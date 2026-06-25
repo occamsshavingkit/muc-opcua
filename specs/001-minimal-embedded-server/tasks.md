@@ -207,8 +207,8 @@
 
 - [X] T123 [P] [US4] Add unsupported Write, CreateSubscription, Publish, Call, HistoryRead, BrowseNext, TranslateBrowsePathsToNodeIds, RegisterNodes, XML, JSON, HTTPS, and WebSockets matrix fixture expecting Bad_ServiceUnsupported or cited transport rejection in tests/fixtures/services/unsupported_services.md (OPC refs: OPC-10000-4 5.9.3.2, 5.9.3.4, 5.9.4.2, 5.9.4.4, 5.9.5.2, 5.9.5.3, 5.11.3.2, 5.11.3.4, 5.11.4.2, 5.11.4.4, 5.12.2.2, 5.12.2.4, 5.14.2.2, 5.14.5.2, 5.14.5.4, 7.38.2; OPC-10000-6 5.3, 5.4.1, 7.4, 7.5.1)
 - [X] T124 [P] [US4] Add malformed MessageChunk size tests for too-small, too-large, and inconsistent declared length in tests/unit/test_message_chunk_errors.c (OPC refs: OPC-10000-6 6.7.2, 6.7.3)
-- [ ] T125 [P] [US4] Add invalid message type and invalid chunk type tests in tests/unit/test_message_chunk_errors.c (OPC refs: OPC-10000-6 6.7.3)
-- [ ] T126 [P] [US4] Add truncated String, negative length, excessive length, and embedded overrun tests asserting Bad_DecodingError for malformed framing and Bad_EncodingLimitsExceeded for over-limit lengths in tests/unit/test_binary_string_errors.c (OPC refs: OPC-10000-4 7.38.2; OPC-10000-6 5.2.2.4)
+- [X] T125 [P] [US4] Add invalid message type and invalid chunk type tests in tests/unit/test_message_chunk_errors.c (OPC refs: OPC-10000-6 6.7.3)
+- [X] T126 [P] [US4] Add truncated String, negative length, excessive length, and embedded overrun tests asserting Bad_DecodingError for malformed framing and Bad_EncodingLimitsExceeded for over-limit lengths in tests/unit/test_binary_string_errors.c (OPC refs: OPC-10000-4 7.38.2; OPC-10000-6 5.2.2.4)
 - [ ] T127 [P] [US4] Add invalid array length and truncated array tests in tests/unit/test_binary_array_errors.c (OPC refs: OPC-10000-6 5.2.5)
 - [ ] T128 [P] [US4] Add invalid NodeId encoding mask tests in tests/unit/test_binary_nodeid_errors.c (OPC refs: OPC-10000-6 5.2.2.9)
 - [ ] T129 [P] [US4] Add invalid ExtensionObject encoding and body length tests in tests/unit/test_binary_extension_object_errors.c (OPC refs: OPC-10000-6 5.2.2.15)
