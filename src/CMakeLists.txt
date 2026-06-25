@@ -6,6 +6,7 @@ add_library(micro_opcua STATIC
     address_space/node_id.c
     address_space/value_source.c
     encoding/binary_reader.c
+    encoding/binary_writer.c
 )
 
 target_include_directories(micro_opcua PUBLIC

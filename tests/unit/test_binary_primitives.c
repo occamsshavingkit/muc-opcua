@@ -8,8 +8,6 @@ void tearDown(void) {}
 
 /* These tests assume binary encoding APIs that will be implemented in subsequent tasks */
 void test_binary_primitive_roundtrip(void) {
-    TEST_IGNORE_MESSAGE("Implement binary primitive roundtrip test");
-#if 0
     opcua_byte_t buffer[64];
     mu_binary_writer_t writer;
     mu_binary_reader_t reader;
@@ -38,7 +36,6 @@ void test_binary_primitive_roundtrip(void) {
     TEST_ASSERT_EQUAL_FLOAT(3.14f, f);
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_statuscode(&reader, &s));
     TEST_ASSERT_EQUAL(MU_STATUS_BAD_INTERNALERROR, s);
-#endif
 }
 
 int main(void) {
