@@ -30,4 +30,8 @@ opcua_statuscode_t mu_session_create(mu_session_t *session,
                                      opcua_uint32_t *session_id,
                                      opcua_uint32_t *auth_token);
 
+opcua_statuscode_t mu_session_activate(mu_session_t *session, 
+                                       opcua_uint32_t auth_token,
+                                       opcua_uint32_t identity_token_encoding_id);
+
 #endif /* MICRO_OPCUA_SERVICES_SESSION_H */

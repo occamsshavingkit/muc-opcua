@@ -22,7 +22,26 @@ void test_session_create(void) {
 }
 
 void test_session_activate_anonymous(void) {
-    TEST_IGNORE_MESSAGE("Implement ActivateSession anonymous identity policy test");
+    mu_session_t session;
+    mu_session_init(&session);
+    
+    double revised_timeout;
+    opcua_uint32_t session_id, auth_token;
+    mu_session_create(&session, 5000.0, &revised_timeout, &session_id, &auth_token);
+    
+    /* Unknown identity token */
+    TEST_ASSERT_EQUAL(MU_STATUS_BAD_IDENTITYTOKENINVALID, 
+                      mu_session_activate(&session, auth_token, 324)); /* UserIdentityToken */
+                      
+    /* Wrong auth token */
+    TEST_ASSERT_EQUAL(MU_STATUS_BAD_SESSIONIDINVALID, 
+                      mu_session_activate(&session, 9999, 321));
+                      
+    /* Success */
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, 
+                      mu_session_activate(&session, auth_token, 321)); /* AnonymousIdentityToken */
+                      
+    TEST_ASSERT_EQUAL(MU_SESSION_STATE_ACTIVATED, session.state);
 }
 
 void test_session_close(void) {

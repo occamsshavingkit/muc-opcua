@@ -43,3 +43,26 @@ opcua_statuscode_t mu_session_create(mu_session_t *session,
 
     return MU_STATUS_GOOD;
 }
+
+opcua_statuscode_t mu_session_activate(mu_session_t *session, 
+                                       opcua_uint32_t auth_token,
+                                       opcua_uint32_t identity_token_encoding_id)
+{
+    if (!session) return MU_STATUS_BAD_INTERNALERROR;
+    
+    if (session->state != MU_SESSION_STATE_CREATED && session->state != MU_SESSION_STATE_ACTIVATED) {
+        return MU_STATUS_BAD_SESSIONIDINVALID;
+    }
+    
+    if (session->auth_token != auth_token) {
+        return MU_STATUS_BAD_SESSIONIDINVALID;
+    }
+    
+    /* We only support anonymous identity tokens per profile */
+    if (identity_token_encoding_id != 321) { /* MU_ID_ANONYMOUSIDENTITYTOKEN_ENCODING_DEFAULTBINARY */
+        return MU_STATUS_BAD_IDENTITYTOKENINVALID;
+    }
+    
+    session->state = MU_SESSION_STATE_ACTIVATED;
+    return MU_STATUS_GOOD;
+}
