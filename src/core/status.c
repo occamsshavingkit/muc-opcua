@@ -13,6 +13,7 @@ const char* mu_status_name(opcua_statuscode_t status)
         case MU_STATUS_BAD_ENCODINGLIMITSEXCEEDED: return "Bad_EncodingLimitsExceeded";
         case MU_STATUS_BAD_TIMEOUT: return "Bad_Timeout";
         case MU_STATUS_BAD_SERVICEUNSUPPORTED: return "Bad_ServiceUnsupported";
+        case MU_STATUS_BAD_NOTREADABLE: return "Bad_NotReadable";
         case MU_STATUS_BAD_SECURITYCHECKSFAILED: return "Bad_SecurityChecksFailed";
         case MU_STATUS_BAD_REQUESTTOOLARGE: return "Bad_RequestTooLarge";
         case MU_STATUS_BAD_RESPONSETOOLARGE: return "Bad_ResponseTooLarge";

@@ -1,6 +1,7 @@
 /* tests/unit/test_address_space_validation.c */
 #include "unity.h"
 #include "micro_opcua/micro_opcua.h"
+#include <string.h>
 
 /* 
  * These tests assume mu_address_space_t and mu_node_t APIs 
@@ -47,4 +48,11 @@ void test_unresolved_references_fail_validation(void) {
     space.node_count = 1;
     
     TEST_ASSERT_NOT_EQUAL(MU_STATUS_GOOD, mu_address_space_validate(&space));
+}
+
+int main(void) {
+    UNITY_BEGIN();
+    RUN_TEST(test_duplicate_nodeids_fail_validation);
+    RUN_TEST(test_unresolved_references_fail_validation);
+    return UNITY_END();
 }

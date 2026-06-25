@@ -31,7 +31,7 @@ static opcua_statuscode_t test_callback_error(void *context, const mu_nodeid_t *
     (void)context;
     (void)node_id;
     (void)value;
-    return MU_STATUS_BAD_DEVICEFAILURE;
+    return MU_STATUS_BAD_INTERNALERROR;
 }
 
 void test_callback_value_source_statuscode_propagation(void) {
@@ -43,5 +43,12 @@ void test_callback_value_source_statuscode_propagation(void) {
     source.data.callback.read = test_callback_error;
     source.data.callback.context = NULL;
     
-    TEST_ASSERT_EQUAL(MU_STATUS_BAD_DEVICEFAILURE, mu_value_source_read(&source, &id, &value));
+    TEST_ASSERT_EQUAL(MU_STATUS_BAD_INTERNALERROR, mu_value_source_read(&source, &id, &value));
+}
+
+int main(void) {
+    UNITY_BEGIN();
+    RUN_TEST(test_callback_value_source_lifetime);
+    RUN_TEST(test_callback_value_source_statuscode_propagation);
+    return UNITY_END();
 }

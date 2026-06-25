@@ -2,6 +2,9 @@
 add_library(micro_opcua STATIC
     core/server.c
     core/status.c
+    address_space/address_space.c
+    address_space/node_id.c
+    address_space/value_source.c
 )
 
 target_include_directories(micro_opcua PUBLIC
