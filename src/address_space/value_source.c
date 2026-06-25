@@ -20,7 +20,12 @@ opcua_statuscode_t mu_value_source_read(const mu_value_source_t *source, const m
             default:
                 return MU_STATUS_BAD_NOTREADABLE;
         }
+    } else if (source->type == MU_VALUESOURCE_CALLBACK) {
+        if (!source->data.callback.read) {
+            return MU_STATUS_BAD_INTERNALERROR;
+        }
+        return source->data.callback.read(source->data.callback.context, node_id, value);
     }
     
-    return MU_STATUS_BAD_INTERNALERROR; /* Callback handled in T059 */
+    return MU_STATUS_BAD_INTERNALERROR;
 }
