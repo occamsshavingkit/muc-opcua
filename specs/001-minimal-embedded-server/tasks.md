@@ -179,7 +179,7 @@
 - [X] T107 [US3] Implement CreateSession response with bounded server nonce/session token fields in src/services/session.c (OPC refs: OPC-10000-4 5.7.2.1, 5.7.2.2, 7.32, 7.33)
 - [X] T108 [US3] Implement ActivateSession identity-token behavior from docs/conformance/identity-policy.md in src/services/session.c (OPC refs: OPC-10000-4 5.7.3.2, 7.40.1, 7.40.3, 7.41)
 - [X] T109 [US3] Implement CloseSession teardown of the single Session slot in src/services/session.c (OPC refs: OPC-10000-4 5.7.4.2)
-- [ ] T110 [US3] Implement FindServers response using ServerConfig identity fields in src/services/discovery.c (OPC refs: OPC-10000-4 5.5.2.2)
+- [X] T110 [US3] Implement FindServers response using ServerConfig identity fields in src/services/discovery.c (OPC refs: OPC-10000-4 5.5.2.2)
 - [ ] T111 [US3] Implement GetEndpoints response with opc.tcp, UA-TCP UA-SC UA-Binary, SecurityPolicy None, and identity policies from docs/conformance/identity-policy.md in src/services/discovery.c (OPC refs: OPC-10000-4 5.5.4.2, 7.14, 7.40.1, 7.40.3, 7.41; OPC-10000-6 7.2)
 - [ ] T112 [US3] Implement Browse request decode and static reference traversal in src/services/browse.c (OPC refs: OPC-10000-4 5.9.2.2; OPC-10000-6 5.2.9)
 - [ ] T113 [US3] Implement Browse response encoding with ReferenceDescription fields in src/services/browse.c (OPC refs: OPC-10000-4 5.9.2.2, 7.29)
