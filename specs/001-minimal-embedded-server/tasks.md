@@ -171,7 +171,7 @@
 - [X] T099 [US3] Define compact request/response encoding IDs and service IDs in src/generated/opcua_ids.c (OPC refs: OPC-10000-4 5.5.2.2, 5.5.4.2, 5.6.2.2, 5.6.3.2, 5.7.2.2, 5.7.3.2, 5.7.4.2, 5.9.2.2, 5.11.2.2; OPC-10000-6 5.2.9)
 - [X] T100 [US3] Implement OPC UA TCP Hello/Acknowledge negotiation and buffer limit checks in src/core/tcp_connection.c (OPC refs: OPC-10000-6 7.1.2.3, 7.1.2.4, 7.2)
 - [X] T101 [US3] Implement UASC MessageChunk header parser and writer in src/core/message_chunk.c (OPC refs: OPC-10000-6 6.7.2, 6.7.3)
-- [ ] T102 [US3] Implement UASC sequence header validation for the single active SecureChannel in src/core/sequence.c (OPC refs: OPC-10000-6 6.7.2.4, 6.7.7)
+- [X] T102 [US3] Implement UASC sequence header validation for the single active SecureChannel in src/core/sequence.c (OPC refs: OPC-10000-6 6.7.2.4, 6.7.7)
 - [ ] T103 [US3] Implement service message body prefix handling using Binary encoding NodeIds in src/core/service_message.c (OPC refs: OPC-10000-6 5.2.2.9, 5.2.9)
 - [ ] T104 [US3] Implement service dispatch table for supported services and request Session requirements in src/core/service_dispatch.c (OPC refs: OPC-10000-4 3.1.3, 5.5.1, 5.5.2.2, 5.5.4.2, 5.6.2.2, 5.6.3.2, 5.7.2.1, 5.7.2.2, 5.7.3.2, 5.7.4.2, 5.9.2.2, 5.11.2.2; OPC-10000-6 5.2.9)
 - [ ] T105 [US3] Implement DiscoveryEndpoint dispatch for FindServers and GetEndpoints without requiring an activated Session in src/core/service_dispatch.c (OPC refs: OPC-10000-4 3.1.3, 5.5.1, 5.5.2.2, 5.5.4.2)

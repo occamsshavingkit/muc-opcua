@@ -41,10 +41,29 @@ void test_message_chunk_parser_invalid_size(void) {
     TEST_ASSERT_EQUAL(MU_STATUS_BAD_TCPMESSAGETOOLARGE, mu_parse_message_header(buffer, 12, &parsed));
 }
 
+#include "../../src/core/sequence.h"
+
+void test_sequence_validation(void) {
+    mu_sequence_validator_t validator;
+    mu_sequence_validator_init(&validator);
+    
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_sequence_validate(&validator, 10));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_sequence_validate(&validator, 11));
+    TEST_ASSERT_EQUAL(MU_STATUS_BAD_SECURITYCHECKSFAILED, mu_sequence_validate(&validator, 11));
+    TEST_ASSERT_EQUAL(MU_STATUS_BAD_SECURITYCHECKSFAILED, mu_sequence_validate(&validator, 13));
+    
+    /* Valid again if we re-init? No, it just aborts. Let's re-init and test wrap around */
+    mu_sequence_validator_init(&validator);
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_sequence_validate(&validator, 4294966272U));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_sequence_validate(&validator, 4294966273U));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_sequence_validate(&validator, 1));
+}
+
 int main(void) {
     UNITY_BEGIN();
     RUN_TEST(test_message_chunk_parser_valid_header);
     RUN_TEST(test_message_chunk_parser_invalid_message_type);
     RUN_TEST(test_message_chunk_parser_invalid_size);
+    RUN_TEST(test_sequence_validation);
     return UNITY_END();
 }
