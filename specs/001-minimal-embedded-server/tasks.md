@@ -111,7 +111,7 @@
 - [X] T055 [US2] Add address-space declarations to the umbrella include in include/micro_opcua/micro_opcua.h (OPC refs: OPC-10000-3 5.2.1, 5.5.1, 5.6.2, 5.9)
 - [X] T056 [US2] Implement NodeId equality, namespace bounds, and lookup helpers in src/address_space/node_id.c (OPC refs: OPC-10000-6 5.2.2.9)
 - [X] T057 [US2] Implement static address-space validation for duplicate nodes and invalid references in src/address_space/address_space.c (OPC refs: OPC-10000-3 5.2.1, 5.5.1, 5.6.2)
-- [ ] T058 [US2] Implement fixed value-source reads for Boolean, Int32, UInt32, Float, and bounded String in src/address_space/value_source.c (OPC refs: OPC-10000-3 5.9; OPC-10000-6 5.2.1, 5.2.2.4)
+- [X] T058 [US2] Implement fixed value-source reads for Boolean, Int32, UInt32, Float, and bounded String in src/address_space/value_source.c (OPC refs: OPC-10000-3 5.9; OPC-10000-6 5.2.1, 5.2.2.4)
 - [ ] T059 [US2] Implement callback value-source reads with caller-owned lifetime rules in src/address_space/value_source.c (OPC refs: OPC-10000-4 5.11.2.3, 7.38.2)
 - [ ] T060 [US2] Implement 64-byte bounded String validation returning Bad_EncodingLimitsExceeded for over-limit values in src/address_space/value_source.c (OPC refs: OPC-10000-4 7.38.2; OPC-10000-6 5.2.2.4)
 - [ ] T061 [US2] Wire address-space sources into the core library target in CMakeLists.txt (OPC refs: N/A - build infrastructure only)
