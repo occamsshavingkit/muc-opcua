@@ -21,8 +21,19 @@ void test_unsupported_security_policy(void) {
                       mu_secure_channel_open(&channel, &invalid_policy, 1000, &revised_lifetime));
 }
 
+#include "../../src/services/session.h"
+
 void test_unsupported_identity_token(void) {
-    TEST_IGNORE_MESSAGE("To be implemented in T144");
+    mu_session_t session;
+    mu_session_init(&session);
+    
+    double revised_timeout;
+    opcua_uint32_t session_id, auth_token;
+    mu_session_create(&session, 10000.0, &revised_timeout, &session_id, &auth_token);
+    
+    /* 321 is AnonymousIdentityToken. 324 is UserNameIdentityToken, which is unsupported */
+    TEST_ASSERT_EQUAL(MU_STATUS_BAD_IDENTITYTOKENINVALID, 
+                      mu_session_activate(&session, auth_token, 324));
 }
 
 int main(void) {
