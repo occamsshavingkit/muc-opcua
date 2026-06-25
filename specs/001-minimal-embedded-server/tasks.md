@@ -141,7 +141,7 @@
 - [X] T072 [P] [US3] Add Hello/Acknowledge byte fixtures and sidecars in tests/fixtures/opcua-tcp/hello_ack.md (OPC refs: OPC-10000-6 7.1.2.3, 7.1.2.4)
 - [X] T073 [P] [US3] Add MessageChunk header and sequence header fixtures in tests/fixtures/uasc/message_chunk.md (OPC refs: OPC-10000-6 6.7.2, 6.7.2.4)
 - [X] T074 [P] [US3] Add OpenSecureChannel SecurityPolicy None fixtures in tests/fixtures/services/open_secure_channel.md (OPC refs: OPC-10000-4 5.6.2.2; OPC-10000-6 6.7.4, 6.7.7)
-- [ ] T075 [P] [US3] Add FindServers and GetEndpoints fixtures in tests/fixtures/services/discovery.md (OPC refs: OPC-10000-4 5.5.2.2, 5.5.4.2)
+- [X] T075 [P] [US3] Add FindServers and GetEndpoints fixtures in tests/fixtures/services/discovery.md (OPC refs: OPC-10000-4 5.5.2.2, 5.5.4.2)
 - [ ] T076 [P] [US3] Add DiscoveryEndpoint no-session unit tests for FindServers and GetEndpoints in tests/unit/test_discovery_endpoint.c (OPC refs: OPC-10000-4 3.1.3, 5.5.1, 5.5.2.2, 5.5.4.2)
 - [ ] T077 [P] [US3] Add host integration test proving FindServers and GetEndpoints work before CreateSession/ActivateSession in tests/integration/test_discovery_endpoint_no_session.c (OPC refs: OPC-10000-4 3.1.3, 5.5.1, 5.5.2.2, 5.5.4.2)
 - [ ] T078 [P] [US3] Add CreateSession, ActivateSession, and CloseSession fixtures in tests/fixtures/services/session.md (OPC refs: OPC-10000-4 5.7.2.2, 5.7.3.2, 5.7.4.2)
