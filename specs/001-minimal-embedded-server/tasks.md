@@ -72,7 +72,7 @@
 - [X] T032 [US1] Define public OPC UA StatusCode constants and status helper prototypes in include/micro_opcua/status.h (OPC refs: OPC-10000-4 7.38.2; OPC-10000-6 7.1.5)
 - [X] T033 [US1] Define TCP, time, entropy, persistence, and crypto adapter interfaces in include/micro_opcua/platform.h (OPC refs: OPC-10000-4 5.6.2.2; OPC-10000-6 7.2)
 - [X] T034 [US1] Define server config, storage, lifecycle, and validation APIs in include/micro_opcua/server.h (OPC refs: OPC-10000-4 5.6.2.2, 5.7.2.2; OPC-10000-6 7.1.2.3, 7.1.2.4, 7.2)
-- [ ] T035 [US1] Create umbrella public include that exposes config, types, status, platform, address-space, and server headers in include/micro_opcua/micro_opcua.h (OPC refs: N/A - header aggregation only)
+- [X] T035 [US1] Create umbrella public include that exposes config, types, status, platform, address-space, and server headers in include/micro_opcua/micro_opcua.h (OPC refs: N/A - header aggregation only)
 - [ ] T036 [US1] Implement StatusCode constants and `mu_status_name` in src/core/status.c (OPC refs: OPC-10000-4 7.38.2; OPC-10000-6 7.1.5)
 - [ ] T037 [US1] Implement server config validation for endpoint scheme, caller buffers, limits, and adapter pointers in src/core/server.c (OPC refs: OPC-10000-6 7.1.2.3, 7.1.2.4, 7.2)
 - [ ] T038 [US1] Implement fixed-storage server init, bounded poll stub, and close without hot-path heap allocation in src/core/server.c (OPC refs: N/A - embedded lifecycle and memory discipline only)
