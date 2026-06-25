@@ -26,8 +26,6 @@ void test_binary_variant_roundtrip(void) {
 }
 
 void test_binary_datavalue_roundtrip(void) {
-    TEST_IGNORE_MESSAGE("Implement binary DataValue test");
-#if 0
     opcua_byte_t buffer[128];
     mu_binary_writer_t writer;
     mu_binary_reader_t reader;
@@ -36,7 +34,7 @@ void test_binary_datavalue_roundtrip(void) {
     memset(&datavalue, 0, sizeof(datavalue));
     datavalue.has_value = true;
     datavalue.value.type = MU_TYPE_INT32;
-    datavalue.value.data.i32 = 42;
+    datavalue.value.value.i32 = 42;
     datavalue.has_status = true;
     datavalue.status = MU_STATUS_GOOD;
     
@@ -49,10 +47,9 @@ void test_binary_datavalue_roundtrip(void) {
     
     TEST_ASSERT_TRUE(read_datavalue.has_value);
     TEST_ASSERT_EQUAL(MU_TYPE_INT32, read_datavalue.value.type);
-    TEST_ASSERT_EQUAL(42, read_datavalue.value.data.i32);
+    TEST_ASSERT_EQUAL(42, read_datavalue.value.value.i32);
     TEST_ASSERT_TRUE(read_datavalue.has_status);
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, read_datavalue.status);
-#endif
 }
 
 int main(void) {
