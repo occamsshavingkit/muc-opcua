@@ -3,6 +3,7 @@
 #define MICRO_OPCUA_SERVICES_SECURE_CHANNEL_H
 
 #include "micro_opcua/opcua_types.h"
+#include "micro_opcua/types.h"
 #include "micro_opcua/status.h"
 #include "../core/sequence.h"
 

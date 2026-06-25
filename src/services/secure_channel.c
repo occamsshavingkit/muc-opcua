@@ -1,6 +1,7 @@
 /* src/services/secure_channel.c */
 #include "secure_channel.h"
 #include <stddef.h>
+#include <string.h>
 
 void mu_secure_channel_init(mu_secure_channel_t *channel) {
     if (channel) {
