@@ -222,7 +222,7 @@
 
 ### Implementation for User Story 4
 
-- [ ] T137 [US4] Implement unsupported-service dispatch to Bad_ServiceUnsupported in src/core/service_dispatch.c (OPC refs: OPC-10000-4 7.38.2)
+- [X] T137 [US4] Implement unsupported-service dispatch to Bad_ServiceUnsupported in src/core/service_dispatch.c (OPC refs: OPC-10000-4 7.38.2)
 - [ ] T138 [US4] Implement MessageChunk size, type, and chunk validation failures in src/core/message_chunk.c (OPC refs: OPC-10000-6 6.7.2, 6.7.3)
 - [ ] T139 [US4] Implement Binary reader bounds errors for truncated primitive, String, and array reads in src/encoding/binary_reader.c (OPC refs: OPC-10000-6 5.2.1, 5.2.2.4, 5.2.5)
 - [ ] T140 [US4] Implement NodeId invalid encoding mask rejection in src/encoding/binary_nodeid.c (OPC refs: OPC-10000-6 5.2.2.9)
