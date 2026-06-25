@@ -148,7 +148,7 @@
 - [X] T079 [P] [US3] Add Browse fixture for the default static address space in tests/fixtures/services/browse.md (OPC refs: OPC-10000-4 5.9.2.2, 7.29)
 - [X] T080 [P] [US3] Add Browse limits tests for requestedMaxReferencesPerNode, response-size bounds, and no continuation points in tests/unit/test_browse_limits.c (OPC refs: OPC-10000-4 5.9.2.2, 5.9.2.4, 7.9)
 - [X] T081 [P] [US3] Add BrowseNext unsupported-service fixture expecting Bad_ServiceUnsupported in tests/fixtures/services/browse_next_unsupported.md (OPC refs: OPC-10000-4 5.9.3.2, 5.9.3.4, 7.38.2)
-- [ ] T082 [P] [US3] Add Read fixtures for Boolean, Int32, UInt32, Float, and bounded String in tests/fixtures/services/read.md (OPC refs: OPC-10000-4 5.11.2.2, 5.11.2.3)
+- [X] T082 [P] [US3] Add Read fixtures for Boolean, Int32, UInt32, Float, and bounded String in tests/fixtures/services/read.md (OPC refs: OPC-10000-4 5.11.2.2, 5.11.2.3)
 - [ ] T083 [P] [US3] Add TCP connection state tests for Hello/Acknowledge negotiation and 8192-byte default buffers in tests/unit/test_tcp_connection.c (OPC refs: OPC-10000-6 7.1.2.3, 7.1.2.4, 7.2)
 - [ ] T084 [P] [US3] Add MessageChunk parser tests for message type, chunk type, size, SecureChannelId, and sequence header in tests/unit/test_message_chunk.c (OPC refs: OPC-10000-6 6.7.2, 6.7.2.4, 6.7.3)
 - [ ] T085 [P] [US3] Add service dispatch tests for known Discovery, SecureChannel, Session, Browse, and Read request IDs in tests/unit/test_service_dispatch.c (OPC refs: OPC-10000-4 5.5.2.2, 5.5.4.2, 5.6.2.2, 5.6.3.2, 5.7.2.2, 5.7.3.2, 5.7.4.2, 5.9.2.2, 5.11.2.2; OPC-10000-6 5.2.9)
