@@ -20,6 +20,8 @@
 #define MU_STATUS_BAD_RESPONSETOOLARGE          0x80B90000
 #define MU_STATUS_BAD_SESSIONIDINVALID        ((opcua_statuscode_t)0x80250000)
 #define MU_STATUS_BAD_IDENTITYTOKENINVALID    ((opcua_statuscode_t)0x80200000)
+#define MU_STATUS_BAD_SECURECHANNELIDINVALID  ((opcua_statuscode_t)0x80210000)
+#define MU_STATUS_BAD_SESSIONCLOSED           ((opcua_statuscode_t)0x80260000)
 #define MU_STATUS_BAD_NODEIDUNKNOWN           ((opcua_statuscode_t)0x80340000)
 #define MU_STATUS_BAD_TOOMANYOPERATIONS       ((opcua_statuscode_t)0x80100000)
 #define MU_STATUS_BAD_NOCONTINUATIONPOINTS    ((opcua_statuscode_t)0x80140000)

@@ -48,6 +48,20 @@ opcua_statuscode_t mu_service_dispatch(
         return MU_STATUS_BAD_SERVICEUNSUPPORTED;
     }
 
+    if (request_id != MU_ID_OPENSECURECHANNELREQUEST) {
+        if (!server->secure_channel.is_open) {
+            /* If we haven't even opened a secure channel, we can't process requests over it */
+            /* OPC UA Part 4, 7.38.2: Bad_SecureChannelIdInvalid */
+            return MU_STATUS_BAD_SECURECHANNELIDINVALID; 
+        }
+    }
+
+    if (handler->requires_session) {
+        if (server->session.state != MU_SESSION_STATE_ACTIVATED) {
+            return MU_STATUS_BAD_SESSIONIDINVALID;
+        }
+    }
+
     /* Handlers to be integrated later */
     
     return MU_STATUS_GOOD;
