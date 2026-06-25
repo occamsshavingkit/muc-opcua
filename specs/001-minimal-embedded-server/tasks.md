@@ -161,7 +161,7 @@
 
 ### Implementation for User Story 3
 
-- [ ] T092 [US3] Implement bounded Binary reader cursor with little-endian primitive reads in src/encoding/binary_reader.c (OPC refs: OPC-10000-6 5.2.1)
+- [X] T092 [US3] Implement bounded Binary reader cursor with little-endian primitive reads in src/encoding/binary_reader.c (OPC refs: OPC-10000-6 5.2.1)
 - [ ] T093 [US3] Implement bounded Binary writer cursor with little-endian primitive writes in src/encoding/binary_writer.c (OPC refs: OPC-10000-6 5.2.1)
 - [ ] T094 [US3] Implement OPC UA Binary String encode/decode with null and length handling in src/encoding/binary_string.c (OPC refs: OPC-10000-6 5.2.2.4)
 - [ ] T095 [US3] Implement OPC UA Binary NodeId encode/decode for v1 numeric and string variants in src/encoding/binary_nodeid.c (OPC refs: OPC-10000-6 5.2.2.9)
