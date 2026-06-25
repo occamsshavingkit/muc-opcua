@@ -6,6 +6,7 @@ void setUp(void) {}
 void tearDown(void) {}
 
 #include "../../src/core/tcp_connection.h"
+#include <string.h>
 
 void test_tcp_hello_acknowledge_negotiation(void) {
     mu_server_config_t config;

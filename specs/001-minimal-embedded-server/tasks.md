@@ -186,7 +186,7 @@
 - [X] T114 [US3] Implement Browse requestedMaxReferencesPerNode, response-size bounds, and no-continuation behavior in src/services/browse.c (OPC refs: OPC-10000-4 5.9.2.2, 5.9.2.4, 7.9)
 - [X] T115 [US3] Implement Read request decode for Value and metadata attributes needed by tested clients in src/services/read.c (OPC refs: OPC-10000-4 5.11.2.2, 5.11.2.3; OPC-10000-6 5.2.9)
 - [X] T116 [US3] Implement Read response encoding with DataValue values from the static address space in src/services/read.c (OPC refs: OPC-10000-4 5.11.2.3; OPC-10000-6 5.2.2.17)
-- [ ] T117 [US3] Integrate TCP, chunk, dispatch, service handlers, and bounded server poll loop in src/core/server.c (OPC refs: OPC-10000-4 5.5.1, 5.5.2.2, 5.5.4.2, 5.6.2.2, 5.6.3.2, 5.7.2.2, 5.7.3.2, 5.7.4.2, 5.9.2.2, 5.11.2.2; OPC-10000-6 6.7.2, 6.7.4, 7.1.2.3, 7.1.2.4, 7.2)
+- [X] T117 [US3] Integrate TCP, chunk, dispatch, service handlers, and bounded server poll loop in src/core/server.c (OPC refs: OPC-10000-4 5.5.1, 5.5.2.2, 5.5.4.2, 5.6.2.2, 5.6.3.2, 5.7.2.2, 5.7.3.2, 5.7.4.2, 5.9.2.2, 5.11.2.2; OPC-10000-6 6.7.2, 6.7.4, 7.1.2.3, 7.1.2.4, 7.2)
 - [ ] T118 [US3] Implement host socket transport adapter for integration tests without exposing POSIX types in src/platform/host_tcp_adapter.c (OPC refs: OPC-10000-6 7.2)
 - [ ] T119 [US3] Update minimal host server to listen on opc.tcp endpoint and drive `mu_server_poll` in examples/minimal_server/main.c (OPC refs: OPC-10000-6 7.2)
 - [ ] T120 [US3] Add CMake registration for encoding, core transport, service sources, and integration test target in CMakeLists.txt (OPC refs: N/A - build infrastructure only)

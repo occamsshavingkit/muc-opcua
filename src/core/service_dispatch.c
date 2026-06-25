@@ -1,5 +1,12 @@
 /* src/core/service_dispatch.c */
 #include "service_dispatch.h"
+#include "server_internal.h"
+#include "micro_opcua/encoding.h"
+#include "../services/discovery.h"
+#include "../services/session.h"
+#include "../services/secure_channel.h"
+#include "../services/browse.h"
+#include "../services/read.h"
 #include <stddef.h>
 
 static const mu_service_handler_t g_supported_services[] = {
