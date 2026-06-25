@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include "static_address_space.h"
 
 #define STORAGE_BYTES 4096
 static opcua_byte_t g_server_storage[STORAGE_BYTES];
@@ -89,6 +90,8 @@ int main(void)
     config.time_adapter.get_tick_ms = stub_get_tick_ms;
 
     config.entropy_adapter.generate_random = stub_generate_random;
+
+    config.address_space = &g_minimal_address_space;
 
     printf("Initializing Micro OPC UA Server...\n");
     status = mu_server_init(g_server_storage, sizeof(g_server_storage), &config, &server);

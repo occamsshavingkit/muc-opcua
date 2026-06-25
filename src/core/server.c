@@ -49,6 +49,14 @@ opcua_statuscode_t mu_server_config_validate(const mu_server_config_t *config)
         return MU_STATUS_BAD_INTERNALERROR;
     }
 
+    /* Validate address space if provided */
+    if (config->address_space != NULL) {
+        opcua_statuscode_t status = mu_address_space_validate(config->address_space);
+        if (status != MU_STATUS_GOOD) {
+            return status;
+        }
+    }
+
     return MU_STATUS_GOOD;
 }
 

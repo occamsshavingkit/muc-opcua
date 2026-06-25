@@ -5,6 +5,7 @@
 #include "micro_opcua/platform.h"
 #include "micro_opcua/config.h"
 #include "micro_opcua/status.h"
+#include "micro_opcua/address_space.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -44,6 +45,9 @@ typedef struct {
     /* Optional Adapters */
     mu_persistence_adapter_t *persistence_adapter; /* NULL if unsupported */
     mu_crypto_adapter_t *crypto_adapter;           /* NULL if unsupported */
+    
+    /* Static Address Space (optional) */
+    const mu_address_space_t *address_space;
     
 } mu_server_config_t;
 
