@@ -2,6 +2,11 @@
 #include "micro_opcua/server.h"
 #include <string.h>
 
+struct mu_server {
+    mu_server_config_t config;
+    opcua_boolean_t is_running;
+};
+
 opcua_statuscode_t mu_server_config_validate(const mu_server_config_t *config)
 {
     if (config == NULL) {
@@ -45,4 +50,65 @@ opcua_statuscode_t mu_server_config_validate(const mu_server_config_t *config)
     }
 
     return MU_STATUS_GOOD;
+}
+
+opcua_statuscode_t mu_server_init(void *storage, size_t storage_size, const mu_server_config_t *config, mu_server_t **out_server)
+{
+    mu_server_t *server;
+    opcua_statuscode_t status;
+
+    if (storage == NULL || out_server == NULL || config == NULL) {
+        return MU_STATUS_BAD_INTERNALERROR;
+    }
+
+    if (storage_size < sizeof(struct mu_server)) {
+        return MU_STATUS_BAD_OUTOFMEMORY;
+    }
+
+    status = mu_server_config_validate(config);
+    if (status != MU_STATUS_GOOD) {
+        return status;
+    }
+
+    /* Initialize without heap */
+    server = (mu_server_t *)storage;
+    memset(server, 0, sizeof(struct mu_server));
+    server->config = *config;
+    server->is_running = true;
+
+    /* Initialize platform TCP adapter */
+    status = server->config.tcp_adapter.listen(server->config.tcp_adapter.context, server->config.endpoint_url);
+    if (status != MU_STATUS_GOOD) {
+        return status;
+    }
+
+    *out_server = server;
+    return MU_STATUS_GOOD;
+}
+
+opcua_statuscode_t mu_server_poll(mu_server_t *server)
+{
+    if (server == NULL || !server->is_running) {
+        return MU_STATUS_BAD_INTERNALERROR;
+    }
+
+    /* 
+     * Bounded poll stub.
+     * In a full implementation, this would accept connections,
+     * read data, process messages, and write responses.
+     */
+     
+    /* TBD: Poll connections */
+
+    return MU_STATUS_GOOD;
+}
+
+void mu_server_close(mu_server_t *server)
+{
+    if (server != NULL) {
+        server->is_running = false;
+        if (server->config.tcp_adapter.shutdown != NULL) {
+            server->config.tcp_adapter.shutdown(server->config.tcp_adapter.context);
+        }
+    }
 }

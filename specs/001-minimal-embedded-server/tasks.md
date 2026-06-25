@@ -75,7 +75,7 @@
 - [X] T035 [US1] Create umbrella public include that exposes config, types, status, platform, address-space, and server headers in include/micro_opcua/micro_opcua.h (OPC refs: N/A - header aggregation only)
 - [X] T036 [US1] Implement StatusCode constants and `mu_status_name` in src/core/status.c (OPC refs: OPC-10000-4 7.38.2; OPC-10000-6 7.1.5)
 - [X] T037 [US1] Implement server config validation for endpoint scheme, caller buffers, limits, and adapter pointers in src/core/server.c (OPC refs: OPC-10000-6 7.1.2.3, 7.1.2.4, 7.2)
-- [ ] T038 [US1] Implement fixed-storage server init, bounded poll stub, and close without hot-path heap allocation in src/core/server.c (OPC refs: N/A - embedded lifecycle and memory discipline only)
+- [X] T038 [US1] Implement fixed-storage server init, bounded poll stub, and close without hot-path heap allocation in src/core/server.c (OPC refs: N/A - embedded lifecycle and memory discipline only)
 - [ ] T039 [US1] Add portable core library target and public include directories in CMakeLists.txt (OPC refs: N/A - build infrastructure only)
 - [ ] T040 [US1] Add host test support fake platform callbacks for TCP/time/entropy in tests/support/fake_platform.c (OPC refs: N/A - host test support only)
 - [ ] T041 [US1] Add minimal host example skeleton using caller-owned buffers and no network behavior yet in examples/minimal_server/main.c (OPC refs: N/A - example skeleton without protocol behavior)
