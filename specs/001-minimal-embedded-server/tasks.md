@@ -249,7 +249,7 @@
 
 ### Tests for User Story 5
 
-- [ ] T151 [P] [US5] Add traceability completeness test that fails if protocol source or test files lack OPC UA section rows in tests/unit/test_traceability_docs.c (OPC refs: N/A - traceability enforcement tooling; validates cited section rows)
+- [ ] T151 [P] [US5] Add traceability completeness and OPC UA MCP provenance coverage test that fails if protocol source or test files lack OPC UA section rows or if plan-cited protocol/conformance decisions lack query-ledger entries in tests/unit/test_traceability_docs.c (OPC refs: N/A - traceability enforcement tooling; validates cited section rows and MCP query provenance)
 - [ ] T152 [P] [US5] Add conformance-claim lint test forbidding profile-compliant or CTT-verified claims without evidence in tests/unit/test_conformance_docs.c (OPC refs: OPC-10000-7 3.1.5, 4.2, 4.4, 4.6, 4.7, 4.8)
 - [ ] T153 [P] [US5] Add size-report parser test for flash, RAM, stack, heap, buffer, and static-table fields in tests/unit/test_size_report.c (OPC refs: N/A - size-report validation only)
 - [ ] T154 [P] [US5] Add async-opcua inventory validation test for required repository areas in tests/unit/test_async_opcua_inventory.c (OPC refs: N/A - external compliance-suite inventory only)
@@ -266,7 +266,7 @@
 - [ ] T162 [US5] Implement host size-report generation and output template in docs/size/host-minimal-server.md (OPC refs: N/A - size-report documentation only)
 - [ ] T163 [US5] Implement Pico size-report generation and output template in docs/size/pico-minimal-server.md (OPC refs: N/A - size-report documentation only)
 - [ ] T164 [US5] Add CMake size-report target that writes docs/size/host-minimal-server.md and docs/size/pico-minimal-server.md in cmake/MicroOpcUaSizeReport.cmake (OPC refs: N/A - size-report build tooling only)
-- [ ] T165 [US5] Update CI workflow to run traceability, conformance-doc, and size-report checks in .github/workflows/ci.yml (OPC refs: N/A - CI orchestration only)
+- [ ] T165 [US5] Update CI workflow to run traceability, conformance-doc, and size-report checks, including <= 128 KiB flash, <= 32 KiB RAM, and <= 16 KiB static-table threshold comparison that fails or flags regressions, in .github/workflows/ci.yml (OPC refs: N/A - CI orchestration only)
 - [ ] T166 [US5] Update quickstart validation commands to match implemented CMake targets in specs/001-minimal-embedded-server/quickstart.md (OPC refs: N/A - quickstart command documentation only)
 - [ ] T167 [US5] Record US5 documentation, scripts, and CI size impact in docs/size/feature-size-ledger.md (OPC refs: N/A - size-impact tracking only)
 

@@ -45,8 +45,9 @@ requiring application heap allocation in the protocol hot path.
 ### User Story 2 - Configure a Tiny Static Address Space (Priority: P2)
 
 An embedded firmware developer can configure server identity, endpoint URL,
-caller-provided transport buffers, and a tiny static address space containing a
-few read-only variables with fixed values or read callbacks.
+caller-provided transport buffers, and a tiny static address space containing
+the five first-version read-only scalar value kinds with fixed values or read
+callbacks.
 
 **Why this priority**: A useful embedded server must expose application data while
 preserving explicit memory ownership and predictable resource use.
@@ -57,7 +58,7 @@ variables are visible to the server core and remain read-only.
 
 **Acceptance Scenarios**:
 
-1. **Given** an application provides server identity, endpoint URL, buffers, and three read-only variables, **When** the server starts, **Then** the configured identity, endpoint, and variables are available to supported OPC UA services.
+1. **Given** an application provides server identity, endpoint URL, buffers, and read-only variables covering Boolean, Int32, UInt32, Float, and bounded String values, **When** the server starts, **Then** the configured identity, endpoint, and variables are available to supported OPC UA services.
 2. **Given** the configured address space contains read-only variables, **When** an unsupported write path is requested, **Then** the server returns the specified OPC UA StatusCode and does not mutate application data.
 3. **Given** application-owned storage is used, **When** the server processes requests, **Then** it does not take ownership of application memory beyond documented lifetimes.
 
@@ -237,8 +238,8 @@ against the agreed embedded budget.
   Int32, UInt32, Float, and bounded String in the first-version static address
   space.
 - **FR-031**: System MUST limit first-version bounded String Variable values to a
-  maximum encoded length of 64 UTF-8 bytes and reject or truncate longer values
-  only according to documented, tested behavior selected during planning.
+  maximum encoded length of 64 UTF-8 bytes and reject longer values according to
+  documented, tested behavior selected during planning.
 
 ### OPC UA Normative Scope *(mandatory for protocol features)*
 

@@ -25,7 +25,7 @@ The first server surface is intentionally narrow: endpoint discovery, OPC UA TCP
 
 **Performance Goals**: Complete the minimal connect/discover/browse/read flow for one active client, one SecureChannel, and one Session without protocol hot-path heap allocation. Process malformed decoder input deterministically without unbounded recursion, unbounded loops, or buffer growth.
 
-**Constraints**: Caller-provided buffers; default single client/channel/session; no subscriptions, writes, methods, history, alarms/events, PubSub, XML, JSON, HTTPS, WebSockets, dynamic address-space mutation, or companion-spec modeling in v1 unless Nano profile research proves a requirement. First-version scalar variable values are Boolean, Int32, UInt32, Float, and bounded String with a maximum encoded payload of 64 UTF-8 bytes. Variable strings or decoded wire strings (e.g., SessionName, EndpointUrl) exceeding their limits (64 bytes for variables/wire strings) are strictly rejected rather than truncated, returning Bad_EncodingLimitsExceeded (malformed wire framing, such as truncated or negative lengths, remains Bad_DecodingError). For Browse requests requiring a continuation point, the server returns Bad_NoContinuationPoints. Only Anonymous user identity tokens are supported, and any other token type is rejected with Bad_IdentityTokenInvalid.
+**Constraints**: Caller-provided buffers; default single client/channel/session; no subscriptions, writes, methods, history, alarms/events, PubSub, XML, JSON, HTTPS, WebSockets, dynamic address-space mutation, or companion-spec modeling in v1 unless Nano profile research proves a requirement. First-version scalar variable values are Boolean, Int32, UInt32, Float, and bounded String with a maximum encoded payload of 64 UTF-8 bytes. That 64-byte limit applies to bounded String Variable values; service/request string fields may use separate documented per-field limits. Bounded String Variable values exceeding their limit are strictly rejected rather than truncated, returning Bad_EncodingLimitsExceeded (malformed wire framing, such as truncated or negative lengths, remains Bad_DecodingError). For Browse requests requiring a continuation point, the server returns Bad_NoContinuationPoints. Only Anonymous user identity tokens are supported, and any other token type is rejected with Bad_IdentityTokenInvalid.
 
 **Scale/Scope**: Tiny static address space suitable for an embedded device example: server root/object nodes plus a small application folder and a handful of read-only variable nodes. Static model size, reference count, and operation limits must be documented in generated traceability and size reports.
 
@@ -63,7 +63,7 @@ The first server surface is intentionally narrow: endpoint discovery, OPC UA TCP
 
 ## Constitution Check
 
-*GATE: Passed before Phase 0 research. Re-check after Phase 1 design.*
+*GATE: Passed before Phase 0 research and re-checked after Phase 1 design using the final plan, research, data model, contracts, and generated tasks.*
 
 | Principle | Status | Evidence |
 |-----------|--------|----------|
@@ -97,6 +97,18 @@ specs/001-minimal-embedded-server/
 ### Source Code (repository root)
 
 ```text
+CMakeLists.txt
+cmake/
+|-- MicroOpcUaOptions.cmake
+|-- MicroOpcUaStaticAnalysis.cmake
+|-- MicroOpcUaTraceability.cmake
+`-- MicroOpcUaSizeReport.cmake
+scripts/
+|-- size-report.sh
+`-- generate-traceability.sh
+.github/
+`-- workflows/
+    `-- ci.yml
 include/
 `-- micro_opcua/
     |-- micro_opcua.h          # Umbrella public API
@@ -128,6 +140,7 @@ docs/
 |-- adr/                       # Toolchain, profile, memory, security decisions
 |-- conformance/               # Current conformance status and profile evidence
 |-- size/                      # Flash/RAM reports
+|-- validation/                # Recorded validation command outputs and results
 `-- traceability/              # Generated implementation/test/spec mappings
 ```
 
