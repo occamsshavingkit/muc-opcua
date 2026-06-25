@@ -27,10 +27,23 @@
 #define MU_ID_BROWSERESPONSE                  530
 #define MU_ID_BROWSENEXTREQUEST               533
 #define MU_ID_BROWSENEXTRESPONSE              536
+#define MU_ID_TRANSLATEBROWSEPATHSTONODEIDSREQUEST 554
+#define MU_ID_TRANSLATEBROWSEPATHSTONODEIDSRESPONSE 557
+#define MU_ID_REGISTERNODESREQUEST                560
+#define MU_ID_REGISTERNODESRESPONSE               563
 
 #define MU_ID_READREQUEST                     631
 #define MU_ID_READRESPONSE                    634
+#define MU_ID_HISTORYREADREQUEST              664
+#define MU_ID_HISTORYREADRESPONSE             667
 #define MU_ID_WRITEREQUEST                    673
 #define MU_ID_WRITERESPONSE                   676
+#define MU_ID_CALLREQUEST                     712
+#define MU_ID_CALLRESPONSE                    715
+
+#define MU_ID_CREATESUBSCRIPTIONREQUEST       787
+#define MU_ID_CREATESUBSCRIPTIONRESPONSE      790
+#define MU_ID_PUBLISHREQUEST                  826
+#define MU_ID_PUBLISHRESPONSE                 829
 
 #endif /* MICRO_OPCUA_OPCUA_IDS_H */
