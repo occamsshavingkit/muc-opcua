@@ -12,6 +12,8 @@ if(MICRO_OPCUA_BUILD_TESTS)
     )
     FetchContent_MakeAvailable(unity)
 
+    add_subdirectory(support)
+
     # We will add these as they are implemented
     add_subdirectory(unit)
     # add_subdirectory(integration)

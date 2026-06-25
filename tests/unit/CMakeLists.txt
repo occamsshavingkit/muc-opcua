@@ -11,6 +11,9 @@ function(add_unity_test test_name test_source)
     if(TARGET micro_opcua)
         target_link_libraries(${test_name} PRIVATE micro_opcua)
     endif()
+    if(TARGET micro_opcua_test_support)
+        target_link_libraries(${test_name} PRIVATE micro_opcua_test_support)
+    endif()
     
     # Register with CTest
     add_test(NAME ${test_name} COMMAND ${test_name})
