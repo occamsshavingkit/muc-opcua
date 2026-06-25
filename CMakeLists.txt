@@ -10,7 +10,7 @@ set(MICRO_OPCUA_PLATFORM "host" CACHE STRING "Target platform (host, pico, ardui
 
 # Phase 1 setup will include other cmake files
 include(cmake/MicroOpcUaOptions.cmake)
-# include(cmake/MicroOpcUaWarnings.cmake)
+include(cmake/MicroOpcUaWarnings.cmake)
 # include(cmake/MicroOpcUaStaticAnalysis.cmake)
 
 # if(MICRO_OPCUA_BUILD_TESTS OR MICRO_OPCUA_BUILD_FUZZERS)
