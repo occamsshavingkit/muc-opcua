@@ -9,6 +9,6 @@
 #include "micro_opcua/platform.h"
 #include "micro_opcua/server.h"
 
-/* Note: address_space.h will be added here in US2 */
+#include "micro_opcua/address_space.h"
 
 #endif /* MICRO_OPCUA_H */

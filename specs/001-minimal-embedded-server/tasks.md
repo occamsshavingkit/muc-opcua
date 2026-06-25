@@ -108,7 +108,7 @@
 ### Implementation for User Story 2
 
 - [X] T054 [US2] Define public address-space node, reference, value-source, and callback types in include/micro_opcua/address_space.h (OPC refs: OPC-10000-3 5.2.1, 5.5.1, 5.6.2, 5.9; OPC-10000-6 5.2.2.9)
-- [ ] T055 [US2] Add address-space declarations to the umbrella include in include/micro_opcua/micro_opcua.h (OPC refs: OPC-10000-3 5.2.1, 5.5.1, 5.6.2, 5.9)
+- [X] T055 [US2] Add address-space declarations to the umbrella include in include/micro_opcua/micro_opcua.h (OPC refs: OPC-10000-3 5.2.1, 5.5.1, 5.6.2, 5.9)
 - [ ] T056 [US2] Implement NodeId equality, namespace bounds, and lookup helpers in src/address_space/node_id.c (OPC refs: OPC-10000-6 5.2.2.9)
 - [ ] T057 [US2] Implement static address-space validation for duplicate nodes and invalid references in src/address_space/address_space.c (OPC refs: OPC-10000-3 5.2.1, 5.5.1, 5.6.2)
 - [ ] T058 [US2] Implement fixed value-source reads for Boolean, Int32, UInt32, Float, and bounded String in src/address_space/value_source.c (OPC refs: OPC-10000-3 5.9; OPC-10000-6 5.2.1, 5.2.2.4)
