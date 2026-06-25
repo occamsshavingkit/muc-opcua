@@ -278,15 +278,15 @@
 
 **Purpose**: Final verification, cleanup, and release-readiness evidence after the selected stories are complete.
 
-- [ ] T168 Run host configure/build/unit/integration test flow and record command output summary plus total elapsed wall-clock time against the SC-001 under-15-minutes target in docs/validation/host-tests.md (OPC refs: OPC-10000-4 5.5.1, 5.5.2.2, 5.5.4.2, 5.6.2.2, 5.7.2.2, 5.7.3.2, 5.9.2.2, 5.11.2.2; OPC-10000-6 5.2.1, 6.7.2, 7.1.2.3, 7.1.2.4, 7.2)
-- [ ] T169 Run sanitizer configure/build/test flow or document unavailable tooling in docs/validation/sanitizers.md (OPC refs: N/A - sanitizer validation runner only)
-- [ ] T170 Run fuzz target compile and one bounded smoke execution per fuzz target or document unavailable tooling in docs/validation/fuzz.md (OPC refs: OPC-10000-6 5.2.1, 5.2.2.4, 5.2.2.9, 5.2.2.15, 5.2.2.16, 5.2.2.17, 5.2.5, 6.7.2, 6.7.3)
-- [ ] T171 Run clang-format, cppcheck, and clang-tidy checks and record results in docs/validation/static-analysis.md (OPC refs: N/A - static-analysis validation runner only)
-- [ ] T172 Run Pico SDK cross-compile and record artifact/size output in docs/validation/pico-cross-compile.md (OPC refs: N/A - embedded build validation runner only)
-- [ ] T173 Run Arduino/PlatformIO adapter skeleton validation and record result in docs/validation/arduino-platformio.md (OPC refs: N/A - embedded adapter validation runner only)
-- [ ] T174 Verify every task-created protocol fixture has a sidecar row in docs/traceability/fixtures.md (OPC refs: OPC-10000-6 5.2.9, 6.7.2; fixture-specific service sections supplied per fixture)
-- [ ] T175 Verify every unsupported service and malformed-input test maps to docs/traceability/statuscodes.md (OPC refs: OPC-10000-4 5.9.3.2, 5.9.3.4, 5.9.4.2, 5.9.4.4, 5.9.5.2, 5.9.5.3, 5.11.3.2, 5.11.3.4, 5.11.4.2, 5.11.4.4, 5.12.2.2, 5.12.2.4, 5.14.2.2, 5.14.5.2, 5.14.5.4, 7.38.2; OPC-10000-6 5.2.2.4, 5.2.2.9, 5.2.2.15, 5.2.5, 6.7.3, 7.1.5)
-- [ ] T176 Finalize README project status, build commands, and conformance caveats in README.md (OPC refs: OPC-10000-4 5.5.1, 5.5.2.2, 5.5.4.2, 5.6.2.2, 5.7.2.2, 5.7.3.2, 5.9.2.2, 5.11.2.2; OPC-10000-6 5.2.1, 5.2.2.4, 5.2.2.9, 5.2.2.15, 5.2.2.16, 5.2.2.17, 5.2.9, 6.7.2, 7.2; OPC-10000-7 3.1.5, 4.2, 4.4, 4.6, 4.7, 4.8)
+- [X] T168 Run host configure/build/unit/integration test flow and record command output summary plus total elapsed wall-clock time against the SC-001 under-15-minutes target in docs/validation/host-tests.md (OPC refs: OPC-10000-4 5.5.1, 5.5.2.2, 5.5.4.2, 5.6.2.2, 5.7.2.2, 5.7.3.2, 5.9.2.2, 5.11.2.2; OPC-10000-6 5.2.1, 6.7.2, 7.1.2.3, 7.1.2.4, 7.2)
+- [X] T169 Run sanitizer configure/build/test flow or document unavailable tooling in docs/validation/sanitizers.md (OPC refs: N/A - sanitizer validation runner only)
+- [X] T170 Run fuzz target compile and one bounded smoke execution per fuzz target or document unavailable tooling in docs/validation/fuzz.md (OPC refs: OPC-10000-6 5.2.1, 5.2.2.4, 5.2.2.9, 5.2.2.15, 5.2.2.16, 5.2.2.17, 5.2.5, 6.7.2, 6.7.3)
+- [X] T171 Run clang-format, cppcheck, and clang-tidy checks and record results in docs/validation/static-analysis.md (OPC refs: N/A - static-analysis validation runner only)
+- [X] T172 Run Pico SDK cross-compile and record artifact/size output in docs/validation/pico-cross-compile.md (OPC refs: N/A - embedded build validation runner only)
+- [X] T173 Run Arduino/PlatformIO adapter skeleton validation and record result in docs/validation/arduino-platformio.md (OPC refs: N/A - embedded adapter validation runner only)
+- [X] T174 Verify every task-created protocol fixture has a sidecar row in docs/traceability/fixtures.md (OPC refs: OPC-10000-6 5.2.9, 6.7.2; fixture-specific service sections supplied per fixture)
+- [X] T175 Verify every unsupported service and malformed-input test maps to docs/traceability/statuscodes.md (OPC refs: OPC-10000-4 5.9.3.2, 5.9.3.4, 5.9.4.2, 5.9.4.4, 5.9.5.2, 5.9.5.3, 5.11.3.2, 5.11.3.4, 5.11.4.2, 5.11.4.4, 5.12.2.2, 5.12.2.4, 5.14.2.2, 5.14.5.2, 5.14.5.4, 7.38.2; OPC-10000-6 5.2.2.4, 5.2.2.9, 5.2.2.15, 5.2.5, 6.7.3, 7.1.5)
+- [X] T176 Finalize README project status, build commands, and conformance caveats in README.md (OPC refs: OPC-10000-4 5.5.1, 5.5.2.2, 5.5.4.2, 5.6.2.2, 5.7.2.2, 5.7.3.2, 5.9.2.2, 5.11.2.2; OPC-10000-6 5.2.1, 5.2.2.4, 5.2.2.9, 5.2.2.15, 5.2.2.16, 5.2.2.17, 5.2.9, 6.7.2, 7.2; OPC-10000-7 3.1.5, 4.2, 4.4, 4.6, 4.7, 4.8)
 
 ---
 
