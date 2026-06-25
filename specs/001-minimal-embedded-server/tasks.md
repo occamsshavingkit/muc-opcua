@@ -155,7 +155,7 @@
 - [X] T086 [P] [US3] Add SecureChannel state tests for OpenSecureChannel and CloseSecureChannel with SecurityPolicy None in tests/unit/test_secure_channel.c (OPC refs: OPC-10000-4 5.6.2.2, 5.6.3.2; OPC-10000-6 6.7.4, 6.7.7)
 - [X] T087 [P] [US3] Add Session state tests for CreateSession, ActivateSession identity policy from docs/conformance/identity-policy.md, and CloseSession in tests/unit/test_session.c (OPC refs: OPC-10000-4 5.7.2.2, 5.7.3.2, 5.7.4.2, 7.40.1, 7.40.3, 7.41)
 - [X] T088 [P] [US3] Add Discovery service tests for FindServers and GetEndpoints response fields in tests/unit/test_discovery_services.c (OPC refs: OPC-10000-4 5.5.2.2, 5.5.4.2, 7.14)
-- [ ] T089 [P] [US3] Add Browse service tests for ReferenceDescription output from static references in tests/unit/test_browse_service.c (OPC refs: OPC-10000-4 5.9.2.2, 7.29)
+- [X] T089 [P] [US3] Add Browse service tests for ReferenceDescription output from static references in tests/unit/test_browse_service.c (OPC refs: OPC-10000-4 5.9.2.2, 7.29)
 - [ ] T090 [P] [US3] Add Read service tests for DataValue output from all v1 scalar value kinds in tests/unit/test_read_service.c (OPC refs: OPC-10000-4 5.11.2.2, 5.11.2.3; OPC-10000-6 5.2.2.17)
 - [ ] T091 [P] [US3] Add host integration test for minimal connect/discover/browse/read happy path in tests/integration/test_minimal_server_flow.c (OPC refs: OPC-10000-4 5.5.1, 5.5.2.2, 5.5.4.2, 5.6.2.2, 5.7.2.2, 5.7.3.2, 5.9.2.2, 5.11.2.2; OPC-10000-6 6.7.2, 6.7.4, 7.1.2.3, 7.1.2.4, 7.2)
 
