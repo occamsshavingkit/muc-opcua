@@ -105,3 +105,44 @@ opcua_statuscode_t mu_tcp_process_hello(
     
     return MU_STATUS_GOOD;
 }
+
+opcua_statuscode_t mu_tcp_create_error_message(
+    opcua_statuscode_t error_code,
+    const char *reason,
+    opcua_byte_t *err_message,
+    size_t *err_length)
+{
+    if (!err_message || !err_length) return MU_STATUS_BAD_INTERNALERROR;
+    
+    size_t reason_len = reason ? strlen(reason) : 0;
+    size_t total_len = 8 + 4 + 4 + reason_len;
+    
+    if (*err_length < total_len) return MU_STATUS_BAD_INTERNALERROR;
+    
+    mu_binary_writer_t writer;
+    mu_binary_writer_init(&writer, err_message, *err_length);
+    
+    opcua_statuscode_t status = mu_binary_write_byte(&writer, 'E');
+    if (status != MU_STATUS_GOOD) return status;
+    status = mu_binary_write_byte(&writer, 'R');
+    if (status != MU_STATUS_GOOD) return status;
+    status = mu_binary_write_byte(&writer, 'R');
+    if (status != MU_STATUS_GOOD) return status;
+    status = mu_binary_write_byte(&writer, 'F');
+    if (status != MU_STATUS_GOOD) return status;
+    
+    status = mu_binary_write_int32(&writer, (opcua_int32_t)total_len);
+    if (status != MU_STATUS_GOOD) return status;
+    
+    status = mu_binary_write_uint32(&writer, (opcua_uint32_t)error_code);
+    if (status != MU_STATUS_GOOD) return status;
+    
+    mu_string_t str_reason;
+    str_reason.length = (opcua_int32_t)reason_len;
+    str_reason.data = (opcua_byte_t*)reason;
+    status = mu_binary_write_string(&writer, &str_reason);
+    if (status != MU_STATUS_GOOD) return status;
+    
+    *err_length = writer.position;
+    return MU_STATUS_GOOD;
+}

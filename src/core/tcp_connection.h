@@ -29,4 +29,10 @@ opcua_statuscode_t mu_tcp_process_hello(
     opcua_byte_t *ack_message, 
     size_t *ack_length);
 
+opcua_statuscode_t mu_tcp_create_error_message(
+    opcua_statuscode_t error_code,
+    const char *reason,
+    opcua_byte_t *err_message,
+    size_t *err_length);
+
 #endif /* MICRO_OPCUA_TCP_CONNECTION_H */

@@ -112,6 +112,26 @@ opcua_statuscode_t mu_server_poll(mu_server_t *server)
             mu_session_init(&server->session);
         }
         return MU_STATUS_GOOD;
+    } else {
+        /* Check if there's another connection waiting to be rejected */
+        void *second_handle = NULL;
+        opcua_statuscode_t status = server->config.tcp_adapter.accept(server->config.tcp_adapter.context, &second_handle);
+        if (status == MU_STATUS_GOOD && second_handle != NULL) {
+            /* We don't have resources. OPC UA 10000-6 7.1.5: immediately close or wait for HEL and send ERR.
+               Wait for HEL (simulate it by just trying to read once) */
+            opcua_byte_t buf[256];
+            size_t bytes_read = 0;
+            status = server->config.tcp_adapter.read(server->config.tcp_adapter.context, second_handle, buf, sizeof(buf), &bytes_read);
+            
+            if (status == MU_STATUS_GOOD && bytes_read >= 8 && buf[0] == 'H' && buf[1] == 'E' && buf[2] == 'L') {
+                size_t err_len = sizeof(buf);
+                if (mu_tcp_create_error_message(MU_STATUS_BAD_TCPNOTENOUGHRESOURCES, "Server full", buf, &err_len) == MU_STATUS_GOOD) {
+                    size_t bytes_written;
+                    server->config.tcp_adapter.write(server->config.tcp_adapter.context, second_handle, buf, err_len, &bytes_written);
+                }
+            }
+            server->config.tcp_adapter.close_connection(server->config.tcp_adapter.context, second_handle);
+        }
     }
 
     /* 2. Read from active connection */
