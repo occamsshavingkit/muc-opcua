@@ -210,7 +210,7 @@
 - [X] T125 [P] [US4] Add invalid message type and invalid chunk type tests in tests/unit/test_message_chunk_errors.c (OPC refs: OPC-10000-6 6.7.3)
 - [X] T126 [P] [US4] Add truncated String, negative length, excessive length, and embedded overrun tests asserting Bad_DecodingError for malformed framing and Bad_EncodingLimitsExceeded for over-limit lengths in tests/unit/test_binary_string_errors.c (OPC refs: OPC-10000-4 7.38.2; OPC-10000-6 5.2.2.4)
 - [X] T127 [P] [US4] Add invalid array length and truncated array tests in tests/unit/test_binary_array_errors.c (OPC refs: OPC-10000-6 5.2.5)
-- [ ] T128 [P] [US4] Add invalid NodeId encoding mask tests in tests/unit/test_binary_nodeid_errors.c (OPC refs: OPC-10000-6 5.2.2.9)
+- [X] T128 [P] [US4] Add invalid NodeId encoding mask tests in tests/unit/test_binary_nodeid_errors.c (OPC refs: OPC-10000-6 5.2.2.9)
 - [ ] T129 [P] [US4] Add invalid ExtensionObject encoding and body length tests in tests/unit/test_binary_extension_object_errors.c (OPC refs: OPC-10000-6 5.2.2.15)
 - [ ] T130 [P] [US4] Add Browse-before-ActivateSession and Read-before-ActivateSession tests in tests/unit/test_service_state_errors.c (OPC refs: OPC-10000-4 5.7.2.1, 5.9.2, 5.11.2, 7.38.2)
 - [ ] T131 [P] [US4] Add Session-before-SecureChannel and service-before-Hello invalid sequence tests in tests/unit/test_service_state_errors.c (OPC refs: OPC-10000-4 5.6.2.2, 5.7.2.1, 5.7.2.2; OPC-10000-6 7.1.2.3, 7.1.2.4, 7.2)
