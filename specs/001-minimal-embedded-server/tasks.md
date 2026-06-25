@@ -250,7 +250,7 @@
 ### Tests for User Story 5
 
 - [X] T151 [P] [US5] Add traceability completeness and OPC UA MCP provenance coverage test that fails if protocol source or test files lack OPC UA section rows or if plan-cited protocol/conformance decisions lack query-ledger entries in tests/unit/test_traceability_docs.c (OPC refs: N/A - traceability enforcement tooling; validates cited section rows and MCP query provenance)
-- [ ] T152 [P] [US5] Add conformance-claim lint test forbidding profile-compliant or CTT-verified claims without evidence in tests/unit/test_conformance_docs.c (OPC refs: OPC-10000-7 3.1.5, 4.2, 4.4, 4.6, 4.7, 4.8)
+- [X] T152 [P] [US5] Add conformance-claim lint test forbidding profile-compliant or CTT-verified claims without evidence in tests/unit/test_conformance_docs.c (OPC refs: OPC-10000-7 3.1.5, 4.2, 4.4, 4.6, 4.7, 4.8)
 - [ ] T153 [P] [US5] Add size-report parser test for flash, RAM, stack, heap, buffer, and static-table fields in tests/unit/test_size_report.c (OPC refs: N/A - size-report validation only)
 - [ ] T154 [P] [US5] Add async-opcua inventory validation test for required repository areas in tests/unit/test_async_opcua_inventory.c (OPC refs: N/A - external compliance-suite inventory only)
 
