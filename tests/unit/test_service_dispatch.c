@@ -6,6 +6,7 @@ void setUp(void) {}
 void tearDown(void) {}
 
 #include "../../src/core/service_dispatch.h"
+#include "../../src/core/server_internal.h"
 
 void test_service_dispatch_known_requests(void) {
     const mu_service_handler_t *handler;
@@ -33,14 +34,14 @@ void test_service_dispatch_unsupported_services(void) {
     mu_server_t server;
 
     opcua_uint32_t unsupported[] = {
-        MU_ID_WRITEREQUEST, 
-        MU_ID_CREATESUBSCRIPTIONREQUEST, 
-        MU_ID_PUBLISHREQUEST, 
-        MU_ID_CALLREQUEST, 
-        MU_ID_HISTORYREADREQUEST, 
-        MU_ID_BROWSENEXTREQUEST, 
-        MU_ID_TRANSLATEBROWSEPATHSTONODEIDSREQUEST, 
-        MU_ID_REGISTERNODESREQUEST
+        673, /* WriteRequest */
+        787, /* CreateSubscriptionRequest */
+        826, /* PublishRequest */
+        711, /* CallRequest */
+        643, /* HistoryReadRequest */
+        533, /* BrowseNextRequest */
+        554, /* TranslateBrowsePathsToNodeIdsRequest */
+        561  /* RegisterNodesRequest */
     };
 
     for (size_t i = 0; i < sizeof(unsupported)/sizeof(unsupported[0]); i++) {

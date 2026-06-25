@@ -36,3 +36,26 @@ const char* mu_status_name(opcua_statuscode_t status)
         default: return "Unknown_StatusCode";
     }
 }
+
+/* Out-of-scope status-mapping table for unsupported features */
+static const opcua_uint32_t g_unsupported_services[] = {
+    673,  /* WriteRequest */
+    711,  /* CallRequest */
+    643,  /* HistoryReadRequest */
+    787,  /* CreateSubscriptionRequest */
+    826,  /* PublishRequest */
+    533,  /* BrowseNextRequest */
+    554,  /* TranslateBrowsePathsToNodeIdsRequest */
+    561   /* RegisterNodesRequest */
+    /* PubSub, XML, JSON, HTTPS, WebSockets are out-of-scope via transport/encoding rejection 
+       or profile omission, not specifically Service request IDs. */
+};
+
+bool mu_is_unsupported_service(opcua_uint32_t request_id) {
+    for (size_t i = 0; i < sizeof(g_unsupported_services) / sizeof(g_unsupported_services[0]); ++i) {
+        if (g_unsupported_services[i] == request_id) {
+            return true;
+        }
+    }
+    return false;
+}
