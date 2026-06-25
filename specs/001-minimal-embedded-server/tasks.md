@@ -19,7 +19,7 @@
 - [X] T004 [P] Create clang-format configuration for C headers, C sources, CMake, and Markdown in .clang-format (OPC refs: N/A - formatting infrastructure only)
 - [X] T005 [P] Create static-analysis CMake targets for format-check (clang-format), cppcheck, and optional clang-tidy in cmake/MicroOpcUaStaticAnalysis.cmake (OPC refs: N/A - static-analysis infrastructure only)
 - [X] T006 Create top-level test registration for Unity, integration tests, fixtures, and fuzz targets in tests/CMakeLists.txt (OPC refs: N/A - test infrastructure only)
-- [ ] T007 Create Unity unit-test target skeleton and test discovery rules in tests/unit/CMakeLists.txt (OPC refs: N/A - test infrastructure only)
+- [X] T007 Create Unity unit-test target skeleton and test discovery rules in tests/unit/CMakeLists.txt (OPC refs: N/A - test infrastructure only)
 - [ ] T008 [P] Create shared Unity configuration for host tests in tests/support/unity_config.h (OPC refs: N/A - test infrastructure only)
 - [ ] T009 [P] Create CI workflow skeleton for host build, tests, static analysis, sanitizer, fuzz compile, and Pico cross-compile in .github/workflows/ci.yml (OPC refs: N/A - CI orchestration only)
 - [ ] T010 [P] Create developer build target summary matching quickstart.md in docs/adr/0001-build-and-test-workflow.md (OPC refs: N/A - developer workflow documentation only)
