@@ -34,10 +34,8 @@ void test_message_chunk_parser_invalid_message_type(void) {
 }
 
 void test_message_chunk_parser_invalid_size(void) {
-    opcua_byte_t buffer[12];
+    opcua_byte_t buffer[12] = { 'M', 'S', 'G', 'F', 20, 0, 0, 0, 1, 0, 0, 0 };
     mu_message_header_t parsed;
-    /* Buffer size smaller than message_size -> BAD_TCPMESSAGETOOLARGE */
-    buffer[4] = 20; buffer[5] = 0; buffer[6] = 0; buffer[7] = 0;
     TEST_ASSERT_EQUAL(MU_STATUS_BAD_TCPMESSAGETOOLARGE, mu_parse_message_header(buffer, 12, &parsed));
 }
 
