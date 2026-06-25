@@ -8,8 +8,8 @@ function(add_unity_test test_name test_source)
     target_include_directories(${test_name} PRIVATE ${CMAKE_SOURCE_DIR}/tests/support)
     
     # The core library will be added later
-    if(TARGET micro_opcua_core)
-        target_link_libraries(${test_name} PRIVATE micro_opcua_core)
+    if(TARGET micro_opcua)
+        target_link_libraries(${test_name} PRIVATE micro_opcua)
     endif()
     
     # Register with CTest
