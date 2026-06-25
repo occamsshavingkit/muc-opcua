@@ -80,7 +80,7 @@
 - [X] T040 [US1] Add host test support fake platform callbacks for TCP/time/entropy in tests/support/fake_platform.c (OPC refs: N/A - host test support only)
 - [X] T041 [US1] Add minimal host example skeleton using caller-owned buffers and no network behavior yet in examples/minimal_server/main.c (OPC refs: N/A - example skeleton without protocol behavior)
 - [X] T042 [US1] Add example build registration for the host minimal server in examples/CMakeLists.txt (OPC refs: N/A - build infrastructure only)
-- [ ] T043 [US1] Add Pico SDK library/example CMake skeleton that links the portable core in platform/pico/CMakeLists.txt (OPC refs: N/A - embedded build skeleton only)
+- [X] T043 [US1] Add Pico SDK library/example CMake skeleton that links the portable core in platform/pico/CMakeLists.txt (OPC refs: N/A - embedded build skeleton only)
 - [ ] T044 [US1] Add Pico adapter skeleton with no public SDK type leakage in platform/pico/mu_pico_adapter.c (OPC refs: N/A - platform adapter skeleton only)
 - [ ] T045 [US1] Add PlatformIO project skeleton for Arduino adapter builds in platform/arduino/platformio.ini (OPC refs: N/A - embedded build skeleton only)
 - [ ] T046 [US1] Add Arduino adapter skeleton preserving the C adapter contract in platform/arduino/src/mu_arduino_adapter.c (OPC refs: N/A - platform adapter skeleton only)

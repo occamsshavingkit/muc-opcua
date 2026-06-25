@@ -22,3 +22,7 @@ endif()
 if(MICRO_OPCUA_BUILD_EXAMPLES)
     add_subdirectory(examples)
 endif()
+
+if(MICRO_OPCUA_PLATFORM STREQUAL "pico")
+    add_subdirectory(platform/pico)
+endif()
