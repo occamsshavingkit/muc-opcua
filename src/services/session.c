@@ -66,3 +66,22 @@ opcua_statuscode_t mu_session_activate(mu_session_t *session,
     session->state = MU_SESSION_STATE_ACTIVATED;
     return MU_STATUS_GOOD;
 }
+
+opcua_statuscode_t mu_session_close(mu_session_t *session,
+                                    opcua_uint32_t auth_token,
+                                    bool delete_subscriptions)
+{
+    if (!session) return MU_STATUS_BAD_INTERNALERROR;
+    (void)delete_subscriptions; /* Not supported yet */
+    
+    if (session->state == MU_SESSION_STATE_CLOSED) {
+        return MU_STATUS_BAD_SESSIONIDINVALID;
+    }
+    
+    if (session->auth_token != auth_token) {
+        return MU_STATUS_BAD_SESSIONIDINVALID;
+    }
+    
+    mu_session_init(session); /* Revert back to closed state */
+    return MU_STATUS_GOOD;
+}

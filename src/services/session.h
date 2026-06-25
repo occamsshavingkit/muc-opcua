@@ -34,4 +34,8 @@ opcua_statuscode_t mu_session_activate(mu_session_t *session,
                                        opcua_uint32_t auth_token,
                                        opcua_uint32_t identity_token_encoding_id);
 
+opcua_statuscode_t mu_session_close(mu_session_t *session,
+                                    opcua_uint32_t auth_token,
+                                    bool delete_subscriptions);
+
 #endif /* MICRO_OPCUA_SERVICES_SESSION_H */
