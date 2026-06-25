@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "opc-ua-reference": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-remote",
+        "https://reference.opcfoundation.org/mcp"
+      ]
+    }
+  }
+}

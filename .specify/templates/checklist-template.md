@@ -15,22 +15,26 @@
   - Feature requirements from spec.md
   - Technical context from plan.md
   - Implementation details from tasks.md
+  - Constitution requirements for OPC UA traceability, embedded size discipline,
+    security/conformance honesty, and test-first protocol work
   
   DO NOT keep these sample items in the generated checklist file.
   ============================================================================
 -->
 
-## [Category 1]
+## Spec Traceability
 
-- [ ] CHK001 First checklist item with clear action
-- [ ] CHK002 Second checklist item
-- [ ] CHK003 Third checklist item
+- [ ] CHK001 Every implemented OPC UA behavior cites exact OPC-10000 part/section
+- [ ] CHK002 Unsupported behavior has an explicit StatusCode and citation
+- [ ] CHK003 Profile or conformance-unit claims are verified from OPC-10000-7
 
-## [Category 2]
+## Embedded Correctness
 
-- [ ] CHK004 Another category item
-- [ ] CHK005 Item with specific criteria
-- [ ] CHK006 Final item in this category
+- [ ] CHK004 Binary encoders/decoders have round-trip and boundary tests
+- [ ] CHK005 Malformed inputs, chunk boundaries, NodeIds, ExtensionObjects,
+  arrays, and strings have host-side negative or fuzz tests
+- [ ] CHK006 Flash/RAM impact, buffers, stack, heap use, and crypto cost are
+  recorded against the feature budget
 
 ## Notes
 

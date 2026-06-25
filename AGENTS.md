@@ -1,4 +1,5 @@
 <!-- SPECKIT START -->
-For additional context about technologies to be used, project structure,
-shell commands, and other important information, read the current plan
+For project-wide constraints, read `.specify/memory/constitution.md`.
+For the active feature's technologies, project structure, shell commands, and
+other planning context, read `specs/001-minimal-embedded-server/plan.md`.
 <!-- SPECKIT END -->

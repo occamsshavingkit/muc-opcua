@@ -6,96 +6,120 @@ description: "Task list template for feature implementation"
 # Tasks: [FEATURE NAME]
 
 **Input**: Design documents from `/specs/[###-feature-name]/`
-**Prerequisites**: plan.md (required), spec.md (required for user stories), research.md, data-model.md, contracts/
+**Prerequisites**: plan.md (required), spec.md (required for user stories),
+research.md, data-model.md, contracts/
 
-**Tests**: The examples below include test tasks. Tests are OPTIONAL - only include them if explicitly requested in the feature specification.
+**Tests**: Tests are mandatory for protocol parsing, serialization, service
+dispatch, StatusCodes, SecureChannel/session state, address-space behavior,
+security behavior, and wire-visible changes. Non-protocol documentation-only tasks
+may omit tests when the feature specification explicitly allows it.
 
-**Organization**: Tasks are grouped by user story to enable independent implementation and testing of each story.
+**Organization**: Tasks are grouped by user story to enable independent
+implementation and testing. Protocol tests and fixtures must appear before the
+implementation tasks they validate.
 
 ## Format: `[ID] [P?] [Story] Description`
 
 - **[P]**: Can run in parallel (different files, no dependencies)
 - **[Story]**: Which user story this task belongs to (e.g., US1, US2, US3)
 - Include exact file paths in descriptions
+- Include OPC UA part/section references in protocol task descriptions
+- Include size impact tasks when a feature adds tables, buffers, stack use, heap
+  use, or crypto dependencies
 
 ## Path Conventions
 
-- **Single project**: `src/`, `tests/` at repository root
-- **Web app**: `backend/src/`, `frontend/src/`
-- **Mobile**: `api/src/`, `ios/src/` or `android/src/`
-- Paths shown below assume single project - adjust based on plan.md structure
+- **Public API**: `include/micro_opcua/`
+- **Core protocol**: `src/core/`, `src/encoding/`, `src/services/`
+- **Address space**: `src/address_space/`
+- **Security interfaces**: `src/security/`
+- **Platform adapters**: `platform/pico/`, `platform/arduino/`
+- **Examples**: `examples/minimal_server/`
+- **Tests**: `tests/unit/`, `tests/integration/`, `tests/fixtures/`,
+  `tests/fuzz/`
+- **Documentation**: `docs/adr/`, `docs/traceability/`
 
-<!-- 
+<!--
   ============================================================================
-  IMPORTANT: The tasks below are SAMPLE TASKS for illustration purposes only.
-  
+  IMPORTANT: The tasks below are SAMPLE TASKS for illustration only.
+
   The /speckit-tasks command MUST replace these with actual tasks based on:
-  - User stories from spec.md (with their priorities P1, P2, P3...)
-  - Feature requirements from plan.md
-  - Entities from data-model.md
-  - Endpoints from contracts/
-  
-  Tasks MUST be organized by user story so each story can be:
-  - Implemented independently
-  - Tested independently
-  - Delivered as an MVP increment
-  
+  - User stories from spec.md (with priorities P1, P2, P3...)
+  - OPC UA normative scope from spec.md and research.md
+  - Constitution Check decisions from plan.md
+  - Entities/data model from data-model.md
+  - Contracts, fixtures, and generated traceability artifacts
+
   DO NOT keep these sample tasks in the generated tasks.md file.
   ============================================================================
 -->
 
 ## Phase 1: Setup (Shared Infrastructure)
 
-**Purpose**: Project initialization and basic structure
+**Purpose**: Project initialization, build tooling, and traceability structure
 
-- [ ] T001 Create project structure per implementation plan
-- [ ] T002 Initialize [language] project with [framework] dependencies
-- [ ] T003 [P] Configure linting and formatting tools
+- [ ] T001 Create CMake project structure from plan.md
+- [ ] T002 Configure C11 host build and warnings-as-errors in CMakeLists.txt
+- [ ] T003 [P] Configure clang-format and cppcheck
+- [ ] T004 [P] Add Unity or CMocka test harness under tests/unit/
+- [ ] T005 [P] Add traceability table skeleton in docs/traceability/
+- [ ] T006 [P] Add embedded cross-compile target for Pico SDK or documented stub
 
 ---
 
 ## Phase 2: Foundational (Blocking Prerequisites)
 
-**Purpose**: Core infrastructure that MUST be complete before ANY user story can be implemented
+**Purpose**: Core infrastructure that MUST be complete before user story work
 
-**⚠️ CRITICAL**: No user story work can begin until this phase is complete
+**CRITICAL**: No user story implementation can begin until this phase is complete.
 
-Examples of foundational tasks (adjust based on your project):
+- [ ] T007 Document target OPC UA profile/conformance-unit set from OPC-10000-7
+  in docs/traceability/[feature].md
+- [ ] T008 Document cited OPC UA sections for each supported and unsupported
+  behavior in docs/traceability/[feature].md
+- [ ] T009 [P] Define public result/status API in include/micro_opcua/status.h
+- [ ] T010 [P] Define caller-provided buffer/config API in include/micro_opcua/config.h
+- [ ] T011 [P] Define platform adapter interfaces for TCP, time, entropy, and
+  persistence in include/micro_opcua/platform.h
+- [ ] T012 Establish size budget measurement command in CMake or scripts/
+- [ ] T013 Add malformed-input fixture directory for this feature under tests/fixtures/
 
-- [ ] T004 Setup database schema and migrations framework
-- [ ] T005 [P] Implement authentication/authorization framework
-- [ ] T006 [P] Setup API routing and middleware structure
-- [ ] T007 Create base models/entities that all stories depend on
-- [ ] T008 Configure error handling and logging infrastructure
-- [ ] T009 Setup environment configuration management
-
-**Checkpoint**: Foundation ready - user story implementation can now begin in parallel
+**Checkpoint**: Foundation ready - user story implementation can begin.
 
 ---
 
-## Phase 3: User Story 1 - [Title] (Priority: P1) 🎯 MVP
+## Phase 3: User Story 1 - [Title] (Priority: P1) [MVP]
 
 **Goal**: [Brief description of what this story delivers]
 
 **Independent Test**: [How to verify this story works on its own]
 
-### Tests for User Story 1 (OPTIONAL - only if tests requested) ⚠️
+### Tests for User Story 1
 
-> **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
+> Write these tests first and confirm they fail before implementation.
 
-- [ ] T010 [P] [US1] Contract test for [endpoint] in tests/contract/test_[name].py
-- [ ] T011 [P] [US1] Integration test for [user journey] in tests/integration/test_[name].py
+- [ ] T014 [P] [US1] Add binary fixture for [OPC UA type/message] citing
+  OPC-10000-[part] [section] in tests/fixtures/[name].bin
+- [ ] T015 [P] [US1] Add round-trip unit test for [encoder/decoder] in
+  tests/unit/test_[name].c
+- [ ] T016 [P] [US1] Add boundary/error unit test for [malformed input] and
+  expected StatusCode in tests/unit/test_[name]_errors.c
+- [ ] T017 [P] [US1] Add fuzz target for [decoder/state machine] in
+  tests/fuzz/fuzz_[name].c
 
 ### Implementation for User Story 1
 
-- [ ] T012 [P] [US1] Create [Entity1] model in src/models/[entity1].py
-- [ ] T013 [P] [US1] Create [Entity2] model in src/models/[entity2].py
-- [ ] T014 [US1] Implement [Service] in src/services/[service].py (depends on T012, T013)
-- [ ] T015 [US1] Implement [endpoint/feature] in src/[location]/[file].py
-- [ ] T016 [US1] Add validation and error handling
-- [ ] T017 [US1] Add logging for user story 1 operations
+- [ ] T018 [P] [US1] Implement [public API] in include/micro_opcua/[name].h
+- [ ] T019 [P] [US1] Implement [core type/encoder] in src/encoding/[name].c
+- [ ] T020 [US1] Implement [service/state transition] in src/services/[name].c
+- [ ] T021 [US1] Map unsupported cases to cited OPC UA StatusCodes in
+  src/core/status.c
+- [ ] T022 [US1] Update docs/traceability/[feature].md with implementation and
+  test file mappings
+- [ ] T023 [US1] Measure and record flash/RAM impact in plan.md or
+  docs/traceability/[feature].md
 
-**Checkpoint**: At this point, User Story 1 should be fully functional and testable independently
+**Checkpoint**: User Story 1 is independently testable and size impact is known.
 
 ---
 
@@ -105,19 +129,24 @@ Examples of foundational tasks (adjust based on your project):
 
 **Independent Test**: [How to verify this story works on its own]
 
-### Tests for User Story 2 (OPTIONAL - only if tests requested) ⚠️
+### Tests for User Story 2
 
-- [ ] T018 [P] [US2] Contract test for [endpoint] in tests/contract/test_[name].py
-- [ ] T019 [P] [US2] Integration test for [user journey] in tests/integration/test_[name].py
+- [ ] T024 [P] [US2] Add fixture or captured bytes for [message/service] in
+  tests/fixtures/[name].bin
+- [ ] T025 [P] [US2] Add service/state-machine test in tests/unit/test_[name].c
+- [ ] T026 [P] [US2] Add integration test using host platform adapter in
+  tests/integration/test_[name].c
 
 ### Implementation for User Story 2
 
-- [ ] T020 [P] [US2] Create [Entity] model in src/models/[entity].py
-- [ ] T021 [US2] Implement [Service] in src/services/[service].py
-- [ ] T022 [US2] Implement [endpoint/feature] in src/[location]/[file].py
-- [ ] T023 [US2] Integrate with User Story 1 components (if needed)
+- [ ] T027 [P] [US2] Implement [data model or address-space element] in
+  src/address_space/[name].c
+- [ ] T028 [US2] Implement [service behavior] in src/services/[name].c
+- [ ] T029 [US2] Integrate with prior user-story components without expanding
+  unsupported OPC UA surface
+- [ ] T030 [US2] Update traceability and size records
 
-**Checkpoint**: At this point, User Stories 1 AND 2 should both work independently
+**Checkpoint**: User Stories 1 and 2 both work independently.
 
 ---
 
@@ -127,18 +156,19 @@ Examples of foundational tasks (adjust based on your project):
 
 **Independent Test**: [How to verify this story works on its own]
 
-### Tests for User Story 3 (OPTIONAL - only if tests requested) ⚠️
+### Tests for User Story 3
 
-- [ ] T024 [P] [US3] Contract test for [endpoint] in tests/contract/test_[name].py
-- [ ] T025 [P] [US3] Integration test for [user journey] in tests/integration/test_[name].py
+- [ ] T031 [P] [US3] Add unit test for [feature] in tests/unit/test_[name].c
+- [ ] T032 [P] [US3] Add malformed or unsupported-case test in
+  tests/unit/test_[name]_errors.c
 
 ### Implementation for User Story 3
 
-- [ ] T026 [P] [US3] Create [Entity] model in src/models/[entity].py
-- [ ] T027 [US3] Implement [Service] in src/services/[service].py
-- [ ] T028 [US3] Implement [endpoint/feature] in src/[location]/[file].py
+- [ ] T033 [P] [US3] Implement [feature] in src/[area]/[name].c
+- [ ] T034 [US3] Update public headers only if required by plan.md
+- [ ] T035 [US3] Update traceability and size records
 
-**Checkpoint**: All user stories should now be independently functional
+**Checkpoint**: Selected user stories are independently functional.
 
 ---
 
@@ -146,16 +176,20 @@ Examples of foundational tasks (adjust based on your project):
 
 ---
 
-## Phase N: Polish & Cross-Cutting Concerns
+## Phase N: Compliance, Size, and Polish
 
-**Purpose**: Improvements that affect multiple user stories
+**Purpose**: Cross-cutting validation required before completion
 
-- [ ] TXXX [P] Documentation updates in docs/
-- [ ] TXXX Code cleanup and refactoring
-- [ ] TXXX Performance optimization across all stories
-- [ ] TXXX [P] Additional unit tests (if requested) in tests/unit/
-- [ ] TXXX Security hardening
-- [ ] TXXX Run quickstart.md validation
+- [ ] TXXX Run host unit and integration tests
+- [ ] TXXX Run fuzz targets or document unavailable fuzz tooling
+- [ ] TXXX Run sanitizer build where available
+- [ ] TXXX Run formatting and static analysis
+- [ ] TXXX Run embedded cross-compile
+- [ ] TXXX Measure flash/RAM impact and compare with plan.md budget
+- [ ] TXXX Verify unsupported services/features return cited OPC UA StatusCodes
+- [ ] TXXX Verify docs/traceability/ maps each implementation and test file to
+  OPC UA sections
+- [ ] TXXX Validate quickstart.md on host
 
 ---
 
@@ -163,89 +197,37 @@ Examples of foundational tasks (adjust based on your project):
 
 ### Phase Dependencies
 
-- **Setup (Phase 1)**: No dependencies - can start immediately
-- **Foundational (Phase 2)**: Depends on Setup completion - BLOCKS all user stories
-- **User Stories (Phase 3+)**: All depend on Foundational phase completion
-  - User stories can then proceed in parallel (if staffed)
-  - Or sequentially in priority order (P1 → P2 → P3)
-- **Polish (Final Phase)**: Depends on all desired user stories being complete
-
-### User Story Dependencies
-
-- **User Story 1 (P1)**: Can start after Foundational (Phase 2) - No dependencies on other stories
-- **User Story 2 (P2)**: Can start after Foundational (Phase 2) - May integrate with US1 but should be independently testable
-- **User Story 3 (P3)**: Can start after Foundational (Phase 2) - May integrate with US1/US2 but should be independently testable
+- **Setup (Phase 1)**: No dependencies
+- **Foundational (Phase 2)**: Depends on Setup completion; blocks all stories
+- **User Stories (Phase 3+)**: Depend on Foundational phase completion
+- **Compliance/Polish**: Depends on all desired user stories being complete
 
 ### Within Each User Story
 
-- Tests (if included) MUST be written and FAIL before implementation
-- Models before services
-- Services before endpoints
-- Core implementation before integration
-- Story complete before moving to next priority
+- Fixtures and tests before implementation
+- Public API before implementation files
+- Encoders/decoders before service dispatch that consumes them
+- StatusCode mapping before integration behavior that returns it
+- Traceability and size records before checkpoint completion
 
 ### Parallel Opportunities
 
-- All Setup tasks marked [P] can run in parallel
-- All Foundational tasks marked [P] can run in parallel (within Phase 2)
-- Once Foundational phase completes, all user stories can start in parallel (if team capacity allows)
-- All tests for a user story marked [P] can run in parallel
-- Models within a story marked [P] can run in parallel
-- Different user stories can be worked on in parallel by different team members
-
----
-
-## Parallel Example: User Story 1
-
-```bash
-# Launch all tests for User Story 1 together (if tests requested):
-Task: "Contract test for [endpoint] in tests/contract/test_[name].py"
-Task: "Integration test for [user journey] in tests/integration/test_[name].py"
-
-# Launch all models for User Story 1 together:
-Task: "Create [Entity1] model in src/models/[entity1].py"
-Task: "Create [Entity2] model in src/models/[entity2].py"
-```
-
----
-
-## Implementation Strategy
-
-### MVP First (User Story 1 Only)
-
-1. Complete Phase 1: Setup
-2. Complete Phase 2: Foundational (CRITICAL - blocks all stories)
-3. Complete Phase 3: User Story 1
-4. **STOP and VALIDATE**: Test User Story 1 independently
-5. Deploy/demo if ready
-
-### Incremental Delivery
-
-1. Complete Setup + Foundational → Foundation ready
-2. Add User Story 1 → Test independently → Deploy/Demo (MVP!)
-3. Add User Story 2 → Test independently → Deploy/Demo
-4. Add User Story 3 → Test independently → Deploy/Demo
-5. Each story adds value without breaking previous stories
-
-### Parallel Team Strategy
-
-With multiple developers:
-
-1. Team completes Setup + Foundational together
-2. Once Foundational is done:
-   - Developer A: User Story 1
-   - Developer B: User Story 2
-   - Developer C: User Story 3
-3. Stories complete and integrate independently
+- Setup tasks marked [P] can run in parallel
+- Foundational interface tasks marked [P] can run in parallel
+- Tests for one story marked [P] can run in parallel
+- Different user stories can proceed in parallel after the foundational phase if
+  they touch different files and preserve independent testability
 
 ---
 
 ## Notes
 
 - [P] tasks = different files, no dependencies
-- [Story] label maps task to specific user story for traceability
-- Each user story should be independently completable and testable
-- Verify tests fail before implementing
+- [Story] label maps task to a user story for traceability
+- Protocol tasks must cite OPC UA part/section references
+- Tests must fail before implementation for protocol behavior
 - Commit after each task or logical group
-- Stop at any checkpoint to validate story independently
-- Avoid: vague tasks, same file conflicts, cross-story dependencies that break independence
+- Stop at checkpoints to validate story behavior, conformance traceability, and
+  embedded size impact
+- Avoid vague tasks, same-file conflicts, hidden heap allocation, uncited protocol
+  behavior, and cross-story dependencies that break independent testing

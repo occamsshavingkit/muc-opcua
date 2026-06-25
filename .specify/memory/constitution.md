@@ -1,50 +1,189 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+<!--
+Sync Impact Report
+Version change: unversioned template -> 1.0.0
+Modified principles: none; initial ratification from template placeholders
+Added principles:
+- I. Spec Fidelity Over Feature Breadth
+- II. Embedded-First C Core
+- III. Minimal OPC UA Surface
+- IV. Protocol Correctness Gates
+- V. Security and Conformance Honesty
+- VI. Fixed Toolchain and Reproducible Builds
+- VII. Size Discipline
+Added sections:
+- Technology and Scope Constraints
+- Development Workflow and Quality Gates
+Removed sections: none
+Templates requiring updates:
+- [updated] .specify/templates/plan-template.md
+- [updated] .specify/templates/spec-template.md
+- [updated] .specify/templates/tasks-template.md
+- [updated] .specify/templates/checklist-template.md
+- [not present] .specify/templates/commands/*.md
+Runtime guidance requiring updates:
+- [updated] AGENTS.md
+Follow-up TODOs: none
+-->
+
+# micro-opcua Constitution
 
 ## Core Principles
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+### I. Spec Fidelity Over Feature Breadth
+Every implemented behavior MUST map to explicit normative OPC UA sections. Specs,
+plans, tasks, code comments for protocol decisions, and tests MUST cite exact OPC UA
+parts and section numbers for protocol, encoding, service, status-code, and
+conformance decisions. Unsupported services and features MUST fail with the correct
+OPC UA StatusCode instead of partial behavior, silent success, or implementation
+defined behavior.
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+Initial scope MUST target the smallest conformant server profile that can be
+justified from OPC-10000-7 after research. Profile membership and conformance units
+MUST be verified from OPC-10000-7 before being claimed. Rationale: a tiny
+implementation is useful only if its narrow behavior is predictable, interoperable,
+and honest about what the standard requires.
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+### II. Embedded-First C Core
+The primary implementation language MUST be freestanding C11, with a C99-compatible
+subset where practical. The core MUST be portable, allocation-aware, usable without
+an operating system, and isolated from platform services behind narrow adapter
+interfaces for I/O, timers, entropy, persistent storage, and TCP integration. The
+protocol hot path MUST NOT require heap allocation; static storage and caller-
+provided buffers are the default memory model.
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+Host tests MUST be the first target for each feature, followed by embedded builds
+for RP2040/Pico SDK and Arduino-compatible toolchains. Rationale: host tests make
+correctness work fast, while the API and memory model remain constrained by the
+microcontroller target from the start.
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+### III. Minimal OPC UA Surface
+The initial transport target MUST be OPC UA TCP over opc.tcp using OPC UA Binary
+encoding. Initial protocol research MUST cover OPC-10000-6 binary encoding rules,
+OPC-10000-6 OPC UA TCP connection protocol, OPC-10000-6 message chunks and
+SecureChannel framing, OPC-10000-4 Discovery, SecureChannel, Session, Attribute,
+and View service sets, and OPC-10000-7 server profiles and conformance units for
+low-end embedded devices.
 
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+The first implementation SHOULD prioritize enough server behavior for discovery,
+secure-channel and session establishment as required by the selected profile,
+browsing a tiny static address space, and reading simple variable values.
+Subscriptions, writes, methods, historical access, alarms/events, PubSub, XML,
+JSON, HTTPS, WebSockets, complex dynamic address-space mutation, and full companion
+specification modeling are out of initial scope unless required by the selected
+conformance profile. Rationale: the project optimizes for a correct smallest
+server, not a broad incomplete stack.
 
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
+### IV. Protocol Correctness Gates
+All binary encoders and decoders MUST have deterministic round-trip tests and
+boundary tests. Wire-level tests MUST use captured or generated byte fixtures tied
+to OPC UA type definitions. Host-side tests MUST include fuzz or property tests for
+decoders, length handling, chunk boundaries, NodeId variants, ExtensionObjects,
+arrays, strings, and malformed input. Features that touch protocol parsing,
+serialization, state machines, StatusCodes, or wire-visible behavior MUST be
+test-first: failing tests are written before implementation.
 
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
+CI MUST run host tests, sanitizers where available, formatting, static analysis,
+and at least one embedded cross-compile. Rationale: protocol bugs on small devices
+are hard to diagnose; correctness must be established before firmware deployment.
 
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+### V. Security and Conformance Honesty
+SecurityPolicy None MAY be used only when the researched target profile permits it
+or when explicitly documented as a non-production interoperability phase. The
+architecture MUST keep cryptography pluggable so constrained builds can use a
+suitable backend such as mbedTLS, PSA Crypto, wolfSSL, or a platform crypto
+provider. Security-sensitive behavior MUST preserve spec traceability and MUST NOT
+be weakened silently for size reasons.
+
+The project MUST label conformance status as experimental, profile-targeting,
+profile-compliant, or CTT-verified. Claims of OPC UA compatibility MUST name the
+exact supported profile, services, encodings, transport profile URI, and tested
+conformance units. Rationale: integrators need to know precisely what can be
+trusted in safety- and operations-adjacent environments.
+
+### VI. Fixed Toolchain and Reproducible Builds
+Builds MUST use CMake for host and embedded library builds. Embedded integration
+MUST target Pico SDK first and Arduino/PlatformIO second. Small C unit tests MUST
+use Unity or CMocka. Host fuzzing MUST use libFuzzer or AFL++ where available.
+Analysis MUST include clang-format, compiler warnings as errors in CI, cppcheck,
+and clang-tidy where useful.
+
+Documentation MUST use Markdown decision records and generated or maintained
+traceability tables mapping implementation files and tests to OPC UA sections.
+Optional code generation is allowed only for compact, auditable protocol or type
+tables; generated output MUST be reproducible and size-reviewed. Rationale: fixed
+tools reduce build drift and make size and conformance changes reviewable.
+
+### VII. Size Discipline
+Every feature plan MUST state expected flash and RAM impact and identify added
+static tables, heap use, stack depth, buffers, and crypto dependencies. Public APIs
+MUST allow the application to provide memory, address-space storage, and transport
+buffers. The default example server MUST fit within conservative microcontroller
+limits selected during planning and MUST leave documented headroom for application
+logic.
+
+Size reductions MUST NOT remove required status handling, bounds checks,
+conformance traceability, or tests. Rationale: small firmware that fails
+ambiguously is more expensive than a slightly larger implementation with explicit
+limits and predictable failures.
+
+## Technology and Scope Constraints
+
+The core project type is a portable C library with thin platform adapters and
+examples. The default source layout MUST separate public headers, core protocol
+logic, generated or maintained specification tables, platform adapters, examples,
+tests, fixtures, fuzz targets, and documentation. Platform-specific code MUST NOT
+leak into protocol parsing, encoding, service dispatch, status-code mapping, or
+address-space model code.
+
+Initial implementation scope is an embedded OPC UA server. Client functionality,
+PubSub, companion specifications, alternate encodings, alternate transports, and
+dynamic server modeling are separate future scopes and require explicit profile,
+size, and conformance justification before planning.
+
+Normative references for initial planning include at minimum:
+
+- OPC-10000-4 5.5.1 Discovery Service Set overview and DiscoveryEndpoint behavior
+- OPC-10000-4 5.7.1 Session Service Set overview
+- OPC-10000-6 5.2.1 OPC UA Binary DataEncoding general rules
+- OPC-10000-6 6.7.2 MessageChunk structure
+- OPC-10000-6 7.1.2.3 Hello Message
+- OPC-10000-6 7.2 OPC UA TCP
+- OPC-10000-7 4.2 Conformance Units and Conformance Groups
+
+## Development Workflow and Quality Gates
+
+Each feature specification MUST include OPC UA normative scope, target profile or
+conformance-unit assumptions, explicit out-of-scope services/features, and
+measurable embedded size goals. Each implementation plan MUST pass the Constitution
+Check before Phase 0 research and again after Phase 1 design. The check MUST cover
+spec traceability, embedded C portability, minimal surface, correctness tests,
+security and conformance honesty, reproducible tooling, and flash/RAM budget.
+
+Tasks MUST be organized so protocol tests and fixtures precede implementation.
+Any task that changes parsing, serialization, service dispatch, StatusCodes,
+SecureChannel/session state, address-space behavior, or security behavior MUST
+include tests that fail before implementation. Reviews MUST reject changes that
+add wire-visible behavior without OPC UA section citations and matching tests.
 
 ## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
+This constitution supersedes ad hoc implementation preferences and all future
+feature plans. Amendments require a written rationale, review of affected Spec Kit
+templates and runtime guidance, a migration note for active specs or plans, and an
+updated semantic version and amendment date.
 
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+Versioning policy:
+
+- MAJOR: backward-incompatible governance changes, removed principles, or a
+  redefinition of project scope away from embedded OPC UA.
+- MINOR: added principles, new mandatory quality gates, expanded scope constraints,
+  or new required toolchain families.
+- PATCH: clarifications, wording fixes, or non-semantic corrections.
+
+Compliance review is mandatory for every spec, plan, task list, and implementation
+review. Deviations from C11 portability, static-memory design, selected OPC UA
+profile requirements, reproducible tooling, size discipline, or test-first protocol
+work MUST be documented in the plan's Complexity Tracking section with a simpler
+alternative and the reason it was rejected.
+
+**Version**: 1.0.0 | **Ratified**: 2026-06-25 | **Last Amended**: 2026-06-25

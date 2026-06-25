@@ -72,8 +72,13 @@
   Fill them out with the right edge cases.
 -->
 
-- What happens when [boundary condition]?
-- How does system handle [error scenario]?
+- What happens when [OPC UA message length/buffer/chunk boundary] is exceeded?
+- How does the system handle [unsupported service or feature] and which OPC UA
+  StatusCode is returned?
+- What happens when [malformed Binary encoding, invalid NodeId, invalid
+  ExtensionObject, or invalid array/string length] is received?
+- How does the feature preserve application flash/RAM headroom on the target
+  microcontroller class?
 
 ## Requirements *(mandatory)*
 
@@ -95,6 +100,27 @@
 - **FR-006**: System MUST authenticate users via [NEEDS CLARIFICATION: auth method not specified - email/password, SSO, OAuth?]
 - **FR-007**: System MUST retain user data for [NEEDS CLARIFICATION: retention period not specified]
 
+### OPC UA Normative Scope *(mandatory for protocol features)*
+
+- **OPC-001**: Target OPC UA role/profile/conformance-unit assumption is [cite
+  OPC-10000-7 section or NEEDS CLARIFICATION].
+- **OPC-002**: Implemented services/features are [list each service/feature with
+  exact OPC-10000 part/section citations].
+- **OPC-003**: Unsupported services/features return [StatusCode behavior with
+  exact OPC UA citation].
+- **OPC-004**: Wire encoding/transport requirements cite [OPC-10000-6 sections,
+  e.g., Binary encoding, MessageChunk structure, Hello/Acknowledge, OPC UA TCP].
+- **OPC-005**: SecurityPolicy and conformance status are [experimental,
+  profile-targeting, profile-compliant, or CTT-verified] with rationale.
+
+### Scope Boundaries *(mandatory)*
+
+- **In Scope**: [minimal feature surface required for this feature]
+- **Out of Scope**: [explicitly excluded services/transports/encodings/features]
+- **Compatibility Claim**: [exact profile/services/encodings/transport profile URI
+  that may be claimed after this feature ships]
+- **Application Headroom Goal**: [flash/RAM headroom expected to remain available]
+
 ### Key Entities *(include if feature involves data)*
 
 - **[Entity 1]**: [What it represents, key attributes without implementation]
@@ -113,6 +139,10 @@
 - **SC-002**: [Measurable metric, e.g., "System handles 1000 concurrent users without degradation"]
 - **SC-003**: [User satisfaction metric, e.g., "90% of users successfully complete primary task on first attempt"]
 - **SC-004**: [Business metric, e.g., "Reduce support tickets related to [X] by 50%"]
+- **SC-005**: [Conformance/correctness metric, e.g., "All specified malformed
+  inputs return cited OPC UA StatusCodes"]
+- **SC-006**: [Embedded metric, e.g., "Default example remains below agreed flash
+  and RAM limits with documented headroom"]
 
 ## Assumptions
 
