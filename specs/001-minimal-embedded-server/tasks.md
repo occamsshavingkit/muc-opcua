@@ -166,7 +166,7 @@
 - [X] T094 [US3] Implement OPC UA Binary String encode/decode with null and length handling in src/encoding/binary_string.c (OPC refs: OPC-10000-6 5.2.2.4)
 - [X] T095 [US3] Implement OPC UA Binary NodeId encode/decode for v1 numeric and string variants in src/encoding/binary_nodeid.c (OPC refs: OPC-10000-6 5.2.2.9)
 - [X] T096 [US3] Implement ExtensionObject header decode and bounded skip behavior in src/encoding/binary_extension_object.c (OPC refs: OPC-10000-6 5.2.2.15)
-- [ ] T097 [US3] Implement Variant encode/decode for v1 scalar values in src/encoding/binary_variant.c (OPC refs: OPC-10000-6 5.2.2.16)
+- [X] T097 [US3] Implement Variant encode/decode for v1 scalar values in src/encoding/binary_variant.c (OPC refs: OPC-10000-6 5.2.2.16)
 - [ ] T098 [US3] Implement DataValue encode/decode for v1 Read responses in src/encoding/binary_datavalue.c (OPC refs: OPC-10000-4 5.11.2.3; OPC-10000-6 5.2.2.17)
 - [ ] T099 [US3] Define compact request/response encoding IDs and service IDs in src/generated/opcua_ids.c (OPC refs: OPC-10000-4 5.5.2.2, 5.5.4.2, 5.6.2.2, 5.6.3.2, 5.7.2.2, 5.7.3.2, 5.7.4.2, 5.9.2.2, 5.11.2.2; OPC-10000-6 5.2.9)
 - [ ] T100 [US3] Implement OPC UA TCP Hello/Acknowledge negotiation and buffer limit checks in src/core/tcp_connection.c (OPC refs: OPC-10000-6 7.1.2.3, 7.1.2.4, 7.2)

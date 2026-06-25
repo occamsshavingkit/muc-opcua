@@ -10,6 +10,7 @@ add_library(micro_opcua STATIC
     encoding/binary_string.c
     encoding/binary_nodeid.c
     encoding/binary_extension_object.c
+    encoding/binary_variant.c
 )
 
 target_include_directories(micro_opcua PUBLIC

@@ -59,4 +59,7 @@ opcua_statuscode_t mu_binary_read_extension_object_header(mu_binary_reader_t *re
 opcua_statuscode_t mu_binary_write_extension_object_header(mu_binary_writer_t *writer, const mu_nodeid_t *type_id, size_t length);
 opcua_statuscode_t mu_binary_skip_extension_object(mu_binary_reader_t *reader);
 
+opcua_statuscode_t mu_binary_read_variant(mu_binary_reader_t *reader, mu_variant_t *value);
+opcua_statuscode_t mu_binary_write_variant(mu_binary_writer_t *writer, const mu_variant_t *value);
+
 #endif /* MICRO_OPCUA_ENCODING_H */

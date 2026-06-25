@@ -8,8 +8,6 @@ void tearDown(void) {}
 
 /* These tests assume binary encoding APIs that will be implemented in subsequent tasks */
 void test_binary_variant_roundtrip(void) {
-    TEST_IGNORE_MESSAGE("Implement binary Variant test");
-#if 0
     opcua_byte_t buffer[128];
     mu_binary_writer_t writer;
     mu_binary_reader_t reader;
@@ -24,8 +22,7 @@ void test_binary_variant_roundtrip(void) {
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_variant(&reader, &read_variant));
     
     TEST_ASSERT_EQUAL(MU_TYPE_INT32, read_variant.type);
-    TEST_ASSERT_EQUAL(42, read_variant.data.i32);
-#endif
+    TEST_ASSERT_EQUAL(42, read_variant.value.i32);
 }
 
 void test_binary_datavalue_roundtrip(void) {
