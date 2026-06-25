@@ -1,0 +1,50 @@
+/* src/services/secure_channel.c */
+#include "secure_channel.h"
+#include <stddef.h>
+
+void mu_secure_channel_init(mu_secure_channel_t *channel) {
+    if (channel) {
+        channel->channel_id = 0;
+        channel->token_id = 0;
+        channel->created_at = 0;
+        channel->revised_lifetime = 0;
+        channel->is_open = false;
+        mu_sequence_validator_init(&channel->sequence);
+    }
+}
+
+opcua_statuscode_t mu_secure_channel_open(mu_secure_channel_t *channel, 
+                                          opcua_uint32_t requested_lifetime, 
+                                          opcua_uint32_t *revised_lifetime) 
+{
+    if (!channel || !revised_lifetime) return MU_STATUS_BAD_INTERNALERROR;
+
+    /* In a real implementation we would generate a random channel ID and token ID */
+    if (!channel->is_open) {
+        channel->channel_id = 1;
+        channel->token_id = 1;
+        mu_sequence_validator_init(&channel->sequence);
+        channel->is_open = true;
+    } else {
+        /* Renew */
+        channel->token_id++;
+    }
+
+    /* Bounded lifetime */
+    opcua_uint32_t lifetime = requested_lifetime;
+    if (lifetime < 10000) lifetime = 10000;
+    if (lifetime > 3600000) lifetime = 3600000;
+
+    channel->revised_lifetime = lifetime;
+    *revised_lifetime = lifetime;
+
+    return MU_STATUS_GOOD;
+}
+
+opcua_statuscode_t mu_secure_channel_close(mu_secure_channel_t *channel) {
+    if (!channel) return MU_STATUS_BAD_INTERNALERROR;
+    if (!channel->is_open) return MU_STATUS_BAD_TCPSECURECHANNELUNKNOWN;
+
+    mu_secure_channel_init(channel); /* Reset */
+    return MU_STATUS_GOOD;
+}
