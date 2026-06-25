@@ -16,7 +16,7 @@ if(MICRO_OPCUA_BUILD_TESTS)
 
     # We will add these as they are implemented
     add_subdirectory(unit)
-    # add_subdirectory(integration)
+    add_subdirectory(integration)
 endif()
 
 if(MICRO_OPCUA_BUILD_FUZZERS AND MICRO_OPCUA_IS_HOST)

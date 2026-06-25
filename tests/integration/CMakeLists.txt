@@ -1,0 +1,9 @@
+# tests/integration/CMakeLists.txt
+
+add_executable(test_minimal_server_flow test_minimal_server_flow.c)
+target_link_libraries(test_minimal_server_flow PRIVATE micro_opcua micro_opcua_test_support unity)
+add_test(NAME test_minimal_server_flow COMMAND test_minimal_server_flow)
+
+add_executable(test_discovery_endpoint_no_session test_discovery_endpoint_no_session.c)
+target_link_libraries(test_discovery_endpoint_no_session PRIVATE micro_opcua micro_opcua_test_support unity)
+add_test(NAME test_discovery_endpoint_no_session COMMAND test_discovery_endpoint_no_session)
