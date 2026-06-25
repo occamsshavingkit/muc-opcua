@@ -9,7 +9,7 @@ set(MICRO_OPCUA_SANITIZERS "" CACHE STRING "Comma-separated list of sanitizers (
 set(MICRO_OPCUA_PLATFORM "host" CACHE STRING "Target platform (host, pico, arduino-skeleton)")
 
 # Phase 1 setup will include other cmake files
-# include(cmake/MicroOpcUaOptions.cmake)
+include(cmake/MicroOpcUaOptions.cmake)
 # include(cmake/MicroOpcUaWarnings.cmake)
 # include(cmake/MicroOpcUaStaticAnalysis.cmake)
 
