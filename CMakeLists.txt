@@ -18,3 +18,7 @@ add_subdirectory(src)
 if(MICRO_OPCUA_BUILD_TESTS OR MICRO_OPCUA_BUILD_FUZZERS)
   add_subdirectory(tests)
 endif()
+
+if(MICRO_OPCUA_BUILD_EXAMPLES)
+    add_subdirectory(examples)
+endif()
