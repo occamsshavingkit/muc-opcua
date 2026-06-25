@@ -21,6 +21,7 @@
 #define MU_STATUS_BAD_SESSIONIDINVALID        ((opcua_statuscode_t)0x80250000)
 #define MU_STATUS_BAD_IDENTITYTOKENINVALID    ((opcua_statuscode_t)0x80200000)
 #define MU_STATUS_BAD_SECURECHANNELIDINVALID  ((opcua_statuscode_t)0x80210000)
+#define MU_STATUS_BAD_SECURITYPOLICYREJECTED  ((opcua_statuscode_t)0x80550000)
 #define MU_STATUS_BAD_SESSIONCLOSED           ((opcua_statuscode_t)0x80260000)
 #define MU_STATUS_BAD_NODEIDUNKNOWN           ((opcua_statuscode_t)0x80340000)
 #define MU_STATUS_BAD_TOOMANYOPERATIONS       ((opcua_statuscode_t)0x80100000)

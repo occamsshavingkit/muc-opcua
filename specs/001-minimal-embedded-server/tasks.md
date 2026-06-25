@@ -228,7 +228,7 @@
 - [X] T140 [US4] Implement NodeId invalid encoding mask rejection in src/encoding/binary_nodeid.c (OPC refs: OPC-10000-6 5.2.2.9)
 - [X] T141 [US4] Implement ExtensionObject invalid encoding and bounded body-length rejection in src/encoding/binary_extension_object.c (OPC refs: OPC-10000-6 5.2.2.15)
 - [X] T142 [US4] Implement invalid service-state StatusCode mapping for pre-Session Browse/Read and pre-SecureChannel Session services in src/core/service_dispatch.c (OPC refs: OPC-10000-4 5.6.2.2, 5.7.2.1, 5.9.2.2, 5.11.2.2, 7.38.2)
-- [ ] T143 [US4] Implement unsupported SecurityPolicy rejection in OpenSecureChannel handling in src/services/secure_channel.c (OPC refs: OPC-10000-4 5.6.2.2, 7.38.2; OPC-10000-6 6.7.4)
+- [X] T143 [US4] Implement unsupported SecurityPolicy rejection in OpenSecureChannel handling in src/services/secure_channel.c (OPC refs: OPC-10000-4 5.6.2.2, 7.38.2; OPC-10000-6 6.7.4)
 - [ ] T144 [US4] Implement unsupported identity-token rejection in ActivateSession handling in src/services/session.c (OPC refs: OPC-10000-4 5.7.3.2, 7.38.2, 7.40.1, 7.40.3, 7.41)
 - [ ] T145 [US4] Implement single-client TCP busy/error behavior for second active connection in src/core/tcp_connection.c (OPC refs: OPC-10000-6 7.1.5)
 - [ ] T146 [US4] Implement the write/subscription/method/history/PubSub/XML/JSON/HTTPS/WebSocket out-of-scope status-mapping table (the data table consumed by the Bad_ServiceUnsupported dispatch implemented in T137) in src/core/status.c (OPC refs: OPC-10000-4 5.11.3.2, 5.11.3.4, 5.11.4.2, 5.11.4.4, 5.12.2.2, 5.12.2.4, 5.14.2.2, 5.14.5.2, 5.14.5.4, 7.38.2; OPC-10000-6 5.3, 5.4.1, 7.4, 7.5.1; OPC-10000-14 5.1)
