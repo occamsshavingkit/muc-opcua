@@ -117,7 +117,7 @@
 - [X] T061 [US2] Wire address-space sources into the core library target in CMakeLists.txt (OPC refs: N/A - build infrastructure only)
 - [X] T062 [US2] Add reusable tiny static address-space definition for examples and integration tests in examples/minimal_server/static_address_space.c (OPC refs: OPC-10000-3 5.2.1, 5.5.1, 5.6.2, 5.9)
 - [X] T063 [US2] Update minimal server example to pass server identity, endpoint, buffers, and static address space in examples/minimal_server/main.c (OPC refs: OPC-10000-3 5.2.1, 5.5.1, 5.6.2; OPC-10000-6 7.2)
-- [ ] T064 [US2] Document address-space configuration and memory lifetimes in examples/minimal_server/README.md (OPC refs: OPC-10000-3 5.2.1, 5.5.1, 5.6.2, 5.9)
+- [X] T064 [US2] Document address-space configuration and memory lifetimes in examples/minimal_server/README.md (OPC refs: OPC-10000-3 5.2.1, 5.5.1, 5.6.2, 5.9)
 - [ ] T065 [US2] Update traceability rows for OPC-10000-3 5.2.1, 5.5.1, 5.6.2, and 5.9 address-space behavior in docs/traceability/sections-to-files.md (OPC refs: OPC-10000-3 5.2.1, 5.5.1, 5.6.2, 5.9)
 - [ ] T066 [US2] Record US2 static node, reference, value, and callback memory impact in docs/size/feature-size-ledger.md (OPC refs: N/A - size-impact tracking only)
 
