@@ -21,7 +21,7 @@ void test_tcp_hello_acknowledge_negotiation(void) {
     // Hello message
     opcua_byte_t hello[] = {
         'H', 'E', 'L', 'F',
-        36, 0, 0, 0, // Message size (36)
+        32, 0, 0, 0, // Message size (32)
         0, 0, 0, 0, // Protocol version
         0, 16, 0, 0, // Receive buffer (4096 - negotiated up to 8192)
         0, 16, 0, 0, // Send buffer (4096)
