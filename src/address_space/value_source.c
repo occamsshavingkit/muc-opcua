@@ -4,7 +4,7 @@
 
 opcua_statuscode_t mu_value_source_read(const mu_value_source_t *source, const mu_nodeid_t *node_id, mu_variant_t *value) {
     if (!source || !value) {
-        return MU_STATUS_BAD_INVALIDARGUMENT;
+        return MU_STATUS_BAD_INTERNALERROR;
     }
     
     if (source->type == MU_VALUESOURCE_STATIC) {
@@ -13,8 +13,12 @@ opcua_statuscode_t mu_value_source_read(const mu_value_source_t *source, const m
             case MU_TYPE_INT32:
             case MU_TYPE_UINT32:
             case MU_TYPE_FLOAT:
+                *value = source->data.static_value;
+                return MU_STATUS_GOOD;
             case MU_TYPE_STRING:
-                /* In T060 we'll add 64-byte limit check */
+                if (source->data.static_value.value.str.length > 64) {
+                    return MU_STATUS_BAD_ENCODINGLIMITSEXCEEDED;
+                }
                 *value = source->data.static_value;
                 return MU_STATUS_GOOD;
             default:

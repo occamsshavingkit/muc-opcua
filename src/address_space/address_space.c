@@ -6,11 +6,11 @@ opcua_statuscode_t mu_address_space_validate(const mu_address_space_t *address_s
     size_t i, j, r;
     
     if (!address_space) {
-        return MU_STATUS_BAD_INVALIDARGUMENT;
+        return MU_STATUS_BAD_INTERNALERROR;
     }
     
     if (!address_space->nodes && address_space->node_count > 0) {
-        return MU_STATUS_BAD_INVALIDARGUMENT;
+        return MU_STATUS_BAD_INTERNALERROR;
     }
     
     /* Check for duplicates */
