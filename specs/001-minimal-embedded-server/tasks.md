@@ -218,7 +218,7 @@
 - [X] T133 [P] [US4] Add second-client integration test expecting OPC UA TCP busy/error behavior in tests/integration/test_single_client_limit.c (OPC refs: OPC-10000-6 7.1.5)
 - [X] T134 [P] [US4] Add fuzz target for Binary reader entry point in tests/fuzz/fuzz_binary_reader.c (OPC refs: OPC-10000-6 5.2.1)
 - [X] T135 [P] [US4] Add fuzz target for MessageChunk parser in tests/fuzz/fuzz_message_chunk.c (OPC refs: OPC-10000-6 6.7.2, 6.7.3)
-- [ ] T136 [P] [US4] Add fuzz target for NodeId, String, array, ExtensionObject, Variant, and DataValue decode surfaces in tests/fuzz/fuzz_binary_types.c (OPC refs: OPC-10000-6 5.2.2.4, 5.2.2.9, 5.2.2.15, 5.2.2.16, 5.2.2.17, 5.2.5)
+- [X] T136 [P] [US4] Add fuzz target for NodeId, String, array, ExtensionObject, Variant, and DataValue decode surfaces in tests/fuzz/fuzz_binary_types.c (OPC refs: OPC-10000-6 5.2.2.4, 5.2.2.9, 5.2.2.15, 5.2.2.16, 5.2.2.17, 5.2.5)
 
 ### Implementation for User Story 4
 
