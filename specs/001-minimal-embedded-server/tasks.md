@@ -84,7 +84,7 @@
 - [X] T044 [US1] Add Pico adapter skeleton with no public SDK type leakage in platform/pico/mu_pico_adapter.c (OPC refs: N/A - platform adapter skeleton only)
 - [X] T045 [US1] Add PlatformIO project skeleton for Arduino adapter builds in platform/arduino/platformio.ini (OPC refs: N/A - embedded build skeleton only)
 - [X] T046 [US1] Add Arduino adapter skeleton preserving the C adapter contract in platform/arduino/src/mu_arduino_adapter.c (OPC refs: N/A - platform adapter skeleton only)
-- [ ] T047 [US1] Update traceability rows for US1 public headers, server lifecycle, platform adapters, and tests in docs/traceability/files-to-sections.md (OPC refs: OPC-10000-4 5.6.2.2, 5.7.2.2, 7.38.2; OPC-10000-6 7.1.2.3, 7.1.2.4, 7.1.5, 7.2)
+- [X] T047 [US1] Update traceability rows for US1 public headers, server lifecycle, platform adapters, and tests in docs/traceability/files-to-sections.md (OPC refs: OPC-10000-4 5.6.2.2, 5.7.2.2, 7.38.2; OPC-10000-6 7.1.2.3, 7.1.2.4, 7.1.5, 7.2)
 - [ ] T048 [US1] Record US1 size impact for public headers, storage, examples, and adapter skeletons in docs/size/feature-size-ledger.md (OPC refs: N/A - size-impact tracking only)
 
 **Checkpoint**: US1 is complete when host tests pass, the minimal host example builds, and the Pico/Arduino skeleton compile targets configure.
