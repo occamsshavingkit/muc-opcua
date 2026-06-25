@@ -7,14 +7,11 @@ void tearDown(void) {}
 
 /* These tests assume binary encoding APIs that will be implemented in subsequent tasks */
 void test_binary_extension_object_roundtrip(void) {
-    TEST_IGNORE_MESSAGE("Implement binary ExtensionObject test");
-#if 0
     opcua_byte_t buffer[128];
     mu_binary_writer_t writer;
     mu_binary_reader_t reader;
     
     mu_nodeid_t type_id = { 1, MU_NODEID_NUMERIC, { 1000 } };
-    opcua_byte_t body_data[] = { 0x01, 0x02, 0x03, 0x04 };
     
     mu_binary_writer_init(&writer, buffer, sizeof(buffer));
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_write_extension_object_header(&writer, &type_id, 4));
@@ -26,7 +23,6 @@ void test_binary_extension_object_roundtrip(void) {
     
     TEST_ASSERT_TRUE(mu_nodeid_equal(&type_id, &read_type_id));
     TEST_ASSERT_EQUAL(4, length);
-#endif
 }
 
 int main(void) {
