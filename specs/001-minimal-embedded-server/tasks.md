@@ -102,7 +102,7 @@
 - [X] T049 [P] [US2] Add address-space validation tests for duplicate NodeIds and unresolved references in tests/unit/test_address_space_validation.c (OPC refs: OPC-10000-3 5.2.1, 5.5.1, 5.6.2; OPC-10000-6 5.2.2.9)
 - [X] T050 [P] [US2] Add static value-source tests for Boolean, Int32, UInt32, Float, empty String, and 64-byte String in tests/unit/test_address_space_values.c (OPC refs: OPC-10000-3 5.9; OPC-10000-6 5.2.1, 5.2.2.4)
 - [X] T051 [P] [US2] Add callback value-source lifetime and StatusCode propagation tests in tests/unit/test_address_space_callbacks.c (OPC refs: OPC-10000-4 5.11.2.3, 7.38.2)
-- [ ] T052 [P] [US2] Add over-limit bounded String validation test for 65-byte UTF-8 payloads expecting Bad_EncodingLimitsExceeded in tests/unit/test_address_space_string_limits.c (OPC refs: OPC-10000-4 7.38.2; OPC-10000-6 5.2.2.4)
+- [X] T052 [P] [US2] Add over-limit bounded String validation test for 65-byte UTF-8 payloads expecting Bad_EncodingLimitsExceeded in tests/unit/test_address_space_string_limits.c (OPC refs: OPC-10000-4 7.38.2; OPC-10000-6 5.2.2.4)
 - [ ] T053 [P] [US2] Add server init test using application-owned address-space storage and caller-owned buffers in tests/unit/test_server_address_space_config.c (OPC refs: OPC-10000-3 5.2.1, 5.5.1, 5.6.2)
 
 ### Implementation for User Story 2
