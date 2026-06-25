@@ -34,6 +34,7 @@ opcua_statuscode_t mu_service_dispatch(
     size_t *response_length) 
 {
     if (!server || !request_body || !response_body || !response_length) return MU_STATUS_BAD_INTERNALERROR;
+    (void)request_length;
 
     const mu_service_handler_t *handler = mu_get_service_handler(request_id);
     if (handler == NULL) {
