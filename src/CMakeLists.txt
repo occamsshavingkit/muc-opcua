@@ -1,5 +1,5 @@
 # src/CMakeLists.txt
-set(MICRO_OPCUA_CORE_SOURCES
+add_library(micro_opcua STATIC
     core/server.c
     core/status.c
     core/tcp_connection.c
