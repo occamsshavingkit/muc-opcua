@@ -27,3 +27,5 @@ foreach(TEST_SOURCE ${UNIT_TEST_SOURCES})
     get_filename_component(TEST_NAME ${TEST_SOURCE} NAME_WE)
     add_unity_test(${TEST_NAME} ${TEST_SOURCE})
 endforeach()
+
+add_test(NAME test_size_report_script COMMAND bash ${CMAKE_SOURCE_DIR}/scripts/measure_size.sh)
