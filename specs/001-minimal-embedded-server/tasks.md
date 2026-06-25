@@ -146,7 +146,7 @@
 - [X] T077 [P] [US3] Add host integration test proving FindServers and GetEndpoints work before CreateSession/ActivateSession in tests/integration/test_discovery_endpoint_no_session.c (OPC refs: OPC-10000-4 3.1.3, 5.5.1, 5.5.2.2, 5.5.4.2)
 - [X] T078 [P] [US3] Add CreateSession, ActivateSession, and CloseSession fixtures in tests/fixtures/services/session.md (OPC refs: OPC-10000-4 5.7.2.2, 5.7.3.2, 5.7.4.2)
 - [X] T079 [P] [US3] Add Browse fixture for the default static address space in tests/fixtures/services/browse.md (OPC refs: OPC-10000-4 5.9.2.2, 7.29)
-- [ ] T080 [P] [US3] Add Browse limits tests for requestedMaxReferencesPerNode, response-size bounds, and no continuation points in tests/unit/test_browse_limits.c (OPC refs: OPC-10000-4 5.9.2.2, 5.9.2.4, 7.9)
+- [X] T080 [P] [US3] Add Browse limits tests for requestedMaxReferencesPerNode, response-size bounds, and no continuation points in tests/unit/test_browse_limits.c (OPC refs: OPC-10000-4 5.9.2.2, 5.9.2.4, 7.9)
 - [ ] T081 [P] [US3] Add BrowseNext unsupported-service fixture expecting Bad_ServiceUnsupported in tests/fixtures/services/browse_next_unsupported.md (OPC refs: OPC-10000-4 5.9.3.2, 5.9.3.4, 7.38.2)
 - [ ] T082 [P] [US3] Add Read fixtures for Boolean, Int32, UInt32, Float, and bounded String in tests/fixtures/services/read.md (OPC refs: OPC-10000-4 5.11.2.2, 5.11.2.3)
 - [ ] T083 [P] [US3] Add TCP connection state tests for Hello/Acknowledge negotiation and 8192-byte default buffers in tests/unit/test_tcp_connection.c (OPC refs: OPC-10000-6 7.1.2.3, 7.1.2.4, 7.2)
