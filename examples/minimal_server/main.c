@@ -3,7 +3,13 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <signal.h>
+#include <unistd.h>
 #include "static_address_space.h"
+
+/* We should be able to include host_tcp_adapter.h if it's in the build path */
+/* For this example we just include its prototype if it's not exported, wait, it should be exposed for host apps. */
+#include "../../src/platform/host_tcp_adapter.h"
 
 #define STORAGE_BYTES 4096
 static opcua_byte_t g_server_storage[STORAGE_BYTES];
@@ -11,37 +17,11 @@ static opcua_byte_t g_server_storage[STORAGE_BYTES];
 static opcua_byte_t g_recv_buffer[MU_MIN_CHUNK_SIZE];
 static opcua_byte_t g_send_buffer[MU_MIN_CHUNK_SIZE];
 
-/* Stub platform adapters for host example without network behavior */
-static opcua_statuscode_t stub_tcp_listen(void *context, const char *endpoint_url) {
-    (void)context;
-    printf("Listening on %s...\n", endpoint_url);
-    return MU_STATUS_GOOD;
-}
+static volatile int g_running = 1;
 
-static opcua_statuscode_t stub_tcp_accept(void *context, void **connection_handle) {
-    (void)context;
-    (void)connection_handle;
-    return MU_STATUS_GOOD;
-}
-
-static opcua_statuscode_t stub_tcp_read(void *context, void *connection_handle, opcua_byte_t *buffer, size_t buffer_size, size_t *bytes_read) {
-    (void)context; (void)connection_handle; (void)buffer; (void)buffer_size;
-    if (bytes_read) *bytes_read = 0;
-    return MU_STATUS_GOOD;
-}
-
-static opcua_statuscode_t stub_tcp_write(void *context, void *connection_handle, const opcua_byte_t *buffer, size_t buffer_size, size_t *bytes_written) {
-    (void)context; (void)connection_handle; (void)buffer;
-    if (bytes_written) *bytes_written = buffer_size;
-    return MU_STATUS_GOOD;
-}
-
-static void stub_tcp_close_connection(void *context, void *connection_handle) {
-    (void)context; (void)connection_handle;
-}
-
-static void stub_tcp_shutdown(void *context) {
-    (void)context;
+static void sigint_handler(int sig) {
+    (void)sig;
+    g_running = 0;
 }
 
 static opcua_datetime_t stub_get_time(void *context) {
@@ -62,6 +42,8 @@ int main(void)
     mu_server_t *server = NULL;
     opcua_statuscode_t status;
 
+    signal(SIGINT, sigint_handler);
+
     memset(&config, 0, sizeof(config));
 
     config.endpoint_url = "opc.tcp://localhost:4840";
@@ -79,12 +61,11 @@ int main(void)
     config.max_sessions = MU_MAX_SESSIONS;
     config.max_secure_channels = MU_MAX_SECURE_CHANNELS;
 
-    config.tcp_adapter.listen = stub_tcp_listen;
-    config.tcp_adapter.accept = stub_tcp_accept;
-    config.tcp_adapter.read = stub_tcp_read;
-    config.tcp_adapter.write = stub_tcp_write;
-    config.tcp_adapter.close_connection = stub_tcp_close_connection;
-    config.tcp_adapter.shutdown = stub_tcp_shutdown;
+    status = mu_host_tcp_adapter_init(&config.tcp_adapter);
+    if (status != MU_STATUS_GOOD) {
+        printf("Failed to init TCP adapter\n");
+        return 1;
+    }
 
     config.time_adapter.get_time = stub_get_time;
     config.time_adapter.get_tick_ms = stub_get_tick_ms;
@@ -100,13 +81,15 @@ int main(void)
         return 1;
     }
 
-    printf("Server initialized successfully.\n");
+    printf("Server initialized successfully. Listening on %s\n", config.endpoint_url);
 
-    /* Main loop (mock) */
-    printf("Entering main loop. Polling once...\n");
-    mu_server_poll(server);
+    /* Main loop */
+    while (g_running) {
+        mu_server_poll(server);
+        usleep(10000); /* 10ms sleep to avoid 100% CPU on non-blocking sockets */
+    }
     
-    printf("Shutting down...\n");
+    printf("\nShutting down...\n");
     mu_server_close(server);
     return 0;
 }
