@@ -4,10 +4,10 @@ This document maps explicit OPC UA normative sections to implementation and test
 
 | OPC UA Part | Section | Description | Files |
 |-------------|---------|-------------|-------|
-| 3 | 5.2.1 | Base NodeClass | |
-| 3 | 5.5.1 | Object NodeClass | |
-| 3 | 5.6.2 | Variable NodeClass | |
-| 3 | 5.9 | NodeClass Attributes | |
+| 3 | 5.2.1 | Base NodeClass | `include/micro_opcua/address_space.h`, `src/address_space/address_space.c` |
+| 3 | 5.5.1 | Object NodeClass | `include/micro_opcua/address_space.h`, `src/address_space/address_space.c` |
+| 3 | 5.6.2 | Variable NodeClass | `include/micro_opcua/address_space.h`, `src/address_space/value_source.c` |
+| 3 | 5.9 | NodeClass Attributes | `include/micro_opcua/address_space.h`, `src/address_space/value_source.c` |
 | 4 | 5.5.1 | Discovery Service Set | |
 | 4 | 5.5.2 | FindServers | |
 | 4 | 5.5.4 | GetEndpoints | |
