@@ -6,6 +6,7 @@ function(add_unity_test test_name test_source)
     # Unity is provided by FetchContent in the parent directory
     target_link_libraries(${test_name} PRIVATE unity)
     target_include_directories(${test_name} PRIVATE ${CMAKE_SOURCE_DIR}/tests/support)
+    target_compile_definitions(${test_name} PRIVATE PROJECT_ROOT_DIR="${CMAKE_SOURCE_DIR}")
     
     # The core library will be added later
     if(TARGET micro_opcua)
