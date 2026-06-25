@@ -16,9 +16,12 @@ typedef struct {
     bool is_open;
 } mu_secure_channel_t;
 
+#define MU_SECURITY_POLICY_NONE "http://opcfoundation.org/UA/SecurityPolicy#None"
+
 void mu_secure_channel_init(mu_secure_channel_t *channel);
 
 opcua_statuscode_t mu_secure_channel_open(mu_secure_channel_t *channel, 
+                                          const mu_string_t *security_policy,
                                           opcua_uint32_t requested_lifetime, 
                                           opcua_uint32_t *revised_lifetime);
 

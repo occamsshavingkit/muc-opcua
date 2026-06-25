@@ -5,25 +5,33 @@
 void setUp(void) {}
 void tearDown(void) {}
 
+#include "../../src/core/server_internal.h"
 #include "../../src/core/service_dispatch.h"
+#include <string.h>
 
 void test_findservers_no_session(void) {
+    mu_server_t server;
+    memset(&server, 0, sizeof(server));
+    server.secure_channel.is_open = true;
+    
     opcua_byte_t req[10];
-    mu_server_t *server = (mu_server_t*)&req; /* Mock server pointer */
     opcua_byte_t resp[10];
     size_t resp_len = 10;
     
-    opcua_statuscode_t status = mu_service_dispatch(server, MU_ID_FINDSERVERSREQUEST, req, 10, resp, &resp_len);
+    opcua_statuscode_t status = mu_service_dispatch(&server, MU_ID_FINDSERVERSREQUEST, req, 10, resp, &resp_len);
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, status);
 }
 
 void test_getendpoints_no_session(void) {
+    mu_server_t server;
+    memset(&server, 0, sizeof(server));
+    server.secure_channel.is_open = true;
+    
     opcua_byte_t req[10];
-    mu_server_t *server = (mu_server_t*)&req;
     opcua_byte_t resp[10];
     size_t resp_len = 10;
     
-    opcua_statuscode_t status = mu_service_dispatch(server, MU_ID_GETENDPOINTSREQUEST, req, 10, resp, &resp_len);
+    opcua_statuscode_t status = mu_service_dispatch(&server, MU_ID_GETENDPOINTSREQUEST, req, 10, resp, &resp_len);
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, status);
 }
 

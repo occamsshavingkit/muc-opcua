@@ -14,10 +14,17 @@ void mu_secure_channel_init(mu_secure_channel_t *channel) {
 }
 
 opcua_statuscode_t mu_secure_channel_open(mu_secure_channel_t *channel, 
+                                          const mu_string_t *security_policy,
                                           opcua_uint32_t requested_lifetime, 
                                           opcua_uint32_t *revised_lifetime) 
 {
     if (!channel || !revised_lifetime) return MU_STATUS_BAD_INTERNALERROR;
+
+    if (security_policy != NULL && security_policy->length > 0) {
+        if (security_policy->length != 47 || strncmp((const char*)security_policy->data, MU_SECURITY_POLICY_NONE, 47) != 0) {
+            return MU_STATUS_BAD_SECURITYPOLICYREJECTED;
+        }
+    }
 
     /* In a real implementation we would generate a random channel ID and token ID */
     if (!channel->is_open) {
