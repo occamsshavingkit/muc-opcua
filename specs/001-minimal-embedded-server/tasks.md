@@ -133,7 +133,7 @@
 
 ### Tests and Fixtures for User Story 3
 
-- [ ] T067 [P] [US3] Add Binary primitive round-trip tests for Boolean, Int32, UInt32, Float, UInt32 lengths, and StatusCode in tests/unit/test_binary_primitives.c (OPC refs: OPC-10000-4 7.38.2; OPC-10000-6 5.2.1)
+- [X] T067 [P] [US3] Add Binary primitive round-trip tests for Boolean, Int32, UInt32, Float, UInt32 lengths, and StatusCode in tests/unit/test_binary_primitives.c (OPC refs: OPC-10000-4 7.38.2; OPC-10000-6 5.2.1)
 - [ ] T068 [P] [US3] Add Binary String tests for null, empty, 64-byte, and over-limit values (over-limit expecting Bad_EncodingLimitsExceeded) in tests/unit/test_binary_string.c (OPC refs: OPC-10000-4 7.38.2; OPC-10000-6 5.2.2.4)
 - [ ] T069 [P] [US3] Add Binary NodeId tests for numeric and string variants in tests/unit/test_binary_nodeid.c (OPC refs: OPC-10000-6 5.2.2.9)
 - [ ] T070 [P] [US3] Add ExtensionObject header tests in tests/unit/test_binary_extension_object.c (OPC refs: OPC-10000-6 5.2.2.15)
