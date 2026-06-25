@@ -227,6 +227,6 @@ The public API and generated compatibility documentation must expose:
 - Transport: OPC UA TCP over `opc.tcp`.
 - Transport profile URI: `http://opcfoundation.org/UA-Profile/Transport/uatcp-uasc-uabinary`.
 - Profile status: `profile-targeting` until verified.
-- Target profile URI: `http://opcfoundation.org/UA-Profile/Server/NanoEmbeddedDevice`.
+- Target profile URIs: `http://opcfoundation.org/UA-Profile/Server/NanoEmbeddedDevice` and `http://opcfoundation.org/UA-Profile/Server/NanoEmbeddedDevice2017`.
 - SecurityPolicy behavior: SecurityPolicy None only as profile-permitted or non-production interoperability behavior.
 - Supported service list and unsupported-service behavior.

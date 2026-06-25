@@ -136,7 +136,6 @@ Required outputs:
 - `docs/traceability/files-to-sections.md`
 - `docs/traceability/statuscodes.md`
 - `docs/traceability/fixtures.md`
-- `docs/traceability/profile-target.md`
 - `docs/traceability/opcua-mcp-queries.md`
 - `docs/conformance/status.md`
 - `docs/conformance/profile-nano.md`

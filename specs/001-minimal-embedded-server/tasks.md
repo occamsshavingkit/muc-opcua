@@ -13,11 +13,11 @@
 
 **Purpose**: Create the build, test, analysis, and repository scaffolding used by every story.
 
-- [ ] T001 Create root CMake project with `MICRO_OPCUA_BUILD_TESTS`, `MICRO_OPCUA_BUILD_EXAMPLES`, `MICRO_OPCUA_BUILD_FUZZERS`, and `MICRO_OPCUA_PLATFORM` options in CMakeLists.txt (OPC refs: N/A - build infrastructure only)
+- [ ] T001 Create root CMake project with `MICRO_OPCUA_BUILD_TESTS`, `MICRO_OPCUA_BUILD_EXAMPLES`, `MICRO_OPCUA_BUILD_FUZZERS`, `MICRO_OPCUA_SANITIZERS`, and `MICRO_OPCUA_PLATFORM` options in CMakeLists.txt (OPC refs: N/A - build infrastructure only)
 - [ ] T002 Create reusable CMake option helpers for host, pico, and arduino-skeleton builds in cmake/MicroOpcUaOptions.cmake (OPC refs: N/A - build infrastructure only)
 - [ ] T003 Create warning and C11 standard configuration with warnings-as-errors support in cmake/MicroOpcUaWarnings.cmake (OPC refs: N/A - C toolchain configuration only)
 - [ ] T004 [P] Create clang-format configuration for C headers, C sources, CMake, and Markdown in .clang-format (OPC refs: N/A - formatting infrastructure only)
-- [ ] T005 [P] Create static-analysis CMake targets for cppcheck and optional clang-tidy in cmake/MicroOpcUaStaticAnalysis.cmake (OPC refs: N/A - static-analysis infrastructure only)
+- [ ] T005 [P] Create static-analysis CMake targets for format-check (clang-format), cppcheck, and optional clang-tidy in cmake/MicroOpcUaStaticAnalysis.cmake (OPC refs: N/A - static-analysis infrastructure only)
 - [ ] T006 Create top-level test registration for Unity, integration tests, fixtures, and fuzz targets in tests/CMakeLists.txt (OPC refs: N/A - test infrastructure only)
 - [ ] T007 Create Unity unit-test target skeleton and test discovery rules in tests/unit/CMakeLists.txt (OPC refs: N/A - test infrastructure only)
 - [ ] T008 [P] Create shared Unity configuration for host tests in tests/support/unity_config.h (OPC refs: N/A - test infrastructure only)
@@ -102,7 +102,7 @@
 - [ ] T049 [P] [US2] Add address-space validation tests for duplicate NodeIds and unresolved references in tests/unit/test_address_space_validation.c (OPC refs: OPC-10000-3 5.2.1, 5.5.1, 5.6.2; OPC-10000-6 5.2.2.9)
 - [ ] T050 [P] [US2] Add static value-source tests for Boolean, Int32, UInt32, Float, empty String, and 64-byte String in tests/unit/test_address_space_values.c (OPC refs: OPC-10000-3 5.9; OPC-10000-6 5.2.1, 5.2.2.4)
 - [ ] T051 [P] [US2] Add callback value-source lifetime and StatusCode propagation tests in tests/unit/test_address_space_callbacks.c (OPC refs: OPC-10000-4 5.11.2.3, 7.38.2)
-- [ ] T052 [P] [US2] Add over-limit bounded String validation test for 65-byte UTF-8 payloads in tests/unit/test_address_space_string_limits.c (OPC refs: OPC-10000-6 5.2.2.4)
+- [ ] T052 [P] [US2] Add over-limit bounded String validation test for 65-byte UTF-8 payloads expecting Bad_EncodingLimitsExceeded in tests/unit/test_address_space_string_limits.c (OPC refs: OPC-10000-4 7.38.2; OPC-10000-6 5.2.2.4)
 - [ ] T053 [P] [US2] Add server init test using application-owned address-space storage and caller-owned buffers in tests/unit/test_server_address_space_config.c (OPC refs: OPC-10000-3 5.2.1, 5.5.1, 5.6.2)
 
 ### Implementation for User Story 2
@@ -113,7 +113,7 @@
 - [ ] T057 [US2] Implement static address-space validation for duplicate nodes and invalid references in src/address_space/address_space.c (OPC refs: OPC-10000-3 5.2.1, 5.5.1, 5.6.2)
 - [ ] T058 [US2] Implement fixed value-source reads for Boolean, Int32, UInt32, Float, and bounded String in src/address_space/value_source.c (OPC refs: OPC-10000-3 5.9; OPC-10000-6 5.2.1, 5.2.2.4)
 - [ ] T059 [US2] Implement callback value-source reads with caller-owned lifetime rules in src/address_space/value_source.c (OPC refs: OPC-10000-4 5.11.2.3, 7.38.2)
-- [ ] T060 [US2] Implement 64-byte bounded String validation and StatusCode return behavior in src/address_space/value_source.c (OPC refs: OPC-10000-4 7.38.2; OPC-10000-6 5.2.2.4)
+- [ ] T060 [US2] Implement 64-byte bounded String validation returning Bad_EncodingLimitsExceeded for over-limit values in src/address_space/value_source.c (OPC refs: OPC-10000-4 7.38.2; OPC-10000-6 5.2.2.4)
 - [ ] T061 [US2] Wire address-space sources into the core library target in CMakeLists.txt (OPC refs: N/A - build infrastructure only)
 - [ ] T062 [US2] Add reusable tiny static address-space definition for examples and integration tests in examples/minimal_server/static_address_space.c (OPC refs: OPC-10000-3 5.2.1, 5.5.1, 5.6.2, 5.9)
 - [ ] T063 [US2] Update minimal server example to pass server identity, endpoint, buffers, and static address space in examples/minimal_server/main.c (OPC refs: OPC-10000-3 5.2.1, 5.5.1, 5.6.2; OPC-10000-6 7.2)
@@ -134,7 +134,7 @@
 ### Tests and Fixtures for User Story 3
 
 - [ ] T067 [P] [US3] Add Binary primitive round-trip tests for Boolean, Int32, UInt32, Float, UInt32 lengths, and StatusCode in tests/unit/test_binary_primitives.c (OPC refs: OPC-10000-4 7.38.2; OPC-10000-6 5.2.1)
-- [ ] T068 [P] [US3] Add Binary String tests for null, empty, 64-byte, and over-limit values in tests/unit/test_binary_string.c (OPC refs: OPC-10000-6 5.2.2.4)
+- [ ] T068 [P] [US3] Add Binary String tests for null, empty, 64-byte, and over-limit values (over-limit expecting Bad_EncodingLimitsExceeded) in tests/unit/test_binary_string.c (OPC refs: OPC-10000-4 7.38.2; OPC-10000-6 5.2.2.4)
 - [ ] T069 [P] [US3] Add Binary NodeId tests for numeric and string variants in tests/unit/test_binary_nodeid.c (OPC refs: OPC-10000-6 5.2.2.9)
 - [ ] T070 [P] [US3] Add ExtensionObject header tests in tests/unit/test_binary_extension_object.c (OPC refs: OPC-10000-6 5.2.2.15)
 - [ ] T071 [P] [US3] Add Variant and DataValue tests for Boolean, Int32, UInt32, Float, and String in tests/unit/test_binary_variant_datavalue.c (OPC refs: OPC-10000-6 5.2.2.16, 5.2.2.17)
@@ -208,7 +208,7 @@
 - [ ] T123 [P] [US4] Add unsupported Write, CreateSubscription, Publish, Call, HistoryRead, BrowseNext, TranslateBrowsePathsToNodeIds, RegisterNodes, XML, JSON, HTTPS, and WebSockets matrix fixture expecting Bad_ServiceUnsupported or cited transport rejection in tests/fixtures/services/unsupported_services.md (OPC refs: OPC-10000-4 5.9.3.2, 5.9.3.4, 5.9.4.2, 5.9.4.4, 5.9.5.2, 5.9.5.3, 5.11.3.2, 5.11.3.4, 5.11.4.2, 5.11.4.4, 5.12.2.2, 5.12.2.4, 5.14.2.2, 5.14.5.2, 5.14.5.4, 7.38.2; OPC-10000-6 5.3, 5.4.1, 7.4, 7.5.1)
 - [ ] T124 [P] [US4] Add malformed MessageChunk size tests for too-small, too-large, and inconsistent declared length in tests/unit/test_message_chunk_errors.c (OPC refs: OPC-10000-6 6.7.2, 6.7.3)
 - [ ] T125 [P] [US4] Add invalid message type and invalid chunk type tests in tests/unit/test_message_chunk_errors.c (OPC refs: OPC-10000-6 6.7.3)
-- [ ] T126 [P] [US4] Add truncated String, negative length, excessive length, and embedded overrun tests in tests/unit/test_binary_string_errors.c (OPC refs: OPC-10000-6 5.2.2.4)
+- [ ] T126 [P] [US4] Add truncated String, negative length, excessive length, and embedded overrun tests asserting Bad_DecodingError for malformed framing and Bad_EncodingLimitsExceeded for over-limit lengths in tests/unit/test_binary_string_errors.c (OPC refs: OPC-10000-4 7.38.2; OPC-10000-6 5.2.2.4)
 - [ ] T127 [P] [US4] Add invalid array length and truncated array tests in tests/unit/test_binary_array_errors.c (OPC refs: OPC-10000-6 5.2.5)
 - [ ] T128 [P] [US4] Add invalid NodeId encoding mask tests in tests/unit/test_binary_nodeid_errors.c (OPC refs: OPC-10000-6 5.2.2.9)
 - [ ] T129 [P] [US4] Add invalid ExtensionObject encoding and body length tests in tests/unit/test_binary_extension_object_errors.c (OPC refs: OPC-10000-6 5.2.2.15)
@@ -231,9 +231,9 @@
 - [ ] T143 [US4] Implement unsupported SecurityPolicy rejection in OpenSecureChannel handling in src/services/secure_channel.c (OPC refs: OPC-10000-4 5.6.2.2, 7.38.2; OPC-10000-6 6.7.4)
 - [ ] T144 [US4] Implement unsupported identity-token rejection in ActivateSession handling in src/services/session.c (OPC refs: OPC-10000-4 5.7.3.2, 7.38.2, 7.40.1, 7.40.3, 7.41)
 - [ ] T145 [US4] Implement single-client TCP busy/error behavior for second active connection in src/core/tcp_connection.c (OPC refs: OPC-10000-6 7.1.5)
-- [ ] T146 [US4] Implement write/subscription/method/history/PubSub/XML/JSON/HTTPS/WebSocket out-of-scope status mapping in src/core/status.c (OPC refs: OPC-10000-4 5.11.3.2, 5.11.3.4, 5.11.4.2, 5.11.4.4, 5.12.2.2, 5.12.2.4, 5.14.2.2, 5.14.5.2, 5.14.5.4, 7.38.2; OPC-10000-6 5.3, 5.4.1, 7.4, 7.5.1; OPC-10000-14 5.1)
+- [ ] T146 [US4] Implement the write/subscription/method/history/PubSub/XML/JSON/HTTPS/WebSocket out-of-scope status-mapping table (the data table consumed by the Bad_ServiceUnsupported dispatch implemented in T137) in src/core/status.c (OPC refs: OPC-10000-4 5.11.3.2, 5.11.3.4, 5.11.4.2, 5.11.4.4, 5.12.2.2, 5.12.2.4, 5.14.2.2, 5.14.5.2, 5.14.5.4, 7.38.2; OPC-10000-6 5.3, 5.4.1, 7.4, 7.5.1; OPC-10000-14 5.1)
 - [ ] T147 [US4] Register fuzz target builds with graceful unavailable-tool documentation in tests/fuzz/CMakeLists.txt (OPC refs: N/A - fuzz build infrastructure only)
-- [ ] T148 [US4] Update StatusCode traceability rows for all US4 error conditions in docs/traceability/statuscodes.md (OPC refs: OPC-10000-4 5.7.2.1, 5.9.3, 5.9.4, 5.9.5, 5.11.3, 5.11.4, 5.12.2, 5.14.2, 5.14.5, 7.38.2; OPC-10000-6 5.2.2.4, 5.2.2.9, 5.2.2.15, 5.2.5, 6.7.3, 7.1.5)
+- [ ] T148 [US4] Update StatusCode traceability rows for all US4 error conditions, including identity-token rejection codes, in docs/traceability/statuscodes.md (OPC refs: OPC-10000-4 5.7.2.1, 5.7.3.2, 5.9.3, 5.9.4, 5.9.5, 5.11.3, 5.11.4, 5.12.2, 5.14.2, 5.14.5, 7.38.2, 7.40.1, 7.40.3, 7.41; OPC-10000-6 5.2.2.4, 5.2.2.9, 5.2.2.15, 5.2.5, 6.7.3, 7.1.5)
 - [ ] T149 [US4] Update traceability rows for malformed fixtures, fuzz targets, and state-machine error tests in docs/traceability/fixtures.md (OPC refs: OPC-10000-4 5.6.2.2, 5.7.2.1, 5.9.2.2, 5.11.2.2, 7.38.2; OPC-10000-6 5.2.1, 5.2.2.4, 5.2.2.9, 5.2.2.15, 5.2.5, 6.7.2, 6.7.3, 7.1.5)
 - [ ] T150 [US4] Record US4 parser checks, fuzz targets, and error-table size impact in docs/size/feature-size-ledger.md (OPC refs: N/A - size-impact tracking only)
 
@@ -257,7 +257,7 @@
 ### Implementation for User Story 5
 
 - [ ] T155 [US5] Implement traceability generation helper for sections-to-files and files-to-sections tables in scripts/generate-traceability.sh (OPC refs: N/A - traceability generation tooling; consumes cited section rows)
-- [ ] T156 [US5] Implement CMake traceability target that invokes scripts/generate-traceability.sh in cmake/MicroOpcUaTraceability.cmake (OPC refs: N/A - build orchestration for traceability tooling only)
+- [ ] T156 [US5] Implement CMake traceability and conformance-docs targets that invoke scripts/generate-traceability.sh and assemble the docs/conformance outputs in cmake/MicroOpcUaTraceability.cmake (OPC refs: N/A - build orchestration for traceability tooling only)
 - [ ] T157 [US5] Complete Nano profile-targeting checklist and conformance-unit evidence placeholders in docs/conformance/profile-nano.md (OPC refs: OPC-10000-7 3.1.5, 4.2, 4.4, 4.6, 4.7, 4.8)
 - [ ] T158 [US5] Complete supported/unsupported service compatibility matrix with exact services, transport, encoding, and SecurityPolicy behavior in docs/conformance/services.md (OPC refs: OPC-10000-4 5.5.1, 5.5.2.2, 5.5.4.2, 5.6.2.2, 5.6.3.2, 5.7.2.2, 5.7.3.2, 5.7.4.2, 5.9.2.2, 5.9.2.4, 5.9.3.2, 5.9.3.4, 5.9.4.2, 5.9.4.4, 5.9.5.2, 5.9.5.3, 5.11.2.2, 5.11.2.3, 5.11.3.2, 5.11.3.4, 5.11.4.2, 5.11.4.4, 5.12.2.2, 5.12.2.4, 5.14.2.2, 5.14.5.2, 5.14.5.4, 7.14, 7.38.2; OPC-10000-6 5.2.1, 5.2.2.4, 5.2.2.9, 5.2.2.15, 5.2.2.16, 5.2.2.17, 5.2.9, 5.3, 5.4.1, 6.7.4, 7.2, 7.4, 7.5.1)
 - [ ] T159 [US5] Complete SecurityPolicy None and user token policy documentation with profile-targeting caveats in docs/conformance/security.md (OPC refs: OPC-10000-4 5.6.2.2, 5.7.3.2, 7.40.1, 7.40.3, 7.41; OPC-10000-6 6.7.4; OPC-10000-7 4.2)
@@ -278,7 +278,7 @@
 
 **Purpose**: Final verification, cleanup, and release-readiness evidence after the selected stories are complete.
 
-- [ ] T168 Run host configure/build/unit/integration test flow and record command output summary in docs/validation/host-tests.md (OPC refs: OPC-10000-4 5.5.1, 5.5.2.2, 5.5.4.2, 5.6.2.2, 5.7.2.2, 5.7.3.2, 5.9.2.2, 5.11.2.2; OPC-10000-6 5.2.1, 6.7.2, 7.1.2.3, 7.1.2.4, 7.2)
+- [ ] T168 Run host configure/build/unit/integration test flow and record command output summary plus total elapsed wall-clock time against the SC-001 under-15-minutes target in docs/validation/host-tests.md (OPC refs: OPC-10000-4 5.5.1, 5.5.2.2, 5.5.4.2, 5.6.2.2, 5.7.2.2, 5.7.3.2, 5.9.2.2, 5.11.2.2; OPC-10000-6 5.2.1, 6.7.2, 7.1.2.3, 7.1.2.4, 7.2)
 - [ ] T169 Run sanitizer configure/build/test flow or document unavailable tooling in docs/validation/sanitizers.md (OPC refs: N/A - sanitizer validation runner only)
 - [ ] T170 Run fuzz target compile and one bounded smoke execution per fuzz target or document unavailable tooling in docs/validation/fuzz.md (OPC refs: OPC-10000-6 5.2.1, 5.2.2.4, 5.2.2.9, 5.2.2.15, 5.2.2.16, 5.2.2.17, 5.2.5, 6.7.2, 6.7.3)
 - [ ] T171 Run clang-format, cppcheck, and clang-tidy checks and record results in docs/validation/static-analysis.md (OPC refs: N/A - static-analysis validation runner only)

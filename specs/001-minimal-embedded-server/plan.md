@@ -25,22 +25,23 @@ The first server surface is intentionally narrow: endpoint discovery, OPC UA TCP
 
 **Performance Goals**: Complete the minimal connect/discover/browse/read flow for one active client, one SecureChannel, and one Session without protocol hot-path heap allocation. Process malformed decoder input deterministically without unbounded recursion, unbounded loops, or buffer growth.
 
-**Constraints**: Caller-provided buffers; default single client/channel/session; no subscriptions, writes, methods, history, alarms/events, PubSub, XML, JSON, HTTPS, WebSockets, dynamic address-space mutation, or companion-spec modeling in v1 unless Nano profile research proves a requirement. First-version scalar variable values are Boolean, Int32, UInt32, Float, and bounded String with a maximum encoded payload of 64 UTF-8 bytes. Variable strings or decoded wire strings (e.g., SessionName, EndpointUrl) exceeding their limits (64 bytes for variables/wire strings) are strictly rejected rather than truncated, returning Bad_OutOfRange or Bad_EncodingLimitsExceeded. For Browse requests requiring a continuation point, the server returns Bad_NoContinuationPoints. Only Anonymous user identity tokens are supported, and any other token type is rejected with Bad_IdentityTokenInvalid.
+**Constraints**: Caller-provided buffers; default single client/channel/session; no subscriptions, writes, methods, history, alarms/events, PubSub, XML, JSON, HTTPS, WebSockets, dynamic address-space mutation, or companion-spec modeling in v1 unless Nano profile research proves a requirement. First-version scalar variable values are Boolean, Int32, UInt32, Float, and bounded String with a maximum encoded payload of 64 UTF-8 bytes. Variable strings or decoded wire strings (e.g., SessionName, EndpointUrl) exceeding their limits (64 bytes for variables/wire strings) are strictly rejected rather than truncated, returning Bad_EncodingLimitsExceeded (malformed wire framing, such as truncated or negative lengths, remains Bad_DecodingError). For Browse requests requiring a continuation point, the server returns Bad_NoContinuationPoints. Only Anonymous user identity tokens are supported, and any other token type is rejected with Bad_IdentityTokenInvalid.
 
 **Scale/Scope**: Tiny static address space suitable for an embedded device example: server root/object nodes plus a small application folder and a handful of read-only variable nodes. Static model size, reference count, and operation limits must be documented in generated traceability and size reports.
 
 **OPC UA Normative References**:
 
 - OPC-10000-3 5.2.1, 5.5.1, 5.6.2, 5.9 for AddressSpace NodeClass and Attribute requirements.
-- OPC-10000-4 5.5.1, 5.5.2, 5.5.4 for Discovery, FindServers, and GetEndpoints.
+- OPC-10000-4 3.1.3, 5.5.1, 5.5.2, 5.5.4, 7.14 for DiscoveryEndpoint, Discovery, FindServers, GetEndpoints, and EndpointDescription.
 - OPC-10000-4 5.6.2 and 5.6.3 for OpenSecureChannel and CloseSecureChannel.
 - OPC-10000-4 5.7.2, 5.7.3, 5.7.4 for CreateSession, ActivateSession, and CloseSession.
-- OPC-10000-4 5.9.2 for Browse and 5.9.2.4 for Browse operation-level StatusCodes.
+- OPC-10000-4 5.9.2 for Browse, 5.9.2.4 for Browse operation-level StatusCodes, and 7.9 for ContinuationPoint parameters.
 - OPC-10000-4 5.11.2 for Read and 5.11.2.3 for Read StatusCodes.
 - OPC-10000-4 7.29, 7.32, 7.33, 7.38.2, 7.40.1, 7.40.3, and 7.41 for ReferenceDescription, request/response headers, common StatusCodes, identity tokens, and user token policy.
-- OPC-10000-6 5.2.1, 5.2.2.4, 5.2.2.9, 5.2.2.15, 5.2.2.16, 5.2.2.17, and 5.2.9 for OPC UA Binary encoding, String, NodeId, ExtensionObject, Variant, DataValue, and message body encoding.
+- OPC-10000-6 5.2.1, 5.2.2.4, 5.2.2.9, 5.2.2.15, 5.2.2.16, 5.2.2.17, 5.2.5, and 5.2.9 for OPC UA Binary encoding, String, NodeId, ExtensionObject, Variant, DataValue, array, and message body encoding.
 - OPC-10000-6 6.7.1, 6.7.2, 6.7.3, 6.7.4, 6.7.7, 7.1.2.3, 7.1.2.4, 7.1.5, and 7.2 for UASC chunks, SecureChannel framing, Hello/Acknowledge, OPC UA TCP errors, and OPC UA TCP transport.
 - OPC-10000-7 3.1.5, 4.2, 4.4, 4.6, 4.7, and 4.8 for facets, conformance units, profile categories, profile definitions, versioning, and applications.
+- OPC-10000-14 5.1 for the PubSub overview, cited only to document PubSub as out-of-scope and to map PubSub requests to `Bad_ServiceUnsupported`.
 
 **Target OPC UA Profile/Conformance Units**: Target the Nano Embedded Device Server Profile family, profile URIs `http://opcfoundation.org/UA-Profile/Server/NanoEmbeddedDevice` and `http://opcfoundation.org/UA-Profile/Server/NanoEmbeddedDevice2017`, and the transport profile URI `http://opcfoundation.org/UA-Profile/Transport/uatcp-uasc-uabinary`. The Micro Embedded Device profile is not the initial target because OPC Foundation profile metadata states that Micro builds on Nano and adds subscriptions. Exact mandatory facets and conformance units must be extracted from OPC-10000-7 and OPC Foundation profile metadata before any `profile-compliant` claim.
 

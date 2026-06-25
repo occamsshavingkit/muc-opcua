@@ -123,8 +123,9 @@ Minimum generated tables:
 - `files-to-sections.md`: source/header/test artifact to OPC UA sections.
 - `statuscodes.md`: internal condition to OPC UA StatusCode or TCP error behavior.
 - `fixtures.md`: byte fixture to OPC UA type/message/section.
-- `profile-target.md`: target profile/facet/conformance-unit evidence.
 - `opcua-mcp-queries.md`: OPC UA MCP query provenance for profile, service, encoding, transport, StatusCode, and conformance decisions.
+
+Target profile/facet/conformance-unit evidence is maintained in `docs/conformance/profile-nano.md` (see Conformance Status Contract below); it is not duplicated as a separate traceability table.
 
 Each row must include:
 

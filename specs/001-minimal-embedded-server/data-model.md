@@ -20,6 +20,8 @@ Represents immutable or init-time server settings.
 - `security_policy_uri`: SecurityPolicy None URI for the v1 interoperability phase unless profile research requires another policy.
 - `security_mode`: MessageSecurityMode None for the v1 interoperability phase unless profile research requires another mode.
 - `user_token_policies`: bounded array selected from profile research, initially anonymous only if permitted.
+- `rx_buffer`: caller-owned receive buffer span (`mu_BytesMut`); default 8192 bytes.
+- `tx_buffer`: caller-owned transmit buffer span (`mu_BytesMut`); default 8192 bytes.
 - `limits`: `ServerLimits` instance.
 - `address_space`: `StaticAddressSpace` instance.
 - `platform`: `PlatformAdapter` instance.
@@ -39,18 +41,16 @@ Represents configured compile-time and runtime bounds.
 - `max_clients`: default 1.
 - `max_secure_channels`: default 1.
 - `max_sessions`: default 1.
-- `rx_buffer_len`: caller-provided receive buffer length.
-- `tx_buffer_len`: caller-provided transmit buffer length.
 - `max_string_value_len`: default and v1 maximum 64 encoded UTF-8 bytes.
-- `max_nodes`: number of static nodes supplied by the application.
-- `max_references`: number of static references supplied by the application.
 - `max_browse_results_per_node`: maximum references returned for one Browse target.
 - `max_read_nodes_per_request`: bounded operation count for Read.
 - `max_browse_nodes_per_request`: bounded operation count for Browse.
 
+Receive/transmit buffer spans are carried on `ServerConfig` (`rx_buffer`/`tx_buffer`), and static node/reference counts are carried on `StaticAddressSpace` (`node_count`/`reference_count`); they are not duplicated here. This matches the public `mu_ServerLimits` contract in `contracts/public-api.md`.
+
 **Validation**
 
-- Default RX/TX buffers are 8192 bytes each.
+- Default `ServerConfig` RX/TX buffers are 8192 bytes each.
 - Any smaller buffer must pass OPC UA TCP Hello/Acknowledge legality checks for the advertised endpoint.
 - All operation maxima must be finite and test-covered.
 
