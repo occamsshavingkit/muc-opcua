@@ -5,7 +5,7 @@
 #include "micro_opcua/opcua_types.h"
 #include "micro_opcua/status.h"
 #include "micro_opcua/address_space.h"
-#include "micro_opcua/binary_codec.h"
+#include "../core/binary_codec.h"
 
 typedef enum {
     MU_BROWSE_DIRECTION_FORWARD = 0,
