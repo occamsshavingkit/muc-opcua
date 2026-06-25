@@ -91,3 +91,14 @@ void test_static_value_source_string_64_bytes(void) {
     TEST_ASSERT_EQUAL(MU_TYPE_STRING, value.type);
     TEST_ASSERT_EQUAL_INT32(64, value.value.str.length);
 }
+
+int main(void) {
+    UNITY_BEGIN();
+    RUN_TEST(test_static_value_source_boolean);
+    RUN_TEST(test_static_value_source_int32);
+    RUN_TEST(test_static_value_source_uint32);
+    RUN_TEST(test_static_value_source_float);
+    RUN_TEST(test_static_value_source_string_empty);
+    RUN_TEST(test_static_value_source_string_64_bytes);
+    return UNITY_END();
+}

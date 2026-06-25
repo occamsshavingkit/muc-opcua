@@ -8,3 +8,9 @@ void tearDown(void) {}
 void test_server_init_with_address_space(void) {
     TEST_IGNORE_MESSAGE("Implement server init with address space test");
 }
+
+int main(void) {
+    UNITY_BEGIN();
+    RUN_TEST(test_server_init_with_address_space);
+    return UNITY_END();
+}

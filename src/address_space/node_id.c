@@ -23,13 +23,13 @@ opcua_boolean_t mu_nodeid_equal(const mu_nodeid_t *n1, const mu_nodeid_t *n2) {
             if (n1->identifier.string.length != n2->identifier.string.length) {
                 return false;
             }
-            if (n1->identifier.string.length == 0) {
+            if (n1->identifier.string.length <= 0) {
                 return true;
             }
             if (!n1->identifier.string.data || !n2->identifier.string.data) {
                 return n1->identifier.string.data == n2->identifier.string.data;
             }
-            return memcmp(n1->identifier.string.data, n2->identifier.string.data, n1->identifier.string.length) == 0;
+            return memcmp(n1->identifier.string.data, n2->identifier.string.data, (size_t)n1->identifier.string.length) == 0;
             
         default:
             /* GUID and Opaque not supported in minimal profile */

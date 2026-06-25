@@ -18,3 +18,9 @@ void test_over_limit_bounded_string_validation(void) {
     
     TEST_ASSERT_EQUAL(MU_STATUS_BAD_ENCODINGLIMITSEXCEEDED, mu_value_source_read(&source, &id, &value));
 }
+
+int main(void) {
+    UNITY_BEGIN();
+    RUN_TEST(test_over_limit_bounded_string_validation);
+    return UNITY_END();
+}
