@@ -144,7 +144,7 @@
 - [X] T075 [P] [US3] Add FindServers and GetEndpoints fixtures in tests/fixtures/services/discovery.md (OPC refs: OPC-10000-4 5.5.2.2, 5.5.4.2)
 - [X] T076 [P] [US3] Add DiscoveryEndpoint no-session unit tests for FindServers and GetEndpoints in tests/unit/test_discovery_endpoint.c (OPC refs: OPC-10000-4 3.1.3, 5.5.1, 5.5.2.2, 5.5.4.2)
 - [X] T077 [P] [US3] Add host integration test proving FindServers and GetEndpoints work before CreateSession/ActivateSession in tests/integration/test_discovery_endpoint_no_session.c (OPC refs: OPC-10000-4 3.1.3, 5.5.1, 5.5.2.2, 5.5.4.2)
-- [ ] T078 [P] [US3] Add CreateSession, ActivateSession, and CloseSession fixtures in tests/fixtures/services/session.md (OPC refs: OPC-10000-4 5.7.2.2, 5.7.3.2, 5.7.4.2)
+- [X] T078 [P] [US3] Add CreateSession, ActivateSession, and CloseSession fixtures in tests/fixtures/services/session.md (OPC refs: OPC-10000-4 5.7.2.2, 5.7.3.2, 5.7.4.2)
 - [ ] T079 [P] [US3] Add Browse fixture for the default static address space in tests/fixtures/services/browse.md (OPC refs: OPC-10000-4 5.9.2.2, 7.29)
 - [ ] T080 [P] [US3] Add Browse limits tests for requestedMaxReferencesPerNode, response-size bounds, and no continuation points in tests/unit/test_browse_limits.c (OPC refs: OPC-10000-4 5.9.2.2, 5.9.2.4, 7.9)
 - [ ] T081 [P] [US3] Add BrowseNext unsupported-service fixture expecting Bad_ServiceUnsupported in tests/fixtures/services/browse_next_unsupported.md (OPC refs: OPC-10000-4 5.9.3.2, 5.9.3.4, 7.38.2)
