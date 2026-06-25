@@ -68,7 +68,7 @@
 ### Implementation for User Story 1
 
 - [X] T030 [US1] Define public compile-time limits and `MU_SERVER_STORAGE_BYTES` in include/micro_opcua/config.h (OPC refs: OPC-10000-6 7.1.2.3, 7.1.2.4)
-- [ ] T031 [US1] Define bytes, string, NodeId, value, and size-report public types in include/micro_opcua/types.h (OPC refs: OPC-10000-6 5.2.1, 5.2.2.4, 5.2.2.9, 5.2.2.16, 5.2.2.17)
+- [X] T031 [US1] Define bytes, string, NodeId, value, and size-report public types in include/micro_opcua/types.h (OPC refs: OPC-10000-6 5.2.1, 5.2.2.4, 5.2.2.9, 5.2.2.16, 5.2.2.17)
 - [ ] T032 [US1] Define public OPC UA StatusCode constants and status helper prototypes in include/micro_opcua/status.h (OPC refs: OPC-10000-4 7.38.2; OPC-10000-6 7.1.5)
 - [ ] T033 [US1] Define TCP, time, entropy, persistence, and crypto adapter interfaces in include/micro_opcua/platform.h (OPC refs: OPC-10000-4 5.6.2.2; OPC-10000-6 7.2)
 - [ ] T034 [US1] Define server config, storage, lifecycle, and validation APIs in include/micro_opcua/server.h (OPC refs: OPC-10000-4 5.6.2.2, 5.7.2.2; OPC-10000-6 7.1.2.3, 7.1.2.4, 7.2)
