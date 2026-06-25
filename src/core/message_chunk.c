@@ -4,7 +4,7 @@
 
 opcua_statuscode_t mu_parse_message_header(const opcua_byte_t *buffer, size_t length, mu_message_header_t *header) {
     if (!buffer || !header) return MU_STATUS_BAD_INTERNALERROR;
-    if (length < 12) return MU_STATUS_BAD_TCPMESSAGETOOLARGE;
+    if (length < 8) return MU_STATUS_BAD_TCPINTERNALERROR;
 
     mu_binary_reader_t reader;
     mu_binary_reader_init(&reader, buffer, length);
@@ -14,11 +14,33 @@ opcua_statuscode_t mu_parse_message_header(const opcua_byte_t *buffer, size_t le
     header->message_type[2] = buffer[2];
     header->chunk_type = buffer[3];
     
+    if (!(header->message_type[0] == 'H' && header->message_type[1] == 'E' && header->message_type[2] == 'L') &&
+        !(header->message_type[0] == 'A' && header->message_type[1] == 'C' && header->message_type[2] == 'K') &&
+        !(header->message_type[0] == 'E' && header->message_type[1] == 'R' && header->message_type[2] == 'R') &&
+        !(header->message_type[0] == 'O' && header->message_type[1] == 'P' && header->message_type[2] == 'N') &&
+        !(header->message_type[0] == 'C' && header->message_type[1] == 'L' && header->message_type[2] == 'O') &&
+        !(header->message_type[0] == 'M' && header->message_type[1] == 'S' && header->message_type[2] == 'G')) {
+        return MU_STATUS_BAD_TCPMESSAGETYPEINVALID;
+    }
+
+    if (header->chunk_type != 'C' && header->chunk_type != 'F' && header->chunk_type != 'A') {
+        return MU_STATUS_BAD_TCPMESSAGETYPEINVALID;
+    }
+    
     reader.position = 4;
     opcua_statuscode_t status = mu_binary_read_uint32(&reader, &header->message_size);
     if (status != MU_STATUS_GOOD) return status;
     
+    if (header->message_size < 8) return MU_STATUS_BAD_TCPINTERNALERROR;
     if (header->message_size > length) return MU_STATUS_BAD_TCPMESSAGETOOLARGE;
+    
+    if (header->message_type[0] == 'H' || header->message_type[0] == 'A' || header->message_type[0] == 'E') {
+        header->secure_channel_id = 0;
+        return MU_STATUS_GOOD;
+    }
+
+    if (length < 12) return MU_STATUS_BAD_TCPINTERNALERROR;
+    if (header->message_size < 12) return MU_STATUS_BAD_TCPINTERNALERROR;
     
     status = mu_binary_read_uint32(&reader, &header->secure_channel_id);
     if (status != MU_STATUS_GOOD) return status;
