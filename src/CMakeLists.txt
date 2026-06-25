@@ -3,6 +3,7 @@ add_library(micro_opcua STATIC
     core/server.c
     core/status.c
     core/tcp_connection.c
+    core/message_chunk.c
     address_space/address_space.c
     address_space/node_id.c
     address_space/value_source.c
