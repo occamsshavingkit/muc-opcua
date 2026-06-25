@@ -182,7 +182,7 @@
 - [X] T110 [US3] Implement FindServers response using ServerConfig identity fields in src/services/discovery.c (OPC refs: OPC-10000-4 5.5.2.2)
 - [X] T111 [US3] Implement GetEndpoints response with opc.tcp, UA-TCP UA-SC UA-Binary, SecurityPolicy None, and identity policies from docs/conformance/identity-policy.md in src/services/discovery.c (OPC refs: OPC-10000-4 5.5.4.2, 7.14, 7.40.1, 7.40.3, 7.41; OPC-10000-6 7.2)
 - [X] T112 [US3] Implement Browse request decode and static reference traversal in src/services/browse.c (OPC refs: OPC-10000-4 5.9.2.2; OPC-10000-6 5.2.9)
-- [ ] T113 [US3] Implement Browse response encoding with ReferenceDescription fields in src/services/browse.c (OPC refs: OPC-10000-4 5.9.2.2, 7.29)
+- [X] T113 [US3] Implement Browse response encoding with ReferenceDescription fields in src/services/browse.c (OPC refs: OPC-10000-4 5.9.2.2, 7.29)
 - [ ] T114 [US3] Implement Browse requestedMaxReferencesPerNode, response-size bounds, and no-continuation behavior in src/services/browse.c (OPC refs: OPC-10000-4 5.9.2.2, 5.9.2.4, 7.9)
 - [ ] T115 [US3] Implement Read request decode for Value and metadata attributes needed by tested clients in src/services/read.c (OPC refs: OPC-10000-4 5.11.2.2, 5.11.2.3; OPC-10000-6 5.2.9)
 - [ ] T116 [US3] Implement Read response encoding with DataValue values from the static address space in src/services/read.c (OPC refs: OPC-10000-4 5.11.2.3; OPC-10000-6 5.2.2.17)
