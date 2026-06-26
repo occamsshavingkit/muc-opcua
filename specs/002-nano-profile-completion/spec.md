@@ -59,10 +59,16 @@ conformant server exists without the integrator hand-building it:
   `ServerCapabilities`(i=2268) with `ServerProfileArray`, `LocaleIdArray`,
   `MaxBrowseContinuationPoints`(=0), and `OperationLimits` (`MaxNodesPerRead`(i=11705),
   `MaxNodesPerBrowse`(i=11710)); `NamespaceArray`(i=2255); `ServerArray`(i=2254).
-- Dynamic attributes (`ServerStatus.CurrentTime`, `.State`, `.StartTime`) are served
-  through value-source callbacks bound to the server's time adapter / running state
-  (architecture: Claude defines the value-source contract; Codex fills the static
-  table and the callback bodies the contract specifies).
+- **US2a (now):** the const structural hierarchy + the static attributes that fit
+  the current variant model (Boolean/Int32/UInt32/Float/String + arrays):
+  NamespaceArray, ServerArray, ServerProfileArray, LocaleIdArray,
+  ServerStatus.State (ServerState enum = Int32, Running=0), and the OperationLimits
+  UInt32s. Provided by the library as `mu_base_address_space()`; Read/Browse fall
+  back to it after the integrator's space. No mutable state, no DateTime.
+- **US2b (follow-up):** live `ServerStatus.CurrentTime`/`StartTime` (DateTime). The
+  variant model has no DateTime/Int64 type yet, so this first needs a DateTime
+  variant type; then the dynamic value sources are runtime-bound to the time adapter
+  via callbacks whose context lives in the (caller-owned, mutable) server struct.
 
 ### US3 — Conformance traceability (P1)
 Fill `docs/conformance/{status,profile-nano,services}.md` with the Nano

@@ -1,5 +1,6 @@
 /* src/services/browse.c */
 #include "browse.h"
+#include "../address_space/base_nodes.h"
 #include <stddef.h>
 
 /* Immediate supertype of a well-known (ns=0) ReferenceType, or 0 at the root.
@@ -191,7 +192,7 @@ opcua_statuscode_t mu_browse_process(const mu_address_space_t *address_space,
                                      mu_reference_description_t *ref_pool,
                                      size_t max_total_refs)
 {
-    if (!address_space || !req || !results || !ref_pool) return MU_STATUS_BAD_INTERNALERROR;
+    if (!req || !results || !ref_pool) return MU_STATUS_BAD_INTERNALERROR;
     if (req->num_nodes_to_browse > max_results) return MU_STATUS_BAD_TOOMANYOPERATIONS;
     
     size_t refs_used = 0;
@@ -204,7 +205,7 @@ opcua_statuscode_t mu_browse_process(const mu_address_space_t *address_space,
         res->num_references = 0;
         res->references = NULL;
         
-        const mu_node_t *node = mu_address_space_find_node(address_space, &desc->node_id);
+        const mu_node_t *node = mu_resolve_node(address_space, &desc->node_id);
         if (!node) {
             res->status_code = MU_STATUS_BAD_NODEIDUNKNOWN;
             continue;
@@ -220,7 +221,7 @@ opcua_statuscode_t mu_browse_process(const mu_address_space_t *address_space,
             
             if (!reference_type_matches(desc, r)) continue;
             
-            const mu_node_t *target = mu_address_space_find_node(address_space, &r->target_id);
+            const mu_node_t *target = mu_resolve_node(address_space, &r->target_id);
             if (!target) continue;
             
             if (desc->node_class_mask != 0) {
@@ -252,7 +253,7 @@ opcua_statuscode_t mu_browse_process(const mu_address_space_t *address_space,
             
             if (!reference_type_matches(desc, r)) continue;
             
-            const mu_node_t *target = mu_address_space_find_node(address_space, &r->target_id);
+            const mu_node_t *target = mu_resolve_node(address_space, &r->target_id);
             if (!target) continue;
             
             if (desc->node_class_mask != 0) {

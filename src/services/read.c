@@ -1,5 +1,6 @@
 /* src/services/read.c */
 #include "read.h"
+#include "../address_space/base_nodes.h"
 #include <stddef.h>
 
 opcua_statuscode_t mu_read_request_decode(mu_binary_reader_t *reader, 
@@ -140,7 +141,7 @@ opcua_statuscode_t mu_read_process(const mu_address_space_t *address_space,
                                    mu_datavalue_t *results_array,
                                    size_t max_results)
 {
-    if (!address_space || !req || !resp || !results_array) return MU_STATUS_BAD_INTERNALERROR;
+    if (!req || !resp || !results_array) return MU_STATUS_BAD_INTERNALERROR;
     if (req->num_nodes_to_read > max_results) return MU_STATUS_BAD_TOOMANYOPERATIONS;
     
     resp->results = results_array;
@@ -155,7 +156,7 @@ opcua_statuscode_t mu_read_process(const mu_address_space_t *address_space,
         dv->has_source_timestamp = false;
         dv->has_server_timestamp = false;
         
-        const mu_node_t *node = mu_address_space_find_node(address_space, &read_val->node_id);
+        const mu_node_t *node = mu_resolve_node(address_space, &read_val->node_id);
         if (!node) {
             dv->has_status = true;
             dv->status = MU_STATUS_BAD_NODEIDUNKNOWN;
