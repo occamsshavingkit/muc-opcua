@@ -53,7 +53,9 @@ typedef struct {
 
 /*
  * Initialize the server with the given config and static storage.
- * Storage must be at least MU_SERVER_STORAGE_BYTES bytes.
+ * Storage must be at least MU_SERVER_STORAGE_BYTES bytes and aligned for the
+ * server struct (it holds pointers/size_t); a plain `static opcua_byte_t[]` is
+ * over-aligned by the compiler, but a byte/offset buffer is rejected.
  */
 opcua_statuscode_t mu_server_init(void *storage, size_t storage_size, const mu_server_config_t *config, mu_server_t **out_server);
 

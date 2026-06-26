@@ -74,6 +74,13 @@ opcua_statuscode_t mu_server_init(void *storage, size_t storage_size, const mu_s
         return MU_STATUS_BAD_INTERNALERROR;
     }
 
+    /* The server struct is placed directly in caller storage and contains pointers
+       and size_t, so the buffer must be suitably aligned (word access to a
+       misaligned struct faults on Cortex-M0+). */
+    if (((uintptr_t)storage % _Alignof(struct mu_server)) != 0) {
+        return MU_STATUS_BAD_INTERNALERROR;
+    }
+
     if (storage_size < sizeof(struct mu_server)) {
         return MU_STATUS_BAD_OUTOFMEMORY;
     }

@@ -170,14 +170,14 @@ static opcua_statuscode_t handle_open_secure_channel(mu_server_t *server,
    ClientCertificate, and RequestedSessionTimeout (the latter two are needed to
    compute the ServerSignature on a secured channel). Tolerates a truncated body
    (outputs are left null / *timeout 0, which mu_session_create bounds up). */
-static void read_create_session_request(mu_binary_reader_t *r, double *timeout,
+static void read_create_session_request(mu_binary_reader_t *r, opcua_uint64_t *timeout_bits,
                                         mu_bytestring_t *client_nonce, mu_bytestring_t *client_cert) {
     mu_string_t str;
     opcua_uint32_t u;
     opcua_int32_t n;
     opcua_byte_t mask;
 
-    *timeout = 0.0;
+    *timeout_bits = 0; /* below the minimum -> clamped up */
     client_nonce->length = -1; client_nonce->data = NULL;
     client_cert->length = -1;  client_cert->data = NULL;
 
@@ -199,9 +199,11 @@ static void read_create_session_request(mu_binary_reader_t *r, double *timeout,
     if (mu_binary_read_bytestring(r, client_nonce) != MU_STATUS_GOOD) return;  /* ClientNonce */
     if (mu_binary_read_bytestring(r, client_cert) != MU_STATUS_GOOD) return;   /* ClientCertificate */
     {
-        double t;
-        if (mu_binary_read_double(r, &t) == MU_STATUS_GOOD) {
-            *timeout = t;
+        /* RequestedSessionTimeout is a Duration (Double); keep its raw bits and
+           clamp by integer compare to avoid soft-float on the no-FPU target. */
+        opcua_uint64_t bits;
+        if (mu_binary_read_uint64(r, &bits) == MU_STATUS_GOOD) {
+            *timeout_bits = bits;
         }
     }
 }
@@ -219,13 +221,13 @@ static opcua_statuscode_t handle_create_session(mu_server_t *server,
     opcua_statuscode_t s = mu_request_header_decode(r, &req);
     if (s != MU_STATUS_GOOD) return s;
 
-    double requested = 0.0;
+    opcua_uint64_t requested_bits = 0;
     mu_bytestring_t client_nonce = { -1, NULL }, client_cert = { -1, NULL };
-    read_create_session_request(r, &requested, &client_nonce, &client_cert);
+    read_create_session_request(r, &requested_bits, &client_nonce, &client_cert);
 
-    double revised = 0.0;
+    opcua_uint64_t revised_bits = 0;
     opcua_uint32_t session_id = 0, auth_token = 0;
-    s = mu_session_create(&server->session, requested, &revised, &session_id, &auth_token);
+    s = mu_session_create(&server->session, requested_bits, &revised_bits, &session_id, &auth_token);
     if (s != MU_STATUS_GOOD) return s;
 
     s = write_response_prefix(w, MU_ID_CREATESESSIONRESPONSE, req.request_handle, MU_STATUS_GOOD);
@@ -242,7 +244,7 @@ static opcua_statuscode_t handle_create_session(mu_server_t *server,
 
     s = mu_binary_write_nodeid(w, &sid);              if (s != MU_STATUS_GOOD) return s; /* SessionId */
     s = mu_binary_write_nodeid(w, &tok);              if (s != MU_STATUS_GOOD) return s; /* AuthenticationToken */
-    s = mu_binary_write_double(w, revised);           if (s != MU_STATUS_GOOD) return s; /* RevisedSessionTimeout */
+    s = mu_binary_write_uint64(w, revised_bits);      if (s != MU_STATUS_GOOD) return s; /* RevisedSessionTimeout (Double bits) */
     s = mu_binary_write_bytestring(w, &server_nonce); if (s != MU_STATUS_GOOD) return s; /* ServerNonce */
 
     /* ServerCertificate: the server's own cert when a crypto adapter is present. */

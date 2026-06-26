@@ -18,6 +18,9 @@ static opcua_statuscode_t key_bytes(const mu_crypto_adapter_t *crypto,
     opcua_statuscode_t s = crypto->get_certificate_key_bits(crypto->context, cert, cert_len, &bits);
     if (s != MU_STATUS_GOOD || bits == 0) return MU_STATUS_BAD_CERTIFICATEINVALID;
     *bytes = bits / 8;
+    /* The RSA modulus must exceed the OAEP overhead, or the plaintext block size
+       would underflow. (Basic256Sha256 also mandates >= 2048-bit keys.) */
+    if (*bytes <= MU_OAEP_SHA1_OVERHEAD) return MU_STATUS_BAD_CERTIFICATEINVALID;
     return MU_STATUS_GOOD;
 }
 

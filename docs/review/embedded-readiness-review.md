@@ -145,7 +145,10 @@ Fix: per-service `option(MICRO_OPCUA_SERVICE_BROWSE|READ|DISCOVERY|...)`, gating
 both the `target_sources` and the matching rows in `g_supported_services[]` and
 the dispatch `switch` so unselected services compile out at the table level.
 
-### M3 — `double`/soft-float in the protocol path
+### M3 — `double`/soft-float in the protocol path — ADDRESSED
+**Status:** Fixed for the session path. RequestedSessionTimeout is now read as raw IEEE-754 bits and clamped to [10000, 3600000] ms by integer bit comparison (valid for positive doubles), then echoed via `write_uint64` — no FP compare/convert. Verified: `session.o` has no `__aeabi_d*` symbols on ARM. (ReadRequest maxAge is read with `read_double`, which is a bit-copy, not FP math.) Covered by `test_session` clamp cases. Original finding:
+
+
 `src/core/service_dispatch.c` (RequestedSessionTimeout), `src/services/session.c:33-37`
 (double bounds compares), `src/services/read.c:14` (maxAge). Cortex-M0+ has no FPU,
 so these pull in libgcc soft-float (`__aeabi_d*`) for the common connect/read path,
@@ -167,7 +170,10 @@ compiled target. The core *is* structurally freestanding (only `<stdint.h>`/
 Fix: add a `-ffreestanding -Werror` compile-only sanity target under the
 `arm-none-eabi` toolchain and wire it into CI to prevent a hosted-header regression.
 
-### M5 — `mu_server_init` doesn't check caller-storage alignment
+### M5 — `mu_server_init` doesn't check caller-storage alignment — ADDRESSED
+**Status:** Fixed. `mu_server_init` rejects storage not aligned to `_Alignof(struct mu_server)`; the requirement is documented at the API. Original finding:
+
+
 `src/core/server.c:87` casts a caller `void *storage` to `mu_server_t *` with no
 alignment check; the examples back it with a `uint8_t[]` (declared alignment 1). A
 caller using a byte/offset buffer would get a misaligned struct — faulting or

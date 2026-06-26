@@ -2,26 +2,38 @@
 #include "session.h"
 #include <stddef.h>
 
+/* IEEE-754 bit patterns of the SessionTimeout bounds (ms). For positive doubles
+   the unsigned bit pattern is monotonic in value, so we clamp by integer compare
+   and never touch the (absent) FPU. */
+#define MU_SESSION_TIMEOUT_MIN_BITS 0x40c3880000000000ULL /* 10000.0   */
+#define MU_SESSION_TIMEOUT_MAX_BITS 0x414b774000000000ULL /* 3600000.0 */
+#define MU_DOUBLE_SIGN_BIT          0x8000000000000000ULL
+
+static opcua_uint64_t clamp_timeout_bits(opcua_uint64_t bits) {
+    /* Sign set (negative / -0 / -NaN) or below the minimum -> minimum; above the
+       maximum (incl. +Inf / +NaN) -> maximum. */
+    if (bits & MU_DOUBLE_SIGN_BIT) return MU_SESSION_TIMEOUT_MIN_BITS;
+    if (bits < MU_SESSION_TIMEOUT_MIN_BITS) return MU_SESSION_TIMEOUT_MIN_BITS;
+    if (bits > MU_SESSION_TIMEOUT_MAX_BITS) return MU_SESSION_TIMEOUT_MAX_BITS;
+    return bits;
+}
+
 void mu_session_init(mu_session_t *session) {
     if (session) {
         session->state = MU_SESSION_STATE_CLOSED;
         session->session_id = 0;
         session->auth_token = 0;
-        session->revised_session_timeout = 0.0;
-        session->server_nonce_length = 32;
-        for (size_t i = 0; i < 32; ++i) {
-            session->server_nonce[i] = (opcua_byte_t)i; /* Simple mock entropy */
-        }
+        session->revised_session_timeout_bits = 0;
     }
 }
 
-opcua_statuscode_t mu_session_create(mu_session_t *session, 
-                                     double requested_session_timeout, 
-                                     double *revised_session_timeout,
+opcua_statuscode_t mu_session_create(mu_session_t *session,
+                                     opcua_uint64_t requested_timeout_bits,
+                                     opcua_uint64_t *revised_timeout_bits,
                                      opcua_uint32_t *session_id,
                                      opcua_uint32_t *auth_token)
 {
-    if (!session || !revised_session_timeout || !session_id || !auth_token) return MU_STATUS_BAD_INTERNALERROR;
+    if (!session || !revised_timeout_bits || !session_id || !auth_token) return MU_STATUS_BAD_INTERNALERROR;
 
     if (session->state != MU_SESSION_STATE_CLOSED) {
         return MU_STATUS_BAD_INTERNALERROR; /* Only 1 session in minimal server */
@@ -29,15 +41,12 @@ opcua_statuscode_t mu_session_create(mu_session_t *session,
 
     session->session_id = 1;
     session->auth_token = 12345; /* Mock token */
-    
-    double timeout = requested_session_timeout;
-    if (timeout < 10000.0) timeout = 10000.0;
-    if (timeout > 3600000.0) timeout = 3600000.0;
 
-    session->revised_session_timeout = timeout;
+    opcua_uint64_t revised = clamp_timeout_bits(requested_timeout_bits);
+    session->revised_session_timeout_bits = revised;
     session->state = MU_SESSION_STATE_CREATED;
 
-    *revised_session_timeout = timeout;
+    *revised_timeout_bits = revised;
     *session_id = session->session_id;
     *auth_token = session->auth_token;
 
