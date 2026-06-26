@@ -27,10 +27,10 @@ Existing convention: View Service Set is OPC 10000-4 §5.9; service handlers liv
   `switch`, and add any missing request/response IDs to `opcua_ids.h`, in
   `src/core/service_dispatch.c`. (OPC refs: OPC 10000-4 §5.9.5, §5.9.6)
 
-- [ ] T003 [Claude-test] Integration test: BrowseNext with `releaseContinuationPoints
+- [X] T003 [Claude-test] Integration test: BrowseNext with `releaseContinuationPoints
   = true` → Good/empty; BrowseNext with an arbitrary continuation point →
   operation-level `Bad_ContinuationPointInvalid`. (OPC refs: OPC 10000-4 §5.9.3, §7.9)
-- [ ] T004 [Codex-impl] Implement `BrowseNext` handler + dispatch/table wiring in
+- [X] T004 [Codex-impl] Implement `BrowseNext` handler + dispatch/table wiring in
   `src/core/service_dispatch.c` (gated under `MICRO_OPCUA_SERVICE_BROWSE`). This
   server issues no ContinuationPoints, so: release→empty Good; otherwise each point
   → `Bad_ContinuationPointInvalid`. (OPC refs: OPC 10000-4 §5.9.3, §7.9)

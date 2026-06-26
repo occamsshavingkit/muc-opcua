@@ -39,9 +39,7 @@ void test_service_dispatch_unsupported_services(void) {
         826, /* PublishRequest */
         711, /* CallRequest */
         643, /* HistoryReadRequest */
-        533, /* BrowseNextRequest */
-        554, /* TranslateBrowsePathsToNodeIdsRequest */
-        561  /* RegisterNodesRequest */
+        554  /* TranslateBrowsePathsToNodeIdsRequest (still unsupported until T006) */
     };
 
     for (size_t i = 0; i < sizeof(unsupported)/sizeof(unsupported[0]); i++) {

@@ -26,6 +26,7 @@
 #define MU_STATUS_BAD_NODEIDUNKNOWN           ((opcua_statuscode_t)0x80340000)
 #define MU_STATUS_BAD_TOOMANYOPERATIONS       ((opcua_statuscode_t)0x80100000)
 #define MU_STATUS_BAD_NOCONTINUATIONPOINTS    ((opcua_statuscode_t)0x80140000)
+#define MU_STATUS_BAD_CONTINUATIONPOINTINVALID ((opcua_statuscode_t)0x804A0000)
 #define MU_STATUS_BAD_ATTRIBUTEIDINVALID      ((opcua_statuscode_t)0x80350000)
 #define MU_STATUS_BAD_CERTIFICATEINVALID      ((opcua_statuscode_t)0x80120000)
 #define MU_STATUS_BAD_SECURITYMODEREJECTED    ((opcua_statuscode_t)0x80540000)

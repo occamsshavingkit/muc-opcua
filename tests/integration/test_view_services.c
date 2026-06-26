@@ -170,8 +170,52 @@ void test_register_and_unregister_nodes(void) {
     TEST_ASSERT_EQUAL(ID_UNREGISTERNODESRESPONSE, parse_response(mock.last_write, mock.last_write_len, &body));
 }
 
+/* BrowseNext: this server issues no ContinuationPoints, so any continuation point
+   supplied is unknown -> per-operation Bad_ContinuationPointInvalid, but the server
+   must still answer with a BrowseNextResponse (not Bad_ServiceUnsupported). */
+#define ID_BROWSENEXTRESPONSE 536
+#define STATUS_BAD_CONTINUATIONPOINTINVALID 0x804A0000u
+
+void test_browse_next_invalid_continuation_point(void) {
+    mock_t mock; memset(&mock, 0, sizeof(mock));
+    enqueue_connect(&mock);
+    opcua_byte_t tmp[512], chunk[512]; mu_binary_writer_t w; size_t clen;
+
+    /* BrowseNext (seq 4): releaseContinuationPoints=false, one 8-byte continuation point. */
+    mu_binary_writer_init(&w, tmp, sizeof(tmp));
+    { mu_nodeid_t t={0,MU_NODEID_NUMERIC,{MU_ID_BROWSENEXTREQUEST}}; mu_binary_write_nodeid(&w,&t); }
+    write_request_header(&w, 12345, 4);
+    mu_binary_write_boolean(&w, false);            /* releaseContinuationPoints */
+    mu_binary_write_int32(&w, 1);                  /* continuationPoints[] count */
+    { opcua_byte_t cp[8] = {1,2,3,4,5,6,7,8}; mu_bytestring_t bs = {8, cp}; mu_binary_write_bytestring(&w, &bs); }
+    clen = build_msg(chunk, sizeof(chunk), 4, 4, tmp, w.position); enqueue(&mock, chunk, clen);
+
+    opcua_byte_t storage[MU_SERVER_STORAGE_BYTES]; mu_server_config_t config;
+    mu_server_t *server = make_server(&mock, storage, sizeof(storage), &config);
+    mu_binary_reader_t body;
+
+    mu_server_poll(server); /* accept */
+    mu_server_poll(server); /* HEL */
+    mu_server_poll(server); /* OPN */
+    mu_server_poll(server); /* CreateSession */
+    mu_server_poll(server); /* ActivateSession */
+
+    mu_server_poll(server); /* BrowseNext */
+    TEST_ASSERT_EQUAL(ID_BROWSENEXTRESPONSE, parse_response(mock.last_write, mock.last_write_len, &body));
+    /* results[]: one BrowseResult with Bad_ContinuationPointInvalid, null CP, no refs. */
+    opcua_int32_t nres; mu_binary_read_int32(&body, &nres);
+    TEST_ASSERT_EQUAL(1, nres);
+    opcua_statuscode_t st; mu_binary_read_statuscode(&body, &st);
+    TEST_ASSERT_EQUAL_HEX32(STATUS_BAD_CONTINUATIONPOINTINVALID, st);
+    mu_bytestring_t cp; mu_binary_read_bytestring(&body, &cp);
+    TEST_ASSERT_EQUAL(-1, cp.length);              /* null continuationPoint */
+    opcua_int32_t nrefs; mu_binary_read_int32(&body, &nrefs);
+    TEST_ASSERT_EQUAL(0, nrefs);
+}
+
 int main(void) {
     UNITY_BEGIN();
     RUN_TEST(test_register_and_unregister_nodes);
+    RUN_TEST(test_browse_next_invalid_continuation_point);
     return UNITY_END();
 }

@@ -44,6 +44,7 @@ static const mu_service_handler_t g_supported_services[] = {
     { MU_ID_UNREGISTERNODESREQUEST,    MU_ID_UNREGISTERNODESRESPONSE,    true  },
 #ifdef MICRO_OPCUA_SERVICE_BROWSE
     { MU_ID_BROWSEREQUEST,             MU_ID_BROWSERESPONSE,             true  },
+    { MU_ID_BROWSENEXTREQUEST,         MU_ID_BROWSENEXTRESPONSE,         true  },
 #endif
 #ifdef MICRO_OPCUA_SERVICE_READ
     { MU_ID_READREQUEST,               MU_ID_READRESPONSE,               true  }
@@ -467,6 +468,7 @@ static opcua_statuscode_t handle_find_servers(mu_server_t *server,
 #define MU_DISPATCH_MAX_READ_NODES   32
 #define MU_DISPATCH_MAX_BROWSE_NODES 8
 #define MU_DISPATCH_MAX_BROWSE_REFS  32
+#define MU_DISPATCH_MAX_BROWSE_CONTINUATION_POINTS 32
 #define MU_DISPATCH_MAX_REGISTER_NODES 32
 
 /* RegisterNodes (OPC 10000-4 5.9.5): this server has no alternate optimized
@@ -616,6 +618,63 @@ static opcua_statuscode_t handle_browse(mu_server_t *server,
     *response_length = w->position;
     return MU_STATUS_GOOD;
 }
+
+/* BrowseNext (OPC 10000-4 5.9.3, 7.9): this server never creates
+   ContinuationPoints, so every supplied point is unknown. */
+static opcua_statuscode_t handle_browse_next(mu_server_t *server,
+                                             mu_binary_reader_t *r,
+                                             mu_binary_writer_t *w,
+                                             size_t *response_length)
+{
+    (void)server;
+
+    mu_request_header_t req;
+    opcua_statuscode_t s = mu_request_header_decode(r, &req);
+    if (s != MU_STATUS_GOOD) return s;
+
+    opcua_boolean_t release_continuation_points;
+    s = mu_binary_read_boolean(r, &release_continuation_points);
+    if (s != MU_STATUS_GOOD) return s;
+    (void)release_continuation_points;
+
+    opcua_int32_t count;
+    s = mu_binary_read_int32(r, &count);
+    if (s != MU_STATUS_GOOD) return s;
+    if (count < 0) {
+        count = 0;
+    }
+    if ((size_t)count > MU_DISPATCH_MAX_BROWSE_CONTINUATION_POINTS) {
+        return MU_STATUS_BAD_TOOMANYOPERATIONS;
+    }
+
+    for (opcua_int32_t i = 0; i < count; ++i) {
+        mu_bytestring_t continuation_point;
+        s = mu_binary_read_bytestring(r, &continuation_point);
+        if (s != MU_STATUS_GOOD) return s;
+    }
+
+    s = write_response_prefix(w, MU_ID_BROWSENEXTRESPONSE, req.request_handle, MU_STATUS_GOOD);
+    if (s != MU_STATUS_GOOD) return s;
+
+    s = mu_binary_write_int32(w, count);
+    if (s != MU_STATUS_GOOD) return s;
+    for (opcua_int32_t i = 0; i < count; ++i) {
+        mu_bytestring_t null_continuation_point = { -1, NULL };
+
+        s = mu_binary_write_statuscode(w, MU_STATUS_BAD_CONTINUATIONPOINTINVALID);
+        if (s != MU_STATUS_GOOD) return s;
+        s = mu_binary_write_bytestring(w, &null_continuation_point);
+        if (s != MU_STATUS_GOOD) return s;
+        s = mu_binary_write_int32(w, 0);
+        if (s != MU_STATUS_GOOD) return s;
+    }
+
+    s = mu_binary_write_int32(w, 0);
+    if (s != MU_STATUS_GOOD) return s;
+
+    *response_length = w->position;
+    return MU_STATUS_GOOD;
+}
 #endif /* MICRO_OPCUA_SERVICE_BROWSE */
 
 opcua_statuscode_t mu_service_dispatch(
@@ -678,6 +737,8 @@ opcua_statuscode_t mu_service_dispatch(
 #ifdef MICRO_OPCUA_SERVICE_BROWSE
         case MU_ID_BROWSEREQUEST:
             return handle_browse(server, &reader, &writer, response_length);
+        case MU_ID_BROWSENEXTREQUEST:
+            return handle_browse_next(server, &reader, &writer, response_length);
 #endif
         default:
             /* Not yet wired (discovery/session/browse/read): succeed with no body. */
