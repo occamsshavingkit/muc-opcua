@@ -13,6 +13,7 @@ add_library(micro_opcua STATIC
     services/service_header.c
     services/discovery.c
     address_space/address_space.c
+    address_space/base_nodes.c
     address_space/node_id.c
     address_space/value_source.c
     encoding/binary_reader.c

@@ -49,16 +49,16 @@ Existing convention: View Service Set is OPC 10000-4 §5.9; service handlers liv
 
 ## US2 — Standard Base Information address space (P1)
 
-- [ ] T007 [Claude] Design the value-source contract for dynamic Server attributes
+- [X] T007 [Claude] Design the value-source contract for dynamic Server attributes
   (`ServerStatus.CurrentTime/State/StartTime`) — a callback signature bound to the
   server's time adapter + running state — and document it in the base-nodes header
   `src/address_space/base_nodes.h`. (OPC refs: OPC 10000-5 §6.3.1, §6.3.3)
-- [ ] T008 [Claude-test] Integration tests: Browse from `Server`(i=2253) lists
+- [X] T008 [Claude-test] Integration tests: Browse from `Server`(i=2253) lists
   ServerStatus/ServerCapabilities/NamespaceArray/ServerArray; Read of
   `ServerStatus`(i=2256), `ServerStatus.State`(i=2259), `ServerCapabilities`(i=2268),
   `ServiceLevel`(i=2267), `NamespaceArray`(i=2255), `ServerArray`(i=2254) return Good
   with correct types. (OPC refs: OPC 10000-5 §6.3, §7; OPC 10000-6 Annex A NodeIds)
-- [ ] T009 [Codex-impl] Implement the library default Base Information node set as a
+- [X] T009 [Codex-impl] Implement the library default Base Information node set as a
   `static const` node table in `src/address_space/base_nodes.c` per the T007 header:
   Root(84)/Objects(85)/Types(86)/Views(87)/Server(2253) hierarchy with references,
   ServerStatus(2256)+State(2259)+BuildInfo(2260)+CurrentTime+StartTime,
@@ -67,7 +67,7 @@ Existing convention: View Service Set is OPC 10000-4 §5.9; service handlers liv
   MaxNodesPerRead(11705)/MaxNodesPerBrowse(11710), NamespaceArray(2255),
   ServerArray(2254), with the value-source callbacks the header declares.
   (OPC refs: OPC 10000-5 §6.3, §7; OPC 10000-6 Annex A)
-- [ ] T010 [Codex-impl] Wire the base node set into address-space resolution as a
+- [X] T010 [Codex-impl] Wire the base node set into address-space resolution as a
   fallback consulted after the integrator's `address_space` (so Read/Browse of the
   standard nodes succeed even when the integrator supplies none), in
   `src/address_space/address_space.c`. (OPC refs: OPC 10000-5 §6.3)

@@ -292,10 +292,64 @@ void test_translate_browse_paths(void) {
     opcua_int32_t nt1; mu_binary_read_int32(&body, &nt1); TEST_ASSERT_EQUAL(0, nt1);
 }
 
+/* US2a: with NO integrator address space, the library's default Base Information
+   node set must answer Read of ServerStatus.State and Browse of Server. */
+void test_base_information_default_nodes(void) {
+    mock_t mock; memset(&mock, 0, sizeof(mock));
+    enqueue_connect(&mock);
+    opcua_byte_t tmp[512], chunk[512]; mu_binary_writer_t w; size_t clen;
+
+    /* Read (seq 4): ServerStatus.State (ns=0;i=2259) Value. */
+    mu_binary_writer_init(&w, tmp, sizeof(tmp));
+    { mu_nodeid_t t={0,MU_NODEID_NUMERIC,{MU_ID_READREQUEST}}; mu_binary_write_nodeid(&w,&t); }
+    write_request_header(&w, 12345, 4);
+    mu_binary_write_double(&w, 0.0);              /* maxAge */
+    mu_binary_write_uint32(&w, 3);                /* TimestampsToReturn Neither */
+    mu_binary_write_int32(&w, 1);                 /* nodesToRead count */
+    { mu_nodeid_t n={0,MU_NODEID_NUMERIC,{2259}}; mu_string_t ns={-1,NULL};
+      mu_binary_write_nodeid(&w,&n); mu_binary_write_uint32(&w,13);   /* AttributeId Value */
+      mu_binary_write_string(&w,&ns); mu_binary_write_uint16(&w,0); mu_binary_write_string(&w,&ns); }
+    clen = build_msg(chunk, sizeof(chunk), 4, 4, tmp, w.position); enqueue(&mock, chunk, clen);
+
+    /* Browse (seq 5): Server (ns=0;i=2253), forward HierarchicalReferences. */
+    mu_binary_writer_init(&w, tmp, sizeof(tmp));
+    { mu_nodeid_t t={0,MU_NODEID_NUMERIC,{MU_ID_BROWSEREQUEST}}; mu_binary_write_nodeid(&w,&t); }
+    write_request_header(&w, 12345, 5);
+    { mu_nodeid_t e={0,MU_NODEID_NUMERIC,{0}}; mu_binary_write_nodeid(&w,&e); mu_binary_write_int64(&w,0); mu_binary_write_uint32(&w,0); }
+    mu_binary_write_uint32(&w, 0);                /* RequestedMaxReferencesPerNode */
+    mu_binary_write_int32(&w, 1);                 /* nodesToBrowse count */
+    { mu_nodeid_t srv={0,MU_NODEID_NUMERIC,{2253}}, hier={0,MU_NODEID_NUMERIC,{33}};
+      mu_binary_write_nodeid(&w,&srv); mu_binary_write_uint32(&w,0); mu_binary_write_nodeid(&w,&hier);
+      mu_binary_write_boolean(&w,true); mu_binary_write_uint32(&w,0); mu_binary_write_uint32(&w,0x3F); }
+    clen = build_msg(chunk, sizeof(chunk), 5, 5, tmp, w.position); enqueue(&mock, chunk, clen);
+
+    opcua_byte_t storage[MU_SERVER_STORAGE_BYTES]; mu_server_config_t config;
+    mu_server_t *server = make_server(&mock, storage, sizeof(storage), &config, NULL); /* no integrator space */
+    mu_binary_reader_t body;
+
+    mu_server_poll(server); mu_server_poll(server); mu_server_poll(server); /* accept,HEL,OPN */
+    mu_server_poll(server); mu_server_poll(server);                         /* Create,Activate */
+
+    mu_server_poll(server); /* Read ServerStatus.State -> Int32 Running(0) */
+    TEST_ASSERT_EQUAL(MU_ID_READRESPONSE, parse_response(mock.last_write, mock.last_write_len, &body));
+    { opcua_int32_t nres; mu_binary_read_int32(&body, &nres); TEST_ASSERT_EQUAL(1, nres);
+      opcua_byte_t mask; mu_binary_read_byte(&body, &mask); TEST_ASSERT_EQUAL(0x01, mask);
+      opcua_byte_t vt; mu_binary_read_byte(&body, &vt); TEST_ASSERT_EQUAL(MU_TYPE_INT32, vt);
+      opcua_int32_t val; mu_binary_read_int32(&body, &val); TEST_ASSERT_EQUAL(0, val); /* ServerState Running */ }
+
+    mu_server_poll(server); /* Browse Server -> children */
+    TEST_ASSERT_EQUAL(MU_ID_BROWSERESPONSE, parse_response(mock.last_write, mock.last_write_len, &body));
+    { opcua_int32_t nr; mu_binary_read_int32(&body, &nr); TEST_ASSERT_EQUAL(1, nr);
+      opcua_statuscode_t opst; mu_binary_read_statuscode(&body, &opst); TEST_ASSERT_EQUAL(MU_STATUS_GOOD, opst);
+      mu_bytestring_t cp; mu_binary_read_bytestring(&body, &cp);
+      opcua_int32_t nrefs; mu_binary_read_int32(&body, &nrefs); TEST_ASSERT_TRUE(nrefs >= 2); }
+}
+
 int main(void) {
     UNITY_BEGIN();
     RUN_TEST(test_register_and_unregister_nodes);
     RUN_TEST(test_browse_next_invalid_continuation_point);
     RUN_TEST(test_translate_browse_paths);
+    RUN_TEST(test_base_information_default_nodes);
     return UNITY_END();
 }
