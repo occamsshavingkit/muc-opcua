@@ -124,7 +124,15 @@ static opcua_statuscode_t handle_create_session(mu_server_t *server,
     s = mu_binary_write_double(w, revised);       if (s != MU_STATUS_GOOD) return s; /* RevisedSessionTimeout */
     s = mu_binary_write_bytestring(w, &empty_bs); if (s != MU_STATUS_GOOD) return s; /* ServerNonce */
     s = mu_binary_write_bytestring(w, &null_bs);  if (s != MU_STATUS_GOOD) return s; /* ServerCertificate */
-    s = mu_binary_write_int32(w, 0);              if (s != MU_STATUS_GOOD) return s; /* ServerEndpoints[] */
+
+    /* ServerEndpoints: the same single endpoint a Client would get from GetEndpoints. */
+    {
+        mu_endpoint_description_t ep;
+        s = mu_discovery_get_endpoint_description(&server->config, &ep); if (s != MU_STATUS_GOOD) return s;
+        s = mu_binary_write_int32(w, 1);          if (s != MU_STATUS_GOOD) return s; /* ServerEndpoints[] */
+        s = mu_endpoint_description_encode(w, &ep); if (s != MU_STATUS_GOOD) return s;
+    }
+
     s = mu_binary_write_int32(w, 0);              if (s != MU_STATUS_GOOD) return s; /* ServerSoftwareCertificates[] */
     s = mu_binary_write_string(w, &null_str);     if (s != MU_STATUS_GOOD) return s; /* ServerSignature.algorithm */
     s = mu_binary_write_bytestring(w, &null_bs);  if (s != MU_STATUS_GOOD) return s; /* ServerSignature.signature */
@@ -207,6 +215,57 @@ static opcua_statuscode_t handle_close_session(mu_server_t *server,
                          delete_subscriptions);
 
     s = write_response_prefix(w, MU_ID_CLOSESESSIONRESPONSE, req.request_handle, close_result);
+    if (s != MU_STATUS_GOOD) return s;
+
+    *response_length = w->position;
+    return MU_STATUS_GOOD;
+}
+
+/* GetEndpoints (OPC 10000-4 5.5.2): return the server's single endpoint. The
+   request's EndpointUrl/LocaleIds/ProfileUris filters are not applied (thin path). */
+static opcua_statuscode_t handle_get_endpoints(mu_server_t *server,
+                                               mu_binary_reader_t *r,
+                                               mu_binary_writer_t *w,
+                                               size_t *response_length)
+{
+    mu_request_header_t req;
+    opcua_statuscode_t s = mu_request_header_decode(r, &req);
+    if (s != MU_STATUS_GOOD) return s;
+
+    mu_endpoint_description_t ep;
+    s = mu_discovery_get_endpoint_description(&server->config, &ep);
+    if (s != MU_STATUS_GOOD) return s;
+
+    s = write_response_prefix(w, MU_ID_GETENDPOINTSRESPONSE, req.request_handle, MU_STATUS_GOOD);
+    if (s != MU_STATUS_GOOD) return s;
+    s = mu_binary_write_int32(w, 1); /* Endpoints[] */
+    if (s != MU_STATUS_GOOD) return s;
+    s = mu_endpoint_description_encode(w, &ep);
+    if (s != MU_STATUS_GOOD) return s;
+
+    *response_length = w->position;
+    return MU_STATUS_GOOD;
+}
+
+/* FindServers (OPC 10000-4 5.5.2): return this server's ApplicationDescription. */
+static opcua_statuscode_t handle_find_servers(mu_server_t *server,
+                                              mu_binary_reader_t *r,
+                                              mu_binary_writer_t *w,
+                                              size_t *response_length)
+{
+    mu_request_header_t req;
+    opcua_statuscode_t s = mu_request_header_decode(r, &req);
+    if (s != MU_STATUS_GOOD) return s;
+
+    mu_application_description_t app;
+    s = mu_discovery_get_application_description(&server->config, &app);
+    if (s != MU_STATUS_GOOD) return s;
+
+    s = write_response_prefix(w, MU_ID_FINDSERVERSRESPONSE, req.request_handle, MU_STATUS_GOOD);
+    if (s != MU_STATUS_GOOD) return s;
+    s = mu_binary_write_int32(w, 1); /* Servers[] */
+    if (s != MU_STATUS_GOOD) return s;
+    s = mu_application_description_encode(w, &app);
     if (s != MU_STATUS_GOOD) return s;
 
     *response_length = w->position;
@@ -321,6 +380,10 @@ opcua_statuscode_t mu_service_dispatch(
     switch (request_id) {
         case MU_ID_OPENSECURECHANNELREQUEST:
             return handle_open_secure_channel(server, &reader, &writer, response_length);
+        case MU_ID_GETENDPOINTSREQUEST:
+            return handle_get_endpoints(server, &reader, &writer, response_length);
+        case MU_ID_FINDSERVERSREQUEST:
+            return handle_find_servers(server, &reader, &writer, response_length);
         case MU_ID_CREATESESSIONREQUEST:
             return handle_create_session(server, &reader, &writer, response_length);
         case MU_ID_ACTIVATESESSIONREQUEST:

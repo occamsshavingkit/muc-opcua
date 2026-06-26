@@ -105,7 +105,7 @@ void test_dispatch_create_session(void) {
     write_request_header(&w, 7);
     size_t req_len = w.position;
 
-    opcua_byte_t resp[256];
+    opcua_byte_t resp[1024]; /* CreateSessionResponse now carries ServerEndpoints */
     size_t resp_len = sizeof(resp);
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD,
         mu_service_dispatch(&server, MU_ID_CREATESESSIONREQUEST, req, req_len, resp, &resp_len));
@@ -349,6 +349,70 @@ void test_dispatch_browse(void) {
     TEST_ASSERT_EQUAL(1, n_refs);                    /* Objects -> MyVar1 */
 }
 
+static void discovery_server(mu_server_t *server) {
+    memset(server, 0, sizeof(*server));
+    server->secure_channel.is_open = true;
+    server->config.endpoint_url = "opc.tcp://localhost:4840";
+    server->config.application_uri = "urn:test:app";
+    server->config.product_uri = "urn:test:product";
+    server->config.application_name = "Test Server";
+}
+
+void test_dispatch_get_endpoints(void) {
+    mu_server_t server;
+    discovery_server(&server);
+
+    opcua_byte_t req[256];
+    mu_binary_writer_t w;
+    mu_binary_writer_init(&w, req, sizeof(req));
+    write_request_header(&w, 3);
+    size_t req_len = w.position;
+
+    opcua_byte_t resp[512];
+    size_t resp_len = sizeof(resp);
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD,
+        mu_service_dispatch(&server, MU_ID_GETENDPOINTSREQUEST, req, req_len, resp, &resp_len));
+
+    mu_binary_reader_t r;
+    mu_binary_reader_init(&r, resp, resp_len);
+    mu_nodeid_t type; mu_binary_read_nodeid(&r, &type);
+    TEST_ASSERT_EQUAL(MU_ID_GETENDPOINTSRESPONSE, type.identifier.numeric);
+    opcua_uint32_t handle; opcua_statuscode_t result;
+    skip_response_header(&r, &handle, &result);
+    TEST_ASSERT_EQUAL(3, handle);
+    opcua_int32_t n_ep; mu_binary_read_int32(&r, &n_ep);
+    TEST_ASSERT_EQUAL(1, n_ep);
+    mu_string_t url; mu_binary_read_string(&r, &url);
+    TEST_ASSERT_EQUAL_MEMORY("opc.tcp://localhost:4840", url.data, 24);
+}
+
+void test_dispatch_find_servers(void) {
+    mu_server_t server;
+    discovery_server(&server);
+
+    opcua_byte_t req[256];
+    mu_binary_writer_t w;
+    mu_binary_writer_init(&w, req, sizeof(req));
+    write_request_header(&w, 4);
+    size_t req_len = w.position;
+
+    opcua_byte_t resp[512];
+    size_t resp_len = sizeof(resp);
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD,
+        mu_service_dispatch(&server, MU_ID_FINDSERVERSREQUEST, req, req_len, resp, &resp_len));
+
+    mu_binary_reader_t r;
+    mu_binary_reader_init(&r, resp, resp_len);
+    mu_nodeid_t type; mu_binary_read_nodeid(&r, &type);
+    TEST_ASSERT_EQUAL(MU_ID_FINDSERVERSRESPONSE, type.identifier.numeric);
+    opcua_uint32_t handle; opcua_statuscode_t result;
+    skip_response_header(&r, &handle, &result);
+    opcua_int32_t n_srv; mu_binary_read_int32(&r, &n_srv);
+    TEST_ASSERT_EQUAL(1, n_srv);
+    mu_string_t app_uri; mu_binary_read_string(&r, &app_uri);
+    TEST_ASSERT_EQUAL_MEMORY("urn:test:app", app_uri.data, 12);
+}
+
 int main(void) {
     UNITY_BEGIN();
     RUN_TEST(test_dispatch_open_secure_channel);
@@ -357,5 +421,7 @@ int main(void) {
     RUN_TEST(test_dispatch_close_session);
     RUN_TEST(test_dispatch_read_value);
     RUN_TEST(test_dispatch_browse);
+    RUN_TEST(test_dispatch_get_endpoints);
+    RUN_TEST(test_dispatch_find_servers);
     return UNITY_END();
 }

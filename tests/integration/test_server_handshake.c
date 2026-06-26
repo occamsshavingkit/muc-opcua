@@ -172,6 +172,13 @@ void test_server_handshake_connect_browse_read(void) {
     { mu_binary_writer_t os; mu_binary_writer_init(&os, chunk, sizeof(chunk)); os.position = 4; mu_binary_write_uint32(&os, (opcua_uint32_t)w.position); }
     enqueue(&mock, chunk, w.position);
 
+    /* GetEndpoints (on the open channel, before a session) */
+    mu_binary_writer_init(&w, tmp, sizeof(tmp));
+    { mu_nodeid_t t = {0, MU_NODEID_NUMERIC, {MU_ID_GETENDPOINTSREQUEST}}; mu_binary_write_nodeid(&w, &t); }
+    write_request_header(&w, 0, 6);
+    clen = build_msg(chunk, sizeof(chunk), 6, 6, tmp, w.position);
+    enqueue(&mock, chunk, clen);
+
     /* CreateSession */
     mu_binary_writer_init(&w, tmp, sizeof(tmp));
     { mu_nodeid_t t = {0, MU_NODEID_NUMERIC, {MU_ID_CREATESESSIONREQUEST}}; mu_binary_write_nodeid(&w, &t); }
@@ -245,6 +252,9 @@ void test_server_handshake_connect_browse_read(void) {
 
     mu_server_poll(server); /* OPN -> OpenSecureChannelResponse */
     TEST_ASSERT_EQUAL_MEMORY("OPNF", mock.last_write, 4);
+
+    mu_server_poll(server); /* GetEndpoints -> GetEndpointsResponse */
+    TEST_ASSERT_EQUAL(MU_ID_GETENDPOINTSRESPONSE, parse_response(mock.last_write, mock.last_write_len, &body));
 
     mu_server_poll(server); /* CreateSession */
     TEST_ASSERT_EQUAL(MU_ID_CREATESESSIONRESPONSE, parse_response(mock.last_write, mock.last_write_len, &body));

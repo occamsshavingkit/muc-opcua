@@ -1,6 +1,77 @@
 /* src/services/discovery.c */
 #include "discovery.h"
 #include <stddef.h>
+#include <string.h>
+
+/* Write a C string as an OPC UA String (NULL -> null string, length -1). */
+static opcua_statuscode_t write_cstr(mu_binary_writer_t *w, const char *s) {
+    if (s == NULL) {
+        mu_string_t null_str = { -1, NULL };
+        return mu_binary_write_string(w, &null_str);
+    }
+    mu_string_t str = { (opcua_int32_t)strlen(s), (const opcua_byte_t *)s };
+    return mu_binary_write_string(w, &str);
+}
+
+/* Write a C string as an OPC UA LocalizedText (text only, no locale). */
+static opcua_statuscode_t write_localizedtext(mu_binary_writer_t *w, const char *text) {
+    if (text == NULL) {
+        return mu_binary_write_byte(w, 0x00); /* no fields present */
+    }
+    opcua_statuscode_t s = mu_binary_write_byte(w, 0x02); /* text present */
+    if (s != MU_STATUS_GOOD) return s;
+    return write_cstr(w, text);
+}
+
+opcua_statuscode_t mu_application_description_encode(mu_binary_writer_t *writer,
+                                                     const mu_application_description_t *desc) {
+    if (!writer || !desc) return MU_STATUS_BAD_INTERNALERROR;
+
+    opcua_statuscode_t s;
+    s = write_cstr(writer, desc->application_uri);          if (s != MU_STATUS_GOOD) return s;
+    s = write_cstr(writer, desc->product_uri);              if (s != MU_STATUS_GOOD) return s;
+    s = write_localizedtext(writer, desc->application_name); if (s != MU_STATUS_GOOD) return s;
+    s = mu_binary_write_uint32(writer, (opcua_uint32_t)desc->application_type); if (s != MU_STATUS_GOOD) return s;
+    s = write_cstr(writer, NULL);                           if (s != MU_STATUS_GOOD) return s; /* gatewayServerUri */
+    s = write_cstr(writer, NULL);                           if (s != MU_STATUS_GOOD) return s; /* discoveryProfileUri */
+
+    /* discoveryUrls: String[] (one entry: the discovery URL) */
+    if (desc->discovery_url != NULL) {
+        s = mu_binary_write_int32(writer, 1);               if (s != MU_STATUS_GOOD) return s;
+        s = write_cstr(writer, desc->discovery_url);        if (s != MU_STATUS_GOOD) return s;
+    } else {
+        s = mu_binary_write_int32(writer, 0);               if (s != MU_STATUS_GOOD) return s;
+    }
+    return MU_STATUS_GOOD;
+}
+
+opcua_statuscode_t mu_endpoint_description_encode(mu_binary_writer_t *writer,
+                                                  const mu_endpoint_description_t *desc) {
+    if (!writer || !desc) return MU_STATUS_BAD_INTERNALERROR;
+
+    opcua_statuscode_t s;
+    s = write_cstr(writer, desc->endpoint_url);             if (s != MU_STATUS_GOOD) return s;
+    s = mu_application_description_encode(writer, &desc->server); if (s != MU_STATUS_GOOD) return s;
+    s = write_cstr(writer, NULL);                           if (s != MU_STATUS_GOOD) return s; /* serverCertificate (null) */
+    s = mu_binary_write_uint32(writer, (opcua_uint32_t)desc->security_mode); if (s != MU_STATUS_GOOD) return s;
+    s = write_cstr(writer, desc->security_policy_uri);      if (s != MU_STATUS_GOOD) return s;
+
+    /* userIdentityTokens: UserTokenPolicy[] */
+    s = mu_binary_write_int32(writer, (opcua_int32_t)desc->num_user_identity_tokens);
+    if (s != MU_STATUS_GOOD) return s;
+    for (size_t i = 0; i < desc->num_user_identity_tokens; ++i) {
+        const mu_user_token_policy_t *t = &desc->user_identity_tokens[i];
+        s = write_cstr(writer, t->policy_id);               if (s != MU_STATUS_GOOD) return s;
+        s = mu_binary_write_uint32(writer, (opcua_uint32_t)t->token_type); if (s != MU_STATUS_GOOD) return s;
+        s = write_cstr(writer, t->issued_token_type);       if (s != MU_STATUS_GOOD) return s;
+        s = write_cstr(writer, t->issuer_endpoint_url);     if (s != MU_STATUS_GOOD) return s;
+        s = write_cstr(writer, t->security_policy_uri);     if (s != MU_STATUS_GOOD) return s;
+    }
+
+    s = write_cstr(writer, desc->transport_profile_uri);    if (s != MU_STATUS_GOOD) return s;
+    s = mu_binary_write_byte(writer, desc->security_level); if (s != MU_STATUS_GOOD) return s;
+    return MU_STATUS_GOOD;
+}
 
 opcua_statuscode_t mu_discovery_get_application_description(const mu_server_config_t *config, 
                                                             mu_application_description_t *desc)

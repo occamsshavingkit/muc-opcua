@@ -3,6 +3,7 @@
 #define MICRO_OPCUA_SERVICES_DISCOVERY_H
 
 #include "micro_opcua/server.h"
+#include "micro_opcua/encoding.h"
 
 typedef enum {
     MU_APPLICATION_TYPE_SERVER = 0,
@@ -60,7 +61,13 @@ typedef struct {
     opcua_byte_t security_level;
 } mu_endpoint_description_t;
 
-opcua_statuscode_t mu_discovery_get_endpoint_description(const mu_server_config_t *config, 
+opcua_statuscode_t mu_discovery_get_endpoint_description(const mu_server_config_t *config,
                                                          mu_endpoint_description_t *desc);
+
+/* OPC UA Binary encoders (OPC 10000-4 7.2, 7.14, 7.41). */
+opcua_statuscode_t mu_application_description_encode(mu_binary_writer_t *writer,
+                                                     const mu_application_description_t *desc);
+opcua_statuscode_t mu_endpoint_description_encode(mu_binary_writer_t *writer,
+                                                  const mu_endpoint_description_t *desc);
 
 #endif /* MICRO_OPCUA_SERVICES_DISCOVERY_H */
