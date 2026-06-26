@@ -10,6 +10,7 @@ void mu_secure_channel_init(mu_secure_channel_t *channel) {
         channel->created_at = 0;
         channel->revised_lifetime = 0;
         channel->is_open = false;
+        channel->out_sequence_number = 0;
         mu_sequence_validator_init(&channel->sequence);
     }
 }

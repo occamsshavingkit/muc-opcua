@@ -20,4 +20,19 @@ opcua_statuscode_t mu_uasc_finalize_symmetric(
     opcua_uint32_t sequence_number, opcua_uint32_t request_id,
     size_t body_length, size_t *out_total_length);
 
+/* Offset where the MessageBody begins in an OpenSecureChannel response chunk with
+   SecurityPolicy None: MessageHeader(8) + SecureChannelId(4) +
+   AsymmetricSecurityHeader{policyUri(4+47) + senderCert(4 null) + thumbprint(4 null)}
+   + SequenceHeader(8) = 79. (OPC 10000-6 6.7.4) */
+#define MU_UASC_ASYMMETRIC_NONE_HEADER_SIZE 79
+
+/* Given a MessageBody already written at offset MU_UASC_ASYMMETRIC_NONE_HEADER_SIZE,
+   fill in the OPN chunk header with an AsymmetricSecurityHeader for SecurityPolicy
+   None. Returns the total chunk length in out_total_length. */
+opcua_statuscode_t mu_uasc_finalize_asymmetric_none(
+    opcua_byte_t *buffer, size_t buffer_size,
+    opcua_uint32_t secure_channel_id,
+    opcua_uint32_t sequence_number, opcua_uint32_t request_id,
+    size_t body_length, size_t *out_total_length);
+
 #endif /* MICRO_OPCUA_UASC_H */

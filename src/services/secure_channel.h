@@ -13,7 +13,8 @@ typedef struct {
     opcua_uint32_t created_at; /* simplistic time for now */
     opcua_uint32_t revised_lifetime;
     
-    mu_sequence_validator_t sequence;
+    mu_sequence_validator_t sequence;       /* validates inbound SequenceNumbers */
+    opcua_uint32_t out_sequence_number;     /* monotonic SequenceNumber for responses */
     bool is_open;
 } mu_secure_channel_t;
 

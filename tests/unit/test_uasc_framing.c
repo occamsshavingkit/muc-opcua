@@ -41,8 +41,46 @@ void test_uasc_finalize_symmetric(void) {
     TEST_ASSERT_EQUAL(0xEF, buf[27]);
 }
 
+/* An OpenSecureChannel response chunk uses an AsymmetricSecurityHeader. For
+   SecurityPolicy None it carries the None policy URI and null sender certificate
+   / receiver thumbprint, so the body offset is fixed at
+   MU_UASC_ASYMMETRIC_NONE_HEADER_SIZE. (OPC 10000-6 6.7.4) */
+void test_uasc_finalize_asymmetric_none(void) {
+    opcua_byte_t buf[128];
+    memset(buf, 0, sizeof(buf));
+
+    /* 8 (MsgHeader) + 4 (ChannelId) + [4 + 47] (SecurityPolicyUri)
+       + 4 (SenderCert null) + 4 (ReceiverThumbprint null) + 8 (SequenceHeader) = 79 */
+    TEST_ASSERT_EQUAL(79, MU_UASC_ASYMMETRIC_NONE_HEADER_SIZE);
+
+    buf[79] = 0xAB; /* 1-byte body */
+
+    size_t total = 0;
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD,
+        mu_uasc_finalize_asymmetric_none(buf, sizeof(buf),
+                                         /*channel*/ 7, /*seq*/ 1, /*reqId*/ 1,
+                                         /*body_length*/ 1, &total));
+
+    TEST_ASSERT_EQUAL(80, total);
+    TEST_ASSERT_EQUAL('O', buf[0]);
+    TEST_ASSERT_EQUAL('P', buf[1]);
+    TEST_ASSERT_EQUAL('N', buf[2]);
+    TEST_ASSERT_EQUAL('F', buf[3]);
+    TEST_ASSERT_EQUAL(80, buf[4]);           /* MessageSize */
+    TEST_ASSERT_EQUAL(7, buf[8]);            /* SecureChannelId */
+    TEST_ASSERT_EQUAL(47, buf[12]);          /* SecurityPolicyUri length */
+    TEST_ASSERT_EQUAL_MEMORY("http://opcfoundation.org/UA/SecurityPolicy#None", &buf[16], 47);
+    TEST_ASSERT_EQUAL(0xFF, buf[63]);        /* SenderCertificate null (-1) */
+    TEST_ASSERT_EQUAL(0xFF, buf[67]);        /* ReceiverCertificateThumbprint null (-1) */
+    TEST_ASSERT_EQUAL(1, buf[71]);           /* SequenceNumber */
+    TEST_ASSERT_EQUAL(1, buf[75]);           /* RequestId */
+    TEST_ASSERT_EQUAL(0xAB, buf[79]);        /* body preserved */
+}
+
 int main(void) {
     UNITY_BEGIN();
     RUN_TEST(test_uasc_finalize_symmetric);
+    RUN_TEST(test_uasc_finalize_asymmetric_none);
     return UNITY_END();
 }
+
