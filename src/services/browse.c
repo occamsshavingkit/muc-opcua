@@ -2,6 +2,46 @@
 #include "browse.h"
 #include <stddef.h>
 
+/* Immediate supertype of a well-known (ns=0) ReferenceType, or 0 at the root.
+   Covers the standard hierarchy needed to resolve Browse includeSubtypes
+   (OPC 10000-5 ReferenceTypes). */
+static opcua_uint32_t ref_type_supertype(opcua_uint32_t id) {
+    switch (id) {
+        case 32: case 33: return 31;              /* NonHierarchical/Hierarchical -> References */
+        case 34: case 35: case 36: return 33;     /* HasChild/Organizes/HasEventSource -> HierarchicalReferences */
+        case 37: case 38: case 39: case 40: return 32; /* HasModellingRule/HasEncoding/HasDescription/HasTypeDefinition -> NonHierarchical */
+        case 44: case 45: return 34;              /* Aggregates/HasSubtype -> HasChild */
+        case 46: case 47: return 44;              /* HasProperty/HasComponent -> Aggregates */
+        case 48: return 36;                       /* HasNotifier -> HasEventSource */
+        default: return 0;
+    }
+}
+
+static opcua_boolean_t ref_type_is_subtype_of(const mu_nodeid_t *child, const mu_nodeid_t *parent) {
+    if (mu_nodeid_equal(child, parent)) return true;
+    if (child->identifier_type != MU_NODEID_NUMERIC || child->namespace_index != 0) return false;
+    if (parent->identifier_type != MU_NODEID_NUMERIC || parent->namespace_index != 0) return false;
+    opcua_uint32_t c = child->identifier.numeric;
+    opcua_uint32_t p = parent->identifier.numeric;
+    while (c != 0) {
+        c = ref_type_supertype(c);
+        if (c == p) return true;
+    }
+    return false;
+}
+
+/* Whether a reference passes the browse description's reference-type filter. */
+static opcua_boolean_t reference_type_matches(const mu_browse_description_t *desc, const mu_reference_t *r) {
+    mu_nodeid_t any = { 0, MU_NODEID_NUMERIC, { 0 } };
+    if (mu_nodeid_equal(&desc->reference_type_id, &any)) {
+        return true; /* no filter: all reference types */
+    }
+    if (desc->include_subtypes) {
+        return ref_type_is_subtype_of(&r->reference_type_id, &desc->reference_type_id);
+    }
+    return mu_nodeid_equal(&desc->reference_type_id, &r->reference_type_id);
+}
+
 opcua_statuscode_t mu_browse_request_decode(mu_binary_reader_t *reader, 
                                             mu_browse_request_t *req,
                                             mu_browse_description_t *desc_array,
@@ -178,9 +218,7 @@ opcua_statuscode_t mu_browse_process(const mu_address_space_t *address_space,
             if (desc->browse_direction == MU_BROWSE_DIRECTION_FORWARD && !r->is_forward) continue;
             if (desc->browse_direction == MU_BROWSE_DIRECTION_INVERSE && r->is_forward) continue;
             
-            if (!mu_nodeid_equal(&desc->reference_type_id, &(mu_nodeid_t){.identifier_type=MU_NODEID_NUMERIC, .namespace_index=0, .identifier.numeric=0})) {
-                if (!mu_nodeid_equal(&desc->reference_type_id, &r->reference_type_id)) continue;
-            }
+            if (!reference_type_matches(desc, r)) continue;
             
             const mu_node_t *target = mu_address_space_find_node(address_space, &r->target_id);
             if (!target) continue;
@@ -212,9 +250,7 @@ opcua_statuscode_t mu_browse_process(const mu_address_space_t *address_space,
             if (desc->browse_direction == MU_BROWSE_DIRECTION_FORWARD && !r->is_forward) continue;
             if (desc->browse_direction == MU_BROWSE_DIRECTION_INVERSE && r->is_forward) continue;
             
-            if (!mu_nodeid_equal(&desc->reference_type_id, &(mu_nodeid_t){.identifier_type=MU_NODEID_NUMERIC, .namespace_index=0, .identifier.numeric=0})) {
-                if (!mu_nodeid_equal(&desc->reference_type_id, &r->reference_type_id)) continue;
-            }
+            if (!reference_type_matches(desc, r)) continue;
             
             const mu_node_t *target = mu_address_space_find_node(address_space, &r->target_id);
             if (!target) continue;
