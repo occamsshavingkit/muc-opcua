@@ -104,9 +104,53 @@ void test_read_service_scalar_values(void) {
     TEST_ASSERT_EQUAL(42, val);
 }
 
+/* BrowseName and DisplayName are mandatory readable Attributes of every Node
+   (OPC 10000-3 5.2.4/5.2.5), returned as QualifiedName and LocalizedText. Reading
+   Value on a non-Variable Node is Bad_AttributeIdInvalid. */
+void test_read_service_browsename_displayname(void) {
+    mu_node_t node;
+    node.node_id = (mu_nodeid_t){.identifier_type = MU_NODEID_NUMERIC, .namespace_index = 1, .identifier.numeric = 1000};
+    node.node_class = MU_NODECLASS_OBJECT;
+    node.browse_name = (mu_string_t){ 6, (const opcua_byte_t *)"MyVar1" };
+    node.display_name = (mu_string_t){ 6, (const opcua_byte_t *)"MyVar1" };
+    node.reference_count = 0;
+    node.value = NULL;
+
+    mu_address_space_t address_space = { .nodes = &node, .node_count = 1 };
+
+    mu_read_value_id_t reads[3] = {
+        { .node_id = node.node_id, .attribute_id = MU_ATTRIBUTEID_BROWSENAME },
+        { .node_id = node.node_id, .attribute_id = MU_ATTRIBUTEID_DISPLAYNAME },
+        { .node_id = node.node_id, .attribute_id = MU_ATTRIBUTEID_VALUE }
+    };
+    mu_read_request_t req = { .max_age = 0, .timestamps_to_return = MU_TIMESTAMPS_TO_RETURN_NEITHER,
+                              .nodes_to_read = reads, .num_nodes_to_read = 3 };
+
+    mu_read_response_t resp;
+    mu_datavalue_t results[3];
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_read_process(&address_space, &req, &resp, results, 3));
+
+    /* BrowseName -> QualifiedName */
+    TEST_ASSERT_TRUE(resp.results[0].has_value);
+    TEST_ASSERT_EQUAL(MU_TYPE_QUALIFIEDNAME, resp.results[0].value.type);
+    TEST_ASSERT_EQUAL(1, resp.results[0].value.value.qualified_name.namespace_index);
+    TEST_ASSERT_EQUAL_MEMORY("MyVar1", resp.results[0].value.value.qualified_name.name.data, 6);
+
+    /* DisplayName -> LocalizedText */
+    TEST_ASSERT_TRUE(resp.results[1].has_value);
+    TEST_ASSERT_EQUAL(MU_TYPE_LOCALIZEDTEXT, resp.results[1].value.type);
+    TEST_ASSERT_EQUAL_MEMORY("MyVar1", resp.results[1].value.value.localized_text.text.data, 6);
+
+    /* Value on an Object -> Bad_AttributeIdInvalid */
+    TEST_ASSERT_FALSE(resp.results[2].has_value);
+    TEST_ASSERT_TRUE(resp.results[2].has_status);
+    TEST_ASSERT_EQUAL(MU_STATUS_BAD_ATTRIBUTEIDINVALID, resp.results[2].status);
+}
+
 int main(void) {
     UNITY_BEGIN();
     RUN_TEST(test_read_service_request_decode);
     RUN_TEST(test_read_service_scalar_values);
+    RUN_TEST(test_read_service_browsename_displayname);
     return UNITY_END();
 }

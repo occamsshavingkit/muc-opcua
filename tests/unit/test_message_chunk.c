@@ -55,6 +55,16 @@ void test_sequence_validation(void) {
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_sequence_validate(&validator, 4294966272U));
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_sequence_validate(&validator, 4294966273U));
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_sequence_validate(&validator, 1));
+
+    /* OPC 10000-6 6.7.2.4: the first number after wrap shall be *less than 1024*,
+       not necessarily exactly 1. A value in [0,1024) is accepted; >= 1024 is not. */
+    mu_sequence_validator_init(&validator);
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_sequence_validate(&validator, 4294967000U));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_sequence_validate(&validator, 500));
+
+    mu_sequence_validator_init(&validator);
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_sequence_validate(&validator, 4294967000U));
+    TEST_ASSERT_EQUAL(MU_STATUS_BAD_SECURITYCHECKSFAILED, mu_sequence_validate(&validator, 2000));
 }
 
 int main(void) {

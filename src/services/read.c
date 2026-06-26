@@ -96,21 +96,36 @@ static opcua_statuscode_t read_attribute(const mu_address_space_t *address_space
             
         case MU_ATTRIBUTEID_NODECLASS:
             value->type = MU_TYPE_INT32;
-            value->value.i32 = node->node_class;
+            value->value.i32 = (opcua_int32_t)node->node_class;
             return MU_STATUS_GOOD;
-            
+
         case MU_ATTRIBUTEID_BROWSENAME:
-            return MU_STATUS_BAD_NOTREADABLE;
-            
+            /* BrowseName is a mandatory, readable Attribute of every Node
+               (OPC 10000-3 5.2.4), encoded as a QualifiedName. */
+            value->type = MU_TYPE_QUALIFIEDNAME;
+            value->value.qualified_name.namespace_index = node->node_id.namespace_index;
+            value->value.qualified_name.name = node->browse_name;
+            return MU_STATUS_GOOD;
+
         case MU_ATTRIBUTEID_DISPLAYNAME:
-            return MU_STATUS_BAD_NOTREADABLE;
-            
+            /* DisplayName is a mandatory, readable Attribute of every Node
+               (OPC 10000-3 5.2.5), encoded as a LocalizedText (null locale). */
+            value->type = MU_TYPE_LOCALIZEDTEXT;
+            value->value.localized_text.locale = (mu_string_t){ -1, NULL };
+            value->value.localized_text.text = node->display_name;
+            return MU_STATUS_GOOD;
+
         case MU_ATTRIBUTEID_VALUE:
+            /* The Value Attribute only exists for Variable (and VariableType) Nodes;
+               reading it on another NodeClass is Bad_AttributeIdInvalid (OPC 10000-3 5.6). */
+            if (node->node_class != MU_NODECLASS_VARIABLE) {
+                return MU_STATUS_BAD_ATTRIBUTEIDINVALID;
+            }
             if (node->value) {
                 return mu_value_source_read(node->value, &node->node_id, value);
             }
             return MU_STATUS_BAD_NOTREADABLE;
-            
+
         default:
             return MU_STATUS_BAD_ATTRIBUTEIDINVALID;
     }

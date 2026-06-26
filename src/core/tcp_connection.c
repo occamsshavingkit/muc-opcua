@@ -59,6 +59,10 @@ opcua_statuscode_t mu_tcp_process_hello(
     status = mu_binary_read_string(&reader, &endpoint_url);
     if (status != MU_STATUS_GOOD) return status;
 
+    /* OPC 10000-6 7.1.2.3: the EndpointUrl encoded value shall be less than 4096 bytes;
+       reject an over-length URL with Bad_TcpEndpointUrlInvalid (not a generic encoding error). */
+    if (endpoint_url.length >= 4096) return MU_STATUS_BAD_TCPENDPOINTURLINVALID;
+
     /* Minimum values */
     if (receive_buffer_size < 8192) receive_buffer_size = 8192;
     if (send_buffer_size < 8192) send_buffer_size = 8192;

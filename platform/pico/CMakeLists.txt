@@ -4,7 +4,9 @@ if(MICRO_OPCUA_PLATFORM STREQUAL "pico")
         mu_pico_adapter.c
     )
     
-    target_link_libraries(micro_opcua_pico PRIVATE
+    # PUBLIC so the public headers and pico_stdlib propagate to executables
+    # (e.g. pico_minimal_server) that link this adapter library.
+    target_link_libraries(micro_opcua_pico PUBLIC
         pico_stdlib
         micro_opcua
     )

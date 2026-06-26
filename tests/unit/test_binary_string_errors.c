@@ -24,10 +24,10 @@ void test_binary_string_negative_length(void) {
 }
 
 void test_binary_string_excessive_length(void) {
-    opcua_byte_t buffer[4] = {65, 0, 0, 0}; /* Length 65, > MU_MAX_STRING_LENGTH (64) */
+    opcua_byte_t buffer[4] = {0x01, 0x10, 0x00, 0x00}; /* Length 4097, > MU_MAX_ENCODED_STRING_LENGTH (4096) */
     mu_binary_reader_t reader;
     mu_binary_reader_init(&reader, buffer, sizeof(buffer));
-    
+
     mu_string_t str;
     TEST_ASSERT_EQUAL(MU_STATUS_BAD_ENCODINGLIMITSEXCEEDED, mu_binary_read_string(&reader, &str));
 }

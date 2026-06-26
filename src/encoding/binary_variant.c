@@ -49,6 +49,26 @@ opcua_statuscode_t mu_binary_read_variant(mu_binary_reader_t *reader, mu_variant
             return mu_binary_read_statuscode(reader, &variant->value.status);
         case MU_TYPE_NODEID:
             return mu_binary_read_nodeid(reader, &variant->value.nodeid);
+        case MU_TYPE_QUALIFIEDNAME:
+            status = mu_binary_read_uint16(reader, &variant->value.qualified_name.namespace_index);
+            if (status != MU_STATUS_GOOD) return status;
+            return mu_binary_read_string(reader, &variant->value.qualified_name.name);
+        case MU_TYPE_LOCALIZEDTEXT: {
+            opcua_byte_t lt_mask;
+            status = mu_binary_read_byte(reader, &lt_mask);
+            if (status != MU_STATUS_GOOD) return status;
+            variant->value.localized_text.locale = (mu_string_t){ -1, NULL };
+            variant->value.localized_text.text = (mu_string_t){ -1, NULL };
+            if (lt_mask & 0x01) {
+                status = mu_binary_read_string(reader, &variant->value.localized_text.locale);
+                if (status != MU_STATUS_GOOD) return status;
+            }
+            if (lt_mask & 0x02) {
+                status = mu_binary_read_string(reader, &variant->value.localized_text.text);
+                if (status != MU_STATUS_GOOD) return status;
+            }
+            return MU_STATUS_GOOD;
+        }
         default:
             return MU_STATUS_BAD_DECODINGERROR;
     }
@@ -97,6 +117,27 @@ opcua_statuscode_t mu_binary_write_variant(mu_binary_writer_t *writer, const mu_
             return mu_binary_write_statuscode(writer, variant->value.status);
         case MU_TYPE_NODEID:
             return mu_binary_write_nodeid(writer, &variant->value.nodeid);
+        case MU_TYPE_QUALIFIEDNAME:
+            status = mu_binary_write_uint16(writer, variant->value.qualified_name.namespace_index);
+            if (status != MU_STATUS_GOOD) return status;
+            return mu_binary_write_string(writer, &variant->value.qualified_name.name);
+        case MU_TYPE_LOCALIZEDTEXT: {
+            const mu_localized_text_t *lt = &variant->value.localized_text;
+            opcua_byte_t lt_mask = 0;
+            if (lt->locale.length >= 0) lt_mask |= 0x01;
+            if (lt->text.length >= 0) lt_mask |= 0x02;
+            status = mu_binary_write_byte(writer, lt_mask);
+            if (status != MU_STATUS_GOOD) return status;
+            if (lt_mask & 0x01) {
+                status = mu_binary_write_string(writer, &lt->locale);
+                if (status != MU_STATUS_GOOD) return status;
+            }
+            if (lt_mask & 0x02) {
+                status = mu_binary_write_string(writer, &lt->text);
+                if (status != MU_STATUS_GOOD) return status;
+            }
+            return MU_STATUS_GOOD;
+        }
         default:
             return MU_STATUS_BAD_ENCODINGERROR;
     }

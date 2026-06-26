@@ -12,7 +12,6 @@ add_library(micro_opcua STATIC
     services/discovery.c
     services/browse.c
     services/read.c
-    platform/host_tcp_adapter.c
     address_space/address_space.c
     address_space/node_id.c
     address_space/value_source.c
@@ -25,6 +24,11 @@ add_library(micro_opcua STATIC
     encoding/binary_datavalue.c
     generated/opcua_ids.c
 )
+
+# The host TCP adapter uses POSIX sockets; only compile it for the host platform.
+if(MICRO_OPCUA_IS_HOST)
+    target_sources(micro_opcua PRIVATE platform/host_tcp_adapter.c)
+endif()
 
 target_include_directories(micro_opcua PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../include>

@@ -16,7 +16,7 @@ opcua_statuscode_t mu_value_source_read(const mu_value_source_t *source, const m
                 *value = source->data.static_value;
                 return MU_STATUS_GOOD;
             case MU_TYPE_STRING:
-                if (source->data.static_value.value.str.length > 64) {
+                if (source->data.static_value.value.str.length > MU_MAX_STRING_VALUE_LENGTH) {
                     return MU_STATUS_BAD_ENCODINGLIMITSEXCEEDED;
                 }
                 *value = source->data.static_value;

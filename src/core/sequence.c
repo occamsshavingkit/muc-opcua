@@ -29,8 +29,10 @@ opcua_statuscode_t mu_sequence_validate(mu_sequence_validator_t *validator, opcu
         return MU_STATUS_GOOD;
     }
     
-    /* Check wrap around */
-    if (validator->last_sequence_number > 4294966271U && sequence_number == 1) {
+    /* Check wrap around. OPC 10000-6 6.7.2.4: SequenceNumber shall not wrap until it is
+       greater than 4 294 966 271 (UInt32.MaxValue - 1024); the first number after the wrap
+       around shall be less than 1024. */
+    if (validator->last_sequence_number > 4294966271U && sequence_number < 1024) {
         validator->last_sequence_number = sequence_number;
         return MU_STATUS_GOOD;
     }

@@ -34,6 +34,18 @@ typedef struct {
     } identifier;
 } mu_nodeid_t;
 
+/* OPC UA QualifiedName (OPC 10000-6 5.2.2.13) */
+typedef struct {
+    opcua_uint16_t namespace_index;
+    mu_string_t name;
+} mu_qualified_name_t;
+
+/* OPC UA LocalizedText (OPC 10000-6 5.2.2.14) */
+typedef struct {
+    mu_string_t locale;
+    mu_string_t text;
+} mu_localized_text_t;
+
 /* Variant Type Enumeration (Built-in Types) */
 typedef enum {
     MU_TYPE_NULL             = 0,
@@ -84,6 +96,8 @@ typedef struct {
         opcua_datetime_t dt;
         opcua_statuscode_t status;
         mu_nodeid_t nodeid;
+        mu_qualified_name_t qualified_name;
+        mu_localized_text_t localized_text;
     } value;
 } mu_variant_t;
 
