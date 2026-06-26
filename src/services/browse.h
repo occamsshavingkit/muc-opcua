@@ -53,6 +53,8 @@ typedef struct {
     size_t num_results;
 } mu_browse_response_t;
 
+opcua_boolean_t ref_type_is_subtype_of(const mu_nodeid_t *child, const mu_nodeid_t *parent);
+
 /* Decodes the body of a BrowseRequest (after the RequestHeader) */
 opcua_statuscode_t mu_browse_request_decode(mu_binary_reader_t *reader, 
                                             mu_browse_request_t *req,

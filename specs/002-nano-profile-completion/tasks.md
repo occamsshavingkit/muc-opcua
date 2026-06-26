@@ -35,12 +35,12 @@ Existing convention: View Service Set is OPC 10000-4 §5.9; service handlers liv
   server issues no ContinuationPoints, so: release→empty Good; otherwise each point
   → `Bad_ContinuationPointInvalid`. (OPC refs: OPC 10000-4 §5.9.3, §7.9)
 
-- [ ] T005 [Claude-test] Test for browse-path resolution: a `BrowsePath` from
+- [X] T005 [Claude-test] Test for browse-path resolution: a `BrowsePath` from
   Objects(i=85) via the `Organizes`/HierarchicalReferences path to a target node
   resolves to its NodeId; an unknown name → `Bad_NoMatch`. In
   `tests/integration/test_view_services.c` (+ a unit test of the resolver if Claude
   extracts one). (OPC refs: OPC 10000-4 §5.9.4)
-- [ ] T006 [Codex-impl] Implement `TranslateBrowsePathsToNodeIds`: decode
+- [X] T006 [Codex-impl] Implement `TranslateBrowsePathsToNodeIds`: decode
   `browsePaths[]`, walk each `RelativePath` element over the static address space by
   BrowseName + reference type, emit `BrowsePathResult` with target NodeIds or
   `Bad_NoMatch`; handler + dispatch/table wiring in `src/core/service_dispatch.c`
