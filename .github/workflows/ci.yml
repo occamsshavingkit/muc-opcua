@@ -33,6 +33,20 @@ jobs:
       - name: Interop smoke test (asyncua client)
         run: PATH="/tmp/venv/bin:$PATH" tests/interop/run_interop.sh
 
+  dotnet-interop:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: Install build dependencies
+        run: sudo apt-get update && sudo apt-get install -y cmake build-essential
+      - name: Build host example
+        run: cmake -S . -B build/host -DMICRO_OPCUA_BUILD_EXAMPLES=ON -DMICRO_OPCUA_PLATFORM=host && cmake --build build/host --target minimal_server
+      - name: OPC Foundation .NET reference-client interop
+        run: tests/interop/run_interop_dotnet.sh
+
   static-analysis:
     runs-on: ubuntu-latest
     steps:

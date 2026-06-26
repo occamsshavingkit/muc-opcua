@@ -5,13 +5,29 @@ of self-authored fixtures. This operationalises **FR-026**: adopt/adapt the
 async-opcua interop suite once the minimal connect/discover/browse/read path
 works (it now does).
 
-## Harness
+## Harnesses
 
-- `tests/interop/interop_smoke.py` — an [`asyncua`](https://github.com/FreeOpcUa/opcua-asyncio)
-  client that connects, reads `ns=1;i=1000` (MyVar1 = 42), and browses the
-  Objects folder (`i=85`) expecting MyVar1 as a child.
-- `tests/interop/run_interop.sh` — starts the host `minimal_server`, waits for
-  the port, runs the smoke test, and tears the server down.
+Two independent clients drive the host `minimal_server`, both as GitHub Actions
+CI jobs (the devcontainer also provisions the toolchains for local/Codespace runs):
+
+1. **asyncua smoke** (`interop` job) — a fast, pip-installable Python client.
+   - `tests/interop/interop_smoke.py` — connects, reads `ns=1;i=1000` (MyVar1 = 42),
+     and browses Objects (`i=85`) expecting MyVar1 as a child.
+   - `tests/interop/run_interop.sh` — starts the server, waits, runs the test.
+2. **OPC Foundation .NET reference client** (`dotnet-interop` job) — the
+   **authoritative** signal: the .NET stack is the implementation the OPC
+   Foundation UACTT is built on, so agreement here is the strongest cross-stack
+   conformance evidence short of the UACTT itself.
+   - `tests/interop/dotnet/` — a console client on
+     `OPCFoundation.NetStandard.Opc.Ua.Client` (pinned **v1.5.378.145**, matching
+     the async-opcua harness) that checks connect, Read (Value/BrowseName/
+     DisplayName/NodeClass), Browse, and a negative unknown-node case.
+   - `tests/interop/run_interop_dotnet.sh` — builds the client, starts the
+     server, runs the checks.
+
+micro-opcua is **server-only**, so only the *their-client → our-server* leg of
+the async-opcua harness applies; the reverse leg (our client → their server) is
+N/A.
 
 The client's `connect()` exercises HEL/ACK, OpenSecureChannel, GetEndpoints,
 CreateSession and ActivateSession; the reads/browse exercise the Attribute and

@@ -11,6 +11,11 @@
   "name": "micro-opcua",
   "image": "mcr.microsoft.com/devcontainers/cpp:1-bookworm",
 
+  "features": {
+    // .NET 8 SDK for the OPC Foundation reference-client interop check (tests/interop/dotnet).
+    "ghcr.io/devcontainers/features/dotnet:2": { "version": "8.0" }
+  },
+
   // System tools the build + checks need (mirrors .github/workflows/ci.yml):
   //   - host build + tests: cmake, build-essential
   //   - static analysis / formatting: cppcheck, clang-tidy, clang-format
