@@ -27,6 +27,7 @@ add_library(micro_opcua STATIC
     security/key_derivation.c
     security/security_policy.c
     security/certificate.c
+    security/asym_chunk.c
     generated/opcua_ids.c
 )
 

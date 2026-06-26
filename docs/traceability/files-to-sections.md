@@ -15,6 +15,9 @@ This document maps implementation and test files back to OPC UA normative sectio
 | `src/security/security_policy.c` | SecurityPolicy | Part 7 | 6.x | SecurityPolicyUri parsing |
 | `src/security/certificate.h` | Certificates | Part 6 / 4 | 6.7.4 / 7.2 | Thumbprint + peer cert validation interface |
 | `src/security/certificate.c` | Certificates | Part 6 / 4 | 6.7.4 / 7.2 | SHA-1 thumbprint, RSA key-size validation |
+| `src/security/asym_chunk.h` | Asymmetric Chunk | Part 6 | 6.7.2 | OPN chunk sign/encrypt interface |
+| `src/security/asym_chunk.c` | Asymmetric Chunk | Part 6 | 6.7.2 | OPN OAEP encrypt + RSA-SHA256 sign + padding |
+| `tests/unit/test_asym_chunk.c` | Tests | Part 6 | 6.7.2 | OPN wrap/unwrap round-trip + tamper tests |
 | `tests/unit/test_security_policy.c` | Tests | Part 7 | 6.x | SecurityPolicy URI + parameter tests |
 | `tests/unit/test_certificate.c` | Tests | Part 6 / 4 | 6.7.4 / 7.2 | Thumbprint + cert validation tests |
 | `src/security/key_derivation.h` | Key Derivation | Part 6 | 6.7.5 | P-SHA256 PRF interface for channel keys |
