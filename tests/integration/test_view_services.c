@@ -110,7 +110,7 @@ static void enqueue_connect(mock_t *mock) {
     clen = build_msg(chunk, sizeof(chunk), 3, 3, tmp, w.position); enqueue(mock, chunk, clen);
 }
 
-static mu_server_t *make_server(mock_t *mock, opcua_byte_t *storage, size_t storage_size, mu_server_config_t *config) {
+static mu_server_t *make_server(mock_t *mock, opcua_byte_t *storage, size_t storage_size, mu_server_config_t *config, const mu_address_space_t *space) {
     memset(config, 0, sizeof(*config));
     config->endpoint_url = "opc.tcp://host:4840";
     config->application_uri="urn:t"; config->product_uri="urn:t"; config->application_name="t";
@@ -123,6 +123,7 @@ static mu_server_t *make_server(mock_t *mock, opcua_byte_t *storage, size_t stor
     config->tcp_adapter.listen=mock_listen; config->tcp_adapter.accept=mock_accept;
     config->tcp_adapter.read=mock_read; config->tcp_adapter.write=mock_write;
     config->tcp_adapter.close_connection=mock_close; config->tcp_adapter.shutdown=mock_shutdown;
+    config->address_space = space;
     mu_server_t *server = NULL;
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_server_init(storage, storage_size, config, &server));
     return server;
@@ -151,7 +152,7 @@ void test_register_and_unregister_nodes(void) {
     clen = build_msg(chunk, sizeof(chunk), 5, 5, tmp, w.position); enqueue(&mock, chunk, clen);
 
     opcua_byte_t storage[MU_SERVER_STORAGE_BYTES]; mu_server_config_t config;
-    mu_server_t *server = make_server(&mock, storage, sizeof(storage), &config);
+    mu_server_t *server = make_server(&mock, storage, sizeof(storage), &config, NULL);
     mu_binary_reader_t body;
 
     mu_server_poll(server); /* accept */
@@ -191,7 +192,7 @@ void test_browse_next_invalid_continuation_point(void) {
     clen = build_msg(chunk, sizeof(chunk), 4, 4, tmp, w.position); enqueue(&mock, chunk, clen);
 
     opcua_byte_t storage[MU_SERVER_STORAGE_BYTES]; mu_server_config_t config;
-    mu_server_t *server = make_server(&mock, storage, sizeof(storage), &config);
+    mu_server_t *server = make_server(&mock, storage, sizeof(storage), &config, NULL);
     mu_binary_reader_t body;
 
     mu_server_poll(server); /* accept */
@@ -213,9 +214,88 @@ void test_browse_next_invalid_continuation_point(void) {
     TEST_ASSERT_EQUAL(0, nrefs);
 }
 
+/* TranslateBrowsePathsToNodeIds: resolve a RelativePath over the address space. */
+#define ID_TRANSLATEBROWSEPATHSREQUEST  554
+#define ID_TRANSLATEBROWSEPATHSRESPONSE 557
+#define STATUS_BAD_NOMATCH 0x806F0000u
+
+/* Objects(85) -Organizes(35)-> MyVar1(ns=1;i=1000, BrowseName "MyVar1"). */
+static const mu_reference_t tbp_obj_refs[] = {
+    { { 0, MU_NODEID_NUMERIC, { 35 } }, { 1, MU_NODEID_NUMERIC, { 1000 } }, true }
+};
+static const mu_reference_t tbp_var_refs[] = {
+    { { 0, MU_NODEID_NUMERIC, { 35 } }, { 0, MU_NODEID_NUMERIC, { 85 } }, false }
+};
+static const mu_value_source_t tbp_var_value = {
+    MU_VALUESOURCE_STATIC, { .static_value = { MU_TYPE_INT32, { .i32 = 42 } } }
+};
+static const mu_node_t tbp_nodes[] = {
+    { { 0, MU_NODEID_NUMERIC, { 85 } }, MU_NODECLASS_OBJECT,
+      { 7, (const opcua_byte_t *)"Objects" }, { 7, (const opcua_byte_t *)"Objects" }, tbp_obj_refs, 1, NULL },
+    { { 1, MU_NODEID_NUMERIC, { 1000 } }, MU_NODECLASS_VARIABLE,
+      { 6, (const opcua_byte_t *)"MyVar1" }, { 6, (const opcua_byte_t *)"MyVar1" }, tbp_var_refs, 1, &tbp_var_value }
+};
+static const mu_address_space_t tbp_space = { tbp_nodes, 2 };
+
+/* Write one BrowsePath: start at Objects(85), one element via HierarchicalReferences
+   (i=33, includeSubtypes) to QualifiedName {ns=1, name}. */
+static void write_browse_path(mu_binary_writer_t *w, const char *name) {
+    mu_nodeid_t start = { 0, MU_NODEID_NUMERIC, { 85 } };
+    mu_nodeid_t hier  = { 0, MU_NODEID_NUMERIC, { 33 } };
+    mu_binary_write_nodeid(w, &start);          /* startingNode */
+    mu_binary_write_int32(w, 1);                /* relativePath.elements count */
+    mu_binary_write_nodeid(w, &hier);           /* referenceTypeId */
+    mu_binary_write_boolean(w, false);          /* isInverse */
+    mu_binary_write_boolean(w, true);           /* includeSubtypes */
+    mu_binary_write_uint16(w, 1);               /* targetName.namespaceIndex */
+    { mu_string_t s = { (opcua_int32_t)strlen(name), (const opcua_byte_t *)name }; mu_binary_write_string(w, &s); }
+}
+
+void test_translate_browse_paths(void) {
+    mock_t mock; memset(&mock, 0, sizeof(mock));
+    enqueue_connect(&mock);
+    opcua_byte_t tmp[512], chunk[512]; mu_binary_writer_t w; size_t clen;
+
+    /* TranslateBrowsePaths (seq 4): path 1 -> MyVar1 (Good), path 2 -> bad name (NoMatch). */
+    mu_binary_writer_init(&w, tmp, sizeof(tmp));
+    { mu_nodeid_t t={0,MU_NODEID_NUMERIC,{ID_TRANSLATEBROWSEPATHSREQUEST}}; mu_binary_write_nodeid(&w,&t); }
+    write_request_header(&w, 12345, 4);
+    mu_binary_write_int32(&w, 2);               /* browsePaths count */
+    write_browse_path(&w, "MyVar1");
+    write_browse_path(&w, "Nope");
+    clen = build_msg(chunk, sizeof(chunk), 4, 4, tmp, w.position); enqueue(&mock, chunk, clen);
+
+    opcua_byte_t storage[MU_SERVER_STORAGE_BYTES]; mu_server_config_t config;
+    mu_server_t *server = make_server(&mock, storage, sizeof(storage), &config, &tbp_space);
+    mu_binary_reader_t body;
+
+    mu_server_poll(server); mu_server_poll(server); mu_server_poll(server); /* accept,HEL,OPN */
+    mu_server_poll(server); mu_server_poll(server);                         /* Create,Activate */
+
+    mu_server_poll(server); /* TranslateBrowsePaths */
+    TEST_ASSERT_EQUAL(ID_TRANSLATEBROWSEPATHSRESPONSE, parse_response(mock.last_write, mock.last_write_len, &body));
+    opcua_int32_t nres; mu_binary_read_int32(&body, &nres);
+    TEST_ASSERT_EQUAL(2, nres);
+
+    /* result[0]: Good, one target = ns=1;i=1000, remainingPathIndex = UInt32.Max. */
+    opcua_statuscode_t st0; mu_binary_read_statuscode(&body, &st0);
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, st0);
+    opcua_int32_t nt0; mu_binary_read_int32(&body, &nt0); TEST_ASSERT_EQUAL(1, nt0);
+    mu_nodeid_t tgt; mu_binary_read_nodeid(&body, &tgt);   /* ExpandedNodeId (local) reads as NodeId */
+    TEST_ASSERT_EQUAL(1, tgt.namespace_index); TEST_ASSERT_EQUAL(1000, tgt.identifier.numeric);
+    opcua_uint32_t rem; mu_binary_read_uint32(&body, &rem);
+    TEST_ASSERT_EQUAL_HEX32(0xFFFFFFFFu, rem);
+
+    /* result[1]: Bad_NoMatch, zero targets. */
+    opcua_statuscode_t st1; mu_binary_read_statuscode(&body, &st1);
+    TEST_ASSERT_EQUAL_HEX32(STATUS_BAD_NOMATCH, st1);
+    opcua_int32_t nt1; mu_binary_read_int32(&body, &nt1); TEST_ASSERT_EQUAL(0, nt1);
+}
+
 int main(void) {
     UNITY_BEGIN();
     RUN_TEST(test_register_and_unregister_nodes);
     RUN_TEST(test_browse_next_invalid_continuation_point);
+    RUN_TEST(test_translate_browse_paths);
     return UNITY_END();
 }

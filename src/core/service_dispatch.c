@@ -1,13 +1,12 @@
 /* src/core/service_dispatch.c */
 #include "service_dispatch.h"
 #include "server_internal.h"
+#include "micro_opcua/address_space.h"
 #include "micro_opcua/encoding.h"
+#include "../services/browse.h"
 #include "../services/discovery.h"
 #include "../services/session.h"
 #include "../services/secure_channel.h"
-#ifdef MICRO_OPCUA_SERVICE_BROWSE
-#include "../services/browse.h"
-#endif
 #ifdef MICRO_OPCUA_SERVICE_READ
 #include "../services/read.h"
 #endif
@@ -42,6 +41,7 @@ static const mu_service_handler_t g_supported_services[] = {
     { MU_ID_CLOSESESSIONREQUEST,       MU_ID_CLOSESESSIONRESPONSE,       true  },
     { MU_ID_REGISTERNODESREQUEST,      MU_ID_REGISTERNODESRESPONSE,      true  },
     { MU_ID_UNREGISTERNODESREQUEST,    MU_ID_UNREGISTERNODESRESPONSE,    true  },
+    { MU_ID_TRANSLATEBROWSEPATHSTONODEIDSREQUEST, MU_ID_TRANSLATEBROWSEPATHSTONODEIDSRESPONSE, true },
 #ifdef MICRO_OPCUA_SERVICE_BROWSE
     { MU_ID_BROWSEREQUEST,             MU_ID_BROWSERESPONSE,             true  },
     { MU_ID_BROWSENEXTREQUEST,         MU_ID_BROWSENEXTRESPONSE,         true  },
@@ -470,6 +470,8 @@ static opcua_statuscode_t handle_find_servers(mu_server_t *server,
 #define MU_DISPATCH_MAX_BROWSE_REFS  32
 #define MU_DISPATCH_MAX_BROWSE_CONTINUATION_POINTS 32
 #define MU_DISPATCH_MAX_REGISTER_NODES 32
+#define MU_DISPATCH_MAX_TRANSLATE_BROWSE_PATHS 16
+#define MU_DISPATCH_MAX_TRANSLATE_ELEMENTS 8
 
 /* RegisterNodes (OPC 10000-4 5.9.5): this server has no alternate optimized
    handles, so registeredNodeIds is the identity mapping of nodesToRegister. */
@@ -544,6 +546,148 @@ static opcua_statuscode_t handle_unregister_nodes(mu_server_t *server,
     }
 
     s = write_response_prefix(w, MU_ID_UNREGISTERNODESRESPONSE, req.request_handle, MU_STATUS_GOOD);
+    if (s != MU_STATUS_GOOD) return s;
+
+    *response_length = w->position;
+    return MU_STATUS_GOOD;
+}
+
+static opcua_boolean_t browse_name_equals(const mu_string_t *left, const mu_string_t *right)
+{
+    if (left->length != right->length) {
+        return false;
+    }
+    if (left->length <= 0) {
+        return left->length == 0;
+    }
+    if (left->data == NULL || right->data == NULL) {
+        return false;
+    }
+    return memcmp(left->data, right->data, (size_t)left->length) == 0;
+}
+
+/* TranslateBrowsePathsToNodeIds (OPC 10000-4 5.9.4): resolve each RelativePath
+   over the static address space and encode BrowsePathResult[] directly. */
+static opcua_statuscode_t handle_translate_browse_paths(mu_server_t *server,
+                                                        mu_binary_reader_t *r,
+                                                        mu_binary_writer_t *w,
+                                                        size_t *response_length)
+{
+    mu_request_header_t req;
+    opcua_statuscode_t s = mu_request_header_decode(r, &req);
+    if (s != MU_STATUS_GOOD) return s;
+
+    opcua_int32_t browse_path_count;
+    s = mu_binary_read_int32(r, &browse_path_count);
+    if (s != MU_STATUS_GOOD) return s;
+    if (browse_path_count < 0) {
+        browse_path_count = 0;
+    }
+    if ((size_t)browse_path_count > MU_DISPATCH_MAX_TRANSLATE_BROWSE_PATHS) {
+        return MU_STATUS_BAD_TOOMANYOPERATIONS;
+    }
+
+    s = write_response_prefix(w, MU_ID_TRANSLATEBROWSEPATHSTONODEIDSRESPONSE,
+                              req.request_handle, MU_STATUS_GOOD);
+    if (s != MU_STATUS_GOOD) return s;
+    s = mu_binary_write_int32(w, browse_path_count);
+    if (s != MU_STATUS_GOOD) return s;
+
+    const mu_address_space_t *address_space = server->config.address_space;
+    size_t path_count = (size_t)browse_path_count;
+    for (size_t path_index = 0; path_index < path_count; ++path_index) {
+        mu_nodeid_t starting_node;
+        s = mu_binary_read_nodeid(r, &starting_node);
+        if (s != MU_STATUS_GOOD) return s;
+
+        opcua_int32_t element_count;
+        s = mu_binary_read_int32(r, &element_count);
+        if (s != MU_STATUS_GOOD) return s;
+        if (element_count < 0) {
+            element_count = 0;
+        }
+        if ((size_t)element_count > MU_DISPATCH_MAX_TRANSLATE_ELEMENTS) {
+            return MU_STATUS_BAD_TOOMANYOPERATIONS;
+        }
+
+        const mu_node_t *current = NULL;
+        if (address_space != NULL) {
+            current = mu_address_space_find_node(address_space, &starting_node);
+        }
+
+        size_t element_total = (size_t)element_count;
+        for (size_t element_index = 0; element_index < element_total; ++element_index) {
+            mu_nodeid_t reference_type_id;
+            opcua_boolean_t is_inverse;
+            opcua_boolean_t include_subtypes;
+            opcua_uint16_t target_namespace_index;
+            mu_string_t target_name;
+
+            s = mu_binary_read_nodeid(r, &reference_type_id);
+            if (s != MU_STATUS_GOOD) return s;
+            s = mu_binary_read_boolean(r, &is_inverse);
+            if (s != MU_STATUS_GOOD) return s;
+            s = mu_binary_read_boolean(r, &include_subtypes);
+            if (s != MU_STATUS_GOOD) return s;
+            s = mu_binary_read_uint16(r, &target_namespace_index);
+            if (s != MU_STATUS_GOOD) return s;
+            s = mu_binary_read_string(r, &target_name);
+            if (s != MU_STATUS_GOOD) return s;
+            (void)target_namespace_index; /* Nano model stores BrowseName name only. */
+
+            if (current != NULL) {
+                const mu_node_t *next = NULL;
+                for (size_t ref_index = 0; ref_index < current->reference_count; ++ref_index) {
+                    const mu_reference_t *ref = &current->references[ref_index];
+                    opcua_boolean_t direction_matches = is_inverse ? !ref->is_forward : ref->is_forward;
+                    opcua_boolean_t type_matches;
+
+                    if (!direction_matches) {
+                        continue;
+                    }
+
+                    if (include_subtypes) {
+                        type_matches = ref_type_is_subtype_of(&ref->reference_type_id, &reference_type_id);
+                    } else {
+                        type_matches = mu_nodeid_equal(&ref->reference_type_id, &reference_type_id);
+                    }
+                    if (!type_matches) {
+                        continue;
+                    }
+
+                    const mu_node_t *target = mu_address_space_find_node(address_space, &ref->target_id);
+                    if (target == NULL) {
+                        continue;
+                    }
+                    if (!browse_name_equals(&target->browse_name, &target_name)) {
+                        continue;
+                    }
+
+                    next = target;
+                    break;
+                }
+                current = next;
+            }
+        }
+
+        if (current != NULL) {
+            s = mu_binary_write_statuscode(w, MU_STATUS_GOOD);
+            if (s != MU_STATUS_GOOD) return s;
+            s = mu_binary_write_int32(w, 1);
+            if (s != MU_STATUS_GOOD) return s;
+            s = mu_binary_write_nodeid(w, &current->node_id);
+            if (s != MU_STATUS_GOOD) return s;
+            s = mu_binary_write_uint32(w, 0xFFFFFFFFu);
+            if (s != MU_STATUS_GOOD) return s;
+        } else {
+            s = mu_binary_write_statuscode(w, MU_STATUS_BAD_NOMATCH);
+            if (s != MU_STATUS_GOOD) return s;
+            s = mu_binary_write_int32(w, 0);
+            if (s != MU_STATUS_GOOD) return s;
+        }
+    }
+
+    s = mu_binary_write_int32(w, 0);
     if (s != MU_STATUS_GOOD) return s;
 
     *response_length = w->position;
@@ -730,6 +874,8 @@ opcua_statuscode_t mu_service_dispatch(
             return handle_register_nodes(server, &reader, &writer, response_length);
         case MU_ID_UNREGISTERNODESREQUEST:
             return handle_unregister_nodes(server, &reader, &writer, response_length);
+        case MU_ID_TRANSLATEBROWSEPATHSTONODEIDSREQUEST:
+            return handle_translate_browse_paths(server, &reader, &writer, response_length);
 #ifdef MICRO_OPCUA_SERVICE_READ
         case MU_ID_READREQUEST:
             return handle_read(server, &reader, &writer, response_length);

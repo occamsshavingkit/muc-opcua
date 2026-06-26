@@ -17,7 +17,7 @@ static opcua_uint32_t ref_type_supertype(opcua_uint32_t id) {
     }
 }
 
-static opcua_boolean_t ref_type_is_subtype_of(const mu_nodeid_t *child, const mu_nodeid_t *parent) {
+opcua_boolean_t ref_type_is_subtype_of(const mu_nodeid_t *child, const mu_nodeid_t *parent) {
     if (mu_nodeid_equal(child, parent)) return true;
     if (child->identifier_type != MU_NODEID_NUMERIC || child->namespace_index != 0) return false;
     if (parent->identifier_type != MU_NODEID_NUMERIC || parent->namespace_index != 0) return false;

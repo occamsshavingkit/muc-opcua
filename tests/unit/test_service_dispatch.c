@@ -34,12 +34,11 @@ void test_service_dispatch_unsupported_services(void) {
     mu_server_t server;
 
     opcua_uint32_t unsupported[] = {
-        673, /* WriteRequest */
-        787, /* CreateSubscriptionRequest */
-        826, /* PublishRequest */
-        711, /* CallRequest */
-        643, /* HistoryReadRequest */
-        554  /* TranslateBrowsePathsToNodeIdsRequest (still unsupported until T006) */
+        673, /* WriteRequest (not in Nano) */
+        787, /* CreateSubscriptionRequest (Micro) */
+        826, /* PublishRequest (Micro) */
+        711, /* CallRequest (Method) */
+        643  /* HistoryReadRequest */
     };
 
     for (size_t i = 0; i < sizeof(unsupported)/sizeof(unsupported[0]); i++) {
