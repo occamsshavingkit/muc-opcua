@@ -92,6 +92,127 @@ static opcua_statuscode_t handle_open_secure_channel(mu_server_t *server,
     return MU_STATUS_GOOD;
 }
 
+/* CreateSession (OPC 10000-4 5.7.2.2). Thin path: parse the RequestHeader, create
+   the session, and emit a structurally valid CreateSessionResponse. Request params
+   (ClientDescription, RequestedSessionTimeout, ...) and the heavy ServerEndpoints
+   array are not yet populated. */
+static opcua_statuscode_t handle_create_session(mu_server_t *server,
+                                                mu_binary_reader_t *r,
+                                                mu_binary_writer_t *w,
+                                                size_t *response_length)
+{
+    mu_request_header_t req;
+    opcua_statuscode_t s = mu_request_header_decode(r, &req);
+    if (s != MU_STATUS_GOOD) return s;
+
+    double revised = 0.0;
+    opcua_uint32_t session_id = 0, auth_token = 0;
+    s = mu_session_create(&server->session, 0.0, &revised, &session_id, &auth_token);
+    if (s != MU_STATUS_GOOD) return s;
+
+    s = write_response_prefix(w, MU_ID_CREATESESSIONRESPONSE, req.request_handle, MU_STATUS_GOOD);
+    if (s != MU_STATUS_GOOD) return s;
+
+    mu_nodeid_t sid = { 0, MU_NODEID_NUMERIC, { session_id } };
+    mu_nodeid_t tok = { 0, MU_NODEID_NUMERIC, { auth_token } };
+    mu_bytestring_t empty_bs = { 0, NULL };
+    mu_bytestring_t null_bs = { -1, NULL };
+    mu_string_t null_str = { -1, NULL };
+
+    s = mu_binary_write_nodeid(w, &sid);          if (s != MU_STATUS_GOOD) return s; /* SessionId */
+    s = mu_binary_write_nodeid(w, &tok);          if (s != MU_STATUS_GOOD) return s; /* AuthenticationToken */
+    s = mu_binary_write_double(w, revised);       if (s != MU_STATUS_GOOD) return s; /* RevisedSessionTimeout */
+    s = mu_binary_write_bytestring(w, &empty_bs); if (s != MU_STATUS_GOOD) return s; /* ServerNonce */
+    s = mu_binary_write_bytestring(w, &null_bs);  if (s != MU_STATUS_GOOD) return s; /* ServerCertificate */
+    s = mu_binary_write_int32(w, 0);              if (s != MU_STATUS_GOOD) return s; /* ServerEndpoints[] */
+    s = mu_binary_write_int32(w, 0);              if (s != MU_STATUS_GOOD) return s; /* ServerSoftwareCertificates[] */
+    s = mu_binary_write_string(w, &null_str);     if (s != MU_STATUS_GOOD) return s; /* ServerSignature.algorithm */
+    s = mu_binary_write_bytestring(w, &null_bs);  if (s != MU_STATUS_GOOD) return s; /* ServerSignature.signature */
+    s = mu_binary_write_uint32(w, 0);             if (s != MU_STATUS_GOOD) return s; /* MaxRequestMessageSize */
+
+    *response_length = w->position;
+    return MU_STATUS_GOOD;
+}
+
+/* ActivateSession (OPC 10000-4 5.7.3.2). The UserIdentityToken's ExtensionObject
+   typeId identifies the token type; only Anonymous (i=321) is accepted. A service
+   failure is reported in the ResponseHeader.serviceResult, not as a transport error. */
+static opcua_statuscode_t handle_activate_session(mu_server_t *server,
+                                                  mu_binary_reader_t *r,
+                                                  mu_binary_writer_t *w,
+                                                  size_t *response_length)
+{
+    mu_request_header_t req;
+    opcua_statuscode_t s = mu_request_header_decode(r, &req);
+    if (s != MU_STATUS_GOOD) return s;
+
+    /* ClientSignature: SignatureData { algorithm(String), signature(ByteString) } */
+    mu_string_t algorithm;
+    mu_bytestring_t signature;
+    s = mu_binary_read_string(r, &algorithm);    if (s != MU_STATUS_GOOD) return s;
+    s = mu_binary_read_bytestring(r, &signature); if (s != MU_STATUS_GOOD) return s;
+
+    /* ClientSoftwareCertificates: array (thin path assumes empty) */
+    opcua_int32_t cert_count;
+    s = mu_binary_read_int32(r, &cert_count);    if (s != MU_STATUS_GOOD) return s;
+
+    /* LocaleIds: String[] */
+    opcua_int32_t locale_count;
+    s = mu_binary_read_int32(r, &locale_count);  if (s != MU_STATUS_GOOD) return s;
+    for (opcua_int32_t i = 0; i < locale_count; ++i) {
+        mu_string_t locale;
+        s = mu_binary_read_string(r, &locale);   if (s != MU_STATUS_GOOD) return s;
+    }
+
+    /* UserIdentityToken: ExtensionObject - typeId identifies the token type */
+    mu_nodeid_t token_type;
+    size_t token_body_len;
+    s = mu_binary_read_extension_object_header(r, &token_type, &token_body_len);
+    if (s != MU_STATUS_GOOD) return s;
+
+    opcua_statuscode_t activate_result =
+        mu_session_activate(&server->session,
+                            req.authentication_token.identifier.numeric,
+                            token_type.identifier.numeric);
+
+    s = write_response_prefix(w, MU_ID_ACTIVATESESSIONRESPONSE, req.request_handle, activate_result);
+    if (s != MU_STATUS_GOOD) return s;
+
+    mu_bytestring_t empty_bs = { 0, NULL };
+    s = mu_binary_write_bytestring(w, &empty_bs); if (s != MU_STATUS_GOOD) return s; /* ServerNonce */
+    s = mu_binary_write_int32(w, 0);              if (s != MU_STATUS_GOOD) return s; /* Results[] */
+    s = mu_binary_write_int32(w, 0);              if (s != MU_STATUS_GOOD) return s; /* DiagnosticInfos[] */
+
+    *response_length = w->position;
+    return MU_STATUS_GOOD;
+}
+
+/* CloseSession (OPC 10000-4 5.7.4.2). */
+static opcua_statuscode_t handle_close_session(mu_server_t *server,
+                                               mu_binary_reader_t *r,
+                                               mu_binary_writer_t *w,
+                                               size_t *response_length)
+{
+    mu_request_header_t req;
+    opcua_statuscode_t s = mu_request_header_decode(r, &req);
+    if (s != MU_STATUS_GOOD) return s;
+
+    opcua_boolean_t delete_subscriptions;
+    s = mu_binary_read_boolean(r, &delete_subscriptions);
+    if (s != MU_STATUS_GOOD) return s;
+
+    opcua_statuscode_t close_result =
+        mu_session_close(&server->session,
+                         req.authentication_token.identifier.numeric,
+                         delete_subscriptions);
+
+    s = write_response_prefix(w, MU_ID_CLOSESESSIONRESPONSE, req.request_handle, close_result);
+    if (s != MU_STATUS_GOOD) return s;
+
+    *response_length = w->position;
+    return MU_STATUS_GOOD;
+}
+
 opcua_statuscode_t mu_service_dispatch(
     mu_server_t *server,
     opcua_uint32_t request_id,
@@ -129,6 +250,12 @@ opcua_statuscode_t mu_service_dispatch(
     switch (request_id) {
         case MU_ID_OPENSECURECHANNELREQUEST:
             return handle_open_secure_channel(server, &reader, &writer, response_length);
+        case MU_ID_CREATESESSIONREQUEST:
+            return handle_create_session(server, &reader, &writer, response_length);
+        case MU_ID_ACTIVATESESSIONREQUEST:
+            return handle_activate_session(server, &reader, &writer, response_length);
+        case MU_ID_CLOSESESSIONREQUEST:
+            return handle_close_session(server, &reader, &writer, response_length);
         default:
             /* Not yet wired (discovery/session/browse/read): succeed with no body. */
             *response_length = 0;
