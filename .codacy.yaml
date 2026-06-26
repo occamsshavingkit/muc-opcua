@@ -1,0 +1,18 @@
+---
+# Codacy configuration.
+#
+# Scope analysis to first-party source. The excluded trees are generated or
+# vendored framework files we do not maintain, plus build output:
+#   .specify/ , .agents/  — Spec Kit + agent-skill scaffolding (the bulk of the
+#                            non-source line count; their lint findings are not ours)
+#   .codex/ , .claude/    — tool/agent configuration
+#   build/                — CMake build output
+#   tests/interop/dotnet/{bin,obj} — generated .NET build artifacts
+exclude_paths:
+  - '.specify/**'
+  - '.agents/**'
+  - '.codex/**'
+  - '.claude/**'
+  - 'build/**'
+  - 'tests/interop/dotnet/bin/**'
+  - 'tests/interop/dotnet/obj/**'
