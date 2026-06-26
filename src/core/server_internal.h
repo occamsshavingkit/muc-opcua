@@ -14,6 +14,7 @@ struct mu_server {
     
     void *client_handle;
     size_t rx_len;              /* bytes accumulated in config.receive_buffer (stream reassembly) */
+    opcua_uint64_t last_activity_ms; /* monotonic tick of last inbound traffic (idle timeout) */
     mu_tcp_connection_t tcp_conn;
     mu_secure_channel_t secure_channel;
     mu_session_t session;

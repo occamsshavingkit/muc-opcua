@@ -56,7 +56,15 @@ Fix (in order of impact):
 5. Until then: size the scratch from `config.max_message_size`, document a minimum
    stack requirement, and add a `static_assert` budget note.
 
-### H2 — Channel/session lifetime is stored but never enforced (stuck-slot DoS)
+### H2 — Channel/session lifetime is stored but never enforced (stuck-slot DoS) — ADDRESSED
+**Status:** Fixed. `mu_server_poll` now stamps `last_activity_ms` (from
+`get_tick_ms`) on accept and on each inbound read, and drops the connection when
+idle longer than the channel lifetime (or a 30 s connect timeout before a channel
+is open), reclaiming the single slot. A monotonic tick of 0 (stub adapter)
+disables the timeout. Covered by `tests/integration/test_connection_robustness.c`.
+Original finding:
+
+
 `src/services/secure_channel.c:48-52`, `src/services/session.c:33-37`,
 `src/core/server.c:317-345`. `revised_lifetime`/`revised_session_timeout` are
 computed and stored but never read back; `created_at` is only ever set to `0`;
@@ -70,7 +78,13 @@ processed chunk; in `mu_server_poll`, close and reclaim the slot when
 `now - last_activity` exceeds the channel lifetime (and a shorter connect-phase
 timeout for a pre-OPN connection). Enforce the session timeout likewise.
 
-### H3 — Non-blocking `write()` return and `bytes_written` are ignored
+### H3 — Non-blocking `write()` return and `bytes_written` are ignored — ADDRESSED
+**Status:** Fixed. `send_buffer_chunk` (and the HELLO ACK path) now check the
+write status and `bytes_written`; on an error or short write the connection is
+closed so a half-framed chunk never wedges the slot. Covered by
+`test_connection_robustness.c`. Original finding:
+
+
 `src/core/server.c:113-116` (`send_buffer_chunk`), `:275-277` (HELLO ACK),
 `:340-341` (server-full ERR). The TCP adapter is explicitly non-blocking, so
 `write()` may legitimately send fewer than `total` bytes; the code discards both

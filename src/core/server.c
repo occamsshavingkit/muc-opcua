@@ -112,10 +112,22 @@ opcua_statuscode_t mu_server_init(void *storage, size_t storage_size, const mu_s
    in place in the receive buffer and need no scratch here. */
 #define MU_SECURE_OPN_REQ_MAX 1024
 
+/* Connect-phase idle timeout: a peer that connects but does not open a secure
+   channel within this window is dropped so the single slot can be reused. */
+#define MU_CONNECT_TIMEOUT_MS 30000
+
+/* Send a fully-framed chunk from the send buffer. The transport is non-blocking,
+   so a write error or short write would leave a half-framed chunk on the wire;
+   drop the connection in that case rather than wedge the slot. */
 static void send_buffer_chunk(mu_server_t *server, size_t total) {
-    size_t bytes_written;
-    server->config.tcp_adapter.write(server->config.tcp_adapter.context, server->client_handle,
-                                     server->config.send_buffer, total, &bytes_written);
+    size_t bytes_written = 0;
+    opcua_statuscode_t s = server->config.tcp_adapter.write(
+        server->config.tcp_adapter.context, server->client_handle,
+        server->config.send_buffer, total, &bytes_written);
+    if (s != MU_STATUS_GOOD || bytes_written != total) {
+        server->config.tcp_adapter.close_connection(server->config.tcp_adapter.context, server->client_handle);
+        server->client_handle = NULL;
+    }
 }
 
 /* Plaintext (SecurityPolicy None) OPN/MSG handling — the only path when no crypto
@@ -281,9 +293,7 @@ static void process_message(mu_server_t *server, opcua_byte_t *msg, size_t msg_l
         status = mu_tcp_process_hello(&server->tcp_conn, msg, msg_len, &server->config,
                                       server->config.send_buffer, &ack_length);
         if (status == MU_STATUS_GOOD) {
-            size_t bytes_written;
-            server->config.tcp_adapter.write(server->config.tcp_adapter.context, server->client_handle,
-                                             server->config.send_buffer, ack_length, &bytes_written);
+            send_buffer_chunk(server, ack_length); /* closes on write failure */
         } else {
             server->config.tcp_adapter.close_connection(server->config.tcp_adapter.context, server->client_handle);
             server->client_handle = NULL;
@@ -330,9 +340,23 @@ opcua_statuscode_t mu_server_poll(mu_server_t *server)
             mu_secure_channel_init(&server->secure_channel);
             mu_session_init(&server->session);
             server->rx_len = 0;
+            server->last_activity_ms = server->config.time_adapter.get_tick_ms(server->config.time_adapter.context);
         }
         return MU_STATUS_GOOD;
     } else {
+        /* Reclaim the single slot from an idle/stuck peer: a connection with no
+           inbound traffic for its channel lifetime (or the connect timeout before
+           a channel is open) is dropped. A monotonic tick of 0 (stub adapter)
+           disables the timeout. */
+        opcua_uint64_t now = server->config.time_adapter.get_tick_ms(server->config.time_adapter.context);
+        opcua_uint64_t limit = server->secure_channel.is_open
+            ? (opcua_uint64_t)server->secure_channel.revised_lifetime : (opcua_uint64_t)MU_CONNECT_TIMEOUT_MS;
+        if (now > server->last_activity_ms && (now - server->last_activity_ms) > limit) {
+            server->config.tcp_adapter.close_connection(server->config.tcp_adapter.context, server->client_handle);
+            server->client_handle = NULL;
+            server->rx_len = 0;
+            return MU_STATUS_GOOD;
+        }
         /* Check if there's another connection waiting to be rejected */
         void *second_handle = NULL;
         opcua_statuscode_t status = server->config.tcp_adapter.accept(server->config.tcp_adapter.context, &second_handle);
@@ -368,7 +392,10 @@ opcua_statuscode_t mu_server_poll(mu_server_t *server)
             server->rx_len = 0;
             return MU_STATUS_GOOD;
         }
-        server->rx_len += bytes_read;
+        if (bytes_read > 0) {
+            server->rx_len += bytes_read;
+            server->last_activity_ms = server->config.time_adapter.get_tick_ms(server->config.time_adapter.context);
+        }
     }
 
     /* 3. Process every complete message in the buffer, reassembling the stream:

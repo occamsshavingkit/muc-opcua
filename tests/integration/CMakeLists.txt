@@ -24,3 +24,8 @@ add_executable(test_server_handshake_secure test_server_handshake_secure.c)
 target_link_libraries(test_server_handshake_secure PRIVATE micro_opcua micro_opcua_test_support unity)
 target_include_directories(test_server_handshake_secure PRIVATE ${CMAKE_SOURCE_DIR}/src)
 add_test(NAME test_server_handshake_secure COMMAND test_server_handshake_secure)
+
+add_executable(test_connection_robustness test_connection_robustness.c)
+target_link_libraries(test_connection_robustness PRIVATE micro_opcua micro_opcua_test_support unity)
+target_include_directories(test_connection_robustness PRIVATE ${CMAKE_SOURCE_DIR}/src)
+add_test(NAME test_connection_robustness COMMAND test_connection_robustness)
