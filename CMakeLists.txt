@@ -11,8 +11,13 @@ option(MICRO_OPCUA_SECURITY "Build SecurityPolicy Basic256Sha256 support" ON)
 # Optional services — turn OFF to drop a service's code from a minimal build.
 # (OpenSecureChannel / Session services are always present.)
 option(MICRO_OPCUA_SERVICE_READ "Build the Read service" ON)
-option(MICRO_OPCUA_SERVICE_BROWSE "Build the Browse service" ON)
+option(MICRO_OPCUA_SERVICE_BROWSE "Build the Browse + BrowseNext + TranslateBrowsePaths services" ON)
 option(MICRO_OPCUA_SERVICE_DISCOVERY "Build GetEndpoints/FindServers" ON)
+option(MICRO_OPCUA_SERVICE_REGISTER_NODES "Build RegisterNodes/UnregisterNodes" ON)
+# The library's standard Base Information node set (Server object hierarchy,
+# ServerStatus, ServerCapabilities). Turn OFF if the integrator supplies a complete
+# address space and does not want the default nodes.
+option(MICRO_OPCUA_BASE_NODES "Build the standard Base Information node set" ON)
 set(MICRO_OPCUA_SANITIZERS "" CACHE STRING "Comma-separated list of sanitizers (e.g. address,undefined)")
 set(MICRO_OPCUA_PLATFORM "host" CACHE STRING "Target platform (host, pico, arduino-skeleton)")
 

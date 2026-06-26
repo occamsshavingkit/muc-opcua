@@ -230,8 +230,8 @@ void test_dispatch_activate_session(void) {
     server.secure_channel.is_open = true;
     server.config.time_adapter.get_time = fake_time;
     mu_session_init(&server.session);
-    double revised; opcua_uint32_t sid, tok;
-    mu_session_create(&server.session, 10000.0, &revised, &sid, &tok); /* -> CREATED, auth=12345 */
+    opcua_uint64_t revised; opcua_uint32_t sid, tok;
+    mu_session_create(&server.session, 0, &revised, &sid, &tok); /* -> CREATED, auth=12345 */
 
     opcua_byte_t req[256];
     size_t req_len = build_activate_body(req, sizeof(req), tok);
@@ -257,8 +257,8 @@ void test_dispatch_close_session(void) {
     memset(&server, 0, sizeof(server));
     server.secure_channel.is_open = true;
     mu_session_init(&server.session);
-    double revised; opcua_uint32_t sid, tok;
-    mu_session_create(&server.session, 10000.0, &revised, &sid, &tok);
+    opcua_uint64_t revised; opcua_uint32_t sid, tok;
+    mu_session_create(&server.session, 0, &revised, &sid, &tok);
     mu_session_activate(&server.session, tok, 321); /* -> ACTIVATED */
 
     /* CloseSessionRequest: RequestHeader (authToken=tok) + DeleteSubscriptions(Boolean) */
@@ -318,8 +318,8 @@ static void activated_server(mu_server_t *server) {
     server->config.time_adapter.get_time = fake_time;
     server->config.address_space = &s_address_space;
     mu_session_init(&server->session);
-    double rev; opcua_uint32_t sid, tok;
-    mu_session_create(&server->session, 10000.0, &rev, &sid, &tok);
+    opcua_uint64_t rev; opcua_uint32_t sid, tok;
+    mu_session_create(&server->session, 0, &rev, &sid, &tok);
     mu_session_activate(&server->session, tok, 321);
 }
 

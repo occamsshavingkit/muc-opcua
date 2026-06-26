@@ -3,7 +3,9 @@
 #include "server_internal.h"
 #include "micro_opcua/address_space.h"
 #include "micro_opcua/encoding.h"
+#ifdef MICRO_OPCUA_SERVICE_BROWSE
 #include "../services/browse.h"
+#endif
 #include "../services/discovery.h"
 #include "../services/session.h"
 #include "../services/secure_channel.h"
@@ -39,10 +41,12 @@ static const mu_service_handler_t g_supported_services[] = {
     { MU_ID_CREATESESSIONREQUEST,      MU_ID_CREATESESSIONRESPONSE,      false }, /* Does not require an activated session */
     { MU_ID_ACTIVATESESSIONREQUEST,    MU_ID_ACTIVATESESSIONRESPONSE,    false }, /* Does not require an activated session to activate */
     { MU_ID_CLOSESESSIONREQUEST,       MU_ID_CLOSESESSIONRESPONSE,       true  },
+#ifdef MICRO_OPCUA_SERVICE_REGISTER_NODES
     { MU_ID_REGISTERNODESREQUEST,      MU_ID_REGISTERNODESRESPONSE,      true  },
     { MU_ID_UNREGISTERNODESREQUEST,    MU_ID_UNREGISTERNODESRESPONSE,    true  },
-    { MU_ID_TRANSLATEBROWSEPATHSTONODEIDSREQUEST, MU_ID_TRANSLATEBROWSEPATHSTONODEIDSRESPONSE, true },
+#endif
 #ifdef MICRO_OPCUA_SERVICE_BROWSE
+    { MU_ID_TRANSLATEBROWSEPATHSTONODEIDSREQUEST, MU_ID_TRANSLATEBROWSEPATHSTONODEIDSRESPONSE, true },
     { MU_ID_BROWSEREQUEST,             MU_ID_BROWSERESPONSE,             true  },
     { MU_ID_BROWSENEXTREQUEST,         MU_ID_BROWSENEXTRESPONSE,         true  },
 #endif
@@ -473,6 +477,7 @@ static opcua_statuscode_t handle_find_servers(mu_server_t *server,
 #define MU_DISPATCH_MAX_TRANSLATE_BROWSE_PATHS 16
 #define MU_DISPATCH_MAX_TRANSLATE_ELEMENTS 8
 
+#ifdef MICRO_OPCUA_SERVICE_REGISTER_NODES
 /* RegisterNodes (OPC 10000-4 5.9.5): this server has no alternate optimized
    handles, so registeredNodeIds is the identity mapping of nodesToRegister. */
 static opcua_statuscode_t handle_register_nodes(mu_server_t *server,
@@ -551,7 +556,9 @@ static opcua_statuscode_t handle_unregister_nodes(mu_server_t *server,
     *response_length = w->position;
     return MU_STATUS_GOOD;
 }
+#endif /* MICRO_OPCUA_SERVICE_REGISTER_NODES */
 
+#ifdef MICRO_OPCUA_SERVICE_BROWSE
 static opcua_boolean_t browse_name_equals(const mu_string_t *left, const mu_string_t *right)
 {
     if (left->length != right->length) {
@@ -693,6 +700,7 @@ static opcua_statuscode_t handle_translate_browse_paths(mu_server_t *server,
     *response_length = w->position;
     return MU_STATUS_GOOD;
 }
+#endif /* MICRO_OPCUA_SERVICE_BROWSE */
 
 #ifdef MICRO_OPCUA_SERVICE_READ
 /* Read (OPC 10000-4 5.11.2): decode the request after the RequestHeader, read each
@@ -871,12 +879,16 @@ opcua_statuscode_t mu_service_dispatch(
             return handle_activate_session(server, &reader, &writer, response_length);
         case MU_ID_CLOSESESSIONREQUEST:
             return handle_close_session(server, &reader, &writer, response_length);
+#ifdef MICRO_OPCUA_SERVICE_REGISTER_NODES
         case MU_ID_REGISTERNODESREQUEST:
             return handle_register_nodes(server, &reader, &writer, response_length);
         case MU_ID_UNREGISTERNODESREQUEST:
             return handle_unregister_nodes(server, &reader, &writer, response_length);
+#endif
+#ifdef MICRO_OPCUA_SERVICE_BROWSE
         case MU_ID_TRANSLATEBROWSEPATHSTONODEIDSREQUEST:
             return handle_translate_browse_paths(server, &reader, &writer, response_length);
+#endif
 #ifdef MICRO_OPCUA_SERVICE_READ
         case MU_ID_READREQUEST:
             return handle_read(server, &reader, &writer, response_length);

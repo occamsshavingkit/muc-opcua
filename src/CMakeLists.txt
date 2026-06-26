@@ -39,6 +39,14 @@ endif()
 if(MICRO_OPCUA_SERVICE_DISCOVERY)
     target_compile_definitions(micro_opcua PUBLIC MICRO_OPCUA_SERVICE_DISCOVERY=1)
 endif()
+if(MICRO_OPCUA_SERVICE_REGISTER_NODES)
+    target_compile_definitions(micro_opcua PUBLIC MICRO_OPCUA_SERVICE_REGISTER_NODES=1)
+endif()
+# base_nodes.c is always compiled (it owns the always-available mu_resolve_node);
+# this flag gates the node-table *content* so the standard node set is dropped.
+if(MICRO_OPCUA_BASE_NODES)
+    target_compile_definitions(micro_opcua PUBLIC MICRO_OPCUA_BASE_NODES=1)
+endif()
 
 # SecurityPolicy Basic256Sha256: the asym/sym chunk crypto and key derivation.
 # Excluded entirely from a None-only build to keep the embedded footprint minimal.

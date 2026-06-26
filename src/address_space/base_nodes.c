@@ -2,6 +2,7 @@
 #include "base_nodes.h"
 #include <stddef.h>
 
+#ifdef MICRO_OPCUA_BASE_NODES
 static const mu_reference_t s_root_refs[] = {
     { { 0, MU_NODEID_NUMERIC, { 35 } }, { 0, MU_NODEID_NUMERIC, { 85 } }, true },
     { { 0, MU_NODEID_NUMERIC, { 35 } }, { 0, MU_NODEID_NUMERIC, { 86 } }, true },
@@ -229,11 +230,18 @@ static const mu_address_space_t s_base_space = {
     s_base_nodes,
     sizeof(s_base_nodes) / sizeof(s_base_nodes[0])
 };
+#else
+static const mu_address_space_t s_base_space = {
+    NULL,
+    0
+};
+#endif /* MICRO_OPCUA_BASE_NODES */
 
 const mu_address_space_t *mu_base_address_space(void) {
     return &s_base_space;
 }
 
+#ifdef MICRO_OPCUA_BASE_NODES
 static opcua_statuscode_t base_status_time_read(void *ctx, const mu_nodeid_t *id, mu_variant_t *v) {
     const mu_base_runtime_t *rt = (const mu_base_runtime_t *)ctx;
 
@@ -246,6 +254,7 @@ static opcua_statuscode_t base_status_time_read(void *ctx, const mu_nodeid_t *id
     }
     return MU_STATUS_GOOD;
 }
+#endif /* MICRO_OPCUA_BASE_NODES */
 
 void mu_base_runtime_init(mu_base_runtime_nodes_t *s,
                           const mu_time_adapter_t *time,
@@ -253,6 +262,7 @@ void mu_base_runtime_init(mu_base_runtime_nodes_t *s,
     s->rt.time = time;
     s->rt.start_time = start_time;
 
+#ifdef MICRO_OPCUA_BASE_NODES
     s->values[0].type = MU_VALUESOURCE_CALLBACK;
     s->values[0].data.callback.read = base_status_time_read;
     s->values[0].data.callback.context = &s->rt;
@@ -281,6 +291,10 @@ void mu_base_runtime_init(mu_base_runtime_nodes_t *s,
 
     s->space.nodes = s->nodes;
     s->space.node_count = 2;
+#else
+    s->space.nodes = NULL;
+    s->space.node_count = 0;
+#endif /* MICRO_OPCUA_BASE_NODES */
 }
 
 const mu_node_t *mu_resolve_node(const mu_address_space_t *user,
