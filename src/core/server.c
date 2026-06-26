@@ -130,6 +130,28 @@ static void send_buffer_chunk(mu_server_t *server, size_t total) {
     }
 }
 
+/* Abort the active connection (a security/protocol violation). The poll loop
+   reclaims the slot when client_handle becomes NULL. */
+static void abort_connection(mu_server_t *server) {
+    server->config.tcp_adapter.close_connection(server->config.tcp_adapter.context, server->client_handle);
+    server->client_handle = NULL;
+}
+
+/* Validate an inbound chunk's sequencing and, for MSG, its channel/token binding.
+   Returns false if the chunk replays/skips a SequenceNumber (OPC 10000-6 6.7.2.4)
+   or is addressed to a different SecureChannel/Token — the caller must abort. */
+static bool accept_inbound_chunk(mu_server_t *server, bool is_opn,
+                                 opcua_uint32_t channel_id, opcua_uint32_t token_id,
+                                 opcua_uint32_t sequence_number) {
+    if (!is_opn) {
+        if (channel_id != server->secure_channel.channel_id ||
+            token_id != server->secure_channel.token_id) {
+            return false;
+        }
+    }
+    return mu_sequence_validate(&server->secure_channel.sequence, sequence_number) == MU_STATUS_GOOD;
+}
+
 /* Plaintext (SecurityPolicy None) OPN/MSG handling — the only path when no crypto
    adapter is configured. Dispatch writes the response body directly into the send
    buffer past the fixed UASC header, then a finalize step frames the chunk. */
@@ -138,8 +160,11 @@ static void handle_data_chunk_plaintext(mu_server_t *server, const opcua_byte_t 
     opcua_statuscode_t status;
     mu_binary_reader_t reader;
     mu_binary_reader_init(&reader, msg, msg_len);
-    reader.position = 12; /* MessageHeader(8) + SecureChannelId(4) */
+    reader.position = 8; /* MessageHeader(8); SecureChannelId follows */
+    opcua_uint32_t channel_id = 0;
+    status = mu_binary_read_uint32(&reader, &channel_id); if (status != MU_STATUS_GOOD) return; /* SecureChannelId */
 
+    opcua_uint32_t token_id = 0;
     if (is_opn) {
         mu_string_t policy_uri;
         mu_bytestring_t sender_cert, receiver_thumbprint;
@@ -147,13 +172,17 @@ static void handle_data_chunk_plaintext(mu_server_t *server, const opcua_byte_t 
         status = mu_binary_read_bytestring(&reader, &sender_cert);         if (status != MU_STATUS_GOOD) return;
         status = mu_binary_read_bytestring(&reader, &receiver_thumbprint); if (status != MU_STATUS_GOOD) return;
     } else {
-        opcua_uint32_t token_id;
         status = mu_binary_read_uint32(&reader, &token_id);               if (status != MU_STATUS_GOOD) return;
     }
 
     mu_sequence_header_t seq;
     status = mu_binary_read_uint32(&reader, &seq.sequence_number);        if (status != MU_STATUS_GOOD) return;
     status = mu_binary_read_uint32(&reader, &seq.request_id);             if (status != MU_STATUS_GOOD) return;
+
+    if (!accept_inbound_chunk(server, is_opn, channel_id, token_id, seq.sequence_number)) {
+        abort_connection(server);
+        return;
+    }
 
     mu_nodeid_t request_type;
     status = mu_binary_read_nodeid(&reader, &request_type);              if (status != MU_STATUS_GOOD) return;
@@ -218,6 +247,7 @@ static void handle_data_chunk_secure(mu_server_t *server, opcua_byte_t *msg, siz
     opcua_uint32_t response_request_id = 0;
     const opcua_byte_t *client_cert = NULL;
     size_t client_cert_len = 0;
+    opcua_uint32_t in_channel_id = 0, in_token_id = 0, in_seq = 0;
 
     if (is_opn) {
         mu_asym_chunk_info_t ai;
@@ -232,6 +262,8 @@ static void handle_data_chunk_secure(mu_server_t *server, opcua_byte_t *msg, siz
         client_cert = ai.sender_cert;
         client_cert_len = ai.sender_cert_len;
         req_full = opn_buf;
+        in_channel_id = ai.secure_channel_id;
+        in_seq = ai.sequence_number;
     } else {
         if (!server->secure_channel.keys_valid) return;
         mu_sym_chunk_info_t si;
@@ -242,6 +274,14 @@ static void handle_data_chunk_secure(mu_server_t *server, opcua_byte_t *msg, siz
             return;
         }
         response_request_id = si.request_id;
+        in_channel_id = si.secure_channel_id;
+        in_token_id = si.token_id;
+        in_seq = si.sequence_number;
+    }
+
+    if (!accept_inbound_chunk(server, is_opn, in_channel_id, in_token_id, in_seq)) {
+        abort_connection(server);
+        return;
     }
 
     mu_binary_reader_t rr;

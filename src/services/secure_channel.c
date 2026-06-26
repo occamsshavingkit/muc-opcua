@@ -37,7 +37,9 @@ opcua_statuscode_t mu_secure_channel_open(mu_secure_channel_t *channel,
     if (!channel->is_open) {
         channel->channel_id = 1;
         channel->token_id = 1;
-        mu_sequence_validator_init(&channel->sequence);
+        /* The inbound SequenceNumber is validated channel-wide starting from the
+           OPN chunk; the validator is reset per connection in mu_secure_channel_init,
+           not here (resetting here would skip the gap check on the first MSG). */
         channel->is_open = true;
     } else {
         /* Renew */

@@ -121,7 +121,10 @@ footprint lever and unlocks stripping for the items under MED/LOW.
 
 ## MED
 
-### M1 — Sequence-number validation is implemented but never called (no replay protection)
+### M1 — Sequence-number validation is implemented but never called — ADDRESSED
+**Status:** Fixed. Every inbound OPN/MSG chunk's SequenceNumber is now fed to `mu_sequence_validate` (channel-wide, starting at the OPN); a gap/replay aborts the connection. The validator is reset per connection (not on channel open, which previously skipped the first MSG's check). Covered by `test_server_rejects_sequence_gap`.
+
+_Original:_ ### M1 — Sequence-number validation is implemented but never called (no replay protection)
 `src/core/sequence.c` provides `mu_sequence_validate` (gap + wrap handling) and
 `mu_secure_channel_t` carries a `sequence` validator that is *initialized* — but
 no caller ever invokes it (verified). The inbound SequenceNumber is parsed and
@@ -170,7 +173,10 @@ Fix: validate `(uintptr_t)storage % _Alignof(struct mu_server) == 0` in
 `mu_server_init`, and/or expose storage as a `union { max_align_t; unsigned char[]; }`;
 document the requirement by `MU_SERVER_STORAGE_BYTES`.
 
-### M6 — Inbound SecureChannelId/TokenId never validated
+### M6 — Inbound SecureChannelId/TokenId never validated — ADDRESSED
+**Status:** Fixed. `accept_inbound_chunk` rejects a MSG whose SecureChannelId/TokenId don't match the open channel (both the secure and None paths), aborting the connection.
+
+_Original:_ ### M6 — Inbound SecureChannelId/TokenId never validated
 `src/core/server.c`. Unwrap fills `secure_channel_id`/`token_id` but the server
 never compares them to the open channel's. For SignAndEncrypt a wrong key fails the
 HMAC, but the None-policy MSG path has no channel binding at all.

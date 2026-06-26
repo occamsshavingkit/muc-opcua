@@ -176,14 +176,14 @@ void test_server_handshake_connect_browse_read(void) {
     mu_binary_writer_init(&w, tmp, sizeof(tmp));
     { mu_nodeid_t t = {0, MU_NODEID_NUMERIC, {MU_ID_GETENDPOINTSREQUEST}}; mu_binary_write_nodeid(&w, &t); }
     write_request_header(&w, 0, 6);
-    clen = build_msg(chunk, sizeof(chunk), 6, 6, tmp, w.position);
+    clen = build_msg(chunk, sizeof(chunk), 2, 2, tmp, w.position);
     enqueue(&mock, chunk, clen);
 
     /* CreateSession */
     mu_binary_writer_init(&w, tmp, sizeof(tmp));
     { mu_nodeid_t t = {0, MU_NODEID_NUMERIC, {MU_ID_CREATESESSIONREQUEST}}; mu_binary_write_nodeid(&w, &t); }
     write_request_header(&w, 0, 2);
-    clen = build_msg(chunk, sizeof(chunk), 2, 2, tmp, w.position);
+    clen = build_msg(chunk, sizeof(chunk), 3, 3, tmp, w.position);
     enqueue(&mock, chunk, clen);
 
     /* ActivateSession */
@@ -194,7 +194,7 @@ void test_server_handshake_connect_browse_read(void) {
     mu_binary_write_int32(&w, 0);           /* ClientSoftwareCertificates */
     mu_binary_write_int32(&w, 0);           /* LocaleIds */
     { mu_nodeid_t anon = {0, MU_NODEID_NUMERIC, {321}}; mu_binary_write_extension_object_header(&w, &anon, 0); }
-    clen = build_msg(chunk, sizeof(chunk), 3, 3, tmp, w.position);
+    clen = build_msg(chunk, sizeof(chunk), 4, 4, tmp, w.position);
     enqueue(&mock, chunk, clen);
 
     /* Browse Objects */
@@ -207,7 +207,7 @@ void test_server_handshake_connect_browse_read(void) {
     { mu_nodeid_t o = {0, MU_NODEID_NUMERIC, {85}}; mu_nodeid_t e = {0, MU_NODEID_NUMERIC, {0}};
       mu_binary_write_nodeid(&w, &o); mu_binary_write_uint32(&w, 0); mu_binary_write_nodeid(&w, &e);
       mu_binary_write_boolean(&w, false); mu_binary_write_uint32(&w, 0); mu_binary_write_uint32(&w, 0x3F); }
-    clen = build_msg(chunk, sizeof(chunk), 4, 4, tmp, w.position);
+    clen = build_msg(chunk, sizeof(chunk), 5, 5, tmp, w.position);
     enqueue(&mock, chunk, clen);
 
     /* Read MyVar1 Value */
@@ -220,7 +220,7 @@ void test_server_handshake_connect_browse_read(void) {
     { mu_nodeid_t v = {1, MU_NODEID_NUMERIC, {1000}}; mu_string_t ns = {-1, NULL};
       mu_binary_write_nodeid(&w, &v); mu_binary_write_uint32(&w, 13); mu_binary_write_string(&w, &ns);
       mu_binary_write_uint16(&w, 0); mu_binary_write_string(&w, &ns); }
-    clen = build_msg(chunk, sizeof(chunk), 5, 5, tmp, w.position);
+    clen = build_msg(chunk, sizeof(chunk), 6, 6, tmp, w.position);
     enqueue(&mock, chunk, clen);
 
     /* ---- Configure the server ---- */
@@ -277,8 +277,73 @@ void test_server_handshake_connect_browse_read(void) {
       opcua_int32_t val; mu_binary_read_int32(&body, &val); TEST_ASSERT_EQUAL(42, val); }
 }
 
+/* A MSG that skips a SequenceNumber (replay/gap) must abort the connection. */
+void test_server_rejects_sequence_gap(void) {
+    mock_t mock;
+    memset(&mock, 0, sizeof(mock));
+    opcua_byte_t tmp[512]; mu_binary_writer_t w; opcua_byte_t chunk[512]; size_t clen;
+
+    /* HEL */
+    mu_binary_writer_init(&w, tmp, sizeof(tmp));
+    tmp[0]='H'; tmp[1]='E'; tmp[2]='L'; tmp[3]='F'; w.position = 4;
+    mu_binary_write_uint32(&w, 0); mu_binary_write_uint32(&w, 0);
+    mu_binary_write_uint32(&w, 8192); mu_binary_write_uint32(&w, 8192);
+    mu_binary_write_uint32(&w, 0); mu_binary_write_uint32(&w, 0);
+    { mu_string_t url = { 19, (const opcua_byte_t *)"opc.tcp://host:4840" }; mu_binary_write_string(&w, &url); }
+    { mu_binary_writer_t hs; mu_binary_writer_init(&hs, tmp, sizeof(tmp)); hs.position = 4; mu_binary_write_uint32(&hs, (opcua_uint32_t)w.position); }
+    enqueue(&mock, tmp, w.position);
+
+    /* OPN None, SequenceNumber 1 */
+    mu_binary_writer_init(&w, chunk, sizeof(chunk));
+    chunk[0]='O'; chunk[1]='P'; chunk[2]='N'; chunk[3]='F'; w.position = 4;
+    mu_binary_write_uint32(&w, 0); mu_binary_write_uint32(&w, 0);
+    { mu_string_t pol = { 47, (const opcua_byte_t *)"http://opcfoundation.org/UA/SecurityPolicy#None" }; mu_binary_write_string(&w, &pol); }
+    mu_binary_write_int32(&w, -1); mu_binary_write_int32(&w, -1);
+    mu_binary_write_uint32(&w, 1); mu_binary_write_uint32(&w, 1);
+    { mu_nodeid_t t = {0, MU_NODEID_NUMERIC, {MU_ID_OPENSECURECHANNELREQUEST}}; mu_binary_write_nodeid(&w, &t); }
+    write_request_header(&w, 0, 1);
+    mu_binary_write_uint32(&w, 0); mu_binary_write_uint32(&w, 0); mu_binary_write_uint32(&w, 1);
+    mu_binary_write_int32(&w, -1); mu_binary_write_uint32(&w, 3600000);
+    { mu_binary_writer_t os; mu_binary_writer_init(&os, chunk, sizeof(chunk)); os.position = 4; mu_binary_write_uint32(&os, (opcua_uint32_t)w.position); }
+    enqueue(&mock, chunk, w.position);
+
+    /* GetEndpoints with a gapped SequenceNumber (99 instead of 2). */
+    mu_binary_writer_init(&w, tmp, sizeof(tmp));
+    { mu_nodeid_t t = {0, MU_NODEID_NUMERIC, {MU_ID_GETENDPOINTSREQUEST}}; mu_binary_write_nodeid(&w, &t); }
+    write_request_header(&w, 0, 7);
+    clen = build_msg(chunk, sizeof(chunk), 99, 7, tmp, w.position);
+    enqueue(&mock, chunk, clen);
+
+    mu_server_config_t config;
+    memset(&config, 0, sizeof(config));
+    config.endpoint_url = "opc.tcp://host:4840";
+    config.application_uri = "urn:test"; config.product_uri = "urn:test"; config.application_name = "test";
+    static opcua_byte_t rx[8192], tx[8192];
+    config.receive_buffer = rx; config.receive_buffer_size = sizeof(rx);
+    config.send_buffer = tx; config.send_buffer_size = sizeof(tx);
+    config.max_chunk_count = 1; config.max_message_size = 8192;
+    config.max_sessions = 1; config.max_secure_channels = 1;
+    fake_platform_init(NULL, &config.time_adapter, &config.entropy_adapter);
+    config.tcp_adapter.context = &mock;
+    config.tcp_adapter.listen = mock_listen; config.tcp_adapter.accept = mock_accept;
+    config.tcp_adapter.read = mock_read; config.tcp_adapter.write = mock_write;
+    config.tcp_adapter.close_connection = mock_close; config.tcp_adapter.shutdown = mock_shutdown;
+
+    opcua_byte_t storage[MU_SERVER_STORAGE_BYTES];
+    mu_server_t *server = NULL;
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_server_init(storage, sizeof(storage), &config, &server));
+
+    mu_server_poll(server); /* accept */
+    mu_server_poll(server); /* HEL -> ACK */
+    mu_server_poll(server); /* OPN (seq 1) -> response, channel open */
+    TEST_ASSERT_NOT_NULL(server->client_handle);
+    mu_server_poll(server); /* GetEndpoints (seq 99, gap) -> abort */
+    TEST_ASSERT_NULL(server->client_handle);
+}
+
 int main(void) {
     UNITY_BEGIN();
     RUN_TEST(test_server_handshake_connect_browse_read);
+    RUN_TEST(test_server_rejects_sequence_gap);
     return UNITY_END();
 }
