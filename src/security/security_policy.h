@@ -13,6 +13,14 @@ typedef enum {
     MU_SECURITY_POLICY_BASIC256SHA256_ID
 } mu_security_policy_id_t;
 
+/* MessageSecurityMode (OPC 10000-4 §7.15) — values match the wire encoding. */
+typedef enum {
+    MU_MESSAGE_SECURITY_MODE_INVALID = 0,
+    MU_MESSAGE_SECURITY_MODE_NONE = 1,
+    MU_MESSAGE_SECURITY_MODE_SIGN = 2,
+    MU_MESSAGE_SECURITY_MODE_SIGN_AND_ENCRYPT = 3
+} mu_message_security_mode_t;
+
 /* Basic256Sha256 algorithm parameters (OPC 10000-7 §6.x profile table). */
 #define MU_B256S256_SIGNATURE_KEY_LENGTH      32  /* HMAC-SHA256 key (bytes) */
 #define MU_B256S256_ENCRYPTION_KEY_LENGTH     32  /* AES-256 key (bytes) */
