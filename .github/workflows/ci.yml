@@ -12,7 +12,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Install dependencies
-        run: sudo apt-get update && sudo apt-get install -y cmake build-essential cppcheck clang-tidy clang-format
+        run: sudo apt-get update && sudo apt-get install -y cmake build-essential cppcheck clang-tidy clang-format libssl-dev
       - name: Configure CMake
         run: cmake -S . -B build/host -DMICRO_OPCUA_BUILD_TESTS=ON -DMICRO_OPCUA_BUILD_EXAMPLES=ON -DMICRO_OPCUA_PLATFORM=host
       - name: Build
@@ -41,7 +41,7 @@ jobs:
         with:
           dotnet-version: '8.0.x'
       - name: Install build dependencies
-        run: sudo apt-get update && sudo apt-get install -y cmake build-essential
+        run: sudo apt-get update && sudo apt-get install -y cmake build-essential libssl-dev
       - name: Build host example
         run: cmake -S . -B build/host -DMICRO_OPCUA_BUILD_EXAMPLES=ON -DMICRO_OPCUA_PLATFORM=host && cmake --build build/host --target minimal_server
       - name: OPC Foundation .NET reference-client interop
@@ -52,7 +52,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Install dependencies
-        run: sudo apt-get update && sudo apt-get install -y cmake clang-format cppcheck clang-tidy
+        run: sudo apt-get update && sudo apt-get install -y cmake clang-format cppcheck clang-tidy libssl-dev
       - name: Configure CMake
         run: cmake -S . -B build/host -DMICRO_OPCUA_BUILD_TESTS=ON -DMICRO_OPCUA_PLATFORM=host
       - name: Format Check
@@ -67,7 +67,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Install dependencies
-        run: sudo apt-get update && sudo apt-get install -y cmake clang
+        run: sudo apt-get update && sudo apt-get install -y cmake clang libssl-dev
       - name: Configure CMake
         run: CC=clang CXX=clang++ cmake -S . -B build/asan -DMICRO_OPCUA_BUILD_TESTS=ON -DMICRO_OPCUA_SANITIZERS="address,undefined" -DMICRO_OPCUA_PLATFORM=host
       - name: Build
