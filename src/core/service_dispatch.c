@@ -40,6 +40,8 @@ static const mu_service_handler_t g_supported_services[] = {
     { MU_ID_CREATESESSIONREQUEST,      MU_ID_CREATESESSIONRESPONSE,      false }, /* Does not require an activated session */
     { MU_ID_ACTIVATESESSIONREQUEST,    MU_ID_ACTIVATESESSIONRESPONSE,    false }, /* Does not require an activated session to activate */
     { MU_ID_CLOSESESSIONREQUEST,       MU_ID_CLOSESESSIONRESPONSE,       true  },
+    { MU_ID_REGISTERNODESREQUEST,      MU_ID_REGISTERNODESRESPONSE,      true  },
+    { MU_ID_UNREGISTERNODESREQUEST,    MU_ID_UNREGISTERNODESRESPONSE,    true  },
 #ifdef MICRO_OPCUA_SERVICE_BROWSE
     { MU_ID_BROWSEREQUEST,             MU_ID_BROWSERESPONSE,             true  },
 #endif
@@ -465,6 +467,86 @@ static opcua_statuscode_t handle_find_servers(mu_server_t *server,
 #define MU_DISPATCH_MAX_READ_NODES   32
 #define MU_DISPATCH_MAX_BROWSE_NODES 8
 #define MU_DISPATCH_MAX_BROWSE_REFS  32
+#define MU_DISPATCH_MAX_REGISTER_NODES 32
+
+/* RegisterNodes (OPC 10000-4 5.9.5): this server has no alternate optimized
+   handles, so registeredNodeIds is the identity mapping of nodesToRegister. */
+static opcua_statuscode_t handle_register_nodes(mu_server_t *server,
+                                                mu_binary_reader_t *r,
+                                                mu_binary_writer_t *w,
+                                                size_t *response_length)
+{
+    (void)server;
+
+    mu_request_header_t req;
+    opcua_statuscode_t s = mu_request_header_decode(r, &req);
+    if (s != MU_STATUS_GOOD) return s;
+
+    opcua_int32_t count;
+    s = mu_binary_read_int32(r, &count);
+    if (s != MU_STATUS_GOOD) return s;
+    if (count < 0) {
+        count = 0;
+    }
+    if ((size_t)count > MU_DISPATCH_MAX_REGISTER_NODES) {
+        return MU_STATUS_BAD_TOOMANYOPERATIONS;
+    }
+
+    mu_nodeid_t nodes[MU_DISPATCH_MAX_REGISTER_NODES];
+    size_t node_count = (size_t)count;
+    for (size_t i = 0; i < node_count; ++i) {
+        s = mu_binary_read_nodeid(r, &nodes[i]);
+        if (s != MU_STATUS_GOOD) return s;
+    }
+
+    s = write_response_prefix(w, MU_ID_REGISTERNODESRESPONSE, req.request_handle, MU_STATUS_GOOD);
+    if (s != MU_STATUS_GOOD) return s;
+    s = mu_binary_write_int32(w, count);
+    if (s != MU_STATUS_GOOD) return s;
+    for (size_t i = 0; i < node_count; ++i) {
+        s = mu_binary_write_nodeid(w, &nodes[i]);
+        if (s != MU_STATUS_GOOD) return s;
+    }
+
+    *response_length = w->position;
+    return MU_STATUS_GOOD;
+}
+
+/* UnregisterNodes (OPC 10000-4 5.9.6): consume the NodeIds and return Good. */
+static opcua_statuscode_t handle_unregister_nodes(mu_server_t *server,
+                                                  mu_binary_reader_t *r,
+                                                  mu_binary_writer_t *w,
+                                                  size_t *response_length)
+{
+    (void)server;
+
+    mu_request_header_t req;
+    opcua_statuscode_t s = mu_request_header_decode(r, &req);
+    if (s != MU_STATUS_GOOD) return s;
+
+    opcua_int32_t count;
+    s = mu_binary_read_int32(r, &count);
+    if (s != MU_STATUS_GOOD) return s;
+    if (count < 0) {
+        count = 0;
+    }
+    if ((size_t)count > MU_DISPATCH_MAX_REGISTER_NODES) {
+        return MU_STATUS_BAD_TOOMANYOPERATIONS;
+    }
+
+    size_t node_count = (size_t)count;
+    for (size_t i = 0; i < node_count; ++i) {
+        mu_nodeid_t ignored;
+        s = mu_binary_read_nodeid(r, &ignored);
+        if (s != MU_STATUS_GOOD) return s;
+    }
+
+    s = write_response_prefix(w, MU_ID_UNREGISTERNODESRESPONSE, req.request_handle, MU_STATUS_GOOD);
+    if (s != MU_STATUS_GOOD) return s;
+
+    *response_length = w->position;
+    return MU_STATUS_GOOD;
+}
 
 #ifdef MICRO_OPCUA_SERVICE_READ
 /* Read (OPC 10000-4 5.11.2): decode the request after the RequestHeader, read each
@@ -585,6 +667,10 @@ opcua_statuscode_t mu_service_dispatch(
             return handle_activate_session(server, &reader, &writer, response_length);
         case MU_ID_CLOSESESSIONREQUEST:
             return handle_close_session(server, &reader, &writer, response_length);
+        case MU_ID_REGISTERNODESREQUEST:
+            return handle_register_nodes(server, &reader, &writer, response_length);
+        case MU_ID_UNREGISTERNODESREQUEST:
+            return handle_unregister_nodes(server, &reader, &writer, response_length);
 #ifdef MICRO_OPCUA_SERVICE_READ
         case MU_ID_READREQUEST:
             return handle_read(server, &reader, &writer, response_length);

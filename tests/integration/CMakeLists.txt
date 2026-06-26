@@ -29,3 +29,8 @@ add_executable(test_connection_robustness test_connection_robustness.c)
 target_link_libraries(test_connection_robustness PRIVATE micro_opcua micro_opcua_test_support unity)
 target_include_directories(test_connection_robustness PRIVATE ${CMAKE_SOURCE_DIR}/src)
 add_test(NAME test_connection_robustness COMMAND test_connection_robustness)
+
+add_executable(test_view_services test_view_services.c)
+target_link_libraries(test_view_services PRIVATE micro_opcua micro_opcua_test_support unity)
+target_include_directories(test_view_services PRIVATE ${CMAKE_SOURCE_DIR}/src)
+add_test(NAME test_view_services COMMAND test_view_services)
