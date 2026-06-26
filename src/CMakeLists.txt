@@ -25,6 +25,8 @@ add_library(micro_opcua STATIC
     encoding/binary_variant.c
     encoding/binary_datavalue.c
     security/key_derivation.c
+    security/security_policy.c
+    security/certificate.c
     generated/opcua_ids.c
 )
 

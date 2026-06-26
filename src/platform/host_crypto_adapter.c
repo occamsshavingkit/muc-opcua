@@ -159,6 +159,13 @@ static opcua_statuscode_t h_get_certificate_key_bits(void *c, const opcua_byte_t
     return MU_STATUS_GOOD;
 }
 
+static opcua_statuscode_t h_get_certificate_thumbprint(void *c, const opcua_byte_t *cert, size_t cert_len, opcua_byte_t *thumbprint) {
+    (void)c;
+    unsigned int len = 0;
+    if (EVP_Digest(cert, cert_len, thumbprint, &len, EVP_sha1(), NULL) != 1) return MU_STATUS_BAD_INTERNALERROR;
+    return MU_STATUS_GOOD;
+}
+
 /* ---- init / cleanup ---- */
 
 static int build_self_signed(struct host_crypto_context *cx) {
@@ -216,6 +223,7 @@ opcua_statuscode_t mu_host_crypto_adapter_init(mu_crypto_adapter_t *adapter) {
     adapter->rsa_oaep_encrypt = h_rsa_oaep_encrypt;
     adapter->get_own_certificate = h_get_own_certificate;
     adapter->get_certificate_key_bits = h_get_certificate_key_bits;
+    adapter->get_certificate_thumbprint = h_get_certificate_thumbprint;
     return MU_STATUS_GOOD;
 }
 

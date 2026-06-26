@@ -82,6 +82,7 @@ typedef struct mu_persistence_adapter {
  */
 #define MU_SHA256_LENGTH 32   /* SHA-256 digest / HMAC-SHA256 size */
 #define MU_AES_BLOCK_SIZE 16  /* AES-CBC block / IV size */
+#define MU_THUMBPRINT_LENGTH 20 /* certificate thumbprint = SHA-1 of DER */
 
 typedef struct mu_crypto_adapter {
     void *context;
@@ -128,6 +129,11 @@ typedef struct mu_crypto_adapter {
         const opcua_byte_t **certificate, size_t *length);
     opcua_statuscode_t (*get_certificate_key_bits)(void *context,
         const opcua_byte_t *certificate, size_t certificate_length, size_t *bits);
+
+    /* Certificate thumbprint: SHA-1 of the DER certificate -> `thumbprint`
+       (MU_THUMBPRINT_LENGTH bytes). */
+    opcua_statuscode_t (*get_certificate_thumbprint)(void *context,
+        const opcua_byte_t *certificate, size_t certificate_length, opcua_byte_t *thumbprint);
 } mu_crypto_adapter_t;
 
 #ifdef __cplusplus

@@ -27,6 +27,7 @@
 #define MU_STATUS_BAD_TOOMANYOPERATIONS       ((opcua_statuscode_t)0x80100000)
 #define MU_STATUS_BAD_NOCONTINUATIONPOINTS    ((opcua_statuscode_t)0x80140000)
 #define MU_STATUS_BAD_ATTRIBUTEIDINVALID      ((opcua_statuscode_t)0x80350000)
+#define MU_STATUS_BAD_CERTIFICATEINVALID      ((opcua_statuscode_t)0x80120000)
 
 /* TCP Specific StatusCodes */
 #define MU_STATUS_BAD_TCPSERVERTOOBUSY          0x807D0000
