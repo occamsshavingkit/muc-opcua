@@ -69,7 +69,7 @@ void test_read_service_scalar_values(void) {
     mu_read_response_t resp;
     mu_datavalue_t result_dv;
     
-    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_read_process(&address_space, &req, &resp, &result_dv, 1));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_read_process(&address_space, NULL, &req, &resp, &result_dv, 1));
     TEST_ASSERT_EQUAL(1, resp.num_results);
     TEST_ASSERT_TRUE(resp.results[0].has_value);
     TEST_ASSERT_EQUAL(MU_TYPE_INT32, resp.results[0].value.type);
@@ -129,7 +129,7 @@ void test_read_service_browsename_displayname(void) {
 
     mu_read_response_t resp;
     mu_datavalue_t results[3];
-    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_read_process(&address_space, &req, &resp, results, 3));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_read_process(&address_space, NULL, &req, &resp, results, 3));
 
     /* BrowseName -> QualifiedName */
     TEST_ASSERT_TRUE(resp.results[0].has_value);

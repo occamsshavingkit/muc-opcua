@@ -186,6 +186,7 @@ opcua_statuscode_t mu_browse_response_encode(mu_binary_writer_t *writer,
 }
 
 opcua_statuscode_t mu_browse_process(const mu_address_space_t *address_space,
+                                     const mu_address_space_t *dynamic,
                                      const mu_browse_request_t *req,
                                      mu_browse_result_t *results,
                                      size_t max_results,
@@ -205,7 +206,7 @@ opcua_statuscode_t mu_browse_process(const mu_address_space_t *address_space,
         res->num_references = 0;
         res->references = NULL;
         
-        const mu_node_t *node = mu_resolve_node(address_space, &desc->node_id);
+        const mu_node_t *node = mu_resolve_node(address_space, dynamic, &desc->node_id);
         if (!node) {
             res->status_code = MU_STATUS_BAD_NODEIDUNKNOWN;
             continue;
@@ -221,7 +222,7 @@ opcua_statuscode_t mu_browse_process(const mu_address_space_t *address_space,
             
             if (!reference_type_matches(desc, r)) continue;
             
-            const mu_node_t *target = mu_resolve_node(address_space, &r->target_id);
+            const mu_node_t *target = mu_resolve_node(address_space, dynamic, &r->target_id);
             if (!target) continue;
             
             if (desc->node_class_mask != 0) {
@@ -253,7 +254,7 @@ opcua_statuscode_t mu_browse_process(const mu_address_space_t *address_space,
             
             if (!reference_type_matches(desc, r)) continue;
             
-            const mu_node_t *target = mu_resolve_node(address_space, &r->target_id);
+            const mu_node_t *target = mu_resolve_node(address_space, dynamic, &r->target_id);
             if (!target) continue;
             
             if (desc->node_class_mask != 0) {

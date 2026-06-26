@@ -44,6 +44,10 @@ static opcua_statuscode_t mock_write(void *c, void *h, const opcua_byte_t *buf, 
     mock_t *m = (mock_t *)c; (void)h; memcpy(m->last_write, buf, len); m->last_write_len = len; *n = len; return MU_STATUS_GOOD;
 }
 
+/* Controllable clock for the live-CurrentTime test. */
+#define TEST_NOW_DT 132000000000000000LL
+static opcua_datetime_t s_test_now(void *c) { (void)c; return TEST_NOW_DT; }
+
 static void enqueue(mock_t *m, const opcua_byte_t *b, size_t len) {
     memcpy(m->inbound[m->inbound_count], b, len); m->inbound_len[m->inbound_count] = len; m->inbound_count++;
 }
@@ -345,11 +349,49 @@ void test_base_information_default_nodes(void) {
       opcua_int32_t nrefs; mu_binary_read_int32(&body, &nrefs); TEST_ASSERT_TRUE(nrefs >= 2); }
 }
 
+/* US2b: ServerStatus.CurrentTime (i=2258) is a live DateTime sourced from the time
+   adapter via a runtime-bound value source in the base node set. */
+void test_server_status_current_time_is_live(void) {
+    mock_t mock; memset(&mock, 0, sizeof(mock));
+    enqueue_connect(&mock);
+    opcua_byte_t tmp[512], chunk[512]; mu_binary_writer_t w; size_t clen;
+
+    /* Read (seq 4): ServerStatus.CurrentTime (ns=0;i=2258) Value. */
+    mu_binary_writer_init(&w, tmp, sizeof(tmp));
+    { mu_nodeid_t t={0,MU_NODEID_NUMERIC,{MU_ID_READREQUEST}}; mu_binary_write_nodeid(&w,&t); }
+    write_request_header(&w, 12345, 4);
+    mu_binary_write_double(&w, 0.0);
+    mu_binary_write_uint32(&w, 3);
+    mu_binary_write_int32(&w, 1);
+    { mu_nodeid_t n={0,MU_NODEID_NUMERIC,{2258}}; mu_string_t ns={-1,NULL};
+      mu_binary_write_nodeid(&w,&n); mu_binary_write_uint32(&w,13);
+      mu_binary_write_string(&w,&ns); mu_binary_write_uint16(&w,0); mu_binary_write_string(&w,&ns); }
+    clen = build_msg(chunk, sizeof(chunk), 4, 4, tmp, w.position); enqueue(&mock, chunk, clen);
+
+    opcua_byte_t storage[MU_SERVER_STORAGE_BYTES]; mu_server_config_t config;
+    mu_server_t *server = make_server(&mock, storage, sizeof(storage), &config, NULL);
+    /* Point the (live) time adapter at a known clock; CurrentTime must read it. */
+    server->config.time_adapter.get_time = s_test_now;
+    mu_binary_reader_t body;
+
+    mu_server_poll(server); mu_server_poll(server); mu_server_poll(server);
+    mu_server_poll(server); mu_server_poll(server);
+
+    mu_server_poll(server); /* Read CurrentTime -> DateTime == s_test_now() */
+    TEST_ASSERT_EQUAL(MU_ID_READRESPONSE, parse_response(mock.last_write, mock.last_write_len, &body));
+    opcua_int32_t nres; mu_binary_read_int32(&body, &nres); TEST_ASSERT_EQUAL(1, nres);
+    opcua_byte_t mask; mu_binary_read_byte(&body, &mask); TEST_ASSERT_EQUAL(0x01, mask);
+    opcua_byte_t vt; mu_binary_read_byte(&body, &vt); TEST_ASSERT_EQUAL(MU_TYPE_DATETIME, vt);
+    opcua_int64_t dt; mu_binary_read_int64(&body, &dt);
+    TEST_ASSERT_EQUAL_HEX64(TEST_NOW_DT, dt);
+}
+
 int main(void) {
     UNITY_BEGIN();
     RUN_TEST(test_register_and_unregister_nodes);
     RUN_TEST(test_browse_next_invalid_continuation_point);
     RUN_TEST(test_translate_browse_paths);
     RUN_TEST(test_base_information_default_nodes);
+    RUN_TEST(test_server_status_current_time_is_live);
     return UNITY_END();
 }

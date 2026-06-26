@@ -26,13 +26,13 @@ Conformance-unit status (Core 2017 Server Facet groups; see [services.md](servic
 | View — RegisterNodes / UnregisterNodes | Implemented | `test_view_services` |
 | Address Space Base — standard nodes | Implemented (static) | `base_nodes.c`; `test_view_services` |
 | Base Info — Server / ServerCapabilities objects | Implemented (static) | `base_nodes.c` |
-| Base Info — ServerStatus.CurrentTime/StartTime (live) | **Pending (US2b)** | needs a DateTime variant type |
+| Base Info — ServerStatus.CurrentTime/StartTime (live) | Implemented | `base_nodes.c` runtime value sources; `test_view_services` |
+
+All in-scope Nano conformance units are implemented and covered by tests/CI.
 
 ## Remaining for Nano
-1. **US2b** — live `ServerStatus.CurrentTime`/`StartTime` (DateTime). The variant
-   model currently has no DateTime/Int64 type; add it, then bind the values to the
-   time adapter via runtime value sources in the (caller-owned) server struct.
-2. **CTT verification** — run the OPC Foundation Compliance Test Tool against the
+1. **CTT verification** — run the OPC Foundation Compliance Test Tool against the
    server and record results; only then may a profile-compliance claim be made.
+   (External step; the implementation surface is complete.)
 
 See `specs/002-nano-profile-completion/` for the task breakdown.

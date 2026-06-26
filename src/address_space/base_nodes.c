@@ -20,7 +20,9 @@ static const mu_reference_t s_server_refs[] = {
 };
 
 static const mu_reference_t s_server_status_refs[] = {
-    { { 0, MU_NODEID_NUMERIC, { 47 } }, { 0, MU_NODEID_NUMERIC, { 2259 } }, true }
+    { { 0, MU_NODEID_NUMERIC, { 47 } }, { 0, MU_NODEID_NUMERIC, { 2259 } }, true },
+    { { 0, MU_NODEID_NUMERIC, { 47 } }, { 0, MU_NODEID_NUMERIC, { 2258 } }, true },
+    { { 0, MU_NODEID_NUMERIC, { 47 } }, { 0, MU_NODEID_NUMERIC, { 2257 } }, true }
 };
 
 static const mu_reference_t s_server_capabilities_refs[] = {
@@ -155,7 +157,7 @@ static const mu_node_t s_base_nodes[] = {
         { 12, (const opcua_byte_t *)"ServerStatus" },
         { 12, (const opcua_byte_t *)"ServerStatus" },
         s_server_status_refs,
-        1,
+        3,
         NULL
     },
     {
@@ -232,9 +234,64 @@ const mu_address_space_t *mu_base_address_space(void) {
     return &s_base_space;
 }
 
-const mu_node_t *mu_resolve_node(const mu_address_space_t *user, const mu_nodeid_t *node_id) {
+static opcua_statuscode_t base_status_time_read(void *ctx, const mu_nodeid_t *id, mu_variant_t *v) {
+    const mu_base_runtime_t *rt = (const mu_base_runtime_t *)ctx;
+
+    *v = (mu_variant_t){0};
+    v->type = MU_TYPE_DATETIME;
+    if (id->identifier.numeric == 2257u) {
+        v->value.dt = rt->start_time;
+    } else {
+        v->value.dt = (rt->time && rt->time->get_time) ? rt->time->get_time(rt->time->context) : 0;
+    }
+    return MU_STATUS_GOOD;
+}
+
+void mu_base_runtime_init(mu_base_runtime_nodes_t *s,
+                          const mu_time_adapter_t *time,
+                          opcua_datetime_t start_time) {
+    s->rt.time = time;
+    s->rt.start_time = start_time;
+
+    s->values[0].type = MU_VALUESOURCE_CALLBACK;
+    s->values[0].data.callback.read = base_status_time_read;
+    s->values[0].data.callback.context = &s->rt;
+    s->values[1].type = MU_VALUESOURCE_CALLBACK;
+    s->values[1].data.callback.read = base_status_time_read;
+    s->values[1].data.callback.context = &s->rt;
+
+    s->nodes[0] = (mu_node_t){
+        .node_id = { .namespace_index = 0, .identifier_type = MU_NODEID_NUMERIC, .identifier.numeric = 2258u },
+        .node_class = MU_NODECLASS_VARIABLE,
+        .browse_name = { .length = (opcua_int32_t)11, .data = (const opcua_byte_t *)"CurrentTime" },
+        .display_name = { .length = (opcua_int32_t)11, .data = (const opcua_byte_t *)"CurrentTime" },
+        .references = NULL,
+        .reference_count = 0,
+        .value = &s->values[0]
+    };
+    s->nodes[1] = (mu_node_t){
+        .node_id = { .namespace_index = 0, .identifier_type = MU_NODEID_NUMERIC, .identifier.numeric = 2257u },
+        .node_class = MU_NODECLASS_VARIABLE,
+        .browse_name = { .length = (opcua_int32_t)9, .data = (const opcua_byte_t *)"StartTime" },
+        .display_name = { .length = (opcua_int32_t)9, .data = (const opcua_byte_t *)"StartTime" },
+        .references = NULL,
+        .reference_count = 0,
+        .value = &s->values[1]
+    };
+
+    s->space.nodes = s->nodes;
+    s->space.node_count = 2;
+}
+
+const mu_node_t *mu_resolve_node(const mu_address_space_t *user,
+                                 const mu_address_space_t *dynamic,
+                                 const mu_nodeid_t *node_id) {
     if (user) {
         const mu_node_t *n = mu_address_space_find_node(user, node_id);
+        if (n) return n;
+    }
+    if (dynamic) {
+        const mu_node_t *n = mu_address_space_find_node(dynamic, node_id);
         if (n) return n;
     }
     return mu_address_space_find_node(mu_base_address_space(), node_id);

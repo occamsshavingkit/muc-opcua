@@ -49,7 +49,7 @@ void test_browse_requested_max_references(void) {
     mu_browse_result_t result;
     mu_reference_description_t ref_pool[10];
     
-    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_browse_process(&address_space, &req, &result, 1, ref_pool, 10));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_browse_process(&address_space, NULL, &req, &result, 1, ref_pool, 10));
     TEST_ASSERT_EQUAL(MU_STATUS_BAD_NOCONTINUATIONPOINTS, result.status_code);
     TEST_ASSERT_EQUAL(0, result.num_references);
 }
@@ -73,7 +73,7 @@ void test_browse_response_size_bounds(void) {
     mu_browse_result_t result;
     mu_reference_description_t ref_pool[2]; /* Only 2 available in pool, need 3 */
     
-    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_browse_process(&address_space, &req, &result, 1, ref_pool, 2));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_browse_process(&address_space, NULL, &req, &result, 1, ref_pool, 2));
     TEST_ASSERT_EQUAL(MU_STATUS_BAD_NOCONTINUATIONPOINTS, result.status_code);
 }
 
@@ -101,7 +101,7 @@ void test_browse_include_subtypes_matches_organizes(void) {
     mu_browse_result_t result;
     mu_reference_description_t ref_pool[10];
 
-    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_browse_process(&address_space, &req, &result, 1, ref_pool, 10));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_browse_process(&address_space, NULL, &req, &result, 1, ref_pool, 10));
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, result.status_code);
     TEST_ASSERT_EQUAL(3, result.num_references); /* all three Organizes refs match */
 }
@@ -124,7 +124,7 @@ void test_browse_no_subtypes_excludes_organizes(void) {
     mu_browse_result_t result;
     mu_reference_description_t ref_pool[10];
 
-    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_browse_process(&address_space, &req, &result, 1, ref_pool, 10));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_browse_process(&address_space, NULL, &req, &result, 1, ref_pool, 10));
     TEST_ASSERT_EQUAL(0, result.num_references); /* exact HierarchicalReferences only */
 }
 

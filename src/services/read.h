@@ -69,6 +69,7 @@ opcua_statuscode_t mu_read_response_encode(mu_binary_writer_t *writer,
                                            const mu_read_response_t *resp);
 
 opcua_statuscode_t mu_read_process(const mu_address_space_t *address_space,
+                                   const mu_address_space_t *dynamic,
                                    const mu_read_request_t *req,
                                    mu_read_response_t *resp,
                                    mu_datavalue_t *results_array,

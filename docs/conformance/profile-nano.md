@@ -36,7 +36,10 @@ Embedded-tier feature) ahead of schedule; subscriptions (Micro) are out of scope
   OperationLimits), NamespaceArray, ServerArray — resolved as a fallback after the
   integrator's address space.
 
-## Known gaps to full Nano (see [status.md](status.md))
-- Live `ServerStatus.CurrentTime`/`StartTime` (DateTime) — pending a DateTime
-  variant type (US2b).
-- CTT verification — not yet run; `profile-targeting` until it passes.
+- **ServerStatus timestamps:** `ServerStatus.CurrentTime` is served live from the
+  time adapter and `StartTime` from the value captured at init, via runtime-bound
+  value sources in the (caller-owned) server struct.
+
+## Remaining to full Nano (see [status.md](status.md))
+- CTT verification — not yet run; `profile-targeting` until it passes. The
+  implementation surface is otherwise complete for the profile.

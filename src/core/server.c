@@ -94,6 +94,11 @@ opcua_statuscode_t mu_server_init(void *storage, size_t storage_size, const mu_s
     server = (mu_server_t *)storage;
     memset(server, 0, sizeof(struct mu_server));
     server->config = *config;
+    {
+        opcua_datetime_t start = server->config.time_adapter.get_time
+            ? server->config.time_adapter.get_time(server->config.time_adapter.context) : 0;
+        mu_base_runtime_init(&server->runtime_base, &server->config.time_adapter, start);
+    }
     server->is_running = true;
     server->client_handle = NULL;
     

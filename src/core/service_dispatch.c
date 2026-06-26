@@ -713,7 +713,8 @@ static opcua_statuscode_t handle_read(mu_server_t *server,
 
     mu_read_response_t rresp;
     mu_datavalue_t results[MU_DISPATCH_MAX_READ_NODES];
-    s = mu_read_process(server->config.address_space, &rreq, &rresp, results, MU_DISPATCH_MAX_READ_NODES);
+    s = mu_read_process(server->config.address_space, &server->runtime_base.space,
+                        &rreq, &rresp, results, MU_DISPATCH_MAX_READ_NODES);
     if (s != MU_STATUS_GOOD) return s;
 
     s = write_response_prefix(w, MU_ID_READRESPONSE, req.request_handle, MU_STATUS_GOOD);
@@ -745,7 +746,7 @@ static opcua_statuscode_t handle_browse(mu_server_t *server,
 
     mu_browse_result_t results[MU_DISPATCH_MAX_BROWSE_NODES];
     mu_reference_description_t ref_pool[MU_DISPATCH_MAX_BROWSE_REFS];
-    s = mu_browse_process(server->config.address_space, &breq,
+    s = mu_browse_process(server->config.address_space, &server->runtime_base.space, &breq,
                           results, MU_DISPATCH_MAX_BROWSE_NODES,
                           ref_pool, MU_DISPATCH_MAX_BROWSE_REFS);
     if (s != MU_STATUS_GOOD) return s;

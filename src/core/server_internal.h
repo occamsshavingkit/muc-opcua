@@ -6,10 +6,12 @@
 #include "tcp_connection.h"
 #include "../services/secure_channel.h"
 #include "../services/session.h"
+#include "../address_space/base_nodes.h"
 #include "service_dispatch.h"
 
 struct mu_server {
     mu_server_config_t config;
+    mu_base_runtime_nodes_t runtime_base;
     opcua_boolean_t is_running;
     
     void *client_handle;

@@ -67,6 +67,7 @@ opcua_statuscode_t mu_browse_response_encode(mu_binary_writer_t *writer,
 
 /* Processes a BrowseRequest to produce a BrowseResponse */
 opcua_statuscode_t mu_browse_process(const mu_address_space_t *address_space,
+                                     const mu_address_space_t *dynamic,
                                      const mu_browse_request_t *req,
                                      mu_browse_result_t *results,
                                      size_t max_results,
