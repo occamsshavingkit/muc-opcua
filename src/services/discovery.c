@@ -52,7 +52,13 @@ opcua_statuscode_t mu_endpoint_description_encode(mu_binary_writer_t *writer,
     opcua_statuscode_t s;
     s = write_cstr(writer, desc->endpoint_url);             if (s != MU_STATUS_GOOD) return s;
     s = mu_application_description_encode(writer, &desc->server); if (s != MU_STATUS_GOOD) return s;
-    s = write_cstr(writer, NULL);                           if (s != MU_STATUS_GOOD) return s; /* serverCertificate (null) */
+    {   /* serverCertificate (ByteString; null when the server has no certificate) */
+        mu_bytestring_t cert = {
+            desc->server_certificate ? (opcua_int32_t)desc->server_certificate_len : -1,
+            desc->server_certificate
+        };
+        s = mu_binary_write_bytestring(writer, &cert);      if (s != MU_STATUS_GOOD) return s;
+    }
     s = mu_binary_write_uint32(writer, (opcua_uint32_t)desc->security_mode); if (s != MU_STATUS_GOOD) return s;
     s = write_cstr(writer, desc->security_policy_uri);      if (s != MU_STATUS_GOOD) return s;
 
@@ -87,27 +93,59 @@ opcua_statuscode_t mu_discovery_get_application_description(const mu_server_conf
     return MU_STATUS_GOOD;
 }
 
-opcua_statuscode_t mu_discovery_get_endpoint_description(const mu_server_config_t *config, 
-                                                         mu_endpoint_description_t *desc)
+static void fill_endpoint(const mu_server_config_t *config, mu_endpoint_description_t *desc,
+                          mu_message_security_mode_t mode, const char *policy_uri,
+                          const opcua_byte_t *cert, size_t cert_len, opcua_byte_t level)
 {
-    if (!config || !desc) return MU_STATUS_BAD_INTERNALERROR;
-
     desc->endpoint_url = config->endpoint_url;
-    
     mu_discovery_get_application_description(config, &desc->server);
-    
-    desc->security_mode = MU_MESSAGE_SECURITY_MODE_NONE;
-    desc->security_policy_uri = "http://opcfoundation.org/UA/SecurityPolicy#None";
-    
+    desc->server_certificate = cert;
+    desc->server_certificate_len = cert_len;
+    desc->security_mode = mode;
+    desc->security_policy_uri = policy_uri;
+
     desc->num_user_identity_tokens = 1;
     desc->user_identity_tokens[0].policy_id = "anonymous";
     desc->user_identity_tokens[0].token_type = MU_USER_TOKEN_TYPE_ANONYMOUS;
     desc->user_identity_tokens[0].issued_token_type = NULL;
     desc->user_identity_tokens[0].issuer_endpoint_url = NULL;
     desc->user_identity_tokens[0].security_policy_uri = NULL;
-    
-    desc->transport_profile_uri = "http://opcfoundation.org/UA-Profile/Transport/uatcp-uasc-uabinary";
-    desc->security_level = 0; /* lowest */
 
+    desc->transport_profile_uri = "http://opcfoundation.org/UA-Profile/Transport/uatcp-uasc-uabinary";
+    desc->security_level = level;
+}
+
+opcua_statuscode_t mu_discovery_get_endpoint_description(const mu_server_config_t *config,
+                                                         mu_endpoint_description_t *desc)
+{
+    if (!config || !desc) return MU_STATUS_BAD_INTERNALERROR;
+    fill_endpoint(config, desc, MU_MESSAGE_SECURITY_MODE_NONE,
+                  mu_security_policy_uri(MU_SECURITY_POLICY_NONE_ID), NULL, 0, 0);
+    return MU_STATUS_GOOD;
+}
+
+opcua_statuscode_t mu_discovery_get_endpoints(const mu_server_config_t *config,
+                                              mu_endpoint_description_t *eps, size_t max, size_t *count)
+{
+    if (!config || !eps || !count || max == 0) return MU_STATUS_BAD_INTERNALERROR;
+
+    const opcua_byte_t *cert = NULL;
+    size_t cert_len = 0;
+    bool have_crypto = config->crypto_adapter != NULL &&
+                       config->crypto_adapter->get_own_certificate != NULL &&
+                       config->crypto_adapter->get_own_certificate(
+                           config->crypto_adapter->context, &cert, &cert_len) == MU_STATUS_GOOD;
+
+    const char *none_uri = mu_security_policy_uri(MU_SECURITY_POLICY_NONE_ID);
+    const char *b256_uri = mu_security_policy_uri(MU_SECURITY_POLICY_BASIC256SHA256_ID);
+    size_t n = 0;
+
+    fill_endpoint(config, &eps[n++], MU_MESSAGE_SECURITY_MODE_NONE, none_uri,
+                  have_crypto ? cert : NULL, have_crypto ? cert_len : 0, 0);
+    if (have_crypto) {
+        if (n < max) fill_endpoint(config, &eps[n++], MU_MESSAGE_SECURITY_MODE_SIGN, b256_uri, cert, cert_len, 1);
+        if (n < max) fill_endpoint(config, &eps[n++], MU_MESSAGE_SECURITY_MODE_SIGN_AND_ENCRYPT, b256_uri, cert, cert_len, 2);
+    }
+    *count = n;
     return MU_STATUS_GOOD;
 }

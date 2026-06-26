@@ -4,9 +4,10 @@
 // implementation the OPC Foundation UACTT is built on). It is the server-bound leg of the
 // async-opcua interop harness adapted for micro-opcua, which is server-only.
 //
-// Connects with SecurityPolicy None + Anonymous and validates the Nano-profile surface:
-// connect (HEL/OPN/GetEndpoints/CreateSession/ActivateSession), Read, Browse, mandatory
-// attribute reads, and a negative (unknown node) case. Exits non-zero if any check fails.
+// Connects with SecurityPolicy Basic256Sha256 / SignAndEncrypt + Anonymous (selecting the
+// most-secure endpoint) and validates the Nano-profile surface: connect
+// (HEL/OPN/GetEndpoints/CreateSession/ActivateSession), Read, Browse, mandatory attribute
+// reads, and a negative (unknown node) case. Exits non-zero if any check fails.
 
 using System;
 using System.Threading.Tasks;
@@ -63,7 +64,8 @@ namespace MicroOpcUa.Interop
             await app.CheckApplicationInstanceCertificatesAsync(false).ConfigureAwait(false);
 
             Console.WriteLine($"Connecting to {url} with the OPC Foundation .NET reference client ...");
-            var selected = CoreClientUtils.SelectEndpoint(config, url, false, 15000);
+            // useSecurity: true -> pick the most-secure endpoint (Basic256Sha256 / SignAndEncrypt).
+            var selected = CoreClientUtils.SelectEndpoint(config, url, true, 15000);
             var endpoint = new ConfiguredEndpoint(null, selected, EndpointConfiguration.Create(config));
 
             using var session = await Session.Create(
@@ -71,7 +73,10 @@ namespace MicroOpcUa.Interop
                 new UserIdentity(new AnonymousIdentityToken()), null).ConfigureAwait(false);
 
             Check("connect (HEL/OPN/GetEndpoints/CreateSession/ActivateSession)", session.Connected);
-            Check("endpoint SecurityPolicy is None", selected.SecurityPolicyUri == SecurityPolicies.None, selected.SecurityPolicyUri);
+            Check("endpoint SecurityPolicy is Basic256Sha256",
+                  selected.SecurityPolicyUri == SecurityPolicies.Basic256Sha256, selected.SecurityPolicyUri);
+            Check("endpoint SecurityMode is SignAndEncrypt",
+                  selected.SecurityMode == MessageSecurityMode.SignAndEncrypt, selected.SecurityMode.ToString());
 
             // Read MyVar1 Value (Int32 = 42)
             var value = session.ReadValue(new NodeId(1000, 1));

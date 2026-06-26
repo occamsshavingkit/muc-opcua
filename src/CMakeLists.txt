@@ -24,24 +24,35 @@ add_library(micro_opcua STATIC
     encoding/binary_extension_object.c
     encoding/binary_variant.c
     encoding/binary_datavalue.c
-    security/key_derivation.c
     security/security_policy.c
-    security/certificate.c
-    security/asym_chunk.c
-    security/sym_chunk.c
     generated/opcua_ids.c
 )
+
+# SecurityPolicy Basic256Sha256: the asym/sym chunk crypto and key derivation.
+# Excluded entirely from a None-only build to keep the embedded footprint minimal.
+# (security_policy.c stays in the core: it only provides shared policy/mode enums.)
+if(MICRO_OPCUA_SECURITY)
+    target_sources(micro_opcua PRIVATE
+        security/key_derivation.c
+        security/certificate.c
+        security/asym_chunk.c
+        security/sym_chunk.c
+    )
+    target_compile_definitions(micro_opcua PUBLIC MICRO_OPCUA_SECURITY=1)
+endif()
 
 # The host TCP adapter uses POSIX sockets; only compile it for the host platform.
 if(MICRO_OPCUA_IS_HOST)
     target_sources(micro_opcua PRIVATE platform/host_tcp_adapter.c)
 
     # The host crypto adapter (SecurityPolicy Basic256Sha256) is backed by OpenSSL.
-    find_package(OpenSSL)
-    if(OpenSSL_FOUND)
-        target_sources(micro_opcua PRIVATE platform/host_crypto_adapter.c)
-        target_link_libraries(micro_opcua PUBLIC OpenSSL::Crypto)
-        target_compile_definitions(micro_opcua PUBLIC MICRO_OPCUA_HAVE_OPENSSL=1)
+    if(MICRO_OPCUA_SECURITY)
+        find_package(OpenSSL)
+        if(OpenSSL_FOUND)
+            target_sources(micro_opcua PRIVATE platform/host_crypto_adapter.c)
+            target_link_libraries(micro_opcua PUBLIC OpenSSL::Crypto)
+            target_compile_definitions(micro_opcua PUBLIC MICRO_OPCUA_HAVE_OPENSSL=1)
+        endif()
     endif()
 endif()
 

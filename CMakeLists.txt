@@ -4,6 +4,9 @@ cmake_minimum_required(VERSION 3.20)
 option(MICRO_OPCUA_BUILD_TESTS "Build tests" OFF)
 option(MICRO_OPCUA_BUILD_EXAMPLES "Build examples" OFF)
 option(MICRO_OPCUA_BUILD_FUZZERS "Build fuzzers" OFF)
+# SecurityPolicy Basic256Sha256 support (asym/sym chunk crypto, ~10 KB code).
+# Turn OFF for a SecurityPolicy-None-only build to drop the crypto layer entirely.
+option(MICRO_OPCUA_SECURITY "Build SecurityPolicy Basic256Sha256 support" ON)
 set(MICRO_OPCUA_SANITIZERS "" CACHE STRING "Comma-separated list of sanitizers (e.g. address,undefined)")
 set(MICRO_OPCUA_PLATFORM "host" CACHE STRING "Target platform (host, pico, arduino-skeleton)")
 

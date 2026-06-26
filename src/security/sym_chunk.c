@@ -8,8 +8,9 @@
 #define MU_SYM_HEADER_SIZE 16   /* type+IsFinal(4) + MessageSize(4) + SecureChannelId(4) + TokenId(4) */
 #define MU_SYM_SIG_LEN     MU_B256S256_SIGNATURE_LENGTH       /* 32 (HMAC-SHA256) */
 #define MU_SYM_BLOCK       MU_B256S256_ENCRYPTION_BLOCK_SIZE  /* 16 (AES) */
-/* Scratch for the signed (and possibly decrypted) region; bounds MSG body size. */
-#define MU_SYM_SCRATCH 4096
+/* Scratch for the signed (and possibly decrypted) region; bounds MSG body size.
+   Sized to hold a discovery response carrying certificates in each endpoint. */
+#define MU_SYM_SCRATCH 8192
 
 opcua_statuscode_t mu_sym_keys_derive(const mu_crypto_adapter_t *crypto,
                                       const opcua_byte_t *secret, size_t secret_len,
@@ -90,7 +91,6 @@ opcua_statuscode_t mu_sym_chunk_wrap(
     size_t presig_len = seqbody_len + 1 + pad_count;
     size_t total = MU_SYM_HEADER_SIZE + enc_len;
     if (total > out_cap) return MU_STATUS_BAD_RESPONSETOOLARGE;
-    if (total > MU_SYM_SCRATCH) return MU_STATUS_BAD_REQUESTTOOLARGE;
 
     put_u32(out + 4, (opcua_uint32_t)total);
     put_u32(out + MU_SYM_HEADER_SIZE, sequence_number);

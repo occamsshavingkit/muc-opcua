@@ -11,6 +11,11 @@ void mu_secure_channel_init(mu_secure_channel_t *channel) {
         channel->revised_lifetime = 0;
         channel->is_open = false;
         channel->out_sequence_number = 0;
+        channel->policy = MU_SECURITY_POLICY_NONE_ID;
+        channel->mode = MU_MESSAGE_SECURITY_MODE_NONE;
+#ifdef MICRO_OPCUA_SECURITY
+        channel->keys_valid = false;
+#endif
         mu_sequence_validator_init(&channel->sequence);
     }
 }

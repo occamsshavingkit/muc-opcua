@@ -6,6 +6,10 @@
 #include "service_message.h"
 #include "uasc.h"
 #include "../services/secure_channel.h"
+#ifdef MICRO_OPCUA_SECURITY
+#include "../security/asym_chunk.h"
+#include "../security/sym_chunk.h"
+#endif
 #include <string.h>
 
 opcua_statuscode_t mu_server_config_validate(const mu_server_config_t *config)
@@ -100,45 +104,23 @@ opcua_statuscode_t mu_server_init(void *storage, size_t storage_size, const mu_s
     return MU_STATUS_GOOD;
 }
 
-/* Process one complete message (HELLO during connect, otherwise an OPN/MSG/CLO
-   chunk) and send any response. Sets client_handle to NULL if the connection is
-   closed (HELLO failure or CloseSecureChannel). */
-static void process_message(mu_server_t *server, const opcua_byte_t *msg, size_t msg_len)
+/* Largest decrypted request / response body handled on the secured path. Sized to
+   hold a GetEndpoints/CreateSession response, which carries the server certificate
+   in each advertised endpoint. */
+#define MU_SECURE_BODY_MAX 8192
+
+static void send_buffer_chunk(mu_server_t *server, size_t total) {
+    size_t bytes_written;
+    server->config.tcp_adapter.write(server->config.tcp_adapter.context, server->client_handle,
+                                     server->config.send_buffer, total, &bytes_written);
+}
+
+/* Plaintext (SecurityPolicy None) OPN/MSG handling — the only path when no crypto
+   adapter is configured. Dispatch writes the response body directly into the send
+   buffer past the fixed UASC header, then a finalize step frames the chunk. */
+static void handle_data_chunk_plaintext(mu_server_t *server, const opcua_byte_t *msg, size_t msg_len, bool is_opn)
 {
     opcua_statuscode_t status;
-
-    if (server->tcp_conn.state == MU_TCP_STATE_CLOSED) {
-        size_t ack_length = server->config.send_buffer_size;
-        status = mu_tcp_process_hello(&server->tcp_conn, msg, msg_len, &server->config,
-                                      server->config.send_buffer, &ack_length);
-        if (status == MU_STATUS_GOOD) {
-            size_t bytes_written;
-            server->config.tcp_adapter.write(server->config.tcp_adapter.context, server->client_handle,
-                                             server->config.send_buffer, ack_length, &bytes_written);
-        } else {
-            server->config.tcp_adapter.close_connection(server->config.tcp_adapter.context, server->client_handle);
-            server->client_handle = NULL;
-        }
-        return;
-    }
-
-    mu_message_header_t header;
-    status = mu_parse_message_header(msg, msg_len, &header);
-    if (status != MU_STATUS_GOOD) return;
-
-    bool is_opn = header.message_type[0] == 'O' && header.message_type[1] == 'P' && header.message_type[2] == 'N';
-    bool is_msg = header.message_type[0] == 'M' && header.message_type[1] == 'S' && header.message_type[2] == 'G';
-    bool is_clo = header.message_type[0] == 'C' && header.message_type[1] == 'L' && header.message_type[2] == 'O';
-
-    if (is_clo) {
-        mu_secure_channel_close(&server->secure_channel);
-        server->config.tcp_adapter.close_connection(server->config.tcp_adapter.context, server->client_handle);
-        server->client_handle = NULL;
-        return;
-    }
-    if (!is_opn && !is_msg) return; /* unsupported chunk type: ignore */
-
-    /* Read the security header to locate the SequenceHeader. */
     mu_binary_reader_t reader;
     mu_binary_reader_init(&reader, msg, msg_len);
     reader.position = 12; /* MessageHeader(8) + SecureChannelId(4) */
@@ -194,12 +176,135 @@ static void process_message(mu_server_t *server, const opcua_byte_t *msg, size_t
                                                 server->secure_channel.channel_id, server->secure_channel.token_id,
                                                 out_seq, seq.request_id, payload_len, &total);
         }
+        if (status == MU_STATUS_GOOD) send_buffer_chunk(server, total);
+    }
+}
+
+#ifdef MICRO_OPCUA_SECURITY
+/* Secured (or secure-capable) OPN/MSG handling: a crypto adapter is present, so
+   OPN chunks are unwrapped/wrapped asymmetrically (None or Basic256Sha256) and
+   MSG chunks symmetrically once the channel has keys. The decrypted request and
+   the response body live in local scratch; the chunk modules frame the wire. */
+static void handle_data_chunk_secure(mu_server_t *server, const opcua_byte_t *msg, size_t msg_len, bool is_opn)
+{
+    const mu_crypto_adapter_t *crypto = server->config.crypto_adapter;
+    opcua_byte_t reqscratch[MU_SECURE_BODY_MAX];
+    opcua_byte_t respbody[MU_SECURE_BODY_MAX];
+    size_t req_len = 0;
+    opcua_uint32_t response_request_id = 0;
+    const opcua_byte_t *client_cert = NULL;
+    size_t client_cert_len = 0;
+
+    if (is_opn) {
+        mu_asym_chunk_info_t ai;
+        memset(&ai, 0, sizeof(ai));
+        if (mu_asym_chunk_unwrap(crypto, msg, msg_len, reqscratch, sizeof(reqscratch), &req_len, &ai) != MU_STATUS_GOOD) {
+            return;
+        }
+        /* Record the negotiated policy before dispatch so the OPN handler can
+           derive channel keys; the client cert is needed to encrypt the reply. */
+        server->secure_channel.policy = ai.policy;
+        response_request_id = ai.request_id;
+        client_cert = ai.sender_cert;
+        client_cert_len = ai.sender_cert_len;
+    } else if (server->secure_channel.policy == MU_SECURITY_POLICY_NONE_ID) {
+        /* The client chose the None endpoint; MSG chunks are plaintext. */
+        handle_data_chunk_plaintext(server, msg, msg_len, false);
+        return;
+    } else {
+        if (!server->secure_channel.keys_valid) return;
+        mu_sym_chunk_info_t si;
+        memset(&si, 0, sizeof(si));
+        if (mu_sym_chunk_unwrap(crypto, server->secure_channel.mode, &server->secure_channel.client_keys,
+                                msg, msg_len, reqscratch, sizeof(reqscratch), &req_len, &si) != MU_STATUS_GOOD) {
+            return;
+        }
+        response_request_id = si.request_id;
+    }
+
+    /* reqscratch holds the service body: [request-type NodeId][RequestHeader][...]. */
+    mu_binary_reader_t rr;
+    mu_binary_reader_init(&rr, reqscratch, req_len);
+    mu_nodeid_t request_type;
+    if (mu_binary_read_nodeid(&rr, &request_type) != MU_STATUS_GOOD) return;
+    const opcua_byte_t *req_body = reqscratch + rr.position;
+    size_t req_body_len = req_len - rr.position;
+
+    size_t resp_len = sizeof(respbody);
+    opcua_statuscode_t status = mu_service_dispatch(server, request_type.identifier.numeric,
+                                                    req_body, req_body_len, respbody, &resp_len);
+    if (status != MU_STATUS_GOOD) {
+        resp_len = sizeof(respbody);
+        if (mu_write_service_fault(respbody, &resp_len, 0, status) == MU_STATUS_GOOD) {
+            status = MU_STATUS_GOOD;
+        } else {
+            resp_len = 0;
+        }
+    }
+    if (status != MU_STATUS_GOOD || resp_len == 0) return;
+
+    opcua_uint32_t out_seq = ++server->secure_channel.out_sequence_number;
+    size_t total = 0;
+    opcua_statuscode_t ws;
+    if (is_opn) {
+        ws = mu_asym_chunk_wrap(crypto, server->secure_channel.policy, server->secure_channel.channel_id,
+                                out_seq, response_request_id, client_cert, client_cert_len,
+                                respbody, resp_len, server->config.send_buffer, server->config.send_buffer_size, &total);
+    } else {
+        ws = mu_sym_chunk_wrap(crypto, server->secure_channel.mode, &server->secure_channel.server_keys, "MSG",
+                               server->secure_channel.channel_id, server->secure_channel.token_id,
+                               out_seq, response_request_id, respbody, resp_len,
+                               server->config.send_buffer, server->config.send_buffer_size, &total);
+    }
+    if (ws == MU_STATUS_GOOD) send_buffer_chunk(server, total);
+}
+#endif /* MICRO_OPCUA_SECURITY */
+
+/* Process one complete message (HELLO during connect, otherwise an OPN/MSG/CLO
+   chunk) and send any response. Sets client_handle to NULL if the connection is
+   closed (HELLO failure or CloseSecureChannel). */
+static void process_message(mu_server_t *server, const opcua_byte_t *msg, size_t msg_len)
+{
+    opcua_statuscode_t status;
+
+    if (server->tcp_conn.state == MU_TCP_STATE_CLOSED) {
+        size_t ack_length = server->config.send_buffer_size;
+        status = mu_tcp_process_hello(&server->tcp_conn, msg, msg_len, &server->config,
+                                      server->config.send_buffer, &ack_length);
         if (status == MU_STATUS_GOOD) {
             size_t bytes_written;
             server->config.tcp_adapter.write(server->config.tcp_adapter.context, server->client_handle,
-                                             server->config.send_buffer, total, &bytes_written);
+                                             server->config.send_buffer, ack_length, &bytes_written);
+        } else {
+            server->config.tcp_adapter.close_connection(server->config.tcp_adapter.context, server->client_handle);
+            server->client_handle = NULL;
         }
+        return;
     }
+
+    mu_message_header_t header;
+    status = mu_parse_message_header(msg, msg_len, &header);
+    if (status != MU_STATUS_GOOD) return;
+
+    bool is_opn = header.message_type[0] == 'O' && header.message_type[1] == 'P' && header.message_type[2] == 'N';
+    bool is_msg = header.message_type[0] == 'M' && header.message_type[1] == 'S' && header.message_type[2] == 'G';
+    bool is_clo = header.message_type[0] == 'C' && header.message_type[1] == 'L' && header.message_type[2] == 'O';
+
+    if (is_clo) {
+        mu_secure_channel_close(&server->secure_channel);
+        server->config.tcp_adapter.close_connection(server->config.tcp_adapter.context, server->client_handle);
+        server->client_handle = NULL;
+        return;
+    }
+    if (!is_opn && !is_msg) return; /* unsupported chunk type: ignore */
+
+#ifdef MICRO_OPCUA_SECURITY
+    if (server->config.crypto_adapter != NULL) {
+        handle_data_chunk_secure(server, msg, msg_len, is_opn);
+        return;
+    }
+#endif
+    handle_data_chunk_plaintext(server, msg, msg_len, is_opn);
 }
 
 opcua_statuscode_t mu_server_poll(mu_server_t *server)

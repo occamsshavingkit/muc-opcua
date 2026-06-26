@@ -10,9 +10,10 @@
 #include <unistd.h>
 #include "static_address_space.h"
 
-/* We should be able to include host_tcp_adapter.h if it's in the build path */
-/* For this example we just include its prototype if it's not exported, wait, it should be exposed for host apps. */
 #include "../../src/platform/host_tcp_adapter.h"
+#ifdef MICRO_OPCUA_HAVE_OPENSSL
+#include "../../src/platform/host_crypto_adapter.h"
+#endif
 
 #define STORAGE_BYTES 4096
 static opcua_byte_t g_server_storage[STORAGE_BYTES];
@@ -74,6 +75,17 @@ int main(void)
     config.time_adapter.get_tick_ms = stub_get_tick_ms;
 
     config.entropy_adapter.generate_random = stub_generate_random;
+
+#ifdef MICRO_OPCUA_HAVE_OPENSSL
+    /* Enable SecurityPolicy Basic256Sha256 by supplying a crypto adapter. The host
+       adapter generates a self-signed instance certificate; the server then also
+       advertises Sign and SignAndEncrypt endpoints alongside None. */
+    static mu_crypto_adapter_t crypto;
+    if (mu_host_crypto_adapter_init(&crypto) == MU_STATUS_GOOD) {
+        config.crypto_adapter = &crypto;
+        printf("SecurityPolicy Basic256Sha256 enabled (self-signed certificate)\n");
+    }
+#endif
 
     config.address_space = &g_minimal_address_space;
 

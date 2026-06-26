@@ -19,3 +19,8 @@ add_test(NAME test_server_handshake COMMAND test_server_handshake)
 add_executable(test_server_framing test_server_framing.c)
 target_link_libraries(test_server_framing PRIVATE micro_opcua micro_opcua_test_support unity)
 add_test(NAME test_server_framing COMMAND test_server_framing)
+
+add_executable(test_server_handshake_secure test_server_handshake_secure.c)
+target_link_libraries(test_server_handshake_secure PRIVATE micro_opcua micro_opcua_test_support unity)
+target_include_directories(test_server_handshake_secure PRIVATE ${CMAKE_SOURCE_DIR}/src)
+add_test(NAME test_server_handshake_secure COMMAND test_server_handshake_secure)

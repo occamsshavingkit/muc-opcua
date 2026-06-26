@@ -52,6 +52,23 @@ All caller-provided; the library itself adds 0 static RAM.
 On the RP2040's 264 KiB RAM this leaves roughly **240 KiB** for the application
 and network stack.
 
+## SecurityPolicy (optional, `MICRO_OPCUA_SECURITY`)
+
+Basic256Sha256 support is a compile-time option (default ON). Turn it OFF for a
+SecurityPolicy-None-only build to drop the crypto layer entirely — no asym/sym
+chunk code, key derivation, certificate handling, or crypto adapter is compiled.
+
+| Build | `libmicro_opcua.a` `.text` (host gcc) | Crypto objects linked |
+|---|---|---|
+| `MICRO_OPCUA_SECURITY=OFF` (None only) | **~38.0 KiB** | none |
+| `MICRO_OPCUA_SECURITY=ON` (default) | **~52.8 KiB** | asym/sym chunk, KDF, cert, host adapter |
+
+So the security layer costs **~14.8 KiB of code** on the host build (the portable
+`asym_chunk`/`sym_chunk`/`key_derivation`/`certificate` part is ~9.6 KiB; the rest
+is the host OpenSSL adapter, which an embedded target replaces with a smaller
+mbedTLS/PSA backend). The secured path also uses ~16 KiB of transient stack
+scratch — present only when a crypto adapter is configured, never on the None path.
+
 ## Notes
 - The ~4.9 KiB peak stack grew from ~2 KiB when `MU_DISPATCH_MAX_READ_NODES` was
   raised 8 → 32 to accept the OPC Foundation .NET client's batch OperationLimits

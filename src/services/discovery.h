@@ -4,6 +4,7 @@
 
 #include "micro_opcua/server.h"
 #include "micro_opcua/encoding.h"
+#include "../security/security_policy.h"  /* mu_message_security_mode_t */
 
 typedef enum {
     MU_APPLICATION_TYPE_SERVER = 0,
@@ -23,13 +24,7 @@ typedef struct {
 opcua_statuscode_t mu_discovery_get_application_description(const mu_server_config_t *config, 
                                                             mu_application_description_t *desc);
 
-/* MessageSecurityMode */
-typedef enum {
-    MU_MESSAGE_SECURITY_MODE_INVALID = 0,
-    MU_MESSAGE_SECURITY_MODE_NONE = 1,
-    MU_MESSAGE_SECURITY_MODE_SIGN = 2,
-    MU_MESSAGE_SECURITY_MODE_SIGNANDENCRYPT = 3
-} mu_message_security_mode_t;
+/* MessageSecurityMode is defined in security_policy.h (included above). */
 
 /* UserTokenType */
 typedef enum {
@@ -50,19 +45,28 @@ typedef struct {
 typedef struct {
     const char *endpoint_url;
     mu_application_description_t server;
-    /* ServerCertificate is empty */
+    const opcua_byte_t *server_certificate;   /* DER; NULL if none */
+    size_t server_certificate_len;
     mu_message_security_mode_t security_mode;
     const char *security_policy_uri;
-    
+
     mu_user_token_policy_t user_identity_tokens[1]; /* only 1 supported: Anonymous */
     size_t num_user_identity_tokens;
-    
+
     const char *transport_profile_uri;
     opcua_byte_t security_level;
 } mu_endpoint_description_t;
 
+/* Up to None + Basic256Sha256(Sign) + Basic256Sha256(SignAndEncrypt). */
+#define MU_DISCOVERY_MAX_ENDPOINTS 3
+
 opcua_statuscode_t mu_discovery_get_endpoint_description(const mu_server_config_t *config,
                                                          mu_endpoint_description_t *desc);
+
+/* Fill the array of endpoints the server advertises: the None endpoint always,
+   plus Basic256Sha256 Sign and SignAndEncrypt when a crypto adapter is present. */
+opcua_statuscode_t mu_discovery_get_endpoints(const mu_server_config_t *config,
+                                              mu_endpoint_description_t *eps, size_t max, size_t *count);
 
 /* OPC UA Binary encoders (OPC 10000-4 7.2, 7.14, 7.41). */
 opcua_statuscode_t mu_application_description_encode(mu_binary_writer_t *writer,
