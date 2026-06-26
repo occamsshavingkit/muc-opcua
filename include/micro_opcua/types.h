@@ -98,7 +98,12 @@ typedef struct {
         mu_nodeid_t nodeid;
         mu_qualified_name_t qualified_name;
         mu_localized_text_t localized_text;
+        const void *array;          /* element array when is_array (points to type[array_length]) */
     } value;
+    /* 1-D array support. These follow the union so existing scalar initializers
+       ({ type, { .scalar } }) keep working (is_array defaults to false). */
+    opcua_boolean_t is_array;
+    opcua_int32_t array_length;     /* element count when is_array (>= 0; -1 = null array) */
 } mu_variant_t;
 
 /* DataValue */

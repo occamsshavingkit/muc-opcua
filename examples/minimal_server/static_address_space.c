@@ -24,6 +24,28 @@ static const mu_value_source_t s_myvar1_value = {
     MU_VALUESOURCE_STATIC, { .static_value = { MU_TYPE_INT32, { .i32 = 42 } } }
 };
 
+/*
+ * Server Base Info: a client (e.g. the OPC Foundation .NET reference stack) reads
+ * the standard NamespaceArray (ns=0;i=2255) and ServerArray (ns=0;i=2254) by NodeId
+ * during session setup to build its namespace table. Both are String[] values.
+ */
+static const mu_string_t s_namespace_array[] = {
+    { 28, (const opcua_byte_t *)"http://opcfoundation.org/UA/" },
+    { 40, (const opcua_byte_t *)"urn:localhost:micro_opcua:minimal_server" }
+};
+static const mu_value_source_t s_namespacearray_value = {
+    MU_VALUESOURCE_STATIC,
+    { .static_value = { .type = MU_TYPE_STRING, .value.array = s_namespace_array, .is_array = true, .array_length = 2 } }
+};
+
+static const mu_string_t s_server_array[] = {
+    { 40, (const opcua_byte_t *)"urn:localhost:micro_opcua:minimal_server" }
+};
+static const mu_value_source_t s_serverarray_value = {
+    MU_VALUESOURCE_STATIC,
+    { .static_value = { .type = MU_TYPE_STRING, .value.array = s_server_array, .is_array = true, .array_length = 1 } }
+};
+
 static const mu_node_t s_nodes[] = {
     {
         { 0, MU_NODEID_NUMERIC, { 85 } },
@@ -42,10 +64,28 @@ static const mu_node_t s_nodes[] = {
         s_myvar1_refs,
         1,
         &s_myvar1_value
+    },
+    {
+        { 0, MU_NODEID_NUMERIC, { 2255 } },
+        MU_NODECLASS_VARIABLE,
+        { 14, (const opcua_byte_t *)"NamespaceArray" },
+        { 14, (const opcua_byte_t *)"NamespaceArray" },
+        NULL,
+        0,
+        &s_namespacearray_value
+    },
+    {
+        { 0, MU_NODEID_NUMERIC, { 2254 } },
+        MU_NODECLASS_VARIABLE,
+        { 11, (const opcua_byte_t *)"ServerArray" },
+        { 11, (const opcua_byte_t *)"ServerArray" },
+        NULL,
+        0,
+        &s_serverarray_value
     }
 };
 
 const mu_address_space_t g_minimal_address_space = {
     s_nodes,
-    2
+    4
 };

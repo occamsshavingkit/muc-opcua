@@ -47,6 +47,7 @@ void test_read_service_scalar_values(void) {
     mu_value_source_t value_source;
     value_source.type = MU_VALUESOURCE_STATIC;
     value_source.data.static_value.type = MU_TYPE_INT32;
+    value_source.data.static_value.is_array = false;
     value_source.data.static_value.value.i32 = 42;
     node.value = &value_source;
     

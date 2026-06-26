@@ -13,6 +13,7 @@ void test_over_limit_bounded_string_validation(void) {
     
     source.type = MU_VALUESOURCE_STATIC;
     source.data.static_value.type = MU_TYPE_STRING;
+    source.data.static_value.is_array = false;
     source.data.static_value.value.str.length = 65;
     source.data.static_value.value.str.data = str_data;
     

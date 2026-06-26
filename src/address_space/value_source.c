@@ -8,6 +8,12 @@ opcua_statuscode_t mu_value_source_read(const mu_value_source_t *source, const m
     }
     
     if (source->type == MU_VALUESOURCE_STATIC) {
+        /* Array values (e.g. NamespaceArray String[]) pass through; the scalar
+           bounded-String limit below applies only to scalar String values. */
+        if (source->data.static_value.is_array) {
+            *value = source->data.static_value;
+            return MU_STATUS_GOOD;
+        }
         switch (source->data.static_value.type) {
             case MU_TYPE_BOOLEAN:
             case MU_TYPE_INT32:

@@ -88,6 +88,9 @@ static opcua_statuscode_t read_attribute(const mu_address_space_t *address_space
                                          mu_variant_t *value)
 {
     (void)address_space;
+    /* Default to a scalar; array attributes (e.g. a String[] Value) set these explicitly. */
+    value->is_array = false;
+    value->array_length = 0;
     switch (attribute_id) {
         case MU_ATTRIBUTEID_NODEID:
             value->type = MU_TYPE_NODEID;

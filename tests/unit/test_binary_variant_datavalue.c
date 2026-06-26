@@ -58,6 +58,7 @@ void test_binary_variant_qualifiedname_roundtrip(void) {
     mu_binary_reader_t reader;
 
     mu_variant_t variant;
+    memset(&variant, 0, sizeof(variant));
     variant.type = MU_TYPE_QUALIFIEDNAME;
     variant.value.qualified_name.namespace_index = 1;
     variant.value.qualified_name.name = (mu_string_t){ 6, (const opcua_byte_t *)"MyVar1" };
@@ -80,6 +81,7 @@ void test_binary_variant_localizedtext_roundtrip(void) {
     mu_binary_reader_t reader;
 
     mu_variant_t variant;
+    memset(&variant, 0, sizeof(variant));
     variant.type = MU_TYPE_LOCALIZEDTEXT;
     variant.value.localized_text.locale = (mu_string_t){ -1, NULL }; /* null locale -> absent */
     variant.value.localized_text.text = (mu_string_t){ 6, (const opcua_byte_t *)"MyVar1" };
@@ -96,11 +98,79 @@ void test_binary_variant_localizedtext_roundtrip(void) {
     TEST_ASSERT_EQUAL_MEMORY("MyVar1", out.value.localized_text.text.data, 6);
 }
 
+/* A Variant carrying a 1-D array sets the array bit (0x80) in the encoding byte,
+   then Int32 length, then the elements (OPC 10000-6 5.2.2.16). */
+void test_binary_variant_string_array_encode(void) {
+    opcua_byte_t buffer[128];
+    mu_binary_writer_t writer;
+    mu_binary_writer_init(&writer, buffer, sizeof(buffer));
+
+    static const mu_string_t arr[2] = {
+        { 3, (const opcua_byte_t *)"foo" },
+        { 3, (const opcua_byte_t *)"bar" }
+    };
+    mu_variant_t v;
+    memset(&v, 0, sizeof(v));
+    v.type = MU_TYPE_STRING;
+    v.is_array = true;
+    v.array_length = 2;
+    v.value.array = arr;
+
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_write_variant(&writer, &v));
+
+    mu_binary_reader_t r;
+    mu_binary_reader_init(&r, buffer, writer.position);
+    opcua_byte_t mask;
+    mu_binary_read_byte(&r, &mask);
+    TEST_ASSERT_EQUAL(MU_TYPE_STRING | 0x80, mask);
+    opcua_int32_t len;
+    mu_binary_read_int32(&r, &len);
+    TEST_ASSERT_EQUAL(2, len);
+    mu_string_t s0, s1;
+    mu_binary_read_string(&r, &s0);
+    mu_binary_read_string(&r, &s1);
+    TEST_ASSERT_EQUAL_MEMORY("foo", s0.data, 3);
+    TEST_ASSERT_EQUAL_MEMORY("bar", s1.data, 3);
+}
+
+void test_binary_variant_int32_array_encode(void) {
+    opcua_byte_t buffer[64];
+    mu_binary_writer_t writer;
+    mu_binary_writer_init(&writer, buffer, sizeof(buffer));
+
+    static const opcua_int32_t arr[3] = { 10, 20, 30 };
+    mu_variant_t v;
+    memset(&v, 0, sizeof(v));
+    v.type = MU_TYPE_INT32;
+    v.is_array = true;
+    v.array_length = 3;
+    v.value.array = arr;
+
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_write_variant(&writer, &v));
+
+    mu_binary_reader_t r;
+    mu_binary_reader_init(&r, buffer, writer.position);
+    opcua_byte_t mask;
+    mu_binary_read_byte(&r, &mask);
+    TEST_ASSERT_EQUAL(MU_TYPE_INT32 | 0x80, mask);
+    opcua_int32_t len, v0, v1, v2;
+    mu_binary_read_int32(&r, &len);
+    mu_binary_read_int32(&r, &v0);
+    mu_binary_read_int32(&r, &v1);
+    mu_binary_read_int32(&r, &v2);
+    TEST_ASSERT_EQUAL(3, len);
+    TEST_ASSERT_EQUAL(10, v0);
+    TEST_ASSERT_EQUAL(20, v1);
+    TEST_ASSERT_EQUAL(30, v2);
+}
+
 int main(void) {
     UNITY_BEGIN();
     RUN_TEST(test_binary_variant_roundtrip);
     RUN_TEST(test_binary_datavalue_roundtrip);
     RUN_TEST(test_binary_variant_qualifiedname_roundtrip);
     RUN_TEST(test_binary_variant_localizedtext_roundtrip);
+    RUN_TEST(test_binary_variant_string_array_encode);
+    RUN_TEST(test_binary_variant_int32_array_encode);
     return UNITY_END();
 }
