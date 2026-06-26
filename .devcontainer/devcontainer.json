@@ -16,8 +16,9 @@
   //   - static analysis / formatting: cppcheck, clang-tidy, clang-format
   //   - sanitizer + fuzzer builds: clang
   //   - RP2040/Pico cross-compile target: gcc-arm-none-eabi, libnewlib-arm-none-eabi
+  //   - interop smoke test (tests/interop): python3 + asyncua (a standards OPC UA client)
   // (The cpp image ships cmake/clang/build-essential already; we install explicitly so the set is pinned.)
-  "onCreateCommand": "sudo apt-get update && sudo apt-get install -y cmake build-essential cppcheck clang-tidy clang-format clang gcc-arm-none-eabi libnewlib-arm-none-eabi pkg-config",
+  "onCreateCommand": "sudo apt-get update && sudo apt-get install -y cmake build-essential cppcheck clang-tidy clang-format clang gcc-arm-none-eabi libnewlib-arm-none-eabi pkg-config python3-pip python3-venv && pip3 install --break-system-packages asyncua",
 
   // Heavy, cacheable work — runs during prebuild so the image ships warm:
   //   - configure + build the host target with tests and examples (this is what we keep repeating)
