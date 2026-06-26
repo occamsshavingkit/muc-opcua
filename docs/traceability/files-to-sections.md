@@ -78,6 +78,9 @@ This document maps implementation and test files back to OPC UA normative sectio
 | `secure_channel.h` | TBD | TBD | TBD | TBD |
 | `discovery.h` | TBD | TBD | TBD | TBD |
 | `service_dispatch.c` | TBD | TBD | TBD | TBD |
+| `uasc.c` | UASC MessageChunk framing | Part 6 | 6.7.2, 6.7.3, 6.7.7 | Symmetric response chunk framing |
+| `uasc.h` | UASC MessageChunk framing | Part 6 | 6.7.2, 6.7.3, 6.7.7 | Symmetric response chunk framing |
+| `test_uasc_framing.c` | Tests | Part 6 | 6.7.2, 6.7.3, 6.7.7 | Test symmetric response framing |
 | `service_header.c` | RequestHeader / ResponseHeader | Part 4 | 7.32, 7.33 | Common request/response header codec |
 | `service_header.h` | RequestHeader / ResponseHeader | Part 4 | 7.32, 7.33 | Common request/response header types |
 | `test_service_header.c` | Tests | Part 4 | 7.32, 7.33 | Test request/response header codec |

@@ -7,6 +7,7 @@ add_library(micro_opcua STATIC
     core/sequence.c
     core/service_message.c
     core/service_dispatch.c
+    core/uasc.c
     services/secure_channel.c
     services/session.c
     services/service_header.c
