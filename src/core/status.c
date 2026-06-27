@@ -16,7 +16,11 @@ const char* mu_status_name(opcua_statuscode_t status)
         case MU_STATUS_BAD_SERVICEUNSUPPORTED: return "Bad_ServiceUnsupported";
         case MU_STATUS_BAD_NOTREADABLE: return "Bad_NotReadable";
         case MU_STATUS_BAD_SECURITYCHECKSFAILED: return "Bad_SecurityChecksFailed";
+#if MICRO_OPCUA_SUBSCRIPTIONS
+        case MU_STATUS_BAD_SEQUENCENUMBERUNKNOWN: return "Bad_SequenceNumberUnknown";
+#else
         case MU_STATUS_BAD_REQUESTTOOLARGE: return "Bad_RequestTooLarge";
+#endif
         case MU_STATUS_BAD_RESPONSETOOLARGE: return "Bad_ResponseTooLarge";
         case MU_STATUS_BAD_SESSIONIDINVALID: return "Bad_SessionIdInvalid";
         case MU_STATUS_BAD_IDENTITYTOKENINVALID: return "Bad_IdentityTokenInvalid";
@@ -29,6 +33,7 @@ const char* mu_status_name(opcua_statuscode_t status)
         case MU_STATUS_BAD_TOOMANYSUBSCRIPTIONS: return "Bad_TooManySubscriptions";
         case MU_STATUS_BAD_SUBSCRIPTIONIDINVALID: return "Bad_SubscriptionIdInvalid";
 #if MICRO_OPCUA_SUBSCRIPTIONS
+        case MU_STATUS_BAD_MESSAGENOTAVAILABLE: return "Bad_MessageNotAvailable";
         case MU_STATUS_BAD_TOOMANYPUBLISHREQUESTS: return "Bad_TooManyPublishRequests";
 #endif
         case MU_STATUS_BAD_NOTHINGTODO: return "Bad_NothingToDo";

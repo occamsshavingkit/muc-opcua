@@ -30,6 +30,9 @@
 #ifndef MU_MAX_PUBLISH_REQUESTS
 #define MU_MAX_PUBLISH_REQUESTS 4
 #endif
+#ifndef MU_MAX_PUBLISH_ACKS
+#define MU_MAX_PUBLISH_ACKS 4
+#endif
 #ifndef MU_MAX_MONITORED_STRING
 #define MU_MAX_MONITORED_STRING 32
 #endif
@@ -121,6 +124,10 @@ typedef struct {
     opcua_uint32_t request_handle;
     opcua_uint32_t request_id;              /* secure-channel request id for the async response */
     opcua_uint64_t enqueued_ms;
+    /* Acknowledgement results for the acks carried by this request, echoed in the
+       PublishResponse results[] when it is answered (OPC 10000-4 §5.14.5.2). */
+    opcua_uint32_t ack_count;
+    opcua_statuscode_t ack_results[MU_MAX_PUBLISH_ACKS];
 } mu_publish_request_t;
 
 /* The whole engine: fixed-size arrays, embedded in struct mu_server. */
@@ -176,12 +183,33 @@ opcua_statuscode_t mu_monitored_item_delete(mu_subscriptions_t *subs,
                                             opcua_uint32_t monitored_item_id);
 
 /* Park a Publish request for asynchronous completion by the publishing timer
-   (OPC 10000-4 §5.14.5). Returns Bad_TooManyPublishRequests when the queue is full. */
+   (OPC 10000-4 §5.14.5). Returns Bad_TooManyPublishRequests when the queue is full; on
+   success, *out_req (if non-NULL) points at the parked slot so the caller can record the
+   acknowledgement results to echo when the request is answered. */
 opcua_statuscode_t mu_publish_request_enqueue(mu_subscriptions_t *subs,
                                               opcua_uint32_t session_id,
                                               opcua_uint32_t request_id,
                                               opcua_uint32_t request_handle,
-                                              opcua_uint64_t now_ms);
+                                              opcua_uint64_t now_ms,
+                                              mu_publish_request_t **out_req);
+
+/* Acknowledge a retained NotificationMessage (OPC 10000-4 §5.14.5): if the subscription's
+   retransmit slot holds the given sequence number, purge it. Returns GOOD,
+   Bad_SubscriptionIdInvalid (unknown sub for the session), or Bad_SequenceNumberUnknown. */
+opcua_statuscode_t mu_subscription_acknowledge(mu_subscriptions_t *subs,
+                                               opcua_uint32_t session_id,
+                                               opcua_uint32_t subscription_id,
+                                               opcua_uint32_t sequence_number);
+
+/* Fetch a retained NotificationMessage body for Republish (OPC 10000-4 §5.14.6). On a
+   match, returns GOOD and points *out_msg / *out_len at the retained NotificationMessage
+   bytes; otherwise Bad_SubscriptionIdInvalid or Bad_MessageNotAvailable. */
+opcua_statuscode_t mu_subscription_republish(mu_subscriptions_t *subs,
+                                             opcua_uint32_t session_id,
+                                             opcua_uint32_t subscription_id,
+                                             opcua_uint32_t sequence_number,
+                                             const opcua_byte_t **out_msg,
+                                             size_t *out_len);
 
 /* Poll-driven sampling + publishing-timer advance. Called once per mu_server_poll with
    the current monotonic tick. Samples due MonitoredItems, fires due publishing timers,

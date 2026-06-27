@@ -102,11 +102,11 @@ All subscription code is gated by `MICRO_OPCUA_SUBSCRIPTIONS`.
 - [X] T015 [Codex-impl] Implement keep-alive emission and the keep-alive/lifetime
   counter state machine in `mu_subscriptions_tick`. (OPC refs: OPC 10000-4 §5.14.1.2)
 
-- [ ] T016 [Claude-test] Integration test: SubscriptionAcknowledgements in a PublishRequest
+- [X] T016 [Claude-test] Integration test: SubscriptionAcknowledgements in a PublishRequest
   purge the acknowledged retained message; a Republish for a retained sequence number
   re-sends it, and Republish for a purged/unknown one → `Bad_MessageNotAvailable`.
   (OPC refs: OPC 10000-4 §5.14.5.2, §5.14.6)
-- [ ] T017 [Codex-impl] Implement acknowledgement processing + `Republish` handler/wiring
+- [X] T017 [Codex-impl] Implement acknowledgement processing + `Republish` handler/wiring
   + `RepublishRequest/Response` IDs. (OPC refs: OPC 10000-4 §5.14.6)
 
 ## US4 — Subscription / MonitoredItem management (P2)

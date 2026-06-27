@@ -643,6 +643,100 @@ void test_publish_keep_alive(void) {
     TEST_ASSERT_EQUAL(0, ndata);   /* keep-alive: empty NotificationMessage */
 }
 
+#define ID_REPUBLISHREQUEST            832
+#define ID_REPUBLISHRESPONSE           835
+#define STATUS_BAD_MESSAGENOTAVAILABLE 0x80B50000u
+
+/* Enqueue a PublishRequest carrying one SubscriptionAcknowledgement {sub_id, ack_seq}. */
+static void enqueue_publish_ack(mock_t *m, opcua_uint32_t seq, opcua_uint32_t sub_id, opcua_uint32_t ack_seq) {
+    opcua_byte_t tmp[256], chunk[256]; mu_binary_writer_t w; size_t clen;
+    mu_binary_writer_init(&w, tmp, sizeof(tmp));
+    { mu_nodeid_t t={0,MU_NODEID_NUMERIC,{ID_PUBLISHREQUEST}}; mu_binary_write_nodeid(&w,&t); }
+    write_request_header(&w, 12345, seq);
+    mu_binary_write_int32(&w, 1);            /* one acknowledgement */
+    mu_binary_write_uint32(&w, sub_id);
+    mu_binary_write_uint32(&w, ack_seq);
+    clen = build_msg(chunk, sizeof(chunk), seq, seq, tmp, w.position); enqueue(m, chunk, clen);
+}
+
+/* Enqueue a RepublishRequest {subscriptionId, retransmitSequenceNumber}. */
+static void enqueue_republish(mock_t *m, opcua_uint32_t seq, opcua_uint32_t sub_id, opcua_uint32_t retransmit_seq) {
+    opcua_byte_t tmp[256], chunk[256]; mu_binary_writer_t w; size_t clen;
+    mu_binary_writer_init(&w, tmp, sizeof(tmp));
+    { mu_nodeid_t t={0,MU_NODEID_NUMERIC,{ID_REPUBLISHREQUEST}}; mu_binary_write_nodeid(&w,&t); }
+    write_request_header(&w, 12345, seq);
+    mu_binary_write_uint32(&w, sub_id);
+    mu_binary_write_uint32(&w, retransmit_seq);
+    clen = build_msg(chunk, sizeof(chunk), seq, seq, tmp, w.position); enqueue(m, chunk, clen);
+}
+
+/* Republish (OPC 10000-4 §5.14.6): a retained NotificationMessage can be re-sent; once
+   acknowledged it is purged and Republish returns Bad_MessageNotAvailable. */
+void test_republish_and_acknowledge(void) {
+    mock_t mock; memset(&mock, 0, sizeof(mock));
+    enqueue_connect(&mock);
+    enqueue_create_subscription(&mock, 4, 200.0, 1000, 1000);
+
+    opcua_byte_t storage[MU_SERVER_STORAGE_BYTES]; mu_server_config_t config;
+    s_mon_val = 10;
+    mu_server_t *server = make_server(&mock, storage, sizeof(storage), &config, &samp_space);
+    mu_binary_reader_t body; opcua_statuscode_t sr;
+
+    run_connect(server);
+    mu_server_poll(server); /* CreateSubscription */
+    TEST_ASSERT_EQUAL(ID_CREATESUBSCRIPTIONRESPONSE, parse_response(mock.last_write, mock.last_write_len, &body, &sr));
+    opcua_uint32_t sub_id; mu_binary_read_uint32(&body, &sub_id);
+
+    /* CreateMonitoredItems (seq 5) on ns=1;i=5000, clientHandle 7. */
+    opcua_byte_t tmp[1024], chunk[1024]; mu_binary_writer_t w; size_t clen;
+    mu_binary_writer_init(&w, tmp, sizeof(tmp));
+    { mu_nodeid_t t={0,MU_NODEID_NUMERIC,{ID_CREATEMONITOREDITEMSREQUEST}}; mu_binary_write_nodeid(&w,&t); }
+    write_request_header(&w, 12345, 5);
+    mu_binary_write_uint32(&w, sub_id);
+    mu_binary_write_uint32(&w, 3);
+    mu_binary_write_int32(&w, 1);
+    write_moncreate_item(&w, 1, 5000, 7, 100.0);
+    clen = build_msg(chunk, sizeof(chunk), 5, 5, tmp, w.position); enqueue(&mock, chunk, clen);
+    mu_server_poll(server); /* CreateMonitoredItems */
+
+    /* Publish #1 (seq 6): deliver the initial value (seq 1) so a message is retained. */
+    enqueue_publish(&mock, 6);
+    mu_server_poll(server);
+    tick_to(server, 300);
+    opcua_uint32_t sid, seqn, ch; mu_datavalue_t dv;
+    TEST_ASSERT_EQUAL(ID_PUBLISHRESPONSE, parse_response(mock.last_write, mock.last_write_len, &body, &sr));
+    TEST_ASSERT_EQUAL(1, parse_publish_response(&body, &sid, &seqn, &ch, &dv));
+    TEST_ASSERT_EQUAL(1, seqn);
+
+    /* Republish (seq 7) of the retained sequence 1 re-sends the NotificationMessage. */
+    enqueue_republish(&mock, 7, sub_id, 1);
+    mu_server_poll(server);
+    TEST_ASSERT_EQUAL(ID_REPUBLISHRESPONSE, parse_response(mock.last_write, mock.last_write_len, &body, &sr));
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, sr);
+    /* RepublishResponse body is a NotificationMessage: sequenceNumber, publishTime, data[]. */
+    opcua_uint32_t rseq; mu_binary_read_uint32(&body, &rseq);
+    TEST_ASSERT_EQUAL(1, rseq);
+    opcua_int64_t pt; mu_binary_read_int64(&body, &pt);
+    opcua_int32_t ndata; mu_binary_read_int32(&body, &ndata);
+    TEST_ASSERT_EQUAL(1, ndata);
+
+    /* Republish (seq 8) of an unknown sequence -> Bad_MessageNotAvailable. */
+    enqueue_republish(&mock, 8, sub_id, 5000);
+    mu_server_poll(server);
+    TEST_ASSERT_EQUAL(ID_SERVICEFAULT, parse_response(mock.last_write, mock.last_write_len, &body, &sr));
+    TEST_ASSERT_EQUAL_HEX32(STATUS_BAD_MESSAGENOTAVAILABLE, sr);
+
+    /* Publish #2 (seq 9) acknowledges sequence 1 -> the retained message is purged. */
+    enqueue_publish_ack(&mock, 9, sub_id, 1);
+    mu_server_poll(server);
+
+    /* Republish (seq 10) of the now-purged sequence 1 -> Bad_MessageNotAvailable. */
+    enqueue_republish(&mock, 10, sub_id, 1);
+    mu_server_poll(server);
+    TEST_ASSERT_EQUAL(ID_SERVICEFAULT, parse_response(mock.last_write, mock.last_write_len, &body, &sr));
+    TEST_ASSERT_EQUAL_HEX32(STATUS_BAD_MESSAGENOTAVAILABLE, sr);
+}
+
 int main(void) {
     UNITY_BEGIN();
     RUN_TEST(test_create_subscription);
@@ -654,5 +748,6 @@ int main(void) {
     RUN_TEST(test_sampling_detects_change);
     RUN_TEST(test_publish_delivers_data_change);
     RUN_TEST(test_publish_keep_alive);
+    RUN_TEST(test_republish_and_acknowledge);
     return UNITY_END();
 }

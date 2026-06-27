@@ -58,7 +58,8 @@ static const mu_service_handler_t g_supported_services[] = {
     { MU_ID_DELETEMONITOREDITEMSREQUEST, MU_ID_DELETEMONITOREDITEMSRESPONSE, true  },
     { MU_ID_CREATESUBSCRIPTIONREQUEST, MU_ID_CREATESUBSCRIPTIONRESPONSE, true  },
     { MU_ID_DELETESUBSCRIPTIONSREQUEST, MU_ID_DELETESUBSCRIPTIONSRESPONSE, true },
-    { MU_ID_PUBLISHREQUEST,             MU_ID_PUBLISHRESPONSE,             true  }
+    { MU_ID_PUBLISHREQUEST,             MU_ID_PUBLISHRESPONSE,             true  },
+    { MU_ID_REPUBLISHREQUEST,           MU_ID_REPUBLISHRESPONSE,           true  }
 #endif
 };
 
@@ -885,27 +886,90 @@ static opcua_statuscode_t handle_publish(mu_server_t *server,
         ack_count = 0;
     }
 
+    opcua_uint32_t stored_ack_count = 0u;
+    opcua_statuscode_t ack_results[MU_MAX_PUBLISH_ACKS];
     for (opcua_int32_t i = 0; i < ack_count; ++i) {
         opcua_uint32_t subscription_id;
         opcua_uint32_t sequence_number;
         s = mu_binary_read_uint32(r, &subscription_id); if (s != MU_STATUS_GOOD) return s;
         s = mu_binary_read_uint32(r, &sequence_number); if (s != MU_STATUS_GOOD) return s;
-        (void)subscription_id;
-        (void)sequence_number;
+        opcua_statuscode_t ack_result =
+            mu_subscription_acknowledge(&server->subs,
+                                        server->session.session_id,
+                                        subscription_id,
+                                        sequence_number);
+        if (stored_ack_count < MU_MAX_PUBLISH_ACKS) {
+            ack_results[stored_ack_count] = ack_result;
+            ++stored_ack_count;
+        }
     }
 
     opcua_uint64_t now_ms =
         server->config.time_adapter.get_tick_ms(server->config.time_adapter.context);
+    mu_publish_request_t *parked = NULL;
     s = mu_publish_request_enqueue(&server->subs,
                                    server->session.session_id,
                                    server->current_request_id,
                                    req.request_handle,
-                                   now_ms);
+                                   now_ms,
+                                   &parked);
+    if (s != MU_STATUS_GOOD) {
+        return s;
+    }
+    if (parked != NULL) {
+        parked->ack_count = stored_ack_count;
+        for (opcua_uint32_t i = 0u; i < stored_ack_count; ++i) {
+            parked->ack_results[i] = ack_results[i];
+        }
+    }
+
+    *response_length = 0;
+    return MU_STATUS_GOOD;
+}
+
+/* Republish (OPC 10000-4 5.14.6): return a retained NotificationMessage body for
+   the requested subscription sequence number. */
+static opcua_statuscode_t handle_republish(mu_server_t *server,
+                                           mu_binary_reader_t *r,
+                                           mu_binary_writer_t *w,
+                                           size_t *response_length)
+{
+    mu_request_header_t req;
+    opcua_statuscode_t s = mu_request_header_decode(r, &req);
+    if (s != MU_STATUS_GOOD) return s;
+
+    opcua_uint32_t subscription_id;
+    opcua_uint32_t sequence_number;
+    s = mu_binary_read_uint32(r, &subscription_id); if (s != MU_STATUS_GOOD) return s;
+    s = mu_binary_read_uint32(r, &sequence_number); if (s != MU_STATUS_GOOD) return s;
+
+    const opcua_byte_t *message = NULL;
+    size_t message_len = 0u;
+    s = mu_subscription_republish(&server->subs,
+                                  server->session.session_id,
+                                  subscription_id,
+                                  sequence_number,
+                                  &message,
+                                  &message_len);
     if (s != MU_STATUS_GOOD) {
         return s;
     }
 
-    *response_length = 0;
+    s = write_response_prefix(w, MU_ID_REPUBLISHRESPONSE,
+                              req.request_handle, MU_STATUS_GOOD);
+    if (s != MU_STATUS_GOOD) return s;
+    if (message_len > w->length - w->position) {
+        return MU_STATUS_BAD_RESPONSETOOLARGE;
+    }
+    if (message_len > 0u) {
+        if (message == NULL) {
+            return MU_STATUS_BAD_INTERNALERROR;
+        }
+        memcpy(w->buffer + w->position, message, message_len);
+        w->position += message_len;
+    }
+
+    *response_length = w->position;
     return MU_STATUS_GOOD;
 }
 #endif /* MICRO_OPCUA_SUBSCRIPTIONS */
@@ -1337,6 +1401,8 @@ opcua_statuscode_t mu_service_dispatch(
             return handle_delete_subscriptions(server, &reader, &writer, response_length);
         case MU_ID_PUBLISHREQUEST:
             return handle_publish(server, &reader, &writer, response_length);
+        case MU_ID_REPUBLISHREQUEST:
+            return handle_republish(server, &reader, &writer, response_length);
 #endif
 #ifdef MICRO_OPCUA_SERVICE_BROWSE
         case MU_ID_BROWSEREQUEST:

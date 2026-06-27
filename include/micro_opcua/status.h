@@ -36,6 +36,8 @@
 #define MU_STATUS_BAD_TOOMANYSUBSCRIPTIONS    ((opcua_statuscode_t)0x80DD0000)
 #define MU_STATUS_BAD_SUBSCRIPTIONIDINVALID   ((opcua_statuscode_t)0x80280000)
 #if MICRO_OPCUA_SUBSCRIPTIONS
+#define MU_STATUS_BAD_MESSAGENOTAVAILABLE     ((opcua_statuscode_t)0x80B50000)
+#define MU_STATUS_BAD_SEQUENCENUMBERUNKNOWN   ((opcua_statuscode_t)0x80B80000)
 #define MU_STATUS_BAD_TOOMANYPUBLISHREQUESTS  ((opcua_statuscode_t)0x80580000)
 #endif
 #define MU_STATUS_BAD_NOTHINGTODO             ((opcua_statuscode_t)0x800F0000)
