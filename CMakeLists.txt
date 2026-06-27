@@ -39,6 +39,8 @@ if(MICRO_OPCUA_PLATFORM STREQUAL "pico")
     pico_sdk_init()
 endif()
 
+include(CTest)
+
 # Phase 1 setup will include other cmake files
 include(cmake/MicroOpcUaOptions.cmake)
 include(cmake/MicroOpcUaWarnings.cmake)
@@ -47,9 +49,35 @@ include(cmake/MicroOpcUaStaticAnalysis.cmake)
 
 add_subdirectory(src)
 
+if(MICRO_OPCUA_STACK_USAGE)
+    if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang|AppleClang")
+        target_compile_options(micro_opcua PRIVATE -fstack-usage)
+    else()
+        message(FATAL_ERROR "MICRO_OPCUA_STACK_USAGE requires a C compiler that supports -fstack-usage")
+    endif()
+endif()
+
 if(MICRO_OPCUA_BUILD_TESTS OR MICRO_OPCUA_BUILD_FUZZERS)
   enable_testing()
   add_subdirectory(tests)
+endif()
+
+if(MICRO_OPCUA_STACK_USAGE)
+    add_custom_target(check_stack_usage
+        COMMAND bash ${CMAKE_CURRENT_SOURCE_DIR}/scripts/check_stack_usage.sh
+            --build-dir ${CMAKE_BINARY_DIR}
+            --threshold ${MICRO_OPCUA_STACK_USAGE_LIMIT}
+        COMMENT "Checking secured-OPN stack usage budget"
+        VERBATIM
+    )
+
+    if(BUILD_TESTING)
+        add_test(NAME test_stack_budget
+            COMMAND bash ${CMAKE_CURRENT_SOURCE_DIR}/scripts/check_stack_usage.sh
+                --build-dir ${CMAKE_BINARY_DIR}
+                --threshold ${MICRO_OPCUA_STACK_USAGE_LIMIT}
+        )
+    endif()
 endif()
 
 if(MICRO_OPCUA_BUILD_EXAMPLES)

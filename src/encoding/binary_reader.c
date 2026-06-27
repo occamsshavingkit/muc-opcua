@@ -12,7 +12,9 @@ void mu_binary_reader_init(mu_binary_reader_t *reader, const opcua_byte_t *buffe
 
 static opcua_statuscode_t ensure_bytes(mu_binary_reader_t *reader, size_t count) {
     if (!reader || !reader->buffer) return MU_STATUS_BAD_INTERNALERROR;
-    if (reader->position + count > reader->length) return MU_STATUS_BAD_DECODINGERROR;
+    /* OPC-10000-6 §5.2 binary encoding; OPC-10000-4 §7.38.2 Bad_DecodingError. */
+    if (reader->position > reader->length) return MU_STATUS_BAD_DECODINGERROR;
+    if (count > reader->length - reader->position) return MU_STATUS_BAD_DECODINGERROR;
     return MU_STATUS_GOOD;
 }
 

@@ -82,6 +82,16 @@ does not copy into multi-KiB scratch. Measured frames (`-fstack-usage`, host gcc
 `nodes`/`results`/`ref_pool` arrays), down from ~25 KiB. Present only when a crypto
 adapter is configured; the None path peaks at ~5.5 KiB.
 
+**Update (2026-06-27, feature 004-optimization-fixes, US1/FR-001):** the secured
+OpenSecureChannel path's `respbody[5120]` + `opn_buf[1024]` were relocated off the
+stack into a server-owned `secure_scratch` region (`struct mu_server`, guarded by
+`MICRO_OPCUA_SECURITY`). Worst-case secured-OPN stack measured by
+`scripts/check_stack_usage.sh` (`-fstack-usage`, host gcc) dropped from **13,664 B
+to 7,536 B** (CI gate `test_stack_budget`, threshold 10,240 B). The ~6 KiB moves
+from stack to caller storage (`MU_SERVER_STORAGE_BYTES` grows by
+`MU_SECURE_SCRATCH_SIZE` on security builds) — a deliberate stack→static trade for a
+single-connection server.
+
 ## Notes
 - `.text` figures predating 2026-06-27 (e.g. a 14.5 KiB core) were measured before the
   Nano View Service Set + Base Information node set were completed; nano core is now

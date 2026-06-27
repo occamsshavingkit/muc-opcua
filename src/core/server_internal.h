@@ -20,6 +20,9 @@ struct mu_server {
     opcua_uint64_t last_activity_ms; /* monotonic tick of last inbound traffic (idle timeout) */
     mu_tcp_connection_t tcp_conn;
     mu_secure_channel_t secure_channel;
+#ifdef MICRO_OPCUA_SECURITY
+    opcua_byte_t secure_scratch[MU_SECURE_SCRATCH_SIZE];
+#endif
     mu_session_t sessions[MU_MAX_SESSIONS];
     mu_session_t *active_session;
 #if MICRO_OPCUA_SUBSCRIPTIONS

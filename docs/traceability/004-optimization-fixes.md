@@ -1,0 +1,48 @@
+# Traceability: 004 Optimization Fixes
+
+This skeleton maps each functional requirement to its behavioural impact and OPC UA
+normative section. Implementation files, tests, and row status are left as
+`(pending)` for the later implementation tasks to fill.
+
+## OPC UA Reference Verification
+
+The OPC UA reference MCP was used to verify these section titles:
+
+| Reference | Verified title |
+|---|---|
+| OPC-10000-4 5.6.2.2 | Parameters (OpenSecureChannel) |
+| OPC-10000-4 5.6.2.3 | Service results (OpenSecureChannel) |
+| OPC-10000-4 5.7.3.2 | Parameters (ActivateSession) |
+| OPC-10000-4 5.9.2 | Browse |
+| OPC-10000-4 7.38.2 | Common StatusCodes |
+| OPC-10000-6 5.2 | OPC UA Binary |
+| OPC-10000-6 5.2.2.9 | NodeId |
+
+Note: the current OPC UA reference identifies OPC-10000-4 5.8.2 as AddNodes, not
+Browse. Browse rows therefore cite OPC-10000-4 5.9.2.
+
+## Functional Requirement Traceability
+
+| FR | Behaviour/Change | OPC UA section(s) | StatusCode (if any) | Impl file(s) | Test(s) | Status |
+|---|---|---|---|---|---|---|
+| FR-001 | Internal stack/storage change for inbound OpenSecureChannel processing; observable OpenSecureChannel behaviour must stay unchanged. | OPC-10000-4 5.6.2.2 Parameters (OpenSecureChannel) | (none) | `src/core/server_internal.h` (`secure_scratch` field); `include/micro_opcua/config.h` (`MU_SECURE_SCRATCH_SIZE`, `MU_SERVER_STORAGE_BYTES`); `src/core/server.c` (`respbody`/`opn_buf` relocated to `server->secure_scratch`) | `scripts/check_stack_usage.sh`; `test_stack_budget` stack-instrumented build (measured 13664 B -> 7536 B) | Done |
+| FR-002 | ActivateSession decoder consumes `clientSoftwareCertificates` and UserIdentityToken bodies at their encoded lengths. | OPC-10000-4 5.7.3.2 Parameters (ActivateSession) | (none) | `src/core/service_dispatch.c` (`handle_activate_session`) | `tests/unit/test_service_dispatch.c` (cert-consumption test); `tests/fixtures/activate_session/nonempty_certs.bin`; `tests/fuzz/fuzz_activate_session.c` | Done |
+| FR-003 | Variable-length binary fields are bounds-checked before copy/skip with overflow-safe remaining-buffer logic. | OPC-10000-6 5.2 OPC UA Binary; OPC-10000-4 7.38.2 Common StatusCodes | `Bad_DecodingError` | `src/encoding/binary_reader.c`; `src/encoding/binary_writer.c` | `tests/unit/test_binary_primitives.c` | Done |
+| FR-004 | Numeric ns=0 NodeId assumptions are guarded before reading numeric union members, including ActivateSession token type handling. | OPC-10000-6 5.2.2.9 NodeId; OPC-10000-4 5.7.3.2 Parameters (ActivateSession); OPC-10000-4 7.38.2 Common StatusCodes | `Bad_DecodingError`; `Bad_IdentityTokenInvalid` | `src/core/server.c` (request type-id); `src/core/service_dispatch.c` (auth-token and identity-token guards) | `tests/unit/test_service_state_errors.c` | Done |
+| FR-005 | OpenSecureChannel rejects `securityPolicyUri` / `securityMode` combinations inconsistent with active server security capability. | OPC-10000-4 5.6.2.2 Parameters (OpenSecureChannel); OPC-10000-4 5.6.2.3 Service results; OPC-10000-4 7.38.2 Common StatusCodes | `Bad_SecurityPolicyRejected`; `Bad_SecurityModeRejected` | `src/services/secure_channel.c`; `src/services/secure_channel.h` (`mu_secure_channel_open`); `src/core/service_dispatch.c`; `src/core/server.c` (wire policy/mode) | `tests/unit/test_secure_channel.c` | Done |
+| FR-006 | Subscription per-operation loops reject over-cap requests before emitting response array lengths. | OPC-10000-4 7.38.2 Common StatusCodes | `Bad_TooManyOperations` | `src/core/service_dispatch.c` (`MU_DISPATCH_MAX_SUBSCRIPTION_OPERATIONS`) | `tests/unit/test_dispatch_services.c` | Done |
+| FR-007 | Internal secret hygiene: zeroize derived secure-channel key sets on close or storage reuse. | N/A - internal memory hygiene; no wire-visible OPC UA behaviour change. | (none) | (pending) | (pending) | (pending) |
+| FR-008 | Internal secret hygiene: scrub crypto stack intermediates before returning. | N/A - internal memory hygiene; no wire-visible OPC UA behaviour change. | (none) | (pending) | (pending) | (pending) |
+| FR-009 | Internal performance change: NodeId resolution becomes sub-linear while preserving NodeId equality semantics. | OPC-10000-6 5.2.2.9 NodeId | (none) | (pending) | (pending) | (pending) |
+| FR-010 | Internal performance change: MonitoredItems cache resolved nodes so recurring sampling avoids address-space lookup. | N/A - internal sampling optimization; no wire-visible OPC UA behaviour change. | (none) | (pending) | (pending) | (pending) |
+| FR-011 | Browse reference resolution changes to a single pass while preserving all-or-nothing-per-node Browse response semantics. | OPC-10000-4 5.9.2 Browse | (none) | (pending) | (pending) | (pending) |
+| FR-012 | Internal performance change: symmetric session keys are prepared once per secure channel and reused per MSG chunk. | N/A - internal crypto optimization; encoded secure-channel message behaviour must stay unchanged. | (none) | (pending) | (pending) | (pending) |
+| FR-013 | Internal performance change: recurring timer arithmetic and inbound-buffer compaction avoid expensive common-path operations. | N/A - internal runtime optimization; no wire-visible OPC UA behaviour change. | (none) | (pending) | (pending) | (pending) |
+| FR-014 | Behaviour-preserving guard: encoded Read, Browse, and subscription responses remain byte-for-byte identical for equivalent inputs. | OPC-10000-4 5.9.2 Browse where Browse output is involved; other service sections remain covered by existing traceability. | (none) | (pending) | (pending) | (pending) |
+| FR-015 | Internal footprint change: consolidate duplicated encode/decode, dispatch, array, endian, and sizing logic without behavioural change. | N/A - internal code-size reduction; no wire-visible OPC UA behaviour change. | (none) | (pending) | (pending) | (pending) |
+| FR-016 | Internal footprint change: gate or remove diagnostic-only and unreferenced embedded-build code. | N/A - internal/diagnostic code-size reduction; no wire-visible OPC UA behaviour change. | (none) | (pending) | (pending) | (pending) |
+| FR-017 | Build configuration change: offer opt-in link-time optimization, default off for distributed archives. | N/A - build option only; no OPC UA protocol behaviour change. | (none) | (pending) | (pending) | (pending) |
+| FR-018 | Build configuration change: optional-service disabled permutations compile cleanly and omit disabled service code. | N/A - build/profile hygiene; unsupported-service behaviour remains covered by existing traceability. | (none) | (pending) | (pending) | (pending) |
+| FR-019 | Cross-cutting constraint: preserve no-heap, statically allocated, bounded-execution design. | N/A - memory-model constraint; no wire-visible OPC UA behaviour change. | (none) | (pending) | (pending) | (pending) |
+| FR-020 | Cross-cutting verification: existing suites continue to pass and new tests cover behavioural changes and stack budget. | OPC-10000-4 5.6.2.2 Parameters (OpenSecureChannel); OPC-10000-4 5.7.3.2 Parameters (ActivateSession); OPC-10000-6 5.2.2.9 NodeId; OPC-10000-4 7.38.2 Common StatusCodes | See FR-003, FR-004, FR-005, and FR-006. | (pending) | (pending) | (pending) |
+| FR-021 | Cross-cutting conformance rule: every observable behavioural change is justified against and cited to the OPC UA specification. | All OPC UA sections cited by behavioural rows in this table. | (none) | (pending) | (pending) | (pending) |

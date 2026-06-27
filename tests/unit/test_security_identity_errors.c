@@ -18,7 +18,7 @@ void test_unsupported_security_policy(void) {
     invalid_policy.length = 57;
     
     TEST_ASSERT_EQUAL(MU_STATUS_BAD_SECURITYPOLICYREJECTED, 
-                      mu_secure_channel_open(&channel, &invalid_policy, 1000, &revised_lifetime));
+                      mu_secure_channel_open(&channel, &invalid_policy, MU_MESSAGE_SECURITY_MODE_NONE, 1000, &revised_lifetime));
 }
 
 #include "../../src/services/session.h"

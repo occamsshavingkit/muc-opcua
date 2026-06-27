@@ -15,7 +15,11 @@
 #include "../../src/platform/host_crypto_adapter.h"
 #endif
 
-#define STORAGE_BYTES 4096
+/* Size the no-heap storage block from the library's required size so it tracks the
+ * compiled feature set (e.g. MICRO_OPCUA_SECURITY adds the server-owned secure
+ * scratch region). Using a hardcoded literal here silently under-sizes the block
+ * when features are enabled and makes mu_server_init() return Bad_OutOfMemory. */
+#define STORAGE_BYTES MU_SERVER_STORAGE_BYTES
 static opcua_byte_t g_server_storage[STORAGE_BYTES];
 
 static opcua_byte_t g_recv_buffer[MU_MIN_CHUNK_SIZE];

@@ -69,6 +69,42 @@ static const mu_service_handler_t g_supported_services[] = {
 
 static const size_t g_num_supported_services = sizeof(g_supported_services) / sizeof(g_supported_services[0]);
 
+typedef struct {
+    const mu_server_t *server;
+    mu_string_t security_policy;
+} mu_opn_security_policy_context_t;
+
+/* OPN SecurityPolicyUri is carried in the asymmetric chunk header, while normal
+   service dispatch receives only the service body. server.c sets this descriptor
+   immediately around OPN dispatch so the handler can validate the requested
+   policy without changing the public dispatch signature. */
+static mu_opn_security_policy_context_t g_opn_security_policy_context;
+
+void mu_service_dispatch_set_opn_security_policy(mu_server_t *server,
+                                                 const mu_string_t *security_policy);
+
+void mu_service_dispatch_set_opn_security_policy(mu_server_t *server,
+                                                 const mu_string_t *security_policy)
+{
+    if (server == NULL || security_policy == NULL) {
+        g_opn_security_policy_context.server = NULL;
+        g_opn_security_policy_context.security_policy.length = -1;
+        g_opn_security_policy_context.security_policy.data = NULL;
+        return;
+    }
+
+    g_opn_security_policy_context.server = server;
+    g_opn_security_policy_context.security_policy = *security_policy;
+}
+
+static const mu_string_t *current_opn_security_policy(const mu_server_t *server)
+{
+    if (g_opn_security_policy_context.server != server) {
+        return NULL;
+    }
+    return &g_opn_security_policy_context.security_policy;
+}
+
 const mu_service_handler_t* mu_get_service_handler(opcua_uint32_t request_id) {
     for (size_t i = 0; i < g_num_supported_services; ++i) {
         if (g_supported_services[i].request_id == request_id) {
@@ -95,20 +131,61 @@ static opcua_statuscode_t write_response_prefix(mu_binary_writer_t *w,
     return mu_response_header_encode(w, &rh);
 }
 
-static opcua_uint32_t read_auth_token_from_request(const opcua_byte_t *request_body,
-                                                   size_t request_length)
+static opcua_statuscode_t skip_extension_object_body(mu_binary_reader_t *r, size_t length)
+{
+    if (length > 0u) {
+        if (r->position > r->length || length > (r->length - r->position)) {
+            return MU_STATUS_BAD_DECODINGERROR;
+        }
+        r->position += length;
+    }
+    return MU_STATUS_GOOD;
+}
+
+static opcua_statuscode_t ensure_array_items_min_remaining(const mu_binary_reader_t *r,
+                                                           opcua_int32_t count,
+                                                           size_t min_item_size)
+{
+    if (count < -1) {
+        return MU_STATUS_BAD_DECODINGERROR;
+    }
+    if (count <= 0) {
+        return MU_STATUS_GOOD;
+    }
+    if (r->position > r->length) {
+        return MU_STATUS_BAD_DECODINGERROR;
+    }
+    if ((size_t)count > (r->length - r->position) / min_item_size) {
+        return MU_STATUS_BAD_DECODINGERROR;
+    }
+    return MU_STATUS_GOOD;
+}
+
+static opcua_statuscode_t read_auth_token_from_request(const opcua_byte_t *request_body,
+                                                       size_t request_length,
+                                                       opcua_uint32_t *auth_token)
 {
     mu_binary_reader_t reader;
     mu_nodeid_t token;
+    opcua_statuscode_t s;
 
+    *auth_token = 0u;
     mu_binary_reader_init(&reader, request_body, request_length);
-    if (mu_binary_read_nodeid(&reader, &token) != MU_STATUS_GOOD) {
-        return 0u;
+    s = mu_binary_read_nodeid(&reader, &token);
+    if (s != MU_STATUS_GOOD) {
+        return MU_STATUS_GOOD;
     }
-    if (token.identifier_type != MU_NODEID_NUMERIC) {
-        return 0u;
+    /* OPC-10000-6 §5.2.2.9 encodes NodeId identifiers as a discriminated union;
+       OPC-10000-4 §7.38.2 defines authenticationToken as a NodeId. A token
+       outside this server's ns=0 numeric token space is a non-match, not a
+       malformed service body for the session-state gate. */
+    if (token.identifier_type != MU_NODEID_NUMERIC ||
+        token.namespace_index != 0u) {
+        return MU_STATUS_GOOD;
     }
-    return token.identifier.numeric;
+
+    *auth_token = token.identifier.numeric;
+    return MU_STATUS_GOOD;
 }
 
 opcua_statuscode_t mu_write_service_fault(opcua_byte_t *buffer, size_t *length,
@@ -155,7 +232,11 @@ static opcua_statuscode_t handle_open_secure_channel(mu_server_t *server,
     s = mu_binary_read_uint32(r, &requested_lifetime); if (s != MU_STATUS_GOOD) return s;
 
     opcua_uint32_t revised = 0;
-    s = mu_secure_channel_open(&server->secure_channel, NULL, requested_lifetime, &revised);
+    s = mu_secure_channel_open(&server->secure_channel,
+                               current_opn_security_policy(server),
+                               (mu_message_security_mode_t)security_mode,
+                               requested_lifetime,
+                               &revised);
     if (s != MU_STATUS_GOOD) return s;
 
     s = write_response_prefix(w, MU_ID_OPENSECURECHANNELRESPONSE, req.request_handle, MU_STATUS_GOOD);
@@ -363,7 +444,7 @@ static opcua_statuscode_t handle_create_session(mu_server_t *server,
     return MU_STATUS_GOOD;
 }
 
-/* ActivateSession (OPC 10000-4 5.7.3.2). The UserIdentityToken's ExtensionObject
+/* ActivateSession (OPC-10000-4 §5.7.3.2). The UserIdentityToken's ExtensionObject
    typeId identifies the token type; only Anonymous (i=321) is accepted. A service
    failure is reported in the ResponseHeader.serviceResult, not as a transport error. */
 static opcua_statuscode_t handle_activate_session(mu_server_t *server,
@@ -381,34 +462,66 @@ static opcua_statuscode_t handle_activate_session(mu_server_t *server,
     s = mu_binary_read_string(r, &algorithm);    if (s != MU_STATUS_GOOD) return s;
     s = mu_binary_read_bytestring(r, &signature); if (s != MU_STATUS_GOOD) return s;
 
-    /* ClientSoftwareCertificates: array (thin path assumes empty) */
+    /* OPC-10000-4 §5.7.3.2: clientSoftwareCertificates[] is reserved for
+       future use, but every SignedSoftwareCertificate must still be consumed. */
     opcua_int32_t cert_count;
     s = mu_binary_read_int32(r, &cert_count);    if (s != MU_STATUS_GOOD) return s;
+    s = ensure_array_items_min_remaining(r, cert_count, 8u); if (s != MU_STATUS_GOOD) return s;
+    for (opcua_int32_t i = 0; i < cert_count; ++i) {
+        mu_bytestring_t certificate_data;
+        mu_bytestring_t certificate_signature;
+        s = mu_binary_read_bytestring(r, &certificate_data);      if (s != MU_STATUS_GOOD) return s;
+        s = mu_binary_read_bytestring(r, &certificate_signature); if (s != MU_STATUS_GOOD) return s;
+    }
 
-    /* LocaleIds: String[] */
+    /* OPC-10000-4 §5.7.3.2: localeIds[] follows clientSoftwareCertificates[]. */
     opcua_int32_t locale_count;
     s = mu_binary_read_int32(r, &locale_count);  if (s != MU_STATUS_GOOD) return s;
+    s = ensure_array_items_min_remaining(r, locale_count, 4u); if (s != MU_STATUS_GOOD) return s;
     for (opcua_int32_t i = 0; i < locale_count; ++i) {
         mu_string_t locale;
         s = mu_binary_read_string(r, &locale);   if (s != MU_STATUS_GOOD) return s;
     }
 
-    /* UserIdentityToken: ExtensionObject - typeId identifies the token type */
+    /* OPC-10000-4 §5.7.3.2: userIdentityToken ExtensionObject precedes
+       userTokenSignature; consume the body at its encoded length for alignment. */
     mu_nodeid_t token_type;
     size_t token_body_len;
     s = mu_binary_read_extension_object_header(r, &token_type, &token_body_len);
     if (s != MU_STATUS_GOOD) return s;
+    /* OPC-10000-6 §5.2.2.9 encodes NodeId identifiers as a discriminated union;
+       OPC-10000-4 §7.38.2 user token typeIds are namespace 0 numeric NodeIds. */
+    bool token_type_is_ns0_numeric =
+        token_type.identifier_type == MU_NODEID_NUMERIC &&
+        token_type.namespace_index == 0u;
+    s = skip_extension_object_body(r, token_body_len);
+    if (s != MU_STATUS_GOOD) return s;
+
+    /* UserTokenSignature: SignatureData { algorithm(String), signature(ByteString) }.
+       OPC-10000-4 §5.7.3.2 places it last, so omitted trailing bytes do not
+       misalign any following field. If bytes remain, they must still decode. */
+    if (r->position < r->length) {
+        mu_string_t user_token_algorithm;
+        mu_bytestring_t user_token_signature;
+        s = mu_binary_read_string(r, &user_token_algorithm);     if (s != MU_STATUS_GOOD) return s;
+        s = mu_binary_read_bytestring(r, &user_token_signature); if (s != MU_STATUS_GOOD) return s;
+    }
 
     opcua_uint32_t auth_token = 0u;
     opcua_statuscode_t activate_result = MU_STATUS_BAD_SESSIONIDINVALID;
-    if (req.authentication_token.identifier_type == MU_NODEID_NUMERIC) {
+    if (req.authentication_token.identifier_type == MU_NODEID_NUMERIC &&
+        req.authentication_token.namespace_index == 0u) {
         auth_token = req.authentication_token.identifier.numeric;
         mu_session_t *slot =
             mu_session_find_by_token(server->sessions, MU_MAX_SESSIONS, auth_token);
         if (slot != NULL) {
-            activate_result = mu_session_activate(slot,
-                                                  auth_token,
-                                                  token_type.identifier.numeric);
+            if (!token_type_is_ns0_numeric) {
+                activate_result = MU_STATUS_BAD_IDENTITYTOKENINVALID;
+            } else {
+                activate_result = mu_session_activate(slot,
+                                                      auth_token,
+                                                      token_type.identifier.numeric);
+            }
         }
     }
 
@@ -539,8 +652,10 @@ static opcua_statuscode_t handle_find_servers(mu_server_t *server,
 #define MU_DISPATCH_MAX_REGISTER_NODES 32
 #define MU_DISPATCH_MAX_TRANSLATE_BROWSE_PATHS 16
 #define MU_DISPATCH_MAX_TRANSLATE_ELEMENTS 8
+#define MU_DISPATCH_MAX_SUBSCRIPTION_OPERATIONS 32
 
 #if MICRO_OPCUA_SUBSCRIPTIONS
+#define MU_DISPATCH_MAX_PUBLISH_ACKS MU_MAX_PUBLISH_ACKS
 #define MU_DOUBLE_SIGN_BIT 0x8000000000000000ULL
 #define MU_PUBLISHING_INTERVAL_MIN_BITS 0x4049000000000000ULL  /* 50.0 */
 #define MU_PUBLISHING_INTERVAL_MAX_BITS 0x40ed4c0000000000ULL  /* 60000.0 */
@@ -588,17 +703,6 @@ static opcua_uint64_t publishing_interval_ms_to_bits(opcua_uint32_t interval_ms)
     opcua_uint64_t leading = (opcua_uint64_t)1u << exponent;
     opcua_uint64_t fraction = ((opcua_uint64_t)interval_ms - leading) << (52u - exponent);
     return ((opcua_uint64_t)(exponent + 1023u) << 52) | fraction;
-}
-
-static opcua_statuscode_t skip_extension_object_body(mu_binary_reader_t *r, size_t length)
-{
-    if (length > 0u) {
-        if (r->position > r->length || length > (r->length - r->position)) {
-            return MU_STATUS_BAD_DECODINGERROR;
-        }
-        r->position += length;
-    }
-    return MU_STATUS_GOOD;
 }
 
 static opcua_statuscode_t read_monitored_item_create_body(
@@ -814,6 +918,9 @@ static opcua_statuscode_t handle_set_publishing_mode(mu_server_t *server,
     if (count <= 0) {
         return MU_STATUS_BAD_NOTHINGTODO;
     }
+    if ((size_t)count > MU_DISPATCH_MAX_SUBSCRIPTION_OPERATIONS) {
+        return MU_STATUS_BAD_TOOMANYOPERATIONS;
+    }
 
     s = write_response_prefix(w, MU_ID_SETPUBLISHINGMODERESPONSE,
                               req.request_handle, MU_STATUS_GOOD);
@@ -865,6 +972,11 @@ static opcua_statuscode_t handle_create_monitored_items(mu_server_t *server,
     s = mu_binary_read_uint32(r, &timestamps_to_return); if (s != MU_STATUS_GOOD) return s;
     s = mu_binary_read_int32(r, &items_to_create); if (s != MU_STATUS_GOOD) return s;
     (void)timestamps_to_return;
+
+    if (items_to_create > 0 &&
+        (size_t)items_to_create > MU_DISPATCH_MAX_SUBSCRIPTION_OPERATIONS) {
+        return MU_STATUS_BAD_TOOMANYOPERATIONS;
+    }
 
     mu_subscription_t *sub =
         mu_subscription_find(&server->subs, server->active_session->session_id, subscription_id);
@@ -984,6 +1096,10 @@ static opcua_statuscode_t handle_modify_monitored_items(mu_server_t *server,
     s = mu_binary_read_int32(r, &count); if (s != MU_STATUS_GOOD) return s;
     (void)timestamps_to_return;
 
+    if (count > 0 && (size_t)count > MU_DISPATCH_MAX_SUBSCRIPTION_OPERATIONS) {
+        return MU_STATUS_BAD_TOOMANYOPERATIONS;
+    }
+
     mu_subscription_t *sub =
         mu_subscription_find(&server->subs, server->active_session->session_id, subscription_id);
     if (sub == NULL) {
@@ -1063,6 +1179,10 @@ static opcua_statuscode_t handle_set_monitoring_mode(mu_server_t *server,
     s = mu_binary_read_uint32(r, &monitoring_mode); if (s != MU_STATUS_GOOD) return s;
     s = mu_binary_read_int32(r, &count); if (s != MU_STATUS_GOOD) return s;
 
+    if (count > 0 && (size_t)count > MU_DISPATCH_MAX_SUBSCRIPTION_OPERATIONS) {
+        return MU_STATUS_BAD_TOOMANYOPERATIONS;
+    }
+
     mu_subscription_t *sub =
         mu_subscription_find(&server->subs, server->active_session->session_id, subscription_id);
     if (sub == NULL) {
@@ -1120,6 +1240,10 @@ static opcua_statuscode_t handle_delete_monitored_items(mu_server_t *server,
     s = mu_binary_read_uint32(r, &subscription_id); if (s != MU_STATUS_GOOD) return s;
     s = mu_binary_read_int32(r, &count); if (s != MU_STATUS_GOOD) return s;
 
+    if (count > 0 && (size_t)count > MU_DISPATCH_MAX_SUBSCRIPTION_OPERATIONS) {
+        return MU_STATUS_BAD_TOOMANYOPERATIONS;
+    }
+
     mu_subscription_t *sub =
         mu_subscription_find(&server->subs, server->active_session->session_id, subscription_id);
     if (sub == NULL) {
@@ -1172,6 +1296,9 @@ static opcua_statuscode_t handle_delete_subscriptions(mu_server_t *server,
     if (count <= 0) {
         return MU_STATUS_BAD_NOTHINGTODO;
     }
+    if ((size_t)count > MU_DISPATCH_MAX_SUBSCRIPTION_OPERATIONS) {
+        return MU_STATUS_BAD_TOOMANYOPERATIONS;
+    }
 
     s = write_response_prefix(w, MU_ID_DELETESUBSCRIPTIONSRESPONSE,
                               req.request_handle, MU_STATUS_GOOD);
@@ -1216,9 +1343,12 @@ static opcua_statuscode_t handle_publish(mu_server_t *server,
     if (ack_count < 0) {
         ack_count = 0;
     }
+    if ((size_t)ack_count > MU_DISPATCH_MAX_PUBLISH_ACKS) {
+        return MU_STATUS_BAD_TOOMANYOPERATIONS;
+    }
 
     opcua_uint32_t stored_ack_count = 0u;
-    opcua_statuscode_t ack_results[MU_MAX_PUBLISH_ACKS];
+    opcua_statuscode_t ack_results[MU_DISPATCH_MAX_PUBLISH_ACKS];
     for (opcua_int32_t i = 0; i < ack_count; ++i) {
         opcua_uint32_t subscription_id;
         opcua_uint32_t sequence_number;
@@ -1229,7 +1359,7 @@ static opcua_statuscode_t handle_publish(mu_server_t *server,
                                         server->active_session->session_id,
                                         subscription_id,
                                         sequence_number);
-        if (stored_ack_count < MU_MAX_PUBLISH_ACKS) {
+        if (stored_ack_count < MU_DISPATCH_MAX_PUBLISH_ACKS) {
             ack_results[stored_ack_count] = ack_result;
             ++stored_ack_count;
         }
@@ -1684,8 +1814,12 @@ opcua_statuscode_t mu_service_dispatch(
     }
 
     if (handler->requires_session) {
-        opcua_uint32_t auth_token =
-            read_auth_token_from_request(request_body, request_length);
+        opcua_uint32_t auth_token = 0u;
+        opcua_statuscode_t s =
+            read_auth_token_from_request(request_body, request_length, &auth_token);
+        if (s != MU_STATUS_GOOD) {
+            return s;
+        }
         mu_session_t *session =
             mu_session_find_by_token(server->sessions, MU_MAX_SESSIONS, auth_token);
         if (session == NULL || session->state != MU_SESSION_STATE_ACTIVATED) {

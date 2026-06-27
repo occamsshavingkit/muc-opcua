@@ -321,10 +321,44 @@ static void activated_server(mu_server_t *server) {
     server->secure_channel.is_open = true;
     server->config.time_adapter.get_time = fake_time;
     server->config.address_space = &s_address_space;
+#if MICRO_OPCUA_SUBSCRIPTIONS
+    mu_subscriptions_init(&server->subs);
+#endif
     mu_session_init(&server->sessions[0]);
     opcua_uint64_t rev; opcua_uint32_t sid, tok;
     mu_session_create(&server->sessions[0], 0, &rev, &sid, &tok);
     mu_session_activate(&server->sessions[0], tok, 321);
+}
+
+void test_dispatch_delete_subscriptions_rejects_too_many_operations_before_results(void) {
+    mu_server_t server;
+    activated_server(&server);
+
+    enum { too_many_operations = 100 };
+    opcua_byte_t req[512];
+    mu_binary_writer_t w;
+    mu_binary_writer_init(&w, req, sizeof(req));
+    write_request_header(&w, 17);
+    mu_binary_write_int32(&w, too_many_operations);
+    for (opcua_int32_t i = 0; i < too_many_operations; ++i) {
+        mu_binary_write_uint32(&w, (opcua_uint32_t)(i + 1));
+    }
+    size_t req_len = w.position;
+
+    opcua_byte_t resp[1024];
+    memset(resp, 0xA5, sizeof(resp));
+    size_t response_capacity = sizeof(resp);
+    size_t resp_len = response_capacity;
+
+    /* OPC-10000-4 §7.38.2: Bad_TooManyOperations is a service-level rejection
+       for a request that specifies too many operations, before results[] length. */
+    opcua_statuscode_t service_result =
+        mu_service_dispatch(&server, MU_ID_DELETESUBSCRIPTIONSREQUEST,
+                            req, req_len, resp, &resp_len);
+
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_BAD_TOOMANYOPERATIONS, service_result);
+    TEST_ASSERT_EQUAL(response_capacity, resp_len);
+    TEST_ASSERT_EQUAL_UINT8(0xA5, resp[0]);
 }
 
 void test_dispatch_read_value(void) {
@@ -505,6 +539,7 @@ int main(void) {
     RUN_TEST(test_dispatch_create_session_honors_timeout);
     RUN_TEST(test_dispatch_activate_session);
     RUN_TEST(test_dispatch_close_session);
+    RUN_TEST(test_dispatch_delete_subscriptions_rejects_too_many_operations_before_results);
     RUN_TEST(test_dispatch_read_value);
     RUN_TEST(test_dispatch_browse);
     RUN_TEST(test_dispatch_get_endpoints);

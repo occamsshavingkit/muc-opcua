@@ -1,7 +1,22 @@
 /* src/services/secure_channel.c */
 #include "secure_channel.h"
 #include <stddef.h>
-#include <string.h>
+
+static mu_security_policy_id_t requested_policy_id(const mu_string_t *security_policy) {
+    if (security_policy == NULL || security_policy->length <= 0) {
+        return MU_SECURITY_POLICY_NONE_ID;
+    }
+    if (security_policy->data == NULL) {
+        return MU_SECURITY_POLICY_INVALID_ID;
+    }
+    return mu_security_policy_from_uri(security_policy->data, (size_t)security_policy->length);
+}
+
+static bool is_valid_security_mode(mu_message_security_mode_t security_mode) {
+    return security_mode == MU_MESSAGE_SECURITY_MODE_NONE ||
+           security_mode == MU_MESSAGE_SECURITY_MODE_SIGN ||
+           security_mode == MU_MESSAGE_SECURITY_MODE_SIGN_AND_ENCRYPT;
+}
 
 void mu_secure_channel_init(mu_secure_channel_t *channel) {
     if (channel) {
@@ -22,15 +37,43 @@ void mu_secure_channel_init(mu_secure_channel_t *channel) {
 
 opcua_statuscode_t mu_secure_channel_open(mu_secure_channel_t *channel, 
                                           const mu_string_t *security_policy,
+                                          mu_message_security_mode_t security_mode,
                                           opcua_uint32_t requested_lifetime, 
                                           opcua_uint32_t *revised_lifetime) 
 {
     if (!channel || !revised_lifetime) return MU_STATUS_BAD_INTERNALERROR;
 
-    if (security_policy != NULL && security_policy->length > 0) {
-        if (security_policy->length != 47 || strncmp((const char*)security_policy->data, MU_SECURITY_POLICY_NONE, 47) != 0) {
+    /* OPC-10000-4 §5.6.2.2 carries SecurityPolicyUri in the OPN header and
+       securityMode in the request body; §5.6.2.3 requires explicit rejection
+       when either value does not meet the server's active security capability. */
+    mu_security_policy_id_t requested_policy = requested_policy_id(security_policy);
+    if (requested_policy == MU_SECURITY_POLICY_INVALID_ID) {
+        return MU_STATUS_BAD_SECURITYPOLICYREJECTED;
+    }
+    if (!is_valid_security_mode(security_mode)) {
+        return MU_STATUS_BAD_SECURITYMODEREJECTED;
+    }
+
+    if (channel->policy == MU_SECURITY_POLICY_NONE_ID) {
+        if (requested_policy != MU_SECURITY_POLICY_NONE_ID) {
             return MU_STATUS_BAD_SECURITYPOLICYREJECTED;
         }
+        if (security_mode != MU_MESSAGE_SECURITY_MODE_NONE) {
+            return MU_STATUS_BAD_SECURITYMODEREJECTED;
+        }
+    }
+#ifdef MICRO_OPCUA_SECURITY
+    else if (channel->policy == MU_SECURITY_POLICY_BASIC256SHA256_ID) {
+        if (requested_policy != MU_SECURITY_POLICY_BASIC256SHA256_ID) {
+            return MU_STATUS_BAD_SECURITYPOLICYREJECTED;
+        }
+        if (security_mode == MU_MESSAGE_SECURITY_MODE_NONE) {
+            return MU_STATUS_BAD_SECURITYMODEREJECTED;
+        }
+    }
+#endif
+    else {
+        return MU_STATUS_BAD_SECURITYPOLICYREJECTED;
     }
 
     /* In a real implementation we would generate a random channel ID and token ID */
@@ -53,6 +96,7 @@ opcua_statuscode_t mu_secure_channel_open(mu_secure_channel_t *channel,
 
     channel->revised_lifetime = lifetime;
     *revised_lifetime = lifetime;
+    channel->mode = security_mode;
 
     return MU_STATUS_GOOD;
 }

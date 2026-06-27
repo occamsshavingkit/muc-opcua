@@ -4,6 +4,31 @@
 
 #include <stddef.h>
 
+/* Optimization-remediation compile-time knobs.
+ * Defaults are intentionally overridable with -D for embedded profiles. */
+
+/* E1: maximum nodes in the address-space index before falling back to a
+ * linear scan. The index RAM scales by 2 bytes per node. */
+#ifndef MU_MAX_ADDRESS_SPACE_NODES
+#define MU_MAX_ADDRESS_SPACE_NODES 64
+#endif
+
+/* E2: opaque per-channel cipher-context storage. 512 bytes gives headroom
+ * for an AES-256 key schedule; backend size asserts are added with adapter use. */
+#ifndef MU_CIPHER_CTX_SIZE
+#define MU_CIPHER_CTX_SIZE 512
+#endif
+
+/* E4: shared secure-path scratch owned by struct mu_server when
+ * MICRO_OPCUA_SECURITY is enabled. Sized for the worst-case secure response /
+ * OPN scratch, replacing respbody[5120] + opn_buf[1024] stack buffers. */
+#ifndef MU_SECURE_SCRATCH_SIZE
+#define MU_SECURE_SCRATCH_SIZE 6144
+#endif
+
+/* D9: mu_status_name() strings are OFF for embedded builds by default; this
+ * macro is intentionally left undefined unless supplied with -D. */
+
 /* Default chunk size limits (OPC 10000-6 7.1.2.3, 7.1.2.4) */
 #define MU_MIN_CHUNK_SIZE 8192
 #define MU_DEFAULT_MAX_CHUNK_COUNT 1
@@ -26,11 +51,18 @@
 /* Fixed storage allocation size for the server.
  * The subscription engine (MICRO_OPCUA_SUBSCRIPTIONS, the Micro profile) adds the
  * fixed-size subscription / MonitoredItem / parked-Publish arrays to struct mu_server,
- * so the no-heap storage block is larger when it is compiled in. */
-#ifdef MICRO_OPCUA_SUBSCRIPTIONS
-#define MU_SERVER_STORAGE_BYTES 3072
+ * so the no-heap storage block is larger when it is compiled in. Security builds
+ * also reserve server-owned scratch for large secure-channel transient buffers. */
+#ifdef MICRO_OPCUA_SECURITY
+#define MU_SERVER_SECURITY_STORAGE_BYTES MU_SECURE_SCRATCH_SIZE
 #else
-#define MU_SERVER_STORAGE_BYTES 1024
+#define MU_SERVER_SECURITY_STORAGE_BYTES 0
+#endif
+
+#ifdef MICRO_OPCUA_SUBSCRIPTIONS
+#define MU_SERVER_STORAGE_BYTES (3072 + MU_SERVER_SECURITY_STORAGE_BYTES)
+#else
+#define MU_SERVER_STORAGE_BYTES (1024 + MU_SERVER_SECURITY_STORAGE_BYTES)
 #endif
 
 #endif /* MICRO_OPCUA_CONFIG_H */

@@ -12,7 +12,9 @@ void mu_binary_writer_init(mu_binary_writer_t *writer, opcua_byte_t *buffer, siz
 
 static opcua_statuscode_t ensure_space(mu_binary_writer_t *writer, size_t count) {
     if (!writer || !writer->buffer) return MU_STATUS_BAD_INTERNALERROR;
-    if (writer->position + count > writer->length) return MU_STATUS_BAD_ENCODINGERROR;
+    /* OPC-10000-6 Section 5.2: encoded values must fit the output buffer. */
+    if (writer->position > writer->length) return MU_STATUS_BAD_ENCODINGERROR;
+    if (count > writer->length - writer->position) return MU_STATUS_BAD_ENCODINGERROR;
     return MU_STATUS_GOOD;
 }
 

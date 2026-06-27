@@ -12,6 +12,9 @@
 #endif
 #include <string.h>
 
+void mu_service_dispatch_set_opn_security_policy(mu_server_t *server,
+                                                 const mu_string_t *security_policy);
+
 opcua_statuscode_t mu_server_config_validate(const mu_server_config_t *config)
 {
     if (config == NULL) {
@@ -130,6 +133,11 @@ opcua_statuscode_t mu_server_init(void *storage, size_t storage_size, const mu_s
    in place in the receive buffer and need no scratch here. */
 #define MU_SECURE_OPN_REQ_MAX 1024
 
+#ifdef MICRO_OPCUA_SECURITY
+_Static_assert(MU_SECURE_RESP_MAX + MU_SECURE_OPN_REQ_MAX <= MU_SECURE_SCRATCH_SIZE,
+               "secure scratch must hold response and OPN request buffers");
+#endif
+
 /* Connect-phase idle timeout: a peer that connects but does not open a secure
    channel within this window is dropped so the single slot can be reused. */
 #define MU_CONNECT_TIMEOUT_MS 30000
@@ -237,6 +245,12 @@ static bool accept_inbound_chunk(mu_server_t *server, bool is_opn,
     return mu_sequence_validate(&server->secure_channel.sequence, sequence_number) == MU_STATUS_GOOD;
 }
 
+/* OPC-10000-6 §5.2.2.9 and OPC-10000-4 §7.38.2: request type ids are
+   well-known ns=0 numeric NodeIds before the request body is dispatched. */
+static bool is_ns0_numeric_nodeid(const mu_nodeid_t *nodeid) {
+    return nodeid->identifier_type == MU_NODEID_NUMERIC && nodeid->namespace_index == 0u;
+}
+
 /* Plaintext (SecurityPolicy None) OPN/MSG handling — the only path when no crypto
    adapter is configured. Dispatch writes the response body directly into the send
    buffer past the fixed UASC header, then a finalize step frames the chunk. */
@@ -249,11 +263,11 @@ static void handle_data_chunk_plaintext(mu_server_t *server, const opcua_byte_t 
     opcua_uint32_t channel_id = 0;
     status = mu_binary_read_uint32(&reader, &channel_id); if (status != MU_STATUS_GOOD) return; /* SecureChannelId */
 
+    mu_string_t opn_security_policy = { -1, NULL };
     opcua_uint32_t token_id = 0;
     if (is_opn) {
-        mu_string_t policy_uri;
         mu_bytestring_t sender_cert, receiver_thumbprint;
-        status = mu_binary_read_string(&reader, &policy_uri);              if (status != MU_STATUS_GOOD) return;
+        status = mu_binary_read_string(&reader, &opn_security_policy);     if (status != MU_STATUS_GOOD) return;
         status = mu_binary_read_bytestring(&reader, &sender_cert);         if (status != MU_STATUS_GOOD) return;
         status = mu_binary_read_bytestring(&reader, &receiver_thumbprint); if (status != MU_STATUS_GOOD) return;
     } else {
@@ -284,7 +298,17 @@ static void handle_data_chunk_plaintext(mu_server_t *server, const opcua_byte_t 
 #if MICRO_OPCUA_SUBSCRIPTIONS
     server->current_request_id = seq.request_id;
 #endif
-    status = mu_service_dispatch(server, request_type.identifier.numeric, req_body, req_body_len, resp_body, &payload_len);
+    if (!is_ns0_numeric_nodeid(&request_type)) {
+        status = MU_STATUS_BAD_DECODINGERROR;
+    } else {
+        if (is_opn) {
+            mu_service_dispatch_set_opn_security_policy(server, &opn_security_policy);
+        }
+        status = mu_service_dispatch(server, request_type.identifier.numeric, req_body, req_body_len, resp_body, &payload_len);
+        if (is_opn) {
+            mu_service_dispatch_set_opn_security_policy(NULL, NULL);
+        }
+    }
 
     if (status != MU_STATUS_GOOD) {
         /* Always answer: send a ServiceFault rather than letting the client time out. */
@@ -328,19 +352,30 @@ static void handle_data_chunk_secure(mu_server_t *server, opcua_byte_t *msg, siz
         return;
     }
 
-    opcua_byte_t respbody[MU_SECURE_RESP_MAX];
-    opcua_byte_t opn_buf[MU_SECURE_OPN_REQ_MAX]; /* OPN request only */
+    /* Single-connection server processes one chunk per poll, so shared secure
+       scratch is not reentered while the request/response is in flight. */
+    opcua_byte_t *respbody = server->secure_scratch;
+    opcua_byte_t *opn_buf = server->secure_scratch + MU_SECURE_RESP_MAX; /* OPN request only */
     const opcua_byte_t *req_full = NULL;         /* [request-type NodeId][RequestHeader][...] */
     size_t req_len = 0;
     opcua_uint32_t response_request_id = 0;
     const opcua_byte_t *client_cert = NULL;
     size_t client_cert_len = 0;
     opcua_uint32_t in_channel_id = 0, in_token_id = 0, in_seq = 0;
+    mu_string_t opn_security_policy = { -1, NULL };
 
     if (is_opn) {
         mu_asym_chunk_info_t ai;
+        mu_binary_reader_t header_reader;
+        opcua_uint32_t header_channel_id;
+
+        mu_binary_reader_init(&header_reader, msg, msg_len);
+        header_reader.position = 8;
+        if (mu_binary_read_uint32(&header_reader, &header_channel_id) != MU_STATUS_GOOD) return;
+        if (mu_binary_read_string(&header_reader, &opn_security_policy) != MU_STATUS_GOOD) return;
+
         memset(&ai, 0, sizeof(ai));
-        if (mu_asym_chunk_unwrap(crypto, msg, msg_len, opn_buf, sizeof(opn_buf), &req_len, &ai) != MU_STATUS_GOOD) {
+        if (mu_asym_chunk_unwrap(crypto, msg, msg_len, opn_buf, MU_SECURE_OPN_REQ_MAX, &req_len, &ai) != MU_STATUS_GOOD) {
             return;
         }
         /* Record the negotiated policy before dispatch so the OPN handler can
@@ -379,14 +414,25 @@ static void handle_data_chunk_secure(mu_server_t *server, opcua_byte_t *msg, siz
     const opcua_byte_t *req_body = req_full + rr.position;
     size_t req_body_len = req_len - rr.position;
 
-    size_t resp_len = sizeof(respbody);
+    size_t resp_len = MU_SECURE_RESP_MAX;
 #if MICRO_OPCUA_SUBSCRIPTIONS
     server->current_request_id = response_request_id;
 #endif
-    opcua_statuscode_t status = mu_service_dispatch(server, request_type.identifier.numeric,
-                                                    req_body, req_body_len, respbody, &resp_len);
+    opcua_statuscode_t status;
+    if (!is_ns0_numeric_nodeid(&request_type)) {
+        status = MU_STATUS_BAD_DECODINGERROR;
+    } else {
+        if (is_opn) {
+            mu_service_dispatch_set_opn_security_policy(server, &opn_security_policy);
+        }
+        status = mu_service_dispatch(server, request_type.identifier.numeric,
+                                     req_body, req_body_len, respbody, &resp_len);
+        if (is_opn) {
+            mu_service_dispatch_set_opn_security_policy(NULL, NULL);
+        }
+    }
     if (status != MU_STATUS_GOOD) {
-        resp_len = sizeof(respbody);
+        resp_len = MU_SECURE_RESP_MAX;
         if (mu_write_service_fault(respbody, &resp_len, 0, status) == MU_STATUS_GOOD) {
             status = MU_STATUS_GOOD;
         } else {
