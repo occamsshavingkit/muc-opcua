@@ -32,7 +32,7 @@ static const mu_node_t s_nodes[] = {
 };
 static const mu_address_space_t g_pico_address_space = { s_nodes, 2 };
 
-static opcua_byte_t g_storage[4096];
+static opcua_byte_t g_storage[MU_SERVER_STORAGE_BYTES];
 static opcua_byte_t g_recv_buffer[MU_MIN_CHUNK_SIZE];
 static opcua_byte_t g_send_buffer[MU_MIN_CHUNK_SIZE];
 
