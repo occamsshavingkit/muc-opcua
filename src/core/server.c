@@ -628,6 +628,7 @@ void mu_server_close(mu_server_t *server)
 {
     if (server != NULL) {
         server->is_running = false;
+        mu_secure_channel_close(&server->secure_channel);
         if (server->config.tcp_adapter.shutdown != NULL) {
             server->config.tcp_adapter.shutdown(server->config.tcp_adapter.context);
         }

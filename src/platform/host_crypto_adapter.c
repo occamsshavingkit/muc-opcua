@@ -1,6 +1,7 @@
 /* src/platform/host_crypto_adapter.c
  * OpenSSL-backed crypto adapter for SecurityPolicy Basic256Sha256 (host/dev). */
 #include "host_crypto_adapter.h"
+#include "micro_opcua/config.h"
 #include "micro_opcua/status.h"
 
 #include <openssl/evp.h>
@@ -10,10 +11,18 @@
 #include <stdlib.h>
 #include <string.h>
 
+_Static_assert(sizeof(void *) <= MU_CIPHER_CTX_SIZE,
+               "MU_CIPHER_CTX_SIZE must fit a host cipher context handle");
+
 struct host_crypto_context {
     EVP_PKEY *key;            /* server RSA private key */
     unsigned char *cert_der;  /* server certificate, DER-encoded */
     int cert_der_len;
+};
+
+struct host_cipher_context {
+    EVP_CIPHER_CTX *encrypt;
+    EVP_CIPHER_CTX *decrypt;
 };
 
 /* ---- digest / mac / symmetric ---- */
@@ -60,6 +69,103 @@ static opcua_statuscode_t h_aes_encrypt(void *c, const opcua_byte_t *key, const 
 static opcua_statuscode_t h_aes_decrypt(void *c, const opcua_byte_t *key, const opcua_byte_t *iv,
                                         const opcua_byte_t *in, size_t len, opcua_byte_t *out) {
     (void)c; return aes_cbc(key, iv, in, len, out, 0);
+}
+
+static void store_cipher_handle(opcua_byte_t *ctx_storage, struct host_cipher_context *handle) {
+    memcpy(ctx_storage, &handle, sizeof(handle));
+}
+
+static struct host_cipher_context *load_cipher_handle(const opcua_byte_t *ctx_storage) {
+    struct host_cipher_context *handle = NULL;
+    memcpy(&handle, ctx_storage, sizeof(handle));
+    return handle;
+}
+
+static void free_cipher_handle(struct host_cipher_context *handle) {
+    if (!handle) return;
+    EVP_CIPHER_CTX_free(handle->encrypt);
+    EVP_CIPHER_CTX_free(handle->decrypt);
+    free(handle);
+}
+
+static opcua_statuscode_t h_cipher_ctx_init(void *c, const opcua_byte_t *key,
+                                            opcua_byte_t *ctx_storage) {
+    (void)c;
+    if (!key || !ctx_storage) return MU_STATUS_BAD_INTERNALERROR;
+
+    struct host_cipher_context *handle =
+        (struct host_cipher_context *)calloc(1, sizeof(*handle));
+    if (!handle) return MU_STATUS_BAD_OUTOFMEMORY;
+
+    handle->encrypt = EVP_CIPHER_CTX_new();
+    handle->decrypt = EVP_CIPHER_CTX_new();
+    if (!handle->encrypt || !handle->decrypt) {
+        free_cipher_handle(handle);
+        return MU_STATUS_BAD_OUTOFMEMORY;
+    }
+
+    int ok =
+        EVP_EncryptInit_ex(handle->encrypt, EVP_aes_256_cbc(), NULL, key, NULL) == 1 &&
+        EVP_CIPHER_CTX_set_padding(handle->encrypt, 0) == 1 &&
+        EVP_DecryptInit_ex(handle->decrypt, EVP_aes_256_cbc(), NULL, key, NULL) == 1 &&
+        EVP_CIPHER_CTX_set_padding(handle->decrypt, 0) == 1;
+    if (!ok) {
+        free_cipher_handle(handle);
+        return MU_STATUS_BAD_INTERNALERROR;
+    }
+
+    store_cipher_handle(ctx_storage, handle);
+    return MU_STATUS_GOOD;
+}
+
+static opcua_statuscode_t aes_cbc_ctx(EVP_CIPHER_CTX *ctx, const opcua_byte_t *iv,
+                                      const opcua_byte_t *in, size_t len,
+                                      opcua_byte_t *out, int encrypt) {
+    if (!ctx || !iv || (!in && len) || !out) return MU_STATUS_BAD_INTERNALERROR;
+    opcua_statuscode_t rc = MU_STATUS_BAD_INTERNALERROR;
+    int outl = 0, finl = 0;
+    int ok = encrypt
+        ? (EVP_EncryptInit_ex(ctx, NULL, NULL, NULL, iv) == 1 &&
+           EVP_CIPHER_CTX_set_padding(ctx, 0) == 1 &&
+           EVP_EncryptUpdate(ctx, out, &outl, in, (int)len) == 1 &&
+           EVP_EncryptFinal_ex(ctx, out + outl, &finl) == 1)
+        : (EVP_DecryptInit_ex(ctx, NULL, NULL, NULL, iv) == 1 &&
+           EVP_CIPHER_CTX_set_padding(ctx, 0) == 1 &&
+           EVP_DecryptUpdate(ctx, out, &outl, in, (int)len) == 1 &&
+           EVP_DecryptFinal_ex(ctx, out + outl, &finl) == 1);
+    if (ok) rc = MU_STATUS_GOOD;
+    return rc;
+}
+
+static opcua_statuscode_t h_aes_encrypt_ctx(void *c, opcua_byte_t *ctx_storage,
+                                            const opcua_byte_t *iv,
+                                            const opcua_byte_t *in, size_t len,
+                                            opcua_byte_t *out) {
+    (void)c;
+    if (!ctx_storage) return MU_STATUS_BAD_INTERNALERROR;
+    struct host_cipher_context *handle = load_cipher_handle(ctx_storage);
+    if (!handle) return MU_STATUS_BAD_INTERNALERROR;
+    return aes_cbc_ctx(handle->encrypt, iv, in, len, out, 1);
+}
+
+static opcua_statuscode_t h_aes_decrypt_ctx(void *c, opcua_byte_t *ctx_storage,
+                                            const opcua_byte_t *iv,
+                                            const opcua_byte_t *in, size_t len,
+                                            opcua_byte_t *out) {
+    (void)c;
+    if (!ctx_storage) return MU_STATUS_BAD_INTERNALERROR;
+    struct host_cipher_context *handle = load_cipher_handle(ctx_storage);
+    if (!handle) return MU_STATUS_BAD_INTERNALERROR;
+    return aes_cbc_ctx(handle->decrypt, iv, in, len, out, 0);
+}
+
+static void h_cipher_ctx_free(void *c, opcua_byte_t *ctx_storage) {
+    (void)c;
+    if (!ctx_storage) return;
+    struct host_cipher_context *handle = load_cipher_handle(ctx_storage);
+    free_cipher_handle(handle);
+    handle = NULL;
+    store_cipher_handle(ctx_storage, handle);
 }
 
 /* ---- RSA ---- */
@@ -217,6 +323,10 @@ opcua_statuscode_t mu_host_crypto_adapter_init(mu_crypto_adapter_t *adapter) {
     adapter->hmac_sha256 = h_hmac_sha256;
     adapter->aes256_cbc_encrypt = h_aes_encrypt;
     adapter->aes256_cbc_decrypt = h_aes_decrypt;
+    adapter->cipher_ctx_init = h_cipher_ctx_init;
+    adapter->aes256_cbc_encrypt_ctx = h_aes_encrypt_ctx;
+    adapter->aes256_cbc_decrypt_ctx = h_aes_decrypt_ctx;
+    adapter->cipher_ctx_free = h_cipher_ctx_free;
     adapter->rsa_sha256_sign = h_rsa_sign;
     adapter->rsa_sha256_verify = h_rsa_verify;
     adapter->rsa_oaep_decrypt = h_rsa_oaep_decrypt;

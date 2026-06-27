@@ -310,6 +310,10 @@ void test_secure_channel_close(void) {
 static void populate_derived_session_keys(mu_secure_channel_t *channel) {
     memset(&channel->client_keys, 0xA5, sizeof(channel->client_keys));
     memset(&channel->server_keys, 0x5A, sizeof(channel->server_keys));
+    channel->client_keys.cipher_ctx_valid = false;
+    channel->client_keys.crypto = NULL;
+    channel->server_keys.cipher_ctx_valid = false;
+    channel->server_keys.crypto = NULL;
     channel->keys_valid = true;
 }
 

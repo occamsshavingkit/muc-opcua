@@ -8,12 +8,16 @@
 #include "../../src/core/server_internal.h"
 #include "../../src/core/service_dispatch.h"
 #include "../../src/services/service_header.h"
+#include "../../src/services/subscription.h"
 #include <string.h>
 
 void setUp(void) {}
 void tearDown(void) {}
 
 static opcua_datetime_t fake_time(void *c) { (void)c; return 0; }
+#if MICRO_OPCUA_SUBSCRIPTIONS
+static opcua_uint64_t fake_tick_ms(void *c) { (void)c; return 0; }
+#endif
 static opcua_statuscode_t fake_entropy(void *c, opcua_byte_t *buf, size_t len) {
     (void)c; if (buf) memset(buf, 0x42, len); return MU_STATUS_GOOD;
 }
@@ -322,6 +326,7 @@ static void activated_server(mu_server_t *server) {
     server->config.time_adapter.get_time = fake_time;
     server->config.address_space = &s_address_space;
 #if MICRO_OPCUA_SUBSCRIPTIONS
+    server->config.time_adapter.get_tick_ms = fake_tick_ms;
     mu_subscriptions_init(&server->subs);
 #endif
     mu_session_init(&server->sessions[0]);
@@ -329,6 +334,185 @@ static void activated_server(mu_server_t *server) {
     mu_session_create(&server->sessions[0], 0, &rev, &sid, &tok);
     mu_session_activate(&server->sessions[0], tok, 321);
 }
+
+#if MICRO_OPCUA_SUBSCRIPTIONS
+static opcua_uint32_t create_subscription_via_dispatch(mu_server_t *server) {
+    opcua_byte_t req[256];
+    mu_binary_writer_t w;
+    mu_binary_writer_init(&w, req, sizeof(req));
+    write_request_header(&w, 21);
+    mu_binary_write_double(&w, 1000.0);     /* RequestedPublishingInterval */
+    mu_binary_write_uint32(&w, 30);         /* RequestedLifetimeCount */
+    mu_binary_write_uint32(&w, 10);         /* RequestedMaxKeepAliveCount */
+    mu_binary_write_uint32(&w, 0);          /* MaxNotificationsPerPublish */
+    mu_binary_write_boolean(&w, true);      /* PublishingEnabled */
+    mu_binary_write_byte(&w, 0);            /* Priority */
+
+    opcua_byte_t resp[256];
+    size_t resp_len = sizeof(resp);
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD,
+        mu_service_dispatch(server, MU_ID_CREATESUBSCRIPTIONREQUEST,
+                            req, w.position, resp, &resp_len));
+
+    mu_binary_reader_t r;
+    mu_binary_reader_init(&r, resp, resp_len);
+    mu_nodeid_t type;
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_nodeid(&r, &type));
+    TEST_ASSERT_EQUAL(MU_ID_CREATESUBSCRIPTIONRESPONSE, type.identifier.numeric);
+
+    opcua_uint32_t handle;
+    opcua_statuscode_t result;
+    skip_response_header(&r, &handle, &result);
+    TEST_ASSERT_EQUAL(21, handle);
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, result);
+
+    opcua_uint32_t subscription_id;
+    mu_binary_read_uint32(&r, &subscription_id);
+    TEST_ASSERT_NOT_EQUAL(0, subscription_id);
+    return subscription_id;
+}
+
+static void write_monitored_item_create_request(mu_binary_writer_t *w,
+                                                const mu_nodeid_t *node_id,
+                                                opcua_uint32_t client_handle) {
+    mu_string_t null_str = { -1, NULL };
+    mu_nodeid_t null_id = { 0, MU_NODEID_NUMERIC, { 0 } };
+
+    mu_binary_write_nodeid(w, node_id);     /* itemToMonitor.nodeId */
+    mu_binary_write_uint32(w, 13);          /* attributeId = Value */
+    mu_binary_write_string(w, &null_str);   /* indexRange */
+    mu_binary_write_uint16(w, 0);           /* dataEncoding.namespaceIndex */
+    mu_binary_write_string(w, &null_str);   /* dataEncoding.name */
+    mu_binary_write_uint32(w, 2);           /* monitoringMode = Reporting */
+    mu_binary_write_uint32(w, client_handle);
+    mu_binary_write_double(w, 500.0);       /* requested samplingInterval */
+    mu_binary_write_extension_object_header(w, &null_id, 0);
+    mu_binary_write_uint32(w, 1);           /* queueSize */
+    mu_binary_write_boolean(w, true);       /* discardOldest */
+}
+
+static opcua_statuscode_t read_monitored_item_create_result(mu_binary_reader_t *r,
+                                                            opcua_uint32_t *id) {
+    opcua_statuscode_t status;
+    opcua_double_t revised_sampling_interval;
+    opcua_uint32_t revised_queue_size;
+    mu_nodeid_t filter_type;
+    size_t filter_length;
+
+    mu_binary_read_statuscode(r, &status);
+    mu_binary_read_uint32(r, id);
+    mu_binary_read_double(r, &revised_sampling_interval);
+    mu_binary_read_uint32(r, &revised_queue_size);
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD,
+        mu_binary_read_extension_object_header(r, &filter_type, &filter_length));
+    TEST_ASSERT_EQUAL_size_t(0, filter_length);
+    (void)revised_sampling_interval;
+    (void)revised_queue_size;
+    return status;
+}
+
+static mu_monitored_item_t *find_monitored_item_by_id(mu_server_t *server,
+                                                      opcua_uint32_t subscription_id,
+                                                      opcua_uint32_t monitored_item_id) {
+    for (size_t i = 0; i < MU_MAX_MONITORED_ITEMS; ++i) {
+        mu_monitored_item_t *item = &server->subs.monitored_items[i];
+        if (item->in_use &&
+            item->subscription_id == subscription_id &&
+            item->monitored_item_id == monitored_item_id) {
+            return item;
+        }
+    }
+    return NULL;
+}
+
+static mu_monitored_item_t *find_monitored_item_by_node(mu_server_t *server,
+                                                        opcua_uint32_t subscription_id,
+                                                        const mu_nodeid_t *node_id) {
+    for (size_t i = 0; i < MU_MAX_MONITORED_ITEMS; ++i) {
+        mu_monitored_item_t *item = &server->subs.monitored_items[i];
+        if (item->in_use &&
+            item->subscription_id == subscription_id &&
+            mu_nodeid_equal(&item->node_id, node_id)) {
+            return item;
+        }
+    }
+    return NULL;
+}
+
+void test_dispatch_create_monitored_item_caches_resolved_node(void) {
+    mu_server_t server;
+    activated_server(&server);
+
+    opcua_uint32_t subscription_id = create_subscription_via_dispatch(&server);
+    mu_nodeid_t known_node_id = { 1, MU_NODEID_NUMERIC, { 1000 } };
+    mu_nodeid_t missing_node_id = { 1, MU_NODEID_NUMERIC, { 9999 } };
+    const mu_node_t *fresh_node =
+        mu_address_space_find_node(server.config.address_space, &known_node_id);
+    TEST_ASSERT_NOT_NULL(fresh_node);
+    TEST_ASSERT_NULL(mu_address_space_find_node(server.config.address_space, &missing_node_id));
+
+    opcua_byte_t req[512];
+    mu_binary_writer_t w;
+    mu_binary_writer_init(&w, req, sizeof(req));
+    write_request_header(&w, 22);
+    mu_binary_write_uint32(&w, subscription_id);
+    mu_binary_write_uint32(&w, 3);          /* TimestampsToReturn = Neither */
+    mu_binary_write_int32(&w, 2);           /* ItemsToCreate */
+    write_monitored_item_create_request(&w, &known_node_id, 41);
+    write_monitored_item_create_request(&w, &missing_node_id, 42);
+
+    opcua_byte_t resp[512];
+    size_t resp_len = sizeof(resp);
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD,
+        mu_service_dispatch(&server, MU_ID_CREATEMONITOREDITEMSREQUEST,
+                            req, w.position, resp, &resp_len));
+
+    mu_binary_reader_t r;
+    mu_binary_reader_init(&r, resp, resp_len);
+    mu_nodeid_t type;
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_nodeid(&r, &type));
+    TEST_ASSERT_EQUAL(MU_ID_CREATEMONITOREDITEMSRESPONSE, type.identifier.numeric);
+    opcua_uint32_t handle;
+    opcua_statuscode_t result;
+    skip_response_header(&r, &handle, &result);
+    TEST_ASSERT_EQUAL(22, handle);
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, result);
+
+    opcua_int32_t result_count;
+    mu_binary_read_int32(&r, &result_count);
+    TEST_ASSERT_EQUAL(2, result_count);
+
+    opcua_uint32_t known_item_id;
+    opcua_uint32_t missing_item_id;
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD,
+        read_monitored_item_create_result(&r, &known_item_id));
+    TEST_ASSERT_NOT_EQUAL(0, known_item_id);
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_BAD_NODEIDUNKNOWN,
+        read_monitored_item_create_result(&r, &missing_item_id));
+    TEST_ASSERT_EQUAL(0, missing_item_id);
+
+    mu_monitored_item_t *known_item =
+        find_monitored_item_by_id(&server, subscription_id, known_item_id);
+    TEST_ASSERT_NOT_NULL(known_item);
+    TEST_ASSERT_NOT_NULL(known_item->resolved_node);
+    TEST_ASSERT_EQUAL_PTR(fresh_node, known_item->resolved_node);
+
+    mu_monitored_item_t *missing_item =
+        find_monitored_item_by_node(&server, subscription_id, &missing_node_id);
+    TEST_ASSERT_NULL(missing_item);
+
+    size_t items_in_use = 0;
+    for (size_t i = 0; i < MU_MAX_MONITORED_ITEMS; ++i) {
+        mu_monitored_item_t *item = &server.subs.monitored_items[i];
+        if (item->in_use) {
+            ++items_in_use;
+        } else {
+            TEST_ASSERT_NULL(item->resolved_node);
+        }
+    }
+    TEST_ASSERT_EQUAL_size_t(1, items_in_use);
+}
+#endif
 
 void test_dispatch_delete_subscriptions_rejects_too_many_operations_before_results(void) {
     mu_server_t server;
@@ -540,6 +724,9 @@ int main(void) {
     RUN_TEST(test_dispatch_activate_session);
     RUN_TEST(test_dispatch_close_session);
     RUN_TEST(test_dispatch_delete_subscriptions_rejects_too_many_operations_before_results);
+#if MICRO_OPCUA_SUBSCRIPTIONS
+    RUN_TEST(test_dispatch_create_monitored_item_caches_resolved_node);
+#endif
     RUN_TEST(test_dispatch_read_value);
     RUN_TEST(test_dispatch_browse);
     RUN_TEST(test_dispatch_get_endpoints);

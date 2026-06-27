@@ -14,6 +14,7 @@ opcua_statuscode_t mu_sym_keys_derive(const mu_crypto_adapter_t *crypto,
                                       const opcua_byte_t *seed, size_t seed_len,
                                       mu_sym_keys_t *out_keys) {
     if (!out_keys) return MU_STATUS_BAD_INTERNALERROR;
+    memset(out_keys, 0, sizeof(*out_keys));
     opcua_byte_t material[MU_B256S256_DERIVED_KEY_LENGTH];
     opcua_statuscode_t s = mu_p_sha256(crypto, secret, secret_len, seed, seed_len, material, sizeof(material));
     if (s != MU_STATUS_GOOD) {
@@ -26,6 +27,26 @@ opcua_statuscode_t mu_sym_keys_derive(const mu_crypto_adapter_t *crypto,
            MU_B256S256_ENCRYPTION_BLOCK_SIZE);
     mu_secure_zero(material, sizeof(material));
     return MU_STATUS_GOOD;
+}
+
+void mu_sym_keys_prepare_cipher(mu_sym_keys_t *keys, const mu_crypto_adapter_t *crypto) {
+    if (!keys) return;
+    mu_sym_keys_release_cipher(keys);
+    keys->crypto = crypto;
+    if (crypto && crypto->cipher_ctx_init) {
+        opcua_statuscode_t s = crypto->cipher_ctx_init(crypto->context, keys->encrypting_key,
+                                                       keys->cipher_ctx);
+        keys->cipher_ctx_valid = (s == MU_STATUS_GOOD);
+    }
+}
+
+void mu_sym_keys_release_cipher(mu_sym_keys_t *keys) {
+    if (!keys) return;
+    if (keys->cipher_ctx_valid && keys->crypto && keys->crypto->cipher_ctx_free) {
+        keys->crypto->cipher_ctx_free(keys->crypto->context, keys->cipher_ctx);
+    }
+    keys->cipher_ctx_valid = false;
+    keys->crypto = NULL;
 }
 
 /* Write the cleartext symmetric header with a placeholder MessageSize. */
@@ -117,8 +138,14 @@ opcua_statuscode_t mu_sym_chunk_wrap(
     mu_secure_zero(mac, sizeof(mac));
 
     /* Encrypt the SequenceHeader..signature region in place (AES-CBC preserves length). */
-    s = crypto->aes256_cbc_encrypt(crypto->context, keys->encrypting_key, keys->iv,
-                                   out + MU_SYM_HEADER_SIZE, enc_len, out + MU_SYM_HEADER_SIZE);
+    if (keys->cipher_ctx_valid && crypto->aes256_cbc_encrypt_ctx) {
+        s = crypto->aes256_cbc_encrypt_ctx(crypto->context, (opcua_byte_t *)keys->cipher_ctx,
+                                           keys->iv, out + MU_SYM_HEADER_SIZE, enc_len,
+                                           out + MU_SYM_HEADER_SIZE);
+    } else {
+        s = crypto->aes256_cbc_encrypt(crypto->context, keys->encrypting_key, keys->iv,
+                                       out + MU_SYM_HEADER_SIZE, enc_len, out + MU_SYM_HEADER_SIZE);
+    }
     if (s != MU_STATUS_GOOD) return s;
 
     *out_len = total;
@@ -152,9 +179,16 @@ opcua_statuscode_t mu_sym_chunk_unwrap(
     if (mode == MU_MESSAGE_SECURITY_MODE_SIGN_AND_ENCRYPT) {
         size_t cipher_len = msg_size - MU_SYM_HEADER_SIZE;
         if (cipher_len == 0 || cipher_len % MU_SYM_BLOCK != 0) return MU_STATUS_BAD_DECODINGERROR;
-        opcua_statuscode_t s = crypto->aes256_cbc_decrypt(crypto->context, keys->encrypting_key, keys->iv,
-                                                          chunk + MU_SYM_HEADER_SIZE, cipher_len,
-                                                          chunk + MU_SYM_HEADER_SIZE);
+        opcua_statuscode_t s;
+        if (keys->cipher_ctx_valid && crypto->aes256_cbc_decrypt_ctx) {
+            s = crypto->aes256_cbc_decrypt_ctx(crypto->context, (opcua_byte_t *)keys->cipher_ctx,
+                                               keys->iv, chunk + MU_SYM_HEADER_SIZE, cipher_len,
+                                               chunk + MU_SYM_HEADER_SIZE);
+        } else {
+            s = crypto->aes256_cbc_decrypt(crypto->context, keys->encrypting_key, keys->iv,
+                                           chunk + MU_SYM_HEADER_SIZE, cipher_len,
+                                           chunk + MU_SYM_HEADER_SIZE);
+        }
         if (s != MU_STATUS_GOOD) return s;
     } else if (mode != MU_MESSAGE_SECURITY_MODE_SIGN) {
         return MU_STATUS_BAD_SECURITYMODEREJECTED;

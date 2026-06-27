@@ -393,6 +393,8 @@ static opcua_statuscode_t handle_open_secure_channel(mu_server_t *server,
                                &server->secure_channel.server_keys);
         if (s != MU_STATUS_GOOD) return s;
         server->secure_channel.keys_valid = true;
+        mu_sym_keys_prepare_cipher(&server->secure_channel.client_keys, cr);
+        mu_sym_keys_prepare_cipher(&server->secure_channel.server_keys, cr);
     }
 #else
     (void)client_nonce;

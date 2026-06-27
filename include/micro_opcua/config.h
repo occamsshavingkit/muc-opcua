@@ -54,7 +54,9 @@
  * so the no-heap storage block is larger when it is compiled in. Security builds
  * also reserve server-owned scratch for large secure-channel transient buffers. */
 #ifdef MICRO_OPCUA_SECURITY
-#define MU_SERVER_SECURITY_STORAGE_BYTES MU_SECURE_SCRATCH_SIZE
+/* secure_scratch + the two per-direction prepared cipher contexts that now live in
+ * client_keys/server_keys (mu_sym_keys_t.cipher_ctx, 2 x MU_CIPHER_CTX_SIZE). */
+#define MU_SERVER_SECURITY_STORAGE_BYTES (MU_SECURE_SCRATCH_SIZE + 2 * MU_CIPHER_CTX_SIZE)
 #else
 #define MU_SERVER_SECURITY_STORAGE_BYTES 0
 #endif

@@ -85,8 +85,8 @@ Each story is an independently shippable, independently testable slice.
 - [X] T020c [US1] Reject an inconsistent policy/mode combination with the T016a StatusCode in `src/services/secure_channel.c`, preserving the None-only build path (FR-005, OPC-10000-4 §5.6.2.2).
 - [X] T021 [US1] Add `secure_scratch[MU_SECURE_SCRATCH_SIZE]` to `struct mu_server` (guarded by `MICRO_OPCUA_SECURITY`) in `src/core/server_internal.h` (data-model.md E4).
 - [X] T022 [US1] Relocate the OPN-path scratch (`respbody`/`opn_buf`) from the stack to `server->secure_scratch` in `src/core/server.c` (FR-001/D1).
-- [ ] T023a [US1] Right-size `MU_ASYM_SCRATCH` (4096 → real RSA block, 256 B for 2048-bit) in `src/security/asym_chunk.c` (FR-001/D1).
-- [ ] T023b [US1] Move `plain`/`sign_buf`/`verify_buf` off the deep stack (into server-owned/shared scratch) in `src/security/asym_chunk.c` (FR-001/D1).
+- [X] T023a [US1] Right-size `MU_ASYM_SCRATCH` (4096 → real RSA block, 256 B for 2048-bit) in `src/security/asym_chunk.c` (FR-001/D1).
+- [X] T023b [US1] Move `plain`/`sign_buf`/`verify_buf` off the deep stack (into server-owned/shared scratch) in `src/security/asym_chunk.c` (FR-001/D1).
 - [X] T024 [US1] Add explicit op caps to the subscription per-op request loops before emitting array lengths in `src/core/service_dispatch.c`, consistent with `MU_DISPATCH_MAX_*`, returning `Bad_TooManyOperations` (OPC-10000-4 §7.38.2) when exceeded (FR-006).
 - [X] T025a [US1] Update `docs/traceability/004-optimization-fixes.md` (FR-001/002/003/004/005/006 rows) mapping each change + test to its OPC UA section.
 - [X] T025b [US1] Record the new secured-OPN stack figure in `docs/size/feature-size-ledger.md`. (Not [P]: shared ledger file.)
@@ -126,9 +126,9 @@ Each story is an independently shippable, independently testable slice.
 
 ### Tests for User Story 3
 
-- [ ] T033 [P] [US3] Add address-space index property test (indexed lookup === linear lookup for all member/non-member NodeIds; comparison count ~log N) in `tests/unit/test_address_space_values.c` (FR-009, contract: address-space-index.md).
-- [ ] T034 [P] [US3] Add a sampling-tick probe test asserting zero `mu_address_space_find_node` calls per tick (resolved-node cached) in `tests/integration/test_subscriptions.c` (FR-010).
-- [ ] T035 [P] [US3] Add a cipher-context probe test (stub adapter counter proves key schedule runs once per channel vs once per message in fallback) in `tests/unit/test_sym_chunk.c` (FR-012, contract: crypto-adapter-cipher-context.md).
+- [X] T033 [P] [US3] Add address-space index property test (indexed lookup === linear lookup for all member/non-member NodeIds; comparison count ~log N) in `tests/unit/test_address_space_values.c` (FR-009, contract: address-space-index.md).
+- [X] T034 [P] [US3] Add a sampling-tick probe test asserting zero `mu_address_space_find_node` calls per tick (resolved-node cached) in `tests/integration/test_subscriptions.c` (FR-010).
+- [X] T035 [P] [US3] Add a cipher-context probe test (stub adapter counter proves key schedule runs once per channel vs once per message in fallback) in `tests/unit/test_sym_chunk.c` (FR-012, contract: crypto-adapter-cipher-context.md).
 - [X] T036 [P] [US3] Add Browse single-pass byte-identical test (output equals two-pass output, all-or-nothing-per-node preserved) in `tests/unit/test_browse_service.c` (FR-011/FR-014, OPC-10000-4 §5.9.2).
 
 ### Implementation for User Story 3
@@ -139,10 +139,10 @@ Each story is an independently shippable, independently testable slice.
 - [X] T038 [US3] Wire index build into `mu_address_space_validate`/server init without masking existing validation errors in `src/address_space/address_space.c` (contract: address-space-index.md).
 - [X] T039 [US3] Cache the resolved `const mu_node_t *` in `mu_monitored_item_t` at CreateMonitoredItems time and use it in the sampling timer in `src/services/subscription.c` (FR-010, data-model.md E3).
 - [X] T040 [US3] Rewrite `mu_browse_process` to a single reference-resolution pass with backpatched count, preserving all-or-nothing-per-node semantics per OPC-10000-4 §5.9.2, in `src/services/browse.c` (FR-011/D7).
-- [ ] T041 [US3] Add the optional cipher-context members to `mu_crypto_adapter_t` in `include/micro_opcua/platform.h` (additive; contract: crypto-adapter-cipher-context.md).
-- [ ] T042 [US3] Add per-channel cipher-ctx storage (`cipher_ctx_*`) to `mu_secure_channel_t` (guarded) in `src/services/secure_channel.h` with a `MU_CIPHER_CTX_SIZE` compile-time assert (data-model.md E2).
-- [ ] T043 [US3] Initialize the cipher context at OPN (where keys derive) and use the ctx AES path with graceful fallback to stateless `aes256_cbc_*` in `src/security/sym_chunk.c` (FR-012/D2).
-- [ ] T044 [US3] Implement the cipher-ctx functions in the host adapter `src/platform/host_crypto_adapter.c` (reuse the EVP context instead of per-op new/free) (FR-012/audit-T2).
+- [X] T041 [US3] Add the optional cipher-context members to `mu_crypto_adapter_t` in `include/micro_opcua/platform.h` (additive; contract: crypto-adapter-cipher-context.md).
+- [X] T042 [US3] Add per-channel cipher-ctx storage (`cipher_ctx_*`) to `mu_secure_channel_t` (guarded) in `src/services/secure_channel.h` with a `MU_CIPHER_CTX_SIZE` compile-time assert (data-model.md E2).
+- [X] T043 [US3] Initialize the cipher context at OPN (where keys derive) and use the ctx AES path with graceful fallback to stateless `aes256_cbc_*` in `src/security/sym_chunk.c` (FR-012/D2).
+- [X] T044 [US3] Implement the cipher-ctx functions in the host adapter `src/platform/host_crypto_adapter.c` (reuse the EVP context instead of per-op new/free) (FR-012/audit-T2).
 - [X] T045 [P] [US3] Add the `advance_sample_timer` divide fast-path (`elapsed < interval` ⇒ single add) in `src/services/subscription.c` — behaviour-preserving, no wire change (FR-013/audit-T11).
 - [X] T046 [US3] Replace the per-message whole-remainder `memmove` with a read cursor + single compaction in `src/core/server.c` — behaviour-preserving, no wire change (FR-013/audit-T12).
 - [X] T047a [US3] Run the T006 golden vectors and confirm Read/Browse/subscription responses are byte-identical (FR-014/SC-003).

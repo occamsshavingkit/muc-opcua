@@ -8,6 +8,7 @@
 #ifndef MICRO_OPCUA_SYM_CHUNK_H
 #define MICRO_OPCUA_SYM_CHUNK_H
 
+#include "micro_opcua/config.h"
 #include "micro_opcua/platform.h"
 #include "micro_opcua/status.h"
 #include "security_policy.h"
@@ -18,6 +19,9 @@ typedef struct {
     opcua_byte_t signing_key[MU_B256S256_SIGNATURE_KEY_LENGTH];
     opcua_byte_t encrypting_key[MU_B256S256_ENCRYPTION_KEY_LENGTH];
     opcua_byte_t iv[MU_B256S256_ENCRYPTION_BLOCK_SIZE];
+    opcua_byte_t cipher_ctx[MU_CIPHER_CTX_SIZE];
+    const mu_crypto_adapter_t *crypto;
+    bool cipher_ctx_valid;
 } mu_sym_keys_t;
 
 typedef struct {
@@ -35,6 +39,9 @@ opcua_statuscode_t mu_sym_keys_derive(const mu_crypto_adapter_t *crypto,
                                       const opcua_byte_t *secret, size_t secret_len,
                                       const opcua_byte_t *seed, size_t seed_len,
                                       mu_sym_keys_t *out_keys);
+
+void mu_sym_keys_prepare_cipher(mu_sym_keys_t *keys, const mu_crypto_adapter_t *crypto);
+void mu_sym_keys_release_cipher(mu_sym_keys_t *keys);
 
 /* Build a symmetric chunk (message_type is "MSG" or "CLO") carrying `body` (an
    encoded service message, without the SequenceHeader). Signs (Sign) or

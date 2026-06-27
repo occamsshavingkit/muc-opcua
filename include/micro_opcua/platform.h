@@ -105,6 +105,19 @@ typedef struct mu_crypto_adapter {
         const opcua_byte_t *key, const opcua_byte_t *iv,
         const opcua_byte_t *input, size_t length, opcua_byte_t *output);
 
+    /* Optional per-channel AES context. `ctx_storage` is MU_CIPHER_CTX_SIZE
+       bytes; all callbacks MAY be NULL, in which case the codec falls back to
+       aes256_cbc_encrypt/decrypt above. */
+    opcua_statuscode_t (*cipher_ctx_init)(void *context,
+        const opcua_byte_t *key /*32B*/, opcua_byte_t *ctx_storage);
+    opcua_statuscode_t (*aes256_cbc_encrypt_ctx)(void *context,
+        opcua_byte_t *ctx_storage, const opcua_byte_t *iv,
+        const opcua_byte_t *input, size_t length, opcua_byte_t *output);
+    opcua_statuscode_t (*aes256_cbc_decrypt_ctx)(void *context,
+        opcua_byte_t *ctx_storage, const opcua_byte_t *iv,
+        const opcua_byte_t *input, size_t length, opcua_byte_t *output);
+    void (*cipher_ctx_free)(void *context, opcua_byte_t *ctx_storage);
+
     /* RSA PKCS#1 v1.5 with SHA-256, signing with the server private key (context). */
     opcua_statuscode_t (*rsa_sha256_sign)(void *context,
         const opcua_byte_t *data, size_t length,

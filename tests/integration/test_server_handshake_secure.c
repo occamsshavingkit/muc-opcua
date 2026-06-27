@@ -277,6 +277,7 @@ void test_secure_handshake_read(void) {
       opcua_byte_t vt; mu_binary_read_byte(&resp, &vt); TEST_ASSERT_EQUAL(MU_TYPE_INT32, vt);
       opcua_int32_t val; mu_binary_read_int32(&resp, &val); TEST_ASSERT_EQUAL(42, val); }
 
+    mu_server_close(server);
     mu_host_crypto_adapter_cleanup(&server_crypto);
     mu_host_crypto_adapter_cleanup(&client_crypto);
 }

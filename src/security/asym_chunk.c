@@ -9,9 +9,15 @@
 /* RSA-OAEP with SHA-1 (MGF1-SHA1) overhead: plaintext block = keybytes - 2*20 - 2. */
 #define MU_OAEP_SHA1_OVERHEAD 42
 
-/* Scratch buffer for the signed prefix (cleartext header + plaintext-before-signature)
-   and for the decrypted plaintext. OPN chunks are small. */
-#define MU_ASYM_SCRATCH 4096
+/* RSA modulus-sized scratch for Basic256Sha256. A 2048-bit RSA modulus is
+   256 bytes; keeping headroom for 4096-bit RSA requires 512 bytes. RSA-OAEP
+   plaintext blocks are smaller than the modulus by MU_OAEP_SHA1_OVERHEAD. */
+#define MU_ASYM_SCRATCH 512
+
+/* Signature input is [cleartext header | signed plaintext], not an RSA block.
+   Keep the existing envelope limit separate so modulus scratch remains small
+   without changing accepted OPN header/body sizes. */
+#define MU_ASYM_SIGNED_INPUT_MAX 4096
 
 static opcua_statuscode_t key_bytes(const mu_crypto_adapter_t *crypto,
                                     const opcua_byte_t *cert, size_t cert_len, size_t *bytes) {
@@ -125,7 +131,7 @@ opcua_statuscode_t mu_asym_chunk_wrap(
     size_t total = hdr_len + cipher_len;
 
     if (enc_len > MU_ASYM_MAX_PLAINTEXT) return MU_STATUS_BAD_REQUESTTOOLARGE;
-    if (hdr_len + presig_len > MU_ASYM_SCRATCH) return MU_STATUS_BAD_REQUESTTOOLARGE;
+    if (hdr_len + presig_len > MU_ASYM_SIGNED_INPUT_MAX) return MU_STATUS_BAD_REQUESTTOOLARGE;
     if (total > out_cap) return MU_STATUS_BAD_RESPONSETOOLARGE;
 
     /* Patch the final (encrypted) MessageSize before signing — the signature
@@ -152,37 +158,35 @@ opcua_statuscode_t mu_asym_chunk_wrap(
     memset(plain + seqbody_len + 1, (int)pad_count, pad_count);   /* Padding bytes */
 
     /* Sign over [cleartext header | SequenceHeader | body | paddingSize | padding].
-       Bound the scratch copy (defense in depth; mirrors the verify path's check). */
-    opcua_byte_t sign_buf[MU_ASYM_SCRATCH];
-    if (hdr_len + presig_len > MU_ASYM_SCRATCH) {
+       The header is already in `out`; stage the signed plaintext after it so no
+       separate header+plaintext stack buffer is needed. */
+    if (hdr_len + presig_len > MU_ASYM_SIGNED_INPUT_MAX) {
         mu_secure_zero(plain, sizeof(plain));
         return MU_STATUS_BAD_INTERNALERROR;
     }
-    memcpy(sign_buf, out, hdr_len);
-    memcpy(sign_buf + hdr_len, plain, presig_len);
-    opcua_byte_t sig[512];
+    opcua_byte_t sig[MU_ASYM_SCRATCH];
     if (sig_len > sizeof(sig)) {
-        mu_secure_zero(sign_buf, sizeof(sign_buf));
         mu_secure_zero(plain, sizeof(plain));
         return MU_STATUS_BAD_INTERNALERROR;
     }
+    memcpy(out + hdr_len, plain, presig_len);
     size_t produced_sig = sizeof(sig);
-    s = crypto->rsa_sha256_sign(crypto->context, sign_buf, hdr_len + presig_len, sig, &produced_sig);
+    s = crypto->rsa_sha256_sign(crypto->context, out, hdr_len + presig_len, sig, &produced_sig);
     if (s != MU_STATUS_GOOD) {
         mu_secure_zero(sig, sizeof(sig));
-        mu_secure_zero(sign_buf, sizeof(sign_buf));
+        mu_secure_zero(out + hdr_len, presig_len);
         mu_secure_zero(plain, sizeof(plain));
         return s;
     }
     if (produced_sig != sig_len) {
         mu_secure_zero(sig, sizeof(sig));
-        mu_secure_zero(sign_buf, sizeof(sign_buf));
+        mu_secure_zero(out + hdr_len, presig_len);
         mu_secure_zero(plain, sizeof(plain));
         return MU_STATUS_BAD_INTERNALERROR;
     }
     memcpy(plain + presig_len, sig, sig_len);   /* signature is the tail of the plaintext */
     mu_secure_zero(sig, sizeof(sig));
-    mu_secure_zero(sign_buf, sizeof(sign_buf));
+    mu_secure_zero(out + hdr_len, presig_len);
 
     /* Encrypt the plaintext block-by-block to the receiver's public key. */
     size_t blocks = enc_len / plain_block;
@@ -192,10 +196,12 @@ opcua_statuscode_t mu_asym_chunk_wrap(
                                      plain + i * plain_block, plain_block,
                                      out + hdr_len + i * cipher_block, &out_block);
         if (s != MU_STATUS_GOOD) {
+            mu_secure_zero(out + hdr_len, cipher_len);
             mu_secure_zero(plain, sizeof(plain));
             return s;
         }
         if (out_block != cipher_block) {
+            mu_secure_zero(out + hdr_len, cipher_len);
             mu_secure_zero(plain, sizeof(plain));
             return MU_STATUS_BAD_INTERNALERROR;
         }
@@ -297,11 +303,11 @@ opcua_statuscode_t mu_asym_chunk_unwrap(
     const opcua_byte_t *signature = plain + signed_len;
 
     /* Verify the sender signature over [cleartext header | signed plaintext]. */
-    if (hdr_len + signed_len > MU_ASYM_SCRATCH) {
+    if (hdr_len + signed_len > MU_ASYM_SIGNED_INPUT_MAX) {
         mu_secure_zero(plain, sizeof(plain));
         return MU_STATUS_BAD_SECURITYCHECKSFAILED;
     }
-    opcua_byte_t verify_buf[MU_ASYM_SCRATCH];
+    opcua_byte_t verify_buf[MU_ASYM_SIGNED_INPUT_MAX];
     memcpy(verify_buf, chunk, hdr_len);
     memcpy(verify_buf + hdr_len, plain, signed_len);
     s = crypto->rsa_sha256_verify(crypto->context, info->sender_cert, info->sender_cert_len,

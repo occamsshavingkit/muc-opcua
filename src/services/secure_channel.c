@@ -111,6 +111,8 @@ opcua_statuscode_t mu_secure_channel_close(mu_secure_channel_t *channel) {
     if (!channel->is_open) return MU_STATUS_BAD_TCPSECURECHANNELUNKNOWN;
 
 #ifdef MICRO_OPCUA_SECURITY
+    mu_sym_keys_release_cipher(&channel->client_keys);
+    mu_sym_keys_release_cipher(&channel->server_keys);
     mu_secure_zero(&channel->client_keys, sizeof(channel->client_keys));
     mu_secure_zero(&channel->server_keys, sizeof(channel->server_keys));
     channel->keys_valid = false;
