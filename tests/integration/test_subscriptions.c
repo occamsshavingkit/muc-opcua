@@ -1204,7 +1204,6 @@ void test_monitored_item_absolute_deadband(void) {
     TEST_ASSERT_EQUAL_INT32(20, dv.value.value.i32);
 }
 
-#if MU_MONITORED_QUEUE_DEPTH >= 2
 /* Overflow InfoBit: InfoType=DataValue (0x0400) | Overflow (0x0080) per OPC-10000-4 §7.20.1
    and the OPC-10000-6 StatusCode encoding. Codex must set exactly this on the oldest retained
    value when the queue overflows. */
@@ -1240,6 +1239,7 @@ static opcua_int32_t parse_publish_notifications(mu_binary_reader_t *body, opcua
     return total;
 }
 
+#if MU_MONITORED_QUEUE_DEPTH >= 2
 /* US1 — MonitoredItem notification queue (OPC 10000-4 §5.13.2 queueSize/discardOldest,
    §7.20.1 overflow). queueSize=2, discardOldest=true: three rapid changes (20,30,40) between
    publishes drop the oldest (20) and deliver the two most-recent (30,40); the oldest retained
@@ -1303,6 +1303,106 @@ void test_monitored_item_queue_overflow(void) {
 }
 #endif /* MU_MONITORED_QUEUE_DEPTH >= 2 */
 
+#define ID_SETTRIGGERINGREQUEST  773  /* SetTriggeringRequest (i=773), OPC 10000-4 §5.13.5 */
+#define ID_SETTRIGGERINGRESPONSE 776  /* SetTriggeringResponse (i=776) */
+
+/* Write one MonitoredItemCreateRequest with an explicit monitoringMode and null filter. */
+static void write_moncreate_item_mode(mu_binary_writer_t *w, opcua_uint16_t ns, opcua_uint32_t ident,
+                                      opcua_uint32_t client_handle, opcua_double_t interval,
+                                      opcua_uint32_t mode) {
+    mu_nodeid_t n = { ns, MU_NODEID_NUMERIC, { ident } };
+    mu_binary_write_nodeid(w, &n);
+    mu_binary_write_uint32(w, 13);          /* attributeId = Value */
+    { mu_string_t nul = {-1,NULL}; mu_binary_write_string(w, &nul); }
+    mu_binary_write_uint16(w, 0);
+    { mu_string_t nul = {-1,NULL}; mu_binary_write_string(w, &nul); }
+    mu_binary_write_uint32(w, mode);        /* monitoringMode: 1 Sampling, 2 Reporting */
+    mu_binary_write_uint32(w, client_handle);
+    mu_binary_write_double(w, interval);
+    { mu_nodeid_t nul = {0,MU_NODEID_NUMERIC,{0}}; mu_binary_write_extension_object_header(w, &nul, 0); }
+    mu_binary_write_uint32(w, 1);           /* queueSize */
+    mu_binary_write_boolean(w, true);       /* discardOldest */
+}
+
+/* US1 — SetTriggering (OPC 10000-4 §5.13.5, §5.13.1.6 triggering model). A triggered item in
+   Sampling mode does not report on its own; once linked to a triggering item, it reports its
+   sampled value when the triggering item reports. RED until Codex implements SetTriggering
+   dispatch (T018) + the triggering engine logic (T015). */
+void test_set_triggering(void) {
+    mock_t mock; memset(&mock, 0, sizeof(mock));
+    enqueue_connect(&mock);
+    enqueue_create_subscription(&mock, 4, 200.0, 1000, 1000);
+
+    opcua_byte_t storage[MU_SERVER_STORAGE_BYTES]; mu_server_config_t config;
+    s_mon_val = 10;
+    mu_server_t *server = make_server(&mock, storage, sizeof(storage), &config, &samp_space);
+    mu_binary_reader_t body; opcua_statuscode_t sr;
+    run_connect(server);
+    mu_server_poll(server); /* CreateSubscription */
+    TEST_ASSERT_EQUAL(ID_CREATESUBSCRIPTIONRESPONSE, parse_response(mock.last_write, mock.last_write_len, &body, &sr));
+    opcua_uint32_t sub_id; mu_binary_read_uint32(&body, &sub_id);
+
+    /* CreateMonitoredItems (seq 5): item A reporting (handle 7), item B sampling (handle 8),
+       both on ns=1;i=5000, sampling 100 ms. */
+    opcua_byte_t tmp[1024], chunk[1024]; mu_binary_writer_t w; size_t clen;
+    mu_binary_writer_init(&w, tmp, sizeof(tmp));
+    { mu_nodeid_t t={0,MU_NODEID_NUMERIC,{ID_CREATEMONITOREDITEMSREQUEST}}; mu_binary_write_nodeid(&w,&t); }
+    write_request_header(&w, 12345, 5);
+    mu_binary_write_uint32(&w, sub_id);
+    mu_binary_write_uint32(&w, 3);
+    mu_binary_write_int32(&w, 2);           /* two items */
+    write_moncreate_item_mode(&w, 1, 5000, 7, 100.0, 2 /*Reporting*/);
+    write_moncreate_item_mode(&w, 1, 5000, 8, 100.0, 1 /*Sampling*/);
+    clen = build_msg(chunk, sizeof(chunk), 5, 5, tmp, w.position); enqueue(&mock, chunk, clen);
+    mu_server_poll(server);
+    TEST_ASSERT_EQUAL(ID_CREATEMONITOREDITEMSRESPONSE, parse_response(mock.last_write, mock.last_write_len, &body, &sr));
+    opcua_int32_t ncreate; mu_binary_read_int32(&body, &ncreate); TEST_ASSERT_EQUAL(2, ncreate);
+    opcua_uint32_t a_id, b_id;
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, read_moncreate_result(&body, &a_id));
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, read_moncreate_result(&body, &b_id));
+
+    /* Publish #1 (seq 6) at t=300, BEFORE linking: item A (Reporting) reports its initial
+       value; B (Sampling, unlinked) does not report on its own. */
+    opcua_uint32_t sid; opcua_uint32_t hs[8]; mu_datavalue_t dvs[8];
+    enqueue_publish(&mock, 6);
+    mu_server_poll(server);
+    tick_to(server, 300);
+    TEST_ASSERT_EQUAL(ID_PUBLISHRESPONSE, parse_response(mock.last_write, mock.last_write_len, &body, &sr));
+    opcua_int32_t n1 = parse_publish_notifications(&body, &sid, hs, dvs, 8);
+    TEST_ASSERT_EQUAL(1, n1);               /* only A reports; B is Sampling and unlinked */
+    TEST_ASSERT_EQUAL(7, hs[0]);
+
+    /* SetTriggering (seq 7): triggeringItem = A, linksToAdd = [B], linksToRemove = []. */
+    mu_binary_writer_init(&w, tmp, sizeof(tmp));
+    { mu_nodeid_t t={0,MU_NODEID_NUMERIC,{ID_SETTRIGGERINGREQUEST}}; mu_binary_write_nodeid(&w,&t); }
+    write_request_header(&w, 12345, 7);
+    mu_binary_write_uint32(&w, sub_id);
+    mu_binary_write_uint32(&w, a_id);       /* triggeringItemId */
+    mu_binary_write_int32(&w, 1);           /* linksToAdd count */
+    mu_binary_write_uint32(&w, b_id);
+    mu_binary_write_int32(&w, 0);           /* linksToRemove count */
+    clen = build_msg(chunk, sizeof(chunk), 7, 7, tmp, w.position); enqueue(&mock, chunk, clen);
+    mu_server_poll(server);
+    TEST_ASSERT_EQUAL(ID_SETTRIGGERINGRESPONSE, parse_response(mock.last_write, mock.last_write_len, &body, &sr));
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, sr);
+    opcua_int32_t nadd; mu_binary_read_int32(&body, &nadd); TEST_ASSERT_EQUAL(1, nadd);
+    opcua_statuscode_t add0; mu_binary_read_statuscode(&body, &add0);
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, add0);
+
+    /* Change to 20: A reports the change; the trigger link makes B report its sample too. */
+    s_mon_val = 20;
+    enqueue_publish(&mock, 8);
+    mu_server_poll(server);
+    tick_to(server, 700);
+    TEST_ASSERT_EQUAL(ID_PUBLISHRESPONSE, parse_response(mock.last_write, mock.last_write_len, &body, &sr));
+    opcua_int32_t n2 = parse_publish_notifications(&body, &sid, hs, dvs, 8);
+    TEST_ASSERT_EQUAL(2, n2);               /* A and triggered B both report */
+    /* Both notifications carry value 20 (handles 7 and 8 in some order). */
+    TEST_ASSERT_TRUE((hs[0]==7 && hs[1]==8) || (hs[0]==8 && hs[1]==7));
+    TEST_ASSERT_EQUAL_INT32(20, dvs[0].value.value.i32);
+    TEST_ASSERT_EQUAL_INT32(20, dvs[1].value.value.i32);
+}
+
 #endif /* MICRO_OPCUA_SUBSCRIPTIONS_STANDARD */
 
 int main(void) {
@@ -1312,6 +1412,7 @@ int main(void) {
 #if MU_MONITORED_QUEUE_DEPTH >= 2
     RUN_TEST(test_monitored_item_queue_overflow);
 #endif
+    RUN_TEST(test_set_triggering);
 #endif
     RUN_TEST(test_create_subscription);
     RUN_TEST(test_create_subscription_too_many);

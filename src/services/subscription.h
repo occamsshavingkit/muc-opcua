@@ -248,6 +248,20 @@ opcua_statuscode_t mu_monitored_item_delete(mu_subscriptions_t *subs,
                                             opcua_uint32_t subscription_id,
                                             opcua_uint32_t monitored_item_id);
 
+#if MICRO_OPCUA_SUBSCRIPTIONS_STANDARD
+/* SetTriggering link storage (OPC-10000-4 §5.13.5). Both MonitoredItems must
+   belong to the named Subscription. */
+opcua_statuscode_t mu_monitored_item_add_trigger_link(mu_subscriptions_t *subs,
+                                                      opcua_uint32_t subscription_id,
+                                                      opcua_uint32_t triggering_item_id,
+                                                      opcua_uint32_t linked_item_id);
+
+opcua_statuscode_t mu_monitored_item_remove_trigger_link(mu_subscriptions_t *subs,
+                                                         opcua_uint32_t subscription_id,
+                                                         opcua_uint32_t triggering_item_id,
+                                                         opcua_uint32_t linked_item_id);
+#endif
+
 /* Park a Publish request for asynchronous completion by the publishing timer
    (OPC 10000-4 §5.14.5). Returns Bad_TooManyPublishRequests when the queue is full; on
    success, *out_req (if non-NULL) points at the parked slot so the caller can record the

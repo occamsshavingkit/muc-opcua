@@ -18,6 +18,12 @@
 #if MICRO_OPCUA_SUBSCRIPTIONS_STANDARD
 /* OPC-10000-4 §7.20.1 / OPC-10000-6 StatusCode: InfoType=DataValue + Overflow. */
 #define MU_STATUSCODE_INFOTYPE_DATAVALUE_OVERFLOW 0x00000480u
+#ifndef MU_STATUS_BAD_TOOMANYOPERATIONS
+/* OPC UA Bad_TooManyOperations. */
+#define MU_LOCAL_STATUS_BAD_TOOMANYOPERATIONS ((opcua_statuscode_t)0x80100000u)
+#else
+#define MU_LOCAL_STATUS_BAD_TOOMANYOPERATIONS MU_STATUS_BAD_TOOMANYOPERATIONS
+#endif
 #endif
 
 static bool variant_scalar_equal(const mu_variant_t *a, const mu_variant_t *b)
@@ -359,6 +365,28 @@ static opcua_uint32_t allocate_monitored_item_id(mu_subscriptions_t *subs)
     return 0u;
 }
 
+#if MICRO_OPCUA_SUBSCRIPTIONS_STANDARD
+static mu_monitored_item_t *find_monitored_item_in_subscription(mu_subscriptions_t *subs,
+                                                               opcua_uint32_t subscription_id,
+                                                               opcua_uint32_t monitored_item_id)
+{
+    if (subs == NULL) {
+        return NULL;
+    }
+
+    for (size_t i = 0; i < MU_MAX_MONITORED_ITEMS; ++i) {
+        mu_monitored_item_t *item = &subs->monitored_items[i];
+        if (item->in_use &&
+            item->subscription_id == subscription_id &&
+            item->monitored_item_id == monitored_item_id) {
+            return item;
+        }
+    }
+
+    return NULL;
+}
+#endif
+
 static void revise_subscription_counts(opcua_uint32_t requested_lifetime_count,
                                        opcua_uint32_t requested_max_keep_alive_count,
                                        opcua_uint32_t *revised_lifetime_count,
@@ -451,6 +479,60 @@ static bool monitored_item_reportable(const mu_monitored_item_t *item,
 }
 
 #if MICRO_OPCUA_SUBSCRIPTIONS_STANDARD
+static bool monitored_item_in_subscription(const mu_monitored_item_t *item,
+                                           const mu_subscription_t *sub)
+{
+    return item->in_use && item->subscription_id == sub->subscription_id;
+}
+
+static bool monitored_item_reports_by_trigger(const struct mu_server *server,
+                                              const mu_subscription_t *sub,
+                                              const mu_monitored_item_t *linked_item)
+{
+    if (!monitored_item_in_subscription(linked_item, sub) ||
+        linked_item->monitoring_mode != MU_MONITORING_MODE_SAMPLING ||
+        linked_item->queue_count == 0u) {
+        return false;
+    }
+
+    for (size_t i = 0; i < MU_MAX_MONITORED_ITEMS; ++i) {
+        const mu_monitored_item_t *triggering_item =
+            &server->subs.monitored_items[i];
+        if (!monitored_item_reportable(triggering_item, sub) ||
+            triggering_item->triggered_count == 0u) {
+            continue;
+        }
+
+        for (opcua_byte_t j = 0u; j < triggering_item->triggered_count; ++j) {
+            if (triggering_item->triggered_items[j] ==
+                linked_item->monitored_item_id) {
+                /* OPC-10000-4 §5.13.1.6: a reporting triggering item releases
+                   linked Sampling-mode items for this publishing cycle. */
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
+static bool count_queue_entries(opcua_int32_t *count,
+                                opcua_uint32_t max_notifications,
+                                opcua_byte_t queue_count)
+{
+    for (opcua_byte_t i = 0u; i < queue_count; ++i) {
+        if (max_notifications != 0u &&
+            (opcua_uint32_t)*count >= max_notifications) {
+            return false;
+        }
+        ++(*count);
+    }
+
+    return true;
+}
+#endif
+
+#if MICRO_OPCUA_SUBSCRIPTIONS_STANDARD
 static opcua_int32_t count_reportable_items(const struct mu_server *server,
                                             mu_subscription_t *sub)
 {
@@ -461,16 +543,23 @@ static opcua_int32_t count_reportable_items(const struct mu_server *server,
     for (size_t i = 0; i < MU_MAX_MONITORED_ITEMS; ++i) {
         if (monitored_item_reportable(&server->subs.monitored_items[i], sub)) {
             const mu_monitored_item_t *item = &server->subs.monitored_items[i];
-            for (opcua_byte_t queued = 0u; queued < item->queue_count; ++queued) {
-                if (max_notifications != 0u &&
-                    (opcua_uint32_t)count >= max_notifications) {
-                    sub->more_notifications = true;
-                    return count;
-                }
-                ++count;
+            if (!count_queue_entries(&count, max_notifications,
+                                     item->queue_count)) {
+                sub->more_notifications = true;
+                return count;
             }
         }
     }
+
+    for (size_t i = 0; i < MU_MAX_MONITORED_ITEMS; ++i) {
+        const mu_monitored_item_t *item = &server->subs.monitored_items[i];
+        if (monitored_item_reports_by_trigger(server, sub, item) &&
+            !count_queue_entries(&count, max_notifications, item->queue_count)) {
+            sub->more_notifications = true;
+            return count;
+        }
+    }
+
     return count;
 }
 #else
@@ -493,9 +582,32 @@ static void prepare_reportable_queues(struct mu_server *server,
 {
     for (size_t i = 0; i < MU_MAX_MONITORED_ITEMS; ++i) {
         mu_monitored_item_t *item = &server->subs.monitored_items[i];
-        if (monitored_item_reportable(item, sub)) {
+        if (monitored_item_in_subscription(item, sub) &&
+            item->monitoring_mode != MU_MONITORING_MODE_DISABLED) {
             monitored_item_prepare_pending_queue(item);
         }
+    }
+}
+
+static void monitored_item_drain_reported_entries(mu_monitored_item_t *item,
+                                                  opcua_int32_t *remaining)
+{
+    opcua_uint32_t queue_size = monitored_item_effective_queue_size(item);
+
+    while (item->queue_count > 0u && *remaining > 0) {
+        item->queue_head = monitored_item_queue_next(item->queue_head,
+                                                     queue_size);
+        --item->queue_count;
+        --(*remaining);
+    }
+
+    if (item->queue_count == 0u) {
+        item->queue_head = 0u;
+        item->queue_tail = 0u;
+        item->pending = false;
+        item->queue_overflow = false;
+    } else {
+        item->pending = true;
     }
 }
 
@@ -504,6 +616,14 @@ static void clear_reported_items(struct mu_server *server,
                                  opcua_int32_t report_count)
 {
     opcua_int32_t remaining = report_count;
+    bool triggered_items[MU_MAX_MONITORED_ITEMS];
+
+    memset(triggered_items, 0, sizeof(triggered_items));
+    for (size_t i = 0; i < MU_MAX_MONITORED_ITEMS; ++i) {
+        triggered_items[i] =
+            monitored_item_reports_by_trigger(server, sub,
+                                              &server->subs.monitored_items[i]);
+    }
 
     for (size_t i = 0; i < MU_MAX_MONITORED_ITEMS && remaining > 0; ++i) {
         mu_monitored_item_t *item = &server->subs.monitored_items[i];
@@ -511,21 +631,13 @@ static void clear_reported_items(struct mu_server *server,
             continue;
         }
 
-        opcua_uint32_t queue_size = monitored_item_effective_queue_size(item);
-        while (item->queue_count > 0u && remaining > 0) {
-            item->queue_head = monitored_item_queue_next(item->queue_head,
-                                                         queue_size);
-            --item->queue_count;
-            --remaining;
-        }
+        monitored_item_drain_reported_entries(item, &remaining);
+    }
 
-        if (item->queue_count == 0u) {
-            item->queue_head = 0u;
-            item->queue_tail = 0u;
-            item->pending = false;
-            item->queue_overflow = false;
-        } else {
-            item->pending = true;
+    for (size_t i = 0; i < MU_MAX_MONITORED_ITEMS && remaining > 0; ++i) {
+        if (triggered_items[i]) {
+            monitored_item_drain_reported_entries(&server->subs.monitored_items[i],
+                                                  &remaining);
         }
     }
 }
@@ -626,6 +738,47 @@ static opcua_statuscode_t write_data_change_notification(mu_binary_writer_t *w,
         if (s != MU_STATUS_GOOD) return s;
 #endif
     }
+
+#if MICRO_OPCUA_SUBSCRIPTIONS_STANDARD
+    for (size_t i = 0; i < MU_MAX_MONITORED_ITEMS && report_count > 0; ++i) {
+        const mu_monitored_item_t *item = &server->subs.monitored_items[i];
+        if (!monitored_item_reports_by_trigger(server, sub, item)) {
+            continue;
+        }
+
+        opcua_uint32_t queue_size = item->queue_size;
+        opcua_byte_t entry_index = item->queue_head;
+        if (queue_size == 0u) {
+            queue_size = 1u;
+        } else if (queue_size > MU_MONITORED_QUEUE_DEPTH) {
+            queue_size = MU_MONITORED_QUEUE_DEPTH;
+        }
+
+        for (opcua_byte_t queued = 0u;
+             queued < item->queue_count && report_count > 0;
+             ++queued) {
+            const mu_variant_t *value = &item->queue[entry_index].value;
+            opcua_statuscode_t status = item->queue[entry_index].status;
+
+            s = mu_binary_write_uint32(w, item->client_handle);
+            if (s != MU_STATUS_GOOD) return s;
+
+            mu_datavalue_t dv;
+            memset(&dv, 0, sizeof(dv));
+            dv.has_value = true;
+            dv.value = *value;
+            if (status != MU_STATUS_GOOD) {
+                dv.has_status = true;
+                dv.status = status;
+            }
+            s = mu_binary_write_datavalue(w, &dv);
+            if (s != MU_STATUS_GOOD) return s;
+
+            --report_count;
+            entry_index = monitored_item_queue_next(entry_index, queue_size);
+        }
+    }
+#endif
 
     s = mu_binary_write_int32(w, 0);
     if (s != MU_STATUS_GOOD) return s;
@@ -1122,6 +1275,71 @@ opcua_statuscode_t mu_monitored_item_delete(mu_subscriptions_t *subs,
 
     return MU_STATUS_BAD_MONITOREDITEMIDINVALID;
 }
+
+#if MICRO_OPCUA_SUBSCRIPTIONS_STANDARD
+opcua_statuscode_t mu_monitored_item_add_trigger_link(mu_subscriptions_t *subs,
+                                                      opcua_uint32_t subscription_id,
+                                                      opcua_uint32_t triggering_item_id,
+                                                      opcua_uint32_t linked_item_id)
+{
+    mu_monitored_item_t *triggering_item =
+        find_monitored_item_in_subscription(subs, subscription_id, triggering_item_id);
+    mu_monitored_item_t *linked_item =
+        find_monitored_item_in_subscription(subs, subscription_id, linked_item_id);
+
+    if (triggering_item == NULL || linked_item == NULL) {
+        return MU_STATUS_BAD_MONITOREDITEMIDINVALID;
+    }
+
+    for (opcua_byte_t i = 0u; i < triggering_item->triggered_count; ++i) {
+        if (triggering_item->triggered_items[i] == linked_item_id) {
+            return MU_STATUS_GOOD;
+        }
+    }
+
+    /* OPC-10000-4 §5.13.5 SetTriggering link list. */
+    if (triggering_item->triggered_count >= MU_MAX_TRIGGER_LINKS) {
+        return MU_LOCAL_STATUS_BAD_TOOMANYOPERATIONS;
+    }
+
+    triggering_item->triggered_items[triggering_item->triggered_count] =
+        linked_item_id;
+    ++triggering_item->triggered_count;
+    return MU_STATUS_GOOD;
+}
+
+opcua_statuscode_t mu_monitored_item_remove_trigger_link(mu_subscriptions_t *subs,
+                                                         opcua_uint32_t subscription_id,
+                                                         opcua_uint32_t triggering_item_id,
+                                                         opcua_uint32_t linked_item_id)
+{
+    mu_monitored_item_t *triggering_item =
+        find_monitored_item_in_subscription(subs, subscription_id, triggering_item_id);
+    mu_monitored_item_t *linked_item =
+        find_monitored_item_in_subscription(subs, subscription_id, linked_item_id);
+
+    if (triggering_item == NULL || linked_item == NULL) {
+        return MU_STATUS_BAD_MONITOREDITEMIDINVALID;
+    }
+
+    for (opcua_byte_t i = 0u; i < triggering_item->triggered_count; ++i) {
+        if (triggering_item->triggered_items[i] != linked_item_id) {
+            continue;
+        }
+
+        while ((opcua_byte_t)(i + 1u) < triggering_item->triggered_count) {
+            triggering_item->triggered_items[i] =
+                triggering_item->triggered_items[i + 1u];
+            ++i;
+        }
+        --triggering_item->triggered_count;
+        triggering_item->triggered_items[triggering_item->triggered_count] = 0u;
+        return MU_STATUS_GOOD;
+    }
+
+    return MU_STATUS_BAD_MONITOREDITEMIDINVALID;
+}
+#endif
 
 void mu_subscriptions_tick(struct mu_server *server, opcua_uint64_t now_ms)
 {

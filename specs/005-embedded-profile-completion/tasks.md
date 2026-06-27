@@ -69,7 +69,7 @@ unchanged.
 - [X] T005 [P] [US1] {Claude} Fixture: CreateMonitoredItems carrying a DataChangeFilter with DeadbandType=Absolute (OPC-10000-4 §7.22.2), bytes in `tests/fixtures/embedded/`.
 - [X] T006 [P] [US1] {Claude} Test: absolute-deadband sampling — sub-threshold change → no notification, at/above → one notification; status change always reports (§7.22.2) in `tests/unit/test_subscriptions_deadband.c`.
 - [X] T007 [P] [US1] {Claude} Test: monitored-item queue≥2 + discardOldest (and discard-newest) with overflow InfoBit (§5.13.2, §7.20.1) in `tests/unit/test_subscriptions_queue.c`.
-- [ ] T008 [P] [US1] {Claude} Test: SetTriggering add/remove links + triggered (Sampling-mode) item reports on triggering event; per-link StatusCodes (§5.13.5) in `tests/unit/test_subscriptions_triggering.c`.
+- [X] T008 [P] [US1] {Claude} Test: SetTriggering add/remove links + triggered (Sampling-mode) item reports on triggering event; per-link StatusCodes (§5.13.5) in `tests/unit/test_subscriptions_triggering.c`.
 - [ ] T009 [P] [US1] {Claude} Test: capacity enforcement — accept ≥100 items / ≥2 subs / ≥5 parallel Publish, reject beyond with `Bad_TooManyMonitoredItems`/`Bad_TooManySubscriptions`/`Bad_TooManyPublishRequests` (§5.13.2, §5.14.2, §5.14.5) in `tests/unit/test_subscriptions_capacity.c`.
 - [ ] T010 [P] [US1] {Claude} Test: malformed DataChangeFilter / SetTriggering decode → cited StatusCodes, no OOB (ASan) in `tests/unit/test_subscriptions_errors.c`.
 - [ ] T011 [P] [US1] {Claude} Fuzz: SetTriggering and DataChangeFilter decoders in `tests/fuzz/fuzz_subscription_filters.c`.
@@ -79,10 +79,10 @@ unchanged.
 - [X] T012 [US1] {Codex} Extend `mu_monitored_item_t` with deadband fields (`deadband_type`, `deadband_value`), a fixed queue ring (`MU_MONITORED_QUEUE_DEPTH`) + `discard_oldest`/`queue_overflow`, and trigger-link storage, in `src/services/subscription.h`.
 - [X] T013 [US1] {Codex} Implement absolute-deadband evaluation in the sampling path (numeric integer + soft-float compare; status changes bypass deadband) (§7.22.2) in `src/services/subscription.c`.
 - [X] T014 [US1] {Codex} Implement the notification queue (depth≥2), discardOldest/discard-newest, and overflow InfoBit signaling in the publish path (§5.13.2, §7.20.1) in `src/services/subscription.c`.
-- [ ] T015 [US1] {Codex} Implement SetTriggering link storage and triggered-item reporting on triggering events (§5.13.5, §5.13.1.6) in `src/services/subscription.c`.
+- [X] T015 [US1] {Codex} Implement SetTriggering link storage and triggered-item reporting on triggering events (§5.13.5, §5.13.1.6) in `src/services/subscription.c`.
 - [ ] T016 [US1] {Codex} Enforce the raised capacities and return cited `Bad_TooMany*` StatusCodes (§5.13.2, §5.14.2, §5.14.5) in `src/services/subscription.c`.
 - [X] T017 [US1] {Codex} Decode the DataChangeFilter deadband fields in the CreateMonitoredItems/ModifyMonitoredItems handlers, rejecting non-numeric/percent with cited StatusCodes (§7.22.2) in `src/core/service_dispatch.c`.
-- [ ] T018 [US1] {Codex} Add the SetTriggering request decode, dispatch handler, and response encode (§5.13.5) in `src/core/service_dispatch.c`.
+- [X] T018 [US1] {Codex} Add the SetTriggering request decode, dispatch handler, and response encode (§5.13.5) in `src/core/service_dispatch.c`.
 - [ ] T019 [US1] {Claude} Run T006–T011 + full suite, ASan, and record results; iterate with Codex on failures.
 - [ ] T020 [US1] {Claude} Measure US1 flash/RAM delta and update `docs/traceability/005-embedded-profile-completion.md` (file/test maps + size).
 

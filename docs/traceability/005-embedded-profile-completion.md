@@ -14,7 +14,7 @@ Facet (§6.6.17) + `Base Info Type System` CU. Status: `profile-targeting` (CTT 
 |---|---|---|---|---|
 | `Monitored Items Deadband Filter` (Std DataChange) — absolute deadband | OPC-10000-4 §7.22.2 (DeadbandType=Absolute) | `src/services/subscription.c` (T013 eval), `src/core/service_dispatch.c` (T017 decode) | `test_subscriptions.c::test_monitored_item_absolute_deadband` | DONE |
 | `Monitor MinQueueSize_02` (Std DataChange) — queue ≥2 + discardOldest + overflow | OPC-10000-4 §5.13.2, §7.20.1 (overflow) | `src/services/subscription.c` (T014), `src/core/service_dispatch.c` | `test_subscriptions.c::test_monitored_item_queue_overflow` | DONE |
-| `Monitor Triggering` (Std DataChange) — SetTriggering | OPC-10000-4 §5.13.5 | `src/services/subscription.c`, `src/core/service_dispatch.c` | `tests/integration/test_subscriptions.c` (triggering) | pending |
+| `Monitor Triggering` (Std DataChange) — SetTriggering | OPC-10000-4 §5.13.5, §5.13.1.6 | `src/services/subscription.c` (T015), `src/core/service_dispatch.c` (T018) | `test_subscriptions.c::test_set_triggering` | DONE |
 | `Monitor Items 10` / `Monitor Items 100` (Std DataChange) | OPC-10000-4 §5.13.2 | `src/services/subscription.{c,h}`, `Makefile`/CMake `-D` | `tests/integration/test_subscriptions.c` (capacity) | pending |
 | `Subscription Minimum 02` / `Subscription Publish Min 05` (Std DataChange) | OPC-10000-4 §5.14.2, §5.14.5 | `src/services/subscription.{c,h}`, build `-D` | `tests/integration/test_subscriptions.c` (capacity) | pending |
 | `Method Call` (Std DataChange 2017) — Call service | OPC-10000-4 §5.11 | `src/core/service_dispatch.c` | `tests/integration/test_method_call.c` | pending |
