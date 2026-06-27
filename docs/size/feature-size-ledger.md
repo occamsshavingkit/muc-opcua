@@ -1,86 +1,91 @@
 # Feature Size Ledger
 
-Measured footprint of the micro-opcua server. The library holds **no mutable
-global state** (`.data` and `.bss` are zero in every translation unit), so all
-RAM is caller-provided; "Heap" is zero everywhere (no `malloc` in the protocol
-path).
+Measured footprint of the micro-opcua server across the three build profiles. The
+library holds **no mutable global state** (`.data` and `.bss` are zero in every
+translation unit), so all RAM is caller-provided; "Heap" is zero everywhere (no
+`malloc` in the protocol path).
 
-- **Measured**: 2026-06-26
-- **Toolchain**: `arm-none-eabi-gcc` 13.2.1 (RP2040 / Pico SDK), `gcc` (host)
-- **How**: `arm-none-eabi-size` over the `micro_opcua` objects and the example
-  ELF; `sizeof(struct mu_server)` from the headers. Reproduce with
-  `cmake -DMICRO_OPCUA_PLATFORM=pico -DMICRO_OPCUA_BUILD_EXAMPLES=ON` then
-  `arm-none-eabi-size`.
+- **Measured**: 2026-06-27 (Micro profile complete: subscriptions + ≥2 sessions)
+- **Toolchain**: `arm-none-eabi-gcc` 13.2.1 (RP2040, Cortex-M0+), `gcc` (host)
+- **How**: cross-compile the portable core (`src/**/*.c` minus the host POSIX/OpenSSL
+  adapters) with `-Os -mcpu=cortex-m0plus -mthumb -ffunction-sections -fdata-sections`,
+  sum `.text` with `size -t`; `sizeof(struct mu_server)` from the headers. Profiles map
+  to `make nano` / `make micro` / `make embedded` (the `MICRO_OPCUA_*` options).
 
-## Summary
+## Summary — core library `.text` (flash), ARM Cortex-M0+ Thumb `-Os`
 
-| Build | Flash | RAM (static) | RAM (peak stack) | Heap |
-|---|---|---|---|---|
-| RP2040 — micro-opcua **core library** | 14.5 KiB | 0 B | — | 0 |
-| RP2040 — **minimal example** (core + Pico SDK + tinyusb/stdio) | ~41 KiB | ~24.9 KiB | ~5 KiB | 0 |
-| Host — minimal example (host libc) | ~46.5 KiB | ~20.5 KiB | ~5 KiB | 0 |
+| Profile | Services | Core `.text` | vs nano | `.data` | `.bss` | Heap |
+|---|---|---|---|---|---|---|
+| **nano** | Core + View + Read, None | **16.9 KiB** (17,283 B) | — | 0 | 0 | 0 |
+| **micro** | nano + Data-Change Subscriptions | **23.6 KiB** (24,200 B) | +6.7 KiB | 0 | 0 | 0 |
+| **embedded** | micro + Basic256Sha256 | **27.7 KiB** (28,330 B) | +10.8 KiB | 0 | 0 | 0 |
 
-## Breakdown (RP2040)
+- **Subscriptions (Micro)** cost **~6.7 KiB** of flash — the engine object
+  `subscription.c` is ~4.4 KiB; the rest is the Subscription/MonitoredItem dispatch
+  handlers + DataChangeNotification encoding.
+- **Basic256Sha256** adds a further **~4.1 KiB** of portable crypto (key derivation,
+  asym/sym chunk, certificate). The host build additionally links an OpenSSL adapter; an
+  MCU replaces it with a smaller mbedTLS/PSA backend.
 
-### Flash
-- micro-opcua core (all `src/**/*.c`): **14,841 B (14.5 KiB)** text, 0 data, 0 bss.
-- Full example ELF: **41,908 B** text — the remaining ~27 KiB is the Pico SDK
-  runtime (tinyusb, stdio_usb, newlib, crt0), which the budget excludes.
+## RAM (all caller-provided; the library adds 0 static RAM)
 
-### RAM
-All caller-provided; the library itself adds 0 static RAM.
-- Per-server context `sizeof(struct mu_server)`: **344 B** (config struct = 200 B).
-  `MU_SERVER_STORAGE_BYTES` default (1024) is ample; the example over-allocates 4096.
-- Default RX + TX transport buffers: **2 × 8192 = 16 KiB** (`MU_MIN_CHUNK_SIZE`).
-- **Static RAM for the protocol ≈ 16.3 KiB** (344 B context + 16 KiB buffers).
-- Peak stack: a `Read`/`Browse` uses **~4.9 KiB** of stack arrays
-  (`MU_DISPATCH_MAX_READ_NODES=32`, browse refs 32). Transient, not static.
-- **Total RAM (static + peak stack) ≈ 21 KiB.**
+| Profile | `sizeof(struct mu_server)` | `MU_SERVER_STORAGE_BYTES` | + RX/TX buffers |
+|---|---|---|---|
+| nano | **672 B** | 1024 | 2 × 8192 = 16 KiB |
+| micro | **2784 B** | 3072 | 2 × 8192 = 16 KiB |
+| embedded | **2952 B** | 3072 | 2 × 8192 = 16 KiB |
+
+- The subscription engine adds **~2.1 KiB** to the server context (fixed-size
+  subscription / MonitoredItem / parked-Publish arrays; capacities are `-D`-overridable:
+  `MU_MAX_SUBSCRIPTIONS`=2, `MU_MAX_MONITORED_ITEMS`=8, `MU_MAX_PUBLISH_REQUESTS`=4).
+  `MU_SERVER_STORAGE_BYTES` is raised to 3072 automatically when
+  `MICRO_OPCUA_SUBSCRIPTIONS` is defined.
+- **Static RAM for the protocol ≈ 16.7 KiB (nano) / 18.7 KiB (micro/embedded)**
+  (context + the two 8 KiB transport buffers).
+- Peak stack: **~5.5 KiB** plaintext (Read/Browse with the 32-deep dispatch arrays);
+  **~12 KiB** on the secured path (response buffer + dispatch arrays). A secure build
+  should provision ≥ 16 KiB of stack.
 
 ### Heap
 - **0 bytes.** No `malloc` in the protocol hot path; storage and buffers are
-  caller-owned.
+  caller-owned. The subscription engine is fixed-size, no allocation.
 
 ## Budget (specs/001-minimal-embedded-server/plan.md)
 
-| Budget | Target | Measured | Status |
+| Budget | Target | Measured (micro) | Status |
 |---|---|---|---|
-| Flash (core + example, excl. board TCP/IP) | ≤ 128 KiB | ~15 KiB core / ~41 KiB image | ✅ well under |
-| RAM (static + peak stack, excl. platform TCP/IP buffers) | ≤ 32 KiB | ~21 KiB | ✅ under |
+| Flash (core, excl. board TCP/IP + crypto backend) | ≤ 128 KiB | ~23.6 KiB | ✅ well under |
+| RAM (static + peak stack, excl. platform TCP/IP buffers) | ≤ 32 KiB | ~19 KiB + stack | ✅ under |
 | Heap | no mandatory heap | 0 | ✅ |
 
-On the RP2040's 264 KiB RAM this leaves roughly **240 KiB** for the application
-and network stack.
+On the RP2040's 264 KiB RAM, a full Micro-profile server (subscriptions + ≥2 sessions)
+leaves roughly **240 KiB** for the application and network stack.
 
-## SecurityPolicy (optional, `MICRO_OPCUA_SECURITY`)
+## Host reference (x86-64, `gcc -Os`)
 
-Basic256Sha256 support is a compile-time option (default ON). Turn it OFF for a
-SecurityPolicy-None-only build to drop the crypto layer entirely — no asym/sym
-chunk code, key derivation, certificate handling, or crypto adapter is compiled.
+Host figures are inflated by libc/printf/the POSIX TCP adapter (and OpenSSL for
+embedded) and are *not* representative of an MCU; included for CI comparison.
 
-| Build | `libmicro_opcua.a` `.text` (host gcc) | Crypto objects linked |
+| Profile | `libmicro_opcua.a` `.text` | `minimal_server` ELF `.text` |
 |---|---|---|
-| `MICRO_OPCUA_SECURITY=OFF` (None only) | **~38.0 KiB** | none |
-| `MICRO_OPCUA_SECURITY=ON` (default) | **~52.8 KiB** | asym/sym chunk, KDF, cert, host adapter |
+| nano | ~32 KiB | ~36 KiB |
+| micro | ~43 KiB | ~47 KiB |
+| embedded | ~54 KiB | ~63 KiB |
 
-So the security layer costs **~14.8 KiB of code** on the host build (the portable
-`asym_chunk`/`sym_chunk`/`key_derivation`/`certificate` part is ~9.6 KiB; the rest
-is the host OpenSSL adapter, which an embedded target replaces with a smaller
-mbedTLS/PSA backend).
+## Secured-path stack (after in-place decrypt)
 
-### Secured-path stack (after in-place decrypt)
-MSG chunks are decrypted in place in the receive buffer, so the secured request
-path no longer copies into multi-KiB scratch. Measured frames (`-fstack-usage`,
-host gcc): `handle_data_chunk_secure` **6.5 KiB** (`respbody[5120]` + a 1 KiB OPN
-buffer), `mu_sym_chunk_unwrap` **176 B** (was ~8.3 KiB). **Peak secured-path stack
-≈ 12 KiB** (during a Read/Browse dispatch: the response buffer plus the 32-deep
-`nodes`/`results`/`ref_pool` arrays), down from ~25 KiB. This is present only when
-a crypto adapter is configured; the None path peaks at ~5.5 KiB. **A secure build
-should provision ≥ 16 KiB of stack.**
+MSG chunks are decrypted in place in the receive buffer, so the secured request path
+does not copy into multi-KiB scratch. Measured frames (`-fstack-usage`, host gcc):
+`handle_data_chunk_secure` **6.5 KiB** (`respbody[5120]` + a 1 KiB OPN buffer),
+`mu_sym_chunk_unwrap` **176 B** (was ~8.3 KiB). **Peak secured-path stack ≈ 12 KiB**
+(during a Read/Browse dispatch: the response buffer plus the 32-deep
+`nodes`/`results`/`ref_pool` arrays), down from ~25 KiB. Present only when a crypto
+adapter is configured; the None path peaks at ~5.5 KiB.
 
 ## Notes
-- The ~4.9 KiB peak stack grew from ~2 KiB when `MU_DISPATCH_MAX_READ_NODES` was
-  raised 8 → 32 to accept the OPC Foundation .NET client's batch OperationLimits
-  read. Levers if stack-constrained: move the batch arrays into the (static)
-  server context, or lower the cap and advertise a real `MaxNodesPerRead`.
-- The example's `g_server_storage` is 4096 B but only 344 B are used.
+- `.text` figures predating 2026-06-27 (e.g. a 14.5 KiB core) were measured before the
+  Nano View Service Set + Base Information node set were completed; nano core is now
+  16.9 KiB.
+- Levers if RAM/stack-constrained: lower the `MU_MAX_*` subscription capacities, shrink
+  `MU_RETRANSMIT_BYTES` (Republish buffer, 256 B/subscription), or lower
+  `MU_DISPATCH_MAX_READ_NODES` (32) and advertise a smaller `MaxNodesPerRead`.
