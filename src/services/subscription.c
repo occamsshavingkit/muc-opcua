@@ -37,6 +37,39 @@ static opcua_uint32_t allocate_subscription_id(mu_subscriptions_t *subs)
     return 0u;
 }
 
+static bool monitored_item_id_in_use(const mu_subscriptions_t *subs,
+                                     opcua_uint32_t monitored_item_id)
+{
+    for (size_t i = 0; i < MU_MAX_MONITORED_ITEMS; ++i) {
+        const mu_monitored_item_t *item = &subs->monitored_items[i];
+        if (item->in_use && item->monitored_item_id == monitored_item_id) {
+            return true;
+        }
+    }
+    return false;
+}
+
+static opcua_uint32_t allocate_monitored_item_id(mu_subscriptions_t *subs)
+{
+    for (size_t i = 0; i <= MU_MAX_MONITORED_ITEMS; ++i) {
+        opcua_uint32_t id = subs->next_monitored_item_id;
+        if (id == 0u) {
+            id = 1u;
+        }
+
+        subs->next_monitored_item_id = id + 1u;
+        if (subs->next_monitored_item_id == 0u) {
+            subs->next_monitored_item_id = 1u;
+        }
+
+        if (!monitored_item_id_in_use(subs, id)) {
+            return id;
+        }
+    }
+
+    return 0u;
+}
+
 void mu_subscriptions_init(mu_subscriptions_t *subs)
 {
     if (subs != NULL) {
@@ -157,6 +190,63 @@ opcua_statuscode_t mu_subscription_delete(mu_subscriptions_t *subs,
 
     memset(sub, 0, sizeof(*sub));
     return MU_STATUS_GOOD;
+}
+
+opcua_statuscode_t mu_monitored_item_alloc(mu_subscriptions_t *subs,
+                                           opcua_uint32_t subscription_id,
+                                           mu_monitored_item_t **out_item)
+{
+    if (subs == NULL || out_item == NULL) {
+        return MU_STATUS_BAD_INTERNALERROR;
+    }
+
+    *out_item = NULL;
+
+    mu_monitored_item_t *slot = NULL;
+    for (size_t i = 0; i < MU_MAX_MONITORED_ITEMS; ++i) {
+        if (!subs->monitored_items[i].in_use) {
+            slot = &subs->monitored_items[i];
+            break;
+        }
+    }
+
+    if (slot == NULL) {
+        return MU_STATUS_BAD_TOOMANYMONITOREDITEMS;
+    }
+
+    opcua_uint32_t monitored_item_id = allocate_monitored_item_id(subs);
+    if (monitored_item_id == 0u) {
+        return MU_STATUS_BAD_TOOMANYMONITOREDITEMS;
+    }
+
+    memset(slot, 0, sizeof(*slot));
+    slot->in_use = true;
+    slot->subscription_id = subscription_id;
+    slot->monitored_item_id = monitored_item_id;
+
+    *out_item = slot;
+    return MU_STATUS_GOOD;
+}
+
+opcua_statuscode_t mu_monitored_item_delete(mu_subscriptions_t *subs,
+                                            opcua_uint32_t subscription_id,
+                                            opcua_uint32_t monitored_item_id)
+{
+    if (subs == NULL) {
+        return MU_STATUS_BAD_INTERNALERROR;
+    }
+
+    for (size_t i = 0; i < MU_MAX_MONITORED_ITEMS; ++i) {
+        mu_monitored_item_t *item = &subs->monitored_items[i];
+        if (item->in_use &&
+            item->subscription_id == subscription_id &&
+            item->monitored_item_id == monitored_item_id) {
+            memset(item, 0, sizeof(*item));
+            return MU_STATUS_GOOD;
+        }
+    }
+
+    return MU_STATUS_BAD_MONITOREDITEMIDINVALID;
 }
 
 void mu_subscriptions_tick(struct mu_server *server, opcua_uint64_t now_ms)

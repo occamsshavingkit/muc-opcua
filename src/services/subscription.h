@@ -161,6 +161,20 @@ mu_subscription_t *mu_subscription_find(mu_subscriptions_t *subs,
                                         opcua_uint32_t session_id,
                                         opcua_uint32_t subscription_id);
 
+/* Allocate a MonitoredItem slot under a subscription (OPC 10000-4 §5.13.2). Assigns a
+   unique non-zero monitored_item_id and records the owning subscription; returns
+   Bad_TooManyMonitoredItems when the array is full. The caller fills the node/attribute/
+   parameters and the initial sample into the returned slot. */
+opcua_statuscode_t mu_monitored_item_alloc(mu_subscriptions_t *subs,
+                                           opcua_uint32_t subscription_id,
+                                           mu_monitored_item_t **out_item);
+
+/* Delete a MonitoredItem under a subscription (OPC 10000-4 §5.13.6). Returns
+   Bad_MonitoredItemIdInvalid for an unknown id. */
+opcua_statuscode_t mu_monitored_item_delete(mu_subscriptions_t *subs,
+                                            opcua_uint32_t subscription_id,
+                                            opcua_uint32_t monitored_item_id);
+
 /* Poll-driven sampling + publishing-timer advance. Called once per mu_server_poll with
    the current monotonic tick. Samples due MonitoredItems, fires due publishing timers,
    and emits parked Publish responses (US2/US3). A no-op until those land. */

@@ -51,12 +51,12 @@ All subscription code is gated by `MICRO_OPCUA_SUBSCRIPTIONS`.
 
 ## US2 — MonitoredItems + data-change sampling (P1)
 
-- [ ] T006 [Claude-test] Integration test: CreateMonitoredItems on a subscription for
+- [X] T006 [Claude-test] Integration test: CreateMonitoredItems on a subscription for
   `ServerStatus.CurrentTime`(i=2258, Value attribute) returns a MonitoredItemCreateResult
   with Good, a non-zero `monitoredItemId`, and a revised sampling interval; an unknown
   NodeId → `Bad_NodeIdUnknown`; exceeding `MU_MAX_MONITORED_ITEMS` →
   `Bad_TooManyMonitoredItems`. (OPC refs: OPC 10000-4 §5.13.2, §7.21)
-- [ ] T007 [Codex-impl] Implement `CreateMonitoredItems` (data-change monitoring mode
+- [X] T007 [Codex-impl] Implement `CreateMonitoredItems` (data-change monitoring mode
   only): decode `itemsToCreate[]` (ReadValueId + MonitoringParameters §7.21 + optional
   DataChangeFilter §7.17), bind each to a node/attribute via the address space, take the
   initial sample into `last_value`, assign `monitoredItemId`; operation results per
@@ -74,10 +74,10 @@ All subscription code is gated by `MICRO_OPCUA_SUBSCRIPTIONS`.
   update `last_value` on change; advance the per-item sampling timer. Call the tick from
   `mu_server_poll`. (OPC refs: OPC 10000-4 §5.12.1.6, §7.17.2)
 
-- [ ] T010 [Claude-test] Integration test: DeleteMonitoredItems removes an item (Good);
+- [X] T010 [Claude-test] Integration test: DeleteMonitoredItems removes an item (Good);
   unknown id → `Bad_MonitoredItemIdInvalid`; unknown subscription →
   `Bad_SubscriptionIdInvalid`. (OPC refs: OPC 10000-4 §5.13.6)
-- [ ] T011 [Codex-impl] Implement `DeleteMonitoredItems` + wiring +
+- [X] T011 [Codex-impl] Implement `DeleteMonitoredItems` + wiring +
   `DeleteMonitoredItemsRequest/Response` IDs. (OPC refs: OPC 10000-4 §5.13.6)
 
 ## US3 — Publish / keep-alive / Republish (P1)

@@ -21,9 +21,11 @@ const char* mu_status_name(opcua_statuscode_t status)
         case MU_STATUS_BAD_SESSIONIDINVALID: return "Bad_SessionIdInvalid";
         case MU_STATUS_BAD_IDENTITYTOKENINVALID: return "Bad_IdentityTokenInvalid";
         case MU_STATUS_BAD_NODEIDUNKNOWN: return "Bad_NodeIdUnknown";
+        case MU_STATUS_BAD_MONITOREDITEMIDINVALID: return "Bad_MonitoredItemIdInvalid";
         case MU_STATUS_BAD_ATTRIBUTEIDINVALID: return "Bad_AttributeIdInvalid";
         case MU_STATUS_BAD_TOOMANYOPERATIONS: return "Bad_TooManyOperations";
         case MU_STATUS_BAD_NOCONTINUATIONPOINTS: return "Bad_NoContinuationPoints";
+        case MU_STATUS_BAD_TOOMANYMONITOREDITEMS: return "Bad_TooManyMonitoredItems";
         case MU_STATUS_BAD_TOOMANYSUBSCRIPTIONS: return "Bad_TooManySubscriptions";
         case MU_STATUS_BAD_SUBSCRIPTIONIDINVALID: return "Bad_SubscriptionIdInvalid";
         case MU_STATUS_BAD_NOTHINGTODO: return "Bad_NothingToDo";

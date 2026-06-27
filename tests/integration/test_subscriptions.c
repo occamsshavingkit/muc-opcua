@@ -26,8 +26,15 @@
 #define ID_DELETESUBSCRIPTIONSREQUEST  847
 #define ID_DELETESUBSCRIPTIONSRESPONSE 850
 #define ID_SERVICEFAULT                397
+#define ID_CREATEMONITOREDITEMSREQUEST  751
+#define ID_CREATEMONITOREDITEMSRESPONSE 754
+#define ID_DELETEMONITOREDITEMSREQUEST  781
+#define ID_DELETEMONITOREDITEMSRESPONSE 784
 #define STATUS_BAD_TOOMANYSUBSCRIPTIONS  0x80DD0000u
 #define STATUS_BAD_SUBSCRIPTIONIDINVALID 0x80280000u
+#define STATUS_BAD_NODEIDUNKNOWN         0x80340000u
+#define STATUS_BAD_TOOMANYMONITOREDITEMS 0x80DB0000u
+#define STATUS_BAD_MONITOREDITEMIDINVALID 0x80420000u
 
 void setUp(void) {}
 void tearDown(void) {}
@@ -35,7 +42,7 @@ void tearDown(void) {}
 #define MAX_INBOUND 16
 typedef struct {
     int accept_count;
-    opcua_byte_t inbound[MAX_INBOUND][512];
+    opcua_byte_t inbound[MAX_INBOUND][1024];
     size_t inbound_len[MAX_INBOUND];
     size_t inbound_count, read_index;
     opcua_byte_t last_write[8192];
@@ -143,6 +150,33 @@ static void enqueue_create_subscription(mock_t *mock, opcua_uint32_t seq,
     mu_binary_write_boolean(&w, true);      /* publishingEnabled */
     mu_binary_write_byte(&w, 0);            /* priority */
     clen = build_msg(chunk, sizeof(chunk), seq, seq, tmp, w.position); enqueue(mock, chunk, clen);
+}
+
+/* Write one MonitoredItemCreateRequest (Value attribute, Reporting mode, null filter). */
+static void write_moncreate_item(mu_binary_writer_t *w, opcua_uint16_t ns, opcua_uint32_t ident,
+                                 opcua_uint32_t client_handle, opcua_double_t interval) {
+    mu_nodeid_t n = { ns, MU_NODEID_NUMERIC, { ident } };
+    mu_binary_write_nodeid(w, &n);          /* itemToMonitor.nodeId */
+    mu_binary_write_uint32(w, 13);          /* attributeId = Value */
+    { mu_string_t nul = {-1,NULL}; mu_binary_write_string(w, &nul); }   /* indexRange */
+    mu_binary_write_uint16(w, 0);           /* dataEncoding.namespaceIndex */
+    { mu_string_t nul = {-1,NULL}; mu_binary_write_string(w, &nul); }   /* dataEncoding.name */
+    mu_binary_write_uint32(w, 2);           /* monitoringMode = Reporting */
+    mu_binary_write_uint32(w, client_handle);
+    mu_binary_write_double(w, interval);    /* samplingInterval */
+    { mu_nodeid_t nul = {0,MU_NODEID_NUMERIC,{0}}; mu_binary_write_extension_object_header(w, &nul, 0); } /* filter (null) */
+    mu_binary_write_uint32(w, 1);           /* queueSize */
+    mu_binary_write_boolean(w, true);       /* discardOldest */
+}
+
+/* Read one MonitoredItemCreateResult: returns the statusCode and outputs the id. */
+static opcua_statuscode_t read_moncreate_result(mu_binary_reader_t *body, opcua_uint32_t *id) {
+    opcua_statuscode_t st; mu_binary_read_statuscode(body, &st);
+    mu_binary_read_uint32(body, id);
+    opcua_double_t revised; mu_binary_read_double(body, &revised);
+    opcua_uint32_t q; mu_binary_read_uint32(body, &q);
+    mu_nodeid_t ft; size_t fl; mu_binary_read_extension_object_header(body, &ft, &fl); /* filterResult */
+    return st;
 }
 
 static mu_server_t *make_server(mock_t *mock, opcua_byte_t *storage, size_t storage_size, mu_server_config_t *config) {
@@ -269,10 +303,144 @@ void test_delete_subscriptions(void) {
     TEST_ASSERT_EQUAL_HEX32(STATUS_BAD_SUBSCRIPTIONIDINVALID, r1);
 }
 
+/* CreateMonitoredItems (OPC 10000-4 §5.13.2): a data MonitoredItem on a valid base node
+   (ServerStatus.CurrentTime, i=2258, Value) succeeds with a non-zero monitoredItemId; an
+   unknown NodeId yields per-op Bad_NodeIdUnknown (§5.13.2.4). */
+void test_create_monitored_items(void) {
+    mock_t mock; memset(&mock, 0, sizeof(mock));
+    enqueue_connect(&mock);
+    enqueue_create_subscription(&mock, 4, 1000.0, 100, 10);
+
+    opcua_byte_t storage[MU_SERVER_STORAGE_BYTES]; mu_server_config_t config;
+    mu_server_t *server = make_server(&mock, storage, sizeof(storage), &config);
+    mu_binary_reader_t body; opcua_statuscode_t sr;
+
+    run_connect(server);
+    mu_server_poll(server); /* CreateSubscription */
+    TEST_ASSERT_EQUAL(ID_CREATESUBSCRIPTIONRESPONSE, parse_response(mock.last_write, mock.last_write_len, &body, &sr));
+    opcua_uint32_t sub_id; mu_binary_read_uint32(&body, &sub_id);
+
+    /* CreateMonitoredItems (seq 5): subscriptionId, timestampsToReturn=Neither, two items. */
+    opcua_byte_t tmp[1024], chunk[1024]; mu_binary_writer_t w; size_t clen;
+    mu_binary_writer_init(&w, tmp, sizeof(tmp));
+    { mu_nodeid_t t={0,MU_NODEID_NUMERIC,{ID_CREATEMONITOREDITEMSREQUEST}}; mu_binary_write_nodeid(&w,&t); }
+    write_request_header(&w, 12345, 5);
+    mu_binary_write_uint32(&w, sub_id);
+    mu_binary_write_uint32(&w, 3);          /* timestampsToReturn = Neither */
+    mu_binary_write_int32(&w, 2);           /* itemsToCreate count */
+    write_moncreate_item(&w, 0, 2258, 42, 500.0);   /* valid: ServerStatus.CurrentTime */
+    write_moncreate_item(&w, 5, 9999, 43, 500.0);   /* unknown node */
+    clen = build_msg(chunk, sizeof(chunk), 5, 5, tmp, w.position); enqueue(&mock, chunk, clen);
+
+    mu_server_poll(server); /* CreateMonitoredItems */
+    TEST_ASSERT_EQUAL(ID_CREATEMONITOREDITEMSRESPONSE, parse_response(mock.last_write, mock.last_write_len, &body, &sr));
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, sr);
+    opcua_int32_t nres; mu_binary_read_int32(&body, &nres);
+    TEST_ASSERT_EQUAL(2, nres);
+    opcua_uint32_t id0, id1;
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, read_moncreate_result(&body, &id0));
+    TEST_ASSERT_NOT_EQUAL(0, id0);
+    TEST_ASSERT_EQUAL_HEX32(STATUS_BAD_NODEIDUNKNOWN, read_moncreate_result(&body, &id1));
+}
+
+/* The (default MU_MAX_MONITORED_ITEMS = 8)+1-th item in one request is rejected per-op
+   with Bad_TooManyMonitoredItems (OPC 10000-4 §5.13.2.4). */
+void test_create_monitored_items_too_many(void) {
+    mock_t mock; memset(&mock, 0, sizeof(mock));
+    enqueue_connect(&mock);
+    enqueue_create_subscription(&mock, 4, 1000.0, 100, 10);
+
+    opcua_byte_t storage[MU_SERVER_STORAGE_BYTES]; mu_server_config_t config;
+    mu_server_t *server = make_server(&mock, storage, sizeof(storage), &config);
+    mu_binary_reader_t body; opcua_statuscode_t sr;
+
+    run_connect(server);
+    mu_server_poll(server); /* CreateSubscription */
+    TEST_ASSERT_EQUAL(ID_CREATESUBSCRIPTIONRESPONSE, parse_response(mock.last_write, mock.last_write_len, &body, &sr));
+    opcua_uint32_t sub_id; mu_binary_read_uint32(&body, &sub_id);
+
+    const opcua_int32_t n_items = 9; /* one past the default cap of 8 */
+    opcua_byte_t tmp[1024], chunk[1024]; mu_binary_writer_t w; size_t clen;
+    mu_binary_writer_init(&w, tmp, sizeof(tmp));
+    { mu_nodeid_t t={0,MU_NODEID_NUMERIC,{ID_CREATEMONITOREDITEMSREQUEST}}; mu_binary_write_nodeid(&w,&t); }
+    write_request_header(&w, 12345, 5);
+    mu_binary_write_uint32(&w, sub_id);
+    mu_binary_write_uint32(&w, 3);
+    mu_binary_write_int32(&w, n_items);
+    for (opcua_int32_t i = 0; i < n_items; ++i) write_moncreate_item(&w, 0, 2258, (opcua_uint32_t)i, 500.0);
+    clen = build_msg(chunk, sizeof(chunk), 5, 5, tmp, w.position); enqueue(&mock, chunk, clen);
+
+    mu_server_poll(server); /* CreateMonitoredItems */
+    TEST_ASSERT_EQUAL(ID_CREATEMONITOREDITEMSRESPONSE, parse_response(mock.last_write, mock.last_write_len, &body, &sr));
+    opcua_int32_t nres; mu_binary_read_int32(&body, &nres);
+    TEST_ASSERT_EQUAL(n_items, nres);
+    opcua_uint32_t id;
+    for (opcua_int32_t i = 0; i < n_items - 1; ++i)
+        TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, read_moncreate_result(&body, &id));
+    TEST_ASSERT_EQUAL_HEX32(STATUS_BAD_TOOMANYMONITOREDITEMS, read_moncreate_result(&body, &id));
+}
+
+/* DeleteMonitoredItems (OPC 10000-4 §5.13.6): removing a created item is Good per-op; an
+   unknown monitoredItemId yields per-op Bad_MonitoredItemIdInvalid. */
+void test_delete_monitored_items(void) {
+    mock_t mock; memset(&mock, 0, sizeof(mock));
+    enqueue_connect(&mock);
+    enqueue_create_subscription(&mock, 4, 1000.0, 100, 10);
+
+    opcua_byte_t storage[MU_SERVER_STORAGE_BYTES]; mu_server_config_t config;
+    mu_server_t *server = make_server(&mock, storage, sizeof(storage), &config);
+    mu_binary_reader_t body; opcua_statuscode_t sr;
+
+    run_connect(server);
+    mu_server_poll(server); /* CreateSubscription */
+    TEST_ASSERT_EQUAL(ID_CREATESUBSCRIPTIONRESPONSE, parse_response(mock.last_write, mock.last_write_len, &body, &sr));
+    opcua_uint32_t sub_id; mu_binary_read_uint32(&body, &sub_id);
+
+    /* CreateMonitoredItems (seq 5): one valid item. */
+    opcua_byte_t tmp[1024], chunk[1024]; mu_binary_writer_t w; size_t clen;
+    mu_binary_writer_init(&w, tmp, sizeof(tmp));
+    { mu_nodeid_t t={0,MU_NODEID_NUMERIC,{ID_CREATEMONITOREDITEMSREQUEST}}; mu_binary_write_nodeid(&w,&t); }
+    write_request_header(&w, 12345, 5);
+    mu_binary_write_uint32(&w, sub_id);
+    mu_binary_write_uint32(&w, 3);
+    mu_binary_write_int32(&w, 1);
+    write_moncreate_item(&w, 0, 2258, 42, 500.0);
+    clen = build_msg(chunk, sizeof(chunk), 5, 5, tmp, w.position); enqueue(&mock, chunk, clen);
+
+    mu_server_poll(server); /* CreateMonitoredItems */
+    TEST_ASSERT_EQUAL(ID_CREATEMONITOREDITEMSRESPONSE, parse_response(mock.last_write, mock.last_write_len, &body, &sr));
+    opcua_int32_t nres; mu_binary_read_int32(&body, &nres); TEST_ASSERT_EQUAL(1, nres);
+    opcua_uint32_t item_id; read_moncreate_result(&body, &item_id);
+
+    /* DeleteMonitoredItems (seq 6): subscriptionId + [ item_id, 0xBEEF ]. */
+    mu_binary_writer_init(&w, tmp, sizeof(tmp));
+    { mu_nodeid_t t={0,MU_NODEID_NUMERIC,{ID_DELETEMONITOREDITEMSREQUEST}}; mu_binary_write_nodeid(&w,&t); }
+    write_request_header(&w, 12345, 6);
+    mu_binary_write_uint32(&w, sub_id);
+    mu_binary_write_int32(&w, 2);
+    mu_binary_write_uint32(&w, item_id);
+    mu_binary_write_uint32(&w, 0xBEEFu);
+    clen = build_msg(chunk, sizeof(chunk), 6, 6, tmp, w.position); enqueue(&mock, chunk, clen);
+
+    mu_server_poll(server); /* DeleteMonitoredItems */
+    TEST_ASSERT_EQUAL(ID_DELETEMONITOREDITEMSRESPONSE, parse_response(mock.last_write, mock.last_write_len, &body, &sr));
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, sr);
+    opcua_int32_t ndel; mu_binary_read_int32(&body, &ndel);
+    TEST_ASSERT_EQUAL(2, ndel);
+    opcua_statuscode_t d0, d1;
+    mu_binary_read_statuscode(&body, &d0);
+    mu_binary_read_statuscode(&body, &d1);
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, d0);
+    TEST_ASSERT_EQUAL_HEX32(STATUS_BAD_MONITOREDITEMIDINVALID, d1);
+}
+
 int main(void) {
     UNITY_BEGIN();
     RUN_TEST(test_create_subscription);
     RUN_TEST(test_create_subscription_too_many);
     RUN_TEST(test_delete_subscriptions);
+    RUN_TEST(test_create_monitored_items);
+    RUN_TEST(test_create_monitored_items_too_many);
+    RUN_TEST(test_delete_monitored_items);
     return UNITY_END();
 }
