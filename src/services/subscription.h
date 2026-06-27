@@ -175,6 +175,14 @@ opcua_statuscode_t mu_monitored_item_delete(mu_subscriptions_t *subs,
                                             opcua_uint32_t subscription_id,
                                             opcua_uint32_t monitored_item_id);
 
+/* Park a Publish request for asynchronous completion by the publishing timer
+   (OPC 10000-4 §5.14.5). Returns Bad_TooManyPublishRequests when the queue is full. */
+opcua_statuscode_t mu_publish_request_enqueue(mu_subscriptions_t *subs,
+                                              opcua_uint32_t session_id,
+                                              opcua_uint32_t request_id,
+                                              opcua_uint32_t request_handle,
+                                              opcua_uint64_t now_ms);
+
 /* Poll-driven sampling + publishing-timer advance. Called once per mu_server_poll with
    the current monotonic tick. Samples due MonitoredItems, fires due publishing timers,
    and emits parked Publish responses (US2/US3). A no-op until those land. */

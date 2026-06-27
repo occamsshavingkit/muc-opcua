@@ -82,24 +82,24 @@ All subscription code is gated by `MICRO_OPCUA_SUBSCRIPTIONS`.
 
 ## US3 — Publish / keep-alive / Republish (P1)
 
-- [ ] T012 [Claude-test] Integration test: with a subscription + a monitored item, a
+- [X] T012 [Claude-test] Integration test: with a subscription + a monitored item, a
   PublishRequest with no pending data is parked (no immediate response); after a value
   change and enough `mu_server_poll` iterations to cross the publishing interval, a
   PublishResponse arrives carrying a DataChangeNotification with the item's
   `clientHandle` and new value, `moreNotifications=false`, an incrementing
   `sequenceNumber`, and `availableSequenceNumbers`. (OPC refs: OPC 10000-4 §5.14.5, §7.20)
-- [ ] T013 [Codex-impl] Implement the Publish request queue + async delivery: park
+- [X] T013 [Codex-impl] Implement the Publish request queue + async delivery: park
   requests in `mu_subscriptions`, build/encode DataChangeNotification NotificationMessages
   in `mu_subscriptions_tick` and emit PublishResponses over the owning connection's
   secure channel, retain the message for Republish; `Bad_TooManyPublishRequests` when the
   queue is full. Handler + table/switch (Publish 826/829 exist). This is the one
   asynchronous service — the send/framing path must be reachable from the tick.
   (OPC refs: OPC 10000-4 §5.14.5, §5.14.1.1, §7.20)
-- [ ] T014 [Claude-test] Integration test: with no data changes, after
+- [X] T014 [Claude-test] Integration test: with no data changes, after
   `max_keep_alive_count` publishing intervals a **keep-alive** PublishResponse (empty
   NotificationMessage, sequence number unchanged) is sent for a parked request.
   (OPC refs: OPC 10000-4 §5.14.1.1, §5.14.1.2)
-- [ ] T015 [Codex-impl] Implement keep-alive emission and the keep-alive/lifetime
+- [X] T015 [Codex-impl] Implement keep-alive emission and the keep-alive/lifetime
   counter state machine in `mu_subscriptions_tick`. (OPC refs: OPC 10000-4 §5.14.1.2)
 
 - [ ] T016 [Claude-test] Integration test: SubscriptionAcknowledgements in a PublishRequest

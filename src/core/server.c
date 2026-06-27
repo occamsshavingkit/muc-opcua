@@ -6,9 +6,6 @@
 #include "service_message.h"
 #include "uasc.h"
 #include "../services/secure_channel.h"
-#if MICRO_OPCUA_SUBSCRIPTIONS
-#include "../services/subscription.c"
-#endif
 #ifdef MICRO_OPCUA_SECURITY
 #include "../security/asym_chunk.h"
 #include "../security/sym_chunk.h"
@@ -148,6 +145,73 @@ static void send_buffer_chunk(mu_server_t *server, size_t total) {
     }
 }
 
+#if MICRO_OPCUA_SUBSCRIPTIONS
+opcua_statuscode_t mu_server_emit_message(mu_server_t *server,
+                                          opcua_uint32_t request_id,
+                                          const opcua_byte_t *body,
+                                          size_t body_len)
+{
+    if (server == NULL || body == NULL) {
+        return MU_STATUS_BAD_INTERNALERROR;
+    }
+
+#ifdef MICRO_OPCUA_SECURITY
+    if (server->secure_channel.mode != MU_MESSAGE_SECURITY_MODE_NONE) {
+        size_t total = 0;
+        opcua_statuscode_t status;
+
+        if (server->config.crypto_adapter == NULL || !server->secure_channel.keys_valid) {
+            return MU_STATUS_BAD_SECURITYCHECKSFAILED;
+        }
+
+        status = mu_sym_chunk_wrap(server->config.crypto_adapter,
+                                   server->secure_channel.mode,
+                                   &server->secure_channel.server_keys,
+                                   "MSG",
+                                   server->secure_channel.channel_id,
+                                   server->secure_channel.token_id,
+                                   ++server->secure_channel.out_sequence_number,
+                                   request_id,
+                                   body,
+                                   body_len,
+                                   server->config.send_buffer,
+                                   server->config.send_buffer_size,
+                                   &total);
+        if (status != MU_STATUS_GOOD) {
+            return status;
+        }
+        send_buffer_chunk(server, total);
+        return MU_STATUS_GOOD;
+    }
+#endif
+
+    if (body_len > server->config.send_buffer_size ||
+        MU_UASC_SYMMETRIC_HEADER_SIZE > server->config.send_buffer_size ||
+        body_len > (server->config.send_buffer_size - MU_UASC_SYMMETRIC_HEADER_SIZE)) {
+        return MU_STATUS_BAD_RESPONSETOOLARGE;
+    }
+
+    memcpy(server->config.send_buffer + MU_UASC_SYMMETRIC_HEADER_SIZE, body, body_len);
+
+    size_t total = 0;
+    opcua_statuscode_t status =
+        mu_uasc_finalize_symmetric(server->config.send_buffer,
+                                   server->config.send_buffer_size,
+                                   server->secure_channel.channel_id,
+                                   server->secure_channel.token_id,
+                                   ++server->secure_channel.out_sequence_number,
+                                   request_id,
+                                   body_len,
+                                   &total);
+    if (status != MU_STATUS_GOOD) {
+        return status;
+    }
+
+    send_buffer_chunk(server, total);
+    return MU_STATUS_GOOD;
+}
+#endif
+
 /* Abort the active connection (a security/protocol violation). The poll loop
    reclaims the slot when client_handle becomes NULL. */
 static void abort_connection(mu_server_t *server) {
@@ -214,6 +278,9 @@ static void handle_data_chunk_plaintext(mu_server_t *server, const opcua_byte_t 
     opcua_byte_t *resp_body = server->config.send_buffer + body_offset;
     size_t payload_len = server->config.send_buffer_size - body_offset;
 
+#if MICRO_OPCUA_SUBSCRIPTIONS
+    server->current_request_id = seq.request_id;
+#endif
     status = mu_service_dispatch(server, request_type.identifier.numeric, req_body, req_body_len, resp_body, &payload_len);
 
     if (status != MU_STATUS_GOOD) {
@@ -310,6 +377,9 @@ static void handle_data_chunk_secure(mu_server_t *server, opcua_byte_t *msg, siz
     size_t req_body_len = req_len - rr.position;
 
     size_t resp_len = sizeof(respbody);
+#if MICRO_OPCUA_SUBSCRIPTIONS
+    server->current_request_id = response_request_id;
+#endif
     opcua_statuscode_t status = mu_service_dispatch(server, request_type.identifier.numeric,
                                                     req_body, req_body_len, respbody, &resp_len);
     if (status != MU_STATUS_GOOD) {

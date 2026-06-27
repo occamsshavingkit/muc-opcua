@@ -510,6 +510,139 @@ void test_sampling_detects_change(void) {
     TEST_ASSERT_EQUAL_INT32(20, item->last_value.value.i32);
 }
 
+#define ID_PUBLISHREQUEST              826
+#define ID_PUBLISHRESPONSE             829
+#define ID_DATACHANGENOTIFICATION      811  /* DataChangeNotification_Encoding_DefaultBinary */
+
+/* Enqueue a PublishRequest with no SubscriptionAcknowledgements (seq == handle). */
+static void enqueue_publish(mock_t *m, opcua_uint32_t seq) {
+    opcua_byte_t tmp[256], chunk[256]; mu_binary_writer_t w; size_t clen;
+    mu_binary_writer_init(&w, tmp, sizeof(tmp));
+    { mu_nodeid_t t={0,MU_NODEID_NUMERIC,{ID_PUBLISHREQUEST}}; mu_binary_write_nodeid(&w,&t); }
+    write_request_header(&w, 12345, seq);
+    mu_binary_write_int32(&w, 0);   /* subscriptionAcknowledgements: empty */
+    clen = build_msg(chunk, sizeof(chunk), seq, seq, tmp, w.position); enqueue(m, chunk, clen);
+}
+
+/* Parse a PublishResponse body: outputs subscriptionId, notificationMessage.sequenceNumber,
+   and the number of NotificationData entries. If there is a DataChangeNotification, outputs
+   the first MonitoredItemNotification's clientHandle and DataValue. Returns notif-data count. */
+static opcua_int32_t parse_publish_response(mu_binary_reader_t *body, opcua_uint32_t *sub_id,
+                                            opcua_uint32_t *seq_num, opcua_uint32_t *client_handle,
+                                            mu_datavalue_t *dv) {
+    mu_binary_read_uint32(body, sub_id);
+    opcua_int32_t navail; mu_binary_read_int32(body, &navail);           /* availableSequenceNumbers */
+    for (opcua_int32_t i = 0; i < navail; ++i) { opcua_uint32_t a; mu_binary_read_uint32(body, &a); }
+    opcua_byte_t more; mu_binary_read_byte(body, &more);                 /* moreNotifications */
+    mu_binary_read_uint32(body, seq_num);                               /* notificationMessage.sequenceNumber */
+    opcua_int64_t publish_time; mu_binary_read_int64(body, &publish_time);
+    opcua_int32_t ndata; mu_binary_read_int32(body, &ndata);             /* notificationData[] */
+    if (ndata > 0) {
+        mu_nodeid_t type; size_t len; mu_binary_read_extension_object_header(body, &type, &len);
+        if (type.identifier.numeric == ID_DATACHANGENOTIFICATION) {
+            opcua_int32_t nitems; mu_binary_read_int32(body, &nitems);   /* monitoredItems[] */
+            if (nitems > 0) {
+                mu_binary_read_uint32(body, client_handle);
+                mu_binary_read_datavalue(body, dv);
+            }
+        }
+    }
+    return ndata;
+}
+
+/* Advance the clock and poll a few times so a due publishing timer (and any sampling) fires. */
+static void tick_to(mu_server_t *server, opcua_uint64_t when) {
+    s_tick = when;
+    mu_server_poll(server);
+    mu_server_poll(server);
+}
+
+/* Publish (OPC 10000-4 §5.14.5): a parked PublishRequest is answered asynchronously by the
+   publishing timer with a DataChangeNotification carrying the monitored item's clientHandle
+   and new value. */
+void test_publish_delivers_data_change(void) {
+    mock_t mock; memset(&mock, 0, sizeof(mock));
+    enqueue_connect(&mock);
+    enqueue_create_subscription(&mock, 4, 200.0, 1000, 1000); /* large keep-alive: no keep-alives here */
+
+    opcua_byte_t storage[MU_SERVER_STORAGE_BYTES]; mu_server_config_t config;
+    s_mon_val = 10;
+    mu_server_t *server = make_server(&mock, storage, sizeof(storage), &config, &samp_space);
+    mu_binary_reader_t body; opcua_statuscode_t sr;
+
+    run_connect(server);
+    mu_server_poll(server); /* CreateSubscription */
+    TEST_ASSERT_EQUAL(ID_CREATESUBSCRIPTIONRESPONSE, parse_response(mock.last_write, mock.last_write_len, &body, &sr));
+    opcua_uint32_t sub_id; mu_binary_read_uint32(&body, &sub_id);
+
+    /* CreateMonitoredItems (seq 5): item on ns=1;i=5000, sampling 100 ms, clientHandle 7. */
+    opcua_byte_t tmp[1024], chunk[1024]; mu_binary_writer_t w; size_t clen;
+    mu_binary_writer_init(&w, tmp, sizeof(tmp));
+    { mu_nodeid_t t={0,MU_NODEID_NUMERIC,{ID_CREATEMONITOREDITEMSREQUEST}}; mu_binary_write_nodeid(&w,&t); }
+    write_request_header(&w, 12345, 5);
+    mu_binary_write_uint32(&w, sub_id);
+    mu_binary_write_uint32(&w, 3);
+    mu_binary_write_int32(&w, 1);
+    write_moncreate_item(&w, 1, 5000, 7, 100.0);
+    clen = build_msg(chunk, sizeof(chunk), 5, 5, tmp, w.position); enqueue(&mock, chunk, clen);
+    mu_server_poll(server); /* CreateMonitoredItems (initial sample = 10) */
+
+    /* Publish #1 (seq 6): parked, then drained with the initial value (10) by the timer. */
+    enqueue_publish(&mock, 6);
+    mu_server_poll(server); /* parks the request (timer not yet due) */
+    tick_to(server, 300);   /* publishing timer (200) fires */
+    opcua_uint32_t sid, seqn, ch; mu_datavalue_t dv;
+    TEST_ASSERT_EQUAL(ID_PUBLISHRESPONSE, parse_response(mock.last_write, mock.last_write_len, &body, &sr));
+    TEST_ASSERT_EQUAL(1, parse_publish_response(&body, &sid, &seqn, &ch, &dv));
+    TEST_ASSERT_EQUAL(sub_id, sid);
+    TEST_ASSERT_EQUAL(7, ch);
+    TEST_ASSERT_EQUAL_INT32(10, dv.value.value.i32);
+    TEST_ASSERT_EQUAL(1, seqn);
+
+    /* Publish #2 (seq 7): a value change is sampled and delivered (20), next sequence number. */
+    s_mon_val = 20;
+    enqueue_publish(&mock, 7);
+    mu_server_poll(server); /* parks #2 */
+    tick_to(server, 700);   /* sample picks up 20, publishing timer fires */
+    TEST_ASSERT_EQUAL(ID_PUBLISHRESPONSE, parse_response(mock.last_write, mock.last_write_len, &body, &sr));
+    TEST_ASSERT_EQUAL(1, parse_publish_response(&body, &sid, &seqn, &ch, &dv));
+    TEST_ASSERT_EQUAL(7, ch);
+    TEST_ASSERT_EQUAL_INT32(20, dv.value.value.i32);
+    TEST_ASSERT_EQUAL(2, seqn);
+}
+
+/* Keep-alive (OPC 10000-4 §5.14.1.1/§5.14.1.2): with no data changes, after
+   max_keep_alive_count publishing intervals a parked PublishRequest is answered with an
+   empty NotificationMessage (no notificationData). */
+void test_publish_keep_alive(void) {
+    mock_t mock; memset(&mock, 0, sizeof(mock));
+    enqueue_connect(&mock);
+    enqueue_create_subscription(&mock, 4, 200.0, 100, 3); /* keep-alive count 3 */
+
+    opcua_byte_t storage[MU_SERVER_STORAGE_BYTES]; mu_server_config_t config;
+    s_mon_val = 10;
+    mu_server_t *server = make_server(&mock, storage, sizeof(storage), &config, &samp_space);
+    mu_binary_reader_t body; opcua_statuscode_t sr;
+
+    run_connect(server);
+    mu_server_poll(server); /* CreateSubscription */
+    TEST_ASSERT_EQUAL(ID_CREATESUBSCRIPTIONRESPONSE, parse_response(mock.last_write, mock.last_write_len, &body, &sr));
+    opcua_uint32_t sub_id; mu_binary_read_uint32(&body, &sub_id);
+
+    /* Park a Publish request (seq 5); no monitored items, so no data ever. */
+    enqueue_publish(&mock, 5);
+    mu_server_poll(server); /* parks it */
+
+    /* Advance several publishing intervals with no data; a keep-alive must be emitted. */
+    for (opcua_uint64_t t = 250; t <= 1450; t += 200) { s_tick = t; mu_server_poll(server); }
+
+    opcua_uint32_t sid, seqn, ch = 0; mu_datavalue_t dv;
+    TEST_ASSERT_EQUAL(ID_PUBLISHRESPONSE, parse_response(mock.last_write, mock.last_write_len, &body, &sr));
+    opcua_int32_t ndata = parse_publish_response(&body, &sid, &seqn, &ch, &dv);
+    TEST_ASSERT_EQUAL(sub_id, sid);
+    TEST_ASSERT_EQUAL(0, ndata);   /* keep-alive: empty NotificationMessage */
+}
+
 int main(void) {
     UNITY_BEGIN();
     RUN_TEST(test_create_subscription);
@@ -519,5 +652,7 @@ int main(void) {
     RUN_TEST(test_create_monitored_items_too_many);
     RUN_TEST(test_delete_monitored_items);
     RUN_TEST(test_sampling_detects_change);
+    RUN_TEST(test_publish_delivers_data_change);
+    RUN_TEST(test_publish_keep_alive);
     return UNITY_END();
 }

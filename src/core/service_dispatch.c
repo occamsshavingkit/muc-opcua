@@ -57,7 +57,8 @@ static const mu_service_handler_t g_supported_services[] = {
     { MU_ID_CREATEMONITOREDITEMSREQUEST, MU_ID_CREATEMONITOREDITEMSRESPONSE, true  },
     { MU_ID_DELETEMONITOREDITEMSREQUEST, MU_ID_DELETEMONITOREDITEMSRESPONSE, true  },
     { MU_ID_CREATESUBSCRIPTIONREQUEST, MU_ID_CREATESUBSCRIPTIONRESPONSE, true  },
-    { MU_ID_DELETESUBSCRIPTIONSREQUEST, MU_ID_DELETESUBSCRIPTIONSRESPONSE, true }
+    { MU_ID_DELETESUBSCRIPTIONSREQUEST, MU_ID_DELETESUBSCRIPTIONSRESPONSE, true },
+    { MU_ID_PUBLISHREQUEST,             MU_ID_PUBLISHRESPONSE,             true  }
 #endif
 };
 
@@ -751,6 +752,7 @@ static opcua_statuscode_t handle_create_monitored_items(mu_server_t *server,
             item->last_status = mu_value_source_read(node->value, &body.node_id, &item->last_value);
             if (item->last_status == MU_STATUS_GOOD) {
                 item->has_value = true;
+                item->pending = true;
             }
         }
         (void)body.queue_size;
@@ -860,6 +862,50 @@ static opcua_statuscode_t handle_delete_subscriptions(mu_server_t *server,
     if (s != MU_STATUS_GOOD) return s;
 
     *response_length = w->position;
+    return MU_STATUS_GOOD;
+}
+
+/* Publish (OPC 10000-4 5.14.5): decode RequestHeader and acknowledgements, then
+   park the request. The publishing timer emits the PublishResponse asynchronously. */
+static opcua_statuscode_t handle_publish(mu_server_t *server,
+                                         mu_binary_reader_t *r,
+                                         mu_binary_writer_t *w,
+                                         size_t *response_length)
+{
+    (void)w;
+
+    mu_request_header_t req;
+    opcua_statuscode_t s = mu_request_header_decode(r, &req);
+    if (s != MU_STATUS_GOOD) return s;
+
+    opcua_int32_t ack_count;
+    s = mu_binary_read_int32(r, &ack_count);
+    if (s != MU_STATUS_GOOD) return s;
+    if (ack_count < 0) {
+        ack_count = 0;
+    }
+
+    for (opcua_int32_t i = 0; i < ack_count; ++i) {
+        opcua_uint32_t subscription_id;
+        opcua_uint32_t sequence_number;
+        s = mu_binary_read_uint32(r, &subscription_id); if (s != MU_STATUS_GOOD) return s;
+        s = mu_binary_read_uint32(r, &sequence_number); if (s != MU_STATUS_GOOD) return s;
+        (void)subscription_id;
+        (void)sequence_number;
+    }
+
+    opcua_uint64_t now_ms =
+        server->config.time_adapter.get_tick_ms(server->config.time_adapter.context);
+    s = mu_publish_request_enqueue(&server->subs,
+                                   server->session.session_id,
+                                   server->current_request_id,
+                                   req.request_handle,
+                                   now_ms);
+    if (s != MU_STATUS_GOOD) {
+        return s;
+    }
+
+    *response_length = 0;
     return MU_STATUS_GOOD;
 }
 #endif /* MICRO_OPCUA_SUBSCRIPTIONS */
@@ -1289,6 +1335,8 @@ opcua_statuscode_t mu_service_dispatch(
             return handle_create_subscription(server, &reader, &writer, response_length);
         case MU_ID_DELETESUBSCRIPTIONSREQUEST:
             return handle_delete_subscriptions(server, &reader, &writer, response_length);
+        case MU_ID_PUBLISHREQUEST:
+            return handle_publish(server, &reader, &writer, response_length);
 #endif
 #ifdef MICRO_OPCUA_SERVICE_BROWSE
         case MU_ID_BROWSEREQUEST:

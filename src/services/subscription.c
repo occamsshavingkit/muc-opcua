@@ -7,6 +7,10 @@
 #include "../address_space/base_nodes.h"
 #include "../core/server_internal.h"
 #include "micro_opcua/address_space.h"
+#include "service_header.h"
+
+#define MU_PUBLISH_BODY_BYTES 512u
+#define MU_ID_DATACHANGENOTIFICATION_ENCODING_DEFAULTBINARY 811u
 
 static bool variant_scalar_equal(const mu_variant_t *a, const mu_variant_t *b)
 {
@@ -167,6 +171,318 @@ static opcua_uint32_t allocate_monitored_item_id(mu_subscriptions_t *subs)
     return 0u;
 }
 
+static bool publish_request_dequeue(mu_subscriptions_t *subs,
+                                    opcua_uint32_t session_id,
+                                    mu_publish_request_t *out_request)
+{
+    bool found = false;
+    size_t best = 0u;
+    opcua_uint64_t best_enqueued = 0u;
+
+    if (subs == NULL || out_request == NULL) {
+        return false;
+    }
+
+    for (size_t i = 0; i < MU_MAX_PUBLISH_REQUESTS; ++i) {
+        const mu_publish_request_t *req = &subs->publish_queue[i];
+        if (!req->in_use || req->session_id != session_id) {
+            continue;
+        }
+        if (!found || req->enqueued_ms < best_enqueued) {
+            found = true;
+            best = i;
+            best_enqueued = req->enqueued_ms;
+        }
+    }
+
+    if (!found) {
+        return false;
+    }
+
+    *out_request = subs->publish_queue[best];
+    memset(&subs->publish_queue[best], 0, sizeof(subs->publish_queue[best]));
+    return true;
+}
+
+static opcua_statuscode_t write_publish_response_prefix(mu_binary_writer_t *w,
+                                                        opcua_uint32_t request_handle)
+{
+    mu_nodeid_t type = { 0, MU_NODEID_NUMERIC, { MU_ID_PUBLISHRESPONSE } };
+    opcua_statuscode_t s = mu_binary_write_nodeid(w, &type);
+    if (s != MU_STATUS_GOOD) return s;
+
+    mu_response_header_t rh;
+    rh.timestamp = 0;
+    rh.request_handle = request_handle;
+    rh.service_result = MU_STATUS_GOOD;
+    return mu_response_header_encode(w, &rh);
+}
+
+static void backpatch_int32(opcua_byte_t *buffer, size_t position, opcua_int32_t value)
+{
+    buffer[position] = (opcua_byte_t)(value & 0xFF);
+    buffer[position + 1u] = (opcua_byte_t)((value >> 8) & 0xFF);
+    buffer[position + 2u] = (opcua_byte_t)((value >> 16) & 0xFF);
+    buffer[position + 3u] = (opcua_byte_t)((value >> 24) & 0xFF);
+}
+
+static bool monitored_item_reportable(const mu_monitored_item_t *item,
+                                      const mu_subscription_t *sub)
+{
+    return item->in_use &&
+           item->subscription_id == sub->subscription_id &&
+           item->pending &&
+           item->monitoring_mode == MU_MONITORING_MODE_REPORTING;
+}
+
+static opcua_int32_t count_reportable_items(const struct mu_server *server,
+                                            const mu_subscription_t *sub)
+{
+    opcua_int32_t count = 0;
+    for (size_t i = 0; i < MU_MAX_MONITORED_ITEMS; ++i) {
+        if (monitored_item_reportable(&server->subs.monitored_items[i], sub)) {
+            ++count;
+        }
+    }
+    return count;
+}
+
+static void clear_reported_items(struct mu_server *server, const mu_subscription_t *sub)
+{
+    for (size_t i = 0; i < MU_MAX_MONITORED_ITEMS; ++i) {
+        mu_monitored_item_t *item = &server->subs.monitored_items[i];
+        if (monitored_item_reportable(item, sub)) {
+            item->pending = false;
+        }
+    }
+}
+
+static opcua_datetime_t publish_time_now(const struct mu_server *server)
+{
+    if (server->config.time_adapter.get_time == NULL) {
+        return 0;
+    }
+    return server->config.time_adapter.get_time(server->config.time_adapter.context);
+}
+
+static opcua_statuscode_t write_data_change_notification(mu_binary_writer_t *w,
+                                                         const struct mu_server *server,
+                                                         const mu_subscription_t *sub,
+                                                         opcua_int32_t report_count)
+{
+    mu_nodeid_t type_id = {
+        0,
+        MU_NODEID_NUMERIC,
+        { MU_ID_DATACHANGENOTIFICATION_ENCODING_DEFAULTBINARY }
+    };
+    opcua_statuscode_t s = mu_binary_write_nodeid(w, &type_id);
+    if (s != MU_STATUS_GOOD) return s;
+    s = mu_binary_write_byte(w, 1u);
+    if (s != MU_STATUS_GOOD) return s;
+
+    size_t length_pos = w->position;
+    s = mu_binary_write_int32(w, 0);
+    if (s != MU_STATUS_GOOD) return s;
+    size_t body_start = w->position;
+
+    s = mu_binary_write_int32(w, report_count);
+    if (s != MU_STATUS_GOOD) return s;
+
+    for (size_t i = 0; i < MU_MAX_MONITORED_ITEMS; ++i) {
+        const mu_monitored_item_t *item = &server->subs.monitored_items[i];
+        if (!monitored_item_reportable(item, sub)) {
+            continue;
+        }
+
+        s = mu_binary_write_uint32(w, item->client_handle);
+        if (s != MU_STATUS_GOOD) return s;
+
+        mu_datavalue_t dv;
+        memset(&dv, 0, sizeof(dv));
+        dv.has_value = true;
+        dv.value = item->last_value;
+        if (item->last_status != MU_STATUS_GOOD) {
+            dv.has_status = true;
+            dv.status = item->last_status;
+        }
+        s = mu_binary_write_datavalue(w, &dv);
+        if (s != MU_STATUS_GOOD) return s;
+    }
+
+    s = mu_binary_write_int32(w, 0);
+    if (s != MU_STATUS_GOOD) return s;
+
+    size_t body_length = w->position - body_start;
+    if (body_length > (size_t)0x7FFFFFFF) {
+        return MU_STATUS_BAD_RESPONSETOOLARGE;
+    }
+    backpatch_int32(w->buffer, length_pos, (opcua_int32_t)body_length);
+    return MU_STATUS_GOOD;
+}
+
+static opcua_statuscode_t build_publish_response(struct mu_server *server,
+                                                 const mu_subscription_t *sub,
+                                                 const mu_publish_request_t *request,
+                                                 opcua_uint32_t sequence_number,
+                                                 bool include_data,
+                                                 opcua_int32_t report_count,
+                                                 opcua_datetime_t publish_time,
+                                                 opcua_byte_t *buffer,
+                                                 size_t buffer_size,
+                                                 size_t *out_length)
+{
+    mu_binary_writer_t w;
+    mu_binary_writer_init(&w, buffer, buffer_size);
+
+    opcua_statuscode_t s =
+        write_publish_response_prefix(&w, request->request_handle);
+    if (s != MU_STATUS_GOOD) return s;
+
+    s = mu_binary_write_uint32(&w, sub->subscription_id);
+    if (s != MU_STATUS_GOOD) return s;
+    s = mu_binary_write_int32(&w, 0);
+    if (s != MU_STATUS_GOOD) return s;
+    s = mu_binary_write_boolean(&w, false);
+    if (s != MU_STATUS_GOOD) return s;
+
+    s = mu_binary_write_uint32(&w, sequence_number);
+    if (s != MU_STATUS_GOOD) return s;
+    s = mu_binary_write_int64(&w, publish_time);
+    if (s != MU_STATUS_GOOD) return s;
+    s = mu_binary_write_int32(&w, include_data ? 1 : 0);
+    if (s != MU_STATUS_GOOD) return s;
+
+    if (include_data) {
+        s = write_data_change_notification(&w, server, sub, report_count);
+        if (s != MU_STATUS_GOOD) return s;
+    }
+
+    s = mu_binary_write_uint32(&w, 0);
+    if (s != MU_STATUS_GOOD) return s;
+    s = mu_binary_write_int32(&w, 0);
+    if (s != MU_STATUS_GOOD) return s;
+
+    *out_length = w.position;
+    return MU_STATUS_GOOD;
+}
+
+static opcua_uint32_t current_sequence_number(mu_subscription_t *sub)
+{
+    if (sub->sequence_number == 0u) {
+        sub->sequence_number = 1u;
+    }
+    return sub->sequence_number;
+}
+
+static void advance_sequence_number(mu_subscription_t *sub)
+{
+    ++sub->sequence_number;
+    if (sub->sequence_number == 0u) {
+        sub->sequence_number = 1u;
+    }
+}
+
+static void store_retransmit(mu_subscription_t *sub,
+                             opcua_uint32_t sequence_number,
+                             opcua_datetime_t publish_time,
+                             const opcua_byte_t *body,
+                             size_t body_length)
+{
+    sub->retransmit.valid = false;
+    sub->retransmit.message_len = 0u;
+
+    if (body_length > MU_RETRANSMIT_BYTES) {
+        return;
+    }
+
+    sub->retransmit.sequence_number = sequence_number;
+    sub->retransmit.publish_time = publish_time;
+    memcpy(sub->retransmit.message, body, body_length);
+    sub->retransmit.message_len = body_length;
+    sub->retransmit.valid = true;
+}
+
+static void advance_publish_timer(mu_subscription_t *sub, opcua_uint64_t now_ms)
+{
+    opcua_uint64_t interval = sub->publishing_interval_ms;
+    const opcua_uint64_t max = ~(opcua_uint64_t)0;
+
+    if (interval == 0u) {
+        interval = 1u;
+    }
+
+    do {
+        if (sub->next_publish_ms > max - interval) {
+            sub->next_publish_ms = max;
+            break;
+        }
+        sub->next_publish_ms += interval;
+    } while (sub->next_publish_ms <= now_ms);
+}
+
+static void publish_due(struct mu_server *server, opcua_uint64_t now_ms)
+{
+    for (size_t i = 0; i < MU_MAX_SUBSCRIPTIONS; ++i) {
+        mu_subscription_t *sub = &server->subs.subscriptions[i];
+        if (!sub->in_use || sub->next_publish_ms > now_ms) {
+            continue;
+        }
+
+        opcua_int32_t report_count = 0;
+        bool has_data = false;
+        if (sub->publishing_enabled) {
+            report_count = count_reportable_items(server, sub);
+            has_data = report_count > 0;
+        }
+
+        if (has_data) {
+            mu_publish_request_t request;
+            if (publish_request_dequeue(&server->subs, sub->session_id, &request)) {
+                opcua_byte_t body[MU_PUBLISH_BODY_BYTES];
+                size_t body_length = 0u;
+                opcua_uint32_t sequence_number = current_sequence_number(sub);
+                opcua_datetime_t publish_time = publish_time_now(server);
+                opcua_statuscode_t s =
+                    build_publish_response(server, sub, &request, sequence_number,
+                                           true, report_count, publish_time,
+                                           body, sizeof(body), &body_length);
+                if (s == MU_STATUS_GOOD) {
+                    s = mu_server_emit_message(server, request.request_id, body, body_length);
+                }
+                if (s == MU_STATUS_GOOD) {
+                    clear_reported_items(server, sub);
+                    sub->keep_alive_counter = 0u;
+                    store_retransmit(sub, sequence_number, publish_time, body, body_length);
+                    advance_sequence_number(sub);
+                }
+            }
+        } else {
+            ++sub->keep_alive_counter;
+            if (sub->keep_alive_counter >= sub->max_keep_alive_count) {
+                mu_publish_request_t request;
+                if (publish_request_dequeue(&server->subs, sub->session_id, &request)) {
+                    opcua_byte_t body[MU_PUBLISH_BODY_BYTES];
+                    size_t body_length = 0u;
+                    opcua_uint32_t sequence_number = current_sequence_number(sub);
+                    opcua_datetime_t publish_time = publish_time_now(server);
+                    opcua_statuscode_t s =
+                        build_publish_response(server, sub, &request, sequence_number,
+                                               false, 0, publish_time,
+                                               body, sizeof(body), &body_length);
+                    if (s == MU_STATUS_GOOD) {
+                        s = mu_server_emit_message(server, request.request_id, body, body_length);
+                    }
+                    if (s == MU_STATUS_GOOD) {
+                        sub->keep_alive_counter = 0u;
+                    }
+                }
+            }
+        }
+
+        advance_publish_timer(sub, now_ms);
+    }
+}
+
 void mu_subscriptions_init(mu_subscriptions_t *subs)
 {
     if (subs != NULL) {
@@ -174,6 +490,32 @@ void mu_subscriptions_init(mu_subscriptions_t *subs)
         subs->next_subscription_id = 1u;
         subs->next_monitored_item_id = 1u;
     }
+}
+
+opcua_statuscode_t mu_publish_request_enqueue(mu_subscriptions_t *subs,
+                                              opcua_uint32_t session_id,
+                                              opcua_uint32_t request_id,
+                                              opcua_uint32_t request_handle,
+                                              opcua_uint64_t now_ms)
+{
+    if (subs == NULL) {
+        return MU_STATUS_BAD_INTERNALERROR;
+    }
+
+    for (size_t i = 0; i < MU_MAX_PUBLISH_REQUESTS; ++i) {
+        mu_publish_request_t *slot = &subs->publish_queue[i];
+        if (!slot->in_use) {
+            memset(slot, 0, sizeof(*slot));
+            slot->in_use = true;
+            slot->session_id = session_id;
+            slot->request_id = request_id;
+            slot->request_handle = request_handle;
+            slot->enqueued_ms = now_ms;
+            return MU_STATUS_GOOD;
+        }
+    }
+
+    return MU_STATUS_BAD_TOOMANYPUBLISHREQUESTS;
 }
 
 opcua_statuscode_t mu_subscription_create(mu_subscriptions_t *subs,
@@ -377,6 +719,8 @@ void mu_subscriptions_tick(struct mu_server *server, opcua_uint64_t now_ms)
 
         advance_sample_timer(item, now_ms);
     }
+
+    publish_due(server, now_ms);
 }
 
 #endif /* MICRO_OPCUA_SUBSCRIPTIONS */

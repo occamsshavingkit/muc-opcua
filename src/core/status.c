@@ -28,6 +28,9 @@ const char* mu_status_name(opcua_statuscode_t status)
         case MU_STATUS_BAD_TOOMANYMONITOREDITEMS: return "Bad_TooManyMonitoredItems";
         case MU_STATUS_BAD_TOOMANYSUBSCRIPTIONS: return "Bad_TooManySubscriptions";
         case MU_STATUS_BAD_SUBSCRIPTIONIDINVALID: return "Bad_SubscriptionIdInvalid";
+#if MICRO_OPCUA_SUBSCRIPTIONS
+        case MU_STATUS_BAD_TOOMANYPUBLISHREQUESTS: return "Bad_TooManyPublishRequests";
+#endif
         case MU_STATUS_BAD_NOTHINGTODO: return "Bad_NothingToDo";
 
         /* TCP Specific StatusCodes */
@@ -48,7 +51,6 @@ static const opcua_uint32_t g_unsupported_services[] = {
     673,  /* WriteRequest */
     711,  /* CallRequest */
     643,  /* HistoryReadRequest */
-    826,  /* PublishRequest */
     533,  /* BrowseNextRequest */
     554,  /* TranslateBrowsePathsToNodeIdsRequest */
     561   /* RegisterNodesRequest */

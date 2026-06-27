@@ -23,7 +23,15 @@ struct mu_server {
     mu_session_t session;
 #if MICRO_OPCUA_SUBSCRIPTIONS
     mu_subscriptions_t subs;
+    opcua_uint32_t current_request_id;
 #endif
 };
+
+#if MICRO_OPCUA_SUBSCRIPTIONS
+opcua_statuscode_t mu_server_emit_message(mu_server_t *server,
+                                          opcua_uint32_t request_id,
+                                          const opcua_byte_t *body,
+                                          size_t body_len);
+#endif
 
 #endif /* MICRO_OPCUA_SERVER_INTERNAL_H */
