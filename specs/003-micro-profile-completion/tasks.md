@@ -63,12 +63,12 @@ All subscription code is gated by `MICRO_OPCUA_SUBSCRIPTIONS`.
   §5.13.2.4. Handler/table/switch + `CreateMonitoredItemsRequest/Response` IDs.
   (OPC refs: OPC 10000-4 §5.13.2, §7.17, §7.21)
 
-- [ ] T008 [Claude-test] Unit test for change detection
+- [X] T008 [Claude-test] Unit test for change detection
   (`tests/unit/test_subscription_sampling.c`): driving `mu_subscriptions_tick` with a
   mock value source whose value changes between ticks sets the item's pending-notification
   flag exactly once per change (StatusValue trigger); no change → no pending flag.
   (OPC refs: OPC 10000-4 §5.12.1.6, §7.17.2)
-- [ ] T009 [Codex-impl] Implement poll-driven sampling in `mu_subscriptions_tick`:
+- [X] T009 [Codex-impl] Implement poll-driven sampling in `mu_subscriptions_tick`:
   sample due REPORTING/SAMPLING items via `mu_resolve_node`+value source, compare to
   `last_value` per the DataChangeFilter trigger, set `has_pending_notification` and
   update `last_value` on change; advance the per-item sampling timer. Call the tick from

@@ -179,7 +179,13 @@ static opcua_statuscode_t read_moncreate_result(mu_binary_reader_t *body, opcua_
     return st;
 }
 
-static mu_server_t *make_server(mock_t *mock, opcua_byte_t *storage, size_t storage_size, mu_server_config_t *config) {
+/* Controllable monotonic clock for the sampling/publish-timer tests. Reset to 0 by
+   make_server so each test starts at tick 0; advance s_tick to fire timers. */
+static opcua_uint64_t s_tick = 0;
+static opcua_uint64_t test_get_tick_ms(void *c) { (void)c; return s_tick; }
+
+static mu_server_t *make_server(mock_t *mock, opcua_byte_t *storage, size_t storage_size,
+                                mu_server_config_t *config, const mu_address_space_t *space) {
     memset(config, 0, sizeof(*config));
     config->endpoint_url = "opc.tcp://host:4840";
     config->application_uri="urn:t"; config->product_uri="urn:t"; config->application_name="t";
@@ -188,11 +194,13 @@ static mu_server_t *make_server(mock_t *mock, opcua_byte_t *storage, size_t stor
     config->send_buffer=tx; config->send_buffer_size=sizeof(tx);
     config->max_chunk_count=1; config->max_message_size=8192; config->max_sessions=1; config->max_secure_channels=1;
     fake_platform_init(NULL, &config->time_adapter, &config->entropy_adapter);
+    s_tick = 0;
+    config->time_adapter.get_tick_ms = test_get_tick_ms; /* controllable clock */
     config->tcp_adapter.context=mock;
     config->tcp_adapter.listen=mock_listen; config->tcp_adapter.accept=mock_accept;
     config->tcp_adapter.read=mock_read; config->tcp_adapter.write=mock_write;
     config->tcp_adapter.close_connection=mock_close; config->tcp_adapter.shutdown=mock_shutdown;
-    config->address_space = NULL;
+    config->address_space = space;
     mu_server_t *server = NULL;
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_server_init(storage, storage_size, config, &server));
     return server;
@@ -217,7 +225,7 @@ void test_create_subscription(void) {
     enqueue_create_subscription(&mock, 5, 500.0, 60, 5);
 
     opcua_byte_t storage[MU_SERVER_STORAGE_BYTES]; mu_server_config_t config;
-    mu_server_t *server = make_server(&mock, storage, sizeof(storage), &config);
+    mu_server_t *server = make_server(&mock, storage, sizeof(storage), &config, NULL);
     mu_binary_reader_t body; opcua_statuscode_t sr;
 
     run_connect(server);
@@ -253,7 +261,7 @@ void test_create_subscription_too_many(void) {
     enqueue_create_subscription(&mock, 6, 1000.0, 100, 10); /* one past the cap */
 
     opcua_byte_t storage[MU_SERVER_STORAGE_BYTES]; mu_server_config_t config;
-    mu_server_t *server = make_server(&mock, storage, sizeof(storage), &config);
+    mu_server_t *server = make_server(&mock, storage, sizeof(storage), &config, NULL);
     mu_binary_reader_t body; opcua_statuscode_t sr;
 
     run_connect(server);
@@ -273,7 +281,7 @@ void test_delete_subscriptions(void) {
     enqueue_create_subscription(&mock, 4, 1000.0, 100, 10);
 
     opcua_byte_t storage[MU_SERVER_STORAGE_BYTES]; mu_server_config_t config;
-    mu_server_t *server = make_server(&mock, storage, sizeof(storage), &config);
+    mu_server_t *server = make_server(&mock, storage, sizeof(storage), &config, NULL);
     mu_binary_reader_t body; opcua_statuscode_t sr;
 
     run_connect(server);
@@ -312,7 +320,7 @@ void test_create_monitored_items(void) {
     enqueue_create_subscription(&mock, 4, 1000.0, 100, 10);
 
     opcua_byte_t storage[MU_SERVER_STORAGE_BYTES]; mu_server_config_t config;
-    mu_server_t *server = make_server(&mock, storage, sizeof(storage), &config);
+    mu_server_t *server = make_server(&mock, storage, sizeof(storage), &config, NULL);
     mu_binary_reader_t body; opcua_statuscode_t sr;
 
     run_connect(server);
@@ -351,7 +359,7 @@ void test_create_monitored_items_too_many(void) {
     enqueue_create_subscription(&mock, 4, 1000.0, 100, 10);
 
     opcua_byte_t storage[MU_SERVER_STORAGE_BYTES]; mu_server_config_t config;
-    mu_server_t *server = make_server(&mock, storage, sizeof(storage), &config);
+    mu_server_t *server = make_server(&mock, storage, sizeof(storage), &config, NULL);
     mu_binary_reader_t body; opcua_statuscode_t sr;
 
     run_connect(server);
@@ -388,7 +396,7 @@ void test_delete_monitored_items(void) {
     enqueue_create_subscription(&mock, 4, 1000.0, 100, 10);
 
     opcua_byte_t storage[MU_SERVER_STORAGE_BYTES]; mu_server_config_t config;
-    mu_server_t *server = make_server(&mock, storage, sizeof(storage), &config);
+    mu_server_t *server = make_server(&mock, storage, sizeof(storage), &config, NULL);
     mu_binary_reader_t body; opcua_statuscode_t sr;
 
     run_connect(server);
@@ -434,6 +442,74 @@ void test_delete_monitored_items(void) {
     TEST_ASSERT_EQUAL_HEX32(STATUS_BAD_MONITOREDITEMIDINVALID, d1);
 }
 
+/* A controllable Int32 variable node (ns=1;i=5000) for change-detection testing. */
+static opcua_int32_t s_mon_val = 0;
+static opcua_statuscode_t mon_read_cb(void *ctx, const mu_nodeid_t *id, mu_variant_t *v) {
+    (void)ctx; (void)id;
+    memset(v, 0, sizeof(*v));
+    v->type = MU_TYPE_INT32;
+    v->value.i32 = s_mon_val;
+    return MU_STATUS_GOOD;
+}
+static const mu_value_source_t mon_value = { MU_VALUESOURCE_CALLBACK, { .callback = { mon_read_cb, NULL } } };
+static const mu_node_t samp_nodes[] = {
+    { { 1, MU_NODEID_NUMERIC, { 5000 } }, MU_NODECLASS_VARIABLE,
+      { 7, (const opcua_byte_t *)"SampVar" }, { 7, (const opcua_byte_t *)"SampVar" }, NULL, 0, &mon_value }
+};
+static const mu_address_space_t samp_space = { samp_nodes, 1 };
+
+/* Poll-driven sampling (OPC 10000-4 §5.12.1.6, §7.17.2): mu_subscriptions_tick samples a
+   REPORTING MonitoredItem each sampling interval and flags a pending notification only when
+   the value changes (StatusValue trigger). White-box check of the engine state via the
+   controllable clock + value node. */
+void test_sampling_detects_change(void) {
+    mock_t mock; memset(&mock, 0, sizeof(mock));
+    enqueue_connect(&mock);
+    enqueue_create_subscription(&mock, 4, 1000.0, 100, 10);
+
+    opcua_byte_t storage[MU_SERVER_STORAGE_BYTES]; mu_server_config_t config;
+    s_mon_val = 10;
+    mu_server_t *server = make_server(&mock, storage, sizeof(storage), &config, &samp_space);
+    mu_binary_reader_t body; opcua_statuscode_t sr;
+
+    run_connect(server);
+    mu_server_poll(server); /* CreateSubscription */
+    TEST_ASSERT_EQUAL(ID_CREATESUBSCRIPTIONRESPONSE, parse_response(mock.last_write, mock.last_write_len, &body, &sr));
+    opcua_uint32_t sub_id; mu_binary_read_uint32(&body, &sub_id);
+
+    /* CreateMonitoredItems (seq 5): item on ns=1;i=5000, sampling 200 ms. */
+    opcua_byte_t tmp[1024], chunk[1024]; mu_binary_writer_t w; size_t clen;
+    mu_binary_writer_init(&w, tmp, sizeof(tmp));
+    { mu_nodeid_t t={0,MU_NODEID_NUMERIC,{ID_CREATEMONITOREDITEMSREQUEST}}; mu_binary_write_nodeid(&w,&t); }
+    write_request_header(&w, 12345, 5);
+    mu_binary_write_uint32(&w, sub_id);
+    mu_binary_write_uint32(&w, 3);
+    mu_binary_write_int32(&w, 1);
+    write_moncreate_item(&w, 1, 5000, 7, 200.0);
+    clen = build_msg(chunk, sizeof(chunk), 5, 5, tmp, w.position); enqueue(&mock, chunk, clen);
+
+    mu_server_poll(server); /* CreateMonitoredItems — initial sample taken */
+    TEST_ASSERT_EQUAL(ID_CREATEMONITOREDITEMSRESPONSE, parse_response(mock.last_write, mock.last_write_len, &body, &sr));
+
+    mu_monitored_item_t *item = &server->subs.monitored_items[0];
+    TEST_ASSERT_TRUE(item->in_use);
+    TEST_ASSERT_TRUE(item->has_value);
+    TEST_ASSERT_EQUAL_INT32(10, item->last_value.value.i32);
+
+    /* Establish a known baseline, then a tick with no value change leaves pending clear. */
+    item->pending = false;
+    s_tick = 250;
+    mu_server_poll(server);
+    TEST_ASSERT_FALSE(item->pending);
+
+    /* A value change at the next sampling tick sets pending and updates last_value. */
+    s_mon_val = 20;
+    s_tick = 450;
+    mu_server_poll(server);
+    TEST_ASSERT_TRUE(item->pending);
+    TEST_ASSERT_EQUAL_INT32(20, item->last_value.value.i32);
+}
+
 int main(void) {
     UNITY_BEGIN();
     RUN_TEST(test_create_subscription);
@@ -442,5 +518,6 @@ int main(void) {
     RUN_TEST(test_create_monitored_items);
     RUN_TEST(test_create_monitored_items_too_many);
     RUN_TEST(test_delete_monitored_items);
+    RUN_TEST(test_sampling_detects_change);
     return UNITY_END();
 }
