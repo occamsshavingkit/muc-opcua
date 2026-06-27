@@ -45,7 +45,7 @@ Each story is an independently shippable, independently testable slice.
 - [X] T005a Add a worst-case stack-usage measurement + CI check target to the build (e.g. `-fstack-usage` aggregation or `-Wstack-usage=<N>`) for SC-001.
 - [X] T005b Record the pre-change secured-OPN stack baseline (~12.8 KiB) from T005a into `docs/size/feature-size-ledger.md` for SC-001 comparison. (Not [P]: shares `feature-size-ledger.md` with T007.)
 - [X] T006 [P] Add a byte-identical response-capture harness in `tests/integration/test_response_regression.c` that records encoded Read/Browse/subscription responses for fixed inputs (golden vectors) — the SC-003 backstop reused by US3 and US4.
-- [ ] T007 Snapshot current per-profile `size` figures into `docs/size/feature-size-ledger.md` as the "pre-remediation" baseline row for SC-005. (Not [P]: shares `feature-size-ledger.md` with T005b.)
+- [X] T007 Snapshot current per-profile `size` figures into `docs/size/feature-size-ledger.md` as the "pre-remediation" baseline row for SC-005. (Not [P]: shares `feature-size-ledger.md` with T005b.)
 - [X] T008 Confirm the existing no-heap check (`tests/unit/test_no_heap_lifecycle.c`) runs for the micro/embedded profiles so FR-019 is enforced throughout.
 
 **Checkpoint**: Foundation ready — user-story work can begin.
@@ -185,15 +185,15 @@ Each story is an independently shippable, independently testable slice.
 
 ## Phase 7: Compliance, Size & Polish
 
-- [ ] T060 Run host unit + integration tests for every build profile (`ctest`).
-- [ ] T061 [P] Run fuzz targets (incl. the US1 additions) for a fixed run budget.
-- [ ] T062 [P] Run the ASan/UBSan build green (FR-020/SC-002).
-- [ ] T063 [P] Run clang-format + cppcheck/clang-tidy with warnings-as-errors.
-- [ ] T064 Run the Pico SDK cross-compile (embedded gate).
-- [ ] T065 Confirm the no-heap check passes for all profiles (FR-019/SC-006).
-- [ ] T066 Verify final secured-OPN stack ≤ 10 KiB and the size ledger reflects the ≥ 8% Micro reduction (SC-001/SC-005).
-- [ ] T067 Verify `docs/traceability/004-optimization-fixes.md` maps every behavioural change + test to OPC UA sections (Constitution IV).
-- [ ] T068 Validate `quickstart.md` end-to-end on host.
+- [X] T060 Run host unit + integration tests for every build profile (`ctest`).
+- [X] T061 [P] Run fuzz targets (incl. the US1 additions) for a fixed run budget.
+- [X] T062 [P] Run the ASan/UBSan build green (FR-020/SC-002).
+- [X] T063 [P] Run clang-format + cppcheck/clang-tidy with warnings-as-errors.
+- [X] T064 Run the Pico SDK cross-compile (embedded gate).
+- [X] T065 Confirm the no-heap check passes for all profiles (FR-019/SC-006).
+- [X] T066 Verify final secured-OPN stack ≤ 10 KiB and the size ledger reflects the ≥ 8% Micro reduction (SC-001/SC-005).
+- [X] T067 Verify `docs/traceability/004-optimization-fixes.md` maps every behavioural change + test to OPC UA sections (Constitution IV).
+- [X] T068 Validate `quickstart.md` end-to-end on host.
 
 ---
 
