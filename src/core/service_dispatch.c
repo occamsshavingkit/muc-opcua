@@ -799,6 +799,14 @@ static opcua_statuscode_t handle_find_servers(mu_server_t *server,
 #define MU_PUBLISHING_INTERVAL_MIN_BITS 0x4049000000000000ULL  /* 50.0 */
 #define MU_PUBLISHING_INTERVAL_MAX_BITS 0x40ed4c0000000000ULL  /* 60000.0 */
 #define MU_MONITORED_VALUE_ATTRIBUTE_ID 13u
+#if MICRO_OPCUA_SUBSCRIPTIONS_STANDARD
+/* OPC-10000-4 §7.22.2 DataChangeFilter binary encoding NodeId. */
+#define MU_ID_DATACHANGEFILTER_ENCODING_DEFAULTBINARY 724u
+#ifndef MU_STATUS_BAD_MONITOREDITEMFILTERUNSUPPORTED
+/* OPC-10000-4 §5.13.2.4 / §7.38.2. */
+#define MU_STATUS_BAD_MONITOREDITEMFILTERUNSUPPORTED ((opcua_statuscode_t)0x80440000)
+#endif
+#endif
 
 typedef struct {
     mu_nodeid_t node_id;
@@ -806,6 +814,12 @@ typedef struct {
     opcua_uint32_t monitoring_mode;
     opcua_uint32_t client_handle;
     opcua_uint64_t sampling_interval_bits;
+#if MICRO_OPCUA_SUBSCRIPTIONS_STANDARD
+    mu_datachange_trigger_t trigger;
+    mu_deadband_type_t deadband_type;
+    opcua_double_t deadband_value;
+    opcua_statuscode_t filter_result;
+#endif
     opcua_uint32_t queue_size;
     opcua_boolean_t discard_oldest;
 } mu_monitored_item_create_body_t;
@@ -862,6 +876,119 @@ static opcua_uint64_t publishing_interval_ms_to_bits(opcua_uint32_t interval_ms)
     return ((opcua_uint64_t)(exponent + 1023u) << 52) | fraction;
 }
 
+#if MICRO_OPCUA_SUBSCRIPTIONS_STANDARD
+static bool is_datachange_filter_binary_type(const mu_nodeid_t *type_id)
+{
+    return type_id->identifier_type == MU_NODEID_NUMERIC &&
+           type_id->namespace_index == 0u &&
+           type_id->identifier.numeric == MU_ID_DATACHANGEFILTER_ENCODING_DEFAULTBINARY;
+}
+
+static bool is_numeric_variant_type(mu_builtin_type_t type)
+{
+    switch (type) {
+        case MU_TYPE_SBYTE:
+        case MU_TYPE_BYTE:
+        case MU_TYPE_INT16:
+        case MU_TYPE_UINT16:
+        case MU_TYPE_INT32:
+        case MU_TYPE_UINT32:
+        case MU_TYPE_INT64:
+        case MU_TYPE_UINT64:
+        case MU_TYPE_FLOAT:
+        case MU_TYPE_DOUBLE:
+            return true;
+        default:
+            return false;
+    }
+}
+
+static bool monitored_node_has_numeric_static_value(const mu_node_t *node)
+{
+    if (node == NULL || node->value == NULL) {
+        return false;
+    }
+    if (node->value->type != MU_VALUESOURCE_STATIC) {
+        /* Callback value types are not exposed at create time; accept and let
+           sampling evaluate the value stream. */
+        return true;
+    }
+    if (node->value->data.static_value.is_array) {
+        return false;
+    }
+    return is_numeric_variant_type(node->value->data.static_value.type);
+}
+
+static void set_datachange_trigger_from_wire(mu_monitored_item_create_body_t *body,
+                                             opcua_uint32_t trigger)
+{
+    switch (trigger) {
+        case 0u:
+            body->trigger = MU_DATACHANGE_TRIGGER_STATUS;
+            break;
+        case 1u:
+            body->trigger = MU_DATACHANGE_TRIGGER_STATUS_VALUE;
+            break;
+        case 2u:
+            body->trigger = MU_DATACHANGE_TRIGGER_STATUS_VALUE_TIMESTAMP;
+            break;
+        default:
+            body->filter_result = MU_STATUS_BAD_MONITOREDITEMFILTERUNSUPPORTED;
+            break;
+    }
+}
+
+static opcua_statuscode_t read_datachange_filter_body(mu_binary_reader_t *r,
+                                                      size_t filter_length,
+                                                      mu_monitored_item_create_body_t *body)
+{
+    opcua_uint32_t trigger;
+    opcua_uint32_t deadband_type;
+    opcua_double_t deadband_value;
+
+    if (filter_length == 0u) {
+        return MU_STATUS_GOOD;
+    }
+    if (filter_length != 16u) {
+        return MU_STATUS_BAD_DECODINGERROR;
+    }
+    if (r->position > r->length || filter_length > r->length - r->position) {
+        return MU_STATUS_BAD_DECODINGERROR;
+    }
+
+    /* OPC-10000-4 §7.22.2: DataChangeFilter is trigger, deadbandType,
+       deadbandValue in the ExtensionObject body. */
+    mu_binary_read_uint32(r, &trigger);
+    mu_binary_read_uint32(r, &deadband_type);
+    mu_binary_read_double(r, &deadband_value);
+    if (r->status != MU_STATUS_GOOD) {
+        return r->status;
+    }
+
+    set_datachange_trigger_from_wire(body, trigger);
+    switch (deadband_type) {
+        case 0u:
+            body->deadband_type = MU_DEADBAND_TYPE_NONE;
+            body->deadband_value = 0.0;
+            break;
+        case 1u:
+            body->deadband_type = MU_DEADBAND_TYPE_ABSOLUTE;
+            body->deadband_value = deadband_value;
+            break;
+        case 2u:
+            body->deadband_type = MU_DEADBAND_TYPE_PERCENT;
+            body->deadband_value = deadband_value;
+            body->filter_result = MU_STATUS_BAD_MONITOREDITEMFILTERUNSUPPORTED;
+            break;
+        default:
+            body->filter_result = MU_STATUS_BAD_MONITOREDITEMFILTERUNSUPPORTED;
+            break;
+    }
+
+    return MU_STATUS_GOOD;
+}
+#endif
+
 static opcua_statuscode_t read_monitored_item_create_body(
     mu_binary_reader_t *r,
     mu_monitored_item_create_body_t *body)
@@ -872,6 +999,13 @@ static opcua_statuscode_t read_monitored_item_create_body(
     mu_string_t data_encoding_name;
     mu_nodeid_t filter_type;
     size_t filter_length;
+
+#if MICRO_OPCUA_SUBSCRIPTIONS_STANDARD
+    body->trigger = MU_DATACHANGE_TRIGGER_STATUS_VALUE;
+    body->deadband_type = MU_DEADBAND_TYPE_NONE;
+    body->deadband_value = 0.0;
+    body->filter_result = MU_STATUS_GOOD;
+#endif
 
     s = mu_binary_read_nodeid(r, &body->node_id); if (s != MU_STATUS_GOOD) return s;
     mu_binary_read_uint32(r, &body->attribute_id);
@@ -886,7 +1020,16 @@ static opcua_statuscode_t read_monitored_item_create_body(
     if (r->status != MU_STATUS_GOOD) return r->status;
     s = mu_binary_read_extension_object_header(r, &filter_type, &filter_length);
     if (s != MU_STATUS_GOOD) return s;
+#if MICRO_OPCUA_SUBSCRIPTIONS_STANDARD
+    if (is_datachange_filter_binary_type(&filter_type)) {
+        s = read_datachange_filter_body(r, filter_length, body);
+        if (s != MU_STATUS_GOOD) return s;
+    } else {
+        s = skip_extension_object_body(r, filter_length); if (s != MU_STATUS_GOOD) return s;
+    }
+#else
     s = skip_extension_object_body(r, filter_length); if (s != MU_STATUS_GOOD) return s;
+#endif
     mu_binary_read_uint32(r, &body->queue_size);
     mu_binary_read_boolean(r, &body->discard_oldest);
     return r->status;
@@ -1259,6 +1402,21 @@ static opcua_statuscode_t handle_create_monitored_items(mu_server_t *server,
             continue;
         }
 
+#if MICRO_OPCUA_SUBSCRIPTIONS_STANDARD
+        if (body.filter_result != MU_STATUS_GOOD) {
+            s = write_monitored_item_create_result(w, body.filter_result, 0u, 0u, 0u);
+            if (s != MU_STATUS_GOOD) return s;
+            continue;
+        }
+        if (body.deadband_type == MU_DEADBAND_TYPE_ABSOLUTE &&
+            !monitored_node_has_numeric_static_value(node)) {
+            s = write_monitored_item_create_result(
+                w, MU_STATUS_BAD_MONITOREDITEMFILTERUNSUPPORTED, 0u, 0u, 0u);
+            if (s != MU_STATUS_GOOD) return s;
+            continue;
+        }
+#endif
+
         mu_monitored_item_t *item = NULL;
         opcua_statuscode_t result =
             mu_monitored_item_alloc(&server->subs, subscription_id, &item);
@@ -1278,6 +1436,23 @@ static opcua_statuscode_t handle_create_monitored_items(mu_server_t *server,
         item->next_sample_ms = now_ms + item->sampling_interval_ms;
         item->has_value = false;
         item->pending = false;
+#if MICRO_OPCUA_SUBSCRIPTIONS_STANDARD
+        item->trigger = body.trigger;
+        item->deadband_type = body.deadband_type;
+        item->deadband_value = body.deadband_value;
+        item->queue_size = body.queue_size;
+        if (item->queue_size == 0u) {
+            item->queue_size = 1u;
+        }
+        if (item->queue_size > MU_MONITORED_QUEUE_DEPTH) {
+            item->queue_size = MU_MONITORED_QUEUE_DEPTH;
+        }
+        item->queue_head = 0u;
+        item->queue_tail = 0u;
+        item->queue_count = 0u;
+        item->discard_oldest = body.discard_oldest;
+        item->queue_overflow = false;
+#endif
         if (node->value != NULL) {
             item->last_status = mu_value_source_read(node->value, &body.node_id, &item->last_value);
             if (item->last_status == MU_STATUS_GOOD) {

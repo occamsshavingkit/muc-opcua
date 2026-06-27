@@ -1106,8 +1106,213 @@ void test_subscription_session_isolation(void) {
     TEST_ASSERT_EQUAL_HEX32(STATUS_BAD_SUBSCRIPTIONIDINVALID, r0);
 }
 
+/* ===================================================================================
+   US1 — Standard DataChange Subscription 2017 Server Facet delta (feature 005).
+   RED tests authored by Claude; Codex implements the engine + dispatch.
+   =================================================================================== */
+
+#if MICRO_OPCUA_SUBSCRIPTIONS_STANDARD
+
+#define ID_DATACHANGEFILTER_ENC_BINARY 724  /* DataChangeFilter_Encoding_DefaultBinary (i=724) */
+
+/* Write one MonitoredItemCreateRequest carrying a DataChangeFilter (OPC 10000-4 §7.22.2):
+   trigger + deadbandType + deadbandValue, with a configurable queueSize/discardOldest. */
+static void write_moncreate_item_filter(mu_binary_writer_t *w, opcua_uint16_t ns, opcua_uint32_t ident,
+                                        opcua_uint32_t client_handle, opcua_double_t interval,
+                                        opcua_uint32_t trigger, opcua_uint32_t deadband_type,
+                                        opcua_double_t deadband_value, opcua_uint32_t queue_size,
+                                        bool discard_oldest) {
+    mu_nodeid_t n = { ns, MU_NODEID_NUMERIC, { ident } };
+    mu_binary_write_nodeid(w, &n);          /* itemToMonitor.nodeId */
+    mu_binary_write_uint32(w, 13);          /* attributeId = Value */
+    { mu_string_t nul = {-1,NULL}; mu_binary_write_string(w, &nul); }   /* indexRange */
+    mu_binary_write_uint16(w, 0);           /* dataEncoding.namespaceIndex */
+    { mu_string_t nul = {-1,NULL}; mu_binary_write_string(w, &nul); }   /* dataEncoding.name */
+    mu_binary_write_uint32(w, 2);           /* monitoringMode = Reporting */
+    mu_binary_write_uint32(w, client_handle);
+    mu_binary_write_double(w, interval);    /* samplingInterval */
+    /* filter: DataChangeFilter ExtensionObject, 16-byte body (§7.22.2). */
+    { mu_nodeid_t ft = {0,MU_NODEID_NUMERIC,{ID_DATACHANGEFILTER_ENC_BINARY}};
+      mu_binary_write_extension_object_header(w, &ft, 16); }
+    mu_binary_write_uint32(w, trigger);         /* DataChangeTrigger */
+    mu_binary_write_uint32(w, deadband_type);   /* DeadbandType: 0 None,1 Absolute,2 Percent */
+    mu_binary_write_double(w, deadband_value);
+    mu_binary_write_uint32(w, queue_size);      /* queueSize */
+    mu_binary_write_boolean(w, discard_oldest); /* discardOldest */
+}
+
+/* US1 — Absolute Deadband DataChangeFilter (OPC 10000-4 §7.22.2, DeadbandType=Absolute);
+   `Monitored Items Deadband Filter` CU. A numeric value change smaller than the deadband is
+   NOT reported; a change at or above it is (compared against the last *reported* value).
+   RED until Codex implements deadband eval (T013) + filter decode (T017). */
+void test_monitored_item_absolute_deadband(void) {
+    mock_t mock; memset(&mock, 0, sizeof(mock));
+    enqueue_connect(&mock);
+    enqueue_create_subscription(&mock, 4, 200.0, 100, 3);   /* keepalive 3 → keep-alives fire */
+
+    opcua_byte_t storage[MU_SERVER_STORAGE_BYTES]; mu_server_config_t config;
+    s_mon_val = 10;
+    mu_server_t *server = make_server(&mock, storage, sizeof(storage), &config, &samp_space);
+    mu_binary_reader_t body; opcua_statuscode_t sr;
+    run_connect(server);
+    mu_server_poll(server); /* CreateSubscription */
+    TEST_ASSERT_EQUAL(ID_CREATESUBSCRIPTIONRESPONSE, parse_response(mock.last_write, mock.last_write_len, &body, &sr));
+    opcua_uint32_t sub_id; mu_binary_read_uint32(&body, &sub_id);
+
+    /* CreateMonitoredItems (seq 5): item with absolute deadband 5.0, sampling 100 ms. */
+    opcua_byte_t tmp[1024], chunk[1024]; mu_binary_writer_t w; size_t clen;
+    mu_binary_writer_init(&w, tmp, sizeof(tmp));
+    { mu_nodeid_t t={0,MU_NODEID_NUMERIC,{ID_CREATEMONITOREDITEMSREQUEST}}; mu_binary_write_nodeid(&w,&t); }
+    write_request_header(&w, 12345, 5);
+    mu_binary_write_uint32(&w, sub_id);
+    mu_binary_write_uint32(&w, 3);          /* timestampsToReturn */
+    mu_binary_write_int32(&w, 1);           /* itemsToCreate count */
+    write_moncreate_item_filter(&w, 1, 5000, 7, 100.0, 1 /*StatusValue*/, 1 /*Absolute*/, 5.0, 1, true);
+    clen = build_msg(chunk, sizeof(chunk), 5, 5, tmp, w.position); enqueue(&mock, chunk, clen);
+    mu_server_poll(server); /* CreateMonitoredItems (initial sample = 10) */
+    TEST_ASSERT_EQUAL(ID_CREATEMONITOREDITEMSRESPONSE, parse_response(mock.last_write, mock.last_write_len, &body, &sr));
+    opcua_int32_t ncreate; mu_binary_read_int32(&body, &ncreate); TEST_ASSERT_EQUAL(1, ncreate);
+    opcua_uint32_t item_id; opcua_statuscode_t cstat = read_moncreate_result(&body, &item_id);
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, cstat);
+
+    opcua_uint32_t sid, seqn, ch; mu_datavalue_t dv;
+
+    /* Publish #1 (seq 6): initial value 10 delivered. */
+    enqueue_publish(&mock, 6);
+    mu_server_poll(server);
+    tick_to(server, 300);
+    TEST_ASSERT_EQUAL(ID_PUBLISHRESPONSE, parse_response(mock.last_write, mock.last_write_len, &body, &sr));
+    TEST_ASSERT_EQUAL(1, parse_publish_response(&body, &sid, &seqn, &ch, &dv));
+    TEST_ASSERT_EQUAL_INT32(10, dv.value.value.i32);
+
+    /* Sub-threshold change to 12 (|12-10| = 2 < 5): suppressed. Park a Publish and advance
+       past maxKeepAliveCount intervals → a keep-alive (0 data) proves suppression. */
+    s_mon_val = 12;
+    enqueue_publish(&mock, 7);
+    mu_server_poll(server);
+    for (opcua_uint64_t t = 500; t <= 1700; t += 200) { s_tick = t; mu_server_poll(server); }
+    TEST_ASSERT_EQUAL(ID_PUBLISHRESPONSE, parse_response(mock.last_write, mock.last_write_len, &body, &sr));
+    TEST_ASSERT_EQUAL(0, parse_publish_response(&body, &sid, &seqn, &ch, &dv));   /* suppressed */
+
+    /* At/above threshold: 20 (|20-10| = 10 >= 5): reported. */
+    s_mon_val = 20;
+    enqueue_publish(&mock, 8);
+    mu_server_poll(server);
+    tick_to(server, 2100);
+    TEST_ASSERT_EQUAL(ID_PUBLISHRESPONSE, parse_response(mock.last_write, mock.last_write_len, &body, &sr));
+    TEST_ASSERT_EQUAL(1, parse_publish_response(&body, &sid, &seqn, &ch, &dv));
+    TEST_ASSERT_EQUAL_INT32(20, dv.value.value.i32);
+}
+
+#if MU_MONITORED_QUEUE_DEPTH >= 2
+/* Overflow InfoBit: InfoType=DataValue (0x0400) | Overflow (0x0080) per OPC-10000-4 §7.20.1
+   and the OPC-10000-6 StatusCode encoding. Codex must set exactly this on the oldest retained
+   value when the queue overflows. */
+#define STATUS_INFO_OVERFLOW 0x00000480u
+
+/* Parse a PublishResponse DataChangeNotification into arrays of clientHandle + DataValue;
+   returns the number of MonitoredItemNotifications delivered. */
+static opcua_int32_t parse_publish_notifications(mu_binary_reader_t *body, opcua_uint32_t *sub_id,
+                                                 opcua_uint32_t *handles, mu_datavalue_t *dvs,
+                                                 opcua_int32_t maxn) {
+    mu_binary_read_uint32(body, sub_id);
+    opcua_int32_t navail; mu_binary_read_int32(body, &navail);
+    for (opcua_int32_t i = 0; i < navail; ++i) { opcua_uint32_t a; mu_binary_read_uint32(body, &a); }
+    opcua_byte_t more; mu_binary_read_byte(body, &more);
+    opcua_uint32_t seqn; mu_binary_read_uint32(body, &seqn);
+    opcua_int64_t pt; mu_binary_read_int64(body, &pt);
+    opcua_int32_t ndata; mu_binary_read_int32(body, &ndata);
+    opcua_int32_t total = 0;
+    for (opcua_int32_t d = 0; d < ndata; ++d) {
+        mu_nodeid_t type; size_t len; mu_binary_read_extension_object_header(body, &type, &len);
+        if (type.identifier.numeric == ID_DATACHANGENOTIFICATION) {
+            opcua_int32_t nitems; mu_binary_read_int32(body, &nitems);
+            for (opcua_int32_t i = 0; i < nitems; ++i) {
+                opcua_uint32_t ch; mu_datavalue_t dv;
+                mu_binary_read_uint32(body, &ch);
+                mu_binary_read_datavalue(body, &dv);
+                if (total < maxn) { handles[total] = ch; dvs[total] = dv; }
+                total++;
+            }
+            opcua_int32_t ndiag; mu_binary_read_int32(body, &ndiag); /* diagnosticInfos[] */
+        }
+    }
+    return total;
+}
+
+/* US1 — MonitoredItem notification queue (OPC 10000-4 §5.13.2 queueSize/discardOldest,
+   §7.20.1 overflow). queueSize=2, discardOldest=true: three rapid changes (20,30,40) between
+   publishes drop the oldest (20) and deliver the two most-recent (30,40); the oldest retained
+   value (30) carries the Overflow InfoBit. RED until Codex implements the queue (T014). */
+void test_monitored_item_queue_overflow(void) {
+    mock_t mock; memset(&mock, 0, sizeof(mock));
+    enqueue_connect(&mock);
+    enqueue_create_subscription(&mock, 4, 1000.0, 1000, 1000); /* publishing 1000 ms */
+
+    opcua_byte_t storage[MU_SERVER_STORAGE_BYTES]; mu_server_config_t config;
+    s_mon_val = 10;
+    mu_server_t *server = make_server(&mock, storage, sizeof(storage), &config, &samp_space);
+    mu_binary_reader_t body; opcua_statuscode_t sr;
+    run_connect(server);
+    mu_server_poll(server); /* CreateSubscription */
+    TEST_ASSERT_EQUAL(ID_CREATESUBSCRIPTIONRESPONSE, parse_response(mock.last_write, mock.last_write_len, &body, &sr));
+    opcua_uint32_t sub_id; mu_binary_read_uint32(&body, &sub_id);
+
+    /* CreateMonitoredItems (seq 5): queueSize=2, discardOldest=true, no deadband, sampling 100 ms. */
+    opcua_byte_t tmp[1024], chunk[1024]; mu_binary_writer_t w; size_t clen;
+    mu_binary_writer_init(&w, tmp, sizeof(tmp));
+    { mu_nodeid_t t={0,MU_NODEID_NUMERIC,{ID_CREATEMONITOREDITEMSREQUEST}}; mu_binary_write_nodeid(&w,&t); }
+    write_request_header(&w, 12345, 5);
+    mu_binary_write_uint32(&w, sub_id);
+    mu_binary_write_uint32(&w, 3);
+    mu_binary_write_int32(&w, 1);
+    write_moncreate_item_filter(&w, 1, 5000, 7, 100.0, 1 /*StatusValue*/, 0 /*None*/, 0.0, 2, true);
+    clen = build_msg(chunk, sizeof(chunk), 5, 5, tmp, w.position); enqueue(&mock, chunk, clen);
+    mu_server_poll(server);
+    TEST_ASSERT_EQUAL(ID_CREATEMONITOREDITEMSRESPONSE, parse_response(mock.last_write, mock.last_write_len, &body, &sr));
+    opcua_int32_t ncreate; mu_binary_read_int32(&body, &ncreate); TEST_ASSERT_EQUAL(1, ncreate);
+    opcua_uint32_t item_id; opcua_statuscode_t cstat = read_moncreate_result(&body, &item_id);
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, cstat);
+
+    opcua_uint32_t sid; opcua_uint32_t hs[8]; mu_datavalue_t dvs[8];
+
+    /* Publish #1 (seq 6) at t=1000: drains the initial value (10). */
+    enqueue_publish(&mock, 6);
+    mu_server_poll(server);
+    tick_to(server, 1000);
+    TEST_ASSERT_EQUAL(ID_PUBLISHRESPONSE, parse_response(mock.last_write, mock.last_write_len, &body, &sr));
+    TEST_ASSERT_EQUAL(1, parse_publish_notifications(&body, &sid, hs, dvs, 8));
+    TEST_ASSERT_EQUAL_INT32(10, dvs[0].value.value.i32);
+
+    /* Three changes sampled before the next publish timer (2000): 20,30,40. queue cap 2 +
+       discardOldest drops 20. */
+    s_mon_val = 20; s_tick = 1100; mu_server_poll(server);
+    s_mon_val = 30; s_tick = 1200; mu_server_poll(server);
+    s_mon_val = 40; s_tick = 1300; mu_server_poll(server);
+
+    /* Publish #2 (seq 7) at t=2000: delivers 30 (Overflow InfoBit) then 40. */
+    enqueue_publish(&mock, 7);
+    mu_server_poll(server);
+    tick_to(server, 2000);
+    TEST_ASSERT_EQUAL(ID_PUBLISHRESPONSE, parse_response(mock.last_write, mock.last_write_len, &body, &sr));
+    opcua_int32_t n = parse_publish_notifications(&body, &sid, hs, dvs, 8);
+    TEST_ASSERT_EQUAL(2, n);
+    TEST_ASSERT_EQUAL_INT32(30, dvs[0].value.value.i32);
+    TEST_ASSERT_EQUAL_HEX32(STATUS_INFO_OVERFLOW, dvs[0].status & STATUS_INFO_OVERFLOW);
+    TEST_ASSERT_EQUAL_INT32(40, dvs[1].value.value.i32);
+}
+#endif /* MU_MONITORED_QUEUE_DEPTH >= 2 */
+
+#endif /* MICRO_OPCUA_SUBSCRIPTIONS_STANDARD */
+
 int main(void) {
     UNITY_BEGIN();
+#if MICRO_OPCUA_SUBSCRIPTIONS_STANDARD
+    RUN_TEST(test_monitored_item_absolute_deadband);
+#if MU_MONITORED_QUEUE_DEPTH >= 2
+    RUN_TEST(test_monitored_item_queue_overflow);
+#endif
+#endif
     RUN_TEST(test_create_subscription);
     RUN_TEST(test_create_subscription_too_many);
     RUN_TEST(test_delete_subscriptions);

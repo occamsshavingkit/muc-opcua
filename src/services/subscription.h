@@ -21,6 +21,26 @@
 
 #if MICRO_OPCUA_SUBSCRIPTIONS
 
+/*
+ * The embedded build raises these maxima via -D overrides to meet the Standard
+ * DataChange Subscription 2017 Server Facet minimums (OPC-10000-7 §6.6.17):
+ * MU_MAX_MONITORED_ITEMS >= 100 (Monitor Items 100),
+ * MU_MAX_SUBSCRIPTIONS >= 2 (Subscription Minimum 02),
+ * MU_MAX_PUBLISH_REQUESTS >= 5 (Subscription Publish Min 05), and
+ * MU_MONITORED_QUEUE_DEPTH >= 2 (Monitor MinQueueSize_02).
+ */
+
+/* OPC-10000-4 §7.21 MonitoringParameters queueSize, §5.13.2. */
+#ifndef MU_MONITORED_QUEUE_DEPTH
+/* Default queue size is 1 for micro; embedded overrides to >=2. */
+#define MU_MONITORED_QUEUE_DEPTH 1
+#endif
+
+/* OPC-10000-4 §5.13.5 SetTriggering. */
+#ifndef MU_MAX_TRIGGER_LINKS
+#define MU_MAX_TRIGGER_LINKS 4
+#endif
+
 /* Fixed engine capacities. Integrator-overridable with -D (e.g. -DMU_MAX_MONITORED_ITEMS=16). */
 #ifndef MU_MAX_SUBSCRIPTIONS
 #define MU_MAX_SUBSCRIPTIONS 2
@@ -66,6 +86,12 @@ typedef enum {
     MU_DATACHANGE_TRIGGER_STATUS_VALUE_TIMESTAMP = 2
 } mu_datachange_trigger_t;
 
+typedef enum {
+    MU_DEADBAND_TYPE_NONE = 0,
+    MU_DEADBAND_TYPE_ABSOLUTE = 1,
+    MU_DEADBAND_TYPE_PERCENT = 2
+} mu_deadband_type_t;
+
 /* A single data MonitoredItem (OPC 10000-4 §5.13, §7.21). */
 typedef struct {
     bool in_use;
@@ -83,6 +109,35 @@ typedef struct {
        the monitorable base nodes (ServerStatus.CurrentTime, .State, ServiceLevel). */
     mu_variant_t last_value;
     opcua_statuscode_t last_status;
+
+#if MICRO_OPCUA_SUBSCRIPTIONS_STANDARD
+    /* Standard DataChange Subscription 2017 Server Facet additions
+     * (OPC-10000-7 §6.6.17), gated to keep micro byte-identical. */
+    /* OPC-10000-4 7.22.2: AbsoluteDeadband compares
+       |new - last_reported| >= deadband_value. */
+    mu_deadband_type_t deadband_type;
+    opcua_double_t deadband_value;
+    opcua_double_t last_reported_numeric;
+    bool has_reported;
+
+    /* OPC-10000-4 5.13.2 MonitoringParameters queueSize/discardOldest;
+       OPC-10000-4 7.20.1 queue overflow. */
+    struct {
+        mu_variant_t value;
+        opcua_statuscode_t status;
+    } queue[MU_MONITORED_QUEUE_DEPTH];
+    opcua_uint32_t queue_size;
+    opcua_byte_t queue_head;
+    opcua_byte_t queue_tail;
+    opcua_byte_t queue_count;
+    bool discard_oldest;
+    bool queue_overflow;
+
+    /* OPC-10000-4 5.13.5: monitored item ids triggered by this item. */
+    opcua_uint32_t triggered_items[MU_MAX_TRIGGER_LINKS];
+    opcua_byte_t triggered_count;
+#endif
+
     bool has_value;                         /* a baseline sample has been taken */
     bool pending;                           /* a change is queued, awaiting the next Publish */
     opcua_uint64_t next_sample_ms;          /* monotonic tick of the next sample */

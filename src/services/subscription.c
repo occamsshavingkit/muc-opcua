@@ -2,6 +2,10 @@
 #include "subscription.h"
 #include <string.h>
 
+#if MICRO_OPCUA_SUBSCRIPTIONS_STANDARD
+#include <math.h>
+#endif
+
 #if MICRO_OPCUA_SUBSCRIPTIONS
 
 #include "../core/server_internal.h"
@@ -10,6 +14,11 @@
 
 #define MU_PUBLISH_BODY_BYTES 512u
 #define MU_ID_DATACHANGENOTIFICATION_ENCODING_DEFAULTBINARY 811u
+
+#if MICRO_OPCUA_SUBSCRIPTIONS_STANDARD
+/* OPC-10000-4 §7.20.1 / OPC-10000-6 StatusCode: InfoType=DataValue + Overflow. */
+#define MU_STATUSCODE_INFOTYPE_DATAVALUE_OVERFLOW 0x00000480u
+#endif
 
 static bool variant_scalar_equal(const mu_variant_t *a, const mu_variant_t *b)
 {
@@ -50,6 +59,180 @@ static bool variant_scalar_equal(const mu_variant_t *a, const mu_variant_t *b)
             return false;
     }
 }
+
+#if MICRO_OPCUA_SUBSCRIPTIONS_STANDARD
+static bool variant_numeric_to_double(const mu_variant_t *value, opcua_double_t *out)
+{
+    if (value->is_array) {
+        return false;
+    }
+
+    switch (value->type) {
+        case MU_TYPE_SBYTE:
+            *out = (opcua_double_t)value->value.sb;
+            return true;
+        case MU_TYPE_BYTE:
+            *out = (opcua_double_t)value->value.by;
+            return true;
+        case MU_TYPE_INT16:
+            *out = (opcua_double_t)value->value.i16;
+            return true;
+        case MU_TYPE_UINT16:
+            *out = (opcua_double_t)value->value.ui16;
+            return true;
+        case MU_TYPE_INT32:
+            *out = (opcua_double_t)value->value.i32;
+            return true;
+        case MU_TYPE_UINT32:
+            *out = (opcua_double_t)value->value.ui32;
+            return true;
+        case MU_TYPE_INT64:
+            *out = (opcua_double_t)value->value.i64;
+            return true;
+        case MU_TYPE_UINT64:
+            *out = (opcua_double_t)value->value.ui64;
+            return true;
+        case MU_TYPE_FLOAT:
+            *out = (opcua_double_t)value->value.f;
+            return true;
+        case MU_TYPE_DOUBLE:
+            *out = value->value.d;
+            return true;
+        default:
+            return false;
+    }
+}
+
+static bool monitored_item_change_reportable(const mu_monitored_item_t *item,
+                                             const mu_variant_t *cur,
+                                             opcua_statuscode_t status)
+{
+    opcua_double_t numeric = 0.0;
+    opcua_double_t reported_numeric = 0.0;
+
+    if (!item->has_reported || status != item->last_status) {
+        return true;
+    }
+
+    if (item->deadband_type != MU_DEADBAND_TYPE_ABSOLUTE) {
+        return true;
+    }
+
+    if (!variant_numeric_to_double(cur, &numeric) ||
+        !variant_numeric_to_double(&item->last_value, &reported_numeric)) {
+        return true;
+    }
+
+    (void)reported_numeric;
+    /* OPC-10000-4 §7.22.2: Absolute deadband suppresses same-status
+       numeric changes smaller than |new - last reported| >= deadbandValue. */
+    return fabs((double)numeric - (double)item->last_reported_numeric) >=
+           (double)item->deadband_value;
+}
+
+static void monitored_item_record_reported(mu_monitored_item_t *item,
+                                           const mu_variant_t *cur)
+{
+    opcua_double_t numeric = 0.0;
+
+    if (variant_numeric_to_double(cur, &numeric)) {
+        item->last_reported_numeric = numeric;
+    }
+    item->has_reported = true;
+}
+
+static opcua_uint32_t monitored_item_effective_queue_size(mu_monitored_item_t *item)
+{
+    opcua_uint32_t queue_size = item->queue_size;
+
+    if (queue_size == 0u) {
+        queue_size = 1u;
+    }
+    if (queue_size > MU_MONITORED_QUEUE_DEPTH) {
+        queue_size = MU_MONITORED_QUEUE_DEPTH;
+    }
+
+    item->queue_size = queue_size;
+    if (item->queue_head >= queue_size) {
+        item->queue_head = 0u;
+    }
+    if (item->queue_tail >= queue_size) {
+        item->queue_tail = 0u;
+    }
+    if (item->queue_count > queue_size) {
+        item->queue_count = (opcua_byte_t)queue_size;
+    }
+    return queue_size;
+}
+
+static opcua_byte_t monitored_item_queue_next(opcua_byte_t index,
+                                              opcua_uint32_t queue_size)
+{
+    ++index;
+    if (index >= queue_size) {
+        index = 0u;
+    }
+    return index;
+}
+
+static opcua_byte_t monitored_item_queue_previous(opcua_byte_t index,
+                                                  opcua_uint32_t queue_size)
+{
+    if (index == 0u) {
+        return (opcua_byte_t)(queue_size - 1u);
+    }
+    return (opcua_byte_t)(index - 1u);
+}
+
+static void monitored_item_mark_overflow(mu_monitored_item_t *item,
+                                         opcua_byte_t index)
+{
+    item->queue[index].status |= MU_STATUSCODE_INFOTYPE_DATAVALUE_OVERFLOW;
+    item->queue_overflow = true;
+}
+
+static void monitored_item_enqueue_report(mu_monitored_item_t *item,
+                                          const mu_variant_t *cur,
+                                          opcua_statuscode_t status)
+{
+    opcua_uint32_t queue_size = monitored_item_effective_queue_size(item);
+
+    /* OPC-10000-4 §5.13.2 queueSize/discardOldest, §7.20.1 overflow. */
+    if (item->queue_count < queue_size) {
+        item->queue[item->queue_tail].value = *cur;
+        item->queue[item->queue_tail].status = status;
+        item->queue_tail = monitored_item_queue_next(item->queue_tail,
+                                                     queue_size);
+        ++item->queue_count;
+    } else if (item->discard_oldest) {
+        item->queue_head = monitored_item_queue_next(item->queue_head,
+                                                     queue_size);
+        item->queue[item->queue_tail].value = *cur;
+        item->queue[item->queue_tail].status = status;
+        item->queue_tail = monitored_item_queue_next(item->queue_tail,
+                                                     queue_size);
+        monitored_item_mark_overflow(item, item->queue_head);
+    } else {
+        opcua_byte_t newest =
+            monitored_item_queue_previous(item->queue_tail, queue_size);
+        item->queue[newest].value = *cur;
+        item->queue[newest].status = status;
+        monitored_item_mark_overflow(item, newest);
+    }
+
+    monitored_item_record_reported(item, cur);
+    item->pending = item->queue_count > 0u;
+}
+
+static void monitored_item_prepare_pending_queue(mu_monitored_item_t *item)
+{
+    if (item->pending && item->queue_count == 0u && item->has_value) {
+        monitored_item_enqueue_report(item, &item->last_value, item->last_status);
+    } else if (item->has_value && !item->has_reported) {
+        monitored_item_record_reported(item, &item->last_value);
+    }
+}
+#endif
 
 static opcua_statuscode_t read_monitored_item_value(const mu_monitored_item_t *item,
                                                     mu_variant_t *cur)
@@ -259,10 +442,38 @@ static bool monitored_item_reportable(const mu_monitored_item_t *item,
 {
     return item->in_use &&
            item->subscription_id == sub->subscription_id &&
+#if MICRO_OPCUA_SUBSCRIPTIONS_STANDARD
+           (item->pending || item->queue_count > 0u) &&
+#else
            item->pending &&
+#endif
            item->monitoring_mode == MU_MONITORING_MODE_REPORTING;
 }
 
+#if MICRO_OPCUA_SUBSCRIPTIONS_STANDARD
+static opcua_int32_t count_reportable_items(const struct mu_server *server,
+                                            mu_subscription_t *sub)
+{
+    opcua_int32_t count = 0;
+    opcua_uint32_t max_notifications = sub->max_notifications_per_publish;
+    sub->more_notifications = false;
+
+    for (size_t i = 0; i < MU_MAX_MONITORED_ITEMS; ++i) {
+        if (monitored_item_reportable(&server->subs.monitored_items[i], sub)) {
+            const mu_monitored_item_t *item = &server->subs.monitored_items[i];
+            for (opcua_byte_t queued = 0u; queued < item->queue_count; ++queued) {
+                if (max_notifications != 0u &&
+                    (opcua_uint32_t)count >= max_notifications) {
+                    sub->more_notifications = true;
+                    return count;
+                }
+                ++count;
+            }
+        }
+    }
+    return count;
+}
+#else
 static opcua_int32_t count_reportable_items(const struct mu_server *server,
                                             const mu_subscription_t *sub)
 {
@@ -274,7 +485,51 @@ static opcua_int32_t count_reportable_items(const struct mu_server *server,
     }
     return count;
 }
+#endif
 
+#if MICRO_OPCUA_SUBSCRIPTIONS_STANDARD
+static void prepare_reportable_queues(struct mu_server *server,
+                                      const mu_subscription_t *sub)
+{
+    for (size_t i = 0; i < MU_MAX_MONITORED_ITEMS; ++i) {
+        mu_monitored_item_t *item = &server->subs.monitored_items[i];
+        if (monitored_item_reportable(item, sub)) {
+            monitored_item_prepare_pending_queue(item);
+        }
+    }
+}
+
+static void clear_reported_items(struct mu_server *server,
+                                 const mu_subscription_t *sub,
+                                 opcua_int32_t report_count)
+{
+    opcua_int32_t remaining = report_count;
+
+    for (size_t i = 0; i < MU_MAX_MONITORED_ITEMS && remaining > 0; ++i) {
+        mu_monitored_item_t *item = &server->subs.monitored_items[i];
+        if (!monitored_item_reportable(item, sub)) {
+            continue;
+        }
+
+        opcua_uint32_t queue_size = monitored_item_effective_queue_size(item);
+        while (item->queue_count > 0u && remaining > 0) {
+            item->queue_head = monitored_item_queue_next(item->queue_head,
+                                                         queue_size);
+            --item->queue_count;
+            --remaining;
+        }
+
+        if (item->queue_count == 0u) {
+            item->queue_head = 0u;
+            item->queue_tail = 0u;
+            item->pending = false;
+            item->queue_overflow = false;
+        } else {
+            item->pending = true;
+        }
+    }
+}
+#else
 static void clear_reported_items(struct mu_server *server, const mu_subscription_t *sub)
 {
     for (size_t i = 0; i < MU_MAX_MONITORED_ITEMS; ++i) {
@@ -284,6 +539,7 @@ static void clear_reported_items(struct mu_server *server, const mu_subscription
         }
     }
 }
+#endif
 
 static opcua_datetime_t publish_time_now(const struct mu_server *server)
 {
@@ -322,6 +578,39 @@ static opcua_statuscode_t write_data_change_notification(mu_binary_writer_t *w,
             continue;
         }
 
+#if MICRO_OPCUA_SUBSCRIPTIONS_STANDARD
+        opcua_uint32_t queue_size = item->queue_size;
+        opcua_byte_t entry_index = item->queue_head;
+        if (queue_size == 0u) {
+            queue_size = 1u;
+        } else if (queue_size > MU_MONITORED_QUEUE_DEPTH) {
+            queue_size = MU_MONITORED_QUEUE_DEPTH;
+        }
+
+        for (opcua_byte_t queued = 0u;
+             queued < item->queue_count && report_count > 0;
+             ++queued) {
+            const mu_variant_t *value = &item->queue[entry_index].value;
+            opcua_statuscode_t status = item->queue[entry_index].status;
+
+            s = mu_binary_write_uint32(w, item->client_handle);
+            if (s != MU_STATUS_GOOD) return s;
+
+            mu_datavalue_t dv;
+            memset(&dv, 0, sizeof(dv));
+            dv.has_value = true;
+            dv.value = *value;
+            if (status != MU_STATUS_GOOD) {
+                dv.has_status = true;
+                dv.status = status;
+            }
+            s = mu_binary_write_datavalue(w, &dv);
+            if (s != MU_STATUS_GOOD) return s;
+
+            --report_count;
+            entry_index = monitored_item_queue_next(entry_index, queue_size);
+        }
+#else
         s = mu_binary_write_uint32(w, item->client_handle);
         if (s != MU_STATUS_GOOD) return s;
 
@@ -335,6 +624,7 @@ static opcua_statuscode_t write_data_change_notification(mu_binary_writer_t *w,
         }
         s = mu_binary_write_datavalue(w, &dv);
         if (s != MU_STATUS_GOOD) return s;
+#endif
     }
 
     s = mu_binary_write_int32(w, 0);
@@ -378,7 +668,11 @@ static opcua_statuscode_t build_publish_response(struct mu_server *server,
     if (s != MU_STATUS_GOOD) return s;
     s = mu_binary_write_int32(&w, 0);
     if (s != MU_STATUS_GOOD) return s;
+#if MICRO_OPCUA_SUBSCRIPTIONS_STANDARD
+    s = mu_binary_write_boolean(&w, include_data && sub->more_notifications);
+#else
     s = mu_binary_write_boolean(&w, false);
+#endif
     if (s != MU_STATUS_GOOD) return s;
 
     size_t message_start = w.position;
@@ -483,6 +777,9 @@ static void publish_due(struct mu_server *server, opcua_uint64_t now_ms)
         opcua_int32_t report_count = 0;
         bool has_data = false;
         if (sub->publishing_enabled) {
+#if MICRO_OPCUA_SUBSCRIPTIONS_STANDARD
+            prepare_reportable_queues(server, sub);
+#endif
             report_count = count_reportable_items(server, sub);
             has_data = report_count > 0;
         }
@@ -505,7 +802,11 @@ static void publish_due(struct mu_server *server, opcua_uint64_t now_ms)
                     s = mu_server_emit_message(server, request.request_id, body, body_length);
                 }
                 if (s == MU_STATUS_GOOD) {
+#if MICRO_OPCUA_SUBSCRIPTIONS_STANDARD
+                    clear_reported_items(server, sub, report_count);
+#else
                     clear_reported_items(server, sub);
+#endif
                     sub->keep_alive_counter = 0u;
                     if (message_end >= message_start && message_end <= body_length) {
                         store_retransmit(sub, sequence_number, publish_time,
@@ -840,15 +1141,34 @@ void mu_subscriptions_tick(struct mu_server *server, opcua_uint64_t now_ms)
         memset(&cur, 0, sizeof(cur));
         opcua_statuscode_t status = read_monitored_item_value(item, &cur);
 
+#if MICRO_OPCUA_SUBSCRIPTIONS_STANDARD
+        if (item->has_value &&
+            (!item->has_reported || (item->pending && item->queue_count == 0u))) {
+            monitored_item_prepare_pending_queue(item);
+        }
+#endif
+
         if (!item->has_value) {
             item->last_value = cur;
             item->last_status = status;
             item->has_value = true;
+#if MICRO_OPCUA_SUBSCRIPTIONS_STANDARD
+            monitored_item_enqueue_report(item, &cur, status);
+#else
             item->pending = true;
+#endif
         } else if (monitored_item_sample_changed(item, &cur, status)) {
+#if MICRO_OPCUA_SUBSCRIPTIONS_STANDARD
+            if (monitored_item_change_reportable(item, &cur, status)) {
+                item->last_value = cur;
+                item->last_status = status;
+                monitored_item_enqueue_report(item, &cur, status);
+            }
+#else
             item->last_value = cur;
             item->last_status = status;
             item->pending = true;
+#endif
         }
 
         advance_sample_timer(item, now_ms);
