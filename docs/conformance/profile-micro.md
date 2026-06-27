@@ -47,9 +47,10 @@ aggregate/percent-deadband filters belong to the Standard/Enhanced DataChange fa
 Security policies on the Micro tier are not required (None is the baseline), though
 Basic256Sha256 is available.
 
+**Concurrent ≥2 sessions** — implemented: the server multiplexes up to
+`MU_MAX_SESSIONS` (default 2) logical sessions over a single TCP connection
+(`test_session`, `test_single_client_limit`).
+
 ## Remaining to full Micro (see [status.md](status.md))
-- **Concurrent ≥2 sessions** — the profile requires support for at least two sessions.
-  The server is currently single-connection / single-session; the multi-connection
-  refactor is the remaining implementation item.
 - **CTT verification** — not yet run; `profile-targeting` until it passes. No
   profile-compliance claim is made without that evidence.

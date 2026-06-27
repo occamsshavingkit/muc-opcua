@@ -255,8 +255,10 @@ are always present.
 Profile shorthand (the `Makefile` wires these into `make nano` / `make micro`):
 
 - **Nano** = Core Server Facet + UA-TCP/UA-SC/UA-Binary + SecurityPolicy None +
-  Anonymous, single Session. Subscriptions OFF.
-- **Micro** = Nano + subscriptions (`MICRO_OPCUA_SUBSCRIPTIONS`) + ≥2 Sessions.
+  Anonymous identity. Subscriptions OFF.
+- **Micro** = Nano + data-change subscriptions (`MICRO_OPCUA_SUBSCRIPTIONS`).
+- (All profiles multiplex up to `MU_MAX_SESSIONS` (default 2) logical sessions over the
+  single TCP connection — it is a core capability, not profile-specific.)
 - **Embedded (partial, ahead of schedule)** = security policies on top, i.e.
   `MICRO_OPCUA_SECURITY` (Basic256Sha256), which is an Embedded-tier feature already
   available.

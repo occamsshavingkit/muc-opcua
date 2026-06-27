@@ -48,12 +48,18 @@ Cortex-M0+ with `-Os`; full methodology and breakdown are in
 
 | Profile | Adds | Core `.text` (flash) | `MU_SERVER_STORAGE_BYTES` | Heap |
 |---|---|---|---|---|
-| **nano** | SecurityPolicy None; Discovery + Session + Read + View service sets + Base Information node set; no subscriptions | **16.2 KiB** | 1024 B | 0 |
-| **micro** | nano **+** data-change subscriptions (MonitoredItems / Publish) | **22.2 KiB** | 3072 B | 0 |
-| **embedded** | micro **+** SecurityPolicy Basic256Sha256 (Sign / Sign&Encrypt) | **27.0 KiB** | 10240 B | 0 |
+| **nano** | SecurityPolicy None; Discovery + Session + Read + View service sets + Base Information node set; no subscriptions | **16.3 KiB** | 1280 B | 0 |
+| **micro** | nano **+** data-change subscriptions (MonitoredItems / Publish) | **22.4 KiB** | 3328 B | 0 |
+| **embedded**¹ | micro **+** SecurityPolicy Basic256Sha256 (Sign / Sign&Encrypt) | **27.1 KiB** | 10496 B | 0 |
 
-In every profile, `.data` and heap are **0**. RAM is caller-provided: the
-`MU_SERVER_STORAGE_BYTES` block above plus two transport buffers (default **2 × 8 KiB**).
+¹ The **`embedded` profile is preliminary** — it is "Micro + Basic256Sha256 transport
+security," *not* a complete/CTT-certified OPC UA Embedded 2017 profile (full type-system
+exposure and the Standard DataChange Subscription facet are still pending). See
+[docs/conformance/status.md](docs/conformance/status.md).
+
+In every profile, `.data`, `.bss`, and heap are **0** (the core has no mutable global
+state). RAM is caller-provided: the `MU_SERVER_STORAGE_BYTES` block above plus two
+transport buffers (default **2 × 8 KiB**).
 On the RP2040's 264 KiB of RAM, a full Micro server leaves roughly 240 KiB for your
 application and network stack.
 
@@ -245,16 +251,18 @@ Set `-DMICRO_OPCUA_PLATFORM=pico` with `PICO_SDK_PATH` pointing at a Pico SDK ch
 
 - **Profile-targeting, not yet CTT-certified.** Surfaces are implemented and tested, but
   no formal compliance claim is made until the OPC UA CTT passes.
-- **Single connection / session today.** Concurrent ≥2-session support is the remaining
-  item for full Micro conformance.
+- **The `embedded` profile is preliminary.** It is the Micro surface **+** SecurityPolicy
+  Basic256Sha256 — *not* a complete OPC UA Embedded 2017 Device Server profile: full
+  address-space/type-system exposure and the Standard DataChange Subscription facet are
+  not yet implemented, and it is not CTT-verified. Use it as "Micro with transport
+  security," not as a certified Embedded profile.
+- **Single TCP connection**, but it multiplexes up to `MU_MAX_SESSIONS` (default 2)
+  concurrent sessions.
 - **Anonymous identity only** — username/x509 user tokens are not implemented.
 - **SecurityPolicy None is for trusted/isolated networks or testing only.** Use
   Basic256Sha256 (embedded profile + crypto adapter) for anything exposed.
 - **Read-only-ish surface:** no Write, Call (Methods), History, NodeManagement, or
   event/aggregate subscriptions (above the Embedded Data Change facet).
-- **~156 B of core `.bss`** (address-space index cache + OPN policy hand-off) — a tracked
-  deviation from the zero-mutable-globals goal; single-connection-safe. See the
-  [size ledger](docs/size/feature-size-ledger.md).
 
 ---
 

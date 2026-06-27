@@ -43,14 +43,17 @@ The Micro Embedded Device 2017 Server Profile builds on Nano (see
 | Subscription — Republish + acknowledgements | Implemented | `test_subscriptions` (§5.14.6, §5.14.5) |
 | MonitoredItem — Create/Modify/SetMode/Delete (data change) | Implemented | `test_subscriptions` (§5.13.2/.3/.4/.6) |
 | Data-change sampling (DataChangeFilter trigger) | Implemented | `test_subscriptions` (§5.12.1.6, §7.17.2) |
-| ≥2 concurrent sessions | Not yet implemented | single connection/session today (multi-connection refactor pending) |
+| ≥2 concurrent sessions | Implemented | up to `MU_MAX_SESSIONS` (default 2) logical sessions multiplexed over one TCP connection; `test_session`, `test_single_client_limit` |
 
 ## Remaining
-1. **≥2 sessions (Micro)** — the multi-connection refactor of the core
-   connection/session state.
-2. **CTT verification** — run the OPC Foundation Compliance Test Tool against the
+1. **CTT verification** — run the OPC Foundation Compliance Test Tool against the
    server and record results; only then may a profile-compliance claim be made.
    (External step.)
+2. **Embedded profile is preliminary** — the `embedded` build is the Micro surface
+   plus SecurityPolicy Basic256Sha256 (Sign / Sign&Encrypt). It is **not** a complete
+   OPC UA Embedded 2017 Device Server profile: full address-space/type-system exposure
+   and the Standard DataChange Subscription facet are not yet implemented, and it is
+   not CTT-verified.
 
 See `specs/002-nano-profile-completion/` and `specs/003-micro-profile-completion/` for
 the task breakdowns.
