@@ -96,7 +96,11 @@ int main(void)
     printf("Initializing Micro OPC UA Server...\n");
     status = mu_server_init(g_server_storage, sizeof(g_server_storage), &config, &server);
     if (status != MU_STATUS_GOOD) {
+#ifdef MICRO_OPCUA_STATUS_STRINGS
         printf("Failed to initialize server: %s\n", mu_status_name(status));
+#else
+        printf("Failed to initialize server: 0x%08X\n", (unsigned)status);
+#endif
         return 1;
     }
 

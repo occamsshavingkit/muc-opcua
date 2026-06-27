@@ -56,9 +56,10 @@
 extern "C" {
 #endif
 
-/* Helper prototype */
+/* Optional diagnostics helper */
+#ifdef MICRO_OPCUA_STATUS_STRINGS
 const char* mu_status_name(opcua_statuscode_t status);
-bool mu_is_unsupported_service(opcua_uint32_t request_id);
+#endif
 
 #ifdef __cplusplus
 }

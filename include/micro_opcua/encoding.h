@@ -12,6 +12,8 @@ typedef struct {
     const opcua_byte_t *buffer;
     size_t length;
     size_t position;
+    /* Sticky first failure for chained binary decoder calls. */
+    opcua_statuscode_t status;
 } mu_binary_reader_t;
 
 void mu_binary_reader_init(mu_binary_reader_t *reader, const opcua_byte_t *buffer, size_t length);
@@ -32,6 +34,8 @@ typedef struct {
     opcua_byte_t *buffer;
     size_t length;
     size_t position;
+    /* Sticky first failure for chained binary encoder calls. */
+    opcua_statuscode_t status;
 } mu_binary_writer_t;
 
 void mu_binary_writer_init(mu_binary_writer_t *writer, opcua_byte_t *buffer, size_t length);

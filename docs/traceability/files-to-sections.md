@@ -82,6 +82,7 @@ This document maps implementation and test files back to OPC UA normative sectio
 | `host_tcp_adapter.h` | TBD | TBD | TBD | TBD |
 | `binary_variant.c` | TBD | TBD | TBD | TBD |
 | `binary_writer.c` | TBD | TBD | TBD | TBD |
+| `binary_le.h` | OPC-10000-6 | 5.2.1 | OPC UA Binary little-endian pack/unpack helpers | shared by binary_reader.c / binary_writer.c |
 | `binary_nodeid.c` | TBD | TBD | TBD | TBD |
 | `binary_extension_object.c` | TBD | TBD | TBD | TBD |
 | `binary_datavalue.c` | TBD | TBD | TBD | TBD |

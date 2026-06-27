@@ -92,6 +92,23 @@ from stack to caller storage (`MU_SERVER_STORAGE_BYTES` grows by
 `MU_SECURE_SCRATCH_SIZE` on security builds) — a deliberate stack→static trade for a
 single-connection server.
 
+**Update (2026-06-27, feature 004-optimization-fixes, US4/FR-015..018):** footprint
+work — sticky-status binary codec (collapsing redundant per-call error checks),
+table-driven service dispatch (removed the parallel switch), shared subscription
+id-array handler driver, `element_size` lookup table, shared little-endian
+pack/unpack helper, removal of the dead `mu_is_unsupported_service` table, and
+gating `mu_status_name` strings behind `MICRO_OPCUA_STATUS_STRINGS`. Measured Micro
+core `.text` (host `gcc -Os`, `libmicro_opcua.a`, subscriptions on / security off):
+**44,561 B → 42,232 B = −2,329 B (~5.2%)** vs the post-US3 core. Net vs the
+pre-remediation baseline (`1f84905`, 43,084 B) is **−852 B (~2%)** — US1–US3 added
+parser-robustness / address-space-index / perf code that offsets part of the US4
+reduction. NOTE: SC-005's ≥8% target is **not fully met** (US4 isolated ~5.2%); the
+sticky-status conversion was applied conservatively (≈48 of ~294 call sites, to
+guarantee byte-identical output), leaving further flash on the table, and opt-in
+`MICRO_OPCUA_LTO` (default OFF) is available for additional reduction. Figures are a
+host `-Os` proxy; ARM Thumb code density differs. All response bytes remain
+byte-identical (golden-vector regression test).
+
 ## Notes
 - `.text` figures predating 2026-06-27 (e.g. a 14.5 KiB core) were measured before the
   Nano View Service Set + Base Information node set were completed; nano core is now

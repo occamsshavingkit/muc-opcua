@@ -120,27 +120,31 @@ static opcua_statuscode_t write_scalar_value(mu_binary_writer_t *w, mu_builtin_t
 
 /* In-memory element stride for a built-in type, for indexing array values. */
 static size_t element_size(mu_builtin_type_t type) {
-    switch (type) {
-        case MU_TYPE_BOOLEAN:    return sizeof(opcua_boolean_t);
-        case MU_TYPE_SBYTE:      return sizeof(opcua_sbyte_t);
-        case MU_TYPE_BYTE:       return sizeof(opcua_byte_t);
-        case MU_TYPE_INT16:      return sizeof(opcua_int16_t);
-        case MU_TYPE_UINT16:     return sizeof(opcua_uint16_t);
-        case MU_TYPE_INT32:      return sizeof(opcua_int32_t);
-        case MU_TYPE_UINT32:     return sizeof(opcua_uint32_t);
-        case MU_TYPE_INT64:      return sizeof(opcua_int64_t);
-        case MU_TYPE_UINT64:     return sizeof(opcua_uint64_t);
-        case MU_TYPE_FLOAT:      return sizeof(opcua_float_t);
-        case MU_TYPE_DOUBLE:     return sizeof(opcua_double_t);
-        case MU_TYPE_STRING:     return sizeof(mu_string_t);
-        case MU_TYPE_BYTESTRING: return sizeof(mu_bytestring_t);
-        case MU_TYPE_DATETIME:   return sizeof(opcua_datetime_t);
-        case MU_TYPE_STATUSCODE: return sizeof(opcua_statuscode_t);
-        case MU_TYPE_NODEID:     return sizeof(mu_nodeid_t);
-        case MU_TYPE_QUALIFIEDNAME: return sizeof(mu_qualified_name_t);
-        case MU_TYPE_LOCALIZEDTEXT: return sizeof(mu_localized_text_t);
-        default: return 0;
+    static const size_t sizes[MU_TYPE_LOCALIZEDTEXT + 1] = {
+        [MU_TYPE_BOOLEAN]       = sizeof(opcua_boolean_t),
+        [MU_TYPE_SBYTE]         = sizeof(opcua_sbyte_t),
+        [MU_TYPE_BYTE]          = sizeof(opcua_byte_t),
+        [MU_TYPE_INT16]         = sizeof(opcua_int16_t),
+        [MU_TYPE_UINT16]        = sizeof(opcua_uint16_t),
+        [MU_TYPE_INT32]         = sizeof(opcua_int32_t),
+        [MU_TYPE_UINT32]        = sizeof(opcua_uint32_t),
+        [MU_TYPE_INT64]         = sizeof(opcua_int64_t),
+        [MU_TYPE_UINT64]        = sizeof(opcua_uint64_t),
+        [MU_TYPE_FLOAT]         = sizeof(opcua_float_t),
+        [MU_TYPE_DOUBLE]        = sizeof(opcua_double_t),
+        [MU_TYPE_STRING]        = sizeof(mu_string_t),
+        [MU_TYPE_DATETIME]      = sizeof(opcua_datetime_t),
+        [MU_TYPE_BYTESTRING]    = sizeof(mu_bytestring_t),
+        [MU_TYPE_NODEID]        = sizeof(mu_nodeid_t),
+        [MU_TYPE_STATUSCODE]    = sizeof(opcua_statuscode_t),
+        [MU_TYPE_QUALIFIEDNAME] = sizeof(mu_qualified_name_t),
+        [MU_TYPE_LOCALIZEDTEXT] = sizeof(mu_localized_text_t),
+    };
+    int type_id = (int)type;
+    if (type_id < 0 || (size_t)type_id >= sizeof(sizes) / sizeof(sizes[0])) {
+        return 0;
     }
+    return sizes[type_id];
 }
 
 opcua_statuscode_t mu_binary_write_variant(mu_binary_writer_t *writer, const mu_variant_t *variant) {

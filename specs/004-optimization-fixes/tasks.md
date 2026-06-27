@@ -160,24 +160,24 @@ Each story is an independently shippable, independently testable slice.
 
 ### Tests for User Story 4
 
-- [ ] T048 [P] [US4] Add a build-matrix check script `scripts/check_build_matrix.sh` that compiles every single optional-service-disabled permutation under warnings-as-errors and asserts the disabled service is absent (`nm`) (FR-018/audit-T17).
-- [ ] T049 [P] [US4] Re-run the T006 golden vectors after the size refactors to confirm byte-identical output (SC-003/FR-014).
+- [X] T048 [P] [US4] Add a build-matrix check script `scripts/check_build_matrix.sh` that compiles every single optional-service-disabled permutation under warnings-as-errors and asserts the disabled service is absent (`nm`) (FR-018/audit-T17).
+- [X] T049 [P] [US4] Re-run the T006 golden vectors after the size refactors to confirm byte-identical output (SC-003/FR-014).
 
 ### Implementation for User Story 4
 
-- [ ] T050 [US4] Add a sticky `status` field to `mu_binary_reader_t`/`mu_binary_writer_t` in `include/micro_opcua/encoding.h`; primitives no-op once tripped; `ensure_*` still run (FR-015/D8, contract: binary-codec-sticky-status.md).
-- [ ] T051 [US4] Convert handlers in `src/core/service_dispatch.c` to a single end-of-handler status check (remove the ~294 per-call checks) (FR-015/D8).
-- [ ] T052a [P] [US4] Consolidate hand-rolled little-endian pack/unpack into one inline helper used by `src/encoding/binary_writer.c` and `binary_reader.c` (FR-015/audit-T13).
-- [ ] T052b [US4] Collapse the signed/unsigned writer twins into one width-parameterized writer in `src/encoding/binary_writer.c` (FR-015/audit-T13).
-- [ ] T053 [P] [US4] Replace the `element_size` switch with a `static const` table in `src/encoding/binary_variant.c` (FR-015/audit-T14).
-- [ ] T054 [US4] Add a `handler` fn-pointer column to `g_supported_services[]` and delete the parallel dispatch `switch`, keeping per-service `#ifdef` rows, in `src/core/service_dispatch.c` (FR-015/D9).
-- [ ] T055 [US4] Factor the four per-id array handlers (set_publishing/set_monitoring/delete_monitored_items/delete_subscriptions) into one driver + per-item callback in `src/core/service_dispatch.c` (FR-015/D9).
-- [ ] T056 [US4] Wrap service-specific static helpers (Browse/Translate, etc.) in their service `#ifdef` so disabled-service builds pass warnings-as-errors in `src/core/service_dispatch.c` (FR-018/audit-T17).
-- [ ] T057a [US4] Gate `mu_status_name` behind `MICRO_OPCUA_STATUS_STRINGS` (default OFF) in `src/core/status.c` (FR-016/D9).
-- [ ] T057b [US4] Delete the dead, stale `g_unsupported_services[]`/`mu_is_unsupported_service` (table + function + declaration) in `src/core/status.c` (FR-016/D9). (Not [P]: shares `status.c` with T057a.)
-- [ ] T058 [US4] Wire `MICRO_OPCUA_LTO` to `INTERPROCEDURAL_OPTIMIZATION` (default OFF) in `cmake/MicroOpcUaCodegen.cmake` (FR-017/D10).
-- [ ] T059a [US4] Rebuild all profiles, measure `size`, and confirm Micro core ≥ 8% smaller than the T007 baseline (SC-005).
-- [ ] T059b [US4] Refresh measured figures in `docs/size/feature-size-ledger.md` and update `docs/traceability/004-optimization-fixes.md` (FR-015/016/017/018 rows). (Not [P]: shared traceability/ledger files.)
+- [X] T050 [US4] Add a sticky `status` field to `mu_binary_reader_t`/`mu_binary_writer_t` in `include/micro_opcua/encoding.h`; primitives no-op once tripped; `ensure_*` still run (FR-015/D8, contract: binary-codec-sticky-status.md).
+- [X] T051 [US4] Convert handlers in `src/core/service_dispatch.c` to a single end-of-handler status check (remove the ~294 per-call checks) (FR-015/D8).
+- [X] T052a [P] [US4] Consolidate hand-rolled little-endian pack/unpack into one inline helper used by `src/encoding/binary_writer.c` and `binary_reader.c` (FR-015/audit-T13).
+- [X] T052b [US4] Collapse the signed/unsigned writer twins into one width-parameterized writer in `src/encoding/binary_writer.c` (FR-015/audit-T13).
+- [X] T053 [P] [US4] Replace the `element_size` switch with a `static const` table in `src/encoding/binary_variant.c` (FR-015/audit-T14).
+- [X] T054 [US4] Add a `handler` fn-pointer column to `g_supported_services[]` and delete the parallel dispatch `switch`, keeping per-service `#ifdef` rows, in `src/core/service_dispatch.c` (FR-015/D9).
+- [X] T055 [US4] Factor the four per-id array handlers (set_publishing/set_monitoring/delete_monitored_items/delete_subscriptions) into one driver + per-item callback in `src/core/service_dispatch.c` (FR-015/D9).
+- [X] T056 [US4] Wrap service-specific static helpers (Browse/Translate, etc.) in their service `#ifdef` so disabled-service builds pass warnings-as-errors in `src/core/service_dispatch.c` (FR-018/audit-T17).
+- [X] T057a [US4] Gate `mu_status_name` behind `MICRO_OPCUA_STATUS_STRINGS` (default OFF) in `src/core/status.c` (FR-016/D9).
+- [X] T057b [US4] Delete the dead, stale `g_unsupported_services[]`/`mu_is_unsupported_service` (table + function + declaration) in `src/core/status.c` (FR-016/D9). (Not [P]: shares `status.c` with T057a.)
+- [X] T058 [US4] Wire `MICRO_OPCUA_LTO` to `INTERPROCEDURAL_OPTIMIZATION` (default OFF) in `cmake/MicroOpcUaCodegen.cmake` (FR-017/D10).
+- [X] T059a [US4] Rebuild all profiles, measure `size`, and confirm Micro core ≥ 8% smaller than the T007 baseline (SC-005).
+- [X] T059b [US4] Refresh measured figures in `docs/size/feature-size-ledger.md` and update `docs/traceability/004-optimization-fixes.md` (FR-015/016/017/018 rows). (Not [P]: shared traceability/ledger files.)
 
 **Checkpoint**: All four stories complete; flash reduced; behaviour unchanged.
 
