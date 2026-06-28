@@ -94,53 +94,54 @@ typedef enum {
 
 /* A single data MonitoredItem (OPC 10000-4 §5.13, §7.21). */
 typedef struct {
-    bool in_use;
+    /* 8-byte aligned fields */
+    opcua_uint64_t next_sample_ms;                        /* monotonic tick of the next sample */
+    const mu_node_t *resolved_node;                       /* cached static address-space resolution */
+#if MICRO_OPCUA_SUBSCRIPTIONS_STANDARD
+    opcua_double_t deadband_value;
+    opcua_double_t last_reported_numeric;
+#endif
+
+    /* Struct/Union fields (4-byte aligned on 32-bit) */
+    mu_variant_t last_value;
+    mu_nodeid_t node_id;                                  /* monitored node (numeric, or string into the buffer) */
+
+    /* 4-byte aligned fields */
     opcua_uint32_t monitored_item_id;                     /* server-assigned IntegerId */
     opcua_uint32_t subscription_id;                       /* owning subscription */
     opcua_uint32_t client_handle;                         /* echoed in every notification */
-    mu_nodeid_t node_id;                                  /* monitored node (numeric, or string into the buffer) */
-    const mu_node_t *resolved_node;                       /* cached static address-space resolution */
-    opcua_byte_t node_id_string[MU_MAX_MONITORED_STRING]; /* backing store for a string identifier */
     opcua_uint32_t attribute_id;                          /* usually Value (13) */
     opcua_uint32_t sampling_interval_ms;                  /* revised */
     mu_monitoring_mode_t monitoring_mode;
     mu_datachange_trigger_t trigger;
-    /* Change-detection state. last_value holds scalar built-in types only, which covers
-       the monitorable base nodes (ServerStatus.CurrentTime, .State, ServiceLevel). */
-    mu_variant_t last_value;
     opcua_statuscode_t last_status;
-
 #if MICRO_OPCUA_SUBSCRIPTIONS_STANDARD
-    /* Standard DataChange Subscription 2017 Server Facet additions
-     * (OPC-10000-7 §6.6.17), gated to keep micro byte-identical. */
-    /* OPC-10000-4 7.22.2: AbsoluteDeadband compares
-       |new - last_reported| >= deadband_value. */
     mu_deadband_type_t deadband_type;
-    opcua_double_t deadband_value;
-    opcua_double_t last_reported_numeric;
-    bool has_reported;
-
-    /* OPC-10000-4 5.13.2 MonitoringParameters queueSize/discardOldest;
-       OPC-10000-4 7.20.1 queue overflow. */
+    opcua_uint32_t queue_size;
+    opcua_uint32_t triggered_items[MU_MAX_TRIGGER_LINKS];
+    
     struct {
         mu_variant_t value;
         opcua_statuscode_t status;
     } queue[MU_MONITORED_QUEUE_DEPTH];
-    opcua_uint32_t queue_size;
+#endif
+
+    /* 1-byte aligned arrays */
+    opcua_byte_t node_id_string[MU_MAX_MONITORED_STRING]; /* backing store for a string identifier */
+
+    /* 1-byte fields */
+    bool in_use;
+    bool has_value;                                       /* a baseline sample has been taken */
+    bool pending;                                         /* a change is queued, awaiting the next Publish */
+#if MICRO_OPCUA_SUBSCRIPTIONS_STANDARD
+    bool has_reported;
     opcua_byte_t queue_head;
     opcua_byte_t queue_tail;
     opcua_byte_t queue_count;
     bool discard_oldest;
     bool queue_overflow;
-
-    /* OPC-10000-4 5.13.5: monitored item ids triggered by this item. */
-    opcua_uint32_t triggered_items[MU_MAX_TRIGGER_LINKS];
     opcua_byte_t triggered_count;
 #endif
-
-    bool has_value;                /* a baseline sample has been taken */
-    bool pending;                  /* a change is queued, awaiting the next Publish */
-    opcua_uint64_t next_sample_ms; /* monotonic tick of the next sample */
 } mu_monitored_item_t;
 
 /* Retransmission slot for Republish (OPC 10000-4 §5.14.6): the last NotificationMessage
@@ -155,25 +156,31 @@ typedef struct {
 
 /* A Subscription (OPC 10000-4 §5.14.1.3 state variables). */
 typedef struct {
-    bool in_use;
+    /* 8-byte aligned fields */
+    opcua_uint64_t next_publish_ms; /* monotonic tick when the publishing timer fires */
+    
+    /* Nested struct (aligned to 4 bytes on 32-bit) */
+    mu_retransmit_slot_t retransmit;
+    
+    /* 4-byte fields */
     opcua_uint32_t subscription_id;        /* server-assigned IntegerId */
     opcua_uint32_t session_id;             /* owning session */
     opcua_uint32_t publishing_interval_ms; /* revised, integer ms */
     opcua_uint32_t max_keep_alive_count;   /* revised */
     opcua_uint32_t lifetime_count;         /* revised */
     opcua_uint32_t max_notifications_per_publish;
-    opcua_byte_t priority;
-    bool publishing_enabled;
-    /* Runtime counters / timers. */
     opcua_uint32_t sequence_number; /* next NotificationMessage sequence number */
     opcua_uint32_t keep_alive_counter;
     opcua_uint32_t lifetime_counter;
-    opcua_uint64_t next_publish_ms; /* monotonic tick when the publishing timer fires */
+    
+    /* 1-byte fields */
+    opcua_byte_t priority;
+    bool in_use;
+    bool publishing_enabled;
     bool more_notifications;
 #if MICRO_OPCUA_SUBSCRIPTIONS_STANDARD
     bool resend_data_pending; /* OPC-10000-5 §9.2 ResendData method latch */
 #endif
-    mu_retransmit_slot_t retransmit;
 } mu_subscription_t;
 
 /* A parked Publish request (OPC 10000-4 §5.14.5): held until the publishing timer fires
