@@ -64,6 +64,17 @@ if(MICRO_OPCUA_SUBSCRIPTIONS)
     endif()
 endif()
 
+if(MICRO_OPCUA_PUBSUB)
+    target_sources(micro_opcua PRIVATE
+        core/pubsub.c
+        encoding/uadp_encoder.c
+    )
+    target_compile_definitions(micro_opcua PUBLIC MICRO_OPCUA_PUBSUB=1)
+    if(MICRO_OPCUA_IS_HOST)
+        target_sources(micro_opcua PRIVATE platform/host_udp_adapter.c)
+    endif()
+endif()
+
 if(MICRO_OPCUA_USER_AUTH)
     target_compile_definitions(micro_opcua PUBLIC MICRO_OPCUA_USER_AUTH=1)
 endif()

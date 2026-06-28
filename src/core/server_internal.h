@@ -70,6 +70,12 @@ struct mu_server {
     } registered_methods[MU_MAX_REGISTERED_METHODS];
     size_t registered_method_count;
 #endif
+
+#ifdef MICRO_OPCUA_PUBSUB
+#define MU_MAX_WRITER_GROUPS 2
+    mu_pubsub_writer_group_t writer_groups[MU_MAX_WRITER_GROUPS];
+    size_t writer_group_count;
+#endif
 };
 
 #if MICRO_OPCUA_SUBSCRIPTIONS

@@ -26,6 +26,7 @@ option(MICRO_OPCUA_BASE_TYPE_SYSTEM "Expose the Base Info Type System node set u
 option(MICRO_OPCUA_SUBSCRIPTIONS "Build the data-change subscription engine (Micro profile)" ON)
 option(MICRO_OPCUA_SUBSCRIPTIONS_STANDARD "Build the Standard DataChange Subscription 2017 facet additions" OFF)
 option(MICRO_OPCUA_EMBEDDED_PROFILE "Apply Embedded 2017 profile gates and capacity minima" OFF)
+option(MICRO_OPCUA_PUBSUB "Build OPC UA PubSub UADP/UDP Publisher (Feature 012)" OFF)
 set(MICRO_OPCUA_SANITIZERS "" CACHE STRING "Comma-separated list of sanitizers (e.g. address,undefined)")
 set(MICRO_OPCUA_PLATFORM "host" CACHE STRING "Target platform (host, pico, arduino-skeleton)")
 

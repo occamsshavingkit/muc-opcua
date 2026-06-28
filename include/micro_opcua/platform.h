@@ -36,6 +36,22 @@ typedef struct mu_tcp_adapter {
 } mu_tcp_adapter_t;
 
 /*
+ * UDP Transport Adapter Interface (Optional, for PubSub)
+ */
+typedef struct mu_udp_adapter {
+    void *context;
+    
+    /* Initialize the UDP socket for broadcasting */
+    opcua_statuscode_t (*init)(void *context, uint16_t port);
+    
+    /* Send a UDP packet to a destination (or broadcast) */
+    opcua_statuscode_t (*send)(void *context, const opcua_byte_t *buffer, size_t buffer_size, const char *address, uint16_t port);
+    
+    /* Shut down the adapter */
+    void (*shutdown)(void *context);
+} mu_udp_adapter_t;
+
+/*
  * Time Adapter Interface
  * Provides UTC time and monotonic ticks.
  */

@@ -6,6 +6,9 @@
 #include "micro_opcua/config.h"
 #include "micro_opcua/platform.h"
 #include "micro_opcua/status.h"
+#ifdef MICRO_OPCUA_PUBSUB
+#include "micro_opcua/pubsub.h"
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -62,6 +65,12 @@ typedef struct {
     /* User Authentication (optional) */
     mu_user_auth_handler_t user_auth_handler;
     void *user_auth_handler_handle;
+    
+#ifdef MICRO_OPCUA_PUBSUB
+    /* PubSub Configuration (optional) */
+    mu_pubsub_connection_t pubsub;
+    mu_udp_adapter_t udp_adapter;
+#endif
     
     /* Write Service Callback (optional) */
 #ifdef MICRO_OPCUA_SERVICE_WRITE

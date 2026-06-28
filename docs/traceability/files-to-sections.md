@@ -87,6 +87,12 @@ This document maps implementation and test files back to OPC UA normative sectio
 | `binary_writer.c` | TBD | TBD | TBD | TBD |
 | `binary_le.h` | OPC-10000-6 | 5.2.1 | OPC UA Binary little-endian pack/unpack helpers | shared by binary_reader.c / binary_writer.c |
 | `binary_nodeid.c` | TBD | TBD | TBD | TBD |
+| `src/encoding/binary_variant.c` | OPC UA Part 6 | 5.3.13 | Variant encoding | Variant support |
+| `src/encoding/binary_datavalue.c` | OPC UA Part 6 | 5.3.14 | DataValue encoding | DataValue support |
+| `src/encoding/uadp_encoder.c` | OPC UA Part 14 | 6.x | PubSub UADP encoding | PubSub UADP |
+| `src/core/pubsub.c` | OPC UA Part 14 | 6.x | PubSub engine | PubSub runtime |
+| `src/platform/host_udp_adapter.c` | OPC UA Part 14 | 6.x | UDP transport | PubSub network |
+| `include/micro_opcua/pubsub.h` | OPC UA Part 14 | 6.x | PubSub headers | PubSub network |
 | `binary_extension_object.c` | TBD | TBD | TBD | TBD |
 | `binary_datavalue.c` | TBD | TBD | TBD | TBD |
 | `binary_reader.c` | TBD | TBD | TBD | TBD |
