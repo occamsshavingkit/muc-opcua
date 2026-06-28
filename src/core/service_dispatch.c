@@ -1127,9 +1127,14 @@ static opcua_statuscode_t write_monitored_item_create_result(mu_binary_writer_t 
 
 static mu_monitored_item_t *find_monitored_item(mu_server_t *server, opcua_uint32_t subscription_id,
                                                 opcua_uint32_t monitored_item_id) {
-    for (size_t i = 0; i < MU_MAX_MONITORED_ITEMS; ++i) {
+    size_t active_checked = 0;
+    for (size_t i = 0; i < MU_MAX_MONITORED_ITEMS && active_checked < server->subs.active_monitored_items_count; ++i) {
         mu_monitored_item_t *item = &server->subs.monitored_items[i];
-        if (item->in_use && item->subscription_id == subscription_id && item->monitored_item_id == monitored_item_id) {
+        if (!item->in_use) {
+            continue;
+        }
+        active_checked++;
+        if (item->subscription_id == subscription_id && item->monitored_item_id == monitored_item_id) {
             return item;
         }
     }
