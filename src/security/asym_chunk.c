@@ -269,7 +269,7 @@ opcua_statuscode_t mu_asym_chunk_unwrap(
     s = mu_certificate_thumbprint(crypto, own_cert, own_cert_len, own_thumb);
     if (s != MU_STATUS_GOOD) return s;
     if (receiver_thumb.length != (opcua_int32_t)MU_THUMBPRINT_LENGTH ||
-        memcmp(receiver_thumb.data, own_thumb, MU_THUMBPRINT_LENGTH) != 0) {
+        !mu_secure_memeq(receiver_thumb.data, own_thumb, MU_THUMBPRINT_LENGTH)) {
         return MU_STATUS_BAD_SECURITYCHECKSFAILED;
     }
 
@@ -324,6 +324,13 @@ opcua_statuscode_t mu_asym_chunk_unwrap(
     if (signed_len < pad_count + 1 + 8) {
         mu_secure_zero(plain, sizeof(plain));
         return MU_STATUS_BAD_SECURITYCHECKSFAILED;
+    }
+    /* Verify padding bytes are all equal to pad_count */
+    for (size_t i = 1; i <= pad_count; i++) {
+        if (plain[signed_len - 1 - i] != pad_count) {
+            mu_secure_zero(plain, sizeof(plain));
+            return MU_STATUS_BAD_SECURITYCHECKSFAILED;
+        }
     }
     size_t seqbody_len = signed_len - 1 - pad_count;
 

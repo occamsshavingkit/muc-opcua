@@ -18,6 +18,16 @@ void mu_secure_zero(void *v, size_t n)
     }
 }
 
+bool mu_secure_memeq(const void *a, const void *b, size_t n) {
+    const volatile unsigned char *pa = (const volatile unsigned char *)a;
+    const volatile unsigned char *pb = (const volatile unsigned char *)b;
+    unsigned char d = 0;
+    for (size_t i = 0; i < n; i++) {
+        d |= (pa[i] ^ pb[i]);
+    }
+    return d == 0;
+}
+
 /* P_SHA256(secret, seed) per RFC 5246:
      A(0) = seed
      A(i) = HMAC(secret, A(i-1))
