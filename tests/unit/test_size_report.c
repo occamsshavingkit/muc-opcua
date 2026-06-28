@@ -24,16 +24,20 @@ void test_size_ledger_contains_required_fields(void) {
     bool has_ram = false;
     bool has_heap = false;
     
+    bool has_feature_009 = false;
+    
     while (fgets(buf, sizeof(buf), fp)) {
         if (strstr(buf, "Flash") != NULL) has_flash = true;
         if (strstr(buf, "RAM") != NULL) has_ram = true;
         if (strstr(buf, "Heap") != NULL || strstr(buf, "Dynamic") != NULL) has_heap = true;
+        if (strstr(buf, "Feature 009") != NULL || strstr(buf, "009-core-feature") != NULL) has_feature_009 = true;
     }
     fclose(fp);
 
     TEST_ASSERT_TRUE_MESSAGE(has_flash, "feature-size-ledger.md does not contain Flash field");
     TEST_ASSERT_TRUE_MESSAGE(has_ram, "feature-size-ledger.md does not contain RAM field");
     TEST_ASSERT_TRUE_MESSAGE(has_heap, "feature-size-ledger.md does not contain Heap field");
+    TEST_ASSERT_TRUE_MESSAGE(has_feature_009, "feature-size-ledger.md does not reference Feature 009");
 }
 
 int main(void) {

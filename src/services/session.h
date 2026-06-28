@@ -20,6 +20,9 @@ typedef struct {
        RAM storage (packed). Stored and manipulated using integer math only to avoid
        FPU or soft-float emulation on the Cortex-M0+ target. */
     opcua_uint32_t revised_session_timeout_ms;
+#ifdef MICRO_OPCUA_MULTIPLE_CONNECTIONS
+    opcua_uint32_t secure_channel_id;
+#endif
 } mu_session_t;
 
 void mu_session_init(mu_session_t *session);

@@ -43,3 +43,20 @@ add_executable(test_subscriptions test_subscriptions.c)
 target_link_libraries(test_subscriptions PRIVATE micro_opcua micro_opcua_test_support unity)
 target_include_directories(test_subscriptions PRIVATE ${CMAKE_SOURCE_DIR}/src)
 add_test(NAME test_subscriptions COMMAND test_subscriptions)
+
+add_executable(test_user_auth_plaintext test_user_auth_plaintext.c)
+target_link_libraries(test_user_auth_plaintext PRIVATE micro_opcua micro_opcua_test_support unity)
+target_include_directories(test_user_auth_plaintext PRIVATE ${CMAKE_SOURCE_DIR}/src)
+add_test(NAME test_user_auth_plaintext COMMAND test_user_auth_plaintext)
+
+add_executable(test_user_auth_encrypted test_user_auth_encrypted.c)
+target_link_libraries(test_user_auth_encrypted PRIVATE micro_opcua micro_opcua_test_support unity)
+target_include_directories(test_user_auth_encrypted PRIVATE ${CMAKE_SOURCE_DIR}/src)
+add_test(NAME test_user_auth_encrypted COMMAND test_user_auth_encrypted)
+
+add_executable(test_write_service test_write_service.c)
+target_link_libraries(test_write_service PRIVATE micro_opcua micro_opcua_test_support unity)
+target_include_directories(test_write_service PRIVATE ${CMAKE_SOURCE_DIR}/src)
+add_test(NAME test_write_service COMMAND test_write_service)
+
+

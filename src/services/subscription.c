@@ -880,6 +880,33 @@ static void publish_due(struct mu_server *server, opcua_uint64_t now_ms) {
             continue;
         }
 
+#ifdef MICRO_OPCUA_MULTIPLE_CONNECTIONS
+        /* Resolve connection for this subscription's session */
+        mu_connection_t *conn_match = NULL;
+        mu_session_t *session = NULL;
+        for (size_t s_idx = 0; s_idx < MU_MAX_SESSIONS; ++s_idx) {
+            if (server->sessions[s_idx].state != MU_SESSION_STATE_CLOSED &&
+                server->sessions[s_idx].session_id == sub->session_id) {
+                session = &server->sessions[s_idx];
+                break;
+            }
+        }
+        if (session != NULL) {
+            for (size_t c = 0; c < MU_MAX_CONNECTIONS; ++c) {
+                if (server->conns[c].client_handle != NULL &&
+                    server->conns[c].secure_channel.channel_id == session->secure_channel_id) {
+                    conn_match = &server->conns[c];
+                    break;
+                }
+            }
+        }
+        if (conn_match == NULL) {
+            /* No active connection for this session's secure channel: skip ticking */
+            continue;
+        }
+        server->active_conn = conn_match;
+#endif
+
         opcua_int32_t report_count = 0;
         bool has_data = false;
         if (sub->publishing_enabled) {
@@ -946,6 +973,10 @@ static void publish_due(struct mu_server *server, opcua_uint64_t now_ms) {
         }
 
         advance_publish_timer(sub, now_ms);
+
+#ifdef MICRO_OPCUA_MULTIPLE_CONNECTIONS
+        server->active_conn = NULL;
+#endif
     }
 }
 

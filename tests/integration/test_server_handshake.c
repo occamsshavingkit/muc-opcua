@@ -12,6 +12,12 @@
 void setUp(void) {}
 void tearDown(void) {}
 
+#ifdef MICRO_OPCUA_MULTIPLE_CONNECTIONS
+#define GET_CLIENT_HANDLE(s) ((s)->conns[0].client_handle)
+#else
+#define GET_CLIENT_HANDLE(s) ((s)->client_handle)
+#endif
+
 /* ---- mock transport: a queue of inbound chunks, captures the last write ---- */
 #define MAX_INBOUND 8
 typedef struct {
@@ -336,9 +342,9 @@ void test_server_rejects_sequence_gap(void) {
     mu_server_poll(server); /* accept */
     mu_server_poll(server); /* HEL -> ACK */
     mu_server_poll(server); /* OPN (seq 1) -> response, channel open */
-    TEST_ASSERT_NOT_NULL(server->client_handle);
+    TEST_ASSERT_NOT_NULL(GET_CLIENT_HANDLE(server));
     mu_server_poll(server); /* GetEndpoints (seq 99, gap) -> abort */
-    TEST_ASSERT_NULL(server->client_handle);
+    TEST_ASSERT_NULL(GET_CLIENT_HANDLE(server));
 }
 
 int main(void) {

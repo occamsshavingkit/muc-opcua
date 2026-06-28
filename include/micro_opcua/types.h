@@ -127,4 +127,16 @@ typedef struct {
     size_t total_allocated;
 } mu_size_report_t;
 
+/* UserNameIdentityToken and AnonymousIdentityToken representations */
+typedef struct {
+    mu_string_t policy_id;
+    mu_string_t username;
+    mu_bytestring_t password;
+    mu_string_t encryption_algorithm;
+} mu_username_identity_token_t;
+
+typedef struct {
+    mu_string_t policy_id;
+} mu_anonymous_identity_token_t;
+
 #endif /* MICRO_OPCUA_TYPES_H */

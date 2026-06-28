@@ -31,9 +31,9 @@ void test_unsupported_identity_token(void) {
     opcua_uint32_t session_id, auth_token;
     mu_session_create(&session, 0, &revised_timeout, &session_id, &auth_token);
     
-    /* 321 is AnonymousIdentityToken. 324 is UserNameIdentityToken, which is unsupported */
+    /* 321 is AnonymousIdentityToken. 327 is CertificateIdentityToken, which is unsupported */
     TEST_ASSERT_EQUAL(MU_STATUS_BAD_IDENTITYTOKENINVALID, 
-                      mu_session_activate(&session, auth_token, 324));
+                      mu_session_activate(&session, auth_token, 327));
 }
 
 int main(void) {

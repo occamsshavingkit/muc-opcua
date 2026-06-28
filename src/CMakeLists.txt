@@ -61,6 +61,24 @@ if(MICRO_OPCUA_SUBSCRIPTIONS)
     endif()
 endif()
 
+if(MICRO_OPCUA_USER_AUTH)
+    target_compile_definitions(micro_opcua PUBLIC MICRO_OPCUA_USER_AUTH=1)
+endif()
+
+if(MICRO_OPCUA_SERVICE_WRITE)
+    target_sources(micro_opcua PRIVATE services/write.c)
+    target_compile_definitions(micro_opcua PUBLIC MICRO_OPCUA_SERVICE_WRITE=1)
+endif()
+
+if(MICRO_OPCUA_MULTIPLE_CONNECTIONS)
+    target_compile_definitions(micro_opcua PUBLIC MICRO_OPCUA_MULTIPLE_CONNECTIONS=1)
+endif()
+
+if(MICRO_OPCUA_EVENTS)
+    target_compile_definitions(micro_opcua PUBLIC MICRO_OPCUA_EVENTS=1)
+endif()
+
+
 foreach(MU_CAPACITY_DEFINE
         MU_MAX_SUBSCRIPTIONS
         MU_MAX_MONITORED_ITEMS

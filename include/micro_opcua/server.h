@@ -17,6 +17,16 @@ extern "C" {
  */
 typedef struct mu_server mu_server_t;
 
+typedef opcua_statuscode_t (*mu_user_auth_handler_t)(void *handle,
+                                                      const mu_string_t *username,
+                                                      const mu_bytestring_t *password,
+                                                      const mu_string_t *policy_id);
+
+typedef opcua_statuscode_t (*mu_write_handler_t)(void *handle,
+                                                 const mu_nodeid_t *node_id,
+                                                 opcua_uint32_t attribute_id,
+                                                 const mu_variant_t *value);
+
 /* Server Configuration */
 typedef struct {
     /* Identity and Discovery */
@@ -48,6 +58,16 @@ typedef struct {
     
     /* Static Address Space (optional) */
     const mu_address_space_t *address_space;
+    
+    /* User Authentication (optional) */
+    mu_user_auth_handler_t user_auth_handler;
+    void *user_auth_handler_handle;
+    
+    /* Write Service Callback (optional) */
+#ifdef MICRO_OPCUA_SERVICE_WRITE
+    mu_write_handler_t write_handler;
+    void *write_handler_handle;
+#endif
     
 } mu_server_config_t;
 

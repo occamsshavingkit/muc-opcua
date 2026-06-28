@@ -39,6 +39,12 @@ const char *mu_status_name(opcua_statuscode_t status) {
         return "Bad_SessionIdInvalid";
     case MU_STATUS_BAD_IDENTITYTOKENINVALID:
         return "Bad_IdentityTokenInvalid";
+    case MU_STATUS_BAD_IDENTITYTOKENREJECTED:
+        return "Bad_IdentityTokenRejected";
+    case MU_STATUS_BAD_SECURECHANNELIDINVALID:
+        return "Bad_SecureChannelIdInvalid";
+    case MU_STATUS_BAD_SECURITYPOLICYREJECTED:
+        return "Bad_SecurityPolicyRejected";
     case MU_STATUS_BAD_TOOMANYSESSIONS:
         return "Bad_TooManySessions";
     case MU_STATUS_BAD_NODEIDUNKNOWN:
@@ -92,6 +98,16 @@ const char *mu_status_name(opcua_statuscode_t status) {
     case MU_STATUS_BAD_TCPENDPOINTURLINVALID:
         return "Bad_TcpEndpointUrlInvalid";
 
+    case MU_STATUS_BAD_NOTWRITABLE:
+        return "Bad_NotWritable";
+    case MU_STATUS_BAD_TYPEMISMATCH:
+        return "Bad_TypeMismatch";
+    case MU_STATUS_BAD_WRITENOTSUPPORTED:
+        return "Bad_WriteNotSupported";
+    case MU_STATUS_BAD_USERCERTIFICATEINVALID:
+        return "Bad_UserCertificateInvalid";
+    case MU_STATUS_BAD_USERCERTIFICATEUNTRUSTED:
+        return "Bad_UserCertificateUntrusted";
     default:
         return "Unknown_StatusCode";
     }

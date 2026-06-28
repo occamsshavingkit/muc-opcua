@@ -112,8 +112,8 @@ opcua_statuscode_t mu_session_activate(mu_session_t *session,
         return MU_STATUS_BAD_SESSIONIDINVALID;
     }
     
-    /* We only support anonymous identity tokens per profile */
-    if (identity_token_encoding_id != 321) { /* MU_ID_ANONYMOUSIDENTITYTOKEN_ENCODING_DEFAULTBINARY */
+    /* We support anonymous (321) and username (324) identity tokens */
+    if (identity_token_encoding_id != 321 && identity_token_encoding_id != 324) {
         return MU_STATUS_BAD_IDENTITYTOKENINVALID;
     }
     

@@ -64,7 +64,9 @@ void test_service_dispatch_unsupported_services(void) {
     mu_server_t server;
 
     opcua_uint32_t unsupported[] = {
+#ifndef MICRO_OPCUA_SERVICE_WRITE
         673, /* WriteRequest (not in Nano) */
+#endif
         711, /* CallRequest (Method) */
         643  /* HistoryReadRequest */
     };
