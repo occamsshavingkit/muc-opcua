@@ -23,7 +23,7 @@ the per-service and per-profile conformance detail, follow the links into
 | **Narrow platform-adapter boundary** | Everything host-specific is a vtable struct in `include/micro_opcua/platform.h`: TCP, time, entropy, and the optional persistence and crypto adapters. The core never calls a socket or a clock directly. |
 | **OPC UA spec fidelity** | Handlers cite the governing clauses (OPC 10000-4/-6/-7). Wire framing, sequence-number validation, and the binary encoding follow the spec; deviations are documented as "thin path" in the service matrix. |
 | **Size discipline** | Optional services and the whole security/subscription layers compile out (`MICRO_OPCUA_*` options). Built with `--gc-sections`; the size ledger lives in [`docs/size/`](size/). |
-| **Single TCP connection, ≥2 logical sessions** | The poll loop services exactly one accepted socket (`server->client_handle`), but the server holds `sessions[MU_MAX_SESSIONS]` (default 2) so multiple OPC UA Sessions can be multiplexed over that one SecureChannel (the Micro profile's "at least two sessions" requirement). |
+| **Multiplexed TCP connections, ≥2 logical sessions** | The poll loop services up to `MU_MAX_CONNECTIONS` (default 4) sockets concurrently. The server holds `sessions[MU_MAX_SESSIONS]` (default 2), allowing multiple OPC UA Sessions to be multiplexed across active SecureChannels. |
 | **Cooperative poll loop** | No threads, no blocking. `mu_server_poll()` does one non-blocking pass (accept → read → reassemble → dispatch → reply → subscription tick) and returns. The integrator calls it from their own super-loop or timer task. |
 
 ---
@@ -170,7 +170,7 @@ Notes that the diagram compresses:
   `ServiceFault` rather than letting the client time out (`mu_write_service_fault`).
 - **Abort on violation.** A replayed/skipped SequenceNumber or a chunk addressed to
   the wrong channel/token aborts the connection (`accept_inbound_chunk` → close).
-- **Single chunk per poll.** Because the server is single-connection, the shared
+- **Single chunk per poll.** Because the server processes connections sequentially per poll iteration, the shared
   secure scratch is never re-entered while a request/response is in flight.
 
 ---
@@ -191,12 +191,12 @@ never opens a channel within `MU_CONNECT_TIMEOUT_MS`) is dropped so the single s
 can be reused.
 
 ### Session (`src/services/session.{c,h}`)
-`sessions[MU_MAX_SESSIONS]` (default 2) — the **single connection multiplexes ≥2
-logical Sessions**, the Micro profile requirement. Each session is a tiny state
+`sessions[MU_MAX_SESSIONS]` (default 2) — **multiple active connections multiplex ≥2
+logical Sessions**, fulfilling the Micro profile requirement. Each session is a tiny state
 machine: `CLOSED → CREATED → ACTIVATED`. `CreateSession` allocates a free slot and
 assigns a `session_id` and `auth_token`; `ActivateSession` validates the auth token
-and accepts only the Anonymous identity token (else `Bad_IdentityTokenInvalid`);
-`CloseSession` frees the slot and (Micro) deletes the session's subscriptions. The
+and supports Anonymous, Username, or X509 identity tokens (else `Bad_IdentityTokenInvalid`);
+`CloseSession` frees the slot and deletes the session's subscriptions. The
 RevisedSessionTimeout is stored as the **raw IEEE-754 bits** of the Duration and
 clamped by integer comparison, so no FPU is needed.
 
@@ -258,10 +258,10 @@ Profile shorthand (the `Makefile` wires these into `make nano` / `make micro`):
   Anonymous identity. Subscriptions OFF.
 - **Micro** = Nano + data-change subscriptions (`MICRO_OPCUA_SUBSCRIPTIONS`).
 - (All profiles multiplex up to `MU_MAX_SESSIONS` (default 2) logical sessions over the
-  single TCP connection — it is a core capability, not profile-specific.)
-- **Embedded (partial, ahead of schedule)** = security policies on top, i.e.
-  `MICRO_OPCUA_SECURITY` (Basic256Sha256), which is an Embedded-tier feature already
-  available.
+  `MU_MAX_CONNECTIONS` TCP connections — it is a core capability, not profile-specific.)
+- **Embedded (2017)** = security policies on top, i.e.
+  `MICRO_OPCUA_SECURITY` (Basic256Sha256) and Standard DataChange subscriptions.
+- **Full-Featured** = Embedded + Write service, Events, Methods, Diagnostics, and Dynamic Nodes.
 
 Profile definitions and current status:
 [`conformance/profile-nano.md`](conformance/profile-nano.md),

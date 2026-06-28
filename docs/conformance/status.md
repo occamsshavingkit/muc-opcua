@@ -15,7 +15,7 @@ Conformance-unit status (Core 2017 Server Facet groups; see [services.md](servic
 | Transport — UA-TCP UA-SC UA-Binary | Implemented | `test_server_handshake*`, `interop`/`dotnet-interop` CI |
 | Security — SecurityPolicy None | Implemented | interop with asyncua + .NET reference client |
 | Security — Basic256Sha256 (beyond Nano) | Implemented | `dotnet-interop` SignAndEncrypt (#162-#166) |
-| Security — User Token Anonymous | Implemented | ActivateSession; non-Anonymous -> `Bad_IdentityTokenInvalid` |
+| Security — User Tokens | Implemented | ActivateSession supports Anonymous, UserName, and X509 |
 | Discovery — FindServers / GetEndpoints | Implemented | `test_discovery_*` |
 | Session — Base / General Behaviour / Minimum 1 | Implemented | `test_session`, `test_server_handshake*` |
 | Attribute — Read | Implemented | `test_read_service`, Base Info reads |
@@ -42,7 +42,7 @@ The Micro Embedded Device 2017 Server Profile builds on Nano (see
 | Subscription — Republish + acknowledgements | Implemented | `test_subscriptions` (§5.14.6, §5.14.5) |
 | MonitoredItem — Create/Modify/SetMode/Delete (data change) | Implemented | `test_subscriptions` (§5.13.2/.3/.4/.6) |
 | Data-change sampling (DataChangeFilter trigger) | Implemented | `test_subscriptions` (§5.12.1.6, §7.17.2) |
-| ≥2 concurrent sessions | Implemented | up to `MU_MAX_SESSIONS` (default 2) logical sessions multiplexed over one TCP connection; `test_session`, `test_single_client_limit` |
+| ≥2 concurrent sessions | Implemented | up to `MU_MAX_SESSIONS` logical sessions multiplexed over up to `MU_MAX_CONNECTIONS` active SecureChannels; `test_session` |
 
 ## Embedded profile progress
 
@@ -57,6 +57,9 @@ conformance-unit map.
 | Standard DataChange Subscription 2017 facet | Implemented | `test_subscriptions_capacity`, `test_subscriptions` |
 | Base Info Type System | Implemented | `test_type_system`, `test_view_services` |
 | Method Call: GetMonitoredItems / ResendData | Implemented | `test_method_call`, `test_method_call_errors` |
+| Write Service | Implemented | Optional feature via `MICRO_OPCUA_SERVICE_WRITE` |
+| Alarms & Conditions (Events) | Implemented | Event notifications via `MICRO_OPCUA_EVENTS` |
+| Dynamic Nodes | Implemented | Runtime node addition via `MICRO_OPCUA_DYNAMIC_NODES` |
 
 ## Remaining
 1. **CTT verification** — run the OPC Foundation Compliance Test Tool against the

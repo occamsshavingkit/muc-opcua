@@ -253,13 +253,12 @@ Set `-DMICRO_OPCUA_PLATFORM=pico` with `PICO_SDK_PATH` pointing at a Pico SDK ch
 - **The `embedded` profile targets Embedded 2017.** It includes Basic256Sha256,
   Standard DataChange 2017, Base Info Type System exposure, and the required
   GetMonitoredItems/ResendData methods, but it is not CTT-verified.
-- **Single TCP connection**, but it multiplexes up to `MU_MAX_SESSIONS` (default 2)
-  concurrent sessions.
-- **Anonymous identity only** — username/x509 user tokens are not implemented.
+- **The `full-featured` profile** adds multiplexed client connections, the Write service,
+  username/X509 user tokens, dynamic nodes, arbitrary user methods, Alarms & Conditions
+  events, and server diagnostics.
 - **SecurityPolicy None is for trusted/isolated networks or testing only.** Use
   Basic256Sha256 (embedded profile + crypto adapter) for anything exposed.
-- **Narrow method surface:** no Write, History, NodeManagement, arbitrary user methods,
-  or event/aggregate subscriptions. Call is limited to GetMonitoredItems/ResendData.
+- **Not implemented yet:** History, NodeManagement, and aggregate subscriptions.
 
 ---
 
@@ -287,10 +286,10 @@ Makefile               Profile build presets (nano/micro/embedded)
 
 ## Documentation
 
-- [docs/getting-started.md](docs/getting-started.md) — install, build, first run *(in progress)*
-- [docs/integration-guide.md](docs/integration-guide.md) — implementing platform adapters & your address space *(in progress)*
-- [docs/architecture.md](docs/architecture.md) — internals, memory model, poll loop *(in progress)*
-- [docs/api-reference.md](docs/api-reference.md) — full API reference *(in progress)*
+- [docs/getting-started.md](docs/getting-started.md) — install, build, first run
+- [docs/integration-guide.md](docs/integration-guide.md) — implementing platform adapters & your address space
+- [docs/architecture.md](docs/architecture.md) — internals, memory model, poll loop
+- [docs/api-reference.md](docs/api-reference.md) — full API reference
 - [docs/conformance/](docs/conformance/) — service & profile conformance matrices
 - [docs/size/feature-size-ledger.md](docs/size/feature-size-ledger.md) — measured footprint
 

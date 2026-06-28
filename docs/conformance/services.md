@@ -12,7 +12,7 @@ are supported.
 | OpenSecureChannel | 5.6.2 | Implemented | None and Basic256Sha256 (asymmetric handshake) |
 | CloseSecureChannel | 5.6.3 | Implemented | |
 | CreateSession | 5.7.2 | Implemented | ServerSignature on secured channels; ServerEndpoints |
-| ActivateSession | 5.7.3 | Implemented | Anonymous identity only (else `Bad_IdentityTokenInvalid`) |
+| ActivateSession | 5.7.3 | Implemented | Supports Anonymous, UserName, and X509 identity tokens |
 | CloseSession | 5.7.4 | Implemented | |
 | Read | 5.10.2 | Implemented | Attribute Read incl. the Base Information nodes |
 | Browse | 5.9.2 | Implemented | HierarchicalReferences + includeSubtypes |
@@ -20,8 +20,8 @@ are supported.
 | TranslateBrowsePathsToNodeIds | 5.9.4 | Implemented | RelativePath walk over the address space; `Bad_NoMatch` |
 | RegisterNodes | 5.9.5 | Implemented | Identity mapping (NodeIds copied back) |
 | UnregisterNodes | 5.9.6 | Implemented | No-op, returns Good |
-| Write | 5.10.3 | Unsupported | Not in Nano/Micro |
-| Call | 5.11.2 | Implemented | Behind MICRO_OPCUA_EMBEDDED_PROFILE (supports GetMonitoredItems/ResendData methods) |
+| Write | 5.10.3 | Implemented | Supported behind `MICRO_OPCUA_SERVICE_WRITE` |
+| Call | 5.11.2 | Implemented | Behind `MICRO_OPCUA_EMBEDDED_PROFILE` (supports GetMonitoredItems/ResendData + custom methods) |
 | CreateMonitoredItems | 5.13.2 | Implemented | Data-change monitoring; initial sample; `Bad_NodeIdUnknown` / `Bad_TooManyMonitoredItems` |
 | ModifyMonitoredItems | 5.13.3 | Implemented | Revised sampling interval / clientHandle |
 | SetMonitoringMode | 5.13.4 | Implemented | Disabled / Sampling / Reporting |
