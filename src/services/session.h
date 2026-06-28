@@ -33,7 +33,8 @@ mu_session_t *mu_session_find_free(mu_session_t *sessions,
 
 /* Create the (single) session. The requested/revised SessionTimeout are passed as
    the raw IEEE-754 bits of the wire Duration; the value is clamped to
-   [10000, 3600000] ms via integer bit comparison (valid for positive doubles). */
+   [10000, 3600000] ms via integer bit comparison and stored internally as milliseconds
+   without floating-point math (valid for positive doubles). */
 opcua_statuscode_t mu_session_create(mu_session_t *session,
                                      opcua_uint64_t requested_timeout_bits,
                                      opcua_uint64_t *revised_timeout_bits,

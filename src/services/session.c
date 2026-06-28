@@ -4,8 +4,10 @@
 #include <string.h>
 
 /* IEEE-754 bit patterns of the SessionTimeout bounds (ms). For positive doubles
-   the unsigned bit pattern is monotonic in value, so we clamp by integer compare
-   and never touch the (absent) FPU. */
+   the unsigned bit pattern is monotonic in value, so we clamp by integer compare.
+   To avoid bringing in FPU operations or soft-float emulation on the Cortex-M0+
+   target, the double bits are converted to milliseconds using integer-only shifts
+   and bitmasks. */
 #define MU_SESSION_TIMEOUT_MIN_BITS 0x40c3880000000000ULL /* 10000.0   */
 #define MU_SESSION_TIMEOUT_MAX_BITS 0x414b774000000000ULL /* 3600000.0 */
 #define MU_DOUBLE_SIGN_BIT          0x8000000000000000ULL
