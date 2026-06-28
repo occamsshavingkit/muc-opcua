@@ -1213,7 +1213,7 @@ static opcua_statuscode_t set_monitoring_mode_result(mu_server_t *server, opcua_
         return MU_STATUS_BAD_MONITOREDITEMIDINVALID;
     }
 
-    item->monitoring_mode = (mu_monitoring_mode_t)mode->monitoring_mode;
+    item->monitoring_mode = (opcua_byte_t)mode->monitoring_mode;
     return MU_STATUS_GOOD;
 }
 
@@ -1433,7 +1433,7 @@ static opcua_statuscode_t handle_create_monitored_items(mu_server_t *server, mu_
         item->resolved_node = node;
         item->attribute_id = body.attribute_id;
         item->client_handle = body.client_handle;
-        item->monitoring_mode = (mu_monitoring_mode_t)body.monitoring_mode;
+        item->monitoring_mode = (opcua_byte_t)body.monitoring_mode;
         item->trigger = MU_DATACHANGE_TRIGGER_STATUS_VALUE;
         item->sampling_interval_ms = publishing_interval_bits_to_ms(body.sampling_interval_bits);
         item->next_sample_ms = now_ms + item->sampling_interval_ms;
