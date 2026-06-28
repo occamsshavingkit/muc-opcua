@@ -3,7 +3,7 @@ set -euo pipefail
 
 usage() {
     cat <<'USAGE'
-Usage: scripts/measure_size.sh [nano|micro|embedded|all]
+Usage: scripts/measure_size.sh [nano|micro|embedded|full-featured|all]
 
 Cross-compiles the portable core with arm-none-eabi-gcc for RP2040/Cortex-M0+
 Thumb code and reports the archive section totals used by the size ledger.
@@ -24,11 +24,11 @@ fi
 
 profile_arg="$1"
 case "$profile_arg" in
-    nano|micro|embedded)
+    nano|micro|embedded|full-featured)
         profiles="$profile_arg"
         ;;
     all)
-        profiles="nano micro embedded"
+        profiles="nano micro embedded full-featured"
         ;;
     *)
         usage >&2
@@ -51,15 +51,27 @@ command -v arm-none-eabi-size >/dev/null 2>&1 || {
 
 build_root="${BUILD_ROOT:-build/size-arm}"
 
-printf '%-9s %10s %8s %8s %10s %s\n' "profile" "text" "data" "bss" "dec" "archive"
+printf '%-14s %10s %8s %8s %10s %s\n' "profile" "text" "data" "bss" "dec" "archive"
 
 for profile in $profiles; do
     case "$profile" in
         nano)
-            defs=(-DMICRO_OPCUA_SECURITY=OFF -DMICRO_OPCUA_SUBSCRIPTIONS=OFF)
+            defs=(
+                -DMICRO_OPCUA_SECURITY=OFF
+                -DMICRO_OPCUA_SUBSCRIPTIONS=OFF
+                -DMICRO_OPCUA_CUSTOM_METHODS=OFF
+                -DMICRO_OPCUA_SERVER_DIAGNOSTICS=OFF
+                -DMICRO_OPCUA_DYNAMIC_NODES=OFF
+            )
             ;;
         micro)
-            defs=(-DMICRO_OPCUA_SECURITY=OFF -DMICRO_OPCUA_SUBSCRIPTIONS=ON)
+            defs=(
+                -DMICRO_OPCUA_SECURITY=OFF
+                -DMICRO_OPCUA_SUBSCRIPTIONS=ON
+                -DMICRO_OPCUA_CUSTOM_METHODS=OFF
+                -DMICRO_OPCUA_SERVER_DIAGNOSTICS=OFF
+                -DMICRO_OPCUA_DYNAMIC_NODES=OFF
+            )
             ;;
         embedded)
             defs=(
@@ -69,6 +81,22 @@ for profile in $profiles; do
                 -DMU_MAX_PUBLISH_REQUESTS=5
                 -DMU_MONITORED_QUEUE_DEPTH=2
                 -DMU_MAX_TRIGGER_LINKS=4
+                -DMICRO_OPCUA_CUSTOM_METHODS=OFF
+                -DMICRO_OPCUA_SERVER_DIAGNOSTICS=OFF
+                -DMICRO_OPCUA_DYNAMIC_NODES=OFF
+            )
+            ;;
+        full-featured)
+            defs=(
+                -DMICRO_OPCUA_EMBEDDED_PROFILE=ON
+                -DMU_MAX_SUBSCRIPTIONS=2
+                -DMU_MAX_MONITORED_ITEMS=100
+                -DMU_MAX_PUBLISH_REQUESTS=5
+                -DMU_MONITORED_QUEUE_DEPTH=2
+                -DMU_MAX_TRIGGER_LINKS=4
+                -DMICRO_OPCUA_CUSTOM_METHODS=ON
+                -DMICRO_OPCUA_SERVER_DIAGNOSTICS=ON
+                -DMICRO_OPCUA_DYNAMIC_NODES=ON
             )
             ;;
     esac
