@@ -18,7 +18,9 @@
 #include "../services/service_header.h"
 #ifdef MICRO_OPCUA_SECURITY
 #include "../security/key_derivation.h"
+#include "../security/security_policy.h"
 #include "../security/sym_chunk.h"
+#include "micro_opcua/security.h"
 #endif
 #include <stddef.h>
 #include <string.h>
@@ -218,6 +220,31 @@ static const mu_string_t *current_opn_security_policy(const mu_server_t *server)
     return &server->opn_pending_security_policy;
 }
 
+void mu_service_dispatch_set_opn_client_cert(mu_server_t *server, const mu_bytestring_t *client_cert);
+
+void mu_service_dispatch_set_opn_client_cert(mu_server_t *server, const mu_bytestring_t *client_cert) {
+    if (server == NULL) {
+        return;
+    }
+
+    if (client_cert == NULL) {
+        server->opn_pending_client_cert.length = -1;
+        server->opn_pending_client_cert.data = NULL;
+        return;
+    }
+
+    server->opn_pending_client_cert = *client_cert;
+}
+
+#ifdef MICRO_OPCUA_SECURITY
+static const mu_bytestring_t *current_opn_client_cert(const mu_server_t *server) {
+    if (server == NULL) {
+        return NULL;
+    }
+    return &server->opn_pending_client_cert;
+}
+#endif
+
 const mu_service_handler_t *mu_get_service_handler(opcua_uint32_t request_id) {
     const mu_service_descriptor_t *descriptor = find_service_descriptor(request_id);
     return descriptor != NULL ? &descriptor->service : NULL;
@@ -338,6 +365,25 @@ static opcua_statuscode_t handle_open_secure_channel(mu_server_t *server, mu_bin
         return r->status;
 
     opcua_uint32_t revised = 0;
+
+#ifdef MICRO_OPCUA_SECURITY
+    if (server->config.trust_list != NULL && current_opn_security_policy(server) != NULL) {
+        /* TrustList validation is required when security is not None */
+        mu_security_policy_id_t requested_policy = mu_security_policy_from_uri(
+            current_opn_security_policy(server)->data, (size_t)current_opn_security_policy(server)->length);
+        if (requested_policy != MU_SECURITY_POLICY_NONE_ID && requested_policy != MU_SECURITY_POLICY_INVALID_ID) {
+            const mu_bytestring_t *client_cert = current_opn_client_cert(server);
+            if (client_cert == NULL || client_cert->length <= 0) {
+                return MU_STATUS_BAD_SECURITYCHECKSFAILED;
+            }
+            if (mu_trust_list_match(server->config.trust_list, client_cert->data, (size_t)client_cert->length) !=
+                MU_STATUS_GOOD) {
+                return MU_STATUS_BAD_SECURITYCHECKSFAILED;
+            }
+        }
+    }
+#endif
+
     s = mu_secure_channel_open(&server_secure_channel, current_opn_security_policy(server),
                                (mu_message_security_mode_t)security_mode, requested_lifetime, &revised);
     if (s != MU_STATUS_GOOD)

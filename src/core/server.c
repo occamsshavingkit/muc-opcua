@@ -13,6 +13,7 @@
 #include <string.h>
 
 void mu_service_dispatch_set_opn_security_policy(mu_server_t *server, const mu_string_t *security_policy);
+void mu_service_dispatch_set_opn_client_cert(mu_server_t *server, const mu_bytestring_t *client_cert);
 
 opcua_statuscode_t mu_server_config_validate(const mu_server_config_t *config) {
     if (config == NULL) {
@@ -271,13 +272,14 @@ static void handle_data_chunk_plaintext(mu_server_t *server, const opcua_byte_t 
         return; /* SecureChannelId */
 
     mu_string_t opn_security_policy = {-1, NULL};
+    mu_bytestring_t opn_sender_cert = {-1, NULL};
     opcua_uint32_t token_id = 0;
     if (is_opn) {
-        mu_bytestring_t sender_cert, receiver_thumbprint;
+        mu_bytestring_t receiver_thumbprint;
         status = mu_binary_read_string(&reader, &opn_security_policy);
         if (status != MU_STATUS_GOOD)
             return;
-        status = mu_binary_read_bytestring(&reader, &sender_cert);
+        status = mu_binary_read_bytestring(&reader, &opn_sender_cert);
         if (status != MU_STATUS_GOOD)
             return;
         status = mu_binary_read_bytestring(&reader, &receiver_thumbprint);
@@ -325,11 +327,13 @@ static void handle_data_chunk_plaintext(mu_server_t *server, const opcua_byte_t 
     } else {
         if (is_opn) {
             mu_service_dispatch_set_opn_security_policy(server, &opn_security_policy);
+            mu_service_dispatch_set_opn_client_cert(server, &opn_sender_cert);
         }
         status = mu_service_dispatch(server, request_type.identifier.numeric, req_body, req_body_len, resp_body,
                                      &payload_len);
         if (is_opn) {
             mu_service_dispatch_set_opn_security_policy(server, NULL);
+            mu_service_dispatch_set_opn_client_cert(server, NULL);
         }
     }
 
@@ -452,11 +456,14 @@ static void handle_data_chunk_secure(mu_server_t *server, opcua_byte_t *msg, siz
     } else {
         if (is_opn) {
             mu_service_dispatch_set_opn_security_policy(server, &opn_security_policy);
+            mu_bytestring_t cert_bs = {(opcua_int32_t)client_cert_len, client_cert};
+            mu_service_dispatch_set_opn_client_cert(server, &cert_bs);
         }
         status =
             mu_service_dispatch(server, request_type.identifier.numeric, req_body, req_body_len, respbody, &resp_len);
         if (is_opn) {
             mu_service_dispatch_set_opn_security_policy(server, NULL);
+            mu_service_dispatch_set_opn_client_cert(server, NULL);
         }
     }
     if (status != MU_STATUS_GOOD) {

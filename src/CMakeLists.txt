@@ -125,6 +125,7 @@ if(MICRO_OPCUA_SECURITY)
         security/certificate.c
         security/asym_chunk.c
         security/sym_chunk.c
+        security/trustlist.c
     )
     target_compile_definitions(micro_opcua PUBLIC MICRO_OPCUA_SECURITY=1)
 endif()

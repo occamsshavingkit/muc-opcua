@@ -53,6 +53,7 @@ struct mu_server {
 #endif
 
     mu_string_t opn_pending_security_policy;
+    mu_bytestring_t opn_pending_client_cert;
 #ifdef MICRO_OPCUA_SECURITY
     opcua_byte_t secure_scratch[MU_SECURE_SCRATCH_SIZE];
 #endif

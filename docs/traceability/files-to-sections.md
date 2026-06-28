@@ -138,4 +138,5 @@ This document maps implementation and test files back to OPC UA normative sectio
 | `wolfssl_crypto_adapter.c` | Crypto Adapter | Part 7 | 6.x | wolfSSL primitives for SecurityPolicy Basic256Sha256 |
 | `test_mbedtls_adapter.c` | Tests | Part 7 | 6.x | Test Mbed TLS crypto adapter |
 | `test_wolfssl_adapter.c` | Tests | Part 7 | 6.x | Test wolfSSL crypto adapter |
-
+| `src/security/trustlist.c` | TrustList | Part 4 | 5.6.2 | Application Authentication TrustList |
+| `include/micro_opcua/security.h` | TrustList | Part 4 | 5.6.2 | Application Authentication TrustList Header |

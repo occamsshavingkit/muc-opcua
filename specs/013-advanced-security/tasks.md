@@ -8,7 +8,7 @@ research.md, data-model.md, quickstart.md
 
 **Purpose**: Project initialization, build tooling, and traceability structure
 
-- [ ] T001 Define `mu_security_policy_t` values for `Aes128-Sha256-RsaOaep` and `Aes256-Sha256-RsaPss` in `include/micro_opcua/security.h`
+- [X] T001 Define `mu_security_policy_t` values for `Aes128-Sha256-RsaOaep` and `Aes256-Sha256-RsaPss` in `include/micro_opcua/security.h` citing OPC 10000-7 section 4.2.
 
 ---
 
@@ -18,10 +18,10 @@ research.md, data-model.md, quickstart.md
 
 **CRITICAL**: No user story implementation can begin until this phase is complete.
 
-- [ ] T002 Define `mu_trust_list_t` struct in `include/micro_opcua/security.h`
-- [ ] T003 Update `mu_server_config_t` to include `mu_trust_list_t*` in `include/micro_opcua/server.h`
-- [ ] T004 [P] Update `mu_crypto_adapter_t` to support generic asymmetric functions taking security policy as an argument (or separate RSA-OAEP / RSA-PSS functions) in `include/micro_opcua/crypto_adapter.h`
-- [ ] T005 [P] Create mock crypto adapters in tests to simulate successful/failed verifications and decryptions in `tests/unit/mock_crypto_adapter.h`
+- [X] T002 Define `mu_trust_list_t` struct for basic Application Authentication (OPC 10000-4, section 5.6.2) in `include/micro_opcua/security.h`
+- [X] T003 Update `mu_server_config_t` to include `mu_trust_list_t*` in `include/micro_opcua/server.h`
+- [X] T004 [P] Update `mu_crypto_adapter_t` to add specific function pointers `rsa_oaep_encrypt`, `rsa_oaep_decrypt`, `rsa_pss_sign`, and `rsa_pss_verify` in `include/micro_opcua/crypto_adapter.h`
+- [X] T005 [P] Create mock crypto adapters in tests to simulate successful/failed verifications and decryptions in `tests/unit/mock_crypto_adapter.h`
 
 **Checkpoint**: Foundation ready - user story implementation can begin.
 
@@ -35,14 +35,14 @@ research.md, data-model.md, quickstart.md
 
 ### Tests for User Story 1
 
-- [ ] T006 [P] [US1] Add round-trip unit test for RSA-OAEP encrypt/decrypt in `tests/unit/test_security_rsa_oaep.c`
-- [ ] T007 [P] [US1] Add malformed-input unit test for RSA-OAEP decryption in `tests/unit/test_security_rsa_oaep_errors.c`
+- [X] T006 [P] [US1] Add round-trip unit test for RSA-OAEP encrypt/decrypt in `tests/unit/test_security_rsa_oaep.c`
+- [X] T007 [P] [US1] Add malformed-input unit test for RSA-OAEP decryption in `tests/unit/test_security_rsa_oaep_errors.c`
 
 ### Implementation for User Story 1
 
-- [ ] T008 [P] [US1] Implement RSA-OAEP in `src/platform/host_crypto_adapter.c` (OpenSSL backend)
-- [ ] T009 [P] [US1] Implement RSA-OAEP in `src/platform/mbedtls_crypto_adapter.c` (mbedTLS backend)
-- [ ] T010 [US1] Update `src/core/service_dispatch.c` to dispatch `Aes128-Sha256-RsaOaep` correctly during `OpenSecureChannel`
+- [X] T008 [P] [US1] Implement RSA-OAEP in `src/platform/host_crypto_adapter.c` (OpenSSL backend) citing OPC 10000-7 Profile definitions
+- [X] T009 [P] [US1] Implement RSA-OAEP in `src/platform/mbedtls_crypto_adapter.c` (mbedTLS backend)
+- [X] T010 [US1] Update `src/core/service_dispatch.c` to dispatch `Aes128-Sha256-RsaOaep` correctly during `OpenSecureChannel` (OPC 10000-4, section 5.5)
 
 **Checkpoint**: User Story 1 is independently testable and size impact is known.
 
@@ -56,14 +56,14 @@ research.md, data-model.md, quickstart.md
 
 ### Tests for User Story 2
 
-- [ ] T011 [P] [US2] Add round-trip unit test for RSA-PSS sign/verify in `tests/unit/test_security_rsa_pss.c`
-- [ ] T012 [P] [US2] Add error unit test for invalid RSA-PSS signature in `tests/unit/test_security_rsa_pss_errors.c`
+- [X] T011 [P] [US2] Add round-trip unit test for RSA-PSS sign/verify in `tests/unit/test_security_rsa_pss.c`
+- [X] T012 [P] [US2] Add error unit test for invalid RSA-PSS signature in `tests/unit/test_security_rsa_pss_errors.c`
 
 ### Implementation for User Story 2
 
-- [ ] T013 [P] [US2] Implement RSA-PSS in `src/platform/host_crypto_adapter.c` (OpenSSL backend)
-- [ ] T014 [P] [US2] Implement RSA-PSS in `src/platform/mbedtls_crypto_adapter.c` (mbedTLS backend)
-- [ ] T015 [US2] Update `src/core/service_dispatch.c` to dispatch `Aes256-Sha256-RsaPss` correctly during `OpenSecureChannel`
+- [X] T013 [P] [US2] Implement RSA-PSS in `src/platform/host_crypto_adapter.c` (OpenSSL backend) citing OPC 10000-7 Profile definitions
+- [X] T014 [P] [US2] Implement RSA-PSS in `src/platform/mbedtls_crypto_adapter.c` (mbedTLS backend)
+- [X] T015 [US2] Update `src/core/service_dispatch.c` to dispatch `Aes256-Sha256-RsaPss` correctly during `OpenSecureChannel` (OPC 10000-4, section 5.5)
 
 **Checkpoint**: User Stories 1 and 2 both work independently.
 
@@ -77,13 +77,13 @@ research.md, data-model.md, quickstart.md
 
 ### Tests for User Story 3
 
-- [ ] T016 [P] [US3] Add unit test for exact matching of client certificate against TrustList in `tests/unit/test_trustlist.c`
-- [ ] T017 [P] [US3] Add unit test for empty/null TrustList rejecting all secure connections in `tests/unit/test_trustlist_errors.c`
+- [X] T016 [P] [US3] Add unit test for exact matching of client certificate against TrustList in `tests/unit/test_trustlist.c`
+- [X] T017 [P] [US3] Add unit test for empty/null TrustList rejecting all secure connections in `tests/unit/test_trustlist_errors.c`
 
 ### Implementation for User Story 3
 
-- [ ] T018 [P] [US3] Implement TrustList matching function `mu_trust_list_match` in `src/security/trustlist.c` (new file)
-- [ ] T019 [US3] Integrate `mu_trust_list_match` in `src/core/service_dispatch.c` during `OpenSecureChannel` handling, returning `Bad_SecurityChecksFailed` on failure.
+- [X] T018 [P] [US3] Implement TrustList matching function `mu_trust_list_match` in `src/security/trustlist.c` (new file) citing OPC 10000-4, section 5.6.2
+- [X] T019 [US3] Integrate `mu_trust_list_match` in `src/core/service_dispatch.c` during `OpenSecureChannel` handling, returning `Bad_SecurityChecksFailed` on failure.
 
 **Checkpoint**: Selected user stories are independently functional.
 
@@ -93,11 +93,12 @@ research.md, data-model.md, quickstart.md
 
 **Purpose**: Cross-cutting validation required before completion
 
-- [ ] T020 Run host unit and integration tests
-- [ ] T021 Run formatting and static analysis
-- [ ] T022 Run embedded cross-compile using Pico SDK and Arduino environments
-- [ ] T023 Measure flash/RAM impact and record in `plan.md`
-- [ ] T024 Validate quickstart example code compiles in `examples/minimal_server/`
+- [X] T020 Run host unit and integration tests
+- [X] T021 Run formatting and static analysis
+- [X] T022 Run embedded cross-compile using Pico SDK and Arduino environments
+- [X] T023 Measure flash/RAM impact and record in `plan.md`
+- [X] T024 Validate quickstart example code compiles in `examples/minimal_server/`
+- [X] T025 Update `docs/traceability/013-advanced-security.md` with implementation and test file mappings
 
 ---
 

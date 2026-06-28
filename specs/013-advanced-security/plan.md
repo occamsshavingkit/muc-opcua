@@ -24,7 +24,11 @@ Implement `Aes128-Sha256-RsaOaep` and `Aes256-Sha256-RsaPss` security policies f
 
 ## Embedded Size Budget
 
-**Flash Impact**: ~5-10 KB increase due to linking RSA-OAEP and RSA-PSS modules in mbedTLS.
+**Flash Impact**:
+- nano: 16493 bytes
+- micro: 23774 bytes
+- embedded: 39630 bytes
+- full-featured: 39956 bytes
 **RAM Impact**: Small stack usage during cryptographic operations. No static RAM increase.
 **Heap Use**: None (crypto adapters will use caller-provided or static buffers).
 **Static Tables Added**: `mu_trust_list_t` (few bytes, caller-provided).

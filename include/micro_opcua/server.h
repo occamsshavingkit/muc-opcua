@@ -5,6 +5,7 @@
 #include "micro_opcua/address_space.h"
 #include "micro_opcua/config.h"
 #include "micro_opcua/platform.h"
+#include "micro_opcua/security.h"
 #include "micro_opcua/status.h"
 #ifdef MICRO_OPCUA_PUBSUB
 #include "micro_opcua/pubsub.h"
@@ -61,6 +62,9 @@ typedef struct {
     /* User Authentication (optional) */
     mu_user_auth_handler_t user_auth_handler;
     void *user_auth_handler_handle;
+
+    /* TrustList for Application Authentication (optional) */
+    const mu_trust_list_t *trust_list;
 
 #ifdef MICRO_OPCUA_PUBSUB
     /* PubSub Configuration (optional) */
