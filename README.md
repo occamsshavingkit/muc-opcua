@@ -23,7 +23,7 @@ OPC Foundation 2017 device server profiles, so you compile in only the surface y
 
 - **Zero heap.** No `malloc` anywhere in the protocol path. The application owns all
   memory: one server-storage block plus the RX/TX buffers. Footprint is deterministic.
-- **Tiny flash.** A complete Nano server is **16.3 KiB** of Arm Cortex-M0+ `-Os` core
+- **Tiny flash.** A complete Nano server is **16.1 KiB** of Arm Cortex-M0+ `-Os` core
   `.text`; Micro (with subscriptions) is **22.4 KiB**; full Embedded 2017 is
   **34.8 KiB**. Static `.bss` is 0 B.
 - **Freestanding & portable.** Plain C11 core with no OS assumptions. Hardware and OS
@@ -48,9 +48,9 @@ Cortex-M0+ with `-Os`; full methodology and breakdown are in
 
 | Profile | Adds | Core `.text` (flash) | `MU_SERVER_STORAGE_BYTES` | Heap |
 |---|---|---|---|---|
-| **nano** | SecurityPolicy None; Discovery + Session + Read + View service sets + Base Information node set; no subscriptions | **16.3 KiB** | 1,280 B | 0 |
+| **nano** | SecurityPolicy None; Discovery + Session + Read + View service sets + Base Information node set; no subscriptions | **16.1 KiB** | 1,280 B | 0 |
 | **micro** | nano **+** data-change subscriptions (MonitoredItems / Publish) | **22.4 KiB** | 3,328 B | 0 |
-| **embedded**¹ | micro **+** Basic256Sha256, Standard DataChange 2017, Base Info Type System, GetMonitoredItems/ResendData | **34.8 KiB** | 45,696 B | 0 |
+| **embedded**¹ | micro **+** Basic256Sha256, Standard DataChange 2017, Base Info Type System, GetMonitoredItems/ResendData | **34.8 KiB** | **44,736 B** | 0 |
 
 ¹ The **`embedded` profile is profile-targeting**, not CTT-certified. It implements the
 Embedded 2017 profile surface selected in the conformance docs, but no formal compliance
