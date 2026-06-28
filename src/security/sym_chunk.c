@@ -203,7 +203,7 @@ opcua_statuscode_t mu_sym_chunk_unwrap(
         mu_secure_zero(mac, sizeof(mac));
         return s;
     }
-    if (memcmp(mac, chunk + signed_len, MU_SYM_SIG_LEN) != 0) {
+    if (!mu_secure_memeq(mac, chunk + signed_len, MU_SYM_SIG_LEN)) {
         mu_secure_zero(mac, sizeof(mac));
         return MU_STATUS_BAD_SECURITYCHECKSFAILED;
     }
@@ -214,6 +214,11 @@ opcua_statuscode_t mu_sym_chunk_unwrap(
     if (mode == MU_MESSAGE_SECURITY_MODE_SIGN_AND_ENCRYPT) {
         pad_count = chunk[signed_len - 1];
         if (signed_len < MU_SYM_HEADER_SIZE + 8 + 1 + pad_count) return MU_STATUS_BAD_SECURITYCHECKSFAILED;
+        for (size_t i = 1; i <= pad_count; i++) {
+            if (chunk[signed_len - 1 - i] != pad_count) {
+                return MU_STATUS_BAD_SECURITYCHECKSFAILED;
+            }
+        }
         pad_count += 1; /* include the PaddingSize byte itself */
     }
     size_t seqbody_len = signed_len - MU_SYM_HEADER_SIZE - pad_count;
