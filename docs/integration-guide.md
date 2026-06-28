@@ -161,7 +161,8 @@ This yields the per-profile sizes you must budget for:
 |---|---|---|
 | Nano | base | **1,280** |
 | Micro | `+ MICRO_OPCUA_SUBSCRIPTIONS` | **3,328** |
-| Embedded 2017 | `+ MICRO_OPCUA_EMBEDDED_PROFILE`, 100 monitored items, queue depth 2 | **45,696** |
+| Embedded 2017 | `+ MICRO_OPCUA_EMBEDDED_PROFILE`, 100 monitored items, queue depth 2 | **63,240** |
+| Full Featured | embedded + methods + diagnostics + dynamic nodes | **63,240** |
 
 > **Pitfall.** If you hardcode `static opcua_byte_t storage[1024]` and later turn
 > on security, `mu_server_init` returns `Bad_OutOfMemory` at runtime. The example
@@ -704,9 +705,10 @@ Full details in
 
 | Profile | Core `.text` (flash) | Caller RAM = storage + 2×8 KiB buffers | Heap |
 |---|---|---|---|
-| **Nano** | **16.3 KiB** | `MU_SERVER_STORAGE_BYTES` 1,280 B + 16 KiB ≈ **17.3 KiB** | **0** |
-| **Micro** | **22.4 KiB** | 3,328 B + 16 KiB ≈ **19.3 KiB** | **0** |
-| **Embedded 2017** | **34.8 KiB** | 45,696 B + 16 KiB ≈ **60.6 KiB** | **0** |
+| **Nano** | **16.1 KiB** (16,441 B) | 1,280 B + 16 KiB ≈ **17.3 KiB** | **0** |
+| **Micro** | **23.2 KiB** (23,730 B) | 3,328 B + 16 KiB ≈ **19.3 KiB** | **0** |
+| **Embedded 2017** | **38.5 KiB** (39,442 B) | 63,240 B + 16 KiB ≈ **79.3 KiB** | **0** |
+| **Full Featured** | **38.8 KiB** (39,768 B) | 63,240 B + 16 KiB ≈ **79.6 KiB** | **0** |
 
 Additional notes for budgeting:
 
@@ -806,7 +808,7 @@ opcua_statuscode_t mu_server_config_validate(const mu_server_config_t *config);
 
 | Constant | Value | Header |
 |---|---|---|
-| `MU_SERVER_STORAGE_BYTES` | 1280 / 3328 / 45696 (per profile) | `config.h` |
+| `MU_SERVER_STORAGE_BYTES` | 1280 / 3328 / 63240 (per profile) | `config.h` |
 | `MU_MIN_CHUNK_SIZE` | 8192 | `config.h` |
 | `MU_DEFAULT_MAX_CHUNK_COUNT` | 1 | `config.h` |
 | `MU_DEFAULT_MAX_MESSAGE_SIZE` | 8192 | `config.h` |

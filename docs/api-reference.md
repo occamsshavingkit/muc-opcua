@@ -1027,30 +1027,34 @@ feature toggles**. Always pass `MU_SERVER_STORAGE_BYTES` as the storage size to
 
 #ifdef MICRO_OPCUA_SUBSCRIPTIONS
 #define MU_SERVER_STORAGE_BYTES \
-    (3072 + MU_SUBSCRIPTIONS_STANDARD_STORAGE_BYTES + \
-     MU_SERVER_SECURITY_STORAGE_BYTES + MU_ADDRESS_SPACE_INDEX_STORAGE_BYTES)
+    (3072 + MU_SUBSCRIPTIONS_STANDARD_STORAGE_BYTES + MU_SERVER_SECURITY_STORAGE_BYTES + \
+     MU_ADDRESS_SPACE_INDEX_STORAGE_BYTES + MU_MULTIPLE_CONNECTIONS_STORAGE_BYTES + MU_EVENTS_STORAGE_BYTES)
 #else
 #define MU_SERVER_STORAGE_BYTES \
-    (1024 + MU_SERVER_SECURITY_STORAGE_BYTES + MU_ADDRESS_SPACE_INDEX_STORAGE_BYTES)
+    (1024 + MU_SERVER_SECURITY_STORAGE_BYTES + MU_ADDRESS_SPACE_INDEX_STORAGE_BYTES + MU_MULTIPLE_CONNECTIONS_STORAGE_BYTES)
 #endif
 ```
 
 | Macro | Definition | Notes |
 |-------|------------|-------|
-| `MU_SERVER_SECURITY_STORAGE_BYTES` | `MU_SECURE_SCRATCH_SIZE + 2*MU_CIPHER_CTX_SIZE` when `MICRO_OPCUA_SECURITY`, else `0` | Secure scratch + two per-direction prepared cipher contexts. With defaults: `6144 + 2*512 = 7168`. |
+| `MU_SERVER_SECURITY_STORAGE_BYTES` | `MU_SECURE_SCRATCH_SIZE + 2*MU_CIPHER_CTX_SIZE` when `MICRO_OPCUA_SECURITY`, else `0` | Secure scratch + two per-direction prepared cipher contexts. With defaults: `12288 + 2*512 = 13312`. |
 | `MU_ADDRESS_SPACE_INDEX_STORAGE_BYTES` | `MU_MAX_ADDRESS_SPACE_NODES * 2 + 128` | Caller-owned lookup-index storage; default `256` B. |
 | `MU_SUBSCRIPTIONS_STANDARD_STORAGE_BYTES` | Standard DataChange storage when `MICRO_OPCUA_SUBSCRIPTIONS_STANDARD`, else `0` | Covers the Embedded 2017 monitored-item queues and trigger links. Default Embedded 2017 capacity contributes `35,200` B. |
-| `MU_SERVER_STORAGE_BYTES` | `(3072 or 1024) + standard-subscription storage + security storage + address-space-index storage` | Base is `3072` with subscriptions (Micro profile), else `1024` (Nano). The subscription engine adds fixed-size Subscription/MonitoredItem/parked-Publish arrays to `struct mu_server`. |
+| `MU_MULTIPLE_CONNECTIONS_STORAGE_BYTES` | `MU_MAX_CONNECTIONS * 2500` when multiple connections are enabled, else `0` | Bounded multi-connection state. Defaults to `10000` B. |
+| `MU_EVENTS_STORAGE_BYTES` | `MU_MAX_SUBSCRIPTIONS * 700` when events are enabled, else `0` | Bounded event-queue storage. Defaults to `1400` B. |
+| `MU_SERVER_STORAGE_BYTES` | Sum of all configured profile/engine storage slices | Total caller-provided memory block required for `mu_server_init`. |
 
 **Worked totals (with default knob values):**
 
-| `MICRO_OPCUA_SUBSCRIPTIONS` | `MICRO_OPCUA_SECURITY` | `MU_SERVER_STORAGE_BYTES` |
-|:---:|:---:|---:|
-| off | off | `1024 + 256 = 1280` |
-| off | on | `1024 + 7168 + 256 = 8448` |
-| on | off | `3072 + 256 = 3328` |
-| on | on | `3072 + 7168 + 256 = 10496` |
-| on + Standard DataChange capacities | on | `3072 + 35200 + 7168 + 256 = 45696` |
+| `MICRO_OPCUA_SUBSCRIPTIONS` | `MICRO_OPCUA_SECURITY` | `MICRO_OPCUA_MULTIPLE_CONNECTIONS` | `MU_SERVER_STORAGE_BYTES` |
+|:---:|:---:|:---:|---:|
+| off | off | off | `1024 + 256 = 1280` |
+| off | off | on | `1024 + 256 + 10000 = 11280` |
+| off | on | off | `1024 + 13312 + 256 = 14592` |
+| off | on | on | `1024 + 13312 + 256 + 10000 = 24592` |
+| on | off | off | `3072 + 256 = 3328` |
+| on | off | on | `3072 + 256 + 10000 = 13328` |
+| on + Standard Subscriptions | on | on | `3072 + 35200 + 13312 + 256 + 10000 + 1400 = 63240` (Embedded / Full) |
 
 ---
 
