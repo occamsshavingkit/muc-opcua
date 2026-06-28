@@ -19,7 +19,7 @@ typedef struct {
     /* RevisedSessionTimeout as the raw IEEE-754 bits of the Duration (ms). Kept as
        bits so the value is clamped and echoed with no floating-point math (the
        Cortex-M0+ target has no FPU). */
-    opcua_uint64_t revised_session_timeout_bits;
+    opcua_uint32_t revised_session_timeout_ms;
 } mu_session_t;
 
 void mu_session_init(mu_session_t *session);

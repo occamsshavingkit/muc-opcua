@@ -53,6 +53,7 @@ opcua_statuscode_t mu_asym_chunk_unwrap(
     const mu_crypto_adapter_t *crypto,
     const opcua_byte_t *chunk, size_t chunk_len,
     opcua_byte_t *out_body, size_t out_cap, size_t *out_body_len,
+    opcua_byte_t *scratch, size_t scratch_len,
     mu_asym_chunk_info_t *info);
 
 #endif /* MICRO_OPCUA_ASYM_CHUNK_H */
