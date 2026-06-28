@@ -1,4 +1,5 @@
 /* src/platform/mbedtls_crypto_adapter.c */
+#ifdef MICRO_OPCUA_HAVE_MBEDTLS
 #include "micro_opcua/platform.h"
 #include "micro_opcua/status.h"
 #include <mbedtls/aes.h>
@@ -291,3 +292,6 @@ void mu_mbedtls_crypto_adapter_cleanup(mu_crypto_adapter_t *adapter) {
     free(ctx);
     adapter->context = NULL;
 }
+#else
+typedef int mu_mbedtls_dummy;
+#endif
