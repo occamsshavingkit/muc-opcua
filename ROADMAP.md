@@ -21,7 +21,7 @@ This roadmap outlines the planned feature milestones and maintenance tasks for t
 - [x] **Feature 012: OPC UA PubSub (Part 14) - UADP / UDP**
   - Introduce connectionless Publish-Subscribe (UADP) over UDP.
   - Ideal for ultra-low footprint sensors broadcasting data without TCP overhead.
-- [ ] **Feature 013: Advanced Security Policies**
+- [x] **Feature 013: Advanced Security Policies**
   - Implement `Aes128-Sha256-RsaOaep` and `Aes256-Sha256-RsaPss`.
   - Add basic TrustList management for rejecting unknown client certificates.
 
