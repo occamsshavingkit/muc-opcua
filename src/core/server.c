@@ -10,7 +10,6 @@
 #include "../security/asym_chunk.h"
 #include "../security/sym_chunk.h"
 #endif
-#include <stdio.h>
 #include <string.h>
 
 void mu_service_dispatch_set_opn_security_policy(mu_server_t *server, const mu_string_t *security_policy);
@@ -22,18 +21,14 @@ opcua_statuscode_t mu_server_config_validate(const mu_server_config_t *config) {
 
     /* Validate Endpoints */
     if (config->endpoint_url == NULL || strncmp(config->endpoint_url, "opc.tcp://", 10) != 0) {
-        printf("DEBUG: Validate Endpoints failed\n");
         return MU_STATUS_BAD_TCPENDPOINTURLINVALID;
     }
 
     /* Validate caller-owned buffers */
     if (config->receive_buffer == NULL || config->receive_buffer_size < MU_MIN_CHUNK_SIZE) {
-        printf("DEBUG: Validate receive buffer failed. recv_buf=%p size=%zu min=%d\n", config->receive_buffer,
-               config->receive_buffer_size, MU_MIN_CHUNK_SIZE);
         return MU_STATUS_BAD_INTERNALERROR;
     }
     if (config->send_buffer == NULL || config->send_buffer_size < MU_MIN_CHUNK_SIZE) {
-        printf("DEBUG: Validate send buffer failed\n");
         return MU_STATUS_BAD_INTERNALERROR;
     }
 
