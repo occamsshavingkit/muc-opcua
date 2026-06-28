@@ -193,9 +193,11 @@ void test_secure_handshake_read(void) {
 
     /* Unwrap the OPN response with the client key; extract token + serverNonce. */
     opcua_byte_t opn_body[8192]; size_t opn_body_len = 0; mu_asym_chunk_info_t ai; memset(&ai, 0, sizeof(ai));
+    opcua_byte_t scratch[6144];
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD,
         mu_asym_chunk_unwrap(&client_crypto, mock.last_write, mock.last_write_len,
-                             opn_body, sizeof(opn_body), &opn_body_len, &ai));
+                             opn_body, sizeof(opn_body), &opn_body_len,
+                             scratch, sizeof(scratch), &ai));
     TEST_ASSERT_EQUAL(MU_SECURITY_POLICY_BASIC256SHA256_ID, ai.policy);
 
     mu_binary_reader_t br;

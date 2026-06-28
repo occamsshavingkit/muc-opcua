@@ -16,7 +16,11 @@
 /* E2: opaque per-channel cipher-context storage. 512 bytes gives headroom
  * for an AES-256 key schedule; backend size asserts are added with adapter use. */
 #ifndef MU_CIPHER_CTX_SIZE
+#ifdef MICRO_OPCUA_HAVE_OPENSSL
+#define MU_CIPHER_CTX_SIZE 32
+#else
 #define MU_CIPHER_CTX_SIZE 512
+#endif
 #endif
 
 /* E4: shared secure-path scratch owned by struct mu_server when

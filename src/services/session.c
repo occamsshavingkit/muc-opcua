@@ -1,6 +1,7 @@
 /* src/services/session.c */
 #include "session.h"
 #include <stddef.h>
+#include <string.h>
 
 /* IEEE-754 bit patterns of the SessionTimeout bounds (ms). For positive doubles
    the unsigned bit pattern is monotonic in value, so we clamp by integer compare
@@ -23,7 +24,7 @@ void mu_session_init(mu_session_t *session) {
         session->state = MU_SESSION_STATE_CLOSED;
         session->session_id = 0;
         session->auth_token = 0;
-        session->revised_session_timeout_bits = 0;
+        session->revised_session_timeout_ms = 0;
     }
 }
 
@@ -77,7 +78,9 @@ opcua_statuscode_t mu_session_create(mu_session_t *session,
     session->auth_token = 12345; /* Mock token */
 
     opcua_uint64_t revised = clamp_timeout_bits(requested_timeout_bits);
-    session->revised_session_timeout_bits = revised;
+    double d;
+    memcpy(&d, &revised, sizeof(d));
+    session->revised_session_timeout_ms = (opcua_uint32_t)d;
     session->state = MU_SESSION_STATE_CREATED;
 
     *revised_timeout_bits = revised;

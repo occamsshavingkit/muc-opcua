@@ -378,7 +378,8 @@ static void handle_data_chunk_secure(mu_server_t *server, opcua_byte_t *msg, siz
         if (mu_binary_read_string(&header_reader, &opn_security_policy) != MU_STATUS_GOOD) return;
 
         memset(&ai, 0, sizeof(ai));
-        if (mu_asym_chunk_unwrap(crypto, msg, msg_len, opn_buf, MU_SECURE_OPN_REQ_MAX, &req_len, &ai) != MU_STATUS_GOOD) {
+        if (mu_asym_chunk_unwrap(crypto, msg, msg_len, opn_buf, MU_SECURE_OPN_REQ_MAX, &req_len,
+                                 server->secure_scratch, MU_SECURE_SCRATCH_SIZE, &ai) != MU_STATUS_GOOD) {
             return;
         }
         /* Record the negotiated policy before dispatch so the OPN handler can

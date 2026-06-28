@@ -216,9 +216,11 @@ opcua_statuscode_t mu_asym_chunk_unwrap(
     const mu_crypto_adapter_t *crypto,
     const opcua_byte_t *chunk, size_t chunk_len,
     opcua_byte_t *out_body, size_t out_cap, size_t *out_body_len,
+    opcua_byte_t *scratch, size_t scratch_len,
     mu_asym_chunk_info_t *info)
 {
-    if (!crypto || !chunk || !out_body || !out_body_len || !info) return MU_STATUS_BAD_INTERNALERROR;
+    if (!crypto || !chunk || !out_body || !out_body_len || !info || !scratch) return MU_STATUS_BAD_INTERNALERROR;
+    if (scratch_len < MU_ASYM_MAX_PLAINTEXT + MU_ASYM_SIGNED_INPUT_MAX) return MU_STATUS_BAD_INTERNALERROR;
     if (chunk_len < 12 || chunk[0] != 'O' || chunk[1] != 'P' || chunk[2] != 'N') {
         return MU_STATUS_BAD_DECODINGERROR;
     }
@@ -281,22 +283,22 @@ opcua_statuscode_t mu_asym_chunk_unwrap(
     if (cipher_len == 0 || cipher_len % own_key_bytes != 0) return MU_STATUS_BAD_DECODINGERROR;
 
     /* Decrypt block-by-block with our private key. */
-    opcua_byte_t plain[MU_ASYM_MAX_PLAINTEXT];
+    opcua_byte_t *plain = scratch;
     size_t plain_len = 0;
     size_t blocks = cipher_len / own_key_bytes;
     for (size_t i = 0; i < blocks; i++) {
-        size_t out_block = sizeof(plain) - plain_len;
+        size_t out_block = MU_ASYM_MAX_PLAINTEXT - plain_len;
         s = crypto->rsa_oaep_decrypt(crypto->context, chunk + hdr_len + i * own_key_bytes, own_key_bytes,
                                      plain + plain_len, &out_block);
         if (s != MU_STATUS_GOOD) {
-            mu_secure_zero(plain, sizeof(plain));
+            mu_secure_zero(plain, MU_ASYM_MAX_PLAINTEXT);
             return MU_STATUS_BAD_SECURITYCHECKSFAILED;
         }
         plain_len += out_block;
     }
 
     if (plain_len < sig_len + 1 + 8) {
-        mu_secure_zero(plain, sizeof(plain));
+        mu_secure_zero(plain, MU_ASYM_MAX_PLAINTEXT);
         return MU_STATUS_BAD_SECURITYCHECKSFAILED;
     }
     size_t signed_len = plain_len - sig_len;  /* SequenceHeader+body+paddingSize+padding */
@@ -304,31 +306,31 @@ opcua_statuscode_t mu_asym_chunk_unwrap(
 
     /* Verify the sender signature over [cleartext header | signed plaintext]. */
     if (hdr_len + signed_len > MU_ASYM_SIGNED_INPUT_MAX) {
-        mu_secure_zero(plain, sizeof(plain));
+        mu_secure_zero(plain, MU_ASYM_MAX_PLAINTEXT);
         return MU_STATUS_BAD_SECURITYCHECKSFAILED;
     }
-    opcua_byte_t verify_buf[MU_ASYM_SIGNED_INPUT_MAX];
+    opcua_byte_t *verify_buf = scratch + MU_ASYM_MAX_PLAINTEXT;
     memcpy(verify_buf, chunk, hdr_len);
     memcpy(verify_buf + hdr_len, plain, signed_len);
     s = crypto->rsa_sha256_verify(crypto->context, info->sender_cert, info->sender_cert_len,
                                   verify_buf, hdr_len + signed_len, signature, sig_len);
     if (s != MU_STATUS_GOOD) {
-        mu_secure_zero(verify_buf, sizeof(verify_buf));
-        mu_secure_zero(plain, sizeof(plain));
+        mu_secure_zero(verify_buf, MU_ASYM_SIGNED_INPUT_MAX);
+        mu_secure_zero(plain, MU_ASYM_MAX_PLAINTEXT);
         return MU_STATUS_BAD_SECURITYCHECKSFAILED;
     }
-    mu_secure_zero(verify_buf, sizeof(verify_buf));
+    mu_secure_zero(verify_buf, MU_ASYM_SIGNED_INPUT_MAX);
 
     /* Strip padding. */
     size_t pad_count = plain[signed_len - 1];
     if (signed_len < pad_count + 1 + 8) {
-        mu_secure_zero(plain, sizeof(plain));
+        mu_secure_zero(plain, MU_ASYM_MAX_PLAINTEXT);
         return MU_STATUS_BAD_SECURITYCHECKSFAILED;
     }
     /* Verify padding bytes are all equal to pad_count */
     for (size_t i = 1; i <= pad_count; i++) {
         if (plain[signed_len - 1 - i] != pad_count) {
-            mu_secure_zero(plain, sizeof(plain));
+            mu_secure_zero(plain, MU_ASYM_MAX_PLAINTEXT);
             return MU_STATUS_BAD_SECURITYCHECKSFAILED;
         }
     }
@@ -341,11 +343,11 @@ opcua_statuscode_t mu_asym_chunk_unwrap(
 
     size_t body_len = seqbody_len - 8;
     if (body_len > out_cap) {
-        mu_secure_zero(plain, sizeof(plain));
+        mu_secure_zero(plain, MU_ASYM_MAX_PLAINTEXT);
         return MU_STATUS_BAD_RESPONSETOOLARGE;
     }
     memcpy(out_body, plain + 8, body_len);
     *out_body_len = body_len;
-    mu_secure_zero(plain, sizeof(plain));
+    mu_secure_zero(plain, MU_ASYM_MAX_PLAINTEXT);
     return MU_STATUS_GOOD;
 }
