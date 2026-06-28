@@ -44,20 +44,34 @@ target_link_libraries(test_subscriptions PRIVATE micro_opcua micro_opcua_test_su
 target_include_directories(test_subscriptions PRIVATE ${CMAKE_SOURCE_DIR}/src)
 add_test(NAME test_subscriptions COMMAND test_subscriptions)
 
-add_executable(test_write_scalar test_write_scalar.c)
-target_link_libraries(test_write_scalar PRIVATE micro_opcua micro_opcua_test_support unity)
-target_include_directories(test_write_scalar PRIVATE ${CMAKE_SOURCE_DIR}/src)
-add_test(NAME test_write_scalar COMMAND test_write_scalar)
+add_executable(test_user_auth_plaintext test_user_auth_plaintext.c)
+target_link_libraries(test_user_auth_plaintext PRIVATE micro_opcua micro_opcua_test_support unity)
+target_include_directories(test_user_auth_plaintext PRIVATE ${CMAKE_SOURCE_DIR}/src)
+add_test(NAME test_user_auth_plaintext COMMAND test_user_auth_plaintext)
 
-add_executable(test_write_batch test_write_batch.c)
-target_link_libraries(test_write_batch PRIVATE micro_opcua micro_opcua_test_support unity)
-target_include_directories(test_write_batch PRIVATE ${CMAKE_SOURCE_DIR}/src)
-add_test(NAME test_write_batch COMMAND test_write_batch)
+add_executable(test_user_auth_encrypted test_user_auth_encrypted.c)
+target_link_libraries(test_user_auth_encrypted PRIVATE micro_opcua micro_opcua_test_support unity)
+target_include_directories(test_user_auth_encrypted PRIVATE ${CMAKE_SOURCE_DIR}/src)
+add_test(NAME test_user_auth_encrypted COMMAND test_user_auth_encrypted)
 
-add_executable(test_write_validation test_write_validation.c)
-target_link_libraries(test_write_validation PRIVATE micro_opcua micro_opcua_test_support unity)
-target_include_directories(test_write_validation PRIVATE ${CMAKE_SOURCE_DIR}/src)
-add_test(NAME test_write_validation COMMAND test_write_validation)
+add_executable(test_write_service_integration test_write_service.c)
+target_link_libraries(test_write_service_integration PRIVATE micro_opcua micro_opcua_test_support unity)
+target_include_directories(test_write_service_integration PRIVATE ${CMAKE_SOURCE_DIR}/src)
+add_test(NAME test_write_service_integration COMMAND test_write_service_integration)
 
+add_executable(test_secure_handshake_modern test_secure_handshake_modern.c)
+target_link_libraries(test_secure_handshake_modern PRIVATE micro_opcua micro_opcua_test_support unity)
+target_include_directories(test_secure_handshake_modern PRIVATE ${CMAKE_SOURCE_DIR}/src)
+add_test(NAME test_secure_handshake_modern COMMAND test_secure_handshake_modern)
+
+add_executable(test_user_auth_certificate test_user_auth_certificate.c)
+target_link_libraries(test_user_auth_certificate PRIVATE micro_opcua micro_opcua_test_support unity)
+target_include_directories(test_user_auth_certificate PRIVATE ${CMAKE_SOURCE_DIR}/src)
+add_test(NAME test_user_auth_certificate COMMAND test_user_auth_certificate)
+
+add_executable(test_event_notifications test_event_notifications.c)
+target_link_libraries(test_event_notifications PRIVATE micro_opcua micro_opcua_test_support unity)
+target_include_directories(test_event_notifications PRIVATE ${CMAKE_SOURCE_DIR}/src)
+add_test(NAME test_event_notifications COMMAND test_event_notifications)
 
 

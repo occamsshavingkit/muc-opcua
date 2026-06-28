@@ -27,7 +27,7 @@
  * MICRO_OPCUA_SECURITY is enabled. Sized for the worst-case secure response /
  * OPN scratch, replacing respbody[5120] + opn_buf[1024] stack buffers. */
 #ifndef MU_SECURE_SCRATCH_SIZE
-#define MU_SECURE_SCRATCH_SIZE 6144
+#define MU_SECURE_SCRATCH_SIZE 12288
 #endif
 
 /* Issue #197: the address-space lookup index now lives in struct mu_server
@@ -49,6 +49,14 @@
 /* Maximum number of sessions/channels for Nano profile */
 #define MU_MAX_SESSIONS 2
 #define MU_MAX_SECURE_CHANNELS 1
+
+#ifndef MU_MAX_CONNECTIONS
+#ifdef MICRO_OPCUA_MULTIPLE_CONNECTIONS
+#define MU_MAX_CONNECTIONS 4
+#else
+#define MU_MAX_CONNECTIONS 1
+#endif
+#endif
 
 /* String length limits.
  * MU_MAX_ENCODED_STRING_LENGTH bounds any String/ByteString on the wire. It must be
@@ -97,11 +105,31 @@
 #define MU_SUBSCRIPTIONS_STANDARD_STORAGE_BYTES 0
 #endif
 
+#ifdef MICRO_OPCUA_MULTIPLE_CONNECTIONS
+#define MU_MULTIPLE_CONNECTIONS_STORAGE_BYTES (MU_MAX_CONNECTIONS * 2500)
+#else
+#define MU_MULTIPLE_CONNECTIONS_STORAGE_BYTES 0
+#endif
+
+#ifdef MICRO_OPCUA_EVENTS
+#ifndef MU_MAX_SUBSCRIPTIONS
+#define MU_MAX_SUBSCRIPTIONS 2
+#endif
+#define MU_EVENTS_STORAGE_BYTES (MU_MAX_SUBSCRIPTIONS * 700)
+#else
+#define MU_EVENTS_STORAGE_BYTES 0
+#endif
+
 #define MU_SERVER_STORAGE_BYTES                                                                                        \
     (3072 + MU_SUBSCRIPTIONS_STANDARD_STORAGE_BYTES + MU_SERVER_SECURITY_STORAGE_BYTES +                               \
-     MU_ADDRESS_SPACE_INDEX_STORAGE_BYTES)
+     MU_ADDRESS_SPACE_INDEX_STORAGE_BYTES + MU_MULTIPLE_CONNECTIONS_STORAGE_BYTES + MU_EVENTS_STORAGE_BYTES)
 #else
-#define MU_SERVER_STORAGE_BYTES (1024 + MU_SERVER_SECURITY_STORAGE_BYTES + MU_ADDRESS_SPACE_INDEX_STORAGE_BYTES)
+#ifdef MICRO_OPCUA_MULTIPLE_CONNECTIONS
+#define MU_MULTIPLE_CONNECTIONS_STORAGE_BYTES (MU_MAX_CONNECTIONS * 2500)
+#else
+#define MU_MULTIPLE_CONNECTIONS_STORAGE_BYTES 0
+#endif
+#define MU_SERVER_STORAGE_BYTES (1024 + MU_SERVER_SECURITY_STORAGE_BYTES + MU_ADDRESS_SPACE_INDEX_STORAGE_BYTES + MU_MULTIPLE_CONNECTIONS_STORAGE_BYTES)
 #endif
 
 #endif /* MICRO_OPCUA_CONFIG_H */

@@ -20,6 +20,10 @@ typedef struct {
        bits so the value is clamped and echoed with no floating-point math (the
        Cortex-M0+ target has no FPU). */
     opcua_uint32_t revised_session_timeout_ms;
+    opcua_byte_t server_nonce[32];
+#ifdef MICRO_OPCUA_MULTIPLE_CONNECTIONS
+    opcua_uint32_t secure_channel_id;
+#endif
 } mu_session_t;
 
 void mu_session_init(mu_session_t *session);

@@ -749,6 +749,122 @@ static opcua_statuscode_t write_data_change_notification(mu_binary_writer_t *w, 
     return MU_STATUS_GOOD;
 }
 
+#ifdef MICRO_OPCUA_EVENTS
+static opcua_statuscode_t write_event_notification_list(mu_binary_writer_t *w, struct mu_server *server,
+                                                        const mu_subscription_t *sub) {
+    mu_nodeid_t type_id = {0, MU_NODEID_NUMERIC, {914}};
+
+    opcua_int32_t event_monitored_item_count = 0;
+    for (size_t i = 0; i < MU_MAX_MONITORED_ITEMS; ++i) {
+        const mu_monitored_item_t *item = &server->subs.monitored_items[i];
+        if (item->in_use && item->subscription_id == sub->subscription_id && item->attribute_id == 12u &&
+            item->monitoring_mode == MU_MONITORING_MODE_REPORTING) {
+            event_monitored_item_count++;
+        }
+    }
+
+    if (event_monitored_item_count == 0) {
+        return mu_binary_write_extension_object_header(w, &type_id, 0);
+    }
+
+    opcua_byte_t body_buf[1024];
+    mu_binary_writer_t sub_w;
+    mu_binary_writer_init(&sub_w, body_buf, sizeof(body_buf));
+
+    opcua_int32_t total_field_lists = event_monitored_item_count * (opcua_int32_t)sub->event_queue.count;
+    opcua_statuscode_t s = mu_binary_write_int32(&sub_w, total_field_lists);
+    if (s != MU_STATUS_GOOD)
+        return s;
+
+    for (size_t i = 0; i < MU_MAX_MONITORED_ITEMS; ++i) {
+        const mu_monitored_item_t *item = &server->subs.monitored_items[i];
+        if (item->in_use && item->subscription_id == sub->subscription_id && item->attribute_id == 12u &&
+            item->monitoring_mode == MU_MONITORING_MODE_REPORTING) {
+
+            size_t idx = sub->event_queue.head;
+            for (size_t k = 0; k < sub->event_queue.count; ++k) {
+                const mu_event_notification_t *ev = &sub->event_queue.queue[idx];
+                idx = (idx + 1) % MU_MAX_EVENT_QUEUE_SIZE;
+
+                s = mu_binary_write_uint32(&sub_w, item->client_handle);
+                if (s != MU_STATUS_GOOD)
+                    return s;
+
+                s = mu_binary_write_int32(&sub_w, (opcua_int32_t)item->select_clauses_count);
+                if (s != MU_STATUS_GOOD)
+                    return s;
+
+                for (opcua_byte_t j = 0; j < item->select_clauses_count; ++j) {
+                    opcua_byte_t field_type = item->select_clauses[j];
+                    mu_variant_t var;
+                    memset(&var, 0, sizeof(var));
+
+                    switch (field_type) {
+                    case 1:
+                        var.type = MU_TYPE_BYTESTRING;
+                        var.value.bytestr = ev->event_id;
+                        break;
+                    case 2:
+                        var.type = MU_TYPE_NODEID;
+                        var.value.nodeid = ev->event_type;
+                        break;
+                    case 3:
+                        var.type = MU_TYPE_DATETIME;
+                        var.value.dt = ev->time;
+                        break;
+                    case 4: {
+                        var.type = MU_TYPE_LOCALIZEDTEXT;
+                        mu_localized_text_t lt = {{-1, NULL}, ev->message};
+                        var.value.localized_text = lt;
+                    } break;
+                    case 5:
+                        var.type = MU_TYPE_UINT16;
+                        var.value.ui16 = ev->severity;
+                        break;
+                    default:
+                        var.type = MU_TYPE_NULL;
+                        break;
+                    }
+                    s = mu_binary_write_variant(&sub_w, &var);
+                    if (s != MU_STATUS_GOOD)
+                        return s;
+                }
+            }
+        }
+    }
+
+    s = mu_binary_write_extension_object_header(w, &type_id, sub_w.position);
+    if (s != MU_STATUS_GOOD)
+        return s;
+    if (w->position + sub_w.position > w->length) {
+        return MU_STATUS_BAD_OUTOFMEMORY;
+    }
+    memcpy(w->buffer + w->position, body_buf, sub_w.position);
+    w->position += sub_w.position;
+    return MU_STATUS_GOOD;
+}
+
+opcua_statuscode_t mu_server_trigger_event(mu_server_t *server, const mu_event_notification_t *event) {
+    if (server == NULL || event == NULL) {
+        return MU_STATUS_BAD_INVALIDARGUMENT;
+    }
+    for (size_t i = 0; i < MU_MAX_SUBSCRIPTIONS; ++i) {
+        mu_subscription_t *sub = &server->subs.subscriptions[i];
+        if (sub->in_use) {
+            mu_event_queue_t *eq = &sub->event_queue;
+            if (eq->count >= MU_MAX_EVENT_QUEUE_SIZE) {
+                eq->head = (eq->head + 1) % MU_MAX_EVENT_QUEUE_SIZE;
+                eq->count--;
+            }
+            eq->queue[eq->tail] = *event;
+            eq->tail = (eq->tail + 1) % MU_MAX_EVENT_QUEUE_SIZE;
+            eq->count++;
+        }
+    }
+    return MU_STATUS_GOOD;
+}
+#endif
+
 static opcua_statuscode_t build_publish_response(struct mu_server *server, const mu_subscription_t *sub,
                                                  const mu_publish_request_t *request, opcua_uint32_t sequence_number,
                                                  bool include_data, opcua_int32_t report_count,
@@ -789,14 +905,35 @@ static opcua_statuscode_t build_publish_response(struct mu_server *server, const
     s = mu_binary_write_int64(&w, publish_time);
     if (s != MU_STATUS_GOOD)
         return s;
-    s = mu_binary_write_int32(&w, include_data ? 1 : 0);
+
+    opcua_int32_t notification_data_count = 0;
+    if (include_data) {
+        if (report_count > 0) {
+            notification_data_count++;
+        }
+#ifdef MICRO_OPCUA_EVENTS
+        if (sub->event_queue.count > 0) {
+            notification_data_count++;
+        }
+#endif
+    }
+    s = mu_binary_write_int32(&w, notification_data_count);
     if (s != MU_STATUS_GOOD)
         return s;
 
     if (include_data) {
-        s = write_data_change_notification(&w, server, sub, report_count);
-        if (s != MU_STATUS_GOOD)
-            return s;
+        if (report_count > 0) {
+            s = write_data_change_notification(&w, server, sub, report_count);
+            if (s != MU_STATUS_GOOD)
+                return s;
+        }
+#ifdef MICRO_OPCUA_EVENTS
+        if (sub->event_queue.count > 0) {
+            s = write_event_notification_list(&w, server, sub);
+            if (s != MU_STATUS_GOOD)
+                return s;
+        }
+#endif
     }
     size_t message_end = w.position;
 
@@ -880,15 +1017,46 @@ static void publish_due(struct mu_server *server, opcua_uint64_t now_ms) {
             continue;
         }
 
+#ifdef MICRO_OPCUA_MULTIPLE_CONNECTIONS
+        /* Resolve connection for this subscription's session */
+        mu_connection_t *conn_match = NULL;
+        mu_session_t *session = NULL;
+        for (size_t s_idx = 0; s_idx < MU_MAX_SESSIONS; ++s_idx) {
+            if (server->sessions[s_idx].state != MU_SESSION_STATE_CLOSED &&
+                server->sessions[s_idx].session_id == sub->session_id) {
+                session = &server->sessions[s_idx];
+                break;
+            }
+        }
+        if (session != NULL) {
+            for (size_t c = 0; c < MU_MAX_CONNECTIONS; ++c) {
+                if (server->conns[c].client_handle != NULL &&
+                    server->conns[c].secure_channel.channel_id == session->secure_channel_id) {
+                    conn_match = &server->conns[c];
+                    break;
+                }
+            }
+        }
+        if (conn_match == NULL) {
+            /* No active connection for this session's secure channel: skip ticking */
+            continue;
+        }
+        server->active_conn = conn_match;
+#endif
+
         opcua_int32_t report_count = 0;
         bool has_data = false;
+        bool has_events = false;
+#ifdef MICRO_OPCUA_EVENTS
+        has_events = (sub->event_queue.count > 0);
+#endif
         if (sub->publishing_enabled) {
 #if MICRO_OPCUA_SUBSCRIPTIONS_STANDARD
             prepare_reportable_queues(server, sub);
             enqueue_resend_data(server, sub);
 #endif
             report_count = count_reportable_items(server, sub);
-            has_data = report_count > 0;
+            has_data = (report_count > 0) || has_events;
         }
 
         if (has_data) {
@@ -911,6 +1079,14 @@ static void publish_due(struct mu_server *server, opcua_uint64_t now_ms) {
                     clear_reported_items(server, sub, report_count);
 #else
                     clear_reported_items(server, sub);
+#endif
+#ifdef MICRO_OPCUA_EVENTS
+                    if (has_events) {
+                        mu_subscription_t *mutable_sub = (mu_subscription_t *)sub;
+                        mutable_sub->event_queue.head = 0;
+                        mutable_sub->event_queue.tail = 0;
+                        mutable_sub->event_queue.count = 0;
+                    }
 #endif
                     sub->keep_alive_counter = 0u;
                     if (message_end >= message_start && message_end <= body_length) {
@@ -946,6 +1122,10 @@ static void publish_due(struct mu_server *server, opcua_uint64_t now_ms) {
         }
 
         advance_publish_timer(sub, now_ms);
+
+#ifdef MICRO_OPCUA_MULTIPLE_CONNECTIONS
+        server->active_conn = NULL;
+#endif
     }
 }
 
@@ -1304,6 +1484,12 @@ void mu_subscriptions_tick(struct mu_server *server, opcua_uint64_t now_ms) {
         if (item->monitoring_mode == MU_MONITORING_MODE_DISABLED || now_ms < item->next_sample_ms) {
             continue;
         }
+
+#ifdef MICRO_OPCUA_EVENTS
+        if (item->attribute_id == 12u) {
+            continue;
+        }
+#endif
 
         mu_variant_t cur;
         memset(&cur, 0, sizeof(cur));

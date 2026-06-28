@@ -70,8 +70,7 @@ opcua_statuscode_t mu_binary_write_variant(mu_binary_writer_t *writer, const mu_
 opcua_statuscode_t mu_binary_read_datavalue(mu_binary_reader_t *reader, mu_datavalue_t *value);
 opcua_statuscode_t mu_binary_write_datavalue(mu_binary_writer_t *writer, const mu_datavalue_t *value);
 
-#ifdef MICRO_OPCUA_SERVICE_WRITE
-opcua_statuscode_t mu_write_value_decode(mu_binary_reader_t *reader, mu_write_value_t *value);
-#endif
+opcua_statuscode_t mu_binary_read_username_identity_token(mu_binary_reader_t *reader, mu_username_identity_token_t *value);
+opcua_statuscode_t mu_binary_read_certificate_identity_token(mu_binary_reader_t *reader, mu_certificate_identity_token_t *value);
 
 #endif /* MICRO_OPCUA_ENCODING_H */

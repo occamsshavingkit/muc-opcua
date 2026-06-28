@@ -42,18 +42,18 @@ static opcua_statuscode_t h_hmac_sha256(void *c, const opcua_byte_t *key, size_t
     return MU_STATUS_GOOD;
 }
 
-static opcua_statuscode_t aes_cbc(const opcua_byte_t *key, const opcua_byte_t *iv,
+static opcua_statuscode_t aes_cbc(const EVP_CIPHER *cipher, const opcua_byte_t *key, const opcua_byte_t *iv,
                                   const opcua_byte_t *in, size_t len, opcua_byte_t *out, int encrypt) {
     EVP_CIPHER_CTX *ctx = EVP_CIPHER_CTX_new();
     if (!ctx) return MU_STATUS_BAD_OUTOFMEMORY;
     opcua_statuscode_t rc = MU_STATUS_BAD_INTERNALERROR;
     int outl = 0, finl = 0;
     int ok = encrypt
-        ? (EVP_EncryptInit_ex(ctx, EVP_aes_256_cbc(), NULL, key, iv) == 1 &&
+        ? (EVP_EncryptInit_ex(ctx, cipher, NULL, key, iv) == 1 &&
            EVP_CIPHER_CTX_set_padding(ctx, 0) == 1 &&
            EVP_EncryptUpdate(ctx, out, &outl, in, (int)len) == 1 &&
            EVP_EncryptFinal_ex(ctx, out + outl, &finl) == 1)
-        : (EVP_DecryptInit_ex(ctx, EVP_aes_256_cbc(), NULL, key, iv) == 1 &&
+        : (EVP_DecryptInit_ex(ctx, cipher, NULL, key, iv) == 1 &&
            EVP_CIPHER_CTX_set_padding(ctx, 0) == 1 &&
            EVP_DecryptUpdate(ctx, out, &outl, in, (int)len) == 1 &&
            EVP_DecryptFinal_ex(ctx, out + outl, &finl) == 1);
@@ -64,11 +64,19 @@ static opcua_statuscode_t aes_cbc(const opcua_byte_t *key, const opcua_byte_t *i
 
 static opcua_statuscode_t h_aes_encrypt(void *c, const opcua_byte_t *key, const opcua_byte_t *iv,
                                         const opcua_byte_t *in, size_t len, opcua_byte_t *out) {
-    (void)c; return aes_cbc(key, iv, in, len, out, 1);
+    (void)c; return aes_cbc(EVP_aes_256_cbc(), key, iv, in, len, out, 1);
 }
 static opcua_statuscode_t h_aes_decrypt(void *c, const opcua_byte_t *key, const opcua_byte_t *iv,
                                         const opcua_byte_t *in, size_t len, opcua_byte_t *out) {
-    (void)c; return aes_cbc(key, iv, in, len, out, 0);
+    (void)c; return aes_cbc(EVP_aes_256_cbc(), key, iv, in, len, out, 0);
+}
+static opcua_statuscode_t h_aes128_encrypt(void *c, const opcua_byte_t *key, const opcua_byte_t *iv,
+                                           const opcua_byte_t *in, size_t len, opcua_byte_t *out) {
+    (void)c; return aes_cbc(EVP_aes_128_cbc(), key, iv, in, len, out, 1);
+}
+static opcua_statuscode_t h_aes128_decrypt(void *c, const opcua_byte_t *key, const opcua_byte_t *iv,
+                                           const opcua_byte_t *in, size_t len, opcua_byte_t *out) {
+    (void)c; return aes_cbc(EVP_aes_128_cbc(), key, iv, in, len, out, 0);
 }
 
 static void store_cipher_handle(opcua_byte_t *ctx_storage, struct host_cipher_context *handle) {
@@ -323,6 +331,8 @@ opcua_statuscode_t mu_host_crypto_adapter_init(mu_crypto_adapter_t *adapter) {
     adapter->hmac_sha256 = h_hmac_sha256;
     adapter->aes256_cbc_encrypt = h_aes_encrypt;
     adapter->aes256_cbc_decrypt = h_aes_decrypt;
+    adapter->aes128_cbc_encrypt = h_aes128_encrypt;
+    adapter->aes128_cbc_decrypt = h_aes128_decrypt;
     adapter->cipher_ctx_init = h_cipher_ctx_init;
     adapter->aes256_cbc_encrypt_ctx = h_aes_encrypt_ctx;
     adapter->aes256_cbc_decrypt_ctx = h_aes_decrypt_ctx;

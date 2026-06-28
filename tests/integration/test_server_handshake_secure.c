@@ -20,7 +20,7 @@ void tearDown(void) {}
 
 /* ---- mock transport with chunks large enough to carry certificates ---- */
 #define MAX_INBOUND 8
-#define CHUNK_CAP 4096
+#define CHUNK_CAP 8192
 typedef struct {
     int accept_count;
     opcua_byte_t inbound[MAX_INBOUND][CHUNK_CAP];
@@ -214,9 +214,9 @@ void test_secure_handshake_read(void) {
     /* Derive the two key sets (client perspective). */
     mu_sym_keys_t c2s, s2c;  /* client->server (we send), server->client (we receive) */
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD,
-        mu_sym_keys_derive(&client_crypto, server_nonce.data, 32, client_nonce, 32, &c2s));
+        mu_sym_keys_derive(&client_crypto, MU_SECURITY_POLICY_BASIC256SHA256_ID, server_nonce.data, 32, client_nonce, 32, &c2s));
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD,
-        mu_sym_keys_derive(&client_crypto, client_nonce, 32, server_nonce.data, 32, &s2c));
+        mu_sym_keys_derive(&client_crypto, MU_SECURITY_POLICY_BASIC256SHA256_ID, client_nonce, 32, server_nonce.data, 32, &s2c));
 
     mu_binary_reader_t resp;
 

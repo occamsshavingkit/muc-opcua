@@ -105,6 +105,15 @@ typedef struct mu_crypto_adapter {
         const opcua_byte_t *key, const opcua_byte_t *iv,
         const opcua_byte_t *input, size_t length, opcua_byte_t *output);
 
+    /* AES-128-CBC (no padding). `length` is a multiple of MU_AES_BLOCK_SIZE,
+       `key` is 16 bytes, `iv` is MU_AES_BLOCK_SIZE bytes. */
+    opcua_statuscode_t (*aes128_cbc_encrypt)(void *context,
+        const opcua_byte_t *key, const opcua_byte_t *iv,
+        const opcua_byte_t *input, size_t length, opcua_byte_t *output);
+    opcua_statuscode_t (*aes128_cbc_decrypt)(void *context,
+        const opcua_byte_t *key, const opcua_byte_t *iv,
+        const opcua_byte_t *input, size_t length, opcua_byte_t *output);
+
     /* Optional per-channel AES context. `ctx_storage` is MU_CIPHER_CTX_SIZE
        bytes; all callbacks MAY be NULL, in which case the codec falls back to
        aes256_cbc_encrypt/decrypt above. */

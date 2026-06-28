@@ -12,6 +12,12 @@
 void setUp(void) {}
 void tearDown(void) {}
 
+#ifdef MICRO_OPCUA_MULTIPLE_CONNECTIONS
+#define GET_CLIENT_HANDLE(s) ((s)->conns[0].client_handle)
+#else
+#define GET_CLIENT_HANDLE(s) ((s)->client_handle)
+#endif
+
 /* ---- controllable mock transport + clock ---- */
 static opcua_uint64_t g_tick_ms;
 static int g_close_count;
@@ -97,16 +103,16 @@ void test_idle_connection_times_out(void) {
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_server_init(storage, sizeof(storage), &config, &server));
 
     mu_server_poll(server);                 /* accept; last_activity stamped at t=0 */
-    TEST_ASSERT_NOT_NULL(server->client_handle);
+    TEST_ASSERT_NOT_NULL(GET_CLIENT_HANDLE(server));
 
     g_tick_ms = 5000;                        /* within the connect timeout */
     mu_server_poll(server);                  /* no data, still connected */
-    TEST_ASSERT_NOT_NULL(server->client_handle);
+    TEST_ASSERT_NOT_NULL(GET_CLIENT_HANDLE(server));
     TEST_ASSERT_EQUAL(0, g_close_count);
 
     g_tick_ms = 60000;                       /* past the connect timeout */
     mu_server_poll(server);                  /* should reclaim the slot */
-    TEST_ASSERT_NULL(server->client_handle);
+    TEST_ASSERT_NULL(GET_CLIENT_HANDLE(server));
     TEST_ASSERT_EQUAL(1, g_close_count);
 }
 
@@ -126,11 +132,11 @@ void test_activity_resets_idle_timer(void) {
     g_tick_ms = 20000;
     mock.next_read = hello; mock.next_read_len = hlen;
     mu_server_poll(server);                  /* HELLO at t=20000 -> activity, ACK sent */
-    TEST_ASSERT_NOT_NULL(server->client_handle);
+    TEST_ASSERT_NOT_NULL(GET_CLIENT_HANDLE(server));
 
     g_tick_ms = 40000;                       /* 20s since last activity: under the limit */
     mu_server_poll(server);
-    TEST_ASSERT_NOT_NULL(server->client_handle);
+    TEST_ASSERT_NOT_NULL(GET_CLIENT_HANDLE(server));
     TEST_ASSERT_EQUAL(0, g_close_count);
 }
 
@@ -148,7 +154,7 @@ void test_write_failure_closes_connection(void) {
     opcua_byte_t hello[128]; size_t hlen = build_hello(hello, sizeof(hello));
     mock.next_read = hello; mock.next_read_len = hlen;
     mu_server_poll(server);                  /* HELLO -> ACK write fails -> close */
-    TEST_ASSERT_NULL(server->client_handle);
+    TEST_ASSERT_NULL(GET_CLIENT_HANDLE(server));
     TEST_ASSERT_EQUAL(1, g_close_count);
 }
 
@@ -166,7 +172,7 @@ void test_short_write_closes_connection(void) {
     opcua_byte_t hello[128]; size_t hlen = build_hello(hello, sizeof(hello));
     mock.next_read = hello; mock.next_read_len = hlen;
     mu_server_poll(server);
-    TEST_ASSERT_NULL(server->client_handle);
+    TEST_ASSERT_NULL(GET_CLIENT_HANDLE(server));
     TEST_ASSERT_EQUAL(1, g_close_count);
 }
 

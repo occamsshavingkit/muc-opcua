@@ -216,3 +216,7 @@ byte-identical (golden-vector regression test).
 - Levers if RAM/stack-constrained: lower the `MU_MAX_*` subscription capacities, shrink
   `MU_RETRANSMIT_BYTES` (Republish buffer, 256 B/subscription), or lower
   `MU_DISPATCH_MAX_READ_NODES` (32) and advertise a smaller `MaxNodesPerRead`.
+
+## Feature 009: Core Feature Expansion
+- Target size impact estimates for Write service, multiple connections, modern security policies, certificate user authentication, and alarms & events are documented in the design specification and implementation plan. Flash impact is expected to remain under 10 KB total.
+

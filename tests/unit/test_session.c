@@ -54,7 +54,7 @@ void test_session_activate_anonymous(void) {
     
     /* Unknown identity token */
     TEST_ASSERT_EQUAL(MU_STATUS_BAD_IDENTITYTOKENINVALID, 
-                      mu_session_activate(&session, auth_token, 324)); /* UserIdentityToken */
+                      mu_session_activate(&session, auth_token, 325)); /* IssuedIdentityToken */
                       
     /* Wrong auth token */
     TEST_ASSERT_EQUAL(MU_STATUS_BAD_SESSIONIDINVALID, 

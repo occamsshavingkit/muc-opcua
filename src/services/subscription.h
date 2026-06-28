@@ -142,6 +142,10 @@ typedef struct {
     bool queue_overflow;
     opcua_byte_t triggered_count;
 #endif
+#ifdef MICRO_OPCUA_EVENTS
+    opcua_byte_t select_clauses[8];
+    opcua_byte_t select_clauses_count;
+#endif
 } mu_monitored_item_t;
 
 /* Retransmission slot for Republish (OPC 10000-4 §5.14.6): the last NotificationMessage
@@ -153,6 +157,16 @@ typedef struct {
     opcua_byte_t message[MU_RETRANSMIT_BYTES];
     size_t message_len;
 } mu_retransmit_slot_t;
+
+#ifdef MICRO_OPCUA_EVENTS
+#define MU_MAX_EVENT_QUEUE_SIZE 8
+typedef struct {
+    mu_event_notification_t queue[MU_MAX_EVENT_QUEUE_SIZE];
+    size_t head;
+    size_t tail;
+    size_t count;
+} mu_event_queue_t;
+#endif
 
 /* A Subscription (OPC 10000-4 §5.14.1.3 state variables). */
 typedef struct {
@@ -180,6 +194,9 @@ typedef struct {
     bool more_notifications;
 #if MICRO_OPCUA_SUBSCRIPTIONS_STANDARD
     bool resend_data_pending; /* OPC-10000-5 §9.2 ResendData method latch */
+#endif
+#ifdef MICRO_OPCUA_EVENTS
+    mu_event_queue_t event_queue;
 #endif
 } mu_subscription_t;
 

@@ -24,7 +24,8 @@ This document maps implementation and test files back to OPC UA normative sectio
 | `src/security/sym_chunk.c` | Symmetric Chunk | Part 6 | 6.7.2, 6.7.5 | MSG AES-256-CBC + HMAC-SHA256 (Sign / SignAndEncrypt) |
 | `tests/unit/test_sym_chunk.c` | Tests | Part 6 | 6.7.2, 6.7.5 | MSG wrap/unwrap round-trip + tamper tests |
 | `tests/integration/test_server_handshake_secure.c` | Tests | Part 6 | 6.7.2-6.7.5 | End-to-end Basic256Sha256 SignAndEncrypt handshake |
-| `tests/unit/test_security_policy.c` | Tests | Part 7 | 6.x | SecurityPolicy URI + parameter tests |
+| `tests/integration/test_write_service.c` | Tests | Part 4 | 5.10.4 | End-to-end Write service tests |
+| `tests/unit/test_security_policy.c` | TBD | TBD | TBD | TBD |
 | `tests/unit/test_certificate.c` | Tests | Part 6 / 4 | 6.7.4 / 7.2 | Thumbprint + cert validation tests |
 | `src/security/key_derivation.h` | Key Derivation | Part 6 | 6.7.5 | P-SHA256 PRF interface for channel keys |
 | `src/security/key_derivation.c` | Key Derivation | Part 6 | 6.7.5 | P-SHA256 (RFC 5246) key material expansion |
@@ -34,6 +35,8 @@ This document maps implementation and test files back to OPC UA normative sectio
 | `tests/unit/test_status.c` | Tests | Part 4 / 6 | 7.38.2 / 7.1.5 | Test Status helpers |
 | `tests/unit/test_server_config.c` | Tests | Part 6 | 7.1.2.3, 7.1.2.4 | Test config validation |
 | `tests/unit/test_platform_adapter_contract.c` | Tests | Part 6 | 7.2 | Test adapters structure |
+| `tests/unit/test_write_decoder.c` | Tests | Part 6 | 5.10.4 | Test Write service request decoder and response encoder |
+| `tests/unit/test_connection_multiplex.c` | Tests | Part 4 | 5.13 | Test concurrent connection multiplexing limits |
 | `fuzz_binary_reader.c` | TBD | TBD | TBD | TBD |
 | `fuzz_binary_types.c` | TBD | TBD | TBD | TBD |
 | `fuzz_message_chunk.c` | TBD | TBD | TBD | TBD |
@@ -96,6 +99,8 @@ This document maps implementation and test files back to OPC UA normative sectio
 | `browse.h` | TBD | TBD | TBD | TBD |
 | `session.c` | TBD | TBD | TBD | TBD |
 | `read.c` | TBD | TBD | TBD | TBD |
+| `write.h` | Attribute Write | Part 4 | 5.10.4 | Write service interface |
+| `write.c` | Attribute Write | Part 4 | 5.10.4 | Write service implementation |
 | `secure_channel.h` | TBD | TBD | TBD | TBD |
 | `discovery.h` | TBD | TBD | TBD | TBD |
 | `service_dispatch.c` | TBD | TBD | TBD | TBD |

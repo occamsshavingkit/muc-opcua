@@ -144,26 +144,31 @@ opcua_statuscode_t mu_binary_read_statuscode(mu_binary_reader_t *reader, opcua_s
     return mu_binary_read_uint32(reader, value);
 }
 
-#ifdef MICRO_OPCUA_SERVICE_WRITE
-/* Citing OPC-10000-4 §5.11.4.2 (WriteValue parameters) and OPC-10000-6 §7.36 */
-opcua_statuscode_t mu_write_value_decode(mu_binary_reader_t *reader, mu_write_value_t *value) {
-    if (!reader || !value)
-        return MU_STATUS_BAD_INTERNALERROR;
-
-    opcua_statuscode_t status;
-
-    status = mu_binary_read_nodeid(reader, &value->node_id);
-    if (status != MU_STATUS_GOOD)
-        return status;
-
-    status = mu_binary_read_int32(reader, &value->attribute_id);
-    if (status != MU_STATUS_GOOD)
-        return status;
-
-    status = mu_binary_read_string(reader, &value->index_range);
-    if (status != MU_STATUS_GOOD)
-        return status;
-
-    return mu_binary_read_datavalue(reader, &value->value);
+opcua_statuscode_t mu_binary_read_username_identity_token(mu_binary_reader_t *reader, mu_username_identity_token_t *value) {
+    opcua_statuscode_t status = reader_status(reader);
+    if (status != MU_STATUS_GOOD) return status;
+    
+    status = mu_binary_read_string(reader, &value->policy_id);
+    if (status != MU_STATUS_GOOD) return status;
+    
+    status = mu_binary_read_string(reader, &value->username);
+    if (status != MU_STATUS_GOOD) return status;
+    
+    status = mu_binary_read_bytestring(reader, &value->password);
+    if (status != MU_STATUS_GOOD) return status;
+    
+    status = mu_binary_read_string(reader, &value->encryption_algorithm);
+    return status;
 }
-#endif
+
+opcua_statuscode_t mu_binary_read_certificate_identity_token(mu_binary_reader_t *reader, mu_certificate_identity_token_t *value) {
+    opcua_statuscode_t status = reader_status(reader);
+    if (status != MU_STATUS_GOOD) return status;
+    
+    status = mu_binary_read_string(reader, &value->policy_id);
+    if (status != MU_STATUS_GOOD) return status;
+    
+    status = mu_binary_read_bytestring(reader, &value->certificate_data);
+    return status;
+}
+

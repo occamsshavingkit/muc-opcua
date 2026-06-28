@@ -106,10 +106,19 @@ opcua_statuscode_t mu_server_init(void *storage, size_t storage_size, const mu_s
         mu_base_runtime_init(&server->runtime_base, &server->config.time_adapter, start);
     }
     server->is_running = true;
-    server->client_handle = NULL;
-    
-    mu_tcp_connection_init(&server->tcp_conn);
-    mu_secure_channel_init(&server->secure_channel);
+#ifdef MICRO_OPCUA_MULTIPLE_CONNECTIONS
+    for (size_t i = 0; i < MU_MAX_CONNECTIONS; ++i) {
+        server->conns[i].client_handle = NULL;
+        mu_tcp_connection_init(&server->conns[i].tcp_conn);
+        mu_secure_channel_init(&server->conns[i].secure_channel);
+        server->conns[i].rx_len = 0;
+    }
+    server->active_conn = NULL;
+#else
+    server_client_handle = NULL;
+    mu_tcp_connection_init(&server_tcp_conn);
+    mu_secure_channel_init(&server_secure_channel);
+#endif
     for (size_t i = 0; i < MU_MAX_SESSIONS; ++i) {
         mu_session_init(&server->sessions[i]);
     }
@@ -131,7 +140,7 @@ opcua_statuscode_t mu_server_init(void *storage, size_t storage_size, const mu_s
 /* Secured-path response scratch — sized to hold the largest service response, a
    GetEndpoints/CreateSession reply that carries the server certificate in each
    advertised endpoint (~3.8 KiB with an RSA-2048 cert). */
-#define MU_SECURE_RESP_MAX 5120
+#define MU_SECURE_RESP_MAX 11264
 /* OPN request body (OpenSecureChannelRequest) is tiny; MSG requests are decrypted
    in place in the receive buffer and need no scratch here. */
 #define MU_SECURE_OPN_REQ_MAX 1024
@@ -151,11 +160,11 @@ _Static_assert(MU_SECURE_RESP_MAX + MU_SECURE_OPN_REQ_MAX <= MU_SECURE_SCRATCH_S
 static void send_buffer_chunk(mu_server_t *server, size_t total) {
     size_t bytes_written = 0;
     opcua_statuscode_t s = server->config.tcp_adapter.write(
-        server->config.tcp_adapter.context, server->client_handle,
+        server->config.tcp_adapter.context, server_client_handle,
         server->config.send_buffer, total, &bytes_written);
     if (s != MU_STATUS_GOOD || bytes_written != total) {
-        server->config.tcp_adapter.close_connection(server->config.tcp_adapter.context, server->client_handle);
-        server->client_handle = NULL;
+        server->config.tcp_adapter.close_connection(server->config.tcp_adapter.context, server_client_handle);
+        server_client_handle = NULL;
     }
 }
 
@@ -169,22 +178,38 @@ opcua_statuscode_t mu_server_emit_message(mu_server_t *server,
         return MU_STATUS_BAD_INTERNALERROR;
     }
 
+#ifdef MICRO_OPCUA_MULTIPLE_CONNECTIONS
+    /* If active_conn is NULL, find connection by active session's secure_channel_id */
+    if (server->active_conn == NULL && server->active_session != NULL) {
+        for (size_t i = 0; i < MU_MAX_CONNECTIONS; ++i) {
+            if (server->conns[i].client_handle != NULL &&
+                server->conns[i].secure_channel.channel_id == server->active_session->secure_channel_id) {
+                server->active_conn = &server->conns[i];
+                break;
+            }
+        }
+    }
+    if (server->active_conn == NULL) {
+        return MU_STATUS_BAD_SECURECHANNELIDINVALID;
+    }
+#endif
+
 #ifdef MICRO_OPCUA_SECURITY
-    if (server->secure_channel.mode != MU_MESSAGE_SECURITY_MODE_NONE) {
+    if (server_secure_channel.mode != MU_MESSAGE_SECURITY_MODE_NONE) {
         size_t total = 0;
         opcua_statuscode_t status;
 
-        if (server->config.crypto_adapter == NULL || !server->secure_channel.keys_valid) {
+        if (server->config.crypto_adapter == NULL || !server_secure_channel.keys_valid) {
             return MU_STATUS_BAD_SECURITYCHECKSFAILED;
         }
 
         status = mu_sym_chunk_wrap(server->config.crypto_adapter,
-                                   server->secure_channel.mode,
-                                   &server->secure_channel.server_keys,
+                                   server_secure_channel.mode,
+                                   &server_secure_channel.server_keys,
                                    "MSG",
-                                   server->secure_channel.channel_id,
-                                   server->secure_channel.token_id,
-                                   ++server->secure_channel.out_sequence_number,
+                                   server_secure_channel.channel_id,
+                                   server_secure_channel.token_id,
+                                   ++server_secure_channel.out_sequence_number,
                                    request_id,
                                    body,
                                    body_len,
@@ -211,9 +236,9 @@ opcua_statuscode_t mu_server_emit_message(mu_server_t *server,
     opcua_statuscode_t status =
         mu_uasc_finalize_symmetric(server->config.send_buffer,
                                    server->config.send_buffer_size,
-                                   server->secure_channel.channel_id,
-                                   server->secure_channel.token_id,
-                                   ++server->secure_channel.out_sequence_number,
+                                   server_secure_channel.channel_id,
+                                   server_secure_channel.token_id,
+                                   ++server_secure_channel.out_sequence_number,
                                    request_id,
                                    body_len,
                                    &total);
@@ -229,8 +254,8 @@ opcua_statuscode_t mu_server_emit_message(mu_server_t *server,
 /* Abort the active connection (a security/protocol violation). The poll loop
    reclaims the slot when client_handle becomes NULL. */
 static void abort_connection(mu_server_t *server) {
-    server->config.tcp_adapter.close_connection(server->config.tcp_adapter.context, server->client_handle);
-    server->client_handle = NULL;
+    server->config.tcp_adapter.close_connection(server->config.tcp_adapter.context, server_client_handle);
+    server_client_handle = NULL;
 }
 
 /* Validate an inbound chunk's sequencing and, for MSG, its channel/token binding.
@@ -240,12 +265,12 @@ static bool accept_inbound_chunk(mu_server_t *server, bool is_opn,
                                  opcua_uint32_t channel_id, opcua_uint32_t token_id,
                                  opcua_uint32_t sequence_number) {
     if (!is_opn) {
-        if (channel_id != server->secure_channel.channel_id ||
-            token_id != server->secure_channel.token_id) {
+        if (channel_id != server_secure_channel.channel_id ||
+            token_id != server_secure_channel.token_id) {
             return false;
         }
     }
-    return mu_sequence_validate(&server->secure_channel.sequence, sequence_number) == MU_STATUS_GOOD;
+    return mu_sequence_validate(&server_secure_channel.sequence, sequence_number) == MU_STATUS_GOOD;
 }
 
 /* OPC-10000-6 §5.2.2.9 and OPC-10000-4 §7.38.2: request type ids are
@@ -324,15 +349,15 @@ static void handle_data_chunk_plaintext(mu_server_t *server, const opcua_byte_t 
     }
 
     if (status == MU_STATUS_GOOD && payload_len > 0) {
-        opcua_uint32_t out_seq = ++server->secure_channel.out_sequence_number;
+        opcua_uint32_t out_seq = ++server_secure_channel.out_sequence_number;
         size_t total = 0;
         if (is_opn) {
             status = mu_uasc_finalize_asymmetric_none(server->config.send_buffer, server->config.send_buffer_size,
-                                                      server->secure_channel.channel_id, out_seq, seq.request_id,
+                                                      server_secure_channel.channel_id, out_seq, seq.request_id,
                                                       payload_len, &total);
         } else {
             status = mu_uasc_finalize_symmetric(server->config.send_buffer, server->config.send_buffer_size,
-                                                server->secure_channel.channel_id, server->secure_channel.token_id,
+                                                server_secure_channel.channel_id, server_secure_channel.token_id,
                                                 out_seq, seq.request_id, payload_len, &total);
         }
         if (status == MU_STATUS_GOOD) send_buffer_chunk(server, total);
@@ -350,7 +375,7 @@ static void handle_data_chunk_secure(mu_server_t *server, opcua_byte_t *msg, siz
     const mu_crypto_adapter_t *crypto = server->config.crypto_adapter;
 
     /* MSG on a None channel is plaintext — handle before reserving secure scratch. */
-    if (!is_opn && server->secure_channel.policy == MU_SECURITY_POLICY_NONE_ID) {
+    if (!is_opn && server_secure_channel.policy == MU_SECURITY_POLICY_NONE_ID) {
         handle_data_chunk_plaintext(server, msg, msg_len, false);
         return;
     }
@@ -384,7 +409,7 @@ static void handle_data_chunk_secure(mu_server_t *server, opcua_byte_t *msg, siz
         }
         /* Record the negotiated policy before dispatch so the OPN handler can
            derive channel keys; the client cert is needed to encrypt the reply. */
-        server->secure_channel.policy = ai.policy;
+        server_secure_channel.policy = ai.policy;
         response_request_id = ai.request_id;
         client_cert = ai.sender_cert;
         client_cert_len = ai.sender_cert_len;
@@ -392,11 +417,11 @@ static void handle_data_chunk_secure(mu_server_t *server, opcua_byte_t *msg, siz
         in_channel_id = ai.secure_channel_id;
         in_seq = ai.sequence_number;
     } else {
-        if (!server->secure_channel.keys_valid) return;
+        if (!server_secure_channel.keys_valid) return;
         mu_sym_chunk_info_t si;
         memset(&si, 0, sizeof(si));
         /* Decrypts msg in place; req_full points into msg. */
-        if (mu_sym_chunk_unwrap(crypto, server->secure_channel.mode, &server->secure_channel.client_keys,
+        if (mu_sym_chunk_unwrap(crypto, server_secure_channel.mode, &server_secure_channel.client_keys,
                                 msg, msg_len, &req_full, &req_len, &si) != MU_STATUS_GOOD) {
             return;
         }
@@ -445,16 +470,16 @@ static void handle_data_chunk_secure(mu_server_t *server, opcua_byte_t *msg, siz
     }
     if (status != MU_STATUS_GOOD || resp_len == 0) return;
 
-    opcua_uint32_t out_seq = ++server->secure_channel.out_sequence_number;
+    opcua_uint32_t out_seq = ++server_secure_channel.out_sequence_number;
     size_t total = 0;
     opcua_statuscode_t ws;
     if (is_opn) {
-        ws = mu_asym_chunk_wrap(crypto, server->secure_channel.policy, server->secure_channel.channel_id,
+        ws = mu_asym_chunk_wrap(crypto, server_secure_channel.policy, server_secure_channel.channel_id,
                                 out_seq, response_request_id, client_cert, client_cert_len,
                                 respbody, resp_len, server->config.send_buffer, server->config.send_buffer_size, &total);
     } else {
-        ws = mu_sym_chunk_wrap(crypto, server->secure_channel.mode, &server->secure_channel.server_keys, "MSG",
-                               server->secure_channel.channel_id, server->secure_channel.token_id,
+        ws = mu_sym_chunk_wrap(crypto, server_secure_channel.mode, &server_secure_channel.server_keys, "MSG",
+                               server_secure_channel.channel_id, server_secure_channel.token_id,
                                out_seq, response_request_id, respbody, resp_len,
                                server->config.send_buffer, server->config.send_buffer_size, &total);
     }
@@ -469,15 +494,15 @@ static void process_message(mu_server_t *server, opcua_byte_t *msg, size_t msg_l
 {
     opcua_statuscode_t status;
 
-    if (server->tcp_conn.state == MU_TCP_STATE_CLOSED) {
+    if (server_tcp_conn.state == MU_TCP_STATE_CLOSED) {
         size_t ack_length = server->config.send_buffer_size;
-        status = mu_tcp_process_hello(&server->tcp_conn, msg, msg_len, &server->config,
+        status = mu_tcp_process_hello(&server_tcp_conn, msg, msg_len, &server->config,
                                       server->config.send_buffer, &ack_length);
         if (status == MU_STATUS_GOOD) {
             send_buffer_chunk(server, ack_length); /* closes on write failure */
         } else {
-            server->config.tcp_adapter.close_connection(server->config.tcp_adapter.context, server->client_handle);
-            server->client_handle = NULL;
+            server->config.tcp_adapter.close_connection(server->config.tcp_adapter.context, server_client_handle);
+            server_client_handle = NULL;
         }
         return;
     }
@@ -491,9 +516,9 @@ static void process_message(mu_server_t *server, opcua_byte_t *msg, size_t msg_l
     bool is_clo = header.message_type[0] == 'C' && header.message_type[1] == 'L' && header.message_type[2] == 'O';
 
     if (is_clo) {
-        mu_secure_channel_close(&server->secure_channel);
-        server->config.tcp_adapter.close_connection(server->config.tcp_adapter.context, server->client_handle);
-        server->client_handle = NULL;
+        mu_secure_channel_close(&server_secure_channel);
+        server->config.tcp_adapter.close_connection(server->config.tcp_adapter.context, server_client_handle);
+        server_client_handle = NULL;
         return;
     }
     if (!is_opn && !is_msg) return; /* unsupported chunk type: ignore */
@@ -513,12 +538,122 @@ opcua_statuscode_t mu_server_poll(mu_server_t *server)
         return MU_STATUS_BAD_INTERNALERROR;
     }
 
+#ifdef MICRO_OPCUA_MULTIPLE_CONNECTIONS
+    /* 1. Try to accept a new connection if we have a free slot */
+    int free_slot = -1;
+    for (size_t i = 0; i < MU_MAX_CONNECTIONS; ++i) {
+        if (server->conns[i].client_handle == NULL) {
+            free_slot = (int)i;
+            break;
+        }
+    }
+
+    void *new_handle = NULL;
+    opcua_statuscode_t status = server->config.tcp_adapter.accept(server->config.tcp_adapter.context, &new_handle);
+    if (status == MU_STATUS_GOOD && new_handle != NULL) {
+        if (free_slot != -1) {
+            mu_connection_t *conn = &server->conns[free_slot];
+            conn->client_handle = new_handle;
+            conn->rx_len = 0;
+            conn->last_activity_ms = server->config.time_adapter.get_tick_ms(server->config.time_adapter.context);
+            mu_tcp_connection_init(&conn->tcp_conn);
+            mu_secure_channel_init(&conn->secure_channel);
+            return MU_STATUS_GOOD;
+        } else {
+            /* Server full: send error message and close */
+            opcua_byte_t buf[256];
+            size_t err_len = sizeof(buf);
+            if (mu_tcp_create_error_message(MU_STATUS_BAD_TCPNOTENOUGHRESOURCES, "Server full", buf, &err_len) == MU_STATUS_GOOD) {
+                size_t bytes_written;
+                server->config.tcp_adapter.write(server->config.tcp_adapter.context, new_handle, buf, err_len, &bytes_written);
+            }
+            server->config.tcp_adapter.close_connection(server->config.tcp_adapter.context, new_handle);
+            return MU_STATUS_GOOD;
+        }
+    }
+
+    /* 2. Poll and read/process each active connection */
+    for (size_t i = 0; i < MU_MAX_CONNECTIONS; ++i) {
+        mu_connection_t *conn = &server->conns[i];
+        if (conn->client_handle == NULL) continue;
+
+        /* Check connection timeout */
+        opcua_uint64_t now = server->config.time_adapter.get_tick_ms(server->config.time_adapter.context);
+        opcua_uint64_t limit = conn->secure_channel.is_open
+            ? (opcua_uint64_t)conn->secure_channel.revised_lifetime : (opcua_uint64_t)MU_CONNECT_TIMEOUT_MS;
+        if (now > conn->last_activity_ms && (now - conn->last_activity_ms) > limit) {
+            server->config.tcp_adapter.close_connection(server->config.tcp_adapter.context, conn->client_handle);
+            conn->client_handle = NULL;
+            conn->rx_len = 0;
+            continue;
+        }
+
+        /* Read from connection */
+        if (conn->rx_len < sizeof(conn->rx_buffer)) {
+            size_t bytes_read = 0;
+            status = server->config.tcp_adapter.read(
+                server->config.tcp_adapter.context, conn->client_handle,
+                conn->rx_buffer + conn->rx_len,
+                sizeof(conn->rx_buffer) - conn->rx_len, &bytes_read);
+
+            if (status != MU_STATUS_GOOD) {
+                server->config.tcp_adapter.close_connection(server->config.tcp_adapter.context, conn->client_handle);
+                conn->client_handle = NULL;
+                conn->rx_len = 0;
+                continue;
+            }
+            if (bytes_read > 0) {
+                conn->rx_len += bytes_read;
+                conn->last_activity_ms = server->config.time_adapter.get_tick_ms(server->config.time_adapter.context);
+            }
+        }
+
+        /* Set active connection context so dispatch / wrap / process_message uses it */
+        server->active_conn = conn;
+
+        /* Process complete messages in the buffer */
+        size_t consumed = 0;
+        while (conn->client_handle != NULL && (conn->rx_len - consumed) >= 8) {
+            const opcua_byte_t *b = conn->rx_buffer + consumed;
+            size_t msg_size = (size_t)b[4] | ((size_t)b[5] << 8) | ((size_t)b[6] << 16) | ((size_t)b[7] << 24);
+
+            if (msg_size < 8 || msg_size > sizeof(conn->rx_buffer)) {
+                server->config.tcp_adapter.close_connection(server->config.tcp_adapter.context, conn->client_handle);
+                conn->client_handle = NULL;
+                conn->rx_len = 0;
+                break;
+            }
+            if (msg_size > (conn->rx_len - consumed)) {
+                break;
+            }
+
+            process_message(server, conn->rx_buffer + consumed, msg_size);
+
+            if (conn->client_handle == NULL) {
+                conn->rx_len = 0;
+                break;
+            }
+
+            consumed += msg_size;
+        }
+
+        if (conn->client_handle != NULL && consumed > 0) {
+            size_t remaining = conn->rx_len - consumed;
+            if (remaining > 0) {
+                memmove(conn->rx_buffer, conn->rx_buffer + consumed, remaining);
+            }
+            conn->rx_len = remaining;
+        }
+
+        server->active_conn = NULL;
+    }
+#else
     /* 1. Accept connections if none active */
-    if (server->client_handle == NULL) {
-        opcua_statuscode_t status = server->config.tcp_adapter.accept(server->config.tcp_adapter.context, &server->client_handle);
-        if (status == MU_STATUS_GOOD && server->client_handle != NULL) {
-            mu_tcp_connection_init(&server->tcp_conn);
-            mu_secure_channel_init(&server->secure_channel);
+    if (server_client_handle == NULL) {
+        opcua_statuscode_t status = server->config.tcp_adapter.accept(server->config.tcp_adapter.context, &server_client_handle);
+        if (status == MU_STATUS_GOOD && server_client_handle != NULL) {
+            mu_tcp_connection_init(&server_tcp_conn);
+            mu_secure_channel_init(&server_secure_channel);
             for (size_t i = 0; i < MU_MAX_SESSIONS; ++i) {
                 mu_session_init(&server->sessions[i]);
             }
@@ -526,8 +661,8 @@ opcua_statuscode_t mu_server_poll(mu_server_t *server)
 #if MICRO_OPCUA_SUBSCRIPTIONS
             mu_subscriptions_init(&server->subs);
 #endif
-            server->rx_len = 0;
-            server->last_activity_ms = server->config.time_adapter.get_tick_ms(server->config.time_adapter.context);
+            server_rx_len = 0;
+            server_last_activity_ms = server->config.time_adapter.get_tick_ms(server->config.time_adapter.context);
         }
         return MU_STATUS_GOOD;
     } else {
@@ -536,12 +671,12 @@ opcua_statuscode_t mu_server_poll(mu_server_t *server)
            a channel is open) is dropped. A monotonic tick of 0 (stub adapter)
            disables the timeout. */
         opcua_uint64_t now = server->config.time_adapter.get_tick_ms(server->config.time_adapter.context);
-        opcua_uint64_t limit = server->secure_channel.is_open
-            ? (opcua_uint64_t)server->secure_channel.revised_lifetime : (opcua_uint64_t)MU_CONNECT_TIMEOUT_MS;
-        if (now > server->last_activity_ms && (now - server->last_activity_ms) > limit) {
-            server->config.tcp_adapter.close_connection(server->config.tcp_adapter.context, server->client_handle);
-            server->client_handle = NULL;
-            server->rx_len = 0;
+        opcua_uint64_t limit = server_secure_channel.is_open
+            ? (opcua_uint64_t)server_secure_channel.revised_lifetime : (opcua_uint64_t)MU_CONNECT_TIMEOUT_MS;
+        if (now > server_last_activity_ms && (now - server_last_activity_ms) > limit) {
+            server->config.tcp_adapter.close_connection(server->config.tcp_adapter.context, server_client_handle);
+            server_client_handle = NULL;
+            server_rx_len = 0;
             return MU_STATUS_GOOD;
         }
         /* Check if there's another connection waiting to be rejected */
@@ -566,60 +701,61 @@ opcua_statuscode_t mu_server_poll(mu_server_t *server)
     }
 
     /* 2. Read from the active connection, appending to the receive buffer. */
-    if (server->rx_len < server->config.receive_buffer_size) {
+    if (server_rx_len < server->config.receive_buffer_size) {
         size_t bytes_read = 0;
         opcua_statuscode_t status = server->config.tcp_adapter.read(
-            server->config.tcp_adapter.context, server->client_handle,
-            server->config.receive_buffer + server->rx_len,
-            server->config.receive_buffer_size - server->rx_len, &bytes_read);
+            server->config.tcp_adapter.context, server_client_handle,
+            server->config.receive_buffer + server_rx_len,
+            server->config.receive_buffer_size - server_rx_len, &bytes_read);
 
         if (status != MU_STATUS_GOOD) {
-            server->config.tcp_adapter.close_connection(server->config.tcp_adapter.context, server->client_handle);
-            server->client_handle = NULL;
-            server->rx_len = 0;
+            server->config.tcp_adapter.close_connection(server->config.tcp_adapter.context, server_client_handle);
+            server_client_handle = NULL;
+            server_rx_len = 0;
             return MU_STATUS_GOOD;
         }
         if (bytes_read > 0) {
-            server->rx_len += bytes_read;
-            server->last_activity_ms = server->config.time_adapter.get_tick_ms(server->config.time_adapter.context);
+            server_rx_len += bytes_read;
+            server_last_activity_ms = server->config.time_adapter.get_tick_ms(server->config.time_adapter.context);
         }
     }
 
     /* 3. Process every complete message in the buffer, reassembling the stream:
        a single read() may carry several messages or only part of one. */
     size_t consumed = 0;
-    while (server->client_handle != NULL && (server->rx_len - consumed) >= 8) {
+    while (server_client_handle != NULL && (server_rx_len - consumed) >= 8) {
         const opcua_byte_t *b = server->config.receive_buffer + consumed;
         /* MessageSize is a UInt32 at byte offset 4 of every TCP/UASC message. */
         size_t msg_size = (size_t)b[4] | ((size_t)b[5] << 8) | ((size_t)b[6] << 16) | ((size_t)b[7] << 24);
 
         if (msg_size < 8 || msg_size > server->config.receive_buffer_size) {
-            server->config.tcp_adapter.close_connection(server->config.tcp_adapter.context, server->client_handle);
-            server->client_handle = NULL;
-            server->rx_len = 0;
+            server->config.tcp_adapter.close_connection(server->config.tcp_adapter.context, server_client_handle);
+            server_client_handle = NULL;
+            server_rx_len = 0;
             return MU_STATUS_GOOD;
         }
-        if (msg_size > (server->rx_len - consumed)) {
+        if (msg_size > (server_rx_len - consumed)) {
             break; /* incomplete: wait for more bytes on a later poll */
         }
 
         process_message(server, server->config.receive_buffer + consumed, msg_size);
 
-        if (server->client_handle == NULL) {
-            server->rx_len = 0;
+        if (server_client_handle == NULL) {
+            server_rx_len = 0;
             break;
         }
 
         consumed += msg_size;
     }
 
-    if (server->client_handle != NULL && consumed > 0) {
-        size_t remaining = server->rx_len - consumed;
+    if (server_client_handle != NULL && consumed > 0) {
+        size_t remaining = server_rx_len - consumed;
         if (remaining > 0) {
             memmove(server->config.receive_buffer, server->config.receive_buffer + consumed, remaining);
         }
-        server->rx_len = remaining;
+        server_rx_len = remaining;
     }
+#endif
 
 #if MICRO_OPCUA_SUBSCRIPTIONS
     mu_subscriptions_tick(server, server->config.time_adapter.get_tick_ms(server->config.time_adapter.context));
@@ -632,7 +768,17 @@ void mu_server_close(mu_server_t *server)
 {
     if (server != NULL) {
         server->is_running = false;
-        mu_secure_channel_close(&server->secure_channel);
+#ifdef MICRO_OPCUA_MULTIPLE_CONNECTIONS
+        for (size_t i = 0; i < MU_MAX_CONNECTIONS; ++i) {
+            if (server->conns[i].client_handle != NULL) {
+                server->config.tcp_adapter.close_connection(server->config.tcp_adapter.context, server->conns[i].client_handle);
+                mu_secure_channel_close(&server->conns[i].secure_channel);
+                server->conns[i].client_handle = NULL;
+            }
+        }
+#else
+        mu_secure_channel_close(&server_secure_channel);
+#endif
         if (server->config.tcp_adapter.shutdown != NULL) {
             server->config.tcp_adapter.shutdown(server->config.tcp_adapter.context);
         }

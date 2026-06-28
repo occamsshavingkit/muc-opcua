@@ -27,6 +27,7 @@ void mu_session_init(mu_session_t *session) {
         session->session_id = 0;
         session->auth_token = 0;
         session->revised_session_timeout_ms = 0;
+        memset(session->server_nonce, 0, sizeof(session->server_nonce));
     }
 }
 
@@ -106,8 +107,9 @@ opcua_statuscode_t mu_session_activate(mu_session_t *session,
         return MU_STATUS_BAD_SESSIONIDINVALID;
     }
     
-    /* We only support anonymous identity tokens per profile */
-    if (identity_token_encoding_id != 321) { /* MU_ID_ANONYMOUSIDENTITYTOKEN_ENCODING_DEFAULTBINARY */
+    /* We support anonymous (321), username (324), and certificate (327) identity tokens */
+    if (identity_token_encoding_id != 321 && identity_token_encoding_id != 324 &&
+        identity_token_encoding_id != 327) {
         return MU_STATUS_BAD_IDENTITYTOKENINVALID;
     }
     

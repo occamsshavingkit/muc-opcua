@@ -37,7 +37,7 @@ static void prepare_host_keys(void) {
     opcua_byte_t client_nonce[32], server_nonce[32];
     for (int i = 0; i < 32; i++) { client_nonce[i] = (opcua_byte_t)i; server_nonce[i] = (opcua_byte_t)(200 - i); }
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD,
-        mu_sym_keys_derive(&crypto, server_nonce, sizeof(server_nonce), client_nonce, sizeof(client_nonce), &keys));
+        mu_sym_keys_derive(&crypto, MU_SECURITY_POLICY_BASIC256SHA256_ID, server_nonce, sizeof(server_nonce), client_nonce, sizeof(client_nonce), &keys));
 }
 #endif
 
@@ -269,12 +269,12 @@ void test_keys_derivation_deterministic(void) {
     opcua_byte_t s1[32], s2[32];
     memset(s1, 0x01, sizeof(s1));
     memset(s2, 0x02, sizeof(s2));
-    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_sym_keys_derive(&crypto, s1, 32, s2, 32, &a));
-    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_sym_keys_derive(&crypto, s1, 32, s2, 32, &b));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_sym_keys_derive(&crypto, MU_SECURITY_POLICY_BASIC256SHA256_ID, s1, 32, s2, 32, &a));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_sym_keys_derive(&crypto, MU_SECURITY_POLICY_BASIC256SHA256_ID, s1, 32, s2, 32, &b));
     TEST_ASSERT_EQUAL_MEMORY(&a, &b, sizeof(a));
     /* Swapping secret/seed yields different material. */
     mu_sym_keys_t c;
-    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_sym_keys_derive(&crypto, s2, 32, s1, 32, &c));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_sym_keys_derive(&crypto, MU_SECURITY_POLICY_BASIC256SHA256_ID, s2, 32, s1, 32, &c));
     TEST_ASSERT_NOT_EQUAL(0, memcmp(&a, &c, sizeof(a)));
 }
 
@@ -368,7 +368,7 @@ void test_wrong_keys_rejected(void) {
     opcua_byte_t a[32], b[32];
     memset(a, 0xAA, sizeof(a));
     memset(b, 0xBB, sizeof(b));
-    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_sym_keys_derive(&crypto, a, 32, b, 32, &other));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_sym_keys_derive(&crypto, MU_SECURITY_POLICY_BASIC256SHA256_ID, a, 32, b, 32, &other));
 
     const opcua_byte_t *recovered = NULL;
     size_t recovered_len = 0;

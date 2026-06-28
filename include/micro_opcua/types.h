@@ -137,4 +137,31 @@ typedef struct {
     size_t total_allocated;
 } mu_size_report_t;
 
+/* UserNameIdentityToken and AnonymousIdentityToken representations */
+typedef struct {
+    mu_string_t policy_id;
+    mu_string_t username;
+    mu_bytestring_t password;
+    mu_string_t encryption_algorithm;
+} mu_username_identity_token_t;
+
+typedef struct {
+    mu_string_t policy_id;
+} mu_anonymous_identity_token_t;
+
+typedef struct {
+    mu_string_t policy_id;
+    mu_bytestring_t certificate_data;
+} mu_certificate_identity_token_t;
+
+#ifdef MICRO_OPCUA_EVENTS
+typedef struct {
+    mu_nodeid_t event_type;
+    mu_bytestring_t event_id;
+    opcua_datetime_t time;
+    mu_string_t message;
+    opcua_uint16_t severity;
+} mu_event_notification_t;
+#endif
+
 #endif /* MICRO_OPCUA_TYPES_H */

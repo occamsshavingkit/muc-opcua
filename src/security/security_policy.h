@@ -10,7 +10,9 @@
 typedef enum {
     MU_SECURITY_POLICY_INVALID_ID = 0,
     MU_SECURITY_POLICY_NONE_ID,
-    MU_SECURITY_POLICY_BASIC256SHA256_ID
+    MU_SECURITY_POLICY_BASIC256SHA256_ID,
+    MU_SECURITY_POLICY_AES128_SHA256_RSAOAEP_ID,
+    MU_SECURITY_POLICY_AES256_SHA256_RSAPSS_ID
 } mu_security_policy_id_t;
 
 /* MessageSecurityMode (OPC 10000-4 §7.15) — values match the wire encoding. */
@@ -20,6 +22,12 @@ typedef enum {
     MU_MESSAGE_SECURITY_MODE_SIGN = 2,
     MU_MESSAGE_SECURITY_MODE_SIGN_AND_ENCRYPT = 3
 } mu_message_security_mode_t;
+
+size_t mu_security_policy_signature_key_length(mu_security_policy_id_t policy);
+size_t mu_security_policy_encryption_key_length(mu_security_policy_id_t policy);
+size_t mu_security_policy_encryption_block_size(mu_security_policy_id_t policy);
+size_t mu_security_policy_signature_length(mu_security_policy_id_t policy);
+size_t mu_security_policy_nonce_length(mu_security_policy_id_t policy);
 
 /* Basic256Sha256 algorithm parameters (OPC 10000-7 §6.x profile table). */
 #define MU_B256S256_SIGNATURE_KEY_LENGTH      32  /* HMAC-SHA256 key (bytes) */

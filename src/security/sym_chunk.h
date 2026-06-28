@@ -16,6 +16,7 @@
 
 /* Per-direction channel keys derived via P-SHA256 (OPC 10000-6 §6.7.5). */
 typedef struct {
+    mu_security_policy_id_t policy;
     opcua_byte_t signing_key[MU_B256S256_SIGNATURE_KEY_LENGTH];
     opcua_byte_t encrypting_key[MU_B256S256_ENCRYPTION_KEY_LENGTH];
     opcua_byte_t iv[MU_B256S256_ENCRYPTION_BLOCK_SIZE];
@@ -34,8 +35,9 @@ typedef struct {
 } mu_sym_chunk_info_t;
 
 /* Derive a key set from a (secret, seed) nonce pair: signing key || encrypting
-   key || IV, split from MU_B256S256_DERIVED_KEY_LENGTH bytes of P-SHA256 output. */
+   key || IV, split from dynamic key material lengths of P-SHA256 output. */
 opcua_statuscode_t mu_sym_keys_derive(const mu_crypto_adapter_t *crypto,
+                                      mu_security_policy_id_t policy,
                                       const opcua_byte_t *secret, size_t secret_len,
                                       const opcua_byte_t *seed, size_t seed_len,
                                       mu_sym_keys_t *out_keys);

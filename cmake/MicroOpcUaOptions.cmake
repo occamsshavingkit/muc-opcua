@@ -26,6 +26,11 @@ elseif(MICRO_OPCUA_PLATFORM STREQUAL "arduino-skeleton")
     set(MICRO_OPCUA_IS_HOST OFF)
     set(MICRO_OPCUA_IS_PICO OFF)
     set(MICRO_OPCUA_IS_ARDUINO ON)
-else()
-    message(FATAL_ERROR "Unknown MICRO_OPCUA_PLATFORM: ${MICRO_OPCUA_PLATFORM}. Valid options are: host, pico, arduino-skeleton.")
 endif()
+
+option(MICRO_OPCUA_USER_AUTH "Build UserName/Password user identity authentication" ON)
+option(MICRO_OPCUA_SERVICE_WRITE "Build the Write service" ON)
+option(MICRO_OPCUA_MULTIPLE_CONNECTIONS "Support concurrent client TCP connections" ON)
+option(MICRO_OPCUA_EVENTS "Build event and Alarm & Condition support" ON)
+
+

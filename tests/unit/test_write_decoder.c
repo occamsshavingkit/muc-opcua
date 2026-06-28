@@ -1,63 +1,130 @@
 /* tests/unit/test_write_decoder.c */
-/* Normative References:
- * - OPC-10000-6 §5.2 (Binary encoding rules)
- * - OPC-10000-4 §5.11.4.2 (WriteValue parameters)
- */
-
-#include "micro_opcua/encoding.h"
+#include "../../src/services/write.h"
+#include "micro_opcua/micro_opcua.h"
 #include "unity.h"
+#include <string.h>
 
 void setUp(void) {}
 void tearDown(void) {}
 
-void test_decode_write_value_scalar_types(void) {
+void test_write_request_decode_happy_path(void) {
 #ifdef MICRO_OPCUA_SERVICE_WRITE
-    opcua_byte_t buffer[256];
-    mu_binary_writer_t writer;
-    mu_binary_writer_init(&writer, buffer, sizeof(buffer));
+    opcua_byte_t buf[256];
+    mu_binary_writer_t w;
+    mu_binary_writer_init(&w, buf, sizeof(buf));
 
-    /* NodeId: 4-byte numeric ns=1, identifier 5001 */
-    mu_nodeid_t node_id = {1, MU_NODEID_NUMERIC, {.numeric = 5001}};
-    mu_binary_write_nodeid(&writer, &node_id);
+    /* WriteRequest body:
+     * - Array size (Int32): 1
+     * - WriteValue[0]:
+     *   - NodeId: Numeric (2, 1001)
+     *   - AttributeId: UInt32 (13, Value attribute)
+     *   - IndexRange: String (null)
+     *   - Value: DataValue
+     *     - Encoding mask: 0x01 (HasValue)
+     *     - Variant: Int32 (value: 42)
+     */
+    /* Write Array Size */
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_write_int32(&w, 1));
 
-    /* AttributeId: 13 (Value) */
-    mu_binary_write_int32(&writer, 13);
+    /* WriteValue[0] NodeId */
+    mu_nodeid_t nid;
+    nid.namespace_index = 2;
+    nid.identifier_type = MU_NODEID_NUMERIC;
+    nid.identifier.numeric = 1001;
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_write_nodeid(&w, &nid));
 
-    /* IndexRange: null String (-1 length) */
-    mu_string_t index_range = {-1, NULL};
-    mu_binary_write_string(&writer, &index_range);
+    /* AttributeId */
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_write_uint32(&w, 13));
 
-    /* DataValue: Int32 42 */
-    mu_datavalue_t dv;
-    dv.has_value = true;
-    dv.has_status = false;
-    dv.has_source_timestamp = false;
-    dv.has_server_timestamp = false;
-    dv.value.type = MU_TYPE_INT32;
-    dv.value.is_array = false;
-    dv.value.value.i32 = 42;
-    mu_binary_write_datavalue(&writer, &dv);
+    /* IndexRange (null string) */
+    mu_string_t idx_range = { -1, NULL };
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_write_string(&w, &idx_range));
 
-    mu_binary_reader_t reader;
-    mu_binary_reader_init(&reader, buffer, writer.position);
+    /* Value (DataValue: has_value=true, variant=Int32 42) */
+    mu_datavalue_t val;
+    memset(&val, 0, sizeof(val));
+    val.has_value = true;
+    val.value.type = MU_TYPE_INT32;
+    val.value.value.i32 = 42;
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_write_datavalue(&w, &val));
 
-    mu_write_value_t wv;
-    opcua_statuscode_t status = mu_write_value_decode(&reader, &wv);
+    /* Now decode it */
+    mu_binary_reader_t r;
+    mu_binary_reader_init(&r, buf, w.position);
 
+    mu_write_request_t req;
+    mu_write_value_t nodes[2];
+    memset(&req, 0, sizeof(req));
+    memset(nodes, 0, sizeof(nodes));
+
+    opcua_statuscode_t status = mu_write_request_decode(&r, &req, nodes, 2);
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, status);
-    TEST_ASSERT_EQUAL(1, wv.node_id.namespace_index);
-    TEST_ASSERT_EQUAL(MU_NODEID_NUMERIC, wv.node_id.identifier_type);
-    TEST_ASSERT_EQUAL(5001, wv.node_id.identifier.numeric);
-    TEST_ASSERT_EQUAL(13, wv.attribute_id);
-    TEST_ASSERT_EQUAL(-1, wv.index_range.length);
-    TEST_ASSERT_TRUE(wv.value.has_value);
-    TEST_ASSERT_EQUAL(MU_TYPE_INT32, wv.value.value.type);
-    TEST_ASSERT_EQUAL(42, wv.value.value.value.i32);
+    TEST_ASSERT_EQUAL(1, req.num_nodes_to_write);
+    TEST_ASSERT_EQUAL(2, req.nodes_to_write[0].node_id.namespace_index);
+    TEST_ASSERT_EQUAL(1001, req.nodes_to_write[0].node_id.identifier.numeric);
+    TEST_ASSERT_EQUAL(13, req.nodes_to_write[0].attribute_id);
+    TEST_ASSERT_EQUAL_INT(MU_TYPE_INT32, req.nodes_to_write[0].value.value.type);
+    TEST_ASSERT_EQUAL(42, req.nodes_to_write[0].value.value.value.i32);
+#endif
+}
+
+void test_write_request_decode_errors(void) {
+#ifdef MICRO_OPCUA_SERVICE_WRITE
+    opcua_byte_t buf[256];
+    mu_binary_writer_t w;
+    mu_binary_writer_init(&w, buf, sizeof(buf));
+
+    /* Too many operations */
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_write_int32(&w, 5));
+
+    mu_binary_reader_t r;
+    mu_binary_reader_init(&r, buf, w.position);
+
+    mu_write_request_t req;
+    mu_write_value_t nodes[2];
+    opcua_statuscode_t status = mu_write_request_decode(&r, &req, nodes, 2);
+    TEST_ASSERT_EQUAL(MU_STATUS_BAD_TOOMANYOPERATIONS, status);
+#endif
+}
+
+void test_write_response_encode(void) {
+#ifdef MICRO_OPCUA_SERVICE_WRITE
+    opcua_byte_t buf[256];
+    mu_binary_writer_t w;
+    mu_binary_writer_init(&w, buf, sizeof(buf));
+
+    opcua_statuscode_t results[] = { MU_STATUS_GOOD, MU_STATUS_BAD_NOTWRITABLE };
+    mu_write_response_t resp;
+    resp.num_results = 2;
+    resp.results = results;
+
+    opcua_statuscode_t status = mu_write_response_encode(&w, &resp);
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, status);
+
+    /* Verify encoding:
+     * - Array size (Int32): 2
+     * - Result[0]: Good (0x00000000)
+     * - Result[1]: Bad_NotWritable (0x803B0000)
+     */
+    mu_binary_reader_t r;
+    mu_binary_reader_init(&r, buf, w.position);
+
+    opcua_int32_t len;
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_int32(&r, &len));
+    TEST_ASSERT_EQUAL(2, len);
+
+    opcua_statuscode_t r1, r2;
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_statuscode(&r, &r1));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, r1);
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_statuscode(&r, &r2));
+    TEST_ASSERT_EQUAL(MU_STATUS_BAD_NOTWRITABLE, r2);
 #endif
 }
 
 int main(void) {
     UNITY_BEGIN();
-    RUN_TEST(test_decode_write_value_scalar_types);
+    RUN_TEST(test_write_request_decode_happy_path);
+    RUN_TEST(test_write_request_decode_errors);
+    RUN_TEST(test_write_response_encode);
     return UNITY_END();
 }
