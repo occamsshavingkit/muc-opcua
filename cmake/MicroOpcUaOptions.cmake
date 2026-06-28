@@ -6,6 +6,7 @@ endif()
 
 option(MICRO_OPCUA_LTO "Enable link-time optimization (interprocedural optimization) for size-optimized firmware builds" OFF)
 option(MICRO_OPCUA_STACK_USAGE "Measure secured-OPN worst-case stack usage" OFF)
+option(MICRO_OPCUA_SERVICE_WRITE "Build the optional Write service (Value attribute only)" OFF)
 set(MICRO_OPCUA_STACK_USAGE_LIMIT 10240 CACHE STRING "Maximum secured-OPN stack usage budget in bytes")
 
 message(STATUS "Configuring Micro OPC UA for platform: ${MICRO_OPCUA_PLATFORM}")

@@ -118,6 +118,16 @@ typedef struct {
     opcua_boolean_t has_server_timestamp;
 } mu_datavalue_t;
 
+#ifdef MICRO_OPCUA_SERVICE_WRITE
+/* WriteValue (OPC 10000-4 §5.11.4.2) */
+typedef struct {
+    mu_nodeid_t node_id;
+    opcua_int32_t attribute_id;
+    mu_string_t index_range;
+    mu_datavalue_t value;
+} mu_write_value_t;
+#endif
+
 /* Size report structure */
 typedef struct {
     size_t config_bytes;

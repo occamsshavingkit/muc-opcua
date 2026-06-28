@@ -42,6 +42,9 @@ endif()
 if(MICRO_OPCUA_SERVICE_REGISTER_NODES)
     target_compile_definitions(micro_opcua PUBLIC MICRO_OPCUA_SERVICE_REGISTER_NODES=1)
 endif()
+if(MICRO_OPCUA_SERVICE_WRITE)
+    target_compile_definitions(micro_opcua PUBLIC MICRO_OPCUA_SERVICE_WRITE=1)
+endif()
 # base_nodes.c is always compiled (it owns the always-available mu_resolve_node);
 # this flag gates the node-table *content* so the standard node set is dropped.
 if(MICRO_OPCUA_BASE_NODES)

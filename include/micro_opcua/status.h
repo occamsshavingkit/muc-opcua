@@ -48,6 +48,9 @@
 #define MU_STATUS_BAD_TOOMANYPUBLISHREQUESTS ((opcua_statuscode_t)0x80580000)
 #endif
 #define MU_STATUS_BAD_NOTHINGTODO ((opcua_statuscode_t)0x800F0000)
+#define MU_STATUS_BAD_NOTWRITABLE ((opcua_statuscode_t)0x803B0000)
+#define MU_STATUS_BAD_WRITENOTSUPPORTED ((opcua_statuscode_t)0x803C0000)
+#define MU_STATUS_BAD_TYPEMISMATCH ((opcua_statuscode_t)0x80740000)
 
 /* TCP Specific StatusCodes */
 #define MU_STATUS_BAD_TCPSERVERTOOBUSY 0x807D0000

@@ -2,10 +2,10 @@
 #ifndef MICRO_OPCUA_SERVER_H
 #define MICRO_OPCUA_SERVER_H
 
-#include "micro_opcua/platform.h"
-#include "micro_opcua/config.h"
-#include "micro_opcua/status.h"
 #include "micro_opcua/address_space.h"
+#include "micro_opcua/config.h"
+#include "micro_opcua/platform.h"
+#include "micro_opcua/status.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -51,11 +51,11 @@ typedef struct {
     mu_tcp_adapter_t tcp_adapter;
     mu_time_adapter_t time_adapter;
     mu_entropy_adapter_t entropy_adapter;
-    
+
     /* Optional Adapters */
     mu_persistence_adapter_t *persistence_adapter; /* NULL if unsupported */
     mu_crypto_adapter_t *crypto_adapter;           /* NULL if unsupported */
-    
+
     /* Static Address Space (optional) */
     const mu_address_space_t *address_space;
     
@@ -77,7 +77,8 @@ typedef struct {
  * server struct (it holds pointers/size_t); a plain `static opcua_byte_t[]` is
  * over-aligned by the compiler, but a byte/offset buffer is rejected.
  */
-opcua_statuscode_t mu_server_init(void *storage, size_t storage_size, const mu_server_config_t *config, mu_server_t **out_server);
+opcua_statuscode_t mu_server_init(void *storage, size_t storage_size, const mu_server_config_t *config,
+                                  mu_server_t **out_server);
 
 /*
  * Run a single non-blocking iteration of the server.
