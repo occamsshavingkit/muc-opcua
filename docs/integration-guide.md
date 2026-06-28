@@ -357,11 +357,11 @@ opcua_statuscode_t (*aes256_cbc_decrypt_ctx)(void *context, opcua_byte_t *ctx_st
 void (*cipher_ctx_free)(void *context, opcua_byte_t *ctx_storage);
 ```
 
-`ctx_storage` is a `MU_CIPHER_CTX_SIZE`-byte (default 512) opaque scratch carved
+`ctx_storage` is a `MU_CIPHER_CTX_SIZE`-byte (default 32 when compiled with OpenSSL/pointer-based adaptors, 512 otherwise) opaque scratch carved
 from server storage — the library owns the memory, your backend owns the layout.
 **All four may be `NULL`**; if so, the codec falls back to the stateless
 `aes256_cbc_encrypt`/`decrypt`. If your backend's key-schedule struct is larger
-than 512 bytes, raise `MU_CIPHER_CTX_SIZE` with `-D` (and remember it feeds
+than the default size, raise `MU_CIPHER_CTX_SIZE` with `-D` (and remember it feeds
 `MU_SERVER_STORAGE_BYTES`).
 
 **Reference and porting target.** `src/platform/host_crypto_adapter.c` is a
@@ -678,7 +678,7 @@ These are plain `#define`s overridable with `-D…` at compile time. They trade 
 | `MU_MAX_MONITORED_ITEMS` | 8 | Total monitored items |
 | `MU_MAX_PUBLISH_REQUESTS` | 4 | Parked Publish requests |
 | `MU_RETRANSMIT_BYTES` | 256 | Republish buffer per subscription |
-| `MU_CIPHER_CTX_SIZE` | 512 | Per-channel AES context scratch (raise if your backend needs more) |
+| `MU_CIPHER_CTX_SIZE` | 32 / 512 | Per-channel AES context scratch (32 with pointer-based/OpenSSL adaptors, 512 otherwise) |
 | `MU_SECURE_SCRATCH_SIZE` | 6144 | Server-owned secure-channel scratch (security builds) |
 | `MICRO_OPCUA_STATUS_STRINGS` | *(undefined)* | Define to compile `mu_status_name()` human-readable strings (costs flash; off by default for embedded). Guard logging with `#ifdef`. |
 
