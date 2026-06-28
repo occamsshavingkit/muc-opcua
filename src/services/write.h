@@ -2,7 +2,7 @@
 #ifndef MICRO_OPCUA_SERVICES_WRITE_H
 #define MICRO_OPCUA_SERVICES_WRITE_H
 
-#include "micro_opcua/opcua_types.h"
+#include "micro_opcua/types.h"
 #include "micro_opcua/encoding.h"
 
 #ifdef MICRO_OPCUA_SERVICE_WRITE
@@ -10,13 +10,6 @@
 #ifndef MU_ATTRIBUTEID_VALUE
 #define MU_ATTRIBUTEID_VALUE 13
 #endif
-
-typedef struct {
-    mu_nodeid_t node_id;
-    opcua_uint32_t attribute_id;
-    mu_string_t index_range;
-    mu_datavalue_t value;
-} mu_write_value_t;
 
 typedef struct {
     size_t num_nodes_to_write;

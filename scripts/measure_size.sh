@@ -62,6 +62,10 @@ for profile in $profiles; do
                 -DMICRO_OPCUA_CUSTOM_METHODS=OFF
                 -DMICRO_OPCUA_SERVER_DIAGNOSTICS=OFF
                 -DMICRO_OPCUA_DYNAMIC_NODES=OFF
+                -DMICRO_OPCUA_USER_AUTH=OFF
+                -DMICRO_OPCUA_SERVICE_WRITE=OFF
+                -DMICRO_OPCUA_MULTIPLE_CONNECTIONS=OFF
+                -DMICRO_OPCUA_EVENTS=OFF
             )
             ;;
         micro)
@@ -71,6 +75,10 @@ for profile in $profiles; do
                 -DMICRO_OPCUA_CUSTOM_METHODS=OFF
                 -DMICRO_OPCUA_SERVER_DIAGNOSTICS=OFF
                 -DMICRO_OPCUA_DYNAMIC_NODES=OFF
+                -DMICRO_OPCUA_USER_AUTH=ON
+                -DMICRO_OPCUA_SERVICE_WRITE=ON
+                -DMICRO_OPCUA_MULTIPLE_CONNECTIONS=OFF
+                -DMICRO_OPCUA_EVENTS=OFF
             )
             ;;
         embedded)
@@ -84,6 +92,10 @@ for profile in $profiles; do
                 -DMICRO_OPCUA_CUSTOM_METHODS=OFF
                 -DMICRO_OPCUA_SERVER_DIAGNOSTICS=OFF
                 -DMICRO_OPCUA_DYNAMIC_NODES=OFF
+                -DMICRO_OPCUA_USER_AUTH=ON
+                -DMICRO_OPCUA_SERVICE_WRITE=ON
+                -DMICRO_OPCUA_MULTIPLE_CONNECTIONS=ON
+                -DMICRO_OPCUA_EVENTS=ON
             )
             ;;
         full-featured)
@@ -97,6 +109,10 @@ for profile in $profiles; do
                 -DMICRO_OPCUA_CUSTOM_METHODS=ON
                 -DMICRO_OPCUA_SERVER_DIAGNOSTICS=ON
                 -DMICRO_OPCUA_DYNAMIC_NODES=ON
+                -DMICRO_OPCUA_USER_AUTH=ON
+                -DMICRO_OPCUA_SERVICE_WRITE=ON
+                -DMICRO_OPCUA_MULTIPLE_CONNECTIONS=ON
+                -DMICRO_OPCUA_EVENTS=ON
             )
             ;;
     esac
