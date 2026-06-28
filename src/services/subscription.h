@@ -204,6 +204,7 @@ typedef struct {
     mu_publish_request_t publish_queue[MU_MAX_PUBLISH_REQUESTS];
     opcua_uint32_t next_subscription_id; /* monotonic id allocator */
     opcua_uint32_t next_monitored_item_id;
+    opcua_uint32_t active_monitored_items_count;
 } mu_subscriptions_t;
 
 struct mu_server; /* forward declaration; the tick reads the address space + send path */

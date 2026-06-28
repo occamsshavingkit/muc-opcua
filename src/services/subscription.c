@@ -1125,6 +1125,9 @@ opcua_statuscode_t mu_subscription_delete(mu_subscriptions_t *subs, opcua_uint32
         mu_monitored_item_t *item = &subs->monitored_items[i];
         if (item->in_use && item->subscription_id == subscription_id) {
             memset(item, 0, sizeof(*item));
+            if (subs->active_monitored_items_count > 0) {
+                subs->active_monitored_items_count--;
+            }
         }
     }
 
@@ -1161,6 +1164,7 @@ opcua_statuscode_t mu_monitored_item_alloc(mu_subscriptions_t *subs, opcua_uint3
     slot->in_use = true;
     slot->subscription_id = subscription_id;
     slot->monitored_item_id = monitored_item_id;
+    subs->active_monitored_items_count++;
 
     *out_item = slot;
     return MU_STATUS_GOOD;
@@ -1176,6 +1180,9 @@ opcua_statuscode_t mu_monitored_item_delete(mu_subscriptions_t *subs, opcua_uint
         mu_monitored_item_t *item = &subs->monitored_items[i];
         if (item->in_use && item->subscription_id == subscription_id && item->monitored_item_id == monitored_item_id) {
             memset(item, 0, sizeof(*item));
+            if (subs->active_monitored_items_count > 0) {
+                subs->active_monitored_items_count--;
+            }
             return MU_STATUS_GOOD;
         }
     }
@@ -1286,9 +1293,15 @@ void mu_subscriptions_tick(struct mu_server *server, opcua_uint64_t now_ms) {
         return;
     }
 
-    for (size_t i = 0; i < MU_MAX_MONITORED_ITEMS; ++i) {
+    size_t active_checked = 0;
+    for (size_t i = 0; i < MU_MAX_MONITORED_ITEMS && active_checked < server->subs.active_monitored_items_count; ++i) {
         mu_monitored_item_t *item = &server->subs.monitored_items[i];
-        if (!item->in_use || item->monitoring_mode == MU_MONITORING_MODE_DISABLED || now_ms < item->next_sample_ms) {
+        if (!item->in_use) {
+            continue;
+        }
+        active_checked++;
+
+        if (item->monitoring_mode == MU_MONITORING_MODE_DISABLED || now_ms < item->next_sample_ms) {
             continue;
         }
 
