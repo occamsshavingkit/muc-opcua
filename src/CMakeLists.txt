@@ -121,6 +121,18 @@ if(MICRO_OPCUA_IS_HOST)
     endif()
 endif()
 
+if(MICRO_OPCUA_HAVE_MBEDTLS)
+    target_sources(micro_opcua PRIVATE platform/mbedtls_crypto_adapter.c)
+    target_link_libraries(micro_opcua PUBLIC mbedcrypto mbedx509)
+    target_compile_definitions(micro_opcua PUBLIC MICRO_OPCUA_HAVE_MBEDTLS=1)
+endif()
+
+if(MICRO_OPCUA_HAVE_WOLFSSL)
+    target_sources(micro_opcua PRIVATE platform/wolfssl_crypto_adapter.c)
+    target_link_libraries(micro_opcua PUBLIC wolfssl)
+    target_compile_definitions(micro_opcua PUBLIC MICRO_OPCUA_HAVE_WOLFSSL=1)
+endif()
+
 target_include_directories(micro_opcua PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../include>
     $<INSTALL_INTERFACE:include>

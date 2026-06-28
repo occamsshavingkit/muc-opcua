@@ -128,3 +128,8 @@ This document maps implementation and test files back to OPC UA normative sectio
 | `encoding.h` | TBD | TBD | TBD | TBD |
 | `subscription.c` | Subscription + MonitoredItem service sets (Micro) | Part 4 | 5.13, 5.14 | No-heap data-change subscription engine |
 | `subscription.h` | Subscription + MonitoredItem service sets (Micro) | Part 4 | 5.13, 5.14, 7.17, 7.21 | Subscription engine data model + contract |
+| `mbedtls_crypto_adapter.c` | Crypto Adapter | Part 7 | 6.x | Mbed TLS primitives for SecurityPolicy Basic256Sha256 |
+| `wolfssl_crypto_adapter.c` | Crypto Adapter | Part 7 | 6.x | wolfSSL primitives for SecurityPolicy Basic256Sha256 |
+| `test_mbedtls_adapter.c` | Tests | Part 7 | 6.x | Test Mbed TLS crypto adapter |
+| `test_wolfssl_adapter.c` | Tests | Part 7 | 6.x | Test wolfSSL crypto adapter |
+
