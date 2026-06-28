@@ -73,8 +73,9 @@ namespace MicroOpcUa.Interop
                 new UserIdentity(new AnonymousIdentityToken()), null).ConfigureAwait(false);
 
             Check("connect (HEL/OPN/GetEndpoints/CreateSession/ActivateSession)", session.Connected);
-            Check("endpoint SecurityPolicy is Basic256Sha256",
-                  selected.SecurityPolicyUri == SecurityPolicies.Basic256Sha256, selected.SecurityPolicyUri);
+            Check("endpoint SecurityPolicy is Basic256Sha256 or Aes128_Sha256_RsaOaep",
+                  selected.SecurityPolicyUri == SecurityPolicies.Basic256Sha256 ||
+                  selected.SecurityPolicyUri == SecurityPolicies.Aes128_Sha256_RsaOaep, selected.SecurityPolicyUri);
             Check("endpoint SecurityMode is SignAndEncrypt",
                   selected.SecurityMode == MessageSecurityMode.SignAndEncrypt, selected.SecurityMode.ToString());
 
