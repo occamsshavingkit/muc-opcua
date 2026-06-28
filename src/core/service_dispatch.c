@@ -355,11 +355,11 @@ static opcua_statuscode_t handle_open_secure_channel(mu_server_t *server, mu_bin
                                ? server->config.time_adapter.get_time(server->config.time_adapter.context)
                                : 0;
 
-    mu_binary_write_uint32(w, 0);                                 /* ServerProtocolVersion */
+    mu_binary_write_uint32(w, 0);                                /* ServerProtocolVersion */
     mu_binary_write_uint32(w, server_secure_channel.channel_id); /* SecurityToken.ChannelId */
     mu_binary_write_uint32(w, server_secure_channel.token_id);   /* SecurityToken.TokenId */
-    mu_binary_write_int64(w, now);                                /* SecurityToken.CreatedAt */
-    mu_binary_write_uint32(w, revised);                           /* SecurityToken.RevisedLifetime */
+    mu_binary_write_int64(w, now);                               /* SecurityToken.CreatedAt */
+    mu_binary_write_uint32(w, revised);                          /* SecurityToken.RevisedLifetime */
     if (w->status != MU_STATUS_GOOD)
         return w->status;
 
@@ -375,19 +375,18 @@ static opcua_statuscode_t handle_open_secure_channel(mu_server_t *server, mu_bin
     server_secure_channel.mode = (mu_message_security_mode_t)security_mode;
 #ifdef MICRO_OPCUA_SECURITY
     if (server_secure_channel.policy != MU_SECURITY_POLICY_NONE_ID &&
-        server_secure_channel.policy != MU_SECURITY_POLICY_INVALID_ID &&
-        server->config.crypto_adapter != NULL) {
+        server_secure_channel.policy != MU_SECURITY_POLICY_INVALID_ID && server->config.crypto_adapter != NULL) {
         const mu_crypto_adapter_t *cr = server->config.crypto_adapter;
         size_t cn_len = client_nonce.length > 0 ? (size_t)client_nonce.length : 0;
         if (cn_len == 0)
             return MU_STATUS_BAD_SECURITYCHECKSFAILED;
         /* Inbound (client->server) keys use ServerNonce as secret; outbound the reverse. */
-        s = mu_sym_keys_derive(cr, server_secure_channel.policy, nonce_buf, sizeof(nonce_buf), client_nonce.data, cn_len,
-                               &server_secure_channel.client_keys);
+        s = mu_sym_keys_derive(cr, server_secure_channel.policy, nonce_buf, sizeof(nonce_buf), client_nonce.data,
+                               cn_len, &server_secure_channel.client_keys);
         if (s != MU_STATUS_GOOD)
             return s;
-        s = mu_sym_keys_derive(cr, server_secure_channel.policy, client_nonce.data, cn_len, nonce_buf, sizeof(nonce_buf),
-                               &server_secure_channel.server_keys);
+        s = mu_sym_keys_derive(cr, server_secure_channel.policy, client_nonce.data, cn_len, nonce_buf,
+                               sizeof(nonce_buf), &server_secure_channel.server_keys);
         if (s != MU_STATUS_GOOD)
             return s;
         server_secure_channel.keys_valid = true;
@@ -565,9 +564,8 @@ static opcua_statuscode_t handle_create_session(mu_server_t *server, mu_binary_r
 #ifdef MICRO_OPCUA_SECURITY
         static const char SIG_URI[] = "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256";
         if (server_secure_channel.policy != MU_SECURITY_POLICY_NONE_ID &&
-            server_secure_channel.policy != MU_SECURITY_POLICY_INVALID_ID &&
-            server->config.crypto_adapter != NULL && server->config.crypto_adapter->rsa_sha256_sign != NULL &&
-            client_cert.length > 0) {
+            server_secure_channel.policy != MU_SECURITY_POLICY_INVALID_ID && server->config.crypto_adapter != NULL &&
+            server->config.crypto_adapter->rsa_sha256_sign != NULL && client_cert.length > 0) {
             const mu_crypto_adapter_t *cr = server->config.crypto_adapter;
             size_t cc = (size_t)client_cert.length;
             size_t cn = client_nonce.length > 0 ? (size_t)client_nonce.length : 0;
@@ -674,7 +672,9 @@ static opcua_statuscode_t handle_activate_session(mu_server_t *server, mu_binary
         return s;
     bool token_type_is_ns0_numeric =
         token_type.identifier_type == MU_NODEID_NUMERIC && token_type.namespace_index == 0u;
+#ifdef MICRO_OPCUA_USER_AUTH
     mu_username_identity_token_t user_token = {{-1, NULL}, {-1, NULL}, {-1, NULL}, {-1, NULL}};
+#endif
     mu_certificate_identity_token_t cert_token = {{-1, NULL}, {-1, NULL}};
     mu_string_t anon_policy_id = {-1, NULL};
     mu_string_t user_token_algorithm = {-1, NULL};
@@ -797,7 +797,7 @@ static opcua_statuscode_t handle_activate_session(mu_server_t *server, mu_binary
                         if (server->config.crypto_adapter != NULL &&
                             server->config.crypto_adapter->get_own_certificate != NULL &&
                             server->config.crypto_adapter->rsa_sha256_verify != NULL) {
-                            
+
                             opcua_statuscode_t gcs = server->config.crypto_adapter->get_own_certificate(
                                 server->config.crypto_adapter->context, &sc_data, &sc_len);
                             if (gcs == MU_STATUS_GOOD) {
@@ -805,16 +805,16 @@ static opcua_statuscode_t handle_activate_session(mu_server_t *server, mu_binary
                                 if (sc_len + 32 <= sizeof(verify_buf)) {
                                     memcpy(verify_buf, sc_data, sc_len);
                                     memcpy(verify_buf + sc_len, slot->server_nonce, 32);
-                                    
+
                                     opcua_statuscode_t vs = server->config.crypto_adapter->rsa_sha256_verify(
                                         server->config.crypto_adapter->context, verify_buf, sc_len + 32,
                                         user_token_signature.data, (size_t)user_token_signature.length,
                                         cert_token.certificate_data.data, (size_t)cert_token.certificate_data.length);
                                     if (vs == MU_STATUS_GOOD) {
                                         if (server->config.user_auth_handler != NULL) {
-                                            activate_result = server->config.user_auth_handler(server->config.user_auth_handler_handle,
-                                                                                               NULL, &cert_token.certificate_data,
-                                                                                               &cert_token.policy_id);
+                                            activate_result = server->config.user_auth_handler(
+                                                server->config.user_auth_handler_handle, NULL,
+                                                &cert_token.certificate_data, &cert_token.policy_id);
                                         } else {
                                             activate_result = MU_STATUS_GOOD;
                                         }
@@ -1198,35 +1198,42 @@ static opcua_statuscode_t read_event_filter_body(mu_binary_reader_t *r, size_t f
 
     opcua_int32_t select_count;
     opcua_statuscode_t s = mu_binary_read_int32(r, &select_count);
-    if (s != MU_STATUS_GOOD) return s;
-    if (select_count < 0) return MU_STATUS_BAD_DECODINGERROR;
-    
+    if (s != MU_STATUS_GOOD)
+        return s;
+    if (select_count < 0)
+        return MU_STATUS_BAD_DECODINGERROR;
+
     for (opcua_int32_t i = 0; i < select_count; ++i) {
         mu_nodeid_t type_id;
         s = mu_binary_read_nodeid(r, &type_id);
-        if (s != MU_STATUS_GOOD) return s;
-        
+        if (s != MU_STATUS_GOOD)
+            return s;
+
         opcua_int32_t bp_count;
         s = mu_binary_read_int32(r, &bp_count);
-        if (s != MU_STATUS_GOOD) return s;
-        if (bp_count < 0) return MU_STATUS_BAD_DECODINGERROR;
-        
+        if (s != MU_STATUS_GOOD)
+            return s;
+        if (bp_count < 0)
+            return MU_STATUS_BAD_DECODINGERROR;
+
         mu_string_t last_name = {-1, NULL};
         for (opcua_int32_t j = 0; j < bp_count; ++j) {
             opcua_uint16_t ns;
             mu_string_t name;
             mu_binary_read_uint16(r, &ns);
             s = mu_binary_read_string(r, &name);
-            if (s != MU_STATUS_GOOD) return s;
+            if (s != MU_STATUS_GOOD)
+                return s;
             last_name = name;
         }
-        
+
         opcua_uint32_t attr_id;
         mu_binary_read_uint32(r, &attr_id);
         mu_string_t idx_range;
         s = mu_binary_read_string(r, &idx_range);
-        if (s != MU_STATUS_GOOD) return s;
-        
+        if (s != MU_STATUS_GOOD)
+            return s;
+
         opcua_byte_t field_type = 0;
         if (last_name.length > 0 && last_name.data != NULL) {
             if (last_name.length == 7 && memcmp(last_name.data, "EventId", 7) == 0) {
@@ -1241,30 +1248,35 @@ static opcua_statuscode_t read_event_filter_body(mu_binary_reader_t *r, size_t f
                 field_type = 5;
             }
         }
-        
+
         if (i < 8) {
             body->select_clauses[i] = field_type;
             body->select_clauses_count++;
         }
     }
-    
+
     opcua_int32_t element_count;
     s = mu_binary_read_int32(r, &element_count);
-    if (s != MU_STATUS_GOOD) return s;
-    if (element_count < 0) return MU_STATUS_BAD_DECODINGERROR;
+    if (s != MU_STATUS_GOOD)
+        return s;
+    if (element_count < 0)
+        return MU_STATUS_BAD_DECODINGERROR;
     for (opcua_int32_t i = 0; i < element_count; ++i) {
         opcua_uint32_t op_type;
         mu_binary_read_uint32(r, &op_type);
         opcua_int32_t arg_count;
         mu_binary_read_int32(r, &arg_count);
-        if (arg_count < 0) return MU_STATUS_BAD_DECODINGERROR;
+        if (arg_count < 0)
+            return MU_STATUS_BAD_DECODINGERROR;
         for (opcua_int32_t j = 0; j < arg_count; ++j) {
             mu_nodeid_t ext_id;
             size_t ext_len;
             s = mu_binary_read_extension_object_header(r, &ext_id, &ext_len);
-            if (s != MU_STATUS_GOOD) return s;
+            if (s != MU_STATUS_GOOD)
+                return s;
             s = skip_extension_object_body(r, ext_len);
-            if (s != MU_STATUS_GOOD) return s;
+            if (s != MU_STATUS_GOOD)
+                return s;
         }
     }
     return r->status;
@@ -2640,10 +2652,8 @@ static opcua_statuscode_t handle_write(mu_server_t *server, mu_binary_reader_t *
 
         /* Apply write callback if configured */
         if (server->config.write_handler) {
-            results[i] = server->config.write_handler(server->config.write_handler_handle,
-                                                      &write_val->node_id,
-                                                      write_val->attribute_id,
-                                                      &write_val->value.value);
+            results[i] = server->config.write_handler(server->config.write_handler_handle, &write_val->node_id,
+                                                      write_val->attribute_id, &write_val->value.value);
         } else {
             results[i] = MU_STATUS_BAD_WRITENOTSUPPORTED;
         }
