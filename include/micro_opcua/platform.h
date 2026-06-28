@@ -158,6 +158,16 @@ typedef struct mu_crypto_adapter {
         const opcua_byte_t *certificate, size_t certificate_length, opcua_byte_t *thumbprint);
 } mu_crypto_adapter_t;
 
+opcua_statuscode_t mu_mbedtls_crypto_adapter_init(mu_crypto_adapter_t *adapter,
+                                                  const opcua_byte_t *cert_der, size_t cert_len,
+                                                  const opcua_byte_t *key_der, size_t key_len);
+void mu_mbedtls_crypto_adapter_cleanup(mu_crypto_adapter_t *adapter);
+
+opcua_statuscode_t mu_wolfssl_crypto_adapter_init(mu_crypto_adapter_t *adapter,
+                                                  const opcua_byte_t *cert_der, size_t cert_len,
+                                                  const opcua_byte_t *key_der, size_t key_len);
+void mu_wolfssl_crypto_adapter_cleanup(mu_crypto_adapter_t *adapter);
+
 #ifdef __cplusplus
 }
 #endif

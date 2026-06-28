@@ -32,5 +32,7 @@ option(MICRO_OPCUA_USER_AUTH "Build UserName/Password user identity authenticati
 option(MICRO_OPCUA_SERVICE_WRITE "Build the Write service" ON)
 option(MICRO_OPCUA_MULTIPLE_CONNECTIONS "Support concurrent client TCP connections" ON)
 option(MICRO_OPCUA_EVENTS "Build event and Alarm & Condition support" ON)
+option(MICRO_OPCUA_HAVE_MBEDTLS "Build with Mbed TLS cryptographic platform adapter" OFF)
+option(MICRO_OPCUA_HAVE_WOLFSSL "Build with wolfSSL cryptographic platform adapter" OFF)
 
 
