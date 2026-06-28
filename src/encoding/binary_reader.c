@@ -144,6 +144,7 @@ opcua_statuscode_t mu_binary_read_statuscode(mu_binary_reader_t *reader, opcua_s
     return mu_binary_read_uint32(reader, value);
 }
 
+#ifdef MICRO_OPCUA_USER_AUTH
 opcua_statuscode_t mu_binary_read_username_identity_token(mu_binary_reader_t *reader, mu_username_identity_token_t *value) {
     opcua_statuscode_t status = reader_status(reader);
     if (status != MU_STATUS_GOOD) return status;
@@ -160,7 +161,9 @@ opcua_statuscode_t mu_binary_read_username_identity_token(mu_binary_reader_t *re
     status = mu_binary_read_string(reader, &value->encryption_algorithm);
     return status;
 }
+#endif
 
+#ifdef MICRO_OPCUA_SECURITY
 opcua_statuscode_t mu_binary_read_certificate_identity_token(mu_binary_reader_t *reader, mu_certificate_identity_token_t *value) {
     opcua_statuscode_t status = reader_status(reader);
     if (status != MU_STATUS_GOOD) return status;
@@ -171,4 +174,5 @@ opcua_statuscode_t mu_binary_read_certificate_identity_token(mu_binary_reader_t 
     status = mu_binary_read_bytestring(reader, &value->certificate_data);
     return status;
 }
+#endif
 
