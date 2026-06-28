@@ -10,6 +10,21 @@
 #include "service_dispatch.h"
 #include "tcp_connection.h"
 
+#ifdef MICRO_OPCUA_SERVICE_NODEMANAGEMENT
+typedef struct {
+    mu_nodeid_t source_node_id;
+    mu_reference_t ref;
+} mu_dynamic_reference_t;
+
+typedef struct {
+    mu_node_t nodes[MU_MAX_DYNAMIC_NODES];
+    size_t nodes_count;
+    
+    mu_dynamic_reference_t references[MU_MAX_DYNAMIC_REFERENCES];
+    size_t references_count;
+} mu_dynamic_address_space_t;
+#endif
+
 #ifdef MICRO_OPCUA_MULTIPLE_CONNECTIONS
 typedef struct {
     void *client_handle;
@@ -77,6 +92,10 @@ struct mu_server {
 #define MU_MAX_WRITER_GROUPS 2
     mu_pubsub_writer_group_t writer_groups[MU_MAX_WRITER_GROUPS];
     size_t writer_group_count;
+#endif
+
+#ifdef MICRO_OPCUA_SERVICE_NODEMANAGEMENT
+    mu_dynamic_address_space_t dynamic_address_space;
 #endif
 };
 

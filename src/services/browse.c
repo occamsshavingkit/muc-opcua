@@ -1,6 +1,7 @@
 /* src/services/browse.c */
 #include "browse.h"
 #include "../address_space/base_nodes.h"
+#include "../core/server_internal.h"
 #include <stddef.h>
 
 /* Immediate supertype of a well-known (ns=0) ReferenceType, or 0 at the root.
@@ -229,14 +230,16 @@ opcua_statuscode_t mu_browse_response_encode(mu_binary_writer_t *writer, const m
 }
 
 opcua_statuscode_t mu_browse_process_with_user_index(const mu_address_space_t *address_space,
-                                                     mu_address_space_index_t *user_index,
-                                                     const mu_address_space_t *dynamic, const mu_browse_request_t *req,
-                                                     mu_browse_result_t *results, size_t max_results,
-                                                     mu_reference_description_t *ref_pool, size_t max_total_refs) {
-    if (!req || !results || !ref_pool)
+                                                     const mu_address_space_index_t *user_index,
+                                                     const mu_address_space_t *dynamic,
+#ifdef MICRO_OPCUA_SERVICE_NODEMANAGEMENT
+                                                     const mu_dynamic_reference_t *dyn_refs, size_t dyn_refs_count,
+#endif
+                                                     const mu_browse_request_t *req, mu_browse_result_t *results,
+                                                     size_t max_results, mu_reference_description_t *ref_pool,
+                                                     size_t max_total_refs) {
+    if (!req || !results || max_results < req->num_nodes_to_browse)
         return MU_STATUS_BAD_INTERNALERROR;
-    if (req->num_nodes_to_browse > max_results)
-        return MU_STATUS_BAD_TOOMANYOPERATIONS;
 
     size_t refs_used = 0;
 
@@ -248,7 +251,8 @@ opcua_statuscode_t mu_browse_process_with_user_index(const mu_address_space_t *a
         res->num_references = 0;
         res->references = NULL;
 
-        const mu_node_t *node = mu_resolve_node(address_space, user_index, dynamic, &desc->node_id);
+        const mu_node_t *node =
+            mu_resolve_node(address_space, (mu_address_space_index_t *)user_index, dynamic, &desc->node_id);
         if (!node) {
             res->status_code = MU_STATUS_BAD_NODEIDUNKNOWN;
             continue;
@@ -270,7 +274,8 @@ opcua_statuscode_t mu_browse_process_with_user_index(const mu_address_space_t *a
             if (!reference_type_matches(desc, r))
                 continue;
 
-            const mu_node_t *target = mu_resolve_node(address_space, user_index, dynamic, &r->target_id);
+            const mu_node_t *target =
+                mu_resolve_node(address_space, (mu_address_space_index_t *)user_index, dynamic, &r->target_id);
             if (!target)
                 continue;
 
@@ -310,6 +315,61 @@ opcua_statuscode_t mu_browse_process_with_user_index(const mu_address_space_t *a
                 }
             }
         }
+#ifdef MICRO_OPCUA_SERVICE_NODEMANAGEMENT
+        /* Also iterate over dynamic references */
+        if (dyn_refs && dyn_refs_count > 0) {
+            for (size_t j = 0; j < dyn_refs_count; ++j) {
+                const mu_dynamic_reference_t *dyn = &dyn_refs[j];
+
+                if (!mu_nodeid_equal(&dyn->source_node_id, &desc->node_id))
+                    continue;
+
+                const mu_reference_t *r = &dyn->ref;
+
+                if (desc->browse_direction == MU_BROWSE_DIRECTION_FORWARD && !r->is_forward)
+                    continue;
+                if (desc->browse_direction == MU_BROWSE_DIRECTION_INVERSE && r->is_forward)
+                    continue;
+
+                if (!reference_type_matches(desc, r))
+                    continue;
+
+                const mu_node_t *target =
+                    mu_resolve_node(address_space, (mu_address_space_index_t *)user_index, dynamic, &r->target_id);
+                if (!target)
+                    continue;
+
+                if (desc->node_class_mask != 0) {
+                    if (!((opcua_uint32_t)target->node_class & desc->node_class_mask))
+                        continue;
+                }
+
+                if (req->requested_max_references_per_node > 0 &&
+                    match_count >= req->requested_max_references_per_node) {
+                    too_many_refs = true;
+                    break;
+                }
+
+                if (match_count >= refs_remaining) {
+                    too_many_refs = true;
+                    break;
+                }
+
+                mu_reference_description_t *ref_desc = &ref_pool[node_refs_start + match_count++];
+                ref_desc->reference_type_id = r->reference_type_id;
+                ref_desc->is_forward = r->is_forward;
+                ref_desc->node_id = target->node_id;
+                ref_desc->browse_name_namespace_index = 0;
+                ref_desc->browse_name = target->browse_name;
+                ref_desc->display_name = target->display_name;
+                ref_desc->node_class = target->node_class;
+
+                ref_desc->type_definition =
+                    (mu_nodeid_t){.identifier_type = MU_NODEID_NUMERIC, .namespace_index = 0, .identifier.numeric = 0};
+                /* Optional: check target's references for TypeDefinition (static and dynamic) */
+            }
+        }
+#endif
 
         if (too_many_refs) {
             res->status_code = MU_STATUS_BAD_NOCONTINUATIONPOINTS; /* Or Bad_ResponseTooLarge */
@@ -327,6 +387,9 @@ opcua_statuscode_t mu_browse_process_with_user_index(const mu_address_space_t *a
 opcua_statuscode_t mu_browse_process(const mu_address_space_t *address_space, const mu_address_space_t *dynamic,
                                      const mu_browse_request_t *req, mu_browse_result_t *results, size_t max_results,
                                      mu_reference_description_t *ref_pool, size_t max_total_refs) {
-    return mu_browse_process_with_user_index(address_space, NULL, dynamic, req, results, max_results, ref_pool,
-                                             max_total_refs);
+    return mu_browse_process_with_user_index(address_space, NULL, dynamic,
+#ifdef MICRO_OPCUA_SERVICE_NODEMANAGEMENT
+                                             NULL, 0,
+#endif
+                                             req, results, max_results, ref_pool, max_total_refs);
 }

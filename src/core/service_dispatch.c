@@ -22,6 +22,9 @@
 #include "../security/sym_chunk.h"
 #include "micro_opcua/security.h"
 #endif
+#ifdef MICRO_OPCUA_SERVICE_NODEMANAGEMENT
+#include "../services/node_management.h"
+#endif
 #include <stddef.h>
 #include <string.h>
 
@@ -43,10 +46,14 @@ opcua_statuscode_t mu_read_process_with_user_index(const mu_address_space_t *add
 
 #ifdef MICRO_OPCUA_SERVICE_BROWSE
 opcua_statuscode_t mu_browse_process_with_user_index(const mu_address_space_t *address_space,
-                                                     mu_address_space_index_t *user_index,
-                                                     const mu_address_space_t *dynamic, const mu_browse_request_t *req,
-                                                     mu_browse_result_t *results, size_t max_results,
-                                                     mu_reference_description_t *ref_pool, size_t max_total_refs);
+                                                     const mu_address_space_index_t *user_index,
+                                                     const mu_address_space_t *dynamic,
+#ifdef MICRO_OPCUA_SERVICE_NODEMANAGEMENT
+                                                     const mu_dynamic_reference_t *dyn_refs, size_t dyn_refs_count,
+#endif
+                                                     const mu_browse_request_t *req, mu_browse_result_t *results,
+                                                     size_t max_results, mu_reference_description_t *ref_pool,
+                                                     size_t max_total_refs);
 #endif
 
 typedef opcua_statuscode_t (*mu_service_dispatch_handler_fn)(mu_server_t *server, mu_binary_reader_t *r,
@@ -123,6 +130,16 @@ opcua_statuscode_t handle_write(mu_server_t *server, mu_binary_reader_t *r, mu_b
 static opcua_statuscode_t handle_call(mu_server_t *server, mu_binary_reader_t *r, mu_binary_writer_t *w,
                                       size_t *response_length);
 #endif
+#ifdef MICRO_OPCUA_SERVICE_NODEMANAGEMENT
+static opcua_statuscode_t handle_add_nodes(mu_server_t *server, mu_binary_reader_t *r, mu_binary_writer_t *w,
+                                           size_t *response_length);
+static opcua_statuscode_t handle_add_references(mu_server_t *server, mu_binary_reader_t *r, mu_binary_writer_t *w,
+                                                size_t *response_length);
+static opcua_statuscode_t handle_delete_nodes(mu_server_t *server, mu_binary_reader_t *r, mu_binary_writer_t *w,
+                                              size_t *response_length);
+static opcua_statuscode_t handle_delete_references(mu_server_t *server, mu_binary_reader_t *r, mu_binary_writer_t *w,
+                                                   size_t *response_length);
+#endif
 
 /* Fill a ServerNonce from the entropy adapter (zeros if unavailable). */
 static void fill_server_nonce(mu_server_t *server, opcua_byte_t *nonce, size_t len) {
@@ -164,6 +181,12 @@ static const mu_service_descriptor_t g_supported_services[] = {
 #endif
 #if MU_DISPATCH_CALL_ENABLED
     {{MU_ID_CALLREQUEST, MU_ID_CALLRESPONSE, true}, handle_call},
+#endif
+#ifdef MICRO_OPCUA_SERVICE_NODEMANAGEMENT
+    {{MU_ID_ADDNODESREQUEST, MU_ID_ADDNODESRESPONSE, true}, handle_add_nodes},
+    {{MU_ID_ADDREFERENCESREQUEST, MU_ID_ADDREFERENCESRESPONSE, true}, handle_add_references},
+    {{MU_ID_DELETENODESREQUEST, MU_ID_DELETENODESRESPONSE, true}, handle_delete_nodes},
+    {{MU_ID_DELETEREFERENCESREQUEST, MU_ID_DELETEREFERENCESRESPONSE, true}, handle_delete_references},
 #endif
 #if MICRO_OPCUA_SUBSCRIPTIONS
     {{MU_ID_CREATEMONITOREDITEMSREQUEST, MU_ID_CREATEMONITOREDITEMSRESPONSE, true}, handle_create_monitored_items},
@@ -2811,9 +2834,20 @@ static opcua_statuscode_t handle_browse(mu_server_t *server, mu_binary_reader_t 
 
     mu_browse_result_t results[MU_DISPATCH_MAX_BROWSE_NODES];
     mu_reference_description_t ref_pool[MU_DISPATCH_MAX_BROWSE_REFS];
-    s = mu_browse_process_with_user_index(server->config.address_space, &server->user_address_space_index,
-                                          &server->runtime_base.space, &breq, results, MU_DISPATCH_MAX_BROWSE_NODES,
-                                          ref_pool, MU_DISPATCH_MAX_BROWSE_REFS);
+
+#ifdef MICRO_OPCUA_SERVICE_NODEMANAGEMENT
+    const mu_dynamic_reference_t *dyn_refs = NULL;
+    size_t dyn_refs_count = 0;
+    dyn_refs = server->dynamic_address_space.references;
+    dyn_refs_count = server->dynamic_address_space.references_count;
+#endif
+
+    s = mu_browse_process_with_user_index(
+        server->config.address_space, &server->user_address_space_index, &server->runtime_base.space,
+#ifdef MICRO_OPCUA_SERVICE_NODEMANAGEMENT
+        dyn_refs, dyn_refs_count,
+#endif
+        &breq, results, MU_DISPATCH_MAX_BROWSE_NODES, ref_pool, MU_DISPATCH_MAX_BROWSE_REFS);
     if (s != MU_STATUS_GOOD)
         return s;
 
@@ -2894,6 +2928,84 @@ static opcua_statuscode_t handle_browse_next(mu_server_t *server, mu_binary_read
     return MU_STATUS_GOOD;
 }
 #endif /* MICRO_OPCUA_SERVICE_BROWSE */
+
+#ifdef MICRO_OPCUA_SERVICE_NODEMANAGEMENT
+static opcua_statuscode_t handle_add_nodes(mu_server_t *server, mu_binary_reader_t *r, mu_binary_writer_t *w,
+                                           size_t *response_length) {
+    mu_request_header_t req;
+    opcua_statuscode_t s = mu_request_header_decode(r, &req);
+    if (s != MU_STATUS_GOOD)
+        return s;
+
+    s = write_response_prefix(w, MU_ID_ADDNODESRESPONSE, req.request_handle, MU_STATUS_GOOD);
+    if (s != MU_STATUS_GOOD)
+        return s;
+
+    s = mu_add_nodes_process(server, r, w);
+    if (s != MU_STATUS_GOOD)
+        return s;
+
+    *response_length = w->position;
+    return MU_STATUS_GOOD;
+}
+
+static opcua_statuscode_t handle_add_references(mu_server_t *server, mu_binary_reader_t *r, mu_binary_writer_t *w,
+                                                size_t *response_length) {
+    mu_request_header_t req;
+    opcua_statuscode_t s = mu_request_header_decode(r, &req);
+    if (s != MU_STATUS_GOOD)
+        return s;
+
+    s = write_response_prefix(w, MU_ID_ADDREFERENCESRESPONSE, req.request_handle, MU_STATUS_GOOD);
+    if (s != MU_STATUS_GOOD)
+        return s;
+
+    s = mu_add_references_process(server, r, w);
+    if (s != MU_STATUS_GOOD)
+        return s;
+
+    *response_length = w->position;
+    return MU_STATUS_GOOD;
+}
+
+static opcua_statuscode_t handle_delete_nodes(mu_server_t *server, mu_binary_reader_t *r, mu_binary_writer_t *w,
+                                              size_t *response_length) {
+    mu_request_header_t req;
+    opcua_statuscode_t s = mu_request_header_decode(r, &req);
+    if (s != MU_STATUS_GOOD)
+        return s;
+
+    s = write_response_prefix(w, MU_ID_DELETENODESRESPONSE, req.request_handle, MU_STATUS_GOOD);
+    if (s != MU_STATUS_GOOD)
+        return s;
+
+    s = mu_delete_nodes_process(server, r, w);
+    if (s != MU_STATUS_GOOD)
+        return s;
+
+    *response_length = w->position;
+    return MU_STATUS_GOOD;
+}
+
+static opcua_statuscode_t handle_delete_references(mu_server_t *server, mu_binary_reader_t *r, mu_binary_writer_t *w,
+                                                   size_t *response_length) {
+    mu_request_header_t req;
+    opcua_statuscode_t s = mu_request_header_decode(r, &req);
+    if (s != MU_STATUS_GOOD)
+        return s;
+
+    s = write_response_prefix(w, MU_ID_DELETEREFERENCESRESPONSE, req.request_handle, MU_STATUS_GOOD);
+    if (s != MU_STATUS_GOOD)
+        return s;
+
+    s = mu_delete_references_process(server, r, w);
+    if (s != MU_STATUS_GOOD)
+        return s;
+
+    *response_length = w->position;
+    return MU_STATUS_GOOD;
+}
+#endif /* MICRO_OPCUA_SERVICE_NODEMANAGEMENT */
 
 opcua_statuscode_t mu_service_dispatch(mu_server_t *server, opcua_uint32_t request_id, const opcua_byte_t *request_body,
                                        size_t request_length, opcua_byte_t *response_body, size_t *response_length) {

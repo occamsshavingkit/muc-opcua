@@ -126,6 +126,9 @@ opcua_statuscode_t mu_server_init(void *storage, size_t storage_size, const mu_s
 #if MICRO_OPCUA_SUBSCRIPTIONS
     mu_subscriptions_init(&server->subs);
 #endif
+#ifdef MICRO_OPCUA_SERVICE_NODEMANAGEMENT
+    memset(&server->dynamic_address_space, 0, sizeof(server->dynamic_address_space));
+#endif
 
     /* Initialize platform TCP adapter */
     status = server->config.tcp_adapter.listen(server->config.tcp_adapter.context, server->config.endpoint_url);

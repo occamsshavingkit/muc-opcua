@@ -113,3 +113,49 @@ opcua_statuscode_t mu_binary_write_nodeid(mu_binary_writer_t *writer, const mu_n
         return MU_STATUS_BAD_ENCODINGERROR;
     }
 }
+
+opcua_statuscode_t mu_binary_read_expanded_nodeid(mu_binary_reader_t *reader, mu_expanded_nodeid_t *value) {
+    if (reader->position >= reader->length) return MU_STATUS_BAD_DECODINGERROR;
+    opcua_byte_t encoding_mask = reader->buffer[reader->position];
+
+    opcua_statuscode_t status = mu_binary_read_nodeid(reader, &value->node_id);
+    if (status != MU_STATUS_GOOD) return status;
+
+    if (encoding_mask & 0x80) { /* NamespaceUriFlag */
+        status = mu_binary_read_string(reader, &value->namespace_uri);
+        if (status != MU_STATUS_GOOD) return status;
+    } else {
+        value->namespace_uri.length = -1;
+        value->namespace_uri.data = NULL;
+    }
+
+    if (encoding_mask & 0x40) { /* ServerIndexFlag */
+        status = mu_binary_read_uint32(reader, &value->server_index);
+        if (status != MU_STATUS_GOOD) return status;
+    } else {
+        value->server_index = 0;
+    }
+
+    return MU_STATUS_GOOD;
+}
+
+opcua_statuscode_t mu_binary_write_expanded_nodeid(mu_binary_writer_t *writer, const mu_expanded_nodeid_t *value) {
+    if (!value) return MU_STATUS_BAD_ENCODINGERROR;
+
+    /* For Micro OPC UA, we don't emit NamespaceUri or ServerIndex. We just encode as NodeId. */
+    /* This satisfies basic server requirements where all nodes are local. */
+    return mu_binary_write_nodeid(writer, &value->node_id);
+}
+
+opcua_statuscode_t mu_binary_read_qualified_name(mu_binary_reader_t *reader, mu_qualified_name_t *value) {
+    opcua_statuscode_t status = mu_binary_read_uint16(reader, &value->namespace_index);
+    if (status != MU_STATUS_GOOD) return status;
+    return mu_binary_read_string(reader, &value->name);
+}
+
+opcua_statuscode_t mu_binary_write_qualified_name(mu_binary_writer_t *writer, const mu_qualified_name_t *value) {
+    if (!value) return MU_STATUS_BAD_ENCODINGERROR;
+    opcua_statuscode_t status = mu_binary_write_uint16(writer, value->namespace_index);
+    if (status != MU_STATUS_GOOD) return status;
+    return mu_binary_write_string(writer, &value->name);
+}
