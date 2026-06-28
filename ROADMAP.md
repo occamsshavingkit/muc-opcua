@@ -18,7 +18,7 @@ This roadmap outlines the planned feature milestones and maintenance tasks for t
 ## 🟡 Phase 2: PubSub and Advanced Security (Up Next)
 *The immediate next steps focus on introducing IoT-friendly PubSub and expanding our cryptographic footprint.*
 
-- [ ] **Feature 012: OPC UA PubSub (Part 14) - UADP / UDP**
+- [x] **Feature 012: OPC UA PubSub (Part 14) - UADP / UDP**
   - Introduce connectionless Publish-Subscribe (UADP) over UDP.
   - Ideal for ultra-low footprint sensors broadcasting data without TCP overhead.
 - [ ] **Feature 013: Advanced Security Policies**
