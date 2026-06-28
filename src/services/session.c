@@ -80,15 +80,9 @@ opcua_statuscode_t mu_session_create(mu_session_t *session,
     session->auth_token = 12345; /* Mock token */
 
     opcua_uint64_t revised = clamp_timeout_bits(requested_timeout_bits);
-    
-    /* Convert IEEE-754 double bits to uint32 milliseconds using integer-only logic
-       to avoid FPU/soft-float calls on Cortex-M0+ (normalized positive doubles only). */
-    opcua_uint32_t exponent_bits = (opcua_uint32_t)((revised >> 52) & 0x7ff);
-    opcua_int32_t exp = (opcua_int32_t)exponent_bits - 1023;
-    opcua_uint64_t fraction_bits = revised & 0xfffffffffffffULL;
-    opcua_uint64_t mantissa = (1ULL << 52) | fraction_bits;
-    session->revised_session_timeout_ms = (opcua_uint32_t)(mantissa >> (52 - exp));
-
+    double d;
+    memcpy(&d, &revised, sizeof(d));
+    session->revised_session_timeout_ms = (opcua_uint32_t)d;
     session->state = MU_SESSION_STATE_CREATED;
 
     *revised_timeout_bits = revised;
