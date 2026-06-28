@@ -326,14 +326,14 @@ randomness, STM32 `RNG` peripheral, nRF `RNG`) or a properly seeded CSPRNG.
 > That is fine for a smoke test on an isolated bench and **unacceptable in
 > production** — replace it before deployment.
 
-### 3.4 Crypto adapter (optional — for Basic256Sha256)
+### 3.4 Crypto adapter (optional — for Basic256Sha256, Aes128-Sha256-RsaOaep, Aes256-Sha256-RsaPss)
 
 Leave `config.crypto_adapter = NULL` and the server offers **SecurityPolicy None
 only**. Supply a `mu_crypto_adapter_t *` and the server additionally advertises
-`Basic256Sha256` Sign and SignAndEncrypt endpoints. The interface
-(`include/micro_opcua/platform.h`) is the full set of primitives OPC 10000-7
-requires for that policy. The server certificate and private key live **inside
-the adapter's `context`** — the library never sees raw key material.
+`Basic256Sha256`, `Aes128-Sha256-RsaOaep`, and `Aes256-Sha256-RsaPss` Sign and
+SignAndEncrypt endpoints. The interface (`include/micro_opcua/platform.h`) is the
+full set of primitives OPC 10000-7 requires for these policies. The server certificate
+and private key live **inside the adapter's `context`** — the library never sees raw key material.
 
 Callbacks you must implement:
 
@@ -341,9 +341,12 @@ Callbacks you must implement:
 |---|---|
 | `sha256` | SHA-256 digest (32 B, `MU_SHA256_LENGTH`) |
 | `hmac_sha256` | HMAC-SHA-256 (key derivation, message signing) |
-| `aes256_cbc_encrypt` / `aes256_cbc_decrypt` | AES-256-CBC, no padding, 16-B blocks/IV (`MU_AES_BLOCK_SIZE`) |
-| `rsa_sha256_sign` / `rsa_sha256_verify` | RSA PKCS#1 v1.5 + SHA-256 (sign with own key, verify with peer DER cert) |
-| `rsa_oaep_decrypt` / `rsa_oaep_encrypt` | RSA-OAEP (MGF1-SHA1) for asymmetric secret exchange |
+| `aes256_cbc_encrypt` / `decrypt` | AES-256-CBC, no padding, 16-B blocks/IV (`MU_AES_BLOCK_SIZE`) |
+| `aes128_cbc_encrypt` / `decrypt` | AES-128-CBC, no padding, 16-B blocks/IV (for Aes128-Sha256-RsaOaep) |
+| `rsa_sha256_sign` / `verify` | RSA PKCS#1 v1.5 + SHA-256 (sign with own key, verify with peer DER cert) |
+| `rsa_pss_sha256_sign` / `verify` | RSA-PSS (RSASSA-PSS with SHA-256, salt length = 32B) (for Aes256-Sha256-RsaPss) |
+| `rsa_oaep_decrypt` / `encrypt` | RSA-OAEP (MGF1-SHA1) for asymmetric secret exchange |
+| `rsa_oaep_sha256_decrypt` / `encrypt` | RSA-OAEP (MGF1-SHA256) (for Aes256-Sha256-RsaPss) |
 | `get_own_certificate` | return server DER certificate |
 | `get_certificate_key_bits` | RSA modulus size of a cert (bits) |
 | `get_certificate_thumbprint` | SHA-1 of DER cert (20 B, `MU_THUMBPRINT_LENGTH`) |
@@ -594,19 +597,22 @@ re-init.
 
 ---
 
-## 6. Security: certificates, keys, and SecurityPolicy
+## 6. Security: certificates, keys, SecurityPolicy, and TrustLists
 
 The authoritative conformance reference is
 [`docs/conformance/security.md`](conformance/security.md). Integration essentials:
 
 - **SecurityPolicy selection is automatic from the crypto adapter.** No crypto
   adapter (`config.crypto_adapter == NULL`) ⇒ **None only**. With a crypto adapter
-  ⇒ the server *also* advertises `Basic256Sha256` Sign and SignAndEncrypt
-  endpoints alongside None. Build security support in with the `MICRO_OPCUA_SECURITY`
+  ⇒ the server *also* advertises `Basic256Sha256`, `Aes128-Sha256-RsaOaep`, and `Aes256-Sha256-RsaPss`
+  Sign and SignAndEncrypt endpoints alongside None. Build security support in with the `MICRO_OPCUA_SECURITY`
   option (see §7).
 - **None is non-production.** Per the conformance note, SecurityPolicy None
   endpoints are for trusted/isolated networks and bench testing only. Ship
-  Basic256Sha256 (or restrict None to a closed network) for anything real.
+  with strong Security Policies (or restrict None to a closed network) for anything real.
+- **TrustLists.** If you provide a `config.trust_list` containing peer certificates,
+  the server will reject any SecureChannel Open requests using a certificate not explicitly in that list.
+  If left `NULL`, the server relies on the application handling authentication elsewhere (not recommended).
 - **Certificate & key provisioning.** The server's instance certificate (DER) and
   RSA private key are owned entirely by your crypto adapter's `context`; the
   library only requests them through `get_own_certificate` /
@@ -649,8 +655,9 @@ From the top-level `CMakeLists.txt` and `cmake/MicroOpcUaOptions.cmake`
 
 | Option | Default | Effect |
 |---|---|---|
-| `MICRO_OPCUA_SECURITY` | ON | Compile Basic256Sha256 support (and grow `MU_SERVER_STORAGE_BYTES`) |
+| `MICRO_OPCUA_SECURITY` | ON | Compile advanced security policies (and grow `MU_SERVER_STORAGE_BYTES`) |
 | `MICRO_OPCUA_SUBSCRIPTIONS` | ON | Data-change subscription engine (Micro profile) |
+| `MICRO_OPCUA_PUBSUB` | OFF | OPC UA PubSub UADP/UDP Publisher |
 | `MICRO_OPCUA_BASE_NODES` | ON | Standard Base Information node set (ServerStatus, CurrentTime, …) |
 | `MICRO_OPCUA_SERVICE_READ` | ON | Read service |
 | `MICRO_OPCUA_SERVICE_BROWSE` | ON | Browse / BrowseNext / TranslateBrowsePaths |
@@ -800,7 +807,8 @@ opcua_statuscode_t mu_server_config_validate(const mu_server_config_t *config);
 | `max_chunk_count`, `max_message_size` | yes | Use `MU_DEFAULT_MAX_CHUNK_COUNT` (1), `MU_DEFAULT_MAX_MESSAGE_SIZE` (8192) |
 | `max_sessions`, `max_secure_channels` | yes | `MU_MAX_SESSIONS` (2), `MU_MAX_SECURE_CHANNELS` (1) |
 | `tcp_adapter`, `time_adapter`, `entropy_adapter` | yes | By value; fill before init |
-| `crypto_adapter` | no | `NULL` ⇒ None only; non-NULL ⇒ + Basic256Sha256 |
+| `crypto_adapter` | no | `NULL` ⇒ None only; non-NULL ⇒ advertises all built security policies |
+| `trust_list` | no | Array of trusted peer certificates for strict authentication |
 | `persistence_adapter` | no | `NULL` if unused |
 | `address_space` | no (but normally yes) | `const`, in flash |
 
