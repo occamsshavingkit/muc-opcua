@@ -15,17 +15,13 @@ This roadmap outlines the planned feature milestones and maintenance tasks for t
 
 ---
 
-## 🟡 Phase 2: Compliance, Tooling, and PubSub (Up Next)
-*The immediate next steps focus on stabilizing the current features against the official OPC UA specifications and introducing IoT-friendly PubSub.*
+## 🟡 Phase 2: PubSub and Advanced Security (Up Next)
+*The immediate next steps focus on introducing IoT-friendly PubSub and expanding our cryptographic footprint.*
 
-- [ ] **Feature 012: OPC Foundation CTT (Compliance Test Tool) Verification**
-  - Run the official CTT against the Nano, Micro, and Embedded profiles.
-  - Fix any protocol or framing deviations discovered by the tool.
-  - *Goal: Achieve formal verifiable compliance.*
-- [ ] **Feature 013: OPC UA PubSub (Part 14) - UADP / UDP**
+- [ ] **Feature 012: OPC UA PubSub (Part 14) - UADP / UDP**
   - Introduce connectionless Publish-Subscribe (UADP) over UDP.
   - Ideal for ultra-low footprint sensors broadcasting data without TCP overhead.
-- [ ] **Feature 014: Advanced Security Policies**
+- [ ] **Feature 013: Advanced Security Policies**
   - Implement `Aes128-Sha256-RsaOaep` and `Aes256-Sha256-RsaPss`.
   - Add basic TrustList management for rejecting unknown client certificates.
 
@@ -37,12 +33,12 @@ This roadmap outlines the planned feature milestones and maintenance tasks for t
 ## 🔵 Phase 3: Advanced Address Space Management
 *Bringing full dynamic control of the address space to the client (where authorized).*
 
-- [ ] **Feature 015: NodeManagement Services**
+- [ ] **Feature 014: NodeManagement Services**
   - Implement `AddNodes`, `DeleteNodes`, `AddReferences`, and `DeleteReferences`.
   - Allow authorized clients to dynamically build the address space at runtime.
-- [ ] **Feature 016: Query Services**
+- [ ] **Feature 015: Query Services**
   - Implement `QueryFirst` and `QueryNext` to allow clients to search the address space using complex filters.
-- [ ] **Feature 017: Advanced Alarms & Conditions**
+- [ ] **Feature 016: Advanced Alarms & Conditions**
   - Expand the basic event system to support Acknowledgeable Conditions, Active/Inactive states, and Dialogs.
 
 **🔍 Milestone Audit B: Documentation & Memory Model Audit**
@@ -53,11 +49,11 @@ This roadmap outlines the planned feature milestones and maintenance tasks for t
 ## 🟣 Phase 4: Historical Data & Enterprise Features
 *Expanding into the History Server facet.*
 
-- [ ] **Feature 018: Historical Access (HA)**
+- [ ] **Feature 017: Historical Access (HA)**
   - Implement `HistoryRead` (Raw and Modified).
   - Implement `HistoryUpdate` (Insert/Replace/Delete).
   - Provide a platform-agnostic persistence adapter interface (e.g., to write to SD card, flash, or host filesystem).
-- [ ] **Feature 019: Aggregate Subscriptions**
+- [ ] **Feature 018: Aggregate Subscriptions**
   - Support for calculating averages, mins, maxes over time periods during publishing.
 
 **🔍 Milestone Audit C: Final API & Conformance Audit**
