@@ -105,9 +105,7 @@ opcua_statuscode_t mu_binary_read_uint64(mu_binary_reader_t *reader, opcua_uint6
 
 opcua_statuscode_t mu_binary_read_float(mu_binary_reader_t *reader, opcua_float_t *value) {
     opcua_uint32_t tmp;
-    opcua_statuscode_t status = reader_status(reader);
-    if (status != MU_STATUS_GOOD) return status;
-    status = mu_binary_read_uint32(reader, &tmp);
+    opcua_statuscode_t status = mu_binary_read_uint32(reader, &tmp);
     if (status != MU_STATUS_GOOD) return status;
     memcpy(value, &tmp, sizeof(opcua_float_t));
     return MU_STATUS_GOOD;
@@ -115,9 +113,7 @@ opcua_statuscode_t mu_binary_read_float(mu_binary_reader_t *reader, opcua_float_
 
 opcua_statuscode_t mu_binary_read_double(mu_binary_reader_t *reader, opcua_double_t *value) {
     opcua_uint64_t tmp;
-    opcua_statuscode_t status = reader_status(reader);
-    if (status != MU_STATUS_GOOD) return status;
-    status = mu_binary_read_uint64(reader, &tmp);
+    opcua_statuscode_t status = mu_binary_read_uint64(reader, &tmp);
     if (status != MU_STATUS_GOOD) return status;
     memcpy(value, &tmp, sizeof(opcua_double_t));
     return MU_STATUS_GOOD;

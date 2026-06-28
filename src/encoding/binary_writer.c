@@ -93,22 +93,16 @@ opcua_statuscode_t mu_binary_write_uint64(mu_binary_writer_t *writer, opcua_uint
 
 opcua_statuscode_t mu_binary_write_float(mu_binary_writer_t *writer, opcua_float_t value) {
     opcua_uint32_t tmp;
-    opcua_statuscode_t status = writer_status(writer);
-    if (status != MU_STATUS_GOOD) return status;
     memcpy(&tmp, &value, sizeof(opcua_float_t));
     return mu_binary_write_uint32(writer, tmp);
 }
 
 opcua_statuscode_t mu_binary_write_double(mu_binary_writer_t *writer, opcua_double_t value) {
     opcua_uint64_t tmp;
-    opcua_statuscode_t status = writer_status(writer);
-    if (status != MU_STATUS_GOOD) return status;
     memcpy(&tmp, &value, sizeof(opcua_double_t));
     return mu_binary_write_uint64(writer, tmp);
 }
 
 opcua_statuscode_t mu_binary_write_statuscode(mu_binary_writer_t *writer, opcua_statuscode_t value) {
-    opcua_statuscode_t status = writer_status(writer);
-    if (status != MU_STATUS_GOOD) return status;
     return mu_binary_write_uint32(writer, value);
 }
