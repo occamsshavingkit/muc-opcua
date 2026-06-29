@@ -49,11 +49,11 @@ This roadmap outlines the planned feature milestones and maintenance tasks for t
 ## 🟣 Phase 4: Historical Data & Enterprise Features
 *Expanding into the History Server facet.*
 
-- [ ] **Feature 017: Historical Access (HA)**
+- [x] **Feature 017: Historical Access (HA)**
   - Implement `HistoryRead` (Raw and Modified).
   - Implement `HistoryUpdate` (Insert/Replace/Delete).
   - Provide a platform-agnostic persistence adapter interface (e.g., to write to SD card, flash, or host filesystem).
-- [ ] **Feature 018: Aggregate Subscriptions**
+- [x] **Feature 018: Aggregate Subscriptions**
   - Support for calculating averages, mins, maxes over time periods during publishing.
 
 **🔍 Milestone Audit C: Final API & Conformance Audit**
