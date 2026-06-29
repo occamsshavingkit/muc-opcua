@@ -126,6 +126,18 @@ opcua_statuscode_t mu_server_init(void *storage, size_t storage_size, const mu_s
 #if MICRO_OPCUA_SUBSCRIPTIONS
     mu_subscriptions_init(&server->subs);
 #endif
+#ifdef MICRO_OPCUA_SERVICE_NODEMANAGEMENT
+    memset(&server->dynamic_address_space, 0, sizeof(server->dynamic_address_space));
+#endif
+#ifdef MICRO_OPCUA_SERVICE_QUERY
+    for (size_t i = 0; i < MU_MAX_QUERY_CONTINUATION_POINTS; ++i) {
+        server->query_context.continuation_points[i].id.length = -1;
+        server->query_context.continuation_points[i].id.data = NULL;
+        server->query_context.continuation_points[i].session_id = 0;
+        server->query_context.continuation_points[i].next_index = 0;
+        server->query_context.continuation_points[i].timestamp_ms = 0;
+    }
+#endif
 
     /* Initialize platform TCP adapter */
     status = server->config.tcp_adapter.listen(server->config.tcp_adapter.context, server->config.endpoint_url);

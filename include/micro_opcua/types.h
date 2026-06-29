@@ -29,6 +29,13 @@ typedef struct {
     } identifier;
 } mu_nodeid_t;
 
+/* OPC UA ExpandedNodeId (OPC 10000-6 5.2.2.10) */
+typedef struct {
+    mu_nodeid_t node_id;
+    mu_string_t namespace_uri;
+    opcua_uint32_t server_index;
+} mu_expanded_nodeid_t;
+
 /* OPC UA QualifiedName (OPC 10000-6 5.2.2.13) */
 typedef struct {
     opcua_uint16_t namespace_index;

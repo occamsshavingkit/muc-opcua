@@ -543,7 +543,18 @@ Set the `MaxNodesPerRead`/`MaxNodesPerBrowse` values to match the dispatch caps
 (`MU_DISPATCH_MAX_READ_NODES` = 32, browse = 8) so a client never sends a batch
 the server will truncate.
 
-### 4.4 Validation and lookup
+### 4.4 Dynamic Address Space (NodeManagement)
+
+The NodeManagement service set allows adding and deleting nodes and references at runtime.
+
+To enable dynamic node management:
+1. Compile with `-DMICRO_OPCUA_SERVICE_NODEMANAGEMENT=1`.
+2. Configure limits via `-DMU_MAX_DYNAMIC_NODES` (default: 32) and `-DMU_MAX_DYNAMIC_REFERENCES` (default: 64). Note that this proportionally increases `MU_SERVER_STORAGE_BYTES` for your static memory budget.
+3. Set `server->config.allow_node_management = true` in your server configuration. If false, NodeManagement services return `BadUserAccessDenied`.
+
+Once enabled, clients can dynamically add variables or objects using `AddNodes` or create relationships via `AddReferences`. Dynamic items are automatically discoverable via `Browse` and `Read` alongside the static address space.
+
+### 4.5 Validation and lookup
 
 - `mu_address_space_validate(&as)` checks that every reference target resolves to a
   node in the space. `mu_server_init` runs this for you; call it yourself in unit

@@ -1,3 +1,4 @@
+#define MICRO_OPCUA_PUBSUB 1
 #include "../../src/core/server_internal.h"
 #include "fake_platform.h"
 #include "micro_opcua/pubsub.h"
