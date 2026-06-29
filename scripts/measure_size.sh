@@ -66,6 +66,9 @@ for profile in $profiles; do
                 -DMICRO_OPCUA_SERVICE_WRITE=OFF
                 -DMICRO_OPCUA_MULTIPLE_CONNECTIONS=OFF
                 -DMICRO_OPCUA_EVENTS=OFF
+                -DMICRO_OPCUA_SERVICE_HISTORY=OFF
+                -DMICRO_OPCUA_SERVICE_QUERY=OFF
+                -DMICRO_OPCUA_SERVICE_NODEMANAGEMENT=OFF
             )
             ;;
         micro)
@@ -79,6 +82,9 @@ for profile in $profiles; do
                 -DMICRO_OPCUA_SERVICE_WRITE=ON
                 -DMICRO_OPCUA_MULTIPLE_CONNECTIONS=OFF
                 -DMICRO_OPCUA_EVENTS=OFF
+                -DMICRO_OPCUA_SERVICE_HISTORY=OFF
+                -DMICRO_OPCUA_SERVICE_QUERY=OFF
+                -DMICRO_OPCUA_SERVICE_NODEMANAGEMENT=OFF
             )
             ;;
         embedded)
