@@ -111,6 +111,9 @@ static void prepare_server(mu_server_t *server, test_io_t *io) {
     TEST_ASSERT_EQUAL_UINT32(AUTH_TOKEN, auth_token);
     TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_session_activate(&server->sessions[0], auth_token,
                                                                 MU_ID_ANONYMOUSIDENTITYTOKEN_ENCODING_DEFAULTBINARY));
+    server->sessions[0].secure_channel_id = server->secure_channel.channel_id;
+    server->conns[0].client_handle = (void *)1;
+    server->conns[0].secure_channel = server->secure_channel;
     mu_subscriptions_init(&server->subs);
 }
 

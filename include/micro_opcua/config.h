@@ -117,7 +117,7 @@
 /* OPC-10000-7 §6.6.17 Standard DataChange Subscription storage; zero unless
  * the Standard facet is enabled. */
 #define MU_SUBSCRIPTIONS_STANDARD_STORAGE_BYTES                                                                        \
-    (MU_MAX_MONITORED_ITEMS * (MU_MONITORED_QUEUE_DEPTH * 96 + MU_MAX_TRIGGER_LINKS * 8 + 128))
+    (MU_MAX_MONITORED_ITEMS * (MU_MONITORED_QUEUE_DEPTH * 96 + MU_MAX_TRIGGER_LINKS * 8 + 200))
 #else
 #define MU_SUBSCRIPTIONS_STANDARD_STORAGE_BYTES 0
 #endif

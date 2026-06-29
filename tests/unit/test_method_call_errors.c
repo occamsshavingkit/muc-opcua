@@ -39,6 +39,18 @@ void tearDown(void) {}
 #define MU_STATUS_BAD_INVALIDARGUMENT ((opcua_statuscode_t)0x80AB0000u)
 #endif
 
+static const mu_reference_t s_empty_refs[1] = {{0}};
+static const mu_node_t s_user_nodes[] = {
+    {{0, MU_NODEID_NUMERIC, {ID_SERVER_OBJECT}},
+     MU_NODECLASS_OBJECT,
+     {6, (const opcua_byte_t *)"Server"},
+     {6, (const opcua_byte_t *)"Server"},
+     s_empty_refs,
+     0,
+     NULL}
+};
+static const mu_address_space_t s_user_space = {s_user_nodes, sizeof(s_user_nodes) / sizeof(s_user_nodes[0])};
+
 static void prepare_server(mu_server_t *server) {
     opcua_uint32_t revised_lifetime = 0u;
     opcua_uint64_t revised_timeout = 0u;
@@ -46,6 +58,7 @@ static void prepare_server(mu_server_t *server) {
     opcua_uint32_t auth_token = 0u;
 
     memset(server, 0, sizeof(*server));
+    server->config.address_space = &s_user_space;
     mu_secure_channel_init(&server->secure_channel);
     TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD,
                             mu_secure_channel_open(&server->secure_channel, NULL, MU_MESSAGE_SECURITY_MODE_NONE,
@@ -58,6 +71,9 @@ static void prepare_server(mu_server_t *server) {
     TEST_ASSERT_EQUAL_UINT32(AUTH_TOKEN, auth_token);
     TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_session_activate(&server->sessions[0], auth_token,
                                                                 MU_ID_ANONYMOUSIDENTITYTOKEN_ENCODING_DEFAULTBINARY));
+    server->sessions[0].secure_channel_id = server->secure_channel.channel_id;
+    server->conns[0].client_handle = (void *)1;
+    server->conns[0].secure_channel = server->secure_channel;
     mu_subscriptions_init(&server->subs);
 }
 

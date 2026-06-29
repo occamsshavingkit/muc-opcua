@@ -126,9 +126,11 @@ static opcua_uint32_t parse_response(const opcua_byte_t *buf, size_t len, mu_bin
 }
 
 static int g_batch_write_count = 0;
-static opcua_statuscode_t mock_write_handler(void *handle, const mu_nodeid_t *node_id, const mu_variant_t *value) {
+static opcua_statuscode_t mock_write_handler(void *handle, const mu_nodeid_t *node_id, opcua_uint32_t attribute_id,
+                                             const mu_variant_t *value) {
     (void)handle;
     (void)node_id;
+    (void)attribute_id;
     (void)value;
     g_batch_write_count++;
     return MU_STATUS_GOOD;

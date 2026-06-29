@@ -12,8 +12,10 @@ static mu_nodeid_t g_last_write_node;
 static mu_variant_t g_last_write_val;
 static int g_write_count = 0;
 
-static opcua_statuscode_t mock_write_handler(void *handle, const mu_nodeid_t *node_id, const mu_variant_t *value) {
+static opcua_statuscode_t mock_write_handler(void *handle, const mu_nodeid_t *node_id, opcua_uint32_t attribute_id,
+                                             const mu_variant_t *value) {
     (void)handle;
+    (void)attribute_id;
     g_last_write_node = *node_id;
     g_last_write_val = *value;
     g_write_count++;

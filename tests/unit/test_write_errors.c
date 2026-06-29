@@ -14,9 +14,11 @@ void setUp(void) {}
 void tearDown(void) {}
 
 #ifdef MICRO_OPCUA_SERVICE_WRITE
-static opcua_statuscode_t dummy_write_handler(void *handle, const mu_nodeid_t *node_id, const mu_variant_t *value) {
+static opcua_statuscode_t dummy_write_handler(void *handle, const mu_nodeid_t *node_id, opcua_uint32_t attribute_id,
+                                              const mu_variant_t *value) {
     (void)handle;
     (void)node_id;
+    (void)attribute_id;
     (void)value;
     return MU_STATUS_GOOD;
 }
@@ -156,7 +158,7 @@ void test_write_service_non_value_attribute(void) {
 
     opcua_statuscode_t item_status;
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_statuscode(&resp_reader, &item_status));
-    TEST_ASSERT_EQUAL(MU_STATUS_BAD_ATTRIBUTEIDINVALID, item_status);
+    TEST_ASSERT_EQUAL(MU_STATUS_BAD_NOTWRITABLE, item_status);
 }
 
 void test_write_service_index_range(void) {

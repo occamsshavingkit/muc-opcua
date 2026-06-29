@@ -38,7 +38,7 @@ This roadmap outlines the planned feature milestones and maintenance tasks for t
   - Allow authorized clients to dynamically build the address space at runtime.
 - [x] **Feature 015: Query Services**
   - Implement `QueryFirst` and `QueryNext` to allow clients to search the address space using complex filters.
-- [ ] **Feature 016: Advanced Alarms & Conditions**
+- [x] **Feature 016: Advanced Alarms & Conditions**
   - Expand the basic event system to support Acknowledgeable Conditions, Active/Inactive states, and Dialogs.
 
 **🔍 Milestone Audit B: Documentation & Memory Model Audit**
