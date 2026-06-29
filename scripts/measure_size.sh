@@ -69,6 +69,7 @@ for profile in $profiles; do
                 -DMICRO_OPCUA_SERVICE_HISTORY=OFF
                 -DMICRO_OPCUA_SERVICE_QUERY=OFF
                 -DMICRO_OPCUA_SERVICE_NODEMANAGEMENT=OFF
+                -DMICRO_OPCUA_PUBSUB=OFF
             )
             ;;
         micro)
@@ -85,6 +86,7 @@ for profile in $profiles; do
                 -DMICRO_OPCUA_SERVICE_HISTORY=OFF
                 -DMICRO_OPCUA_SERVICE_QUERY=OFF
                 -DMICRO_OPCUA_SERVICE_NODEMANAGEMENT=OFF
+                -DMICRO_OPCUA_PUBSUB=OFF
             )
             ;;
         embedded)

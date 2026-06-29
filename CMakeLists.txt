@@ -4,6 +4,12 @@ cmake_minimum_required(VERSION 3.20)
 option(MICRO_OPCUA_BUILD_TESTS "Build tests" OFF)
 option(MICRO_OPCUA_BUILD_EXAMPLES "Build examples" OFF)
 option(MICRO_OPCUA_BUILD_FUZZERS "Build fuzzers" OFF)
+if(MICRO_OPCUA_BUILD_TESTS OR MICRO_OPCUA_BUILD_EXAMPLES OR MICRO_OPCUA_BUILD_FUZZERS)
+    set(MICRO_OPCUA_DEFAULT_OPTION_VAL ON)
+else()
+    set(MICRO_OPCUA_DEFAULT_OPTION_VAL OFF)
+endif()
+
 # SecurityPolicy Basic256Sha256 support (asym/sym chunk crypto, ~10 KB code).
 # Turn OFF for a SecurityPolicy-None-only build to drop the crypto layer entirely.
 option(MICRO_OPCUA_SECURITY "Build SecurityPolicy Basic256Sha256 support" ON)
@@ -13,11 +19,11 @@ option(MICRO_OPCUA_SECURITY "Build SecurityPolicy Basic256Sha256 support" ON)
 option(MICRO_OPCUA_SERVICE_READ "Build the Read service" ON)
 option(MICRO_OPCUA_SERVICE_BROWSE "Build the Browse + BrowseNext + TranslateBrowsePaths services" ON)
 option(MICRO_OPCUA_SERVICE_DISCOVERY "Build GetEndpoints/FindServers" ON)
-option(MICRO_OPCUA_SERVICE_REGISTER_NODES "Build RegisterNodes/UnregisterNodes" ON)
-option(MICRO_OPCUA_SERVICE_WRITE "Build the optional Write service (Value attribute only)" ON)
-option(MICRO_OPCUA_SERVICE_HISTORY "Build Historical Access" ON)
-option(MICRO_OPCUA_SERVICE_QUERY "Build the Query services" ON)
-option(MICRO_OPCUA_SERVICE_NODEMANAGEMENT "Build the optional NodeManagement service set" ON)
+option(MICRO_OPCUA_SERVICE_REGISTER_NODES "Build RegisterNodes/UnregisterNodes" ${MICRO_OPCUA_DEFAULT_OPTION_VAL})
+option(MICRO_OPCUA_SERVICE_WRITE "Build the optional Write service (Value attribute only)" ${MICRO_OPCUA_DEFAULT_OPTION_VAL})
+option(MICRO_OPCUA_SERVICE_HISTORY "Build Historical Access" ${MICRO_OPCUA_DEFAULT_OPTION_VAL})
+option(MICRO_OPCUA_SERVICE_QUERY "Build the Query services" ${MICRO_OPCUA_DEFAULT_OPTION_VAL})
+option(MICRO_OPCUA_SERVICE_NODEMANAGEMENT "Build the optional NodeManagement service set" ${MICRO_OPCUA_DEFAULT_OPTION_VAL})
 # The library's standard Base Information node set (Server object hierarchy,
 # ServerStatus, ServerCapabilities). Turn OFF if the integrator supplies a complete
 # address space and does not want the default nodes.
@@ -29,7 +35,7 @@ option(MICRO_OPCUA_BASE_TYPE_SYSTEM "Expose the Base Info Type System node set u
 option(MICRO_OPCUA_SUBSCRIPTIONS "Build the data-change subscription engine (Micro profile)" ON)
 option(MICRO_OPCUA_SUBSCRIPTIONS_STANDARD "Build the Standard DataChange Subscription 2017 facet additions" OFF)
 option(MICRO_OPCUA_EMBEDDED_PROFILE "Apply Embedded 2017 profile gates and capacity minima" OFF)
-option(MICRO_OPCUA_PUBSUB "Build Publish/Subscribe capabilities" ON)
+option(MICRO_OPCUA_PUBSUB "Build Publish/Subscribe capabilities" ${MICRO_OPCUA_DEFAULT_OPTION_VAL})
 set(MICRO_OPCUA_SANITIZERS "" CACHE STRING "Comma-separated list of sanitizers (e.g. address,undefined)")
 set(MICRO_OPCUA_PLATFORM "host" CACHE STRING "Target platform (host, pico, arduino-skeleton)")
 
