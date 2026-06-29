@@ -1904,8 +1904,8 @@ static opcua_statuscode_t handle_create_monitored_items(mu_server_t *server, mu_
         memcpy(item->select_clauses, body.select_clauses, sizeof(item->select_clauses));
 #endif
 #if MICRO_OPCUA_SUBSCRIPTIONS_STANDARD
-        item->trigger = body.trigger;
-        item->deadband_type = body.deadband_type;
+        item->trigger = (opcua_byte_t)body.trigger;
+        item->deadband_type = (opcua_byte_t)body.deadband_type;
         item->deadband_value = body.deadband_value;
         item->queue_size = body.queue_size;
         if (item->queue_size == 0u) {
