@@ -56,8 +56,8 @@ This roadmap outlines the planned feature milestones and maintenance tasks for t
 - [x] **Feature 018: Aggregate Subscriptions**
   - Support for calculating averages, mins, maxes over time periods during publishing.
 
-**🔍 Milestone Audit C: Final API & Conformance Audit**
-*Complete review of `docs/api-reference.md` and conformance matrices for HA.*
+- [x] **🔍 Milestone Audit C: Final API & Conformance Audit**
+  - Complete review of `docs/api-reference.md` and conformance matrices for HA.
 
 ---
 
