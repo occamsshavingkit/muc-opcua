@@ -84,6 +84,11 @@ if(MICRO_OPCUA_SERVICE_WRITE)
     target_compile_definitions(micro_opcua PUBLIC MICRO_OPCUA_SERVICE_WRITE=1)
 endif()
 
+if(MICRO_OPCUA_SERVICE_HISTORY)
+    target_sources(micro_opcua PRIVATE services/history.c)
+    target_compile_definitions(micro_opcua PUBLIC MICRO_OPCUA_SERVICE_HISTORY=1)
+endif()
+
 if(MICRO_OPCUA_MULTIPLE_CONNECTIONS)
     target_compile_definitions(micro_opcua PUBLIC MICRO_OPCUA_MULTIPLE_CONNECTIONS=1)
 endif()

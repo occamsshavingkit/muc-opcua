@@ -10,6 +10,9 @@
 #ifdef MICRO_OPCUA_PUBSUB
 #include "micro_opcua/pubsub.h"
 #endif
+#ifdef MICRO_OPCUA_SERVICE_HISTORY
+#include "micro_opcua/services/history.h"
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -76,6 +79,10 @@ typedef struct {
 #ifdef MICRO_OPCUA_SERVICE_WRITE
     mu_write_handler_t write_handler;
     void *write_handler_handle;
+#endif
+
+#ifdef MICRO_OPCUA_SERVICE_HISTORY
+    mu_history_adapter_t history_adapter;
 #endif
 
 } mu_server_config_t;

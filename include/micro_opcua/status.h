@@ -52,6 +52,7 @@
 #define MU_STATUS_BAD_NOTWRITABLE ((opcua_statuscode_t)0x803B0000)
 #define MU_STATUS_BAD_WRITENOTSUPPORTED ((opcua_statuscode_t)0x803C0000)
 #define MU_STATUS_BAD_TYPEMISMATCH ((opcua_statuscode_t)0x80740000)
+#define MU_STATUS_BAD_HISTORYOPERATIONUNSUPPORTED ((opcua_statuscode_t)0x80BD0000)
 
 /* TCP Specific StatusCodes */
 #define MU_STATUS_BAD_TCPSERVERTOOBUSY 0x807D0000

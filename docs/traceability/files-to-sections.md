@@ -103,10 +103,21 @@ This document maps implementation and test files back to OPC UA normative sectio
 | `discovery.c` | TBD | TBD | TBD | TBD |
 | `secure_channel.c` | TBD | TBD | TBD | TBD |
 | `browse.h` | TBD | TBD | TBD | TBD |
+| `services/alarms_conditions.h` | 9. | 5.11 | Advanced alarms and conditions |
+| `services/history.h` | 4, 11 | 5.10.3, 5.10.4 | Historical Access structures and types |
 | `session.c` | TBD | TBD | TBD | TBD |
 | `read.c` | TBD | TBD | TBD | TBD |
 | `write.h` | Attribute Write | Part 4 | 5.10.4 | Write service interface |
 | `write.c` | Attribute Write | Part 4 | 5.10.4 | Write service implementation |
+
+### Implementation (`src/`)
+
+| File | Part | Sections | Notes |
+|------|------|----------|-------|
+| `core/server.c` | 4 | 5.4, 5.5 | Service dispatch |
+| `services/alarms_conditions.c` | 9 | 5.11 | Alarms and Conditions execution |
+| `services/history.c` | 4, 11 | 5.10.3, 5.10.4 | HistoryRead, HistoryUpdate parsing and dispatch |
+| `services/read.c` | 4 | 5.10.2 | Read service implementation |
 | `secure_channel.h` | TBD | TBD | TBD | TBD |
 | `discovery.h` | TBD | TBD | TBD | TBD |
 | `service_dispatch.c` | TBD | TBD | TBD | TBD |
