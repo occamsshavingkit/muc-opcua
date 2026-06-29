@@ -12,6 +12,7 @@ add_library(micro_opcua STATIC
     services/session.c
     services/service_header.c
     services/discovery.c
+    services/alarms_conditions.c
     address_space/address_space.c
     address_space/base_nodes.c
     address_space/node_id.c

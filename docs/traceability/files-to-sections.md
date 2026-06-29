@@ -140,3 +140,6 @@ This document maps implementation and test files back to OPC UA normative sectio
 | `test_wolfssl_adapter.c` | Tests | Part 7 | 6.x | Test wolfSSL crypto adapter |
 | `src/security/trustlist.c` | TrustList | Part 4 | 5.6.2 | Application Authentication TrustList |
 | `include/micro_opcua/security.h` | TrustList | Part 4 | 5.6.2 | Application Authentication TrustList Header |
+| `include/micro_opcua/services/alarms_conditions.h` | Alarms and Conditions | Part 9 | 5.5, 5.7, 5.8 | Alarms & Conditions types and API |
+| `src/services/alarms_conditions.c` | Alarms and Conditions | Part 9 | 5.5, 5.7, 5.8 | Alarms & Conditions method processing |
+| `tests/unit/test_alarms_conditions.c` | Tests | Part 9 | 5.5, 5.7, 5.8 | Test Alarms & Conditions functionality |
