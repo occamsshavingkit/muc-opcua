@@ -8,19 +8,19 @@ are supported.
 | Service | OPC 10000-4 § | Status | Notes |
 |---------|---------------|--------|-------|
 | FindServers | 5.5.2 | Implemented | Returns this server's ApplicationDescription |
-| GetEndpoints | 5.5.3 | Implemented | None + Basic256Sha256 (Sign / SignAndEncrypt) endpoints |
+| GetEndpoints | 5.5.4.2 | Implemented | None + Basic256Sha256 (Sign / SignAndEncrypt) endpoints; applies `profileUris` transport-profile filtering |
 | OpenSecureChannel | 5.6.2 | Implemented | None and Basic256Sha256 (asymmetric handshake) |
 | CloseSecureChannel | 5.6.3 | Implemented | |
 | CreateSession | 5.7.2 | Implemented | ServerSignature on secured channels; ServerEndpoints |
 | ActivateSession | 5.7.3 | Implemented | Supports Anonymous, UserName, and X509 identity tokens |
 | CloseSession | 5.7.4 | Implemented | |
-| Read | 5.10.2 | Implemented | Attribute Read incl. the Base Information nodes |
+| Read | 5.11.2 | Implemented | Attribute Read incl. the Base Information nodes |
 | Browse | 5.9.2 | Implemented | HierarchicalReferences + includeSubtypes |
 | BrowseNext | 5.9.3 | Implemented | No continuation points issued -> `Bad_ContinuationPointInvalid` |
 | TranslateBrowsePathsToNodeIds | 5.9.4 | Implemented | RelativePath walk over the address space; `Bad_NoMatch` |
 | RegisterNodes | 5.9.5 | Implemented | Identity mapping (NodeIds copied back) |
 | UnregisterNodes | 5.9.6 | Implemented | No-op, returns Good |
-| Write | 5.10.3 | Implemented | Supported behind `MICRO_OPCUA_SERVICE_WRITE` |
+| Write | 5.11.4 | Implemented | Supported behind `MICRO_OPCUA_SERVICE_WRITE` |
 | Call | 5.11.2 | Implemented | Behind `MICRO_OPCUA_EMBEDDED_PROFILE` (supports GetMonitoredItems/ResendData + custom methods) |
 | CreateMonitoredItems | 5.13.2 | Implemented | Data-change monitoring; initial sample; `Bad_NodeIdUnknown` / `Bad_TooManyMonitoredItems` |
 | ModifyMonitoredItems | 5.13.3 | Implemented | Revised sampling interval / clientHandle |
@@ -34,7 +34,7 @@ are supported.
 | TransferSubscriptions | 5.14.7 | Unsupported | Above the Embedded DataChange facet (Standard tier) |
 | DeleteSubscriptions | 5.14.8 | Implemented | Deletes the subscription and its MonitoredItems |
 | SetTriggering | 5.13.5 | Implemented | Behind MICRO_OPCUA_EMBEDDED_PROFILE (links monitored items within a subscription) |
-| HistoryRead / HistoryUpdate | 5.10 | Implemented | Behind `MICRO_OPCUA_SERVICE_HISTORY`, persistence adapter based |
+| HistoryRead / HistoryUpdate | 5.11.3 / 5.11.5 | Implemented | Behind `MICRO_OPCUA_SERVICE_HISTORY`, persistence adapter based |
 | AddNodes / DeleteNodes / AddReferences / DeleteReferences | 5.7 | Implemented | Behind `MICRO_OPCUA_SERVICE_NODEMANAGEMENT` and `MICRO_OPCUA_DYNAMIC_NODES` |
 | QueryFirst / QueryNext | 5.9.x | Implemented | Behind `MICRO_OPCUA_SERVICE_QUERY` |
 
@@ -50,4 +50,6 @@ build option (`tests/integration/test_subscriptions.c`). The Standard DataChange
 facet is supported under `MICRO_OPCUA_EMBEDDED_PROFILE=ON`, which implements SetTriggering,
 Call (with GetMonitoredItems/ResendData methods), and larger monitored-item/queue bounds.
 The TransferSubscriptions service remains unsupported. Aggregate filters (Average/Min/Max)
-are supported under `MICRO_OPCUA_SUBSCRIPTIONS_STANDARD` (Feature 018).
+are supported under `MICRO_OPCUA_SUBSCRIPTIONS_STANDARD` as scoped `AggregateFilter`
+support per OPC-10000-4 §7.22.4 and OPC-10000-13 §5.4.3.5, §5.4.3.10, and §5.4.3.11
+(Feature 018).

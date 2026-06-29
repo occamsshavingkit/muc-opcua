@@ -56,8 +56,8 @@ As an OPC UA client, I want to subscribe to a variable's minimum and maximum val
 
 ### OPC UA Normative Scope *(mandatory for protocol features)*
 
-- **OPC-001**: Target OPC UA conformance units are Monitored Item Aggregate Filter (Part 4, 7.16) and standard Aggregate Types (Part 13).
-- **OPC-002**: Implemented filters are `AggregateFilter` (Part 4, 7.16.3). Supported NodeIds are `Average` (11565), `Minimum` (11569), and `Maximum` (11570).
+- **OPC-001**: Target OPC UA scope is the scoped MonitoredItem `AggregateFilter` behavior defined by OPC-10000-4 §7.22.4 and standard AggregateFunction objects from OPC-10000-13.
+- **OPC-002**: Implemented filters are `AggregateFilter` (OPC-10000-4 §7.22.4). Supported namespace 0 NodeIds are `Average` (`2342`, OPC-10000-13 §4.2.2.4), `Minimum` (`2346`, OPC-10000-13 §4.2.2.9), and `Maximum` (`2347`, OPC-10000-13 §4.2.2.10).
 - **OPC-003**: Unsupported aggregate types or configurations return `Bad_MonitoredItemFilterUnsupported` or `Bad_FilterNotAllowed`.
 - **OPC-004**: Wire encoding uses standard binary representations of `AggregateFilter` and `AggregateConfiguration`.
 
@@ -65,7 +65,7 @@ As an OPC UA client, I want to subscribe to a variable's minimum and maximum val
 
 - **In Scope**: `AggregateFilter` support for `Average`, `Minimum`, and `Maximum` on numeric variables. Bounded running calculators stored within monitored item instances.
 - **Out of Scope**: Historical aggregates (aggregates queried via HistoryRead - this is part of Feature 017 but is a separate enterprise profile). Complex aggregates like StandardDeviation, Variance, or custom configurations are out of scope.
-- **Compatibility Claim**: Monitored Item Aggregate Filter Facet.
+- **Compatibility Claim**: Profile-targeting scoped MonitoredItem AggregateFilter support for Average, Minimum, and Maximum; not CTT-verified.
 - **Application Headroom Goal**: The implementation must add <2KB of flash and 0 bytes of heap memory. MonitoredItem structure footprint growth must be limited to <32 bytes.
 
 ### Key Entities *(include if feature involves data)*

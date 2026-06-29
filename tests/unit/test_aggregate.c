@@ -131,6 +131,97 @@ static opcua_uint32_t create_subscription(mu_server_t *server) {
     return sub_id;
 }
 
+static opcua_statuscode_t create_aggregate_item_result(mu_server_t *server, opcua_uint32_t sub_id,
+                                                       opcua_uint32_t aggregate_type) {
+    opcua_byte_t req[512];
+    mu_binary_writer_t w;
+    mu_binary_writer_init(&w, req, sizeof(req));
+    write_request_header(&w, 22);
+    mu_binary_write_uint32(&w, sub_id);
+    mu_binary_write_uint32(&w, 0);
+    mu_binary_write_int32(&w, 1);
+
+    mu_nodeid_t node_id = {1, MU_NODEID_NUMERIC, {1000}};
+    mu_binary_write_nodeid(&w, &node_id);
+    mu_binary_write_uint32(&w, 13);
+    mu_string_t null_str = {-1, NULL};
+    mu_binary_write_string(&w, &null_str);
+    mu_binary_write_uint16(&w, 0);
+    mu_binary_write_string(&w, &null_str);
+    mu_binary_write_uint32(&w, 2);
+    mu_binary_write_uint32(&w, 42);
+    mu_binary_write_double(&w, 100.0);
+
+    mu_nodeid_t filter_type = {0, MU_NODEID_NUMERIC, {MU_ID_AGGREGATEFILTER_ENCODING_DEFAULTBINARY}};
+    mu_binary_write_extension_object_header(&w, &filter_type, 8 + 8 + 5 + 5);
+
+    mu_binary_write_int64(&w, 0);
+    mu_nodeid_t agg_type = {0, MU_NODEID_NUMERIC, {aggregate_type}};
+    mu_binary_write_nodeid(&w, &agg_type);
+    mu_binary_write_double(&w, 5000.0);
+    mu_binary_write_boolean(&w, true);
+    mu_binary_write_boolean(&w, false);
+    mu_binary_write_byte(&w, 0);
+    mu_binary_write_byte(&w, 0);
+    mu_binary_write_boolean(&w, false);
+
+    mu_binary_write_uint32(&w, 1);
+    mu_binary_write_boolean(&w, true);
+
+    opcua_byte_t resp[512];
+    size_t resp_len = sizeof(resp);
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_service_dispatch(server, MU_ID_CREATEMONITOREDITEMSREQUEST, req, w.position,
+                                                          resp, &resp_len));
+
+    mu_binary_reader_t r;
+    mu_binary_reader_init(&r, resp, resp_len);
+    mu_nodeid_t type;
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_nodeid(&r, &type));
+
+    opcua_uint32_t handle;
+    opcua_statuscode_t result;
+    skip_response_header(&r, &handle, &result);
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, result);
+
+    opcua_int32_t results_count;
+    mu_binary_read_int32(&r, &results_count);
+    TEST_ASSERT_EQUAL(1, results_count);
+
+    opcua_statuscode_t item_result;
+    mu_binary_read_statuscode(&r, &item_result);
+    return item_result;
+}
+
+void test_aggregate_standard_nodeids_match_opcua_nodeset(void) {
+    /* OPC-10000-4 §7.22.4 AggregateFilter; OPC-10000-6 §5.2.2.9 NodeId;
+       OPC-10000-6 §5.2.2.15 ExtensionObject; OPC-10000-13 §4.2.2.4,
+       §4.2.2.9, and §4.2.2.10 AggregateFunction objects. Numeric values are
+       from OPC Foundation UA NodeSet NodeIds.csv. */
+    TEST_ASSERT_EQUAL_UINT32(730u, MU_ID_AGGREGATEFILTER_ENCODING_DEFAULTBINARY);
+    TEST_ASSERT_EQUAL_UINT32(2342u, MU_ID_AGGREGATETYPE_AVERAGE);
+    TEST_ASSERT_EQUAL_UINT32(2346u, MU_ID_AGGREGATETYPE_MINIMUM);
+    TEST_ASSERT_EQUAL_UINT32(2347u, MU_ID_AGGREGATETYPE_MAXIMUM);
+}
+
+void test_aggregate_filter_rejects_stale_operation_limits_nodeids(void) {
+    /* OPC-10000-13 aggregate functions are ns=0;i=2342/2346/2347. The stale
+       11565/11569/11570 values are OperationLimits variables, not aggregate
+       functions, and must be rejected by OPC-10000-4 §5.13.2.4 filter rules. */
+    mu_server_t server;
+    activated_server(&server);
+    opcua_uint32_t sub_id = create_subscription(&server);
+
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_BAD_MONITOREDITEMFILTERUNSUPPORTED,
+                            create_aggregate_item_result(&server, sub_id, 11565u));
+    TEST_ASSERT_FALSE(server.subs.monitored_items[0].in_use);
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_BAD_MONITOREDITEMFILTERUNSUPPORTED,
+                            create_aggregate_item_result(&server, sub_id, 11569u));
+    TEST_ASSERT_FALSE(server.subs.monitored_items[0].in_use);
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_BAD_MONITOREDITEMFILTERUNSUPPORTED,
+                            create_aggregate_item_result(&server, sub_id, 11570u));
+    TEST_ASSERT_FALSE(server.subs.monitored_items[0].in_use);
+}
+
 void test_aggregate_filter_decodes_correctly(void) {
     mu_server_t server;
     activated_server(&server);
@@ -581,6 +672,8 @@ void test_aggregate_requires_standard_subscriptions(void) {
 int main(void) {
     UNITY_BEGIN();
 #if MICRO_OPCUA_SUBSCRIPTIONS && MICRO_OPCUA_SUBSCRIPTIONS_STANDARD
+    RUN_TEST(test_aggregate_standard_nodeids_match_opcua_nodeset);
+    RUN_TEST(test_aggregate_filter_rejects_stale_operation_limits_nodeids);
     RUN_TEST(test_aggregate_filter_decodes_correctly);
     RUN_TEST(test_aggregate_filter_fails_on_non_numeric);
     RUN_TEST(test_aggregate_filter_fails_on_unsupported_aggregate_type);

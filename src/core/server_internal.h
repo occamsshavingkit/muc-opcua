@@ -33,8 +33,11 @@ typedef struct {
     opcua_uint64_t last_activity_ms;
     mu_tcp_connection_t tcp_conn;
     mu_secure_channel_t secure_channel;
-    opcua_byte_t rx_buffer[2048];
+    opcua_byte_t rx_buffer[MU_CONNECTION_RX_BUFFER_SIZE];
 } mu_connection_t;
+
+_Static_assert(sizeof(mu_connection_t) <= (MU_CONNECTION_RX_BUFFER_SIZE + MU_CONNECTION_BASE_STORAGE_BYTES),
+               "MU_CONNECTION_BASE_STORAGE_BYTES must cover mu_connection_t fields outside rx_buffer");
 #endif
 
 struct mu_server {

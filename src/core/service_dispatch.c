@@ -1092,12 +1092,82 @@ static opcua_statuscode_t handle_close_session(mu_server_t *server, mu_binary_re
 }
 
 #ifdef MICRO_OPCUA_SERVICE_DISCOVERY
-/* GetEndpoints (OPC 10000-4 5.5.2): return the server's single endpoint. The
-   request's EndpointUrl/LocaleIds/ProfileUris filters are not applied (thin path). */
+static bool string_matches_cstr(const mu_string_t *left, const char *right) {
+    if (left == NULL || right == NULL || left->length < 0 || left->data == NULL) {
+        return false;
+    }
+    size_t right_len = strlen(right);
+    return (size_t)left->length == right_len && memcmp(left->data, right, right_len) == 0;
+}
+
+static opcua_statuscode_t skip_string_array(mu_binary_reader_t *r, opcua_int32_t *count_out) {
+    opcua_int32_t count;
+    opcua_statuscode_t s = mu_binary_read_int32(r, &count);
+    if (s != MU_STATUS_GOOD) {
+        return s;
+    }
+    if (count < 0) {
+        if (count_out != NULL) {
+            *count_out = count;
+        }
+        return MU_STATUS_GOOD;
+    }
+    for (opcua_int32_t i = 0; i < count; ++i) {
+        mu_string_t ignored;
+        s = mu_binary_read_string(r, &ignored);
+        if (s != MU_STATUS_GOOD) {
+            return s;
+        }
+    }
+    if (count_out != NULL) {
+        *count_out = count;
+    }
+    return MU_STATUS_GOOD;
+}
+
+static opcua_statuscode_t endpoint_matches_profile_filter(mu_binary_reader_t *r,
+                                                          const mu_endpoint_description_t *endpoint,
+                                                          bool *matches) {
+    opcua_int32_t profile_count;
+    opcua_statuscode_t s = mu_binary_read_int32(r, &profile_count);
+    if (s != MU_STATUS_GOOD) {
+        return s;
+    }
+    if (profile_count <= 0) {
+        *matches = true;
+        return MU_STATUS_GOOD;
+    }
+
+    *matches = false;
+    for (opcua_int32_t i = 0; i < profile_count; ++i) {
+        mu_string_t profile_uri;
+        s = mu_binary_read_string(r, &profile_uri);
+        if (s != MU_STATUS_GOOD) {
+            return s;
+        }
+        if (string_matches_cstr(&profile_uri, endpoint->transport_profile_uri)) {
+            *matches = true;
+        }
+    }
+    return MU_STATUS_GOOD;
+}
+
+/* GetEndpoints (OPC-10000-4 §5.5.4.2): return endpoints matching the requested
+   transport profile URI filter. EndpointUrl and locale negotiation remain a
+   documented minimal-server subset. */
 static opcua_statuscode_t handle_get_endpoints(mu_server_t *server, mu_binary_reader_t *r, mu_binary_writer_t *w,
                                                size_t *response_length) {
     mu_request_header_t req;
     opcua_statuscode_t s = mu_request_header_decode(r, &req);
+    if (s != MU_STATUS_GOOD)
+        return s;
+
+    mu_string_t endpoint_url;
+    s = mu_binary_read_string(r, &endpoint_url);
+    if (s != MU_STATUS_GOOD)
+        return s;
+
+    s = skip_string_array(r, NULL); /* localeIds[] */
     if (s != MU_STATUS_GOOD)
         return s;
 
@@ -1107,13 +1177,32 @@ static opcua_statuscode_t handle_get_endpoints(mu_server_t *server, mu_binary_re
     if (s != MU_STATUS_GOOD)
         return s;
 
+    bool include[MU_DISCOVERY_MAX_ENDPOINTS] = {false};
+    size_t filtered_count = 0;
+    const size_t bounded_count = count > MU_DISCOVERY_MAX_ENDPOINTS ? MU_DISCOVERY_MAX_ENDPOINTS : count;
+    const size_t profile_filter_pos = r->position;
+    for (size_t i = 0; i < bounded_count; ++i) {
+        r->position = profile_filter_pos;
+        r->status = MU_STATUS_GOOD;
+        bool matches = false;
+        s = endpoint_matches_profile_filter(r, &eps[i], &matches);
+        if (s != MU_STATUS_GOOD)
+            return s;
+        if (matches) {
+            include[i] = true;
+            ++filtered_count;
+        }
+    }
+
     s = write_response_prefix(w, MU_ID_GETENDPOINTSRESPONSE, req.request_handle, MU_STATUS_GOOD);
     if (s != MU_STATUS_GOOD)
         return s;
-    s = mu_binary_write_int32(w, (opcua_int32_t)count); /* Endpoints[] */
+    s = mu_binary_write_int32(w, (opcua_int32_t)filtered_count); /* Endpoints[] */
     if (s != MU_STATUS_GOOD)
         return s;
-    for (size_t i = 0; i < count; ++i) {
+    for (size_t i = 0; i < bounded_count; ++i) {
+        if (!include[i])
+            continue;
         s = mu_endpoint_description_encode(w, &eps[i]);
         if (s != MU_STATUS_GOOD)
             return s;
@@ -1422,12 +1511,17 @@ static opcua_statuscode_t read_aggregate_filter_body(mu_binary_reader_t *r, size
         return MU_STATUS_GOOD;
     }
 
+    /* OPC-10000-4 §7.22.4 carries an AggregateFunction NodeId. This scoped
+       subscription implementation supports only the OPC-10000-13 §5.4.3.5
+       Average, §5.4.3.10 Minimum, and §5.4.3.11 Maximum functions. */
     if (body->aggregate_type != MU_ID_AGGREGATETYPE_AVERAGE && body->aggregate_type != MU_ID_AGGREGATETYPE_MINIMUM &&
         body->aggregate_type != MU_ID_AGGREGATETYPE_MAXIMUM) {
         body->filter_result = MU_STATUS_BAD_MONITOREDITEMFILTERUNSUPPORTED;
         return MU_STATUS_GOOD;
     }
 
+    /* OPC-10000-4 §5.13.2.4 / §5.13.3.4: invalid filter parameters are
+       reported as per-item filter StatusCodes, not as a service failure. */
     if (processing_interval <= 0.0) {
         body->filter_result = MU_STATUS_BAD_FILTERNOTALLOWED;
         return MU_STATUS_GOOD;

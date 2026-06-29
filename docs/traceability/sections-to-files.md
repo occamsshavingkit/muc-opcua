@@ -10,7 +10,7 @@ This document maps explicit OPC UA normative sections to implementation and test
 | 3 | 5.9 | NodeClass Attributes | `include/micro_opcua/address_space.h`, `src/address_space/value_source.c` |
 | 4 | 5.5.1 | Discovery Service Set | `src/services/discovery.c`, `src/core/server.c` |
 | 4 | 5.5.2 | FindServers | `src/services/discovery.c` |
-| 4 | 5.5.4 | GetEndpoints | `src/services/discovery.c` |
+| 4 | 5.5.4.2 | GetEndpoints parameters and profileUris filtering | `src/core/service_dispatch.c`, `src/services/discovery.c`, `tests/unit/test_discovery_endpoint.c` |
 | 4 | 5.6.2 | OpenSecureChannel | `src/services/secure_channel.c` |
 | 4 | 5.6.3 | CloseSecureChannel | `src/services/secure_channel.c` |
 | 4 | 5.7.2 | CreateSession | `src/services/session.c` |
@@ -22,6 +22,10 @@ This document maps explicit OPC UA normative sections to implementation and test
 | 4 | 7.32 | RequestHeader | `src/core/service_message.c` |
 | 4 | 7.33 | ResponseHeader | `src/core/service_message.c` |
 | 4 | 7.38.2 | Common StatusCodes | `src/core/status.c` |
+| 4 | 7.22.4 | AggregateFilter | `src/core/service_dispatch.c`, `tests/unit/test_aggregate.c`, `specs/018-aggregate-subscriptions/spec.md` |
+| 13 | 5.4.3.5 | Average aggregate | `src/services/subscription.c`, `tests/unit/test_aggregate.c` |
+| 13 | 5.4.3.10 | Minimum aggregate | `src/services/subscription.c`, `tests/unit/test_aggregate.c` |
+| 13 | 5.4.3.11 | Maximum aggregate | `src/services/subscription.c`, `tests/unit/test_aggregate.c` |
 | 4 | 7.40.1 | UserIdentityToken | `src/encoding/binary_extension_object.c` |
 | 4 | 7.40.3 | AnonymousIdentityToken | `src/encoding/binary_extension_object.c` |
 | 4 | 7.41 | UserTokenPolicy | `src/services/discovery.c` |

@@ -22,7 +22,7 @@
 **Purpose**: Struct definitions and decoder setup
 
 - [x] T003 [P] Define `mu_aggregate_state_t` and update `mu_monitored_item_t` structure in `src/core/subscription.c` or internal headers
-- [x] T004 Define `MU_ID_AGGREGATEFILTER_ENCODING_DEFAULTBINARY` (729) in `include/micro_opcua/opcua_ids.h`
+- [x] T004 Define `MU_ID_AGGREGATEFILTER_ENCODING_DEFAULTBINARY` (`730`, OPC-10000-4 §7.22.4) in `include/micro_opcua/opcua_ids.h`
 - [x] T005 Document target conformance units in `docs/traceability/files-to-sections.md`
 
 ## Phase 3: User Story 1 - Average Aggregate (Priority: P1) [MVP]

@@ -1,4 +1,5 @@
 /* tests/unit/test_build_config.c */
+#include "micro_opcua/config.h"
 #include "unity.h"
 
 void setUp(void) {}
@@ -28,10 +29,17 @@ void test_build_config_wolfssl(void) {
 #endif
 }
 
+void test_build_config_connection_rx_buffer_size_default(void) {
+    /* OPC-10000-6 §7.1.2.3 sets an 8192-byte receive-buffer negotiation floor,
+       so the per-connection backing store cannot be smaller. */
+    TEST_ASSERT_TRUE(MU_CONNECTION_RX_BUFFER_SIZE >= MU_MIN_CHUNK_SIZE);
+}
+
 int main(void) {
     UNITY_BEGIN();
     RUN_TEST(test_build_config_user_auth);
     RUN_TEST(test_build_config_mbedtls);
     RUN_TEST(test_build_config_wolfssl);
+    RUN_TEST(test_build_config_connection_rx_buffer_size_default);
     return UNITY_END();
 }

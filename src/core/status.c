@@ -26,13 +26,8 @@ const char *mu_status_name(opcua_statuscode_t status) {
         return "Bad_NotReadable";
     case MU_STATUS_BAD_SECURITYCHECKSFAILED:
         return "Bad_SecurityChecksFailed";
-#if MICRO_OPCUA_SUBSCRIPTIONS
-    case MU_STATUS_BAD_SEQUENCENUMBERUNKNOWN:
-        return "Bad_SequenceNumberUnknown";
-#else
     case MU_STATUS_BAD_REQUESTTOOLARGE:
         return "Bad_RequestTooLarge";
-#endif
     case MU_STATUS_BAD_RESPONSETOOLARGE:
         return "Bad_ResponseTooLarge";
     case MU_STATUS_BAD_SESSIONIDINVALID:
@@ -49,8 +44,16 @@ const char *mu_status_name(opcua_statuscode_t status) {
         return "Bad_TooManySessions";
     case MU_STATUS_BAD_NODEIDUNKNOWN:
         return "Bad_NodeIdUnknown";
+    case MU_STATUS_BAD_NOTFOUND:
+        return "Bad_NotFound";
     case MU_STATUS_BAD_NODEIDINVALID:
         return "Bad_NodeIdInvalid";
+    case MU_STATUS_BAD_NODEIDEXISTS:
+        return "Bad_NodeIdExists";
+    case MU_STATUS_BAD_NODEIDREJECTED:
+        return "Bad_NodeIdRejected";
+    case MU_STATUS_BAD_NODECLASSINVALID:
+        return "Bad_NodeClassInvalid";
     case MU_STATUS_BAD_METHODINVALID:
         return "Bad_MethodInvalid";
     case MU_STATUS_BAD_ARGUMENTSMISSING:
@@ -76,6 +79,8 @@ const char *mu_status_name(opcua_statuscode_t status) {
 #if MICRO_OPCUA_SUBSCRIPTIONS
     case MU_STATUS_BAD_MESSAGENOTAVAILABLE:
         return "Bad_MessageNotAvailable";
+    case MU_STATUS_BAD_SEQUENCENUMBERUNKNOWN:
+        return "Bad_SequenceNumberUnknown";
     case MU_STATUS_BAD_TOOMANYPUBLISHREQUESTS:
         return "Bad_TooManyPublishRequests";
 #endif
@@ -104,10 +109,16 @@ const char *mu_status_name(opcua_statuscode_t status) {
         return "Bad_TypeMismatch";
     case MU_STATUS_BAD_WRITENOTSUPPORTED:
         return "Bad_WriteNotSupported";
-    case MU_STATUS_BAD_USERCERTIFICATEINVALID:
-        return "Bad_UserCertificateInvalid";
-    case MU_STATUS_BAD_USERCERTIFICATEUNTRUSTED:
-        return "Bad_UserCertificateUntrusted";
+    case MU_STATUS_BAD_HISTORYOPERATIONUNSUPPORTED:
+        return "Bad_HistoryOperationUnsupported";
+    case MU_STATUS_BAD_MONITOREDITEMFILTERUNSUPPORTED:
+        return "Bad_MonitoredItemFilterUnsupported";
+    case MU_STATUS_BAD_MONITOREDITEMFILTERINVALID:
+        return "Bad_MonitoredItemFilterInvalid";
+    case MU_STATUS_BAD_CERTIFICATEINVALID:
+        return "Bad_CertificateInvalid";
+    case MU_STATUS_BAD_CERTIFICATEUNTRUSTED:
+        return "Bad_CertificateUntrusted";
     default:
         return "Unknown_StatusCode";
     }

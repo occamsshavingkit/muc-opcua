@@ -30,7 +30,7 @@ but an OPC Foundation Compliance Test Tool run has not yet been performed.
 | Security Default ApplicationInstance Certificate | OPC-10000-7 §6.6.69 security CU | Satisfied | `src/security/certificate.c`, `test_certificate`, secure handshake tests |
 | Standard DataChange Subscription 2017 facet | OPC-10000-7 §6.6.17 | Implemented | `tests/unit/test_subscriptions_capacity.c`, `tests/integration/test_subscriptions.c` |
 | Monitored Items Deadband Filter | OPC-10000-4 §7.22.2 | Implemented | absolute-deadband coverage in subscription tests |
-| Monitored Items Aggregate Filter | OPC-10000-4 §7.16; OPC-10000-13 | Implemented | Average/Min/Max filters in `src/core/subscription.c`, `tests/unit/test_aggregate.c` |
+| Monitored Items Aggregate Filter | OPC-10000-4 §7.22.4; OPC-10000-13 §5.4.3.5; OPC-10000-13 §5.4.3.10; OPC-10000-13 §5.4.3.11 | Profile-targeting, scoped | Average/Min/Max filters in `src/services/subscription.c`, `tests/unit/test_aggregate.c` |
 | Monitor MinQueueSize_02 | OPC-10000-4 §5.13.2, §7.20.1 | Implemented | queue/discard/overflow coverage in subscription tests |
 | Monitor Triggering | OPC-10000-4 §5.13.5, §5.13.1.6 | Implemented | SetTriggering coverage in subscription tests |
 | Subscription Minimum 02 | OPC-10000-4 §5.14.2 | Implemented | `tests/unit/test_subscriptions_capacity.c` |

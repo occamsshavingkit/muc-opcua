@@ -10,8 +10,8 @@ UA-Binary with SecurityPolicy None and Anonymous identity.
 ## Goal
 
 Close the gap between the current server (connect → discover → session → Browse →
-Read, interop-validated) and a *complete* Nano profile surface, so the server can
-be CTT-verified. The crypto/security work (Basic256Sha256) is already done and is
+Read, interop-validated) and a *complete* Nano profile surface, so the server is
+ready for a future CTT run. The crypto/security work (Basic256Sha256) is already done and is
 above Nano; this feature does **not** add subscriptions (that is the Micro profile).
 
 ## Division of work (per request)
