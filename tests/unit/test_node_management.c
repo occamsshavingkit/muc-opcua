@@ -1,4 +1,5 @@
 /* tests/unit/test_node_management.c */
+#define MICRO_OPCUA_SERVICE_NODEMANAGEMENT 1
 #include "../../src/core/server_internal.h"
 #include "../../src/services/node_management.h"
 #include "micro_opcua/server.h"

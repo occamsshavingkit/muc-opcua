@@ -15,7 +15,8 @@ option(MICRO_OPCUA_SERVICE_BROWSE "Build the Browse + BrowseNext + TranslateBrow
 option(MICRO_OPCUA_SERVICE_DISCOVERY "Build GetEndpoints/FindServers" ON)
 option(MICRO_OPCUA_SERVICE_REGISTER_NODES "Build RegisterNodes/UnregisterNodes" ON)
 option(MICRO_OPCUA_SERVICE_WRITE "Build the optional Write service (Value attribute only)" OFF)
-option(MICRO_OPCUA_SERVICE_NODEMANAGEMENT "Build the optional NodeManagement service set" OFF)
+option(MICRO_OPCUA_SERVICE_QUERY "Build the Query services" ON)
+option(MICRO_OPCUA_SERVICE_NODEMANAGEMENT "Build the optional NodeManagement service set" ON)
 # The library's standard Base Information node set (Server object hierarchy,
 # ServerStatus, ServerCapabilities). Turn OFF if the integrator supplies a complete
 # address space and does not want the default nodes.
@@ -27,7 +28,7 @@ option(MICRO_OPCUA_BASE_TYPE_SYSTEM "Expose the Base Info Type System node set u
 option(MICRO_OPCUA_SUBSCRIPTIONS "Build the data-change subscription engine (Micro profile)" ON)
 option(MICRO_OPCUA_SUBSCRIPTIONS_STANDARD "Build the Standard DataChange Subscription 2017 facet additions" OFF)
 option(MICRO_OPCUA_EMBEDDED_PROFILE "Apply Embedded 2017 profile gates and capacity minima" OFF)
-option(MICRO_OPCUA_PUBSUB "Build OPC UA PubSub UADP/UDP Publisher (Feature 012)" OFF)
+option(MICRO_OPCUA_PUBSUB "Build Publish/Subscribe capabilities" ON)
 set(MICRO_OPCUA_SANITIZERS "" CACHE STRING "Comma-separated list of sanitizers (e.g. address,undefined)")
 set(MICRO_OPCUA_PLATFORM "host" CACHE STRING "Target platform (host, pico, arduino-skeleton)")
 

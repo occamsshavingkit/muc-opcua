@@ -13,6 +13,11 @@ This document maps implementation and test files back to OPC UA normative sectio
 | `src/core/server.c` | Server Core | Part 4 / 6 | 5.6.2.2 / 7.1.2.3 | Init, validate, and poll implementations |
 | `include/micro_opcua/services/node_management.h` | NodeManagement | Part 4 | 5.7.2, 5.7.3, 5.7.4, 5.7.5 | NodeManagement services interface |
 | `src/services/node_management.c` | NodeManagement | Part 4 | 5.7.2, 5.7.3, 5.7.4, 5.7.5 | NodeManagement services implementation |
+| `src/services/query.h` | Query | Part 4 | 5.8 | Query services interface |
+| `src/services/query.c` | Query | Part 4 | 5.8 | Query services implementation |
+| `src/encoding/binary_query.c` | Encoding | Part 6 | 5.2 | Query service payload binary encoding |
+| `tests/unit/test_query_encoding.c` | Tests | Part 6 | 5.2 | Query binary encode/decode tests |
+| `tests/unit/test_query_service.c` | Tests | Part 4 | 5.8 | Query services tests |
 | `tests/unit/test_node_management.c` | Tests | Part 4 | 5.7 | NodeManagement positive tests |
 | `tests/unit/test_node_management_errors.c` | Tests | Part 4 | 5.7 | NodeManagement error tests |
 | `tests/unit/test_address_space_dynamic.c` | Tests | Part 4 / 5 | 5.7 / 6.3 | Dynamic Address Space tests |

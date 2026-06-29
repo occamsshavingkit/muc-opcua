@@ -1,4 +1,5 @@
 /* tests/unit/test_address_space_dynamic.c */
+#define MICRO_OPCUA_SERVICE_NODEMANAGEMENT 1
 #include "../../src/core/server_internal.h"
 #include "../../src/services/browse.h"
 #include "micro_opcua/server.h"

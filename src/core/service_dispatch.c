@@ -151,6 +151,64 @@ static void fill_server_nonce(mu_server_t *server, opcua_byte_t *nonce, size_t l
     memset(nonce, 0, len);
 }
 
+static opcua_statuscode_t write_response_prefix(mu_binary_writer_t *w, opcua_uint32_t response_type_id,
+                                                opcua_uint32_t request_handle, opcua_statuscode_t service_result);
+
+#ifdef MICRO_OPCUA_SERVICE_QUERY
+#include "../services/query.h"
+static opcua_statuscode_t handle_query_first(mu_server_t *server, mu_binary_reader_t *r, mu_binary_writer_t *w,
+                                             size_t *response_length) {
+    mu_request_header_t req_header;
+    opcua_statuscode_t status = mu_request_header_decode(r, &req_header);
+    if (status != MU_STATUS_GOOD) return status;
+
+    mu_query_first_request_t req;
+    mu_query_first_response_t resp;
+    
+    mu_node_type_description_t node_types[4];
+    mu_content_filter_element_t filter_elements[4];
+    mu_filter_operand_t filter_operands[8];
+    mu_query_data_set_t data_sets[16];
+
+    status = mu_query_first_request_decode(r, &req, node_types, 4, filter_elements, 4, filter_operands, 8);
+    if (status != MU_STATUS_GOOD) return status;
+
+    status = mu_query_first_process(server, &req, &resp, data_sets, 16);
+    
+    opcua_statuscode_t wstatus = write_response_prefix(w, MU_ID_QUERYFIRSTRESPONSE, req_header.request_handle, status);
+    if (wstatus != MU_STATUS_GOOD) return wstatus;
+    wstatus = mu_query_first_response_encode(w, &resp);
+    if (wstatus != MU_STATUS_GOOD) return wstatus;
+
+    *response_length = w->position;
+    return status;
+}
+
+static opcua_statuscode_t handle_query_next(mu_server_t *server, mu_binary_reader_t *r, mu_binary_writer_t *w,
+                                            size_t *response_length) {
+    mu_request_header_t req_header;
+    opcua_statuscode_t status = mu_request_header_decode(r, &req_header);
+    if (status != MU_STATUS_GOOD) return status;
+
+    mu_query_next_request_t req;
+    mu_query_next_response_t resp;
+    mu_query_data_set_t data_sets[16];
+
+    status = mu_query_next_request_decode(r, &req);
+    if (status != MU_STATUS_GOOD) return status;
+
+    status = mu_query_next_process(server, &req, &resp, data_sets, 16);
+    
+    opcua_statuscode_t wstatus = write_response_prefix(w, MU_ID_QUERYNEXTRESPONSE, req_header.request_handle, status);
+    if (wstatus != MU_STATUS_GOOD) return wstatus;
+    wstatus = mu_query_next_response_encode(w, &resp);
+    if (wstatus != MU_STATUS_GOOD) return wstatus;
+
+    *response_length = w->position;
+    return status;
+}
+#endif
+
 static const mu_service_descriptor_t g_supported_services[] = {
 #ifdef MICRO_OPCUA_SERVICE_DISCOVERY
     {{MU_ID_FINDSERVERSREQUEST, MU_ID_FINDSERVERSRESPONSE, false}, handle_find_servers},
@@ -175,6 +233,10 @@ static const mu_service_descriptor_t g_supported_services[] = {
 #endif
 #ifdef MICRO_OPCUA_SERVICE_READ
     {{MU_ID_READREQUEST, MU_ID_READRESPONSE, true}, handle_read},
+#endif
+#ifdef MICRO_OPCUA_SERVICE_QUERY
+    {{MU_ID_QUERYFIRSTREQUEST, MU_ID_QUERYFIRSTRESPONSE, true}, handle_query_first},
+    {{MU_ID_QUERYNEXTREQUEST, MU_ID_QUERYNEXTRESPONSE, true}, handle_query_next},
 #endif
 #ifdef MICRO_OPCUA_SERVICE_WRITE
     {{MU_ID_WRITEREQUEST, MU_ID_WRITERESPONSE, true}, handle_write},
