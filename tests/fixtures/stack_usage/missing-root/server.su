@@ -1,0 +1,10 @@
+/repo/src/core/service_dispatch.c:1:1:mu_service_dispatch	64	static
+/repo/src/core/service_dispatch.c:2:1:handle_open_secure_channel	128	static
+/repo/src/services/secure_channel.c:1:1:mu_secure_channel_open	256	static
+/repo/src/security/asym_chunk.c:1:1:mu_asym_chunk_unwrap	512	static
+/repo/src/security/asym_chunk.c:2:1:mu_asym_chunk_wrap	768	static
+/repo/src/security/asym_chunk.c:3:1:key_bytes	64	static
+/repo/src/security/asym_chunk.c:4:1:write_header	96	static
+/repo/src/security/asym_chunk.c:5:1:wrap_none	80	static
+/repo/src/security/sym_chunk.c:1:1:mu_sym_keys_derive	320	static
+/repo/src/security/key_derivation.c:1:1:mu_p_sha256	384	static

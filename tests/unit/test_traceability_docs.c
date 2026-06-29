@@ -83,9 +83,23 @@ void test_mcp_provenance_coverage(void) {
     TEST_ASSERT_NOT_NULL(strstr(queries_content, "Resulting Decision"));
 }
 
+void test_traceability_docs_do_not_keep_stale_aggregate_or_tbd_protocol_rows(void) {
+    char path[1024];
+    snprintf(path, sizeof(path), "%s/docs/traceability/files-to-sections.md", PROJECT_ROOT_DIR);
+    read_file_content(path, files_to_sections_content, sizeof(files_to_sections_content));
+    TEST_ASSERT_MESSAGE(strlen(files_to_sections_content) > 0, "Could not read files-to-sections.md");
+
+    /* OPC-10000-4 §7.22.4 is the current AggregateFilter section. */
+    TEST_ASSERT_NULL_MESSAGE(strstr(files_to_sections_content, "Part 4 | 7.16"),
+                             "AggregateFilter traceability must not cite stale OPC-10000-4 §7.16");
+    TEST_ASSERT_NULL_MESSAGE(strstr(files_to_sections_content, "| TBD | TBD | TBD | TBD |"),
+                             "Protocol traceability rows must have exact OPC UA references");
+}
+
 int main(void) {
     UNITY_BEGIN();
     RUN_TEST(test_traceability_completeness);
     RUN_TEST(test_mcp_provenance_coverage);
+    RUN_TEST(test_traceability_docs_do_not_keep_stale_aggregate_or_tbd_protocol_rows);
     return UNITY_END();
 }

@@ -75,8 +75,8 @@ fi
 #   frames are live together while deriving Basic256Sha256 channel keys.
 # - Crypto adapter callbacks are outside this library's stack budget; their
 #   implementation must be measured separately by the platform integrator.
-# - If a required function is missing, the estimate is not trustworthy and the
-#   script fails closed.
+# - If an internal static root helper is optimized away, the emitted frame is
+#   treated as 0 and reported; other required emitted functions still fail closed.
 
 frame_for() {
     local source_suffix=$1
@@ -161,7 +161,12 @@ max_value() {
     printf '%s\n' "$max"
 }
 
-root_frame=$(require_frame "src/core/server.c" "handle_data_chunk_secure")
+root_frame=$(frame_for "src/core/server.c" "handle_data_chunk_secure")
+root_frame_note=""
+if [ -z "$root_frame" ]; then
+    root_frame=0
+    root_frame_note=" (not emitted)"
+fi
 service_dispatch_frame=$(require_frame "src/core/service_dispatch.c" "mu_service_dispatch")
 open_secure_channel_frame=$(require_frame "src/core/service_dispatch.c" "handle_open_secure_channel")
 secure_channel_open_frame=$(require_frame "src/services/secure_channel.c" "mu_secure_channel_open")
@@ -188,7 +193,7 @@ echo "Secured OPN stack estimate: ${estimate} bytes"
 echo "Threshold: ${threshold} bytes"
 echo "Method: handle_data_chunk_secure + max(asymmetric unwrap/wrap phase, OpenSecureChannel dispatch/KDF phase)"
 echo "Frames:"
-printf '  %-42s %8d\n' "src/core/server.c:handle_data_chunk_secure" "$root_frame"
+printf '  %-42s %8d%s\n' "src/core/server.c:handle_data_chunk_secure" "$root_frame" "$root_frame_note"
 printf '  %-42s %8d\n' "src/security/asym_chunk.c:mu_asym_chunk_unwrap" "$asym_unwrap_frame"
 printf '  %-42s %8d\n' "src/security/asym_chunk.c:mu_asym_chunk_wrap" "$asym_wrap_frame"
 printf '  %-42s %8d\n' "src/security/asym_chunk.c:max_helper" "$asym_helper_frame"

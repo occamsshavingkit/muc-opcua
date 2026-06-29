@@ -27,25 +27,36 @@ void test_session_create(void) {
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_session_create(&session, bits(5000.0), &revised, &session_id, &auth_token));
     TEST_ASSERT_EQUAL(MU_SESSION_STATE_CREATED, session.state);
     TEST_ASSERT_EQUAL_HEX64(bits(10000.0), revised);
+    TEST_ASSERT_EQUAL_UINT32(10000u, session.revised_session_timeout_ms);
     TEST_ASSERT_EQUAL(1, session_id);
 
     /* In range -> unchanged. */
     mu_session_init(&session);
     mu_session_create(&session, bits(60000.0), &revised, &session_id, &auth_token);
     TEST_ASSERT_EQUAL_HEX64(bits(60000.0), revised);
+    TEST_ASSERT_EQUAL_UINT32(60000u, session.revised_session_timeout_ms);
+
+    /* Fractional in-range values remain on the wire and truncate for local timers. */
+    mu_session_init(&session);
+    mu_session_create(&session, bits(60000.75), &revised, &session_id, &auth_token);
+    TEST_ASSERT_EQUAL_HEX64(bits(60000.75), revised);
+    TEST_ASSERT_EQUAL_UINT32(60000u, session.revised_session_timeout_ms);
 
     /* Above the 3600000 ms maximum -> clamped down. */
     mu_session_init(&session);
     mu_session_create(&session, bits(9999999.0), &revised, &session_id, &auth_token);
     TEST_ASSERT_EQUAL_HEX64(bits(3600000.0), revised);
+    TEST_ASSERT_EQUAL_UINT32(3600000u, session.revised_session_timeout_ms);
 
     /* Negative / zero -> minimum. */
     mu_session_init(&session);
     mu_session_create(&session, bits(-1.0), &revised, &session_id, &auth_token);
     TEST_ASSERT_EQUAL_HEX64(bits(10000.0), revised);
+    TEST_ASSERT_EQUAL_UINT32(10000u, session.revised_session_timeout_ms);
     mu_session_init(&session);
     mu_session_create(&session, 0, &revised, &session_id, &auth_token);
     TEST_ASSERT_EQUAL_HEX64(bits(10000.0), revised);
+    TEST_ASSERT_EQUAL_UINT32(10000u, session.revised_session_timeout_ms);
 }
 
 void test_session_activate_anonymous(void) {

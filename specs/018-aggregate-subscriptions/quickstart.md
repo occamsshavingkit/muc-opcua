@@ -13,11 +13,11 @@ When creating a MonitoredItem via the `CreateMonitoredItems` service:
 1. Set the `itemToMonitor` NodeId to a numeric variable node.
 2. Set the `monitoringMode` to `Reporting`.
 3. Set the `requestedParameters.filter` ExtensionObject:
-   - **TypeId**: `MU_ID_AGGREGATEFILTER_ENCODING_DEFAULTBINARY` (729)
+   - **TypeId**: `MU_ID_AGGREGATEFILTER_ENCODING_DEFAULTBINARY` (`730`, OPC-10000-4 §7.22.4)
    - **Body**:
      - `startTime`: DateTime (when the calculation starts, e.g., 0)
      - `processingInterval`: Double (milliseconds, e.g., 5000.0)
-     - `aggregateType`: NodeId (numeric namespace 0: 11565 for Average, 11569 for Minimum, 11570 for Maximum)
+     - `aggregateType`: NodeId (numeric namespace 0: `2342` for Average, `2346` for Minimum, `2347` for Maximum)
      - `aggregateConfiguration`: Configuration byte mask
 
 ## 3. Verify Output

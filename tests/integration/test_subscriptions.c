@@ -30,7 +30,7 @@
 #define ID_CREATEMONITOREDITEMSRESPONSE 754
 #define ID_DELETEMONITOREDITEMSREQUEST 781
 #define ID_DELETEMONITOREDITEMSRESPONSE 784
-#define STATUS_BAD_TOOMANYSUBSCRIPTIONS 0x80DD0000u
+#define STATUS_BAD_TOOMANYSUBSCRIPTIONS 0x80770000u
 #define STATUS_BAD_SUBSCRIPTIONIDINVALID 0x80280000u
 #define STATUS_BAD_NODEIDUNKNOWN 0x80340000u
 #define STATUS_BAD_TOOMANYMONITOREDITEMS 0x80DB0000u
@@ -909,7 +909,7 @@ void test_publish_keep_alive(void) {
 
 #define ID_REPUBLISHREQUEST 832
 #define ID_REPUBLISHRESPONSE 835
-#define STATUS_BAD_MESSAGENOTAVAILABLE 0x80B50000u
+#define STATUS_BAD_MESSAGENOTAVAILABLE 0x807B0000u
 
 /* Enqueue a PublishRequest carrying one SubscriptionAcknowledgement {sub_id, ack_seq}. */
 static void enqueue_publish_ack(mock_t *m, opcua_uint32_t seq, opcua_uint32_t sub_id, opcua_uint32_t ack_seq) {
@@ -1983,8 +1983,8 @@ void test_standard_facet_errors(void) {
     mu_binary_writer_t w;
     size_t clen;
 
-    /* (1) CreateMonitoredItems with Percent deadband (seq 6) → per-item
-       Bad_MonitoredItemFilterUnsupported (0x80430000). */
+    /* (1) CreateMonitoredItems with Percent deadband (seq 6) -> per-item
+       Bad_MonitoredItemFilterUnsupported (0x80440000). */
     mu_binary_writer_init(&w, tmp, sizeof(tmp));
     {
         mu_nodeid_t t = {0, MU_NODEID_NUMERIC, {ID_CREATEMONITOREDITEMSREQUEST}};
@@ -2005,7 +2005,7 @@ void test_standard_facet_errors(void) {
     TEST_ASSERT_EQUAL(1, nc);
     opcua_uint32_t dummy;
     opcua_statuscode_t pst = read_moncreate_result(&body, &dummy);
-    TEST_ASSERT_EQUAL_HEX32(0x80430000u, pst);
+    TEST_ASSERT_EQUAL_HEX32(0x80440000u, pst);
 
     /* (2) SetTriggering with a valid triggering item but unknown link id (seq 7) → per-link
        Bad_MonitoredItemIdInvalid. */

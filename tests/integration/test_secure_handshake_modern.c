@@ -294,6 +294,12 @@ static void run_handshake_for_policy(mu_security_policy_id_t policy_id) {
         mu_binary_write_nodeid(&w, &t);
     }
     write_request_header(&w, 0, 2);
+    {
+        mu_string_t null_str = {-1, NULL};
+        mu_binary_write_string(&w, &null_str);
+        mu_binary_write_int32(&w, 0);
+        mu_binary_write_int32(&w, 0);
+    }
     secure_call(&mock, server, &client_crypto, &c2s, &s2c, scid, token_id, 2, tmp, w.position,
                 MU_ID_GETENDPOINTSRESPONSE, &resp);
 

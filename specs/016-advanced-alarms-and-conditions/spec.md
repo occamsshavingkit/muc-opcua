@@ -61,7 +61,7 @@ As a server process, I want to present a Dialog Condition to clients when user i
 - **OPC-002**: Implemented features include `AcknowledgeableConditionType` (Part 9, 5.5), `AlarmConditionType` (Part 9, 5.8), and `DialogConditionType` (Part 9, 5.7).
 - **OPC-003**: Unsupported features or malformed method calls return standard Part 4 status codes (e.g., `Bad_ConditionAlreadyAcked`, `Bad_ConditionInvalid`).
 - **OPC-004**: Method Calls for Acknowledge and Respond are encoded as standard `Call` service requests (Part 4, 5.8).
-- **OPC-005**: SecurityPolicy and conformance status are profile-compliant.
+- **OPC-005**: SecurityPolicy and conformance status are profile-targeting until CTT evidence exists.
 
 ### Scope Boundaries *(mandatory)*
 

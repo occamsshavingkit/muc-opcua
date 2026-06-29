@@ -228,6 +228,12 @@ void test_server_handshake_connect_browse_read(void) {
         mu_binary_write_nodeid(&w, &t);
     }
     write_request_header(&w, 0, 6);
+    {
+        mu_string_t null_str = {-1, NULL};
+        mu_binary_write_string(&w, &null_str);
+        mu_binary_write_int32(&w, 0);
+        mu_binary_write_int32(&w, 0);
+    }
     clen = build_msg(chunk, sizeof(chunk), 2, 2, tmp, w.position);
     enqueue(&mock, chunk, clen);
 
@@ -471,6 +477,12 @@ void test_server_rejects_sequence_gap(void) {
         mu_binary_write_nodeid(&w, &t);
     }
     write_request_header(&w, 0, 7);
+    {
+        mu_string_t null_str = {-1, NULL};
+        mu_binary_write_string(&w, &null_str);
+        mu_binary_write_int32(&w, 0);
+        mu_binary_write_int32(&w, 0);
+    }
     clen = build_msg(chunk, sizeof(chunk), 99, 7, tmp, w.position);
     enqueue(&mock, chunk, clen);
 

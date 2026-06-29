@@ -24,6 +24,18 @@ static opcua_uint64_t clamp_timeout_bits(opcua_uint64_t bits) {
     return bits;
 }
 
+static opcua_uint32_t duration_bits_to_ms(opcua_uint64_t bits) {
+    opcua_uint32_t exponent = (opcua_uint32_t)((bits >> 52) & 0x7FFu);
+    opcua_uint64_t fraction = bits & 0x000FFFFFFFFFFFFFULL;
+    opcua_uint64_t mantissa = (1ULL << 52) | fraction;
+    opcua_uint32_t unbiased = exponent - 1023u;
+
+    if (unbiased >= 52u) {
+        return (opcua_uint32_t)(mantissa << (unbiased - 52u));
+    }
+    return (opcua_uint32_t)(mantissa >> (52u - unbiased));
+}
+
 void mu_session_init(mu_session_t *session) {
     if (session) {
         session->state = MU_SESSION_STATE_CLOSED;
@@ -76,9 +88,7 @@ opcua_statuscode_t mu_session_create(mu_session_t *session, opcua_uint64_t reque
     session->auth_token = 12345; /* Mock token */
 
     opcua_uint64_t revised = clamp_timeout_bits(requested_timeout_bits);
-    double d;
-    memcpy(&d, &revised, sizeof(d));
-    session->revised_session_timeout_ms = (opcua_uint32_t)d;
+    session->revised_session_timeout_ms = duration_bits_to_ms(revised);
     session->state = MU_SESSION_STATE_CREATED;
 
     *revised_timeout_bits = revised;

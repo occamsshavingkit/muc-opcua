@@ -668,6 +668,10 @@ void test_dispatch_get_endpoints(void) {
     mu_binary_writer_t w;
     mu_binary_writer_init(&w, req, sizeof(req));
     write_request_header(&w, 3);
+    mu_string_t null_str = {-1, NULL};
+    mu_binary_write_string(&w, &null_str); /* endpointUrl */
+    mu_binary_write_int32(&w, 0);          /* localeIds[] */
+    mu_binary_write_int32(&w, 0);          /* profileUris[] */
     size_t req_len = w.position;
 
     opcua_byte_t resp[512];

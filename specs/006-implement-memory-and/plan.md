@@ -20,7 +20,7 @@ This feature implements the key memory (RAM/SRAM) and performance improvements d
 **Scale/Scope**: Reclaims ~800 bytes of static RAM and ~6 KB of peak stack usage  
 **OPC UA Normative References**: OPC-10000-4 §5.6.2.2, OPC-10000-6 §6.7.2  
 **Target OPC UA Profile/Conformance Units**: Standard DataChange Subscription 2017 Server Facet  
-**Conformance Status Target**: CTT-verified (experimental)  
+**Conformance Status Target**: Profile-targeting
 
 ## Embedded Size Budget
 

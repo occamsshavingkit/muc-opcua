@@ -17,9 +17,9 @@ This feature adds support for `AggregateFilter` inside MonitoredItems in Subscri
 **Project Type**: Embedded Library  
 **Performance Goals**: Publishing cycle latency < 1ms, zero overhead on non-aggregate items  
 **Constraints**: strictly no heap allocations, static configuration limits  
-**OPC UA Normative References**: OPC-10000-4 Section 7.16 (AggregateFilter), OPC-10000-13 (Aggregates)  
+**OPC UA Normative References**: OPC-10000-4 §7.22.4 (AggregateFilter), OPC-10000-13 §4.2.2.4 / §5.4.3.5 (Average), OPC-10000-13 §4.2.2.9 / §5.4.3.10 (Minimum), OPC-10000-13 §4.2.2.10 / §5.4.3.11 (Maximum)
 **Target OPC UA Profile/Conformance Units**: Monitored Item Aggregate Filter Facet  
-**Conformance Status Target**: Profile-compliant  
+**Conformance Status Target**: Profile-targeting
 
 ## Embedded Size Budget
 
@@ -38,7 +38,7 @@ This feature adds support for `AggregateFilter` inside MonitoredItems in Subscri
 - **Embedded C Core**: Standard C11, no heap, platform-independent.
 - **Memory Model**: No heap allocation on hot path. Bounded state arrays.
 - **Minimal OPC UA Surface**: Restricts aggregates to Average, Min, and Max.
-- **Profile Research**: Facet fits within small micro-embedded profiles.
+- **Profile Research**: Scoped facet remains profile-targeting until OPC-10000-7 profile membership and CTT evidence are available.
 - **Correctness Gates**: Unity unit tests verify decoding, state updates, aggregate computation, and output formatting.
 - **Security Honesty**: No impact on Secure Channel structure.
 - **Toolchain Discipline**: Standard CMake build and test framework.
