@@ -6,6 +6,7 @@
 #include "../services/secure_channel.h"
 #include "../services/session.h"
 #include "../services/subscription.h"
+#include "micro_opcua/services/alarms_conditions.h"
 #include "micro_opcua/server.h"
 #include "service_dispatch.h"
 #include "tcp_connection.h"
@@ -108,6 +109,11 @@ struct mu_server {
             opcua_uint64_t timestamp_ms;
         } continuation_points[MU_MAX_QUERY_CONTINUATION_POINTS];
     } query_context;
+#endif
+
+#ifdef MICRO_OPCUA_SERVICE_ALARMS_CONDITIONS
+    mu_condition_t conditions[MU_MAX_CONDITIONS];
+    size_t condition_count;
 #endif
 };
 

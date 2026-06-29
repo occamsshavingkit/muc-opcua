@@ -2429,6 +2429,15 @@ static opcua_statuscode_t write_single_call_method_result(mu_server_t *server, m
         return write_resend_data_result(server, w, args[0].value.ui32);
     }
 
+#ifdef MICRO_OPCUA_SERVICE_ALARMS_CONDITIONS
+    if (nodeid_is_ns0_numeric(method_id, 9111) || nodeid_is_ns0_numeric(method_id, 9113) || nodeid_is_ns0_numeric(method_id, 9069)) {
+        mu_variant_t output_args[2];
+        size_t output_args_count = 0;
+        opcua_statuscode_t alarms_status = mu_alarms_conditions_method_dispatch(server, method_id, object_id, arg_count, args, &output_args_count, output_args);
+        return write_call_method_result(w, alarms_status, 0, NULL, output_args_count, output_args);
+    }
+#endif
+
 #ifdef MICRO_OPCUA_CUSTOM_METHODS
     /* Verify object exists in address space */
     const mu_node_t *obj_node =
