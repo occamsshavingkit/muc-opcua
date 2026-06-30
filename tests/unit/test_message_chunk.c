@@ -7,6 +7,42 @@ void tearDown(void) {}
 
 #include "../../src/core/message_chunk.h"
 
+void test_message_header_secure_conversation_parse_write_byte_equivalence(void) {
+    /* OPC-10000-6 6.7.2.2 and 7.1.2.2: fixed MessageHeader bytes preserve
+       type, finality, size, and channel id. */
+    static const struct {
+        opcua_byte_t bytes[12];
+        opcua_uint32_t message_size;
+        opcua_uint32_t secure_channel_id;
+    } cases[] = {
+        {{'O', 'P', 'N', 'F', 0x1C, 0x00, 0x00, 0x00, 0x04, 0x03, 0x02, 0x01}, 28u, 0x01020304u},
+        {{'M', 'S', 'G', 'F', 0x20, 0x00, 0x00, 0x00, 0x0D, 0x0C, 0x0B, 0x0A}, 32u, 0x0A0B0C0Du},
+        {{'C', 'L', 'O', 'F', 0x18, 0x00, 0x00, 0x00, 0x44, 0x33, 0x22, 0x11}, 24u, 0x11223344u},
+    };
+
+    for (size_t i = 0; i < sizeof(cases) / sizeof(cases[0]); ++i) {
+        mu_message_header_t parsed;
+        opcua_byte_t input[32] = {0};
+        opcua_byte_t encoded[12] = {0};
+
+        TEST_ASSERT_TRUE(cases[i].message_size <= sizeof(input));
+        for (size_t j = 0; j < sizeof(cases[i].bytes); ++j) {
+            input[j] = cases[i].bytes[j];
+        }
+
+        TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_parse_message_header(input, cases[i].message_size, &parsed));
+        TEST_ASSERT_EQUAL_UINT8(cases[i].bytes[0], parsed.message_type[0]);
+        TEST_ASSERT_EQUAL_UINT8(cases[i].bytes[1], parsed.message_type[1]);
+        TEST_ASSERT_EQUAL_UINT8(cases[i].bytes[2], parsed.message_type[2]);
+        TEST_ASSERT_EQUAL_UINT8(cases[i].bytes[3], parsed.chunk_type);
+        TEST_ASSERT_EQUAL_UINT32(cases[i].message_size, parsed.message_size);
+        TEST_ASSERT_EQUAL_UINT32(cases[i].secure_channel_id, parsed.secure_channel_id);
+
+        TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_write_message_header(encoded, sizeof(encoded), &parsed));
+        TEST_ASSERT_EQUAL_UINT8_ARRAY(cases[i].bytes, encoded, sizeof(cases[i].bytes));
+    }
+}
+
 void test_message_chunk_parser_valid_header(void) {
     opcua_byte_t buffer[128];
     mu_message_header_t header;
@@ -69,6 +105,7 @@ void test_sequence_validation(void) {
 
 int main(void) {
     UNITY_BEGIN();
+    RUN_TEST(test_message_header_secure_conversation_parse_write_byte_equivalence);
     RUN_TEST(test_message_chunk_parser_valid_header);
     RUN_TEST(test_message_chunk_parser_invalid_message_type);
     RUN_TEST(test_message_chunk_parser_invalid_size);

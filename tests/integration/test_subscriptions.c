@@ -1156,8 +1156,8 @@ void test_republish_unknown_sequence_returns_bad_message_not_available(void) {
     opcua_uint32_t sub_id;
     opcua_uint32_t item_id;
     s_mon_val = 10;
-    mu_server_t *server = setup_sub_with_item(&mock, storage, sizeof(storage), &config, 200.0, 1000, 1000, 100.0,
-                                              &sub_id, &item_id);
+    mu_server_t *server =
+        setup_sub_with_item(&mock, storage, sizeof(storage), &config, 200.0, 1000, 1000, 100.0, &sub_id, &item_id);
     (void)item_id;
 
     mu_binary_reader_t body;

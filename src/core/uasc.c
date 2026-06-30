@@ -1,6 +1,13 @@
 /* src/core/uasc.c */
 #include "uasc.h"
-#include "micro_opcua/encoding.h"
+#include <string.h>
+
+static void mu_uasc_write_uint32_le(opcua_byte_t *buffer, size_t offset, opcua_uint32_t value) {
+    buffer[offset] = (opcua_byte_t)(value & 0xFFu);
+    buffer[offset + 1u] = (opcua_byte_t)((value >> 8u) & 0xFFu);
+    buffer[offset + 2u] = (opcua_byte_t)((value >> 16u) & 0xFFu);
+    buffer[offset + 3u] = (opcua_byte_t)((value >> 24u) & 0xFFu);
+}
 
 opcua_statuscode_t mu_uasc_finalize_symmetric(opcua_byte_t *buffer, size_t buffer_size,
                                               opcua_uint32_t secure_channel_id, opcua_uint32_t token_id,
@@ -19,25 +26,11 @@ opcua_statuscode_t mu_uasc_finalize_symmetric(opcua_byte_t *buffer, size_t buffe
     buffer[2] = 'G';
     buffer[3] = 'F';
 
-    mu_binary_writer_t w;
-    mu_binary_writer_init(&w, buffer, buffer_size);
-    w.position = 4;
-
-    opcua_statuscode_t status = mu_binary_write_uint32(&w, (opcua_uint32_t)total); /* MessageSize */
-    if (status != MU_STATUS_GOOD)
-        return status;
-    status = mu_binary_write_uint32(&w, secure_channel_id); /* SecureChannelId */
-    if (status != MU_STATUS_GOOD)
-        return status;
-    status = mu_binary_write_uint32(&w, token_id); /* SymmetricSecurityHeader.TokenId */
-    if (status != MU_STATUS_GOOD)
-        return status;
-    status = mu_binary_write_uint32(&w, sequence_number); /* SequenceHeader.SequenceNumber */
-    if (status != MU_STATUS_GOOD)
-        return status;
-    status = mu_binary_write_uint32(&w, request_id); /* SequenceHeader.RequestId */
-    if (status != MU_STATUS_GOOD)
-        return status;
+    mu_uasc_write_uint32_le(buffer, 4u, (opcua_uint32_t)total); /* MessageSize */
+    mu_uasc_write_uint32_le(buffer, 8u, secure_channel_id);     /* SecureChannelId */
+    mu_uasc_write_uint32_le(buffer, 12u, token_id);             /* SymmetricSecurityHeader.TokenId */
+    mu_uasc_write_uint32_le(buffer, 16u, sequence_number);      /* SequenceHeader.SequenceNumber */
+    mu_uasc_write_uint32_le(buffer, 20u, request_id);           /* SequenceHeader.RequestId */
 
     /* MessageBody is assumed already present at offset MU_UASC_SYMMETRIC_HEADER_SIZE. */
     *out_total_length = total;
@@ -62,36 +55,14 @@ opcua_statuscode_t mu_uasc_finalize_asymmetric_none(opcua_byte_t *buffer, size_t
     buffer[2] = 'N';
     buffer[3] = 'F';
 
-    mu_binary_writer_t w;
-    mu_binary_writer_init(&w, buffer, buffer_size);
-    w.position = 4;
-
-    opcua_statuscode_t status = mu_binary_write_uint32(&w, (opcua_uint32_t)total); /* MessageSize */
-    if (status != MU_STATUS_GOOD)
-        return status;
-    status = mu_binary_write_uint32(&w, secure_channel_id); /* SecureChannelId */
-    if (status != MU_STATUS_GOOD)
-        return status;
-
-    /* AsymmetricSecurityHeader (SecurityPolicy None) */
-    mu_string_t policy = {(opcua_int32_t)(sizeof(policy_uri) - 1), (const opcua_byte_t *)policy_uri};
-    status = mu_binary_write_string(&w, &policy); /* SecurityPolicyUri */
-    if (status != MU_STATUS_GOOD)
-        return status;
-    status = mu_binary_write_int32(&w, -1); /* SenderCertificate (null) */
-    if (status != MU_STATUS_GOOD)
-        return status;
-    status = mu_binary_write_int32(&w, -1); /* ReceiverCertificateThumbprint (null) */
-    if (status != MU_STATUS_GOOD)
-        return status;
-
-    /* SequenceHeader */
-    status = mu_binary_write_uint32(&w, sequence_number);
-    if (status != MU_STATUS_GOOD)
-        return status;
-    status = mu_binary_write_uint32(&w, request_id);
-    if (status != MU_STATUS_GOOD)
-        return status;
+    mu_uasc_write_uint32_le(buffer, 4u, (opcua_uint32_t)total);                     /* MessageSize */
+    mu_uasc_write_uint32_le(buffer, 8u, secure_channel_id);                         /* SecureChannelId */
+    mu_uasc_write_uint32_le(buffer, 12u, (opcua_uint32_t)(sizeof(policy_uri) - 1)); /* SecurityPolicyUri length */
+    memcpy(&buffer[16u], policy_uri, sizeof(policy_uri) - 1u);                      /* SecurityPolicyUri bytes */
+    mu_uasc_write_uint32_le(buffer, 63u, 0xFFFFFFFFu);                              /* SenderCertificate (null) */
+    mu_uasc_write_uint32_le(buffer, 67u, 0xFFFFFFFFu);                              /* ReceiverThumbprint (null) */
+    mu_uasc_write_uint32_le(buffer, 71u, sequence_number);                          /* SequenceHeader.SequenceNumber */
+    mu_uasc_write_uint32_le(buffer, 75u, request_id);                               /* SequenceHeader.RequestId */
 
     /* MessageBody is assumed already present at offset MU_UASC_ASYMMETRIC_NONE_HEADER_SIZE. */
     *out_total_length = total;

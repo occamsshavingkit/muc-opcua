@@ -12,6 +12,21 @@ static mu_nodeid_t g_last_write_node;
 static mu_variant_t g_last_write_val;
 static int g_write_count = 0;
 
+typedef struct {
+    int count;
+    mu_nodeid_t nodes[4];
+    opcua_uint32_t attributes[4];
+    mu_variant_t values[4];
+    opcua_statuscode_t return_status[4];
+} write_callback_log_t;
+
+typedef struct {
+    mu_nodeid_t node_id;
+    opcua_int32_t attribute_id;
+    mu_string_t index_range;
+    mu_datavalue_t value;
+} write_request_item_t;
+
 static opcua_statuscode_t mock_write_handler(void *handle, const mu_nodeid_t *node_id, opcua_uint32_t attribute_id,
                                              const mu_variant_t *value) {
     (void)handle;
@@ -20,6 +35,124 @@ static opcua_statuscode_t mock_write_handler(void *handle, const mu_nodeid_t *no
     g_last_write_val = *value;
     g_write_count++;
     return MU_STATUS_GOOD;
+}
+
+static opcua_statuscode_t logging_write_handler(void *handle, const mu_nodeid_t *node_id, opcua_uint32_t attribute_id,
+                                                const mu_variant_t *value) {
+    write_callback_log_t *log = (write_callback_log_t *)handle;
+    int index;
+    if (!log) {
+        return MU_STATUS_GOOD;
+    }
+
+    index = log->count;
+    if (index < 4) {
+        log->nodes[index] = *node_id;
+        log->attributes[index] = attribute_id;
+        log->values[index] = *value;
+    }
+    log->count++;
+    if (index < 4 && log->return_status[index] != MU_STATUS_GOOD) {
+        return log->return_status[index];
+    }
+    return MU_STATUS_GOOD;
+}
+
+static mu_datavalue_t int32_datavalue(opcua_int32_t value) {
+    mu_datavalue_t dv;
+    memset(&dv, 0, sizeof(dv));
+    dv.has_value = true;
+    dv.value.type = MU_TYPE_INT32;
+    dv.value.is_array = false;
+    dv.value.value.i32 = value;
+    return dv;
+}
+
+static mu_datavalue_t float_datavalue(float value) {
+    mu_datavalue_t dv;
+    memset(&dv, 0, sizeof(dv));
+    dv.has_value = true;
+    dv.value.type = MU_TYPE_FLOAT;
+    dv.value.is_array = false;
+    dv.value.value.f = value;
+    return dv;
+}
+
+static void encode_write_request(mu_binary_writer_t *writer, opcua_uint32_t request_handle,
+                                 const write_request_item_t *items, size_t item_count) {
+    mu_nodeid_t auth_token = {0, MU_NODEID_NUMERIC, {0}};
+    mu_string_t audit_id = {15, (const opcua_byte_t *)"batch-equivalence"};
+    mu_nodeid_t null_id = {0, MU_NODEID_NUMERIC, {0}};
+
+    mu_binary_write_nodeid(writer, &auth_token);
+    mu_binary_write_int64(writer, 0);
+    mu_binary_write_uint32(writer, request_handle);
+    mu_binary_write_uint32(writer, 0);
+    mu_binary_write_string(writer, &audit_id);
+    mu_binary_write_uint32(writer, 10000);
+    mu_binary_write_extension_object_header(writer, &null_id, 0);
+
+    mu_binary_write_int32(writer, (opcua_int32_t)item_count);
+    for (size_t i = 0; i < item_count; ++i) {
+        mu_binary_write_nodeid(writer, &items[i].node_id);
+        mu_binary_write_int32(writer, items[i].attribute_id);
+        mu_binary_write_string(writer, &items[i].index_range);
+        mu_binary_write_datavalue(writer, &items[i].value);
+    }
+}
+
+static void decode_write_response_results(const opcua_byte_t *buffer, size_t length, opcua_uint32_t request_handle,
+                                          opcua_statuscode_t *results, size_t result_count) {
+    mu_binary_reader_t reader;
+    mu_nodeid_t response_type;
+    opcua_int64_t timestamp;
+    opcua_uint32_t actual_request_handle;
+    opcua_statuscode_t service_result;
+    opcua_byte_t diag_mask;
+    opcua_int32_t string_table_len;
+    mu_nodeid_t ext_id;
+    size_t ext_len;
+    opcua_int32_t results_len;
+
+    mu_binary_reader_init(&reader, buffer, length);
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_nodeid(&reader, &response_type));
+    TEST_ASSERT_EQUAL(MU_ID_WRITERESPONSE, response_type.identifier.numeric);
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_int64(&reader, &timestamp));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_uint32(&reader, &actual_request_handle));
+    TEST_ASSERT_EQUAL(request_handle, actual_request_handle);
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_statuscode(&reader, &service_result));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, service_result);
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_byte(&reader, &diag_mask));
+    TEST_ASSERT_EQUAL(0, diag_mask);
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_int32(&reader, &string_table_len));
+    TEST_ASSERT_EQUAL(-1, string_table_len);
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_extension_object_header(&reader, &ext_id, &ext_len));
+    TEST_ASSERT_EQUAL(0, ext_id.identifier.numeric);
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_int32(&reader, &results_len));
+    TEST_ASSERT_EQUAL((opcua_int32_t)result_count, results_len);
+
+    for (size_t i = 0; i < result_count; ++i) {
+        TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_statuscode(&reader, &results[i]));
+    }
+}
+
+static void run_write_items(mu_server_t *server, const write_request_item_t *items, size_t item_count,
+                            opcua_uint32_t request_handle, opcua_statuscode_t *results) {
+    opcua_byte_t req_buffer[512];
+    opcua_byte_t resp_buffer[512];
+    mu_binary_writer_t writer;
+    mu_binary_reader_t reader;
+    mu_binary_writer_t resp_writer;
+    size_t resp_len = 0;
+
+    mu_binary_writer_init(&writer, req_buffer, sizeof(req_buffer));
+    encode_write_request(&writer, request_handle, items, item_count);
+
+    mu_binary_reader_init(&reader, req_buffer, writer.position);
+    mu_binary_writer_init(&resp_writer, resp_buffer, sizeof(resp_buffer));
+
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, handle_write(server, &reader, &resp_writer, &resp_len));
+    decode_write_response_results(resp_buffer, resp_len, request_handle, results, item_count);
 }
 
 #ifdef MICRO_OPCUA_SERVICE_WRITE
@@ -389,6 +522,96 @@ void test_write_service_batch(void) {
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_statuscode(&resp_reader, &item_status1));
     TEST_ASSERT_EQUAL(MU_STATUS_BAD_TYPEMISMATCH, item_status1);
 }
+
+void test_write_service_batch_matches_individual_operation_results_and_callback_order(void) {
+    /* OPC-10000-4 sections 5.11.4.2, 5.11.4.4, 6.5.8, and 7.38.2:
+       a Write batch reports one result per requested operation, preserves
+       operation order, and exposes the same accepted write details to callbacks
+       that audit-capable integrations would observe. */
+    mu_server_t server;
+    memset(&server, 0, sizeof(server));
+
+    mu_node_t nodes[2];
+    memset(nodes, 0, sizeof(nodes));
+
+    nodes[0].node_id = (mu_nodeid_t){1, MU_NODEID_NUMERIC, {.numeric = 7001}};
+    nodes[0].node_class = MU_NODECLASS_VARIABLE;
+    nodes[0].browse_name = (mu_string_t){4, (const opcua_byte_t *)"IntA"};
+    nodes[0].display_name = (mu_string_t){4, (const opcua_byte_t *)"IntA"};
+
+    mu_value_source_t int_value;
+    int_value.type = MU_VALUESOURCE_STATIC;
+    int_value.data.static_value.type = MU_TYPE_INT32;
+    int_value.data.static_value.is_array = false;
+    int_value.data.static_value.value.i32 = 10;
+    nodes[0].value = &int_value;
+
+    nodes[1].node_id = (mu_nodeid_t){1, MU_NODEID_NUMERIC, {.numeric = 7002}};
+    nodes[1].node_class = MU_NODECLASS_VARIABLE;
+    nodes[1].browse_name = (mu_string_t){6, (const opcua_byte_t *)"FloatA"};
+    nodes[1].display_name = (mu_string_t){6, (const opcua_byte_t *)"FloatA"};
+
+    mu_value_source_t float_value;
+    float_value.type = MU_VALUESOURCE_STATIC;
+    float_value.data.static_value.type = MU_TYPE_FLOAT;
+    float_value.data.static_value.is_array = false;
+    float_value.data.static_value.value.f = 1.0f;
+    nodes[1].value = &float_value;
+
+    mu_address_space_t address_space = {nodes, 2};
+    write_callback_log_t batch_log;
+    memset(&batch_log, 0, sizeof(batch_log));
+    batch_log.return_status[1] = MU_STATUS_BAD_USERACCESSDENIED;
+
+    server.config.address_space = &address_space;
+    server.config.write_handler = logging_write_handler;
+    server.config.write_handler_handle = &batch_log;
+    memset(&server.user_address_space_index, 0, sizeof(server.user_address_space_index));
+
+    mu_string_t null_range = {-1, NULL};
+    write_request_item_t batch_items[5];
+    memset(batch_items, 0, sizeof(batch_items));
+    batch_items[0] = (write_request_item_t){nodes[0].node_id, 13, null_range, int32_datavalue(111)};
+    batch_items[1] = (write_request_item_t){(mu_nodeid_t){1, MU_NODEID_NUMERIC, {.numeric = 7999}}, 13, null_range,
+                                            int32_datavalue(222)};
+    batch_items[2] = (write_request_item_t){nodes[1].node_id, 13, null_range, int32_datavalue(333)};
+    batch_items[3] = (write_request_item_t){nodes[0].node_id, 3, null_range, int32_datavalue(444)};
+    batch_items[4] = (write_request_item_t){nodes[1].node_id, 13, null_range, float_datavalue(5.5f)};
+
+    opcua_statuscode_t batch_results[5];
+    run_write_items(&server, batch_items, 5, 77, batch_results);
+
+    TEST_ASSERT_EQUAL(2, batch_log.count);
+    TEST_ASSERT_EQUAL(7001, batch_log.nodes[0].identifier.numeric);
+    TEST_ASSERT_EQUAL(13, batch_log.attributes[0]);
+    TEST_ASSERT_EQUAL(MU_TYPE_INT32, batch_log.values[0].type);
+    TEST_ASSERT_EQUAL(111, batch_log.values[0].value.i32);
+    TEST_ASSERT_EQUAL(7002, batch_log.nodes[1].identifier.numeric);
+    TEST_ASSERT_EQUAL(13, batch_log.attributes[1]);
+    TEST_ASSERT_EQUAL(MU_TYPE_FLOAT, batch_log.values[1].type);
+    TEST_ASSERT_FLOAT_WITHIN(0.001f, 5.5f, batch_log.values[1].value.f);
+
+    opcua_statuscode_t individual_results[5];
+    opcua_statuscode_t single_result[1];
+    for (size_t i = 0; i < 5; ++i) {
+        write_callback_log_t single_log;
+        memset(&single_log, 0, sizeof(single_log));
+        single_log.return_status[0] = (i == 4) ? MU_STATUS_BAD_USERACCESSDENIED : MU_STATUS_GOOD;
+        server.config.write_handler_handle = &single_log;
+
+        run_write_items(&server, &batch_items[i], 1, (opcua_uint32_t)(100 + i), single_result);
+        individual_results[i] = single_result[0];
+    }
+
+    for (size_t i = 0; i < 5; ++i) {
+        TEST_ASSERT_EQUAL_HEX32(individual_results[i], batch_results[i]);
+    }
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, batch_results[0]);
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_BAD_NODEIDUNKNOWN, batch_results[1]);
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_BAD_TYPEMISMATCH, batch_results[2]);
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_BAD_NOTWRITABLE, batch_results[3]);
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_BAD_USERACCESSDENIED, batch_results[4]);
+}
 #endif
 
 int main(void) {
@@ -397,6 +620,7 @@ int main(void) {
     RUN_TEST(test_write_service_basic);
     RUN_TEST(test_write_service_type_mismatch);
     RUN_TEST(test_write_service_batch);
+    RUN_TEST(test_write_service_batch_matches_individual_operation_results_and_callback_order);
 #endif
     return UNITY_END();
 }

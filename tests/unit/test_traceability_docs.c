@@ -11,6 +11,7 @@ void tearDown(void) {}
 
 static char files_to_sections_content[65536];
 static char sections_to_files_content[65536];
+static char optimize_hot_paths_content[131072];
 static char queries_content[65536];
 
 typedef struct {
@@ -131,6 +132,86 @@ static int contains_between(const char *start, const char *end, const char *need
     return 0;
 }
 
+static int table_cell_bounds(const char *row_start, size_t cell_index, const char **cell_start, const char **cell_end) {
+    const char *line_end = line_end_for(row_start);
+    const char *cursor = row_start;
+    size_t current_cell = 0;
+
+    if (*cursor != '|')
+        return 0;
+
+    ++cursor;
+    while (cursor < line_end) {
+        const char *next_pipe = find_char_between(cursor, line_end, '|');
+        if (!next_pipe)
+            return 0;
+
+        if (current_cell == cell_index) {
+            *cell_start = cursor;
+            *cell_end = next_pipe;
+            return 1;
+        }
+
+        cursor = next_pipe + 1;
+        ++current_cell;
+    }
+
+    return 0;
+}
+
+static const char *find_markdown_table_row_containing(const char *content, const char *needle) {
+    const char *line = content;
+
+    while (*line) {
+        const char *line_end = line_end_for(line);
+        if (*line == '|' && contains_between(line, line_end, needle))
+            return line;
+
+        if (*line_end == '\0')
+            break;
+        line = line_end + 1;
+    }
+
+    return NULL;
+}
+
+static int feature_section_cell_has_exact_section(const char *row_start, const char *section_anchor) {
+    const char *section_start;
+    const char *section_end;
+    size_t section_anchor_len = strlen(section_anchor);
+
+    if (!table_cell_bounds(row_start, 1, &section_start, &section_end))
+        return 0;
+
+    while (section_start < section_end && (*section_start == ' ' || *section_start == '\t'))
+        ++section_start;
+
+    if ((size_t)(section_end - section_start) < section_anchor_len)
+        return 0;
+
+    if (memcmp(section_start, section_anchor, section_anchor_len) != 0)
+        return 0;
+
+    return section_start + section_anchor_len == section_end || section_start[section_anchor_len] == ' ' ||
+           section_start[section_anchor_len] == '\t';
+}
+
+static const char *find_feature_mapping_row_for_section(const char *content, const char *section_anchor) {
+    const char *line = content;
+
+    while (*line) {
+        const char *line_end = line_end_for(line);
+        if (*line == '|' && feature_section_cell_has_exact_section(line, section_anchor))
+            return line;
+
+        if (*line_end == '\0')
+            break;
+        line = line_end + 1;
+    }
+
+    return NULL;
+}
+
 static int section_mapping_row_has_file_path(const char *row_start) {
     const char *line_end = line_end_for(row_start);
     const char *cursor = row_start;
@@ -157,6 +238,35 @@ static int section_mapping_row_has_file_path(const char *row_start) {
     return contains_between(files_start, files_end, "`src/") || contains_between(files_start, files_end, "`include/") ||
            contains_between(files_start, files_end, "`tests/") || contains_between(files_start, files_end, "`docs/") ||
            contains_between(files_start, files_end, "`specs/");
+}
+
+static int feature_mapping_row_has_source_file(const char *row_start) {
+    const char *source_start;
+    const char *source_end;
+
+    if (!table_cell_bounds(row_start, 2, &source_start, &source_end))
+        return 0;
+
+    return contains_between(source_start, source_end, "`src/") ||
+           contains_between(source_start, source_end, "`include/");
+}
+
+static int feature_mapping_row_has_test_or_doc_evidence(const char *row_start) {
+    const char *evidence_start;
+    const char *evidence_end;
+
+    if (!table_cell_bounds(row_start, 3, &evidence_start, &evidence_end))
+        return 0;
+
+    if (contains_between(evidence_start, evidence_end, "Placeholder") ||
+        contains_between(evidence_start, evidence_end, "placeholder") ||
+        contains_between(evidence_start, evidence_end, "TBD"))
+        return 0;
+
+    return contains_between(evidence_start, evidence_end, "`tests/") ||
+           contains_between(evidence_start, evidence_end, "`docs/") ||
+           contains_between(evidence_start, evidence_end, "`specs/") ||
+           contains_between(evidence_start, evidence_end, "`scripts/");
 }
 
 static void append_traceability_failure(char *buffer, size_t buffer_len, const char *file_path, const char *reason) {
@@ -320,6 +430,167 @@ void test_traceability_docs_cited_opc_sections_have_file_mappings(void) {
         TEST_FAIL_MESSAGE(failures);
 }
 
+void test_optimize_hot_paths_binary_traceability_rows_have_source_and_evidence_mappings(void) {
+    static const char *const binary_section_anchors[] = {
+        "OPC-10000-6 section 5.2.1 Binary DataEncoding general rules",
+        "OPC-10000-6 section 5.2.2.4 String",
+        "OPC-10000-6 section 5.2.2.7 ByteString",
+        "OPC-10000-6 section 5.2.2.9 NodeId",
+        "OPC-10000-6 section 5.2.5 Arrays",
+    };
+    char path[1024];
+    char failures[4096];
+    size_t i;
+
+    failures[0] = '\0';
+    snprintf(path, sizeof(path), "%s/docs/traceability/022-optimize-hot-paths.md", PROJECT_ROOT_DIR);
+    read_file_content(path, optimize_hot_paths_content, sizeof(optimize_hot_paths_content));
+    TEST_ASSERT_MESSAGE(strlen(optimize_hot_paths_content) > 0, "Could not read 022-optimize-hot-paths.md");
+
+    for (i = 0; i < sizeof(binary_section_anchors) / sizeof(binary_section_anchors[0]); ++i) {
+        const char *row = find_markdown_table_row_containing(optimize_hot_paths_content, binary_section_anchors[i]);
+
+        if (!row) {
+            append_traceability_failure(failures, sizeof(failures), binary_section_anchors[i],
+                                        "missing from 022-optimize-hot-paths.md OPC UA Section Mapping table");
+            continue;
+        }
+
+        if (!feature_mapping_row_has_source_file(row)) {
+            append_traceability_failure(failures, sizeof(failures), binary_section_anchors[i],
+                                        "has no source file mapping");
+        }
+
+        if (!feature_mapping_row_has_test_or_doc_evidence(row)) {
+            append_traceability_failure(failures, sizeof(failures), binary_section_anchors[i],
+                                        "has no concrete test/doc evidence mapping");
+        }
+    }
+
+    if (failures[0] != '\0')
+        TEST_FAIL_MESSAGE(failures);
+}
+
+void test_optimize_hot_paths_transport_framing_traceability_rows_have_source_and_evidence_mappings(void) {
+    static const char *const transport_framing_section_anchors[] = {
+        "OPC-10000-6 section 6.7.2", "OPC-10000-6 section 6.7.2.2", "OPC-10000-6 section 6.7.2.4",
+        "OPC-10000-6 section 6.7.4", "OPC-10000-6 section 7.1.2.2", "OPC-10000-6 section 7.2",
+    };
+    char path[1024];
+    char failures[4096];
+    size_t i;
+
+    failures[0] = '\0';
+    snprintf(path, sizeof(path), "%s/docs/traceability/022-optimize-hot-paths.md", PROJECT_ROOT_DIR);
+    read_file_content(path, optimize_hot_paths_content, sizeof(optimize_hot_paths_content));
+    TEST_ASSERT_MESSAGE(strlen(optimize_hot_paths_content) > 0, "Could not read 022-optimize-hot-paths.md");
+
+    for (i = 0; i < sizeof(transport_framing_section_anchors) / sizeof(transport_framing_section_anchors[0]); ++i) {
+        const char *row =
+            find_feature_mapping_row_for_section(optimize_hot_paths_content, transport_framing_section_anchors[i]);
+
+        if (!row) {
+            append_traceability_failure(failures, sizeof(failures), transport_framing_section_anchors[i],
+                                        "missing from 022-optimize-hot-paths.md OPC UA Section Mapping table");
+            continue;
+        }
+
+        if (!feature_mapping_row_has_source_file(row)) {
+            append_traceability_failure(failures, sizeof(failures), transport_framing_section_anchors[i],
+                                        "has no source file mapping");
+        }
+
+        if (!feature_mapping_row_has_test_or_doc_evidence(row)) {
+            append_traceability_failure(failures, sizeof(failures), transport_framing_section_anchors[i],
+                                        "has no concrete test/doc evidence mapping");
+        }
+    }
+
+    if (failures[0] != '\0')
+        TEST_FAIL_MESSAGE(failures);
+}
+
+void test_optimize_hot_paths_service_statuscode_traceability_rows_have_source_and_evidence_mappings(void) {
+    static const char *const service_statuscode_section_anchors[] = {
+        "OPC-10000-4 section 5.11.2.4",
+        "OPC-10000-4 section 5.11.4.4",
+        "OPC-10000-4 section 7.38.2",
+    };
+    char path[1024];
+    char failures[4096];
+    size_t i;
+
+    failures[0] = '\0';
+    snprintf(path, sizeof(path), "%s/docs/traceability/022-optimize-hot-paths.md", PROJECT_ROOT_DIR);
+    read_file_content(path, optimize_hot_paths_content, sizeof(optimize_hot_paths_content));
+    TEST_ASSERT_MESSAGE(strlen(optimize_hot_paths_content) > 0, "Could not read 022-optimize-hot-paths.md");
+
+    for (i = 0; i < sizeof(service_statuscode_section_anchors) / sizeof(service_statuscode_section_anchors[0]); ++i) {
+        const char *row =
+            find_feature_mapping_row_for_section(optimize_hot_paths_content, service_statuscode_section_anchors[i]);
+
+        if (!row) {
+            append_traceability_failure(failures, sizeof(failures), service_statuscode_section_anchors[i],
+                                        "missing from 022-optimize-hot-paths.md OPC UA Section Mapping table");
+            continue;
+        }
+
+        if (!feature_mapping_row_has_source_file(row)) {
+            append_traceability_failure(failures, sizeof(failures), service_statuscode_section_anchors[i],
+                                        "has no source file mapping");
+        }
+
+        if (!feature_mapping_row_has_test_or_doc_evidence(row)) {
+            append_traceability_failure(failures, sizeof(failures), service_statuscode_section_anchors[i],
+                                        "has no concrete test/doc evidence mapping");
+        }
+    }
+
+    if (failures[0] != '\0')
+        TEST_FAIL_MESSAGE(failures);
+}
+
+void test_optimize_hot_paths_write_audit_and_conformance_traceability_rows_have_source_and_evidence_mappings(void) {
+    static const char *const write_audit_and_conformance_section_anchors[] = {
+        "OPC-10000-4 section 6.5.8",
+        "OPC-10000-7 section 4.2",
+    };
+    char path[1024];
+    char failures[4096];
+    size_t i;
+
+    failures[0] = '\0';
+    snprintf(path, sizeof(path), "%s/docs/traceability/022-optimize-hot-paths.md", PROJECT_ROOT_DIR);
+    read_file_content(path, optimize_hot_paths_content, sizeof(optimize_hot_paths_content));
+    TEST_ASSERT_MESSAGE(strlen(optimize_hot_paths_content) > 0, "Could not read 022-optimize-hot-paths.md");
+
+    for (i = 0; i < sizeof(write_audit_and_conformance_section_anchors) /
+                        sizeof(write_audit_and_conformance_section_anchors[0]);
+         ++i) {
+        const char *row = find_feature_mapping_row_for_section(optimize_hot_paths_content,
+                                                               write_audit_and_conformance_section_anchors[i]);
+
+        if (!row) {
+            append_traceability_failure(failures, sizeof(failures), write_audit_and_conformance_section_anchors[i],
+                                        "missing from 022-optimize-hot-paths.md OPC UA Section Mapping table");
+            continue;
+        }
+
+        if (!feature_mapping_row_has_source_file(row)) {
+            append_traceability_failure(failures, sizeof(failures), write_audit_and_conformance_section_anchors[i],
+                                        "has no source file mapping");
+        }
+
+        if (!feature_mapping_row_has_test_or_doc_evidence(row)) {
+            append_traceability_failure(failures, sizeof(failures), write_audit_and_conformance_section_anchors[i],
+                                        "has no concrete test/doc evidence mapping");
+        }
+    }
+
+    if (failures[0] != '\0')
+        TEST_FAIL_MESSAGE(failures);
+}
+
 int main(void) {
     UNITY_BEGIN();
     RUN_TEST(test_traceability_completeness);
@@ -327,5 +598,9 @@ int main(void) {
     RUN_TEST(test_traceability_docs_do_not_keep_stale_aggregate_or_tbd_protocol_rows);
     RUN_TEST(test_traceability_docs_changed_protocol_files_have_opc_section_mappings);
     RUN_TEST(test_traceability_docs_cited_opc_sections_have_file_mappings);
+    RUN_TEST(test_optimize_hot_paths_binary_traceability_rows_have_source_and_evidence_mappings);
+    RUN_TEST(test_optimize_hot_paths_transport_framing_traceability_rows_have_source_and_evidence_mappings);
+    RUN_TEST(test_optimize_hot_paths_service_statuscode_traceability_rows_have_source_and_evidence_mappings);
+    RUN_TEST(test_optimize_hot_paths_write_audit_and_conformance_traceability_rows_have_source_and_evidence_mappings);
     return UNITY_END();
 }

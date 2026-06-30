@@ -12,6 +12,7 @@ void mu_binary_reader_init(mu_binary_reader_t *reader, const opcua_byte_t *buffe
     }
 }
 
+#if defined(MICRO_OPCUA_USER_AUTH) || defined(MICRO_OPCUA_SECURITY)
 static opcua_statuscode_t reader_status(const mu_binary_reader_t *reader) {
     if (!reader)
         return MU_STATUS_BAD_INTERNALERROR;
@@ -20,6 +21,7 @@ static opcua_statuscode_t reader_status(const mu_binary_reader_t *reader) {
         return reader->status;
     return MU_STATUS_GOOD;
 }
+#endif
 
 static opcua_statuscode_t reader_fail(mu_binary_reader_t *reader, opcua_statuscode_t status) {
     if (reader)
@@ -28,17 +30,18 @@ static opcua_statuscode_t reader_fail(mu_binary_reader_t *reader, opcua_statusco
 }
 
 static opcua_statuscode_t ensure_bytes(mu_binary_reader_t *reader, size_t count) {
-    opcua_statuscode_t status = reader_status(reader);
-    if (status != MU_STATUS_GOOD)
-        return status;
+    /* OPC-10000-6 section 5.2: validate remaining bytes before advancing. */
+    if (reader && reader->status == MU_STATUS_GOOD && reader->buffer && reader->position <= reader->length &&
+        count <= reader->length - reader->position) {
+        return MU_STATUS_GOOD;
+    }
+    if (!reader)
+        return MU_STATUS_BAD_INTERNALERROR;
+    if (reader->status != MU_STATUS_GOOD)
+        return reader->status;
     if (!reader->buffer)
         return reader_fail(reader, MU_STATUS_BAD_INTERNALERROR);
-    /* OPC-10000-6 section 5.2: validate remaining bytes before advancing. */
-    if (reader->position > reader->length)
-        return reader_fail(reader, MU_STATUS_BAD_DECODINGERROR);
-    if (count > reader->length - reader->position)
-        return reader_fail(reader, MU_STATUS_BAD_DECODINGERROR);
-    return MU_STATUS_GOOD;
+    return reader_fail(reader, MU_STATUS_BAD_DECODINGERROR);
 }
 
 opcua_statuscode_t mu_binary_read_boolean(mu_binary_reader_t *reader, opcua_boolean_t *value) {
@@ -94,16 +97,16 @@ opcua_statuscode_t mu_binary_read_int32(mu_binary_reader_t *reader, opcua_int32_
 
 opcua_statuscode_t mu_binary_read_array_length(mu_binary_reader_t *reader, opcua_int32_t *length) {
     opcua_statuscode_t status = ensure_bytes(reader, 4);
+    opcua_int32_t decoded_length;
     if (status != MU_STATUS_GOOD)
         return status;
-    *length = (opcua_int32_t)mu_binary_le_get_u32(&reader->buffer[reader->position]);
+    decoded_length = (opcua_int32_t)mu_binary_le_get_u32(&reader->buffer[reader->position]);
+    *length = decoded_length;
     reader->position += 4;
     /* OPC-10000-6 section 5.2.5 encodes array length as Int32; only -1 is null.
        Element-size checks happen at callers; reject counts that would overflow
        even one-byte element position arithmetic. */
-    if (*length < -1)
-        return reader_fail(reader, MU_STATUS_BAD_DECODINGERROR);
-    if (*length > 0 && (size_t)*length > SIZE_MAX - reader->position)
+    if (decoded_length < -1 || (decoded_length > 0 && (size_t)decoded_length > SIZE_MAX - reader->position))
         return reader_fail(reader, MU_STATUS_BAD_DECODINGERROR);
     return MU_STATUS_GOOD;
 }
@@ -154,9 +157,6 @@ opcua_statuscode_t mu_binary_read_double(mu_binary_reader_t *reader, opcua_doubl
 }
 
 opcua_statuscode_t mu_binary_read_statuscode(mu_binary_reader_t *reader, opcua_statuscode_t *value) {
-    opcua_statuscode_t status = reader_status(reader);
-    if (status != MU_STATUS_GOOD)
-        return status;
     return mu_binary_read_uint32(reader, value);
 }
 

@@ -24,12 +24,11 @@ opcua_statuscode_t mu_write_request_decode(mu_binary_reader_t *reader, mu_write_
         return MU_STATUS_BAD_TOOMANYOPERATIONS;
     }
 
-    req->num_nodes_to_write = (size_t)no_of_nodes;
+    size_t node_count = (size_t)no_of_nodes;
+    req->num_nodes_to_write = node_count;
     req->nodes_to_write = nodes_array;
 
-    for (size_t i = 0; i < req->num_nodes_to_write; ++i) {
-        mu_write_value_t *node = &req->nodes_to_write[i];
-
+    for (mu_write_value_t *node = nodes_array, *end = nodes_array + node_count; node != end; ++node) {
         status = mu_binary_read_nodeid(reader, &node->node_id);
         if (status != MU_STATUS_GOOD)
             return status;
@@ -55,12 +54,14 @@ opcua_statuscode_t mu_write_response_encode(mu_binary_writer_t *writer, const mu
         return MU_STATUS_BAD_INTERNALERROR;
 
     opcua_statuscode_t status;
-    status = mu_binary_write_int32(writer, (opcua_int32_t)resp->num_results);
+    size_t result_count = resp->num_results;
+    status = mu_binary_write_int32(writer, (opcua_int32_t)result_count);
     if (status != MU_STATUS_GOOD)
         return status;
 
-    for (size_t i = 0; i < resp->num_results; ++i) {
-        status = mu_binary_write_statuscode(writer, resp->results[i]);
+    const opcua_statuscode_t *results = resp->results;
+    for (size_t i = 0; i < result_count; ++i) {
+        status = mu_binary_write_statuscode(writer, results[i]);
         if (status != MU_STATUS_GOOD)
             return status;
     }

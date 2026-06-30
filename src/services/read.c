@@ -173,7 +173,20 @@ opcua_statuscode_t mu_read_process_with_user_index(const mu_address_space_t *add
             continue;
         }
 
-        opcua_statuscode_t status = read_attribute(address_space, node, read_val->attribute_id, &dv->value);
+        opcua_statuscode_t status;
+        if (read_val->attribute_id == MU_ATTRIBUTEID_VALUE) {
+            dv->value.is_array = false;
+            dv->value.array_length = 0;
+            if (node->node_class != MU_NODECLASS_VARIABLE) {
+                status = MU_STATUS_BAD_ATTRIBUTEIDINVALID;
+            } else if (node->value) {
+                status = mu_value_source_read(node->value, &node->node_id, &dv->value);
+            } else {
+                status = MU_STATUS_BAD_NOTREADABLE;
+            }
+        } else {
+            status = read_attribute(address_space, node, read_val->attribute_id, &dv->value);
+        }
         if (status == MU_STATUS_GOOD) {
             dv->has_value = true;
             /* Optionally add timestamps based on req->timestamps_to_return, but not strictly needed for test */

@@ -58,9 +58,55 @@ void test_binary_reader_rejects_overflowed_bounds_check(void) {
     TEST_ASSERT_EQUAL_size_t(overflow_position, reader.position);
 }
 
+void test_binary_reader_preserves_status_and_position_after_primitive_error(void) {
+    const opcua_byte_t buffer[1] = {0x01};
+    mu_binary_reader_t reader;
+    opcua_uint32_t value = 0xA5A5A5A5u;
+    opcua_boolean_t boolean_value = false;
+
+    /* OPC-10000-6 section 5.2.1 defines Binary DataEncoding as a concrete
+       encoded stream. A primitive read that cannot consume all required bytes
+       must fail without consuming partial stream bytes, and the reader's sticky
+       error status must make later primitive reads no-ops. */
+    mu_binary_reader_init(&reader, buffer, sizeof(buffer));
+
+    TEST_ASSERT_EQUAL(MU_STATUS_BAD_DECODINGERROR, mu_binary_read_uint32(&reader, &value));
+    TEST_ASSERT_EQUAL(MU_STATUS_BAD_DECODINGERROR, reader.status);
+    TEST_ASSERT_EQUAL_size_t(0u, reader.position);
+    TEST_ASSERT_EQUAL_HEX32(0xA5A5A5A5u, value);
+
+    TEST_ASSERT_EQUAL(MU_STATUS_BAD_DECODINGERROR, mu_binary_read_boolean(&reader, &boolean_value));
+    TEST_ASSERT_EQUAL(MU_STATUS_BAD_DECODINGERROR, reader.status);
+    TEST_ASSERT_EQUAL_size_t(0u, reader.position);
+    TEST_ASSERT_FALSE(boolean_value);
+}
+
+void test_binary_writer_preserves_status_and_position_after_primitive_error(void) {
+    opcua_byte_t buffer[1] = {0xCCu};
+    mu_binary_writer_t writer;
+
+    /* OPC-10000-6 section 5.2.1 Binary DataEncoding writes complete primitive
+       values to the stream. A primitive write that cannot fit must fail without
+       partial output, and the writer's sticky error status must make later
+       primitive writes no-ops. */
+    mu_binary_writer_init(&writer, buffer, sizeof(buffer));
+
+    TEST_ASSERT_EQUAL(MU_STATUS_BAD_ENCODINGERROR, mu_binary_write_uint32(&writer, 0x12345678u));
+    TEST_ASSERT_EQUAL(MU_STATUS_BAD_ENCODINGERROR, writer.status);
+    TEST_ASSERT_EQUAL_size_t(0u, writer.position);
+    TEST_ASSERT_EQUAL_HEX8(0xCCu, buffer[0]);
+
+    TEST_ASSERT_EQUAL(MU_STATUS_BAD_ENCODINGERROR, mu_binary_write_boolean(&writer, true));
+    TEST_ASSERT_EQUAL(MU_STATUS_BAD_ENCODINGERROR, writer.status);
+    TEST_ASSERT_EQUAL_size_t(0u, writer.position);
+    TEST_ASSERT_EQUAL_HEX8(0xCCu, buffer[0]);
+}
+
 int main(void) {
     UNITY_BEGIN();
     RUN_TEST(test_binary_primitive_roundtrip);
     RUN_TEST(test_binary_reader_rejects_overflowed_bounds_check);
+    RUN_TEST(test_binary_reader_preserves_status_and_position_after_primitive_error);
+    RUN_TEST(test_binary_writer_preserves_status_and_position_after_primitive_error);
     return UNITY_END();
 }

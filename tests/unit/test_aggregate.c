@@ -412,7 +412,8 @@ void test_aggregate_filter_fails_on_unsupported_aggregate_type(void) {
 
     /* ExtensionObject filter: AggregateFilter */
     mu_nodeid_t filter_type = {0, MU_NODEID_NUMERIC, {MU_ID_AGGREGATEFILTER_ENCODING_DEFAULTBINARY}};
-    mu_binary_write_extension_object_header(&w, &filter_type, aggregate_filter_body_length(time_average_aggregate_type));
+    mu_binary_write_extension_object_header(&w, &filter_type,
+                                            aggregate_filter_body_length(time_average_aggregate_type));
 
     /* AggregateFilter Body with unsupported standard TimeAverage type */
     mu_binary_write_int64(&w, 0);
@@ -491,9 +492,8 @@ void test_aggregate_filter_fails_on_truncated_extension_object_body(void) {
 
     opcua_byte_t resp[512];
     size_t resp_len = sizeof(resp);
-    TEST_ASSERT_EQUAL_HEX32(
-        MU_STATUS_BAD_DECODINGERROR,
-        mu_service_dispatch(&server, MU_ID_CREATEMONITOREDITEMSREQUEST, req, w.position, resp, &resp_len));
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_BAD_DECODINGERROR, mu_service_dispatch(&server, MU_ID_CREATEMONITOREDITEMSREQUEST,
+                                                                             req, w.position, resp, &resp_len));
     TEST_ASSERT_EQUAL_size_t(0u, server.subs.active_monitored_items_count);
     TEST_ASSERT_FALSE(server.subs.monitored_items[0].in_use);
 }

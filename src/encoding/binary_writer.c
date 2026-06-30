@@ -28,17 +28,17 @@ static opcua_statuscode_t writer_fail(mu_binary_writer_t *writer, opcua_statusco
 }
 
 static opcua_statuscode_t ensure_space(mu_binary_writer_t *writer, size_t count) {
+    /* OPC-10000-6 Section 5.2: encoded values must fit the output buffer. */
+    if (writer && writer->status == MU_STATUS_GOOD && writer->buffer && writer->position <= writer->length &&
+        count <= writer->length - writer->position) {
+        return MU_STATUS_GOOD;
+    }
     opcua_statuscode_t status = writer_status(writer);
     if (status != MU_STATUS_GOOD)
         return status;
     if (!writer->buffer)
         return writer_fail(writer, MU_STATUS_BAD_INTERNALERROR);
-    /* OPC-10000-6 Section 5.2: encoded values must fit the output buffer. */
-    if (writer->position > writer->length)
-        return writer_fail(writer, MU_STATUS_BAD_ENCODINGERROR);
-    if (count > writer->length - writer->position)
-        return writer_fail(writer, MU_STATUS_BAD_ENCODINGERROR);
-    return MU_STATUS_GOOD;
+    return writer_fail(writer, MU_STATUS_BAD_ENCODINGERROR);
 }
 
 opcua_statuscode_t mu_binary_write_boolean(mu_binary_writer_t *writer, opcua_boolean_t value) {

@@ -3,6 +3,13 @@
 #include "micro_opcua/encoding.h"
 #include <string.h>
 
+static void tcp_write_uint32_le(opcua_byte_t *buffer, size_t offset, opcua_uint32_t value) {
+    buffer[offset] = (opcua_byte_t)(value & 0xFFu);
+    buffer[offset + 1u] = (opcua_byte_t)((value >> 8u) & 0xFFu);
+    buffer[offset + 2u] = (opcua_byte_t)((value >> 16u) & 0xFFu);
+    buffer[offset + 3u] = (opcua_byte_t)((value >> 24u) & 0xFFu);
+}
+
 void mu_tcp_connection_init(mu_tcp_connection_t *connection) {
     if (connection) {
         connection->state = MU_TCP_STATE_CLOSED;
@@ -99,42 +106,19 @@ opcua_statuscode_t mu_tcp_process_hello(mu_tcp_connection_t *connection, const o
     if (*ack_length < 28)
         return MU_STATUS_BAD_INTERNALERROR;
 
-    mu_binary_writer_t writer;
-    mu_binary_writer_init(&writer, ack_message, *ack_length);
+    /* OPC-10000-6 sections 7.1.2.2 and 7.2: fixed ACKF response header and body. */
+    ack_message[0] = 'A';
+    ack_message[1] = 'C';
+    ack_message[2] = 'K';
+    ack_message[3] = 'F';
+    tcp_write_uint32_le(ack_message, 4u, 28u);                              /* MessageSize */
+    tcp_write_uint32_le(ack_message, 8u, 0u);                               /* ProtocolVersion */
+    tcp_write_uint32_le(ack_message, 12u, connection->send_buffer_size);    /* Server receive limit */
+    tcp_write_uint32_le(ack_message, 16u, connection->receive_buffer_size); /* Server send limit */
+    tcp_write_uint32_le(ack_message, 20u, connection->max_message_size);
+    tcp_write_uint32_le(ack_message, 24u, connection->max_chunk_count);
 
-    status = mu_binary_write_byte(&writer, 'A');
-    if (status != MU_STATUS_GOOD)
-        return status;
-    status = mu_binary_write_byte(&writer, 'C');
-    if (status != MU_STATUS_GOOD)
-        return status;
-    status = mu_binary_write_byte(&writer, 'K');
-    if (status != MU_STATUS_GOOD)
-        return status;
-    status = mu_binary_write_byte(&writer, 'F');
-    if (status != MU_STATUS_GOOD)
-        return status;
-
-    status = mu_binary_write_int32(&writer, 28); /* ACK size */
-    if (status != MU_STATUS_GOOD)
-        return status;
-    status = mu_binary_write_uint32(&writer, 0); /* ProtocolVersion */
-    if (status != MU_STATUS_GOOD)
-        return status;
-    status = mu_binary_write_uint32(&writer, connection->send_buffer_size); /* Server's receive is client's send */
-    if (status != MU_STATUS_GOOD)
-        return status;
-    status = mu_binary_write_uint32(&writer, connection->receive_buffer_size); /* Server's send is client's receive */
-    if (status != MU_STATUS_GOOD)
-        return status;
-    status = mu_binary_write_uint32(&writer, connection->max_message_size);
-    if (status != MU_STATUS_GOOD)
-        return status;
-    status = mu_binary_write_uint32(&writer, connection->max_chunk_count);
-    if (status != MU_STATUS_GOOD)
-        return status;
-
-    *ack_length = writer.position;
+    *ack_length = 28u;
     connection->state = MU_TCP_STATE_ESTABLISHED;
 
     return MU_STATUS_GOOD;
@@ -151,34 +135,22 @@ opcua_statuscode_t mu_tcp_create_error_message(opcua_statuscode_t error_code, co
     if (*err_length < total_len)
         return MU_STATUS_BAD_INTERNALERROR;
 
+    /* OPC-10000-6 sections 7.1.2.2 and 7.2: fixed ERRF response header and Error field. */
+    err_message[0] = 'E';
+    err_message[1] = 'R';
+    err_message[2] = 'R';
+    err_message[3] = 'F';
+    tcp_write_uint32_le(err_message, 4u, (opcua_uint32_t)total_len);
+    tcp_write_uint32_le(err_message, 8u, (opcua_uint32_t)error_code);
+
     mu_binary_writer_t writer;
     mu_binary_writer_init(&writer, err_message, *err_length);
-
-    opcua_statuscode_t status = mu_binary_write_byte(&writer, 'E');
-    if (status != MU_STATUS_GOOD)
-        return status;
-    status = mu_binary_write_byte(&writer, 'R');
-    if (status != MU_STATUS_GOOD)
-        return status;
-    status = mu_binary_write_byte(&writer, 'R');
-    if (status != MU_STATUS_GOOD)
-        return status;
-    status = mu_binary_write_byte(&writer, 'F');
-    if (status != MU_STATUS_GOOD)
-        return status;
-
-    status = mu_binary_write_int32(&writer, (opcua_int32_t)total_len);
-    if (status != MU_STATUS_GOOD)
-        return status;
-
-    status = mu_binary_write_uint32(&writer, (opcua_uint32_t)error_code);
-    if (status != MU_STATUS_GOOD)
-        return status;
+    writer.position = 12u;
 
     mu_string_t str_reason;
     str_reason.length = (opcua_int32_t)reason_len;
     str_reason.data = (opcua_byte_t *)reason;
-    status = mu_binary_write_string(&writer, &str_reason);
+    opcua_statuscode_t status = mu_binary_write_string(&writer, &str_reason);
     if (status != MU_STATUS_GOOD)
         return status;
 

@@ -236,6 +236,9 @@ static const mu_service_descriptor_t g_supported_services[] = {
     {{MU_ID_ACTIVATESESSIONREQUEST, MU_ID_ACTIVATESESSIONRESPONSE, false},
      handle_activate_session}, /* Does not require an activated session to activate */
     {{MU_ID_CLOSESESSIONREQUEST, MU_ID_CLOSESESSIONRESPONSE, true}, handle_close_session},
+#ifdef MICRO_OPCUA_SERVICE_READ
+    {{MU_ID_READREQUEST, MU_ID_READRESPONSE, true}, handle_read},
+#endif
 #ifdef MICRO_OPCUA_SERVICE_REGISTER_NODES
     {{MU_ID_REGISTERNODESREQUEST, MU_ID_REGISTERNODESRESPONSE, true}, handle_register_nodes},
     {{MU_ID_UNREGISTERNODESREQUEST, MU_ID_UNREGISTERNODESRESPONSE, true}, handle_unregister_nodes},
@@ -245,9 +248,6 @@ static const mu_service_descriptor_t g_supported_services[] = {
      handle_translate_browse_paths},
     {{MU_ID_BROWSEREQUEST, MU_ID_BROWSERESPONSE, true}, handle_browse},
     {{MU_ID_BROWSENEXTREQUEST, MU_ID_BROWSENEXTRESPONSE, true}, handle_browse_next},
-#endif
-#ifdef MICRO_OPCUA_SERVICE_READ
-    {{MU_ID_READREQUEST, MU_ID_READRESPONSE, true}, handle_read},
 #endif
 #ifdef MICRO_OPCUA_SERVICE_QUERY
     {{MU_ID_QUERYFIRSTREQUEST, MU_ID_QUERYFIRSTRESPONSE, true}, handle_query_first},
@@ -3514,56 +3514,44 @@ opcua_statuscode_t handle_write(mu_server_t *server, mu_binary_reader_t *r, mu_b
     wresp.results = results;
 
     for (size_t i = 0; i < wreq.num_nodes_to_write; ++i) {
-        mu_write_value_t *write_val = &wreq.nodes_to_write[i];
-        results[i] = MU_STATUS_GOOD;
+        const mu_write_value_t *write_val = &wreq.nodes_to_write[i];
+        opcua_statuscode_t result = MU_STATUS_GOOD;
 
         const mu_node_t *node = mu_resolve_node(server->config.address_space, &server->user_address_space_index,
                                                 &server->runtime_base.space, &write_val->node_id);
         if (!node) {
-            results[i] = MU_STATUS_BAD_NODEIDUNKNOWN;
-            continue;
-        }
-
-        if (write_val->attribute_id != MU_ATTRIBUTEID_VALUE) {
-            results[i] = MU_STATUS_BAD_NOTWRITABLE;
-            continue;
-        }
-
-        /* OPC-10000-4 section 5.11.4.2: Value Attribute writes require DataValue.value. */
-        if (!write_val->value.has_value) {
-            results[i] = MU_STATUS_BAD_TYPEMISMATCH;
-            continue;
-        }
-
-        if (write_val->index_range.length > 0) {
-            results[i] = MU_STATUS_BAD_WRITENOTSUPPORTED;
-            continue;
-        }
-
-        if (node->node_class != MU_NODECLASS_VARIABLE) {
-            results[i] = MU_STATUS_BAD_NOTWRITABLE;
-            continue;
-        }
-
-        /* Check value type matches if the variable has a current value */
-        if (node->value) {
+            result = MU_STATUS_BAD_NODEIDUNKNOWN;
+        } else if (write_val->attribute_id != MU_ATTRIBUTEID_VALUE) {
+            result = MU_STATUS_BAD_NOTWRITABLE;
+        } else if (!write_val->value.has_value) {
+            /* OPC-10000-4 section 5.11.4.2: Value Attribute writes require DataValue.value. */
+            result = MU_STATUS_BAD_TYPEMISMATCH;
+        } else if (write_val->index_range.length > 0) {
+            result = MU_STATUS_BAD_WRITENOTSUPPORTED;
+        } else if (node->node_class != MU_NODECLASS_VARIABLE) {
+            result = MU_STATUS_BAD_NOTWRITABLE;
+        } else if (node->value) {
+            /* Check value type matches if the variable has a current value */
             mu_variant_t current_val;
             s = mu_value_source_read(node->value, &node->node_id, &current_val);
-            if (s == MU_STATUS_GOOD) {
-                if (current_val.type != write_val->value.value.type) {
-                    results[i] = MU_STATUS_BAD_TYPEMISMATCH;
-                    continue;
-                }
+            if (s == MU_STATUS_GOOD && current_val.type != write_val->value.value.type) {
+                result = MU_STATUS_BAD_TYPEMISMATCH;
             }
         }
 
-        /* Apply write callback if configured */
-        if (server->config.write_handler) {
-            results[i] = server->config.write_handler(server->config.write_handler_handle, &write_val->node_id,
-                                                      (opcua_uint32_t)write_val->attribute_id, &write_val->value.value);
-        } else {
-            results[i] = MU_STATUS_BAD_WRITENOTSUPPORTED;
+        if (result == MU_STATUS_GOOD) {
+            /* Apply write callback if configured */
+            mu_write_handler_t write_handler = server->config.write_handler;
+            void *write_handler_handle = server->config.write_handler_handle;
+            if (write_handler) {
+                result = write_handler(write_handler_handle, &write_val->node_id,
+                                       (opcua_uint32_t)write_val->attribute_id, &write_val->value.value);
+            } else {
+                result = MU_STATUS_BAD_WRITENOTSUPPORTED;
+            }
         }
+
+        results[i] = result;
     }
 
     s = write_response_prefix(w, MU_ID_WRITERESPONSE, req.request_handle, MU_STATUS_GOOD);

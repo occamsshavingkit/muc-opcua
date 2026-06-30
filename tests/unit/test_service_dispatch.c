@@ -55,22 +55,36 @@ void test_service_dispatch_unknown_request(void) {
 }
 
 void test_service_dispatch_unsupported_services(void) {
-    opcua_byte_t req_body[1];
-    opcua_byte_t resp_body[1];
-    size_t resp_len = 1;
+    opcua_byte_t req_body[1] = {0};
+    opcua_byte_t resp_body[8] = {0};
     mu_server_t server;
+    memset(&server, 0, sizeof(server));
+    server.secure_channel.is_open = true;
 
-    opcua_uint32_t unsupported[] = {
+    const opcua_uint32_t unsupported[] = {
 #ifndef MICRO_OPCUA_SERVICE_WRITE
-        673, /* WriteRequest (not in Nano) */
+        MU_ID_WRITEREQUEST,
 #endif
-        711, /* CallRequest (Method) */
-        643  /* HistoryReadRequest */
+#if !(MICRO_OPCUA_SUBSCRIPTIONS && MICRO_OPCUA_SUBSCRIPTIONS_STANDARD && MICRO_OPCUA_BASE_TYPE_SYSTEM)
+        MU_ID_CALLREQUEST,
+#endif
+#ifndef MICRO_OPCUA_SERVICE_HISTORY
+        MU_ID_HISTORYREADREQUEST,
+#endif
+        841u /* TransferSubscriptionsRequest_Encoding_DefaultBinary */
     };
 
+    /* OPC-10000-4 section 7.38.2 defines Bad_ServiceUnsupported for a requested
+       service the Server does not support. OPC-10000-7 section 4.2 treats
+       ConformanceUnits as specific feature sets, so these disabled or out-of-
+       profile services must remain absent from the dispatch table rather than
+       becoming implied profile/conformance support. */
     for (size_t i = 0; i < sizeof(unsupported) / sizeof(unsupported[0]); i++) {
-        TEST_ASSERT_EQUAL(MU_STATUS_BAD_SERVICEUNSUPPORTED,
-                          mu_service_dispatch(&server, unsupported[i], req_body, 1, resp_body, &resp_len));
+        size_t resp_len = sizeof(resp_body);
+        TEST_ASSERT_NULL(mu_get_service_handler(unsupported[i]));
+        TEST_ASSERT_EQUAL_HEX32(
+            MU_STATUS_BAD_SERVICEUNSUPPORTED,
+            mu_service_dispatch(&server, unsupported[i], req_body, sizeof(req_body), resp_body, &resp_len));
     }
 }
 

@@ -179,11 +179,108 @@ void test_read_service_browsename_displayname(void) {
     TEST_ASSERT_EQUAL(MU_STATUS_BAD_ATTRIBUTEIDINVALID, resp.results[2].status);
 }
 
+void test_read_service_batch_preserves_per_operation_results(void) {
+    mu_value_source_t variable_value;
+    variable_value.type = MU_VALUESOURCE_STATIC;
+    variable_value.data.static_value.type = MU_TYPE_INT32;
+    variable_value.data.static_value.is_array = false;
+    variable_value.data.static_value.value.i32 = 77;
+
+    mu_node_t nodes[2];
+    nodes[0].node_id =
+        (mu_nodeid_t){.identifier_type = MU_NODEID_NUMERIC, .namespace_index = 1, .identifier.numeric = 1001};
+    nodes[0].node_class = MU_NODECLASS_VARIABLE;
+    nodes[0].browse_name = (mu_string_t){8, (const opcua_byte_t *)"BatchVar"};
+    nodes[0].display_name = (mu_string_t){8, (const opcua_byte_t *)"BatchVar"};
+    nodes[0].references = NULL;
+    nodes[0].reference_count = 0;
+    nodes[0].value = &variable_value;
+
+    nodes[1].node_id =
+        (mu_nodeid_t){.identifier_type = MU_NODEID_NUMERIC, .namespace_index = 1, .identifier.numeric = 1002};
+    nodes[1].node_class = MU_NODECLASS_OBJECT;
+    nodes[1].browse_name = (mu_string_t){8, (const opcua_byte_t *)"BatchObj"};
+    nodes[1].display_name = (mu_string_t){8, (const opcua_byte_t *)"BatchObj"};
+    nodes[1].references = NULL;
+    nodes[1].reference_count = 0;
+    nodes[1].value = NULL;
+
+    mu_address_space_t address_space = {.nodes = nodes, .node_count = 2};
+
+    mu_read_value_id_t reads[5] = {
+        {.node_id = nodes[0].node_id, .attribute_id = MU_ATTRIBUTEID_VALUE},
+        {.node_id = nodes[0].node_id, .attribute_id = MU_ATTRIBUTEID_DISPLAYNAME},
+        {.node_id = {.identifier_type = MU_NODEID_NUMERIC, .namespace_index = 1, .identifier.numeric = 9999},
+         .attribute_id = MU_ATTRIBUTEID_VALUE},
+        {.node_id = nodes[1].node_id, .attribute_id = MU_ATTRIBUTEID_VALUE},
+        {.node_id = nodes[0].node_id, .attribute_id = MU_ATTRIBUTEID_DESCRIPTION},
+    };
+
+    mu_read_request_t batch_req = {.max_age = 0,
+                                   .timestamps_to_return = MU_TIMESTAMPS_TO_RETURN_NEITHER,
+                                   .nodes_to_read = reads,
+                                   .num_nodes_to_read = 5};
+    mu_read_response_t batch_resp;
+    mu_datavalue_t batch_results[5];
+
+    /* OPC-10000-4 5.11.2.2 returns a StatusCode for each nodesToRead entry.
+       OPC-10000-4 5.11.2.4 and 7.38.2 define those operation-level statuses,
+       so mixed per-operation failures must not change the service-level result. */
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_read_process(&address_space, NULL, &batch_req, &batch_resp, batch_results, 5));
+    TEST_ASSERT_EQUAL(5, batch_resp.num_results);
+
+    for (size_t i = 0; i < batch_req.num_nodes_to_read; ++i) {
+        mu_read_request_t single_req = {.max_age = 0,
+                                        .timestamps_to_return = MU_TIMESTAMPS_TO_RETURN_NEITHER,
+                                        .nodes_to_read = &reads[i],
+                                        .num_nodes_to_read = 1};
+        mu_read_response_t single_resp;
+        mu_datavalue_t single_result;
+
+        TEST_ASSERT_EQUAL(MU_STATUS_GOOD,
+                          mu_read_process(&address_space, NULL, &single_req, &single_resp, &single_result, 1));
+        TEST_ASSERT_EQUAL(1, single_resp.num_results);
+        TEST_ASSERT_EQUAL(single_resp.results[0].has_value, batch_resp.results[i].has_value);
+        TEST_ASSERT_EQUAL(single_resp.results[0].has_status, batch_resp.results[i].has_status);
+
+        if (single_resp.results[0].has_status) {
+            TEST_ASSERT_EQUAL(single_resp.results[0].status, batch_resp.results[i].status);
+        }
+        if (single_resp.results[0].has_value) {
+            TEST_ASSERT_EQUAL(single_resp.results[0].value.type, batch_resp.results[i].value.type);
+            TEST_ASSERT_EQUAL(single_resp.results[0].value.is_array, batch_resp.results[i].value.is_array);
+
+            if (batch_resp.results[i].value.type == MU_TYPE_INT32) {
+                TEST_ASSERT_EQUAL(single_resp.results[0].value.value.i32, batch_resp.results[i].value.value.i32);
+            } else if (batch_resp.results[i].value.type == MU_TYPE_LOCALIZEDTEXT) {
+                TEST_ASSERT_EQUAL(single_resp.results[0].value.value.localized_text.text.length,
+                                  batch_resp.results[i].value.value.localized_text.text.length);
+                TEST_ASSERT_EQUAL_MEMORY(single_resp.results[0].value.value.localized_text.text.data,
+                                         batch_resp.results[i].value.value.localized_text.text.data,
+                                         (size_t)batch_resp.results[i].value.value.localized_text.text.length);
+            }
+        }
+    }
+
+    TEST_ASSERT_TRUE(batch_resp.results[0].has_value);
+    TEST_ASSERT_EQUAL(MU_TYPE_INT32, batch_resp.results[0].value.type);
+    TEST_ASSERT_EQUAL(77, batch_resp.results[0].value.value.i32);
+    TEST_ASSERT_TRUE(batch_resp.results[1].has_value);
+    TEST_ASSERT_EQUAL(MU_TYPE_LOCALIZEDTEXT, batch_resp.results[1].value.type);
+    TEST_ASSERT_TRUE(batch_resp.results[2].has_status);
+    TEST_ASSERT_EQUAL(MU_STATUS_BAD_NODEIDUNKNOWN, batch_resp.results[2].status);
+    TEST_ASSERT_TRUE(batch_resp.results[3].has_status);
+    TEST_ASSERT_EQUAL(MU_STATUS_BAD_ATTRIBUTEIDINVALID, batch_resp.results[3].status);
+    TEST_ASSERT_TRUE(batch_resp.results[4].has_status);
+    TEST_ASSERT_EQUAL(MU_STATUS_BAD_ATTRIBUTEIDINVALID, batch_resp.results[4].status);
+}
+
 int main(void) {
     UNITY_BEGIN();
     RUN_TEST(test_read_service_request_decode);
     RUN_TEST(test_read_service_scalar_values);
     RUN_TEST(test_read_service_rejects_invalid_timestamps_to_return);
     RUN_TEST(test_read_service_browsename_displayname);
+    RUN_TEST(test_read_service_batch_preserves_per_operation_results);
     return UNITY_END();
 }

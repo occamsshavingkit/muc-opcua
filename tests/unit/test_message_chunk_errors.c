@@ -215,6 +215,13 @@ void test_message_chunk_inconsistent_length(void) {
     TEST_ASSERT_EQUAL(MU_STATUS_BAD_TCPMESSAGETOOLARGE, mu_parse_message_header(buffer, sizeof(buffer), &header));
 }
 
+void test_message_chunk_msg_at_message_header_boundary_rejected(void) {
+    /* OPC-10000-6 section 6.7.2: a MSG chunk needs the MessageHeader plus SecureChannelId before body bytes. */
+    opcua_byte_t buffer[8] = {'M', 'S', 'G', 'F', 8, 0, 0, 0};
+    mu_message_header_t header;
+    TEST_ASSERT_EQUAL(MU_STATUS_BAD_TCPINTERNALERROR, mu_parse_message_header(buffer, sizeof(buffer), &header));
+}
+
 void test_message_chunk_invalid_message_type(void) {
     /* OPC-10000-6 sections 6.7.2 and 7.1.2.2 require invalid MessageType values to return Bad_TcpMessageTypeInvalid. */
     opcua_byte_t buffer[12] = {'X', 'Y', 'Z', 'F', 12, 0, 0, 0, 0, 0, 0, 1};
@@ -228,6 +235,13 @@ void test_message_chunk_abort_chunk_returns_tcp_error_status(void) {
     size_t len = build_abort_msg(buffer, sizeof(buffer), MU_STATUS_BAD_TCPINTERNALERROR);
     mu_message_header_t header;
     TEST_ASSERT_EQUAL(MU_STATUS_BAD_TCPINTERNALERROR, mu_parse_message_header(buffer, len, &header));
+}
+
+void test_message_chunk_abort_chunk_missing_error_code_rejected(void) {
+    /* OPC-10000-6 section 6.7.3: abort chunks must include the Error StatusCode before optional Reason text. */
+    opcua_byte_t buffer[16] = {'M', 'S', 'G', 'A', 16, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0};
+    mu_message_header_t header;
+    TEST_ASSERT_EQUAL(MU_STATUS_BAD_TCPINTERNALERROR, mu_parse_message_header(buffer, sizeof(buffer), &header));
 }
 
 void test_message_chunk_abort_chunk_does_not_dispatch_service_payload(void) {
@@ -289,6 +303,67 @@ void test_message_chunk_non_final_chunk_in_single_chunk_mode_returns_tcp_error_w
     assert_tcp_error_write(&transport, 0, MU_STATUS_BAD_TCPINTERNALERROR);
 }
 
+void test_message_chunk_incomplete_declared_chunk_waits_without_dispatch(void) {
+    /* OPC-10000-6 section 6.7.2: MessageSize defines the chunk byte boundary; incomplete chunks are not dispatched. */
+    message_chunk_transport_t transport;
+    opcua_byte_t chunk_prefix[8] = {'M', 'S', 'G', 'F', 24, 0, 0, 0};
+    mu_server_config_t config;
+    opcua_byte_t rx[8192];
+    opcua_byte_t tx[8192];
+    union {
+        _Alignas(8) opcua_byte_t bytes[MU_SERVER_STORAGE_BYTES];
+        struct mu_server align;
+    } storage;
+    mu_server_t *server = NULL;
+
+    memset(&transport, 0, sizeof(transport));
+    enqueue_request(&transport, chunk_prefix, sizeof(chunk_prefix));
+
+    configure_transport_server(&config, &transport, rx, tx);
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_server_init(storage.bytes, sizeof(storage.bytes), &config, &server));
+
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_server_poll(server));
+    mark_transport_and_channel_established(server);
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_server_poll(server));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_server_poll(server));
+
+    TEST_ASSERT_EQUAL(1u, transport.read_index);
+    TEST_ASSERT_EQUAL(0, transport.write_count);
+}
+
+void test_message_chunk_continuation_followed_by_abort_sends_only_continuation_error(void) {
+    /* OPC-10000-6 section 6.7.3: an abort after a malformed continuation does not turn prior bytes into a request. */
+    message_chunk_transport_t transport;
+    opcua_byte_t chunks[128];
+    mu_server_config_t config;
+    opcua_byte_t rx[8192];
+    opcua_byte_t tx[8192];
+    union {
+        _Alignas(8) opcua_byte_t bytes[MU_SERVER_STORAGE_BYTES];
+        struct mu_server align;
+    } storage;
+    mu_server_t *server = NULL;
+    size_t continuation_len;
+    size_t abort_len;
+
+    memset(&transport, 0, sizeof(transport));
+    continuation_len = build_non_final_msg_with_unsupported_service(chunks, sizeof(chunks));
+    abort_len =
+        build_abort_msg(chunks + continuation_len, sizeof(chunks) - continuation_len, MU_STATUS_BAD_TCPINTERNALERROR);
+    enqueue_request(&transport, chunks, continuation_len + abort_len);
+
+    configure_transport_server(&config, &transport, rx, tx);
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_server_init(storage.bytes, sizeof(storage.bytes), &config, &server));
+
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_server_poll(server));
+    mark_transport_and_channel_established(server);
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_server_poll(server));
+
+    TEST_ASSERT_EQUAL(1u, transport.read_index);
+    TEST_ASSERT_EQUAL(1, transport.write_count);
+    assert_tcp_error_write(&transport, 0, MU_STATUS_BAD_TCPINTERNALERROR);
+}
+
 void test_message_chunk_invalid_chunk_type(void) {
     opcua_byte_t buffer[12] = {'M', 'S', 'G', 'X', 12, 0, 0, 0, 0, 0, 0, 1};
     mu_message_header_t header;
@@ -300,10 +375,14 @@ int main(void) {
     RUN_TEST(test_message_chunk_too_small);
     RUN_TEST(test_message_chunk_too_large);
     RUN_TEST(test_message_chunk_inconsistent_length);
+    RUN_TEST(test_message_chunk_msg_at_message_header_boundary_rejected);
     RUN_TEST(test_message_chunk_invalid_message_type);
     RUN_TEST(test_message_chunk_abort_chunk_returns_tcp_error_status);
+    RUN_TEST(test_message_chunk_abort_chunk_missing_error_code_rejected);
     RUN_TEST(test_message_chunk_abort_chunk_does_not_dispatch_service_payload);
     RUN_TEST(test_message_chunk_non_final_chunk_in_single_chunk_mode_returns_tcp_error_without_dispatch);
+    RUN_TEST(test_message_chunk_incomplete_declared_chunk_waits_without_dispatch);
+    RUN_TEST(test_message_chunk_continuation_followed_by_abort_sends_only_continuation_error);
     RUN_TEST(test_message_chunk_invalid_chunk_type);
     return UNITY_END();
 }

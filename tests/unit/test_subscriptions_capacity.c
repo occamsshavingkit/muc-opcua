@@ -125,8 +125,7 @@ void test_set_triggering_rejects_link_capacity_exhaustion_without_corrupting_exi
     TEST_ASSERT_GREATER_OR_EQUAL_UINT32(MU_MAX_TRIGGER_LINKS + 2u, MU_MAX_MONITORED_ITEMS);
 
     mu_subscription_t *sub = NULL;
-    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD,
-                            mu_subscription_create(&subs, 1u, 100u, 30u, 10u, 0u, 0u, true, 0u, &sub));
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_subscription_create(&subs, 1u, 100u, 30u, 10u, 0u, 0u, true, 0u, &sub));
     TEST_ASSERT_NOT_NULL(sub);
 
     mu_monitored_item_t *triggering_item = NULL;

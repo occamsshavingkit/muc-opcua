@@ -30,8 +30,11 @@ PROFILE_CACHE_RESET := -U MU_MAX_SUBSCRIPTIONS -U MU_MAX_MONITORED_ITEMS \
 EMBEDDED_CAPS := -DMU_MAX_SUBSCRIPTIONS=2 -DMU_MAX_MONITORED_ITEMS=100 \
 	-DMU_MAX_PUBLISH_REQUESTS=5 -DMU_MONITORED_QUEUE_DEPTH=2 \
 	-DMU_MAX_TRIGGER_LINKS=4
+SPEED_LAB_FLAGS ?= --cpu 11 --use-sudo --require-affinity --require-realtime \
+	--require-isolated-cpu --shield-cpu
+SPEED_SMOKE_FLAGS ?= --cpu 11 --realtime-priority 0
 
-.PHONY: help nano micro embedded all-profiles test clean
+.PHONY: help nano micro embedded all-profiles test speed-matrix speed-smoke speed-current speed-baseline speed-compare clean
 
 help:
 	@echo "micro-opcua profile builds:"
@@ -39,6 +42,10 @@ help:
 	@echo "  make micro     Micro profile (None + subscriptions ON)      -> $(BUILD)/micro"
 	@echo "  make embedded  Embedded 2017 profile target                 -> $(BUILD)/embedded"
 	@echo "  make test      build with tests and run ctest"
+	@echo "  make speed-smoke     run non-strict speed benchmark smoke"
+	@echo "  make speed-current   run lab speed/resource benchmark matrix"
+	@echo "  make speed-baseline  refresh docs/benchmarks/speed-baseline.json in lab mode"
+	@echo "  make speed-compare   compare lab speed/resource results to baseline"
 	@echo "  make clean     remove profile build directories"
 
 nano:
@@ -62,6 +69,21 @@ test:
 	$(CMAKE) -S . -B $(BUILD)/test -DMICRO_OPCUA_BUILD_TESTS=ON
 	$(CMAKE) --build $(BUILD)/test
 	cd $(BUILD)/test && ctest --output-on-failure
+
+speed-matrix:
+	python3 scripts/run_speed_bench.py --matrix
+
+speed-smoke:
+	python3 scripts/run_speed_bench.py $(SPEED_SMOKE_FLAGS)
+
+speed-current:
+	python3 scripts/run_speed_bench.py $(SPEED_LAB_FLAGS)
+
+speed-baseline:
+	python3 scripts/run_speed_bench.py $(SPEED_LAB_FLAGS) --update-baseline
+
+speed-compare:
+	python3 scripts/run_speed_bench.py $(SPEED_LAB_FLAGS) --compare
 
 clean:
 	rm -rf $(BUILD)/nano $(BUILD)/micro $(BUILD)/embedded $(BUILD)/test

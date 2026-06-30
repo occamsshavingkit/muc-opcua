@@ -9,9 +9,6 @@ opcua_statuscode_t mu_parse_message_header(const opcua_byte_t *buffer, size_t le
     if (length < 8)
         return MU_STATUS_BAD_TCPINTERNALERROR;
 
-    mu_binary_reader_t reader;
-    mu_binary_reader_init(&reader, buffer, length);
-
     header->message_type[0] = buffer[0];
     header->message_type[1] = buffer[1];
     header->message_type[2] = buffer[2];
@@ -31,10 +28,8 @@ opcua_statuscode_t mu_parse_message_header(const opcua_byte_t *buffer, size_t le
         return MU_STATUS_BAD_TCPMESSAGETYPEINVALID;
     }
 
-    reader.position = 4;
-    opcua_statuscode_t status = mu_binary_read_uint32(&reader, &header->message_size);
-    if (status != MU_STATUS_GOOD)
-        return status;
+    header->message_size = (opcua_uint32_t)buffer[4] | ((opcua_uint32_t)buffer[5] << 8u) |
+                           ((opcua_uint32_t)buffer[6] << 16u) | ((opcua_uint32_t)buffer[7] << 24u);
 
     if (header->message_size < 8)
         return MU_STATUS_BAD_TCPINTERNALERROR;
@@ -56,9 +51,8 @@ opcua_statuscode_t mu_parse_message_header(const opcua_byte_t *buffer, size_t le
     if (header->message_size < 12)
         return MU_STATUS_BAD_TCPINTERNALERROR;
 
-    status = mu_binary_read_uint32(&reader, &header->secure_channel_id);
-    if (status != MU_STATUS_GOOD)
-        return status;
+    header->secure_channel_id = (opcua_uint32_t)buffer[8] | ((opcua_uint32_t)buffer[9] << 8u) |
+                                ((opcua_uint32_t)buffer[10] << 16u) | ((opcua_uint32_t)buffer[11] << 24u);
 
     if (header->chunk_type == 'A') {
         /* OPC-10000-6 section 6.7.2: abort chunks carry Error/Reason, not service MessageBody bytes. */
@@ -69,9 +63,11 @@ opcua_statuscode_t mu_parse_message_header(const opcua_byte_t *buffer, size_t le
             return MU_STATUS_BAD_TCPINTERNALERROR;
         }
 
+        mu_binary_reader_t reader;
+        mu_binary_reader_init(&reader, buffer, length);
         reader.position = MU_UASC_SYMMETRIC_HEADER_SIZE;
         opcua_statuscode_t abort_status = MU_STATUS_GOOD;
-        status = mu_binary_read_statuscode(&reader, &abort_status);
+        opcua_statuscode_t status = mu_binary_read_statuscode(&reader, &abort_status);
         if (status != MU_STATUS_GOOD) {
             return status;
         }
@@ -87,22 +83,18 @@ opcua_statuscode_t mu_write_message_header(opcua_byte_t *buffer, size_t length, 
     if (length < 12)
         return MU_STATUS_BAD_INTERNALERROR;
 
-    mu_binary_writer_t writer;
-    mu_binary_writer_init(&writer, buffer, length);
-
     buffer[0] = header->message_type[0];
     buffer[1] = header->message_type[1];
     buffer[2] = header->message_type[2];
     buffer[3] = header->chunk_type;
-    writer.position = 4;
-
-    opcua_statuscode_t status = mu_binary_write_uint32(&writer, header->message_size);
-    if (status != MU_STATUS_GOOD)
-        return status;
-
-    status = mu_binary_write_uint32(&writer, header->secure_channel_id);
-    if (status != MU_STATUS_GOOD)
-        return status;
+    buffer[4] = (opcua_byte_t)(header->message_size & 0xFFu);
+    buffer[5] = (opcua_byte_t)((header->message_size >> 8u) & 0xFFu);
+    buffer[6] = (opcua_byte_t)((header->message_size >> 16u) & 0xFFu);
+    buffer[7] = (opcua_byte_t)((header->message_size >> 24u) & 0xFFu);
+    buffer[8] = (opcua_byte_t)(header->secure_channel_id & 0xFFu);
+    buffer[9] = (opcua_byte_t)((header->secure_channel_id >> 8u) & 0xFFu);
+    buffer[10] = (opcua_byte_t)((header->secure_channel_id >> 16u) & 0xFFu);
+    buffer[11] = (opcua_byte_t)((header->secure_channel_id >> 24u) & 0xFFu);
 
     return MU_STATUS_GOOD;
 }
@@ -112,19 +104,26 @@ opcua_statuscode_t mu_parse_sequence_header(const opcua_byte_t *buffer, size_t l
     if (!buffer || !offset || !header)
         return MU_STATUS_BAD_INTERNALERROR;
 
-    mu_binary_reader_t reader;
-    mu_binary_reader_init(&reader, buffer, length);
-    reader.position = *offset;
+    size_t position = *offset;
+    if (position > length)
+        return MU_STATUS_BAD_DECODINGERROR;
+    if (4u > length - position)
+        return MU_STATUS_BAD_DECODINGERROR;
 
-    opcua_statuscode_t status = mu_binary_read_uint32(&reader, &header->sequence_number);
-    if (status != MU_STATUS_GOOD)
-        return status;
+    header->sequence_number = (opcua_uint32_t)buffer[position] | ((opcua_uint32_t)buffer[position + 1u] << 8u) |
+                              ((opcua_uint32_t)buffer[position + 2u] << 16u) |
+                              ((opcua_uint32_t)buffer[position + 3u] << 24u);
+    position += 4u;
 
-    status = mu_binary_read_uint32(&reader, &header->request_id);
-    if (status != MU_STATUS_GOOD)
-        return status;
+    if (4u > length - position)
+        return MU_STATUS_BAD_DECODINGERROR;
 
-    *offset = reader.position;
+    header->request_id = (opcua_uint32_t)buffer[position] | ((opcua_uint32_t)buffer[position + 1u] << 8u) |
+                         ((opcua_uint32_t)buffer[position + 2u] << 16u) |
+                         ((opcua_uint32_t)buffer[position + 3u] << 24u);
+    position += 4u;
+
+    *offset = position;
     return MU_STATUS_GOOD;
 }
 
@@ -133,18 +132,27 @@ opcua_statuscode_t mu_write_sequence_header(opcua_byte_t *buffer, size_t length,
     if (!buffer || !offset || !header)
         return MU_STATUS_BAD_INTERNALERROR;
 
-    mu_binary_writer_t writer;
-    mu_binary_writer_init(&writer, buffer, length);
-    writer.position = *offset;
+    size_t position = *offset;
+    if (position > length)
+        return MU_STATUS_BAD_ENCODINGERROR;
+    if (4u > length - position)
+        return MU_STATUS_BAD_ENCODINGERROR;
 
-    opcua_statuscode_t status = mu_binary_write_uint32(&writer, header->sequence_number);
-    if (status != MU_STATUS_GOOD)
-        return status;
+    buffer[position] = (opcua_byte_t)(header->sequence_number & 0xFFu);
+    buffer[position + 1u] = (opcua_byte_t)((header->sequence_number >> 8u) & 0xFFu);
+    buffer[position + 2u] = (opcua_byte_t)((header->sequence_number >> 16u) & 0xFFu);
+    buffer[position + 3u] = (opcua_byte_t)((header->sequence_number >> 24u) & 0xFFu);
+    position += 4u;
 
-    status = mu_binary_write_uint32(&writer, header->request_id);
-    if (status != MU_STATUS_GOOD)
-        return status;
+    if (4u > length - position)
+        return MU_STATUS_BAD_ENCODINGERROR;
 
-    *offset = writer.position;
+    buffer[position] = (opcua_byte_t)(header->request_id & 0xFFu);
+    buffer[position + 1u] = (opcua_byte_t)((header->request_id >> 8u) & 0xFFu);
+    buffer[position + 2u] = (opcua_byte_t)((header->request_id >> 16u) & 0xFFu);
+    buffer[position + 3u] = (opcua_byte_t)((header->request_id >> 24u) & 0xFFu);
+    position += 4u;
+
+    *offset = position;
     return MU_STATUS_GOOD;
 }
