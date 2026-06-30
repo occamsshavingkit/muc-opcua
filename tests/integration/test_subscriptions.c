@@ -971,6 +971,50 @@ static void enqueue_republish(mock_t *m, opcua_uint32_t seq, opcua_uint32_t sub_
     enqueue(m, chunk, clen);
 }
 
+/* Publish acknowledgement results (OPC 10000-4 §5.14.5.4): an acknowledgement for a
+   sequence number unknown to the Server is reported per-ack as Bad_SequenceNumberUnknown
+   while the Publish service result remains Good. */
+void test_publish_acknowledgement_unknown_sequence_returns_result(void) {
+    mock_t mock;
+    memset(&mock, 0, sizeof(mock));
+    enqueue_connect(&mock);
+    enqueue_create_subscription(&mock, 4, 200.0, 100, 3);
+
+    _Alignas(8) opcua_byte_t storage[MU_SERVER_STORAGE_BYTES];
+    mu_server_config_t config;
+    mu_server_t *server = make_server(&mock, storage, sizeof(storage), &config, NULL);
+    mu_binary_reader_t body;
+    opcua_statuscode_t sr;
+
+    run_connect(server);
+    mu_server_poll(server); /* CreateSubscription */
+    TEST_ASSERT_EQUAL(ID_CREATESUBSCRIPTIONRESPONSE, parse_response(mock.last_write, mock.last_write_len, &body, &sr));
+    opcua_uint32_t sub_id;
+    mu_binary_read_uint32(&body, &sub_id);
+
+    enqueue_publish_ack(&mock, 5, sub_id, 0xDEADBEEFu);
+    mu_server_poll(server); /* parks the Publish request */
+
+    for (opcua_uint64_t t = 250; t <= 1450; t += 200) {
+        s_tick = t;
+        mu_server_poll(server);
+    }
+
+    opcua_uint32_t sid, seqn, ch = 0;
+    mu_datavalue_t dv;
+    TEST_ASSERT_EQUAL(ID_PUBLISHRESPONSE, parse_response(mock.last_write, mock.last_write_len, &body, &sr));
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, sr);
+    TEST_ASSERT_EQUAL(0, parse_publish_response(&body, &sid, &seqn, &ch, &dv));
+    TEST_ASSERT_EQUAL(sub_id, sid);
+
+    opcua_int32_t ack_results_count;
+    opcua_statuscode_t ack_result;
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_binary_read_int32(&body, &ack_results_count));
+    TEST_ASSERT_EQUAL(1, ack_results_count);
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_binary_read_statuscode(&body, &ack_result));
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_BAD_SEQUENCENUMBERUNKNOWN, ack_result);
+}
+
 /* Republish (OPC 10000-4 §5.14.6): a retained NotificationMessage can be re-sent; once
    acknowledged it is purged and Republish returns Bad_MessageNotAvailable. */
 void test_republish_and_acknowledge(void) {
@@ -1099,6 +1143,41 @@ static mu_server_t *setup_sub_with_item(mock_t *mock, opcua_byte_t *storage, siz
     mu_binary_read_int32(&body, &n);
     read_moncreate_result(&body, item_id_out);
     return server;
+}
+
+/* Republish (OPC 10000-4 §5.14.6.3): requesting a NotificationMessage sequence number
+   that is not available returns Bad_MessageNotAvailable. */
+void test_republish_unknown_sequence_returns_bad_message_not_available(void) {
+    mock_t mock;
+    memset(&mock, 0, sizeof(mock));
+
+    _Alignas(8) opcua_byte_t storage[MU_SERVER_STORAGE_BYTES];
+    mu_server_config_t config;
+    opcua_uint32_t sub_id;
+    opcua_uint32_t item_id;
+    s_mon_val = 10;
+    mu_server_t *server = setup_sub_with_item(&mock, storage, sizeof(storage), &config, 200.0, 1000, 1000, 100.0,
+                                              &sub_id, &item_id);
+    (void)item_id;
+
+    mu_binary_reader_t body;
+    opcua_statuscode_t sr;
+
+    enqueue_publish(&mock, 6);
+    mu_server_poll(server);
+    tick_to(server, 300);
+
+    opcua_uint32_t sid, seqn, ch;
+    mu_datavalue_t dv;
+    TEST_ASSERT_EQUAL(ID_PUBLISHRESPONSE, parse_response(mock.last_write, mock.last_write_len, &body, &sr));
+    TEST_ASSERT_EQUAL(1, parse_publish_response(&body, &sid, &seqn, &ch, &dv));
+    TEST_ASSERT_EQUAL(sub_id, sid);
+    TEST_ASSERT_EQUAL(1, seqn);
+
+    enqueue_republish(&mock, 7, sub_id, 5000);
+    mu_server_poll(server);
+    TEST_ASSERT_EQUAL(ID_SERVICEFAULT, parse_response(mock.last_write, mock.last_write_len, &body, &sr));
+    TEST_ASSERT_EQUAL_HEX32(STATUS_BAD_MESSAGENOTAVAILABLE, sr);
 }
 
 /* ModifySubscription (OPC 10000-4 §5.14.3): revised publishing interval reflects the new
@@ -2096,7 +2175,9 @@ int main(void) {
     RUN_TEST(test_sampling_detects_change);
     RUN_TEST(test_publish_delivers_data_change);
     RUN_TEST(test_publish_keep_alive);
+    RUN_TEST(test_publish_acknowledgement_unknown_sequence_returns_result);
     RUN_TEST(test_republish_and_acknowledge);
+    RUN_TEST(test_republish_unknown_sequence_returns_bad_message_not_available);
     RUN_TEST(test_modify_subscription);
     RUN_TEST(test_set_publishing_mode);
     RUN_TEST(test_modify_monitored_items);

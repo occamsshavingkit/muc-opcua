@@ -381,8 +381,12 @@ void test_aggregate_filter_fails_on_non_numeric(void) {
 
 void test_aggregate_filter_fails_on_unsupported_aggregate_type(void) {
     /* OPC-10000-4 §7.22.4: AggregateFilter selects the AggregateFunction used
-       for returned values; unsupported aggregate functions are rejected with the
-       per-item Bad_MonitoredItemFilterUnsupported result. */
+       for returned values. OPC-10000-13 §4.2.2.5 and §5.4.3.6 define
+       TimeAverage as a standard AggregateFunction. OPC-10000-13 §4.2.2.4,
+       §4.2.2.9, and §4.2.2.10 scope this build to Average, Minimum, and
+       Maximum, so TimeAverage is rejected with the per-item
+       Bad_MonitoredItemFilterUnsupported result. */
+    const opcua_uint32_t time_average_aggregate_type = 2343u;
     mu_server_t server;
     activated_server(&server);
     opcua_uint32_t sub_id = create_subscription(&server);
@@ -408,11 +412,11 @@ void test_aggregate_filter_fails_on_unsupported_aggregate_type(void) {
 
     /* ExtensionObject filter: AggregateFilter */
     mu_nodeid_t filter_type = {0, MU_NODEID_NUMERIC, {MU_ID_AGGREGATEFILTER_ENCODING_DEFAULTBINARY}};
-    mu_binary_write_extension_object_header(&w, &filter_type, aggregate_filter_body_length(99999u));
+    mu_binary_write_extension_object_header(&w, &filter_type, aggregate_filter_body_length(time_average_aggregate_type));
 
-    /* AggregateFilter Body with unsupported type 99999 */
+    /* AggregateFilter Body with unsupported standard TimeAverage type */
     mu_binary_write_int64(&w, 0);
-    mu_nodeid_t agg_type = {0, MU_NODEID_NUMERIC, {99999}};
+    mu_nodeid_t agg_type = {0, MU_NODEID_NUMERIC, {time_average_aggregate_type}};
     mu_binary_write_nodeid(&w, &agg_type);
     mu_binary_write_double(&w, 5000.0);
     /* AggregateConfiguration */
@@ -446,6 +450,52 @@ void test_aggregate_filter_fails_on_unsupported_aggregate_type(void) {
     opcua_statuscode_t item_result;
     mu_binary_read_statuscode(&r, &item_result);
     TEST_ASSERT_EQUAL_HEX32(MU_STATUS_BAD_MONITOREDITEMFILTERUNSUPPORTED, item_result);
+    TEST_ASSERT_EQUAL_size_t(0u, server.subs.active_monitored_items_count);
+    TEST_ASSERT_FALSE(server.subs.monitored_items[0].in_use);
+}
+
+void test_aggregate_filter_fails_on_truncated_extension_object_body(void) {
+    /* OPC-10000-4 §7.22.4 defines AggregateFilter as a MonitoringFilter.
+       OPC-10000-6 §5.2.2.15 requires the ExtensionObject ByteString length to
+       bound the complete encoded body; a truncated body is a decoding error. */
+    mu_server_t server;
+    activated_server(&server);
+    opcua_uint32_t sub_id = create_subscription(&server);
+
+    opcua_byte_t req[512];
+    mu_binary_writer_t w;
+    mu_binary_writer_init(&w, req, sizeof(req));
+    write_request_header(&w, 22);
+    mu_binary_write_uint32(&w, sub_id);
+    mu_binary_write_uint32(&w, 0);
+    mu_binary_write_int32(&w, 1);
+
+    mu_nodeid_t node_id = {1, MU_NODEID_NUMERIC, {1000}};
+    mu_binary_write_nodeid(&w, &node_id);
+    mu_binary_write_uint32(&w, 13);
+    mu_string_t null_str = {-1, NULL};
+    mu_binary_write_string(&w, &null_str);
+    mu_binary_write_uint16(&w, 0);
+    mu_binary_write_string(&w, &null_str);
+    mu_binary_write_uint32(&w, 2);
+    mu_binary_write_uint32(&w, 42);
+    mu_binary_write_double(&w, 100.0);
+
+    mu_nodeid_t filter_type = {0, MU_NODEID_NUMERIC, {MU_ID_AGGREGATEFILTER_ENCODING_DEFAULTBINARY}};
+    mu_binary_write_extension_object_header(&w, &filter_type,
+                                            aggregate_filter_body_length(MU_ID_AGGREGATETYPE_AVERAGE));
+
+    /* Malformed AggregateFilter body: only startTime is present. */
+    mu_binary_write_int64(&w, 0);
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, w.status);
+
+    opcua_byte_t resp[512];
+    size_t resp_len = sizeof(resp);
+    TEST_ASSERT_EQUAL_HEX32(
+        MU_STATUS_BAD_DECODINGERROR,
+        mu_service_dispatch(&server, MU_ID_CREATEMONITOREDITEMSREQUEST, req, w.position, resp, &resp_len));
+    TEST_ASSERT_EQUAL_size_t(0u, server.subs.active_monitored_items_count);
+    TEST_ASSERT_FALSE(server.subs.monitored_items[0].in_use);
 }
 
 void test_aggregate_filter_fails_on_invalid_interval(void) {
@@ -801,6 +851,7 @@ int main(void) {
     RUN_TEST(test_aggregate_filter_decodes_correctly);
     RUN_TEST(test_aggregate_filter_fails_on_non_numeric);
     RUN_TEST(test_aggregate_filter_fails_on_unsupported_aggregate_type);
+    RUN_TEST(test_aggregate_filter_fails_on_truncated_extension_object_body);
     RUN_TEST(test_aggregate_filter_fails_on_invalid_interval);
     RUN_TEST(test_aggregate_filter_average_scoped_support);
     RUN_TEST(test_aggregate_filter_minimum_scoped_support);

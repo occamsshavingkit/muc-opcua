@@ -394,6 +394,154 @@ while (running) {
 
 ---
 
+## Embed with FreeRTOS + lwIP
+
+For a Pico W or similar MCU running FreeRTOS with lwIP sockets, treat the platform
+as an application-owned envelope around the portable library. The core still
+uses caller-owned storage and does not require heap allocation; FreeRTOS task
+stacks, the FreeRTOS heap, lwIP heap, socket buffers, and Wi-Fi driver memory are
+platform resources that you budget separately.
+
+Use the external platform mode when your firmware provides the TCP/IP stack:
+
+```cmake
+set(MICRO_OPCUA_PROFILE nano CACHE STRING "" FORCE)
+set(MICRO_OPCUA_PLATFORM external CACHE STRING "" FORCE)
+set(MICRO_OPCUA_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+set(MICRO_OPCUA_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+set(MICRO_OPCUA_BUILD_FUZZERS OFF CACHE BOOL "" FORCE)
+set(MICRO_OPCUA_OPTIMIZE_SIZE ON CACHE BOOL "" FORCE)
+
+add_subdirectory(path/to/micro-opcua ${CMAKE_BINARY_DIR}/micro-opcua)
+
+target_link_libraries(app PRIVATE
+    micro_opcua
+    pico_stdlib
+    pico_cyw43_arch_lwip_sys_freertos
+    FreeRTOS-Kernel-Heap4)
+```
+
+The in-tree `platform/pico` target is useful as a lifecycle and adapter-wiring
+skeleton, but it is not a complete Pico W TCP/IP integration. On a real
+FreeRTOS/lwIP build, provide the three required adapters yourself:
+
+| Adapter | FreeRTOS/lwIP backing | Required behavior |
+|---|---|---|
+| `mu_tcp_adapter_t` | lwIP sockets with `NO_SYS=0`, `LWIP_SOCKET=1`, `LWIP_NETCONN=1` | Nonblocking `listen`, `accept`, `read`, `write`, `close_connection`, `shutdown` |
+| `mu_time_adapter_t` | FreeRTOS tick count plus RTC/NTP if available | UTC OPC UA `DateTime` and monotonic millisecond ticks |
+| `mu_entropy_adapter_t` | MCU RNG or platform CSPRNG | Fill nonce/random buffers; replace deterministic stubs before deployment |
+
+The TCP callbacks should follow the same nonblocking contract as the host
+adapter. `accept` returns `MU_STATUS_GOOD` with `connection_handle = NULL` when
+no client is pending. `read` and `write` return `MU_STATUS_GOOD` with zero bytes
+for `EAGAIN` or `EWOULDBLOCK`. EOF or a real socket error should return a bad
+TCP status so the server closes the connection.
+
+```c
+typedef struct {
+    int listen_fd;
+} mu_lwip_tcp_context_t;
+
+static opcua_statuscode_t lwip_tcp_read(void *context, void *connection_handle,
+                                        opcua_byte_t *buffer, size_t buffer_size,
+                                        size_t *bytes_read) {
+    (void)context;
+    int fd = (int)(intptr_t)connection_handle;
+    int rc = lwip_read(fd, buffer, buffer_size);
+    if (rc < 0) {
+        if (errno == EAGAIN || errno == EWOULDBLOCK) {
+            *bytes_read = 0;
+            return MU_STATUS_GOOD;
+        }
+        return MU_STATUS_BAD_TCPINTERNALERROR;
+    }
+    if (rc == 0) {
+        return MU_STATUS_BAD_TCPINTERNALERROR;
+    }
+    *bytes_read = (size_t)rc;
+    return MU_STATUS_GOOD;
+}
+```
+
+For time, OPC UA wire timestamps use 100 ns ticks since 1601-01-01 UTC. If the
+target has no trusted wall clock during bring-up, keep `get_tick_ms` monotonic
+for session and subscription timeouts and document that wall-clock timestamps are
+not production quality until RTC/NTP is wired.
+
+```c
+#define MU_OPCUA_UNIX_EPOCH_DATETIME 116444736000000000ULL
+
+static opcua_datetime_t freertos_get_time(void *context) {
+    (void)context;
+    return (opcua_datetime_t)(MU_OPCUA_UNIX_EPOCH_DATETIME +
+        ((opcua_uint64_t)xTaskGetTickCount() * portTICK_PERIOD_MS * 10000ULL));
+}
+
+static opcua_uint64_t freertos_get_tick_ms(void *context) {
+    (void)context;
+    return (opcua_uint64_t)xTaskGetTickCount() * portTICK_PERIOD_MS;
+}
+```
+
+The server task uses the same caller-owned storage model as the host example:
+
+```c
+static uintptr_t server_storage[(MU_SERVER_STORAGE_BYTES + sizeof(uintptr_t) - 1u) /
+                                sizeof(uintptr_t)];
+static opcua_byte_t receive_buffer[MU_MIN_CHUNK_SIZE];
+static opcua_byte_t send_buffer[MU_MIN_CHUNK_SIZE];
+static mu_lwip_tcp_context_t tcp_context;
+
+static void opcua_task(void *arg) {
+    (void)arg;
+
+    mu_server_config_t config = {0};
+    config.endpoint_url = "opc.tcp://0.0.0.0:4840";
+    config.receive_buffer = receive_buffer;
+    config.receive_buffer_size = sizeof(receive_buffer);
+    config.send_buffer = send_buffer;
+    config.send_buffer_size = sizeof(send_buffer);
+    config.max_chunk_count = MU_DEFAULT_MAX_CHUNK_COUNT;
+    config.max_message_size = MU_DEFAULT_MAX_MESSAGE_SIZE;
+    config.max_sessions = 1;
+    config.max_secure_channels = 1;
+    config.address_space = &address_space;
+
+    mu_lwip_tcp_adapter_init(&config.tcp_adapter, &tcp_context);
+    mu_freertos_time_adapter_init(&config.time_adapter);
+    mu_target_entropy_adapter_init(&config.entropy_adapter);
+
+    mu_server_t *server = NULL;
+    opcua_statuscode_t status =
+        mu_server_init(server_storage, sizeof(server_storage), &config, &server);
+    if (status != MU_STATUS_GOOD) {
+        vTaskDelete(NULL);
+    }
+
+    for (;;) {
+        (void)mu_server_poll(server);
+        vTaskDelay(pdMS_TO_TICKS(10));
+    }
+}
+```
+
+Budget the firmware as a whole, not just the library archive. A typical
+FreeRTOS/lwIP envelope has at least these categories:
+
+| Category | Owner | Example budget item |
+|---|---|---|
+| Server storage | Application, sized by library | `MU_SERVER_STORAGE_BYTES` |
+| OPC UA RX/TX buffers | Application, sized by library minimums | Two `MU_MIN_CHUNK_SIZE` arrays |
+| Server task stack | FreeRTOS application | Stack for `mu_server_poll()` plus platform callbacks |
+| FreeRTOS heap | Platform/application | Task, queue, timer, and driver allocations |
+| lwIP heap and pools | Platform/application | TCP/IP control blocks, pbufs, socket state |
+| Wi-Fi/Ethernet driver memory | Platform/application | CYW43 or MAC/PHY driver buffers |
+
+For a deeper adapter contract, including the exact callback rules and storage
+layout, continue with [the integration guide](integration-guide.md#3-implementing-the-platform-adapters).
+
+---
+
 ## Summary
 
 - micro-opcua builds in three profiles — `make nano` (None), `make micro`
@@ -412,7 +560,9 @@ while (running) {
 
 1. **Embed it in firmware** — implement the TCP/time/entropy (and optional
    crypto) adapters for your board, supply your own static address space, and
-   wire `mu_server_poll()` into your main loop. See **[docs/integration-guide.md](integration-guide.md)**.
+   wire `mu_server_poll()` into your main loop. For FreeRTOS + lwIP, start with
+   [Embed with FreeRTOS + lwIP](#embed-with-freertos--lwip); for the full adapter
+   contract see **[docs/integration-guide.md](integration-guide.md)**.
 2. **Look up the API** — every public type and function
    (`mu_server_init`, `mu_server_poll`, the config and adapter structs) is
    documented in **[docs/api-reference.md](api-reference.md)** and in the headers

@@ -1,7 +1,7 @@
 # MicroOpcUaOptions.cmake
 
 if(NOT DEFINED MICRO_OPCUA_PLATFORM)
-    set(MICRO_OPCUA_PLATFORM "host" CACHE STRING "Target platform (host, pico, arduino-skeleton)")
+    set(MICRO_OPCUA_PLATFORM "host" CACHE STRING "Target platform (host, external, pico, arduino-skeleton)")
 endif()
 
 option(MICRO_OPCUA_LTO "Enable link-time optimization (interprocedural optimization) for size-optimized firmware builds" OFF)
@@ -20,11 +20,18 @@ elseif(MICRO_OPCUA_PLATFORM STREQUAL "pico")
     set(MICRO_OPCUA_IS_HOST OFF)
     set(MICRO_OPCUA_IS_PICO ON)
     set(MICRO_OPCUA_IS_ARDUINO OFF)
+elseif(MICRO_OPCUA_PLATFORM STREQUAL "external")
+    # Application-owned platform integration; do not compile in-tree adapters.
+    set(MICRO_OPCUA_IS_HOST OFF)
+    set(MICRO_OPCUA_IS_PICO OFF)
+    set(MICRO_OPCUA_IS_ARDUINO OFF)
 elseif(MICRO_OPCUA_PLATFORM STREQUAL "arduino-skeleton")
     # Arduino build specific options
     set(MICRO_OPCUA_IS_HOST OFF)
     set(MICRO_OPCUA_IS_PICO OFF)
     set(MICRO_OPCUA_IS_ARDUINO ON)
+else()
+    message(FATAL_ERROR "Unsupported MICRO_OPCUA_PLATFORM: ${MICRO_OPCUA_PLATFORM}")
 endif()
 
 option(MICRO_OPCUA_USER_AUTH "Build UserName/Password user identity authentication" OFF)
@@ -36,5 +43,4 @@ option(MICRO_OPCUA_HAVE_WOLFSSL "Build with wolfSSL cryptographic platform adapt
 option(MICRO_OPCUA_CUSTOM_METHODS "Build support for custom method calls" OFF)
 option(MICRO_OPCUA_SERVER_DIAGNOSTICS "Build support for server diagnostics summary nodes" OFF)
 option(MICRO_OPCUA_DYNAMIC_NODES "Build support for AddNodes/DeleteNodes dynamic node management" OFF)
-
 

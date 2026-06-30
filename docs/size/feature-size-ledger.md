@@ -635,3 +635,52 @@ byte-identical (golden-vector regression test).
 
 ## Feature 009: Core Feature Expansion
 - Target size impact estimates for Write service, multiple connections, modern security policies, certificate user authentication, and alarms & events are documented in the design specification and implementation plan. Flash impact is expected to remain under 10 KB total.
+
+## Feature 021 US3 aggregate-slice size evidence
+
+- **Measured**: 2026-06-30
+- **Command**: `scripts/measure_size.sh all`
+- **Toolchain**: `arm-none-eabi-gcc` 13.2.1 for RP2040/Cortex-M0+ Thumb `-Os`
+
+| Profile | text | data | bss | dec | Archive |
+|---|---:|---:|---:|---:|---|
+| nano | 16,366 B | 0 B | 0 B | 16,366 B | `build/size-arm/nano/src/libmicro_opcua.a` |
+| micro | 23,873 B | 0 B | 0 B | 23,873 B | `build/size-arm/micro/src/libmicro_opcua.a` |
+| embedded | 43,078 B | 0 B | 0 B | 43,078 B | `build/size-arm/embedded/src/libmicro_opcua.a` |
+| full-featured | 51,172 B | 0 B | 0 B | 51,172 B | `build/size-arm/full-featured/src/libmicro_opcua.a` |
+
+Aggregate-slice conclusion: T017a-T017e had no production-code delta in this
+worktree; the aggregate updates are host tests and documentation evidence only.
+The runtime flash/RAM delta attributable to the aggregate slice is therefore
+`text +0 B`, `.data +0 B`, `.bss +0 B`. No new heap use, mutable static storage,
+or runtime static tables were added. The table above records current absolute
+profile outputs from the size script, not aggregate-slice runtime growth.
+
+## Feature 021 US4 subscription-negative-path size evidence
+
+- **Measured**: 2026-06-30
+- **Command**: `scripts/measure_size.sh all`
+- **Toolchain**: `arm-none-eabi-gcc` 13.2.1 for RP2040/Cortex-M0+ Thumb `-Os`
+
+| Profile | text | data | bss | dec | Archive |
+|---|---:|---:|---:|---:|---|
+| nano | 16,366 B | 0 B | 0 B | 16,366 B | `build/size-arm/nano/src/libmicro_opcua.a` |
+| micro | 23,873 B | 0 B | 0 B | 23,873 B | `build/size-arm/micro/src/libmicro_opcua.a` |
+| embedded | 43,078 B | 0 B | 0 B | 43,078 B | `build/size-arm/embedded/src/libmicro_opcua.a` |
+| full-featured | 51,172 B | 0 B | 0 B | 51,172 B | `build/size-arm/full-featured/src/libmicro_opcua.a` |
+
+Subscription-negative-path conclusion: US4 added negative-path tests and
+traceability documentation for MonitoredItem/Subscription invalid IDs,
+capacities, queue overflow, trigger-link capacity, invalid Publish
+acknowledgement, invalid Republish sequence, and unsupported
+TransferSubscriptions. T024a-T025 production validation found no production-code
+changes were needed because the production paths were already present. The
+runtime flash/RAM delta attributable to the US4 implementation is therefore
+`text +0 B`, `.data +0 B`, `.bss +0 B`.
+
+No new heap use, runtime static tables, mutable static storage, or
+caller-storage changes are attributable to US4. Throughput impact is also
+`+0` for runtime paths: only tests and documentation changed, so the
+negative-path tests increase CI/test coverage without changing runtime
+throughput. The table above records current absolute profile outputs from the
+size script, not subscription-negative-path runtime growth.

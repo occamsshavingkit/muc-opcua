@@ -11,7 +11,9 @@ Core 2017 Server Facet* and requires the OPC UA TCP binary transport.
 - **Embedded** = Micro + security policies + the Standard DataChange Subscription facet
   + full type-system exposure.
 
-micro-opcua supports Nano, Micro, and Embedded UA profiles, allowing the integrator to select the desired feature set via CMake configuration profiles.
+micro-opcua provides profile-targeted CMake configurations for Nano-, Micro-,
+and Embedded-oriented feature sets; these remain profile-targeting labels scoped
+to OPC-10000-7 §4.2/§4.3 evidence.
 
 ## Profile constraints honoured
 - OPC UA TCP transport only (`opc.tcp`, UA-SC, UA-Binary).
@@ -39,6 +41,7 @@ micro-opcua supports Nano, Micro, and Embedded UA profiles, allowing the integra
   time adapter and `StartTime` from the value captured at init, via runtime-bound
   value sources in the (caller-owned) server struct.
 
-## Remaining to full Nano (see [status.md](status.md))
-- CTT verification — not yet run; `profile-targeting` until it passes. The
-  implementation surface is otherwise complete for the profile.
+## Remaining Nano evidence (see [status.md](status.md))
+- External conformance evidence, including CTT verification, has not been
+  produced; status remains `profile-targeting` until OPC-10000-7 §4.2/§4.3
+  profile and ConformanceUnit evidence is reviewed and verified.

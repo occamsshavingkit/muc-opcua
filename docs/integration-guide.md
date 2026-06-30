@@ -688,7 +688,7 @@ From the top-level `CMakeLists.txt` and `cmake/MicroOpcUaOptions.cmake`
 | `MICRO_OPCUA_SERVICE_DISCOVERY` | ON | GetEndpoints / FindServers |
 | `MICRO_OPCUA_SERVICE_REGISTER_NODES` | ON | RegisterNodes / UnregisterNodes |
 | `MICRO_OPCUA_LTO` | OFF | Link-time / interprocedural optimization for smaller firmware |
-| `MICRO_OPCUA_PLATFORM` | `host` | Target platform: `host`, `pico`, `arduino-skeleton` |
+| `MICRO_OPCUA_PLATFORM` | `host` | Target platform: `host`, `external`, `pico`, `arduino-skeleton` |
 | `MICRO_OPCUA_BUILD_EXAMPLES` | OFF | Build the example servers |
 
 Turn features **off** to shrink the build for Nano-class targets, e.g.:

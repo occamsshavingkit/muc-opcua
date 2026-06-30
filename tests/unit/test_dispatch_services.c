@@ -847,10 +847,28 @@ void test_dispatch_unsupported_service_returns_bad_serviceunsupported(void) {
                             mu_service_dispatch(&server, unsupported_request_id, req, sizeof(req), resp, &resp_len));
 }
 
+void test_dispatch_transfer_subscriptions_returns_bad_serviceunsupported(void) {
+    mu_server_t server;
+    memset(&server, 0, sizeof(server));
+    server.secure_channel.is_open = true;
+
+    opcua_byte_t req[1] = {0};
+    opcua_byte_t resp[64];
+    size_t resp_len = sizeof(resp);
+    enum { transfer_subscriptions_request_id = 841u }; /* TransferSubscriptionsRequest_Encoding_DefaultBinary */
+
+    /* OPC-10000-4 sections 5.14.7 and 7.38.2: unsupported
+       TransferSubscriptions requests return Bad_ServiceUnsupported. */
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_BAD_SERVICEUNSUPPORTED,
+                            mu_service_dispatch(&server, transfer_subscriptions_request_id, req, sizeof(req), resp,
+                                                &resp_len));
+}
+
 int main(void) {
     UNITY_BEGIN();
     RUN_TEST(test_service_fault_encode);
     RUN_TEST(test_dispatch_unsupported_service_returns_bad_serviceunsupported);
+    RUN_TEST(test_dispatch_transfer_subscriptions_returns_bad_serviceunsupported);
     RUN_TEST(test_dispatch_open_secure_channel);
     RUN_TEST(test_dispatch_create_session);
     RUN_TEST(test_dispatch_create_session_honors_timeout);

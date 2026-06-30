@@ -223,7 +223,7 @@ Selected options (see [CMakeLists.txt](CMakeLists.txt) and
 | `MICRO_OPCUA_BASE_NODES` | ON | Standard Base Information node set |
 | `MICRO_OPCUA_SERVICE_READ` / `_BROWSE` / `_DISCOVERY` / `_REGISTER_NODES` | ON | Per-service code gating |
 | `MICRO_OPCUA_BUILD_EXAMPLES` / `_BUILD_TESTS` / `_BUILD_FUZZERS` | OFF | Build extras |
-| `MICRO_OPCUA_PLATFORM` | `host` | Target: `host`, `pico`, `arduino-skeleton` |
+| `MICRO_OPCUA_PLATFORM` | `host` | Target: `host`, `external`, `pico`, `arduino-skeleton` |
 
 ### Tests
 

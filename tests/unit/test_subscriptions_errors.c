@@ -630,6 +630,249 @@ void test_modify_monitored_items_disallowed_monitoring_filter_returns_item_statu
     TEST_ASSERT_EQUAL_HEX32(MU_STATUS_BAD_FILTERNOTALLOWED, item_result);
 }
 
+void test_modify_monitored_items_unknown_id_returns_item_status_without_mutation(void) {
+    mu_server_t server;
+    opcua_uint32_t subscription_id = 0u;
+    mu_monitored_item_t *item = NULL;
+    opcua_byte_t body[256];
+    opcua_byte_t response[256];
+    size_t response_len = sizeof(response);
+    mu_binary_writer_t w;
+    mu_binary_reader_t r;
+    mu_nodeid_t response_type = {0u, MU_NODEID_NUMERIC, {0u}};
+    mu_nodeid_t null_filter = {0u, MU_NODEID_NUMERIC, {0u}};
+    opcua_uint32_t handle = 0u;
+    opcua_statuscode_t service_result = 0u;
+    opcua_int32_t results_count = 0;
+    opcua_statuscode_t item_result = 0u;
+    opcua_double_t revised_sampling_interval = -1.0;
+    opcua_uint32_t revised_queue_size = 0u;
+    mu_nodeid_t filter_result_type = {0u, MU_NODEID_NUMERIC, {0u}};
+    size_t filter_result_length = 0u;
+    opcua_int32_t diagnostic_count = 0;
+    const opcua_uint32_t invalid_monitored_item_id = 0xBEEFu;
+    const opcua_uint32_t existing_queue_size = 1u;
+    const opcua_boolean_t existing_discard_oldest = false;
+    const opcua_uint32_t requested_queue_size = 2u;
+    const opcua_boolean_t requested_discard_oldest = true;
+
+    prepare_dispatch_server(&server, &subscription_id);
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_monitored_item_alloc(&server.subs, subscription_id, &item));
+    TEST_ASSERT_NOT_NULL(item);
+    item->client_handle = 17u;
+    item->sampling_interval_ms = 250u;
+    item->queue_size = existing_queue_size;
+    item->discard_oldest = existing_discard_oldest;
+    item->attribute_id = 13u;
+
+    mu_binary_writer_init(&w, body, sizeof(body));
+    write_request_header(&w, 13u);
+    mu_binary_write_uint32(&w, subscription_id);
+    mu_binary_write_uint32(&w, 3u);
+    mu_binary_write_int32(&w, 1);
+    mu_binary_write_uint32(&w, invalid_monitored_item_id);
+    mu_binary_write_uint32(&w, 99u);
+    mu_binary_write_double(&w, 100.0);
+    mu_binary_write_extension_object_header(&w, &null_filter, 0u);
+    mu_binary_write_uint32(&w, requested_queue_size);
+    mu_binary_write_boolean(&w, requested_discard_oldest);
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, w.status);
+
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_service_dispatch(&server, MU_ID_MODIFYMONITOREDITEMSREQUEST, body,
+                                                                w.position, response, &response_len));
+
+    mu_binary_reader_init(&r, response, response_len);
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_binary_read_nodeid(&r, &response_type));
+    TEST_ASSERT_EQUAL_UINT32(MU_ID_MODIFYMONITOREDITEMSRESPONSE, response_type.identifier.numeric);
+    read_response_header(&r, &handle, &service_result);
+    TEST_ASSERT_EQUAL_UINT32(13u, handle);
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, service_result);
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_binary_read_int32(&r, &results_count));
+    TEST_ASSERT_EQUAL_INT32(1, results_count);
+
+    /* OPC-10000-4 sections 5.13.3 and 5.13.3.4 require an unknown
+       monitoredItemId to return per-item Bad_MonitoredItemIdInvalid. */
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_binary_read_statuscode(&r, &item_result));
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_BAD_MONITOREDITEMIDINVALID, item_result);
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_binary_read_double(&r, &revised_sampling_interval));
+    TEST_ASSERT_TRUE(revised_sampling_interval == 0.0);
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_binary_read_uint32(&r, &revised_queue_size));
+    TEST_ASSERT_EQUAL_UINT32(1u, revised_queue_size);
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD,
+                            mu_binary_read_extension_object_header(&r, &filter_result_type, &filter_result_length));
+    TEST_ASSERT_EQUAL_UINT16(0u, filter_result_type.namespace_index);
+    TEST_ASSERT_EQUAL(MU_NODEID_NUMERIC, filter_result_type.identifier_type);
+    TEST_ASSERT_EQUAL_UINT32(0u, filter_result_type.identifier.numeric);
+    TEST_ASSERT_EQUAL_size_t(0u, filter_result_length);
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_binary_read_int32(&r, &diagnostic_count));
+    TEST_ASSERT_EQUAL_INT32(0, diagnostic_count);
+    TEST_ASSERT_EQUAL_size_t(response_len, r.position);
+
+    TEST_ASSERT_EQUAL_UINT32(1u, server.subs.active_monitored_items_count);
+    TEST_ASSERT_TRUE(item->in_use);
+    TEST_ASSERT_EQUAL_UINT32(17u, item->client_handle);
+    TEST_ASSERT_EQUAL_UINT32(250u, item->sampling_interval_ms);
+    TEST_ASSERT_EQUAL_UINT32(existing_queue_size, item->queue_size);
+    TEST_ASSERT_EQUAL(existing_discard_oldest, item->discard_oldest);
+}
+
+void test_delete_monitored_items_unknown_id_returns_item_status_without_deleting_existing_item(void) {
+    mu_server_t server;
+    opcua_uint32_t subscription_id = 0u;
+    mu_monitored_item_t *item = NULL;
+    opcua_byte_t body[128];
+    opcua_byte_t response[256];
+    size_t response_len = sizeof(response);
+    mu_binary_writer_t w;
+    mu_binary_reader_t r;
+    mu_nodeid_t response_type = {0u, MU_NODEID_NUMERIC, {0u}};
+    opcua_uint32_t handle = 0u;
+    opcua_statuscode_t service_result = 0u;
+    opcua_int32_t results_count = 0;
+    opcua_statuscode_t item_result = 0u;
+    opcua_int32_t diagnostic_count = 0;
+    const opcua_uint32_t invalid_monitored_item_id = 0xBEEFu;
+    opcua_uint32_t original_subscription_id = 0u;
+    opcua_uint32_t original_monitored_item_id = 0u;
+
+    prepare_dispatch_server(&server, &subscription_id);
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_monitored_item_alloc(&server.subs, subscription_id, &item));
+    TEST_ASSERT_NOT_NULL(item);
+    original_subscription_id = item->subscription_id;
+    original_monitored_item_id = item->monitored_item_id;
+
+    mu_binary_writer_init(&w, body, sizeof(body));
+    write_request_header(&w, 14u);
+    mu_binary_write_uint32(&w, subscription_id);
+    mu_binary_write_int32(&w, 1);
+    mu_binary_write_uint32(&w, invalid_monitored_item_id);
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, w.status);
+
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_service_dispatch(&server, MU_ID_DELETEMONITOREDITEMSREQUEST, body,
+                                                                w.position, response, &response_len));
+
+    mu_binary_reader_init(&r, response, response_len);
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_binary_read_nodeid(&r, &response_type));
+    TEST_ASSERT_EQUAL_UINT32(MU_ID_DELETEMONITOREDITEMSRESPONSE, response_type.identifier.numeric);
+    read_response_header(&r, &handle, &service_result);
+    TEST_ASSERT_EQUAL_UINT32(14u, handle);
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, service_result);
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_binary_read_int32(&r, &results_count));
+    TEST_ASSERT_EQUAL_INT32(1, results_count);
+
+    /* OPC-10000-4 section 5.13.6 requires an unknown monitoredItemId to
+       return per-item Bad_MonitoredItemIdInvalid. */
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_binary_read_statuscode(&r, &item_result));
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_BAD_MONITOREDITEMIDINVALID, item_result);
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_binary_read_int32(&r, &diagnostic_count));
+    TEST_ASSERT_EQUAL_INT32(0, diagnostic_count);
+    TEST_ASSERT_EQUAL_size_t(response_len, r.position);
+
+    TEST_ASSERT_EQUAL_UINT32(1u, server.subs.active_monitored_items_count);
+    TEST_ASSERT_TRUE(item->in_use);
+    TEST_ASSERT_EQUAL_UINT32(original_subscription_id, item->subscription_id);
+    TEST_ASSERT_EQUAL_UINT32(original_monitored_item_id, item->monitored_item_id);
+}
+
+void test_modify_subscription_unknown_id_returns_subscription_id_invalid_without_mutation(void) {
+    mu_server_t server;
+    opcua_uint32_t subscription_id = 0u;
+    mu_subscription_t *sub = NULL;
+    opcua_uint32_t original_interval_ms = 0u;
+    opcua_uint32_t original_lifetime_count = 0u;
+    opcua_uint32_t original_keep_alive_count = 0u;
+    opcua_uint32_t original_max_notifications_per_publish = 0u;
+    opcua_byte_t original_priority = 0u;
+    opcua_byte_t body[128];
+    mu_binary_writer_t w;
+    const opcua_uint32_t invalid_subscription_id = 0xDEADu;
+    const opcua_uint32_t requested_max_notifications_per_publish = 7u;
+    const opcua_byte_t requested_priority = 3u;
+
+    prepare_dispatch_server(&server, &subscription_id);
+    sub = mu_subscription_find(&server.subs, server.sessions[0].session_id, subscription_id);
+    TEST_ASSERT_NOT_NULL(sub);
+    original_interval_ms = sub->publishing_interval_ms;
+    original_lifetime_count = sub->lifetime_count;
+    original_keep_alive_count = sub->max_keep_alive_count;
+    original_max_notifications_per_publish = sub->max_notifications_per_publish;
+    original_priority = sub->priority;
+
+    mu_binary_writer_init(&w, body, sizeof(body));
+    write_request_header(&w, 15u);
+    mu_binary_write_uint32(&w, invalid_subscription_id);
+    mu_binary_write_double(&w, 250.0);
+    mu_binary_write_uint32(&w, 60u);
+    mu_binary_write_uint32(&w, 20u);
+    mu_binary_write_uint32(&w, requested_max_notifications_per_publish);
+    mu_binary_write_byte(&w, requested_priority);
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, w.status);
+
+    /* OPC-10000-4 section 5.14.3 requires an unknown subscriptionId to
+       return Bad_SubscriptionIdInvalid for ModifySubscription. */
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_BAD_SUBSCRIPTIONIDINVALID,
+                            dispatch_body(&server, MU_ID_MODIFYSUBSCRIPTIONREQUEST, body, w.position));
+
+    TEST_ASSERT_TRUE(sub->in_use);
+    TEST_ASSERT_EQUAL_UINT32(subscription_id, sub->subscription_id);
+    TEST_ASSERT_EQUAL_UINT32(original_interval_ms, sub->publishing_interval_ms);
+    TEST_ASSERT_EQUAL_UINT32(original_lifetime_count, sub->lifetime_count);
+    TEST_ASSERT_EQUAL_UINT32(original_keep_alive_count, sub->max_keep_alive_count);
+    TEST_ASSERT_EQUAL_UINT32(original_max_notifications_per_publish, sub->max_notifications_per_publish);
+    TEST_ASSERT_EQUAL_UINT8(original_priority, sub->priority);
+}
+
+void test_delete_subscriptions_unknown_id_returns_per_operation_status_without_deleting_existing_subscription(void) {
+    mu_server_t server;
+    opcua_uint32_t subscription_id = 0u;
+    mu_subscription_t *sub = NULL;
+    opcua_byte_t body[128];
+    opcua_byte_t response[256];
+    size_t response_len = sizeof(response);
+    mu_binary_writer_t w;
+    mu_binary_reader_t r;
+    mu_nodeid_t response_type = {0u, MU_NODEID_NUMERIC, {0u}};
+    opcua_uint32_t handle = 0u;
+    opcua_statuscode_t service_result = 0u;
+    opcua_int32_t results_count = 0;
+    opcua_statuscode_t item_result = 0u;
+    opcua_int32_t diagnostic_count = 0;
+    const opcua_uint32_t invalid_subscription_id = 0xDEADu;
+
+    prepare_dispatch_server(&server, &subscription_id);
+    sub = mu_subscription_find(&server.subs, server.sessions[0].session_id, subscription_id);
+    TEST_ASSERT_NOT_NULL(sub);
+
+    mu_binary_writer_init(&w, body, sizeof(body));
+    write_request_header(&w, 16u);
+    mu_binary_write_int32(&w, 1);
+    mu_binary_write_uint32(&w, invalid_subscription_id);
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, w.status);
+
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_service_dispatch(&server, MU_ID_DELETESUBSCRIPTIONSREQUEST, body,
+                                                                w.position, response, &response_len));
+
+    mu_binary_reader_init(&r, response, response_len);
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_binary_read_nodeid(&r, &response_type));
+    TEST_ASSERT_EQUAL_UINT32(MU_ID_DELETESUBSCRIPTIONSRESPONSE, response_type.identifier.numeric);
+    read_response_header(&r, &handle, &service_result);
+    TEST_ASSERT_EQUAL_UINT32(16u, handle);
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, service_result);
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_binary_read_int32(&r, &results_count));
+    TEST_ASSERT_EQUAL_INT32(1, results_count);
+
+    /* OPC-10000-4 section 5.14.8 reports unknown subscriptionIds in
+       DeleteSubscriptions results[] as Bad_SubscriptionIdInvalid. */
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_binary_read_statuscode(&r, &item_result));
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_BAD_SUBSCRIPTIONIDINVALID, item_result);
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_binary_read_int32(&r, &diagnostic_count));
+    TEST_ASSERT_EQUAL_INT32(0, diagnostic_count);
+    TEST_ASSERT_EQUAL_size_t(response_len, r.position);
+
+    TEST_ASSERT_TRUE(sub->in_use);
+    TEST_ASSERT_EQUAL_UINT32(subscription_id, sub->subscription_id);
+}
+
 void test_publish_oversize_notification_response_returns_response_too_large_fault(void) {
     mu_server_t server;
     opcua_uint32_t subscription_id = 0u;
@@ -755,6 +998,10 @@ int main(void) {
     RUN_TEST(test_modify_monitored_items_unsupported_monitoring_filter_returns_item_status);
     RUN_TEST(test_modify_monitored_items_invalid_monitoring_filter_returns_item_status);
     RUN_TEST(test_modify_monitored_items_disallowed_monitoring_filter_returns_item_status);
+    RUN_TEST(test_modify_monitored_items_unknown_id_returns_item_status_without_mutation);
+    RUN_TEST(test_delete_monitored_items_unknown_id_returns_item_status_without_deleting_existing_item);
+    RUN_TEST(test_modify_subscription_unknown_id_returns_subscription_id_invalid_without_mutation);
+    RUN_TEST(test_delete_subscriptions_unknown_id_returns_per_operation_status_without_deleting_existing_subscription);
     RUN_TEST(test_publish_oversize_notification_response_returns_response_too_large_fault);
     RUN_TEST(test_truncated_set_triggering_link_array_returns_decoding_error);
     RUN_TEST(test_oversized_set_triggering_link_array_returns_too_many_operations);

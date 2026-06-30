@@ -1406,7 +1406,7 @@ These are CMake options that configure which code is compiled. All features defa
 | `MICRO_OPCUA_BASE_TYPE_SYSTEM` | `MICRO_OPCUA_BASE_TYPE_SYSTEM=1` | OFF | Expose the Base Info Type System node set. |
 | `MICRO_OPCUA_LTO` | *(toolchain LTO)* | OFF | Enable link-time / interprocedural optimization. |
 | `MICRO_OPCUA_OPTIMIZE_SIZE` | `-Os` | OFF | Optimize the library for size. |
-| `MICRO_OPCUA_PLATFORM` | *(string)* | `host` | Target platform: `host`, `pico`, or `arduino-skeleton`. |
+| `MICRO_OPCUA_PLATFORM` | *(string)* | `host` | Target platform: `host`, `external`, `pico`, or `arduino-skeleton`. |
 
 **Notes:**
 - OpenSecureChannel and the Session services are **always present** (not gated).

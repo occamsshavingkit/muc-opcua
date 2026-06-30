@@ -8,15 +8,20 @@ subscriptions via the Embedded Data Change Subscription Server Facet and support
 least two sessions.*
 
 ## The profile ladder (for orientation)
+OPC 10000-7 §4.2 defines conformance units and §4.3 defines profiles. The
+shorthand below is orientation for the current profile target, not a
+claim that external profile validation has been completed.
+
 - **Nano** = Core Server Facet + UA-TCP UA-SC UA-Binary + SecurityPolicy None + Anonymous.
 - **Micro** = Nano + subscriptions (Embedded Data Change Subscription facet) + ≥2 sessions.
 - **Embedded** = Micro + security policies + the Standard DataChange Subscription facet
   + full type-system exposure.
 
-micro-opcua has the complete Nano surface (see [profile-nano.md](profile-nano.md)) plus,
-ahead of schedule, Basic256Sha256 (an Embedded-tier feature).
+micro-opcua currently targets the Nano surface documented in
+[profile-nano.md](profile-nano.md) plus, ahead of schedule, Basic256Sha256
+(an Embedded-tier feature).
 
-## Implemented surface (the Embedded Data Change Subscription Server Facet)
+## Micro-targeted surface (the Embedded Data Change Subscription Server Facet)
 A no-heap subscription engine (`src/services/subscription.{c,h}`, compiled behind the
 `MICRO_OPCUA_SUBSCRIPTIONS` build option, ON for `make micro`). All state is fixed-size
 and lives in the caller-owned server struct; sampling and Publish delivery are driven
@@ -62,6 +67,6 @@ Server Facet; aggregate filters (Average/Min/Max) are supported.
 `MU_MAX_SESSIONS` (default 2) logical sessions over a single TCP connection
 (`test_session`, `test_single_client_limit`).
 
-## Remaining to full Micro (see [status.md](status.md))
+## Remaining evidence for Micro profile status (see [status.md](status.md))
 - **CTT verification** — not yet run; `profile-targeting` until it passes. No
-  profile-compliance claim is made without that evidence.
+  profile conformance status is claimed without that evidence.

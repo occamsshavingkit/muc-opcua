@@ -76,7 +76,7 @@ option(MICRO_OPCUA_SUBSCRIPTIONS_STANDARD "Build the Standard DataChange Subscri
 option(MICRO_OPCUA_EMBEDDED_PROFILE "Apply Embedded 2017 profile gates and capacity minima" OFF)
 option(MICRO_OPCUA_PUBSUB "Build Publish/Subscribe capabilities" OFF)
 set(MICRO_OPCUA_SANITIZERS "" CACHE STRING "Comma-separated list of sanitizers (e.g. address,undefined)")
-set(MICRO_OPCUA_PLATFORM "host" CACHE STRING "Target platform (host, pico, arduino-skeleton)")
+set(MICRO_OPCUA_PLATFORM "host" CACHE STRING "Target platform (host, external, pico, arduino-skeleton)")
 
 if(MICRO_OPCUA_EMBEDDED_PROFILE)
     set(MICRO_OPCUA_SECURITY ON CACHE BOOL "Build SecurityPolicy Basic256Sha256 support" FORCE)

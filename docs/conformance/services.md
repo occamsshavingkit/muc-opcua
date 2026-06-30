@@ -27,21 +27,21 @@ is available only when the named build option is enabled. `Unsupported` returns
 | RegisterNodes | 5.9.5 | Implemented subset | Identity mapping (NodeIds copied back) |
 | UnregisterNodes | 5.9.6 | Implemented subset | No-op, returns Good |
 | Write | 5.11.4 | Optional implemented subset | Behind `MICRO_OPCUA_SERVICE_WRITE` |
-| Call | 5.11.2 | Optional implemented subset | Behind `MICRO_OPCUA_EMBEDDED_PROFILE` (GetMonitoredItems/ResendData + custom methods only) |
-| CreateMonitoredItems | 5.13.2 | Implemented subset | Data-change monitoring; initial sample; `Bad_NodeIdUnknown` / `Bad_TooManyMonitoredItems` |
-| ModifyMonitoredItems | 5.13.3 | Implemented subset | Revised sampling interval / clientHandle |
+| Call | 5.12.2 | Optional implemented subset | Behind `MICRO_OPCUA_EMBEDDED_PROFILE` (GetMonitoredItems/ResendData + custom methods only) |
+| CreateMonitoredItems | 5.13.2 | Implemented subset | Data-change monitoring; initial sample; `Bad_NodeIdUnknown` / `Bad_TooManyMonitoredItems`; queue bounds |
+| ModifyMonitoredItems | 5.13.3 | Implemented subset | Revised sampling interval / clientHandle; invalid MonitoredItemId -> `Bad_MonitoredItemIdInvalid` |
 | SetMonitoringMode | 5.13.4 | Implemented subset | Disabled / Sampling / Reporting |
 | DeleteMonitoredItems | 5.13.6 | Implemented subset | `Bad_MonitoredItemIdInvalid` |
 | CreateSubscription | 5.14.2 | Implemented subset | Revised publishing interval / lifetime / keep-alive; `Bad_TooManySubscriptions` |
-| ModifySubscription | 5.14.3 | Implemented subset | Revised timing parameters |
+| ModifySubscription | 5.14.3 | Implemented subset | Revised timing parameters; invalid SubscriptionId -> `Bad_SubscriptionIdInvalid` |
 | SetPublishingMode | 5.14.4 | Implemented subset | Disabled -> keep-alives only |
-| Publish | 5.14.5 | Implemented subset | Parked + answered asynchronously by the publishing timer; keep-alive; ack processing |
-| Republish | 5.14.6 | Implemented subset | Resends the retained NotificationMessage; `Bad_MessageNotAvailable` |
-| TransferSubscriptions | 5.14.7 | Unsupported | Outside the current profile-targeting implemented subset |
-| DeleteSubscriptions | 5.14.8 | Implemented subset | Deletes the subscription and its MonitoredItems |
-| SetTriggering | 5.13.5 | Optional implemented subset | Behind `MICRO_OPCUA_EMBEDDED_PROFILE` (links monitored items within a subscription) |
+| Publish | 5.14.5 | Implemented subset | Parked + answered asynchronously by the publishing timer; keep-alive; ack processing; `Bad_TooManyPublishRequests` |
+| Republish | 5.14.6 | Implemented subset | Resends the retained NotificationMessage; invalid sequence -> `Bad_MessageNotAvailable` |
+| TransferSubscriptions | 5.14.7 | Unsupported | Dispatch returns `Bad_ServiceUnsupported`; `TransferSubscriptionsRequest_Encoding_DefaultBinary` ns=0;i=841 tested |
+| DeleteSubscriptions | 5.14.8 | Implemented subset | Deletes the subscription and its MonitoredItems; invalid SubscriptionId -> `Bad_SubscriptionIdInvalid` |
+| SetTriggering | 5.13.5 | Optional implemented subset | Behind `MICRO_OPCUA_EMBEDDED_PROFILE` (links monitored items within a subscription; link capacity -> `Bad_TooManyOperations`) |
 | HistoryRead / HistoryUpdate | 5.11.3 / 5.11.5 | Optional implemented subset | Behind `MICRO_OPCUA_SERVICE_HISTORY`, persistence adapter based |
-| AddNodes / DeleteNodes / AddReferences / DeleteReferences | 5.7 | Optional implemented subset | Behind `MICRO_OPCUA_SERVICE_NODEMANAGEMENT` and `MICRO_OPCUA_DYNAMIC_NODES` |
+| AddNodes / DeleteNodes / AddReferences / DeleteReferences | 5.8 | Optional implemented subset | Behind `MICRO_OPCUA_SERVICE_NODEMANAGEMENT` and `MICRO_OPCUA_DYNAMIC_NODES` |
 | QueryFirst / QueryNext | 5.9.x | Optional implemented subset | Behind `MICRO_OPCUA_SERVICE_QUERY` |
 
 The View Service Set entries (Browse, BrowseNext, TranslateBrowsePaths,
@@ -60,6 +60,28 @@ and Profile targeting, not a Micro profile or facet completion claim. The
 `MICRO_OPCUA_EMBEDDED_PROFILE=ON` build adds an optional implemented subset for
 SetTriggering, Call (with GetMonitoredItems/ResendData methods), and larger
 monitored-item/queue bounds. The TransferSubscriptions service remains unsupported.
+
+Subscription and MonitoredItem negative-path evidence is scoped to the tested
+profile-targeting behavior. OPC-10000-4 sections 5.13.3 and 5.13.6 invalid
+MonitoredItemId requests for ModifyMonitoredItems and DeleteMonitoredItems
+return `Bad_MonitoredItemIdInvalid` without mutating subscription storage.
+OPC-10000-4 sections 5.14.3 and 5.14.8 invalid SubscriptionId requests for
+ModifySubscription and DeleteSubscriptions return `Bad_SubscriptionIdInvalid`
+without mutating subscription storage. Capacity/resource paths are tested for
+CreateSubscription per OPC-10000-4 section 5.14.2 (`Bad_TooManySubscriptions`),
+CreateMonitoredItems per OPC-10000-4 section 5.13.2
+(`Bad_TooManyMonitoredItems`), Publish queued request capacity per OPC-10000-4
+section 5.14.5 (`Bad_TooManyPublishRequests`), and SetTriggering link capacity
+per OPC-10000-4 section 5.13.5 (local `Bad_TooManyOperations`). Monitoring
+parameters queue bounds and overflow behavior are tied to OPC-10000-4 section
+5.13.2 and the resulting queue/notification behavior, not a full Subscription
+Service Set claim. Publish invalid acknowledgement handling follows
+OPC-10000-4 section 5.14.5.4 by returning per-ack
+`Bad_SequenceNumberUnknown` results in PublishResponse. Republish invalid
+sequence handling follows OPC-10000-4 section 5.14.6.3 by returning
+service-level `Bad_MessageNotAvailable`. TransferSubscriptions remains outside
+the implemented subset and dispatches `Bad_ServiceUnsupported` for
+`TransferSubscriptionsRequest_Encoding_DefaultBinary` (ns=0;i=841).
 Aggregate filters remain scoped `AggregateFilter` support under
 `MICRO_OPCUA_SUBSCRIPTIONS_STANDARD`, not full OPC-10000-13 aggregate coverage.
 Average is supported only within the implementation's verified subset and
@@ -84,6 +106,9 @@ AggregateFunction objects recognized by this build, and OPC-10000-13 sections
 5.4.3.5, 5.4.3.10, and 5.4.3.11 are the corresponding calculations exercised
 by project aggregate tests. Other AggregateFunction NodeIds and full Part 13
 aggregate status/configuration semantics are not claimed as implemented
-coverage; unsupported aggregate selections are rejected with
-`Bad_MonitoredItemFilterUnsupported`, while invalid or disallowed filter uses
-remain per-item filter failures rather than success.
+coverage; `TimeAverage` and other AggregateFunction NodeIds outside the
+Average/Minimum/Maximum trio are rejected with
+`Bad_MonitoredItemFilterUnsupported`. Malformed `AggregateFilter`
+ExtensionObjects are rejected during OPC-10000-6 section 5.2.2.15
+ExtensionObject decode with `Bad_DecodingError`, while invalid or disallowed
+filter uses remain per-item filter failures rather than success.
