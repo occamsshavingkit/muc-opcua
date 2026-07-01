@@ -27,6 +27,10 @@ static opcua_boolean_t mu_uadp_variant_encoding_is_unsupported(opcua_byte_t enco
         return true;
     }
 
+    /* Variable-length scalar Variants are intentionally accepted in this
+     * caller-storage subset. The public mu_pubsub_received_message_t contract
+     * requires the input buffer to outlive decoded field values because the
+     * shared binary Variant decoder may borrow payload bytes. */
     switch (type) {
     case MU_TYPE_NULL:
     case MU_TYPE_BOOLEAN:

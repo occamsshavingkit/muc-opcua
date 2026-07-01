@@ -139,12 +139,12 @@ This document maps implementation and test files back to OPC UA normative sectio
 | `binary_nodeid.c` | Traceability mapped | OPC UA Part 4 / 6 | 5.5.4.2, 5.7, 5.11, 5.13, 5.14 / 5.2, 6.7, 7.2 | Placeholder replaced; see feature-specific rows and tests for exact service/encoding coverage |
 | `src/encoding/binary_variant.c` | OPC UA Part 6 | 5.3.13 | Variant encoding | Variant support |
 | `src/encoding/binary_datavalue.c` | OPC UA Part 6 | 5.3.14 | DataValue encoding | DataValue support |
-| `src/encoding/uadp_encoder.c` | OPC UA Part 14 / Part 6 | 7.2.4.4.2, 7.2.4.5.2, 7.2.4.5.4, 7.2.4.5.5 / 5.2.2.16 | Scoped UADP NetworkMessage, PayloadHeader, Data Key Frame, and Variant field encode/decode | PubSub UADP |
+| `src/encoding/uadp_encoder.c` | OPC UA Part 14 / Part 6 | 7.2.4.4.2, 7.2.4.5.2, 7.2.4.5.3, 7.2.4.5.4, 7.2.4.5.5 / 5.2.2.16 | Scoped UADP NetworkMessage, PayloadHeader, DataSet payload sizing, Data Key Frame, and Variant field encode/decode | PubSub UADP |
 | `src/core/pubsub.c` | OPC UA Part 14 | 5.4.6.2.2, 7.3.2.1 | Cooperative UADP/UDP publisher timing and UDP send dispatch | PubSub runtime |
 | `src/core/server.c` | OPC UA Part 14 | 5.4.6.2.2, 7.3.2.1 | `mu_server_poll()` drives connectionless PubSub publishing independent of TCP Sessions | PubSub runtime |
 | `src/platform/host_udp_adapter.c` | OPC UA Part 14 | 7.3.2.1 | Host UDP datagram transport for UADP | PubSub network |
-| `include/micro_opcua/pubsub.h` | OPC UA Part 14 / Part 6 | 7.2.4.4.2, 7.2.4.5.2, 7.2.4.5.4, 7.2.4.5.5, 7.3.2.1 / 5.2.2.16 | Scoped PubSub Publisher API, decoder API, and caller-owned field/output contract | PubSub network |
-| `tests/unit/test_uadp_encoding.c` | OPC UA Part 14 / Part 6 | 7.2.4.4.2, 7.2.4.5.2, 7.2.4.5.4, 7.2.4.5.5 / 5.2.2.16 | Byte-level UADP encoder and decoder coverage | PubSub UADP tests |
+| `include/micro_opcua/pubsub.h` | OPC UA Part 14 / Part 6 | 7.2.4.4.2, 7.2.4.5.2, 7.2.4.5.3, 7.2.4.5.4, 7.2.4.5.5, 7.3.2.1 / 5.2.2.16 | Scoped PubSub Publisher API, decoder API, and caller-owned field/output contract | PubSub network |
+| `tests/unit/test_uadp_encoding.c` | OPC UA Part 14 / Part 6 | 7.2.4.4.2, 7.2.4.5.2, 7.2.4.5.3, 7.2.4.5.4, 7.2.4.5.5 / 5.2.2.16 | Byte-level UADP encoder and decoder coverage, including DataSet payload sizing | PubSub UADP tests |
 | `tests/unit/test_pubsub.c` | OPC UA Part 14 | 5.4.6.2.2, 7.3.2.1 | Publisher timing, destination address, and connectionless poll coverage | PubSub runtime tests |
 | `binary_extension_object.c` | Traceability mapped | OPC UA Part 4 / 6 | 5.5.4.2, 5.7, 5.11, 5.13, 5.14 / 5.2, 6.7, 7.2 | Placeholder replaced; see feature-specific rows and tests for exact service/encoding coverage |
 | `binary_datavalue.c` | Traceability mapped | OPC UA Part 4 / 6 | 5.5.4.2, 5.7, 5.11, 5.13, 5.14 / 5.2, 6.7, 7.2 | Placeholder replaced; see feature-specific rows and tests for exact service/encoding coverage |

@@ -337,7 +337,6 @@ static int feature_mapping_row_has_concrete_source_or_doc_path(const char *row_s
 
     return contains_between(source_start, source_end, "`src/") ||
            contains_between(source_start, source_end, "`include/") ||
-           contains_between(source_start, source_end, "`tests/") ||
            contains_between(source_start, source_end, "`docs/") ||
            contains_between(source_start, source_end, "`README.md`") ||
            contains_between(source_start, source_end, "`Makefile`");

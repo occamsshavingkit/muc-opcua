@@ -788,7 +788,7 @@ cmake -B build -DMICRO_OPCUA_SUBSCRIPTIONS=ON \
 
 ### 7.4 Flash / RAM budget
 
-Measured 2026-06-28 on ARM Cortex-M0+ (RP2040), `arm-none-eabi-gcc -Os
+Measured 2026-06-30 on ARM Cortex-M0+ (RP2040), `arm-none-eabi-gcc -Os
 -mcpu=cortex-m0plus -mthumb -ffunction-sections -fdata-sections`; your board TCP/IP
 stack and crypto backend are extra. Reproduce with `scripts/measure_size.sh all`.
 Full details in
@@ -796,10 +796,10 @@ Full details in
 
 | Profile | Core `.text` (flash) | Caller RAM = storage + 2×8 KiB buffers | Heap |
 |---|---|---|---|
-| **Nano** | **16.1 KiB** (16,441 B) | 1,280 B + 16 KiB ≈ **17.3 KiB** | **0** |
-| **Micro** | **23.2 KiB** (23,730 B) | 3,328 B + 16 KiB ≈ **19.3 KiB** | **0** |
-| **Embedded 2017** | **38.5 KiB** (39,442 B) | 63,240 B + 16 KiB ≈ **79.3 KiB** | **0** |
-| **Full Featured** | **38.8 KiB** (39,768 B) | 63,240 B + 16 KiB ≈ **79.6 KiB** | **0** |
+| **Nano** | **15.9 KiB** (16,278 B) | 1,280 B + 16 KiB ≈ **17.3 KiB** | **0** |
+| **Micro** | **23.2 KiB** (23,785 B) | 3,328 B + 16 KiB ≈ **19.3 KiB** | **0** |
+| **Embedded 2017** | **42.0 KiB** (42,990 B) | 63,240 B + 16 KiB ≈ **79.3 KiB** | **0** |
+| **Full Featured** | **50.4 KiB** (51,612 B) | 63,240 B + 16 KiB ≈ **79.6 KiB** | **0** |
 
 Additional notes for budgeting:
 

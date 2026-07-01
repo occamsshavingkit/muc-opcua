@@ -2,7 +2,7 @@
 
 **Feature Branch**: `023-conformance-docs-subscriber`
 **Created**: 2026-06-30
-**Status**: Draft
+**Status**: Final
 **Input**: User description: "Start items 2 through 5: conformance/evidence cleanup, stronger in-repo conformance substitute checks, scoped PubSub UADP/UDP subscriber support, and profile-relevant subscription/DataChange/status polish. Examine user and implementor documentation for ease of use and remove or guard stale numeric claims and stale OPC UA behavior/status documentation."
 
 ## User Scenarios & Testing *(mandatory)*

@@ -351,8 +351,6 @@ static int has_negative_or_policy_context(const char *line) {
         "no profile-compliance claim",
         "no profile compliance claim",
         "no-profile-compliance",
-        "profile-compliance claim",
-        "profile compliance claim",
         "out of scope",
         "no ctt-verified",
         "no ctt verified",
@@ -812,19 +810,25 @@ static void print_missing_services_doc_evidence(const char *path, const doc_evid
 
 static int line_has_resource_evidence_context(const char *line) {
     return contains_ci(line, "Measured snapshot") || contains_ci(line, "Measured 2026") ||
-           contains_ci(line, "reproduce with") || strstr(line, "scripts/measure_size.sh all") != NULL;
+           contains_ci(line, "reproduce with") || contains_ci(line, "Current ARM Cortex-M0+ profile matrix") ||
+           strstr(line, "scripts/measure_size.sh all") != NULL;
 }
 
 static int line_has_public_profile_size_number(const char *line) {
-    if (!contains_ci(line, "KiB")) {
-        return 0;
+    int public_profile_line = contains_ci(line, "complete Nano server") || contains_ci(line, "Micro is") ||
+                              contains_ci(line, "Embedded 2017 is") || contains_ci(line, "| **nano** |") ||
+                              contains_ci(line, "| **micro** |") || contains_ci(line, "| **embedded**") ||
+                              contains_ci(line, "| **Nano** |") || contains_ci(line, "| **Micro** |") ||
+                              contains_ci(line, "| **Embedded 2017**") || contains_ci(line, "| **Full Featured**");
+    int archive_profile_line = (contains_ci(line, "| nano |") || contains_ci(line, "| micro |") ||
+                                contains_ci(line, "| embedded |") || contains_ci(line, "| full-featured |")) &&
+                               contains_ci(line, "src/libmicro_opcua.a");
+
+    if (public_profile_line) {
+        return contains_ci(line, "KiB");
     }
 
-    return contains_ci(line, "complete Nano server") || contains_ci(line, "Micro is") ||
-           contains_ci(line, "Embedded 2017 is") || contains_ci(line, "| **nano** |") ||
-           contains_ci(line, "| **micro** |") || contains_ci(line, "| **embedded**") ||
-           contains_ci(line, "| **Nano** |") || contains_ci(line, "| **Micro** |") ||
-           contains_ci(line, "| **Embedded 2017**") || contains_ci(line, "| **Full Featured**");
+    return archive_profile_line && contains_ci(line, " B |");
 }
 
 static void check_file_for_unlabeled_resource_numbers(const char *path, size_t *checked_files,
@@ -1158,6 +1162,10 @@ void test_ctt_verified_claims_require_external_ctt_evidence_per_opc_10000_7_4_2_
         "Negative CTT wording must remain allowed");
     TEST_ASSERT_TRUE_MESSAGE(claim_wording_is_supported("Status: CTT verified with an external CTT evidence report."),
                              "Explicit external CTT evidence wording must remain allowed");
+    TEST_ASSERT_FALSE_MESSAGE(claim_wording_is_supported("Status: profile-compliance claim."),
+                              "Bare profile-compliance claim wording is not negative or policy context");
+    TEST_ASSERT_FALSE_MESSAGE(claim_wording_is_supported("Status: profile compliance claim."),
+                              "Bare profile compliance claim wording is not negative or policy context");
 
     size_t checked_files = 0u;
     size_t unsupported_claims = 0u;
@@ -1243,6 +1251,10 @@ void test_public_size_numbers_are_snapshot_labeled_or_reproducible(void) {
     TEST_ASSERT_TRUE_MESSAGE(line_has_public_profile_size_number(
                                  "| **Full Featured** | **38.8 KiB** (39,768 B) | 63,240 B + 16 KiB | **0** |"),
                              "Expected integration-guide profile rows with KiB numbers to be scanned");
+    TEST_ASSERT_TRUE_MESSAGE(
+        line_has_public_profile_size_number(
+            "| nano | 16,278 B | 0 B | 0 B | 16,278 B | `build/size-arm/nano/src/libmicro_opcua.a` |"),
+        "Expected size-ledger byte-only profile rows to be scanned");
     TEST_ASSERT_FALSE_MESSAGE(
         line_has_public_profile_size_number("`MU_MIN_CHUNK_SIZE` (8192 bytes) is the protocol floor"),
         "Protocol constants are not measured profile-size evidence");

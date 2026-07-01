@@ -137,6 +137,34 @@ void test_uadp_network_message_decoder_rejects_null_field_output_with_capacity(v
     TEST_ASSERT_EQUAL_UINT32(0u, missing_fields.field_count);
 }
 
+void test_uadp_network_message_decoder_rejects_zero_field_capacity_for_nonempty_payload(void) {
+    opcua_byte_t buffer[64];
+    size_t bytes_written = build_sample_uadp_message(buffer, sizeof(buffer));
+    mu_variant_t sentinel = {
+        .type = MU_TYPE_UINT32,
+        .value.ui32 = 0xA5A5A5A5u,
+    };
+    mu_pubsub_received_message_t message = {
+        .publisher_id = 0xDEADBEEFu,
+        .data_set_writer_id = 0xBEEFu,
+        .fields = &sentinel,
+        .field_capacity = 0,
+        .field_count = 99,
+    };
+
+    /* OPC-10000-4 section 7.38.2: a non-empty DataSetMessage requires caller
+       output capacity. With zero capacity, the decoder must fail before
+       writing any field slot. */
+    opcua_statuscode_t status = mu_decode_uadp_network_message(buffer, bytes_written, &message);
+
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_BAD_TOOMANYOPERATIONS, status);
+    TEST_ASSERT_EQUAL_UINT32(0xDEADBEEFu, message.publisher_id);
+    TEST_ASSERT_EQUAL_UINT16(0xBEEFu, message.data_set_writer_id);
+    TEST_ASSERT_EQUAL_UINT32(0u, message.field_count);
+    TEST_ASSERT_EQUAL(MU_TYPE_UINT32, sentinel.type);
+    TEST_ASSERT_EQUAL_UINT32(0xA5A5A5A5u, sentinel.value.ui32);
+}
+
 void test_uadp_network_message_decoder_rejects_truncated_network_header(void) {
     opcua_byte_t buffer[64];
     size_t bytes_written = build_sample_uadp_message(buffer, sizeof(buffer));
@@ -390,6 +418,7 @@ int main(void) {
     RUN_TEST(test_uadp_network_message_decoder_rejects_null_input_buffer);
     RUN_TEST(test_uadp_network_message_decoder_rejects_null_decoded_message_pointer);
     RUN_TEST(test_uadp_network_message_decoder_rejects_null_field_output_with_capacity);
+    RUN_TEST(test_uadp_network_message_decoder_rejects_zero_field_capacity_for_nonempty_payload);
     RUN_TEST(test_uadp_network_message_decoder_rejects_truncated_network_header);
     RUN_TEST(test_uadp_network_message_decoder_rejects_truncated_payload_header);
     RUN_TEST(test_uadp_network_message_decoder_rejects_dataset_message_size_mismatch);
