@@ -1,9 +1,9 @@
 #ifndef MU_SERVICES_HISTORY_H
 #define MU_SERVICES_HISTORY_H
 
-#include "micro_opcua/opcua_types.h"
-#include "micro_opcua/status.h"
-#include "micro_opcua/types.h"
+#include "muc_opcua/opcua_types.h"
+#include "muc_opcua/status.h"
+#include "muc_opcua/types.h"
 #include <stddef.h>
 
 #ifdef __cplusplus

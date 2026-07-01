@@ -1,6 +1,6 @@
-/* include/micro_opcua/config.h */
-#ifndef MICRO_OPCUA_CONFIG_H
-#define MICRO_OPCUA_CONFIG_H
+/* include/muc_opcua/config.h */
+#ifndef MUC_OPCUA_CONFIG_H
+#define MUC_OPCUA_CONFIG_H
 
 #include <stddef.h>
 
@@ -16,7 +16,7 @@
 /* E2: opaque per-channel cipher-context storage. 512 bytes gives headroom
  * for an AES-256 key schedule; backend size asserts are added with adapter use. */
 #ifndef MU_CIPHER_CTX_SIZE
-#ifdef MICRO_OPCUA_HAVE_OPENSSL
+#ifdef MUC_OPCUA_HAVE_OPENSSL
 #define MU_CIPHER_CTX_SIZE 32
 #else
 #define MU_CIPHER_CTX_SIZE 512
@@ -24,7 +24,7 @@
 #endif
 
 /* E4: shared secure-path scratch owned by struct mu_server when
- * MICRO_OPCUA_SECURITY is enabled. Sized for the worst-case secure response /
+ * MUC_OPCUA_SECURITY is enabled. Sized for the worst-case secure response /
  * OPN scratch, replacing respbody[5120] + opn_buf[1024] stack buffers. */
 #ifndef MU_SECURE_SCRATCH_SIZE
 #define MU_SECURE_SCRATCH_SIZE 12288
@@ -84,14 +84,14 @@
 #define MU_MAX_SESSIONS 2
 
 #ifndef MU_MAX_CONNECTIONS
-#ifdef MICRO_OPCUA_MULTIPLE_CONNECTIONS
+#ifdef MUC_OPCUA_MULTIPLE_CONNECTIONS
 #define MU_MAX_CONNECTIONS 4
 #else
 #define MU_MAX_CONNECTIONS 1
 #endif
 #endif
 
-/* Per-connection stream reassembly buffer used when MICRO_OPCUA_MULTIPLE_CONNECTIONS
+/* Per-connection stream reassembly buffer used when MUC_OPCUA_MULTIPLE_CONNECTIONS
  * is enabled. OPC-10000-6 §7.1.2.3 defines an 8192-byte minimum receive buffer
  * negotiation floor, so the backing storage must not be smaller than that floor. */
 #ifndef MU_CONNECTION_RX_BUFFER_SIZE
@@ -118,11 +118,11 @@
 #define MU_MAX_STRING_VALUE_LENGTH 64
 
 /* Fixed storage allocation size for the server.
- * The subscription engine (MICRO_OPCUA_SUBSCRIPTIONS, the Micro profile) adds the
+ * The subscription engine (MUC_OPCUA_SUBSCRIPTIONS, the Micro profile) adds the
  * fixed-size subscription / MonitoredItem / parked-Publish arrays to struct mu_server,
  * so the no-heap storage block is larger when it is compiled in. Security builds
  * also reserve server-owned scratch for large secure-channel transient buffers. */
-#ifdef MICRO_OPCUA_SECURITY
+#ifdef MUC_OPCUA_SECURITY
 /* secure_scratch + the two per-direction prepared cipher contexts that now live in
  * client_keys/server_keys (mu_sym_keys_t.cipher_ctx, 2 x MU_CIPHER_CTX_SIZE). */
 #define MU_SERVER_SECURITY_STORAGE_BYTES (MU_SECURE_SCRATCH_SIZE + 2 * MU_CIPHER_CTX_SIZE)
@@ -130,8 +130,8 @@
 #define MU_SERVER_SECURITY_STORAGE_BYTES 0
 #endif
 
-#ifdef MICRO_OPCUA_SUBSCRIPTIONS
-#if MICRO_OPCUA_SUBSCRIPTIONS_STANDARD
+#ifdef MUC_OPCUA_SUBSCRIPTIONS
+#if MUC_OPCUA_SUBSCRIPTIONS_STANDARD
 /* src/services/subscription.h is the canonical definer for these capacities.
  * These fallbacks must match its defaults so caller-storage sizing is correct
  * even when subscription.h is not included first. Because both files use
@@ -154,14 +154,14 @@
 #define MU_SUBSCRIPTIONS_STANDARD_STORAGE_BYTES 0
 #endif
 
-#ifdef MICRO_OPCUA_MULTIPLE_CONNECTIONS
+#ifdef MUC_OPCUA_MULTIPLE_CONNECTIONS
 #define MU_MULTIPLE_CONNECTIONS_STORAGE_BYTES                                                                          \
     (MU_MAX_CONNECTIONS * (MU_CONNECTION_RX_BUFFER_SIZE + MU_CONNECTION_BASE_STORAGE_BYTES))
 #else
 #define MU_MULTIPLE_CONNECTIONS_STORAGE_BYTES 0
 #endif
 
-#ifdef MICRO_OPCUA_EVENTS
+#ifdef MUC_OPCUA_EVENTS
 #ifndef MU_MAX_SUBSCRIPTIONS
 #define MU_MAX_SUBSCRIPTIONS 2
 #endif
@@ -170,13 +170,13 @@
 #define MU_EVENTS_STORAGE_BYTES 0
 #endif
 
-#ifdef MICRO_OPCUA_PUBSUB
+#ifdef MUC_OPCUA_PUBSUB
 #define MU_PUBSUB_STORAGE_BYTES 100
 #else
 #define MU_PUBSUB_STORAGE_BYTES 0
 #endif
 
-#ifdef MICRO_OPCUA_SERVICE_NODEMANAGEMENT
+#ifdef MUC_OPCUA_SERVICE_NODEMANAGEMENT
 #define MU_NODEMANAGEMENT_STORAGE_BYTES                                                                                \
     (MU_MAX_DYNAMIC_NODES * (96 + MU_MAX_DYNAMIC_BROWSE_NAME_LENGTH + MU_MAX_DYNAMIC_DISPLAY_NAME_LENGTH +             \
                              MU_MAX_DYNAMIC_STRING_NODEID_LENGTH) +                                                    \
@@ -185,7 +185,7 @@
 #define MU_NODEMANAGEMENT_STORAGE_BYTES 0
 #endif
 
-#ifdef MICRO_OPCUA_SERVICE_QUERY
+#ifdef MUC_OPCUA_SERVICE_QUERY
 #ifndef MU_MAX_QUERY_CONTINUATION_POINTS
 #define MU_MAX_QUERY_CONTINUATION_POINTS 2
 #endif
@@ -194,7 +194,7 @@
 #define MU_QUERY_STORAGE_BYTES 0
 #endif
 
-#ifdef MICRO_OPCUA_SERVICE_ALARMS_CONDITIONS
+#ifdef MUC_OPCUA_SERVICE_ALARMS_CONDITIONS
 #ifndef MU_MAX_CONDITIONS
 #define MU_MAX_CONDITIONS 10
 #endif
@@ -209,18 +209,18 @@
      MU_PUBSUB_STORAGE_BYTES + MU_NODEMANAGEMENT_STORAGE_BYTES + MU_QUERY_STORAGE_BYTES +                              \
      MU_ALARMS_CONDITIONS_STORAGE_BYTES)
 #else
-#ifdef MICRO_OPCUA_MULTIPLE_CONNECTIONS
+#ifdef MUC_OPCUA_MULTIPLE_CONNECTIONS
 #define MU_MULTIPLE_CONNECTIONS_STORAGE_BYTES                                                                          \
     (MU_MAX_CONNECTIONS * (MU_CONNECTION_RX_BUFFER_SIZE + MU_CONNECTION_BASE_STORAGE_BYTES))
 #else
 #define MU_MULTIPLE_CONNECTIONS_STORAGE_BYTES 0
 #endif
-#ifdef MICRO_OPCUA_PUBSUB
+#ifdef MUC_OPCUA_PUBSUB
 #define MU_PUBSUB_STORAGE_BYTES 100
 #else
 #define MU_PUBSUB_STORAGE_BYTES 0
 #endif
-#ifdef MICRO_OPCUA_SERVICE_NODEMANAGEMENT
+#ifdef MUC_OPCUA_SERVICE_NODEMANAGEMENT
 #define MU_NODEMANAGEMENT_STORAGE_BYTES                                                                                \
     (MU_MAX_DYNAMIC_NODES * (96 + MU_MAX_DYNAMIC_BROWSE_NAME_LENGTH + MU_MAX_DYNAMIC_DISPLAY_NAME_LENGTH +             \
                              MU_MAX_DYNAMIC_STRING_NODEID_LENGTH) +                                                    \
@@ -228,7 +228,7 @@
 #else
 #define MU_NODEMANAGEMENT_STORAGE_BYTES 0
 #endif
-#ifdef MICRO_OPCUA_SERVICE_QUERY
+#ifdef MUC_OPCUA_SERVICE_QUERY
 #ifndef MU_MAX_QUERY_CONTINUATION_POINTS
 #define MU_MAX_QUERY_CONTINUATION_POINTS 2
 #endif
@@ -236,7 +236,7 @@
 #else
 #define MU_QUERY_STORAGE_BYTES 0
 #endif
-#ifdef MICRO_OPCUA_SERVICE_ALARMS_CONDITIONS
+#ifdef MUC_OPCUA_SERVICE_ALARMS_CONDITIONS
 #ifndef MU_MAX_CONDITIONS
 #define MU_MAX_CONDITIONS 10
 #endif
@@ -250,4 +250,4 @@
      MU_QUERY_STORAGE_BYTES + MU_ALARMS_CONDITIONS_STORAGE_BYTES)
 #endif
 
-#endif /* MICRO_OPCUA_CONFIG_H */
+#endif /* MUC_OPCUA_CONFIG_H */

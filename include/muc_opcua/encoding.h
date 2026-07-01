@@ -1,11 +1,11 @@
-/* include/micro_opcua/encoding.h */
-#ifndef MICRO_OPCUA_ENCODING_H
-#define MICRO_OPCUA_ENCODING_H
+/* include/muc_opcua/encoding.h */
+#ifndef MUC_OPCUA_ENCODING_H
+#define MUC_OPCUA_ENCODING_H
 
-#include "micro_opcua/config.h"
-#include "micro_opcua/opcua_types.h"
-#include "micro_opcua/status.h"
-#include "micro_opcua/types.h"
+#include "muc_opcua/config.h"
+#include "muc_opcua/opcua_types.h"
+#include "muc_opcua/status.h"
+#include "muc_opcua/types.h"
 #include <stddef.h>
 
 typedef struct {
@@ -83,4 +83,4 @@ opcua_statuscode_t mu_binary_read_username_identity_token(mu_binary_reader_t *re
 opcua_statuscode_t mu_binary_read_certificate_identity_token(mu_binary_reader_t *reader,
                                                              mu_certificate_identity_token_t *value);
 
-#endif /* MICRO_OPCUA_ENCODING_H */
+#endif /* MUC_OPCUA_ENCODING_H */

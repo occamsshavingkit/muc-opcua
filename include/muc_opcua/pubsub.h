@@ -1,7 +1,7 @@
-#ifndef MICRO_OPCUA_PUBSUB_H
-#define MICRO_OPCUA_PUBSUB_H
+#ifndef MUC_OPCUA_PUBSUB_H
+#define MUC_OPCUA_PUBSUB_H
 
-#include "micro_opcua/types.h"
+#include "muc_opcua/types.h"
 
 #ifndef MU_PUBSUB_MAX_FIELDS
 #define MU_PUBSUB_MAX_FIELDS 8
@@ -74,4 +74,4 @@ opcua_statuscode_t mu_decode_uadp_network_message(const opcua_byte_t *buffer, si
 }
 #endif
 
-#endif // MICRO_OPCUA_PUBSUB_H
+#endif // MUC_OPCUA_PUBSUB_H

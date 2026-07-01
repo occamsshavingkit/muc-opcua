@@ -1,6 +1,6 @@
-# cmake/MicroOpcUaStaticAnalysis.cmake
+# cmake/MucOpcUaStaticAnalysis.cmake
 
-set(MICRO_OPCUA_STATIC_ANALYSIS_DIRS
+set(MUC_OPCUA_STATIC_ANALYSIS_DIRS
     "${CMAKE_SOURCE_DIR}/src"
     "${CMAKE_SOURCE_DIR}/include"
     "${CMAKE_SOURCE_DIR}/tests"
@@ -12,7 +12,7 @@ if(CLANG_FORMAT)
     # Using a simple script or find command might not be perfectly cross-platform in CMake,
     # but it's acceptable for host builds on Linux/macOS.
     add_custom_target(format-check
-        COMMAND bash -c "find \"$@\" -type f \\( -name '*.c' -o -name '*.h' \\) -print0 | xargs -0 --no-run-if-empty \"${CLANG_FORMAT}\" --dry-run --Werror" bash ${MICRO_OPCUA_STATIC_ANALYSIS_DIRS}
+        COMMAND bash -c "find \"$@\" -type f \\( -name '*.c' -o -name '*.h' \\) -print0 | xargs -0 --no-run-if-empty \"${CLANG_FORMAT}\" --dry-run --Werror" bash ${MUC_OPCUA_STATIC_ANALYSIS_DIRS}
         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
         COMMENT "Check formatting with clang-format"
         VERBATIM
@@ -39,7 +39,7 @@ find_program(CLANG_TIDY clang-tidy)
 if(CLANG_TIDY)
     set(CMAKE_EXPORT_COMPILE_COMMANDS ON CACHE BOOL "Export compile_commands.json for clang-tidy" FORCE)
     add_custom_target(clang-tidy
-        COMMAND bash -c "find \"$@\" -type f -name '*.c' -print0 | xargs -0 --no-run-if-empty \"${CLANG_TIDY}\" -p \"${CMAKE_BINARY_DIR}\"" bash ${MICRO_OPCUA_STATIC_ANALYSIS_DIRS}
+        COMMAND bash -c "find \"$@\" -type f -name '*.c' -print0 | xargs -0 --no-run-if-empty \"${CLANG_TIDY}\" -p \"${CMAKE_BINARY_DIR}\"" bash ${MUC_OPCUA_STATIC_ANALYSIS_DIRS}
         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
         COMMENT "Static analysis with clang-tidy"
         VERBATIM

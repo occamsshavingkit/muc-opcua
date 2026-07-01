@@ -1,8 +1,8 @@
-/* include/micro_opcua/opcua_ids.h */
-#ifndef MICRO_OPCUA_OPCUA_IDS_H
-#define MICRO_OPCUA_OPCUA_IDS_H
+/* include/muc_opcua/opcua_ids.h */
+#ifndef MUC_OPCUA_OPCUA_IDS_H
+#define MUC_OPCUA_OPCUA_IDS_H
 
-#include "micro_opcua/opcua_types.h"
+#include "muc_opcua/opcua_types.h"
 
 #define MU_ID_FINDSERVERSREQUEST 422
 #define MU_ID_FINDSERVERSRESPONSE 425
@@ -93,4 +93,4 @@
 #define MU_ID_AGGREGATETYPE_MINIMUM 2346
 #define MU_ID_AGGREGATETYPE_MAXIMUM 2347
 
-#endif /* MICRO_OPCUA_OPCUA_IDS_H */
+#endif /* MUC_OPCUA_OPCUA_IDS_H */

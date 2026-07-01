@@ -93,23 +93,23 @@ build is expected to be **transiently broken** after this phase (src/, tests/,
 platform/, examples/ still `#include "micro_opcua/...".h`) — that's expected for
 a rename and is resolved by Phase 3 (US1), not a defect in this phase.
 
-- [ ] T003 `git mv include/micro_opcua/ include/muc_opcua/` (including
+- [X] T003 `git mv include/micro_opcua/ include/muc_opcua/` (including
   `git mv include/muc_opcua/micro_opcua.h include/muc_opcua/muc_opcua.h` for the
   umbrella header), then fix every `MICRO_OPCUA_*_H` header guard and any
   internal `micro_opcua`/`MICRO_OPCUA` prose/path reference within all 14 files
   now under `include/muc_opcua/**` (including `include/muc_opcua/services/`)
-- [ ] T004 [P] `git mv cmake/MicroOpcUaOptions.cmake cmake/MucOpcUaOptions.cmake`,
+- [X] T004 [P] `git mv cmake/MicroOpcUaOptions.cmake cmake/MucOpcUaOptions.cmake`,
   `git mv cmake/MicroOpcUaCodegen.cmake cmake/MucOpcUaCodegen.cmake`,
   `git mv cmake/MicroOpcUaStaticAnalysis.cmake cmake/MucOpcUaStaticAnalysis.cmake`,
   `git mv cmake/MicroOpcUaWarnings.cmake cmake/MucOpcUaWarnings.cmake`, updating
   every `MICRO_OPCUA_*` reference inside each renamed file
-- [ ] T005 Update `CMakeLists.txt`: `project(micro_opcua ...)` ->
+- [X] T005 Update `CMakeLists.txt`: `project(micro_opcua ...)` ->
   `project(muc_opcua ...)`, every `MICRO_OPCUA_*` option/cache-variable name ->
   `MUC_OPCUA_*` (leaving `MUC_OPCUA_PROFILE`'s accepted values `nano`/`micro`/
   `embedded`/`full`/`custom` untouched per research.md Decision 2), and the four
   `include(cmake/MicroOpcUa*.cmake)` call sites -> the T004 filenames (depends on
   T003, T004)
-- [ ] T006 [P] Update `src/CMakeLists.txt`: `add_library(micro_opcua STATIC ...)`
+- [X] T006 [P] Update `src/CMakeLists.txt`: `add_library(micro_opcua STATIC ...)`
   -> `add_library(muc_opcua STATIC ...)` and
   `target_include_directories(micro_opcua PUBLIC ...)` -> `target_include_directories(muc_opcua PUBLIC ...)`
   (depends on T003)

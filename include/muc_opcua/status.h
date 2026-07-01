@@ -1,8 +1,8 @@
-/* include/micro_opcua/status.h */
-#ifndef MICRO_OPCUA_STATUS_H
-#define MICRO_OPCUA_STATUS_H
+/* include/muc_opcua/status.h */
+#ifndef MUC_OPCUA_STATUS_H
+#define MUC_OPCUA_STATUS_H
 
-#include "micro_opcua/opcua_types.h"
+#include "muc_opcua/opcua_types.h"
 
 /* Common OPC UA StatusCodes (OPC-10000-4 section 7.38.2 / OPC-10000-6 section 7.1.5) */
 #define MU_STATUS_GOOD 0x00000000
@@ -49,7 +49,7 @@
 #define MU_STATUS_BAD_TOOMANYMONITOREDITEMS ((opcua_statuscode_t)0x80DB0000)
 #define MU_STATUS_BAD_TOOMANYSUBSCRIPTIONS ((opcua_statuscode_t)0x80770000)
 #define MU_STATUS_BAD_SUBSCRIPTIONIDINVALID ((opcua_statuscode_t)0x80280000)
-#if MICRO_OPCUA_SUBSCRIPTIONS
+#if MUC_OPCUA_SUBSCRIPTIONS
 #define MU_STATUS_BAD_MESSAGENOTAVAILABLE ((opcua_statuscode_t)0x807B0000)
 #define MU_STATUS_BAD_SEQUENCENUMBERUNKNOWN ((opcua_statuscode_t)0x807A0000)
 #define MU_STATUS_BAD_TOOMANYPUBLISHREQUESTS ((opcua_statuscode_t)0x80780000)
@@ -84,7 +84,7 @@ extern "C" {
 #endif
 
 /* Optional diagnostics helper */
-#ifdef MICRO_OPCUA_STATUS_STRINGS
+#ifdef MUC_OPCUA_STATUS_STRINGS
 const char *mu_status_name(opcua_statuscode_t status);
 #endif
 
@@ -92,4 +92,4 @@ const char *mu_status_name(opcua_statuscode_t status);
 }
 #endif
 
-#endif /* MICRO_OPCUA_STATUS_H */
+#endif /* MUC_OPCUA_STATUS_H */

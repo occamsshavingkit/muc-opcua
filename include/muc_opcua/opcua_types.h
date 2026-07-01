@@ -1,4 +1,4 @@
-/* include/micro_opcua/opcua_types.h */
+/* include/muc_opcua/opcua_types.h */
 #ifndef OPCUA_TYPES_H
 #define OPCUA_TYPES_H
 

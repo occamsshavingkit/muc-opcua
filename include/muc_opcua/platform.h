@@ -1,8 +1,8 @@
-/* include/micro_opcua/platform.h */
-#ifndef MICRO_OPCUA_PLATFORM_H
-#define MICRO_OPCUA_PLATFORM_H
+/* include/muc_opcua/platform.h */
+#ifndef MUC_OPCUA_PLATFORM_H
+#define MUC_OPCUA_PLATFORM_H
 
-#include "micro_opcua/types.h"
+#include "muc_opcua/types.h"
 #include <stddef.h>
 
 #ifdef __cplusplus
@@ -190,4 +190,4 @@ void mu_wolfssl_crypto_adapter_cleanup(mu_crypto_adapter_t *adapter);
 }
 #endif
 
-#endif /* MICRO_OPCUA_PLATFORM_H */
+#endif /* MUC_OPCUA_PLATFORM_H */

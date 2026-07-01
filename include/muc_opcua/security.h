@@ -1,8 +1,8 @@
-/* include/micro_opcua/security.h */
-#ifndef MICRO_OPCUA_SECURITY_H
-#define MICRO_OPCUA_SECURITY_H
+/* include/muc_opcua/security.h */
+#ifndef MUC_OPCUA_SECURITY_H
+#define MUC_OPCUA_SECURITY_H
 
-#include "micro_opcua/opcua_types.h"
+#include "muc_opcua/opcua_types.h"
 #include <stddef.h>
 
 #ifdef __cplusplus
@@ -27,4 +27,4 @@ opcua_statuscode_t mu_trust_list_match(const mu_trust_list_t *trust_list, const 
 }
 #endif
 
-#endif /* MICRO_OPCUA_SECURITY_H */
+#endif /* MUC_OPCUA_SECURITY_H */

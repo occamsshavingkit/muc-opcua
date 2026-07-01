@@ -1,10 +1,10 @@
-#ifndef MICRO_OPCUA_SERVICES_ALARMS_CONDITIONS_H
-#define MICRO_OPCUA_SERVICES_ALARMS_CONDITIONS_H
+#ifndef MUC_OPCUA_SERVICES_ALARMS_CONDITIONS_H
+#define MUC_OPCUA_SERVICES_ALARMS_CONDITIONS_H
 
-#include "micro_opcua/config.h"
-#include "micro_opcua/types.h"
+#include "muc_opcua/config.h"
+#include "muc_opcua/types.h"
 
-#ifdef MICRO_OPCUA_SERVICE_ALARMS_CONDITIONS
+#ifdef MUC_OPCUA_SERVICE_ALARMS_CONDITIONS
 
 #ifdef __cplusplus
 extern "C" {
@@ -57,6 +57,6 @@ mu_status_t mu_alarms_conditions_method_dispatch(struct mu_server *server, const
 }
 #endif
 
-#endif /* MICRO_OPCUA_SERVICE_ALARMS_CONDITIONS */
+#endif /* MUC_OPCUA_SERVICE_ALARMS_CONDITIONS */
 
-#endif /* MICRO_OPCUA_SERVICES_ALARMS_CONDITIONS_H */
+#endif /* MUC_OPCUA_SERVICES_ALARMS_CONDITIONS_H */

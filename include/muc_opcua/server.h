@@ -1,17 +1,17 @@
-/* include/micro_opcua/server.h */
-#ifndef MICRO_OPCUA_SERVER_H
-#define MICRO_OPCUA_SERVER_H
+/* include/muc_opcua/server.h */
+#ifndef MUC_OPCUA_SERVER_H
+#define MUC_OPCUA_SERVER_H
 
-#include "micro_opcua/address_space.h"
-#include "micro_opcua/config.h"
-#include "micro_opcua/platform.h"
-#include "micro_opcua/security.h"
-#include "micro_opcua/status.h"
-#ifdef MICRO_OPCUA_PUBSUB
-#include "micro_opcua/pubsub.h"
+#include "muc_opcua/address_space.h"
+#include "muc_opcua/config.h"
+#include "muc_opcua/platform.h"
+#include "muc_opcua/security.h"
+#include "muc_opcua/status.h"
+#ifdef MUC_OPCUA_PUBSUB
+#include "muc_opcua/pubsub.h"
 #endif
-#ifdef MICRO_OPCUA_SERVICE_HISTORY
-#include "micro_opcua/services/history.h"
+#ifdef MUC_OPCUA_SERVICE_HISTORY
+#include "muc_opcua/services/history.h"
 #endif
 
 #ifdef __cplusplus
@@ -72,19 +72,19 @@ typedef struct {
     /* TrustList for Application Authentication (optional) */
     const mu_trust_list_t *trust_list;
 
-#ifdef MICRO_OPCUA_PUBSUB
+#ifdef MUC_OPCUA_PUBSUB
     /* PubSub Configuration (optional) */
     mu_pubsub_connection_t pubsub;
     mu_udp_adapter_t udp_adapter;
 #endif
 
     /* Write Service Callback (optional) */
-#ifdef MICRO_OPCUA_SERVICE_WRITE
+#ifdef MUC_OPCUA_SERVICE_WRITE
     mu_write_handler_t write_handler;
     void *write_handler_handle;
 #endif
 
-#ifdef MICRO_OPCUA_SERVICE_HISTORY
+#ifdef MUC_OPCUA_SERVICE_HISTORY
     mu_history_adapter_t history_adapter;
 #endif
 
@@ -115,7 +115,7 @@ void mu_server_close(mu_server_t *server);
  */
 opcua_statuscode_t mu_server_config_validate(const mu_server_config_t *config);
 
-#ifdef MICRO_OPCUA_CUSTOM_METHODS
+#ifdef MUC_OPCUA_CUSTOM_METHODS
 /*
  * Register a callback handler for a method node.
  */
@@ -123,7 +123,7 @@ opcua_statuscode_t mu_server_register_method_callback(mu_server_t *server, const
                                                       mu_method_callback_t callback, void *context);
 #endif
 
-#ifdef MICRO_OPCUA_EVENTS
+#ifdef MUC_OPCUA_EVENTS
 /*
  * Trigger an Event to be published to all subscriptions that monitor events.
  */
@@ -134,4 +134,4 @@ opcua_statuscode_t mu_server_trigger_event(mu_server_t *server, const mu_event_n
 }
 #endif
 
-#endif /* MICRO_OPCUA_SERVER_H */
+#endif /* MUC_OPCUA_SERVER_H */

@@ -1,10 +1,10 @@
-/* include/micro_opcua/address_space.h */
-#ifndef MICRO_OPCUA_ADDRESS_SPACE_H
-#define MICRO_OPCUA_ADDRESS_SPACE_H
+/* include/muc_opcua/address_space.h */
+#ifndef MUC_OPCUA_ADDRESS_SPACE_H
+#define MUC_OPCUA_ADDRESS_SPACE_H
 
-#include "micro_opcua/config.h"
-#include "micro_opcua/status.h"
-#include "micro_opcua/types.h"
+#include "muc_opcua/config.h"
+#include "muc_opcua/status.h"
+#include "muc_opcua/types.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -109,4 +109,4 @@ opcua_statuscode_t mu_value_source_read(const mu_value_source_t *source, const m
 }
 #endif
 
-#endif /* MICRO_OPCUA_ADDRESS_SPACE_H */
+#endif /* MUC_OPCUA_ADDRESS_SPACE_H */

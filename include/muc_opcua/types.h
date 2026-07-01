@@ -1,9 +1,9 @@
-/* include/micro_opcua/types.h */
-#ifndef MICRO_OPCUA_TYPES_H
-#define MICRO_OPCUA_TYPES_H
+/* include/muc_opcua/types.h */
+#ifndef MUC_OPCUA_TYPES_H
+#define MUC_OPCUA_TYPES_H
 
-#include "micro_opcua/config.h"
-#include "micro_opcua/opcua_types.h"
+#include "muc_opcua/config.h"
+#include "muc_opcua/opcua_types.h"
 
 /* OPC UA ByteString and String (bounded by caller configuration or static max) */
 typedef struct {
@@ -120,7 +120,7 @@ typedef struct {
     opcua_boolean_t has_server_timestamp;
 } mu_datavalue_t;
 
-#ifdef MICRO_OPCUA_SERVICE_WRITE
+#ifdef MUC_OPCUA_SERVICE_WRITE
 /* WriteValue (OPC 10000-4 §5.11.4.2) */
 typedef struct {
     mu_nodeid_t node_id;
@@ -156,7 +156,7 @@ typedef struct {
     mu_bytestring_t certificate_data;
 } mu_certificate_identity_token_t;
 
-#ifdef MICRO_OPCUA_EVENTS
+#ifdef MUC_OPCUA_EVENTS
 typedef struct {
     mu_nodeid_t event_type;
     mu_bytestring_t event_id;
@@ -166,4 +166,4 @@ typedef struct {
 } mu_event_notification_t;
 #endif
 
-#endif /* MICRO_OPCUA_TYPES_H */
+#endif /* MUC_OPCUA_TYPES_H */
