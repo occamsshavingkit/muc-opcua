@@ -321,7 +321,7 @@ consistent and green under the new name.
   StatusCode, or conformance claim (OPC-001 through OPC-005), consistent with
   every other traceability doc's normative-scope framing (depends on
   T007-T030)
-- [ ] T034 Walk through `quickstart.md` end to end on a genuinely fresh clone as
+- [X] T034 Walk through `quickstart.md` end to end on a genuinely fresh clone as
   a final sanity check; attach the output as evidence in the PR description
   (depends on T031, T032, T033)
 
