@@ -305,14 +305,14 @@ consistent and green under the new name.
 
 **Purpose**: Prove the rename is complete and self-guarding.
 
-- [ ] T031 Re-run the T002 stale-old-name regression guard (over its defined
+- [X] T031 Re-run the T002 stale-old-name regression guard (over its defined
   scope — everything except `build*/`, `.git/`, `specs/001-023/**`, and the
   per-feature `docs/traceability/NNN-*.md` files); confirm it now **passes**
   (zero matches outside the resolved T024 allow-list) — SC-002, SC-006
   (depends on T011, T023, T025, T030)
-- [ ] T032 Re-run the full host `ctest` suite; confirm green — SC-001, SC-003
+- [X] T032 Re-run the full host `ctest` suite; confirm green — SC-001, SC-003
   (depends on T011)
-- [ ] T033 Add `docs/traceability/024-rename-muc-opcua.md` mapping this
+- [X] T033 Add `docs/traceability/024-rename-muc-opcua.md` mapping this
   feature's FR-001 through FR-010 to the tasks/files that implement them,
   matching the existing per-feature traceability doc pattern, and recording
   T012's confirmed-zero-size-delta result (SC-005) as this feature's size
