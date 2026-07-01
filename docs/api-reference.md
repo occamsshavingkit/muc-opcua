@@ -59,7 +59,7 @@ int main(void) {
     config.endpoint_url     = "opc.tcp://0.0.0.0:4840";
     config.application_uri  = "urn:example:muc-opcua";
     config.product_uri      = "urn:example:product";
-    config.application_name = "Micro OPC UA Server";
+    config.application_name = "muc-opcua Server";
 
     config.receive_buffer      = recv_buf;
     config.receive_buffer_size = sizeof(recv_buf);

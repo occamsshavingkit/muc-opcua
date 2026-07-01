@@ -1,8 +1,8 @@
-// Interop check: OPC Foundation UA-.NETStandard reference client -> micro-opcua server.
+// Interop check: OPC Foundation UA-.NETStandard reference client -> muc-opcua server.
 //
 // This is the authoritative cross-stack interop signal (the .NET reference stack is the
 // implementation the OPC Foundation UACTT is built on). It is the server-bound leg of the
-// async-opcua interop harness adapted for micro-opcua, which is server-only.
+// async-opcua interop harness adapted for muc-opcua, which is server-only.
 //
 // Connects with SecurityPolicy Basic256Sha256 / SignAndEncrypt + Anonymous (selecting the
 // most-secure endpoint) and validates the Nano-profile surface: connect
@@ -15,7 +15,7 @@ using Opc.Ua;
 using Opc.Ua.Client;
 using Opc.Ua.Configuration;
 
-namespace MicroOpcUa.Interop
+namespace MucOpcUa.Interop
 {
     internal static class Program
     {
@@ -33,8 +33,8 @@ namespace MicroOpcUa.Interop
 
             var config = new ApplicationConfiguration
             {
-                ApplicationName = "micro-opcua-interop-client",
-                ApplicationUri = "urn:micro-opcua:interop:client",
+                ApplicationName = "muc-opcua-interop-client",
+                ApplicationUri = "urn:muc-opcua:interop:client",
                 ApplicationType = ApplicationType.Client,
                 SecurityConfiguration = new SecurityConfiguration
                 {
@@ -42,7 +42,7 @@ namespace MicroOpcUa.Interop
                     {
                         StoreType = CertificateStoreType.Directory,
                         StorePath = "pki/own",
-                        SubjectName = "CN=micro-opcua-interop-client"
+                        SubjectName = "CN=muc-opcua-interop-client"
                     },
                     TrustedIssuerCertificates = new CertificateTrustList { StoreType = CertificateStoreType.Directory, StorePath = "pki/issuer" },
                     TrustedPeerCertificates = new CertificateTrustList { StoreType = CertificateStoreType.Directory, StorePath = "pki/trusted" },
@@ -69,7 +69,7 @@ namespace MicroOpcUa.Interop
             var endpoint = new ConfiguredEndpoint(null, selected, EndpointConfiguration.Create(config));
 
             using var session = await Session.Create(
-                config, endpoint, false, "micro-opcua interop", 60000,
+                config, endpoint, false, "muc-opcua interop", 60000,
                 new UserIdentity(new AnonymousIdentityToken()), null).ConfigureAwait(false);
 
             Check("connect (HEL/OPN/GetEndpoints/CreateSession/ActivateSession)", session.Connected);

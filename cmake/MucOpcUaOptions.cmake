@@ -8,7 +8,7 @@ option(MUC_OPCUA_LTO "Enable link-time optimization (interprocedural optimizatio
 option(MUC_OPCUA_STACK_USAGE "Measure secured-OPN worst-case stack usage" OFF)
 set(MUC_OPCUA_STACK_USAGE_LIMIT 10240 CACHE STRING "Maximum secured-OPN stack usage budget in bytes")
 
-message(STATUS "Configuring Micro OPC UA for platform: ${MUC_OPCUA_PLATFORM}")
+message(STATUS "Configuring muc-opcua for platform: ${MUC_OPCUA_PLATFORM}")
 
 if(MUC_OPCUA_PLATFORM STREQUAL "host")
     # Host build specific options

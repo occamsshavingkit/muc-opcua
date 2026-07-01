@@ -8,14 +8,23 @@ forbidden substring), extended to a repo-wide sweep.
 ## Inputs
 
 - The set of tracked files in the repository, excluding:
-  - build output directories (`build*/`) and VCS metadata (`.git/`);
+  - build output directories (`build*/`), .NET build intermediates/output
+    (`bin/`, `obj/`), and VCS metadata (`.git/`);
   - `specs/001-023/**` and the per-feature `docs/traceability/NNN-*.md` files —
     these are **frozen historical record** (research.md Decision 4) and are
     expected to retain the old name forever, by design, the same way a project
     rename doesn't rewrite already-merged commits or PR descriptions. This is a
     permanent, two-part directory/glob exclusion, not a growing allow-list.
+  - two self-referential test files — this guard's own source (its
+    `forbidden_literals[]` array and failure message must contain the old
+    name to search for it) and `test_traceability_docs.c` (which quotes
+    `include/micro_opcua/...` paths verbatim to match the frozen
+    `docs/traceability/023-*.md` content byte-for-byte). Distinct from the
+    single-entry migration-note allow-list below — this is a structural
+    necessity of self-referential tests, not a growing exception budget.
 - The forbidden-literal set from research.md Decision 1: `micro-opcua`,
-  `micro_opcua`, `MICRO_OPCUA`, `MicroOpcUa`, `Micro-OPCUA` (case-sensitive, exact
+  `micro_opcua`, `MICRO_OPCUA`, `MicroOpcUa`, `Micro-OPCUA`, and (per the
+  Decision 1 Addendum found during T030) `Micro OPC UA` (case-sensitive, exact
   substring match — not a word-boundary regex, consistent with how the rename
   itself was applied).
 

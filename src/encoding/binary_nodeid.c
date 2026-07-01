@@ -147,7 +147,7 @@ opcua_statuscode_t mu_binary_write_expanded_nodeid(mu_binary_writer_t *writer, c
     if (!value)
         return MU_STATUS_BAD_ENCODINGERROR;
 
-    /* For Micro OPC UA, we don't emit NamespaceUri or ServerIndex. We just encode as NodeId. */
+    /* For muc-opcua, we don't emit NamespaceUri or ServerIndex. We just encode as NodeId. */
     /* This satisfies basic server requirements where all nodes are local. */
     return mu_binary_write_nodeid(writer, &value->node_id);
 }

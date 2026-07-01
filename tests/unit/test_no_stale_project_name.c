@@ -4,9 +4,9 @@
  * tracked tree and fails if any non-excluded file still contains the old
  * project name in one of its five literal forms (research.md Decision 1).
  *
- * Exclusions (all frozen/historical or self-referential planning record, not
- * "current documentation a reader relies on"):
- *   - build output directories and VCS metadata
+ * Exclusions (all frozen/historical, self-referential, or generated/untracked
+ * build output, not "current documentation a reader relies on"):
+ *   - build output directories (including .NET's bin/obj) and VCS metadata
  *   - the entire specs/ tree: every specs/NNN-feature directory is a spec-kit
  *     planning/history record for one feature (already-shipped for 001-023,
  *     and this rename's own record for 024 itself, which necessarily quotes
@@ -16,6 +16,8 @@
  *     already-shipped features; the living index files in the same directory
  *     are NOT excluded).
  *   - one explicit, path-based allow-list entry for the migration note.
+ *   - two self-referential test files (this one, and test_traceability_docs.c)
+ *     whose job requires quoting the old name verbatim.
  */
 #define _POSIX_C_SOURCE 200809L
 #include "unity.h"
@@ -40,12 +42,15 @@ static const char *const forbidden_literals[] = {
     "micro-opcua",
     "MicroOpcUa",
     "Micro-OPCUA",
+    "Micro OPC UA",
 };
 
 /* Directory names, matched by exact basename, that are skipped entirely. */
 static const char *const excluded_dir_names[] = {
     ".git",
     "specs", /* every specs/NNN-feature directory is a spec-kit planning/history record */
+    "obj",   /* .NET build intermediates (tests/interop/dotnet/obj), gitignored */
+    "bin",   /* .NET build output (tests/interop/dotnet/bin), gitignored */
 };
 
 /* "build" prefixed directories are matched by prefix, not exact name (build,
@@ -76,6 +81,19 @@ static const char *const excluded_traceability_files[] = {
    contracts/regression-guard-contract.md. */
 static const char *const allow_listed_files[] = {
     "docs/migration-024-muc-opcua-rename.md",
+};
+
+/* Test files whose job is to search for or quote the old name, distinct from
+   the migration-note allow-list above (that one names the FR-007 exception
+   budget; this one is a structural necessity of self-referential tests):
+   - this guard's own source unavoidably contains the old-name literals it
+     searches for, in forbidden_literals[] and its failure message;
+   - test_traceability_docs.c quotes include/micro_opcua/... paths verbatim
+     because those quotes must match the frozen docs/traceability/023-*.md
+     content byte-for-byte (see that file's own comments). */
+static const char *const self_referential_test_files[] = {
+    "tests/unit/test_no_stale_project_name.c",
+    "tests/unit/test_traceability_docs.c",
 };
 
 /* Binary/non-text extensions skipped so the scan never mis-decodes bytes;
@@ -127,6 +145,10 @@ static void check_file_for_forbidden_literals(const char *full_path, const char 
         return;
     }
     if (relative_path_matches_any(relative_path, allow_listed_files, ARRAY_COUNT(allow_listed_files))) {
+        return;
+    }
+    if (relative_path_matches_any(relative_path, self_referential_test_files,
+                                  ARRAY_COUNT(self_referential_test_files))) {
         return;
     }
     if (is_skipped_extension(full_path)) {

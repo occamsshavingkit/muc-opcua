@@ -1,10 +1,10 @@
 # Minimal Server Example
 
-This example demonstrates how to configure and run the Micro OPC UA minimal server. It focuses on the initialization of the server identity, network buffers, and a statically allocated address space.
+This example demonstrates how to configure and run the muc-opcua minimal server. It focuses on the initialization of the server identity, network buffers, and a statically allocated address space.
 
 ## Memory Lifetimes
 
-In Micro OPC UA, the server is designed to operate entirely without dynamic memory allocation (`malloc`/`free`). All required memory must be provided by the application during initialization.
+In muc-opcua, the server is designed to operate entirely without dynamic memory allocation (`malloc`/`free`). All required memory must be provided by the application during initialization.
 
 ### Server Storage
 The core server state (`mu_server_t`) is completely opaque. It requires a contiguous block of statically allocated memory provided at initialization:

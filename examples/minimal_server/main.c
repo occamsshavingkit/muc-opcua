@@ -107,7 +107,7 @@ int main(void) {
     config.endpoint_url = "opc.tcp://localhost:4840";
     config.application_uri = "urn:localhost:muc_opcua:minimal_server";
     config.product_uri = "urn:muc_opcua:minimal_server";
-    config.application_name = "Minimal Micro OPC UA Server";
+    config.application_name = "Minimal muc-opcua Server";
 
     config.receive_buffer = g_recv_buffer;
     config.receive_buffer_size = sizeof(g_recv_buffer);
@@ -148,7 +148,7 @@ int main(void) {
 
     config.address_space = &g_minimal_address_space;
 
-    printf("Initializing Micro OPC UA Server...\n");
+    printf("Initializing muc-opcua Server...\n");
     status = mu_server_init(g_server_storage, sizeof(g_server_storage), &config, &server);
     if (status != MU_STATUS_GOOD) {
 #ifdef MUC_OPCUA_STATUS_STRINGS

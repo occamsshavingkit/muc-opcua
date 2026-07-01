@@ -46,7 +46,7 @@ int main(void)
     config.endpoint_url = "opc.tcp://0.0.0.0:4840";
     config.application_uri = "urn:pico:muc_opcua:minimal_server";
     config.product_uri = "urn:muc_opcua:minimal_server";
-    config.application_name = "Micro OPC UA Pico Server";
+    config.application_name = "muc-opcua Pico Server";
 
     config.receive_buffer = g_recv_buffer;
     config.receive_buffer_size = sizeof(g_recv_buffer);
@@ -63,11 +63,11 @@ int main(void)
 
     mu_server_t *server = NULL;
     if (mu_server_init(g_storage, sizeof(g_storage), &config, &server) != MU_STATUS_GOOD) {
-        printf("Failed to initialize Micro OPC UA server\n");
+        printf("Failed to initialize muc-opcua server\n");
         return 1;
     }
 
-    printf("Micro OPC UA Pico server initialized\n");
+    printf("muc-opcua Pico server initialized\n");
 
     while (true) {
         mu_server_poll(server);

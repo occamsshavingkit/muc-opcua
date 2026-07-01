@@ -278,21 +278,21 @@ references `MUC_OPCUA_*` and passes; confirm the interop harness still builds
 
 ### Implementation for User Story 3
 
-- [ ] T026 [P] [US3] Update `.github/workflows/ci.yml`: every `-DMICRO_OPCUA_*`
+- [X] T026 [P] [US3] Update `.github/workflows/ci.yml`: every `-DMICRO_OPCUA_*`
   flag across every job (host-build, sanitizer-build, pico-cross-compile,
   static-analysis/fuzz) -> `-DMUC_OPCUA_*`
-- [ ] T027 [P] [US3] Update `.devcontainer/devcontainer.json`: the `"name"`
+- [X] T027 [P] [US3] Update `.devcontainer/devcontainer.json`: the `"name"`
   field and the baked `updateContentCommand`'s `-DMICRO_OPCUA_*` flags
-- [ ] T028 [P] [US3] Update `tests/interop/dotnet/interop.csproj`
+- [X] T028 [P] [US3] Update `tests/interop/dotnet/interop.csproj`
   (`<RootNamespace>MicroOpcUa.Interop</RootNamespace>`) and `Program.cs`
   (`namespace MicroOpcUa.Interop`, `ApplicationName`, `ApplicationUri`,
   certificate `SubjectName` string literals), plus any literal references in
   `tests/interop/run_interop.sh`, `run_interop_dotnet.sh`, and
   `interop_smoke.py`
-- [ ] T029 [US3] Run `dotnet build` in `tests/interop/dotnet/` to confirm it
+- [X] T029 [US3] Run `dotnet build` in `tests/interop/dotnet/` to confirm it
   compiles cleanly under the renamed `MucOpcUa.Interop` namespace (depends on
   T028)
-- [ ] T030 [US3] Confirm the CI jobs pass locally with the renamed options per
+- [X] T030 [US3] Confirm the CI jobs pass locally with the renamed options per
   `quickstart.md`'s "Confirm CI still passes" commands (host build, sanitizer
   build, and Pico cross-compile at minimum) (depends on T007-T012, T026)
 

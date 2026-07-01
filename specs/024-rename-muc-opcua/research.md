@@ -14,6 +14,7 @@ with "don't rewrite historical narrative"):
 | `micro-opcua` | `muc-opcua` | GitHub URL, README/doc prose, kebab-case mentions |
 | `MicroOpcUa` | `MucOpcUa` | CMake include-module filenames (`cmake/MicroOpcUaOptions.cmake` etc.), the .NET interop harness's C# namespace (`MicroOpcUa.Interop`) |
 | `Micro-OPCUA` | `Muc-OPCUA` | One Markdown title (`ROADMAP.md` first line: `# Micro-OPCUA Roadmap`) |
+| `Micro OPC UA` | `muc-opcua` | Human-readable project display name with a literal space between "OPC" and "UA" (console banners, `application_name` config strings, doc prose) — see Addendum below |
 
 **Rationale**: A grep across the full tree (`grep -rEIo '[Mm][Ii][Cc][Rr][Oo][-_ ]?[Oo][Pp][Cc][Uu][Aa]'`,
 excluding `build*/`) found exactly these five case/separator variants and no others —
@@ -22,6 +23,21 @@ excluding `build*/`) found exactly these five case/separator variants and no oth
 directly attached to `micro`/`Micro`/`MICRO`, so a literal-string substitution (not a
 word-boundary regex on bare "micro") cannot touch the OPC Foundation's own **Micro**
 server-profile vocabulary, which never appears in one of these five compound forms.
+
+**Addendum (found during T030 local CI replication)**: the original grep's `[Oo][Pp][Cc][Uu][Aa]`
+segment requires "OPCUA" contiguous, so it has a blind spot for the project referring
+to itself as "Micro OPC UA" — two words, with a space between "OPC" and "UA" — in
+`README.md`, `docs/api-reference.md`, `docs/getting-started.md`,
+`examples/minimal_server/{main.c,README.md}`, `platform/pico/pico_minimal_server.c`,
+`src/encoding/binary_nodeid.c`, and `cmake/MucOpcUaOptions.cmake`'s `message(STATUS ...)`.
+This is unambiguously the project's own display name (console banners, an
+`application_name` config string, a code comment) rather than the OPC Foundation's
+profile vocabulary — no instance reads "Micro OPC UA Embedded Device..." or similar
+profile phrasing — so it was renamed to `muc-opcua` for consistency with every other
+prose mention. `tests/unit/test_no_stale_project_name.c`'s `forbidden_literals[]` was
+extended with this sixth pattern to guard against regression. The one frozen
+occurrence (`specs/017-historical-access/research.md`) is already out of scope via the
+existing `specs/` directory exclusion.
 
 **Alternatives considered**:
 - *Regex `\bmicro\b` word-boundary rename, then manually fix profile-name

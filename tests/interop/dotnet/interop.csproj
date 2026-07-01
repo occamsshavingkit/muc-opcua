@@ -6,7 +6,7 @@
     <Nullable>disable</Nullable>
     <ImplicitUsings>disable</ImplicitUsings>
     <AssemblyName>InteropClient</AssemblyName>
-    <RootNamespace>MicroOpcUa.Interop</RootNamespace>
+    <RootNamespace>MucOpcUa.Interop</RootNamespace>
     <InvariantGlobalization>true</InvariantGlobalization>
   </PropertyGroup>
 

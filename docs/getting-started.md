@@ -151,7 +151,7 @@ Start the server you just built:
 Expected output:
 
 ```
-Initializing Micro OPC UA Server...
+Initializing muc-opcua Server...
 Server initialized successfully. Listening on opc.tcp://localhost:4840
 ```
 

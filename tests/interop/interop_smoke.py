@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""Interop smoke test for micro-opcua.
+"""Interop smoke test for muc-opcua.
 
-Drives the running micro-opcua server with `asyncua` (a mature, standards-
+Drives the running muc-opcua server with `asyncua` (a mature, standards-
 compliant Python OPC UA client) to validate the connect -> discover -> session
 -> browse -> read path against a real client rather than self-authored fixtures.
 This operationalises spec FR-026 (adopt/adapt the async-opcua interop suite once

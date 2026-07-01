@@ -1,5 +1,5 @@
 {
-  // Dev container for micro-opcua. Used by GitHub Codespaces and "Dev Containers" in VS Code.
+  // Dev container for muc-opcua. Used by GitHub Codespaces and "Dev Containers" in VS Code.
   //
   // The point: a Codespaces *prebuild* runs `updateContentCommand` ahead of time and bakes the result
   // into the image, so a new codespace (or a rebuilt one) starts with the host build already configured
@@ -8,7 +8,7 @@
   // To get the "already compiled" benefit, enable a prebuild once in the repo:
   //   GitHub repo → Settings → Codespaces → "Set up prebuild" → branch main, this devcontainer.
   // Without a prebuild the container still works; the first `cmake --build` just runs normally.
-  "name": "micro-opcua",
+  "name": "muc-opcua",
   "image": "mcr.microsoft.com/devcontainers/cpp:1-bookworm",
 
   "features": {
@@ -28,7 +28,7 @@
   // Heavy, cacheable work — runs during prebuild so the image ships warm:
   //   - configure + build the host target with tests and examples (this is what we keep repeating)
   //   - fetching Unity (CMake FetchContent) happens as part of the configure step above
-  "updateContentCommand": "cmake -S . -B build/host -DMICRO_OPCUA_BUILD_TESTS=ON -DMICRO_OPCUA_BUILD_EXAMPLES=ON -DMICRO_OPCUA_PLATFORM=host && cmake --build build/host",
+  "updateContentCommand": "cmake -S . -B build/host -DMUC_OPCUA_BUILD_TESTS=ON -DMUC_OPCUA_BUILD_EXAMPLES=ON -DMUC_OPCUA_PLATFORM=host && cmake --build build/host",
 
   "customizations": {
     "vscode": {

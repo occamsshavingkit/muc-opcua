@@ -35,14 +35,14 @@ for line in lines:
         # If we have a pending node, save it first? No, preprocessor directives shouldn't split a node,
         # but in our file, they are between nodes or inside node references.
         # Wait, the only preprocessor directives at node level are:
-        # '#if MICRO_OPCUA_BASE_TYPE_SYSTEM'
-        # '#if MICRO_OPCUA_SUBSCRIPTIONS_STANDARD'
+        # '#if MUC_OPCUA_BASE_TYPE_SYSTEM'
+        # '#if MUC_OPCUA_SUBSCRIPTIONS_STANDARD'
         # '#endif'
-        if 'MICRO_OPCUA_BASE_TYPE_SYSTEM' in stripped:
-            current_cond.append('MICRO_OPCUA_BASE_TYPE_SYSTEM')
+        if 'MUC_OPCUA_BASE_TYPE_SYSTEM' in stripped:
+            current_cond.append('MUC_OPCUA_BASE_TYPE_SYSTEM')
             continue
-        elif 'MICRO_OPCUA_SUBSCRIPTIONS_STANDARD' in stripped:
-            current_cond.append('MICRO_OPCUA_SUBSCRIPTIONS_STANDARD')
+        elif 'MUC_OPCUA_SUBSCRIPTIONS_STANDARD' in stripped:
+            current_cond.append('MUC_OPCUA_SUBSCRIPTIONS_STANDARD')
             continue
     elif stripped.startswith('#endif'):
         if current_cond:

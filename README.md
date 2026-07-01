@@ -83,7 +83,7 @@ build/micro/examples/minimal_server
 You should see:
 
 ```
-Initializing Micro OPC UA Server...
+Initializing muc-opcua Server...
 Server initialized successfully. Listening on opc.tcp://localhost:4840
 ```
 

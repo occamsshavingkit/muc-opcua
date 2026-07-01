@@ -12,7 +12,7 @@ PROJ="$HERE/dotnet"
 
 if [ ! -x "$SERVER" ]; then
     echo "Server binary not found: $SERVER" >&2
-    echo "Build it: cmake -S . -B build/host -DMICRO_OPCUA_BUILD_EXAMPLES=ON && cmake --build build/host --target minimal_server" >&2
+    echo "Build it: cmake -S . -B build/host -DMUC_OPCUA_BUILD_EXAMPLES=ON && cmake --build build/host --target minimal_server" >&2
     exit 2
 fi
 

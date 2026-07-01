@@ -12,7 +12,7 @@ SERVER="${1:-$ROOT/build/host/examples/minimal_server}"
 if [ ! -x "$SERVER" ]; then
     echo "Server binary not found: $SERVER" >&2
     echo "Build it first:" >&2
-    echo "  cmake -S . -B build/host -DMICRO_OPCUA_BUILD_EXAMPLES=ON -DMICRO_OPCUA_PLATFORM=host" >&2
+    echo "  cmake -S . -B build/host -DMUC_OPCUA_BUILD_EXAMPLES=ON -DMUC_OPCUA_PLATFORM=host" >&2
     echo "  cmake --build build/host --target minimal_server" >&2
     exit 2
 fi
