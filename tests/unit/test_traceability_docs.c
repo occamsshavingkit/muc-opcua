@@ -12,6 +12,7 @@ void tearDown(void) {}
 static char files_to_sections_content[65536];
 static char sections_to_files_content[65536];
 static char optimize_hot_paths_content[131072];
+static char feature_023_content[65536];
 static char queries_content[65536];
 
 typedef struct {
@@ -212,6 +213,24 @@ static const char *find_feature_mapping_row_for_section(const char *content, con
     return NULL;
 }
 
+static const char *find_feature_mapping_row_for_section_with_text(const char *content, const char *section_anchor,
+                                                                  const char *required_text) {
+    const char *line = content;
+
+    while (*line) {
+        const char *line_end = line_end_for(line);
+        if (*line == '|' && feature_section_cell_has_exact_section(line, section_anchor) &&
+            contains_between(line, line_end, required_text))
+            return line;
+
+        if (*line_end == '\0')
+            break;
+        line = line_end + 1;
+    }
+
+    return NULL;
+}
+
 static int section_mapping_row_has_file_path(const char *row_start) {
     const char *line_end = line_end_for(row_start);
     const char *cursor = row_start;
@@ -267,6 +286,61 @@ static int feature_mapping_row_has_test_or_doc_evidence(const char *row_start) {
            contains_between(evidence_start, evidence_end, "`docs/") ||
            contains_between(evidence_start, evidence_end, "`specs/") ||
            contains_between(evidence_start, evidence_end, "`scripts/");
+}
+
+static int feature_mapping_row_cell_has_text(const char *row_start, size_t cell_index, const char *text) {
+    const char *cell_start;
+    const char *cell_end;
+
+    if (!table_cell_bounds(row_start, cell_index, &cell_start, &cell_end))
+        return 0;
+
+    return contains_between(cell_start, cell_end, text);
+}
+
+static int feature_mapping_row_cell_has_path(const char *row_start, size_t cell_index, const char *path) {
+    return feature_mapping_row_cell_has_text(row_start, cell_index, path);
+}
+
+static int markdown_table_row_has_anchor(const char *row_start, const char *anchor) {
+    return contains_between(row_start, line_end_for(row_start), anchor);
+}
+
+static const char *markdown_list_item_end(const char *item_start) {
+    const char *line_end = line_end_for(item_start);
+    const char *cursor = line_end;
+
+    if (*cursor != '\n')
+        return line_end;
+
+    cursor++;
+    while (*cursor == ' ' || *cursor == '\t') {
+        line_end = line_end_for(cursor);
+        if (*line_end == '\0')
+            return line_end;
+        cursor = line_end + 1;
+    }
+
+    return line_end;
+}
+
+static int feature_mapping_row_has_concrete_source_or_doc_path(const char *row_start) {
+    const char *source_start;
+    const char *source_end;
+
+    if (!table_cell_bounds(row_start, 2, &source_start, &source_end))
+        return 0;
+
+    if (contains_between(source_start, source_end, "Placeholder") ||
+        contains_between(source_start, source_end, "placeholder") || contains_between(source_start, source_end, "TBD"))
+        return 0;
+
+    return contains_between(source_start, source_end, "`src/") ||
+           contains_between(source_start, source_end, "`include/") ||
+           contains_between(source_start, source_end, "`tests/") ||
+           contains_between(source_start, source_end, "`docs/") ||
+           contains_between(source_start, source_end, "`README.md`") ||
+           contains_between(source_start, source_end, "`Makefile`");
 }
 
 static void append_traceability_failure(char *buffer, size_t buffer_len, const char *file_path, const char *reason) {
@@ -591,6 +665,520 @@ void test_optimize_hot_paths_write_audit_and_conformance_traceability_rows_have_
         TEST_FAIL_MESSAGE(failures);
 }
 
+void test_023_feature_traceability_pubsub_rows_have_sections_sources_and_evidence(void) {
+    static const char *const section_anchors[] = {
+        "OPC-10000-14 section 7.2.4.4.2", "OPC-10000-14 section 7.2.4.5.2", "OPC-10000-14 section 7.2.4.5.5",
+        "OPC-10000-6 section 5.2.2.16",   "OPC-10000-4 section 7.38.2",
+    };
+    char path[1024];
+    char failures[4096];
+    size_t i;
+
+    failures[0] = '\0';
+    snprintf(path, sizeof(path), "%s/docs/traceability/023-conformance-docs-subscriber.md", PROJECT_ROOT_DIR);
+    read_file_content(path, feature_023_content, sizeof(feature_023_content));
+    TEST_ASSERT_MESSAGE(strlen(feature_023_content) > 0, "Could not read 023-conformance-docs-subscriber.md");
+
+    for (i = 0; i < sizeof(section_anchors) / sizeof(section_anchors[0]); ++i) {
+        const char *row = find_feature_mapping_row_for_section(feature_023_content, section_anchors[i]);
+        if (!row) {
+            append_traceability_failure(failures, sizeof(failures), section_anchors[i],
+                                        "missing from 023 feature traceability table");
+            continue;
+        }
+        if (!feature_mapping_row_has_source_file(row)) {
+            append_traceability_failure(failures, sizeof(failures), section_anchors[i], "has no source file mapping");
+        }
+        if (!feature_mapping_row_has_test_or_doc_evidence(row)) {
+            append_traceability_failure(failures, sizeof(failures), section_anchors[i],
+                                        "has no concrete test/doc evidence mapping");
+        }
+    }
+
+    if (failures[0] != '\0')
+        TEST_FAIL_MESSAGE(failures);
+}
+
+void test_023_feature_traceability_documentation_and_conformance_check_rows_have_sources_and_evidence(void) {
+    static const struct {
+        const char *section_anchor;
+        const char *required_source_path;
+        const char *required_evidence_path;
+        const char *required_secondary_evidence_path;
+    } documentation_check_rows[] = {
+        {"OPC-10000-7 section 4.2", "`docs/conformance/services.md`", "`tests/unit/test_conformance_docs.c`",
+         "`docs/traceability/conformance-claims.md`"},
+        {"OPC-10000-7 section 4.3", "`docs/conformance/status.md`", "`tests/unit/test_conformance_docs.c`",
+         "`README.md`"},
+        {"OPC-10000-4 section 7.38.2", "`include/micro_opcua/status.h`", "`tests/unit/test_conformance_docs.c`",
+         "`docs/conformance/status.md`"},
+    };
+    char path[1024];
+    char failures[4096];
+    size_t i;
+
+    failures[0] = '\0';
+    snprintf(path, sizeof(path), "%s/docs/traceability/023-conformance-docs-subscriber.md", PROJECT_ROOT_DIR);
+    read_file_content(path, feature_023_content, sizeof(feature_023_content));
+    TEST_ASSERT_MESSAGE(strlen(feature_023_content) > 0, "Could not read 023-conformance-docs-subscriber.md");
+
+    for (i = 0; i < sizeof(documentation_check_rows) / sizeof(documentation_check_rows[0]); ++i) {
+        const char *row =
+            find_feature_mapping_row_for_section(feature_023_content, documentation_check_rows[i].section_anchor);
+
+        if (!row) {
+            append_traceability_failure(failures, sizeof(failures), documentation_check_rows[i].section_anchor,
+                                        "missing from 023 feature traceability table");
+            continue;
+        }
+
+        if (!feature_mapping_row_has_concrete_source_or_doc_path(row)) {
+            append_traceability_failure(failures, sizeof(failures), documentation_check_rows[i].section_anchor,
+                                        "has no concrete source/doc path mapping");
+        }
+        if (!feature_mapping_row_has_test_or_doc_evidence(row)) {
+            append_traceability_failure(failures, sizeof(failures), documentation_check_rows[i].section_anchor,
+                                        "has no concrete test/doc evidence mapping");
+        }
+        if (!feature_mapping_row_cell_has_path(row, 2, documentation_check_rows[i].required_source_path)) {
+            append_traceability_failure(failures, sizeof(failures), documentation_check_rows[i].section_anchor,
+                                        "missing required source/doc path");
+        }
+        if (!feature_mapping_row_cell_has_path(row, 3, documentation_check_rows[i].required_evidence_path)) {
+            append_traceability_failure(failures, sizeof(failures), documentation_check_rows[i].section_anchor,
+                                        "missing required conformance-check evidence path");
+        }
+        if (!feature_mapping_row_cell_has_path(row, 3, documentation_check_rows[i].required_secondary_evidence_path)) {
+            append_traceability_failure(failures, sizeof(failures), documentation_check_rows[i].section_anchor,
+                                        "missing required documentation evidence path");
+        }
+    }
+
+    if (failures[0] != '\0')
+        TEST_FAIL_MESSAGE(failures);
+}
+
+void test_023_feature_traceability_lists_negative_path_evidence(void) {
+    char path[1024];
+    snprintf(path, sizeof(path), "%s/docs/traceability/023-conformance-docs-subscriber.md", PROJECT_ROOT_DIR);
+    read_file_content(path, feature_023_content, sizeof(feature_023_content));
+    TEST_ASSERT_MESSAGE(strlen(feature_023_content) > 0, "Could not read 023-conformance-docs-subscriber.md");
+
+    TEST_ASSERT_NOT_NULL_MESSAGE(strstr(feature_023_content, "Bad_MonitoredItemIdInvalid"),
+                                 "Missing invalid MonitoredItemId evidence");
+    TEST_ASSERT_NOT_NULL_MESSAGE(strstr(feature_023_content, "Bad_SubscriptionIdInvalid"),
+                                 "Missing invalid SubscriptionId evidence");
+    TEST_ASSERT_NOT_NULL_MESSAGE(strstr(feature_023_content, "Bad_SequenceNumberUnknown"),
+                                 "Missing Publish acknowledgement evidence");
+    TEST_ASSERT_NOT_NULL_MESSAGE(strstr(feature_023_content, "Bad_MessageNotAvailable"),
+                                 "Missing Republish invalid sequence evidence");
+    TEST_ASSERT_NOT_NULL_MESSAGE(strstr(feature_023_content, "Bad_MonitoredItemFilterUnsupported"),
+                                 "Missing DataChange/Aggregate filter evidence");
+    TEST_ASSERT_NOT_NULL_MESSAGE(strstr(feature_023_content, "`tests/unit/test_subscriptions_errors.c`"),
+                                 "Missing subscription error unit test evidence");
+    TEST_ASSERT_NOT_NULL_MESSAGE(strstr(feature_023_content, "`tests/integration/test_subscriptions.c`"),
+                                 "Missing subscription integration test evidence");
+    TEST_ASSERT_NOT_NULL_MESSAGE(strstr(feature_023_content, "`tests/unit/test_aggregate.c`"),
+                                 "Missing aggregate unit test evidence");
+}
+
+void test_023_feature_traceability_invalid_id_rows_have_opc_refs_statuses_and_evidence(void) {
+    static const struct {
+        const char *label;
+        const char *section_anchor;
+        const char *status_code;
+        const char *required_unit_evidence_path;
+        const char *required_related_evidence_path;
+    } invalid_id_rows[] = {
+        {"ModifyMonitoredItems invalid MonitoredItemId", "OPC-10000-4 section 5.13.3", "Bad_MonitoredItemIdInvalid",
+         "`tests/unit/test_subscriptions_errors.c`", "`tests/unit/test_traceability_docs.c`"},
+        {"DeleteMonitoredItems invalid MonitoredItemId", "OPC-10000-4 section 5.13.6", "Bad_MonitoredItemIdInvalid",
+         "`tests/unit/test_subscriptions_errors.c`", "`tests/integration/test_subscriptions.c`"},
+        {"ModifySubscription invalid SubscriptionId", "OPC-10000-4 section 5.14.3", "Bad_SubscriptionIdInvalid",
+         "`tests/unit/test_subscriptions_errors.c`", "`tests/integration/test_subscriptions.c`"},
+        {"DeleteSubscriptions invalid SubscriptionId", "OPC-10000-4 section 5.14.8", "Bad_SubscriptionIdInvalid",
+         "`tests/unit/test_subscriptions_errors.c`", "`tests/integration/test_subscriptions.c`"},
+    };
+    char path[1024];
+    char failures[4096];
+    const char *negative_path_row;
+    size_t i;
+
+    failures[0] = '\0';
+    snprintf(path, sizeof(path), "%s/docs/traceability/023-conformance-docs-subscriber.md", PROJECT_ROOT_DIR);
+    read_file_content(path, feature_023_content, sizeof(feature_023_content));
+    TEST_ASSERT_MESSAGE(strlen(feature_023_content) > 0, "Could not read 023-conformance-docs-subscriber.md");
+
+    negative_path_row = find_markdown_table_row_containing(feature_023_content, "Negative-path evidence");
+    if (!negative_path_row) {
+        append_traceability_failure(failures, sizeof(failures), "US4 invalid ID evidence",
+                                    "missing Negative-path evidence lane");
+    } else {
+        if (!markdown_table_row_has_anchor(negative_path_row, "OPC-10000-4 §7.38.2")) {
+            append_traceability_failure(failures, sizeof(failures), "US4 invalid ID evidence",
+                                        "negative-path evidence lane is missing OPC-10000-4 §7.38.2");
+        }
+        if (!markdown_table_row_has_anchor(negative_path_row, "`tests/unit/test_subscriptions_errors.c`")) {
+            append_traceability_failure(failures, sizeof(failures), "US4 invalid ID evidence",
+                                        "negative-path evidence lane is missing subscription error unit evidence");
+        }
+        if (!markdown_table_row_has_anchor(negative_path_row, "`tests/integration/test_subscriptions.c`")) {
+            append_traceability_failure(failures, sizeof(failures), "US4 invalid ID evidence",
+                                        "negative-path evidence lane is missing subscription integration evidence");
+        }
+    }
+
+    for (i = 0; i < sizeof(invalid_id_rows) / sizeof(invalid_id_rows[0]); ++i) {
+        const char *row = find_feature_mapping_row_for_section(feature_023_content, invalid_id_rows[i].section_anchor);
+
+        if (!row) {
+            append_traceability_failure(failures, sizeof(failures), invalid_id_rows[i].label,
+                                        "missing OPC UA Section Mapping row");
+            continue;
+        }
+
+        if (!feature_mapping_row_cell_has_text(row, 2, "`src/services/subscription.c`")) {
+            append_traceability_failure(failures, sizeof(failures), invalid_id_rows[i].label,
+                                        "missing subscription service source path");
+        }
+        if (!feature_mapping_row_cell_has_text(row, 3, invalid_id_rows[i].required_unit_evidence_path)) {
+            append_traceability_failure(failures, sizeof(failures), invalid_id_rows[i].label,
+                                        "missing subscription error unit evidence path");
+        }
+        if (!feature_mapping_row_cell_has_text(row, 3, invalid_id_rows[i].required_related_evidence_path)) {
+            append_traceability_failure(failures, sizeof(failures), invalid_id_rows[i].label,
+                                        "missing related traceability or integration evidence path");
+        }
+        if (!feature_mapping_row_cell_has_text(row, 4, invalid_id_rows[i].status_code)) {
+            append_traceability_failure(failures, sizeof(failures), invalid_id_rows[i].label,
+                                        "missing required invalid ID StatusCode in row notes");
+        }
+    }
+
+    if (failures[0] != '\0')
+        TEST_FAIL_MESSAGE(failures);
+}
+
+void test_023_feature_traceability_publish_republish_rows_have_opc_refs_statuses_and_evidence(void) {
+    static const struct {
+        const char *label;
+        const char *section_anchor;
+        const char *status_code;
+        const char *required_evidence_path;
+    } publish_republish_rows[] = {
+        {"Publish acknowledgement invalid sequence", "OPC-10000-4 section 5.14.5.4", "Bad_SequenceNumberUnknown",
+         "`tests/integration/test_subscriptions.c`"},
+        {"Republish unavailable sequence", "OPC-10000-4 section 5.14.6.3", "Bad_MessageNotAvailable",
+         "`tests/integration/test_subscriptions.c`"},
+    };
+    char path[1024];
+    char failures[4096];
+    const char *negative_path_row;
+    const char *negative_path_section;
+    const char *negative_path_section_end;
+    size_t i;
+
+    failures[0] = '\0';
+    snprintf(path, sizeof(path), "%s/docs/traceability/023-conformance-docs-subscriber.md", PROJECT_ROOT_DIR);
+    read_file_content(path, feature_023_content, sizeof(feature_023_content));
+    TEST_ASSERT_MESSAGE(strlen(feature_023_content) > 0, "Could not read 023-conformance-docs-subscriber.md");
+
+    negative_path_row = find_markdown_table_row_containing(feature_023_content, "Negative-path evidence");
+    if (!negative_path_row) {
+        append_traceability_failure(failures, sizeof(failures), "US4 publish/republish evidence",
+                                    "missing Negative-path evidence lane");
+    } else {
+        if (!markdown_table_row_has_anchor(negative_path_row, "OPC-10000-4 §7.38.2")) {
+            append_traceability_failure(failures, sizeof(failures), "US4 publish/republish evidence",
+                                        "negative-path evidence lane is missing OPC-10000-4 §7.38.2");
+        }
+        if (!markdown_table_row_has_anchor(negative_path_row, "`tests/integration/test_subscriptions.c`")) {
+            append_traceability_failure(failures, sizeof(failures), "US4 publish/republish evidence",
+                                        "negative-path evidence lane is missing subscription integration evidence");
+        }
+    }
+
+    negative_path_section = strstr(feature_023_content, "## Negative-Path Evidence");
+    negative_path_section_end = NULL;
+    if (!negative_path_section) {
+        append_traceability_failure(failures, sizeof(failures), "US4 publish/republish evidence",
+                                    "missing Negative-Path Evidence section");
+    } else {
+        negative_path_section_end = strstr(negative_path_section + strlen("## Negative-Path Evidence"), "\n## ");
+    }
+
+    for (i = 0; i < sizeof(publish_republish_rows) / sizeof(publish_republish_rows[0]); ++i) {
+        const char *row =
+            find_feature_mapping_row_for_section(feature_023_content, publish_republish_rows[i].section_anchor);
+        const char *evidence_status;
+
+        if (!row) {
+            append_traceability_failure(failures, sizeof(failures), publish_republish_rows[i].label,
+                                        "missing OPC UA Section Mapping row");
+            continue;
+        }
+
+        if (!feature_mapping_row_cell_has_text(row, 2, "`src/services/subscription.c`")) {
+            append_traceability_failure(failures, sizeof(failures), publish_republish_rows[i].label,
+                                        "missing subscription service source path");
+        }
+        if (!feature_mapping_row_cell_has_text(row, 3, publish_republish_rows[i].required_evidence_path)) {
+            append_traceability_failure(failures, sizeof(failures), publish_republish_rows[i].label,
+                                        "missing subscription integration evidence path");
+        }
+        if (!feature_mapping_row_cell_has_text(row, 4, publish_republish_rows[i].status_code)) {
+            append_traceability_failure(failures, sizeof(failures), publish_republish_rows[i].label,
+                                        "missing required publish/republish StatusCode in row notes");
+        }
+
+        if (!negative_path_section)
+            continue;
+
+        evidence_status = strstr(negative_path_section, publish_republish_rows[i].status_code);
+        if (evidence_status && negative_path_section_end && evidence_status >= negative_path_section_end)
+            evidence_status = NULL;
+
+        if (!evidence_status) {
+            append_traceability_failure(failures, sizeof(failures), publish_republish_rows[i].label,
+                                        "missing StatusCode entry in Negative-Path Evidence section");
+        } else {
+            const char *item_start = line_start_for(feature_023_content, evidence_status);
+            const char *item_end = markdown_list_item_end(item_start);
+
+            if (!contains_between(item_start, item_end, publish_republish_rows[i].required_evidence_path)) {
+                append_traceability_failure(failures, sizeof(failures), publish_republish_rows[i].label,
+                                            "negative-path StatusCode evidence is missing integration path");
+            }
+        }
+    }
+
+    if (failures[0] != '\0')
+        TEST_FAIL_MESSAGE(failures);
+}
+
+void test_023_feature_traceability_filter_rows_have_opc_refs_statuses_and_evidence(void) {
+    static const struct {
+        const char *label;
+        const char *section_anchor;
+        const char *row_anchor;
+        const char *required_source_path;
+        const char *required_evidence_path;
+        const char *required_related_evidence_path;
+        const char *required_status_code;
+        const char *required_secondary_status_code;
+        const char *required_concept;
+    } filter_rows[] = {
+        {"CreateMonitoredItems DataChangeFilter", "OPC-10000-4 section 5.13.2", "DataChangeFilter",
+         "`src/services/subscription.c`", "`tests/unit/test_subscriptions_errors.c`", "`docs/conformance/services.md`",
+         "Bad_MonitoredItemFilterUnsupported", "Bad_MonitoredItemFilterInvalid", "percent deadband"},
+        {"ModifyMonitoredItems DataChangeFilter", "OPC-10000-4 section 5.13.3", "DataChangeFilter",
+         "`src/services/subscription.c`", "`tests/unit/test_subscriptions_errors.c`", "`docs/conformance/services.md`",
+         "Bad_MonitoredItemFilterUnsupported", "Bad_MonitoredItemFilterInvalid", "malformed filter"},
+        {"DataChangeFilter definition", "OPC-10000-4 section 7.22.2", "DataChangeFilter",
+         "`src/core/service_dispatch.c`", "`tests/unit/test_subscriptions_errors.c`", "`docs/conformance/services.md`",
+         "Bad_MonitoredItemFilterUnsupported", "Bad_MonitoredItemFilterInvalid", "percent deadband"},
+        {"CreateMonitoredItems AggregateFilter", "OPC-10000-4 section 5.13.2", "AggregateFilter",
+         "`src/core/service_dispatch.c`", "`tests/unit/test_aggregate.c`", "`docs/conformance/services.md`",
+         "Bad_MonitoredItemFilterUnsupported", NULL, "Unsupported aggregate"},
+        {"AggregateFilter definition", "OPC-10000-4 section 7.22.4", "AggregateFilter", "`src/core/service_dispatch.c`",
+         "`tests/unit/test_aggregate.c`", "`docs/conformance/services.md`", "Bad_MonitoredItemFilterUnsupported", NULL,
+         "malformed filter"},
+    };
+    static const struct {
+        const char *status_code;
+        const char *required_evidence_path;
+        const char *required_secondary_evidence_path;
+    } negative_path_status_rows[] = {
+        {"Bad_MonitoredItemFilterUnsupported", "`tests/unit/test_subscriptions_errors.c`",
+         "`tests/unit/test_aggregate.c`"},
+        {"Bad_MonitoredItemFilterInvalid", "`tests/unit/test_subscriptions_errors.c`", NULL},
+    };
+    char path[1024];
+    char failures[8192];
+    const char *negative_path_row;
+    const char *negative_path_section;
+    const char *negative_path_section_end;
+    size_t i;
+
+    failures[0] = '\0';
+    snprintf(path, sizeof(path), "%s/docs/traceability/023-conformance-docs-subscriber.md", PROJECT_ROOT_DIR);
+    read_file_content(path, feature_023_content, sizeof(feature_023_content));
+    TEST_ASSERT_MESSAGE(strlen(feature_023_content) > 0, "Could not read 023-conformance-docs-subscriber.md");
+
+    negative_path_row = find_markdown_table_row_containing(feature_023_content, "Negative-path evidence");
+    if (!negative_path_row) {
+        append_traceability_failure(failures, sizeof(failures), "US4 filter evidence",
+                                    "missing Negative-path evidence lane");
+    } else {
+        if (!markdown_table_row_has_anchor(negative_path_row, "OPC-10000-4 §7.38.2")) {
+            append_traceability_failure(failures, sizeof(failures), "US4 filter evidence",
+                                        "negative-path evidence lane is missing OPC-10000-4 §7.38.2");
+        }
+        if (!markdown_table_row_has_anchor(negative_path_row, "`tests/unit/test_subscriptions_errors.c`")) {
+            append_traceability_failure(failures, sizeof(failures), "US4 filter evidence",
+                                        "negative-path evidence lane is missing DataChangeFilter unit evidence");
+        }
+        if (!markdown_table_row_has_anchor(negative_path_row, "`tests/unit/test_aggregate.c`")) {
+            append_traceability_failure(failures, sizeof(failures), "US4 filter evidence",
+                                        "negative-path evidence lane is missing AggregateFilter unit evidence");
+        }
+    }
+
+    negative_path_section = strstr(feature_023_content, "## Negative-Path Evidence");
+    negative_path_section_end = NULL;
+    if (!negative_path_section) {
+        append_traceability_failure(failures, sizeof(failures), "US4 filter evidence",
+                                    "missing Negative-Path Evidence section");
+    } else {
+        negative_path_section_end = strstr(negative_path_section + strlen("## Negative-Path Evidence"), "\n## ");
+    }
+
+    for (i = 0; i < sizeof(filter_rows) / sizeof(filter_rows[0]); ++i) {
+        const char *row = find_feature_mapping_row_for_section_with_text(
+            feature_023_content, filter_rows[i].section_anchor, filter_rows[i].row_anchor);
+
+        if (!row) {
+            append_traceability_failure(failures, sizeof(failures), filter_rows[i].label,
+                                        "missing OPC UA Section Mapping row");
+            continue;
+        }
+
+        if (!feature_mapping_row_cell_has_text(row, 2, filter_rows[i].required_source_path)) {
+            append_traceability_failure(failures, sizeof(failures), filter_rows[i].label,
+                                        "missing required filter implementation source path");
+        }
+        if (!feature_mapping_row_cell_has_text(row, 3, filter_rows[i].required_evidence_path)) {
+            append_traceability_failure(failures, sizeof(failures), filter_rows[i].label,
+                                        "missing required filter unit evidence path");
+        }
+        if (!feature_mapping_row_cell_has_text(row, 3, filter_rows[i].required_related_evidence_path)) {
+            append_traceability_failure(failures, sizeof(failures), filter_rows[i].label,
+                                        "missing required conformance documentation evidence path");
+        }
+        if (!feature_mapping_row_cell_has_text(row, 4, filter_rows[i].required_status_code)) {
+            append_traceability_failure(failures, sizeof(failures), filter_rows[i].label,
+                                        "missing required filter StatusCode in row notes");
+        }
+        if (filter_rows[i].required_secondary_status_code &&
+            !feature_mapping_row_cell_has_text(row, 4, filter_rows[i].required_secondary_status_code)) {
+            append_traceability_failure(failures, sizeof(failures), filter_rows[i].label,
+                                        "missing required secondary filter StatusCode in row notes");
+        }
+        if (!feature_mapping_row_cell_has_text(row, 4, filter_rows[i].required_concept)) {
+            append_traceability_failure(failures, sizeof(failures), filter_rows[i].label,
+                                        "missing required filter evidence concept in row notes");
+        }
+    }
+
+    if (negative_path_section) {
+        for (i = 0; i < sizeof(negative_path_status_rows) / sizeof(negative_path_status_rows[0]); ++i) {
+            const char *evidence_status = strstr(negative_path_section, negative_path_status_rows[i].status_code);
+
+            if (evidence_status && negative_path_section_end && evidence_status >= negative_path_section_end)
+                evidence_status = NULL;
+
+            if (!evidence_status) {
+                append_traceability_failure(failures, sizeof(failures), negative_path_status_rows[i].status_code,
+                                            "missing StatusCode entry in Negative-Path Evidence section");
+            } else {
+                const char *item_start = line_start_for(feature_023_content, evidence_status);
+                const char *item_end = markdown_list_item_end(item_start);
+
+                if (!contains_between(item_start, item_end, negative_path_status_rows[i].required_evidence_path)) {
+                    append_traceability_failure(failures, sizeof(failures), negative_path_status_rows[i].status_code,
+                                                "negative-path StatusCode evidence is missing primary unit path");
+                }
+                if (negative_path_status_rows[i].required_secondary_evidence_path &&
+                    !contains_between(item_start, item_end,
+                                      negative_path_status_rows[i].required_secondary_evidence_path)) {
+                    append_traceability_failure(failures, sizeof(failures), negative_path_status_rows[i].status_code,
+                                                "negative-path StatusCode evidence is missing secondary unit path");
+                }
+            }
+        }
+    }
+
+    if (failures[0] != '\0')
+        TEST_FAIL_MESSAGE(failures);
+}
+
+void test_023_feature_traceability_has_story_evidence_rows(void) {
+    static const struct {
+        const char *story;
+        const char *story_anchor;
+        const char *evidence_row_anchor;
+        const char *required_row_anchors[6];
+    } story_rows[] = {
+        {"US1 documentation cleanup",
+         "## US1 Documentation Evidence",
+         "Documentation cleanup",
+         {"OPC-10000-7 §4.2/§4.3", "`docs/conformance/services.md`", "`tests/unit/test_conformance_docs.c`",
+          "`docs/traceability/conformance-claims.md`", NULL, NULL}},
+        {"US2 stale-claim and stale-number checks",
+         "| US2 | OPC-10000-4 section 7.38.2",
+         "Stale-claim and stale-number checks",
+         {"OPC-10000-7 §4.2/§4.3", "OPC-10000-4 §7.38.2", "`tests/unit/test_conformance_docs.c`",
+          "`tests/unit/test_traceability_docs.c`", "`docs/traceability/conformance-claims.md`", NULL}},
+        {"US3 PubSub subscriber decoder",
+         "| US3 | OPC-10000-14 section 7.2.4.4.2",
+         "PubSub subscriber decoder",
+         {"OPC-10000-14 §7.2.4.4.2", "OPC-10000-4 §7.38.2", "`include/micro_opcua/pubsub.h`",
+          "`src/encoding/uadp_encoder.c`", "`tests/unit/test_uadp_encoding.c`", "`tests/unit/test_pubsub.c`"}},
+        {"US4 negative-path evidence",
+         "| US4 | OPC-10000-4 section 5.14.5.4",
+         "Negative-path evidence",
+         {"OPC-10000-4 §7.38.2", "`tests/unit/test_subscriptions_errors.c`", "`tests/integration/test_subscriptions.c`",
+          "`tests/unit/test_aggregate.c`", "`tests/unit/test_traceability_docs.c`", NULL}},
+    };
+    char path[1024];
+    char failures[4096];
+    size_t i;
+
+    failures[0] = '\0';
+    snprintf(path, sizeof(path), "%s/docs/traceability/023-conformance-docs-subscriber.md", PROJECT_ROOT_DIR);
+    read_file_content(path, feature_023_content, sizeof(feature_023_content));
+    TEST_ASSERT_MESSAGE(strlen(feature_023_content) > 0, "Could not read 023-conformance-docs-subscriber.md");
+
+    for (i = 0; i < sizeof(story_rows) / sizeof(story_rows[0]); ++i) {
+        const char *row = find_markdown_table_row_containing(feature_023_content, story_rows[i].evidence_row_anchor);
+        size_t j;
+
+        if (!strstr(feature_023_content, story_rows[i].story_anchor)) {
+            append_traceability_failure(failures, sizeof(failures), story_rows[i].story,
+                                        "missing story row or section anchor");
+        }
+
+        if (!row) {
+            append_traceability_failure(failures, sizeof(failures), story_rows[i].story,
+                                        "missing Evidence Skeleton row");
+            continue;
+        }
+
+        if (!feature_mapping_row_has_concrete_source_or_doc_path(row)) {
+            append_traceability_failure(failures, sizeof(failures), story_rows[i].story,
+                                        "evidence row has no concrete source/doc path");
+        }
+        if (!feature_mapping_row_has_test_or_doc_evidence(row)) {
+            append_traceability_failure(failures, sizeof(failures), story_rows[i].story,
+                                        "evidence row has no concrete test/doc evidence path");
+        }
+
+        for (j = 0; j < sizeof(story_rows[i].required_row_anchors) / sizeof(story_rows[i].required_row_anchors[0]);
+             ++j) {
+            if (!story_rows[i].required_row_anchors[j])
+                continue;
+
+            if (!markdown_table_row_has_anchor(row, story_rows[i].required_row_anchors[j])) {
+                append_traceability_failure(failures, sizeof(failures), story_rows[i].story,
+                                            "evidence row is missing a required OPC or evidence anchor");
+            }
+        }
+    }
+
+    if (failures[0] != '\0')
+        TEST_FAIL_MESSAGE(failures);
+}
+
 int main(void) {
     UNITY_BEGIN();
     RUN_TEST(test_traceability_completeness);
@@ -602,5 +1190,12 @@ int main(void) {
     RUN_TEST(test_optimize_hot_paths_transport_framing_traceability_rows_have_source_and_evidence_mappings);
     RUN_TEST(test_optimize_hot_paths_service_statuscode_traceability_rows_have_source_and_evidence_mappings);
     RUN_TEST(test_optimize_hot_paths_write_audit_and_conformance_traceability_rows_have_source_and_evidence_mappings);
+    RUN_TEST(test_023_feature_traceability_pubsub_rows_have_sections_sources_and_evidence);
+    RUN_TEST(test_023_feature_traceability_documentation_and_conformance_check_rows_have_sources_and_evidence);
+    RUN_TEST(test_023_feature_traceability_lists_negative_path_evidence);
+    RUN_TEST(test_023_feature_traceability_invalid_id_rows_have_opc_refs_statuses_and_evidence);
+    RUN_TEST(test_023_feature_traceability_publish_republish_rows_have_opc_refs_statuses_and_evidence);
+    RUN_TEST(test_023_feature_traceability_filter_rows_have_opc_refs_statuses_and_evidence);
+    RUN_TEST(test_023_feature_traceability_has_story_evidence_rows);
     return UNITY_END();
 }

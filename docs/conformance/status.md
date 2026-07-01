@@ -21,6 +21,8 @@ values are listed below.
 | `Bad_DecodingError` | `MU_STATUS_BAD_DECODINGERROR` | Malformed or truncated binary input | OPC-10000-4 section 7.38.2 |
 | `Bad_EncodingLimitsExceeded` | `MU_STATUS_BAD_ENCODINGLIMITSEXCEEDED` | Encoded input exceeds supported limits | OPC-10000-4 section 7.38.2 |
 | `Bad_ServiceUnsupported` | `MU_STATUS_BAD_SERVICEUNSUPPORTED` | Unsupported service request | OPC-10000-4 section 7.38.2 |
+| `Bad_NotSupported` | `MU_STATUS_BAD_NOTSUPPORTED` | Unsupported operation, field encoding, or PubSub layout within a supported service/API | OPC-10000-4 section 7.38.2 |
+| `Bad_InvalidArgument` | `MU_STATUS_BAD_INVALIDARGUMENT` | Missing or inconsistent caller-supplied arguments | OPC-10000-4 section 7.38.2 |
 | `Bad_MonitoredItemFilterUnsupported` | `MU_STATUS_BAD_MONITOREDITEMFILTERUNSUPPORTED` | Unsupported monitored item filter | OPC-10000-4 section 7.38.2 |
 | `Bad_MonitoredItemFilterInvalid` | `MU_STATUS_BAD_MONITOREDITEMFILTERINVALID` | Invalid monitored item filter parameters | OPC-10000-4 section 7.38.2 |
 | `Bad_FilterNotAllowed` | `MU_STATUS_BAD_FILTERNOTALLOWED` | Filter supplied where the service disallows one | OPC-10000-4 section 7.38.2 |
@@ -49,6 +51,8 @@ grounded in OPC-10000-4 section 7.38.2 Common StatusCodes.
 | `Bad_DecodingError` | `0x80070000` | `MU_STATUS_BAD_DECODINGERROR` | OPC-10000-4 section 7.38.2 |
 | `Bad_EncodingLimitsExceeded` | `0x80080000` | `MU_STATUS_BAD_ENCODINGLIMITSEXCEEDED` | OPC-10000-4 section 7.38.2 |
 | `Bad_ServiceUnsupported` | `0x800B0000` | `MU_STATUS_BAD_SERVICEUNSUPPORTED` | OPC-10000-4 section 7.38.2 |
+| `Bad_NotSupported` | `0x803D0000` | `MU_STATUS_BAD_NOTSUPPORTED` | OPC-10000-4 section 7.38.2 |
+| `Bad_InvalidArgument` | `0x80AB0000` | `MU_STATUS_BAD_INVALIDARGUMENT` | OPC-10000-4 section 7.38.2 |
 | `Bad_MonitoredItemFilterUnsupported` | `0x80440000` | `MU_STATUS_BAD_MONITOREDITEMFILTERUNSUPPORTED` | OPC-10000-4 section 7.38.2 |
 | `Bad_MonitoredItemFilterInvalid` | `0x80430000` | `MU_STATUS_BAD_MONITOREDITEMFILTERINVALID` | OPC-10000-4 section 7.38.2 |
 | `Bad_FilterNotAllowed` | `0x80450000` | `MU_STATUS_BAD_FILTERNOTALLOWED` | OPC-10000-4 section 7.38.2 |

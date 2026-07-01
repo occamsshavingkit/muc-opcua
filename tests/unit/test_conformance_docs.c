@@ -23,6 +23,12 @@ typedef struct {
     opcua_statuscode_t status;
 } statuscode_name_entry_t;
 
+typedef struct {
+    const char *description;
+    const char *const *terms;
+    size_t term_count;
+} doc_evidence_requirement_t;
+
 static const statuscode_name_entry_t known_statuscode_names[] = {
     {"Good", MU_STATUS_GOOD},
     {"Bad_UnexpectedError", MU_STATUS_BAD_UNEXPECTEDERROR},
@@ -101,6 +107,8 @@ static const char *const feature_required_statuscode_names[] = {
     "Bad_DecodingError",
     "Bad_EncodingLimitsExceeded",
     "Bad_ServiceUnsupported",
+    "Bad_NotSupported",
+    "Bad_InvalidArgument",
     "Bad_MonitoredItemFilterUnsupported",
     "Bad_MonitoredItemFilterInvalid",
     "Bad_FilterNotAllowed",
@@ -123,6 +131,8 @@ static const statuscode_name_entry_t feature_required_statuscode_values[] = {
     {"Bad_DecodingError", MU_STATUS_BAD_DECODINGERROR},
     {"Bad_EncodingLimitsExceeded", MU_STATUS_BAD_ENCODINGLIMITSEXCEEDED},
     {"Bad_ServiceUnsupported", MU_STATUS_BAD_SERVICEUNSUPPORTED},
+    {"Bad_NotSupported", MU_STATUS_BAD_NOTSUPPORTED},
+    {"Bad_InvalidArgument", MU_STATUS_BAD_INVALIDARGUMENT},
     {"Bad_MonitoredItemFilterUnsupported", MU_STATUS_BAD_MONITOREDITEMFILTERUNSUPPORTED},
     {"Bad_MonitoredItemFilterInvalid", MU_STATUS_BAD_MONITOREDITEMFILTERINVALID},
     {"Bad_FilterNotAllowed", MU_STATUS_BAD_FILTERNOTALLOWED},
@@ -337,10 +347,18 @@ static int has_negative_or_policy_context(const char *line) {
         "no profile-compliant",
         "no profile compliant",
         "no profile-compliance",
+        "no profile compliance",
+        "no profile-compliance claim",
+        "no profile compliance claim",
+        "no-profile-compliance",
+        "profile-compliance claim",
+        "profile compliance claim",
+        "out of scope",
         "no ctt-verified",
         "no ctt verified",
         "no ctt-certified",
         "no ctt certified",
+        "no ctt/profile",
         "no external ctt evidence",
         "without",
         "until",
@@ -695,6 +713,202 @@ static void check_file_for_unsupported_claims(const char *path, int (*matches_cl
     fclose(file);
 }
 
+static int file_contains_text(const char *path, const char *needle) {
+    FILE *file = fopen(path, "r");
+    if (file == NULL) {
+        return 0;
+    }
+
+    char line[4096];
+    while (fgets(line, sizeof(line), file) != NULL) {
+        if (strstr(line, needle) != NULL) {
+            fclose(file);
+            return 1;
+        }
+    }
+
+    fclose(file);
+    return 0;
+}
+
+static int line_is_blank(const char *line) {
+    for (const char *cursor = line; *cursor != '\0'; ++cursor) {
+        if (!isspace((unsigned char)*cursor)) {
+            return 0;
+        }
+    }
+    return 1;
+}
+
+static int append_doc_line_to_block(char *block, size_t block_size, const char *line) {
+    size_t used = strlen(block);
+
+    for (const char *cursor = line; *cursor != '\0'; ++cursor) {
+        if (used + 2u >= block_size) {
+            return 0;
+        }
+        block[used++] = (*cursor == '\n' || *cursor == '\r') ? ' ' : *cursor;
+    }
+
+    if (used + 1u >= block_size) {
+        return 0;
+    }
+    block[used++] = ' ';
+    block[used] = '\0';
+    return 1;
+}
+
+static int doc_block_contains_all_terms(const char *block, const char *const *terms, size_t term_count) {
+    for (size_t i = 0u; i < term_count; ++i) {
+        if (strstr(block, terms[i]) == NULL) {
+            return 0;
+        }
+    }
+    return 1;
+}
+
+static int services_doc_has_evidence_block(const char *path, const doc_evidence_requirement_t *requirement) {
+    FILE *file = fopen(path, "r");
+    if (file == NULL) {
+        printf("Could not open services doc: %s\n", path);
+        return 0;
+    }
+
+    char block[32768];
+    char line[4096];
+    block[0] = '\0';
+
+    while (fgets(line, sizeof(line), file) != NULL) {
+        if (line_is_blank(line)) {
+            if (doc_block_contains_all_terms(block, requirement->terms, requirement->term_count)) {
+                fclose(file);
+                return 1;
+            }
+            block[0] = '\0';
+            continue;
+        }
+
+        if (!append_doc_line_to_block(block, sizeof(block), line)) {
+            printf("Services doc paragraph too long while checking evidence for %s in %s\n", requirement->description,
+                   path);
+            fclose(file);
+            return 0;
+        }
+    }
+
+    int found = doc_block_contains_all_terms(block, requirement->terms, requirement->term_count);
+    fclose(file);
+    return found;
+}
+
+static void print_missing_services_doc_evidence(const char *path, const doc_evidence_requirement_t *requirement) {
+    printf("Missing services doc evidence block for %s. Required terms in one paragraph/block:\n",
+           requirement->description);
+    for (size_t i = 0u; i < requirement->term_count; ++i) {
+        const char *term = requirement->terms[i];
+        printf("  - %s%s\n", term, file_contains_text(path, term) ? " (present elsewhere)" : "");
+    }
+}
+
+static int line_has_resource_evidence_context(const char *line) {
+    return contains_ci(line, "Measured snapshot") || contains_ci(line, "Measured 2026") ||
+           contains_ci(line, "reproduce with") || strstr(line, "scripts/measure_size.sh all") != NULL;
+}
+
+static int line_has_public_profile_size_number(const char *line) {
+    if (!contains_ci(line, "KiB")) {
+        return 0;
+    }
+
+    return contains_ci(line, "complete Nano server") || contains_ci(line, "Micro is") ||
+           contains_ci(line, "Embedded 2017 is") || contains_ci(line, "| **nano** |") ||
+           contains_ci(line, "| **micro** |") || contains_ci(line, "| **embedded**") ||
+           contains_ci(line, "| **Nano** |") || contains_ci(line, "| **Micro** |") ||
+           contains_ci(line, "| **Embedded 2017**") || contains_ci(line, "| **Full Featured**");
+}
+
+static void check_file_for_unlabeled_resource_numbers(const char *path, size_t *checked_files,
+                                                      size_t *checked_resource_lines,
+                                                      size_t *unlabeled_resource_numbers) {
+    enum { evidence_context_line_limit = 12 };
+
+    FILE *file = fopen(path, "r");
+    if (file == NULL) {
+        printf("Could not open public resource doc: %s\n", path);
+        ++(*unlabeled_resource_numbers);
+        return;
+    }
+
+    ++(*checked_files);
+    char line[4096];
+    size_t line_number = 0u;
+    size_t lines_since_evidence = evidence_context_line_limit + 1u;
+
+    while (fgets(line, sizeof(line), file) != NULL) {
+        ++line_number;
+
+        if (line_has_resource_evidence_context(line)) {
+            lines_since_evidence = 0u;
+        } else if (lines_since_evidence <= evidence_context_line_limit) {
+            ++lines_since_evidence;
+        }
+
+        if (!line_has_public_profile_size_number(line)) {
+            continue;
+        }
+
+        ++(*checked_resource_lines);
+        if (lines_since_evidence > evidence_context_line_limit) {
+            printf("Measured public size number lacks nearby snapshot/reproduction context: %s:%zu:%s", path,
+                   line_number, line);
+            ++(*unlabeled_resource_numbers);
+        }
+    }
+
+    fclose(file);
+}
+
+static void assert_file_lacks_text(const char *path, const char *needle) {
+    FILE *file = fopen(path, "r");
+    TEST_ASSERT_NOT_NULL_MESSAGE(file, path);
+
+    char line[4096];
+    size_t line_number = 0u;
+    while (fgets(line, sizeof(line), file) != NULL) {
+        ++line_number;
+        if (strstr(line, needle) != NULL) {
+            printf("Stale public documentation text: %s:%zu matched '%s': %s", path, line_number, needle, line);
+            fclose(file);
+            TEST_FAIL_MESSAGE("Public documentation contains stale support text");
+        }
+    }
+
+    fclose(file);
+}
+
+static void assert_file_lacks_stale_aggregate_nodeid_context(const char *path) {
+    FILE *file = fopen(path, "r");
+    TEST_ASSERT_NOT_NULL_MESSAGE(file, path);
+
+    char line[4096];
+    size_t line_number = 0u;
+    while (fgets(line, sizeof(line), file) != NULL) {
+        ++line_number;
+        if ((strstr(line, "11565") || strstr(line, "11569") || strstr(line, "11570")) &&
+            (contains_ci(line, "Aggregate") || contains_ci(line, "Average") || contains_ci(line, "Minimum") ||
+             contains_ci(line, "Maximum"))) {
+            printf("Stale aggregate NodeId context: %s:%zu:%s", path, line_number, line);
+            fclose(file);
+            TEST_FAIL_MESSAGE(
+                "OPC-10000-4 section 7.22.4 and OPC-10000-13 sections 4.2.2.4/4.2.2.9/4.2.2.10 require "
+                "AggregateFunction identifiers; public docs must not present stale OperationLimits NodeIds "
+                "11565/11569/11570 as Average/Minimum/Maximum identifiers");
+        }
+    }
+
+    fclose(file);
+}
+
 static void check_tree_for_unsupported_claims(const char *dir_path, int (*matches_claim)(const char *line),
                                               size_t *checked_files, size_t *unsupported_claims) {
     DIR *dir = opendir(dir_path);
@@ -990,6 +1204,133 @@ void test_statuscode_numeric_values_in_status_conformance_doc_match_implementati
         "OPC-10000-4 section 7.38.2 StatusCode numeric values must match implementation constants");
 }
 
+void test_public_docs_do_not_contain_stale_profile_support_claims_per_opc_10000_7_4_2_and_4_3(void) {
+    assert_file_lacks_text(PROJECT_ROOT_DIR "/README.md", "remaining Micro item");
+    assert_file_lacks_text(PROJECT_ROOT_DIR "/Makefile", "remaining Micro item");
+    assert_file_lacks_text(PROJECT_ROOT_DIR "/README.md",
+                           "Not implemented yet: History, NodeManagement, and aggregate subscriptions");
+}
+
+void test_conformance_docs_use_current_query_and_nodemanagement_sections(void) {
+    const char *services = PROJECT_ROOT_DIR "/docs/conformance/services.md";
+
+    TEST_ASSERT_TRUE_MESSAGE(file_contains_text(services, "| QueryFirst / QueryNext | B.2.3 / B.2.4 |"),
+                             "Query services must cite OPC-10000-4 Appendix B sections B.2.3/B.2.4");
+    TEST_ASSERT_TRUE_MESSAGE(
+        file_contains_text(services, "| AddNodes / DeleteNodes / AddReferences / DeleteReferences | 5.8 |"),
+        "NodeManagement services must cite OPC-10000-4 section 5.8");
+}
+
+void test_public_docs_do_not_use_stale_aggregate_nodeids_per_opc_10000_4_7_22_4_and_opc_10000_13(void) {
+    static const char *const public_docs[] = {
+        PROJECT_ROOT_DIR "/README.md",
+        PROJECT_ROOT_DIR "/docs/api-reference.md",
+        PROJECT_ROOT_DIR "/docs/integration-guide.md",
+        PROJECT_ROOT_DIR "/docs/conformance/services.md",
+        PROJECT_ROOT_DIR "/docs/conformance/status.md",
+        PROJECT_ROOT_DIR "/docs/traceability/012-opcua-pubsub.md",
+    };
+
+    for (size_t i = 0u; i < ARRAY_COUNT(public_docs); ++i) {
+        assert_file_lacks_stale_aggregate_nodeid_context(public_docs[i]);
+    }
+}
+
+void test_public_size_numbers_are_snapshot_labeled_or_reproducible(void) {
+    TEST_ASSERT_TRUE_MESSAGE(
+        line_has_public_profile_size_number("| **nano** | core profile | **15.9 KiB** (16,278 B) | 1,280 B | 0 |"),
+        "Expected README profile rows with KiB numbers to be scanned");
+    TEST_ASSERT_TRUE_MESSAGE(line_has_public_profile_size_number(
+                                 "| **Full Featured** | **38.8 KiB** (39,768 B) | 63,240 B + 16 KiB | **0** |"),
+                             "Expected integration-guide profile rows with KiB numbers to be scanned");
+    TEST_ASSERT_FALSE_MESSAGE(
+        line_has_public_profile_size_number("`MU_MIN_CHUNK_SIZE` (8192 bytes) is the protocol floor"),
+        "Protocol constants are not measured profile-size evidence");
+    TEST_ASSERT_TRUE_MESSAGE(line_has_resource_evidence_context("Measured snapshot (2026-06-30, reproduce with"),
+                             "Expected measured snapshot wording to satisfy resource evidence context");
+    TEST_ASSERT_TRUE_MESSAGE(line_has_resource_evidence_context("Reproduce with `scripts/measure_size.sh all`."),
+                             "Expected reproduction command wording to satisfy resource evidence context");
+
+    TEST_ASSERT_TRUE_MESSAGE(file_contains_text(PROJECT_ROOT_DIR "/README.md", "Measured snapshot"),
+                             "README profile numbers must be labeled as a measured snapshot");
+    TEST_ASSERT_TRUE_MESSAGE(file_contains_text(PROJECT_ROOT_DIR "/README.md", "scripts/measure_size.sh all"),
+                             "README profile numbers must link to a reproduction command");
+    TEST_ASSERT_TRUE_MESSAGE(file_contains_text(PROJECT_ROOT_DIR "/docs/integration-guide.md", "Measured 2026"),
+                             "Integration-guide size numbers must include the measurement date");
+    TEST_ASSERT_TRUE_MESSAGE(
+        file_contains_text(PROJECT_ROOT_DIR "/docs/integration-guide.md", "scripts/measure_size.sh all"),
+        "Integration-guide size numbers must link to a reproduction command");
+
+    size_t checked_files = 0u;
+    size_t checked_resource_lines = 0u;
+    size_t unlabeled_resource_numbers = 0u;
+
+    check_file_for_unlabeled_resource_numbers(PROJECT_ROOT_DIR "/README.md", &checked_files, &checked_resource_lines,
+                                              &unlabeled_resource_numbers);
+    check_file_for_unlabeled_resource_numbers(PROJECT_ROOT_DIR "/docs/integration-guide.md", &checked_files,
+                                              &checked_resource_lines, &unlabeled_resource_numbers);
+    check_file_for_unlabeled_resource_numbers(PROJECT_ROOT_DIR "/docs/size/feature-size-ledger.md", &checked_files,
+                                              &checked_resource_lines, &unlabeled_resource_numbers);
+
+    TEST_ASSERT_EQUAL_MESSAGE(3u, checked_files, "Expected to scan public resource docs");
+    TEST_ASSERT_GREATER_THAN_MESSAGE(0u, checked_resource_lines,
+                                     "Expected to scan public profile-size resource numbers");
+    TEST_ASSERT_EQUAL_MESSAGE(
+        0u, unlabeled_resource_numbers,
+        "Measured public profile-size numbers must be snapshot-labeled or linked to reproduction commands");
+}
+
+void test_services_doc_names_negative_path_evidence_tests(void) {
+    const char *services = PROJECT_ROOT_DIR "/docs/conformance/services.md";
+    static const char *const invalid_id_terms[] = {
+        "tests/unit/test_subscriptions_errors.c",
+        "5.13.3",
+        "5.13.6",
+        "5.14.3",
+        "5.14.8",
+        "Bad_MonitoredItemIdInvalid",
+        "Bad_SubscriptionIdInvalid",
+    };
+    static const char *const publish_republish_terms[] = {
+        "tests/integration/test_subscriptions.c",
+        "5.14.5.4",
+        "5.14.6.3",
+        "Bad_SequenceNumberUnknown",
+        "Bad_MessageNotAvailable",
+    };
+    static const char *const datachange_filter_terms[] = {
+        "tests/unit/test_subscriptions_errors.c", "DataChangeFilter",  "7.22.2", "5.13.2", "5.13.3",
+        "Bad_MonitoredItemFilterUnsupported",     "Bad_DecodingError",
+    };
+    static const char *const aggregate_filter_terms[] = {
+        "tests/unit/test_aggregate.c",        "AggregateFilter",   "7.22.4",
+        "Bad_MonitoredItemFilterUnsupported", "Bad_DecodingError",
+    };
+    static const doc_evidence_requirement_t requirements[] = {
+        {"Subscription invalid MonitoredItemId/SubscriptionId negative paths", invalid_id_terms,
+         ARRAY_COUNT(invalid_id_terms)},
+        {"Publish acknowledgement and Republish invalid sequence negative paths", publish_republish_terms,
+         ARRAY_COUNT(publish_republish_terms)},
+        {"DataChangeFilter unsupported/malformed negative paths", datachange_filter_terms,
+         ARRAY_COUNT(datachange_filter_terms)},
+        {"AggregateFilter unsupported/malformed negative paths", aggregate_filter_terms,
+         ARRAY_COUNT(aggregate_filter_terms)},
+    };
+
+    size_t missing_evidence = 0u;
+    for (size_t i = 0u; i < ARRAY_COUNT(requirements); ++i) {
+        if (!services_doc_has_evidence_block(services, &requirements[i])) {
+            print_missing_services_doc_evidence(services, &requirements[i]);
+            ++missing_evidence;
+        }
+    }
+
+    TEST_ASSERT_EQUAL_MESSAGE(
+        0u, missing_evidence,
+        "docs/conformance/services.md must name the tests, OPC-10000-4 refs, and StatusCodes covering selected "
+        "Subscription/DataChange/Aggregate negative paths");
+}
+
 void test_fuzz_harnesses_do_not_contain_todo_placeholder_markers_per_fr_020_sc_006(void) {
     TEST_ASSERT_NOT_NULL_MESSAGE(matching_fuzz_placeholder_marker("/* TODO */"),
                                  "Expected TODO markers to be rejected");
@@ -1049,6 +1390,11 @@ int main(void) {
     RUN_TEST(test_ctt_verified_claims_require_external_ctt_evidence_per_opc_10000_7_4_2_and_4_3);
     RUN_TEST(test_statuscode_names_in_conformance_docs_match_opc_10000_4_7_38_2);
     RUN_TEST(test_statuscode_numeric_values_in_status_conformance_doc_match_implementation_per_opc_10000_4_7_38_2);
+    RUN_TEST(test_public_docs_do_not_contain_stale_profile_support_claims_per_opc_10000_7_4_2_and_4_3);
+    RUN_TEST(test_conformance_docs_use_current_query_and_nodemanagement_sections);
+    RUN_TEST(test_public_docs_do_not_use_stale_aggregate_nodeids_per_opc_10000_4_7_22_4_and_opc_10000_13);
+    RUN_TEST(test_public_size_numbers_are_snapshot_labeled_or_reproducible);
+    RUN_TEST(test_services_doc_names_negative_path_evidence_tests);
     RUN_TEST(test_fuzz_harnesses_do_not_contain_todo_placeholder_markers_per_fr_020_sc_006);
     RUN_TEST(test_fuzz_harnesses_do_not_discard_or_ignore_input_per_fr_020_sc_006);
     RUN_TEST(test_docs_and_specs_do_not_claim_profile_compliance_without_ctt_evidence);

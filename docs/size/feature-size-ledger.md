@@ -751,3 +751,80 @@ with realtime scheduling and CPU shielding. All 66 paired rows passed the
 configured gates. Median normalized ratios versus `docs/benchmarks/speed-baseline.json`
 were nano `0.994`, micro `1.003`, embedded `1.004`, and full `1.005`; the worst
 row was full `subscription-active-tick` at `0.937`, above the `0.85` gate.
+
+## Feature 023 US3 PubSub subscriber resource-impact evidence
+
+- **Measured**: 2026-07-01 for Feature 023 T037a
+  (`023-conformance-docs-subscriber`, scoped UADP/UDP subscriber decode)
+- **Command**: `scripts/measure_size.sh all`
+- **Exit code**: `0`
+- **Toolchain**: `arm-none-eabi-gcc` 13.2.1, `GNU size` 2.42, `cmake` 3.28.3
+- **Plan budget context**: `specs/023-conformance-docs-subscriber/plan.md`
+  targets less than 2 KiB added Arm Cortex-M0+ `.text` for the subscriber
+  decoder, no mandatory static RAM, caller-provided decode output slots, no heap,
+  and added peak stack below 256 B.
+
+Current ARM Cortex-M0+ profile matrix:
+
+| Profile | text | data | bss | dec | Archive |
+|---|---:|---:|---:|---:|---|
+| nano | 16,278 B | 0 B | 0 B | 16,278 B | `build/size-arm/nano/src/libmicro_opcua.a` |
+| micro | 23,785 B | 0 B | 0 B | 23,785 B | `build/size-arm/micro/src/libmicro_opcua.a` |
+| embedded | 42,990 B | 0 B | 0 B | 42,990 B | `build/size-arm/embedded/src/libmicro_opcua.a` |
+| full-featured | 51,612 B | 0 B | 0 B | 51,612 B | `build/size-arm/full-featured/src/libmicro_opcua.a` |
+
+Delta versus the most recent ARM matrix already recorded in this ledger:
+
+| Profile | `.text` delta | `.data` delta | `.bss` delta |
+|---|---:|---:|---:|
+| nano | -88 B | +0 B | +0 B |
+| micro | -88 B | +0 B | +0 B |
+| embedded | -88 B | +0 B | +0 B |
+| full-featured | +440 B | +0 B | +0 B |
+
+Resource-risk conclusion: the measured archive `.data` and `.bss` remain 0 B for
+all profiles. The measured `.text` movement is flat-to-down for nano, micro, and
+embedded, and the full-featured archive grows by 440 B, which is within the
+Feature 023 subscriber decoder flash target. This entry records the T037a ARM
+size evidence only; it does not claim external CTT/profile compliance, full
+release-gate passage, stack-budget proof, or heap proof beyond the archive
+section results above.
+
+### Feature 023 T047 final size validation
+
+- **Measured**: 2026-07-01 for Feature 023 T047 after T041-T043 documentation
+  and test-evidence work.
+- **Command**: `scripts/measure_size.sh all`
+- **Exit code**: `0`
+- **Result**: **PASS**. The current ARM Cortex-M0+ archive matrix is unchanged
+  from the T037a/T037b Feature 023 entry above, so the post-implementation
+  documentation/test-evidence tasks did not add runtime size. Archive `.data`
+  and `.bss` remain 0 B for every profile, matching the plan's no mandatory
+  static RAM expectation.
+
+Command output:
+
+```text
+profile              text     data      bss        dec archive
+nano           16278        0        0      16278 build/size-arm/nano/src/libmicro_opcua.a
+micro          23785        0        0      23785 build/size-arm/micro/src/libmicro_opcua.a
+embedded       42990        0        0      42990 build/size-arm/embedded/src/libmicro_opcua.a
+full-featured      51612        0        0      51612 build/size-arm/full-featured/src/libmicro_opcua.a
+```
+
+Current ARM Cortex-M0+ profile matrix:
+
+| Profile | text | data | bss | dec | Archive |
+|---|---:|---:|---:|---:|---|
+| nano | 16,278 B | 0 B | 0 B | 16,278 B | `build/size-arm/nano/src/libmicro_opcua.a` |
+| micro | 23,785 B | 0 B | 0 B | 23,785 B | `build/size-arm/micro/src/libmicro_opcua.a` |
+| embedded | 42,990 B | 0 B | 0 B | 42,990 B | `build/size-arm/embedded/src/libmicro_opcua.a` |
+| full-featured | 51,612 B | 0 B | 0 B | 51,612 B | `build/size-arm/full-featured/src/libmicro_opcua.a` |
+
+Budget comparison:
+
+| Budget item | Current T047 evidence | Status |
+|---|---|---|
+| Scoped UADP subscriber decoder target less than 2 KiB added Arm Cortex-M0+ `.text` | The T037a/T037b delta remains nano `-88 B`, micro `-88 B`, embedded `-88 B`, and full-featured `+440 B`; the T047 matrix is identical to T037a/T037b. | PASS |
+| No mandatory static RAM | Every measured archive reports `.data=0 B` and `.bss=0 B`. | PASS |
+| Caller-provided output slots and no heap | No runtime source changes occurred after T037a/T037b for T041-T043; T047 records unchanged archive sections after documentation/test-evidence work. | PASS |

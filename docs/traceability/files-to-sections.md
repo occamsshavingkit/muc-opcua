@@ -34,7 +34,7 @@ This document maps implementation and test files back to OPC UA normative sectio
 | `tests/unit/test_binary_extension_object_errors.c` | Tests | OPC-10000-6 | 5.2.2.15 | ExtensionObject declared-body overrun and underrun tests |
 | `tests/unit/test_binary_string_errors.c` | Tests | OPC-10000-6 | 5.2 | String and ByteString declared-length boundary tests |
 | `tests/unit/test_browse_service.c` | Tests | OPC-10000-4 | 5.9.2.4, 7.38.2 | BrowseDirection validation and exact StatusCode tests |
-| `tests/unit/test_conformance_docs.c` | Tests | OPC-10000-4 / OPC-10000-7 | 7.38.2 / 4.2, 4.3 | Conformance-claim, StatusCode documentation, and fuzz-placeholder gate tests |
+| `tests/unit/test_conformance_docs.c` | Tests | OPC-10000-4 / OPC-10000-7 / OPC-10000-13 | 5.8, 7.22.4, 7.38.2, B.2.3, B.2.4 / 4.2, 4.3 / 4.2.2.4, 4.2.2.9, 4.2.2.10 | Conformance-claim, StatusCode documentation, stale-number, Query/NodeManagement section, aggregate NodeId, and fuzz-placeholder gate tests |
 | `tests/unit/test_discovery_encode.c` | Tests | OPC-10000-4 / OPC-10000-6 | 7.2, 7.14, 7.41 / 5.2 | EndpointDescription and ApplicationDescription binary encoding tests |
 | `tests/unit/test_discovery_endpoint.c` | Tests | OPC-10000-4 | 5.5.2.2, 5.5.4.2 | FindServers and GetEndpoints no-session, URL, profile, and locale filter tests |
 | `tests/unit/test_discovery_services.c` | Tests | OPC-10000-4 / OPC-10000-6 | 5.5.2.2, 5.5.4.2 / 5.2.5 | Discovery malformed-array and truncated-body tests |
@@ -48,7 +48,7 @@ This document maps implementation and test files back to OPC UA normative sectio
 | `tests/unit/test_session.c` | Tests | OPC-10000-4 | 5.7.2, 5.7.2.1, 5.7.2.2, 5.7.2.3, 7.38.2 | CreateSession truncation, token freshness, channel binding, and nonce tests |
 | `tests/unit/test_subscriptions_errors.c` | Tests | OPC-10000-4 / OPC-10000-6 | 5.13.2.4, 5.13.3.4, 5.14.5.1, 7.22.1, 7.22.2, 7.38.2 / 5.2.2.15 | MonitoringFilter error and oversize Publish response tests |
 | `tests/unit/test_tcp_connection.c` | Tests | OPC-10000-6 | 7.1.2.3, 7.1.2.4 | HEL/ACK negotiated buffer-size boundary tests |
-| `tests/unit/test_traceability_docs.c` | Tests | OPC-10000-4 / OPC-10000-6 / OPC-10000-7 / OPC-10000-13 | 5.5.2, 5.5.4, 5.6.2, 5.7.2, 5.7.3, 5.13.2.4, 5.13.3.4, 5.14, 7.22.1, 7.22.4, 7.38.2 / 5.2, 5.2.2.15, 5.2.5, 6.7.2, 7.1.2.2, 7.1.2.3, 7.1.2.4 / 4.2, 4.3 / 4.2.2.4, 4.2.2.9, 4.2.2.10, 5.4.3.5, 5.4.3.10, 5.4.3.11 | Files-to-sections and sections-to-files coverage gate tests |
+| `tests/unit/test_traceability_docs.c` | Tests | OPC-10000-4 / OPC-10000-6 / OPC-10000-7 / OPC-10000-13 / OPC-10000-14 | 5.5.2, 5.5.4, 5.6.2, 5.7.2, 5.7.3, 5.13.2.4, 5.13.3.4, 5.14, 7.22.1, 7.22.4, 7.38.2 / 5.2, 5.2.2.15, 5.2.2.16, 5.2.5, 6.7.2, 7.1.2.2, 7.1.2.3, 7.1.2.4 / 4.2, 4.3 / 4.2.2.4, 4.2.2.9, 4.2.2.10, 5.4.3.5, 5.4.3.10, 5.4.3.11 / 7.2.4.4.2, 7.2.4.5.2, 7.2.4.5.5 | Files-to-sections, sections-to-files, and feature traceability coverage gate tests |
 | `tests/unit/test_write_errors.c` | Tests | OPC-10000-4 | 5.11.4.2, 5.11.4.3, 5.11.4.4, 7.38.2 | Write request parameter and per-operation StatusCode tests |
 | `tests/fuzz/fuzz_binary_reader.c` | Fuzz Tests | OPC-10000-6 | 5.2, 5.2.5 | Binary reader fuzz coverage for declared lengths and malformed array counts |
 | `tests/fuzz/fuzz_message_chunk.c` | Fuzz Tests | OPC-10000-6 | 6.7.2, 7.1.2.2 | MessageChunk fuzz coverage for message type, size, abort, and continuation chunks |
@@ -139,12 +139,12 @@ This document maps implementation and test files back to OPC UA normative sectio
 | `binary_nodeid.c` | Traceability mapped | OPC UA Part 4 / 6 | 5.5.4.2, 5.7, 5.11, 5.13, 5.14 / 5.2, 6.7, 7.2 | Placeholder replaced; see feature-specific rows and tests for exact service/encoding coverage |
 | `src/encoding/binary_variant.c` | OPC UA Part 6 | 5.3.13 | Variant encoding | Variant support |
 | `src/encoding/binary_datavalue.c` | OPC UA Part 6 | 5.3.14 | DataValue encoding | DataValue support |
-| `src/encoding/uadp_encoder.c` | OPC UA Part 14 / Part 6 | 7.2.4.4.2, 7.2.4.5.2, 7.2.4.5.4, 7.2.4.5.5 / 5.2.2.16 | Scoped UADP NetworkMessage, PayloadHeader, Data Key Frame, and Variant field encoding | PubSub UADP |
+| `src/encoding/uadp_encoder.c` | OPC UA Part 14 / Part 6 | 7.2.4.4.2, 7.2.4.5.2, 7.2.4.5.4, 7.2.4.5.5 / 5.2.2.16 | Scoped UADP NetworkMessage, PayloadHeader, Data Key Frame, and Variant field encode/decode | PubSub UADP |
 | `src/core/pubsub.c` | OPC UA Part 14 | 5.4.6.2.2, 7.3.2.1 | Cooperative UADP/UDP publisher timing and UDP send dispatch | PubSub runtime |
 | `src/core/server.c` | OPC UA Part 14 | 5.4.6.2.2, 7.3.2.1 | `mu_server_poll()` drives connectionless PubSub publishing independent of TCP Sessions | PubSub runtime |
 | `src/platform/host_udp_adapter.c` | OPC UA Part 14 | 7.3.2.1 | Host UDP datagram transport for UADP | PubSub network |
-| `include/micro_opcua/pubsub.h` | OPC UA Part 14 | 7.2.4.4.2, 7.2.4.5.2, 7.2.4.5.4, 7.2.4.5.5, 7.3.2.1 | Scoped PubSub Publisher API and caller-owned field contract | PubSub network |
-| `tests/unit/test_uadp_encoding.c` | OPC UA Part 14 / Part 6 | 7.2.4.4.2, 7.2.4.5.2, 7.2.4.5.4, 7.2.4.5.5 / 5.2.2.16 | Byte-level UADP encoder coverage | PubSub UADP tests |
+| `include/micro_opcua/pubsub.h` | OPC UA Part 14 / Part 6 | 7.2.4.4.2, 7.2.4.5.2, 7.2.4.5.4, 7.2.4.5.5, 7.3.2.1 / 5.2.2.16 | Scoped PubSub Publisher API, decoder API, and caller-owned field/output contract | PubSub network |
+| `tests/unit/test_uadp_encoding.c` | OPC UA Part 14 / Part 6 | 7.2.4.4.2, 7.2.4.5.2, 7.2.4.5.4, 7.2.4.5.5 / 5.2.2.16 | Byte-level UADP encoder and decoder coverage | PubSub UADP tests |
 | `tests/unit/test_pubsub.c` | OPC UA Part 14 | 5.4.6.2.2, 7.3.2.1 | Publisher timing, destination address, and connectionless poll coverage | PubSub runtime tests |
 | `binary_extension_object.c` | Traceability mapped | OPC UA Part 4 / 6 | 5.5.4.2, 5.7, 5.11, 5.13, 5.14 / 5.2, 6.7, 7.2 | Placeholder replaced; see feature-specific rows and tests for exact service/encoding coverage |
 | `binary_datavalue.c` | Traceability mapped | OPC UA Part 4 / 6 | 5.5.4.2, 5.7, 5.11, 5.13, 5.14 / 5.2, 6.7, 7.2 | Placeholder replaced; see feature-specific rows and tests for exact service/encoding coverage |
