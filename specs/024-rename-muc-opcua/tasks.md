@@ -63,7 +63,7 @@ proves the rename is complete, before any renaming happens.
   as the reference point T012/T033 diff against. This is the only task that adds
   new content to this file; T018 (US2) only fixes old-name references in the
   file's *pre-existing* prose and never touches this new note
-- [ ] T002 Implement the stale-old-name regression guard per
+- [X] T002 Implement the stale-old-name regression guard per
   `contracts/regression-guard-contract.md` (new `tests/unit/test_no_stale_project_name.c`
   following the existing `tests/unit/test_conformance_docs.c` pattern, or a new
   `tests/tools/check_no_stale_name.sh` if scanning non-C files like
