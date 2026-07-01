@@ -2,8 +2,8 @@
 
 A freestanding, no-heap OPC UA server library for embedded targets (freestanding C11).
 This document is the authoritative reference for the **public API** exposed under
-`include/micro_opcua/`. Every signature, struct field, enum, and macro below is copied
-verbatim from the headers on branch `004-docs`.
+`include/micro_opcua/`. Every signature, struct field, enum, and macro below tracks
+the current public headers.
 
 The umbrella header pulls in the whole public surface:
 
@@ -528,19 +528,52 @@ typedef struct {
 | `user_auth_handler` | `mu_user_auth_handler_t` | No | Optional callback handler for username/password authentication. |
 | `user_auth_handler_handle` | `void *` | No | Optional user context handle passed to `user_auth_handler`. |
 | `trust_list` | `const mu_trust_list_t *` | No | Optional pointer to application certificate trust list. |
-| `pubsub` | `mu_pubsub_connection_t` | No | Optional PubSub connection parameters. |
-| `udp_adapter` | `mu_udp_adapter_t` | No | Optional UDP adapter for PubSub. |
-
-When `MICRO_OPCUA_PUBSUB` is enabled, PubSub is scoped to a UADP/UDP Publisher.
-`mu_pubsub_connection_t.address` selects the unicast, multicast, or broadcast
-destination; `NULL` keeps the default IPv4 broadcast destination. A
-`mu_pubsub_writer_group_t` contains one `mu_pubsub_dataset_writer_t`; its
-`fields` array is caller-owned and must outlive the registered writer group.
-Fields are encoded as scalar OPC UA Binary Variants in a UADP Data Key Frame
-(OPC-10000-14 sections 7.2.4.4.2, 7.2.4.5.2, 7.2.4.5.4, and 7.2.4.5.5).
+| `pubsub` | `mu_pubsub_connection_t` | No | Optional scoped UADP/UDP publisher connection parameters; not a PubSub configuration model. |
+| `udp_adapter` | `mu_udp_adapter_t` | No | Optional UDP send adapter for PubSub publishing. The subscriber decoder accepts caller-provided UDP payload bytes. |
 | `write_handler` | `mu_write_handler_t` | No | Optional callback handler for custom Node write operations. |
 | `write_handler_handle` | `void *` | No | Optional user context handle passed to `write_handler`. |
 | `history_adapter` | `mu_history_adapter_t` | No | Optional history access persistence adapter. |
+
+**PubSub scope (`MICRO_OPCUA_PUBSUB`):** PubSub is a scoped UADP/UDP publisher plus
+the matching caller-storage UADP NetworkMessage decoder. This is not a full PubSub
+Subscriber profile or CTT conformance claim. `mu_pubsub_connection_t.address`
+selects the unicast, multicast, or broadcast publisher destination; `NULL` keeps
+the default IPv4 broadcast destination. A `mu_pubsub_writer_group_t` contains one
+`mu_pubsub_dataset_writer_t`; its `fields` array is caller-owned and must outlive
+the registered writer group.
+
+The supported wire layout is the layout emitted by `mu_encode_uadp_network_message`:
+UADP version 1 over UDP with one UInt32 PublisherId (OPC-10000-14 §7.2.4.4.2), a
+PayloadHeader containing exactly one DataSetWriterId (OPC-10000-14 §7.2.4.5.2),
+one DataSetMessage size entry for the complete remaining DataSet payload, and one
+Data Key Frame containing scalar fields encoded as OPC UA Binary Variants
+(OPC-10000-14 §7.2.4.5.5). The decoder API:
+
+```c
+opcua_statuscode_t mu_decode_uadp_network_message(
+    const opcua_byte_t *buffer,
+    size_t buffer_size,
+    mu_pubsub_received_message_t *message);
+```
+
+Callers own the UDP payload buffer and the `mu_variant_t` output slots referenced by
+`mu_pubsub_received_message_t.fields`; the decoder does not allocate heap memory.
+Scalar fixed-width values are copied into the output slots. String, ByteString,
+QualifiedName, and LocalizedText Variant payloads may borrow bytes from the input
+payload. The input buffer must outlive decoded field values for those
+variable-length payloads. On success the
+decoder fills `publisher_id`, `data_set_writer_id`, `fields[0..field_count)`, and
+`field_count`.
+
+Rejected inputs and unsupported layouts return deterministic StatusCodes named by
+OPC-10000-4 §7.38.2:
+
+| Rejected condition | StatusCode |
+|--------------------|------------|
+| `buffer == NULL`, `message == NULL`, or nonzero `field_capacity` with `fields == NULL` | `Bad_InvalidArgument` |
+| Truncated UADP header, PayloadHeader, DataSetMessage size, DataSetMessage body, Variant field, or declared DataSetMessage size that does not match the remaining payload | `Bad_DecodingError` |
+| More decoded fields than caller capacity, including zero capacity for a payload with fields, or more than `MU_PUBSUB_MAX_FIELDS` | `Bad_TooManyOperations` |
+| Unsupported PublisherId type, PubSub security header, ExtendedFlags2/non-DataSetMessage payload types, chunked NetworkMessages, discovery messages, multiple DataSetMessages, delta/event/action messages, RawData-only metadata-dependent payloads, Variant array or unsupported complex field encodings, JSON mapping, MQTT/broker mappings, Ethernet transport, or dynamic PubSub configuration/metadata features | `Bad_NotSupported` |
 
 **Note:** Required adapters are stored **by value** in the config struct;
 optional adapters/handlers are stored **by pointer/value** and must remain valid for the
@@ -1403,10 +1436,10 @@ These are CMake options that configure which code is compiled. All features defa
 | `MICRO_OPCUA_SERVICE_REGISTER_NODES` | `MICRO_OPCUA_SERVICE_REGISTER_NODES=1` | OFF | Build RegisterNodes/UnregisterNodes. |
 | `MICRO_OPCUA_SERVICE_WRITE` | `MICRO_OPCUA_SERVICE_WRITE=1` | OFF | Build the Write service. |
 | `MICRO_OPCUA_SERVICE_HISTORY` | `MICRO_OPCUA_SERVICE_HISTORY=1` | OFF | Build Historical Access (HistoryRead/HistoryUpdate). |
-| `MICRO_OPCUA_SERVICE_QUERY` | `MICRO_OPCUA_SERVICE_QUERY=1` | OFF | Build the Query services. |
-| `MICRO_OPCUA_SERVICE_NODEMANAGEMENT` | `MICRO_OPCUA_SERVICE_NODEMANAGEMENT=1` | OFF | Build the optional NodeManagement service set. |
-| `MICRO_OPCUA_DYNAMIC_NODES` | `MICRO_OPCUA_DYNAMIC_NODES=1` | OFF | Build AddNodes/DeleteNodes dynamic node management. |
-| `MICRO_OPCUA_PUBSUB` | `MICRO_OPCUA_PUBSUB=1` | OFF | Build Publish/Subscribe capabilities. |
+| `MICRO_OPCUA_SERVICE_QUERY` | `MICRO_OPCUA_SERVICE_QUERY=1` | OFF | Build QueryFirst/QueryNext (OPC-10000-4 Appendix B §B.2.3/§B.2.4). |
+| `MICRO_OPCUA_SERVICE_NODEMANAGEMENT` | `MICRO_OPCUA_SERVICE_NODEMANAGEMENT=1` | OFF | Build the NodeManagement service set: AddNodes, AddReferences, DeleteNodes, and DeleteReferences (OPC-10000-4 §5.8). |
+| `MICRO_OPCUA_DYNAMIC_NODES` | `MICRO_OPCUA_DYNAMIC_NODES=1` | OFF | Profile flag for dynamic AddNodes/DeleteNodes support; the `full` profile enables it with `MICRO_OPCUA_SERVICE_NODEMANAGEMENT`. |
+| `MICRO_OPCUA_PUBSUB` | `MICRO_OPCUA_PUBSUB=1` | OFF | Build the scoped UADP/UDP PubSub publisher and caller-storage decoder; does not claim full PubSub Subscriber profile compliance. |
 | `MICRO_OPCUA_CUSTOM_METHODS` | `MICRO_OPCUA_CUSTOM_METHODS=1` | OFF | Build support for custom method calls. |
 | `MICRO_OPCUA_SERVER_DIAGNOSTICS` | `MICRO_OPCUA_SERVER_DIAGNOSTICS=1` | OFF | Build support for server diagnostics summary nodes. |
 | `MICRO_OPCUA_EVENTS` | `MICRO_OPCUA_EVENTS=1` | OFF | Build support for event notifications. |

@@ -23,9 +23,10 @@ OPC Foundation 2017 device server profiles, so you compile in only the surface y
 
 - **Zero heap.** No `malloc` anywhere in the protocol path. The application owns all
   memory: one server-storage block plus the RX/TX buffers. Footprint is deterministic.
-- **Tiny flash.** A complete Nano server is **16.1 KiB** of Arm Cortex-M0+ `-Os` core
-  `.text`; Micro (with subscriptions) is **22.4 KiB**; full Embedded 2017 is
-  **34.8 KiB**. Static `.bss` is 0 B.
+- **Tiny flash.** Measured snapshot (2026-06-30, reproduce with
+  `scripts/measure_size.sh all`): a complete Nano server is **15.9 KiB**
+  (16,278 B) of Arm Cortex-M0+ `-Os` core `.text`; Micro is **23.2 KiB**
+  (23,785 B); Embedded 2017 is **42.0 KiB** (42,990 B). Static `.bss` is 0 B.
 - **Freestanding & portable.** Plain C11 core with no OS assumptions. Hardware and OS
   services are injected via small adapter structs in
   [`include/micro_opcua/platform.h`](include/micro_opcua/platform.h) — bring your own
@@ -42,15 +43,16 @@ OPC Foundation 2017 device server profiles, so you compile in only the surface y
 ## Profiles
 
 Each profile is a build configuration (`make nano|micro|embedded`, or the
-`MICRO_OPCUA_*` CMake options). Footprint figures are real measurements on Arm
-Cortex-M0+ with `-Os`; full methodology and breakdown are in
+`MICRO_OPCUA_*` CMake options). Footprint figures are a measured snapshot on Arm
+Cortex-M0+ with `-Os`; reproduce with `scripts/measure_size.sh all`. Full
+methodology and breakdown are in
 [docs/size/feature-size-ledger.md](docs/size/feature-size-ledger.md).
 
 | Profile | Adds | Core `.text` (flash) | `MU_SERVER_STORAGE_BYTES` | Heap |
 |---|---|---|---|---|
-| **nano** | SecurityPolicy None; Discovery + Session + Read + View service sets + Base Information node set; no subscriptions | **16.1 KiB** | 1,280 B | 0 |
-| **micro** | nano **+** data-change subscriptions (MonitoredItems / Publish) | **22.4 KiB** | 3,328 B | 0 |
-| **embedded**¹ | micro **+** Basic256Sha256, Standard DataChange 2017, Base Info Type System, GetMonitoredItems/ResendData | **34.8 KiB** | **44,736 B** | 0 |
+| **nano** | SecurityPolicy None; Discovery + Session + Read + View service sets + Base Information node set; no subscriptions | **15.9 KiB** (16,278 B) | 1,280 B | 0 |
+| **micro** | nano **+** data-change subscriptions (MonitoredItems / Publish) | **23.2 KiB** (23,785 B) | 3,328 B | 0 |
+| **embedded**¹ | micro **+** Basic256Sha256, Standard DataChange 2017, Base Info Type System, GetMonitoredItems/ResendData | **42.0 KiB** (42,990 B) | **63,240 B** | 0 |
 
 ¹ The **`embedded` profile is profile-targeting**, not CTT-certified. It implements the
 Embedded 2017 profile surface selected in the conformance docs, but no formal compliance
@@ -59,8 +61,8 @@ claim is made until the OPC UA CTT passes. See [docs/conformance/status.md](docs
 In every profile, `.data`, `.bss`, and heap are **0** (the core has no mutable global
 state). RAM is caller-provided: the `MU_SERVER_STORAGE_BYTES` block above plus two
 transport buffers (default **2 × 8 KiB**).
-On the RP2040's 264 KiB of RAM, a full Micro server leaves roughly 240 KiB for your
-application and network stack.
+On the RP2040's 264 KiB of RAM, a Micro server leaves roughly 244 KiB for your
+application and network stack before stack and adapter storage.
 
 ---
 
@@ -173,8 +175,8 @@ values are either static or served live through a read callback
 ## Supported OPC UA surface
 
 micro-opcua transports OPC UA TCP (`opc.tcp`) with UA-SecureConversation and UA-Binary
-encoding. Implemented service sets (single client / channel / session today; concurrent
-≥2-session support is the remaining Micro item):
+encoding. Implemented service sets are profile-targeting subsets with bounded
+multi-session and secure-channel capacity controlled by the build configuration:
 
 - **Discovery** — FindServers, GetEndpoints
 - **SecureChannel** — Open/CloseSecureChannel (None and Basic256Sha256)
@@ -258,7 +260,14 @@ Set `-DMICRO_OPCUA_PLATFORM=pico` with `PICO_SDK_PATH` pointing at a Pico SDK ch
   events, and server diagnostics.
 - **SecurityPolicy None is for trusted/isolated networks or testing only.** Use
   Basic256Sha256 (embedded profile + crypto adapter) for anything exposed.
-- **Not implemented yet:** History, NodeManagement, and aggregate subscriptions.
+- **Optional services are build-gated.** History, NodeManagement, Query, Write,
+  Events, custom Methods, diagnostics, aggregate subscriptions, and PubSub are
+  available only behind their documented CMake options and remain scoped to the
+  tested subsets in [docs/conformance/services.md](docs/conformance/services.md).
+- **PubSub is scoped.** The PubSub surface is a UADP/UDP publisher plus a
+  caller-storage decoder for the matching Data Key Frame subset; PubSub security,
+  broker mappings, JSON mappings, dynamic PubSub configuration, and full
+  DataSetReader runtime management remain out of scope.
 
 ---
 

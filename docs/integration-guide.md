@@ -404,10 +404,17 @@ typedef struct mu_udp_adapter {
 
 A UDP transport adapter interface to broadcast UADP NetworkMessages over UDP/IP connectionless channels. Enable this by setting `config.pubsub.enabled = true` and supplying the `udp_adapter` interface.
 
-The current PubSub surface is a scoped UADP/UDP Publisher. It encodes one
-DataSetWriter per WriterGroup with a UADP PayloadHeader, a sized Data Key Frame,
-and scalar fields encoded as OPC UA Binary Variants. The field array is
-caller-owned and must outlive the registered writer group:
+The current PubSub surface is a scoped UADP/UDP Publisher plus a matching
+caller-storage decoder for the same UADP NetworkMessage layout. The publisher
+encodes one DataSetWriter per WriterGroup with a UADP PayloadHeader, a sized
+Data Key Frame, and scalar fields encoded as OPC UA Binary Variants. The field
+array is caller-owned and must outlive the registered writer group. The decoder
+is for scoped Publisher/Subscriber integration, not full PubSub Subscriber profile
+compliance. For decoded String, ByteString, QualifiedName, or LocalizedText
+Variant fields, the input buffer must outlive decoded field values because the
+binary decoder may borrow bytes from that buffer. Scope follows OPC-10000-14
+§5.4.2.1/§5.4.2.2 for Subscriber message reception, §5.4.6.2.2 for UADP over UDP,
+and §7.3.2.1 for UDP transport:
 
 ```c
 static mu_pubsub_field_t fields[] = {
@@ -431,9 +438,31 @@ mu_pubsub_writer_group_t wg = {
 mu_server_add_writer_group(server, &wg);
 ```
 
-Unsupported in this slice: Subscriber behavior, PubSub security, MQTT/AMQP/JSON
-mappings, dynamic PublishedDataSet management, arrays, and multiple
-DataSetWriters per WriterGroup.
+Decoder callers provide the UDP payload buffer and `mu_variant_t` output slots.
+Keep the input buffer alive while reading decoded variable-length field values:
+
+```c
+mu_variant_t decoded_fields[1]; /* caller-provided decode output slots */
+mu_pubsub_received_message_t message = {
+    .fields = decoded_fields,
+    .field_capacity = 1,
+    .field_count = 0,
+};
+
+opcua_statuscode_t rc =
+    mu_decode_uadp_network_message(payload, payload_len, &message);
+if (rc == MU_STATUS_GOOD) {
+    /* message.field_count is the number of decoded slots now valid. */
+    if (message.field_count == 1) {
+        mu_variant_t first_value = message.fields[0];
+        (void)first_value;
+    }
+}
+```
+
+Unsupported in this slice: PubSub security, MQTT/AMQP/JSON mappings, dynamic
+PublishedDataSet and DataSetReader management, arrays, delta frames, event
+messages, and multiple DataSetWriters per WriterGroup.
 
 ### 3.7 Wiring the adapters
 
@@ -712,7 +741,7 @@ From the top-level `CMakeLists.txt` and `cmake/MicroOpcUaOptions.cmake`
 |---|---|---|
 | `MICRO_OPCUA_SECURITY` | ON | Compile advanced security policies (and grow `MU_SERVER_STORAGE_BYTES`) |
 | `MICRO_OPCUA_SUBSCRIPTIONS` | ON | Data-change subscription engine (Micro profile) |
-| `MICRO_OPCUA_PUBSUB` | OFF | OPC UA PubSub UADP/UDP Publisher |
+| `MICRO_OPCUA_PUBSUB` | OFF | OPC UA PubSub UADP/UDP Publisher and scoped decoder |
 | `MICRO_OPCUA_BASE_NODES` | ON | Standard Base Information node set (ServerStatus, CurrentTime, …) |
 | `MICRO_OPCUA_SERVICE_READ` | ON | Read service |
 | `MICRO_OPCUA_SERVICE_BROWSE` | ON | Browse / BrowseNext / TranslateBrowsePaths |
@@ -759,7 +788,7 @@ cmake -B build -DMICRO_OPCUA_SUBSCRIPTIONS=ON \
 
 ### 7.4 Flash / RAM budget
 
-Measured 2026-06-28 on ARM Cortex-M0+ (RP2040), `arm-none-eabi-gcc -Os
+Measured 2026-06-30 on ARM Cortex-M0+ (RP2040), `arm-none-eabi-gcc -Os
 -mcpu=cortex-m0plus -mthumb -ffunction-sections -fdata-sections`; your board TCP/IP
 stack and crypto backend are extra. Reproduce with `scripts/measure_size.sh all`.
 Full details in
@@ -767,10 +796,10 @@ Full details in
 
 | Profile | Core `.text` (flash) | Caller RAM = storage + 2×8 KiB buffers | Heap |
 |---|---|---|---|
-| **Nano** | **16.1 KiB** (16,441 B) | 1,280 B + 16 KiB ≈ **17.3 KiB** | **0** |
-| **Micro** | **23.2 KiB** (23,730 B) | 3,328 B + 16 KiB ≈ **19.3 KiB** | **0** |
-| **Embedded 2017** | **38.5 KiB** (39,442 B) | 63,240 B + 16 KiB ≈ **79.3 KiB** | **0** |
-| **Full Featured** | **38.8 KiB** (39,768 B) | 63,240 B + 16 KiB ≈ **79.6 KiB** | **0** |
+| **Nano** | **15.9 KiB** (16,278 B) | 1,280 B + 16 KiB ≈ **17.3 KiB** | **0** |
+| **Micro** | **23.2 KiB** (23,785 B) | 3,328 B + 16 KiB ≈ **19.3 KiB** | **0** |
+| **Embedded 2017** | **42.0 KiB** (42,990 B) | 63,240 B + 16 KiB ≈ **79.3 KiB** | **0** |
+| **Full Featured** | **50.4 KiB** (51,612 B) | 63,240 B + 16 KiB ≈ **79.6 KiB** | **0** |
 
 Additional notes for budgeting:
 

@@ -25,7 +25,7 @@ This document maps explicit OPC UA normative sections to implementation and test
 | 4 | 7.29 | ReferenceDescription | `src/encoding/binary_extension_object.c` |
 | 4 | 7.32 | RequestHeader | `src/core/service_message.c` |
 | 4 | 7.33 | ResponseHeader | `src/core/service_message.c` |
-| 4 | 7.38.2 | Common StatusCodes | `src/core/status.c` |
+| 4 | 7.38.2 | Common StatusCodes | `include/micro_opcua/status.h`, `src/core/status.c`, `src/encoding/uadp_encoder.c`, `docs/conformance/status.md`, `tests/unit/test_conformance_docs.c`, `tests/unit/test_traceability_docs.c`, `docs/traceability/023-conformance-docs-subscriber.md` |
 | 4 | 7.22.1 | MonitoringFilter | `src/services/subscription.c`, `tests/unit/test_subscriptions_errors.c` |
 | 4 | 7.22.4 | AggregateFilter | `src/core/service_dispatch.c`, `tests/unit/test_aggregate.c`, `specs/018-aggregate-subscriptions/spec.md` |
 | 13 | 4.2.2.4 | Average AggregateFunction object | `src/services/subscription.c`, `tests/unit/test_aggregate.c` |
@@ -42,7 +42,7 @@ This document maps explicit OPC UA normative sections to implementation and test
 | 6 | 5.2.2.4 | String Encoding | `src/encoding/binary_string.c` |
 | 6 | 5.2.2.9 | NodeId Encoding | `src/encoding/binary_nodeid.c` |
 | 6 | 5.2.2.15 | ExtensionObject Encoding | `src/encoding/binary_extension_object.c` |
-| 6 | 5.2.2.16 | Variant Encoding | `src/encoding/binary_variant.c` |
+| 6 | 5.2.2.16 | Variant Encoding | `src/encoding/binary_variant.c`, `include/micro_opcua/pubsub.h`, `src/encoding/uadp_encoder.c`, `tests/unit/test_uadp_encoding.c`, `tests/unit/test_traceability_docs.c`, `docs/traceability/023-conformance-docs-subscriber.md` |
 | 6 | 5.2.2.17 | DataValue Encoding | `src/encoding/binary_datavalue.c` |
 | 6 | 5.2.5 | Array Encoding | `src/encoding/binary_reader.c`, `src/encoding/binary_writer.c` |
 | 6 | 5.2.9 | Message Body Encoding | `src/core/service_message.c` |
@@ -63,3 +63,14 @@ This document maps explicit OPC UA normative sections to implementation and test
 | 7 | 4.6 | Profile Definitions | |
 | 7 | 4.7 | Profile Versioning | |
 | 7 | 4.8 | Applications | |
+| 14 | 5.4.2.1 | PubSub Publisher component | `include/micro_opcua/pubsub.h`, `src/core/pubsub.c`, `docs/integration-guide.md` |
+| 14 | 5.4.2.2 | PubSub Subscriber component | `include/micro_opcua/pubsub.h`, `src/encoding/uadp_encoder.c`, `tests/unit/test_uadp_encoding.c` |
+| 14 | 5.4.6.2.2 | UADP WriterGroup message mapping | `src/core/pubsub.c`, `src/encoding/uadp_encoder.c`, `tests/unit/test_pubsub.c` |
+| 14 | 7.2.4.4.2 | UADP NetworkMessage layout | `include/micro_opcua/pubsub.h`, `src/encoding/uadp_encoder.c`, `tests/unit/test_uadp_encoding.c`, `tests/unit/test_traceability_docs.c`, `docs/traceability/023-conformance-docs-subscriber.md` |
+| 14 | 7.2.4.5.2 | UADP PayloadHeader | `include/micro_opcua/pubsub.h`, `src/encoding/uadp_encoder.c`, `tests/unit/test_uadp_encoding.c`, `tests/unit/test_traceability_docs.c`, `docs/traceability/023-conformance-docs-subscriber.md` |
+| 14 | 7.2.4.5.3 | DataSet payload | `src/encoding/uadp_encoder.c`, `tests/unit/test_uadp_encoding.c` |
+| 14 | 7.2.4.5.4 | DataSetMessage header | `src/encoding/uadp_encoder.c`, `tests/unit/test_uadp_encoding.c` |
+| 14 | 7.2.4.5.5 | Data Key Frame DataSetMessage | `include/micro_opcua/pubsub.h`, `src/encoding/uadp_encoder.c`, `tests/unit/test_uadp_encoding.c`, `tests/unit/test_traceability_docs.c`, `docs/traceability/023-conformance-docs-subscriber.md` |
+| 14 | 7.2.4.5.6 | Data Delta Frame DataSetMessage | `src/encoding/uadp_encoder.c`, `tests/unit/test_uadp_encoding.c` |
+| 14 | 7.2.4.5.7 | Event DataSetMessage | `src/encoding/uadp_encoder.c`, `tests/unit/test_uadp_encoding.c` |
+| 14 | 7.3.2.1 | UDP/UADP mapping | `include/micro_opcua/pubsub.h`, `src/core/pubsub.c`, `src/platform/host_udp_adapter.c`, `docs/integration-guide.md` |

@@ -10,8 +10,8 @@
 #                  OFF. Complete.
 #   make micro     Micro profile configuration — Nano + the data-change subscription
 #                  engine (MICRO_OPCUA_SUBSCRIPTIONS=ON: the Embedded Data Change
-#                  Subscription Server Facet). Distinct from nano. (Concurrent ≥2-session
-#                  support is the remaining Micro item.)
+#                  Subscription Server Facet). Distinct from nano, with bounded
+#                  multi-session capacity controlled by MU_MAX_SESSIONS.
 #   make embedded  Embedded profile configuration — Micro + Basic256Sha256,
 #                  Standard DataChange Subscription 2017 facet capacities, and
 #                  Base Info Type System exposure.
