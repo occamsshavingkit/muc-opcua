@@ -516,8 +516,8 @@ typedef struct {
 | `send_buffer_size` | `size_t` | Yes | Size of `send_buffer`. |
 | `max_chunk_count` | `opcua_uint32_t` | Yes | Max chunks per message (default suggestion: `MU_DEFAULT_MAX_CHUNK_COUNT`). |
 | `max_message_size` | `opcua_uint32_t` | Yes | Max assembled message size (default suggestion: `MU_DEFAULT_MAX_MESSAGE_SIZE`). |
-| `max_sessions` | `opcua_uint32_t` | Yes | Max concurrent sessions; bounded by `MU_MAX_SESSIONS`. |
-| `max_secure_channels` | `opcua_uint32_t` | Yes | Max concurrent secure channels; bounded by `MU_MAX_SECURE_CHANNELS`. |
+| `max_sessions` | `opcua_uint32_t` | Yes | Max concurrent sessions; rejected by `mu_server_config_validate` if it exceeds the compiled `MU_MAX_SESSIONS`. |
+| `max_secure_channels` | `opcua_uint32_t` | Yes | Max concurrent secure channels; rejected by `mu_server_config_validate` if it exceeds the compiled `MU_MAX_SECURE_CHANNELS`/`MU_MAX_CONNECTIONS`. |
 | `tcp_adapter` | `mu_tcp_adapter_t` | Yes | Networking adapter (by value). |
 | `time_adapter` | `mu_time_adapter_t` | Yes | Time/tick adapter (by value). |
 | `entropy_adapter` | `mu_entropy_adapter_t` | Yes | CSPRNG adapter (by value); needed for session nonces. |
@@ -1125,8 +1125,9 @@ embedded profiles; a few are fixed library constants. Feature toggles
 | `MU_MIN_CHUNK_SIZE` | `8192` | Minimum chunk size (OPC 10000-6 7.1.2.3/7.1.2.4). |
 | `MU_DEFAULT_MAX_CHUNK_COUNT` | `1` | Default `max_chunk_count`. |
 | `MU_DEFAULT_MAX_MESSAGE_SIZE` | `8192` | Default `max_message_size`. |
-| `MU_MAX_SESSIONS` | `2` | Max sessions (Nano profile bound). |
-| `MU_MAX_SECURE_CHANNELS` | `1` | Max secure channels. |
+| `MU_MAX_SESSIONS` | `2` | Max sessions (Micro profile requires >=2, `docs/conformance/profile-micro.md`). `#ifndef`-guarded; raise with `-DMU_MAX_SESSIONS=N`. |
+| `MU_MAX_CONNECTIONS` | `1` (`4` if `MUC_OPCUA_MULTIPLE_CONNECTIONS`) | Max concurrent TCP connections/secure channels. `#ifndef`-guarded; raise with `-DMU_MAX_CONNECTIONS=N`. |
+| `MU_MAX_SECURE_CHANNELS` | `1` | Alias of `MU_MAX_CONNECTIONS` (one secure channel per connection); kept as a separate macro for API stability. |
 | `MU_MAX_ENCODED_STRING_LENGTH` | `4096` | Upper bound on any String/ByteString on the wire (must fit the Hello EndpointUrl, which "shall be less than 4096 bytes"). |
 | `MU_MAX_STRING_VALUE_LENGTH` | `64` | Tighter limit for a bounded String *variable value* (UTF-8 bytes); enforced at the value-source layer, not on every wire string. |
 

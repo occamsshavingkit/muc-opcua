@@ -218,8 +218,13 @@ void test_connection_limits(void) {
 
     mu_server_config_t config;
     memset(&config, 0, sizeof(config));
-    config.max_sessions = 4;
-    config.max_secure_channels = 4;
+    /* This test only exercises TCP/connection-level multiplexing up to
+       MU_MAX_CONNECTIONS (4 sessions were never created here); max_sessions
+       only needs to be a value mu_server_config_validate() accepts, i.e. within
+       the compiled MU_MAX_SESSIONS ceiling, which is independent of connection
+       count (see config.h). */
+    config.max_sessions = MU_MAX_SESSIONS;
+    config.max_secure_channels = MU_MAX_CONNECTIONS;
     config.max_chunk_count = 1;
     config.max_message_size = 8192;
     config.endpoint_url = "opc.tcp://localhost:4840";

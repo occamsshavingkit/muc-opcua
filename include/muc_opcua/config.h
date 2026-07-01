@@ -47,10 +47,30 @@
 #define MU_DEFAULT_MAX_MESSAGE_SIZE 8192
 
 /**
- * @brief Default secure channel limits
+ * @brief Maximum concurrent TCP connections. Each connection owns exactly one
+ * SecureChannel (OPC 10000-6 7.1.2), so this is also the structural ceiling on
+ * concurrent secure channels -- see MU_MAX_SECURE_CHANNELS below. Overridable
+ * with -D independent of MUC_OPCUA_MULTIPLE_CONNECTIONS.
+ */
+#ifndef MU_MAX_CONNECTIONS
+#ifdef MUC_OPCUA_MULTIPLE_CONNECTIONS
+#define MU_MAX_CONNECTIONS 4
+#else
+#define MU_MAX_CONNECTIONS 1
+#endif
+#endif
+
+/**
+ * @brief Default secure channel limits. Kept as its own overridable macro for
+ * API stability, but structurally always equal to MU_MAX_CONNECTIONS -- one
+ * secure channel per connection, never more (see mu_connection_t in
+ * server_internal.h). Previously hardcoded to 2 independent of connection
+ * count, which did not match either the 1:1 structural reality or this
+ * project's own documentation (docs/architecture.md, docs/api-reference.md,
+ * docs/integration-guide.md all documented this as 1).
  */
 #ifndef MU_MAX_SECURE_CHANNELS
-#define MU_MAX_SECURE_CHANNELS 2
+#define MU_MAX_SECURE_CHANNELS MU_MAX_CONNECTIONS
 #endif
 
 /**
@@ -80,15 +100,15 @@
 #define MU_MAX_DYNAMIC_REFERENCE_STRING_NODEID_LENGTH MU_MAX_DYNAMIC_STRING_NODEID_LENGTH
 #endif
 
-/* Maximum number of sessions/channels for Nano profile */
+/**
+ * @brief Maximum concurrent Sessions. The Micro profile requires >=2 sessions
+ * (docs/conformance/profile-micro.md), multiplexed over as few as a single
+ * SecureChannel/connection -- so this floor is independent of
+ * MU_MAX_CONNECTIONS. Previously had no #ifndef guard, so it could not be
+ * raised with -D at all, unlike every other limit in this file.
+ */
+#ifndef MU_MAX_SESSIONS
 #define MU_MAX_SESSIONS 2
-
-#ifndef MU_MAX_CONNECTIONS
-#ifdef MUC_OPCUA_MULTIPLE_CONNECTIONS
-#define MU_MAX_CONNECTIONS 4
-#else
-#define MU_MAX_CONNECTIONS 1
-#endif
 #endif
 
 /* Per-connection stream reassembly buffer used when MUC_OPCUA_MULTIPLE_CONNECTIONS

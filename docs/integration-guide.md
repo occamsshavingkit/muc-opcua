@@ -889,7 +889,7 @@ opcua_statuscode_t mu_server_config_validate(const mu_server_config_t *config);
 | `receive_buffer` / `receive_buffer_size` | yes | `>= MU_MIN_CHUNK_SIZE` |
 | `send_buffer` / `send_buffer_size` | yes | `>= MU_MIN_CHUNK_SIZE` |
 | `max_chunk_count`, `max_message_size` | yes | Use `MU_DEFAULT_MAX_CHUNK_COUNT` (1), `MU_DEFAULT_MAX_MESSAGE_SIZE` (8192) |
-| `max_sessions`, `max_secure_channels` | yes | `MU_MAX_SESSIONS` (2), `MU_MAX_SECURE_CHANNELS` (1) |
+| `max_sessions`, `max_secure_channels` | yes | Must not exceed the compiled `MU_MAX_SESSIONS` (2) / `MU_MAX_SECURE_CHANNELS` (== `MU_MAX_CONNECTIONS`, 1) ceilings, or `mu_server_config_validate`/`mu_server_init` reject the config; see "Raising the concurrency limits" below |
 | `tcp_adapter`, `time_adapter`, `entropy_adapter` | yes | By value; fill before init |
 | `crypto_adapter` | no | `NULL` ⇒ None only; non-NULL ⇒ advertises all built security policies |
 | `trust_list` | no | Array of trusted peer certificates for strict authentication |
@@ -904,8 +904,28 @@ opcua_statuscode_t mu_server_config_validate(const mu_server_config_t *config);
 | `MU_MIN_CHUNK_SIZE` | 8192 | `config.h` |
 | `MU_DEFAULT_MAX_CHUNK_COUNT` | 1 | `config.h` |
 | `MU_DEFAULT_MAX_MESSAGE_SIZE` | 8192 | `config.h` |
-| `MU_MAX_SESSIONS` / `MU_MAX_SECURE_CHANNELS` | 2 / 1 | `config.h` |
+| `MU_MAX_SESSIONS` / `MU_MAX_SECURE_CHANNELS` / `MU_MAX_CONNECTIONS` | 2 / 1 / 1 | `config.h` |
 | `MU_SHA256_LENGTH` / `MU_AES_BLOCK_SIZE` / `MU_THUMBPRINT_LENGTH` | 32 / 16 / 20 | `platform.h` |
+
+### Raising the concurrency limits
+
+`MU_MAX_SESSIONS` and `MU_MAX_CONNECTIONS` are both `#ifndef`-guarded, so both can
+be raised with a `-D` flag (e.g. `-DMUC_OPCUA_MULTIPLE_CONNECTIONS -DMU_MAX_CONNECTIONS=8`).
+`MU_MAX_SECURE_CHANNELS` always equals `MU_MAX_CONNECTIONS` (one secure channel
+per connection) and does not need to be set independently. Two things to know
+before raising either:
+
+- `config.max_sessions`/`config.max_secure_channels` must not exceed the
+  compiled `MU_MAX_SESSIONS`/`MU_MAX_CONNECTIONS` — `mu_server_init` rejects
+  the config with `Bad_InternalError` otherwise, rather than silently
+  under-provisioning.
+- `MU_SERVER_STORAGE_BYTES` is a flat size calibrated for the **default**
+  limits; it does not automatically grow when you raise `MU_MAX_SESSIONS` or
+  `MU_MAX_CONNECTIONS`. If you raise either, over-allocate the storage buffer
+  passed to `mu_server_init` beyond `MU_SERVER_STORAGE_BYTES` (or size it from
+  a build with your actual flags) — `mu_server_init` returns
+  `Bad_OutOfMemory` cleanly if the buffer is too small, rather than
+  overflowing it.
 
 ### Related docs
 

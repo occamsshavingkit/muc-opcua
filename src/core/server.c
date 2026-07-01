@@ -33,8 +33,16 @@ opcua_statuscode_t mu_server_config_validate(const mu_server_config_t *config) {
         return MU_STATUS_BAD_INTERNALERROR;
     }
 
-    /* Validate limits */
-    if (config->max_sessions == 0 || config->max_secure_channels == 0) {
+    /* Validate limits. An upper bound isn't just belt-and-suspenders: without it
+       a caller requesting more sessions/channels than this build was compiled
+       for (MU_MAX_SESSIONS / MU_MAX_CONNECTIONS size the static sessions[]/
+       conns[] arrays) was previously accepted here and then silently capped at
+       the compiled size by CreateSession / the connection accept path, with no
+       indication the requested capacity was never actually available. */
+    if (config->max_sessions == 0 || config->max_sessions > MU_MAX_SESSIONS) {
+        return MU_STATUS_BAD_INTERNALERROR;
+    }
+    if (config->max_secure_channels == 0 || config->max_secure_channels > MU_MAX_CONNECTIONS) {
         return MU_STATUS_BAD_INTERNALERROR;
     }
     if (config->max_chunk_count == 0 || config->max_message_size < MU_MIN_CHUNK_SIZE) {
