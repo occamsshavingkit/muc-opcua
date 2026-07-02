@@ -85,6 +85,9 @@ typedef struct {
 
 static secure_fixture_t g_fixture;
 
+/* Intentionally included after the fixture types/g_fixture so the mock scaffolding
+   stays private to this test. */
+/* cppcheck-suppress misra-c2012-20.1 */
 #include "../support/user_auth_secure_e2e_helpers.h"
 
 static bool auth_username_matches(const mu_string_t *username, const mu_bytestring_t *password) {
@@ -131,6 +134,7 @@ static opcua_statuscode_t test_auth_handler(void *handle, const mu_string_t *use
     (void)policy_id;
 
     if (auth_username_matches(username, password)) {
+        /* cppcheck-suppress misra-c2012-15.5 */
         return MU_STATUS_GOOD;
     }
     if (auth_certificate_matches(fixture, username, password)) {
