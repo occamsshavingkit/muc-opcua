@@ -299,6 +299,11 @@ opcua_statuscode_t mu_history_update_request_decode(mu_binary_reader_t *reader, 
         s = mu_binary_read_int32(reader, &length);
         if (s != MU_STATUS_GOOD)
             return s;
+        /* OPC-10000-6 5.2.2.15: an ExtensionObject body length is a non-negative
+           Int32. Reject negatives so the later (size_t)length skip math cannot
+           wrap (matches binary_extension_object.c's convention). */
+        if (length < 0)
+            return MU_STATUS_BAD_DECODINGERROR;
 
         size_t start_pos = reader->position;
 

@@ -878,6 +878,31 @@ void test_history_update_decode(void) {
 #endif
 }
 
+/* Feature 025 (F11): a negative ExtensionObject body length must be rejected as a
+   decoding error, not used in (size_t) skip math. OPC-10000-6 §5.2.2.15. */
+void test_history_update_decode_rejects_negative_length(void) {
+#ifdef MUC_OPCUA_SERVICE_HISTORY
+    opcua_byte_t buf[64];
+    mu_binary_writer_t w;
+    mu_binary_writer_init(&w, buf, sizeof(buf));
+
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_write_int32(&w, 1)); /* 1 update detail */
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD,
+                      mu_binary_write_nodeid(
+                          &w, &(mu_nodeid_t){.namespace_index = 0,
+                                             .identifier_type = MU_NODEID_NUMERIC,
+                                             .identifier.numeric = MU_ID_UPDATEDATADETAILS_ENCODING_DEFAULTBINARY}));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_write_byte(&w, 0x01)); /* encoding mask = ByteString */
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_write_int32(&w, -1));  /* negative body length */
+
+    mu_binary_reader_t r;
+    mu_binary_reader_init(&r, buf, w.position);
+    mu_history_update_item_t items[2];
+    mu_history_update_request_t req;
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_BAD_DECODINGERROR, mu_history_update_request_decode(&r, &req, items, 2));
+#endif
+}
+
 void test_history_update_dispatch(void) {
 #ifdef MUC_OPCUA_SERVICE_HISTORY
     mu_history_adapter_t adapter;
@@ -1038,6 +1063,7 @@ int main(void) {
     RUN_TEST(test_history_read_dispatch);
     RUN_TEST(test_history_read_pagination);
     RUN_TEST(test_history_update_decode);
+    RUN_TEST(test_history_update_decode_rejects_negative_length);
     RUN_TEST(test_history_update_dispatch);
 #endif
     return UNITY_END();

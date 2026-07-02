@@ -71,6 +71,46 @@ void test_validate_none_policy_needs_no_cert(void) {
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_certificate_validate(&crypto, MU_SECURITY_POLICY_NONE_ID, NULL, 0));
 }
 
+/* OPC-10000-4 §5.5 (feature 025 F3): a secured policy MUST fail closed when the
+   backend cannot check certificate validity (no verify_certificate_validity hook)
+   rather than silently accepting an unchecked certificate. */
+void test_validate_fails_closed_without_validity_hook(void) {
+    const opcua_byte_t *cert = NULL;
+    size_t cert_len = 0;
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, crypto.get_own_certificate(crypto.context, &cert, &cert_len));
+    mu_crypto_adapter_t no_validity = crypto;
+    no_validity.verify_certificate_validity = NULL;
+    TEST_ASSERT_EQUAL(MU_STATUS_BAD_CERTIFICATEINVALID,
+                      mu_certificate_validate(&no_validity, MU_SECURITY_POLICY_BASIC256SHA256_ID, cert, cert_len));
+}
+
+/* A validity-hook result other than Good is propagated (e.g. an expired cert
+   surfaces as Bad_CertificateTimeInvalid). */
+static opcua_statuscode_t stub_validity_time_invalid(void *c, const opcua_byte_t *cert, size_t len) {
+    (void)c;
+    (void)cert;
+    (void)len;
+    return MU_STATUS_BAD_CERTIFICATETIMEINVALID;
+}
+
+void test_validate_propagates_expired_cert(void) {
+    const opcua_byte_t *cert = NULL;
+    size_t cert_len = 0;
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, crypto.get_own_certificate(crypto.context, &cert, &cert_len));
+    mu_crypto_adapter_t expired = crypto;
+    expired.verify_certificate_validity = stub_validity_time_invalid;
+    TEST_ASSERT_EQUAL(MU_STATUS_BAD_CERTIFICATETIMEINVALID,
+                      mu_certificate_validate(&expired, MU_SECURITY_POLICY_BASIC256SHA256_ID, cert, cert_len));
+}
+
+/* The real host backend reports its freshly generated self-signed cert as valid. */
+void test_validate_accepts_in_window_cert(void) {
+    const opcua_byte_t *cert = NULL;
+    size_t cert_len = 0;
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, crypto.get_own_certificate(crypto.context, &cert, &cert_len));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, crypto.verify_certificate_validity(crypto.context, cert, cert_len));
+}
+
 int main(void) {
     UNITY_BEGIN();
     RUN_TEST(test_thumbprint_is_sha1_of_der);
@@ -78,6 +118,9 @@ int main(void) {
     RUN_TEST(test_validate_rejects_garbage);
     RUN_TEST(test_validate_rejects_missing_cert_for_secure_policy);
     RUN_TEST(test_validate_none_policy_needs_no_cert);
+    RUN_TEST(test_validate_fails_closed_without_validity_hook);
+    RUN_TEST(test_validate_propagates_expired_cert);
+    RUN_TEST(test_validate_accepts_in_window_cert);
     return UNITY_END();
 }
 

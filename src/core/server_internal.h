@@ -84,6 +84,12 @@ struct mu_server {
     mu_bytestring_t opn_pending_client_cert;
 #ifdef MUC_OPCUA_SECURITY
     opcua_byte_t secure_scratch[MU_SECURE_SCRATCH_SIZE];
+    /* Persistent copy of the current SecureChannel's client application-instance
+       certificate, populated at OpenSecureChannel and used to verify the
+       ActivateSession ClientSignature (OPC-10000-4 §5.7.3). Needed because the OPN
+       sender certificate points into transient receive-buffer memory. */
+    opcua_byte_t channel_client_cert[MU_MAX_CLIENT_CERT_SIZE];
+    size_t channel_client_cert_len;
 #endif
     mu_session_t sessions[MU_MAX_SESSIONS];
     mu_session_t *active_session;

@@ -99,8 +99,16 @@ opcua_statuscode_t mu_content_filter_decode(mu_binary_reader_t *reader, mu_conte
                     operands[operand_index + j].type = MU_FILTEROPERAND_LITERAL;
                     status = mu_binary_read_variant(reader, &operands[operand_index + j].operand.literal.value);
                 } else {
-                    /* Unsupported operand */
+                    /* Unsupported operand: zero-initialize the slot so its type
+                       discriminator is never left uninitialized (the count still
+                       includes this slot), and bound the skip against the bytes
+                       actually remaining so a crafted length cannot over-advance
+                       the reader (OPC-10000-6 5.2.2.15). */
+                    operands[operand_index + j].type = MU_FILTEROPERAND_ELEMENT;
+                    operands[operand_index + j].operand.element.index = 0u;
                     if (len > 0) {
+                        if (len > reader->length - reader->position)
+                            return MU_STATUS_BAD_DECODINGERROR;
                         reader->position += len; /* Skip */
                     } else {
                         return MU_STATUS_BAD_NOTSUPPORTED;

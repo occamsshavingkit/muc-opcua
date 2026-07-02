@@ -146,7 +146,7 @@ static opcua_uint32_t parse_create_session_auth_token(mu_binary_reader_t *resp) 
     return auth_token.identifier.numeric;
 }
 
-static void run_handshake_for_policy(mu_security_policy_id_t policy_id) {
+static void run_handshake_for_policy(mu_security_policy_id_t policy_id, int tamper_signature) {
     mock_t mock;
     memset(&mock, 0, sizeof(mock));
 
@@ -258,6 +258,12 @@ static void run_handshake_for_policy(mu_security_policy_id_t policy_id) {
     config.tcp_adapter.shutdown = mock_shutdown;
     config.crypto_adapter = &server_crypto;
     config.address_space = &space;
+    /* Secured policies require a configured trust list (fail-closed). Trust the
+       test client's application-instance certificate. */
+    const opcua_byte_t *trusted_certs[1] = {client_cert};
+    const size_t trusted_lens[1] = {client_cert_len};
+    mu_trust_list_t trust = {trusted_certs, trusted_lens, 1};
+    config.trust_list = &trust;
 
     _Alignas(8) opcua_byte_t storage[MU_SERVER_STORAGE_BYTES];
     mu_server_t *server = NULL;
@@ -347,7 +353,35 @@ static void run_handshake_for_policy(mu_security_policy_id_t policy_id) {
                 MU_ID_CREATESESSIONRESPONSE, &resp);
     opcua_uint32_t session_auth_token = parse_create_session_auth_token(&resp);
 
-    /* ActivateSession (anonymous). */
+    /* The CreateSession response reader is now positioned at RevisedSessionTimeout,
+       followed by the session ServerNonce. Extract the nonce so the client can
+       produce a valid application ClientSignature over (serverCert || serverNonce)
+       for ActivateSession (OPC-10000-4 §5.7.3). */
+    opcua_uint64_t revised_bits;
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_uint64(&resp, &revised_bits));
+    mu_bytestring_t cs_server_nonce;
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_bytestring(&resp, &cs_server_nonce));
+    TEST_ASSERT_EQUAL(32, cs_server_nonce.length);
+    opcua_byte_t sess_nonce[32];
+    memcpy(sess_nonce, cs_server_nonce.data, 32);
+
+    static const char SIG_ALG[] = "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256";
+    opcua_byte_t to_sign[1536];
+    TEST_ASSERT_TRUE(server_cert_len + 32 <= sizeof(to_sign));
+    memcpy(to_sign, server_cert, server_cert_len);
+    memcpy(to_sign + server_cert_len, sess_nonce, 32);
+    opcua_byte_t client_sig[512];
+    size_t client_sig_len = sizeof(client_sig);
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, client_crypto.rsa_sha256_sign(client_crypto.context, to_sign,
+                                                                    server_cert_len + 32, client_sig, &client_sig_len));
+
+    /* Negative path: corrupt the signature so verification must fail
+       (OPC-10000-4 §5.7.3 — the server must reject an unproven activation). */
+    if (tamper_signature && client_sig_len > 0) {
+        client_sig[0] ^= 0xFFu;
+    }
+
+    /* ActivateSession (anonymous, with a valid application ClientSignature). */
     mu_binary_writer_init(&w, tmp, sizeof(tmp));
     {
         mu_nodeid_t t = {0, MU_NODEID_NUMERIC, {MU_ID_ACTIVATESESSIONREQUEST}};
@@ -355,10 +389,10 @@ static void run_handshake_for_policy(mu_security_policy_id_t policy_id) {
     }
     write_request_header(&w, session_auth_token, 4);
     {
-        mu_string_t ns = {-1, NULL};
-        mu_bytestring_t nb = {-1, NULL};
-        mu_binary_write_string(&w, &ns);
-        mu_binary_write_bytestring(&w, &nb);
+        mu_string_t sig_alg = {(opcua_int32_t)(sizeof(SIG_ALG) - 1), (const opcua_byte_t *)SIG_ALG};
+        mu_bytestring_t sig_bs = {(opcua_int32_t)client_sig_len, client_sig};
+        mu_binary_write_string(&w, &sig_alg);
+        mu_binary_write_bytestring(&w, &sig_bs);
         mu_binary_write_int32(&w, 0);
         mu_binary_write_int32(&w, 0);
         mu_nodeid_t anon = {0, MU_NODEID_NUMERIC, {321}};
@@ -386,10 +420,13 @@ static void run_handshake_for_policy(mu_security_policy_id_t policy_id) {
         mu_binary_write_uint16(&w, 0);
         mu_binary_write_string(&w, &ns);
     }
-    secure_call(&mock, server, &client_crypto, &c2s, &s2c, scid, token_id, 5, tmp, w.position, MU_ID_READRESPONSE,
-                &resp);
+    /* When the ClientSignature was tampered, activation must have failed, so a
+       subsequent Read on the (still unactivated) session is answered with a
+       ServiceFault rather than a ReadResponse. */
+    secure_call(&mock, server, &client_crypto, &c2s, &s2c, scid, token_id, 5, tmp, w.position,
+                tamper_signature ? MU_ID_SERVICEFAULT : MU_ID_READRESPONSE, &resp);
 
-    {
+    if (!tamper_signature) {
         opcua_int32_t nres;
         mu_binary_read_int32(&resp, &nres);
         TEST_ASSERT_EQUAL(1, nres);
@@ -410,17 +447,24 @@ static void run_handshake_for_policy(mu_security_policy_id_t policy_id) {
 }
 
 void test_secure_handshake_aes128_oaep(void) {
-    run_handshake_for_policy(MU_SECURITY_POLICY_AES128_SHA256_RSAOAEP_ID);
+    run_handshake_for_policy(MU_SECURITY_POLICY_AES128_SHA256_RSAOAEP_ID, 0);
 }
 
 void test_secure_handshake_aes256_pss(void) {
-    run_handshake_for_policy(MU_SECURITY_POLICY_AES256_SHA256_RSAPSS_ID);
+    run_handshake_for_policy(MU_SECURITY_POLICY_AES256_SHA256_RSAPSS_ID, 0);
+}
+
+/* OPC-10000-4 §5.7.3/§7.38.2: a bad application ClientSignature must block
+   activation on a secured channel. */
+void test_secure_handshake_rejects_tampered_signature(void) {
+    run_handshake_for_policy(MU_SECURITY_POLICY_AES128_SHA256_RSAOAEP_ID, 1);
 }
 
 int main(void) {
     UNITY_BEGIN();
     RUN_TEST(test_secure_handshake_aes128_oaep);
     RUN_TEST(test_secure_handshake_aes256_pss);
+    RUN_TEST(test_secure_handshake_rejects_tampered_signature);
     return UNITY_END();
 }
 

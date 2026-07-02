@@ -370,6 +370,22 @@ static opcua_statuscode_t m_get_certificate_key_bits(void *context, const opcua_
     return MU_STATUS_GOOD;
 }
 
+static opcua_statuscode_t m_verify_certificate_validity(void *context, const opcua_byte_t *certificate,
+                                                        size_t certificate_length) {
+    (void)context;
+    mbedtls_x509_crt crt;
+    mbedtls_x509_crt_init(&crt);
+    int ret = mbedtls_x509_crt_parse_der(&crt, certificate, certificate_length);
+    if (ret != 0) {
+        mbedtls_x509_crt_free(&crt);
+        return MU_STATUS_BAD_CERTIFICATEINVALID;
+    }
+    /* OPC-10000-4 §5.5: reject not-yet-valid or expired certificates. */
+    int invalid = mbedtls_x509_time_is_future(&crt.valid_from) || mbedtls_x509_time_is_past(&crt.valid_to);
+    mbedtls_x509_crt_free(&crt);
+    return invalid ? MU_STATUS_BAD_CERTIFICATETIMEINVALID : MU_STATUS_GOOD;
+}
+
 static opcua_statuscode_t m_get_certificate_thumbprint(void *context, const opcua_byte_t *certificate,
                                                        size_t certificate_length, opcua_byte_t *thumbprint) {
     (void)context;
@@ -421,6 +437,7 @@ opcua_statuscode_t mu_mbedtls_crypto_adapter_init(mu_crypto_adapter_t *adapter, 
     adapter->get_own_certificate = m_get_own_certificate;
     adapter->get_certificate_key_bits = m_get_certificate_key_bits;
     adapter->get_certificate_thumbprint = m_get_certificate_thumbprint;
+    adapter->verify_certificate_validity = m_verify_certificate_validity;
 
     return MU_STATUS_GOOD;
 }

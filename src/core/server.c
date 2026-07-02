@@ -70,6 +70,15 @@ opcua_statuscode_t mu_server_config_validate(const mu_server_config_t *config) {
         if (status != MU_STATUS_GOOD) {
             return status;
         }
+        /* Feature 025 (F6): the user address-space sort index is a fixed
+           order[MU_MAX_ADDRESS_SPACE_NODES] array. A larger space previously fell
+           back to a silent O(n) linear scan AND made Query return nothing. Fail
+           loudly at init instead (Constitution §VII: predictable failure over
+           ambiguous degradation). Integrators needing more must raise
+           MU_MAX_ADDRESS_SPACE_NODES, which resizes the index storage. */
+        if (config->address_space->node_count > MU_MAX_ADDRESS_SPACE_NODES) {
+            return MU_STATUS_BAD_INTERNALERROR;
+        }
     }
 
     return MU_STATUS_GOOD;

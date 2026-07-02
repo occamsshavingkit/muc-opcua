@@ -30,6 +30,35 @@ void test_content_filter_decode(void) {
     TEST_ASSERT_EQUAL_UINT32(0, filter.elements_count);
 }
 
+/* Feature 025 (F11): an unsupported filter operand whose declared ExtensionObject
+   body length exceeds the bytes actually remaining must be rejected, not skipped
+   past the end of the buffer. OPC-10000-6 §5.2.2.15. */
+void test_content_filter_rejects_unsupported_operand_oversized_length(void) {
+    opcua_byte_t buf[64];
+    mu_binary_writer_t w;
+    mu_binary_writer_init(&w, buf, sizeof(buf));
+
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_write_uint32(&w, 1)); /* 1 element */
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_write_uint32(&w, 0)); /* filter operator */
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_write_uint32(&w, 1)); /* 1 operand */
+    /* Operand ExtensionObject: unsupported typeId (not 594/597), ByteString body
+       claiming far more bytes than remain in the buffer. */
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_write_nodeid(&w, &(mu_nodeid_t){.namespace_index = 0,
+                                                                                .identifier_type = MU_NODEID_NUMERIC,
+                                                                                .identifier.numeric = 999}));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_write_byte(&w, 0x01));  /* encoding = ByteString */
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_write_int32(&w, 1000)); /* body length >> remaining */
+
+    mu_binary_reader_t reader;
+    mu_binary_reader_init(&reader, buf, w.position);
+
+    mu_content_filter_t filter;
+    mu_content_filter_element_t elements[1];
+    mu_filter_operand_t operands[1];
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_BAD_DECODINGERROR,
+                            mu_content_filter_decode(&reader, &filter, elements, 1, operands, 1));
+}
+
 void test_query_next_request_decode(void) {
     opcua_byte_t buf[] = {
         0x01,                                      /* release_continuation_point = true */
@@ -52,6 +81,7 @@ int main(void) {
     UNITY_BEGIN();
 #ifdef MUC_OPCUA_SERVICE_QUERY
     RUN_TEST(test_content_filter_decode);
+    RUN_TEST(test_content_filter_rejects_unsupported_operand_oversized_length);
     RUN_TEST(test_query_next_request_decode);
 #endif
     return UNITY_END();

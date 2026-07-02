@@ -176,6 +176,15 @@ typedef struct mu_crypto_adapter {
        (MU_THUMBPRINT_LENGTH bytes). */
     opcua_statuscode_t (*get_certificate_thumbprint)(void *context, const opcua_byte_t *certificate,
                                                      size_t certificate_length, opcua_byte_t *thumbprint);
+
+    /* Certificate validity period (OPC-10000-4 §5.5): MU_STATUS_GOOD when the
+       current time is within [notBefore, notAfter] of the DER certificate,
+       MU_STATUS_BAD_CERTIFICATETIMEINVALID when expired or not yet valid, or
+       MU_STATUS_BAD_CERTIFICATEINVALID when unparseable. OPTIONAL: a NULL pointer
+       means the backend cannot check validity, in which case secured policies MUST
+       fail closed (see mu_certificate_validate). */
+    opcua_statuscode_t (*verify_certificate_validity)(void *context, const opcua_byte_t *certificate,
+                                                      size_t certificate_length);
 } mu_crypto_adapter_t;
 
 opcua_statuscode_t mu_mbedtls_crypto_adapter_init(mu_crypto_adapter_t *adapter, const opcua_byte_t *cert_der,

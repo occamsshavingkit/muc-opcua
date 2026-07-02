@@ -361,6 +361,24 @@ static opcua_statuscode_t h_get_certificate_key_bits(void *c, const opcua_byte_t
     return MU_STATUS_GOOD;
 }
 
+static opcua_statuscode_t h_verify_certificate_validity(void *c, const opcua_byte_t *cert, size_t cert_len) {
+    (void)c;
+    const unsigned char *p = cert;
+    X509 *x = d2i_X509(NULL, &p, (long)cert_len);
+    if (!x)
+        return MU_STATUS_BAD_CERTIFICATEINVALID;
+    /* X509_cmp_time(t, NULL) compares against the current time: <0 if t is in the
+       past, >0 if in the future. notBefore must be past, notAfter must be future. */
+    int not_before = X509_cmp_time(X509_get0_notBefore(x), NULL);
+    int not_after = X509_cmp_time(X509_get0_notAfter(x), NULL);
+    X509_free(x);
+    if (not_before == 0 || not_after == 0)
+        return MU_STATUS_BAD_CERTIFICATEINVALID; /* unparseable time field */
+    if (not_before > 0 || not_after < 0)
+        return MU_STATUS_BAD_CERTIFICATETIMEINVALID; /* not yet valid, or expired */
+    return MU_STATUS_GOOD;
+}
+
 static opcua_statuscode_t h_get_certificate_thumbprint(void *c, const opcua_byte_t *cert, size_t cert_len,
                                                        opcua_byte_t *thumbprint) {
     (void)c;
@@ -443,6 +461,7 @@ opcua_statuscode_t mu_host_crypto_adapter_init(mu_crypto_adapter_t *adapter) {
     adapter->get_own_certificate = h_get_own_certificate;
     adapter->get_certificate_key_bits = h_get_certificate_key_bits;
     adapter->get_certificate_thumbprint = h_get_certificate_thumbprint;
+    adapter->verify_certificate_validity = h_verify_certificate_validity;
     return MU_STATUS_GOOD;
 }
 

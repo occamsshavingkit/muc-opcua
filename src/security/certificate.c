@@ -36,5 +36,17 @@ opcua_statuscode_t mu_certificate_validate(const mu_crypto_adapter_t *crypto, mu
     if (bits < MU_B256S256_MIN_ASYMMETRIC_KEY_BITS || bits > MU_B256S256_MAX_ASYMMETRIC_KEY_BITS) {
         return MU_STATUS_BAD_SECURITYCHECKSFAILED;
     }
+
+    /* OPC-10000-4 §5.5: a secured policy MUST reject expired / not-yet-valid
+       certificates. Fail closed when the backend cannot check validity — a
+       missing hook must not silently skip the check. */
+    if (crypto->verify_certificate_validity == NULL) {
+        return MU_STATUS_BAD_CERTIFICATEINVALID;
+    }
+    opcua_statuscode_t vs = crypto->verify_certificate_validity(crypto->context, certificate, length);
+    if (vs != MU_STATUS_GOOD) {
+        return vs;
+    }
+
     return MU_STATUS_GOOD;
 }

@@ -365,6 +365,32 @@ static opcua_statuscode_t w_get_certificate_key_bits(void *context, const opcua_
     return MU_STATUS_GOOD;
 }
 
+static opcua_statuscode_t w_verify_certificate_validity(void *context, const opcua_byte_t *certificate,
+                                                        size_t certificate_length) {
+    (void)context;
+    /* ParseCert with the VERIFY flag runs wolfSSL's notBefore/notAfter date
+       validation (OPC-10000-4 §5.5); with a NULL CertificateManager it does not
+       attempt CA chain verification. */
+    DecodedCert decoded;
+    InitDecodedCert(&decoded, certificate, (word32)certificate_length, NULL);
+    int ret = ParseCert(&decoded, CERT_TYPE, VERIFY, NULL);
+    FreeDecodedCert(&decoded);
+    if (ret == 0) {
+        return MU_STATUS_GOOD;
+    }
+#ifdef ASN_BEFORE_DATE_E
+    if (ret == ASN_BEFORE_DATE_E) {
+        return MU_STATUS_BAD_CERTIFICATETIMEINVALID;
+    }
+#endif
+#ifdef ASN_AFTER_DATE_E
+    if (ret == ASN_AFTER_DATE_E) {
+        return MU_STATUS_BAD_CERTIFICATETIMEINVALID;
+    }
+#endif
+    return MU_STATUS_BAD_CERTIFICATEINVALID;
+}
+
 static opcua_statuscode_t w_get_certificate_thumbprint(void *context, const opcua_byte_t *certificate,
                                                        size_t certificate_length, opcua_byte_t *thumbprint) {
     (void)context;
@@ -443,6 +469,7 @@ opcua_statuscode_t mu_wolfssl_crypto_adapter_init(mu_crypto_adapter_t *adapter, 
     adapter->get_own_certificate = w_get_own_certificate;
     adapter->get_certificate_key_bits = w_get_certificate_key_bits;
     adapter->get_certificate_thumbprint = w_get_certificate_thumbprint;
+    adapter->verify_certificate_validity = w_verify_certificate_validity;
 
     return MU_STATUS_GOOD;
 }

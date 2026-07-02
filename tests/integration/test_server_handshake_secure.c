@@ -252,6 +252,12 @@ void test_secure_handshake_read(void) {
     config.tcp_adapter.shutdown = mock_shutdown;
     config.crypto_adapter = &server_crypto;
     config.address_space = &space;
+    /* Secured policies require a configured trust list (fail-closed). Trust the
+       test client's application-instance certificate. */
+    const opcua_byte_t *trusted_certs[1] = {client_cert};
+    const size_t trusted_lens[1] = {client_cert_len};
+    mu_trust_list_t trust = {trusted_certs, trusted_lens, 1};
+    config.trust_list = &trust;
 
     _Alignas(8) opcua_byte_t storage[MU_SERVER_STORAGE_BYTES];
     mu_server_t *server = NULL;
@@ -343,7 +349,33 @@ void test_secure_handshake_read(void) {
     secure_call(&mock, server, &client_crypto, &c2s, &s2c, scid, token_id, 3, tmp, w.position,
                 MU_ID_CREATESESSIONRESPONSE, &resp);
 
-    /* ActivateSession (anonymous). */
+    /* Read SessionId, AuthenticationToken, RevisedSessionTimeout, then the session
+       ServerNonce from the CreateSession response so the client can sign
+       (serverCert || serverNonce) for ActivateSession (OPC-10000-4 §5.7.3). */
+    {
+        mu_nodeid_t cs_sid, cs_tok;
+        opcua_uint64_t cs_revised;
+        TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_nodeid(&resp, &cs_sid));
+        TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_nodeid(&resp, &cs_tok));
+        TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_uint64(&resp, &cs_revised));
+    }
+    mu_bytestring_t cs_server_nonce;
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_bytestring(&resp, &cs_server_nonce));
+    TEST_ASSERT_EQUAL(32, cs_server_nonce.length);
+    opcua_byte_t sess_nonce[32];
+    memcpy(sess_nonce, cs_server_nonce.data, 32);
+
+    static const char SIG_ALG[] = "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256";
+    opcua_byte_t to_sign[1536];
+    TEST_ASSERT_TRUE(server_cert_len + 32 <= sizeof(to_sign));
+    memcpy(to_sign, server_cert, server_cert_len);
+    memcpy(to_sign + server_cert_len, sess_nonce, 32);
+    opcua_byte_t client_sig[512];
+    size_t client_sig_len = sizeof(client_sig);
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, client_crypto.rsa_sha256_sign(client_crypto.context, to_sign,
+                                                                    server_cert_len + 32, client_sig, &client_sig_len));
+
+    /* ActivateSession (anonymous, with a valid application ClientSignature). */
     mu_binary_writer_init(&w, tmp, sizeof(tmp));
     {
         mu_nodeid_t t = {0, MU_NODEID_NUMERIC, {MU_ID_ACTIVATESESSIONREQUEST}};
@@ -351,10 +383,10 @@ void test_secure_handshake_read(void) {
     }
     write_request_header(&w, TEST_FAKE_FIRST_AUTH_TOKEN, 4);
     {
-        mu_string_t ns = {-1, NULL};
-        mu_bytestring_t nb = {-1, NULL};
-        mu_binary_write_string(&w, &ns);
-        mu_binary_write_bytestring(&w, &nb);
+        mu_string_t sig_alg = {(opcua_int32_t)(sizeof(SIG_ALG) - 1), (const opcua_byte_t *)SIG_ALG};
+        mu_bytestring_t sig_bs = {(opcua_int32_t)client_sig_len, client_sig};
+        mu_binary_write_string(&w, &sig_alg);
+        mu_binary_write_bytestring(&w, &sig_bs);
         mu_binary_write_int32(&w, 0);
         mu_binary_write_int32(&w, 0);
         mu_nodeid_t anon = {0, MU_NODEID_NUMERIC, {321}};

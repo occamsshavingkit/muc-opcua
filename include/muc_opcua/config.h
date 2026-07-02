@@ -4,6 +4,9 @@
 
 #include <stddef.h>
 
+/* Feature 025 (F9): reject illegal feature-gate combinations at compile time. */
+#include "muc_opcua/features.h"
+
 /* Optimization-remediation compile-time knobs.
  * Defaults are intentionally overridable with -D for embedded profiles. */
 
@@ -28,6 +31,16 @@
  * OPN scratch, replacing respbody[5120] + opn_buf[1024] stack buffers. */
 #ifndef MU_SECURE_SCRATCH_SIZE
 #define MU_SECURE_SCRATCH_SIZE 12288
+#endif
+
+/* Feature 025 (F2/F5): persistent copy of the current SecureChannel's client
+ * application-instance certificate, retained for the channel lifetime so the
+ * ActivateSession ClientSignature can be verified (OPC-10000-4 §5.7.3). The OPN
+ * sender certificate otherwise points into transient receive-buffer memory that
+ * is gone by ActivateSession time. Sized for an RSA-4096 app-instance cert, and
+ * only present in MUC_OPCUA_SECURITY builds. */
+#ifndef MU_MAX_CLIENT_CERT_SIZE
+#define MU_MAX_CLIENT_CERT_SIZE 1600
 #endif
 
 /* Issue #197: the address-space lookup index now lives in struct mu_server
@@ -145,13 +158,24 @@
 #ifdef MUC_OPCUA_SECURITY
 /* secure_scratch + the two per-direction prepared cipher contexts that now live in
  * client_keys/server_keys (mu_sym_keys_t.cipher_ctx, 2 x MU_CIPHER_CTX_SIZE). */
-#define MU_SERVER_SECURITY_STORAGE_BYTES (MU_SECURE_SCRATCH_SIZE + 2 * MU_CIPHER_CTX_SIZE)
+#define MU_SERVER_SECURITY_STORAGE_BYTES (MU_SECURE_SCRATCH_SIZE + 2 * MU_CIPHER_CTX_SIZE + MU_MAX_CLIENT_CERT_SIZE)
 #else
 #define MU_SERVER_SECURITY_STORAGE_BYTES 0
 #endif
 
+/* Feature 025 (T038): single definition of every storage sub-total. Each macro
+ * already evaluates to 0 when its feature is disabled, so MU_SERVER_STORAGE_BYTES
+ * needs only one form. The base constant is the sole thing that differs between a
+ * subscription-capable server (3072, adds the fixed subscription/MonitoredItem/
+ * parked-Publish arrays) and a non-subscription server (1024). Previously the two
+ * arms duplicated every sub-total macro, which invited drift. */
 #ifdef MUC_OPCUA_SUBSCRIPTIONS
-#if MUC_OPCUA_SUBSCRIPTIONS_STANDARD
+#define MU_SERVER_STORAGE_BASE_BYTES 3072
+#else
+#define MU_SERVER_STORAGE_BASE_BYTES 1024
+#endif
+
+#if defined(MUC_OPCUA_SUBSCRIPTIONS) && MUC_OPCUA_SUBSCRIPTIONS_STANDARD
 /* src/services/subscription.h is the canonical definer for these capacities.
  * These fallbacks must match its defaults so caller-storage sizing is correct
  * even when subscription.h is not included first. Because both files use
@@ -165,7 +189,6 @@
 #ifndef MU_MAX_TRIGGER_LINKS
 #define MU_MAX_TRIGGER_LINKS 4
 #endif
-
 /* OPC-10000-7 §6.6.17 Standard DataChange Subscription storage; zero unless
  * the Standard facet is enabled. */
 #define MU_SUBSCRIPTIONS_STANDARD_STORAGE_BYTES                                                                        \
@@ -224,50 +247,9 @@
 #endif
 
 #define MU_SERVER_STORAGE_BYTES                                                                                        \
-    (3072 + MU_SUBSCRIPTIONS_STANDARD_STORAGE_BYTES + MU_SERVER_SECURITY_STORAGE_BYTES +                               \
+    (MU_SERVER_STORAGE_BASE_BYTES + MU_SUBSCRIPTIONS_STANDARD_STORAGE_BYTES + MU_SERVER_SECURITY_STORAGE_BYTES +       \
      MU_ADDRESS_SPACE_INDEX_STORAGE_BYTES + MU_MULTIPLE_CONNECTIONS_STORAGE_BYTES + MU_EVENTS_STORAGE_BYTES +          \
      MU_PUBSUB_STORAGE_BYTES + MU_NODEMANAGEMENT_STORAGE_BYTES + MU_QUERY_STORAGE_BYTES +                              \
      MU_ALARMS_CONDITIONS_STORAGE_BYTES)
-#else
-#ifdef MUC_OPCUA_MULTIPLE_CONNECTIONS
-#define MU_MULTIPLE_CONNECTIONS_STORAGE_BYTES                                                                          \
-    (MU_MAX_CONNECTIONS * (MU_CONNECTION_RX_BUFFER_SIZE + MU_CONNECTION_BASE_STORAGE_BYTES))
-#else
-#define MU_MULTIPLE_CONNECTIONS_STORAGE_BYTES 0
-#endif
-#ifdef MUC_OPCUA_PUBSUB
-#define MU_PUBSUB_STORAGE_BYTES 100
-#else
-#define MU_PUBSUB_STORAGE_BYTES 0
-#endif
-#ifdef MUC_OPCUA_SERVICE_NODEMANAGEMENT
-#define MU_NODEMANAGEMENT_STORAGE_BYTES                                                                                \
-    (MU_MAX_DYNAMIC_NODES * (96 + MU_MAX_DYNAMIC_BROWSE_NAME_LENGTH + MU_MAX_DYNAMIC_DISPLAY_NAME_LENGTH +             \
-                             MU_MAX_DYNAMIC_STRING_NODEID_LENGTH) +                                                    \
-     MU_MAX_DYNAMIC_REFERENCES * (88 + 3 * MU_MAX_DYNAMIC_REFERENCE_STRING_NODEID_LENGTH) + 128)
-#else
-#define MU_NODEMANAGEMENT_STORAGE_BYTES 0
-#endif
-#ifdef MUC_OPCUA_SERVICE_QUERY
-#ifndef MU_MAX_QUERY_CONTINUATION_POINTS
-#define MU_MAX_QUERY_CONTINUATION_POINTS 2
-#endif
-#define MU_QUERY_STORAGE_BYTES (MU_MAX_QUERY_CONTINUATION_POINTS * 16 + 64)
-#else
-#define MU_QUERY_STORAGE_BYTES 0
-#endif
-#ifdef MUC_OPCUA_SERVICE_ALARMS_CONDITIONS
-#ifndef MU_MAX_CONDITIONS
-#define MU_MAX_CONDITIONS 10
-#endif
-#define MU_ALARMS_CONDITIONS_STORAGE_BYTES (MU_MAX_CONDITIONS * 32)
-#else
-#define MU_ALARMS_CONDITIONS_STORAGE_BYTES 0
-#endif
-#define MU_SERVER_STORAGE_BYTES                                                                                        \
-    (1024 + MU_SERVER_SECURITY_STORAGE_BYTES + MU_ADDRESS_SPACE_INDEX_STORAGE_BYTES +                                  \
-     MU_MULTIPLE_CONNECTIONS_STORAGE_BYTES + MU_PUBSUB_STORAGE_BYTES + MU_NODEMANAGEMENT_STORAGE_BYTES +               \
-     MU_QUERY_STORAGE_BYTES + MU_ALARMS_CONDITIONS_STORAGE_BYTES)
-#endif
 
 #endif /* MUC_OPCUA_CONFIG_H */

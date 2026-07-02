@@ -43,7 +43,10 @@ opcua_boolean_t ref_type_is_subtype_of(const mu_nodeid_t *child, const mu_nodeid
         return false;
     opcua_uint32_t c = child->identifier.numeric;
     opcua_uint32_t p = parent->identifier.numeric;
-    while (c != 0) {
+    /* The supertype table is static and acyclic, so this climb terminates. The
+       iteration bound is defense-in-depth: a future edit that introduced a cycle
+       would otherwise hang. 64 far exceeds the ReferenceType hierarchy depth. */
+    for (int guard = 0; c != 0 && guard < 64; ++guard) {
         c = ref_type_supertype(c);
         if (c == p)
             return true;

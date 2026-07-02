@@ -334,10 +334,23 @@ void mu_service_dispatch_set_opn_client_cert(mu_server_t *server, const mu_bytes
     if (client_cert == NULL) {
         server->opn_pending_client_cert.length = -1;
         server->opn_pending_client_cert.data = NULL;
+        /* Keep the persistent per-channel copy (channel_client_cert): it must
+           outlive OPN so ActivateSession can verify the ClientSignature. */
         return;
     }
 
     server->opn_pending_client_cert = *client_cert;
+#ifdef MUC_OPCUA_SECURITY
+    /* Persist a copy of the client application-instance certificate for the
+       channel lifetime (OPC-10000-4 §5.7.3 ActivateSession ClientSignature). */
+    if (client_cert->length > 0 && client_cert->data != NULL &&
+        (size_t)client_cert->length <= sizeof(server->channel_client_cert)) {
+        memcpy(server->channel_client_cert, client_cert->data, (size_t)client_cert->length);
+        server->channel_client_cert_len = (size_t)client_cert->length;
+    } else {
+        server->channel_client_cert_len = 0;
+    }
+#endif
 }
 
 #ifdef MUC_OPCUA_SECURITY
@@ -346,6 +359,49 @@ static const mu_bytestring_t *current_opn_client_cert(const mu_server_t *server)
         return NULL;
     }
     return &server->opn_pending_client_cert;
+}
+
+/* OPC-10000-4 §5.7.3 / §7.38.2: on a Sign or SignAndEncrypt SecureChannel the
+   client MUST prove possession of its application-instance private key by signing
+   (serverCertificate || serverNonce) with RSA-SHA256. The server verifies that
+   ClientSignature against the certificate the client presented when it opened the
+   SecureChannel, which binds activation to the fresh per-session ServerNonce
+   (anti-replay). SecurityPolicy None carries a null signature and is exempt. */
+static opcua_statuscode_t verify_activate_client_signature(mu_server_t *server, const mu_session_t *slot,
+                                                           const mu_bytestring_t *signature) {
+    if (server_secure_channel.policy == MU_SECURITY_POLICY_NONE_ID ||
+        server_secure_channel.policy == MU_SECURITY_POLICY_INVALID_ID) {
+        return MU_STATUS_GOOD; /* None: no ClientSignature required */
+    }
+    const mu_crypto_adapter_t *cr = server->config.crypto_adapter;
+    if (cr == NULL || cr->get_own_certificate == NULL || cr->rsa_sha256_verify == NULL) {
+        return MU_STATUS_BAD_SECURITYCHECKSFAILED;
+    }
+    if (signature == NULL || signature->length <= 0 || signature->data == NULL) {
+        return MU_STATUS_BAD_SECURITYCHECKSFAILED;
+    }
+    /* The client's application-instance certificate, persisted from OpenSecureChannel
+       (the OPN sender cert points into transient receive-buffer memory). */
+    if (server->channel_client_cert_len == 0) {
+        return MU_STATUS_BAD_SECURITYCHECKSFAILED;
+    }
+    const opcua_byte_t *own_cert = NULL;
+    size_t own_cert_len = 0;
+    if (cr->get_own_certificate(cr->context, &own_cert, &own_cert_len) != MU_STATUS_GOOD) {
+        return MU_STATUS_BAD_SECURITYCHECKSFAILED;
+    }
+    /* verify_data = serverCertificate || serverNonce (sized as the existing
+       user-token verify path: server cert plus the 32-byte nonce). */
+    opcua_byte_t verify_buf[1536];
+    if (own_cert_len + sizeof(slot->server_nonce) > sizeof(verify_buf)) {
+        return MU_STATUS_BAD_SECURITYCHECKSFAILED;
+    }
+    memcpy(verify_buf, own_cert, own_cert_len);
+    memcpy(verify_buf + own_cert_len, slot->server_nonce, sizeof(slot->server_nonce));
+    opcua_statuscode_t vs =
+        cr->rsa_sha256_verify(cr->context, server->channel_client_cert, server->channel_client_cert_len, verify_buf,
+                              own_cert_len + sizeof(slot->server_nonce), signature->data, (size_t)signature->length);
+    return (vs == MU_STATUS_GOOD) ? MU_STATUS_GOOD : MU_STATUS_BAD_SECURITYCHECKSFAILED;
 }
 #endif
 
@@ -486,28 +542,34 @@ static opcua_statuscode_t handle_open_secure_channel(mu_server_t *server, mu_bin
         return MU_STATUS_BAD_SECURITYCHECKSFAILED;
     }
 
-#ifdef MUC_OPCUA_SECURITY
-    if (server->config.trust_list != NULL && current_opn_security_policy(server) != NULL) {
-        /* TrustList validation is required when security is not None */
-        mu_security_policy_id_t requested_policy = mu_security_policy_from_uri(
-            current_opn_security_policy(server)->data, (size_t)current_opn_security_policy(server)->length);
-        if (requested_policy != MU_SECURITY_POLICY_NONE_ID && requested_policy != MU_SECURITY_POLICY_INVALID_ID) {
-            const mu_bytestring_t *client_cert = current_opn_client_cert(server);
-            if (client_cert == NULL || client_cert->length <= 0) {
-                return MU_STATUS_BAD_SECURITYCHECKSFAILED;
-            }
-            if (mu_trust_list_match(server->config.trust_list, client_cert->data, (size_t)client_cert->length) !=
-                MU_STATUS_GOOD) {
-                return MU_STATUS_BAD_SECURITYCHECKSFAILED;
-            }
-        }
-    }
-#endif
-
     s = mu_secure_channel_open(&server_secure_channel, current_opn_security_policy(server),
                                (mu_message_security_mode_t)security_mode, requested_lifetime, &revised);
     if (s != MU_STATUS_GOOD)
         return s;
+
+#ifdef MUC_OPCUA_SECURITY
+    /* The channel opened as a supported policy; now enforce application
+       authentication. This runs AFTER mu_secure_channel_open so an unsupported
+       policy or a missing crypto adapter is still reported as
+       Bad_SecurityPolicyRejected rather than being masked by a trust failure. */
+    if (server_secure_channel.policy != MU_SECURITY_POLICY_NONE_ID &&
+        server_secure_channel.policy != MU_SECURITY_POLICY_INVALID_ID) {
+        /* OPC-10000-4 §5.5 / §6.1.3: for any non-None policy, application
+           authentication is mandatory. Fail closed when no trust list is
+           configured rather than silently accepting the certificate. */
+        if (server->config.trust_list == NULL) {
+            return MU_STATUS_BAD_SECURITYCHECKSFAILED;
+        }
+        const mu_bytestring_t *client_cert = current_opn_client_cert(server);
+        if (client_cert == NULL || client_cert->length <= 0) {
+            return MU_STATUS_BAD_SECURITYCHECKSFAILED;
+        }
+        if (mu_trust_list_match(server->config.trust_list, client_cert->data, (size_t)client_cert->length) !=
+            MU_STATUS_GOOD) {
+            return MU_STATUS_BAD_SECURITYCHECKSFAILED;
+        }
+    }
+#endif
 
     s = write_response_prefix(w, MU_ID_OPENSECURECHANNELRESPONSE, req.request_handle, MU_STATUS_GOOD);
     if (s != MU_STATUS_GOOD)
@@ -666,6 +728,21 @@ static opcua_statuscode_t handle_create_session(mu_server_t *server, mu_binary_r
     /* OPC-10000-4 section 5.7.2: the complete CreateSession body is mandatory. */
     if (r->position != r->length)
         return MU_STATUS_BAD_DECODINGERROR;
+
+#ifdef MUC_OPCUA_SECURITY
+    /* OPC-10000-4 §5.6.2: on a secured channel the ClientCertificate presented in
+       CreateSession MUST be the same application-instance certificate that opened
+       the SecureChannel. Binding them lets ActivateSession verify the
+       ClientSignature against the trusted channel certificate. */
+    if (server_secure_channel.policy != MU_SECURITY_POLICY_NONE_ID &&
+        server_secure_channel.policy != MU_SECURITY_POLICY_INVALID_ID) {
+        if (client_cert.length <= 0 || (size_t)client_cert.length != server->channel_client_cert_len ||
+            server->channel_client_cert_len == 0 ||
+            memcmp(client_cert.data, server->channel_client_cert, server->channel_client_cert_len) != 0) {
+            return MU_STATUS_BAD_SECURITYCHECKSFAILED;
+        }
+    }
+#endif
 
     opcua_uint64_t revised_bits = 0;
     opcua_uint32_t session_id = 0, auth_token = 0;
@@ -973,7 +1050,16 @@ static opcua_statuscode_t handle_activate_session(mu_server_t *server, mu_binary
             } else if (!token_type_is_ns0_numeric) {
                 activate_result = MU_STATUS_BAD_IDENTITYTOKENINVALID;
             } else {
-                if (token_type.identifier.numeric == 321) {
+                opcua_statuscode_t client_sig_result = MU_STATUS_GOOD;
+#ifdef MUC_OPCUA_SECURITY
+                /* OPC-10000-4 §5.7.3/§7.38.2: verify the application ClientSignature
+                   over (serverCertificate || serverNonce) before honoring any
+                   identity token. Rejected activations leave the Session in CREATED. */
+                client_sig_result = verify_activate_client_signature(server, slot, &signature);
+#endif
+                if (client_sig_result != MU_STATUS_GOOD) {
+                    activate_result = client_sig_result;
+                } else if (token_type.identifier.numeric == 321) {
                     /* Anonymous validation */
                     if (server->config.user_auth_handler != NULL) {
                         activate_result = server->config.user_auth_handler(server->config.user_auth_handler_handle,
@@ -1022,6 +1108,14 @@ static opcua_statuscode_t handle_activate_session(mu_server_t *server, mu_binary
                                 size_t actual_pw_len = (pw_len > 0) ? (size_t)pw_len : 0;
                                 size_t nonce_offset = 4 + actual_pw_len;
                                 size_t nonce_len = out_len - nonce_offset;
+                                /* Compare the returned ServerNonce (feature 025 F10
+                                   anti-replay). memcmp is appropriate here: the
+                                   ServerNonce is sent in the clear in the
+                                   CreateSession response, so it is not a secret and
+                                   needs no constant-time compare (unlike the MAC/key
+                                   comparisons that use mu_secure_memeq). Using
+                                   mu_secure_memeq would also pull security-only code
+                                   into the USER_AUTH-without-SECURITY (micro) build. */
                                 if (nonce_len != 32 ||
                                     memcmp(decrypt_buf + nonce_offset, slot->server_nonce, 32) != 0) {
                                     activate_result = MU_STATUS_BAD_IDENTITYTOKENREJECTED;
