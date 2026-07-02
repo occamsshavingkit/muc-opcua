@@ -35,7 +35,7 @@ Backing test column: comma-separated ctest names (as registered), no `test_` typ
 | UserName identity token (auth) | OPC-10000-4 §5.7.3 / §7.37 | micro,embedded,full | test_user_auth_plaintext |
 | SecurityPolicy Basic256Sha256 asym chunk | OPC-10000-6 §6.7 / OPC-10000-7 | embedded,full | test_asym_chunk |
 | SecurityPolicy symmetric chunk (sign/encrypt) | OPC-10000-6 §6.7.5 | embedded,full | test_sym_chunk |
-| Certificate validation (parse / key-size / validity) | OPC-10000-4 §5.5 | embedded,full | test_certificate |
+| Certificate validation (parse / key-size / validity) | OPC-10000-4 §5.5 | embedded,full | test_certificate, test_certificate_validity |
 | Application authentication TrustList | OPC-10000-4 §5.6.2 | embedded,full | test_security_trustlist |
 | X509 user identity token (auth) | OPC-10000-4 §5.7.3 | embedded,full | test_user_auth_certificate |
 | Secured handshake end-to-end (ServerSignature/ClientSignature) | OPC-10000-4 §5.6.3 / §5.7.3 | embedded,full | test_server_handshake_secure |

@@ -71,7 +71,7 @@ foreach(TEST_SOURCE ${UNIT_TEST_SOURCES})
            TEST_NAME STREQUAL "test_security_rsa_oaep_errors" OR TEST_NAME STREQUAL "test_security_rsa_pss" OR
            TEST_NAME STREQUAL "test_security_rsa_pss_errors" OR TEST_NAME STREQUAL "test_security_trustlist" OR
            TEST_NAME STREQUAL "test_sym_chunk" OR TEST_NAME STREQUAL "test_wolfssl_adapter" OR
-           TEST_NAME STREQUAL "test_security_policy_selection")
+           TEST_NAME STREQUAL "test_security_policy_selection" OR TEST_NAME STREQUAL "test_certificate_validity")
         # These exercise src/security/**, src/platform/host_crypto_adapter.c, and
         # mu_binary_read_certificate_identity_token, all excluded from the library
         # entirely when MUC_OPCUA_SECURITY is off (nano/micro profiles) -- see

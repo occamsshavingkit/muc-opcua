@@ -85,12 +85,12 @@ per-profile test.
 
 **Goal**: each security accept+reject path exercised on a real crypto backend.
 
-- [ ] T025 [P] [US3] Add cert fixtures/generator in `tests/fixtures/`: a real expired cert, a not-yet-valid cert, and an out-of-key-size cert; document generation. Feeds T029/T030.
+- [X] T025 [P] [US3] Add cert fixtures/generator in `tests/fixtures/`: a real expired cert, a not-yet-valid cert, and an out-of-key-size cert; document generation. Feeds T029/T030.
 - [ ] T026 [US3] Real-crypto X509 (i=327) user-token ActivateSession test: correctly-signed → accepted, bad signature → rejected (host adapter), replacing the mock-only path. OPC-10000-4 §5.7.3 (ActivateSession / UserIdentityToken signature).
 - [ ] T027 [US3] UserName/password over a secured channel: valid password → Good, wrong password → `Bad_IdentityTokenRejected` (real backend). OPC-10000-4 §5.7.3 / §7.37 (UserNameIdentityToken).
 - [ ] T028 [US3] Encrypted-password + ServerNonce anti-replay: correct nonce → accepted, wrong/stale nonce → rejected. OPC-10000-4 §5.6.3.2 (ServerNonce anti-replay) / §7.37.
-- [ ] T029 [P] [US3] Certificate validity rejection with real certs: expired and not-yet-valid → `Bad_CertificateTimeInvalid` (uses T025 fixtures). OPC-10000-4 §5.5 (certificate validation) / OPC-10000-6 §6.1.3.
-- [ ] T030 [P] [US3] Out-of-bounds RSA key size → `Bad_SecurityChecksFailed` (uses T025 fixture). OPC-10000-7 Basic256Sha256 asymmetric key-size bounds.
+- [X] T029 [P] [US3] Certificate validity rejection with real certs: expired and not-yet-valid → `Bad_CertificateTimeInvalid` (uses T025 fixtures). OPC-10000-4 §5.5 (certificate validation) / OPC-10000-6 §6.1.3.
+- [X] T030 [P] [US3] Out-of-bounds RSA key size → `Bad_SecurityChecksFailed` (uses T025 fixture). OPC-10000-7 Basic256Sha256 asymmetric key-size bounds.
 - [ ] T031 [US3] End-to-end fail-closed trust: `allow_untrusted_clients=false` + client cert absent from trust list → OPN rejected. OPC-10000-4 §5.5 / §6.1.3 (application authentication / trust).
 - [ ] T032 [US3] Make all US3 tests `TEST_IGNORE` (skip visibly) when no crypto backend is compiled, and register them to run under embedded/full.
 - [ ] T033 [US3] Register the US3 claims as rows in the claim→test map (T008).
