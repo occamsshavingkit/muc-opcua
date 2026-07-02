@@ -1188,10 +1188,17 @@ static opcua_statuscode_t handle_activate_session(mu_server_t *server, mu_binary
                                     memcpy(verify_buf, sc_data, sc_len);
                                     memcpy(verify_buf + sc_len, slot->server_nonce, 32);
 
+                                    /* rsa_sha256_verify contract is
+                                       (certificate, cert_len, data, data_len, signature, sig_len):
+                                       the USER certificate provides the public key, the signed data is
+                                       (serverCert || serverNonce), and user_token_signature is the
+                                       signature (OPC-10000-4 §5.7.3.3 UserIdentityToken signature). The
+                                       arguments were previously mis-ordered, which only worked against a
+                                       mock verifier; a real backend rejected or misverified it. */
                                     opcua_statuscode_t vs = server->config.crypto_adapter->rsa_sha256_verify(
-                                        server->config.crypto_adapter->context, verify_buf, sc_len + 32,
-                                        user_token_signature.data, (size_t)user_token_signature.length,
-                                        cert_token.certificate_data.data, (size_t)cert_token.certificate_data.length);
+                                        server->config.crypto_adapter->context, cert_token.certificate_data.data,
+                                        (size_t)cert_token.certificate_data.length, verify_buf, sc_len + 32,
+                                        user_token_signature.data, (size_t)user_token_signature.length);
                                     if (vs == MU_STATUS_GOOD) {
                                         if (server->config.user_auth_handler != NULL) {
                                             activate_result = server->config.user_auth_handler(

@@ -111,6 +111,34 @@ void test_validate_accepts_in_window_cert(void) {
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, crypto.verify_certificate_validity(crypto.context, cert, cert_len));
 }
 
+/* Feature 027: rsa_sha256_verify's contract is
+   (certificate, cert_len, data, data_len, signature, sig_len) — the public key
+   comes from the FIRST argument. The x509 user-identity-token verify path used to
+   pass the signed data as the certificate; that only "worked" against a mock and
+   was rejected by a real backend. This exercises the real host adapter to pin the
+   argument order down so the bug cannot silently return. */
+void test_rsa_verify_argument_order_is_certificate_first(void) {
+    const opcua_byte_t *cert = NULL;
+    size_t cert_len = 0;
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, crypto.get_own_certificate(crypto.context, &cert, &cert_len));
+
+    /* Payload standing in for (serverCert || serverNonce). */
+    opcua_byte_t data[64];
+    memset(data, 0xAB, sizeof(data));
+    opcua_byte_t sig[512];
+    size_t sig_len = sizeof(sig);
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, crypto.rsa_sha256_sign(crypto.context, data, sizeof(data), sig, &sig_len));
+
+    /* Correct contract order verifies. */
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD,
+                      crypto.rsa_sha256_verify(crypto.context, cert, cert_len, data, sizeof(data), sig, sig_len));
+
+    /* The previously-shipped mis-ordering (signed data passed as the certificate)
+       must NOT verify on a real backend. */
+    TEST_ASSERT_NOT_EQUAL(MU_STATUS_GOOD,
+                          crypto.rsa_sha256_verify(crypto.context, data, sizeof(data), sig, sig_len, cert, cert_len));
+}
+
 int main(void) {
     UNITY_BEGIN();
     RUN_TEST(test_thumbprint_is_sha1_of_der);
@@ -121,6 +149,7 @@ int main(void) {
     RUN_TEST(test_validate_fails_closed_without_validity_hook);
     RUN_TEST(test_validate_propagates_expired_cert);
     RUN_TEST(test_validate_accepts_in_window_cert);
+    RUN_TEST(test_rsa_verify_argument_order_is_certificate_first);
     return UNITY_END();
 }
 

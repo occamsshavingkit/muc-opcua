@@ -143,11 +143,15 @@ static opcua_statuscode_t mock_get_own_certificate(void *context, const opcua_by
 
 static mock_t global_mock;
 
-static opcua_statuscode_t mock_rsa_sha256_verify(void *context, const opcua_byte_t *data, size_t data_len,
-                                                 const opcua_byte_t *signature, size_t signature_len,
-                                                 const opcua_byte_t *cert_der, size_t cert_der_len) {
+/* Parameter order matches the declared rsa_sha256_verify adapter contract:
+   (context, certificate, cert_len, data, data_len, signature, sig_len). The public
+   key comes from `certificate` (the client/user cert), the signed `data` is
+   (serverCert || serverNonce), and `signature` is the user-token signature. */
+static opcua_statuscode_t mock_rsa_sha256_verify(void *context, const opcua_byte_t *cert_der, size_t cert_der_len,
+                                                 const opcua_byte_t *data, size_t data_len,
+                                                 const opcua_byte_t *signature, size_t signature_len) {
     (void)context;
-    /* Verify server certificate prefix */
+    /* Verify server certificate prefix (signed data = serverCert || serverNonce) */
     if (data_len != sizeof(server_cert_bytes) + 32) {
         return MU_STATUS_BAD_SECURITYCHECKSFAILED;
     }
@@ -164,7 +168,7 @@ static opcua_statuscode_t mock_rsa_sha256_verify(void *context, const opcua_byte
     if (signature_len != sizeof(client_sig_bytes) || memcmp(signature, client_sig_bytes, signature_len) != 0) {
         return MU_STATUS_BAD_SECURITYCHECKSFAILED;
     }
-    /* Verify client certificate */
+    /* Verify client/user certificate provides the public key */
     if (cert_der_len != sizeof(client_cert_bytes) || memcmp(cert_der, client_cert_bytes, cert_der_len) != 0) {
         return MU_STATUS_BAD_SECURITYCHECKSFAILED;
     }
