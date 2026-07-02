@@ -1052,10 +1052,32 @@ void test_history_update_dispatch(void) {
 
 #endif // MUC_OPCUA_SERVICE_HISTORY
 
+/* Feature 028 (T037): only ReadRawModifiedDetails is supported; a HistoryRead whose
+   historyReadDetails ExtensionObject is any other type decodes to
+   Bad_HistoryOperationUnsupported. OPC-10000-4 §5.11.3 (HistoryRead) / OPC-10000-11. */
+void test_history_read_unsupported_details_is_operation_unsupported(void) {
+#ifdef MUC_OPCUA_SERVICE_HISTORY
+    opcua_byte_t buf[64];
+    mu_binary_writer_t w;
+    mu_binary_writer_init(&w, buf, sizeof(buf));
+    /* Not READRAWMODIFIEDDETAILS -> unsupported. */
+    mu_nodeid_t ext_id = {.identifier_type = MU_NODEID_NUMERIC, .namespace_index = 0, .identifier.numeric = 9999};
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_write_nodeid(&w, &ext_id));
+
+    mu_binary_reader_t r;
+    mu_binary_reader_init(&r, buf, w.position);
+    mu_history_read_request_t req;
+    mu_history_read_value_id_t nodes[1];
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_BAD_HISTORYOPERATIONUNSUPPORTED,
+                            mu_history_read_request_decode(&r, &req, nodes, 1));
+#endif
+}
+
 int main(void) {
     UNITY_BEGIN();
 #ifdef MUC_OPCUA_SERVICE_HISTORY
     RUN_TEST(test_history_read_decode);
+    RUN_TEST(test_history_read_unsupported_details_is_operation_unsupported);
     RUN_TEST(test_history_read_details_extension_object_truncated_body_returns_decoding_error);
     RUN_TEST(test_history_read_decode_continuation_point_is_owned_from_request_buffer);
     RUN_TEST(test_history_read_decode_continuation_point_stable_after_later_request_reuses_buffer);

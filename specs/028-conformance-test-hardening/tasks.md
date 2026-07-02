@@ -105,8 +105,8 @@ per-profile test.
 
 - [ ] T034 [P] [US4] Force `Bad_TooManySessions`: drive CreateSession beyond `MU_MAX_SESSIONS` and assert it. OPC-10000-4 §5.7.2 (CreateSession) / §7.38.2.
 - [ ] T035 [P] [US4] Force `Bad_RequestTooLarge`: drive an oversized request/OPN and assert it (`asym_chunk.c` emission). OPC-10000-6 §7.1.5 (UA-TCP error) / §6.7.2.
-- [ ] T036 [P] [US4] Force Read beyond `MU_DISPATCH_MAX_READ_NODES` → `Bad_TooManyOperations` in `tests/unit/test_read_service.c`. OPC-10000-4 §5.11.2 (Read) / §7.38.2.
-- [ ] T037 [P] [US4] Force `Bad_HistoryOperationUnsupported` (history.c emission). OPC-10000-4 §5.11.5 (HistoryUpdate) / OPC-10000-11.
+- [X] T036 [P] [US4] Force Read beyond `MU_DISPATCH_MAX_READ_NODES` → `Bad_TooManyOperations` in `tests/unit/test_read_service.c`. OPC-10000-4 §5.11.2 (Read) / §7.38.2.
+- [X] T037 [P] [US4] Force `Bad_HistoryOperationUnsupported` (history.c emission). OPC-10000-4 §5.11.5 (HistoryUpdate) / OPC-10000-11.
 - [ ] T038 [P] [US4] Force `Bad_MessageNotAvailable` (subscription.c republish emission). OPC-10000-4 §5.14.6.3 (Republish).
 - [ ] T039 [P] [US4] Force `Bad_NotFound` (node_management.c DeleteReferences emission). OPC-10000-4 §5.8 (DeleteReferences).
 - [ ] T040 [US4] Drive a CloseSecureChannel (CLO) message through `mu_server_poll` and assert the channel is observably closed. OPC-10000-4 §5.6.3 (CloseSecureChannel) / OPC-10000-6 §6.7.3.

@@ -275,9 +275,29 @@ void test_read_service_batch_preserves_per_operation_results(void) {
     TEST_ASSERT_EQUAL(MU_STATUS_BAD_ATTRIBUTEIDINVALID, batch_resp.results[4].status);
 }
 
+/* Feature 028 (T036): a Read request whose nodesToRead count exceeds the caller's
+   fixed capacity (MU_DISPATCH_MAX_READ_NODES at the dispatch boundary) must decode
+   to Bad_TooManyOperations, matching Browse/Write/Query. OPC-10000-4 §5.11.2 / §7.38.2. */
+void test_read_over_capacity_is_too_many_operations(void) {
+    opcua_byte_t buffer[64];
+    mu_binary_writer_t writer;
+    mu_binary_writer_init(&writer, buffer, sizeof(buffer));
+    mu_binary_write_double(&writer, 0.0);                        /* MaxAge */
+    mu_binary_write_uint32(&writer, MU_TIMESTAMPS_TO_RETURN_BOTH);
+    mu_binary_write_int32(&writer, 3);                           /* nodesToRead count = 3 */
+
+    mu_binary_reader_t reader;
+    mu_binary_reader_init(&reader, buffer, writer.position);
+    mu_read_request_t req;
+    mu_read_value_id_t nodes[2]; /* capacity 2 < 3 */
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_BAD_TOOMANYOPERATIONS,
+                            mu_read_request_decode(&reader, &req, nodes, 2));
+}
+
 int main(void) {
     UNITY_BEGIN();
     RUN_TEST(test_read_service_request_decode);
+    RUN_TEST(test_read_over_capacity_is_too_many_operations);
     RUN_TEST(test_read_service_scalar_values);
     RUN_TEST(test_read_service_rejects_invalid_timestamps_to_return);
     RUN_TEST(test_read_service_browsename_displayname);

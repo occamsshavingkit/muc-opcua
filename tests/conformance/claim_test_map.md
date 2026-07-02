@@ -14,6 +14,7 @@ Backing test column: comma-separated ctest names (as registered), no `test_` typ
 | Claim / conformance unit | OPC UA § | Profiles | Backing test |
 |--------------------------|----------|----------|--------------|
 | Attribute Read service | OPC-10000-4 §5.11.2 | all | test_read_service |
+| Read operation limit → Bad_TooManyOperations | OPC-10000-4 §5.11.2 / §7.38.2 | all | test_read_service |
 | View Browse service | OPC-10000-4 §5.9.2 | all | test_browse_service |
 | View Browse operation limit | OPC-10000-4 §5.9.2 / §7.38.2 | all | test_browse_limits |
 | View TranslateBrowsePaths | OPC-10000-4 §5.9.4 | all | test_view_services |
@@ -42,6 +43,7 @@ Backing test column: comma-separated ctest names (as registered), no `test_` typ
 | Aggregate subscriptions | OPC-10000-4 §7.22 / OPC-10000-13 | embedded,full | test_aggregate |
 | Alarms & Conditions / Events | OPC-10000-9 | embedded,full | test_alarms_conditions |
 | Historical Access (HistoryRead/Update) | OPC-10000-11 | full | test_history |
+| HistoryRead unsupported details → Bad_HistoryOperationUnsupported | OPC-10000-4 §5.11.3 / OPC-10000-11 | full | test_history |
 | Query services (QueryFirst/QueryNext) | OPC-10000-4 §5.9 | full | test_query_service |
 | NodeManagement (AddNodes/DeleteReferences) | OPC-10000-4 §5.8 | full | test_node_management |
 | PubSub UADP encoding | OPC-10000-14 | full | test_uadp_encoding |
