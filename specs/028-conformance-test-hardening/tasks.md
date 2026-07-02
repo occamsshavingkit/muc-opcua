@@ -140,10 +140,10 @@ primitive round-trips added.
 
 ## Phase 8: Polish & Cross-Cutting
 
-- [ ] T054 Global gate sweep: all four profile suites + ASAN/UBSan green; `scripts/measure_size.sh all` within gates (`.text` +3%, data+bss +5%, no new heap); `scripts/check_build_matrix.sh`.
-- [ ] T055 [P] Verify the anti-over-claim guards still pass and status stays profile-targeting after all reconciliations.
-- [ ] T056 [P] Update `docs/traceability/conformance-claims.md` to describe the new claim→test enforcement (replaces the substring-matching description). Grounding: OPC-10000-7 §4.2 (Conformance Units and Conformance Groups).
-- [ ] T057 [P] Update project memory (feature 028): per-profile CI + claim→test map enforce "claimed unit ⇒ profile-runnable test"; record which claims were reconciled by doc-correction vs implemented.
+- [X] T054 Global gate sweep: all four profile suites + ASAN/UBSan green; `scripts/measure_size.sh all` within gates (`.text` +3%, data+bss +5%, no new heap); `scripts/check_build_matrix.sh`.
+- [X] T055 [P] Verify the anti-over-claim guards still pass and status stays profile-targeting after all reconciliations.
+- [X] T056 [P] Update `docs/traceability/conformance-claims.md` to describe the new claim→test enforcement (replaces the substring-matching description). Grounding: OPC-10000-7 §4.2 (Conformance Units and Conformance Groups).
+- [X] T057 [P] Update project memory (feature 028): per-profile CI + claim→test map enforce "claimed unit ⇒ profile-runnable test"; record which claims were reconciled by doc-correction vs implemented.
 
 ---
 
