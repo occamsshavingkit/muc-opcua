@@ -34,7 +34,7 @@ SPEED_LAB_FLAGS ?= --cpu 11 --use-sudo --require-affinity --require-realtime \
 	--require-isolated-cpu --shield-cpu
 SPEED_SMOKE_FLAGS ?= --cpu 11 --realtime-priority 0
 
-.PHONY: help nano micro embedded all-profiles test speed-matrix speed-smoke speed-current speed-baseline speed-compare clean
+.PHONY: help nano micro embedded all-profiles test test-nano test-micro test-embedded test-full test-profiles speed-matrix speed-smoke speed-current speed-baseline speed-compare clean
 
 help:
 	@echo "muc-opcua profile builds:"
@@ -69,6 +69,35 @@ test:
 	$(CMAKE) -S . -B $(BUILD)/test -DMUC_OPCUA_BUILD_TESTS=ON
 	$(CMAKE) --build $(BUILD)/test
 	cd $(BUILD)/test && ctest --output-on-failure
+
+# Feature 028: per-profile test execution. An explicit -DMUC_OPCUA_PROFILE is
+# honored (the "force full" resolution only applies to the default profile), so
+# these build+run the tests that survive each profile's RUN_TEST gates against
+# that profile's actual library — the per-profile conformance evidence.
+TEST_COMMON := -DMUC_OPCUA_BUILD_TESTS=ON -DMUC_OPCUA_PLATFORM=host \
+	-DMUC_OPCUA_HAVE_MBEDTLS=ON -DMUC_OPCUA_HAVE_WOLFSSL=ON
+
+test-nano:
+	$(CMAKE) -S . -B $(BUILD)/test-nano $(PROFILE_CACHE_RESET) $(TEST_COMMON) -DMUC_OPCUA_PROFILE=nano
+	$(CMAKE) --build $(BUILD)/test-nano
+	cd $(BUILD)/test-nano && ctest --output-on-failure
+
+test-micro:
+	$(CMAKE) -S . -B $(BUILD)/test-micro $(PROFILE_CACHE_RESET) $(TEST_COMMON) -DMUC_OPCUA_PROFILE=micro
+	$(CMAKE) --build $(BUILD)/test-micro
+	cd $(BUILD)/test-micro && ctest --output-on-failure
+
+test-embedded:
+	$(CMAKE) -S . -B $(BUILD)/test-embedded $(PROFILE_CACHE_RESET) $(TEST_COMMON) -DMUC_OPCUA_PROFILE=embedded $(EMBEDDED_CAPS)
+	$(CMAKE) --build $(BUILD)/test-embedded
+	cd $(BUILD)/test-embedded && ctest --output-on-failure
+
+test-full:
+	$(CMAKE) -S . -B $(BUILD)/test-full $(PROFILE_CACHE_RESET) $(TEST_COMMON) -DMUC_OPCUA_PROFILE=full $(EMBEDDED_CAPS)
+	$(CMAKE) --build $(BUILD)/test-full
+	cd $(BUILD)/test-full && ctest --output-on-failure
+
+test-profiles: test-nano test-micro test-embedded test-full
 
 speed-matrix:
 	python3 scripts/run_speed_bench.py --matrix
