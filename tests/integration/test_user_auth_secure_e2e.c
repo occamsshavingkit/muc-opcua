@@ -8,7 +8,10 @@
 #include "fake_platform.h"
 #include "muc_opcua/muc_opcua.h"
 #include "unity.h"
+/* The static-analysis environment may not provide system headers; the build does. */
+/* cppcheck-suppress missingIncludeSystem */
 #include <stdbool.h>
+/* cppcheck-suppress missingIncludeSystem */
 #include <string.h>
 
 #ifdef MUC_OPCUA_HAVE_OPENSSL
@@ -26,6 +29,10 @@ static const char SIG_ALG_RSA_SHA256[] = "http://www.w3.org/2001/04/xmldsig-more
 static const char PASSWORD_ENCRYPTION_ALG[] = "http://www.w3.org/2001/04/xmlenc#rsa-oaep";
 static const char USERNAME_POLICY[] = "username_policy";
 static const char CERT_POLICY[] = "cert_user_policy";
+#define SIG_ALG_RSA_SHA256_LEN (sizeof(SIG_ALG_RSA_SHA256) - 1u)
+#define PASSWORD_ENCRYPTION_ALG_LEN (sizeof(PASSWORD_ENCRYPTION_ALG) - 1u)
+#define USERNAME_POLICY_LEN (sizeof(USERNAME_POLICY) - 1u)
+#define CERT_POLICY_LEN (sizeof(CERT_POLICY) - 1u)
 
 typedef struct {
     int accept_count;
@@ -78,213 +85,63 @@ typedef struct {
 
 static secure_fixture_t g_fixture;
 
-void setUp(void) {
-    memset(&g_fixture, 0, sizeof(g_fixture));
-}
+#include "../support/user_auth_secure_e2e_helpers.h"
 
-static void cleanup_crypto(mu_crypto_adapter_t *crypto) {
-    if (crypto->context != NULL) {
-        mu_host_crypto_adapter_cleanup(crypto);
+static bool auth_username_matches(const mu_string_t *username, const mu_bytestring_t *password) {
+    bool matches = false;
+
+    if (username != NULL) {
+        if (password != NULL) {
+            if (username->length == (opcua_int32_t)5) {
+                if (password->length == (opcua_int32_t)5) {
+                    if (memcmp(username->data, "admin", 5u) == 0) {
+                        if (memcmp(password->data, "admin", 5u) == 0) {
+                            matches = true;
+                        }
+                    }
+                }
+            }
+        }
     }
+    return matches;
 }
 
-void tearDown(void) {
-    if (g_fixture.server != NULL) {
-        mu_server_close(g_fixture.server);
-        g_fixture.server = NULL;
+static bool auth_certificate_matches(const secure_fixture_t *fixture, const mu_string_t *username,
+                                     const mu_bytestring_t *password) {
+    bool matches = false;
+
+    if (username == NULL) {
+        if (password != NULL) {
+            if (fixture != NULL) {
+                if (password->length == (opcua_int32_t)fixture->user_cert_len) {
+                    if (memcmp(password->data, fixture->user_cert, fixture->user_cert_len) == 0) {
+                        matches = true;
+                    }
+                }
+            }
+        }
     }
-    mu_sym_keys_release_cipher(&g_fixture.c2s);
-    mu_sym_keys_release_cipher(&g_fixture.s2c);
-    cleanup_crypto(&g_fixture.server_crypto);
-    cleanup_crypto(&g_fixture.client_crypto);
-    cleanup_crypto(&g_fixture.user_crypto);
-    cleanup_crypto(&g_fixture.other_crypto);
-}
-
-static opcua_statuscode_t mock_listen(void *context, const char *url) {
-    (void)context;
-    (void)url;
-    return MU_STATUS_GOOD;
-}
-
-static void mock_shutdown(void *context) {
-    (void)context;
-}
-
-static void mock_close(void *context, void *handle) {
-    mock_t *mock = (mock_t *)context;
-    (void)handle;
-    mock->close_count++;
-}
-
-static opcua_statuscode_t mock_accept(void *context, void **handle) {
-    mock_t *mock = (mock_t *)context;
-    mock->accept_count++;
-    *handle = (mock->accept_count == 1) ? (void *)1 : NULL;
-    return MU_STATUS_GOOD;
-}
-
-static opcua_statuscode_t mock_read(void *context, void *handle, opcua_byte_t *buffer, size_t capacity,
-                                    size_t *bytes_read) {
-    mock_t *mock = (mock_t *)context;
-    (void)handle;
-    if (mock->read_index >= mock->inbound_count) {
-        *bytes_read = 0;
-        return MU_STATUS_GOOD;
-    }
-    size_t length = mock->inbound_len[mock->read_index];
-    TEST_ASSERT_TRUE(length <= capacity);
-    memcpy(buffer, mock->inbound[mock->read_index], length);
-    mock->read_index++;
-    *bytes_read = length;
-    return MU_STATUS_GOOD;
-}
-
-static opcua_statuscode_t mock_write(void *context, void *handle, const opcua_byte_t *buffer, size_t length,
-                                     size_t *bytes_written) {
-    mock_t *mock = (mock_t *)context;
-    (void)handle;
-    TEST_ASSERT_TRUE(length <= sizeof(mock->last_write));
-    memcpy(mock->last_write, buffer, length);
-    mock->last_write_len = length;
-    *bytes_written = length;
-    return MU_STATUS_GOOD;
-}
-
-static void enqueue(mock_t *mock, const opcua_byte_t *bytes, size_t length) {
-    TEST_ASSERT_TRUE(mock->inbound_count < MAX_INBOUND);
-    TEST_ASSERT_TRUE(length <= CHUNK_CAP);
-    memcpy(mock->inbound[mock->inbound_count], bytes, length);
-    mock->inbound_len[mock->inbound_count] = length;
-    mock->inbound_count++;
-}
-
-static void reset_inbound(mock_t *mock) {
-    mock->inbound_count = 0;
-    mock->read_index = 0;
-}
-
-static void write_request_header(mu_binary_writer_t *writer, opcua_uint32_t auth_token, opcua_uint32_t handle) {
-    mu_nodeid_t auth = {0, MU_NODEID_NUMERIC, {auth_token}};
-    mu_nodeid_t null_id = {0, MU_NODEID_NUMERIC, {0}};
-    mu_string_t null_string = {-1, NULL};
-
-    mu_binary_write_nodeid(writer, &auth);
-    mu_binary_write_int64(writer, 0);
-    mu_binary_write_uint32(writer, handle);
-    mu_binary_write_uint32(writer, 0);
-    mu_binary_write_string(writer, &null_string);
-    mu_binary_write_uint32(writer, 0);
-    mu_binary_write_extension_object_header(writer, &null_id, 0);
-}
-
-static void parse_decoded_response(const opcua_byte_t *body, size_t length, decoded_response_t *response) {
-    mu_binary_reader_t reader;
-    mu_nodeid_t type;
-    opcua_int64_t timestamp;
-    opcua_byte_t diagnostics_mask;
-    opcua_byte_t additional_encoding;
-    opcua_int32_t string_table_count;
-    mu_nodeid_t additional_header;
-
-    mu_binary_reader_init(&reader, body, length);
-    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_nodeid(&reader, &type));
-    TEST_ASSERT_EQUAL(MU_NODEID_NUMERIC, type.identifier_type);
-    TEST_ASSERT_EQUAL(0, type.namespace_index);
-    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_int64(&reader, &timestamp));
-    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_uint32(&reader, &response->request_handle));
-    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_statuscode(&reader, &response->service_result));
-    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_byte(&reader, &diagnostics_mask));
-    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_int32(&reader, &string_table_count));
-    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_nodeid(&reader, &additional_header));
-    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_byte(&reader, &additional_encoding));
-
-    response->type_id = type.identifier.numeric;
-    response->body = reader;
-}
-
-static void unwrap_opn_response(secure_fixture_t *fixture, decoded_response_t *response) {
-    opcua_byte_t opn_body[CHUNK_CAP];
-    size_t opn_body_len = 0;
-    opcua_byte_t scratch[6144];
-    mu_asym_chunk_info_t info;
-
-    memset(&info, 0, sizeof(info));
-    TEST_ASSERT_TRUE(fixture->mock.last_write_len >= 8u);
-    TEST_ASSERT_EQUAL_MEMORY("OPNF", fixture->mock.last_write, 4);
-    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_asym_chunk_unwrap(&fixture->client_crypto, fixture->mock.last_write,
-                                                           fixture->mock.last_write_len, opn_body, sizeof(opn_body),
-                                                           &opn_body_len, scratch, sizeof(scratch), &info));
-    TEST_ASSERT_EQUAL(MU_SECURITY_POLICY_BASIC256SHA256_ID, info.policy);
-    parse_decoded_response(opn_body, opn_body_len, response);
-}
-
-static void secure_call(secure_fixture_t *fixture, const opcua_byte_t *body, size_t body_len,
-                        decoded_response_t *response) {
-    opcua_byte_t chunk[CHUNK_CAP];
-    size_t message_len = 0;
-    const opcua_byte_t *response_body = NULL;
-    size_t response_body_len = 0;
-    mu_sym_chunk_info_t info;
-    opcua_uint32_t sequence = fixture->next_sequence;
-
-    fixture->next_sequence++;
-    TEST_ASSERT_EQUAL(MU_STATUS_GOOD,
-                      mu_sym_chunk_wrap(&fixture->client_crypto, MU_MESSAGE_SECURITY_MODE_SIGN_AND_ENCRYPT,
-                                        &fixture->c2s, "MSG", fixture->secure_channel_id, fixture->token_id, sequence,
-                                        sequence, body, body_len, chunk, sizeof(chunk), &message_len));
-    reset_inbound(&fixture->mock);
-    enqueue(&fixture->mock, chunk, message_len);
-    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_server_poll(fixture->server));
-
-    memset(&info, 0, sizeof(info));
-    TEST_ASSERT_EQUAL(MU_STATUS_GOOD,
-                      mu_sym_chunk_unwrap(&fixture->client_crypto, MU_MESSAGE_SECURITY_MODE_SIGN_AND_ENCRYPT,
-                                          &fixture->s2c, fixture->mock.last_write, fixture->mock.last_write_len,
-                                          &response_body, &response_body_len, &info));
-    parse_decoded_response(response_body, response_body_len, response);
-}
-
-static void init_crypto(secure_fixture_t *fixture) {
-    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_host_crypto_adapter_init(&fixture->server_crypto));
-    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_host_crypto_adapter_init(&fixture->client_crypto));
-    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_host_crypto_adapter_init(&fixture->user_crypto));
-    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_host_crypto_adapter_init(&fixture->other_crypto));
-    TEST_ASSERT_EQUAL(MU_STATUS_GOOD,
-                      fixture->server_crypto.get_own_certificate(fixture->server_crypto.context, &fixture->server_cert,
-                                                                 &fixture->server_cert_len));
-    TEST_ASSERT_EQUAL(MU_STATUS_GOOD,
-                      fixture->client_crypto.get_own_certificate(fixture->client_crypto.context, &fixture->client_cert,
-                                                                 &fixture->client_cert_len));
-    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, fixture->user_crypto.get_own_certificate(
-                                          fixture->user_crypto.context, &fixture->user_cert, &fixture->user_cert_len));
-    TEST_ASSERT_EQUAL(MU_STATUS_GOOD,
-                      fixture->other_crypto.get_own_certificate(fixture->other_crypto.context, &fixture->other_cert,
-                                                                &fixture->other_cert_len));
+    return matches;
 }
 
 static opcua_statuscode_t test_auth_handler(void *handle, const mu_string_t *username, const mu_bytestring_t *password,
                                             const mu_string_t *policy_id) {
+    /* cppcheck-suppress misra-c2012-11.5 */
     secure_fixture_t *fixture = (secure_fixture_t *)handle;
     (void)policy_id;
 
-    if ((username != NULL) && (password != NULL) && (username->length == 5) &&
-        (memcmp(username->data, "admin", 5) == 0) && (password->length == 5) &&
-        (memcmp(password->data, "admin", 5) == 0)) {
+    if (auth_username_matches(username, password)) {
         return MU_STATUS_GOOD;
     }
-    if ((username == NULL) && (password != NULL) && (fixture != NULL) &&
-        (password->length == (opcua_int32_t)fixture->user_cert_len) &&
-        (memcmp(password->data, fixture->user_cert, fixture->user_cert_len) == 0)) {
+    if (auth_certificate_matches(fixture, username, password)) {
         return MU_STATUS_GOOD;
     }
     return MU_STATUS_BAD_IDENTITYTOKENREJECTED;
 }
 
 static void configure_server(secure_fixture_t *fixture, bool trust_client_cert) {
-    mu_server_config_t config;
+    mu_server_config_t config = {0};
 
-    memset(&config, 0, sizeof(config));
     config.endpoint_url = "opc.tcp://host:4840";
     config.application_uri = "urn:test";
     config.product_uri = "urn:test";
@@ -474,7 +331,7 @@ static void parse_create_session_response(secure_fixture_t *fixture, decoded_res
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_uint64(&response->body, &revised_timeout));
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_bytestring(&response->body, &session_nonce));
     TEST_ASSERT_EQUAL(32, session_nonce.length);
-    memcpy(fixture->session_server_nonce, session_nonce.data, sizeof(fixture->session_server_nonce));
+    copy_bytes(fixture->session_server_nonce, session_nonce.data, sizeof(fixture->session_server_nonce));
 }
 
 static void drive_to_create_session(secure_fixture_t *fixture) {
@@ -495,9 +352,9 @@ static size_t sign_with_identity(secure_fixture_t *fixture, mu_crypto_adapter_t 
     size_t signature_len = signature_cap;
 
     TEST_ASSERT_TRUE((fixture->server_cert_len + sizeof(fixture->session_server_nonce)) <= sizeof(signed_data));
-    memcpy(signed_data, fixture->server_cert, fixture->server_cert_len);
-    memcpy(signed_data + fixture->server_cert_len, fixture->session_server_nonce,
-           sizeof(fixture->session_server_nonce));
+    copy_bytes(signed_data, fixture->server_cert, fixture->server_cert_len);
+    copy_bytes(signed_data + fixture->server_cert_len, fixture->session_server_nonce,
+               sizeof(fixture->session_server_nonce));
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD,
                       crypto->rsa_sha256_sign(crypto->context, signed_data,
                                               fixture->server_cert_len + sizeof(fixture->session_server_nonce),
@@ -511,7 +368,7 @@ static void write_extension_body(mu_binary_writer_t *writer, opcua_uint32_t type
 
     mu_binary_write_extension_object_header(writer, &token_type, body_len);
     TEST_ASSERT_TRUE((writer->position + body_len) <= writer->length);
-    memcpy(writer->buffer + writer->position, body, body_len);
+    copy_bytes(writer->buffer + writer->position, body, body_len);
     writer->position += body_len;
 }
 
@@ -529,7 +386,7 @@ static void begin_activate_request(secure_fixture_t *fixture, mu_binary_writer_t
     client_signature_len =
         sign_with_identity(fixture, &fixture->client_crypto, client_signature, sizeof(client_signature));
     {
-        mu_string_t algorithm = {(opcua_int32_t)strlen(SIG_ALG_RSA_SHA256), (const opcua_byte_t *)SIG_ALG_RSA_SHA256};
+        mu_string_t algorithm = {(opcua_int32_t)SIG_ALG_RSA_SHA256_LEN, (const opcua_byte_t *)SIG_ALG_RSA_SHA256};
         mu_bytestring_t signature = {(opcua_int32_t)client_signature_len, client_signature};
         mu_binary_write_string(writer, &algorithm);
         mu_binary_write_bytestring(writer, &signature);
@@ -552,10 +409,10 @@ static void append_username_token(mu_binary_writer_t *writer, const opcua_byte_t
     opcua_byte_t password_block[128];
     opcua_byte_t encrypted_password[SIGNATURE_CAP];
     mu_binary_writer_t token_writer;
-    mu_string_t policy = {(opcua_int32_t)strlen(USERNAME_POLICY), (const opcua_byte_t *)USERNAME_POLICY};
-    mu_string_t username = {5, (const opcua_byte_t *)"admin"};
+    mu_string_t policy = {(opcua_int32_t)USERNAME_POLICY_LEN, (const opcua_byte_t *)USERNAME_POLICY};
+    mu_string_t username = {(opcua_int32_t)5, (const opcua_byte_t *)"admin"};
     mu_string_t null_string = {-1, NULL};
-    mu_string_t encryption_algorithm = {(opcua_int32_t)strlen(PASSWORD_ENCRYPTION_ALG),
+    mu_string_t encryption_algorithm = {(opcua_int32_t)PASSWORD_ENCRYPTION_ALG_LEN,
                                         (const opcua_byte_t *)PASSWORD_ENCRYPTION_ALG};
     mu_bytestring_t password_bytes;
 
@@ -572,9 +429,9 @@ static void append_username_token(mu_binary_writer_t *writer, const opcua_byte_t
         password_block[1] = (opcua_byte_t)((secret_len >> 8) & 0xFFu);
         password_block[2] = (opcua_byte_t)((secret_len >> 16) & 0xFFu);
         password_block[3] = (opcua_byte_t)((secret_len >> 24) & 0xFFu);
-        memcpy(password_block + 4, password, password_len);
-        memcpy(password_block + 4u + password_len, g_fixture.session_server_nonce,
-               sizeof(g_fixture.session_server_nonce));
+        copy_bytes(password_block + 4, password, password_len);
+        copy_bytes(password_block + 4u + password_len, g_fixture.session_server_nonce,
+                   sizeof(g_fixture.session_server_nonce));
         if (flip_nonce) {
             password_block[4u + password_len] ^= 0x01u;
         }
@@ -596,12 +453,13 @@ static void append_username_token(mu_binary_writer_t *writer, const opcua_byte_t
     write_extension_body(writer, 324, token_body, token_writer.position);
 }
 
-static void activate_username(const char *password, bool encrypted, bool flip_nonce, opcua_statuscode_t expected) {
+static void activate_username(const char *password, size_t password_len, bool encrypted, bool flip_nonce,
+                              opcua_statuscode_t expected) {
     opcua_byte_t body[SERVICE_BODY_CAP];
     mu_binary_writer_t writer;
 
     begin_activate_request(&g_fixture, &writer, body, sizeof(body));
-    append_username_token(&writer, (const opcua_byte_t *)password, strlen(password), encrypted, flip_nonce);
+    append_username_token(&writer, (const opcua_byte_t *)password, password_len, encrypted, flip_nonce);
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, writer.status);
     activate_with_prebuilt_body(body, writer.position, expected);
 }
@@ -611,7 +469,7 @@ static void append_x509_token(mu_binary_writer_t *writer, bool corrupt_signature
     opcua_byte_t user_signature[SIGNATURE_CAP];
     size_t user_signature_len;
     mu_binary_writer_t token_writer;
-    mu_string_t policy = {(opcua_int32_t)strlen(CERT_POLICY), (const opcua_byte_t *)CERT_POLICY};
+    mu_string_t policy = {(opcua_int32_t)CERT_POLICY_LEN, (const opcua_byte_t *)CERT_POLICY};
 
     mu_binary_writer_init(&token_writer, token_body, sizeof(token_body));
     mu_binary_write_string(&token_writer, &policy);
@@ -623,11 +481,13 @@ static void append_x509_token(mu_binary_writer_t *writer, bool corrupt_signature
     write_extension_body(writer, 327, token_body, token_writer.position);
 
     user_signature_len = sign_with_identity(&g_fixture, &g_fixture.user_crypto, user_signature, sizeof(user_signature));
-    if (corrupt_signature && (user_signature_len > 0u)) {
-        user_signature[0] ^= 0x80u;
+    if (corrupt_signature) {
+        if (user_signature_len > 0u) {
+            user_signature[0] ^= 0x80u;
+        }
     }
     {
-        mu_string_t algorithm = {(opcua_int32_t)strlen(SIG_ALG_RSA_SHA256), (const opcua_byte_t *)SIG_ALG_RSA_SHA256};
+        mu_string_t algorithm = {(opcua_int32_t)SIG_ALG_RSA_SHA256_LEN, (const opcua_byte_t *)SIG_ALG_RSA_SHA256};
         mu_bytestring_t signature = {(opcua_int32_t)user_signature_len, user_signature};
         mu_binary_write_string(writer, &algorithm);
         mu_binary_write_bytestring(writer, &signature);
@@ -654,22 +514,22 @@ static bool server_channel_is_open(const secure_fixture_t *fixture) {
 
 void test_username_plaintext_accepts_admin_password(void) {
     drive_to_create_session(&g_fixture);
-    activate_username("admin", false, false, MU_STATUS_GOOD);
+    activate_username("admin", sizeof("admin") - 1u, false, false, MU_STATUS_GOOD);
 }
 
 void test_username_plaintext_rejects_wrong_password(void) {
     drive_to_create_session(&g_fixture);
-    activate_username("wrong", false, false, MU_STATUS_BAD_IDENTITYTOKENREJECTED);
+    activate_username("wrong", sizeof("wrong") - 1u, false, false, MU_STATUS_BAD_IDENTITYTOKENREJECTED);
 }
 
 void test_encrypted_username_accepts_spec_secret_layout(void) {
     drive_to_create_session(&g_fixture);
-    activate_username("admin", true, false, MU_STATUS_GOOD);
+    activate_username("admin", sizeof("admin") - 1u, true, false, MU_STATUS_GOOD);
 }
 
 void test_encrypted_username_rejects_wrong_server_nonce(void) {
     drive_to_create_session(&g_fixture);
-    activate_username("admin", true, true, MU_STATUS_BAD_IDENTITYTOKENREJECTED);
+    activate_username("admin", sizeof("admin") - 1u, true, true, MU_STATUS_BAD_IDENTITYTOKENREJECTED);
 }
 
 void test_x509_user_token_accepts_real_signature(void) {

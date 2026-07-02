@@ -254,8 +254,7 @@ void test_integration_write_errors(void) {
     mu_string_t index_range = {3, (const opcua_byte_t *)"1:2"};
     mu_binary_write_string(&w, &index_range);
 
-    mu_datavalue_t dv;
-    memset(&dv, 0, sizeof(dv));
+    mu_datavalue_t dv = {0};
     dv.has_value = true;
     dv.has_status = false;
     dv.has_source_timestamp = false;

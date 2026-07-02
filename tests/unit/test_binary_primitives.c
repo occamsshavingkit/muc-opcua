@@ -1,6 +1,8 @@
 /* tests/unit/test_binary_primitives.c */
 #include "muc_opcua/muc_opcua.h"
 #include "unity.h"
+/* The static-analysis environment may not provide system headers; the build does. */
+/* cppcheck-suppress missingIncludeSystem */
 #include <float.h>
 #include <stdint.h>
 #include <string.h>

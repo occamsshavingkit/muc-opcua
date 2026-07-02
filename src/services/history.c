@@ -332,8 +332,7 @@ opcua_statuscode_t mu_history_update_request_decode(mu_binary_reader_t *reader, 
 
                 for (size_t j = 0; j < item->body.data.num_values; ++j) {
                     mu_historical_data_point_t *dp = &item->body.data.values[j];
-                    mu_datavalue_t dv;
-                    memset(&dv, 0, sizeof(dv));
+                    mu_datavalue_t dv = {0};
                     s = mu_binary_read_datavalue(reader, &dv);
                     if (s != MU_STATUS_GOOD)
                         return s;

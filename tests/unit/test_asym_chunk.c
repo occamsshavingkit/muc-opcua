@@ -201,7 +201,9 @@ void test_oversized_basic256sha256_request_returns_bad_requesttoolarge(void) {
     get_cert(&server_crypto, &server_cert, &server_cert_len);
 
     opcua_byte_t body[MU_ASYM_MAX_PLAINTEXT];
-    memset(body, 0xA5, sizeof(body));
+    for (size_t i = 0u; i < sizeof(body); ++i) {
+        body[i] = 0xA5u;
+    }
 
     opcua_byte_t chunk[4096];
     size_t chunk_len = sizeof(chunk);

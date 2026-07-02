@@ -53,8 +53,7 @@ void test_binary_datavalue_roundtrip(void) {
 }
 
 static mu_datavalue_t datavalue_for_timestamp_mask(opcua_byte_t mask) {
-    mu_datavalue_t value;
-    memset(&value, 0, sizeof(value));
+    mu_datavalue_t value = {0};
     value.has_source_timestamp = (mask & 0x01u) != 0u;
     value.has_source_picoseconds = (mask & 0x02u) != 0u;
     value.has_server_timestamp = (mask & 0x04u) != 0u;
@@ -117,8 +116,7 @@ void test_binary_datavalue_timestamp_picosecond_masks_roundtrip(void) {
 
         mu_binary_reader_t reader;
         mu_binary_reader_init(&reader, buffer, writer.position);
-        mu_datavalue_t read_datavalue;
-        memset(&read_datavalue, 0, sizeof(read_datavalue));
+        mu_datavalue_t read_datavalue = {0};
         TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_datavalue(&reader, &read_datavalue));
         assert_datavalue_timestamp_fields_equal(&datavalue, &read_datavalue);
         TEST_ASSERT_EQUAL_size_t(writer.position, reader.position);
