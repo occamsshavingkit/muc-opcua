@@ -22,4 +22,18 @@ opcua_statuscode_t mu_certificate_thumbprint(const mu_crypto_adapter_t *crypto, 
 opcua_statuscode_t mu_certificate_validate(const mu_crypto_adapter_t *crypto, mu_security_policy_id_t policy,
                                            const opcua_byte_t *certificate, size_t length);
 
+/* Feature 026: policy-keyed asymmetric signing/verification. Dispatches to the
+   RSA-PKCS#1.5-SHA256 or RSA-PSS-SHA256 adapter primitive per the SecurityPolicy
+   (OPC-10000-7), so callers never hardcode the scheme. Fails closed
+   (Bad_SecurityChecksFailed) if the crypto adapter or the required primitive for
+   the policy is absent — never a silent PKCS#1.5 fallback for a PSS policy. */
+opcua_statuscode_t mu_asym_signature_sign(const mu_crypto_adapter_t *crypto, mu_security_policy_id_t policy,
+                                          const opcua_byte_t *data, size_t data_length, opcua_byte_t *signature,
+                                          size_t *signature_length);
+
+opcua_statuscode_t mu_asym_signature_verify(const mu_crypto_adapter_t *crypto, mu_security_policy_id_t policy,
+                                            const opcua_byte_t *certificate, size_t certificate_length,
+                                            const opcua_byte_t *data, size_t data_length, const opcua_byte_t *signature,
+                                            size_t signature_length);
+
 #endif /* MUC_OPCUA_CERTIFICATE_H */

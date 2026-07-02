@@ -146,7 +146,8 @@ static opcua_uint32_t parse_create_session_auth_token(mu_binary_reader_t *resp) 
     return auth_token.identifier.numeric;
 }
 
-static void run_handshake_for_policy(mu_security_policy_id_t policy_id, int tamper_signature, int allow_untrusted) {
+static void run_handshake_for_policy(mu_security_policy_id_t policy_id, int tamper_signature, int allow_untrusted,
+                                     int wrong_algorithm) {
     mock_t mock;
     memset(&mock, 0, sizeof(mock));
 
@@ -371,15 +372,30 @@ static void run_handshake_for_policy(mu_security_policy_id_t policy_id, int tamp
     opcua_byte_t sess_nonce[32];
     memcpy(sess_nonce, cs_server_nonce.data, 32);
 
-    static const char SIG_ALG[] = "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256";
+    /* Sign the ClientSignature with the scheme the negotiated policy requires
+       (feature 026): RSA-PSS for Aes256_Sha256_RsaPss, RSA-PKCS#1.5 otherwise, and
+       advertise the matching algorithm URI. */
+    static const char SIG_ALG_PKCS15[] = "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256";
+    static const char SIG_ALG_PSS[] = "http://opcfoundation.org/UA/security/rsa-pss-sha2-256";
+    bool use_pss = (policy_id == MU_SECURITY_POLICY_AES256_SHA256_RSAPSS_ID);
+    const char *sig_alg = use_pss ? SIG_ALG_PSS : SIG_ALG_PKCS15;
+    /* Negative path for feature 026: advertise the wrong algorithm URI for the
+       policy (the server must reject on the algorithm mismatch). */
+    if (wrong_algorithm) {
+        sig_alg = use_pss ? SIG_ALG_PKCS15 : SIG_ALG_PSS;
+    }
     opcua_byte_t to_sign[1536];
     TEST_ASSERT_TRUE(server_cert_len + 32 <= sizeof(to_sign));
     memcpy(to_sign, server_cert, server_cert_len);
     memcpy(to_sign + server_cert_len, sess_nonce, 32);
     opcua_byte_t client_sig[512];
     size_t client_sig_len = sizeof(client_sig);
-    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, client_crypto.rsa_sha256_sign(client_crypto.context, to_sign,
-                                                                    server_cert_len + 32, client_sig, &client_sig_len));
+    opcua_statuscode_t sign_rc =
+        use_pss ? client_crypto.rsa_pss_sha256_sign(client_crypto.context, to_sign, server_cert_len + 32, client_sig,
+                                                    &client_sig_len)
+                : client_crypto.rsa_sha256_sign(client_crypto.context, to_sign, server_cert_len + 32, client_sig,
+                                                &client_sig_len);
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, sign_rc);
 
     /* Negative path: corrupt the signature so verification must fail
        (OPC-10000-4 §5.7.3 — the server must reject an unproven activation). */
@@ -395,9 +411,9 @@ static void run_handshake_for_policy(mu_security_policy_id_t policy_id, int tamp
     }
     write_request_header(&w, session_auth_token, 4);
     {
-        mu_string_t sig_alg = {(opcua_int32_t)(sizeof(SIG_ALG) - 1), (const opcua_byte_t *)SIG_ALG};
+        mu_string_t sig_alg_str = {(opcua_int32_t)strlen(sig_alg), (const opcua_byte_t *)sig_alg};
         mu_bytestring_t sig_bs = {(opcua_int32_t)client_sig_len, client_sig};
-        mu_binary_write_string(&w, &sig_alg);
+        mu_binary_write_string(&w, &sig_alg_str);
         mu_binary_write_bytestring(&w, &sig_bs);
         mu_binary_write_int32(&w, 0);
         mu_binary_write_int32(&w, 0);
@@ -426,13 +442,14 @@ static void run_handshake_for_policy(mu_security_policy_id_t policy_id, int tamp
         mu_binary_write_uint16(&w, 0);
         mu_binary_write_string(&w, &ns);
     }
-    /* When the ClientSignature was tampered, activation must have failed, so a
-       subsequent Read on the (still unactivated) session is answered with a
-       ServiceFault rather than a ReadResponse. */
+    /* When the ClientSignature was tampered or advertised the wrong algorithm URI,
+       activation must have failed, so a subsequent Read on the (still unactivated)
+       session is answered with a ServiceFault rather than a ReadResponse. */
+    int expect_reject = tamper_signature || wrong_algorithm;
     secure_call(&mock, server, &client_crypto, &c2s, &s2c, scid, token_id, 5, tmp, w.position,
-                tamper_signature ? MU_ID_SERVICEFAULT : MU_ID_READRESPONSE, &resp);
+                expect_reject ? MU_ID_SERVICEFAULT : MU_ID_READRESPONSE, &resp);
 
-    if (!tamper_signature) {
+    if (!expect_reject) {
         opcua_int32_t nres;
         mu_binary_read_int32(&resp, &nres);
         TEST_ASSERT_EQUAL(1, nres);
@@ -453,17 +470,17 @@ static void run_handshake_for_policy(mu_security_policy_id_t policy_id, int tamp
 }
 
 void test_secure_handshake_aes128_oaep(void) {
-    run_handshake_for_policy(MU_SECURITY_POLICY_AES128_SHA256_RSAOAEP_ID, 0, 0);
+    run_handshake_for_policy(MU_SECURITY_POLICY_AES128_SHA256_RSAOAEP_ID, 0, 0, 0);
 }
 
 void test_secure_handshake_aes256_pss(void) {
-    run_handshake_for_policy(MU_SECURITY_POLICY_AES256_SHA256_RSAPSS_ID, 0, 0);
+    run_handshake_for_policy(MU_SECURITY_POLICY_AES256_SHA256_RSAPSS_ID, 0, 0, 0);
 }
 
 /* OPC-10000-4 §5.7.3/§7.38.2: a bad application ClientSignature must block
    activation on a secured channel. */
 void test_secure_handshake_rejects_tampered_signature(void) {
-    run_handshake_for_policy(MU_SECURITY_POLICY_AES128_SHA256_RSAOAEP_ID, 1, 0);
+    run_handshake_for_policy(MU_SECURITY_POLICY_AES128_SHA256_RSAOAEP_ID, 1, 0, 0);
 }
 
 /* Feature 025 (F3): with no trust list but allow_untrusted_clients set, a secured
@@ -471,7 +488,13 @@ void test_secure_handshake_rejects_tampered_signature(void) {
    the demo/interop path (the .NET reference client generates its own cert) and
    guards against the fail-closed trust check regressing interop. */
 void test_secure_handshake_allow_untrusted_client(void) {
-    run_handshake_for_policy(MU_SECURITY_POLICY_AES128_SHA256_RSAOAEP_ID, 0, 1);
+    run_handshake_for_policy(MU_SECURITY_POLICY_AES128_SHA256_RSAOAEP_ID, 0, 1, 0);
+}
+
+/* Feature 026 (FR-005): a ClientSignature advertising the wrong algorithm URI for
+   the negotiated policy must be rejected (here: PKCS#1.5 URI on a PSS channel). */
+void test_secure_handshake_rejects_wrong_algorithm(void) {
+    run_handshake_for_policy(MU_SECURITY_POLICY_AES256_SHA256_RSAPSS_ID, 0, 0, 1);
 }
 
 int main(void) {
@@ -480,6 +503,7 @@ int main(void) {
     RUN_TEST(test_secure_handshake_aes256_pss);
     RUN_TEST(test_secure_handshake_rejects_tampered_signature);
     RUN_TEST(test_secure_handshake_allow_untrusted_client);
+    RUN_TEST(test_secure_handshake_rejects_wrong_algorithm);
     return UNITY_END();
 }
 

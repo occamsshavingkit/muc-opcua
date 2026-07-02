@@ -50,3 +50,42 @@ opcua_statuscode_t mu_certificate_validate(const mu_crypto_adapter_t *crypto, mu
 
     return MU_STATUS_GOOD;
 }
+
+opcua_statuscode_t mu_asym_signature_sign(const mu_crypto_adapter_t *crypto, mu_security_policy_id_t policy,
+                                          const opcua_byte_t *data, size_t data_length, opcua_byte_t *signature,
+                                          size_t *signature_length) {
+    if (crypto == NULL) {
+        return MU_STATUS_BAD_SECURITYCHECKSFAILED;
+    }
+    if (mu_security_policy_uses_pss(policy)) {
+        if (crypto->rsa_pss_sha256_sign == NULL) {
+            return MU_STATUS_BAD_SECURITYCHECKSFAILED; /* fail closed: no PKCS#1.5 fallback */
+        }
+        return crypto->rsa_pss_sha256_sign(crypto->context, data, data_length, signature, signature_length);
+    }
+    if (crypto->rsa_sha256_sign == NULL) {
+        return MU_STATUS_BAD_SECURITYCHECKSFAILED;
+    }
+    return crypto->rsa_sha256_sign(crypto->context, data, data_length, signature, signature_length);
+}
+
+opcua_statuscode_t mu_asym_signature_verify(const mu_crypto_adapter_t *crypto, mu_security_policy_id_t policy,
+                                            const opcua_byte_t *certificate, size_t certificate_length,
+                                            const opcua_byte_t *data, size_t data_length, const opcua_byte_t *signature,
+                                            size_t signature_length) {
+    if (crypto == NULL) {
+        return MU_STATUS_BAD_SECURITYCHECKSFAILED;
+    }
+    if (mu_security_policy_uses_pss(policy)) {
+        if (crypto->rsa_pss_sha256_verify == NULL) {
+            return MU_STATUS_BAD_SECURITYCHECKSFAILED; /* fail closed: no PKCS#1.5 fallback */
+        }
+        return crypto->rsa_pss_sha256_verify(crypto->context, certificate, certificate_length, data, data_length,
+                                             signature, signature_length);
+    }
+    if (crypto->rsa_sha256_verify == NULL) {
+        return MU_STATUS_BAD_SECURITYCHECKSFAILED;
+    }
+    return crypto->rsa_sha256_verify(crypto->context, certificate, certificate_length, data, data_length, signature,
+                                     signature_length);
+}

@@ -96,3 +96,35 @@ size_t mu_security_policy_nonce_length(mu_security_policy_id_t policy) {
     const mu_security_policy_params_t *row = policy_row(policy);
     return row ? row->nonce_len : 0;
 }
+
+#ifdef MUC_OPCUA_SECURITY
+/* OPC-10000-7 SecurityPolicy asymmetric-signature algorithm URIs (feature 026). */
+static const char SIG_URI_RSA_SHA256[] = "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256";
+static const char SIG_URI_RSA_PSS_SHA256[] = "http://opcfoundation.org/UA/security/rsa-pss-sha2-256";
+#endif
+
+const char *mu_security_policy_asym_signature_uri(mu_security_policy_id_t policy) {
+#ifdef MUC_OPCUA_SECURITY
+    switch (policy) {
+    case MU_SECURITY_POLICY_BASIC256SHA256_ID:
+    case MU_SECURITY_POLICY_AES128_SHA256_RSAOAEP_ID:
+        return SIG_URI_RSA_SHA256;
+    case MU_SECURITY_POLICY_AES256_SHA256_RSAPSS_ID:
+        return SIG_URI_RSA_PSS_SHA256;
+    default:
+        return NULL;
+    }
+#else
+    (void)policy;
+    return NULL;
+#endif
+}
+
+opcua_boolean_t mu_security_policy_uses_pss(mu_security_policy_id_t policy) {
+#ifdef MUC_OPCUA_SECURITY
+    return policy == MU_SECURITY_POLICY_AES256_SHA256_RSAPSS_ID;
+#else
+    (void)policy;
+    return false;
+#endif
+}
