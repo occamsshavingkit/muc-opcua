@@ -267,6 +267,7 @@ void test_integration_write_batch(void) {
     mu_string_t index_range = {-1, NULL};
     mu_binary_write_string(&w, &index_range);
     mu_datavalue_t dv0;
+    memset(&dv0, 0, sizeof(dv0));
     dv0.has_value = true;
     dv0.has_status = false;
     dv0.has_source_timestamp = false;
@@ -281,6 +282,7 @@ void test_integration_write_batch(void) {
     mu_binary_write_int32(&w, 13);
     mu_binary_write_string(&w, &index_range);
     mu_datavalue_t dv1;
+    memset(&dv1, 0, sizeof(dv1));
     dv1.has_value = true;
     dv1.has_status = false;
     dv1.has_source_timestamp = false;

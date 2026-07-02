@@ -1283,6 +1283,47 @@ void test_set_publishing_mode(void) {
     TEST_ASSERT_EQUAL(0, parse_publish_response(&body, &sid, &seqn, &ch, &dv)); /* keep-alive, no data */
 }
 
+/* SetPublishingMode (OPC 10000-4 §5.14.4 / §7.38.2): an unknown
+   SubscriptionId is reported per item as Bad_SubscriptionIdInvalid. */
+void test_set_publishing_mode_unknown_subscription_returns_item_status(void) {
+    mock_t mock;
+    memset(&mock, 0, sizeof(mock));
+    _Alignas(8) opcua_byte_t storage[MU_SERVER_STORAGE_BYTES];
+    mu_server_config_t config;
+    opcua_uint32_t sub_id;
+    opcua_uint32_t item_id;
+    mu_server_t *server =
+        setup_sub_with_item(&mock, storage, sizeof(storage), &config, 200.0, 100, 2, 100.0, &sub_id, &item_id);
+    (void)item_id;
+
+    opcua_byte_t tmp[512];
+    opcua_byte_t chunk[512];
+    mu_binary_writer_t w;
+    mu_binary_writer_init(&w, tmp, sizeof(tmp));
+    {
+        mu_nodeid_t t = {0, MU_NODEID_NUMERIC, {ID_SETPUBLISHINGMODEREQUEST}};
+        mu_binary_write_nodeid(&w, &t);
+    }
+    write_request_header(&w, TEST_FIRST_AUTH_TOKEN, 6);
+    mu_binary_write_boolean(&w, true);
+    mu_binary_write_int32(&w, 1);
+    mu_binary_write_uint32(&w, sub_id + 1000u);
+    size_t clen = build_msg(chunk, sizeof(chunk), 6, 6, tmp, w.position);
+    enqueue(&mock, chunk, clen);
+
+    mu_binary_reader_t body;
+    opcua_statuscode_t sr;
+    mu_server_poll(server);
+    TEST_ASSERT_EQUAL(ID_SETPUBLISHINGMODERESPONSE, parse_response(mock.last_write, mock.last_write_len, &body, &sr));
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, sr);
+    opcua_int32_t nres;
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_binary_read_int32(&body, &nres));
+    TEST_ASSERT_EQUAL(1, nres);
+    opcua_statuscode_t item_status;
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_binary_read_statuscode(&body, &item_status));
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_BAD_SUBSCRIPTIONIDINVALID, item_status);
+}
+
 /* ModifyMonitoredItems (OPC 10000-4 §5.13.3): the revised sampling interval reflects the
    new requested value. */
 void test_modify_monitored_items(void) {
@@ -1404,6 +1445,47 @@ void test_set_monitoring_mode(void) {
     mu_server_poll(server);
     TEST_ASSERT_TRUE(item->pending);
     TEST_ASSERT_EQUAL_INT32(30, item->last_value.value.i32);
+}
+
+/* SetMonitoringMode (OPC 10000-4 §5.13.4 / §7.38.2): an unknown
+   MonitoredItemId is reported per item as Bad_MonitoredItemIdInvalid. */
+void test_set_monitoring_mode_unknown_item_returns_item_status(void) {
+    mock_t mock;
+    memset(&mock, 0, sizeof(mock));
+    _Alignas(8) opcua_byte_t storage[MU_SERVER_STORAGE_BYTES];
+    mu_server_config_t config;
+    opcua_uint32_t sub_id;
+    opcua_uint32_t item_id;
+    mu_server_t *server =
+        setup_sub_with_item(&mock, storage, sizeof(storage), &config, 1000.0, 100, 10, 100.0, &sub_id, &item_id);
+
+    opcua_byte_t tmp[512];
+    opcua_byte_t chunk[512];
+    mu_binary_writer_t w;
+    mu_binary_writer_init(&w, tmp, sizeof(tmp));
+    {
+        mu_nodeid_t t = {0, MU_NODEID_NUMERIC, {ID_SETMONITORINGMODEREQUEST}};
+        mu_binary_write_nodeid(&w, &t);
+    }
+    write_request_header(&w, TEST_FIRST_AUTH_TOKEN, 6);
+    mu_binary_write_uint32(&w, sub_id);
+    mu_binary_write_uint32(&w, 2); /* Reporting */
+    mu_binary_write_int32(&w, 1);
+    mu_binary_write_uint32(&w, item_id + 1000u);
+    size_t clen = build_msg(chunk, sizeof(chunk), 6, 6, tmp, w.position);
+    enqueue(&mock, chunk, clen);
+
+    mu_binary_reader_t body;
+    opcua_statuscode_t sr;
+    mu_server_poll(server);
+    TEST_ASSERT_EQUAL(ID_SETMONITORINGMODERESPONSE, parse_response(mock.last_write, mock.last_write_len, &body, &sr));
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, sr);
+    opcua_int32_t nres;
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_binary_read_int32(&body, &nres));
+    TEST_ASSERT_EQUAL(1, nres);
+    opcua_statuscode_t item_status;
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_binary_read_statuscode(&body, &item_status));
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_BAD_MONITOREDITEMIDINVALID, item_status);
 }
 
 #define ID_READREQUEST 631
@@ -2188,8 +2270,10 @@ int main(void) {
     RUN_TEST(test_republish_unknown_sequence_returns_bad_message_not_available);
     RUN_TEST(test_modify_subscription);
     RUN_TEST(test_set_publishing_mode);
+    RUN_TEST(test_set_publishing_mode_unknown_subscription_returns_item_status);
     RUN_TEST(test_modify_monitored_items);
     RUN_TEST(test_set_monitoring_mode);
+    RUN_TEST(test_set_monitoring_mode_unknown_item_returns_item_status);
     RUN_TEST(test_two_sessions);
     RUN_TEST(test_subscription_session_isolation);
     return UNITY_END();

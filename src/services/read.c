@@ -2,6 +2,7 @@
 #include "read.h"
 #include "../address_space/base_nodes.h"
 #include <stddef.h>
+#include <string.h>
 
 opcua_statuscode_t mu_read_request_decode(mu_binary_reader_t *reader, mu_read_request_t *req,
                                           mu_read_value_id_t *nodes_array, size_t max_nodes) {
@@ -161,10 +162,7 @@ opcua_statuscode_t mu_read_process_with_user_index(const mu_address_space_t *add
         const mu_read_value_id_t *read_val = &req->nodes_to_read[i];
         mu_datavalue_t *dv = &resp->results[i];
 
-        dv->has_value = false;
-        dv->has_status = false;
-        dv->has_source_timestamp = false;
-        dv->has_server_timestamp = false;
+        memset(dv, 0, sizeof(*dv));
 
         const mu_node_t *node = mu_resolve_node(address_space, user_index, dynamic, &read_val->node_id);
         if (!node) {

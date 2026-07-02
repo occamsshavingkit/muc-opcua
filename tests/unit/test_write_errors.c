@@ -280,6 +280,7 @@ void test_write_service_non_value_attribute(void) {
     mu_binary_write_string(&writer, &audit_id);
 
     mu_datavalue_t dv;
+    memset(&dv, 0, sizeof(dv));
     dv.has_value = true;
     dv.has_status = false;
     dv.has_source_timestamp = false;
@@ -382,6 +383,7 @@ void test_write_service_index_range(void) {
     mu_binary_write_string(&writer, &index_range);
 
     mu_datavalue_t dv;
+    memset(&dv, 0, sizeof(dv));
     dv.has_value = true;
     dv.has_status = false;
     dv.has_source_timestamp = false;

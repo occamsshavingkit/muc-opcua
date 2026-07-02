@@ -3828,6 +3828,7 @@ opcua_statuscode_t handle_history_read(mu_server_t *server, mu_binary_reader_t *
     mu_history_read_result_t results[MU_MAX_HISTORY_NODES_PER_READ];
     mu_datavalue_t dvals[MU_MAX_HISTORY_NODES_PER_READ][10];
     opcua_byte_t continuation_points[MU_MAX_HISTORY_NODES_PER_READ][MU_MAX_HISTORY_READ_CONTINUATION_POINT_LENGTH];
+    memset(dvals, 0, sizeof(dvals));
     mu_history_read_response_t resp;
     resp.num_results = req.num_nodes_to_read;
     resp.results = results;

@@ -255,6 +255,7 @@ void test_integration_write_errors(void) {
     mu_binary_write_string(&w, &index_range);
 
     mu_datavalue_t dv;
+    memset(&dv, 0, sizeof(dv));
     dv.has_value = true;
     dv.has_status = false;
     dv.has_source_timestamp = false;

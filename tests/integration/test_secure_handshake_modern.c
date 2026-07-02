@@ -497,6 +497,12 @@ void test_secure_handshake_rejects_wrong_algorithm(void) {
     run_handshake_for_policy(MU_SECURITY_POLICY_AES256_SHA256_RSAPSS_ID, 0, 0, 1);
 }
 
+/* OPC-10000-4 §7.37 / OPC-10000-7 SecurityPolicy: a ClientSignature advertising
+   RSA-PSS on a PKCS#1.5 Basic256Sha256 channel is also a policy mismatch. */
+void test_secure_handshake_rejects_pss_algorithm_on_basic256sha256(void) {
+    run_handshake_for_policy(MU_SECURITY_POLICY_BASIC256SHA256_ID, 0, 0, 1);
+}
+
 int main(void) {
     UNITY_BEGIN();
     RUN_TEST(test_secure_handshake_aes128_oaep);
@@ -504,6 +510,7 @@ int main(void) {
     RUN_TEST(test_secure_handshake_rejects_tampered_signature);
     RUN_TEST(test_secure_handshake_allow_untrusted_client);
     RUN_TEST(test_secure_handshake_rejects_wrong_algorithm);
+    RUN_TEST(test_secure_handshake_rejects_pss_algorithm_on_basic256sha256);
     return UNITY_END();
 }
 

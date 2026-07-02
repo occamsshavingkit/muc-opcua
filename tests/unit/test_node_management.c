@@ -352,6 +352,45 @@ void test_DeleteReferencesResponse_Encode(void) {
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, status_code);
 }
 
+void test_DeleteReferences_MissingReference_IsBadNotFound(void) {
+    opcua_byte_t request[512];
+    mu_binary_writer_t w;
+    mu_binary_writer_init(&w, request, sizeof(request));
+
+    mu_binary_write_int32(&w, 1);
+    {
+        mu_nodeid_t sid = {0, MU_NODEID_NUMERIC, {85}};
+        mu_nodeid_t rid = {0, MU_NODEID_NUMERIC, {35}};
+        mu_expanded_nodeid_t tid = {{1, MU_NODEID_NUMERIC, {1000}}, {-1, NULL}, 0};
+
+        mu_binary_write_nodeid(&w, &sid);
+        mu_binary_write_nodeid(&w, &rid);
+        mu_binary_write_byte(&w, 1); /* isForward */
+        mu_binary_write_expanded_nodeid(&w, &tid);
+        mu_binary_write_byte(&w, 1); /* deleteBidirectional */
+    }
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, w.status);
+
+    opcua_byte_t response[512];
+    mu_binary_writer_t rw;
+    mu_binary_writer_init(&rw, response, sizeof(response));
+    mu_binary_reader_t r;
+    mu_binary_reader_init(&r, request, w.position);
+
+    /* OPC-10000-4 section 5.8 DeleteReferences: a syntactically valid request
+       for a reference that is not present returns per-item Bad_NotFound. */
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_delete_references_process(&server, &r, &rw));
+
+    mu_binary_reader_t rr;
+    mu_binary_reader_init(&rr, response, rw.position);
+    opcua_int32_t result_count = 0;
+    opcua_statuscode_t status_code = 0u;
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_int32(&rr, &result_count));
+    TEST_ASSERT_EQUAL(1, result_count);
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_statuscode(&rr, &status_code));
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_BAD_NOTFOUND, status_code);
+}
+
 /* Feature 028 (T020/T021): AddNodes with a requestedNewNodeId that already exists
    must return Bad_NodeIdExists per-result (OPC-10000-4 §5.8 AddNodes / §7.38.2),
    not silently create a duplicate node. */
@@ -369,8 +408,8 @@ static void encode_add_nodes_one(mu_binary_writer_t *w, opcua_uint32_t new_numer
     mu_binary_write_uint32(w, 1); /* nodeClass Object */
     mu_nodeid_t attr_type = {0, MU_NODEID_NUMERIC, {251}};
     mu_binary_write_nodeid(w, &attr_type);
-    mu_binary_write_byte(w, 1);   /* ExtensionObject encoding: ByteString */
-    mu_binary_write_int32(w, 0);  /* empty attributes body */
+    mu_binary_write_byte(w, 1);  /* ExtensionObject encoding: ByteString */
+    mu_binary_write_int32(w, 0); /* empty attributes body */
     mu_expanded_nodeid_t tdef = {{0, MU_NODEID_NUMERIC, {58}}, {-1, NULL}, 0};
     mu_binary_write_expanded_nodeid(w, &tdef);
 }
@@ -417,5 +456,6 @@ int main(void) {
     RUN_TEST(test_AddReferencesResponse_Encode);
     RUN_TEST(test_DeleteReferencesRequest_Decode);
     RUN_TEST(test_DeleteReferencesResponse_Encode);
+    RUN_TEST(test_DeleteReferences_MissingReference_IsBadNotFound);
     return UNITY_END();
 }

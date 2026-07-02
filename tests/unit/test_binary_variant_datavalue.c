@@ -52,6 +52,79 @@ void test_binary_datavalue_roundtrip(void) {
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, read_datavalue.status);
 }
 
+static mu_datavalue_t datavalue_for_timestamp_mask(opcua_byte_t mask) {
+    mu_datavalue_t value;
+    memset(&value, 0, sizeof(value));
+    value.has_source_timestamp = (mask & 0x01u) != 0u;
+    value.has_source_picoseconds = (mask & 0x02u) != 0u;
+    value.has_server_timestamp = (mask & 0x04u) != 0u;
+    value.has_server_picoseconds = (mask & 0x08u) != 0u;
+    value.source_timestamp = 123456789012345678LL;
+    value.source_picoseconds = 1234u;
+    value.server_timestamp = 223456789012345678LL;
+    value.server_picoseconds = 5678u;
+    return value;
+}
+
+static opcua_byte_t datavalue_expected_timestamp_mask(const mu_datavalue_t *value) {
+    opcua_byte_t mask = 0u;
+    if (value->has_source_timestamp) {
+        mask |= 0x04u;
+    }
+    if (value->has_source_picoseconds) {
+        mask |= 0x10u;
+    }
+    if (value->has_server_timestamp) {
+        mask |= 0x08u;
+    }
+    if (value->has_server_picoseconds) {
+        mask |= 0x20u;
+    }
+    return mask;
+}
+
+static void assert_datavalue_timestamp_fields_equal(const mu_datavalue_t *expected, const mu_datavalue_t *actual) {
+    TEST_ASSERT_EQUAL(expected->has_source_timestamp, actual->has_source_timestamp);
+    TEST_ASSERT_EQUAL(expected->has_source_picoseconds, actual->has_source_picoseconds);
+    TEST_ASSERT_EQUAL(expected->has_server_timestamp, actual->has_server_timestamp);
+    TEST_ASSERT_EQUAL(expected->has_server_picoseconds, actual->has_server_picoseconds);
+    if (expected->has_source_timestamp) {
+        TEST_ASSERT_EQUAL_INT64(expected->source_timestamp, actual->source_timestamp);
+    }
+    if (expected->has_source_picoseconds) {
+        TEST_ASSERT_EQUAL_UINT16(expected->source_picoseconds, actual->source_picoseconds);
+    }
+    if (expected->has_server_timestamp) {
+        TEST_ASSERT_EQUAL_INT64(expected->server_timestamp, actual->server_timestamp);
+    }
+    if (expected->has_server_picoseconds) {
+        TEST_ASSERT_EQUAL_UINT16(expected->server_picoseconds, actual->server_picoseconds);
+    }
+}
+
+void test_binary_datavalue_timestamp_picosecond_masks_roundtrip(void) {
+    opcua_byte_t buffer[64];
+
+    /* OPC-10000-6 section 5.2.2.17: DataValue timestamp and picosecond mask
+       bits control the exact fields on the wire and must survive decode. */
+    for (opcua_byte_t mask = 0u; mask < 16u; ++mask) {
+        mu_datavalue_t datavalue = datavalue_for_timestamp_mask(mask);
+        mu_binary_writer_t writer;
+        mu_binary_writer_init(&writer, buffer, sizeof(buffer));
+        TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_write_datavalue(&writer, &datavalue));
+        TEST_ASSERT_GREATER_THAN(0u, writer.position);
+        TEST_ASSERT_EQUAL_HEX8(datavalue_expected_timestamp_mask(&datavalue), buffer[0]);
+
+        mu_binary_reader_t reader;
+        mu_binary_reader_init(&reader, buffer, writer.position);
+        mu_datavalue_t read_datavalue;
+        memset(&read_datavalue, 0, sizeof(read_datavalue));
+        TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_datavalue(&reader, &read_datavalue));
+        assert_datavalue_timestamp_fields_equal(&datavalue, &read_datavalue);
+        TEST_ASSERT_EQUAL_size_t(writer.position, reader.position);
+    }
+}
+
 void test_binary_variant_qualifiedname_roundtrip(void) {
     opcua_byte_t buffer[128];
     mu_binary_writer_t writer;
@@ -161,13 +234,37 @@ void test_binary_variant_int32_array_encode(void) {
     TEST_ASSERT_EQUAL(30, v2);
 }
 
+void test_binary_qualifiedname_truncated_name_returns_decoding_error(void) {
+    const opcua_byte_t buffer[] = {0x01u, 0x00u, 0x04u, 0x00u, 0x00u, 0x00u, 't'};
+    mu_binary_reader_t reader;
+    mu_binary_reader_init(&reader, buffer, sizeof(buffer));
+
+    mu_qualified_name_t value;
+    /* OPC-10000-6 section 5.2.2.13: QualifiedName.name is a complete String. */
+    TEST_ASSERT_EQUAL(MU_STATUS_BAD_DECODINGERROR, mu_binary_read_qualified_name(&reader, &value));
+}
+
+void test_binary_localizedtext_truncated_text_returns_decoding_error(void) {
+    const opcua_byte_t buffer[] = {MU_TYPE_LOCALIZEDTEXT, 0x02u, 0x04u, 0x00u, 0x00u, 0x00u, 't'};
+    mu_binary_reader_t reader;
+    mu_binary_reader_init(&reader, buffer, sizeof(buffer));
+
+    mu_variant_t value;
+    /* OPC-10000-6 section 5.2.2.14: LocalizedText text is a complete String.
+       This is wire-reachable through the Variant decoder. */
+    TEST_ASSERT_EQUAL(MU_STATUS_BAD_DECODINGERROR, mu_binary_read_variant(&reader, &value));
+}
+
 int main(void) {
     UNITY_BEGIN();
     RUN_TEST(test_binary_variant_roundtrip);
     RUN_TEST(test_binary_datavalue_roundtrip);
+    RUN_TEST(test_binary_datavalue_timestamp_picosecond_masks_roundtrip);
     RUN_TEST(test_binary_variant_qualifiedname_roundtrip);
     RUN_TEST(test_binary_variant_localizedtext_roundtrip);
     RUN_TEST(test_binary_variant_string_array_encode);
     RUN_TEST(test_binary_variant_int32_array_encode);
+    RUN_TEST(test_binary_qualifiedname_truncated_name_returns_decoding_error);
+    RUN_TEST(test_binary_localizedtext_truncated_text_returns_decoding_error);
     return UNITY_END();
 }

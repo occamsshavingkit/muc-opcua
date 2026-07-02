@@ -277,6 +277,40 @@ void test_create_session_two_successful_responses_use_fresh_session_ids_and_toke
                           second_authentication_token.identifier.numeric);
 }
 
+void test_create_session_overflow_returns_bad_toomanysessions_without_allocating(void) {
+    mu_server_t server;
+    memset(&server, 0, sizeof(server));
+    server.secure_channel.is_open = true;
+    server.config.time_adapter.get_time = fake_time;
+    server.config.entropy_adapter.generate_random = fake_entropy;
+    for (size_t i = 0; i < MU_MAX_SESSIONS; ++i) {
+        mu_session_init(&server.sessions[i]);
+    }
+
+    for (size_t i = 0; i < MU_MAX_SESSIONS; ++i) {
+        mu_nodeid_t session_id;
+        mu_nodeid_t authentication_token;
+        dispatch_create_session_and_read_ids(&server, &session_id, &authentication_token);
+    }
+
+    mu_session_t sessions_before[MU_MAX_SESSIONS];
+    memcpy(sessions_before, server.sessions, sizeof(sessions_before));
+    mu_session_t *active_session_before = server.active_session;
+
+    opcua_byte_t request[256];
+    size_t request_length = build_create_session_body(request, sizeof(request), 1200000.0);
+    opcua_byte_t response[1024];
+    size_t response_length = sizeof(response);
+
+    /* OPC-10000-4 sections 5.7.2 and 7.38.2: once all compiled Session slots
+       are in use, CreateSession fails with Bad_TooManySessions. */
+    TEST_ASSERT_EQUAL_HEX32(
+        MU_STATUS_BAD_TOOMANYSESSIONS,
+        mu_service_dispatch(&server, MU_ID_CREATESESSIONREQUEST, request, request_length, response, &response_length));
+    TEST_ASSERT_EQUAL_PTR(active_session_before, server.active_session);
+    assert_sessions_unchanged(sessions_before, server.sessions);
+}
+
 void test_create_session_server_nonce_entropy_failure_returns_bad_securitychecksfailed_without_allocating_session(
     void) {
     mu_server_t server;
@@ -314,6 +348,7 @@ int main(void) {
     RUN_TEST(test_session_close);
     RUN_TEST(test_create_session_truncated_body_returns_bad_decodingerror_without_allocating_session);
     RUN_TEST(test_create_session_two_successful_responses_use_fresh_session_ids_and_tokens);
+    RUN_TEST(test_create_session_overflow_returns_bad_toomanysessions_without_allocating);
     RUN_TEST(
         test_create_session_server_nonce_entropy_failure_returns_bad_securitychecksfailed_without_allocating_session);
     return UNITY_END();

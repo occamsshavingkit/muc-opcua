@@ -112,6 +112,100 @@ static size_t build_msg(opcua_byte_t *out, size_t cap, opcua_uint32_t seq, opcua
     return 24 + body_len;
 }
 
+static void enqueue_hello(mock_t *mock) {
+    opcua_byte_t tmp[512];
+    mu_binary_writer_t w;
+
+    mu_binary_writer_init(&w, tmp, sizeof(tmp));
+    tmp[0] = 'H';
+    tmp[1] = 'E';
+    tmp[2] = 'L';
+    tmp[3] = 'F';
+    w.position = 4;
+    mu_binary_write_uint32(&w, 0);
+    mu_binary_write_uint32(&w, 0);
+    mu_binary_write_uint32(&w, 8192);
+    mu_binary_write_uint32(&w, 8192);
+    mu_binary_write_uint32(&w, 0);
+    mu_binary_write_uint32(&w, 0);
+    {
+        mu_string_t url = {19, (const opcua_byte_t *)"opc.tcp://host:4840"};
+        mu_binary_write_string(&w, &url);
+    }
+    {
+        mu_binary_writer_t hs;
+        mu_binary_writer_init(&hs, tmp, sizeof(tmp));
+        hs.position = 4;
+        mu_binary_write_uint32(&hs, (opcua_uint32_t)w.position);
+    }
+    enqueue(mock, tmp, w.position);
+}
+
+static void enqueue_open_secure_channel_none(mock_t *mock) {
+    opcua_byte_t chunk[512];
+    mu_binary_writer_t w;
+
+    mu_binary_writer_init(&w, chunk, sizeof(chunk));
+    chunk[0] = 'O';
+    chunk[1] = 'P';
+    chunk[2] = 'N';
+    chunk[3] = 'F';
+    w.position = 4;
+    mu_binary_write_uint32(&w, 0);
+    mu_binary_write_uint32(&w, 0);
+    {
+        mu_string_t pol = {47, (const opcua_byte_t *)"http://opcfoundation.org/UA/SecurityPolicy#None"};
+        mu_binary_write_string(&w, &pol);
+    }
+    mu_binary_write_int32(&w, -1);
+    mu_binary_write_int32(&w, -1);
+    mu_binary_write_uint32(&w, 1);
+    mu_binary_write_uint32(&w, 1);
+    {
+        mu_nodeid_t t = {0, MU_NODEID_NUMERIC, {MU_ID_OPENSECURECHANNELREQUEST}};
+        mu_binary_write_nodeid(&w, &t);
+    }
+    write_request_header(&w, 0, 1);
+    mu_binary_write_uint32(&w, 0);
+    mu_binary_write_uint32(&w, 0);
+    mu_binary_write_uint32(&w, 1);
+    mu_binary_write_int32(&w, -1);
+    mu_binary_write_uint32(&w, 3600000);
+    {
+        mu_binary_writer_t os;
+        mu_binary_writer_init(&os, chunk, sizeof(chunk));
+        os.position = 4;
+        mu_binary_write_uint32(&os, (opcua_uint32_t)w.position);
+    }
+    enqueue(mock, chunk, w.position);
+}
+
+static void enqueue_close_secure_channel(mock_t *mock, opcua_uint32_t seq, opcua_uint32_t reqid) {
+    opcua_byte_t chunk[24];
+    mu_binary_writer_t w;
+
+    mu_binary_writer_init(&w, chunk, sizeof(chunk));
+    chunk[0] = 'C';
+    chunk[1] = 'L';
+    chunk[2] = 'O';
+    chunk[3] = 'F';
+    w.position = 4;
+    mu_binary_write_uint32(&w, (opcua_uint32_t)sizeof(chunk));
+    mu_binary_write_uint32(&w, 1);
+    mu_binary_write_uint32(&w, 1);
+    mu_binary_write_uint32(&w, seq);
+    mu_binary_write_uint32(&w, reqid);
+    enqueue(mock, chunk, sizeof(chunk));
+}
+
+static bool server_channel_is_open(const mu_server_t *server) {
+#ifdef MUC_OPCUA_MULTIPLE_CONNECTIONS
+    return server->conns[0].secure_channel.is_open;
+#else
+    return server->secure_channel.is_open;
+#endif
+}
+
 /* Read past a response's chunk header + ResponseHeader, returning the response
    type id and a reader positioned at the service body. */
 static opcua_uint32_t parse_response(const opcua_byte_t *buf, size_t len, mu_binary_reader_t *body) {
@@ -523,9 +617,62 @@ void test_server_rejects_sequence_gap(void) {
     TEST_ASSERT_NULL(GET_CLIENT_HANDLE(server));
 }
 
+void test_close_secure_channel_message_closes_channel(void) {
+    mock_t mock;
+    memset(&mock, 0, sizeof(mock));
+
+    enqueue_hello(&mock);
+    enqueue_open_secure_channel_none(&mock);
+    enqueue_close_secure_channel(&mock, 2, 2);
+
+    mu_server_config_t config;
+    memset(&config, 0, sizeof(config));
+    config.endpoint_url = "opc.tcp://host:4840";
+    config.application_uri = "urn:test";
+    config.product_uri = "urn:test";
+    config.application_name = "test";
+    opcua_byte_t rx[8192];
+    opcua_byte_t tx[8192];
+    config.receive_buffer = rx;
+    config.receive_buffer_size = sizeof(rx);
+    config.send_buffer = tx;
+    config.send_buffer_size = sizeof(tx);
+    config.max_chunk_count = 1;
+    config.max_message_size = 8192;
+    config.max_sessions = 1;
+    config.max_secure_channels = 1;
+    fake_platform_init(NULL, &config.time_adapter, &config.entropy_adapter);
+    config.tcp_adapter.context = &mock;
+    config.tcp_adapter.listen = mock_listen;
+    config.tcp_adapter.accept = mock_accept;
+    config.tcp_adapter.read = mock_read;
+    config.tcp_adapter.write = mock_write;
+    config.tcp_adapter.close_connection = mock_close;
+    config.tcp_adapter.shutdown = mock_shutdown;
+
+    _Alignas(8) opcua_byte_t storage[MU_SERVER_STORAGE_BYTES];
+    mu_server_t *server = NULL;
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_server_init(storage, sizeof(storage), &config, &server));
+
+    mu_server_poll(server); /* accept */
+    mu_server_poll(server); /* HEL -> ACK */
+    TEST_ASSERT_EQUAL_MEMORY("ACKF", mock.last_write, 4);
+    mu_server_poll(server); /* OPN -> OpenSecureChannelResponse */
+    TEST_ASSERT_EQUAL_MEMORY("OPNF", mock.last_write, 4);
+    TEST_ASSERT_TRUE(server_channel_is_open(server));
+    TEST_ASSERT_NOT_NULL(GET_CLIENT_HANDLE(server));
+
+    /* OPC-10000-4 §5.6.3 / OPC-10000-6 §6.7.3: a CLO message closes the
+       SecureChannel and the underlying transport connection. */
+    mu_server_poll(server);
+    TEST_ASSERT_FALSE(server_channel_is_open(server));
+    TEST_ASSERT_NULL(GET_CLIENT_HANDLE(server));
+}
+
 int main(void) {
     UNITY_BEGIN();
     RUN_TEST(test_server_handshake_connect_browse_read);
     RUN_TEST(test_server_rejects_sequence_gap);
+    RUN_TEST(test_close_secure_channel_message_closes_channel);
     return UNITY_END();
 }

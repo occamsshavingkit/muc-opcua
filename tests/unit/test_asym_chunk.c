@@ -195,6 +195,24 @@ void test_wrong_receiver_thumbprint_rejected(void) {
                                                &recovered_len, scratch, sizeof(scratch), &info));
 }
 
+void test_oversized_basic256sha256_request_returns_bad_requesttoolarge(void) {
+    const opcua_byte_t *server_cert = NULL;
+    size_t server_cert_len = 0;
+    get_cert(&server_crypto, &server_cert, &server_cert_len);
+
+    opcua_byte_t body[MU_ASYM_MAX_PLAINTEXT];
+    memset(body, 0xA5, sizeof(body));
+
+    opcua_byte_t chunk[4096];
+    size_t chunk_len = sizeof(chunk);
+
+    /* OPC-10000-6 sections 6.7.2 and 7.1.5: an OPN body that cannot fit in
+       this single asymmetric chunk is rejected as Bad_RequestTooLarge. */
+    TEST_ASSERT_EQUAL(MU_STATUS_BAD_REQUESTTOOLARGE,
+                      mu_asym_chunk_wrap(&client_crypto, MU_SECURITY_POLICY_BASIC256SHA256_ID, 0, 1, 5, server_cert,
+                                         server_cert_len, body, sizeof(body), chunk, sizeof(chunk), &chunk_len));
+}
+
 int main(void) {
     UNITY_BEGIN();
     RUN_TEST(test_basic256sha256_roundtrip);
@@ -202,6 +220,7 @@ int main(void) {
     RUN_TEST(test_aes256_sha256_rsapss_roundtrip);
     RUN_TEST(test_tampered_signature_rejected);
     RUN_TEST(test_wrong_receiver_thumbprint_rejected);
+    RUN_TEST(test_oversized_basic256sha256_request_returns_bad_requesttoolarge);
     return UNITY_END();
 }
 

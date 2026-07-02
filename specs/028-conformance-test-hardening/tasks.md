@@ -103,16 +103,16 @@ per-profile test.
 
 **Goal**: every implemented-but-untested code/path from the audit has a forcing test.
 
-- [ ] T034 [P] [US4] Force `Bad_TooManySessions`: drive CreateSession beyond `MU_MAX_SESSIONS` and assert it. OPC-10000-4 §5.7.2 (CreateSession) / §7.38.2.
-- [ ] T035 [P] [US4] Force `Bad_RequestTooLarge`: drive an oversized request/OPN and assert it (`asym_chunk.c` emission). OPC-10000-6 §7.1.5 (UA-TCP error) / §6.7.2.
+- [X] T034 [P] [US4] Force `Bad_TooManySessions`: drive CreateSession beyond `MU_MAX_SESSIONS` and assert it. OPC-10000-4 §5.7.2 (CreateSession) / §7.38.2.
+- [X] T035 [P] [US4] Force `Bad_RequestTooLarge`: drive an oversized request/OPN and assert it (`asym_chunk.c` emission). OPC-10000-6 §7.1.5 (UA-TCP error) / §6.7.2.
 - [X] T036 [P] [US4] Force Read beyond `MU_DISPATCH_MAX_READ_NODES` → `Bad_TooManyOperations` in `tests/unit/test_read_service.c`. OPC-10000-4 §5.11.2 (Read) / §7.38.2.
 - [X] T037 [P] [US4] Force `Bad_HistoryOperationUnsupported` (history.c emission). OPC-10000-4 §5.11.5 (HistoryUpdate) / OPC-10000-11.
-- [ ] T038 [P] [US4] Force `Bad_MessageNotAvailable` (subscription.c republish emission). OPC-10000-4 §5.14.6.3 (Republish).
-- [ ] T039 [P] [US4] Force `Bad_NotFound` (node_management.c DeleteReferences emission). OPC-10000-4 §5.8 (DeleteReferences).
-- [ ] T040 [US4] Drive a CloseSecureChannel (CLO) message through `mu_server_poll` and assert the channel is observably closed. OPC-10000-4 §5.6.3 (CloseSecureChannel) / OPC-10000-6 §6.7.3.
-- [ ] T041 [P] [US4] SetMonitoringMode invalid MonitoredItemId → per-item invalid-id StatusCode. OPC-10000-4 §5.13.4 / §7.38.2.
-- [ ] T042 [P] [US4] SetPublishingMode invalid SubscriptionId → per-item invalid-id StatusCode. OPC-10000-4 §5.14.4 / §7.38.2.
-- [ ] T043 [US4] Register the US4 claims as rows in the claim→test map (T008).
+- [X] T038 [P] [US4] Force `Bad_MessageNotAvailable` (subscription.c republish emission). OPC-10000-4 §5.14.6.3 (Republish).
+- [X] T039 [P] [US4] Force `Bad_NotFound` (node_management.c DeleteReferences emission). OPC-10000-4 §5.8 (DeleteReferences).
+- [X] T040 [US4] Drive a CloseSecureChannel (CLO) message through `mu_server_poll` and assert the channel is observably closed. OPC-10000-4 §5.6.3 (CloseSecureChannel) / OPC-10000-6 §6.7.3.
+- [X] T041 [P] [US4] SetMonitoringMode invalid MonitoredItemId → per-item invalid-id StatusCode. OPC-10000-4 §5.13.4 / §7.38.2.
+- [X] T042 [P] [US4] SetPublishingMode invalid SubscriptionId → per-item invalid-id StatusCode. OPC-10000-4 §5.14.4 / §7.38.2.
+- [X] T043 [US4] Register the US4 claims as rows in the claim→test map (T008).
 
 **Checkpoint**: US4 shippable — implemented behaviors verified; checker green.
 
@@ -123,16 +123,16 @@ per-profile test.
 **Goal**: every wire-reachable decoder has malformed-input coverage; missing
 primitive round-trips added.
 
-- [ ] T044 [P] [US5] ExpandedNodeId malformed-decode unit test (bad NamespaceUri/ServerIndex flag + truncation → `Bad_DecodingError`). OPC-10000-6 §5.2.2.10 (ExpandedNodeId).
-- [ ] T045 [P] [US5] Add a `tests/fuzz/fuzz_expanded_nodeid.c` fuzz target for ExpandedNodeId decode. OPC-10000-6 §5.2.2.10.
-- [ ] T046 [P] [US5] HELLO EndpointUrl over-length rejection (`Bad_TcpEndpointUrlInvalid`) in `tests/unit/test_tcp_connection.c`. OPC-10000-6 §7.1.2.3 (Hello Message).
-- [ ] T047 [P] [US5] NodeId Guid (0x04) / Opaque (0x05) identifier types handled-or-explicitly-rejected in `tests/unit/test_binary_nodeid_errors.c`. OPC-10000-6 §5.2.2.9 (NodeId).
-- [ ] T048 [P] [US5] Round-trip/boundary tests for SByte, Int16, UInt16, Int64, UInt64, Double, DateTime in `tests/unit/test_binary_primitives.c`. OPC-10000-6 §5.2.2.2 / §5.2.2.3 (built-in numeric); DateTime §5.2.2.5.
-- [ ] T049 [P] [US5] DataValue timestamp/picosecond mask-bit round-trip in `tests/unit/test_binary_variant_datavalue.c`. OPC-10000-6 §5.2.2.17 (DataValue).
-- [ ] T050 [P] [US5] QualifiedName / LocalizedText malformed-decode tests (`Bad_DecodingError` on truncated fields). OPC-10000-6 §5.2.2.12 (QualifiedName) / §5.2.2.13 (LocalizedText).
-- [ ] T051 [P] [US5] Reverse wrong-algorithm: RSA-PSS URI advertised on a PKCS#1.5 policy is rejected (extend `tests/integration/test_secure_handshake_modern.c`). OPC-10000-7 SecurityPolicy (signature algorithm) / OPC-10000-4 §7.37 (SignatureData).
-- [ ] T052 [P] [US5] MessageChunk count-limit negative: a message spanning `> max_chunk_count` chunks is rejected (`tests/unit/test_message_chunk_errors.c`). OPC-10000-6 §6.7.2 (MessageChunk) / §7.1.2.4 (Acknowledge limits).
-- [ ] T053 [US5] Register the US5 claims as rows in the claim→test map (T008).
+- [X] T044 [P] [US5] ExpandedNodeId malformed-decode unit test (bad NamespaceUri/ServerIndex flag + truncation → `Bad_DecodingError`). OPC-10000-6 §5.2.2.10 (ExpandedNodeId).
+- [X] T045 [P] [US5] Add a `tests/fuzz/fuzz_expanded_nodeid.c` fuzz target for ExpandedNodeId decode. OPC-10000-6 §5.2.2.10.
+- [X] T046 [P] [US5] HELLO EndpointUrl over-length rejection (`Bad_TcpEndpointUrlInvalid`) in `tests/unit/test_tcp_connection.c`. OPC-10000-6 §7.1.2.3 (Hello Message).
+- [X] T047 [P] [US5] NodeId Guid (0x04) / Opaque (0x05) identifier types handled-or-explicitly-rejected in `tests/unit/test_binary_nodeid_errors.c`. OPC-10000-6 §5.2.2.9 (NodeId).
+- [X] T048 [P] [US5] Round-trip/boundary tests for SByte, Int16, UInt16, Int64, UInt64, Double, DateTime in `tests/unit/test_binary_primitives.c`. OPC-10000-6 §5.2.2.2 / §5.2.2.3 (built-in numeric); DateTime §5.2.2.5.
+- [X] T049 [P] [US5] DataValue timestamp/picosecond mask-bit round-trip in `tests/unit/test_binary_variant_datavalue.c`. OPC-10000-6 §5.2.2.17 (DataValue).
+- [X] T050 [P] [US5] QualifiedName / LocalizedText malformed-decode tests (`Bad_DecodingError` on truncated fields). OPC-10000-6 §5.2.2.12 (QualifiedName) / §5.2.2.13 (LocalizedText).
+- [X] T051 [P] [US5] Reverse wrong-algorithm: RSA-PSS URI advertised on a PKCS#1.5 policy is rejected (extend `tests/integration/test_secure_handshake_modern.c`). OPC-10000-7 SecurityPolicy (signature algorithm) / OPC-10000-4 §7.37 (SignatureData).
+- [X] T052 [P] [US5] MessageChunk count-limit negative: a message spanning `> max_chunk_count` chunks is rejected (`tests/unit/test_message_chunk_errors.c`). OPC-10000-6 §6.7.2 (MessageChunk) / §7.1.2.4 (Acknowledge limits).
+- [X] T053 [US5] Register the US5 claims as rows in the claim→test map (T008).
 
 **Checkpoint**: US5 shippable — wire surface coverage complete; checker green.
 
