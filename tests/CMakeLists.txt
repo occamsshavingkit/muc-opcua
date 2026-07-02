@@ -19,6 +19,8 @@ if(MUC_OPCUA_BUILD_TESTS)
     # We will add these as they are implemented
     add_subdirectory(unit)
     add_subdirectory(integration)
+    # Feature 028: claim->test map enforcement (per-profile).
+    add_subdirectory(conformance)
 endif()
 
 if((MUC_OPCUA_BUILD_TESTS OR MUC_OPCUA_BUILD_BENCHMARKS) AND MUC_OPCUA_IS_HOST)

@@ -352,9 +352,64 @@ void test_DeleteReferencesResponse_Encode(void) {
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, status_code);
 }
 
+/* Feature 028 (T020/T021): AddNodes with a requestedNewNodeId that already exists
+   must return Bad_NodeIdExists per-result (OPC-10000-4 §5.8 AddNodes / §7.38.2),
+   not silently create a duplicate node. */
+static void encode_add_nodes_one(mu_binary_writer_t *w, opcua_uint32_t new_numeric) {
+    mu_binary_write_int32(w, 1); /* one AddNodesItem */
+    mu_nodeid_t pid = {0, MU_NODEID_NUMERIC, {85}};
+    mu_binary_write_nodeid(w, &pid);
+    mu_nodeid_t rid = {0, MU_NODEID_NUMERIC, {35}};
+    mu_binary_write_nodeid(w, &rid);
+    mu_expanded_nodeid_t newid = {{1, MU_NODEID_NUMERIC, {0}}, {-1, NULL}, 0};
+    newid.node_id.identifier.numeric = new_numeric;
+    mu_binary_write_expanded_nodeid(w, &newid);
+    mu_qualified_name_t bn = {1, {6, (const opcua_byte_t *)"MyNode"}};
+    mu_binary_write_qualified_name(w, &bn);
+    mu_binary_write_uint32(w, 1); /* nodeClass Object */
+    mu_nodeid_t attr_type = {0, MU_NODEID_NUMERIC, {251}};
+    mu_binary_write_nodeid(w, &attr_type);
+    mu_binary_write_byte(w, 1);   /* ExtensionObject encoding: ByteString */
+    mu_binary_write_int32(w, 0);  /* empty attributes body */
+    mu_expanded_nodeid_t tdef = {{0, MU_NODEID_NUMERIC, {58}}, {-1, NULL}, 0};
+    mu_binary_write_expanded_nodeid(w, &tdef);
+}
+
+static opcua_statuscode_t add_nodes_first_result_status(opcua_uint32_t new_numeric) {
+    opcua_byte_t req[512];
+    mu_binary_writer_t w;
+    mu_binary_writer_init(&w, req, sizeof(req));
+    encode_add_nodes_one(&w, new_numeric);
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, w.status);
+
+    opcua_byte_t resp[512];
+    mu_binary_writer_t rw;
+    mu_binary_writer_init(&rw, resp, sizeof(resp));
+    mu_binary_reader_t r;
+    mu_binary_reader_init(&r, req, w.position);
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_add_nodes_process(&server, &r, &rw));
+
+    mu_binary_reader_t rr;
+    mu_binary_reader_init(&rr, resp, rw.position);
+    opcua_int32_t rescount = 0;
+    mu_binary_read_int32(&rr, &rescount);
+    TEST_ASSERT_EQUAL(1, rescount);
+    opcua_statuscode_t st = 0;
+    mu_binary_read_statuscode(&rr, &st);
+    return st;
+}
+
+void test_AddNodes_DuplicateNodeId_IsBadNodeIdExists(void) {
+    /* First insertion with an explicit NodeId succeeds. */
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, add_nodes_first_result_status(5000));
+    /* Re-adding the same NodeId is rejected per-result. */
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_BAD_NODEIDEXISTS, add_nodes_first_result_status(5000));
+}
+
 int main(void) {
     UNITY_BEGIN();
     RUN_TEST(test_AddNodesRequest_Decode);
+    RUN_TEST(test_AddNodes_DuplicateNodeId_IsBadNodeIdExists);
     RUN_TEST(test_AddNodesResponse_Encode);
     RUN_TEST(test_DeleteNodesRequest_Decode);
     RUN_TEST(test_DeleteNodesResponse_Encode);

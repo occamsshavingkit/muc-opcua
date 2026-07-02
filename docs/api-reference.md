@@ -222,6 +222,13 @@ type IDs.
 | `MU_TYPE_STRING` | 12 | | |
 | `MU_TYPE_DATETIME` | 13 | | |
 
+**Encoding scope:** these tags enumerate the OPC UA built-in type IDs, but not
+every tag is carried by every codec. `MU_TYPE_GUID` (14, OPC-10000-6 §5.2.2.6) and
+`MU_TYPE_DIAGNOSTICINFO` (25, OPC-10000-6 §5.2.2.11) are encoded and tested only on
+the UADP path (`src/encoding/uadp_encoder.c`, OPC-10000-14); the binary service
+Variant codec does not carry them. (See also the NodeId note above: the NodeId union
+carries only `numeric`.)
+
 ### 3.7 `mu_variant_t`
 
 A tagged union holding a scalar or 1-D array value.

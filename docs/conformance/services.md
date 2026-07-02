@@ -24,8 +24,8 @@ is available only when the named build option is enabled. `Unsupported` returns
 | Browse | 5.9.2 | Implemented subset | HierarchicalReferences + includeSubtypes |
 | BrowseNext | 5.9.3 | Implemented subset | No continuation points issued -> `Bad_ContinuationPointInvalid` |
 | TranslateBrowsePathsToNodeIds | 5.9.4 | Implemented subset | RelativePath walk over the address space; `Bad_NoMatch` |
-| RegisterNodes | 5.9.5 | Implemented subset | Identity mapping (NodeIds copied back) |
-| UnregisterNodes | 5.9.6 | Implemented subset | No-op, returns Good |
+| RegisterNodes | 5.9.5 | Optional implemented subset | Behind `MUC_OPCUA_SERVICE_REGISTER_NODES` (full profile only); identity mapping (NodeIds copied back). Nano/Micro/Embedded return `Bad_ServiceUnsupported` (`test_profile_surface`) |
+| UnregisterNodes | 5.9.6 | Optional implemented subset | Behind `MUC_OPCUA_SERVICE_REGISTER_NODES` (full profile only); no-op, returns Good. Nano/Micro/Embedded return `Bad_ServiceUnsupported` |
 | Write | 5.11.4 | Optional implemented subset | Behind `MUC_OPCUA_SERVICE_WRITE` |
 | Call | 5.12.2 | Optional implemented subset | Behind `MUC_OPCUA_EMBEDDED_PROFILE` (GetMonitoredItems/ResendData + custom methods only) |
 | CreateMonitoredItems | 5.13.2 | Implemented subset | Data-change monitoring; initial sample; `Bad_NodeIdUnknown` / `Bad_TooManyMonitoredItems`; queue bounds |
@@ -44,11 +44,13 @@ is available only when the named build option is enabled. `Unsupported` returns
 | AddNodes / DeleteNodes / AddReferences / DeleteReferences | 5.8 | Optional implemented subset | Behind `MUC_OPCUA_SERVICE_NODEMANAGEMENT` and `MUC_OPCUA_DYNAMIC_NODES` |
 | QueryFirst / QueryNext | B.2.3 / B.2.4 | Optional implemented subset | Behind `MUC_OPCUA_SERVICE_QUERY`; OPC-10000-4 Appendix B §B.2.3/§B.2.4 |
 
-The View Service Set entries (Browse, BrowseNext, TranslateBrowsePaths,
-RegisterNodes, UnregisterNodes) are documented as profile-targeting service
-subsets for OPC-10000-7 section 4.2 ConformanceUnit analysis and section 4.3
-Profile analysis. Current project evidence is `tests/integration/test_view_services.c`;
-this does not assert Nano profile completion.
+The core View Service Set entries (Browse, BrowseNext, TranslateBrowsePaths) are
+documented as profile-targeting service subsets for OPC-10000-7 section 4.2
+ConformanceUnit analysis and section 4.3 Profile analysis. RegisterNodes /
+UnregisterNodes (§5.9.5 / §5.9.6) are optional for Nano and are compiled only in
+the full profile; the Nano/Micro/Embedded builds return `Bad_ServiceUnsupported`
+for them (`test_profile_surface`). Current project evidence is
+`tests/integration/test_view_services.c`; this does not assert Nano profile completion.
 
 PubSub is outside the Part 4 Service Set matrix, so it is not listed as a Part
 4 service. The documented optional `MUC_OPCUA_PUBSUB` status is scoped

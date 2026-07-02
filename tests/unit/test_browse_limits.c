@@ -121,9 +121,32 @@ void test_browse_no_subtypes_excludes_organizes(void) {
     TEST_ASSERT_EQUAL(0, result.num_references); /* exact HierarchicalReferences only */
 }
 
+/* Feature 028 (T013): a Browse request whose nodesToBrowse count exceeds the
+   caller's fixed capacity must decode to Bad_TooManyOperations (OPC-10000-4
+   §5.9.2 / §7.38.2), consistent with Read/Write/Query — not Bad_InternalError. */
+void test_browse_over_capacity_is_too_many_operations(void) {
+    opcua_byte_t buf[64];
+    mu_binary_writer_t w;
+    mu_binary_writer_init(&w, buf, sizeof(buf));
+    mu_nodeid_t null_view = {0, MU_NODEID_NUMERIC, {0}};
+    mu_binary_write_nodeid(&w, &null_view);   /* ViewDescription.viewId */
+    mu_binary_write_int64(&w, 0);             /* timestamp */
+    mu_binary_write_uint32(&w, 0);            /* viewVersion */
+    mu_binary_write_uint32(&w, 0);            /* requestedMaxReferencesPerNode */
+    mu_binary_write_int32(&w, 5);             /* nodesToBrowse count = 5 */
+
+    mu_binary_reader_t r;
+    mu_binary_reader_init(&r, buf, w.position);
+    mu_browse_request_t req;
+    mu_browse_description_t desc_array[1]; /* capacity 1 < 5 */
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_BAD_TOOMANYOPERATIONS,
+                            mu_browse_request_decode(&r, &req, desc_array, 1));
+}
+
 int main(void) {
     UNITY_BEGIN();
     RUN_TEST(test_browse_requested_max_references);
+    RUN_TEST(test_browse_over_capacity_is_too_many_operations);
     RUN_TEST(test_browse_response_size_bounds);
     RUN_TEST(test_browse_no_continuation_points);
     RUN_TEST(test_browse_include_subtypes_matches_organizes);

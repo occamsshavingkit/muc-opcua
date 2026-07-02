@@ -57,6 +57,11 @@ Embedded profile gates are enabled:
 - Method Call for `Server.GetMonitoredItems` and `Server.ResendData`
   (OPC-10000-4 §5.12.2.2; OPC-10000-5 §9.1, §9.2).
 - Base Info Type System exposure.
+- Base Information nodes and the `ServerProfileArray` (`MUC_OPCUA_BASE_NODES` is OFF
+  for Micro, like Nano): the `MicroEmbeddedDevice2017` URI names the profile *target*
+  and is **not** emitted anywhere as a runtime `ServerProfileArray` value; the
+  integrator supplies the address space (`test_profile_surface`). OPC-10000-7 §4.3
+  (ServerProfileArray / profile URIs), OPC-10000-5.
 - Security policies beyond None. Basic256Sha256 is available in the embedded build.
 
 TransferSubscriptions (§5.14.7) belongs to the Client Redundancy Facet and is not part

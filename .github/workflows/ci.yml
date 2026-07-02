@@ -20,6 +20,26 @@ jobs:
       - name: Test
         run: ctest --test-dir build/host --output-on-failure
 
+  # Feature 028: run the suite against each profile's actual library so the
+  # per-profile RUN_TEST gates and the claim->test checker produce real
+  # per-profile conformance evidence (not just the all-features `full` build).
+  profile-tests:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        profile: [nano, micro, embedded, full]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install dependencies
+        run: sudo apt-get update && sudo apt-get install -y cmake build-essential libssl-dev libmbedtls-dev libwolfssl-dev
+      - name: Configure (${{ matrix.profile }})
+        run: cmake -S . -B build/${{ matrix.profile }} -DMUC_OPCUA_BUILD_TESTS=ON -DMUC_OPCUA_PLATFORM=host -DMUC_OPCUA_HAVE_MBEDTLS=ON -DMUC_OPCUA_HAVE_WOLFSSL=ON -DMUC_OPCUA_PROFILE=${{ matrix.profile }}
+      - name: Build (${{ matrix.profile }})
+        run: cmake --build build/${{ matrix.profile }}
+      - name: Test (${{ matrix.profile }})
+        run: ctest --test-dir build/${{ matrix.profile }} --output-on-failure
+
   interop:
     runs-on: ubuntu-latest
     steps:

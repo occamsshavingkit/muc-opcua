@@ -29,17 +29,24 @@ to OPC-10000-7 §4.2/§4.3 evidence.
   CloseSecureChannel, Create/Activate/CloseSession.
 - **Discovery:** GetEndpoints, FindServers.
 - **Attribute:** Read.
-- **View:** Browse, BrowseNext, TranslateBrowsePathsToNodeIds, RegisterNodes,
-  UnregisterNodes (the full View Service Set).
-- **Address Space / Base Info:** a library-default standard node set
-  (`src/address_space/base_nodes.c`) — the Server object hierarchy, ServerStatus
-  (+ State = Running), ServerCapabilities (ServerProfileArray, LocaleIdArray,
-  OperationLimits), NamespaceArray, ServerArray — resolved as a fallback after the
-  integrator's address space.
+- **View:** Browse, BrowseNext, TranslateBrowsePathsToNodeIds. RegisterNodes /
+  UnregisterNodes (OPC-10000-4 §5.9.5 / §5.9.6) are optional for Nano and are
+  compiled only in the full profile (`MUC_OPCUA_SERVICE_REGISTER_NODES`, OFF here);
+  a Nano build returns `Bad_ServiceUnsupported` for them (`test_profile_surface`).
+- **Address Space / Base Info:** Base Information is optional for the Nano profile
+  (OPC-10000-7 Core Server Facet), and the Nano build does **not** compile the
+  standard node set (`MUC_OPCUA_BASE_NODES` is OFF) — a Nano server exposes the
+  integrator-supplied address space only (`test_profile_surface`). The library's
+  standard Base Information node set (`src/address_space/base_nodes.c` — the Server
+  object hierarchy, ServerStatus (+ State = Running), ServerCapabilities
+  (ServerProfileArray, LocaleIdArray, OperationLimits), NamespaceArray, ServerArray)
+  is available and is enabled in the Embedded and full profiles, where it resolves
+  as a fallback after the integrator's address space.
 
-- **ServerStatus timestamps:** `ServerStatus.CurrentTime` is served live from the
-  time adapter and `StartTime` from the value captured at init, via runtime-bound
-  value sources in the (caller-owned) server struct.
+- **ServerStatus timestamps (Embedded / full, when the base node set is built):**
+  `ServerStatus.CurrentTime` is served live from the time adapter and `StartTime`
+  from the value captured at init, via runtime-bound value sources in the
+  (caller-owned) server struct.
 
 ## Remaining Nano evidence (see [status.md](status.md))
 - External conformance evidence, including CTT verification, has not been
