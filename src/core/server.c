@@ -373,6 +373,7 @@ static void handle_data_chunk_plaintext(mu_server_t *server, const opcua_byte_t 
         }
     }
 
+    bool opn_rejected = ((is_opn) && (status != MU_STATUS_GOOD));
     if (status != MU_STATUS_GOOD) {
         /* Always answer: send a ServiceFault rather than letting the client time out. */
         payload_len = server->config.send_buffer_size - body_offset;
@@ -395,8 +396,12 @@ static void handle_data_chunk_plaintext(mu_server_t *server, const opcua_byte_t 
                                                 server_secure_channel.channel_id, server_secure_channel.token_id,
                                                 out_seq, seq.request_id, payload_len, &total);
         }
-        if (status == MU_STATUS_GOOD)
+        if (status == MU_STATUS_GOOD) {
             send_buffer_chunk(server, total);
+        }
+    }
+    if (opn_rejected && server_secure_channel.is_open) {
+        (void)mu_secure_channel_close(&server_secure_channel);
     }
 }
 
@@ -502,6 +507,7 @@ static void handle_data_chunk_secure(mu_server_t *server, opcua_byte_t *msg, siz
             mu_service_dispatch_set_opn_client_cert(server, NULL);
         }
     }
+    bool opn_rejected = ((is_opn) && (status != MU_STATUS_GOOD));
     if (status != MU_STATUS_GOOD) {
         resp_len = MU_SECURE_RESP_MAX;
         if (mu_write_service_fault(respbody, &resp_len, 0, status) == MU_STATUS_GOOD) {
@@ -510,8 +516,9 @@ static void handle_data_chunk_secure(mu_server_t *server, opcua_byte_t *msg, siz
             resp_len = 0;
         }
     }
-    if (status != MU_STATUS_GOOD || resp_len == 0)
+    if ((status != MU_STATUS_GOOD) || (resp_len == 0u)) {
         return;
+    }
 
     opcua_uint32_t out_seq = ++server_secure_channel.out_sequence_number;
     size_t total = 0;
@@ -526,8 +533,12 @@ static void handle_data_chunk_secure(mu_server_t *server, opcua_byte_t *msg, siz
                                response_request_id, respbody, resp_len, server->config.send_buffer,
                                server->config.send_buffer_size, &total);
     }
-    if (ws == MU_STATUS_GOOD)
+    if (ws == MU_STATUS_GOOD) {
         send_buffer_chunk(server, total);
+    }
+    if (opn_rejected && server_secure_channel.is_open) {
+        (void)mu_secure_channel_close(&server_secure_channel);
+    }
 }
 #endif /* MUC_OPCUA_SECURITY */
 

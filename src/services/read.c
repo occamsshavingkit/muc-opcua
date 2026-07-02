@@ -161,10 +161,7 @@ opcua_statuscode_t mu_read_process_with_user_index(const mu_address_space_t *add
         const mu_read_value_id_t *read_val = &req->nodes_to_read[i];
         mu_datavalue_t *dv = &resp->results[i];
 
-        dv->has_value = false;
-        dv->has_status = false;
-        dv->has_source_timestamp = false;
-        dv->has_server_timestamp = false;
+        *dv = (mu_datavalue_t){0};
 
         const mu_node_t *node = mu_resolve_node(address_space, user_index, dynamic, &read_val->node_id);
         if (!node) {

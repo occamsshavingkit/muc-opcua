@@ -113,11 +113,15 @@ typedef struct {
     mu_variant_t value;
     opcua_statuscode_t status;
     opcua_datetime_t source_timestamp;
+    opcua_uint16_t source_picoseconds;
     opcua_datetime_t server_timestamp;
+    opcua_uint16_t server_picoseconds;
     opcua_boolean_t has_value;
     opcua_boolean_t has_status;
     opcua_boolean_t has_source_timestamp;
+    opcua_boolean_t has_source_picoseconds;
     opcua_boolean_t has_server_timestamp;
+    opcua_boolean_t has_server_picoseconds;
 } mu_datavalue_t;
 
 #ifdef MUC_OPCUA_SERVICE_WRITE

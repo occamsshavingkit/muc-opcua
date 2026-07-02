@@ -1114,24 +1114,23 @@ static opcua_statuscode_t handle_activate_session(mu_server_t *server, mu_binary
                                     activate_result = MU_STATUS_BAD_IDENTITYTOKENREJECTED;
                                     goto activate_done;
                                 }
-                                opcua_int32_t pw_len =
+                                opcua_int32_t secret_len =
                                     (opcua_int32_t)decrypt_buf[0] | ((opcua_int32_t)decrypt_buf[1] << 8) |
                                     ((opcua_int32_t)decrypt_buf[2] << 16) | ((opcua_int32_t)decrypt_buf[3] << 24);
-                                if (pw_len < -1 || (pw_len > 0 && (size_t)pw_len > out_len - 4)) {
+                                /* OPC-10000-4 §7.40.2.2 Table 182: the legacy
+                                   encrypted token Length covers the password
+                                   bytes plus the 32-byte ServerNonce, excluding
+                                   the Length field itself. */
+                                if (secret_len < 32 || (size_t)secret_len != (out_len - 4u)) {
                                     activate_result = MU_STATUS_BAD_IDENTITYTOKENREJECTED;
                                     goto activate_done;
                                 }
-                                if (pw_len == -1) {
-                                    decrypted_password.length = -1;
-                                    decrypted_password.data = NULL;
-                                } else {
-                                    decrypted_password.length = pw_len;
-                                    decrypted_password.data = decrypt_buf + 4;
-                                }
+                                size_t actual_pw_len = (size_t)secret_len - 32u;
+                                decrypted_password.length = (opcua_int32_t)actual_pw_len;
+                                decrypted_password.data = decrypt_buf + 4;
 
                                 /* Verify server nonce (prevent replay attacks, OPC-10000-4 §5.6.3.2) */
-                                size_t actual_pw_len = (pw_len > 0) ? (size_t)pw_len : 0;
-                                size_t nonce_offset = 4 + actual_pw_len;
+                                size_t nonce_offset = 4u + actual_pw_len;
                                 size_t nonce_len = out_len - nonce_offset;
                                 /* Compare the returned ServerNonce (feature 025 F10
                                    anti-replay). memcmp is appropriate here: the
@@ -1189,9 +1188,9 @@ static opcua_statuscode_t handle_activate_session(mu_server_t *server, mu_binary
                                     memcpy(verify_buf + sc_len, slot->server_nonce, 32);
 
                                     opcua_statuscode_t vs = server->config.crypto_adapter->rsa_sha256_verify(
-                                        server->config.crypto_adapter->context, verify_buf, sc_len + 32,
-                                        user_token_signature.data, (size_t)user_token_signature.length,
-                                        cert_token.certificate_data.data, (size_t)cert_token.certificate_data.length);
+                                        server->config.crypto_adapter->context, cert_token.certificate_data.data,
+                                        (size_t)cert_token.certificate_data.length, verify_buf, sc_len + 32,
+                                        user_token_signature.data, (size_t)user_token_signature.length);
                                     if (vs == MU_STATUS_GOOD) {
                                         if (server->config.user_auth_handler != NULL) {
                                             activate_result = server->config.user_auth_handler(
@@ -3829,6 +3828,7 @@ opcua_statuscode_t handle_history_read(mu_server_t *server, mu_binary_reader_t *
     mu_history_read_result_t results[MU_MAX_HISTORY_NODES_PER_READ];
     mu_datavalue_t dvals[MU_MAX_HISTORY_NODES_PER_READ][10];
     opcua_byte_t continuation_points[MU_MAX_HISTORY_NODES_PER_READ][MU_MAX_HISTORY_READ_CONTINUATION_POINT_LENGTH];
+    memset(dvals, 0, sizeof(dvals));
     mu_history_read_response_t resp;
     resp.num_results = req.num_nodes_to_read;
     resp.results = results;

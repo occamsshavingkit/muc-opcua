@@ -17,3 +17,23 @@ Guard coverage:
 Feature 023 evidence ties these rows to `docs/traceability/023-conformance-docs-subscriber.md`.
 The guards are documentation/conformance checks only; they do not claim profile
 compliance or CTT verification.
+
+## Claim → test enforcement (Feature 028)
+
+The guards above check documentation *wording*. Feature 028 adds an orthogonal,
+machine-checked link from each claimed ConformanceUnit/behaviour to a test that
+actually runs **in the profile that claims it** — replacing markdown substring
+"traceability" with an enforced "claimed unit ⇒ profile-runnable backing test".
+
+| Mechanism | What it enforces | Evidence |
+|---|---|---|
+| Per-profile CI + `make test-{nano,micro,embedded,full}` | Each profile's suite is built and run with `-DMUC_OPCUA_PROFILE=<p>`, so the per-profile `RUN_TEST` gates in `tests/unit/CMakeLists.txt` are live and each profile's claimed units run against that profile's actual library (not the "force full" default). | `.github/workflows/ci.yml` `profile-tests` matrix; `Makefile`. |
+| `test_claim_map` (per-profile ctest) | For the profile a build targets, every row of `tests/conformance/claim_test_map.md` listing that profile MUST name a backing test that is ctest-registered in that build; a claimed unit with no profile-runnable test fails the build. | `tests/conformance/check_claim_map.py`; manifest `tests/conformance/claim_test_map.md`; grounding OPC-10000-7 §4.2/§4.3. |
+
+Because the manifest lists the profile(s) each claim applies to, a claim that is
+*doc-corrected* to a narrower profile (e.g. RegisterNodes → full only) automatically
+stops requiring a backing test in the profiles it no longer claims, and a claim that
+is *implemented* (e.g. AddNodes duplicate → `Bad_NodeIdExists`) must name its test or
+the build fails. The status stays **profile-targeting**: this is conformance
+*evidence discipline* only — it is not a claim that any profile has been certified or
+externally validated by the Compliance Test Tool.

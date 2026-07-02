@@ -210,6 +210,7 @@ void test_write_service_basic(void) {
     mu_binary_write_string(&writer, &audit_id); // indexRange (null)
 
     mu_datavalue_t dv;
+    memset(&dv, 0, sizeof(dv));
     dv.has_value = true;
     dv.has_status = false;
     dv.has_source_timestamp = false;
@@ -330,6 +331,7 @@ void test_write_service_type_mismatch(void) {
     mu_binary_write_string(&writer, &audit_id);
 
     mu_datavalue_t dv;
+    memset(&dv, 0, sizeof(dv));
     dv.has_value = true;
     dv.has_status = false;
     dv.has_source_timestamp = false;
@@ -447,7 +449,7 @@ void test_write_service_batch(void) {
     mu_binary_write_nodeid(&writer, &nodes[0].node_id);
     mu_binary_write_int32(&writer, 13);
     mu_binary_write_string(&writer, &audit_id);
-    mu_datavalue_t dv0;
+    mu_datavalue_t dv0 = {0};
     dv0.has_value = true;
     dv0.has_status = false;
     dv0.has_source_timestamp = false;
@@ -461,7 +463,7 @@ void test_write_service_batch(void) {
     mu_binary_write_nodeid(&writer, &nodes[1].node_id);
     mu_binary_write_int32(&writer, 13);
     mu_binary_write_string(&writer, &audit_id);
-    mu_datavalue_t dv1;
+    mu_datavalue_t dv1 = {0};
     dv1.has_value = true;
     dv1.has_status = false;
     dv1.has_source_timestamp = false;

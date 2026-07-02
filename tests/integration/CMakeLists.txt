@@ -70,6 +70,11 @@ if(MUC_OPCUA_USER_AUTH AND MUC_OPCUA_SECURITY)
     target_link_libraries(test_user_auth_certificate PRIVATE muc_opcua muc_opcua_test_support unity)
     target_include_directories(test_user_auth_certificate PRIVATE ${CMAKE_SOURCE_DIR}/src)
     add_test(NAME test_user_auth_certificate COMMAND test_user_auth_certificate)
+
+    add_executable(test_user_auth_secure_e2e test_user_auth_secure_e2e.c)
+    target_link_libraries(test_user_auth_secure_e2e PRIVATE muc_opcua muc_opcua_test_support unity)
+    target_include_directories(test_user_auth_secure_e2e PRIVATE ${CMAKE_SOURCE_DIR}/src)
+    add_test(NAME test_user_auth_secure_e2e COMMAND test_user_auth_secure_e2e)
 endif()
 
 if(MUC_OPCUA_SERVICE_WRITE)
@@ -90,5 +95,4 @@ if(MUC_OPCUA_EVENTS)
     target_include_directories(test_event_notifications PRIVATE ${CMAKE_SOURCE_DIR}/src)
     add_test(NAME test_event_notifications COMMAND test_event_notifications)
 endif()
-
 

@@ -86,14 +86,14 @@ per-profile test.
 **Goal**: each security accept+reject path exercised on a real crypto backend.
 
 - [X] T025 [P] [US3] Add cert fixtures/generator in `tests/fixtures/`: a real expired cert, a not-yet-valid cert, and an out-of-key-size cert; document generation. Feeds T029/T030.
-- [ ] T026 [US3] Real-crypto X509 (i=327) user-token ActivateSession test: correctly-signed → accepted, bad signature → rejected (host adapter), replacing the mock-only path. OPC-10000-4 §5.7.3 (ActivateSession / UserIdentityToken signature).
-- [ ] T027 [US3] UserName/password over a secured channel: valid password → Good, wrong password → `Bad_IdentityTokenRejected` (real backend). OPC-10000-4 §5.7.3 / §7.37 (UserNameIdentityToken).
-- [ ] T028 [US3] Encrypted-password + ServerNonce anti-replay: correct nonce → accepted, wrong/stale nonce → rejected. OPC-10000-4 §5.6.3.2 (ServerNonce anti-replay) / §7.37.
+- [X] T026 [US3] Real-crypto X509 (i=327) user-token ActivateSession test: correctly-signed → accepted, bad signature → rejected (host adapter), replacing the mock-only path. OPC-10000-4 §5.7.3 (ActivateSession / UserIdentityToken signature).
+- [X] T027 [US3] UserName/password over a secured channel: valid password → Good, wrong password → `Bad_IdentityTokenRejected` (real backend). OPC-10000-4 §5.7.3 / §7.37 (UserNameIdentityToken).
+- [X] T028 [US3] Encrypted-password + ServerNonce anti-replay: correct nonce → accepted, wrong/stale nonce → rejected. OPC-10000-4 §5.6.3.2 (ServerNonce anti-replay) / §7.37.
 - [X] T029 [P] [US3] Certificate validity rejection with real certs: expired and not-yet-valid → `Bad_CertificateTimeInvalid` (uses T025 fixtures). OPC-10000-4 §5.5 (certificate validation) / OPC-10000-6 §6.1.3.
 - [X] T030 [P] [US3] Out-of-bounds RSA key size → `Bad_SecurityChecksFailed` (uses T025 fixture). OPC-10000-7 Basic256Sha256 asymmetric key-size bounds.
-- [ ] T031 [US3] End-to-end fail-closed trust: `allow_untrusted_clients=false` + client cert absent from trust list → OPN rejected. OPC-10000-4 §5.5 / §6.1.3 (application authentication / trust).
-- [ ] T032 [US3] Make all US3 tests `TEST_IGNORE` (skip visibly) when no crypto backend is compiled, and register them to run under embedded/full.
-- [ ] T033 [US3] Register the US3 claims as rows in the claim→test map (T008).
+- [X] T031 [US3] End-to-end fail-closed trust: `allow_untrusted_clients=false` + client cert absent from trust list → OPN rejected. OPC-10000-4 §5.5 / §6.1.3 (application authentication / trust).
+- [X] T032 [US3] Make all US3 tests `TEST_IGNORE` (skip visibly) when no crypto backend is compiled, and register them to run under embedded/full.
+- [X] T033 [US3] Register the US3 claims as rows in the claim→test map (T008).
 
 **Checkpoint**: US3 shippable — security acceptance proven with real crypto; checker green.
 
@@ -103,16 +103,16 @@ per-profile test.
 
 **Goal**: every implemented-but-untested code/path from the audit has a forcing test.
 
-- [ ] T034 [P] [US4] Force `Bad_TooManySessions`: drive CreateSession beyond `MU_MAX_SESSIONS` and assert it. OPC-10000-4 §5.7.2 (CreateSession) / §7.38.2.
-- [ ] T035 [P] [US4] Force `Bad_RequestTooLarge`: drive an oversized request/OPN and assert it (`asym_chunk.c` emission). OPC-10000-6 §7.1.5 (UA-TCP error) / §6.7.2.
+- [X] T034 [P] [US4] Force `Bad_TooManySessions`: drive CreateSession beyond `MU_MAX_SESSIONS` and assert it. OPC-10000-4 §5.7.2 (CreateSession) / §7.38.2.
+- [X] T035 [P] [US4] Force `Bad_RequestTooLarge`: drive an oversized request/OPN and assert it (`asym_chunk.c` emission). OPC-10000-6 §7.1.5 (UA-TCP error) / §6.7.2.
 - [X] T036 [P] [US4] Force Read beyond `MU_DISPATCH_MAX_READ_NODES` → `Bad_TooManyOperations` in `tests/unit/test_read_service.c`. OPC-10000-4 §5.11.2 (Read) / §7.38.2.
 - [X] T037 [P] [US4] Force `Bad_HistoryOperationUnsupported` (history.c emission). OPC-10000-4 §5.11.5 (HistoryUpdate) / OPC-10000-11.
-- [ ] T038 [P] [US4] Force `Bad_MessageNotAvailable` (subscription.c republish emission). OPC-10000-4 §5.14.6.3 (Republish).
-- [ ] T039 [P] [US4] Force `Bad_NotFound` (node_management.c DeleteReferences emission). OPC-10000-4 §5.8 (DeleteReferences).
-- [ ] T040 [US4] Drive a CloseSecureChannel (CLO) message through `mu_server_poll` and assert the channel is observably closed. OPC-10000-4 §5.6.3 (CloseSecureChannel) / OPC-10000-6 §6.7.3.
-- [ ] T041 [P] [US4] SetMonitoringMode invalid MonitoredItemId → per-item invalid-id StatusCode. OPC-10000-4 §5.13.4 / §7.38.2.
-- [ ] T042 [P] [US4] SetPublishingMode invalid SubscriptionId → per-item invalid-id StatusCode. OPC-10000-4 §5.14.4 / §7.38.2.
-- [ ] T043 [US4] Register the US4 claims as rows in the claim→test map (T008).
+- [X] T038 [P] [US4] Force `Bad_MessageNotAvailable` (subscription.c republish emission). OPC-10000-4 §5.14.6.3 (Republish).
+- [X] T039 [P] [US4] Force `Bad_NotFound` (node_management.c DeleteReferences emission). OPC-10000-4 §5.8 (DeleteReferences).
+- [X] T040 [US4] Drive a CloseSecureChannel (CLO) message through `mu_server_poll` and assert the channel is observably closed. OPC-10000-4 §5.6.3 (CloseSecureChannel) / OPC-10000-6 §6.7.3.
+- [X] T041 [P] [US4] SetMonitoringMode invalid MonitoredItemId → per-item invalid-id StatusCode. OPC-10000-4 §5.13.4 / §7.38.2.
+- [X] T042 [P] [US4] SetPublishingMode invalid SubscriptionId → per-item invalid-id StatusCode. OPC-10000-4 §5.14.4 / §7.38.2.
+- [X] T043 [US4] Register the US4 claims as rows in the claim→test map (T008).
 
 **Checkpoint**: US4 shippable — implemented behaviors verified; checker green.
 
@@ -123,16 +123,16 @@ per-profile test.
 **Goal**: every wire-reachable decoder has malformed-input coverage; missing
 primitive round-trips added.
 
-- [ ] T044 [P] [US5] ExpandedNodeId malformed-decode unit test (bad NamespaceUri/ServerIndex flag + truncation → `Bad_DecodingError`). OPC-10000-6 §5.2.2.10 (ExpandedNodeId).
-- [ ] T045 [P] [US5] Add a `tests/fuzz/fuzz_expanded_nodeid.c` fuzz target for ExpandedNodeId decode. OPC-10000-6 §5.2.2.10.
-- [ ] T046 [P] [US5] HELLO EndpointUrl over-length rejection (`Bad_TcpEndpointUrlInvalid`) in `tests/unit/test_tcp_connection.c`. OPC-10000-6 §7.1.2.3 (Hello Message).
-- [ ] T047 [P] [US5] NodeId Guid (0x04) / Opaque (0x05) identifier types handled-or-explicitly-rejected in `tests/unit/test_binary_nodeid_errors.c`. OPC-10000-6 §5.2.2.9 (NodeId).
-- [ ] T048 [P] [US5] Round-trip/boundary tests for SByte, Int16, UInt16, Int64, UInt64, Double, DateTime in `tests/unit/test_binary_primitives.c`. OPC-10000-6 §5.2.2.2 / §5.2.2.3 (built-in numeric); DateTime §5.2.2.5.
-- [ ] T049 [P] [US5] DataValue timestamp/picosecond mask-bit round-trip in `tests/unit/test_binary_variant_datavalue.c`. OPC-10000-6 §5.2.2.17 (DataValue).
-- [ ] T050 [P] [US5] QualifiedName / LocalizedText malformed-decode tests (`Bad_DecodingError` on truncated fields). OPC-10000-6 §5.2.2.12 (QualifiedName) / §5.2.2.13 (LocalizedText).
-- [ ] T051 [P] [US5] Reverse wrong-algorithm: RSA-PSS URI advertised on a PKCS#1.5 policy is rejected (extend `tests/integration/test_secure_handshake_modern.c`). OPC-10000-7 SecurityPolicy (signature algorithm) / OPC-10000-4 §7.37 (SignatureData).
-- [ ] T052 [P] [US5] MessageChunk count-limit negative: a message spanning `> max_chunk_count` chunks is rejected (`tests/unit/test_message_chunk_errors.c`). OPC-10000-6 §6.7.2 (MessageChunk) / §7.1.2.4 (Acknowledge limits).
-- [ ] T053 [US5] Register the US5 claims as rows in the claim→test map (T008).
+- [X] T044 [P] [US5] ExpandedNodeId malformed-decode unit test (bad NamespaceUri/ServerIndex flag + truncation → `Bad_DecodingError`). OPC-10000-6 §5.2.2.10 (ExpandedNodeId).
+- [X] T045 [P] [US5] Add a `tests/fuzz/fuzz_expanded_nodeid.c` fuzz target for ExpandedNodeId decode. OPC-10000-6 §5.2.2.10.
+- [X] T046 [P] [US5] HELLO EndpointUrl over-length rejection (`Bad_TcpEndpointUrlInvalid`) in `tests/unit/test_tcp_connection.c`. OPC-10000-6 §7.1.2.3 (Hello Message).
+- [X] T047 [P] [US5] NodeId Guid (0x04) / Opaque (0x05) identifier types handled-or-explicitly-rejected in `tests/unit/test_binary_nodeid_errors.c`. OPC-10000-6 §5.2.2.9 (NodeId).
+- [X] T048 [P] [US5] Round-trip/boundary tests for SByte, Int16, UInt16, Int64, UInt64, Double, DateTime in `tests/unit/test_binary_primitives.c`. OPC-10000-6 §5.2.2.2 / §5.2.2.3 (built-in numeric); DateTime §5.2.2.5.
+- [X] T049 [P] [US5] DataValue timestamp/picosecond mask-bit round-trip in `tests/unit/test_binary_variant_datavalue.c`. OPC-10000-6 §5.2.2.17 (DataValue).
+- [X] T050 [P] [US5] QualifiedName / LocalizedText malformed-decode tests (`Bad_DecodingError` on truncated fields). OPC-10000-6 §5.2.2.12 (QualifiedName) / §5.2.2.13 (LocalizedText).
+- [X] T051 [P] [US5] Reverse wrong-algorithm: RSA-PSS URI advertised on a PKCS#1.5 policy is rejected (extend `tests/integration/test_secure_handshake_modern.c`). OPC-10000-7 SecurityPolicy (signature algorithm) / OPC-10000-4 §7.37 (SignatureData).
+- [X] T052 [P] [US5] MessageChunk count-limit negative: a message spanning `> max_chunk_count` chunks is rejected (`tests/unit/test_message_chunk_errors.c`). OPC-10000-6 §6.7.2 (MessageChunk) / §7.1.2.4 (Acknowledge limits).
+- [X] T053 [US5] Register the US5 claims as rows in the claim→test map (T008).
 
 **Checkpoint**: US5 shippable — wire surface coverage complete; checker green.
 
@@ -140,10 +140,10 @@ primitive round-trips added.
 
 ## Phase 8: Polish & Cross-Cutting
 
-- [ ] T054 Global gate sweep: all four profile suites + ASAN/UBSan green; `scripts/measure_size.sh all` within gates (`.text` +3%, data+bss +5%, no new heap); `scripts/check_build_matrix.sh`.
-- [ ] T055 [P] Verify the anti-over-claim guards still pass and status stays profile-targeting after all reconciliations.
-- [ ] T056 [P] Update `docs/traceability/conformance-claims.md` to describe the new claim→test enforcement (replaces the substring-matching description). Grounding: OPC-10000-7 §4.2 (Conformance Units and Conformance Groups).
-- [ ] T057 [P] Update project memory (feature 028): per-profile CI + claim→test map enforce "claimed unit ⇒ profile-runnable test"; record which claims were reconciled by doc-correction vs implemented.
+- [X] T054 Global gate sweep: all four profile suites + ASAN/UBSan green; `scripts/measure_size.sh all` within gates (`.text` +3%, data+bss +5%, no new heap); `scripts/check_build_matrix.sh`.
+- [X] T055 [P] Verify the anti-over-claim guards still pass and status stays profile-targeting after all reconciliations.
+- [X] T056 [P] Update `docs/traceability/conformance-claims.md` to describe the new claim→test enforcement (replaces the substring-matching description). Grounding: OPC-10000-7 §4.2 (Conformance Units and Conformance Groups).
+- [X] T057 [P] Update project memory (feature 028): per-profile CI + claim→test map enforce "claimed unit ⇒ profile-runnable test"; record which claims were reconciled by doc-correction vs implemented.
 
 ---
 

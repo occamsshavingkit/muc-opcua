@@ -20,6 +20,11 @@ target_link_libraries(fuzz_binary_types PRIVATE muc_opcua)
 target_compile_options(fuzz_binary_types PRIVATE -fsanitize=fuzzer)
 target_link_options(fuzz_binary_types PRIVATE -fsanitize=fuzzer)
 
+add_executable(fuzz_expanded_nodeid fuzz_expanded_nodeid.c)
+target_link_libraries(fuzz_expanded_nodeid PRIVATE muc_opcua)
+target_compile_options(fuzz_expanded_nodeid PRIVATE -fsanitize=fuzzer)
+target_link_options(fuzz_expanded_nodeid PRIVATE -fsanitize=fuzzer)
+
 add_executable(fuzz_activate_session fuzz_activate_session.c)
 target_link_libraries(fuzz_activate_session PRIVATE muc_opcua)
 target_compile_options(fuzz_activate_session PRIVATE -fsanitize=fuzzer)
