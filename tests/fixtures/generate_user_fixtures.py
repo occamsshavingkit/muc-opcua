@@ -112,8 +112,14 @@ def create_encrypted_fixture():
     body.extend(len(username).to_bytes(4, 'little'))
     body.extend(username)
     
-    # password: ByteString (encrypted representation: dummy 32-byte cipher)
-    password = b"\xaa" * 32
+    # password: ByteString. This fixture keeps deterministic bytes rather than
+    # real RSA ciphertext, but the dummy payload follows OPC-10000-4 §7.40.2.2
+    # Table 182: Length = len(password) + len(ServerNonce), excluding the
+    # Length field itself.
+    raw_password = b"admin"
+    server_nonce = bytes([0x42] * 32)
+    secret = raw_password + server_nonce
+    password = len(secret).to_bytes(4, 'little') + secret
     body.extend(len(password).to_bytes(4, 'little'))
     body.extend(password)
     

@@ -40,6 +40,10 @@ Backing test column: comma-separated ctest names (as registered), no `test_` typ
 | Application authentication TrustList | OPC-10000-4 §5.6.2 | embedded,full | test_security_trustlist |
 | X509 user identity token (auth) | OPC-10000-4 §5.7.3 | embedded,full | test_user_auth_certificate |
 | Secured handshake end-to-end (ServerSignature/ClientSignature) | OPC-10000-4 §5.6.3 / §5.7.3 | embedded,full | test_server_handshake_secure |
+| X509 user token e2e (real signature) | OPC-10000-4 §5.7.3 | embedded,full | test_user_auth_secure_e2e |
+| UserName accept+reject over secured channel | OPC-10000-4 §5.7.3 / §7.36 | embedded,full | test_user_auth_secure_e2e |
+| Encrypted password + ServerNonce anti-replay | OPC-10000-4 §5.6.3.2 / §7.40.2.2 | embedded,full | test_user_auth_secure_e2e |
+| Fail-closed application trust at OPN | OPC-10000-4 §5.5 / §6.1.3 | embedded,full | test_user_auth_secure_e2e |
 | Aggregate subscriptions | OPC-10000-4 §7.22 / OPC-10000-13 | embedded,full | test_aggregate |
 | Alarms & Conditions / Events | OPC-10000-9 | embedded,full | test_alarms_conditions |
 | Historical Access (HistoryRead/Update) | OPC-10000-11 | full | test_history |

@@ -143,9 +143,9 @@ static opcua_statuscode_t mock_get_own_certificate(void *context, const opcua_by
 
 static mock_t global_mock;
 
-static opcua_statuscode_t mock_rsa_sha256_verify(void *context, const opcua_byte_t *data, size_t data_len,
-                                                 const opcua_byte_t *signature, size_t signature_len,
-                                                 const opcua_byte_t *cert_der, size_t cert_der_len) {
+static opcua_statuscode_t mock_rsa_sha256_verify(void *context, const opcua_byte_t *cert_der, size_t cert_der_len,
+                                                 const opcua_byte_t *data, size_t data_len,
+                                                 const opcua_byte_t *signature, size_t signature_len) {
     (void)context;
     /* Verify server certificate prefix */
     if (data_len != sizeof(server_cert_bytes) + 32) {
