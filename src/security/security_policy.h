@@ -50,4 +50,14 @@ mu_security_policy_id_t mu_security_policy_from_uri(const opcua_byte_t *uri, siz
 /* The canonical URI string for a policy id, or NULL for INVALID. */
 const char *mu_security_policy_uri(mu_security_policy_id_t id);
 
+/* The SignatureData.algorithm URI for the policy's asymmetric (RSA) signatures, or
+   NULL for None/Invalid. OPC-10000-7 SecurityPolicy definitions: the PKCS#1.5
+   policies use the xmldsig rsa-sha256 URI; Aes256_Sha256_RsaPss uses the
+   rsa-pss-sha2-256 URI. */
+const char *mu_security_policy_asym_signature_uri(mu_security_policy_id_t policy);
+
+/* True iff the policy's asymmetric signatures use RSA-PSS-SHA256
+   (Aes256_Sha256_RsaPss); false for the PKCS#1.5 policies and None/Invalid. */
+opcua_boolean_t mu_security_policy_uses_pss(mu_security_policy_id_t policy);
+
 #endif /* MUC_OPCUA_SECURITY_POLICY_H */

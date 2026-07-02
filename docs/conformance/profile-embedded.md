@@ -43,6 +43,7 @@ OPC-10000-7 §4.2 conformance-unit or §4.3 profile verification.
 | Micro 2017 base | OPC-10000-7 Micro profile definition | Targeted behavior | `profile-micro.md`, `test_subscriptions`, `test_session`, `test_single_client_limit` |
 | SecurityPolicy None | OPC-10000-7 Core/Nano security baseline | Targeted behavior | `profile-nano.md`, handshake/interoperability tests |
 | SecurityPolicy Basic256Sha256 | OPC-10000-7 Embedded security policy support | Targeted behavior | `src/security/*`, `test_asym_chunk`, `test_sym_chunk`, `test_server_handshake_secure` |
+| SecurityPolicy Aes256_Sha256_RsaPss signatures | OPC-10000-7 Aes256_Sha256_RsaPss (RSA-PSS-SHA256 + `rsa-pss-sha2-256` URI) | Targeted behavior (feature 026): asymmetric signature scheme/URI is policy-selected; PSS for this policy, PKCS#1.5 for Basic256Sha256/Aes128 | `src/security/certificate.c` (`mu_asym_signature_*`), `security_policy.c`, `test_secure_handshake_modern` (aes256_pss + wrong-algorithm reject) |
 | Security Default ApplicationInstance Certificate | OPC-10000-7 §6.6.69 security CU | Targeted behavior | `src/security/certificate.c`, `test_certificate`, secure handshake tests |
 | Standard DataChange Subscription 2017 facet | OPC-10000-7 §6.6.17 | Targeted behavior | `tests/unit/test_subscriptions_capacity.c`, `tests/integration/test_subscriptions.c` |
 | Monitored Items Deadband Filter | OPC-10000-4 §7.22.2 | Targeted behavior | absolute-deadband coverage in subscription tests |

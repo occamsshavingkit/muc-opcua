@@ -20,6 +20,7 @@
 #endif
 #include "../services/service_header.h"
 #ifdef MUC_OPCUA_SECURITY
+#include "../security/certificate.h"
 #include "../security/key_derivation.h"
 #include "../security/security_policy.h"
 #include "../security/sym_chunk.h"
@@ -368,16 +369,29 @@ static const mu_bytestring_t *current_opn_client_cert(const mu_server_t *server)
    SecureChannel, which binds activation to the fresh per-session ServerNonce
    (anti-replay). SecurityPolicy None carries a null signature and is exempt. */
 static opcua_statuscode_t verify_activate_client_signature(mu_server_t *server, const mu_session_t *slot,
+                                                           const mu_string_t *algorithm,
                                                            const mu_bytestring_t *signature) {
     if (server_secure_channel.policy == MU_SECURITY_POLICY_NONE_ID ||
         server_secure_channel.policy == MU_SECURITY_POLICY_INVALID_ID) {
         return MU_STATUS_GOOD; /* None: no ClientSignature required */
     }
     const mu_crypto_adapter_t *cr = server->config.crypto_adapter;
-    if (cr == NULL || cr->get_own_certificate == NULL || cr->rsa_sha256_verify == NULL) {
+    if (cr == NULL || cr->get_own_certificate == NULL) {
         return MU_STATUS_BAD_SECURITYCHECKSFAILED;
     }
     if (signature == NULL || signature->length <= 0 || signature->data == NULL) {
+        return MU_STATUS_BAD_SECURITYCHECKSFAILED;
+    }
+    /* Feature 026 (FR-005): the ClientSignature's declared algorithm URI MUST match
+       the negotiated policy's signature algorithm (OPC-10000-7). Exact length+bytes
+       compare; a short/absent/mismatched URI is rejected before verification. */
+    const char *expected_uri = mu_security_policy_asym_signature_uri(server_secure_channel.policy);
+    if (expected_uri == NULL) {
+        return MU_STATUS_BAD_SECURITYCHECKSFAILED;
+    }
+    size_t expected_uri_len = strlen(expected_uri);
+    if (algorithm == NULL || algorithm->data == NULL || algorithm->length < 0 ||
+        (size_t)algorithm->length != expected_uri_len || memcmp(algorithm->data, expected_uri, expected_uri_len) != 0) {
         return MU_STATUS_BAD_SECURITYCHECKSFAILED;
     }
     /* The client's application-instance certificate, persisted from OpenSecureChannel
@@ -398,9 +412,10 @@ static opcua_statuscode_t verify_activate_client_signature(mu_server_t *server, 
     }
     memcpy(verify_buf, own_cert, own_cert_len);
     memcpy(verify_buf + own_cert_len, slot->server_nonce, sizeof(slot->server_nonce));
-    opcua_statuscode_t vs =
-        cr->rsa_sha256_verify(cr->context, server->channel_client_cert, server->channel_client_cert_len, verify_buf,
-                              own_cert_len + sizeof(slot->server_nonce), signature->data, (size_t)signature->length);
+    /* Feature 026: verify under the policy's scheme (PKCS#1.5 or PSS). */
+    opcua_statuscode_t vs = mu_asym_signature_verify(
+        cr, server_secure_channel.policy, server->channel_client_cert, server->channel_client_cert_len, verify_buf,
+        own_cert_len + sizeof(slot->server_nonce), signature->data, (size_t)signature->length);
     return (vs == MU_STATUS_GOOD) ? MU_STATUS_GOOD : MU_STATUS_BAD_SECURITYCHECKSFAILED;
 }
 #endif
@@ -848,10 +863,14 @@ static opcua_statuscode_t handle_create_session(mu_server_t *server, mu_binary_r
     {
         bool wrote_sig = false;
 #ifdef MUC_OPCUA_SECURITY
-        static const char SIG_URI[] = "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256";
+        /* Feature 026: the signature scheme and SignatureData.algorithm URI follow
+           the negotiated SecurityPolicy (PKCS#1.5 for Basic256Sha256/Aes128,
+           RSA-PSS for Aes256_Sha256_RsaPss). mu_asym_signature_sign dispatches and
+           fails closed if the policy's primitive is absent. */
+        const char *sig_uri = mu_security_policy_asym_signature_uri(server_secure_channel.policy);
         if (server_secure_channel.policy != MU_SECURITY_POLICY_NONE_ID &&
             server_secure_channel.policy != MU_SECURITY_POLICY_INVALID_ID && server->config.crypto_adapter != NULL &&
-            server->config.crypto_adapter->rsa_sha256_sign != NULL && client_cert.length > 0) {
+            sig_uri != NULL && client_cert.length > 0) {
             const mu_crypto_adapter_t *cr = server->config.crypto_adapter;
             size_t cc = (size_t)client_cert.length;
             size_t cn = client_nonce.length > 0 ? (size_t)client_nonce.length : 0;
@@ -862,8 +881,9 @@ static opcua_statuscode_t handle_create_session(mu_server_t *server, mu_binary_r
                     memcpy(to_sign + cc, client_nonce.data, cn);
                 opcua_byte_t sig[512];
                 size_t sig_len = sizeof(sig);
-                if (cr->rsa_sha256_sign(cr->context, to_sign, cc + cn, sig, &sig_len) == MU_STATUS_GOOD) {
-                    mu_string_t alg = {(opcua_int32_t)(sizeof(SIG_URI) - 1), (const opcua_byte_t *)SIG_URI};
+                if (mu_asym_signature_sign(cr, server_secure_channel.policy, to_sign, cc + cn, sig, &sig_len) ==
+                    MU_STATUS_GOOD) {
+                    mu_string_t alg = {(opcua_int32_t)strlen(sig_uri), (const opcua_byte_t *)sig_uri};
                     mu_bytestring_t sig_bs = {(opcua_int32_t)sig_len, sig};
                     s = mu_binary_write_string(w, &alg);
                     if (s != MU_STATUS_GOOD)
@@ -1060,7 +1080,7 @@ static opcua_statuscode_t handle_activate_session(mu_server_t *server, mu_binary
                 /* OPC-10000-4 §5.7.3/§7.38.2: verify the application ClientSignature
                    over (serverCertificate || serverNonce) before honoring any
                    identity token. Rejected activations leave the Session in CREATED. */
-                client_sig_result = verify_activate_client_signature(server, slot, &signature);
+                client_sig_result = verify_activate_client_signature(server, slot, &algorithm, &signature);
 #endif
                 if (client_sig_result != MU_STATUS_GOOD) {
                     activate_result = client_sig_result;
