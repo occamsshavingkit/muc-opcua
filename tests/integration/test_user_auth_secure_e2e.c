@@ -133,14 +133,9 @@ static opcua_statuscode_t test_auth_handler(void *handle, const mu_string_t *use
     secure_fixture_t *fixture = (secure_fixture_t *)handle;
     (void)policy_id;
 
-    if (auth_username_matches(username, password)) {
-        /* cppcheck-suppress misra-c2012-15.5 */
-        return MU_STATUS_GOOD;
-    }
-    if (auth_certificate_matches(fixture, username, password)) {
-        return MU_STATUS_GOOD;
-    }
-    return MU_STATUS_BAD_IDENTITYTOKENREJECTED;
+    opcua_boolean_t accepted =
+        auth_username_matches(username, password) || auth_certificate_matches(fixture, username, password);
+    return accepted ? MU_STATUS_GOOD : MU_STATUS_BAD_IDENTITYTOKENREJECTED;
 }
 
 static void configure_server(secure_fixture_t *fixture, bool trust_client_cert) {
