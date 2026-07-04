@@ -293,6 +293,7 @@ void test_dispatch_activate_session(void) {
     memset(&server, 0, sizeof(server));
     server.secure_channel.is_open = true;
     server.config.time_adapter.get_time = fake_time;
+    server.config.entropy_adapter.generate_random = fake_entropy;
     mu_session_init(&server.sessions[0]);
     opcua_uint64_t revised;
     opcua_uint32_t sid, tok;

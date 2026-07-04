@@ -3,6 +3,7 @@
 #include "unity.h"
 #include <stdbool.h>
 #include <string.h>
+#include "fake_platform.h"
 
 void setUp(void) {}
 void tearDown(void) {}
@@ -46,6 +47,7 @@ static void prepare_created_session(mu_server_t *server, opcua_uint32_t *auth_to
 
     memset(server, 0, sizeof(*server));
     server->secure_channel.is_open = true;
+    fake_platform_init(NULL, &server->config.time_adapter, &server->config.entropy_adapter);
     mu_session_init(&server->sessions[0]);
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD,
                       mu_session_create(&server->sessions[0], 0, &revised_timeout, &session_id, auth_token));

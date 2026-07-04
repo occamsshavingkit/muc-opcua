@@ -151,12 +151,11 @@ static opcua_statuscode_t handle_delete_references(mu_server_t *server, mu_binar
                                                    size_t *response_length);
 #endif
 
-/* Fill a ServerNonce from the entropy adapter (zeros if unavailable). */
-static void fill_server_nonce(mu_server_t *server, opcua_byte_t *nonce, size_t len) {
-    if (mu_session_generate_server_nonce(&server->config.entropy_adapter, nonce, len) == MU_STATUS_GOOD) {
-        return;
-    }
-    memset(nonce, 0, len);
+/* Fill a ServerNonce from the entropy adapter. Fails closed: returns the
+   error code on entropy failure so callers can reject the request. OPC-10000-4
+   S5.7.3, S7.38.2. */
+static opcua_statuscode_t fill_server_nonce(mu_server_t *server, opcua_byte_t *nonce, size_t len) {
+    return mu_session_generate_server_nonce(&server->config.entropy_adapter, nonce, len);
 }
 
 static opcua_statuscode_t write_response_prefix(mu_binary_writer_t *w, opcua_uint32_t response_type_id,
@@ -1112,6 +1111,9 @@ static opcua_statuscode_t handle_activate_session(mu_server_t *server, mu_binary
                             if (ds == MU_STATUS_GOOD) {
                                 if (out_len < 4) {
                                     activate_result = MU_STATUS_BAD_IDENTITYTOKENREJECTED;
+#ifdef MUC_OPCUA_SECURITY
+                                    mu_secure_zero(decrypt_buf, sizeof(decrypt_buf));
+#endif
                                     goto activate_done;
                                 }
                                 opcua_int32_t secret_len =
@@ -1123,6 +1125,9 @@ static opcua_statuscode_t handle_activate_session(mu_server_t *server, mu_binary
                                    the Length field itself. */
                                 if (secret_len < 32 || (size_t)secret_len != (out_len - 4u)) {
                                     activate_result = MU_STATUS_BAD_IDENTITYTOKENREJECTED;
+#ifdef MUC_OPCUA_SECURITY
+                                    mu_secure_zero(decrypt_buf, sizeof(decrypt_buf));
+#endif
                                     goto activate_done;
                                 }
                                 size_t actual_pw_len = (size_t)secret_len - 32u;
@@ -1143,14 +1148,23 @@ static opcua_statuscode_t handle_activate_session(mu_server_t *server, mu_binary
                                 if (nonce_len != 32 ||
                                     memcmp(decrypt_buf + nonce_offset, slot->server_nonce, 32) != 0) {
                                     activate_result = MU_STATUS_BAD_IDENTITYTOKENREJECTED;
+#ifdef MUC_OPCUA_SECURITY
+                                    mu_secure_zero(decrypt_buf, sizeof(decrypt_buf));
+#endif
                                     goto activate_done;
                                 }
                             } else {
                                 activate_result = MU_STATUS_BAD_IDENTITYTOKENREJECTED;
+#ifdef MUC_OPCUA_SECURITY
+                                mu_secure_zero(decrypt_buf, sizeof(decrypt_buf));
+#endif
                                 goto activate_done;
                             }
                         } else {
                             activate_result = MU_STATUS_BAD_IDENTITYTOKENREJECTED;
+#ifdef MUC_OPCUA_SECURITY
+                            mu_secure_zero(decrypt_buf, sizeof(decrypt_buf));
+#endif
                             goto activate_done;
                         }
                     }
@@ -1163,6 +1177,9 @@ static opcua_statuscode_t handle_activate_session(mu_server_t *server, mu_binary
                         /* Secure by default: reject if username token type accepted but no handler configured */
                         activate_result = MU_STATUS_BAD_IDENTITYTOKENREJECTED;
                     }
+#ifdef MUC_OPCUA_SECURITY
+                    mu_secure_zero(decrypt_buf, sizeof(decrypt_buf));
+#endif
                 activate_done:;
 #else
                     activate_result = MU_STATUS_BAD_IDENTITYTOKENINVALID;
@@ -1226,13 +1243,17 @@ static opcua_statuscode_t handle_activate_session(mu_server_t *server, mu_binary
         }
     }
 
+    opcua_byte_t nonce_buf[MU_SERVER_NONCE_LENGTH];
+    s = fill_server_nonce(server, nonce_buf, sizeof(nonce_buf));
+    if (s != MU_STATUS_GOOD)
+        return s;
+
+    mu_bytestring_t server_nonce = {(opcua_int32_t)sizeof(nonce_buf), nonce_buf};
+
     s = write_response_prefix(w, MU_ID_ACTIVATESESSIONRESPONSE, req.request_handle, activate_result);
     if (s != MU_STATUS_GOOD)
         return s;
 
-    opcua_byte_t nonce_buf[MU_SERVER_NONCE_LENGTH];
-    fill_server_nonce(server, nonce_buf, sizeof(nonce_buf));
-    mu_bytestring_t server_nonce = {(opcua_int32_t)sizeof(nonce_buf), nonce_buf};
     s = mu_binary_write_bytestring(w, &server_nonce);
     if (s != MU_STATUS_GOOD)
         return s;                /* ServerNonce */
