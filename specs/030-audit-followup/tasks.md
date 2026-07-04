@@ -59,7 +59,11 @@
 
 - [ ] T009 [US3] In `src/services/secure_channel.c` `mu_secure_channel_open`, use static incrementing counter for channel_id instead of hardcoded `1`. OPC-10000-6 §6.7.4.
 
-- [ ] T010 [US3] Update integration tests to not assume channel_id==1: `test_view_services.c`, `test_subscriptions.c`, `test_user_auth_plaintext.c` — read channel_id from OPN response header.
+- [ ] T010a [P] [US3] Update `tests/integration/test_view_services.c` to read channel_id from OPN response header instead of assuming value 1.
+
+- [ ] T010b [P] [US3] Update `tests/integration/test_subscriptions.c` to read channel_id from OPN response header instead of assuming value 1.
+
+- [ ] T010c [P] [US3] Update `tests/integration/test_user_auth_plaintext.c` to read channel_id from OPN response header instead of assuming value 1.
 
 **Checkpoint**: Unique channel IDs; all integration tests green.
 
@@ -92,7 +96,7 @@
 - **Setup** → US1/US2/US3/US4 in parallel (different files)
 - **US1**: T003→T004→T005 (service_dispatch.c sequential)
 - **US2**: T006→T007→T008 (service_dispatch.c sequential; depends on US1 for same-file coordination)
-- **US3**: T009→T010 (independent of US1/US2)
+- **US3**: T009→T010a/T010b/T010c (test updates are [P] after code change)
 - **US4**: T011→T012 (independent of all others)
 - **Polish**: After all stories
 
