@@ -11,7 +11,7 @@
 #include <string.h>
 
 /* Checked memcpy: returns dst on success, NULL if n exceeds dst_size. */
-static inline void *mu_checked_memcpy(void *restrict dst, size_t dst_size, const void *restrict src, size_t n) {
+static inline void *mu_checked_memcpy(void *dst, size_t dst_size, const void *src, size_t n) {
     if (n > dst_size) {
         return NULL;
     }
@@ -20,8 +20,8 @@ static inline void *mu_checked_memcpy(void *restrict dst, size_t dst_size, const
 
 /* Checked memcpy at offset: capacity is dst_cap, write starts at dst + offset.
  * Returns dst on success, NULL if offset + n exceeds dst_cap. */
-static inline void *mu_checked_memcpy_off(void *restrict dst, size_t dst_cap, size_t dst_offset,
-                                          const void *restrict src, size_t n) {
+static inline void *mu_checked_memcpy_off(void *dst, size_t dst_cap, size_t dst_offset,
+                                          const void *src, size_t n) {
     if (n > dst_cap - dst_offset) {
         return NULL;
     }
