@@ -386,9 +386,10 @@ opcua_statuscode_t mu_browse_process_with_user_index(const mu_address_space_t *a
 #endif
 
         if (too_many_refs) {
-            res->status_code = MU_STATUS_BAD_NOCONTINUATIONPOINTS; /* Or Bad_ResponseTooLarge */
+            res->status_code = MU_STATUS_BAD_NOCONTINUATIONPOINTS;
             res->references = &ref_pool[node_refs_start];
             res->num_references = match_count;
+            refs_used = node_refs_start + match_count;
             continue;
         }
 

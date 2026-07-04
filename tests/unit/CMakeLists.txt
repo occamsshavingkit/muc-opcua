@@ -86,6 +86,17 @@ foreach(TEST_SOURCE ${UNIT_TEST_SOURCES})
         if(NOT MUC_OPCUA_USER_AUTH AND NOT MUC_OPCUA_SECURITY)
             set(RUN_TEST OFF)
         endif()
+    elseif(TEST_NAME STREQUAL "test_password_decrypt_zeroize")
+        # Uses mu_secure_zero from security/key_derivation.c (MUC_OPCUA_SECURITY).
+        if(NOT MUC_OPCUA_SECURITY)
+            set(RUN_TEST OFF)
+        endif()
+    elseif(TEST_NAME STREQUAL "test_read_browsename_namespace" OR
+           TEST_NAME STREQUAL "test_read_timestamps_to_return")
+        # Exercise browse/read service APIs.
+        if(NOT MUC_OPCUA_SERVICE_READ)
+            set(RUN_TEST OFF)
+        endif()
     endif()
 
     if(RUN_TEST)
