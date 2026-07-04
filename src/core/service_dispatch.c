@@ -232,6 +232,13 @@ static opcua_statuscode_t handle_query_next(mu_server_t *server, mu_binary_reade
 }
 #endif
 
+/* Service dispatch table. Entries MUST appear in ascending order of
+   service.request_id: find_service_descriptor() performs a binary search.
+   Grounding: OPC-10000-4 §4.1 (Service Set model) and §7.1 — Services are
+   dispatched by the numeric identifier of their request NodeId, and the
+   specification assigns those identifiers in ascending order per Service Set.
+   Each entry retains its own feature-guard so any subset produced by the
+   preprocessor remains a sorted subsequence. */
 static const mu_service_descriptor_t g_supported_services[] = {
 #ifdef MUC_OPCUA_SERVICE_DISCOVERY
     {{MU_ID_FINDSERVERSREQUEST, MU_ID_FINDSERVERSRESPONSE, false}, handle_find_servers},
@@ -244,38 +251,40 @@ static const mu_service_descriptor_t g_supported_services[] = {
     {{MU_ID_ACTIVATESESSIONREQUEST, MU_ID_ACTIVATESESSIONRESPONSE, false},
      handle_activate_session}, /* Does not require an activated session to activate */
     {{MU_ID_CLOSESESSIONREQUEST, MU_ID_CLOSESESSIONRESPONSE, true}, handle_close_session},
-#ifdef MUC_OPCUA_SERVICE_READ
-    {{MU_ID_READREQUEST, MU_ID_READRESPONSE, true}, handle_read},
-#endif
-#ifdef MUC_OPCUA_SERVICE_REGISTER_NODES
-    {{MU_ID_REGISTERNODESREQUEST, MU_ID_REGISTERNODESRESPONSE, true}, handle_register_nodes},
-    {{MU_ID_UNREGISTERNODESREQUEST, MU_ID_UNREGISTERNODESRESPONSE, true}, handle_unregister_nodes},
-#endif
-#ifdef MUC_OPCUA_SERVICE_BROWSE
-    {{MU_ID_TRANSLATEBROWSEPATHSTONODEIDSREQUEST, MU_ID_TRANSLATEBROWSEPATHSTONODEIDSRESPONSE, true},
-     handle_translate_browse_paths},
-    {{MU_ID_BROWSEREQUEST, MU_ID_BROWSERESPONSE, true}, handle_browse},
-    {{MU_ID_BROWSENEXTREQUEST, MU_ID_BROWSENEXTRESPONSE, true}, handle_browse_next},
-#endif
-#ifdef MUC_OPCUA_SERVICE_QUERY
-    {{MU_ID_QUERYFIRSTREQUEST, MU_ID_QUERYFIRSTRESPONSE, true}, handle_query_first},
-    {{MU_ID_QUERYNEXTREQUEST, MU_ID_QUERYNEXTRESPONSE, true}, handle_query_next},
-#endif
-#ifdef MUC_OPCUA_SERVICE_WRITE
-    {{MU_ID_WRITEREQUEST, MU_ID_WRITERESPONSE, true}, handle_write},
-#endif
-#ifdef MUC_OPCUA_SERVICE_HISTORY
-    {{MU_ID_HISTORYREADREQUEST, MU_ID_HISTORYREADRESPONSE, true}, handle_history_read},
-    {{MU_ID_HISTORYUPDATEREQUEST, MU_ID_HISTORYUPDATERESPONSE, true}, handle_history_update},
-#endif
-#if MU_DISPATCH_CALL_ENABLED
-    {{MU_ID_CALLREQUEST, MU_ID_CALLRESPONSE, true}, handle_call},
-#endif
 #ifdef MUC_OPCUA_SERVICE_NODEMANAGEMENT
     {{MU_ID_ADDNODESREQUEST, MU_ID_ADDNODESRESPONSE, true}, handle_add_nodes},
     {{MU_ID_ADDREFERENCESREQUEST, MU_ID_ADDREFERENCESRESPONSE, true}, handle_add_references},
     {{MU_ID_DELETENODESREQUEST, MU_ID_DELETENODESRESPONSE, true}, handle_delete_nodes},
     {{MU_ID_DELETEREFERENCESREQUEST, MU_ID_DELETEREFERENCESRESPONSE, true}, handle_delete_references},
+#endif
+#ifdef MUC_OPCUA_SERVICE_BROWSE
+    {{MU_ID_BROWSEREQUEST, MU_ID_BROWSERESPONSE, true}, handle_browse},
+    {{MU_ID_BROWSENEXTREQUEST, MU_ID_BROWSENEXTRESPONSE, true}, handle_browse_next},
+    {{MU_ID_TRANSLATEBROWSEPATHSTONODEIDSREQUEST, MU_ID_TRANSLATEBROWSEPATHSTONODEIDSRESPONSE, true},
+     handle_translate_browse_paths},
+#endif
+#ifdef MUC_OPCUA_SERVICE_REGISTER_NODES
+    {{MU_ID_REGISTERNODESREQUEST, MU_ID_REGISTERNODESRESPONSE, true}, handle_register_nodes},
+    {{MU_ID_UNREGISTERNODESREQUEST, MU_ID_UNREGISTERNODESRESPONSE, true}, handle_unregister_nodes},
+#endif
+#ifdef MUC_OPCUA_SERVICE_QUERY
+    {{MU_ID_QUERYFIRSTREQUEST, MU_ID_QUERYFIRSTRESPONSE, true}, handle_query_first},
+    {{MU_ID_QUERYNEXTREQUEST, MU_ID_QUERYNEXTRESPONSE, true}, handle_query_next},
+#endif
+#ifdef MUC_OPCUA_SERVICE_READ
+    {{MU_ID_READREQUEST, MU_ID_READRESPONSE, true}, handle_read},
+#endif
+#ifdef MUC_OPCUA_SERVICE_HISTORY
+    {{MU_ID_HISTORYREADREQUEST, MU_ID_HISTORYREADRESPONSE, true}, handle_history_read},
+#endif
+#ifdef MUC_OPCUA_SERVICE_WRITE
+    {{MU_ID_WRITEREQUEST, MU_ID_WRITERESPONSE, true}, handle_write},
+#endif
+#ifdef MUC_OPCUA_SERVICE_HISTORY
+    {{MU_ID_HISTORYUPDATEREQUEST, MU_ID_HISTORYUPDATEREQUEST, true}, handle_history_update},
+#endif
+#if MU_DISPATCH_CALL_ENABLED
+    {{MU_ID_CALLREQUEST, MU_ID_CALLRESPONSE, true}, handle_call},
 #endif
 #if MUC_OPCUA_SUBSCRIPTIONS
     {{MU_ID_CREATEMONITOREDITEMSREQUEST, MU_ID_CREATEMONITOREDITEMSRESPONSE, true}, handle_create_monitored_items},
@@ -288,18 +297,31 @@ static const mu_service_descriptor_t g_supported_services[] = {
     {{MU_ID_CREATESUBSCRIPTIONREQUEST, MU_ID_CREATESUBSCRIPTIONRESPONSE, true}, handle_create_subscription},
     {{MU_ID_MODIFYSUBSCRIPTIONREQUEST, MU_ID_MODIFYSUBSCRIPTIONRESPONSE, true}, handle_modify_subscription},
     {{MU_ID_SETPUBLISHINGMODEREQUEST, MU_ID_SETPUBLISHINGMODERESPONSE, true}, handle_set_publishing_mode},
-    {{MU_ID_DELETESUBSCRIPTIONSREQUEST, MU_ID_DELETESUBSCRIPTIONSRESPONSE, true}, handle_delete_subscriptions},
     {{MU_ID_PUBLISHREQUEST, MU_ID_PUBLISHRESPONSE, true}, handle_publish},
-    {{MU_ID_REPUBLISHREQUEST, MU_ID_REPUBLISHRESPONSE, true}, handle_republish}
+    {{MU_ID_REPUBLISHREQUEST, MU_ID_REPUBLISHRESPONSE, true}, handle_republish},
+    {{MU_ID_DELETESUBSCRIPTIONSREQUEST, MU_ID_DELETESUBSCRIPTIONSRESPONSE, true}, handle_delete_subscriptions},
 #endif
 };
 
 static const size_t g_num_supported_services = sizeof(g_supported_services) / sizeof(g_supported_services[0]);
 
+/* Binary search over g_supported_services[] (sorted by service.request_id).
+   Reduces dispatch lookup from O(N) (~15 comparisons across the full table) to
+   O(log N) (≤6 comparisons worst case for the largest profile; ≤5 for typical
+   profiles). Grounding: OPC-10000-4 §4.1, §7.1. */
 static const mu_service_descriptor_t *find_service_descriptor(opcua_uint32_t request_id) {
-    for (size_t i = 0; i < g_num_supported_services; ++i) {
-        if (g_supported_services[i].service.request_id == request_id) {
-            return &g_supported_services[i];
+    size_t lo = 0;
+    size_t hi = g_num_supported_services;
+    while (lo < hi) {
+        size_t mid = lo + ((hi - lo) / 2u);
+        opcua_uint32_t mid_id = g_supported_services[mid].service.request_id;
+        if (mid_id == request_id) {
+            return &g_supported_services[mid];
+        }
+        if (mid_id < request_id) {
+            lo = mid + 1u;
+        } else {
+            hi = mid;
         }
     }
     return NULL;
@@ -835,16 +857,24 @@ static opcua_statuscode_t handle_create_session(mu_server_t *server, mu_binary_r
         return s;
     }
 
+    /* OPC-10000-4 §5.7.3: emit the response prefix BEFORE allocating session
+       state. A prefix encode failure returns before any session is created,
+       so no cleanup is required. Body-field encode failures after the session
+       slot has been transitioned to MU_SESSION_STATE_CREATED are routed to
+       the cleanup path at the end of this function so the slot is not leaked
+       (§5.7.3 — response encoding failure must not leak a session slot). */
+    s = write_response_prefix(w, MU_ID_CREATESESSIONRESPONSE, req.request_handle, MU_STATUS_GOOD);
+    if (s != MU_STATUS_GOOD) {
+        return s;
+    }
+
+    bool session_created = false;
     s = mu_session_create_with_identifiers(slot, requested_bits, session_id, auth_token,
                                            server_secure_channel.channel_id, &revised_bits, &session_id, &auth_token);
     if (s != MU_STATUS_GOOD) {
         return s;
     }
-
-    s = write_response_prefix(w, MU_ID_CREATESESSIONRESPONSE, req.request_handle, MU_STATUS_GOOD);
-    if (s != MU_STATUS_GOOD) {
-        return s;
-    }
+    session_created = true;
 
     mu_nodeid_t sid = {0, MU_NODEID_NUMERIC, {slot->session_id}};
     mu_nodeid_t tok = {0, MU_NODEID_NUMERIC, {slot->auth_token}};
@@ -856,20 +886,23 @@ static opcua_statuscode_t handle_create_session(mu_server_t *server, mu_binary_r
 
     s = mu_binary_write_nodeid(w, &sid);
     if (s != MU_STATUS_GOOD) {
-        return s; /* SessionId */
+        goto cleanup; /* SessionId */
     }
     s = mu_binary_write_nodeid(w, &tok);
     if (s != MU_STATUS_GOOD) {
-        return s; /* AuthenticationToken */
+        goto cleanup; /* AuthenticationToken */
     }
     s = mu_binary_write_uint64(w, revised_bits);
     if (s != MU_STATUS_GOOD) {
-        return s; /* RevisedSessionTimeout (Double bits) */
+        goto cleanup; /* RevisedSessionTimeout (Double bits) */
     }
     s = mu_binary_write_bytestring(w, &server_nonce);
     if (s != MU_STATUS_GOOD) {
-        return s; /* ServerNonce */
+        goto cleanup; /* ServerNonce */
     }
+#ifdef MUC_OPCUA_SECURITY
+    mu_secure_zero(nonce_buf, sizeof(nonce_buf));
+#endif
 
     /* ServerCertificate: the server's own cert when a crypto adapter is present. */
     {
@@ -885,7 +918,7 @@ static opcua_statuscode_t handle_create_session(mu_server_t *server, mu_binary_r
         }
         s = mu_binary_write_bytestring(w, &server_cert);
         if (s != MU_STATUS_GOOD) {
-            return s;
+            goto cleanup;
         }
     }
 
@@ -895,23 +928,23 @@ static opcua_statuscode_t handle_create_session(mu_server_t *server, mu_binary_r
         size_t count = 0;
         s = mu_discovery_get_endpoints(&server->config, eps, MU_DISCOVERY_MAX_ENDPOINTS, &count);
         if (s != MU_STATUS_GOOD) {
-            return s;
+            goto cleanup;
         }
         s = mu_binary_write_int32(w, (opcua_int32_t)count);
         if (s != MU_STATUS_GOOD) {
-            return s; /* ServerEndpoints[] */
+            goto cleanup; /* ServerEndpoints[] */
         }
         for (size_t i = 0; i < count; ++i) {
             s = mu_endpoint_description_encode(w, &eps[i]);
             if (s != MU_STATUS_GOOD) {
-                return s;
+                goto cleanup;
             }
         }
     }
 
     s = mu_binary_write_int32(w, 0);
     if (s != MU_STATUS_GOOD) {
-        return s; /* ServerSoftwareCertificates[] */
+        goto cleanup; /* ServerSoftwareCertificates[] */
     }
 
     /* ServerSignature: on a secured channel, sign ClientCertificate || ClientNonce
@@ -946,11 +979,11 @@ static opcua_statuscode_t handle_create_session(mu_server_t *server, mu_binary_r
                     mu_bytestring_t sig_bs = {(opcua_int32_t)sig_len, sig};
                     s = mu_binary_write_string(w, &alg);
                     if (s != MU_STATUS_GOOD) {
-                        return s;
+                        goto cleanup;
                     }
                     s = mu_binary_write_bytestring(w, &sig_bs);
                     if (s != MU_STATUS_GOOD) {
-                        return s;
+                        goto cleanup;
                     }
                     wrote_sig = true;
                 }
@@ -960,22 +993,33 @@ static opcua_statuscode_t handle_create_session(mu_server_t *server, mu_binary_r
         if (!wrote_sig) {
             s = mu_binary_write_string(w, &null_str);
             if (s != MU_STATUS_GOOD) {
-                return s; /* ServerSignature.algorithm */
+                goto cleanup; /* ServerSignature.algorithm */
             }
             s = mu_binary_write_bytestring(w, &null_bs);
             if (s != MU_STATUS_GOOD) {
-                return s; /* ServerSignature.signature */
+                goto cleanup; /* ServerSignature.signature */
             }
         }
     }
 
     s = mu_binary_write_uint32(w, 0);
     if (s != MU_STATUS_GOOD) {
-        return s; /* MaxRequestMessageSize */
+        goto cleanup; /* MaxRequestMessageSize */
     }
 
     *response_length = w->position;
     return MU_STATUS_GOOD;
+
+cleanup:
+    /* OPC-10000-4 §5.7.3: a response-body encode failure after the session
+       slot was allocated must not leak the slot. Guarded by session_created so
+       a prefix encode failure (which returns before session creation) does not
+       attempt to close a slot that was never transitioned to CREATED, avoiding
+       an invalid/double close. */
+    if (session_created) {
+        (void)mu_session_close(slot, auth_token, true);
+    }
+    return s;
 }
 
 /* ActivateSession (OPC-10000-4 section 5.7.3.2). The UserIdentityToken's ExtensionObject
@@ -1102,8 +1146,8 @@ static opcua_statuscode_t handle_activate_session(mu_server_t *server, mu_binary
         if (s != MU_STATUS_GOOD)
             return s;
 #endif
-    } else if (token_type_is_ns0_numeric && token_type.identifier.numeric == 327) {
 #ifdef MUC_OPCUA_SECURITY
+    } else if (token_type_is_ns0_numeric && token_type.identifier.numeric == 327) {
         s = ensure_reader_bytes_remaining(r, token_body_len);
         if (s != MU_STATUS_GOOD) {
             return s;
@@ -1119,10 +1163,6 @@ static opcua_statuscode_t handle_activate_session(mu_server_t *server, mu_binary
             }
         }
         r->position += token_body_len;
-#else
-        s = skip_extension_object_body(r, token_body_len);
-        if (s != MU_STATUS_GOOD)
-            return s;
 #endif
     } else {
         s = skip_extension_object_body(r, token_body_len);
@@ -1269,9 +1309,9 @@ static opcua_statuscode_t handle_activate_session(mu_server_t *server, mu_binary
 #else
                     activate_result = MU_STATUS_BAD_IDENTITYTOKENINVALID;
 #endif
+#ifdef MUC_OPCUA_SECURITY
                 } else if (token_type.identifier.numeric == 327) {
                     /* Certificate user authentication */
-#ifdef MUC_OPCUA_SECURITY
                     if (cert_token.certificate_data.length <= 0 || user_token_signature.length <= 0) {
                         activate_result = MU_STATUS_BAD_IDENTITYTOKENREJECTED;
                     } else {
@@ -1314,8 +1354,6 @@ static opcua_statuscode_t handle_activate_session(mu_server_t *server, mu_binary
                             activate_result = MU_STATUS_BAD_IDENTITYTOKENREJECTED;
                         }
                     }
-#else
-                    activate_result = MU_STATUS_BAD_IDENTITYTOKENREJECTED;
 #endif
                 } else {
                     activate_result = MU_STATUS_BAD_IDENTITYTOKENINVALID;
@@ -1345,6 +1383,9 @@ static opcua_statuscode_t handle_activate_session(mu_server_t *server, mu_binary
     if (s != MU_STATUS_GOOD) {
         return s; /* ServerNonce */
     }
+#ifdef MUC_OPCUA_SECURITY
+    mu_secure_zero(nonce_buf, sizeof(nonce_buf));
+#endif
     mu_binary_write_int32(w, 0); /* Results[] */
     mu_binary_write_int32(w, 0); /* DiagnosticInfos[] */
     if (w->status != MU_STATUS_GOOD) {
@@ -1639,31 +1680,6 @@ static opcua_statuscode_t endpoint_matches_profile_filter(mu_binary_reader_t *r,
     return MU_STATUS_GOOD;
 }
 
-static opcua_statuscode_t validate_get_endpoints_profile_uris_body(mu_binary_reader_t *r) {
-    opcua_int32_t profile_count;
-    opcua_statuscode_t s = mu_binary_read_int32(r, &profile_count);
-    if (s != MU_STATUS_GOOD) {
-        return s;
-    }
-    /* OPC-10000-6 section 5.2.5: -1 encodes a null array; lower values are malformed. */
-    if (profile_count < -1) {
-        return MU_STATUS_BAD_DECODINGERROR;
-    }
-    if (profile_count == -1 || profile_count == 0) {
-        return MU_STATUS_GOOD;
-    }
-
-    /* OPC-10000-4 section 5.5.4.2: profileUris[] is part of the mandatory body. */
-    for (opcua_int32_t i = 0; i < profile_count; ++i) {
-        mu_string_t profile_uri;
-        s = mu_binary_read_string(r, &profile_uri);
-        if (s != MU_STATUS_GOOD) {
-            return s;
-        }
-    }
-    return MU_STATUS_GOOD;
-}
-
 static opcua_statuscode_t getendpoints_endpoint_description_encode(mu_binary_writer_t *w,
                                                                    const mu_endpoint_description_t *desc,
                                                                    const mu_string_t *requested_locale) {
@@ -1733,6 +1749,11 @@ static opcua_statuscode_t getendpoints_endpoint_description_encode(mu_binary_wri
     return mu_binary_write_byte(w, desc->security_level);
 }
 
+/* Bound for the cached profileUris[] filter in handle_get_endpoints. OPC-10000-7
+   defines a small set of transport profiles; 8 covers all realistic client
+   filters with margin. Larger wire lists fall back to per-endpoint re-parsing. */
+#define MU_GETENDPOINTS_PROFILE_CACHE_MAX 8
+
 /* GetEndpoints (OPC-10000-4 section 5.5.4.2): return endpoints matching the requested
    endpointUrl and transport profile URI filters, with localeIds[] selecting
    localized ApplicationDescription text per OPC-10000-4 section 5.4. */
@@ -1756,13 +1777,48 @@ static opcua_statuscode_t handle_get_endpoints(mu_server_t *server, mu_binary_re
         return s;
     }
 
+    /* OPC-10000-4 section 5.5.4.2: profileUris[] filters returned endpoints by
+       transport profile URI. Parse the wire array once into a local cache so each
+       endpoint compares against cached strings instead of re-reading the wire
+       array per endpoint (previously N+1 re-parses; now 1 parse plus N cheap
+       comparisons). profile_filter_pos is retained for the overflow fallback. */
     const size_t profile_filter_pos = r->position;
-    s = validate_get_endpoints_profile_uris_body(r);
-    if (s != MU_STATUS_GOOD) {
-        return s;
+    mu_string_t profile_cache[MU_GETENDPOINTS_PROFILE_CACHE_MAX];
+    size_t profile_count = 0;
+    bool profile_all_match = false;
+    bool profile_overflow = false;
+    {
+        opcua_int32_t wire_count;
+        s = mu_binary_read_int32(r, &wire_count);
+        if (s != MU_STATUS_GOOD) {
+            return s;
+        }
+        /* OPC-10000-6 section 5.2.5: -1 encodes a null array; lower values are malformed. */
+        if (wire_count < -1) {
+            return MU_STATUS_BAD_DECODINGERROR;
+        }
+        if (wire_count <= 0) {
+            /* Spec: "All Endpoints are returned if the list is empty." Skip caching. */
+            profile_all_match = true;
+        } else {
+            opcua_int32_t to_cache = wire_count;
+            if (to_cache > (opcua_int32_t)MU_GETENDPOINTS_PROFILE_CACHE_MAX) {
+                to_cache = (opcua_int32_t)MU_GETENDPOINTS_PROFILE_CACHE_MAX;
+                profile_overflow = true;
+            }
+            for (opcua_int32_t i = 0; i < wire_count; ++i) {
+                mu_string_t uri;
+                s = mu_binary_read_string(r, &uri);
+                if (s != MU_STATUS_GOOD) {
+                    return s;
+                }
+                if (i < to_cache) {
+                    profile_cache[(size_t)i] = uri;
+                }
+            }
+            profile_count = (size_t)to_cache;
+        }
     }
-    r->position = profile_filter_pos;
-    r->status = MU_STATUS_GOOD;
 
     mu_endpoint_description_t eps[MU_DISCOVERY_MAX_ENDPOINTS];
     size_t count = 0;
@@ -1775,12 +1831,25 @@ static opcua_statuscode_t handle_get_endpoints(mu_server_t *server, mu_binary_re
     size_t filtered_count = 0;
     const size_t bounded_count = count > MU_DISCOVERY_MAX_ENDPOINTS ? MU_DISCOVERY_MAX_ENDPOINTS : count;
     for (size_t i = 0; i < bounded_count; ++i) {
-        r->position = profile_filter_pos;
-        r->status = MU_STATUS_GOOD;
-        bool matches = false;
-        s = endpoint_matches_profile_filter(r, &eps[i], &matches);
-        if (s != MU_STATUS_GOOD) {
-            return s;
+        bool matches = profile_all_match;
+        if (!profile_all_match) {
+            if (profile_overflow) {
+                /* Wire list exceeded the cache; fall back to re-parsing per endpoint. */
+                r->position = profile_filter_pos;
+                r->status = MU_STATUS_GOOD;
+                s = endpoint_matches_profile_filter(r, &eps[i], &matches);
+                if (s != MU_STATUS_GOOD) {
+                    return s;
+                }
+            } else {
+                matches = false;
+                for (size_t j = 0; j < profile_count; ++j) {
+                    if (string_matches_cstr(&profile_cache[j], eps[i].transport_profile_uri)) {
+                        matches = true;
+                        break;
+                    }
+                }
+            }
         }
         if (matches && getendpoints_endpoint_matches(&endpoint_url, &eps[i])) {
             include[i] = true;

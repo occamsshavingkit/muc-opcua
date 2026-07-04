@@ -224,8 +224,9 @@ static opcua_statuscode_t w_rsa_oaep_encrypt(void *context, const opcua_byte_t *
                                  WC_RSA_OAEP_PAD, WC_HASH_TYPE_SHA, WC_MGF1SHA1, NULL, 0);
     wc_FreeRsaKey(&peer_key);
 
-    if (ret < 0)
+    if (ret < 0) {
         return MU_STATUS_BAD_INTERNALERROR;
+    }
     *output_length = (size_t)ret;
     return MU_STATUS_GOOD;
 }
@@ -235,18 +236,21 @@ static opcua_statuscode_t w_rsa_pss_sha256_sign(void *context, const opcua_byte_
     struct wolfssl_crypto_context *ctx = (struct wolfssl_crypto_context *)context;
     opcua_byte_t hash[32];
     wc_Sha256 sha;
-    if (wc_InitSha256(&sha) != 0)
+    if (wc_InitSha256(&sha) != 0) {
         return MU_STATUS_BAD_INTERNALERROR;
-    if (wc_Sha256Update(&sha, data, (word32)length) != 0)
+    }
+    if (wc_Sha256Update(&sha, data, (word32)length) != 0) {
         return MU_STATUS_BAD_INTERNALERROR;
+    }
     if (wc_Sha256Final(&sha, hash) != 0) {
         return MU_STATUS_BAD_INTERNALERROR;
     }
 
     int ret = wc_RsaPSS_Sign(hash, sizeof(hash), signature, (word32)*signature_length, WC_HASH_TYPE_SHA256,
                              WC_MGF1SHA256, &ctx->key, &ctx->rng);
-    if (ret < 0)
+    if (ret < 0) {
         return MU_STATUS_BAD_INTERNALERROR;
+    }
     *signature_length = (size_t)ret;
     return MU_STATUS_GOOD;
 }
@@ -303,8 +307,9 @@ static opcua_statuscode_t w_rsa_oaep_sha256_decrypt(void *context, const opcua_b
 
     int ret = wc_RsaPrivateDecrypt_ex(input, (word32)length, output, (word32)*output_length, &ctx->key, WC_RSA_OAEP_PAD,
                                       WC_HASH_TYPE_SHA256, WC_MGF1SHA256, NULL, 0);
-    if (ret < 0)
+    if (ret < 0) {
         return MU_STATUS_BAD_SECURITYCHECKSFAILED;
+    }
     *output_length = (size_t)ret;
     return MU_STATUS_GOOD;
 }
@@ -339,8 +344,9 @@ static opcua_statuscode_t w_rsa_oaep_sha256_encrypt(void *context, const opcua_b
                                  WC_RSA_OAEP_PAD, WC_HASH_TYPE_SHA256, WC_MGF1SHA256, NULL, 0);
     wc_FreeRsaKey(&peer_key);
 
-    if (ret < 0)
+    if (ret < 0) {
         return MU_STATUS_BAD_INTERNALERROR;
+    }
     *output_length = (size_t)ret;
     return MU_STATUS_GOOD;
 }

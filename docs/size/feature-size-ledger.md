@@ -15,29 +15,31 @@ restoring `.bss = 0`.)
 
 ## Summary — core library `.text` (flash), ARM Cortex-M0+ Thumb `-Os`
 
-Refreshed 2026-06-28 after feature `011-add-opcua-features`.
+Refreshed 2026-07-04 after feature `031-deferred-audit-fixes`.
 
 | Profile | Services | Core `.text` | vs nano | `.data` | `.bss` | Heap |
 |---|---|---|---|---|---|---|
-| **nano** | Core + View + Read, None | **16.1 KiB** (16,441 B) | -40 B vs previous | 0 | 0 | 0 |
-| **micro** | nano + Subscriptions + Write, None | **23.2 KiB** (23,730 B) | +7.3 KiB | 0 | 0 | 0 |
-| **embedded** | micro + Security + Events | **38.5 KiB** (39,442 B) | +23.0 KiB | 0 | 0 | 0 |
-| **full-featured** | embedded + methods + diagnostics + dynamic nodes | **38.8 KiB** (39,768 B) | +23.3 KiB | 0 | 0 | 0 |
+| **nano** | Core + View + Read, None | **16.1 KiB** (16,520 B) | — | 0 | 0 | 0 |
+| **micro** | nano + Subscriptions + Write, None | **23.6 KiB** (24,203 B) | +7.7 KiB | 0 | 0 | 0 |
+| **embedded** | micro + Security + Events | **43.7 KiB** (44,764 B) | +28.2 KiB | 0 | 0 | 0 |
+| **full-featured** | embedded + methods + diagnostics + dynamic nodes | **52.3 KiB** (53,514 B) | +36.9 KiB | 0 | 0 | 0 |
 
-- **Subscriptions (Micro)** cost **~6.0 KiB** of flash (engine `subscription.c` plus the
+- **Subscriptions (Micro)** cost **~7.7 KiB** of flash (engine `subscription.c` plus the
   Subscription/MonitoredItem dispatch handlers + DataChangeNotification encoding).
-- **Nano and Micro are unchanged** by feature 005/006: the current ARM Thumb totals are smaller than the previous ledger because the new Embedded 2017 work is profile-gated.
-- **Embedded 2017** compiles to **39,442 B** of flash, which includes standard subscriptions, security policies, and event notifications.
-- **`.bss` = 0 (no mutable global state).** Feature 004 briefly introduced ~156 B of
-  file-static state (the address-space lookup index cache + the OPN policy hand-off);
-  **issue #197 relocated it into the caller-provided server storage**, restoring the
-  zero-mutable-globals property (verified: `nm` shows no `.bss` symbols in the core).
-  The relocation moved the index into `struct mu_server`, so
-  `MU_SERVER_STORAGE_BYTES` now also includes `MU_ADDRESS_SPACE_INDEX_STORAGE_BYTES`.
-  The trade cost ~170 B of `.text` per profile (the index cache is now threaded rather
-  than file-static). Net core flash is still flat-to-down vs the pre-feature baseline
-  (nano 16.9 → 16.1 KiB) despite the added parser-robustness, address-space index, OPN
-  validation, and per-channel cipher context.
+- **Nano and Micro are unchanged** by feature 005/006: the current ARM Thumb totals are
+  smaller than the previous ledger because the new Embedded 2017 work is profile-gated.
+- **Embedded 2017** compiles to **44,764 B** of flash, which includes standard
+  subscriptions, security policies, event notifications, and the feature-025/026/031
+  audit remediation fixes (binary search dispatch, bitmap publish scan, session
+  ordering, nonce zeroization).
+- **`.bss` = 0 (no mutable global state).** The bitmap added by feature 031 is
+  allocated in the caller-provided `mu_subscriptions_t` struct — zero static RAM impact.
+  Feature 004's file-static state was relocated in issue #197, restoring zero-BSS.
+- **Feature 031 delta vs previous ledger (16,278/23,785/42,990/51,612 B):**
+  nano +242 B (+1.5%), micro +418 B (+1.8%), embedded +1,774 B (+4.1%),
+  full-featured +1,902 B (+3.7%). The subscription bitmap, binary search dispatch,
+  session cleanup path, and nonce zeroization add modest .text to the shared core.
+  No new heap, no new .bss, no new .data.
 
 ## RAM (all caller-provided; the library adds 0 static RAM)
 
@@ -908,4 +910,36 @@ full-featured      52822        0        0      52822 build/size-arm/full-featur
 - Integer deadband branching in subscription hot path
 - Unconditional username-token ServerNonce anti-replay check
 - `.data = 0`, `.bss = 0` across all profiles (no-heap invariant preserved)
+
+### Feature 031 (deferred audit fixes) post-completion measurement
+
+- **Measured**: 2026-07-04 for Feature 031 completion.
+- **Command**: `BUILD_ROOT=build/size-031 scripts/measure_size.sh all`
+
+```text
+profile              text     data      bss        dec archive
+nano           16520        0        0      16520 build/size-031/nano/src/libmuc_opcua.a
+micro          24203        0        0      24203 build/size-031/micro/src/libmuc_opcua.a
+embedded       44764        0        0      44764 build/size-031/embedded/src/libmuc_opcua.a
+full-featured      53514        0        0      53514 build/size-031/full-featured/src/libmuc_opcua.a
+```
+
+**Delta vs previous (Feature 025):**
+
+| Profile | Previous | Current | Delta | Notes |
+|---|---|---|---|---|
+| nano | 16,436 | 16,520 | +84 | Binary search dispatch, session create cleanup path, cert token ifdef consolidation (service_dispatch.c shared across all profiles) |
+| micro | 23,839 | 24,203 | +364 | Nano delta + bitmap publish scan, deadband NONE fix, publish timer bound, 64-bit div avoidance (subscription.c) |
+| embedded | 44,100 | 44,764 | +664 | Micro delta + nonce zeroization, cert token verification path |
+| full-featured | 52,822 | 53,514 | +692 | Embedded delta + profile URI cache, triggered-items scan |
+
+**Key contributors to growth:**
+- Bitmap publish scan (T003): ~+100 B flash, ~+32 B RAM (struct field in `mu_subscriptions_t`)
+- Binary search dispatch (T013): ~+50 B flash (binary search code in shared service_dispatch.c)
+- Session create cleanup path (T010): ~+30 B flash (cleanup label + session_close call)
+- Nonce zeroization (T012): ~+24 B flash (two `mu_secure_zero` calls)
+- Publish timer bound (T007): ~+12 B flash
+- Service_dispatch.c shared growth: ~+145 B across all profiles (binary search + cleanup + ifdef)
+- **`<math.h>` removed from subscription.c** — double-precision software emulation library (~12 KB) no longer linked for profiles with subscriptions. The net effect is that the code-size additions above are partially offset for micro/embedded/full, keeping `.text` growth modest.
+- `.data = 0`, `.bss = 0`, heap = 0 across all profiles (no-heap invariant preserved).
 

@@ -93,9 +93,7 @@ static const mu_reference_t s_objects_refs[] = {{{0, MU_NODEID_NUMERIC, {35}}, {
 
 #if MUC_OPCUA_BASE_TYPE_SYSTEM
 static const mu_reference_t s_views_refs[] = {{{0, MU_NODEID_NUMERIC, {40}}, {0, MU_NODEID_NUMERIC, {61}}, true}};
-#endif
 
-#if MUC_OPCUA_BASE_TYPE_SYSTEM
 static const mu_reference_t s_types_refs[] = {{{0, MU_NODEID_NUMERIC, {35}}, {0, MU_NODEID_NUMERIC, {88}}, true},
                                               {{0, MU_NODEID_NUMERIC, {35}}, {0, MU_NODEID_NUMERIC, {89}}, true},
                                               {{0, MU_NODEID_NUMERIC, {35}}, {0, MU_NODEID_NUMERIC, {90}}, true},
@@ -117,9 +115,7 @@ static const mu_reference_t s_type_folder_data_refs[] = {
 static const mu_reference_t s_type_folder_reference_refs[] = {
     {{0, MU_NODEID_NUMERIC, {35}}, {0, MU_NODEID_NUMERIC, {31}}, true},
     {{0, MU_NODEID_NUMERIC, {40}}, {0, MU_NODEID_NUMERIC, {61}}, true}};
-#endif
 
-#if MUC_OPCUA_BASE_TYPE_SYSTEM
 static const mu_reference_t s_references_refs[] = {{{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {32}}, true},
                                                    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {33}}, true}};
 
@@ -164,6 +160,19 @@ static const mu_reference_t s_base_variable_type_refs[] = {
 
 static const mu_reference_t s_base_data_variable_type_refs[] = {
     {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {68}}, true}};
+
+static const mu_reference_t s_property_type_ref[] = {
+    {{0, MU_NODEID_NUMERIC, {40}}, {0, MU_NODEID_NUMERIC, {68}}, true}};
+
+#if MUC_OPCUA_SUBSCRIPTIONS_STANDARD
+static const mu_reference_t s_get_monitored_items_refs[] = {
+    {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {11493}}, true},
+    {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {11494}}, true}};
+
+static const mu_reference_t s_resend_data_refs[] = {
+    {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {12874}}, true}};
+#endif
+
 #endif
 
 static const mu_reference_t s_server_refs[] = {{{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {2254}}, true},
@@ -204,21 +213,6 @@ static const mu_reference_t s_operation_limits_refs[] = {
     {{0, MU_NODEID_NUMERIC, {40}}, {0, MU_NODEID_NUMERIC, {58}}, true}
 #endif
 };
-
-#if MUC_OPCUA_BASE_TYPE_SYSTEM
-static const mu_reference_t s_property_type_ref[] = {
-    {{0, MU_NODEID_NUMERIC, {40}}, {0, MU_NODEID_NUMERIC, {68}}, true}};
-
-#if MUC_OPCUA_SUBSCRIPTIONS_STANDARD
-static const mu_reference_t s_get_monitored_items_refs[] = {
-    {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {11493}}, true},
-    {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {11494}}, true}};
-
-static const mu_reference_t s_resend_data_refs[] = {
-    {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {12874}}, true}};
-#endif
-
-#endif
 
 static const mu_string_t s_server_array[] = {{20, s_str_urn_muc_opcua_server}};
 
@@ -723,31 +717,29 @@ void mu_base_runtime_init(mu_base_runtime_nodes_t *s, const mu_time_adapter_t *t
     s->values[1].data.callback.read = base_status_time_read;
     s->values[1].data.callback.context = &s->rt;
 
+#if MUC_OPCUA_BASE_TYPE_SYSTEM
+    const mu_reference_t *const type_ref = s_property_type_ref;
+    const size_t type_ref_cnt = sizeof(s_property_type_ref) / sizeof(s_property_type_ref[0]);
+#else
+    const mu_reference_t *const type_ref = NULL;
+    const size_t type_ref_cnt = 0;
+#endif
+
     s->nodes[0] = (mu_node_t){
         .node_id = {.namespace_index = 0, .identifier_type = MU_NODEID_NUMERIC, .identifier.numeric = 2258u},
         .node_class = MU_NODECLASS_VARIABLE,
         .browse_name = {.length = (opcua_int32_t)11, .data = (const opcua_byte_t *)"CurrentTime"},
         .display_name = {.length = (opcua_int32_t)11, .data = (const opcua_byte_t *)"CurrentTime"},
-#if MUC_OPCUA_BASE_TYPE_SYSTEM
-        .references = s_property_type_ref,
-        .reference_count = sizeof(s_property_type_ref) / sizeof(s_property_type_ref[0]),
-#else
-        .references = NULL,
-        .reference_count = 0,
-#endif
+        .references = type_ref,
+        .reference_count = type_ref_cnt,
         .value = &s->values[0]};
     s->nodes[1] = (mu_node_t){
         .node_id = {.namespace_index = 0, .identifier_type = MU_NODEID_NUMERIC, .identifier.numeric = 2257u},
         .node_class = MU_NODECLASS_VARIABLE,
         .browse_name = {.length = (opcua_int32_t)9, .data = (const opcua_byte_t *)"StartTime"},
         .display_name = {.length = (opcua_int32_t)9, .data = (const opcua_byte_t *)"StartTime"},
-#if MUC_OPCUA_BASE_TYPE_SYSTEM
-        .references = s_property_type_ref,
-        .reference_count = sizeof(s_property_type_ref) / sizeof(s_property_type_ref[0]),
-#else
-        .references = NULL,
-        .reference_count = 0,
-#endif
+        .references = type_ref,
+        .reference_count = type_ref_cnt,
         .value = &s->values[1]};
 
     s->space.nodes = s->nodes;
