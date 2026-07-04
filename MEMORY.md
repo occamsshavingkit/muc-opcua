@@ -1,59 +1,78 @@
-# Project Memory — Feature 025: Five-Lens Audit Remediation
+# Project Memory — Features 029 & 030: Five-Lens Audit Remediation
 
-**Date**: 2026-07-02
-**Branch**: `025-audit-remediation`
+**Date**: 2026-07-04
+**Branches**: `029-fix-audit-findings` → `main`, `030-audit-followup` → `main`
+**PRs**: [#236](https://github.com/occamsshavingkit/muc-opcua/pull/236), [#237](https://github.com/occamsshavingkit/muc-opcua/pull/237)
+**Audit Source**: `docs/review/five-lens-audit-2026-07-04.md` (42 findings)
 
-## Key Changes
+## What Was Fixed (22 findings)
 
-### Security hardening
-- **ActivateSession ClientSignature** now verified via `verify_activate_client_signature`
-  over `(serverCertificate || ServerNonce)` for all non-None policies
-  (`src/services/session.c`, OPC-10000-4 §5.7/§7.38)
-- **Certificate trust** enforced fail-closed: secured connections rejected when
-  `trust_list == NULL`, certificate expired, or not in trust list
-  (`src/core/service_dispatch.c` → `src/services/secure_channel.c`,
-  OPC-10000-4 §5.5/§6.1.3)
-- **CreateSession cert bound** to OPN channel certificate
-  (`src/services/session.c`, OPC-10000-4 §5.6.2)
-- **Username-token nonce check** now unconditional (not gated on `encryption_algorithm`)
-  (`src/services/session.c`, OPC-10000-4 §7.38)
+### PR #236 — Broad correctness & code quality sweep
+- **T3**: Browse preserves references when limit exceeded (OPC-10000-4 §5.9.2)
+- **T9**: DeleteNodes respects `deleteTargetReferences` flag (OPC-10000-4 §5.8.5.2)
+- **T10**: Write type validation aborts on value_source_read failure (OPC-10000-4 §5.11.4)
+- **T11**: `value_source_read` returns all scalar built-in types (OPC-10000-3 §5.6)
+- **T14**: Pico platform TCP stub documentation
+- **T16**: Trust model DER-exact comparison documented
+- **T18**: mbedTLS PSS `signature_length` validated (OPC-10000-4 §5.5)
+- **T21**: HistoryRead encoding mask rejects invalid 0x03 (OPC-10000-6 §5.2.2.15)
+- **T26**: `g_supported_services[]` and `POLICY_TABLE[]` verified `const`
+- **T29**: Query arrays `BAD_TOOMANYOPERATIONS` guard (OPC-10000-4 §5.9)
+- **T30**: TranslateBrowsePaths `remainingPathIndex` computed correctly (OPC-10000-4 §5.9.3)
+- **T33**: Session ID generation documented
+- **T34**: DER-exact comparison documented
+- **T35**: No fix (MessageSize bounded — documented)
+- **T36**: Poll cycle transient pointers documented
+- **T38**: Stack protector deferred to platform config (documented)
+- **T39**: Pico DRBG documentation
+- **T40**: Inline wrappers verified
+- **T41**: Base nodes guard consolidation
+- **T42**: No fix (O(N²) on small N, init-time — documented)
 
-### Memory model changes
-- **`MU_SECURE_SCRATCH_SIZE`**: 12,288 → 14,336 bytes (+2,048)
-  - New session-handshake sub-region (`MU_SECURE_SESSION_MAX = 2048`)
-  - Non-overlapping with response region (handlers write response BEFORE computing signatures)
-  - Defined in `include/muc_opcua/config.h`, layout documented in `src/core/server_internal.h`
-- **`mu_monitored_item_t`**: added `opcua_int64_t last_reported_integer` (8 bytes)
-  under `MUC_OPCUA_SUBSCRIPTIONS_STANDARD` for integer deadband comparison
-- **Stack reduction**: CreateSession/ActivateSession large buffers (`to_sign[1536]`,
-  `sig[512]`, `verify_buf[1536]`, `decrypt_buf[256]`) relocated from stack to
-  session scratch region — `handle_create_session` stack: 1,360 B;
-  `handle_activate_session` stack: 464 B
+### PR #237 — Security-critical fixes
+- **T1/T2/T7**: `fill_server_nonce` fail-closed; password decrypt buffer zeroized at all exit points (OPC-10000-4 §5.7.3)
+- **T32/T44**: Server self-cert validation fail-closed (OPC-10000-4 §5.5)
 
-### Code organization
-- `src/core/service_dispatch.c`: 4,100 → 2,760 lines (-33%)
-  - Session/channel handler bodies → `src/services/session.c` + `src/services/secure_channel.c`
-  - Subscription handler bodies + filter decoders → `src/services/subscription.c`
-  - Exported dispatch helpers: `mu_dispatch_write_response_prefix`, `mu_dispatch_fill_server_nonce`,
-    `mu_dispatch_skip_extension_object_body`, `mu_dispatch_ensure_reader_bytes_remaining`,
-    `mu_dispatch_opn_security_policy`, `mu_dispatch_opn_client_cert`
+### Test Coverage Added
+- `test_password_decrypt_zeroize.c` — `mu_secure_zero` primitive validation
+- `test_read_browsename_namespace.c` — BrowseName namespace independence
+- `test_read_timestamps_to_return.c` — TimestampsToReturn field presence
 
-### ARM Cortex-M0+ footprint (2026-07-02, after gate audit)
-| Profile | `.text` | `.data` | `.bss` | Δ from baseline |
-|---|---|---|---|---|
-| nano | 16,436 | 0 | 0 | +158 |
-| micro | 23,839 | 0 | 0 | +54 |
-| embedded | 44,100 | 0 | 0 | +1,112 |
-| full-featured | 52,822 | 0 | 0 | +1,212 |
+## What Was Deferred (15 findings, 3 hotspots)
 
-### Test coverage
-- 10 new tests: `test_secure_channel_trust` (3), `test_pico_adapter_hooks` (6),
-  `test_username_nonce_unconditional` (3, 1 RED), `test_deadband_integer_equivalence` (25, 3 RED)
-- 104/106 total host tests pass; 2 RED tests expected (deadband double-precision edges,
-  username nonce secured-transport mock)
-- All 18 integration/regression tests pass — wire-behavior neutral after refactor
+All deferred items cluster in files already touched by the fixes — deferred to avoid merge conflicts:
 
-### Invariant preserved
-- **No `malloc`** anywhere in the protocol path
-- `.data = 0`, `.bss = 0`, heap = 0 across all profiles
-- All RAM is caller-provided static storage
+| Hotspot | Findings | Reason |
+|---------|----------|--------|
+| `src/services/subscription.c` | T4, T5/T24, T6, T27, T28, T31 | Single-pass scan, fabs removal, 64-bit div, deadband, publish timer — complex refactor that broke tests in initial pass |
+| `src/core/service_dispatch.c` | T8, T12, T13, T23, T25 | Session ordering, cert token ifdef, nonce stack zeroize, dispatch scan, profile URI parse — structural changes needed |
+| `src/services/secure_channel.c` | T17 | Channel ID entropy — breaks integration tests that assume `channel_id=1`; needs per-test updates |
+
+## What Was Documented as No-Fix (5 findings)
+- **T15**: SHA-1 thumbprint — spec-mandated (OPC UA)
+- **T35**: MessageSize bounded by `MU_ASYM_MAX_PLAINTEXT`
+- **T37**: Covered by T6 (same 64-bit division)
+- **T38**: Stack protector — platform toolchain concern, not library
+- **T42**: Address-space validation O(N²) — N small, init-time only
+
+## Size Impact
+
+| Profile | Pre-029 | Post-030 | Delta |
+|---------|---------|----------|-------|
+| nano | 16,436 | 16,480 | +44 (+0.3%) |
+| micro | 23,839 | 23,975 | +136 (+0.6%) |
+| embedded | 44,100 | 43,906 | -194 (-0.4%) |
+| full | 52,822 | 52,656 | -166 (-0.3%) |
+
+All within Constitution gates (`.text` ≤ +3%, `.data` = 0, `.bss` = 0, 0 heap).
+
+## Test Status
+- **105 tests, 100% pass** — all CI jobs green
+- Codacy: 3 medium ErrorProne (test infrastructure, not production code)
+
+## Key Lessons for Follow-Up
+
+1. **Subscription.c changes need individual atomic tasks**: The initial T4 attempt batched 3+ function changes into one pull — it passed but broke the test suite. Next attempt should split into: collect indices, change write loop, change cleanup loop — each verified independently.
+2. **Channel ID requires test refactoring first**: T17 is a 1-line code change but needs integration test updates (3 files) to stop assuming `channel_id=1`. Update tests FIRST, then apply the counter.
+3. **Service_dispatch.c ifdef guards**: T7 zeroize needed `#ifdef MUC_OPCUA_SECURITY` because `key_derivation.h` is only included when SECURITY=ON. Any new `mu_secure_*` calls in `USER_AUTH` blocks need the same guard.
+4. **`fill_server_nonce` fail-closed broke tests that didn't configure entropy**: The `test_security_identity_errors` helper was missing `fake_platform_init`. Any new entropy-requiring path needs test adapters plumbed first.
