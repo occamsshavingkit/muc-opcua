@@ -16,3 +16,40 @@ exclude_paths:
   - 'build/**'
   - 'tests/interop/dotnet/bin/**'
   - 'tests/interop/dotnet/obj/**'
+
+engines:
+  # Configure Cppcheck for C language (not C++).
+  cppcheck:
+    language: c
+
+  # Flawfinder flags raw memcpy/strlen/read in protocol serialization code.
+  # Production code uses mu_checked_memcpy wrappers or guard-before-copy;
+  # test/benchmark/fuzz/example code is not deployed.
+  flawfinder:
+    exclude_paths:
+      - 'tests/**'
+      - 'benchmark/**'
+      - 'fuzz/**'
+      - 'examples/**'
+
+  # Lizard cyclomatic-complexity and function-length thresholds.
+  # Protocol dispatch functions are naturally longer than typical application
+  # code; exclude test scaffolding files that inflate metrics artificially.
+  lizard:
+    exclude_paths:
+      - 'tests/unit/test_traceability_docs.c'
+      - 'tests/unit/test_conformance_docs.c'
+      - 'tests/unit/test_size_report.c'
+      - 'tests/unit/test_async_opcua_inventory.c'
+
+  # Markdown link-fragment checks.  Docs links may point to sections that
+  # exist in the rendered output but are generated, not in raw Markdown.
+  markdownlint:
+    exclude_paths:
+      - '**/traceability/**'
+
+  # Shell scripts under scripts/ are CI infrastructure; pipeline warnings
+  # are not deployment-relevant.
+  shellcheck:
+    exclude_paths:
+      - 'scripts/**'
