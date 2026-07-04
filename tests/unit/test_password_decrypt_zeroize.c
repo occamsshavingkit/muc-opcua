@@ -17,7 +17,7 @@ void tearDown(void) {}
 void test_mu_secure_zero_clears_256_byte_buffer(void) {
     opcua_byte_t buf[256];
     /* Fill with a non-zero pattern */
-    memset(buf, 0xAA, sizeof(buf));
+    (void)memset(buf, 0xAA, sizeof(buf));
 
     mu_secure_zero(buf, sizeof(buf));
 
@@ -30,7 +30,7 @@ void test_mu_secure_zero_clears_256_byte_buffer(void) {
 /* Verify that zeriozation happens immediately (no compiler optimization elides it) */
 void test_secure_zero_not_optimized_away(void) {
     volatile opcua_byte_t buf[256];
-    memset((void *)buf, 0xBB, sizeof(buf));
+    (void)memset((void *)buf, 0xBB, sizeof(buf));
 
     mu_secure_zero((opcua_byte_t *)buf, sizeof(buf));
 
@@ -42,7 +42,7 @@ void test_secure_zero_not_optimized_away(void) {
 /* Verify partial zeroization (first N bytes) */
 void test_secure_zero_partial_buffer(void) {
     opcua_byte_t buf[256];
-    memset(buf, 0xCC, sizeof(buf));
+    (void)memset(buf, 0xCC, sizeof(buf));
 
     /* Zeroize only the first 32 bytes (server nonce size) */
     mu_secure_zero(buf, 32);

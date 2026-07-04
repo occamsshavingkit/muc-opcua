@@ -52,7 +52,7 @@ void test_browse_requested_max_references(void) {
 
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_browse_process(&address_space, NULL, &req, &result, 1, ref_pool, 10));
     TEST_ASSERT_EQUAL(MU_STATUS_BAD_NOCONTINUATIONPOINTS, result.status_code);
-    TEST_ASSERT_EQUAL(2, result.num_references);  /* T3: refs returned up to the requested limit */
+    TEST_ASSERT_EQUAL(2, result.num_references); /* T3: refs returned up to the requested limit */
 }
 
 void test_browse_response_size_bounds(void) {
@@ -129,18 +129,17 @@ void test_browse_over_capacity_is_too_many_operations(void) {
     mu_binary_writer_t w;
     mu_binary_writer_init(&w, buf, sizeof(buf));
     mu_nodeid_t null_view = {0, MU_NODEID_NUMERIC, {0}};
-    mu_binary_write_nodeid(&w, &null_view);   /* ViewDescription.viewId */
-    mu_binary_write_int64(&w, 0);             /* timestamp */
-    mu_binary_write_uint32(&w, 0);            /* viewVersion */
-    mu_binary_write_uint32(&w, 0);            /* requestedMaxReferencesPerNode */
-    mu_binary_write_int32(&w, 5);             /* nodesToBrowse count = 5 */
+    mu_binary_write_nodeid(&w, &null_view); /* ViewDescription.viewId */
+    mu_binary_write_int64(&w, 0);           /* timestamp */
+    mu_binary_write_uint32(&w, 0);          /* viewVersion */
+    mu_binary_write_uint32(&w, 0);          /* requestedMaxReferencesPerNode */
+    mu_binary_write_int32(&w, 5);           /* nodesToBrowse count = 5 */
 
     mu_binary_reader_t r;
     mu_binary_reader_init(&r, buf, w.position);
     mu_browse_request_t req;
     mu_browse_description_t desc_array[1]; /* capacity 1 < 5 */
-    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_BAD_TOOMANYOPERATIONS,
-                            mu_browse_request_decode(&r, &req, desc_array, 1));
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_BAD_TOOMANYOPERATIONS, mu_browse_request_decode(&r, &req, desc_array, 1));
 }
 
 int main(void) {

@@ -22,7 +22,7 @@ void test_decode_username_token_direct(void) {
     mu_binary_reader_init(&reader, buf, sizeof(buf));
 
     mu_username_identity_token_t token;
-    memset(&token, 0, sizeof(token));
+    (void)memset(&token, 0, sizeof(token));
 
     opcua_statuscode_t status = mu_binary_read_username_identity_token(&reader, &token);
 

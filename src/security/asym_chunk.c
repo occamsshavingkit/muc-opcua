@@ -23,13 +23,15 @@ static opcua_statuscode_t key_bytes(const mu_crypto_adapter_t *crypto, const opc
                                     size_t *bytes) {
     size_t bits = 0;
     opcua_statuscode_t s = crypto->get_certificate_key_bits(crypto->context, cert, cert_len, &bits);
-    if (s != MU_STATUS_GOOD || bits == 0)
+    if (s != MU_STATUS_GOOD || bits == 0) {
         return MU_STATUS_BAD_CERTIFICATEINVALID;
+    }
     *bytes = bits / 8;
     /* The RSA modulus must exceed the OAEP overhead, or the plaintext block size
        would underflow. (Basic256Sha256 also mandates >= 2048-bit keys.) */
-    if (*bytes <= MU_OAEP_SHA1_OVERHEAD)
+    if (*bytes <= MU_OAEP_SHA1_OVERHEAD) {
         return MU_STATUS_BAD_CERTIFICATEINVALID;
+    }
     return MU_STATUS_GOOD;
 }
 
@@ -39,8 +41,9 @@ static opcua_statuscode_t write_header(mu_binary_writer_t *w, mu_security_policy
                                        const opcua_byte_t *sender_cert, size_t sender_cert_len,
                                        const opcua_byte_t *receiver_thumbprint, size_t thumb_len) {
     const char *uri = mu_security_policy_uri(policy);
-    if (!uri)
+    if (!uri) {
         return MU_STATUS_BAD_SECURITYPOLICYREJECTED;
+    }
 
     w->buffer[0] = 'O';
     w->buffer[1] = 'P';
@@ -48,21 +51,25 @@ static opcua_statuscode_t write_header(mu_binary_writer_t *w, mu_security_policy
     w->buffer[3] = 'F';
     w->position = 4;
     opcua_statuscode_t s = mu_binary_write_uint32(w, 0); /* MessageSize placeholder */
-    if (s != MU_STATUS_GOOD)
+    if (s != MU_STATUS_GOOD) {
         return s;
+    }
     s = mu_binary_write_uint32(w, scid);
-    if (s != MU_STATUS_GOOD)
+    if (s != MU_STATUS_GOOD) {
         return s;
+    }
 
     mu_string_t policy_uri = {(opcua_int32_t)strlen(uri), (const opcua_byte_t *)uri};
     s = mu_binary_write_string(w, &policy_uri);
-    if (s != MU_STATUS_GOOD)
+    if (s != MU_STATUS_GOOD) {
         return s;
+    }
 
     mu_bytestring_t cert = {sender_cert ? (opcua_int32_t)sender_cert_len : -1, sender_cert};
     s = mu_binary_write_bytestring(w, &cert);
-    if (s != MU_STATUS_GOOD)
+    if (s != MU_STATUS_GOOD) {
         return s;
+    }
 
     mu_bytestring_t thumb = {receiver_thumbprint ? (opcua_int32_t)thumb_len : -1, receiver_thumbprint};
     return mu_binary_write_bytestring(w, &thumb);
@@ -76,16 +83,20 @@ static opcua_statuscode_t wrap_none(opcua_uint32_t scid, opcua_uint32_t seq, opc
     mu_binary_writer_t w;
     mu_binary_writer_init(&w, out, out_cap);
     opcua_statuscode_t s = write_header(&w, MU_SECURITY_POLICY_NONE_ID, scid, NULL, 0, NULL, 0);
-    if (s != MU_STATUS_GOOD)
+    if (s != MU_STATUS_GOOD) {
         return s;
+    }
     s = mu_binary_write_uint32(&w, seq);
-    if (s != MU_STATUS_GOOD)
+    if (s != MU_STATUS_GOOD) {
         return s;
+    }
     s = mu_binary_write_uint32(&w, rid);
-    if (s != MU_STATUS_GOOD)
+    if (s != MU_STATUS_GOOD) {
         return s;
-    if (w.position + body_len > out_cap)
+    }
+    if (w.position + body_len > out_cap) {
         return MU_STATUS_BAD_RESPONSETOOLARGE;
+    }
     memcpy(out + w.position, body, body_len);
     size_t total = w.position + body_len;
     /* Patch MessageSize. */
@@ -102,32 +113,38 @@ opcua_statuscode_t mu_asym_chunk_wrap(const mu_crypto_adapter_t *crypto, mu_secu
                                       opcua_uint32_t request_id, const opcua_byte_t *receiver_cert,
                                       size_t receiver_cert_len, const opcua_byte_t *body, size_t body_len,
                                       opcua_byte_t *out, size_t out_cap, size_t *out_len) {
-    if (!out || !out_len || (!body && body_len))
+    if (!out || !out_len || (!body && body_len)) {
         return MU_STATUS_BAD_INTERNALERROR;
+    }
 
     if (policy == MU_SECURITY_POLICY_NONE_ID) {
         return wrap_none(secure_channel_id, sequence_number, request_id, body, body_len, out, out_cap, out_len);
     }
     if (policy != MU_SECURITY_POLICY_BASIC256SHA256_ID && policy != MU_SECURITY_POLICY_AES128_SHA256_RSAOAEP_ID &&
-        policy != MU_SECURITY_POLICY_AES256_SHA256_RSAPSS_ID)
+        policy != MU_SECURITY_POLICY_AES256_SHA256_RSAPSS_ID) {
         return MU_STATUS_BAD_SECURITYPOLICYREJECTED;
-    if (!crypto || !receiver_cert || receiver_cert_len == 0)
+    }
+    if (!crypto || !receiver_cert || receiver_cert_len == 0) {
         return MU_STATUS_BAD_INTERNALERROR;
+    }
 
     /* Our certificate goes in the header; we sign with our key. */
     const opcua_byte_t *sender_cert = NULL;
     size_t sender_cert_len = 0;
     opcua_statuscode_t s = crypto->get_own_certificate(crypto->context, &sender_cert, &sender_cert_len);
-    if (s != MU_STATUS_GOOD)
+    if (s != MU_STATUS_GOOD) {
         return s;
+    }
 
     size_t sig_len = 0, recv_key_bytes = 0;
     s = key_bytes(crypto, sender_cert, sender_cert_len, &sig_len);
-    if (s != MU_STATUS_GOOD)
+    if (s != MU_STATUS_GOOD) {
         return s;
+    }
     s = key_bytes(crypto, receiver_cert, receiver_cert_len, &recv_key_bytes);
-    if (s != MU_STATUS_GOOD)
+    if (s != MU_STATUS_GOOD) {
         return s;
+    }
     size_t plain_block = (policy == MU_SECURITY_POLICY_AES256_SHA256_RSAPSS_ID)
                              ? (recv_key_bytes - 66)
                              : (recv_key_bytes - MU_OAEP_SHA1_OVERHEAD);
@@ -136,14 +153,16 @@ opcua_statuscode_t mu_asym_chunk_wrap(const mu_crypto_adapter_t *crypto, mu_secu
     /* Receiver thumbprint for the header. */
     opcua_byte_t thumb[MU_THUMBPRINT_LENGTH];
     s = mu_certificate_thumbprint(crypto, receiver_cert, receiver_cert_len, thumb);
-    if (s != MU_STATUS_GOOD)
+    if (s != MU_STATUS_GOOD) {
         return s;
+    }
 
     mu_binary_writer_t w;
     mu_binary_writer_init(&w, out, out_cap);
     s = write_header(&w, policy, secure_channel_id, sender_cert, sender_cert_len, thumb, sizeof(thumb));
-    if (s != MU_STATUS_GOOD)
+    if (s != MU_STATUS_GOOD) {
         return s;
+    }
     size_t hdr_len = w.position;
 
     /* Plaintext to protect: SequenceHeader(8) + body. */
@@ -156,12 +175,15 @@ opcua_statuscode_t mu_asym_chunk_wrap(const mu_crypto_adapter_t *crypto, mu_secu
     size_t cipher_len = (enc_len / plain_block) * cipher_block;
     size_t total = hdr_len + cipher_len;
 
-    if (enc_len > MU_ASYM_MAX_PLAINTEXT)
+    if (enc_len > MU_ASYM_MAX_PLAINTEXT) {
         return MU_STATUS_BAD_REQUESTTOOLARGE;
-    if (hdr_len + presig_len > MU_ASYM_SIGNED_INPUT_MAX)
+    }
+    if (hdr_len + presig_len > MU_ASYM_SIGNED_INPUT_MAX) {
         return MU_STATUS_BAD_REQUESTTOOLARGE;
-    if (total > out_cap)
+    }
+    if (total > out_cap) {
         return MU_STATUS_BAD_RESPONSETOOLARGE;
+    }
 
     /* Patch the final (encrypted) MessageSize before signing — the signature
        covers the header, which includes MessageSize. */
@@ -255,36 +277,43 @@ opcua_statuscode_t mu_asym_chunk_wrap(const mu_crypto_adapter_t *crypto, mu_secu
 opcua_statuscode_t mu_asym_chunk_unwrap(const mu_crypto_adapter_t *crypto, const opcua_byte_t *chunk, size_t chunk_len,
                                         opcua_byte_t *out_body, size_t out_cap, size_t *out_body_len,
                                         opcua_byte_t *scratch, size_t scratch_len, mu_asym_chunk_info_t *info) {
-    if (!crypto || !chunk || !out_body || !out_body_len || !info || !scratch)
+    if (!crypto || !chunk || !out_body || !out_body_len || !info || !scratch) {
         return MU_STATUS_BAD_INTERNALERROR;
-    if (scratch_len < MU_ASYM_MAX_PLAINTEXT + MU_ASYM_SIGNED_INPUT_MAX)
+    }
+    if (scratch_len < MU_ASYM_MAX_PLAINTEXT + MU_ASYM_SIGNED_INPUT_MAX) {
         return MU_STATUS_BAD_INTERNALERROR;
+    }
     if (chunk_len < 12 || chunk[0] != 'O' || chunk[1] != 'P' || chunk[2] != 'N') {
         return MU_STATUS_BAD_DECODINGERROR;
     }
 
     size_t msg_size = (size_t)chunk[4] | ((size_t)chunk[5] << 8) | ((size_t)chunk[6] << 16) | ((size_t)chunk[7] << 24);
-    if (msg_size > chunk_len)
+    if (msg_size > chunk_len) {
         return MU_STATUS_BAD_DECODINGERROR;
+    }
 
     mu_binary_reader_t r;
     mu_binary_reader_init(&r, chunk, msg_size);
     r.position = 8;
     opcua_statuscode_t s = mu_binary_read_uint32(&r, &info->secure_channel_id);
-    if (s != MU_STATUS_GOOD)
+    if (s != MU_STATUS_GOOD) {
         return s;
+    }
 
     mu_string_t policy_uri;
     mu_bytestring_t sender_cert, receiver_thumb;
     s = mu_binary_read_string(&r, &policy_uri);
-    if (s != MU_STATUS_GOOD)
+    if (s != MU_STATUS_GOOD) {
         return s;
+    }
     s = mu_binary_read_bytestring(&r, &sender_cert);
-    if (s != MU_STATUS_GOOD)
+    if (s != MU_STATUS_GOOD) {
         return s;
+    }
     s = mu_binary_read_bytestring(&r, &receiver_thumb);
-    if (s != MU_STATUS_GOOD)
+    if (s != MU_STATUS_GOOD) {
         return s;
+    }
     size_t hdr_len = r.position;
 
     info->policy = mu_security_policy_from_uri(policy_uri.data, policy_uri.length > 0 ? (size_t)policy_uri.length : 0);
@@ -293,38 +322,44 @@ opcua_statuscode_t mu_asym_chunk_unwrap(const mu_crypto_adapter_t *crypto, const
 
     if (info->policy == MU_SECURITY_POLICY_NONE_ID) {
         /* Cleartext: SequenceHeader follows the header. */
-        if (hdr_len + 8 > msg_size)
+        if (hdr_len + 8 > msg_size) {
             return MU_STATUS_BAD_DECODINGERROR;
+        }
         info->sequence_number = (opcua_uint32_t)chunk[hdr_len] | ((opcua_uint32_t)chunk[hdr_len + 1] << 8) |
                                 ((opcua_uint32_t)chunk[hdr_len + 2] << 16) | ((opcua_uint32_t)chunk[hdr_len + 3] << 24);
         info->request_id = (opcua_uint32_t)chunk[hdr_len + 4] | ((opcua_uint32_t)chunk[hdr_len + 5] << 8) |
                            ((opcua_uint32_t)chunk[hdr_len + 6] << 16) | ((opcua_uint32_t)chunk[hdr_len + 7] << 24);
         size_t body_len = msg_size - hdr_len - 8;
-        if (body_len > out_cap)
+        if (body_len > out_cap) {
             return MU_STATUS_BAD_RESPONSETOOLARGE;
+        }
         memcpy(out_body, chunk + hdr_len + 8, body_len);
         *out_body_len = body_len;
         return MU_STATUS_GOOD;
     }
     if (info->policy != MU_SECURITY_POLICY_BASIC256SHA256_ID &&
         info->policy != MU_SECURITY_POLICY_AES128_SHA256_RSAOAEP_ID &&
-        info->policy != MU_SECURITY_POLICY_AES256_SHA256_RSAPSS_ID)
+        info->policy != MU_SECURITY_POLICY_AES256_SHA256_RSAPSS_ID) {
         return MU_STATUS_BAD_SECURITYPOLICYREJECTED;
+    }
 
     /* Validate the sender certificate and that the chunk is addressed to us. */
     s = mu_certificate_validate(crypto, info->policy, info->sender_cert, info->sender_cert_len);
-    if (s != MU_STATUS_GOOD)
+    if (s != MU_STATUS_GOOD) {
         return s;
+    }
 
     const opcua_byte_t *own_cert = NULL;
     size_t own_cert_len = 0;
     s = crypto->get_own_certificate(crypto->context, &own_cert, &own_cert_len);
-    if (s != MU_STATUS_GOOD)
+    if (s != MU_STATUS_GOOD) {
         return s;
+    }
     opcua_byte_t own_thumb[MU_THUMBPRINT_LENGTH];
     s = mu_certificate_thumbprint(crypto, own_cert, own_cert_len, own_thumb);
-    if (s != MU_STATUS_GOOD)
+    if (s != MU_STATUS_GOOD) {
         return s;
+    }
     if (receiver_thumb.length != (opcua_int32_t)MU_THUMBPRINT_LENGTH ||
         !mu_secure_memeq(receiver_thumb.data, own_thumb, MU_THUMBPRINT_LENGTH)) {
         return MU_STATUS_BAD_SECURITYCHECKSFAILED;
@@ -332,15 +367,18 @@ opcua_statuscode_t mu_asym_chunk_unwrap(const mu_crypto_adapter_t *crypto, const
 
     size_t own_key_bytes = 0, sig_len = 0;
     s = key_bytes(crypto, own_cert, own_cert_len, &own_key_bytes);
-    if (s != MU_STATUS_GOOD)
+    if (s != MU_STATUS_GOOD) {
         return s;
+    }
     s = key_bytes(crypto, info->sender_cert, info->sender_cert_len, &sig_len);
-    if (s != MU_STATUS_GOOD)
+    if (s != MU_STATUS_GOOD) {
         return s;
+    }
 
     size_t cipher_len = msg_size - hdr_len;
-    if (cipher_len == 0 || cipher_len % own_key_bytes != 0)
+    if (cipher_len == 0 || cipher_len % own_key_bytes != 0) {
         return MU_STATUS_BAD_DECODINGERROR;
+    }
 
     /* Decrypt block-by-block with our private key. */
     opcua_byte_t *plain = scratch;

@@ -50,7 +50,7 @@ static opcua_statuscode_t mock_read(void *c, void *h, opcua_byte_t *buf, size_t 
     }
     size_t len = m->inbound_len[m->read_index];
     TEST_ASSERT_TRUE(len <= cap);
-    memcpy(buf, m->inbound[m->read_index], len);
+    (void)memcpy(buf, m->inbound[m->read_index], len);
     m->read_index++;
     *n = len;
     return MU_STATUS_GOOD;
@@ -59,14 +59,14 @@ static opcua_statuscode_t mock_read(void *c, void *h, opcua_byte_t *buf, size_t 
 static opcua_statuscode_t mock_write(void *c, void *h, const opcua_byte_t *buf, size_t len, size_t *n) {
     mock_t *m = (mock_t *)c;
     (void)h;
-    memcpy(m->last_write, buf, len);
+    (void)memcpy(m->last_write, buf, len);
     m->last_write_len = len;
     *n = len;
     return MU_STATUS_GOOD;
 }
 
 static void enqueue(mock_t *m, const opcua_byte_t *bytes, size_t len) {
-    memcpy(m->inbound[m->inbound_count], bytes, len);
+    (void)memcpy(m->inbound[m->inbound_count], bytes, len);
     m->inbound_len[m->inbound_count] = len;
     m->inbound_count++;
 }
@@ -118,7 +118,7 @@ static size_t build_msg(opcua_byte_t *out, size_t cap, opcua_uint32_t seq, opcua
     mu_binary_write_uint32(&w, 1);
     mu_binary_write_uint32(&w, seq);
     mu_binary_write_uint32(&w, reqid);
-    memcpy(out + 24, body, body_len);
+    (void)memcpy(out + 24, body, body_len);
     return 24 + body_len;
 }
 
@@ -292,7 +292,7 @@ static opcua_statuscode_t test_auth_handler(void *handle, const mu_string_t *use
 
 void test_plaintext_user_auth_flow_rejects_username_password_over_security_policy_none(void) {
     mock_t mock;
-    memset(&mock, 0, sizeof(mock));
+    (void)memset(&mock, 0, sizeof(mock));
 
     /* ---- Build the inbound queue ---- */
     opcua_byte_t tmp[512];
@@ -367,7 +367,7 @@ void test_plaintext_user_auth_flow_rejects_username_password_over_security_polic
 
     /* ---- Configure the server ---- */
     mu_server_config_t config;
-    memset(&config, 0, sizeof(config));
+    (void)memset(&config, 0, sizeof(config));
     config.endpoint_url = "opc.tcp://host:4840";
     config.application_uri = "urn:test";
     config.product_uri = "urn:test";

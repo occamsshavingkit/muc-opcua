@@ -48,8 +48,9 @@ static void mock_shutdown(void *c) {
 }
 static opcua_statuscode_t mock_entropy(void *c, opcua_byte_t *b, size_t n) {
     (void)c;
-    if (b)
-        memset(b, 0, n);
+    if (b) {
+        (void)memset(b, 0, n);
+    }
     return MU_STATUS_GOOD;
 }
 

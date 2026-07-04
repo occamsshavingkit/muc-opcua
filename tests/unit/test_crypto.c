@@ -44,7 +44,7 @@ void test_sha256_known_answer(void) {
 /* HMAC-SHA256 — RFC 4231 Test Case 1. */
 void test_hmac_sha256_known_answer(void) {
     opcua_byte_t key[20];
-    memset(key, 0x0b, sizeof(key));
+    (void)memset(key, 0x0b, sizeof(key));
     const opcua_byte_t data[] = {'H', 'i', ' ', 'T', 'h', 'e', 'r', 'e'};
     opcua_byte_t expected[MU_SHA256_LENGTH];
     from_hex("b0344c61d8db38535ca8afceaf0bf12b881dc200c9833da726e9376c2e32cff7", expected);
@@ -101,7 +101,7 @@ void test_rsa_sign_verify_roundtrip(void) {
 
     /* A tampered message must not verify. */
     opcua_byte_t tampered[sizeof(data)];
-    memcpy(tampered, data, sizeof(data));
+    (void)memcpy(tampered, data, sizeof(data));
     tampered[0] ^= 0xFF;
     TEST_ASSERT_NOT_EQUAL(MU_STATUS_GOOD, crypto.rsa_sha256_verify(crypto.context, cert, cert_len, tampered,
                                                                    sizeof(tampered), sig, sig_len));
@@ -138,8 +138,8 @@ void test_p_sha256_first_block_matches_construction(void) {
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD,
                       crypto.hmac_sha256(crypto.context, secret, sizeof(secret) - 1, seed, sizeof(seed) - 1, a1));
     opcua_byte_t concat[MU_SHA256_LENGTH + 32];
-    memcpy(concat, a1, MU_SHA256_LENGTH);
-    memcpy(concat + MU_SHA256_LENGTH, seed, sizeof(seed) - 1);
+    (void)memcpy(concat, a1, MU_SHA256_LENGTH);
+    (void)memcpy(concat + MU_SHA256_LENGTH, seed, sizeof(seed) - 1);
     opcua_byte_t expected_block[MU_SHA256_LENGTH];
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, crypto.hmac_sha256(crypto.context, secret, sizeof(secret) - 1, concat,
                                                          MU_SHA256_LENGTH + (sizeof(seed) - 1), expected_block));

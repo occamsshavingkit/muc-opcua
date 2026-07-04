@@ -60,7 +60,7 @@ static void write_int32_value_writevalue(mu_binary_writer_t *writer, const mu_no
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_write_int32(writer, attribute_id));
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_write_string(writer, &null_string));
 
-    memset(&dv, 0, sizeof(dv));
+    (void)memset(&dv, 0, sizeof(dv));
     dv.has_value = true;
     dv.value.type = MU_TYPE_INT32;
     dv.value.is_array = false;
@@ -106,7 +106,7 @@ static void assert_single_write_result(const opcua_byte_t *resp_buffer, size_t r
 
 void test_write_service_empty_array(void) {
     mu_server_t server;
-    memset(&server, 0, sizeof(server));
+    (void)memset(&server, 0, sizeof(server));
     server.config.write_handler = dummy_write_handler;
 
     opcua_byte_t req_buffer[128];
@@ -147,7 +147,7 @@ void test_write_datavalue_without_value_returns_type_mismatch_without_callback(v
     memset(&server, 0, sizeof(server));
 
     mu_node_t node;
-    memset(&node, 0, sizeof(node));
+    (void)memset(&node, 0, sizeof(node));
     node.node_id = (mu_nodeid_t){1, MU_NODEID_NUMERIC, {.numeric = 5001}};
     node.node_class = MU_NODECLASS_VARIABLE;
     node.browse_name = (mu_string_t){4, (const opcua_byte_t *)"Test"};
@@ -158,7 +158,7 @@ void test_write_datavalue_without_value_returns_type_mismatch_without_callback(v
     server.config.address_space = &address_space;
     server.config.write_handler = counting_write_handler;
     server.config.write_handler_handle = &callback_count;
-    memset(&server.user_address_space_index, 0, sizeof(server.user_address_space_index));
+    (void)memset(&server.user_address_space_index, 0, sizeof(server.user_address_space_index));
 
     opcua_byte_t req_buffer[128];
     mu_binary_writer_t writer;

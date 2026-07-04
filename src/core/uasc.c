@@ -13,12 +13,14 @@ opcua_statuscode_t mu_uasc_finalize_symmetric(opcua_byte_t *buffer, size_t buffe
                                               opcua_uint32_t secure_channel_id, opcua_uint32_t token_id,
                                               opcua_uint32_t sequence_number, opcua_uint32_t request_id,
                                               size_t body_length, size_t *out_total_length) {
-    if (!buffer || !out_total_length)
+    if (!buffer || !out_total_length) {
         return MU_STATUS_BAD_INTERNALERROR;
+    }
 
     size_t total = MU_UASC_SYMMETRIC_HEADER_SIZE + body_length;
-    if (total > buffer_size)
+    if (total > buffer_size) {
         return MU_STATUS_BAD_RESPONSETOOLARGE;
+    }
 
     /* MessageHeader: MessageType "MSG" + IsFinal 'F' */
     buffer[0] = 'M';
@@ -43,12 +45,14 @@ opcua_statuscode_t mu_uasc_finalize_asymmetric_none(opcua_byte_t *buffer, size_t
                                                     size_t *out_total_length) {
     static const char policy_uri[] = "http://opcfoundation.org/UA/SecurityPolicy#None";
 
-    if (!buffer || !out_total_length)
+    if (!buffer || !out_total_length) {
         return MU_STATUS_BAD_INTERNALERROR;
+    }
 
     size_t total = MU_UASC_ASYMMETRIC_NONE_HEADER_SIZE + body_length;
-    if (total > buffer_size)
+    if (total > buffer_size) {
         return MU_STATUS_BAD_RESPONSETOOLARGE;
+    }
 
     buffer[0] = 'O';
     buffer[1] = 'P';

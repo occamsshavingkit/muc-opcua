@@ -58,8 +58,8 @@ opcua_statuscode_t mu_p_sha256(const mu_crypto_adapter_t *crypto, const opcua_by
     size_t produced = 0;
     while (produced < output_length) {
         /* block = HMAC(secret, A(i) + seed) */
-        memcpy(hmac_input, a, MU_SHA256_LENGTH);
-        memcpy(hmac_input + MU_SHA256_LENGTH, seed, seed_length);
+        (void)memcpy(hmac_input, a, MU_SHA256_LENGTH);
+        (void)memcpy(hmac_input + MU_SHA256_LENGTH, seed, seed_length);
         status = crypto->hmac_sha256(crypto->context, secret, secret_length, hmac_input, MU_SHA256_LENGTH + seed_length,
                                      block);
         if (status != MU_STATUS_GOOD) {
@@ -70,8 +70,9 @@ opcua_statuscode_t mu_p_sha256(const mu_crypto_adapter_t *crypto, const opcua_by
         }
 
         size_t take = output_length - produced;
-        if (take > MU_SHA256_LENGTH)
+        if (take > MU_SHA256_LENGTH) {
             take = MU_SHA256_LENGTH;
+        }
         memcpy(output + produced, block, take);
         produced += take;
 

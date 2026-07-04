@@ -59,8 +59,9 @@ _Static_assert(MU_CIPHER_CTX_SIZE >= MU_B256S256_ENCRYPTION_KEY_LENGTH, "test ci
 static opcua_statuscode_t counting_hmac_sha256(void *context, const opcua_byte_t *key, size_t key_length,
                                                const opcua_byte_t *data, size_t data_length, opcua_byte_t *mac) {
     counting_crypto_stub_t *stub = (counting_crypto_stub_t *)context;
-    if (!stub || !key || key_length == 0 || !data || !mac)
+    if (!stub || !key || key_length == 0 || !data || !mac) {
         return MU_STATUS_BAD_INTERNALERROR;
+    }
     stub->hmac_sha256_calls++;
     for (size_t i = 0; i < MU_B256S256_SIGNATURE_LENGTH; i++) {
         mac[i] = (opcua_byte_t)(0xA5u ^ (opcua_byte_t)i ^ key[i % key_length] ^ (opcua_byte_t)data_length);
@@ -86,8 +87,9 @@ static void counting_xor_crypt(const opcua_byte_t *key, const opcua_byte_t *iv, 
 static opcua_statuscode_t counting_aes256_cbc_encrypt(void *context, const opcua_byte_t *key, const opcua_byte_t *iv,
                                                       const opcua_byte_t *input, size_t length, opcua_byte_t *output) {
     counting_crypto_stub_t *stub = (counting_crypto_stub_t *)context;
-    if (!stub || !key || !iv || !input || !output)
+    if (!stub || !key || !iv || !input || !output) {
         return MU_STATUS_BAD_INTERNALERROR;
+    }
     stub->stateless_encrypt_calls++;
     counting_xor_crypt(key, iv, input, length, output);
     return MU_STATUS_GOOD;
@@ -96,8 +98,9 @@ static opcua_statuscode_t counting_aes256_cbc_encrypt(void *context, const opcua
 static opcua_statuscode_t counting_aes256_cbc_decrypt(void *context, const opcua_byte_t *key, const opcua_byte_t *iv,
                                                       const opcua_byte_t *input, size_t length, opcua_byte_t *output) {
     counting_crypto_stub_t *stub = (counting_crypto_stub_t *)context;
-    if (!stub || !key || !iv || !input || !output)
+    if (!stub || !key || !iv || !input || !output) {
         return MU_STATUS_BAD_INTERNALERROR;
+    }
     stub->stateless_decrypt_calls++;
     counting_xor_crypt(key, iv, input, length, output);
     return MU_STATUS_GOOD;
@@ -105,8 +108,9 @@ static opcua_statuscode_t counting_aes256_cbc_decrypt(void *context, const opcua
 
 static opcua_statuscode_t counting_cipher_ctx_init(void *context, const opcua_byte_t *key, opcua_byte_t *ctx_storage) {
     counting_crypto_stub_t *stub = (counting_crypto_stub_t *)context;
-    if (!stub || !key || !ctx_storage)
+    if (!stub || !key || !ctx_storage) {
         return MU_STATUS_BAD_INTERNALERROR;
+    }
     stub->cipher_ctx_init_calls++;
     memcpy(ctx_storage, key, MU_B256S256_ENCRYPTION_KEY_LENGTH);
     memset(ctx_storage + MU_B256S256_ENCRYPTION_KEY_LENGTH, 0, MU_CIPHER_CTX_SIZE - MU_B256S256_ENCRYPTION_KEY_LENGTH);
@@ -117,8 +121,9 @@ static opcua_statuscode_t counting_aes256_cbc_encrypt_ctx(void *context, opcua_b
                                                           const opcua_byte_t *iv, const opcua_byte_t *input,
                                                           size_t length, opcua_byte_t *output) {
     counting_crypto_stub_t *stub = (counting_crypto_stub_t *)context;
-    if (!stub || !ctx_storage || !iv || !input || !output)
+    if (!stub || !ctx_storage || !iv || !input || !output) {
         return MU_STATUS_BAD_INTERNALERROR;
+    }
     stub->cipher_ctx_encrypt_calls++;
     counting_xor_crypt(ctx_storage, iv, input, length, output);
     return MU_STATUS_GOOD;
@@ -128,8 +133,9 @@ static opcua_statuscode_t counting_aes256_cbc_decrypt_ctx(void *context, opcua_b
                                                           const opcua_byte_t *iv, const opcua_byte_t *input,
                                                           size_t length, opcua_byte_t *output) {
     counting_crypto_stub_t *stub = (counting_crypto_stub_t *)context;
-    if (!stub || !ctx_storage || !iv || !input || !output)
+    if (!stub || !ctx_storage || !iv || !input || !output) {
         return MU_STATUS_BAD_INTERNALERROR;
+    }
     stub->cipher_ctx_decrypt_calls++;
     counting_xor_crypt(ctx_storage, iv, input, length, output);
     return MU_STATUS_GOOD;
@@ -137,10 +143,12 @@ static opcua_statuscode_t counting_aes256_cbc_decrypt_ctx(void *context, opcua_b
 
 static void counting_cipher_ctx_free(void *context, opcua_byte_t *ctx_storage) {
     counting_crypto_stub_t *stub = (counting_crypto_stub_t *)context;
-    if (stub)
+    if (stub) {
         stub->cipher_ctx_free_calls++;
-    if (ctx_storage)
+    }
+    if (ctx_storage) {
         memset(ctx_storage, 0, MU_CIPHER_CTX_SIZE);
+    }
 }
 
 static void counting_stub_init(counting_crypto_stub_t *stub, mu_crypto_adapter_t *adapter, bool provide_ctx_init) {
@@ -282,8 +290,9 @@ void test_keys_derivation_deterministic(void) {
 void test_sign_and_encrypt_roundtrip(void) {
     prepare_host_keys();
     opcua_byte_t body[100];
-    for (size_t i = 0; i < sizeof(body); i++)
+    for (size_t i = 0; i < sizeof(body); i++) {
         body[i] = (opcua_byte_t)(i * 3 + 5);
+    }
 
     opcua_byte_t chunk[1024];
     size_t chunk_len = 0;
@@ -313,8 +322,9 @@ void test_sign_and_encrypt_roundtrip(void) {
 void test_sign_only_roundtrip(void) {
     prepare_host_keys();
     opcua_byte_t body[55];
-    for (size_t i = 0; i < sizeof(body); i++)
+    for (size_t i = 0; i < sizeof(body); i++) {
         body[i] = (opcua_byte_t)(i + 1);
+    }
 
     opcua_byte_t chunk[1024];
     size_t chunk_len = 0;

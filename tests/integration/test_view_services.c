@@ -34,8 +34,9 @@ typedef struct {
 static opcua_uint32_t s_channel_id = 1;
 
 static opcua_uint32_t read_opn_channel_id(const opcua_byte_t *buf, size_t len) {
-    if (len < 12)
+    if (len < 12) {
         return 1;
+    }
     return (opcua_uint32_t)buf[8] | ((opcua_uint32_t)buf[9] << 8u) | ((opcua_uint32_t)buf[10] << 16u) |
            ((opcua_uint32_t)buf[11] << 24u);
 }

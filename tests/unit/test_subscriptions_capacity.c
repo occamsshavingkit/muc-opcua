@@ -178,7 +178,7 @@ void test_rejects_publish_request_queue_capacity_exhaustion_without_storage_grow
 
 void test_monitored_item_queue_clamps_to_fixed_depth_and_marks_overflow(void) {
     mu_server_t server;
-    memset(&server, 0, sizeof(server));
+    (void)memset(&server, 0, sizeof(server));
     mu_subscriptions_init(&server.subs);
     assert_standard_capacity_configuration();
 

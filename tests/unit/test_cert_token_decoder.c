@@ -19,7 +19,7 @@ void test_decode_cert_token_direct(void) {
     mu_binary_reader_init(&reader, buf, sizeof(buf));
 
     mu_certificate_identity_token_t token;
-    memset(&token, 0, sizeof(token));
+    (void)memset(&token, 0, sizeof(token));
 
     opcua_statuscode_t status = mu_binary_read_certificate_identity_token(&reader, &token);
 

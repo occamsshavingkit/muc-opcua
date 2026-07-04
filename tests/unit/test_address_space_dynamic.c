@@ -57,7 +57,7 @@ static opcua_uint64_t mock_get_tick(void *context) {
 }
 static opcua_statuscode_t mock_generate_random(void *context, opcua_byte_t *buffer, size_t length) {
     (void)context;
-    memset(buffer, 0, length);
+    (void)memset(buffer, 0, length);
     return MU_STATUS_GOOD;
 }
 
@@ -68,7 +68,7 @@ static mu_node_t static_nodes[1];
 static mu_address_space_t static_space;
 
 void setUp(void) {
-    memset(&config, 0, sizeof(config));
+    (void)memset(&config, 0, sizeof(config));
     config.endpoint_url = "opc.tcp://localhost:4840";
     config.receive_buffer = rx_buf;
     config.receive_buffer_size = sizeof(rx_buf);
@@ -91,7 +91,7 @@ void setUp(void) {
     config.entropy_adapter.generate_random = mock_generate_random;
 
     /* Static node */
-    memset(&static_nodes[0], 0, sizeof(mu_node_t));
+    (void)memset(&static_nodes[0], 0, sizeof(mu_node_t));
     static_nodes[0].node_id.identifier_type = MU_NODEID_NUMERIC;
     static_nodes[0].node_id.namespace_index = 1;
     static_nodes[0].node_id.identifier.numeric = 42;
@@ -103,7 +103,7 @@ void setUp(void) {
 
     mu_server_t *out_server;
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_server_init(storage.bytes, sizeof(storage.bytes), &config, &out_server));
-    memcpy(&server, out_server, sizeof(mu_server_t));
+    (void)memcpy(&server, out_server, sizeof(mu_server_t));
 }
 
 void tearDown(void) {}
@@ -112,7 +112,7 @@ void test_ResolveNode_DynamicFallback(void) {
     /* Setup dynamic node */
     server.dynamic_address_space.nodes_count = 1;
     mu_node_t *dyn_node = &server.dynamic_address_space.nodes[0];
-    memset(dyn_node, 0, sizeof(mu_node_t));
+    (void)memset(dyn_node, 0, sizeof(mu_node_t));
     dyn_node->node_id.identifier_type = MU_NODEID_NUMERIC;
     dyn_node->node_id.namespace_index = 1;
     dyn_node->node_id.identifier.numeric = 99;
@@ -170,7 +170,7 @@ void test_Browse_DynamicReferences(void) {
     dyn_node->node_class = MU_NODECLASS_OBJECT;
 
     mu_node_t *dyn_node2 = &server.dynamic_address_space.nodes[1];
-    memset(dyn_node2, 0, sizeof(mu_node_t));
+    (void)memset(dyn_node2, 0, sizeof(mu_node_t));
     dyn_node2->node_id.identifier_type = MU_NODEID_NUMERIC;
     dyn_node2->node_id.namespace_index = 1;
     dyn_node2->node_id.identifier.numeric = 42;

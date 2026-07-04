@@ -11,7 +11,7 @@ static opcua_statuscode_t mock_sha256(void *context, const opcua_byte_t *data, s
     (void)context;
     (void)data;
     (void)length;
-    memset(digest, 0, MU_SHA256_LENGTH);
+    (void)memset(digest, 0, MU_SHA256_LENGTH);
     return MU_STATUS_GOOD;
 }
 
@@ -22,7 +22,7 @@ static opcua_statuscode_t mock_hmac_sha256(void *context, const opcua_byte_t *ke
     (void)key_length;
     (void)data;
     (void)data_length;
-    memset(mac, 0, MU_SHA256_LENGTH);
+    (void)memset(mac, 0, MU_SHA256_LENGTH);
     return MU_STATUS_GOOD;
 }
 
@@ -40,7 +40,7 @@ static opcua_statuscode_t mock_rsa_sha256_sign(void *context, const opcua_byte_t
     (void)data;
     (void)length;
     *signature_length = 32;
-    memset(signature, 0xAA, 32);
+    (void)memset(signature, 0xAA, 32);
     return MU_STATUS_GOOD;
 }
 
@@ -87,7 +87,7 @@ static opcua_statuscode_t mock_rsa_pss_sha256_sign(void *context, const opcua_by
     (void)data;
     (void)length;
     *signature_length = 32;
-    memset(signature, 0xBB, 32);
+    (void)memset(signature, 0xBB, 32);
     return MU_STATUS_GOOD;
 }
 

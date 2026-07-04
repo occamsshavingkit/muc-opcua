@@ -59,7 +59,7 @@ static opcua_statuscode_t mock_read(void *c, void *h, opcua_byte_t *buf, size_t 
     }
     size_t len = m->inbound_len[m->read_index];
     TEST_ASSERT_TRUE(len <= cap);
-    memcpy(buf, m->inbound[m->read_index], len);
+    (void)memcpy(buf, m->inbound[m->read_index], len);
     m->read_index++;
     *n = len;
     return MU_STATUS_GOOD;
@@ -67,7 +67,7 @@ static opcua_statuscode_t mock_read(void *c, void *h, opcua_byte_t *buf, size_t 
 static opcua_statuscode_t mock_write(void *c, void *h, const opcua_byte_t *buf, size_t len, size_t *n) {
     mock_t *m = (mock_t *)c;
     (void)h;
-    memcpy(m->last_write, buf, len);
+    (void)memcpy(m->last_write, buf, len);
     m->last_write_len = len;
     *n = len;
     return MU_STATUS_GOOD;
@@ -75,7 +75,7 @@ static opcua_statuscode_t mock_write(void *c, void *h, const opcua_byte_t *buf, 
 
 /* ---- inbound chunk builders ---- */
 static void enqueue(mock_t *m, const opcua_byte_t *bytes, size_t len) {
-    memcpy(m->inbound[m->inbound_count], bytes, len);
+    (void)memcpy(m->inbound[m->inbound_count], bytes, len);
     m->inbound_len[m->inbound_count] = len;
     m->inbound_count++;
 }
@@ -108,7 +108,7 @@ static size_t build_msg(opcua_byte_t *out, size_t cap, opcua_uint32_t seq, opcua
     mu_binary_write_uint32(&w, 1);                               /* TokenId */
     mu_binary_write_uint32(&w, seq);
     mu_binary_write_uint32(&w, reqid);
-    memcpy(out + 24, body, body_len);
+    (void)memcpy(out + 24, body, body_len);
     return 24 + body_len;
 }
 
@@ -234,7 +234,7 @@ static opcua_uint32_t parse_response(const opcua_byte_t *buf, size_t len, mu_bin
 
 void test_server_handshake_connect_browse_read(void) {
     mock_t mock;
-    memset(&mock, 0, sizeof(mock));
+    (void)memset(&mock, 0, sizeof(mock));
 
     /* Address space: Objects(85) Organizes MyVar1(1000, Int32=42). */
     static const mu_reference_t obj_refs[] = {{{0, MU_NODEID_NUMERIC, {35}}, {1, MU_NODEID_NUMERIC, {1000}}, true}};
@@ -416,7 +416,7 @@ void test_server_handshake_connect_browse_read(void) {
 
     /* ---- Configure the server ---- */
     mu_server_config_t config;
-    memset(&config, 0, sizeof(config));
+    (void)memset(&config, 0, sizeof(config));
     config.endpoint_url = "opc.tcp://host:4840";
     config.application_uri = "urn:test";
     config.product_uri = "urn:test";

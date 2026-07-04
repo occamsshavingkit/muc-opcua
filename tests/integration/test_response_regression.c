@@ -75,7 +75,7 @@ static opcua_statuscode_t mock_read(void *c, void *h, opcua_byte_t *buf, size_t 
     }
     size_t len = m->inbound_len[m->read_index];
     TEST_ASSERT_TRUE(len <= cap);
-    memcpy(buf, m->inbound[m->read_index], len);
+    (void)memcpy(buf, m->inbound[m->read_index], len);
     m->read_index++;
     *n = len;
     return MU_STATUS_GOOD;
@@ -85,7 +85,7 @@ static opcua_statuscode_t mock_write(void *c, void *h, const opcua_byte_t *buf, 
     mock_t *m = (mock_t *)c;
     (void)h;
     TEST_ASSERT_TRUE(len <= sizeof(m->last_write));
-    memcpy(m->last_write, buf, len);
+    (void)memcpy(m->last_write, buf, len);
     m->last_write_len = len;
     *n = len;
     return MU_STATUS_GOOD;
@@ -94,7 +94,7 @@ static opcua_statuscode_t mock_write(void *c, void *h, const opcua_byte_t *buf, 
 static void enqueue(mock_t *m, const opcua_byte_t *bytes, size_t len) {
     TEST_ASSERT_TRUE(m->inbound_count < MAX_INBOUND);
     TEST_ASSERT_TRUE(len <= sizeof(m->inbound[0]));
-    memcpy(m->inbound[m->inbound_count], bytes, len);
+    (void)memcpy(m->inbound[m->inbound_count], bytes, len);
     m->inbound_len[m->inbound_count] = len;
     m->inbound_count++;
 }
@@ -126,7 +126,7 @@ static size_t build_msg(opcua_byte_t *out, size_t cap, opcua_uint32_t seq, opcua
     mu_binary_write_uint32(&w, 1);
     mu_binary_write_uint32(&w, seq);
     mu_binary_write_uint32(&w, reqid);
-    memcpy(out + 24, body, body_len);
+    (void)memcpy(out + 24, body, body_len);
     return 24 + body_len;
 }
 
@@ -362,22 +362,22 @@ static const opcua_byte_t *capture_service_body(const mock_t *mock, opcua_uint32
 }
 
 static void print_c_array_literal(const char *name, const opcua_byte_t *bytes, size_t len) {
-    printf("\n%s capture (%zu bytes):\n", name, len);
-    printf("static const opcua_byte_t %s[] = {", name);
+    (void)printf("\n%s capture (%zu bytes):\n", name, len);
+    (void)printf("static const opcua_byte_t %s[] = {", name);
     if (len > 0) {
-        printf("\n");
+        (void)printf("\n");
     }
     for (size_t i = 0; i < len; ++i) {
         if ((i % 12u) == 0u) {
-            printf("    ");
+            (void)printf("    ");
         }
-        printf("0x%02X", (unsigned int)bytes[i]);
+        (void)printf("0x%02X", (unsigned int)bytes[i]);
         if (i + 1u < len) {
-            printf(",");
+            (void)printf(",");
         }
-        printf(((i % 12u) == 11u || i + 1u == len) ? "\n" : " ");
+        (void)printf(((i % 12u) == 11u || i + 1u == len) ? "\n" : " ");
     }
-    printf("};\n");
+    (void)printf("};\n");
 }
 
 static void assert_or_capture(const char *name, const opcua_byte_t *golden, size_t golden_len,
@@ -413,7 +413,7 @@ static const mu_node_t regression_nodes[] = {{{0, MU_NODEID_NUMERIC, {85}},
 static const mu_address_space_t regression_space = {regression_nodes, 2};
 
 static mu_server_t *make_server(mock_t *mock, opcua_byte_t *storage, size_t storage_size, mu_server_config_t *config) {
-    memset(config, 0, sizeof(*config));
+    (void)memset(config, 0, sizeof(*config));
     config->endpoint_url = "opc.tcp://host:4840";
     config->application_uri = "urn:response-regression";
     config->product_uri = "urn:response-regression";
@@ -456,7 +456,7 @@ static void run_connect(mu_server_t *server) {
 
 void test_read_browse_and_publish_response_bytes_are_stable(void) {
     mock_t mock;
-    memset(&mock, 0, sizeof(mock));
+    (void)memset(&mock, 0, sizeof(mock));
     enqueue_connect(&mock);
     enqueue_browse_objects(&mock, 4);
     enqueue_read_myvar1(&mock, 5);

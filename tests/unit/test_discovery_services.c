@@ -10,7 +10,7 @@ void setUp(void) {}
 void tearDown(void) {}
 
 static void discovery_server(mu_server_t *server) {
-    memset(server, 0, sizeof(*server));
+    (void)memset(server, 0, sizeof(*server));
     server->secure_channel.is_open = true;
     server->config.endpoint_url = "opc.tcp://localhost:4840";
     server->config.application_uri = "urn:test:app";

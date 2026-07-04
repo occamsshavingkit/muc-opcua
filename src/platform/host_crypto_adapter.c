@@ -85,12 +85,12 @@ static opcua_statuscode_t h_aes128_decrypt(void *c, const opcua_byte_t *key, con
 }
 
 static void store_cipher_handle(opcua_byte_t *ctx_storage, struct host_cipher_context *handle) {
-    memcpy(ctx_storage, &handle, sizeof(handle));
+    (void)memcpy(ctx_storage, &handle, sizeof(handle));
 }
 
 static struct host_cipher_context *load_cipher_handle(const opcua_byte_t *ctx_storage) {
     struct host_cipher_context *handle = NULL;
-    memcpy(&handle, ctx_storage, sizeof(handle));
+    (void)memcpy(&handle, ctx_storage, sizeof(handle));
     return handle;
 }
 

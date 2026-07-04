@@ -10,7 +10,7 @@ void tearDown(void) {}
 
 static opcua_uint64_t bits(double d) {
     opcua_uint64_t b;
-    memcpy(&b, &d, sizeof(b));
+    (void)memcpy(&b, &d, sizeof(b));
     return b;
 }
 

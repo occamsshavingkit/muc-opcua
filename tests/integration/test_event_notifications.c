@@ -58,7 +58,7 @@ static opcua_statuscode_t mock_read(void *c, void *h, opcua_byte_t *buf, size_t 
     }
     size_t len = m->inbound_len[m->read_index];
     TEST_ASSERT_TRUE(len <= cap);
-    memcpy(buf, m->inbound[m->read_index], len);
+    (void)memcpy(buf, m->inbound[m->read_index], len);
     m->read_index++;
     *n = len;
     return MU_STATUS_GOOD;
@@ -67,14 +67,14 @@ static opcua_statuscode_t mock_read(void *c, void *h, opcua_byte_t *buf, size_t 
 static opcua_statuscode_t mock_write(void *c, void *h, const opcua_byte_t *buf, size_t len, size_t *n) {
     mock_t *m = (mock_t *)c;
     (void)h;
-    memcpy(m->last_write, buf, len);
+    (void)memcpy(m->last_write, buf, len);
     m->last_write_len = len;
     *n = len;
     return MU_STATUS_GOOD;
 }
 
 static void enqueue(mock_t *m, const opcua_byte_t *bytes, size_t len) {
-    memcpy(m->inbound[m->inbound_count], bytes, len);
+    (void)memcpy(m->inbound[m->inbound_count], bytes, len);
     m->inbound_len[m->inbound_count] = len;
     m->inbound_count++;
 }
@@ -93,7 +93,7 @@ static size_t build_msg(opcua_byte_t *out, size_t cap, opcua_uint32_t seq, opcua
     mu_binary_write_uint32(&w, 1);
     mu_binary_write_uint32(&w, seq);
     mu_binary_write_uint32(&w, reqid);
-    memcpy(out + 24, body, body_len);
+    (void)memcpy(out + 24, body, body_len);
     return 24 + body_len;
 }
 
@@ -282,7 +282,7 @@ static void write_event_filter(mu_binary_writer_t *w) {
     mu_binary_write_int32(&f_w, 0);
 
     mu_binary_write_extension_object_header(w, &filter_type, f_w.position);
-    memcpy(w->buffer + w->position, filter_buf, f_w.position);
+    (void)memcpy(w->buffer + w->position, filter_buf, f_w.position);
     w->position += f_w.position;
 }
 
@@ -350,13 +350,13 @@ static opcua_uint64_t test_get_tick_ms(void *c) {
 void test_alarm_event_generation_and_publishing(void) {
 #if MUC_OPCUA_SUBSCRIPTIONS && MUC_OPCUA_EVENTS
     mock_t mock;
-    memset(&mock, 0, sizeof(mock));
+    (void)memset(&mock, 0, sizeof(mock));
     enqueue_connect(&mock);
     enqueue_create_subscription(&mock, 4, 200.0);
 
     _Alignas(8) opcua_byte_t storage[MU_SERVER_STORAGE_BYTES];
     mu_server_config_t config;
-    memset(&config, 0, sizeof(config));
+    (void)memset(&config, 0, sizeof(config));
     config.endpoint_url = "opc.tcp://host:4840";
     config.application_uri = "urn:t";
     config.product_uri = "urn:t";
@@ -406,7 +406,7 @@ void test_alarm_event_generation_and_publishing(void) {
 
     /* Trigger Alarm Event on server */
     mu_event_notification_t ev;
-    memset(&ev, 0, sizeof(ev));
+    (void)memset(&ev, 0, sizeof(ev));
     ev.event_type.namespace_index = 0;
     ev.event_type.identifier_type = MU_NODEID_NUMERIC;
     ev.event_type.identifier.numeric = 2782; /* ExclusiveLimitAlarmType */

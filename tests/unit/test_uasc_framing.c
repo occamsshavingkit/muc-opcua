@@ -13,7 +13,7 @@ void tearDown(void) {}
    (OPC 10000-6 6.7.2 MessageChunk, 6.7.3 SymmetricSecurityHeader, 6.7.7 SequenceHeader) */
 void test_uasc_finalize_symmetric(void) {
     opcua_byte_t buf[64];
-    memset(buf, 0, sizeof(buf));
+    (void)memset(buf, 0, sizeof(buf));
 
     TEST_ASSERT_EQUAL(24, MU_UASC_SYMMETRIC_HEADER_SIZE);
 

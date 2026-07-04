@@ -140,24 +140,33 @@ static const char *scenario_name(scenario_t scenario) {
 }
 
 static scenario_t parse_scenario(const char *text) {
-    if (strcmp(text, "read-value") == 0)
+    if (strcmp(text, "read-value") == 0) {
         return SCENARIO_READ_VALUE;
-    if (strcmp(text, "read-bad-node") == 0)
+    }
+    if (strcmp(text, "read-bad-node") == 0) {
         return SCENARIO_READ_BAD_NODE;
-    if (strcmp(text, "binary-primitive") == 0)
+    }
+    if (strcmp(text, "binary-primitive") == 0) {
         return SCENARIO_BINARY_PRIMITIVE;
-    if (strcmp(text, "message-chunk-header") == 0)
+    }
+    if (strcmp(text, "message-chunk-header") == 0) {
         return SCENARIO_MESSAGE_CHUNK_HEADER;
-    if (strcmp(text, "uasc-response-framing") == 0)
+    }
+    if (strcmp(text, "uasc-response-framing") == 0) {
         return SCENARIO_UASC_RESPONSE_FRAMING;
-    if (strcmp(text, "write-value") == 0)
+    }
+    if (strcmp(text, "write-value") == 0) {
         return SCENARIO_WRITE_VALUE;
-    if (strcmp(text, "write-bad-type") == 0)
+    }
+    if (strcmp(text, "write-bad-type") == 0) {
         return SCENARIO_WRITE_BAD_TYPE;
-    if (strcmp(text, "subscription-idle-tick") == 0)
+    }
+    if (strcmp(text, "subscription-idle-tick") == 0) {
         return SCENARIO_SUBSCRIPTION_IDLE_TICK;
-    if (strcmp(text, "subscription-active-tick") == 0)
+    }
+    if (strcmp(text, "subscription-active-tick") == 0) {
         return SCENARIO_SUBSCRIPTION_ACTIVE_TICK;
+    }
     return SCENARIO_UNKNOWN;
 }
 
@@ -269,20 +278,25 @@ static int parse_options(int argc, char **argv, bench_options_t *options) {
             options->scenario = parse_scenario(argv[++i]);
             options->scenario_name = argv[i];
         } else if (strcmp(arg, "--nodes") == 0) {
-            if (parse_size_arg(arg, argv[++i], &options->nodes) != 0)
+            if (parse_size_arg(arg, argv[++i], &options->nodes) != 0) {
                 return 2;
+            }
         } else if (strcmp(arg, "--batch") == 0) {
-            if (parse_size_arg(arg, argv[++i], &options->batch) != 0)
+            if (parse_size_arg(arg, argv[++i], &options->batch) != 0) {
                 return 2;
+            }
         } else if (strcmp(arg, "--iterations") == 0) {
-            if (parse_u32_arg(arg, argv[++i], &options->iterations) != 0)
+            if (parse_u32_arg(arg, argv[++i], &options->iterations) != 0) {
                 return 2;
+            }
         } else if (strcmp(arg, "--warmup") == 0) {
-            if (parse_u32_arg(arg, argv[++i], &options->warmup) != 0)
+            if (parse_u32_arg(arg, argv[++i], &options->warmup) != 0) {
                 return 2;
+            }
         } else if (strcmp(arg, "--min-ms") == 0) {
-            if (parse_u32_arg(arg, argv[++i], &options->min_ms) != 0)
+            if (parse_u32_arg(arg, argv[++i], &options->min_ms) != 0) {
                 return 2;
+            }
         } else {
             fprintf(stderr, "unknown option: %s\n", arg);
             print_usage(stderr, argv[0]);
@@ -348,8 +362,9 @@ static opcua_statuscode_t build_read_request(const bench_options_t *options, opc
         mu_binary_write_string(&writer, &null_string);
     }
 
-    if (writer.status != MU_STATUS_GOOD)
+    if (writer.status != MU_STATUS_GOOD) {
         return writer.status;
+    }
     *request_len = writer.position;
     return MU_STATUS_GOOD;
 }
@@ -384,8 +399,9 @@ static opcua_statuscode_t build_write_request(const bench_options_t *options, op
         mu_binary_write_datavalue(&writer, &value);
     }
 
-    if (writer.status != MU_STATUS_GOOD)
+    if (writer.status != MU_STATUS_GOOD) {
         return writer.status;
+    }
     *request_len = writer.position;
     return MU_STATUS_GOOD;
 }
@@ -462,8 +478,9 @@ static opcua_statuscode_t init_server(size_t node_count, mu_server_t **server) {
     fake_platform_init(&config.tcp_adapter, &config.time_adapter, &config.entropy_adapter);
 
     opcua_statuscode_t status = mu_server_init(server_storage, sizeof(server_storage), &config, server);
-    if (status != MU_STATUS_GOOD)
+    if (status != MU_STATUS_GOOD) {
         return status;
+    }
 
     mu_secure_channel_init(&(*server)->secure_channel);
     (*server)->secure_channel.is_open = true;
@@ -497,10 +514,12 @@ static int validate_response_header(const opcua_byte_t *response, size_t respons
     (void)timestamp;
     (void)request_handle;
 
-    if (reader.status != MU_STATUS_GOOD)
+    if (reader.status != MU_STATUS_GOOD) {
         return 1;
-    if (response_type.identifier_type != MU_NODEID_NUMERIC || response_type.identifier.numeric != response_id)
+    }
+    if (response_type.identifier_type != MU_NODEID_NUMERIC || response_type.identifier.numeric != response_id) {
         return 1;
+    }
     return service_result == MU_STATUS_GOOD ? 0 : 1;
 }
 
@@ -509,8 +528,9 @@ static int run_dispatch_once(mu_server_t *server, opcua_uint32_t request_id, siz
     size_t response_len = sizeof(response_buffer);
     opcua_statuscode_t status =
         mu_service_dispatch(server, request_id, request_buffer, request_len, response_buffer, &response_len);
-    if (status != MU_STATUS_GOOD)
+    if (status != MU_STATUS_GOOD) {
         return 1;
+    }
     return validate_response_header(response_buffer, response_len, response_id);
 }
 
@@ -758,14 +778,16 @@ static opcua_statuscode_t setup_active_subscription(mu_server_t *server, size_t 
 
     mu_subscription_t *sub = NULL;
     opcua_statuscode_t status = mu_subscription_create(&server->subs, 1u, 100u, 30u, 10u, 0u, 0u, true, 0u, &sub);
-    if (status != MU_STATUS_GOOD)
+    if (status != MU_STATUS_GOOD) {
         return status;
+    }
 
     for (size_t i = 0; i < item_count; ++i) {
         mu_monitored_item_t *item = NULL;
         status = mu_monitored_item_alloc(&server->subs, sub->subscription_id, &item);
-        if (status != MU_STATUS_GOOD)
+        if (status != MU_STATUS_GOOD) {
             return status;
+        }
 
         item->resolved_node = &bench_nodes[i % MAX_BENCH_NODES];
         item->node_id = item->resolved_node->node_id;
@@ -798,8 +820,9 @@ static int run_message_chunk_header_benchmark(const bench_options_t *options, ui
     }
 
     start_ns = monotonic_ns();
-    if (start_ns == 0u)
+    if (start_ns == 0u) {
         return 1;
+    }
 
     uint64_t min_ns = (uint64_t)options->min_ms * 1000000ull;
     uint64_t done = 0u;
@@ -811,8 +834,9 @@ static int run_message_chunk_header_benchmark(const bench_options_t *options, ui
         }
         done++;
         end_ns = monotonic_ns();
-        if (end_ns == 0u || end_ns < start_ns)
+        if (end_ns == 0u || end_ns < start_ns) {
             return 1;
+        }
         current_elapsed = end_ns - start_ns;
     } while (done < (uint64_t)options->iterations || current_elapsed < min_ns);
 
@@ -834,8 +858,9 @@ static int run_binary_primitive_benchmark(const bench_options_t *options, uint64
     }
 
     start_ns = monotonic_ns();
-    if (start_ns == 0u)
+    if (start_ns == 0u) {
         return 1;
+    }
 
     uint64_t min_ns = (uint64_t)options->min_ms * 1000000ull;
     uint64_t done = 0u;
@@ -847,8 +872,9 @@ static int run_binary_primitive_benchmark(const bench_options_t *options, uint64
         }
         done++;
         end_ns = monotonic_ns();
-        if (end_ns == 0u || end_ns < start_ns)
+        if (end_ns == 0u || end_ns < start_ns) {
             return 1;
+        }
         current_elapsed = end_ns - start_ns;
     } while (done < (uint64_t)options->iterations || current_elapsed < min_ns);
 
@@ -870,8 +896,9 @@ static int run_uasc_response_framing_benchmark(const bench_options_t *options, u
     }
 
     start_ns = monotonic_ns();
-    if (start_ns == 0u)
+    if (start_ns == 0u) {
         return 1;
+    }
 
     uint64_t min_ns = (uint64_t)options->min_ms * 1000000ull;
     uint64_t done = 0u;
@@ -883,8 +910,9 @@ static int run_uasc_response_framing_benchmark(const bench_options_t *options, u
         }
         done++;
         end_ns = monotonic_ns();
-        if (end_ns == 0u || end_ns < start_ns)
+        if (end_ns == 0u || end_ns < start_ns) {
             return 1;
+        }
         current_elapsed = end_ns - start_ns;
     } while (done < (uint64_t)options->iterations || current_elapsed < min_ns);
 
@@ -946,8 +974,9 @@ static int run_benchmark(const bench_options_t *options, uint64_t *elapsed_ns, u
     }
 
     start_ns = monotonic_ns();
-    if (start_ns == 0u)
+    if (start_ns == 0u) {
         return 1;
+    }
 
     uint64_t min_ns = (uint64_t)options->min_ms * 1000000ull;
     uint64_t done = 0u;
@@ -967,8 +996,9 @@ static int run_benchmark(const bench_options_t *options, uint64_t *elapsed_ns, u
         }
         done++;
         end_ns = monotonic_ns();
-        if (end_ns == 0u || end_ns < start_ns)
+        if (end_ns == 0u || end_ns < start_ns) {
             return 1;
+        }
         current_elapsed = end_ns - start_ns;
     } while (done < (uint64_t)options->iterations || current_elapsed < min_ns);
 
@@ -999,16 +1029,18 @@ int main(int argc, char **argv) {
     uint64_t elapsed_ns = 0u;
     uint64_t actual_iterations = 0u;
 
-    if (parse_options(argc, argv, &options) != 0)
+    if (parse_options(argc, argv, &options) != 0) {
         return 2;
+    }
 
     if (!scenario_supported(options.scenario)) {
         print_unsupported(&options);
         return 0;
     }
 
-    if (run_benchmark(&options, &elapsed_ns, &actual_iterations) != 0)
+    if (run_benchmark(&options, &elapsed_ns, &actual_iterations) != 0) {
         return 1;
+    }
 
     double seconds = (double)elapsed_ns / 1000000000.0;
     double ops_per_sec = seconds > 0.0 ? (double)actual_iterations / seconds : 0.0;

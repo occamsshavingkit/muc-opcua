@@ -26,7 +26,7 @@ static opcua_statuscode_t fuzz_entropy(void *context, opcua_byte_t *buffer, size
     if (buffer == NULL && length != 0u)
         return MU_STATUS_BAD_INTERNALERROR;
     if (buffer != NULL)
-        memset(buffer, 0xa5, length);
+        (void)memset(buffer, 0xa5, length);
     return MU_STATUS_GOOD;
 }
 
@@ -38,7 +38,7 @@ static bool prepare_server(mu_server_t *server, opcua_uint32_t *session_id_out) 
     opcua_uint32_t session_id = 0;
     opcua_uint32_t auth_token = 0;
 
-    memset(server, 0, sizeof(*server));
+    (void)memset(server, 0, sizeof(*server));
     server->config.entropy_adapter.generate_random = fuzz_entropy;
 
     mu_secure_channel_init(&server->secure_channel);

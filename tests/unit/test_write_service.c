@@ -60,7 +60,7 @@ static opcua_statuscode_t logging_write_handler(void *handle, const mu_nodeid_t 
 
 static mu_datavalue_t int32_datavalue(opcua_int32_t value) {
     mu_datavalue_t dv;
-    memset(&dv, 0, sizeof(dv));
+    (void)memset(&dv, 0, sizeof(dv));
     dv.has_value = true;
     dv.value.type = MU_TYPE_INT32;
     dv.value.is_array = false;
@@ -159,7 +159,7 @@ static void run_write_items(mu_server_t *server, const write_request_item_t *ite
 void test_write_service_basic(void) {
     /* Initialize mock server structure */
     mu_server_t server;
-    memset(&server, 0, sizeof(server));
+    (void)memset(&server, 0, sizeof(server));
 
     /* 1. Setup address space node */
     mu_node_t node;
@@ -182,7 +182,7 @@ void test_write_service_basic(void) {
     server.config.write_handler = mock_write_handler;
 
     /* Initialize user address space index */
-    memset(&server.user_address_space_index, 0, sizeof(server.user_address_space_index));
+    (void)memset(&server.user_address_space_index, 0, sizeof(server.user_address_space_index));
 
     /* 2. Encode WriteRequest */
     opcua_byte_t req_buffer[256];
@@ -394,7 +394,7 @@ void test_write_service_batch(void) {
     memset(&server, 0, sizeof(server));
 
     mu_node_t nodes[2];
-    memset(nodes, 0, sizeof(nodes));
+    (void)memset(nodes, 0, sizeof(nodes));
 
     nodes[0].node_id = (mu_nodeid_t){1, MU_NODEID_NUMERIC, {.numeric = 1001}};
     nodes[0].node_class = MU_NODECLASS_VARIABLE;
@@ -562,7 +562,7 @@ void test_write_service_batch_matches_individual_operation_results_and_callback_
 
     mu_address_space_t address_space = {nodes, 2};
     write_callback_log_t batch_log;
-    memset(&batch_log, 0, sizeof(batch_log));
+    (void)memset(&batch_log, 0, sizeof(batch_log));
     batch_log.return_status[1] = MU_STATUS_BAD_USERACCESSDENIED;
 
     server.config.address_space = &address_space;
@@ -572,7 +572,7 @@ void test_write_service_batch_matches_individual_operation_results_and_callback_
 
     mu_string_t null_range = {-1, NULL};
     write_request_item_t batch_items[5];
-    memset(batch_items, 0, sizeof(batch_items));
+    (void)memset(batch_items, 0, sizeof(batch_items));
     batch_items[0] = (write_request_item_t){nodes[0].node_id, 13, null_range, int32_datavalue(111)};
     batch_items[1] = (write_request_item_t){(mu_nodeid_t){1, MU_NODEID_NUMERIC, {.numeric = 7999}}, 13, null_range,
                                             int32_datavalue(222)};
@@ -597,7 +597,7 @@ void test_write_service_batch_matches_individual_operation_results_and_callback_
     opcua_statuscode_t single_result[1];
     for (size_t i = 0; i < 5; ++i) {
         write_callback_log_t single_log;
-        memset(&single_log, 0, sizeof(single_log));
+        (void)memset(&single_log, 0, sizeof(single_log));
         single_log.return_status[0] = (i == 4) ? MU_STATUS_BAD_USERACCESSDENIED : MU_STATUS_GOOD;
         server.config.write_handler_handle = &single_log;
 

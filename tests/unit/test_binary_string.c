@@ -55,8 +55,9 @@ void test_binary_string_above_value_limit_roundtrips(void) {
     mu_binary_reader_t reader;
 
     static opcua_byte_t data[100];
-    for (int i = 0; i < 100; ++i)
+    for (int i = 0; i < 100; ++i) {
         data[i] = (opcua_byte_t)('A' + (i % 26));
+    }
     mu_string_t str = {100, data};
 
     mu_binary_writer_init(&writer, buffer, sizeof(buffer));

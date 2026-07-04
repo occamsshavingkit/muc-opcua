@@ -13,7 +13,7 @@ void tearDown(void) {}
 static opcua_statuscode_t fake_entropy(void *context, opcua_byte_t *buffer, size_t length) {
     (void)context;
     if (buffer != NULL) {
-        memset(buffer, 0x42, length);
+        (void)memset(buffer, 0x42, length);
     }
     return MU_STATUS_GOOD;
 }
@@ -58,7 +58,7 @@ void test_service_dispatch_unsupported_services(void) {
     opcua_byte_t req_body[1] = {0};
     opcua_byte_t resp_body[8] = {0};
     mu_server_t server;
-    memset(&server, 0, sizeof(server));
+    (void)memset(&server, 0, sizeof(server));
     server.secure_channel.is_open = true;
 
     const opcua_uint32_t unsupported[] = {

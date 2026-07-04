@@ -57,7 +57,7 @@ static opcua_statuscode_t test_read(void *context, void *handle, opcua_byte_t *b
 
     size_t len = transport->inbound_len[transport->read_index];
     TEST_ASSERT_TRUE(len <= capacity);
-    memcpy(buffer, transport->inbound[transport->read_index], len);
+    (void)memcpy(buffer, transport->inbound[transport->read_index], len);
     transport->read_index++;
     *bytes_read = len;
     return MU_STATUS_GOOD;
@@ -69,7 +69,7 @@ static opcua_statuscode_t test_write(void *context, void *handle, const opcua_by
     (void)handle;
     TEST_ASSERT_TRUE((size_t)transport->write_count < TEST_MAX_WRITES);
     TEST_ASSERT_TRUE(len <= sizeof(transport->writes[0]));
-    memcpy(transport->writes[transport->write_count], buffer, len);
+    (void)memcpy(transport->writes[transport->write_count], buffer, len);
     transport->write_len[transport->write_count] = len;
     transport->write_count++;
     *bytes_written = len;
@@ -79,7 +79,7 @@ static opcua_statuscode_t test_write(void *context, void *handle, const opcua_by
 static void enqueue_request(message_chunk_transport_t *transport, const opcua_byte_t *bytes, size_t len) {
     TEST_ASSERT_TRUE(transport->inbound_count < TEST_MAX_INBOUND);
     TEST_ASSERT_TRUE(len <= sizeof(transport->inbound[0]));
-    memcpy(transport->inbound[transport->inbound_count], bytes, len);
+    (void)memcpy(transport->inbound[transport->inbound_count], bytes, len);
     transport->inbound_len[transport->inbound_count] = len;
     transport->inbound_count++;
 }
@@ -156,7 +156,7 @@ static void assert_tcp_error_write(const message_chunk_transport_t *transport, i
 
 static void configure_transport_server(mu_server_config_t *config, message_chunk_transport_t *transport,
                                        opcua_byte_t *rx, opcua_byte_t *tx) {
-    memset(config, 0, sizeof(*config));
+    (void)memset(config, 0, sizeof(*config));
     config->endpoint_url = "opc.tcp://host:4840";
     config->application_uri = "urn:test";
     config->product_uri = "urn:test";
@@ -258,7 +258,7 @@ void test_message_chunk_abort_chunk_does_not_dispatch_service_payload(void) {
     mu_server_t *server = NULL;
     size_t len;
 
-    memset(&transport, 0, sizeof(transport));
+    (void)memset(&transport, 0, sizeof(transport));
     len = build_abort_msg(chunk, sizeof(chunk), MU_STATUS_BAD_TCPINTERNALERROR);
     enqueue_request(&transport, chunk, len);
 

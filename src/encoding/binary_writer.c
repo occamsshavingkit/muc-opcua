@@ -13,17 +13,20 @@ void mu_binary_writer_init(mu_binary_writer_t *writer, opcua_byte_t *buffer, siz
 }
 
 static opcua_statuscode_t writer_status(const mu_binary_writer_t *writer) {
-    if (!writer)
+    if (!writer) {
         return MU_STATUS_BAD_INTERNALERROR;
+    }
     /* Once tripped, later primitive writes are no-ops. */
-    if (writer->status != MU_STATUS_GOOD)
+    if (writer->status != MU_STATUS_GOOD) {
         return writer->status;
+    }
     return MU_STATUS_GOOD;
 }
 
 static opcua_statuscode_t writer_fail(mu_binary_writer_t *writer, opcua_statuscode_t status) {
-    if (writer)
+    if (writer) {
         writer->status = status;
+    }
     return status;
 }
 
@@ -34,33 +37,38 @@ static opcua_statuscode_t ensure_space(mu_binary_writer_t *writer, size_t count)
         return MU_STATUS_GOOD;
     }
     opcua_statuscode_t status = writer_status(writer);
-    if (status != MU_STATUS_GOOD)
+    if (status != MU_STATUS_GOOD) {
         return status;
-    if (!writer->buffer)
+    }
+    if (!writer->buffer) {
         return writer_fail(writer, MU_STATUS_BAD_INTERNALERROR);
+    }
     return writer_fail(writer, MU_STATUS_BAD_ENCODINGERROR);
 }
 
 opcua_statuscode_t mu_binary_write_boolean(mu_binary_writer_t *writer, opcua_boolean_t value) {
     opcua_statuscode_t status = ensure_space(writer, 1);
-    if (status != MU_STATUS_GOOD)
+    if (status != MU_STATUS_GOOD) {
         return status;
+    }
     writer->buffer[writer->position++] = value ? 1 : 0;
     return MU_STATUS_GOOD;
 }
 
 opcua_statuscode_t mu_binary_write_sbyte(mu_binary_writer_t *writer, opcua_sbyte_t value) {
     opcua_statuscode_t status = ensure_space(writer, 1);
-    if (status != MU_STATUS_GOOD)
+    if (status != MU_STATUS_GOOD) {
         return status;
+    }
     writer->buffer[writer->position++] = (opcua_byte_t)value;
     return MU_STATUS_GOOD;
 }
 
 opcua_statuscode_t mu_binary_write_byte(mu_binary_writer_t *writer, opcua_byte_t value) {
     opcua_statuscode_t status = ensure_space(writer, 1);
-    if (status != MU_STATUS_GOOD)
+    if (status != MU_STATUS_GOOD) {
         return status;
+    }
     writer->buffer[writer->position++] = value;
     return MU_STATUS_GOOD;
 }
@@ -71,8 +79,9 @@ opcua_statuscode_t mu_binary_write_int16(mu_binary_writer_t *writer, opcua_int16
 
 opcua_statuscode_t mu_binary_write_uint16(mu_binary_writer_t *writer, opcua_uint16_t value) {
     opcua_statuscode_t status = ensure_space(writer, 2);
-    if (status != MU_STATUS_GOOD)
+    if (status != MU_STATUS_GOOD) {
         return status;
+    }
     mu_binary_le_put_u16(&writer->buffer[writer->position], value);
     writer->position += 2;
     return MU_STATUS_GOOD;
@@ -84,8 +93,9 @@ opcua_statuscode_t mu_binary_write_int32(mu_binary_writer_t *writer, opcua_int32
 
 opcua_statuscode_t mu_binary_write_uint32(mu_binary_writer_t *writer, opcua_uint32_t value) {
     opcua_statuscode_t status = ensure_space(writer, 4);
-    if (status != MU_STATUS_GOOD)
+    if (status != MU_STATUS_GOOD) {
         return status;
+    }
     mu_binary_le_put_u32(&writer->buffer[writer->position], value);
     writer->position += 4;
     return MU_STATUS_GOOD;
@@ -97,8 +107,9 @@ opcua_statuscode_t mu_binary_write_int64(mu_binary_writer_t *writer, opcua_int64
 
 opcua_statuscode_t mu_binary_write_uint64(mu_binary_writer_t *writer, opcua_uint64_t value) {
     opcua_statuscode_t status = ensure_space(writer, 8);
-    if (status != MU_STATUS_GOOD)
+    if (status != MU_STATUS_GOOD) {
         return status;
+    }
     mu_binary_le_put_u64(&writer->buffer[writer->position], value);
     writer->position += 8;
     return MU_STATUS_GOOD;

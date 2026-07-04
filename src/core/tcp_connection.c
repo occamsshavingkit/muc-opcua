@@ -28,8 +28,9 @@ opcua_statuscode_t mu_tcp_process_hello(mu_tcp_connection_t *connection, const o
         return MU_STATUS_BAD_INTERNALERROR;
     }
 
-    if (length < 8)
+    if (length < 8) {
         return MU_STATUS_BAD_TCPMESSAGETOOLARGE;
+    }
 
     if (message[0] != 'H' || message[1] != 'E' || message[2] != 'L' || message[3] != 'F') {
         return MU_STATUS_BAD_TCPMESSAGETYPEINVALID;
@@ -41,44 +42,54 @@ opcua_statuscode_t mu_tcp_process_hello(mu_tcp_connection_t *connection, const o
 
     opcua_int32_t message_size;
     opcua_statuscode_t status = mu_binary_read_int32(&reader, &message_size);
-    if (status != MU_STATUS_GOOD)
+    if (status != MU_STATUS_GOOD) {
         return status;
+    }
 
-    if (message_size > (opcua_int32_t)length)
+    if (message_size > (opcua_int32_t)length) {
         return MU_STATUS_BAD_TCPMESSAGETOOLARGE;
+    }
 
     opcua_uint32_t protocol_version, receive_buffer_size, send_buffer_size;
     opcua_uint32_t max_message_size, max_chunk_count;
     mu_string_t endpoint_url;
 
     status = mu_binary_read_uint32(&reader, &protocol_version);
-    if (status != MU_STATUS_GOOD)
+    if (status != MU_STATUS_GOOD) {
         return status;
+    }
     status = mu_binary_read_uint32(&reader, &receive_buffer_size);
-    if (status != MU_STATUS_GOOD)
+    if (status != MU_STATUS_GOOD) {
         return status;
+    }
     status = mu_binary_read_uint32(&reader, &send_buffer_size);
-    if (status != MU_STATUS_GOOD)
+    if (status != MU_STATUS_GOOD) {
         return status;
+    }
     status = mu_binary_read_uint32(&reader, &max_message_size);
-    if (status != MU_STATUS_GOOD)
+    if (status != MU_STATUS_GOOD) {
         return status;
+    }
     status = mu_binary_read_uint32(&reader, &max_chunk_count);
-    if (status != MU_STATUS_GOOD)
+    if (status != MU_STATUS_GOOD) {
         return status;
+    }
     status = mu_binary_read_string(&reader, &endpoint_url);
-    if (status != MU_STATUS_GOOD)
+    if (status != MU_STATUS_GOOD) {
         return status;
+    }
 
     /* OPC 10000-6 7.1.2.3: the EndpointUrl encoded value shall be less than 4096 bytes;
        reject an over-length URL with Bad_TcpEndpointUrlInvalid (not a generic encoding error). */
-    if (endpoint_url.length >= 4096)
+    if (endpoint_url.length >= 4096) {
         return MU_STATUS_BAD_TCPENDPOINTURLINVALID;
+    }
 
     /* OPC-10000-6 sections 7.1.2.3/7.1.2.4: HEL/ACK buffer sizes below the
        minimum chunk size are unsupported by this fixed-buffer implementation. */
-    if (receive_buffer_size < MU_MIN_CHUNK_SIZE || send_buffer_size < MU_MIN_CHUNK_SIZE)
+    if (receive_buffer_size < MU_MIN_CHUNK_SIZE || send_buffer_size < MU_MIN_CHUNK_SIZE) {
         return MU_STATUS_BAD_TCPNOTENOUGHRESOURCES;
+    }
 
     /* OPC-10000-6 section 7.1.2.4: ACK buffer sizes are capped by the peer's
        HEL limits and this server's configured transport buffers. */
@@ -97,14 +108,17 @@ opcua_statuscode_t mu_tcp_process_hello(mu_tcp_connection_t *connection, const o
         max_message_size < config->max_message_size ? max_message_size : config->max_message_size;
     connection->max_chunk_count = max_chunk_count < config->max_chunk_count ? max_chunk_count : config->max_chunk_count;
 
-    if (connection->max_message_size == 0)
+    if (connection->max_message_size == 0) {
         connection->max_message_size = config->max_message_size;
-    if (connection->max_chunk_count == 0)
+    }
+    if (connection->max_chunk_count == 0) {
         connection->max_chunk_count = config->max_chunk_count;
+    }
 
     /* Write ACK */
-    if (*ack_length < 28)
+    if (*ack_length < 28) {
         return MU_STATUS_BAD_INTERNALERROR;
+    }
 
     /* OPC-10000-6 sections 7.1.2.2 and 7.2: fixed ACKF response header and body. */
     ack_message[0] = 'A';
@@ -126,14 +140,16 @@ opcua_statuscode_t mu_tcp_process_hello(mu_tcp_connection_t *connection, const o
 
 opcua_statuscode_t mu_tcp_create_error_message(opcua_statuscode_t error_code, const char *reason,
                                                opcua_byte_t *err_message, size_t *err_length) {
-    if (!err_message || !err_length)
+    if (!err_message || !err_length) {
         return MU_STATUS_BAD_INTERNALERROR;
+    }
 
     size_t reason_len = reason ? strlen(reason) : 0;
     size_t total_len = 8 + 4 + 4 + reason_len;
 
-    if (*err_length < total_len)
+    if (*err_length < total_len) {
         return MU_STATUS_BAD_INTERNALERROR;
+    }
 
     /* OPC-10000-6 sections 7.1.2.2 and 7.2: fixed ERRF response header and Error field. */
     err_message[0] = 'E';
@@ -151,8 +167,9 @@ opcua_statuscode_t mu_tcp_create_error_message(opcua_statuscode_t error_code, co
     str_reason.length = (opcua_int32_t)reason_len;
     str_reason.data = (opcua_byte_t *)reason;
     opcua_statuscode_t status = mu_binary_write_string(&writer, &str_reason);
-    if (status != MU_STATUS_GOOD)
+    if (status != MU_STATUS_GOOD) {
         return status;
+    }
 
     *err_length = writer.position;
     return MU_STATUS_GOOD;

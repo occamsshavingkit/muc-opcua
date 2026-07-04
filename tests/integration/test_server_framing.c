@@ -46,10 +46,12 @@ static opcua_statuscode_t m_read(void *c, void *h, opcua_byte_t *buf, size_t cap
     (void)h;
     size_t avail = m->feed_len - m->fed;
     size_t want = avail;
-    if (m->chunk && want > m->chunk)
+    if (m->chunk && want > m->chunk) {
         want = m->chunk;
-    if (want > cap)
+    }
+    if (want > cap) {
         want = cap;
+    }
     memcpy(buf, m->feed + m->fed, want);
     m->fed += want;
     *n = want;

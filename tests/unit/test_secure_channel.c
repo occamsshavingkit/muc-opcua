@@ -58,7 +58,7 @@ static opcua_statuscode_t test_read(void *context, void *handle, opcua_byte_t *b
 
     size_t len = transport->inbound_len[transport->read_index];
     TEST_ASSERT_TRUE(len <= capacity);
-    memcpy(buffer, transport->inbound[transport->read_index], len);
+    (void)memcpy(buffer, transport->inbound[transport->read_index], len);
     transport->read_index++;
     *bytes_read = len;
     return MU_STATUS_GOOD;
@@ -70,7 +70,7 @@ static opcua_statuscode_t test_write(void *context, void *handle, const opcua_by
     (void)handle;
     TEST_ASSERT_TRUE(transport->write_count < (int)TEST_MAX_WRITES);
     TEST_ASSERT_TRUE(len <= sizeof(transport->writes[0]));
-    memcpy(transport->writes[transport->write_count], buffer, len);
+    (void)memcpy(transport->writes[transport->write_count], buffer, len);
     transport->write_len[transport->write_count] = len;
     transport->write_count++;
     *bytes_written = len;
@@ -87,7 +87,7 @@ static opcua_statuscode_t failing_entropy(void *context, opcua_byte_t *buffer, s
 static void enqueue_request(secure_channel_transport_t *transport, const opcua_byte_t *bytes, size_t len) {
     TEST_ASSERT_TRUE(transport->inbound_count < TEST_MAX_INBOUND);
     TEST_ASSERT_TRUE(len <= sizeof(transport->inbound[0]));
-    memcpy(transport->inbound[transport->inbound_count], bytes, len);
+    (void)memcpy(transport->inbound[transport->inbound_count], bytes, len);
     transport->inbound_len[transport->inbound_count] = len;
     transport->inbound_count++;
 }
@@ -171,7 +171,7 @@ static size_t build_opn(opcua_byte_t *out, size_t capacity, const opcua_byte_t *
 
 static void configure_transport_server(mu_server_config_t *config, secure_channel_transport_t *transport,
                                        opcua_byte_t *rx, opcua_byte_t *tx) {
-    memset(config, 0, sizeof(*config));
+    (void)memset(config, 0, sizeof(*config));
     config->endpoint_url = "opc.tcp://host:4840";
     config->application_uri = "urn:test";
     config->product_uri = "urn:test";
@@ -207,19 +207,22 @@ static opcua_statuscode_t read_opn_response_service_result(const opcua_byte_t *b
     r.position = MU_UASC_ASYMMETRIC_NONE_HEADER_SIZE;
 
     status = mu_binary_read_nodeid(&r, &type);
-    if (status != MU_STATUS_GOOD)
+    if (status != MU_STATUS_GOOD) {
         return status;
+    }
     if (type.identifier_type != MU_NODEID_NUMERIC || type.namespace_index != 0) {
         return MU_STATUS_BAD_DECODINGERROR;
     }
     *response_type = type.identifier.numeric;
 
     status = mu_binary_read_int64(&r, &timestamp);
-    if (status != MU_STATUS_GOOD)
+    if (status != MU_STATUS_GOOD) {
         return status;
+    }
     status = mu_binary_read_uint32(&r, &handle);
-    if (status != MU_STATUS_GOOD)
+    if (status != MU_STATUS_GOOD) {
         return status;
+    }
     (void)timestamp;
     (void)handle;
     return mu_binary_read_statuscode(&r, service_result);

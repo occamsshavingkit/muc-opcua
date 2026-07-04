@@ -130,7 +130,7 @@ opcua_statuscode_t mu_query_first_process(mu_server_t *server, const mu_query_fi
                     server->query_context.continuation_points[i].id_buf;
                 server->query_context.continuation_points[i].id.length =
                     sizeof(server->query_context.continuation_points[i].id_buf);
-                memset(server->query_context.continuation_points[i].id_buf, 0, 8);
+                (void)memset(server->query_context.continuation_points[i].id_buf, 0, 8);
                 server->query_context.continuation_points[i].id_buf[0] = next_index & 0xFF;
                 server->query_context.continuation_points[i].id_buf[1] = (next_index >> 8) & 0xFF;
 

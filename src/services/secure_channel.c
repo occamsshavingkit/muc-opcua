@@ -42,8 +42,9 @@ void mu_secure_channel_init(mu_secure_channel_t *channel) {
 opcua_statuscode_t mu_secure_channel_open(mu_secure_channel_t *channel, const mu_string_t *security_policy,
                                           mu_message_security_mode_t security_mode, opcua_uint32_t requested_lifetime,
                                           opcua_uint32_t *revised_lifetime) {
-    if (!channel || !revised_lifetime)
+    if (!channel || !revised_lifetime) {
         return MU_STATUS_BAD_INTERNALERROR;
+    }
 
     /* OPC-10000-4 §5.6.2.2 carries SecurityPolicyUri in the OPN header and
        securityMode in the request body; §5.6.2.3 requires explicit rejection
@@ -95,10 +96,12 @@ opcua_statuscode_t mu_secure_channel_open(mu_secure_channel_t *channel, const mu
 
     /* Bounded lifetime */
     opcua_uint32_t lifetime = requested_lifetime;
-    if (lifetime < 10000)
+    if (lifetime < 10000) {
         lifetime = 10000;
-    if (lifetime > 3600000)
+    }
+    if (lifetime > 3600000) {
         lifetime = 3600000;
+    }
 
     channel->revised_lifetime = lifetime;
     *revised_lifetime = lifetime;
@@ -108,10 +111,12 @@ opcua_statuscode_t mu_secure_channel_open(mu_secure_channel_t *channel, const mu
 }
 
 opcua_statuscode_t mu_secure_channel_close(mu_secure_channel_t *channel) {
-    if (!channel)
+    if (!channel) {
         return MU_STATUS_BAD_INTERNALERROR;
-    if (!channel->is_open)
+    }
+    if (!channel->is_open) {
         return MU_STATUS_BAD_TCPSECURECHANNELUNKNOWN;
+    }
 
 #ifdef MUC_OPCUA_SECURITY
     mu_sym_keys_release_cipher(&channel->client_keys);

@@ -17,7 +17,7 @@ void tearDown(void) {
 
 void test_rsa_oaep_malformed_input(void) {
     opcua_byte_t malformed[256];
-    memset(malformed, 0x42, sizeof(malformed));
+    (void)memset(malformed, 0x42, sizeof(malformed));
 
     opcua_byte_t recovered[256];
     size_t rec_len = sizeof(recovered);

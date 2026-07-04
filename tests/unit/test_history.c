@@ -115,8 +115,8 @@ void test_history_read_decode(void) {
 
     mu_history_read_request_t req;
     mu_history_read_value_id_t nodes[2];
-    memset(&req, 0, sizeof(req));
-    memset(nodes, 0, sizeof(nodes));
+    (void)memset(&req, 0, sizeof(req));
+    (void)memset(nodes, 0, sizeof(nodes));
 
     opcua_statuscode_t status = mu_history_read_request_decode(&r, &req, nodes, 2);
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, status);
@@ -226,7 +226,7 @@ void test_history_read_decode_continuation_point_is_owned_from_request_buffer(vo
     TEST_ASSERT_NOT_NULL(req.nodes_to_read[0].continuation_point.data);
     TEST_ASSERT_EQUAL(false, pointer_points_into_buffer(req.nodes_to_read[0].continuation_point.data, buf, w.position));
 
-    memset(buf, 0xA5, w.position);
+    (void)memset(buf, 0xA5, w.position);
     TEST_ASSERT_EQUAL_INT8_ARRAY(continuation_point, req.nodes_to_read[0].continuation_point.data,
                                  sizeof(continuation_point));
 #endif
@@ -247,8 +247,8 @@ void test_history_read_decode_continuation_point_stable_after_later_request_reus
     write_history_read_request_with_continuation_point(&w, buf, sizeof(buf), first_continuation_point,
                                                        sizeof(first_continuation_point));
     mu_binary_reader_init(&r, buf, w.position);
-    memset(&first_req, 0, sizeof(first_req));
-    memset(first_nodes, 0, sizeof(first_nodes));
+    (void)memset(&first_req, 0, sizeof(first_req));
+    (void)memset(first_nodes, 0, sizeof(first_nodes));
 
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_history_read_request_decode(&r, &first_req, first_nodes, 1));
     TEST_ASSERT_EQUAL(1, first_req.num_nodes_to_read);
@@ -260,8 +260,8 @@ void test_history_read_decode_continuation_point_stable_after_later_request_reus
     write_history_read_request_with_continuation_point(&w, buf, sizeof(buf), later_continuation_point,
                                                        sizeof(later_continuation_point));
     mu_binary_reader_init(&r, buf, w.position);
-    memset(&later_req, 0, sizeof(later_req));
-    memset(later_nodes, 0, sizeof(later_nodes));
+    (void)memset(&later_req, 0, sizeof(later_req));
+    (void)memset(later_nodes, 0, sizeof(later_nodes));
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_history_read_request_decode(&r, &later_req, later_nodes, 1));
 
     /* OPC-10000-4 section 5.11.3.2 defines HistoryRead's per-node
@@ -392,7 +392,7 @@ static opcua_statuscode_t mock_read_raw_modified(void *context, const mu_nodeid_
             data_points[0].value.value.i32 = 99;
             *actual_data_points = 1;
             if (cp_out && cp_out_length) {
-                memcpy(cp_out, "CP01", 4);
+                (void)memcpy(cp_out, "CP01", 4);
                 *cp_out_length = 4;
             }
             return MU_STATUS_GOOD;
@@ -413,15 +413,15 @@ static opcua_statuscode_t mock_read_raw_modified(void *context, const mu_nodeid_
 void test_history_read_dispatch(void) {
 #ifdef MUC_OPCUA_SERVICE_HISTORY
     mu_history_adapter_t adapter;
-    memset(&adapter, 0, sizeof(adapter));
+    (void)memset(&adapter, 0, sizeof(adapter));
     adapter.read_raw_modified = mock_read_raw_modified;
 
     mu_server_config_t config;
-    memset(&config, 0, sizeof(config));
+    (void)memset(&config, 0, sizeof(config));
     config.history_adapter = adapter;
 
     struct mu_server server;
-    memset(&server, 0, sizeof(server));
+    (void)memset(&server, 0, sizeof(server));
     server.config = config;
 
     opcua_byte_t req_buf[256];

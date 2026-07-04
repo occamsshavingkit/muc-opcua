@@ -37,20 +37,14 @@ void setUp(void) {}
 void tearDown(void) {}
 
 static const char *const forbidden_literals[] = {
-    "MICRO_OPCUA",
-    "micro_opcua",
-    "micro-opcua",
-    "MicroOpcUa",
-    "Micro-OPCUA",
-    "Micro OPC UA",
+    "MICRO_OPCUA", "micro_opcua", "micro-opcua", "MicroOpcUa", "Micro-OPCUA", "Micro OPC UA",
 };
 
 /* Directory names, matched by exact basename, that are skipped entirely. */
 static const char *const excluded_dir_names[] = {
-    ".git",
-    "specs", /* every specs/NNN-feature directory is a spec-kit planning/history record */
-    "obj",   /* .NET build intermediates (tests/interop/dotnet/obj), gitignored */
-    "bin",   /* .NET build output (tests/interop/dotnet/bin), gitignored */
+    ".git", "specs", /* every specs/NNN-feature directory is a spec-kit planning/history record */
+    "obj",           /* .NET build intermediates (tests/interop/dotnet/obj), gitignored */
+    "bin",           /* .NET build output (tests/interop/dotnet/bin), gitignored */
 };
 
 /* "build" prefixed directories are matched by prefix, not exact name (build,
@@ -138,8 +132,8 @@ static int is_excluded_dir_name(const char *name) {
     return 0;
 }
 
-static void check_file_for_forbidden_literals(const char *full_path, const char *relative_path,
-                                              size_t *checked_files, size_t *forbidden_matches) {
+static void check_file_for_forbidden_literals(const char *full_path, const char *relative_path, size_t *checked_files,
+                                              size_t *forbidden_matches) {
     if (relative_path_matches_any(relative_path, excluded_traceability_files,
                                   ARRAY_COUNT(excluded_traceability_files))) {
         return;

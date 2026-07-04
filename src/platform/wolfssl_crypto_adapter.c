@@ -107,8 +107,8 @@ static opcua_statuscode_t w_rsa_sha256_sign(void *context, const opcua_byte_t *d
         return MU_STATUS_BAD_INTERNALERROR;
 
     opcua_byte_t digest_info[51];
-    memcpy(digest_info, sha256_digest_info, 19);
-    memcpy(digest_info + 19, hash, 32);
+    (void)memcpy(digest_info, sha256_digest_info, 19);
+    (void)memcpy(digest_info + 19, hash, 32);
 
     int ret =
         wc_RsaSSL_Sign(digest_info, sizeof(digest_info), signature, (word32)*signature_length, &ctx->key, &ctx->rng);

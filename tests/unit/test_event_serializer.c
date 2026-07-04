@@ -20,13 +20,13 @@ void test_event_queue_circular_buffer(void) {
 
     /* Construct a server shell containing the subscriptions */
     mu_server_t server;
-    memset(&server, 0, sizeof(server));
+    (void)memset(&server, 0, sizeof(server));
     server.subs = subs;
 
     /* Enqueue 8 events, verifying counts */
     for (uint16_t i = 0; i < 8; ++i) {
         mu_event_notification_t ev;
-        memset(&ev, 0, sizeof(ev));
+        (void)memset(&ev, 0, sizeof(ev));
         ev.severity = i + 10;
 
         status = mu_server_trigger_event(&server, &ev);
@@ -41,7 +41,7 @@ void test_event_queue_circular_buffer(void) {
 
     /* Enqueue 9th event: should discard oldest event (severity 10) and enqueue the new one (severity 18) */
     mu_event_notification_t ev9;
-    memset(&ev9, 0, sizeof(ev9));
+    (void)memset(&ev9, 0, sizeof(ev9));
     ev9.severity = 18;
     status = mu_server_trigger_event(&server, &ev9);
     TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, status);

@@ -59,12 +59,12 @@ static opcua_uint64_t mock_get_tick(void *context) {
 }
 static opcua_statuscode_t mock_generate_random(void *context, opcua_byte_t *buffer, size_t length) {
     (void)context;
-    memset(buffer, 0xAA, length);
+    (void)memset(buffer, 0xAA, length);
     return MU_STATUS_GOOD;
 }
 
 void setUp(void) {
-    memset(&config, 0, sizeof(config));
+    (void)memset(&config, 0, sizeof(config));
     config.endpoint_url = "opc.tcp://localhost:4840";
     config.receive_buffer = rx_buf;
     config.receive_buffer_size = sizeof(rx_buf);
@@ -90,7 +90,7 @@ void setUp(void) {
 
     mu_server_t *out_server = NULL;
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_server_init(storage.bytes, sizeof(storage.bytes), &config, &out_server));
-    memcpy(&server, out_server, sizeof(mu_server_t));
+    (void)memcpy(&server, out_server, sizeof(mu_server_t));
 }
 
 void tearDown(void) {}

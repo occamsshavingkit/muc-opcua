@@ -26,8 +26,9 @@ static opcua_uint64_t fake_tick_ms(void *c) {
 #endif
 static opcua_statuscode_t fake_entropy(void *c, opcua_byte_t *buf, size_t len) {
     (void)c;
-    if (buf)
-        memset(buf, 0x42, len);
+    if (buf) {
+        (void)memset(buf, 0x42, len);
+    }
     return MU_STATUS_GOOD;
 }
 #define TEST_ENTROPY_FIRST_SESSION_ID 0x42424242u

@@ -59,12 +59,12 @@ static opcua_uint64_t mock_get_tick(void *context) {
 }
 static opcua_statuscode_t mock_generate_random(void *context, opcua_byte_t *buffer, size_t length) {
     (void)context;
-    memset(buffer, 0xAA, length);
+    (void)memset(buffer, 0xAA, length);
     return MU_STATUS_GOOD;
 }
 
 void setUp(void) {
-    memset(&config, 0, sizeof(config));
+    (void)memset(&config, 0, sizeof(config));
     config.endpoint_url = "opc.tcp://localhost:4840";
     config.receive_buffer = rx_buf;
     config.receive_buffer_size = sizeof(rx_buf);
@@ -90,7 +90,7 @@ void setUp(void) {
 
     mu_server_t *out_server = NULL;
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_server_init(storage.bytes, sizeof(storage.bytes), &config, &out_server));
-    memcpy(&server, out_server, sizeof(mu_server_t));
+    (void)memcpy(&server, out_server, sizeof(mu_server_t));
 }
 
 void tearDown(void) {}
@@ -246,7 +246,7 @@ void test_AddNodes_BrowseNameStableAfterRequestBufferOverwrite(void) {
     /* OPC-10000-4 section 5.8.2.2 AddNodes defines browseName as the
        AddNodesItem QualifiedName; once added, that Node state must not alias
        transient request bytes that later traffic can overwrite. */
-    memset(buffer, 0xA5, sizeof(buffer));
+    (void)memset(buffer, 0xA5, sizeof(buffer));
 
     const mu_node_t *node = &server.dynamic_address_space.nodes[0];
     TEST_ASSERT_EQUAL_INT32((opcua_int32_t)(sizeof(browse_name) - 1), node->browse_name.length);

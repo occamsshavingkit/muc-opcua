@@ -17,7 +17,7 @@ static opcua_uint32_t read_uint32_le(const opcua_byte_t *data) {
 
 void test_tcp_hello_acknowledge_negotiation(void) {
     mu_server_config_t config;
-    memset(&config, 0, sizeof(config));
+    (void)memset(&config, 0, sizeof(config));
     config.receive_buffer_size = 8192;
     config.send_buffer_size = 8192;
     config.max_message_size = 65536;
