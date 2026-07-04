@@ -34,13 +34,14 @@ engines:
 
   # Lizard cyclomatic-complexity and function-length thresholds.
   # Protocol dispatch functions are naturally longer than typical application
-  # code; exclude test scaffolding files that inflate metrics artificially.
+  # code.  Test scaffolding, benchmarks, scripts, and examples inflate metrics
+  # artificially and are not deployment code.
   lizard:
     exclude_paths:
-      - 'tests/unit/test_traceability_docs.c'
-      - 'tests/unit/test_conformance_docs.c'
-      - 'tests/unit/test_size_report.c'
-      - 'tests/unit/test_async_opcua_inventory.c'
+      - 'tests/**'
+      - 'benchmark/**'
+      - 'scripts/**'
+      - 'examples/**'
 
   # Markdown link-fragment checks.  Docs links may point to sections that
   # exist in the rendered output but are generated, not in raw Markdown.
