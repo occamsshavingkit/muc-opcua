@@ -23,10 +23,12 @@
 
 static opcua_statuscode_t fuzz_entropy(void *context, opcua_byte_t *buffer, size_t length) {
     (void)context;
-    if (buffer == NULL && length != 0u)
+    if (buffer == NULL && length != 0u) {
         return MU_STATUS_BAD_INTERNALERROR;
-    if (buffer != NULL)
+    }
+    if (buffer != NULL) {
         (void)memset(buffer, 0xa5, length);
+    }
     return MU_STATUS_GOOD;
 }
 
@@ -70,8 +72,9 @@ static void dispatch_one(opcua_uint32_t request_type, const opcua_byte_t *body, 
     opcua_byte_t response_body[FUZZ_RESPONSE_CAPACITY];
     size_t response_length = sizeof(response_body);
 
-    if (!prepare_server(&server, &session_id))
+    if (!prepare_server(&server, &session_id)) {
         return;
+    }
     (void)mu_service_dispatch(&server, request_type, body, len, response_body, &response_length);
 }
 
@@ -83,8 +86,9 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
         data = &empty;
         len = 0u;
     }
-    if (len > FUZZ_REQUEST_CAPACITY)
+    if (len > FUZZ_REQUEST_CAPACITY) {
         len = FUZZ_REQUEST_CAPACITY;
+    }
 
     /* CreateMonitoredItems exercises the DataChangeFilter/deadband decode (§7.22.2). */
     dispatch_one(MU_ID_CREATEMONITOREDITEMSREQUEST, data, len);

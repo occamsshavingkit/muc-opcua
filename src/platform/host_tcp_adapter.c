@@ -34,8 +34,9 @@ static opcua_statuscode_t host_listen(void *context, const char *endpoint_url) {
     }
 
     ctx->server_fd = socket(AF_INET, SOCK_STREAM, 0);
-    if (ctx->server_fd < 0)
+    if (ctx->server_fd < 0) {
         return MU_STATUS_BAD_INTERNALERROR;
+    }
 
     int opt = 1;
     setsockopt(ctx->server_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
@@ -144,12 +145,14 @@ static void host_shutdown(void *context) {
 }
 
 opcua_statuscode_t mu_host_tcp_adapter_init(mu_tcp_adapter_t *adapter) {
-    if (!adapter)
+    if (!adapter) {
         return MU_STATUS_BAD_INTERNALERROR;
+    }
 
     struct host_tcp_context *ctx = malloc(sizeof(struct host_tcp_context));
-    if (!ctx)
+    if (!ctx) {
         return MU_STATUS_BAD_OUTOFMEMORY;
+    }
 
     ctx->server_fd = -1;
 

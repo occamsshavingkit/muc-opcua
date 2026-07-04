@@ -228,7 +228,7 @@ static opcua_statuscode_t read_response_service_result_at(const opcua_byte_t *bu
 }
 
 static void prepare_created_session(mu_server_t *server, opcua_uint32_t *auth_token) {
-    memset(server, 0, sizeof(*server));
+    (void)memset(server, 0, sizeof(*server));
     server->secure_channel.is_open = true;
     fake_platform_init(NULL, &server->config.time_adapter, &server->config.entropy_adapter);
     mu_session_init(&server->sessions[0]);
@@ -254,7 +254,7 @@ static size_t build_activate_body(opcua_byte_t *buffer, size_t capacity, const m
 
 void test_browse_before_activate_session(void) {
     mu_server_t server;
-    memset(&server, 0, sizeof(server));
+    (void)memset(&server, 0, sizeof(server));
     server.tcp_conn.state = MU_TCP_STATE_ESTABLISHED;
     server.secure_channel.is_open = true;
     server.sessions[0].state = MU_SESSION_STATE_CLOSED;
@@ -375,7 +375,7 @@ void test_service_before_hello(void) {
 
 void test_request_type_non_numeric_nodeid_rejected_with_bad_decodingerror(void) {
     state_error_transport_t transport;
-    memset(&transport, 0, sizeof(transport));
+    (void)memset(&transport, 0, sizeof(transport));
 
     opcua_byte_t chunk[512];
     size_t len = build_hello(chunk, sizeof(chunk));
@@ -457,7 +457,7 @@ void test_activate_session_rejects_non_numeric_user_identity_token_typeid(void) 
     prepare_created_session(&server, &token);
 
     opcua_byte_t type_name[MU_ID_ANONYMOUSIDENTITYTOKEN_ENCODING_DEFAULTBINARY];
-    memset(type_name, 'A', sizeof(type_name));
+    (void)memset(type_name, 'A', sizeof(type_name));
     mu_string_t non_numeric_name = {(opcua_int32_t)sizeof(type_name), type_name};
     mu_nodeid_t unsupported_type;
     unsupported_type.namespace_index = 0;

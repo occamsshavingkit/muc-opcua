@@ -58,7 +58,7 @@ void test_basic256sha256_roundtrip(void) {
     opcua_byte_t recovered[2048];
     size_t recovered_len = 0;
     mu_asym_chunk_info_t info;
-    memset(&info, 0, sizeof(info));
+    (void)memset(&info, 0, sizeof(info));
     opcua_byte_t scratch[6144];
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD,
                       mu_asym_chunk_unwrap(&server_crypto, chunk, chunk_len, recovered, sizeof(recovered),
@@ -151,7 +151,7 @@ void test_tampered_signature_rejected(void) {
     get_cert(&server_crypto, &server_cert, &server_cert_len);
 
     opcua_byte_t body[80];
-    memset(body, 0x5A, sizeof(body));
+    (void)memset(body, 0x5A, sizeof(body));
 
     opcua_byte_t chunk[4096];
     size_t chunk_len = 0;
@@ -180,7 +180,7 @@ void test_wrong_receiver_thumbprint_rejected(void) {
     get_cert(&client_crypto, &client_cert, &client_cert_len);
 
     opcua_byte_t body[48];
-    memset(body, 0x11, sizeof(body));
+    (void)memset(body, 0x11, sizeof(body));
 
     opcua_byte_t chunk[4096];
     size_t chunk_len = 0;

@@ -90,7 +90,7 @@ void test_service_dispatch_unsupported_services(void) {
 
 void test_activate_session_consumes_nonempty_certificates_and_identity_body(void) {
     mu_server_t server;
-    memset(&server, 0, sizeof(server));
+    (void)memset(&server, 0, sizeof(server));
     server.secure_channel.is_open = true;
     server.config.entropy_adapter.generate_random = fake_entropy;
     mu_session_init(&server.sessions[0]);

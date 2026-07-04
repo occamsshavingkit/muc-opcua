@@ -33,7 +33,7 @@ void test_unresolved_references_fail_validation(void) {
     mu_reference_t refs[1];
     mu_address_space_t space;
 
-    memset(nodes, 0, sizeof(nodes));
+    (void)memset(nodes, 0, sizeof(nodes));
     (void)memset(refs, 0, sizeof(refs));
 
     refs[0].target_id.identifier_type = MU_NODEID_NUMERIC;

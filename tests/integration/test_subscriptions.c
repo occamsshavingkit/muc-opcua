@@ -347,7 +347,7 @@ static opcua_uint64_t test_get_tick_ms(void *c) {
 
 static mu_server_t *make_server(mock_t *mock, opcua_byte_t *storage, size_t storage_size, mu_server_config_t *config,
                                 const mu_address_space_t *space) {
-    memset(config, 0, sizeof(*config));
+    (void)memset(config, 0, sizeof(*config));
     config->endpoint_url = "opc.tcp://host:4840";
     config->application_uri = "urn:t";
     config->product_uri = "urn:t";
@@ -391,7 +391,7 @@ static void run_connect(mu_server_t *server) {
    request gets a distinct id. */
 void test_create_subscription(void) {
     mock_t mock;
-    memset(&mock, 0, sizeof(mock));
+    (void)memset(&mock, 0, sizeof(mock));
     enqueue_connect(&mock);
     enqueue_create_subscription(&mock, 4, 1000.0, 100, 10);
     enqueue_create_subscription(&mock, 5, 500.0, 60, 5);
@@ -696,7 +696,7 @@ static opcua_int32_t s_mon_val = 0;
 static opcua_statuscode_t mon_read_cb(void *ctx, const mu_nodeid_t *id, mu_variant_t *v) {
     (void)ctx;
     (void)id;
-    memset(v, 0, sizeof(*v));
+    (void)memset(v, 0, sizeof(*v));
     v->type = MU_TYPE_INT32;
     v->value.i32 = s_mon_val;
     return MU_STATUS_GOOD;

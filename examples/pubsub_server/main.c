@@ -27,8 +27,9 @@ static opcua_uint64_t stub_get_tick_ms(void *context) {
 
 static opcua_statuscode_t stub_generate_random(void *context, opcua_byte_t *buffer, size_t length) {
     (void)context;
-    if (buffer)
+    if (buffer) {
         (void)memset(buffer, 0xAA, length);
+    }
     return MU_STATUS_GOOD;
 }
 

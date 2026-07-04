@@ -28,7 +28,7 @@ static void read_file_content(const char *path, char *buffer, size_t max_len) {
     }
     size_t read_len = fread(buffer, 1, max_len - 1, f);
     buffer[read_len] = '\0';
-    fclose(f);
+    (void)fclose(f);
 }
 
 static const char *find_backticked_mapping(const char *content, const char *file_path) {
@@ -42,7 +42,7 @@ static const char *find_backticked_mapping(const char *content, const char *file
         return mapping;
     }
 
-    snprintf(needle, sizeof(needle), "`%s`", basename);
+    (void)snprintf(needle, sizeof(needle), "`%s`", basename);
     return strstr(content, needle);
 }
 

@@ -75,8 +75,9 @@ static opcua_statuscode_t write_request_header(mu_binary_writer_t *writer) {
     opcua_statuscode_t status;
 
     status = mu_binary_write_nodeid(writer, &token);
-    if (status != MU_STATUS_GOOD)
+    if (status != MU_STATUS_GOOD) {
         return status;
+    }
     status = mu_binary_write_int64(writer, 0);
     if (status != MU_STATUS_GOOD)
         return status;

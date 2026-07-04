@@ -445,7 +445,7 @@ void test_plaintext_user_auth_flow_rejects_username_password_over_security_polic
 
 void test_anonymous_identity_token_succeeds_over_security_policy_none(void) {
     mock_t mock;
-    memset(&mock, 0, sizeof(mock));
+    (void)memset(&mock, 0, sizeof(mock));
 
     opcua_byte_t tmp[512];
     mu_binary_writer_t w;
@@ -518,7 +518,7 @@ void test_anonymous_identity_token_succeeds_over_security_policy_none(void) {
     enqueue(&mock, chunk, clen);
 
     mu_server_config_t config;
-    memset(&config, 0, sizeof(config));
+    (void)memset(&config, 0, sizeof(config));
     config.endpoint_url = "opc.tcp://host:4840";
     config.application_uri = "urn:test";
     config.product_uri = "urn:test";

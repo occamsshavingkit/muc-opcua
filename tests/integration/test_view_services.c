@@ -68,7 +68,7 @@ static opcua_statuscode_t mock_read(void *c, void *h, opcua_byte_t *buf, size_t 
     }
     size_t len = m->inbound_len[m->read_index];
     TEST_ASSERT_TRUE(len <= cap);
-    memcpy(buf, m->inbound[m->read_index], len);
+    (void)memcpy(buf, m->inbound[m->read_index], len);
     m->read_index++;
     *n = len;
     return MU_STATUS_GOOD;
@@ -76,7 +76,7 @@ static opcua_statuscode_t mock_read(void *c, void *h, opcua_byte_t *buf, size_t 
 static opcua_statuscode_t mock_write(void *c, void *h, const opcua_byte_t *buf, size_t len, size_t *n) {
     mock_t *m = (mock_t *)c;
     (void)h;
-    memcpy(m->last_write, buf, len);
+    (void)memcpy(m->last_write, buf, len);
     m->last_write_len = len;
     *n = len;
     return MU_STATUS_GOOD;
@@ -90,7 +90,7 @@ static opcua_datetime_t s_test_now(void *c) {
 }
 
 static void enqueue(mock_t *m, const opcua_byte_t *b, size_t len) {
-    memcpy(m->inbound[m->inbound_count], b, len);
+    (void)memcpy(m->inbound[m->inbound_count], b, len);
     m->inbound_len[m->inbound_count] = len;
     m->inbound_count++;
 }
@@ -119,7 +119,7 @@ static size_t build_msg(opcua_byte_t *out, size_t cap, opcua_uint32_t seq, opcua
     mu_binary_write_uint32(&w, 1);
     mu_binary_write_uint32(&w, seq);
     mu_binary_write_uint32(&w, reqid);
-    memcpy(out + 24, body, blen);
+    (void)memcpy(out + 24, body, blen);
     return 24 + blen;
 }
 static opcua_uint32_t parse_response(const opcua_byte_t *buf, size_t len, mu_binary_reader_t *body) {
@@ -249,7 +249,7 @@ static void enqueue_session(mock_t *mock) {
 
 static mu_server_t *make_server(mock_t *mock, opcua_byte_t *storage, size_t storage_size, mu_server_config_t *config,
                                 const mu_address_space_t *space) {
-    memset(config, 0, sizeof(*config));
+    (void)memset(config, 0, sizeof(*config));
     config->endpoint_url = "opc.tcp://host:4840";
     config->application_uri = "urn:t";
     config->product_uri = "urn:t";
@@ -280,7 +280,7 @@ static mu_server_t *make_server(mock_t *mock, opcua_byte_t *storage, size_t stor
 /* RegisterNodes echoes nodesToRegister; UnregisterNodes returns Good. */
 void test_register_and_unregister_nodes(void) {
     mock_t mock;
-    memset(&mock, 0, sizeof(mock));
+    (void)memset(&mock, 0, sizeof(mock));
     enqueue_connect(&mock);
     opcua_byte_t tmp[512], chunk[512];
     mu_binary_writer_t w;

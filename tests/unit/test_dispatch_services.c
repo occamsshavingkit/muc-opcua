@@ -68,7 +68,7 @@ static void skip_response_header(mu_binary_reader_t *r, opcua_uint32_t *handle, 
 
 void test_dispatch_open_secure_channel(void) {
     mu_server_t server;
-    memset(&server, 0, sizeof(server));
+    (void)memset(&server, 0, sizeof(server));
     mu_secure_channel_init(&server.secure_channel);
     server.config.time_adapter.get_time = fake_time;
     server.config.entropy_adapter.generate_random = fake_entropy;
@@ -186,7 +186,7 @@ void test_dispatch_truncated_create_session_body_returns_bad_decodingerror_witho
     server.config.entropy_adapter.generate_random = fake_entropy;
 
     mu_session_t sessions_before[MU_MAX_SESSIONS];
-    memcpy(sessions_before, server.sessions, sizeof(sessions_before));
+    (void)memcpy(sessions_before, server.sessions, sizeof(sessions_before));
     mu_session_t *active_session_before = server.active_session;
 
     opcua_byte_t req[256];
@@ -384,7 +384,7 @@ static const mu_node_t s_nodes[] = {{{0, MU_NODEID_NUMERIC, {85}},
 static const mu_address_space_t s_address_space = {s_nodes, 2};
 
 static void activated_server(mu_server_t *server) {
-    memset(server, 0, sizeof(*server));
+    (void)memset(server, 0, sizeof(*server));
     server->secure_channel.is_open = true;
     server->config.time_adapter.get_time = fake_time;
     server->config.address_space = &s_address_space;
@@ -578,7 +578,7 @@ void test_dispatch_delete_subscriptions_rejects_too_many_operations_before_resul
     size_t req_len = w.position;
 
     opcua_byte_t resp[1024];
-    memset(resp, 0xA5, sizeof(resp));
+    (void)memset(resp, 0xA5, sizeof(resp));
     size_t response_capacity = sizeof(resp);
     size_t resp_len = response_capacity;
 

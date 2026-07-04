@@ -287,7 +287,7 @@ void test_message_chunk_non_final_chunk_in_single_chunk_mode_returns_tcp_error_w
     mu_server_t *server = NULL;
     size_t len;
 
-    memset(&transport, 0, sizeof(transport));
+    (void)memset(&transport, 0, sizeof(transport));
     len = build_non_final_msg_with_unsupported_service(chunk, sizeof(chunk));
     enqueue_request(&transport, chunk, len);
 

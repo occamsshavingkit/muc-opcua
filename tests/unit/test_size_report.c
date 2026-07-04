@@ -40,7 +40,7 @@ void test_size_ledger_contains_required_fields(void) {
             has_feature_009 = true;
         }
     }
-    fclose(fp);
+    (void)fclose(fp);
 
     TEST_ASSERT_TRUE_MESSAGE(has_flash, "feature-size-ledger.md does not contain Flash field");
     TEST_ASSERT_TRUE_MESSAGE(has_ram, "feature-size-ledger.md does not contain RAM field");

@@ -144,7 +144,7 @@ void test_write_service_empty_array(void) {
 
 void test_write_datavalue_without_value_returns_type_mismatch_without_callback(void) {
     mu_server_t server;
-    memset(&server, 0, sizeof(server));
+    (void)memset(&server, 0, sizeof(server));
 
     mu_node_t node;
     (void)memset(&node, 0, sizeof(node));
@@ -253,7 +253,7 @@ void test_write_service_non_value_attribute(void) {
     mu_address_space_t address_space = {&node, 1};
     server.config.address_space = &address_space;
     server.config.write_handler = dummy_write_handler;
-    memset(&server.user_address_space_index, 0, sizeof(server.user_address_space_index));
+    (void)memset(&server.user_address_space_index, 0, sizeof(server.user_address_space_index));
 
     opcua_byte_t req_buffer[128];
     mu_binary_writer_t writer;
@@ -280,7 +280,7 @@ void test_write_service_non_value_attribute(void) {
     mu_binary_write_string(&writer, &audit_id);
 
     mu_datavalue_t dv;
-    memset(&dv, 0, sizeof(dv));
+    (void)memset(&dv, 0, sizeof(dv));
     dv.has_value = true;
     dv.has_status = false;
     dv.has_source_timestamp = false;
@@ -475,7 +475,7 @@ void test_write_value_on_object_is_operation_level_bad_notwritable(void) {
     memset(&server, 0, sizeof(server));
 
     mu_node_t node;
-    memset(&node, 0, sizeof(node));
+    (void)memset(&node, 0, sizeof(node));
     node.node_id = (mu_nodeid_t){1, MU_NODEID_NUMERIC, {.numeric = 5002}};
     node.node_class = MU_NODECLASS_OBJECT;
     node.browse_name = (mu_string_t){6, (const opcua_byte_t *)"Object"};

@@ -78,7 +78,7 @@ static opcua_statuscode_t mock_read(void *c, void *h, opcua_byte_t *buf, size_t 
         *n = 0;
         return MU_STATUS_GOOD;
     }
-    memcpy(buf, m->next_read, m->next_read_len);
+    (void)memcpy(buf, m->next_read, m->next_read_len);
     *n = m->next_read_len;
     m->next_read_len = 0; /* consumed */
     return MU_STATUS_GOOD;
@@ -101,7 +101,7 @@ static opcua_statuscode_t mock_write(void *c, void *h, const opcua_byte_t *buf, 
 
 static void make_config(mu_server_config_t *config, mock_t *mock, opcua_byte_t *rx, size_t rxn, opcua_byte_t *tx,
                         size_t txn) {
-    memset(config, 0, sizeof(*config));
+    (void)memset(config, 0, sizeof(*config));
     config->endpoint_url = "opc.tcp://host:4840";
     config->application_uri = "urn:t";
     config->product_uri = "urn:t";
@@ -160,7 +160,7 @@ void test_idle_connection_times_out(void) {
     g_close_count = 0;
     g_write_mode = 0;
     mock_t mock;
-    memset(&mock, 0, sizeof(mock));
+    (void)memset(&mock, 0, sizeof(mock));
     mu_server_config_t config;
     static opcua_byte_t rx[8192], tx[8192];
     make_config(&config, &mock, rx, sizeof(rx), tx, sizeof(tx));

@@ -760,8 +760,9 @@ static opcua_statuscode_t write_data_change_notification(mu_binary_writer_t *w, 
         }
 #else
         s = mu_binary_write_uint32(w, item->client_handle);
-        if (s != MU_STATUS_GOOD)
+        if (s != MU_STATUS_GOOD) {
             return s;
+        }
 
         mu_datavalue_t dv;
         memset(&dv, 0, sizeof(dv));

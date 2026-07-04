@@ -18,8 +18,9 @@
 
 opcua_statuscode_t mu_host_udp_init(void *context, uint16_t port) {
     (void)port;
-    if (!context)
+    if (!context) {
         return MU_STATUS_BAD_INVALIDARGUMENT;
+    }
 
 #ifdef _WIN32
     WSADATA wsaData;
@@ -43,8 +44,9 @@ opcua_statuscode_t mu_host_udp_send(void *context, const opcua_byte_t *buffer, s
     if (!context)
         return MU_STATUS_BAD_INTERNALERROR;
     int fd = *(int *)context;
-    if (fd < 0)
+    if (fd < 0) {
         return MU_STATUS_BAD_INTERNALERROR;
+    }
 
     struct sockaddr_in dest_addr;
     (void)memset(&dest_addr, 0, sizeof(dest_addr));

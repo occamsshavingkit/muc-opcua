@@ -46,7 +46,7 @@ void mu_session_init(mu_session_t *session) {
         session->session_id = 0;
         session->auth_token = 0;
         session->revised_session_timeout_ms = 0;
-        memset(session->server_nonce, 0, sizeof(session->server_nonce));
+        (void)memset(session->server_nonce, 0, sizeof(session->server_nonce));
 #ifdef MUC_OPCUA_MULTIPLE_CONNECTIONS
         session->secure_channel_id = 0;
 #endif

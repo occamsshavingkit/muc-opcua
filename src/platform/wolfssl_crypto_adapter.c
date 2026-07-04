@@ -28,12 +28,15 @@ static const opcua_byte_t sha256_digest_info[] = {0x30, 0x31, 0x30, 0x0d, 0x06, 
 static opcua_statuscode_t w_sha256(void *context, const opcua_byte_t *data, size_t length, opcua_byte_t *digest) {
     (void)context;
     wc_Sha256 sha;
-    if (wc_InitSha256(&sha) != 0)
+    if (wc_InitSha256(&sha) != 0) {
         return MU_STATUS_BAD_INTERNALERROR;
-    if (wc_Sha256Update(&sha, data, (word32)length) != 0)
+    }
+    if (wc_Sha256Update(&sha, data, (word32)length) != 0) {
         return MU_STATUS_BAD_INTERNALERROR;
-    if (wc_Sha256Final(&sha, digest) != 0)
+    }
+    if (wc_Sha256Final(&sha, digest) != 0) {
         return MU_STATUS_BAD_INTERNALERROR;
+    }
     return MU_STATUS_GOOD;
 }
 
@@ -41,12 +44,15 @@ static opcua_statuscode_t w_hmac_sha256(void *context, const opcua_byte_t *key, 
                                         const opcua_byte_t *data, size_t data_length, opcua_byte_t *mac) {
     (void)context;
     Hmac hmac;
-    if (wc_HmacSetKey(&hmac, WC_SHA256, key, (word32)key_length) != 0)
+    if (wc_HmacSetKey(&hmac, WC_SHA256, key, (word32)key_length) != 0) {
         return MU_STATUS_BAD_INTERNALERROR;
-    if (wc_HmacUpdate(&hmac, data, (word32)data_length) != 0)
+    }
+    if (wc_HmacUpdate(&hmac, data, (word32)data_length) != 0) {
         return MU_STATUS_BAD_INTERNALERROR;
-    if (wc_HmacFinal(&hmac, mac) != 0)
+    }
+    if (wc_HmacFinal(&hmac, mac) != 0) {
         return MU_STATUS_BAD_INTERNALERROR;
+    }
     return MU_STATUS_GOOD;
 }
 
@@ -54,10 +60,12 @@ static opcua_statuscode_t w_aes256_cbc_encrypt(void *context, const opcua_byte_t
                                                const opcua_byte_t *input, size_t length, opcua_byte_t *output) {
     (void)context;
     Aes aes;
-    if (wc_AesSetKey(&aes, key, 32, iv, AES_ENCRYPTION) != 0)
+    if (wc_AesSetKey(&aes, key, 32, iv, AES_ENCRYPTION) != 0) {
         return MU_STATUS_BAD_INTERNALERROR;
-    if (wc_AesCbcEncrypt(&aes, output, input, (word32)length) != 0)
+    }
+    if (wc_AesCbcEncrypt(&aes, output, input, (word32)length) != 0) {
         return MU_STATUS_BAD_INTERNALERROR;
+    }
     return MU_STATUS_GOOD;
 }
 
@@ -65,10 +73,12 @@ static opcua_statuscode_t w_aes256_cbc_decrypt(void *context, const opcua_byte_t
                                                const opcua_byte_t *input, size_t length, opcua_byte_t *output) {
     (void)context;
     Aes aes;
-    if (wc_AesSetKey(&aes, key, 32, iv, AES_DECRYPTION) != 0)
+    if (wc_AesSetKey(&aes, key, 32, iv, AES_DECRYPTION) != 0) {
         return MU_STATUS_BAD_INTERNALERROR;
-    if (wc_AesCbcDecrypt(&aes, output, input, (word32)length) != 0)
+    }
+    if (wc_AesCbcDecrypt(&aes, output, input, (word32)length) != 0) {
         return MU_STATUS_BAD_INTERNALERROR;
+    }
     return MU_STATUS_GOOD;
 }
 
@@ -76,8 +86,9 @@ static opcua_statuscode_t w_aes128_cbc_encrypt(void *context, const opcua_byte_t
                                                const opcua_byte_t *input, size_t length, opcua_byte_t *output) {
     (void)context;
     Aes aes;
-    if (wc_AesSetKey(&aes, key, 16, iv, AES_ENCRYPTION) != 0)
+    if (wc_AesSetKey(&aes, key, 16, iv, AES_ENCRYPTION) != 0) {
         return MU_STATUS_BAD_INTERNALERROR;
+    }
     if (wc_AesCbcEncrypt(&aes, output, input, (word32)length) != 0)
         return MU_STATUS_BAD_INTERNALERROR;
     return MU_STATUS_GOOD;
@@ -87,8 +98,9 @@ static opcua_statuscode_t w_aes128_cbc_decrypt(void *context, const opcua_byte_t
                                                const opcua_byte_t *input, size_t length, opcua_byte_t *output) {
     (void)context;
     Aes aes;
-    if (wc_AesSetKey(&aes, key, 16, iv, AES_DECRYPTION) != 0)
+    if (wc_AesSetKey(&aes, key, 16, iv, AES_DECRYPTION) != 0) {
         return MU_STATUS_BAD_INTERNALERROR;
+    }
     if (wc_AesCbcDecrypt(&aes, output, input, (word32)length) != 0)
         return MU_STATUS_BAD_INTERNALERROR;
     return MU_STATUS_GOOD;
@@ -103,8 +115,9 @@ static opcua_statuscode_t w_rsa_sha256_sign(void *context, const opcua_byte_t *d
         return MU_STATUS_BAD_INTERNALERROR;
     if (wc_Sha256Update(&sha, data, (word32)length) != 0)
         return MU_STATUS_BAD_INTERNALERROR;
-    if (wc_Sha256Final(&sha, hash) != 0)
+    if (wc_Sha256Final(&sha, hash) != 0) {
         return MU_STATUS_BAD_INTERNALERROR;
+    }
 
     opcua_byte_t digest_info[51];
     (void)memcpy(digest_info, sha256_digest_info, 19);
@@ -112,8 +125,9 @@ static opcua_statuscode_t w_rsa_sha256_sign(void *context, const opcua_byte_t *d
 
     int ret =
         wc_RsaSSL_Sign(digest_info, sizeof(digest_info), signature, (word32)*signature_length, &ctx->key, &ctx->rng);
-    if (ret < 0)
+    if (ret < 0) {
         return MU_STATUS_BAD_INTERNALERROR;
+    }
     *signature_length = (size_t)ret;
     return MU_STATUS_GOOD;
 }
@@ -327,8 +341,9 @@ static opcua_statuscode_t w_rsa_oaep_sha256_encrypt(void *context, const opcua_b
 
 static opcua_statuscode_t w_get_own_certificate(void *context, const opcua_byte_t **certificate, size_t *length) {
     struct wolfssl_crypto_context *ctx = (struct wolfssl_crypto_context *)context;
-    if (!ctx->cert_der)
+    if (!ctx->cert_der) {
         return MU_STATUS_BAD_INTERNALERROR;
+    }
     *certificate = ctx->cert_der;
     *length = ctx->cert_len;
     return MU_STATUS_GOOD;
@@ -395,23 +410,28 @@ static opcua_statuscode_t w_get_certificate_thumbprint(void *context, const opcu
                                                        size_t certificate_length, opcua_byte_t *thumbprint) {
     (void)context;
     wc_Sha sha;
-    if (wc_InitSha(&sha) != 0)
+    if (wc_InitSha(&sha) != 0) {
         return MU_STATUS_BAD_INTERNALERROR;
-    if (wc_ShaUpdate(&sha, certificate, (word32)certificate_length) != 0)
+    }
+    if (wc_ShaUpdate(&sha, certificate, (word32)certificate_length) != 0) {
         return MU_STATUS_BAD_INTERNALERROR;
-    if (wc_ShaFinal(&sha, thumbprint) != 0)
+    }
+    if (wc_ShaFinal(&sha, thumbprint) != 0) {
         return MU_STATUS_BAD_INTERNALERROR;
+    }
     return MU_STATUS_GOOD;
 }
 
 opcua_statuscode_t mu_wolfssl_crypto_adapter_init(mu_crypto_adapter_t *adapter, const opcua_byte_t *cert_der,
                                                   size_t cert_len, const opcua_byte_t *key_der, size_t key_len) {
-    if (!adapter)
+    if (!adapter) {
         return MU_STATUS_BAD_INTERNALERROR;
+    }
 
     struct wolfssl_crypto_context *ctx = (struct wolfssl_crypto_context *)calloc(1, sizeof(*ctx));
-    if (!ctx)
+    if (!ctx) {
         return MU_STATUS_BAD_OUTOFMEMORY;
+    }
 
     ctx->cert_der = cert_der;
     ctx->cert_len = cert_len;
@@ -475,8 +495,9 @@ opcua_statuscode_t mu_wolfssl_crypto_adapter_init(mu_crypto_adapter_t *adapter, 
 }
 
 void mu_wolfssl_crypto_adapter_cleanup(mu_crypto_adapter_t *adapter) {
-    if (!adapter || !adapter->context)
+    if (!adapter || !adapter->context) {
         return;
+    }
     struct wolfssl_crypto_context *ctx = (struct wolfssl_crypto_context *)adapter->context;
     wc_FreeRng(&ctx->rng);
     wc_FreeRsaKey(&ctx->key);

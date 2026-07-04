@@ -236,7 +236,7 @@ static void run_handshake_for_policy(mu_security_policy_id_t policy_id, int tamp
     enqueue(&mock, chunk, clen);
 
     mu_server_config_t config;
-    memset(&config, 0, sizeof(config));
+    (void)memset(&config, 0, sizeof(config));
     config.endpoint_url = "opc.tcp://host:4840";
     config.application_uri = "urn:test";
     config.product_uri = "urn:test";
@@ -287,7 +287,7 @@ static void run_handshake_for_policy(mu_security_policy_id_t policy_id, int tamp
     opcua_byte_t opn_body[8192];
     size_t opn_body_len = 0;
     mu_asym_chunk_info_t ai;
-    memset(&ai, 0, sizeof(ai));
+    (void)memset(&ai, 0, sizeof(ai));
     opcua_byte_t scratch[6144];
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD,
                       mu_asym_chunk_unwrap(&client_crypto, mock.last_write, mock.last_write_len, opn_body,
@@ -371,7 +371,7 @@ static void run_handshake_for_policy(mu_security_policy_id_t policy_id, int tamp
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_bytestring(&resp, &cs_server_nonce));
     TEST_ASSERT_EQUAL(32, cs_server_nonce.length);
     opcua_byte_t sess_nonce[32];
-    memcpy(sess_nonce, cs_server_nonce.data, 32);
+    (void)memcpy(sess_nonce, cs_server_nonce.data, 32);
 
     /* Sign the ClientSignature with the scheme the negotiated policy requires
        (feature 026): RSA-PSS for Aes256_Sha256_RsaPss, RSA-PKCS#1.5 otherwise, and
@@ -388,7 +388,7 @@ static void run_handshake_for_policy(mu_security_policy_id_t policy_id, int tamp
     opcua_byte_t to_sign[1536];
     TEST_ASSERT_TRUE(server_cert_len + 32 <= sizeof(to_sign));
     (void)memcpy(to_sign, server_cert, server_cert_len);
-    memcpy(to_sign + server_cert_len, sess_nonce, 32);
+    (void)memcpy(to_sign + server_cert_len, sess_nonce, 32);
     opcua_byte_t client_sig[512];
     size_t client_sig_len = sizeof(client_sig);
     opcua_statuscode_t sign_rc =
