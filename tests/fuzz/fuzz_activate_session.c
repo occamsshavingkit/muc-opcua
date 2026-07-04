@@ -58,8 +58,9 @@ static opcua_statuscode_t write_activate_prefix(opcua_byte_t *buffer, size_t cap
         return status;
     }
     status = mu_binary_write_int64(&writer, 0);
-    if (status != MU_STATUS_GOOD)
+    if (status != MU_STATUS_GOOD) {
         return status;
+    }
     status = mu_binary_write_uint32(&writer, 0);
     if (status != MU_STATUS_GOOD)
         return status;

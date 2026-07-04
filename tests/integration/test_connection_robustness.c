@@ -189,7 +189,7 @@ void test_activity_resets_idle_timer(void) {
     g_close_count = 0;
     g_write_mode = 0;
     mock_t mock;
-    memset(&mock, 0, sizeof(mock));
+    (void)memset(&mock, 0, sizeof(mock));
     mu_server_config_t config;
     static opcua_byte_t rx[8192], tx[8192];
     make_config(&config, &mock, rx, sizeof(rx), tx, sizeof(tx));

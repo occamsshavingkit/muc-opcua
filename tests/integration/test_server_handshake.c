@@ -619,14 +619,14 @@ void test_server_rejects_sequence_gap(void) {
 
 void test_close_secure_channel_message_closes_channel(void) {
     mock_t mock;
-    memset(&mock, 0, sizeof(mock));
+    (void)memset(&mock, 0, sizeof(mock));
 
     enqueue_hello(&mock);
     enqueue_open_secure_channel_none(&mock);
     enqueue_close_secure_channel(&mock, 2, 2);
 
     mu_server_config_t config;
-    memset(&config, 0, sizeof(config));
+    (void)memset(&config, 0, sizeof(config));
     config.endpoint_url = "opc.tcp://host:4840";
     config.application_uri = "urn:test";
     config.product_uri = "urn:test";

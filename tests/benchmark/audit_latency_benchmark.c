@@ -425,7 +425,7 @@ static int dispatch_expect(mu_server_t *server, const char *name, opcua_uint32_t
     opcua_statuscode_t status = mu_service_dispatch(server, request_id, request, request_len, response, &response_len);
 
     if (status != MU_STATUS_GOOD) {
-        fprintf(stderr, "%s dispatch failed: 0x%08" PRIx32 "\n", name, (uint32_t)status);
+        (void)fprintf(stderr, "%s dispatch failed: 0x%08" PRIx32 "\n", name, (uint32_t)status);
         return 1;
     }
     return read_response_prefix(name, response, response_len, expected_response_id, expected_handle, body);
@@ -471,7 +471,7 @@ static int init_and_run_flow(const benchmark_requests_t *requests) {
     opcua_statuscode_t status = init_benchmark_server(&server);
 
     if (status != MU_STATUS_GOOD) {
-        fprintf(stderr, "server init failed: 0x%08" PRIx32 "\n", (uint32_t)status);
+        (void)fprintf(stderr, "server init failed: 0x%08" PRIx32 "\n", (uint32_t)status);
         return 1;
     }
     return run_flow(server, requests);
@@ -494,16 +494,16 @@ static int write_output_file(const char *path, const char *json) {
 
     file = fopen(path, "wb");
     if (file == NULL) {
-        fprintf(stderr, "failed to open output path %s: %s\n", path, strerror(errno));
+        (void)fprintf(stderr, "failed to open output path %s: %s\n", path, strerror(errno));
         return 1;
     }
     if (fputs(json, file) == EOF) {
-        fprintf(stderr, "failed to write output path %s\n", path);
-        fclose(file);
+        (void)fprintf(stderr, "failed to write output path %s\n", path);
+        (void)fclose(file);
         return 1;
     }
     if (fclose(file) != 0) {
-        fprintf(stderr, "failed to close output path %s: %s\n", path, strerror(errno));
+        (void)fprintf(stderr, "failed to close output path %s: %s\n", path, strerror(errno));
         return 1;
     }
     return 0;
@@ -546,7 +546,7 @@ int main(int argc, char **argv) {
         }
         end_ns = monotonic_ns();
         if (end_ns == 0u || end_ns < start_ns) {
-            fprintf(stderr, "monotonic clock failed during benchmark\n");
+            (void)fprintf(stderr, "monotonic clock failed during benchmark\n");
             return 1;
         }
         total_ns += end_ns - start_ns;
@@ -568,10 +568,10 @@ int main(int argc, char **argv) {
                         options.scenario, options.iterations, options.warmup, total_ns, total_ns,
                         total_ns / options.iterations);
     if (json_len < 0 || (size_t)json_len >= sizeof(json)) {
-        fprintf(stderr, "failed to format benchmark JSON\n");
+        (void)fprintf(stderr, "failed to format benchmark JSON\n");
         return 1;
     }
 
-    fputs(json, stdout);
+    (void)fputs(json, stdout);
     return write_output_file(options.output_path, json);
 }

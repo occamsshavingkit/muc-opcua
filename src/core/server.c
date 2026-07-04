@@ -746,7 +746,7 @@ opcua_statuscode_t mu_server_poll(mu_server_t *server) {
         if (conn->client_handle != NULL && consumed > 0) {
             size_t remaining = conn->rx_len - consumed;
             if (remaining > 0) {
-                memmove(conn->rx_buffer, conn->rx_buffer + consumed, remaining);
+                (void)memmove(conn->rx_buffer, conn->rx_buffer + consumed, remaining);
             }
             conn->rx_len = remaining;
         }
@@ -861,7 +861,7 @@ opcua_statuscode_t mu_server_poll(mu_server_t *server) {
     if (server_client_handle != NULL && consumed > 0) {
         size_t remaining = server_rx_len - consumed;
         if (remaining > 0) {
-            memmove(server->config.receive_buffer, server->config.receive_buffer + consumed, remaining);
+            (void)memmove(server->config.receive_buffer, server->config.receive_buffer + consumed, remaining);
         }
         server_rx_len = remaining;
     }

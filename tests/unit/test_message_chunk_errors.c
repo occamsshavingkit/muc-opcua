@@ -316,7 +316,7 @@ void test_message_chunk_incomplete_declared_chunk_waits_without_dispatch(void) {
     } storage;
     mu_server_t *server = NULL;
 
-    memset(&transport, 0, sizeof(transport));
+    (void)memset(&transport, 0, sizeof(transport));
     enqueue_request(&transport, chunk_prefix, sizeof(chunk_prefix));
 
     configure_transport_server(&config, &transport, rx, tx);

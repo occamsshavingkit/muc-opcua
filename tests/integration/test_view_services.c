@@ -364,7 +364,7 @@ void test_register_and_unregister_nodes(void) {
 
 void test_browse_next_invalid_continuation_point(void) {
     mock_t mock;
-    memset(&mock, 0, sizeof(mock));
+    (void)memset(&mock, 0, sizeof(mock));
     enqueue_connect(&mock);
     opcua_byte_t tmp[512], chunk[512];
     mu_binary_writer_t w;

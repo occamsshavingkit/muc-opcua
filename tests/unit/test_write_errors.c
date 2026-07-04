@@ -233,7 +233,7 @@ void test_write_datavalue_without_value_returns_type_mismatch_without_callback(v
 
 void test_write_service_non_value_attribute(void) {
     mu_server_t server;
-    memset(&server, 0, sizeof(server));
+    (void)memset(&server, 0, sizeof(server));
 
     mu_node_t node;
     node.node_id = (mu_nodeid_t){1, MU_NODEID_NUMERIC, {.numeric = 5001}};
@@ -354,7 +354,7 @@ void test_write_service_index_range(void) {
     mu_address_space_t address_space = {&node, 1};
     server.config.address_space = &address_space;
     server.config.write_handler = dummy_write_handler;
-    memset(&server.user_address_space_index, 0, sizeof(server.user_address_space_index));
+    (void)memset(&server.user_address_space_index, 0, sizeof(server.user_address_space_index));
 
     opcua_byte_t req_buffer[128];
     mu_binary_writer_t writer;
@@ -383,7 +383,7 @@ void test_write_service_index_range(void) {
     mu_binary_write_string(&writer, &index_range);
 
     mu_datavalue_t dv;
-    memset(&dv, 0, sizeof(dv));
+    (void)memset(&dv, 0, sizeof(dv));
     dv.has_value = true;
     dv.has_status = false;
     dv.has_source_timestamp = false;

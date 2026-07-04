@@ -398,7 +398,7 @@ static void check_file_traceability(const char *dir_path) {
         }
 
         char path[1024];
-        snprintf(path, sizeof(path), "%s/%s", dir_path, entry->d_name);
+        (void)snprintf(path, sizeof(path), "%s/%s", dir_path, entry->d_name);
 
         struct stat st;
         if (stat(path, &st) == 0) {
@@ -413,7 +413,7 @@ static void check_file_traceability(const char *dir_path) {
                        Let's just check if the basename is present. */
                     if (strstr(files_to_sections_content, entry->d_name) == NULL) {
                         char msg[1024];
-                        snprintf(msg, sizeof(msg), "File %s missing from files-to-sections.md", entry->d_name);
+                        (void)snprintf(msg, sizeof(msg), "File %s missing from files-to-sections.md", entry->d_name);
                         TEST_FAIL_MESSAGE(msg);
                     }
                 }
@@ -426,20 +426,20 @@ static void check_file_traceability(const char *dir_path) {
 void test_traceability_completeness(void) {
     /* Read files-to-sections.md */
     char path[1024];
-    snprintf(path, sizeof(path), "%s/docs/traceability/files-to-sections.md", PROJECT_ROOT_DIR);
+    (void)snprintf(path, sizeof(path), "%s/docs/traceability/files-to-sections.md", PROJECT_ROOT_DIR);
     read_file_content(path, files_to_sections_content, sizeof(files_to_sections_content));
     TEST_ASSERT_MESSAGE(strlen(files_to_sections_content) > 0, "Could not read files-to-sections.md");
 
-    snprintf(path, sizeof(path), "%s/src", PROJECT_ROOT_DIR);
+    (void)snprintf(path, sizeof(path), "%s/src", PROJECT_ROOT_DIR);
     check_file_traceability(path);
-    snprintf(path, sizeof(path), "%s/include", PROJECT_ROOT_DIR);
+    (void)snprintf(path, sizeof(path), "%s/include", PROJECT_ROOT_DIR);
     check_file_traceability(path);
 }
 
 void test_mcp_provenance_coverage(void) {
     /* Read opcua-mcp-queries.md */
     char path[1024];
-    snprintf(path, sizeof(path), "%s/docs/traceability/opcua-mcp-queries.md", PROJECT_ROOT_DIR);
+    (void)snprintf(path, sizeof(path), "%s/docs/traceability/opcua-mcp-queries.md", PROJECT_ROOT_DIR);
     read_file_content(path, queries_content, sizeof(queries_content));
     TEST_ASSERT_MESSAGE(strlen(queries_content) > 0, "Could not read opcua-mcp-queries.md");
 
@@ -515,7 +515,7 @@ void test_traceability_docs_cited_opc_sections_have_file_mappings(void) {
     size_t i;
 
     failures[0] = '\0';
-    snprintf(path, sizeof(path), "%s/docs/traceability/sections-to-files.md", PROJECT_ROOT_DIR);
+    (void)snprintf(path, sizeof(path), "%s/docs/traceability/sections-to-files.md", PROJECT_ROOT_DIR);
     read_file_content(path, sections_to_files_content, sizeof(sections_to_files_content));
     TEST_ASSERT_MESSAGE(strlen(sections_to_files_content) > 0, "Could not read sections-to-files.md");
 
@@ -524,7 +524,7 @@ void test_traceability_docs_cited_opc_sections_have_file_mappings(void) {
             find_section_mapping_row(sections_to_files_content, cited_sections[i].part, cited_sections[i].section);
         char label[64];
 
-        snprintf(label, sizeof(label), "OPC-10000-%s section %s", cited_sections[i].part, cited_sections[i].section);
+        (void)snprintf(label, sizeof(label), "OPC-10000-%s section %s", cited_sections[i].part, cited_sections[i].section);
         if (!row) {
             append_traceability_failure(failures, sizeof(failures), label, "missing from sections-to-files.md");
             continue;
@@ -553,7 +553,7 @@ void test_optimize_hot_paths_binary_traceability_rows_have_source_and_evidence_m
     size_t i;
 
     failures[0] = '\0';
-    snprintf(path, sizeof(path), "%s/docs/traceability/022-optimize-hot-paths.md", PROJECT_ROOT_DIR);
+    (void)snprintf(path, sizeof(path), "%s/docs/traceability/022-optimize-hot-paths.md", PROJECT_ROOT_DIR);
     read_file_content(path, optimize_hot_paths_content, sizeof(optimize_hot_paths_content));
     TEST_ASSERT_MESSAGE(strlen(optimize_hot_paths_content) > 0, "Could not read 022-optimize-hot-paths.md");
 
@@ -715,7 +715,7 @@ void test_023_feature_traceability_pubsub_rows_have_sections_sources_and_evidenc
     size_t i;
 
     failures[0] = '\0';
-    snprintf(path, sizeof(path), "%s/docs/traceability/023-conformance-docs-subscriber.md", PROJECT_ROOT_DIR);
+    (void)snprintf(path, sizeof(path), "%s/docs/traceability/023-conformance-docs-subscriber.md", PROJECT_ROOT_DIR);
     read_file_content(path, feature_023_content, sizeof(feature_023_content));
     TEST_ASSERT_MESSAGE(strlen(feature_023_content) > 0, "Could not read 023-conformance-docs-subscriber.md");
 

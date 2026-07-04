@@ -83,7 +83,7 @@ static opcua_statuscode_t m_aes128_cbc_encrypt(void *context, const opcua_byte_t
         return MU_STATUS_BAD_INTERNALERROR;
     }
     opcua_byte_t iv_copy[16];
-    memcpy(iv_copy, iv, 16);
+    (void)memcpy(iv_copy, iv, 16);
     ret = mbedtls_aes_crypt_cbc(&aes, MBEDTLS_AES_ENCRYPT, length, iv_copy, input, output);
     mbedtls_aes_free(&aes);
     return (ret == 0) ? MU_STATUS_GOOD : MU_STATUS_BAD_INTERNALERROR;
@@ -215,15 +215,17 @@ static opcua_statuscode_t m_rsa_oaep_encrypt(void *context, const opcua_byte_t *
 static opcua_statuscode_t m_rsa_pss_sha256_sign(void *context, const opcua_byte_t *data, size_t length,
                                                 opcua_byte_t *signature, size_t *signature_length) {
     struct mbedtls_crypto_context *ctx = (struct mbedtls_crypto_context *)context;
-    if (mbedtls_pk_get_type(&ctx->pk) != MBEDTLS_PK_RSA)
+    if (mbedtls_pk_get_type(&ctx->pk) != MBEDTLS_PK_RSA) {
         return MU_STATUS_BAD_INTERNALERROR;
+    }
     mbedtls_rsa_context *rsa = mbedtls_pk_rsa(ctx->pk);
     mbedtls_rsa_set_padding(rsa, MBEDTLS_RSA_PKCS_V21, MBEDTLS_MD_SHA256);
 
     opcua_byte_t hash[32];
     int ret = mbedtls_sha256_ret(data, length, hash, 0);
-    if (ret != 0)
+    if (ret != 0) {
         return MU_STATUS_BAD_INTERNALERROR;
+    }
 
     mbedtls_entropy_context entropy;
     mbedtls_ctr_drbg_context ctr_drbg;

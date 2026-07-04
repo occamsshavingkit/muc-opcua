@@ -148,7 +148,7 @@ static size_t build_create_session_body(opcua_byte_t *buf, size_t cap, opcua_dou
 
 void test_dispatch_create_session_honors_timeout(void) {
     mu_server_t server;
-    memset(&server, 0, sizeof(server));
+    (void)memset(&server, 0, sizeof(server));
     server.secure_channel.is_open = true;
     mu_session_init(&server.sessions[0]);
     server.config.time_adapter.get_time = fake_time;
@@ -741,7 +741,7 @@ void test_dispatch_browse(void) {
 }
 
 static void discovery_server(mu_server_t *server) {
-    memset(server, 0, sizeof(*server));
+    (void)memset(server, 0, sizeof(*server));
     server->secure_channel.is_open = true;
     server->config.endpoint_url = "opc.tcp://localhost:4840";
     server->config.application_uri = "urn:test:app";

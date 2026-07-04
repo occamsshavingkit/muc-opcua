@@ -210,7 +210,7 @@ void test_write_service_basic(void) {
     mu_binary_write_string(&writer, &audit_id); // indexRange (null)
 
     mu_datavalue_t dv;
-    memset(&dv, 0, sizeof(dv));
+    (void)memset(&dv, 0, sizeof(dv));
     dv.has_value = true;
     dv.has_status = false;
     dv.has_source_timestamp = false;
@@ -391,7 +391,7 @@ void test_write_service_type_mismatch(void) {
 
 void test_write_service_batch(void) {
     mu_server_t server;
-    memset(&server, 0, sizeof(server));
+    (void)memset(&server, 0, sizeof(server));
 
     mu_node_t nodes[2];
     (void)memset(nodes, 0, sizeof(nodes));
@@ -424,7 +424,7 @@ void test_write_service_batch(void) {
     server.config.address_space = &address_space;
     server.config.write_handler = mock_write_handler;
 
-    memset(&server.user_address_space_index, 0, sizeof(server.user_address_space_index));
+    (void)memset(&server.user_address_space_index, 0, sizeof(server.user_address_space_index));
 
     opcua_byte_t req_buffer[512];
     mu_binary_writer_t writer;

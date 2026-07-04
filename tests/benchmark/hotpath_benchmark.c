@@ -298,26 +298,26 @@ static int parse_options(int argc, char **argv, bench_options_t *options) {
                 return 2;
             }
         } else {
-            fprintf(stderr, "unknown option: %s\n", arg);
+            (void)fprintf(stderr, "unknown option: %s\n", arg);
             print_usage(stderr, argv[0]);
             return 2;
         }
     }
 
     if (options->scenario == SCENARIO_UNKNOWN) {
-        fprintf(stderr, "unsupported scenario name: %s\n", options->scenario_name);
+        (void)fprintf(stderr, "unsupported scenario name: %s\n", options->scenario_name);
         return 2;
     }
     if (options->nodes == 0u || options->nodes > MAX_BENCH_NODES) {
-        fprintf(stderr, "--nodes must be in the range 1..%u\n", (unsigned)MAX_BENCH_NODES);
+        (void)fprintf(stderr, "--nodes must be in the range 1..%u\n", (unsigned)MAX_BENCH_NODES);
         return 2;
     }
     if (options->batch == 0u || options->batch > MAX_BENCH_BATCH) {
-        fprintf(stderr, "--batch must be in the range 1..%u\n", (unsigned)MAX_BENCH_BATCH);
+        (void)fprintf(stderr, "--batch must be in the range 1..%u\n", (unsigned)MAX_BENCH_BATCH);
         return 2;
     }
     if (options->iterations == 0u) {
-        fprintf(stderr, "--iterations must be greater than zero\n");
+        (void)fprintf(stderr, "--iterations must be greater than zero\n");
         return 2;
     }
 
@@ -383,7 +383,7 @@ static opcua_statuscode_t build_write_request(const bench_options_t *options, op
     for (size_t i = 0; i < options->batch; ++i) {
         mu_nodeid_t node_id = {1u, MU_NODEID_NUMERIC, {BENCH_NODE_BASE + (opcua_uint32_t)(i % options->nodes)}};
         mu_datavalue_t value;
-        memset(&value, 0, sizeof(value));
+        (void)memset(&value, 0, sizeof(value));
         value.has_value = true;
         if (options->scenario == SCENARIO_WRITE_BAD_TYPE) {
             value.value.type = MU_TYPE_STRING;
@@ -458,7 +458,7 @@ static opcua_statuscode_t init_server(size_t node_count, mu_server_t **server) {
     mu_server_config_t config;
 
     init_address_space(node_count, &bench_address_space);
-    memset(&config, 0, sizeof(config));
+    (void)memset(&config, 0, sizeof(config));
     config.endpoint_url = "opc.tcp://host:4840";
     config.application_uri = "urn:muc-opcua:hotpath-benchmark";
     config.product_uri = "urn:muc-opcua:hotpath-benchmark";

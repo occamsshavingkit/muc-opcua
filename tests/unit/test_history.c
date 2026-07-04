@@ -217,8 +217,8 @@ void test_history_read_decode_continuation_point_is_owned_from_request_buffer(vo
 
     mu_history_read_request_t req;
     mu_history_read_value_id_t nodes[1];
-    memset(&req, 0, sizeof(req));
-    memset(nodes, 0, sizeof(nodes));
+    (void)memset(&req, 0, sizeof(req));
+    (void)memset(nodes, 0, sizeof(nodes));
 
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_history_read_request_decode(&r, &req, nodes, 1));
     TEST_ASSERT_EQUAL(1, req.num_nodes_to_read);
@@ -906,16 +906,16 @@ void test_history_update_decode_rejects_negative_length(void) {
 void test_history_update_dispatch(void) {
 #ifdef MUC_OPCUA_SERVICE_HISTORY
     mu_history_adapter_t adapter;
-    memset(&adapter, 0, sizeof(adapter));
+    (void)memset(&adapter, 0, sizeof(adapter));
     adapter.update_data = mock_update_data;
     adapter.delete_raw_modified = mock_delete_raw_modified;
 
     mu_server_config_t config;
-    memset(&config, 0, sizeof(config));
+    (void)memset(&config, 0, sizeof(config));
     config.history_adapter = adapter;
 
     struct mu_server server;
-    memset(&server, 0, sizeof(server));
+    (void)memset(&server, 0, sizeof(server));
     server.config = config;
 
     opcua_byte_t req_buf[256];

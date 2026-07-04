@@ -279,7 +279,7 @@ void test_create_session_two_successful_responses_use_fresh_session_ids_and_toke
 
 void test_create_session_overflow_returns_bad_toomanysessions_without_allocating(void) {
     mu_server_t server;
-    memset(&server, 0, sizeof(server));
+    (void)memset(&server, 0, sizeof(server));
     server.secure_channel.is_open = true;
     server.config.time_adapter.get_time = fake_time;
     server.config.entropy_adapter.generate_random = fake_entropy;
@@ -323,7 +323,7 @@ void test_create_session_server_nonce_entropy_failure_returns_bad_securitychecks
     }
 
     mu_session_t sessions_before[MU_MAX_SESSIONS];
-    memcpy(sessions_before, server.sessions, sizeof(sessions_before));
+    (void)memcpy(sessions_before, server.sessions, sizeof(sessions_before));
     mu_session_t *active_session_before = server.active_session;
 
     opcua_byte_t request[256];

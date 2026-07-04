@@ -412,8 +412,8 @@ opcua_statuscode_t mu_asym_chunk_unwrap(const mu_crypto_adapter_t *crypto, const
         return MU_STATUS_BAD_SECURITYCHECKSFAILED;
     }
     opcua_byte_t *verify_buf = scratch + MU_ASYM_MAX_PLAINTEXT;
-    memcpy(verify_buf, chunk, hdr_len);
-    memcpy(verify_buf + hdr_len, plain, signed_len);
+    (void)memcpy(verify_buf, chunk, hdr_len);
+    (void)memcpy(verify_buf + hdr_len, plain, signed_len);
     if (info->policy == MU_SECURITY_POLICY_AES256_SHA256_RSAPSS_ID) {
         s = crypto->rsa_pss_sha256_verify(crypto->context, info->sender_cert, info->sender_cert_len, verify_buf,
                                           hdr_len + signed_len, signature, sig_len);

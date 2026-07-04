@@ -88,7 +88,7 @@ void test_none_passthrough(void) {
     opcua_byte_t recovered[512];
     size_t recovered_len = 0;
     mu_asym_chunk_info_t info;
-    memset(&info, 0, sizeof(info));
+    (void)memset(&info, 0, sizeof(info));
     opcua_byte_t scratch[6144];
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD,
                       mu_asym_chunk_unwrap(&server_crypto, chunk, chunk_len, recovered, sizeof(recovered),

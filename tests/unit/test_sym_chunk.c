@@ -252,7 +252,7 @@ void test_cipher_context_falls_back_to_stateless_without_init_callback(void) {
         const opcua_byte_t *recovered = NULL;
         size_t recovered_len = 0;
         mu_sym_chunk_info_t info;
-        memset(&info, 0, sizeof(info));
+        (void)memset(&info, 0, sizeof(info));
         TEST_ASSERT_EQUAL(MU_STATUS_GOOD,
                           mu_sym_chunk_unwrap(&adapter, MU_MESSAGE_SECURITY_MODE_SIGN_AND_ENCRYPT, &local_keys, chunk,
                                               chunk_len, &recovered, &recovered_len, &info));

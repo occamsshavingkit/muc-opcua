@@ -284,7 +284,7 @@ static void assert_opn_entropy_failure_returns_security_checks_failed(void) {
     opcua_uint32_t response_type;
     opcua_statuscode_t service_result;
 
-    memset(&transport, 0, sizeof(transport));
+    (void)memset(&transport, 0, sizeof(transport));
 
     len = build_hello(chunk, sizeof(chunk));
     enqueue_request(&transport, chunk, len);

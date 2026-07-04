@@ -65,8 +65,9 @@ static void require_bad_decoding_for_overdeclared_length(uint32_t declared_lengt
         status = mu_binary_read_string(&reader, &value);
     }
 
-    if (status != MU_STATUS_BAD_DECODINGERROR || reader.status != MU_STATUS_BAD_DECODINGERROR)
+    if (status != MU_STATUS_BAD_DECODINGERROR || reader.status != MU_STATUS_BAD_DECODINGERROR) {
         abort();
+    }
 }
 
 int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {

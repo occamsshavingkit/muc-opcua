@@ -694,7 +694,7 @@ void test_aggregate_filter_maximum_scoped_support(void) {
     item->aggregate_state.processing_interval = 100.0;
     item->aggregate_state.last_calculation = 0;
     item->aggregate_state.sample_count = 0;
-    memset(&item->aggregate_state.accumulator, 0, sizeof(item->aggregate_state.accumulator));
+    (void)memset(&item->aggregate_state.accumulator, 0, sizeof(item->aggregate_state.accumulator));
     item->sampling_interval_ms = 10;
     item->next_sample_ms = 10;
     item->queue_head = 0;

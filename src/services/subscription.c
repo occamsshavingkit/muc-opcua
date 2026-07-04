@@ -656,7 +656,7 @@ static void clear_reported_items(struct mu_server *server, const mu_subscription
     opcua_int32_t remaining = report_count;
     bool triggered_items[MU_MAX_MONITORED_ITEMS];
 
-    memset(triggered_items, 0, sizeof(triggered_items));
+    (void)memset(triggered_items, 0, sizeof(triggered_items));
     for (size_t i = 0; i < MU_MAX_MONITORED_ITEMS; ++i) {
         triggered_items[i] = monitored_item_reports_by_trigger(server, sub, &server->subs.monitored_items[i]);
     }
@@ -765,7 +765,7 @@ static opcua_statuscode_t write_data_change_notification(mu_binary_writer_t *w, 
         }
 
         mu_datavalue_t dv;
-        memset(&dv, 0, sizeof(dv));
+        (void)memset(&dv, 0, sizeof(dv));
         dv.has_value = true;
         dv.value = item->last_value;
         if (item->last_status != MU_STATUS_GOOD) {
@@ -773,8 +773,9 @@ static opcua_statuscode_t write_data_change_notification(mu_binary_writer_t *w, 
             dv.status = item->last_status;
         }
         s = mu_binary_write_datavalue(w, &dv);
-        if (s != MU_STATUS_GOOD)
+        if (s != MU_STATUS_GOOD) {
             return s;
+        }
 #endif
     }
 
@@ -885,7 +886,7 @@ static opcua_statuscode_t write_event_notification_list(mu_binary_writer_t *w, s
                 for (opcua_byte_t j = 0; j < item->select_clauses_count; ++j) {
                     opcua_byte_t field_type = item->select_clauses[j];
                     mu_variant_t var;
-                    memset(&var, 0, sizeof(var));
+                    (void)memset(&var, 0, sizeof(var));
 
                     switch (field_type) {
                     case 1:
@@ -929,7 +930,7 @@ static opcua_statuscode_t write_event_notification_list(mu_binary_writer_t *w, s
     if (w->position + sub_w.position > w->length) {
         return MU_STATUS_BAD_OUTOFMEMORY;
     }
-    memcpy(w->buffer + w->position, body_buf, sub_w.position);
+    (void)memcpy(w->buffer + w->position, body_buf, sub_w.position);
     w->position += sub_w.position;
     return MU_STATUS_GOOD;
 }
@@ -1090,7 +1091,7 @@ static void store_retransmit(mu_subscription_t *sub, opcua_uint32_t sequence_num
 
     sub->retransmit.sequence_number = sequence_number;
     sub->retransmit.publish_time = publish_time;
-    memcpy(sub->retransmit.message, body, body_length);
+    (void)memcpy(sub->retransmit.message, body, body_length);
     sub->retransmit.message_len = body_length;
     sub->retransmit.valid = true;
 }
@@ -1263,7 +1264,7 @@ static void publish_due(struct mu_server *server, opcua_uint64_t now_ms) {
 
 void mu_subscriptions_init(mu_subscriptions_t *subs) {
     if (subs != NULL) {
-        memset(subs, 0, sizeof(*subs));
+        (void)memset(subs, 0, sizeof(*subs));
         subs->next_subscription_id = 1u;
         subs->next_monitored_item_id = 1u;
     }
@@ -1282,7 +1283,7 @@ opcua_statuscode_t mu_publish_request_enqueue(mu_subscriptions_t *subs, opcua_ui
     for (size_t i = 0; i < MU_MAX_PUBLISH_REQUESTS; ++i) {
         mu_publish_request_t *slot = &subs->publish_queue[i];
         if (!slot->in_use) {
-            memset(slot, 0, sizeof(*slot));
+            (void)memset(slot, 0, sizeof(*slot));
             slot->in_use = true;
             slot->session_id = session_id;
             slot->request_id = request_id;

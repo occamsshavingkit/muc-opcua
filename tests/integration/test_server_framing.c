@@ -182,7 +182,7 @@ void test_coalesced_messages_both_processed(void) {
 /* A single message split across two reads must be reassembled and answered once. */
 void test_split_message_reassembled(void) {
     mock_t mock;
-    memset(&mock, 0, sizeof(mock));
+    (void)memset(&mock, 0, sizeof(mock));
     size_t h = build_hello(mock.feed);
     mock.feed_len = h;
     mock.chunk = 5; /* deliver 5 bytes per read -> HEL header spans multiple reads */

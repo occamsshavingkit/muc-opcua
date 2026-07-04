@@ -114,8 +114,9 @@ static opcua_statuscode_t h_cipher_ctx_init(void *c, const opcua_byte_t *key, op
     }
 
     struct host_cipher_context *handle = (struct host_cipher_context *)calloc(1, sizeof(*handle));
-    if (!handle)
+    if (!handle) {
         return MU_STATUS_BAD_OUTOFMEMORY;
+    }
 
     handle->encrypt = EVP_CIPHER_CTX_new();
     handle->decrypt = EVP_CIPHER_CTX_new();
@@ -150,8 +151,9 @@ static opcua_statuscode_t aes_cbc_ctx(EVP_CIPHER_CTX *ctx, const opcua_byte_t *i
                      : (EVP_DecryptInit_ex(ctx, NULL, NULL, NULL, iv) == 1 && EVP_CIPHER_CTX_set_padding(ctx, 0) == 1 &&
                         EVP_DecryptUpdate(ctx, out, &outl, in, (int)len) == 1 &&
                         EVP_DecryptFinal_ex(ctx, out + outl, &finl) == 1);
-    if (ok)
+    if (ok) {
         rc = MU_STATUS_GOOD;
+    }
     return rc;
 }
 
@@ -170,8 +172,9 @@ static opcua_statuscode_t h_aes_encrypt_ctx(void *c, opcua_byte_t *ctx_storage, 
 static opcua_statuscode_t h_aes_decrypt_ctx(void *c, opcua_byte_t *ctx_storage, const opcua_byte_t *iv,
                                             const opcua_byte_t *in, size_t len, opcua_byte_t *out) {
     (void)c;
-    if (!ctx_storage)
+    if (!ctx_storage) {
         return MU_STATUS_BAD_INTERNALERROR;
+    }
     struct host_cipher_context *handle = load_cipher_handle(ctx_storage);
     if (!handle)
         return MU_STATUS_BAD_INTERNALERROR;
@@ -269,8 +272,9 @@ static opcua_statuscode_t h_rsa_oaep_encrypt(void *c, const opcua_byte_t *cert, 
                                              size_t len, opcua_byte_t *out, size_t *out_len) {
     (void)c;
     EVP_PKEY *pk = pubkey_from_cert(cert, cert_len);
-    if (!pk)
+    if (!pk) {
         return MU_STATUS_BAD_SECURITYCHECKSFAILED;
+    }
     opcua_statuscode_t rc = rsa_oaep(pk, 1, in, len, out, out_len);
     EVP_PKEY_free(pk);
     return rc;
@@ -280,8 +284,9 @@ static opcua_statuscode_t h_rsa_pss_sha256_sign(void *c, const opcua_byte_t *dat
                                                 size_t *sig_len) {
     struct host_crypto_context *cx = (struct host_crypto_context *)c;
     EVP_MD_CTX *md = EVP_MD_CTX_new();
-    if (!md)
+    if (!md) {
         return MU_STATUS_BAD_OUTOFMEMORY;
+    }
     opcua_statuscode_t rc = MU_STATUS_BAD_INTERNALERROR;
     size_t sl = *sig_len;
     EVP_PKEY_CTX *pctx = NULL;
@@ -324,8 +329,9 @@ static opcua_statuscode_t h_rsa_pss_sha256_verify(void *c, const opcua_byte_t *c
 static opcua_statuscode_t rsa_oaep_sha256(EVP_PKEY *pk, int encrypt, const opcua_byte_t *in, size_t in_len,
                                           opcua_byte_t *out, size_t *out_len) {
     EVP_PKEY_CTX *pc = EVP_PKEY_CTX_new(pk, NULL);
-    if (!pc)
+    if (!pc) {
         return MU_STATUS_BAD_INTERNALERROR;
+    }
     opcua_statuscode_t rc = MU_STATUS_BAD_INTERNALERROR;
     size_t ol = *out_len;
     int init_ok = encrypt ? (EVP_PKEY_encrypt_init(pc) == 1) : (EVP_PKEY_decrypt_init(pc) == 1);
@@ -380,8 +386,9 @@ static opcua_statuscode_t h_verify_certificate_validity(void *c, const opcua_byt
     (void)c;
     const unsigned char *p = cert;
     X509 *x = d2i_X509(NULL, &p, (long)cert_len);
-    if (!x)
+    if (!x) {
         return MU_STATUS_BAD_CERTIFICATEINVALID;
+    }
     /* X509_cmp_time(t, NULL) compares against the current time: <0 if t is in the
        past, >0 if in the future. notBefore must be past, notAfter must be future. */
     int not_before = X509_cmp_time(X509_get0_notBefore(x), NULL);
@@ -447,14 +454,17 @@ opcua_statuscode_t mu_host_crypto_adapter_init(mu_crypto_adapter_t *adapter) {
     }
 
     struct host_crypto_context *cx = (struct host_crypto_context *)calloc(1, sizeof(*cx));
-    if (!cx)
+    if (!cx) {
         return MU_STATUS_BAD_OUTOFMEMORY;
+    }
 
     if (!build_self_signed(cx)) {
-        if (cx->key)
+        if (cx->key) {
             EVP_PKEY_free(cx->key);
-        if (cx->cert_der)
+        }
+        if (cx->cert_der) {
             OPENSSL_free(cx->cert_der);
+        }
         free(cx);
         return MU_STATUS_BAD_INTERNALERROR;
     }
@@ -486,8 +496,9 @@ opcua_statuscode_t mu_host_crypto_adapter_init(mu_crypto_adapter_t *adapter) {
 }
 
 void mu_host_crypto_adapter_cleanup(mu_crypto_adapter_t *adapter) {
-    if (!adapter || !adapter->context)
+    if (!adapter || !adapter->context) {
         return;
+    }
     struct host_crypto_context *cx = (struct host_crypto_context *)adapter->context;
     if (cx->key)
         EVP_PKEY_free(cx->key);

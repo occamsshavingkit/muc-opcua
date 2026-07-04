@@ -432,7 +432,7 @@ void test_create_subscription(void) {
    service result Bad_TooManySubscriptions (OPC 10000-4 §5.14.2.3). */
 void test_create_subscription_too_many(void) {
     mock_t mock;
-    memset(&mock, 0, sizeof(mock));
+    (void)memset(&mock, 0, sizeof(mock));
     enqueue_connect(&mock);
     enqueue_create_subscription(&mock, 4, 1000.0, 100, 10);
     enqueue_create_subscription(&mock, 5, 1000.0, 100, 10);

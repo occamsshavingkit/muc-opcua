@@ -378,7 +378,7 @@ void test_AddNodes_StringNodeIdStableAfterRequestBufferOverwrite(void) {
     /* OPC-10000-4 section 5.8.2.2 AddNodes defines requestedNewNodeId as the
        requested ExpandedNodeId of the Node to add; the stored string NodeId
        must not alias transient request bytes that later traffic can overwrite. */
-    memset(buffer, 0xA5, sizeof(buffer));
+    (void)memset(buffer, 0xA5, sizeof(buffer));
 
     const mu_node_t *node = &server.dynamic_address_space.nodes[0];
     TEST_ASSERT_EQUAL_UINT16(1, node->node_id.namespace_index);

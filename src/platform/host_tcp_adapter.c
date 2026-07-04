@@ -67,8 +67,9 @@ static opcua_statuscode_t host_listen(void *context, const char *endpoint_url) {
 
 static opcua_statuscode_t host_accept(void *context, void **connection_handle) {
     struct host_tcp_context *ctx = (struct host_tcp_context *)context;
-    if (ctx->server_fd < 0)
+    if (ctx->server_fd < 0) {
         return MU_STATUS_BAD_INTERNALERROR;
+    }
 
     struct sockaddr_in client_addr;
     socklen_t addr_len = sizeof(client_addr);

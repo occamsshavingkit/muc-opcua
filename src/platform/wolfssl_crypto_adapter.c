@@ -89,8 +89,9 @@ static opcua_statuscode_t w_aes128_cbc_encrypt(void *context, const opcua_byte_t
     if (wc_AesSetKey(&aes, key, 16, iv, AES_ENCRYPTION) != 0) {
         return MU_STATUS_BAD_INTERNALERROR;
     }
-    if (wc_AesCbcEncrypt(&aes, output, input, (word32)length) != 0)
+    if (wc_AesCbcEncrypt(&aes, output, input, (word32)length) != 0) {
         return MU_STATUS_BAD_INTERNALERROR;
+    }
     return MU_STATUS_GOOD;
 }
 
@@ -101,8 +102,9 @@ static opcua_statuscode_t w_aes128_cbc_decrypt(void *context, const opcua_byte_t
     if (wc_AesSetKey(&aes, key, 16, iv, AES_DECRYPTION) != 0) {
         return MU_STATUS_BAD_INTERNALERROR;
     }
-    if (wc_AesCbcDecrypt(&aes, output, input, (word32)length) != 0)
+    if (wc_AesCbcDecrypt(&aes, output, input, (word32)length) != 0) {
         return MU_STATUS_BAD_INTERNALERROR;
+    }
     return MU_STATUS_GOOD;
 }
 
@@ -111,10 +113,12 @@ static opcua_statuscode_t w_rsa_sha256_sign(void *context, const opcua_byte_t *d
     struct wolfssl_crypto_context *ctx = (struct wolfssl_crypto_context *)context;
     opcua_byte_t hash[32];
     wc_Sha256 sha;
-    if (wc_InitSha256(&sha) != 0)
+    if (wc_InitSha256(&sha) != 0) {
         return MU_STATUS_BAD_INTERNALERROR;
-    if (wc_Sha256Update(&sha, data, (word32)length) != 0)
+    }
+    if (wc_Sha256Update(&sha, data, (word32)length) != 0) {
         return MU_STATUS_BAD_INTERNALERROR;
+    }
     if (wc_Sha256Final(&sha, hash) != 0) {
         return MU_STATUS_BAD_INTERNALERROR;
     }
@@ -183,8 +187,9 @@ static opcua_statuscode_t w_rsa_oaep_decrypt(void *context, const opcua_byte_t *
 
     int ret = wc_RsaPrivateDecrypt_ex(input, (word32)length, output, (word32)*output_length, &ctx->key, WC_RSA_OAEP_PAD,
                                       WC_HASH_TYPE_SHA, WC_MGF1SHA1, NULL, 0);
-    if (ret < 0)
+    if (ret < 0) {
         return MU_STATUS_BAD_SECURITYCHECKSFAILED;
+    }
     *output_length = (size_t)ret;
     return MU_STATUS_GOOD;
 }
@@ -234,8 +239,9 @@ static opcua_statuscode_t w_rsa_pss_sha256_sign(void *context, const opcua_byte_
         return MU_STATUS_BAD_INTERNALERROR;
     if (wc_Sha256Update(&sha, data, (word32)length) != 0)
         return MU_STATUS_BAD_INTERNALERROR;
-    if (wc_Sha256Final(&sha, hash) != 0)
+    if (wc_Sha256Final(&sha, hash) != 0) {
         return MU_STATUS_BAD_INTERNALERROR;
+    }
 
     int ret = wc_RsaPSS_Sign(hash, sizeof(hash), signature, (word32)*signature_length, WC_HASH_TYPE_SHA256,
                              WC_MGF1SHA256, &ctx->key, &ctx->rng);

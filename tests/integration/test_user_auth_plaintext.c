@@ -590,7 +590,7 @@ void test_anonymous_identity_token_succeeds_over_security_policy_none(void) {
 
 void test_getendpoints_security_policy_none_omits_username_identity_tokens(void) {
     mock_t mock;
-    memset(&mock, 0, sizeof(mock));
+    (void)memset(&mock, 0, sizeof(mock));
 
     opcua_byte_t tmp[512];
     opcua_byte_t chunk[512];
@@ -607,7 +607,7 @@ void test_getendpoints_security_policy_none_omits_username_identity_tokens(void)
     enqueue(&mock, chunk, clen);
 
     mu_server_config_t config;
-    memset(&config, 0, sizeof(config));
+    (void)memset(&config, 0, sizeof(config));
     config.endpoint_url = "opc.tcp://host:4840";
     config.application_uri = "urn:test";
     config.product_uri = "urn:test";
