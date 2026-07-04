@@ -64,6 +64,24 @@ opcua_statuscode_t mu_server_config_validate(const mu_server_config_t *config) {
         return MU_STATUS_BAD_INTERNALERROR;
     }
 
+    /* Validate the server's own certificate is within its validity window. */
+    if (config->crypto_adapter != NULL) {
+        const opcua_byte_t *own_cert = NULL;
+        size_t own_cert_len = 0;
+        if (config->crypto_adapter->get_own_certificate != NULL &&
+            config->crypto_adapter->verify_certificate_validity != NULL) {
+            if (config->crypto_adapter->get_own_certificate(config->crypto_adapter->context,
+                                                            &own_cert, &own_cert_len) == MU_STATUS_GOOD) {
+                opcua_statuscode_t cert_status =
+                    config->crypto_adapter->verify_certificate_validity(config->crypto_adapter->context,
+                                                                        own_cert, own_cert_len);
+                if (cert_status != MU_STATUS_GOOD) {
+                    return cert_status;
+                }
+            }
+        }
+    }
+
     /* Validate address space if provided */
     if (config->address_space != NULL) {
         opcua_statuscode_t status = mu_address_space_validate(config->address_space);
@@ -114,6 +132,9 @@ opcua_statuscode_t mu_server_init(void *storage, size_t storage_size, const mu_s
     memset(server, 0, sizeof(struct mu_server));
     server->config = *config;
     server->user_address_space_index = (mu_address_space_index_t){0};
+    /* opn_pending_security_policy and opn_pending_client_cert are transient
+       pointers into the receive buffer, valid only within a single
+       mu_server_poll cycle (safe for single-threaded poll model). */
     server->opn_pending_security_policy.length = -1;
     server->opn_pending_security_policy.data = NULL;
     {
@@ -166,17 +187,9 @@ opcua_statuscode_t mu_server_init(void *storage, size_t storage_size, const mu_s
     return MU_STATUS_GOOD;
 }
 
-/* Secured-path response scratch — sized to hold the largest service response, a
-   GetEndpoints/CreateSession reply that carries the server certificate in each
-   advertised endpoint (~3.8 KiB with an RSA-2048 cert). */
-#define MU_SECURE_RESP_MAX 11264
-/* OPN request body (OpenSecureChannelRequest) is tiny; MSG requests are decrypted
-   in place in the receive buffer and need no scratch here. */
-#define MU_SECURE_OPN_REQ_MAX 1024
-
 #ifdef MUC_OPCUA_SECURITY
-_Static_assert(MU_SECURE_RESP_MAX + MU_SECURE_OPN_REQ_MAX <= MU_SECURE_SCRATCH_SIZE,
-               "secure scratch must hold response and OPN request buffers");
+_Static_assert(MU_SECURE_RESP_MAX + MU_SECURE_OPN_REQ_MAX + MU_SECURE_SESSION_MAX <= MU_SECURE_SCRATCH_SIZE,
+               "secure scratch must hold response, OPN request, and session-handshake buffers");
 #endif
 
 /* Connect-phase idle timeout: a peer that connects but does not open a secure

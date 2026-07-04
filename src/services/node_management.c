@@ -596,21 +596,23 @@ opcua_statuscode_t mu_delete_nodes_process(mu_server_t *server, mu_binary_reader
         }
 
         if (found) {
-            /* T020: Ensure DeleteNodes implementation also deletes all references to the deleted node */
-            size_t r_idx = 0;
-            while (r_idx < server->dynamic_address_space.references_count) {
-                mu_dynamic_reference_t *dyn_ref = &server->dynamic_address_space.references[r_idx];
+            if (items[i].delete_target_references) {
+                /* T020: Ensure DeleteNodes implementation also deletes all references to the deleted node */
+                size_t r_idx = 0;
+                while (r_idx < server->dynamic_address_space.references_count) {
+                    mu_dynamic_reference_t *dyn_ref = &server->dynamic_address_space.references[r_idx];
 
-                if (mu_nodeid_equal(&dyn_ref->source_node_id, &items[i].node_id) ||
-                    mu_nodeid_equal(&dyn_ref->ref.target_id, &items[i].node_id)) {
+                    if (mu_nodeid_equal(&dyn_ref->source_node_id, &items[i].node_id) ||
+                        mu_nodeid_equal(&dyn_ref->ref.target_id, &items[i].node_id)) {
 
-                    size_t last = --server->dynamic_address_space.references_count;
-                    if (r_idx != last) {
-                        mu_dynamic_reference_move(&server->dynamic_address_space, r_idx, last);
+                        size_t last = --server->dynamic_address_space.references_count;
+                        if (r_idx != last) {
+                            mu_dynamic_reference_move(&server->dynamic_address_space, r_idx, last);
+                        }
+                        /* Do not increment r_idx since we swapped in a new element to check */
+                    } else {
+                        r_idx++;
                     }
-                    /* Do not increment r_idx since we swapped in a new element to check */
-                } else {
-                    r_idx++;
                 }
             }
 

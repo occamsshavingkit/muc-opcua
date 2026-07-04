@@ -59,8 +59,8 @@ opcua_statuscode_t mu_history_read_request_decode(mu_binary_reader_t *reader, mu
     if (s != MU_STATUS_GOOD)
         return s;
 
-    // Ensure it's a byte string (bit 0)
-    if ((encoding_mask & 0x01) == 0)
+    // Only ByteString encoding is supported
+    if (encoding_mask != 0x01)
         return MU_STATUS_BAD_NOTSUPPORTED;
 
     opcua_int32_t length;

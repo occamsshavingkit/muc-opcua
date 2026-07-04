@@ -878,4 +878,34 @@ full-featured      51610        0        0      51610 build/size-arm/full-featur
   length field was updated to match (`{22, ...}` -> `{20, ...}`; the
   `examples/minimal_server` `NamespaceArray`/`ServerArray` URNs were fixed the
   same way, `{40, ...}` -> `{38, ...}`) so the wire-encoded String length is
-  exactly correct.
+   exactly correct.
+
+### Feature 025 (audit remediation) post-completion measurement
+
+- **Measured**: 2026-07-02 for Feature 025 completion. Handlers kept `static` in `service_dispatch.c` per project size constraint.
+- **Command**: `scripts/measure_size.sh all`
+
+```text
+profile              text     data      bss        dec archive
+nano           16436        0        0      16436 build/size-arm/nano/src/libmuc_opcua.a
+micro          23839        0        0      23839 build/size-arm/micro/src/libmuc_opcua.a
+embedded       44100        0        0      44100 build/size-arm/embedded/src/libmuc_opcua.a
+full-featured      52822        0        0      52822 build/size-arm/full-featured/src/libmuc_opcua.a
+```
+
+**Delta vs previous (Feature 024 T012):**
+
+| Profile | Previous | Current | Delta | Notes |
+|---|---|---|---|---|
+| nano | 16,278 | 16,436 | +158 | Gate fixes: ServerCertificate branch now behind `#ifdef MUC_OPCUA_SECURITY` |
+| micro | 23,785 | 23,839 | +54 | Gate fixes: RSA OAEP decrypt behind `#ifdef MUC_OPCUA_SECURITY`; security scratch macros gated |
+| embedded | 42,988 | 44,100 | +1,112 | Session scratch (+2KB), certificate trust hooks, ClientSignature verification |
+| full-featured | 51,610 | 52,822 | +1,212 | Embedded delta + full-featured overhead |
+
+**Key contributors to growth:**
+- `MU_SECURE_SCRATCH_SIZE`: 12,288 → 14,336 (+2,048 B) for session handshake buffers (embedded/full only)
+- Certificate validity hook call + trust-list fail-closed enforcement (embedded/full only)
+- Integer deadband branching in subscription hot path
+- Unconditional username-token ServerNonce anti-replay check
+- `.data = 0`, `.bss = 0` across all profiles (no-heap invariant preserved)
+

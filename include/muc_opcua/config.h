@@ -28,9 +28,9 @@
 
 /* E4: shared secure-path scratch owned by struct mu_server when
  * MUC_OPCUA_SECURITY is enabled. Sized for the worst-case secure response /
- * OPN scratch, replacing respbody[5120] + opn_buf[1024] stack buffers. */
+ * OPN scratch + session-handshake buffers (CreateSession/ActivateSession). */
 #ifndef MU_SECURE_SCRATCH_SIZE
-#define MU_SECURE_SCRATCH_SIZE 12288
+#define MU_SECURE_SCRATCH_SIZE 14336
 #endif
 
 /* Feature 025 (F2/F5): persistent copy of the current SecureChannel's client

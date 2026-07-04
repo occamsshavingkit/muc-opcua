@@ -152,7 +152,7 @@ opcua_statuscode_t mu_query_first_request_decode(mu_binary_reader_t *reader, mu_
     if (count == (opcua_uint32_t)-1)
         count = 0;
     if (count > max_node_types)
-        return MU_STATUS_BAD_OUTOFMEMORY;
+        return MU_STATUS_BAD_TOOMANYOPERATIONS;
 
     req->node_types = count > 0 ? node_types : NULL;
     req->node_types_count = count;
