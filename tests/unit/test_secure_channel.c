@@ -244,7 +244,7 @@ static void assert_opn_rejected(const opcua_byte_t *policy_uri, opcua_int32_t po
     opcua_uint32_t response_type;
     opcua_statuscode_t service_result;
 
-    memset(&transport, 0, sizeof(transport));
+    (void)memset(&transport, 0, sizeof(transport));
 
     len = build_hello(chunk, sizeof(chunk));
     enqueue_request(&transport, chunk, len);
@@ -346,8 +346,8 @@ void test_secure_channel_close(void) {
 
 #ifdef MUC_OPCUA_SECURITY
 static void populate_derived_session_keys(mu_secure_channel_t *channel) {
-    memset(&channel->client_keys, 0xA5, sizeof(channel->client_keys));
-    memset(&channel->server_keys, 0x5A, sizeof(channel->server_keys));
+    (void)memset(&channel->client_keys, 0xA5, sizeof(channel->client_keys));
+    (void)memset(&channel->server_keys, 0x5A, sizeof(channel->server_keys));
     channel->client_keys.cipher_ctx_valid = false;
     channel->client_keys.crypto = NULL;
     channel->server_keys.cipher_ctx_valid = false;

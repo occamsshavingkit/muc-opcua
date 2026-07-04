@@ -499,7 +499,7 @@ void test_server_handshake_connect_browse_read(void) {
 /* A MSG that skips a SequenceNumber (replay/gap) must abort the connection. */
 void test_server_rejects_sequence_gap(void) {
     mock_t mock;
-    memset(&mock, 0, sizeof(mock));
+    (void)memset(&mock, 0, sizeof(mock));
     opcua_byte_t tmp[512];
     mu_binary_writer_t w;
     opcua_byte_t chunk[512];
@@ -582,7 +582,7 @@ void test_server_rejects_sequence_gap(void) {
     enqueue(&mock, chunk, clen);
 
     mu_server_config_t config;
-    memset(&config, 0, sizeof(config));
+    (void)memset(&config, 0, sizeof(config));
     config.endpoint_url = "opc.tcp://host:4840";
     config.application_uri = "urn:test";
     config.product_uri = "urn:test";

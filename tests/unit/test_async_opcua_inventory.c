@@ -51,7 +51,7 @@ void test_async_opcua_inventory_has_areas(void) {
             has_tools = true;
         }
     }
-    fclose(fp);
+    (void)fclose(fp);
 
     TEST_ASSERT_TRUE_MESSAGE(has_devcontainer, "Inventory missing .devcontainer");
     TEST_ASSERT_TRUE_MESSAGE(has_codegen_tests, "Inventory missing codegen-tests");

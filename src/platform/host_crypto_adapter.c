@@ -29,8 +29,9 @@ struct host_cipher_context {
 static opcua_statuscode_t h_sha256(void *c, const opcua_byte_t *data, size_t len, opcua_byte_t *digest) {
     (void)c;
     unsigned int dlen = 0;
-    if (EVP_Digest(data, len, digest, &dlen, EVP_sha256(), NULL) != 1)
+    if (EVP_Digest(data, len, digest, &dlen, EVP_sha256(), NULL) != 1) {
         return MU_STATUS_BAD_INTERNALERROR;
+    }
     return MU_STATUS_GOOD;
 }
 
@@ -38,16 +39,18 @@ static opcua_statuscode_t h_hmac_sha256(void *c, const opcua_byte_t *key, size_t
                                         size_t data_len, opcua_byte_t *mac) {
     (void)c;
     unsigned int mlen = 0;
-    if (HMAC(EVP_sha256(), key, (int)key_len, data, data_len, mac, &mlen) == NULL)
+    if (HMAC(EVP_sha256(), key, (int)key_len, data, data_len, mac, &mlen) == NULL) {
         return MU_STATUS_BAD_INTERNALERROR;
+    }
     return MU_STATUS_GOOD;
 }
 
 static opcua_statuscode_t aes_cbc(const EVP_CIPHER *cipher, const opcua_byte_t *key, const opcua_byte_t *iv,
                                   const opcua_byte_t *in, size_t len, opcua_byte_t *out, int encrypt) {
     EVP_CIPHER_CTX *ctx = EVP_CIPHER_CTX_new();
-    if (!ctx)
+    if (!ctx) {
         return MU_STATUS_BAD_OUTOFMEMORY;
+    }
     opcua_statuscode_t rc = MU_STATUS_BAD_INTERNALERROR;
     int outl = 0, finl = 0;
     int ok = encrypt
@@ -57,8 +60,9 @@ static opcua_statuscode_t aes_cbc(const EVP_CIPHER *cipher, const opcua_byte_t *
                  : (EVP_DecryptInit_ex(ctx, cipher, NULL, key, iv) == 1 && EVP_CIPHER_CTX_set_padding(ctx, 0) == 1 &&
                     EVP_DecryptUpdate(ctx, out, &outl, in, (int)len) == 1 &&
                     EVP_DecryptFinal_ex(ctx, out + outl, &finl) == 1);
-    if (ok)
+    if (ok) {
         rc = MU_STATUS_GOOD;
+    }
     EVP_CIPHER_CTX_free(ctx);
     return rc;
 }
@@ -95,8 +99,9 @@ static struct host_cipher_context *load_cipher_handle(const opcua_byte_t *ctx_st
 }
 
 static void free_cipher_handle(struct host_cipher_context *handle) {
-    if (!handle)
+    if (!handle) {
         return;
+    }
     EVP_CIPHER_CTX_free(handle->encrypt);
     EVP_CIPHER_CTX_free(handle->decrypt);
     free(handle);
@@ -104,8 +109,9 @@ static void free_cipher_handle(struct host_cipher_context *handle) {
 
 static opcua_statuscode_t h_cipher_ctx_init(void *c, const opcua_byte_t *key, opcua_byte_t *ctx_storage) {
     (void)c;
-    if (!key || !ctx_storage)
+    if (!key || !ctx_storage) {
         return MU_STATUS_BAD_INTERNALERROR;
+    }
 
     struct host_cipher_context *handle = (struct host_cipher_context *)calloc(1, sizeof(*handle));
     if (!handle)
@@ -133,8 +139,9 @@ static opcua_statuscode_t h_cipher_ctx_init(void *c, const opcua_byte_t *key, op
 
 static opcua_statuscode_t aes_cbc_ctx(EVP_CIPHER_CTX *ctx, const opcua_byte_t *iv, const opcua_byte_t *in, size_t len,
                                       opcua_byte_t *out, int encrypt) {
-    if (!ctx || !iv || (!in && len) || !out)
+    if (!ctx || !iv || (!in && len) || !out) {
         return MU_STATUS_BAD_INTERNALERROR;
+    }
     opcua_statuscode_t rc = MU_STATUS_BAD_INTERNALERROR;
     int outl = 0, finl = 0;
     int ok = encrypt ? (EVP_EncryptInit_ex(ctx, NULL, NULL, NULL, iv) == 1 && EVP_CIPHER_CTX_set_padding(ctx, 0) == 1 &&
@@ -151,8 +158,9 @@ static opcua_statuscode_t aes_cbc_ctx(EVP_CIPHER_CTX *ctx, const opcua_byte_t *i
 static opcua_statuscode_t h_aes_encrypt_ctx(void *c, opcua_byte_t *ctx_storage, const opcua_byte_t *iv,
                                             const opcua_byte_t *in, size_t len, opcua_byte_t *out) {
     (void)c;
-    if (!ctx_storage)
+    if (!ctx_storage) {
         return MU_STATUS_BAD_INTERNALERROR;
+    }
     struct host_cipher_context *handle = load_cipher_handle(ctx_storage);
     if (!handle)
         return MU_STATUS_BAD_INTERNALERROR;
@@ -186,8 +194,9 @@ static opcua_statuscode_t h_rsa_sign(void *c, const opcua_byte_t *data, size_t l
                                      size_t *sig_len) {
     struct host_crypto_context *cx = (struct host_crypto_context *)c;
     EVP_MD_CTX *md = EVP_MD_CTX_new();
-    if (!md)
+    if (!md) {
         return MU_STATUS_BAD_OUTOFMEMORY;
+    }
     opcua_statuscode_t rc = MU_STATUS_BAD_INTERNALERROR;
     size_t sl = *sig_len;
     if (EVP_DigestSignInit(md, NULL, EVP_sha256(), NULL, cx->key) == 1 &&
@@ -202,8 +211,9 @@ static opcua_statuscode_t h_rsa_sign(void *c, const opcua_byte_t *data, size_t l
 static EVP_PKEY *pubkey_from_cert(const opcua_byte_t *cert, size_t cert_len) {
     const unsigned char *p = cert;
     X509 *x = d2i_X509(NULL, &p, (long)cert_len);
-    if (!x)
+    if (!x) {
         return NULL;
+    }
     EVP_PKEY *pk = X509_get_pubkey(x);
     X509_free(x);
     return pk;
@@ -213,8 +223,9 @@ static opcua_statuscode_t h_rsa_verify(void *c, const opcua_byte_t *cert, size_t
                                        size_t data_len, const opcua_byte_t *sig, size_t sig_len) {
     (void)c;
     EVP_PKEY *pk = pubkey_from_cert(cert, cert_len);
-    if (!pk)
+    if (!pk) {
         return MU_STATUS_BAD_SECURITYCHECKSFAILED;
+    }
     opcua_statuscode_t rc = MU_STATUS_BAD_SECURITYCHECKSFAILED;
     EVP_MD_CTX *md = EVP_MD_CTX_new();
     if (md && EVP_DigestVerifyInit(md, NULL, EVP_sha256(), NULL, pk) == 1 &&
@@ -229,8 +240,9 @@ static opcua_statuscode_t h_rsa_verify(void *c, const opcua_byte_t *cert, size_t
 static opcua_statuscode_t rsa_oaep(EVP_PKEY *pk, int encrypt, const opcua_byte_t *in, size_t in_len, opcua_byte_t *out,
                                    size_t *out_len) {
     EVP_PKEY_CTX *pc = EVP_PKEY_CTX_new(pk, NULL);
-    if (!pc)
+    if (!pc) {
         return MU_STATUS_BAD_INTERNALERROR;
+    }
     opcua_statuscode_t rc = MU_STATUS_BAD_INTERNALERROR;
     size_t ol = *out_len;
     int init_ok = encrypt ? (EVP_PKEY_encrypt_init(pc) == 1) : (EVP_PKEY_decrypt_init(pc) == 1);
@@ -302,8 +314,9 @@ static opcua_statuscode_t h_rsa_pss_sha256_verify(void *c, const opcua_byte_t *c
             rc = MU_STATUS_GOOD;
         }
     }
-    if (md)
+    if (md) {
         EVP_MD_CTX_free(md);
+    }
     EVP_PKEY_free(pk);
     return rc;
 }
@@ -374,10 +387,12 @@ static opcua_statuscode_t h_verify_certificate_validity(void *c, const opcua_byt
     int not_before = X509_cmp_time(X509_get0_notBefore(x), NULL);
     int not_after = X509_cmp_time(X509_get0_notAfter(x), NULL);
     X509_free(x);
-    if (not_before == 0 || not_after == 0)
+    if (not_before == 0 || not_after == 0) {
         return MU_STATUS_BAD_CERTIFICATEINVALID; /* unparseable time field */
-    if (not_before > 0 || not_after < 0)
+    }
+    if (not_before > 0 || not_after < 0) {
         return MU_STATUS_BAD_CERTIFICATETIMEINVALID; /* not yet valid, or expired */
+    }
     return MU_STATUS_GOOD;
 }
 
@@ -385,8 +400,9 @@ static opcua_statuscode_t h_get_certificate_thumbprint(void *c, const opcua_byte
                                                        opcua_byte_t *thumbprint) {
     (void)c;
     unsigned int len = 0;
-    if (EVP_Digest(cert, cert_len, thumbprint, &len, EVP_sha1(), NULL) != 1)
+    if (EVP_Digest(cert, cert_len, thumbprint, &len, EVP_sha1(), NULL) != 1) {
         return MU_STATUS_BAD_INTERNALERROR;
+    }
     return MU_STATUS_GOOD;
 }
 
@@ -394,8 +410,9 @@ static opcua_statuscode_t h_get_certificate_thumbprint(void *c, const opcua_byte
 
 static int build_self_signed(struct host_crypto_context *cx) {
     cx->key = EVP_RSA_gen(2048);
-    if (!cx->key)
+    if (!cx->key) {
         return 0;
+    }
 
     X509 *x = X509_new();
     if (!x)
@@ -425,8 +442,9 @@ static int build_self_signed(struct host_crypto_context *cx) {
 }
 
 opcua_statuscode_t mu_host_crypto_adapter_init(mu_crypto_adapter_t *adapter) {
-    if (!adapter)
+    if (!adapter) {
         return MU_STATUS_BAD_INTERNALERROR;
+    }
 
     struct host_crypto_context *cx = (struct host_crypto_context *)calloc(1, sizeof(*cx));
     if (!cx)

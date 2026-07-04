@@ -112,8 +112,8 @@ static opcua_statuscode_t counting_cipher_ctx_init(void *context, const opcua_by
         return MU_STATUS_BAD_INTERNALERROR;
     }
     stub->cipher_ctx_init_calls++;
-    memcpy(ctx_storage, key, MU_B256S256_ENCRYPTION_KEY_LENGTH);
-    memset(ctx_storage + MU_B256S256_ENCRYPTION_KEY_LENGTH, 0, MU_CIPHER_CTX_SIZE - MU_B256S256_ENCRYPTION_KEY_LENGTH);
+    (void)memcpy(ctx_storage, key, MU_B256S256_ENCRYPTION_KEY_LENGTH);
+    (void)memset(ctx_storage + MU_B256S256_ENCRYPTION_KEY_LENGTH, 0, MU_CIPHER_CTX_SIZE - MU_B256S256_ENCRYPTION_KEY_LENGTH);
     return MU_STATUS_GOOD;
 }
 
@@ -147,13 +147,13 @@ static void counting_cipher_ctx_free(void *context, opcua_byte_t *ctx_storage) {
         stub->cipher_ctx_free_calls++;
     }
     if (ctx_storage) {
-        memset(ctx_storage, 0, MU_CIPHER_CTX_SIZE);
+        (void)memset(ctx_storage, 0, MU_CIPHER_CTX_SIZE);
     }
 }
 
 static void counting_stub_init(counting_crypto_stub_t *stub, mu_crypto_adapter_t *adapter, bool provide_ctx_init) {
-    memset(stub, 0, sizeof(*stub));
-    memset(adapter, 0, sizeof(*adapter));
+    (void)memset(stub, 0, sizeof(*stub));
+    (void)memset(adapter, 0, sizeof(*adapter));
     adapter->context = stub;
     adapter->hmac_sha256 = counting_hmac_sha256;
     adapter->aes256_cbc_encrypt = counting_aes256_cbc_encrypt;
@@ -165,7 +165,7 @@ static void counting_stub_init(counting_crypto_stub_t *stub, mu_crypto_adapter_t
 }
 
 static void fill_counting_keys(mu_sym_keys_t *keys) {
-    memset(keys, 0, sizeof(*keys));
+    (void)memset(keys, 0, sizeof(*keys));
     for (size_t i = 0; i < MU_B256S256_SIGNATURE_KEY_LENGTH; i++) {
         keys->signing_key[i] = (opcua_byte_t)(0x10u + (i * 3u));
     }
@@ -207,7 +207,7 @@ void test_cipher_context_prepared_once_and_reused_per_message(void) {
         const opcua_byte_t *recovered = NULL;
         size_t recovered_len = 0;
         mu_sym_chunk_info_t info;
-        memset(&info, 0, sizeof(info));
+        (void)memset(&info, 0, sizeof(info));
         TEST_ASSERT_EQUAL(MU_STATUS_GOOD,
                           mu_sym_chunk_unwrap(&adapter, MU_MESSAGE_SECURITY_MODE_SIGN_AND_ENCRYPT, &local_keys, chunk,
                                               chunk_len, &recovered, &recovered_len, &info));
@@ -273,8 +273,8 @@ void test_keys_derivation_deterministic(void) {
     prepare_host_keys();
     mu_sym_keys_t a, b;
     opcua_byte_t s1[32], s2[32];
-    memset(s1, 0x01, sizeof(s1));
-    memset(s2, 0x02, sizeof(s2));
+    (void)memset(s1, 0x01, sizeof(s1));
+    (void)memset(s2, 0x02, sizeof(s2));
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD,
                       mu_sym_keys_derive(&crypto, MU_SECURITY_POLICY_BASIC256SHA256_ID, s1, 32, s2, 32, &a));
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD,
@@ -347,7 +347,7 @@ void test_sign_only_roundtrip(void) {
 void test_tampered_body_rejected(void) {
     prepare_host_keys();
     opcua_byte_t body[64];
-    memset(body, 0x33, sizeof(body));
+    (void)memset(body, 0x33, sizeof(body));
     opcua_byte_t chunk[1024];
     size_t chunk_len = 0;
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD,
@@ -366,7 +366,7 @@ void test_tampered_body_rejected(void) {
 void test_wrong_keys_rejected(void) {
     prepare_host_keys();
     opcua_byte_t body[40];
-    memset(body, 0x77, sizeof(body));
+    (void)memset(body, 0x77, sizeof(body));
     opcua_byte_t chunk[1024];
     size_t chunk_len = 0;
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_sym_chunk_wrap(&crypto, MU_MESSAGE_SECURITY_MODE_SIGN, &keys, "MSG", 1, 1, 1,
@@ -374,8 +374,8 @@ void test_wrong_keys_rejected(void) {
 
     mu_sym_keys_t other;
     opcua_byte_t a[32], b[32];
-    memset(a, 0xAA, sizeof(a));
-    memset(b, 0xBB, sizeof(b));
+    (void)memset(a, 0xAA, sizeof(a));
+    (void)memset(b, 0xBB, sizeof(b));
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD,
                       mu_sym_keys_derive(&crypto, MU_SECURITY_POLICY_BASIC256SHA256_ID, a, 32, b, 32, &other));
 

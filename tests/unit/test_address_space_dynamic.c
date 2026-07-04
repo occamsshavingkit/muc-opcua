@@ -163,7 +163,7 @@ void test_Browse_DynamicReferences(void) {
     /* Add dynamic node 99 and 42 */
     server.dynamic_address_space.nodes_count = 2;
     mu_node_t *dyn_node = &server.dynamic_address_space.nodes[0];
-    memset(dyn_node, 0, sizeof(mu_node_t));
+    (void)memset(dyn_node, 0, sizeof(mu_node_t));
     dyn_node->node_id.identifier_type = MU_NODEID_NUMERIC;
     dyn_node->node_id.namespace_index = 1;
     dyn_node->node_id.identifier.numeric = 99;

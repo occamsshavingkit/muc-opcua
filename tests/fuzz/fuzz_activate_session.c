@@ -54,8 +54,9 @@ static opcua_statuscode_t write_activate_prefix(opcua_byte_t *buffer, size_t cap
     mu_binary_writer_init(&writer, buffer, capacity);
 
     status = mu_binary_write_nodeid(&writer, &auth_token);
-    if (status != MU_STATUS_GOOD)
+    if (status != MU_STATUS_GOOD) {
         return status;
+    }
     status = mu_binary_write_int64(&writer, 0);
     if (status != MU_STATUS_GOOD)
         return status;

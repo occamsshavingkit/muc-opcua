@@ -32,7 +32,7 @@ void test_browsename_namespace_independent_of_nodeid(void) {
                              .data.static_value = {.type = MU_TYPE_INT32, .value = {.i32 = 42}, .is_array = false}};
 
     mu_variant_t read_val;
-    memset(&read_val, 0, sizeof(read_val));
+    (void)memset(&read_val, 0, sizeof(read_val));
     opcua_statuscode_t s = mu_value_source_read(node.value, &node.node_id, &read_val);
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, s);
     TEST_ASSERT_EQUAL(42, read_val.value.i32);

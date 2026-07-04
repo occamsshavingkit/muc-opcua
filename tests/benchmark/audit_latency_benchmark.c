@@ -366,11 +366,11 @@ static int validate_count(const char *name, mu_binary_reader_t *body, opcua_int3
     }
     if (allow_greater_than_zero) {
         if (count <= 0) {
-            fprintf(stderr, "%s returned no entries\n", name);
+            (void)fprintf(stderr, "%s returned no entries\n", name);
             return 1;
         }
     } else if (count != expected) {
-        fprintf(stderr, "%s returned count %" PRId32 ", expected %" PRId32 "\n", name, (int32_t)count,
+        (void)fprintf(stderr, "%s returned count %" PRId32 ", expected %" PRId32 "\n", name, (int32_t)count,
                 (int32_t)expected);
         return 1;
     }
@@ -384,12 +384,12 @@ static int validate_create_session(mu_binary_reader_t *body) {
     mu_binary_read_nodeid(body, &session_id);
     mu_binary_read_nodeid(body, &auth_token);
     if (body->status != MU_STATUS_GOOD) {
-        fprintf(stderr, "CreateSession session token decode failed: 0x%08" PRIx32 "\n", (uint32_t)body->status);
+        (void)fprintf(stderr, "CreateSession session token decode failed: 0x%08" PRIx32 "\n", (uint32_t)body->status);
         return 1;
     }
     if (auth_token.identifier_type != MU_NODEID_NUMERIC ||
         auth_token.identifier.numeric != TEST_FAKE_FIRST_AUTH_TOKEN) {
-        fprintf(stderr, "CreateSession returned unexpected authentication token\n");
+        (void)fprintf(stderr, "CreateSession returned unexpected authentication token\n");
         return 1;
     }
     (void)session_id;
@@ -407,11 +407,11 @@ static int validate_read(mu_binary_reader_t *body) {
     mu_binary_read_byte(body, &value_type);
     mu_binary_read_int32(body, &value);
     if (body->status != MU_STATUS_GOOD) {
-        fprintf(stderr, "Read result decode failed: 0x%08" PRIx32 "\n", (uint32_t)body->status);
+        (void)fprintf(stderr, "Read result decode failed: 0x%08" PRIx32 "\n", (uint32_t)body->status);
         return 1;
     }
     if (result_count != 1 || value_mask != 0x01u || value_type != MU_TYPE_INT32 || value != 42) {
-        fprintf(stderr, "Read returned unexpected DataValue\n");
+        (void)fprintf(stderr, "Read returned unexpected DataValue\n");
         return 1;
     }
     return 0;

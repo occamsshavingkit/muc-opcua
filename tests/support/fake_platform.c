@@ -59,7 +59,7 @@ static opcua_uint64_t fake_get_tick_ms(void *context) {
 static opcua_statuscode_t fake_generate_random(void *context, opcua_byte_t *buffer, size_t length) {
     (void)context;
     if (buffer) {
-        memset(buffer, 0x42, length); /* Fixed randomness for tests */
+        (void)memset(buffer, 0x42, length); /* Fixed randomness for tests */
     }
     return MU_STATUS_GOOD;
 }
@@ -67,7 +67,7 @@ static opcua_statuscode_t fake_generate_random(void *context, opcua_byte_t *buff
 void fake_platform_init(mu_tcp_adapter_t *tcp_adapter, mu_time_adapter_t *time_adapter,
                         mu_entropy_adapter_t *entropy_adapter) {
     if (tcp_adapter) {
-        memset(tcp_adapter, 0, sizeof(*tcp_adapter));
+        (void)memset(tcp_adapter, 0, sizeof(*tcp_adapter));
         tcp_adapter->listen = fake_tcp_listen;
         tcp_adapter->accept = fake_tcp_accept;
         tcp_adapter->read = fake_tcp_read;
@@ -77,13 +77,13 @@ void fake_platform_init(mu_tcp_adapter_t *tcp_adapter, mu_time_adapter_t *time_a
     }
 
     if (time_adapter) {
-        memset(time_adapter, 0, sizeof(*time_adapter));
+        (void)memset(time_adapter, 0, sizeof(*time_adapter));
         time_adapter->get_time = fake_get_time;
         time_adapter->get_tick_ms = fake_get_tick_ms;
     }
 
     if (entropy_adapter) {
-        memset(entropy_adapter, 0, sizeof(*entropy_adapter));
+        (void)memset(entropy_adapter, 0, sizeof(*entropy_adapter));
         entropy_adapter->generate_random = fake_generate_random;
     }
 }

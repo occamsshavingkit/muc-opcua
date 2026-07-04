@@ -207,14 +207,14 @@ static int parse_u32_arg(const char *name, const char *value, uint32_t *out) {
     unsigned long parsed;
 
     if (value == NULL || value[0] == '\0') {
-        fprintf(stderr, "%s requires a value\n", name);
+        (void)fprintf(stderr, "%s requires a value\n", name);
         return 1;
     }
 
     errno = 0;
     parsed = strtoul(value, &end, 10);
     if (errno != 0 || end == value || *end != '\0' || parsed > (unsigned long)UINT32_MAX) {
-        fprintf(stderr, "%s has invalid integer value: %s\n", name, value);
+        (void)fprintf(stderr, "%s has invalid integer value: %s\n", name, value);
         return 1;
     }
 
@@ -232,7 +232,7 @@ static int parse_size_arg(const char *name, const char *value, size_t *out) {
 }
 
 static void print_usage(FILE *stream, const char *program) {
-    fprintf(stream,
+    (void)fprintf(stream,
             "Usage: %s --scenario NAME [--nodes N] [--batch N] [--iterations N] [--warmup N] [--min-ms N]\n"
             "       %s --list\n",
             program, program);
@@ -245,7 +245,7 @@ static void print_list(void) {
         SCENARIO_WRITE_BAD_TYPE,       SCENARIO_SUBSCRIPTION_IDLE_TICK, SCENARIO_SUBSCRIPTION_ACTIVE_TICK,
     };
     for (size_t i = 0; i < sizeof(scenarios) / sizeof(scenarios[0]); ++i) {
-        printf("%s %s\n", scenario_name(scenarios[i]), scenario_supported(scenarios[i]) ? "supported" : "unsupported");
+        (void)printf("%s %s\n", scenario_name(scenarios[i]), scenario_supported(scenarios[i]) ? "supported" : "unsupported");
     }
 }
 
@@ -270,7 +270,7 @@ static int parse_options(int argc, char **argv, bench_options_t *options) {
         }
 
         if (i + 1 >= argc) {
-            fprintf(stderr, "%s requires a value\n", arg);
+            (void)fprintf(stderr, "%s requires a value\n", arg);
             return 2;
         }
 

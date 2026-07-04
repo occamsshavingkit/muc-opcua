@@ -206,9 +206,9 @@ opcua_statuscode_t mu_asym_chunk_wrap(const mu_crypto_adapter_t *crypto, mu_secu
         mu_secure_zero(plain, sizeof(plain));
         return s;
     }
-    memcpy(plain + 8, body, body_len);
+    (void)memcpy(plain + 8, body, body_len);
     plain[seqbody_len] = (opcua_byte_t)pad_count;               /* PaddingSize */
-    memset(plain + seqbody_len + 1, (int)pad_count, pad_count); /* Padding bytes */
+    (void)memset(plain + seqbody_len + 1, (int)pad_count, pad_count); /* Padding bytes */
 
     /* Sign over [cleartext header | SequenceHeader | body | paddingSize | padding].
        The header is already in `out`; stage the signed plaintext after it so no
@@ -222,7 +222,7 @@ opcua_statuscode_t mu_asym_chunk_wrap(const mu_crypto_adapter_t *crypto, mu_secu
         mu_secure_zero(plain, sizeof(plain));
         return MU_STATUS_BAD_INTERNALERROR;
     }
-    memcpy(out + hdr_len, plain, presig_len);
+    (void)memcpy(out + hdr_len, plain, presig_len);
     size_t produced_sig = sizeof(sig);
     if (policy == MU_SECURITY_POLICY_AES256_SHA256_RSAPSS_ID) {
         s = crypto->rsa_pss_sha256_sign(crypto->context, out, hdr_len + presig_len, sig, &produced_sig);
@@ -241,7 +241,7 @@ opcua_statuscode_t mu_asym_chunk_wrap(const mu_crypto_adapter_t *crypto, mu_secu
         mu_secure_zero(plain, sizeof(plain));
         return MU_STATUS_BAD_INTERNALERROR;
     }
-    memcpy(plain + presig_len, sig, sig_len); /* signature is the tail of the plaintext */
+    (void)memcpy(plain + presig_len, sig, sig_len); /* signature is the tail of the plaintext */
     mu_secure_zero(sig, sizeof(sig));
     mu_secure_zero(out + hdr_len, presig_len);
 

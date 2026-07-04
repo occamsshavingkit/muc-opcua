@@ -52,7 +52,7 @@ static opcua_statuscode_t m_read(void *c, void *h, opcua_byte_t *buf, size_t cap
     if (want > cap) {
         want = cap;
     }
-    memcpy(buf, m->feed + m->fed, want);
+    (void)memcpy(buf, m->feed + m->fed, want);
     m->fed += want;
     *n = want;
     return MU_STATUS_GOOD;
@@ -61,7 +61,7 @@ static opcua_statuscode_t m_write(void *c, void *h, const opcua_byte_t *buf, siz
     mock_t *m = c;
     (void)h;
     if (m->write_count < 8) {
-        memcpy(m->writes[m->write_count], buf, len < 512 ? len : 512);
+        (void)memcpy(m->writes[m->write_count], buf, len < 512 ? len : 512);
         m->write_len[m->write_count] = len;
         m->write_count++;
     }
@@ -132,7 +132,7 @@ static size_t build_opn(opcua_byte_t *out) {
 }
 
 static void configure(mu_server_config_t *config, mock_t *mock, opcua_byte_t *rx, opcua_byte_t *tx) {
-    memset(config, 0, sizeof(*config));
+    (void)memset(config, 0, sizeof(*config));
     config->endpoint_url = "opc.tcp://host:4840";
     config->application_uri = "u";
     config->product_uri = "u";
@@ -158,7 +158,7 @@ static void configure(mu_server_config_t *config, mock_t *mock, opcua_byte_t *rx
 /* Two messages (HEL + OPN) delivered in a single read() must both be answered. */
 void test_coalesced_messages_both_processed(void) {
     mock_t mock;
-    memset(&mock, 0, sizeof(mock));
+    (void)memset(&mock, 0, sizeof(mock));
     size_t h = build_hello(mock.feed);
     size_t o = build_opn(mock.feed + h);
     mock.feed_len = h + o;

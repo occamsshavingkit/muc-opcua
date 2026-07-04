@@ -12,8 +12,9 @@ static uint32_t read_le32_prefix(const uint8_t *data, size_t size) {
     uint32_t value = 0u;
     size_t i;
     size_t limit = size < 4u ? size : 4u;
-    for (i = 0u; i < limit; ++i)
+    for (i = 0u; i < limit; ++i) {
         value |= (uint32_t)data[i] << (8u * i);
+    }
     return value;
 }
 
@@ -33,8 +34,9 @@ static void require_bad_decoding_for_invalid_array_count(uint32_t encoded_count)
     write_le32(buffer, encoded_count);
     mu_binary_reader_init(&reader, buffer, sizeof(buffer));
     status = mu_binary_read_array_length(&reader, &length);
-    if (status != MU_STATUS_BAD_DECODINGERROR || reader.status != MU_STATUS_BAD_DECODINGERROR)
+    if (status != MU_STATUS_BAD_DECODINGERROR || reader.status != MU_STATUS_BAD_DECODINGERROR) {
         abort();
+    }
 }
 
 static uint32_t overdeclared_length_from_input(const uint8_t *data, size_t size, size_t payload_length) {
@@ -50,8 +52,9 @@ static void require_bad_decoding_for_overdeclared_length(uint32_t declared_lengt
     size_t i;
 
     write_le32(buffer, declared_length);
-    for (i = 0u; i < payload_length; ++i)
+    for (i = 0u; i < payload_length; ++i) {
         buffer[4u + i] = i < size ? data[i] : (uint8_t)i;
+    }
 
     mu_binary_reader_init(&reader, buffer, 4u + payload_length);
     if (read_bytestring) {
@@ -74,8 +77,9 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     uint32_t bytestring_declared_length = overdeclared_length_from_input(data, size, bytestring_payload_length);
 
     /* OPC-10000-6 section 5.2.5: -1 is the only null-array marker; lower counts are malformed. */
-    if (encoded_count == 0xffffffffu)
+    if (encoded_count == 0xffffffffu) {
         encoded_count = 0xfffffffeu;
+    }
 
     require_bad_decoding_for_invalid_array_count(encoded_count);
 

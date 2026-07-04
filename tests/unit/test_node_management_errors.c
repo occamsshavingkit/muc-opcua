@@ -314,7 +314,7 @@ void test_AddNodes_DisplayNameStableAfterRequestBufferOverwrite(void) {
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, res_status);
     TEST_ASSERT_EQUAL(1, server.dynamic_address_space.nodes_count);
 
-    memset(buffer, 0xA5, sizeof(buffer));
+    (void)memset(buffer, 0xA5, sizeof(buffer));
 
     const mu_node_t *node = &server.dynamic_address_space.nodes[0];
     TEST_ASSERT_EQUAL_INT32((opcua_int32_t)(sizeof(display_name) - 1), node->display_name.length);

@@ -58,7 +58,7 @@ int main(void) {
     stdio_init_all();
 
     mu_server_config_t config;
-    memset(&config, 0, sizeof(config));
+    (void)memset(&config, 0, sizeof(config));
 
     config.endpoint_url = "opc.tcp://0.0.0.0:4840";
     config.application_uri = "urn:pico:muc_opcua:minimal_server";
@@ -80,11 +80,11 @@ int main(void) {
 
     mu_server_t *server = NULL;
     if (mu_server_init(g_storage, sizeof(g_storage), &config, &server) != MU_STATUS_GOOD) {
-        printf("Failed to initialize muc-opcua server\n");
+        (void)printf("Failed to initialize muc-opcua server\n");
         return 1;
     }
 
-    printf("muc-opcua Pico server initialized\n");
+    (void)printf("muc-opcua Pico server initialized\n");
 
     while (true) {
         mu_server_poll(server);

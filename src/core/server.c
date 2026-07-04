@@ -131,7 +131,7 @@ opcua_statuscode_t mu_server_init(void *storage, size_t storage_size, const mu_s
 
     /* Initialize without heap */
     server = (mu_server_t *)storage;
-    memset(server, 0, sizeof(struct mu_server));
+    (void)memset(server, 0, sizeof(struct mu_server));
     server->config = *config;
     server->user_address_space_index = (mu_address_space_index_t){0};
     /* opn_pending_security_policy and opn_pending_client_cert are transient
@@ -167,7 +167,7 @@ opcua_statuscode_t mu_server_init(void *storage, size_t storage_size, const mu_s
     mu_subscriptions_init(&server->subs);
 #endif
 #ifdef MUC_OPCUA_SERVICE_NODEMANAGEMENT
-    memset(&server->dynamic_address_space, 0, sizeof(server->dynamic_address_space));
+    (void)memset(&server->dynamic_address_space, 0, sizeof(server->dynamic_address_space));
 #endif
 #ifdef MUC_OPCUA_SERVICE_QUERY
     for (size_t i = 0; i < MU_MAX_QUERY_CONTINUATION_POINTS; ++i) {
@@ -468,7 +468,7 @@ static void handle_data_chunk_secure(mu_server_t *server, opcua_byte_t *msg, siz
             return;
         }
 
-        memset(&ai, 0, sizeof(ai));
+        (void)memset(&ai, 0, sizeof(ai));
         if (mu_asym_chunk_unwrap(crypto, msg, msg_len, opn_buf, MU_SECURE_OPN_REQ_MAX, &req_len, server->secure_scratch,
                                  MU_SECURE_SCRATCH_SIZE, &ai) != MU_STATUS_GOOD) {
             return;
@@ -487,7 +487,7 @@ static void handle_data_chunk_secure(mu_server_t *server, opcua_byte_t *msg, siz
             return;
         }
         mu_sym_chunk_info_t si;
-        memset(&si, 0, sizeof(si));
+        (void)memset(&si, 0, sizeof(si));
         /* Decrypts msg in place; req_full points into msg. */
         if (mu_sym_chunk_unwrap(crypto, server_secure_channel.mode, &server_secure_channel.client_keys, msg, msg_len,
                                 &req_full, &req_len, &si) != MU_STATUS_GOOD) {

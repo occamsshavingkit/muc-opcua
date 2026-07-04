@@ -35,7 +35,7 @@ static opcua_statuscode_t test_auth_handler(void *handle, const mu_string_t *use
 
 void test_encrypted_password_decryption(void) {
     mu_crypto_adapter_t crypto;
-    memset(&crypto, 0, sizeof(crypto));
+    (void)memset(&crypto, 0, sizeof(crypto));
     crypto.rsa_oaep_decrypt = mock_rsa_oaep_decrypt;
 
     /* "admin" XOR 0x5A is:

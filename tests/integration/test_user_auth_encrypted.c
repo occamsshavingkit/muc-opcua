@@ -135,7 +135,7 @@ static opcua_statuscode_t test_auth_handler(void *handle, const mu_string_t *use
 
 void test_encrypted_username_token_over_security_policy_none_is_rejected(void) {
     mock_t mock;
-    memset(&mock, 0, sizeof(mock));
+    (void)memset(&mock, 0, sizeof(mock));
 
     /* ---- Build the inbound queue ---- */
     opcua_byte_t tmp[512];
@@ -246,7 +246,7 @@ void test_encrypted_username_token_over_security_policy_none_is_rejected(void) {
         plain_block[2] = 0;
         plain_block[3] = 0;
         (void)memcpy(plain_block + 4, "admin", 5);
-        memset(plain_block + 9, 0x42, 32);
+        (void)memset(plain_block + 9, 0x42, 32);
 
         /* encrypt by XORing with 0x5A to simulate mock rsa OAEP decryption */
         opcua_byte_t encrypted_pwd[41];
@@ -265,7 +265,7 @@ void test_encrypted_username_token_over_security_policy_none_is_rejected(void) {
 
     /* ---- Configure the server ---- */
     mu_server_config_t config;
-    memset(&config, 0, sizeof(config));
+    (void)memset(&config, 0, sizeof(config));
     config.endpoint_url = "opc.tcp://host:4840";
     config.application_uri = "urn:test";
     config.product_uri = "urn:test";
@@ -293,7 +293,7 @@ void test_encrypted_username_token_over_security_policy_none_is_rejected(void) {
 
     /* Attach crypto adapter */
     static mu_crypto_adapter_t crypto_adapter;
-    memset(&crypto_adapter, 0, sizeof(crypto_adapter));
+    (void)memset(&crypto_adapter, 0, sizeof(crypto_adapter));
     crypto_adapter.rsa_oaep_decrypt = mock_rsa_oaep_decrypt;
     config.crypto_adapter = &crypto_adapter;
 

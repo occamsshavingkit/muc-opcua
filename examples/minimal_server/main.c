@@ -36,8 +36,9 @@ static opcua_statuscode_t minimal_read_raw_modified(
     (void)continuation_point_length; (void)cp_out; (void)cp_out_length;
     (void)data_points; (void)max_data_points;
     *data_points_count = 0;
-    if (cp_out_length) *cp_out_length = 0;
-    return MU_STATUS_GOOD;
+    if (cp_out_length) *cp_out_length = 0; {
+        return MU_STATUS_GOOD;
+    }
 }
 
 static opcua_statuscode_t minimal_update_data(
@@ -90,8 +91,9 @@ static opcua_uint64_t stub_get_tick_ms(void *context) {
 }
 static opcua_statuscode_t stub_generate_random(void *context, opcua_byte_t *buffer, size_t length) {
     (void)context;
-    if (buffer)
+    if (buffer) {
         (void)memset(buffer, 0xAA, length);
+    }
     return MU_STATUS_GOOD;
 }
 

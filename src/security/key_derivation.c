@@ -73,7 +73,7 @@ opcua_statuscode_t mu_p_sha256(const mu_crypto_adapter_t *crypto, const opcua_by
         if (take > MU_SHA256_LENGTH) {
             take = MU_SHA256_LENGTH;
         }
-        memcpy(output + produced, block, take);
+        (void)memcpy(output + produced, block, take);
         produced += take;
 
         /* A(i+1) = HMAC(secret, A(i)) */

@@ -52,7 +52,7 @@ void test_tcp_hello_acknowledge_negotiation(void) {
 
 void test_tcp_ack_send_buffer_size_is_capped_by_configured_send_buffer(void) {
     mu_server_config_t config;
-    memset(&config, 0, sizeof(config));
+    (void)memset(&config, 0, sizeof(config));
     config.receive_buffer_size = 16384;
     config.send_buffer_size = 12288;
     config.max_message_size = 65536;

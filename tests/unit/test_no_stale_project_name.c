@@ -161,14 +161,14 @@ static void check_file_for_forbidden_literals(const char *full_path, const char 
         ++line_number;
         for (size_t i = 0u; i < ARRAY_COUNT(forbidden_literals); ++i) {
             if (strstr(line, forbidden_literals[i]) != NULL) {
-                printf("Stale project-name literal '%s' in %s:%zu:%s", forbidden_literals[i], relative_path,
+                (void)printf("Stale project-name literal '%s' in %s:%zu:%s", forbidden_literals[i], relative_path,
                        line_number, line);
                 ++(*forbidden_matches);
             }
         }
     }
 
-    fclose(file);
+    (void)fclose(file);
 }
 
 static void walk_tree_for_forbidden_literals(const char *root, const char *relative_prefix, size_t *checked_files,

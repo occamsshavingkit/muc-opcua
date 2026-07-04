@@ -16,7 +16,7 @@ opcua_statuscode_t mu_sym_keys_derive(const mu_crypto_adapter_t *crypto, mu_secu
     if (!out_keys) {
         return MU_STATUS_BAD_INTERNALERROR;
     }
-    memset(out_keys, 0, sizeof(*out_keys));
+    (void)memset(out_keys, 0, sizeof(*out_keys));
     out_keys->policy = policy;
 
     size_t sig_key_len = mu_security_policy_signature_key_length(policy);
@@ -35,8 +35,8 @@ opcua_statuscode_t mu_sym_keys_derive(const mu_crypto_adapter_t *crypto, mu_secu
         return s;
     }
     (void)memcpy(out_keys->signing_key, material, sig_key_len);
-    memcpy(out_keys->encrypting_key, material + sig_key_len, enc_key_len);
-    memcpy(out_keys->iv, material + sig_key_len + enc_key_len, iv_len);
+    (void)memcpy(out_keys->encrypting_key, material + sig_key_len, enc_key_len);
+    (void)memcpy(out_keys->iv, material + sig_key_len + enc_key_len, iv_len);
     mu_secure_zero(material, sizeof(material));
     return MU_STATUS_GOOD;
 }
@@ -131,7 +131,7 @@ opcua_statuscode_t mu_sym_chunk_wrap(const mu_crypto_adapter_t *crypto, mu_messa
             mu_secure_zero(mac, sizeof(mac));
             return s;
         }
-        memcpy(out + signed_len, mac, MU_SYM_SIG_LEN);
+        (void)memcpy(out + signed_len, mac, MU_SYM_SIG_LEN);
         mu_secure_zero(mac, sizeof(mac));
         *out_len = total;
         return MU_STATUS_GOOD;
@@ -154,7 +154,7 @@ opcua_statuscode_t mu_sym_chunk_wrap(const mu_crypto_adapter_t *crypto, mu_messa
         return MU_STATUS_BAD_RESPONSETOOLARGE;
     }
     out[MU_SYM_HEADER_SIZE + seqbody_len] = (opcua_byte_t)pad_count; /* PaddingSize */
-    memset(out + MU_SYM_HEADER_SIZE + seqbody_len + 1, (int)pad_count, pad_count);
+    (void)memset(out + MU_SYM_HEADER_SIZE + seqbody_len + 1, (int)pad_count, pad_count);
 
     /* Sign-then-encrypt: HMAC over [header | SeqHeader | body | paddingSize | padding]. */
     size_t signed_len = MU_SYM_HEADER_SIZE + presig_len;
@@ -165,7 +165,7 @@ opcua_statuscode_t mu_sym_chunk_wrap(const mu_crypto_adapter_t *crypto, mu_messa
         mu_secure_zero(mac, sizeof(mac));
         return s;
     }
-    memcpy(out + signed_len, mac, MU_SYM_SIG_LEN); /* signature tails the plaintext */
+    (void)memcpy(out + signed_len, mac, MU_SYM_SIG_LEN); /* signature tails the plaintext */
     mu_secure_zero(mac, sizeof(mac));
 
     /* Encrypt the SequenceHeader..signature region in place (AES-CBC preserves length). */

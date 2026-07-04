@@ -49,7 +49,7 @@ void test_uasc_finalize_symmetric(void) {
    MU_UASC_ASYMMETRIC_NONE_HEADER_SIZE. (OPC 10000-6 6.7.4) */
 void test_uasc_finalize_asymmetric_none(void) {
     opcua_byte_t buf[128];
-    memset(buf, 0, sizeof(buf));
+    (void)memset(buf, 0, sizeof(buf));
 
     /* 8 (MsgHeader) + 4 (ChannelId) + [4 + 47] (SecurityPolicyUri)
        + 4 (SenderCert null) + 4 (ReceiverThumbprint null) + 8 (SequenceHeader) = 79 */

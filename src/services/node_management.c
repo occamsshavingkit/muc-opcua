@@ -117,7 +117,7 @@ static void mu_dynamic_node_move(mu_dynamic_address_space_t *space, size_t dest_
             space->nodes[dest_index].node_id.identifier.string.data = NULL;
         } else {
             if (string_nodeid_length > 0) {
-                memcpy(space->string_nodeid_storage[dest_index], space->string_nodeid_storage[source_index],
+                (void)memcpy(space->string_nodeid_storage[dest_index], space->string_nodeid_storage[source_index],
                        (size_t)string_nodeid_length);
             }
             space->nodes[dest_index].node_id.identifier.string.data = space->string_nodeid_storage[dest_index];
@@ -128,7 +128,7 @@ static void mu_dynamic_node_move(mu_dynamic_address_space_t *space, size_t dest_
         space->nodes[dest_index].browse_name.data = NULL;
     } else {
         if (browse_name_length > 0) {
-            memcpy(space->browse_name_storage[dest_index], space->browse_name_storage[source_index],
+            (void)memcpy(space->browse_name_storage[dest_index], space->browse_name_storage[source_index],
                    (size_t)browse_name_length);
         }
         space->nodes[dest_index].browse_name.data = space->browse_name_storage[dest_index];
@@ -138,7 +138,7 @@ static void mu_dynamic_node_move(mu_dynamic_address_space_t *space, size_t dest_
         space->nodes[dest_index].display_name.data = NULL;
     } else {
         if (display_name_length > 0) {
-            memcpy(space->display_name_storage[dest_index], space->display_name_storage[source_index],
+            (void)memcpy(space->display_name_storage[dest_index], space->display_name_storage[source_index],
                    (size_t)display_name_length);
         }
         space->nodes[dest_index].display_name.data = space->display_name_storage[dest_index];
@@ -524,7 +524,7 @@ opcua_statuscode_t mu_add_nodes_process(mu_server_t *server, mu_binary_reader_t 
 
     mu_add_nodes_result_t results[8];
     for (size_t i = 0; i < count; ++i) {
-        memset(&results[i], 0, sizeof(results[i]));
+        (void)memset(&results[i], 0, sizeof(results[i]));
         results[i].added_node_id.identifier_type = MU_NODEID_NUMERIC;
         results[i].added_node_id.namespace_index = 0;
         results[i].added_node_id.identifier.numeric = 0;
@@ -601,7 +601,7 @@ opcua_statuscode_t mu_add_nodes_process(mu_server_t *server, mu_binary_reader_t 
         /* Add to dynamic address space */
         size_t idx = server->dynamic_address_space.nodes_count++;
         mu_node_t *node = &server->dynamic_address_space.nodes[idx];
-        memset(node, 0, sizeof(mu_node_t));
+        (void)memset(node, 0, sizeof(mu_node_t));
         mu_dynamic_string_nodeid_copy(&server->dynamic_address_space, idx, &new_id);
         node->node_class = (mu_node_class_t)items[i].node_class;
         mu_dynamic_browse_name_copy(&server->dynamic_address_space, idx, &items[i].browse_name.name);

@@ -17,14 +17,16 @@ static opcua_statuscode_t arduino_tcp_accept(void *context, void **connection_ha
 
 static opcua_statuscode_t arduino_tcp_read(void *context, void *connection_handle, opcua_byte_t *buffer, size_t buffer_size, size_t *bytes_read) {
     (void)context; (void)connection_handle; (void)buffer; (void)buffer_size;
-    if (bytes_read) *bytes_read = 0;
-    return MU_STATUS_GOOD;
+    if (bytes_read) *bytes_read = 0; {
+        return MU_STATUS_GOOD;
+    }
 }
 
 static opcua_statuscode_t arduino_tcp_write(void *context, void *connection_handle, const opcua_byte_t *buffer, size_t buffer_size, size_t *bytes_written) {
     (void)context; (void)connection_handle; (void)buffer;
-    if (bytes_written) *bytes_written = buffer_size;
-    return MU_STATUS_GOOD;
+    if (bytes_written) *bytes_written = buffer_size; {
+        return MU_STATUS_GOOD;
+    }
 }
 
 static void arduino_tcp_close_connection(void *context, void *connection_handle) {
@@ -45,16 +47,17 @@ static opcua_uint64_t arduino_get_tick_ms(void *context) {
     return 0; /* Stub */
 }
 
-static opcua_statuscode_t arduino_generate_random(void *context, opcua_byte_t *buffer, size_t length) {
+(void)static opcua_statuscode_t arduino_generate_random(void *context, opcua_byte_t *buffer, size_t length) {
     (void)context;
-    if (buffer) memset(buffer, 0, length); /* Stub */
-    return MU_STATUS_GOOD;
+    if (buffer) memset(buffer, 0, length); /* Stub */ {
+        return MU_STATUS_GOOD;
+    }
 }
 
 void mu_arduino_adapter_init(
     mu_tcp_adapter_t *tcp_adapter,
     mu_time_adapter_t *time_adapter,
-    mu_entropy_adapter_t *entropy_adapter)
+    (void)mu_entropy_adapter_t *entropy_adapter)
 {
     if (tcp_adapter) {
         memset(tcp_adapter, 0, sizeof(*tcp_adapter));
@@ -64,13 +67,13 @@ void mu_arduino_adapter_init(
         tcp_adapter->write = arduino_tcp_write;
         tcp_adapter->close_connection = arduino_tcp_close_connection;
         tcp_adapter->shutdown = arduino_tcp_shutdown;
-    }
+    (void)}
 
     if (time_adapter) {
         memset(time_adapter, 0, sizeof(*time_adapter));
         time_adapter->get_time = arduino_get_time;
         time_adapter->get_tick_ms = arduino_get_tick_ms;
-    }
+    (void)}
 
     if (entropy_adapter) {
         memset(entropy_adapter, 0, sizeof(*entropy_adapter));

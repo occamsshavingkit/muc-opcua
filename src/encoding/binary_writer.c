@@ -117,13 +117,13 @@ opcua_statuscode_t mu_binary_write_uint64(mu_binary_writer_t *writer, opcua_uint
 
 opcua_statuscode_t mu_binary_write_float(mu_binary_writer_t *writer, opcua_float_t value) {
     opcua_uint32_t tmp;
-    memcpy(&tmp, &value, sizeof(opcua_float_t));
+    (void)memcpy(&tmp, &value, sizeof(opcua_float_t));
     return mu_binary_write_uint32(writer, tmp);
 }
 
 opcua_statuscode_t mu_binary_write_double(mu_binary_writer_t *writer, opcua_double_t value) {
     opcua_uint64_t tmp;
-    memcpy(&tmp, &value, sizeof(opcua_double_t));
+    (void)memcpy(&tmp, &value, sizeof(opcua_double_t));
     return mu_binary_write_uint64(writer, tmp);
 }
 

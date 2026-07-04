@@ -152,7 +152,7 @@ void test_binary_variant_localizedtext_roundtrip(void) {
     mu_binary_reader_t reader;
 
     mu_variant_t variant;
-    memset(&variant, 0, sizeof(variant));
+    (void)memset(&variant, 0, sizeof(variant));
     variant.type = MU_TYPE_LOCALIZEDTEXT;
     variant.value.localized_text.locale = (mu_string_t){-1, NULL}; /* null locale -> absent */
     variant.value.localized_text.text = (mu_string_t){6, (const opcua_byte_t *)"MyVar1"};
@@ -208,7 +208,7 @@ void test_binary_variant_int32_array_encode(void) {
 
     static const opcua_int32_t arr[3] = {10, 20, 30};
     mu_variant_t v;
-    memset(&v, 0, sizeof(v));
+    (void)memset(&v, 0, sizeof(v));
     v.type = MU_TYPE_INT32;
     v.is_array = true;
     v.array_length = 3;

@@ -70,7 +70,7 @@ static mu_datavalue_t int32_datavalue(opcua_int32_t value) {
 
 static mu_datavalue_t float_datavalue(float value) {
     mu_datavalue_t dv;
-    memset(&dv, 0, sizeof(dv));
+    (void)memset(&dv, 0, sizeof(dv));
     dv.has_value = true;
     dv.value.type = MU_TYPE_FLOAT;
     dv.value.is_array = false;
@@ -283,7 +283,7 @@ void test_write_service_basic(void) {
 
 void test_write_service_type_mismatch(void) {
     mu_server_t server;
-    memset(&server, 0, sizeof(server));
+    (void)memset(&server, 0, sizeof(server));
 
     mu_node_t node;
     node.node_id = (mu_nodeid_t){1, MU_NODEID_NUMERIC, {.numeric = 5001}};
@@ -304,7 +304,7 @@ void test_write_service_type_mismatch(void) {
     server.config.address_space = &address_space;
     server.config.write_handler = mock_write_handler;
 
-    memset(&server.user_address_space_index, 0, sizeof(server.user_address_space_index));
+    (void)memset(&server.user_address_space_index, 0, sizeof(server.user_address_space_index));
 
     opcua_byte_t req_buffer[256];
     mu_binary_writer_t writer;
@@ -534,7 +534,7 @@ void test_write_service_batch_matches_individual_operation_results_and_callback_
     memset(&server, 0, sizeof(server));
 
     mu_node_t nodes[2];
-    memset(nodes, 0, sizeof(nodes));
+    (void)memset(nodes, 0, sizeof(nodes));
 
     nodes[0].node_id = (mu_nodeid_t){1, MU_NODEID_NUMERIC, {.numeric = 7001}};
     nodes[0].node_class = MU_NODECLASS_VARIABLE;

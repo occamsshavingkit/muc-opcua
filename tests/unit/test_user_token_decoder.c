@@ -46,7 +46,7 @@ void test_decode_username_from_file_fixture(void) {
 
     opcua_byte_t buf[512];
     size_t n = fread(buf, 1, sizeof(buf), f);
-    fclose(f);
+    (void)fclose(f);
 
     TEST_ASSERT_TRUE(n > 0);
 
@@ -94,7 +94,7 @@ void test_decode_username_from_file_fixture(void) {
 
     /* Read body */
     mu_username_identity_token_t token;
-    memset(&token, 0, sizeof(token));
+    (void)memset(&token, 0, sizeof(token));
     status = mu_binary_read_username_identity_token(&reader, &token);
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, status);
 

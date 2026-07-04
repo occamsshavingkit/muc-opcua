@@ -38,7 +38,7 @@ static opcua_statuscode_t mock_udp_send(void *context, const opcua_byte_t *buffe
     udp_last_port = port;
     udp_last_size = buffer_size;
     if (address) {
-        strncpy(udp_last_address, address, sizeof(udp_last_address) - 1u);
+        (void)strncpy(udp_last_address, address, sizeof(udp_last_address) - 1u);
         udp_last_address[sizeof(udp_last_address) - 1u] = '\0';
     }
     if (buffer && buffer_size <= sizeof(udp_last_payload)) {
@@ -92,13 +92,13 @@ void test_pubsub_poll_timing(void) {
         (void)printf("FAIL endpoint\n");
     }
     if (config.receive_buffer == NULL || config.receive_buffer_size < MU_MIN_CHUNK_SIZE) {
-        printf("FAIL recv\n");
+        (void)printf("FAIL recv\n");
     }
     if (config.send_buffer == NULL || config.send_buffer_size < MU_MIN_CHUNK_SIZE) {
         (void)printf("FAIL send\n");
     }
     if (config.max_sessions == 0 || config.max_secure_channels == 0) {
-        printf("FAIL max\n");
+        (void)printf("FAIL max\n");
     }
     if (config.max_chunk_count == 0 || config.max_message_size < MU_MIN_CHUNK_SIZE) {
         (void)printf("FAIL max chunk\n");
@@ -106,13 +106,13 @@ void test_pubsub_poll_timing(void) {
     if (config.tcp_adapter.listen == NULL || config.tcp_adapter.accept == NULL || config.tcp_adapter.read == NULL ||
         config.tcp_adapter.write == NULL || config.tcp_adapter.close_connection == NULL ||
         config.tcp_adapter.shutdown == NULL) {
-        printf("FAIL tcp\n");
+        (void)printf("FAIL tcp\n");
     }
     if (config.time_adapter.get_time == NULL || config.time_adapter.get_tick_ms == NULL) {
-        printf("FAIL time\n");
+        (void)printf("FAIL time\n");
     }
     if (config.entropy_adapter.generate_random == NULL) {
-        printf("FAIL entropy\n");
+        (void)printf("FAIL entropy\n");
     }
 
     mu_server_t *server = NULL;
