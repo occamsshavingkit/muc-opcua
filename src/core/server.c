@@ -70,14 +70,17 @@ opcua_statuscode_t mu_server_config_validate(const mu_server_config_t *config) {
         size_t own_cert_len = 0;
         if (config->crypto_adapter->get_own_certificate != NULL &&
             config->crypto_adapter->verify_certificate_validity != NULL) {
-            if (config->crypto_adapter->get_own_certificate(config->crypto_adapter->context,
-                                                            &own_cert, &own_cert_len) == MU_STATUS_GOOD) {
-                opcua_statuscode_t cert_status =
-                    config->crypto_adapter->verify_certificate_validity(config->crypto_adapter->context,
-                                                                        own_cert, own_cert_len);
-                if (cert_status != MU_STATUS_GOOD) {
-                    return cert_status;
-                }
+            opcua_statuscode_t cert_ret =
+                config->crypto_adapter->get_own_certificate(config->crypto_adapter->context,
+                                                             &own_cert, &own_cert_len);
+            if (cert_ret != MU_STATUS_GOOD) {
+                return cert_ret;
+            }
+            opcua_statuscode_t cert_status =
+                config->crypto_adapter->verify_certificate_validity(config->crypto_adapter->context,
+                                                                    own_cert, own_cert_len);
+            if (cert_status != MU_STATUS_GOOD) {
+                return cert_status;
             }
         }
     }

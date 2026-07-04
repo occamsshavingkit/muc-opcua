@@ -29,6 +29,17 @@ typedef struct {
     size_t last_write_len;
 } mock_t;
 
+/* Channel ID assigned by the server (T009: incrementing counter, not always 1).
+   Set from the OPN response header before building any MSG chunks. */
+static opcua_uint32_t s_channel_id = 1;
+
+static opcua_uint32_t read_opn_channel_id(const opcua_byte_t *buf, size_t len) {
+    if (len < 12)
+        return 1;
+    return (opcua_uint32_t)buf[8] | ((opcua_uint32_t)buf[9] << 8u) | ((opcua_uint32_t)buf[10] << 16u) |
+           ((opcua_uint32_t)buf[11] << 24u);
+}
+
 static opcua_statuscode_t mock_listen(void *c, const char *u) {
     (void)c;
     (void)u;
@@ -103,7 +114,7 @@ static size_t build_msg(opcua_byte_t *out, size_t cap, opcua_uint32_t seq, opcua
     out[3] = 'F';
     w.position = 4;
     mu_binary_write_uint32(&w, (opcua_uint32_t)(24 + blen));
-    mu_binary_write_uint32(&w, 1);
+    mu_binary_write_uint32(&w, s_channel_id);
     mu_binary_write_uint32(&w, 1);
     mu_binary_write_uint32(&w, seq);
     mu_binary_write_uint32(&w, reqid);
@@ -133,16 +144,17 @@ static opcua_uint32_t parse_response(const opcua_byte_t *buf, size_t len, mu_bin
     return type.identifier.numeric;
 }
 
-/* Append HEL, OPN(None, seq 1), CreateSession(seq 2), ActivateSession(seq 3). */
+/* Append HEL and OPN(None, seq 1) only. Must be followed by mu_server_poll for
+   accept/HEL/OPN, then set s_channel_id from the OPN response, then call
+   enqueue_session before any service requests. */
 static void enqueue_connect(mock_t *mock) {
-    opcua_byte_t tmp[512], chunk[512];
+    opcua_byte_t chunk[512];
     mu_binary_writer_t w;
-    size_t clen;
-    mu_binary_writer_init(&w, tmp, sizeof(tmp));
-    tmp[0] = 'H';
-    tmp[1] = 'E';
-    tmp[2] = 'L';
-    tmp[3] = 'F';
+    mu_binary_writer_init(&w, chunk, sizeof(chunk));
+    chunk[0] = 'H';
+    chunk[1] = 'E';
+    chunk[2] = 'L';
+    chunk[3] = 'F';
     w.position = 4;
     mu_binary_write_uint32(&w, 0);
     mu_binary_write_uint32(&w, 0);
@@ -156,11 +168,11 @@ static void enqueue_connect(mock_t *mock) {
     }
     {
         mu_binary_writer_t hs;
-        mu_binary_writer_init(&hs, tmp, sizeof(tmp));
+        mu_binary_writer_init(&hs, chunk, sizeof(chunk));
         hs.position = 4;
         mu_binary_write_uint32(&hs, (opcua_uint32_t)w.position);
     }
-    enqueue(mock, tmp, w.position);
+    enqueue(mock, chunk, w.position);
 
     mu_binary_writer_init(&w, chunk, sizeof(chunk));
     chunk[0] = 'O';
@@ -195,7 +207,14 @@ static void enqueue_connect(mock_t *mock) {
         mu_binary_write_uint32(&os, (opcua_uint32_t)w.position);
     }
     enqueue(mock, chunk, w.position);
+}
 
+/* Append CreateSession(seq 2) and ActivateSession(seq 3) as MSG chunks using
+   the channel_id read from the OPN response. Call after s_channel_id is set. */
+static void enqueue_session(mock_t *mock) {
+    opcua_byte_t tmp[512], chunk[512];
+    mu_binary_writer_t w;
+    size_t clen;
     mu_binary_writer_init(&w, tmp, sizeof(tmp));
     {
         mu_nodeid_t t = {0, MU_NODEID_NUMERIC, {MU_ID_CREATESESSIONREQUEST}};
@@ -266,6 +285,17 @@ void test_register_and_unregister_nodes(void) {
     mu_binary_writer_t w;
     size_t clen;
 
+    _Alignas(8) opcua_byte_t storage[MU_SERVER_STORAGE_BYTES];
+    mu_server_config_t config;
+    mu_server_t *server = make_server(&mock, storage, sizeof(storage), &config, NULL);
+    mu_binary_reader_t body;
+
+    mu_server_poll(server); /* accept */
+    mu_server_poll(server); /* HEL */
+    mu_server_poll(server); /* OPN */
+    s_channel_id = read_opn_channel_id(mock.last_write, mock.last_write_len);
+    enqueue_session(&mock);
+
     /* RegisterNodes (seq 4): nodesToRegister = [ ns=1;i=1000 ]. */
     mu_binary_writer_init(&w, tmp, sizeof(tmp));
     {
@@ -296,14 +326,6 @@ void test_register_and_unregister_nodes(void) {
     clen = build_msg(chunk, sizeof(chunk), 5, 5, tmp, w.position);
     enqueue(&mock, chunk, clen);
 
-    _Alignas(8) opcua_byte_t storage[MU_SERVER_STORAGE_BYTES];
-    mu_server_config_t config;
-    mu_server_t *server = make_server(&mock, storage, sizeof(storage), &config, NULL);
-    mu_binary_reader_t body;
-
-    mu_server_poll(server); /* accept */
-    mu_server_poll(server); /* HEL */
-    mu_server_poll(server); /* OPN */
     mu_server_poll(server); /* CreateSession */
     mu_server_poll(server); /* ActivateSession */
 
@@ -347,6 +369,17 @@ void test_browse_next_invalid_continuation_point(void) {
     mu_binary_writer_t w;
     size_t clen;
 
+    _Alignas(8) opcua_byte_t storage[MU_SERVER_STORAGE_BYTES];
+    mu_server_config_t config;
+    mu_server_t *server = make_server(&mock, storage, sizeof(storage), &config, NULL);
+    mu_binary_reader_t body;
+
+    mu_server_poll(server); /* accept */
+    mu_server_poll(server); /* HEL */
+    mu_server_poll(server); /* OPN */
+    s_channel_id = read_opn_channel_id(mock.last_write, mock.last_write_len);
+    enqueue_session(&mock);
+
     /* BrowseNext (seq 4): releaseContinuationPoints=false, one 8-byte continuation point. */
     mu_binary_writer_init(&w, tmp, sizeof(tmp));
     {
@@ -364,14 +397,6 @@ void test_browse_next_invalid_continuation_point(void) {
     clen = build_msg(chunk, sizeof(chunk), 4, 4, tmp, w.position);
     enqueue(&mock, chunk, clen);
 
-    _Alignas(8) opcua_byte_t storage[MU_SERVER_STORAGE_BYTES];
-    mu_server_config_t config;
-    mu_server_t *server = make_server(&mock, storage, sizeof(storage), &config, NULL);
-    mu_binary_reader_t body;
-
-    mu_server_poll(server); /* accept */
-    mu_server_poll(server); /* HEL */
-    mu_server_poll(server); /* OPN */
     mu_server_poll(server); /* CreateSession */
     mu_server_poll(server); /* ActivateSession */
 
@@ -442,6 +467,17 @@ void test_translate_browse_paths(void) {
     mu_binary_writer_t w;
     size_t clen;
 
+    _Alignas(8) opcua_byte_t storage[MU_SERVER_STORAGE_BYTES];
+    mu_server_config_t config;
+    mu_server_t *server = make_server(&mock, storage, sizeof(storage), &config, &tbp_space);
+    mu_binary_reader_t body;
+
+    mu_server_poll(server);
+    mu_server_poll(server);
+    mu_server_poll(server); /* accept,HEL,OPN */
+    s_channel_id = read_opn_channel_id(mock.last_write, mock.last_write_len);
+    enqueue_session(&mock);
+
     /* TranslateBrowsePaths (seq 4): path 1 -> MyVar1 (Good), path 2 -> bad name (NoMatch). */
     mu_binary_writer_init(&w, tmp, sizeof(tmp));
     {
@@ -455,14 +491,6 @@ void test_translate_browse_paths(void) {
     clen = build_msg(chunk, sizeof(chunk), 4, 4, tmp, w.position);
     enqueue(&mock, chunk, clen);
 
-    _Alignas(8) opcua_byte_t storage[MU_SERVER_STORAGE_BYTES];
-    mu_server_config_t config;
-    mu_server_t *server = make_server(&mock, storage, sizeof(storage), &config, &tbp_space);
-    mu_binary_reader_t body;
-
-    mu_server_poll(server);
-    mu_server_poll(server);
-    mu_server_poll(server); /* accept,HEL,OPN */
     mu_server_poll(server);
     mu_server_poll(server); /* Create,Activate */
 
@@ -511,6 +539,17 @@ void test_base_information_default_nodes(void) {
     opcua_byte_t tmp[512], chunk[512];
     mu_binary_writer_t w;
     size_t clen;
+
+    _Alignas(8) opcua_byte_t storage[MU_SERVER_STORAGE_BYTES];
+    mu_server_config_t config;
+    mu_server_t *server = make_server(&mock, storage, sizeof(storage), &config, NULL); /* no integrator space */
+    mu_binary_reader_t body;
+
+    mu_server_poll(server);
+    mu_server_poll(server);
+    mu_server_poll(server); /* accept,HEL,OPN */
+    s_channel_id = read_opn_channel_id(mock.last_write, mock.last_write_len);
+    enqueue_session(&mock);
 
     /* Read (seq 4): ServerStatus.State (ns=0;i=2259) Value. */
     mu_binary_writer_init(&w, tmp, sizeof(tmp));
@@ -561,14 +600,6 @@ void test_base_information_default_nodes(void) {
     clen = build_msg(chunk, sizeof(chunk), 5, 5, tmp, w.position);
     enqueue(&mock, chunk, clen);
 
-    _Alignas(8) opcua_byte_t storage[MU_SERVER_STORAGE_BYTES];
-    mu_server_config_t config;
-    mu_server_t *server = make_server(&mock, storage, sizeof(storage), &config, NULL); /* no integrator space */
-    mu_binary_reader_t body;
-
-    mu_server_poll(server);
-    mu_server_poll(server);
-    mu_server_poll(server); /* accept,HEL,OPN */
     mu_server_poll(server);
     mu_server_poll(server); /* Create,Activate */
 
@@ -619,6 +650,19 @@ void test_server_status_current_time_is_live(void) {
     mu_binary_writer_t w;
     size_t clen;
 
+    _Alignas(8) opcua_byte_t storage[MU_SERVER_STORAGE_BYTES];
+    mu_server_config_t config;
+    mu_server_t *server = make_server(&mock, storage, sizeof(storage), &config, NULL);
+    /* Point the (live) time adapter at a known clock; CurrentTime must read it. */
+    server->config.time_adapter.get_time = s_test_now;
+    mu_binary_reader_t body;
+
+    mu_server_poll(server);
+    mu_server_poll(server);
+    mu_server_poll(server); /* accept,HEL,OPN */
+    s_channel_id = read_opn_channel_id(mock.last_write, mock.last_write_len);
+    enqueue_session(&mock);
+
     /* Read (seq 4): ServerStatus.CurrentTime (ns=0;i=2258) Value. */
     mu_binary_writer_init(&w, tmp, sizeof(tmp));
     {
@@ -641,18 +685,8 @@ void test_server_status_current_time_is_live(void) {
     clen = build_msg(chunk, sizeof(chunk), 4, 4, tmp, w.position);
     enqueue(&mock, chunk, clen);
 
-    _Alignas(8) opcua_byte_t storage[MU_SERVER_STORAGE_BYTES];
-    mu_server_config_t config;
-    mu_server_t *server = make_server(&mock, storage, sizeof(storage), &config, NULL);
-    /* Point the (live) time adapter at a known clock; CurrentTime must read it. */
-    server->config.time_adapter.get_time = s_test_now;
-    mu_binary_reader_t body;
-
     mu_server_poll(server);
-    mu_server_poll(server);
-    mu_server_poll(server);
-    mu_server_poll(server);
-    mu_server_poll(server);
+    mu_server_poll(server); /* Create,Activate */
 
     mu_server_poll(server); /* Read CurrentTime -> DateTime == s_test_now() */
     TEST_ASSERT_EQUAL(MU_ID_READRESPONSE, parse_response(mock.last_write, mock.last_write_len, &body));
