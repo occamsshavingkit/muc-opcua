@@ -69,6 +69,26 @@ Every `MUC_OPCUA_*` gate is `=1` when on and undefined when off, and both
 defaults would wrongly make `#ifdef X` true and enable the feature. So
 `features.h` contains only `#error` guards for illegal combinations, not defaults.
 
+## 7. Certificate trust model: DER-exact comparison, no chain-of-trust
+
+Per OPC-10000-4 §5.5, the server must trust the client's application-instance
+certificate. The current trust implementation (`mu_trust_list_match`) performs
+a **DER-octet exact comparison** between a presented certificate and a
+pre-configured trust list. It does *not* walk a certificate chain, verify a
+CA signature, or consult CRL/OCSP revocation status.
+
+This is intentional: the design targets **pre-verified certificate
+deployments** where integrators provision certificates directly into the
+trust list (e.g. self-signed application-instance certificates generated
+offline). Chain-of-trust validation (X.509 path building, revocation
+checking) would require ASN.1 parsing and crypto operations that add
+significant `.text` and RAM cost, which is out of scope for the constrained
+profiles this project targets.
+
+Integrators who require chain-of-trust or revocation should implement the
+optional `verify_certificate_validity` crypto-adapter hook with their own
+validation logic.
+
 ## Consequences
 
 - Secured Embedded/full profiles now enforce OPC-10000-4 application

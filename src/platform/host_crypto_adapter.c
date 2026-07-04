@@ -234,7 +234,9 @@ static opcua_statuscode_t rsa_oaep(EVP_PKEY *pk, int encrypt, const opcua_byte_t
     opcua_statuscode_t rc = MU_STATUS_BAD_INTERNALERROR;
     size_t ol = *out_len;
     int init_ok = encrypt ? (EVP_PKEY_encrypt_init(pc) == 1) : (EVP_PKEY_decrypt_init(pc) == 1);
-    if (init_ok && EVP_PKEY_CTX_set_rsa_padding(pc, RSA_PKCS1_OAEP_PADDING) == 1) {
+    if (init_ok && EVP_PKEY_CTX_set_rsa_padding(pc, RSA_PKCS1_OAEP_PADDING) == 1 &&
+        EVP_PKEY_CTX_set_rsa_oaep_md(pc, EVP_sha1()) == 1 &&
+        EVP_PKEY_CTX_set_rsa_mgf1_md(pc, EVP_sha1()) == 1) {
         int op = encrypt ? EVP_PKEY_encrypt(pc, out, &ol, in, in_len) : EVP_PKEY_decrypt(pc, out, &ol, in, in_len);
         if (op == 1) {
             *out_len = ol;

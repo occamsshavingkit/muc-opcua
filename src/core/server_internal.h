@@ -11,6 +11,24 @@
 #include "service_dispatch.h"
 #include "tcp_connection.h"
 
+/* Scratch layout within server->secure_scratch (all under MUC_OPCUA_SECURITY):
+   [0,                  MU_SECURE_RESP_MAX)           response body
+   [MU_SECURE_RESP_MAX, MU_SECURE_RESP_MAX + OPN_MAX) OPN request unwrap
+   [RESP_MAX + OPN_MAX, end)                          session handshake buffers
+   Details and _Static_asserts in server.c. */
+#ifdef MUC_OPCUA_SECURITY
+#define MU_SECURE_RESP_MAX 11264
+#define MU_SECURE_OPN_REQ_MAX 1024
+#define MU_SECURE_SESSION_OFFSET (MU_SECURE_RESP_MAX + MU_SECURE_OPN_REQ_MAX)
+
+/* Session-handshake scratch region — used by CreateSession (to_sign/sig) and
+   ActivateSession (verify_buf/decrypt_buf). Handler writes the response body into
+   respbody BEFORE signing/verification, so the session region MUST NOT overlap. */
+#define MU_SECURE_SESSION_MAX 2048
+#define MU_SESSION_TO_SIGN_SIZE 1536
+#define MU_SESSION_SIG_SIZE 512
+#endif
+
 #ifdef MUC_OPCUA_SERVICE_NODEMANAGEMENT
 typedef struct {
     mu_nodeid_t source_node_id;

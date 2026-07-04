@@ -260,50 +260,22 @@ static const mu_value_source_t s_max_nodes_per_read_value = {
 static const mu_value_source_t s_max_nodes_per_browse_value = {
     MU_VALUESOURCE_STATIC, {.static_value = {.type = MU_TYPE_UINT32, .value.ui32 = 8}}};
 
+#if MUC_OPCUA_BASE_TYPE_SYSTEM
 static const mu_node_t s_base_nodes[] = {
-#if MUC_OPCUA_BASE_TYPE_SYSTEM
     {{0, MU_NODEID_NUMERIC, {1}}, MU_NODECLASS_DATATYPE, {7, s_str_Boolean}, {7, s_str_Boolean}, NULL, 0, NULL},
-#endif
-#if MUC_OPCUA_BASE_TYPE_SYSTEM
     {{0, MU_NODEID_NUMERIC, {2}}, MU_NODECLASS_DATATYPE, {5, s_str_SByte}, {5, s_str_SByte}, NULL, 0, NULL},
-#endif
-#if MUC_OPCUA_BASE_TYPE_SYSTEM
     {{0, MU_NODEID_NUMERIC, {3}}, MU_NODECLASS_DATATYPE, {4, s_str_Byte}, {4, s_str_Byte}, NULL, 0, NULL},
-#endif
-#if MUC_OPCUA_BASE_TYPE_SYSTEM
     {{0, MU_NODEID_NUMERIC, {4}}, MU_NODECLASS_DATATYPE, {5, s_str_Int16}, {5, s_str_Int16}, NULL, 0, NULL},
-#endif
-#if MUC_OPCUA_BASE_TYPE_SYSTEM
     {{0, MU_NODEID_NUMERIC, {5}}, MU_NODECLASS_DATATYPE, {6, s_str_UInt16}, {6, s_str_UInt16}, NULL, 0, NULL},
-#endif
-#if MUC_OPCUA_BASE_TYPE_SYSTEM
     {{0, MU_NODEID_NUMERIC, {6}}, MU_NODECLASS_DATATYPE, {5, s_str_Int32}, {5, s_str_Int32}, NULL, 0, NULL},
-#endif
-#if MUC_OPCUA_BASE_TYPE_SYSTEM
     {{0, MU_NODEID_NUMERIC, {7}}, MU_NODECLASS_DATATYPE, {6, s_str_UInt32}, {6, s_str_UInt32}, NULL, 0, NULL},
-#endif
-#if MUC_OPCUA_BASE_TYPE_SYSTEM
     {{0, MU_NODEID_NUMERIC, {8}}, MU_NODECLASS_DATATYPE, {5, s_str_Int64}, {5, s_str_Int64}, NULL, 0, NULL},
-#endif
-#if MUC_OPCUA_BASE_TYPE_SYSTEM
     {{0, MU_NODEID_NUMERIC, {9}}, MU_NODECLASS_DATATYPE, {6, s_str_UInt64}, {6, s_str_UInt64}, NULL, 0, NULL},
-#endif
-#if MUC_OPCUA_BASE_TYPE_SYSTEM
     {{0, MU_NODEID_NUMERIC, {10}}, MU_NODECLASS_DATATYPE, {5, s_str_Float}, {5, s_str_Float}, NULL, 0, NULL},
-#endif
-#if MUC_OPCUA_BASE_TYPE_SYSTEM
     {{0, MU_NODEID_NUMERIC, {11}}, MU_NODECLASS_DATATYPE, {6, s_str_Double}, {6, s_str_Double}, NULL, 0, NULL},
-#endif
-#if MUC_OPCUA_BASE_TYPE_SYSTEM
     {{0, MU_NODEID_NUMERIC, {12}}, MU_NODECLASS_DATATYPE, {6, s_str_String}, {6, s_str_String}, NULL, 0, NULL},
-#endif
-#if MUC_OPCUA_BASE_TYPE_SYSTEM
     {{0, MU_NODEID_NUMERIC, {13}}, MU_NODECLASS_DATATYPE, {8, s_str_DateTime}, {8, s_str_DateTime}, NULL, 0, NULL},
-#endif
-#if MUC_OPCUA_BASE_TYPE_SYSTEM
     {{0, MU_NODEID_NUMERIC, {17}}, MU_NODECLASS_DATATYPE, {6, s_str_NodeId}, {6, s_str_NodeId}, NULL, 0, NULL},
-#endif
-#if MUC_OPCUA_BASE_TYPE_SYSTEM
     {{0, MU_NODEID_NUMERIC, {19}},
      MU_NODECLASS_DATATYPE,
      {10, s_str_StatusCode},
@@ -311,8 +283,6 @@ static const mu_node_t s_base_nodes[] = {
      NULL,
      0,
      NULL},
-#endif
-#if MUC_OPCUA_BASE_TYPE_SYSTEM
     {{0, MU_NODEID_NUMERIC, {20}},
      MU_NODECLASS_DATATYPE,
      {13, s_str_QualifiedName},
@@ -320,8 +290,6 @@ static const mu_node_t s_base_nodes[] = {
      NULL,
      0,
      NULL},
-#endif
-#if MUC_OPCUA_BASE_TYPE_SYSTEM
     {{0, MU_NODEID_NUMERIC, {21}},
      MU_NODECLASS_DATATYPE,
      {13, s_str_LocalizedText},
@@ -329,9 +297,6 @@ static const mu_node_t s_base_nodes[] = {
      NULL,
      0,
      NULL},
-
-#endif
-#if MUC_OPCUA_BASE_TYPE_SYSTEM
     {{0, MU_NODEID_NUMERIC, {24}},
      MU_NODECLASS_DATATYPE,
      {12, s_str_BaseDataType},
@@ -339,8 +304,6 @@ static const mu_node_t s_base_nodes[] = {
      s_base_data_type_refs,
      sizeof(s_base_data_type_refs) / sizeof(s_base_data_type_refs[0]),
      NULL},
-#endif
-#if MUC_OPCUA_BASE_TYPE_SYSTEM
     {{0, MU_NODEID_NUMERIC, {31}},
      MU_NODECLASS_REFERENCETYPE,
      {10, s_str_References},
@@ -348,8 +311,6 @@ static const mu_node_t s_base_nodes[] = {
      s_references_refs,
      sizeof(s_references_refs) / sizeof(s_references_refs[0]),
      NULL},
-#endif
-#if MUC_OPCUA_BASE_TYPE_SYSTEM
     {{0, MU_NODEID_NUMERIC, {32}},
      MU_NODECLASS_REFERENCETYPE,
      {25, s_str_NonHierarchicalReferences},
@@ -357,8 +318,6 @@ static const mu_node_t s_base_nodes[] = {
      s_nonhierarchical_refs,
      sizeof(s_nonhierarchical_refs) / sizeof(s_nonhierarchical_refs[0]),
      NULL},
-#endif
-#if MUC_OPCUA_BASE_TYPE_SYSTEM
     {{0, MU_NODEID_NUMERIC, {33}},
      MU_NODECLASS_REFERENCETYPE,
      {22, s_str_HierarchicalReferences},
@@ -366,8 +325,6 @@ static const mu_node_t s_base_nodes[] = {
      s_hierarchical_refs,
      sizeof(s_hierarchical_refs) / sizeof(s_hierarchical_refs[0]),
      NULL},
-#endif
-#if MUC_OPCUA_BASE_TYPE_SYSTEM
     {{0, MU_NODEID_NUMERIC, {34}},
      MU_NODECLASS_REFERENCETYPE,
      {8, s_str_HasChild},
@@ -375,8 +332,6 @@ static const mu_node_t s_base_nodes[] = {
      s_has_child_refs,
      sizeof(s_has_child_refs) / sizeof(s_has_child_refs[0]),
      NULL},
-#endif
-#if MUC_OPCUA_BASE_TYPE_SYSTEM
     {{0, MU_NODEID_NUMERIC, {35}},
      MU_NODECLASS_REFERENCETYPE,
      {9, s_str_Organizes},
@@ -384,8 +339,6 @@ static const mu_node_t s_base_nodes[] = {
      NULL,
      0,
      NULL},
-#endif
-#if MUC_OPCUA_BASE_TYPE_SYSTEM
     {{0, MU_NODEID_NUMERIC, {40}},
      MU_NODECLASS_REFERENCETYPE,
      {17, s_str_HasTypeDefinition},
@@ -393,8 +346,6 @@ static const mu_node_t s_base_nodes[] = {
      NULL,
      0,
      NULL},
-#endif
-#if MUC_OPCUA_BASE_TYPE_SYSTEM
     {{0, MU_NODEID_NUMERIC, {44}},
      MU_NODECLASS_REFERENCETYPE,
      {10, s_str_Aggregates},
@@ -402,8 +353,6 @@ static const mu_node_t s_base_nodes[] = {
      s_aggregates_refs,
      sizeof(s_aggregates_refs) / sizeof(s_aggregates_refs[0]),
      NULL},
-#endif
-#if MUC_OPCUA_BASE_TYPE_SYSTEM
     {{0, MU_NODEID_NUMERIC, {45}},
      MU_NODECLASS_REFERENCETYPE,
      {10, s_str_HasSubtype},
@@ -411,8 +360,6 @@ static const mu_node_t s_base_nodes[] = {
      NULL,
      0,
      NULL},
-#endif
-#if MUC_OPCUA_BASE_TYPE_SYSTEM
     {{0, MU_NODEID_NUMERIC, {46}},
      MU_NODECLASS_REFERENCETYPE,
      {11, s_str_HasProperty},
@@ -420,8 +367,6 @@ static const mu_node_t s_base_nodes[] = {
      NULL,
      0,
      NULL},
-#endif
-#if MUC_OPCUA_BASE_TYPE_SYSTEM
     {{0, MU_NODEID_NUMERIC, {47}},
      MU_NODECLASS_REFERENCETYPE,
      {12, s_str_HasComponent},
@@ -429,9 +374,6 @@ static const mu_node_t s_base_nodes[] = {
      NULL,
      0,
      NULL},
-
-#endif
-#if MUC_OPCUA_BASE_TYPE_SYSTEM
     {{0, MU_NODEID_NUMERIC, {58}},
      MU_NODECLASS_OBJECTTYPE,
      {14, s_str_BaseObjectType},
@@ -439,8 +381,6 @@ static const mu_node_t s_base_nodes[] = {
      s_base_object_type_refs,
      sizeof(s_base_object_type_refs) / sizeof(s_base_object_type_refs[0]),
      NULL},
-#endif
-#if MUC_OPCUA_BASE_TYPE_SYSTEM
     {{0, MU_NODEID_NUMERIC, {61}},
      MU_NODECLASS_OBJECTTYPE,
      {10, s_str_FolderType},
@@ -448,8 +388,6 @@ static const mu_node_t s_base_nodes[] = {
      NULL,
      0,
      NULL},
-#endif
-#if MUC_OPCUA_BASE_TYPE_SYSTEM
     {{0, MU_NODEID_NUMERIC, {62}},
      MU_NODECLASS_VARIABLETYPE,
      {16, s_str_BaseVariableType},
@@ -457,8 +395,6 @@ static const mu_node_t s_base_nodes[] = {
      s_base_variable_type_refs,
      sizeof(s_base_variable_type_refs) / sizeof(s_base_variable_type_refs[0]),
      NULL},
-#endif
-#if MUC_OPCUA_BASE_TYPE_SYSTEM
     {{0, MU_NODEID_NUMERIC, {63}},
      MU_NODECLASS_VARIABLETYPE,
      {20, s_str_BaseDataVariableType},
@@ -466,8 +402,6 @@ static const mu_node_t s_base_nodes[] = {
      s_base_data_variable_type_refs,
      sizeof(s_base_data_variable_type_refs) / sizeof(s_base_data_variable_type_refs[0]),
      NULL},
-#endif
-#if MUC_OPCUA_BASE_TYPE_SYSTEM
     {{0, MU_NODEID_NUMERIC, {68}},
      MU_NODECLASS_VARIABLETYPE,
      {12, s_str_PropertyType},
@@ -475,7 +409,6 @@ static const mu_node_t s_base_nodes[] = {
      NULL,
      0,
      NULL},
-#endif
     {{0, MU_NODEID_NUMERIC, {84}},
      MU_NODECLASS_OBJECT,
      {4, s_str_Root},
@@ -494,27 +427,16 @@ static const mu_node_t s_base_nodes[] = {
      MU_NODECLASS_OBJECT,
      {5, s_str_Types},
      {5, s_str_Types},
-#if MUC_OPCUA_BASE_TYPE_SYSTEM
      s_types_refs,
      sizeof(s_types_refs) / sizeof(s_types_refs[0]),
-#else
-     NULL,
-     0,
-#endif
      NULL},
     {{0, MU_NODEID_NUMERIC, {87}},
      MU_NODECLASS_OBJECT,
      {5, s_str_Views},
      {5, s_str_Views},
-#if MUC_OPCUA_BASE_TYPE_SYSTEM
      s_views_refs,
      sizeof(s_views_refs) / sizeof(s_views_refs[0]),
-#else
-     NULL,
-     0,
-#endif
      NULL},
-#if MUC_OPCUA_BASE_TYPE_SYSTEM
     {{0, MU_NODEID_NUMERIC, {88}},
      MU_NODECLASS_OBJECT,
      {11, s_str_ObjectTypes},
@@ -522,8 +444,6 @@ static const mu_node_t s_base_nodes[] = {
      s_type_folder_object_refs,
      sizeof(s_type_folder_object_refs) / sizeof(s_type_folder_object_refs[0]),
      NULL},
-#endif
-#if MUC_OPCUA_BASE_TYPE_SYSTEM
     {{0, MU_NODEID_NUMERIC, {89}},
      MU_NODECLASS_OBJECT,
      {13, s_str_VariableTypes},
@@ -531,8 +451,6 @@ static const mu_node_t s_base_nodes[] = {
      s_type_folder_variable_refs,
      sizeof(s_type_folder_variable_refs) / sizeof(s_type_folder_variable_refs[0]),
      NULL},
-#endif
-#if MUC_OPCUA_BASE_TYPE_SYSTEM
     {{0, MU_NODEID_NUMERIC, {90}},
      MU_NODECLASS_OBJECT,
      {9, s_str_DataTypes},
@@ -540,8 +458,6 @@ static const mu_node_t s_base_nodes[] = {
      s_type_folder_data_refs,
      sizeof(s_type_folder_data_refs) / sizeof(s_type_folder_data_refs[0]),
      NULL},
-#endif
-#if MUC_OPCUA_BASE_TYPE_SYSTEM
     {{0, MU_NODEID_NUMERIC, {91}},
      MU_NODECLASS_OBJECT,
      {14, s_str_ReferenceTypes},
@@ -549,9 +465,6 @@ static const mu_node_t s_base_nodes[] = {
      s_type_folder_reference_refs,
      sizeof(s_type_folder_reference_refs) / sizeof(s_type_folder_reference_refs[0]),
      NULL},
-
-#endif
-#if MUC_OPCUA_BASE_TYPE_SYSTEM
     {{0, MU_NODEID_NUMERIC, {2004}},
      MU_NODECLASS_OBJECTTYPE,
      {10, s_str_ServerType},
@@ -559,7 +472,6 @@ static const mu_node_t s_base_nodes[] = {
      NULL,
      0,
      NULL},
-#endif
     {{0, MU_NODEID_NUMERIC, {2253}},
      MU_NODECLASS_OBJECT,
      {6, s_str_Server},
@@ -571,25 +483,15 @@ static const mu_node_t s_base_nodes[] = {
      MU_NODECLASS_VARIABLE,
      {11, s_str_ServerArray},
      {11, s_str_ServerArray},
-#if MUC_OPCUA_BASE_TYPE_SYSTEM
      s_property_type_ref,
      sizeof(s_property_type_ref) / sizeof(s_property_type_ref[0]),
-#else
-     NULL,
-     0,
-#endif
      &s_server_array_value},
     {{0, MU_NODEID_NUMERIC, {2255}},
      MU_NODECLASS_VARIABLE,
      {14, s_str_NamespaceArray},
      {14, s_str_NamespaceArray},
-#if MUC_OPCUA_BASE_TYPE_SYSTEM
      s_property_type_ref,
      sizeof(s_property_type_ref) / sizeof(s_property_type_ref[0]),
-#else
-     NULL,
-     0,
-#endif
      &s_namespace_array_value},
     {{0, MU_NODEID_NUMERIC, {2256}},
      MU_NODECLASS_VARIABLE,
@@ -602,13 +504,8 @@ static const mu_node_t s_base_nodes[] = {
      MU_NODECLASS_VARIABLE,
      {5, s_str_State},
      {5, s_str_State},
-#if MUC_OPCUA_BASE_TYPE_SYSTEM
      s_property_type_ref,
      sizeof(s_property_type_ref) / sizeof(s_property_type_ref[0]),
-#else
-     NULL,
-     0,
-#endif
      &s_server_status_state_value},
     {{0, MU_NODEID_NUMERIC, {2268}},
      MU_NODECLASS_OBJECT,
@@ -621,27 +518,16 @@ static const mu_node_t s_base_nodes[] = {
      MU_NODECLASS_VARIABLE,
      {18, s_str_ServerProfileArray},
      {18, s_str_ServerProfileArray},
-#if MUC_OPCUA_BASE_TYPE_SYSTEM
      s_property_type_ref,
      sizeof(s_property_type_ref) / sizeof(s_property_type_ref[0]),
-#else
-     NULL,
-     0,
-#endif
      &s_server_profile_array_value},
     {{0, MU_NODEID_NUMERIC, {2271}},
      MU_NODECLASS_VARIABLE,
      {13, s_str_LocaleIdArray},
      {13, s_str_LocaleIdArray},
-#if MUC_OPCUA_BASE_TYPE_SYSTEM
      s_property_type_ref,
      sizeof(s_property_type_ref) / sizeof(s_property_type_ref[0]),
-#else
-     NULL,
-     0,
-#endif
      &s_locale_id_array_value},
-#if MUC_OPCUA_BASE_TYPE_SYSTEM
 #if MUC_OPCUA_SUBSCRIPTIONS_STANDARD
     {{0, MU_NODEID_NUMERIC, {11492}},
      MU_NODECLASS_METHOD,
@@ -650,10 +536,6 @@ static const mu_node_t s_base_nodes[] = {
      s_get_monitored_items_refs,
      sizeof(s_get_monitored_items_refs) / sizeof(s_get_monitored_items_refs[0]),
      NULL},
-#endif
-#endif
-#if MUC_OPCUA_BASE_TYPE_SYSTEM
-#if MUC_OPCUA_SUBSCRIPTIONS_STANDARD
     {{0, MU_NODEID_NUMERIC, {11493}},
      MU_NODECLASS_VARIABLE,
      {14, s_str_InputArguments},
@@ -661,10 +543,6 @@ static const mu_node_t s_base_nodes[] = {
      s_property_type_ref,
      sizeof(s_property_type_ref) / sizeof(s_property_type_ref[0]),
      NULL},
-#endif
-#endif
-#if MUC_OPCUA_BASE_TYPE_SYSTEM
-#if MUC_OPCUA_SUBSCRIPTIONS_STANDARD
     {{0, MU_NODEID_NUMERIC, {11494}},
      MU_NODECLASS_VARIABLE,
      {15, s_str_OutputArguments},
@@ -672,7 +550,6 @@ static const mu_node_t s_base_nodes[] = {
      s_property_type_ref,
      sizeof(s_property_type_ref) / sizeof(s_property_type_ref[0]),
      NULL},
-#endif
 #endif
     {{0, MU_NODEID_NUMERIC, {11704}},
      MU_NODECLASS_OBJECT,
@@ -685,27 +562,16 @@ static const mu_node_t s_base_nodes[] = {
      MU_NODECLASS_VARIABLE,
      {15, s_str_MaxNodesPerRead},
      {15, s_str_MaxNodesPerRead},
-#if MUC_OPCUA_BASE_TYPE_SYSTEM
      s_property_type_ref,
      sizeof(s_property_type_ref) / sizeof(s_property_type_ref[0]),
-#else
-     NULL,
-     0,
-#endif
      &s_max_nodes_per_read_value},
     {{0, MU_NODEID_NUMERIC, {11710}},
      MU_NODECLASS_VARIABLE,
      {17, s_str_MaxNodesPerBrowse},
      {17, s_str_MaxNodesPerBrowse},
-#if MUC_OPCUA_BASE_TYPE_SYSTEM
      s_property_type_ref,
      sizeof(s_property_type_ref) / sizeof(s_property_type_ref[0]),
-#else
-     NULL,
-     0,
-#endif
      &s_max_nodes_per_browse_value},
-#if MUC_OPCUA_BASE_TYPE_SYSTEM
 #if MUC_OPCUA_SUBSCRIPTIONS_STANDARD
     {{0, MU_NODEID_NUMERIC, {12873}},
      MU_NODECLASS_METHOD,
@@ -714,21 +580,124 @@ static const mu_node_t s_base_nodes[] = {
      s_resend_data_refs,
      sizeof(s_resend_data_refs) / sizeof(s_resend_data_refs[0]),
      NULL},
-#endif
-#endif
-#if MUC_OPCUA_BASE_TYPE_SYSTEM
-#if MUC_OPCUA_SUBSCRIPTIONS_STANDARD
     {{0, MU_NODEID_NUMERIC, {12874}},
      MU_NODECLASS_VARIABLE,
      {14, s_str_InputArguments},
      {14, s_str_InputArguments},
      s_property_type_ref,
      sizeof(s_property_type_ref) / sizeof(s_property_type_ref[0]),
-     NULL}
-
-#endif
+     NULL},
 #endif
 };
+#else
+static const mu_node_t s_base_nodes[] = {
+    {{0, MU_NODEID_NUMERIC, {84}},
+     MU_NODECLASS_OBJECT,
+     {4, s_str_Root},
+     {4, s_str_Root},
+     s_root_refs,
+     sizeof(s_root_refs) / sizeof(s_root_refs[0]),
+     NULL},
+    {{0, MU_NODEID_NUMERIC, {85}},
+     MU_NODECLASS_OBJECT,
+     {7, s_str_Objects},
+     {7, s_str_Objects},
+     s_objects_refs,
+     sizeof(s_objects_refs) / sizeof(s_objects_refs[0]),
+     NULL},
+    {{0, MU_NODEID_NUMERIC, {86}},
+     MU_NODECLASS_OBJECT,
+     {5, s_str_Types},
+     {5, s_str_Types},
+     NULL,
+     0,
+     NULL},
+    {{0, MU_NODEID_NUMERIC, {87}},
+     MU_NODECLASS_OBJECT,
+     {5, s_str_Views},
+     {5, s_str_Views},
+     NULL,
+     0,
+     NULL},
+    {{0, MU_NODEID_NUMERIC, {2253}},
+     MU_NODECLASS_OBJECT,
+     {6, s_str_Server},
+     {6, s_str_Server},
+     s_server_refs,
+     sizeof(s_server_refs) / sizeof(s_server_refs[0]),
+     NULL},
+    {{0, MU_NODEID_NUMERIC, {2254}},
+     MU_NODECLASS_VARIABLE,
+     {11, s_str_ServerArray},
+     {11, s_str_ServerArray},
+     NULL,
+     0,
+     &s_server_array_value},
+    {{0, MU_NODEID_NUMERIC, {2255}},
+     MU_NODECLASS_VARIABLE,
+     {14, s_str_NamespaceArray},
+     {14, s_str_NamespaceArray},
+     NULL,
+     0,
+     &s_namespace_array_value},
+    {{0, MU_NODEID_NUMERIC, {2256}},
+     MU_NODECLASS_VARIABLE,
+     {12, s_str_ServerStatus},
+     {12, s_str_ServerStatus},
+     s_server_status_refs,
+     sizeof(s_server_status_refs) / sizeof(s_server_status_refs[0]),
+     NULL},
+    {{0, MU_NODEID_NUMERIC, {2259}},
+     MU_NODECLASS_VARIABLE,
+     {5, s_str_State},
+     {5, s_str_State},
+     NULL,
+     0,
+     &s_server_status_state_value},
+    {{0, MU_NODEID_NUMERIC, {2268}},
+     MU_NODECLASS_OBJECT,
+     {18, s_str_ServerCapabilities},
+     {18, s_str_ServerCapabilities},
+     s_server_capabilities_refs,
+     sizeof(s_server_capabilities_refs) / sizeof(s_server_capabilities_refs[0]),
+     NULL},
+    {{0, MU_NODEID_NUMERIC, {2269}},
+     MU_NODECLASS_VARIABLE,
+     {18, s_str_ServerProfileArray},
+     {18, s_str_ServerProfileArray},
+     NULL,
+     0,
+     &s_server_profile_array_value},
+    {{0, MU_NODEID_NUMERIC, {2271}},
+     MU_NODECLASS_VARIABLE,
+     {13, s_str_LocaleIdArray},
+     {13, s_str_LocaleIdArray},
+     NULL,
+     0,
+     &s_locale_id_array_value},
+    {{0, MU_NODEID_NUMERIC, {11704}},
+     MU_NODECLASS_OBJECT,
+     {15, s_str_OperationLimits},
+     {15, s_str_OperationLimits},
+     s_operation_limits_refs,
+     sizeof(s_operation_limits_refs) / sizeof(s_operation_limits_refs[0]),
+     NULL},
+    {{0, MU_NODEID_NUMERIC, {11705}},
+     MU_NODECLASS_VARIABLE,
+     {15, s_str_MaxNodesPerRead},
+     {15, s_str_MaxNodesPerRead},
+     NULL,
+     0,
+     &s_max_nodes_per_read_value},
+    {{0, MU_NODEID_NUMERIC, {11710}},
+     MU_NODECLASS_VARIABLE,
+     {17, s_str_MaxNodesPerBrowse},
+     {17, s_str_MaxNodesPerBrowse},
+     NULL,
+     0,
+     &s_max_nodes_per_browse_value},
+};
+#endif
 
 static const mu_address_space_t s_base_space = {s_base_nodes, sizeof(s_base_nodes) / sizeof(s_base_nodes[0])};
 #else

@@ -15,22 +15,15 @@ opcua_statuscode_t mu_value_source_read(const mu_value_source_t *source, const m
             *value = source->data.static_value;
             return MU_STATUS_GOOD;
         }
-        switch (source->data.static_value.type) {
-        case MU_TYPE_BOOLEAN:
-        case MU_TYPE_INT32:
-        case MU_TYPE_UINT32:
-        case MU_TYPE_FLOAT:
-            *value = source->data.static_value;
-            return MU_STATUS_GOOD;
-        case MU_TYPE_STRING:
+        if (source->data.static_value.type == MU_TYPE_STRING) {
             if (source->data.static_value.value.str.length > MU_MAX_STRING_VALUE_LENGTH) {
                 return MU_STATUS_BAD_ENCODINGLIMITSEXCEEDED;
             }
-            *value = source->data.static_value;
-            return MU_STATUS_GOOD;
-        default:
-            return MU_STATUS_BAD_NOTREADABLE;
         }
+        /* All scalar built-in types (Boolean through UInt64, Float, Double,
+           String, DateTime, Guid, StatusCode, etc.) are accepted. OPC-10000-3 S5.6. */
+        *value = source->data.static_value;
+        return MU_STATUS_GOOD;
     } else if (source->type == MU_VALUESOURCE_CALLBACK) {
         if (!source->data.callback.read) {
             return MU_STATUS_BAD_INTERNALERROR;

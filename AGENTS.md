@@ -1,5 +1,5 @@
 <!-- SPECKIT START -->
-For project-wide constraints, read `.specify/memory/constitution.md`.
-For the active feature's technologies, project structure, shell commands, and
-other planning context, read `specs/024-rename-muc-opcua/plan.md`.
+For additional context about technologies to be used, project structure,
+shell commands, and other important information, read the current plan:
+specs/029-fix-audit-findings/plan.md
 <!-- SPECKIT END -->

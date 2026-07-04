@@ -52,7 +52,7 @@ void test_browse_requested_max_references(void) {
 
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_browse_process(&address_space, NULL, &req, &result, 1, ref_pool, 10));
     TEST_ASSERT_EQUAL(MU_STATUS_BAD_NOCONTINUATIONPOINTS, result.status_code);
-    TEST_ASSERT_EQUAL(0, result.num_references);
+    TEST_ASSERT_EQUAL(2, result.num_references);  /* T3: refs returned up to the requested limit */
 }
 
 void test_browse_response_size_bounds(void) {

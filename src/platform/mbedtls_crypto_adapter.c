@@ -248,7 +248,6 @@ static opcua_statuscode_t m_rsa_pss_sha256_verify(void *context, const opcua_byt
                                                   size_t data_length, const opcua_byte_t *signature,
                                                   size_t signature_length) {
     (void)context;
-    (void)signature_length;
     mbedtls_x509_crt crt;
     mbedtls_x509_crt_init(&crt);
     int ret = mbedtls_x509_crt_parse_der(&crt, certificate, certificate_length);
@@ -271,6 +270,10 @@ static opcua_statuscode_t m_rsa_pss_sha256_verify(void *context, const opcua_byt
         return MU_STATUS_BAD_INTERNALERROR;
     }
 
+    if (signature_length != mbedtls_rsa_get_len(rsa)) {
+        mbedtls_x509_crt_free(&crt);
+        return MU_STATUS_BAD_SECURITYCHECKSFAILED;
+    }
     ret = mbedtls_rsa_rsassa_pss_verify(rsa, mbedtls_ctr_drbg_random, NULL, MBEDTLS_RSA_PUBLIC, MBEDTLS_MD_SHA256,
                                         sizeof(hash), hash, signature);
     mbedtls_x509_crt_free(&crt);

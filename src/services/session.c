@@ -1,5 +1,6 @@
 /* src/services/session.c */
 #include "session.h"
+#include "../core/server_internal.h"
 #include <stddef.h>
 #include <string.h>
 
@@ -123,7 +124,10 @@ opcua_statuscode_t mu_session_generate_session_id(const mu_session_t *sessions, 
 
     for (size_t salt = 0; salt <= count; ++salt) {
         /* OPC-10000-4 section 5.7.2.2: CreateSession SessionId is generated
-           from entropy; the salt only resolves active-slot collisions. */
+           from entropy; the salt only resolves active-slot collisions.
+           Session ID is generated via XOR with 0x9E3779B9u; bounded by
+           MU_MAX_SESSIONS (default 2). Not cryptographically random —
+           acceptable for single-connection profile. */
         opcua_uint32_t candidate = base ^ (opcua_uint32_t)(0x9E3779B9u * (opcua_uint32_t)salt);
         if (candidate == 0u) {
             candidate = (opcua_uint32_t)(0x85EBCA6Bu ^ (opcua_uint32_t)salt);

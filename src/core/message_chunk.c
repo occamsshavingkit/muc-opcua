@@ -15,12 +15,11 @@ opcua_statuscode_t mu_parse_message_header(const opcua_byte_t *buffer, size_t le
     header->chunk_type = buffer[3];
 
     /* OPC-10000-6 6.7.2 and 7.1.2.2 define the accepted 3-byte MessageType values. */
-    if (!(header->message_type[0] == 'H' && header->message_type[1] == 'E' && header->message_type[2] == 'L') &&
-        !(header->message_type[0] == 'A' && header->message_type[1] == 'C' && header->message_type[2] == 'K') &&
-        !(header->message_type[0] == 'E' && header->message_type[1] == 'R' && header->message_type[2] == 'R') &&
-        !(header->message_type[0] == 'O' && header->message_type[1] == 'P' && header->message_type[2] == 'N') &&
-        !(header->message_type[0] == 'C' && header->message_type[1] == 'L' && header->message_type[2] == 'O') &&
-        !(header->message_type[0] == 'M' && header->message_type[1] == 'S' && header->message_type[2] == 'G')) {
+    opcua_uint32_t msg_type = ((opcua_uint32_t)header->message_type[0]) |
+                              ((opcua_uint32_t)header->message_type[1] << 8u) |
+                              ((opcua_uint32_t)header->message_type[2] << 16u);
+    if (msg_type != 0x4C4548u && msg_type != 0x4B4341u && msg_type != 0x525245u &&
+        msg_type != 0x4E504Fu && msg_type != 0x4F4C43u && msg_type != 0x47534Du) {
         return MU_STATUS_BAD_TCPMESSAGETYPEINVALID;
     }
 
@@ -41,7 +40,7 @@ opcua_statuscode_t mu_parse_message_header(const opcua_byte_t *buffer, size_t le
         return MU_STATUS_BAD_TCPINTERNALERROR;
     }
 
-    if (header->message_type[0] == 'H' || header->message_type[0] == 'A' || header->message_type[0] == 'E') {
+    if (msg_type == 0x4C4548u || msg_type == 0x4B4341u || msg_type == 0x525245u) {
         header->secure_channel_id = 0;
         return MU_STATUS_GOOD;
     }
