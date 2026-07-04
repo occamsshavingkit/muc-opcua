@@ -1,4 +1,4 @@
-# TODO — micro-opcua
+# TODO — muc-opcua
 
 **Updated**: 2026-07-04
 **Source**: `docs/review/five-lens-audit-2026-07-04.md`, Codacy triage, deferred findings
@@ -36,6 +36,7 @@
 
 ## Tech Debt
 
+- [ ] `src/core/service_dispatch.c:284` — HistoryUpdate dispatch entry has wrong response_id: `MU_ID_HISTORYUPDATEREQUEST` (700) is used for both request and response; the response_id should be `MU_ID_HISTORYUPDATERESPONSE` (703). Pre-existing bug surfaced while reordering the table for binary search (T013). Out of scope for T013; fixing changes the wire-visible response NodeId and needs its own test.
 - [ ] `subscription.c` is 1,692 lines — consider splitting into separate concerns (publish, monitor, filter)
 - [ ] `service_dispatch.c` is large — service-specific dispatch could be extracted
 - [ ] MISRA 15.6: 10 single-statement bodies remain in platform crypto adapters (wolfssl, host_crypto, mbedtls)

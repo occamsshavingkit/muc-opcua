@@ -2,10 +2,6 @@
 #include "subscription.h"
 #include <string.h>
 
-#if MUC_OPCUA_SUBSCRIPTIONS_STANDARD
-#include <math.h>
-#endif
-
 #if MUC_OPCUA_SUBSCRIPTIONS
 
 #include "../core/server_internal.h"
@@ -117,18 +113,24 @@ static bool monitored_item_change_reportable(const mu_monitored_item_t *item, co
         return true;
     }
 
-    if (item->deadband_type != MU_DEADBAND_TYPE_ABSOLUTE) {
-        return true;
-    }
-
     if (!variant_numeric_to_double(cur, &numeric) || !variant_numeric_to_double(&item->last_value, &reported_numeric)) {
         return true;
     }
 
     (void)reported_numeric;
-    /* OPC-10000-4 §7.22.2: Absolute deadband suppresses same-status
-       numeric changes smaller than |new - last reported| >= deadbandValue. */
-    return fabs((double)numeric - (double)item->last_reported_numeric) >= (double)item->deadband_value;
+    /* OPC-10000-4 §7.22.2: DeadbandType NONE reports only on an actual
+       value change; Absolute suppresses same-status numeric changes
+       smaller than deadbandValue. */
+    double diff = (double)numeric - (double)item->last_reported_numeric;
+    if (diff < 0.0) {
+        diff = -diff;
+    }
+
+    if (item->deadband_type == MU_DEADBAND_TYPE_ABSOLUTE) {
+        return diff >= (double)item->deadband_value;
+    }
+
+    return diff > 0.0;
 }
 
 static void monitored_item_record_reported(mu_monitored_item_t *item, const mu_variant_t *cur) {
@@ -334,13 +336,30 @@ static void advance_sample_timer(mu_monitored_item_t *item, opcua_uint64_t now_m
             return;
         }
 
-        opcua_uint64_t steps = (elapsed / interval) + 1u;
-        opcua_uint64_t max_steps = (max - item->next_sample_ms) / interval;
+        /* Catch-up path: advance by whole sampling intervals using
+         * repeated subtraction bounded to 10 steps. This avoids the
+         * Cortex-M0+ software 64-bit divide (__aeabi_uldivmod,
+         * ~300 cycles). When the server is very late the remaining
+         * catch-up is deferred to subsequent ticks. Grounding:
+         * OPC-10000-4 §5.13.1.2 (sampling interval behavior). */
+        opcua_uint64_t steps = 0u;
+        while ((elapsed >= interval) && (steps < 10u)) {
+            elapsed -= interval;
+            steps++;
+        }
 
-        if (steps > max_steps) {
-            item->next_sample_ms = max;
-        } else {
-            item->next_sample_ms += steps * interval;
+        /* Advance next_sample_ms by (steps + 1) intervals, saturating
+         * at UINT64_MAX on overflow. The +1 lands the timer past
+         * now_ms so the next tick takes the hot path. The incremental
+         * overflow check replaces the former max_steps division. */
+        opcua_uint64_t advance = steps + 1u;
+        while (advance > 0u) {
+            if (item->next_sample_ms > max - interval) {
+                item->next_sample_ms = max;
+                break;
+            }
+            item->next_sample_ms += interval;
+            advance--;
         }
     }
 }
@@ -449,7 +468,7 @@ static void revise_subscription_counts(opcua_uint32_t requested_lifetime_count,
 static bool publish_request_dequeue(mu_subscriptions_t *subs, opcua_uint32_t session_id,
                                     mu_publish_request_t *out_request) {
     bool found = false;
-    size_t best = 0u;
+    size_t best = 0;
     opcua_uint64_t best_enqueued = 0u;
 
     if (subs == NULL || out_request == NULL) {
@@ -556,22 +575,38 @@ static opcua_int32_t count_reportable_items(const struct mu_server *server, mu_s
     opcua_uint32_t max_notifications = sub->max_notifications_per_publish;
     sub->more_notifications = false;
 
-    for (size_t i = 0; i < MU_MAX_MONITORED_ITEMS; ++i) {
-        if (monitored_item_reportable(&server->subs.monitored_items[i], sub)) {
-            const mu_monitored_item_t *item = &server->subs.monitored_items[i];
-            if (!count_queue_entries(&count, max_notifications, item->queue_count)) {
-                sub->more_notifications = true;
-                return count;
+    for (size_t w = 0; w < MU_REPORTABLE_BITMAP_WORDS; ++w) {
+        opcua_uint32_t bits = server->subs.reportable_bitmap[w];
+        while (bits != 0u) {
+            size_t i = w * 32u + (size_t)__builtin_ctz(bits);
+            bits &= (bits - 1u);
+            if (i >= MU_MAX_MONITORED_ITEMS) {
+                break;
+            }
+            if (monitored_item_reportable(&server->subs.monitored_items[i], sub)) {
+                const mu_monitored_item_t *item = &server->subs.monitored_items[i];
+                if (!count_queue_entries(&count, max_notifications, item->queue_count)) {
+                    sub->more_notifications = true;
+                    return count;
+                }
             }
         }
     }
 
-    for (size_t i = 0; i < MU_MAX_MONITORED_ITEMS; ++i) {
-        const mu_monitored_item_t *item = &server->subs.monitored_items[i];
-        if (monitored_item_reports_by_trigger(server, sub, item) &&
-            !count_queue_entries(&count, max_notifications, item->queue_count)) {
-            sub->more_notifications = true;
-            return count;
+    for (size_t w = 0; w < MU_REPORTABLE_BITMAP_WORDS; ++w) {
+        opcua_uint32_t bits = server->subs.reportable_bitmap[w];
+        while (bits != 0u) {
+            size_t i = w * 32u + (size_t)__builtin_ctz(bits);
+            bits &= (bits - 1u);
+            if (i >= MU_MAX_MONITORED_ITEMS) {
+                break;
+            }
+            const mu_monitored_item_t *item = &server->subs.monitored_items[i];
+            if (monitored_item_reports_by_trigger(server, sub, item) &&
+                !count_queue_entries(&count, max_notifications, item->queue_count)) {
+                sub->more_notifications = true;
+                return count;
+            }
         }
     }
 
@@ -580,9 +615,17 @@ static opcua_int32_t count_reportable_items(const struct mu_server *server, mu_s
 #else
 static opcua_int32_t count_reportable_items(const struct mu_server *server, const mu_subscription_t *sub) {
     opcua_int32_t count = 0;
-    for (size_t i = 0; i < MU_MAX_MONITORED_ITEMS; ++i) {
-        if (monitored_item_reportable(&server->subs.monitored_items[i], sub)) {
-            ++count;
+    for (size_t w = 0; w < MU_REPORTABLE_BITMAP_WORDS; ++w) {
+        opcua_uint32_t bits = server->subs.reportable_bitmap[w];
+        while (bits != 0u) {
+            size_t i = w * 32u + (size_t)__builtin_ctz(bits);
+            bits &= (bits - 1u);
+            if (i >= MU_MAX_MONITORED_ITEMS) {
+                break;
+            }
+            if (monitored_item_reportable(&server->subs.monitored_items[i], sub)) {
+                ++count;
+            }
         }
     }
     return count;
@@ -628,6 +671,7 @@ static void enqueue_resend_data(struct mu_server *server, mu_subscription_t *sub
         }
 
         monitored_item_enqueue_report(item, &cur, status);
+        server->subs.reportable_bitmap[i / 32u] |= (1u << (i % 32u));
     }
 
     sub->resend_data_pending = false;
@@ -657,31 +701,70 @@ static void clear_reported_items(struct mu_server *server, const mu_subscription
     bool triggered_items[MU_MAX_MONITORED_ITEMS];
 
     (void)memset(triggered_items, 0, sizeof(triggered_items));
-    for (size_t i = 0; i < MU_MAX_MONITORED_ITEMS; ++i) {
-        triggered_items[i] = monitored_item_reports_by_trigger(server, sub, &server->subs.monitored_items[i]);
-    }
-
-    for (size_t i = 0; i < MU_MAX_MONITORED_ITEMS && remaining > 0; ++i) {
-        mu_monitored_item_t *item = &server->subs.monitored_items[i];
-        if (!monitored_item_reportable(item, sub)) {
-            continue;
+    for (size_t w = 0; w < MU_REPORTABLE_BITMAP_WORDS; ++w) {
+        opcua_uint32_t bits = server->subs.reportable_bitmap[w];
+        while (bits != 0u) {
+            size_t i = w * 32u + (size_t)__builtin_ctz(bits);
+            bits &= (bits - 1u);
+            if (i >= MU_MAX_MONITORED_ITEMS) {
+                break;
+            }
+            triggered_items[i] = monitored_item_reports_by_trigger(server, sub, &server->subs.monitored_items[i]);
         }
-
-        monitored_item_drain_reported_entries(item, &remaining);
     }
 
-    for (size_t i = 0; i < MU_MAX_MONITORED_ITEMS && remaining > 0; ++i) {
-        if (triggered_items[i]) {
-            monitored_item_drain_reported_entries(&server->subs.monitored_items[i], &remaining);
+    for (size_t w = 0; w < MU_REPORTABLE_BITMAP_WORDS; ++w) {
+        opcua_uint32_t bits = server->subs.reportable_bitmap[w];
+        while (bits != 0u && remaining > 0) {
+            size_t i = w * 32u + (size_t)__builtin_ctz(bits);
+            bits &= (bits - 1u);
+            if (i >= MU_MAX_MONITORED_ITEMS) {
+                break;
+            }
+            mu_monitored_item_t *item = &server->subs.monitored_items[i];
+            if (!monitored_item_reportable(item, sub)) {
+                continue;
+            }
+
+            monitored_item_drain_reported_entries(item, &remaining);
+            if (!item->pending && item->queue_count == 0u) {
+                server->subs.reportable_bitmap[i / 32u] &= ~(1u << (i % 32u));
+            }
+        }
+    }
+
+    for (size_t w = 0; w < MU_REPORTABLE_BITMAP_WORDS; ++w) {
+        opcua_uint32_t bits = server->subs.reportable_bitmap[w];
+        while (bits != 0u && remaining > 0) {
+            size_t i = w * 32u + (size_t)__builtin_ctz(bits);
+            bits &= (bits - 1u);
+            if (i >= MU_MAX_MONITORED_ITEMS) {
+                break;
+            }
+            if (triggered_items[i]) {
+                monitored_item_drain_reported_entries(&server->subs.monitored_items[i], &remaining);
+                if (!server->subs.monitored_items[i].pending && server->subs.monitored_items[i].queue_count == 0u) {
+                    server->subs.reportable_bitmap[i / 32u] &= ~(1u << (i % 32u));
+                }
+            }
         }
     }
 }
 #else
 static void clear_reported_items(struct mu_server *server, const mu_subscription_t *sub) {
-    for (size_t i = 0; i < MU_MAX_MONITORED_ITEMS; ++i) {
-        mu_monitored_item_t *item = &server->subs.monitored_items[i];
-        if (monitored_item_reportable(item, sub)) {
-            item->pending = false;
+    for (size_t w = 0; w < MU_REPORTABLE_BITMAP_WORDS; ++w) {
+        opcua_uint32_t bits = server->subs.reportable_bitmap[w];
+        while (bits != 0u) {
+            size_t i = w * 32u + (size_t)__builtin_ctz(bits);
+            bits &= (bits - 1u);
+            if (i >= MU_MAX_MONITORED_ITEMS) {
+                break;
+            }
+            mu_monitored_item_t *item = &server->subs.monitored_items[i];
+            if (monitored_item_reportable(item, sub)) {
+                item->pending = false;
+                server->subs.reportable_bitmap[i / 32u] &= ~(1u << (i % 32u));
+            }
         }
     }
 }
@@ -718,106 +801,122 @@ static opcua_statuscode_t write_data_change_notification(mu_binary_writer_t *w, 
         return s;
     }
 
-    for (size_t i = 0; i < MU_MAX_MONITORED_ITEMS; ++i) {
-        const mu_monitored_item_t *item = &server->subs.monitored_items[i];
-        if (!monitored_item_reportable(item, sub)) {
-            continue;
-        }
+    for (size_t bw = 0; bw < MU_REPORTABLE_BITMAP_WORDS; ++bw) {
+        opcua_uint32_t bits = server->subs.reportable_bitmap[bw];
+        while (bits != 0u) {
+            size_t i = bw * 32u + (size_t)__builtin_ctz(bits);
+            bits &= (bits - 1u);
+            if (i >= MU_MAX_MONITORED_ITEMS) {
+                break;
+            }
+            const mu_monitored_item_t *item = &server->subs.monitored_items[i];
+            if (!monitored_item_reportable(item, sub)) {
+                continue;
+            }
 
 #if MUC_OPCUA_SUBSCRIPTIONS_STANDARD
-        opcua_uint32_t queue_size = item->queue_size;
-        opcua_byte_t entry_index = item->queue_head;
-        if (queue_size == 0u) {
-            queue_size = 1u;
-        } else if (queue_size > MU_MONITORED_QUEUE_DEPTH) {
-            queue_size = MU_MONITORED_QUEUE_DEPTH;
-        }
+            opcua_uint32_t queue_size = item->queue_size;
+            opcua_byte_t entry_index = item->queue_head;
+            if (queue_size == 0u) {
+                queue_size = 1u;
+            } else if (queue_size > MU_MONITORED_QUEUE_DEPTH) {
+                queue_size = MU_MONITORED_QUEUE_DEPTH;
+            }
 
-        for (opcua_byte_t queued = 0u; queued < item->queue_count && report_count > 0; ++queued) {
-            const mu_variant_t *value = &item->queue[entry_index].value;
-            opcua_statuscode_t status = item->queue[entry_index].status;
+            for (opcua_byte_t queued = 0u; queued < item->queue_count && report_count > 0; ++queued) {
+                const mu_variant_t *value = &item->queue[entry_index].value;
+                opcua_statuscode_t status = item->queue[entry_index].status;
 
+                s = mu_binary_write_uint32(w, item->client_handle);
+                if (s != MU_STATUS_GOOD) {
+                    return s;
+                }
+
+                mu_datavalue_t dv;
+                memset(&dv, 0, sizeof(dv));
+                dv.has_value = true;
+                dv.value = *value;
+                if (status != MU_STATUS_GOOD) {
+                    dv.has_status = true;
+                    dv.status = status;
+                }
+                s = mu_binary_write_datavalue(w, &dv);
+                if (s != MU_STATUS_GOOD) {
+                    return s;
+                }
+
+                --report_count;
+                entry_index = monitored_item_queue_next(entry_index, queue_size);
+            }
+#else
             s = mu_binary_write_uint32(w, item->client_handle);
             if (s != MU_STATUS_GOOD) {
                 return s;
             }
 
             mu_datavalue_t dv;
-            memset(&dv, 0, sizeof(dv));
+            (void)memset(&dv, 0, sizeof(dv));
             dv.has_value = true;
-            dv.value = *value;
-            if (status != MU_STATUS_GOOD) {
+            dv.value = item->last_value;
+            if (item->last_status != MU_STATUS_GOOD) {
                 dv.has_status = true;
-                dv.status = status;
+                dv.status = item->last_status;
             }
             s = mu_binary_write_datavalue(w, &dv);
             if (s != MU_STATUS_GOOD) {
                 return s;
             }
-
-            --report_count;
-            entry_index = monitored_item_queue_next(entry_index, queue_size);
-        }
-#else
-        s = mu_binary_write_uint32(w, item->client_handle);
-        if (s != MU_STATUS_GOOD) {
-            return s;
-        }
-
-        mu_datavalue_t dv;
-        (void)memset(&dv, 0, sizeof(dv));
-        dv.has_value = true;
-        dv.value = item->last_value;
-        if (item->last_status != MU_STATUS_GOOD) {
-            dv.has_status = true;
-            dv.status = item->last_status;
-        }
-        s = mu_binary_write_datavalue(w, &dv);
-        if (s != MU_STATUS_GOOD) {
-            return s;
-        }
 #endif
+        }
     }
 
 #if MUC_OPCUA_SUBSCRIPTIONS_STANDARD
-    for (size_t i = 0; i < MU_MAX_MONITORED_ITEMS && report_count > 0; ++i) {
-        const mu_monitored_item_t *item = &server->subs.monitored_items[i];
-        if (!monitored_item_reports_by_trigger(server, sub, item)) {
-            continue;
-        }
-
-        opcua_uint32_t queue_size = item->queue_size;
-        opcua_byte_t entry_index = item->queue_head;
-        if (queue_size == 0u) {
-            queue_size = 1u;
-        } else if (queue_size > MU_MONITORED_QUEUE_DEPTH) {
-            queue_size = MU_MONITORED_QUEUE_DEPTH;
-        }
-
-        for (opcua_byte_t queued = 0u; queued < item->queue_count && report_count > 0; ++queued) {
-            const mu_variant_t *value = &item->queue[entry_index].value;
-            opcua_statuscode_t status = item->queue[entry_index].status;
-
-            s = mu_binary_write_uint32(w, item->client_handle);
-            if (s != MU_STATUS_GOOD) {
-                return s;
+    for (size_t bw = 0; bw < MU_REPORTABLE_BITMAP_WORDS && report_count > 0; ++bw) {
+        opcua_uint32_t bits = server->subs.reportable_bitmap[bw];
+        while (bits != 0u && report_count > 0) {
+            size_t i = bw * 32u + (size_t)__builtin_ctz(bits);
+            bits &= (bits - 1u);
+            if (i >= MU_MAX_MONITORED_ITEMS) {
+                break;
+            }
+            const mu_monitored_item_t *item = &server->subs.monitored_items[i];
+            if (!monitored_item_reports_by_trigger(server, sub, item)) {
+                continue;
             }
 
-            mu_datavalue_t dv;
-            memset(&dv, 0, sizeof(dv));
-            dv.has_value = true;
-            dv.value = *value;
-            if (status != MU_STATUS_GOOD) {
-                dv.has_status = true;
-                dv.status = status;
-            }
-            s = mu_binary_write_datavalue(w, &dv);
-            if (s != MU_STATUS_GOOD) {
-                return s;
+            opcua_uint32_t queue_size = item->queue_size;
+            opcua_byte_t entry_index = item->queue_head;
+            if (queue_size == 0u) {
+                queue_size = 1u;
+            } else if (queue_size > MU_MONITORED_QUEUE_DEPTH) {
+                queue_size = MU_MONITORED_QUEUE_DEPTH;
             }
 
-            --report_count;
-            entry_index = monitored_item_queue_next(entry_index, queue_size);
+            for (opcua_byte_t queued = 0u; queued < item->queue_count && report_count > 0; ++queued) {
+                const mu_variant_t *value = &item->queue[entry_index].value;
+                opcua_statuscode_t status = item->queue[entry_index].status;
+
+                s = mu_binary_write_uint32(w, item->client_handle);
+                if (s != MU_STATUS_GOOD) {
+                    return s;
+                }
+
+                mu_datavalue_t dv;
+                memset(&dv, 0, sizeof(dv));
+                dv.has_value = true;
+                dv.value = *value;
+                if (status != MU_STATUS_GOOD) {
+                    dv.has_status = true;
+                    dv.status = status;
+                }
+                s = mu_binary_write_datavalue(w, &dv);
+                if (s != MU_STATUS_GOOD) {
+                    return s;
+                }
+
+                --report_count;
+                entry_index = monitored_item_queue_next(entry_index, queue_size);
+            }
         }
     }
 #endif
@@ -1114,7 +1213,12 @@ static opcua_statuscode_t emit_publish_response_too_large_fault(struct mu_server
     return mu_server_emit_message(server, request->request_id, buffer, fault_length);
 }
 
-static void advance_publish_timer(mu_subscription_t *sub, opcua_uint64_t now_ms) {
+/* Exposed (non-static) for white-box unit testing of the publish-timer loop
+ * bound (T002/T007). OPC-10000-4 §5.13.1.2 Publish Service Set: the publishing
+ * timer advances by the (revised) publishing interval. The 0-interval case is
+ * clamped to 1 ms; without an iteration cap a far-future now_ms would spin the
+ * do/while nearly forever. */
+void advance_publish_timer(mu_subscription_t *sub, opcua_uint64_t now_ms) {
     opcua_uint64_t interval = sub->publishing_interval_ms;
     const opcua_uint64_t max = ~(opcua_uint64_t)0;
 
@@ -1122,13 +1226,19 @@ static void advance_publish_timer(mu_subscription_t *sub, opcua_uint64_t now_ms)
         interval = 1u;
     }
 
+    /* Bound the catch-up loop at 100 iterations so a far-future now_ms with a
+     * 0 (clamped to 1 ms) or extremely small interval cannot near-infinite
+     * spin; remaining catch-up is deferred to subsequent ticks. Grounding:
+     * OPC-10000-4 §5.13.1.2 (publish interval). */
+    unsigned safety = 0u;
     do {
         if (sub->next_publish_ms > max - interval) {
             sub->next_publish_ms = max;
             break;
         }
         sub->next_publish_ms += interval;
-    } while (sub->next_publish_ms <= now_ms);
+        safety++;
+    } while ((sub->next_publish_ms <= now_ms) && (safety < 100u));
 }
 
 static void publish_due(struct mu_server *server, opcua_uint64_t now_ms) {
@@ -1184,9 +1294,9 @@ static void publish_due(struct mu_server *server, opcua_uint64_t now_ms) {
             mu_publish_request_t request;
             if (publish_request_dequeue(&server->subs, sub->session_id, &request)) {
                 opcua_byte_t body[MU_PUBLISH_BODY_BYTES];
-                size_t body_length = 0u;
-                size_t message_start = 0u;
-                size_t message_end = 0u;
+                size_t body_length = 0;
+                size_t message_start = 0;
+                size_t message_end = 0;
                 opcua_uint32_t sequence_number = current_sequence_number(sub);
                 opcua_datetime_t publish_time = publish_time_now(server);
                 bool sent_response_too_large_fault = false;
@@ -1233,7 +1343,7 @@ static void publish_due(struct mu_server *server, opcua_uint64_t now_ms) {
                 mu_publish_request_t request;
                 if (publish_request_dequeue(&server->subs, sub->session_id, &request)) {
                     opcua_byte_t body[MU_PUBLISH_BODY_BYTES];
-                    size_t body_length = 0u;
+                    size_t body_length = 0;
                     opcua_uint32_t sequence_number = current_sequence_number(sub);
                     opcua_datetime_t publish_time = publish_time_now(server);
                     bool sent_response_too_large_fault = false;
@@ -1573,7 +1683,7 @@ opcua_statuscode_t mu_subscription_get_monitored_items(mu_subscriptions_t *subs,
         return MU_STATUS_BAD_SUBSCRIPTIONIDINVALID;
     }
 
-    for (size_t i = 0u; i < MU_MAX_MONITORED_ITEMS; ++i) {
+    for (size_t i = 0; i < MU_MAX_MONITORED_ITEMS; ++i) {
         const mu_monitored_item_t *item = &subs->monitored_items[i];
         if (!item->in_use || item->subscription_id != subscription_id) {
             continue;
@@ -1606,6 +1716,8 @@ void mu_subscriptions_tick(struct mu_server *server, opcua_uint64_t now_ms) {
         return;
     }
 
+    (void)memset(server->subs.reportable_bitmap, 0, sizeof(server->subs.reportable_bitmap));
+
     size_t active_checked = 0;
     for (size_t i = 0; i < MU_MAX_MONITORED_ITEMS && active_checked < server->subs.active_monitored_items_count; ++i) {
         mu_monitored_item_t *item = &server->subs.monitored_items[i];
@@ -1613,6 +1725,15 @@ void mu_subscriptions_tick(struct mu_server *server, opcua_uint64_t now_ms) {
             continue;
         }
         active_checked++;
+
+#if MUC_OPCUA_SUBSCRIPTIONS_STANDARD
+        if (item->pending || item->queue_count > 0u)
+#else
+        if (item->pending)
+#endif
+        {
+            server->subs.reportable_bitmap[i / 32u] |= (1u << (i % 32u));
+        }
 
         if (item->monitoring_mode == MU_MONITORING_MODE_DISABLED) {
             continue;
@@ -1623,6 +1744,9 @@ void mu_subscriptions_tick(struct mu_server *server, opcua_uint64_t now_ms) {
             if ((opcua_double_t)(now_ms - (opcua_uint64_t)item->aggregate_state.last_calculation) >=
                 item->aggregate_state.processing_interval) {
                 monitored_item_publish_aggregate(item, now_ms);
+                if (item->pending || item->queue_count > 0u) {
+                    server->subs.reportable_bitmap[i / 32u] |= (1u << (i % 32u));
+                }
             }
         }
 #endif
@@ -1681,6 +1805,15 @@ void mu_subscriptions_tick(struct mu_server *server, opcua_uint64_t now_ms) {
             item->last_status = status;
             item->pending = true;
 #endif
+        }
+
+#if MUC_OPCUA_SUBSCRIPTIONS_STANDARD
+        if (item->pending || item->queue_count > 0u)
+#else
+        if (item->pending)
+#endif
+        {
+            server->subs.reportable_bitmap[i / 32u] |= (1u << (i % 32u));
         }
 
         advance_sample_timer(item, now_ms);

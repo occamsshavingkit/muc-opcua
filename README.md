@@ -23,10 +23,10 @@ OPC Foundation 2017 device server profiles, so you compile in only the surface y
 
 - **Zero heap.** No `malloc` anywhere in the protocol path. The application owns all
   memory: one server-storage block plus the RX/TX buffers. Footprint is deterministic.
-- **Tiny flash.** Measured snapshot (2026-06-30, reproduce with
-  `scripts/measure_size.sh all`): a complete Nano server is **15.9 KiB**
-  (16,278 B) of Arm Cortex-M0+ `-Os` core `.text`; Micro is **23.2 KiB**
-  (23,785 B); Embedded 2017 is **42.0 KiB** (42,990 B). Static `.bss` is 0 B.
+- **Tiny flash.** Measured snapshot (2026-07-04, reproduce with
+  `scripts/measure_size.sh all`): a complete Nano server is **16.1 KiB**
+  (16,520 B) of Arm Cortex-M0+ `-Os` core `.text`; Micro is **23.6 KiB**
+  (24,203 B); Embedded 2017 is **43.7 KiB** (44,764 B). Static `.bss` is 0 B.
 - **Freestanding & portable.** Plain C11 core with no OS assumptions. Hardware and OS
   services are injected via small adapter structs in
   [`include/muc_opcua/platform.h`](include/muc_opcua/platform.h) — bring your own
@@ -50,9 +50,9 @@ methodology and breakdown are in
 
 | Profile | Adds | Core `.text` (flash) | `MU_SERVER_STORAGE_BYTES` | Heap |
 |---|---|---|---|---|
-| **nano** | SecurityPolicy None; Discovery + Session + Read + View service sets + Base Information node set; no subscriptions | **15.9 KiB** (16,278 B) | 1,280 B | 0 |
-| **micro** | nano **+** data-change subscriptions (MonitoredItems / Publish) | **23.2 KiB** (23,785 B) | 3,328 B | 0 |
-| **embedded**¹ | micro **+** Basic256Sha256, Standard DataChange 2017, Base Info Type System, GetMonitoredItems/ResendData | **42.0 KiB** (42,990 B) | **63,240 B** | 0 |
+| **nano** | SecurityPolicy None; Discovery + Session + Read + View service sets + Base Information node set; no subscriptions | **16.1 KiB** (16,520 B) | 1,280 B | 0 |
+| **micro** | nano **+** data-change subscriptions (MonitoredItems / Publish) | **23.6 KiB** (24,203 B) | 3,328 B | 0 |
+| **embedded**¹ | micro **+** Basic256Sha256, Standard DataChange 2017, Base Info Type System, GetMonitoredItems/ResendData | **43.7 KiB** (44,764 B) | **63,240 B** | 0 |
 
 ¹ The **`embedded` profile is profile-targeting**, not CTT-certified. It implements the
 Embedded 2017 profile surface selected in the conformance docs, but no formal compliance

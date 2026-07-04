@@ -48,6 +48,9 @@
 #ifndef MU_MAX_MONITORED_ITEMS
 #define MU_MAX_MONITORED_ITEMS 8
 #endif
+/* Bitmap words for the per-tick reportable-items scan (T003).
+ * Sized for the maximum MU_MAX_MONITORED_ITEMS across all profiles. */
+#define MU_REPORTABLE_BITMAP_WORDS ((MU_MAX_MONITORED_ITEMS + 31u) / 32u)
 #ifndef MU_MAX_PUBLISH_REQUESTS
 #define MU_MAX_PUBLISH_REQUESTS 4
 #endif
@@ -242,6 +245,10 @@ typedef struct {
     opcua_uint32_t next_subscription_id; /* monotonic id allocator */
     opcua_uint32_t next_monitored_item_id;
     opcua_uint32_t active_monitored_items_count;
+    /* Per-tick bitmap of items with pending/queued data (T003, OPC-10000-4
+     * §5.13.1.2). Populated during the sampling loop; the count, encode and
+     * clear passes iterate only set bits instead of scanning the full array. */
+    opcua_uint32_t reportable_bitmap[MU_REPORTABLE_BITMAP_WORDS];
 } mu_subscriptions_t;
 
 struct mu_server; /* forward declaration; the tick reads the address space + send path */

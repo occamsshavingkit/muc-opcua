@@ -156,6 +156,11 @@ struct mu_server {
 #if MUC_OPCUA_SUBSCRIPTIONS
 opcua_statuscode_t mu_server_emit_message(mu_server_t *server, opcua_uint32_t request_id, const opcua_byte_t *body,
                                           size_t body_len);
+
+/* White-box exposure (T002/T007) of the publish-timer advance helper so the
+ * iteration bound can be unit-tested directly, independent of the
+ * multi-connection tick path. OPC-10000-4 §5.13.1.2. */
+void advance_publish_timer(mu_subscription_t *sub, opcua_uint64_t now_ms);
 #endif
 
 #endif /* MUC_OPCUA_SERVER_INTERNAL_H */

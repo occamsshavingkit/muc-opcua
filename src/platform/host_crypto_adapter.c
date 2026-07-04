@@ -164,8 +164,9 @@ static opcua_statuscode_t h_aes_encrypt_ctx(void *c, opcua_byte_t *ctx_storage, 
         return MU_STATUS_BAD_INTERNALERROR;
     }
     struct host_cipher_context *handle = load_cipher_handle(ctx_storage);
-    if (!handle)
+    if (!handle) {
         return MU_STATUS_BAD_INTERNALERROR;
+    }
     return aes_cbc_ctx(handle->encrypt, iv, in, len, out, 1);
 }
 
@@ -176,15 +177,17 @@ static opcua_statuscode_t h_aes_decrypt_ctx(void *c, opcua_byte_t *ctx_storage, 
         return MU_STATUS_BAD_INTERNALERROR;
     }
     struct host_cipher_context *handle = load_cipher_handle(ctx_storage);
-    if (!handle)
+    if (!handle) {
         return MU_STATUS_BAD_INTERNALERROR;
+    }
     return aes_cbc_ctx(handle->decrypt, iv, in, len, out, 0);
 }
 
 static void h_cipher_ctx_free(void *c, opcua_byte_t *ctx_storage) {
     (void)c;
-    if (!ctx_storage)
+    if (!ctx_storage) {
         return;
+    }
     struct host_cipher_context *handle = load_cipher_handle(ctx_storage);
     free_cipher_handle(handle);
     handle = NULL;
@@ -250,8 +253,7 @@ static opcua_statuscode_t rsa_oaep(EVP_PKEY *pk, int encrypt, const opcua_byte_t
     size_t ol = *out_len;
     int init_ok = encrypt ? (EVP_PKEY_encrypt_init(pc) == 1) : (EVP_PKEY_decrypt_init(pc) == 1);
     if (init_ok && EVP_PKEY_CTX_set_rsa_padding(pc, RSA_PKCS1_OAEP_PADDING) == 1 &&
-        EVP_PKEY_CTX_set_rsa_oaep_md(pc, EVP_sha1()) == 1 &&
-        EVP_PKEY_CTX_set_rsa_mgf1_md(pc, EVP_sha1()) == 1) {
+        EVP_PKEY_CTX_set_rsa_oaep_md(pc, EVP_sha1()) == 1 && EVP_PKEY_CTX_set_rsa_mgf1_md(pc, EVP_sha1()) == 1) {
         int op = encrypt ? EVP_PKEY_encrypt(pc, out, &ol, in, in_len) : EVP_PKEY_decrypt(pc, out, &ol, in, in_len);
         if (op == 1) {
             *out_len = ol;
@@ -307,8 +309,9 @@ static opcua_statuscode_t h_rsa_pss_sha256_verify(void *c, const opcua_byte_t *c
                                                   size_t sig_len) {
     (void)c;
     EVP_PKEY *pk = pubkey_from_cert(cert, cert_len);
-    if (!pk)
+    if (!pk) {
         return MU_STATUS_BAD_SECURITYCHECKSFAILED;
+    }
     opcua_statuscode_t rc = MU_STATUS_BAD_SECURITYCHECKSFAILED;
     EVP_MD_CTX *md = EVP_MD_CTX_new();
     EVP_PKEY_CTX *pctx = NULL;
@@ -358,8 +361,9 @@ static opcua_statuscode_t h_rsa_oaep_sha256_encrypt(void *c, const opcua_byte_t 
                                                     size_t *out_len) {
     (void)c;
     EVP_PKEY *pk = pubkey_from_cert(cert, cert_len);
-    if (!pk)
+    if (!pk) {
         return MU_STATUS_BAD_SECURITYCHECKSFAILED;
+    }
     opcua_statuscode_t rc = rsa_oaep_sha256(pk, 1, in, len, out, out_len);
     EVP_PKEY_free(pk);
     return rc;
@@ -375,8 +379,9 @@ static opcua_statuscode_t h_get_own_certificate(void *c, const opcua_byte_t **ce
 static opcua_statuscode_t h_get_certificate_key_bits(void *c, const opcua_byte_t *cert, size_t cert_len, size_t *bits) {
     (void)c;
     EVP_PKEY *pk = pubkey_from_cert(cert, cert_len);
-    if (!pk)
+    if (!pk) {
         return MU_STATUS_BAD_SECURITYCHECKSFAILED;
+    }
     *bits = (size_t)EVP_PKEY_get_bits(pk);
     EVP_PKEY_free(pk);
     return MU_STATUS_GOOD;
@@ -422,8 +427,9 @@ static int build_self_signed(struct host_crypto_context *cx) {
     }
 
     X509 *x = X509_new();
-    if (!x)
+    if (!x) {
         return 0;
+    }
     int ok = 0;
     if (X509_set_version(x, 2) == 1) {
         ASN1_INTEGER_set(X509_get_serialNumber(x), 1);
@@ -500,10 +506,12 @@ void mu_host_crypto_adapter_cleanup(mu_crypto_adapter_t *adapter) {
         return;
     }
     struct host_crypto_context *cx = (struct host_crypto_context *)adapter->context;
-    if (cx->key)
+    if (cx->key) {
         EVP_PKEY_free(cx->key);
-    if (cx->cert_der)
+    }
+    if (cx->cert_der) {
         OPENSSL_free(cx->cert_der);
+    }
     free(cx);
     adapter->context = NULL;
 }

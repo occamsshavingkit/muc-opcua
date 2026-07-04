@@ -289,8 +289,9 @@ static opcua_statuscode_t m_rsa_oaep_sha256_decrypt(void *context, const opcua_b
                                                     opcua_byte_t *output, size_t *output_length) {
     (void)length;
     struct mbedtls_crypto_context *ctx = (struct mbedtls_crypto_context *)context;
-    if (mbedtls_pk_get_type(&ctx->pk) != MBEDTLS_PK_RSA)
+    if (mbedtls_pk_get_type(&ctx->pk) != MBEDTLS_PK_RSA) {
         return MU_STATUS_BAD_INTERNALERROR;
+    }
     mbedtls_rsa_context *rsa = mbedtls_pk_rsa(ctx->pk);
     mbedtls_rsa_set_padding(rsa, MBEDTLS_RSA_PKCS_V21, MBEDTLS_MD_SHA256);
 
