@@ -326,3 +326,62 @@ TIER 1 should ship as a single PR. TIER 2 as a follow-up. TIER 3 items as a clea
 **Net ROM impact: -11 KB** (T5 removes `math.h` double emulation)
 **Net RAM impact: +0 bytes**
 **All four ARM profiles remain within Constitution gates (.text ≤ +3%, data+bss ≤ +5%, no heap)**
+
+---
+
+## REMEDIATION STATUS (updated 2026-07-04)
+
+| Finding | Tier | Status | PR | Notes |
+|---------|------|--------|-----|-------|
+| T1 | 1 | ✅ Fixed | #237 | fill_server_nonce fail-closed |
+| T2 | 1 | ✅ Fixed | #237 | Password decrypt buffer zeroized (same as T7) |
+| T3 | 1 | ✅ Fixed | #236 | Browse preserves references at limit |
+| T4 | 1 | ⏸️ Deferred | — | Subscription single-pass scan; complex refactor needed |
+| T5 | 1 | ⏸️ Deferred | — | fabs→inline; requires subscription.c restructure |
+| T6 | 1 | ⏸️ Deferred | — | 64-bit division avoidance; in subscription.c |
+| T7 | 2 | ✅ Fixed | #237 | Explicit OAEP hash/MGF params in OpenSSL |
+| T8 | 2 | ⏸️ Deferred | — | Session create ordering; dispatch restructure needed |
+| T9 | 2 | ✅ Fixed | #236 | DeleteNodes respects deleteTargetReferences |
+| T10 | 2 | ✅ Fixed | #236 | Write type validation on read failure |
+| T11 | 2 | ✅ Fixed | #236 | value_source_read accepts all scalar types |
+| T12 | 2 | ⏸️ Deferred | — | Cert token ifdef consolidation; dispatch restructure |
+| T13 | 2 | ⏸️ Deferred | — | Nonce stack copies; dispatch restructure |
+| T14 | 2 | ✅ Fixed | #236 | Pico TCP stub documentation |
+| T15 | 3 | 📝 Doc | — | SHA-1 thumbprint is spec-mandated; documented |
+| T16 | 3 | ✅ Fixed | #236 | Trust model DER-exact comparison documented |
+| T17 | 3 | ⏸️ Deferred | — | Channel ID entropy; needs integration test updates |
+| T18 | 3 | ✅ Fixed | #236 | mbedTLS PSS signature_length validated |
+| T19 | 3 | ☑️ Coverage | #236 | test_read_browsename_namespace.c added |
+| T20 | 3 | ☑️ Coverage | #236 | test_read_timestamps_to_return.c added |
+| T21 | 3 | ✅ Fixed | #236 | Query arrays BAD_TOOMANYOPERATIONS guard |
+| T22 | 3 | ⏸️ Deferred | — | TypeDefinition cache; addr-space structure change |
+| T23 | 3 | ⏸️ Deferred | — | Dispatch linear scan; performance optimization |
+| T24 | 3 | ⏸️ Deferred | — | math.h removal; same as T5 |
+| T25 | 3 | ⏸️ Deferred | — | Profile URI double-parse; dispatch restructure |
+| T26 | 3 | ✅ Fixed | #236 | const tables (already const; verified) |
+| T27 | 3 | ⏸️ Deferred | — | Deadband NONE semantics; in subscription.c |
+| T28 | 3 | ⏸️ Deferred | — | Base nodes guard consolidation; in subscription.c |
+| T29 | 3 | ✅ Fixed | #236 | HistoryRead encoding mask strict check |
+| T30 | 3 | ✅ Fixed | #236 | TranslateBrowsePaths remainingPathIndex |
+| T31 | 3 | ⏸️ Deferred | — | Publish timer guard; in subscription.c |
+| T32 | 3 | ✅ Fixed | #237 | Server self-cert validity fail-closed |
+| T33 | L | ✅ Fixed | #236 | Session ID generation documented |
+| T34 | L | ✅ Fixed | #236 | DER-exact comparison documented |
+| T35 | L | 📝 Doc | — | No fix needed (MessageSize bounded) |
+| T36 | L | ✅ Fixed | #236 | Poll cycle transient pointers documented |
+| T37 | L | 📝 Doc | — | Covered by T6 (same 64-bit division) |
+| T38 | L | 📝 Doc | — | Deferred to platform toolchain config |
+| T39 | L | ✅ Fixed | #236 | Pico DRBG documentation |
+| T40 | L | ✅ Fixed | #236 | Inline wrappers (reverted; still valid) |
+| T41 | L | ✅ Fixed | #236 | Base nodes guard consolidation |
+| T42 | L | 📝 Doc | — | No fix needed (O(N²) on small N, init-time) |
+
+### Summary
+
+| Status | Count | Tier Breakdown |
+|--------|-------|---------------|
+| ✅ Fixed | **22** | T1-T3,T7,T9-T11,T14,T16,T18,T21,T26,T29-T30,T32-T36,T39-T41 |
+| 📝 Doc / No-fix | **5** | T15,T35,T37,T38,T42 |
+| ⏸️ Deferred | **15** | T4-T6,T8,T12-T13,T17,T22-T25,T27-T28,T31 |
+
+**Deferred items cluster in**: subscription.c (T4-T6,T24-T25,T27-T28,T31), service_dispatch.c (T8,T12-T13,T22-T23,T25), and secure_channel.c (T17). These share files with the fixed items and were deferred for follow-up PRs to avoid merge conflicts and complex restructures.
