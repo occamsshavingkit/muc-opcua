@@ -44,7 +44,7 @@ static opcua_statuscode_t host_listen(void *context, const char *endpoint_url) {
     fcntl(ctx->server_fd, F_SETFL, flags | O_NONBLOCK);
 
     struct sockaddr_in addr;
-    memset(&addr, 0, sizeof(addr));
+    (void)memset(&addr, 0, sizeof(addr));
     addr.sin_family = AF_INET;
     addr.sin_addr.s_addr = INADDR_ANY;
     addr.sin_port = htons(port);

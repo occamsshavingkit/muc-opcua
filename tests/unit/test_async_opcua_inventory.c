@@ -15,7 +15,7 @@ void tearDown(void) {}
 
 void test_async_opcua_inventory_has_areas(void) {
     char path[1024];
-    snprintf(path, sizeof(path), "%s/docs/conformance/async-opcua-inventory.md", PROJECT_ROOT_DIR);
+    (void)snprintf(path, sizeof(path), "%s/docs/conformance/async-opcua-inventory.md", PROJECT_ROOT_DIR);
     FILE *fp = fopen(path, "r");
 
     if (!fp) {
@@ -32,18 +32,24 @@ void test_async_opcua_inventory_has_areas(void) {
     bool has_tools = false;
 
     while (fgets(buf, sizeof(buf), fp)) {
-        if (strstr(buf, ".devcontainer") != NULL)
+        if (strstr(buf, ".devcontainer") != NULL) {
             has_devcontainer = true;
-        if (strstr(buf, "codegen-tests") != NULL)
+        }
+        if (strstr(buf, "codegen-tests") != NULL) {
             has_codegen_tests = true;
-        if (strstr(buf, "dotnet-tests") != NULL)
+        }
+        if (strstr(buf, "dotnet-tests") != NULL) {
             has_dotnet_tests = true;
-        if (strstr(buf, "fuzz") != NULL)
+        }
+        if (strstr(buf, "fuzz") != NULL) {
             has_fuzz = true;
-        if (strstr(buf, "schemas") != NULL)
+        }
+        if (strstr(buf, "schemas") != NULL) {
             has_schemas = true;
-        if (strstr(buf, "tools") != NULL)
+        }
+        if (strstr(buf, "tools") != NULL) {
             has_tools = true;
+        }
     }
     fclose(fp);
 

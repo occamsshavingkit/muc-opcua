@@ -4,8 +4,9 @@
 opcua_statuscode_t mu_binary_read_variant(mu_binary_reader_t *reader, mu_variant_t *variant) {
     opcua_byte_t encoding_mask;
     opcua_statuscode_t status = mu_binary_read_byte(reader, &encoding_mask);
-    if (status != MU_STATUS_GOOD)
+    if (status != MU_STATUS_GOOD) {
         return status;
+    }
 
     opcua_byte_t type = encoding_mask & 0x3F;
     if ((encoding_mask & 0x80) || (encoding_mask & 0x40)) {
@@ -52,25 +53,29 @@ opcua_statuscode_t mu_binary_read_variant(mu_binary_reader_t *reader, mu_variant
         return mu_binary_read_nodeid(reader, &variant->value.nodeid);
     case MU_TYPE_QUALIFIEDNAME:
         status = mu_binary_read_uint16(reader, &variant->value.qualified_name.namespace_index);
-        if (status != MU_STATUS_GOOD)
+        if (status != MU_STATUS_GOOD) {
             return status;
+        }
         return mu_binary_read_string(reader, &variant->value.qualified_name.name);
     case MU_TYPE_LOCALIZEDTEXT: {
         opcua_byte_t lt_mask;
         status = mu_binary_read_byte(reader, &lt_mask);
-        if (status != MU_STATUS_GOOD)
+        if (status != MU_STATUS_GOOD) {
             return status;
+        }
         variant->value.localized_text.locale = (mu_string_t){-1, NULL};
         variant->value.localized_text.text = (mu_string_t){-1, NULL};
         if (lt_mask & 0x01) {
             status = mu_binary_read_string(reader, &variant->value.localized_text.locale);
-            if (status != MU_STATUS_GOOD)
+            if (status != MU_STATUS_GOOD) {
                 return status;
+            }
         }
         if (lt_mask & 0x02) {
             status = mu_binary_read_string(reader, &variant->value.localized_text.text);
-            if (status != MU_STATUS_GOOD)
+            if (status != MU_STATUS_GOOD) {
                 return status;
+            }
         }
         return MU_STATUS_GOOD;
     }
@@ -120,29 +125,35 @@ static opcua_statuscode_t write_scalar_value(mu_binary_writer_t *w, mu_builtin_t
     case MU_TYPE_QUALIFIEDNAME: {
         const mu_qualified_name_t *q = (const mu_qualified_name_t *)p;
         opcua_statuscode_t s = mu_binary_write_uint16(w, q->namespace_index);
-        if (s != MU_STATUS_GOOD)
+        if (s != MU_STATUS_GOOD) {
             return s;
+        }
         return mu_binary_write_string(w, &q->name);
     }
     case MU_TYPE_LOCALIZEDTEXT: {
         const mu_localized_text_t *lt = (const mu_localized_text_t *)p;
         opcua_byte_t lt_mask = 0;
-        if (lt->locale.length >= 0)
+        if (lt->locale.length >= 0) {
             lt_mask |= 0x01;
-        if (lt->text.length >= 0)
+        }
+        if (lt->text.length >= 0) {
             lt_mask |= 0x02;
+        }
         opcua_statuscode_t s = mu_binary_write_byte(w, lt_mask);
-        if (s != MU_STATUS_GOOD)
+        if (s != MU_STATUS_GOOD) {
             return s;
+        }
         if (lt_mask & 0x01) {
             s = mu_binary_write_string(w, &lt->locale);
-            if (s != MU_STATUS_GOOD)
+            if (s != MU_STATUS_GOOD) {
                 return s;
+            }
         }
         if (lt_mask & 0x02) {
             s = mu_binary_write_string(w, &lt->text);
-            if (s != MU_STATUS_GOOD)
+            if (s != MU_STATUS_GOOD) {
                 return s;
+            }
         }
         return MU_STATUS_GOOD;
     }
@@ -181,15 +192,18 @@ static size_t element_size(mu_builtin_type_t type) {
 }
 
 opcua_statuscode_t mu_binary_write_variant(mu_binary_writer_t *writer, const mu_variant_t *variant) {
-    if (!variant)
+    if (!variant) {
         return MU_STATUS_BAD_ENCODINGERROR;
+    }
 
     opcua_byte_t encoding_mask = (opcua_byte_t)variant->type;
-    if (variant->is_array)
+    if (variant->is_array) {
         encoding_mask |= 0x80; /* OPC 10000-6 5.2.2.16 array bit */
+    }
     opcua_statuscode_t status = mu_binary_write_byte(writer, encoding_mask);
-    if (status != MU_STATUS_GOOD)
+    if (status != MU_STATUS_GOOD) {
         return status;
+    }
 
     if (variant->type == MU_TYPE_NULL) {
         return MU_STATUS_GOOD;
@@ -197,19 +211,22 @@ opcua_statuscode_t mu_binary_write_variant(mu_binary_writer_t *writer, const mu_
 
     if (variant->is_array) {
         status = mu_binary_write_int32(writer, variant->array_length);
-        if (status != MU_STATUS_GOOD)
+        if (status != MU_STATUS_GOOD) {
             return status;
+        }
         if (variant->array_length < 0 || variant->value.array == NULL) {
             return MU_STATUS_GOOD; /* null array */
         }
         size_t stride = element_size(variant->type);
-        if (stride == 0)
+        if (stride == 0) {
             return MU_STATUS_BAD_ENCODINGERROR;
+        }
         const opcua_byte_t *base = (const opcua_byte_t *)variant->value.array;
         for (opcua_int32_t i = 0; i < variant->array_length; ++i) {
             status = write_scalar_value(writer, variant->type, base + (size_t)i * stride);
-            if (status != MU_STATUS_GOOD)
+            if (status != MU_STATUS_GOOD) {
                 return status;
+            }
         }
         return MU_STATUS_GOOD;
     }

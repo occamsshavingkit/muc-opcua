@@ -15,7 +15,7 @@ void tearDown(void) {}
 
 void test_size_ledger_contains_required_fields(void) {
     char path[1024];
-    snprintf(path, sizeof(path), "%s/docs/size/feature-size-ledger.md", PROJECT_ROOT_DIR);
+    (void)snprintf(path, sizeof(path), "%s/docs/size/feature-size-ledger.md", PROJECT_ROOT_DIR);
     FILE *fp = fopen(path, "r");
     TEST_ASSERT_NOT_NULL_MESSAGE(fp, "Could not open feature-size-ledger.md");
 
@@ -27,14 +27,18 @@ void test_size_ledger_contains_required_fields(void) {
     bool has_feature_009 = false;
 
     while (fgets(buf, sizeof(buf), fp)) {
-        if (strstr(buf, "Flash") != NULL)
+        if (strstr(buf, "Flash") != NULL) {
             has_flash = true;
-        if (strstr(buf, "RAM") != NULL)
+        }
+        if (strstr(buf, "RAM") != NULL) {
             has_ram = true;
-        if (strstr(buf, "Heap") != NULL || strstr(buf, "Dynamic") != NULL)
+        }
+        if (strstr(buf, "Heap") != NULL || strstr(buf, "Dynamic") != NULL) {
             has_heap = true;
-        if (strstr(buf, "Feature 009") != NULL || strstr(buf, "009-core-feature") != NULL)
+        }
+        if (strstr(buf, "Feature 009") != NULL || strstr(buf, "009-core-feature") != NULL) {
             has_feature_009 = true;
+        }
     }
     fclose(fp);
 

@@ -48,7 +48,7 @@ static opcua_statuscode_t m_aes256_cbc_encrypt(void *context, const opcua_byte_t
         return MU_STATUS_BAD_INTERNALERROR;
     }
     opcua_byte_t iv_copy[16];
-    memcpy(iv_copy, iv, 16);
+    (void)memcpy(iv_copy, iv, 16);
     ret = mbedtls_aes_crypt_cbc(&aes, MBEDTLS_AES_ENCRYPT, length, iv_copy, input, output);
     mbedtls_aes_free(&aes);
     return (ret == 0) ? MU_STATUS_GOOD : MU_STATUS_BAD_INTERNALERROR;

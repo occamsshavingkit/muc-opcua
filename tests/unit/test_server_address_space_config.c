@@ -59,12 +59,12 @@ static opcua_uint64_t mock_get_tick(void *c) {
 }
 static opcua_statuscode_t mock_random(void *c, opcua_byte_t *b, size_t n) {
     (void)c;
-    memset(b, 0, n);
+    (void)memset(b, 0, n);
     return MU_STATUS_GOOD;
 }
 
 void setUp(void) {
-    memset(&config, 0, sizeof(config));
+    (void)memset(&config, 0, sizeof(config));
     config.endpoint_url = "opc.tcp://localhost:4840";
     config.receive_buffer = rx_buf;
     config.receive_buffer_size = sizeof(rx_buf);
@@ -86,7 +86,7 @@ void setUp(void) {
 
     /* Distinct numeric NodeIds, no references, so validation passes the
        duplicate and unresolved-reference checks and only the size cap matters. */
-    memset(s_nodes, 0, sizeof(s_nodes));
+    (void)memset(s_nodes, 0, sizeof(s_nodes));
     for (size_t i = 0; i < (MU_MAX_ADDRESS_SPACE_NODES + 1); ++i) {
         s_nodes[i].node_id.identifier_type = MU_NODEID_NUMERIC;
         s_nodes[i].node_id.namespace_index = 1;

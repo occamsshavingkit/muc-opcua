@@ -9,8 +9,9 @@ void mu_sequence_validator_init(mu_sequence_validator_t *validator) {
 }
 
 opcua_statuscode_t mu_sequence_validate(mu_sequence_validator_t *validator, opcua_uint32_t sequence_number) {
-    if (!validator)
+    if (!validator) {
         return MU_STATUS_BAD_INTERNALERROR;
+    }
 
     if (!validator->is_initialized) {
         validator->last_sequence_number = sequence_number;

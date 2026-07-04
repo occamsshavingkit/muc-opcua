@@ -64,7 +64,7 @@ static mu_node_t s_nodes[] = {{{0, MU_NODEID_NUMERIC, {85}},
 static const mu_address_space_t s_address_space = {s_nodes, 3};
 
 static void activated_server(mu_server_t *server) {
-    memset(server, 0, sizeof(*server));
+    (void)memset(server, 0, sizeof(*server));
     server->secure_channel.is_open = true;
     server->config.time_adapter.get_time = fake_time;
     server->config.address_space = &s_address_space;
@@ -582,7 +582,7 @@ void test_aggregate_filter_average_scoped_support(void) {
     item->aggregate_state.processing_interval = 100.0;
     item->aggregate_state.last_calculation = 0;
     item->aggregate_state.sample_count = 0;
-    memset(&item->aggregate_state.accumulator, 0, sizeof(item->aggregate_state.accumulator));
+    (void)memset(&item->aggregate_state.accumulator, 0, sizeof(item->aggregate_state.accumulator));
     item->sampling_interval_ms = 10;
     item->next_sample_ms = 10;
     item->queue_head = 0;
@@ -733,7 +733,7 @@ void test_aggregate_min_max_calculations(void) {
 
     /* Test Min Aggregate */
     mu_monitored_item_t item_min;
-    memset(&item_min, 0, sizeof(item_min));
+    (void)memset(&item_min, 0, sizeof(item_min));
     item_min.in_use = true;
     item_min.has_aggregate = true;
     item_min.aggregate_state.aggregate_type = MU_ID_AGGREGATETYPE_MINIMUM;
@@ -747,7 +747,7 @@ void test_aggregate_min_max_calculations(void) {
 
     /* Test Max Aggregate */
     mu_monitored_item_t item_max;
-    memset(&item_max, 0, sizeof(item_max));
+    (void)memset(&item_max, 0, sizeof(item_max));
     item_max.in_use = true;
     item_max.has_aggregate = true;
     item_max.aggregate_state.aggregate_type = MU_ID_AGGREGATETYPE_MAXIMUM;
@@ -802,7 +802,7 @@ void test_aggregate_no_samples_publishes_last_known(void) {
     activated_server(&server);
 
     mu_monitored_item_t item;
-    memset(&item, 0, sizeof(item));
+    (void)memset(&item, 0, sizeof(item));
     item.in_use = true;
     item.has_aggregate = true;
     item.aggregate_state.aggregate_type = MU_ID_AGGREGATETYPE_AVERAGE;

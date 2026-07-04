@@ -9,8 +9,9 @@ void tearDown(void) {}
 static opcua_statuscode_t mock_rsa_oaep_decrypt(void *context, const opcua_byte_t *input, size_t length,
                                                 opcua_byte_t *output, size_t *output_length) {
     (void)context;
-    if (length > *output_length)
+    if (length > *output_length) {
         return MU_STATUS_BAD_OUTOFMEMORY;
+    }
     /* Decryption mock: XOR with 0x5A to simulate decryption */
     for (size_t i = 0; i < length; ++i) {
         output[i] = input[i] ^ 0x5A;

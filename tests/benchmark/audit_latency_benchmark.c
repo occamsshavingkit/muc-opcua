@@ -65,7 +65,7 @@ static const mu_node_t nodes[] = {
 static const mu_address_space_t address_space = {nodes, 2};
 
 static void print_usage(FILE *stream, const char *program) {
-    fprintf(stream, "Usage: %s [--scenario %s] [--iterations N] [--warmup N] [--output PATH]\n", program,
+    (void)fprintf(stream, "Usage: %s [--scenario %s] [--iterations N] [--warmup N] [--output PATH]\n", program,
             AUDIT_LATENCY_SCENARIO);
 }
 
@@ -74,14 +74,14 @@ static int parse_u32_arg(const char *name, const char *value, uint32_t *out) {
     unsigned long parsed;
 
     if (value == NULL || value[0] == '\0') {
-        fprintf(stderr, "%s requires a non-empty integer value\n", name);
+        (void)fprintf(stderr, "%s requires a non-empty integer value\n", name);
         return 1;
     }
 
     errno = 0;
     parsed = strtoul(value, &end, 10);
     if (errno != 0 || end == value || *end != '\0' || parsed > (unsigned long)UINT32_MAX) {
-        fprintf(stderr, "%s has invalid integer value: %s\n", name, value);
+        (void)fprintf(stderr, "%s has invalid integer value: %s\n", name, value);
         return 1;
     }
 
@@ -103,7 +103,7 @@ static int parse_options(int argc, char **argv, benchmark_options_t *options) {
         }
 
         if (i + 1 >= argc) {
-            fprintf(stderr, "%s requires a value\n", arg);
+            (void)fprintf(stderr, "%s requires a value\n", arg);
             return 1;
         }
 
@@ -120,18 +120,18 @@ static int parse_options(int argc, char **argv, benchmark_options_t *options) {
         } else if (strcmp(arg, "--output") == 0) {
             options->output_path = argv[++i];
         } else {
-            fprintf(stderr, "unknown option: %s\n", arg);
+            (void)fprintf(stderr, "unknown option: %s\n", arg);
             print_usage(stderr, argv[0]);
             return 1;
         }
     }
 
     if (strcmp(options->scenario, AUDIT_LATENCY_SCENARIO) != 0) {
-        fprintf(stderr, "unsupported scenario: %s\n", options->scenario);
+        (void)fprintf(stderr, "unsupported scenario: %s\n", options->scenario);
         return 1;
     }
     if (options->iterations == 0u) {
-        fprintf(stderr, "--iterations must be greater than zero\n");
+        (void)fprintf(stderr, "--iterations must be greater than zero\n");
         return 1;
     }
 
@@ -151,7 +151,7 @@ static void write_raw_bytes(mu_binary_writer_t *writer, const opcua_byte_t *byte
         writer->status = MU_STATUS_BAD_ENCODINGERROR;
         return;
     }
-    memcpy(writer->buffer + writer->position, bytes, length);
+    (void)memcpy(writer->buffer + writer->position, bytes, length);
     writer->position += length;
 }
 
@@ -171,7 +171,7 @@ static void write_request_header(mu_binary_writer_t *writer, opcua_uint32_t auth
 
 static int finish_request(const char *name, const mu_binary_writer_t *writer, size_t *length) {
     if (writer->status != MU_STATUS_GOOD) {
-        fprintf(stderr, "failed to build %s request: 0x%08" PRIx32 "\n", name, (uint32_t)writer->status);
+        (void)fprintf(stderr, "failed to build %s request: 0x%08" PRIx32 "\n", name, (uint32_t)writer->status);
         return 1;
     }
     *length = writer->position;
@@ -281,7 +281,7 @@ static opcua_statuscode_t init_benchmark_server(mu_server_t **server) {
     mu_server_config_t config;
     opcua_statuscode_t status;
 
-    memset(&config, 0, sizeof(config));
+    (void)memset(&config, 0, sizeof(config));
     config.endpoint_url = "opc.tcp://host:4840";
     config.application_uri = "urn:audit:latency";
     config.product_uri = "urn:audit:latency";
@@ -321,7 +321,7 @@ static int read_response_prefix(const char *name, const opcua_byte_t *response, 
     mu_binary_reader_init(&reader, response, response_len);
     if (mu_binary_read_nodeid(&reader, &type) != MU_STATUS_GOOD || type.identifier_type != MU_NODEID_NUMERIC ||
         type.identifier.numeric != expected_type) {
-        fprintf(stderr, "%s returned unexpected response type\n", name);
+        (void)fprintf(stderr, "%s returned unexpected response type\n", name);
         return 1;
     }
 
@@ -339,16 +339,16 @@ static int read_response_prefix(const char *name, const opcua_byte_t *response, 
     (void)additional_header_encoding;
 
     if (reader.status != MU_STATUS_GOOD) {
-        fprintf(stderr, "%s response header decode failed: 0x%08" PRIx32 "\n", name, (uint32_t)reader.status);
+        (void)fprintf(stderr, "%s response header decode failed: 0x%08" PRIx32 "\n", name, (uint32_t)reader.status);
         return 1;
     }
     if (handle != expected_handle) {
-        fprintf(stderr, "%s returned requestHandle %" PRIu32 ", expected %" PRIu32 "\n", name, (uint32_t)handle,
+        (void)fprintf(stderr, "%s returned requestHandle %" PRIu32 ", expected %" PRIu32 "\n", name, (uint32_t)handle,
                 (uint32_t)expected_handle);
         return 1;
     }
     if (service_result != MU_STATUS_GOOD) {
-        fprintf(stderr, "%s returned serviceResult 0x%08" PRIx32 "\n", name, (uint32_t)service_result);
+        (void)fprintf(stderr, "%s returned serviceResult 0x%08" PRIx32 "\n", name, (uint32_t)service_result);
         return 1;
     }
 
@@ -361,7 +361,7 @@ static int validate_count(const char *name, mu_binary_reader_t *body, opcua_int3
     opcua_int32_t count;
     mu_binary_read_int32(body, &count);
     if (body->status != MU_STATUS_GOOD) {
-        fprintf(stderr, "%s count decode failed: 0x%08" PRIx32 "\n", name, (uint32_t)body->status);
+        (void)fprintf(stderr, "%s count decode failed: 0x%08" PRIx32 "\n", name, (uint32_t)body->status);
         return 1;
     }
     if (allow_greater_than_zero) {

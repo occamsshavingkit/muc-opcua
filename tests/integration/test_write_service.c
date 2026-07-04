@@ -49,7 +49,7 @@ static opcua_statuscode_t mock_read(void *c, void *h, opcua_byte_t *buf, size_t 
     }
     size_t len = m->inbound_len[m->read_index];
     TEST_ASSERT_TRUE(len <= cap);
-    memcpy(buf, m->inbound[m->read_index], len);
+    (void)memcpy(buf, m->inbound[m->read_index], len);
     m->read_index++;
     *n = len;
     return MU_STATUS_GOOD;
@@ -58,14 +58,14 @@ static opcua_statuscode_t mock_read(void *c, void *h, opcua_byte_t *buf, size_t 
 static opcua_statuscode_t mock_write(void *c, void *h, const opcua_byte_t *buf, size_t len, size_t *n) {
     mock_t *m = (mock_t *)c;
     (void)h;
-    memcpy(m->last_write, buf, len);
+    (void)memcpy(m->last_write, buf, len);
     m->last_write_len = len;
     *n = len;
     return MU_STATUS_GOOD;
 }
 
 static void enqueue(mock_t *m, const opcua_byte_t *bytes, size_t len) {
-    memcpy(m->inbound[m->inbound_count], bytes, len);
+    (void)memcpy(m->inbound[m->inbound_count], bytes, len);
     m->inbound_len[m->inbound_count] = len;
     m->inbound_count++;
 }
@@ -97,7 +97,7 @@ static size_t build_msg(opcua_byte_t *out, size_t cap, opcua_uint32_t seq, opcua
     mu_binary_write_uint32(&w, 1);
     mu_binary_write_uint32(&w, seq);
     mu_binary_write_uint32(&w, reqid);
-    memcpy(out + 24, body, body_len);
+    (void)memcpy(out + 24, body, body_len);
     return 24 + body_len;
 }
 
@@ -116,7 +116,7 @@ static opcua_statuscode_t test_write_handler(void *handle, const mu_nodeid_t *no
 void test_write_service_integration(void) {
 #ifdef MUC_OPCUA_SERVICE_WRITE
     mock_t mock;
-    memset(&mock, 0, sizeof(mock));
+    (void)memset(&mock, 0, sizeof(mock));
 
     /* Address Space Definition */
     static const mu_reference_t obj_refs[] = {{{0, MU_NODEID_NUMERIC, {35}}, {1, MU_NODEID_NUMERIC, {1001}}, true},
@@ -281,7 +281,7 @@ void test_write_service_integration(void) {
     mu_string_t range = {-1, NULL};
     mu_binary_write_string(&w, &range);
     mu_datavalue_t val1;
-    memset(&val1, 0, sizeof(val1));
+    (void)memset(&val1, 0, sizeof(val1));
     val1.has_value = true;
     val1.value.type = MU_TYPE_INT32;
     val1.value.value.i32 = 42;
@@ -299,7 +299,7 @@ void test_write_service_integration(void) {
     mu_binary_write_uint32(&w, 13);
     mu_binary_write_string(&w, &range);
     mu_datavalue_t val2;
-    memset(&val2, 0, sizeof(val2));
+    (void)memset(&val2, 0, sizeof(val2));
     val2.has_value = true;
     val2.value.type = MU_TYPE_FLOAT;
     val2.value.value.f = 4.2f;
@@ -316,7 +316,7 @@ void test_write_service_integration(void) {
 
     /* ---- Configure the server ---- */
     mu_server_config_t config;
-    memset(&config, 0, sizeof(config));
+    (void)memset(&config, 0, sizeof(config));
     config.endpoint_url = "opc.tcp://host:4840";
     config.application_uri = "urn:test";
     config.product_uri = "urn:test";

@@ -20,8 +20,9 @@ static opcua_statuscode_t fake_tcp_read(void *context, void *connection_handle, 
     (void)connection_handle;
     (void)buffer;
     (void)buffer_size;
-    if (bytes_read)
+    if (bytes_read) {
         *bytes_read = 0;
+    }
     return MU_STATUS_GOOD;
 }
 
@@ -30,8 +31,9 @@ static opcua_statuscode_t fake_tcp_write(void *context, void *connection_handle,
     (void)context;
     (void)connection_handle;
     (void)buffer;
-    if (bytes_written)
+    if (bytes_written) {
         *bytes_written = buffer_size;
+    }
     return MU_STATUS_GOOD;
 }
 

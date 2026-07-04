@@ -18,7 +18,7 @@ static opcua_datetime_t multiplex_fake_time(void *context) {
 static opcua_statuscode_t multiplex_fake_entropy(void *context, opcua_byte_t *buffer, size_t length) {
     (void)context;
     if (buffer != NULL) {
-        memset(buffer, 0x42, length);
+        (void)memset(buffer, 0x42, length);
     }
     return MU_STATUS_GOOD;
 }
@@ -118,7 +118,7 @@ static void skip_multiplex_response_header(mu_binary_reader_t *reader, opcua_uin
 }
 
 static void init_multiplex_server(mu_server_t *server) {
-    memset(server, 0, sizeof(*server));
+    (void)memset(server, 0, sizeof(*server));
     server->config.time_adapter.get_time = multiplex_fake_time;
     server->config.entropy_adapter.generate_random = multiplex_fake_entropy;
     for (size_t i = 0; i < MU_MAX_SESSIONS; ++i) {
@@ -196,7 +196,7 @@ static opcua_statuscode_t mock_write(void *context, void *handle, const opcua_by
     (void)handle;
     tcp->write_count++;
     if (len <= sizeof(tcp->last_write_buf)) {
-        memcpy(tcp->last_write_buf, buffer, len);
+        (void)memcpy(tcp->last_write_buf, buffer, len);
         tcp->last_write_len = len;
     }
     *bytes_written = len;
@@ -206,7 +206,7 @@ static opcua_statuscode_t mock_write(void *context, void *handle, const opcua_by
 void test_connection_limits(void) {
 #ifdef MUC_OPCUA_MULTIPLE_CONNECTIONS
     mock_tcp_t tcp;
-    memset(&tcp, 0, sizeof(tcp));
+    (void)memset(&tcp, 0, sizeof(tcp));
 
     tcp.handles[0] = (void *)0x10;
     tcp.handles[1] = (void *)0x20;
@@ -217,7 +217,7 @@ void test_connection_limits(void) {
     tcp.next_handle = 0;
 
     mu_server_config_t config;
-    memset(&config, 0, sizeof(config));
+    (void)memset(&config, 0, sizeof(config));
     /* This test only exercises TCP/connection-level multiplexing up to
        MU_MAX_CONNECTIONS (4 sessions were never created here); max_sessions
        only needs to be a value mu_server_config_validate() accepts, i.e. within

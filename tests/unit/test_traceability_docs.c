@@ -36,18 +36,20 @@ static const char *find_backticked_mapping(const char *content, const char *file
     const char *basename = strrchr(file_path, '/');
     basename = basename ? basename + 1 : file_path;
 
-    snprintf(needle, sizeof(needle), "`%s`", file_path);
+    (void)snprintf(needle, sizeof(needle), "`%s`", file_path);
     const char *mapping = strstr(content, needle);
-    if (mapping)
+    if (mapping) {
         return mapping;
+    }
 
     snprintf(needle, sizeof(needle), "`%s`", basename);
     return strstr(content, needle);
 }
 
 static const char *line_start_for(const char *content, const char *position) {
-    while (position > content && position[-1] != '\n')
+    while (position > content && position[-1] != '\n') {
         --position;
+    }
     return position;
 }
 
@@ -58,8 +60,9 @@ static const char *line_end_for(const char *position) {
 
 static const char *find_char_between(const char *start, const char *end, char needle) {
     while (start < end) {
-        if (*start == needle)
+        if (*start == needle) {
             return start;
+        }
         ++start;
     }
 
@@ -69,26 +72,30 @@ static const char *find_char_between(const char *start, const char *end, char ne
 static int cell_matches(const char *start, const char *end, const char *expected) {
     size_t expected_len = strlen(expected);
 
-    while (start < end && (*start == ' ' || *start == '\t'))
+    while (start < end && (*start == ' ' || *start == '\t')) {
         ++start;
-    while (end > start && (end[-1] == ' ' || end[-1] == '\t'))
+    }
+    while (end > start && (end[-1] == ' ' || end[-1] == '\t')) {
         --end;
+    }
 
     return (size_t)(end - start) == expected_len && memcmp(start, expected, expected_len) == 0;
 }
 
 static const char *mapping_block_end(const char *line_start) {
     const char *line_end = strchr(line_start, '\n');
-    if (!line_end)
+    if (!line_end) {
         return line_start + strlen(line_start);
+    }
 
     const char *cursor = line_end + 1;
     int continuation_lines = 0;
     while (*cursor && *cursor != '|' && continuation_lines < 2) {
         const char *next_end = strchr(cursor, '\n');
         line_end = next_end ? next_end : cursor + strlen(cursor);
-        if (!next_end)
+        if (!next_end) {
             break;
+        }
         cursor = next_end + 1;
         ++continuation_lines;
     }
@@ -108,13 +115,15 @@ static const char *find_section_mapping_row(const char *content, const char *par
                 const char *section_start = part_end + 1;
                 const char *section_end = find_char_between(section_start, line_end, '|');
                 if (section_end && cell_matches(part_start, part_end, part) &&
-                    cell_matches(section_start, section_end, section))
+                    cell_matches(section_start, section_end, section)) {
                     return line;
+                }
             }
         }
 
-        if (*line_end == '\0')
+        if (*line_end == '\0') {
             break;
+        }
         line = line_end + 1;
     }
 
@@ -126,8 +135,9 @@ static int contains_between(const char *start, const char *end, const char *need
     const char *cursor;
 
     for (cursor = start; cursor + needle_len <= end; ++cursor) {
-        if (memcmp(cursor, needle, needle_len) == 0)
+        if (memcmp(cursor, needle, needle_len) == 0) {
             return 1;
+        }
     }
 
     return 0;
@@ -138,14 +148,16 @@ static int table_cell_bounds(const char *row_start, size_t cell_index, const cha
     const char *cursor = row_start;
     size_t current_cell = 0;
 
-    if (*cursor != '|')
+    if (*cursor != '|') {
         return 0;
+    }
 
     ++cursor;
     while (cursor < line_end) {
         const char *next_pipe = find_char_between(cursor, line_end, '|');
-        if (!next_pipe)
+        if (!next_pipe) {
             return 0;
+        }
 
         if (current_cell == cell_index) {
             *cell_start = cursor;
@@ -165,11 +177,13 @@ static const char *find_markdown_table_row_containing(const char *content, const
 
     while (*line) {
         const char *line_end = line_end_for(line);
-        if (*line == '|' && contains_between(line, line_end, needle))
+        if (*line == '|' && contains_between(line, line_end, needle)) {
             return line;
+        }
 
-        if (*line_end == '\0')
+        if (*line_end == '\0') {
             break;
+        }
         line = line_end + 1;
     }
 
@@ -181,17 +195,21 @@ static int feature_section_cell_has_exact_section(const char *row_start, const c
     const char *section_end;
     size_t section_anchor_len = strlen(section_anchor);
 
-    if (!table_cell_bounds(row_start, 1, &section_start, &section_end))
+    if (!table_cell_bounds(row_start, 1, &section_start, &section_end)) {
         return 0;
+    }
 
-    while (section_start < section_end && (*section_start == ' ' || *section_start == '\t'))
+    while (section_start < section_end && (*section_start == ' ' || *section_start == '\t')) {
         ++section_start;
+    }
 
-    if ((size_t)(section_end - section_start) < section_anchor_len)
+    if ((size_t)(section_end - section_start) < section_anchor_len) {
         return 0;
+    }
 
-    if (memcmp(section_start, section_anchor, section_anchor_len) != 0)
+    if (memcmp(section_start, section_anchor, section_anchor_len) != 0) {
         return 0;
+    }
 
     return section_start + section_anchor_len == section_end || section_start[section_anchor_len] == ' ' ||
            section_start[section_anchor_len] == '\t';
@@ -202,11 +220,13 @@ static const char *find_feature_mapping_row_for_section(const char *content, con
 
     while (*line) {
         const char *line_end = line_end_for(line);
-        if (*line == '|' && feature_section_cell_has_exact_section(line, section_anchor))
+        if (*line == '|' && feature_section_cell_has_exact_section(line, section_anchor)) {
             return line;
+        }
 
-        if (*line_end == '\0')
+        if (*line_end == '\0') {
             break;
+        }
         line = line_end + 1;
     }
 
@@ -220,11 +240,13 @@ static const char *find_feature_mapping_row_for_section_with_text(const char *co
     while (*line) {
         const char *line_end = line_end_for(line);
         if (*line == '|' && feature_section_cell_has_exact_section(line, section_anchor) &&
-            contains_between(line, line_end, required_text))
+            contains_between(line, line_end, required_text)) {
             return line;
+        }
 
-        if (*line_end == '\0')
+        if (*line_end == '\0') {
             break;
+        }
         line = line_end + 1;
     }
 
@@ -251,8 +273,9 @@ static int section_mapping_row_has_file_path(const char *row_start) {
         ++cursor;
     }
 
-    if (!files_start)
+    if (!files_start) {
         return 0;
+    }
 
     return contains_between(files_start, files_end, "`src/") || contains_between(files_start, files_end, "`include/") ||
            contains_between(files_start, files_end, "`tests/") || contains_between(files_start, files_end, "`docs/") ||
@@ -263,8 +286,9 @@ static int feature_mapping_row_has_source_file(const char *row_start) {
     const char *source_start;
     const char *source_end;
 
-    if (!table_cell_bounds(row_start, 2, &source_start, &source_end))
+    if (!table_cell_bounds(row_start, 2, &source_start, &source_end)) {
         return 0;
+    }
 
     return contains_between(source_start, source_end, "`src/") ||
            contains_between(source_start, source_end, "`include/");
@@ -274,13 +298,15 @@ static int feature_mapping_row_has_test_or_doc_evidence(const char *row_start) {
     const char *evidence_start;
     const char *evidence_end;
 
-    if (!table_cell_bounds(row_start, 3, &evidence_start, &evidence_end))
+    if (!table_cell_bounds(row_start, 3, &evidence_start, &evidence_end)) {
         return 0;
+    }
 
     if (contains_between(evidence_start, evidence_end, "Placeholder") ||
         contains_between(evidence_start, evidence_end, "placeholder") ||
-        contains_between(evidence_start, evidence_end, "TBD"))
+        contains_between(evidence_start, evidence_end, "TBD")) {
         return 0;
+    }
 
     return contains_between(evidence_start, evidence_end, "`tests/") ||
            contains_between(evidence_start, evidence_end, "`docs/") ||
@@ -292,8 +318,9 @@ static int feature_mapping_row_cell_has_text(const char *row_start, size_t cell_
     const char *cell_start;
     const char *cell_end;
 
-    if (!table_cell_bounds(row_start, cell_index, &cell_start, &cell_end))
+    if (!table_cell_bounds(row_start, cell_index, &cell_start, &cell_end)) {
         return 0;
+    }
 
     return contains_between(cell_start, cell_end, text);
 }
@@ -310,14 +337,16 @@ static const char *markdown_list_item_end(const char *item_start) {
     const char *line_end = line_end_for(item_start);
     const char *cursor = line_end;
 
-    if (*cursor != '\n')
+    if (*cursor != '\n') {
         return line_end;
+    }
 
     cursor++;
     while (*cursor == ' ' || *cursor == '\t') {
         line_end = line_end_for(cursor);
-        if (*line_end == '\0')
+        if (*line_end == '\0') {
             return line_end;
+        }
         cursor = line_end + 1;
     }
 
@@ -328,12 +357,15 @@ static int feature_mapping_row_has_concrete_source_or_doc_path(const char *row_s
     const char *source_start;
     const char *source_end;
 
-    if (!table_cell_bounds(row_start, 2, &source_start, &source_end))
+    if (!table_cell_bounds(row_start, 2, &source_start, &source_end)) {
         return 0;
+    }
 
     if (contains_between(source_start, source_end, "Placeholder") ||
-        contains_between(source_start, source_end, "placeholder") || contains_between(source_start, source_end, "TBD"))
+        contains_between(source_start, source_end, "placeholder") ||
+        contains_between(source_start, source_end, "TBD")) {
         return 0;
+    }
 
     return contains_between(source_start, source_end, "`src/") ||
            contains_between(source_start, source_end, "`include/") ||
@@ -345,8 +377,9 @@ static int feature_mapping_row_has_concrete_source_or_doc_path(const char *row_s
 static void append_traceability_failure(char *buffer, size_t buffer_len, const char *file_path, const char *reason) {
     size_t used = strlen(buffer);
     int written;
-    if (used >= buffer_len - 1)
+    if (used >= buffer_len - 1) {
         return;
+    }
 
     written = snprintf(buffer + used, buffer_len - used, "%s%s: %s", used ? "\n" : "", file_path, reason);
     (void)written;
@@ -354,13 +387,15 @@ static void append_traceability_failure(char *buffer, size_t buffer_len, const c
 
 static void check_file_traceability(const char *dir_path) {
     DIR *dir = opendir(dir_path);
-    if (!dir)
+    if (!dir) {
         return;
+    }
 
     struct dirent *entry;
     while ((entry = readdir(dir)) != NULL) {
-        if (entry->d_name[0] == '.')
+        if (entry->d_name[0] == '.') {
             continue;
+        }
 
         char path[1024];
         snprintf(path, sizeof(path), "%s/%s", dir_path, entry->d_name);
@@ -461,8 +496,9 @@ void test_traceability_docs_changed_protocol_files_have_opc_section_mappings(voi
         }
     }
 
-    if (failures[0] != '\0')
+    if (failures[0] != '\0') {
         TEST_FAIL_MESSAGE(failures);
+    }
 }
 
 void test_traceability_docs_cited_opc_sections_have_file_mappings(void) {
@@ -499,8 +535,9 @@ void test_traceability_docs_cited_opc_sections_have_file_mappings(void) {
         }
     }
 
-    if (failures[0] != '\0')
+    if (failures[0] != '\0') {
         TEST_FAIL_MESSAGE(failures);
+    }
 }
 
 void test_optimize_hot_paths_binary_traceability_rows_have_source_and_evidence_mappings(void) {
@@ -540,8 +577,9 @@ void test_optimize_hot_paths_binary_traceability_rows_have_source_and_evidence_m
         }
     }
 
-    if (failures[0] != '\0')
+    if (failures[0] != '\0') {
         TEST_FAIL_MESSAGE(failures);
+    }
 }
 
 void test_optimize_hot_paths_transport_framing_traceability_rows_have_source_and_evidence_mappings(void) {
@@ -579,8 +617,9 @@ void test_optimize_hot_paths_transport_framing_traceability_rows_have_source_and
         }
     }
 
-    if (failures[0] != '\0')
+    if (failures[0] != '\0') {
         TEST_FAIL_MESSAGE(failures);
+    }
 }
 
 void test_optimize_hot_paths_service_statuscode_traceability_rows_have_source_and_evidence_mappings(void) {
@@ -619,8 +658,9 @@ void test_optimize_hot_paths_service_statuscode_traceability_rows_have_source_an
         }
     }
 
-    if (failures[0] != '\0')
+    if (failures[0] != '\0') {
         TEST_FAIL_MESSAGE(failures);
+    }
 }
 
 void test_optimize_hot_paths_write_audit_and_conformance_traceability_rows_have_source_and_evidence_mappings(void) {
@@ -660,8 +700,9 @@ void test_optimize_hot_paths_write_audit_and_conformance_traceability_rows_have_
         }
     }
 
-    if (failures[0] != '\0')
+    if (failures[0] != '\0') {
         TEST_FAIL_MESSAGE(failures);
+    }
 }
 
 void test_023_feature_traceability_pubsub_rows_have_sections_sources_and_evidence(void) {
@@ -694,8 +735,9 @@ void test_023_feature_traceability_pubsub_rows_have_sections_sources_and_evidenc
         }
     }
 
-    if (failures[0] != '\0')
+    if (failures[0] != '\0') {
         TEST_FAIL_MESSAGE(failures);
+    }
 }
 
 void test_023_feature_traceability_documentation_and_conformance_check_rows_have_sources_and_evidence(void) {
@@ -753,8 +795,9 @@ void test_023_feature_traceability_documentation_and_conformance_check_rows_have
         }
     }
 
-    if (failures[0] != '\0')
+    if (failures[0] != '\0') {
         TEST_FAIL_MESSAGE(failures);
+    }
 }
 
 void test_023_feature_traceability_lists_negative_path_evidence(void) {
@@ -854,8 +897,9 @@ void test_023_feature_traceability_invalid_id_rows_have_opc_refs_statuses_and_ev
         }
     }
 
-    if (failures[0] != '\0')
+    if (failures[0] != '\0') {
         TEST_FAIL_MESSAGE(failures);
+    }
 }
 
 void test_023_feature_traceability_publish_republish_rows_have_opc_refs_statuses_and_evidence(void) {
@@ -930,12 +974,14 @@ void test_023_feature_traceability_publish_republish_rows_have_opc_refs_statuses
                                         "missing required publish/republish StatusCode in row notes");
         }
 
-        if (!negative_path_section)
+        if (!negative_path_section) {
             continue;
+        }
 
         evidence_status = strstr(negative_path_section, publish_republish_rows[i].status_code);
-        if (evidence_status && negative_path_section_end && evidence_status >= negative_path_section_end)
+        if (evidence_status && negative_path_section_end && evidence_status >= negative_path_section_end) {
             evidence_status = NULL;
+        }
 
         if (!evidence_status) {
             append_traceability_failure(failures, sizeof(failures), publish_republish_rows[i].label,
@@ -951,8 +997,9 @@ void test_023_feature_traceability_publish_republish_rows_have_opc_refs_statuses
         }
     }
 
-    if (failures[0] != '\0')
+    if (failures[0] != '\0') {
         TEST_FAIL_MESSAGE(failures);
+    }
 }
 
 void test_023_feature_traceability_filter_rows_have_opc_refs_statuses_and_evidence(void) {
@@ -1073,8 +1120,9 @@ void test_023_feature_traceability_filter_rows_have_opc_refs_statuses_and_eviden
         for (i = 0; i < sizeof(negative_path_status_rows) / sizeof(negative_path_status_rows[0]); ++i) {
             const char *evidence_status = strstr(negative_path_section, negative_path_status_rows[i].status_code);
 
-            if (evidence_status && negative_path_section_end && evidence_status >= negative_path_section_end)
+            if (evidence_status && negative_path_section_end && evidence_status >= negative_path_section_end) {
                 evidence_status = NULL;
+            }
 
             if (!evidence_status) {
                 append_traceability_failure(failures, sizeof(failures), negative_path_status_rows[i].status_code,
@@ -1097,8 +1145,9 @@ void test_023_feature_traceability_filter_rows_have_opc_refs_statuses_and_eviden
         }
     }
 
-    if (failures[0] != '\0')
+    if (failures[0] != '\0') {
         TEST_FAIL_MESSAGE(failures);
+    }
 }
 
 void test_023_feature_traceability_has_story_evidence_rows(void) {
@@ -1164,8 +1213,9 @@ void test_023_feature_traceability_has_story_evidence_rows(void) {
 
         for (j = 0; j < sizeof(story_rows[i].required_row_anchors) / sizeof(story_rows[i].required_row_anchors[0]);
              ++j) {
-            if (!story_rows[i].required_row_anchors[j])
+            if (!story_rows[i].required_row_anchors[j]) {
                 continue;
+            }
 
             if (!markdown_table_row_has_anchor(row, story_rows[i].required_row_anchors[j])) {
                 append_traceability_failure(failures, sizeof(failures), story_rows[i].story,
@@ -1174,8 +1224,9 @@ void test_023_feature_traceability_has_story_evidence_rows(void) {
         }
     }
 
-    if (failures[0] != '\0')
+    if (failures[0] != '\0') {
         TEST_FAIL_MESSAGE(failures);
+    }
 }
 
 int main(void) {

@@ -11,7 +11,7 @@ void tearDown(void) {}
 
 void test_endpoint_description_encode(void) {
     mu_server_config_t config;
-    memset(&config, 0, sizeof(config));
+    (void)memset(&config, 0, sizeof(config));
     config.application_uri = "urn:test:app";
     config.product_uri = "urn:test:product";
     config.application_name = "Test Server";

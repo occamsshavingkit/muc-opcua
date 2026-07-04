@@ -16,12 +16,15 @@
 static opcua_uint64_t clamp_timeout_bits(opcua_uint64_t bits) {
     /* Sign set (negative / -0 / -NaN) or below the minimum -> minimum; above the
        maximum (incl. +Inf / +NaN) -> maximum. */
-    if (bits & MU_DOUBLE_SIGN_BIT)
+    if (bits & MU_DOUBLE_SIGN_BIT) {
         return MU_SESSION_TIMEOUT_MIN_BITS;
-    if (bits < MU_SESSION_TIMEOUT_MIN_BITS)
+    }
+    if (bits < MU_SESSION_TIMEOUT_MIN_BITS) {
         return MU_SESSION_TIMEOUT_MIN_BITS;
-    if (bits > MU_SESSION_TIMEOUT_MAX_BITS)
+    }
+    if (bits > MU_SESSION_TIMEOUT_MAX_BITS) {
         return MU_SESSION_TIMEOUT_MAX_BITS;
+    }
     return bits;
 }
 
@@ -192,8 +195,9 @@ opcua_statuscode_t mu_session_create_with_identifiers(mu_session_t *session, opc
                                                       opcua_uint32_t creating_secure_channel_id,
                                                       opcua_uint64_t *revised_timeout_bits, opcua_uint32_t *session_id,
                                                       opcua_uint32_t *auth_token) {
-    if (!session || !revised_timeout_bits || !session_id || !auth_token)
+    if (!session || !revised_timeout_bits || !session_id || !auth_token) {
         return MU_STATUS_BAD_INTERNALERROR;
+    }
 
     if (session->state != MU_SESSION_STATE_CLOSED) {
         return MU_STATUS_BAD_INTERNALERROR; /* Only 1 session in minimal server */
@@ -229,8 +233,9 @@ opcua_statuscode_t mu_session_create(mu_session_t *session, opcua_uint64_t reque
 
 opcua_statuscode_t mu_session_validate_secure_channel(const mu_session_t *session,
                                                       opcua_uint32_t active_secure_channel_id) {
-    if (!session)
+    if (!session) {
         return MU_STATUS_BAD_INTERNALERROR;
+    }
 
 #ifdef MUC_OPCUA_MULTIPLE_CONNECTIONS
     /* OPC-10000-4 section 7.38.2: reject Session use through a SecureChannel
@@ -247,8 +252,9 @@ opcua_statuscode_t mu_session_validate_secure_channel(const mu_session_t *sessio
 
 opcua_statuscode_t mu_session_activate(mu_session_t *session, opcua_uint32_t auth_token,
                                        opcua_uint32_t identity_token_encoding_id) {
-    if (!session)
+    if (!session) {
         return MU_STATUS_BAD_INTERNALERROR;
+    }
 
     if (session->state != MU_SESSION_STATE_CREATED && session->state != MU_SESSION_STATE_ACTIVATED) {
         return MU_STATUS_BAD_SESSIONIDINVALID;
@@ -268,8 +274,9 @@ opcua_statuscode_t mu_session_activate(mu_session_t *session, opcua_uint32_t aut
 }
 
 opcua_statuscode_t mu_session_close(mu_session_t *session, opcua_uint32_t auth_token, bool delete_subscriptions) {
-    if (!session)
+    if (!session) {
         return MU_STATUS_BAD_INTERNALERROR;
+    }
     (void)delete_subscriptions; /* Not supported yet */
 
     if (session->state == MU_SESSION_STATE_CLOSED) {

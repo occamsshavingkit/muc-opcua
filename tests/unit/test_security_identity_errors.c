@@ -1,9 +1,9 @@
 /* tests/unit/test_security_identity_errors.c */
+#include "fake_platform.h"
 #include "muc_opcua/muc_opcua.h"
 #include "unity.h"
 #include <stdbool.h>
 #include <string.h>
-#include "fake_platform.h"
 
 void setUp(void) {}
 void tearDown(void) {}
@@ -45,7 +45,7 @@ static void prepare_created_session(mu_server_t *server, opcua_uint32_t *auth_to
     opcua_uint64_t revised_timeout = 0;
     opcua_uint32_t session_id = 0;
 
-    memset(server, 0, sizeof(*server));
+    (void)memset(server, 0, sizeof(*server));
     server->secure_channel.is_open = true;
     fake_platform_init(NULL, &server->config.time_adapter, &server->config.entropy_adapter);
     mu_session_init(&server->sessions[0]);
@@ -174,7 +174,7 @@ static size_t build_username_activate_request(opcua_byte_t *request, size_t capa
        a default server must not accept clear-text username/password activation. */
     mu_binary_write_extension_object_header(&writer, &username_token, token_writer.position);
     TEST_ASSERT_TRUE(writer.position + token_writer.position <= capacity);
-    memcpy(request + writer.position, token_body, token_writer.position);
+    (void)memcpy(request + writer.position, token_body, token_writer.position);
     writer.position += token_writer.position;
     mu_binary_write_string(&writer, &null_string);    /* UserTokenSignature.algorithm */
     mu_binary_write_bytestring(&writer, &null_bytes); /* UserTokenSignature.signature */
@@ -228,7 +228,7 @@ void test_getendpoints_security_policy_none_does_not_advertise_username_tokens(v
     opcua_int32_t endpoint_count = 0;
     bool saw_security_policy_none = false;
 
-    memset(&server, 0, sizeof(server));
+    (void)memset(&server, 0, sizeof(server));
     server.secure_channel.is_open = true;
     server.config.endpoint_url = "opc.tcp://localhost:4840";
     server.config.application_uri = "urn:test:app";

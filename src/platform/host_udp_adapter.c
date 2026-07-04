@@ -47,7 +47,7 @@ opcua_statuscode_t mu_host_udp_send(void *context, const opcua_byte_t *buffer, s
         return MU_STATUS_BAD_INTERNALERROR;
 
     struct sockaddr_in dest_addr;
-    memset(&dest_addr, 0, sizeof(dest_addr));
+    (void)memset(&dest_addr, 0, sizeof(dest_addr));
     dest_addr.sin_family = AF_INET;
     dest_addr.sin_port = htons(port);
 

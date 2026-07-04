@@ -91,7 +91,7 @@ static opcua_uint64_t stub_get_tick_ms(void *context) {
 static opcua_statuscode_t stub_generate_random(void *context, opcua_byte_t *buffer, size_t length) {
     (void)context;
     if (buffer)
-        memset(buffer, 0xAA, length);
+        (void)memset(buffer, 0xAA, length);
     return MU_STATUS_GOOD;
 }
 
@@ -102,7 +102,7 @@ int main(void) {
 
     signal(SIGINT, sigint_handler);
 
-    memset(&config, 0, sizeof(config));
+    (void)memset(&config, 0, sizeof(config));
 
     config.endpoint_url = "opc.tcp://localhost:4840";
     config.application_uri = "urn:localhost:muc_opcua:minimal_server";
@@ -121,7 +121,7 @@ int main(void) {
 
     status = mu_host_tcp_adapter_init(&config.tcp_adapter);
     if (status != MU_STATUS_GOOD) {
-        printf("Failed to init TCP adapter\n");
+        (void)printf("Failed to init TCP adapter\n");
         return 1;
     }
 
@@ -142,8 +142,8 @@ int main(void) {
            supply config.trust_list and leave this false so unknown certificates
            are rejected (certificate validity is enforced either way). */
         config.allow_untrusted_clients = 1;
-        printf("SecurityPolicy Basic256Sha256 enabled (self-signed certificate)\n");
-        printf("WARNING: allow_untrusted_clients=1 (demo) — application authentication is disabled\n");
+        (void)printf("SecurityPolicy Basic256Sha256 enabled (self-signed certificate)\n");
+        (void)printf("WARNING: allow_untrusted_clients=1 (demo) — application authentication is disabled\n");
     }
 #endif
 #ifdef MUC_OPCUA_SERVICE_HISTORY
@@ -154,25 +154,25 @@ int main(void) {
 
     config.address_space = &g_minimal_address_space;
 
-    printf("Initializing muc-opcua Server...\n");
+    (void)printf("Initializing muc-opcua Server...\n");
     status = mu_server_init(g_server_storage, sizeof(g_server_storage), &config, &server);
     if (status != MU_STATUS_GOOD) {
 #ifdef MUC_OPCUA_STATUS_STRINGS
-        printf("Failed to initialize server: %s\n", mu_status_name(status));
+        (void)printf("Failed to initialize server: %s\n", mu_status_name(status));
 #else
-        printf("Failed to initialize server: 0x%08X\n", (unsigned)status);
+        (void)printf("Failed to initialize server: 0x%08X\n", (unsigned)status);
 #endif
         return 1;
     }
 
-    printf("Server initialized successfully. Listening on %s\n", config.endpoint_url);
+    (void)printf("Server initialized successfully. Listening on %s\n", config.endpoint_url);
 
 #ifdef MUC_OPCUA_SERVICE_ALARMS_CONDITIONS
     {
         mu_condition_id_t cid;
         cid.node_id = mu_nodeid_make_numeric(1, 12345);
         if (mu_alarms_trigger_dialog(server, &cid, 0x03) == MU_STATUS_GOOD) {
-            printf("Triggered test dialog condition (NodeId 1:12345)\n");
+            (void)printf("Triggered test dialog condition (NodeId 1:12345)\n");
         }
     }
 #endif
@@ -183,7 +183,7 @@ int main(void) {
         usleep(10000); /* 10ms sleep to avoid 100% CPU on non-blocking sockets */
     }
 
-    printf("\nShutting down...\n");
+    (void)printf("\nShutting down...\n");
     mu_server_close(server);
     return 0;
 }

@@ -16,7 +16,7 @@ static opcua_statuscode_t fuzz_entropy(void *context, opcua_byte_t *buffer, size
         return MU_STATUS_BAD_INTERNALERROR;
     }
     if (buffer != NULL) {
-        memset(buffer, 0xa5, length);
+        (void)memset(buffer, 0xa5, length);
     }
     return MU_STATUS_GOOD;
 }
@@ -27,7 +27,7 @@ static bool prepare_activate_session_server(mu_server_t *server) {
     opcua_uint32_t session_id = 0;
     opcua_uint32_t auth_token = 0;
 
-    memset(server, 0, sizeof(*server));
+    (void)memset(server, 0, sizeof(*server));
     server->config.entropy_adapter.generate_random = fuzz_entropy;
 
     mu_secure_channel_init(&server->secure_channel);
@@ -110,14 +110,14 @@ static size_t build_structured_request(const uint8_t *data, size_t size, opcua_b
     if (tail_length > tail_capacity) {
         tail_length = tail_capacity;
     }
-    memcpy(request + prefix_length, seed_tail, tail_length);
+    (void)memcpy(request + prefix_length, seed_tail, tail_length);
 
     overlay_length = size;
     if (overlay_length > tail_capacity) {
         overlay_length = tail_capacity;
     }
     if (overlay_length != 0u) {
-        memcpy(request + prefix_length, data, overlay_length);
+        (void)memcpy(request + prefix_length, data, overlay_length);
     }
 
     if (overlay_length > tail_length) {

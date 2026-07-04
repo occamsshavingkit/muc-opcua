@@ -53,7 +53,7 @@ static void stub_shutdown(void *context) {
    perturbs exactly the field(s) under test. */
 static void build_valid_config(mu_server_config_t *config, opcua_byte_t *rx_buf, size_t rx_buf_size,
                                opcua_byte_t *tx_buf, size_t tx_buf_size) {
-    memset(config, 0, sizeof(*config));
+    (void)memset(config, 0, sizeof(*config));
     config->endpoint_url = "opc.tcp://localhost:4840";
     config->receive_buffer = rx_buf;
     config->receive_buffer_size = rx_buf_size;

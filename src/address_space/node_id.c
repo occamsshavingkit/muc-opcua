@@ -6,38 +6,49 @@
 #undef mu_address_space_find_node
 
 static int mu_nodeid_compare_direct(const mu_nodeid_t *left, const mu_nodeid_t *right) {
-    if (left->namespace_index < right->namespace_index)
+    if (left->namespace_index < right->namespace_index) {
         return -1;
-    if (left->namespace_index > right->namespace_index)
+    }
+    if (left->namespace_index > right->namespace_index) {
         return 1;
+    }
 
-    if (left->identifier_type < right->identifier_type)
+    if (left->identifier_type < right->identifier_type) {
         return -1;
-    if (left->identifier_type > right->identifier_type)
+    }
+    if (left->identifier_type > right->identifier_type) {
         return 1;
+    }
 
     switch (left->identifier_type) {
     case MU_NODEID_NUMERIC:
-        if (left->identifier.numeric < right->identifier.numeric)
+        if (left->identifier.numeric < right->identifier.numeric) {
             return -1;
-        if (left->identifier.numeric > right->identifier.numeric)
+        }
+        if (left->identifier.numeric > right->identifier.numeric) {
             return 1;
+        }
         return 0;
 
     case MU_NODEID_STRING: {
         opcua_int32_t len1 = left->identifier.string.length;
         opcua_int32_t len2 = right->identifier.string.length;
-        if (len1 < len2)
+        if (len1 < len2) {
             return -1;
-        if (len1 > len2)
+        }
+        if (len1 > len2) {
             return 1;
-        if (len1 <= 0)
+        }
+        if (len1 <= 0) {
             return 0;
+        }
         if (!left->identifier.string.data || !right->identifier.string.data) {
-            if (left->identifier.string.data < right->identifier.string.data)
+            if (left->identifier.string.data < right->identifier.string.data) {
                 return -1;
-            if (left->identifier.string.data > right->identifier.string.data)
+            }
+            if (left->identifier.string.data > right->identifier.string.data) {
                 return 1;
+            }
             return 0;
         }
         return memcmp(left->identifier.string.data, right->identifier.string.data, (size_t)len1);

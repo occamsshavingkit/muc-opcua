@@ -37,8 +37,9 @@ void test_basic256sha256_roundtrip(void) {
 
     /* A representative OPN request body (opaque bytes here). */
     opcua_byte_t body[120];
-    for (size_t i = 0; i < sizeof(body); i++)
+    for (size_t i = 0; i < sizeof(body); i++) {
         body[i] = (opcua_byte_t)(i * 7 + 1);
+    }
 
     opcua_byte_t chunk[4096];
     size_t chunk_len = 0;
@@ -75,8 +76,9 @@ void test_basic256sha256_roundtrip(void) {
 
 void test_none_passthrough(void) {
     opcua_byte_t body[64];
-    for (size_t i = 0; i < sizeof(body); i++)
+    for (size_t i = 0; i < sizeof(body); i++) {
         body[i] = (opcua_byte_t)(255 - i);
+    }
 
     opcua_byte_t chunk[512];
     size_t chunk_len = 0;
@@ -106,8 +108,9 @@ void test_aes256_sha256_rsapss_roundtrip(void) {
 
     /* A representative OPN request body (opaque bytes here). */
     opcua_byte_t body[120];
-    for (size_t i = 0; i < sizeof(body); i++)
+    for (size_t i = 0; i < sizeof(body); i++) {
         body[i] = (opcua_byte_t)(i * 7 + 1);
+    }
 
     opcua_byte_t chunk[4096];
     size_t chunk_len = 0;

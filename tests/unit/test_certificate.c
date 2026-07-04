@@ -55,7 +55,7 @@ void test_validate_accepts_rsa2048(void) {
 /* Unparseable bytes are rejected. */
 void test_validate_rejects_garbage(void) {
     opcua_byte_t junk[64];
-    memset(junk, 0xAB, sizeof(junk));
+    (void)memset(junk, 0xAB, sizeof(junk));
     TEST_ASSERT_NOT_EQUAL(MU_STATUS_GOOD,
                           mu_certificate_validate(&crypto, MU_SECURITY_POLICY_BASIC256SHA256_ID, junk, sizeof(junk)));
 }

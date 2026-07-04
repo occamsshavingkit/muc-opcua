@@ -4,10 +4,12 @@
 #include "uasc.h"
 
 opcua_statuscode_t mu_parse_message_header(const opcua_byte_t *buffer, size_t length, mu_message_header_t *header) {
-    if (!buffer || !header)
+    if (!buffer || !header) {
         return MU_STATUS_BAD_INTERNALERROR;
-    if (length < 8)
+    }
+    if (length < 8) {
         return MU_STATUS_BAD_TCPINTERNALERROR;
+    }
 
     header->message_type[0] = buffer[0];
     header->message_type[1] = buffer[1];
@@ -18,8 +20,8 @@ opcua_statuscode_t mu_parse_message_header(const opcua_byte_t *buffer, size_t le
     opcua_uint32_t msg_type = ((opcua_uint32_t)header->message_type[0]) |
                               ((opcua_uint32_t)header->message_type[1] << 8u) |
                               ((opcua_uint32_t)header->message_type[2] << 16u);
-    if (msg_type != 0x4C4548u && msg_type != 0x4B4341u && msg_type != 0x525245u &&
-        msg_type != 0x4E504Fu && msg_type != 0x4F4C43u && msg_type != 0x47534Du) {
+    if (msg_type != 0x4C4548u && msg_type != 0x4B4341u && msg_type != 0x525245u && msg_type != 0x4E504Fu &&
+        msg_type != 0x4F4C43u && msg_type != 0x47534Du) {
         return MU_STATUS_BAD_TCPMESSAGETYPEINVALID;
     }
 
@@ -30,10 +32,12 @@ opcua_statuscode_t mu_parse_message_header(const opcua_byte_t *buffer, size_t le
     header->message_size = (opcua_uint32_t)buffer[4] | ((opcua_uint32_t)buffer[5] << 8u) |
                            ((opcua_uint32_t)buffer[6] << 16u) | ((opcua_uint32_t)buffer[7] << 24u);
 
-    if (header->message_size < 8)
+    if (header->message_size < 8) {
         return MU_STATUS_BAD_TCPINTERNALERROR;
-    if (header->message_size > length)
+    }
+    if (header->message_size > length) {
         return MU_STATUS_BAD_TCPMESSAGETOOLARGE;
+    }
 
     if (header->chunk_type == 'C') {
         /* OPC-10000-6 section 6.7.2: single-chunk mode rejects continuation chunks before MessageBody dispatch. */
@@ -45,10 +49,12 @@ opcua_statuscode_t mu_parse_message_header(const opcua_byte_t *buffer, size_t le
         return MU_STATUS_GOOD;
     }
 
-    if (length < 12)
+    if (length < 12) {
         return MU_STATUS_BAD_TCPINTERNALERROR;
-    if (header->message_size < 12)
+    }
+    if (header->message_size < 12) {
         return MU_STATUS_BAD_TCPINTERNALERROR;
+    }
 
     header->secure_channel_id = (opcua_uint32_t)buffer[8] | ((opcua_uint32_t)buffer[9] << 8u) |
                                 ((opcua_uint32_t)buffer[10] << 16u) | ((opcua_uint32_t)buffer[11] << 24u);
@@ -77,10 +83,12 @@ opcua_statuscode_t mu_parse_message_header(const opcua_byte_t *buffer, size_t le
 }
 
 opcua_statuscode_t mu_write_message_header(opcua_byte_t *buffer, size_t length, const mu_message_header_t *header) {
-    if (!buffer || !header)
+    if (!buffer || !header) {
         return MU_STATUS_BAD_INTERNALERROR;
-    if (length < 12)
+    }
+    if (length < 12) {
         return MU_STATUS_BAD_INTERNALERROR;
+    }
 
     buffer[0] = header->message_type[0];
     buffer[1] = header->message_type[1];
@@ -100,22 +108,26 @@ opcua_statuscode_t mu_write_message_header(opcua_byte_t *buffer, size_t length, 
 
 opcua_statuscode_t mu_parse_sequence_header(const opcua_byte_t *buffer, size_t length, size_t *offset,
                                             mu_sequence_header_t *header) {
-    if (!buffer || !offset || !header)
+    if (!buffer || !offset || !header) {
         return MU_STATUS_BAD_INTERNALERROR;
+    }
 
     size_t position = *offset;
-    if (position > length)
+    if (position > length) {
         return MU_STATUS_BAD_DECODINGERROR;
-    if (4u > length - position)
+    }
+    if (4u > length - position) {
         return MU_STATUS_BAD_DECODINGERROR;
+    }
 
     header->sequence_number = (opcua_uint32_t)buffer[position] | ((opcua_uint32_t)buffer[position + 1u] << 8u) |
                               ((opcua_uint32_t)buffer[position + 2u] << 16u) |
                               ((opcua_uint32_t)buffer[position + 3u] << 24u);
     position += 4u;
 
-    if (4u > length - position)
+    if (4u > length - position) {
         return MU_STATUS_BAD_DECODINGERROR;
+    }
 
     header->request_id = (opcua_uint32_t)buffer[position] | ((opcua_uint32_t)buffer[position + 1u] << 8u) |
                          ((opcua_uint32_t)buffer[position + 2u] << 16u) |
@@ -128,14 +140,17 @@ opcua_statuscode_t mu_parse_sequence_header(const opcua_byte_t *buffer, size_t l
 
 opcua_statuscode_t mu_write_sequence_header(opcua_byte_t *buffer, size_t length, size_t *offset,
                                             const mu_sequence_header_t *header) {
-    if (!buffer || !offset || !header)
+    if (!buffer || !offset || !header) {
         return MU_STATUS_BAD_INTERNALERROR;
+    }
 
     size_t position = *offset;
-    if (position > length)
+    if (position > length) {
         return MU_STATUS_BAD_ENCODINGERROR;
-    if (4u > length - position)
+    }
+    if (4u > length - position) {
         return MU_STATUS_BAD_ENCODINGERROR;
+    }
 
     buffer[position] = (opcua_byte_t)(header->sequence_number & 0xFFu);
     buffer[position + 1u] = (opcua_byte_t)((header->sequence_number >> 8u) & 0xFFu);
@@ -143,8 +158,9 @@ opcua_statuscode_t mu_write_sequence_header(opcua_byte_t *buffer, size_t length,
     buffer[position + 3u] = (opcua_byte_t)((header->sequence_number >> 24u) & 0xFFu);
     position += 4u;
 
-    if (4u > length - position)
+    if (4u > length - position) {
         return MU_STATUS_BAD_ENCODINGERROR;
+    }
 
     buffer[position] = (opcua_byte_t)(header->request_id & 0xFFu);
     buffer[position + 1u] = (opcua_byte_t)((header->request_id >> 8u) & 0xFFu);

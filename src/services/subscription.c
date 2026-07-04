@@ -259,7 +259,7 @@ static void monitored_item_accumulate_aggregate(mu_monitored_item_t *item, const
 
 static void monitored_item_publish_aggregate(mu_monitored_item_t *item, opcua_uint64_t now_ms) {
     mu_variant_t calc_val;
-    memset(&calc_val, 0, sizeof(calc_val));
+    (void)memset(&calc_val, 0, sizeof(calc_val));
     opcua_statuscode_t calc_status = MU_STATUS_GOOD;
 
     if (item->aggregate_state.sample_count == 0u) {
@@ -287,7 +287,7 @@ static void monitored_item_publish_aggregate(mu_monitored_item_t *item, opcua_ui
 
     /* Reset state */
     item->aggregate_state.sample_count = 0u;
-    memset(&item->aggregate_state.accumulator, 0, sizeof(item->aggregate_state.accumulator));
+    (void)memset(&item->aggregate_state.accumulator, 0, sizeof(item->aggregate_state.accumulator));
     item->aggregate_state.last_calculation = (opcua_datetime_t)now_ms;
 }
 #endif
@@ -473,15 +473,16 @@ static bool publish_request_dequeue(mu_subscriptions_t *subs, opcua_uint32_t ses
     }
 
     *out_request = subs->publish_queue[best];
-    memset(&subs->publish_queue[best], 0, sizeof(subs->publish_queue[best]));
+    (void)memset(&subs->publish_queue[best], 0, sizeof(subs->publish_queue[best]));
     return true;
 }
 
 static opcua_statuscode_t write_publish_response_prefix(mu_binary_writer_t *w, opcua_uint32_t request_handle) {
     mu_nodeid_t type = {0, MU_NODEID_NUMERIC, {MU_ID_PUBLISHRESPONSE}};
     opcua_statuscode_t s = mu_binary_write_nodeid(w, &type);
-    if (s != MU_STATUS_GOOD)
+    if (s != MU_STATUS_GOOD) {
         return s;
+    }
 
     mu_response_header_t rh;
     rh.timestamp = 0;
@@ -697,21 +698,25 @@ static opcua_statuscode_t write_data_change_notification(mu_binary_writer_t *w, 
                                                          const mu_subscription_t *sub, opcua_int32_t report_count) {
     mu_nodeid_t type_id = {0, MU_NODEID_NUMERIC, {MU_ID_DATACHANGENOTIFICATION_ENCODING_DEFAULTBINARY}};
     opcua_statuscode_t s = mu_binary_write_nodeid(w, &type_id);
-    if (s != MU_STATUS_GOOD)
+    if (s != MU_STATUS_GOOD) {
         return s;
+    }
     s = mu_binary_write_byte(w, 1u);
-    if (s != MU_STATUS_GOOD)
+    if (s != MU_STATUS_GOOD) {
         return s;
+    }
 
     size_t length_pos = w->position;
     s = mu_binary_write_int32(w, 0);
-    if (s != MU_STATUS_GOOD)
+    if (s != MU_STATUS_GOOD) {
         return s;
+    }
     size_t body_start = w->position;
 
     s = mu_binary_write_int32(w, report_count);
-    if (s != MU_STATUS_GOOD)
+    if (s != MU_STATUS_GOOD) {
         return s;
+    }
 
     for (size_t i = 0; i < MU_MAX_MONITORED_ITEMS; ++i) {
         const mu_monitored_item_t *item = &server->subs.monitored_items[i];
@@ -733,8 +738,9 @@ static opcua_statuscode_t write_data_change_notification(mu_binary_writer_t *w, 
             opcua_statuscode_t status = item->queue[entry_index].status;
 
             s = mu_binary_write_uint32(w, item->client_handle);
-            if (s != MU_STATUS_GOOD)
+            if (s != MU_STATUS_GOOD) {
                 return s;
+            }
 
             mu_datavalue_t dv;
             memset(&dv, 0, sizeof(dv));
@@ -745,8 +751,9 @@ static opcua_statuscode_t write_data_change_notification(mu_binary_writer_t *w, 
                 dv.status = status;
             }
             s = mu_binary_write_datavalue(w, &dv);
-            if (s != MU_STATUS_GOOD)
+            if (s != MU_STATUS_GOOD) {
                 return s;
+            }
 
             --report_count;
             entry_index = monitored_item_queue_next(entry_index, queue_size);
@@ -790,8 +797,9 @@ static opcua_statuscode_t write_data_change_notification(mu_binary_writer_t *w, 
             opcua_statuscode_t status = item->queue[entry_index].status;
 
             s = mu_binary_write_uint32(w, item->client_handle);
-            if (s != MU_STATUS_GOOD)
+            if (s != MU_STATUS_GOOD) {
                 return s;
+            }
 
             mu_datavalue_t dv;
             memset(&dv, 0, sizeof(dv));
@@ -802,8 +810,9 @@ static opcua_statuscode_t write_data_change_notification(mu_binary_writer_t *w, 
                 dv.status = status;
             }
             s = mu_binary_write_datavalue(w, &dv);
-            if (s != MU_STATUS_GOOD)
+            if (s != MU_STATUS_GOOD) {
                 return s;
+            }
 
             --report_count;
             entry_index = monitored_item_queue_next(entry_index, queue_size);
@@ -812,8 +821,9 @@ static opcua_statuscode_t write_data_change_notification(mu_binary_writer_t *w, 
 #endif
 
     s = mu_binary_write_int32(w, 0);
-    if (s != MU_STATUS_GOOD)
+    if (s != MU_STATUS_GOOD) {
         return s;
+    }
 
     size_t body_length = w->position - body_start;
     if (body_length > (size_t)0x7FFFFFFF) {
@@ -847,8 +857,9 @@ static opcua_statuscode_t write_event_notification_list(mu_binary_writer_t *w, s
 
     opcua_int32_t total_field_lists = event_monitored_item_count * (opcua_int32_t)sub->event_queue.count;
     opcua_statuscode_t s = mu_binary_write_int32(&sub_w, total_field_lists);
-    if (s != MU_STATUS_GOOD)
+    if (s != MU_STATUS_GOOD) {
         return s;
+    }
 
     for (size_t i = 0; i < MU_MAX_MONITORED_ITEMS; ++i) {
         const mu_monitored_item_t *item = &server->subs.monitored_items[i];
@@ -861,12 +872,14 @@ static opcua_statuscode_t write_event_notification_list(mu_binary_writer_t *w, s
                 idx = (idx + 1) % MU_MAX_EVENT_QUEUE_SIZE;
 
                 s = mu_binary_write_uint32(&sub_w, item->client_handle);
-                if (s != MU_STATUS_GOOD)
+                if (s != MU_STATUS_GOOD) {
                     return s;
+                }
 
                 s = mu_binary_write_int32(&sub_w, (opcua_int32_t)item->select_clauses_count);
-                if (s != MU_STATUS_GOOD)
+                if (s != MU_STATUS_GOOD) {
                     return s;
+                }
 
                 for (opcua_byte_t j = 0; j < item->select_clauses_count; ++j) {
                     opcua_byte_t field_type = item->select_clauses[j];
@@ -900,16 +913,18 @@ static opcua_statuscode_t write_event_notification_list(mu_binary_writer_t *w, s
                         break;
                     }
                     s = mu_binary_write_variant(&sub_w, &var);
-                    if (s != MU_STATUS_GOOD)
+                    if (s != MU_STATUS_GOOD) {
                         return s;
+                    }
                 }
             }
         }
     }
 
     s = mu_binary_write_extension_object_header(w, &type_id, sub_w.position);
-    if (s != MU_STATUS_GOOD)
+    if (s != MU_STATUS_GOOD) {
         return s;
+    }
     if (w->position + sub_w.position > w->length) {
         return MU_STATUS_BAD_OUTOFMEMORY;
     }
@@ -955,30 +970,36 @@ static opcua_statuscode_t build_publish_response(struct mu_server *server, const
     }
 
     opcua_statuscode_t s = write_publish_response_prefix(&w, request->request_handle);
-    if (s != MU_STATUS_GOOD)
+    if (s != MU_STATUS_GOOD) {
         return s;
+    }
 
     s = mu_binary_write_uint32(&w, sub->subscription_id);
-    if (s != MU_STATUS_GOOD)
+    if (s != MU_STATUS_GOOD) {
         return s;
+    }
     s = mu_binary_write_int32(&w, 0);
-    if (s != MU_STATUS_GOOD)
+    if (s != MU_STATUS_GOOD) {
         return s;
+    }
 #if MUC_OPCUA_SUBSCRIPTIONS_STANDARD
     s = mu_binary_write_boolean(&w, include_data && sub->more_notifications);
 #else
     s = mu_binary_write_boolean(&w, false);
 #endif
-    if (s != MU_STATUS_GOOD)
+    if (s != MU_STATUS_GOOD) {
         return s;
+    }
 
     size_t message_start = w.position;
     s = mu_binary_write_uint32(&w, sequence_number);
-    if (s != MU_STATUS_GOOD)
+    if (s != MU_STATUS_GOOD) {
         return s;
+    }
     s = mu_binary_write_int64(&w, publish_time);
-    if (s != MU_STATUS_GOOD)
+    if (s != MU_STATUS_GOOD) {
         return s;
+    }
 
     opcua_int32_t notification_data_count = 0;
     if (include_data) {
@@ -992,20 +1013,23 @@ static opcua_statuscode_t build_publish_response(struct mu_server *server, const
 #endif
     }
     s = mu_binary_write_int32(&w, notification_data_count);
-    if (s != MU_STATUS_GOOD)
+    if (s != MU_STATUS_GOOD) {
         return s;
+    }
 
     if (include_data) {
         if (report_count > 0) {
             s = write_data_change_notification(&w, server, sub, report_count);
-            if (s != MU_STATUS_GOOD)
+            if (s != MU_STATUS_GOOD) {
                 return s;
+            }
         }
 #ifdef MUC_OPCUA_EVENTS
         if (sub->event_queue.count > 0) {
             s = write_event_notification_list(&w, server, sub);
-            if (s != MU_STATUS_GOOD)
+            if (s != MU_STATUS_GOOD) {
                 return s;
+            }
         }
 #endif
     }
@@ -1016,16 +1040,19 @@ static opcua_statuscode_t build_publish_response(struct mu_server *server, const
         ack_count = MU_MAX_PUBLISH_ACKS;
     }
     s = mu_binary_write_int32(&w, (opcua_int32_t)ack_count);
-    if (s != MU_STATUS_GOOD)
+    if (s != MU_STATUS_GOOD) {
         return s;
+    }
     for (opcua_uint32_t i = 0; i < ack_count; ++i) {
         s = mu_binary_write_statuscode(&w, request->ack_results[i]);
-        if (s != MU_STATUS_GOOD)
+        if (s != MU_STATUS_GOOD) {
             return s;
+        }
     }
     s = mu_binary_write_int32(&w, 0);
-    if (s != MU_STATUS_GOOD)
+    if (s != MU_STATUS_GOOD) {
         return s;
+    }
 
     *out_length = w.position;
     if (out_message_start != NULL) {

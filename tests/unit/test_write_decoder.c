@@ -42,7 +42,7 @@ void test_write_request_decode_happy_path(void) {
 
     /* Value (DataValue: has_value=true, variant=Int32 42) */
     mu_datavalue_t val;
-    memset(&val, 0, sizeof(val));
+    (void)memset(&val, 0, sizeof(val));
     val.has_value = true;
     val.value.type = MU_TYPE_INT32;
     val.value.value.i32 = 42;
@@ -54,8 +54,8 @@ void test_write_request_decode_happy_path(void) {
 
     mu_write_request_t req;
     mu_write_value_t nodes[2];
-    memset(&req, 0, sizeof(req));
-    memset(nodes, 0, sizeof(nodes));
+    (void)memset(&req, 0, sizeof(req));
+    (void)memset(nodes, 0, sizeof(nodes));
 
     opcua_statuscode_t status = mu_write_request_decode(&r, &req, nodes, 2);
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, status);

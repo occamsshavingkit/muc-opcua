@@ -55,7 +55,7 @@ static opcua_statuscode_t mock_read(void *c, void *h, opcua_byte_t *buf, size_t 
     }
     size_t len = m->inbound_len[m->read_index];
     TEST_ASSERT_TRUE(len <= cap);
-    memcpy(buf, m->inbound[m->read_index], len);
+    (void)memcpy(buf, m->inbound[m->read_index], len);
     m->read_index++;
     *n = len;
     return MU_STATUS_GOOD;
@@ -63,14 +63,14 @@ static opcua_statuscode_t mock_read(void *c, void *h, opcua_byte_t *buf, size_t 
 static opcua_statuscode_t mock_write(void *c, void *h, const opcua_byte_t *buf, size_t len, size_t *n) {
     mock_t *m = (mock_t *)c;
     (void)h;
-    memcpy(m->last_write, buf, len);
+    (void)memcpy(m->last_write, buf, len);
     m->last_write_len = len;
     *n = len;
     return MU_STATUS_GOOD;
 }
 
 static void enqueue(mock_t *m, const opcua_byte_t *bytes, size_t len) {
-    memcpy(m->inbound[m->inbound_count], bytes, len);
+    (void)memcpy(m->inbound[m->inbound_count], bytes, len);
     m->inbound_len[m->inbound_count] = len;
     m->inbound_count++;
 }
@@ -125,7 +125,7 @@ static void secure_call(mock_t *mock, mu_server_t *server, mu_crypto_adapter_t *
     const opcua_byte_t *rbody = NULL;
     size_t rblen = 0;
     mu_sym_chunk_info_t si;
-    memset(&si, 0, sizeof(si));
+    (void)memset(&si, 0, sizeof(si));
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_sym_chunk_unwrap(cc, MU_MESSAGE_SECURITY_MODE_SIGN_AND_ENCRYPT, s2c,
                                                           mock->last_write, mock->last_write_len, &rbody, &rblen, &si));
     opcua_uint32_t type = parse_decoded(rbody, rblen, resp);
@@ -149,7 +149,7 @@ static opcua_uint32_t parse_create_session_auth_token(mu_binary_reader_t *resp) 
 static void run_handshake_for_policy(mu_security_policy_id_t policy_id, int tamper_signature, int allow_untrusted,
                                      int wrong_algorithm) {
     mock_t mock;
-    memset(&mock, 0, sizeof(mock));
+    (void)memset(&mock, 0, sizeof(mock));
 
     static mu_crypto_adapter_t server_crypto, client_crypto;
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_host_crypto_adapter_init(&server_crypto));
@@ -185,8 +185,9 @@ static void run_handshake_for_policy(mu_security_policy_id_t policy_id, int tamp
     mu_binary_writer_t w;
     size_t clen;
     opcua_byte_t client_nonce[32];
-    for (int i = 0; i < 32; i++)
+    for (int i = 0; i < 32; i++) {
         client_nonce[i] = (opcua_byte_t)(i + 1);
+    }
 
     /* HEL */
     mu_binary_writer_init(&w, tmp, sizeof(tmp));
@@ -386,7 +387,7 @@ static void run_handshake_for_policy(mu_security_policy_id_t policy_id, int tamp
     }
     opcua_byte_t to_sign[1536];
     TEST_ASSERT_TRUE(server_cert_len + 32 <= sizeof(to_sign));
-    memcpy(to_sign, server_cert, server_cert_len);
+    (void)memcpy(to_sign, server_cert, server_cert_len);
     memcpy(to_sign + server_cert_len, sess_nonce, 32);
     opcua_byte_t client_sig[512];
     size_t client_sig_len = sizeof(client_sig);

@@ -19,7 +19,7 @@ static void mu_dynamic_string_copy(mu_string_t *target, opcua_byte_t *dest, cons
     }
 
     if (source->length > 0) {
-        memcpy(dest, source->data, (size_t)source->length);
+        (void)memcpy(dest, source->data, (size_t)source->length);
     }
 
     target->length = source->length;
@@ -35,15 +35,17 @@ static opcua_boolean_t mu_dynamic_display_name_fits(const mu_string_t *name) {
 }
 
 static opcua_boolean_t mu_dynamic_string_nodeid_fits(const mu_nodeid_t *node_id) {
-    if (node_id->identifier_type != MU_NODEID_STRING)
+    if (node_id->identifier_type != MU_NODEID_STRING) {
         return true;
+    }
 
     return mu_dynamic_string_fits(&node_id->identifier.string, MU_MAX_DYNAMIC_STRING_NODEID_LENGTH);
 }
 
 static opcua_boolean_t mu_dynamic_reference_string_nodeid_fits(const mu_nodeid_t *node_id) {
-    if (node_id->identifier_type != MU_NODEID_STRING)
+    if (node_id->identifier_type != MU_NODEID_STRING) {
         return true;
+    }
 
     return mu_dynamic_string_fits(&node_id->identifier.string, MU_MAX_DYNAMIC_REFERENCE_STRING_NODEID_LENGTH);
 }
@@ -151,10 +153,12 @@ static opcua_boolean_t mu_nodeid_is_numeric0(const mu_nodeid_t *node_id, opcua_u
 static opcua_statuscode_t mu_decode_localized_text_text(mu_binary_reader_t *reader, mu_string_t *text) {
     opcua_byte_t encoding_mask = 0;
     opcua_statuscode_t status = mu_binary_read_byte(reader, &encoding_mask);
-    if (status != MU_STATUS_GOOD)
+    if (status != MU_STATUS_GOOD) {
         return status;
-    if ((encoding_mask & (opcua_byte_t)~0x03u) != 0u)
+    }
+    if ((encoding_mask & (opcua_byte_t)~0x03u) != 0u) {
         return MU_STATUS_BAD_DECODINGERROR;
+    }
 
     text->length = -1;
     text->data = NULL;
@@ -162,13 +166,15 @@ static opcua_statuscode_t mu_decode_localized_text_text(mu_binary_reader_t *read
     if ((encoding_mask & 0x01u) != 0u) {
         mu_string_t ignored_locale;
         status = mu_binary_read_string(reader, &ignored_locale);
-        if (status != MU_STATUS_GOOD)
+        if (status != MU_STATUS_GOOD) {
             return status;
+        }
     }
     if ((encoding_mask & 0x02u) != 0u) {
         status = mu_binary_read_string(reader, text);
-        if (status != MU_STATUS_GOOD)
+        if (status != MU_STATUS_GOOD) {
             return status;
+        }
     }
 
     return MU_STATUS_GOOD;
@@ -180,28 +186,33 @@ static opcua_statuscode_t mu_add_nodes_item_display_name(const mu_add_nodes_item
     display_name->length = -1;
     display_name->data = NULL;
 
-    if (item->node_attributes_len == 0 || item->node_attributes == NULL)
+    if (item->node_attributes_len == 0 || item->node_attributes == NULL) {
         return MU_STATUS_GOOD;
+    }
 
-    if (!mu_nodeid_is_numeric0(&item->node_attributes_type_id, MU_OBJECTATTRIBUTES_ENCODING_DEFAULTBINARY_ID))
+    if (!mu_nodeid_is_numeric0(&item->node_attributes_type_id, MU_OBJECTATTRIBUTES_ENCODING_DEFAULTBINARY_ID)) {
         return MU_STATUS_GOOD;
+    }
 
     mu_binary_reader_t body;
     mu_binary_reader_init(&body, item->node_attributes, item->node_attributes_len);
 
     opcua_uint32_t specified_attributes = 0;
     opcua_statuscode_t status = mu_binary_read_uint32(&body, &specified_attributes);
-    if (status != MU_STATUS_GOOD)
+    if (status != MU_STATUS_GOOD) {
         return status;
+    }
 
     /* OPC-10000-4 sections 5.8.2.2 and 7.24.2: ObjectAttributes carries
        DisplayName as LocalizedText when NodeAttributes bit 6 is specified. */
-    if ((specified_attributes & MU_NODEATTRIBUTES_DISPLAYNAME_BIT) == 0u)
+    if ((specified_attributes & MU_NODEATTRIBUTES_DISPLAYNAME_BIT) == 0u) {
         return MU_STATUS_GOOD;
+    }
 
     status = mu_decode_localized_text_text(&body, display_name);
-    if (status != MU_STATUS_GOOD)
+    if (status != MU_STATUS_GOOD) {
         return status;
+    }
 
     *has_display_name = true;
     return MU_STATUS_GOOD;
@@ -212,8 +223,9 @@ opcua_statuscode_t mu_add_nodes_request_decode(mu_binary_reader_t *r, mu_add_nod
                                                size_t *out_count) {
     opcua_int32_t count = 0;
     opcua_statuscode_t s = mu_binary_read_int32(r, &count);
-    if (s != MU_STATUS_GOOD)
+    if (s != MU_STATUS_GOOD) {
         return s;
+    }
 
     if (count < 0) {
         *out_count = 0;
@@ -228,28 +240,34 @@ opcua_statuscode_t mu_add_nodes_request_decode(mu_binary_reader_t *r, mu_add_nod
 
     for (size_t i = 0; i < *out_count; ++i) {
         s = mu_binary_read_nodeid(r, &items[i].parent_node_id);
-        if (s != MU_STATUS_GOOD)
+        if (s != MU_STATUS_GOOD) {
             return s;
+        }
 
         s = mu_binary_read_nodeid(r, &items[i].reference_type_id);
-        if (s != MU_STATUS_GOOD)
+        if (s != MU_STATUS_GOOD) {
             return s;
+        }
 
         s = mu_binary_read_expanded_nodeid(r, &items[i].requested_new_node_id);
-        if (s != MU_STATUS_GOOD)
+        if (s != MU_STATUS_GOOD) {
             return s;
+        }
 
         s = mu_binary_read_qualified_name(r, &items[i].browse_name);
-        if (s != MU_STATUS_GOOD)
+        if (s != MU_STATUS_GOOD) {
             return s;
+        }
 
         s = mu_binary_read_uint32(r, &items[i].node_class);
-        if (s != MU_STATUS_GOOD)
+        if (s != MU_STATUS_GOOD) {
             return s;
+        }
 
         s = mu_binary_read_extension_object_header(r, &items[i].node_attributes_type_id, &items[i].node_attributes_len);
-        if (s != MU_STATUS_GOOD)
+        if (s != MU_STATUS_GOOD) {
             return s;
+        }
 
         if (items[i].node_attributes_len > 0) {
             if (r->position > r->length || items[i].node_attributes_len > (r->length - r->position)) {
@@ -263,8 +281,9 @@ opcua_statuscode_t mu_add_nodes_request_decode(mu_binary_reader_t *r, mu_add_nod
         }
 
         s = mu_binary_read_expanded_nodeid(r, &items[i].type_definition);
-        if (s != MU_STATUS_GOOD)
+        if (s != MU_STATUS_GOOD) {
             return s;
+        }
     }
 
     return MU_STATUS_GOOD;
@@ -273,17 +292,20 @@ opcua_statuscode_t mu_add_nodes_request_decode(mu_binary_reader_t *r, mu_add_nod
 opcua_statuscode_t mu_add_nodes_response_encode(mu_binary_writer_t *w, const mu_add_nodes_result_t *results,
                                                 size_t count) {
     opcua_statuscode_t s = mu_binary_write_int32(w, (opcua_int32_t)count);
-    if (s != MU_STATUS_GOOD)
+    if (s != MU_STATUS_GOOD) {
         return s;
+    }
 
     for (size_t i = 0; i < count; ++i) {
         s = mu_binary_write_statuscode(w, results[i].status_code);
-        if (s != MU_STATUS_GOOD)
+        if (s != MU_STATUS_GOOD) {
             return s;
+        }
 
         s = mu_binary_write_nodeid(w, &results[i].added_node_id);
-        if (s != MU_STATUS_GOOD)
+        if (s != MU_STATUS_GOOD) {
             return s;
+        }
     }
 
     /* DiagnosticInfos */
@@ -294,8 +316,9 @@ opcua_statuscode_t mu_add_references_request_decode(mu_binary_reader_t *r, mu_ad
                                                     size_t max_items, size_t *out_count) {
     opcua_int32_t count = 0;
     opcua_statuscode_t s = mu_binary_read_int32(r, &count);
-    if (s != MU_STATUS_GOOD)
+    if (s != MU_STATUS_GOOD) {
         return s;
+    }
 
     if (count < 0) {
         *out_count = 0;
@@ -310,30 +333,36 @@ opcua_statuscode_t mu_add_references_request_decode(mu_binary_reader_t *r, mu_ad
 
     for (size_t i = 0; i < *out_count; ++i) {
         s = mu_binary_read_nodeid(r, &items[i].source_node_id);
-        if (s != MU_STATUS_GOOD)
+        if (s != MU_STATUS_GOOD) {
             return s;
+        }
 
         s = mu_binary_read_nodeid(r, &items[i].reference_type_id);
-        if (s != MU_STATUS_GOOD)
+        if (s != MU_STATUS_GOOD) {
             return s;
+        }
 
         opcua_byte_t b;
         s = mu_binary_read_byte(r, &b);
-        if (s != MU_STATUS_GOOD)
+        if (s != MU_STATUS_GOOD) {
             return s;
+        }
         items[i].is_forward = b ? true : false;
 
         s = mu_binary_read_string(r, &items[i].target_server_uri);
-        if (s != MU_STATUS_GOOD)
+        if (s != MU_STATUS_GOOD) {
             return s;
+        }
 
         s = mu_binary_read_expanded_nodeid(r, &items[i].target_node_id);
-        if (s != MU_STATUS_GOOD)
+        if (s != MU_STATUS_GOOD) {
             return s;
+        }
 
         s = mu_binary_read_uint32(r, &items[i].target_node_class);
-        if (s != MU_STATUS_GOOD)
+        if (s != MU_STATUS_GOOD) {
             return s;
+        }
     }
 
     return MU_STATUS_GOOD;
@@ -342,13 +371,15 @@ opcua_statuscode_t mu_add_references_request_decode(mu_binary_reader_t *r, mu_ad
 opcua_statuscode_t mu_add_references_response_encode(mu_binary_writer_t *w, const mu_add_references_result_t *results,
                                                      size_t count) {
     opcua_statuscode_t s = mu_binary_write_int32(w, (opcua_int32_t)count);
-    if (s != MU_STATUS_GOOD)
+    if (s != MU_STATUS_GOOD) {
         return s;
+    }
 
     for (size_t i = 0; i < count; ++i) {
         s = mu_binary_write_statuscode(w, results[i].status_code);
-        if (s != MU_STATUS_GOOD)
+        if (s != MU_STATUS_GOOD) {
             return s;
+        }
     }
 
     /* DiagnosticInfos */
@@ -359,8 +390,9 @@ opcua_statuscode_t mu_delete_nodes_request_decode(mu_binary_reader_t *r, mu_dele
                                                   size_t max_items, size_t *out_count) {
     opcua_int32_t count = 0;
     opcua_statuscode_t s = mu_binary_read_int32(r, &count);
-    if (s != MU_STATUS_GOOD)
+    if (s != MU_STATUS_GOOD) {
         return s;
+    }
 
     if (count < 0) {
         *out_count = 0;
@@ -375,13 +407,15 @@ opcua_statuscode_t mu_delete_nodes_request_decode(mu_binary_reader_t *r, mu_dele
 
     for (size_t i = 0; i < *out_count; ++i) {
         s = mu_binary_read_nodeid(r, &items[i].node_id);
-        if (s != MU_STATUS_GOOD)
+        if (s != MU_STATUS_GOOD) {
             return s;
+        }
 
         opcua_byte_t b;
         s = mu_binary_read_byte(r, &b);
-        if (s != MU_STATUS_GOOD)
+        if (s != MU_STATUS_GOOD) {
             return s;
+        }
         items[i].delete_target_references = b ? true : false;
     }
 
@@ -391,13 +425,15 @@ opcua_statuscode_t mu_delete_nodes_request_decode(mu_binary_reader_t *r, mu_dele
 opcua_statuscode_t mu_delete_nodes_response_encode(mu_binary_writer_t *w, const opcua_statuscode_t *results,
                                                    size_t count) {
     opcua_statuscode_t s = mu_binary_write_int32(w, (opcua_int32_t)count);
-    if (s != MU_STATUS_GOOD)
+    if (s != MU_STATUS_GOOD) {
         return s;
+    }
 
     for (size_t i = 0; i < count; ++i) {
         s = mu_binary_write_statuscode(w, results[i]);
-        if (s != MU_STATUS_GOOD)
+        if (s != MU_STATUS_GOOD) {
             return s;
+        }
     }
 
     /* DiagnosticInfos */
@@ -408,8 +444,9 @@ opcua_statuscode_t mu_delete_references_request_decode(mu_binary_reader_t *r, mu
                                                        size_t max_items, size_t *out_count) {
     opcua_int32_t count = 0;
     opcua_statuscode_t s = mu_binary_read_int32(r, &count);
-    if (s != MU_STATUS_GOOD)
+    if (s != MU_STATUS_GOOD) {
         return s;
+    }
 
     if (count < 0) {
         *out_count = 0;
@@ -424,26 +461,31 @@ opcua_statuscode_t mu_delete_references_request_decode(mu_binary_reader_t *r, mu
 
     for (size_t i = 0; i < *out_count; ++i) {
         s = mu_binary_read_nodeid(r, &items[i].source_node_id);
-        if (s != MU_STATUS_GOOD)
+        if (s != MU_STATUS_GOOD) {
             return s;
+        }
 
         s = mu_binary_read_nodeid(r, &items[i].reference_type_id);
-        if (s != MU_STATUS_GOOD)
+        if (s != MU_STATUS_GOOD) {
             return s;
+        }
 
         opcua_byte_t b;
         s = mu_binary_read_byte(r, &b);
-        if (s != MU_STATUS_GOOD)
+        if (s != MU_STATUS_GOOD) {
             return s;
+        }
         items[i].is_forward = b ? true : false;
 
         s = mu_binary_read_expanded_nodeid(r, &items[i].target_node_id);
-        if (s != MU_STATUS_GOOD)
+        if (s != MU_STATUS_GOOD) {
             return s;
+        }
 
         s = mu_binary_read_byte(r, &b);
-        if (s != MU_STATUS_GOOD)
+        if (s != MU_STATUS_GOOD) {
             return s;
+        }
         items[i].delete_bidirectional = b ? true : false;
     }
 
@@ -453,13 +495,15 @@ opcua_statuscode_t mu_delete_references_request_decode(mu_binary_reader_t *r, mu
 opcua_statuscode_t mu_delete_references_response_encode(mu_binary_writer_t *w, const opcua_statuscode_t *results,
                                                         size_t count) {
     opcua_statuscode_t s = mu_binary_write_int32(w, (opcua_int32_t)count);
-    if (s != MU_STATUS_GOOD)
+    if (s != MU_STATUS_GOOD) {
         return s;
+    }
 
     for (size_t i = 0; i < count; ++i) {
         s = mu_binary_write_statuscode(w, results[i]);
-        if (s != MU_STATUS_GOOD)
+        if (s != MU_STATUS_GOOD) {
             return s;
+        }
     }
 
     /* DiagnosticInfos */
@@ -474,8 +518,9 @@ opcua_statuscode_t mu_add_nodes_process(mu_server_t *server, mu_binary_reader_t 
     mu_add_nodes_item_t items[8]; /* Arbitrary local max for processing */
     size_t count = 0;
     opcua_statuscode_t s = mu_add_nodes_request_decode(r, items, 8, &count);
-    if (s != MU_STATUS_GOOD)
+    if (s != MU_STATUS_GOOD) {
         return s;
+    }
 
     mu_add_nodes_result_t results[8];
     for (size_t i = 0; i < count; ++i) {
@@ -577,8 +622,9 @@ opcua_statuscode_t mu_delete_nodes_process(mu_server_t *server, mu_binary_reader
     mu_delete_nodes_item_t items[8];
     size_t count = 0;
     opcua_statuscode_t s = mu_delete_nodes_request_decode(r, items, 8, &count);
-    if (s != MU_STATUS_GOOD)
+    if (s != MU_STATUS_GOOD) {
         return s;
+    }
 
     opcua_statuscode_t results[8];
     for (size_t i = 0; i < count; ++i) {
@@ -633,8 +679,9 @@ opcua_statuscode_t mu_add_references_process(mu_server_t *server, mu_binary_read
     mu_add_references_item_t items[8];
     size_t count = 0;
     opcua_statuscode_t s = mu_add_references_request_decode(r, items, 8, &count);
-    if (s != MU_STATUS_GOOD)
+    if (s != MU_STATUS_GOOD) {
         return s;
+    }
 
     mu_add_references_result_t results[8];
     for (size_t i = 0; i < count; ++i) {
@@ -668,8 +715,9 @@ opcua_statuscode_t mu_delete_references_process(mu_server_t *server, mu_binary_r
     mu_delete_references_item_t items[8];
     size_t count = 0;
     opcua_statuscode_t s = mu_delete_references_request_decode(r, items, 8, &count);
-    if (s != MU_STATUS_GOOD)
+    if (s != MU_STATUS_GOOD) {
         return s;
+    }
 
     opcua_statuscode_t results[8];
     for (size_t i = 0; i < count; ++i) {

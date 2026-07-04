@@ -41,7 +41,7 @@ static opcua_statuscode_t test_entropy(void *context, opcua_byte_t *buffer, size
         return MU_STATUS_BAD_INTERNALERROR;
     }
     if (buffer != NULL) {
-        memset(buffer, 0x5a, length);
+        (void)memset(buffer, 0x5a, length);
     }
     return MU_STATUS_GOOD;
 }
@@ -63,7 +63,7 @@ static void prepare_dispatch_server(mu_server_t *server, opcua_uint32_t *subscri
     opcua_uint32_t auth_token = 0u;
     mu_subscription_t *sub = NULL;
 
-    memset(server, 0, sizeof(*server));
+    (void)memset(server, 0, sizeof(*server));
     server->config.entropy_adapter.generate_random = test_entropy;
     server->config.time_adapter.get_tick_ms = test_tick_ms;
     server->config.time_adapter.get_time = test_time;
@@ -139,7 +139,7 @@ static opcua_statuscode_t capture_publish_write(void *context, void *client_hand
     TEST_ASSERT_NOT_NULL(capture);
     TEST_ASSERT_NOT_NULL(buffer);
     TEST_ASSERT_TRUE(length <= sizeof(capture->frame));
-    memcpy(capture->frame, buffer, length);
+    (void)memcpy(capture->frame, buffer, length);
     capture->frame_len = length;
     ++capture->writes;
     *bytes_written = length;
@@ -887,8 +887,8 @@ void test_publish_oversize_notification_response_returns_response_too_large_faul
     opcua_statuscode_t service_result = 0u;
 
     prepare_dispatch_server(&server, &subscription_id);
-    memset(&capture, 0, sizeof(capture));
-    memset(large_value, 'x', sizeof(large_value));
+    (void)memset(&capture, 0, sizeof(capture));
+    (void)memset(large_value, 'x', sizeof(large_value));
     server.config.tcp_adapter.context = &capture;
     server.config.tcp_adapter.write = capture_publish_write;
     server.config.tcp_adapter.close_connection = capture_publish_close;

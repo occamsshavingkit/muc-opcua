@@ -79,7 +79,7 @@ static opcua_statuscode_t mock_read(void *c, void *h, opcua_byte_t *buf, size_t 
     }
     size_t len = m->inbound_len[m->read_index];
     TEST_ASSERT_TRUE(len <= cap);
-    memcpy(buf, m->inbound[m->read_index], len);
+    (void)memcpy(buf, m->inbound[m->read_index], len);
     m->read_index++;
     *n = len;
     return MU_STATUS_GOOD;
@@ -87,14 +87,14 @@ static opcua_statuscode_t mock_read(void *c, void *h, opcua_byte_t *buf, size_t 
 static opcua_statuscode_t mock_write(void *c, void *h, const opcua_byte_t *buf, size_t len, size_t *n) {
     mock_t *m = (mock_t *)c;
     (void)h;
-    memcpy(m->last_write, buf, len);
+    (void)memcpy(m->last_write, buf, len);
     m->last_write_len = len;
     *n = len;
     return MU_STATUS_GOOD;
 }
 
 static void enqueue(mock_t *m, const opcua_byte_t *b, size_t len) {
-    memcpy(m->inbound[m->inbound_count], b, len);
+    (void)memcpy(m->inbound[m->inbound_count], b, len);
     m->inbound_len[m->inbound_count] = len;
     m->inbound_count++;
 }
@@ -144,7 +144,7 @@ static size_t build_msg(opcua_byte_t *out, size_t cap, opcua_uint32_t seq, opcua
     mu_binary_write_uint32(&w, 1);
     mu_binary_write_uint32(&w, seq);
     mu_binary_write_uint32(&w, reqid);
-    memcpy(out + 24, body, blen);
+    (void)memcpy(out + 24, body, blen);
     return 24 + blen;
 }
 /* Parse the response chunk: returns the response type NodeId, positions `body` at the
@@ -169,8 +169,9 @@ static opcua_uint32_t parse_response(const opcua_byte_t *buf, size_t len, mu_bin
     mu_binary_read_int32(&r, &st);
     mu_binary_read_nodeid(&r, &addl);
     mu_binary_read_byte(&r, &enc);
-    if (service_result)
+    if (service_result) {
         *service_result = res;
+    }
     *body = r;
     return type.identifier.numeric;
 }
@@ -596,8 +597,9 @@ void test_create_monitored_items_too_many(void) {
     mu_binary_write_uint32(&w, sub_id);
     mu_binary_write_uint32(&w, 3);
     mu_binary_write_int32(&w, n_items);
-    for (opcua_int32_t i = 0; i < n_items; ++i)
+    for (opcua_int32_t i = 0; i < n_items; ++i) {
         write_moncreate_item(&w, 0, 2258, (opcua_uint32_t)i, 500.0);
+    }
     clen = build_msg(chunk, sizeof(chunk), 5, 5, tmp, w.position);
     enqueue(&mock, chunk, clen);
 
@@ -608,8 +610,9 @@ void test_create_monitored_items_too_many(void) {
     mu_binary_read_int32(&body, &nres);
     TEST_ASSERT_EQUAL(n_items, nres);
     opcua_uint32_t id;
-    for (opcua_int32_t i = 0; i < n_items - 1; ++i)
+    for (opcua_int32_t i = 0; i < n_items - 1; ++i) {
         TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, read_moncreate_result(&body, &id));
+    }
     TEST_ASSERT_EQUAL_HEX32(STATUS_BAD_TOOMANYMONITOREDITEMS, read_moncreate_result(&body, &id));
 }
 
@@ -1573,8 +1576,9 @@ static opcua_uint32_t parse_create_session_token(mu_binary_reader_t *body, opcua
     mu_nodeid_t sid, tok;
     mu_binary_read_nodeid(body, &sid); /* sessionId */
     mu_binary_read_nodeid(body, &tok); /* authenticationToken */
-    if (session_id)
+    if (session_id) {
         *session_id = sid.identifier.numeric;
+    }
     return tok.identifier.numeric;
 }
 

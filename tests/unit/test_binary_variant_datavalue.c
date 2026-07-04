@@ -31,7 +31,7 @@ void test_binary_datavalue_roundtrip(void) {
     mu_binary_reader_t reader;
 
     mu_datavalue_t datavalue;
-    memset(&datavalue, 0, sizeof(datavalue));
+    (void)memset(&datavalue, 0, sizeof(datavalue));
     datavalue.has_value = true;
     datavalue.value.type = MU_TYPE_INT32;
     datavalue.value.value.i32 = 42;
@@ -129,7 +129,7 @@ void test_binary_variant_qualifiedname_roundtrip(void) {
     mu_binary_reader_t reader;
 
     mu_variant_t variant;
-    memset(&variant, 0, sizeof(variant));
+    (void)memset(&variant, 0, sizeof(variant));
     variant.type = MU_TYPE_QUALIFIEDNAME;
     variant.value.qualified_name.namespace_index = 1;
     variant.value.qualified_name.name = (mu_string_t){6, (const opcua_byte_t *)"MyVar1"};
@@ -178,7 +178,7 @@ void test_binary_variant_string_array_encode(void) {
 
     static const mu_string_t arr[2] = {{3, (const opcua_byte_t *)"foo"}, {3, (const opcua_byte_t *)"bar"}};
     mu_variant_t v;
-    memset(&v, 0, sizeof(v));
+    (void)memset(&v, 0, sizeof(v));
     v.type = MU_TYPE_STRING;
     v.is_array = true;
     v.array_length = 2;

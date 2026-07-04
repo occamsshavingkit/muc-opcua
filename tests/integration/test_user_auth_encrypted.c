@@ -49,7 +49,7 @@ static opcua_statuscode_t mock_read(void *c, void *h, opcua_byte_t *buf, size_t 
     }
     size_t len = m->inbound_len[m->read_index];
     TEST_ASSERT_TRUE(len <= cap);
-    memcpy(buf, m->inbound[m->read_index], len);
+    (void)memcpy(buf, m->inbound[m->read_index], len);
     m->read_index++;
     *n = len;
     return MU_STATUS_GOOD;
@@ -58,14 +58,14 @@ static opcua_statuscode_t mock_read(void *c, void *h, opcua_byte_t *buf, size_t 
 static opcua_statuscode_t mock_write(void *c, void *h, const opcua_byte_t *buf, size_t len, size_t *n) {
     mock_t *m = (mock_t *)c;
     (void)h;
-    memcpy(m->last_write, buf, len);
+    (void)memcpy(m->last_write, buf, len);
     m->last_write_len = len;
     *n = len;
     return MU_STATUS_GOOD;
 }
 
 static void enqueue(mock_t *m, const opcua_byte_t *bytes, size_t len) {
-    memcpy(m->inbound[m->inbound_count], bytes, len);
+    (void)memcpy(m->inbound[m->inbound_count], bytes, len);
     m->inbound_len[m->inbound_count] = len;
     m->inbound_count++;
 }
@@ -97,15 +97,16 @@ static size_t build_msg(opcua_byte_t *out, size_t cap, opcua_uint32_t seq, opcua
     mu_binary_write_uint32(&w, 1);
     mu_binary_write_uint32(&w, seq);
     mu_binary_write_uint32(&w, reqid);
-    memcpy(out + 24, body, body_len);
+    (void)memcpy(out + 24, body, body_len);
     return 24 + body_len;
 }
 
 static opcua_statuscode_t mock_rsa_oaep_decrypt(void *context, const opcua_byte_t *input, size_t length,
                                                 opcua_byte_t *output, size_t *output_length) {
     (void)context;
-    if (length > *output_length)
+    if (length > *output_length) {
         return MU_STATUS_BAD_OUTOFMEMORY;
+    }
     /* Decryption mock: XOR with 0x5A to simulate decryption */
     for (size_t i = 0; i < length; ++i) {
         output[i] = input[i] ^ 0x5A;
@@ -244,7 +245,7 @@ void test_encrypted_username_token_over_security_policy_none_is_rejected(void) {
         plain_block[1] = 0;
         plain_block[2] = 0;
         plain_block[3] = 0;
-        memcpy(plain_block + 4, "admin", 5);
+        (void)memcpy(plain_block + 4, "admin", 5);
         memset(plain_block + 9, 0x42, 32);
 
         /* encrypt by XORing with 0x5A to simulate mock rsa OAEP decryption */

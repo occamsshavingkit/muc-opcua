@@ -62,7 +62,7 @@ static opcua_statuscode_t mock_write(void *context, void *handle, const opcua_by
     mock->write_called = true;
     if (handle == mock->second_handle) {
         if (length < sizeof(mock->written_data)) {
-            memcpy(mock->written_data, buffer, length);
+            (void)memcpy(mock->written_data, buffer, length);
             mock->written_len = length;
             *bytes_written = length;
         }
@@ -95,10 +95,10 @@ void test_single_client_limit_second_connection(void) {
     return;
 #endif
     mu_server_config_t config;
-    memset(&config, 0, sizeof(config));
+    (void)memset(&config, 0, sizeof(config));
 
     mock_tcp_t mock_ctx;
-    memset(&mock_ctx, 0, sizeof(mock_ctx));
+    (void)memset(&mock_ctx, 0, sizeof(mock_ctx));
     mock_ctx.client_handle = (void *)1;
     mock_ctx.second_handle = (void *)2;
 

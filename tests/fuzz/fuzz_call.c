@@ -35,7 +35,7 @@ static int prepare_server(mu_server_t *server, opcua_byte_t *send_buffer) {
     opcua_uint32_t session_id = 0u;
     opcua_uint32_t auth_token = 0u;
 
-    memset(server, 0, sizeof(*server));
+    (void)memset(server, 0, sizeof(*server));
     server->config.send_buffer = send_buffer;
     server->config.send_buffer_size = FUZZ_BODY_CAPACITY;
     server->config.tcp_adapter.write = fuzz_write;
@@ -120,7 +120,7 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
         size = sizeof(request_body) - writer.position;
     }
     if (size > 0u) {
-        memcpy(request_body + writer.position, data, size);
+        (void)memcpy(request_body + writer.position, data, size);
         writer.position += size;
     }
 

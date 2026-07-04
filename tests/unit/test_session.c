@@ -13,7 +13,7 @@ void tearDown(void) {}
 /* Wire SessionTimeout is a Duration (Double); the API works on its raw bits. */
 static opcua_uint64_t bits(double d) {
     opcua_uint64_t b;
-    memcpy(&b, &d, sizeof(b));
+    (void)memcpy(&b, &d, sizeof(b));
     return b;
 }
 
@@ -25,7 +25,7 @@ static opcua_datetime_t fake_time(void *context) {
 static opcua_statuscode_t fake_entropy(void *context, opcua_byte_t *buffer, size_t length) {
     (void)context;
     if (buffer != NULL) {
-        memset(buffer, 0x42, length);
+        (void)memset(buffer, 0x42, length);
     }
     return MU_STATUS_GOOD;
 }
@@ -222,7 +222,7 @@ void test_session_close(void) {
 
 void test_create_session_truncated_body_returns_bad_decodingerror_without_allocating_session(void) {
     mu_server_t server;
-    memset(&server, 0, sizeof(server));
+    (void)memset(&server, 0, sizeof(server));
     server.secure_channel.is_open = true;
     server.config.time_adapter.get_time = fake_time;
     server.config.entropy_adapter.generate_random = fake_entropy;
@@ -231,7 +231,7 @@ void test_create_session_truncated_body_returns_bad_decodingerror_without_alloca
     }
 
     mu_session_t sessions_before[MU_MAX_SESSIONS];
-    memcpy(sessions_before, server.sessions, sizeof(sessions_before));
+    (void)memcpy(sessions_before, server.sessions, sizeof(sessions_before));
     mu_session_t *active_session_before = server.active_session;
 
     opcua_byte_t request[256];

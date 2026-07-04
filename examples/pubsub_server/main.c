@@ -28,7 +28,7 @@ static opcua_uint64_t stub_get_tick_ms(void *context) {
 static opcua_statuscode_t stub_generate_random(void *context, opcua_byte_t *buffer, size_t length) {
     (void)context;
     if (buffer)
-        memset(buffer, 0xAA, length);
+        (void)memset(buffer, 0xAA, length);
     return MU_STATUS_GOOD;
 }
 
@@ -39,7 +39,7 @@ static opcua_byte_t send_buffer[8192];
 
 int main(void) {
     mu_server_config_t config;
-    memset(&config, 0, sizeof(config));
+    (void)memset(&config, 0, sizeof(config));
 
     config.endpoint_url = "opc.tcp://localhost:4840";
     config.receive_buffer = receive_buffer;
@@ -74,7 +74,7 @@ int main(void) {
     mu_server_t *server = NULL;
     opcua_statuscode_t status = mu_server_init(server_storage, sizeof(server_storage), &config, &server);
     if (status != MU_STATUS_GOOD) {
-        printf("Failed to init server: %x\n", status);
+        (void)printf("Failed to init server: %x\n", status);
         return 1;
     }
 
@@ -86,7 +86,7 @@ int main(void) {
                                    .dataset_writer = {.data_set_writer_id = 1, .fields = fields, .field_count = 1}};
     mu_server_add_writer_group(server, &wg);
 
-    printf("PubSub server started. Broadcasting UADP packets every 1 second...\n");
+    (void)printf("PubSub server started. Broadcasting UADP packets every 1 second...\n");
 
     while (true) {
         mu_server_poll(server);

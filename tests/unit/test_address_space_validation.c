@@ -15,7 +15,7 @@ void test_duplicate_nodeids_fail_validation(void) {
     mu_node_t nodes[2];
     mu_address_space_t space;
 
-    memset(nodes, 0, sizeof(nodes));
+    (void)memset(nodes, 0, sizeof(nodes));
     nodes[0].node_id.identifier_type = MU_NODEID_NUMERIC;
     nodes[0].node_id.identifier.numeric = 1000;
 
@@ -34,7 +34,7 @@ void test_unresolved_references_fail_validation(void) {
     mu_address_space_t space;
 
     memset(nodes, 0, sizeof(nodes));
-    memset(refs, 0, sizeof(refs));
+    (void)memset(refs, 0, sizeof(refs));
 
     refs[0].target_id.identifier_type = MU_NODEID_NUMERIC;
     refs[0].target_id.identifier.numeric = 9999; /* Does not exist */

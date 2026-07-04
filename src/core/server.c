@@ -71,14 +71,12 @@ opcua_statuscode_t mu_server_config_validate(const mu_server_config_t *config) {
         if (config->crypto_adapter->get_own_certificate != NULL &&
             config->crypto_adapter->verify_certificate_validity != NULL) {
             opcua_statuscode_t cert_ret =
-                config->crypto_adapter->get_own_certificate(config->crypto_adapter->context,
-                                                             &own_cert, &own_cert_len);
+                config->crypto_adapter->get_own_certificate(config->crypto_adapter->context, &own_cert, &own_cert_len);
             if (cert_ret != MU_STATUS_GOOD) {
                 return cert_ret;
             }
-            opcua_statuscode_t cert_status =
-                config->crypto_adapter->verify_certificate_validity(config->crypto_adapter->context,
-                                                                    own_cert, own_cert_len);
+            opcua_statuscode_t cert_status = config->crypto_adapter->verify_certificate_validity(
+                config->crypto_adapter->context, own_cert, own_cert_len);
             if (cert_status != MU_STATUS_GOOD) {
                 return cert_status;
             }
@@ -320,8 +318,9 @@ static void handle_data_chunk_plaintext(mu_server_t *server, const opcua_byte_t 
     reader.position = 8; /* MessageHeader(8); SecureChannelId follows */
     opcua_uint32_t channel_id = 0;
     status = mu_binary_read_uint32(&reader, &channel_id);
-    if (status != MU_STATUS_GOOD)
+    if (status != MU_STATUS_GOOD) {
         return; /* SecureChannelId */
+    }
 
     mu_string_t opn_security_policy = {-1, NULL};
     mu_bytestring_t opn_sender_cert = {-1, NULL};
@@ -329,27 +328,33 @@ static void handle_data_chunk_plaintext(mu_server_t *server, const opcua_byte_t 
     if (is_opn) {
         mu_bytestring_t receiver_thumbprint;
         status = mu_binary_read_string(&reader, &opn_security_policy);
-        if (status != MU_STATUS_GOOD)
+        if (status != MU_STATUS_GOOD) {
             return;
+        }
         status = mu_binary_read_bytestring(&reader, &opn_sender_cert);
-        if (status != MU_STATUS_GOOD)
+        if (status != MU_STATUS_GOOD) {
             return;
+        }
         status = mu_binary_read_bytestring(&reader, &receiver_thumbprint);
-        if (status != MU_STATUS_GOOD)
+        if (status != MU_STATUS_GOOD) {
             return;
+        }
     } else {
         status = mu_binary_read_uint32(&reader, &token_id);
-        if (status != MU_STATUS_GOOD)
+        if (status != MU_STATUS_GOOD) {
             return;
+        }
     }
 
     mu_sequence_header_t seq;
     status = mu_binary_read_uint32(&reader, &seq.sequence_number);
-    if (status != MU_STATUS_GOOD)
+    if (status != MU_STATUS_GOOD) {
         return;
+    }
     status = mu_binary_read_uint32(&reader, &seq.request_id);
-    if (status != MU_STATUS_GOOD)
+    if (status != MU_STATUS_GOOD) {
         return;
+    }
 
     if (!accept_inbound_chunk(server, is_opn, channel_id, token_id, seq.sequence_number)) {
         abort_connection(server);
@@ -358,15 +363,17 @@ static void handle_data_chunk_plaintext(mu_server_t *server, const opcua_byte_t 
 
     mu_nodeid_t request_type;
     status = mu_binary_read_nodeid(&reader, &request_type);
-    if (status != MU_STATUS_GOOD)
+    if (status != MU_STATUS_GOOD) {
         return;
+    }
 
     const opcua_byte_t *req_body = msg + reader.position;
     size_t req_body_len = msg_len - reader.position;
 
     size_t body_offset = is_opn ? MU_UASC_ASYMMETRIC_NONE_HEADER_SIZE : MU_UASC_SYMMETRIC_HEADER_SIZE;
-    if (body_offset >= server->config.send_buffer_size)
+    if (body_offset >= server->config.send_buffer_size) {
         return;
+    }
 
     opcua_byte_t *resp_body = server->config.send_buffer + body_offset;
     size_t payload_len = server->config.send_buffer_size - body_offset;
@@ -455,10 +462,12 @@ static void handle_data_chunk_secure(mu_server_t *server, opcua_byte_t *msg, siz
 
         mu_binary_reader_init(&header_reader, msg, msg_len);
         header_reader.position = 8;
-        if (mu_binary_read_uint32(&header_reader, &header_channel_id) != MU_STATUS_GOOD)
+        if (mu_binary_read_uint32(&header_reader, &header_channel_id) != MU_STATUS_GOOD) {
             return;
-        if (mu_binary_read_string(&header_reader, &opn_security_policy) != MU_STATUS_GOOD)
+        }
+        if (mu_binary_read_string(&header_reader, &opn_security_policy) != MU_STATUS_GOOD) {
             return;
+        }
 
         memset(&ai, 0, sizeof(ai));
         if (mu_asym_chunk_unwrap(crypto, msg, msg_len, opn_buf, MU_SECURE_OPN_REQ_MAX, &req_len, server->secure_scratch,
@@ -475,8 +484,9 @@ static void handle_data_chunk_secure(mu_server_t *server, opcua_byte_t *msg, siz
         in_channel_id = ai.secure_channel_id;
         in_seq = ai.sequence_number;
     } else {
-        if (!server_secure_channel.keys_valid)
+        if (!server_secure_channel.keys_valid) {
             return;
+        }
         mu_sym_chunk_info_t si;
         memset(&si, 0, sizeof(si));
         /* Decrypts msg in place; req_full points into msg. */
@@ -498,8 +508,9 @@ static void handle_data_chunk_secure(mu_server_t *server, opcua_byte_t *msg, siz
     mu_binary_reader_t rr;
     mu_binary_reader_init(&rr, req_full, req_len);
     mu_nodeid_t request_type;
-    if (mu_binary_read_nodeid(&rr, &request_type) != MU_STATUS_GOOD)
+    if (mu_binary_read_nodeid(&rr, &request_type) != MU_STATUS_GOOD) {
         return;
+    }
     const opcua_byte_t *req_body = req_full + rr.position;
     size_t req_body_len = req_len - rr.position;
 
@@ -596,8 +607,9 @@ static void process_message(mu_server_t *server, opcua_byte_t *msg, size_t msg_l
         server_client_handle = NULL;
         return;
     }
-    if (!is_opn && !is_msg)
+    if (!is_opn && !is_msg) {
         return; /* unsupported chunk type: ignore */
+    }
 
 #ifdef MUC_OPCUA_SECURITY
     if (server->config.crypto_adapter != NULL) {
@@ -669,8 +681,9 @@ opcua_statuscode_t mu_server_poll(mu_server_t *server) {
     /* 2. Poll and read/process each active connection */
     for (size_t i = 0; i < MU_MAX_CONNECTIONS; ++i) {
         mu_connection_t *conn = &server->conns[i];
-        if (conn->client_handle == NULL)
+        if (conn->client_handle == NULL) {
             continue;
+        }
 
         /* Check connection timeout */
         opcua_uint64_t now = server->config.time_adapter.get_tick_ms(server->config.time_adapter.context);

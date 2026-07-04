@@ -214,7 +214,7 @@ void test_uadp_network_message_decoder_rejects_dataset_message_size_mismatch(voi
     };
     opcua_byte_t size_mismatch[64];
 
-    memcpy(size_mismatch, buffer, bytes_written);
+    (void)memcpy(size_mismatch, buffer, bytes_written);
     size_mismatch[9] = (opcua_byte_t)(size_mismatch[9] + 1u);
 
     /* OPC-10000-14 section 7.2.4.5.3: the sized DataSetMessage must fit
@@ -391,7 +391,7 @@ void test_uadp_network_message_decoder_rejects_unsupported_dataset_message_type(
 
 void test_uadp_network_message_rejects_too_many_fields(void) {
     mu_pubsub_field_t fields[MU_PUBSUB_MAX_FIELDS + 1];
-    memset(fields, 0, sizeof(fields));
+    (void)memset(fields, 0, sizeof(fields));
     for (size_t i = 0; i < sizeof(fields) / sizeof(fields[0]); ++i) {
         fields[i].value.type = MU_TYPE_UINT32;
         fields[i].value.value.ui32 = (opcua_uint32_t)i;
