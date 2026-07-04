@@ -3,6 +3,7 @@
 #include "../services/secure_channel.h"
 #include "message_chunk.h"
 #include "muc_opcua/encoding.h"
+#include "safe_mem.h"
 #include "server_internal.h"
 #include "service_message.h"
 #include "uasc.h"
@@ -262,12 +263,10 @@ opcua_statuscode_t mu_server_emit_message(mu_server_t *server, opcua_uint32_t re
     }
 #endif
 
-    if (body_len > server->config.send_buffer_size || MU_UASC_SYMMETRIC_HEADER_SIZE > server->config.send_buffer_size ||
-        body_len > (server->config.send_buffer_size - MU_UASC_SYMMETRIC_HEADER_SIZE)) {
+    if (!mu_checked_memcpy_off(server->config.send_buffer, server->config.send_buffer_size,
+                               MU_UASC_SYMMETRIC_HEADER_SIZE, body, body_len)) {
         return MU_STATUS_BAD_RESPONSETOOLARGE;
     }
-
-    memcpy(server->config.send_buffer + MU_UASC_SYMMETRIC_HEADER_SIZE, body, body_len);
 
     size_t total = 0;
     opcua_statuscode_t status = mu_uasc_finalize_symmetric(

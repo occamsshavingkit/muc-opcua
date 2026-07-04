@@ -3,6 +3,7 @@
 #include "sym_chunk.h"
 #include "key_derivation.h"
 #include "muc_opcua/encoding.h"
+#include "../core/safe_mem.h"
 #include <string.h>
 
 #define MU_SYM_HEADER_SIZE 16 /* type+IsFinal(4) + MessageSize(4) + SecureChannelId(4) + TokenId(4) */
@@ -119,7 +120,9 @@ opcua_statuscode_t mu_sym_chunk_wrap(const mu_crypto_adapter_t *crypto, mu_messa
         put_u32(out + 4, (opcua_uint32_t)total);
         put_u32(out + MU_SYM_HEADER_SIZE, sequence_number);
         put_u32(out + MU_SYM_HEADER_SIZE + 4, request_id);
-        memcpy(out + MU_SYM_HEADER_SIZE + 8, body, body_len);
+        if (!mu_checked_memcpy_off(out, out_cap, MU_SYM_HEADER_SIZE + 8, body, body_len)) {
+            return MU_STATUS_BAD_RESPONSETOOLARGE;
+        }
         size_t signed_len = MU_SYM_HEADER_SIZE + seqbody_len;
         opcua_byte_t mac[MU_SYM_SIG_LEN];
         opcua_statuscode_t s =
@@ -147,7 +150,9 @@ opcua_statuscode_t mu_sym_chunk_wrap(const mu_crypto_adapter_t *crypto, mu_messa
     put_u32(out + 4, (opcua_uint32_t)total);
     put_u32(out + MU_SYM_HEADER_SIZE, sequence_number);
     put_u32(out + MU_SYM_HEADER_SIZE + 4, request_id);
-    memcpy(out + MU_SYM_HEADER_SIZE + 8, body, body_len);
+    if (!mu_checked_memcpy_off(out, out_cap, MU_SYM_HEADER_SIZE + 8, body, body_len)) {
+        return MU_STATUS_BAD_RESPONSETOOLARGE;
+    }
     out[MU_SYM_HEADER_SIZE + seqbody_len] = (opcua_byte_t)pad_count; /* PaddingSize */
     memset(out + MU_SYM_HEADER_SIZE + seqbody_len + 1, (int)pad_count, pad_count);
 

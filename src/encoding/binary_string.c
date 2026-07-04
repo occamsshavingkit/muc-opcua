@@ -1,5 +1,6 @@
 /* src/encoding/binary_string.c */
 #include "muc_opcua/encoding.h"
+#include "../core/safe_mem.h"
 #include <string.h>
 
 static opcua_statuscode_t string_reader_fail(mu_binary_reader_t *reader, opcua_statuscode_t status) {
@@ -72,10 +73,10 @@ opcua_statuscode_t mu_binary_write_string(mu_binary_writer_t *writer, const mu_s
     }
 
     if (value->length > 0) {
-        if (writer->position + (size_t)value->length > writer->length) {
+        if (!mu_checked_memcpy_off(writer->buffer, writer->length, writer->position, value->data,
+                                   (size_t)value->length)) {
             return MU_STATUS_BAD_ENCODINGERROR;
         }
-        memcpy(writer->buffer + writer->position, value->data, (size_t)value->length);
         writer->position += (size_t)value->length;
     }
 

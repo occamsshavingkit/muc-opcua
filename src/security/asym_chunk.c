@@ -4,6 +4,7 @@
 #include "certificate.h"
 #include "key_derivation.h"
 #include "muc_opcua/encoding.h"
+#include "../core/safe_mem.h"
 #include <string.h>
 
 /* RSA-OAEP with SHA-1 (MGF1-SHA1) overhead: plaintext block = keybytes - 2*20 - 2. */
@@ -94,10 +95,9 @@ static opcua_statuscode_t wrap_none(opcua_uint32_t scid, opcua_uint32_t seq, opc
     if (s != MU_STATUS_GOOD) {
         return s;
     }
-    if (w.position + body_len > out_cap) {
+    if (!mu_checked_memcpy_off(out, out_cap, w.position, body, body_len)) {
         return MU_STATUS_BAD_RESPONSETOOLARGE;
     }
-    memcpy(out + w.position, body, body_len);
     size_t total = w.position + body_len;
     /* Patch MessageSize. */
     out[4] = (opcua_byte_t)(total);
@@ -330,10 +330,9 @@ opcua_statuscode_t mu_asym_chunk_unwrap(const mu_crypto_adapter_t *crypto, const
         info->request_id = (opcua_uint32_t)chunk[hdr_len + 4] | ((opcua_uint32_t)chunk[hdr_len + 5] << 8) |
                            ((opcua_uint32_t)chunk[hdr_len + 6] << 16) | ((opcua_uint32_t)chunk[hdr_len + 7] << 24);
         size_t body_len = msg_size - hdr_len - 8;
-        if (body_len > out_cap) {
+        if (!mu_checked_memcpy(out_body, out_cap, chunk + hdr_len + 8, body_len)) {
             return MU_STATUS_BAD_RESPONSETOOLARGE;
         }
-        memcpy(out_body, chunk + hdr_len + 8, body_len);
         *out_body_len = body_len;
         return MU_STATUS_GOOD;
     }
@@ -450,11 +449,10 @@ opcua_statuscode_t mu_asym_chunk_unwrap(const mu_crypto_adapter_t *crypto, const
                        ((opcua_uint32_t)plain[7] << 24);
 
     size_t body_len = seqbody_len - 8;
-    if (body_len > out_cap) {
+    if (!mu_checked_memcpy(out_body, out_cap, plain + 8, body_len)) {
         mu_secure_zero(plain, MU_ASYM_MAX_PLAINTEXT);
         return MU_STATUS_BAD_RESPONSETOOLARGE;
     }
-    memcpy(out_body, plain + 8, body_len);
     *out_body_len = body_len;
     mu_secure_zero(plain, MU_ASYM_MAX_PLAINTEXT);
     return MU_STATUS_GOOD;
