@@ -43,7 +43,7 @@
 
 - [ ] T006 [US2] In `src/core/service_dispatch.c`, move `decrypt_buf[256]` declaration and all `mu_secure_zero()` calls under `#ifdef MUC_OPCUA_SECURITY` guard. OPC-10000-4 §5.7.3.
 
-- [ ] T007 [US2] Ensure zeroization occurs AFTER `user_auth_handler` call (not before — password must be valid when passed to handler). Zeroize at all 5 `goto activate_done` sites within SECURITY block and at natural exit.
+- [ ] T007 [US2] Ensure zeroization occurs AFTER `user_auth_handler` call (not before — password must be valid when passed to handler). Zeroize at all 5 `goto activate_done` sites within SECURITY block and at natural exit. OPC-10000-4 §5.7.3.
 
 - [ ] T008 [US2] Verify ARM nano/micro profiles compile clean (`scripts/measure_size.sh all`).
 
