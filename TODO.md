@@ -1,7 +1,7 @@
 # TODO — muc-opcua
 
-**Updated**: 2026-07-05 (spec 039 implementation)
-**Source**: stale audit findings, interop gaps, hot-path audit, comp review
+**Updated**: 2026-07-05 (specs 039, 040, 041 implementation complete)
+**Source**: code review findings, complexity audit, binary size analysis
 
 ## Remaining Active Backlog
 
@@ -80,7 +80,7 @@ Items identified by CodeRabbit review of spec 039 (PR #251) — deferred for fut
 | CD1 | `service_dispatch.c` + others | ns0-numeric NodeId check duplicated 13× — needs shared `mu_nodeid_is_ns0_numeric()` |
 | CD2 | `mbedtls_crypto_adapter.c` | 8 near-identical AES/OAEP functions differing only in key size or hash |
 | CD3 | `host_crypto_adapter.c` | 6 near-identical cipher/OAEP functions |
-| CD4 | `sym_chunk.c`, `asym_chunk.c` | Manual LE byte writes instead of `mu_binary_le_put_u32()` from `binary_le.h` |
+| CD4 | `sym_chunk.c`, `asym_chunk.c` | Manual LE byte writes instead of `mu_binary_le_put_u32()` | ✅ sym_chunk.c `get_u32` replaced; asym_chunk.c still uses manual byte writes |
 | CD5 | `dispatch_session.c` | Duplicate signature verification logic in `verify_activate_client_signature` and `handle_activate_certificate` |
 | CD6 | `server.c` | Poll helper duplication across `#ifdef` branches |
 
@@ -92,7 +92,26 @@ Items identified by CodeRabbit review of spec 039 (PR #251) — deferred for fut
 | CN2 | `src/core/service_dispatch.c` | 1621-1700 | Per-item filter-update logic nests 4-5 levels |
 | CN3 | `src/core/service_dispatch.c` | 961-1069 | `read_event_filter_body` triple-nested with string-comparison chain |
 
-## ✅ Completed in Spec 039
+### Future Work: Binary Size Measurement
+
+Archive measurement (`measure_size.sh`) is conservative — measures `.a` without
+`--gc-sections`. The linked ELF better reflects flash usage. See
+`docs/research/binary-size-optimization.md` for full analysis.
+
+## ✅ Completed in Spec 041 — Split Oversized Files
+
+- 11 files >500 lines split into directories with ~55 sub-files
+- service_dispatch → 17 files, subscription_publish → 5, server → 5, etc.
+- All logic files now ≤488 lines (base_nodes.c excluded — generated tables)
+- CMake build system updated, traceability docs updated with 69 new files
+
+## ✅ Completed in Spec 040 — Decompose Oversized Functions
+
+- 16 functions >100 lines decomposed into 34 file-static helpers
+- Largest reductions: handle_create_session (263→92), handle_activate_session (246→76)
+- All parent functions ≤100 lines, helpers ≤50 lines
+
+## ✅ Completed in Spec 039 — Clear Remaining Backlog
 
 - Bugs: protocol version constant (T002), sampling interval fix (T003), timestampsToReturn validation (T004)
 - Hot-Path: variant array free (T005), read cache enabled (T006), tick batching (T007), auth token reuse (T008), reader/writer bounds batching (T009-T010), DataValue zero-init removal (T011), memmove deferral (T012), session timeout scan optimization (T013), write type-check fix (T014), duplicate node check O(N log N) (T015), MessageSize once (T016), listen() gate (T017)
