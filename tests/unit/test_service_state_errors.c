@@ -275,8 +275,7 @@ static size_t build_activate_body(opcua_byte_t *buffer, size_t capacity, const m
 }
 
 void test_browse_before_activate_session(void) {
-    mu_server_t server;
-    (void)memset(&server, 0, sizeof(server));
+    mu_server_t server = {0};
     server.tcp_conn.state = MU_TCP_STATE_ESTABLISHED;
     server.secure_channel.is_open = true;
     server.sessions[0].state = MU_SESSION_STATE_CLOSED;
@@ -288,8 +287,7 @@ void test_browse_before_activate_session(void) {
 }
 
 void test_read_before_activate_session(void) {
-    mu_server_t server;
-    (void)memset(&server, 0, sizeof(server));
+    mu_server_t server = {0};
     server.tcp_conn.state = MU_TCP_STATE_ESTABLISHED;
     server.secure_channel.is_open = true;
     server.sessions[0].state = MU_SESSION_STATE_CREATED; /* Created but not activated */
@@ -368,8 +366,7 @@ void test_read_with_unknown_session_token_returns_bad_sessionidinvalid(void) {
 }
 
 void test_session_before_secure_channel(void) {
-    mu_server_t server;
-    memset(&server, 0, sizeof(server));
+    mu_server_t server = {0};
     server.tcp_conn.state = MU_TCP_STATE_ESTABLISHED;
     server.secure_channel.is_open = false; /* Not open */
 
@@ -380,8 +377,7 @@ void test_session_before_secure_channel(void) {
 }
 
 void test_service_before_hello(void) {
-    mu_server_t server;
-    memset(&server, 0, sizeof(server));
+    mu_server_t server = {0};
     server.tcp_conn.state = MU_TCP_STATE_CONNECTED; /* Not established yet */
 
     opcua_byte_t req[1], resp[1];
