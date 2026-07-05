@@ -10,7 +10,7 @@
 
 ## Phase 1: Setup
 
-- [ ] T001 Verify baseline: `cd build && cmake .. -DCMAKE_BUILD_TYPE=Debug -DMUC_OPCUA_BUILD_TESTS=ON && cmake --build . && ctest --output-on-failure` — record that all pass
+- [X] T001 Verify baseline: `cd build && cmake .. -DCMAKE_BUILD_TYPE=Debug -DMUC_OPCUA_BUILD_TESTS=ON && cmake --build . && ctest --output-on-failure` — record that all pass
 
 ---
 
@@ -18,9 +18,9 @@
 
 **Goal**: Decompose 3 functions in `dispatch_session.c`
 
-- [ ] T002 [US1] Decompose `handle_create_session` (263 lines) in `src/core/dispatch_session.c` — extract helpers for: encode-routing-info, encode-server-endpoints, encode-server-signature, build-discovery-url. Parent ≤ 100 lines. Rebuild and test after.
-- [ ] T003 [US1] Decompose `handle_activate_session` (246 lines) in `src/core/dispatch_session.c` — extract helpers for: decode-client-software-certs, decode-user-identity-token, verify-and-activate. Parent ≤ 100 lines. Rebuild and test after.
-- [ ] T004 [US1] Decompose `read_create_session_request` (109 lines) in `src/core/dispatch_session.c` — extract helpers for: decode-session-name, decode-endpoint-urls. Parent ≤ 100 lines. Rebuild and test after.
+- [X] T002 [US1] Decompose `handle_create_session` (263 lines) in `src/core/dispatch_session.c` — extract helpers for: encode-routing-info, encode-server-endpoints, encode-server-signature, build-discovery-url. Parent ≤ 100 lines. Rebuild and test after.
+- [X] T003 [US1] Decompose `handle_activate_session` (246 lines) in `src/core/dispatch_session.c` — extract helpers for: decode-client-software-certs, decode-user-identity-token, verify-and-activate. Parent ≤ 100 lines. Rebuild and test after.
+- [X] T004 [US1] Decompose `read_create_session_request` (109 lines) in `src/core/dispatch_session.c` — extract helpers for: decode-session-name, decode-endpoint-urls. Parent ≤ 100 lines. Rebuild and test after.
 
 ---
 
@@ -28,9 +28,9 @@
 
 **Goal**: Decompose 3 functions in `service_dispatch.c`
 
-- [ ] T005 [US2] Decompose `handle_modify_monitored_items` (210 lines) in `src/core/service_dispatch.c` — extract helpers for: filter-resolution, node-validation, item-update, response-encode. Parent ≤ 100 lines. Rebuild and test after.
-- [ ] T006 [US2] Decompose `handle_open_secure_channel` (149 lines) in `src/core/service_dispatch.c` — extract helpers for: security-policy-select, nonce-validate, response-encode. Parent ≤ 100 lines. Rebuild and test after.
-- [ ] T007 [US2] Decompose `handle_create_monitored_items` (98 lines) in `src/core/service_dispatch.c` — extract helpers for: filter-resolution, item-allocation. Parent ≤ 100 lines. Rebuild and test after.
+- [X] T005 [US2] Decompose `handle_modify_monitored_items` (210 lines) in `src/core/service_dispatch.c` — extract helpers for: filter-resolution, node-validation, item-update, response-encode. Parent ≤ 100 lines. Rebuild and test after.
+- [X] T006 [US2] Decompose `handle_open_secure_channel` (149 lines) in `src/core/service_dispatch.c` — extract helpers for: security-policy-select, nonce-validate, response-encode. Parent ≤ 100 lines. Rebuild and test after.
+- [X] T007 [US2] Decompose `handle_create_monitored_items` (98 lines) in `src/core/service_dispatch.c` — extract helpers for: filter-resolution, item-allocation. Parent ≤ 100 lines. Rebuild and test after.
 
 ---
 
@@ -38,10 +38,10 @@
 
 **Goal**: Decompose 4 functions in `server.c`
 
-- [ ] T008 [US3] Decompose `process_message` (183 lines) in `src/core/server.c` — extract helpers for: process-hello, process-opn-or-msg, process-multi-chunk-continuation, process-multi-chunk-final. Parent ≤ 100 lines. Rebuild and test after.
-- [ ] T009 [US3] Decompose `handle_data_chunk_secure` (134 lines) in `src/core/server.c` — extract helpers for: opn-path, msg-path. Parent ≤ 100 lines. Rebuild and test after.
-- [ ] T010 [US3] Decompose `handle_data_chunk_plaintext` (123 lines) in `src/core/server.c` — extract helpers for: opn-setup, sequence-check, dispatch. Parent ≤ 100 lines. Rebuild and test after.
-- [ ] T011 [US3] Decompose `mu_server_poll` (102 lines) in `src/core/server.c` — extract helpers for: connection-accept, read-process, timeout-maintenance. Parent ≤ 100 lines. Rebuild and test after.
+- [X] T008 [US3] Decompose `process_message` (183 lines) in `src/core/server.c` — extract helpers for: process-hello, process-opn-or-msg, process-multi-chunk-continuation, process-multi-chunk-final. Parent ≤ 100 lines. Rebuild and test after.
+- [X] T009 [US3] Decompose `handle_data_chunk_secure` (134 lines) in `src/core/server.c` — extract helpers for: opn-path, msg-path. Parent ≤ 100 lines. Rebuild and test after.
+- [X] T010 [US3] Decompose `handle_data_chunk_plaintext` (123 lines) in `src/core/server.c` — extract helpers for: opn-setup, sequence-check, dispatch. Parent ≤ 100 lines. Rebuild and test after.
+- [X] T011 [US3] Decompose `mu_server_poll` (102 lines) in `src/core/server.c` — extract helpers for: connection-accept, read-process, timeout-maintenance. Parent ≤ 100 lines. Rebuild and test after.
 
 ---
 
@@ -49,10 +49,10 @@
 
 **Goal**: Decompose 5 functions in `asym_chunk.c` + `subscription_publish.c`
 
-- [ ] T012 [US4] Decompose `mu_asym_chunk_wrap` (166 lines) in `src/security/asym_chunk.c` — extract helpers for: policy-dispatch, cleartext-header, padding, signing, encrypt. Parent ≤ 100 lines. Rebuild and test after.
-- [ ] T013 [US4] Decompose `mu_asym_chunk_unwrap` (182 lines) in `src/security/asym_chunk.c` — extract helpers for: decrypt, signature-verify, payload-extract. Parent ≤ 100 lines. Rebuild and test after.
-- [ ] T014 [US4] Decompose `write_data_change_notification` (168 lines) in `src/services/subscription_publish.c` — extract helpers for: notification-header, payload-per-item, diagnostics. Parent ≤ 100 lines. Rebuild and test after.
-- [ ] T015 [US4] Decompose `publish_due` (139 lines) in `src/services/subscription_publish.c` — extract helpers for: subscription-select, notification-build, response-encode. Parent ≤ 100 lines. Rebuild and test after.
+- [X] T012 [US4] Decompose `mu_asym_chunk_wrap` (166 lines) in `src/security/asym_chunk.c` — extract helpers for: policy-dispatch, cleartext-header, padding, signing, encrypt. Parent ≤ 100 lines. Rebuild and test after.
+- [X] T013 [US4] Decompose `mu_asym_chunk_unwrap` (182 lines) in `src/security/asym_chunk.c` — extract helpers for: decrypt, signature-verify, payload-extract. Parent ≤ 100 lines. Rebuild and test after.
+- [X] T014 [US4] Decompose `write_data_change_notification` (168 lines) in `src/services/subscription_publish.c` — extract helpers for: notification-header, payload-per-item, diagnostics. Parent ≤ 100 lines. Rebuild and test after.
+- [X] T015 [US4] Decompose `publish_due` (139 lines) in `src/services/subscription_publish.c` — extract helpers for: subscription-select, notification-build, response-encode. Parent ≤ 100 lines. Rebuild and test after.
 - [ ] T016 [US4] Decompose `build_publish_response` (117 lines) in `src/services/subscription_publish.c` — extract helpers for: header-write, results-write. Parent ≤ 100 lines. Rebuild and test after.
 
 ---
@@ -61,7 +61,7 @@
 
 **Goal**: Decompose 1 function in `read.c`
 
-- [ ] T017 [US5] Decompose `read_attribute` (102 lines) in `src/services/read.c` — extract helpers for: attribute-type-dispatch. Parent ≤ 100 lines. Rebuild and test after.
+- [X] T017 [US5] Decompose `read_attribute` (102 lines) in `src/services/read.c` — extract helpers for: attribute-type-dispatch. Parent ≤ 100 lines. Rebuild and test after.
 
 ---
 

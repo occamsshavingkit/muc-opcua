@@ -321,6 +321,62 @@ opcua_statuscode_t mu_read_response_encode(mu_binary_writer_t *writer, const mu_
     return MU_STATUS_GOOD;
 }
 
+#ifdef MUC_OPCUA_MULTI_CHUNK
+static opcua_statuscode_t read_multichunk_attribute(const mu_node_t *node, opcua_uint32_t attribute_id,
+                                                    mu_variant_t *value) {
+    switch (attribute_id) {
+    case MU_ATTRIBUTEID_DESCRIPTION:
+        value->type = MU_TYPE_LOCALIZEDTEXT;
+        value->value.localized_text.locale = (mu_string_t){-1, NULL};
+        value->value.localized_text.text = (mu_string_t){-1, NULL};
+        return MU_STATUS_GOOD;
+    case MU_ATTRIBUTEID_WRITEMASK:
+        value->type = MU_TYPE_UINT32;
+        value->value.ui32 = 0;
+        return MU_STATUS_GOOD;
+    case MU_ATTRIBUTEID_USERWRITEMASK:
+        value->type = MU_TYPE_UINT32;
+        value->value.ui32 = 0;
+        return MU_STATUS_GOOD;
+    case MU_ATTRIBUTEID_DATATYPE:
+        if (node->node_class != MU_NODECLASS_VARIABLE && node->node_class != MU_NODECLASS_VARIABLETYPE) {
+            return MU_STATUS_BAD_ATTRIBUTEIDINVALID;
+        }
+        value->type = MU_TYPE_NODEID;
+        if (node->type_definition.namespace_index != 0 || node->type_definition.identifier_type != 0 ||
+            node->type_definition.identifier.numeric != 0) {
+            value->value.nodeid = node->type_definition;
+        } else {
+            value->value.nodeid = (mu_nodeid_t){0, MU_NODEID_NUMERIC, {.numeric = 24}};
+        }
+        return MU_STATUS_GOOD;
+    case MU_ATTRIBUTEID_VALUERANK:
+        if (node->node_class != MU_NODECLASS_VARIABLE && node->node_class != MU_NODECLASS_VARIABLETYPE) {
+            return MU_STATUS_BAD_ATTRIBUTEIDINVALID;
+        }
+        value->type = MU_TYPE_INT32;
+        value->value.i32 = -1;
+        return MU_STATUS_GOOD;
+    case MU_ATTRIBUTEID_ACCESSLEVEL:
+        if (node->node_class != MU_NODECLASS_VARIABLE) {
+            return MU_STATUS_BAD_ATTRIBUTEIDINVALID;
+        }
+        value->type = MU_TYPE_UINT32;
+        value->value.ui32 = (node->value != NULL) ? 0x01 : 0;
+        return MU_STATUS_GOOD;
+    case MU_ATTRIBUTEID_HISTORIZING:
+        if (node->node_class != MU_NODECLASS_VARIABLE) {
+            return MU_STATUS_BAD_ATTRIBUTEIDINVALID;
+        }
+        value->type = MU_TYPE_BOOLEAN;
+        value->value.b = false;
+        return MU_STATUS_GOOD;
+    default:
+        return MU_STATUS_BAD_ATTRIBUTEIDINVALID;
+    }
+}
+#endif
+
 static opcua_statuscode_t read_attribute(const mu_address_space_t *address_space, const mu_node_t *node,
                                          opcua_uint32_t attribute_id, mu_variant_t *value) {
     (void)address_space;
@@ -364,64 +420,13 @@ static opcua_statuscode_t read_attribute(const mu_address_space_t *address_space
             return mu_value_source_read(node->value, &node->node_id, value);
         }
         return MU_STATUS_BAD_NOTREADABLE;
-
 #ifdef MUC_OPCUA_MULTI_CHUNK
-    case MU_ATTRIBUTEID_DESCRIPTION:
-        value->type = MU_TYPE_LOCALIZEDTEXT;
-        value->value.localized_text.locale = (mu_string_t){-1, NULL};
-        value->value.localized_text.text = (mu_string_t){-1, NULL};
-        return MU_STATUS_GOOD;
-
-    case MU_ATTRIBUTEID_WRITEMASK:
-        value->type = MU_TYPE_UINT32;
-        value->value.ui32 = 0;
-        return MU_STATUS_GOOD;
-
-    case MU_ATTRIBUTEID_USERWRITEMASK:
-        value->type = MU_TYPE_UINT32;
-        value->value.ui32 = 0;
-        return MU_STATUS_GOOD;
-
-    case MU_ATTRIBUTEID_DATATYPE:
-        if (node->node_class != MU_NODECLASS_VARIABLE && node->node_class != MU_NODECLASS_VARIABLETYPE) {
-            return MU_STATUS_BAD_ATTRIBUTEIDINVALID;
-        }
-        value->type = MU_TYPE_NODEID;
-        if (node->type_definition.namespace_index != 0 || node->type_definition.identifier_type != 0 ||
-            node->type_definition.identifier.numeric != 0) {
-            value->value.nodeid = node->type_definition;
-        } else {
-            value->value.nodeid = (mu_nodeid_t){0, MU_NODEID_NUMERIC, {.numeric = 24}};
-        }
-        return MU_STATUS_GOOD;
-
-    case MU_ATTRIBUTEID_VALUERANK:
-        if (node->node_class != MU_NODECLASS_VARIABLE && node->node_class != MU_NODECLASS_VARIABLETYPE) {
-            return MU_STATUS_BAD_ATTRIBUTEIDINVALID;
-        }
-        value->type = MU_TYPE_INT32;
-        value->value.i32 = -1;
-        return MU_STATUS_GOOD;
-
-    case MU_ATTRIBUTEID_ACCESSLEVEL:
-        if (node->node_class != MU_NODECLASS_VARIABLE) {
-            return MU_STATUS_BAD_ATTRIBUTEIDINVALID;
-        }
-        value->type = MU_TYPE_UINT32;
-        value->value.ui32 = (node->value != NULL) ? 0x01 : 0;
-        return MU_STATUS_GOOD;
-
-    case MU_ATTRIBUTEID_HISTORIZING:
-        if (node->node_class != MU_NODECLASS_VARIABLE) {
-            return MU_STATUS_BAD_ATTRIBUTEIDINVALID;
-        }
-        value->type = MU_TYPE_BOOLEAN;
-        value->value.b = false;
-        return MU_STATUS_GOOD;
-#endif /* MUC_OPCUA_MULTI_CHUNK */
-
+    default:
+        return read_multichunk_attribute(node, attribute_id, value);
+#else
     default:
         return MU_STATUS_BAD_ATTRIBUTEIDINVALID;
+#endif
     }
 }
 
