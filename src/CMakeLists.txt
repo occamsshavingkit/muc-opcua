@@ -133,6 +133,7 @@ if(MUC_OPCUA_CUSTOM_METHODS)
 endif()
 
 if(MUC_OPCUA_SERVER_DIAGNOSTICS)
+    target_sources(muc_opcua PRIVATE services/diagnostics.c)
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_SERVER_DIAGNOSTICS=1)
 endif()
 
