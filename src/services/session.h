@@ -27,6 +27,12 @@ void mu_session_init(mu_session_t *session);
 
 mu_session_t *mu_session_find_by_token(mu_session_t *sessions, size_t count, opcua_uint32_t auth_token);
 
+/* OPC-10000-4 section 5.7.4.1: find a CLOSED session by its (preserved)
+   authenticationToken. Used by the request dispatch path to distinguish a
+   request on a closed Session (Bad_SessionClosed) from a request with an
+   unknown token (Bad_SessionIdInvalid). */
+mu_session_t *mu_session_find_closed_by_token(mu_session_t *sessions, size_t count, opcua_uint32_t auth_token);
+
 mu_session_t *mu_session_find_free(mu_session_t *sessions, size_t count);
 
 /* Create the (single) session. The requested/revised SessionTimeout are passed as

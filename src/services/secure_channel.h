@@ -5,6 +5,7 @@
 #include "../core/sequence.h"
 #include "../security/security_policy.h" /* mu_security_policy_id_t, mu_message_security_mode_t */
 #include "muc_opcua/opcua_types.h"
+#include "muc_opcua/platform.h" /* mu_entropy_adapter_t */
 #include "muc_opcua/status.h"
 #include "muc_opcua/types.h"
 #ifdef MUC_OPCUA_SECURITY
@@ -37,7 +38,7 @@ void mu_secure_channel_init(mu_secure_channel_t *channel);
 
 opcua_statuscode_t mu_secure_channel_open(mu_secure_channel_t *channel, const mu_string_t *security_policy,
                                           mu_message_security_mode_t security_mode, opcua_uint32_t requested_lifetime,
-                                          opcua_uint32_t *revised_lifetime);
+                                          const mu_entropy_adapter_t *entropy, opcua_uint32_t *revised_lifetime);
 
 opcua_statuscode_t mu_secure_channel_close(mu_secure_channel_t *channel);
 

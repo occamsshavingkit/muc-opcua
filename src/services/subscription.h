@@ -151,6 +151,7 @@ typedef struct {
     /* 1-byte fields */
     opcua_byte_t monitoring_mode; /* mu_monitoring_mode_t */
     opcua_byte_t trigger;         /* mu_datachange_trigger_t */
+    opcua_byte_t timestamps_to_return; /* mu_timestamps_to_return_t (OPC-10000-4 §5.13.2.2 Table 63) */
     bool in_use;
     bool has_value; /* a baseline sample has been taken */
     bool pending;   /* a change is queued, awaiting the next Publish */

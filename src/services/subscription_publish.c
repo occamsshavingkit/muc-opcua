@@ -6,6 +6,7 @@
 
 #include "../core/server_internal.h"
 #include "../core/service_dispatch.h"
+#include "../services/read.h"
 #include "muc_opcua/address_space.h"
 #include "service_header.h"
 
@@ -384,6 +385,22 @@ static opcua_datetime_t publish_time_now(const struct mu_server *server) {
     return server->config.time_adapter.get_time(server->config.time_adapter.context);
 }
 
+/* Apply source/server timestamps to a DataValue per the MonitoredItem's
+ * TimestampsToReturn setting (OPC-10000-4 §5.13.2.2 Table 63). Without
+ * per-sample capture, the server's current UTC time stands in for both. */
+static void datavalue_apply_timestamps(mu_datavalue_t *dv, const mu_monitored_item_t *item,
+                                       opcua_datetime_t now) {
+    opcua_byte_t mode = item->timestamps_to_return;
+    if (mode == MU_TIMESTAMPS_TO_RETURN_SOURCE || mode == MU_TIMESTAMPS_TO_RETURN_BOTH) {
+        dv->has_source_timestamp = true;
+        dv->source_timestamp = now;
+    }
+    if (mode == MU_TIMESTAMPS_TO_RETURN_SERVER || mode == MU_TIMESTAMPS_TO_RETURN_BOTH) {
+        dv->has_server_timestamp = true;
+        dv->server_timestamp = now;
+    }
+}
+
 static opcua_statuscode_t write_data_change_notification(mu_binary_writer_t *w, const struct mu_server *server,
                                                          const mu_subscription_t *sub, opcua_int32_t report_count) {
     mu_nodeid_t type_id = {0, MU_NODEID_NUMERIC, {MU_ID_DATACHANGENOTIFICATION_ENCODING_DEFAULTBINARY}};
@@ -407,6 +424,10 @@ static opcua_statuscode_t write_data_change_notification(mu_binary_writer_t *w, 
     if (s != MU_STATUS_GOOD) {
         return s;
     }
+
+    /* Snapshot the publish-time once for all MonitoredItems in this
+     * NotificationMessage (OPC-10000-4 §5.13.2.2 Table 63). */
+    opcua_datetime_t now = publish_time_now(server);
 
     for (size_t bw = 0; bw < MU_REPORTABLE_BITMAP_WORDS; ++bw) {
         opcua_uint32_t bits = server->subs.reportable_bitmap[bw];
@@ -447,6 +468,7 @@ static opcua_statuscode_t write_data_change_notification(mu_binary_writer_t *w, 
                     dv.has_status = true;
                     dv.status = status;
                 }
+                datavalue_apply_timestamps(&dv, item, now);
                 s = mu_binary_write_datavalue(w, &dv);
                 if (s != MU_STATUS_GOOD) {
                     return s;
@@ -469,6 +491,7 @@ static opcua_statuscode_t write_data_change_notification(mu_binary_writer_t *w, 
                 dv.has_status = true;
                 dv.status = item->last_status;
             }
+            datavalue_apply_timestamps(&dv, item, now);
             s = mu_binary_write_datavalue(w, &dv);
             if (s != MU_STATUS_GOOD) {
                 return s;
@@ -516,6 +539,7 @@ static opcua_statuscode_t write_data_change_notification(mu_binary_writer_t *w, 
                     dv.has_status = true;
                     dv.status = status;
                 }
+                datavalue_apply_timestamps(&dv, item, now);
                 s = mu_binary_write_datavalue(w, &dv);
                 if (s != MU_STATUS_GOOD) {
                     return s;

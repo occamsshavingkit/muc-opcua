@@ -20,6 +20,30 @@ static bool is_valid_security_mode(mu_message_security_mode_t security_mode) {
            security_mode == MU_MESSAGE_SECURITY_MODE_SIGN_AND_ENCRYPT;
 }
 
+/* OPC-10000-6 section 6.7.2.2: "When a Server starts the first SecureChannelId
+   used should be a value that is likely to be unique after each restart." The
+   identifier is therefore drawn from the entropy adapter rather than a static
+   incrementing counter (which is predictable on reboot). 0 is reserved for an
+   unset/invalid id (it is the value carried by an OpenSecureChannel request). */
+static opcua_statuscode_t generate_channel_id(const mu_entropy_adapter_t *entropy, opcua_uint32_t *channel_id) {
+    if (entropy == NULL || entropy->generate_random == NULL || channel_id == NULL) {
+        return MU_STATUS_BAD_SECURITYCHECKSFAILED;
+    }
+
+    opcua_byte_t random[sizeof(opcua_uint32_t)];
+    if (entropy->generate_random(entropy->context, random, sizeof(random)) != MU_STATUS_GOOD) {
+        return MU_STATUS_BAD_SECURITYCHECKSFAILED;
+    }
+
+    opcua_uint32_t candidate = ((opcua_uint32_t)random[0]) | ((opcua_uint32_t)random[1] << 8) |
+                               ((opcua_uint32_t)random[2] << 16) | ((opcua_uint32_t)random[3] << 24);
+    if (candidate == 0u) {
+        candidate = 1u; /* 0 reserved for invalid; 2^-32 collision folded to 1 */
+    }
+    *channel_id = candidate;
+    return MU_STATUS_GOOD;
+}
+
 void mu_secure_channel_init(mu_secure_channel_t *channel) {
     if (channel) {
         channel->channel_id = 0;
@@ -41,7 +65,7 @@ void mu_secure_channel_init(mu_secure_channel_t *channel) {
 
 opcua_statuscode_t mu_secure_channel_open(mu_secure_channel_t *channel, const mu_string_t *security_policy,
                                           mu_message_security_mode_t security_mode, opcua_uint32_t requested_lifetime,
-                                          opcua_uint32_t *revised_lifetime) {
+                                          const mu_entropy_adapter_t *entropy, opcua_uint32_t *revised_lifetime) {
     if (!channel || !revised_lifetime) {
         return MU_STATUS_BAD_INTERNALERROR;
     }
@@ -81,14 +105,13 @@ opcua_statuscode_t mu_secure_channel_open(mu_secure_channel_t *channel, const mu
         return MU_STATUS_BAD_SECURITYPOLICYREJECTED;
     }
 
-    /* Generate a unique channel ID using an incrementing counter.
-       With MU_MAX_CONNECTIONS=1, the first channel always gets ID 1, but
-       subsequent connections or renewals get unique IDs per OPC-10000-6 §6.7.4. */
+    /* Assign a cryptographically random SecureChannelId on ISSUE (Renew keeps
+       the existing id and only rolls the token). With MU_MAX_CONNECTIONS=1 the
+       id need only be non-zero and restart-unique per OPC-10000-6 section 6.7.2.2. */
     if (!channel->is_open) {
-        static opcua_uint32_t next_channel_id = 1;
-        channel->channel_id = next_channel_id++;
-        if (next_channel_id == 0) {
-            next_channel_id = 1;  /* wrap; 0 reserved for invalid */
+        opcua_statuscode_t id_status = generate_channel_id(entropy, &channel->channel_id);
+        if (id_status != MU_STATUS_GOOD) {
+            return id_status;
         }
         channel->token_id = 1;
         /* The inbound SequenceNumber is validated channel-wide starting from the

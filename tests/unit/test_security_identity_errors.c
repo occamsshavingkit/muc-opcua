@@ -24,9 +24,12 @@ void test_unsupported_security_policy(void) {
     invalid_policy.data = (opcua_byte_t *)"http://opcfoundation.org/UA/SecurityPolicy#Basic256Sha256";
     invalid_policy.length = 57;
 
+    /* Policy validation precedes SecureChannelId generation, so no entropy
+       adapter is required to exercise this rejection path. */
     TEST_ASSERT_EQUAL(
         MU_STATUS_BAD_SECURITYPOLICYREJECTED,
-        mu_secure_channel_open(&channel, &invalid_policy, MU_MESSAGE_SECURITY_MODE_NONE, 1000, &revised_lifetime));
+        mu_secure_channel_open(&channel, &invalid_policy, MU_MESSAGE_SECURITY_MODE_NONE, 1000, NULL,
+                               &revised_lifetime));
 }
 
 void test_unsupported_identity_token(void) {

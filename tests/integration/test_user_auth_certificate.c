@@ -22,6 +22,30 @@ typedef struct {
     bool nonce_captured;
 } mock_t;
 
+static opcua_uint32_t s_channel_id = 1u;
+
+static opcua_uint32_t read_opn_channel_id(const opcua_byte_t *buf, size_t len) {
+    if (len < 12) {
+        return 1u;
+    }
+    return (opcua_uint32_t)buf[8] | ((opcua_uint32_t)buf[9] << 8u) | ((opcua_uint32_t)buf[10] << 16u) |
+           ((opcua_uint32_t)buf[11] << 24u);
+}
+
+static void patch_msg_channel_ids(mock_t *m, opcua_uint32_t channel_id) {
+    for (size_t i = 0; i < m->inbound_count; ++i) {
+        if (m->inbound_len[i] >= 12 && ((m->inbound[i][0] == 'M' && m->inbound[i][1] == 'S' &&
+                                         m->inbound[i][2] == 'G' && m->inbound[i][3] == 'F') ||
+                                        (m->inbound[i][0] == 'C' && m->inbound[i][1] == 'L' &&
+                                         m->inbound[i][2] == 'O' && m->inbound[i][3] == 'F'))) {
+            m->inbound[i][8] = (opcua_byte_t)(channel_id);
+            m->inbound[i][9] = (opcua_byte_t)(channel_id >> 8u);
+            m->inbound[i][10] = (opcua_byte_t)(channel_id >> 16u);
+            m->inbound[i][11] = (opcua_byte_t)(channel_id >> 24u);
+        }
+    }
+}
+
 static opcua_statuscode_t mock_listen(void *c, const char *u) {
     (void)c;
     (void)u;
@@ -122,7 +146,7 @@ static size_t build_msg(opcua_byte_t *out, size_t cap, opcua_uint32_t seq, opcua
     out[3] = 'F';
     w.position = 4;
     mu_binary_write_uint32(&w, (opcua_uint32_t)(24 + body_len));
-    mu_binary_write_uint32(&w, 1);
+    mu_binary_write_uint32(&w, s_channel_id);
     mu_binary_write_uint32(&w, 1);
     mu_binary_write_uint32(&w, seq);
     mu_binary_write_uint32(&w, reqid);
@@ -347,6 +371,8 @@ void test_certificate_user_auth_flow(void) {
     mu_server_poll(server); /* accept */
     mu_server_poll(server); /* HEL -> ACK */
     mu_server_poll(server); /* OPN -> Response */
+    s_channel_id = read_opn_channel_id(global_mock.last_write, global_mock.last_write_len);
+    patch_msg_channel_ids(&global_mock, s_channel_id);
     mu_server_poll(server); /* CreateSession -> Response */
 
     mu_server_poll(server); /* ActivateSession -> Response (Success) */

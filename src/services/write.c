@@ -36,7 +36,7 @@ opcua_statuscode_t mu_write_request_decode(mu_binary_reader_t *reader, mu_write_
             return status;
         }
 
-        status = mu_binary_read_int32(reader, &node->attribute_id);
+        status = mu_binary_read_uint32(reader, &node->attribute_id);
         if (status != MU_STATUS_GOOD) {
             return status;
         }

@@ -82,6 +82,14 @@ static void fake_close(void *context, void *handle) {
     (void)handle;
 }
 
+static opcua_statuscode_t test_method_call_entropy(void *context, opcua_byte_t *buffer, size_t length) {
+    (void)context;
+    if (buffer != NULL) {
+        (void)memset(buffer, 0x5a, length);
+    }
+    return MU_STATUS_GOOD;
+}
+
 static void prepare_server(mu_server_t *server, test_io_t *io) {
     opcua_uint32_t revised_lifetime = 0u;
     opcua_uint64_t revised_timeout = 0u;
@@ -94,6 +102,7 @@ static void prepare_server(mu_server_t *server, test_io_t *io) {
     server->config.address_space = &s_user_space;
     server->config.send_buffer = io->send_buffer;
     server->config.send_buffer_size = sizeof(io->send_buffer);
+    server->config.entropy_adapter.generate_random = test_method_call_entropy;
     server->config.tcp_adapter.context = io;
     server->config.tcp_adapter.write = fake_write;
     server->config.tcp_adapter.close_connection = fake_close;
@@ -102,7 +111,7 @@ static void prepare_server(mu_server_t *server, test_io_t *io) {
     mu_secure_channel_init(&server->secure_channel);
     TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD,
                             mu_secure_channel_open(&server->secure_channel, NULL, MU_MESSAGE_SECURITY_MODE_NONE,
-                                                   3600000u, &revised_lifetime));
+                                                   3600000u, &server->config.entropy_adapter, &revised_lifetime));
     for (size_t i = 0u; i < MU_MAX_SESSIONS; ++i) {
         mu_session_init(&server->sessions[i]);
     }

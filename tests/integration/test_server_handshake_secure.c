@@ -321,7 +321,9 @@ void test_secure_handshake_read(void) {
                 MU_ID_GETENDPOINTSRESPONSE, &resp);
 
     /* CreateSession with a full ClientDescription + ClientNonce + ClientCertificate,
-       so the server computes a real ServerSignature over (ClientCert || ClientNonce). */
+       so the server computes a real ServerSignature over (ClientCert || ClientNonce).
+       The ApplicationUri matches the client cert's Subject CN ("muc-opcua") so the
+       OPC-10000-4 §5.7.2.1 binding check passes. */
     mu_binary_writer_init(&w, tmp, sizeof(tmp));
     {
         mu_nodeid_t t = {0, MU_NODEID_NUMERIC, {MU_ID_CREATESESSIONREQUEST}};
@@ -330,16 +332,17 @@ void test_secure_handshake_read(void) {
     write_request_header(&w, 0, 3);
     {
         mu_string_t ns = {-1, NULL};
-        mu_binary_write_string(&w, &ns); /* ClientDescription.applicationUri */
-        mu_binary_write_string(&w, &ns); /* productUri */
-        mu_binary_write_byte(&w, 0x00);  /* applicationName LocalizedText: no fields */
-        mu_binary_write_uint32(&w, 1);   /* applicationType Client */
-        mu_binary_write_string(&w, &ns); /* gatewayServerUri */
-        mu_binary_write_string(&w, &ns); /* discoveryProfileUri */
-        mu_binary_write_int32(&w, 0);    /* discoveryUrls[] */
-        mu_binary_write_string(&w, &ns); /* ServerUri */
-        mu_binary_write_string(&w, &ns); /* EndpointUrl */
-        mu_binary_write_string(&w, &ns); /* SessionName */
+        mu_string_t app_uri = {9, (const opcua_byte_t *)"muc-opcua"};
+        mu_binary_write_string(&w, &app_uri); /* ClientDescription.applicationUri */
+        mu_binary_write_string(&w, &ns);       /* productUri */
+        mu_binary_write_byte(&w, 0x00);        /* applicationName LocalizedText: no fields */
+        mu_binary_write_uint32(&w, 1);         /* applicationType Client */
+        mu_binary_write_string(&w, &ns);       /* gatewayServerUri */
+        mu_binary_write_string(&w, &ns);       /* discoveryProfileUri */
+        mu_binary_write_int32(&w, 0);          /* discoveryUrls[] */
+        mu_binary_write_string(&w, &ns);       /* ServerUri */
+        mu_binary_write_string(&w, &ns);       /* EndpointUrl */
+        mu_binary_write_string(&w, &ns);       /* SessionName */
         mu_bytestring_t cn = {32, client_nonce};
         mu_binary_write_bytestring(&w, &cn); /* ClientNonce */
         mu_bytestring_t cc = {(opcua_int32_t)client_cert_len, client_cert};
@@ -438,9 +441,233 @@ void test_secure_handshake_read(void) {
     mu_host_crypto_adapter_cleanup(&client_crypto);
 }
 
+/* OPC-10000-4 §5.7.2.1: CreateSession with an ApplicationUri that does not match
+   any identity in the client certificate is rejected with Bad_CertificateUriInvalid.
+   This exercises the full dispatch_session.c -> mu_certificate_validate_application_uri
+   -> host backend path (CN fallback, since the self-signed test cert carries no SAN). */
+void test_create_session_rejects_mismatched_application_uri(void) {
+    mock_t mock;
+    (void)memset(&mock, 0, sizeof(mock));
+
+    static mu_crypto_adapter_t server_crypto, client_crypto;
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_host_crypto_adapter_init(&server_crypto));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_host_crypto_adapter_init(&client_crypto));
+    const opcua_byte_t *server_cert = NULL;
+    size_t server_cert_len = 0;
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD,
+                      server_crypto.get_own_certificate(server_crypto.context, &server_cert, &server_cert_len));
+    const opcua_byte_t *client_cert = NULL;
+    size_t client_cert_len = 0;
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD,
+                      client_crypto.get_own_certificate(client_crypto.context, &client_cert, &client_cert_len));
+
+    static const mu_node_t node = {{0, MU_NODEID_NUMERIC, {85}},
+                                   MU_NODECLASS_OBJECT,
+                                   {7, (const opcua_byte_t *)"Objects"},
+                                   {7, (const opcua_byte_t *)"Objects"},
+                                   NULL,
+                                   0,
+                                   NULL};
+    static const mu_address_space_t space = {&node, 1};
+
+    opcua_byte_t tmp[1024], chunk[CHUNK_CAP];
+    mu_binary_writer_t w;
+    size_t clen;
+    opcua_byte_t client_nonce[32];
+    for (int i = 0; i < 32; i++) {
+        client_nonce[i] = (opcua_byte_t)(i + 1);
+    }
+
+    /* HEL */
+    mu_binary_writer_init(&w, tmp, sizeof(tmp));
+    tmp[0] = 'H';
+    tmp[1] = 'E';
+    tmp[2] = 'L';
+    tmp[3] = 'F';
+    w.position = 4;
+    mu_binary_write_uint32(&w, 0);
+    mu_binary_write_uint32(&w, 0);
+    mu_binary_write_uint32(&w, 8192);
+    mu_binary_write_uint32(&w, 8192);
+    mu_binary_write_uint32(&w, 0);
+    mu_binary_write_uint32(&w, 0);
+    {
+        mu_string_t url = {19, (const opcua_byte_t *)"opc.tcp://host:4840"};
+        mu_binary_write_string(&w, &url);
+    }
+    {
+        mu_binary_writer_t hs;
+        mu_binary_writer_init(&hs, tmp, sizeof(tmp));
+        hs.position = 4;
+        mu_binary_write_uint32(&hs, (opcua_uint32_t)w.position);
+    }
+    enqueue(&mock, tmp, w.position);
+
+    /* OPN */
+    mu_binary_writer_init(&w, tmp, sizeof(tmp));
+    {
+        mu_nodeid_t t = {0, MU_NODEID_NUMERIC, {MU_ID_OPENSECURECHANNELREQUEST}};
+        mu_binary_write_nodeid(&w, &t);
+    }
+    write_request_header(&w, 0, 1);
+    mu_binary_write_uint32(&w, 0);
+    mu_binary_write_uint32(&w, 0);
+    mu_binary_write_uint32(&w, 3);
+    {
+        mu_bytestring_t cn = {32, client_nonce};
+        mu_binary_write_bytestring(&w, &cn);
+    }
+    mu_binary_write_uint32(&w, 3600000);
+    clen = 0;
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD,
+                      mu_asym_chunk_wrap(&client_crypto, MU_SECURITY_POLICY_BASIC256SHA256_ID, 0, 1, 1, server_cert,
+                                         server_cert_len, tmp, w.position, chunk, sizeof(chunk), &clen));
+    enqueue(&mock, chunk, clen);
+
+    mu_server_config_t config;
+    (void)memset(&config, 0, sizeof(config));
+    config.endpoint_url = "opc.tcp://host:4840";
+    config.application_uri = "urn:test";
+    config.product_uri = "urn:test";
+    config.application_name = "test";
+    static opcua_byte_t rx[8192], tx[8192];
+    config.receive_buffer = rx;
+    config.receive_buffer_size = sizeof(rx);
+    config.send_buffer = tx;
+    config.send_buffer_size = sizeof(tx);
+    config.max_chunk_count = 1;
+    config.max_message_size = 8192;
+    config.max_sessions = 1;
+    config.max_secure_channels = 1;
+    fake_platform_init(NULL, &config.time_adapter, &config.entropy_adapter);
+    config.tcp_adapter.context = &mock;
+    config.tcp_adapter.listen = mock_listen;
+    config.tcp_adapter.accept = mock_accept;
+    config.tcp_adapter.read = mock_read;
+    config.tcp_adapter.write = mock_write;
+    config.tcp_adapter.close_connection = mock_close;
+    config.tcp_adapter.shutdown = mock_shutdown;
+    config.crypto_adapter = &server_crypto;
+    config.address_space = &space;
+    const opcua_byte_t *trusted_certs[1] = {client_cert};
+    const size_t trusted_lens[1] = {client_cert_len};
+    mu_trust_list_t trust = {trusted_certs, trusted_lens, 1};
+    config.trust_list = &trust;
+
+    _Alignas(8) opcua_byte_t storage[MU_SERVER_STORAGE_BYTES];
+    mu_server_t *server = NULL;
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_server_init(storage, sizeof(storage), &config, &server));
+
+    mu_server_poll(server); /* accept */
+    mu_server_poll(server); /* HEL -> ACK */
+    mu_server_poll(server); /* OPN -> secured OpenSecureChannelResponse */
+
+    /* Unwrap the OPN response to obtain the symmetric keys. */
+    {
+        opcua_byte_t opn_body[8192];
+        size_t opn_body_len = 0;
+        mu_asym_chunk_info_t ai;
+        (void)memset(&ai, 0, sizeof(ai));
+        opcua_byte_t scratch[6144];
+        TEST_ASSERT_EQUAL(MU_STATUS_GOOD,
+                          mu_asym_chunk_unwrap(&client_crypto, mock.last_write, mock.last_write_len, opn_body,
+                                               sizeof(opn_body), &opn_body_len, scratch, sizeof(scratch), &ai));
+        mu_binary_reader_t br;
+        (void)parse_decoded(opn_body, opn_body_len, &br);
+        opcua_uint32_t spv, scid, token_id, revised;
+        opcua_int64_t created;
+        mu_binary_read_uint32(&br, &spv);
+        mu_binary_read_uint32(&br, &scid);
+        mu_binary_read_uint32(&br, &token_id);
+        mu_binary_read_int64(&br, &created);
+        mu_binary_read_uint32(&br, &revised);
+        mu_bytestring_t server_nonce;
+        mu_binary_read_bytestring(&br, &server_nonce);
+
+        mu_sym_keys_t c2s, s2c;
+        TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_sym_keys_derive(&client_crypto, MU_SECURITY_POLICY_BASIC256SHA256_ID,
+                                                              server_nonce.data, 32, client_nonce, 32, &c2s));
+        TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_sym_keys_derive(&client_crypto, MU_SECURITY_POLICY_BASIC256SHA256_ID,
+                                                              client_nonce, 32, server_nonce.data, 32, &s2c));
+
+        /* CreateSession with an ApplicationUri that does NOT match the client
+           cert CN ("muc-opcua"). Expect Bad_CertificateUriInvalid. */
+        mu_binary_writer_init(&w, tmp, sizeof(tmp));
+        {
+            mu_nodeid_t t = {0, MU_NODEID_NUMERIC, {MU_ID_CREATESESSIONREQUEST}};
+            mu_binary_write_nodeid(&w, &t);
+        }
+        write_request_header(&w, 0, 2);
+        {
+            mu_string_t ns = {-1, NULL};
+            mu_string_t bad_uri = {13, (const opcua_byte_t *)"urn:wrong:app"};
+            mu_binary_write_string(&w, &bad_uri);
+            mu_binary_write_string(&w, &ns);
+            mu_binary_write_byte(&w, 0x00);
+            mu_binary_write_uint32(&w, 1);
+            mu_binary_write_string(&w, &ns);
+            mu_binary_write_string(&w, &ns);
+            mu_binary_write_int32(&w, 0);
+            mu_binary_write_string(&w, &ns);
+            mu_binary_write_string(&w, &ns);
+            mu_binary_write_string(&w, &ns);
+            mu_bytestring_t cn = {32, client_nonce};
+            mu_binary_write_bytestring(&w, &cn);
+            mu_bytestring_t cc = {(opcua_int32_t)client_cert_len, client_cert};
+            mu_binary_write_bytestring(&w, &cc);
+            mu_binary_write_double(&w, 60000.0);
+            mu_binary_write_uint32(&w, 0);
+        }
+        opcua_byte_t msg_chunk[CHUNK_CAP];
+        size_t msg_len = 0;
+        TEST_ASSERT_EQUAL(MU_STATUS_GOOD,
+                          mu_sym_chunk_wrap(&client_crypto, MU_MESSAGE_SECURITY_MODE_SIGN_AND_ENCRYPT, &c2s, "MSG", scid,
+                                            token_id, 2, 2, tmp, w.position, msg_chunk, sizeof(msg_chunk), &msg_len));
+        mock.inbound_count = 0;
+        mock.read_index = 0;
+        enqueue(&mock, msg_chunk, msg_len);
+        mu_server_poll(server);
+
+        /* Unwrap the response and assert Bad_CertificateUriInvalid. The
+           server emits a ServiceFault (not CreateSessionResponse) on error. */
+        const opcua_byte_t *rbody = NULL;
+        size_t rblen = 0;
+        mu_sym_chunk_info_t si;
+        (void)memset(&si, 0, sizeof(si));
+        TEST_ASSERT_EQUAL(MU_STATUS_GOOD,
+                          mu_sym_chunk_unwrap(&client_crypto, MU_MESSAGE_SECURITY_MODE_SIGN_AND_ENCRYPT, &s2c,
+                                              mock.last_write, mock.last_write_len, &rbody, &rblen, &si));
+        mu_binary_reader_t resp;
+        (void)parse_decoded(rbody, rblen, &resp);
+        /* parse_decoded already consumed the ResponseHeader; the ServiceFault's
+           ResponseHeader StatusCode is the service result. Re-scan from the start
+           to read it (ResponseHeader layout: type NodeId | ts | handle | status). */
+        mu_binary_reader_t hdr;
+        mu_binary_reader_init(&hdr, rbody, rblen);
+        mu_nodeid_t type;
+        mu_binary_read_nodeid(&hdr, &type);
+        TEST_ASSERT_EQUAL(MU_ID_SERVICEFAULT, type.identifier.numeric);
+        opcua_int64_t ts;
+        opcua_uint32_t handle;
+        opcua_statuscode_t res;
+        mu_binary_read_int64(&hdr, &ts);
+        mu_binary_read_uint32(&hdr, &handle);
+        mu_binary_read_statuscode(&hdr, &res);
+        TEST_ASSERT_EQUAL_HEX32(MU_STATUS_BAD_CERTIFICATEURIINVALID, res);
+
+        mu_sym_keys_release_cipher(&c2s);
+        mu_sym_keys_release_cipher(&s2c);
+    }
+
+    mu_server_close(server);
+    mu_host_crypto_adapter_cleanup(&server_crypto);
+    mu_host_crypto_adapter_cleanup(&client_crypto);
+}
+
 int main(void) {
     UNITY_BEGIN();
     RUN_TEST(test_secure_handshake_read);
+    RUN_TEST(test_create_session_rejects_mismatched_application_uri);
     return UNITY_END();
 }
 

@@ -71,7 +71,7 @@ static void prepare_dispatch_server(mu_server_t *server, opcua_uint32_t *subscri
     mu_secure_channel_init(&server->secure_channel);
     TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD,
                             mu_secure_channel_open(&server->secure_channel, NULL, MU_MESSAGE_SECURITY_MODE_NONE,
-                                                   3600000u, &revised_lifetime));
+                                                   3600000u, &server->config.entropy_adapter, &revised_lifetime));
     for (size_t i = 0u; i < MU_MAX_SESSIONS; ++i) {
         mu_session_init(&server->sessions[i]);
     }

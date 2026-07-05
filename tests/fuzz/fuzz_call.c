@@ -29,6 +29,14 @@ static void fuzz_close(void *context, void *handle) {
     (void)handle;
 }
 
+static opcua_statuscode_t fuzz_entropy(void *context, opcua_byte_t *buffer, size_t length) {
+    (void)context;
+    if (buffer != NULL) {
+        (void)memset(buffer, 0xa5, length);
+    }
+    return MU_STATUS_GOOD;
+}
+
 static int prepare_server(mu_server_t *server, opcua_byte_t *send_buffer) {
     opcua_uint32_t revised_lifetime = 0u;
     opcua_uint64_t revised_timeout = 0u;
@@ -40,11 +48,12 @@ static int prepare_server(mu_server_t *server, opcua_byte_t *send_buffer) {
     server->config.send_buffer_size = FUZZ_BODY_CAPACITY;
     server->config.tcp_adapter.write = fuzz_write;
     server->config.tcp_adapter.close_connection = fuzz_close;
+    server->config.entropy_adapter.generate_random = fuzz_entropy;
     server->client_handle = (void *)1;
 
     mu_secure_channel_init(&server->secure_channel);
     if (mu_secure_channel_open(&server->secure_channel, NULL, MU_MESSAGE_SECURITY_MODE_NONE, 3600000u,
-                               &revised_lifetime) != MU_STATUS_GOOD) {
+                               &server->config.entropy_adapter, &revised_lifetime) != MU_STATUS_GOOD) {
         return 0;
     }
     for (size_t i = 0u; i < MU_MAX_SESSIONS; ++i) {

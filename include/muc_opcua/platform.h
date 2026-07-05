@@ -184,7 +184,20 @@ typedef struct mu_crypto_adapter {
        means the backend cannot check validity, in which case secured policies MUST
        fail closed (see mu_certificate_validate). */
     opcua_statuscode_t (*verify_certificate_validity)(void *context, const opcua_byte_t *certificate,
-                                                      size_t certificate_length);
+                                                       size_t certificate_length);
+
+    /* OPC-10000-4 §5.7.2.1: in CreateSession the Server MUST check that the
+       clientDescription.applicationUri matches the ClientCertificate. The
+       adapter extracts URI entries from the certificate's SubjectAltName
+       extension (and falls back to the Subject CN) and compares each to
+       `application_uri`. Returns MU_STATUS_GOOD when any entry matches,
+       MU_STATUS_BAD_CERTIFICATEURIINVALID otherwise. OPTIONAL: a NULL pointer
+       means the backend cannot check (callers skip the validation, preserving
+       backward compatibility with adapters that have no SAN/CN parser). */
+    opcua_statuscode_t (*verify_certificate_application_uri)(void *context, const opcua_byte_t *certificate,
+                                                              size_t certificate_length,
+                                                              const char *application_uri,
+                                                              size_t application_uri_length);
 } mu_crypto_adapter_t;
 
 opcua_statuscode_t mu_mbedtls_crypto_adapter_init(mu_crypto_adapter_t *adapter, const opcua_byte_t *cert_der,

@@ -581,6 +581,65 @@ void test_create_monitored_items(void) {
     TEST_ASSERT_EQUAL_HEX32(STATUS_BAD_NODEIDUNKNOWN, read_moncreate_result(&body, &id1));
 }
 
+/* OPC-10000-4 §7.21: a MonitoringParameters.SamplingInterval of -1 (any negative
+   Double) requests the default defined by the Subscription's publishing interval.
+   The revised sampling interval echoed in the response must equal that publishing
+   interval, not the 50 ms hardcoded minimum. */
+void test_create_monitored_items_sampling_minus_one_uses_publishing_interval(void) {
+    mock_t mock;
+    memset(&mock, 0, sizeof(mock));
+    enqueue_connect(&mock);
+
+    _Alignas(8) opcua_byte_t storage[MU_SERVER_STORAGE_BYTES];
+    mu_server_config_t config;
+    mu_server_t *server = make_server(&mock, storage, sizeof(storage), &config, NULL);
+    mu_binary_reader_t body;
+    opcua_statuscode_t sr;
+
+    run_connect(server, &mock);
+    enqueue_create_subscription(&mock, 4, 1000.0, 100, 10);
+    mu_server_poll(server); /* CreateSubscription */
+    TEST_ASSERT_EQUAL(ID_CREATESUBSCRIPTIONRESPONSE, parse_response(mock.last_write, mock.last_write_len, &body, &sr));
+    opcua_uint32_t sub_id;
+    mu_binary_read_uint32(&body, &sub_id);
+
+    /* CreateMonitoredItems (seq 5): one item with samplingInterval = -1.0. */
+    opcua_byte_t tmp[1024], chunk[1024];
+    mu_binary_writer_t w;
+    size_t clen;
+    mu_binary_writer_init(&w, tmp, sizeof(tmp));
+    {
+        mu_nodeid_t t = {0, MU_NODEID_NUMERIC, {ID_CREATEMONITOREDITEMSREQUEST}};
+        mu_binary_write_nodeid(&w, &t);
+    }
+    write_request_header(&w, TEST_FIRST_AUTH_TOKEN, 5);
+    mu_binary_write_uint32(&w, sub_id);
+    mu_binary_write_uint32(&w, 3);                /* timestampsToReturn = Neither */
+    mu_binary_write_int32(&w, 1);                 /* itemsToCreate count */
+    write_moncreate_item(&w, 0, 2258, 42, -1.0);  /* samplingInterval = -1 */
+    clen = build_msg(chunk, sizeof(chunk), 5, 5, tmp, w.position);
+    enqueue(&mock, chunk, clen);
+
+    mu_server_poll(server); /* CreateMonitoredItems */
+    TEST_ASSERT_EQUAL(ID_CREATEMONITOREDITEMSRESPONSE,
+                      parse_response(mock.last_write, mock.last_write_len, &body, &sr));
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, sr);
+    opcua_int32_t nres;
+    mu_binary_read_int32(&body, &nres);
+    TEST_ASSERT_EQUAL(1, nres);
+    opcua_statuscode_t st;
+    mu_binary_read_statuscode(&body, &st);
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, st);
+    opcua_uint32_t item_id;
+    mu_binary_read_uint32(&body, &item_id);
+    TEST_ASSERT_NOT_EQUAL(0, item_id);
+    opcua_double_t revised_sampling;
+    mu_binary_read_double(&body, &revised_sampling);
+    /* Revised sampling interval must reflect the Subscription publishing interval
+       (1000 ms), not the 50 ms minimum. */
+    TEST_ASSERT_TRUE(revised_sampling >= 999.0 && revised_sampling <= 1001.0);
+}
+
 /* The (default MU_MAX_MONITORED_ITEMS = 8)+1-th item in one request is rejected per-op
    with Bad_TooManyMonitoredItems (OPC 10000-4 §5.13.2.4). */
 void test_create_monitored_items_too_many(void) {
@@ -1350,7 +1409,8 @@ void test_set_publishing_mode_unknown_subscription_returns_item_status(void) {
 }
 
 /* ModifyMonitoredItems (OPC 10000-4 §5.13.3): the revised sampling interval reflects the
-   new requested value. */
+   new requested value, and the revised queueSize/discardOldest are applied per
+   Table 67. */
 void test_modify_monitored_items(void) {
     mock_t mock;
     memset(&mock, 0, sizeof(mock));
@@ -1382,7 +1442,7 @@ void test_modify_monitored_items(void) {
         mu_nodeid_t nul = {0, MU_NODEID_NUMERIC, {0}};
         mu_binary_write_extension_object_header(&w, &nul, 0);
     }
-    mu_binary_write_uint32(&w, 1);     /* queueSize */
+    mu_binary_write_uint32(&w, 5u);    /* queueSize (exceeds depth; expect clamp to 2) */
     mu_binary_write_boolean(&w, true); /* discardOldest */
     clen = build_msg(chunk, sizeof(chunk), 6, 6, tmp, w.position);
     enqueue(&mock, chunk, clen);
@@ -1400,6 +1460,86 @@ void test_modify_monitored_items(void) {
     opcua_double_t revised;
     mu_binary_read_double(&body, &revised);
     TEST_ASSERT_TRUE(revised >= 249.0 && revised <= 251.0);
+    /* OPC-10000-4 §5.13.3.2 Table 67: RevisedQueueSize reflects the clamped
+       capacity actually allocated (5 -> MU_MONITORED_QUEUE_DEPTH). */
+    opcua_uint32_t revised_queue_size;
+    mu_binary_read_uint32(&body, &revised_queue_size);
+    TEST_ASSERT_EQUAL_UINT32(MU_MONITORED_QUEUE_DEPTH, revised_queue_size);
+    /* The decoded values must be applied to the monitored item, not discarded. */
+#if MUC_OPCUA_SUBSCRIPTIONS_STANDARD
+    mu_monitored_item_t *item = &server->subs.monitored_items[0];
+    TEST_ASSERT_EQUAL_UINT32(MU_MONITORED_QUEUE_DEPTH, item->queue_size);
+    TEST_ASSERT_TRUE(item->discard_oldest);
+#endif
+}
+
+/* OPC-10000-4 §5.13.3.1: "Changes to the MonitoredItem settings shall be applied
+   immediately by the Server." A DataChangeFilter in ModifyMonitoredItems must update
+   the item's trigger, deadbandType and deadbandValue, not just be decoded and discarded. */
+void test_modify_monitored_items_applies_datachange_filter(void) {
+    mock_t mock;
+    memset(&mock, 0, sizeof(mock));
+    _Alignas(8) opcua_byte_t storage[MU_SERVER_STORAGE_BYTES];
+    mu_server_config_t config;
+    opcua_uint32_t sub_id, item_id;
+    s_mon_val = 10;
+    mu_server_t *server =
+        setup_sub_with_item(&mock, storage, sizeof(storage), &config, 1000.0, 100, 10, 500.0, &sub_id, &item_id);
+    mu_binary_reader_t body;
+    opcua_statuscode_t sr;
+
+    /* Capture pre-modify filter state to confirm the modify actually changes it. */
+    mu_monitored_item_t *item = &server->subs.monitored_items[0];
+    TEST_ASSERT_NOT_EQUAL(MU_DATACHANGE_TRIGGER_STATUS, item->trigger);
+
+    opcua_byte_t tmp[512], chunk[512];
+    mu_binary_writer_t w;
+    size_t clen;
+    mu_binary_writer_init(&w, tmp, sizeof(tmp));
+    {
+        mu_nodeid_t t = {0, MU_NODEID_NUMERIC, {ID_MODIFYMONITOREDITEMSREQUEST}};
+        mu_binary_write_nodeid(&w, &t);
+    }
+    write_request_header(&w, TEST_FIRST_AUTH_TOKEN, 6);
+    mu_binary_write_uint32(&w, sub_id);
+    mu_binary_write_uint32(&w, 3);       /* timestampsToReturn */
+    mu_binary_write_int32(&w, 1);        /* itemsToModify */
+    mu_binary_write_uint32(&w, item_id); /* monitoredItemId */
+    mu_binary_write_uint32(&w, 7);       /* clientHandle */
+    mu_binary_write_double(&w, 250.0);   /* samplingInterval */
+    {
+        /* DataChangeFilter: trigger=STATUS(0), deadbandType=NONE(0), deadbandValue=0.0 */
+        mu_nodeid_t ft = {0, MU_NODEID_NUMERIC, {724}}; /* DataChangeFilter DefaultBinary */
+        mu_binary_write_extension_object_header(&w, &ft, 16u);
+        mu_binary_write_uint32(&w, 0u);  /* trigger = STATUS */
+        mu_binary_write_uint32(&w, 0u);  /* deadbandType = NONE */
+        mu_binary_write_double(&w, 0.0); /* deadbandValue */
+    }
+    mu_binary_write_uint32(&w, 1u);    /* queueSize */
+    mu_binary_write_boolean(&w, true); /* discardOldest */
+    clen = build_msg(chunk, sizeof(chunk), 6, 6, tmp, w.position);
+    enqueue(&mock, chunk, clen);
+
+    mu_server_poll(server);
+    TEST_ASSERT_EQUAL(ID_MODIFYMONITOREDITEMSRESPONSE,
+                      parse_response(mock.last_write, mock.last_write_len, &body, &sr));
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, sr);
+    opcua_int32_t nres;
+    mu_binary_read_int32(&body, &nres);
+    TEST_ASSERT_EQUAL(1, nres);
+    opcua_statuscode_t st;
+    mu_binary_read_statuscode(&body, &st);
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, st);
+
+    /* OPC-10000-4 §5.13.3.2: the decoded DataChangeFilter fields must be applied
+       to the monitored item, not decoded and discarded. The trigger and deadband
+       fields are only tracked under MUC_OPCUA_SUBSCRIPTIONS_STANDARD; without it
+       the filter body is decoded-and-skipped, so the item retains its create-time
+       defaults. */
+#if MUC_OPCUA_SUBSCRIPTIONS_STANDARD
+    TEST_ASSERT_EQUAL_UINT8(MU_DATACHANGE_TRIGGER_STATUS, item->trigger);
+    TEST_ASSERT_EQUAL_UINT8(MU_DEADBAND_TYPE_NONE, item->deadband_type);
+#endif
 }
 
 /* SetMonitoringMode (OPC 10000-4 §5.13.4): DISABLED stops change detection; REPORTING
@@ -2287,6 +2427,7 @@ int main(void) {
     RUN_TEST(test_delete_subscriptions);
 #if MUC_OPCUA_BASE_NODES
     RUN_TEST(test_create_monitored_items);
+    RUN_TEST(test_create_monitored_items_sampling_minus_one_uses_publishing_interval);
     RUN_TEST(test_create_monitored_items_too_many);
     RUN_TEST(test_delete_monitored_items);
 #endif
@@ -2300,6 +2441,7 @@ int main(void) {
     RUN_TEST(test_set_publishing_mode);
     RUN_TEST(test_set_publishing_mode_unknown_subscription_returns_item_status);
     RUN_TEST(test_modify_monitored_items);
+    RUN_TEST(test_modify_monitored_items_applies_datachange_filter);
     RUN_TEST(test_set_monitoring_mode);
     RUN_TEST(test_set_monitoring_mode_unknown_item_returns_item_status);
     RUN_TEST(test_two_sessions);

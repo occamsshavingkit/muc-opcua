@@ -88,11 +88,13 @@ static opcua_statuscode_t verify_activate_client_signature(mu_server_t *server, 
 }
 #endif
 
-/* Decode a CreateSessionRequest body, capturing the ClientNonce,
-   ClientCertificate, and RequestedSessionTimeout (the latter two are needed to
-   compute the ServerSignature on a secured channel). */
-static opcua_statuscode_t read_create_session_request(mu_binary_reader_t *r, opcua_uint64_t *timeout_bits,
-                                                      mu_bytestring_t *client_nonce, mu_bytestring_t *client_cert) {
+/* Decode a CreateSessionRequest body, capturing the ApplicationUri (the first
+   field of the ClientDescription), ClientNonce, ClientCertificate, and
+   RequestedSessionTimeout (the latter two are needed to compute the
+   ServerSignature on a secured channel). */
+static opcua_statuscode_t read_create_session_request(mu_binary_reader_t *r, mu_string_t *application_uri,
+                                                       opcua_uint64_t *timeout_bits, mu_bytestring_t *client_nonce,
+                                                       mu_bytestring_t *client_cert) {
     mu_string_t str;
     opcua_uint32_t u;
     opcua_int32_t n;
@@ -100,12 +102,14 @@ static opcua_statuscode_t read_create_session_request(mu_binary_reader_t *r, opc
     opcua_statuscode_t status;
 
     *timeout_bits = 0; /* below the minimum -> clamped up */
+    application_uri->length = -1;
+    application_uri->data = NULL;
     client_nonce->length = -1;
     client_nonce->data = NULL;
     client_cert->length = -1;
     client_cert->data = NULL;
 
-    status = mu_binary_read_string(r, &str);
+    status = mu_binary_read_string(r, application_uri);
     if (status != MU_STATUS_GOOD) {
         return status; /* ClientDescription.applicationUri */
     }
@@ -170,6 +174,13 @@ static opcua_statuscode_t read_create_session_request(mu_binary_reader_t *r, opc
     if (status != MU_STATUS_GOOD) {
         return status; /* ClientNonce */
     }
+    /* OPC-10000-4 §5.7.2.3 Table 16: the ClientNonce is optional (null when
+       the SecurityPolicy is None), but when present its length shall be in the
+       32-128 byte range. A non-null nonce outside that range is rejected with
+       Bad_NonceInvalid. A null (-1) or empty (0) nonce is permitted. */
+    if (client_nonce->length > 0 && (client_nonce->length < 32 || client_nonce->length > 128)) {
+        return MU_STATUS_BAD_NONCEINVALID;
+    }
     status = mu_binary_read_bytestring(r, client_cert);
     if (status != MU_STATUS_GOOD) {
         return status; /* ClientCertificate */
@@ -204,7 +215,8 @@ opcua_statuscode_t handle_create_session(mu_server_t *server, mu_binary_reader_t
 
     opcua_uint64_t requested_bits = 0;
     mu_bytestring_t client_nonce = {-1, NULL}, client_cert = {-1, NULL};
-    s = read_create_session_request(r, &requested_bits, &client_nonce, &client_cert);
+    mu_string_t application_uri = {-1, NULL};
+    s = read_create_session_request(r, &application_uri, &requested_bits, &client_nonce, &client_cert);
     /* OPC-10000-4 section 7.38.2: Bad_DecodingError covers invalid stream data;
        reject incomplete mandatory service bodies before session state changes. */
     if (s != MU_STATUS_GOOD) {
@@ -214,6 +226,17 @@ opcua_statuscode_t handle_create_session(mu_server_t *server, mu_binary_reader_t
     if (r->position != r->length) {
         return MU_STATUS_BAD_DECODINGERROR;
     }
+
+    /* NOTE: OPC-10000-4 §5.7.2.2 Table 15 states that the CreateSession serverUri
+       is "no longer used ... the Server shall ignore any value provided" and the
+       endpointUrl is "diagnostics" only ("The Server should return a suitable
+       default URL if it does not recognize the HostName"). The Server is
+       therefore REQUIRED to accept any serverUri/endpointUrl and must NOT reject
+       on mismatch. Bad_ServerUriInvalid (defined in status.h at 0x804F0000)
+       applies to the FindServers/RegisterServer services (§5.5.5.3), where
+       serverUri identifies a registered server, not to CreateSession. T007
+       originally requested CreateSession validation here, but the current spec
+       text prohibits it; see TODO.md for the grounding discrepancy. */
 
 #ifdef MUC_OPCUA_SECURITY
     /* OPC-10000-4 §5.6.2: on a secured channel the ClientCertificate presented in
@@ -226,6 +249,21 @@ opcua_statuscode_t handle_create_session(mu_server_t *server, mu_binary_reader_t
             server->channel_client_cert_len == 0 ||
             memcmp(client_cert.data, server->channel_client_cert, server->channel_client_cert_len) != 0) {
             return MU_STATUS_BAD_SECURITYCHECKSFAILED;
+        }
+        /* OPC-10000-4 §5.7.2.1: the ApplicationUri in the ClientDescription MUST
+           match an identity in the ClientCertificate (SubjectAltName URI, falling
+           back to Subject CN). SecurityPolicy=None and a null/empty
+           ApplicationUri or ClientCertificate skip the check (validated in the
+           wrapper), preserving backward compatibility with test clients that
+           omit the ApplicationUri. On mismatch CreateSession returns
+           Bad_CertificateUriInvalid. */
+        opcua_statuscode_t au_status = mu_certificate_validate_application_uri(
+            server->config.crypto_adapter, server_secure_channel.policy, client_cert.data,
+            (size_t)client_cert.length, (const char *)application_uri.data, (size_t)(application_uri.length > 0
+                                                                                          ? application_uri.length
+                                                                                          : 0));
+        if (au_status != MU_STATUS_GOOD) {
+            return au_status;
         }
     }
 #endif

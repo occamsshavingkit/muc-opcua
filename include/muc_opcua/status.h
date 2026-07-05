@@ -28,6 +28,7 @@
 #define MU_STATUS_BAD_SECURITYPOLICYREJECTED ((opcua_statuscode_t)0x80550000)
 #define MU_STATUS_BAD_TOOMANYSESSIONS ((opcua_statuscode_t)0x80560000)
 #define MU_STATUS_BAD_SESSIONCLOSED ((opcua_statuscode_t)0x80260000)
+#define MU_STATUS_BAD_NONCEINVALID ((opcua_statuscode_t)0x80240000)
 #define MU_STATUS_BAD_USERACCESSDENIED ((opcua_statuscode_t)0x801F0000)
 #define MU_STATUS_BAD_NODEIDUNKNOWN ((opcua_statuscode_t)0x80340000)
 #define MU_STATUS_BAD_NOTFOUND ((opcua_statuscode_t)0x803E0000)
@@ -45,8 +46,13 @@
 #define MU_STATUS_BAD_CONTINUATIONPOINTINVALID ((opcua_statuscode_t)0x804A0000)
 #define MU_STATUS_BAD_ATTRIBUTEIDINVALID ((opcua_statuscode_t)0x80350000)
 #define MU_STATUS_BAD_NOMATCH ((opcua_statuscode_t)0x806F0000)
+/* OPC-10000-4 §5.9.4.4: targetName missing in a RelativePath. */
+#define MU_STATUS_BAD_BROWSENAMEINVALID ((opcua_statuscode_t)0x80600000)
 #define MU_STATUS_BAD_CERTIFICATEINVALID ((opcua_statuscode_t)0x80120000)
 #define MU_STATUS_BAD_SECURITYMODEREJECTED ((opcua_statuscode_t)0x80540000)
+/* OPC-10000-4 §5.6.2.3 Table 12: SecurityToken requestType is not ISSUE (0)
+   or RENEW (1). */
+#define MU_STATUS_BAD_REQUESTTYPEINVALID ((opcua_statuscode_t)0x803C0000)
 #define MU_STATUS_BAD_TOOMANYMONITOREDITEMS ((opcua_statuscode_t)0x80DB0000)
 #define MU_STATUS_BAD_TOOMANYSUBSCRIPTIONS ((opcua_statuscode_t)0x80770000)
 #define MU_STATUS_BAD_SUBSCRIPTIONIDINVALID ((opcua_statuscode_t)0x80280000)
@@ -64,8 +70,13 @@
 #define MU_STATUS_BAD_MONITOREDITEMFILTERINVALID ((opcua_statuscode_t)0x80430000)
 #define MU_STATUS_BAD_FILTERNOTALLOWED ((opcua_statuscode_t)0x80450000)
 #define MU_STATUS_BAD_TIMESTAMPSTORETURNINVALID ((opcua_statuscode_t)0x802A0000)
+#define MU_STATUS_BAD_NONCEINVALID ((opcua_statuscode_t)0x80240000)
 #define MU_STATUS_BAD_BROWSEDIRECTIONINVALID ((opcua_statuscode_t)0x804D0000)
 #define MU_STATUS_BAD_NODATA ((opcua_statuscode_t)0x809B0000)
+/* OPC-10000-4 §7.38.2: Bad_ViewIdUnknown — "The View node id does not refer to
+   a View object." Returned by Browse (§5.9.2.2 Table 34) when the client
+   requests a non-null View that the server does not recognize or support. */
+#define MU_STATUS_BAD_VIEWIDUNKNOWN ((opcua_statuscode_t)0x80390000)
 
 /* TCP Specific StatusCodes (OPC-10000-4 section 7.38.2) */
 #define MU_STATUS_BAD_TCPSERVERTOOBUSY 0x807D0000
@@ -79,6 +90,17 @@
 #define MU_STATUS_BAD_CERTIFICATEUNTRUSTED ((opcua_statuscode_t)0x801A0000)
 #define MU_STATUS_BAD_USERCERTIFICATEINVALID MU_STATUS_BAD_CERTIFICATEINVALID
 #define MU_STATUS_BAD_USERCERTIFICATEUNTRUSTED MU_STATUS_BAD_CERTIFICATEUNTRUSTED
+/* OPC-10000-4 §7.38.2: ApplicationUri in CreateSession does not match the
+   ClientCertificate (SAN URI / Subject CN). Grounding: §5.7.2.1. */
+#define MU_STATUS_BAD_CERTIFICATEURIINVALID ((opcua_statuscode_t)0x80170000)
+/* OPC-10000-4 §7.38.2 / OPC Foundation Opc.Ua.StatusCodes.csv:
+   BadServerUriInvalid = 0x804F0000 ("The Server URI is not valid"). Listed in
+   CreateSession result Table 16 (§5.7.2.3) and used by FindServers/RegisterServer
+   (§5.5.5.3), where serverUri identifies a registered server. NOTE: in
+   CreateSession itself §5.7.2.2 Table 15 says serverUri "is no longer used ...
+   the Server shall ignore any value provided", so this code is not returned
+   from CreateSession validation in this implementation. */
+#define MU_STATUS_BAD_SERVERURIINVALID ((opcua_statuscode_t)0x804F0000)
 
 #ifdef __cplusplus
 extern "C" {

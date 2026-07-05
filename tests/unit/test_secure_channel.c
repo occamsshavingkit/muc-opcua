@@ -84,6 +84,21 @@ static opcua_statuscode_t failing_entropy(void *context, opcua_byte_t *buffer, s
     return MU_STATUS_BAD_SECURITYCHECKSFAILED;
 }
 
+static opcua_statuscode_t test_entropy(void *context, opcua_byte_t *buffer, size_t len) {
+    (void)context;
+    if (buffer != NULL) {
+        (void)memset(buffer, 0x42, len);
+    }
+    return MU_STATUS_GOOD;
+}
+
+static mu_entropy_adapter_t channel_test_entropy_adapter(void) {
+    mu_entropy_adapter_t adapter;
+    adapter.context = NULL;
+    adapter.generate_random = test_entropy;
+    return adapter;
+}
+
 static void enqueue_request(secure_channel_transport_t *transport, const opcua_byte_t *bytes, size_t len) {
     TEST_ASSERT_TRUE(transport->inbound_count < TEST_MAX_INBOUND);
     TEST_ASSERT_TRUE(len <= sizeof(transport->inbound[0]));
@@ -136,7 +151,8 @@ static size_t build_hello(opcua_byte_t *out, size_t capacity) {
 }
 
 static size_t build_opn(opcua_byte_t *out, size_t capacity, const opcua_byte_t *policy_uri,
-                        opcua_int32_t policy_uri_len, mu_message_security_mode_t security_mode) {
+                        opcua_int32_t policy_uri_len, mu_message_security_mode_t security_mode,
+                        opcua_uint32_t request_type) {
     mu_binary_writer_t w;
     mu_binary_writer_init(&w, out, capacity);
 
@@ -161,7 +177,7 @@ static size_t build_opn(opcua_byte_t *out, size_t capacity, const opcua_byte_t *
     }
     write_request_header(&w, 77);
     (void)mu_binary_write_uint32(&w, 0);
-    (void)mu_binary_write_uint32(&w, 0);
+    (void)mu_binary_write_uint32(&w, request_type);
     (void)mu_binary_write_uint32(&w, (opcua_uint32_t)security_mode);
     (void)mu_binary_write_int32(&w, -1);
     (void)mu_binary_write_uint32(&w, 3600000);
@@ -229,7 +245,8 @@ static opcua_statuscode_t read_opn_response_service_result(const opcua_byte_t *b
 }
 
 static void assert_opn_rejected(const opcua_byte_t *policy_uri, opcua_int32_t policy_uri_len,
-                                mu_message_security_mode_t security_mode, opcua_statuscode_t expected_status) {
+                                mu_message_security_mode_t security_mode, opcua_uint32_t request_type,
+                                opcua_statuscode_t expected_status) {
     secure_channel_transport_t transport;
     opcua_byte_t chunk[512];
     mu_server_config_t config;
@@ -248,7 +265,7 @@ static void assert_opn_rejected(const opcua_byte_t *policy_uri, opcua_int32_t po
 
     len = build_hello(chunk, sizeof(chunk));
     enqueue_request(&transport, chunk, len);
-    len = build_opn(chunk, sizeof(chunk), policy_uri, policy_uri_len, security_mode);
+    len = build_opn(chunk, sizeof(chunk), policy_uri, policy_uri_len, security_mode, request_type);
     enqueue_request(&transport, chunk, len);
 
     configure_transport_server(&config, &transport, rx, tx);
@@ -289,7 +306,7 @@ static void assert_opn_entropy_failure_returns_security_checks_failed(void) {
     len = build_hello(chunk, sizeof(chunk));
     enqueue_request(&transport, chunk, len);
     len = build_opn(chunk, sizeof(chunk), policy_uri, (opcua_int32_t)(sizeof(policy_uri) - 1u),
-                    MU_MESSAGE_SECURITY_MODE_NONE);
+                    MU_MESSAGE_SECURITY_MODE_NONE, 0);
     enqueue_request(&transport, chunk, len);
 
     configure_transport_server(&config, &transport, rx, tx);
@@ -315,19 +332,43 @@ void test_secure_channel_open_none(void) {
     mu_secure_channel_init(&channel);
     TEST_ASSERT_FALSE(channel.is_open);
 
+    mu_entropy_adapter_t entropy = channel_test_entropy_adapter();
     opcua_uint32_t revised_lifetime = 0;
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD,
-                      mu_secure_channel_open(&channel, NULL, MU_MESSAGE_SECURITY_MODE_NONE, 1000, &revised_lifetime));
+                      mu_secure_channel_open(&channel, NULL, MU_MESSAGE_SECURITY_MODE_NONE, 1000, &entropy,
+                                             &revised_lifetime));
     TEST_ASSERT_TRUE(channel.is_open);
     TEST_ASSERT_EQUAL(10000, revised_lifetime); /* Bounded to min */
-    TEST_ASSERT_GREATER_THAN(0, channel.channel_id);  /* non-zero counter */
+    TEST_ASSERT_GREATER_THAN(0, channel.channel_id);  /* non-zero random id */
     TEST_ASSERT_EQUAL(1, channel.token_id);
 
-    /* Renew */
+    /* Renew keeps the channel id; only the token rolls. */
+    opcua_uint32_t saved_channel_id = channel.channel_id;
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_secure_channel_open(&channel, NULL, MU_MESSAGE_SECURITY_MODE_NONE, 5000000,
-                                                             &revised_lifetime));
+                                                             &entropy, &revised_lifetime));
     TEST_ASSERT_EQUAL(3600000, revised_lifetime); /* Bounded to max */
+    TEST_ASSERT_EQUAL(saved_channel_id, channel.channel_id);
     TEST_ASSERT_EQUAL(2, channel.token_id);
+}
+
+void test_secure_channel_open_rejects_when_entropy_unavailable(void) {
+    /* OPC-10000-6 section 6.7.2.2 requires a restart-unique SecureChannelId; the
+       id is drawn from the entropy adapter, so a missing or failing adapter must
+       reject the open (fail closed) rather than fall back to a predictable id. */
+    mu_secure_channel_t channel;
+    mu_secure_channel_init(&channel);
+
+    mu_entropy_adapter_t broken = {NULL, failing_entropy};
+    opcua_uint32_t revised_lifetime = 0;
+    TEST_ASSERT_EQUAL(MU_STATUS_BAD_SECURITYCHECKSFAILED,
+                      mu_secure_channel_open(&channel, NULL, MU_MESSAGE_SECURITY_MODE_NONE, 1000, &broken,
+                                             &revised_lifetime));
+    TEST_ASSERT_FALSE(channel.is_open);
+
+    TEST_ASSERT_EQUAL(MU_STATUS_BAD_SECURITYCHECKSFAILED,
+                      mu_secure_channel_open(&channel, NULL, MU_MESSAGE_SECURITY_MODE_NONE, 1000, NULL,
+                                             &revised_lifetime));
+    TEST_ASSERT_FALSE(channel.is_open);
 }
 
 void test_secure_channel_close(void) {
@@ -336,8 +377,9 @@ void test_secure_channel_close(void) {
 
     TEST_ASSERT_EQUAL(MU_STATUS_BAD_TCPSECURECHANNELUNKNOWN, mu_secure_channel_close(&channel));
 
+    mu_entropy_adapter_t entropy = channel_test_entropy_adapter();
     opcua_uint32_t revised_lifetime = 0;
-    mu_secure_channel_open(&channel, NULL, MU_MESSAGE_SECURITY_MODE_NONE, 3600000, &revised_lifetime);
+    mu_secure_channel_open(&channel, NULL, MU_MESSAGE_SECURITY_MODE_NONE, 3600000, &entropy, &revised_lifetime);
     TEST_ASSERT_TRUE(channel.is_open);
 
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_secure_channel_close(&channel));
@@ -374,9 +416,10 @@ void test_secure_channel_close_and_init_zeroize_derived_session_keys(void) {
 
     mu_secure_channel_init(&channel);
     channel.policy = MU_SECURITY_POLICY_BASIC256SHA256_ID;
+    mu_entropy_adapter_t entropy = channel_test_entropy_adapter();
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD,
                       mu_secure_channel_open(&channel, &policy, MU_MESSAGE_SECURITY_MODE_SIGN_AND_ENCRYPT, 3600000,
-                                             &revised_lifetime));
+                                             &entropy, &revised_lifetime));
     populate_derived_session_keys(&channel);
 
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_secure_channel_close(&channel));
@@ -395,7 +438,7 @@ void test_opn_rejects_unacceptable_security_policy_without_crypto_adapter(void) 
        parameter; §5.6.2.3 defines Bad_SecurityPolicyRejected for a policy that
        does not meet the server requirements. This server has no crypto adapter,
        so its active SecureChannel capability is SecurityPolicy None. */
-    assert_opn_rejected(policy_uri, (opcua_int32_t)(sizeof(policy_uri) - 1u), MU_MESSAGE_SECURITY_MODE_NONE,
+    assert_opn_rejected(policy_uri, (opcua_int32_t)(sizeof(policy_uri) - 1u), MU_MESSAGE_SECURITY_MODE_NONE, 0,
                         MU_STATUS_BAD_SECURITYPOLICYREJECTED);
 }
 
@@ -409,7 +452,7 @@ void test_opn_rejects_signing_modes_for_security_policy_none(void) {
        the server requirements. With SecurityPolicy None / no crypto adapter,
        Sign and SignAndEncrypt are inconsistent with the active capability. */
     for (size_t i = 0; i < (sizeof(modes) / sizeof(modes[0])); ++i) {
-        assert_opn_rejected(policy_uri, (opcua_int32_t)(sizeof(policy_uri) - 1u), modes[i],
+        assert_opn_rejected(policy_uri, (opcua_int32_t)(sizeof(policy_uri) - 1u), modes[i], 0,
                             MU_STATUS_BAD_SECURITYMODEREJECTED);
     }
 }
@@ -421,9 +464,19 @@ void test_opn_entropy_failure_returns_bad_security_checks_failed(void) {
     assert_opn_entropy_failure_returns_security_checks_failed();
 }
 
+void test_opn_rejects_invalid_request_type(void) {
+    /* OPC-10000-4 §5.6.2.3 Table 12: requestType shall be ISSUE (0) or
+       RENEW (1). Any other value is rejected with Bad_RequestTypeInvalid
+       (0x803C0000). Uses SecurityPolicy None so no crypto adapter is needed. */
+    static const opcua_byte_t policy_uri[] = "http://opcfoundation.org/UA/SecurityPolicy#None";
+    assert_opn_rejected(policy_uri, (opcua_int32_t)(sizeof(policy_uri) - 1u), MU_MESSAGE_SECURITY_MODE_NONE, 2,
+                        MU_STATUS_BAD_REQUESTTYPEINVALID);
+}
+
 int main(void) {
     UNITY_BEGIN();
     RUN_TEST(test_secure_channel_open_none);
+    RUN_TEST(test_secure_channel_open_rejects_when_entropy_unavailable);
     RUN_TEST(test_secure_channel_close);
 #ifdef MUC_OPCUA_SECURITY
     RUN_TEST(test_secure_channel_close_and_init_zeroize_derived_session_keys);
@@ -431,5 +484,6 @@ int main(void) {
     RUN_TEST(test_opn_rejects_unacceptable_security_policy_without_crypto_adapter);
     RUN_TEST(test_opn_rejects_signing_modes_for_security_policy_none);
     RUN_TEST(test_opn_entropy_failure_returns_bad_security_checks_failed);
+    RUN_TEST(test_opn_rejects_invalid_request_type);
     return UNITY_END();
 }

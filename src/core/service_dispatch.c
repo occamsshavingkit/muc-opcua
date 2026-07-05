@@ -1,10 +1,12 @@
 /* src/core/service_dispatch.c */
 #include "service_dispatch.h"
 #include "../services/discovery.h"
+#include "../services/read.h"
 #include "../services/secure_channel.h"
 #include "../services/session.h"
 #include "muc_opcua/address_space.h"
 #include "muc_opcua/encoding.h"
+#include "muc_opcua/transport.h"
 #include "server_internal.h"
 #ifdef MUC_OPCUA_SERVICE_HISTORY
 #include "../services/history.h"
@@ -187,7 +189,7 @@ static const mu_service_descriptor_t g_supported_services[] = {
     {{MU_ID_GETENDPOINTSREQUEST, MU_ID_GETENDPOINTSRESPONSE, false}, handle_get_endpoints},
 #endif
     {{MU_ID_OPENSECURECHANNELREQUEST, MU_ID_OPENSECURECHANNELRESPONSE, false}, handle_open_secure_channel},
-    {{MU_ID_CLOSESECURECHANNELREQUEST, MU_ID_CLOSESECURECHANNELRESPONSE, false}, NULL},
+    {{MU_ID_CLOSESECURECHANNELREQUEST, MU_ID_CLOSESECURECHANNELRESPONSE, false}, handle_close_secure_channel},
     {{MU_ID_CREATESESSIONREQUEST, MU_ID_CREATESESSIONRESPONSE, false},
      handle_create_session}, /* Does not require an activated session */
     {{MU_ID_ACTIVATESESSIONREQUEST, MU_ID_ACTIVATESESSIONRESPONSE, false},
@@ -460,9 +462,24 @@ static opcua_statuscode_t handle_open_secure_channel(mu_server_t *server, mu_bin
     if (r->status != MU_STATUS_GOOD) {
         return r->status;
     }
+    /* OPC-10000-4 §5.6.2.3 Table 12: requestType shall be ISSUE (0) or
+       RENEW (1). Any other value is rejected with Bad_RequestTypeInvalid. */
+    if (request_type > 1) {
+        return MU_STATUS_BAD_REQUESTTYPEINVALID;
+    }
     s = mu_binary_read_bytestring(r, &client_nonce);
     if (s != MU_STATUS_GOOD) {
         return s;
+    }
+    /* OPC-10000-4 section 5.6.2.3 Table 12: a Server shall check the minimum
+        length of the Client nonce and return Bad_NonceInvalid if the length is
+        below 32 bytes. The spec also bounds the upper end at 128 bytes (per
+        OPC-10000-4 section 5.7.2.2 / OPC-10000-7 SecureChannelNonceLength). A
+        null nonce (length == -1) or empty nonce (length == 0) is allowed; this
+        sentinel is used with the None SecurityPolicy where no nonce is
+        required. asyncua sends an empty (length 0) ByteString for None. */
+    if (client_nonce.length > 0 && (client_nonce.length < 32 || client_nonce.length > 128)) {
+        return MU_STATUS_BAD_NONCEINVALID;
     }
     mu_binary_read_uint32(r, &requested_lifetime);
     if (r->status != MU_STATUS_GOOD) {
@@ -481,7 +498,8 @@ static opcua_statuscode_t handle_open_secure_channel(mu_server_t *server, mu_bin
     }
 
     s = mu_secure_channel_open(&server_secure_channel, current_opn_security_policy(server),
-                               (mu_message_security_mode_t)security_mode, requested_lifetime, &revised);
+                               (mu_message_security_mode_t)security_mode, requested_lifetime,
+                               &server->config.entropy_adapter, &revised);
     if (s != MU_STATUS_GOOD) {
         return s;
     }
@@ -524,7 +542,7 @@ static opcua_statuscode_t handle_open_secure_channel(mu_server_t *server, mu_bin
                                ? server->config.time_adapter.get_time(server->config.time_adapter.context)
                                : 0;
 
-    mu_binary_write_uint32(w, 0);                                /* ServerProtocolVersion */
+    mu_binary_write_uint32(w, MU_OPC_UA_TCP_PROTOCOL_VERSION);   /* ServerProtocolVersion (OPC-10000-6 §7.1.2.2) */
     mu_binary_write_uint32(w, server_secure_channel.channel_id); /* SecurityToken.ChannelId */
     mu_binary_write_uint32(w, server_secure_channel.token_id);   /* SecurityToken.TokenId */
     mu_binary_write_int64(w, now);                               /* SecurityToken.CreatedAt */
@@ -568,6 +586,34 @@ static opcua_statuscode_t handle_open_secure_channel(mu_server_t *server, mu_bin
 #else
     (void)client_nonce;
 #endif
+
+    *response_length = w->position;
+    return MU_STATUS_GOOD;
+}
+
+/* CloseSecureChannel (OPC-10000-4 §5.6.3.2 Table 13): decode the request
+   header, close the active SecureChannel, and encode
+   CloseSecureChannelResponse. The response carries only a ResponseHeader — no
+   body fields — per Table 13. */
+opcua_statuscode_t handle_close_secure_channel(mu_server_t *server, mu_binary_reader_t *r, mu_binary_writer_t *w,
+                                               size_t *response_length) {
+    mu_request_header_t req;
+    opcua_statuscode_t s = mu_request_header_decode(r, &req);
+    if (s != MU_STATUS_GOOD) {
+        return s;
+    }
+
+    s = mu_secure_channel_close(&server_secure_channel);
+    if (s != MU_STATUS_GOOD) {
+        return s;
+    }
+
+    /* OPC-10000-4 §5.6.3.2 Table 13: CloseSecureChannelResponse has only a
+       ResponseHeader; there are no body fields to encode. */
+    s = write_response_prefix(w, MU_ID_CLOSESECURECHANNELRESPONSE, req.request_handle, MU_STATUS_GOOD);
+    if (s != MU_STATUS_GOOD) {
+        return s;
+    }
 
     *response_length = w->position;
     return MU_STATUS_GOOD;
@@ -1296,7 +1342,12 @@ static opcua_statuscode_t handle_create_monitored_items(mu_server_t *server, mu_
     if (r->status != MU_STATUS_GOOD) {
         return r->status;
     }
-    (void)timestamps_to_return;
+    /* OPC-10000-4 §5.13.2.2 Table 63: TimestampsToReturn is an enumeration
+       (Source=0, Server=1, Both=2, Neither=3). Reject anything else with
+       Bad_TimestampsToReturnInvalid per §7.38.2. */
+    if (timestamps_to_return > MU_TIMESTAMPS_TO_RETURN_NEITHER) {
+        return MU_STATUS_BAD_TIMESTAMPSTORETURNINVALID;
+    }
 
     if (items_to_create > 0 && (size_t)items_to_create > MU_DISPATCH_MAX_SUBSCRIPTION_OPERATIONS) {
         return MU_STATUS_BAD_TOOMANYOPERATIONS;
@@ -1306,7 +1357,6 @@ static opcua_statuscode_t handle_create_monitored_items(mu_server_t *server, mu_
     if (sub == NULL) {
         return MU_STATUS_BAD_SUBSCRIPTIONIDINVALID;
     }
-    (void)sub;
 
     if (items_to_create <= 0) {
         return MU_STATUS_BAD_NOTHINGTODO;
@@ -1403,7 +1453,15 @@ static opcua_statuscode_t handle_create_monitored_items(mu_server_t *server, mu_
         item->client_handle = body.client_handle;
         item->monitoring_mode = (opcua_byte_t)body.monitoring_mode;
         item->trigger = MU_DATACHANGE_TRIGGER_STATUS_VALUE;
-        item->sampling_interval_ms = publishing_interval_bits_to_ms(body.sampling_interval_bits);
+        item->timestamps_to_return = (opcua_byte_t)timestamps_to_return;
+        /* OPC-10000-4 §7.21: a SamplingInterval of -1 (any negative Double,
+           detected via the sign bit) requests the default defined by the
+           Subscription's publishing interval. Otherwise revise/clamp as usual. */
+        if ((body.sampling_interval_bits & MU_DOUBLE_SIGN_BIT) != 0u) {
+            item->sampling_interval_ms = sub->publishing_interval_ms;
+        } else {
+            item->sampling_interval_ms = publishing_interval_bits_to_ms(body.sampling_interval_bits);
+        }
         item->next_sample_ms = now_ms + item->sampling_interval_ms;
         item->has_value = false;
         item->pending = false;
@@ -1446,8 +1504,17 @@ static opcua_statuscode_t handle_create_monitored_items(mu_server_t *server, mu_
         (void)body.queue_size;
         (void)body.discard_oldest;
 
+        /* OPC-10000-4 §5.13.2.2 Table 63: RevisedQueueSize reflects the
+           queue capacity actually allocated. Under MUC_OPCUA_SUBSCRIPTIONS_STANDARD
+           item->queue_size holds the revised (clamped 1..MU_MONITORED_QUEUE_DEPTH)
+           value; otherwise the minimal queue depth of 1 is reported. */
+#if MUC_OPCUA_SUBSCRIPTIONS_STANDARD
+        const opcua_uint32_t revised_queue_size = item->queue_size;
+#else
+        const opcua_uint32_t revised_queue_size = 1u;
+#endif
         s = write_monitored_item_create_result(w, MU_STATUS_GOOD, item->monitored_item_id, item->sampling_interval_ms,
-                                               1u);
+                                               revised_queue_size);
         if (s != MU_STATUS_GOOD) {
             return s;
         }
@@ -1463,14 +1530,15 @@ static opcua_statuscode_t handle_create_monitored_items(mu_server_t *server, mu_
 }
 
 static opcua_statuscode_t write_monitored_item_modify_result(mu_binary_writer_t *w, opcua_statuscode_t result,
-                                                             opcua_uint32_t revised_sampling_interval_ms) {
+                                                             opcua_uint32_t revised_sampling_interval_ms,
+                                                             opcua_uint32_t revised_queue_size) {
     opcua_uint64_t sampling_bits = 0u;
     mu_binary_write_statuscode(w, result);
     if (result == MU_STATUS_GOOD) {
         sampling_bits = publishing_interval_ms_to_bits(revised_sampling_interval_ms);
     }
     mu_binary_write_uint64(w, sampling_bits);
-    mu_binary_write_uint32(w, 1u);
+    mu_binary_write_uint32(w, revised_queue_size);
     if (w->status != MU_STATUS_GOOD) {
         return w->status;
     }
@@ -1520,7 +1588,6 @@ static opcua_statuscode_t handle_modify_monitored_items(mu_server_t *server, mu_
     if (s != MU_STATUS_GOOD) {
         return s;
     }
-
     for (opcua_int32_t i = 0; i < count; ++i) {
         opcua_uint32_t monitored_item_id;
         opcua_uint32_t client_handle;
@@ -1529,8 +1596,20 @@ static opcua_statuscode_t handle_modify_monitored_items(mu_server_t *server, mu_
         size_t filter_length;
         opcua_statuscode_t filter_result = MU_STATUS_GOOD;
         bool has_datachange_filter = false;
+        bool has_aggregate_filter = false;
         opcua_uint32_t queue_size;
         opcua_boolean_t discard_oldest;
+#if MUC_OPCUA_SUBSCRIPTIONS_STANDARD
+        mu_monitored_item_create_body_t filter_body;
+        filter_body.trigger = MU_DATACHANGE_TRIGGER_STATUS_VALUE;
+        filter_body.deadband_type = MU_DEADBAND_TYPE_NONE;
+        filter_body.deadband_value = 0.0;
+        filter_body.filter_result = MU_STATUS_GOOD;
+        filter_body.has_datachange_filter = false;
+        filter_body.has_aggregate = false;
+        filter_body.aggregate_type = 0u;
+        filter_body.processing_interval = 0.0;
+#endif
 
         mu_binary_read_uint32(r, &monitored_item_id);
         mu_binary_read_uint32(r, &client_handle);
@@ -1550,20 +1629,26 @@ static opcua_statuscode_t handle_modify_monitored_items(mu_server_t *server, mu_
 #if MUC_OPCUA_SUBSCRIPTIONS_STANDARD
         if (is_datachange_filter_binary_type(&filter_type)) {
             const size_t filter_body_start = r->position;
-            mu_monitored_item_create_body_t filter_body;
+
             has_datachange_filter = true;
-            filter_body.trigger = MU_DATACHANGE_TRIGGER_STATUS_VALUE;
-            filter_body.deadband_type = MU_DEADBAND_TYPE_NONE;
-            filter_body.deadband_value = 0.0;
-            filter_body.filter_result = MU_STATUS_GOOD;
             filter_body.has_datachange_filter = true;
-            filter_body.has_aggregate = false;
-            filter_body.aggregate_type = 0u;
-            filter_body.processing_interval = 0.0;
 
             /* OPC-10000-4 sections 5.13.3.4 and 7.22.2: invalid
                DataChangeFilter enum fields are per-item filter results. */
             s = read_datachange_filter_body(r, filter_length, &filter_body);
+            if (s != MU_STATUS_GOOD) {
+                return s;
+            }
+            if (r->position != filter_body_start + filter_length) {
+                return MU_STATUS_BAD_DECODINGERROR;
+            }
+            filter_result = filter_body.filter_result;
+        } else if (filter_type.identifier_type == MU_NODEID_NUMERIC && filter_type.namespace_index == 0u &&
+                   filter_type.identifier.numeric == MU_ID_AGGREGATEFILTER_ENCODING_DEFAULTBINARY) {
+            const size_t filter_body_start = r->position;
+
+            has_aggregate_filter = true;
+            s = read_aggregate_filter_body(r, filter_length, &filter_body);
             if (s != MU_STATUS_GOOD) {
                 return s;
             }
@@ -1602,6 +1687,7 @@ static opcua_statuscode_t handle_modify_monitored_items(mu_server_t *server, mu_
         mu_monitored_item_t *item = find_monitored_item(server, subscription_id, monitored_item_id);
         opcua_statuscode_t result = MU_STATUS_BAD_MONITOREDITEMIDINVALID;
         opcua_uint32_t revised_sampling_interval_ms = 0u;
+        opcua_uint32_t revised_queue_size = 1u;
         if (item != NULL) {
             if (filter_result != MU_STATUS_GOOD) {
                 result = filter_result;
@@ -1609,15 +1695,51 @@ static opcua_statuscode_t handle_modify_monitored_items(mu_server_t *server, mu_
                 /* OPC-10000-4 section 5.13.3.4: valid MonitoringFilters can
                    still be disallowed for the target MonitoredItem. */
                 result = MU_STATUS_BAD_FILTERNOTALLOWED;
+            } else if (has_aggregate_filter && item->attribute_id != MU_MONITORED_VALUE_ATTRIBUTE_ID) {
+                result = MU_STATUS_BAD_FILTERNOTALLOWED;
             } else {
                 revised_sampling_interval_ms = publishing_interval_bits_to_ms(sampling_interval_bits);
                 item->sampling_interval_ms = revised_sampling_interval_ms;
                 item->client_handle = client_handle;
+#if MUC_OPCUA_SUBSCRIPTIONS_STANDARD
+                /* OPC-10000-4 §5.13.3.2 Table 67: the Server shall accept
+                   and revise queueSize and discardOldest on modify. Clamp the
+                   requested queue to [1, MU_MONITORED_QUEUE_DEPTH] mirroring
+                   CreateMonitoredItems, and report the revised value. */
+                item->queue_size = queue_size;
+                if (item->queue_size == 0u) {
+                    item->queue_size = 1u;
+                }
+                if (item->queue_size > MU_MONITORED_QUEUE_DEPTH) {
+                    item->queue_size = MU_MONITORED_QUEUE_DEPTH;
+                }
+                item->discard_oldest = discard_oldest;
+                revised_queue_size = item->queue_size;
+                /* OPC-10000-4 §5.13.3.1/§5.13.3.2: changes to MonitoredItem
+                   settings (including filters) shall be applied immediately.
+                   Apply the decoded DataChangeFilter and AggregateFilter
+                   fields to the item, mirroring CreateMonitoredItems. */
+                if (has_datachange_filter) {
+                    item->trigger = (opcua_byte_t)filter_body.trigger;
+                    item->deadband_type = (opcua_byte_t)filter_body.deadband_type;
+                    item->deadband_value = filter_body.deadband_value;
+                }
+                if (has_aggregate_filter) {
+                    item->has_aggregate = true;
+                    item->aggregate_state.aggregate_type = filter_body.aggregate_type;
+                    item->aggregate_state.processing_interval = filter_body.processing_interval;
+                    item->aggregate_state.sample_count = 0u;
+                    memset(&item->aggregate_state.accumulator, 0, sizeof(item->aggregate_state.accumulator));
+                    opcua_uint64_t now_ms =
+                        server->config.time_adapter.get_tick_ms(server->config.time_adapter.context);
+                    item->aggregate_state.last_calculation = (opcua_datetime_t)now_ms;
+                }
+#endif
                 result = MU_STATUS_GOOD;
             }
         }
 
-        s = write_monitored_item_modify_result(w, result, revised_sampling_interval_ms);
+        s = write_monitored_item_modify_result(w, result, revised_sampling_interval_ms, revised_queue_size);
         if (s != MU_STATUS_GOOD) {
             return s;
         }
@@ -2124,6 +2246,12 @@ opcua_statuscode_t mu_service_dispatch(mu_server_t *server, opcua_uint32_t reque
         }
         mu_session_t *session = mu_session_find_by_token(server->sessions, MU_MAX_SESSIONS, auth_token);
         if (session == NULL) {
+            /* OPC-10000-4 section 5.7.4.1: a request carrying the token of a
+               Session that has been closed (but whose slot has not yet been
+               reused) is Bad_SessionClosed, not Bad_SessionIdInvalid. */
+            if (mu_session_find_closed_by_token(server->sessions, MU_MAX_SESSIONS, auth_token) != NULL) {
+                return MU_STATUS_BAD_SESSIONCLOSED;
+            }
             /* OPC-10000-4 section 7.38.2: an unknown Session authenticationToken
                is Bad_SessionIdInvalid, before channel-binding or activation checks. */
             return MU_STATUS_BAD_SESSIONIDINVALID;

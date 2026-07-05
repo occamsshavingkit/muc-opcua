@@ -9,6 +9,19 @@
 void setUp(void) {}
 void tearDown(void) {}
 
+/* SecureChannelId assigned by the server in the OPN response; MSG chunks must
+   carry this id (OPC-10000-6 section 6.7.2.2). It is read from the OPN response
+   after the OPN poll and used by build_msg for subsequent MSG chunks. */
+static opcua_uint32_t s_channel_id = 1u;
+
+static opcua_uint32_t read_opn_channel_id(const opcua_byte_t *buf, size_t len) {
+    if (len < 12) {
+        return 1u;
+    }
+    return (opcua_uint32_t)buf[8] | ((opcua_uint32_t)buf[9] << 8u) | ((opcua_uint32_t)buf[10] << 16u) |
+           ((opcua_uint32_t)buf[11] << 24u);
+}
+
 #define MAX_INBOUND 8
 typedef struct {
     int accept_count;
@@ -93,7 +106,7 @@ static size_t build_msg(opcua_byte_t *out, size_t cap, opcua_uint32_t seq, opcua
     out[3] = 'F';
     w.position = 4;
     mu_binary_write_uint32(&w, (opcua_uint32_t)(24 + body_len));
-    mu_binary_write_uint32(&w, 1);
+    mu_binary_write_uint32(&w, s_channel_id);
     mu_binary_write_uint32(&w, 1);
     mu_binary_write_uint32(&w, seq);
     mu_binary_write_uint32(&w, reqid);
@@ -209,6 +222,44 @@ void test_write_service_integration(void) {
     }
     enqueue(&mock, chunk, w.position);
 
+    /* ---- Configure the server ---- */
+    mu_server_config_t config;
+    (void)memset(&config, 0, sizeof(config));
+    config.endpoint_url = "opc.tcp://host:4840";
+    config.application_uri = "urn:test";
+    config.product_uri = "urn:test";
+    config.application_name = "test";
+    static opcua_byte_t rx[8192], tx[8192];
+    config.receive_buffer = rx;
+    config.receive_buffer_size = sizeof(rx);
+    config.send_buffer = tx;
+    config.send_buffer_size = sizeof(tx);
+    config.max_chunk_count = 1;
+    config.max_message_size = 8192;
+    config.max_sessions = 1;
+    config.max_secure_channels = 1;
+    fake_platform_init(NULL, &config.time_adapter, &config.entropy_adapter);
+    config.tcp_adapter.context = &mock;
+    config.tcp_adapter.listen = mock_listen;
+    config.tcp_adapter.accept = mock_accept;
+    config.tcp_adapter.read = mock_read;
+    config.tcp_adapter.write = mock_write;
+    config.tcp_adapter.close_connection = mock_close;
+    config.tcp_adapter.shutdown = mock_shutdown;
+    config.address_space = &space;
+
+    /* Write Handler registration */
+    config.write_handler = test_write_handler;
+
+    _Alignas(8) opcua_byte_t storage[MU_SERVER_STORAGE_BYTES];
+    mu_server_t *server = NULL;
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_server_init(storage, sizeof(storage), &config, &server));
+
+    mu_server_poll(server); /* accept */
+    mu_server_poll(server); /* HEL -> ACK */
+    mu_server_poll(server); /* OPN -> Response */
+    s_channel_id = read_opn_channel_id(mock.last_write, mock.last_write_len);
+
     /* 3. CreateSession */
     mu_binary_writer_init(&w, tmp, sizeof(tmp));
     {
@@ -314,42 +365,6 @@ void test_write_service_integration(void) {
     clen = build_msg(chunk, sizeof(chunk), 4, 4, tmp, w.position);
     enqueue(&mock, chunk, clen);
 
-    /* ---- Configure the server ---- */
-    mu_server_config_t config;
-    (void)memset(&config, 0, sizeof(config));
-    config.endpoint_url = "opc.tcp://host:4840";
-    config.application_uri = "urn:test";
-    config.product_uri = "urn:test";
-    config.application_name = "test";
-    static opcua_byte_t rx[8192], tx[8192];
-    config.receive_buffer = rx;
-    config.receive_buffer_size = sizeof(rx);
-    config.send_buffer = tx;
-    config.send_buffer_size = sizeof(tx);
-    config.max_chunk_count = 1;
-    config.max_message_size = 8192;
-    config.max_sessions = 1;
-    config.max_secure_channels = 1;
-    fake_platform_init(NULL, &config.time_adapter, &config.entropy_adapter);
-    config.tcp_adapter.context = &mock;
-    config.tcp_adapter.listen = mock_listen;
-    config.tcp_adapter.accept = mock_accept;
-    config.tcp_adapter.read = mock_read;
-    config.tcp_adapter.write = mock_write;
-    config.tcp_adapter.close_connection = mock_close;
-    config.tcp_adapter.shutdown = mock_shutdown;
-    config.address_space = &space;
-
-    /* Write Handler registration */
-    config.write_handler = test_write_handler;
-
-    _Alignas(8) opcua_byte_t storage[MU_SERVER_STORAGE_BYTES];
-    mu_server_t *server = NULL;
-    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_server_init(storage, sizeof(storage), &config, &server));
-
-    mu_server_poll(server); /* accept */
-    mu_server_poll(server); /* HEL -> ACK */
-    mu_server_poll(server); /* OPN -> Response */
     mu_server_poll(server); /* CreateSession -> Response */
     mu_server_poll(server); /* ActivateSession -> Response */
 

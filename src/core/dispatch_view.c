@@ -36,17 +36,25 @@ opcua_statuscode_t mu_browse_process_with_user_index(const mu_address_space_t *a
 #endif
 
 #ifdef MUC_OPCUA_SERVICE_BROWSE
-static opcua_boolean_t browse_name_equals(const mu_string_t *left, const mu_string_t *right) {
-    if (left->length != right->length) {
+/* Compare two QualifiedNames (OPC-10000-4 §7.30): both the namespace_index
+ * and the name string must match. Static address-space nodes do not store a
+ * browse_name namespace_index, so callers pass 0 (the default namespace) for
+ * the node side. */
+static opcua_boolean_t browse_name_equals(opcua_uint16_t node_namespace_index, const mu_string_t *node_name,
+                                          opcua_uint16_t target_namespace_index, const mu_string_t *target_name) {
+    if (node_namespace_index != target_namespace_index) {
         return false;
     }
-    if (left->length <= 0) {
-        return left->length == 0;
-    }
-    if (left->data == NULL || right->data == NULL) {
+    if (node_name->length != target_name->length) {
         return false;
     }
-    return memcmp(left->data, right->data, (size_t)left->length) == 0;
+    if (node_name->length <= 0) {
+        return node_name->length == 0;
+    }
+    if (node_name->data == NULL || target_name->data == NULL) {
+        return false;
+    }
+    return memcmp(node_name->data, target_name->data, (size_t)node_name->length) == 0;
 }
 
 /* TranslateBrowsePathsToNodeIds (OPC 10000-4 5.9.4): resolve each RelativePath
@@ -107,6 +115,7 @@ opcua_statuscode_t handle_translate_browse_paths(mu_server_t *server, mu_binary_
         }
 
         size_t element_total = (size_t)element_count;
+        opcua_statuscode_t path_status = MU_STATUS_GOOD;
         for (size_t element_index = 0; element_index < element_total; ++element_index) {
             mu_nodeid_t reference_type_id;
             opcua_boolean_t is_inverse;
@@ -128,7 +137,15 @@ opcua_statuscode_t handle_translate_browse_paths(mu_server_t *server, mu_binary_
             if (s != MU_STATUS_GOOD) {
                 return s;
             }
-            (void)target_namespace_index; /* Nano model stores BrowseName name only. */
+
+            /* T018 (OPC-10000-4 §5.9.4.1): the last RelativePathElement must
+             * carry a targetName. Empty/null is "missing" -> Bad_BrowseNameInvalid. */
+            if (element_index == element_total - 1U &&
+                (target_name.length <= 0 || target_name.data == NULL)) {
+                path_status = MU_STATUS_BAD_BROWSENAMEINVALID;
+                current = NULL;
+                break;
+            }
 
             if (current != NULL) {
                 const mu_node_t *next = NULL;
@@ -155,7 +172,9 @@ opcua_statuscode_t handle_translate_browse_paths(mu_server_t *server, mu_binary_
                     if (target == NULL) {
                         continue;
                     }
-                    if (!browse_name_equals(&target->browse_name, &target_name)) {
+                    /* T017 (OPC-10000-4 §7.30): QualifiedName match must include
+                     * namespace_index. Static nodes implicitly use namespace 0. */
+                    if (!browse_name_equals(0, &target->browse_name, target_namespace_index, &target_name)) {
                         continue;
                     }
 
@@ -166,7 +185,13 @@ opcua_statuscode_t handle_translate_browse_paths(mu_server_t *server, mu_binary_
             }
         }
 
-        if (current != NULL) {
+        if (path_status == MU_STATUS_BAD_BROWSENAMEINVALID) {
+            mu_binary_write_statuscode(w, MU_STATUS_BAD_BROWSENAMEINVALID);
+            mu_binary_write_int32(w, 0);
+            if (w->status != MU_STATUS_GOOD) {
+                return w->status;
+            }
+        } else if (current != NULL) {
             mu_binary_write_statuscode(w, MU_STATUS_GOOD);
             mu_binary_write_int32(w, 1);
             if (w->status != MU_STATUS_GOOD) {

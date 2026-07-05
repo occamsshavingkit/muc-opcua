@@ -111,6 +111,97 @@ void test_validate_accepts_in_window_cert(void) {
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, crypto.verify_certificate_validity(crypto.context, cert, cert_len));
 }
 
+/* ---- OPC-10000-4 §5.7.2.1: ApplicationUri-to-ClientCertificate binding ---- */
+
+/* The host adapter's self-signed certificate has Subject CN "muc-opcua" and no
+   SubjectAltName URI extension, so the Subject CN fallback path matches. */
+void test_application_uri_matches_subject_cn(void) {
+    const opcua_byte_t *cert = NULL;
+    size_t cert_len = 0;
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, crypto.get_own_certificate(crypto.context, &cert, &cert_len));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD,
+                      crypto.verify_certificate_application_uri(crypto.context, cert, cert_len, "muc-opcua", 9));
+}
+
+/* A URI that matches neither SAN nor CN is rejected. */
+void test_application_uri_rejects_mismatch(void) {
+    const opcua_byte_t *cert = NULL;
+    size_t cert_len = 0;
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, crypto.get_own_certificate(crypto.context, &cert, &cert_len));
+    TEST_ASSERT_EQUAL(MU_STATUS_BAD_CERTIFICATEURIINVALID,
+                      crypto.verify_certificate_application_uri(crypto.context, cert, cert_len,
+                                                                 "urn:wrong:application", 21));
+}
+
+/* Unparseable certificate bytes are reported as Bad_CertificateInvalid. */
+void test_application_uri_rejects_unparseable_cert(void) {
+    opcua_byte_t junk[64];
+    (void)memset(junk, 0xCD, sizeof(junk));
+    TEST_ASSERT_EQUAL(MU_STATUS_BAD_CERTIFICATEINVALID,
+                      crypto.verify_certificate_application_uri(crypto.context, junk, sizeof(junk), "x", 1));
+}
+
+/* A null/empty ApplicationUri is rejected at the callback layer (the wrapper
+   also skips on null before reaching here). */
+void test_application_uri_rejects_empty_uri(void) {
+    const opcua_byte_t *cert = NULL;
+    size_t cert_len = 0;
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, crypto.get_own_certificate(crypto.context, &cert, &cert_len));
+    TEST_ASSERT_EQUAL(MU_STATUS_BAD_CERTIFICATEURIINVALID,
+                      crypto.verify_certificate_application_uri(crypto.context, cert, cert_len, "", 0));
+}
+
+/* mu_certificate_validate_application_uri wrapper: skips when policy is None or
+   when application_uri is null/empty (backward-compat with test clients). */
+void test_validate_application_uri_skips_for_none_policy(void) {
+    const opcua_byte_t *cert = NULL;
+    size_t cert_len = 0;
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, crypto.get_own_certificate(crypto.context, &cert, &cert_len));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD,
+                      mu_certificate_validate_application_uri(&crypto, MU_SECURITY_POLICY_NONE_ID, cert, cert_len,
+                                                               "urn:does:not:match", 19));
+}
+
+void test_validate_application_uri_skips_when_uri_empty(void) {
+    const opcua_byte_t *cert = NULL;
+    size_t cert_len = 0;
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, crypto.get_own_certificate(crypto.context, &cert, &cert_len));
+    /* Empty URI is permitted (skip) to preserve existing test clients. */
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD,
+                      mu_certificate_validate_application_uri(&crypto, MU_SECURITY_POLICY_BASIC256SHA256_ID, cert,
+                                                               cert_len, NULL, 0));
+}
+
+void test_validate_application_uri_accepts_matching_cn(void) {
+    const opcua_byte_t *cert = NULL;
+    size_t cert_len = 0;
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, crypto.get_own_certificate(crypto.context, &cert, &cert_len));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD,
+                      mu_certificate_validate_application_uri(&crypto, MU_SECURITY_POLICY_BASIC256SHA256_ID, cert,
+                                                               cert_len, "muc-opcua", 9));
+}
+
+void test_validate_application_uri_rejects_mismatch(void) {
+    const opcua_byte_t *cert = NULL;
+    size_t cert_len = 0;
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, crypto.get_own_certificate(crypto.context, &cert, &cert_len));
+    TEST_ASSERT_EQUAL(MU_STATUS_BAD_CERTIFICATEURIINVALID,
+                      mu_certificate_validate_application_uri(&crypto, MU_SECURITY_POLICY_BASIC256SHA256_ID, cert,
+                                                               cert_len, "urn:wrong:app", 13));
+}
+
+/* Adapters without the callback skip the check (preserves backward compat). */
+void test_validate_application_uri_skips_when_hook_absent(void) {
+    const opcua_byte_t *cert = NULL;
+    size_t cert_len = 0;
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, crypto.get_own_certificate(crypto.context, &cert, &cert_len));
+    mu_crypto_adapter_t no_hook = crypto;
+    no_hook.verify_certificate_application_uri = NULL;
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD,
+                      mu_certificate_validate_application_uri(&no_hook, MU_SECURITY_POLICY_BASIC256SHA256_ID, cert,
+                                                               cert_len, "urn:does:not:match", 19));
+}
+
 int main(void) {
     UNITY_BEGIN();
     RUN_TEST(test_thumbprint_is_sha1_of_der);
@@ -121,6 +212,16 @@ int main(void) {
     RUN_TEST(test_validate_fails_closed_without_validity_hook);
     RUN_TEST(test_validate_propagates_expired_cert);
     RUN_TEST(test_validate_accepts_in_window_cert);
+    /* T004: ApplicationUri-vs-ClientCertificate binding (OPC-10000-4 §5.7.2.1). */
+    RUN_TEST(test_application_uri_matches_subject_cn);
+    RUN_TEST(test_application_uri_rejects_mismatch);
+    RUN_TEST(test_application_uri_rejects_unparseable_cert);
+    RUN_TEST(test_application_uri_rejects_empty_uri);
+    RUN_TEST(test_validate_application_uri_skips_for_none_policy);
+    RUN_TEST(test_validate_application_uri_skips_when_uri_empty);
+    RUN_TEST(test_validate_application_uri_accepts_matching_cn);
+    RUN_TEST(test_validate_application_uri_rejects_mismatch);
+    RUN_TEST(test_validate_application_uri_skips_when_hook_absent);
     return UNITY_END();
 }
 

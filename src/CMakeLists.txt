@@ -25,6 +25,7 @@ add_library(muc_opcua STATIC
     encoding/binary_extension_object.c
     encoding/binary_variant.c
     encoding/binary_datavalue.c
+    encoding/variant_type.c
     security/security_policy.c
     generated/opcua_ids.c
 )

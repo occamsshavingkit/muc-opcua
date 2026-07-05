@@ -287,6 +287,28 @@ opcua_statuscode_t mu_session_close(mu_session_t *session, opcua_uint32_t auth_t
         return MU_STATUS_BAD_SESSIONIDINVALID;
     }
 
-    mu_session_init(session); /* Revert back to closed state */
+    /* OPC-10000-4 section 5.7.4.1: mark the Session CLOSED but preserve the
+       authenticationToken and SessionId so that subsequent requests carrying
+       this token can be rejected with Bad_SessionClosed (rather than
+       Bad_SessionIdInvalid, which is reserved for a token the server has never
+       issued). The slot remains reusable: mu_session_find_free returns CLOSED
+       slots and mu_session_create_with_identifiers overwrites the token on
+       reuse. The server nonce is cleared as a security hygiene measure. */
+    session->state = MU_SESSION_STATE_CLOSED;
+    (void)memset(session->server_nonce, 0, sizeof(session->server_nonce));
     return MU_STATUS_GOOD;
+}
+
+mu_session_t *mu_session_find_closed_by_token(mu_session_t *sessions, size_t count, opcua_uint32_t auth_token) {
+    if (sessions == NULL) {
+        return NULL;
+    }
+
+    for (size_t i = 0; i < count; ++i) {
+        if (sessions[i].state == MU_SESSION_STATE_CLOSED && sessions[i].auth_token == auth_token) {
+            return &sessions[i];
+        }
+    }
+
+    return NULL;
 }
