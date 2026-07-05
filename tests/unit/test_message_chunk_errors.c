@@ -273,6 +273,7 @@ void test_message_chunk_abort_chunk_does_not_dispatch_service_payload(void) {
     TEST_ASSERT_EQUAL(0, transport.write_count);
 }
 
+#ifdef MUC_OPCUA_MULTI_CHUNK
 void test_message_chunk_non_final_chunk_in_single_chunk_mode_returns_tcp_error_without_dispatch(void) {
     /* OPC-10000-6 section 6.7.2: IsFinal 'C' is a continuation chunk; it is buffered for multi-chunk reassembly. */
     message_chunk_transport_t transport;
@@ -361,6 +362,7 @@ void test_message_chunk_continuation_followed_by_abort_sends_only_continuation_e
     TEST_ASSERT_EQUAL(1u, transport.read_index);
     TEST_ASSERT_EQUAL(0, transport.write_count);
 }
+#endif /* MUC_OPCUA_MULTI_CHUNK */
 
 void test_message_chunk_invalid_chunk_type(void) {
     opcua_byte_t buffer[12] = {'M', 'S', 'G', 'X', 12, 0, 0, 0, 0, 0, 0, 1};
@@ -378,9 +380,13 @@ int main(void) {
     RUN_TEST(test_message_chunk_abort_chunk_returns_tcp_error_status);
     RUN_TEST(test_message_chunk_abort_chunk_missing_error_code_rejected);
     RUN_TEST(test_message_chunk_abort_chunk_does_not_dispatch_service_payload);
+#ifdef MUC_OPCUA_MULTI_CHUNK
     RUN_TEST(test_message_chunk_non_final_chunk_in_single_chunk_mode_returns_tcp_error_without_dispatch);
+#endif
     RUN_TEST(test_message_chunk_incomplete_declared_chunk_waits_without_dispatch);
+#ifdef MUC_OPCUA_MULTI_CHUNK
     RUN_TEST(test_message_chunk_continuation_followed_by_abort_sends_only_continuation_error);
+#endif
     RUN_TEST(test_message_chunk_invalid_chunk_type);
     return UNITY_END();
 }
