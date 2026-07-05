@@ -101,7 +101,9 @@ static void prepare_server(mu_server_t *server) {
     TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD,
                             mu_session_create(&server->sessions[0], 0u, &revised_timeout, &session_id, &auth_token));
     TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_session_activate(&server->sessions[0], auth_token, 321u));
+#ifdef MUC_OPCUA_MULTIPLE_CONNECTIONS
     server->sessions[0].secure_channel_id = server->secure_channel.channel_id;
+#endif
     server->active_session = &server->sessions[0];
 
     mu_subscriptions_init(&server->subs);
