@@ -187,7 +187,7 @@ T044, T045, T046, T047, T048, T049
 
 **MVP (US1 only)**: T001 → T002-T004 → T044 → done. Fixes the 3 verified bugs in ~5 tasks.
 
-**Fast delivery**: T001 → all US1-6 in parallel → T044-T049. 51 tasks, high parallelism.
+**Fast delivery**: T001 → all US1-6 in parallel → T044-T049. 52 tasks, high parallelism.
 
 **Per AGENTS.md rules**:
 - Each task is coherent and atomic — one fix per task
