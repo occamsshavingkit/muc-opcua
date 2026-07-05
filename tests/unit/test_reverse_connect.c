@@ -4,7 +4,7 @@
  * Server-initiated TCP connections per OPC-10000-6 §7.5.
  * Behavioral tests to be added when MUC_OPCUA_REVERSE_CONNECT is implemented.
  */
-#warning "STUB: reverse connect tests not yet implemented — feature gated behind MUC_OPCUA_REVERSE_CONNECT"
+/* STUB: reverse connect tests not yet implemented - feature gated behind MUC_OPCUA_REVERSE_CONNECT */
 
 #include "unity.h"
 

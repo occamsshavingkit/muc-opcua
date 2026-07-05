@@ -4,7 +4,7 @@
  * OPC-10000-4 §A.2 (TimestampsToReturn).
  * Behavioral tests to be added when MUC_OPCUA_TIME_SYNC is implemented.
  */
-#warning "STUB: time sync tests not yet implemented — feature gated behind MUC_OPCUA_TIME_SYNC"
+/* STUB: time sync tests not yet implemented - feature gated behind MUC_OPCUA_TIME_SYNC */
 
 #include "unity.h"
 
