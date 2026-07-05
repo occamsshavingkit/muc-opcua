@@ -41,6 +41,57 @@ Items identified by CodeRabbit review of spec 039 (PR #251) — deferred for fut
 | STUB4 | `tests/unit/test_time_sync.c` | Security time synchronization | OPC-10000-4 §A.2 |
 | STUB5 | `tests/unit/test_complex_types.c` | Complex type round-trip encode/decode | OPC-10000-3 §5.6.4
 
+### Complexity Audit (2026-07-05) — Oversized Functions
+
+| ID | File | Function | Lines | Issue |
+|----|------|----------|-------|-------|
+| CX1 | `src/core/dispatch_session.c:208` | `handle_create_session` | 263 | 163 lines over budget |
+| CX2 | `src/core/dispatch_session.c:602` | `handle_activate_session` | 246 | 146 lines over |
+| CX3 | `src/core/service_dispatch.c:1569` | `handle_modify_monitored_items` | 210 | 110 lines over |
+| CX4 | `src/core/server.c:579` | `process_message` | 183 | 5 distinct concerns |
+| CX5 | `src/security/asym_chunk.c:281` | `mu_asym_chunk_unwrap` | 182 | 7+ responsibilities |
+| CX6 | `src/services/subscription_publish.c:457` | `write_data_change_notification` | 168 | 68 lines over |
+| CX7 | `src/security/asym_chunk.c:115` | `mu_asym_chunk_wrap` | 166 | 7+ responsibilities |
+| CX8 | `src/core/service_dispatch.c:452` | `handle_open_secure_channel` | 149 | 49 lines over |
+| CX9 | `src/services/subscription_publish.c:1018` | `publish_due` | 139 | 39 lines over |
+| CX10 | `src/core/server.c:440` | `handle_data_chunk_secure` | 134 | 34 lines over |
+| CX11 | `src/core/server.c:317` | `handle_data_chunk_plaintext` | 123 | 23 lines over |
+| CX12 | `src/services/subscription_publish.c:797` | `build_publish_response` | 117 | 17 lines over |
+| CX13 | `src/core/dispatch_session.c:95` | `read_create_session_request` | 109 | 9 lines over |
+| CX14 | `src/core/server.c:932` | `mu_server_poll` | 102 | 2 lines over |
+| CX15 | `src/services/read.c:324` | `read_attribute` | 102 | 2 lines over |
+| CX16 | `src/core/service_dispatch.c:1451` | `handle_create_monitored_items` | 98 | borderline |
+
+### Complexity Audit (2026-07-05) — Too Many Parameters
+
+| ID | File | Function | Params |
+|----|------|----------|--------|
+| CP1 | `src/security/sym_chunk.c:99` | `mu_sym_chunk_wrap` | 13 |
+| CP2 | `src/security/asym_chunk.c:115` | `mu_asym_chunk_wrap` | 12 |
+| CP3 | `src/security/asym_chunk.c:281` | `mu_asym_chunk_unwrap` | 9 |
+| CP4 | `src/core/uasc.c:13` | `mu_uasc_finalize_symmetric` | 8 |
+| CP5 | `src/core/service_dispatch.c:1252` | `drive_subscription_id_status_array` | 8 |
+| CP6 | `src/services/read.c:428` | `mu_read_process_with_user_index` | 8 |
+
+### Complexity Audit (2026-07-05) — Duplicate Code
+
+| ID | Area | Issue |
+|----|------|-------|
+| CD1 | `service_dispatch.c` + others | ns0-numeric NodeId check duplicated 13× — needs shared `mu_nodeid_is_ns0_numeric()` |
+| CD2 | `mbedtls_crypto_adapter.c` | 8 near-identical AES/OAEP functions differing only in key size or hash |
+| CD3 | `host_crypto_adapter.c` | 6 near-identical cipher/OAEP functions |
+| CD4 | `sym_chunk.c`, `asym_chunk.c` | Manual LE byte writes instead of `mu_binary_le_put_u32()` from `binary_le.h` |
+| CD5 | `dispatch_session.c` | Duplicate signature verification logic in `verify_activate_client_signature` and `handle_activate_certificate` |
+| CD6 | `server.c` | Poll helper duplication across `#ifdef` branches |
+
+### Complexity Audit (2026-07-05) — Deep Nesting
+
+| ID | File | Lines | Issue |
+|----|------|-------|-------|
+| CN1 | `src/core/service_dispatch.c` | 1122-1186 | Filter-type dispatch chain reaches 5 nesting levels |
+| CN2 | `src/core/service_dispatch.c` | 1621-1700 | Per-item filter-update logic nests 4-5 levels |
+| CN3 | `src/core/service_dispatch.c` | 961-1069 | `read_event_filter_body` triple-nested with string-comparison chain |
+
 ## ✅ Completed in Spec 039
 
 - Bugs: protocol version constant (T002), sampling interval fix (T003), timestampsToReturn validation (T004)
