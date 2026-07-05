@@ -73,7 +73,13 @@ opcua_statuscode_t mu_session_close(mu_session_t *session, opcua_uint32_t auth_t
    Unlike mu_session_close, no authenticationToken is required — the Server
    itself is closing the idle Session. As with CloseSession, the state is set to
    CLOSED and the serverNonce is zeroed, while the session_id and auth_token are
-   preserved so subsequent requests on the stale token return Bad_SessionClosed. */
+   preserved so subsequent requests on the stale token return Bad_SessionClosed.
+   When MUC_OPCUA_MULTI_CHUNK is off (nano profile), session timeout is not
+   tracked; the inline no-op satisfies callers that are compiled out. */
+#ifdef MUC_OPCUA_MULTI_CHUNK
 void mu_session_close_timeout(mu_session_t *session);
+#else
+static inline void mu_session_close_timeout(mu_session_t *session) { (void)session; }
+#endif
 
 #endif /* MUC_OPCUA_SERVICES_SESSION_H */

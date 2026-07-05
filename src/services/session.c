@@ -314,6 +314,7 @@ mu_session_t *mu_session_find_closed_by_token(mu_session_t *sessions, size_t cou
     return NULL;
 }
 
+#ifdef MUC_OPCUA_MULTI_CHUNK
 void mu_session_close_timeout(mu_session_t *session) {
     if (session == NULL) {
         return;
@@ -331,3 +332,4 @@ void mu_session_close_timeout(mu_session_t *session) {
     session->state = MU_SESSION_STATE_CLOSED;
     (void)memset(session->server_nonce, 0, sizeof(session->server_nonce));
 }
+#endif /* MUC_OPCUA_MULTI_CHUNK */
