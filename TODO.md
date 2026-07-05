@@ -5,7 +5,31 @@
 
 ## Remaining Active Backlog
 
-(All 43 items cleared — see Completed in Spec 039 below.)
+Items identified by CodeRabbit review of spec 039 (PR #251) — deferred for future cleanup:
+
+### Bugs (functional)
+
+| ID | File | Severity | Issue |
+|----|------|----------|-------|
+| CR1 | `tests/unit/test_write_response.c` | MEDIUM | Tests silently become no-ops when `MUC_OPCUA_SERVICE_WRITE` undefined — needs explicit skip placeholder |
+| CR2 | `src/security/asym_chunk.c` | LOW | Duplicate safe conversion logic; should reuse `mu_safe_int32_from_size_t` for cert/thumb length clamping |
+
+### Code Quality
+
+| ID | File | Severity | Issue |
+|----|------|----------|-------|
+| CR3 | `src/core/ctz.h` | LOW | `mu_ctz_u32` is a macro on GCC/Clang but `static inline` on fallback — unify to `static inline` wrapper for type safety |
+| CR4 | `src/core/safe_mem.h` | LOW | `#include <stdint.h>` between declarations instead of at top — reorder for MISRA compliance |
+| CR5 | `tests/unit/test_dispatch_subscription.c` | LOW | Duplicate helpers (`test_entropy`, `test_tick_ms`, `prepare_server`, etc.) from `test_transfer_subscriptions.c` — extract to shared test utility |
+
+### Documentation
+
+| ID | File | Severity | Issue |
+|----|------|----------|-------|
+| CR6 | `specs/039-clear-remaining-backlog/spec.md` | LOW | Summary says 43 items but listed categories sum to 40 — reconcile count |
+| CR7 | `specs/039-clear-remaining-backlog/plan.md` | LOW | Size budget missing CTZ de Bruijn lookup table (128 bytes static) |
+| CR8 | `specs/039-clear-remaining-backlog/quickstart.md` | LOW | Placeholder verification grep misses `#warning "STUB"` marker |
+| CR9 | `specs/039-clear-remaining-backlog/quickstart.md` | LOW | Full verification block starts with `cd build` but previous section already left reader there |
 
 ## ✅ Completed in Spec 039
 
