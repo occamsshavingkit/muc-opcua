@@ -4,8 +4,11 @@
 #include <stddef.h>
 #include <string.h>
 
-/* maxAge read cache (OPC-10000-4 �5.11.2) */
-#define MU_READ_CACHE_SIZE 4
+/* maxAge read cache (OPC-10000-4 section 5.11.2). Disabled: always re-reads from
+ * the data source, which satisfies maxAge=0 (mandatory) and is spec-compliant
+ * for maxAge>0 (caching is optional). Re-enable by moving cache into caller-provided
+ * server storage to avoid introducing BSS. */
+/* static cache disabled — no BSS, no RAM, always fresh reads */
 
 typedef struct {
     mu_nodeid_t node_id;
@@ -14,32 +17,15 @@ typedef struct {
     opcua_boolean_t valid;
 } mu_read_cache_entry_t;
 
-static mu_read_cache_entry_t g_read_cache[MU_READ_CACHE_SIZE];
-static size_t g_read_cache_next = 0;
-
 static opcua_boolean_t mu_read_cache_lookup(const mu_nodeid_t *node_id, opcua_double_t max_age_ms,
                                              opcua_datetime_t now, mu_variant_t *out) {
-    if (max_age_ms <= 0.0) return false;
-    opcua_datetime_t max_age_ticks = (opcua_datetime_t)(max_age_ms * 10000.0);
-    for (size_t i = 0; i < MU_READ_CACHE_SIZE; i++) {
-        if (g_read_cache[i].valid && mu_nodeid_equal(&g_read_cache[i].node_id, node_id)) {
-            if ((now - g_read_cache[i].read_time) <= max_age_ticks) {
-                *out = g_read_cache[i].variant;
-                return true;
-            }
-        }
-    }
+    (void)node_id; (void)max_age_ms; (void)now; (void)out;
     return false;
 }
 
 static void mu_read_cache_store(const mu_nodeid_t *node_id, const mu_variant_t *val,
                                  opcua_datetime_t read_time) {
-    if (!val) return;
-    g_read_cache[g_read_cache_next].node_id = *node_id;
-    g_read_cache[g_read_cache_next].variant = *val;
-    g_read_cache[g_read_cache_next].read_time = read_time;
-    g_read_cache[g_read_cache_next].valid = true;
-    g_read_cache_next = (g_read_cache_next + 1) % MU_READ_CACHE_SIZE;
+    (void)node_id; (void)val; (void)read_time;
 }
 
 static size_t variant_elem_size(mu_builtin_type_t type) {
