@@ -302,6 +302,7 @@ void test_message_chunk_non_final_chunk_in_single_chunk_mode_returns_tcp_error_w
     TEST_ASSERT_EQUAL(1u, transport.read_index);
     TEST_ASSERT_EQUAL(0, transport.write_count);
 }
+#endif /* MUC_OPCUA_MULTI_CHUNK */
 
 void test_message_chunk_incomplete_declared_chunk_waits_without_dispatch(void) {
     /* OPC-10000-6 section 6.7.2: MessageSize defines the chunk byte boundary; incomplete chunks are not dispatched. */
@@ -331,6 +332,7 @@ void test_message_chunk_incomplete_declared_chunk_waits_without_dispatch(void) {
     TEST_ASSERT_EQUAL(0, transport.write_count);
 }
 
+#ifdef MUC_OPCUA_MULTI_CHUNK
 void test_message_chunk_continuation_followed_by_abort_sends_only_continuation_error(void) {
     /* OPC-10000-6 section 6.7.3: a 'C' chunk followed by abort: 'C' is buffered, abort triggers assembler reset. */
     message_chunk_transport_t transport;
