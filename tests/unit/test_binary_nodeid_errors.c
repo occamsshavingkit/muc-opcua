@@ -265,8 +265,12 @@ int main(void) {
     RUN_TEST(test_binary_expanded_nodeid_truncated_namespace_uri_fails);
     RUN_TEST(test_binary_expanded_nodeid_truncated_server_index_fails);
 #ifdef MUC_OPCUA_EXTENDED_NODEIDS
+
+#ifdef MUC_OPCUA_EXTENDED_NODEIDS
     RUN_TEST(test_binary_nodeid_guid_decode_roundtrip);
     RUN_TEST(test_binary_nodeid_opaque_decode_roundtrip);
+#endif
+
 #endif /* MUC_OPCUA_EXTENDED_NODEIDS */
     return UNITY_END();
 }
