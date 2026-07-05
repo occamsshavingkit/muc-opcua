@@ -20,7 +20,7 @@ extern opcua_statuscode_t mu_read_process_with_user_index(const mu_address_space
                                                           const mu_address_space_t *dynamic,
                                                           const mu_read_request_t *req, opcua_datetime_t now,
                                                           mu_read_response_t *resp, mu_datavalue_t *results_array,
-                                                          size_t max_results, mu_read_cache_t *cache);
+                                                          size_t max_results);
 #endif
 
 #ifdef MUC_OPCUA_SERVICE_READ
@@ -51,7 +51,7 @@ opcua_statuscode_t handle_read(mu_server_t *server, mu_binary_reader_t *r, mu_bi
                                : 0;
     s = mu_read_process_with_user_index(server->config.address_space, &server->user_address_space_index,
                                         &server->runtime_base.space, &rreq, now, &rresp, results,
-                                        MU_DISPATCH_MAX_READ_NODES, &server->read_cache);
+                                        MU_DISPATCH_MAX_READ_NODES);
     if (s != MU_STATUS_GOOD) {
         return s;
     }
