@@ -180,6 +180,12 @@ void test_AddNodesResponse_Encode(void) {
     mu_binary_read_nodeid(&r, &nid);
     TEST_ASSERT_EQUAL(1, nid.namespace_index);
     TEST_ASSERT_EQUAL(1000, nid.identifier.numeric);
+
+    opcua_int32_t diag_len;
+    mu_binary_read_int32(&r, &diag_len);
+    TEST_ASSERT_EQUAL(0, diag_len);
+
+    TEST_ASSERT_EQUAL(w.position, r.position);
 }
 
 void test_DeleteNodesRequest_Decode(void) {
@@ -234,6 +240,12 @@ void test_DeleteNodesResponse_Encode(void) {
     opcua_uint32_t status_code;
     mu_binary_read_uint32(&r, &status_code);
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, status_code);
+
+    opcua_int32_t diag_len;
+    mu_binary_read_int32(&r, &diag_len);
+    TEST_ASSERT_EQUAL(0, diag_len);
+
+    TEST_ASSERT_EQUAL(w.position, r.position);
 }
 
 /* Encode AddReferencesRequest manually, then decode and check */
@@ -294,6 +306,12 @@ void test_AddReferencesResponse_Encode(void) {
     opcua_uint32_t status_code;
     mu_binary_read_uint32(&r, &status_code);
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, status_code);
+
+    opcua_int32_t diag_len;
+    mu_binary_read_int32(&r, &diag_len);
+    TEST_ASSERT_EQUAL(0, diag_len);
+
+    TEST_ASSERT_EQUAL(w.position, r.position);
 }
 
 void test_DeleteReferencesRequest_Decode(void) {
@@ -350,6 +368,12 @@ void test_DeleteReferencesResponse_Encode(void) {
     opcua_uint32_t status_code;
     mu_binary_read_uint32(&r, &status_code);
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, status_code);
+
+    opcua_int32_t diag_len;
+    mu_binary_read_int32(&r, &diag_len);
+    TEST_ASSERT_EQUAL(0, diag_len);
+
+    TEST_ASSERT_EQUAL(w.position, r.position);
 }
 
 void test_DeleteReferences_MissingReference_IsBadNotFound(void) {

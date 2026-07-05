@@ -88,6 +88,48 @@ void test_browse_service_response_encode(void) {
     opcua_int32_t num_refs;
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_int32(&reader, &num_refs));
     TEST_ASSERT_EQUAL(1, num_refs);
+
+    mu_nodeid_t ref_type_id;
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_nodeid(&reader, &ref_type_id));
+    TEST_ASSERT_EQUAL(35, ref_type_id.identifier.numeric);
+
+    opcua_boolean_t is_forward;
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_boolean(&reader, &is_forward));
+    TEST_ASSERT_TRUE(is_forward);
+
+    mu_nodeid_t node_id;
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_nodeid(&reader, &node_id));
+    TEST_ASSERT_EQUAL(85, node_id.identifier.numeric);
+
+    opcua_uint16_t browse_name_ns;
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_uint16(&reader, &browse_name_ns));
+    TEST_ASSERT_EQUAL(0, browse_name_ns);
+
+    mu_string_t browse_name;
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_string(&reader, &browse_name));
+    TEST_ASSERT_EQUAL(7, browse_name.length);
+
+    opcua_byte_t lt_mask;
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_byte(&reader, &lt_mask));
+    TEST_ASSERT_EQUAL(2, lt_mask);
+
+    mu_string_t disp_name;
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_string(&reader, &disp_name));
+    TEST_ASSERT_EQUAL(7, disp_name.length);
+
+    opcua_uint32_t node_class;
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_uint32(&reader, &node_class));
+    TEST_ASSERT_EQUAL(1, node_class);
+
+    mu_nodeid_t type_def;
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_nodeid(&reader, &type_def));
+    TEST_ASSERT_EQUAL(61, type_def.identifier.numeric);
+
+    opcua_int32_t diag_len;
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_int32(&reader, &diag_len));
+    TEST_ASSERT_EQUAL(0, diag_len);
+
+    TEST_ASSERT_EQUAL(writer.position, reader.position);
 }
 
 void test_browse_service_rejects_invalid_browse_direction(void) {

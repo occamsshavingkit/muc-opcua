@@ -839,6 +839,22 @@ void test_service_fault_encode(void) {
     mu_binary_read_uint32(&r, &h);
     mu_binary_read_statuscode(&r, &res);
     TEST_ASSERT_EQUAL(MU_STATUS_BAD_SERVICEUNSUPPORTED, res);
+
+    opcua_byte_t diag_mask;
+    mu_binary_read_byte(&r, &diag_mask);
+    TEST_ASSERT_EQUAL(0x00, diag_mask);
+
+    opcua_int32_t str_table_len;
+    mu_binary_read_int32(&r, &str_table_len);
+    TEST_ASSERT_EQUAL(-1, str_table_len);
+
+    mu_nodeid_t ext_obj_type;
+    size_t ext_obj_body_len;
+    mu_binary_read_extension_object_header(&r, &ext_obj_type, &ext_obj_body_len);
+    TEST_ASSERT_EQUAL(0, ext_obj_type.identifier.numeric);
+    TEST_ASSERT_EQUAL(0, ext_obj_body_len);
+
+    TEST_ASSERT_EQUAL(len, r.position);
 }
 
 void test_dispatch_unsupported_service_returns_bad_serviceunsupported(void) {
