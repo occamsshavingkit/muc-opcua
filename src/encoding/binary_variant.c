@@ -1,5 +1,102 @@
 /* src/encoding/binary_variant.c */
 #include "muc_opcua/encoding.h"
+#include <stdlib.h>
+
+/* In-memory element stride for a built-in type, for indexing array values. */
+static size_t element_size(mu_builtin_type_t type) {
+    static const size_t sizes[MU_TYPE_LOCALIZEDTEXT + 1] = {
+        [MU_TYPE_BOOLEAN] = sizeof(opcua_boolean_t),
+        [MU_TYPE_SBYTE] = sizeof(opcua_sbyte_t),
+        [MU_TYPE_BYTE] = sizeof(opcua_byte_t),
+        [MU_TYPE_INT16] = sizeof(opcua_int16_t),
+        [MU_TYPE_UINT16] = sizeof(opcua_uint16_t),
+        [MU_TYPE_INT32] = sizeof(opcua_int32_t),
+        [MU_TYPE_UINT32] = sizeof(opcua_uint32_t),
+        [MU_TYPE_INT64] = sizeof(opcua_int64_t),
+        [MU_TYPE_UINT64] = sizeof(opcua_uint64_t),
+        [MU_TYPE_FLOAT] = sizeof(opcua_float_t),
+        [MU_TYPE_DOUBLE] = sizeof(opcua_double_t),
+        [MU_TYPE_STRING] = sizeof(mu_string_t),
+        [MU_TYPE_DATETIME] = sizeof(opcua_datetime_t),
+        [MU_TYPE_BYTESTRING] = sizeof(mu_bytestring_t),
+        [MU_TYPE_NODEID] = sizeof(mu_nodeid_t),
+        [MU_TYPE_STATUSCODE] = sizeof(opcua_statuscode_t),
+        [MU_TYPE_QUALIFIEDNAME] = sizeof(mu_qualified_name_t),
+        [MU_TYPE_LOCALIZEDTEXT] = sizeof(mu_localized_text_t),
+    };
+    int type_id = (int)type;
+    if (type_id < 0 || (size_t)type_id >= sizeof(sizes) / sizeof(sizes[0])) {
+        return 0;
+    }
+    return sizes[type_id];
+}
+
+/* Read one built-in value into the slot pointed to by p (used for both
+   scalars and array elements). For scalars p is &variant->value (all union
+   members alias offset 0); for arrays it is the element address. */
+static opcua_statuscode_t read_scalar_value(mu_binary_reader_t *reader, mu_builtin_type_t type, void *p) {
+    switch (type) {
+    case MU_TYPE_BOOLEAN:
+        return mu_binary_read_boolean(reader, (opcua_boolean_t *)p);
+    case MU_TYPE_SBYTE:
+        return mu_binary_read_sbyte(reader, (opcua_sbyte_t *)p);
+    case MU_TYPE_BYTE:
+        return mu_binary_read_byte(reader, (opcua_byte_t *)p);
+    case MU_TYPE_INT16:
+        return mu_binary_read_int16(reader, (opcua_int16_t *)p);
+    case MU_TYPE_UINT16:
+        return mu_binary_read_uint16(reader, (opcua_uint16_t *)p);
+    case MU_TYPE_INT32:
+        return mu_binary_read_int32(reader, (opcua_int32_t *)p);
+    case MU_TYPE_UINT32:
+        return mu_binary_read_uint32(reader, (opcua_uint32_t *)p);
+    case MU_TYPE_INT64:
+        return mu_binary_read_int64(reader, (opcua_int64_t *)p);
+    case MU_TYPE_UINT64:
+        return mu_binary_read_uint64(reader, (opcua_uint64_t *)p);
+    case MU_TYPE_FLOAT:
+        return mu_binary_read_float(reader, (opcua_float_t *)p);
+    case MU_TYPE_DOUBLE:
+        return mu_binary_read_double(reader, (opcua_double_t *)p);
+    case MU_TYPE_STRING:
+        return mu_binary_read_string(reader, (mu_string_t *)p);
+    case MU_TYPE_BYTESTRING:
+        return mu_binary_read_bytestring(reader, (mu_bytestring_t *)p);
+    case MU_TYPE_DATETIME:
+        return mu_binary_read_int64(reader, (opcua_datetime_t *)p);
+    case MU_TYPE_STATUSCODE:
+        return mu_binary_read_statuscode(reader, (opcua_statuscode_t *)p);
+    case MU_TYPE_NODEID:
+        return mu_binary_read_nodeid(reader, (mu_nodeid_t *)p);
+    case MU_TYPE_QUALIFIEDNAME:
+        return mu_binary_read_qualified_name(reader, (mu_qualified_name_t *)p);
+    case MU_TYPE_LOCALIZEDTEXT: {
+        mu_localized_text_t *lt = (mu_localized_text_t *)p;
+        opcua_byte_t lt_mask;
+        opcua_statuscode_t s = mu_binary_read_byte(reader, &lt_mask);
+        if (s != MU_STATUS_GOOD) {
+            return s;
+        }
+        lt->locale = (mu_string_t){-1, NULL};
+        lt->text = (mu_string_t){-1, NULL};
+        if (lt_mask & 0x01) {
+            s = mu_binary_read_string(reader, &lt->locale);
+            if (s != MU_STATUS_GOOD) {
+                return s;
+            }
+        }
+        if (lt_mask & 0x02) {
+            s = mu_binary_read_string(reader, &lt->text);
+            if (s != MU_STATUS_GOOD) {
+                return s;
+            }
+        }
+        return MU_STATUS_GOOD;
+    }
+    default:
+        return MU_STATUS_BAD_DECODINGERROR;
+    }
+}
 
 opcua_statuscode_t mu_binary_read_variant(mu_binary_reader_t *reader, mu_variant_t *variant) {
     opcua_byte_t encoding_mask;
@@ -9,80 +106,98 @@ opcua_statuscode_t mu_binary_read_variant(mu_binary_reader_t *reader, mu_variant
     }
 
     opcua_byte_t type = encoding_mask & 0x3F;
-    if ((encoding_mask & 0x80) || (encoding_mask & 0x40)) {
-        /* Arrays / dimensions not supported */
+    opcua_boolean_t is_array = (encoding_mask & 0x80) != 0;
+    opcua_boolean_t has_dimensions = (encoding_mask & 0x40) != 0;
+
+    /* OPC-10000-6 section 5.2.2.16: the dimensions bit is only meaningful with
+       the array bit; a dimensions flag without an array is malformed. */
+    if (has_dimensions && !is_array) {
         return MU_STATUS_BAD_DECODINGERROR;
     }
 
     variant->type = (mu_builtin_type_t)type;
+    variant->is_array = false;
+    variant->array_length = 0;
+    variant->value.array = NULL;
 
-    switch (type) {
-    case MU_TYPE_NULL:
-        break;
-    case MU_TYPE_BOOLEAN:
-        return mu_binary_read_boolean(reader, &variant->value.b);
-    case MU_TYPE_SBYTE:
-        return mu_binary_read_sbyte(reader, &variant->value.sb);
-    case MU_TYPE_BYTE:
-        return mu_binary_read_byte(reader, &variant->value.by);
-    case MU_TYPE_INT16:
-        return mu_binary_read_int16(reader, &variant->value.i16);
-    case MU_TYPE_UINT16:
-        return mu_binary_read_uint16(reader, &variant->value.ui16);
-    case MU_TYPE_INT32:
-        return mu_binary_read_int32(reader, &variant->value.i32);
-    case MU_TYPE_UINT32:
-        return mu_binary_read_uint32(reader, &variant->value.ui32);
-    case MU_TYPE_INT64:
-        return mu_binary_read_int64(reader, &variant->value.i64);
-    case MU_TYPE_UINT64:
-        return mu_binary_read_uint64(reader, &variant->value.ui64);
-    case MU_TYPE_FLOAT:
-        return mu_binary_read_float(reader, &variant->value.f);
-    case MU_TYPE_DOUBLE:
-        return mu_binary_read_double(reader, &variant->value.d);
-    case MU_TYPE_STRING:
-        return mu_binary_read_string(reader, &variant->value.str);
-    case MU_TYPE_BYTESTRING:
-        return mu_binary_read_bytestring(reader, &variant->value.bytestr);
-    case MU_TYPE_DATETIME:
-        return mu_binary_read_int64(reader, &variant->value.dt);
-    case MU_TYPE_STATUSCODE:
-        return mu_binary_read_statuscode(reader, &variant->value.status);
-    case MU_TYPE_NODEID:
-        return mu_binary_read_nodeid(reader, &variant->value.nodeid);
-    case MU_TYPE_QUALIFIEDNAME:
-        status = mu_binary_read_uint16(reader, &variant->value.qualified_name.namespace_index);
+    if (type == MU_TYPE_NULL) {
+        return MU_STATUS_GOOD;
+    }
+
+    if (is_array) {
+        variant->is_array = true;
+        opcua_int32_t length = 0;
+        status = mu_binary_read_int32(reader, &length);
         if (status != MU_STATUS_GOOD) {
             return status;
         }
-        return mu_binary_read_string(reader, &variant->value.qualified_name.name);
-    case MU_TYPE_LOCALIZEDTEXT: {
-        opcua_byte_t lt_mask;
-        status = mu_binary_read_byte(reader, &lt_mask);
-        if (status != MU_STATUS_GOOD) {
-            return status;
+        /* OPC-10000-6 section 5.2.5: Int32 length encodes element count, with
+           -1 meaning a null array. Any other negative value is malformed. */
+        if (length < -1) {
+            return MU_STATUS_BAD_DECODINGERROR;
         }
-        variant->value.localized_text.locale = (mu_string_t){-1, NULL};
-        variant->value.localized_text.text = (mu_string_t){-1, NULL};
-        if (lt_mask & 0x01) {
-            status = mu_binary_read_string(reader, &variant->value.localized_text.locale);
+        variant->array_length = length;
+
+        if (length > 0) {
+            size_t stride = element_size((mu_builtin_type_t)type);
+            if (stride == 0) {
+                return MU_STATUS_BAD_DECODINGERROR;
+            }
+            /* Each element occupies at least one byte on the wire, so a length
+               greater than the remaining buffer cannot decode. This also bounds
+               the allocation below to the remaining input size. */
+            if (reader->position > reader->length ||
+                (size_t)length > reader->length - reader->position) {
+                return MU_STATUS_BAD_DECODINGERROR;
+            }
+            if ((size_t)length > SIZE_MAX / stride) {
+                return MU_STATUS_BAD_DECODINGERROR;
+            }
+
+            /* Minimum viable array read: heap-allocate the decoded element
+               buffer. The variant owns this allocation; callers that decode a
+               variant array must release variant.value.array (e.g. with
+               free((void *)variant.value.array)) once no longer needed. A
+               future mu_variant_destroy helper should centralize this. */
+            void *elements = calloc((size_t)length, stride);
+            if (elements == NULL) {
+                return MU_STATUS_BAD_OUTOFMEMORY;
+            }
+            for (opcua_int32_t i = 0; i < length; ++i) {
+                status = read_scalar_value(reader, (mu_builtin_type_t)type,
+                                           (opcua_byte_t *)elements + (size_t)i * stride);
+                if (status != MU_STATUS_GOOD) {
+                    free(elements);
+                    return status;
+                }
+            }
+            variant->value.array = elements;
+        }
+
+        if (has_dimensions) {
+            /* The variant has no field to carry array dimensions today, but the
+               dimensions Int32 array (Int32 count followed by that many Int32s)
+               must still be consumed to keep the reader position consistent. */
+            opcua_int32_t dim_count = 0;
+            status = mu_binary_read_int32(reader, &dim_count);
             if (status != MU_STATUS_GOOD) {
                 return status;
             }
-        }
-        if (lt_mask & 0x02) {
-            status = mu_binary_read_string(reader, &variant->value.localized_text.text);
-            if (status != MU_STATUS_GOOD) {
-                return status;
+            if (dim_count < -1) {
+                return MU_STATUS_BAD_DECODINGERROR;
+            }
+            for (opcua_int32_t i = 0; i < dim_count; ++i) {
+                opcua_int32_t dim;
+                status = mu_binary_read_int32(reader, &dim);
+                if (status != MU_STATUS_GOOD) {
+                    return status;
+                }
             }
         }
         return MU_STATUS_GOOD;
     }
-    default:
-        return MU_STATUS_BAD_DECODINGERROR;
-    }
-    return MU_STATUS_GOOD;
+
+    return read_scalar_value(reader, (mu_builtin_type_t)type, &variant->value);
 }
 
 /* Write one built-in value from a pointer to it (used for both scalars and array
@@ -160,35 +275,6 @@ static opcua_statuscode_t write_scalar_value(mu_binary_writer_t *w, mu_builtin_t
     default:
         return MU_STATUS_BAD_ENCODINGERROR;
     }
-}
-
-/* In-memory element stride for a built-in type, for indexing array values. */
-static size_t element_size(mu_builtin_type_t type) {
-    static const size_t sizes[MU_TYPE_LOCALIZEDTEXT + 1] = {
-        [MU_TYPE_BOOLEAN] = sizeof(opcua_boolean_t),
-        [MU_TYPE_SBYTE] = sizeof(opcua_sbyte_t),
-        [MU_TYPE_BYTE] = sizeof(opcua_byte_t),
-        [MU_TYPE_INT16] = sizeof(opcua_int16_t),
-        [MU_TYPE_UINT16] = sizeof(opcua_uint16_t),
-        [MU_TYPE_INT32] = sizeof(opcua_int32_t),
-        [MU_TYPE_UINT32] = sizeof(opcua_uint32_t),
-        [MU_TYPE_INT64] = sizeof(opcua_int64_t),
-        [MU_TYPE_UINT64] = sizeof(opcua_uint64_t),
-        [MU_TYPE_FLOAT] = sizeof(opcua_float_t),
-        [MU_TYPE_DOUBLE] = sizeof(opcua_double_t),
-        [MU_TYPE_STRING] = sizeof(mu_string_t),
-        [MU_TYPE_DATETIME] = sizeof(opcua_datetime_t),
-        [MU_TYPE_BYTESTRING] = sizeof(mu_bytestring_t),
-        [MU_TYPE_NODEID] = sizeof(mu_nodeid_t),
-        [MU_TYPE_STATUSCODE] = sizeof(opcua_statuscode_t),
-        [MU_TYPE_QUALIFIEDNAME] = sizeof(mu_qualified_name_t),
-        [MU_TYPE_LOCALIZEDTEXT] = sizeof(mu_localized_text_t),
-    };
-    int type_id = (int)type;
-    if (type_id < 0 || (size_t)type_id >= sizeof(sizes) / sizeof(sizes[0])) {
-        return 0;
-    }
-    return sizes[type_id];
 }
 
 opcua_statuscode_t mu_binary_write_variant(mu_binary_writer_t *writer, const mu_variant_t *variant) {

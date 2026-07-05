@@ -194,6 +194,12 @@ opcua_statuscode_t skip_extension_object_body(mu_binary_reader_t *r, size_t leng
 opcua_statuscode_t ensure_array_items_min_remaining(const mu_binary_reader_t *r, opcua_int32_t count,
                                                     size_t min_item_size);
 
+/* SecureChannel service handler — implemented in service_dispatch.c (T001).
+ * OpenSecureChannel remains static in service_dispatch.c; CloseSecureChannel is
+ * exposed for direct unit testing. Grounding: OPC-10000-4 §5.6.3.2 Table 13. */
+opcua_statuscode_t handle_close_secure_channel(mu_server_t *server, mu_binary_reader_t *r, mu_binary_writer_t *w,
+                                               size_t *response_length);
+
 /* Session service handlers — implemented in dispatch_session.c (T008). */
 opcua_statuscode_t handle_create_session(mu_server_t *server, mu_binary_reader_t *r, mu_binary_writer_t *w,
                                          size_t *response_length);

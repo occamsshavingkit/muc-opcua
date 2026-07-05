@@ -45,7 +45,7 @@ static bool prepare_server(mu_server_t *server, opcua_uint32_t *session_id_out) 
 
     mu_secure_channel_init(&server->secure_channel);
     if (mu_secure_channel_open(&server->secure_channel, NULL, MU_MESSAGE_SECURITY_MODE_NONE, 3600000u,
-                               &revised_lifetime) != MU_STATUS_GOOD) {
+                               &server->config.entropy_adapter, &revised_lifetime) != MU_STATUS_GOOD) {
         return false;
     }
     for (size_t i = 0; i < MU_MAX_SESSIONS; ++i) {

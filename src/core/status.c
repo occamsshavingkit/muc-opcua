@@ -130,6 +130,12 @@ const char *mu_status_name(opcua_statuscode_t status) {
         return "Bad_CertificateInvalid";
     case MU_STATUS_BAD_CERTIFICATEUNTRUSTED:
         return "Bad_CertificateUntrusted";
+    case MU_STATUS_BAD_NONCEINVALID:
+        return "Bad_NonceInvalid";
+    case MU_STATUS_BAD_REQUESTTYPEINVALID:
+        return "Bad_RequestTypeInvalid";
+    case MU_STATUS_BAD_SERVERURIINVALID:
+        return "Bad_ServerUriInvalid";
     default:
         return "Unknown_StatusCode";
     }

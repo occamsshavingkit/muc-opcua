@@ -25,6 +25,28 @@ typedef struct {
     size_t write_len[TEST_MAX_WRITES];
 } state_error_transport_t;
 
+static opcua_uint32_t s_channel_id = 1u;
+
+static opcua_uint32_t read_opn_channel_id(const opcua_byte_t *buf, size_t len) {
+    if (len < 12) {
+        return 1u;
+    }
+    return (opcua_uint32_t)buf[8] | ((opcua_uint32_t)buf[9] << 8u) | ((opcua_uint32_t)buf[10] << 16u) |
+           ((opcua_uint32_t)buf[11] << 24u);
+}
+
+static void patch_msg_channel_ids(state_error_transport_t *t, opcua_uint32_t channel_id) {
+    for (size_t i = 0; i < t->inbound_count; ++i) {
+        if (t->inbound_len[i] >= 12 && t->inbound[i][0] == 'M' && t->inbound[i][1] == 'S' &&
+            t->inbound[i][2] == 'G' && t->inbound[i][3] == 'F') {
+            t->inbound[i][8] = (opcua_byte_t)(channel_id);
+            t->inbound[i][9] = (opcua_byte_t)(channel_id >> 8u);
+            t->inbound[i][10] = (opcua_byte_t)(channel_id >> 16u);
+            t->inbound[i][11] = (opcua_byte_t)(channel_id >> 24u);
+        }
+    }
+}
+
 static opcua_statuscode_t test_listen(void *context, const char *endpoint_url) {
     (void)context;
     (void)endpoint_url;
@@ -165,7 +187,7 @@ static size_t build_msg(opcua_byte_t *out, size_t capacity, opcua_uint32_t seque
     out[3] = 'F';
     w.position = 4;
     (void)mu_binary_write_uint32(&w, (opcua_uint32_t)(TEST_MSG_HEADER_SIZE + body_len));
-    (void)mu_binary_write_uint32(&w, 1);
+    (void)mu_binary_write_uint32(&w, s_channel_id);
     (void)mu_binary_write_uint32(&w, 1);
     (void)mu_binary_write_uint32(&w, sequence_number);
     (void)mu_binary_write_uint32(&w, request_id);
@@ -409,6 +431,8 @@ void test_request_type_non_numeric_nodeid_rejected_with_bad_decodingerror(void) 
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_server_poll(server));
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_server_poll(server));
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_server_poll(server));
+    s_channel_id = read_opn_channel_id(transport.writes[1], transport.write_len[1]);
+    patch_msg_channel_ids(&transport, s_channel_id);
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_server_poll(server));
 
     TEST_ASSERT_EQUAL(3, transport.write_count);

@@ -21,7 +21,9 @@ typedef struct {
 } mu_set_publishing_mode_context_t;
 
 /* SetPublishingMode per-id callback: flip publishing_enabled on the matching
-   session-owned Subscription. */
+   session-owned Subscription. Per OPC-10000-4 §5.14.4 state table row 19,
+   enabling publishing MUST reset the lifetime counter and clear the
+   MoreNotifications flag. */
 static opcua_statuscode_t set_publishing_mode_result(mu_server_t *server, opcua_uint32_t subscription_id,
                                                      void *context) {
     const mu_set_publishing_mode_context_t *mode = (const mu_set_publishing_mode_context_t *)context;
@@ -31,6 +33,10 @@ static opcua_statuscode_t set_publishing_mode_result(mu_server_t *server, opcua_
     }
 
     sub->publishing_enabled = mode->publishing_enabled;
+    if (mode->publishing_enabled) {
+        sub->lifetime_counter = 0u;
+        sub->more_notifications = false;
+    }
     return MU_STATUS_GOOD;
 }
 

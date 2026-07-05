@@ -70,6 +70,24 @@ static opcua_boolean_t reference_type_matches(const mu_browse_description_t *des
     return mu_nodeid_equal(&desc->reference_type_id, &r->reference_type_id);
 }
 
+/* OPC-10000-4 §5.9.2.2 ViewDescription.viewId: a null NodeId (ns=0, numeric 0)
+   means "no View" and the server returns all references. A non-null View must
+   name a View object; this micro profile does not implement Views, so any
+   non-null viewId is rejected with Bad_ViewIdUnknown rather than silently
+   ignored (per the minimal-implementation guidance in the task spec). */
+static opcua_boolean_t view_id_is_null(const mu_nodeid_t *view_id) {
+    if (view_id->namespace_index != 0) {
+        return false;
+    }
+    if (view_id->identifier_type == MU_NODEID_NUMERIC) {
+        return view_id->identifier.numeric == 0;
+    }
+    if (view_id->identifier_type == MU_NODEID_STRING) {
+        return view_id->identifier.string.length <= 0;
+    }
+    return false;
+}
+
 opcua_statuscode_t mu_browse_request_decode(mu_binary_reader_t *reader, mu_browse_request_t *req,
                                             mu_browse_description_t *desc_array, size_t max_desc) {
     if (!reader || !req || !desc_array) {
@@ -281,6 +299,20 @@ opcua_statuscode_t mu_browse_process_with_user_index(const mu_address_space_t *a
                                                      size_t max_total_refs) {
     if (!req || !results || max_results < req->num_nodes_to_browse) {
         return MU_STATUS_BAD_INTERNALERROR;
+    }
+
+    /* OPC-10000-4 §5.9.2.2 Table 34: a non-null View restricts the returned
+       references to those "defined for that View". This micro profile does not
+       implement Views, so per the minimal-implementation guidance reject any
+       client-requested viewId with Bad_ViewIdUnknown instead of silently
+       ignoring it. A null viewId (the common case) browses normally. */
+    if (!view_id_is_null(&req->view_id)) {
+        for (size_t i = 0; i < req->num_nodes_to_browse; ++i) {
+            results[i].status_code = MU_STATUS_BAD_VIEWIDUNKNOWN;
+            results[i].num_references = 0;
+            results[i].references = NULL;
+        }
+        return MU_STATUS_GOOD;
     }
 
     size_t refs_used = 0;

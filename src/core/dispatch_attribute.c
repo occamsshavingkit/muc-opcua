@@ -29,10 +29,11 @@
    declared in read.h (only mu_read_process is) so forward-declare it here for
    the dispatch handler. OPC-10000-4 5.11.2. */
 extern opcua_statuscode_t mu_read_process_with_user_index(const mu_address_space_t *address_space,
-                                                          mu_address_space_index_t *user_index,
-                                                          const mu_address_space_t *dynamic,
-                                                          const mu_read_request_t *req, mu_read_response_t *resp,
-                                                          mu_datavalue_t *results_array, size_t max_results);
+                                                           mu_address_space_index_t *user_index,
+                                                           const mu_address_space_t *dynamic,
+                                                           const mu_read_request_t *req, opcua_datetime_t now,
+                                                           mu_read_response_t *resp, mu_datavalue_t *results_array,
+                                                           size_t max_results);
 #endif
 
 #ifdef MUC_OPCUA_SERVICE_READ
@@ -55,8 +56,14 @@ opcua_statuscode_t handle_read(mu_server_t *server, mu_binary_reader_t *r, mu_bi
 
     mu_read_response_t rresp;
     mu_datavalue_t results[MU_DISPATCH_MAX_READ_NODES];
+    /* OPC-10000-4 5.11.2.2 Table 47: timestampsToReturn controls which
+     * timestamp Attributes accompany each Value. Source the current UTC time
+     * from the server's time adapter (mirrors subscription_publish.c). */
+    opcua_datetime_t now = server->config.time_adapter.get_time
+                               ? server->config.time_adapter.get_time(server->config.time_adapter.context)
+                               : 0;
     s = mu_read_process_with_user_index(server->config.address_space, &server->user_address_space_index,
-                                        &server->runtime_base.space, &rreq, &rresp, results,
+                                        &server->runtime_base.space, &rreq, now, &rresp, results,
                                         MU_DISPATCH_MAX_READ_NODES);
     if (s != MU_STATUS_GOOD) {
         return s;
@@ -119,10 +126,14 @@ opcua_statuscode_t handle_write(mu_server_t *server, mu_binary_reader_t *r, mu_b
         } else if (node->node_class != MU_NODECLASS_VARIABLE) {
             result = MU_STATUS_BAD_NOTWRITABLE;
         } else if (node->value) {
-            /* Check value type matches if the variable has a current value */
+            /* Check value type is assignable if the variable has a current value.
+             * OPC-10000-4 5.11.4.2 Table 53: subtypes of the Attribute DataType
+             * shall be accepted by the Server. mu_variant_type_is_assignable
+             * encodes that rule (currently exact-match for built-in types,
+             * with infrastructure for TypeDef-based subtypes). */
             mu_variant_t current_val;
             s = mu_value_source_read(node->value, &node->node_id, &current_val);
-            if (s == MU_STATUS_GOOD && current_val.type != write_val->value.value.type) {
+            if (s == MU_STATUS_GOOD && !mu_variant_type_is_assignable(current_val.type, write_val->value.value.type)) {
                 result = MU_STATUS_BAD_TYPEMISMATCH;
             }
         }

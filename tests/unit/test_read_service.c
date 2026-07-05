@@ -67,7 +67,7 @@ void test_read_service_scalar_values(void) {
     mu_read_response_t resp;
     mu_datavalue_t result_dv;
 
-    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_read_process(&address_space, NULL, &req, &resp, &result_dv, 1));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_read_process(&address_space, NULL, &req, 0, &resp, &result_dv, 1));
     TEST_ASSERT_EQUAL(1, resp.num_results);
     TEST_ASSERT_TRUE(resp.results[0].has_value);
     TEST_ASSERT_EQUAL(MU_TYPE_INT32, resp.results[0].value.type);
@@ -138,7 +138,7 @@ void test_read_service_rejects_invalid_timestamps_to_return(void) {
     mu_datavalue_t result_dv;
 
     TEST_ASSERT_EQUAL(MU_STATUS_BAD_TIMESTAMPSTORETURNINVALID,
-                      mu_read_process(&address_space, NULL, &req, &resp, &result_dv, 1));
+                      mu_read_process(&address_space, NULL, &req, 0, &resp, &result_dv, 1));
 }
 
 /* BrowseName and DisplayName are mandatory readable Attributes of every Node
@@ -166,7 +166,7 @@ void test_read_service_browsename_displayname(void) {
 
     mu_read_response_t resp;
     mu_datavalue_t results[3];
-    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_read_process(&address_space, NULL, &req, &resp, results, 3));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_read_process(&address_space, NULL, &req, 0, &resp, results, 3));
 
     /* BrowseName -> QualifiedName */
     TEST_ASSERT_TRUE(resp.results[0].has_value);
@@ -232,7 +232,7 @@ void test_read_service_batch_preserves_per_operation_results(void) {
     /* OPC-10000-4 5.11.2.2 returns a StatusCode for each nodesToRead entry.
        OPC-10000-4 5.11.2.4 and 7.38.2 define those operation-level statuses,
        so mixed per-operation failures must not change the service-level result. */
-    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_read_process(&address_space, NULL, &batch_req, &batch_resp, batch_results, 5));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_read_process(&address_space, NULL, &batch_req, 0, &batch_resp, batch_results, 5));
     TEST_ASSERT_EQUAL(5, batch_resp.num_results);
 
     for (size_t i = 0; i < batch_req.num_nodes_to_read; ++i) {
@@ -244,7 +244,7 @@ void test_read_service_batch_preserves_per_operation_results(void) {
         mu_datavalue_t single_result;
 
         TEST_ASSERT_EQUAL(MU_STATUS_GOOD,
-                          mu_read_process(&address_space, NULL, &single_req, &single_resp, &single_result, 1));
+                          mu_read_process(&address_space, NULL, &single_req, 0, &single_resp, &single_result, 1));
         TEST_ASSERT_EQUAL(1, single_resp.num_results);
         TEST_ASSERT_EQUAL(single_resp.results[0].has_value, batch_resp.results[i].has_value);
         TEST_ASSERT_EQUAL(single_resp.results[0].has_status, batch_resp.results[i].has_status);

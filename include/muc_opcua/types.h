@@ -108,6 +108,15 @@ typedef struct {
     opcua_int32_t array_length; /* element count when is_array (>= 0; -1 = null array) */
 } mu_variant_t;
 
+/* Variant DataType assignability check (OPC-10000-4 5.11.4.2 Table 53).
+   Returns true if `actual` is the same as, or a subtype of, `expected`. The
+   simple built-in types (Boolean, SByte, Byte, ..., NodeId) have no subtypes
+   in the address space, so for those this reduces to exact equality today.
+   The infrastructure (switch on `expected`) is in place so that custom
+   DataTypes defined as subtypes of a base type can be accepted here without
+   touching the call sites. */
+opcua_boolean_t mu_variant_type_is_assignable(mu_builtin_type_t expected, mu_builtin_type_t actual);
+
 /* DataValue */
 typedef struct {
     mu_variant_t value;
@@ -128,7 +137,7 @@ typedef struct {
 /* WriteValue (OPC 10000-4 §5.11.4.2) */
 typedef struct {
     mu_nodeid_t node_id;
-    opcua_int32_t attribute_id;
+    opcua_uint32_t attribute_id;
     mu_string_t index_range;
     mu_datavalue_t value;
 } mu_write_value_t;

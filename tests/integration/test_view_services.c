@@ -444,7 +444,7 @@ static const mu_node_t tbp_nodes[] = {{{0, MU_NODEID_NUMERIC, {85}},
 static const mu_address_space_t tbp_space = {tbp_nodes, 2};
 
 /* Write one BrowsePath: start at Objects(85), one element via HierarchicalReferences
-   (i=33, includeSubtypes) to QualifiedName {ns=1, name}. */
+   (i=33, includeSubtypes) to QualifiedName {ns=ns, name}. */
 static void write_browse_path(mu_binary_writer_t *w, const char *name) {
     mu_nodeid_t start = {0, MU_NODEID_NUMERIC, {85}};
     mu_nodeid_t hier = {0, MU_NODEID_NUMERIC, {33}};
@@ -453,9 +453,27 @@ static void write_browse_path(mu_binary_writer_t *w, const char *name) {
     mu_binary_write_nodeid(w, &hier);  /* referenceTypeId */
     mu_binary_write_boolean(w, false); /* isInverse */
     mu_binary_write_boolean(w, true);  /* includeSubtypes */
-    mu_binary_write_uint16(w, 1);      /* targetName.namespaceIndex */
+    mu_binary_write_uint16(w, 0);      /* targetName.namespaceIndex (static BrowseName ns=0) */
     {
         mu_string_t s = {(opcua_int32_t)strlen(name), (const opcua_byte_t *)name};
+        mu_binary_write_string(w, &s);
+    }
+}
+
+/* Variant of write_browse_path that lets the caller pick targetName namespace
+   and length. Used to exercise T017 (namespace-aware QualifiedName match) and
+   T018 (empty targetName on last element). */
+static void write_browse_path_qn(mu_binary_writer_t *w, opcua_uint16_t ns, const char *name, size_t name_len) {
+    mu_nodeid_t start = {0, MU_NODEID_NUMERIC, {85}};
+    mu_nodeid_t hier = {0, MU_NODEID_NUMERIC, {33}};
+    mu_binary_write_nodeid(w, &start);
+    mu_binary_write_int32(w, 1);
+    mu_binary_write_nodeid(w, &hier);
+    mu_binary_write_boolean(w, false);
+    mu_binary_write_boolean(w, true);
+    mu_binary_write_uint16(w, ns);
+    {
+        mu_string_t s = {(opcua_int32_t)name_len, (const opcua_byte_t *)name};
         mu_binary_write_string(w, &s);
     }
 }
@@ -479,16 +497,22 @@ void test_translate_browse_paths(void) {
     s_channel_id = read_opn_channel_id(mock.last_write, mock.last_write_len);
     enqueue_session(&mock);
 
-    /* TranslateBrowsePaths (seq 4): path 1 -> MyVar1 (Good), path 2 -> bad name (NoMatch). */
+    /* TranslateBrowsePaths (seq 4):
+     *   path 1 -> MyVar1 with ns=0 (Good)
+     *   path 2 -> bad name (NoMatch)
+     *   path 3 -> right name, wrong namespace (NoMatch) — T017
+     *   path 4 -> empty targetName (BrowseNameInvalid) — T018 */
     mu_binary_writer_init(&w, tmp, sizeof(tmp));
     {
         mu_nodeid_t t = {0, MU_NODEID_NUMERIC, {ID_TRANSLATEBROWSEPATHSREQUEST}};
         mu_binary_write_nodeid(&w, &t);
     }
     write_request_header(&w, TEST_FAKE_FIRST_AUTH_TOKEN, 4);
-    mu_binary_write_int32(&w, 2); /* browsePaths count */
+    mu_binary_write_int32(&w, 4); /* browsePaths count */
     write_browse_path(&w, "MyVar1");
     write_browse_path(&w, "Nope");
+    write_browse_path_qn(&w, 1, "MyVar1", strlen("MyVar1")); /* ns mismatch */
+    write_browse_path_qn(&w, 0, "", 0);                      /* empty targetName */
     clen = build_msg(chunk, sizeof(chunk), 4, 4, tmp, w.position);
     enqueue(&mock, chunk, clen);
 
@@ -499,7 +523,7 @@ void test_translate_browse_paths(void) {
     TEST_ASSERT_EQUAL(ID_TRANSLATEBROWSEPATHSRESPONSE, parse_response(mock.last_write, mock.last_write_len, &body));
     opcua_int32_t nres;
     mu_binary_read_int32(&body, &nres);
-    TEST_ASSERT_EQUAL(2, nres);
+    TEST_ASSERT_EQUAL(4, nres);
 
     /* result[0]: Good, one target = ns=1;i=1000, remainingPathIndex = UInt32.Max. */
     opcua_statuscode_t st0;
@@ -523,6 +547,22 @@ void test_translate_browse_paths(void) {
     opcua_int32_t nt1;
     mu_binary_read_int32(&body, &nt1);
     TEST_ASSERT_EQUAL(0, nt1);
+
+    /* result[2]: Bad_NoMatch (namespace mismatch — T017). */
+    opcua_statuscode_t st2;
+    mu_binary_read_statuscode(&body, &st2);
+    TEST_ASSERT_EQUAL_HEX32(STATUS_BAD_NOMATCH, st2);
+    opcua_int32_t nt2;
+    mu_binary_read_int32(&body, &nt2);
+    TEST_ASSERT_EQUAL(0, nt2);
+
+    /* result[3]: Bad_BrowseNameInvalid (empty targetName — T018). */
+    opcua_statuscode_t st3;
+    mu_binary_read_statuscode(&body, &st3);
+    TEST_ASSERT_EQUAL_HEX32(0x80600000u, st3);
+    opcua_int32_t nt3;
+    mu_binary_read_int32(&body, &nt3);
+    TEST_ASSERT_EQUAL(0, nt3);
 }
 
 /* US2a: with NO integrator address space, the library's default Base Information

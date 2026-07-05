@@ -187,7 +187,7 @@ void test_Browse_DynamicReferences(void) {
     req_desc.node_class_mask = 0xFFFFFFFF;
     req_desc.result_mask = 0x3F;
 
-    mu_browse_request_t req;
+    mu_browse_request_t req = {0}; /* view_id/timestamp/view_version zeroed = null View (T015) */
     req.requested_max_references_per_node = 0;
     req.num_nodes_to_browse = 1;
     req.nodes_to_browse = &req_desc;

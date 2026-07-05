@@ -153,10 +153,65 @@ void test_browse_service_rejects_invalid_browse_direction(void) {
     TEST_ASSERT_EQUAL(0, result.num_references);
 }
 
+/* T015: OPC-10000-4 §5.9.2.2 Table 34 — a non-null ViewDescription.viewId must
+   restrict results to references defined for that View. This micro profile does
+   not implement Views, so a non-null viewId is rejected with Bad_ViewIdUnknown
+   instead of being silently ignored. A null viewId (the common case) browses
+   normally. */
+void test_browse_service_rejects_non_null_view_id(void) {
+    mu_browse_description_t desc = {
+        .node_id = {.identifier_type = MU_NODEID_NUMERIC, .namespace_index = 0, .identifier.numeric = 84},
+        .browse_direction = MU_BROWSE_DIRECTION_FORWARD,
+        .reference_type_id = {.identifier_type = MU_NODEID_NUMERIC, .namespace_index = 0, .identifier.numeric = 0},
+        .include_subtypes = true,
+        .node_class_mask = 0,
+        .result_mask = 0x3F};
+
+    mu_browse_request_t req = {.view_id = {.identifier_type = MU_NODEID_NUMERIC, .namespace_index = 0,
+                                           .identifier.numeric = 12345}, /* non-null View */
+                               .timestamp = 0,
+                               .view_version = 0,
+                               .requested_max_references_per_node = 0,
+                               .nodes_to_browse = &desc,
+                               .num_nodes_to_browse = 1};
+    mu_browse_result_t result;
+    mu_reference_description_t ref_pool[4];
+
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_browse_process(NULL, NULL, &req, &result, 1, ref_pool, 4));
+    TEST_ASSERT_EQUAL(MU_STATUS_BAD_VIEWIDUNKNOWN, result.status_code);
+    TEST_ASSERT_EQUAL(0, result.num_references);
+}
+
+void test_browse_service_accepts_null_view_id(void) {
+    mu_browse_description_t desc = {
+        .node_id = {.identifier_type = MU_NODEID_NUMERIC, .namespace_index = 0, .identifier.numeric = 84},
+        .browse_direction = MU_BROWSE_DIRECTION_FORWARD,
+        .reference_type_id = {.identifier_type = MU_NODEID_NUMERIC, .namespace_index = 0, .identifier.numeric = 0},
+        .include_subtypes = true,
+        .node_class_mask = 0,
+        .result_mask = 0x3F};
+
+    /* null viewId: ns=0, numeric 0 -> browse normally (no Bad_ViewIdUnknown) */
+    mu_browse_request_t req = {.view_id = {.identifier_type = MU_NODEID_NUMERIC, .namespace_index = 0,
+                                           .identifier.numeric = 0},
+                               .timestamp = 0,
+                               .view_version = 0,
+                               .requested_max_references_per_node = 0,
+                               .nodes_to_browse = &desc,
+                               .num_nodes_to_browse = 1};
+    mu_browse_result_t result;
+    mu_reference_description_t ref_pool[4];
+
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_browse_process(NULL, NULL, &req, &result, 1, ref_pool, 4));
+    TEST_ASSERT_NOT_EQUAL(MU_STATUS_BAD_VIEWIDUNKNOWN, result.status_code);
+}
+
 int main(void) {
     UNITY_BEGIN();
     RUN_TEST(test_browse_service_static_references);
     RUN_TEST(test_browse_service_response_encode);
     RUN_TEST(test_browse_service_rejects_invalid_browse_direction);
+    RUN_TEST(test_browse_service_rejects_non_null_view_id);
+    RUN_TEST(test_browse_service_accepts_null_view_id);
     return UNITY_END();
 }

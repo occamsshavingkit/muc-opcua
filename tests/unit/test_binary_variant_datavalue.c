@@ -1,6 +1,7 @@
 /* tests/unit/test_binary_variant_datavalue.c */
 #include "muc_opcua/muc_opcua.h"
 #include "unity.h"
+#include <stdlib.h>
 #include <string.h>
 
 void setUp(void) {}
@@ -232,6 +233,107 @@ void test_binary_variant_int32_array_encode(void) {
     TEST_ASSERT_EQUAL(30, v2);
 }
 
+/* OPC-10000-6 section 5.2.2.16 / 5.2.5: a Variant with the array bit set
+   decodes to a 1-D array (Int32 length + elements). */
+void test_binary_variant_int32_array_roundtrip(void) {
+    opcua_byte_t buffer[64];
+    mu_binary_writer_t writer;
+    mu_binary_writer_init(&writer, buffer, sizeof(buffer));
+
+    static const opcua_int32_t arr[3] = {10, 20, 30};
+    mu_variant_t v;
+    (void)memset(&v, 0, sizeof(v));
+    v.type = MU_TYPE_INT32;
+    v.is_array = true;
+    v.array_length = 3;
+    v.value.array = arr;
+
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_write_variant(&writer, &v));
+
+    mu_binary_reader_t reader;
+    mu_binary_reader_init(&reader, buffer, writer.position);
+    mu_variant_t out;
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_variant(&reader, &out));
+    TEST_ASSERT_EQUAL(MU_TYPE_INT32, out.type);
+    TEST_ASSERT_TRUE(out.is_array);
+    TEST_ASSERT_EQUAL(3, out.array_length);
+    TEST_ASSERT_EQUAL_size_t(writer.position, reader.position);
+
+    const opcua_int32_t *got = (const opcua_int32_t *)out.value.array;
+    TEST_ASSERT_EQUAL(10, got[0]);
+    TEST_ASSERT_EQUAL(20, got[1]);
+    TEST_ASSERT_EQUAL(30, got[2]);
+    free((void *)out.value.array);
+}
+
+void test_binary_variant_string_array_roundtrip(void) {
+    opcua_byte_t buffer[128];
+    mu_binary_writer_t writer;
+    mu_binary_writer_init(&writer, buffer, sizeof(buffer));
+
+    static const mu_string_t arr[2] = {{3, (const opcua_byte_t *)"foo"}, {3, (const opcua_byte_t *)"bar"}};
+    mu_variant_t v;
+    (void)memset(&v, 0, sizeof(v));
+    v.type = MU_TYPE_STRING;
+    v.is_array = true;
+    v.array_length = 2;
+    v.value.array = arr;
+
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_write_variant(&writer, &v));
+
+    mu_binary_reader_t reader;
+    mu_binary_reader_init(&reader, buffer, writer.position);
+    mu_variant_t out;
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_variant(&reader, &out));
+    TEST_ASSERT_EQUAL(MU_TYPE_STRING, out.type);
+    TEST_ASSERT_TRUE(out.is_array);
+    TEST_ASSERT_EQUAL(2, out.array_length);
+
+    const mu_string_t *got = (const mu_string_t *)out.value.array;
+    TEST_ASSERT_EQUAL(3, got[0].length);
+    TEST_ASSERT_EQUAL_MEMORY("foo", got[0].data, 3);
+    TEST_ASSERT_EQUAL(3, got[1].length);
+    TEST_ASSERT_EQUAL_MEMORY("bar", got[1].data, 3);
+    free((void *)out.value.array);
+}
+
+/* Int32 length of -1 is a null array: is_array set, no element buffer. */
+void test_binary_variant_null_array_decodes(void) {
+    /* encoding mask = INT32 | 0x80, length = -1 */
+    const opcua_byte_t buffer[] = {MU_TYPE_INT32 | 0x80, 0xFFu, 0xFFu, 0xFFu, 0xFFu};
+    mu_binary_reader_t reader;
+    mu_binary_reader_init(&reader, buffer, sizeof(buffer));
+
+    mu_variant_t out;
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_variant(&reader, &out));
+    TEST_ASSERT_EQUAL(MU_TYPE_INT32, out.type);
+    TEST_ASSERT_TRUE(out.is_array);
+    TEST_ASSERT_EQUAL(-1, out.array_length);
+    TEST_ASSERT_NULL(out.value.array);
+    TEST_ASSERT_EQUAL_size_t(sizeof(buffer), reader.position);
+}
+
+/* A claimed element count that exceeds the remaining wire bytes is rejected. */
+void test_binary_variant_array_truncated_returns_decoding_error(void) {
+    /* encoding mask = INT32 | 0x80, length = 3, only one element present */
+    const opcua_byte_t buffer[] = {MU_TYPE_INT32 | 0x80, 0x03, 0x00, 0x00, 0x00, 0x0A, 0x00, 0x00, 0x00};
+    mu_binary_reader_t reader;
+    mu_binary_reader_init(&reader, buffer, sizeof(buffer));
+
+    mu_variant_t out;
+    TEST_ASSERT_EQUAL(MU_STATUS_BAD_DECODINGERROR, mu_binary_read_variant(&reader, &out));
+}
+
+/* OPC-10000-6 section 5.2.2.16: the dimensions bit requires the array bit. */
+void test_binary_variant_dimensions_without_array_returns_decoding_error(void) {
+    const opcua_byte_t buffer[] = {MU_TYPE_INT32 | 0x40};
+    mu_binary_reader_t reader;
+    mu_binary_reader_init(&reader, buffer, sizeof(buffer));
+
+    mu_variant_t out;
+    TEST_ASSERT_EQUAL(MU_STATUS_BAD_DECODINGERROR, mu_binary_read_variant(&reader, &out));
+}
+
 void test_binary_qualifiedname_truncated_name_returns_decoding_error(void) {
     const opcua_byte_t buffer[] = {0x01u, 0x00u, 0x04u, 0x00u, 0x00u, 0x00u, 't'};
     mu_binary_reader_t reader;
@@ -262,6 +364,11 @@ int main(void) {
     RUN_TEST(test_binary_variant_localizedtext_roundtrip);
     RUN_TEST(test_binary_variant_string_array_encode);
     RUN_TEST(test_binary_variant_int32_array_encode);
+    RUN_TEST(test_binary_variant_int32_array_roundtrip);
+    RUN_TEST(test_binary_variant_string_array_roundtrip);
+    RUN_TEST(test_binary_variant_null_array_decodes);
+    RUN_TEST(test_binary_variant_array_truncated_returns_decoding_error);
+    RUN_TEST(test_binary_variant_dimensions_without_array_returns_decoding_error);
     RUN_TEST(test_binary_qualifiedname_truncated_name_returns_decoding_error);
     RUN_TEST(test_binary_localizedtext_truncated_text_returns_decoding_error);
     return UNITY_END();

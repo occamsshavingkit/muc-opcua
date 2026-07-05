@@ -8,6 +8,7 @@
 #include <openssl/hmac.h>
 #include <openssl/rsa.h>
 #include <openssl/x509.h>
+#include <openssl/x509v3.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -418,6 +419,72 @@ static opcua_statuscode_t h_get_certificate_thumbprint(void *c, const opcua_byte
     return MU_STATUS_GOOD;
 }
 
+/* OPC-10000-4 §5.7.2.1: compare clientDescription.ApplicationUri against the
+   URIs in the certificate's SubjectAltName extension, falling back to the
+   Subject CN when no SAN URI is present. Returns MU_STATUS_GOOD when any
+   certificate identity matches `application_uri`, MU_STATUS_BAD_CERTIFICATEURIINVALID
+   otherwise (or MU_STATUS_BAD_CERTIFICATEINVALID on a parse failure). */
+static opcua_statuscode_t h_verify_certificate_application_uri(void *c, const opcua_byte_t *cert, size_t cert_len,
+                                                                const char *application_uri,
+                                                                size_t application_uri_len) {
+    (void)c;
+    if (application_uri == NULL || application_uri_len == 0 || cert == NULL || cert_len == 0) {
+        return MU_STATUS_BAD_CERTIFICATEURIINVALID;
+    }
+    const unsigned char *p = cert;
+    X509 *x = d2i_X509(NULL, &p, (long)cert_len);
+    if (x == NULL) {
+        return MU_STATUS_BAD_CERTIFICATEINVALID;
+    }
+    opcua_statuscode_t rc = MU_STATUS_BAD_CERTIFICATEURIINVALID;
+    int matched = 0;
+
+    /* Primary check: SubjectAltName URI entries (OPC-10000-4 §5.7.2.1). */
+    STACK_OF(GENERAL_NAME) *san = (STACK_OF(GENERAL_NAME) *)X509_get_ext_d2i(x, NID_subject_alt_name, NULL, NULL);
+    int san_count = (san != NULL) ? sk_GENERAL_NAME_num(san) : 0;
+    for (int i = 0; i < san_count; ++i) {
+        GENERAL_NAME *gn = sk_GENERAL_NAME_value(san, i);
+        if (gn == NULL) {
+            continue;
+        }
+        if (gn->type == GEN_URI) {
+            const ASN1_STRING *uri = gn->d.uniformResourceIdentifier;
+            if (uri != NULL) {
+                int uri_len = ASN1_STRING_length(uri);
+                if (uri_len >= 0 && (size_t)uri_len == application_uri_len &&
+                    memcmp(ASN1_STRING_get0_data(uri), application_uri, application_uri_len) == 0) {
+                    matched = 1;
+                    break;
+                }
+            }
+        }
+    }
+    if (san != NULL) {
+        sk_GENERAL_NAME_pop_free(san, GENERAL_NAME_free);
+    }
+
+    /* Fallback: Subject CN. RFC 6125 permits CN-based matching when no
+       SAN URI is present; this preserves backward compatibility with
+       self-signed test certificates that only set CN. */
+    if (!matched && san_count == 0) {
+        X509_NAME *name = X509_get_subject_name(x);
+        if (name != NULL) {
+            char cn_buf[256];
+            int cn_len = X509_NAME_get_text_by_NID(name, NID_commonName, cn_buf, (int)sizeof(cn_buf));
+            if (cn_len > 0 && (size_t)cn_len == application_uri_len &&
+                memcmp(cn_buf, application_uri, application_uri_len) == 0) {
+                matched = 1;
+            }
+        }
+    }
+
+    X509_free(x);
+    if (matched) {
+        rc = MU_STATUS_GOOD;
+    }
+    return rc;
+}
+
 /* ---- init / cleanup ---- */
 
 static int build_self_signed(struct host_crypto_context *cx) {
@@ -498,6 +565,7 @@ opcua_statuscode_t mu_host_crypto_adapter_init(mu_crypto_adapter_t *adapter) {
     adapter->get_certificate_key_bits = h_get_certificate_key_bits;
     adapter->get_certificate_thumbprint = h_get_certificate_thumbprint;
     adapter->verify_certificate_validity = h_verify_certificate_validity;
+    adapter->verify_certificate_application_uri = h_verify_certificate_application_uri;
     return MU_STATUS_GOOD;
 }
 

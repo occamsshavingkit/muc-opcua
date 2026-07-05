@@ -9,6 +9,7 @@ This document maps implementation and test files back to OPC UA normative sectio
 | `include/muc_opcua/types.h` | Built-in Types | Part 6 | 5.2.1, 5.2.2.* | Numeric, String, NodeId, Variant types |
 | `include/muc_opcua/status.h` | StatusCodes | OPC-10000-4 / OPC-10000-6 | 7.38.2 / 7.1.5 | Public StatusCode constants and TCP-specific StatusCodes |
 | `include/muc_opcua/platform.h` | Platform Adapters | Part 4 / 6 | 5.6.2.2 / 7.2 | Adapter Interfaces |
+| `include/muc_opcua/transport.h` | OPC UA TCP Transport | OPC-10000-4 / OPC-10000-6 | 5.6.2.2 / 7.1.2.2 | OPC UA TCP protocol version constant (ServerProtocolVersion / ACK ProtocolVersion) |
 | `include/muc_opcua/server.h` | Server API | Part 4 / 6 | 5.6.2.2 / 7.1.2.3 | Config & Lifecycle APIs |
 | `src/core/status.c` | StatusCodes | Part 4 / 6 | 7.38.2 / 7.1.5 | Status Helper `mu_status_name` |
 | `src/core/server.c` | Server Core | OPC-10000-4 / OPC-10000-6 | 7.38.2 / 5.2.2.9, 6.7.2, 7.1.2.2, 7.2 | TCP stream/chunk handling, request type-id validation, and status/error mapping |
@@ -148,6 +149,7 @@ This document maps implementation and test files back to OPC UA normative sectio
 | `binary_le.h` | OPC-10000-6 | 5.2.1 | OPC UA Binary little-endian pack/unpack helpers | shared by binary_reader.c / binary_writer.c |
 | `binary_nodeid.c` | Traceability mapped | OPC UA Part 4 / 6 | 5.5.4.2, 5.7, 5.11, 5.13, 5.14 / 5.2, 6.7, 7.2 | Placeholder replaced; see feature-specific rows and tests for exact service/encoding coverage |
 | `src/encoding/binary_variant.c` | OPC UA Part 6 | 5.3.13 | Variant encoding | Variant support |
+| `src/encoding/variant_type.c` | OPC UA Part 4 | 5.11.4.2 | Variant DataType assignability (subtypes accepted) | Write value-type check |
 | `src/encoding/binary_datavalue.c` | OPC UA Part 6 | 5.3.14 | DataValue encoding | DataValue support |
 | `src/encoding/uadp_encoder.c` | OPC UA Part 14 / Part 6 | 7.2.4.4.2, 7.2.4.5.2, 7.2.4.5.3, 7.2.4.5.4, 7.2.4.5.5 / 5.2.2.16 | Scoped UADP NetworkMessage, PayloadHeader, DataSet payload sizing, Data Key Frame, and Variant field encode/decode | PubSub UADP |
 | `src/core/pubsub.c` | OPC UA Part 14 | 5.4.6.2.2, 7.3.2.1 | Cooperative UADP/UDP publisher timing and UDP send dispatch | PubSub runtime |

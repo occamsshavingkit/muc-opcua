@@ -158,8 +158,8 @@ static opcua_statuscode_t read_attribute(const mu_address_space_t *address_space
 opcua_statuscode_t mu_read_process_with_user_index(const mu_address_space_t *address_space,
                                                    mu_address_space_index_t *user_index,
                                                    const mu_address_space_t *dynamic, const mu_read_request_t *req,
-                                                   mu_read_response_t *resp, mu_datavalue_t *results_array,
-                                                   size_t max_results) {
+                                                   opcua_datetime_t now, mu_read_response_t *resp,
+                                                   mu_datavalue_t *results_array, size_t max_results) {
     if (!req || !resp || !results_array) {
         return MU_STATUS_BAD_INTERNALERROR;
     }
@@ -203,7 +203,21 @@ opcua_statuscode_t mu_read_process_with_user_index(const mu_address_space_t *add
         }
         if (status == MU_STATUS_GOOD) {
             dv->has_value = true;
-            /* Optionally add timestamps based on req->timestamps_to_return, but not strictly needed for test */
+            /* Populate sourceTimestamp / serverTimestamp per TimestampsToReturn.
+             * OPC-10000-4 5.11.2.2 Table 47 references the TimestampsToReturn
+             * enumeration (7.39 Table 180): SOURCE(0), SERVER(1), BOTH(2),
+             * NEITHER(3). Without per-value capture the server's current UTC
+             * time stands in for both, matching the MonitoredItem behaviour
+             * in subscription_publish.c. */
+            opcua_uint32_t ttr = req->timestamps_to_return;
+            if (ttr == MU_TIMESTAMPS_TO_RETURN_SOURCE || ttr == MU_TIMESTAMPS_TO_RETURN_BOTH) {
+                dv->has_source_timestamp = true;
+                dv->source_timestamp = now;
+            }
+            if (ttr == MU_TIMESTAMPS_TO_RETURN_SERVER || ttr == MU_TIMESTAMPS_TO_RETURN_BOTH) {
+                dv->has_server_timestamp = true;
+                dv->server_timestamp = now;
+            }
         } else {
             dv->has_status = true;
             dv->status = status;
@@ -214,7 +228,7 @@ opcua_statuscode_t mu_read_process_with_user_index(const mu_address_space_t *add
 }
 
 opcua_statuscode_t mu_read_process(const mu_address_space_t *address_space, const mu_address_space_t *dynamic,
-                                   const mu_read_request_t *req, mu_read_response_t *resp,
+                                   const mu_read_request_t *req, opcua_datetime_t now, mu_read_response_t *resp,
                                    mu_datavalue_t *results_array, size_t max_results) {
-    return mu_read_process_with_user_index(address_space, NULL, dynamic, req, resp, results_array, max_results);
+    return mu_read_process_with_user_index(address_space, NULL, dynamic, req, now, resp, results_array, max_results);
 }

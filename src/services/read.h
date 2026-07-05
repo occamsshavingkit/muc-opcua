@@ -65,8 +65,12 @@ opcua_statuscode_t mu_read_request_decode(mu_binary_reader_t *reader, mu_read_re
 
 opcua_statuscode_t mu_read_response_encode(mu_binary_writer_t *writer, const mu_read_response_t *resp);
 
+/* Process a Read request (OPC-10000-4 5.11.2). `now` is the current server UTC
+ * time (100-ns intervals since 1601-01-01) used to populate sourceTimestamp
+ * and/or serverTimestamp per req->timestamps_to_return (5.11.2.2 Table 47,
+ * 7.39 Table 180). Pass 0 if no time source is available. */
 opcua_statuscode_t mu_read_process(const mu_address_space_t *address_space, const mu_address_space_t *dynamic,
-                                   const mu_read_request_t *req, mu_read_response_t *resp,
+                                   const mu_read_request_t *req, opcua_datetime_t now, mu_read_response_t *resp,
                                    mu_datavalue_t *results_array, size_t max_results);
 
 #endif /* MUC_OPCUA_SERVICES_READ_H */

@@ -117,6 +117,76 @@ void test_dispatch_open_secure_channel(void) {
     TEST_ASSERT_EQUAL(3600000, revised);
 }
 
+/* Build an OpenSecureChannelRequest body identical to
+   test_dispatch_open_secure_channel but with an explicit clientNonce of the
+   given length. Used to exercise the Bad_NonceInvalid length check
+   (OPC-10000-4 section 5.6.2.3 Table 12). */
+static size_t build_opn_body_with_nonce(opcua_byte_t *buf, size_t cap, const opcua_byte_t *nonce,
+                                        opcua_int32_t nonce_len) {
+    mu_binary_writer_t w;
+    mu_binary_writer_init(&w, buf, cap);
+    write_request_header(&w, 99);
+    mu_binary_write_uint32(&w, 0); /* ClientProtocolVersion */
+    mu_binary_write_uint32(&w, 0); /* RequestType = ISSUE */
+    mu_binary_write_uint32(&w, 1); /* SecurityMode = NONE */
+    mu_bytestring_t cn = {nonce_len, nonce};
+    mu_binary_write_bytestring(&w, &cn);
+    mu_binary_write_uint32(&w, 3600000); /* RequestedLifetime */
+    return w.position;
+}
+
+void test_dispatch_open_secure_channel_rejects_short_nonce(void) {
+    mu_server_t server;
+    (void)memset(&server, 0, sizeof(server));
+    mu_secure_channel_init(&server.secure_channel);
+    server.config.time_adapter.get_time = fake_time;
+    server.config.entropy_adapter.generate_random = fake_entropy;
+
+    opcua_byte_t nonce[31];
+    (void)memset(nonce, 0x11, sizeof(nonce));
+    opcua_byte_t req[256], resp[256];
+    size_t req_len = build_opn_body_with_nonce(req, sizeof(req), nonce, (opcua_int32_t)sizeof(nonce));
+    size_t resp_len = sizeof(resp);
+    TEST_ASSERT_EQUAL(MU_STATUS_BAD_NONCEINVALID,
+                      mu_service_dispatch(&server, MU_ID_OPENSECURECHANNELREQUEST, req, req_len, resp, &resp_len));
+    TEST_ASSERT_FALSE(server.secure_channel.is_open);
+}
+
+void test_dispatch_open_secure_channel_rejects_long_nonce(void) {
+    mu_server_t server;
+    (void)memset(&server, 0, sizeof(server));
+    mu_secure_channel_init(&server.secure_channel);
+    server.config.time_adapter.get_time = fake_time;
+    server.config.entropy_adapter.generate_random = fake_entropy;
+
+    opcua_byte_t nonce[129];
+    (void)memset(nonce, 0x22, sizeof(nonce));
+    opcua_byte_t req[512], resp[256];
+    size_t req_len = build_opn_body_with_nonce(req, sizeof(req), nonce, (opcua_int32_t)sizeof(nonce));
+    size_t resp_len = sizeof(resp);
+    TEST_ASSERT_EQUAL(MU_STATUS_BAD_NONCEINVALID,
+                      mu_service_dispatch(&server, MU_ID_OPENSECURECHANNELREQUEST, req, req_len, resp, &resp_len));
+    TEST_ASSERT_FALSE(server.secure_channel.is_open);
+}
+
+void test_dispatch_open_secure_channel_accepts_boundary_nonces(void) {
+    mu_server_t server;
+    (void)memset(&server, 0, sizeof(server));
+    mu_secure_channel_init(&server.secure_channel);
+    server.config.time_adapter.get_time = fake_time;
+    server.config.entropy_adapter.generate_random = fake_entropy;
+
+    /* 32-byte nonce (lower bound) is accepted. */
+    opcua_byte_t nonce32[32];
+    (void)memset(nonce32, 0x33, sizeof(nonce32));
+    opcua_byte_t req[256], resp[256];
+    size_t req_len = build_opn_body_with_nonce(req, sizeof(req), nonce32, 32);
+    size_t resp_len = sizeof(resp);
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD,
+                      mu_service_dispatch(&server, MU_ID_OPENSECURECHANNELREQUEST, req, req_len, resp, &resp_len));
+    TEST_ASSERT_TRUE(server.secure_channel.is_open);
+}
+
 #include "../../src/services/session.h"
 
 /* A full CreateSessionRequest body (after the request-type NodeId): RequestHeader,
@@ -358,6 +428,68 @@ void test_dispatch_close_session(void) {
     mu_nodeid_t type;
     mu_binary_read_nodeid(&r, &type);
     TEST_ASSERT_EQUAL(MU_ID_CLOSESESSIONRESPONSE, type.identifier.numeric);
+}
+
+/* OPC-10000-4 section 5.7.4.1: after CloseSession, subsequent requests on the
+   same (now-closed) Session MUST be rejected with Bad_SessionClosed — not
+   Bad_SessionIdInvalid, which is reserved for a token the server never issued. */
+void test_dispatch_request_after_close_session_returns_bad_sessionclosed(void) {
+    mu_server_t server;
+    memset(&server, 0, sizeof(server));
+    server.secure_channel.is_open = true;
+    mu_session_init(&server.sessions[0]);
+    opcua_uint64_t revised;
+    opcua_uint32_t sid, tok;
+    mu_session_create(&server.sessions[0], 0, &revised, &sid, &tok);
+    mu_session_activate(&server.sessions[0], tok, 321); /* -> ACTIVATED */
+
+    /* Build a session-requiring request (CloseSession) using the valid token. */
+    opcua_byte_t req[256];
+    mu_binary_writer_t w;
+    mu_binary_writer_init(&w, req, sizeof(req));
+    mu_nodeid_t auth = {0, MU_NODEID_NUMERIC, {tok}};
+    mu_string_t null_str = {-1, NULL};
+    mu_nodeid_t null_id = {0, MU_NODEID_NUMERIC, {0}};
+    mu_binary_write_nodeid(&w, &auth);
+    mu_binary_write_int64(&w, 0);
+    mu_binary_write_uint32(&w, 0);
+    mu_binary_write_uint32(&w, 0);
+    mu_binary_write_string(&w, &null_str);
+    mu_binary_write_uint32(&w, 0);
+    mu_binary_write_extension_object_header(&w, &null_id, 0);
+    mu_binary_write_boolean(&w, true);
+    size_t req_len = w.position;
+
+    opcua_byte_t resp[256];
+    size_t resp_len = sizeof(resp);
+
+    /* Close the session first. */
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD,
+                      mu_service_dispatch(&server, MU_ID_CLOSESESSIONREQUEST, req, req_len, resp, &resp_len));
+    TEST_ASSERT_EQUAL(MU_SESSION_STATE_CLOSED, server.sessions[0].state);
+    /* The auth_token is preserved on the CLOSED slot for post-close rejection. */
+    TEST_ASSERT_EQUAL_UINT32(tok, server.sessions[0].auth_token);
+
+    /* A second request with the same token is rejected with Bad_SessionClosed. */
+    resp_len = sizeof(resp);
+    TEST_ASSERT_EQUAL(MU_STATUS_BAD_SESSIONCLOSED,
+                      mu_service_dispatch(&server, MU_ID_CLOSESESSIONREQUEST, req, req_len, resp, &resp_len));
+
+    /* A request with a truly unknown token still gets Bad_SessionIdInvalid. */
+    mu_binary_writer_init(&w, req, sizeof(req));
+    auth.identifier.numeric = tok + 1u; /* a token the server never issued */
+    mu_binary_write_nodeid(&w, &auth);
+    mu_binary_write_int64(&w, 0);
+    mu_binary_write_uint32(&w, 0);
+    mu_binary_write_uint32(&w, 0);
+    mu_binary_write_string(&w, &null_str);
+    mu_binary_write_uint32(&w, 0);
+    mu_binary_write_extension_object_header(&w, &null_id, 0);
+    mu_binary_write_boolean(&w, true);
+    req_len = w.position;
+    resp_len = sizeof(resp);
+    TEST_ASSERT_EQUAL(MU_STATUS_BAD_SESSIONIDINVALID,
+                      mu_service_dispatch(&server, MU_ID_CLOSESESSIONREQUEST, req, req_len, resp, &resp_len));
 }
 
 #include "../../src/services/browse.h"
@@ -896,11 +1028,15 @@ int main(void) {
     RUN_TEST(test_dispatch_unsupported_service_returns_bad_serviceunsupported);
     RUN_TEST(test_dispatch_transfer_subscriptions_returns_bad_serviceunsupported);
     RUN_TEST(test_dispatch_open_secure_channel);
+    RUN_TEST(test_dispatch_open_secure_channel_rejects_short_nonce);
+    RUN_TEST(test_dispatch_open_secure_channel_rejects_long_nonce);
+    RUN_TEST(test_dispatch_open_secure_channel_accepts_boundary_nonces);
     RUN_TEST(test_dispatch_create_session);
     RUN_TEST(test_dispatch_create_session_honors_timeout);
     RUN_TEST(test_dispatch_truncated_create_session_body_returns_bad_decodingerror_without_session_mutation);
     RUN_TEST(test_dispatch_activate_session);
     RUN_TEST(test_dispatch_close_session);
+    RUN_TEST(test_dispatch_request_after_close_session_returns_bad_sessionclosed);
     RUN_TEST(test_dispatch_delete_subscriptions_rejects_too_many_operations_before_results);
 #if MUC_OPCUA_SUBSCRIPTIONS
     RUN_TEST(test_dispatch_create_monitored_item_caches_resolved_node);

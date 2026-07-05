@@ -32,7 +32,7 @@ static bool prepare_activate_session_server(mu_server_t *server) {
 
     mu_secure_channel_init(&server->secure_channel);
     if (mu_secure_channel_open(&server->secure_channel, NULL, MU_MESSAGE_SECURITY_MODE_NONE, 3600000u,
-                               &revised_lifetime) != MU_STATUS_GOOD) {
+                               &server->config.entropy_adapter, &revised_lifetime) != MU_STATUS_GOOD) {
         return false;
     }
 

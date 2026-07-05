@@ -49,6 +49,14 @@ static const mu_node_t s_user_nodes[] = {{{0, MU_NODEID_NUMERIC, {ID_SERVER_OBJE
                                           NULL}};
 static const mu_address_space_t s_user_space = {s_user_nodes, sizeof(s_user_nodes) / sizeof(s_user_nodes[0])};
 
+static opcua_statuscode_t test_entropy(void *context, opcua_byte_t *buffer, size_t length) {
+    (void)context;
+    if (buffer != NULL) {
+        (void)memset(buffer, 0x5a, length);
+    }
+    return MU_STATUS_GOOD;
+}
+
 static void prepare_server(mu_server_t *server) {
     opcua_uint32_t revised_lifetime = 0u;
     opcua_uint64_t revised_timeout = 0u;
@@ -57,10 +65,11 @@ static void prepare_server(mu_server_t *server) {
 
     memset(server, 0, sizeof(*server));
     server->config.address_space = &s_user_space;
+    server->config.entropy_adapter.generate_random = test_entropy;
     mu_secure_channel_init(&server->secure_channel);
     TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD,
                             mu_secure_channel_open(&server->secure_channel, NULL, MU_MESSAGE_SECURITY_MODE_NONE,
-                                                   3600000u, &revised_lifetime));
+                                                   3600000u, &server->config.entropy_adapter, &revised_lifetime));
     for (size_t i = 0u; i < MU_MAX_SESSIONS; ++i) {
         mu_session_init(&server->sessions[i]);
     }
