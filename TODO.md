@@ -31,6 +31,16 @@ Items identified by CodeRabbit review of spec 039 (PR #251) — deferred for fut
 | CR8 | `specs/039-clear-remaining-backlog/quickstart.md` | LOW | Placeholder verification grep misses `#warning "STUB"` marker |
 | CR9 | `specs/039-clear-remaining-backlog/quickstart.md` | LOW | Full verification block starts with `cd build` but previous section already left reader there |
 
+### Features with Stub Tests (test infrastructure exists, implementation deferred)
+
+| ID | Test File | Feature | OPC Ref |
+|----|-----------|---------|---------|
+| STUB1 | `tests/unit/test_aggregate_full.c` | Full aggregate function set (42 functions) | OPC-10000-13 |
+| STUB2 | `tests/unit/test_audit_events.c` | Audit event dispatch (mu_raise_audit_event call path) | OPC-10000-5 §6.5 |
+| STUB3 | `tests/unit/test_reverse_connect.c` | Server-initiated TCP connections | OPC-10000-6 §7.5 |
+| STUB4 | `tests/unit/test_time_sync.c` | Security time synchronization | OPC-10000-4 §A.2 |
+| STUB5 | `tests/unit/test_complex_types.c` | Complex type round-trip encode/decode | OPC-10000-3 §5.6.4
+
 ## ✅ Completed in Spec 039
 
 - Bugs: protocol version constant (T002), sampling interval fix (T003), timestampsToReturn validation (T004)
