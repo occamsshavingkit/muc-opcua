@@ -802,7 +802,8 @@ static bool is_numeric_variant_type(mu_builtin_type_t type) {
 
 static bool monitored_node_has_numeric_static_value(const mu_node_t *node) {
     if (node == NULL || node->value == NULL) {
-        return false;
+        /* NULL or unbound value — accept at create time; sampling will evaluate. */
+        return true;
     }
     if (node->value->type != MU_VALUESOURCE_STATIC) {
         /* Callback value types are not exposed at create time; accept and let
