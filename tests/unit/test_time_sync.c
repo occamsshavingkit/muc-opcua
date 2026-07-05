@@ -1,12 +1,12 @@
 /* tests/unit/test_time_sync.c
  *
- * Spec Kit 037, T082. Validate timestamp population infrastructure.
+ * Placeholder test file for time sync functionality.
  * OPC-10000-4 §A.2 (TimestampsToReturn).
+ * Behavioral tests to be added when MUC_OPCUA_TIME_SYNC is implemented.
  */
-#include "unity.h"
+#warning "STUB: time sync tests not yet implemented — feature gated behind MUC_OPCUA_TIME_SYNC"
 
-/* STUB: behavioral tests needed for timestamp population (OPC-10000-4 §A.2)
-   when MUC_OPCUA_TIME_SYNC is enabled. */
+#include "unity.h"
 
 void setUp(void) {}
 void tearDown(void) {}

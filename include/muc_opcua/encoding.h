@@ -1,4 +1,9 @@
 /* include/muc_opcua/encoding.h */
+/*
+ * Spec grounding:
+ *   OPC-10000-6 §5 OPC UA Binary Encoding
+ *   OPC-10000-3 §5 Address Space types
+ */
 #ifndef MUC_OPCUA_ENCODING_H
 #define MUC_OPCUA_ENCODING_H
 

@@ -18,6 +18,8 @@ opcua_statuscode_t handle_transfer_subscriptions(mu_server_t *server, mu_binary_
     opcua_statuscode_t s = mu_binary_read_int32(r, &subscription_count);
     if (s != MU_STATUS_GOOD)
         return s;
+    if (subscription_count < 0)
+        return MU_STATUS_BAD_DECODINGERROR;
 
     opcua_uint32_t sub_ids[16];
     opcua_uint32_t count = (subscription_count > 0) ? (opcua_uint32_t)subscription_count : 0u;

@@ -70,7 +70,14 @@ opcua_statuscode_t mu_read_response_encode(mu_binary_writer_t *writer, const mu_
  * and/or serverTimestamp per req->timestamps_to_return (5.11.2.2 Table 47,
  * 7.39 Table 180). Pass 0 if no time source is available. */
 opcua_statuscode_t mu_read_process(const mu_address_space_t *address_space, const mu_address_space_t *dynamic,
-                                   const mu_read_request_t *req, opcua_datetime_t now, mu_read_response_t *resp,
-                                   mu_datavalue_t *results_array, size_t max_results);
+                                    const mu_read_request_t *req, opcua_datetime_t now, mu_read_response_t *resp,
+                                    mu_datavalue_t *results_array, size_t max_results);
+
+typedef struct {
+    size_t hits;
+    size_t misses;
+} mu_read_cache_stats_t;
+
+void mu_read_cache_get_stats(mu_read_cache_stats_t *out);
 
 #endif /* MUC_OPCUA_SERVICES_READ_H */

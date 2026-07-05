@@ -27,4 +27,17 @@ static inline void *mu_checked_memcpy_off(void *dst, size_t dst_cap, size_t dst_
     return memcpy((opcua_byte_t *)dst + dst_offset, src, n);
 }
 
+/* Range-checked narrowing: size_t → int32_t.
+ * Returns value cast to int32_t, or INT32_MAX if value overflows. */
+#include <stdint.h>
+static inline opcua_int32_t mu_safe_int32_from_size_t(size_t v) {
+    return (v > (size_t)INT32_MAX) ? INT32_MAX : (opcua_int32_t)v;
+}
+
+/* Range-checked narrowing: size_t → int32_t with upper bound.
+ * Returns value cast to int32_t if v ≤ max_val, else max_val. */
+static inline opcua_int32_t mu_safe_int32_from_size_t_max(size_t v, int32_t max_val) {
+    return (v > (size_t)max_val) ? max_val : (opcua_int32_t)v;
+}
+
 #endif /* MU_SAFE_MEM_H */

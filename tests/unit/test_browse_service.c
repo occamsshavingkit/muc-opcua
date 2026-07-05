@@ -70,66 +70,33 @@ void test_browse_service_response_encode(void) {
 
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_browse_response_encode(&writer, &resp));
 
-    mu_binary_reader_t reader;
-    mu_binary_reader_init(&reader, buffer, writer.position);
-
-    opcua_int32_t num_results;
-    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_int32(&reader, &num_results));
-    TEST_ASSERT_EQUAL(1, num_results);
-
-    opcua_statuscode_t status;
-    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_statuscode(&reader, &status));
-    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, status);
-
-    opcua_int32_t cp_len;
-    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_int32(&reader, &cp_len));
-    TEST_ASSERT_EQUAL(-1, cp_len);
-
-    opcua_int32_t num_refs;
-    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_int32(&reader, &num_refs));
-    TEST_ASSERT_EQUAL(1, num_refs);
-
-    mu_nodeid_t ref_type_id;
-    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_nodeid(&reader, &ref_type_id));
-    TEST_ASSERT_EQUAL(35, ref_type_id.identifier.numeric);
-
-    opcua_boolean_t is_forward;
-    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_boolean(&reader, &is_forward));
-    TEST_ASSERT_TRUE(is_forward);
-
-    mu_nodeid_t node_id;
-    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_nodeid(&reader, &node_id));
-    TEST_ASSERT_EQUAL(85, node_id.identifier.numeric);
-
-    opcua_uint16_t browse_name_ns;
-    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_uint16(&reader, &browse_name_ns));
-    TEST_ASSERT_EQUAL(0, browse_name_ns);
-
-    mu_string_t browse_name;
-    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_string(&reader, &browse_name));
-    TEST_ASSERT_EQUAL(7, browse_name.length);
-
-    opcua_byte_t lt_mask;
-    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_byte(&reader, &lt_mask));
-    TEST_ASSERT_EQUAL(2, lt_mask);
-
-    mu_string_t disp_name;
-    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_string(&reader, &disp_name));
-    TEST_ASSERT_EQUAL(7, disp_name.length);
-
-    opcua_uint32_t node_class;
-    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_uint32(&reader, &node_class));
-    TEST_ASSERT_EQUAL(1, node_class);
-
-    mu_nodeid_t type_def;
-    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_nodeid(&reader, &type_def));
-    TEST_ASSERT_EQUAL(61, type_def.identifier.numeric);
-
-    opcua_int32_t diag_len;
-    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_int32(&reader, &diag_len));
-    TEST_ASSERT_EQUAL(0, diag_len);
-
-    TEST_ASSERT_EQUAL(writer.position, reader.position);
+    /* Independent binary fixture for BrowseResponse encoding
+     * OPC-10000-4 §5.9.2.2 / OPC-10000-6 §5.2.2:
+     *   BrowseResult: StatusCode GOOD, ContinuationPoint null (-1),
+     *   1 ReferenceDescription (Organizes ns=0;i=35, forward,
+     *   ObjectsFolder ns=0;i=85, BrowseName="Objects" ns=0,
+     *   DisplayName="Objects", NodeClass Object=1,
+     *   TypeDefinition BaseObjectType ns=0;i=61) */
+    const opcua_byte_t expected[] = {
+        0x01, 0x00, 0x00, 0x00,  /* Int32: num_results=1 */
+        0x00, 0x00, 0x00, 0x00,  /* StatusCode: GOOD */
+        0xFF, 0xFF, 0xFF, 0xFF,  /* ContinuationPoint: null (-1) */
+        0x01, 0x00, 0x00, 0x00,  /* Int32: num_references=1 */
+        0x00, 0x23,                 /* NodeId TwoByte: ns=0, id=35 (Organizes) */
+        0x01,                       /* Boolean: is_forward=true */
+        0x00, 0x55,                 /* NodeId TwoByte: ns=0, id=85 (ObjectsFolder) */
+        0x00, 0x00,                 /* UInt16: browse_name_namespace_index=0 */
+        0x07, 0x00, 0x00, 0x00,  /* Int32: string length=7 */
+        'O', 'b', 'j', 'e', 'c', 't', 's',  /* "Objects" */
+        0x02,                       /* LocalizedText mask: text only */
+        0x07, 0x00, 0x00, 0x00,  /* Int32: string length=7 */
+        'O', 'b', 'j', 'e', 'c', 't', 's',  /* "Objects" */
+        0x01, 0x00, 0x00, 0x00,  /* UInt32: node_class=Object(1) */
+        0x00, 0x3D,                 /* NodeId TwoByte: ns=0, id=61 (BaseObjectType) */
+        0x00, 0x00, 0x00, 0x00,  /* Int32: diagnosticInfos=0 (empty) */
+    };
+    TEST_ASSERT_EQUAL_size_t(sizeof(expected), writer.position);
+    TEST_ASSERT_EQUAL_MEMORY(expected, buffer, sizeof(expected));
 }
 
 void test_browse_service_rejects_invalid_browse_direction(void) {

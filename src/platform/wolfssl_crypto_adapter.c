@@ -1,5 +1,6 @@
 /* src/platform/wolfssl_crypto_adapter.c */
 #ifdef MUC_OPCUA_HAVE_WOLFSSL
+#include "muc_opcua/config.h"
 #include "muc_opcua/platform.h"
 #include "muc_opcua/status.h"
 #include <stdlib.h>
@@ -440,10 +441,14 @@ opcua_statuscode_t mu_wolfssl_crypto_adapter_init(mu_crypto_adapter_t *adapter, 
         return MU_STATUS_BAD_INTERNALERROR;
     }
 
+#ifdef MUC_OPCUA_ALLOW_HEAP
     struct wolfssl_crypto_context *ctx = (struct wolfssl_crypto_context *)calloc(1, sizeof(*ctx));
     if (!ctx) {
         return MU_STATUS_BAD_OUTOFMEMORY;
     }
+#else
+    return MU_STATUS_BAD_OUTOFMEMORY;
+#endif
 
     ctx->cert_der = cert_der;
     ctx->cert_len = cert_len;

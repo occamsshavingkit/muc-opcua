@@ -68,11 +68,99 @@ void test_write_service_prefix_null_buffer(void) {
     TEST_ASSERT_EQUAL(MU_STATUS_BAD_INTERNALERROR, s);
 }
 
+/* Round-trip with boundary NodeId value: ns=0 numeric 0. */
+void test_write_then_parse_boundary_zero(void) {
+    opcua_byte_t buf[16];
+    size_t offset = 0;
+
+    mu_nodeid_t write_id = {0u, MU_NODEID_NUMERIC, {0u}};
+    opcua_statuscode_t s = mu_write_service_prefix(buf, sizeof(buf), &offset, &write_id);
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, s);
+    TEST_ASSERT_TRUE(offset > 0);
+
+    size_t read_offset = 0;
+    mu_nodeid_t read_id;
+    s = mu_parse_service_prefix(buf, offset, &read_offset, &read_id);
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, s);
+    TEST_ASSERT_EQUAL(0u, read_id.namespace_index);
+    TEST_ASSERT_EQUAL(MU_NODEID_NUMERIC, read_id.identifier_type);
+    TEST_ASSERT_EQUAL(0u, read_id.identifier.numeric);
+}
+
+/* Round-trip with boundary NodeId value: ns=0 numeric max uint32. */
+void test_write_then_parse_boundary_max_uint32(void) {
+    opcua_byte_t buf[16];
+    size_t offset = 0;
+
+    mu_nodeid_t write_id = {0u, MU_NODEID_NUMERIC, {0xFFFFFFFFu}};
+    opcua_statuscode_t s = mu_write_service_prefix(buf, sizeof(buf), &offset, &write_id);
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, s);
+    TEST_ASSERT_TRUE(offset > 0);
+
+    size_t read_offset = 0;
+    mu_nodeid_t read_id;
+    s = mu_parse_service_prefix(buf, offset, &read_offset, &read_id);
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, s);
+    TEST_ASSERT_EQUAL(MU_NODEID_NUMERIC, read_id.identifier_type);
+    TEST_ASSERT_EQUAL(0xFFFFFFFFu, read_id.identifier.numeric);
+}
+
+/* Round-trip with boundary NodeId value: ns=65535 numeric 0. */
+void test_write_then_parse_boundary_max_namespace(void) {
+    opcua_byte_t buf[16];
+    size_t offset = 0;
+
+    mu_nodeid_t write_id = {65535u, MU_NODEID_NUMERIC, {0u}};
+    opcua_statuscode_t s = mu_write_service_prefix(buf, sizeof(buf), &offset, &write_id);
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, s);
+    TEST_ASSERT_TRUE(offset > 0);
+
+    size_t read_offset = 0;
+    mu_nodeid_t read_id;
+    s = mu_parse_service_prefix(buf, offset, &read_offset, &read_id);
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, s);
+    TEST_ASSERT_EQUAL(65535u, read_id.namespace_index);
+    TEST_ASSERT_EQUAL(MU_NODEID_NUMERIC, read_id.identifier_type);
+    TEST_ASSERT_EQUAL(0u, read_id.identifier.numeric);
+}
+
+/* Parse with truncated/invalid input returns error. */
+void test_parse_service_prefix_truncated(void) {
+    opcua_byte_t buf[1] = {0xFF}; /* invalid encoding mask, only 1 byte */
+    mu_nodeid_t node_id;
+    size_t offset = 0;
+    opcua_statuscode_t s = mu_parse_service_prefix(buf, 1, &offset, &node_id);
+    TEST_ASSERT_NOT_EQUAL(MU_STATUS_GOOD, s);
+}
+
+/* Parse with empty buffer returns error. */
+void test_parse_service_prefix_empty(void) {
+    opcua_byte_t buf[1] = {0x00};
+    mu_nodeid_t node_id;
+    size_t offset = 0;
+    opcua_statuscode_t s = mu_parse_service_prefix(buf, 0, &offset, &node_id);
+    TEST_ASSERT_NOT_EQUAL(MU_STATUS_GOOD, s);
+}
+
+/* Write with NULL node_id returns error. */
+void test_write_service_prefix_null_nodeid(void) {
+    opcua_byte_t buf[16];
+    size_t offset = 0;
+    opcua_statuscode_t s = mu_write_service_prefix(buf, sizeof(buf), &offset, NULL);
+    TEST_ASSERT_EQUAL(MU_STATUS_BAD_INTERNALERROR, s);
+}
+
 int main(void) {
     UNITY_BEGIN();
     RUN_TEST(test_parse_service_prefix_valid_nodeid);
     RUN_TEST(test_parse_service_prefix_null_buffer);
     RUN_TEST(test_write_then_parse_service_prefix_roundtrip);
     RUN_TEST(test_write_service_prefix_null_buffer);
+    RUN_TEST(test_write_then_parse_boundary_zero);
+    RUN_TEST(test_write_then_parse_boundary_max_uint32);
+    RUN_TEST(test_write_then_parse_boundary_max_namespace);
+    RUN_TEST(test_parse_service_prefix_truncated);
+    RUN_TEST(test_parse_service_prefix_empty);
+    RUN_TEST(test_write_service_prefix_null_nodeid);
     return UNITY_END();
 }

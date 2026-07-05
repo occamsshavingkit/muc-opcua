@@ -61,6 +61,7 @@ typedef struct {
 typedef struct {
     void *client_handle;
     size_t rx_len;
+    size_t rx_read_pos;            /* start offset of unconsumed data in rx_buffer (HP8) */
     opcua_uint64_t last_activity_ms;
     mu_tcp_connection_t tcp_conn;
     mu_secure_channel_t secure_channel;
@@ -83,6 +84,7 @@ struct mu_server {
 #endif
     void *client_handle;
     size_t rx_len;                   /* bytes accumulated in config.receive_buffer (stream reassembly) */
+    size_t rx_read_pos;              /* start offset of unconsumed data in receive_buffer (HP8) */
     opcua_uint64_t last_activity_ms; /* monotonic tick of last inbound traffic (idle timeout) */
     mu_tcp_connection_t tcp_conn;
     mu_secure_channel_t secure_channel;
@@ -95,6 +97,7 @@ struct mu_server {
 #define server_tcp_conn (*(server->active_conn ? &server->active_conn->tcp_conn : &server->tcp_conn))
 #define server_client_handle (*(server->active_conn ? &server->active_conn->client_handle : &server->client_handle))
 #define server_rx_len (*(server->active_conn ? &server->active_conn->rx_len : &server->rx_len))
+#define server_rx_read_pos (*(server->active_conn ? &server->active_conn->rx_read_pos : &server->rx_read_pos))
 #define server_last_activity_ms                                                                                        \
     (*(server->active_conn ? &server->active_conn->last_activity_ms : &server->last_activity_ms))
 #define server_chunk_assembly (server->chunk_assembly)
@@ -103,6 +106,7 @@ struct mu_server {
 #define server_tcp_conn (server->tcp_conn)
 #define server_client_handle (server->client_handle)
 #define server_rx_len (server->rx_len)
+#define server_rx_read_pos (server->rx_read_pos)
 #define server_last_activity_ms (server->last_activity_ms)
 #define server_chunk_assembly (server->chunk_assembly)
 #endif
@@ -120,6 +124,9 @@ struct mu_server {
 #endif
     mu_session_t sessions[MU_MAX_SESSIONS];
     mu_session_t *active_session;
+#if defined(MUC_OPCUA_SESSION_TIMEOUT)
+    opcua_uint64_t next_session_timeout_ms;
+#endif
 #if MUC_OPCUA_SUBSCRIPTIONS
     mu_subscriptions_t subs;
     opcua_uint32_t current_request_id;

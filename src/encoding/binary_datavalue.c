@@ -1,4 +1,11 @@
 /* src/encoding/binary_datavalue.c */
+
+/*
+ * Spec grounding: OPC-10000-6 (UA Binary) §5.2.2.17 DataValue
+ * Implements binary encoding/decoding for the DataValue structure, including
+ * optional fields (Value, StatusCode, SourceTimestamp, etc.) controlled by an encoding mask.
+ */
+
 #include "muc_opcua/encoding.h"
 
 opcua_statuscode_t mu_binary_read_datavalue(mu_binary_reader_t *reader, mu_datavalue_t *value) {

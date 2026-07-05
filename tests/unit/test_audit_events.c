@@ -7,8 +7,7 @@
 #include "unity.h"
 #include <string.h>
 
-/* STUB: audit event dispatch behavioral tests needed (mu_raise_audit_event)
-   when MUC_OPCUA_AUDITING is enabled. */
+#warning "STUB: Audit event dispatch behavioral tests (mu_raise_audit_event call path) not yet implemented. Only type/struct field presence and constant-distinctness verified."
 
 void setUp(void) {}
 void tearDown(void) {}

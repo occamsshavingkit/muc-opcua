@@ -318,6 +318,9 @@ opcua_statuscode_t handle_create_session(mu_server_t *server, mu_binary_reader_t
        dispatch without a full mu_server_init. */
     if (server->config.time_adapter.get_tick_ms != NULL) {
         slot->last_activity_ms = server->config.time_adapter.get_tick_ms(server->config.time_adapter.context);
+#if defined(MUC_OPCUA_SESSION_TIMEOUT)
+        server->next_session_timeout_ms = 0;
+#endif
     }
 
     mu_nodeid_t sid = {0, MU_NODEID_NUMERIC, {slot->session_id}};
@@ -481,7 +484,7 @@ static opcua_statuscode_t handle_activate_username(mu_server_t *server, mu_sessi
     }
 
     opcua_statuscode_t result = MU_STATUS_GOOD;
-    opcua_byte_t decrypt_buf[256];
+    opcua_byte_t decrypt_buf[512];
     mu_bytestring_t decrypted_password = user_token->password;
 
     if (user_token->encryption_algorithm.length > 0 && user_token->password.length > 0) {
@@ -802,6 +805,9 @@ opcua_statuscode_t handle_activate_session(mu_server_t *server, mu_binary_reader
                     if (activate_result == MU_STATUS_GOOD && server->config.time_adapter.get_tick_ms != NULL) {
                         slot->last_activity_ms =
                             server->config.time_adapter.get_tick_ms(server->config.time_adapter.context);
+#if defined(MUC_OPCUA_SESSION_TIMEOUT)
+                        server->next_session_timeout_ms = 0;
+#endif
                     }
                 }
             }

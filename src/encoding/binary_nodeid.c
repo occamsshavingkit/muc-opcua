@@ -1,4 +1,11 @@
 /* src/encoding/binary_nodeid.c */
+
+/*
+ * Spec grounding: OPC-10000-6 (UA Binary) §5.2.2.9 NodeId
+ * Implements binary encoding/decoding for the NodeId structure, including
+ * TwoByte, FourByte, Numeric, String, GUID, ByteString, and Namespace URI formats.
+ */
+
 #include "muc_opcua/encoding.h"
 
 opcua_statuscode_t mu_binary_read_nodeid(mu_binary_reader_t *reader, mu_nodeid_t *value) {
@@ -262,9 +269,153 @@ opcua_statuscode_t mu_binary_write_expanded_nodeid(mu_binary_writer_t *writer, c
         return MU_STATUS_BAD_ENCODINGERROR;
     }
 
-    /* For muc-opcua, we don't emit NamespaceUri or ServerIndex. We just encode as NodeId. */
-    /* This satisfies basic server requirements where all nodes are local. */
-    return mu_binary_write_nodeid(writer, &value->node_id);
+    opcua_statuscode_t status;
+    const mu_nodeid_t *node = &value->node_id;
+
+    opcua_byte_t encoding_mask;
+
+    switch (node->identifier_type) {
+    case MU_NODEID_NUMERIC:
+        /* TwoByte */
+        if (node->namespace_index == 0 && node->identifier.numeric <= 255) {
+            encoding_mask = 0x00;
+        }
+        /* FourByte */
+        else if (node->namespace_index <= 255 && node->identifier.numeric <= 65535) {
+            encoding_mask = 0x01;
+        }
+        /* Numeric */
+        else {
+            encoding_mask = 0x02;
+        }
+        break;
+
+    case MU_NODEID_STRING:
+        encoding_mask = 0x03;
+        break;
+
+#ifdef MUC_OPCUA_EXTENDED_NODEIDS
+    case MU_NODEID_GUID:
+        encoding_mask = 0x04;
+        break;
+
+    case MU_NODEID_OPAQUE:
+        encoding_mask = 0x05;
+        break;
+#endif /* MUC_OPCUA_EXTENDED_NODEIDS */
+
+    default:
+        return MU_STATUS_BAD_ENCODINGERROR;
+    }
+
+    if (value->namespace_uri.length >= 0 && value->namespace_uri.data != NULL) {
+        encoding_mask |= 0x80; /* NamespaceUriFlag */
+    }
+    if (value->server_index != 0) {
+        encoding_mask |= 0x40; /* ServerIndexFlag */
+    }
+
+    status = mu_binary_write_byte(writer, encoding_mask);
+    if (status != MU_STATUS_GOOD) {
+        return status;
+    }
+
+    /* Write namespace_index for formats >= FourByte */
+    switch (encoding_mask & 0x0F) {
+    case 0x00: /* TwoByte — no namespace index, just the id byte */
+        status = mu_binary_write_byte(writer, (opcua_byte_t)node->identifier.numeric);
+        if (status != MU_STATUS_GOOD) {
+            return status;
+        }
+        break;
+
+    case 0x01: /* FourByte */
+        status = mu_binary_write_byte(writer, (opcua_byte_t)node->namespace_index);
+        if (status != MU_STATUS_GOOD) {
+            return status;
+        }
+        status = mu_binary_write_uint16(writer, (opcua_uint16_t)node->identifier.numeric);
+        if (status != MU_STATUS_GOOD) {
+            return status;
+        }
+        break;
+
+    case 0x02: /* Numeric */
+        status = mu_binary_write_uint16(writer, node->namespace_index);
+        if (status != MU_STATUS_GOOD) {
+            return status;
+        }
+        status = mu_binary_write_uint32(writer, node->identifier.numeric);
+        if (status != MU_STATUS_GOOD) {
+            return status;
+        }
+        break;
+
+    case 0x03: /* String */
+        status = mu_binary_write_uint16(writer, node->namespace_index);
+        if (status != MU_STATUS_GOOD) {
+            return status;
+        }
+        status = mu_binary_write_string(writer, &node->identifier.string);
+        if (status != MU_STATUS_GOOD) {
+            return status;
+        }
+        break;
+
+#ifdef MUC_OPCUA_EXTENDED_NODEIDS
+    case 0x04: /* Guid */
+        status = mu_binary_write_uint16(writer, node->namespace_index);
+        if (status != MU_STATUS_GOOD) {
+            return status;
+        }
+        {
+            int i;
+            for (i = 0; i < 16; i++) {
+                status = mu_binary_write_byte(writer, node->identifier.guid[i]);
+                if (status != MU_STATUS_GOOD) {
+                    return status;
+                }
+            }
+        }
+        break;
+
+    case 0x05: /* Opaque */
+        status = mu_binary_write_uint16(writer, node->namespace_index);
+        if (status != MU_STATUS_GOOD) {
+            return status;
+        }
+        status = mu_binary_write_int32(writer, (opcua_int32_t)node->identifier.opaque.length);
+        if (status != MU_STATUS_GOOD) {
+            return status;
+        }
+        {
+            int i;
+            for (i = 0; i < node->identifier.opaque.length; i++) {
+                status = mu_binary_write_byte(writer, node->identifier.opaque.data[i]);
+                if (status != MU_STATUS_GOOD) {
+                    return status;
+                }
+            }
+        }
+        break;
+#endif /* MUC_OPCUA_EXTENDED_NODEIDS */
+    }
+
+    if (encoding_mask & 0x80) { /* NamespaceUriFlag */
+        status = mu_binary_write_string(writer, &value->namespace_uri);
+        if (status != MU_STATUS_GOOD) {
+            return status;
+        }
+    }
+
+    if (encoding_mask & 0x40) { /* ServerIndexFlag */
+        status = mu_binary_write_uint32(writer, value->server_index);
+        if (status != MU_STATUS_GOOD) {
+            return status;
+        }
+    }
+
+    return MU_STATUS_GOOD;
 }
 
 opcua_statuscode_t mu_binary_read_qualified_name(mu_binary_reader_t *reader, mu_qualified_name_t *value) {

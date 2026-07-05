@@ -7,6 +7,12 @@
 /* Feature 025 (F9): reject illegal feature-gate combinations at compile time. */
 #include "muc_opcua/features.h"
 
+/* UB7 / FR-026: gate dynamic (heap) allocation. When undefined or 0 the
+ * library compiles with zero calloc / malloc calls. Overridable with -D. */
+#ifndef MUC_OPCUA_ALLOW_HEAP
+#define MUC_OPCUA_ALLOW_HEAP 1
+#endif
+
 /* Optimization-remediation compile-time knobs.
  * Defaults are intentionally overridable with -D for embedded profiles. */
 
