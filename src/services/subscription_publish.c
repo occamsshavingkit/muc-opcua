@@ -516,7 +516,7 @@ static opcua_statuscode_t write_dcn_object_end(mu_binary_writer_t *w, size_t len
 
 static opcua_statuscode_t write_data_change_notification(mu_binary_writer_t *w, const struct mu_server *server,
                                                          const mu_subscription_t *sub, opcua_int32_t report_count) {
-    size_t length_pos;
+    size_t length_pos = 0;
     opcua_statuscode_t s = write_dcn_object_header(w, report_count, &length_pos);
     if (s != MU_STATUS_GOOD) {
         return s;
