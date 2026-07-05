@@ -108,7 +108,8 @@ opcua_statuscode_t mu_read_process_with_user_index(const mu_address_space_t *add
                                                    mu_address_space_index_t *user_index,
                                                    const mu_address_space_t *dynamic, const mu_read_request_t *req,
                                                    opcua_datetime_t now, mu_read_response_t *resp,
-                                                   mu_datavalue_t *results_array, size_t max_results) {
+                                                   mu_datavalue_t *results_array, size_t max_results,
+                                                   mu_read_cache_t *cache) {
     if (!req || !resp || !results_array) {
         return MU_STATUS_BAD_INTERNALERROR;
     }
@@ -147,12 +148,12 @@ opcua_statuscode_t mu_read_process_with_user_index(const mu_address_space_t *add
             if (node->node_class != MU_NODECLASS_VARIABLE) {
                 status = MU_STATUS_BAD_ATTRIBUTEIDINVALID;
             } else if (node->value) {
-                if (mu_read_cache_lookup(&read_val->node_id, req->max_age, now, &dv->value)) {
+                if (mu_read_cache_lookup(cache, &read_val->node_id, req->max_age, now, &dv->value)) {
                     status = MU_STATUS_GOOD;
                 } else {
                     status = mu_value_source_read(node->value, &node->node_id, &dv->value);
                     if (status == MU_STATUS_GOOD) {
-                        mu_read_cache_store(&read_val->node_id, &dv->value, now);
+                        mu_read_cache_store(cache, &read_val->node_id, &dv->value, now);
                     }
                 }
             } else {
@@ -188,6 +189,6 @@ opcua_statuscode_t mu_read_process_with_user_index(const mu_address_space_t *add
 
 opcua_statuscode_t mu_read_process(const mu_address_space_t *address_space, const mu_address_space_t *dynamic,
                                    const mu_read_request_t *req, opcua_datetime_t now, mu_read_response_t *resp,
-                                   mu_datavalue_t *results_array, size_t max_results) {
-    return mu_read_process_with_user_index(address_space, NULL, dynamic, req, now, resp, results_array, max_results);
+                                   mu_datavalue_t *results_array, size_t max_results, mu_read_cache_t *cache) {
+    return mu_read_process_with_user_index(address_space, NULL, dynamic, req, now, resp, results_array, max_results, cache);
 }
