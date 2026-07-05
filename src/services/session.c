@@ -225,10 +225,9 @@ opcua_statuscode_t mu_session_create_with_identifiers(mu_session_t *session, opc
     return MU_STATUS_GOOD;
 }
 
-__attribute__((deprecated("use mu_session_create_with_identifiers instead")))
-opcua_statuscode_t mu_session_create(mu_session_t *session, opcua_uint64_t requested_timeout_bits,
-                                     opcua_uint64_t *revised_timeout_bits, opcua_uint32_t *session_id,
-                                     opcua_uint32_t *auth_token) {
+__attribute__((deprecated("use mu_session_create_with_identifiers instead"))) opcua_statuscode_t
+mu_session_create(mu_session_t *session, opcua_uint64_t requested_timeout_bits, opcua_uint64_t *revised_timeout_bits,
+                  opcua_uint32_t *session_id, opcua_uint32_t *auth_token) {
     return mu_session_create_with_identifiers(session, requested_timeout_bits, 1u, 12345u, 0u, revised_timeout_bits,
                                               session_id, auth_token);
 }

@@ -209,9 +209,8 @@ option(MUC_OPCUA_STANDARD_PROFILE "Apply Standard 2017 profile gates and capacit
 option(MUC_OPCUA_SESSION_TIMEOUT "Enable session timeout enforcement" OFF)
 set(MUC_OPCUA_SANITIZERS "" CACHE STRING "Comma-separated list of sanitizers (e.g. address,undefined)")
 if(MUC_OPCUA_SANITIZERS)
-    string(REPLACE "," " " SAN_FLAGS "${MUC_OPCUA_SANITIZERS}")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fsanitize=${SAN_FLAGS}")
-    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fsanitize=${SAN_FLAGS}")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fsanitize=${MUC_OPCUA_SANITIZERS}")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fsanitize=${MUC_OPCUA_SANITIZERS}")
 endif()
 set(MUC_OPCUA_PLATFORM "host" CACHE STRING "Target platform (host, external, pico, arduino-skeleton)")
 

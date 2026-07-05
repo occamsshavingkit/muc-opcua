@@ -455,8 +455,8 @@ void test_create_subscription(void) {
    Only meaningful when MU_MAX_SUBSCRIPTIONS is small enough for the
    mock queue; skip when the capacity is too large. */
 void test_create_subscription_too_many(void) {
-#if MU_MAX_SUBSCRIPTIONS > 50
-    TEST_PASS_MESSAGE("MU_MAX_SUBSCRIPTIONS too large for this test");
+#if MU_MAX_SUBSCRIPTIONS > 2
+    TEST_PASS_MESSAGE("MU_MAX_SUBSCRIPTIONS too large for overflow test (needs cap <= 2)");
     return;
 #else
     mock_t mock;

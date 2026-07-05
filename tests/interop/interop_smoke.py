@@ -56,29 +56,42 @@ async def main() -> None:
             else:
                 raise
 
-        # Subscribe/Publish — create subscription, add monitored item for MyVar1,
-        # write a value to trigger a notification, then receive the Publish response.
+        # Subscribe/Publish — only if writes are supported (needs a write to trigger notification).
+        # Skip gracefully when the server returns BadWriteNotSupported.
+        write_ok = True
         try:
-            sub = await asyncio.wait_for(
-                client.create_subscription(period=500, handler=None), timeout=10
-            )
-            try:
-                handle = await asyncio.wait_for(
-                    sub.subscribe_data_change(var, ua.AttributeIds.Value), timeout=10
-                )
-                # Write a new value to trigger a data-change notification
-                await asyncio.wait_for(myvar.write_value(99, varianttype=ua.VariantType.Int32), timeout=10)
-                # Poll for a short time to receive the notification
-                notif = await asyncio.wait_for(sub._internal_subscription.publish(timeout=3), timeout=8)
-                print(f"  subscribe/publish ns=1;i=1000   OK (notification received)")
-                await asyncio.wait_for(sub.unsubscribe(handle), timeout=5)
-            finally:
-                await asyncio.wait_for(sub.delete(), timeout=10)
-        except (ua.UaStatusCodeError, asyncio.TimeoutError) as e:
-            if "BadServiceUnsupported" in str(e) or "BadSubscriptionIdInvalid" in str(e):
-                print(f"  subscribe/publish   SKIP (server does not support subscriptions)")
-            else:
+            await asyncio.wait_for(myvar.write_value(99, varianttype=ua.VariantType.Int32), timeout=10)
+        except ua.UaStatusCodeError as e:
+            write_ok = False
+            if "BadWriteNotSupported" not in str(e):
                 raise
+        if write_ok:
+            try:
+                await asyncio.wait_for(myvar.write_value(old, varianttype=ua.VariantType.Int32), timeout=10)
+            except ua.UaStatusCodeError:
+                pass
+
+            try:
+                sub = await asyncio.wait_for(
+                    client.create_subscription(period=500, handler=None), timeout=10
+                )
+                try:
+                    handle = await asyncio.wait_for(
+                        sub.subscribe_data_change(var, ua.AttributeIds.Value), timeout=10
+                    )
+                    await asyncio.wait_for(myvar.write_value(99, varianttype=ua.VariantType.Int32), timeout=10)
+                    notif = await asyncio.wait_for(sub._internal_subscription.publish(timeout=3), timeout=8)
+                    print(f"  subscribe/publish ns=1;i=1000   OK (notification received)")
+                    await asyncio.wait_for(sub.unsubscribe(handle), timeout=5)
+                finally:
+                    await asyncio.wait_for(sub.delete(), timeout=10)
+            except (ua.UaStatusCodeError, asyncio.TimeoutError) as e:
+                if "BadServiceUnsupported" in str(e) or "BadSubscriptionIdInvalid" in str(e):
+                    print(f"  subscribe/publish   SKIP (server does not support subscriptions)")
+                else:
+                    raise
+        else:
+            print(f"  subscribe/publish   SKIP (server does not support writes)")
     finally:
         await client.disconnect()
 

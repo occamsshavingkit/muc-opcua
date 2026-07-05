@@ -1353,16 +1353,18 @@ static opcua_statuscode_t delete_monitored_item_result(mu_server_t *server, opcu
    dispatch_subscription.c (T012). Extern prototypes in server_internal.h. */
 
 static opcua_statuscode_t write_create_monitored_items_prefix(mu_binary_writer_t *w, opcua_uint32_t request_handle,
-                                                               opcua_int32_t items_to_create) {
+                                                              opcua_int32_t items_to_create) {
     opcua_statuscode_t s = write_response_prefix(w, MU_ID_CREATEMONITOREDITEMSRESPONSE, request_handle, MU_STATUS_GOOD);
-    if (s != MU_STATUS_GOOD) return s;
+    if (s != MU_STATUS_GOOD)
+        return s;
     return mu_binary_write_int32(w, items_to_create);
 }
 
 #if MUC_OPCUA_SUBSCRIPTIONS_STANDARD
 static opcua_statuscode_t validate_create_item_filter(const mu_monitored_item_create_body_t *body,
-                                                       const mu_node_t *node) {
-    if (body->filter_result != MU_STATUS_GOOD) return body->filter_result;
+                                                      const mu_node_t *node) {
+    if (body->filter_result != MU_STATUS_GOOD)
+        return body->filter_result;
     if (body->has_datachange_filter && body->attribute_id != MU_MONITORED_VALUE_ATTRIBUTE_ID)
         return MU_STATUS_BAD_FILTERNOTALLOWED;
     if (body->deadband_type == MU_DEADBAND_TYPE_ABSOLUTE && !monitored_node_has_numeric_static_value(node))
@@ -1373,10 +1375,10 @@ static opcua_statuscode_t validate_create_item_filter(const mu_monitored_item_cr
 }
 #endif
 
-static opcua_statuscode_t configure_monitored_item(mu_monitored_item_t *item, const mu_monitored_item_create_body_t *body,
-                                                     const mu_node_t *node, mu_subscription_t *sub,
-                                                     opcua_uint32_t timestamps_to_return, opcua_uint64_t now_ms,
-                                                      mu_server_t *server) {
+static opcua_statuscode_t configure_monitored_item(mu_monitored_item_t *item,
+                                                   const mu_monitored_item_create_body_t *body, const mu_node_t *node,
+                                                   mu_subscription_t *sub, opcua_uint32_t timestamps_to_return,
+                                                   opcua_uint64_t now_ms, mu_server_t *server) {
     (void)server; /* used by mu_resolve_eurange_span under MUC_OPCUA_DATA_ACCESS */
     copy_monitored_node_id(item, &body->node_id);
     item->resolved_node = node;
@@ -1408,8 +1410,12 @@ static opcua_statuscode_t configure_monitored_item(mu_monitored_item_t *item, co
     }
 #endif
     item->queue_size = body->queue_size;
-    if (item->queue_size == 0u) { item->queue_size = 1u; }
-    if (item->queue_size > MU_MONITORED_QUEUE_DEPTH) { item->queue_size = MU_MONITORED_QUEUE_DEPTH; }
+    if (item->queue_size == 0u) {
+        item->queue_size = 1u;
+    }
+    if (item->queue_size > MU_MONITORED_QUEUE_DEPTH) {
+        item->queue_size = MU_MONITORED_QUEUE_DEPTH;
+    }
     item->queue_head = 0u;
     item->queue_tail = 0u;
     item->queue_count = 0u;
@@ -1439,41 +1445,49 @@ static opcua_statuscode_t configure_monitored_item(mu_monitored_item_t *item, co
 /* CreateMonitoredItems (OPC 10000-4 5.13.2): data-change monitoring for Value
    Attributes only, backed by the fixed-size subscription engine. */
 static opcua_statuscode_t handle_create_monitored_items(mu_server_t *server, mu_binary_reader_t *r,
-                                                         mu_binary_writer_t *w, size_t *response_length) {
+                                                        mu_binary_writer_t *w, size_t *response_length) {
     mu_request_header_t req;
     opcua_statuscode_t s = mu_request_header_decode(r, &req);
-    if (s != MU_STATUS_GOOD) return s;
+    if (s != MU_STATUS_GOOD)
+        return s;
 
     opcua_uint32_t subscription_id, timestamps_to_return;
     opcua_int32_t items_to_create;
     mu_binary_read_uint32(r, &subscription_id);
     mu_binary_read_uint32(r, &timestamps_to_return);
     mu_binary_read_int32(r, &items_to_create);
-    if (r->status != MU_STATUS_GOOD) return r->status;
+    if (r->status != MU_STATUS_GOOD)
+        return r->status;
 
-    if (timestamps_to_return > MU_TIMESTAMPS_TO_RETURN_NEITHER) return MU_STATUS_BAD_TIMESTAMPSTORETURNINVALID;
+    if (timestamps_to_return > MU_TIMESTAMPS_TO_RETURN_NEITHER)
+        return MU_STATUS_BAD_TIMESTAMPSTORETURNINVALID;
     if (items_to_create > 0 && (size_t)items_to_create > MU_DISPATCH_MAX_SUBSCRIPTION_OPERATIONS)
         return MU_STATUS_BAD_TOOMANYOPERATIONS;
 
     mu_subscription_t *sub = mu_subscription_find(&server->subs, server->active_session->session_id, subscription_id);
-    if (sub == NULL) return MU_STATUS_BAD_SUBSCRIPTIONIDINVALID;
-    if (items_to_create <= 0) return MU_STATUS_BAD_NOTHINGTODO;
+    if (sub == NULL)
+        return MU_STATUS_BAD_SUBSCRIPTIONIDINVALID;
+    if (items_to_create <= 0)
+        return MU_STATUS_BAD_NOTHINGTODO;
 
     s = write_create_monitored_items_prefix(w, req.request_handle, items_to_create);
-    if (s != MU_STATUS_GOOD) return s;
+    if (s != MU_STATUS_GOOD)
+        return s;
 
     opcua_uint64_t now_ms = server->config.time_adapter.get_tick_ms(server->config.time_adapter.context);
 
     for (opcua_int32_t i = 0; i < items_to_create; ++i) {
         mu_monitored_item_create_body_t body;
         s = read_monitored_item_create_body(r, &body);
-        if (s != MU_STATUS_GOOD) return s;
+        if (s != MU_STATUS_GOOD)
+            return s;
 
         const mu_node_t *node = mu_resolve_node(server->config.address_space, &server->user_address_space_index,
                                                 &server->runtime_base.space, &body.node_id);
         if (node == NULL) {
             s = write_monitored_item_create_result(w, MU_STATUS_BAD_NODEIDUNKNOWN, 0u, 0u, 0u);
-            if (s != MU_STATUS_GOOD) return s;
+            if (s != MU_STATUS_GOOD)
+                return s;
             continue;
         }
 
@@ -1482,7 +1496,8 @@ static opcua_statuscode_t handle_create_monitored_items(mu_server_t *server, mu_
             opcua_statuscode_t filter_status = validate_create_item_filter(&body, node);
             if (filter_status != MU_STATUS_GOOD) {
                 s = write_monitored_item_create_result(w, filter_status, 0u, 0u, 0u);
-                if (s != MU_STATUS_GOOD) return s;
+                if (s != MU_STATUS_GOOD)
+                    return s;
                 continue;
             }
         }
@@ -1494,7 +1509,8 @@ static opcua_statuscode_t handle_create_monitored_items(mu_server_t *server, mu_
 #endif
               )) {
             s = write_monitored_item_create_result(w, MU_STATUS_BAD_ATTRIBUTEIDINVALID, 0u, 0u, 0u);
-            if (s != MU_STATUS_GOOD) return s;
+            if (s != MU_STATUS_GOOD)
+                return s;
             continue;
         }
 
@@ -1502,7 +1518,8 @@ static opcua_statuscode_t handle_create_monitored_items(mu_server_t *server, mu_
         opcua_statuscode_t result = mu_monitored_item_alloc(&server->subs, subscription_id, &item);
         if (result != MU_STATUS_GOOD) {
             s = write_monitored_item_create_result(w, result, 0u, 0u, 0u);
-            if (s != MU_STATUS_GOOD) return s;
+            if (s != MU_STATUS_GOOD)
+                return s;
             continue;
         }
 
@@ -1513,13 +1530,15 @@ static opcua_statuscode_t handle_create_monitored_items(mu_server_t *server, mu_
 #else
         const opcua_uint32_t revised_queue_size = 1u;
 #endif
-        s = write_monitored_item_create_result(w, MU_STATUS_GOOD, item->monitored_item_id,
-                                                item->sampling_interval_ms, revised_queue_size);
-        if (s != MU_STATUS_GOOD) return s;
+        s = write_monitored_item_create_result(w, MU_STATUS_GOOD, item->monitored_item_id, item->sampling_interval_ms,
+                                               revised_queue_size);
+        if (s != MU_STATUS_GOOD)
+            return s;
     }
 
     s = mu_binary_write_int32(w, 0);
-    if (s != MU_STATUS_GOOD) return s;
+    if (s != MU_STATUS_GOOD)
+        return s;
 
     *response_length = w->position;
     return MU_STATUS_GOOD;

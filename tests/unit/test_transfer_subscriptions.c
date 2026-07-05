@@ -6,7 +6,8 @@
 #include "muc_opcua/opcua_ids.h"
 #include "unity.h"
 
-#pragma message "STUB: transfer_subscriptions handler needs integration tests for count parsing, 16-item cap, response encoding (OPC-10000-4 §5.14.7)"
+#pragma message                                                                                                        \
+    "STUB: transfer_subscriptions handler needs integration tests for count parsing, 16-item cap, response encoding (OPC-10000-4 §5.14.7)"
 
 void setUp(void) {}
 void tearDown(void) {}
