@@ -31,12 +31,12 @@ opcua_statuscode_t mu_read_process_with_user_index(const mu_address_space_t *add
                                                    mu_address_space_index_t *user_index,
                                                    const mu_address_space_t *dynamic, const mu_read_request_t *req,
                                                    opcua_datetime_t now, mu_read_response_t *resp,
-                                                   mu_datavalue_t *results_array, size_t max_results);
+                                                   mu_datavalue_t *results_array, size_t max_results, mu_read_cache_t *cache);
 
-opcua_boolean_t mu_read_cache_lookup(const mu_nodeid_t *node_id, opcua_double_t max_age_ms, opcua_datetime_t now,
+opcua_boolean_t mu_read_cache_lookup(mu_read_cache_t *cache, const mu_nodeid_t *node_id, opcua_double_t max_age_ms, opcua_datetime_t now,
                                      mu_variant_t *out);
 
-void mu_read_cache_store(const mu_nodeid_t *node_id, const mu_variant_t *val, opcua_datetime_t read_time);
+void mu_read_cache_store(mu_read_cache_t *cache, const mu_nodeid_t *node_id, const mu_variant_t *val, opcua_datetime_t read_time);
 
 #ifdef MUC_OPCUA_MULTI_CHUNK
 opcua_statuscode_t apply_index_range(const mu_string_t *index_range, mu_variant_t *value);

@@ -7,6 +7,7 @@
 #include "muc_opcua/opcua_types.h"
 #include "muc_opcua/status.h"
 
+typedef struct mu_read_cache mu_read_cache_t;
 
 typedef enum {
     MU_ATTRIBUTEID_NODEID = 1,
@@ -72,7 +73,7 @@ opcua_statuscode_t mu_read_response_encode(mu_binary_writer_t *writer, const mu_
  * 7.39 Table 180). Pass 0 if no time source is available. */
 opcua_statuscode_t mu_read_process(const mu_address_space_t *address_space, const mu_address_space_t *dynamic,
                                    const mu_read_request_t *req, opcua_datetime_t now, mu_read_response_t *resp,
-                                   mu_datavalue_t *results_array, size_t max_results);
+                                   mu_datavalue_t *results_array, size_t max_results, mu_read_cache_t *cache);
 
 typedef struct {
     size_t hits;

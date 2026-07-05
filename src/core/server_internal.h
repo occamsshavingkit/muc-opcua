@@ -3,6 +3,7 @@
 #define MUC_OPCUA_SERVER_INTERNAL_H
 
 #include "../address_space/base_nodes.h"
+#include "../services/read/common.h"
 #include "../services/secure_channel.h"
 #include "../services/session.h"
 #include "../services/subscription.h"
@@ -124,6 +125,7 @@ struct mu_server {
 #endif
     mu_session_t sessions[MU_MAX_SESSIONS];
     mu_session_t *active_session;
+    mu_read_cache_t read_cache;
 #if defined(MUC_OPCUA_SESSION_TIMEOUT)
     opcua_uint64_t next_session_timeout_ms;
 #endif
