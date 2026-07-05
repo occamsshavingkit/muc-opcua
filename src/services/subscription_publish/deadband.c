@@ -67,7 +67,7 @@ opcua_int32_t count_reportable_items(const struct mu_server *server, mu_subscrip
     return count;
 }
 #else
-opcua_int32_t count_reportable_items(const struct mu_server *server, const mu_subscription_t *sub) {
+opcua_int32_t count_reportable_items(const struct mu_server *server, mu_subscription_t *sub) {
     opcua_int32_t count = 0;
     for (size_t w = 0; w < MU_REPORTABLE_BITMAP_WORDS; ++w) {
         opcua_uint32_t bits = server->subs.reportable_bitmap[w];
