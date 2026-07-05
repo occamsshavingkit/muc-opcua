@@ -334,12 +334,11 @@ void test_secure_channel_open_none(void) {
 
     mu_entropy_adapter_t entropy = channel_test_entropy_adapter();
     opcua_uint32_t revised_lifetime = 0;
-    TEST_ASSERT_EQUAL(MU_STATUS_GOOD,
-                      mu_secure_channel_open(&channel, NULL, MU_MESSAGE_SECURITY_MODE_NONE, 1000, &entropy,
-                                             &revised_lifetime));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_secure_channel_open(&channel, NULL, MU_MESSAGE_SECURITY_MODE_NONE, 1000,
+                                                             &entropy, &revised_lifetime));
     TEST_ASSERT_TRUE(channel.is_open);
-    TEST_ASSERT_EQUAL(10000, revised_lifetime); /* Bounded to min */
-    TEST_ASSERT_GREATER_THAN(0, channel.channel_id);  /* non-zero random id */
+    TEST_ASSERT_EQUAL(10000, revised_lifetime);      /* Bounded to min */
+    TEST_ASSERT_GREATER_THAN(0, channel.channel_id); /* non-zero random id */
     TEST_ASSERT_EQUAL(1, channel.token_id);
 
     /* Renew keeps the channel id; only the token rolls. */
@@ -360,14 +359,14 @@ void test_secure_channel_open_rejects_when_entropy_unavailable(void) {
 
     mu_entropy_adapter_t broken = {NULL, failing_entropy};
     opcua_uint32_t revised_lifetime = 0;
-    TEST_ASSERT_EQUAL(MU_STATUS_BAD_SECURITYCHECKSFAILED,
-                      mu_secure_channel_open(&channel, NULL, MU_MESSAGE_SECURITY_MODE_NONE, 1000, &broken,
-                                             &revised_lifetime));
+    TEST_ASSERT_EQUAL(
+        MU_STATUS_BAD_SECURITYCHECKSFAILED,
+        mu_secure_channel_open(&channel, NULL, MU_MESSAGE_SECURITY_MODE_NONE, 1000, &broken, &revised_lifetime));
     TEST_ASSERT_FALSE(channel.is_open);
 
-    TEST_ASSERT_EQUAL(MU_STATUS_BAD_SECURITYCHECKSFAILED,
-                      mu_secure_channel_open(&channel, NULL, MU_MESSAGE_SECURITY_MODE_NONE, 1000, NULL,
-                                             &revised_lifetime));
+    TEST_ASSERT_EQUAL(
+        MU_STATUS_BAD_SECURITYCHECKSFAILED,
+        mu_secure_channel_open(&channel, NULL, MU_MESSAGE_SECURITY_MODE_NONE, 1000, NULL, &revised_lifetime));
     TEST_ASSERT_FALSE(channel.is_open);
 }
 

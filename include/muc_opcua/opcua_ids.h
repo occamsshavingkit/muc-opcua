@@ -88,9 +88,21 @@
 #define MU_ID_DELETESUBSCRIPTIONSREQUEST 847
 #define MU_ID_DELETESUBSCRIPTIONSRESPONSE 850
 
+#define MU_ID_TRANSFERSUBSCRIPTIONSREQUEST 841
+#define MU_ID_TRANSFERSUBSCRIPTIONSRESPONSE 844
+
 #define MU_ID_AGGREGATEFILTER_ENCODING_DEFAULTBINARY 730
 #define MU_ID_AGGREGATETYPE_AVERAGE 2342
 #define MU_ID_AGGREGATETYPE_MINIMUM 2346
 #define MU_ID_AGGREGATETYPE_MAXIMUM 2347
+
+/* Data Access Server Facet — OPC-10000-3 §5.6.2 */
+#define MU_ID_EURANGE 113                              /* EURange Property on AnalogItemType */
+#define MU_ID_ENGINEERINGUNITS 115                     /* EngineeringUnits Property */
+#define MU_ID_INSTRUMENTRANGE 117                      /* InstrumentRange Property */
+#define MU_ID_ANALOGITEMTYPE 2368                      /* AnalogItemType ObjectType */
+#define MU_ID_RANGE_ENCODING_DEFAULTBINARY 121         /* Range data type encoding */
+#define MU_ID_EUINFORMATION_ENCODING_DEFAULTBINARY 125 /* EUInformation encoding */
+#define MU_ID_PERCENTDEADBAND 3                        /* PercentDeadband type in DataChangeFilter */
 
 #endif /* MUC_OPCUA_OPCUA_IDS_H */

@@ -462,12 +462,22 @@ void test_traceability_docs_do_not_keep_stale_aggregate_or_tbd_protocol_rows(voi
 
 void test_traceability_docs_changed_protocol_files_have_opc_section_mappings(void) {
     static const char *const changed_protocol_files[] = {
-        "src/core/service_dispatch.c",    "src/core/message_chunk.c",     "src/core/server.c",
-        "src/core/tcp_connection.c",      "src/encoding/binary_reader.c", "src/encoding/binary_extension_object.c",
-        "src/encoding/binary_query.c",    "src/services/discovery.c",     "src/services/history.c",
-        "src/services/node_management.c", "src/services/query.c",         "src/services/session.c",
-        "src/services/subscription_monitor.c", "src/services/subscription_publish.c",
-        "src/services/subscription_aggregate.c", "include/muc_opcua/status.h",
+        "src/core/service_dispatch.c",
+        "src/core/message_chunk.c",
+        "src/core/server.c",
+        "src/core/tcp_connection.c",
+        "src/encoding/binary_reader.c",
+        "src/encoding/binary_extension_object.c",
+        "src/encoding/binary_query.c",
+        "src/services/discovery.c",
+        "src/services/history.c",
+        "src/services/node_management.c",
+        "src/services/query.c",
+        "src/services/session.c",
+        "src/services/subscription_monitor.c",
+        "src/services/subscription_publish.c",
+        "src/services/subscription_aggregate.c",
+        "include/muc_opcua/status.h",
     };
     char path[1024];
     char failures[4096];
@@ -525,7 +535,8 @@ void test_traceability_docs_cited_opc_sections_have_file_mappings(void) {
             find_section_mapping_row(sections_to_files_content, cited_sections[i].part, cited_sections[i].section);
         char label[64];
 
-        (void)snprintf(label, sizeof(label), "OPC-10000-%s section %s", cited_sections[i].part, cited_sections[i].section);
+        (void)snprintf(label, sizeof(label), "OPC-10000-%s section %s", cited_sections[i].part,
+                       cited_sections[i].section);
         if (!row) {
             append_traceability_failure(failures, sizeof(failures), label, "missing from sections-to-files.md");
             continue;

@@ -28,12 +28,10 @@
 /* mu_read_process_with_user_index is defined in src/services/read.c. It is not
    declared in read.h (only mu_read_process is) so forward-declare it here for
    the dispatch handler. OPC-10000-4 5.11.2. */
-extern opcua_statuscode_t mu_read_process_with_user_index(const mu_address_space_t *address_space,
-                                                           mu_address_space_index_t *user_index,
-                                                           const mu_address_space_t *dynamic,
-                                                           const mu_read_request_t *req, opcua_datetime_t now,
-                                                           mu_read_response_t *resp, mu_datavalue_t *results_array,
-                                                           size_t max_results);
+extern opcua_statuscode_t
+mu_read_process_with_user_index(const mu_address_space_t *address_space, mu_address_space_index_t *user_index,
+                                const mu_address_space_t *dynamic, const mu_read_request_t *req, opcua_datetime_t now,
+                                mu_read_response_t *resp, mu_datavalue_t *results_array, size_t max_results);
 #endif
 
 #ifdef MUC_OPCUA_SERVICE_READ

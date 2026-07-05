@@ -17,40 +17,64 @@ typedef struct {
     opcua_boolean_t valid;
 } mu_read_cache_entry_t;
 
-static opcua_boolean_t mu_read_cache_lookup(const mu_nodeid_t *node_id, opcua_double_t max_age_ms,
-                                             opcua_datetime_t now, mu_variant_t *out) {
-    (void)node_id; (void)max_age_ms; (void)now; (void)out;
+static opcua_boolean_t mu_read_cache_lookup(const mu_nodeid_t *node_id, opcua_double_t max_age_ms, opcua_datetime_t now,
+                                            mu_variant_t *out) {
+    (void)node_id;
+    (void)max_age_ms;
+    (void)now;
+    (void)out;
     return false;
 }
 
-static void mu_read_cache_store(const mu_nodeid_t *node_id, const mu_variant_t *val,
-                                 opcua_datetime_t read_time) {
-    (void)node_id; (void)val; (void)read_time;
+static void mu_read_cache_store(const mu_nodeid_t *node_id, const mu_variant_t *val, opcua_datetime_t read_time) {
+    (void)node_id;
+    (void)val;
+    (void)read_time;
 }
 
 #ifdef MUC_OPCUA_MULTI_CHUNK
 static size_t variant_elem_size(mu_builtin_type_t type) {
     switch (type) {
-    case MU_TYPE_BOOLEAN:       return sizeof(opcua_boolean_t);
-    case MU_TYPE_SBYTE:         return sizeof(opcua_sbyte_t);
-    case MU_TYPE_BYTE:          return sizeof(opcua_byte_t);
-    case MU_TYPE_INT16:         return sizeof(opcua_int16_t);
-    case MU_TYPE_UINT16:        return sizeof(opcua_uint16_t);
-    case MU_TYPE_INT32:         return sizeof(opcua_int32_t);
-    case MU_TYPE_UINT32:        return sizeof(opcua_uint32_t);
-    case MU_TYPE_INT64:         return sizeof(opcua_int64_t);
-    case MU_TYPE_UINT64:        return sizeof(opcua_uint64_t);
-    case MU_TYPE_FLOAT:         return sizeof(opcua_float_t);
-    case MU_TYPE_DOUBLE:        return sizeof(opcua_double_t);
-    case MU_TYPE_STRING:        return sizeof(mu_string_t);
-    case MU_TYPE_DATETIME:      return sizeof(opcua_datetime_t);
-    case MU_TYPE_BYTESTRING:    return sizeof(mu_bytestring_t);
-    case MU_TYPE_NODEID:        return sizeof(mu_nodeid_t);
-    case MU_TYPE_EXPANDEDNODEID:return sizeof(mu_expanded_nodeid_t);
-    case MU_TYPE_STATUSCODE:    return sizeof(opcua_statuscode_t);
-    case MU_TYPE_QUALIFIEDNAME: return sizeof(mu_qualified_name_t);
-    case MU_TYPE_LOCALIZEDTEXT: return sizeof(mu_localized_text_t);
-    default:                    return 0;
+    case MU_TYPE_BOOLEAN:
+        return sizeof(opcua_boolean_t);
+    case MU_TYPE_SBYTE:
+        return sizeof(opcua_sbyte_t);
+    case MU_TYPE_BYTE:
+        return sizeof(opcua_byte_t);
+    case MU_TYPE_INT16:
+        return sizeof(opcua_int16_t);
+    case MU_TYPE_UINT16:
+        return sizeof(opcua_uint16_t);
+    case MU_TYPE_INT32:
+        return sizeof(opcua_int32_t);
+    case MU_TYPE_UINT32:
+        return sizeof(opcua_uint32_t);
+    case MU_TYPE_INT64:
+        return sizeof(opcua_int64_t);
+    case MU_TYPE_UINT64:
+        return sizeof(opcua_uint64_t);
+    case MU_TYPE_FLOAT:
+        return sizeof(opcua_float_t);
+    case MU_TYPE_DOUBLE:
+        return sizeof(opcua_double_t);
+    case MU_TYPE_STRING:
+        return sizeof(mu_string_t);
+    case MU_TYPE_DATETIME:
+        return sizeof(opcua_datetime_t);
+    case MU_TYPE_BYTESTRING:
+        return sizeof(mu_bytestring_t);
+    case MU_TYPE_NODEID:
+        return sizeof(mu_nodeid_t);
+    case MU_TYPE_EXPANDEDNODEID:
+        return sizeof(mu_expanded_nodeid_t);
+    case MU_TYPE_STATUSCODE:
+        return sizeof(opcua_statuscode_t);
+    case MU_TYPE_QUALIFIEDNAME:
+        return sizeof(mu_qualified_name_t);
+    case MU_TYPE_LOCALIZEDTEXT:
+        return sizeof(mu_localized_text_t);
+    default:
+        return 0;
     }
 }
 #endif
@@ -310,13 +334,11 @@ static opcua_statuscode_t read_attribute(const mu_address_space_t *address_space
         return MU_STATUS_GOOD;
 
     case MU_ATTRIBUTEID_DATATYPE:
-        if (node->node_class != MU_NODECLASS_VARIABLE &&
-            node->node_class != MU_NODECLASS_VARIABLETYPE) {
+        if (node->node_class != MU_NODECLASS_VARIABLE && node->node_class != MU_NODECLASS_VARIABLETYPE) {
             return MU_STATUS_BAD_ATTRIBUTEIDINVALID;
         }
         value->type = MU_TYPE_NODEID;
-        if (node->type_definition.namespace_index != 0 ||
-            node->type_definition.identifier_type != 0 ||
+        if (node->type_definition.namespace_index != 0 || node->type_definition.identifier_type != 0 ||
             node->type_definition.identifier.numeric != 0) {
             value->value.nodeid = node->type_definition;
         } else {
@@ -325,8 +347,7 @@ static opcua_statuscode_t read_attribute(const mu_address_space_t *address_space
         return MU_STATUS_GOOD;
 
     case MU_ATTRIBUTEID_VALUERANK:
-        if (node->node_class != MU_NODECLASS_VARIABLE &&
-            node->node_class != MU_NODECLASS_VARIABLETYPE) {
+        if (node->node_class != MU_NODECLASS_VARIABLE && node->node_class != MU_NODECLASS_VARIABLETYPE) {
             return MU_STATUS_BAD_ATTRIBUTEIDINVALID;
         }
         value->type = MU_TYPE_INT32;

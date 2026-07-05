@@ -6,11 +6,11 @@
 #include <string.h>
 
 /* OPC-10000-4 §5.9.2.2 Table 34: resultMask bits */
-#define BROWSE_RESULTMASK_REFERENCE_TYPE  0x01U
-#define BROWSE_RESULTMASK_IS_FORWARD      0x02U
-#define BROWSE_RESULTMASK_NODE_CLASS      0x04U
-#define BROWSE_RESULTMASK_BROWSE_NAME     0x08U
-#define BROWSE_RESULTMASK_DISPLAY_NAME    0x10U
+#define BROWSE_RESULTMASK_REFERENCE_TYPE 0x01U
+#define BROWSE_RESULTMASK_IS_FORWARD 0x02U
+#define BROWSE_RESULTMASK_NODE_CLASS 0x04U
+#define BROWSE_RESULTMASK_BROWSE_NAME 0x08U
+#define BROWSE_RESULTMASK_DISPLAY_NAME 0x10U
 #define BROWSE_RESULTMASK_TYPE_DEFINITION 0x20U
 
 /* Immediate supertype of a well-known (ns=0) ReferenceType, or 0 at the root.
@@ -70,8 +70,8 @@ opcua_boolean_t ref_type_is_subtype_of(const mu_nodeid_t *child, const mu_nodeid
 /* Populate a ReferenceDescription, applying resultMask to filter which fields are
    included. NodeId is always populated (not controlled by resultMask).
    OPC-10000-4 §5.9.2.2 Table 34. */
-static void fill_ref_desc(mu_reference_description_t *ref_desc, const mu_reference_t *r,
-                          const mu_node_t *target, opcua_uint32_t result_mask) {
+static void fill_ref_desc(mu_reference_description_t *ref_desc, const mu_reference_t *r, const mu_node_t *target,
+                          opcua_uint32_t result_mask) {
     memset(ref_desc, 0, sizeof(*ref_desc));
 
     /* NodeId is always returned (not in resultMask) */

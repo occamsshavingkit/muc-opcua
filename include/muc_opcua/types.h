@@ -83,6 +83,20 @@ typedef enum {
     MU_TYPE_DIAGNOSTICINFO = 25
 } mu_builtin_type_t;
 
+#if MUC_OPCUA_DATA_ACCESS
+typedef struct {
+    opcua_double_t low;
+    opcua_double_t high;
+} mu_range_t;
+
+typedef struct {
+    mu_string_t namespace_uri;
+    opcua_int32_t unit_id;
+    mu_string_t display_name;
+    mu_string_t description;
+} mu_eu_information_t;
+#endif /* MUC_OPCUA_DATA_ACCESS */
+
 /* Variant */
 typedef struct {
     mu_builtin_type_t type;
@@ -182,6 +196,35 @@ typedef struct {
     mu_string_t message;
     opcua_uint16_t severity;
 } mu_event_notification_t;
+
+typedef struct {
+    mu_bytestring_t event_id;
+    mu_nodeid_t event_type;
+    mu_nodeid_t source_node;
+    mu_string_t source_name;
+    opcua_datetime_t time;
+    opcua_datetime_t receive_time;
+    struct {
+        opcua_int16_t offset;
+        opcua_boolean_t daylight_saving_in_offset;
+    } local_time;
+    mu_string_t message;
+    opcua_uint16_t severity;
+} mu_event_fields_t;
+
+#if MUC_OPCUA_EVENT_FILTER_WHERE
+#include <stdbool.h>
+/* Evaluate ContentFilter where-clause against event fields.
+ * Returns true if the event matches the filter (or filter is empty).
+   OPC-10000-4 §7.22.3 */
+bool mu_evaluate_event_filter_where(const mu_event_fields_t *event_fields, const opcua_uint32_t *operators,
+                                    const opcua_uint32_t *field_indices, const int64_t *filter_values,
+                                    opcua_uint32_t element_count);
+
+/* Resolve a SimpleAttributeOperand BrowsePath to a BaseEventType field index.
+ * Returns field index (0-8) or -1 if unknown. OPC-10000-5 §6.4.2 */
+int mu_event_filter_resolve_select_clause(const char *browse_path, size_t len);
+#endif
 #endif
 
 #endif /* MUC_OPCUA_TYPES_H */

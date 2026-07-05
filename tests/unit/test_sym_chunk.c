@@ -113,7 +113,8 @@ static opcua_statuscode_t counting_cipher_ctx_init(void *context, const opcua_by
     }
     stub->cipher_ctx_init_calls++;
     (void)memcpy(ctx_storage, key, MU_B256S256_ENCRYPTION_KEY_LENGTH);
-    (void)memset(ctx_storage + MU_B256S256_ENCRYPTION_KEY_LENGTH, 0, MU_CIPHER_CTX_SIZE - MU_B256S256_ENCRYPTION_KEY_LENGTH);
+    (void)memset(ctx_storage + MU_B256S256_ENCRYPTION_KEY_LENGTH, 0,
+                 MU_CIPHER_CTX_SIZE - MU_B256S256_ENCRYPTION_KEY_LENGTH);
     return MU_STATUS_GOOD;
 }
 

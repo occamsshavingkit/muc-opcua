@@ -233,9 +233,9 @@ static int parse_size_arg(const char *name, const char *value, size_t *out) {
 
 static void print_usage(FILE *stream, const char *program) {
     (void)fprintf(stream,
-            "Usage: %s --scenario NAME [--nodes N] [--batch N] [--iterations N] [--warmup N] [--min-ms N]\n"
-            "       %s --list\n",
-            program, program);
+                  "Usage: %s --scenario NAME [--nodes N] [--batch N] [--iterations N] [--warmup N] [--min-ms N]\n"
+                  "       %s --list\n",
+                  program, program);
 }
 
 static void print_list(void) {
@@ -245,7 +245,8 @@ static void print_list(void) {
         SCENARIO_WRITE_BAD_TYPE,       SCENARIO_SUBSCRIPTION_IDLE_TICK, SCENARIO_SUBSCRIPTION_ACTIVE_TICK,
     };
     for (size_t i = 0; i < sizeof(scenarios) / sizeof(scenarios[0]); ++i) {
-        (void)printf("%s %s\n", scenario_name(scenarios[i]), scenario_supported(scenarios[i]) ? "supported" : "unsupported");
+        (void)printf("%s %s\n", scenario_name(scenarios[i]),
+                     scenario_supported(scenarios[i]) ? "supported" : "unsupported");
     }
 }
 

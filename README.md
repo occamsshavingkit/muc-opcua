@@ -9,13 +9,15 @@ all of its OS/hardware services (TCP, clock, entropy, crypto, persistence) throu
 narrow caller-supplied adapter structs. A host build (POSIX + OpenSSL) is provided for
 development, tests, and interop against standard OPC UA clients.
 
-It ships in three feature tiers — **nano**, **micro**, **embedded** — that map to the
-OPC Foundation 2017 device server profiles, so you compile in only the surface you need.
+It ships in five feature tiers — **nano**, **micro**, **embedded**, **standard**,
+**full** — that map to the OPC Foundation 2017 device server profiles, so you compile
+in only the surface you need.
 
 > **Status:** profile-*targeting*. The Nano surface is complete; Micro adds data-change
-> subscriptions; SecurityPolicy Basic256Sha256 has been validated against the OPC
-> Foundation .NET reference client. No formal profile-compliance claim is made until the
-> OPC UA CTT passes — see [docs/conformance/](docs/conformance/).
+> subscriptions; Standard targets the full OPC-10000-7 Standard 2017 UA Server face.
+> SecurityPolicy Basic256Sha256 has been validated against the OPC Foundation .NET
+> reference client. No formal profile-compliance claim is made until the OPC UA CTT
+> passes — see [docs/conformance/](docs/conformance/).
 
 ---
 
@@ -42,27 +44,31 @@ OPC Foundation 2017 device server profiles, so you compile in only the surface y
 
 ## Profiles
 
-Each profile is a build configuration (`make nano|micro|embedded`, or the
-`MUC_OPCUA_*` CMake options). Footprint figures are a measured snapshot on Arm
-Cortex-M0+ with `-Os`; reproduce with `scripts/measure_size.sh all`. Full
-methodology and breakdown are in
-[docs/size/feature-size-ledger.md](docs/size/feature-size-ledger.md).
+Each profile is a CMake configuration (`make nano|micro|embedded|standard`, or
+`-DMUC_OPCUA_PROFILE=...`). All figures are Arm Cortex-M0+ Thumb `-Os`, zero
+`.data`/`.bss`/heap. Reproduce with `scripts/measure_size.sh all`.
 
-| Profile | Adds | Core `.text` (flash) | `MU_SERVER_STORAGE_BYTES` | Heap |
-|---|---|---|---|---|
-| **nano** | SecurityPolicy None; Discovery + Session + Read + View service sets + Base Information node set; no subscriptions | **16.1 KiB** (16,520 B) | 1,280 B | 0 |
-| **micro** | nano **+** data-change subscriptions (MonitoredItems / Publish) | **23.6 KiB** (24,203 B) | 3,328 B | 0 |
-| **embedded**¹ | micro **+** Basic256Sha256, Standard DataChange 2017, Base Info Type System, GetMonitoredItems/ResendData | **43.7 KiB** (44,764 B) | **63,240 B** | 0 |
+**Core `.text` (flash)**
 
-¹ The **`embedded` profile is profile-targeting**, not CTT-certified. It implements the
-Embedded 2017 profile surface selected in the conformance docs, but no formal compliance
-claim is made until the OPC UA CTT passes. See [docs/conformance/status.md](docs/conformance/status.md).
+| Profile | .text | OPC UA Profile |
+|---------|-------|----------------|
+| nano | 17,392 B | Nano Embedded Device 2017 |
+| micro | 27,826 B | Micro Embedded Device 2017 |
+| embedded | 52,765 B | Embedded 2017 UA Server |
+| standard | 62,958 B | Standard 2017 UA Server |
+| full | 62,950 B | — (everything on) |
 
-In every profile, `.data`, `.bss`, and heap are **0** (the core has no mutable global
-state). RAM is caller-provided: the `MU_SERVER_STORAGE_BYTES` block above plus two
-transport buffers (default **2 × 8 KiB**).
-On the RP2040's 264 KiB of RAM, a Micro server leaves roughly 244 KiB for your
-application and network stack before stack and adapter storage.
+**Caller-provided storage** (`MU_SERVER_STORAGE_BYTES`)
+
+| Profile | Storage | Sessions | Subscriptions | Monitored Items | Publish |
+|---------|---------|----------|---------------|-----------------|---------|
+| nano | 1,280 B | 2 | — | — | — |
+| micro | 11,552 B | 2 | 2 | 8 | 2 |
+| embedded | 100,792 B | 2 | 2 | 100 | 5 |
+| standard | 457,052 B | 50 | 50 | 1,000 | 50 |
+| full | 820,052 B | 100 | 100 | 2,000 | 100 |
+
+Full methodology in [docs/size/feature-size-ledger.md](docs/size/feature-size-ledger.md).
 
 ---
 
@@ -93,9 +99,9 @@ the OPC Foundation .NET reference client, or `opcua-client` from `python-opcua` 
 `asyncua` — connect anonymously, and browse the `Server` object, read `ServerStatus`,
 or (on the micro/embedded profiles) create a subscription on a variable.
 
-To build the other tiers: `make nano`, `make embedded`, or `make all-profiles`.
-Run `make help` for a summary. The example binary always lands at
-`build/<profile>/examples/minimal_server`.
+To build the other tiers: `make nano`, `make embedded`, `make standard`, or
+`make all-profiles`. Run `make help` for a summary. The example binary always lands
+at `build/<profile>/examples/minimal_server`.
 
 ---
 

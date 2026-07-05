@@ -2,9 +2,9 @@
 #ifndef MUC_OPCUA_MESSAGE_CHUNK_H
 #define MUC_OPCUA_MESSAGE_CHUNK_H
 
+#include "muc_opcua/config.h"
 #include "muc_opcua/opcua_types.h"
 #include "muc_opcua/status.h"
-#include "muc_opcua/config.h"
 #include <stddef.h>
 
 typedef struct {

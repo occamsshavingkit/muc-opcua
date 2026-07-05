@@ -243,6 +243,9 @@ static const mu_service_descriptor_t g_supported_services[] = {
     {{MU_ID_SETPUBLISHINGMODEREQUEST, MU_ID_SETPUBLISHINGMODERESPONSE, true}, handle_set_publishing_mode},
     {{MU_ID_PUBLISHREQUEST, MU_ID_PUBLISHRESPONSE, true}, handle_publish},
     {{MU_ID_REPUBLISHREQUEST, MU_ID_REPUBLISHRESPONSE, true}, handle_republish},
+#if MUC_OPCUA_REDUNDANCY
+    {{MU_ID_TRANSFERSUBSCRIPTIONSREQUEST, MU_ID_TRANSFERSUBSCRIPTIONSRESPONSE, true}, handle_transfer_subscriptions},
+#endif
     {{MU_ID_DELETESUBSCRIPTIONSREQUEST, MU_ID_DELETESUBSCRIPTIONSRESPONSE, true}, handle_delete_subscriptions},
 #endif
 };
@@ -1499,6 +1502,12 @@ static opcua_statuscode_t handle_create_monitored_items(mu_server_t *server, mu_
         item->trigger = (opcua_byte_t)body.trigger;
         item->deadband_type = (opcua_byte_t)body.deadband_type;
         item->deadband_value = body.deadband_value;
+#if MUC_OPCUA_DATA_ACCESS
+        item->deadband_span = 0.0;
+        if (item->deadband_type == MU_DEADBAND_TYPE_PERCENT && node != NULL) {
+            item->deadband_span = mu_resolve_eurange_span(server, node);
+        }
+#endif
         item->queue_size = body.queue_size;
         if (item->queue_size == 0u) {
             item->queue_size = 1u;
@@ -2299,8 +2308,7 @@ opcua_statuscode_t mu_service_dispatch(mu_server_t *server, opcua_uint32_t reque
            requests for revised_session_timeout_ms. Guard get_tick_ms for
            white-box tests that dispatch without a full mu_server_init. */
         if (server->config.time_adapter.get_tick_ms != NULL) {
-            session->last_activity_ms =
-                server->config.time_adapter.get_tick_ms(server->config.time_adapter.context);
+            session->last_activity_ms = server->config.time_adapter.get_tick_ms(server->config.time_adapter.context);
         }
     }
 

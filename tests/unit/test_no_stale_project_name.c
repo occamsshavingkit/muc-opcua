@@ -162,7 +162,7 @@ static void check_file_for_forbidden_literals(const char *full_path, const char 
         for (size_t i = 0u; i < ARRAY_COUNT(forbidden_literals); ++i) {
             if (strstr(line, forbidden_literals[i]) != NULL) {
                 (void)printf("Stale project-name literal '%s' in %s:%zu:%s", forbidden_literals[i], relative_path,
-                       line_number, line);
+                             line_number, line);
                 ++(*forbidden_matches);
             }
         }

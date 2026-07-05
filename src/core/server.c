@@ -709,8 +709,8 @@ static void process_message(mu_server_t *server, opcua_byte_t *msg, size_t msg_l
         if (!is_ns0_numeric_nodeid(&request_type)) {
             status = MU_STATUS_BAD_DECODINGERROR;
         } else {
-            status = mu_service_dispatch(server, request_type.identifier.numeric, req_body, req_body_len,
-                                         resp_body, &payload_len);
+            status = mu_service_dispatch(server, request_type.identifier.numeric, req_body, req_body_len, resp_body,
+                                         &payload_len);
         }
 
         if (status != MU_STATUS_GOOD) {
@@ -726,9 +726,8 @@ static void process_message(mu_server_t *server, opcua_byte_t *msg, size_t msg_l
             opcua_uint32_t out_seq = ++server_secure_channel.out_sequence_number;
             size_t total = 0;
             opcua_statuscode_t ws = mu_uasc_finalize_symmetric(
-                server->config.send_buffer, server->config.send_buffer_size,
-                server_secure_channel.channel_id, server_secure_channel.token_id,
-                out_seq, seq.request_id, payload_len, &total);
+                server->config.send_buffer, server->config.send_buffer_size, server_secure_channel.channel_id,
+                server_secure_channel.token_id, out_seq, seq.request_id, payload_len, &total);
             if (ws == MU_STATUS_GOOD) {
                 send_buffer_chunk(server, total);
             }

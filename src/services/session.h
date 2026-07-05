@@ -79,7 +79,9 @@ opcua_statuscode_t mu_session_close(mu_session_t *session, opcua_uint32_t auth_t
 #ifdef MUC_OPCUA_MULTI_CHUNK
 void mu_session_close_timeout(mu_session_t *session);
 #else
-static inline void mu_session_close_timeout(mu_session_t *session) { (void)session; }
+static inline void mu_session_close_timeout(mu_session_t *session) {
+    (void)session;
+}
 #endif
 
 #endif /* MUC_OPCUA_SERVICES_SESSION_H */

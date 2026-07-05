@@ -1,10 +1,10 @@
 /* src/security/asym_chunk.c
  * Asymmetric (OPN) chunk protection for Basic256Sha256 (OPC 10000-6 §6.7.2). */
 #include "asym_chunk.h"
+#include "../core/safe_mem.h"
 #include "certificate.h"
 #include "key_derivation.h"
 #include "muc_opcua/encoding.h"
-#include "../core/safe_mem.h"
 #include <string.h>
 
 /* RSA-OAEP with SHA-1 (MGF1-SHA1) overhead: plaintext block = keybytes - 2*20 - 2. */
@@ -207,7 +207,7 @@ opcua_statuscode_t mu_asym_chunk_wrap(const mu_crypto_adapter_t *crypto, mu_secu
         return s;
     }
     (void)memcpy(plain + 8, body, body_len);
-    plain[seqbody_len] = (opcua_byte_t)pad_count;               /* PaddingSize */
+    plain[seqbody_len] = (opcua_byte_t)pad_count;                     /* PaddingSize */
     (void)memset(plain + seqbody_len + 1, (int)pad_count, pad_count); /* Padding bytes */
 
     /* Sign over [cleartext header | SequenceHeader | body | paddingSize | padding].

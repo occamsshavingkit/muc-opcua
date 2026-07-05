@@ -6,12 +6,14 @@
 
 #ifdef MUC_OPCUA_MULTI_CHUNK
 void mu_chunk_assembler_init(mu_chunk_assembler_t *assembler) {
-    if (!assembler) return;
+    if (!assembler)
+        return;
     (void)memset(assembler, 0, sizeof(*assembler));
 }
 
 void mu_chunk_assembler_reset(mu_chunk_assembler_t *assembler) {
-    if (!assembler) return;
+    if (!assembler)
+        return;
     assembler->is_active = false;
     assembler->length = 0;
 }

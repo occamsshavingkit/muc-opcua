@@ -32,4 +32,49 @@
 #error "MUC_OPCUA_BASE_TYPE_SYSTEM requires MUC_OPCUA_BASE_NODES"
 #endif
 
+/* Data Access Facet requires base nodes for AnalogItem metadata exposure. */
+#if defined(MUC_OPCUA_DATA_ACCESS) && MUC_OPCUA_DATA_ACCESS && !MUC_OPCUA_BASE_NODES
+#error "MUC_OPCUA_DATA_ACCESS requires MUC_OPCUA_BASE_NODES"
+#endif
+
+/* Event filter where-clause requires the event subsystem. */
+#if defined(MUC_OPCUA_EVENT_FILTER_WHERE) && MUC_OPCUA_EVENT_FILTER_WHERE && !MUC_OPCUA_EVENTS
+#error "MUC_OPCUA_EVENT_FILTER_WHERE requires MUC_OPCUA_EVENTS"
+#endif
+
+/* Auditing requires events for audit event delivery. */
+#if defined(MUC_OPCUA_AUDITING) && MUC_OPCUA_AUDITING && !MUC_OPCUA_EVENTS
+#error "MUC_OPCUA_AUDITING requires MUC_OPCUA_EVENTS"
+#endif
+
+/* Complex types require base nodes for the type hierarchy. */
+#if defined(MUC_OPCUA_COMPLEX_TYPES) && MUC_OPCUA_COMPLEX_TYPES && !MUC_OPCUA_BASE_NODES
+#error "MUC_OPCUA_COMPLEX_TYPES requires MUC_OPCUA_BASE_NODES"
+#endif
+
+/* Full aggregate set requires the standard subscription facet. */
+#if defined(MUC_OPCUA_AGGREGATE_FULL) && MUC_OPCUA_AGGREGATE_FULL && !MUC_OPCUA_SUBSCRIPTIONS_STANDARD
+#error "MUC_OPCUA_AGGREGATE_FULL requires MUC_OPCUA_SUBSCRIPTIONS_STANDARD"
+#endif
+
+/* Redundancy (TransferSubscriptions) requires subscriptions. */
+#if defined(MUC_OPCUA_REDUNDANCY) && MUC_OPCUA_REDUNDANCY && !MUC_OPCUA_SUBSCRIPTIONS
+#error "MUC_OPCUA_REDUNDANCY requires MUC_OPCUA_SUBSCRIPTIONS"
+#endif
+
+/* Namespaces metadata requires base nodes. */
+#if defined(MUC_OPCUA_NAMESPACES) && MUC_OPCUA_NAMESPACES && !MUC_OPCUA_BASE_NODES
+#error "MUC_OPCUA_NAMESPACES requires MUC_OPCUA_BASE_NODES"
+#endif
+
+/* Standard profile implies all mandatory standard facets. */
+#if defined(MUC_OPCUA_STANDARD_PROFILE) && MUC_OPCUA_STANDARD_PROFILE
+#if !MUC_OPCUA_DATA_ACCESS
+#error "MUC_OPCUA_STANDARD_PROFILE requires MUC_OPCUA_DATA_ACCESS"
+#endif
+#if !MUC_OPCUA_METHOD_SERVER
+#error "MUC_OPCUA_STANDARD_PROFILE requires MUC_OPCUA_METHOD_SERVER"
+#endif
+#endif
+
 #endif /* MUC_OPCUA_FEATURES_H */

@@ -223,4 +223,15 @@ opcua_statuscode_t mu_binary_read_certificate_identity_token(mu_binary_reader_t 
     status = mu_binary_read_bytestring(reader, &value->certificate_data);
     return status;
 }
+
+#if MUC_OPCUA_DATA_ACCESS
+opcua_statuscode_t mu_binary_read_range(mu_binary_reader_t *reader, mu_range_t *value) {
+    if (!reader || !value)
+        return MU_STATUS_BAD_INTERNALERROR;
+    opcua_statuscode_t s = mu_binary_read_double(reader, &value->low);
+    if (s != MU_STATUS_GOOD)
+        return s;
+    return mu_binary_read_double(reader, &value->high);
+}
+#endif
 #endif

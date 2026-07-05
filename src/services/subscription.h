@@ -120,6 +120,9 @@ typedef struct {
 #if MUC_OPCUA_SUBSCRIPTIONS_STANDARD
     opcua_double_t deadband_value;
     opcua_double_t last_reported_numeric;
+#if MUC_OPCUA_DATA_ACCESS
+    opcua_double_t deadband_span; /* EURange.High - EURange.Low for percent deadband */
+#endif
     mu_aggregate_state_t aggregate_state;
 #endif
     const mu_node_t *resolved_node; /* cached static address-space resolution */
@@ -149,8 +152,8 @@ typedef struct {
     opcua_byte_t node_id_string[MU_MAX_MONITORED_STRING]; /* backing store for a string identifier */
 
     /* 1-byte fields */
-    opcua_byte_t monitoring_mode; /* mu_monitoring_mode_t */
-    opcua_byte_t trigger;         /* mu_datachange_trigger_t */
+    opcua_byte_t monitoring_mode;      /* mu_monitoring_mode_t */
+    opcua_byte_t trigger;              /* mu_datachange_trigger_t */
     opcua_byte_t timestamps_to_return; /* mu_timestamps_to_return_t (OPC-10000-4 §5.13.2.2 Table 63) */
     bool in_use;
     bool has_value; /* a baseline sample has been taken */
@@ -169,6 +172,12 @@ typedef struct {
 #ifdef MUC_OPCUA_EVENTS
     opcua_byte_t select_clauses[8];
     opcua_byte_t select_clauses_count;
+#if MUC_OPCUA_EVENT_FILTER_WHERE
+    opcua_uint32_t where_operators[8];
+    opcua_uint32_t where_field_indices[8];
+    opcua_int64_t where_values[8];
+    opcua_byte_t where_clause_count;
+#endif
 #endif
 } mu_monitored_item_t;
 
@@ -230,9 +239,9 @@ typedef struct {
     bool in_use;
     opcua_uint32_t session_id;
     opcua_uint32_t request_handle;
-    opcua_uint32_t request_id;    /* secure-channel request id for the async response */
-    opcua_uint64_t enqueued_ms;   /* monotonic tick when the request was parked */
-    opcua_uint32_t timeout_hint;  /* RequestHeader.timeoutHint (OPC-10000-4 §7.32), ms */
+    opcua_uint32_t request_id;   /* secure-channel request id for the async response */
+    opcua_uint64_t enqueued_ms;  /* monotonic tick when the request was parked */
+    opcua_uint32_t timeout_hint; /* RequestHeader.timeoutHint (OPC-10000-4 §7.32), ms */
     /* Acknowledgement results for the acks carried by this request, echoed in the
        PublishResponse results[] when it is answered (OPC 10000-4 §5.14.5.2). */
     opcua_uint32_t ack_count;
@@ -350,8 +359,7 @@ opcua_statuscode_t mu_subscription_republish(mu_subscriptions_t *subs, opcua_uin
 /* Issue a StatusChangeNotification (OPC-10000-4 §5.14.1.4) by answering a parked
    Publish request for the subscription's session. status is the StatusCode carried
    in the notification (Bad_Timeout for lifetime expiry / explicit delete). */
-void issue_status_change_notification(struct mu_server *server, mu_subscription_t *sub,
-                                      opcua_statuscode_t status);
+void issue_status_change_notification(struct mu_server *server, mu_subscription_t *sub, opcua_statuscode_t status);
 
 /* Poll-driven sampling + publishing-timer advance. Called once per mu_server_poll with
    the current monotonic tick. Samples due MonitoredItems, fires due publishing timers,

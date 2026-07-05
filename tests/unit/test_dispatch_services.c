@@ -112,7 +112,7 @@ void test_dispatch_open_secure_channel(void) {
     mu_binary_read_uint32(&r, &token_id);
     mu_binary_read_int64(&r, &created);
     mu_binary_read_uint32(&r, &revised);
-    TEST_ASSERT_GREATER_THAN(0, channel_id);  /* non-zero counter */
+    TEST_ASSERT_GREATER_THAN(0, channel_id); /* non-zero counter */
     TEST_ASSERT_EQUAL(1, token_id);
     TEST_ASSERT_EQUAL(3600000, revised);
 }
