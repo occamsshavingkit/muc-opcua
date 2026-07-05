@@ -1466,9 +1466,11 @@ void test_modify_monitored_items(void) {
     mu_binary_read_uint32(&body, &revised_queue_size);
     TEST_ASSERT_EQUAL_UINT32(MU_MONITORED_QUEUE_DEPTH, revised_queue_size);
     /* The decoded values must be applied to the monitored item, not discarded. */
+#if MUC_OPCUA_SUBSCRIPTIONS_STANDARD
     mu_monitored_item_t *item = &server->subs.monitored_items[0];
     TEST_ASSERT_EQUAL_UINT32(MU_MONITORED_QUEUE_DEPTH, item->queue_size);
     TEST_ASSERT_TRUE(item->discard_oldest);
+#endif
 }
 
 /* OPC-10000-4 §5.13.3.1: "Changes to the MonitoredItem settings shall be applied
@@ -1530,9 +1532,14 @@ void test_modify_monitored_items_applies_datachange_filter(void) {
     TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, st);
 
     /* OPC-10000-4 §5.13.3.2: the decoded DataChangeFilter fields must be applied
-       to the monitored item, not decoded and discarded. */
+       to the monitored item, not decoded and discarded. The trigger and deadband
+       fields are only tracked under MUC_OPCUA_SUBSCRIPTIONS_STANDARD; without it
+       the filter body is decoded-and-skipped, so the item retains its create-time
+       defaults. */
+#if MUC_OPCUA_SUBSCRIPTIONS_STANDARD
     TEST_ASSERT_EQUAL_UINT8(MU_DATACHANGE_TRIGGER_STATUS, item->trigger);
     TEST_ASSERT_EQUAL_UINT8(MU_DEADBAND_TYPE_NONE, item->deadband_type);
+#endif
 }
 
 /* SetMonitoringMode (OPC 10000-4 §5.13.4): DISABLED stops change detection; REPORTING

@@ -472,12 +472,13 @@ static opcua_statuscode_t handle_open_secure_channel(mu_server_t *server, mu_bin
         return s;
     }
     /* OPC-10000-4 section 5.6.2.3 Table 12: a Server shall check the minimum
-       length of the Client nonce and return Bad_NonceInvalid if the length is
-       below 32 bytes. The spec also bounds the upper end at 128 bytes (per
-       OPC-10000-4 section 5.7.2.2 / OPC-10000-7 SecureChannelNonceLength). A
-       null nonce (length == -1) is allowed; this sentinel is used with the
-       None SecurityPolicy where no nonce is required. */
-    if (client_nonce.length >= 0 && (client_nonce.length < 32 || client_nonce.length > 128)) {
+        length of the Client nonce and return Bad_NonceInvalid if the length is
+        below 32 bytes. The spec also bounds the upper end at 128 bytes (per
+        OPC-10000-4 section 5.7.2.2 / OPC-10000-7 SecureChannelNonceLength). A
+        null nonce (length == -1) or empty nonce (length == 0) is allowed; this
+        sentinel is used with the None SecurityPolicy where no nonce is
+        required. asyncua sends an empty (length 0) ByteString for None. */
+    if (client_nonce.length > 0 && (client_nonce.length < 32 || client_nonce.length > 128)) {
         return MU_STATUS_BAD_NONCEINVALID;
     }
     mu_binary_read_uint32(r, &requested_lifetime);
