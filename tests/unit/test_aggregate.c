@@ -77,6 +77,9 @@ static void activated_server(mu_server_t *server) {
     mu_session_create(&server->sessions[0], 0, &rev, &sid, &tok);
     mu_session_activate(&server->sessions[0], tok, 321);
     server->active_session = &server->sessions[0];
+    /* Reset value pointers between tests so ASan doesn't flag reads from
+       previous test frames' stack-locals via s_nodes[*].value. */
+    ((mu_node_t *)&s_nodes[1])->value = NULL;
 }
 
 /* Helper to write a request header */
