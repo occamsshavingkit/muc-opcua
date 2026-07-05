@@ -1,13 +1,23 @@
 # src/CMakeLists.txt
 add_library(muc_opcua STATIC
-    core/server.c
+    core/server/init.c
+    core/server/poll.c
+    core/server/data_chunk.c
+    core/server/process_message.c
+    core/server/dispatch.c
     core/status.c
     core/tcp_connection.c
     core/message_chunk.c
     core/sequence.c
     core/service_message.c
-    core/service_dispatch.c
-    core/dispatch_session.c
+    core/service_dispatch/dispatch_core.c
+    core/service_dispatch/response_encode.c
+    core/service_dispatch/reader_helpers.c
+    core/service_dispatch/osc_handler.c
+    core/service_dispatch/handler_stubs.c
+    core/service_dispatch/create_session.c
+    core/service_dispatch/activate_session.c
+    core/service_dispatch/close_session.c
     core/uasc.c
     services/secure_channel.c
     services/session.c
@@ -32,15 +42,20 @@ add_library(muc_opcua STATIC
 
 # Optional services compile out at the source + dispatch-table level.
 if(MUC_OPCUA_SERVICE_READ)
-    target_sources(muc_opcua PRIVATE services/read.c)
+    target_sources(muc_opcua PRIVATE services/read/cache.c services/read/read_attribute.c services/read/read_process.c)
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_SERVICE_READ=1)
 endif()
 if(MUC_OPCUA_SERVICE_BROWSE)
-    target_sources(muc_opcua PRIVATE services/browse.c core/dispatch_view.c)
+    target_sources(muc_opcua PRIVATE services/browse/browse.c services/browse/browse_next.c services/browse/translate_paths.c core/service_dispatch/view_handler.c)
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_SERVICE_BROWSE=1)
 endif()
 if(MUC_OPCUA_SERVICE_DISCOVERY)
-    target_sources(muc_opcua PRIVATE core/dispatch_discovery.c)
+    target_sources(muc_opcua PRIVATE
+        core/dispatch_discovery/common.c
+        core/dispatch_discovery/get_endpoints.c
+        core/dispatch_discovery/find_servers.c
+        core/dispatch_discovery/register_server.c
+    )
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_SERVICE_DISCOVERY=1)
 endif()
 if(MUC_OPCUA_SERVICE_REGISTER_NODES)
@@ -53,10 +68,10 @@ endif()
 # sets internally (#ifdef MUC_OPCUA_SERVICE_READ / ..._WRITE), so compile it
 # whenever either service is enabled.
 if(MUC_OPCUA_SERVICE_READ OR MUC_OPCUA_SERVICE_WRITE)
-    target_sources(muc_opcua PRIVATE core/dispatch_attribute.c)
+    target_sources(muc_opcua PRIVATE core/service_dispatch/attribute_handler.c)
 endif()
 if(MUC_OPCUA_SERVICE_NODEMANAGEMENT)
-    target_sources(muc_opcua PRIVATE services/node_management.c core/dispatch_node_mgmt.c)
+    target_sources(muc_opcua PRIVATE services/node_management/add_nodes.c services/node_management/add_references.c services/node_management/delete.c core/dispatch_node_mgmt.c)
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_SERVICE_NODEMANAGEMENT=1)
 endif()
 if(MUC_OPCUA_SERVICE_QUERY)
@@ -77,12 +92,19 @@ endif()
 if(MUC_OPCUA_SUBSCRIPTIONS)
     target_sources(muc_opcua PRIVATE
         services/subscription_monitor.c
-        services/subscription_publish.c
-        core/dispatch_subscription.c
+        services/subscription_publish/publish_due.c
+        services/subscription_publish/tick.c
+        services/subscription_publish/notification.c
+        services/subscription_publish/deadband.c
+        services/subscription_publish/retransmit.c
+        core/service_dispatch/subscription_crud.c
+        core/service_dispatch/monitored_items.c
+        core/service_dispatch/filter_reader.c
+        core/service_dispatch/subscription_helpers.c
     )
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_SUBSCRIPTIONS=1)
     if(MUC_OPCUA_SUBSCRIPTIONS_STANDARD)
-        target_sources(muc_opcua PRIVATE services/subscription_aggregate.c)
+        target_sources(muc_opcua PRIVATE services/subscription_aggregate.c core/service_dispatch/triggering.c)
         target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_SUBSCRIPTIONS_STANDARD=1)
     endif()
 endif()
@@ -116,7 +138,7 @@ if(MUC_OPCUA_SERVICE_WRITE)
 endif()
 
 if(MUC_OPCUA_SERVICE_HISTORY)
-    target_sources(muc_opcua PRIVATE services/history.c)
+    target_sources(muc_opcua PRIVATE services/history.c core/service_dispatch/history_handler.c)
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_SERVICE_HISTORY=1)
 endif()
 
@@ -172,7 +194,8 @@ if(MUC_OPCUA_SECURITY)
     target_sources(muc_opcua PRIVATE
         security/key_derivation.c
         security/certificate.c
-        security/asym_chunk.c
+        security/asym_chunk/wrap.c
+        security/asym_chunk/unwrap.c
         security/sym_chunk.c
         security/trustlist.c
     )
@@ -187,7 +210,13 @@ if(MUC_OPCUA_IS_HOST)
     if(MUC_OPCUA_SECURITY)
         find_package(OpenSSL)
         if(OpenSSL_FOUND)
-            target_sources(muc_opcua PRIVATE platform/host_crypto_adapter.c)
+            target_sources(muc_opcua PRIVATE
+                platform/host_crypto/common.c
+                platform/host_crypto/hash.c
+                platform/host_crypto/cipher.c
+                platform/host_crypto/asymmetric.c
+                platform/host_crypto/sign.c
+            )
             target_link_libraries(muc_opcua PUBLIC OpenSSL::Crypto)
             target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_HAVE_OPENSSL=1)
         endif()
@@ -201,7 +230,12 @@ if(MUC_OPCUA_HAVE_MBEDTLS)
 endif()
 
 if(MUC_OPCUA_HAVE_WOLFSSL)
-    target_sources(muc_opcua PRIVATE platform/wolfssl_crypto_adapter.c)
+    target_sources(muc_opcua PRIVATE
+        platform/wolfssl_crypto/cipher.c
+        platform/wolfssl_crypto/asymmetric.c
+        platform/wolfssl_crypto/hash.c
+        platform/wolfssl_crypto/sign.c
+    )
     target_link_libraries(muc_opcua PUBLIC wolfssl)
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_HAVE_WOLFSSL=1)
 endif()

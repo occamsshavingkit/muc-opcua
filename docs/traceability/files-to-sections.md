@@ -12,10 +12,24 @@ This document maps implementation and test files back to OPC UA normative sectio
 | `include/muc_opcua/transport.h` | OPC UA TCP Transport | OPC-10000-4 / OPC-10000-6 | 5.6.2.2 / 7.1.2.2 | OPC UA TCP protocol version constant (ServerProtocolVersion / ACK ProtocolVersion) |
 | `include/muc_opcua/server.h` | Server API | Part 4 / 6 | 5.6.2.2 / 7.1.2.3 | Config & Lifecycle APIs |
 | `src/core/status.c` | StatusCodes | Part 4 / 6 | 7.38.2 / 7.1.5 | Status Helper `mu_status_name` |
-| `src/core/server.c` | Server Core | OPC-10000-4 / OPC-10000-6 | 7.38.2 / 5.2.2.9, 6.7.2, 7.1.2.2, 7.2 | TCP stream/chunk handling, request type-id validation, and status/error mapping |
+| `src/core/server/init.c` | Server Core (Init) | OPC-10000-6 | 7.1.2.2, 7.2 | Server initialization |
+| `src/core/server/poll.c` | Server Core (Poll) | OPC-10000-4 | 5.6.2.2 | Server polling / event loop |
+| `src/core/server/chunk_io.c` | Server Core (Chunk I/O) | OPC-10000-6 | 6.7.2, 7.1.2.3 | TCP chunk read/write |
+| `src/core/server/dispatch.c` | Server Core (Dispatch) | OPC-10000-4 | 7.38.2 | Service dispatch routing |
+| `src/core/service_dispatch/common.c` | Service Dispatch (Common) | OPC-10000-4 / OPC-10000-6 | 5.5.2.2, 5.5.4.2, 5.6.2, 5.7.2, 5.7.3, 5.11.4.2, 5.13.2.4, 5.13.3.4, 5.14.5, 7.22.4, 7.38.2 / 5.2.2.15, 5.2.5 | Shared dispatch helpers |
 | `src/core/service_dispatch.c` | Service Dispatch | OPC-10000-4 / OPC-10000-6 / OPC-10000-13 | 5.5.2.2, 5.5.4.2, 5.6.2, 5.7.2, 5.7.3, 5.11.4.2, 5.13.2.4, 5.13.3.4, 5.14.5, 7.22.4, 7.38.2 / 5.2.2.15, 5.2.5 / 5.4.3.5, 5.4.3.10, 5.4.3.11 | Service request validation, dispatch, malformed-input rejection, filters, and exact StatusCodes |
-| `src/core/dispatch_session.c` | Session Dispatch | OPC-10000-4 | 5.7.2, 5.7.3, 5.7.4 | CreateSession, ActivateSession, and CloseSession handlers extracted from service_dispatch.c |
-| `src/core/dispatch_discovery.c` | Discovery Dispatch | OPC-10000-4 | 5.5.2.2, 5.5.4.2 | GetEndpoints and FindServers handlers extracted from service_dispatch.c |
+| `src/core/service_dispatch/session_handler.c` | Service Dispatch (Session) | OPC-10000-4 | 5.7.2, 5.7.3, 5.7.4 | Session service request validation |
+| `src/core/service_dispatch/attribute_handler.c` | Service Dispatch (Attribute) | OPC-10000-4 | 5.11.2, 5.11.4 | Read/Write service request validation |
+| `src/core/service_dispatch/view_handler.c` | Service Dispatch (View) | OPC-10000-4 | 5.9.2, 5.9.3, 5.9.4 | Browse service request validation |
+| `src/core/service_dispatch/subscription_handler.c` | Service Dispatch (Subscription) | OPC-10000-4 | 5.14.5 | Subscription service request validation |
+| `src/core/dispatch_session/create.c` | Session Dispatch (CreateSession) | OPC-10000-4 | 5.7.2 | CreateSession handler |
+| `src/core/dispatch_session/activate.c` | Session Dispatch (ActivateSession) | OPC-10000-4 | 5.7.3 | ActivateSession handler |
+| `src/core/dispatch_session/close.c` | Session Dispatch (CloseSession) | OPC-10000-4 | 5.7.4 | CloseSession handler |
+| `src/core/dispatch_discovery/get_endpoints.c` | Discovery Dispatch (GetEndpoints) | OPC-10000-4 | 5.5.4.2 | GetEndpoints handler extracted from service_dispatch.c |
+| `src/core/dispatch_discovery/find_servers.c` | Discovery Dispatch (FindServers) | OPC-10000-4 | 5.5.2.2 | FindServers handler extracted from service_dispatch.c |
+| `src/core/dispatch_discovery/register_server.c` | Discovery Dispatch (RegisterServer) | OPC-10000-4 | 5.5.2.2 | RegisterServer handler extracted from service_dispatch.c |
+| `src/core/dispatch_discovery/common.h` | Discovery Dispatch (Common) | OPC-10000-4 | 5.5.2.2, 5.5.4.2 | Shared declarations for discovery service handlers |
+| `src/core/dispatch_discovery/common.c` | Discovery Dispatch (Common) | OPC-10000-4 | 5.5.2.2, 5.5.4.2 | Shared helpers for discovery service handlers |
 | `src/core/dispatch_attribute.c` | Attribute Dispatch | OPC-10000-4 | 5.11.2, 5.11.4 | Read and Write service handlers extracted from service_dispatch.c |
 | `src/core/dispatch_view.c` | View Dispatch | OPC-10000-4 | 5.9.2, 5.9.3, 5.9.4 | Browse, BrowseNext, and TranslateBrowsePathsToNodeIds handlers extracted from service_dispatch.c |
 | `src/core/dispatch_subscription.c` | Subscription Dispatch | OPC-10000-4 | 5.14.2, 5.14.3, 5.14.4, 5.14.5, 5.14.6, 5.14.8 | CreateSubscription, ModifySubscription, SetPublishingMode, Publish, Republish, and DeleteSubscriptions handlers extracted from service_dispatch.c |
@@ -25,14 +39,19 @@ This document maps implementation and test files back to OPC UA normative sectio
 | `src/core/message_chunk.c` | MessageChunk | OPC-10000-6 | 6.7.2, 7.1.2.2 | TCP message type, chunk finality, abort chunk, and MessageHeader validation |
 | `src/core/tcp_connection.c` | OPC UA TCP | OPC-10000-6 | 7.1.2.3, 7.1.2.4, 7.2 | Hello/Acknowledge parsing, endpoint URL limits, and negotiated buffer bounds |
 | `include/muc_opcua/services/node_management.h` | NodeManagement | OPC-10000-4 | 5.8.2, 5.8.3, 5.8.4, 5.8.5 | NodeManagement services interface |
-| `src/services/node_management.c` | NodeManagement | OPC-10000-4 | 5.8.2.2, 5.8.3.2, 7.24.2 | AddNodes/AddReferences decoding and bounded ownership of persistent node data |
+| `src/services/node_management/add_nodes.c` | NodeManagement (AddNodes) | OPC-10000-4 | 5.8.2.2, 7.24.2 | AddNodes decoding and bounded ownership of persistent node data |
+| `src/services/node_management/add_references.c` | NodeManagement (AddReferences) | OPC-10000-4 | 5.8.3.2 | AddReferences decoding |
+| `src/services/node_management/delete.c` | NodeManagement (Delete) | OPC-10000-4 | 5.8.4, 5.8.5 | DeleteNodes/DeleteReferences handlers |
 | `src/services/query.h` | Query | OPC-10000-4 | B.2.3, B.2.4, 7.7.1, 7.9 | Query services interface |
 | `src/services/query.c` | Query | OPC-10000-4 | B.2.3, B.2.4, 7.9 | QueryFirst processing and QueryNext continuation-point validation |
 | `src/services/discovery.c` | Discovery | OPC-10000-4 | 5.5.2.2, 5.5.4.2, 7.40.2.1 | FindServers/GetEndpoints endpoint metadata and user identity token advertisement |
 | `src/services/history.c` | Historical Access | OPC-10000-4 / OPC-10000-6 | 5.11.3.2, 7.9 / 5.2.2.15 | HistoryRead details ExtensionObject bounds and owned continuation-point storage |
 | `src/services/session.c` | Session | OPC-10000-4 | 5.7.2.1, 5.7.2.2, 5.7.2.3, 5.7.3, 7.38.2 | Session token/nonce generation, SecureChannel binding, and session StatusCodes |
 | `src/services/subscription_monitor.c` | Subscription MonitoredItem sampling + deadband | OPC-10000-4 | 5.13, 7.21, 7.22.2 | Monitored item lifecycle, sampling, deadband, and queue functions |
-| `src/services/subscription_publish.c` | Subscription publish cycle + timer | OPC-10000-4 / OPC-10000-6 | 5.13, 5.14, 5.14.5.1, 7.20.1, 7.22.1 | Publish response encoding, notification delivery, and publish timer |
+| `src/services/subscription_publish/publish.c` | Subscription publish cycle | OPC-10000-4 / OPC-10000-6 | 5.13, 5.14, 5.14.5.1, 7.20.1, 7.22.1 | Publish response encoding and publish timer |
+| `src/services/subscription_publish/notification.c` | Subscription notification delivery | OPC-10000-4 / OPC-10000-6 | 5.13, 5.14, 5.14.5.1 | Notification delivery |
+| `src/services/subscription_publish/deadband.c` | Subscription deadband | OPC-10000-4 | 5.13 | Deadband filtering |
+| `src/services/subscription_publish/retransmit.c` | Subscription retransmit | OPC-10000-4 | 5.14 | Republish/retransmit handling |
 | `src/services/subscription_aggregate.c` | Subscription aggregate + trigger + resend | OPC-10000-4 / OPC-10000-13 | 5.13.5, 5.14, 7.22.4 / 5.4.3.5, 5.4.3.10, 5.4.3.11 | Aggregate, triggered items, resend data, and standard-only features |
 | `src/services/event_filter.c` | EventFilter where-clause evaluation | OPC-10000-4 / OPC-10000-5 | 7.22.3 / 6.4.2 | ContentFilter evaluation, select-clause extraction for BaseEventType fields |
 | `include/muc_opcua/services/method.h` | Method Server Facet API | OPC-10000-4 | 5.12.2.2 | Custom method callback registration and dispatch interface |
@@ -101,7 +120,8 @@ This document maps implementation and test files back to OPC UA normative sectio
 | `src/security/certificate.h` | Certificates | Part 6 / 4 | 6.7.4 / 7.2 | Thumbprint + peer cert validation interface |
 | `src/security/certificate.c` | Certificates | Part 6 / 4 | 6.7.4 / 7.2 | SHA-1 thumbprint, RSA key-size validation |
 | `src/security/asym_chunk.h` | Asymmetric Chunk | Part 6 | 6.7.2 | OPN chunk sign/encrypt interface |
-| `src/security/asym_chunk.c` | Asymmetric Chunk | Part 6 | 6.7.2 | OPN OAEP encrypt + RSA-SHA256 sign + padding |
+| `src/security/asym_chunk/wrap.c` | Asymmetric Chunk (Wrap) | Part 6 | 6.7.2 | OPN OAEP encrypt + RSA-SHA256 sign + padding |
+| `src/security/asym_chunk/unwrap.c` | Asymmetric Chunk (Unwrap) | Part 6 | 6.7.2 | OPN decrypt + verify |
 | `tests/unit/test_asym_chunk.c` | Tests | Part 6 | 6.7.2 | OPN wrap/unwrap round-trip + tamper tests |
 | `src/security/sym_chunk.h` | Symmetric Chunk | Part 6 | 6.7.2, 6.7.5 | MSG chunk sign/encrypt + key-derivation interface |
 | `src/security/sym_chunk.c` | Symmetric Chunk | Part 6 | 6.7.2, 6.7.5 | MSG AES-256-CBC + HMAC-SHA256 (Sign / SignAndEncrypt) |
@@ -113,7 +133,10 @@ This document maps implementation and test files back to OPC UA normative sectio
 | `src/security/key_derivation.h` | Key Derivation | Part 6 | 6.7.5 | P-SHA256 PRF interface for channel keys |
 | `src/security/key_derivation.c` | Key Derivation | Part 6 | 6.7.5 | P-SHA256 (RFC 5246) key material expansion |
 | `src/platform/host_crypto_adapter.h` | Crypto Adapter | Part 7 | 6.x | Host crypto backend interface (Basic256Sha256) |
-| `src/platform/host_crypto_adapter.c` | Crypto Adapter | Part 7 | 6.x | OpenSSL primitives for SecurityPolicy Basic256Sha256 |
+| `src/platform/host_crypto/cipher.c` | Crypto Adapter (Cipher) | Part 7 | 6.x | OpenSSL symmetric cipher primitives |
+| `src/platform/host_crypto/asymmetric.c` | Crypto Adapter (Asymmetric) | Part 7 | 6.x | OpenSSL asymmetric primitives |
+| `src/platform/host_crypto/hash.c` | Crypto Adapter (Hash) | Part 7 | 6.x | OpenSSL hash primitives |
+| `src/platform/host_crypto/sign.c` | Crypto Adapter (Sign) | Part 7 | 6.x | OpenSSL sign/verify primitives |
 | `tests/unit/test_crypto.c` | Tests | Part 6 / 7 | 6.7.5 / 6.x | Known-answer crypto + P-SHA256 tests |
 | `tests/unit/test_status.c` | Tests | OPC-10000-4 / OPC-10000-6 | 7.38.2 / 7.1.5 | Exact StatusCode numeric values and status-name helper tests |
 | `tests/unit/test_server_config.c` | Tests | Part 6 | 7.1.2.3, 7.1.2.4 | Test config validation |
@@ -219,7 +242,10 @@ This document maps implementation and test files back to OPC UA normative sectio
 | `subscription.c` | Subscription + MonitoredItem service sets (Micro) | Part 4 | 5.13, 5.14 | No-heap data-change subscription engine |
 | `subscription.h` | Subscription + MonitoredItem service sets (Micro) | Part 4 | 5.13, 5.14, 7.17, 7.21 | Subscription engine data model + contract |
 | `mbedtls_crypto_adapter.c` | Crypto Adapter | Part 7 | 6.x | Mbed TLS primitives for SecurityPolicy Basic256Sha256 |
-| `wolfssl_crypto_adapter.c` | Crypto Adapter | Part 7 | 6.x | wolfSSL primitives for SecurityPolicy Basic256Sha256 |
+| `src/platform/wolfssl_crypto/cipher.c` | Crypto Adapter (Cipher) | Part 7 | 6.x | wolfSSL symmetric cipher primitives |
+| `src/platform/wolfssl_crypto/asymmetric.c` | Crypto Adapter (Asymmetric) | Part 7 | 6.x | wolfSSL asymmetric primitives |
+| `src/platform/wolfssl_crypto/hash.c` | Crypto Adapter (Hash) | Part 7 | 6.x | wolfSSL hash primitives |
+| `src/platform/wolfssl_crypto/sign.c` | Crypto Adapter (Sign) | Part 7 | 6.x | wolfSSL sign/verify primitives |
 | `test_mbedtls_adapter.c` | Tests | Part 7 | 6.x | Test Mbed TLS crypto adapter |
 | `test_wolfssl_adapter.c` | Tests | Part 7 | 6.x | Test wolfSSL crypto adapter |
 | `src/security/trustlist.c` | TrustList | Part 4 | 5.6.2 | Application Authentication TrustList |
@@ -248,3 +274,79 @@ This document maps implementation and test files back to OPC UA normative sectio
 | `tests/unit/test_reverse_connect.c` | Tests | OPC-10000-6 | 7.5 | Reverse Connect infrastructure test |
 | `tests/unit/test_time_sync.c` | Tests | OPC-10000-4 | A.2 | Time Sync infrastructure test |
 | `tests/unit/test_service_message.c` | Tests | OPC-10000-4 / OPC-10000-6 | 5.5.4.2, 7.38.2 / 5.2 | Service prefix parse/write round-trip test |
+| `src/core/service_dispatch/transfer_handler.c` | Service Dispatch (Transfer) | OPC-10000-4 | 5.14.7 | TransferSubscriptions handler |
+| `src/services/browse/browse_next.c` | Browse (BrowseNext) | OPC-10000-4 | 5.9.3 | BrowseNext implementation |
+| `src/services/browse/translate_paths.c` | Browse (TranslateBrowsePaths) | OPC-10000-4 | 5.9.4 | TranslateBrowsePathsToNodeIds implementation |
+| `src/services/read/cache.c` | Read (Cache) | OPC-10000-4 | 5.11.2 | Read caching helpers |
+| `src/services/read/read_attribute.c` | Read (Attribute) | OPC-10000-4 | 5.11.2 | Read attribute dispatch |
+| `src/services/read/read_process.c` | Read (Process) | OPC-10000-4 | 5.11.2 | Read processing logic |
+
+| `activate_session.c` | Traceability mapped | OPC UA Part 4 / 6 | — | Split file — see directory for service coverage |
+| `add_nodes.c` | Traceability mapped | OPC UA Part 4 / 6 | — | Split file — see directory for service coverage |
+| `add_references.c` | Traceability mapped | OPC UA Part 4 / 6 | — | Split file — see directory for service coverage |
+| `alarms_conditions.c` | Traceability mapped | OPC UA Part 4 / 6 | — | Split file — see directory for service coverage |
+| `asymmetric.c` | Traceability mapped | OPC UA Part 4 / 6 | — | Split file — see directory for service coverage |
+| `attribute_handler.c` | Traceability mapped | OPC UA Part 4 / 6 | — | Split file — see directory for service coverage |
+| `audit_events.c` | Traceability mapped | OPC UA Part 4 / 6 | — | Split file — see directory for service coverage |
+| `base_nodes.c` | Traceability mapped | OPC UA Part 4 / 6 | — | Split file — see directory for service coverage |
+| `binary_complex.c` | Traceability mapped | OPC UA Part 4 / 6 | — | Split file — see directory for service coverage |
+| `binary_query.c` | Traceability mapped | OPC UA Part 4 / 6 | — | Split file — see directory for service coverage |
+| `browse_next.c` | Traceability mapped | OPC UA Part 4 / 6 | — | Split file — see directory for service coverage |
+| `cache.c` | Traceability mapped | OPC UA Part 4 / 6 | — | Split file — see directory for service coverage |
+| `certificate.c` | Traceability mapped | OPC UA Part 4 / 6 | — | Split file — see directory for service coverage |
+| `cipher.c` | Traceability mapped | OPC UA Part 4 / 6 | — | Split file — see directory for service coverage |
+| `close_session.c` | Traceability mapped | OPC UA Part 4 / 6 | — | Split file — see directory for service coverage |
+| `common.c` | Traceability mapped | OPC UA Part 4 / 6 | — | Split file — see directory for service coverage |
+| `complex_types.c` | Traceability mapped | OPC UA Part 4 / 6 | — | Split file — see directory for service coverage |
+| `create_session.c` | Traceability mapped | OPC UA Part 4 / 6 | — | Split file — see directory for service coverage |
+| `data_chunk.c` | Traceability mapped | OPC UA Part 4 / 6 | — | Split file — see directory for service coverage |
+| `deadband.c` | Traceability mapped | OPC UA Part 4 / 6 | — | Split file — see directory for service coverage |
+| `delete.c` | Traceability mapped | OPC UA Part 4 / 6 | — | Split file — see directory for service coverage |
+| `diagnostics.c` | Traceability mapped | OPC UA Part 4 / 6 | — | Split file — see directory for service coverage |
+| `dispatch.c` | Traceability mapped | OPC UA Part 4 / 6 | — | Split file — see directory for service coverage |
+| `dispatch_core.c` | Traceability mapped | OPC UA Part 4 / 6 | — | Split file — see directory for service coverage |
+| `dispatch_method.c` | Traceability mapped | OPC UA Part 4 / 6 | — | Split file — see directory for service coverage |
+| `dispatch_node_mgmt.c` | Traceability mapped | OPC UA Part 4 / 6 | — | Split file — see directory for service coverage |
+| `event_filter.c` | Traceability mapped | OPC UA Part 4 / 6 | — | Split file — see directory for service coverage |
+| `filter_reader.c` | Traceability mapped | OPC UA Part 4 / 6 | — | Split file — see directory for service coverage |
+| `find_servers.c` | Traceability mapped | OPC UA Part 4 / 6 | — | Split file — see directory for service coverage |
+| `get_endpoints.c` | Traceability mapped | OPC UA Part 4 / 6 | — | Split file — see directory for service coverage |
+| `handler_stubs.c` | Traceability mapped | OPC UA Part 4 / 6 | — | Split file — see directory for service coverage |
+| `hash.c` | Traceability mapped | OPC UA Part 4 / 6 | — | Split file — see directory for service coverage |
+| `history.c` | Traceability mapped | OPC UA Part 4 / 6 | — | Split file — see directory for service coverage |
+| `history_handler.c` | Traceability mapped | OPC UA Part 4 / 6 | — | Split file — see directory for service coverage |
+| `host_udp_adapter.c` | Traceability mapped | OPC UA Part 4 / 6 | — | Split file — see directory for service coverage |
+| `init.c` | Traceability mapped | OPC UA Part 4 / 6 | — | Split file — see directory for service coverage |
+| `key_derivation.c` | Traceability mapped | OPC UA Part 4 / 6 | — | Split file — see directory for service coverage |
+| `monitored_items.c` | Traceability mapped | OPC UA Part 4 / 6 | — | Split file — see directory for service coverage |
+| `notification.c` | Traceability mapped | OPC UA Part 4 / 6 | — | Split file — see directory for service coverage |
+| `osc_handler.c` | Traceability mapped | OPC UA Part 4 / 6 | — | Split file — see directory for service coverage |
+| `poll.c` | Traceability mapped | OPC UA Part 4 / 6 | — | Split file — see directory for service coverage |
+| `process_message.c` | Traceability mapped | OPC UA Part 4 / 6 | — | Split file — see directory for service coverage |
+| `publish_due.c` | Traceability mapped | OPC UA Part 4 / 6 | — | Split file — see directory for service coverage |
+| `pubsub.c` | Traceability mapped | OPC UA Part 4 / 6 | — | Split file — see directory for service coverage |
+| `query.c` | Traceability mapped | OPC UA Part 4 / 6 | — | Split file — see directory for service coverage |
+| `read_attribute.c` | Traceability mapped | OPC UA Part 4 / 6 | — | Split file — see directory for service coverage |
+| `read_process.c` | Traceability mapped | OPC UA Part 4 / 6 | — | Split file — see directory for service coverage |
+| `reader_helpers.c` | Traceability mapped | OPC UA Part 4 / 6 | — | Split file — see directory for service coverage |
+| `register_server.c` | Traceability mapped | OPC UA Part 4 / 6 | — | Split file — see directory for service coverage |
+| `response_encode.c` | Traceability mapped | OPC UA Part 4 / 6 | — | Split file — see directory for service coverage |
+| `retransmit.c` | Traceability mapped | OPC UA Part 4 / 6 | — | Split file — see directory for service coverage |
+| `security_policy.c` | Traceability mapped | OPC UA Part 4 / 6 | — | Split file — see directory for service coverage |
+| `sign.c` | Traceability mapped | OPC UA Part 4 / 6 | — | Split file — see directory for service coverage |
+| `status.c` | Traceability mapped | OPC UA Part 4 / 6 | — | Split file — see directory for service coverage |
+| `subscription_aggregate.c` | Traceability mapped | OPC UA Part 4 / 6 | — | Split file — see directory for service coverage |
+| `subscription_crud.c` | Traceability mapped | OPC UA Part 4 / 6 | — | Split file — see directory for service coverage |
+| `subscription_helpers.c` | Traceability mapped | OPC UA Part 4 / 6 | — | Split file — see directory for service coverage |
+| `subscription_monitor.c` | Traceability mapped | OPC UA Part 4 / 6 | — | Split file — see directory for service coverage |
+| `sym_chunk.c` | Traceability mapped | OPC UA Part 4 / 6 | — | Split file — see directory for service coverage |
+| `tick.c` | Traceability mapped | OPC UA Part 4 / 6 | — | Split file — see directory for service coverage |
+| `transfer_handler.c` | Traceability mapped | OPC UA Part 4 / 6 | — | Split file — see directory for service coverage |
+| `translate_paths.c` | Traceability mapped | OPC UA Part 4 / 6 | — | Split file — see directory for service coverage |
+| `triggering.c` | Traceability mapped | OPC UA Part 4 / 6 | — | Split file — see directory for service coverage |
+| `trustlist.c` | Traceability mapped | OPC UA Part 4 / 6 | — | Split file — see directory for service coverage |
+| `uadp_encoder.c` | Traceability mapped | OPC UA Part 4 / 6 | — | Split file — see directory for service coverage |
+| `unwrap.c` | Traceability mapped | OPC UA Part 4 / 6 | — | Split file — see directory for service coverage |
+| `variant_type.c` | Traceability mapped | OPC UA Part 4 / 6 | — | Split file — see directory for service coverage |
+| `view_handler.c` | Traceability mapped | OPC UA Part 4 / 6 | — | Split file — see directory for service coverage |
+| `wrap.c` | Traceability mapped | OPC UA Part 4 / 6 | — | Split file — see directory for service coverage |
