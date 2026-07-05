@@ -39,7 +39,7 @@ find_program(CLANG_TIDY clang-tidy)
 if(CLANG_TIDY)
     set(CMAKE_EXPORT_COMPILE_COMMANDS ON CACHE BOOL "Export compile_commands.json for clang-tidy" FORCE)
     add_custom_target(clang-tidy
-        COMMAND bash -c "find \"$@\" -type f -name '*.c' -print0 | xargs -0 --no-run-if-empty \"${CLANG_TIDY}\" -p \"${CMAKE_BINARY_DIR}\"" bash ${MUC_OPCUA_STATIC_ANALYSIS_DIRS}
+        COMMAND bash -c "find \"$@\" -type f -name '*.c' -print0 | xargs -0 --no-run-if-empty \"${CLANG_TIDY}\" --warnings-as-errors='*' -p \"${CMAKE_BINARY_DIR}\"" bash ${MUC_OPCUA_STATIC_ANALYSIS_DIRS}
         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
         COMMENT "Static analysis with clang-tidy"
         VERBATIM

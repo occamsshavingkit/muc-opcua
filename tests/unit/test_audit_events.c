@@ -7,8 +7,8 @@
 #include "unity.h"
 #include <string.h>
 
-#pragma message                                                                                                        \
-    "STUB: audit event dispatch behavioral tests needed (mu_raise_audit_event) when MUC_OPCUA_AUDITING is enabled"
+/* STUB: audit event dispatch behavioral tests needed (mu_raise_audit_event)
+   when MUC_OPCUA_AUDITING is enabled. */
 
 void setUp(void) {}
 void tearDown(void) {}

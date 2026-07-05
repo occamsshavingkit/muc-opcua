@@ -42,8 +42,7 @@ mu_session_t *mu_session_find_free(mu_session_t *sessions, size_t count);
    without floating-point math (valid for positive doubles). */
 opcua_statuscode_t mu_session_create(mu_session_t *session, opcua_uint64_t requested_timeout_bits,
                                      opcua_uint64_t *revised_timeout_bits, opcua_uint32_t *session_id,
-                                     opcua_uint32_t *auth_token)
-    __attribute__((deprecated("use mu_session_create_with_identifiers instead")));
+                                     opcua_uint32_t *auth_token);
 
 opcua_statuscode_t mu_session_generate_session_id(const mu_session_t *sessions, size_t count,
                                                   const mu_entropy_adapter_t *entropy, opcua_uint32_t *session_id);
