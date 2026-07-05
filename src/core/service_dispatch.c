@@ -243,10 +243,10 @@ static const mu_service_descriptor_t g_supported_services[] = {
     {{MU_ID_SETPUBLISHINGMODEREQUEST, MU_ID_SETPUBLISHINGMODERESPONSE, true}, handle_set_publishing_mode},
     {{MU_ID_PUBLISHREQUEST, MU_ID_PUBLISHRESPONSE, true}, handle_publish},
     {{MU_ID_REPUBLISHREQUEST, MU_ID_REPUBLISHRESPONSE, true}, handle_republish},
-    {{MU_ID_DELETESUBSCRIPTIONSREQUEST, MU_ID_DELETESUBSCRIPTIONSRESPONSE, true}, handle_delete_subscriptions},
-#endif
 #if MUC_OPCUA_REDUNDANCY
     {{MU_ID_TRANSFERSUBSCRIPTIONSREQUEST, MU_ID_TRANSFERSUBSCRIPTIONSRESPONSE, true}, handle_transfer_subscriptions},
+#endif
+    {{MU_ID_DELETESUBSCRIPTIONSREQUEST, MU_ID_DELETESUBSCRIPTIONSRESPONSE, true}, handle_delete_subscriptions},
 #endif
 };
 
