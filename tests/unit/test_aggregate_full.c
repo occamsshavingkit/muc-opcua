@@ -7,7 +7,8 @@
 #include "muc_opcua/types.h"
 #include "unity.h"
 
-/* STUB: Aggregate function behavioral tests not yet implemented (OPC-10000-13). Only constant-value checks and pass-through messages present. */
+/* STUB: Aggregate function behavioral tests not yet implemented (OPC-10000-13).
+ * Only constant-value checks and pass-through messages present. */
 
 void setUp(void) {}
 void tearDown(void) {}
