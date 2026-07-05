@@ -158,7 +158,7 @@ opcua_statuscode_t mu_binary_read_variant(mu_binary_reader_t *reader, mu_variant
                variant array must release variant.value.array (e.g. with
                free((void *)variant.value.array)) once no longer needed. A
                future mu_variant_destroy helper should centralize this. */
-#ifdef MUC_OPCUA_ALLOW_HEAP
+#if MUC_OPCUA_ALLOW_HEAP
             {
                 void *elements = calloc((size_t)length, stride);
                 if (elements == NULL) {

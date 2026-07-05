@@ -164,7 +164,7 @@ async def main() -> None:
                     call_handled = True
                     try:
                         result = await asyncio.wait_for(
-                            child.call_method(child.nodeid), timeout=10
+                            objects.call_method(child.nodeid), timeout=10
                         )
                         print(f"  call method {child.nodeid.to_string()}   OK")
                     except ua.UaStatusCodeError as e2:
@@ -179,7 +179,7 @@ async def main() -> None:
                         m = methods[0]
                         try:
                             result = await asyncio.wait_for(
-                                m.call_method(m.nodeid), timeout=10
+                                child.call_method(m.nodeid), timeout=10
                             )
                             print(f"  call method {m.nodeid.to_string()}   OK")
                         except ua.UaStatusCodeError as e2:

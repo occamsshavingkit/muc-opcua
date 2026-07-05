@@ -114,7 +114,7 @@ static opcua_statuscode_t h_cipher_ctx_init(void *c, const opcua_byte_t *key, op
         return MU_STATUS_BAD_INTERNALERROR;
     }
 
-#ifdef MUC_OPCUA_ALLOW_HEAP
+#if MUC_OPCUA_ALLOW_HEAP
     struct host_cipher_context *handle = (struct host_cipher_context *)calloc(1, sizeof(*handle));
     if (!handle) {
         return MU_STATUS_BAD_OUTOFMEMORY;
@@ -530,7 +530,7 @@ opcua_statuscode_t mu_host_crypto_adapter_init(mu_crypto_adapter_t *adapter) {
         return MU_STATUS_BAD_INTERNALERROR;
     }
 
-#ifdef MUC_OPCUA_ALLOW_HEAP
+#if MUC_OPCUA_ALLOW_HEAP
     struct host_crypto_context *cx = (struct host_crypto_context *)calloc(1, sizeof(*cx));
     if (!cx) {
         return MU_STATUS_BAD_OUTOFMEMORY;

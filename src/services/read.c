@@ -25,8 +25,6 @@ static size_t mu_read_cache_misses = 0;
 
 static opcua_boolean_t mu_read_cache_lookup(const mu_nodeid_t *node_id, opcua_double_t max_age_ms, opcua_datetime_t now,
                                             mu_variant_t *out) {
-    (void)node_id;
-
     /* OPC-10000-4 §5.11.2: maxAge=0 means always read from source */
     if (max_age_ms == 0.0) {
         mu_read_cache_misses++;
@@ -35,6 +33,9 @@ static opcua_boolean_t mu_read_cache_lookup(const mu_nodeid_t *node_id, opcua_do
 
     for (size_t i = 0; i < MU_READ_CACHE_SLOTS; i++) {
         if (!mu_read_cache[i].valid)
+            continue;
+
+        if (!mu_nodeid_equal(node_id, &mu_read_cache[i].node_id))
             continue;
 
         opcua_datetime_t age_ticks = now - mu_read_cache[i].read_time;
