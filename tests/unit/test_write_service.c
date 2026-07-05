@@ -9,14 +9,14 @@ void setUp(void) {}
 void tearDown(void) {}
 
 static mu_nodeid_t g_last_write_node;
-static mu_variant_t g_last_write_val;
+static mu_datavalue_t g_last_write_val;
 static int g_write_count = 0;
 
 typedef struct {
     int count;
     mu_nodeid_t nodes[4];
     opcua_uint32_t attributes[4];
-    mu_variant_t values[4];
+    mu_datavalue_t values[4];
     opcua_statuscode_t return_status[4];
 } write_callback_log_t;
 
@@ -28,7 +28,7 @@ typedef struct {
 } write_request_item_t;
 
 static opcua_statuscode_t mock_write_handler(void *handle, const mu_nodeid_t *node_id, opcua_uint32_t attribute_id,
-                                             const mu_variant_t *value) {
+                                             const mu_datavalue_t *value) {
     (void)handle;
     (void)attribute_id;
     g_last_write_node = *node_id;
@@ -38,7 +38,7 @@ static opcua_statuscode_t mock_write_handler(void *handle, const mu_nodeid_t *no
 }
 
 static opcua_statuscode_t logging_write_handler(void *handle, const mu_nodeid_t *node_id, opcua_uint32_t attribute_id,
-                                                const mu_variant_t *value) {
+                                                const mu_datavalue_t *value) {
     write_callback_log_t *log = (write_callback_log_t *)handle;
     int index;
     if (!log) {
@@ -236,8 +236,8 @@ void test_write_service_basic(void) {
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, status);
     TEST_ASSERT_EQUAL(1, g_write_count);
     TEST_ASSERT_EQUAL(5001, g_last_write_node.identifier.numeric);
-    TEST_ASSERT_EQUAL(MU_TYPE_INT32, g_last_write_val.type);
-    TEST_ASSERT_EQUAL(42, g_last_write_val.value.i32);
+    TEST_ASSERT_EQUAL(MU_TYPE_INT32, g_last_write_val.value.type);
+    TEST_ASSERT_EQUAL(42, g_last_write_val.value.value.i32);
 
     /* Verify response */
     mu_binary_reader_t resp_reader;
@@ -586,12 +586,12 @@ void test_write_service_batch_matches_individual_operation_results_and_callback_
     TEST_ASSERT_EQUAL(2, batch_log.count);
     TEST_ASSERT_EQUAL(7001, batch_log.nodes[0].identifier.numeric);
     TEST_ASSERT_EQUAL(13, batch_log.attributes[0]);
-    TEST_ASSERT_EQUAL(MU_TYPE_INT32, batch_log.values[0].type);
-    TEST_ASSERT_EQUAL(111, batch_log.values[0].value.i32);
+    TEST_ASSERT_EQUAL(MU_TYPE_INT32, batch_log.values[0].value.type);
+    TEST_ASSERT_EQUAL(111, batch_log.values[0].value.value.i32);
     TEST_ASSERT_EQUAL(7002, batch_log.nodes[1].identifier.numeric);
     TEST_ASSERT_EQUAL(13, batch_log.attributes[1]);
-    TEST_ASSERT_EQUAL(MU_TYPE_FLOAT, batch_log.values[1].type);
-    TEST_ASSERT_FLOAT_WITHIN(0.001f, 5.5f, batch_log.values[1].value.f);
+    TEST_ASSERT_EQUAL(MU_TYPE_FLOAT, batch_log.values[1].value.type);
+    TEST_ASSERT_FLOAT_WITHIN(0.001f, 5.5f, batch_log.values[1].value.value.f);
 
     opcua_statuscode_t individual_results[5];
     opcua_statuscode_t single_result[1];

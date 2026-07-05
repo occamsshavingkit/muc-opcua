@@ -1605,6 +1605,12 @@ void test_set_monitoring_mode(void) {
     mu_server_poll(server);
     TEST_ASSERT_EQUAL(ID_SETMONITORINGMODERESPONSE, parse_response(mock.last_write, mock.last_write_len, &body, &sr));
 
+    /* OPC-10000-4 §5.13.1.3: enabling (DISABLED->REPORTING) triggers an
+       immediate sample of the current value (20), queued as pending. */
+    TEST_ASSERT_TRUE(item->pending);
+    TEST_ASSERT_TRUE(item->has_value);
+    TEST_ASSERT_EQUAL_INT32(20, item->last_value.value.i32);
+
     s_mon_val = 30;
     s_tick = 600;
     mu_server_poll(server);

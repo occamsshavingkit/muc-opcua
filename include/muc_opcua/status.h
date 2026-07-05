@@ -60,6 +60,8 @@
 #define MU_STATUS_BAD_MESSAGENOTAVAILABLE ((opcua_statuscode_t)0x807B0000)
 #define MU_STATUS_BAD_SEQUENCENUMBERUNKNOWN ((opcua_statuscode_t)0x807A0000)
 #define MU_STATUS_BAD_TOOMANYPUBLISHREQUESTS ((opcua_statuscode_t)0x80780000)
+/* OPC-10000-4 §5.14.5.3: Publish when no Subscription exists for this Session. */
+#define MU_STATUS_BAD_NOSUBSCRIPTION ((opcua_statuscode_t)0x80500000)
 #endif
 #define MU_STATUS_BAD_NOTHINGTODO ((opcua_statuscode_t)0x800F0000)
 #define MU_STATUS_BAD_NOTWRITABLE ((opcua_statuscode_t)0x803B0000)
@@ -73,6 +75,9 @@
 #define MU_STATUS_BAD_NONCEINVALID ((opcua_statuscode_t)0x80240000)
 #define MU_STATUS_BAD_BROWSEDIRECTIONINVALID ((opcua_statuscode_t)0x804D0000)
 #define MU_STATUS_BAD_NODATA ((opcua_statuscode_t)0x809B0000)
+/* OPC-10000-4 §7.38.2 Table 179: NumericRange status codes. */
+#define MU_STATUS_BAD_INDEXRANGEINVALID ((opcua_statuscode_t)0x80940000)
+#define MU_STATUS_BAD_INDEXRANGENODATA ((opcua_statuscode_t)0x80950000)
 /* OPC-10000-4 §7.38.2: Bad_ViewIdUnknown — "The View node id does not refer to
    a View object." Returned by Browse (§5.9.2.2 Table 34) when the client
    requests a non-null View that the server does not recognize or support. */

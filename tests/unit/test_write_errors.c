@@ -17,7 +17,7 @@ void tearDown(void) {}
 
 #ifdef MUC_OPCUA_SERVICE_WRITE
 static opcua_statuscode_t dummy_write_handler(void *handle, const mu_nodeid_t *node_id, opcua_uint32_t attribute_id,
-                                              const mu_variant_t *value) {
+                                              const mu_datavalue_t *value) {
     (void)handle;
     (void)node_id;
     (void)attribute_id;
@@ -26,7 +26,7 @@ static opcua_statuscode_t dummy_write_handler(void *handle, const mu_nodeid_t *n
 }
 
 static opcua_statuscode_t counting_write_handler(void *handle, const mu_nodeid_t *node_id, opcua_uint32_t attribute_id,
-                                                 const mu_variant_t *value) {
+                                                 const mu_datavalue_t *value) {
     int *callback_count = (int *)handle;
     (void)node_id;
     (void)attribute_id;

@@ -314,6 +314,14 @@ opcua_statuscode_t handle_create_session(mu_server_t *server, mu_binary_reader_t
     }
     session_created = true;
 
+    /* OPC-10000-4 section 5.7.2.1: seed last_activity_ms at creation so the
+       SessionTimeout idle window starts from CreateSession, not from the first
+       subsequent service request. Guard get_tick_ms for white-box tests that
+       dispatch without a full mu_server_init. */
+    if (server->config.time_adapter.get_tick_ms != NULL) {
+        slot->last_activity_ms = server->config.time_adapter.get_tick_ms(server->config.time_adapter.context);
+    }
+
     mu_nodeid_t sid = {0, MU_NODEID_NUMERIC, {slot->session_id}};
     mu_nodeid_t tok = {0, MU_NODEID_NUMERIC, {slot->auth_token}};
     mu_bytestring_t null_bs = {-1, NULL};
@@ -799,6 +807,12 @@ opcua_statuscode_t handle_activate_session(mu_server_t *server, mu_binary_reader
 
                 if (activate_result == MU_STATUS_GOOD) {
                     activate_result = mu_session_activate(slot, auth_token, token_type.identifier.numeric);
+                    /* OPC-10000-4 section 5.7.2.1: ActivateSession is a service
+                       request on the Session, so refresh the idle timer. */
+                    if (activate_result == MU_STATUS_GOOD && server->config.time_adapter.get_tick_ms != NULL) {
+                        slot->last_activity_ms =
+                            server->config.time_adapter.get_tick_ms(server->config.time_adapter.context);
+                    }
                 }
             }
         }

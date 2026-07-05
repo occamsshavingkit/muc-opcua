@@ -91,7 +91,7 @@ static opcua_statuscode_t read_bench_value(void *context, const mu_nodeid_t *nod
 
 #ifdef MUC_OPCUA_SERVICE_WRITE
 static opcua_statuscode_t write_bench_value(void *handle, const mu_nodeid_t *node_id, opcua_uint32_t attribute_id,
-                                            const mu_variant_t *value) {
+                                            const mu_datavalue_t *value) {
     (void)handle;
     if (attribute_id != BENCH_ATTRIBUTE_VALUE) {
         return MU_STATUS_BAD_NOTWRITABLE;
@@ -105,11 +105,11 @@ static opcua_statuscode_t write_bench_value(void *handle, const mu_nodeid_t *nod
     if (index >= MAX_BENCH_NODES) {
         return MU_STATUS_BAD_NODEIDUNKNOWN;
     }
-    if (value == NULL || value->is_array || value->type != MU_TYPE_INT32) {
+    if (value == NULL || value->value.is_array || value->value.type != MU_TYPE_INT32) {
         return MU_STATUS_BAD_TYPEMISMATCH;
     }
 
-    bench_values[index] = value->value.i32;
+    bench_values[index] = value->value.value.i32;
     return MU_STATUS_GOOD;
 }
 #endif

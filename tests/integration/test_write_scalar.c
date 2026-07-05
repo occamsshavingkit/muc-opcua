@@ -127,11 +127,11 @@ static opcua_uint32_t parse_response(const opcua_byte_t *buf, size_t len, mu_bin
 }
 
 static mu_nodeid_t g_int_last_write_node;
-static mu_variant_t g_int_last_write_val;
+static mu_datavalue_t g_int_last_write_val;
 static int g_int_write_count = 0;
 
 static opcua_statuscode_t mock_write_handler(void *handle, const mu_nodeid_t *node_id, opcua_uint32_t attribute_id,
-                                             const mu_variant_t *value) {
+                                             const mu_datavalue_t *value) {
     (void)handle;
     (void)attribute_id;
     g_int_last_write_node = *node_id;
@@ -319,8 +319,8 @@ void test_integration_write_happy_path(void) {
 
     TEST_ASSERT_EQUAL(1, g_int_write_count);
     TEST_ASSERT_EQUAL(1000, g_int_last_write_node.identifier.numeric);
-    TEST_ASSERT_EQUAL(MU_TYPE_INT32, g_int_last_write_val.type);
-    TEST_ASSERT_EQUAL(12345, g_int_last_write_val.value.i32);
+    TEST_ASSERT_EQUAL(MU_TYPE_INT32, g_int_last_write_val.value.type);
+    TEST_ASSERT_EQUAL(12345, g_int_last_write_val.value.value.i32);
 
     TEST_ASSERT_EQUAL(MU_ID_WRITERESPONSE, parse_response(mock.last_write, mock.last_write_len, &body));
 

@@ -734,7 +734,7 @@ void test_dispatch_delete_subscriptions_rejects_too_many_operations_before_resul
 
 #ifdef MUC_OPCUA_SERVICE_WRITE
 static opcua_statuscode_t counting_write_handler(void *handle, const mu_nodeid_t *node_id, opcua_uint32_t attribute_id,
-                                                 const mu_variant_t *value) {
+                                                 const mu_datavalue_t *value) {
     int *count = (int *)handle;
     (void)node_id;
     (void)attribute_id;

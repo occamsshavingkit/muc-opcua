@@ -36,15 +36,28 @@ static opcua_statuscode_t set_publishing_mode_result(mu_server_t *server, opcua_
     if (mode->publishing_enabled) {
         sub->lifetime_counter = 0u;
         sub->more_notifications = false;
+    } else {
+        mu_publish_request_queue_clear(&server->subs, server->active_session->session_id);
     }
     return MU_STATUS_GOOD;
 }
 
-/* DeleteSubscriptions per-id callback. */
+/* DeleteSubscriptions per-id callback.
+ * OPC-10000-4 §5.14.1.4: issue a StatusChangeNotification before closing the
+ * Subscription so the client receives the closure reason. */
 static opcua_statuscode_t delete_subscription_result(mu_server_t *server, opcua_uint32_t subscription_id,
-                                                     void *context) {
+                                                      void *context) {
     (void)context;
-    return mu_subscription_delete(&server->subs, server->active_session->session_id, subscription_id);
+    mu_subscription_t *sub = mu_subscription_find(&server->subs, server->active_session->session_id, subscription_id);
+    if (sub != NULL) {
+        issue_status_change_notification(server, sub, MU_STATUS_BAD_TIMEOUT);
+    }
+    opcua_statuscode_t s =
+        mu_subscription_delete(&server->subs, server->active_session->session_id, subscription_id);
+    if (mu_subscriptions_count_for_session(&server->subs, server->active_session->session_id) == 0u) {
+        mu_publish_request_queue_clear(&server->subs, server->active_session->session_id);
+    }
+    return s;
 }
 
 /* CreateSubscription (OPC 10000-4 5.14.2): decode the request parameters, let the
@@ -225,6 +238,17 @@ opcua_statuscode_t handle_publish(mu_server_t *server, mu_binary_reader_t *r, mu
         }
     }
 
+    opcua_uint32_t sub_count = 0u;
+    for (size_t i = 0; i < MU_MAX_SUBSCRIPTIONS; ++i) {
+        const mu_subscription_t *sub = &server->subs.subscriptions[i];
+        if (sub->in_use && sub->session_id == server->active_session->session_id) {
+            ++sub_count;
+        }
+    }
+    if (sub_count == 0u) {
+        return MU_STATUS_BAD_NOSUBSCRIPTION;
+    }
+
     opcua_uint64_t now_ms = server->config.time_adapter.get_tick_ms(server->config.time_adapter.context);
     mu_publish_request_t *parked = NULL;
     s = mu_publish_request_enqueue(&server->subs, server->active_session->session_id, server->current_request_id,
@@ -233,6 +257,7 @@ opcua_statuscode_t handle_publish(mu_server_t *server, mu_binary_reader_t *r, mu
         return s;
     }
     if (parked != NULL) {
+        parked->timeout_hint = req.timeout_hint;
         parked->ack_count = stored_ack_count;
         for (opcua_uint32_t i = 0u; i < stored_ack_count; ++i) {
             parked->ack_results[i] = ack_results[i];

@@ -3,6 +3,15 @@
 #include "../address_space/base_nodes.h"
 #include "../core/server_internal.h"
 #include <stddef.h>
+#include <string.h>
+
+/* OPC-10000-4 §5.9.2.2 Table 34: resultMask bits */
+#define BROWSE_RESULTMASK_REFERENCE_TYPE  0x01U
+#define BROWSE_RESULTMASK_IS_FORWARD      0x02U
+#define BROWSE_RESULTMASK_NODE_CLASS      0x04U
+#define BROWSE_RESULTMASK_BROWSE_NAME     0x08U
+#define BROWSE_RESULTMASK_DISPLAY_NAME    0x10U
+#define BROWSE_RESULTMASK_TYPE_DEFINITION 0x20U
 
 /* Immediate supertype of a well-known (ns=0) ReferenceType, or 0 at the root.
    Covers the standard hierarchy needed to resolve Browse includeSubtypes
@@ -56,6 +65,36 @@ opcua_boolean_t ref_type_is_subtype_of(const mu_nodeid_t *child, const mu_nodeid
         }
     }
     return false;
+}
+
+/* Populate a ReferenceDescription, applying resultMask to filter which fields are
+   included. NodeId is always populated (not controlled by resultMask).
+   OPC-10000-4 §5.9.2.2 Table 34. */
+static void fill_ref_desc(mu_reference_description_t *ref_desc, const mu_reference_t *r,
+                          const mu_node_t *target, opcua_uint32_t result_mask) {
+    memset(ref_desc, 0, sizeof(*ref_desc));
+
+    /* NodeId is always returned (not in resultMask) */
+    ref_desc->node_id = target->node_id;
+
+    if ((result_mask & BROWSE_RESULTMASK_REFERENCE_TYPE) != 0) {
+        ref_desc->reference_type_id = r->reference_type_id;
+    }
+    if ((result_mask & BROWSE_RESULTMASK_IS_FORWARD) != 0) {
+        ref_desc->is_forward = r->is_forward;
+    }
+    if ((result_mask & BROWSE_RESULTMASK_BROWSE_NAME) != 0) {
+        ref_desc->browse_name = target->browse_name;
+    }
+    if ((result_mask & BROWSE_RESULTMASK_DISPLAY_NAME) != 0) {
+        ref_desc->display_name = target->display_name;
+    }
+    if ((result_mask & BROWSE_RESULTMASK_NODE_CLASS) != 0) {
+        ref_desc->node_class = target->node_class;
+    }
+    if ((result_mask & BROWSE_RESULTMASK_TYPE_DEFINITION) != 0) {
+        ref_desc->type_definition = target->type_definition;
+    }
 }
 
 /* Whether a reference passes the browse description's reference-type filter. */
@@ -380,16 +419,7 @@ opcua_statuscode_t mu_browse_process_with_user_index(const mu_address_space_t *a
             }
 
             mu_reference_description_t *ref_desc = &ref_pool[node_refs_start + match_count++];
-            ref_desc->reference_type_id = r->reference_type_id;
-            ref_desc->is_forward = r->is_forward;
-            ref_desc->node_id = target->node_id;
-            ref_desc->browse_name_namespace_index = 0;
-            ref_desc->browse_name = target->browse_name;
-            ref_desc->display_name = target->display_name;
-            ref_desc->node_class = target->node_class;
-
-            /* TypeDefinition cached on the node (audit T22). */
-            ref_desc->type_definition = target->type_definition;
+            fill_ref_desc(ref_desc, r, target, desc->result_mask);
         }
 #ifdef MUC_OPCUA_SERVICE_NODEMANAGEMENT
         /* Also iterate over dynamic references */
@@ -438,16 +468,7 @@ opcua_statuscode_t mu_browse_process_with_user_index(const mu_address_space_t *a
                 }
 
                 mu_reference_description_t *ref_desc = &ref_pool[node_refs_start + match_count++];
-                ref_desc->reference_type_id = r->reference_type_id;
-                ref_desc->is_forward = r->is_forward;
-                ref_desc->node_id = target->node_id;
-                ref_desc->browse_name_namespace_index = 0;
-                ref_desc->browse_name = target->browse_name;
-                ref_desc->display_name = target->display_name;
-                ref_desc->node_class = target->node_class;
-
-                /* TypeDefinition cached on the node (audit T22). */
-                ref_desc->type_definition = target->type_definition;
+                fill_ref_desc(ref_desc, r, target, desc->result_mask);
             }
         }
 #endif

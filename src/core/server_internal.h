@@ -10,6 +10,7 @@
 #include "muc_opcua/server.h"
 #include "muc_opcua/services/alarms_conditions.h"
 #include "service_dispatch.h"
+#include "message_chunk.h"
 #include "tcp_connection.h"
 
 /* Scratch layout within server->secure_scratch (all under MUC_OPCUA_SECURITY):
@@ -83,6 +84,7 @@ struct mu_server {
     opcua_uint64_t last_activity_ms; /* monotonic tick of last inbound traffic (idle timeout) */
     mu_tcp_connection_t tcp_conn;
     mu_secure_channel_t secure_channel;
+    mu_chunk_assembler_t chunk_assembly;
 
 #ifdef MUC_OPCUA_MULTIPLE_CONNECTIONS
 #define server_secure_channel (*(server->active_conn ? &server->active_conn->secure_channel : &server->secure_channel))
@@ -91,12 +93,14 @@ struct mu_server {
 #define server_rx_len (*(server->active_conn ? &server->active_conn->rx_len : &server->rx_len))
 #define server_last_activity_ms                                                                                        \
     (*(server->active_conn ? &server->active_conn->last_activity_ms : &server->last_activity_ms))
+#define server_chunk_assembly (server->chunk_assembly)
 #else
 #define server_secure_channel (server->secure_channel)
 #define server_tcp_conn (server->tcp_conn)
 #define server_client_handle (server->client_handle)
 #define server_rx_len (server->rx_len)
 #define server_last_activity_ms (server->last_activity_ms)
+#define server_chunk_assembly (server->chunk_assembly)
 #endif
 
     mu_string_t opn_pending_security_policy;

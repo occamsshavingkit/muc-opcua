@@ -2,6 +2,18 @@
 #include "message_chunk.h"
 #include "muc_opcua/encoding.h"
 #include "uasc.h"
+#include <string.h>
+
+void mu_chunk_assembler_init(mu_chunk_assembler_t *assembler) {
+    if (!assembler) return;
+    (void)memset(assembler, 0, sizeof(*assembler));
+}
+
+void mu_chunk_assembler_reset(mu_chunk_assembler_t *assembler) {
+    if (!assembler) return;
+    assembler->is_active = false;
+    assembler->length = 0;
+}
 
 opcua_statuscode_t mu_parse_message_header(const opcua_byte_t *buffer, size_t length, mu_message_header_t *header) {
     if (!buffer || !header) {
@@ -39,8 +51,7 @@ opcua_statuscode_t mu_parse_message_header(const opcua_byte_t *buffer, size_t le
         return MU_STATUS_BAD_TCPMESSAGETOOLARGE;
     }
 
-    if (header->chunk_type == 'C') {
-        /* OPC-10000-6 section 6.7.2: single-chunk mode rejects continuation chunks before MessageBody dispatch. */
+    if (header->chunk_type == 'C' && header->message_type[0] != 'M') {
         return MU_STATUS_BAD_TCPINTERNALERROR;
     }
 

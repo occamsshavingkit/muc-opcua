@@ -1308,7 +1308,33 @@ static opcua_statuscode_t set_monitoring_mode_result(mu_server_t *server, opcua_
         return MU_STATUS_BAD_MONITOREDITEMIDINVALID;
     }
 
+    const opcua_byte_t previous_mode = item->monitoring_mode;
     item->monitoring_mode = (opcua_byte_t)mode->monitoring_mode;
+
+    /* OPC-10000-4 §5.13.1.3: when a MonitoredItem is enabled (MonitoringMode
+       changes from DISABLED to SAMPLING or REPORTING), the Server shall take
+       the first sample as soon as possible, and the time of this sample
+       becomes the starting point for the next sampling interval. This mirrors
+       the immediate baseline sample taken at MonitoredItem creation. Event
+       (EventNotifier, attribute 12) items have no Value to sample. */
+    if (previous_mode == MU_MONITORING_MODE_DISABLED &&
+        (item->monitoring_mode == MU_MONITORING_MODE_SAMPLING ||
+         item->monitoring_mode == MU_MONITORING_MODE_REPORTING) &&
+        item->attribute_id != 12u) {
+        mu_variant_t cur;
+        opcua_statuscode_t read_status = read_monitored_item_value(item, &cur);
+        if (read_status == MU_STATUS_GOOD) {
+            item->last_value = cur;
+            item->last_status = MU_STATUS_GOOD;
+            item->has_value = true;
+            item->pending = true;
+            opcua_uint64_t now_ms = server->config.time_adapter.get_tick_ms(server->config.time_adapter.context);
+            item->next_sample_ms = now_ms + item->sampling_interval_ms;
+        } else {
+            item->last_status = read_status;
+        }
+    }
+
     return MU_STATUS_GOOD;
 }
 
@@ -2268,6 +2294,14 @@ opcua_statuscode_t mu_service_dispatch(mu_server_t *server, opcua_uint32_t reque
             return MU_STATUS_BAD_SESSIONNOTACTIVATED;
         }
         server->active_session = session;
+        /* OPC-10000-4 section 5.7.2.1: every service request on a Session
+           refreshes its idle timer; the Server closes a Session that sees no
+           requests for revised_session_timeout_ms. Guard get_tick_ms for
+           white-box tests that dispatch without a full mu_server_init. */
+        if (server->config.time_adapter.get_tick_ms != NULL) {
+            session->last_activity_ms =
+                server->config.time_adapter.get_tick_ms(server->config.time_adapter.context);
+        }
     }
 
     mu_binary_reader_t reader;

@@ -46,6 +46,7 @@ void mu_session_init(mu_session_t *session) {
         session->session_id = 0;
         session->auth_token = 0;
         session->revised_session_timeout_ms = 0;
+        session->last_activity_ms = 0;
         (void)memset(session->server_nonce, 0, sizeof(session->server_nonce));
 #ifdef MUC_OPCUA_MULTIPLE_CONNECTIONS
         session->secure_channel_id = 0;
@@ -311,4 +312,22 @@ mu_session_t *mu_session_find_closed_by_token(mu_session_t *sessions, size_t cou
     }
 
     return NULL;
+}
+
+void mu_session_close_timeout(mu_session_t *session) {
+    if (session == NULL) {
+        return;
+    }
+
+    /* OPC-10000-4 section 5.7.2.1: a Session whose last_activity_ms predates
+       now - revised_session_timeout_ms is closed by the Server. The state
+       transition and nonce-clear mirror mu_session_close; the auth_token and
+       session_id are preserved so the dispatch path can distinguish a timed-out
+       Session (Bad_SessionClosed) from an unknown token (Bad_SessionIdInvalid). */
+    if (session->state == MU_SESSION_STATE_CLOSED) {
+        return;
+    }
+
+    session->state = MU_SESSION_STATE_CLOSED;
+    (void)memset(session->server_nonce, 0, sizeof(session->server_nonce));
 }
