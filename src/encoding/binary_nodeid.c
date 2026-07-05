@@ -67,6 +67,7 @@ opcua_statuscode_t mu_binary_read_nodeid(mu_binary_reader_t *reader, mu_nodeid_t
         }
         break;
 
+#ifdef MUC_OPCUA_EXTENDED_NODEIDS
     case 0x04: /* Guid */
         value->identifier_type = MU_NODEID_GUID;
         status = mu_binary_read_uint16(reader, &value->namespace_index);
@@ -111,6 +112,8 @@ opcua_statuscode_t mu_binary_read_nodeid(mu_binary_reader_t *reader, mu_nodeid_t
             }
         }
         break;
+
+#endif /* MUC_OPCUA_EXTENDED_NODEIDS */
 
     default:
         return MU_STATUS_BAD_DECODINGERROR;
@@ -170,6 +173,7 @@ opcua_statuscode_t mu_binary_write_nodeid(mu_binary_writer_t *writer, const mu_n
         }
         return mu_binary_write_string(writer, &value->identifier.string);
 
+#ifdef MUC_OPCUA_EXTENDED_NODEIDS
     case MU_NODEID_GUID:
         status = mu_binary_write_byte(writer, 0x04); /* Guid mask */
         if (status != MU_STATUS_GOOD) {
@@ -213,6 +217,7 @@ opcua_statuscode_t mu_binary_write_nodeid(mu_binary_writer_t *writer, const mu_n
             }
         }
         return MU_STATUS_GOOD;
+#endif /* MUC_OPCUA_EXTENDED_NODEIDS */
 
     default:
         return MU_STATUS_BAD_ENCODINGERROR;

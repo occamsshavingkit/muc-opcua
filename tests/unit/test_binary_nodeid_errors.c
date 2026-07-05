@@ -169,6 +169,7 @@ void test_binary_expanded_nodeid_truncated_server_index_fails(void) {
     assert_expanded_nodeid_fails(buffer, sizeof(buffer));
 }
 
+#ifdef MUC_OPCUA_EXTENDED_NODEIDS
 void test_binary_nodeid_guid_decode_roundtrip(void) {
     const opcua_byte_t buffer[] = {0x04u, 0x01u, 0x00u, 0x00u, 0x01u, 0x02u, 0x03u, 0x04u, 0x05u, 0x06u,
                                    0x07u, 0x08u, 0x09u, 0x0au, 0x0bu, 0x0cu, 0x0du, 0x0eu, 0x0fu};
@@ -246,6 +247,7 @@ void test_binary_nodeid_opaque_decode_roundtrip(void) {
     /* Verify mu_nodeid_equal works. */
     TEST_ASSERT_TRUE(mu_nodeid_equal(&node_id, &node_id2));
 }
+#endif /* MUC_OPCUA_EXTENDED_NODEIDS */
 
 int main(void) {
     UNITY_BEGIN();
@@ -262,7 +264,9 @@ int main(void) {
     RUN_TEST(test_binary_nodeid_truncated_string_variant_fails);
     RUN_TEST(test_binary_expanded_nodeid_truncated_namespace_uri_fails);
     RUN_TEST(test_binary_expanded_nodeid_truncated_server_index_fails);
+#ifdef MUC_OPCUA_EXTENDED_NODEIDS
     RUN_TEST(test_binary_nodeid_guid_decode_roundtrip);
     RUN_TEST(test_binary_nodeid_opaque_decode_roundtrip);
+#endif /* MUC_OPCUA_EXTENDED_NODEIDS */
     return UNITY_END();
 }

@@ -158,7 +158,9 @@ opcua_statuscode_t mu_server_init(void *storage, size_t storage_size, const mu_s
     server_client_handle = NULL;
     mu_tcp_connection_init(&server_tcp_conn);
     mu_secure_channel_init(&server_secure_channel);
+#ifdef MUC_OPCUA_MULTI_CHUNK
     mu_chunk_assembler_init(&server->chunk_assembly);
+#endif
 #endif
     for (size_t i = 0; i < MU_MAX_SESSIONS; ++i) {
         mu_session_init(&server->sessions[i]);
@@ -592,9 +594,15 @@ static void process_message(mu_server_t *server, opcua_byte_t *msg, size_t msg_l
     status = mu_parse_message_header(msg, msg_len, &header);
     if (status != MU_STATUS_GOOD) {
         if (header.chunk_type == 'C') {
+#ifndef MUC_OPCUA_MULTI_CHUNK
+            send_tcp_error_chunk(server, MU_STATUS_BAD_TCPMESSAGETYPEINVALID);
+#else
             send_tcp_error_chunk(server, status);
+#endif
         }
+#ifdef MUC_OPCUA_MULTI_CHUNK
         mu_chunk_assembler_reset(&server_chunk_assembly);
+#endif
         return;
     }
 
@@ -603,6 +611,7 @@ static void process_message(mu_server_t *server, opcua_byte_t *msg, size_t msg_l
     bool is_clo = header.message_type[0] == 'C' && header.message_type[1] == 'L' && header.message_type[2] == 'O';
 
     /* OPC-10000-6 §6.7.2: multi-chunk MSG continuation chunks — buffer body bytes. */
+#ifdef MUC_OPCUA_MULTI_CHUNK
     if (is_msg && header.chunk_type == 'C') {
         size_t body_offset = MU_UASC_SYMMETRIC_HEADER_SIZE;
         if (msg_len <= body_offset) {
@@ -624,8 +633,10 @@ static void process_message(mu_server_t *server, opcua_byte_t *msg, size_t msg_l
         ca->length += body_len;
         return;
     }
+#endif /* MUC_OPCUA_MULTI_CHUNK */
 
     /* OPC-10000-6 §6.7.2: final chunk completes a multi-chunk MSG assembly. */
+#ifdef MUC_OPCUA_MULTI_CHUNK
     if (is_msg && header.chunk_type == 'F' && server_chunk_assembly.is_active) {
         mu_chunk_assembler_t *ca = &server_chunk_assembly;
         size_t body_offset = MU_UASC_SYMMETRIC_HEADER_SIZE;
@@ -726,6 +737,7 @@ static void process_message(mu_server_t *server, opcua_byte_t *msg, size_t msg_l
         mu_chunk_assembler_reset(ca);
         return;
     }
+#endif /* MUC_OPCUA_MULTI_CHUNK */
 
     if (is_clo) {
         mu_secure_channel_close(&server_secure_channel);
@@ -926,7 +938,9 @@ opcua_statuscode_t mu_server_poll(mu_server_t *server) {
         if (status == MU_STATUS_GOOD && server_client_handle != NULL) {
             mu_tcp_connection_init(&server_tcp_conn);
             mu_secure_channel_init(&server_secure_channel);
+#ifdef MUC_OPCUA_MULTI_CHUNK
             mu_chunk_assembler_init(&server->chunk_assembly);
+#endif
             for (size_t i = 0; i < MU_MAX_SESSIONS; ++i) {
                 mu_session_init(&server->sessions[i]);
             }

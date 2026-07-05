@@ -176,13 +176,19 @@
 #endif
 
 /* Multi-chunk reassembly buffer size. OPC-10000-6 §6.7.2 */
+#ifdef MUC_OPCUA_MULTI_CHUNK
 #ifndef MU_CHUNK_ASSEMBLY_BUFFER_SIZE
 #define MU_CHUNK_ASSEMBLY_BUFFER_SIZE 8192
+#endif
 #endif
 
 /* Multi-chunk reassembly storage. Sized for the default max message plus
    assembler bookkeeping. */
+#ifdef MUC_OPCUA_MULTI_CHUNK
 #define MU_CHUNK_ASSEMBLY_STORAGE_BYTES (MU_CHUNK_ASSEMBLY_BUFFER_SIZE + 32)
+#else
+#define MU_CHUNK_ASSEMBLY_STORAGE_BYTES 0
+#endif
 
 #if defined(MUC_OPCUA_SUBSCRIPTIONS) && MUC_OPCUA_SUBSCRIPTIONS_STANDARD
 /* src/services/subscription.h is the canonical definer for these capacities.

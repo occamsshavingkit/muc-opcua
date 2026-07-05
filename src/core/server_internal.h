@@ -84,7 +84,9 @@ struct mu_server {
     opcua_uint64_t last_activity_ms; /* monotonic tick of last inbound traffic (idle timeout) */
     mu_tcp_connection_t tcp_conn;
     mu_secure_channel_t secure_channel;
+#ifdef MUC_OPCUA_MULTI_CHUNK
     mu_chunk_assembler_t chunk_assembly;
+#endif
 
 #ifdef MUC_OPCUA_MULTIPLE_CONNECTIONS
 #define server_secure_channel (*(server->active_conn ? &server->active_conn->secure_channel : &server->secure_channel))
