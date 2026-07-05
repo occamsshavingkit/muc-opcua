@@ -415,12 +415,12 @@ static void handle_data_chunk_plaintext(mu_server_t *server, const opcua_byte_t 
         size_t total = 0;
         if (is_opn) {
             status = mu_uasc_finalize_asymmetric_none(server->config.send_buffer, server->config.send_buffer_size,
-                                                       server_secure_channel.channel_id, out_seq, seq.request_id,
-                                                       payload_len, &total);
+                                                      server_secure_channel.channel_id, out_seq, seq.request_id,
+                                                      payload_len, &total);
         } else {
             status = mu_uasc_finalize_symmetric(server->config.send_buffer, server->config.send_buffer_size,
-                                                 server_secure_channel.channel_id, server_secure_channel.token_id,
-                                                 out_seq, seq.request_id, payload_len, &total);
+                                                server_secure_channel.channel_id, server_secure_channel.token_id,
+                                                out_seq, seq.request_id, payload_len, &total);
         }
         if (status == MU_STATUS_GOOD) {
             send_buffer_chunk(server, total);
@@ -527,7 +527,8 @@ static void handle_data_chunk_secure(mu_server_t *server, opcua_byte_t *msg, siz
     } else {
         if (is_opn) {
             mu_service_dispatch_set_opn_security_policy(server, &opn_security_policy);
-            mu_bytestring_t cert_bs = {(opcua_int32_t)(client_cert_len > (size_t)INT32_MAX ? INT32_MAX : client_cert_len), client_cert};
+            mu_bytestring_t cert_bs = {
+                (opcua_int32_t)(client_cert_len > (size_t)INT32_MAX ? INT32_MAX : client_cert_len), client_cert};
             mu_service_dispatch_set_opn_client_cert(server, &cert_bs);
         }
         status =
@@ -831,9 +832,8 @@ static void poll_send_error_and_close(mu_server_t *server, void *handle) {
 }
 #endif /* MUC_OPCUA_MULTIPLE_CONNECTIONS */
 
-static bool poll_check_idle_timeout(mu_server_t *server, void **handle_ptr, size_t *rx_len_ptr,
-                                    size_t *read_pos_ptr, opcua_uint64_t *last_activity_ptr,
-                                    const mu_secure_channel_t *channel) {
+static bool poll_check_idle_timeout(mu_server_t *server, void **handle_ptr, size_t *rx_len_ptr, size_t *read_pos_ptr,
+                                    opcua_uint64_t *last_activity_ptr, const mu_secure_channel_t *channel) {
     opcua_uint64_t now = server->config.time_adapter.get_tick_ms(server->config.time_adapter.context);
     opcua_uint64_t limit =
         channel->is_open ? (opcua_uint64_t)channel->revised_lifetime : (opcua_uint64_t)MU_CONNECT_TIMEOUT_MS;
@@ -889,8 +889,8 @@ static void poll_process_buffer(mu_server_t *server, void **handle_ptr, size_t *
 }
 
 static opcua_statuscode_t poll_read_data(mu_server_t *server, void **handle_ptr, size_t *read_pos_ptr,
-                                         size_t *rx_len_ptr, opcua_uint64_t *last_activity_ptr,
-                                         opcua_byte_t *buffer, size_t buffer_size) {
+                                         size_t *rx_len_ptr, opcua_uint64_t *last_activity_ptr, opcua_byte_t *buffer,
+                                         size_t buffer_size) {
     size_t write_pos = *read_pos_ptr + *rx_len_ptr;
     if (write_pos >= buffer_size) {
         return MU_STATUS_GOOD;
@@ -1054,7 +1054,7 @@ void mu_server_close(mu_server_t *server) {
 
 #ifdef MUC_OPCUA_CUSTOM_METHODS
 opcua_statuscode_t mu_server_register_method_callback(mu_server_t *server, const mu_nodeid_t *method_id,
-                                                       mu_method_callback_t callback, void *context) {
+                                                      mu_method_callback_t callback, void *context) {
     if (server == NULL || method_id == NULL || callback == NULL) {
         return MU_STATUS_BAD_ARGUMENTSMISSING;
     }

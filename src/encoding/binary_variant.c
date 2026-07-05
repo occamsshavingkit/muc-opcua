@@ -166,7 +166,7 @@ opcua_statuscode_t mu_binary_read_variant(mu_binary_reader_t *reader, mu_variant
                 }
                 for (opcua_int32_t i = 0; i < length; ++i) {
                     status = read_scalar_value(reader, (mu_builtin_type_t)type,
-                                              (opcua_byte_t *)elements + (size_t)i * stride);
+                                               (opcua_byte_t *)elements + (size_t)i * stride);
                     if (status != MU_STATUS_GOOD) {
                         free(elements);
                         return status;

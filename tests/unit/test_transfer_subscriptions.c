@@ -117,9 +117,8 @@ static opcua_uint32_t create_subscription(mu_server_t *server) {
     mu_binary_write_byte(&w, 0u);
     TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, w.status);
 
-    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD,
-                            mu_service_dispatch(server, MU_ID_CREATESUBSCRIPTIONREQUEST, request, w.position,
-                                                response, &response_len));
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_service_dispatch(server, MU_ID_CREATESUBSCRIPTIONREQUEST, request,
+                                                                w.position, response, &response_len));
 
     mu_binary_reader_init(&r, response, response_len);
     TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_binary_read_nodeid(&r, &response_type));
@@ -161,9 +160,8 @@ void test_transfer_subscriptions_valid_existing_subscription(void) {
     mu_binary_write_boolean(&w, true);
     TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, w.status);
 
-    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD,
-                            mu_service_dispatch(&server, MU_ID_TRANSFERSUBSCRIPTIONSREQUEST, request, w.position,
-                                                response, &response_len));
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_service_dispatch(&server, MU_ID_TRANSFERSUBSCRIPTIONSREQUEST, request,
+                                                                w.position, response, &response_len));
 
     mu_binary_reader_init(&r, response, response_len);
     TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_binary_read_nodeid(&r, &response_type));
@@ -212,9 +210,8 @@ void test_transfer_subscriptions_unknown_id_returns_bad_id(void) {
     mu_binary_write_boolean(&w, true);
     TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, w.status);
 
-    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD,
-                            mu_service_dispatch(&server, MU_ID_TRANSFERSUBSCRIPTIONSREQUEST, request, w.position,
-                                                response, &response_len));
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_service_dispatch(&server, MU_ID_TRANSFERSUBSCRIPTIONSREQUEST, request,
+                                                                w.position, response, &response_len));
 
     mu_binary_reader_init(&r, response, response_len);
     TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_binary_read_nodeid(&r, &response_type));
@@ -263,9 +260,8 @@ void test_transfer_subscriptions_16_item_cap_overflow(void) {
     mu_binary_write_boolean(&w, true);
     TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, w.status);
 
-    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD,
-                            mu_service_dispatch(&server, MU_ID_TRANSFERSUBSCRIPTIONSREQUEST, request, w.position,
-                                                response, &response_len));
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_service_dispatch(&server, MU_ID_TRANSFERSUBSCRIPTIONSREQUEST, request,
+                                                                w.position, response, &response_len));
 
     mu_binary_reader_init(&r, response, response_len);
     TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_binary_read_nodeid(&r, &response_type));
@@ -319,9 +315,8 @@ void test_transfer_subscriptions_mixed_ids_response_encoding(void) {
     mu_binary_write_boolean(&w, true);
     TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, w.status);
 
-    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD,
-                            mu_service_dispatch(&server, MU_ID_TRANSFERSUBSCRIPTIONSREQUEST, request, w.position,
-                                                response, &response_len));
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_service_dispatch(&server, MU_ID_TRANSFERSUBSCRIPTIONSREQUEST, request,
+                                                                w.position, response, &response_len));
 
     mu_binary_reader_init(&r, response, response_len);
     TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_binary_read_nodeid(&r, &response_type));
@@ -375,9 +370,8 @@ void test_transfer_subscriptions_zero_count(void) {
     mu_binary_write_boolean(&w, true);
     TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, w.status);
 
-    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD,
-                            mu_service_dispatch(&server, MU_ID_TRANSFERSUBSCRIPTIONSREQUEST, request, w.position,
-                                                response, &response_len));
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_service_dispatch(&server, MU_ID_TRANSFERSUBSCRIPTIONSREQUEST, request,
+                                                                w.position, response, &response_len));
 
     mu_binary_reader_init(&r, response, response_len);
     TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_binary_read_nodeid(&r, &response_type));
@@ -416,9 +410,9 @@ void test_transfer_subscriptions_negative_count_returns_bad_decoding_error(void)
     mu_binary_write_boolean(&w, true);
     TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, w.status);
 
-    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_BAD_DECODINGERROR,
-                            mu_service_dispatch(&server, MU_ID_TRANSFERSUBSCRIPTIONSREQUEST, request, w.position,
-                                                response, &response_len));
+    TEST_ASSERT_EQUAL_HEX32(
+        MU_STATUS_BAD_DECODINGERROR,
+        mu_service_dispatch(&server, MU_ID_TRANSFERSUBSCRIPTIONSREQUEST, request, w.position, response, &response_len));
 
     /* Verify an error response is still a valid TransferSubscriptionsResponse
      * with the failing status code. */

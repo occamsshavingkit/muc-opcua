@@ -41,8 +41,7 @@ void test_binary_nodeid_string_roundtrip(void) {
 
     /* Byte-level assertion: String NodeId encoding (OPC 10000-6 §5.2.2.9):
        format 0x03 (String), uint16 ns=1, String "test" */
-    const opcua_byte_t expected[] = {0x03, 0x01, 0x00, 0x04, 0x00, 0x00, 0x00,
-                                     0x74, 0x65, 0x73, 0x74};
+    const opcua_byte_t expected[] = {0x03, 0x01, 0x00, 0x04, 0x00, 0x00, 0x00, 0x74, 0x65, 0x73, 0x74};
     TEST_ASSERT_EQUAL_size_t(sizeof(expected), writer.position);
     TEST_ASSERT_EQUAL_MEMORY(expected, buffer, sizeof(expected));
 

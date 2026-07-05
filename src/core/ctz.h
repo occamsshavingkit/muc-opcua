@@ -15,9 +15,8 @@ extern "C" {
 #define mu_ctz_u32(x) ((unsigned)__builtin_ctz(x))
 #else
 static inline unsigned mu_ctz_u32(uint32_t x) {
-    static const unsigned char debruijn[32] = {
-        0,  1,  28, 2,  29, 14, 24, 3,  30, 22, 20, 15, 25, 17, 4,  8,
-        31, 27, 13, 23, 21, 19, 16, 7,  26, 12, 18, 6,  11, 5,  10, 9};
+    static const unsigned char debruijn[32] = {0,  1,  28, 2,  29, 14, 24, 3, 30, 22, 20, 15, 25, 17, 4,  8,
+                                               31, 27, 13, 23, 21, 19, 16, 7, 26, 12, 18, 6,  11, 5,  10, 9};
     return debruijn[((x & (~x + 1u)) * 0x077CB531u) >> 27];
 }
 #endif

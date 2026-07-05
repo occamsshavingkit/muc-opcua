@@ -20,8 +20,8 @@ opcua_statuscode_t mu_trust_list_match(const mu_trust_list_t *trust_list, const 
     }
 
     for (size_t i = 0; i < trust_list->count; ++i) {
-        if (trust_list->lengths[i] == cert_length
-            && mu_constant_time_memcmp(trust_list->certificates[i], cert_data, cert_length) == 0) {
+        if (trust_list->lengths[i] == cert_length &&
+            mu_constant_time_memcmp(trust_list->certificates[i], cert_data, cert_length) == 0) {
             return MU_STATUS_GOOD; /* Exact match found */
         }
     }

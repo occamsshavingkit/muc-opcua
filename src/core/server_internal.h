@@ -61,7 +61,7 @@ typedef struct {
 typedef struct {
     void *client_handle;
     size_t rx_len;
-    size_t rx_read_pos;            /* start offset of unconsumed data in rx_buffer (HP8) */
+    size_t rx_read_pos; /* start offset of unconsumed data in rx_buffer (HP8) */
     opcua_uint64_t last_activity_ms;
     mu_tcp_connection_t tcp_conn;
     mu_secure_channel_t secure_channel;

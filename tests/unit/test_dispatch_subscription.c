@@ -135,9 +135,8 @@ void test_create_subscription_returns_valid_subscription_id(void) {
     mu_binary_write_byte(&w, 0u);
     TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, w.status);
 
-    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD,
-                            mu_service_dispatch(&server, MU_ID_CREATESUBSCRIPTIONREQUEST, request, w.position,
-                                                response, &response_len));
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_service_dispatch(&server, MU_ID_CREATESUBSCRIPTIONREQUEST, request,
+                                                                w.position, response, &response_len));
 
     mu_binary_reader_init(&r, response, response_len);
     TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_binary_read_nodeid(&r, &response_type));
@@ -176,9 +175,8 @@ void test_create_subscription_returns_revised_parameters(void) {
     mu_binary_write_byte(&w, 127u);
     TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, w.status);
 
-    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD,
-                            mu_service_dispatch(&server, MU_ID_CREATESUBSCRIPTIONREQUEST, request, w.position,
-                                                response, &response_len));
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_service_dispatch(&server, MU_ID_CREATESUBSCRIPTIONREQUEST, request,
+                                                                w.position, response, &response_len));
 
     mu_binary_reader_init(&r, response, response_len);
     TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_binary_read_nodeid(&r, &response_type));
@@ -217,9 +215,8 @@ void test_create_subscription_creates_subscription_in_server_state(void) {
     mu_binary_write_byte(&w, 4u);
     TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, w.status);
 
-    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD,
-                            mu_service_dispatch(&server, MU_ID_CREATESUBSCRIPTIONREQUEST, request, w.position,
-                                                response, &response_len));
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_service_dispatch(&server, MU_ID_CREATESUBSCRIPTIONREQUEST, request,
+                                                                w.position, response, &response_len));
 
     opcua_uint32_t count = 0u;
     for (size_t i = 0u; i < MU_MAX_SUBSCRIPTIONS; ++i) {
@@ -255,9 +252,8 @@ void test_create_subscription_duplicate_keeps_first_and_returns_another_id(void)
     mu_binary_write_byte(&w, 0u);
     TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, w.status);
 
-    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD,
-                            mu_service_dispatch(&server, MU_ID_CREATESUBSCRIPTIONREQUEST, request, w.position,
-                                                response, &response_len));
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_service_dispatch(&server, MU_ID_CREATESUBSCRIPTIONREQUEST, request,
+                                                                w.position, response, &response_len));
 
     mu_binary_reader_init(&r, response, response_len);
     TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_binary_read_nodeid(&r, &response_type));
@@ -276,9 +272,8 @@ void test_create_subscription_duplicate_keeps_first_and_returns_another_id(void)
     TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, w.status);
 
     response_len = sizeof(response);
-    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD,
-                            mu_service_dispatch(&server, MU_ID_CREATESUBSCRIPTIONREQUEST, request, w.position,
-                                                response, &response_len));
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_service_dispatch(&server, MU_ID_CREATESUBSCRIPTIONREQUEST, request,
+                                                                w.position, response, &response_len));
 
     mu_binary_reader_init(&r, response, response_len);
     TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_binary_read_nodeid(&r, &response_type));
@@ -328,9 +323,8 @@ void test_modify_subscription_updates_and_returns_revised_parameters(void) {
     mu_binary_write_byte(&w, 0u);
     TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, w.status);
 
-    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD,
-                            mu_service_dispatch(&server, MU_ID_CREATESUBSCRIPTIONREQUEST, request, w.position,
-                                                response, &response_len));
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_service_dispatch(&server, MU_ID_CREATESUBSCRIPTIONREQUEST, request,
+                                                                w.position, response, &response_len));
 
     mu_binary_reader_init(&r, response, response_len);
     TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_binary_read_nodeid(&r, &response_type));
@@ -350,9 +344,8 @@ void test_modify_subscription_updates_and_returns_revised_parameters(void) {
     TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, w.status);
 
     response_len = sizeof(response);
-    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD,
-                            mu_service_dispatch(&server, MU_ID_MODIFYSUBSCRIPTIONREQUEST, request, w.position,
-                                                response, &response_len));
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_service_dispatch(&server, MU_ID_MODIFYSUBSCRIPTIONREQUEST, request,
+                                                                w.position, response, &response_len));
 
     mu_binary_reader_init(&r, response, response_len);
     TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_binary_read_nodeid(&r, &response_type));
@@ -390,9 +383,9 @@ void test_modify_subscription_unknown_id_returns_subscription_id_invalid(void) {
     mu_binary_write_byte(&w, 5u);
     TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, w.status);
 
-    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_BAD_SUBSCRIPTIONIDINVALID,
-                            mu_service_dispatch(&server, MU_ID_MODIFYSUBSCRIPTIONREQUEST, request, w.position,
-                                                response, &response_len));
+    TEST_ASSERT_EQUAL_HEX32(
+        MU_STATUS_BAD_SUBSCRIPTIONIDINVALID,
+        mu_service_dispatch(&server, MU_ID_MODIFYSUBSCRIPTIONREQUEST, request, w.position, response, &response_len));
 }
 
 /* ------------------------------------------------------------------ */
@@ -426,9 +419,8 @@ void test_delete_subscriptions_removes_existing_subscription(void) {
     mu_binary_write_byte(&w, 0u);
     TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, w.status);
 
-    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD,
-                            mu_service_dispatch(&server, MU_ID_CREATESUBSCRIPTIONREQUEST, request, w.position,
-                                                response, &response_len));
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_service_dispatch(&server, MU_ID_CREATESUBSCRIPTIONREQUEST, request,
+                                                                w.position, response, &response_len));
 
     mu_binary_reader_init(&r, response, response_len);
     TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_binary_read_nodeid(&r, &response_type));
@@ -445,9 +437,8 @@ void test_delete_subscriptions_removes_existing_subscription(void) {
     TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, w.status);
 
     response_len = sizeof(response);
-    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD,
-                            mu_service_dispatch(&server, MU_ID_DELETESUBSCRIPTIONSREQUEST, request, w.position,
-                                                response, &response_len));
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_service_dispatch(&server, MU_ID_DELETESUBSCRIPTIONSREQUEST, request,
+                                                                w.position, response, &response_len));
 
     mu_binary_reader_init(&r, response, response_len);
     TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_binary_read_nodeid(&r, &response_type));
@@ -489,9 +480,8 @@ void test_delete_subscriptions_unknown_id_returns_per_operation_status(void) {
     mu_binary_write_uint32(&w, unknown_subscription_id);
     TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, w.status);
 
-    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD,
-                            mu_service_dispatch(&server, MU_ID_DELETESUBSCRIPTIONSREQUEST, request, w.position,
-                                                response, &response_len));
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_service_dispatch(&server, MU_ID_DELETESUBSCRIPTIONSREQUEST, request,
+                                                                w.position, response, &response_len));
 
     mu_binary_reader_init(&r, response, response_len);
     TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_binary_read_nodeid(&r, &response_type));
@@ -540,9 +530,8 @@ void test_delete_subscriptions_multiple_ids_returns_corresponding_statuses(void)
     mu_binary_write_byte(&w, 0u);
     TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, w.status);
 
-    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD,
-                            mu_service_dispatch(&server, MU_ID_CREATESUBSCRIPTIONREQUEST, request, w.position,
-                                                response, &response_len));
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_service_dispatch(&server, MU_ID_CREATESUBSCRIPTIONREQUEST, request,
+                                                                w.position, response, &response_len));
 
     mu_binary_reader_init(&r, response, response_len);
     TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_binary_read_nodeid(&r, &response_type));
@@ -559,9 +548,8 @@ void test_delete_subscriptions_multiple_ids_returns_corresponding_statuses(void)
     TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, w.status);
 
     response_len = sizeof(response);
-    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD,
-                            mu_service_dispatch(&server, MU_ID_DELETESUBSCRIPTIONSREQUEST, request, w.position,
-                                                response, &response_len));
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_service_dispatch(&server, MU_ID_DELETESUBSCRIPTIONSREQUEST, request,
+                                                                w.position, response, &response_len));
 
     mu_binary_reader_init(&r, response, response_len);
     TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_binary_read_nodeid(&r, &response_type));

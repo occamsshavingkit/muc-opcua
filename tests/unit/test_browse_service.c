@@ -78,22 +78,22 @@ void test_browse_service_response_encode(void) {
      *   DisplayName="Objects", NodeClass Object=1,
      *   TypeDefinition BaseObjectType ns=0;i=61) */
     const opcua_byte_t expected[] = {
-        0x01, 0x00, 0x00, 0x00,  /* Int32: num_results=1 */
-        0x00, 0x00, 0x00, 0x00,  /* StatusCode: GOOD */
-        0xFF, 0xFF, 0xFF, 0xFF,  /* ContinuationPoint: null (-1) */
-        0x01, 0x00, 0x00, 0x00,  /* Int32: num_references=1 */
-        0x00, 0x23,                 /* NodeId TwoByte: ns=0, id=35 (Organizes) */
-        0x01,                       /* Boolean: is_forward=true */
-        0x00, 0x55,                 /* NodeId TwoByte: ns=0, id=85 (ObjectsFolder) */
-        0x00, 0x00,                 /* UInt16: browse_name_namespace_index=0 */
-        0x07, 0x00, 0x00, 0x00,  /* Int32: string length=7 */
-        'O', 'b', 'j', 'e', 'c', 't', 's',  /* "Objects" */
-        0x02,                       /* LocalizedText mask: text only */
-        0x07, 0x00, 0x00, 0x00,  /* Int32: string length=7 */
-        'O', 'b', 'j', 'e', 'c', 't', 's',  /* "Objects" */
-        0x01, 0x00, 0x00, 0x00,  /* UInt32: node_class=Object(1) */
-        0x00, 0x3D,                 /* NodeId TwoByte: ns=0, id=61 (BaseObjectType) */
-        0x00, 0x00, 0x00, 0x00,  /* Int32: diagnosticInfos=0 (empty) */
+        0x01, 0x00, 0x00, 0x00,                /* Int32: num_results=1 */
+        0x00, 0x00, 0x00, 0x00,                /* StatusCode: GOOD */
+        0xFF, 0xFF, 0xFF, 0xFF,                /* ContinuationPoint: null (-1) */
+        0x01, 0x00, 0x00, 0x00,                /* Int32: num_references=1 */
+        0x00, 0x23,                            /* NodeId TwoByte: ns=0, id=35 (Organizes) */
+        0x01,                                  /* Boolean: is_forward=true */
+        0x00, 0x55,                            /* NodeId TwoByte: ns=0, id=85 (ObjectsFolder) */
+        0x00, 0x00,                            /* UInt16: browse_name_namespace_index=0 */
+        0x07, 0x00, 0x00, 0x00,                /* Int32: string length=7 */
+        'O',  'b',  'j',  'e',  'c', 't', 's', /* "Objects" */
+        0x02,                                  /* LocalizedText mask: text only */
+        0x07, 0x00, 0x00, 0x00,                /* Int32: string length=7 */
+        'O',  'b',  'j',  'e',  'c', 't', 's', /* "Objects" */
+        0x01, 0x00, 0x00, 0x00,                /* UInt32: node_class=Object(1) */
+        0x00, 0x3D,                            /* NodeId TwoByte: ns=0, id=61 (BaseObjectType) */
+        0x00, 0x00, 0x00, 0x00,                /* Int32: diagnosticInfos=0 (empty) */
     };
     TEST_ASSERT_EQUAL_size_t(sizeof(expected), writer.position);
     TEST_ASSERT_EQUAL_MEMORY(expected, buffer, sizeof(expected));

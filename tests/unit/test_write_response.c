@@ -7,8 +7,8 @@
  *   - DiagnosticInfos: null
  * OPC 10000-4 §5.11.4 Write Service, OPC 10000-6 §5.2 */
 
-#include "../../src/services/write.h"
 #include "../../src/services/service_header.h"
+#include "../../src/services/write.h"
 #include "muc_opcua/muc_opcua.h"
 #include "unity.h"
 #include <stdio.h>
@@ -29,14 +29,14 @@
 
 static const opcua_byte_t EXPECTED_FIXTURE[] = {
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /* timestamp = 0 */
-    0x01, 0x00, 0x00, 0x00,                           /* requestHandle = 1 */
-    0x00, 0x00, 0x00, 0x00,                           /* serviceResult = GOOD */
-    0x00,                                             /* serviceDiagnostics: empty */
-    0xFF, 0xFF, 0xFF, 0xFF,                           /* stringTable: null */
-    0x00, 0x00, 0x00,                                 /* additionalHeader: null */
-    0x01, 0x00, 0x00, 0x00,                           /* Results[] count = 1 */
-    0x00, 0x00, 0x00, 0x00,                           /* Results[0] = GOOD */
-    0xFF, 0xFF, 0xFF, 0xFF,                           /* DiagnosticInfos: null */
+    0x01, 0x00, 0x00, 0x00,                         /* requestHandle = 1 */
+    0x00, 0x00, 0x00, 0x00,                         /* serviceResult = GOOD */
+    0x00,                                           /* serviceDiagnostics: empty */
+    0xFF, 0xFF, 0xFF, 0xFF,                         /* stringTable: null */
+    0x00, 0x00, 0x00,                               /* additionalHeader: null */
+    0x01, 0x00, 0x00, 0x00,                         /* Results[] count = 1 */
+    0x00, 0x00, 0x00, 0x00,                         /* Results[0] = GOOD */
+    0xFF, 0xFF, 0xFF, 0xFF,                         /* DiagnosticInfos: null */
 };
 
 #define FIXTURE_SIZE sizeof(EXPECTED_FIXTURE)

@@ -10,7 +10,7 @@
 /* single-entry cache — one stored Variant */
 
 #define MU_READ_CACHE_SLOTS 1UL
-#define MU_MAXAGE_ALWAYS_CACHE_THRESHOLD_MS 1e12  /* ~31 years; treat as "uncapped maxAge" */
+#define MU_MAXAGE_ALWAYS_CACHE_THRESHOLD_MS 1e12 /* ~31 years; treat as "uncapped maxAge" */
 
 typedef struct {
     mu_nodeid_t node_id;

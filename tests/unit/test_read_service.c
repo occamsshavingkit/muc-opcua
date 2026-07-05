@@ -86,11 +86,11 @@ void test_read_service_scalar_values(void) {
      *   Variant mask=0x06 (BuiltInType Int32, scalar), Int32=42,
      *   Int32 DiagnosticInfos[]=empty (0) */
     const opcua_byte_t expected[] = {
-        0x01, 0x00, 0x00, 0x00,  /* Int32: num_results=1 */
-        0x01,                       /* DataValue encoding mask: has_value */
-        0x06,                       /* Variant mask: BuiltInType Int32, scalar */
-        0x2A, 0x00, 0x00, 0x00,  /* Int32: value=42 (LE) */
-        0x00, 0x00, 0x00, 0x00,  /* Int32: diagnosticInfos=0 (empty) */
+        0x01, 0x00, 0x00, 0x00, /* Int32: num_results=1 */
+        0x01,                   /* DataValue encoding mask: has_value */
+        0x06,                   /* Variant mask: BuiltInType Int32, scalar */
+        0x2A, 0x00, 0x00, 0x00, /* Int32: value=42 (LE) */
+        0x00, 0x00, 0x00, 0x00, /* Int32: diagnosticInfos=0 (empty) */
     };
     TEST_ASSERT_EQUAL_size_t(sizeof(expected), writer.position);
     TEST_ASSERT_EQUAL_MEMORY(expected, buffer, sizeof(expected));
