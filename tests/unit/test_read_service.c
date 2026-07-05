@@ -232,7 +232,8 @@ void test_read_service_batch_preserves_per_operation_results(void) {
     /* OPC-10000-4 5.11.2.2 returns a StatusCode for each nodesToRead entry.
        OPC-10000-4 5.11.2.4 and 7.38.2 define those operation-level statuses,
        so mixed per-operation failures must not change the service-level result. */
-    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_read_process(&address_space, NULL, &batch_req, 0, &batch_resp, batch_results, 5));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD,
+                      mu_read_process(&address_space, NULL, &batch_req, 0, &batch_resp, batch_results, 5));
     TEST_ASSERT_EQUAL(5, batch_resp.num_results);
 
     for (size_t i = 0; i < batch_req.num_nodes_to_read; ++i) {

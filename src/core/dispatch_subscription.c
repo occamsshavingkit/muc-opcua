@@ -46,14 +46,13 @@ static opcua_statuscode_t set_publishing_mode_result(mu_server_t *server, opcua_
  * OPC-10000-4 §5.14.1.4: issue a StatusChangeNotification before closing the
  * Subscription so the client receives the closure reason. */
 static opcua_statuscode_t delete_subscription_result(mu_server_t *server, opcua_uint32_t subscription_id,
-                                                      void *context) {
+                                                     void *context) {
     (void)context;
     mu_subscription_t *sub = mu_subscription_find(&server->subs, server->active_session->session_id, subscription_id);
     if (sub != NULL) {
         issue_status_change_notification(server, sub, MU_STATUS_BAD_TIMEOUT);
     }
-    opcua_statuscode_t s =
-        mu_subscription_delete(&server->subs, server->active_session->session_id, subscription_id);
+    opcua_statuscode_t s = mu_subscription_delete(&server->subs, server->active_session->session_id, subscription_id);
     if (mu_subscriptions_count_for_session(&server->subs, server->active_session->session_id) == 0u) {
         mu_publish_request_queue_clear(&server->subs, server->active_session->session_id);
     }

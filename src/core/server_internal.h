@@ -6,11 +6,13 @@
 #include "../services/secure_channel.h"
 #include "../services/session.h"
 #include "../services/subscription.h"
+#include "message_chunk.h"
+#include "muc_opcua/address_space/complex_types.h"
 #include "muc_opcua/encoding.h"
 #include "muc_opcua/server.h"
 #include "muc_opcua/services/alarms_conditions.h"
+#include "muc_opcua/services/diagnostics.h"
 #include "service_dispatch.h"
-#include "message_chunk.h"
 #include "tcp_connection.h"
 
 /* Scratch layout within server->secure_scratch (all under MUC_OPCUA_SECURITY):
@@ -158,6 +160,22 @@ struct mu_server {
     mu_condition_t conditions[MU_MAX_CONDITIONS];
     size_t condition_count;
 #endif
+
+#if MUC_OPCUA_SERVER_DIAGNOSTICS
+    mu_diagnostics_summary_t diag;
+#endif
+
+#if MUC_OPCUA_COMPLEX_TYPES
+#define MU_MAX_COMPLEX_TYPE_ENTRIES 8
+    struct {
+        const mu_structure_definition_t *structures[MU_MAX_COMPLEX_TYPE_ENTRIES];
+        mu_nodeid_t structure_ids[MU_MAX_COMPLEX_TYPE_ENTRIES];
+        opcua_uint16_t structure_count;
+        const mu_enum_definition_t *enums[MU_MAX_COMPLEX_TYPE_ENTRIES];
+        mu_nodeid_t enum_ids[MU_MAX_COMPLEX_TYPE_ENTRIES];
+        opcua_uint16_t enum_count;
+    } complex_types;
+#endif
 };
 
 #if MUC_OPCUA_SUBSCRIPTIONS
@@ -171,8 +189,7 @@ void advance_publish_timer(mu_subscription_t *sub, opcua_uint64_t now_ms);
 
 void advance_sample_timer(mu_monitored_item_t *item, opcua_uint64_t now_ms);
 opcua_statuscode_t read_monitored_item_value(const mu_monitored_item_t *item, mu_variant_t *cur);
-bool monitored_item_sample_changed(const mu_monitored_item_t *item, const mu_variant_t *cur,
-                                   opcua_statuscode_t status);
+bool monitored_item_sample_changed(const mu_monitored_item_t *item, const mu_variant_t *cur, opcua_statuscode_t status);
 bool monitored_item_reportable(const mu_monitored_item_t *item, const mu_subscription_t *sub);
 #endif
 
@@ -294,6 +311,11 @@ opcua_statuscode_t handle_delete_references(mu_server_t *server, mu_binary_reade
 #if MUC_OPCUA_SUBSCRIPTIONS && MUC_OPCUA_SUBSCRIPTIONS_STANDARD && MUC_OPCUA_BASE_TYPE_SYSTEM
 opcua_statuscode_t handle_call(mu_server_t *server, mu_binary_reader_t *r, mu_binary_writer_t *w,
                                size_t *response_length);
+#endif
+
+#if MUC_OPCUA_REDUNDANCY
+opcua_statuscode_t handle_transfer_subscriptions(mu_server_t *server, mu_binary_reader_t *r, mu_binary_writer_t *w,
+                                                 size_t *response_length);
 #endif
 
 #endif /* MUC_OPCUA_SERVER_INTERNAL_H */

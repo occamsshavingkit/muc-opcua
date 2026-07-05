@@ -93,8 +93,8 @@ static opcua_statuscode_t verify_activate_client_signature(mu_server_t *server, 
    RequestedSessionTimeout (the latter two are needed to compute the
    ServerSignature on a secured channel). */
 static opcua_statuscode_t read_create_session_request(mu_binary_reader_t *r, mu_string_t *application_uri,
-                                                       opcua_uint64_t *timeout_bits, mu_bytestring_t *client_nonce,
-                                                       mu_bytestring_t *client_cert) {
+                                                      opcua_uint64_t *timeout_bits, mu_bytestring_t *client_nonce,
+                                                      mu_bytestring_t *client_cert) {
     mu_string_t str;
     opcua_uint32_t u;
     opcua_int32_t n;
@@ -258,10 +258,8 @@ opcua_statuscode_t handle_create_session(mu_server_t *server, mu_binary_reader_t
            omit the ApplicationUri. On mismatch CreateSession returns
            Bad_CertificateUriInvalid. */
         opcua_statuscode_t au_status = mu_certificate_validate_application_uri(
-            server->config.crypto_adapter, server_secure_channel.policy, client_cert.data,
-            (size_t)client_cert.length, (const char *)application_uri.data, (size_t)(application_uri.length > 0
-                                                                                          ? application_uri.length
-                                                                                          : 0));
+            server->config.crypto_adapter, server_secure_channel.policy, client_cert.data, (size_t)client_cert.length,
+            (const char *)application_uri.data, (size_t)(application_uri.length > 0 ? application_uri.length : 0));
         if (au_status != MU_STATUS_GOOD) {
             return au_status;
         }

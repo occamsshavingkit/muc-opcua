@@ -90,10 +90,10 @@ opcua_statuscode_t mu_asym_signature_verify(const mu_crypto_adapter_t *crypto, m
                                      signature_length);
 }
 
-opcua_statuscode_t
-mu_certificate_validate_application_uri(const mu_crypto_adapter_t *crypto, mu_security_policy_id_t policy,
-                                        const opcua_byte_t *certificate, size_t certificate_length,
-                                        const char *application_uri, size_t application_uri_length) {
+opcua_statuscode_t mu_certificate_validate_application_uri(const mu_crypto_adapter_t *crypto,
+                                                           mu_security_policy_id_t policy,
+                                                           const opcua_byte_t *certificate, size_t certificate_length,
+                                                           const char *application_uri, size_t application_uri_length) {
     /* OPC-10000-4 §5.7.2.1: the check is only meaningful on a secured channel
        with a client certificate and a declared ApplicationUri. Skipping the
        absent cases preserves backward compatibility with SecurityPolicy=None
@@ -111,6 +111,6 @@ mu_certificate_validate_application_uri(const mu_crypto_adapter_t *crypto, mu_se
         return MU_STATUS_GOOD;
     }
     opcua_statuscode_t s = crypto->verify_certificate_application_uri(crypto->context, certificate, certificate_length,
-                                                                       application_uri, application_uri_length);
+                                                                      application_uri, application_uri_length);
     return (s == MU_STATUS_GOOD) ? MU_STATUS_GOOD : MU_STATUS_BAD_CERTIFICATEURIINVALID;
 }

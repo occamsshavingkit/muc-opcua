@@ -33,6 +33,11 @@ This document maps implementation and test files back to OPC UA normative sectio
 | `src/services/subscription_monitor.c` | Subscription MonitoredItem sampling + deadband | OPC-10000-4 | 5.13, 7.21, 7.22.2 | Monitored item lifecycle, sampling, deadband, and queue functions |
 | `src/services/subscription_publish.c` | Subscription publish cycle + timer | OPC-10000-4 / OPC-10000-6 | 5.13, 5.14, 5.14.5.1, 7.20.1, 7.22.1 | Publish response encoding, notification delivery, and publish timer |
 | `src/services/subscription_aggregate.c` | Subscription aggregate + trigger + resend | OPC-10000-4 / OPC-10000-13 | 5.13.5, 5.14, 7.22.4 / 5.4.3.5, 5.4.3.10, 5.4.3.11 | Aggregate, triggered items, resend data, and standard-only features |
+| `src/services/event_filter.c` | EventFilter where-clause evaluation | OPC-10000-4 / OPC-10000-5 | 7.22.3 / 6.4.2 | ContentFilter evaluation, select-clause extraction for BaseEventType fields |
+| `include/muc_opcua/services/method.h` | Method Server Facet API | OPC-10000-4 | 5.12.2.2 | Custom method callback registration and dispatch interface |
+| `include/muc_opcua/services/audit.h` | Audit event type definitions | OPC-10000-5 | 6.5 | Audit event structs for Standard profile |
+| `src/services/audit_events.c` | Audit event construction stub | OPC-10000-5 | 6.5 | Audit event delivery infrastructure |
+| `src/core/dispatch_transfer.c` | TransferSubscriptions handler | OPC-10000-4 | 5.14.7 | TransferSubscriptions service dispatch |
 | `src/encoding/binary_reader.c` | Binary Decoding | OPC-10000-6 | 5.2, 5.2.5 | Primitive bounds, declared-length checks, and array length validation |
 | `src/encoding/binary_extension_object.c` | ExtensionObject Encoding | OPC-10000-6 | 5.2.2.15 | ExtensionObject header/body bounds and skip validation |
 | `src/encoding/binary_query.c` | Query Encoding | OPC-10000-4 / OPC-10000-6 | B.2.3, 7.7.1 / 5.2.2.15 | QueryFirst ContentFilter and operand ExtensionObject decoding |
@@ -222,3 +227,21 @@ This document maps implementation and test files back to OPC UA normative sectio
 | `include/muc_opcua/services/alarms_conditions.h` | Alarms and Conditions | Part 9 | 5.5, 5.7, 5.8 | Alarms & Conditions types and API |
 | `src/services/alarms_conditions.c` | Alarms and Conditions | Part 9 | 5.5, 5.7, 5.8 | Alarms & Conditions method processing |
 | `tests/unit/test_alarms_conditions.c` | Tests | Part 9 | 5.5, 5.7, 5.8 | Test Alarms & Conditions functionality |
+| `src/address_space/complex_types.c` | ComplexType Server Facet | OPC-10000-3 | 5.6.4, 5.6.5 | Structure/Enum type registration |
+| `src/services/diagnostics.c` | Server Diagnostics | OPC-10000-5 | 6.3.3, 6.3.5 | Diagnostics counter management |
+| `src/encoding/binary_complex.c` | ComplexType Binary Encoding | OPC-10000-6 | 5.2.2.9, 5.2.2.12 | Structure/Enum binary encode |
+| `include/muc_opcua/services/diagnostics.h` | Diagnostics API | OPC-10000-5 | 6.3 | Server diagnostics counter API |
+| `include/muc_opcua/address_space/complex_types.h` | ComplexType API | OPC-10000-3 | 5.6.4, 5.6.5 | Structure/Enum type definitions |
+| `tests/unit/test_percent_deadband.c` | Tests | OPC-10000-4 | 7.22.2 | Percent deadband evaluation unit tests |
+| `tests/unit/test_analog_item.c` | Tests | OPC-10000-3 | 5.6.2 | AnalogItemType property validation |
+| `tests/unit/test_event_filter_where.c` | Tests | OPC-10000-4 | 7.22.3 | EventFilter where-clause test |
+| `tests/unit/test_event_filter_select.c` | Tests | OPC-10000-5 | 6.4.2 | Select-clause extraction test |
+| `tests/unit/test_event_notifier.c` | Tests | OPC-10000-3 | 5.4.6 | EventNotifier attribute test |
+| `tests/unit/test_method_call_arbitrary.c` | Tests | OPC-10000-4 | 5.12.2.2 | Custom method registration test |
+| `tests/unit/test_audit_events.c` | Tests | OPC-10000-5 | 6.5 | Audit event types test |
+| `tests/unit/test_complex_types.c` | Tests | OPC-10000-3 | 5.6.4, 5.6.5 | Complex type registration test |
+| `tests/unit/test_diagnostics.c` | Tests | OPC-10000-5 | 6.3.3, 6.3.5 | Diagnostics counter test |
+| `tests/unit/test_transfer_subscriptions.c` | Tests | OPC-10000-4 | 5.14.7 | TransferSubscriptions handler test |
+| `tests/unit/test_aggregate_full.c` | Tests | OPC-10000-13 | — | Aggregate function set test |
+| `tests/unit/test_reverse_connect.c` | Tests | OPC-10000-6 | 7.5 | Reverse Connect infrastructure test |
+| `tests/unit/test_time_sync.c` | Tests | OPC-10000-4 | A.2 | Time Sync infrastructure test |

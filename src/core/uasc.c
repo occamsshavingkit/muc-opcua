@@ -62,7 +62,7 @@ opcua_statuscode_t mu_uasc_finalize_asymmetric_none(opcua_byte_t *buffer, size_t
     mu_uasc_write_uint32_le(buffer, 4u, (opcua_uint32_t)total);                     /* MessageSize */
     mu_uasc_write_uint32_le(buffer, 8u, secure_channel_id);                         /* SecureChannelId */
     mu_uasc_write_uint32_le(buffer, 12u, (opcua_uint32_t)(sizeof(policy_uri) - 1)); /* SecurityPolicyUri length */
-    (void)memcpy(&buffer[16u], policy_uri, sizeof(policy_uri) - 1u);                      /* SecurityPolicyUri bytes */
+    (void)memcpy(&buffer[16u], policy_uri, sizeof(policy_uri) - 1u);                /* SecurityPolicyUri bytes */
     mu_uasc_write_uint32_le(buffer, 63u, 0xFFFFFFFFu);                              /* SenderCertificate (null) */
     mu_uasc_write_uint32_le(buffer, 67u, 0xFFFFFFFFu);                              /* ReceiverThumbprint (null) */
     mu_uasc_write_uint32_le(buffer, 71u, sequence_number);                          /* SequenceHeader.SequenceNumber */

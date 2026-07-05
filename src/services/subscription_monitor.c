@@ -120,6 +120,13 @@ bool monitored_item_change_reportable(const mu_monitored_item_t *item, const mu_
         return diff >= (double)item->deadband_value;
     }
 
+#if MUC_OPCUA_DATA_ACCESS
+    if (item->deadband_type == MU_DEADBAND_TYPE_PERCENT) {
+        double threshold = (item->deadband_value / 100.0) * item->deadband_span;
+        return diff >= threshold;
+    }
+#endif
+
     return diff > 0.0;
 }
 
@@ -175,8 +182,7 @@ static void monitored_item_mark_overflow(mu_monitored_item_t *item, opcua_byte_t
     item->queue_overflow = true;
 }
 
-void monitored_item_enqueue_report(mu_monitored_item_t *item, const mu_variant_t *cur,
-                                   opcua_statuscode_t status) {
+void monitored_item_enqueue_report(mu_monitored_item_t *item, const mu_variant_t *cur, opcua_statuscode_t status) {
     opcua_uint32_t queue_size = monitored_item_effective_queue_size(item);
 
     if (item->queue_count < queue_size) {

@@ -164,8 +164,8 @@ static bool publish_request_dequeue(mu_subscriptions_t *subs, opcua_uint32_t ses
    side timeout has elapsed, emit a Bad_Timeout fault instead of a Publish response and
    return false so the caller skips normal processing. A timeoutHint of 0 means the
    client did not specify a timeout and the request is always considered valid. */
-static bool publish_request_dequeue_valid(struct mu_server *server, opcua_uint32_t session_id,
-                                          opcua_uint64_t now_ms, mu_publish_request_t *out_request) {
+static bool publish_request_dequeue_valid(struct mu_server *server, opcua_uint32_t session_id, opcua_uint64_t now_ms,
+                                          mu_publish_request_t *out_request) {
     if (!publish_request_dequeue(&server->subs, session_id, out_request)) {
         return false;
     }
@@ -441,8 +441,7 @@ static opcua_datetime_t publish_time_now(const struct mu_server *server) {
 /* Apply source/server timestamps to a DataValue per the MonitoredItem's
  * TimestampsToReturn setting (OPC-10000-4 §5.13.2.2 Table 63). Without
  * per-sample capture, the server's current UTC time stands in for both. */
-static void datavalue_apply_timestamps(mu_datavalue_t *dv, const mu_monitored_item_t *item,
-                                       opcua_datetime_t now) {
+static void datavalue_apply_timestamps(mu_datavalue_t *dv, const mu_monitored_item_t *item, opcua_datetime_t now) {
     opcua_byte_t mode = item->timestamps_to_return;
     if (mode == MU_TIMESTAMPS_TO_RETURN_SOURCE || mode == MU_TIMESTAMPS_TO_RETURN_BOTH) {
         dv->has_source_timestamp = true;
@@ -694,6 +693,22 @@ static opcua_statuscode_t write_event_notification_list(mu_binary_writer_t *w, s
             for (size_t k = 0; k < sub->event_queue.count; ++k) {
                 const mu_event_notification_t *ev = &sub->event_queue.queue[idx];
                 idx = (idx + 1) % MU_MAX_EVENT_QUEUE_SIZE;
+
+#if MUC_OPCUA_EVENT_FILTER_WHERE
+                if (item->where_clause_count > 0) {
+                    mu_event_fields_t fields;
+                    memset(&fields, 0, sizeof(fields));
+                    fields.event_id = ev->event_id;
+                    fields.event_type = ev->event_type;
+                    fields.time = ev->time;
+                    fields.message = ev->message;
+                    fields.severity = ev->severity;
+                    if (!mu_evaluate_event_filter_where(&fields, item->where_operators, item->where_field_indices,
+                                                        item->where_values, item->where_clause_count)) {
+                        continue; /* event filtered out by where-clause */
+                    }
+                }
+#endif
 
                 s = mu_binary_write_uint32(&sub_w, item->client_handle);
                 if (s != MU_STATUS_GOOD) {
@@ -968,8 +983,7 @@ void advance_publish_timer(mu_subscription_t *sub, opcua_uint64_t now_ms) {
  * delivered immediately and is dropped — the client will discover the closure on its next
  * access to the subscription id. `status` is the StatusCode carried in the notification
  * (Bad_Timeout for lifetime expiry per §5.14.1.4). */
-void issue_status_change_notification(struct mu_server *server, mu_subscription_t *sub,
-                                             opcua_statuscode_t status) {
+void issue_status_change_notification(struct mu_server *server, mu_subscription_t *sub, opcua_statuscode_t status) {
     mu_publish_request_t request;
     if (!publish_request_dequeue(&server->subs, sub->session_id, &request)) {
         return;
@@ -982,9 +996,9 @@ void issue_status_change_notification(struct mu_server *server, mu_subscription_
     opcua_uint32_t sequence_number = current_sequence_number(sub);
     opcua_datetime_t publish_time = publish_time_now(server);
     bool sent_response_too_large_fault = false;
-    opcua_statuscode_t s = build_publish_response(server, sub, &request, sequence_number, false, 0, status,
-                                                  publish_time, body, sizeof(body), &body_length, &message_start,
-                                                  &message_end);
+    opcua_statuscode_t s =
+        build_publish_response(server, sub, &request, sequence_number, false, 0, status, publish_time, body,
+                               sizeof(body), &body_length, &message_start, &message_end);
     if (s == MU_STATUS_GOOD) {
         s = mu_server_emit_message(server, request.request_id, body, body_length);
     }
@@ -1057,10 +1071,9 @@ static void publish_due(struct mu_server *server, opcua_uint64_t now_ms) {
                 opcua_uint32_t sequence_number = current_sequence_number(sub);
                 opcua_datetime_t publish_time = publish_time_now(server);
                 bool sent_response_too_large_fault = false;
-                    opcua_statuscode_t s =
-                        build_publish_response(server, sub, &request, sequence_number, true, report_count,
-                                               MU_STATUS_GOOD, publish_time,
-                                               body, sizeof(body), &body_length, &message_start, &message_end);
+                opcua_statuscode_t s = build_publish_response(server, sub, &request, sequence_number, true,
+                                                              report_count, MU_STATUS_GOOD, publish_time, body,
+                                                              sizeof(body), &body_length, &message_start, &message_end);
                 if (s == MU_STATUS_GOOD) {
                     s = mu_server_emit_message(server, request.request_id, body, body_length);
                 }
@@ -1108,8 +1121,7 @@ static void publish_due(struct mu_server *server, opcua_uint64_t now_ms) {
                     bool sent_response_too_large_fault = false;
                     opcua_statuscode_t s =
                         build_publish_response(server, sub, &request, sequence_number, false, 0, MU_STATUS_GOOD,
-                                               publish_time, body,
-                                               sizeof(body), &body_length, NULL, NULL);
+                                               publish_time, body, sizeof(body), &body_length, NULL, NULL);
                     if (s == MU_STATUS_GOOD) {
                         s = mu_server_emit_message(server, request.request_id, body, body_length);
                     }

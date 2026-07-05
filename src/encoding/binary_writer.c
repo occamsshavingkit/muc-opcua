@@ -130,3 +130,14 @@ opcua_statuscode_t mu_binary_write_double(mu_binary_writer_t *writer, opcua_doub
 opcua_statuscode_t mu_binary_write_statuscode(mu_binary_writer_t *writer, opcua_statuscode_t value) {
     return mu_binary_write_uint32(writer, value);
 }
+
+#if MUC_OPCUA_DATA_ACCESS
+opcua_statuscode_t mu_binary_write_range(mu_binary_writer_t *writer, const mu_range_t *value) {
+    if (!writer || !value)
+        return MU_STATUS_BAD_INTERNALERROR;
+    opcua_statuscode_t s = mu_binary_write_double(writer, value->low);
+    if (s != MU_STATUS_GOOD)
+        return s;
+    return mu_binary_write_double(writer, value->high);
+}
+#endif

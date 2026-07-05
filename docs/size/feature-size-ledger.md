@@ -1,5 +1,43 @@
 # Feature Size Ledger
 
+## Current (2026-07-05): Standard 2017 UA Server Profile (Feature 037)
+
+Measured after Standard 2017 UA Server Profile implementation. Five profiles,
+all with zero `.data`, `.bss`, and heap.
+
+- **Toolchain**: `arm-none-eabi-gcc` 13.2.1, Cortex-M0+ Thumb `-Os`
+- **Target**: `MUC_OPCUA_PLATFORM=external`, no host adapters
+
+### ARM Cortex-M0+ `.text` (flash)
+
+| Profile | .text | .data | .bss |
+|---------|-------|-------|------|
+| nano | 17,392 B | 0 | 0 |
+| micro | 27,826 B | 0 | 0 |
+| embedded | 52,765 B | 0 | 0 |
+| standard | 62,958 B | 0 | 0 |
+| full | 62,950 B | 0 | 0 |
+
+### Caller-provided storage (`MU_SERVER_STORAGE_BYTES`)
+
+| Profile | Storage | Sessions | Subscriptions | Monitored Items | Publish |
+|---------|---------|----------|---------------|-----------------|---------|
+| nano | 1,280 B | 2 | — | — | — |
+| micro | 11,552 B | 2 | 2 | 8 | 2 |
+| embedded | 100,792 B | 2 | 2 | 100 | 5 |
+| standard | 457,052 B | 50 | 50 | 1,000 | 50 |
+| full | 820,052 B | 100 | 100 | 2,000 | 100 |
+
+- **Nano** is byte-identical to the pre-feature baseline (HANDOFF.md: 17,392 B).
+- **Micro** and **embedded** show negligible growth (<1%) from feature-gate
+  additions in headers and the extended `ServerProfileArray` string constant.
+- **Standard** is the OPC-10000-7 minima (50 sessions, 1000 monitored items).
+- **Full** is everything on with generous capacities. Not an OPC UA profile.
+
+---
+
+## Historical
+
 Measured footprint of the muc-opcua server across the three build profiles. The core
 has **no mutable global state** (`.data`, `.bss`, and heap are all zero — no `malloc` in
 the protocol path), so all RAM is caller-provided. (Feature 004 briefly introduced ~156 B

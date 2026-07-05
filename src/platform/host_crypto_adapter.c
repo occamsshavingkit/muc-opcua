@@ -425,8 +425,8 @@ static opcua_statuscode_t h_get_certificate_thumbprint(void *c, const opcua_byte
    certificate identity matches `application_uri`, MU_STATUS_BAD_CERTIFICATEURIINVALID
    otherwise (or MU_STATUS_BAD_CERTIFICATEINVALID on a parse failure). */
 static opcua_statuscode_t h_verify_certificate_application_uri(void *c, const opcua_byte_t *cert, size_t cert_len,
-                                                                const char *application_uri,
-                                                                size_t application_uri_len) {
+                                                               const char *application_uri,
+                                                               size_t application_uri_len) {
     (void)c;
     if (application_uri == NULL || application_uri_len == 0 || cert == NULL || cert_len == 0) {
         return MU_STATUS_BAD_CERTIFICATEURIINVALID;

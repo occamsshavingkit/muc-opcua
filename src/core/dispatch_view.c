@@ -140,8 +140,7 @@ opcua_statuscode_t handle_translate_browse_paths(mu_server_t *server, mu_binary_
 
             /* T018 (OPC-10000-4 §5.9.4.1): the last RelativePathElement must
              * carry a targetName. Empty/null is "missing" -> Bad_BrowseNameInvalid. */
-            if (element_index == element_total - 1U &&
-                (target_name.length <= 0 || target_name.data == NULL)) {
+            if (element_index == element_total - 1U && (target_name.length <= 0 || target_name.data == NULL)) {
                 path_status = MU_STATUS_BAD_BROWSENAMEINVALID;
                 current = NULL;
                 break;

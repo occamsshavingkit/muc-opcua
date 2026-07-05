@@ -66,7 +66,7 @@ static const mu_address_space_t address_space = {nodes, 2};
 
 static void print_usage(FILE *stream, const char *program) {
     (void)fprintf(stream, "Usage: %s [--scenario %s] [--iterations N] [--warmup N] [--output PATH]\n", program,
-            AUDIT_LATENCY_SCENARIO);
+                  AUDIT_LATENCY_SCENARIO);
 }
 
 static int parse_u32_arg(const char *name, const char *value, uint32_t *out) {
@@ -344,7 +344,7 @@ static int read_response_prefix(const char *name, const opcua_byte_t *response, 
     }
     if (handle != expected_handle) {
         (void)fprintf(stderr, "%s returned requestHandle %" PRIu32 ", expected %" PRIu32 "\n", name, (uint32_t)handle,
-                (uint32_t)expected_handle);
+                      (uint32_t)expected_handle);
         return 1;
     }
     if (service_result != MU_STATUS_GOOD) {
@@ -371,7 +371,7 @@ static int validate_count(const char *name, mu_binary_reader_t *body, opcua_int3
         }
     } else if (count != expected) {
         (void)fprintf(stderr, "%s returned count %" PRId32 ", expected %" PRId32 "\n", name, (int32_t)count,
-                (int32_t)expected);
+                      (int32_t)expected);
         return 1;
     }
     return 0;

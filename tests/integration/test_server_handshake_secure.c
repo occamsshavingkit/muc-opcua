@@ -334,15 +334,15 @@ void test_secure_handshake_read(void) {
         mu_string_t ns = {-1, NULL};
         mu_string_t app_uri = {9, (const opcua_byte_t *)"muc-opcua"};
         mu_binary_write_string(&w, &app_uri); /* ClientDescription.applicationUri */
-        mu_binary_write_string(&w, &ns);       /* productUri */
-        mu_binary_write_byte(&w, 0x00);        /* applicationName LocalizedText: no fields */
-        mu_binary_write_uint32(&w, 1);         /* applicationType Client */
-        mu_binary_write_string(&w, &ns);       /* gatewayServerUri */
-        mu_binary_write_string(&w, &ns);       /* discoveryProfileUri */
-        mu_binary_write_int32(&w, 0);          /* discoveryUrls[] */
-        mu_binary_write_string(&w, &ns);       /* ServerUri */
-        mu_binary_write_string(&w, &ns);       /* EndpointUrl */
-        mu_binary_write_string(&w, &ns);       /* SessionName */
+        mu_binary_write_string(&w, &ns);      /* productUri */
+        mu_binary_write_byte(&w, 0x00);       /* applicationName LocalizedText: no fields */
+        mu_binary_write_uint32(&w, 1);        /* applicationType Client */
+        mu_binary_write_string(&w, &ns);      /* gatewayServerUri */
+        mu_binary_write_string(&w, &ns);      /* discoveryProfileUri */
+        mu_binary_write_int32(&w, 0);         /* discoveryUrls[] */
+        mu_binary_write_string(&w, &ns);      /* ServerUri */
+        mu_binary_write_string(&w, &ns);      /* EndpointUrl */
+        mu_binary_write_string(&w, &ns);      /* SessionName */
         mu_bytestring_t cn = {32, client_nonce};
         mu_binary_write_bytestring(&w, &cn); /* ClientNonce */
         mu_bytestring_t cc = {(opcua_int32_t)client_cert_len, client_cert};
@@ -586,9 +586,9 @@ void test_create_session_rejects_mismatched_application_uri(void) {
 
         mu_sym_keys_t c2s, s2c;
         TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_sym_keys_derive(&client_crypto, MU_SECURITY_POLICY_BASIC256SHA256_ID,
-                                                              server_nonce.data, 32, client_nonce, 32, &c2s));
+                                                             server_nonce.data, 32, client_nonce, 32, &c2s));
         TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_sym_keys_derive(&client_crypto, MU_SECURITY_POLICY_BASIC256SHA256_ID,
-                                                              client_nonce, 32, server_nonce.data, 32, &s2c));
+                                                             client_nonce, 32, server_nonce.data, 32, &s2c));
 
         /* CreateSession with an ApplicationUri that does NOT match the client
            cert CN ("muc-opcua"). Expect Bad_CertificateUriInvalid. */
@@ -620,9 +620,9 @@ void test_create_session_rejects_mismatched_application_uri(void) {
         }
         opcua_byte_t msg_chunk[CHUNK_CAP];
         size_t msg_len = 0;
-        TEST_ASSERT_EQUAL(MU_STATUS_GOOD,
-                          mu_sym_chunk_wrap(&client_crypto, MU_MESSAGE_SECURITY_MODE_SIGN_AND_ENCRYPT, &c2s, "MSG", scid,
-                                            token_id, 2, 2, tmp, w.position, msg_chunk, sizeof(msg_chunk), &msg_len));
+        TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_sym_chunk_wrap(&client_crypto, MU_MESSAGE_SECURITY_MODE_SIGN_AND_ENCRYPT,
+                                                            &c2s, "MSG", scid, token_id, 2, 2, tmp, w.position,
+                                                            msg_chunk, sizeof(msg_chunk), &msg_len));
         mock.inbound_count = 0;
         mock.read_index = 0;
         enqueue(&mock, msg_chunk, msg_len);

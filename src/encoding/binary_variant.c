@@ -146,8 +146,7 @@ opcua_statuscode_t mu_binary_read_variant(mu_binary_reader_t *reader, mu_variant
             /* Each element occupies at least one byte on the wire, so a length
                greater than the remaining buffer cannot decode. This also bounds
                the allocation below to the remaining input size. */
-            if (reader->position > reader->length ||
-                (size_t)length > reader->length - reader->position) {
+            if (reader->position > reader->length || (size_t)length > reader->length - reader->position) {
                 return MU_STATUS_BAD_DECODINGERROR;
             }
             if ((size_t)length > SIZE_MAX / stride) {
@@ -164,8 +163,8 @@ opcua_statuscode_t mu_binary_read_variant(mu_binary_reader_t *reader, mu_variant
                 return MU_STATUS_BAD_OUTOFMEMORY;
             }
             for (opcua_int32_t i = 0; i < length; ++i) {
-                status = read_scalar_value(reader, (mu_builtin_type_t)type,
-                                           (opcua_byte_t *)elements + (size_t)i * stride);
+                status =
+                    read_scalar_value(reader, (mu_builtin_type_t)type, (opcua_byte_t *)elements + (size_t)i * stride);
                 if (status != MU_STATUS_GOOD) {
                     free(elements);
                     return status;

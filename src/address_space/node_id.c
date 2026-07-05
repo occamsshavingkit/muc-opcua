@@ -66,8 +66,7 @@ static int mu_nodeid_compare_direct(const mu_nodeid_t *left, const mu_nodeid_t *
         if (left->identifier.opaque.length == 0) {
             return 0;
         }
-        return memcmp(left->identifier.opaque.data, right->identifier.opaque.data,
-                      left->identifier.opaque.length);
+        return memcmp(left->identifier.opaque.data, right->identifier.opaque.data, left->identifier.opaque.length);
 #endif /* MUC_OPCUA_EXTENDED_NODEIDS */
     default:
         return 0;
@@ -186,8 +185,7 @@ opcua_boolean_t mu_nodeid_equal(const mu_nodeid_t *n1, const mu_nodeid_t *n2) {
         if (n1->identifier.opaque.length == 0) {
             return true;
         }
-        return memcmp(n1->identifier.opaque.data, n2->identifier.opaque.data,
-                      n1->identifier.opaque.length) == 0;
+        return memcmp(n1->identifier.opaque.data, n2->identifier.opaque.data, n1->identifier.opaque.length) == 0;
 #endif /* MUC_OPCUA_EXTENDED_NODEIDS */
 
     default:

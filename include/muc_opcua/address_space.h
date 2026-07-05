@@ -67,6 +67,10 @@ typedef struct {
     /* Cached HasTypeDefinition target (OPC 10000-3). Zero-initialized when the
      * node has no TypeDefinition. Eliminates the O(R*T) scan in Browse. */
     mu_nodeid_t type_definition;
+
+    /* EventNotifier attribute (OPC-10000-3 §5.4.6). Bits: 0=SubscribeToEvents, 1=HistoryRead.
+     * Zero means the node does not support event subscriptions. */
+    opcua_byte_t event_notifier;
 } mu_node_t;
 
 typedef struct mu_address_space mu_address_space_t;

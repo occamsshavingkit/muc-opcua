@@ -82,6 +82,10 @@ typedef struct {
        still enforced. */
     opcua_boolean_t allow_untrusted_clients;
 
+#ifdef MUC_OPCUA_AUDITING
+    opcua_boolean_t auditing_enabled;
+#endif
+
 #ifdef MUC_OPCUA_PUBSUB
     /* PubSub Configuration (optional) */
     mu_pubsub_connection_t pubsub;
@@ -138,6 +142,11 @@ opcua_statuscode_t mu_server_register_method_callback(mu_server_t *server, const
  * Trigger an Event to be published to all subscriptions that monitor events.
  */
 opcua_statuscode_t mu_server_trigger_event(mu_server_t *server, const mu_event_notification_t *event);
+#endif
+
+#ifdef MUC_OPCUA_AUDITING
+#include "muc_opcua/services/audit.h"
+void mu_raise_audit_event(mu_server_t *server, const mu_audit_event_t *event);
 #endif
 
 #ifdef __cplusplus

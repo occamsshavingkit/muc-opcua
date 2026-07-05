@@ -1,5 +1,6 @@
 /* src/address_space/base_nodes.c */
 #include "base_nodes.h"
+#include "muc_opcua/opcua_ids.h"
 #include <stddef.h>
 
 #ifdef MUC_OPCUA_BASE_NODES
@@ -66,11 +67,17 @@ static const opcua_byte_t s_str_UInt32[] = "UInt32";
 static const opcua_byte_t s_str_UInt64[] = "UInt64";
 static const opcua_byte_t s_str_VariableTypes[] = "VariableTypes";
 static const opcua_byte_t s_str_Views[] = "Views";
+static const opcua_byte_t s_str_ServerRedundancy[] = "ServerRedundancy";
+static const opcua_byte_t s_str_Namespaces[] = "Namespaces";
+static const opcua_byte_t s_str_RedundancySupport[] = "RedundancySupport";
+static const opcua_byte_t s_str_ServiceLevel[] = "ServiceLevel";
 static const opcua_byte_t s_str_en[] = "en";
 static const opcua_byte_t s_str_http___opcfoundation_org_UA_Profile_Server_EmbeddedUA2017[] =
     "http://opcfoundation.org/UA-Profile/Server/EmbeddedUA2017";
 static const opcua_byte_t s_str_http___opcfoundation_org_UA_Profile_Server_NanoEmbeddedDevice2017[] =
     "http://opcfoundation.org/UA-Profile/Server/NanoEmbeddedDevice2017";
+static const opcua_byte_t s_str_http___opcfoundation_org_UA_Profile_Server_StandardUA2017[] =
+    "http://opcfoundation.org/UA-Profile/Server/StandardUA2017";
 static const opcua_byte_t s_str_http___opcfoundation_org_UA_[] = "http://opcfoundation.org/UA/";
 static const opcua_byte_t s_str_urn_muc_opcua_server[] = "urn:muc-opcua:server";
 #if defined(__GNUC__) || defined(__clang__)
@@ -230,7 +237,9 @@ static const mu_value_source_t s_server_status_state_value = {
     MU_VALUESOURCE_STATIC, {.static_value = {.type = MU_TYPE_INT32, .value.i32 = 0}}};
 
 static const mu_string_t s_server_profile_array[] = {
-#if MUC_OPCUA_BASE_TYPE_SYSTEM
+#if MUC_OPCUA_STANDARD_PROFILE
+    {75, s_str_http___opcfoundation_org_UA_Profile_Server_StandardUA2017}
+#elif MUC_OPCUA_BASE_TYPE_SYSTEM
     {57, s_str_http___opcfoundation_org_UA_Profile_Server_EmbeddedUA2017}
 #else
     {65, s_str_http___opcfoundation_org_UA_Profile_Server_NanoEmbeddedDevice2017}
@@ -256,33 +265,117 @@ static const mu_value_source_t s_max_nodes_per_browse_value = {
 
 #if MUC_OPCUA_BASE_TYPE_SYSTEM
 static const mu_node_t s_base_nodes[] = {
-    {{0, MU_NODEID_NUMERIC, {1}}, MU_NODECLASS_DATATYPE, {7, s_str_Boolean}, {7, s_str_Boolean}, NULL, 0, NULL,
+    {{0, MU_NODEID_NUMERIC, {1}},
+     MU_NODECLASS_DATATYPE,
+     {7, s_str_Boolean},
+     {7, s_str_Boolean},
+     NULL,
+     0,
+     NULL,
      .type_definition = {0}},
-    {{0, MU_NODEID_NUMERIC, {2}}, MU_NODECLASS_DATATYPE, {5, s_str_SByte}, {5, s_str_SByte}, NULL, 0, NULL,
+    {{0, MU_NODEID_NUMERIC, {2}},
+     MU_NODECLASS_DATATYPE,
+     {5, s_str_SByte},
+     {5, s_str_SByte},
+     NULL,
+     0,
+     NULL,
      .type_definition = {0}},
-    {{0, MU_NODEID_NUMERIC, {3}}, MU_NODECLASS_DATATYPE, {4, s_str_Byte}, {4, s_str_Byte}, NULL, 0, NULL,
+    {{0, MU_NODEID_NUMERIC, {3}},
+     MU_NODECLASS_DATATYPE,
+     {4, s_str_Byte},
+     {4, s_str_Byte},
+     NULL,
+     0,
+     NULL,
      .type_definition = {0}},
-    {{0, MU_NODEID_NUMERIC, {4}}, MU_NODECLASS_DATATYPE, {5, s_str_Int16}, {5, s_str_Int16}, NULL, 0, NULL,
+    {{0, MU_NODEID_NUMERIC, {4}},
+     MU_NODECLASS_DATATYPE,
+     {5, s_str_Int16},
+     {5, s_str_Int16},
+     NULL,
+     0,
+     NULL,
      .type_definition = {0}},
-    {{0, MU_NODEID_NUMERIC, {5}}, MU_NODECLASS_DATATYPE, {6, s_str_UInt16}, {6, s_str_UInt16}, NULL, 0, NULL,
+    {{0, MU_NODEID_NUMERIC, {5}},
+     MU_NODECLASS_DATATYPE,
+     {6, s_str_UInt16},
+     {6, s_str_UInt16},
+     NULL,
+     0,
+     NULL,
      .type_definition = {0}},
-    {{0, MU_NODEID_NUMERIC, {6}}, MU_NODECLASS_DATATYPE, {5, s_str_Int32}, {5, s_str_Int32}, NULL, 0, NULL,
+    {{0, MU_NODEID_NUMERIC, {6}},
+     MU_NODECLASS_DATATYPE,
+     {5, s_str_Int32},
+     {5, s_str_Int32},
+     NULL,
+     0,
+     NULL,
      .type_definition = {0}},
-    {{0, MU_NODEID_NUMERIC, {7}}, MU_NODECLASS_DATATYPE, {6, s_str_UInt32}, {6, s_str_UInt32}, NULL, 0, NULL,
+    {{0, MU_NODEID_NUMERIC, {7}},
+     MU_NODECLASS_DATATYPE,
+     {6, s_str_UInt32},
+     {6, s_str_UInt32},
+     NULL,
+     0,
+     NULL,
      .type_definition = {0}},
-    {{0, MU_NODEID_NUMERIC, {8}}, MU_NODECLASS_DATATYPE, {5, s_str_Int64}, {5, s_str_Int64}, NULL, 0, NULL,
+    {{0, MU_NODEID_NUMERIC, {8}},
+     MU_NODECLASS_DATATYPE,
+     {5, s_str_Int64},
+     {5, s_str_Int64},
+     NULL,
+     0,
+     NULL,
      .type_definition = {0}},
-    {{0, MU_NODEID_NUMERIC, {9}}, MU_NODECLASS_DATATYPE, {6, s_str_UInt64}, {6, s_str_UInt64}, NULL, 0, NULL,
+    {{0, MU_NODEID_NUMERIC, {9}},
+     MU_NODECLASS_DATATYPE,
+     {6, s_str_UInt64},
+     {6, s_str_UInt64},
+     NULL,
+     0,
+     NULL,
      .type_definition = {0}},
-    {{0, MU_NODEID_NUMERIC, {10}}, MU_NODECLASS_DATATYPE, {5, s_str_Float}, {5, s_str_Float}, NULL, 0, NULL,
+    {{0, MU_NODEID_NUMERIC, {10}},
+     MU_NODECLASS_DATATYPE,
+     {5, s_str_Float},
+     {5, s_str_Float},
+     NULL,
+     0,
+     NULL,
      .type_definition = {0}},
-    {{0, MU_NODEID_NUMERIC, {11}}, MU_NODECLASS_DATATYPE, {6, s_str_Double}, {6, s_str_Double}, NULL, 0, NULL,
+    {{0, MU_NODEID_NUMERIC, {11}},
+     MU_NODECLASS_DATATYPE,
+     {6, s_str_Double},
+     {6, s_str_Double},
+     NULL,
+     0,
+     NULL,
      .type_definition = {0}},
-    {{0, MU_NODEID_NUMERIC, {12}}, MU_NODECLASS_DATATYPE, {6, s_str_String}, {6, s_str_String}, NULL, 0, NULL,
+    {{0, MU_NODEID_NUMERIC, {12}},
+     MU_NODECLASS_DATATYPE,
+     {6, s_str_String},
+     {6, s_str_String},
+     NULL,
+     0,
+     NULL,
      .type_definition = {0}},
-    {{0, MU_NODEID_NUMERIC, {13}}, MU_NODECLASS_DATATYPE, {8, s_str_DateTime}, {8, s_str_DateTime}, NULL, 0, NULL,
+    {{0, MU_NODEID_NUMERIC, {13}},
+     MU_NODECLASS_DATATYPE,
+     {8, s_str_DateTime},
+     {8, s_str_DateTime},
+     NULL,
+     0,
+     NULL,
      .type_definition = {0}},
-    {{0, MU_NODEID_NUMERIC, {17}}, MU_NODECLASS_DATATYPE, {6, s_str_NodeId}, {6, s_str_NodeId}, NULL, 0, NULL,
+    {{0, MU_NODEID_NUMERIC, {17}},
+     MU_NODECLASS_DATATYPE,
+     {6, s_str_NodeId},
+     {6, s_str_NodeId},
+     NULL,
+     0,
+     NULL,
      .type_definition = {0}},
     {{0, MU_NODEID_NUMERIC, {19}},
      MU_NODECLASS_DATATYPE,
@@ -659,9 +752,21 @@ static const mu_node_t s_base_nodes[] = {
      sizeof(s_objects_refs) / sizeof(s_objects_refs[0]),
      NULL,
      .type_definition = {0}},
-    {{0, MU_NODEID_NUMERIC, {86}}, MU_NODECLASS_OBJECT, {5, s_str_Types}, {5, s_str_Types}, NULL, 0, NULL,
+    {{0, MU_NODEID_NUMERIC, {86}},
+     MU_NODECLASS_OBJECT,
+     {5, s_str_Types},
+     {5, s_str_Types},
+     NULL,
+     0,
+     NULL,
      .type_definition = {0}},
-    {{0, MU_NODEID_NUMERIC, {87}}, MU_NODECLASS_OBJECT, {5, s_str_Views}, {5, s_str_Views}, NULL, 0, NULL,
+    {{0, MU_NODEID_NUMERIC, {87}},
+     MU_NODECLASS_OBJECT,
+     {5, s_str_Views},
+     {5, s_str_Views},
+     NULL,
+     0,
+     NULL,
      .type_definition = {0}},
     {{0, MU_NODEID_NUMERIC, {2253}},
      MU_NODECLASS_OBJECT,
@@ -751,6 +856,17 @@ static const mu_node_t s_base_nodes[] = {
      0,
      &s_max_nodes_per_browse_value,
      .type_definition = {0}},
+#if MUC_OPCUA_REDUNDANCY || MUC_OPCUA_STANDARD_PROFILE
+    {{0, MU_NODEID_NUMERIC, {2296}},
+     MU_NODECLASS_OBJECT,
+     {16, s_str_ServerRedundancy},
+     {16, s_str_ServerRedundancy},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {2034u}}},
+#endif
+
 };
 #endif
 
@@ -843,3 +959,28 @@ const mu_node_t *mu_resolve_node(const mu_address_space_t *user, mu_address_spac
     }
     return mu_address_space_find_node(mu_base_address_space(), NULL, node_id);
 }
+
+#if MUC_OPCUA_DATA_ACCESS
+double mu_resolve_eurange_span(const struct mu_server *server, const mu_node_t *node) {
+    (void)server;
+    if (node == NULL || node->references == NULL) {
+        return 0.0;
+    }
+    for (size_t i = 0; i < node->reference_count; ++i) {
+        if (node->references[i].reference_type_id.identifier.numeric == 46u && /* HasProperty */
+            node->references[i].target_id.identifier.numeric == MU_ID_EURANGE) {
+            const mu_node_t *range_node = mu_resolve_node(NULL, NULL, NULL, &node->references[i].target_id);
+            if (range_node != NULL) {
+                if (range_node->value != NULL && range_node->value->type == MU_VALUESOURCE_STATIC) {
+                    const mu_variant_t *sv = &range_node->value->data.static_value;
+                    if (sv->type == MU_TYPE_DOUBLE && sv->value.array != NULL) {
+                        const opcua_double_t *darr = (const opcua_double_t *)sv->value.array;
+                        return darr[1] - darr[0]; /* High - Low */
+                    }
+                }
+            }
+        }
+    }
+    return 0.0;
+}
+#endif

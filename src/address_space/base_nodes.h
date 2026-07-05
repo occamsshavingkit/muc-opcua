@@ -57,4 +57,11 @@ void mu_base_runtime_init(mu_base_runtime_nodes_t *storage, const mu_time_adapte
 const mu_node_t *mu_resolve_node(const mu_address_space_t *user, mu_address_space_index_t *user_index,
                                  const mu_address_space_t *dynamic, const mu_nodeid_t *node_id);
 
+#if MUC_OPCUA_DATA_ACCESS
+/* Resolve the EURange span (High - Low) for a Variable node. Returns 0.0 if
+   the node has no EURange Property or the value cannot be read.
+   OPC-10000-4 §7.22.2, OPC-10000-3 §5.6.2. */
+double mu_resolve_eurange_span(const struct mu_server *server, const mu_node_t *node);
+#endif
+
 #endif /* MUC_OPCUA_BASE_NODES_H */

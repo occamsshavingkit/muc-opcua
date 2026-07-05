@@ -37,8 +37,8 @@ static opcua_uint32_t read_opn_channel_id(const opcua_byte_t *buf, size_t len) {
 
 static void patch_msg_channel_ids(state_error_transport_t *t, opcua_uint32_t channel_id) {
     for (size_t i = 0; i < t->inbound_count; ++i) {
-        if (t->inbound_len[i] >= 12 && t->inbound[i][0] == 'M' && t->inbound[i][1] == 'S' &&
-            t->inbound[i][2] == 'G' && t->inbound[i][3] == 'F') {
+        if (t->inbound_len[i] >= 12 && t->inbound[i][0] == 'M' && t->inbound[i][1] == 'S' && t->inbound[i][2] == 'G' &&
+            t->inbound[i][3] == 'F') {
             t->inbound[i][8] = (opcua_byte_t)(channel_id);
             t->inbound[i][9] = (opcua_byte_t)(channel_id >> 8u);
             t->inbound[i][10] = (opcua_byte_t)(channel_id >> 16u);

@@ -284,7 +284,7 @@ static void check_line_for_unknown_statuscode_names(const char *path, size_t lin
 
         if (!is_known_statuscode_name(cursor, token_len)) {
             (void)printf("Unknown StatusCode name per OPC-10000-4 section 7.38.2: %s:%zu:%.*s\n", path, line_number,
-                   (int)token_len, cursor);
+                         (int)token_len, cursor);
             ++(*unknown_names);
         }
     }

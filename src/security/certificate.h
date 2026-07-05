@@ -29,10 +29,10 @@ opcua_statuscode_t mu_certificate_validate(const mu_crypto_adapter_t *crypto, mu
    backward compatibility with adapters lacking a SAN/CN parser). Otherwise
    dispatches to the adapter and returns MU_STATUS_BAD_CERTIFICATEURIINVALID
    on mismatch. */
-opcua_statuscode_t
-mu_certificate_validate_application_uri(const mu_crypto_adapter_t *crypto, mu_security_policy_id_t policy,
-                                        const opcua_byte_t *certificate, size_t certificate_length,
-                                        const char *application_uri, size_t application_uri_length);
+opcua_statuscode_t mu_certificate_validate_application_uri(const mu_crypto_adapter_t *crypto,
+                                                           mu_security_policy_id_t policy,
+                                                           const opcua_byte_t *certificate, size_t certificate_length,
+                                                           const char *application_uri, size_t application_uri_length);
 
 /* Feature 026: policy-keyed asymmetric signing/verification. Dispatches to the
    RSA-PKCS#1.5-SHA256 or RSA-PSS-SHA256 adapter primitive per the SecurityPolicy

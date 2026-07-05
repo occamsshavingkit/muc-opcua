@@ -66,20 +66,20 @@ static size_t build_create_session_body(opcua_byte_t *buf, size_t cap) {
     write_request_header(&w, 7);
     mu_string_t ns = {-1, NULL};
     mu_bytestring_t nb = {-1, NULL};
-    mu_binary_write_string(&w, &ns);     /* applicationUri */
-    mu_binary_write_string(&w, &ns);     /* productUri */
-    mu_binary_write_byte(&w, 0x00);      /* applicationName LocalizedText (empty) */
-    mu_binary_write_uint32(&w, 1);       /* applicationType = CLIENT */
-    mu_binary_write_string(&w, &ns);     /* gatewayServerUri */
-    mu_binary_write_string(&w, &ns);     /* discoveryProfileUri */
-    mu_binary_write_int32(&w, 0);        /* discoveryUrls[] */
-    mu_binary_write_string(&w, &ns);     /* ServerUri */
-    mu_binary_write_string(&w, &ns);     /* EndpointUrl */
-    mu_binary_write_string(&w, &ns);     /* SessionName */
-    mu_binary_write_bytestring(&w, &nb); /* ClientNonce */
-    mu_binary_write_bytestring(&w, &nb); /* ClientCertificate */
+    mu_binary_write_string(&w, &ns);       /* applicationUri */
+    mu_binary_write_string(&w, &ns);       /* productUri */
+    mu_binary_write_byte(&w, 0x00);        /* applicationName LocalizedText (empty) */
+    mu_binary_write_uint32(&w, 1);         /* applicationType = CLIENT */
+    mu_binary_write_string(&w, &ns);       /* gatewayServerUri */
+    mu_binary_write_string(&w, &ns);       /* discoveryProfileUri */
+    mu_binary_write_int32(&w, 0);          /* discoveryUrls[] */
+    mu_binary_write_string(&w, &ns);       /* ServerUri */
+    mu_binary_write_string(&w, &ns);       /* EndpointUrl */
+    mu_binary_write_string(&w, &ns);       /* SessionName */
+    mu_binary_write_bytestring(&w, &nb);   /* ClientNonce */
+    mu_binary_write_bytestring(&w, &nb);   /* ClientCertificate */
     mu_binary_write_double(&w, 1200000.0); /* RequestedSessionTimeout */
-    mu_binary_write_uint32(&w, 0);       /* MaxResponseMessageSize */
+    mu_binary_write_uint32(&w, 0);         /* MaxResponseMessageSize */
     return w.position;
 }
 
@@ -113,8 +113,7 @@ void test_create_session_encode_failure_reclaims_session_slot(void) {
 
     opcua_byte_t resp[SESSION_ORDER_RESP_BUF_LEN];
     size_t resp_len = sizeof(resp);
-    opcua_statuscode_t s =
-        mu_service_dispatch(&server, MU_ID_CREATESESSIONREQUEST, req, req_len, resp, &resp_len);
+    opcua_statuscode_t s = mu_service_dispatch(&server, MU_ID_CREATESESSIONREQUEST, req, req_len, resp, &resp_len);
 
     /* OPC-10000-4 §5.3: an undersized response buffer yields an encoding
      * fault (Bad_EncodingError / Bad_EncodingLimitsExceeded), not Good. */

@@ -118,7 +118,7 @@ static void mu_dynamic_node_move(mu_dynamic_address_space_t *space, size_t dest_
         } else {
             if (string_nodeid_length > 0) {
                 (void)memcpy(space->string_nodeid_storage[dest_index], space->string_nodeid_storage[source_index],
-                       (size_t)string_nodeid_length);
+                             (size_t)string_nodeid_length);
             }
             space->nodes[dest_index].node_id.identifier.string.data = space->string_nodeid_storage[dest_index];
         }
@@ -129,7 +129,7 @@ static void mu_dynamic_node_move(mu_dynamic_address_space_t *space, size_t dest_
     } else {
         if (browse_name_length > 0) {
             (void)memcpy(space->browse_name_storage[dest_index], space->browse_name_storage[source_index],
-                   (size_t)browse_name_length);
+                         (size_t)browse_name_length);
         }
         space->nodes[dest_index].browse_name.data = space->browse_name_storage[dest_index];
     }
@@ -139,7 +139,7 @@ static void mu_dynamic_node_move(mu_dynamic_address_space_t *space, size_t dest_
     } else {
         if (display_name_length > 0) {
             (void)memcpy(space->display_name_storage[dest_index], space->display_name_storage[source_index],
-                   (size_t)display_name_length);
+                         (size_t)display_name_length);
         }
         space->nodes[dest_index].display_name.data = space->display_name_storage[dest_index];
     }

@@ -167,7 +167,8 @@ void test_browse_service_rejects_non_null_view_id(void) {
         .node_class_mask = 0,
         .result_mask = 0x3F};
 
-    mu_browse_request_t req = {.view_id = {.identifier_type = MU_NODEID_NUMERIC, .namespace_index = 0,
+    mu_browse_request_t req = {.view_id = {.identifier_type = MU_NODEID_NUMERIC,
+                                           .namespace_index = 0,
                                            .identifier.numeric = 12345}, /* non-null View */
                                .timestamp = 0,
                                .view_version = 0,
@@ -192,13 +193,13 @@ void test_browse_service_accepts_null_view_id(void) {
         .result_mask = 0x3F};
 
     /* null viewId: ns=0, numeric 0 -> browse normally (no Bad_ViewIdUnknown) */
-    mu_browse_request_t req = {.view_id = {.identifier_type = MU_NODEID_NUMERIC, .namespace_index = 0,
-                                           .identifier.numeric = 0},
-                               .timestamp = 0,
-                               .view_version = 0,
-                               .requested_max_references_per_node = 0,
-                               .nodes_to_browse = &desc,
-                               .num_nodes_to_browse = 1};
+    mu_browse_request_t req = {
+        .view_id = {.identifier_type = MU_NODEID_NUMERIC, .namespace_index = 0, .identifier.numeric = 0},
+        .timestamp = 0,
+        .view_version = 0,
+        .requested_max_references_per_node = 0,
+        .nodes_to_browse = &desc,
+        .num_nodes_to_browse = 1};
     mu_browse_result_t result;
     mu_reference_description_t ref_pool[4];
 

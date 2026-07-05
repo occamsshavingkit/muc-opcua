@@ -128,9 +128,9 @@ void test_application_uri_rejects_mismatch(void) {
     const opcua_byte_t *cert = NULL;
     size_t cert_len = 0;
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, crypto.get_own_certificate(crypto.context, &cert, &cert_len));
-    TEST_ASSERT_EQUAL(MU_STATUS_BAD_CERTIFICATEURIINVALID,
-                      crypto.verify_certificate_application_uri(crypto.context, cert, cert_len,
-                                                                 "urn:wrong:application", 21));
+    TEST_ASSERT_EQUAL(
+        MU_STATUS_BAD_CERTIFICATEURIINVALID,
+        crypto.verify_certificate_application_uri(crypto.context, cert, cert_len, "urn:wrong:application", 21));
 }
 
 /* Unparseable certificate bytes are reported as Bad_CertificateInvalid. */
@@ -157,9 +157,8 @@ void test_validate_application_uri_skips_for_none_policy(void) {
     const opcua_byte_t *cert = NULL;
     size_t cert_len = 0;
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, crypto.get_own_certificate(crypto.context, &cert, &cert_len));
-    TEST_ASSERT_EQUAL(MU_STATUS_GOOD,
-                      mu_certificate_validate_application_uri(&crypto, MU_SECURITY_POLICY_NONE_ID, cert, cert_len,
-                                                               "urn:does:not:match", 19));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_certificate_validate_application_uri(&crypto, MU_SECURITY_POLICY_NONE_ID, cert,
+                                                                              cert_len, "urn:does:not:match", 19));
 }
 
 void test_validate_application_uri_skips_when_uri_empty(void) {
@@ -167,9 +166,8 @@ void test_validate_application_uri_skips_when_uri_empty(void) {
     size_t cert_len = 0;
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, crypto.get_own_certificate(crypto.context, &cert, &cert_len));
     /* Empty URI is permitted (skip) to preserve existing test clients. */
-    TEST_ASSERT_EQUAL(MU_STATUS_GOOD,
-                      mu_certificate_validate_application_uri(&crypto, MU_SECURITY_POLICY_BASIC256SHA256_ID, cert,
-                                                               cert_len, NULL, 0));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_certificate_validate_application_uri(
+                                          &crypto, MU_SECURITY_POLICY_BASIC256SHA256_ID, cert, cert_len, NULL, 0));
 }
 
 void test_validate_application_uri_accepts_matching_cn(void) {
@@ -178,7 +176,7 @@ void test_validate_application_uri_accepts_matching_cn(void) {
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, crypto.get_own_certificate(crypto.context, &cert, &cert_len));
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD,
                       mu_certificate_validate_application_uri(&crypto, MU_SECURITY_POLICY_BASIC256SHA256_ID, cert,
-                                                               cert_len, "muc-opcua", 9));
+                                                              cert_len, "muc-opcua", 9));
 }
 
 void test_validate_application_uri_rejects_mismatch(void) {
@@ -187,7 +185,7 @@ void test_validate_application_uri_rejects_mismatch(void) {
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, crypto.get_own_certificate(crypto.context, &cert, &cert_len));
     TEST_ASSERT_EQUAL(MU_STATUS_BAD_CERTIFICATEURIINVALID,
                       mu_certificate_validate_application_uri(&crypto, MU_SECURITY_POLICY_BASIC256SHA256_ID, cert,
-                                                               cert_len, "urn:wrong:app", 13));
+                                                              cert_len, "urn:wrong:app", 13));
 }
 
 /* Adapters without the callback skip the check (preserves backward compat). */
@@ -199,7 +197,7 @@ void test_validate_application_uri_skips_when_hook_absent(void) {
     no_hook.verify_certificate_application_uri = NULL;
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD,
                       mu_certificate_validate_application_uri(&no_hook, MU_SECURITY_POLICY_BASIC256SHA256_ID, cert,
-                                                               cert_len, "urn:does:not:match", 19));
+                                                              cert_len, "urn:does:not:match", 19));
 }
 
 int main(void) {
