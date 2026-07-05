@@ -223,8 +223,18 @@ void test_secure_handshake_read(void) {
     mu_binary_write_uint32(&w, 3600000); /* RequestedLifetime */
     clen = 0;
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD,
-                      mu_asym_chunk_wrap(&client_crypto, MU_SECURITY_POLICY_BASIC256SHA256_ID, 0, 1, 1, server_cert,
-                                         server_cert_len, tmp, w.position, chunk, sizeof(chunk), &clen));
+                      mu_asym_chunk_wrap(&(mu_asym_wrap_params_t){.crypto = &client_crypto,
+                                                                  .policy = MU_SECURITY_POLICY_BASIC256SHA256_ID,
+                                                                  .secure_channel_id = 0,
+                                                                  .sequence_number = 1,
+                                                                  .request_id = 1,
+                                                                  .receiver_cert = server_cert,
+                                                                  .receiver_cert_len = server_cert_len,
+                                                                  .body = tmp,
+                                                                  .body_len = w.position,
+                                                                  .out = chunk,
+                                                                  .out_cap = sizeof(chunk),
+                                                                  .out_len = &clen}));
     enqueue(&mock, chunk, clen);
 
     /* ---- Configure the secured server ---- */
@@ -520,8 +530,18 @@ void test_create_session_rejects_mismatched_application_uri(void) {
     mu_binary_write_uint32(&w, 3600000);
     clen = 0;
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD,
-                      mu_asym_chunk_wrap(&client_crypto, MU_SECURITY_POLICY_BASIC256SHA256_ID, 0, 1, 1, server_cert,
-                                         server_cert_len, tmp, w.position, chunk, sizeof(chunk), &clen));
+                      mu_asym_chunk_wrap(&(mu_asym_wrap_params_t){.crypto = &client_crypto,
+                                                                  .policy = MU_SECURITY_POLICY_BASIC256SHA256_ID,
+                                                                  .secure_channel_id = 0,
+                                                                  .sequence_number = 1,
+                                                                  .request_id = 1,
+                                                                  .receiver_cert = server_cert,
+                                                                  .receiver_cert_len = server_cert_len,
+                                                                  .body = tmp,
+                                                                  .body_len = w.position,
+                                                                  .out = chunk,
+                                                                  .out_cap = sizeof(chunk),
+                                                                  .out_len = &clen}));
     enqueue(&mock, chunk, clen);
 
     mu_server_config_t config;

@@ -1,5 +1,6 @@
 /* src/security/asym_chunk/unwrap.c
  * mu_asym_chunk_unwrap and its helpers. */
+#include "../asym_chunk.h"
 #include "common.h"
 
 /* --- Helpers for mu_asym_chunk_unwrap --- */

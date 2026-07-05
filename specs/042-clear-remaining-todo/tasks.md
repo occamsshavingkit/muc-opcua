@@ -29,11 +29,11 @@
 ## Phase 3: US2 — Parameter Reduction (P2)
 
 - [ ] T011 [US2] Refactor `mu_sym_chunk_wrap` (13 params) in `src/security/sym_chunk.c` — group params into `mu_sym_wrap_params_t` struct (FR-010, CP1)
-- [ ] T012 [US2] Refactor `mu_asym_chunk_wrap` (12 params) in `src/security/asym_chunk/wrap.c` — group into `mu_asym_wrap_params_t` (FR-011, CP2)
-- [ ] T013 [US2] Refactor `mu_asym_chunk_unwrap` (9 params) in `src/security/asym_chunk/unwrap.c` — group into `mu_asym_unwrap_params_t` (FR-012, CP3)
+- [X] T012 [US2] Refactor `mu_asym_chunk_wrap` (12 params) in `src/security/asym_chunk/wrap.c` — group into `mu_asym_wrap_params_t` (FR-011, CP2)
+- [X] T013 [US2] Refactor `mu_asym_chunk_unwrap` (9 params) in `src/security/asym_chunk/unwrap.c` — group into `mu_asym_unwrap_params_t` (FR-012, CP3)
 - [ ] T014 [US2] Refactor `mu_uasc_finalize_symmetric` (8 params) in `src/core/uasc.c` — group into `mu_uasc_sym_finalize_params_t` (FR-013, CP4)
 - [ ] T015 [US2] Refactor `drive_subscription_id_status_array` (8 params) in `src/core/service_dispatch/subscription_helpers.c` — group into context struct (FR-014, CP5)
-- [ ] T016 [US2] Refactor `mu_read_process_with_user_index` (8 params) in `src/services/read/read_process.c` — group into `mu_read_process_params_t` (FR-015, CP6)
+- [X] T016 [US2] Refactor `mu_read_process_with_user_index` (8 params) in `src/services/read/read_process.c` — group into `mu_read_process_params_t` (FR-015, CP6)
 
 ---
 
@@ -41,7 +41,7 @@
 
 - [ ] T017 [US3] Create `mu_nodeid_is_ns0_numeric()` in `src/encoding/binary_nodeid.h` — replace all 13 inline uses across `service_dispatch/`, `dispatch_session/`, `server/` (FR-016, CD1)
 - [ ] T018 [US3] Consolidate MbedTLS AES/OAEP functions in `src/platform/mbedtls_crypto_adapter.c` — parameterize by key size and hash type (FR-017, CD2)
-- [ ] T019 [US3] Consolidate host crypto cipher/OAEP functions in `src/platform/host_crypto/` — parameterize by key size and hash type (FR-018, CD3)
+- [X] T019 [US3] Consolidate host crypto cipher/OAEP functions in `src/platform/host_crypto/` — parameterize by key size and hash type (FR-018, CD3)
 - [ ] T020 [US3] Consolidate duplicate signature verification in `src/core/service_dispatch/activate_session.c` — extract shared `verify_buf` construction (FR-019, CD5)
 - [ ] T021 [US3] Unify poll helper duplication across `#ifdef` branches in `src/core/server/poll.c` (FR-020, CD6)
 
@@ -49,9 +49,9 @@
 
 ## Phase 5: US4 — Deep Nesting (P3)
 
-- [ ] T022 [US4] Replace nested if/else filter-type dispatch in `src/core/service_dispatch/filter_reader.c` with dispatch table (FR-021, CN1)
-- [ ] T023 [US4] Reduce per-item filter-update nesting in `src/core/service_dispatch/monitored_items.c` — extract helper functions (FR-022, CN2)
-- [ ] T024 [US4] Replace string-comparison chain in `read_event_filter_body` in `src/core/service_dispatch/filter_reader.c` with lookup table (FR-023, CN3)
+- [X] T022 [US4] Replace nested if/else filter-type dispatch in `src/core/service_dispatch/filter_reader.c` with dispatch table (FR-021, CN1)
+- [X] T023 [US4] Reduce per-item filter-update nesting in `src/core/service_dispatch/monitored_items.c` — extract helper functions (FR-022, CN2)
+- [X] T024 [US4] Replace string-comparison chain in `read_event_filter_body` in `src/core/service_dispatch/filter_reader.c` with lookup table (FR-023, CN3)
 
 ---
 

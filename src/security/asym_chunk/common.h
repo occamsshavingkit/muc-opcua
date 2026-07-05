@@ -4,11 +4,28 @@
 #define MUC_OPCUA_ASYM_CHUNK_COMMON_H
 
 #include "../../core/safe_mem.h"
-#include "../asym_chunk.h"
 #include "../certificate.h"
 #include "../key_derivation.h"
+#include "../security_policy.h"
 #include "muc_opcua/encoding.h"
+#include "muc_opcua/platform.h"
+#include "muc_opcua/status.h"
 #include <string.h>
+
+typedef struct {
+    const mu_crypto_adapter_t *crypto;
+    mu_security_policy_id_t policy;
+    opcua_uint32_t secure_channel_id;
+    opcua_uint32_t sequence_number;
+    opcua_uint32_t request_id;
+    const opcua_byte_t *receiver_cert;
+    size_t receiver_cert_len;
+    const opcua_byte_t *body;
+    size_t body_len;
+    opcua_byte_t *out;
+    size_t out_cap;
+    size_t *out_len;
+} mu_asym_wrap_params_t;
 
 /* RSA-OAEP with SHA-1 (MGF1-SHA1) overhead: plaintext block = keybytes - 2*20 - 2. */
 #define MU_OAEP_SHA1_OVERHEAD 42
@@ -23,16 +40,14 @@
    without changing accepted OPN header/body sizes. */
 #define MU_ASYM_SIGNED_INPUT_MAX 4096
 
-static opcua_statuscode_t key_bytes(const mu_crypto_adapter_t *crypto, const opcua_byte_t *cert, size_t cert_len,
-                                    size_t *bytes) {
+static inline opcua_statuscode_t key_bytes(const mu_crypto_adapter_t *crypto, const opcua_byte_t *cert, size_t cert_len,
+                                           size_t *bytes) {
     size_t bits = 0;
     opcua_statuscode_t s = crypto->get_certificate_key_bits(crypto->context, cert, cert_len, &bits);
     if (s != MU_STATUS_GOOD || bits == 0) {
         return MU_STATUS_BAD_CERTIFICATEINVALID;
     }
     *bytes = bits / 8;
-    /* The RSA modulus must exceed the OAEP overhead, or the plaintext block size
-       would underflow. (Basic256Sha256 also mandates >= 2048-bit keys.) */
     if (*bytes <= MU_OAEP_SHA1_OVERHEAD) {
         return MU_STATUS_BAD_CERTIFICATEINVALID;
     }

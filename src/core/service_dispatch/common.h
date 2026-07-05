@@ -255,6 +255,10 @@ mu_monitored_item_t *find_monitored_item(mu_server_t *server, opcua_uint32_t sub
                                          opcua_uint32_t monitored_item_id);
 opcua_statuscode_t write_null_extension_object(mu_binary_writer_t *w);
 bool is_datachange_filter_binary_type(const mu_nodeid_t *type_id);
+bool is_aggregate_filter_binary_type(const mu_nodeid_t *type_id);
+#ifdef MUC_OPCUA_EVENTS
+bool is_event_filter_binary_type(const mu_nodeid_t *type_id);
+#endif
 bool is_known_monitoring_filter_binary_type(const mu_nodeid_t *type_id, size_t length);
 opcua_statuscode_t read_datachange_filter_body(mu_binary_reader_t *r, size_t filter_length,
                                                mu_monitored_item_create_body_t *body);

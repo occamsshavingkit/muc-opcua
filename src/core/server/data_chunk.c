@@ -388,9 +388,19 @@ void handle_data_chunk_secure(mu_server_t *server, opcua_byte_t *msg, size_t msg
     size_t total = 0;
     opcua_statuscode_t ws;
     if (is_opn) {
-        ws = mu_asym_chunk_wrap(crypto, server_secure_channel.policy, server_secure_channel.channel_id, out_seq,
-                                response_request_id, client_cert, client_cert_len, respbody, resp_len,
-                                server->config.send_buffer, server->config.send_buffer_size, &total);
+        mu_asym_wrap_params_t awp = {.crypto = crypto,
+                                     .policy = server_secure_channel.policy,
+                                     .secure_channel_id = server_secure_channel.channel_id,
+                                     .sequence_number = out_seq,
+                                     .request_id = response_request_id,
+                                     .receiver_cert = client_cert,
+                                     .receiver_cert_len = client_cert_len,
+                                     .body = respbody,
+                                     .body_len = resp_len,
+                                     .out = server->config.send_buffer,
+                                     .out_cap = server->config.send_buffer_size,
+                                     .out_len = &total};
+        ws = mu_asym_chunk_wrap(&awp);
     } else {
         ws = mu_sym_chunk_wrap(crypto, server_secure_channel.mode, &server_secure_channel.server_keys, "MSG",
                                server_secure_channel.channel_id, server_secure_channel.token_id, out_seq,
