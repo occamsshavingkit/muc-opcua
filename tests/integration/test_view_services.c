@@ -31,7 +31,7 @@ typedef struct {
 
 /* Channel ID assigned by the server (T009: incrementing counter, not always 1).
    Set from the OPN response header before building any MSG chunks. */
-static opcua_uint32_t s_channel_id = 1;
+static opcua_uint32_t s_channel_id = 0;
 
 static opcua_uint32_t read_opn_channel_id(const opcua_byte_t *buf, size_t len) {
     if (len < 12) {

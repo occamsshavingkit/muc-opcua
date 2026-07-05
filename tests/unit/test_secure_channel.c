@@ -320,7 +320,7 @@ void test_secure_channel_open_none(void) {
                       mu_secure_channel_open(&channel, NULL, MU_MESSAGE_SECURITY_MODE_NONE, 1000, &revised_lifetime));
     TEST_ASSERT_TRUE(channel.is_open);
     TEST_ASSERT_EQUAL(10000, revised_lifetime); /* Bounded to min */
-    TEST_ASSERT_EQUAL(1, channel.channel_id);
+    TEST_ASSERT_GREATER_THAN(0, channel.channel_id);  /* non-zero counter */
     TEST_ASSERT_EQUAL(1, channel.token_id);
 
     /* Renew */

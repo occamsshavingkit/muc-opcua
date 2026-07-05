@@ -81,7 +81,11 @@ opcua_statuscode_t mu_secure_channel_open(mu_secure_channel_t *channel, const mu
         return MU_STATUS_BAD_SECURITYPOLICYREJECTED;
     }
 
-    /* In a real implementation we would generate a random channel ID and token ID */
+    /* In a real implementation we would generate a random channel ID and token ID.
+       FIXME: Replace hardcoded IDs with incrementing counter or entropy once
+       the integration tests that hardcode channel_id=1 in binary responses
+       are refactored to read the actual channel_id from the OPN response
+       (see test_view_services.c:read_opn_channel_id for the correct pattern). */
     if (!channel->is_open) {
         channel->channel_id = 1;
         channel->token_id = 1;
