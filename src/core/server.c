@@ -432,6 +432,60 @@ static void handle_data_chunk_plaintext(mu_server_t *server, const opcua_byte_t 
 }
 
 #ifdef MUC_OPCUA_SECURITY
+/* Unwrap an incoming asymmetric OPN chunk and extract its metadata. */
+static bool secure_unwrap_opn(mu_server_t *server, const mu_crypto_adapter_t *crypto, opcua_byte_t *msg, size_t msg_len,
+                              opcua_byte_t *opn_buf, mu_string_t *out_security_policy,
+                              const opcua_byte_t **out_req_full, size_t *out_req_len, opcua_uint32_t *out_request_id,
+                              opcua_uint32_t *out_channel_id, opcua_uint32_t *out_seq,
+                              const opcua_byte_t **out_client_cert, size_t *out_client_cert_len) {
+    mu_asym_chunk_info_t ai;
+    mu_binary_reader_t header_reader;
+    opcua_uint32_t header_channel_id;
+
+    mu_binary_reader_init(&header_reader, msg, msg_len);
+    header_reader.position = 8;
+    if (mu_binary_read_uint32(&header_reader, &header_channel_id) != MU_STATUS_GOOD) {
+        return false;
+    }
+    if (mu_binary_read_string(&header_reader, out_security_policy) != MU_STATUS_GOOD) {
+        return false;
+    }
+
+    (void)memset(&ai, 0, sizeof(ai));
+    if (mu_asym_chunk_unwrap(crypto, msg, msg_len, opn_buf, MU_SECURE_OPN_REQ_MAX, out_req_len, server->secure_scratch,
+                             MU_SECURE_SCRATCH_SIZE, &ai) != MU_STATUS_GOOD) {
+        return false;
+    }
+    server_secure_channel.policy = ai.policy;
+    *out_request_id = ai.request_id;
+    *out_client_cert = ai.sender_cert;
+    *out_client_cert_len = ai.sender_cert_len;
+    *out_req_full = opn_buf;
+    *out_channel_id = ai.secure_channel_id;
+    *out_seq = ai.sequence_number;
+    return true;
+}
+
+/* Unwrap an incoming symmetric MSG chunk and extract its metadata. */
+static bool secure_unwrap_msg(mu_server_t *server, const mu_crypto_adapter_t *crypto, opcua_byte_t *msg, size_t msg_len,
+                              const opcua_byte_t **out_req_full, size_t *out_req_len, opcua_uint32_t *out_request_id,
+                              opcua_uint32_t *out_channel_id, opcua_uint32_t *out_token_id, opcua_uint32_t *out_seq) {
+    if (!server_secure_channel.keys_valid) {
+        return false;
+    }
+    mu_sym_chunk_info_t si;
+    (void)memset(&si, 0, sizeof(si));
+    if (mu_sym_chunk_unwrap(crypto, server_secure_channel.mode, &server_secure_channel.client_keys, msg, msg_len,
+                            out_req_full, out_req_len, &si) != MU_STATUS_GOOD) {
+        return false;
+    }
+    *out_request_id = si.request_id;
+    *out_channel_id = si.secure_channel_id;
+    *out_token_id = si.token_id;
+    *out_seq = si.sequence_number;
+    return true;
+}
+
 /* Secured (or secure-capable) OPN/MSG handling: a crypto adapter is present, so
    OPN chunks are unwrapped/wrapped asymmetrically (None or Basic256Sha256) and
    MSG chunks symmetrically once the channel has keys. MSG chunks are decrypted in
@@ -440,17 +494,14 @@ static void handle_data_chunk_plaintext(mu_server_t *server, const opcua_byte_t 
 static void handle_data_chunk_secure(mu_server_t *server, opcua_byte_t *msg, size_t msg_len, bool is_opn) {
     const mu_crypto_adapter_t *crypto = server->config.crypto_adapter;
 
-    /* MSG on a None channel is plaintext — handle before reserving secure scratch. */
     if (!is_opn && server_secure_channel.policy == MU_SECURITY_POLICY_NONE_ID) {
         handle_data_chunk_plaintext(server, msg, msg_len, false);
         return;
     }
 
-    /* Single-connection server processes one chunk per poll, so shared secure
-       scratch is not reentered while the request/response is in flight. */
     opcua_byte_t *respbody = server->secure_scratch;
-    opcua_byte_t *opn_buf = server->secure_scratch + MU_SECURE_RESP_MAX; /* OPN request only */
-    const opcua_byte_t *req_full = NULL;                                 /* [request-type NodeId][RequestHeader][...] */
+    opcua_byte_t *opn_buf = server->secure_scratch + MU_SECURE_RESP_MAX;
+    const opcua_byte_t *req_full = NULL;
     size_t req_len = 0;
     opcua_uint32_t response_request_id = 0;
     const opcua_byte_t *client_cert = NULL;
@@ -459,48 +510,15 @@ static void handle_data_chunk_secure(mu_server_t *server, opcua_byte_t *msg, siz
     mu_string_t opn_security_policy = {-1, NULL};
 
     if (is_opn) {
-        mu_asym_chunk_info_t ai;
-        mu_binary_reader_t header_reader;
-        opcua_uint32_t header_channel_id;
-
-        mu_binary_reader_init(&header_reader, msg, msg_len);
-        header_reader.position = 8;
-        if (mu_binary_read_uint32(&header_reader, &header_channel_id) != MU_STATUS_GOOD) {
+        if (!secure_unwrap_opn(server, crypto, msg, msg_len, opn_buf, &opn_security_policy, &req_full, &req_len,
+                               &response_request_id, &in_channel_id, &in_seq, &client_cert, &client_cert_len)) {
             return;
         }
-        if (mu_binary_read_string(&header_reader, &opn_security_policy) != MU_STATUS_GOOD) {
-            return;
-        }
-
-        (void)memset(&ai, 0, sizeof(ai));
-        if (mu_asym_chunk_unwrap(crypto, msg, msg_len, opn_buf, MU_SECURE_OPN_REQ_MAX, &req_len, server->secure_scratch,
-                                 MU_SECURE_SCRATCH_SIZE, &ai) != MU_STATUS_GOOD) {
-            return;
-        }
-        /* Record the negotiated policy before dispatch so the OPN handler can
-           derive channel keys; the client cert is needed to encrypt the reply. */
-        server_secure_channel.policy = ai.policy;
-        response_request_id = ai.request_id;
-        client_cert = ai.sender_cert;
-        client_cert_len = ai.sender_cert_len;
-        req_full = opn_buf;
-        in_channel_id = ai.secure_channel_id;
-        in_seq = ai.sequence_number;
     } else {
-        if (!server_secure_channel.keys_valid) {
+        if (!secure_unwrap_msg(server, crypto, msg, msg_len, &req_full, &req_len, &response_request_id, &in_channel_id,
+                               &in_token_id, &in_seq)) {
             return;
         }
-        mu_sym_chunk_info_t si;
-        (void)memset(&si, 0, sizeof(si));
-        /* Decrypts msg in place; req_full points into msg. */
-        if (mu_sym_chunk_unwrap(crypto, server_secure_channel.mode, &server_secure_channel.client_keys, msg, msg_len,
-                                &req_full, &req_len, &si) != MU_STATUS_GOOD) {
-            return;
-        }
-        response_request_id = si.request_id;
-        in_channel_id = si.secure_channel_id;
-        in_token_id = si.token_id;
-        in_seq = si.sequence_number;
     }
 
     if (!accept_inbound_chunk(server, is_opn, in_channel_id, in_token_id, in_seq)) {
@@ -573,6 +591,102 @@ static void handle_data_chunk_secure(mu_server_t *server, opcua_byte_t *msg, siz
 }
 #endif /* MUC_OPCUA_SECURITY */
 
+/* Process the TCP HEL message before the secure channel is opened. */
+static void process_message_hello(mu_server_t *server, opcua_byte_t *msg, size_t msg_len) {
+    size_t ack_length = server->config.send_buffer_size;
+    opcua_statuscode_t status =
+        mu_tcp_process_hello(&server_tcp_conn, msg, msg_len, &server->config, server->config.send_buffer, &ack_length);
+    if (status == MU_STATUS_GOOD) {
+        send_buffer_chunk(server, ack_length);
+    } else {
+        server->config.tcp_adapter.close_connection(server->config.tcp_adapter.context, server_client_handle);
+        server_client_handle = NULL;
+    }
+}
+
+#ifdef MUC_OPCUA_MULTI_CHUNK
+/* Buffer body bytes from a multi-chunk MSG continuation chunk. */
+static void process_message_multi_chunk_continuation(mu_server_t *server, const opcua_byte_t *msg, size_t msg_len) {
+    size_t body_offset = MU_UASC_SYMMETRIC_HEADER_SIZE;
+    if (msg_len <= body_offset) {
+        send_tcp_error_chunk(server, MU_STATUS_BAD_TCPINTERNALERROR);
+        return;
+    }
+    size_t body_len = msg_len - body_offset;
+    mu_chunk_assembler_t *ca = &server_chunk_assembly;
+    if (!ca->is_active) {
+        ca->is_active = true;
+        ca->length = 0;
+    }
+    if (ca->length + body_len > sizeof(ca->buffer)) {
+        mu_chunk_assembler_reset(ca);
+        send_tcp_error_chunk(server, MU_STATUS_BAD_TCPINTERNALERROR);
+        return;
+    }
+    (void)memcpy(ca->buffer + ca->length, msg + body_offset, body_len);
+    ca->length += body_len;
+}
+
+/* Dispatch a fully-assembled multi-chunk MSG body and send the response,
+   then reset the chunk assembler. */
+static void process_message_multi_chunk_final_dispatch(mu_server_t *server, const mu_nodeid_t *request_type,
+                                                       opcua_uint32_t response_request_id, const opcua_byte_t *req_body,
+                                                       size_t req_body_len) {
+    size_t body_offset = MU_UASC_SYMMETRIC_HEADER_SIZE;
+    if (body_offset >= server->config.send_buffer_size) {
+        mu_chunk_assembler_reset(&server_chunk_assembly);
+        return;
+    }
+    opcua_byte_t *resp_body = server->config.send_buffer + body_offset;
+    size_t payload_len = server->config.send_buffer_size - body_offset;
+
+#if MUC_OPCUA_SUBSCRIPTIONS
+    server->current_request_id = response_request_id;
+#endif
+    opcua_statuscode_t status;
+    if (!is_ns0_numeric_nodeid(request_type)) {
+        status = MU_STATUS_BAD_DECODINGERROR;
+    } else {
+        status = mu_service_dispatch(server, request_type->identifier.numeric, req_body, req_body_len, resp_body,
+                                     &payload_len);
+    }
+
+    if (status != MU_STATUS_GOOD) {
+        payload_len = server->config.send_buffer_size - body_offset;
+        if (mu_write_service_fault(resp_body, &payload_len, 0, status) == MU_STATUS_GOOD) {
+            status = MU_STATUS_GOOD;
+        } else {
+            payload_len = 0;
+        }
+    }
+
+    if (status == MU_STATUS_GOOD && payload_len > 0) {
+        opcua_uint32_t out_seq = ++server_secure_channel.out_sequence_number;
+        size_t total = 0;
+        opcua_statuscode_t ws = mu_uasc_finalize_symmetric(
+            server->config.send_buffer, server->config.send_buffer_size, server_secure_channel.channel_id,
+            server_secure_channel.token_id, out_seq, response_request_id, payload_len, &total);
+        if (ws == MU_STATUS_GOOD) {
+            send_buffer_chunk(server, total);
+        }
+    }
+
+    mu_chunk_assembler_reset(&server_chunk_assembly);
+}
+#endif /* MUC_OPCUA_MULTI_CHUNK */
+
+/* Route an OPN or MSG chunk to the appropriate handler based on the
+   configured security policy. */
+static void process_message_opn_or_msg(mu_server_t *server, opcua_byte_t *msg, size_t msg_len, bool is_opn) {
+#ifdef MUC_OPCUA_SECURITY
+    if (server->config.crypto_adapter != NULL) {
+        handle_data_chunk_secure(server, msg, msg_len, is_opn);
+        return;
+    }
+#endif
+    handle_data_chunk_plaintext(server, msg, msg_len, is_opn);
+}
+
 /* Process one complete message (HELLO during connect, otherwise an OPN/MSG/CLO
    chunk) and send any response. Sets client_handle to NULL if the connection is
    closed (HELLO failure or CloseSecureChannel). */
@@ -580,15 +694,7 @@ static void process_message(mu_server_t *server, opcua_byte_t *msg, size_t msg_l
     opcua_statuscode_t status;
 
     if (server_tcp_conn.state == MU_TCP_STATE_CLOSED) {
-        size_t ack_length = server->config.send_buffer_size;
-        status = mu_tcp_process_hello(&server_tcp_conn, msg, msg_len, &server->config, server->config.send_buffer,
-                                      &ack_length);
-        if (status == MU_STATUS_GOOD) {
-            send_buffer_chunk(server, ack_length); /* closes on write failure */
-        } else {
-            server->config.tcp_adapter.close_connection(server->config.tcp_adapter.context, server_client_handle);
-            server_client_handle = NULL;
-        }
+        process_message_hello(server, msg, msg_len);
         return;
     }
 
@@ -612,33 +718,12 @@ static void process_message(mu_server_t *server, opcua_byte_t *msg, size_t msg_l
     bool is_msg = header.message_type[0] == 'M' && header.message_type[1] == 'S' && header.message_type[2] == 'G';
     bool is_clo = header.message_type[0] == 'C' && header.message_type[1] == 'L' && header.message_type[2] == 'O';
 
-    /* OPC-10000-6 §6.7.2: multi-chunk MSG continuation chunks — buffer body bytes. */
 #ifdef MUC_OPCUA_MULTI_CHUNK
     if (is_msg && header.chunk_type == 'C') {
-        size_t body_offset = MU_UASC_SYMMETRIC_HEADER_SIZE;
-        if (msg_len <= body_offset) {
-            send_tcp_error_chunk(server, MU_STATUS_BAD_TCPINTERNALERROR);
-            return;
-        }
-        size_t body_len = msg_len - body_offset;
-        mu_chunk_assembler_t *ca = &server_chunk_assembly;
-        if (!ca->is_active) {
-            ca->is_active = true;
-            ca->length = 0;
-        }
-        if (ca->length + body_len > sizeof(ca->buffer)) {
-            mu_chunk_assembler_reset(ca);
-            send_tcp_error_chunk(server, MU_STATUS_BAD_TCPINTERNALERROR);
-            return;
-        }
-        (void)memcpy(ca->buffer + ca->length, msg + body_offset, body_len);
-        ca->length += body_len;
+        process_message_multi_chunk_continuation(server, msg, msg_len);
         return;
     }
-#endif /* MUC_OPCUA_MULTI_CHUNK */
 
-    /* OPC-10000-6 §6.7.2: final chunk completes a multi-chunk MSG assembly. */
-#ifdef MUC_OPCUA_MULTI_CHUNK
     if (is_msg && header.chunk_type == 'F' && server_chunk_assembly.is_active) {
         mu_chunk_assembler_t *ca = &server_chunk_assembly;
         size_t body_offset = MU_UASC_SYMMETRIC_HEADER_SIZE;
@@ -656,7 +741,7 @@ static void process_message(mu_server_t *server, opcua_byte_t *msg, size_t msg_l
 
         mu_binary_reader_t reader;
         mu_binary_reader_init(&reader, msg, msg_len);
-        reader.position = 8; /* skip MessageHeader(8) */
+        reader.position = 8;
 
         opcua_uint32_t channel_id = 0;
         opcua_uint32_t token_id = 0;
@@ -696,46 +781,7 @@ static void process_message(mu_server_t *server, opcua_byte_t *msg, size_t msg_l
         const opcua_byte_t *req_body = ca->buffer + body_reader.position;
         size_t req_body_len = ca->length - body_reader.position;
 
-        body_offset = MU_UASC_SYMMETRIC_HEADER_SIZE;
-        if (body_offset >= server->config.send_buffer_size) {
-            mu_chunk_assembler_reset(ca);
-            return;
-        }
-
-        opcua_byte_t *resp_body = server->config.send_buffer + body_offset;
-        size_t payload_len = server->config.send_buffer_size - body_offset;
-
-#if MUC_OPCUA_SUBSCRIPTIONS
-        server->current_request_id = seq.request_id;
-#endif
-        if (!is_ns0_numeric_nodeid(&request_type)) {
-            status = MU_STATUS_BAD_DECODINGERROR;
-        } else {
-            status = mu_service_dispatch(server, request_type.identifier.numeric, req_body, req_body_len, resp_body,
-                                         &payload_len);
-        }
-
-        if (status != MU_STATUS_GOOD) {
-            payload_len = server->config.send_buffer_size - body_offset;
-            if (mu_write_service_fault(resp_body, &payload_len, 0, status) == MU_STATUS_GOOD) {
-                status = MU_STATUS_GOOD;
-            } else {
-                payload_len = 0;
-            }
-        }
-
-        if (status == MU_STATUS_GOOD && payload_len > 0) {
-            opcua_uint32_t out_seq = ++server_secure_channel.out_sequence_number;
-            size_t total = 0;
-            opcua_statuscode_t ws = mu_uasc_finalize_symmetric(
-                server->config.send_buffer, server->config.send_buffer_size, server_secure_channel.channel_id,
-                server_secure_channel.token_id, out_seq, seq.request_id, payload_len, &total);
-            if (ws == MU_STATUS_GOOD) {
-                send_buffer_chunk(server, total);
-            }
-        }
-
-        mu_chunk_assembler_reset(ca);
+        process_message_multi_chunk_final_dispatch(server, &request_type, seq.request_id, req_body, req_body_len);
         return;
     }
 #endif /* MUC_OPCUA_MULTI_CHUNK */
@@ -747,16 +793,10 @@ static void process_message(mu_server_t *server, opcua_byte_t *msg, size_t msg_l
         return;
     }
     if (!is_opn && !is_msg) {
-        return; /* unsupported chunk type: ignore */
-    }
-
-#ifdef MUC_OPCUA_SECURITY
-    if (server->config.crypto_adapter != NULL) {
-        handle_data_chunk_secure(server, msg, msg_len, is_opn);
         return;
     }
-#endif
-    handle_data_chunk_plaintext(server, msg, msg_len, is_opn);
+
+    process_message_opn_or_msg(server, msg, msg_len, is_opn);
 }
 
 static opcua_statuscode_t mu_server_poll_background(mu_server_t *server) {
@@ -929,13 +969,10 @@ static void poll_single_read_and_process(mu_server_t *server) {
 }
 #endif
 
-opcua_statuscode_t mu_server_poll(mu_server_t *server) {
-    if (server == NULL || !server->is_running) {
-        return MU_STATUS_BAD_INTERNALERROR;
-    }
-
 #ifdef MUC_OPCUA_MULTIPLE_CONNECTIONS
-    /* 1. Try to accept a new connection if we have a free slot */
+/* Try to accept a new connection into a free slot. Returns true when an accept
+   occurred (and the caller should immediately return mu_server_poll_background). */
+static bool poll_try_accept_multi(mu_server_t *server) {
     int free_slot = -1;
     for (size_t i = 0; i < MU_MAX_CONNECTIONS; ++i) {
         if (server->conns[i].client_handle == NULL) {
@@ -958,53 +995,41 @@ opcua_statuscode_t mu_server_poll(mu_server_t *server) {
         } else {
             poll_send_error_and_close(server, new_handle);
         }
-        return mu_server_poll_background(server);
+        return true;
     }
-
-    /* 2. Poll and read/process each active connection */
-    for (size_t i = 0; i < MU_MAX_CONNECTIONS; ++i) {
-        mu_connection_t *conn = &server->conns[i];
-        if (conn->client_handle == NULL) {
-            continue;
-        }
-
-        if (poll_check_idle_timeout(server, &conn->client_handle, &conn->rx_len, &conn->rx_read_pos,
-                                    &conn->last_activity_ms, &conn->secure_channel)) {
-            continue;
-        }
-        poll_conn_read_and_process(server, conn);
-    }
+    return false;
+}
 #else
-    /* 1. Accept connection if none active */
-    if (server_client_handle == NULL) {
-        opcua_statuscode_t status =
-            server->config.tcp_adapter.accept(server->config.tcp_adapter.context, &server_client_handle);
-        if (status == MU_STATUS_GOOD && server_client_handle != NULL) {
-            mu_tcp_connection_init(&server_tcp_conn);
-            mu_secure_channel_init(&server_secure_channel);
+/* Try to accept a new connection when no client is connected. Returns true when
+   the function handled the poll cycle (caller should return immediately). */
+static bool poll_try_accept_single(mu_server_t *server) {
+    if (server_client_handle != NULL) {
+        return false;
+    }
+    opcua_statuscode_t status =
+        server->config.tcp_adapter.accept(server->config.tcp_adapter.context, &server_client_handle);
+    if (status == MU_STATUS_GOOD && server_client_handle != NULL) {
+        mu_tcp_connection_init(&server_tcp_conn);
+        mu_secure_channel_init(&server_secure_channel);
 #ifdef MUC_OPCUA_MULTI_CHUNK
-            mu_chunk_assembler_init(&server->chunk_assembly);
+        mu_chunk_assembler_init(&server->chunk_assembly);
 #endif
-            for (size_t i = 0; i < MU_MAX_SESSIONS; ++i) {
-                mu_session_init(&server->sessions[i]);
-            }
-            server->active_session = NULL;
-#if MUC_OPCUA_SUBSCRIPTIONS
-            mu_subscriptions_init(&server->subs);
-#endif
-            server_rx_len = 0;
-            server_rx_read_pos = 0;
-            server_last_activity_ms = server->config.time_adapter.get_tick_ms(server->config.time_adapter.context);
+        for (size_t i = 0; i < MU_MAX_SESSIONS; ++i) {
+            mu_session_init(&server->sessions[i]);
         }
-        return mu_server_poll_background(server);
+        server->active_session = NULL;
+#if MUC_OPCUA_SUBSCRIPTIONS
+        mu_subscriptions_init(&server->subs);
+#endif
+        server_rx_len = 0;
+        server_rx_read_pos = 0;
+        server_last_activity_ms = server->config.time_adapter.get_tick_ms(server->config.time_adapter.context);
     }
+    return true;
+}
 
-    if (poll_check_idle_timeout(server, &server_client_handle, &server_rx_len, &server_rx_read_pos,
-                                &server_last_activity_ms, &server_secure_channel)) {
-        return mu_server_poll_background(server);
-    }
-
-    /* Check for a second connection waiting to be rejected */
+/* Check for a second connection attempt and reject it with an error message. */
+static void poll_reject_second_connection(mu_server_t *server) {
     void *second_handle = NULL;
     opcua_statuscode_t status = server->config.tcp_adapter.accept(server->config.tcp_adapter.context, &second_handle);
     if (status == MU_STATUS_GOOD && second_handle != NULL) {
@@ -1024,6 +1049,42 @@ opcua_statuscode_t mu_server_poll(mu_server_t *server) {
         }
         server->config.tcp_adapter.close_connection(server->config.tcp_adapter.context, second_handle);
     }
+}
+#endif /* MUC_OPCUA_MULTIPLE_CONNECTIONS (else branch helpers) */
+
+opcua_statuscode_t mu_server_poll(mu_server_t *server) {
+    if (server == NULL || !server->is_running) {
+        return MU_STATUS_BAD_INTERNALERROR;
+    }
+
+#ifdef MUC_OPCUA_MULTIPLE_CONNECTIONS
+    if (poll_try_accept_multi(server)) {
+        return mu_server_poll_background(server);
+    }
+
+    for (size_t i = 0; i < MU_MAX_CONNECTIONS; ++i) {
+        mu_connection_t *conn = &server->conns[i];
+        if (conn->client_handle == NULL) {
+            continue;
+        }
+
+        if (poll_check_idle_timeout(server, &conn->client_handle, &conn->rx_len, &conn->rx_read_pos,
+                                    &conn->last_activity_ms, &conn->secure_channel)) {
+            continue;
+        }
+        poll_conn_read_and_process(server, conn);
+    }
+#else
+    if (poll_try_accept_single(server)) {
+        return mu_server_poll_background(server);
+    }
+
+    if (poll_check_idle_timeout(server, &server_client_handle, &server_rx_len, &server_rx_read_pos,
+                                &server_last_activity_ms, &server_secure_channel)) {
+        return mu_server_poll_background(server);
+    }
+
+    poll_reject_second_connection(server);
 
     poll_single_read_and_process(server);
 #endif

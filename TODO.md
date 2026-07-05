@@ -41,26 +41,26 @@ Items identified by CodeRabbit review of spec 039 (PR #251) — deferred for fut
 | STUB4 | `tests/unit/test_time_sync.c` | Security time synchronization | OPC-10000-4 §A.2 |
 | STUB5 | `tests/unit/test_complex_types.c` | Complex type round-trip encode/decode | OPC-10000-3 §5.6.4
 
-### Complexity Audit (2026-07-05) — Oversized Functions
+### Complexity Audit (2026-07-05) — Oversized Functions ✅ Fixed in Spec 040
 
-| ID | File | Function | Lines | Issue |
-|----|------|----------|-------|-------|
-| CX1 | `src/core/dispatch_session.c:208` | `handle_create_session` | 263 | 163 lines over budget |
-| CX2 | `src/core/dispatch_session.c:602` | `handle_activate_session` | 246 | 146 lines over |
-| CX3 | `src/core/service_dispatch.c:1569` | `handle_modify_monitored_items` | 210 | 110 lines over |
-| CX4 | `src/core/server.c:579` | `process_message` | 183 | 5 distinct concerns |
-| CX5 | `src/security/asym_chunk.c:281` | `mu_asym_chunk_unwrap` | 182 | 7+ responsibilities |
-| CX6 | `src/services/subscription_publish.c:457` | `write_data_change_notification` | 168 | 68 lines over |
-| CX7 | `src/security/asym_chunk.c:115` | `mu_asym_chunk_wrap` | 166 | 7+ responsibilities |
-| CX8 | `src/core/service_dispatch.c:452` | `handle_open_secure_channel` | 149 | 49 lines over |
-| CX9 | `src/services/subscription_publish.c:1018` | `publish_due` | 139 | 39 lines over |
-| CX10 | `src/core/server.c:440` | `handle_data_chunk_secure` | 134 | 34 lines over |
-| CX11 | `src/core/server.c:317` | `handle_data_chunk_plaintext` | 123 | 23 lines over |
-| CX12 | `src/services/subscription_publish.c:797` | `build_publish_response` | 117 | 17 lines over |
-| CX13 | `src/core/dispatch_session.c:95` | `read_create_session_request` | 109 | 9 lines over |
-| CX14 | `src/core/server.c:932` | `mu_server_poll` | 102 | 2 lines over |
-| CX15 | `src/services/read.c:324` | `read_attribute` | 102 | 2 lines over |
-| CX16 | `src/core/service_dispatch.c:1451` | `handle_create_monitored_items` | 98 | borderline |
+| ID | File | Function | Lines | Status |
+|----|------|----------|-------|--------|
+| CX1 | `src/core/dispatch_session.c` | `handle_create_session` | 263→92 | ✅ Decomposed |
+| CX2 | `src/core/dispatch_session.c` | `handle_activate_session` | 246→76 | ✅ Decomposed |
+| CX3 | `src/core/service_dispatch.c` | `handle_modify_monitored_items` | 210→84 | ✅ Decomposed |
+| CX4 | `src/core/server.c` | `process_message` | 183→85 | ✅ Decomposed |
+| CX5 | `src/security/asym_chunk.c` | `mu_asym_chunk_unwrap` | 182→94 | ✅ Decomposed |
+| CX6 | `src/services/subscription_publish.c` | `write_data_change_notification` | 168→89 | ✅ Decomposed |
+| CX7 | `src/security/asym_chunk.c` | `mu_asym_chunk_wrap` | 166→55 | ✅ Decomposed |
+| CX8 | `src/core/service_dispatch.c` | `handle_open_secure_channel` | 149→89 | ✅ Decomposed |
+| CX9 | `src/services/subscription_publish.c` | `publish_due` | 139→34 | ✅ Decomposed |
+| CX10 | `src/core/server.c` | `handle_data_chunk_secure` | 134→89 | ✅ Decomposed |
+| CX11 | `src/core/server.c` | `handle_data_chunk_plaintext` | 123→79 | ✅ Decomposed |
+| CX12 | `src/services/subscription_publish.c` | `build_publish_response` | 117→76 | ✅ Decomposed |
+| CX13 | `src/core/dispatch_session.c` | `read_create_session_request` | 109→23 | ✅ Decomposed |
+| CX14 | `src/core/server.c` | `mu_server_poll` | 102→36 | ✅ Decomposed |
+| CX15 | `src/services/read.c` | `read_attribute` | 102→52 | ✅ Decomposed |
+| CX16 | `src/core/service_dispatch.c` | `handle_create_monitored_items` | 98→52 | ✅ Decomposed |
 
 ### Complexity Audit (2026-07-05) — Too Many Parameters
 
