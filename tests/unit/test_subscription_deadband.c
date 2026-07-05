@@ -1,7 +1,7 @@
 /* tests/unit/test_subscription_deadband.c
  *
  * Spec Kit 031, T001 (RED phase). Unit test for the deadband NONE semantics
- * of the static helper monitored_item_change_reportable().
+ * of the helper monitored_item_change_reportable().
  *
  * Grounding: OPC-10000-4 §7.22.2 DataChangeFilter.deadbandType.
  *   DeadbandType None (0) = "No Deadband calculation should be applied." A
@@ -11,45 +11,21 @@
  *   when the value is unchanged. T006 fixes it to fall through to a value
  *   equality comparison.
  *
- * Access note: monitored_item_change_reportable() has internal linkage, and
- * the live tick path can never reach it with an unchanged value (the caller
- * is gated by monitored_item_change_changed(), which already filters equal
- * samples). The semantics can therefore only be exercised by calling the
- * helper directly. To do so, subscription.c is compiled into this translation
- * unit; every external-linkage symbol it defines is aliased to a local name so
- * it cannot clash with the same symbols provided by the linked muc_opcua
- * library. The static helpers (including the one under test) are then visible
- * to this TU. Add new public functions in subscription.c to the alias block
- * below if a multiple-definition link error appears.
+ * Access note: monitored_item_change_reportable() was made extern during the
+ * 032-source-modules refactor; it is now declared in
+ * src/core/server_internal.h and no longer requires vendoring the whole
+ * translation unit.
  */
 #include "unity.h"
 
 #include <string.h>
 
+#include "../../src/core/server_internal.h"
+
 void setUp(void) {}
 void tearDown(void) {}
 
 #if MUC_OPCUA_SUBSCRIPTIONS && MUC_OPCUA_SUBSCRIPTIONS_STANDARD
-
-#define mu_server_trigger_event               deadband_local_trigger_event
-#define advance_publish_timer                 deadband_local_advance_publish_timer
-#define mu_subscriptions_init                 deadband_local_subs_init
-#define mu_publish_request_enqueue            deadband_local_pub_enqueue
-#define mu_subscription_create                deadband_local_sub_create
-#define mu_subscription_apply_parameters      deadband_local_sub_apply
-#define mu_subscription_find                  deadband_local_sub_find
-#define mu_subscription_acknowledge           deadband_local_sub_ack
-#define mu_subscription_republish             deadband_local_sub_republish
-#define mu_subscription_delete                deadband_local_sub_delete
-#define mu_monitored_item_alloc               deadband_local_mi_alloc
-#define mu_monitored_item_delete              deadband_local_mi_delete
-#define mu_monitored_item_add_trigger_link    deadband_local_mi_add_link
-#define mu_monitored_item_remove_trigger_link deadband_local_mi_rm_link
-#define mu_subscription_get_monitored_items   deadband_local_sub_get_items
-#define mu_subscription_request_resend_data   deadband_local_sub_resend
-#define mu_subscriptions_tick                 deadband_local_subs_tick
-
-#include "../../src/services/subscription.c"
 
 static mu_variant_t make_int32(opcua_int32_t v) {
     mu_variant_t out;

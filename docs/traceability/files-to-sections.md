@@ -13,6 +13,13 @@ This document maps implementation and test files back to OPC UA normative sectio
 | `src/core/status.c` | StatusCodes | Part 4 / 6 | 7.38.2 / 7.1.5 | Status Helper `mu_status_name` |
 | `src/core/server.c` | Server Core | OPC-10000-4 / OPC-10000-6 | 7.38.2 / 5.2.2.9, 6.7.2, 7.1.2.2, 7.2 | TCP stream/chunk handling, request type-id validation, and status/error mapping |
 | `src/core/service_dispatch.c` | Service Dispatch | OPC-10000-4 / OPC-10000-6 / OPC-10000-13 | 5.5.2.2, 5.5.4.2, 5.6.2, 5.7.2, 5.7.3, 5.11.4.2, 5.13.2.4, 5.13.3.4, 5.14.5, 7.22.4, 7.38.2 / 5.2.2.15, 5.2.5 / 5.4.3.5, 5.4.3.10, 5.4.3.11 | Service request validation, dispatch, malformed-input rejection, filters, and exact StatusCodes |
+| `src/core/dispatch_session.c` | Session Dispatch | OPC-10000-4 | 5.7.2, 5.7.3, 5.7.4 | CreateSession, ActivateSession, and CloseSession handlers extracted from service_dispatch.c |
+| `src/core/dispatch_discovery.c` | Discovery Dispatch | OPC-10000-4 | 5.5.2.2, 5.5.4.2 | GetEndpoints and FindServers handlers extracted from service_dispatch.c |
+| `src/core/dispatch_attribute.c` | Attribute Dispatch | OPC-10000-4 | 5.11.2, 5.11.4 | Read and Write service handlers extracted from service_dispatch.c |
+| `src/core/dispatch_view.c` | View Dispatch | OPC-10000-4 | 5.9.2, 5.9.3, 5.9.4 | Browse, BrowseNext, and TranslateBrowsePathsToNodeIds handlers extracted from service_dispatch.c |
+| `src/core/dispatch_subscription.c` | Subscription Dispatch | OPC-10000-4 | 5.14.2, 5.14.3, 5.14.4, 5.14.5, 5.14.6, 5.14.8 | CreateSubscription, ModifySubscription, SetPublishingMode, Publish, Republish, and DeleteSubscriptions handlers extracted from service_dispatch.c |
+| `src/core/dispatch_node_mgmt.c` | NodeManagement Dispatch | OPC-10000-4 | 5.8.2, 5.8.3, 5.8.4, 5.8.5 | AddNodes, AddReferences, DeleteNodes, and DeleteReferences handlers extracted from service_dispatch.c |
+| `src/core/dispatch_method.c` | Method Dispatch | OPC-10000-4 / OPC-10000-5 | 5.12.2.2 / 9.1, 9.2 | Call handler (GetMonitoredItems, ResendData) extracted from service_dispatch.c |
 | `src/core/message_chunk.c` | MessageChunk | OPC-10000-6 | 6.7.2, 7.1.2.2 | TCP message type, chunk finality, abort chunk, and MessageHeader validation |
 | `src/core/tcp_connection.c` | OPC UA TCP | OPC-10000-6 | 7.1.2.3, 7.1.2.4, 7.2 | Hello/Acknowledge parsing, endpoint URL limits, and negotiated buffer bounds |
 | `include/muc_opcua/services/node_management.h` | NodeManagement | OPC-10000-4 | 5.8.2, 5.8.3, 5.8.4, 5.8.5 | NodeManagement services interface |
@@ -22,7 +29,9 @@ This document maps implementation and test files back to OPC UA normative sectio
 | `src/services/discovery.c` | Discovery | OPC-10000-4 | 5.5.2.2, 5.5.4.2, 7.40.2.1 | FindServers/GetEndpoints endpoint metadata and user identity token advertisement |
 | `src/services/history.c` | Historical Access | OPC-10000-4 / OPC-10000-6 | 5.11.3.2, 7.9 / 5.2.2.15 | HistoryRead details ExtensionObject bounds and owned continuation-point storage |
 | `src/services/session.c` | Session | OPC-10000-4 | 5.7.2.1, 5.7.2.2, 5.7.2.3, 5.7.3, 7.38.2 | Session token/nonce generation, SecureChannel binding, and session StatusCodes |
-| `src/services/subscription.c` | Subscription + MonitoredItem service sets | OPC-10000-4 / OPC-10000-13 | 5.13, 5.14, 5.14.5.1, 7.20.1, 7.22.1, 7.22.2, 7.22.4 / 5.4.3.5, 5.4.3.10, 5.4.3.11 | Subscription queues, Publish responses, MonitoringFilter, and scoped AggregateFilter handling |
+| `src/services/subscription_monitor.c` | Subscription MonitoredItem sampling + deadband | OPC-10000-4 | 5.13, 7.21, 7.22.2 | Monitored item lifecycle, sampling, deadband, and queue functions |
+| `src/services/subscription_publish.c` | Subscription publish cycle + timer | OPC-10000-4 / OPC-10000-6 | 5.13, 5.14, 5.14.5.1, 7.20.1, 7.22.1 | Publish response encoding, notification delivery, and publish timer |
+| `src/services/subscription_aggregate.c` | Subscription aggregate + trigger + resend | OPC-10000-4 / OPC-10000-13 | 5.13.5, 5.14, 7.22.4 / 5.4.3.5, 5.4.3.10, 5.4.3.11 | Aggregate, triggered items, resend data, and standard-only features |
 | `src/encoding/binary_reader.c` | Binary Decoding | OPC-10000-6 | 5.2, 5.2.5 | Primitive bounds, declared-length checks, and array length validation |
 | `src/encoding/binary_extension_object.c` | ExtensionObject Encoding | OPC-10000-6 | 5.2.2.15 | ExtensionObject header/body bounds and skip validation |
 | `src/encoding/binary_query.c` | Query Encoding | OPC-10000-4 / OPC-10000-6 | B.2.3, 7.7.1 / 5.2.2.15 | QueryFirst ContentFilter and operand ExtensionObject decoding |

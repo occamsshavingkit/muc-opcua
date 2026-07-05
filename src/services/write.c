@@ -75,6 +75,12 @@ opcua_statuscode_t mu_write_response_encode(mu_binary_writer_t *writer, const mu
         }
     }
 
+    /* WriteResponse DiagnosticInfos[] — null array per OPC-10000-6 §5.2.2.15 */
+    status = mu_binary_write_int32(writer, -1);
+    if (status != MU_STATUS_GOOD) {
+        return status;
+    }
+
     return MU_STATUS_GOOD;
 }
 

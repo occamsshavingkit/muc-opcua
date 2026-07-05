@@ -7,6 +7,7 @@ add_library(muc_opcua STATIC
     core/sequence.c
     core/service_message.c
     core/service_dispatch.c
+    core/dispatch_session.c
     core/uasc.c
     services/secure_channel.c
     services/session.c
@@ -34,10 +35,11 @@ if(MUC_OPCUA_SERVICE_READ)
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_SERVICE_READ=1)
 endif()
 if(MUC_OPCUA_SERVICE_BROWSE)
-    target_sources(muc_opcua PRIVATE services/browse.c)
+    target_sources(muc_opcua PRIVATE services/browse.c core/dispatch_view.c)
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_SERVICE_BROWSE=1)
 endif()
 if(MUC_OPCUA_SERVICE_DISCOVERY)
+    target_sources(muc_opcua PRIVATE core/dispatch_discovery.c)
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_SERVICE_DISCOVERY=1)
 endif()
 if(MUC_OPCUA_SERVICE_REGISTER_NODES)
@@ -46,8 +48,14 @@ endif()
 if(MUC_OPCUA_SERVICE_WRITE)
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_SERVICE_WRITE=1)
 endif()
+# Read/Write attribute dispatch handlers. dispatch_attribute.c carries both
+# sets internally (#ifdef MUC_OPCUA_SERVICE_READ / ..._WRITE), so compile it
+# whenever either service is enabled.
+if(MUC_OPCUA_SERVICE_READ OR MUC_OPCUA_SERVICE_WRITE)
+    target_sources(muc_opcua PRIVATE core/dispatch_attribute.c)
+endif()
 if(MUC_OPCUA_SERVICE_NODEMANAGEMENT)
-    target_sources(muc_opcua PRIVATE services/node_management.c)
+    target_sources(muc_opcua PRIVATE services/node_management.c core/dispatch_node_mgmt.c)
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_SERVICE_NODEMANAGEMENT=1)
 endif()
 if(MUC_OPCUA_SERVICE_QUERY)
@@ -66,11 +74,24 @@ endif()
 # The data-change subscription engine (Micro profile). Source + dispatch handlers are
 # gated under MUC_OPCUA_SUBSCRIPTIONS so a Nano build drops them at the source level.
 if(MUC_OPCUA_SUBSCRIPTIONS)
-    target_sources(muc_opcua PRIVATE services/subscription.c)
+    target_sources(muc_opcua PRIVATE
+        services/subscription_monitor.c
+        services/subscription_publish.c
+        core/dispatch_subscription.c
+    )
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_SUBSCRIPTIONS=1)
     if(MUC_OPCUA_SUBSCRIPTIONS_STANDARD)
+        target_sources(muc_opcua PRIVATE services/subscription_aggregate.c)
         target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_SUBSCRIPTIONS_STANDARD=1)
     endif()
+endif()
+
+# Call service dispatch (OPC-10000-4 5.12.2.2). The Call handler is gated by
+# the same compound condition as the original MU_DISPATCH_CALL_ENABLED macro
+# in service_dispatch.c: Subscriptions + STANDARD aggregates + BaseInfo
+# type system. The file also wraps itself in the matching #if internally.
+if(MUC_OPCUA_SUBSCRIPTIONS AND MUC_OPCUA_SUBSCRIPTIONS_STANDARD AND MUC_OPCUA_BASE_TYPE_SYSTEM)
+    target_sources(muc_opcua PRIVATE core/dispatch_method.c)
 endif()
 
 if(MUC_OPCUA_PUBSUB)

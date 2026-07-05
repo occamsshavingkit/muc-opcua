@@ -6,6 +6,7 @@
 #include "../services/secure_channel.h"
 #include "../services/session.h"
 #include "../services/subscription.h"
+#include "muc_opcua/encoding.h"
 #include "muc_opcua/server.h"
 #include "muc_opcua/services/alarms_conditions.h"
 #include "service_dispatch.h"
@@ -161,6 +162,126 @@ opcua_statuscode_t mu_server_emit_message(mu_server_t *server, opcua_uint32_t re
  * iteration bound can be unit-tested directly, independent of the
  * multi-connection tick path. OPC-10000-4 §5.13.1.2. */
 void advance_publish_timer(mu_subscription_t *sub, opcua_uint64_t now_ms);
+
+void advance_sample_timer(mu_monitored_item_t *item, opcua_uint64_t now_ms);
+opcua_statuscode_t read_monitored_item_value(const mu_monitored_item_t *item, mu_variant_t *cur);
+bool monitored_item_sample_changed(const mu_monitored_item_t *item, const mu_variant_t *cur,
+                                   opcua_statuscode_t status);
+bool monitored_item_reportable(const mu_monitored_item_t *item, const mu_subscription_t *sub);
+#endif
+
+#if MUC_OPCUA_SUBSCRIPTIONS_STANDARD
+bool variant_numeric_to_double(const mu_variant_t *value, opcua_double_t *out);
+bool monitored_item_change_reportable(const mu_monitored_item_t *item, const mu_variant_t *cur,
+                                      opcua_statuscode_t status);
+opcua_uint32_t monitored_item_effective_queue_size(mu_monitored_item_t *item);
+opcua_byte_t monitored_item_queue_next(opcua_byte_t index, opcua_uint32_t queue_size);
+void monitored_item_enqueue_report(mu_monitored_item_t *item, const mu_variant_t *cur, opcua_statuscode_t status);
+void monitored_item_prepare_pending_queue(mu_monitored_item_t *item);
+void monitored_item_accumulate_aggregate(mu_monitored_item_t *item, const mu_variant_t *cur);
+void monitored_item_publish_aggregate(mu_monitored_item_t *item, opcua_uint64_t now_ms);
+bool monitored_item_in_subscription(const mu_monitored_item_t *item, const mu_subscription_t *sub);
+bool monitored_item_reports_by_trigger(const struct mu_server *server, const mu_subscription_t *sub,
+                                       const mu_monitored_item_t *linked_item);
+#endif
+
+/* Shared dispatch helpers — extracted modules call these across translation-unit
+ * boundaries (T008+). Definitions live in service_dispatch.c. */
+opcua_statuscode_t write_response_prefix(mu_binary_writer_t *w, opcua_uint32_t response_type_id,
+                                         opcua_uint32_t request_handle, opcua_statuscode_t service_result);
+opcua_statuscode_t ensure_reader_bytes_remaining(const mu_binary_reader_t *r, size_t length);
+opcua_statuscode_t skip_extension_object_body(mu_binary_reader_t *r, size_t length);
+opcua_statuscode_t ensure_array_items_min_remaining(const mu_binary_reader_t *r, opcua_int32_t count,
+                                                    size_t min_item_size);
+
+/* Session service handlers — implemented in dispatch_session.c (T008). */
+opcua_statuscode_t handle_create_session(mu_server_t *server, mu_binary_reader_t *r, mu_binary_writer_t *w,
+                                         size_t *response_length);
+opcua_statuscode_t handle_activate_session(mu_server_t *server, mu_binary_reader_t *r, mu_binary_writer_t *w,
+                                           size_t *response_length);
+opcua_statuscode_t handle_close_session(mu_server_t *server, mu_binary_reader_t *r, mu_binary_writer_t *w,
+                                        size_t *response_length);
+
+/* Discovery service handlers — implemented in dispatch_discovery.c (T009).
+ * Compiled under MUC_OPCUA_SERVICE_DISCOVERY; the dispatch table in
+ * service_dispatch.c references these by name. */
+#ifdef MUC_OPCUA_SERVICE_DISCOVERY
+opcua_statuscode_t handle_get_endpoints(mu_server_t *server, mu_binary_reader_t *r, mu_binary_writer_t *w,
+                                        size_t *response_length);
+opcua_statuscode_t handle_find_servers(mu_server_t *server, mu_binary_reader_t *r, mu_binary_writer_t *w,
+                                       size_t *response_length);
+#endif
+
+/* Read/Write attribute service handlers — implemented in dispatch_attribute.c
+ * (T010). The dispatch table in service_dispatch.c references these by name. */
+#ifdef MUC_OPCUA_SERVICE_READ
+opcua_statuscode_t handle_read(mu_server_t *server, mu_binary_reader_t *r, mu_binary_writer_t *w,
+                               size_t *response_length);
+#endif
+#ifdef MUC_OPCUA_SERVICE_WRITE
+opcua_statuscode_t handle_write(mu_server_t *server, mu_binary_reader_t *r, mu_binary_writer_t *w,
+                                size_t *response_length);
+#endif
+
+/* Browse-family service handlers — implemented in dispatch_view.c (T011).
+ * The dispatch table in service_dispatch.c references these by name. */
+#ifdef MUC_OPCUA_SERVICE_BROWSE
+opcua_statuscode_t handle_browse(mu_server_t *server, mu_binary_reader_t *r, mu_binary_writer_t *w,
+                                 size_t *response_length);
+opcua_statuscode_t handle_browse_next(mu_server_t *server, mu_binary_reader_t *r, mu_binary_writer_t *w,
+                                      size_t *response_length);
+opcua_statuscode_t handle_translate_browse_paths(mu_server_t *server, mu_binary_reader_t *r, mu_binary_writer_t *w,
+                                                 size_t *response_length);
+#endif
+
+/* Subscription service-set handlers — implemented in dispatch_subscription.c
+ * (T012). The dispatch table in service_dispatch.c references these by name;
+ * the MonitoredItems handlers remain in service_dispatch.c. */
+#if MUC_OPCUA_SUBSCRIPTIONS
+opcua_statuscode_t handle_create_subscription(mu_server_t *server, mu_binary_reader_t *r, mu_binary_writer_t *w,
+                                              size_t *response_length);
+opcua_statuscode_t handle_modify_subscription(mu_server_t *server, mu_binary_reader_t *r, mu_binary_writer_t *w,
+                                              size_t *response_length);
+opcua_statuscode_t handle_set_publishing_mode(mu_server_t *server, mu_binary_reader_t *r, mu_binary_writer_t *w,
+                                              size_t *response_length);
+opcua_statuscode_t handle_delete_subscriptions(mu_server_t *server, mu_binary_reader_t *r, mu_binary_writer_t *w,
+                                               size_t *response_length);
+opcua_statuscode_t handle_publish(mu_server_t *server, mu_binary_reader_t *r, mu_binary_writer_t *w,
+                                  size_t *response_length);
+opcua_statuscode_t handle_republish(mu_server_t *server, mu_binary_reader_t *r, mu_binary_writer_t *w,
+                                    size_t *response_length);
+
+/* Shared subscription dispatch helpers — defined in service_dispatch.c, shared
+ * with the MonitoredItems handlers that remain there (T012). */
+opcua_uint32_t publishing_interval_bits_to_ms(opcua_uint64_t bits);
+opcua_uint64_t publishing_interval_ms_to_bits(opcua_uint32_t interval_ms);
+opcua_statuscode_t drive_subscription_id_status_array(
+    mu_server_t *server, mu_binary_reader_t *r, mu_binary_writer_t *w, size_t *response_length,
+    opcua_uint32_t response_type_id, opcua_uint32_t request_handle, bool validate_subscription_id,
+    opcua_uint32_t subscription_id,
+    opcua_statuscode_t (*item_result)(mu_server_t *server, opcua_uint32_t id, void *context), void *context);
+#endif
+
+/* NodeManagement service-set handlers — implemented in dispatch_node_mgmt.c
+ * (T013). The dispatch table in service_dispatch.c references these by name. */
+#ifdef MUC_OPCUA_SERVICE_NODEMANAGEMENT
+opcua_statuscode_t handle_add_nodes(mu_server_t *server, mu_binary_reader_t *r, mu_binary_writer_t *w,
+                                    size_t *response_length);
+opcua_statuscode_t handle_add_references(mu_server_t *server, mu_binary_reader_t *r, mu_binary_writer_t *w,
+                                         size_t *response_length);
+opcua_statuscode_t handle_delete_nodes(mu_server_t *server, mu_binary_reader_t *r, mu_binary_writer_t *w,
+                                       size_t *response_length);
+opcua_statuscode_t handle_delete_references(mu_server_t *server, mu_binary_reader_t *r, mu_binary_writer_t *w,
+                                            size_t *response_length);
+#endif
+
+/* Call service handler — implemented in dispatch_method.c (T014). The dispatch
+ * table in service_dispatch.c references this by name. The guard matches the
+ * original MU_DISPATCH_CALL_ENABLED condition in service_dispatch.c
+ * (MUC_OPCUA_METHOD_CALL is not defined in this codebase). */
+#if MUC_OPCUA_SUBSCRIPTIONS && MUC_OPCUA_SUBSCRIPTIONS_STANDARD && MUC_OPCUA_BASE_TYPE_SYSTEM
+opcua_statuscode_t handle_call(mu_server_t *server, mu_binary_reader_t *r, mu_binary_writer_t *w,
+                               size_t *response_length);
 #endif
 
 #endif /* MUC_OPCUA_SERVER_INTERNAL_H */

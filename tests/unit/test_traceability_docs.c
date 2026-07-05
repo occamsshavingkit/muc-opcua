@@ -466,7 +466,8 @@ void test_traceability_docs_changed_protocol_files_have_opc_section_mappings(voi
         "src/core/tcp_connection.c",      "src/encoding/binary_reader.c", "src/encoding/binary_extension_object.c",
         "src/encoding/binary_query.c",    "src/services/discovery.c",     "src/services/history.c",
         "src/services/node_management.c", "src/services/query.c",         "src/services/session.c",
-        "src/services/subscription.c",    "include/muc_opcua/status.h",
+        "src/services/subscription_monitor.c", "src/services/subscription_publish.c",
+        "src/services/subscription_aggregate.c", "include/muc_opcua/status.h",
     };
     char path[1024];
     char failures[4096];

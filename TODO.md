@@ -1,43 +1,34 @@
 # TODO — muc-opcua
 
 **Updated**: 2026-07-04
-**Source**: `docs/review/five-lens-audit-2026-07-04.md`, Codacy triage, deferred findings
+**Source**: `docs/review/five-lens-audit-2026-07-04.md`, interop findings, code review
 
-## Deferred: Five-Lens Audit (15 findings, 3 hotspots)
+## Remaining Backlog
 
-### `src/services/subscription.c` — T4, T5/T24, T6, T27, T28, T31
+### Deferred audit findings
 
-- [ ] T4: Single-pass scan for monitored item collection
-- [ ] T5/T24: Remove `fabs` usage (float in embedded)
-- [ ] T6: 64-bit division in publish timer — use shift or platform-safe alternative
-- [ ] T27: Deadband filter — review for correctness
-- [ ] T28: Publish timer accuracy
+| File | Finding | Notes |
+|------|---------|-------|
+| `src/services/secure_channel.c` | T17 | Channel ID entropy. Fix 3 integration tests first (they assume channel_id=1). |
+| `src/services/browse.c` | T22 | TypeDefinition cache. Requires adding field to `mu_node_t` struct. |
 
-**Lesson**: Split into atomic tasks: collect indices, change write loop, change cleanup loop. Verify each independently.
+### Tech debt
 
-### `src/core/service_dispatch.c` — T8, T12, T13, T23, T25
+- `src/core/service_dispatch.c` (being split in spec 032) — extract per-service dispatch into modules
+- `src/services/subscription.c` (split completed in spec 032) — verify module boundaries
 
-- [ ] T8: Session ordering in dispatch
-- [ ] T12: Certificate token `#ifdef` guard
-- [ ] T13: Nonce stack zeroize
-- [ ] T23: Dispatch scan optimization
-- [ ] T25: Profile URI parse validation
+### Interop Test Hardening (HIGH)
 
-**Lesson**: Any new `mu_secure_*` calls in `USER_AUTH` blocks need `#ifdef MUC_OPCUA_SECURITY` guard.
+**Problem discovered 2026-07-04**: WriteResponse was missing the mandatory `diagnosticInfos[]` field (OPC-10000-4 §5.11.4.2, OPC-10000-6 §5.2.5). Neither interop smoke tests nor unit tests caught this — open62541 client was the detector.
 
-### `src/services/secure_channel.c` — T17
+**Root causes identified**:
+1. `tests/interop/interop_smoke.py` has **zero write tests** — no Write request is ever sent to the server
+2. `tests/unit/test_write_decoder.c` validates `results[]` encoding but **never reads diagnosticInfos** — incomplete wire-level test
+3. No test verifies a full WriteResponse binary round-trip against a known-good fixture
 
-- [ ] T17: Channel ID entropy — update integration tests first (3 files assume `channel_id=1`), then apply counter
-
-## Codacy
-
-- [ ] Complete custom coding standard configuration in Codacy UI (finalize pattern exclusions)
-- [ ] Tune Lizard complexity thresholds (currently: CCN>8, NLOC>50, params>5, file>500 — protocol code is naturally higher)
-
-## Tech Debt
-
-- [ ] `src/core/service_dispatch.c:284` — HistoryUpdate dispatch entry has wrong response_id: `MU_ID_HISTORYUPDATEREQUEST` (700) is used for both request and response; the response_id should be `MU_ID_HISTORYUPDATERESPONSE` (703). Pre-existing bug surfaced while reordering the table for binary search (T013). Out of scope for T013; fixing changes the wire-visible response NodeId and needs its own test.
-- [ ] `subscription.c` is 1,692 lines — consider splitting into separate concerns (publish, monitor, filter)
-- [ ] `service_dispatch.c` is large — service-specific dispatch could be extracted
-- [ ] MISRA 15.6: 10 single-statement bodies remain in platform crypto adapters (wolfssl, host_crypto, mbedtls)
-- [ ] MISRA 10.4: 2 `size_t` vs `0u` type inconsistencies in `subscription.c:1576,1610`
+**Required**:
+- [ ] Audit all interop tests: verify each service (Read, Write, Browse, Subscribe, Publish, Call, CreateSession, ActivateSession) has at least one wire-level round-trip test against a real client
+- [ ] Audit all `*_encode` unit tests: verify each reads every mandatory field in the encoded response, including null/empty arrays
+- [ ] Add write interop test: issue Write via asyncua/opcua-asyncio, verify server responds with well-formed WriteResponse
+- [ ] Generate binary fixture for WriteResponse and add round-trip encode/decode test
+- [ ] No silent failures: every test that reads a binary response must verify `reader->position == expected_length` at the end to catch trailing/missing fields
