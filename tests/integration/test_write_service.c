@@ -116,11 +116,11 @@ static size_t build_msg(opcua_byte_t *out, size_t cap, opcua_uint32_t seq, opcua
 
 static opcua_statuscode_t last_written_value = 0;
 static opcua_statuscode_t test_write_handler(void *handle, const mu_nodeid_t *node_id, opcua_uint32_t attribute_id,
-                                             const mu_variant_t *value) {
+                                             const mu_datavalue_t *value) {
     (void)handle;
     (void)attribute_id;
-    if (node_id->identifier.numeric == 1001 && value->type == MU_TYPE_INT32) {
-        last_written_value = value->value.i32;
+    if (node_id->identifier.numeric == 1001 && value->value.type == MU_TYPE_INT32) {
+        last_written_value = value->value.value.i32;
         return MU_STATUS_GOOD;
     }
     return MU_STATUS_BAD_NOTWRITABLE;

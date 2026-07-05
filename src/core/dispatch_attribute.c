@@ -144,7 +144,7 @@ opcua_statuscode_t handle_write(mu_server_t *server, mu_binary_reader_t *r, mu_b
             void *write_handler_handle = server->config.write_handler_handle;
             if (write_handler) {
                 result = write_handler(write_handler_handle, &write_val->node_id,
-                                       (opcua_uint32_t)write_val->attribute_id, &write_val->value.value);
+                                       (opcua_uint32_t)write_val->attribute_id, &write_val->value);
             } else {
                 result = MU_STATUS_BAD_WRITENOTSUPPORTED;
             }

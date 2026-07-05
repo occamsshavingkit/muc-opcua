@@ -219,7 +219,7 @@ void test_read_service_batch_preserves_per_operation_results(void) {
         {.node_id = {.identifier_type = MU_NODEID_NUMERIC, .namespace_index = 1, .identifier.numeric = 9999},
          .attribute_id = MU_ATTRIBUTEID_VALUE},
         {.node_id = nodes[1].node_id, .attribute_id = MU_ATTRIBUTEID_VALUE},
-        {.node_id = nodes[0].node_id, .attribute_id = MU_ATTRIBUTEID_DESCRIPTION},
+        {.node_id = nodes[0].node_id, .attribute_id = MU_ATTRIBUTEID_EVENTNOTIFIER},
     };
 
     mu_read_request_t batch_req = {.max_age = 0,

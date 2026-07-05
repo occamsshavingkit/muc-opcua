@@ -17,6 +17,7 @@ typedef struct {
        bits so the value is clamped and echoed with no floating-point math (the
        Cortex-M0+ target has no FPU). */
     opcua_uint32_t revised_session_timeout_ms;
+    opcua_uint64_t last_activity_ms;
     opcua_byte_t server_nonce[32];
 #ifdef MUC_OPCUA_MULTIPLE_CONNECTIONS
     opcua_uint32_t secure_channel_id;
@@ -67,5 +68,12 @@ opcua_statuscode_t mu_session_activate(mu_session_t *session, opcua_uint32_t aut
                                        opcua_uint32_t identity_token_encoding_id);
 
 opcua_statuscode_t mu_session_close(mu_session_t *session, opcua_uint32_t auth_token, bool delete_subscriptions);
+
+/* OPC-10000-4 section 5.7.2.1: close a Session due to SessionTimeout expiry.
+   Unlike mu_session_close, no authenticationToken is required — the Server
+   itself is closing the idle Session. As with CloseSession, the state is set to
+   CLOSED and the serverNonce is zeroed, while the session_id and auth_token are
+   preserved so subsequent requests on the stale token return Bad_SessionClosed. */
+void mu_session_close_timeout(mu_session_t *session);
 
 #endif /* MUC_OPCUA_SERVICES_SESSION_H */

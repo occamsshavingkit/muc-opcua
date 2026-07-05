@@ -26,7 +26,7 @@ is available only when the named build option is enabled. `Unsupported` returns
 | TranslateBrowsePathsToNodeIds | 5.9.4 | Implemented subset | RelativePath walk over the address space; `Bad_NoMatch` |
 | RegisterNodes | 5.9.5 | Optional implemented subset | Behind `MUC_OPCUA_SERVICE_REGISTER_NODES` (full profile only); identity mapping (NodeIds copied back). Nano/Micro/Embedded return `Bad_ServiceUnsupported` (`test_profile_surface`) |
 | UnregisterNodes | 5.9.6 | Optional implemented subset | Behind `MUC_OPCUA_SERVICE_REGISTER_NODES` (full profile only); no-op, returns Good. Nano/Micro/Embedded return `Bad_ServiceUnsupported` |
-| Write | 5.11.4 | Optional implemented subset | Behind `MUC_OPCUA_SERVICE_WRITE` |
+| Write | 5.11.4 | Optional implemented subset | Behind `MUC_OPCUA_SERVICE_WRITE`. Only the Value attribute (AttributeId 13) is writable; all other attributes reject with `Bad_NotWritable`. Write of index ranges (NumericRange) is not supported and returns `Bad_WriteNotSupported`. Under OPC-10000-4 §5.11.4, the micro/embedded profiles scope Write to Value attribute writes only. |
 | Call | 5.12.2 | Optional implemented subset | Behind `MUC_OPCUA_EMBEDDED_PROFILE` (GetMonitoredItems/ResendData + custom methods only) |
 | CreateMonitoredItems | 5.13.2 | Implemented subset | Data-change monitoring; initial sample; `Bad_NodeIdUnknown` / `Bad_TooManyMonitoredItems`; queue bounds |
 | ModifyMonitoredItems | 5.13.3 | Implemented subset | Revised sampling interval / clientHandle; invalid MonitoredItemId -> `Bad_MonitoredItemIdInvalid` |

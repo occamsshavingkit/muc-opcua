@@ -22,6 +22,11 @@ static opcua_datetime_t fake_time(void *context) {
     return 0;
 }
 
+static opcua_uint64_t fake_tick_ms(void *context) {
+    (void)context;
+    return 0;
+}
+
 static opcua_statuscode_t fake_entropy(void *context, opcua_byte_t *buffer, size_t length) {
     (void)context;
     if (buffer != NULL) {
@@ -220,6 +225,63 @@ void test_session_close(void) {
     TEST_ASSERT_EQUAL(MU_SESSION_STATE_CLOSED, session.state);
 }
 
+/* OPC-10000-4 section 5.7.2.1: mu_session_close_timeout transitions an idle
+   Session to CLOSED without requiring the authenticationToken. The session_id
+   and auth_token are preserved so dispatch can return Bad_SessionClosed (not
+   Bad_SessionIdInvalid) on subsequent use of the stale token. */
+void test_session_close_timeout(void) {
+    mu_session_t session;
+    mu_session_init(&session);
+
+    opcua_uint64_t revised_timeout;
+    opcua_uint32_t session_id, auth_token;
+    mu_session_create(&session, bits(5000.0), &revised_timeout, &session_id, &auth_token);
+    TEST_ASSERT_EQUAL(MU_SESSION_STATE_CREATED, session.state);
+
+    /* CloseSession zeroed the nonce as hygiene; timeout close must do the same. */
+    (void)memset(session.server_nonce, 0xAA, sizeof(session.server_nonce));
+
+    mu_session_close_timeout(&session);
+
+    TEST_ASSERT_EQUAL(MU_SESSION_STATE_CLOSED, session.state);
+    /* auth_token and session_id preserved for Bad_SessionClosed dispatch. */
+    TEST_ASSERT_EQUAL(session_id, session.session_id);
+    TEST_ASSERT_EQUAL(auth_token, session.auth_token);
+    /* Nonce cleared. */
+    opcua_byte_t zero_nonce[32];
+    (void)memset(zero_nonce, 0, sizeof(zero_nonce));
+    TEST_ASSERT_EQUAL_MEMORY(zero_nonce, session.server_nonce, sizeof(zero_nonce));
+
+    /* Closing an already-closed session is a no-op (no crash). */
+    mu_session_close_timeout(&session);
+    TEST_ASSERT_EQUAL(MU_SESSION_STATE_CLOSED, session.state);
+
+    /* NULL session is a safe no-op. */
+    mu_session_close_timeout(NULL);
+}
+
+/* A timed-out Session that has been transitioned to CLOSED (but whose slot has
+   not yet been reused) must be found by mu_session_find_closed_by_token so that
+   dispatch returns Bad_SessionClosed — not Bad_SessionIdInvalid. */
+void test_session_timeout_rejects_request_on_closed_slot(void) {
+    mu_session_t sessions[2];
+    for (size_t i = 0; i < 2; ++i) {
+        mu_session_init(&sessions[i]);
+    }
+
+    opcua_uint64_t revised_timeout;
+    opcua_uint32_t session_id, auth_token;
+    mu_session_create(&sessions[0], bits(5000.0), &revised_timeout, &session_id, &auth_token);
+
+    mu_session_close_timeout(&sessions[0]);
+
+    /* OPC-10000-4 section 5.7.4.1: a request on a closed session's token is
+       Bad_SessionClosed, distinguished from an unknown token. */
+    mu_session_t *found = mu_session_find_closed_by_token(sessions, 2, auth_token);
+    TEST_ASSERT_NOT_NULL(found);
+    TEST_ASSERT_EQUAL_PTR(&sessions[0], found);
+}
+
 void test_create_session_truncated_body_returns_bad_decodingerror_without_allocating_session(void) {
     mu_server_t server;
     (void)memset(&server, 0, sizeof(server));
@@ -346,6 +408,8 @@ int main(void) {
     RUN_TEST(test_session_create);
     RUN_TEST(test_session_activate_anonymous);
     RUN_TEST(test_session_close);
+    RUN_TEST(test_session_close_timeout);
+    RUN_TEST(test_session_timeout_rejects_request_on_closed_slot);
     RUN_TEST(test_create_session_truncated_body_returns_bad_decodingerror_without_allocating_session);
     RUN_TEST(test_create_session_two_successful_responses_use_fresh_session_ids_and_tokens);
     RUN_TEST(test_create_session_overflow_returns_bad_toomanysessions_without_allocating);

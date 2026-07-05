@@ -169,27 +169,82 @@ void test_binary_expanded_nodeid_truncated_server_index_fails(void) {
     assert_expanded_nodeid_fails(buffer, sizeof(buffer));
 }
 
-void test_binary_nodeid_guid_identifier_is_rejected_cleanly(void) {
+void test_binary_nodeid_guid_decode_roundtrip(void) {
     const opcua_byte_t buffer[] = {0x04u, 0x01u, 0x00u, 0x00u, 0x01u, 0x02u, 0x03u, 0x04u, 0x05u, 0x06u,
                                    0x07u, 0x08u, 0x09u, 0x0au, 0x0bu, 0x0cu, 0x0du, 0x0eu, 0x0fu};
     mu_binary_reader_t reader;
     mu_binary_reader_init(&reader, buffer, sizeof(buffer));
 
     mu_nodeid_t node_id;
-    /* OPC-10000-6 section 5.2.2.9 Guid NodeIds are either supported or rejected
-       deterministically; this profile explicitly rejects them. */
-    TEST_ASSERT_EQUAL(MU_STATUS_BAD_DECODINGERROR, mu_binary_read_nodeid(&reader, &node_id));
+    /* OPC-10000-6 section 5.2.2.9: Guid NodeId format (0x04) decode. */
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_nodeid(&reader, &node_id));
+    TEST_ASSERT_EQUAL(MU_NODEID_GUID, node_id.identifier_type);
+    TEST_ASSERT_EQUAL(1, node_id.namespace_index);
+    {
+        int i;
+        for (i = 0; i < 16; i++) {
+            TEST_ASSERT_EQUAL(i, node_id.identifier.guid[i]);
+        }
+    }
+
+    /* Roundtrip encode then decode. */
+    opcua_byte_t out_buffer[64];
+    mu_binary_writer_t writer;
+    mu_binary_writer_init(&writer, out_buffer, sizeof(out_buffer));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_write_nodeid(&writer, &node_id));
+
+    mu_binary_reader_t reader2;
+    mu_binary_reader_init(&reader2, out_buffer, writer.position);
+    mu_nodeid_t node_id2;
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_nodeid(&reader2, &node_id2));
+    TEST_ASSERT_EQUAL(MU_NODEID_GUID, node_id2.identifier_type);
+    TEST_ASSERT_EQUAL(1, node_id2.namespace_index);
+    {
+        int i;
+        for (i = 0; i < 16; i++) {
+            TEST_ASSERT_EQUAL(i, node_id2.identifier.guid[i]);
+        }
+    }
+
+    /* Verify mu_nodeid_equal works. */
+    TEST_ASSERT_TRUE(mu_nodeid_equal(&node_id, &node_id2));
 }
 
-void test_binary_nodeid_opaque_identifier_is_rejected_cleanly(void) {
+void test_binary_nodeid_opaque_decode_roundtrip(void) {
     const opcua_byte_t buffer[] = {0x05u, 0x01u, 0x00u, 0x03u, 0x00u, 0x00u, 0x00u, 0xaau, 0xbbu, 0xccu};
     mu_binary_reader_t reader;
     mu_binary_reader_init(&reader, buffer, sizeof(buffer));
 
     mu_nodeid_t node_id;
-    /* OPC-10000-6 section 5.2.2.9 Opaque NodeIds are either supported or
-       rejected deterministically; this profile explicitly rejects them. */
-    TEST_ASSERT_EQUAL(MU_STATUS_BAD_DECODINGERROR, mu_binary_read_nodeid(&reader, &node_id));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_nodeid(&reader, &node_id));
+    TEST_ASSERT_EQUAL(MU_NODEID_OPAQUE, node_id.identifier_type);
+    TEST_ASSERT_EQUAL(1, node_id.namespace_index);
+    TEST_ASSERT_EQUAL(3, node_id.identifier.opaque.length);
+    TEST_ASSERT_EQUAL(0xaa, node_id.identifier.opaque.data[0]);
+    TEST_ASSERT_EQUAL(0xbb, node_id.identifier.opaque.data[1]);
+    TEST_ASSERT_EQUAL(0xcc, node_id.identifier.opaque.data[2]);
+
+    /* Roundtrip encode then decode. */
+    opcua_byte_t out_buffer[64];
+    mu_binary_writer_t writer;
+    mu_binary_writer_init(&writer, out_buffer, sizeof(out_buffer));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_write_nodeid(&writer, &node_id));
+    TEST_ASSERT_EQUAL(sizeof(buffer), writer.position);
+    assert_buffer_equal(buffer, out_buffer, sizeof(buffer));
+
+    mu_binary_reader_t reader2;
+    mu_binary_reader_init(&reader2, out_buffer, writer.position);
+    mu_nodeid_t node_id2;
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_nodeid(&reader2, &node_id2));
+    TEST_ASSERT_EQUAL(MU_NODEID_OPAQUE, node_id2.identifier_type);
+    TEST_ASSERT_EQUAL(1, node_id2.namespace_index);
+    TEST_ASSERT_EQUAL(3, node_id2.identifier.opaque.length);
+    TEST_ASSERT_EQUAL(0xaa, node_id2.identifier.opaque.data[0]);
+    TEST_ASSERT_EQUAL(0xbb, node_id2.identifier.opaque.data[1]);
+    TEST_ASSERT_EQUAL(0xcc, node_id2.identifier.opaque.data[2]);
+
+    /* Verify mu_nodeid_equal works. */
+    TEST_ASSERT_TRUE(mu_nodeid_equal(&node_id, &node_id2));
 }
 
 int main(void) {
@@ -207,7 +262,7 @@ int main(void) {
     RUN_TEST(test_binary_nodeid_truncated_string_variant_fails);
     RUN_TEST(test_binary_expanded_nodeid_truncated_namespace_uri_fails);
     RUN_TEST(test_binary_expanded_nodeid_truncated_server_index_fails);
-    RUN_TEST(test_binary_nodeid_guid_identifier_is_rejected_cleanly);
-    RUN_TEST(test_binary_nodeid_opaque_identifier_is_rejected_cleanly);
+    RUN_TEST(test_binary_nodeid_guid_decode_roundtrip);
+    RUN_TEST(test_binary_nodeid_opaque_decode_roundtrip);
     return UNITY_END();
 }

@@ -2,6 +2,158 @@
 #include "read.h"
 #include "../address_space/base_nodes.h"
 #include <stddef.h>
+#include <string.h>
+
+/* maxAge read cache (OPC-10000-4 �5.11.2) */
+#define MU_READ_CACHE_SIZE 4
+
+typedef struct {
+    mu_nodeid_t node_id;
+    mu_variant_t variant;
+    opcua_datetime_t read_time;
+    opcua_boolean_t valid;
+} mu_read_cache_entry_t;
+
+static mu_read_cache_entry_t g_read_cache[MU_READ_CACHE_SIZE];
+static size_t g_read_cache_next = 0;
+
+static opcua_boolean_t mu_read_cache_lookup(const mu_nodeid_t *node_id, opcua_double_t max_age_ms,
+                                             opcua_datetime_t now, mu_variant_t *out) {
+    if (max_age_ms <= 0.0) return false;
+    opcua_datetime_t max_age_ticks = (opcua_datetime_t)(max_age_ms * 10000.0);
+    for (size_t i = 0; i < MU_READ_CACHE_SIZE; i++) {
+        if (g_read_cache[i].valid && mu_nodeid_equal(&g_read_cache[i].node_id, node_id)) {
+            if ((now - g_read_cache[i].read_time) <= max_age_ticks) {
+                *out = g_read_cache[i].variant;
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+static void mu_read_cache_store(const mu_nodeid_t *node_id, const mu_variant_t *val,
+                                 opcua_datetime_t read_time) {
+    if (!val) return;
+    g_read_cache[g_read_cache_next].node_id = *node_id;
+    g_read_cache[g_read_cache_next].variant = *val;
+    g_read_cache[g_read_cache_next].read_time = read_time;
+    g_read_cache[g_read_cache_next].valid = true;
+    g_read_cache_next = (g_read_cache_next + 1) % MU_READ_CACHE_SIZE;
+}
+
+static size_t variant_elem_size(mu_builtin_type_t type) {
+    switch (type) {
+    case MU_TYPE_BOOLEAN:       return sizeof(opcua_boolean_t);
+    case MU_TYPE_SBYTE:         return sizeof(opcua_sbyte_t);
+    case MU_TYPE_BYTE:          return sizeof(opcua_byte_t);
+    case MU_TYPE_INT16:         return sizeof(opcua_int16_t);
+    case MU_TYPE_UINT16:        return sizeof(opcua_uint16_t);
+    case MU_TYPE_INT32:         return sizeof(opcua_int32_t);
+    case MU_TYPE_UINT32:        return sizeof(opcua_uint32_t);
+    case MU_TYPE_INT64:         return sizeof(opcua_int64_t);
+    case MU_TYPE_UINT64:        return sizeof(opcua_uint64_t);
+    case MU_TYPE_FLOAT:         return sizeof(opcua_float_t);
+    case MU_TYPE_DOUBLE:        return sizeof(opcua_double_t);
+    case MU_TYPE_STRING:        return sizeof(mu_string_t);
+    case MU_TYPE_DATETIME:      return sizeof(opcua_datetime_t);
+    case MU_TYPE_BYTESTRING:    return sizeof(mu_bytestring_t);
+    case MU_TYPE_NODEID:        return sizeof(mu_nodeid_t);
+    case MU_TYPE_EXPANDEDNODEID:return sizeof(mu_expanded_nodeid_t);
+    case MU_TYPE_STATUSCODE:    return sizeof(opcua_statuscode_t);
+    case MU_TYPE_QUALIFIEDNAME: return sizeof(mu_qualified_name_t);
+    case MU_TYPE_LOCALIZEDTEXT: return sizeof(mu_localized_text_t);
+    default:                    return 0;
+    }
+}
+
+static opcua_statuscode_t parse_numeric_range(const mu_string_t *range_str, opcua_int32_t *start, opcua_int32_t *end) {
+    const char *p = (const char *)range_str->data;
+    opcua_int32_t len = range_str->length;
+    opcua_int32_t pos = 0;
+
+    *start = 0;
+    *end = -1;
+
+    if (pos >= len || p[pos] < '0' || p[pos] > '9') {
+        return MU_STATUS_BAD_INDEXRANGEINVALID;
+    }
+
+    while (pos < len && p[pos] >= '0' && p[pos] <= '9') {
+        *start = *start * 10 + (p[pos] - '0');
+        pos++;
+    }
+
+    if (pos < len && p[pos] == ':') {
+        pos++;
+        if (pos >= len || p[pos] < '0' || p[pos] > '9') {
+            return MU_STATUS_BAD_INDEXRANGEINVALID;
+        }
+
+        *end = 0;
+        while (pos < len && p[pos] >= '0' && p[pos] <= '9') {
+            *end = *end * 10 + (p[pos] - '0');
+            pos++;
+        }
+    }
+
+    if (pos != len) {
+        return MU_STATUS_BAD_INDEXRANGEINVALID;
+    }
+
+    if (*end != -1 && *start >= *end) {
+        return MU_STATUS_BAD_INDEXRANGEINVALID;
+    }
+
+    return MU_STATUS_GOOD;
+}
+
+/* Apply a NumericRange to an array value (OPC-10000-4 §7.27).
+   Modifies `value` in place. Returns GOOD, Bad_IndexRangeInvalid, or Bad_IndexRangeNoData. */
+static opcua_statuscode_t apply_index_range(const mu_string_t *index_range, mu_variant_t *value) {
+    if (!index_range || index_range->length <= 0 || !index_range->data) {
+        return MU_STATUS_GOOD;
+    }
+
+    if (!value->is_array) {
+        return MU_STATUS_GOOD;
+    }
+
+    if (value->array_length <= 0) {
+        return MU_STATUS_GOOD;
+    }
+
+    opcua_int32_t start, end;
+    opcua_statuscode_t s = parse_numeric_range(index_range, &start, &end);
+    if (s != MU_STATUS_GOOD) {
+        return s;
+    }
+
+    if (start < 0 || start >= value->array_length) {
+        return MU_STATUS_BAD_INDEXRANGENODATA;
+    }
+
+    size_t esize = variant_elem_size(value->type);
+    if (esize == 0) {
+        return MU_STATUS_BAD_INTERNALERROR;
+    }
+
+    const char *arr = (const char *)value->value.array;
+
+    if (end == -1) {
+        memcpy(&value->value, arr + (size_t)start * esize, esize);
+        value->is_array = false;
+        value->array_length = 0;
+    } else {
+        if (end >= value->array_length) {
+            end = value->array_length - 1;
+        }
+        value->value.array = arr + (size_t)start * esize;
+        value->array_length = end - start + 1;
+    }
+
+    return MU_STATUS_GOOD;
+}
 
 opcua_statuscode_t mu_read_request_decode(mu_binary_reader_t *reader, mu_read_request_t *req,
                                           mu_read_value_id_t *nodes_array, size_t max_nodes) {
@@ -150,6 +302,81 @@ static opcua_statuscode_t read_attribute(const mu_address_space_t *address_space
         }
         return MU_STATUS_BAD_NOTREADABLE;
 
+    /* OPC-10000-3 Table 1: Description Attribute (id 5), mandatory on all Nodes.
+       Returns an empty LocalizedText (both locale and text are null strings)
+       since the micro node model does not store a separate description. */
+    case MU_ATTRIBUTEID_DESCRIPTION:
+        value->type = MU_TYPE_LOCALIZEDTEXT;
+        value->value.localized_text.locale = (mu_string_t){-1, NULL};
+        value->value.localized_text.text = (mu_string_t){-1, NULL};
+        return MU_STATUS_GOOD;
+
+    /* OPC-10000-3 Table 1: WriteMask Attribute (id 6), mandatory on all Nodes.
+       Indicates which Attributes are writable. The micro profile does not track
+       per-node write masks — returns 0 (nothing writable). */
+    case MU_ATTRIBUTEID_WRITEMASK:
+        value->type = MU_TYPE_UINT32;
+        value->value.ui32 = 0;
+        return MU_STATUS_GOOD;
+
+    /* OPC-10000-3 Table 1: UserWriteMask Attribute (id 7), mandatory on all Nodes.
+       Same semantics as WriteMask but for the current user. Returns 0. */
+    case MU_ATTRIBUTEID_USERWRITEMASK:
+        value->type = MU_TYPE_UINT32;
+        value->value.ui32 = 0;
+        return MU_STATUS_GOOD;
+
+    /* OPC-10000-3 §5.6.3: DataType Attribute (id 14), only exists on Variable
+       and VariableType Nodes. Returns the type_definition NodeId, or
+       BaseDataType (ns=0;i=24) if the node has no explicit type. */
+    case MU_ATTRIBUTEID_DATATYPE:
+        if (node->node_class != MU_NODECLASS_VARIABLE &&
+            node->node_class != MU_NODECLASS_VARIABLETYPE) {
+            return MU_STATUS_BAD_ATTRIBUTEIDINVALID;
+        }
+        value->type = MU_TYPE_NODEID;
+        if (node->type_definition.namespace_index != 0 ||
+            node->type_definition.identifier_type != 0 ||
+            node->type_definition.identifier.numeric != 0) {
+            value->value.nodeid = node->type_definition;
+        } else {
+            value->value.nodeid = (mu_nodeid_t){0, MU_NODEID_NUMERIC, {.numeric = 24}};
+        }
+        return MU_STATUS_GOOD;
+
+    /* OPC-10000-3 §5.6.5: ValueRank Attribute (id 15), only exists on Variable
+       and VariableType Nodes. Returns -1 (scalar) in the micro profile. */
+    case MU_ATTRIBUTEID_VALUERANK:
+        if (node->node_class != MU_NODECLASS_VARIABLE &&
+            node->node_class != MU_NODECLASS_VARIABLETYPE) {
+            return MU_STATUS_BAD_ATTRIBUTEIDINVALID;
+        }
+        value->type = MU_TYPE_INT32;
+        value->value.i32 = -1;
+        return MU_STATUS_GOOD;
+
+    /* OPC-10000-3 §5.6.6: AccessLevel Attribute (id 17), only exists on Variable
+       Nodes. Returns CurrentRead (0x01) if the node has a readable value source,
+       or 0 otherwise. */
+    case MU_ATTRIBUTEID_ACCESSLEVEL:
+        if (node->node_class != MU_NODECLASS_VARIABLE) {
+            return MU_STATUS_BAD_ATTRIBUTEIDINVALID;
+        }
+        value->type = MU_TYPE_UINT32;
+        value->value.ui32 = (node->value != NULL) ? 0x01 : 0;
+        return MU_STATUS_GOOD;
+
+    /* OPC-10000-3 §5.6.9: Historizing Attribute (id 20), only exists on Variable
+       Nodes. Indicates whether the server is actively collecting history for the
+       Value. The micro profile does not implement history — returns false. */
+    case MU_ATTRIBUTEID_HISTORIZING:
+        if (node->node_class != MU_NODECLASS_VARIABLE) {
+            return MU_STATUS_BAD_ATTRIBUTEIDINVALID;
+        }
+        value->type = MU_TYPE_BOOLEAN;
+        value->value.b = false;
+        return MU_STATUS_GOOD;
+
     default:
         return MU_STATUS_BAD_ATTRIBUTEIDINVALID;
     }
@@ -194,12 +421,23 @@ opcua_statuscode_t mu_read_process_with_user_index(const mu_address_space_t *add
             if (node->node_class != MU_NODECLASS_VARIABLE) {
                 status = MU_STATUS_BAD_ATTRIBUTEIDINVALID;
             } else if (node->value) {
-                status = mu_value_source_read(node->value, &node->node_id, &dv->value);
+                if (mu_read_cache_lookup(&read_val->node_id, req->max_age, now, &dv->value)) {
+                    status = MU_STATUS_GOOD;
+                } else {
+                    status = mu_value_source_read(node->value, &node->node_id, &dv->value);
+                    if (status == MU_STATUS_GOOD) {
+                        mu_read_cache_store(&read_val->node_id, &dv->value, now);
+                    }
+                }
             } else {
                 status = MU_STATUS_BAD_NOTREADABLE;
             }
         } else {
             status = read_attribute(address_space, node, read_val->attribute_id, &dv->value);
+        }
+        if (status == MU_STATUS_GOOD) {
+            /* Apply index_range if specified (OPC-10000-4 §7.27/§7.28). */
+            status = apply_index_range(&read_val->index_range, &dv->value);
         }
         if (status == MU_STATUS_GOOD) {
             dv->has_value = true;

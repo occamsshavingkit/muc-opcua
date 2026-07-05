@@ -274,7 +274,7 @@ void test_message_chunk_abort_chunk_does_not_dispatch_service_payload(void) {
 }
 
 void test_message_chunk_non_final_chunk_in_single_chunk_mode_returns_tcp_error_without_dispatch(void) {
-    /* OPC-10000-6 section 6.7.2: IsFinal 'C' is a continuation chunk, not a complete service request. */
+    /* OPC-10000-6 section 6.7.2: IsFinal 'C' is a continuation chunk; it is buffered for multi-chunk reassembly. */
     message_chunk_transport_t transport;
     opcua_byte_t chunk[128];
     mu_server_config_t config;
@@ -299,8 +299,7 @@ void test_message_chunk_non_final_chunk_in_single_chunk_mode_returns_tcp_error_w
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_server_poll(server));
 
     TEST_ASSERT_EQUAL(1u, transport.read_index);
-    TEST_ASSERT_EQUAL(1, transport.write_count);
-    assert_tcp_error_write(&transport, 0, MU_STATUS_BAD_TCPINTERNALERROR);
+    TEST_ASSERT_EQUAL(0, transport.write_count);
 }
 
 void test_message_chunk_incomplete_declared_chunk_waits_without_dispatch(void) {
@@ -332,7 +331,7 @@ void test_message_chunk_incomplete_declared_chunk_waits_without_dispatch(void) {
 }
 
 void test_message_chunk_continuation_followed_by_abort_sends_only_continuation_error(void) {
-    /* OPC-10000-6 section 6.7.3: an abort after a malformed continuation does not turn prior bytes into a request. */
+    /* OPC-10000-6 section 6.7.3: a 'C' chunk followed by abort: 'C' is buffered, abort triggers assembler reset. */
     message_chunk_transport_t transport;
     opcua_byte_t chunks[128];
     mu_server_config_t config;
@@ -360,8 +359,7 @@ void test_message_chunk_continuation_followed_by_abort_sends_only_continuation_e
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_server_poll(server));
 
     TEST_ASSERT_EQUAL(1u, transport.read_index);
-    TEST_ASSERT_EQUAL(1, transport.write_count);
-    assert_tcp_error_write(&transport, 0, MU_STATUS_BAD_TCPINTERNALERROR);
+    TEST_ASSERT_EQUAL(0, transport.write_count);
 }
 
 void test_message_chunk_invalid_chunk_type(void) {

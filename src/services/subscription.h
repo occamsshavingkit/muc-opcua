@@ -230,8 +230,9 @@ typedef struct {
     bool in_use;
     opcua_uint32_t session_id;
     opcua_uint32_t request_handle;
-    opcua_uint32_t request_id; /* secure-channel request id for the async response */
-    opcua_uint64_t enqueued_ms;
+    opcua_uint32_t request_id;    /* secure-channel request id for the async response */
+    opcua_uint64_t enqueued_ms;   /* monotonic tick when the request was parked */
+    opcua_uint32_t timeout_hint;  /* RequestHeader.timeoutHint (OPC-10000-4 §7.32), ms */
     /* Acknowledgement results for the acks carried by this request, echoed in the
        PublishResponse results[] when it is answered (OPC 10000-4 §5.14.5.2). */
     opcua_uint32_t ack_count;
@@ -325,6 +326,14 @@ opcua_statuscode_t mu_publish_request_enqueue(mu_subscriptions_t *subs, opcua_ui
                                               opcua_uint32_t request_id, opcua_uint32_t request_handle,
                                               opcua_uint64_t now_ms, mu_publish_request_t **out_req);
 
+/* OPC-10000-4 §5.14.1.4 DeleteClientPublReqQueue: clear all parked Publish
+   requests for the given session. Called when SetPublishingMode disables
+   publishing or when the last Subscription for a session is deleted. */
+void mu_publish_request_queue_clear(mu_subscriptions_t *subs, opcua_uint32_t session_id);
+
+/* Return the number of in-use subscriptions owned by a session. */
+size_t mu_subscriptions_count_for_session(const mu_subscriptions_t *subs, opcua_uint32_t session_id);
+
 /* Acknowledge a retained NotificationMessage (OPC 10000-4 §5.14.5): if the subscription's
    retransmit slot holds the given sequence number, purge it. Returns GOOD,
    Bad_SubscriptionIdInvalid (unknown sub for the session), or Bad_SequenceNumberUnknown. */
@@ -337,6 +346,12 @@ opcua_statuscode_t mu_subscription_acknowledge(mu_subscriptions_t *subs, opcua_u
 opcua_statuscode_t mu_subscription_republish(mu_subscriptions_t *subs, opcua_uint32_t session_id,
                                              opcua_uint32_t subscription_id, opcua_uint32_t sequence_number,
                                              const opcua_byte_t **out_msg, size_t *out_len);
+
+/* Issue a StatusChangeNotification (OPC-10000-4 §5.14.1.4) by answering a parked
+   Publish request for the subscription's session. status is the StatusCode carried
+   in the notification (Bad_Timeout for lifetime expiry / explicit delete). */
+void issue_status_change_notification(struct mu_server *server, mu_subscription_t *sub,
+                                      opcua_statuscode_t status);
 
 /* Poll-driven sampling + publishing-timer advance. Called once per mu_server_poll with
    the current monotonic tick. Samples due MonitoredItems, fires due publishing timers,

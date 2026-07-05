@@ -67,6 +67,51 @@ opcua_statuscode_t mu_binary_read_nodeid(mu_binary_reader_t *reader, mu_nodeid_t
         }
         break;
 
+    case 0x04: /* Guid */
+        value->identifier_type = MU_NODEID_GUID;
+        status = mu_binary_read_uint16(reader, &value->namespace_index);
+        if (status != MU_STATUS_GOOD) {
+            return status;
+        }
+        {
+            int i;
+            for (i = 0; i < 16; i++) {
+                status = mu_binary_read_byte(reader, &value->identifier.guid[i]);
+                if (status != MU_STATUS_GOOD) {
+                    return status;
+                }
+            }
+        }
+        break;
+
+    case 0x05: /* Opaque */
+        value->identifier_type = MU_NODEID_OPAQUE;
+        status = mu_binary_read_uint16(reader, &value->namespace_index);
+        if (status != MU_STATUS_GOOD) {
+            return status;
+        }
+        {
+            opcua_int32_t opaque_len;
+            status = mu_binary_read_int32(reader, &opaque_len);
+            if (status != MU_STATUS_GOOD) {
+                return status;
+            }
+            if (opaque_len < 0 || opaque_len > 16) {
+                return MU_STATUS_BAD_DECODINGERROR;
+            }
+            value->identifier.opaque.length = (opcua_uint16_t)opaque_len;
+            if (opaque_len > 0) {
+                int i;
+                for (i = 0; i < opaque_len; i++) {
+                    status = mu_binary_read_byte(reader, &value->identifier.opaque.data[i]);
+                    if (status != MU_STATUS_GOOD) {
+                        return status;
+                    }
+                }
+            }
+        }
+        break;
+
     default:
         return MU_STATUS_BAD_DECODINGERROR;
     }
@@ -124,6 +169,50 @@ opcua_statuscode_t mu_binary_write_nodeid(mu_binary_writer_t *writer, const mu_n
             return status;
         }
         return mu_binary_write_string(writer, &value->identifier.string);
+
+    case MU_NODEID_GUID:
+        status = mu_binary_write_byte(writer, 0x04); /* Guid mask */
+        if (status != MU_STATUS_GOOD) {
+            return status;
+        }
+        status = mu_binary_write_uint16(writer, value->namespace_index);
+        if (status != MU_STATUS_GOOD) {
+            return status;
+        }
+        {
+            int i;
+            for (i = 0; i < 16; i++) {
+                status = mu_binary_write_byte(writer, value->identifier.guid[i]);
+                if (status != MU_STATUS_GOOD) {
+                    return status;
+                }
+            }
+        }
+        return MU_STATUS_GOOD;
+
+    case MU_NODEID_OPAQUE:
+        status = mu_binary_write_byte(writer, 0x05); /* Opaque mask */
+        if (status != MU_STATUS_GOOD) {
+            return status;
+        }
+        status = mu_binary_write_uint16(writer, value->namespace_index);
+        if (status != MU_STATUS_GOOD) {
+            return status;
+        }
+        status = mu_binary_write_int32(writer, (opcua_int32_t)value->identifier.opaque.length);
+        if (status != MU_STATUS_GOOD) {
+            return status;
+        }
+        {
+            int i;
+            for (i = 0; i < value->identifier.opaque.length; i++) {
+                status = mu_binary_write_byte(writer, value->identifier.opaque.data[i]);
+                if (status != MU_STATUS_GOOD) {
+                    return status;
+                }
+            }
+        }
+        return MU_STATUS_GOOD;
 
     default:
         return MU_STATUS_BAD_ENCODINGERROR;

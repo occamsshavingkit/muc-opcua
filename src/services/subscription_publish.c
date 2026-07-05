@@ -12,6 +12,8 @@
 
 #define MU_PUBLISH_BODY_BYTES 512u
 #define MU_ID_DATACHANGENOTIFICATION_ENCODING_DEFAULTBINARY 811u
+/* StatusChangeNotification_Encoding_DefaultBinary (OPC-10000-4 §7.25.4 Table 163). */
+#define MU_ID_STATUSCHANGENOTIFICATION_ENCODING_DEFAULTBINARY 813u
 
 #if MUC_OPCUA_SUBSCRIPTIONS_STANDARD
 #define MU_STATUSCODE_INFOTYPE_DATAVALUE_OVERFLOW 0x00000480u
@@ -104,6 +106,28 @@ static void revise_subscription_counts(opcua_uint32_t requested_lifetime_count,
     *revised_max_keep_alive_count = revised_keep_alive;
 }
 
+size_t mu_subscriptions_count_for_session(const mu_subscriptions_t *subs, opcua_uint32_t session_id) {
+    size_t count = 0u;
+    for (size_t i = 0u; i < MU_MAX_SUBSCRIPTIONS; ++i) {
+        const mu_subscription_t *sub = &subs->subscriptions[i];
+        if (sub->in_use && sub->session_id == session_id) {
+            ++count;
+        }
+    }
+    return count;
+}
+
+void mu_publish_request_queue_clear(mu_subscriptions_t *subs, opcua_uint32_t session_id) {
+    if (subs == NULL) {
+        return;
+    }
+    for (size_t i = 0u; i < MU_MAX_PUBLISH_REQUESTS; ++i) {
+        if (subs->publish_queue[i].in_use && subs->publish_queue[i].session_id == session_id) {
+            (void)memset(&subs->publish_queue[i], 0, sizeof(subs->publish_queue[i]));
+        }
+    }
+}
+
 static bool publish_request_dequeue(mu_subscriptions_t *subs, opcua_uint32_t session_id,
                                     mu_publish_request_t *out_request) {
     bool found = false;
@@ -133,6 +157,35 @@ static bool publish_request_dequeue(mu_subscriptions_t *subs, opcua_uint32_t ses
     *out_request = subs->publish_queue[best];
     (void)memset(&subs->publish_queue[best], 0, sizeof(subs->publish_queue[best]));
     return true;
+}
+
+/* OPC-10000-4 §5.14.1.4 / §7.32: before processing a parked Publish response the
+   Server shall validate the request is still within its timeoutHint. If the client-
+   side timeout has elapsed, emit a Bad_Timeout fault instead of a Publish response and
+   return false so the caller skips normal processing. A timeoutHint of 0 means the
+   client did not specify a timeout and the request is always considered valid. */
+static bool publish_request_dequeue_valid(struct mu_server *server, opcua_uint32_t session_id,
+                                          opcua_uint64_t now_ms, mu_publish_request_t *out_request) {
+    if (!publish_request_dequeue(&server->subs, session_id, out_request)) {
+        return false;
+    }
+
+    if (out_request->timeout_hint == 0u || now_ms < out_request->enqueued_ms) {
+        return true;
+    }
+
+    if ((now_ms - out_request->enqueued_ms) <= (opcua_uint64_t)out_request->timeout_hint) {
+        return true;
+    }
+
+    opcua_byte_t fault_buf[MU_PUBLISH_BODY_BYTES];
+    size_t fault_length = sizeof(fault_buf);
+    opcua_statuscode_t s =
+        mu_write_service_fault(fault_buf, &fault_length, out_request->request_handle, MU_STATUS_BAD_TIMEOUT);
+    if (s == MU_STATUS_GOOD) {
+        (void)mu_server_emit_message(server, out_request->request_id, fault_buf, fault_length);
+    }
+    return false;
 }
 
 static opcua_statuscode_t write_publish_response_prefix(mu_binary_writer_t *w, opcua_uint32_t request_handle) {
@@ -565,6 +618,45 @@ static opcua_statuscode_t write_data_change_notification(mu_binary_writer_t *w, 
     return MU_STATUS_GOOD;
 }
 
+/* Encode a StatusChangeNotification as a NotificationData ExtensionObject
+ * (OPC-10000-4 §7.25.4 Table 163). The body carries a StatusCode and an
+ * empty DiagnosticInfo. Issued when a Subscription is closed (e.g. lifetime
+ * expiry carries Bad_Timeout per §5.14.1.4). */
+static opcua_statuscode_t write_status_change_notification(mu_binary_writer_t *w, opcua_statuscode_t status) {
+    mu_nodeid_t type_id = {0, MU_NODEID_NUMERIC, {MU_ID_STATUSCHANGENOTIFICATION_ENCODING_DEFAULTBINARY}};
+    opcua_statuscode_t s = mu_binary_write_nodeid(w, &type_id);
+    if (s != MU_STATUS_GOOD) {
+        return s;
+    }
+    s = mu_binary_write_byte(w, 1u);
+    if (s != MU_STATUS_GOOD) {
+        return s;
+    }
+
+    size_t length_pos = w->position;
+    s = mu_binary_write_int32(w, 0);
+    if (s != MU_STATUS_GOOD) {
+        return s;
+    }
+    size_t body_start = w->position;
+
+    s = mu_binary_write_statuscode(w, status);
+    if (s != MU_STATUS_GOOD) {
+        return s;
+    }
+    s = mu_binary_write_byte(w, 0u);
+    if (s != MU_STATUS_GOOD) {
+        return s;
+    }
+
+    size_t body_length = w->position - body_start;
+    if (body_length > (size_t)0x7FFFFFFF) {
+        return MU_STATUS_BAD_RESPONSETOOLARGE;
+    }
+    backpatch_int32(w->buffer, length_pos, (opcua_int32_t)body_length);
+    return MU_STATUS_GOOD;
+}
+
 #ifdef MUC_OPCUA_EVENTS
 static opcua_statuscode_t write_event_notification_list(mu_binary_writer_t *w, struct mu_server *server,
                                                         const mu_subscription_t *sub) {
@@ -689,9 +781,9 @@ opcua_statuscode_t mu_server_trigger_event(mu_server_t *server, const mu_event_n
 static opcua_statuscode_t build_publish_response(struct mu_server *server, const mu_subscription_t *sub,
                                                  const mu_publish_request_t *request, opcua_uint32_t sequence_number,
                                                  bool include_data, opcua_int32_t report_count,
-                                                 opcua_datetime_t publish_time, opcua_byte_t *buffer,
-                                                 size_t buffer_size, size_t *out_length, size_t *out_message_start,
-                                                 size_t *out_message_end) {
+                                                 opcua_statuscode_t status_change, opcua_datetime_t publish_time,
+                                                 opcua_byte_t *buffer, size_t buffer_size, size_t *out_length,
+                                                 size_t *out_message_start, size_t *out_message_end) {
     mu_binary_writer_t w;
     mu_binary_writer_init(&w, buffer, buffer_size);
     if (out_message_start != NULL) {
@@ -734,7 +826,9 @@ static opcua_statuscode_t build_publish_response(struct mu_server *server, const
     }
 
     opcua_int32_t notification_data_count = 0;
-    if (include_data) {
+    if (status_change != MU_STATUS_GOOD) {
+        notification_data_count++;
+    } else if (include_data) {
         if (report_count > 0) {
             notification_data_count++;
         }
@@ -749,7 +843,12 @@ static opcua_statuscode_t build_publish_response(struct mu_server *server, const
         return s;
     }
 
-    if (include_data) {
+    if (status_change != MU_STATUS_GOOD) {
+        s = write_status_change_notification(&w, status_change);
+        if (s != MU_STATUS_GOOD) {
+            return s;
+        }
+    } else if (include_data) {
         if (report_count > 0) {
             s = write_data_change_notification(&w, server, sub, report_count);
             if (s != MU_STATUS_GOOD) {
@@ -863,6 +962,44 @@ void advance_publish_timer(mu_subscription_t *sub, opcua_uint64_t now_ms) {
     } while ((sub->next_publish_ms <= now_ms) && (safety < 100u));
 }
 
+/* Issue a StatusChangeNotification (OPC-10000-4 §5.14.1.4 IssueStatusChangeNotification)
+ * by answering a parked Publish request for the subscription's session before the
+ * subscription is torn down. If no Publish request is queued, the notification cannot be
+ * delivered immediately and is dropped — the client will discover the closure on its next
+ * access to the subscription id. `status` is the StatusCode carried in the notification
+ * (Bad_Timeout for lifetime expiry per §5.14.1.4). */
+void issue_status_change_notification(struct mu_server *server, mu_subscription_t *sub,
+                                             opcua_statuscode_t status) {
+    mu_publish_request_t request;
+    if (!publish_request_dequeue(&server->subs, sub->session_id, &request)) {
+        return;
+    }
+
+    opcua_byte_t body[MU_PUBLISH_BODY_BYTES];
+    size_t body_length = 0;
+    size_t message_start = 0;
+    size_t message_end = 0;
+    opcua_uint32_t sequence_number = current_sequence_number(sub);
+    opcua_datetime_t publish_time = publish_time_now(server);
+    bool sent_response_too_large_fault = false;
+    opcua_statuscode_t s = build_publish_response(server, sub, &request, sequence_number, false, 0, status,
+                                                  publish_time, body, sizeof(body), &body_length, &message_start,
+                                                  &message_end);
+    if (s == MU_STATUS_GOOD) {
+        s = mu_server_emit_message(server, request.request_id, body, body_length);
+    }
+    if (publish_response_oversize_status(s)) {
+        s = emit_publish_response_too_large_fault(server, &request, body, sizeof(body));
+        sent_response_too_large_fault = (s == MU_STATUS_GOOD);
+    }
+    if (s == MU_STATUS_GOOD && !sent_response_too_large_fault) {
+        if (message_end >= message_start && message_end <= body_length) {
+            store_retransmit(sub, sequence_number, publish_time, body + message_start, message_end - message_start);
+        }
+        advance_sequence_number(sub);
+    }
+}
+
 static void publish_due(struct mu_server *server, opcua_uint64_t now_ms) {
     for (size_t i = 0; i < MU_MAX_SUBSCRIPTIONS; ++i) {
         mu_subscription_t *sub = &server->subs.subscriptions[i];
@@ -912,7 +1049,7 @@ static void publish_due(struct mu_server *server, opcua_uint64_t now_ms) {
 
         if (has_data) {
             mu_publish_request_t request;
-            if (publish_request_dequeue(&server->subs, sub->session_id, &request)) {
+            if (publish_request_dequeue_valid(server, sub->session_id, now_ms, &request)) {
                 opcua_byte_t body[MU_PUBLISH_BODY_BYTES];
                 size_t body_length = 0;
                 size_t message_start = 0;
@@ -920,9 +1057,10 @@ static void publish_due(struct mu_server *server, opcua_uint64_t now_ms) {
                 opcua_uint32_t sequence_number = current_sequence_number(sub);
                 opcua_datetime_t publish_time = publish_time_now(server);
                 bool sent_response_too_large_fault = false;
-                opcua_statuscode_t s =
-                    build_publish_response(server, sub, &request, sequence_number, true, report_count, publish_time,
-                                           body, sizeof(body), &body_length, &message_start, &message_end);
+                    opcua_statuscode_t s =
+                        build_publish_response(server, sub, &request, sequence_number, true, report_count,
+                                               MU_STATUS_GOOD, publish_time,
+                                               body, sizeof(body), &body_length, &message_start, &message_end);
                 if (s == MU_STATUS_GOOD) {
                     s = mu_server_emit_message(server, request.request_id, body, body_length);
                 }
@@ -944,7 +1082,10 @@ static void publish_due(struct mu_server *server, opcua_uint64_t now_ms) {
                         mutable_sub->event_queue.count = 0;
                     }
 #endif
+                    /* DequeuePublishReq() calls ResetLifetimeCounter() per
+                     * OPC-10000-4 §5.14.1.4 Table 81. */
                     sub->keep_alive_counter = 0u;
+                    sub->lifetime_counter = 0u;
                     if (message_end >= message_start && message_end <= body_length) {
                         store_retransmit(sub, sequence_number, publish_time, body + message_start,
                                          message_end - message_start);
@@ -959,14 +1100,15 @@ static void publish_due(struct mu_server *server, opcua_uint64_t now_ms) {
             ++sub->keep_alive_counter;
             if (sub->keep_alive_counter >= sub->max_keep_alive_count) {
                 mu_publish_request_t request;
-                if (publish_request_dequeue(&server->subs, sub->session_id, &request)) {
+                if (publish_request_dequeue_valid(server, sub->session_id, now_ms, &request)) {
                     opcua_byte_t body[MU_PUBLISH_BODY_BYTES];
                     size_t body_length = 0;
                     opcua_uint32_t sequence_number = current_sequence_number(sub);
                     opcua_datetime_t publish_time = publish_time_now(server);
                     bool sent_response_too_large_fault = false;
                     opcua_statuscode_t s =
-                        build_publish_response(server, sub, &request, sequence_number, false, 0, publish_time, body,
+                        build_publish_response(server, sub, &request, sequence_number, false, 0, MU_STATUS_GOOD,
+                                               publish_time, body,
                                                sizeof(body), &body_length, NULL, NULL);
                     if (s == MU_STATUS_GOOD) {
                         s = mu_server_emit_message(server, request.request_id, body, body_length);
@@ -977,12 +1119,21 @@ static void publish_due(struct mu_server *server, opcua_uint64_t now_ms) {
                     }
                     if (s == MU_STATUS_GOOD && !sent_response_too_large_fault) {
                         sub->keep_alive_counter = 0u;
+                        sub->lifetime_counter = 0u;
                     }
                 }
             }
         }
 
         advance_publish_timer(sub, now_ms);
+        ++sub->lifetime_counter;
+        if (sub->lifetime_counter >= sub->lifetime_count) {
+            /* OPC-10000-4 §5.14.1.4: on lifetime expiry the Server shall issue a
+             * StatusChangeNotification with Bad_Timeout before deleting the
+             * Subscription (§5.14.1.1). */
+            issue_status_change_notification(server, sub, MU_STATUS_BAD_TIMEOUT);
+            mu_subscription_delete(&server->subs, sub->session_id, sub->subscription_id);
+        }
 
 #ifdef MUC_OPCUA_MULTIPLE_CONNECTIONS
         server->active_conn = NULL;

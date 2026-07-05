@@ -26,6 +26,11 @@ typedef struct {
     union {
         opcua_uint32_t numeric;
         mu_string_t string;
+        opcua_byte_t guid[16];
+        struct {
+            opcua_byte_t data[16];
+            opcua_uint16_t length;
+        } opaque;
     } identifier;
 } mu_nodeid_t;
 

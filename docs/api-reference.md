@@ -603,7 +603,7 @@ typedef opcua_statuscode_t (*mu_user_auth_handler_t)(void *handle,
 typedef opcua_statuscode_t (*mu_write_handler_t)(void *handle,
                                                  const mu_nodeid_t *node_id,
                                                  opcua_uint32_t attribute_id,
-                                                 const mu_variant_t *value);
+                                                 const mu_datavalue_t *value);
 ```
 
 ### 5.2.2 Optional Server Extension APIs

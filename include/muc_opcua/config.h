@@ -175,6 +175,15 @@
 #define MU_SERVER_STORAGE_BASE_BYTES 1024
 #endif
 
+/* Multi-chunk reassembly buffer size. OPC-10000-6 §6.7.2 */
+#ifndef MU_CHUNK_ASSEMBLY_BUFFER_SIZE
+#define MU_CHUNK_ASSEMBLY_BUFFER_SIZE 8192
+#endif
+
+/* Multi-chunk reassembly storage. Sized for the default max message plus
+   assembler bookkeeping. */
+#define MU_CHUNK_ASSEMBLY_STORAGE_BYTES (MU_CHUNK_ASSEMBLY_BUFFER_SIZE + 32)
+
 #if defined(MUC_OPCUA_SUBSCRIPTIONS) && MUC_OPCUA_SUBSCRIPTIONS_STANDARD
 /* src/services/subscription.h is the canonical definer for these capacities.
  * These fallbacks must match its defaults so caller-storage sizing is correct
@@ -250,6 +259,6 @@
     (MU_SERVER_STORAGE_BASE_BYTES + MU_SUBSCRIPTIONS_STANDARD_STORAGE_BYTES + MU_SERVER_SECURITY_STORAGE_BYTES +       \
      MU_ADDRESS_SPACE_INDEX_STORAGE_BYTES + MU_MULTIPLE_CONNECTIONS_STORAGE_BYTES + MU_EVENTS_STORAGE_BYTES +          \
      MU_PUBSUB_STORAGE_BYTES + MU_NODEMANAGEMENT_STORAGE_BYTES + MU_QUERY_STORAGE_BYTES +                              \
-     MU_ALARMS_CONDITIONS_STORAGE_BYTES)
+     MU_ALARMS_CONDITIONS_STORAGE_BYTES + MU_CHUNK_ASSEMBLY_STORAGE_BYTES)
 
 #endif /* MUC_OPCUA_CONFIG_H */
