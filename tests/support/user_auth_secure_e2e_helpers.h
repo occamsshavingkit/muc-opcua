@@ -158,7 +158,10 @@ static void unwrap_opn_response(secure_fixture_t *fixture, decoded_response_t *r
                                                            fixture->mock.last_write_len, opn_body, sizeof(opn_body),
                                                            &opn_body_len, scratch, sizeof(scratch), &info));
     TEST_ASSERT_EQUAL(MU_SECURITY_POLICY_BASIC256SHA256_ID, info.policy);
-    parse_decoded_response(opn_body, opn_body_len, response);
+    /* Copy into the fixture RX buffer so decoded pointers survive unwrap_opn_response return. */
+    TEST_ASSERT_TRUE(opn_body_len <= sizeof(fixture->rx));
+    memcpy(fixture->rx, opn_body, opn_body_len);
+    parse_decoded_response(fixture->rx, opn_body_len, response);
 }
 
 static void secure_call(secure_fixture_t *fixture, const opcua_byte_t *body, size_t body_len,
