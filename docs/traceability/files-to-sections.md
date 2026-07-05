@@ -21,6 +21,7 @@ This document maps implementation and test files back to OPC UA normative sectio
 | `src/core/dispatch_subscription.c` | Subscription Dispatch | OPC-10000-4 | 5.14.2, 5.14.3, 5.14.4, 5.14.5, 5.14.6, 5.14.8 | CreateSubscription, ModifySubscription, SetPublishingMode, Publish, Republish, and DeleteSubscriptions handlers extracted from service_dispatch.c |
 | `src/core/dispatch_node_mgmt.c` | NodeManagement Dispatch | OPC-10000-4 | 5.8.2, 5.8.3, 5.8.4, 5.8.5 | AddNodes, AddReferences, DeleteNodes, and DeleteReferences handlers extracted from service_dispatch.c |
 | `src/core/dispatch_method.c` | Method Dispatch | OPC-10000-4 / OPC-10000-5 | 5.12.2.2 / 9.1, 9.2 | Call handler (GetMonitoredItems, ResendData) extracted from service_dispatch.c |
+| `src/core/service_context.h` | Service Context | OPC-10000-4 | — | Lightweight header for service-layer modules; incremental core↔services separation |
 | `src/core/message_chunk.c` | MessageChunk | OPC-10000-6 | 6.7.2, 7.1.2.2 | TCP message type, chunk finality, abort chunk, and MessageHeader validation |
 | `src/core/tcp_connection.c` | OPC UA TCP | OPC-10000-6 | 7.1.2.3, 7.1.2.4, 7.2 | Hello/Acknowledge parsing, endpoint URL limits, and negotiated buffer bounds |
 | `include/muc_opcua/services/node_management.h` | NodeManagement | OPC-10000-4 | 5.8.2, 5.8.3, 5.8.4, 5.8.5 | NodeManagement services interface |
@@ -245,3 +246,4 @@ This document maps implementation and test files back to OPC UA normative sectio
 | `tests/unit/test_aggregate_full.c` | Tests | OPC-10000-13 | — | Aggregate function set test |
 | `tests/unit/test_reverse_connect.c` | Tests | OPC-10000-6 | 7.5 | Reverse Connect infrastructure test |
 | `tests/unit/test_time_sync.c` | Tests | OPC-10000-4 | A.2 | Time Sync infrastructure test |
+| `tests/unit/test_service_message.c` | Tests | OPC-10000-4 / OPC-10000-6 | 5.5.4.2, 7.38.2 / 5.2 | Service prefix parse/write round-trip test |

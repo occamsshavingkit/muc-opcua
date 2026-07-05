@@ -42,7 +42,8 @@ mu_session_t *mu_session_find_free(mu_session_t *sessions, size_t count);
    without floating-point math (valid for positive doubles). */
 opcua_statuscode_t mu_session_create(mu_session_t *session, opcua_uint64_t requested_timeout_bits,
                                      opcua_uint64_t *revised_timeout_bits, opcua_uint32_t *session_id,
-                                     opcua_uint32_t *auth_token);
+                                     opcua_uint32_t *auth_token)
+    __attribute__((deprecated("use mu_session_create_with_identifiers instead")));
 
 opcua_statuscode_t mu_session_generate_session_id(const mu_session_t *sessions, size_t count,
                                                   const mu_entropy_adapter_t *entropy, opcua_uint32_t *session_id);
@@ -74,9 +75,9 @@ opcua_statuscode_t mu_session_close(mu_session_t *session, opcua_uint32_t auth_t
    itself is closing the idle Session. As with CloseSession, the state is set to
    CLOSED and the serverNonce is zeroed, while the session_id and auth_token are
    preserved so subsequent requests on the stale token return Bad_SessionClosed.
-   When MUC_OPCUA_MULTI_CHUNK is off (nano profile), session timeout is not
+   When MUC_OPCUA_SESSION_TIMEOUT is off, session timeout is not
    tracked; the inline no-op satisfies callers that are compiled out. */
-#ifdef MUC_OPCUA_MULTI_CHUNK
+#if defined(MUC_OPCUA_SESSION_TIMEOUT)
 void mu_session_close_timeout(mu_session_t *session);
 #else
 static inline void mu_session_close_timeout(mu_session_t *session) {

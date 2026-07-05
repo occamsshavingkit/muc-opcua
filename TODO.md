@@ -1,43 +1,82 @@
 # TODO — muc-opcua
 
-**Updated**: 2026-07-04
-**Source**: `docs/review/five-lens-audit-2026-07-04.md`, interop findings, code review
+**Updated**: 2026-07-05 (spec 038 implementation)
+**Source**: stale audit findings, interop gaps, hot-path audit, comp review
 
-## Remaining Backlog
+## Remaining Active Backlog
 
-### Deferred audit findings
+### Bugs (verified ACTIVE 2026-07-05)
 
-| File | Finding | Notes |
-|------|---------|-------|
-| `src/services/secure_channel.c` | T17 | Channel ID entropy. Fix 3 integration tests first (they assume channel_id=1). |
-| `src/services/browse.c` | T22 | TypeDefinition cache. Requires adding field to `mu_node_t` struct. |
-| `src/core/tcp_connection.c` | T006 follow-up | Lines 20 and 129 hardcode the OPC UA TCP protocol version (`0`/`0u`) instead of using `MU_OPC_UA_TCP_PROTOCOL_VERSION` from `include/muc_opcua/transport.h`. Same constant as T006 but in the HEL/ACK exchange rather than the OPN response, so out of T006's scope. |
-| `specs/035-spec-compliance-fixes` | T007 grounding invalid | T007 requested CreateSession ServerUri/EndpointUrl validation returning Bad_ServerUriInvalid, citing "OPC-10000-4 §5.7.2.3". The **current** spec says the opposite: §5.7.2.2 Table 15 states serverUri "is no longer used ... the Server shall ignore any value provided" and endpointUrl is "diagnostics" only (never reject). Strict validation broke 12 tests that correctly send null serverUri. The canonical `MU_STATUS_BAD_SERVERURIINVALID` (0x804F0000, per OPC Foundation Opc.Ua.StatusCodes.csv) was added to `status.h`/`status.c` — it applies to FindServers/RegisterServer (§5.5.5.3), not CreateSession. Revisit if a future FindServers/RegisterServer implementation needs it; do NOT add CreateSession validation. |
-| `src/core/service_dispatch.c` | T009 I8 audit misattribution | Audit finding I8 claimed CreateSubscription mishandles sampling interval=-1. CreateSubscription has a **publishing** interval, not a sampling interval, and per OPC-10000-4 §5.14.2.2/§5.14.3.2 "If the requested value is 0 or negative, the Server shall revise with the fastest supported publishing interval" — i.e. the minimum (50 ms). The current `publishing_interval_bits_to_ms` behavior is already spec-compliant, so I8 was not changed. Only I11 (CreateMonitoredItems §7.21) was a real bug and was fixed in T009. |
-| `src/core/service_dispatch.c` | ModifyMonitoredItems sampling interval=-1 | Same §7.21 bug as I11 but in `handle_modify_monitored_items` (~line 1656, `revised_sampling_interval_ms = publishing_interval_bits_to_ms(sampling_interval_bits)`). When a ModifyMonitoredItems request sends -1, it currently resolves to the 50 ms minimum instead of the owning Subscription's `publishing_interval_ms`. Out of T009's explicit scope (which named only CreateSubscription/CreateMonitoredItems); fix alongside T012/T013 which already touch ModifyMonitoredItems. |
-| `src/core/service_dispatch.c` | ModifyMonitoredItems timestampsToReturn ignored | `handle_modify_monitored_items` (~line 1548) decodes `timestamps_to_return` then `(void)`s it, so a modify request can neither validate (`Bad_TimestampsToReturnInvalid`) nor update the per-item setting that Publish relies on. Symmetric with the CreateMonitoredItems fix done in T010; fix alongside T012/T013 which already touch ModifyMonitoredItems. |
-| `tests/unit/test_address_space_dynamic.c` | Pre-existing test failure: `test_Browse_DynamicReferences` | Discovered while running the full suite after T016. The test (line 214) expects `MU_STATUS_GOOD` from `mu_browse_process_with_user_index` but gets `MU_STATUS_BAD_VIEWIDUNKNOWN` (0x80390000). Reproduces without any of T016's changes (the read/timestamp code path). Browse/dynamic-view issue — unrelated to Read timestamps. Fix before T023/T024 can be marked complete. |
-| `tests/` (7 tests) | Pre-existing failures blocking T023/T024 | Discovered while running the full suite after T022. `test_service_state_errors`, `test_server_handshake`, `test_response_regression`, `test_user_auth_encrypted`, `test_user_auth_certificate`, `test_write_service_integration`, and `test_event_notifications` all fail with the accumulated working-tree changes from prior tasks (T003-T020) but pass at the clean branch HEAD. Reproduced with T022's variant changes reverted, so NOT caused by T022. `test_response_regression` shows response-byte drift (e.g. Expected 0x4D Was 0x4F) — golden masters need regenerating after the response-encoding changes in T016/T010. Investigate and fix before T023/T024. |
-| `src/core/server.c`, `src/core/service_dispatch.c`, `src/services/session.h` | T001 (spec 036) session-timeout SEGFAULT under ctest | T001 added session-timeout reaping in `mu_server_poll_background` and a `last_activity_ms` refresh in `mu_service_dispatch`. The reaper keys off the **monotonic** time adapter, so under ctest (which adds ~1 s of startup overhead before the first `mu_server_poll`) tests that create a session and call `mu_server_poll` later see `now_ms - last_activity_ms > revised_session_timeout_ms` and the session is force-closed mid-test, SEGFAULT-ing `test_session`, `test_dispatch_services`, `test_dispatch_session_order`, `test_service_dispatch`, `test_method_call_errors`, `test_connection_multiplex` in the default build (and the same class of tests in `build/test-micro`, `build/test-embedded`). Tests pass when the binary is run directly (no ctest overhead) and pass when T001's working-tree diff is reverted. NOT caused by T007 (SetMonitoringMode immediate-sample), which only touches `set_monitoring_mode_result`. Fix: either initialise `last_activity_ms` at session creation from the same adapter, or use the mock/zero-tick guard consistently in tests, or cap the reaper so it never fires inside the test's first poll window. |
-| `src/services/subscription_publish.c` | T002 (spec 036) breaks `test_advance_publish_timer_terminates_within_bound_when_interval_is_zero` | T002 increments `sub->lifetime_counter` every `publish_due` cycle and deletes the subscription when `lifetime_counter >= lifetime_count`. In `tests/unit/test_subscription_publish.c:60` the zero-interval subscription is reaped before the assertion can read `next_publish_ms` (expected ≤100, observed 1001 because the slot was recycled/reset). Reproduces in `build/test-micro` and `build/test-embedded`. Fix: in the test, either set a large `lifetime_count`, or guard the reaper so a publish that sends a response resets the lifetime counter (T002 already resets on send — the bug is the unconditional `++lifetime_counter` on every `advance_publish_timer`). |
+| File | Finding |
+|------|---------|
+| `src/core/tcp_connection.c` | Hardcoded protocol version (`0`/`0u`) instead of `MU_OPC_UA_TCP_PROTOCOL_VERSION` |
+| `src/core/service_dispatch.c` | ModifyMonitoredItems sampling interval=-1 resolves to 50ms instead of sub's publishing_interval_ms |
+| `src/core/service_dispatch.c` | ModifyMonitoredItems timestampsToReturn decoded then `(void)`ed — not validated or applied |
 
-### Tech debt
+### Hot-Path (from 2026-07-05 audit)
 
-- `src/core/service_dispatch.c` (being split in spec 032) — extract per-service dispatch into modules
-- `src/services/subscription.c` (split completed in spec 032) — verify module boundaries
+| ID | File | Severity | Issue |
+|----|------|----------|-------|
+| HP1 | `src/encoding/binary_variant.c` | HIGH | `calloc()` variant array leak — no `free()` in callers |
+| HP2 | `src/services/read.c` | HIGH | Read cache disabled (always misses) |
+| HP3 | `src/core/server.c`, `dispatch.c` | HIGH | Multiple redundant `get_tick_ms()` calls per poll |
+| HP4 | `src/core/service_dispatch.c` | MEDIUM | Auth token extraction re-parses full NodeId |
+| HP5 | `src/encoding/binary_reader.c` | MEDIUM | Per-primitive `ensure_bytes()` bounds checks |
+| HP6 | `src/encoding/binary_writer.c` | MEDIUM | Per-primitive `ensure_space()` bounds checks |
+| HP7 | `src/services/read.c` | MEDIUM | Full DataValue zero-init per result |
+| HP8 | `src/core/server.c` | MEDIUM | `memmove()` of unconsumed recv buffer |
+| HP9 | `src/core/server.c` | MEDIUM | Session timeout scans all slots |
+| HP10 | `src/core/dispatch_attribute.c` | MEDIUM | Write type-check reads current value |
+| HP11 | `src/address_space/address_space.c` | LOW | O(N^2) duplicate check at startup |
+| HP12 | `server.c`, `message_chunk.c` | LOW | MessageSize parsed twice |
+| HP13 | `src/core/server.c` | LOW | `listen()` inside `mu_server_init()` |
 
-### Interop Test Hardening (HIGH)
+### Comprehensive Review (from 2026-07-05)
 
-**Problem discovered 2026-07-04**: WriteResponse was missing the mandatory `diagnosticInfos[]` field (OPC-10000-4 §5.11.4.2, OPC-10000-6 §5.2.5). Neither interop smoke tests nor unit tests caught this — open62541 client was the detector.
+| ID | Severity | Issue |
+|----|----------|-------|
+| CQ6 | MEDIUM | `__builtin_ctz()` used 9x with no portability fallback |
+| CQ7 | MEDIUM | Three duplicate LE uint32 write helpers |
+| CQ8 | MEDIUM | Three copies of message-dispatch logic in server.c |
+| AR3 | MEDIUM | `server_internal.h` unconditionally includes `subscription.h` |
+| AR4 | MEDIUM | `handle_history_update` always returns GOOD |
+| SE1 | MEDIUM | OPN nonce length mismatch (KDF_MAX_SEED=64 but nonces up to 128) |
+| SE2 | MEDIUM | Password decrypt buffer undersized for 4096-bit RSA |
+| SE3 | MEDIUM | Non-constant-time trust list `memcmp()` |
+| SE4 | MEDIUM | `read_event_filter_body` no cap on select_count |
+| UB3 | MEDIUM | Strict aliasing violation in binary_string.c |
+| UB4 | MEDIUM | C11 requirement not documented |
+| UB5 | MEDIUM | int32_t ← uint32_t cast impl-defined |
+| UB6 | MEDIUM | `mu_binary_write_expanded_nodeid` drops NamespaceUri/ServerIndex flags |
+| UB7 | MEDIUM | `calloc` pulls in heap allocator on embedded |
+| TQ7 | MEDIUM | 6 placeholder-only tests provide false confidence |
+| TQ8 | MEDIUM | Circular verification in response encoding tests |
+| TQ9 | MEDIUM | No dispatch_subscription.c unit tests in isolation |
+| D2 | MEDIUM | Zero spec grounding in binary_nodeid.c, binary_datavalue.c, uasc.c |
+| D3 | MEDIUM | Zero spec grounding in public API headers (encoding.h, server.h) |
+| D4 | MEDIUM | Sparse ADRs (only 2 for 37 specs) |
 
-**Root causes identified**:
-1. `tests/interop/interop_smoke.py` has **zero write tests** — no Write request is ever sent to the server
-2. `tests/unit/test_write_decoder.c` validates `results[]` encoding but **never reads diagnosticInfos** — incomplete wire-level test
-3. No test verifies a full WriteResponse binary round-trip against a known-good fixture
+### Interop Test Hardening
 
-**Required**:
-- [ ] Audit all interop tests: verify each service (Read, Write, Browse, Subscribe, Publish, Call, CreateSession, ActivateSession) has at least one wire-level round-trip test against a real client
-- [ ] Audit all `*_encode` unit tests: verify each reads every mandatory field in the encoded response, including null/empty arrays
-- [ ] Add write interop test: issue Write via asyncua/opcua-asyncio, verify server responds with well-formed WriteResponse
-- [ ] Generate binary fixture for WriteResponse and add round-trip encode/decode test
-- [ ] No silent failures: every test that reads a binary response must verify `reader->position == expected_length` at the end to catch trailing/missing fields
+- [ ] Audit all interop tests for per-service coverage
+- [ ] Audit all `*_encode` unit tests for mandatory field verification
+- [ ] Generate binary fixture for WriteResponse and add round-trip test
+- [ ] Verify `reader->position == expected_length` in all response decode tests
+- [ ] Add interop tests for Subscribe/Publish and Call service sets
+
+### Documentation
+
+- [ ] Add ADRs for: zero-heap design, adapter pattern, profile tier system, poll model
+- [ ] Add spec grounding comments to `binary_nodeid.c`, `binary_datavalue.c`, `uasc.c`, `encoding.h`, `server.h`
+
+## ✅ Completed in Spec 038
+
+- CI/CD: removed `|| true` from 5 silent-failure steps, wired sanitizers, added coverage+fuzz jobs, added `standard` to matrix, set Debug build type
+- Clang-tidy: added `--warnings-as-errors=*`
+- Session timeout: gated on `MUC_OPCUA_SESSION_TIMEOUT` instead of `MUC_OPCUA_MULTI_CHUNK`
+- `mu_session_create` deprecated in favor of `mu_session_create_with_identifiers`
+- `mu_checked_memcpy_off` integer underflow guard (UB1)
+- `mu_binary_read_expanded_nodeid` null-buffer guard (UB2)
+- `handle_activate_session` decomposed into per-token helpers
+- `mu_server_poll` common logic extracted from duplicated branches
+- Version tracking: CHANGELOG.md + version.h.in

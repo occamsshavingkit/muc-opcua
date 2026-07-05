@@ -145,6 +145,10 @@ if(MUC_OPCUA_MULTI_CHUNK)
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_MULTI_CHUNK=1)
 endif()
 
+if(MUC_OPCUA_SESSION_TIMEOUT)
+    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_SESSION_TIMEOUT=1)
+endif()
+
 if(MUC_OPCUA_EXTENDED_NODEIDS)
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_EXTENDED_NODEIDS=1)
 endif()

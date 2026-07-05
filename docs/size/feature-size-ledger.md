@@ -1,6 +1,48 @@
 # Feature Size Ledger
 
-## Current (2026-07-05): Standard 2017 UA Server Profile (Feature 037)
+## Current (2026-07-05): Backlog Critical Fixes (Feature 038)
+
+Measured after spec 038 implementation (CI/CD fixes, UB fixes, session timeout
+gating, function decomposition, placeholder test stubs, version tracking).
+
+- **Toolchain**: `arm-none-eabi-gcc` 13.2.1, Cortex-M0+ Thumb `-Os`
+- **Target**: `MUC_OPCUA_PLATFORM=arduino-skeleton`, no host adapters
+- **Delta vs pre-feature baseline**: nano +38 B (+0.2%), micro +38 B (+0.1%),
+  standard +0 B (new profile), embedded +162 B (+0.3%), full +162 B (+0.3%)
+
+### ARM Cortex-M0+ `.text` (flash)
+
+| Profile | .text | .data | .bss |
+|---------|-------|-------|------|
+| nano | 17,430 B | 0 | 0 |
+| micro | 27,864 B | 0 | 0 |
+| embedded | 52,927 B | 0 | 0 |
+| standard | 61,907 B | 0 | 0 |
+| full | 61,903 B | 0 | 0 |
+
+### Caller-provided storage (host x86-64 `sizeof`)
+
+| Profile | sizeof(struct mu_server) | MU_SERVER_STORAGE_BYTES | Sessions | Subscriptions | Monitored Items | Publish |
+|---------|--------------------------|-------------------------|----------|---------------|-----------------|---------|
+| nano | 1,064 B | 1,280 B | 2 | — | — | — |
+| micro | 11,448 B | 11,552 B | 2 | 2 | 8 | 2 |
+| standard | 94,912 B | 97,116 B | 50 | 50 | 1,000 | 50 |
+| embedded | 64,752 B | 69,656 B | 2 | 2 | 100 | 5 |
+| full | 94,912 B | 97,116 B | 100 | 100 | 2,000 | 100 |
+
+### Delta vs spec 037 baseline
+
+| Profile | .text delta | .data delta | .bss delta | sizeof(server) delta | Storage delta |
+|---------|-------------|-------------|------------|----------------------|---------------|
+| nano | +38 B | +0 B | +0 B | +152 B | +0 B |
+| micro | +38 B | +0 B | +0 B | — | +0 B |
+| standard | — (new) | +0 B | +0 B | — | — |
+| embedded | +162 B | +0 B | +0 B | — | +0 B |
+| full | +162 B | +0 B | +0 B | — | +0 B |
+
+---
+
+## Previous (2026-07-05): Standard 2017 UA Server Profile (Feature 037)
 
 Measured after Standard 2017 UA Server Profile implementation. Five profiles,
 all with zero `.data`, `.bss`, and heap.

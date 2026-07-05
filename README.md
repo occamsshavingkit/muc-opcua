@@ -25,10 +25,10 @@ in only the surface you need.
 
 - **Zero heap.** No `malloc` anywhere in the protocol path. The application owns all
   memory: one server-storage block plus the RX/TX buffers. Footprint is deterministic.
-- **Tiny flash.** Measured snapshot (2026-07-04, reproduce with
-  `scripts/measure_size.sh all`): a complete Nano server is **16.1 KiB**
-  (16,520 B) of Arm Cortex-M0+ `-Os` core `.text`; Micro is **23.6 KiB**
-  (24,203 B); Embedded 2017 is **43.7 KiB** (44,764 B). Static `.bss` is 0 B.
+- **Tiny flash.** Measured snapshot (2026-07-05, reproduce with
+  `scripts/measure_size.sh all`): a complete Nano server is **17.0 KiB**
+  (17,430 B) of Arm Cortex-M0+ `-Os` core `.text`; Micro is **27.2 KiB**
+  (27,864 B); Standard 2017 is **60.5 KiB** (61,907 B). Static `.bss` is 0 B.
 - **Freestanding & portable.** Plain C11 core with no OS assumptions. Hardware and OS
   services are injected via small adapter structs in
   [`include/muc_opcua/platform.h`](include/muc_opcua/platform.h) — bring your own
@@ -52,11 +52,11 @@ Each profile is a CMake configuration (`make nano|micro|embedded|standard`, or
 
 | Profile | .text | OPC UA Profile |
 |---------|-------|----------------|
-| nano | 17,392 B | Nano Embedded Device 2017 |
-| micro | 27,826 B | Micro Embedded Device 2017 |
-| embedded | 52,765 B | Embedded 2017 UA Server |
-| standard | 62,958 B | Standard 2017 UA Server |
-| full | 62,950 B | — (everything on) |
+| nano | 17,430 B | Nano Embedded Device 2017 |
+| micro | 27,864 B | Micro Embedded Device 2017 |
+| embedded | 52,927 B | Embedded 2017 UA Server |
+| standard | 61,907 B | Standard 2017 UA Server |
+| full | 61,903 B | — (everything on) |
 
 **Caller-provided storage** (`MU_SERVER_STORAGE_BYTES`)
 

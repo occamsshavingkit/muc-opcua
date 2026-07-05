@@ -206,10 +206,21 @@ option(MUC_OPCUA_REVERSE_CONNECT "Build Reverse Connect Facet (server-initiated 
 option(MUC_OPCUA_TIME_SYNC "Build Security Time Synchronization (timestamp population)" OFF)
 option(MUC_OPCUA_NAMESPACES "Build Namespaces metadata node per OPC-10000-5 6.2.10" OFF)
 option(MUC_OPCUA_STANDARD_PROFILE "Apply Standard 2017 profile gates and capacity minima" OFF)
+option(MUC_OPCUA_SESSION_TIMEOUT "Enable session timeout enforcement" OFF)
 set(MUC_OPCUA_SANITIZERS "" CACHE STRING "Comma-separated list of sanitizers (e.g. address,undefined)")
+if(MUC_OPCUA_SANITIZERS)
+    string(REPLACE "," " " SAN_FLAGS "${MUC_OPCUA_SANITIZERS}")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fsanitize=${SAN_FLAGS}")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fsanitize=${SAN_FLAGS}")
+endif()
 set(MUC_OPCUA_PLATFORM "host" CACHE STRING "Target platform (host, external, pico, arduino-skeleton)")
 
 if(MUC_OPCUA_STANDARD_PROFILE)
+    if(DEFINED MUC_OPCUA_PROFILE AND NOT MUC_OPCUA_PROFILE STREQUAL "")
+        if(NOT MUC_OPCUA_PROFILE STREQUAL "standard" AND NOT MUC_OPCUA_PROFILE STREQUAL "full")
+            message(FATAL_ERROR "MUC_OPCUA_STANDARD_PROFILE requires MUC_OPCUA_PROFILE=standard or full, not '${MUC_OPCUA_PROFILE}'")
+        endif()
+    endif()
     set(MUC_OPCUA_SECURITY ON CACHE BOOL "" FORCE)
     set(MUC_OPCUA_SUBSCRIPTIONS ON CACHE BOOL "" FORCE)
     set(MUC_OPCUA_SUBSCRIPTIONS_STANDARD ON CACHE BOOL "" FORCE)
@@ -261,6 +272,10 @@ if(MUC_OPCUA_EMBEDDED_PROFILE)
     if(NOT DEFINED MU_MAX_TRIGGER_LINKS)
         set(MU_MAX_TRIGGER_LINKS 4 CACHE STRING "Embedded profile triggering link capacity")
     endif()
+endif()
+
+if(MUC_OPCUA_MULTI_CHUNK OR MUC_OPCUA_MULTIPLE_CONNECTIONS)
+    set(MUC_OPCUA_SESSION_TIMEOUT ON CACHE BOOL "Enable session timeout enforcement" FORCE)
 endif()
 
 # The Pico SDK installs its cross-compilation toolchain, so it must be imported
@@ -327,3 +342,14 @@ endif()
 if(MUC_OPCUA_PLATFORM STREQUAL "pico")
     add_subdirectory(platform/pico)
 endif()
+
+# Generate version.h from template (T027-T028)
+set(MUC_OPCUA_VERSION_MAJOR ${PROJECT_VERSION_MAJOR})
+set(MUC_OPCUA_VERSION_MINOR ${PROJECT_VERSION_MINOR})
+set(MUC_OPCUA_VERSION_PATCH ${PROJECT_VERSION_PATCH})
+configure_file(
+    ${CMAKE_SOURCE_DIR}/include/muc_opcua/version.h.in
+    ${CMAKE_BINARY_DIR}/include/muc_opcua/version.h
+    @ONLY
+)
+target_include_directories(muc_opcua PUBLIC ${CMAKE_BINARY_DIR}/include)

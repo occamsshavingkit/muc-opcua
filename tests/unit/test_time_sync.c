@@ -5,6 +5,8 @@
  */
 #include "unity.h"
 
+#pragma message "STUB: behavioral tests needed for timestamp population (OPC-10000-4 §A.2) when MUC_OPCUA_TIME_SYNC is enabled"
+
 void setUp(void) {}
 void tearDown(void) {}
 

@@ -1352,117 +1352,149 @@ static opcua_statuscode_t delete_monitored_item_result(mu_server_t *server, opcu
    (set_publishing_mode_result, delete_subscription_result) moved to
    dispatch_subscription.c (T012). Extern prototypes in server_internal.h. */
 
+static opcua_statuscode_t write_create_monitored_items_prefix(mu_binary_writer_t *w, opcua_uint32_t request_handle,
+                                                               opcua_int32_t items_to_create) {
+    opcua_statuscode_t s = write_response_prefix(w, MU_ID_CREATEMONITOREDITEMSRESPONSE, request_handle, MU_STATUS_GOOD);
+    if (s != MU_STATUS_GOOD) return s;
+    return mu_binary_write_int32(w, items_to_create);
+}
+
+#if MUC_OPCUA_SUBSCRIPTIONS_STANDARD
+static opcua_statuscode_t validate_create_item_filter(const mu_monitored_item_create_body_t *body,
+                                                       const mu_node_t *node) {
+    if (body->filter_result != MU_STATUS_GOOD) return body->filter_result;
+    if (body->has_datachange_filter && body->attribute_id != MU_MONITORED_VALUE_ATTRIBUTE_ID)
+        return MU_STATUS_BAD_FILTERNOTALLOWED;
+    if (body->deadband_type == MU_DEADBAND_TYPE_ABSOLUTE && !monitored_node_has_numeric_static_value(node))
+        return MU_STATUS_BAD_MONITOREDITEMFILTERUNSUPPORTED;
+    if (body->has_aggregate && !monitored_node_has_numeric_static_value(node))
+        return MU_STATUS_BAD_FILTERNOTALLOWED;
+    return MU_STATUS_GOOD;
+}
+#endif
+
+static opcua_statuscode_t configure_monitored_item(mu_monitored_item_t *item, const mu_monitored_item_create_body_t *body,
+                                                     const mu_node_t *node, mu_subscription_t *sub,
+                                                     opcua_uint32_t timestamps_to_return, opcua_uint64_t now_ms,
+                                                      mu_server_t *server) {
+    (void)server; /* used by mu_resolve_eurange_span under MUC_OPCUA_DATA_ACCESS */
+    copy_monitored_node_id(item, &body->node_id);
+    item->resolved_node = node;
+    item->attribute_id = body->attribute_id;
+    item->client_handle = body->client_handle;
+    item->monitoring_mode = (opcua_byte_t)body->monitoring_mode;
+    item->trigger = MU_DATACHANGE_TRIGGER_STATUS_VALUE;
+    item->timestamps_to_return = (opcua_byte_t)timestamps_to_return;
+    if ((body->sampling_interval_bits & MU_DOUBLE_SIGN_BIT) != 0u) {
+        item->sampling_interval_ms = sub->publishing_interval_ms;
+    } else {
+        item->sampling_interval_ms = publishing_interval_bits_to_ms(body->sampling_interval_bits);
+    }
+    item->next_sample_ms = now_ms + item->sampling_interval_ms;
+    item->has_value = false;
+    item->pending = false;
+#ifdef MUC_OPCUA_EVENTS
+    item->select_clauses_count = body->select_clauses_count;
+    memcpy(item->select_clauses, body->select_clauses, sizeof(item->select_clauses));
+#endif
+#if MUC_OPCUA_SUBSCRIPTIONS_STANDARD
+    item->trigger = (opcua_byte_t)body->trigger;
+    item->deadband_type = (opcua_byte_t)body->deadband_type;
+    item->deadband_value = body->deadband_value;
+#if MUC_OPCUA_DATA_ACCESS
+    item->deadband_span = 0.0;
+    if (item->deadband_type == MU_DEADBAND_TYPE_PERCENT && node != NULL) {
+        item->deadband_span = mu_resolve_eurange_span(server, node);
+    }
+#endif
+    item->queue_size = body->queue_size;
+    if (item->queue_size == 0u) { item->queue_size = 1u; }
+    if (item->queue_size > MU_MONITORED_QUEUE_DEPTH) { item->queue_size = MU_MONITORED_QUEUE_DEPTH; }
+    item->queue_head = 0u;
+    item->queue_tail = 0u;
+    item->queue_count = 0u;
+    item->discard_oldest = body->discard_oldest;
+    item->queue_overflow = false;
+    item->has_aggregate = body->has_aggregate;
+    if (item->has_aggregate) {
+        item->aggregate_state.aggregate_type = body->aggregate_type;
+        item->aggregate_state.processing_interval = body->processing_interval;
+        item->aggregate_state.last_calculation = (opcua_datetime_t)now_ms;
+        item->aggregate_state.sample_count = 0u;
+        memset(&item->aggregate_state.accumulator, 0, sizeof(item->aggregate_state.accumulator));
+    }
+#endif
+    if (body->attribute_id != 12u && node->value != NULL) {
+        item->last_status = mu_value_source_read(node->value, &body->node_id, &item->last_value);
+        if (item->last_status == MU_STATUS_GOOD) {
+            item->has_value = true;
+            item->pending = true;
+        }
+    }
+    (void)body->queue_size;
+    (void)body->discard_oldest;
+    return MU_STATUS_GOOD;
+}
+
 /* CreateMonitoredItems (OPC 10000-4 5.13.2): data-change monitoring for Value
    Attributes only, backed by the fixed-size subscription engine. */
 static opcua_statuscode_t handle_create_monitored_items(mu_server_t *server, mu_binary_reader_t *r,
-                                                        mu_binary_writer_t *w, size_t *response_length) {
+                                                         mu_binary_writer_t *w, size_t *response_length) {
     mu_request_header_t req;
     opcua_statuscode_t s = mu_request_header_decode(r, &req);
-    if (s != MU_STATUS_GOOD) {
-        return s;
-    }
+    if (s != MU_STATUS_GOOD) return s;
 
-    opcua_uint32_t subscription_id;
-    opcua_uint32_t timestamps_to_return;
+    opcua_uint32_t subscription_id, timestamps_to_return;
     opcua_int32_t items_to_create;
     mu_binary_read_uint32(r, &subscription_id);
     mu_binary_read_uint32(r, &timestamps_to_return);
     mu_binary_read_int32(r, &items_to_create);
-    if (r->status != MU_STATUS_GOOD) {
-        return r->status;
-    }
-    /* OPC-10000-4 §5.13.2.2 Table 63: TimestampsToReturn is an enumeration
-       (Source=0, Server=1, Both=2, Neither=3). Reject anything else with
-       Bad_TimestampsToReturnInvalid per §7.38.2. */
-    if (timestamps_to_return > MU_TIMESTAMPS_TO_RETURN_NEITHER) {
-        return MU_STATUS_BAD_TIMESTAMPSTORETURNINVALID;
-    }
+    if (r->status != MU_STATUS_GOOD) return r->status;
 
-    if (items_to_create > 0 && (size_t)items_to_create > MU_DISPATCH_MAX_SUBSCRIPTION_OPERATIONS) {
+    if (timestamps_to_return > MU_TIMESTAMPS_TO_RETURN_NEITHER) return MU_STATUS_BAD_TIMESTAMPSTORETURNINVALID;
+    if (items_to_create > 0 && (size_t)items_to_create > MU_DISPATCH_MAX_SUBSCRIPTION_OPERATIONS)
         return MU_STATUS_BAD_TOOMANYOPERATIONS;
-    }
 
     mu_subscription_t *sub = mu_subscription_find(&server->subs, server->active_session->session_id, subscription_id);
-    if (sub == NULL) {
-        return MU_STATUS_BAD_SUBSCRIPTIONIDINVALID;
-    }
+    if (sub == NULL) return MU_STATUS_BAD_SUBSCRIPTIONIDINVALID;
+    if (items_to_create <= 0) return MU_STATUS_BAD_NOTHINGTODO;
 
-    if (items_to_create <= 0) {
-        return MU_STATUS_BAD_NOTHINGTODO;
-    }
-
-    s = write_response_prefix(w, MU_ID_CREATEMONITOREDITEMSRESPONSE, req.request_handle, MU_STATUS_GOOD);
-    if (s != MU_STATUS_GOOD) {
-        return s;
-    }
-    s = mu_binary_write_int32(w, items_to_create);
-    if (s != MU_STATUS_GOOD) {
-        return s;
-    }
+    s = write_create_monitored_items_prefix(w, req.request_handle, items_to_create);
+    if (s != MU_STATUS_GOOD) return s;
 
     opcua_uint64_t now_ms = server->config.time_adapter.get_tick_ms(server->config.time_adapter.context);
 
     for (opcua_int32_t i = 0; i < items_to_create; ++i) {
         mu_monitored_item_create_body_t body;
         s = read_monitored_item_create_body(r, &body);
-        if (s != MU_STATUS_GOOD) {
-            return s;
-        }
+        if (s != MU_STATUS_GOOD) return s;
 
         const mu_node_t *node = mu_resolve_node(server->config.address_space, &server->user_address_space_index,
                                                 &server->runtime_base.space, &body.node_id);
         if (node == NULL) {
             s = write_monitored_item_create_result(w, MU_STATUS_BAD_NODEIDUNKNOWN, 0u, 0u, 0u);
-            if (s != MU_STATUS_GOOD) {
-                return s;
-            }
+            if (s != MU_STATUS_GOOD) return s;
             continue;
         }
 
 #if MUC_OPCUA_SUBSCRIPTIONS_STANDARD
-        if (body.filter_result != MU_STATUS_GOOD) {
-            s = write_monitored_item_create_result(w, body.filter_result, 0u, 0u, 0u);
-            if (s != MU_STATUS_GOOD) {
-                return s;
+        {
+            opcua_statuscode_t filter_status = validate_create_item_filter(&body, node);
+            if (filter_status != MU_STATUS_GOOD) {
+                s = write_monitored_item_create_result(w, filter_status, 0u, 0u, 0u);
+                if (s != MU_STATUS_GOOD) return s;
+                continue;
             }
-            continue;
-        }
-        if (body.has_datachange_filter && body.attribute_id != MU_MONITORED_VALUE_ATTRIBUTE_ID) {
-            /* OPC-10000-4 sections 5.13.2.4 and 7.38.2: DataChangeFilter is
-               syntactically valid but not allowed for non-Value attributes. */
-            s = write_monitored_item_create_result(w, MU_STATUS_BAD_FILTERNOTALLOWED, 0u, 0u, 0u);
-            if (s != MU_STATUS_GOOD) {
-                return s;
-            }
-            continue;
-        }
-        if (body.deadband_type == MU_DEADBAND_TYPE_ABSOLUTE && !monitored_node_has_numeric_static_value(node)) {
-            s = write_monitored_item_create_result(w, MU_STATUS_BAD_MONITOREDITEMFILTERUNSUPPORTED, 0u, 0u, 0u);
-            if (s != MU_STATUS_GOOD) {
-                return s;
-            }
-            continue;
-        }
-        if (body.has_aggregate && !monitored_node_has_numeric_static_value(node)) {
-            s = write_monitored_item_create_result(w, MU_STATUS_BAD_FILTERNOTALLOWED, 0u, 0u, 0u);
-            if (s != MU_STATUS_GOOD) {
-                return s;
-            }
-            continue;
         }
 #endif
 
-        bool attr_ok = (body.attribute_id == MU_MONITORED_VALUE_ATTRIBUTE_ID);
+        if (!(body.attribute_id == MU_MONITORED_VALUE_ATTRIBUTE_ID
 #ifdef MUC_OPCUA_EVENTS
-        if (body.attribute_id == 12u) {
-            attr_ok = true;
-        }
+              || body.attribute_id == 12u
 #endif
-        if (!attr_ok) {
+              )) {
             s = write_monitored_item_create_result(w, MU_STATUS_BAD_ATTRIBUTEIDINVALID, 0u, 0u, 0u);
-            if (s != MU_STATUS_GOOD) {
-                return s;
-            }
+            if (s != MU_STATUS_GOOD) return s;
             continue;
         }
 
@@ -1470,95 +1502,24 @@ static opcua_statuscode_t handle_create_monitored_items(mu_server_t *server, mu_
         opcua_statuscode_t result = mu_monitored_item_alloc(&server->subs, subscription_id, &item);
         if (result != MU_STATUS_GOOD) {
             s = write_monitored_item_create_result(w, result, 0u, 0u, 0u);
-            if (s != MU_STATUS_GOOD) {
-                return s;
-            }
+            if (s != MU_STATUS_GOOD) return s;
             continue;
         }
 
-        copy_monitored_node_id(item, &body.node_id);
-        item->resolved_node = node;
-        item->attribute_id = body.attribute_id;
-        item->client_handle = body.client_handle;
-        item->monitoring_mode = (opcua_byte_t)body.monitoring_mode;
-        item->trigger = MU_DATACHANGE_TRIGGER_STATUS_VALUE;
-        item->timestamps_to_return = (opcua_byte_t)timestamps_to_return;
-        /* OPC-10000-4 §7.21: a SamplingInterval of -1 (any negative Double,
-           detected via the sign bit) requests the default defined by the
-           Subscription's publishing interval. Otherwise revise/clamp as usual. */
-        if ((body.sampling_interval_bits & MU_DOUBLE_SIGN_BIT) != 0u) {
-            item->sampling_interval_ms = sub->publishing_interval_ms;
-        } else {
-            item->sampling_interval_ms = publishing_interval_bits_to_ms(body.sampling_interval_bits);
-        }
-        item->next_sample_ms = now_ms + item->sampling_interval_ms;
-        item->has_value = false;
-        item->pending = false;
-#ifdef MUC_OPCUA_EVENTS
-        item->select_clauses_count = body.select_clauses_count;
-        memcpy(item->select_clauses, body.select_clauses, sizeof(item->select_clauses));
-#endif
-#if MUC_OPCUA_SUBSCRIPTIONS_STANDARD
-        item->trigger = (opcua_byte_t)body.trigger;
-        item->deadband_type = (opcua_byte_t)body.deadband_type;
-        item->deadband_value = body.deadband_value;
-#if MUC_OPCUA_DATA_ACCESS
-        item->deadband_span = 0.0;
-        if (item->deadband_type == MU_DEADBAND_TYPE_PERCENT && node != NULL) {
-            item->deadband_span = mu_resolve_eurange_span(server, node);
-        }
-#endif
-        item->queue_size = body.queue_size;
-        if (item->queue_size == 0u) {
-            item->queue_size = 1u;
-        }
-        if (item->queue_size > MU_MONITORED_QUEUE_DEPTH) {
-            item->queue_size = MU_MONITORED_QUEUE_DEPTH;
-        }
-        item->queue_head = 0u;
-        item->queue_tail = 0u;
-        item->queue_count = 0u;
-        item->discard_oldest = body.discard_oldest;
-        item->queue_overflow = false;
-        item->has_aggregate = body.has_aggregate;
-        if (item->has_aggregate) {
-            item->aggregate_state.aggregate_type = body.aggregate_type;
-            item->aggregate_state.processing_interval = body.processing_interval;
-            item->aggregate_state.last_calculation = (opcua_datetime_t)now_ms;
-            item->aggregate_state.sample_count = 0u;
-            memset(&item->aggregate_state.accumulator, 0, sizeof(item->aggregate_state.accumulator));
-        }
-#endif
-        if (body.attribute_id != 12u && node->value != NULL) {
-            item->last_status = mu_value_source_read(node->value, &body.node_id, &item->last_value);
-            if (item->last_status == MU_STATUS_GOOD) {
-                item->has_value = true;
-                item->pending = true;
-            }
-        }
-        (void)body.queue_size;
-        (void)body.discard_oldest;
+        configure_monitored_item(item, &body, node, sub, timestamps_to_return, now_ms, server);
 
-        /* OPC-10000-4 §5.13.2.2 Table 63: RevisedQueueSize reflects the
-           queue capacity actually allocated. Under MUC_OPCUA_SUBSCRIPTIONS_STANDARD
-           item->queue_size holds the revised (clamped 1..MU_MONITORED_QUEUE_DEPTH)
-           value; otherwise the minimal queue depth of 1 is reported. */
 #if MUC_OPCUA_SUBSCRIPTIONS_STANDARD
         const opcua_uint32_t revised_queue_size = item->queue_size;
 #else
         const opcua_uint32_t revised_queue_size = 1u;
 #endif
-        s = write_monitored_item_create_result(w, MU_STATUS_GOOD, item->monitored_item_id, item->sampling_interval_ms,
-                                               revised_queue_size);
-        if (s != MU_STATUS_GOOD) {
-            return s;
-        }
+        s = write_monitored_item_create_result(w, MU_STATUS_GOOD, item->monitored_item_id,
+                                                item->sampling_interval_ms, revised_queue_size);
+        if (s != MU_STATUS_GOOD) return s;
     }
 
     s = mu_binary_write_int32(w, 0);
-    if (s != MU_STATUS_GOOD) {
-        return s;
-    }
+    if (s != MU_STATUS_GOOD) return s;
 
     *response_length = w->position;
     return MU_STATUS_GOOD;
