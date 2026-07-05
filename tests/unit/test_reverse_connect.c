@@ -1,12 +1,12 @@
 /* tests/unit/test_reverse_connect.c
  *
- * Spec Kit 037, T081. Validate Reverse Connect stub infrastructure.
+ * Placeholder test file for reverse connect functionality.
  * Server-initiated TCP connections per OPC-10000-6 §7.5.
+ * Behavioral tests to be added when MUC_OPCUA_REVERSE_CONNECT is implemented.
  */
-#include "unity.h"
+/* STUB: reverse connect tests not yet implemented - feature gated behind MUC_OPCUA_REVERSE_CONNECT */
 
-/* STUB: behavioral tests needed for Reverse Connect (OPC-10000-6 §7.5)
-   when MUC_OPCUA_REVERSE_CONNECT is enabled. */
+#include "unity.h"
 
 void setUp(void) {}
 void tearDown(void) {}

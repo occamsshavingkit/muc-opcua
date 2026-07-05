@@ -1,4 +1,9 @@
 /* include/muc_opcua/server.h */
+/*
+ * Spec grounding:
+ *   OPC-10000-4 §5 OPC UA Services
+ *   OPC-10000-7 §6.6 Server Profiles
+ */
 #ifndef MUC_OPCUA_SERVER_H
 #define MUC_OPCUA_SERVER_H
 

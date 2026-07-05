@@ -1,6 +1,21 @@
 /* tests/unit/test_discovery_encode.c
  * Byte-level tests for the EndpointDescription / ApplicationDescription encoders
- * (OPC 10000-4 7.14, 7.2, 7.41). */
+ * (OPC 10000-4 7.14, 7.2, 7.41).
+ *
+ * ENCODE TEST GAPS (T037 audit):
+ *   - securityPolicyUri content: only s.length == 47 asserted; missing
+ *     TEST_ASSERT_EQUAL_MEMORY on the actual URI string
+ *     ("http://opcfoundation.org/UA/SecurityPolicy#None").
+ *   - transportProfileUri content: only s.length == 65 asserted; missing
+ *     TEST_ASSERT_EQUAL_MEMORY on the actual URI string
+ *     ("http://opcfoundation.org/UA-Profile/Transport/uatcp-uasc-uabinary").
+ *   - No standalone ApplicationDescription-encode test (mu_application_description_encode
+ *     is only exercised indirectly via EndpointDescription).
+ *   - No edge-case encode coverage: empty/null endpointUrl, non-null serverCertificate,
+ *     Sign/SignAndEncrypt security modes, ApplicationType CLIENT / CLIENTANDSERVER /
+ *     DISCOVERYSERVER, non-null gatewayServerUri, non-null discoveryProfileUri,
+ *     multiple discoveryUrls[], multiple UserTokenPolicies, securityLevel > 0.
+ *   - No encode buffer-overflow test (writing to a too-small buffer). */
 #include "../../src/services/discovery.h"
 #include "muc_opcua/muc_opcua.h"
 #include "unity.h"
@@ -67,6 +82,7 @@ void test_endpoint_description_encode(void) {
     /* securityPolicyUri */
     mu_binary_read_string(&r, &s);
     TEST_ASSERT_EQUAL(47, s.length);
+    TEST_ASSERT_EQUAL_MEMORY("http://opcfoundation.org/UA/SecurityPolicy#None", s.data, 47);
     /* userIdentityTokens[] : UserTokenPolicies */
     opcua_int32_t n_tok;
     mu_binary_read_int32(&r, &n_tok);
@@ -85,14 +101,109 @@ void test_endpoint_description_encode(void) {
     /* transportProfileUri */
     mu_binary_read_string(&r, &s);
     TEST_ASSERT_EQUAL(65, s.length);
+    TEST_ASSERT_EQUAL_MEMORY("http://opcfoundation.org/UA-Profile/Transport/uatcp-uasc-uabinary", s.data, 65);
     /* securityLevel */
     opcua_byte_t level;
     mu_binary_read_byte(&r, &level);
     TEST_ASSERT_EQUAL(0, level);
+
+    TEST_ASSERT_EQUAL_size_t(w.position, r.position);
+}
+
+/* Standalone ApplicationDescription encode test with byte-level assertions. */
+void test_application_description_encode(void) {
+    mu_application_description_t desc;
+    (void)memset(&desc, 0, sizeof(desc));
+    desc.application_uri = "urn:test:app";
+    desc.product_uri = "urn:test:product";
+    desc.application_name = "Test Server";
+    desc.application_type = MU_APPLICATION_TYPE_CLIENT;
+    desc.discovery_url = NULL;
+
+    opcua_byte_t buf[256];
+    mu_binary_writer_t w;
+    mu_binary_writer_init(&w, buf, sizeof(buf));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_application_description_encode(&w, &desc));
+
+    mu_binary_reader_t r;
+    mu_binary_reader_init(&r, buf, w.position);
+    mu_string_t s;
+
+    /* applicationUri */
+    mu_binary_read_string(&r, &s);
+    TEST_ASSERT_EQUAL_MEMORY("urn:test:app", s.data, 12);
+    /* productUri */
+    mu_binary_read_string(&r, &s);
+    TEST_ASSERT_EQUAL_MEMORY("urn:test:product", s.data, 16);
+    /* applicationName (LocalizedText: text only) */
+    opcua_byte_t lt_mask;
+    mu_binary_read_byte(&r, &lt_mask);
+    TEST_ASSERT_EQUAL(0x02, lt_mask);
+    mu_binary_read_string(&r, &s);
+    TEST_ASSERT_EQUAL_MEMORY("Test Server", s.data, 11);
+    /* applicationType */
+    opcua_uint32_t app_type;
+    mu_binary_read_uint32(&r, &app_type);
+    TEST_ASSERT_EQUAL(MU_APPLICATION_TYPE_CLIENT, app_type);
+    /* gatewayServerUri (null) */
+    mu_binary_read_string(&r, &s);
+    TEST_ASSERT_EQUAL(-1, s.length);
+    /* discoveryProfileUri (null) */
+    mu_binary_read_string(&r, &s);
+    TEST_ASSERT_EQUAL(-1, s.length);
+    /* discoveryUrls[] (0 entries when discovery_url is NULL) */
+    opcua_int32_t n_disc;
+    mu_binary_read_int32(&r, &n_disc);
+    TEST_ASSERT_EQUAL(0, n_disc);
+}
+
+/* Edge case: empty endpointUrl (NULL pointer) encodes as null string. */
+void test_endpoint_encode_empty_url(void) {
+    mu_endpoint_description_t ep;
+    (void)memset(&ep, 0, sizeof(ep));
+    ep.endpoint_url = NULL;
+    ep.security_policy_uri = "http://opcfoundation.org/UA/SecurityPolicy#None";
+    ep.transport_profile_uri = "http://opcfoundation.org/UA-Profile/Transport/uatcp-uasc-uabinary";
+    ep.num_user_identity_tokens = 0;
+
+    opcua_byte_t buf[256];
+    mu_binary_writer_t w;
+    mu_binary_writer_init(&w, buf, sizeof(buf));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_endpoint_description_encode(&w, &ep));
+
+    mu_binary_reader_t r;
+    mu_binary_reader_init(&r, buf, w.position);
+    mu_string_t s;
+
+    /* endpointUrl is null (-1 length) */
+    mu_binary_read_string(&r, &s);
+    TEST_ASSERT_EQUAL(-1, s.length);
+}
+
+/* Buffer-overflow test: write to a too-small buffer returns an error. */
+void test_endpoint_encode_buffer_overflow(void) {
+    mu_server_config_t config;
+    (void)memset(&config, 0, sizeof(config));
+    config.application_uri = "urn:test:app";
+    config.product_uri = "urn:test:product";
+    config.application_name = "Test Server";
+    config.endpoint_url = "opc.tcp://localhost:4840";
+
+    mu_endpoint_description_t ep;
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_discovery_get_endpoint_description(&config, &ep));
+
+    opcua_byte_t buf[4];
+    mu_binary_writer_t w;
+    mu_binary_writer_init(&w, buf, sizeof(buf));
+    opcua_statuscode_t sc = mu_endpoint_description_encode(&w, &ep);
+    TEST_ASSERT_NOT_EQUAL(MU_STATUS_GOOD, sc);
 }
 
 int main(void) {
     UNITY_BEGIN();
     RUN_TEST(test_endpoint_description_encode);
+    RUN_TEST(test_application_description_encode);
+    RUN_TEST(test_endpoint_encode_empty_url);
+    RUN_TEST(test_endpoint_encode_buffer_overflow);
     return UNITY_END();
 }

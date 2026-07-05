@@ -3,8 +3,8 @@
 #include <string.h>
 
 /* Maximum seed (the peer nonce) we accommodate on the stack. Channel nonces are
-   32 bytes for Basic256Sha256; 64 is generous headroom. */
-#define MU_KDF_MAX_SEED 64
+   32 bytes for Basic256Sha256; 128 allows for larger nonces (OPC-10000-6 §6.7.6). */
+#define MU_KDF_MAX_SEED 128
 
 void mu_secure_zero(void *v, size_t n) {
     volatile unsigned char *p = (volatile unsigned char *)v;

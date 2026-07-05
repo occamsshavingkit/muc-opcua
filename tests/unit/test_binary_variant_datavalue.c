@@ -18,6 +18,11 @@ void test_binary_variant_roundtrip(void) {
     mu_binary_writer_init(&writer, buffer, sizeof(buffer));
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_write_variant(&writer, &variant));
 
+    /* Byte-level assertion: encoding mask = INT32, value = 42 LE */
+    TEST_ASSERT_EQUAL(5u, writer.position);
+    TEST_ASSERT_EQUAL(MU_TYPE_INT32, buffer[0]);
+    TEST_ASSERT_EQUAL(42, buffer[1]); /* low byte of int32 */
+
     mu_binary_reader_init(&reader, buffer, writer.position);
     mu_variant_t read_variant;
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_variant(&reader, &read_variant));
@@ -41,6 +46,13 @@ void test_binary_datavalue_roundtrip(void) {
 
     mu_binary_writer_init(&writer, buffer, sizeof(buffer));
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_write_datavalue(&writer, &datavalue));
+
+    /* Byte-level assertion: DataValue mask (0x01=hasValue|0x02=hasStatus),
+       then Variant: encoding mask INT32 (0x06), int32 42 LE,
+       then StatusCode: GOOD (0x00000000) */
+    TEST_ASSERT_EQUAL(0x03, buffer[0]);          /* has_value | has_status */
+    TEST_ASSERT_EQUAL(MU_TYPE_INT32, buffer[1]); /* variant encoding mask */
+    TEST_ASSERT_EQUAL(42, buffer[2]);            /* int32 value low byte */
 
     mu_binary_reader_init(&reader, buffer, writer.position);
     mu_datavalue_t read_datavalue;

@@ -8,6 +8,9 @@
 #include "unity.h"
 #include <string.h>
 
+/* STUB: Complex type round-trip encode/decode behavioral tests not yet
+ * implemented. Only type creation and registration API tested. */
+
 void setUp(void) {}
 void tearDown(void) {}
 

@@ -158,19 +158,27 @@ opcua_statuscode_t mu_binary_read_variant(mu_binary_reader_t *reader, mu_variant
                variant array must release variant.value.array (e.g. with
                free((void *)variant.value.array)) once no longer needed. A
                future mu_variant_destroy helper should centralize this. */
-            void *elements = calloc((size_t)length, stride);
-            if (elements == NULL) {
-                return MU_STATUS_BAD_OUTOFMEMORY;
-            }
-            for (opcua_int32_t i = 0; i < length; ++i) {
-                status =
-                    read_scalar_value(reader, (mu_builtin_type_t)type, (opcua_byte_t *)elements + (size_t)i * stride);
-                if (status != MU_STATUS_GOOD) {
-                    free(elements);
-                    return status;
+#if MUC_OPCUA_ALLOW_HEAP
+            {
+                void *elements = calloc((size_t)length, stride);
+                if (elements == NULL) {
+                    return MU_STATUS_BAD_OUTOFMEMORY;
                 }
+                for (opcua_int32_t i = 0; i < length; ++i) {
+                    status = read_scalar_value(reader, (mu_builtin_type_t)type,
+                                               (opcua_byte_t *)elements + (size_t)i * stride);
+                    if (status != MU_STATUS_GOOD) {
+                        free(elements);
+                        return status;
+                    }
+                }
+                variant->value.array = elements;
             }
-            variant->value.array = elements;
+#else
+            /* Heap allocation disabled -- skip the array elements on the wire
+               but report failure since we cannot store them. */
+            return MU_STATUS_BAD_OUTOFMEMORY;
+#endif
         }
 
         if (has_dimensions) {

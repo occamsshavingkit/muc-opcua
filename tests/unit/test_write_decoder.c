@@ -123,6 +123,8 @@ void test_write_response_encode(void) {
      * per OPC-10000-6 §5.2.5 and OPC-10000-4 §5.11.4.2 Table 53 */
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_int32(&r, &len));
     TEST_ASSERT_EQUAL(-1, len);
+
+    TEST_ASSERT_EQUAL_size_t(w.position, r.position);
 #endif
 }
 

@@ -1,14 +1,8 @@
 /* src/core/tcp_connection.c */
 #include "tcp_connection.h"
+#include "../encoding/binary_le.h"
 #include "muc_opcua/encoding.h"
 #include <string.h>
-
-static void tcp_write_uint32_le(opcua_byte_t *buffer, size_t offset, opcua_uint32_t value) {
-    buffer[offset] = (opcua_byte_t)(value & 0xFFu);
-    buffer[offset + 1u] = (opcua_byte_t)((value >> 8u) & 0xFFu);
-    buffer[offset + 2u] = (opcua_byte_t)((value >> 16u) & 0xFFu);
-    buffer[offset + 3u] = (opcua_byte_t)((value >> 24u) & 0xFFu);
-}
 
 void mu_tcp_connection_init(mu_tcp_connection_t *connection) {
     if (connection) {
@@ -125,12 +119,12 @@ opcua_statuscode_t mu_tcp_process_hello(mu_tcp_connection_t *connection, const o
     ack_message[1] = 'C';
     ack_message[2] = 'K';
     ack_message[3] = 'F';
-    tcp_write_uint32_le(ack_message, 4u, 28u);                              /* MessageSize */
-    tcp_write_uint32_le(ack_message, 8u, 0u);                               /* ProtocolVersion */
-    tcp_write_uint32_le(ack_message, 12u, connection->send_buffer_size);    /* Server receive limit */
-    tcp_write_uint32_le(ack_message, 16u, connection->receive_buffer_size); /* Server send limit */
-    tcp_write_uint32_le(ack_message, 20u, connection->max_message_size);
-    tcp_write_uint32_le(ack_message, 24u, connection->max_chunk_count);
+    mu_binary_le_put_u32(&ack_message[4u], 28u);                              /* MessageSize */
+    mu_binary_le_put_u32(&ack_message[8u], 0u);                               /* ProtocolVersion */
+    mu_binary_le_put_u32(&ack_message[12u], connection->send_buffer_size);    /* Server receive limit */
+    mu_binary_le_put_u32(&ack_message[16u], connection->receive_buffer_size); /* Server send limit */
+    mu_binary_le_put_u32(&ack_message[20u], connection->max_message_size);
+    mu_binary_le_put_u32(&ack_message[24u], connection->max_chunk_count);
 
     *ack_length = 28u;
     connection->state = MU_TCP_STATE_ESTABLISHED;
@@ -156,8 +150,8 @@ opcua_statuscode_t mu_tcp_create_error_message(opcua_statuscode_t error_code, co
     err_message[1] = 'R';
     err_message[2] = 'R';
     err_message[3] = 'F';
-    tcp_write_uint32_le(err_message, 4u, (opcua_uint32_t)total_len);
-    tcp_write_uint32_le(err_message, 8u, (opcua_uint32_t)error_code);
+    mu_binary_le_put_u32(&err_message[4u], (opcua_uint32_t)total_len);
+    mu_binary_le_put_u32(&err_message[8u], (opcua_uint32_t)error_code);
 
     mu_binary_writer_t writer;
     mu_binary_writer_init(&writer, err_message, *err_length);

@@ -19,6 +19,12 @@ typedef struct {
     size_t count;                      /* Number of certificates in the TrustList */
 } mu_trust_list_t;
 
+/*
+ * Constant-time memory comparison. Returns 0 only when the buffers are equal,
+ * with leakage proportional only to the buffer length, not to the byte values.
+ */
+int mu_constant_time_memcmp(const opcua_byte_t *a, const opcua_byte_t *b, size_t len);
+
 /* Matches a certificate against the TrustList. Returns MU_STATUS_GOOD if trusted. */
 opcua_statuscode_t mu_trust_list_match(const mu_trust_list_t *trust_list, const opcua_byte_t *cert_data,
                                        size_t cert_length);

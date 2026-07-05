@@ -134,6 +134,12 @@ static void decode_write_response_results(const opcua_byte_t *buffer, size_t len
     for (size_t i = 0; i < result_count; ++i) {
         TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_statuscode(&reader, &results[i]));
     }
+
+    opcua_int32_t diag_infos_len;
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_int32(&reader, &diag_infos_len));
+    TEST_ASSERT_EQUAL(-1, diag_infos_len);
+
+    TEST_ASSERT_EQUAL_size_t(length, reader.position);
 }
 
 static void run_write_items(mu_server_t *server, const write_request_item_t *items, size_t item_count,
@@ -279,6 +285,12 @@ void test_write_service_basic(void) {
     opcua_statuscode_t item_status;
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_statuscode(&resp_reader, &item_status));
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, item_status);
+
+    opcua_int32_t diag_infos_len;
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_int32(&resp_reader, &diag_infos_len));
+    TEST_ASSERT_EQUAL(-1, diag_infos_len);
+
+    TEST_ASSERT_EQUAL_size_t(resp_len, resp_reader.position);
 }
 
 void test_write_service_type_mismatch(void) {
@@ -387,6 +399,12 @@ void test_write_service_type_mismatch(void) {
     opcua_statuscode_t item_status;
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_statuscode(&resp_reader, &item_status));
     TEST_ASSERT_EQUAL(MU_STATUS_BAD_TYPEMISMATCH, item_status);
+
+    opcua_int32_t diag_infos_len;
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_int32(&resp_reader, &diag_infos_len));
+    TEST_ASSERT_EQUAL(-1, diag_infos_len);
+
+    TEST_ASSERT_EQUAL_size_t(resp_len, resp_reader.position);
 }
 
 void test_write_service_batch(void) {
@@ -523,6 +541,12 @@ void test_write_service_batch(void) {
     opcua_statuscode_t item_status1;
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_statuscode(&resp_reader, &item_status1));
     TEST_ASSERT_EQUAL(MU_STATUS_BAD_TYPEMISMATCH, item_status1);
+
+    opcua_int32_t diag_infos_len;
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_int32(&resp_reader, &diag_infos_len));
+    TEST_ASSERT_EQUAL(-1, diag_infos_len);
+
+    TEST_ASSERT_EQUAL_size_t(resp_len, resp_reader.position);
 }
 
 void test_write_service_batch_matches_individual_operation_results_and_callback_order(void) {

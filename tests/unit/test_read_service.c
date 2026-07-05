@@ -73,40 +73,27 @@ void test_read_service_scalar_values(void) {
     TEST_ASSERT_EQUAL(MU_TYPE_INT32, resp.results[0].value.type);
     TEST_ASSERT_EQUAL(42, resp.results[0].value.value.i32);
 
-    /* Encode */
+    /* Encode and verify against independent binary fixture
+     * OPC-10000-4 §7.38.1 / OPC-10000-6 §5.2.2.17 DataValue, §5.2.2.16 Variant */
     opcua_byte_t buffer[256];
     mu_binary_writer_t writer;
     mu_binary_writer_init(&writer, buffer, sizeof(buffer));
 
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_read_response_encode(&writer, &resp));
 
-    /* Decode to verify */
-    mu_binary_reader_t reader;
-    mu_binary_reader_init(&reader, buffer, writer.position);
-
-    opcua_int32_t num_results;
-    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_int32(&reader, &num_results));
-    TEST_ASSERT_EQUAL(1, num_results);
-
-    /* DataValue Encoding Mask */
-    opcua_byte_t mask;
-    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_byte(&reader, &mask));
-    TEST_ASSERT_EQUAL(1, mask); /* has_value = true, everything else false */
-
-    /* Variant */
-    opcua_byte_t type_id;
-    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_byte(&reader, &type_id));
-    TEST_ASSERT_EQUAL(MU_TYPE_INT32, type_id);
-
-    opcua_int32_t val;
-    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_int32(&reader, &val));
-    TEST_ASSERT_EQUAL(42, val);
-
-    opcua_int32_t diag_len;
-    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_int32(&reader, &diag_len));
-    TEST_ASSERT_EQUAL(0, diag_len);
-
-    TEST_ASSERT_EQUAL(writer.position, reader.position);
+    /* ReadResponse with one DataValue (Int32=42, has_value only):
+     *   Int32 NoOfResults=1, DataValue mask=0x01,
+     *   Variant mask=0x06 (BuiltInType Int32, scalar), Int32=42,
+     *   Int32 DiagnosticInfos[]=empty (0) */
+    const opcua_byte_t expected[] = {
+        0x01, 0x00, 0x00, 0x00, /* Int32: num_results=1 */
+        0x01,                   /* DataValue encoding mask: has_value */
+        0x06,                   /* Variant mask: BuiltInType Int32, scalar */
+        0x2A, 0x00, 0x00, 0x00, /* Int32: value=42 (LE) */
+        0x00, 0x00, 0x00, 0x00, /* Int32: diagnosticInfos=0 (empty) */
+    };
+    TEST_ASSERT_EQUAL_size_t(sizeof(expected), writer.position);
+    TEST_ASSERT_EQUAL_MEMORY(expected, buffer, sizeof(expected));
 }
 
 void test_read_service_rejects_invalid_timestamps_to_return(void) {

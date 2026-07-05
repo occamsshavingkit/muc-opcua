@@ -975,6 +975,9 @@ static opcua_statuscode_t read_event_filter_body(mu_binary_reader_t *r, size_t f
     if (select_count < 0) {
         return MU_STATUS_BAD_DECODINGERROR;
     }
+    if (select_count > 100) {
+        return MU_STATUS_BAD_EVENTFILTERINVALID;
+    }
 
     for (opcua_int32_t i = 0; i < select_count; ++i) {
         mu_nodeid_t type_id;
@@ -1717,6 +1720,7 @@ static opcua_statuscode_t handle_modify_monitored_items(mu_server_t *server, mu_
                 revised_sampling_interval_ms = publishing_interval_bits_to_ms(sampling_interval_bits);
                 item->sampling_interval_ms = revised_sampling_interval_ms;
                 item->client_handle = client_handle;
+                item->timestamps_to_return = (opcua_byte_t)timestamps_to_return;
 #if MUC_OPCUA_SUBSCRIPTIONS_STANDARD
                 /* OPC-10000-4 §5.13.3.2 Table 67: the Server shall accept
                    and revise queueSize and discardOldest on modify. Clamp the

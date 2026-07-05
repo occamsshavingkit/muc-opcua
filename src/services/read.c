@@ -4,11 +4,13 @@
 #include <stddef.h>
 #include <string.h>
 
-/* maxAge read cache (OPC-10000-4 section 5.11.2). Disabled: always re-reads from
- * the data source, which satisfies maxAge=0 (mandatory) and is spec-compliant
- * for maxAge>0 (caching is optional). Re-enable by moving cache into caller-provided
- * server storage to avoid introducing BSS. */
-/* static cache disabled — no BSS, no RAM, always fresh reads */
+/* maxAge read cache (OPC-10000-4 section 5.11.2). Single-entry static cache.
+ * maxAge=0 bypasses the cache (mandatory). Larger maxAge values allow
+ * returning a cached value when (now - read_time) <= max_age_ms * 10000. */
+/* single-entry cache — one stored Variant */
+
+#define MU_READ_CACHE_SLOTS 1UL
+#define MU_MAXAGE_ALWAYS_CACHE_THRESHOLD_MS 1e12 /* ~31 years; treat as "uncapped maxAge" */
 
 typedef struct {
     mu_nodeid_t node_id;
@@ -17,19 +19,66 @@ typedef struct {
     opcua_boolean_t valid;
 } mu_read_cache_entry_t;
 
+static mu_read_cache_entry_t mu_read_cache[MU_READ_CACHE_SLOTS];
+static size_t mu_read_cache_hits = 0;
+static size_t mu_read_cache_misses = 0;
+
 static opcua_boolean_t mu_read_cache_lookup(const mu_nodeid_t *node_id, opcua_double_t max_age_ms, opcua_datetime_t now,
                                             mu_variant_t *out) {
-    (void)node_id;
-    (void)max_age_ms;
-    (void)now;
-    (void)out;
+    /* OPC-10000-4 §5.11.2: maxAge=0 means always read from source */
+    if (max_age_ms == 0.0) {
+        mu_read_cache_misses++;
+        return false;
+    }
+
+    for (size_t i = 0; i < MU_READ_CACHE_SLOTS; i++) {
+        if (!mu_read_cache[i].valid)
+            continue;
+
+        if (!mu_nodeid_equal(node_id, &mu_read_cache[i].node_id))
+            continue;
+
+        opcua_datetime_t age_ticks = now - mu_read_cache[i].read_time;
+
+        /* Clock skew: cached read_time is in the future — still the freshest data we have */
+        if (age_ticks < 0) {
+            memcpy(out, &mu_read_cache[i].variant, sizeof(mu_variant_t));
+            mu_read_cache_hits++;
+            return true;
+        }
+
+        /* maxAge >= threshold: treat as "use cached unconditionally" (spec "max Double") */
+        if (max_age_ms >= MU_MAXAGE_ALWAYS_CACHE_THRESHOLD_MS) {
+            memcpy(out, &mu_read_cache[i].variant, sizeof(mu_variant_t));
+            mu_read_cache_hits++;
+            return true;
+        }
+
+        opcua_datetime_t max_age_ticks = (opcua_datetime_t)(max_age_ms * 10000.0);
+        if (age_ticks <= max_age_ticks) {
+            memcpy(out, &mu_read_cache[i].variant, sizeof(mu_variant_t));
+            mu_read_cache_hits++;
+            return true;
+        }
+    }
+
+    mu_read_cache_misses++;
     return false;
 }
 
 static void mu_read_cache_store(const mu_nodeid_t *node_id, const mu_variant_t *val, opcua_datetime_t read_time) {
     (void)node_id;
-    (void)val;
-    (void)read_time;
+    memcpy(&mu_read_cache[0].node_id, node_id, sizeof(mu_nodeid_t));
+    memcpy(&mu_read_cache[0].variant, val, sizeof(mu_variant_t));
+    mu_read_cache[0].read_time = read_time;
+    mu_read_cache[0].valid = true;
+}
+
+void mu_read_cache_get_stats(mu_read_cache_stats_t *out) {
+    if (out) {
+        out->hits = mu_read_cache_hits;
+        out->misses = mu_read_cache_misses;
+    }
 }
 
 #ifdef MUC_OPCUA_MULTI_CHUNK
@@ -399,7 +448,12 @@ opcua_statuscode_t mu_read_process_with_user_index(const mu_address_space_t *add
         const mu_read_value_id_t *read_val = &req->nodes_to_read[i];
         mu_datavalue_t *dv = &resp->results[i];
 
-        *dv = (mu_datavalue_t){0};
+        dv->has_value = false;
+        dv->has_status = false;
+        dv->has_source_timestamp = false;
+        dv->has_source_picoseconds = false;
+        dv->has_server_timestamp = false;
+        dv->has_server_picoseconds = false;
 
         const mu_node_t *node = mu_resolve_node(address_space, user_index, dynamic, &read_val->node_id);
         if (!node) {

@@ -18,6 +18,7 @@
 #include "server_internal.h"
 #include "service_dispatch.h"
 #include <stddef.h>
+#include <stdlib.h>
 #include <string.h>
 
 #if MUC_OPCUA_SUBSCRIPTIONS && MUC_OPCUA_SUBSCRIPTIONS_STANDARD && MUC_OPCUA_BASE_TYPE_SYSTEM
@@ -260,6 +261,7 @@ opcua_statuscode_t handle_call(mu_server_t *server, mu_binary_reader_t *r, mu_bi
         mu_nodeid_t method_id;
         mu_variant_t args[MU_DISPATCH_MAX_CALL_INPUT_ARGUMENTS];
         opcua_int32_t arg_count = 0;
+        memset(args, 0, sizeof(args));
 
         s = mu_binary_read_nodeid(r, &object_id);
         if (s != MU_STATUS_GOOD) {
@@ -271,10 +273,20 @@ opcua_statuscode_t handle_call(mu_server_t *server, mu_binary_reader_t *r, mu_bi
         }
         s = read_call_input_arguments(r, args, &arg_count);
         if (s != MU_STATUS_GOOD) {
+            for (opcua_int32_t ai = 0; ai < MU_DISPATCH_MAX_CALL_INPUT_ARGUMENTS; ++ai) {
+                if (args[ai].is_array && args[ai].value.array != NULL) {
+                    free((void *)args[ai].value.array);
+                }
+            }
             return s;
         }
 
         s = write_single_call_method_result(server, w, &object_id, &method_id, args, arg_count);
+        for (opcua_int32_t ai = 0; ai < arg_count; ++ai) {
+            if (args[ai].is_array && args[ai].value.array != NULL) {
+                free((void *)args[ai].value.array);
+            }
+        }
         if (s != MU_STATUS_GOOD) {
             return s;
         }

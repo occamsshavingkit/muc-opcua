@@ -60,19 +60,23 @@ static opcua_statuscode_t write_header(mu_binary_writer_t *w, mu_security_policy
         return s;
     }
 
-    mu_string_t policy_uri = {(opcua_int32_t)strlen(uri), (const opcua_byte_t *)uri};
+    mu_string_t policy_uri = {mu_safe_int32_from_size_t(strlen(uri)), (const opcua_byte_t *)uri};
     s = mu_binary_write_string(w, &policy_uri);
     if (s != MU_STATUS_GOOD) {
         return s;
     }
 
-    mu_bytestring_t cert = {sender_cert ? (opcua_int32_t)sender_cert_len : -1, sender_cert};
+    mu_bytestring_t cert = {
+        sender_cert ? (opcua_int32_t)(sender_cert_len > (size_t)INT32_MAX ? INT32_MAX : sender_cert_len) : -1,
+        sender_cert};
     s = mu_binary_write_bytestring(w, &cert);
     if (s != MU_STATUS_GOOD) {
         return s;
     }
 
-    mu_bytestring_t thumb = {receiver_thumbprint ? (opcua_int32_t)thumb_len : -1, receiver_thumbprint};
+    mu_bytestring_t thumb = {
+        receiver_thumbprint ? (opcua_int32_t)(thumb_len > (size_t)INT32_MAX ? INT32_MAX : thumb_len) : -1,
+        receiver_thumbprint};
     return mu_binary_write_bytestring(w, &thumb);
 }
 

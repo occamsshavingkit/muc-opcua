@@ -4,6 +4,7 @@
 
 #if MUC_OPCUA_SUBSCRIPTIONS
 
+#include "../core/ctz.h"
 #include "../core/server_internal.h"
 #include "../core/service_dispatch.h"
 #include "../services/read.h"
@@ -239,7 +240,7 @@ static opcua_int32_t count_reportable_items(const struct mu_server *server, mu_s
     for (size_t w = 0; w < MU_REPORTABLE_BITMAP_WORDS; ++w) {
         opcua_uint32_t bits = server->subs.reportable_bitmap[w];
         while (bits != 0u) {
-            size_t i = w * 32u + (size_t)__builtin_ctz(bits);
+            size_t i = w * 32u + (size_t)mu_ctz_u32(bits);
             bits &= (bits - 1u);
             if (i >= MU_MAX_MONITORED_ITEMS) {
                 break;
@@ -257,7 +258,7 @@ static opcua_int32_t count_reportable_items(const struct mu_server *server, mu_s
     for (size_t w = 0; w < MU_REPORTABLE_BITMAP_WORDS; ++w) {
         opcua_uint32_t bits = server->subs.reportable_bitmap[w];
         while (bits != 0u) {
-            size_t i = w * 32u + (size_t)__builtin_ctz(bits);
+            size_t i = w * 32u + (size_t)mu_ctz_u32(bits);
             bits &= (bits - 1u);
             if (i >= MU_MAX_MONITORED_ITEMS) {
                 break;
@@ -279,7 +280,7 @@ static opcua_int32_t count_reportable_items(const struct mu_server *server, cons
     for (size_t w = 0; w < MU_REPORTABLE_BITMAP_WORDS; ++w) {
         opcua_uint32_t bits = server->subs.reportable_bitmap[w];
         while (bits != 0u) {
-            size_t i = w * 32u + (size_t)__builtin_ctz(bits);
+            size_t i = w * 32u + (size_t)mu_ctz_u32(bits);
             bits &= (bits - 1u);
             if (i >= MU_MAX_MONITORED_ITEMS) {
                 break;
@@ -365,7 +366,7 @@ static void clear_reported_items(struct mu_server *server, const mu_subscription
     for (size_t w = 0; w < MU_REPORTABLE_BITMAP_WORDS; ++w) {
         opcua_uint32_t bits = server->subs.reportable_bitmap[w];
         while (bits != 0u) {
-            size_t i = w * 32u + (size_t)__builtin_ctz(bits);
+            size_t i = w * 32u + (size_t)mu_ctz_u32(bits);
             bits &= (bits - 1u);
             if (i >= MU_MAX_MONITORED_ITEMS) {
                 break;
@@ -377,7 +378,7 @@ static void clear_reported_items(struct mu_server *server, const mu_subscription
     for (size_t w = 0; w < MU_REPORTABLE_BITMAP_WORDS; ++w) {
         opcua_uint32_t bits = server->subs.reportable_bitmap[w];
         while (bits != 0u && remaining > 0) {
-            size_t i = w * 32u + (size_t)__builtin_ctz(bits);
+            size_t i = w * 32u + (size_t)mu_ctz_u32(bits);
             bits &= (bits - 1u);
             if (i >= MU_MAX_MONITORED_ITEMS) {
                 break;
@@ -397,7 +398,7 @@ static void clear_reported_items(struct mu_server *server, const mu_subscription
     for (size_t w = 0; w < MU_REPORTABLE_BITMAP_WORDS; ++w) {
         opcua_uint32_t bits = server->subs.reportable_bitmap[w];
         while (bits != 0u && remaining > 0) {
-            size_t i = w * 32u + (size_t)__builtin_ctz(bits);
+            size_t i = w * 32u + (size_t)mu_ctz_u32(bits);
             bits &= (bits - 1u);
             if (i >= MU_MAX_MONITORED_ITEMS) {
                 break;
@@ -416,7 +417,7 @@ static void clear_reported_items(struct mu_server *server, const mu_subscription
     for (size_t w = 0; w < MU_REPORTABLE_BITMAP_WORDS; ++w) {
         opcua_uint32_t bits = server->subs.reportable_bitmap[w];
         while (bits != 0u) {
-            size_t i = w * 32u + (size_t)__builtin_ctz(bits);
+            size_t i = w * 32u + (size_t)mu_ctz_u32(bits);
             bits &= (bits - 1u);
             if (i >= MU_MAX_MONITORED_ITEMS) {
                 break;
@@ -484,7 +485,7 @@ static opcua_statuscode_t write_data_change_notification(mu_binary_writer_t *w, 
     for (size_t bw = 0; bw < MU_REPORTABLE_BITMAP_WORDS; ++bw) {
         opcua_uint32_t bits = server->subs.reportable_bitmap[bw];
         while (bits != 0u) {
-            size_t i = bw * 32u + (size_t)__builtin_ctz(bits);
+            size_t i = bw * 32u + (size_t)mu_ctz_u32(bits);
             bits &= (bits - 1u);
             if (i >= MU_MAX_MONITORED_ITEMS) {
                 break;
@@ -556,7 +557,7 @@ static opcua_statuscode_t write_data_change_notification(mu_binary_writer_t *w, 
     for (size_t bw = 0; bw < MU_REPORTABLE_BITMAP_WORDS && report_count > 0; ++bw) {
         opcua_uint32_t bits = server->subs.reportable_bitmap[bw];
         while (bits != 0u && report_count > 0) {
-            size_t i = bw * 32u + (size_t)__builtin_ctz(bits);
+            size_t i = bw * 32u + (size_t)mu_ctz_u32(bits);
             bits &= (bits - 1u);
             if (i >= MU_MAX_MONITORED_ITEMS) {
                 break;

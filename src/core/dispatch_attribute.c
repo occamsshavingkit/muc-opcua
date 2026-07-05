@@ -15,6 +15,7 @@
 #include "../services/write.h"
 #endif
 #include <stddef.h>
+#include <stdlib.h>
 #include <string.h>
 
 /* Per-request operation bounds (bounded, stack-allocated). Sized so a standards
@@ -152,10 +153,17 @@ opcua_statuscode_t handle_write(mu_server_t *server, mu_binary_reader_t *r, mu_b
     }
 
     s = write_response_prefix(w, MU_ID_WRITERESPONSE, req.request_handle, MU_STATUS_GOOD);
-    if (s != MU_STATUS_GOOD) {
-        return s;
+    if (s == MU_STATUS_GOOD) {
+        s = mu_write_response_encode(w, &wresp);
     }
-    s = mu_write_response_encode(w, &wresp);
+
+    for (size_t i = 0; i < wreq.num_nodes_to_write; ++i) {
+        if (wreq.nodes_to_write[i].value.has_value && wreq.nodes_to_write[i].value.value.is_array &&
+            wreq.nodes_to_write[i].value.value.value.array != NULL) {
+            free((void *)wreq.nodes_to_write[i].value.value.value.array);
+        }
+    }
+
     if (s != MU_STATUS_GOOD) {
         return s;
     }

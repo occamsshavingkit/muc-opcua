@@ -16,6 +16,12 @@ void test_binary_nodeid_numeric_roundtrip(void) {
     mu_binary_writer_init(&writer, buffer, sizeof(buffer));
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_write_nodeid(&writer, &id));
 
+    /* Byte-level assertion: Numeric NodeId encoding (OPC 10000-6 §5.2.2.9):
+       FourByte format 0x01 (ns<=255, id<=65535), ns=1, id=1000=0x3E8 */
+    const opcua_byte_t expected[] = {0x01, 0x01, 0xE8, 0x03};
+    TEST_ASSERT_EQUAL_size_t(sizeof(expected), writer.position);
+    TEST_ASSERT_EQUAL_MEMORY(expected, buffer, sizeof(expected));
+
     mu_binary_reader_init(&reader, buffer, writer.position);
     mu_nodeid_t read_id;
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_nodeid(&reader, &read_id));
@@ -32,6 +38,12 @@ void test_binary_nodeid_string_roundtrip(void) {
 
     mu_binary_writer_init(&writer, buffer, sizeof(buffer));
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_write_nodeid(&writer, &id));
+
+    /* Byte-level assertion: String NodeId encoding (OPC 10000-6 §5.2.2.9):
+       format 0x03 (String), uint16 ns=1, String "test" */
+    const opcua_byte_t expected[] = {0x03, 0x01, 0x00, 0x04, 0x00, 0x00, 0x00, 0x74, 0x65, 0x73, 0x74};
+    TEST_ASSERT_EQUAL_size_t(sizeof(expected), writer.position);
+    TEST_ASSERT_EQUAL_MEMORY(expected, buffer, sizeof(expected));
 
     mu_binary_reader_init(&reader, buffer, writer.position);
     mu_nodeid_t read_id;

@@ -73,4 +73,11 @@ opcua_statuscode_t mu_read_process(const mu_address_space_t *address_space, cons
                                    const mu_read_request_t *req, opcua_datetime_t now, mu_read_response_t *resp,
                                    mu_datavalue_t *results_array, size_t max_results);
 
+typedef struct {
+    size_t hits;
+    size_t misses;
+} mu_read_cache_stats_t;
+
+void mu_read_cache_get_stats(mu_read_cache_stats_t *out);
+
 #endif /* MUC_OPCUA_SERVICES_READ_H */
