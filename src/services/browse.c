@@ -356,17 +356,8 @@ opcua_statuscode_t mu_browse_process_with_user_index(const mu_address_space_t *a
             ref_desc->display_name = target->display_name;
             ref_desc->node_class = target->node_class;
 
-            /* Find HasTypeDefinition if present */
-            ref_desc->type_definition =
-                (mu_nodeid_t){.identifier_type = MU_NODEID_NUMERIC, .namespace_index = 0, .identifier.numeric = 0};
-            for (size_t k = 0; k < target->reference_count; ++k) {
-                if (target->references[k].is_forward &&
-                    target->references[k].reference_type_id.identifier_type == MU_NODEID_NUMERIC &&
-                    target->references[k].reference_type_id.identifier.numeric == 40) { /* HasTypeDefinition */
-                    ref_desc->type_definition = target->references[k].target_id;
-                    break;
-                }
-            }
+            /* TypeDefinition cached on the node (audit T22). */
+            ref_desc->type_definition = target->type_definition;
         }
 #ifdef MUC_OPCUA_SERVICE_NODEMANAGEMENT
         /* Also iterate over dynamic references */
@@ -423,9 +414,8 @@ opcua_statuscode_t mu_browse_process_with_user_index(const mu_address_space_t *a
                 ref_desc->display_name = target->display_name;
                 ref_desc->node_class = target->node_class;
 
-                ref_desc->type_definition =
-                    (mu_nodeid_t){.identifier_type = MU_NODEID_NUMERIC, .namespace_index = 0, .identifier.numeric = 0};
-                /* Optional: check target's references for TypeDefinition (static and dynamic) */
+                /* TypeDefinition cached on the node (audit T22). */
+                ref_desc->type_definition = target->type_definition;
             }
         }
 #endif
