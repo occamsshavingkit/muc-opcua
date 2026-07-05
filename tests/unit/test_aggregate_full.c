@@ -7,7 +7,8 @@
 #include "muc_opcua/types.h"
 #include "unity.h"
 
-#pragma message "STUB: aggregate function behavioral tests needed (OPC-10000-13) when MUC_OPCUA_AGGREGATE_FULL is enabled"
+#pragma message                                                                                                        \
+    "STUB: aggregate function behavioral tests needed (OPC-10000-13) when MUC_OPCUA_AGGREGATE_FULL is enabled"
 
 void setUp(void) {}
 void tearDown(void) {}

@@ -5,7 +5,8 @@
  */
 #include "unity.h"
 
-#pragma message "STUB: behavioral tests needed for Reverse Connect (OPC-10000-6 §7.5) when MUC_OPCUA_REVERSE_CONNECT is enabled"
+#pragma message                                                                                                        \
+    "STUB: behavioral tests needed for Reverse Connect (OPC-10000-6 §7.5) when MUC_OPCUA_REVERSE_CONNECT is enabled"
 
 void setUp(void) {}
 void tearDown(void) {}

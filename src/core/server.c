@@ -823,8 +823,7 @@ static void poll_send_error_and_close(mu_server_t *server, void *handle) {
     if (mu_tcp_create_error_message(MU_STATUS_BAD_TCPNOTENOUGHRESOURCES, "Server full", buf, &err_len) ==
         MU_STATUS_GOOD) {
         size_t bytes_written;
-        server->config.tcp_adapter.write(server->config.tcp_adapter.context, handle, buf, err_len,
-                                         &bytes_written);
+        server->config.tcp_adapter.write(server->config.tcp_adapter.context, handle, buf, err_len, &bytes_written);
     }
     server->config.tcp_adapter.close_connection(server->config.tcp_adapter.context, handle);
 }
@@ -847,8 +846,8 @@ static size_t poll_msg_size(const opcua_byte_t *buffer, size_t offset) {
     return (size_t)b[4] | ((size_t)b[5] << 8) | ((size_t)b[6] << 16) | ((size_t)b[7] << 24);
 }
 
-static void poll_process_buffer(mu_server_t *server, void **handle_ptr, size_t *rx_len_ptr,
-                                 opcua_byte_t *buffer, size_t buffer_size) {
+static void poll_process_buffer(mu_server_t *server, void **handle_ptr, size_t *rx_len_ptr, opcua_byte_t *buffer,
+                                size_t buffer_size) {
     size_t consumed = 0;
     while (*handle_ptr != NULL && (*rx_len_ptr - consumed) >= 8) {
         size_t msg_size = poll_msg_size(buffer, consumed);
@@ -879,15 +878,13 @@ static void poll_process_buffer(mu_server_t *server, void **handle_ptr, size_t *
 }
 
 static opcua_statuscode_t poll_read_data(mu_server_t *server, void **handle_ptr, size_t *rx_len_ptr,
-                                          opcua_uint64_t *last_activity_ptr, opcua_byte_t *buffer,
-                                          size_t buffer_size) {
+                                         opcua_uint64_t *last_activity_ptr, opcua_byte_t *buffer, size_t buffer_size) {
     if (*rx_len_ptr >= buffer_size) {
         return MU_STATUS_GOOD;
     }
     size_t bytes_read = 0;
     opcua_statuscode_t status = server->config.tcp_adapter.read(
-        server->config.tcp_adapter.context, *handle_ptr, buffer + *rx_len_ptr,
-        buffer_size - *rx_len_ptr, &bytes_read);
+        server->config.tcp_adapter.context, *handle_ptr, buffer + *rx_len_ptr, buffer_size - *rx_len_ptr, &bytes_read);
 
     if (status != MU_STATUS_GOOD) {
         poll_close_connection(server, handle_ptr, rx_len_ptr);
@@ -902,8 +899,8 @@ static opcua_statuscode_t poll_read_data(mu_server_t *server, void **handle_ptr,
 
 #ifdef MUC_OPCUA_MULTIPLE_CONNECTIONS
 static void poll_conn_read_and_process(mu_server_t *server, mu_connection_t *conn) {
-    poll_read_data(server, &conn->client_handle, &conn->rx_len, &conn->last_activity_ms,
-                   conn->rx_buffer, sizeof(conn->rx_buffer));
+    poll_read_data(server, &conn->client_handle, &conn->rx_len, &conn->last_activity_ms, conn->rx_buffer,
+                   sizeof(conn->rx_buffer));
 
     server->active_conn = conn;
     poll_process_buffer(server, &conn->client_handle, &conn->rx_len, conn->rx_buffer, sizeof(conn->rx_buffer));
@@ -914,8 +911,8 @@ static void poll_single_read_and_process(mu_server_t *server) {
     poll_read_data(server, &server_client_handle, &server_rx_len, &server_last_activity_ms,
                    server->config.receive_buffer, server->config.receive_buffer_size);
 
-    poll_process_buffer(server, &server_client_handle, &server_rx_len,
-                         server->config.receive_buffer, server->config.receive_buffer_size);
+    poll_process_buffer(server, &server_client_handle, &server_rx_len, server->config.receive_buffer,
+                        server->config.receive_buffer_size);
 }
 #endif
 
@@ -935,8 +932,7 @@ opcua_statuscode_t mu_server_poll(mu_server_t *server) {
     }
 
     void *new_handle = NULL;
-    opcua_statuscode_t status =
-        server->config.tcp_adapter.accept(server->config.tcp_adapter.context, &new_handle);
+    opcua_statuscode_t status = server->config.tcp_adapter.accept(server->config.tcp_adapter.context, &new_handle);
     if (status == MU_STATUS_GOOD && new_handle != NULL) {
         if (free_slot != -1) {
             mu_connection_t *conn = &server->conns[free_slot];
@@ -958,8 +954,8 @@ opcua_statuscode_t mu_server_poll(mu_server_t *server) {
             continue;
         }
 
-        if (poll_check_idle_timeout(server, &conn->client_handle, &conn->rx_len,
-                                     &conn->last_activity_ms, &conn->secure_channel)) {
+        if (poll_check_idle_timeout(server, &conn->client_handle, &conn->rx_len, &conn->last_activity_ms,
+                                    &conn->secure_channel)) {
             continue;
         }
         poll_conn_read_and_process(server, conn);
@@ -983,26 +979,24 @@ opcua_statuscode_t mu_server_poll(mu_server_t *server) {
             mu_subscriptions_init(&server->subs);
 #endif
             server_rx_len = 0;
-            server_last_activity_ms =
-                server->config.time_adapter.get_tick_ms(server->config.time_adapter.context);
+            server_last_activity_ms = server->config.time_adapter.get_tick_ms(server->config.time_adapter.context);
         }
         return mu_server_poll_background(server);
     }
 
-    if (poll_check_idle_timeout(server, &server_client_handle, &server_rx_len,
-                                 &server_last_activity_ms, &server_secure_channel)) {
+    if (poll_check_idle_timeout(server, &server_client_handle, &server_rx_len, &server_last_activity_ms,
+                                &server_secure_channel)) {
         return mu_server_poll_background(server);
     }
 
     /* Check for a second connection waiting to be rejected */
     void *second_handle = NULL;
-    opcua_statuscode_t status =
-        server->config.tcp_adapter.accept(server->config.tcp_adapter.context, &second_handle);
+    opcua_statuscode_t status = server->config.tcp_adapter.accept(server->config.tcp_adapter.context, &second_handle);
     if (status == MU_STATUS_GOOD && second_handle != NULL) {
         opcua_byte_t buf[256];
         size_t bytes_read = 0;
-        status = server->config.tcp_adapter.read(server->config.tcp_adapter.context, second_handle, buf,
-                                                  sizeof(buf), &bytes_read);
+        status = server->config.tcp_adapter.read(server->config.tcp_adapter.context, second_handle, buf, sizeof(buf),
+                                                 &bytes_read);
 
         if (status == MU_STATUS_GOOD && bytes_read >= 8 && buf[0] == 'H' && buf[1] == 'E' && buf[2] == 'L') {
             size_t err_len = sizeof(buf);
@@ -1010,7 +1004,7 @@ opcua_statuscode_t mu_server_poll(mu_server_t *server) {
                 MU_STATUS_GOOD) {
                 size_t bytes_written;
                 server->config.tcp_adapter.write(server->config.tcp_adapter.context, second_handle, buf, err_len,
-                                                  &bytes_written);
+                                                 &bytes_written);
             }
         }
         server->config.tcp_adapter.close_connection(server->config.tcp_adapter.context, second_handle);

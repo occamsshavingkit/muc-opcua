@@ -475,7 +475,7 @@ static opcua_statuscode_t handle_activate_anonymous(mu_server_t *server, const m
 
 #ifdef MUC_OPCUA_USER_AUTH
 static opcua_statuscode_t handle_activate_username(mu_server_t *server, mu_session_t *slot,
-                                                    mu_username_identity_token_t *user_token) {
+                                                   mu_username_identity_token_t *user_token) {
     if (!mu_security_policy_allows_username_password_tokens(server_secure_channel.policy)) {
         return MU_STATUS_BAD_IDENTITYTOKENREJECTED;
     }
@@ -485,12 +485,11 @@ static opcua_statuscode_t handle_activate_username(mu_server_t *server, mu_sessi
     mu_bytestring_t decrypted_password = user_token->password;
 
     if (user_token->encryption_algorithm.length > 0 && user_token->password.length > 0) {
-        if (server->config.crypto_adapter != NULL &&
-            server->config.crypto_adapter->rsa_oaep_decrypt != NULL) {
+        if (server->config.crypto_adapter != NULL && server->config.crypto_adapter->rsa_oaep_decrypt != NULL) {
             size_t out_len = sizeof(decrypt_buf);
             opcua_statuscode_t ds = server->config.crypto_adapter->rsa_oaep_decrypt(
-                server->config.crypto_adapter->context, user_token->password.data,
-                (size_t)user_token->password.length, decrypt_buf, &out_len);
+                server->config.crypto_adapter->context, user_token->password.data, (size_t)user_token->password.length,
+                decrypt_buf, &out_len);
             if (ds != MU_STATUS_GOOD) {
                 result = MU_STATUS_BAD_IDENTITYTOKENREJECTED;
                 goto cleanup;
@@ -499,9 +498,8 @@ static opcua_statuscode_t handle_activate_username(mu_server_t *server, mu_sessi
                 result = MU_STATUS_BAD_IDENTITYTOKENREJECTED;
                 goto cleanup;
             }
-            opcua_int32_t secret_len =
-                (opcua_int32_t)decrypt_buf[0] | ((opcua_int32_t)decrypt_buf[1] << 8) |
-                ((opcua_int32_t)decrypt_buf[2] << 16) | ((opcua_int32_t)decrypt_buf[3] << 24);
+            opcua_int32_t secret_len = (opcua_int32_t)decrypt_buf[0] | ((opcua_int32_t)decrypt_buf[1] << 8) |
+                                       ((opcua_int32_t)decrypt_buf[2] << 16) | ((opcua_int32_t)decrypt_buf[3] << 24);
             /* OPC-10000-4 §7.40.2.2 Table 182: the legacy
                encrypted token Length covers the password
                bytes plus the 32-byte ServerNonce, excluding
@@ -525,8 +523,7 @@ static opcua_statuscode_t handle_activate_username(mu_server_t *server, mu_sessi
                comparisons that use mu_secure_memeq). Using
                mu_secure_memeq would also pull security-only code
                into the USER_AUTH-without-SECURITY (micro) build. */
-            if (nonce_len != 32 ||
-                memcmp(decrypt_buf + nonce_offset, slot->server_nonce, 32) != 0) {
+            if (nonce_len != 32 || memcmp(decrypt_buf + nonce_offset, slot->server_nonce, 32) != 0) {
                 result = MU_STATUS_BAD_IDENTITYTOKENREJECTED;
                 goto cleanup;
             }
@@ -537,9 +534,8 @@ static opcua_statuscode_t handle_activate_username(mu_server_t *server, mu_sessi
     }
 
     if (server->config.user_auth_handler != NULL) {
-        result = server->config.user_auth_handler(server->config.user_auth_handler_handle,
-                                                  &user_token->username, &decrypted_password,
-                                                  &user_token->policy_id);
+        result = server->config.user_auth_handler(server->config.user_auth_handler_handle, &user_token->username,
+                                                  &decrypted_password, &user_token->policy_id);
     } else {
         /* Secure by default: reject if username token type accepted but no handler configured */
         result = MU_STATUS_BAD_IDENTITYTOKENREJECTED;
@@ -555,22 +551,21 @@ cleanup:
 
 #ifdef MUC_OPCUA_SECURITY
 static opcua_statuscode_t handle_activate_certificate(mu_server_t *server, mu_session_t *slot,
-                                                       const mu_certificate_identity_token_t *cert_token,
-                                                       const mu_bytestring_t *user_token_signature) {
+                                                      const mu_certificate_identity_token_t *cert_token,
+                                                      const mu_bytestring_t *user_token_signature) {
     if (cert_token->certificate_data.length <= 0 || user_token_signature->length <= 0) {
         return MU_STATUS_BAD_IDENTITYTOKENREJECTED;
     }
 
     const opcua_byte_t *sc_data = NULL;
     size_t sc_len = 0;
-    if (server->config.crypto_adapter == NULL ||
-        server->config.crypto_adapter->get_own_certificate == NULL ||
+    if (server->config.crypto_adapter == NULL || server->config.crypto_adapter->get_own_certificate == NULL ||
         server->config.crypto_adapter->rsa_sha256_verify == NULL) {
         return MU_STATUS_BAD_IDENTITYTOKENREJECTED;
     }
 
-    opcua_statuscode_t gcs = server->config.crypto_adapter->get_own_certificate(
-        server->config.crypto_adapter->context, &sc_data, &sc_len);
+    opcua_statuscode_t gcs =
+        server->config.crypto_adapter->get_own_certificate(server->config.crypto_adapter->context, &sc_data, &sc_len);
     if (gcs != MU_STATUS_GOOD) {
         return MU_STATUS_BAD_IDENTITYTOKENREJECTED;
     }
@@ -584,8 +579,8 @@ static opcua_statuscode_t handle_activate_certificate(mu_server_t *server, mu_se
 
     opcua_statuscode_t vs = server->config.crypto_adapter->rsa_sha256_verify(
         server->config.crypto_adapter->context, cert_token->certificate_data.data,
-        (size_t)cert_token->certificate_data.length, verify_buf, sc_len + 32,
-        user_token_signature->data, (size_t)user_token_signature->length);
+        (size_t)cert_token->certificate_data.length, verify_buf, sc_len + 32, user_token_signature->data,
+        (size_t)user_token_signature->length);
     if (vs != MU_STATUS_GOOD) {
         return MU_STATUS_BAD_IDENTITYTOKENREJECTED;
     }

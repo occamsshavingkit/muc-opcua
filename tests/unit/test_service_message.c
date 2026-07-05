@@ -8,9 +8,9 @@
 
 /* Internal function under test — declared in service_message.h */
 opcua_statuscode_t mu_parse_service_prefix(const opcua_byte_t *buffer, size_t length, size_t *offset,
-                                            mu_nodeid_t *node_id);
+                                           mu_nodeid_t *node_id);
 opcua_statuscode_t mu_write_service_prefix(opcua_byte_t *buffer, size_t length, size_t *offset,
-                                            const mu_nodeid_t *node_id);
+                                           const mu_nodeid_t *node_id);
 
 void setUp(void) {}
 void tearDown(void) {}

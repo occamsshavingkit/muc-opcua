@@ -17,7 +17,7 @@ import shutil
 import subprocess  # nosec B404 — this checker's job is to invoke ctest on the build
 import sys
 
-VALID_PROFILES = {"nano", "micro", "embedded", "full"}
+VALID_PROFILES = {"nano", "micro", "embedded", "standard", "full"}
 
 
 def _parse_profiles(cell):
