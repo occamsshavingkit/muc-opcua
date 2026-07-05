@@ -190,5 +190,6 @@ opcua_statuscode_t mu_read_process_with_user_index(const mu_address_space_t *add
 opcua_statuscode_t mu_read_process(const mu_address_space_t *address_space, const mu_address_space_t *dynamic,
                                    const mu_read_request_t *req, opcua_datetime_t now, mu_read_response_t *resp,
                                    mu_datavalue_t *results_array, size_t max_results, mu_read_cache_t *cache) {
-    return mu_read_process_with_user_index(address_space, NULL, dynamic, req, now, resp, results_array, max_results, cache);
+    return mu_read_process_with_user_index(address_space, NULL, dynamic, req, now, resp, results_array, max_results,
+                                           cache);
 }
