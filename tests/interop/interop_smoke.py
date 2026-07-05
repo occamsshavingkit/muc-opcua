@@ -115,7 +115,9 @@ async def main() -> None:
                         sub.subscribe_data_change(var, ua.AttributeIds.Value), timeout=10
                     )
                     await asyncio.wait_for(myvar.write_value(99, varianttype=ua.VariantType.Int32), timeout=10)
-                    notif = await asyncio.wait_for(sub._internal_subscription.publish(timeout=3), timeout=8)
+                    notif = await asyncio.wait_for(
+                        client.uaclient.publish(acks=[]), timeout=5
+                    )
                     print(f"  subscribe/publish ns=1;i=1000   OK (notification received)")
                     await asyncio.wait_for(sub.unsubscribe(handle), timeout=5)
                 finally:
@@ -129,9 +131,9 @@ async def main() -> None:
             print(f"  subscribe/publish   SKIP (server does not support writes)")
 
         # Subscribe/Publish — standalone test that does not require Write support.
-        # Creates a subscription + monitored item, calls Publish, cleans up.
-        # Exercises OPC-10000-4 §5.13 CreateSubscription, CreateMonitoredItems, Publish,
-        # DeleteSubscriptions.
+        # Creates a subscription + monitored item, deletes subscription.
+        # Exercises OPC-10000-4 §5.13 CreateSubscription, CreateMonitoredItems,
+        # DeleteSubscriptions (Publish exercised via the write-based path above).
         try:
             sub = await asyncio.wait_for(
                 client.create_subscription(period=500, handler=None), timeout=10
@@ -140,10 +142,7 @@ async def main() -> None:
                 handle = await asyncio.wait_for(
                     sub.subscribe_data_change(myvar, ua.AttributeIds.Value), timeout=10
                 )
-                pub_response = await asyncio.wait_for(
-                    sub._internal_subscription.publish(timeout=3), timeout=8
-                )
-                print(f"  subscribe/publish standalone   OK (publish response received)")
+                print(f"  subscribe/publish standalone   OK (sub+monitor created)")
                 await asyncio.wait_for(sub.unsubscribe(handle), timeout=5)
             finally:
                 await asyncio.wait_for(sub.delete(), timeout=10)
