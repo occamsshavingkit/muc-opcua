@@ -101,6 +101,12 @@ void test_read_service_scalar_values(void) {
     opcua_int32_t val;
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_int32(&reader, &val));
     TEST_ASSERT_EQUAL(42, val);
+
+    opcua_int32_t diag_len;
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_int32(&reader, &diag_len));
+    TEST_ASSERT_EQUAL(0, diag_len);
+
+    TEST_ASSERT_EQUAL(writer.position, reader.position);
 }
 
 void test_read_service_rejects_invalid_timestamps_to_return(void) {

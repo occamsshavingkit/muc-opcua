@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 """Interop smoke test for muc-opcua.
-
+ 
 Drives the running muc-opcua server with `asyncua` (a mature, standards-
 compliant Python OPC UA client) to validate the connect -> discover -> session
--> browse -> read path against a real client rather than self-authored fixtures.
-This operationalises spec FR-026 (adopt/adapt the async-opcua interop suite once
-the minimal connect/discover/browse/read path works).
+-> browse -> read -> write path against a real client rather than self-authored
+fixtures. This operationalises spec FR-026 (adopt/adapt the async-opcua interop
+suite once the minimal connect/discover/browse/read path works) and interop test
+hardening (spec 033) which adds write coverage.
 
 Exits 0 on success, 1 on failure.
 """
@@ -14,6 +15,7 @@ import sys
 import traceback
 
 from asyncua import Client
+from asyncua import ua
 
 URL = sys.argv[1] if len(sys.argv) > 1 else "opc.tcp://localhost:4840"
 
@@ -34,6 +36,25 @@ async def main() -> None:
         ids = [c.nodeid.to_string() for c in children]
         assert any("i=1000" in i for i in ids), f"MyVar1 not found under Objects: {ids}"
         print(f"  browse i=85 children = {ids}   OK")
+
+        # Write — sets MyVar1 to 100, then reads back to verify.
+        # Some server configurations (e.g. minimal_server without write handler)
+        # return BadWriteNotSupported. Gracefully skip in that case.
+        myvar = client.get_node("ns=1;i=1000")
+        try:
+            dv = await asyncio.wait_for(myvar.read_value(), timeout=10)
+            old = dv
+            await asyncio.wait_for(myvar.write_value(100, varianttype=ua.VariantType.Int32), timeout=10)
+            new_dv = await asyncio.wait_for(myvar.read_value(), timeout=10)
+            assert new_dv == 100, f"Write expected 100, got {new_dv!r}"
+            print(f"  write ns=1;i=1000 = 100   OK")
+            # Restore original value
+            await asyncio.wait_for(myvar.write_value(old, varianttype=ua.VariantType.Int32), timeout=10)
+        except ua.UaStatusCodeError as e:
+            if "BadWriteNotSupported" in str(e):
+                print(f"  write ns=1;i=1000   SKIP (server does not support writes)")
+            else:
+                raise
     finally:
         await client.disconnect()
 
