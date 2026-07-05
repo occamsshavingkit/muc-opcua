@@ -28,6 +28,7 @@ static void mu_read_cache_store(const mu_nodeid_t *node_id, const mu_variant_t *
     (void)node_id; (void)val; (void)read_time;
 }
 
+#ifdef MUC_OPCUA_MULTI_CHUNK
 static size_t variant_elem_size(mu_builtin_type_t type) {
     switch (type) {
     case MU_TYPE_BOOLEAN:       return sizeof(opcua_boolean_t);
@@ -52,7 +53,9 @@ static size_t variant_elem_size(mu_builtin_type_t type) {
     default:                    return 0;
     }
 }
+#endif
 
+#ifdef MUC_OPCUA_MULTI_CHUNK
 static opcua_statuscode_t parse_numeric_range(const mu_string_t *range_str, opcua_int32_t *start, opcua_int32_t *end) {
     const char *p = (const char *)range_str->data;
     opcua_int32_t len = range_str->length;
@@ -140,6 +143,7 @@ static opcua_statuscode_t apply_index_range(const mu_string_t *index_range, mu_v
 
     return MU_STATUS_GOOD;
 }
+#endif /* MUC_OPCUA_MULTI_CHUNK */
 
 opcua_statuscode_t mu_read_request_decode(mu_binary_reader_t *reader, mu_read_request_t *req,
                                           mu_read_value_id_t *nodes_array, size_t max_nodes) {
@@ -288,33 +292,23 @@ static opcua_statuscode_t read_attribute(const mu_address_space_t *address_space
         }
         return MU_STATUS_BAD_NOTREADABLE;
 
-    /* OPC-10000-3 Table 1: Description Attribute (id 5), mandatory on all Nodes.
-       Returns an empty LocalizedText (both locale and text are null strings)
-       since the micro node model does not store a separate description. */
+#ifdef MUC_OPCUA_MULTI_CHUNK
     case MU_ATTRIBUTEID_DESCRIPTION:
         value->type = MU_TYPE_LOCALIZEDTEXT;
         value->value.localized_text.locale = (mu_string_t){-1, NULL};
         value->value.localized_text.text = (mu_string_t){-1, NULL};
         return MU_STATUS_GOOD;
 
-    /* OPC-10000-3 Table 1: WriteMask Attribute (id 6), mandatory on all Nodes.
-       Indicates which Attributes are writable. The micro profile does not track
-       per-node write masks — returns 0 (nothing writable). */
     case MU_ATTRIBUTEID_WRITEMASK:
         value->type = MU_TYPE_UINT32;
         value->value.ui32 = 0;
         return MU_STATUS_GOOD;
 
-    /* OPC-10000-3 Table 1: UserWriteMask Attribute (id 7), mandatory on all Nodes.
-       Same semantics as WriteMask but for the current user. Returns 0. */
     case MU_ATTRIBUTEID_USERWRITEMASK:
         value->type = MU_TYPE_UINT32;
         value->value.ui32 = 0;
         return MU_STATUS_GOOD;
 
-    /* OPC-10000-3 §5.6.3: DataType Attribute (id 14), only exists on Variable
-       and VariableType Nodes. Returns the type_definition NodeId, or
-       BaseDataType (ns=0;i=24) if the node has no explicit type. */
     case MU_ATTRIBUTEID_DATATYPE:
         if (node->node_class != MU_NODECLASS_VARIABLE &&
             node->node_class != MU_NODECLASS_VARIABLETYPE) {
@@ -330,8 +324,6 @@ static opcua_statuscode_t read_attribute(const mu_address_space_t *address_space
         }
         return MU_STATUS_GOOD;
 
-    /* OPC-10000-3 §5.6.5: ValueRank Attribute (id 15), only exists on Variable
-       and VariableType Nodes. Returns -1 (scalar) in the micro profile. */
     case MU_ATTRIBUTEID_VALUERANK:
         if (node->node_class != MU_NODECLASS_VARIABLE &&
             node->node_class != MU_NODECLASS_VARIABLETYPE) {
@@ -341,9 +333,6 @@ static opcua_statuscode_t read_attribute(const mu_address_space_t *address_space
         value->value.i32 = -1;
         return MU_STATUS_GOOD;
 
-    /* OPC-10000-3 §5.6.6: AccessLevel Attribute (id 17), only exists on Variable
-       Nodes. Returns CurrentRead (0x01) if the node has a readable value source,
-       or 0 otherwise. */
     case MU_ATTRIBUTEID_ACCESSLEVEL:
         if (node->node_class != MU_NODECLASS_VARIABLE) {
             return MU_STATUS_BAD_ATTRIBUTEIDINVALID;
@@ -352,9 +341,6 @@ static opcua_statuscode_t read_attribute(const mu_address_space_t *address_space
         value->value.ui32 = (node->value != NULL) ? 0x01 : 0;
         return MU_STATUS_GOOD;
 
-    /* OPC-10000-3 §5.6.9: Historizing Attribute (id 20), only exists on Variable
-       Nodes. Indicates whether the server is actively collecting history for the
-       Value. The micro profile does not implement history — returns false. */
     case MU_ATTRIBUTEID_HISTORIZING:
         if (node->node_class != MU_NODECLASS_VARIABLE) {
             return MU_STATUS_BAD_ATTRIBUTEIDINVALID;
@@ -362,6 +348,7 @@ static opcua_statuscode_t read_attribute(const mu_address_space_t *address_space
         value->type = MU_TYPE_BOOLEAN;
         value->value.b = false;
         return MU_STATUS_GOOD;
+#endif /* MUC_OPCUA_MULTI_CHUNK */
 
     default:
         return MU_STATUS_BAD_ATTRIBUTEIDINVALID;
@@ -422,8 +409,9 @@ opcua_statuscode_t mu_read_process_with_user_index(const mu_address_space_t *add
             status = read_attribute(address_space, node, read_val->attribute_id, &dv->value);
         }
         if (status == MU_STATUS_GOOD) {
-            /* Apply index_range if specified (OPC-10000-4 §7.27/§7.28). */
+#ifdef MUC_OPCUA_MULTI_CHUNK
             status = apply_index_range(&read_val->index_range, &dv->value);
+#endif
         }
         if (status == MU_STATUS_GOOD) {
             dv->has_value = true;

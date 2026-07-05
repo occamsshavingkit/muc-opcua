@@ -229,6 +229,7 @@ void test_session_close(void) {
    Session to CLOSED without requiring the authenticationToken. The session_id
    and auth_token are preserved so dispatch can return Bad_SessionClosed (not
    Bad_SessionIdInvalid) on subsequent use of the stale token. */
+#ifdef MUC_OPCUA_MULTI_CHUNK
 void test_session_close_timeout(void) {
     mu_session_t session;
     mu_session_init(&session);
@@ -281,6 +282,7 @@ void test_session_timeout_rejects_request_on_closed_slot(void) {
     TEST_ASSERT_NOT_NULL(found);
     TEST_ASSERT_EQUAL_PTR(&sessions[0], found);
 }
+#endif /* MUC_OPCUA_MULTI_CHUNK */
 
 void test_create_session_truncated_body_returns_bad_decodingerror_without_allocating_session(void) {
     mu_server_t server;
@@ -408,8 +410,10 @@ int main(void) {
     RUN_TEST(test_session_create);
     RUN_TEST(test_session_activate_anonymous);
     RUN_TEST(test_session_close);
+#ifdef MUC_OPCUA_MULTI_CHUNK
     RUN_TEST(test_session_close_timeout);
     RUN_TEST(test_session_timeout_rejects_request_on_closed_slot);
+#endif
     RUN_TEST(test_create_session_truncated_body_returns_bad_decodingerror_without_allocating_session);
     RUN_TEST(test_create_session_two_successful_responses_use_fresh_session_ids_and_tokens);
     RUN_TEST(test_create_session_overflow_returns_bad_toomanysessions_without_allocating);

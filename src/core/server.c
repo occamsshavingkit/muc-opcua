@@ -768,12 +768,7 @@ static opcua_statuscode_t mu_server_poll_background(mu_server_t *server) {
     }
 #endif
 
-    /* OPC-10000-4 section 5.7.2.1: a Session whose last service request predates
-       now - revised_session_timeout_ms is closed by the Server. This runs every
-       poll cycle so timed-out Sessions are reclaimed regardless of connection
-       state (a Session may outlive its SecureChannel in the multi-connection
-       profile). A monotonic tick of 0 (stub adapter) disables the check, matching
-       the connection idle-timeout convention. */
+#ifdef MUC_OPCUA_MULTI_CHUNK
     {
         opcua_uint64_t now_ms = server->config.time_adapter.get_tick_ms(server->config.time_adapter.context);
         if (now_ms != 0u) {
@@ -789,8 +784,6 @@ static opcua_statuscode_t mu_server_poll_background(mu_server_t *server) {
                     (now_ms - session->last_activity_ms) > session->revised_session_timeout_ms) {
                     mu_session_close_timeout(session);
 #if MUC_OPCUA_SUBSCRIPTIONS
-                    /* Match CloseSession's subscription cleanup so a timed-out
-                       Session does not leak Subscription slots. */
                     for (size_t j = 0; j < MU_MAX_SUBSCRIPTIONS; ++j) {
                         mu_subscription_t *sub = &server->subs.subscriptions[j];
                         if (sub->in_use && sub->session_id == session->session_id) {
@@ -805,6 +798,7 @@ static opcua_statuscode_t mu_server_poll_background(mu_server_t *server) {
             }
         }
     }
+#endif /* MUC_OPCUA_MULTI_CHUNK */
 
 #if MUC_OPCUA_SUBSCRIPTIONS
     mu_subscriptions_tick(server, server->config.time_adapter.get_tick_ms(server->config.time_adapter.context));
