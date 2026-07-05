@@ -10,6 +10,18 @@
 void setUp(void) {}
 void tearDown(void) {}
 
+/* Channel ID assigned by the server (T009: incrementing counter, not always 1).
+   Set from the OPN response header before building any MSG chunks. */
+static opcua_uint32_t s_channel_id = 0;
+
+static opcua_uint32_t read_opn_channel_id(const opcua_byte_t *buf, size_t len) {
+    if (len < 12) {
+        return 1;
+    }
+    return (opcua_uint32_t)buf[8] | ((opcua_uint32_t)buf[9] << 8u) | ((opcua_uint32_t)buf[10] << 16u) |
+           ((opcua_uint32_t)buf[11] << 24u);
+}
+
 #define MAX_INBOUND 8
 typedef struct {
     int accept_count;
@@ -114,7 +126,7 @@ static size_t build_msg(opcua_byte_t *out, size_t cap, opcua_uint32_t seq, opcua
     out[3] = 'F';
     w.position = 4;
     mu_binary_write_uint32(&w, (opcua_uint32_t)(24 + body_len));
-    mu_binary_write_uint32(&w, 1);
+    mu_binary_write_uint32(&w, s_channel_id);
     mu_binary_write_uint32(&w, 1);
     mu_binary_write_uint32(&w, seq);
     mu_binary_write_uint32(&w, reqid);
@@ -354,17 +366,6 @@ void test_plaintext_user_auth_flow_rejects_username_password_over_security_polic
     }
     enqueue(&mock, chunk, w.position);
 
-    /* CreateSession */
-    mu_binary_writer_init(&w, tmp, sizeof(tmp));
-    {
-        mu_nodeid_t t = {0, MU_NODEID_NUMERIC, {MU_ID_CREATESESSIONREQUEST}};
-        mu_binary_write_nodeid(&w, &t);
-    }
-    write_request_header(&w, 0, 2);
-    write_create_session_request_body_fields(&w);
-    clen = build_msg(chunk, sizeof(chunk), 2, 2, tmp, w.position);
-    enqueue(&mock, chunk, clen);
-
     /* ---- Configure the server ---- */
     mu_server_config_t config;
     (void)memset(&config, 0, sizeof(config));
@@ -400,6 +401,18 @@ void test_plaintext_user_auth_flow_rejects_username_password_over_security_polic
     mu_server_poll(server); /* accept */
     mu_server_poll(server); /* HEL -> ACK */
     mu_server_poll(server); /* OPN -> Response */
+    s_channel_id = read_opn_channel_id(mock.last_write, mock.last_write_len);
+
+    /* CreateSession */
+    mu_binary_writer_init(&w, tmp, sizeof(tmp));
+    {
+        mu_nodeid_t t = {0, MU_NODEID_NUMERIC, {MU_ID_CREATESESSIONREQUEST}};
+        mu_binary_write_nodeid(&w, &t);
+    }
+    write_request_header(&w, 0, 2);
+    write_create_session_request_body_fields(&w);
+    clen = build_msg(chunk, sizeof(chunk), 2, 2, tmp, w.position);
+    enqueue(&mock, chunk, clen);
     mu_server_poll(server); /* CreateSession -> Response */
 
     /* ActivateSession with UserNameIdentityToken over SecurityPolicy#None.
@@ -506,17 +519,6 @@ void test_anonymous_identity_token_succeeds_over_security_policy_none(void) {
     }
     enqueue(&mock, chunk, w.position);
 
-    /* CreateSession */
-    mu_binary_writer_init(&w, tmp, sizeof(tmp));
-    {
-        mu_nodeid_t t = {0, MU_NODEID_NUMERIC, {MU_ID_CREATESESSIONREQUEST}};
-        mu_binary_write_nodeid(&w, &t);
-    }
-    write_request_header(&w, 0, 2);
-    write_create_session_request_body_fields(&w);
-    clen = build_msg(chunk, sizeof(chunk), 2, 2, tmp, w.position);
-    enqueue(&mock, chunk, clen);
-
     mu_server_config_t config;
     (void)memset(&config, 0, sizeof(config));
     config.endpoint_url = "opc.tcp://host:4840";
@@ -548,6 +550,18 @@ void test_anonymous_identity_token_succeeds_over_security_policy_none(void) {
     mu_server_poll(server); /* accept */
     mu_server_poll(server); /* HEL -> ACK */
     mu_server_poll(server); /* OPN -> Response */
+    s_channel_id = read_opn_channel_id(mock.last_write, mock.last_write_len);
+
+    /* CreateSession */
+    mu_binary_writer_init(&w, tmp, sizeof(tmp));
+    {
+        mu_nodeid_t t = {0, MU_NODEID_NUMERIC, {MU_ID_CREATESESSIONREQUEST}};
+        mu_binary_write_nodeid(&w, &t);
+    }
+    write_request_header(&w, 0, 2);
+    write_create_session_request_body_fields(&w);
+    clen = build_msg(chunk, sizeof(chunk), 2, 2, tmp, w.position);
+    enqueue(&mock, chunk, clen);
     mu_server_poll(server); /* CreateSession -> Response */
 
     /* ActivateSession with AnonymousIdentityToken.
@@ -603,9 +617,6 @@ void test_getendpoints_security_policy_none_omits_username_identity_tokens(void)
     write_open_secure_channel_none_message(&writer, chunk, sizeof(chunk));
     enqueue(&mock, chunk, writer.position);
 
-    clen = write_get_endpoints_message(chunk, sizeof(chunk), 2, 2, 7);
-    enqueue(&mock, chunk, clen);
-
     mu_server_config_t config;
     (void)memset(&config, 0, sizeof(config));
     config.endpoint_url = "opc.tcp://host:4840";
@@ -638,6 +649,9 @@ void test_getendpoints_security_policy_none_omits_username_identity_tokens(void)
     mu_server_poll(server); /* accept */
     mu_server_poll(server); /* HEL -> ACK */
     mu_server_poll(server); /* OPN -> OpenSecureChannelResponse */
+    s_channel_id = read_opn_channel_id(mock.last_write, mock.last_write_len);
+    clen = write_get_endpoints_message(chunk, sizeof(chunk), 2, 2, 7);
+    enqueue(&mock, chunk, clen);
     mu_server_poll(server); /* GetEndpoints -> GetEndpointsResponse */
 
     mu_binary_reader_t body;

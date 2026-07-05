@@ -36,11 +36,23 @@
 #define STATUS_BAD_TOOMANYMONITOREDITEMS 0x80DB0000u
 #define STATUS_BAD_MONITOREDITEMIDINVALID 0x80420000u
 /* tests/support/fake_platform.c returns entropy byte 0x42. The first CreateSession
-   authenticationToken is generated from that entropy by src/services/session.c. */
+    authenticationToken is generated from that entropy by src/services/session.c. */
 #define TEST_FIRST_AUTH_TOKEN 0xE7E7E7E7u
 
 void setUp(void) {}
 void tearDown(void) {}
+
+/* Channel ID assigned by the server (T009: incrementing counter, not always 1).
+   Set from the OPN response header before building any MSG chunks. */
+static opcua_uint32_t s_channel_id = 0;
+
+static opcua_uint32_t read_opn_channel_id(const opcua_byte_t *buf, size_t len) {
+    if (len < 12) {
+        return 1;
+    }
+    return (opcua_uint32_t)buf[8] | ((opcua_uint32_t)buf[9] << 8u) | ((opcua_uint32_t)buf[10] << 16u) |
+           ((opcua_uint32_t)buf[11] << 24u);
+}
 
 #define MAX_INBOUND 16
 typedef struct {
@@ -140,7 +152,7 @@ static size_t build_msg(opcua_byte_t *out, size_t cap, opcua_uint32_t seq, opcua
     out[3] = 'F';
     w.position = 4;
     mu_binary_write_uint32(&w, (opcua_uint32_t)(24 + blen));
-    mu_binary_write_uint32(&w, 1);
+    mu_binary_write_uint32(&w, s_channel_id);
     mu_binary_write_uint32(&w, 1);
     mu_binary_write_uint32(&w, seq);
     mu_binary_write_uint32(&w, reqid);
@@ -176,11 +188,12 @@ static opcua_uint32_t parse_response(const opcua_byte_t *buf, size_t len, mu_bin
     return type.identifier.numeric;
 }
 
-/* Append HEL, OPN(None, seq 1), CreateSession(seq 2), ActivateSession(seq 3). */
+/* Append HEL and OPN(None, seq 1) only. Must be followed by mu_server_poll for
+   accept/HEL/OPN, then set s_channel_id from the OPN response, then call
+   enqueue_session before any service requests. */
 static void enqueue_connect(mock_t *mock) {
     opcua_byte_t tmp[512], chunk[512];
     mu_binary_writer_t w;
-    size_t clen;
     mu_binary_writer_init(&w, tmp, sizeof(tmp));
     tmp[0] = 'H';
     tmp[1] = 'E';
@@ -238,7 +251,14 @@ static void enqueue_connect(mock_t *mock) {
         mu_binary_write_uint32(&os, (opcua_uint32_t)w.position);
     }
     enqueue(mock, chunk, w.position);
+}
 
+/* Append CreateSession(seq 2) and ActivateSession(seq 3) as MSG chunks using
+   the channel_id read from the OPN response. Call after s_channel_id is set. */
+static void enqueue_session(mock_t *mock) {
+    opcua_byte_t tmp[512], chunk[512];
+    mu_binary_writer_t w;
+    size_t clen;
     mu_binary_writer_init(&w, tmp, sizeof(tmp));
     {
         mu_nodeid_t t = {0, MU_NODEID_NUMERIC, {MU_ID_CREATESESSIONREQUEST}};
@@ -377,10 +397,12 @@ static mu_server_t *make_server(mock_t *mock, opcua_byte_t *storage, size_t stor
     return server;
 }
 
-static void run_connect(mu_server_t *server) {
+static void run_connect(mu_server_t *server, mock_t *mock) {
     mu_server_poll(server); /* accept */
     mu_server_poll(server); /* HEL */
     mu_server_poll(server); /* OPN */
+    s_channel_id = read_opn_channel_id(mock->last_write, mock->last_write_len);
+    enqueue_session(mock);  /* CreateSession + ActivateSession */
     mu_server_poll(server); /* CreateSession */
     mu_server_poll(server); /* ActivateSession */
 }
@@ -393,8 +415,6 @@ void test_create_subscription(void) {
     mock_t mock;
     (void)memset(&mock, 0, sizeof(mock));
     enqueue_connect(&mock);
-    enqueue_create_subscription(&mock, 4, 1000.0, 100, 10);
-    enqueue_create_subscription(&mock, 5, 500.0, 60, 5);
 
     _Alignas(8) opcua_byte_t storage[MU_SERVER_STORAGE_BYTES];
     mu_server_config_t config;
@@ -402,8 +422,10 @@ void test_create_subscription(void) {
     mu_binary_reader_t body;
     opcua_statuscode_t sr;
 
-    run_connect(server);
+    run_connect(server, &mock);
 
+    enqueue_create_subscription(&mock, 4, 1000.0, 100, 10);
+    enqueue_create_subscription(&mock, 5, 500.0, 60, 5);
     mu_server_poll(server); /* CreateSubscription #1 */
     TEST_ASSERT_EQUAL(ID_CREATESUBSCRIPTIONRESPONSE, parse_response(mock.last_write, mock.last_write_len, &body, &sr));
     TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, sr);
@@ -434,9 +456,6 @@ void test_create_subscription_too_many(void) {
     mock_t mock;
     (void)memset(&mock, 0, sizeof(mock));
     enqueue_connect(&mock);
-    enqueue_create_subscription(&mock, 4, 1000.0, 100, 10);
-    enqueue_create_subscription(&mock, 5, 1000.0, 100, 10);
-    enqueue_create_subscription(&mock, 6, 1000.0, 100, 10); /* one past the cap */
 
     _Alignas(8) opcua_byte_t storage[MU_SERVER_STORAGE_BYTES];
     mu_server_config_t config;
@@ -444,7 +463,10 @@ void test_create_subscription_too_many(void) {
     mu_binary_reader_t body;
     opcua_statuscode_t sr;
 
-    run_connect(server);
+    run_connect(server, &mock);
+    enqueue_create_subscription(&mock, 4, 1000.0, 100, 10);
+    enqueue_create_subscription(&mock, 5, 1000.0, 100, 10);
+    enqueue_create_subscription(&mock, 6, 1000.0, 100, 10); /* one past the cap */
     mu_server_poll(server); /* #1 ok */
     mu_server_poll(server); /* #2 ok */
     mu_server_poll(server); /* #3 rejected */
@@ -459,7 +481,6 @@ void test_delete_subscriptions(void) {
     mock_t mock;
     memset(&mock, 0, sizeof(mock));
     enqueue_connect(&mock);
-    enqueue_create_subscription(&mock, 4, 1000.0, 100, 10);
 
     _Alignas(8) opcua_byte_t storage[MU_SERVER_STORAGE_BYTES];
     mu_server_config_t config;
@@ -467,7 +488,8 @@ void test_delete_subscriptions(void) {
     mu_binary_reader_t body;
     opcua_statuscode_t sr;
 
-    run_connect(server);
+    run_connect(server, &mock);
+    enqueue_create_subscription(&mock, 4, 1000.0, 100, 10);
     mu_server_poll(server); /* CreateSubscription */
     TEST_ASSERT_EQUAL(ID_CREATESUBSCRIPTIONRESPONSE, parse_response(mock.last_write, mock.last_write_len, &body, &sr));
     opcua_uint32_t sub_id;
@@ -514,7 +536,6 @@ void test_create_monitored_items(void) {
     mock_t mock;
     memset(&mock, 0, sizeof(mock));
     enqueue_connect(&mock);
-    enqueue_create_subscription(&mock, 4, 1000.0, 100, 10);
 
     _Alignas(8) opcua_byte_t storage[MU_SERVER_STORAGE_BYTES];
     mu_server_config_t config;
@@ -522,7 +543,8 @@ void test_create_monitored_items(void) {
     mu_binary_reader_t body;
     opcua_statuscode_t sr;
 
-    run_connect(server);
+    run_connect(server, &mock);
+    enqueue_create_subscription(&mock, 4, 1000.0, 100, 10);
     mu_server_poll(server); /* CreateSubscription */
     TEST_ASSERT_EQUAL(ID_CREATESUBSCRIPTIONRESPONSE, parse_response(mock.last_write, mock.last_write_len, &body, &sr));
     opcua_uint32_t sub_id;
@@ -570,7 +592,6 @@ void test_create_monitored_items_too_many(void) {
     mock_t mock;
     memset(&mock, 0, sizeof(mock));
     enqueue_connect(&mock);
-    enqueue_create_subscription(&mock, 4, 1000.0, 100, 10);
 
     _Alignas(8) opcua_byte_t storage[MU_SERVER_STORAGE_BYTES];
     mu_server_config_t config;
@@ -578,7 +599,8 @@ void test_create_monitored_items_too_many(void) {
     mu_binary_reader_t body;
     opcua_statuscode_t sr;
 
-    run_connect(server);
+    run_connect(server, &mock);
+    enqueue_create_subscription(&mock, 4, 1000.0, 100, 10);
     mu_server_poll(server); /* CreateSubscription */
     TEST_ASSERT_EQUAL(ID_CREATESUBSCRIPTIONRESPONSE, parse_response(mock.last_write, mock.last_write_len, &body, &sr));
     opcua_uint32_t sub_id;
@@ -622,7 +644,6 @@ void test_delete_monitored_items(void) {
     mock_t mock;
     memset(&mock, 0, sizeof(mock));
     enqueue_connect(&mock);
-    enqueue_create_subscription(&mock, 4, 1000.0, 100, 10);
 
     _Alignas(8) opcua_byte_t storage[MU_SERVER_STORAGE_BYTES];
     mu_server_config_t config;
@@ -630,7 +651,8 @@ void test_delete_monitored_items(void) {
     mu_binary_reader_t body;
     opcua_statuscode_t sr;
 
-    run_connect(server);
+    run_connect(server, &mock);
+    enqueue_create_subscription(&mock, 4, 1000.0, 100, 10);
     mu_server_poll(server); /* CreateSubscription */
     TEST_ASSERT_EQUAL(ID_CREATESUBSCRIPTIONRESPONSE, parse_response(mock.last_write, mock.last_write_len, &body, &sr));
     opcua_uint32_t sub_id;
@@ -719,7 +741,6 @@ void test_sampling_detects_change(void) {
     mock_t mock;
     memset(&mock, 0, sizeof(mock));
     enqueue_connect(&mock);
-    enqueue_create_subscription(&mock, 4, 1000.0, 100, 10);
 
     _Alignas(8) opcua_byte_t storage[MU_SERVER_STORAGE_BYTES];
     mu_server_config_t config;
@@ -728,7 +749,8 @@ void test_sampling_detects_change(void) {
     mu_binary_reader_t body;
     opcua_statuscode_t sr;
 
-    run_connect(server);
+    run_connect(server, &mock);
+    enqueue_create_subscription(&mock, 4, 1000.0, 100, 10);
     mu_server_poll(server); /* CreateSubscription */
     TEST_ASSERT_EQUAL(ID_CREATESUBSCRIPTIONRESPONSE, parse_response(mock.last_write, mock.last_write_len, &body, &sr));
     opcua_uint32_t sub_id;
@@ -843,7 +865,6 @@ void test_publish_delivers_data_change(void) {
     mock_t mock;
     memset(&mock, 0, sizeof(mock));
     enqueue_connect(&mock);
-    enqueue_create_subscription(&mock, 4, 200.0, 1000, 1000); /* large keep-alive: no keep-alives here */
 
     _Alignas(8) opcua_byte_t storage[MU_SERVER_STORAGE_BYTES];
     mu_server_config_t config;
@@ -852,7 +873,8 @@ void test_publish_delivers_data_change(void) {
     mu_binary_reader_t body;
     opcua_statuscode_t sr;
 
-    run_connect(server);
+    run_connect(server, &mock);
+    enqueue_create_subscription(&mock, 4, 200.0, 1000, 1000); /* large keep-alive: no keep-alives here */
     mu_server_poll(server); /* CreateSubscription */
     TEST_ASSERT_EQUAL(ID_CREATESUBSCRIPTIONRESPONSE, parse_response(mock.last_write, mock.last_write_len, &body, &sr));
     opcua_uint32_t sub_id;
@@ -908,7 +930,6 @@ void test_publish_keep_alive(void) {
     mock_t mock;
     memset(&mock, 0, sizeof(mock));
     enqueue_connect(&mock);
-    enqueue_create_subscription(&mock, 4, 200.0, 100, 3); /* keep-alive count 3 */
 
     _Alignas(8) opcua_byte_t storage[MU_SERVER_STORAGE_BYTES];
     mu_server_config_t config;
@@ -917,7 +938,8 @@ void test_publish_keep_alive(void) {
     mu_binary_reader_t body;
     opcua_statuscode_t sr;
 
-    run_connect(server);
+    run_connect(server, &mock);
+    enqueue_create_subscription(&mock, 4, 200.0, 100, 3); /* keep-alive count 3 */
     mu_server_poll(server); /* CreateSubscription */
     TEST_ASSERT_EQUAL(ID_CREATESUBSCRIPTIONRESPONSE, parse_response(mock.last_write, mock.last_write_len, &body, &sr));
     opcua_uint32_t sub_id;
@@ -987,7 +1009,6 @@ void test_publish_acknowledgement_unknown_sequence_returns_result(void) {
     mock_t mock;
     memset(&mock, 0, sizeof(mock));
     enqueue_connect(&mock);
-    enqueue_create_subscription(&mock, 4, 200.0, 100, 3);
 
     _Alignas(8) opcua_byte_t storage[MU_SERVER_STORAGE_BYTES];
     mu_server_config_t config;
@@ -995,7 +1016,8 @@ void test_publish_acknowledgement_unknown_sequence_returns_result(void) {
     mu_binary_reader_t body;
     opcua_statuscode_t sr;
 
-    run_connect(server);
+    run_connect(server, &mock);
+    enqueue_create_subscription(&mock, 4, 200.0, 100, 3);
     mu_server_poll(server); /* CreateSubscription */
     TEST_ASSERT_EQUAL(ID_CREATESUBSCRIPTIONRESPONSE, parse_response(mock.last_write, mock.last_write_len, &body, &sr));
     opcua_uint32_t sub_id;
@@ -1030,7 +1052,6 @@ void test_republish_and_acknowledge(void) {
     mock_t mock;
     memset(&mock, 0, sizeof(mock));
     enqueue_connect(&mock);
-    enqueue_create_subscription(&mock, 4, 200.0, 1000, 1000);
 
     _Alignas(8) opcua_byte_t storage[MU_SERVER_STORAGE_BYTES];
     mu_server_config_t config;
@@ -1039,7 +1060,8 @@ void test_republish_and_acknowledge(void) {
     mu_binary_reader_t body;
     opcua_statuscode_t sr;
 
-    run_connect(server);
+    run_connect(server, &mock);
+    enqueue_create_subscription(&mock, 4, 200.0, 1000, 1000);
     mu_server_poll(server); /* CreateSubscription */
     TEST_ASSERT_EQUAL(ID_CREATESUBSCRIPTIONRESPONSE, parse_response(mock.last_write, mock.last_write_len, &body, &sr));
     opcua_uint32_t sub_id;
@@ -1120,11 +1142,11 @@ static mu_server_t *setup_sub_with_item(mock_t *mock, opcua_byte_t *storage, siz
                                         opcua_double_t sampling, opcua_uint32_t *sub_id_out,
                                         opcua_uint32_t *item_id_out) {
     enqueue_connect(mock);
-    enqueue_create_subscription(mock, 4, interval, lifetime, keepalive);
     mu_server_t *server = make_server(mock, storage, ssize, config, &samp_space);
     mu_binary_reader_t body;
     opcua_statuscode_t sr;
-    run_connect(server);
+    run_connect(server, mock);
+    enqueue_create_subscription(mock, 4, interval, lifetime, keepalive);
     mu_server_poll(server);
     TEST_ASSERT_EQUAL(ID_CREATESUBSCRIPTIONRESPONSE,
                       parse_response(mock->last_write, mock->last_write_len, &body, &sr));
@@ -1195,13 +1217,13 @@ void test_modify_subscription(void) {
     mock_t mock;
     memset(&mock, 0, sizeof(mock));
     enqueue_connect(&mock);
-    enqueue_create_subscription(&mock, 4, 1000.0, 100, 10);
     _Alignas(8) opcua_byte_t storage[MU_SERVER_STORAGE_BYTES];
     mu_server_config_t config;
     mu_server_t *server = make_server(&mock, storage, sizeof(storage), &config, NULL);
     mu_binary_reader_t body;
     opcua_statuscode_t sr;
-    run_connect(server);
+    run_connect(server, &mock);
+    enqueue_create_subscription(&mock, 4, 1000.0, 100, 10);
     mu_server_poll(server);
     TEST_ASSERT_EQUAL(ID_CREATESUBSCRIPTIONRESPONSE, parse_response(mock.last_write, mock.last_write_len, &body, &sr));
     opcua_uint32_t sub_id;
@@ -1652,7 +1674,6 @@ void test_two_sessions(void) {
     mock_t mock;
     memset(&mock, 0, sizeof(mock));
     enqueue_hel_opn(&mock);
-    enqueue_create_session(&mock, 2);
     _Alignas(8) opcua_byte_t storage[MU_SERVER_STORAGE_BYTES];
     mu_server_config_t config;
     mu_server_t *server = make_server(&mock, storage, sizeof(storage), &config, NULL);
@@ -1662,6 +1683,8 @@ void test_two_sessions(void) {
     mu_server_poll(server); /* accept */
     mu_server_poll(server); /* HEL */
     mu_server_poll(server); /* OPN */
+    s_channel_id = read_opn_channel_id(mock.last_write, mock.last_write_len);
+    enqueue_create_session(&mock, 2);
     mu_server_poll(server); /* CreateSession #1 */
     TEST_ASSERT_EQUAL(MU_ID_CREATESESSIONRESPONSE, parse_response(mock.last_write, mock.last_write_len, &body, &sr));
     opcua_uint32_t sid1, tok1 = parse_create_session_token(&body, &sid1);
@@ -1705,7 +1728,6 @@ void test_subscription_session_isolation(void) {
     mock_t mock;
     memset(&mock, 0, sizeof(mock));
     enqueue_hel_opn(&mock);
-    enqueue_create_session(&mock, 2);
     _Alignas(8) opcua_byte_t storage[MU_SERVER_STORAGE_BYTES];
     mu_server_config_t config;
     mu_server_t *server = make_server(&mock, storage, sizeof(storage), &config, NULL);
@@ -1715,6 +1737,8 @@ void test_subscription_session_isolation(void) {
     mu_server_poll(server);
     mu_server_poll(server);
     mu_server_poll(server); /* accept,HEL,OPN */
+    s_channel_id = read_opn_channel_id(mock.last_write, mock.last_write_len);
+    enqueue_create_session(&mock, 2);
     mu_server_poll(server); /* CreateSession #1 */
     TEST_ASSERT_EQUAL(MU_ID_CREATESESSIONRESPONSE, parse_response(mock.last_write, mock.last_write_len, &body, &sr));
     opcua_uint32_t tok1 = parse_create_session_token(&body, NULL);
@@ -1823,7 +1847,6 @@ void test_monitored_item_absolute_deadband(void) {
     mock_t mock;
     memset(&mock, 0, sizeof(mock));
     enqueue_connect(&mock);
-    enqueue_create_subscription(&mock, 4, 200.0, 100, 3); /* keepalive 3 → keep-alives fire */
 
     _Alignas(8) opcua_byte_t storage[MU_SERVER_STORAGE_BYTES];
     mu_server_config_t config;
@@ -1831,7 +1854,8 @@ void test_monitored_item_absolute_deadband(void) {
     mu_server_t *server = make_server(&mock, storage, sizeof(storage), &config, &samp_space);
     mu_binary_reader_t body;
     opcua_statuscode_t sr;
-    run_connect(server);
+    run_connect(server, &mock);
+    enqueue_create_subscription(&mock, 4, 200.0, 100, 3); /* keepalive 3 → keep-alives fire */
     mu_server_poll(server); /* CreateSubscription */
     TEST_ASSERT_EQUAL(ID_CREATESUBSCRIPTIONRESPONSE, parse_response(mock.last_write, mock.last_write_len, &body, &sr));
     opcua_uint32_t sub_id;
@@ -1955,7 +1979,6 @@ void test_monitored_item_queue_overflow(void) {
     mock_t mock;
     memset(&mock, 0, sizeof(mock));
     enqueue_connect(&mock);
-    enqueue_create_subscription(&mock, 4, 1000.0, 1000, 1000); /* publishing 1000 ms */
 
     _Alignas(8) opcua_byte_t storage[MU_SERVER_STORAGE_BYTES];
     mu_server_config_t config;
@@ -1963,7 +1986,8 @@ void test_monitored_item_queue_overflow(void) {
     mu_server_t *server = make_server(&mock, storage, sizeof(storage), &config, &samp_space);
     mu_binary_reader_t body;
     opcua_statuscode_t sr;
-    run_connect(server);
+    run_connect(server, &mock);
+    enqueue_create_subscription(&mock, 4, 1000.0, 1000, 1000); /* publishing 1000 ms */
     mu_server_poll(server); /* CreateSubscription */
     TEST_ASSERT_EQUAL(ID_CREATESUBSCRIPTIONRESPONSE, parse_response(mock.last_write, mock.last_write_len, &body, &sr));
     opcua_uint32_t sub_id;
@@ -2069,7 +2093,6 @@ void test_set_triggering(void) {
     mock_t mock;
     memset(&mock, 0, sizeof(mock));
     enqueue_connect(&mock);
-    enqueue_create_subscription(&mock, 4, 200.0, 1000, 1000);
 
     _Alignas(8) opcua_byte_t storage[MU_SERVER_STORAGE_BYTES];
     mu_server_config_t config;
@@ -2077,7 +2100,8 @@ void test_set_triggering(void) {
     mu_server_t *server = make_server(&mock, storage, sizeof(storage), &config, &samp_space);
     mu_binary_reader_t body;
     opcua_statuscode_t sr;
-    run_connect(server);
+    run_connect(server, &mock);
+    enqueue_create_subscription(&mock, 4, 200.0, 1000, 1000);
     mu_server_poll(server); /* CreateSubscription */
     TEST_ASSERT_EQUAL(ID_CREATESUBSCRIPTIONRESPONSE, parse_response(mock.last_write, mock.last_write_len, &body, &sr));
     opcua_uint32_t sub_id;

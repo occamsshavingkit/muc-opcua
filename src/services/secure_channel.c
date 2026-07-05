@@ -81,13 +81,15 @@ opcua_statuscode_t mu_secure_channel_open(mu_secure_channel_t *channel, const mu
         return MU_STATUS_BAD_SECURITYPOLICYREJECTED;
     }
 
-    /* In a real implementation we would generate a random channel ID and token ID.
-       FIXME: Replace hardcoded IDs with incrementing counter or entropy once
-       the integration tests that hardcode channel_id=1 in binary responses
-       are refactored to read the actual channel_id from the OPN response
-       (see test_view_services.c:read_opn_channel_id for the correct pattern). */
+    /* Generate a unique channel ID using an incrementing counter.
+       With MU_MAX_CONNECTIONS=1, the first channel always gets ID 1, but
+       subsequent connections or renewals get unique IDs per OPC-10000-6 §6.7.4. */
     if (!channel->is_open) {
-        channel->channel_id = 1;
+        static opcua_uint32_t next_channel_id = 1;
+        channel->channel_id = next_channel_id++;
+        if (next_channel_id == 0) {
+            next_channel_id = 1;  /* wrap; 0 reserved for invalid */
+        }
         channel->token_id = 1;
         /* The inbound SequenceNumber is validated channel-wide starting from the
            OPN chunk; the validator is reset per connection in mu_secure_channel_init,
