@@ -14,7 +14,7 @@ jobs:
       - name: Install dependencies
         run: sudo apt-get update && sudo apt-get install -y cmake build-essential cppcheck clang-tidy clang-format libssl-dev libmbedtls-dev libwolfssl-dev
       - name: Configure CMake
-        run: cmake -S . -B build/host -DMUC_OPCUA_BUILD_TESTS=ON -DMUC_OPCUA_BUILD_EXAMPLES=ON -DMUC_OPCUA_PLATFORM=host -DMUC_OPCUA_HAVE_MBEDTLS=ON -DMUC_OPCUA_HAVE_WOLFSSL=ON -DMUC_OPCUA_PUBSUB=ON
+        run: cmake -S . -B build/host -DCMAKE_BUILD_TYPE=Debug -DMUC_OPCUA_BUILD_TESTS=ON -DMUC_OPCUA_BUILD_EXAMPLES=ON -DMUC_OPCUA_PLATFORM=host -DMUC_OPCUA_HAVE_MBEDTLS=ON -DMUC_OPCUA_HAVE_WOLFSSL=ON -DMUC_OPCUA_PUBSUB=ON
       - name: Build
         run: cmake --build build/host
       - name: Test
@@ -28,13 +28,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        profile: [nano, micro, embedded, full]
+        profile: [nano, micro, standard, embedded, full]
     steps:
       - uses: actions/checkout@v4
       - name: Install dependencies
         run: sudo apt-get update && sudo apt-get install -y cmake build-essential libssl-dev libmbedtls-dev libwolfssl-dev
       - name: Configure (${{ matrix.profile }})
-        run: cmake -S . -B build/${{ matrix.profile }} -DMUC_OPCUA_BUILD_TESTS=ON -DMUC_OPCUA_PLATFORM=host -DMUC_OPCUA_HAVE_MBEDTLS=ON -DMUC_OPCUA_HAVE_WOLFSSL=ON -DMUC_OPCUA_PROFILE=${{ matrix.profile }}
+        run: cmake -S . -B build/${{ matrix.profile }} -DCMAKE_BUILD_TYPE=Debug -DMUC_OPCUA_BUILD_TESTS=ON -DMUC_OPCUA_PLATFORM=host -DMUC_OPCUA_HAVE_MBEDTLS=ON -DMUC_OPCUA_HAVE_WOLFSSL=ON -DMUC_OPCUA_PROFILE=${{ matrix.profile }}
       - name: Build (${{ matrix.profile }})
         run: cmake --build build/${{ matrix.profile }}
       - name: Test (${{ matrix.profile }})
@@ -76,11 +76,11 @@ jobs:
       - name: Configure CMake
         run: cmake -S . -B build/host -DMUC_OPCUA_BUILD_TESTS=ON -DMUC_OPCUA_PLATFORM=host -DMUC_OPCUA_PUBSUB=ON
       - name: Format Check
-        run: cmake --build build/host --target format-check || true
+        run: cmake --build build/host --target format-check
       - name: CppCheck
-        run: cmake --build build/host --target cppcheck || true
+        run: cmake --build build/host --target cppcheck
       - name: Clang-Tidy
-        run: cmake --build build/host --target clang-tidy || true
+        run: cmake --build build/host --target clang-tidy
 
   sanitizer-build:
     runs-on: ubuntu-latest
@@ -93,7 +93,7 @@ jobs:
       - name: Build
         run: cmake --build build/asan
       - name: Test
-        run: ctest --test-dir build/asan --output-on-failure || true
+        run: ctest --test-dir build/asan --output-on-failure
 
   fuzz-build:
     runs-on: ubuntu-latest
@@ -104,7 +104,15 @@ jobs:
       - name: Configure CMake
         run: CC=clang CXX=clang++ cmake -S . -B build/fuzz -DMUC_OPCUA_BUILD_FUZZERS=ON -DMUC_OPCUA_PLATFORM=host -DMUC_OPCUA_PUBSUB=ON
       - name: Build
-        run: cmake --build build/fuzz || true
+        run: cmake --build build/fuzz
+      - name: Run fuzzers (60s each)
+        run: |
+          for fuzzer in build/fuzz/tests/fuzz/fuzz_*; do
+            if [ -x "$fuzzer" ]; then
+              echo "Running $fuzzer for 60s..."
+              timeout 60 "$fuzzer" -max_total_time=60 || true
+            fi
+          done
 
   pico-cross-compile:
     runs-on: ubuntu-latest
@@ -138,3 +146,20 @@ jobs:
               -std=c11 -Iinclude -Isrc -Wall -Wextra -Werror -DMUC_OPCUA_SECURITY=1 \
               -c "$f" -o /dev/null
           done
+
+  coverage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install dependencies
+        run: sudo apt-get update && sudo apt-get install -y cmake build-essential gcovr
+      - name: Configure CMake (coverage)
+        run: cmake -S . -B build/coverage -DCMAKE_C_FLAGS="--coverage" -DCMAKE_EXE_LINKER_FLAGS="--coverage" -DMUC_OPCUA_BUILD_TESTS=ON -DMUC_OPCUA_PLATFORM=host -DMUC_OPCUA_PROFILE=standard
+      - name: Build
+        run: cmake --build build/coverage
+      - name: Test
+        run: ctest --test-dir build/coverage --output-on-failure
+      - name: Generate coverage report
+        run: gcovr -r . --xml -o coverage.xml
+      - name: Generate HTML coverage report
+        run: gcovr -r . --html-details coverage.html

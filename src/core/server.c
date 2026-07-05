@@ -767,7 +767,7 @@ static opcua_statuscode_t mu_server_poll_background(mu_server_t *server) {
     }
 #endif
 
-#ifdef MUC_OPCUA_MULTI_CHUNK
+#if defined(MUC_OPCUA_SESSION_TIMEOUT)
     {
         opcua_uint64_t now_ms = server->config.time_adapter.get_tick_ms(server->config.time_adapter.context);
         if (now_ms != 0u) {
@@ -797,7 +797,7 @@ static opcua_statuscode_t mu_server_poll_background(mu_server_t *server) {
             }
         }
     }
-#endif /* MUC_OPCUA_MULTI_CHUNK */
+#endif /* defined(MUC_OPCUA_SESSION_TIMEOUT) */
 
 #if MUC_OPCUA_SUBSCRIPTIONS
     mu_subscriptions_tick(server, server->config.time_adapter.get_tick_ms(server->config.time_adapter.context));
@@ -805,6 +805,119 @@ static opcua_statuscode_t mu_server_poll_background(mu_server_t *server) {
 
     return MU_STATUS_GOOD;
 }
+
+/* --- Shared poll helpers --- */
+
+static void poll_close_connection(mu_server_t *server, void **handle_ptr, size_t *rx_len_ptr) {
+    if (*handle_ptr != NULL) {
+        server->config.tcp_adapter.close_connection(server->config.tcp_adapter.context, *handle_ptr);
+        *handle_ptr = NULL;
+        *rx_len_ptr = 0;
+    }
+}
+
+#ifdef MUC_OPCUA_MULTIPLE_CONNECTIONS
+static void poll_send_error_and_close(mu_server_t *server, void *handle) {
+    opcua_byte_t buf[256];
+    size_t err_len = sizeof(buf);
+    if (mu_tcp_create_error_message(MU_STATUS_BAD_TCPNOTENOUGHRESOURCES, "Server full", buf, &err_len) ==
+        MU_STATUS_GOOD) {
+        size_t bytes_written;
+        server->config.tcp_adapter.write(server->config.tcp_adapter.context, handle, buf, err_len,
+                                         &bytes_written);
+    }
+    server->config.tcp_adapter.close_connection(server->config.tcp_adapter.context, handle);
+}
+#endif /* MUC_OPCUA_MULTIPLE_CONNECTIONS */
+
+static bool poll_check_idle_timeout(mu_server_t *server, void **handle_ptr, size_t *rx_len_ptr,
+                                    opcua_uint64_t *last_activity_ptr, const mu_secure_channel_t *channel) {
+    opcua_uint64_t now = server->config.time_adapter.get_tick_ms(server->config.time_adapter.context);
+    opcua_uint64_t limit =
+        channel->is_open ? (opcua_uint64_t)channel->revised_lifetime : (opcua_uint64_t)MU_CONNECT_TIMEOUT_MS;
+    if (now > *last_activity_ptr && (now - *last_activity_ptr) > limit) {
+        poll_close_connection(server, handle_ptr, rx_len_ptr);
+        return true;
+    }
+    return false;
+}
+
+static size_t poll_msg_size(const opcua_byte_t *buffer, size_t offset) {
+    const opcua_byte_t *b = buffer + offset;
+    return (size_t)b[4] | ((size_t)b[5] << 8) | ((size_t)b[6] << 16) | ((size_t)b[7] << 24);
+}
+
+static void poll_process_buffer(mu_server_t *server, void **handle_ptr, size_t *rx_len_ptr,
+                                 opcua_byte_t *buffer, size_t buffer_size) {
+    size_t consumed = 0;
+    while (*handle_ptr != NULL && (*rx_len_ptr - consumed) >= 8) {
+        size_t msg_size = poll_msg_size(buffer, consumed);
+        if (msg_size < 8 || msg_size > buffer_size) {
+            poll_close_connection(server, handle_ptr, rx_len_ptr);
+            return;
+        }
+        if (msg_size > (*rx_len_ptr - consumed)) {
+            break;
+        }
+
+        process_message(server, buffer + consumed, msg_size);
+
+        if (*handle_ptr == NULL) {
+            *rx_len_ptr = 0;
+            return;
+        }
+        consumed += msg_size;
+    }
+
+    if (*handle_ptr != NULL && consumed > 0) {
+        size_t remaining = *rx_len_ptr - consumed;
+        if (remaining > 0) {
+            (void)memmove(buffer, buffer + consumed, remaining);
+        }
+        *rx_len_ptr = remaining;
+    }
+}
+
+static opcua_statuscode_t poll_read_data(mu_server_t *server, void **handle_ptr, size_t *rx_len_ptr,
+                                          opcua_uint64_t *last_activity_ptr, opcua_byte_t *buffer,
+                                          size_t buffer_size) {
+    if (*rx_len_ptr >= buffer_size) {
+        return MU_STATUS_GOOD;
+    }
+    size_t bytes_read = 0;
+    opcua_statuscode_t status = server->config.tcp_adapter.read(
+        server->config.tcp_adapter.context, *handle_ptr, buffer + *rx_len_ptr,
+        buffer_size - *rx_len_ptr, &bytes_read);
+
+    if (status != MU_STATUS_GOOD) {
+        poll_close_connection(server, handle_ptr, rx_len_ptr);
+        return MU_STATUS_GOOD;
+    }
+    if (bytes_read > 0) {
+        *rx_len_ptr += bytes_read;
+        *last_activity_ptr = server->config.time_adapter.get_tick_ms(server->config.time_adapter.context);
+    }
+    return MU_STATUS_GOOD;
+}
+
+#ifdef MUC_OPCUA_MULTIPLE_CONNECTIONS
+static void poll_conn_read_and_process(mu_server_t *server, mu_connection_t *conn) {
+    poll_read_data(server, &conn->client_handle, &conn->rx_len, &conn->last_activity_ms,
+                   conn->rx_buffer, sizeof(conn->rx_buffer));
+
+    server->active_conn = conn;
+    poll_process_buffer(server, &conn->client_handle, &conn->rx_len, conn->rx_buffer, sizeof(conn->rx_buffer));
+    server->active_conn = NULL;
+}
+#else
+static void poll_single_read_and_process(mu_server_t *server) {
+    poll_read_data(server, &server_client_handle, &server_rx_len, &server_last_activity_ms,
+                   server->config.receive_buffer, server->config.receive_buffer_size);
+
+    poll_process_buffer(server, &server_client_handle, &server_rx_len,
+                         server->config.receive_buffer, server->config.receive_buffer_size);
+}
+#endif
 
 opcua_statuscode_t mu_server_poll(mu_server_t *server) {
     if (server == NULL || !server->is_running) {
@@ -822,7 +935,8 @@ opcua_statuscode_t mu_server_poll(mu_server_t *server) {
     }
 
     void *new_handle = NULL;
-    opcua_statuscode_t status = server->config.tcp_adapter.accept(server->config.tcp_adapter.context, &new_handle);
+    opcua_statuscode_t status =
+        server->config.tcp_adapter.accept(server->config.tcp_adapter.context, &new_handle);
     if (status == MU_STATUS_GOOD && new_handle != NULL) {
         if (free_slot != -1) {
             mu_connection_t *conn = &server->conns[free_slot];
@@ -831,20 +945,10 @@ opcua_statuscode_t mu_server_poll(mu_server_t *server) {
             conn->last_activity_ms = server->config.time_adapter.get_tick_ms(server->config.time_adapter.context);
             mu_tcp_connection_init(&conn->tcp_conn);
             mu_secure_channel_init(&conn->secure_channel);
-            return mu_server_poll_background(server);
         } else {
-            /* Server full: send error message and close */
-            opcua_byte_t buf[256];
-            size_t err_len = sizeof(buf);
-            if (mu_tcp_create_error_message(MU_STATUS_BAD_TCPNOTENOUGHRESOURCES, "Server full", buf, &err_len) ==
-                MU_STATUS_GOOD) {
-                size_t bytes_written;
-                server->config.tcp_adapter.write(server->config.tcp_adapter.context, new_handle, buf, err_len,
-                                                 &bytes_written);
-            }
-            server->config.tcp_adapter.close_connection(server->config.tcp_adapter.context, new_handle);
-            return mu_server_poll_background(server);
+            poll_send_error_and_close(server, new_handle);
         }
+        return mu_server_poll_background(server);
     }
 
     /* 2. Poll and read/process each active connection */
@@ -854,77 +958,14 @@ opcua_statuscode_t mu_server_poll(mu_server_t *server) {
             continue;
         }
 
-        /* Check connection timeout */
-        opcua_uint64_t now = server->config.time_adapter.get_tick_ms(server->config.time_adapter.context);
-        opcua_uint64_t limit = conn->secure_channel.is_open ? (opcua_uint64_t)conn->secure_channel.revised_lifetime
-                                                            : (opcua_uint64_t)MU_CONNECT_TIMEOUT_MS;
-        if (now > conn->last_activity_ms && (now - conn->last_activity_ms) > limit) {
-            server->config.tcp_adapter.close_connection(server->config.tcp_adapter.context, conn->client_handle);
-            conn->client_handle = NULL;
-            conn->rx_len = 0;
+        if (poll_check_idle_timeout(server, &conn->client_handle, &conn->rx_len,
+                                     &conn->last_activity_ms, &conn->secure_channel)) {
             continue;
         }
-
-        /* Read from connection */
-        if (conn->rx_len < sizeof(conn->rx_buffer)) {
-            size_t bytes_read = 0;
-            status = server->config.tcp_adapter.read(server->config.tcp_adapter.context, conn->client_handle,
-                                                     conn->rx_buffer + conn->rx_len,
-                                                     sizeof(conn->rx_buffer) - conn->rx_len, &bytes_read);
-
-            if (status != MU_STATUS_GOOD) {
-                server->config.tcp_adapter.close_connection(server->config.tcp_adapter.context, conn->client_handle);
-                conn->client_handle = NULL;
-                conn->rx_len = 0;
-                continue;
-            }
-            if (bytes_read > 0) {
-                conn->rx_len += bytes_read;
-                conn->last_activity_ms = server->config.time_adapter.get_tick_ms(server->config.time_adapter.context);
-            }
-        }
-
-        /* Set active connection context so dispatch / wrap / process_message uses it */
-        server->active_conn = conn;
-
-        /* Process complete messages in the buffer */
-        size_t consumed = 0;
-        while (conn->client_handle != NULL && (conn->rx_len - consumed) >= 8) {
-            const opcua_byte_t *b = conn->rx_buffer + consumed;
-            size_t msg_size = (size_t)b[4] | ((size_t)b[5] << 8) | ((size_t)b[6] << 16) | ((size_t)b[7] << 24);
-
-            if (msg_size < 8 || msg_size > sizeof(conn->rx_buffer)) {
-                server->config.tcp_adapter.close_connection(server->config.tcp_adapter.context, conn->client_handle);
-                conn->client_handle = NULL;
-                conn->rx_len = 0;
-                break;
-            }
-            if (msg_size > (conn->rx_len - consumed)) {
-                break;
-            }
-
-            process_message(server, conn->rx_buffer + consumed, msg_size);
-
-            if (conn->client_handle == NULL) {
-                conn->rx_len = 0;
-                break;
-            }
-
-            consumed += msg_size;
-        }
-
-        if (conn->client_handle != NULL && consumed > 0) {
-            size_t remaining = conn->rx_len - consumed;
-            if (remaining > 0) {
-                (void)memmove(conn->rx_buffer, conn->rx_buffer + consumed, remaining);
-            }
-            conn->rx_len = remaining;
-        }
-
-        server->active_conn = NULL;
+        poll_conn_read_and_process(server, conn);
     }
 #else
-    /* 1. Accept connections if none active */
+    /* 1. Accept connection if none active */
     if (server_client_handle == NULL) {
         opcua_statuscode_t status =
             server->config.tcp_adapter.accept(server->config.tcp_adapter.context, &server_client_handle);
@@ -942,102 +983,40 @@ opcua_statuscode_t mu_server_poll(mu_server_t *server) {
             mu_subscriptions_init(&server->subs);
 #endif
             server_rx_len = 0;
-            server_last_activity_ms = server->config.time_adapter.get_tick_ms(server->config.time_adapter.context);
+            server_last_activity_ms =
+                server->config.time_adapter.get_tick_ms(server->config.time_adapter.context);
         }
         return mu_server_poll_background(server);
-    } else {
-        /* Reclaim the single slot from an idle/stuck peer: a connection with no
-           inbound traffic for its channel lifetime (or the connect timeout before
-           a channel is open) is dropped. A monotonic tick of 0 (stub adapter)
-           disables the timeout. */
-        opcua_uint64_t now = server->config.time_adapter.get_tick_ms(server->config.time_adapter.context);
-        opcua_uint64_t limit = server_secure_channel.is_open ? (opcua_uint64_t)server_secure_channel.revised_lifetime
-                                                             : (opcua_uint64_t)MU_CONNECT_TIMEOUT_MS;
-        if (now > server_last_activity_ms && (now - server_last_activity_ms) > limit) {
-            server->config.tcp_adapter.close_connection(server->config.tcp_adapter.context, server_client_handle);
-            server_client_handle = NULL;
-            server_rx_len = 0;
-            return mu_server_poll_background(server);
-        }
-        /* Check if there's another connection waiting to be rejected */
-        void *second_handle = NULL;
-        opcua_statuscode_t status =
-            server->config.tcp_adapter.accept(server->config.tcp_adapter.context, &second_handle);
-        if (status == MU_STATUS_GOOD && second_handle != NULL) {
-            /* We don't have resources. OPC UA 10000-6 7.1.5: immediately close or wait for HEL and send ERR.
-               Wait for HEL (simulate it by just trying to read once) */
-            opcua_byte_t buf[256];
-            size_t bytes_read = 0;
-            status = server->config.tcp_adapter.read(server->config.tcp_adapter.context, second_handle, buf,
-                                                     sizeof(buf), &bytes_read);
-
-            if (status == MU_STATUS_GOOD && bytes_read >= 8 && buf[0] == 'H' && buf[1] == 'E' && buf[2] == 'L') {
-                size_t err_len = sizeof(buf);
-                if (mu_tcp_create_error_message(MU_STATUS_BAD_TCPNOTENOUGHRESOURCES, "Server full", buf, &err_len) ==
-                    MU_STATUS_GOOD) {
-                    size_t bytes_written;
-                    server->config.tcp_adapter.write(server->config.tcp_adapter.context, second_handle, buf, err_len,
-                                                     &bytes_written);
-                }
-            }
-            server->config.tcp_adapter.close_connection(server->config.tcp_adapter.context, second_handle);
-        }
     }
 
-    /* 2. Read from the active connection, appending to the receive buffer. */
-    if (server_rx_len < server->config.receive_buffer_size) {
+    if (poll_check_idle_timeout(server, &server_client_handle, &server_rx_len,
+                                 &server_last_activity_ms, &server_secure_channel)) {
+        return mu_server_poll_background(server);
+    }
+
+    /* Check for a second connection waiting to be rejected */
+    void *second_handle = NULL;
+    opcua_statuscode_t status =
+        server->config.tcp_adapter.accept(server->config.tcp_adapter.context, &second_handle);
+    if (status == MU_STATUS_GOOD && second_handle != NULL) {
+        opcua_byte_t buf[256];
         size_t bytes_read = 0;
-        opcua_statuscode_t status = server->config.tcp_adapter.read(
-            server->config.tcp_adapter.context, server_client_handle, server->config.receive_buffer + server_rx_len,
-            server->config.receive_buffer_size - server_rx_len, &bytes_read);
+        status = server->config.tcp_adapter.read(server->config.tcp_adapter.context, second_handle, buf,
+                                                  sizeof(buf), &bytes_read);
 
-        if (status != MU_STATUS_GOOD) {
-            server->config.tcp_adapter.close_connection(server->config.tcp_adapter.context, server_client_handle);
-            server_client_handle = NULL;
-            server_rx_len = 0;
-            return mu_server_poll_background(server);
+        if (status == MU_STATUS_GOOD && bytes_read >= 8 && buf[0] == 'H' && buf[1] == 'E' && buf[2] == 'L') {
+            size_t err_len = sizeof(buf);
+            if (mu_tcp_create_error_message(MU_STATUS_BAD_TCPNOTENOUGHRESOURCES, "Server full", buf, &err_len) ==
+                MU_STATUS_GOOD) {
+                size_t bytes_written;
+                server->config.tcp_adapter.write(server->config.tcp_adapter.context, second_handle, buf, err_len,
+                                                  &bytes_written);
+            }
         }
-        if (bytes_read > 0) {
-            server_rx_len += bytes_read;
-            server_last_activity_ms = server->config.time_adapter.get_tick_ms(server->config.time_adapter.context);
-        }
+        server->config.tcp_adapter.close_connection(server->config.tcp_adapter.context, second_handle);
     }
 
-    /* 3. Process every complete message in the buffer, reassembling the stream:
-       a single read() may carry several messages or only part of one. */
-    size_t consumed = 0;
-    while (server_client_handle != NULL && (server_rx_len - consumed) >= 8) {
-        const opcua_byte_t *b = server->config.receive_buffer + consumed;
-        /* MessageSize is a UInt32 at byte offset 4 of every TCP/UASC message. */
-        size_t msg_size = (size_t)b[4] | ((size_t)b[5] << 8) | ((size_t)b[6] << 16) | ((size_t)b[7] << 24);
-
-        if (msg_size < 8 || msg_size > server->config.receive_buffer_size) {
-            server->config.tcp_adapter.close_connection(server->config.tcp_adapter.context, server_client_handle);
-            server_client_handle = NULL;
-            server_rx_len = 0;
-            return mu_server_poll_background(server);
-        }
-        if (msg_size > (server_rx_len - consumed)) {
-            break; /* incomplete: wait for more bytes on a later poll */
-        }
-
-        process_message(server, server->config.receive_buffer + consumed, msg_size);
-
-        if (server_client_handle == NULL) {
-            server_rx_len = 0;
-            break;
-        }
-
-        consumed += msg_size;
-    }
-
-    if (server_client_handle != NULL && consumed > 0) {
-        size_t remaining = server_rx_len - consumed;
-        if (remaining > 0) {
-            (void)memmove(server->config.receive_buffer, server->config.receive_buffer + consumed, remaining);
-        }
-        server_rx_len = remaining;
-    }
+    poll_single_read_and_process(server);
 #endif
 
     return mu_server_poll_background(server);

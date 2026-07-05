@@ -466,6 +466,138 @@ cleanup:
     return s;
 }
 
+static opcua_statuscode_t handle_activate_anonymous(mu_server_t *server, const mu_string_t *anon_policy_id) {
+    if (server->config.user_auth_handler != NULL) {
+        return server->config.user_auth_handler(server->config.user_auth_handler_handle, NULL, NULL, anon_policy_id);
+    }
+    return MU_STATUS_GOOD;
+}
+
+#ifdef MUC_OPCUA_USER_AUTH
+static opcua_statuscode_t handle_activate_username(mu_server_t *server, mu_session_t *slot,
+                                                    mu_username_identity_token_t *user_token) {
+    if (!mu_security_policy_allows_username_password_tokens(server_secure_channel.policy)) {
+        return MU_STATUS_BAD_IDENTITYTOKENREJECTED;
+    }
+
+    opcua_statuscode_t result = MU_STATUS_GOOD;
+    opcua_byte_t decrypt_buf[256];
+    mu_bytestring_t decrypted_password = user_token->password;
+
+    if (user_token->encryption_algorithm.length > 0 && user_token->password.length > 0) {
+        if (server->config.crypto_adapter != NULL &&
+            server->config.crypto_adapter->rsa_oaep_decrypt != NULL) {
+            size_t out_len = sizeof(decrypt_buf);
+            opcua_statuscode_t ds = server->config.crypto_adapter->rsa_oaep_decrypt(
+                server->config.crypto_adapter->context, user_token->password.data,
+                (size_t)user_token->password.length, decrypt_buf, &out_len);
+            if (ds != MU_STATUS_GOOD) {
+                result = MU_STATUS_BAD_IDENTITYTOKENREJECTED;
+                goto cleanup;
+            }
+            if (out_len < 4) {
+                result = MU_STATUS_BAD_IDENTITYTOKENREJECTED;
+                goto cleanup;
+            }
+            opcua_int32_t secret_len =
+                (opcua_int32_t)decrypt_buf[0] | ((opcua_int32_t)decrypt_buf[1] << 8) |
+                ((opcua_int32_t)decrypt_buf[2] << 16) | ((opcua_int32_t)decrypt_buf[3] << 24);
+            /* OPC-10000-4 §7.40.2.2 Table 182: the legacy
+               encrypted token Length covers the password
+               bytes plus the 32-byte ServerNonce, excluding
+               the Length field itself. */
+            if (secret_len < 32 || (size_t)secret_len != (out_len - 4u)) {
+                result = MU_STATUS_BAD_IDENTITYTOKENREJECTED;
+                goto cleanup;
+            }
+            size_t actual_pw_len = (size_t)secret_len - 32u;
+            decrypted_password.length = (opcua_int32_t)actual_pw_len;
+            decrypted_password.data = decrypt_buf + 4;
+
+            /* Verify server nonce (prevent replay attacks, OPC-10000-4 §5.6.3.2) */
+            size_t nonce_offset = 4u + actual_pw_len;
+            size_t nonce_len = out_len - nonce_offset;
+            /* Compare the returned ServerNonce (feature 025 F10
+               anti-replay). memcmp is appropriate here: the
+               ServerNonce is sent in the clear in the
+               CreateSession response, so it is not a secret and
+               needs no constant-time compare (unlike the MAC/key
+               comparisons that use mu_secure_memeq). Using
+               mu_secure_memeq would also pull security-only code
+               into the USER_AUTH-without-SECURITY (micro) build. */
+            if (nonce_len != 32 ||
+                memcmp(decrypt_buf + nonce_offset, slot->server_nonce, 32) != 0) {
+                result = MU_STATUS_BAD_IDENTITYTOKENREJECTED;
+                goto cleanup;
+            }
+        } else {
+            result = MU_STATUS_BAD_IDENTITYTOKENREJECTED;
+            goto cleanup;
+        }
+    }
+
+    if (server->config.user_auth_handler != NULL) {
+        result = server->config.user_auth_handler(server->config.user_auth_handler_handle,
+                                                  &user_token->username, &decrypted_password,
+                                                  &user_token->policy_id);
+    } else {
+        /* Secure by default: reject if username token type accepted but no handler configured */
+        result = MU_STATUS_BAD_IDENTITYTOKENREJECTED;
+    }
+
+cleanup:
+#ifdef MUC_OPCUA_SECURITY
+    mu_secure_zero(decrypt_buf, sizeof(decrypt_buf));
+#endif
+    return result;
+}
+#endif /* MUC_OPCUA_USER_AUTH */
+
+#ifdef MUC_OPCUA_SECURITY
+static opcua_statuscode_t handle_activate_certificate(mu_server_t *server, mu_session_t *slot,
+                                                       const mu_certificate_identity_token_t *cert_token,
+                                                       const mu_bytestring_t *user_token_signature) {
+    if (cert_token->certificate_data.length <= 0 || user_token_signature->length <= 0) {
+        return MU_STATUS_BAD_IDENTITYTOKENREJECTED;
+    }
+
+    const opcua_byte_t *sc_data = NULL;
+    size_t sc_len = 0;
+    if (server->config.crypto_adapter == NULL ||
+        server->config.crypto_adapter->get_own_certificate == NULL ||
+        server->config.crypto_adapter->rsa_sha256_verify == NULL) {
+        return MU_STATUS_BAD_IDENTITYTOKENREJECTED;
+    }
+
+    opcua_statuscode_t gcs = server->config.crypto_adapter->get_own_certificate(
+        server->config.crypto_adapter->context, &sc_data, &sc_len);
+    if (gcs != MU_STATUS_GOOD) {
+        return MU_STATUS_BAD_IDENTITYTOKENREJECTED;
+    }
+
+    opcua_byte_t verify_buf[1536];
+    if (sc_len + 32 > sizeof(verify_buf)) {
+        return MU_STATUS_BAD_INTERNALERROR;
+    }
+    memcpy(verify_buf, sc_data, sc_len);
+    memcpy(verify_buf + sc_len, slot->server_nonce, 32);
+
+    opcua_statuscode_t vs = server->config.crypto_adapter->rsa_sha256_verify(
+        server->config.crypto_adapter->context, cert_token->certificate_data.data,
+        (size_t)cert_token->certificate_data.length, verify_buf, sc_len + 32,
+        user_token_signature->data, (size_t)user_token_signature->length);
+    if (vs != MU_STATUS_GOOD) {
+        return MU_STATUS_BAD_IDENTITYTOKENREJECTED;
+    }
+
+    if (server->config.user_auth_handler != NULL) {
+        return server->config.user_auth_handler(server->config.user_auth_handler_handle, NULL,
+                                                &cert_token->certificate_data, &cert_token->policy_id);
+    }
+    return MU_STATUS_GOOD;
+}
+#endif /* MUC_OPCUA_SECURITY */
+
 /* ActivateSession (OPC-10000-4 section 5.7.3.2). The UserIdentityToken's ExtensionObject
    typeId identifies the token type; only Anonymous (i=321) is accepted. A service
    failure is reported in the ResponseHeader.serviceResult, not as a transport error. */
@@ -653,151 +785,16 @@ opcua_statuscode_t handle_activate_session(mu_server_t *server, mu_binary_reader
                 if (client_sig_result != MU_STATUS_GOOD) {
                     activate_result = client_sig_result;
                 } else if (token_type.identifier.numeric == 321) {
-                    /* Anonymous validation */
-                    if (server->config.user_auth_handler != NULL) {
-                        activate_result = server->config.user_auth_handler(server->config.user_auth_handler_handle,
-                                                                           NULL, NULL, &anon_policy_id);
-                    } else {
-                        activate_result = MU_STATUS_GOOD;
-                    }
+                    activate_result = handle_activate_anonymous(server, &anon_policy_id);
                 } else if (token_type.identifier.numeric == 324) {
 #ifdef MUC_OPCUA_USER_AUTH
-                    if (!mu_security_policy_allows_username_password_tokens(server_secure_channel.policy)) {
-                        activate_result = MU_STATUS_BAD_IDENTITYTOKENREJECTED;
-                        goto activate_done;
-                    }
-
-                    mu_bytestring_t decrypted_password = user_token.password;
-                    opcua_byte_t decrypt_buf[256];
-
-                    if (user_token.encryption_algorithm.length > 0 && user_token.password.length > 0) {
-                        if (server->config.crypto_adapter != NULL &&
-                            server->config.crypto_adapter->rsa_oaep_decrypt != NULL) {
-                            size_t out_len = sizeof(decrypt_buf);
-                            opcua_statuscode_t ds = server->config.crypto_adapter->rsa_oaep_decrypt(
-                                server->config.crypto_adapter->context, user_token.password.data,
-                                (size_t)user_token.password.length, decrypt_buf, &out_len);
-                            if (ds == MU_STATUS_GOOD) {
-                                if (out_len < 4) {
-                                    activate_result = MU_STATUS_BAD_IDENTITYTOKENREJECTED;
-#ifdef MUC_OPCUA_SECURITY
-                                    mu_secure_zero(decrypt_buf, sizeof(decrypt_buf));
-#endif
-                                    goto activate_done;
-                                }
-                                opcua_int32_t secret_len =
-                                    (opcua_int32_t)decrypt_buf[0] | ((opcua_int32_t)decrypt_buf[1] << 8) |
-                                    ((opcua_int32_t)decrypt_buf[2] << 16) | ((opcua_int32_t)decrypt_buf[3] << 24);
-                                /* OPC-10000-4 §7.40.2.2 Table 182: the legacy
-                                   encrypted token Length covers the password
-                                   bytes plus the 32-byte ServerNonce, excluding
-                                   the Length field itself. */
-                                if (secret_len < 32 || (size_t)secret_len != (out_len - 4u)) {
-                                    activate_result = MU_STATUS_BAD_IDENTITYTOKENREJECTED;
-#ifdef MUC_OPCUA_SECURITY
-                                    mu_secure_zero(decrypt_buf, sizeof(decrypt_buf));
-#endif
-                                    goto activate_done;
-                                }
-                                size_t actual_pw_len = (size_t)secret_len - 32u;
-                                decrypted_password.length = (opcua_int32_t)actual_pw_len;
-                                decrypted_password.data = decrypt_buf + 4;
-
-                                /* Verify server nonce (prevent replay attacks, OPC-10000-4 §5.6.3.2) */
-                                size_t nonce_offset = 4u + actual_pw_len;
-                                size_t nonce_len = out_len - nonce_offset;
-                                /* Compare the returned ServerNonce (feature 025 F10
-                                   anti-replay). memcmp is appropriate here: the
-                                   ServerNonce is sent in the clear in the
-                                   CreateSession response, so it is not a secret and
-                                   needs no constant-time compare (unlike the MAC/key
-                                   comparisons that use mu_secure_memeq). Using
-                                   mu_secure_memeq would also pull security-only code
-                                   into the USER_AUTH-without-SECURITY (micro) build. */
-                                if (nonce_len != 32 ||
-                                    memcmp(decrypt_buf + nonce_offset, slot->server_nonce, 32) != 0) {
-                                    activate_result = MU_STATUS_BAD_IDENTITYTOKENREJECTED;
-#ifdef MUC_OPCUA_SECURITY
-                                    mu_secure_zero(decrypt_buf, sizeof(decrypt_buf));
-#endif
-                                    goto activate_done;
-                                }
-                            } else {
-                                activate_result = MU_STATUS_BAD_IDENTITYTOKENREJECTED;
-#ifdef MUC_OPCUA_SECURITY
-                                mu_secure_zero(decrypt_buf, sizeof(decrypt_buf));
-#endif
-                                goto activate_done;
-                            }
-                        } else {
-                            activate_result = MU_STATUS_BAD_IDENTITYTOKENREJECTED;
-#ifdef MUC_OPCUA_SECURITY
-                            mu_secure_zero(decrypt_buf, sizeof(decrypt_buf));
-#endif
-                            goto activate_done;
-                        }
-                    }
-
-                    if (server->config.user_auth_handler != NULL) {
-                        activate_result = server->config.user_auth_handler(server->config.user_auth_handler_handle,
-                                                                           &user_token.username, &decrypted_password,
-                                                                           &user_token.policy_id);
-                    } else {
-                        /* Secure by default: reject if username token type accepted but no handler configured */
-                        activate_result = MU_STATUS_BAD_IDENTITYTOKENREJECTED;
-                    }
-#ifdef MUC_OPCUA_SECURITY
-                    mu_secure_zero(decrypt_buf, sizeof(decrypt_buf));
-#endif
-                activate_done:;
+                    activate_result = handle_activate_username(server, slot, &user_token);
 #else
                     activate_result = MU_STATUS_BAD_IDENTITYTOKENINVALID;
 #endif
 #ifdef MUC_OPCUA_SECURITY
                 } else if (token_type.identifier.numeric == 327) {
-                    /* Certificate user authentication */
-                    if (cert_token.certificate_data.length <= 0 || user_token_signature.length <= 0) {
-                        activate_result = MU_STATUS_BAD_IDENTITYTOKENREJECTED;
-                    } else {
-                        const opcua_byte_t *sc_data = NULL;
-                        size_t sc_len = 0;
-                        if (server->config.crypto_adapter != NULL &&
-                            server->config.crypto_adapter->get_own_certificate != NULL &&
-                            server->config.crypto_adapter->rsa_sha256_verify != NULL) {
-
-                            opcua_statuscode_t gcs = server->config.crypto_adapter->get_own_certificate(
-                                server->config.crypto_adapter->context, &sc_data, &sc_len);
-                            if (gcs == MU_STATUS_GOOD) {
-                                opcua_byte_t verify_buf[1536];
-                                if (sc_len + 32 <= sizeof(verify_buf)) {
-                                    memcpy(verify_buf, sc_data, sc_len);
-                                    memcpy(verify_buf + sc_len, slot->server_nonce, 32);
-
-                                    opcua_statuscode_t vs = server->config.crypto_adapter->rsa_sha256_verify(
-                                        server->config.crypto_adapter->context, cert_token.certificate_data.data,
-                                        (size_t)cert_token.certificate_data.length, verify_buf, sc_len + 32,
-                                        user_token_signature.data, (size_t)user_token_signature.length);
-                                    if (vs == MU_STATUS_GOOD) {
-                                        if (server->config.user_auth_handler != NULL) {
-                                            activate_result = server->config.user_auth_handler(
-                                                server->config.user_auth_handler_handle, NULL,
-                                                &cert_token.certificate_data, &cert_token.policy_id);
-                                        } else {
-                                            activate_result = MU_STATUS_GOOD;
-                                        }
-                                    } else {
-                                        activate_result = MU_STATUS_BAD_IDENTITYTOKENREJECTED;
-                                    }
-                                } else {
-                                    activate_result = MU_STATUS_BAD_INTERNALERROR;
-                                }
-                            } else {
-                                activate_result = MU_STATUS_BAD_IDENTITYTOKENREJECTED;
-                            }
-                        } else {
-                            activate_result = MU_STATUS_BAD_IDENTITYTOKENREJECTED;
-                        }
-                    }
+                    activate_result = handle_activate_certificate(server, slot, &cert_token, &user_token_signature);
 #endif
                 } else {
                     activate_result = MU_STATUS_BAD_IDENTITYTOKENINVALID;

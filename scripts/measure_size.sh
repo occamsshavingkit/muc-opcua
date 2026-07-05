@@ -3,7 +3,7 @@ set -euo pipefail
 
 usage() {
     cat <<'USAGE'
-Usage: scripts/measure_size.sh [nano|micro|embedded|full-featured|all]
+Usage: scripts/measure_size.sh [nano|micro|standard|embedded|full|all]
 
 Cross-compiles the portable core with arm-none-eabi-gcc for RP2040/Cortex-M0+
 Thumb code and reports the archive section totals used by the size ledger.
@@ -24,11 +24,11 @@ fi
 
 profile_arg="$1"
 case "$profile_arg" in
-    nano|micro|embedded|full-featured)
+    nano|micro|standard|embedded|full-featured|full)
         profiles="$profile_arg"
         ;;
     all)
-        profiles="nano micro embedded full-featured"
+        profiles="nano micro standard embedded full"
         ;;
     *)
         usage >&2
@@ -63,6 +63,18 @@ for profile in $profiles; do
         micro)
             defs=(
                 -DMUC_OPCUA_PROFILE=micro
+                -DMU_MAX_MONITORED_ITEMS=8
+            )
+            ;;
+        standard)
+            defs=(
+                -DMUC_OPCUA_PROFILE=standard
+                -DMUC_OPCUA_STANDARD_PROFILE=ON
+                -DMU_MAX_SUBSCRIPTIONS=50
+                -DMU_MAX_MONITORED_ITEMS=1000
+                -DMU_MAX_PUBLISH_REQUESTS=50
+                -DMU_MONITORED_QUEUE_DEPTH=2
+                -DMU_MAX_TRIGGER_LINKS=4
             )
             ;;
         embedded)
@@ -75,12 +87,12 @@ for profile in $profiles; do
                 -DMU_MAX_TRIGGER_LINKS=4
             )
             ;;
-        full-featured)
+        full-featured|full)
             defs=(
                 -DMUC_OPCUA_PROFILE=full
-                -DMU_MAX_SUBSCRIPTIONS=2
-                -DMU_MAX_MONITORED_ITEMS=100
-                -DMU_MAX_PUBLISH_REQUESTS=5
+                -DMU_MAX_SUBSCRIPTIONS=100
+                -DMU_MAX_MONITORED_ITEMS=2000
+                -DMU_MAX_PUBLISH_REQUESTS=100
                 -DMU_MONITORED_QUEUE_DEPTH=2
                 -DMU_MAX_TRIGGER_LINKS=4
             )

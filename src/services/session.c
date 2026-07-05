@@ -225,6 +225,7 @@ opcua_statuscode_t mu_session_create_with_identifiers(mu_session_t *session, opc
     return MU_STATUS_GOOD;
 }
 
+__attribute__((deprecated("use mu_session_create_with_identifiers instead")))
 opcua_statuscode_t mu_session_create(mu_session_t *session, opcua_uint64_t requested_timeout_bits,
                                      opcua_uint64_t *revised_timeout_bits, opcua_uint32_t *session_id,
                                      opcua_uint32_t *auth_token) {
@@ -314,7 +315,7 @@ mu_session_t *mu_session_find_closed_by_token(mu_session_t *sessions, size_t cou
     return NULL;
 }
 
-#ifdef MUC_OPCUA_MULTI_CHUNK
+#ifdef MUC_OPCUA_SESSION_TIMEOUT
 void mu_session_close_timeout(mu_session_t *session) {
     if (session == NULL) {
         return;
@@ -332,4 +333,4 @@ void mu_session_close_timeout(mu_session_t *session) {
     session->state = MU_SESSION_STATE_CLOSED;
     (void)memset(session->server_nonce, 0, sizeof(session->server_nonce));
 }
-#endif /* MUC_OPCUA_MULTI_CHUNK */
+#endif /* MUC_OPCUA_SESSION_TIMEOUT */

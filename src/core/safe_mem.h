@@ -21,7 +21,7 @@ static inline void *mu_checked_memcpy(void *dst, size_t dst_size, const void *sr
 /* Checked memcpy at offset: capacity is dst_cap, write starts at dst + offset.
  * Returns dst on success, NULL if offset + n exceeds dst_cap. */
 static inline void *mu_checked_memcpy_off(void *dst, size_t dst_cap, size_t dst_offset, const void *src, size_t n) {
-    if (n > dst_cap - dst_offset) {
+    if (dst_offset > dst_cap || n > dst_cap - dst_offset) {
         return NULL;
     }
     return memcpy((opcua_byte_t *)dst + dst_offset, src, n);

@@ -225,7 +225,7 @@ opcua_statuscode_t mu_binary_write_nodeid(mu_binary_writer_t *writer, const mu_n
 }
 
 opcua_statuscode_t mu_binary_read_expanded_nodeid(mu_binary_reader_t *reader, mu_expanded_nodeid_t *value) {
-    if (reader->position >= reader->length) {
+    if (!reader->buffer || reader->position >= reader->length) {
         return MU_STATUS_BAD_DECODINGERROR;
     }
     opcua_byte_t encoding_mask = reader->buffer[reader->position];
