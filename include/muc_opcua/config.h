@@ -176,9 +176,9 @@
  * parked-Publish arrays) and a non-subscription server (1024). Previously the two
  * arms duplicated every sub-total macro, which invited drift. */
 #ifdef MUC_OPCUA_SUBSCRIPTIONS
-#define MU_SERVER_STORAGE_BASE_BYTES 8192
+#define MU_SERVER_STORAGE_BASE_BYTES 3200
 #else
-#define MU_SERVER_STORAGE_BASE_BYTES 2048
+#define MU_SERVER_STORAGE_BASE_BYTES 1152
 #endif
 
 /* Multi-chunk reassembly buffer size. OPC-10000-6 §6.7.2 */

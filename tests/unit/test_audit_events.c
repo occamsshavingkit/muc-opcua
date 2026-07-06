@@ -9,6 +9,7 @@
 #include <string.h>
 #include <stdio.h>
 
+#include "../../src/core/server_internal.h"
 #include "fake_platform.h"
 
 void setUp(void) {}
@@ -18,6 +19,26 @@ void tearDown(void) {}
 
 static opcua_byte_t rx_buf[8192];
 static opcua_byte_t tx_buf[8192];
+
+static struct mu_server s_audit_server;
+static mu_server_config_t s_audit_cfg;
+
+static void setup_audit_server(bool auditing_enabled) {
+    memset(&s_audit_server, 0, sizeof(s_audit_server));
+    memset(&s_audit_cfg, 0, sizeof(s_audit_cfg));
+    s_audit_cfg.endpoint_url = "opc.tcp://localhost:4840";
+    s_audit_cfg.receive_buffer = rx_buf;
+    s_audit_cfg.receive_buffer_size = sizeof(rx_buf);
+    s_audit_cfg.send_buffer = tx_buf;
+    s_audit_cfg.send_buffer_size = sizeof(tx_buf);
+    s_audit_cfg.max_sessions = 1;
+    s_audit_cfg.max_secure_channels = 1;
+    s_audit_cfg.max_chunk_count = 1;
+    s_audit_cfg.max_message_size = 8192;
+    s_audit_cfg.auditing_enabled = auditing_enabled;
+    fake_platform_init(&s_audit_cfg.tcp_adapter, &s_audit_cfg.time_adapter, &s_audit_cfg.entropy_adapter);
+    s_audit_server.config = s_audit_cfg;
+}
 
 /* Callback tracking for test assertions */
 static int g_callback_invocations = 0;
@@ -107,21 +128,8 @@ void test_audit_disabled_flag(void) {
 
 /* T031: OPC-10000-5 §6.5 — valid audit event dispatch does not crash */
 void test_raise_audit_event_valid_input(void) {
-    _Alignas(8) opcua_byte_t storage[MU_SERVER_STORAGE_BYTES];
-    mu_server_config_t config;
-    memset(&config, 0, sizeof(config));
-    config.endpoint_url = "opc.tcp://localhost:4840";
-    config.receive_buffer = rx_buf;
-    config.receive_buffer_size = sizeof(rx_buf);
-    config.send_buffer = tx_buf;
-    config.send_buffer_size = sizeof(tx_buf);
-    config.max_sessions = 1;
-    config.max_secure_channels = 1;
-    config.max_chunk_count = 1;
-    config.max_message_size = 8192;
-    fake_platform_init(&config.tcp_adapter, &config.time_adapter, &config.entropy_adapter);
-    mu_server_t *server = NULL;
-    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_server_init(storage, sizeof(storage), &config, &server));
+    setup_audit_server(false);
+    mu_server_t *server = &s_audit_server;
 
     mu_audit_event_t event;
     memset(&event, 0, sizeof(event));
@@ -144,22 +152,8 @@ void test_raise_audit_event_null_safety(void) {
 /* T010: OPC-10000-5 §6.5.3 — callback receives event with populated fields */
 void test_callback_receives_event_fields(void) {
     reset_callback_tracking();
-    _Alignas(8) opcua_byte_t storage[MU_SERVER_STORAGE_BYTES];
-    mu_server_config_t config;
-    memset(&config, 0, sizeof(config));
-    config.endpoint_url = "opc.tcp://localhost:4840";
-    config.receive_buffer = rx_buf;
-    config.receive_buffer_size = sizeof(rx_buf);
-    config.send_buffer = tx_buf;
-    config.send_buffer_size = sizeof(tx_buf);
-    config.max_sessions = 1;
-    config.max_secure_channels = 1;
-    config.max_chunk_count = 1;
-    config.max_message_size = 8192;
-    config.auditing_enabled = true;
-    fake_platform_init(&config.tcp_adapter, &config.time_adapter, &config.entropy_adapter);
-    mu_server_t *server = NULL;
-    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_server_init(storage, sizeof(storage), &config, &server));
+    setup_audit_server(true);
+    mu_server_t *server = &s_audit_server;
     mu_server_set_audit_callback(server, audit_test_callback, NULL);
 
     mu_audit_event_t event;
@@ -184,22 +178,8 @@ void test_callback_receives_event_fields(void) {
 
 /* T011: multiple callbacks fire in registration order */
 void test_multiple_callbacks_fire_in_order(void) {
-    _Alignas(8) opcua_byte_t storage[MU_SERVER_STORAGE_BYTES];
-    mu_server_config_t config;
-    memset(&config, 0, sizeof(config));
-    config.endpoint_url = "opc.tcp://localhost:4840";
-    config.receive_buffer = rx_buf;
-    config.receive_buffer_size = sizeof(rx_buf);
-    config.send_buffer = tx_buf;
-    config.send_buffer_size = sizeof(tx_buf);
-    config.max_sessions = 1;
-    config.max_secure_channels = 1;
-    config.max_chunk_count = 1;
-    config.max_message_size = 8192;
-    config.auditing_enabled = true;
-    fake_platform_init(&config.tcp_adapter, &config.time_adapter, &config.entropy_adapter);
-    mu_server_t *server = NULL;
-    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_server_init(storage, sizeof(storage), &config, &server));
+    setup_audit_server(true);
+    mu_server_t *server = &s_audit_server;
 
     int order_a = 0, order_b = 0, order_c = 0;
     mu_server_set_audit_callback(server, audit_callback_a, &order_a);
@@ -220,22 +200,8 @@ void test_multiple_callbacks_fire_in_order(void) {
 /* T012: OPC-10000-5 §6.5 — callback NOT invoked when auditing disabled */
 void test_auditing_disabled_no_dispatch(void) {
     reset_callback_tracking();
-    _Alignas(8) opcua_byte_t storage[MU_SERVER_STORAGE_BYTES];
-    mu_server_config_t config;
-    memset(&config, 0, sizeof(config));
-    config.endpoint_url = "opc.tcp://localhost:4840";
-    config.receive_buffer = rx_buf;
-    config.receive_buffer_size = sizeof(rx_buf);
-    config.send_buffer = tx_buf;
-    config.send_buffer_size = sizeof(tx_buf);
-    config.max_sessions = 1;
-    config.max_secure_channels = 1;
-    config.max_chunk_count = 1;
-    config.max_message_size = 8192;
-    config.auditing_enabled = false;
-    fake_platform_init(&config.tcp_adapter, &config.time_adapter, &config.entropy_adapter);
-    mu_server_t *server = NULL;
-    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_server_init(storage, sizeof(storage), &config, &server));
+    setup_audit_server(false);
+    mu_server_t *server = &s_audit_server;
     mu_server_set_audit_callback(server, audit_test_callback, NULL);
 
     mu_audit_event_t event;
@@ -249,21 +215,8 @@ void test_auditing_disabled_no_dispatch(void) {
 
 /* T013: mu_server_add_audit_callback overflow returns BAD_OUTOFMEMORY */
 void test_add_audit_callback_overflow(void) {
-    _Alignas(8) opcua_byte_t storage[MU_SERVER_STORAGE_BYTES];
-    mu_server_config_t config;
-    memset(&config, 0, sizeof(config));
-    config.endpoint_url = "opc.tcp://localhost:4840";
-    config.receive_buffer = rx_buf;
-    config.receive_buffer_size = sizeof(rx_buf);
-    config.send_buffer = tx_buf;
-    config.send_buffer_size = sizeof(tx_buf);
-    config.max_sessions = 1;
-    config.max_secure_channels = 1;
-    config.max_chunk_count = 1;
-    config.max_message_size = 8192;
-    fake_platform_init(&config.tcp_adapter, &config.time_adapter, &config.entropy_adapter);
-    mu_server_t *server = NULL;
-    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_server_init(storage, sizeof(storage), &config, &server));
+    setup_audit_server(false);
+    mu_server_t *server = &s_audit_server;
 
     int dummy = 0;
     mu_server_set_audit_callback(server, audit_callback_a, &dummy);
