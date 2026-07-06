@@ -9,86 +9,93 @@
 
 ### User Story 1 - Aggregate Function Behavioral Tests (Priority: P1)
 
-A developer can verify that the 42 aggregate functions compute correct results
-by running unit tests exercising each function with known inputs and expected
-outputs (OPC-10000-13).
+A developer can verify that the 3 existing aggregate functions (Average, Minimum,
+Maximum) handle edge cases correctly by running unit tests that directly exercise
+the accumulate-and-publish cycle with known inputs and expected outputs
+(OPC-10000-13). Note: only 3 of 42 OPC-10000-13 aggregates are implemented;
+remaining functions (PercentDeadband, Range, DurationGood, DurationBad,
+AggregateStatus, Count, etc.) are deferred pending `MUC_OPCUA_AGGREGATE_FULL`
+feature implementation.
 
-**Why this priority**: Aggregate functions are the most complex stub (42
-functions), touching the data-change pipeline (subscriptions, deadbands,
-percent-banding). Incorrect aggregation silently corrupts monitoring data.
+**Why this priority**: Aggregate functions touch the data-change pipeline
+(subscriptions, deadbands, percent-banding). Incorrect aggregation silently
+corrupts monitoring data. Even with only 3 functions, edge-case verification is
+critical.
 
-**Independent Test**: Run `test_aggregate_full` — each aggregate function is
-tested independently with at least one known-input-to-expected-output vector.
+**Independent Test**: Run `test_aggregate_full` — each of the 3 existing
+aggregate functions is tested via direct API calls with known-input/
+expected-output vectors, covering edge cases not tested by the existing
+full-pipeline `test_aggregate.c`.
 
 **Acceptance Scenarios**:
 
-1. **Given** a PercentDeadband aggregate function, **When** raw samples cross
-   the deadband threshold, **Then** only samples that change by >= deadband
-   percent are included.
-2. **Given** a numeric aggregate function (Avg, Sum, Min, Max, Count, Duration),
-   **When** fed a sequence of known inputs, **Then** the output matches the
-   precomputed expected value.
-3. **Given** a duration-based aggregate (DurationGood, DurationBad), **When**
-   fed status-coded samples, **Then** only samples with the correct status are
-   counted in the duration.
-4. **Given** StatusCode aggregate (AggregateStatus), **When** fed a mix of Good
-   and Bad statuses, **Then** the aggregate status correctly reflects the
-   worst/best status per OPC UA rules.
-5. **Given** a range aggregate (Range), **When** fed samples with varying
-   values, **Then** the range is correctly computed as max - min.
+1. **Given** an Average aggregate with sample_count > 0, **When** published,
+   **Then** the published value is `sum / sample_count` as a `MU_TYPE_DOUBLE`.
+2. **Given** a Minimum aggregate with multiple samples, **When** samples include
+   decreasing values, **Then** the published minimum tracks the lowest value seen.
+3. **Given** a Maximum aggregate with multiple samples, **When** samples include
+   increasing values, **Then** the published maximum tracks the highest value seen.
+4. **Given** an aggregate with sample_count == 0 and no previous value, **When**
+   published, **Then** `MU_STATUS_BAD_NODATA` is returned.
+5. **Given** a non-numeric variant (e.g., string) accumulated into an aggregate,
+   **When** accumulated, **Then** the sample_count is NOT incremented.
 
 ---
 
 ### User Story 2 - Audit Event Dispatch Tests (Priority: P2)
 
-A developer can verify that `mu_raise_audit_event` correctly dispatches audit
-events to registered callback handlers, including negative-path tests for
-null/missing handlers and event field validation (OPC-10000-5 §6.5).
+A developer can verify that `mu_raise_audit_event` handles edge cases correctly
+without crashing, and that the auditing configuration flag is accessible.
+Callback-based dispatch tests are deferred pending implementation of the
+callback mechanism (OPC-10000-5 §6.5).
 
-**Why this priority**: Audit events are a security-relevant path. Incorrect
-dispatch silently drops security-critical audit records.
+**Why this priority**: Audit events are a security-relevant path. Even though
+the current implementation is a no-op, verifying NULL-safety and configuration
+accessibility prevents future regressions when callbacks are added.
 
-**Independent Test**: Run `test_audit_events` — covers the dispatch path,
-callback registration, and edge cases.
+**Independent Test**: Run `test_audit_events` — covers NULL-safety, config flag
+access, and documents what is deferred.
 
 **Acceptance Scenarios**:
 
-1. **Given** a registered audit callback, **When** `mu_raise_audit_event` is
-   called with a valid event, **Then** the callback receives the event with
-   correct ActionTimeStamp, ServerId, and ClientAuditEntryId.
-2. **Given** no registered audit callback, **When** `mu_raise_audit_event` is
-   called, **Then** the function returns without error (graceful no-op).
-3. **Given** a NULL server or NULL event pointer, **When**
-   `mu_raise_audit_event` is called, **Then** the function returns gracefully
-   without segfault.
+1. **Given** a server instance with auditing disabled, **When**
+   `mu_raise_audit_event` is called with a valid event, **Then** the function
+   returns without crash and the server remains valid.
+2. **Given** NULL server or NULL event pointer, **When**
+   `mu_raise_audit_event` is called, **Then** the function returns without crash.
+3. **Given** a server config with `auditing_enabled` set, **When** read,
+   **Then** the flag correctly reflects the configured value.
+4. **Given** the codebase does not yet have a callback mechanism, **When** a
+   developer reads the test file, **Then** the deferred work is documented
+   as a comment listing pending API additions (callback typedef, registration,
+   dispatch).
 
 ---
 
 ### User Story 3 - Complex Type Round-Trip Tests (Priority: P2)
 
-A developer can verify that complex OPC UA types (structures with nested fields,
-arrays of structures, optional fields) encode and decode correctly through a
-full binary round-trip (OPC-10000-3 §5.6.4).
+A developer can verify that complex type registration API and type definition
+field validation works correctly. Encode/decode round-trip tests are deferred
+pending implementation of `mu_binary_encode_struct`/`mu_binary_decode_struct`
+in `src/encoding/binary_complex.c` (currently a dead stub).
 
 **Why this priority**: Complex type encoding is used by PubSub, alarms,
-historical data, and advanced diagnostics. Encoding bugs corrupt all features
-that depend on those types.
+historical data, and advanced diagnostics. The registration API is the
+foundation — round-trip tests require an encoder that does not yet exist.
 
-**Independent Test**: Run `test_complex_types` — each type is
-encode→decode→deep-equal verified independently.
+**Independent Test**: Run `test_complex_types` — existing registration
+and field validation tests pass. STUB comment replaced with deferred-work
+documentation. No behavioral test changes in this feature.
 
 **Acceptance Scenarios**:
 
-1. **Given** a structure type with required scalar fields, **When** encoded
-   with `mu_binary_encode_struct` and decoded with `mu_binary_decode_struct`,
-   **Then** the decoded value matches the original.
-2. **Given** a structure type with optional fields (EncodingMask
-   present/absent), **When** encoded with all optional fields present and
-   decoded, **Then** the decoder correctly identifies which fields are present.
-3. **Given** a structure type with nested structures, **When** round-tripped
-   through encode/decode, **Then** all levels of nesting are preserved.
-4. **Given** a structure type with arrays of a fundamental type, **When**
-   round-tripped, **Then** array length and elements are preserved.
+1. **Given** the `mu_structure_field_t` and `mu_structure_definition_t` types,
+   **When** a developer reads `test_complex_types.c`, **Then** the file clearly
+   documents what is tested (registration API, type definitions) vs. what is
+   deferred (encode/decode round-trips pending `binary_complex.c` implementation).
+2. **Given** the existing registration tests, **When** run, **Then** all tests
+   pass and the `/* STUB: ... */` marker is replaced with a documentation
+   comment describing deferred work.
 
 ---
 
@@ -161,16 +168,19 @@ services return valid endpoint descriptions without requiring a session.
 
 ### Functional Requirements
 
-- **FR-001**: `test_aggregate_full` MUST test at least 10 of the 42 aggregate
-  functions with known-input/expected-output vectors (OPC-10000-13)
-- **FR-002**: `test_aggregate_full` MUST test PercentDeadband with samples
-  crossing and not crossing the threshold
-- **FR-003**: `test_audit_events` MUST verify `mu_raise_audit_event` delivers
-  events to a registered callback (OPC-10000-5 §6.5)
-- **FR-004**: `test_audit_events` MUST verify graceful no-op when no callback
-  is registered
-- **FR-005**: `test_complex_types` MUST round-trip at least 3 complex type
-  definitions through encode→decode→verify (OPC-10000-3 §5.6.4)
+- **FR-001**: `test_aggregate_full` MUST test the 3 existing aggregate functions
+  (Average, Minimum, Maximum) with edge-case known-input/expected-output vectors
+  via direct API calls (OPC-10000-13)
+- **FR-002**: `test_aggregate_full` MUST test zero-sample fallback behavior
+  (sample_count=0) for both no-previous-value (BAD_NODATA) and has-previous-value
+  (publish-as-is) cases (OPC-10000-13)
+- **FR-003**: `test_audit_events` MUST verify `mu_raise_audit_event` does not
+  crash when called with valid inputs or NULL arguments (OPC-10000-5 §6.5)
+- **FR-004**: `test_audit_events` MUST verify `auditing_enabled` config flag
+  is readable and reflects the configured value
+- **FR-005**: `test_complex_types` MUST document deferred work (encode/decode
+  round-trips pending `binary_complex.c` implementation) and remove the
+  `/* STUB: */` placeholder marker (OPC-10000-3 §5.6.4)
 - **FR-006**: `test_minimal_server_flow` MUST exercise the full server
   lifecycle: connect → HELLO/ACK → OpenSecureChannel → CreateSession →
   ActivateSession → Read → CloseSession → disconnect
@@ -180,8 +190,8 @@ services return valid endpoint descriptions without requiring a session.
   and GetEndpoints without an active session
 - **FR-009**: All new tests MUST gate on the same `MUC_OPCUA_*` feature flags
   that gate the feature implementation
-- **FR-010**: The `/* STUB: ... */` comment markers MUST be removed from all
-  5 test files after tests are implemented
+- **FR-010**: The `/* STUB: */` comment markers MUST be removed from all
+  5 test files after implementation
 
 ### OPC UA Normative Scope
 
@@ -204,16 +214,17 @@ services return valid endpoint descriptions without requiring a session.
   feature doesn't exist)
 - **Out of Scope**: Creating `docs/async-opcua-inventory.md` (test deferred,
   doc doesn't exist)
-- **Out of Scope**: Implementing the 42 aggregate functions themselves (they
-  already exist in `src/services/aggregates/`)
+- **Out of Scope**: Implementing the 42 aggregate functions themselves (only
+  3 exist in `src/services/subscription_aggregate.c`; remaining 39 deferred
+  behind `MUC_OPCUA_AGGREGATE_FULL`)
 - **Out of Scope**: Modifying the audit event API or implementation
 - **Out of Scope**: Adding new complex type definitions
 
 ### Key Entities
 
-- **Aggregate Function**: A computation (Avg, Sum, Min, Max, Count, Duration,
-  PercentDeadband, Range, StatusCode, etc.) applied over a time series of
-  DataValues. Defined in OPC-10000-13.
+- **Aggregate Function**: A computation (Average, Minimum, Maximum) applied over
+  a time series of DataValues. 3 of 42 OPC-10000-13 functions are implemented;
+  remaining functions deferred behind `MUC_OPCUA_AGGREGATE_FULL`.
 - **Audit Event**: A security event record with ActionTimeStamp, ServerId,
   ClientAuditEntryId, Status, and event-specific fields. Raised via
   `mu_raise_audit_event` (OPC-10000-5 §6.5).
@@ -228,31 +239,32 @@ services return valid endpoint descriptions without requiring a session.
 
 ### Measurable Outcomes
 
-- **SC-001**: All 5 `/* STUB: ... */` comment markers are removed from the
+- **SC-001**: All 5 `/* STUB: */` comment markers are removed from the
   codebase
-- **SC-002**: `test_aggregate_full` contains at least 10 aggregate function
-  test cases with known-input/expected-output vectors
-- **SC-003**: `test_audit_events` exercises both the registered-callback and
-  no-callback paths
-- **SC-004**: `test_complex_types` round-trips at least 3 distinct complex
-  type definitions
+- **SC-002**: `test_aggregate_full` contains at least 6 edge-case test
+  functions exercising the 3 existing aggregate functions via direct API calls
+- **SC-003**: `test_audit_events` exercises NULL-safety and config flag access
+  paths
+- **SC-004**: `test_complex_types` contains documentation of deferred
+  encode/decode work and no longer has the `/* STUB: */` marker
 - **SC-005**: `test_minimal_server_flow` successfully completes the full
   server lifecycle without crashes or memory leaks
 - **SC-006**: `test_discovery_endpoint_no_session` returns valid endpoint
-  descriptions without requiring a session
+  descriptions and server listings without requiring a session
 - **SC-007**: All 5 tests pass in every profile where the relevant feature
   flags are enabled
-- **SC-008**: No new test uses `TEST_IGNORE_MESSAGE` or `TEST_IGNORE` —
-  all tests exercise real code paths
+- **SC-008**: No target test file uses `TEST_IGNORE_MESSAGE` as a placeholder
+  — all tests exercise real code paths or document deferred work
 
 ## Assumptions
 
-- The aggregate function implementations in `src/services/aggregates/`
-  already exist and produce correct results per OPC-10000-13
-- `mu_raise_audit_event` in `src/services/audit_events.c` is complete and
-  functional
-- The complex type encoder/decoder already supports round-trip for the types
-  being tested
+- The aggregate function implementations exist in `src/services/subscription_aggregate.c`
+  (3 functions: Average, Minimum, Maximum) and produce correct results per OPC-10000-13
+- `mu_raise_audit_event` in `src/services/audit_events.c` is a no-op — callback
+  dispatch is deferred pending implementation of `mu_audit_callback_t`
+- The complex type encoder/decoder (`mu_binary_encode_struct` /
+  `mu_binary_decode_struct`) does not exist — `src/encoding/binary_complex.c`
+  is a dead stub. Round-trip tests are deferred until the encoder is implemented
 - The server implementation supports the complete lifecycle (connect, secure
   channel, session, read, close) without needing additional feature work
 - Discovery services (FindServers, GetEndpoints) work correctly without a
