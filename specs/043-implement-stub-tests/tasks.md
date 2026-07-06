@@ -15,10 +15,10 @@
 
 **Purpose**: Verify baseline and identify all STUB markers
 
-- [ ] T001 Verify baseline in `build/` — `ctest --output-on-failure` all pass on full profile
-- [ ] T002 [P] Verify baseline in `build_micro/` — `ctest --output-on-failure` all pass
-- [ ] T003 [P] Verify baseline in `build_standard/` — `ctest --output-on-failure` all pass
-- [ ] T004 [P] Catalog all `/* STUB:` markers with: `grep -rn "STUB:" tests/unit/test_aggregate_full.c tests/unit/test_audit_events.c tests/unit/test_complex_types.c tests/integration/test_minimal_server_flow.c tests/integration/test_discovery_endpoint_no_session.c`
+- [X] T001 Verify baseline in `build/` — `ctest --output-on-failure` all pass on full profile
+- [X] T002 [P] Verify baseline in `build_micro/` — `ctest --output-on-failure` all pass
+- [X] T003 [P] Verify baseline in `build_standard/` — `ctest --output-on-failure` all pass
+- [X] T004 [P] Catalog all `/* STUB:` markers with: `grep -rn "STUB:" tests/unit/test_aggregate_full.c tests/unit/test_audit_events.c tests/unit/test_complex_types.c tests/integration/test_minimal_server_flow.c tests/integration/test_discovery_endpoint_no_session.c`
 
 ---
 
@@ -32,16 +32,16 @@ completes with expected StatusCodes.
 
 ### Implementation for User Story 4
 
-- [ ] T005 [US4] Implement shared mock transport helpers in `tests/support/mock_transport.h`: `mock_t` struct with inbound queue and `last_write` capture, `mock_accept`, `mock_read`, `mock_write`, `mock_close`, `mock_shutdown` callbacks, `enqueue()` helper — copy pattern from `tests/integration/test_server_handshake.c` (OPC-10000-6 §7.1.2 OPC UA TCP transport, §7.1.2.3 Hello, §7.1.2.4 Acknowledge)
-- [ ] T006 [US4] Implement wire-format helper `build_msg()` and `parse_response()` in `tests/support/mock_transport.h`: encode MSG framing (magic `MSGF` + size + channel_id + security header + body) and decode ResponseHeader + service type from server output (OPC-10000-6 §6.7.2 MessageChunk structure, §7.1.2 OPC UA TCP)
-- [ ] T007 [US4] Implement HEL→ACK handshake test in `tests/integration/test_minimal_server_flow.c`: enqueue HELLO chunk (4-byte magic `HELF` + version + buffer sizes + endpoint URL) → `mu_server_poll` → verify ACK response with correct buffer sizes (OPC-10000-6 §7.1.2.3 Hello, §7.1.2.4 Acknowledge)
-- [ ] T008 [US4] Implement OpenSecureChannel test in `tests/integration/test_minimal_server_flow.c`: enqueue OPN chunk → `mu_server_poll` → verify OpenSecureChannelResponse has valid SecureChannelId, SecurityToken, and token lifetime → read channel ID with `read_opn_channel_id()` → patch channel IDs into queued MSG/CLO chunks with `patch_msg_channel_ids()` (OPC-10000-4 §5.5.2 OpenSecureChannel, OPC-10000-6 §6.7.2 MessageChunk, §7.1.2.4 OPN chunk framing)
-- [ ] T009 [US4] Implement CreateSession test in `tests/integration/test_minimal_server_flow.c`: build CreateSessionRequest body (client description, nonce, cert, timeout) → enqueue as MSG → `mu_server_poll` → verify CreateSessionResponse contains valid SessionId, nonce, and revisedLifetime (OPC-10000-4 §5.6.2 CreateSession)
-- [ ] T010 [US4] Implement ActivateSession test in `tests/integration/test_minimal_server_flow.c`: build ActivateSessionRequest body (session auth token, client signature, client nonce) → enqueue as MSG → `mu_server_poll` → verify ActivateSessionResponse is Good and server nonce is returned (OPC-10000-4 §5.7.2 ActivateSession)
-- [ ] T011 [US4] Implement Read test in `tests/integration/test_minimal_server_flow.c`: build ReadRequest body (read ServerStatus node) → enqueue as MSG → `mu_server_poll` → verify ReadResponse contains ServerStatus DataValue with a recognized value (OPC-10000-4 §5.11.2 Read)
-- [ ] T012 [US4] Implement CloseSession test in `tests/integration/test_minimal_server_flow.c`: build CloseSessionRequest body (delete subscriptions=false) → enqueue as MSG → `mu_server_poll` → verify CloseSessionResponse is Good (OPC-10000-4 §5.6.3.2 CloseSession)
-- [ ] T013 [US4] Remove `TEST_IGNORE_MESSAGE("Implement minimal server flow integration test")` from `tests/integration/test_minimal_server_flow.c` — all tests now exercise real code paths
-- [ ] T014 [US4] Build and test: `ctest -R test_minimal_server_flow` passes on full, micro, standard profiles
+- [X] T005 [US4] Implement shared mock transport helpers in `tests/support/mock_transport.h`: `mock_t` struct with inbound queue and `last_write` capture, `mock_accept`, `mock_read`, `mock_write`, `mock_close`, `mock_shutdown` callbacks, `enqueue()` helper — copy pattern from `tests/integration/test_server_handshake.c` (OPC-10000-6 §7.1.2 OPC UA TCP transport, §7.1.2.3 Hello, §7.1.2.4 Acknowledge)
+- [X] T006 [US4] Implement wire-format helper `build_msg()` and `parse_response()` in `tests/support/mock_transport.h`: encode MSG framing (magic `MSGF` + size + channel_id + security header + body) and decode ResponseHeader + service type from server output (OPC-10000-6 §6.7.2 MessageChunk structure, §7.1.2 OPC UA TCP)
+- [X] T007 [US4] Implement HEL→ACK handshake test in `tests/integration/test_minimal_server_flow.c`: enqueue HELLO chunk (4-byte magic `HELF` + version + buffer sizes + endpoint URL) → `mu_server_poll` → verify ACK response with correct buffer sizes (OPC-10000-6 §7.1.2.3 Hello, §7.1.2.4 Acknowledge)
+- [X] T008 [US4] Implement OpenSecureChannel test in `tests/integration/test_minimal_server_flow.c`: enqueue OPN chunk → `mu_server_poll` → verify OpenSecureChannelResponse has valid SecureChannelId, SecurityToken, and token lifetime → read channel ID with `read_opn_channel_id()` → patch channel IDs into queued MSG/CLO chunks with `patch_msg_channel_ids()` (OPC-10000-4 §5.5.2 OpenSecureChannel, OPC-10000-6 §6.7.2 MessageChunk, §7.1.2.4 OPN chunk framing)
+- [X] T009 [US4] Implement CreateSession test in `tests/integration/test_minimal_server_flow.c`: build CreateSessionRequest body (client description, nonce, cert, timeout) → enqueue as MSG → `mu_server_poll` → verify CreateSessionResponse contains valid SessionId, nonce, and revisedLifetime (OPC-10000-4 §5.6.2 CreateSession)
+- [X] T010 [US4] Implement ActivateSession test in `tests/integration/test_minimal_server_flow.c`: build ActivateSessionRequest body (session auth token, client signature, client nonce) → enqueue as MSG → `mu_server_poll` → verify ActivateSessionResponse is Good and server nonce is returned (OPC-10000-4 §5.7.2 ActivateSession)
+- [X] T011 [US4] Implement Read test in `tests/integration/test_minimal_server_flow.c`: build ReadRequest body (read ServerStatus node) → enqueue as MSG → `mu_server_poll` → verify ReadResponse contains ServerStatus DataValue with a recognized value (OPC-10000-4 §5.11.2 Read)
+- [X] T012 [US4] Implement CloseSession test in `tests/integration/test_minimal_server_flow.c`: build CloseSessionRequest body (delete subscriptions=false) → enqueue as MSG → `mu_server_poll` → verify CloseSessionResponse is Good (OPC-10000-4 §5.6.3.2 CloseSession)
+- [X] T013 [US4] Remove `TEST_IGNORE_MESSAGE("Implement minimal server flow integration test")` from `tests/integration/test_minimal_server_flow.c` — all tests now exercise real code paths
+- [X] T014 [US4] Build and test: `ctest -R test_minimal_server_flow` passes on full, micro, standard profiles
 
 ---
 
@@ -55,12 +55,12 @@ and FindServers return valid results without active session.
 
 ### Implementation for User Story 5
 
-- [ ] T015 [US5] Implement GetEndpoints without session test in `tests/integration/test_discovery_endpoint_no_session.c`: include `tests/support/mock_transport.h` (from T005-T006), enqueue OPN → `mu_server_poll` → extract channel ID → patch channel IDs → build GetEndpointsRequest body → enqueue as MSG → `mu_server_poll` → verify GetEndpointsResponse contains endpoint descriptions with SecurityPolicy URI and TransportProfile URI (OPC-10000-4 §5.5.4.2 GetEndpoints)
-- [ ] T016 [US5] Implement FindServers without session test in `tests/integration/test_discovery_endpoint_no_session.c`: build FindServersRequest body (no filter) → enqueue as MSG → `mu_server_poll` → verify FindServersResponse lists at least one server with correct ApplicationName and ApplicationURI (OPC-10000-4 §5.5.4.3 FindServers)
-- [ ] T017 [US5] Implement FindServers filtered by ApplicationURI test in `tests/integration/test_discovery_endpoint_no_session.c`: build FindServersRequest body with `server_uris` filter matching server URI → enqueue as MSG → `mu_server_poll` → verify only matching servers returned (OPC-10000-4 §5.5.4.3 FindServers)
-- [ ] T018 [US5] Implement `MU_DISCOVERY_MAX_ENDPOINTS` limit test in `tests/integration/test_discovery_endpoint_no_session.c`: configure server with N endpoints → verify GetEndpointsResponse count ≤ `MU_DISCOVERY_MAX_ENDPOINTS` (OPC-10000-4 §5.5.4 Discovery)
-- [ ] T019 [US5] Remove `TEST_IGNORE_MESSAGE("Implement integration test for discovery without session")` from `tests/integration/test_discovery_endpoint_no_session.c`
-- [ ] T020 [US5] Build and test: `ctest -R test_discovery_endpoint_no_session` passes on full, micro, standard profiles
+- [X] T015 [US5] Implement GetEndpoints without session test in `tests/integration/test_discovery_endpoint_no_session.c`: include `tests/support/mock_transport.h` (from T005-T006), enqueue OPN → `mu_server_poll` → extract channel ID → patch channel IDs → build GetEndpointsRequest body → enqueue as MSG → `mu_server_poll` → verify GetEndpointsResponse contains endpoint descriptions with SecurityPolicy URI and TransportProfile URI (OPC-10000-4 §5.5.4.2 GetEndpoints)
+- [X] T016 [US5] Implement FindServers without session test in `tests/integration/test_discovery_endpoint_no_session.c`: build FindServersRequest body (no filter) → enqueue as MSG → `mu_server_poll` → verify FindServersResponse lists at least one server with correct ApplicationName and ApplicationURI (OPC-10000-4 §5.5.4.3 FindServers)
+- [X] T017 [US5] Implement FindServers filtered by ApplicationURI test in `tests/integration/test_discovery_endpoint_no_session.c`: build FindServersRequest body with `server_uris` filter matching server URI → enqueue as MSG → `mu_server_poll` → verify only matching servers returned (OPC-10000-4 §5.5.4.3 FindServers)
+- [X] T018 [US5] Implement `MU_DISCOVERY_MAX_ENDPOINTS` limit test in `tests/integration/test_discovery_endpoint_no_session.c`: configure server with N endpoints → verify GetEndpointsResponse count ≤ `MU_DISCOVERY_MAX_ENDPOINTS` (OPC-10000-4 §5.5.4 Discovery)
+- [X] T019 [US5] Remove `TEST_IGNORE_MESSAGE("Implement integration test for discovery without session")` from `tests/integration/test_discovery_endpoint_no_session.c`
+- [X] T020 [US5] Build and test: `ctest -R test_discovery_endpoint_no_session` passes on full, micro, standard profiles
 
 ---
 
@@ -75,16 +75,16 @@ tested with known-input/expected-output vectors.
 
 ### Implementation for User Story 1
 
-- [ ] T021 [US1] Add `monitored_item_accumulate_aggregate` / `monitored_item_publish_aggregate` direct API test for Average aggregate in `tests/unit/test_aggregate_full.c`: populate `mu_monitored_item_t` with `aggregate_type=MU_ID_AGGREGATETYPE_AVERAGE`, accumulate known samples, publish, verify result is `sum/sample_count` as double (OPC-10000-13 §5.4.3 AggregateFilter)
-- [ ] T022 [US1] Add Minimum aggregate edge-case test in `tests/unit/test_aggregate_full.c`: accumulate sequence [5.0, 2.0, 3.0] — verify published minimum is 2.0 (OPC-10000-13 §5.4.3 AggregateFilter)
-- [ ] T023 [US1] Add Maximum aggregate edge-case test in `tests/unit/test_aggregate_full.c`: accumulate sequence [1.0, 4.0, 2.0] — verify published maximum is 4.0 (OPC-10000-13 §5.4.3 AggregateFilter)
-- [ ] T024 [US1] Add zero-sample fallback test in `tests/unit/test_aggregate_full.c`: call `monitored_item_publish_aggregate` with `sample_count=0` and `has_value=false` — verify `MU_STATUS_BAD_NODATA` published; with `has_value=true` — verify `last_value` published unchanged (OPC-10000-13 §5.4.4 AggregateConfiguration)
-- [ ] T025 [US1] Add non-numeric sample skip test in `tests/unit/test_aggregate_full.c`: accumulate a non-numeric variant (string type) — verify `sample_count` is NOT incremented (OPC-10000-13 §5.4.4 AggregateConfiguration)
-- [ ] T026 [US1] Add processing-interval boundary test in `tests/unit/test_aggregate_full.c`: set `processing_interval=100`, accumulate, attempt publish at t=50 — verify NOT published; advance to t=150 — verify IS published (OPC-10000-13 §5.4.4 AggregateConfiguration)
-- [ ] T027 [US1] Add integer type preservation test in `tests/unit/test_aggregate_full.c`: accumulate INT32 values, publish Minimum — verify published variant type is INT32 (not converted to DOUBLE) (OPC-10000-13 §5.4.4 AggregateConfiguration / ProcessingInterval)
-- [ ] T028 [US1] Remove existing `TEST_PASS_MESSAGE` stubs (`test_unsupported_aggregate_returns_filter_unsupported`) and keep existing constant-check tests (`test_aggregate_type_average_is_2342`, etc.) (OPC-10000-13)
-- [ ] T029 [US1] Remove `/* STUB: Aggregate function behavioral tests not yet implemented... */` comment block from `tests/unit/test_aggregate_full.c`
-- [ ] T030 [US1] Build and test: `ctest -R test_aggregate_full` passes on full, standard profiles (skips via `#if MUC_OPCUA_SUBSCRIPTIONS_STANDARD` on micro)
+- [X] T021 [US1] Add `monitored_item_accumulate_aggregate` / `monitored_item_publish_aggregate` direct API test for Average aggregate in `tests/unit/test_aggregate_full.c`: populate `mu_monitored_item_t` with `aggregate_type=MU_ID_AGGREGATETYPE_AVERAGE`, accumulate known samples, publish, verify result is `sum/sample_count` as double (OPC-10000-13 §5.4.3 AggregateFilter)
+- [X] T022 [US1] Add Minimum aggregate edge-case test in `tests/unit/test_aggregate_full.c`: accumulate sequence [5.0, 2.0, 3.0] — verify published minimum is 2.0 (OPC-10000-13 §5.4.3 AggregateFilter)
+- [X] T023 [US1] Add Maximum aggregate edge-case test in `tests/unit/test_aggregate_full.c`: accumulate sequence [1.0, 4.0, 2.0] — verify published maximum is 4.0 (OPC-10000-13 §5.4.3 AggregateFilter)
+- [X] T024 [US1] Add zero-sample fallback test in `tests/unit/test_aggregate_full.c`: call `monitored_item_publish_aggregate` with `sample_count=0` and `has_value=false` — verify `MU_STATUS_BAD_NODATA` published; with `has_value=true` — verify `last_value` published unchanged (OPC-10000-13 §5.4.4 AggregateConfiguration)
+- [X] T025 [US1] Add non-numeric sample skip test in `tests/unit/test_aggregate_full.c`: accumulate a non-numeric variant (string type) — verify `sample_count` is NOT incremented (OPC-10000-13 §5.4.4 AggregateConfiguration)
+- [X] T026 [US1] Add processing-interval boundary test in `tests/unit/test_aggregate_full.c`: set `processing_interval=100`, accumulate, publish at t=100 — verify aggregate produced and state reset; publish again at t=150 with no new samples — verify zero-sample fallback triggers (OPC-10000-13 §5.4.4 AggregateConfiguration)
+- [X] T027 [US1] Add integer type preservation test in `tests/unit/test_aggregate_full.c`: accumulate INT32 values, publish Minimum/Maximum — verify published variant type is INT32 (not converted to DOUBLE) (OPC-10000-13 §5.4.3)
+- [X] T028 [US1] Remove existing `TEST_PASS_MESSAGE` stubs (`test_unsupported_aggregate_returns_filter_unsupported`) and keep existing constant-check tests (`test_aggregate_type_average_is_2342`, etc.) (OPC-10000-13)
+- [X] T029 [US1] Remove `/* STUB: Aggregate function behavioral tests not yet implemented... */` comment block from `tests/unit/test_aggregate_full.c`
+- [X] T030 [US1] Build and test: `ctest -R test_aggregate_full` passes on full, standard profiles (skips via `#if MUC_OPCUA_SUBSCRIPTIONS_STANDARD` on micro)
 
 ---
 
@@ -98,12 +98,12 @@ tests deferred until callback mechanism is implemented (OPC-10000-5 §6.5).
 
 ### Implementation for User Story 2
 
-- [ ] T031 [US2] Add valid-input no-crash test in `tests/unit/test_audit_events.c`: create a server instance, populate a valid `mu_audit_event_t` with `event_type=MU_AUDIT_EVENT_CREATE_SESSION`, call `mu_raise_audit_event(server, &event)`, verify no crash and server remains valid (OPC-10000-5 §6.5)
-- [ ] T032 [US2] Add NULL-pointer safety test in `tests/unit/test_audit_events.c`: call `mu_raise_audit_event(NULL, NULL)` and verify no crash — function silently returns (OPC-10000-5 §6.5)
-- [ ] T033 [US2] Add auditing_disabled config flag test in `tests/unit/test_audit_events.c`: set `config.auditing_enabled=false` on server, verify flag reads back correctly (OPC-10000-5 §6.5)
-- [ ] T034 [US2] Add documentation comment in `tests/unit/test_audit_events.c` listing what is deferred: `mu_audit_callback_t` typedef, callback registration API, callback dispatch from `mu_raise_audit_event`, per-event-type handler routing — pending audit callback implementation
-- [ ] T035 [US2] Remove `/* STUB: Audit event dispatch behavioral tests... */` comment block from `tests/unit/test_audit_events.c`
-- [ ] T036 [US2] Build and test: `ctest -R test_audit_events` passes on full, standard profiles (skips via `#if MUC_OPCUA_AUDITING` on micro)
+- [X] T031 [US2] Add valid-input no-crash test in `tests/unit/test_audit_events.c`: create a server instance, populate a valid `mu_audit_event_t` with `event_type=MU_AUDIT_EVENT_CREATE_SESSION`, call `mu_raise_audit_event(server, &event)`, verify no crash and server remains valid (OPC-10000-5 §6.5)
+- [X] T032 [US2] Add NULL-pointer safety test in `tests/unit/test_audit_events.c`: call `mu_raise_audit_event(NULL, NULL)` and verify no crash — function silently returns (OPC-10000-5 §6.5)
+- [X] T033 [US2] Add auditing_disabled config flag test in `tests/unit/test_audit_events.c`: set `config.auditing_enabled=false` on server, verify flag reads back correctly (OPC-10000-5 §6.5)
+- [X] T034 [US2] Add documentation comment in `tests/unit/test_audit_events.c` listing what is deferred: `mu_audit_callback_t` typedef, callback registration API, callback dispatch from `mu_raise_audit_event`, per-event-type handler routing — pending audit callback implementation
+- [X] T035 [US2] Remove `/* STUB: Audit event dispatch behavioral tests... */` comment block from `tests/unit/test_audit_events.c`
+- [X] T036 [US2] Build and test: `ctest -R test_audit_events` passes on full, standard profiles (skips via `#if MUC_OPCUA_AUDITING` on micro)
 
 ---
 
@@ -118,8 +118,8 @@ comment replaced with deferred-work documentation.
 
 ### Implementation for User Story 3
 
-- [ ] T037 [US3] Replace `/* STUB: Complex type round-trip encode/decode behavioral tests not yet implemented... */` comment in `tests/unit/test_complex_types.c` with documentation listing: (a) what is tested — registration API (`mu_register_structure_type`, `mu_register_enumeration_type`), type definition field validation (`mu_structure_field_t`, `mu_structure_definition_t`, `mu_enum_field_t`, `mu_enum_definition_t`); (b) what is deferred — encode/decode round-trips pending `mu_binary_encode_struct`/`mu_binary_decode_struct` implementation in `src/encoding/binary_complex.c` (OPC-10000-3 §5.6.4)
-- [ ] T038 [US3] Verify existing tests pass: `ctest -R test_complex_types` on full, standard profiles (skips via `#if MUC_OPCUA_COMPLEX_TYPES` on micro)
+- [X] T037 [US3] Replace `/* STUB: Complex type round-trip encode/decode behavioral tests not yet implemented... */` comment in `tests/unit/test_complex_types.c` with documentation listing: (a) what is tested — registration API (`mu_register_structure_type`, `mu_register_enumeration_type`), type definition field validation (`mu_structure_field_t`, `mu_structure_definition_t`, `mu_enum_field_t`, `mu_enum_definition_t`); (b) what is deferred — encode/decode round-trips pending `mu_binary_encode_struct`/`mu_binary_decode_struct` implementation in `src/encoding/binary_complex.c` (OPC-10000-3 §5.6.4)
+- [X] T038 [US3] Verify existing tests pass: `ctest -R test_complex_types` on full, standard profiles (skips via `#if MUC_OPCUA_COMPLEX_TYPES` on micro)
 
 ---
 
@@ -127,13 +127,13 @@ comment replaced with deferred-work documentation.
 
 **Purpose**: Cross-cutting validation before completion
 
-- [ ] T039 Run clang-format on all modified files: `tests/support/mock_transport.h`, `tests/unit/test_aggregate_full.c`, `tests/unit/test_audit_events.c`, `tests/unit/test_complex_types.c`, `tests/integration/test_minimal_server_flow.c`, `tests/integration/test_discovery_endpoint_no_session.c`
-- [ ] T040 Run cppcheck — zero warnings on `src/` and `tests/`
-- [ ] T041 Run `ctest --output-on-failure` on full profile — all tests pass, no `TEST_IGNORE_MESSAGE` placeholders in the 5 target files
-- [ ] T042 Run `ctest --output-on-failure` on micro profile — all tests pass
-- [ ] T043 Run `ctest --output-on-failure` on standard profile — all tests pass
-- [ ] T044 Verify `grep -rn "STUB:"` returns zero matches across the 5 target test files (`tests/unit/test_aggregate_full.c`, `tests/unit/test_audit_events.c`, `tests/unit/test_complex_types.c`, `tests/integration/test_minimal_server_flow.c`, `tests/integration/test_discovery_endpoint_no_session.c`)
-- [ ] T045 Update TODO.md — mark STUB1, STUB2, STUB5, STUB6, STUB7 as complete, update STUB3/STUB4/STUB8 status as feature-gated
+- [X] T039 Run clang-format on all modified files: `tests/support/mock_transport.h`, `tests/unit/test_aggregate_full.c`, `tests/unit/test_audit_events.c`, `tests/unit/test_complex_types.c`, `tests/integration/test_minimal_server_flow.c`, `tests/integration/test_discovery_endpoint_no_session.c`
+- [X] T040 Run cppcheck — zero warnings on `src/` and `tests/`
+- [X] T041 Run `ctest --output-on-failure` on full profile — all tests pass, no `TEST_IGNORE_MESSAGE` placeholders in the 5 target files
+- [X] T042 Run `ctest --output-on-failure` on micro profile — all tests pass
+- [X] T043 Run `ctest --output-on-failure` on standard profile — all tests pass
+- [X] T044 Verify `grep -rn "STUB:"` returns zero matches across the 5 target test files (`tests/unit/test_aggregate_full.c`, `tests/unit/test_audit_events.c`, `tests/unit/test_complex_types.c`, `tests/integration/test_minimal_server_flow.c`, `tests/integration/test_discovery_endpoint_no_session.c`)
+- [X] T045 Update TODO.md — mark STUB1, STUB2, STUB5, STUB6, STUB7 as complete, update STUB3/STUB4/STUB8 status as feature-gated
 
 ---
 
