@@ -214,7 +214,7 @@
  * the Standard facet is enabled. Covers monitored-item arrays, subscription
  * arrays, parked publish requests, and event infrastructure. */
 #define MU_SUBSCRIPTIONS_STANDARD_STORAGE_BYTES                                                                        \
-    (MU_MAX_MONITORED_ITEMS * (MU_MONITORED_QUEUE_DEPTH * 96 + MU_MAX_TRIGGER_LINKS * 8 + 225) +                        \
+    (MU_MAX_MONITORED_ITEMS * (MU_MONITORED_QUEUE_DEPTH * 96 + MU_MAX_TRIGGER_LINKS * 8 + 225) +                       \
      MU_MAX_SUBSCRIPTIONS * 336 + MU_MAX_PUBLISH_REQUESTS * 48)
 #else
 #define MU_SUBSCRIPTIONS_STANDARD_STORAGE_BYTES 0
