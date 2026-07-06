@@ -86,7 +86,7 @@ static mu_server_t *setup_server_with_channel(mock_t *mock, opcua_uint32_t *chan
     enqueue_hel(mock);
     enqueue_opn_none(mock);
 
-    mu_server_config_t config;
+    static mu_server_config_t config;
     (void)memset(&config, 0, sizeof(config));
     config.endpoint_url = "opc.tcp://host:4840";
     config.application_uri = "urn:test";
@@ -110,7 +110,7 @@ static mu_server_t *setup_server_with_channel(mock_t *mock, opcua_uint32_t *chan
     config.tcp_adapter.close_connection = mock_close;
     config.tcp_adapter.shutdown = mock_shutdown;
 
-    _Alignas(8) opcua_byte_t storage[MU_SERVER_STORAGE_BYTES];
+    static _Alignas(8) opcua_byte_t storage[MU_SERVER_STORAGE_BYTES];
     mu_server_t *server = NULL;
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_server_init(storage, sizeof(storage), &config, &server));
 
