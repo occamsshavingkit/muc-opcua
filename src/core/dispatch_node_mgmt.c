@@ -23,7 +23,12 @@ opcua_statuscode_t handle_add_nodes(mu_server_t *server, mu_binary_reader_t *r, 
         return s;
     }
 
-    s = write_response_prefix(w, MU_ID_ADDNODESRESPONSE, req.request_handle, MU_STATUS_GOOD, server);
+    s = write_response_prefix(w, MU_ID_ADDNODESRESPONSE, req.request_handle, MU_STATUS_GOOD
+#ifdef MUC_OPCUA_TIME_SYNC
+                              ,
+                              server
+#endif
+    );
     if (s != MU_STATUS_GOOD) {
         return s;
     }
@@ -46,7 +51,12 @@ opcua_statuscode_t handle_add_references(mu_server_t *server, mu_binary_reader_t
         return s;
     }
 
-    s = write_response_prefix(w, MU_ID_ADDREFERENCESRESPONSE, req.request_handle, MU_STATUS_GOOD, server);
+    s = write_response_prefix(w, MU_ID_ADDREFERENCESRESPONSE, req.request_handle, MU_STATUS_GOOD
+#ifdef MUC_OPCUA_TIME_SYNC
+                              ,
+                              server
+#endif
+    );
     if (s != MU_STATUS_GOOD) {
         return s;
     }
@@ -69,7 +79,12 @@ opcua_statuscode_t handle_delete_nodes(mu_server_t *server, mu_binary_reader_t *
         return s;
     }
 
-    s = write_response_prefix(w, MU_ID_DELETENODESRESPONSE, req.request_handle, MU_STATUS_GOOD, server);
+    s = write_response_prefix(w, MU_ID_DELETENODESRESPONSE, req.request_handle, MU_STATUS_GOOD
+#ifdef MUC_OPCUA_TIME_SYNC
+                              ,
+                              server
+#endif
+    );
     if (s != MU_STATUS_GOOD) {
         return s;
     }
@@ -92,7 +107,12 @@ opcua_statuscode_t handle_delete_references(mu_server_t *server, mu_binary_reade
         return s;
     }
 
-    s = write_response_prefix(w, MU_ID_DELETEREFERENCESRESPONSE, req.request_handle, MU_STATUS_GOOD, server);
+    s = write_response_prefix(w, MU_ID_DELETEREFERENCESRESPONSE, req.request_handle, MU_STATUS_GOOD
+#ifdef MUC_OPCUA_TIME_SYNC
+                              ,
+                              server
+#endif
+    );
     if (s != MU_STATUS_GOOD) {
         return s;
     }

@@ -35,7 +35,12 @@ opcua_statuscode_t handle_close_session(mu_server_t *server, mu_binary_reader_t 
         }
     }
 
-    s = write_response_prefix(w, MU_ID_CLOSESESSIONRESPONSE, req.request_handle, close_result, server);
+    s = write_response_prefix(w, MU_ID_CLOSESESSIONRESPONSE, req.request_handle, close_result
+#ifdef MUC_OPCUA_TIME_SYNC
+                              ,
+                              server
+#endif
+    );
     if (s != MU_STATUS_GOOD) {
         return s;
     }

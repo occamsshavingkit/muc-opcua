@@ -1,6 +1,6 @@
 # TODO — muc-opcua
 
-**Updated**: 2026-07-06 (specs 039-043 implementation complete)
+**Updated**: 2026-07-06 (specs 038-044 implementation complete)
 **Source**: code review findings, complexity audit, binary size analysis
 
 ## Remaining Active Backlog
@@ -49,16 +49,22 @@ Feature code exists. Only test implementation is needed.
 | STUB6 | `tests/integration/test_minimal_server_flow.c` | Minimal server lifecycle integration test | Full lifecycle: TCP connect → HEL→ACK → OpenSecureChannel → CreateSession → ActivateSession → Read → CloseSession → disconnect. Verify all StatusCodes are Good, repeat 3× no memory leaks | OPC-10000-6 §7.1 / OPC-10000-4 §5.6 | ✅ Complete (spec 043) |
 | STUB7 | `tests/integration/test_discovery_endpoint_no_session.c` | Discovery without session | (a) GetEndpoints without session → endpoints with correct SecurityPolicy + TransportProfile URIs, (b) FindServers without session → servers list with correct ApplicationName + ApplicationURI, (c) FindServers filtered by ApplicationURI → only matching servers returned, (d) MU_DISCOVERY_MAX_ENDPOINTS limit enforced | OPC-10000-4 §5.5.4 | ✅ Complete (spec 043) |
 
-### Features with Stub Tests — Feature Implementation Required First
+### Features with Stub Tests (implementation complete — spec 044)
 
-These tests exist as placeholders but the feature code they test does not exist.
-The feature must be implemented before the test can be written.
-
-| ID | Test File | Feature | Missing Implementation | OPC Ref |
+| ID | Test File | Feature | OPC Ref | Status |
 |----|-----------|---------|------------------------|---------|
-| STUB3 | `tests/unit/test_reverse_connect.c` | Server-initiated TCP connections | `MUC_OPCUA_REVERSE_CONNECT` cmake option + server reverse-connect logic (OPC-10000-6 §7.5: server opens TCP socket to client instead of client connecting). Needs: (a) cmake flag wiring, (b) `mu_server_reverse_connect` API, (c) transport layer changes for outbound TCP | OPC-10000-6 §7.5 |
-| STUB4 | `tests/unit/test_time_sync.c` | Security time synchronization | `MUC_OPCUA_TIME_SYNC` cmake option + timestampsToReturn injection/handling (OPC-10000-4 §A.2: server injects ServerTimestamp into responses, validation of client/server timestamp fields). Needs: (a) cmake flag wiring, (b) timestamp field population in response header construction | OPC-10000-4 §A.2 |
-| STUB8 | `tests/unit/test_async_opcua_inventory.c` | Async OPC-UA conformance inventory | `docs/conformance/async-opcua-inventory.md` — conformance inventory doc listing async-capable features, devcontainer setup, codegen tests, dotnet interop, fuzz harnesses. Test reads this doc and validates sections exist | N/A (conformance doc) |
+| STUB3 | `tests/unit/test_reverse_connect.c` | Server-initiated TCP connections | OPC-10000-6 §7.5 | ✅ Complete (spec 044) |
+| STUB4 | `tests/unit/test_time_sync.c` | Security time synchronization | OPC-10000-4 §A.2 | ✅ Complete (spec 044) |
+| STUB8 | `tests/unit/test_async_opcua_inventory.c` | Async OPC-UA conformance inventory | N/A (conformance doc) | ✅ Complete (spec 044) |
+
+### Deferred Features (code incomplete — tests exist)
+
+| ID | Feature | Status |
+|----|---------|--------|
+| D1 | Complex type encode/decode | `src/encoding/binary_complex.c` is dead stub. Registration API tested (spec 043). Round-trip tests deferred. OPC-10000-3 §5.6.4 |
+| D2 | Audit callback mechanism | `mu_raise_audit_event` is no-op. `mu_audit_callback_t` doesn't exist. NULL-safety tested (spec 043). OPC-10000-5 §6.5 |
+| D3 | 39 additional aggregate functions | Only 3 of 42 OPC-10000-13 aggregates exist. Edge-cases tested (spec 043). `MUC_OPCUA_AGGREGATE_FULL` OFF. |
+| D4 | Binary size measurement | ELF measurement vs archive measurement. `docs/research/binary-size-optimization.md` exists. |
 
 ### Complexity Audit (2026-07-05) — Oversized Functions ✅ Fixed in Spec 040
 

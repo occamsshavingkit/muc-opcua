@@ -168,7 +168,12 @@ static opcua_statuscode_t initialize_create_session(mu_server_t *server, mu_bina
     if (s != MU_STATUS_GOOD) {
         return s;
     }
-    s = write_response_prefix(w, MU_ID_CREATESESSIONRESPONSE, req->request_handle, MU_STATUS_GOOD, server);
+    s = write_response_prefix(w, MU_ID_CREATESESSIONRESPONSE, req->request_handle, MU_STATUS_GOOD
+#ifdef MUC_OPCUA_TIME_SYNC
+                              ,
+                              server
+#endif
+    );
     if (s != MU_STATUS_GOOD) {
         return s;
     }

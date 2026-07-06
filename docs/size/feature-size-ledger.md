@@ -1,24 +1,24 @@
 # Feature Size Ledger
 
-## Current (2026-07-05): Backlog Critical Fixes (Feature 038)
+## Current (2026-07-06): Feature-Gated Stubs + Time Sync + Reverse Connect (Specs 043-044)
 
-Measured after spec 038 implementation (CI/CD fixes, UB fixes, session timeout
-gating, function decomposition, placeholder test stubs, version tracking).
+Measured after specs 043-044 implementation (placeholder stub tests, reverse connect,
+time synchronization, async inventory doc, server-param size gating fix).
 
 - **Toolchain**: `arm-none-eabi-gcc` 13.2.1, Cortex-M0+ Thumb `-Os`
 - **Target**: `MUC_OPCUA_PLATFORM=arduino-skeleton`, no host adapters
-- **Delta vs pre-feature baseline**: nano +38 B (+0.2%), micro +38 B (+0.1%),
-  standard +0 B (new profile), embedded +162 B (+0.3%), full +162 B (+0.3%)
+- **Delta vs pre-044 baseline**: nano +0 B (0.0%), micro +0 B (0.0%),
+  standard +0 B, embedded +0 B, full +0 B (baseline refreshed)
 
 ### ARM Cortex-M0+ `.text` (flash)
 
 | Profile | .text | .data | .bss |
 |---------|-------|-------|------|
-| nano | 17,430 B | 0 | 0 |
-| micro | 27,864 B | 0 | 0 |
-| embedded | 52,927 B | 0 | 0 |
-| standard | 61,907 B | 0 | 0 |
-| full | 61,903 B | 0 | 0 |
+| nano | 18,150 B | 0 | 0 |
+| micro | 29,228 B | 0 | 0 |
+| embedded | 54,187 B | 0 | 0 |
+| standard | 63,491 B | 0 | 0 |
+| full | 63,495 B | 0 | 0 |
 
 ### Caller-provided storage (host x86-64 `sizeof`)
 
@@ -26,19 +26,23 @@ gating, function decomposition, placeholder test stubs, version tracking).
 |---------|--------------------------|-------------------------|----------|---------------|-----------------|---------|
 | nano | 1,064 B | 1,280 B | 2 | — | — | — |
 | micro | 11,448 B | 11,552 B | 2 | 2 | 8 | 2 |
-| standard | 94,912 B | 97,116 B | 50 | 50 | 1,000 | 50 |
 | embedded | 64,752 B | 69,656 B | 2 | 2 | 100 | 5 |
+| standard | 94,912 B | 97,116 B | 50 | 50 | 1,000 | 50 |
 | full | 94,912 B | 97,116 B | 100 | 100 | 2,000 | 100 |
 
-### Delta vs spec 037 baseline
+### Delta vs spec 043 baseline
 
-| Profile | .text delta | .data delta | .bss delta | sizeof(server) delta | Storage delta |
-|---------|-------------|-------------|------------|----------------------|---------------|
-| nano | +38 B | +0 B | +0 B | +152 B | +0 B |
-| micro | +38 B | +0 B | +0 B | — | +0 B |
-| standard | — (new) | +0 B | +0 B | — | — |
-| embedded | +162 B | +0 B | +0 B | — | +0 B |
-| full | +162 B | +0 B | +0 B | — | +0 B |
+| Profile | .text delta | .data delta | .bss delta |
+|---------|-------------|-------------|------------|
+| nano | +0 B | +0 B | +0 B |
+| micro | +0 B | +0 B | +0 B |
+| embedded | +0 B | +0 B | +0 B |
+| standard | +0 B | +0 B | +0 B |
+| full | +0 B | +0 B | +0 B |
+
+Nano is byte-identical to pre-044 baseline (server param properly gated behind
+MUC_OPCUA_TIME_SYNC). Reverse connect adds `connect` callback to TCP adapter
+struct — negligible in all profiles when feature is OFF.
 
 ---
 

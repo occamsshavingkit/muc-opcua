@@ -95,6 +95,9 @@ struct mu_address_space {
 opcua_statuscode_t mu_address_space_validate(const mu_address_space_t *address_space);
 
 /* NodeId helpers */
+static inline opcua_boolean_t mu_nodeid_is_ns0_numeric(const mu_nodeid_t *nodeid) {
+    return nodeid->identifier_type == MU_NODEID_NUMERIC && nodeid->namespace_index == 0u;
+}
 opcua_boolean_t mu_nodeid_equal(const mu_nodeid_t *n1, const mu_nodeid_t *n2);
 opcua_boolean_t mu_nodeid_in_namespace(const mu_nodeid_t *node_id, opcua_uint16_t namespace_index);
 const mu_node_t *mu_address_space_find_node(const mu_address_space_t *address_space, mu_address_space_index_t *index,

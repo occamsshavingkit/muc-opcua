@@ -94,7 +94,12 @@ static void test_time_sync_write_response_prefix_populated(void) {
     mu_binary_writer_t w;
     mu_binary_writer_init(&w, buf, sizeof(buf));
 
-    s = write_response_prefix(&w, MU_ID_READRESPONSE, 42, MU_STATUS_GOOD, server);
+    s = write_response_prefix(&w, MU_ID_READRESPONSE, 42, MU_STATUS_GOOD
+#ifdef MUC_OPCUA_TIME_SYNC
+                              ,
+                              server
+#endif
+    );
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, s);
 
     opcua_int64_t ts = parse_response_timestamp(buf, w.position);
@@ -123,7 +128,12 @@ static void test_time_sync_service_fault_populated(void) {
     opcua_byte_t buf[256];
     size_t len = sizeof(buf);
 
-    s = mu_write_service_fault(buf, &len, 42, MU_STATUS_BAD_SERVICEUNSUPPORTED, server);
+    s = mu_write_service_fault(buf, &len, 42, MU_STATUS_BAD_SERVICEUNSUPPORTED
+#ifdef MUC_OPCUA_TIME_SYNC
+                               ,
+                               server
+#endif
+    );
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, s);
     TEST_ASSERT_GREATER_THAN(0, len);
 
@@ -144,7 +154,12 @@ static void test_time_sync_null_server_produces_zero_timestamp(void) {
     mu_binary_writer_t w;
     mu_binary_writer_init(&w, buf, sizeof(buf));
 
-    opcua_statuscode_t s = write_response_prefix(&w, MU_ID_READRESPONSE, 42, MU_STATUS_GOOD, NULL);
+    opcua_statuscode_t s = write_response_prefix(&w, MU_ID_READRESPONSE, 42, MU_STATUS_GOOD
+#ifdef MUC_OPCUA_TIME_SYNC
+                                                 ,
+                                                 NULL
+#endif
+    );
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, s);
 
     opcua_int64_t ts = parse_response_timestamp(buf, w.position);
