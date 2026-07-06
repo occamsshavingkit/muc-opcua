@@ -68,7 +68,7 @@ Items identified by CodeRabbit review of spec 039 (PR #251) — all fixed in spe
 |----|------|----------|--------|--------|
 | CP1 | `src/security/sym_chunk.c` | `mu_sym_chunk_wrap` | 13→1 | ✅ mu_sym_wrap_params_t struct |
 | CP2 | `src/security/asym_chunk.c` | `mu_asym_chunk_wrap` | 12→1 | ✅ mu_asym_wrap_params_t struct |
-| CP3 | `src/security/asym_chunk.c` | `mu_asym_chunk_unwrap` | 9→9 | ⚠️ Deferred — struct-based approach caused integration issues |
+| CP3 | `src/security/asym_chunk.c` | `mu_asym_chunk_unwrap` | 9→1 | ✅ mu_asym_unwrap_params_t struct |
 | CP4 | `src/core/uasc.c` | `mu_uasc_finalize_symmetric` | 8→1 | ✅ mu_uasc_sym_finalize_params_t struct |
 | CP5 | `src/core/service_dispatch.c` | `drive_subscription_id_status_array` | 8→1 | ✅ mu_subscription_id_status_ctx_t struct |
 | CP6 | `src/services/read.c` | `mu_read_process_with_user_index` | 8→1 | ✅ mu_read_process_params_t struct |
