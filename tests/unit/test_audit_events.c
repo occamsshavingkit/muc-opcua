@@ -44,12 +44,12 @@ static void setup_audit_server(bool auditing_enabled) {
 static int g_callback_invocations = 0;
 static int g_callback_order[4] = {0, 0, 0, 0};
 static int g_callback_count = 0;
-static mu_audit_event_t *g_last_event = NULL;
+static mu_audit_event_t g_last_event_copy;
 
 static void reset_callback_tracking(void) {
     g_callback_invocations = 0;
     g_callback_count = 0;
-    g_last_event = NULL;
+    memset(&g_last_event_copy, 0, sizeof(g_last_event_copy));
     memset(g_callback_order, 0, sizeof(g_callback_order));
 }
 
@@ -62,7 +62,7 @@ static void audit_test_callback(struct mu_server *server, const mu_audit_event_t
     if (g_callback_count < 4) {
         g_callback_order[g_callback_count++] = event->event_type;
     }
-    g_last_event = (mu_audit_event_t *)event;
+    memcpy(&g_last_event_copy, event, sizeof(g_last_event_copy));
 }
 
 static void audit_callback_a(struct mu_server *server, const mu_audit_event_t *event, void *context) {
@@ -171,9 +171,8 @@ void test_callback_receives_event_fields(void) {
     mu_raise_audit_event(server, &event);
 
     TEST_ASSERT_EQUAL_INT(1, g_callback_invocations);
-    TEST_ASSERT_NOT_NULL(g_last_event);
-    TEST_ASSERT_EQUAL_UINT32(MU_AUDIT_EVENT_CREATE_SESSION, g_last_event->event_type);
-    TEST_ASSERT_EQUAL_UINT32(42, g_last_event->specific.create_session.session_id.identifier.numeric);
+    TEST_ASSERT_EQUAL_UINT32(MU_AUDIT_EVENT_CREATE_SESSION, g_last_event_copy.event_type);
+    TEST_ASSERT_EQUAL_UINT32(42, g_last_event_copy.specific.create_session.session_id.identifier.numeric);
 }
 
 /* T011: multiple callbacks fire in registration order */
