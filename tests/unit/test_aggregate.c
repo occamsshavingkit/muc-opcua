@@ -389,13 +389,13 @@ void test_aggregate_filter_fails_on_unsupported_aggregate_type(void) {
        §4.2.2.9, and §4.2.2.10 scope this build to Average, Minimum, and
        Maximum, so TimeAverage is rejected with the per-item
        Bad_MonitoredItemFilterUnsupported result. */
-    const     opcua_uint32_t time_average_aggregate_type =
+    const opcua_uint32_t time_average_aggregate_type =
 #ifdef MUC_OPCUA_AGGREGATE_FULL
         2356u /* Average2 — not in AGGREGATE_FULL whitelist */
 #else
         2343u /* TimeAverage — unsupported in standard build */
 #endif
-    ;
+        ;
     mu_server_t server;
     activated_server(&server);
     opcua_uint32_t sub_id = create_subscription(&server);

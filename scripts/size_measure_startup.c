@@ -30,7 +30,8 @@ void Reset_Handler(void) {
         *dst++ = 0;
     }
     main();
-    while (1) {}
+    while (1) {
+    }
 }
 
 void _close(void) {}
