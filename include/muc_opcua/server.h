@@ -39,6 +39,9 @@ typedef opcua_statuscode_t (*mu_write_handler_t)(void *handle, const mu_nodeid_t
 typedef struct {
     /* Identity and Discovery */
     const char *endpoint_url;
+#if MUC_OPCUA_REVERSE_CONNECT
+    const char *reverse_connect_url;
+#endif
     const char *application_uri;
     const char *product_uri;
     const char *application_name;

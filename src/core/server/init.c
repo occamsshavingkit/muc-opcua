@@ -9,7 +9,14 @@ opcua_statuscode_t mu_server_config_validate(const mu_server_config_t *config) {
     }
 
     /* Validate Endpoints */
-    if (config->endpoint_url == NULL || strncmp(config->endpoint_url, "opc.tcp://", 10) != 0) {
+#if MUC_OPCUA_REVERSE_CONNECT
+    if (config->reverse_connect_url != NULL) {
+        if (strncmp(config->reverse_connect_url, "opc.tcp://", 10) != 0) {
+            return MU_STATUS_BAD_TCPENDPOINTURLINVALID;
+        }
+    } else
+#endif
+        if (config->endpoint_url == NULL || strncmp(config->endpoint_url, "opc.tcp://", 10) != 0) {
         return MU_STATUS_BAD_TCPENDPOINTURLINVALID;
     }
 
@@ -38,9 +45,18 @@ opcua_statuscode_t mu_server_config_validate(const mu_server_config_t *config) {
     }
 
     /* Validate Platform Adapters */
-    if (config->tcp_adapter.listen == NULL || config->tcp_adapter.accept == NULL || config->tcp_adapter.read == NULL ||
-        config->tcp_adapter.write == NULL || config->tcp_adapter.close_connection == NULL ||
-        config->tcp_adapter.shutdown == NULL) {
+#if MUC_OPCUA_REVERSE_CONNECT
+    if (config->reverse_connect_url != NULL) {
+        if (config->tcp_adapter.connect == NULL || config->tcp_adapter.accept == NULL ||
+            config->tcp_adapter.read == NULL || config->tcp_adapter.write == NULL ||
+            config->tcp_adapter.close_connection == NULL || config->tcp_adapter.shutdown == NULL) {
+            return MU_STATUS_BAD_INTERNALERROR;
+        }
+    } else
+#endif
+        if (config->tcp_adapter.listen == NULL || config->tcp_adapter.accept == NULL ||
+            config->tcp_adapter.read == NULL || config->tcp_adapter.write == NULL ||
+            config->tcp_adapter.close_connection == NULL || config->tcp_adapter.shutdown == NULL) {
         return MU_STATUS_BAD_INTERNALERROR;
     }
 
@@ -171,9 +187,27 @@ opcua_statuscode_t mu_server_init(void *storage, size_t storage_size, const mu_s
 #endif
 
     /* Initialize platform TCP adapter */
-    status = server->config.tcp_adapter.listen(server->config.tcp_adapter.context, server->config.endpoint_url);
-    if (status != MU_STATUS_GOOD) {
-        return status;
+#if MUC_OPCUA_REVERSE_CONNECT
+    if (config->reverse_connect_url != NULL) {
+        void *handle = NULL;
+        status = server->config.tcp_adapter.connect(server->config.tcp_adapter.context, config->reverse_connect_url,
+                                                    &handle);
+        if (status != MU_STATUS_GOOD) {
+            return status;
+        }
+#ifdef MUC_OPCUA_MULTIPLE_CONNECTIONS
+        server->conns[0].client_handle = handle;
+        server->active_conn = &server->conns[0];
+#else
+        server->client_handle = handle;
+#endif
+    } else
+#endif
+    {
+        status = server->config.tcp_adapter.listen(server->config.tcp_adapter.context, server->config.endpoint_url);
+        if (status != MU_STATUS_GOOD) {
+            return status;
+        }
     }
 
     *out_server = server;

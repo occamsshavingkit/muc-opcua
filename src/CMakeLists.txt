@@ -154,6 +154,10 @@ if(MUC_OPCUA_CUSTOM_METHODS)
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_CUSTOM_METHODS=1)
 endif()
 
+if(MUC_OPCUA_REVERSE_CONNECT)
+    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_REVERSE_CONNECT=1)
+endif()
+
 if(MUC_OPCUA_SERVER_DIAGNOSTICS)
     target_sources(muc_opcua PRIVATE services/diagnostics.c)
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_SERVER_DIAGNOSTICS=1)
@@ -169,6 +173,10 @@ endif()
 
 if(MUC_OPCUA_SESSION_TIMEOUT)
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_SESSION_TIMEOUT=1)
+endif()
+
+if(MUC_OPCUA_TIME_SYNC)
+    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_TIME_SYNC=1)
 endif()
 
 if(MUC_OPCUA_EXTENDED_NODEIDS)

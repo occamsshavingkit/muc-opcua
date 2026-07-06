@@ -49,7 +49,7 @@ bool publish_request_dequeue_valid(struct mu_server *server, opcua_uint32_t sess
     opcua_byte_t fault_buf[MU_PUBLISH_BODY_BYTES];
     size_t fault_length = sizeof(fault_buf);
     opcua_statuscode_t s =
-        mu_write_service_fault(fault_buf, &fault_length, out_request->request_handle, MU_STATUS_BAD_TIMEOUT);
+        mu_write_service_fault(fault_buf, &fault_length, out_request->request_handle, MU_STATUS_BAD_TIMEOUT, server);
     if (s == MU_STATUS_GOOD) {
         (void)mu_server_emit_message(server, out_request->request_id, fault_buf, fault_length);
     }
@@ -244,7 +244,7 @@ static opcua_statuscode_t emit_publish_response_too_large_fault(struct mu_server
                                                                 opcua_byte_t *buffer, size_t buffer_size) {
     size_t fault_length = buffer_size;
     opcua_statuscode_t s =
-        mu_write_service_fault(buffer, &fault_length, request->request_handle, MU_STATUS_BAD_RESPONSETOOLARGE);
+        mu_write_service_fault(buffer, &fault_length, request->request_handle, MU_STATUS_BAD_RESPONSETOOLARGE, server);
     if (s != MU_STATUS_GOOD) {
         return s;
     }

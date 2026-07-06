@@ -56,7 +56,7 @@ opcua_statuscode_t handle_read(mu_server_t *server, mu_binary_reader_t *r, mu_bi
         return s;
     }
 
-    s = write_response_prefix(w, MU_ID_READRESPONSE, req.request_handle, MU_STATUS_GOOD);
+    s = write_response_prefix(w, MU_ID_READRESPONSE, req.request_handle, MU_STATUS_GOOD, server);
     if (s != MU_STATUS_GOOD) {
         return s;
     }
@@ -140,7 +140,7 @@ opcua_statuscode_t handle_write(mu_server_t *server, mu_binary_reader_t *r, mu_b
         results[i] = result;
     }
 
-    s = write_response_prefix(w, MU_ID_WRITERESPONSE, req.request_handle, MU_STATUS_GOOD);
+    s = write_response_prefix(w, MU_ID_WRITERESPONSE, req.request_handle, MU_STATUS_GOOD, server);
     if (s == MU_STATUS_GOOD) {
         s = mu_write_response_encode(w, &wresp);
     }

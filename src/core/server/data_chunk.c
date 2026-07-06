@@ -218,7 +218,7 @@ void handle_data_chunk_plaintext(mu_server_t *server, const opcua_byte_t *msg, s
     if (status != MU_STATUS_GOOD) {
         /* Always answer: send a ServiceFault rather than letting the client time out. */
         payload_len = server->config.send_buffer_size - body_offset;
-        if (mu_write_service_fault(resp_body, &payload_len, 0, status) == MU_STATUS_GOOD) {
+        if (mu_write_service_fault(resp_body, &payload_len, 0, status, server) == MU_STATUS_GOOD) {
             status = MU_STATUS_GOOD;
         } else {
             payload_len = 0;
@@ -381,7 +381,7 @@ void handle_data_chunk_secure(mu_server_t *server, opcua_byte_t *msg, size_t msg
     bool opn_rejected = ((is_opn) && (status != MU_STATUS_GOOD));
     if (status != MU_STATUS_GOOD) {
         resp_len = MU_SECURE_RESP_MAX;
-        if (mu_write_service_fault(respbody, &resp_len, 0, status) == MU_STATUS_GOOD) {
+        if (mu_write_service_fault(respbody, &resp_len, 0, status, server) == MU_STATUS_GOOD) {
             status = MU_STATUS_GOOD;
         } else {
             resp_len = 0;

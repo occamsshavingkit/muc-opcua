@@ -220,7 +220,8 @@ bool monitored_item_reports_by_trigger(const struct mu_server *server, const mu_
 /* Shared dispatch helpers — extracted modules call these across translation-unit
  * boundaries (T008+). Definitions live in service_dispatch.c. */
 opcua_statuscode_t write_response_prefix(mu_binary_writer_t *w, opcua_uint32_t response_type_id,
-                                         opcua_uint32_t request_handle, opcua_statuscode_t service_result);
+                                         opcua_uint32_t request_handle, opcua_statuscode_t service_result,
+                                         const mu_server_t *server);
 opcua_statuscode_t ensure_reader_bytes_remaining(const mu_binary_reader_t *r, size_t length);
 opcua_statuscode_t skip_extension_object_body(mu_binary_reader_t *r, size_t length);
 opcua_statuscode_t ensure_array_items_min_remaining(const mu_binary_reader_t *r, opcua_int32_t count,

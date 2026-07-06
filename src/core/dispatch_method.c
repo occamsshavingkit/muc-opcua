@@ -247,7 +247,7 @@ opcua_statuscode_t handle_call(mu_server_t *server, mu_binary_reader_t *r, mu_bi
         return MU_STATUS_BAD_TOOMANYOPERATIONS;
     }
 
-    s = write_response_prefix(w, MU_ID_CALLRESPONSE, req.request_handle, MU_STATUS_GOOD);
+    s = write_response_prefix(w, MU_ID_CALLRESPONSE, req.request_handle, MU_STATUS_GOOD, server);
     if (s != MU_STATUS_GOOD) {
         return s;
     }
