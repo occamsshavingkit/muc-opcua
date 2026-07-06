@@ -1,4 +1,4 @@
-#Async OPC - UA Inventory
+# Async OPC - UA Inventory
 
 Overview of the project areas, toolchains, and infrastructure that support
 development, testing, and conformance of the muc-opcua library.

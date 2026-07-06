@@ -1,1 +1,0 @@
-/home/quackdcs/.config/opencode/commands/speckit.implement.md

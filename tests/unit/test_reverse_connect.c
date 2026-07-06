@@ -35,6 +35,7 @@ static opcua_statuscode_t test_random(void *ctx, opcua_byte_t *buf, size_t len) 
 static int g_connect_called;
 static int g_listen_called;
 static const char *g_connect_url;
+static int g_sentinel;
 
 static opcua_statuscode_t mock_listen_track(void *ctx, const char *url) {
     (void)ctx;
@@ -48,7 +49,7 @@ static opcua_statuscode_t mock_connect_track(void *ctx, const char *url, void **
     (void)url;
     g_connect_called++;
     g_connect_url = url;
-    *handle = (void *)0x1;
+    *handle = &g_sentinel;
     return MU_STATUS_GOOD;
 }
 
@@ -126,7 +127,7 @@ void test_reverse_connect_url_calls_connect_not_listen(void) {
     g_listen_called = 0;
     g_connect_url = NULL;
 
-    opcua_byte_t storage[MU_SERVER_STORAGE_BYTES];
+    _Alignas(8) opcua_byte_t storage[MU_SERVER_STORAGE_BYTES];
     mu_server_t *server = NULL;
     opcua_statuscode_t s = mu_server_init(storage, sizeof(storage), &cfg, &server);
 
@@ -150,7 +151,7 @@ void test_null_reverse_connect_url_calls_listen(void) {
     g_connect_called = 0;
     g_listen_called = 0;
 
-    opcua_byte_t storage[MU_SERVER_STORAGE_BYTES];
+    _Alignas(8) opcua_byte_t storage[MU_SERVER_STORAGE_BYTES];
     mu_server_t *server = NULL;
     opcua_statuscode_t s = mu_server_init(storage, sizeof(storage), &cfg, &server);
 

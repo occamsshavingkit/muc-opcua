@@ -37,11 +37,13 @@ static opcua_int64_t parse_response_timestamp(const opcua_byte_t *buf, size_t le
     mu_binary_reader_t r;
     mu_binary_reader_init(&r, buf, len);
     mu_nodeid_t type;
-    if (mu_binary_read_nodeid(&r, &type) != MU_STATUS_GOOD)
+    if (mu_binary_read_nodeid(&r, &type) != MU_STATUS_GOOD) {
         return -1;
+    }
     opcua_int64_t ts = 0;
-    if (mu_binary_read_int64(&r, &ts) != MU_STATUS_GOOD)
+    if (mu_binary_read_int64(&r, &ts) != MU_STATUS_GOOD) {
         return -1;
+    }
     return ts;
 }
 
