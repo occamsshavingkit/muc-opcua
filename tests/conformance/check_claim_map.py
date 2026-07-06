@@ -17,7 +17,8 @@ import shutil
 import subprocess  # nosec B404 — this checker's job is to invoke ctest on the build
 import sys
 
-VALID_PROFILES = {"nano", "micro", "embedded", "standard", "full"}
+VALID_PROFILES = {"nano", "micro", "embedded", "standard", "full", "default"}
+PROFILE_ALIASES = {"default": "full"}
 
 
 def _parse_profiles(cell):
@@ -106,18 +107,20 @@ def main():
         print(f"claim-map: unknown profile '{args.profile}'", file=sys.stderr)
         return 2
 
+    profile = PROFILE_ALIASES.get(args.profile, args.profile)
+
     rows = parse_manifest(args.manifest)
     if not rows:
         print("claim-map: manifest has no claim rows (parse failure?)", file=sys.stderr)
         return 2
 
     registered = registered_tests(args.build_dir)
-    gaps, applicable = find_gaps(rows, args.profile, registered)
+    gaps, applicable = find_gaps(rows, profile, registered)
 
     if gaps:
         print(
             f"claim-map FAIL: {len(gaps)} claimed conformance unit(s) lack a "
-            f"profile-runnable backing test in profile '{args.profile}':",
+            f"profile-runnable backing test in profile '{profile}':",
             file=sys.stderr,
         )
         for g in gaps:

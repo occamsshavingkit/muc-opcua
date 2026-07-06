@@ -223,8 +223,18 @@ void test_secure_handshake_read(void) {
     mu_binary_write_uint32(&w, 3600000); /* RequestedLifetime */
     clen = 0;
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD,
-                      mu_asym_chunk_wrap(&client_crypto, MU_SECURITY_POLICY_BASIC256SHA256_ID, 0, 1, 1, server_cert,
-                                         server_cert_len, tmp, w.position, chunk, sizeof(chunk), &clen));
+                      mu_asym_chunk_wrap(&(mu_asym_wrap_params_t){.crypto = &client_crypto,
+                                                                  .policy = MU_SECURITY_POLICY_BASIC256SHA256_ID,
+                                                                  .secure_channel_id = 0,
+                                                                  .sequence_number = 1,
+                                                                  .request_id = 1,
+                                                                  .receiver_cert = server_cert,
+                                                                  .receiver_cert_len = server_cert_len,
+                                                                  .body = tmp,
+                                                                  .body_len = w.position,
+                                                                  .out = chunk,
+                                                                  .out_cap = sizeof(chunk),
+                                                                  .out_len = &clen}));
     enqueue(&mock, chunk, clen);
 
     /* ---- Configure the secured server ---- */
@@ -277,9 +287,15 @@ void test_secure_handshake_read(void) {
     mu_asym_chunk_info_t ai;
     (void)memset(&ai, 0, sizeof(ai));
     opcua_byte_t scratch[6144];
-    TEST_ASSERT_EQUAL(MU_STATUS_GOOD,
-                      mu_asym_chunk_unwrap(&client_crypto, mock.last_write, mock.last_write_len, opn_body,
-                                           sizeof(opn_body), &opn_body_len, scratch, sizeof(scratch), &ai));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_asym_chunk_unwrap(&(mu_asym_unwrap_params_t){.crypto = &client_crypto,
+                                                                                      .chunk = mock.last_write,
+                                                                                      .chunk_len = mock.last_write_len,
+                                                                                      .out_body = opn_body,
+                                                                                      .out_cap = sizeof(opn_body),
+                                                                                      .out_body_len = &opn_body_len,
+                                                                                      .scratch = scratch,
+                                                                                      .scratch_len = sizeof(scratch),
+                                                                                      .info = &ai}));
     TEST_ASSERT_EQUAL(MU_SECURITY_POLICY_BASIC256SHA256_ID, ai.policy);
 
     mu_binary_reader_t br;
@@ -520,8 +536,18 @@ void test_create_session_rejects_mismatched_application_uri(void) {
     mu_binary_write_uint32(&w, 3600000);
     clen = 0;
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD,
-                      mu_asym_chunk_wrap(&client_crypto, MU_SECURITY_POLICY_BASIC256SHA256_ID, 0, 1, 1, server_cert,
-                                         server_cert_len, tmp, w.position, chunk, sizeof(chunk), &clen));
+                      mu_asym_chunk_wrap(&(mu_asym_wrap_params_t){.crypto = &client_crypto,
+                                                                  .policy = MU_SECURITY_POLICY_BASIC256SHA256_ID,
+                                                                  .secure_channel_id = 0,
+                                                                  .sequence_number = 1,
+                                                                  .request_id = 1,
+                                                                  .receiver_cert = server_cert,
+                                                                  .receiver_cert_len = server_cert_len,
+                                                                  .body = tmp,
+                                                                  .body_len = w.position,
+                                                                  .out = chunk,
+                                                                  .out_cap = sizeof(chunk),
+                                                                  .out_len = &clen}));
     enqueue(&mock, chunk, clen);
 
     mu_server_config_t config;
@@ -570,8 +596,15 @@ void test_create_session_rejects_mismatched_application_uri(void) {
         (void)memset(&ai, 0, sizeof(ai));
         opcua_byte_t scratch[6144];
         TEST_ASSERT_EQUAL(MU_STATUS_GOOD,
-                          mu_asym_chunk_unwrap(&client_crypto, mock.last_write, mock.last_write_len, opn_body,
-                                               sizeof(opn_body), &opn_body_len, scratch, sizeof(scratch), &ai));
+                          mu_asym_chunk_unwrap(&(mu_asym_unwrap_params_t){.crypto = &client_crypto,
+                                                                          .chunk = mock.last_write,
+                                                                          .chunk_len = mock.last_write_len,
+                                                                          .out_body = opn_body,
+                                                                          .out_cap = sizeof(opn_body),
+                                                                          .out_body_len = &opn_body_len,
+                                                                          .scratch = scratch,
+                                                                          .scratch_len = sizeof(scratch),
+                                                                          .info = &ai}));
         mu_binary_reader_t br;
         (void)parse_decoded(opn_body, opn_body_len, &br);
         opcua_uint32_t spv, scid, token_id, revised;

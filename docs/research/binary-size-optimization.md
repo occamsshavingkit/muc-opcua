@@ -58,7 +58,7 @@ All `.data` = 0, `.bss` = 0. Constitution compliant.
 - Crypto adapter functions: Only one compiled per build (conditionally), no cross-adapter duplication
 - `handle_set_monitoring_mode` / `handle_set_publishing_mode`: Structural pattern, not code copy
 
-### 6. Profile Compliance
+### 6. Export Symbol Count by Profile
 - Nano: 149 exported symbols — all correct per OPC UA 2017 Nano Server Profile
 - Micro: 220 symbols — adds Write + Subscription handlers (correct)
 - Embedded: 269 symbols — adds Security + Events (correct)

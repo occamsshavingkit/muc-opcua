@@ -1,5 +1,6 @@
 /* src/security/asym_chunk/wrap.c
  * mu_asym_chunk_wrap and its helpers. */
+#include "../asym_chunk.h"
 #include "common.h"
 
 /* Write the cleartext OPN header: "OPNF", a zero MessageSize placeholder,
@@ -17,7 +18,7 @@ static opcua_statuscode_t write_header(mu_binary_writer_t *w, mu_security_policy
     w->buffer[2] = 'N';
     w->buffer[3] = 'F';
     w->position = 4;
-    opcua_statuscode_t s = mu_binary_write_uint32(w, 0); /* MessageSize placeholder */
+    opcua_statuscode_t s = mu_binary_write_uint32(w, 0);
     if (s != MU_STATUS_GOOD) {
         return s;
     }
@@ -32,17 +33,13 @@ static opcua_statuscode_t write_header(mu_binary_writer_t *w, mu_security_policy
         return s;
     }
 
-    mu_bytestring_t cert = {
-        sender_cert ? (opcua_int32_t)(sender_cert_len > (size_t)INT32_MAX ? INT32_MAX : sender_cert_len) : -1,
-        sender_cert};
+    mu_bytestring_t cert = {sender_cert ? mu_safe_int32_from_size_t(sender_cert_len) : -1, sender_cert};
     s = mu_binary_write_bytestring(w, &cert);
     if (s != MU_STATUS_GOOD) {
         return s;
     }
 
-    mu_bytestring_t thumb = {
-        receiver_thumbprint ? (opcua_int32_t)(thumb_len > (size_t)INT32_MAX ? INT32_MAX : thumb_len) : -1,
-        receiver_thumbprint};
+    mu_bytestring_t thumb = {receiver_thumbprint ? mu_safe_int32_from_size_t(thumb_len) : -1, receiver_thumbprint};
     return mu_binary_write_bytestring(w, &thumb);
 }
 
@@ -69,7 +66,6 @@ static opcua_statuscode_t wrap_none(opcua_uint32_t scid, opcua_uint32_t seq, opc
         return MU_STATUS_BAD_RESPONSETOOLARGE;
     }
     size_t total = w.position + body_len;
-    /* Patch MessageSize. */
     out[4] = (opcua_byte_t)(total);
     out[5] = (opcua_byte_t)(total >> 8);
     out[6] = (opcua_byte_t)(total >> 16);
@@ -242,59 +238,56 @@ static opcua_statuscode_t encrypt_wrap_blocks(const mu_crypto_adapter_t *crypto,
     return MU_STATUS_GOOD;
 }
 
-opcua_statuscode_t mu_asym_chunk_wrap(const mu_crypto_adapter_t *crypto, mu_security_policy_id_t policy,
-                                      opcua_uint32_t secure_channel_id, opcua_uint32_t sequence_number,
-                                      opcua_uint32_t request_id, const opcua_byte_t *receiver_cert,
-                                      size_t receiver_cert_len, const opcua_byte_t *body, size_t body_len,
-                                      opcua_byte_t *out, size_t out_cap, size_t *out_len) {
-    if (!out || !out_len || (!body && body_len)) {
+opcua_statuscode_t mu_asym_chunk_wrap(const mu_asym_wrap_params_t *p) {
+    if (!p || !p->out || !p->out_len || (!p->body && p->body_len)) {
         return MU_STATUS_BAD_INTERNALERROR;
     }
 
-    if (policy == MU_SECURITY_POLICY_NONE_ID) {
-        return wrap_none(secure_channel_id, sequence_number, request_id, body, body_len, out, out_cap, out_len);
+    if (p->policy == MU_SECURITY_POLICY_NONE_ID) {
+        return wrap_none(p->secure_channel_id, p->sequence_number, p->request_id, p->body, p->body_len, p->out,
+                         p->out_cap, p->out_len);
     }
 
-    opcua_statuscode_t s = validate_wrap_policy(crypto, policy, receiver_cert, receiver_cert_len);
+    opcua_statuscode_t s = validate_wrap_policy(p->crypto, p->policy, p->receiver_cert, p->receiver_cert_len);
     if (s != MU_STATUS_GOOD) {
         return s;
     }
 
     opcua_byte_t thumb[MU_THUMBPRINT_LENGTH];
     size_t hdr_len = 0, sig_len = 0, plain_block = 0, cipher_block = 0;
-    s = build_wrap_header(crypto, policy, secure_channel_id, receiver_cert, receiver_cert_len, out, out_cap, thumb,
-                          sizeof(thumb), &hdr_len, &sig_len, &plain_block, &cipher_block);
+    s = build_wrap_header(p->crypto, p->policy, p->secure_channel_id, p->receiver_cert, p->receiver_cert_len, p->out,
+                          p->out_cap, thumb, sizeof(thumb), &hdr_len, &sig_len, &plain_block, &cipher_block);
     if (s != MU_STATUS_GOOD) {
         return s;
     }
 
     size_t presig_len = 0, enc_len = 0, cipher_len = 0, total = 0;
-    s = compute_wrap_sizes(body_len, sig_len, plain_block, cipher_block, hdr_len, out_cap, &presig_len, &enc_len,
+    s = compute_wrap_sizes(p->body_len, sig_len, plain_block, cipher_block, hdr_len, p->out_cap, &presig_len, &enc_len,
                            &cipher_len, &total);
     if (s != MU_STATUS_GOOD) {
         return s;
     }
 
-    out[4] = (opcua_byte_t)(total);
-    out[5] = (opcua_byte_t)(total >> 8);
-    out[6] = (opcua_byte_t)(total >> 16);
-    out[7] = (opcua_byte_t)(total >> 24);
+    p->out[4] = (opcua_byte_t)(total);
+    p->out[5] = (opcua_byte_t)(total >> 8);
+    p->out[6] = (opcua_byte_t)(total >> 16);
+    p->out[7] = (opcua_byte_t)(total >> 24);
 
     opcua_byte_t plain[MU_ASYM_MAX_PLAINTEXT];
-    s = sign_wrap_payload(crypto, policy, sequence_number, request_id, body, body_len, plain, sizeof(plain), out,
-                          hdr_len, presig_len, sig_len);
+    s = sign_wrap_payload(p->crypto, p->policy, p->sequence_number, p->request_id, p->body, p->body_len, plain,
+                          sizeof(plain), p->out, hdr_len, presig_len, sig_len);
     if (s != MU_STATUS_GOOD) {
         return s;
     }
 
-    s = encrypt_wrap_blocks(crypto, policy, receiver_cert, receiver_cert_len, plain, plain_block, cipher_block, enc_len,
-                            out, hdr_len);
+    s = encrypt_wrap_blocks(p->crypto, p->policy, p->receiver_cert, p->receiver_cert_len, plain, plain_block,
+                            cipher_block, enc_len, p->out, hdr_len);
     if (s != MU_STATUS_GOOD) {
         mu_secure_zero(plain, sizeof(plain));
         return s;
     }
 
-    *out_len = total;
+    *p->out_len = total;
     mu_secure_zero(plain, sizeof(plain));
     return MU_STATUS_GOOD;
 }

@@ -232,9 +232,19 @@ static void enqueue_basic256_opn(secure_fixture_t *fixture) {
     mu_binary_write_uint32(&writer, 3600000);
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, writer.status);
 
-    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_asym_chunk_wrap(&fixture->client_crypto, MU_SECURITY_POLICY_BASIC256SHA256_ID,
-                                                         0, 1, 1, fixture->server_cert, fixture->server_cert_len, body,
-                                                         writer.position, chunk, sizeof(chunk), &chunk_len));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD,
+                      mu_asym_chunk_wrap(&(mu_asym_wrap_params_t){.crypto = &fixture->client_crypto,
+                                                                  .policy = MU_SECURITY_POLICY_BASIC256SHA256_ID,
+                                                                  .secure_channel_id = 0,
+                                                                  .sequence_number = 1,
+                                                                  .request_id = 1,
+                                                                  .receiver_cert = fixture->server_cert,
+                                                                  .receiver_cert_len = fixture->server_cert_len,
+                                                                  .body = body,
+                                                                  .body_len = writer.position,
+                                                                  .out = chunk,
+                                                                  .out_cap = sizeof(chunk),
+                                                                  .out_len = &chunk_len}));
     enqueue(&fixture->mock, chunk, chunk_len);
 }
 

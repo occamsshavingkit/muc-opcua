@@ -167,8 +167,7 @@ opcua_statuscode_t read_modify_item_filter(mu_binary_reader_t *r, opcua_statusco
             return MU_STATUS_BAD_DECODINGERROR;
         }
         *filter_result = filter_body->filter_result;
-    } else if (filter_type.identifier_type == MU_NODEID_NUMERIC && filter_type.namespace_index == 0u &&
-               filter_type.identifier.numeric == MU_ID_AGGREGATEFILTER_ENCODING_DEFAULTBINARY) {
+    } else if (is_aggregate_filter_binary_type(&filter_type)) {
         const size_t filter_body_start = r->position;
 
         *has_aggregate_filter = true;
@@ -202,6 +201,40 @@ opcua_statuscode_t read_modify_item_filter(mu_binary_reader_t *r, opcua_statusco
 #endif
     return MU_STATUS_GOOD;
 }
+#if MUC_OPCUA_SUBSCRIPTIONS_STANDARD
+static opcua_uint32_t clamp_queue_size(opcua_uint32_t queue_size) {
+    if (queue_size == 0u) {
+        return 1u;
+    }
+    if (queue_size > MU_MONITORED_QUEUE_DEPTH) {
+        return MU_MONITORED_QUEUE_DEPTH;
+    }
+    return queue_size;
+}
+#endif
+
+#if MUC_OPCUA_SUBSCRIPTIONS_STANDARD
+static opcua_statuscode_t apply_modify_item_filters(mu_monitored_item_t *item, mu_server_t *server,
+                                                    bool has_datachange_filter, bool has_aggregate_filter,
+                                                    mu_monitored_item_create_body_t *filter_body) {
+    if (has_datachange_filter) {
+        item->trigger = (opcua_byte_t)filter_body->trigger;
+        item->deadband_type = (opcua_byte_t)filter_body->deadband_type;
+        item->deadband_value = filter_body->deadband_value;
+    }
+    if (has_aggregate_filter) {
+        item->has_aggregate = true;
+        item->aggregate_state.aggregate_type = filter_body->aggregate_type;
+        item->aggregate_state.processing_interval = filter_body->processing_interval;
+        item->aggregate_state.sample_count = 0u;
+        memset(&item->aggregate_state.accumulator, 0, sizeof(item->aggregate_state.accumulator));
+        opcua_uint64_t now_ms = server->config.time_adapter.get_tick_ms(server->config.time_adapter.context);
+        item->aggregate_state.last_calculation = (opcua_datetime_t)now_ms;
+    }
+    return MU_STATUS_GOOD;
+}
+#endif
+
 opcua_statuscode_t apply_modify_item_fields(mu_server_t *server, opcua_uint32_t subscription_id,
                                             opcua_uint32_t monitored_item_id, opcua_uint32_t client_handle,
                                             opcua_uint64_t sampling_interval_bits, opcua_uint32_t timestamps_to_return,
@@ -221,47 +254,44 @@ opcua_statuscode_t apply_modify_item_fields(mu_server_t *server, opcua_uint32_t 
     opcua_uint32_t revised_queue_size = 1u;
     (void)queue_size;
     (void)discard_oldest;
-    if (item != NULL) {
-        if (filter_result != MU_STATUS_GOOD) {
-            result = filter_result;
-        } else if (has_datachange_filter && item->attribute_id != MU_MONITORED_VALUE_ATTRIBUTE_ID) {
-            result = MU_STATUS_BAD_FILTERNOTALLOWED;
-        } else if (has_aggregate_filter && item->attribute_id != MU_MONITORED_VALUE_ATTRIBUTE_ID) {
-            result = MU_STATUS_BAD_FILTERNOTALLOWED;
-        } else {
-            revised_sampling_interval_ms = publishing_interval_bits_to_ms(sampling_interval_bits);
-            item->sampling_interval_ms = revised_sampling_interval_ms;
-            item->client_handle = client_handle;
-            item->timestamps_to_return = (opcua_byte_t)timestamps_to_return;
-#if MUC_OPCUA_SUBSCRIPTIONS_STANDARD
-            item->queue_size = queue_size;
-            if (item->queue_size == 0u) {
-                item->queue_size = 1u;
-            }
-            if (item->queue_size > MU_MONITORED_QUEUE_DEPTH) {
-                item->queue_size = MU_MONITORED_QUEUE_DEPTH;
-            }
-            item->discard_oldest = discard_oldest;
-            revised_queue_size = item->queue_size;
-            if (has_datachange_filter) {
-                item->trigger = (opcua_byte_t)filter_body->trigger;
-                item->deadband_type = (opcua_byte_t)filter_body->deadband_type;
-                item->deadband_value = filter_body->deadband_value;
-            }
-            if (has_aggregate_filter) {
-                item->has_aggregate = true;
-                item->aggregate_state.aggregate_type = filter_body->aggregate_type;
-                item->aggregate_state.processing_interval = filter_body->processing_interval;
-                item->aggregate_state.sample_count = 0u;
-                memset(&item->aggregate_state.accumulator, 0, sizeof(item->aggregate_state.accumulator));
-                opcua_uint64_t now_ms = server->config.time_adapter.get_tick_ms(server->config.time_adapter.context);
-                item->aggregate_state.last_calculation = (opcua_datetime_t)now_ms;
-            }
-#endif
-            result = MU_STATUS_GOOD;
-        }
+
+    if (item == NULL) {
+        *result_out = result;
+        *revised_sampling_interval_ms_out = revised_sampling_interval_ms;
+        *revised_queue_size_out = revised_queue_size;
+        return MU_STATUS_GOOD;
     }
-    *result_out = result;
+
+    if (filter_result != MU_STATUS_GOOD) {
+        *result_out = filter_result;
+        *revised_sampling_interval_ms_out = revised_sampling_interval_ms;
+        *revised_queue_size_out = revised_queue_size;
+        return MU_STATUS_GOOD;
+    }
+
+    if ((has_datachange_filter || has_aggregate_filter) && item->attribute_id != MU_MONITORED_VALUE_ATTRIBUTE_ID) {
+        *result_out = MU_STATUS_BAD_FILTERNOTALLOWED;
+        *revised_sampling_interval_ms_out = revised_sampling_interval_ms;
+        *revised_queue_size_out = revised_queue_size;
+        return MU_STATUS_GOOD;
+    }
+
+    revised_sampling_interval_ms = publishing_interval_bits_to_ms(sampling_interval_bits);
+    item->sampling_interval_ms = revised_sampling_interval_ms;
+    item->client_handle = client_handle;
+    item->timestamps_to_return = (opcua_byte_t)timestamps_to_return;
+
+#if MUC_OPCUA_SUBSCRIPTIONS_STANDARD
+    item->queue_size = clamp_queue_size(queue_size);
+    item->discard_oldest = discard_oldest;
+    revised_queue_size = item->queue_size;
+    apply_modify_item_filters(item, server, has_datachange_filter, has_aggregate_filter, filter_body);
+#else
+    (void)has_datachange_filter;
+    (void)has_aggregate_filter;
+#endif
+
+    *result_out = MU_STATUS_GOOD;
     *revised_sampling_interval_ms_out = revised_sampling_interval_ms;
     *revised_queue_size_out = revised_queue_size;
     return MU_STATUS_GOOD;

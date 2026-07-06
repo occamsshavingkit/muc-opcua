@@ -40,29 +40,30 @@ bool is_datachange_filter_binary_type(const mu_nodeid_t *type_id) {
            type_id->identifier.numeric == MU_ID_DATACHANGEFILTER_ENCODING_DEFAULTBINARY;
 }
 
+bool is_aggregate_filter_binary_type(const mu_nodeid_t *type_id) {
+    return type_id->identifier_type == MU_NODEID_NUMERIC && type_id->namespace_index == 0u &&
+           type_id->identifier.numeric == MU_ID_AGGREGATEFILTER_ENCODING_DEFAULTBINARY;
+}
+
+#ifdef MUC_OPCUA_EVENTS
+bool is_event_filter_binary_type(const mu_nodeid_t *type_id) {
+    return type_id->identifier_type == MU_NODEID_NUMERIC && type_id->namespace_index == 0u &&
+           type_id->identifier.numeric == MU_ID_EVENTFILTER_ENCODING_DEFAULTBINARY;
+}
+#endif
+
 static bool is_null_extension_object_type(const mu_nodeid_t *type_id, size_t length) {
     return type_id->identifier_type == MU_NODEID_NUMERIC && type_id->namespace_index == 0u &&
            type_id->identifier.numeric == 0u && length == 0u;
 }
 
 bool is_known_monitoring_filter_binary_type(const mu_nodeid_t *type_id, size_t length) {
-    if (is_null_extension_object_type(type_id, length)) {
-        return true;
-    }
-    if (is_datachange_filter_binary_type(type_id)) {
-        return true;
-    }
-    if (type_id->identifier_type == MU_NODEID_NUMERIC && type_id->namespace_index == 0u &&
-        type_id->identifier.numeric == MU_ID_AGGREGATEFILTER_ENCODING_DEFAULTBINARY) {
-        return true;
-    }
+    return is_null_extension_object_type(type_id, length) || is_datachange_filter_binary_type(type_id) ||
+           is_aggregate_filter_binary_type(type_id)
 #ifdef MUC_OPCUA_EVENTS
-    if (type_id->identifier_type == MU_NODEID_NUMERIC && type_id->namespace_index == 0u &&
-        type_id->identifier.numeric == MU_ID_EVENTFILTER_ENCODING_DEFAULTBINARY) {
-        return true;
-    }
+           || is_event_filter_binary_type(type_id)
 #endif
-    return false;
+        ;
 }
 
 static bool is_numeric_variant_type(mu_builtin_type_t type) {
@@ -231,6 +232,24 @@ opcua_statuscode_t read_aggregate_filter_body(mu_binary_reader_t *r, size_t filt
 #endif
 
 #ifdef MUC_OPCUA_EVENTS
+static opcua_byte_t resolve_event_field_type_by_name(const mu_string_t *name) {
+    static const struct {
+        const char *str;
+        opcua_int32_t len;
+        opcua_byte_t field_type;
+    } field_table[] = {
+        {"EventId", 7, 1}, {"EventType", 9, 2}, {"Time", 4, 3}, {"Message", 7, 4}, {"Severity", 8, 5},
+    };
+    static const size_t table_size = sizeof(field_table) / sizeof(field_table[0]);
+
+    for (size_t i = 0; i < table_size; i++) {
+        if (name->length == field_table[i].len && memcmp(name->data, field_table[i].str, (size_t)name->length) == 0) {
+            return field_table[i].field_type;
+        }
+    }
+    return 0;
+}
+
 opcua_statuscode_t read_event_filter_body(mu_binary_reader_t *r, size_t filter_length,
                                           mu_monitored_item_create_body_t *body) {
     (void)filter_length;
@@ -290,17 +309,7 @@ opcua_statuscode_t read_event_filter_body(mu_binary_reader_t *r, size_t filter_l
 
         opcua_byte_t field_type = 0;
         if (last_name.length > 0 && last_name.data != NULL) {
-            if (last_name.length == 7 && memcmp(last_name.data, "EventId", 7) == 0) {
-                field_type = 1;
-            } else if (last_name.length == 9 && memcmp(last_name.data, "EventType", 9) == 0) {
-                field_type = 2;
-            } else if (last_name.length == 4 && memcmp(last_name.data, "Time", 4) == 0) {
-                field_type = 3;
-            } else if (last_name.length == 7 && memcmp(last_name.data, "Message", 7) == 0) {
-                field_type = 4;
-            } else if (last_name.length == 8 && memcmp(last_name.data, "Severity", 8) == 0) {
-                field_type = 5;
-            }
+            field_type = resolve_event_field_type_by_name(&last_name);
         }
 
         if (i < 8) {

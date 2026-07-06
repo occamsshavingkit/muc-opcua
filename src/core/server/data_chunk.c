@@ -267,8 +267,15 @@ static bool secure_unwrap_opn(mu_server_t *server, const mu_crypto_adapter_t *cr
     }
 
     (void)memset(&ai, 0, sizeof(ai));
-    if (mu_asym_chunk_unwrap(crypto, msg, msg_len, opn_buf, MU_SECURE_OPN_REQ_MAX, out_req_len, server->secure_scratch,
-                             MU_SECURE_SCRATCH_SIZE, &ai) != MU_STATUS_GOOD) {
+    if (mu_asym_chunk_unwrap(&(mu_asym_unwrap_params_t){.crypto = crypto,
+                                                        .chunk = msg,
+                                                        .chunk_len = msg_len,
+                                                        .out_body = opn_buf,
+                                                        .out_cap = MU_SECURE_OPN_REQ_MAX,
+                                                        .out_body_len = out_req_len,
+                                                        .scratch = server->secure_scratch,
+                                                        .scratch_len = MU_SECURE_SCRATCH_SIZE,
+                                                        .info = &ai}) != MU_STATUS_GOOD) {
         return false;
     }
     server_secure_channel.policy = ai.policy;
@@ -388,9 +395,19 @@ void handle_data_chunk_secure(mu_server_t *server, opcua_byte_t *msg, size_t msg
     size_t total = 0;
     opcua_statuscode_t ws;
     if (is_opn) {
-        ws = mu_asym_chunk_wrap(crypto, server_secure_channel.policy, server_secure_channel.channel_id, out_seq,
-                                response_request_id, client_cert, client_cert_len, respbody, resp_len,
-                                server->config.send_buffer, server->config.send_buffer_size, &total);
+        mu_asym_wrap_params_t awp = {.crypto = crypto,
+                                     .policy = server_secure_channel.policy,
+                                     .secure_channel_id = server_secure_channel.channel_id,
+                                     .sequence_number = out_seq,
+                                     .request_id = response_request_id,
+                                     .receiver_cert = client_cert,
+                                     .receiver_cert_len = client_cert_len,
+                                     .body = respbody,
+                                     .body_len = resp_len,
+                                     .out = server->config.send_buffer,
+                                     .out_cap = server->config.send_buffer_size,
+                                     .out_len = &total};
+        ws = mu_asym_chunk_wrap(&awp);
     } else {
         ws = mu_sym_chunk_wrap(crypto, server_secure_channel.mode, &server_secure_channel.server_keys, "MSG",
                                server_secure_channel.channel_id, server_secure_channel.token_id, out_seq,

@@ -45,9 +45,18 @@ void test_basic256sha256_roundtrip(void) {
     size_t chunk_len = 0;
     /* Client wraps, encrypting to the server certificate. */
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD,
-                      mu_asym_chunk_wrap(&client_crypto, MU_SECURITY_POLICY_BASIC256SHA256_ID, 0 /* new channel */,
-                                         1 /* seq */, 42 /* request id */, server_cert, server_cert_len, body,
-                                         sizeof(body), chunk, sizeof(chunk), &chunk_len));
+                      mu_asym_chunk_wrap(&(mu_asym_wrap_params_t){.crypto = &client_crypto,
+                                                                  .policy = MU_SECURITY_POLICY_BASIC256SHA256_ID,
+                                                                  .secure_channel_id = 0 /* new channel */,
+                                                                  .sequence_number = 1 /* seq */,
+                                                                  .request_id = 42 /* request id */,
+                                                                  .receiver_cert = server_cert,
+                                                                  .receiver_cert_len = server_cert_len,
+                                                                  .body = body,
+                                                                  .body_len = sizeof(body),
+                                                                  .out = chunk,
+                                                                  .out_cap = sizeof(chunk),
+                                                                  .out_len = &chunk_len}));
     TEST_ASSERT_GREATER_THAN(0, chunk_len);
     /* Header is cleartext "OPNF". */
     TEST_ASSERT_EQUAL('O', chunk[0]);
@@ -60,9 +69,15 @@ void test_basic256sha256_roundtrip(void) {
     mu_asym_chunk_info_t info;
     (void)memset(&info, 0, sizeof(info));
     opcua_byte_t scratch[6144];
-    TEST_ASSERT_EQUAL(MU_STATUS_GOOD,
-                      mu_asym_chunk_unwrap(&server_crypto, chunk, chunk_len, recovered, sizeof(recovered),
-                                           &recovered_len, scratch, sizeof(scratch), &info));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_asym_chunk_unwrap(&(mu_asym_unwrap_params_t){.crypto = &server_crypto,
+                                                                                      .chunk = chunk,
+                                                                                      .chunk_len = chunk_len,
+                                                                                      .out_body = recovered,
+                                                                                      .out_cap = sizeof(recovered),
+                                                                                      .out_body_len = &recovered_len,
+                                                                                      .scratch = scratch,
+                                                                                      .scratch_len = sizeof(scratch),
+                                                                                      .info = &info}));
 
     TEST_ASSERT_EQUAL(sizeof(body), recovered_len);
     TEST_ASSERT_EQUAL_MEMORY(body, recovered, sizeof(body));
@@ -82,17 +97,33 @@ void test_none_passthrough(void) {
 
     opcua_byte_t chunk[512];
     size_t chunk_len = 0;
-    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_asym_chunk_wrap(&client_crypto, MU_SECURITY_POLICY_NONE_ID, 7, 3, 99, NULL, 0,
-                                                         body, sizeof(body), chunk, sizeof(chunk), &chunk_len));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_asym_chunk_wrap(&(mu_asym_wrap_params_t){.crypto = &client_crypto,
+                                                                                  .policy = MU_SECURITY_POLICY_NONE_ID,
+                                                                                  .secure_channel_id = 7,
+                                                                                  .sequence_number = 3,
+                                                                                  .request_id = 99,
+                                                                                  .receiver_cert = NULL,
+                                                                                  .receiver_cert_len = 0,
+                                                                                  .body = body,
+                                                                                  .body_len = sizeof(body),
+                                                                                  .out = chunk,
+                                                                                  .out_cap = sizeof(chunk),
+                                                                                  .out_len = &chunk_len}));
 
     opcua_byte_t recovered[512];
     size_t recovered_len = 0;
     mu_asym_chunk_info_t info;
     (void)memset(&info, 0, sizeof(info));
     opcua_byte_t scratch[6144];
-    TEST_ASSERT_EQUAL(MU_STATUS_GOOD,
-                      mu_asym_chunk_unwrap(&server_crypto, chunk, chunk_len, recovered, sizeof(recovered),
-                                           &recovered_len, scratch, sizeof(scratch), &info));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_asym_chunk_unwrap(&(mu_asym_unwrap_params_t){.crypto = &server_crypto,
+                                                                                      .chunk = chunk,
+                                                                                      .chunk_len = chunk_len,
+                                                                                      .out_body = recovered,
+                                                                                      .out_cap = sizeof(recovered),
+                                                                                      .out_body_len = &recovered_len,
+                                                                                      .scratch = scratch,
+                                                                                      .scratch_len = sizeof(scratch),
+                                                                                      .info = &info}));
     TEST_ASSERT_EQUAL(sizeof(body), recovered_len);
     TEST_ASSERT_EQUAL_MEMORY(body, recovered, sizeof(body));
     TEST_ASSERT_EQUAL(MU_SECURITY_POLICY_NONE_ID, info.policy);
@@ -116,9 +147,18 @@ void test_aes256_sha256_rsapss_roundtrip(void) {
     size_t chunk_len = 0;
     /* Client wraps, encrypting to the server certificate. */
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD,
-                      mu_asym_chunk_wrap(&client_crypto, MU_SECURITY_POLICY_AES256_SHA256_RSAPSS_ID,
-                                         0 /* new channel */, 1 /* seq */, 42 /* request id */, server_cert,
-                                         server_cert_len, body, sizeof(body), chunk, sizeof(chunk), &chunk_len));
+                      mu_asym_chunk_wrap(&(mu_asym_wrap_params_t){.crypto = &client_crypto,
+                                                                  .policy = MU_SECURITY_POLICY_AES256_SHA256_RSAPSS_ID,
+                                                                  .secure_channel_id = 0 /* new channel */,
+                                                                  .sequence_number = 1 /* seq */,
+                                                                  .request_id = 42 /* request id */,
+                                                                  .receiver_cert = server_cert,
+                                                                  .receiver_cert_len = server_cert_len,
+                                                                  .body = body,
+                                                                  .body_len = sizeof(body),
+                                                                  .out = chunk,
+                                                                  .out_cap = sizeof(chunk),
+                                                                  .out_len = &chunk_len}));
     TEST_ASSERT_GREATER_THAN(0, chunk_len);
     /* Header is cleartext "OPNF". */
     TEST_ASSERT_EQUAL('O', chunk[0]);
@@ -131,9 +171,15 @@ void test_aes256_sha256_rsapss_roundtrip(void) {
     mu_asym_chunk_info_t info;
     memset(&info, 0, sizeof(info));
     opcua_byte_t scratch[6144];
-    TEST_ASSERT_EQUAL(MU_STATUS_GOOD,
-                      mu_asym_chunk_unwrap(&server_crypto, chunk, chunk_len, recovered, sizeof(recovered),
-                                           &recovered_len, scratch, sizeof(scratch), &info));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_asym_chunk_unwrap(&(mu_asym_unwrap_params_t){.crypto = &server_crypto,
+                                                                                      .chunk = chunk,
+                                                                                      .chunk_len = chunk_len,
+                                                                                      .out_body = recovered,
+                                                                                      .out_cap = sizeof(recovered),
+                                                                                      .out_body_len = &recovered_len,
+                                                                                      .scratch = scratch,
+                                                                                      .scratch_len = sizeof(scratch),
+                                                                                      .info = &info}));
 
     TEST_ASSERT_EQUAL(sizeof(body), recovered_len);
     TEST_ASSERT_EQUAL_MEMORY(body, recovered, sizeof(body));
@@ -156,8 +202,18 @@ void test_tampered_signature_rejected(void) {
     opcua_byte_t chunk[4096];
     size_t chunk_len = 0;
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD,
-                      mu_asym_chunk_wrap(&client_crypto, MU_SECURITY_POLICY_BASIC256SHA256_ID, 0, 1, 5, server_cert,
-                                         server_cert_len, body, sizeof(body), chunk, sizeof(chunk), &chunk_len));
+                      mu_asym_chunk_wrap(&(mu_asym_wrap_params_t){.crypto = &client_crypto,
+                                                                  .policy = MU_SECURITY_POLICY_BASIC256SHA256_ID,
+                                                                  .secure_channel_id = 0,
+                                                                  .sequence_number = 1,
+                                                                  .request_id = 5,
+                                                                  .receiver_cert = server_cert,
+                                                                  .receiver_cert_len = server_cert_len,
+                                                                  .body = body,
+                                                                  .body_len = sizeof(body),
+                                                                  .out = chunk,
+                                                                  .out_cap = sizeof(chunk),
+                                                                  .out_len = &chunk_len}));
 
     /* Flip a byte in the encrypted region (after the cleartext header). */
     chunk[chunk_len - 1] ^= 0xFF;
@@ -168,8 +224,15 @@ void test_tampered_signature_rejected(void) {
     memset(&info, 0, sizeof(info));
     opcua_byte_t scratch[6144];
     TEST_ASSERT_NOT_EQUAL(MU_STATUS_GOOD,
-                          mu_asym_chunk_unwrap(&server_crypto, chunk, chunk_len, recovered, sizeof(recovered),
-                                               &recovered_len, scratch, sizeof(scratch), &info));
+                          mu_asym_chunk_unwrap(&(mu_asym_unwrap_params_t){.crypto = &server_crypto,
+                                                                          .chunk = chunk,
+                                                                          .chunk_len = chunk_len,
+                                                                          .out_body = recovered,
+                                                                          .out_cap = sizeof(recovered),
+                                                                          .out_body_len = &recovered_len,
+                                                                          .scratch = scratch,
+                                                                          .scratch_len = sizeof(scratch),
+                                                                          .info = &info}));
 }
 
 void test_wrong_receiver_thumbprint_rejected(void) {
@@ -185,8 +248,18 @@ void test_wrong_receiver_thumbprint_rejected(void) {
     opcua_byte_t chunk[4096];
     size_t chunk_len = 0;
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD,
-                      mu_asym_chunk_wrap(&client_crypto, MU_SECURITY_POLICY_BASIC256SHA256_ID, 0, 1, 5, client_cert,
-                                         client_cert_len, body, sizeof(body), chunk, sizeof(chunk), &chunk_len));
+                      mu_asym_chunk_wrap(&(mu_asym_wrap_params_t){.crypto = &client_crypto,
+                                                                  .policy = MU_SECURITY_POLICY_BASIC256SHA256_ID,
+                                                                  .secure_channel_id = 0,
+                                                                  .sequence_number = 1,
+                                                                  .request_id = 5,
+                                                                  .receiver_cert = client_cert,
+                                                                  .receiver_cert_len = client_cert_len,
+                                                                  .body = body,
+                                                                  .body_len = sizeof(body),
+                                                                  .out = chunk,
+                                                                  .out_cap = sizeof(chunk),
+                                                                  .out_len = &chunk_len}));
 
     opcua_byte_t recovered[2048];
     size_t recovered_len = 0;
@@ -194,8 +267,15 @@ void test_wrong_receiver_thumbprint_rejected(void) {
     memset(&info, 0, sizeof(info));
     opcua_byte_t scratch[6144];
     TEST_ASSERT_NOT_EQUAL(MU_STATUS_GOOD,
-                          mu_asym_chunk_unwrap(&server_crypto, chunk, chunk_len, recovered, sizeof(recovered),
-                                               &recovered_len, scratch, sizeof(scratch), &info));
+                          mu_asym_chunk_unwrap(&(mu_asym_unwrap_params_t){.crypto = &server_crypto,
+                                                                          .chunk = chunk,
+                                                                          .chunk_len = chunk_len,
+                                                                          .out_body = recovered,
+                                                                          .out_cap = sizeof(recovered),
+                                                                          .out_body_len = &recovered_len,
+                                                                          .scratch = scratch,
+                                                                          .scratch_len = sizeof(scratch),
+                                                                          .info = &info}));
 }
 
 void test_oversized_basic256sha256_request_returns_bad_requesttoolarge(void) {
@@ -214,8 +294,18 @@ void test_oversized_basic256sha256_request_returns_bad_requesttoolarge(void) {
     /* OPC-10000-6 sections 6.7.2 and 7.1.5: an OPN body that cannot fit in
        this single asymmetric chunk is rejected as Bad_RequestTooLarge. */
     TEST_ASSERT_EQUAL(MU_STATUS_BAD_REQUESTTOOLARGE,
-                      mu_asym_chunk_wrap(&client_crypto, MU_SECURITY_POLICY_BASIC256SHA256_ID, 0, 1, 5, server_cert,
-                                         server_cert_len, body, sizeof(body), chunk, sizeof(chunk), &chunk_len));
+                      mu_asym_chunk_wrap(&(mu_asym_wrap_params_t){.crypto = &client_crypto,
+                                                                  .policy = MU_SECURITY_POLICY_BASIC256SHA256_ID,
+                                                                  .secure_channel_id = 0,
+                                                                  .sequence_number = 1,
+                                                                  .request_id = 5,
+                                                                  .receiver_cert = server_cert,
+                                                                  .receiver_cert_len = server_cert_len,
+                                                                  .body = body,
+                                                                  .body_len = sizeof(body),
+                                                                  .out = chunk,
+                                                                  .out_cap = sizeof(chunk),
+                                                                  .out_len = &chunk_len}));
 }
 
 int main(void) {

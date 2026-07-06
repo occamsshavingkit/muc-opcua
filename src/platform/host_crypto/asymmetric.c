@@ -2,8 +2,8 @@
  * RSA-OAEP encrypt/decrypt, RSA key management, and certificate utilities. */
 #include "common.h"
 
-static opcua_statuscode_t rsa_oaep(EVP_PKEY *pk, int encrypt, const opcua_byte_t *in, size_t in_len, opcua_byte_t *out,
-                                   size_t *out_len) {
+static opcua_statuscode_t rsa_oaep_impl(EVP_PKEY *pk, int encrypt, const opcua_byte_t *in, size_t in_len,
+                                        opcua_byte_t *out, size_t *out_len, const EVP_MD *md) {
     EVP_PKEY_CTX *pc = EVP_PKEY_CTX_new(pk, NULL);
     if (!pc) {
         return MU_STATUS_BAD_INTERNALERROR;
@@ -12,28 +12,7 @@ static opcua_statuscode_t rsa_oaep(EVP_PKEY *pk, int encrypt, const opcua_byte_t
     size_t ol = *out_len;
     int init_ok = encrypt ? (EVP_PKEY_encrypt_init(pc) == 1) : (EVP_PKEY_decrypt_init(pc) == 1);
     if (init_ok && EVP_PKEY_CTX_set_rsa_padding(pc, RSA_PKCS1_OAEP_PADDING) == 1 &&
-        EVP_PKEY_CTX_set_rsa_oaep_md(pc, EVP_sha1()) == 1 && EVP_PKEY_CTX_set_rsa_mgf1_md(pc, EVP_sha1()) == 1) {
-        int op = encrypt ? EVP_PKEY_encrypt(pc, out, &ol, in, in_len) : EVP_PKEY_decrypt(pc, out, &ol, in, in_len);
-        if (op == 1) {
-            *out_len = ol;
-            rc = MU_STATUS_GOOD;
-        }
-    }
-    EVP_PKEY_CTX_free(pc);
-    return rc;
-}
-
-static opcua_statuscode_t rsa_oaep_sha256(EVP_PKEY *pk, int encrypt, const opcua_byte_t *in, size_t in_len,
-                                          opcua_byte_t *out, size_t *out_len) {
-    EVP_PKEY_CTX *pc = EVP_PKEY_CTX_new(pk, NULL);
-    if (!pc) {
-        return MU_STATUS_BAD_INTERNALERROR;
-    }
-    opcua_statuscode_t rc = MU_STATUS_BAD_INTERNALERROR;
-    size_t ol = *out_len;
-    int init_ok = encrypt ? (EVP_PKEY_encrypt_init(pc) == 1) : (EVP_PKEY_decrypt_init(pc) == 1);
-    if (init_ok && EVP_PKEY_CTX_set_rsa_padding(pc, RSA_PKCS1_OAEP_PADDING) == 1 &&
-        EVP_PKEY_CTX_set_rsa_oaep_md(pc, EVP_sha256()) == 1 && EVP_PKEY_CTX_set_rsa_mgf1_md(pc, EVP_sha256()) == 1) {
+        EVP_PKEY_CTX_set_rsa_oaep_md(pc, md) == 1 && EVP_PKEY_CTX_set_rsa_mgf1_md(pc, md) == 1) {
         int op = encrypt ? EVP_PKEY_encrypt(pc, out, &ol, in, in_len) : EVP_PKEY_decrypt(pc, out, &ol, in, in_len);
         if (op == 1) {
             *out_len = ol;
@@ -57,7 +36,7 @@ EVP_PKEY *pubkey_from_cert(const opcua_byte_t *cert, size_t cert_len) {
 
 opcua_statuscode_t h_rsa_oaep_decrypt(void *c, const opcua_byte_t *in, size_t len, opcua_byte_t *out, size_t *out_len) {
     struct host_crypto_context *cx = (struct host_crypto_context *)c;
-    return rsa_oaep(cx->key, 0, in, len, out, out_len);
+    return rsa_oaep_impl(cx->key, 0, in, len, out, out_len, EVP_sha1());
 }
 
 opcua_statuscode_t h_rsa_oaep_encrypt(void *c, const opcua_byte_t *cert, size_t cert_len, const opcua_byte_t *in,
@@ -67,7 +46,7 @@ opcua_statuscode_t h_rsa_oaep_encrypt(void *c, const opcua_byte_t *cert, size_t 
     if (!pk) {
         return MU_STATUS_BAD_SECURITYCHECKSFAILED;
     }
-    opcua_statuscode_t rc = rsa_oaep(pk, 1, in, len, out, out_len);
+    opcua_statuscode_t rc = rsa_oaep_impl(pk, 1, in, len, out, out_len, EVP_sha1());
     EVP_PKEY_free(pk);
     return rc;
 }
@@ -75,7 +54,7 @@ opcua_statuscode_t h_rsa_oaep_encrypt(void *c, const opcua_byte_t *cert, size_t 
 opcua_statuscode_t h_rsa_oaep_sha256_decrypt(void *c, const opcua_byte_t *in, size_t len, opcua_byte_t *out,
                                              size_t *out_len) {
     struct host_crypto_context *cx = (struct host_crypto_context *)c;
-    return rsa_oaep_sha256(cx->key, 0, in, len, out, out_len);
+    return rsa_oaep_impl(cx->key, 0, in, len, out, out_len, EVP_sha256());
 }
 
 opcua_statuscode_t h_rsa_oaep_sha256_encrypt(void *c, const opcua_byte_t *cert, size_t cert_len, const opcua_byte_t *in,
@@ -85,7 +64,7 @@ opcua_statuscode_t h_rsa_oaep_sha256_encrypt(void *c, const opcua_byte_t *cert, 
     if (!pk) {
         return MU_STATUS_BAD_SECURITYCHECKSFAILED;
     }
-    opcua_statuscode_t rc = rsa_oaep_sha256(pk, 1, in, len, out, out_len);
+    opcua_statuscode_t rc = rsa_oaep_impl(pk, 1, in, len, out, out_len, EVP_sha256());
     EVP_PKEY_free(pk);
     return rc;
 }
