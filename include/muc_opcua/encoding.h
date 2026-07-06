@@ -93,4 +93,15 @@ opcua_statuscode_t mu_binary_read_range(mu_binary_reader_t *reader, mu_range_t *
 opcua_statuscode_t mu_binary_write_range(mu_binary_writer_t *writer, const mu_range_t *value);
 #endif
 
+#if MUC_OPCUA_COMPLEX_TYPES
+#include "muc_opcua/address_space/complex_types.h"
+
+opcua_statuscode_t mu_binary_encode_struct(mu_binary_writer_t *writer, const mu_structure_definition_t *def,
+                                           const void *field_values);
+opcua_statuscode_t mu_binary_decode_struct(mu_binary_reader_t *reader, const mu_structure_definition_t *def,
+                                           void *field_values);
+opcua_statuscode_t mu_binary_encode_enum(mu_binary_writer_t *writer, opcua_int32_t value);
+opcua_statuscode_t mu_binary_decode_enum(mu_binary_reader_t *reader, opcua_int32_t *value);
+#endif
+
 #endif /* MUC_OPCUA_ENCODING_H */

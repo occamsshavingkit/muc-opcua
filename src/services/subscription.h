@@ -108,6 +108,17 @@ typedef struct {
         struct {
             mu_variant_t max_val;
         } max;
+#if MUC_OPCUA_AGGREGATE_FULL
+        struct { opcua_uint32_t value; } cnt;
+        struct { mu_variant_t min_val; mu_variant_t max_val; } range;
+        struct { opcua_uint64_t start_ms; opcua_uint64_t running_total_ms; } duration;
+        struct { opcua_uint32_t good_count; opcua_uint32_t bad_count; } percent;
+        struct { mu_variant_t first_val; mu_variant_t last_val; } endpoint;
+        struct { opcua_double_t weighted_sum; opcua_uint64_t duration_ms; } timeavg;
+        struct { opcua_double_t running_total; } total;
+        struct { opcua_statuscode_t worst_status; } worstq;
+        struct { mu_variant_t prev_val; opcua_uint64_t prev_time_ms; } interp;
+#endif
     } accumulator;
     opcua_uint32_t aggregate_type; /* MU_ID_AGGREGATETYPE_AVERAGE, MINIMUM, MAXIMUM */
     opcua_uint32_t sample_count;   /* number of samples in the current interval */

@@ -1,6 +1,6 @@
 # TODO — muc-opcua
 
-**Updated**: 2026-07-06 (specs 038-044 implementation complete)
+**Updated**: 2026-07-06 (spec 045 implementation complete — D1-D4 deferred features finished)
 **Source**: code review findings, complexity audit, binary size analysis
 
 ## Remaining Active Backlog
@@ -61,10 +61,10 @@ Feature code exists. Only test implementation is needed.
 
 | ID | Feature | Status |
 |----|---------|--------|
-| D1 | Complex type encode/decode | `src/encoding/binary_complex.c` is dead stub. Registration API tested (spec 043). Round-trip tests deferred. OPC-10000-3 §5.6.4 |
-| D2 | Audit callback mechanism | `mu_raise_audit_event` is no-op. `mu_audit_callback_t` doesn't exist. NULL-safety tested (spec 043). OPC-10000-5 §6.5 |
-| D3 | 39 additional aggregate functions | Only 3 of 42 OPC-10000-13 aggregates exist. Edge-cases tested (spec 043). `MUC_OPCUA_AGGREGATE_FULL` OFF. |
-| D4 | Binary size measurement | ELF measurement vs archive measurement. `docs/research/binary-size-optimization.md` exists. |
+| D1 | Complex type encode/decode | ✅ Complete (spec 045) — `mu_binary_encode_struct`/`mu_binary_decode_struct`/`mu_binary_encode_enum`/`mu_binary_decode_enum` implemented in `src/encoding/binary_complex.c`. Round-trip tests pass for scalar, optional fields, enumerations. OPC-10000-3 §5.6.4, OPC-10000-6 §5.2.2.12, §5.2.2.9. |
+| D2 | Audit callback mechanism | ✅ Complete (spec 045) — `mu_audit_callback_t` typedef, `mu_server_set_audit_callback`/`mu_server_add_audit_callback` API, dispatch from `mu_raise_audit_event`. Callback ordering, auditing-disabled gate, NULL-safety. OPC-10000-5 §6.5. |
+| D3 | 39 additional aggregate functions | ✅ Complete (spec 045) — All 21 new aggregate function IDs added to `opcua_ids.h`. Accumulate/publish branches for Count, Range, Duration*, Percent*, Start, End, Delta, DeltaBounds, TimeAverage, TimeAverage2, Total, Total2, Maximum2, Minimum2, WorstQuality, WorstQuality2, AnnotationCount, Interpolative. Filter reader whitelist expanded. Gated on `MUC_OPCUA_AGGREGATE_FULL`. OPC-10000-13. |
+| D4 | Binary size measurement | ✅ Complete (spec 045) — `scripts/measure_size.sh` now produces linked-ELF measurements with `.text`/`.data`/`.bss` breakdown, JSON output (`--json`), LTO comparison (`--lto`), and graceful toolchain-absence handling. Supporting files: `scripts/size_measure.ld`, `scripts/size_measure_startup.c`, `scripts/size_measure_main.c`. |
 
 ### Complexity Audit (2026-07-05) — Oversized Functions ✅ Fixed in Spec 040
 

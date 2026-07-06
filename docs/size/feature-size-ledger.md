@@ -1,6 +1,47 @@
 # Feature Size Ledger
 
-## Current (2026-07-06): Feature-Gated Stubs + Time Sync + Reverse Connect (Specs 043-044)
+## Current (2026-07-06): Deferred Features (D1-D4) — Spec 045
+
+Measured after implementing complex type binary encode/decode (D1), audit event
+callback dispatch (D2), additional aggregate functions (D3), and binary size
+measurement tooling (D4). All features gate on existing flags with zero impact
+when OFF.
+
+- **Toolchain**: `arm-none-eabi-gcc` 13.2.1, Cortex-M0+ Thumb `-Os`
+- **Target**: `MUC_OPCUA_PLATFORM=arduino-skeleton`, no host adapters
+- **Delta vs pre-045 baseline**: nano +0 B (0.0%), micro +0 B (0.0%),
+  standard +0 B, embedded +0 B, full +0 B (flags OFF when not required)
+
+### ARM Cortex-M0+ `.text` (flash)
+
+| Profile | .text | .data | .bss |
+|---------|-------|-------|------|
+| nano | 18,150 B | 0 | 0 |
+| micro | 29,228 B | 0 | 0 |
+| embedded | 54,187 B | 0 | 0 |
+| standard | 65,752 B | 0 | 0 |
+| full | 65,752 B | 0 | 0 |
+
+### Linked-ELF sizes (dead-code eliminated, `--gc-sections`)
+
+| Profile | elf .text | elf .data | elf .bss | elf .dec |
+|---------|-----------|-----------|----------|----------|
+| standard | 13,104 B | 0 | 512 B | 13,616 B |
+
+- **Archive vs ELF**: archive is conservative (no `--gc-sections`); linked ELF
+  better reflects actual flash usage. Standard archive `.text` = 65,752 B,
+  ELF `.text` = 13,104 B (80% dead-code elimination).
+- **D1 (complex types)**: ~1-2 KB flash when `MUC_OPCUA_COMPLEX_TYPES=ON`.
+  Implemented in `src/encoding/binary_complex.c`. Encode/decode for structs
+  (scalar, optional, nested, array) and enumerations. Zero static RAM.
+- **D2 (audit events)**: ~0.5 KB flash when `MUC_OPCUA_AUDITING=ON`.
+  Callback storage: 4 × (function pointer + void*) = ~64 bytes in `mu_server`.
+- **D3 (aggregate functions)**: ~2-4 KB flash when `MUC_OPCUA_AGGREGATE_FULL=ON`.
+  21 new aggregate type IDs, expanded accumulator union ~180 bytes.
+- **D4 (measurement tooling)**: 0 bytes (script only). Now produces linked-ELF
+  measurements with JSON output and LTO comparison.
+
+---
 
 Measured after specs 043-044 implementation (placeholder stub tests, reverse connect,
 time synchronization, async inventory doc, server-param size gating fix).

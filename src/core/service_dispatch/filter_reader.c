@@ -217,7 +217,31 @@ opcua_statuscode_t read_aggregate_filter_body(mu_binary_reader_t *r, size_t filt
     }
 
     if (body->aggregate_type != MU_ID_AGGREGATETYPE_AVERAGE && body->aggregate_type != MU_ID_AGGREGATETYPE_MINIMUM &&
-        body->aggregate_type != MU_ID_AGGREGATETYPE_MAXIMUM) {
+        body->aggregate_type != MU_ID_AGGREGATETYPE_MAXIMUM
+#ifdef MUC_OPCUA_AGGREGATE_FULL
+        && body->aggregate_type != MU_ID_AGGREGATETYPE_COUNT
+        && body->aggregate_type != MU_ID_AGGREGATETYPE_RANGE
+        && body->aggregate_type != MU_ID_AGGREGATETYPE_DELTA
+        && body->aggregate_type != MU_ID_AGGREGATETYPE_DELTA_BOUNDS
+        && body->aggregate_type != MU_ID_AGGREGATETYPE_DURATION_GOOD
+        && body->aggregate_type != MU_ID_AGGREGATETYPE_DURATION_BAD
+        && body->aggregate_type != MU_ID_AGGREGATETYPE_DURATION_IN_STATE_ZERO
+        && body->aggregate_type != MU_ID_AGGREGATETYPE_START
+        && body->aggregate_type != MU_ID_AGGREGATETYPE_END
+        && body->aggregate_type != MU_ID_AGGREGATETYPE_INTERPOLATIVE
+        && body->aggregate_type != MU_ID_AGGREGATETYPE_MAXIMUM_2
+        && body->aggregate_type != MU_ID_AGGREGATETYPE_MINIMUM_2
+        && body->aggregate_type != MU_ID_AGGREGATETYPE_PERCENT_GOOD
+        && body->aggregate_type != MU_ID_AGGREGATETYPE_PERCENT_BAD
+        && body->aggregate_type != MU_ID_AGGREGATETYPE_TIME_AVERAGE
+        && body->aggregate_type != MU_ID_AGGREGATETYPE_TIME_AVERAGE_2
+        && body->aggregate_type != MU_ID_AGGREGATETYPE_TOTAL
+        && body->aggregate_type != MU_ID_AGGREGATETYPE_TOTAL_2
+        && body->aggregate_type != MU_ID_AGGREGATETYPE_WORST_QUALITY
+        && body->aggregate_type != MU_ID_AGGREGATETYPE_WORST_QUALITY_2
+        && body->aggregate_type != MU_ID_AGGREGATETYPE_ANNOTATION_COUNT
+#endif
+    ) {
         body->filter_result = MU_STATUS_BAD_MONITOREDITEMFILTERUNSUPPORTED;
         return MU_STATUS_GOOD;
     }
