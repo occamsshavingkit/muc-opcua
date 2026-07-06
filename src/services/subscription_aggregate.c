@@ -121,8 +121,9 @@ void monitored_item_accumulate_aggregate(mu_monitored_item_t *item, const mu_var
     } else if (item->aggregate_state.aggregate_type == MU_ID_AGGREGATETYPE_INTERPOLATIVE) {
         item->aggregate_state.accumulator.interp.prev_val = *cur;
     }
+#else
+    }
 #endif
-
     item->aggregate_state.sample_count++;
 }
 
