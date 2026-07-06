@@ -8,8 +8,19 @@
 #include "unity.h"
 #include <string.h>
 
-/* STUB: Complex type round-trip encode/decode behavioral tests not yet
- * implemented. Only type creation and registration API tested. */
+/* Complex type registration and field validation tests.
+ *
+ * Tested:
+ *  - Registration API (mu_register_structure_type, mu_register_enumeration_type)
+ *  - Type definition field validation (mu_structure_field_t, mu_structure_definition_t,
+ *    mu_enum_field_t, mu_enum_definition_t)
+ *  - Constant values for structure_type and field attributes
+ *
+ * Deferred:
+ *  - Binary encode/decode round-trip tests pending implementation of
+ *    mu_binary_encode_struct / mu_binary_decode_struct in src/encoding/binary_complex.c
+ *    (OPC-10000-3 §5.6.4)
+ */
 
 void setUp(void) {}
 void tearDown(void) {}

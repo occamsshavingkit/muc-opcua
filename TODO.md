@@ -31,15 +31,28 @@ Items identified by CodeRabbit review of spec 039 (PR #251) — all fixed in spe
 | CR8 | `specs/039-clear-remaining-backlog/quickstart.md` | LOW | Placeholder grep misses #warning | ✅ Fixed: updated grep pattern |
 | CR9 | `specs/039-clear-remaining-backlog/quickstart.md` | LOW | Verification block not self-contained | ✅ Fixed: uses `mkdir -p build && cd build` |
 
-### Features with Stub Tests (test infrastructure exists, implementation deferred)
+### Features with Stub Tests (implementation complete — spec 043)
 
-| ID | Test File | Feature | OPC Ref |
-|----|-----------|---------|---------|
-| STUB1 | `tests/unit/test_aggregate_full.c` | Full aggregate function set (42 functions) | OPC-10000-13 |
-| STUB2 | `tests/unit/test_audit_events.c` | Audit event dispatch (mu_raise_audit_event call path) | OPC-10000-5 §6.5 |
-| STUB3 | `tests/unit/test_reverse_connect.c` | Server-initiated TCP connections | OPC-10000-6 §7.5 |
-| STUB4 | `tests/unit/test_time_sync.c` | Security time synchronization | OPC-10000-4 §A.2 |
-| STUB5 | `tests/unit/test_complex_types.c` | Complex type round-trip encode/decode | OPC-10000-3 §5.6.4
+Feature code exists. Only test implementation is needed.
+
+| ID | Test File | Feature | What the Test Must Cover | OPC Ref | Status |
+|----|-----------|---------|--------------------------|---------|--------|
+| STUB1 | `tests/unit/test_aggregate_full.c` | Full aggregate function behavioral tests | ≥10 aggregate functions: (a) numeric: Avg, Sum, Min, Max, Count — known inputs → expected outputs, (b) PercentDeadband: samples crossing/not crossing threshold, (c) DurationGood/DurationBad: status-coded samples, (d) AggregateStatus: worst/best status, (e) Range: max − min. Each function independently testable | OPC-10000-13 | ✅ Complete (spec 043) |
+| STUB2 | `tests/unit/test_audit_events.c` | Audit event dispatch (mu_raise_audit_event path) | (a) Registered callback receives event with correct fields (ActionTimeStamp, ServerId, ClientAuditEntryId), (b) No callback → graceful no-op return, (c) NULL server/event pointer → graceful no-op return, (d) Multiple callbacks registered → all fire | OPC-10000-5 §6.5 | ✅ Complete (spec 043) |
+| STUB5 | `tests/unit/test_complex_types.c` | Complex type round-trip encode/decode | ≥3 types: (a) Structure with required scalar fields → encode→decode→deep-equal, (b) Structure with optional fields (EncodingMask) → verify present/absent detection, (c) Structure with nested structures → all levels preserved, (d) Structure with arrays → length + elements preserved | OPC-10000-3 §5.6.4 | ✅ Complete (spec 043) |
+| STUB6 | `tests/integration/test_minimal_server_flow.c` | Minimal server lifecycle integration test | Full lifecycle: TCP connect → HEL→ACK → OpenSecureChannel → CreateSession → ActivateSession → Read → CloseSession → disconnect. Verify all StatusCodes are Good, repeat 3× no memory leaks | OPC-10000-6 §7.1 / OPC-10000-4 §5.6 | ✅ Complete (spec 043) |
+| STUB7 | `tests/integration/test_discovery_endpoint_no_session.c` | Discovery without session | (a) GetEndpoints without session → endpoints with correct SecurityPolicy + TransportProfile URIs, (b) FindServers without session → servers list with correct ApplicationName + ApplicationURI, (c) FindServers filtered by ApplicationURI → only matching servers returned, (d) MU_DISCOVERY_MAX_ENDPOINTS limit enforced | OPC-10000-4 §5.5.4 | ✅ Complete (spec 043) |
+
+### Features with Stub Tests — Feature Implementation Required First
+
+These tests exist as placeholders but the feature code they test does not exist.
+The feature must be implemented before the test can be written.
+
+| ID | Test File | Feature | Missing Implementation | OPC Ref |
+|----|-----------|---------|------------------------|---------|
+| STUB3 | `tests/unit/test_reverse_connect.c` | Server-initiated TCP connections | `MUC_OPCUA_REVERSE_CONNECT` cmake option + server reverse-connect logic (OPC-10000-6 §7.5: server opens TCP socket to client instead of client connecting). Needs: (a) cmake flag wiring, (b) `mu_server_reverse_connect` API, (c) transport layer changes for outbound TCP | OPC-10000-6 §7.5 |
+| STUB4 | `tests/unit/test_time_sync.c` | Security time synchronization | `MUC_OPCUA_TIME_SYNC` cmake option + timestampsToReturn injection/handling (OPC-10000-4 §A.2: server injects ServerTimestamp into responses, validation of client/server timestamp fields). Needs: (a) cmake flag wiring, (b) timestamp field population in response header construction | OPC-10000-4 §A.2 |
+| STUB8 | `tests/unit/test_async_opcua_inventory.c` | Async OPC-UA conformance inventory | `docs/conformance/async-opcua-inventory.md` — conformance inventory doc listing async-capable features, devcontainer setup, codegen tests, dotnet interop, fuzz harnesses. Test reads this doc and validates sections exist | N/A (conformance doc) |
 
 ### Complexity Audit (2026-07-05) — Oversized Functions ✅ Fixed in Spec 040
 
