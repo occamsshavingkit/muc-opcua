@@ -1,11 +1,17 @@
 # TODO — muc-opcua
 
-**Updated**: 2026-07-05 (specs 039, 040, 041, 042 implementation complete)
+**Updated**: 2026-07-06 (specs 039-043 implementation complete)
 **Source**: code review findings, complexity audit, binary size analysis
 
 ## Remaining Active Backlog
 
-Items identified by CodeRabbit review of spec 039 (PR #251) — all fixed in spec 042:
+### Proposed Features
+
+| ID | Feature | Scope | Effort | OPC Ref |
+|----|---------|-------|--------|---------|
+| F1 | **mDNS discovery (server-side)** | Publish `_opcua-tcp._tcp` DNS-SD record on server start so OPC UA clients auto-discover the server on the local network. Fire-and-forget: extract hostname/port from `config.endpoint_url`, register TXT record with application URI and `/discovery` path. Needs: (a) optional platform adapter callback (`publish_mdns`/`unpublish_mdns`), (b) default no-op implementation, (c) example using Avahi/Linux or Bonjour/macOS adapter | Small | OPC-10000-12 §6.3 (LDS-ME) |
+
+### Features with Stub Tests — Feature Implementation Required First
 
 ### Bugs (functional) ✅
 
