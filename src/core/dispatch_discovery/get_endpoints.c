@@ -199,7 +199,7 @@ opcua_statuscode_t handle_get_endpoints(mu_server_t *server, mu_binary_reader_t 
         }
     }
 
-    s = write_response_prefix(w, MU_ID_GETENDPOINTSRESPONSE, req.request_handle, MU_STATUS_GOOD);
+    s = write_response_prefix(w, MU_ID_GETENDPOINTSRESPONSE, req.request_handle, MU_STATUS_GOOD, server);
     if (s != MU_STATUS_GOOD) {
         return s;
     }

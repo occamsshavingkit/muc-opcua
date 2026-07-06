@@ -75,7 +75,7 @@ opcua_statuscode_t handle_create_subscription(mu_server_t *server, mu_binary_rea
         return s;
     }
 
-    s = write_response_prefix(w, MU_ID_CREATESUBSCRIPTIONRESPONSE, req.request_handle, MU_STATUS_GOOD);
+    s = write_response_prefix(w, MU_ID_CREATESUBSCRIPTIONRESPONSE, req.request_handle, MU_STATUS_GOOD, server);
     if (s != MU_STATUS_GOOD) {
         return s;
     }
@@ -125,7 +125,7 @@ opcua_statuscode_t handle_modify_subscription(mu_server_t *server, mu_binary_rea
                                      requested_lifetime_count, requested_max_keep_alive_count,
                                      max_notifications_per_publish, priority);
 
-    s = write_response_prefix(w, MU_ID_MODIFYSUBSCRIPTIONRESPONSE, req.request_handle, MU_STATUS_GOOD);
+    s = write_response_prefix(w, MU_ID_MODIFYSUBSCRIPTIONRESPONSE, req.request_handle, MU_STATUS_GOOD, server);
     if (s != MU_STATUS_GOOD) {
         return s;
     }
@@ -261,7 +261,7 @@ opcua_statuscode_t handle_republish(mu_server_t *server, mu_binary_reader_t *r, 
         return s;
     }
 
-    s = write_response_prefix(w, MU_ID_REPUBLISHRESPONSE, req.request_handle, MU_STATUS_GOOD);
+    s = write_response_prefix(w, MU_ID_REPUBLISHRESPONSE, req.request_handle, MU_STATUS_GOOD, server);
     if (s != MU_STATUS_GOOD) {
         return s;
     }

@@ -3,8 +3,8 @@
 #if MUC_OPCUA_SUBSCRIPTIONS
 
 opcua_statuscode_t write_create_monitored_items_prefix(mu_binary_writer_t *w, opcua_uint32_t request_handle,
-                                                       opcua_int32_t items_to_create) {
-    opcua_statuscode_t s = write_response_prefix(w, MU_ID_CREATEMONITOREDITEMSRESPONSE, request_handle, MU_STATUS_GOOD);
+                                                       opcua_int32_t items_to_create, const mu_server_t *server) {
+    opcua_statuscode_t s = write_response_prefix(w, MU_ID_CREATEMONITOREDITEMSRESPONSE, request_handle, MU_STATUS_GOOD, server);
     if (s != MU_STATUS_GOOD)
         return s;
     return mu_binary_write_int32(w, items_to_create);
@@ -90,7 +90,7 @@ opcua_statuscode_t handle_create_monitored_items(mu_server_t *server, mu_binary_
     if (items_to_create <= 0)
         return MU_STATUS_BAD_NOTHINGTODO;
 
-    s = write_create_monitored_items_prefix(w, req.request_handle, items_to_create);
+    s = write_create_monitored_items_prefix(w, req.request_handle, items_to_create, server);
     if (s != MU_STATUS_GOOD)
         return s;
 
@@ -329,7 +329,7 @@ opcua_statuscode_t handle_modify_monitored_items(mu_server_t *server, mu_binary_
         return MU_STATUS_BAD_NOTHINGTODO;
     }
 
-    s = write_response_prefix(w, MU_ID_MODIFYMONITOREDITEMSRESPONSE, req.request_handle, MU_STATUS_GOOD);
+    s = write_response_prefix(w, MU_ID_MODIFYMONITOREDITEMSRESPONSE, req.request_handle, MU_STATUS_GOOD, server);
     if (s != MU_STATUS_GOOD) {
         return s;
     }

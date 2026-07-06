@@ -199,7 +199,7 @@ opcua_statuscode_t drive_subscription_id_status_array(mu_server_t *server, mu_bi
         return MU_STATUS_BAD_NOTHINGTODO;
     }
 
-    s = write_response_prefix(w, response_type_id, request_handle, MU_STATUS_GOOD);
+    s = write_response_prefix(w, response_type_id, request_handle, MU_STATUS_GOOD, server);
     if (s != MU_STATUS_GOOD) {
         return s;
     }

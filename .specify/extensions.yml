@@ -138,6 +138,14 @@ hooks:
     prompt: Commit analysis results?
     description: Auto-commit after analysis
     condition: null
+  after_tasks:
+  - extension: analyze
+    command: speckit.analyze
+    enabled: true
+    optional: false
+    prompt: Run OPC-UA standards reference check on generated tasks?
+    description: Analyze tasks for OPC-UA spec references
+    condition: null
   after_taskstoissues:
   - extension: git
     command: speckit.git.commit

@@ -168,7 +168,7 @@ static opcua_statuscode_t initialize_create_session(mu_server_t *server, mu_bina
     if (s != MU_STATUS_GOOD) {
         return s;
     }
-    s = write_response_prefix(w, MU_ID_CREATESESSIONRESPONSE, req->request_handle, MU_STATUS_GOOD);
+    s = write_response_prefix(w, MU_ID_CREATESESSIONRESPONSE, req->request_handle, MU_STATUS_GOOD, server);
     if (s != MU_STATUS_GOOD) {
         return s;
     }

@@ -32,7 +32,7 @@ static opcua_statuscode_t enforce_osc_application_auth(const mu_server_t *server
 static opcua_statuscode_t encode_osc_security_token(mu_binary_writer_t *w, opcua_uint32_t request_handle,
                                                     opcua_uint32_t revised, const opcua_byte_t *nonce_buf,
                                                     size_t nonce_len, const mu_server_t *server) {
-    opcua_statuscode_t s = write_response_prefix(w, MU_ID_OPENSECURECHANNELRESPONSE, request_handle, MU_STATUS_GOOD);
+    opcua_statuscode_t s = write_response_prefix(w, MU_ID_OPENSECURECHANNELRESPONSE, request_handle, MU_STATUS_GOOD, server);
     if (s != MU_STATUS_GOOD) {
         return s;
     }
@@ -158,7 +158,7 @@ opcua_statuscode_t handle_close_secure_channel(mu_server_t *server, mu_binary_re
         return s;
     }
 
-    s = write_response_prefix(w, MU_ID_CLOSESECURECHANNELRESPONSE, req.request_handle, MU_STATUS_GOOD);
+    s = write_response_prefix(w, MU_ID_CLOSESECURECHANNELRESPONSE, req.request_handle, MU_STATUS_GOOD, server);
     if (s != MU_STATUS_GOOD) {
         return s;
     }

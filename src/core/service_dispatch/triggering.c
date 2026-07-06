@@ -91,7 +91,7 @@ opcua_statuscode_t handle_set_triggering(mu_server_t *server, mu_binary_reader_t
                                                                   links_to_remove[i]);
     }
 
-    s = write_response_prefix(w, MU_ID_SETTRIGGERINGRESPONSE, req.request_handle, MU_STATUS_GOOD);
+    s = write_response_prefix(w, MU_ID_SETTRIGGERINGRESPONSE, req.request_handle, MU_STATUS_GOOD, server);
     if (s != MU_STATUS_GOOD) {
         return s;
     }

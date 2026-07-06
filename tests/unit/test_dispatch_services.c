@@ -957,7 +957,7 @@ void test_dispatch_find_servers(void) {
 void test_service_fault_encode(void) {
     opcua_byte_t buf[64];
     size_t len = sizeof(buf);
-    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_write_service_fault(buf, &len, 0, MU_STATUS_BAD_SERVICEUNSUPPORTED));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_write_service_fault(buf, &len, 0, MU_STATUS_BAD_SERVICEUNSUPPORTED, NULL));
 
     mu_binary_reader_t r;
     mu_binary_reader_init(&r, buf, len);
