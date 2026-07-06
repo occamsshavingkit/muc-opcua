@@ -95,8 +95,7 @@ opcua_statuscode_t read_monitored_item_create_body(mu_binary_reader_t *r, mu_mon
     }
 #else
 #ifdef MUC_OPCUA_EVENTS
-    if (filter_type.identifier_type == MU_NODEID_NUMERIC && filter_type.namespace_index == 0u &&
-        filter_type.identifier.numeric == MU_ID_EVENTFILTER_ENCODING_DEFAULTBINARY) {
+    if (is_event_filter_binary_type(&filter_type)) {
         s = read_event_filter_body(r, filter_length, body);
         if (s != MU_STATUS_GOOD)
             return s;

@@ -203,10 +203,12 @@ opcua_statuscode_t read_modify_item_filter(mu_binary_reader_t *r, opcua_statusco
 }
 #if MUC_OPCUA_SUBSCRIPTIONS_STANDARD
 static opcua_uint32_t clamp_queue_size(opcua_uint32_t queue_size) {
-    if (queue_size == 0u)
+    if (queue_size == 0u) {
         return 1u;
-    if (queue_size > MU_MONITORED_QUEUE_DEPTH)
+    }
+    if (queue_size > MU_MONITORED_QUEUE_DEPTH) {
         return MU_MONITORED_QUEUE_DEPTH;
+    }
     return queue_size;
 }
 #endif
