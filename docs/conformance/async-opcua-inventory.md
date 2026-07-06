@@ -1,7 +1,7 @@
 #Async OPC - UA Inventory
 
 Overview of the project areas, toolchains, and infrastructure that support
-development, testing, and conformance of the micro-opcua library.
+development, testing, and conformance of the muc-opcua library.
 
 ## .devcontainer
 
@@ -26,7 +26,7 @@ builds (embedded, micro, nano, standard).
 ## dotnet-tests
 
 Located in `tests/interop/dotnet/`, these tests verify interoperability
-between the micro-opcua server and the OPC Foundation .NET reference client.
+between the muc-opcua server and the OPC Foundation .NET reference client.
 The `run_interop_dotnet.sh` script starts the minimal server on port 4840,
 builds and runs the .NET client from `tests/interop/dotnet/interop.csproj`,
 and checks that the client can discover endpoints, browse the address space,
