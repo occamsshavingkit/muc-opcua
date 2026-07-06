@@ -6,8 +6,8 @@
 #include "muc_opcua/server.h"
 #include "muc_opcua/services/audit.h"
 #include "unity.h"
-#include <string.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "../../src/core/server_internal.h"
 #include "fake_platform.h"

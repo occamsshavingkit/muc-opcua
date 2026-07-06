@@ -57,8 +57,7 @@ opcua_statuscode_t mu_register_enumeration_type(struct mu_server *server, const 
 
 const mu_structure_definition_t *mu_find_structure_definition(const struct mu_server *server,
                                                               const mu_nodeid_t *type_id);
-const mu_enum_definition_t *mu_find_enum_definition(const struct mu_server *server,
-                                                    const mu_nodeid_t *type_id);
+const mu_enum_definition_t *mu_find_enum_definition(const struct mu_server *server, const mu_nodeid_t *type_id);
 
 #endif /* MUC_OPCUA_COMPLEX_TYPES */
 

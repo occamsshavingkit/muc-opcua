@@ -60,9 +60,11 @@ void monitored_item_accumulate_aggregate(mu_monitored_item_t *item, const mu_var
             item->aggregate_state.accumulator.range.max_val = *cur;
         } else {
             opcua_double_t existing;
-            if (variant_numeric_to_double(&item->aggregate_state.accumulator.range.min_val, &existing) && val_double < existing)
+            if (variant_numeric_to_double(&item->aggregate_state.accumulator.range.min_val, &existing) &&
+                val_double < existing)
                 item->aggregate_state.accumulator.range.min_val = *cur;
-            if (variant_numeric_to_double(&item->aggregate_state.accumulator.range.max_val, &existing) && val_double > existing)
+            if (variant_numeric_to_double(&item->aggregate_state.accumulator.range.max_val, &existing) &&
+                val_double > existing)
                 item->aggregate_state.accumulator.range.max_val = *cur;
         }
     } else if (item->aggregate_state.aggregate_type == MU_ID_AGGREGATETYPE_START) {
@@ -93,7 +95,8 @@ void monitored_item_accumulate_aggregate(mu_monitored_item_t *item, const mu_var
             item->aggregate_state.accumulator.max.max_val = *cur;
         } else {
             opcua_double_t existing;
-            if (variant_numeric_to_double(&item->aggregate_state.accumulator.max.max_val, &existing) && val_double > existing)
+            if (variant_numeric_to_double(&item->aggregate_state.accumulator.max.max_val, &existing) &&
+                val_double > existing)
                 item->aggregate_state.accumulator.max.max_val = *cur;
         }
     } else if (item->aggregate_state.aggregate_type == MU_ID_AGGREGATETYPE_MINIMUM_2) {
@@ -101,7 +104,8 @@ void monitored_item_accumulate_aggregate(mu_monitored_item_t *item, const mu_var
             item->aggregate_state.accumulator.min.min_val = *cur;
         } else {
             opcua_double_t existing;
-            if (variant_numeric_to_double(&item->aggregate_state.accumulator.min.min_val, &existing) && val_double < existing)
+            if (variant_numeric_to_double(&item->aggregate_state.accumulator.min.min_val, &existing) &&
+                val_double < existing)
                 item->aggregate_state.accumulator.min.min_val = *cur;
         }
     } else if (item->aggregate_state.aggregate_type == MU_ID_AGGREGATETYPE_WORST_QUALITY ||
@@ -177,11 +181,13 @@ void monitored_item_publish_aggregate(mu_monitored_item_t *item, opcua_uint64_t 
             calc_val.is_array = false;
         } else if (item->aggregate_state.aggregate_type == MU_ID_AGGREGATETYPE_TIME_AVERAGE) {
             calc_val.type = MU_TYPE_DOUBLE;
-            calc_val.value.d = item->aggregate_state.accumulator.timeavg.weighted_sum / item->aggregate_state.sample_count;
+            calc_val.value.d =
+                item->aggregate_state.accumulator.timeavg.weighted_sum / item->aggregate_state.sample_count;
             calc_val.is_array = false;
         } else if (item->aggregate_state.aggregate_type == MU_ID_AGGREGATETYPE_TIME_AVERAGE_2) {
             calc_val.type = MU_TYPE_DOUBLE;
-            calc_val.value.d = item->aggregate_state.accumulator.timeavg.weighted_sum / item->aggregate_state.sample_count;
+            calc_val.value.d =
+                item->aggregate_state.accumulator.timeavg.weighted_sum / item->aggregate_state.sample_count;
             calc_val.is_array = false;
         } else if (item->aggregate_state.aggregate_type == MU_ID_AGGREGATETYPE_TOTAL ||
                    item->aggregate_state.aggregate_type == MU_ID_AGGREGATETYPE_TOTAL_2) {
@@ -219,13 +225,15 @@ void monitored_item_publish_aggregate(mu_monitored_item_t *item, opcua_uint64_t 
             calc_val.type = MU_TYPE_DOUBLE;
             opcua_uint32_t total = item->aggregate_state.accumulator.percent.good_count +
                                    item->aggregate_state.accumulator.percent.bad_count;
-            calc_val.value.d = total > 0u ? (opcua_double_t)item->aggregate_state.accumulator.percent.good_count * 100.0 / total : 0.0;
+            calc_val.value.d =
+                total > 0u ? (opcua_double_t)item->aggregate_state.accumulator.percent.good_count * 100.0 / total : 0.0;
             calc_val.is_array = false;
         } else if (item->aggregate_state.aggregate_type == MU_ID_AGGREGATETYPE_PERCENT_BAD) {
             calc_val.type = MU_TYPE_DOUBLE;
             opcua_uint32_t total = item->aggregate_state.accumulator.percent.good_count +
                                    item->aggregate_state.accumulator.percent.bad_count;
-            calc_val.value.d = total > 0u ? (opcua_double_t)item->aggregate_state.accumulator.percent.bad_count * 100.0 / total : 0.0;
+            calc_val.value.d =
+                total > 0u ? (opcua_double_t)item->aggregate_state.accumulator.percent.bad_count * 100.0 / total : 0.0;
             calc_val.is_array = false;
         } else if (item->aggregate_state.aggregate_type == MU_ID_AGGREGATETYPE_INTERPOLATIVE) {
             calc_val = item->aggregate_state.accumulator.interp.prev_val;

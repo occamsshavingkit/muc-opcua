@@ -276,8 +276,7 @@
 
 #ifdef MUC_OPCUA_COMPLEX_TYPES
 /* 8 structures * (def_ptr + nodeid) + 8 enums * (def_ptr + nodeid) + 2 * uint16 */
-#define MU_COMPLEX_TYPES_STORAGE_BYTES                                                                              \
-    (8 * (sizeof(void *) + 24) + 8 * (sizeof(void *) + 24) + 4)
+#define MU_COMPLEX_TYPES_STORAGE_BYTES (8 * (sizeof(void *) + 24) + 8 * (sizeof(void *) + 24) + 4)
 #else
 #define MU_COMPLEX_TYPES_STORAGE_BYTES 0
 #endif
@@ -285,8 +284,7 @@
 #define MU_SERVER_STORAGE_BYTES                                                                                        \
     (MU_SERVER_STORAGE_BASE_BYTES + MU_SUBSCRIPTIONS_STANDARD_STORAGE_BYTES + MU_SERVER_SECURITY_STORAGE_BYTES +       \
      MU_ADDRESS_SPACE_INDEX_STORAGE_BYTES + MU_MULTIPLE_CONNECTIONS_STORAGE_BYTES + MU_EVENTS_STORAGE_BYTES +          \
-     MU_PUBSUB_STORAGE_BYTES + MU_NODEMANAGEMENT_STORAGE_BYTES +                                                       \
-     MU_ALARMS_CONDITIONS_STORAGE_BYTES + MU_CHUNK_ASSEMBLY_STORAGE_BYTES +                                            \
-     MU_AUDITING_STORAGE_BYTES + MU_COMPLEX_TYPES_STORAGE_BYTES)
+     MU_PUBSUB_STORAGE_BYTES + MU_NODEMANAGEMENT_STORAGE_BYTES + MU_ALARMS_CONDITIONS_STORAGE_BYTES +                  \
+     MU_CHUNK_ASSEMBLY_STORAGE_BYTES + MU_AUDITING_STORAGE_BYTES + MU_COMPLEX_TYPES_STORAGE_BYTES)
 
 #endif /* MUC_OPCUA_CONFIG_H */

@@ -35,7 +35,8 @@ opcua_statuscode_t mu_register_enumeration_type(struct mu_server *server, const 
 
 const mu_structure_definition_t *mu_find_structure_definition(const struct mu_server *server,
                                                               const mu_nodeid_t *type_id) {
-    if (server == NULL || type_id == NULL) return NULL;
+    if (server == NULL || type_id == NULL)
+        return NULL;
     opcua_uint16_t i;
     for (i = 0; i < server->complex_types.structure_count; i++) {
         const mu_nodeid_t *stored = &server->complex_types.structure_ids[i];
@@ -47,9 +48,9 @@ const mu_structure_definition_t *mu_find_structure_definition(const struct mu_se
     return NULL;
 }
 
-const mu_enum_definition_t *mu_find_enum_definition(const struct mu_server *server,
-                                                    const mu_nodeid_t *type_id) {
-    if (server == NULL || type_id == NULL) return NULL;
+const mu_enum_definition_t *mu_find_enum_definition(const struct mu_server *server, const mu_nodeid_t *type_id) {
+    if (server == NULL || type_id == NULL)
+        return NULL;
     opcua_uint16_t i;
     for (i = 0; i < server->complex_types.enum_count; i++) {
         const mu_nodeid_t *stored = &server->complex_types.enum_ids[i];

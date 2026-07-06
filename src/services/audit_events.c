@@ -7,14 +7,15 @@
 
 #if MUC_OPCUA_AUDITING
 
+#include "muc_opcua/server.h"
 #include "muc_opcua/services/audit.h"
 #include "muc_opcua/types.h"
-#include "muc_opcua/server.h"
 
 #include "../core/server_internal.h"
 
 void mu_server_set_audit_callback(mu_server_t *server, mu_audit_callback_t callback, void *context) {
-    if (server == NULL) return;
+    if (server == NULL)
+        return;
     server->audit_callback_count = 0;
     if (callback != NULL) {
         server->audit_callbacks[0].callback = callback;
@@ -24,8 +25,10 @@ void mu_server_set_audit_callback(mu_server_t *server, mu_audit_callback_t callb
 }
 
 opcua_statuscode_t mu_server_add_audit_callback(mu_server_t *server, mu_audit_callback_t callback, void *context) {
-    if (server == NULL || callback == NULL) return MU_STATUS_BAD_ARGUMENTSMISSING;
-    if (server->audit_callback_count >= MU_MAX_AUDIT_CALLBACKS) return MU_STATUS_BAD_OUTOFMEMORY;
+    if (server == NULL || callback == NULL)
+        return MU_STATUS_BAD_ARGUMENTSMISSING;
+    if (server->audit_callback_count >= MU_MAX_AUDIT_CALLBACKS)
+        return MU_STATUS_BAD_OUTOFMEMORY;
     size_t idx = server->audit_callback_count++;
     server->audit_callbacks[idx].callback = callback;
     server->audit_callbacks[idx].context = context;
@@ -33,8 +36,10 @@ opcua_statuscode_t mu_server_add_audit_callback(mu_server_t *server, mu_audit_ca
 }
 
 void mu_raise_audit_event(mu_server_t *server, const mu_audit_event_t *event) {
-    if (server == NULL || event == NULL) return;
-    if (!server->config.auditing_enabled) return;
+    if (server == NULL || event == NULL)
+        return;
+    if (!server->config.auditing_enabled)
+        return;
 
     mu_audit_event_t mutable_event = *event;
     mutable_event.action_timestamp = 0; /* placeholder — platform time adapter needed for real timestamp */

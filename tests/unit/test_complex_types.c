@@ -29,8 +29,8 @@ static mu_nodeid_t make_numeric_nodeid(opcua_uint16_t ns, opcua_uint32_t id) {
     return nid;
 }
 
-static mu_structure_field_t make_field(const char *name, opcua_uint32_t type_node_id,
-                                        opcua_int32_t rank, opcua_boolean_t optional) {
+static mu_structure_field_t make_field(const char *name, opcua_uint32_t type_node_id, opcua_int32_t rank,
+                                       opcua_boolean_t optional) {
     mu_structure_field_t f;
     memset(&f, 0, sizeof(f));
     f.name = name;
@@ -56,16 +56,16 @@ void test_struct_roundtrip_scalars(void) {
     } test_fields_t;
 
     mu_structure_field_t fields[10];
-    fields[0] = make_field("Bool",  1, -1, false);
-    fields[1] = make_field("Byte",  3, -1, false);
+    fields[0] = make_field("Bool", 1, -1, false);
+    fields[1] = make_field("Byte", 3, -1, false);
     fields[2] = make_field("Int16", 4, -1, false);
-    fields[3] = make_field("UInt16",5, -1, false);
+    fields[3] = make_field("UInt16", 5, -1, false);
     fields[4] = make_field("Int32", 6, -1, false);
-    fields[5] = make_field("UInt32",7, -1, false);
+    fields[5] = make_field("UInt32", 7, -1, false);
     fields[6] = make_field("Int64", 8, -1, false);
-    fields[7] = make_field("UInt64",9, -1, false);
+    fields[7] = make_field("UInt64", 9, -1, false);
     fields[8] = make_field("Float", 10, -1, false);
-    fields[9] = make_field("Double",11,-1, false);
+    fields[9] = make_field("Double", 11, -1, false);
 
     mu_structure_definition_t def;
     memset(&def, 0, sizeof(def));
@@ -75,16 +75,16 @@ void test_struct_roundtrip_scalars(void) {
 
     test_fields_t in_val;
     memset(&in_val, 0, sizeof(in_val));
-    in_val.b   = true;
-    in_val.by  = 200;
+    in_val.b = true;
+    in_val.by = 200;
     in_val.i16 = -300;
     in_val.u16 = 400;
     in_val.i32 = -50000;
     in_val.u32 = 60000;
     in_val.i64 = -7000000000LL;
     in_val.u64 = 8000000000ULL;
-    in_val.f   = 1.5f;
-    in_val.d   = 2.5;
+    in_val.f = 1.5f;
+    in_val.d = 2.5;
 
     memset(encode_buf, 0, sizeof(encode_buf));
     mu_binary_writer_t writer;
@@ -137,7 +137,7 @@ void test_struct_roundtrip_optional_fields(void) {
     memset(&in_val, 0, sizeof(in_val));
     in_val.mask = (1u << 0) | (1u << 2);
     in_val.a = 100;
-    in_val.b = 0;   /* not set in mask */
+    in_val.b = 0; /* not set in mask */
     in_val.c = 300;
 
     memset(encode_buf, 0, sizeof(encode_buf));
