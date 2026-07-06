@@ -22,7 +22,8 @@ opcua_statuscode_t handle_history_read(mu_server_t *server, mu_binary_reader_t *
     }
 
     if (!server->config.history_adapter.read_raw_modified) {
-        s = write_response_prefix(w, MU_ID_HISTORYREADRESPONSE, req_header.request_handle, MU_STATUS_BAD_NOTSUPPORTED, server);
+        s = write_response_prefix(w, MU_ID_HISTORYREADRESPONSE, req_header.request_handle, MU_STATUS_BAD_NOTSUPPORTED,
+                                  server);
         if (s == MU_STATUS_GOOD) {
             *response_length = w->position;
         }

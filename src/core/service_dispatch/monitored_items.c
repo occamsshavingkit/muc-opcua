@@ -4,7 +4,8 @@
 
 opcua_statuscode_t write_create_monitored_items_prefix(mu_binary_writer_t *w, opcua_uint32_t request_handle,
                                                        opcua_int32_t items_to_create, const mu_server_t *server) {
-    opcua_statuscode_t s = write_response_prefix(w, MU_ID_CREATEMONITOREDITEMSRESPONSE, request_handle, MU_STATUS_GOOD, server);
+    opcua_statuscode_t s =
+        write_response_prefix(w, MU_ID_CREATEMONITOREDITEMSRESPONSE, request_handle, MU_STATUS_GOOD, server);
     if (s != MU_STATUS_GOOD)
         return s;
     return mu_binary_write_int32(w, items_to_create);
