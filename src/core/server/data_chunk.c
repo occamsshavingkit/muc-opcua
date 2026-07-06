@@ -267,8 +267,15 @@ static bool secure_unwrap_opn(mu_server_t *server, const mu_crypto_adapter_t *cr
     }
 
     (void)memset(&ai, 0, sizeof(ai));
-    if (mu_asym_chunk_unwrap(crypto, msg, msg_len, opn_buf, MU_SECURE_OPN_REQ_MAX, out_req_len, server->secure_scratch,
-                             MU_SECURE_SCRATCH_SIZE, &ai) != MU_STATUS_GOOD) {
+    if (mu_asym_chunk_unwrap(&(mu_asym_unwrap_params_t){.crypto = crypto,
+                                                        .chunk = msg,
+                                                        .chunk_len = msg_len,
+                                                        .out_body = opn_buf,
+                                                        .out_cap = MU_SECURE_OPN_REQ_MAX,
+                                                        .out_body_len = out_req_len,
+                                                        .scratch = server->secure_scratch,
+                                                        .scratch_len = MU_SECURE_SCRATCH_SIZE,
+                                                        .info = &ai}) != MU_STATUS_GOOD) {
         return false;
     }
     server_secure_channel.policy = ai.policy;

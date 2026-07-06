@@ -69,9 +69,15 @@ void test_basic256sha256_roundtrip(void) {
     mu_asym_chunk_info_t info;
     (void)memset(&info, 0, sizeof(info));
     opcua_byte_t scratch[6144];
-    TEST_ASSERT_EQUAL(MU_STATUS_GOOD,
-                      mu_asym_chunk_unwrap(&server_crypto, chunk, chunk_len, recovered, sizeof(recovered),
-                                           &recovered_len, scratch, sizeof(scratch), &info));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_asym_chunk_unwrap(&(mu_asym_unwrap_params_t){.crypto = &server_crypto,
+                                                                                      .chunk = chunk,
+                                                                                      .chunk_len = chunk_len,
+                                                                                      .out_body = recovered,
+                                                                                      .out_cap = sizeof(recovered),
+                                                                                      .out_body_len = &recovered_len,
+                                                                                      .scratch = scratch,
+                                                                                      .scratch_len = sizeof(scratch),
+                                                                                      .info = &info}));
 
     TEST_ASSERT_EQUAL(sizeof(body), recovered_len);
     TEST_ASSERT_EQUAL_MEMORY(body, recovered, sizeof(body));
@@ -109,9 +115,15 @@ void test_none_passthrough(void) {
     mu_asym_chunk_info_t info;
     (void)memset(&info, 0, sizeof(info));
     opcua_byte_t scratch[6144];
-    TEST_ASSERT_EQUAL(MU_STATUS_GOOD,
-                      mu_asym_chunk_unwrap(&server_crypto, chunk, chunk_len, recovered, sizeof(recovered),
-                                           &recovered_len, scratch, sizeof(scratch), &info));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_asym_chunk_unwrap(&(mu_asym_unwrap_params_t){.crypto = &server_crypto,
+                                                                                      .chunk = chunk,
+                                                                                      .chunk_len = chunk_len,
+                                                                                      .out_body = recovered,
+                                                                                      .out_cap = sizeof(recovered),
+                                                                                      .out_body_len = &recovered_len,
+                                                                                      .scratch = scratch,
+                                                                                      .scratch_len = sizeof(scratch),
+                                                                                      .info = &info}));
     TEST_ASSERT_EQUAL(sizeof(body), recovered_len);
     TEST_ASSERT_EQUAL_MEMORY(body, recovered, sizeof(body));
     TEST_ASSERT_EQUAL(MU_SECURITY_POLICY_NONE_ID, info.policy);
@@ -159,9 +171,15 @@ void test_aes256_sha256_rsapss_roundtrip(void) {
     mu_asym_chunk_info_t info;
     memset(&info, 0, sizeof(info));
     opcua_byte_t scratch[6144];
-    TEST_ASSERT_EQUAL(MU_STATUS_GOOD,
-                      mu_asym_chunk_unwrap(&server_crypto, chunk, chunk_len, recovered, sizeof(recovered),
-                                           &recovered_len, scratch, sizeof(scratch), &info));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_asym_chunk_unwrap(&(mu_asym_unwrap_params_t){.crypto = &server_crypto,
+                                                                                      .chunk = chunk,
+                                                                                      .chunk_len = chunk_len,
+                                                                                      .out_body = recovered,
+                                                                                      .out_cap = sizeof(recovered),
+                                                                                      .out_body_len = &recovered_len,
+                                                                                      .scratch = scratch,
+                                                                                      .scratch_len = sizeof(scratch),
+                                                                                      .info = &info}));
 
     TEST_ASSERT_EQUAL(sizeof(body), recovered_len);
     TEST_ASSERT_EQUAL_MEMORY(body, recovered, sizeof(body));
@@ -206,8 +224,15 @@ void test_tampered_signature_rejected(void) {
     memset(&info, 0, sizeof(info));
     opcua_byte_t scratch[6144];
     TEST_ASSERT_NOT_EQUAL(MU_STATUS_GOOD,
-                          mu_asym_chunk_unwrap(&server_crypto, chunk, chunk_len, recovered, sizeof(recovered),
-                                               &recovered_len, scratch, sizeof(scratch), &info));
+                          mu_asym_chunk_unwrap(&(mu_asym_unwrap_params_t){.crypto = &server_crypto,
+                                                                          .chunk = chunk,
+                                                                          .chunk_len = chunk_len,
+                                                                          .out_body = recovered,
+                                                                          .out_cap = sizeof(recovered),
+                                                                          .out_body_len = &recovered_len,
+                                                                          .scratch = scratch,
+                                                                          .scratch_len = sizeof(scratch),
+                                                                          .info = &info}));
 }
 
 void test_wrong_receiver_thumbprint_rejected(void) {
@@ -242,8 +267,15 @@ void test_wrong_receiver_thumbprint_rejected(void) {
     memset(&info, 0, sizeof(info));
     opcua_byte_t scratch[6144];
     TEST_ASSERT_NOT_EQUAL(MU_STATUS_GOOD,
-                          mu_asym_chunk_unwrap(&server_crypto, chunk, chunk_len, recovered, sizeof(recovered),
-                                               &recovered_len, scratch, sizeof(scratch), &info));
+                          mu_asym_chunk_unwrap(&(mu_asym_unwrap_params_t){.crypto = &server_crypto,
+                                                                          .chunk = chunk,
+                                                                          .chunk_len = chunk_len,
+                                                                          .out_body = recovered,
+                                                                          .out_cap = sizeof(recovered),
+                                                                          .out_body_len = &recovered_len,
+                                                                          .scratch = scratch,
+                                                                          .scratch_len = sizeof(scratch),
+                                                                          .info = &info}));
 }
 
 void test_oversized_basic256sha256_request_returns_bad_requesttoolarge(void) {

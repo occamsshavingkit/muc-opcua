@@ -154,9 +154,16 @@ static void unwrap_opn_response(secure_fixture_t *fixture, decoded_response_t *r
 
     TEST_ASSERT_TRUE(fixture->mock.last_write_len >= 8u);
     TEST_ASSERT_EQUAL_MEMORY("OPNF", fixture->mock.last_write, 4);
-    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_asym_chunk_unwrap(&fixture->client_crypto, fixture->mock.last_write,
-                                                           fixture->mock.last_write_len, opn_body, sizeof(opn_body),
-                                                           &opn_body_len, scratch, sizeof(scratch), &info));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD,
+                      mu_asym_chunk_unwrap(&(mu_asym_unwrap_params_t){.crypto = &fixture->client_crypto,
+                                                                      .chunk = fixture->mock.last_write,
+                                                                      .chunk_len = fixture->mock.last_write_len,
+                                                                      .out_body = opn_body,
+                                                                      .out_cap = sizeof(opn_body),
+                                                                      .out_body_len = &opn_body_len,
+                                                                      .scratch = scratch,
+                                                                      .scratch_len = sizeof(scratch),
+                                                                      .info = &info}));
     TEST_ASSERT_EQUAL(MU_SECURITY_POLICY_BASIC256SHA256_ID, info.policy);
     /* Copy into the fixture RX buffer so decoded pointers survive unwrap_opn_response return. */
     TEST_ASSERT_TRUE(opn_body_len <= sizeof(fixture->rx));

@@ -27,6 +27,20 @@ typedef struct {
     size_t *out_len;
 } mu_asym_wrap_params_t;
 
+typedef struct mu_asym_chunk_info_s mu_asym_chunk_info_t;
+
+typedef struct {
+    const mu_crypto_adapter_t *crypto;
+    const opcua_byte_t *chunk;
+    size_t chunk_len;
+    opcua_byte_t *out_body;
+    size_t out_cap;
+    size_t *out_body_len;
+    opcua_byte_t *scratch;
+    size_t scratch_len;
+    mu_asym_chunk_info_t *info;
+} mu_asym_unwrap_params_t;
+
 /* RSA-OAEP with SHA-1 (MGF1-SHA1) overhead: plaintext block = keybytes - 2*20 - 2. */
 #define MU_OAEP_SHA1_OVERHEAD 42
 

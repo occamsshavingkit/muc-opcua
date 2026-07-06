@@ -86,28 +86,27 @@ static opcua_statuscode_t extract_unwrap_payload(opcua_byte_t *plain, size_t sig
     return MU_STATUS_GOOD;
 }
 
-opcua_statuscode_t mu_asym_chunk_unwrap(const mu_crypto_adapter_t *crypto, const opcua_byte_t *chunk, size_t chunk_len,
-                                        opcua_byte_t *out_body, size_t out_cap, size_t *out_body_len,
-                                        opcua_byte_t *scratch, size_t scratch_len, mu_asym_chunk_info_t *info) {
-    if (!crypto || !chunk || !out_body || !out_body_len || !info || !scratch) {
+opcua_statuscode_t mu_asym_chunk_unwrap(const mu_asym_unwrap_params_t *p) {
+    if (!p->crypto || !p->chunk || !p->out_body || !p->out_body_len || !p->info || !p->scratch) {
         return MU_STATUS_BAD_INTERNALERROR;
     }
-    if (scratch_len < MU_ASYM_MAX_PLAINTEXT + MU_ASYM_SIGNED_INPUT_MAX) {
+    if (p->scratch_len < MU_ASYM_MAX_PLAINTEXT + MU_ASYM_SIGNED_INPUT_MAX) {
         return MU_STATUS_BAD_INTERNALERROR;
     }
-    if (chunk_len < 12 || chunk[0] != 'O' || chunk[1] != 'P' || chunk[2] != 'N') {
+    if (p->chunk_len < 12 || p->chunk[0] != 'O' || p->chunk[1] != 'P' || p->chunk[2] != 'N') {
         return MU_STATUS_BAD_DECODINGERROR;
     }
 
-    size_t msg_size = (size_t)chunk[4] | ((size_t)chunk[5] << 8) | ((size_t)chunk[6] << 16) | ((size_t)chunk[7] << 24);
-    if (msg_size > chunk_len) {
+    size_t msg_size =
+        (size_t)p->chunk[4] | ((size_t)p->chunk[5] << 8) | ((size_t)p->chunk[6] << 16) | ((size_t)p->chunk[7] << 24);
+    if (msg_size > p->chunk_len) {
         return MU_STATUS_BAD_DECODINGERROR;
     }
 
     mu_binary_reader_t r;
-    mu_binary_reader_init(&r, chunk, msg_size);
+    mu_binary_reader_init(&r, p->chunk, msg_size);
     r.position = 8;
-    opcua_statuscode_t s = mu_binary_read_uint32(&r, &info->secure_channel_id);
+    opcua_statuscode_t s = mu_binary_read_uint32(&r, &p->info->secure_channel_id);
     if (s != MU_STATUS_GOOD) {
         return s;
     }
@@ -128,46 +127,49 @@ opcua_statuscode_t mu_asym_chunk_unwrap(const mu_crypto_adapter_t *crypto, const
     }
     size_t hdr_len = r.position;
 
-    info->policy = mu_security_policy_from_uri(policy_uri.data, policy_uri.length > 0 ? (size_t)policy_uri.length : 0);
-    info->sender_cert = sender_cert.length > 0 ? sender_cert.data : NULL;
-    info->sender_cert_len = sender_cert.length > 0 ? (size_t)sender_cert.length : 0;
+    p->info->policy =
+        mu_security_policy_from_uri(policy_uri.data, policy_uri.length > 0 ? (size_t)policy_uri.length : 0);
+    p->info->sender_cert = sender_cert.length > 0 ? sender_cert.data : NULL;
+    p->info->sender_cert_len = sender_cert.length > 0 ? (size_t)sender_cert.length : 0;
 
-    if (info->policy == MU_SECURITY_POLICY_NONE_ID) {
+    if (p->info->policy == MU_SECURITY_POLICY_NONE_ID) {
         /* Cleartext: SequenceHeader follows the header. */
         if (hdr_len + 8 > msg_size) {
             return MU_STATUS_BAD_DECODINGERROR;
         }
-        info->sequence_number = (opcua_uint32_t)chunk[hdr_len] | ((opcua_uint32_t)chunk[hdr_len + 1] << 8) |
-                                ((opcua_uint32_t)chunk[hdr_len + 2] << 16) | ((opcua_uint32_t)chunk[hdr_len + 3] << 24);
-        info->request_id = (opcua_uint32_t)chunk[hdr_len + 4] | ((opcua_uint32_t)chunk[hdr_len + 5] << 8) |
-                           ((opcua_uint32_t)chunk[hdr_len + 6] << 16) | ((opcua_uint32_t)chunk[hdr_len + 7] << 24);
+        p->info->sequence_number = (opcua_uint32_t)p->chunk[hdr_len] | ((opcua_uint32_t)p->chunk[hdr_len + 1] << 8) |
+                                   ((opcua_uint32_t)p->chunk[hdr_len + 2] << 16) |
+                                   ((opcua_uint32_t)p->chunk[hdr_len + 3] << 24);
+        p->info->request_id = (opcua_uint32_t)p->chunk[hdr_len + 4] | ((opcua_uint32_t)p->chunk[hdr_len + 5] << 8) |
+                              ((opcua_uint32_t)p->chunk[hdr_len + 6] << 16) |
+                              ((opcua_uint32_t)p->chunk[hdr_len + 7] << 24);
         size_t body_len = msg_size - hdr_len - 8;
-        if (!mu_checked_memcpy(out_body, out_cap, chunk + hdr_len + 8, body_len)) {
+        if (!mu_checked_memcpy(p->out_body, p->out_cap, p->chunk + hdr_len + 8, body_len)) {
             return MU_STATUS_BAD_RESPONSETOOLARGE;
         }
-        *out_body_len = body_len;
+        *p->out_body_len = body_len;
         return MU_STATUS_GOOD;
     }
-    if (info->policy != MU_SECURITY_POLICY_BASIC256SHA256_ID &&
-        info->policy != MU_SECURITY_POLICY_AES128_SHA256_RSAOAEP_ID &&
-        info->policy != MU_SECURITY_POLICY_AES256_SHA256_RSAPSS_ID) {
+    if (p->info->policy != MU_SECURITY_POLICY_BASIC256SHA256_ID &&
+        p->info->policy != MU_SECURITY_POLICY_AES128_SHA256_RSAOAEP_ID &&
+        p->info->policy != MU_SECURITY_POLICY_AES256_SHA256_RSAPSS_ID) {
         return MU_STATUS_BAD_SECURITYPOLICYREJECTED;
     }
 
-    /* Validate the sender certificate and that the chunk is addressed to us. */
-    s = mu_certificate_validate(crypto, info->policy, info->sender_cert, info->sender_cert_len);
+    /* Validate the sender certificate and that the p->chunk is addressed to us. */
+    s = mu_certificate_validate(p->crypto, p->info->policy, p->info->sender_cert, p->info->sender_cert_len);
     if (s != MU_STATUS_GOOD) {
         return s;
     }
 
     const opcua_byte_t *own_cert = NULL;
     size_t own_cert_len = 0;
-    s = crypto->get_own_certificate(crypto->context, &own_cert, &own_cert_len);
+    s = p->crypto->get_own_certificate(p->crypto->context, &own_cert, &own_cert_len);
     if (s != MU_STATUS_GOOD) {
         return s;
     }
     opcua_byte_t own_thumb[MU_THUMBPRINT_LENGTH];
-    s = mu_certificate_thumbprint(crypto, own_cert, own_cert_len, own_thumb);
+    s = mu_certificate_thumbprint(p->crypto, own_cert, own_cert_len, own_thumb);
     if (s != MU_STATUS_GOOD) {
         return s;
     }
@@ -177,11 +179,11 @@ opcua_statuscode_t mu_asym_chunk_unwrap(const mu_crypto_adapter_t *crypto, const
     }
 
     size_t own_key_bytes = 0, sig_len = 0;
-    s = key_bytes(crypto, own_cert, own_cert_len, &own_key_bytes);
+    s = key_bytes(p->crypto, own_cert, own_cert_len, &own_key_bytes);
     if (s != MU_STATUS_GOOD) {
         return s;
     }
-    s = key_bytes(crypto, info->sender_cert, info->sender_cert_len, &sig_len);
+    s = key_bytes(p->crypto, p->info->sender_cert, p->info->sender_cert_len, &sig_len);
     if (s != MU_STATUS_GOOD) {
         return s;
     }
@@ -191,9 +193,10 @@ opcua_statuscode_t mu_asym_chunk_unwrap(const mu_crypto_adapter_t *crypto, const
         return MU_STATUS_BAD_DECODINGERROR;
     }
 
-    opcua_byte_t *plain = scratch;
+    opcua_byte_t *plain = p->scratch;
     size_t plain_len = 0;
-    s = decrypt_unwrap_blocks(crypto, info->policy, chunk, hdr_len, own_key_bytes, cipher_len, plain, &plain_len);
+    s = decrypt_unwrap_blocks(p->crypto, p->info->policy, p->chunk, hdr_len, own_key_bytes, cipher_len, plain,
+                              &plain_len);
     if (s != MU_STATUS_GOOD) {
         return s;
     }
@@ -205,12 +208,13 @@ opcua_statuscode_t mu_asym_chunk_unwrap(const mu_crypto_adapter_t *crypto, const
     size_t signed_len = plain_len - sig_len;
     const opcua_byte_t *signature = plain + signed_len;
 
-    s = verify_unwrap_signature(crypto, info, chunk, hdr_len, plain, signed_len, signature, sig_len, scratch);
+    s = verify_unwrap_signature(p->crypto, p->info, p->chunk, hdr_len, plain, signed_len, signature, sig_len,
+                                p->scratch);
     if (s != MU_STATUS_GOOD) {
         return s;
     }
 
-    s = extract_unwrap_payload(plain, signed_len, out_body, out_cap, out_body_len, info);
+    s = extract_unwrap_payload(plain, signed_len, p->out_body, p->out_cap, p->out_body_len, p->info);
     if (s != MU_STATUS_GOOD) {
         return s;
     }
