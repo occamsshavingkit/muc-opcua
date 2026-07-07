@@ -1,0 +1,67 @@
+{
+  "schema_version": "1.0",
+  "presets": {
+    "agent-parity-governance": {
+      "version": "0.3.0",
+      "source": "local",
+      "manifest_hash": "sha256:0a9275eb476617130233e5ed863d2ad48d811047ced15b25cec7c3d60ec35816",
+      "enabled": true,
+      "priority": 10,
+      "registered_commands": {
+        "claude": [
+          "speckit.specify",
+          "speckit.plan",
+          "speckit.tasks"
+        ],
+        "opencode": [
+          "speckit.specify",
+          "speckit.plan",
+          "speckit.tasks"
+        ]
+      },
+      "registered_skills": [],
+      "installed_at": "2026-07-06T11:47:58.455747+00:00"
+    },
+    "workflow-preset": {
+      "version": "1.3.11",
+      "source": "local",
+      "manifest_hash": "sha256:b1909e4424cc07d7a50672a35c24a1e865a2065b2775e381815b72eb1748e8fb",
+      "enabled": true,
+      "priority": 10,
+      "registered_commands": {
+        "claude": [
+          "speckit.specify",
+          "speckit.clarify",
+          "speckit.checklist",
+          "speckit.constitution",
+          "speckit.analyze",
+          "speckit.plan",
+          "speckit.tasks",
+          "speckit.implement"
+        ],
+        "opencode": [
+          "speckit.specify",
+          "speckit.clarify",
+          "speckit.checklist",
+          "speckit.constitution",
+          "speckit.analyze",
+          "speckit.plan",
+          "speckit.tasks",
+          "speckit.implement"
+        ]
+      },
+      "registered_skills": [],
+      "installed_at": "2026-07-06T11:47:59.772903+00:00"
+    },
+    "firmware-development": {
+      "version": "1.0.0",
+      "source": "local",
+      "manifest_hash": "sha256:59bfc893e23aa79ead16cc02ca29b3a9a60d85880233fb48ccf2faf567643598",
+      "enabled": true,
+      "priority": 10,
+      "registered_commands": {},
+      "registered_skills": [],
+      "installed_at": "2026-07-06T11:50:51.765696+00:00"
+    }
+  }
+}

@@ -11,7 +11,7 @@ init_commit_message: "[Spec Kit] Initial commit"
 # Set "default" to enable for all commands, then override per-command.
 # Each key can be true/false. Message is customizable per-command.
 auto_commit:
-  default: true
+  default: false
   before_clarify:
     enabled: false
     message: "[Spec Kit] Save progress before clarification"
@@ -22,7 +22,7 @@ auto_commit:
     enabled: false
     message: "[Spec Kit] Save progress before task generation"
   before_implement:
-    enabled: true
+    enabled: false
     message: "[Spec Kit] Save progress before implementation"
   before_checklist:
     enabled: false
@@ -43,10 +43,10 @@ auto_commit:
     enabled: false
     message: "[Spec Kit] Clarify specification"
   after_plan:
-    enabled: true
+    enabled: false
     message: "[Spec Kit] Add implementation plan"
   after_tasks:
-    enabled: true
+    enabled: false
     message: "[Spec Kit] Add tasks"
   after_implement:
     enabled: false

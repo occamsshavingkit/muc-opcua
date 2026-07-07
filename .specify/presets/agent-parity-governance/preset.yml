@@ -1,0 +1,76 @@
+schema_version: "1.0"
+
+preset:
+  id: "agent-parity-governance"
+  name: "Agent Parity Governance"
+  version: "0.3.0"
+  description: "Adds shared-guidance parity, audit-ready Spec-Kit run evidence, and agent-neutral model-routing guidance across a project's declared AI-agent instruction surfaces so agent guidance does not drift."
+  author: "Thorsten Hindermann"
+  repository: "https://github.com/hindermath/spec-kit-preset-agent-parity-governance"
+  license: "MIT"
+
+requires:
+  speckit_version: ">=0.8.0"
+
+provides:
+  templates:
+    - type: "template"
+      name: "constitution-template"
+      file: "templates/constitution-addendum.md"
+      description: "Append multi-agent guidance parity governance"
+      strategy: "append"
+
+    - type: "template"
+      name: "spec-template"
+      file: "templates/spec-addendum.md"
+      description: "Append agent-parity applicability section"
+      strategy: "append"
+
+    - type: "template"
+      name: "plan-template"
+      file: "templates/plan-addendum.md"
+      description: "Append agent-parity planning checks"
+      strategy: "append"
+
+    - type: "template"
+      name: "tasks-template"
+      file: "templates/tasks-addendum.md"
+      description: "Append agent-parity tasks"
+      strategy: "append"
+
+    - type: "template"
+      name: "agent-parity-guidance-addendum-template"
+      file: "templates/agent-file-addendum.md"
+      description: "Standalone agent guidance addendum for parity governance"
+
+    - type: "template"
+      name: "agent-parity-checklist-template"
+      file: "templates/agent-parity-checklist-template.md"
+      description: "Starter checklist for verifying parity across maintained agent surfaces"
+
+    - type: "command"
+      name: "speckit.specify"
+      file: "commands/speckit.specify.md"
+      description: "Wrap specify with agent-parity checks"
+      strategy: "wrap"
+
+    - type: "command"
+      name: "speckit.plan"
+      file: "commands/speckit.plan.md"
+      description: "Wrap plan with agent-parity checks"
+      strategy: "wrap"
+
+    - type: "command"
+      name: "speckit.tasks"
+      file: "commands/speckit.tasks.md"
+      description: "Wrap tasks with agent-parity checks"
+      strategy: "wrap"
+
+tags:
+  - "agents"
+  - "governance"
+  - "parity"
+  - "agent-md"
+  - "agent-guidance"
+  - "model-routing"
+  - "multi-agent"

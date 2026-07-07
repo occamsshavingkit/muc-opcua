@@ -1,0 +1,73 @@
+schema_version: "1.0"
+
+extension:
+  id: "squad"
+  name: "Squad Bridge"
+  version: "1.3.0"
+  description: "Bootstrap and synchronize a Squad agent team from your Speckit spec and tasks."
+  author: "jwill824"
+  repository: "https://github.com/jwill824/spec-kit-squad"
+  documentation: "https://github.com/jwill824/spec-kit-squad/blob/main/README.md"
+  changelog: "https://github.com/jwill824/spec-kit-squad/blob/main/docs/CHANGELOG.md"
+  license: "MIT"
+  homepage: "https://github.com/jwill824/spec-kit-squad"
+
+requires:
+  speckit_version: ">=0.8.11"
+  tools:
+    - name: "@bradygaster/squad-cli"
+      version: ">=0.9.4"
+      required: true
+  commands:
+    - "speckit.specify"
+    - "speckit.tasks"
+
+provides:
+  commands:
+    - name: "speckit.squad.init"
+      file: "commands/init.md"
+      description: "Initialize a Squad team from the current spec"
+
+    - name: "speckit.squad.generate"
+      file: "commands/generate.md"
+      description: "Re-generate Squad agent definitions as your spec evolves"
+
+    - name: "speckit.squad.route"
+      file: "commands/route.md"
+      description: "Route open Speckit tasks to the right Squad agents"
+
+    - name: "speckit.squad.status"
+      file: "commands/status.md"
+      description: "Show alignment between your spec, tasks, and squad"
+
+  config:
+    - name: "squad-config.yml"
+      template: "squad-config.template.yml"
+      description: "Squad bridge configuration"
+      required: false
+
+hooks:
+  after_specify:
+    command: "speckit.squad.generate"
+    optional: true
+    prompt: "Spec updated — regenerate Squad agent definitions?"
+    description: "Keeps Squad agents aligned as the spec evolves"
+
+  after_tasks:
+    command: "speckit.squad.route"
+    optional: true
+    prompt: "Tasks generated — route them to Squad agents?"
+    description: "Distributes new tasks to the right agents automatically"
+
+tags:
+  - "multi-agent"
+  - "agents"
+  - "orchestration"
+  - "process"
+  - "integration"
+
+defaults:
+  squad:
+    auto_generate: false
+    agent_model: "claude-sonnet-4"
+    routing_strategy: "capability-match"

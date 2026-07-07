@@ -1,0 +1,63 @@
+schema_version: "1.0"
+
+extension:
+  id: "spec-validate"
+  name: "Spec Validate"
+  version: "1.0.1"
+  description: "Comprehension validation, review gating, and approval state for spec-kit artifacts"
+  author: "Ahmed Eltayeb"
+  repository: "https://github.com/aeltayeb/spec-kit-spec-validate"
+  license: "MIT"
+
+requires:
+  speckit_version: ">=0.5.0"
+
+provides:
+  commands:
+    - name: "speckit.spec-validate.validate"
+      file: "commands/validate.md"
+      description: "Validate comprehension of spec.md"
+    - name: "speckit.spec-validate.validate-tasks"
+      file: "commands/validate-tasks.md"
+      description: "Validate comprehension of tasks.md"
+    - name: "speckit.spec-validate.review"
+      file: "commands/review.md"
+      description: "Record peer review outcomes"
+    - name: "speckit.spec-validate.gate"
+      file: "commands/gate.md"
+      description: "Hard gate before implementation"
+    - name: "speckit.spec-validate.status"
+      file: "commands/status.md"
+      description: "Show approval and warning state"
+    - name: "speckit.spec-validate.analytics"
+      file: "commands/analytics.md"
+      description: "Show private and aggregate analytics"
+
+  config:
+    - name: "spec-validate-config.yml"
+      template: "config-template.yml"
+      description: "Validation, review, privacy, and timeout settings"
+      required: false
+
+hooks:
+  after_specify:
+    command: "speckit.spec-validate.validate"
+    optional: true
+    prompt: "Spec generated. Run comprehension validation now?"
+    description: "Run spec validation after specification is generated"
+  after_tasks:
+    command: "speckit.spec-validate.validate-tasks"
+    optional: true
+    prompt: "Tasks generated. Run task validation now?"
+    description: "Run task validation after tasks are generated"
+  before_implement:
+    command: "speckit.spec-validate.gate"
+    optional: false
+    description: "Hard gate implementation on validation and review policy"
+
+tags:
+  - "validation"
+  - "review"
+  - "quality"
+  - "workflow"
+  - "process"

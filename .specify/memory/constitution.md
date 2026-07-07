@@ -1,5 +1,24 @@
 <!--
 Sync Impact Report
+Version change: 1.0.1 -> 1.0.2 (MINOR: added client scope to Principle III and
+  Technology/Scope Constraints section — material expansion of project scope)
+Modified principles:
+- III. Minimal OPC UA Surface — broadened from "smallest conformant server" to
+  "smallest conformant server or client" client included alongside server
+Added sections: none
+Modified sections:
+- Technology and Scope Constraints — client is no longer a "separate future
+  scope"; server and client share the same library with isolated state
+Removed sections: none
+Templates requiring updates:
+- [pending] .specify/templates/plan-template.md (no principle changes needed)
+- [pending] .specify/templates/spec-template.md (already generic enough)
+- [pending] .specify/templates/tasks-template.md (already generic enough)
+- [pending] .specify/templates/checklist-template.md (already generic enough)
+Runtime guidance requiring updates: none (no agent-name changes)
+Follow-up TODOs: none
+
+Prior entry (2026-07-01, version 1.0.1):
 Version change: 1.0.0 -> 1.0.1 (PATCH: wording-only correction, no principle
   change, per this constitution's own Versioning policy)
 Modified principles: none; title only (the project was renamed; see
@@ -53,11 +72,11 @@ conformance decisions. Unsupported services and features MUST fail with the corr
 OPC UA StatusCode instead of partial behavior, silent success, or implementation
 defined behavior.
 
-Initial scope MUST target the smallest conformant server profile that can be
-justified from OPC-10000-7 after research. Profile membership and conformance units
-MUST be verified from OPC-10000-7 before being claimed. Rationale: a tiny
-implementation is useful only if its narrow behavior is predictable, interoperable,
-and honest about what the standard requires.
+Initial scope MUST target the smallest conformant server or client profile that
+can be justified from OPC-10000-7 after research. Profile membership and
+conformance units MUST be verified from OPC-10000-7 before being claimed.
+Rationale: a tiny implementation is useful only if its narrow behavior is
+predictable, interoperable, and honest about what the standard requires.
 
 ### II. Embedded-First C Core
 The primary implementation language MUST be freestanding C11, with a C99-compatible
@@ -151,10 +170,14 @@ tests, fixtures, fuzz targets, and documentation. Platform-specific code MUST NO
 leak into protocol parsing, encoding, service dispatch, status-code mapping, or
 address-space model code.
 
-Initial implementation scope is an embedded OPC UA server. Client functionality,
-PubSub, companion specifications, alternate encodings, alternate transports, and
-dynamic server modeling are separate future scopes and require explicit profile,
-size, and conformance justification before planning.
+Initial implementation scope is an embedded OPC UA server and client — both
+bundled in the same library, sharing the encoding, security, and transport layer
+while maintaining isolated server/client state. Client profile tiers follow the
+same nano→micro→embedded→full progression as the server, gated on
+`MUC_OPCUA_CLIENT_PROFILE`. PubSub, companion specifications, alternate
+encodings, alternate transports, and dynamic server modeling are separate future
+scopes and require explicit profile, size, and conformance justification before
+planning.
 
 Normative references for initial planning include at minimum:
 
@@ -202,4 +225,4 @@ profile requirements, reproducible tooling, size discipline, or test-first proto
 work MUST be documented in the plan's Complexity Tracking section with a simpler
 alternative and the reason it was rejected.
 
-**Version**: 1.0.1 | **Ratified**: 2026-06-25 | **Last Amended**: 2026-07-01
+**Version**: 1.0.2 | **Ratified**: 2026-06-25 | **Last Amended**: 2026-07-07

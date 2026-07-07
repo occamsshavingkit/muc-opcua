@@ -1,0 +1,35 @@
+patterns:
+  behavioral:
+    description: "Requirement describing expected system behavior"
+    template:
+      correct: "{actual behavior from spec}"
+      decoy_1: "Weaker generic fallback (e.g., show generic message)"
+      decoy_2: "Conflicting behavior (opposite or incompatible action)"
+
+  error_handling:
+    description: "Requirement describing error responses"
+    template:
+      correct: "{actual error path from spec}"
+      decoy_1: "Generic error message without specifics"
+      decoy_2: "Silent failure or incorrect fallback"
+
+  data_constraint:
+    description: "Requirement about data validation or entity rules"
+    template:
+      correct: "{actual constraint from spec}"
+      decoy_1: "Missing the constraint (no validation)"
+      decoy_2: "Wrong constraint (different rule applied)"
+
+  edge_case:
+    description: "Requirement handling boundary conditions"
+    template:
+      correct: "{actual edge case response from spec}"
+      decoy_1: "Omitted edge case (default path taken)"
+      decoy_2: "Wrong default for the edge case"
+
+  security:
+    description: "Requirement about access control or data protection"
+    template:
+      correct: "{actual access control from spec}"
+      decoy_1: "Overly permissive (no restriction)"
+      decoy_2: "Overly restrictive (blocks legitimate use)"
