@@ -12,12 +12,12 @@
 #if defined(__linux__) || defined(__APPLE__)
 #define _GNU_SOURCE
 
-#include <string.h>
-#include <unistd.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <sys/socket.h>
 #include <netinet/in.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/socket.h>
+#include <unistd.h>
 
 /* mDNS multicast group and port (RFC 6762) */
 #define MDNS_PORT 5353
@@ -26,7 +26,7 @@
 #define DNS_TYPE_PTR 12
 #define DNS_TYPE_SRV 33
 #define DNS_TYPE_TXT 16
-#define DNS_TYPE_A   1
+#define DNS_TYPE_A 1
 #define DNS_CLASS_IN 1
 
 /* Per-packet state; stack-allocated during publish/unpublish */
@@ -52,7 +52,8 @@ static void dns_write_name(dns_writer_t *w, const char *name) {
     w->buf[w->pos++] = 0;
 }
 
-static void dns_write_record(dns_writer_t *w, const char *name, uint16_t type, uint16_t cls, uint32_t ttl, uint16_t rdlen) {
+static void dns_write_record(dns_writer_t *w, const char *name, uint16_t type, uint16_t cls, uint32_t ttl,
+                             uint16_t rdlen) {
     dns_write_name(w, name);
     dns_write_u16(w, type);
     dns_write_u16(w, cls);
@@ -67,8 +68,7 @@ typedef struct {
     struct sockaddr_in dst;
 } mdns_ctx_t;
 
-static void mdns_publish_impl(void *ctx, const char *hostname, uint16_t port,
-                               const char *app_uri, const char *path) {
+static void mdns_publish_impl(void *ctx, const char *hostname, uint16_t port, const char *app_uri, const char *path) {
     (void)path;
     mdns_ctx_t *c = (mdns_ctx_t *)ctx;
     if (c == NULL || c->fd < 0 || hostname == NULL || *hostname == '\0')
@@ -81,7 +81,7 @@ static void mdns_publish_impl(void *ctx, const char *hostname, uint16_t port,
     dns_write_u16(&w, 0);
     dns_write_u16(&w, 0x8400);
     dns_write_u16(&w, 0);
-    dns_write_u16(&w, 3);       /* answer RRs: PTR, SRV, TXT, A */
+    dns_write_u16(&w, 3); /* answer RRs: PTR, SRV, TXT, A */
     dns_write_u16(&w, 0);
     dns_write_u16(&w, 0);
 
