@@ -4,6 +4,7 @@
 
 #include "muc_opcua/types.h"
 #include <stddef.h>
+#include <stdint.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -209,6 +210,30 @@ void mu_mbedtls_crypto_adapter_cleanup(mu_crypto_adapter_t *adapter);
 opcua_statuscode_t mu_wolfssl_crypto_adapter_init(mu_crypto_adapter_t *adapter, const opcua_byte_t *cert_der,
                                                   size_t cert_len, const opcua_byte_t *key_der, size_t key_len);
 void mu_wolfssl_crypto_adapter_cleanup(mu_crypto_adapter_t *adapter);
+
+/*
+ * mDNS Discovery Adapter Interface (Optional)
+ * Publishes and removes DNS-SD records for server discovery per RFC 6763.
+ * When set to NULL in the server config, no mDNS activity occurs.
+ */
+typedef struct mu_mdns_adapter {
+    void *context;
+
+    /* Publish an _opcua-tcp._tcp DNS-SD record.
+     * Best-effort; failure does not abort server init. Empty hostname = no-op. */
+    void (*publish)(void *context, const char *hostname, uint16_t port, const char *app_uri, const char *path);
+
+    /* Remove the previously published DNS-SD record.
+     * Best-effort; does not block shutdown. */
+    void (*unpublish)(void *context);
+} mu_mdns_adapter_t;
+
+/* Static no-op adapter. Both callbacks are NULL-safe no-ops. */
+extern mu_mdns_adapter_t mu_mdns_adapter_noop;
+
+/* Initialize the host POSIX mDNS adapter (UDP multicast, 224.0.0.251:5353).
+ * Returns MU_STATUS_GOOD on success. */
+opcua_statuscode_t mu_host_mdns_adapter_init(mu_mdns_adapter_t *adapter);
 
 #ifdef __cplusplus
 }

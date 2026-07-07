@@ -1,7 +1,50 @@
 /* src/core/server/init.c */
 #include "../safe_mem.h"
 #include "common.h"
+#include <stdlib.h>
 #include <string.h>
+
+/* Static helper: extract hostname and port from an opc.tcp:// endpoint URL.
+ * Hostname is written to the caller-provided buffer; port is written to *port.
+ * Returns MU_STATUS_GOOD on success. */
+static opcua_statuscode_t parse_endpoint_url(const char *url, char *hostname, size_t hostname_cap, uint16_t *port) {
+    if (url == NULL || *url == '\0')
+        return MU_STATUS_BAD_INTERNALERROR;
+    const char *scheme_end = strstr(url, "://");
+    if (scheme_end == NULL)
+        return MU_STATUS_BAD_INTERNALERROR;
+    const char *hp = scheme_end + 3;
+    if (*hp == '\0')
+        return MU_STATUS_BAD_INTERNALERROR;
+    const char *host_start = hp;
+    const char *host_end;
+    uint16_t default_port = 4840;
+    if (*host_start == '[') {
+        host_start++;
+        host_end = strchr(host_start, ']');
+        if (host_end == NULL)
+            return MU_STATUS_BAD_INTERNALERROR;
+        const char *after = host_end + 1;
+        if (*after == ':')
+            *port = (uint16_t)atoi(after + 1);
+        else
+            *port = default_port;
+    } else {
+        host_end = strchr(host_start, ':');
+        if (host_end == NULL) {
+            host_end = host_start + strlen(host_start);
+            *port = default_port;
+        } else {
+            *port = (uint16_t)atoi(host_end + 1);
+        }
+    }
+    size_t len = (size_t)(host_end - host_start);
+    if (len >= hostname_cap)
+        len = hostname_cap - 1;
+    memcpy(hostname, host_start, len);
+    hostname[len] = '\0';
+    return MU_STATUS_GOOD;
+}
 
 opcua_statuscode_t mu_server_config_validate(const mu_server_config_t *config) {
     if (config == NULL) {
@@ -149,6 +192,17 @@ opcua_statuscode_t mu_server_init(void *storage, size_t storage_size, const mu_s
         mu_base_runtime_init(&server->runtime_base, &server->config.time_adapter, start);
     }
     server->is_running = true;
+
+    /* Optional mDNS publish */
+    if (server->config.mdns_adapter != NULL && server->config.mdns_adapter->publish != NULL) {
+        char hostname[256];
+        uint16_t port = 0;
+        if (parse_endpoint_url(server->config.endpoint_url, hostname, sizeof(hostname), &port) == MU_STATUS_GOOD) {
+            server->config.mdns_adapter->publish(server->config.mdns_adapter->context, hostname, port,
+                                                 server->config.application_uri, "/discovery");
+        }
+    }
+
 #ifdef MUC_OPCUA_MULTIPLE_CONNECTIONS
     for (size_t i = 0; i < MU_MAX_CONNECTIONS; ++i) {
         server->conns[i].client_handle = NULL;
@@ -217,6 +271,12 @@ opcua_statuscode_t mu_server_init(void *storage, size_t storage_size, const mu_s
 void mu_server_close(mu_server_t *server) {
     if (server != NULL) {
         server->is_running = false;
+
+        /* Optional mDNS unpublish — must precede TCP shutdown */
+        if (server->config.mdns_adapter != NULL && server->config.mdns_adapter->unpublish != NULL) {
+            server->config.mdns_adapter->unpublish(server->config.mdns_adapter->context);
+        }
+
 #ifdef MUC_OPCUA_MULTIPLE_CONNECTIONS
         for (size_t i = 0; i < MU_MAX_CONNECTIONS; ++i) {
             if (server->conns[i].client_handle != NULL) {

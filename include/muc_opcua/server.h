@@ -110,6 +110,9 @@ typedef struct {
     mu_history_adapter_t history_adapter;
 #endif
 
+    /* mDNS Discovery Adapter (optional) — NULL = disabled, zero storage impact */
+    mu_mdns_adapter_t *mdns_adapter;
+
 } mu_server_config_t;
 
 /*
