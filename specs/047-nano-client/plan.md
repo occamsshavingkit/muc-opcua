@@ -128,7 +128,6 @@ existing directories. No code duplication between client and server.
 
 ## Design Artifacts
 
-- Internal object design: `./class-diagram.md`
 - Service sequences: `./contracts/sequences.md`
 - Data model: `./data-model.md`
 - Interface contracts: `./contracts/api.md`

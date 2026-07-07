@@ -64,6 +64,29 @@ The client instance struct. Allocated by the caller, initialized by
 | source_timestamp | mu_date_time_t | Source timestamp |
 | source_picoseconds | uint16_t | Source picoseconds |
 
+## mu_client_transport_t
+
+Platform TCP adapter interface. Caller provides an implementation matching
+this function pointer table.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| connect | mu_status_code_t (*)(void *ctx, const char *host, uint16_t port, uint32_t timeout_ms) | Open TCP connection |
+| send | mu_status_code_t (*)(void *ctx, const uint8_t *data, size_t len) | Send data |
+| recv | mu_status_code_t (*)(void *ctx, uint8_t *buf, size_t *len) | Receive data (blocking with timeout) |
+| close | void (*)(void *ctx) | Close TCP connection |
+| ctx | void * | Opaque transport context (socket fd, etc.) |
+
+## mu_identity_token_t
+
+User identity token for ActivateSession. For Nano profile, only anonymous
+is supported.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| type | mu_identity_token_type_t | Token type (anonymous, username, certificate) |
+| data | void * | Token-specific data (NULL for anonymous) |
+
 ## mu_browse_result_t
 
 | Field | Type | Description |
