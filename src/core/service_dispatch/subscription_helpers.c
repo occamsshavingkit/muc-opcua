@@ -340,7 +340,7 @@ opcua_statuscode_t configure_monitored_item(mu_monitored_item_t *item, const mu_
         memset(&item->aggregate_state.accumulator, 0, sizeof(item->aggregate_state.accumulator));
     }
 #endif
-    if (body->attribute_id != 12u && node->value != NULL) {
+    if (body->attribute_id != 12u && node != NULL && node->value != NULL) {
         item->last_status = mu_value_source_read(node->value, &body->node_id, &item->last_value);
         if (item->last_status == MU_STATUS_GOOD) {
             item->has_value = true;
