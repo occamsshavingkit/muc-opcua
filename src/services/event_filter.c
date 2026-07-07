@@ -37,8 +37,9 @@ typedef enum {
 } mu_filter_field_type_t;
 
 static int64_t read_field_int(const mu_event_fields_t *fields, int idx) {
-    (void)fields;
     switch (idx) {
+    case 8:
+        return fields != NULL ? fields->severity : 0;
     default:
         return 0;
     }

@@ -118,7 +118,11 @@ void test_instances_have_type_definition_references(void) {
 }
 
 void test_server_profile_array_advertises_embedded_profile(void) {
+#if MUC_OPCUA_STANDARD_PROFILE
+    static const char embedded_profile[] = "http://opcfoundation.org/UA-Profile/Server/StandardUA2017";
+#else
     static const char embedded_profile[] = "http://opcfoundation.org/UA-Profile/Server/EmbeddedUA2017";
+#endif
     const mu_node_t *node = base_node(2269u);
     mu_variant_t value;
 

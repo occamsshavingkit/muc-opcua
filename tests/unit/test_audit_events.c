@@ -45,15 +45,30 @@ static int g_callback_invocations = 0;
 static int g_callback_order[4] = {0, 0, 0, 0};
 static int g_callback_count = 0;
 static mu_audit_event_t g_last_event_copy;
+static int g_ordered_callback_ids[3] = {0, 0, 0};
+static int g_ordered_callback_count = 0;
 
 static void reset_callback_tracking(void) {
     g_callback_invocations = 0;
     g_callback_count = 0;
+    g_ordered_callback_count = 0;
     memset(&g_last_event_copy, 0, sizeof(g_last_event_copy));
     memset(g_callback_order, 0, sizeof(g_callback_order));
+    memset(g_ordered_callback_ids, 0, sizeof(g_ordered_callback_ids));
+}
+
+static void record_ordered_callback(int callback_id) {
+    if (g_ordered_callback_count < 3) {
+        g_ordered_callback_ids[g_ordered_callback_count++] = callback_id;
+    }
 }
 
 static struct mu_server *g_test_server = NULL;
+
+static opcua_datetime_t audit_test_time(void *context) {
+    (void)context;
+    return 123456789u;
+}
 
 static void audit_test_callback(struct mu_server *server, const mu_audit_event_t *event, void *context) {
     (void)context;
@@ -66,22 +81,22 @@ static void audit_test_callback(struct mu_server *server, const mu_audit_event_t
 }
 
 static void audit_callback_a(struct mu_server *server, const mu_audit_event_t *event, void *context) {
-    int *order = (int *)context;
-    *order = 1;
+    (void)context;
+    record_ordered_callback(1);
     (void)server;
     (void)event;
 }
 
 static void audit_callback_b(struct mu_server *server, const mu_audit_event_t *event, void *context) {
-    int *order = (int *)context;
-    *order = 2;
+    (void)context;
+    record_ordered_callback(2);
     (void)server;
     (void)event;
 }
 
 static void audit_callback_c(struct mu_server *server, const mu_audit_event_t *event, void *context) {
-    int *order = (int *)context;
-    *order = 3;
+    (void)context;
+    record_ordered_callback(3);
     (void)server;
     (void)event;
 }
@@ -154,6 +169,7 @@ void test_callback_receives_event_fields(void) {
     reset_callback_tracking();
     setup_audit_server(true);
     mu_server_t *server = &s_audit_server;
+    server->config.time_adapter.get_time = audit_test_time;
     mu_server_set_audit_callback(server, audit_test_callback, NULL);
 
     mu_audit_event_t event;
@@ -171,19 +187,25 @@ void test_callback_receives_event_fields(void) {
     mu_raise_audit_event(server, &event);
 
     TEST_ASSERT_EQUAL_INT(1, g_callback_invocations);
+    TEST_ASSERT_EQUAL_PTR(server, g_test_server);
+    TEST_ASSERT_EQUAL_UINT64(123456789u, g_last_event_copy.action_timestamp);
     TEST_ASSERT_EQUAL_UINT32(MU_AUDIT_EVENT_CREATE_SESSION, g_last_event_copy.event_type);
+    TEST_ASSERT_EQUAL_INT32(10, g_last_event_copy.server_id.length);
+    TEST_ASSERT_EQUAL_STRING_LEN("TestServer", g_last_event_copy.server_id.data, 10);
+    TEST_ASSERT_EQUAL_INT32(11, g_last_event_copy.client_audit_entry_id.length);
+    TEST_ASSERT_EQUAL_STRING_LEN("AuditEntry1", g_last_event_copy.client_audit_entry_id.data, 11);
     TEST_ASSERT_EQUAL_UINT32(42, g_last_event_copy.specific.create_session.session_id.identifier.numeric);
 }
 
 /* T011: multiple callbacks fire in registration order */
 void test_multiple_callbacks_fire_in_order(void) {
+    reset_callback_tracking();
     setup_audit_server(true);
     mu_server_t *server = &s_audit_server;
 
-    int order_a = 0, order_b = 0, order_c = 0;
-    mu_server_set_audit_callback(server, audit_callback_a, &order_a);
-    mu_server_add_audit_callback(server, audit_callback_b, &order_b);
-    mu_server_add_audit_callback(server, audit_callback_c, &order_c);
+    mu_server_set_audit_callback(server, audit_callback_a, NULL);
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_server_add_audit_callback(server, audit_callback_b, NULL));
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_server_add_audit_callback(server, audit_callback_c, NULL));
 
     mu_audit_event_t event;
     memset(&event, 0, sizeof(event));
@@ -191,9 +213,10 @@ void test_multiple_callbacks_fire_in_order(void) {
 
     mu_raise_audit_event(server, &event);
 
-    TEST_ASSERT_EQUAL_INT(1, order_a);
-    TEST_ASSERT_EQUAL_INT(2, order_b);
-    TEST_ASSERT_EQUAL_INT(3, order_c);
+    TEST_ASSERT_EQUAL_INT(3, g_ordered_callback_count);
+    TEST_ASSERT_EQUAL_INT(1, g_ordered_callback_ids[0]);
+    TEST_ASSERT_EQUAL_INT(2, g_ordered_callback_ids[1]);
+    TEST_ASSERT_EQUAL_INT(3, g_ordered_callback_ids[2]);
 }
 
 /* T012: OPC-10000-5 §6.5 — callback NOT invoked when auditing disabled */

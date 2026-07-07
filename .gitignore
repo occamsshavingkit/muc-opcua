@@ -25,3 +25,4 @@ docs/benchmarks/speed-current.json
 .opencode/command/speckit.implement.md
 .opencode/command/speckit.tasks.md
 .opencode/command/speckit.plan.md
+.worktrees/

@@ -5,6 +5,9 @@
  */
 #include "muc_opcua/opcua_ids.h"
 #include "muc_opcua/types.h"
+#if MUC_OPCUA_DATA_ACCESS
+#include "services/subscription.h"
+#endif
 #include "unity.h"
 #include <string.h>
 
@@ -34,8 +37,8 @@ void test_percent_deadband_type_is_3(void) {
 #if MUC_OPCUA_DATA_ACCESS
 void test_range_type_is_defined(void) {
     mu_range_t r = {.low = 0.0, .high = 100.0};
-    TEST_ASSERT_EQUAL_DOUBLE(0.0, r.low);
-    TEST_ASSERT_EQUAL_DOUBLE(100.0, r.high);
+    TEST_ASSERT_TRUE(r.low == 0.0);
+    TEST_ASSERT_TRUE(r.high == 100.0);
 }
 
 void test_eu_information_type_is_defined(void) {

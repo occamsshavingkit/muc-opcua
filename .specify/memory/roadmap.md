@@ -1,21 +1,18 @@
 <!--
 SYNC IMPACT REPORT
 ==================
-Version change: (none) → 1.0.0
-Bump rationale: Initial creation — roadmap for the OPC UA client implementation
+Version change: 1.0.1 → 1.0.2
+Bump rationale: PATCH — Nano client implementation has started but is not complete
 
 Changes this revision:
-  - Added spec 001 — Nano Client: Discovery + Read
-  - Added spec 002 — Micro Client: Subscriptions
-  - Added spec 003 — Embedded Client: Methods + Events
-  - Added spec 004 — Full Client: Remaining Services
-  - Decided C-01 through C-04 (see below)
+  - Marked spec 001 — Nano Client: Discovery + Read as in-progress
+  - Preserved spec dir for spec 001 as specs/047-nano-client/
 
-Specs affected: none (initial)
-Open questions added/resolved: Q1 — What does "Standard UA Client Profile" include beyond the tiered scope?
-  Q2 — Constitution amendment pending to add client scope to Principle III and Technology Constraints.
+Specs affected: 001 — Nano Client: Discovery + Read
+Open questions added/resolved: none
 
-Notes: Constitution must be amended in parallel (MINOR bump) to add client scope.
+Notes: Nano client scaffolding and local verification gates exist, but real OPC UA
+wire-service interop tasks remain open. Do not claim implemented or verified.
 -->
 
 # muc-opcua — Spec Roadmap
@@ -60,7 +57,7 @@ Status legend (lifecycle): **undecided** · **needs-info** · **planned** ·
 
 ## Planned Specs
 
-### 001 — Nano Client: Discovery + Read  [status: planned]
+### 001 — Nano Client: Discovery + Read  [status: in-progress]
 
 - **Description:** Minimal viable OPC UA client implementing the Nano Embedded
   UA Client Profile: discover endpoints, open a SecureChannel, create/activate
@@ -83,11 +80,13 @@ Status legend (lifecycle): **undecided** · **needs-info** · **planned** ·
   - PubSub, JSON, HTTPS
 - **Depends on:** none (shared transport/encoding layer already exists)
 - **Governed by:** C-01, C-02, C-03, C-04; ADR-0001, ADR-0002, ADR-0003
-- **Spec dir:** _not yet created_
+- **Spec dir:** `specs/047-nano-client/`
 - **Notes:** First client spec. Nano profile is the smallest client conformance
   unit from OPC-10000-7; targeted flash budget ~8-12 KB when server is also
   linked (shared encoding/transport). Implementation order follows the service
-  call chain: discover → connect → authenticate → read → browse.
+  call chain: discover → connect → authenticate → read → browse. Current work has
+  API/state-machine scaffolding and local fake-transport tests; full OPC UA TCP
+  service encoding/decoding against the muc-opcua server remains open.
 
 ### 002 — Micro Client: Subscriptions  [status: planned]
 
@@ -178,4 +177,4 @@ Status legend (lifecycle): **undecided** · **needs-info** · **planned** ·
 
 ---
 
-**Version**: 1.0.0 | **Ratified**: 2026-07-07 | **Last Amended**: 2026-07-07
+**Version**: 1.0.2 | **Ratified**: 2026-07-07 | **Last Amended**: 2026-07-07

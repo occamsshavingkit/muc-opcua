@@ -34,10 +34,10 @@ validate.
 
 **Purpose**: Verify current CI state before any changes
 
-- [ ] T001 Verify baseline — `ctest --output-on-failure` passes on full profile in `build/`
-- [ ] T002 [P] Verify baseline — `ctest --output-on-failure` passes on micro profile in `build_micro/`
-- [ ] T003 [P] Verify baseline — `ctest --output-on-failure` passes on standard profile in `build_standard/`
-- [ ] T004 [P] Catalog current `#if MUC_OPCUA_COMPLEX_TYPES`, `#if MUC_OPCUA_AUDITING`, `#if MUC_OPCUA_AGGREGATE_FULL` usage with `grep -rn "MUC_OPCUA_COMPLEX_TYPES\|MUC_OPCUA_AUDITING\|MUC_OPCUA_AGGREGATE_FULL" src/ include/`
+- [X] T001 Verify baseline — `ctest --output-on-failure` passes on full profile in `build/`
+- [X] T002 [P] Verify baseline — `ctest --output-on-failure` passes on micro profile in `build_micro/`
+- [X] T003 [P] Verify baseline — `ctest --output-on-failure` passes on standard profile in `build_standard/`
+- [X] T004 [P] Catalog current `#if MUC_OPCUA_COMPLEX_TYPES`, `#if MUC_OPCUA_AUDITING`, `#if MUC_OPCUA_AGGREGATE_FULL` usage with `grep -rn "MUC_OPCUA_COMPLEX_TYPES\|MUC_OPCUA_AUDITING\|MUC_OPCUA_AGGREGATE_FULL" src/ include/`
 
 ---
 
@@ -48,11 +48,11 @@ into C code. This is a blocking prerequisite for D1, D2, and D3.
 
 **CRITICAL**: No user story implementation can begin until this phase is complete.
 
-- [ ] T005 Audit `src/CMakeLists.txt` for all `MUC_OPCUA_*` options that lack `target_compile_definitions` — grep for `option(MUC_OPCUA_*` in `CMakeLists.txt` and verify each has a corresponding `target_compile_definitions` block in `src/CMakeLists.txt`
-- [ ] T006 Add `target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_COMPLEX_TYPES=1)` gated on `if(MUC_OPCUA_COMPLEX_TYPES)` in `src/CMakeLists.txt`
-- [ ] T007 [P] Add `target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_AUDITING=1)` gated on `if(MUC_OPCUA_AUDITING)` in `src/CMakeLists.txt`
-- [ ] T008 [P] Add `target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_AGGREGATE_FULL=1)` gated on `if(MUC_OPCUA_AGGREGATE_FULL)` in `src/CMakeLists.txt` (if missing)
-- [ ] T009 Verify all profiles build and tests pass after CMake fixes: `for p in nano micro embedded standard; do cmake -S . -B build_$p -DMUC_OPCUA_PROFILE=$p && cmake --build build_$p && ctest --test-dir build_$p --output-on-failure; done`
+- [X] T005 Audit `src/CMakeLists.txt` for all `MUC_OPCUA_*` options that lack `target_compile_definitions` — grep for `option(MUC_OPCUA_*` in `CMakeLists.txt` and verify each has a corresponding `target_compile_definitions` block in `src/CMakeLists.txt`
+- [X] T006 Add `target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_COMPLEX_TYPES=1)` gated on `if(MUC_OPCUA_COMPLEX_TYPES)` in `src/CMakeLists.txt`
+- [X] T007 [P] Add `target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_AUDITING=1)` gated on `if(MUC_OPCUA_AUDITING)` in `src/CMakeLists.txt`
+- [X] T008 [P] Add `target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_AGGREGATE_FULL=1)` gated on `if(MUC_OPCUA_AGGREGATE_FULL)` in `src/CMakeLists.txt` (if missing)
+- [X] T009 Verify all profiles build and tests pass after CMake fixes: `for p in nano micro embedded standard; do cmake -S . -B build_$p -DMUC_OPCUA_PROFILE=$p && cmake --build build_$p && ctest --test-dir build_$p --output-on-failure; done`
 
 **Checkpoint**: CMake gates working — feature flags actually compile into C code.
 
@@ -69,22 +69,22 @@ correct fields, multiple callbacks fire in order, NULL-safety, auditing-disabled
 
 ### Tests for User Story 2
 
-- [ ] T010 [P] [US2] Add callback-dispatch round-trip test in `tests/unit/test_audit_events.c`: register a callback, call `mu_raise_audit_event` with a valid event, verify callback received the event with populated `action_timestamp`, `server_id`, `client_audit_entry_id`, and correct `event_type`-specific union fields (OPC-10000-5 §6.5.3)
-- [ ] T011 [P] [US2] Add multiple-callback ordering test in `tests/unit/test_audit_events.c`: register 3 callbacks via `set` + `add` + `add`, verify all 3 fire in registration order
-- [ ] T012 [P] [US2] Add auditing-disabled gate test in `tests/unit/test_audit_events.c`: register callback, set `auditing_enabled=false`, raise event, verify callback NOT invoked (OPC-10000-5 §6.5)
-- [ ] T013 [P] [US2] Add `mu_server_add_audit_callback` overflow test in `tests/unit/test_audit_events.c`: register ≥5 callbacks, verify 5th returns `MU_STATUS_BAD_OUTOFMEMORY`
-- [ ] T014 [US2] Verify new tests FAIL against current no-op `mu_raise_audit_event` (test-first gate)
+- [X] T010 [P] [US2] Add callback-dispatch round-trip test in `tests/unit/test_audit_events.c`: register a callback, call `mu_raise_audit_event` with a valid event, verify callback received the event with populated `action_timestamp`, `server_id`, `client_audit_entry_id`, and correct `event_type`-specific union fields (OPC-10000-5 §6.5.3)
+- [X] T011 [P] [US2] Add multiple-callback ordering test in `tests/unit/test_audit_events.c`: register 3 callbacks via `set` + `add` + `add`, verify all 3 fire in registration order
+- [X] T012 [P] [US2] Add auditing-disabled gate test in `tests/unit/test_audit_events.c`: register callback, set `auditing_enabled=false`, raise event, verify callback NOT invoked (OPC-10000-5 §6.5)
+- [X] T013 [P] [US2] Add `mu_server_add_audit_callback` overflow test in `tests/unit/test_audit_events.c`: register ≥5 callbacks, verify 5th returns `MU_STATUS_BAD_OUTOFMEMORY`
+- [X] T014 [US2] Verify new tests FAIL against current no-op `mu_raise_audit_event` (test-first gate)
 
 ### Implementation for User Story 2
 
-- [ ] T015 [US2] Add `mu_audit_callback_t` typedef in `include/muc_opcua/services/audit.h`: `typedef void (*mu_audit_callback_t)(struct mu_server *, const mu_audit_event_t *, void *)`
-- [ ] T016 [US2] Add `#define MU_MAX_AUDIT_CALLBACKS 4` and callback storage array (`audit_callbacks[MU_MAX_AUDIT_CALLBACKS]` with `callback` + `context` + `audit_callback_count`) in `struct mu_server` in `src/core/server_internal.h`, gated on `#if MUC_OPCUA_AUDITING` (follow pattern from `registered_methods`)
-- [ ] T017 [US2] Declare `mu_server_set_audit_callback` and `mu_server_add_audit_callback` in `include/muc_opcua/server.h`, gated on `#ifdef MUC_OPCUA_AUDITING`
-- [ ] T018 [US2] Implement `mu_server_set_audit_callback`: clear `audit_callback_count=0`, if `callback != NULL` register at position 0, in `src/services/audit_events.c`
-- [ ] T019 [US2] Implement `mu_server_add_audit_callback`: NULL-check → count check → append → return `MU_STATUS_GOOD`/`MU_STATUS_BAD_OUTOFMEMORY`/`MU_STATUS_BAD_ARGUMENTSMISSING`, in `src/services/audit_events.c`
-- [ ] T020 [US2] Replace `mu_raise_audit_event` no-op body in `src/services/audit_events.c` with: NULL-check (server+event) → `auditing_enabled` check → populate `action_timestamp` → iterate `audit_callbacks[]` → call each callback
-- [ ] T021 [US2] Populate `action_timestamp` in `mu_raise_audit_event` using `mu_time_now_ms()` (if available via server) or 0 as timestamp placeholder
-- [ ] T022 [US2] Run `ctest -R test_audit_events` on full and standard profiles — all tests pass, including existing NULL-safety test (`test_raise_audit_event_null_safety` from spec 043) and valid-input no-crash test (`test_raise_audit_event_valid_input`)
+- [X] T015 [US2] Add `mu_audit_callback_t` typedef in `include/muc_opcua/services/audit.h`: `typedef void (*mu_audit_callback_t)(struct mu_server *, const mu_audit_event_t *, void *)`
+- [X] T016 [US2] Add `#define MU_MAX_AUDIT_CALLBACKS 4` and callback storage array (`audit_callbacks[MU_MAX_AUDIT_CALLBACKS]` with `callback` + `context` + `audit_callback_count`) in `struct mu_server` in `src/core/server_internal.h`, gated on `#if MUC_OPCUA_AUDITING` (follow pattern from `registered_methods`)
+- [X] T017 [US2] Declare `mu_server_set_audit_callback` and `mu_server_add_audit_callback` in `include/muc_opcua/server.h`, gated on `#ifdef MUC_OPCUA_AUDITING`
+- [X] T018 [US2] Implement `mu_server_set_audit_callback`: clear `audit_callback_count=0`, if `callback != NULL` register at position 0, in `src/services/audit_events.c`
+- [X] T019 [US2] Implement `mu_server_add_audit_callback`: NULL-check → count check → append → return `MU_STATUS_GOOD`/`MU_STATUS_BAD_OUTOFMEMORY`/`MU_STATUS_BAD_ARGUMENTSMISSING`, in `src/services/audit_events.c`
+- [X] T020 [US2] Replace `mu_raise_audit_event` no-op body in `src/services/audit_events.c` with: NULL-check (server+event) → `auditing_enabled` check → populate `action_timestamp` → iterate `audit_callbacks[]` → call each callback
+- [X] T021 [US2] Populate `action_timestamp` in `mu_raise_audit_event` using `mu_time_now_ms()` (if available via server) or 0 as timestamp placeholder
+- [X] T022 [US2] Run `ctest -R test_audit_events` on full and standard profiles — all tests pass, including existing NULL-safety test (`test_raise_audit_event_null_safety` from spec 043) and valid-input no-crash test (`test_raise_audit_event_valid_input`)
 
 **Checkpoint**: Audit callback dispatch independently testable. Existing NULL-safety
 and constant tests still pass.
@@ -103,28 +103,28 @@ malformed input.
 
 ### Tests for User Story 1
 
-- [ ] T023 [P] [US1] Add round-trip test for scalar fields in `tests/unit/test_complex_types.c`: register a structure with ≥8 built-in scalar types (Boolean, SByte, Byte, Int16, UInt16, Int32, UInt32, Int64, UInt64, Float, Double, String) as required fields, encode, decode, verify all field values preserved (OPC-10000-6 §5.2.2.12)
-- [ ] T024 [P] [US1] Add round-trip test for optional fields with EncodingMask in `tests/unit/test_complex_types.c`: register structure with `structure_type=MU_STRUCTURE_TYPE_OPTIONAL`, set some optional fields, encode, decode, verify only fields with set EncodingMask bits are present (OPC-10000-6 §5.2.2.12)
-- [ ] T025 [P] [US1] Add round-trip test for nested structures in `tests/unit/test_complex_types.c`: register outer + inner structures, encode with populated nested field, decode, verify all nesting levels preserved (OPC-10000-6 §5.4.1 — structure body = field concatenation including nested structures)
-- [ ] T026 [P] [US1] Add round-trip test for array fields in `tests/unit/test_complex_types.c`: register structure with Int32 array field (`value_rank=1`), encode [1, 2, 3], decode, verify array length and values preserved (OPC-10000-6 §5.2.2.1 — array encoding length prefix + elements)
-- [ ] T027 [P] [US1] Add empty-structure round-trip test in `tests/unit/test_complex_types.c`: register structure with `field_count=0`, encode zero-field body, decode, verify success with empty output (OPC-10000-6 §5.2.2.12)
-- [ ] T028 [P] [US1] Add malformed-input tests in `tests/unit/test_complex_types.c`: truncated data → `MU_STATUS_BAD_DECODINGERROR`, encoding mask bit set but field absent → `MU_STATUS_BAD_DECODINGERROR` (OPC-10000-6 §5.4.1 — decoder validation)
-- [ ] T029 [US1] Verify all new complex type tests FAIL against dead stub (test-first gate)
+- [X] T023 [P] [US1] Add round-trip test for scalar fields in `tests/unit/test_complex_types.c`: register a structure with ≥8 built-in scalar types (Boolean, SByte, Byte, Int16, UInt16, Int32, UInt32, Int64, UInt64, Float, Double, String) as required fields, encode, decode, verify all field values preserved (OPC-10000-6 §5.2.2.12)
+- [X] T024 [P] [US1] Add round-trip test for optional fields with EncodingMask in `tests/unit/test_complex_types.c`: register structure with `structure_type=MU_STRUCTURE_TYPE_OPTIONAL`, set some optional fields, encode, decode, verify only fields with set EncodingMask bits are present (OPC-10000-6 §5.2.2.12)
+- [X] T025 [P] [US1] Add round-trip test for nested structures in `tests/unit/test_complex_types.c`: register outer + inner structures, encode with populated nested field, decode, verify all nesting levels preserved (OPC-10000-6 §5.4.1 — structure body = field concatenation including nested structures)
+- [X] T026 [P] [US1] Add round-trip test for array fields in `tests/unit/test_complex_types.c`: register structure with Int32 array field (`value_rank=1`), encode [1, 2, 3], decode, verify array length and values preserved (OPC-10000-6 §5.2.2.1 — array encoding length prefix + elements)
+- [X] T027 [P] [US1] Add empty-structure round-trip test in `tests/unit/test_complex_types.c`: register structure with `field_count=0`, encode zero-field body, decode, verify success with empty output (OPC-10000-6 §5.2.2.12)
+- [X] T028 [P] [US1] Add malformed-input tests in `tests/unit/test_complex_types.c`: truncated data → `MU_STATUS_BAD_DECODINGERROR`, encoding mask bit set but field absent → `MU_STATUS_BAD_DECODINGERROR` (OPC-10000-6 §5.4.1 — decoder validation)
+- [X] T029 [US1] Verify all new complex type tests FAIL against dead stub (test-first gate)
 
 ### Implementation for User Story 1
 
-- [ ] T030 [US1] Add `mu_binary_encode_struct` declaration in `include/muc_opcua/encoding.h`, gated on `#if MUC_OPCUA_COMPLEX_TYPES`
-- [ ] T031 [US1] Add `mu_binary_decode_struct` declaration in `include/muc_opcua/encoding.h`
-- [ ] T032 [US1] Add `mu_find_structure_definition` and `mu_find_enum_definition` declarations in `include/muc_opcua/address_space/complex_types.h`
-- [ ] T033 [US1] Implement `mu_find_structure_definition` in `src/address_space/complex_types.c`: linear scan of `server->complex_types.structures[]` matching `type_id` NodeId, return definition pointer or NULL
-- [ ] T034 [US1] Implement `mu_find_enum_definition` in `src/address_space/complex_types.c`: same pattern for `server->complex_types.enums[]`
-- [ ] T035 [US1] Implement `mu_binary_encode_struct` in `src/encoding/binary_complex.c`: iterate `def->fields`, for each field dispatch to `mu_binary_write_{type}` based on field `data_type` NodeId, handle optional fields via EncodingMask, handle arrays with length prefix, recurse for nested structures (OPC-10000-6 §5.4.1)
-- [ ] T036 [US1] Implement `mu_binary_decode_struct` in `src/encoding/binary_complex.c`: same iteration pattern using `mu_binary_read_{type}`, validate truncation after each field, return `MU_STATUS_BAD_DECODINGERROR` on malformed input (OPC-10000-6 §5.4.1)
-- [ ] T037 [US1] Implement `mu_binary_encode_enum` in `src/encoding/binary_complex.c`: wrap `mu_binary_write_int32` (OPC-10000-6 §5.2.2.9)
-- [ ] T038 [US1] Implement `mu_binary_decode_enum` in `src/encoding/binary_complex.c`: wrap `mu_binary_read_int32` (OPC-10000-6 §5.2.2.9)
-- [ ] T039 [US1] Add field-type dispatch table mapping from OPC UA built-in type NodeIds to `mu_binary_write_*`/`mu_binary_read_*` functions, used by encode_struct/decode_struct
-- [ ] T040 [US1] Remove dead stub `muc_opcua_complex_types_placeholder()` from `src/encoding/binary_complex.c`
-- [ ] T041 [US1] Run `ctest -R test_complex_types` on full and standard profiles — all tests pass, existing registration tests still pass
+- [X] T030 [US1] Add `mu_binary_encode_struct` declaration in `include/muc_opcua/encoding.h`, gated on `#if MUC_OPCUA_COMPLEX_TYPES`
+- [X] T031 [US1] Add `mu_binary_decode_struct` declaration in `include/muc_opcua/encoding.h`
+- [X] T032 [US1] Add `mu_find_structure_definition` and `mu_find_enum_definition` declarations in `include/muc_opcua/address_space/complex_types.h`
+- [X] T033 [US1] Implement `mu_find_structure_definition` in `src/address_space/complex_types.c`: linear scan of `server->complex_types.structures[]` matching `type_id` NodeId, return definition pointer or NULL
+- [X] T034 [US1] Implement `mu_find_enum_definition` in `src/address_space/complex_types.c`: same pattern for `server->complex_types.enums[]`
+- [X] T035 [US1] Implement `mu_binary_encode_struct` in `src/encoding/binary_complex.c`: iterate `def->fields`, for each field dispatch to `mu_binary_write_{type}` based on field `data_type` NodeId, handle optional fields via EncodingMask, handle arrays with length prefix, recurse for nested structures (OPC-10000-6 §5.4.1)
+- [X] T036 [US1] Implement `mu_binary_decode_struct` in `src/encoding/binary_complex.c`: same iteration pattern using `mu_binary_read_{type}`, validate truncation after each field, return `MU_STATUS_BAD_DECODINGERROR` on malformed input (OPC-10000-6 §5.4.1)
+- [X] T037 [US1] Implement `mu_binary_encode_enum` in `src/encoding/binary_complex.c`: wrap `mu_binary_write_int32` (OPC-10000-6 §5.2.2.9)
+- [X] T038 [US1] Implement `mu_binary_decode_enum` in `src/encoding/binary_complex.c`: wrap `mu_binary_read_int32` (OPC-10000-6 §5.2.2.9)
+- [X] T039 [US1] Add field-type dispatch table mapping from OPC UA built-in type NodeIds to `mu_binary_write_*`/`mu_binary_read_*` functions, used by encode_struct/decode_struct
+- [X] T040 [US1] Remove dead stub `muc_opcua_complex_types_placeholder()` from `src/encoding/binary_complex.c`
+- [X] T041 [US1] Run `ctest -R test_complex_types` on full and standard profiles — all tests pass, existing registration tests still pass
 
 **Checkpoint**: Complex type encode/decode independently testable with round-trip
 verification for scalar, optional, nested, array, and malformed-input cases.
@@ -143,47 +143,47 @@ aggregate tests (Average, Minimum, Maximum) still pass.
 
 ### Tests for User Story 3
 
-- [ ] T042 [P] [US3] Add Count aggregate test in `tests/unit/test_aggregate_full.c`: accumulate 5 numeric samples, publish, verify Count = 5 and type is Int64 (OPC-10000-13 §4.2.2.3)
-- [ ] T043 [P] [US3] Add Range aggregate test in `tests/unit/test_aggregate_full.c`: accumulate [1.0, 5.0, 3.0], publish, verify Range = 4.0 (max − min) (OPC-10000-13 §4.2.2.11)
-- [ ] T044 [P] [US3] Add DurationGood aggregate test in `tests/unit/test_aggregate_full.c`: accumulate samples with Good/Bad/Good statuses at t=0, t=10, t=30, publish at t=100, verify DurationGood = 80ms (0-10 + 30-100) (OPC-10000-13 §4.2.2.6)
-- [ ] T045 [P] [US3] Add DurationBad aggregate test in `tests/unit/test_aggregate_full.c`: accumulate Bad/Good/Bad samples at t=0, t=20, t=50, publish at t=100, verify DurationBad = 70ms (0-20 + 50-100) (OPC-10000-13 §4.2.2.7)
-- [ ] T046 [P] [US3] Add PercentGood/PercentBad aggregate test in `tests/unit/test_aggregate_full.c`: accumulate 4 Good + 1 Bad, publish, verify PercentGood = 80.0, PercentBad = 20.0 (OPC-10000-13 §4.2.2.12, §4.2.2.13)
-- [ ] T047 [P] [US3] Add Start/End aggregate tests in `tests/unit/test_aggregate_full.c`: accumulate [10.0, 20.0, 30.0], publish, verify Start = 10.0, End = 30.0 (OPC-10000-13 §4.2.2.14, §4.2.2.5)
-- [ ] T048 [P] [US3] Add TimeAverage aggregate test in `tests/unit/test_aggregate_full.c`: accumulate samples at known timestamps, publish, verify time-weighted average matches expected (OPC-10000-13 §4.2.2.16)
-- [ ] T049 [P] [US3] Add Total aggregate test in `tests/unit/test_aggregate_full.c`: accumulate [5.0, 3.0, 2.0], publish, verify Total = 10.0 (OPC-10000-13 §4.2.2.18)
-- [ ] T050 [P] [US3] Add Delta aggregate test in `tests/unit/test_aggregate_full.c`: accumulate [10.0, 15.0, 12.0], publish, verify Delta = 2.0 (end − start) (OPC-10000-13 §4.2.2.4)
-- [ ] T051 [P] [US3] Add WorstQuality aggregate test in `tests/unit/test_aggregate_full.c`: accumulate Good → Uncertain → Bad statuses, publish, verify WorstQuality = Bad (OPC-10000-13 §4.2.2.20)
-- [ ] T052 [P] [US3] Add Interpolative aggregate test in `tests/unit/test_aggregate_full.c`: verify interpolated value at processing-interval boundary matches expected linear interpolation (OPC-10000-13 §4.2.2.8)
-- [ ] T052a [P] [US3] Add DurationInStateZero aggregate test in `tests/unit/test_aggregate_full.c`: accumulate samples with status transitions through zero-state, publish, verify duration in zero-state matches expected (OPC-10000-13 §4.2.2)
-- [ ] T052b [P] [US3] Add DeltaBounds aggregate test in `tests/unit/test_aggregate_full.c`: accumulate [10.0, 18.0, 12.0], publish, verify DeltaBounds = {delta: 2.0, bounds: {low: 10.0, high: 18.0}} (OPC-10000-13 §4.2.2)
-- [ ] T052c [P] [US3] Add Maximum2/Minimum2 aggregate tests in `tests/unit/test_aggregate_full.c`: accumulate [3.0, 7.0, 2.0], publish, verify Maximum2 = 7.0 without timestamp, Minimum2 = 2.0 without timestamp (simple extrema vs timed variants) (OPC-10000-13 §4.2.2)
-- [ ] T052d [P] [US3] Verify existing Maximum/Minimum tests (`test_maximum_aggregate_direct` and `test_minimum_aggregate_direct` from spec 043 in `tests/unit/test_aggregate_full.c`) already cover MaximumActualTime/MinimumActualTime behavior — aggregate IDs 2347/2346 already implemented with timestamp-preserving publish, no new tests needed (OPC-10000-13 §4.2.2)
-- [ ] T052e [P] [US3] Add TimeAverage2 aggregate test in `tests/unit/test_aggregate_full.c`: accumulate samples, publish, verify TimeAverage2 uses simple average (not time-weighted) of sample values (OPC-10000-13 §4.2.2.17)
-- [ ] T052f [P] [US3] Add Total2 aggregate test in `tests/unit/test_aggregate_full.c`: accumulate samples, publish, verify Total2 uses time-weighted sum vs simple sum (OPC-10000-13 §4.2.2.19)
-- [ ] T052g [P] [US3] Add WorstQuality2 aggregate test in `tests/unit/test_aggregate_full.c`: accumulate samples with mixed discrete/analog qualities, publish, verify WorstQuality2 evaluates per OPC UA quality rules (OPC-10000-13 §4.2.2.21)
-- [ ] T052h [P] [US3] Add AnnotationCount aggregate test in `tests/unit/test_aggregate_full.c`: accumulate samples with annotations, publish, verify AnnotationCount = number of samples containing annotations (OPC-10000-13 §4.2.2.2)
-- [ ] T053 [US3] Verify all new aggregate tests FAIL against current code (only 3 aggregates whitelisted, filter rejects others — test-first gate via direct API bypass)
+- [X] T042 [P] [US3] Add Count aggregate test in `tests/unit/test_aggregate_full.c`: accumulate 5 numeric samples, publish, verify Count = 5 and type is Int64 (OPC-10000-13 §4.2.2.3)
+- [X] T043 [P] [US3] Add Range aggregate test in `tests/unit/test_aggregate_full.c`: accumulate [1.0, 5.0, 3.0], publish, verify Range = 4.0 (max − min) (OPC-10000-13 §4.2.2.11)
+- [X] T044 [P] [US3] Add DurationGood aggregate test in `tests/unit/test_aggregate_full.c`: accumulate samples with Good/Bad/Good statuses at t=0, t=10, t=30, publish at t=100, verify DurationGood = 80ms (0-10 + 30-100) (OPC-10000-13 §4.2.2.6)
+- [X] T045 [P] [US3] Add DurationBad aggregate test in `tests/unit/test_aggregate_full.c`: accumulate Bad/Good/Bad samples at t=0, t=20, t=50, publish at t=100, verify DurationBad = 70ms (0-20 + 50-100) (OPC-10000-13 §4.2.2.7)
+- [X] T046 [P] [US3] Add PercentGood/PercentBad aggregate test in `tests/unit/test_aggregate_full.c`: accumulate 4 Good + 1 Bad, publish, verify PercentGood = 80.0, PercentBad = 20.0 (OPC-10000-13 §4.2.2.12, §4.2.2.13)
+- [X] T047 [P] [US3] Add Start/End aggregate tests in `tests/unit/test_aggregate_full.c`: accumulate [10.0, 20.0, 30.0], publish, verify Start = 10.0, End = 30.0 (OPC-10000-13 §4.2.2.14, §4.2.2.5)
+- [X] T048 [P] [US3] Add TimeAverage aggregate test in `tests/unit/test_aggregate_full.c`: accumulate samples at known timestamps, publish, verify time-weighted average matches expected (OPC-10000-13 §4.2.2.16)
+- [X] T049 [P] [US3] Add Total aggregate test in `tests/unit/test_aggregate_full.c`: accumulate [5.0, 3.0, 2.0], publish, verify Total = 10.0 (OPC-10000-13 §4.2.2.18)
+- [X] T050 [P] [US3] Add Delta aggregate test in `tests/unit/test_aggregate_full.c`: accumulate [10.0, 15.0, 12.0], publish, verify Delta = 2.0 (end − start) (OPC-10000-13 §4.2.2.4)
+- [X] T051 [P] [US3] Add WorstQuality aggregate test in `tests/unit/test_aggregate_full.c`: accumulate Good → Uncertain → Bad statuses, publish, verify WorstQuality = Bad (OPC-10000-13 §4.2.2.20)
+- [X] T052 [P] [US3] Add Interpolative aggregate test in `tests/unit/test_aggregate_full.c`: verify interpolated value at processing-interval boundary matches expected linear interpolation (OPC-10000-13 §4.2.2.8)
+- [X] T052a [P] [US3] Add DurationInStateZero aggregate test in `tests/unit/test_aggregate_full.c`: accumulate samples with status transitions through zero-state, publish, verify duration in zero-state matches expected (OPC-10000-13 §4.2.2)
+- [X] T052b [P] [US3] Add DeltaBounds aggregate test in `tests/unit/test_aggregate_full.c`: accumulate [10.0, 18.0, 12.0], publish, verify DeltaBounds = {delta: 2.0, bounds: {low: 10.0, high: 18.0}} (OPC-10000-13 §4.2.2)
+- [X] T052c [P] [US3] Add Maximum2/Minimum2 aggregate tests in `tests/unit/test_aggregate_full.c`: accumulate [3.0, 7.0, 2.0], publish, verify Maximum2 = 7.0 without timestamp, Minimum2 = 2.0 without timestamp (simple extrema vs timed variants) (OPC-10000-13 §4.2.2)
+- [X] T052d [P] [US3] Verify existing Maximum/Minimum tests (`test_maximum_aggregate_direct` and `test_minimum_aggregate_direct` from spec 043 in `tests/unit/test_aggregate_full.c`) already cover MaximumActualTime/MinimumActualTime behavior — aggregate IDs 2347/2346 already implemented with timestamp-preserving publish, no new tests needed (OPC-10000-13 §4.2.2)
+- [X] T052e [P] [US3] Add TimeAverage2 aggregate test in `tests/unit/test_aggregate_full.c`: accumulate samples, publish, verify TimeAverage2 uses simple average (not time-weighted) of sample values (OPC-10000-13 §4.2.2.17)
+- [X] T052f [P] [US3] Add Total2 aggregate test in `tests/unit/test_aggregate_full.c`: accumulate samples, publish, verify Total2 uses time-weighted sum vs simple sum (OPC-10000-13 §4.2.2.19)
+- [X] T052g [P] [US3] Add WorstQuality2 aggregate test in `tests/unit/test_aggregate_full.c`: accumulate samples with mixed discrete/analog qualities, publish, verify WorstQuality2 evaluates per OPC UA quality rules (OPC-10000-13 §4.2.2.21)
+- [X] T052h [P] [US3] Add AnnotationCount aggregate test in `tests/unit/test_aggregate_full.c`: accumulate samples with annotations, publish, verify AnnotationCount = number of samples containing annotations (OPC-10000-13 §4.2.2.2)
+- [X] T053 [US3] Verify all new aggregate tests FAIL against current code (only 3 aggregates whitelisted, filter rejects others — test-first gate via direct API bypass)
 
 ### Implementation for User Story 3
 
-- [ ] T054 [US3] Add 21 new aggregate type ID constants to `include/muc_opcua/opcua_ids.h`: `MU_ID_AGGREGATETYPE_COUNT` (2351), `DELTA` (2359), `DURATION_GOOD` (2360), `DURATION_BAD` (2361), `DURATION_IN_STATE_ZERO` (2363), `END` (2357), `INTERPOLATIVE` (2341), `MAXIMUM_2` (11287), `MINIMUM_2` (11288), `PERCENT_GOOD` (2365), `PERCENT_BAD` (2366), `RANGE` (2350), `START` (2358), `TIME_AVERAGE` (2343), `TIME_AVERAGE_2` (11286), `TOTAL` (2344), `TOTAL_2` (11308), `WORST_QUALITY` (2367), `WORST_QUALITY_2` (11292), `ANNOTATION_COUNT` (2352), `DELTA_BOUNDS` (11509) — note: MaximumActualTime (2346) and MinimumActualTime (2347) already exist as `MU_ID_AGGREGATETYPE_MAXIMUM`/`MU_ID_AGGREGATETYPE_MINIMUM` (OPC-10000-13 §4.2.2)
-- [ ] T055 [US3] Expand accumulator union in `mu_aggregate_state_t` in `src/services/subscription.h`, gated on `#if MUC_OPCUA_AGGREGATE_FULL`: add `count`, `range`, `duration`, `percent`, `endpoint`, `timeavg`, `total`, `worstq`, `interp` members per data-model.md
-- [ ] T056 [US3] Add Count accumulate/publish branches in `src/services/subscription_aggregate.c`: accumulate increments count, publish outputs Int64, gated on `#if MUC_OPCUA_AGGREGATE_FULL` (OPC-10000-13 §4.2.2.3)
-- [ ] T057 [P] [US3] Add Range accumulate/publish branches: accumulate tracks min_val + max_val, publish computes (max − min) as Double (OPC-10000-13 §4.2.2.11)
-- [ ] T058 [P] [US3] Add DurationGood/Bad/InStateZero accumulate/publish branches: accumulate tracks start-time and running-total, publish outputs duration in ms as Double (OPC-10000-13 §4.2.2)
-- [ ] T059 [P] [US3] Add PercentGood/PercentBad accumulate/publish branches: accumulate counts Good/Bad samples, publish outputs percentage as Double (OPC-10000-13 §4.2.2.12-13)
-- [ ] T060 [P] [US3] Add Start/End accumulate/publish branches: Start captures first sample only, End captures last (overwrite) (OPC-10000-13 §4.2.2.5, §4.2.2.14)
-- [ ] T061 [P] [US3] Add TimeAverage/TimeAverage2 accumulate/publish branches: accumulate time-weighted sum using time deltas between samples, publish weighted average (OPC-10000-13 §4.2.2.16-17)
-- [ ] T062 [P] [US3] Add Total/Total2 accumulate/publish branches: accumulate running sum, publish total (OPC-10000-13 §4.2.2.18-19)
-- [ ] T063 [P] [US3] Add Delta accumulate/publish branches: tracks first_val and last_val, publish computes last − first (OPC-10000-13 §4.2.2.4)
-- [ ] T064 [P] [US3] Add WorstQuality/WorstQuality2 accumulate/publish branches: tracks worse status across samples per OPC UA status severity (OPC-10000-13 §4.2.2.20-21)
-- [ ] T065 [P] [US3] Add Interpolative accumulate/publish branches: track prev_val + prev_time, at publish interpolate to processing-interval boundary (OPC-10000-13 §4.2.2.8)
-- [ ] T065a [P] [US3] Add DeltaBounds accumulate/publish branches: tracks first/last val + min/max bounds, publish computes delta with bounding range (OPC-10000-13 §4.2.2)
-- [ ] T065b [P] [US3] Add Maximum2/Minimum2 accumulate/publish branches: track simple extreme values without timestamp (same accumulator as Maximum/Minimum but publish as plain Double without time) (OPC-10000-13 §4.2.2)
-- [ ] T065c [P] [US3] Verify existing Maximum/Minimum accumulate/publish branches (`monitored_item_accumulate_aggregate` / `monitored_item_publish_aggregate` for MINIMUM/MAXIMUM cases in `src/services/subscription_aggregate.c`) already serve as MaximumActualTime/MinimumActualTime — publish preserves original variant type + timestamp, no new branches needed (OPC-10000-13 §4.2.2)
-- [ ] T065d [P] [US3] Add AnnotationCount accumulate/publish branches: count samples that have non-null annotations, publish as Int64 (OPC-10000-13 §4.2.2.2)
-- [ ] T066 [US3] Expand filter reader whitelist in `src/core/service_dispatch/filter_reader.c`: when `MUC_OPCUA_AGGREGATE_FULL` is defined, replace 3-way equality check with a lookup or range check accepting all 24 aggregate type IDs defined (3 existing + 21 new); when not defined, keep existing 3-type whitelist (OPC-10000-4 §7.22)
-- [ ] T067 [US3] Run `ctest -R test_aggregate_full` and `ctest -R test_aggregate` on full and standard profiles — all tests pass, existing 3-function tests unchanged
+- [X] T054 [US3] Add 21 new aggregate type ID constants to `include/muc_opcua/opcua_ids.h`: `MU_ID_AGGREGATETYPE_COUNT` (2351), `DELTA` (2359), `DURATION_GOOD` (2360), `DURATION_BAD` (2361), `DURATION_IN_STATE_ZERO` (2363), `END` (2357), `INTERPOLATIVE` (2341), `MAXIMUM_2` (11287), `MINIMUM_2` (11288), `PERCENT_GOOD` (2365), `PERCENT_BAD` (2366), `RANGE` (2350), `START` (2358), `TIME_AVERAGE` (2343), `TIME_AVERAGE_2` (11286), `TOTAL` (2344), `TOTAL_2` (11308), `WORST_QUALITY` (2367), `WORST_QUALITY_2` (11292), `ANNOTATION_COUNT` (2352), `DELTA_BOUNDS` (11509) — note: MaximumActualTime (2346) and MinimumActualTime (2347) already exist as `MU_ID_AGGREGATETYPE_MAXIMUM`/`MU_ID_AGGREGATETYPE_MINIMUM` (OPC-10000-13 §4.2.2)
+- [X] T055 [US3] Expand accumulator union in `mu_aggregate_state_t` in `src/services/subscription.h`, gated on `#if MUC_OPCUA_AGGREGATE_FULL`: add `count`, `range`, `duration`, `percent`, `endpoint`, `timeavg`, `total`, `worstq`, `interp` members per data-model.md
+- [X] T056 [US3] Add Count accumulate/publish branches in `src/services/subscription_aggregate.c`: accumulate increments count, publish outputs Int64, gated on `#if MUC_OPCUA_AGGREGATE_FULL` (OPC-10000-13 §4.2.2.3)
+- [X] T057 [P] [US3] Add Range accumulate/publish branches: accumulate tracks min_val + max_val, publish computes (max − min) as Double (OPC-10000-13 §4.2.2.11)
+- [X] T058 [P] [US3] Add DurationGood/Bad/InStateZero accumulate/publish branches: accumulate tracks start-time and running-total, publish outputs duration in ms as Double (OPC-10000-13 §4.2.2)
+- [X] T059 [P] [US3] Add PercentGood/PercentBad accumulate/publish branches: accumulate counts Good/Bad samples, publish outputs percentage as Double (OPC-10000-13 §4.2.2.12-13)
+- [X] T060 [P] [US3] Add Start/End accumulate/publish branches: Start captures first sample only, End captures last (overwrite) (OPC-10000-13 §4.2.2.5, §4.2.2.14)
+- [X] T061 [P] [US3] Add TimeAverage/TimeAverage2 accumulate/publish branches: accumulate time-weighted sum using time deltas between samples, publish weighted average (OPC-10000-13 §4.2.2.16-17)
+- [X] T062 [P] [US3] Add Total/Total2 accumulate/publish branches: accumulate running sum, publish total (OPC-10000-13 §4.2.2.18-19)
+- [X] T063 [P] [US3] Add Delta accumulate/publish branches: tracks first_val and last_val, publish computes last − first (OPC-10000-13 §4.2.2.4)
+- [X] T064 [P] [US3] Add WorstQuality/WorstQuality2 accumulate/publish branches: tracks worse status across samples per OPC UA status severity (OPC-10000-13 §4.2.2.20-21)
+- [X] T065 [P] [US3] Add Interpolative accumulate/publish branches: track prev_val + prev_time, at publish interpolate to processing-interval boundary (OPC-10000-13 §4.2.2.8)
+- [X] T065a [P] [US3] Add DeltaBounds accumulate/publish branches: tracks first/last val + min/max bounds, publish computes delta with bounding range (OPC-10000-13 §4.2.2)
+- [X] T065b [P] [US3] Add Maximum2/Minimum2 accumulate/publish branches: track simple extreme values without timestamp (same accumulator as Maximum/Minimum but publish as plain Double without time) (OPC-10000-13 §4.2.2)
+- [X] T065c [P] [US3] Verify existing Maximum/Minimum accumulate/publish branches (`monitored_item_accumulate_aggregate` / `monitored_item_publish_aggregate` for MINIMUM/MAXIMUM cases in `src/services/subscription_aggregate.c`) already serve as MaximumActualTime/MinimumActualTime — publish preserves original variant type + timestamp, no new branches needed (OPC-10000-13 §4.2.2)
+- [X] T065d [P] [US3] Add AnnotationCount accumulate/publish branches: count samples that have non-null annotations, publish as Int64 (OPC-10000-13 §4.2.2.2)
+- [X] T066 [US3] Expand filter reader whitelist in `src/core/service_dispatch/filter_reader.c`: when `MUC_OPCUA_AGGREGATE_FULL` is defined, replace 3-way equality check with a lookup or range check accepting all 24 aggregate type IDs defined (3 existing + 21 new); when not defined, keep existing 3-type whitelist (OPC-10000-4 §7.22)
+- [X] T067 [US3] Run `ctest -R test_aggregate_full` and `ctest -R test_aggregate` on full and standard profiles — all tests pass, existing 3-function tests unchanged
 
 **Checkpoint**: All 21 new aggregate functions independently testable (plus 2 existing). Existing
 Average/Minimum/Maximum tests still pass. Bounding variants remain deferred.
@@ -201,14 +201,14 @@ includes linked-ELF sizes with `.text`/`.data`/`.bss` breakdown and JSON report.
 
 ### Implementation for User Story 4
 
-- [ ] T068 [US4] Create `scripts/size_measure.ld` — minimal Cortex-M0+ linker script with Flash at `0x10000000` (256K), RAM at `0x20000000` (256K), standard sections (`.text`, `.rodata`, `.data`, `.bss`), stack at end of RAM
-- [ ] T069 [US4] Create `scripts/size_measure_startup.c` — minimal startup: vector table (stack pointer + Reset_Handler), `Reset_Handler` that zeroes `.bss`, copies `.data`, calls `main()`, loops forever
-- [ ] T070 [US4] Create `scripts/size_measure_main.c` — minimal `main()` that calls `mu_server_init()` to force linker to pull in library code (so `--gc-sections` can strip unreferenced symbols)
-- [ ] T071 [US4] Modify `scripts/measure_size.sh`: after building each profile archive, also compile + link an ELF using `size_measure.ld` + `size_measure_startup.c` + `size_measure_main.c` + `libmuc_opcua.a`, then run `arm-none-eabi-size` on the ELF
-- [ ] T072 [US4] Add JSON output to `scripts/measure_size.sh`: write `build/size-arm/size-report.json` with per-profile records containing `profile`, `archive` (`.text`/`.data`/`.bss`/`.dec`), `elf` (same fields), `elf_path`, and `timestamp`
-- [ ] T073 [US4] Add `--lto` flag to `scripts/measure_size.sh`: rebuild with `-flto -ffat-lto-objects` in `CMAKE_C_FLAGS` (bypassing `CheckIPOSupported` cross-compile failure), produce `lto_elf` measurements in addition to `elf`, report delta
-- [ ] T074 [US4] Change toolchain-absence handling in `scripts/measure_size.sh`: replace `exit 127` with `echo "warning: arm-none-eabi-gcc not found; skipping size measurement" >&2; exit 0` for graceful CI skip
-- [ ] T075 [US4] Run `bash scripts/measure_size.sh standard` and verify: linked-ELF output in table, JSON file produced, archive size ≥ ELF size (dead-code elimination visible)
+- [X] T068 [US4] Create `scripts/size_measure.ld` — minimal Cortex-M0+ linker script with Flash at `0x10000000` (256K), RAM at `0x20000000` (256K), standard sections (`.text`, `.rodata`, `.data`, `.bss`), stack at end of RAM
+- [X] T069 [US4] Create `scripts/size_measure_startup.c` — minimal startup: vector table (stack pointer + Reset_Handler), `Reset_Handler` that zeroes `.bss`, copies `.data`, calls `main()`, loops forever
+- [X] T070 [US4] Create `scripts/size_measure_main.c` — minimal `main()` that calls `mu_server_init()` to force linker to pull in library code (so `--gc-sections` can strip unreferenced symbols)
+- [X] T071 [US4] Modify `scripts/measure_size.sh`: after building each profile archive, also compile + link an ELF using `size_measure.ld` + `size_measure_startup.c` + `size_measure_main.c` + `libmuc_opcua.a`, then run `arm-none-eabi-size` on the ELF
+- [X] T072 [US4] Add JSON output to `scripts/measure_size.sh`: write `build/size-arm/size-report.json` with per-profile records containing `profile`, `archive` (`.text`/`.data`/`.bss`/`.dec`), `elf` (same fields), `elf_path`, and `timestamp`
+- [X] T073 [US4] Add `--lto` flag to `scripts/measure_size.sh`: rebuild with `-flto -ffat-lto-objects` in `CMAKE_C_FLAGS` (bypassing `CheckIPOSupported` cross-compile failure), produce `lto_elf` measurements in addition to `elf`, report delta
+- [X] T074 [US4] Change toolchain-absence handling in `scripts/measure_size.sh`: replace `exit 127` with `echo "warning: arm-none-eabi-gcc not found; skipping size measurement" >&2; exit 0` for graceful CI skip
+- [X] T075 [US4] Run `bash scripts/measure_size.sh standard` and verify: linked-ELF output in table, JSON file produced, archive size ≥ ELF size (dead-code elimination visible)
 
 **Checkpoint**: Size measurement tooling produces accurate linked-ELF sizes with
 JSON output. Gracefully handles missing cross-compiler.
@@ -219,15 +219,15 @@ JSON output. Gracefully handles missing cross-compiler.
 
 **Purpose**: Cross-cutting validation before completion
 
-- [ ] T076 Run clang-format on all modified files in `src/`, `include/`, `tests/`
-- [ ] T077 Run cppcheck — zero new warnings introduced on `src/` and `tests/`
-- [ ] T078 Run `ctest --output-on-failure` on full profile — all tests pass, zero regressions
-- [ ] T079 [P] Run `ctest --output-on-failure` on micro profile — all tests pass, zero regressions
-- [ ] T080 [P] Run `ctest --output-on-failure` on standard profile — all tests pass, zero regressions
-- [ ] T081 [P] Run `ctest --output-on-failure` on embedded profile — all tests pass, zero regressions
-- [ ] T082 Verify `grep -rn "STUB:" tests/` returns zero matches across the 5 files touched by specs 043-044 (already clean, verify no regressions)
-- [ ] T083 Run `bash scripts/measure_size.sh all` and record linked-ELF sizes against budget in plan.md
-- [ ] T084 Update `TODO.md`: mark D1, D2, D3, D4 as complete, update deferred-items list
+- [X] T076 Run clang-format on all modified files in `src/`, `include/`, `tests/`
+- [X] T077 Run cppcheck — zero new warnings introduced on `src/` and `tests/`
+- [X] T078 Run `ctest --output-on-failure` on full profile — all tests pass, zero regressions
+- [X] T079 [P] Run `ctest --output-on-failure` on micro profile — all tests pass, zero regressions
+- [X] T080 [P] Run `ctest --output-on-failure` on standard profile — all tests pass, zero regressions
+- [X] T081 [P] Run `ctest --output-on-failure` on embedded profile — all tests pass, zero regressions
+- [X] T082 Verify `grep -rn "STUB:" tests/` returns zero matches across the 5 files touched by specs 043-044 (already clean, verify no regressions)
+- [X] T083 Run `bash scripts/measure_size.sh all` and record linked-ELF sizes against budget in plan.md
+- [X] T084 Update `TODO.md`: mark D1, D2, D3, D4 as complete, update deferred-items list
 
 ---
 

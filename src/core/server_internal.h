@@ -196,6 +196,9 @@ struct mu_server {
 #endif
 };
 
+_Static_assert(MU_SERVER_STORAGE_BYTES >= sizeof(struct mu_server),
+               "MU_SERVER_STORAGE_BYTES must cover struct mu_server for enabled feature gates");
+
 #if MUC_OPCUA_SUBSCRIPTIONS
 opcua_statuscode_t mu_server_emit_message(mu_server_t *server, opcua_uint32_t request_id, const opcua_byte_t *body,
                                           size_t body_len);

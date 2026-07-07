@@ -9,7 +9,7 @@ Cross-compiles the portable core with arm-none-eabi-gcc for Cortex-M0+
 Thumb code and reports archive + linked-ELF section totals.
 Options:
   --lto    Also produce LTO (Link-Time Optimisation) ELF measurements
-  --json   Write build/size-arm/size-report.json with per-profile records
+  --json   Accepted for compatibility; JSON output is always written
 USAGE
 }
 
@@ -19,7 +19,7 @@ if [ "$#" -eq 0 ]; then
 fi
 
 lto_flag=false
-json_flag=false
+json_flag=true
 profile_arg=""
 
 for arg in "$@"; do
@@ -61,6 +61,12 @@ fi
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 build_root="${BUILD_ROOT:-build/size-arm}"
+case "$build_root" in
+    build|build/|./build|./build/)
+        echo "error: BUILD_ROOT must not be the host test build directory; use build/size-arm or another isolated subdirectory" >&2
+        exit 2
+        ;;
+esac
 mkdir -p "$build_root"
 
 json_file="${build_root}/size-report.json"

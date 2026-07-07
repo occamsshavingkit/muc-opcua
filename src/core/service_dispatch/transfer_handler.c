@@ -6,12 +6,28 @@
 opcua_statuscode_t handle_transfer_subscriptions(mu_server_t *server, mu_binary_reader_t *r, mu_binary_writer_t *w,
                                                  size_t *response_length) {
     (void)response_length;
+    mu_request_header_t req;
     opcua_int32_t subscription_count;
-    opcua_statuscode_t s = mu_binary_read_int32(r, &subscription_count);
+    opcua_statuscode_t s = mu_request_header_decode(r, &req);
     if (s != MU_STATUS_GOOD)
         return s;
-    if (subscription_count < 0)
+
+    s = mu_binary_read_int32(r, &subscription_count);
+    if (s != MU_STATUS_GOOD)
+        return s;
+    if (subscription_count < 0) {
+        s = write_response_prefix(w, MU_ID_TRANSFERSUBSCRIPTIONSRESPONSE, req.request_handle,
+                                  MU_STATUS_BAD_DECODINGERROR
+#ifdef MUC_OPCUA_TIME_SYNC
+                                  ,
+                                  server
+#endif
+        );
+        if (s == MU_STATUS_GOOD) {
+            *response_length = w->position;
+        }
         return MU_STATUS_BAD_DECODINGERROR;
+    }
 
     opcua_uint32_t sub_ids[16];
     opcua_uint32_t count = (subscription_count > 0) ? (opcua_uint32_t)subscription_count : 0u;
@@ -25,6 +41,15 @@ opcua_statuscode_t handle_transfer_subscriptions(mu_server_t *server, mu_binary_
     }
     opcua_byte_t send_initial;
     s = mu_binary_read_byte(r, &send_initial);
+    if (s != MU_STATUS_GOOD)
+        return s;
+
+    s = write_response_prefix(w, MU_ID_TRANSFERSUBSCRIPTIONSRESPONSE, req.request_handle, MU_STATUS_GOOD
+#ifdef MUC_OPCUA_TIME_SYNC
+                              ,
+                              server
+#endif
+    );
     if (s != MU_STATUS_GOOD)
         return s;
 
@@ -47,6 +72,9 @@ opcua_statuscode_t handle_transfer_subscriptions(mu_server_t *server, mu_binary_
     }
 
     s = mu_binary_write_int32(w, 0);
+    if (s == MU_STATUS_GOOD) {
+        *response_length = w->position;
+    }
     return s;
 }
 

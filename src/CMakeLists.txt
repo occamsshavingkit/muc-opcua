@@ -40,6 +40,12 @@ add_library(muc_opcua STATIC
     generated/opcua_ids.c
 )
 
+if(MUC_OPCUA_ALLOW_HEAP)
+    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_ALLOW_HEAP=1)
+else()
+    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_ALLOW_HEAP=0)
+endif()
+
 # Optional services compile out at the source + dispatch-table level.
 if(MUC_OPCUA_SERVICE_READ)
     target_sources(muc_opcua PRIVATE services/read/cache.c services/read/read_attribute.c services/read/read_process.c)
@@ -82,9 +88,9 @@ endif()
 # this flag gates the node-table *content* so the standard node set is dropped.
 if(MUC_OPCUA_BASE_NODES)
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_BASE_NODES=1)
-    if(MUC_OPCUA_BASE_TYPE_SYSTEM)
-        target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_BASE_TYPE_SYSTEM=1)
-    endif()
+endif()
+if(MUC_OPCUA_BASE_TYPE_SYSTEM)
+    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_BASE_TYPE_SYSTEM=1)
 endif()
 
 # The data-change subscription engine (Micro profile). Source + dispatch handlers are
@@ -150,8 +156,34 @@ if(MUC_OPCUA_EVENTS)
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_EVENTS=1)
 endif()
 
+if(MUC_OPCUA_DATA_ACCESS)
+    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_DATA_ACCESS=1)
+endif()
+
+if(MUC_OPCUA_METHOD_SERVER)
+    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_METHOD_SERVER=1)
+endif()
+
+if(MUC_OPCUA_EVENT_FILTER_WHERE)
+    target_sources(muc_opcua PRIVATE services/event_filter.c)
+    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_EVENT_FILTER_WHERE=1)
+endif()
+
 if(MUC_OPCUA_CUSTOM_METHODS)
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_CUSTOM_METHODS=1)
+endif()
+
+if(MUC_OPCUA_REDUNDANCY)
+    target_sources(muc_opcua PRIVATE core/service_dispatch/transfer_handler.c)
+    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_REDUNDANCY=1)
+endif()
+
+if(MUC_OPCUA_NAMESPACES)
+    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_NAMESPACES=1)
+endif()
+
+if(MUC_OPCUA_STANDARD_PROFILE)
+    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_STANDARD_PROFILE=1)
 endif()
 
 if(MUC_OPCUA_REVERSE_CONNECT)
@@ -198,6 +230,22 @@ endif()
 
 if(MUC_OPCUA_AGGREGATE_FULL)
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_AGGREGATE_FULL=1)
+endif()
+
+if(MUC_OPCUA_CLIENT_NANO)
+    target_sources(muc_opcua PRIVATE
+        client/client.c
+        client/client_secure_channel.c
+        client/client_session.c
+        client/client_read.c
+        client/client_browse.c
+        client/client_state.c
+        client/client_errors.c
+    )
+    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_CLIENT_NANO=1)
+    if(MUC_OPCUA_IS_HOST)
+        target_sources(muc_opcua PRIVATE platform/posix_client_transport.c)
+    endif()
 endif()
 
 

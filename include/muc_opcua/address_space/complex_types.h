@@ -27,9 +27,10 @@ typedef struct {
     opcua_uint32_t *array_dimensions;
     opcua_uint32_t max_string_length;
     opcua_boolean_t is_optional;
+    const struct mu_structure_definition *nested_structure;
 } mu_structure_field_t;
 
-typedef struct {
+typedef struct mu_structure_definition {
     mu_nodeid_t default_encoding_id;
     mu_nodeid_t base_data_type;
     opcua_uint32_t structure_type;

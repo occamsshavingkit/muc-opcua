@@ -238,7 +238,7 @@ static const mu_value_source_t s_server_status_state_value = {
 
 static const mu_string_t s_server_profile_array[] = {
 #if MUC_OPCUA_STANDARD_PROFILE
-    {75, s_str_http___opcfoundation_org_UA_Profile_Server_StandardUA2017}
+    {57, s_str_http___opcfoundation_org_UA_Profile_Server_StandardUA2017}
 #elif MUC_OPCUA_BASE_TYPE_SYSTEM
     {57, s_str_http___opcfoundation_org_UA_Profile_Server_EmbeddedUA2017}
 #else

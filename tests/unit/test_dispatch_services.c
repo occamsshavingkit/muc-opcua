@@ -1020,11 +1020,17 @@ void test_dispatch_transfer_subscriptions_returns_bad_serviceunsupported(void) {
     size_t resp_len = sizeof(resp);
     enum { transfer_subscriptions_request_id = 841u }; /* TransferSubscriptionsRequest_Encoding_DefaultBinary */
 
+#if MUC_OPCUA_REDUNDANCY
+    TEST_ASSERT_EQUAL_HEX32(
+        MU_STATUS_BAD_SESSIONIDINVALID,
+        mu_service_dispatch(&server, transfer_subscriptions_request_id, req, sizeof(req), resp, &resp_len));
+#else
     /* OPC-10000-4 sections 5.14.7 and 7.38.2: unsupported
        TransferSubscriptions requests return Bad_ServiceUnsupported. */
     TEST_ASSERT_EQUAL_HEX32(
         MU_STATUS_BAD_SERVICEUNSUPPORTED,
         mu_service_dispatch(&server, transfer_subscriptions_request_id, req, sizeof(req), resp, &resp_len));
+#endif
 }
 
 int main(void) {

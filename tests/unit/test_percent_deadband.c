@@ -23,7 +23,7 @@ static mu_variant_t make_double(opcua_double_t v) {
     mu_variant_t out;
     (void)memset(&out, 0, sizeof(out));
     out.type = MU_TYPE_DOUBLE;
-    out.value.dbl = v;
+    out.value.d = v;
     return out;
 }
 
