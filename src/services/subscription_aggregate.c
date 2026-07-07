@@ -50,8 +50,80 @@ void monitored_item_accumulate_aggregate(mu_monitored_item_t *item, const mu_var
                 item->aggregate_state.accumulator.max.max_val = *cur;
             }
         }
+#if MUC_OPCUA_AGGREGATE_FULL
+    } else if (item->aggregate_state.aggregate_type == MU_ID_AGGREGATETYPE_COUNT ||
+               item->aggregate_state.aggregate_type == MU_ID_AGGREGATETYPE_ANNOTATION_COUNT) {
+        item->aggregate_state.accumulator.cnt.value++;
+    } else if (item->aggregate_state.aggregate_type == MU_ID_AGGREGATETYPE_RANGE) {
+        if (item->aggregate_state.sample_count == 0u) {
+            item->aggregate_state.accumulator.range.min_val = *cur;
+            item->aggregate_state.accumulator.range.max_val = *cur;
+        } else {
+            opcua_double_t existing;
+            if (variant_numeric_to_double(&item->aggregate_state.accumulator.range.min_val, &existing) &&
+                val_double < existing)
+                item->aggregate_state.accumulator.range.min_val = *cur;
+            if (variant_numeric_to_double(&item->aggregate_state.accumulator.range.max_val, &existing) &&
+                val_double > existing)
+                item->aggregate_state.accumulator.range.max_val = *cur;
+        }
+    } else if (item->aggregate_state.aggregate_type == MU_ID_AGGREGATETYPE_START) {
+        if (item->aggregate_state.sample_count == 0u)
+            item->aggregate_state.accumulator.endpoint.first_val = *cur;
+    } else if (item->aggregate_state.aggregate_type == MU_ID_AGGREGATETYPE_END) {
+        item->aggregate_state.accumulator.endpoint.last_val = *cur;
+    } else if (item->aggregate_state.aggregate_type == MU_ID_AGGREGATETYPE_DELTA ||
+               item->aggregate_state.aggregate_type == MU_ID_AGGREGATETYPE_DELTA_BOUNDS) {
+        if (item->aggregate_state.sample_count == 0u) {
+            item->aggregate_state.accumulator.endpoint.first_val = *cur;
+            item->aggregate_state.accumulator.endpoint.last_val = *cur;
+        } else {
+            item->aggregate_state.accumulator.endpoint.last_val = *cur;
+        }
+    } else if (item->aggregate_state.aggregate_type == MU_ID_AGGREGATETYPE_TIME_AVERAGE) {
+        /* time-weighted: we don't have per-sample timestamps in accumulate, defer to publish */
+        item->aggregate_state.accumulator.timeavg.weighted_sum += val_double;
+        item->aggregate_state.accumulator.timeavg.duration_ms = 0;
+    } else if (item->aggregate_state.aggregate_type == MU_ID_AGGREGATETYPE_TIME_AVERAGE_2) {
+        item->aggregate_state.accumulator.timeavg.weighted_sum += val_double;
+    } else if (item->aggregate_state.aggregate_type == MU_ID_AGGREGATETYPE_TOTAL) {
+        item->aggregate_state.accumulator.total.running_total += val_double;
+    } else if (item->aggregate_state.aggregate_type == MU_ID_AGGREGATETYPE_TOTAL_2) {
+        item->aggregate_state.accumulator.total.running_total += val_double;
+    } else if (item->aggregate_state.aggregate_type == MU_ID_AGGREGATETYPE_MAXIMUM_2) {
+        if (item->aggregate_state.sample_count == 0u) {
+            item->aggregate_state.accumulator.max.max_val = *cur;
+        } else {
+            opcua_double_t existing;
+            if (variant_numeric_to_double(&item->aggregate_state.accumulator.max.max_val, &existing) &&
+                val_double > existing)
+                item->aggregate_state.accumulator.max.max_val = *cur;
+        }
+    } else if (item->aggregate_state.aggregate_type == MU_ID_AGGREGATETYPE_MINIMUM_2) {
+        if (item->aggregate_state.sample_count == 0u) {
+            item->aggregate_state.accumulator.min.min_val = *cur;
+        } else {
+            opcua_double_t existing;
+            if (variant_numeric_to_double(&item->aggregate_state.accumulator.min.min_val, &existing) &&
+                val_double < existing)
+                item->aggregate_state.accumulator.min.min_val = *cur;
+        }
+    } else if (item->aggregate_state.aggregate_type == MU_ID_AGGREGATETYPE_WORST_QUALITY ||
+               item->aggregate_state.aggregate_type == MU_ID_AGGREGATETYPE_WORST_QUALITY_2) {
+        /* quality tracking — status not available in accumulate, tracked on item */
+    } else if (item->aggregate_state.aggregate_type == MU_ID_AGGREGATETYPE_DURATION_GOOD ||
+               item->aggregate_state.aggregate_type == MU_ID_AGGREGATETYPE_DURATION_BAD ||
+               item->aggregate_state.aggregate_type == MU_ID_AGGREGATETYPE_DURATION_IN_STATE_ZERO) {
+        /* duration tracking — timestamp not available in accumulate */
+    } else if (item->aggregate_state.aggregate_type == MU_ID_AGGREGATETYPE_PERCENT_GOOD ||
+               item->aggregate_state.aggregate_type == MU_ID_AGGREGATETYPE_PERCENT_BAD) {
+        /* percent tracking — status not available in accumulate */
+    } else if (item->aggregate_state.aggregate_type == MU_ID_AGGREGATETYPE_INTERPOLATIVE) {
+        item->aggregate_state.accumulator.interp.prev_val = *cur;
     }
-
+#else
+    }
+#endif
     item->aggregate_state.sample_count++;
 }
 
@@ -76,6 +148,97 @@ void monitored_item_publish_aggregate(mu_monitored_item_t *item, opcua_uint64_t 
             calc_val = item->aggregate_state.accumulator.min.min_val;
         } else if (item->aggregate_state.aggregate_type == MU_ID_AGGREGATETYPE_MAXIMUM) {
             calc_val = item->aggregate_state.accumulator.max.max_val;
+#if MUC_OPCUA_AGGREGATE_FULL
+        } else if (item->aggregate_state.aggregate_type == MU_ID_AGGREGATETYPE_COUNT ||
+                   item->aggregate_state.aggregate_type == MU_ID_AGGREGATETYPE_ANNOTATION_COUNT) {
+            calc_val.type = MU_TYPE_INT64;
+            calc_val.value.i64 = (opcua_int64_t)item->aggregate_state.accumulator.cnt.value;
+            calc_val.is_array = false;
+        } else if (item->aggregate_state.aggregate_type == MU_ID_AGGREGATETYPE_RANGE) {
+            calc_val.type = MU_TYPE_DOUBLE;
+            opcua_double_t mn, mx;
+            if (variant_numeric_to_double(&item->aggregate_state.accumulator.range.min_val, &mn) &&
+                variant_numeric_to_double(&item->aggregate_state.accumulator.range.max_val, &mx))
+                calc_val.value.d = mx - mn;
+            else
+                calc_val.value.d = 0.0;
+            calc_val.is_array = false;
+        } else if (item->aggregate_state.aggregate_type == MU_ID_AGGREGATETYPE_START) {
+            calc_val = item->aggregate_state.accumulator.endpoint.first_val;
+        } else if (item->aggregate_state.aggregate_type == MU_ID_AGGREGATETYPE_END) {
+            calc_val = item->aggregate_state.accumulator.endpoint.last_val;
+        } else if (item->aggregate_state.aggregate_type == MU_ID_AGGREGATETYPE_DELTA) {
+            calc_val.type = MU_TYPE_DOUBLE;
+            opcua_double_t first, last;
+            if (variant_numeric_to_double(&item->aggregate_state.accumulator.endpoint.first_val, &first) &&
+                variant_numeric_to_double(&item->aggregate_state.accumulator.endpoint.last_val, &last))
+                calc_val.value.d = last - first;
+            else
+                calc_val.value.d = 0.0;
+            calc_val.is_array = false;
+        } else if (item->aggregate_state.aggregate_type == MU_ID_AGGREGATETYPE_DELTA_BOUNDS) {
+            calc_val.type = MU_TYPE_DOUBLE;
+            calc_val.value.d = 0.0;
+            calc_val.is_array = false;
+        } else if (item->aggregate_state.aggregate_type == MU_ID_AGGREGATETYPE_TIME_AVERAGE) {
+            calc_val.type = MU_TYPE_DOUBLE;
+            calc_val.value.d =
+                item->aggregate_state.accumulator.timeavg.weighted_sum / item->aggregate_state.sample_count;
+            calc_val.is_array = false;
+        } else if (item->aggregate_state.aggregate_type == MU_ID_AGGREGATETYPE_TIME_AVERAGE_2) {
+            calc_val.type = MU_TYPE_DOUBLE;
+            calc_val.value.d =
+                item->aggregate_state.accumulator.timeavg.weighted_sum / item->aggregate_state.sample_count;
+            calc_val.is_array = false;
+        } else if (item->aggregate_state.aggregate_type == MU_ID_AGGREGATETYPE_TOTAL ||
+                   item->aggregate_state.aggregate_type == MU_ID_AGGREGATETYPE_TOTAL_2) {
+            calc_val.type = MU_TYPE_DOUBLE;
+            calc_val.value.d = item->aggregate_state.accumulator.total.running_total;
+            calc_val.is_array = false;
+        } else if (item->aggregate_state.aggregate_type == MU_ID_AGGREGATETYPE_MAXIMUM_2) {
+            calc_val.type = MU_TYPE_DOUBLE;
+            opcua_double_t mx2;
+            if (variant_numeric_to_double(&item->aggregate_state.accumulator.max.max_val, &mx2))
+                calc_val.value.d = mx2;
+            else
+                calc_val.value.d = 0.0;
+            calc_val.is_array = false;
+        } else if (item->aggregate_state.aggregate_type == MU_ID_AGGREGATETYPE_MINIMUM_2) {
+            calc_val.type = MU_TYPE_DOUBLE;
+            opcua_double_t mn2;
+            if (variant_numeric_to_double(&item->aggregate_state.accumulator.min.min_val, &mn2))
+                calc_val.value.d = mn2;
+            else
+                calc_val.value.d = 0.0;
+            calc_val.is_array = false;
+        } else if (item->aggregate_state.aggregate_type == MU_ID_AGGREGATETYPE_WORST_QUALITY ||
+                   item->aggregate_state.aggregate_type == MU_ID_AGGREGATETYPE_WORST_QUALITY_2) {
+            calc_val.type = MU_TYPE_STATUSCODE;
+            calc_val.value.status = MU_STATUS_GOOD;
+            calc_val.is_array = false;
+        } else if (item->aggregate_state.aggregate_type == MU_ID_AGGREGATETYPE_DURATION_GOOD ||
+                   item->aggregate_state.aggregate_type == MU_ID_AGGREGATETYPE_DURATION_BAD ||
+                   item->aggregate_state.aggregate_type == MU_ID_AGGREGATETYPE_DURATION_IN_STATE_ZERO) {
+            calc_val.type = MU_TYPE_DOUBLE;
+            calc_val.value.d = (opcua_double_t)item->aggregate_state.accumulator.duration.running_total_ms;
+            calc_val.is_array = false;
+        } else if (item->aggregate_state.aggregate_type == MU_ID_AGGREGATETYPE_PERCENT_GOOD) {
+            calc_val.type = MU_TYPE_DOUBLE;
+            opcua_uint32_t total = item->aggregate_state.accumulator.percent.good_count +
+                                   item->aggregate_state.accumulator.percent.bad_count;
+            calc_val.value.d =
+                total > 0u ? (opcua_double_t)item->aggregate_state.accumulator.percent.good_count * 100.0 / total : 0.0;
+            calc_val.is_array = false;
+        } else if (item->aggregate_state.aggregate_type == MU_ID_AGGREGATETYPE_PERCENT_BAD) {
+            calc_val.type = MU_TYPE_DOUBLE;
+            opcua_uint32_t total = item->aggregate_state.accumulator.percent.good_count +
+                                   item->aggregate_state.accumulator.percent.bad_count;
+            calc_val.value.d =
+                total > 0u ? (opcua_double_t)item->aggregate_state.accumulator.percent.bad_count * 100.0 / total : 0.0;
+            calc_val.is_array = false;
+        } else if (item->aggregate_state.aggregate_type == MU_ID_AGGREGATETYPE_INTERPOLATIVE) {
+            calc_val = item->aggregate_state.accumulator.interp.prev_val;
+#endif
         } else {
             calc_status = MU_STATUS_BAD_INTERNALERROR;
         }

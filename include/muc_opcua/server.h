@@ -155,6 +155,8 @@ opcua_statuscode_t mu_server_trigger_event(mu_server_t *server, const mu_event_n
 #ifdef MUC_OPCUA_AUDITING
 #include "muc_opcua/services/audit.h"
 void mu_raise_audit_event(mu_server_t *server, const mu_audit_event_t *event);
+void mu_server_set_audit_callback(mu_server_t *server, mu_audit_callback_t callback, void *context);
+opcua_statuscode_t mu_server_add_audit_callback(mu_server_t *server, mu_audit_callback_t callback, void *context);
 #endif
 
 #ifdef __cplusplus

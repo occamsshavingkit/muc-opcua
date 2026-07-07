@@ -1,1 +1,3 @@
-{"feature_directory":"specs/044-impl-feature-gated-stubs"}
+{
+  "feature_directory": "specs/045-implement-deferred-features"
+}

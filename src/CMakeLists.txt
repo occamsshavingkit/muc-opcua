@@ -183,6 +183,23 @@ if(MUC_OPCUA_EXTENDED_NODEIDS)
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_EXTENDED_NODEIDS=1)
 endif()
 
+if(MUC_OPCUA_COMPLEX_TYPES)
+    target_sources(muc_opcua PRIVATE
+        address_space/complex_types.c
+        encoding/binary_complex.c
+    )
+    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_COMPLEX_TYPES=1)
+endif()
+
+if(MUC_OPCUA_AUDITING)
+    target_sources(muc_opcua PRIVATE services/audit_events.c)
+    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_AUDITING=1)
+endif()
+
+if(MUC_OPCUA_AGGREGATE_FULL)
+    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_AGGREGATE_FULL=1)
+endif()
+
 
 foreach(MU_CAPACITY_DEFINE
         MU_MAX_SUBSCRIPTIONS

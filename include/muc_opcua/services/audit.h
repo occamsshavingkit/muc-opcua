@@ -15,6 +15,8 @@ extern "C" {
 
 #if MUC_OPCUA_AUDITING
 
+struct mu_server;
+
 #define MU_AUDIT_EVENT_OPEN_SECURE_CHANNEL 0
 #define MU_AUDIT_EVENT_CREATE_SESSION 1
 #define MU_AUDIT_EVENT_ACTIVATE_SESSION 2
@@ -45,6 +47,8 @@ typedef struct {
         } write_update;
     } specific;
 } mu_audit_event_t;
+
+typedef void (*mu_audit_callback_t)(struct mu_server *server, const mu_audit_event_t *event, void *context);
 
 #endif /* MUC_OPCUA_AUDITING */
 

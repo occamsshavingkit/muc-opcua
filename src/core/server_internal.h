@@ -185,6 +185,15 @@ struct mu_server {
         opcua_uint16_t enum_count;
     } complex_types;
 #endif
+
+#ifdef MUC_OPCUA_AUDITING
+#define MU_MAX_AUDIT_CALLBACKS 4
+    struct {
+        mu_audit_callback_t callback;
+        void *context;
+    } audit_callbacks[MU_MAX_AUDIT_CALLBACKS];
+    size_t audit_callback_count;
+#endif
 };
 
 #if MUC_OPCUA_SUBSCRIPTIONS

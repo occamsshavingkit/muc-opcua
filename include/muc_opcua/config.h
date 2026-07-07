@@ -211,9 +211,11 @@
 #define MU_MAX_TRIGGER_LINKS 4
 #endif
 /* OPC-10000-7 §6.6.17 Standard DataChange Subscription storage; zero unless
- * the Standard facet is enabled. */
+ * the Standard facet is enabled. Covers monitored-item arrays, subscription
+ * arrays, parked publish requests, and event infrastructure. */
 #define MU_SUBSCRIPTIONS_STANDARD_STORAGE_BYTES                                                                        \
-    (MU_MAX_MONITORED_ITEMS * (MU_MONITORED_QUEUE_DEPTH * 96 + MU_MAX_TRIGGER_LINKS * 8 + 200))
+    (MU_MAX_MONITORED_ITEMS * (MU_MONITORED_QUEUE_DEPTH * 96 + MU_MAX_TRIGGER_LINKS * 8 + 225) +                       \
+     MU_MAX_SUBSCRIPTIONS * 336 + MU_MAX_PUBLISH_REQUESTS * 48)
 #else
 #define MU_SUBSCRIPTIONS_STANDARD_STORAGE_BYTES 0
 #endif
@@ -267,10 +269,24 @@
 #define MU_ALARMS_CONDITIONS_STORAGE_BYTES 0
 #endif
 
+#ifdef MUC_OPCUA_AUDITING
+/* MU_MAX_AUDIT_CALLBACKS(4) * (callback_ptr + context_ptr) + count */
+#define MU_AUDITING_STORAGE_BYTES (4 * 2 * sizeof(void *) + sizeof(size_t))
+#else
+#define MU_AUDITING_STORAGE_BYTES 0
+#endif
+
+#ifdef MUC_OPCUA_COMPLEX_TYPES
+/* 8 structures * (def_ptr + nodeid) + 8 enums * (def_ptr + nodeid) + 2 * uint16 */
+#define MU_COMPLEX_TYPES_STORAGE_BYTES (8 * (sizeof(void *) + 24) + 8 * (sizeof(void *) + 24) + 4)
+#else
+#define MU_COMPLEX_TYPES_STORAGE_BYTES 0
+#endif
+
 #define MU_SERVER_STORAGE_BYTES                                                                                        \
     (MU_SERVER_STORAGE_BASE_BYTES + MU_SUBSCRIPTIONS_STANDARD_STORAGE_BYTES + MU_SERVER_SECURITY_STORAGE_BYTES +       \
      MU_ADDRESS_SPACE_INDEX_STORAGE_BYTES + MU_MULTIPLE_CONNECTIONS_STORAGE_BYTES + MU_EVENTS_STORAGE_BYTES +          \
-     MU_PUBSUB_STORAGE_BYTES + MU_NODEMANAGEMENT_STORAGE_BYTES + MU_QUERY_STORAGE_BYTES +                              \
-     MU_ALARMS_CONDITIONS_STORAGE_BYTES + MU_CHUNK_ASSEMBLY_STORAGE_BYTES)
+     MU_PUBSUB_STORAGE_BYTES + MU_NODEMANAGEMENT_STORAGE_BYTES + MU_ALARMS_CONDITIONS_STORAGE_BYTES +                  \
+     MU_CHUNK_ASSEMBLY_STORAGE_BYTES + MU_AUDITING_STORAGE_BYTES + MU_COMPLEX_TYPES_STORAGE_BYTES)
 
 #endif /* MUC_OPCUA_CONFIG_H */
