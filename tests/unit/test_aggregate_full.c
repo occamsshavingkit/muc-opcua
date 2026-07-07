@@ -320,8 +320,23 @@ void test_duration_good_aggregate_direct(void) {
     item.has_aggregate = true;
     item.monitoring_mode = MU_MONITORING_MODE_REPORTING;
     item.aggregate_state.aggregate_type = MU_ID_AGGREGATETYPE_DURATION_GOOD;
-    item.aggregate_state.sample_count = 1;
-    item.aggregate_state.accumulator.duration.running_total_ms = 80;
+    item.aggregate_state.last_calculation = 0;
+
+    mu_variant_t sample = {MU_TYPE_FLOAT, {.f = 1.0f}};
+
+    item.last_status = MU_STATUS_GOOD;
+    item.aggregate_state.accumulator.duration.start_ms = 0;
+    monitored_item_accumulate_aggregate(&item, &sample);
+
+    item.last_status = MU_STATUS_BAD_NODATA;
+    item.aggregate_state.accumulator.duration.start_ms = 10;
+    monitored_item_accumulate_aggregate(&item, &sample);
+
+    item.last_status = MU_STATUS_GOOD;
+    item.aggregate_state.accumulator.duration.start_ms = 30;
+    monitored_item_accumulate_aggregate(&item, &sample);
+
+    TEST_ASSERT_EQUAL_UINT32(3, item.aggregate_state.sample_count);
 
     monitored_item_publish_aggregate(&item, 100);
 
@@ -338,8 +353,22 @@ void test_duration_bad_aggregate_direct(void) {
     item.has_aggregate = true;
     item.monitoring_mode = MU_MONITORING_MODE_REPORTING;
     item.aggregate_state.aggregate_type = MU_ID_AGGREGATETYPE_DURATION_BAD;
-    item.aggregate_state.sample_count = 1;
-    item.aggregate_state.accumulator.duration.running_total_ms = 70;
+
+    mu_variant_t sample = {MU_TYPE_FLOAT, {.f = 1.0f}};
+
+    item.last_status = MU_STATUS_BAD_NODATA;
+    item.aggregate_state.accumulator.duration.start_ms = 0;
+    monitored_item_accumulate_aggregate(&item, &sample);
+
+    item.last_status = MU_STATUS_GOOD;
+    item.aggregate_state.accumulator.duration.start_ms = 20;
+    monitored_item_accumulate_aggregate(&item, &sample);
+
+    item.last_status = MU_STATUS_BAD_NODATA;
+    item.aggregate_state.accumulator.duration.start_ms = 50;
+    monitored_item_accumulate_aggregate(&item, &sample);
+
+    TEST_ASSERT_EQUAL_UINT32(3, item.aggregate_state.sample_count);
 
     monitored_item_publish_aggregate(&item, 100);
 
@@ -350,15 +379,27 @@ void test_duration_bad_aggregate_direct(void) {
 
 /* T046: PercentGood/PercentBad aggregate (OPC-10000-13 §4.2.2.12-13) */
 void test_percent_good_bad_aggregate_direct(void) {
+    mu_variant_t sample = {MU_TYPE_FLOAT, {.f = 1.0f}};
+
     mu_monitored_item_t item_good;
     (void)memset(&item_good, 0, sizeof(item_good));
     item_good.in_use = true;
     item_good.has_aggregate = true;
     item_good.monitoring_mode = MU_MONITORING_MODE_REPORTING;
     item_good.aggregate_state.aggregate_type = MU_ID_AGGREGATETYPE_PERCENT_GOOD;
-    item_good.aggregate_state.sample_count = 5;
-    item_good.aggregate_state.accumulator.percent.good_count = 4;
-    item_good.aggregate_state.accumulator.percent.bad_count = 1;
+
+    item_good.last_status = MU_STATUS_GOOD;
+    monitored_item_accumulate_aggregate(&item_good, &sample);
+    item_good.last_status = MU_STATUS_GOOD;
+    monitored_item_accumulate_aggregate(&item_good, &sample);
+    item_good.last_status = MU_STATUS_GOOD;
+    monitored_item_accumulate_aggregate(&item_good, &sample);
+    item_good.last_status = MU_STATUS_GOOD;
+    monitored_item_accumulate_aggregate(&item_good, &sample);
+    item_good.last_status = MU_STATUS_BAD_NODATA;
+    monitored_item_accumulate_aggregate(&item_good, &sample);
+
+    TEST_ASSERT_EQUAL_UINT32(5, item_good.aggregate_state.sample_count);
 
     monitored_item_publish_aggregate(&item_good, 100);
 
@@ -372,9 +413,19 @@ void test_percent_good_bad_aggregate_direct(void) {
     item_bad.has_aggregate = true;
     item_bad.monitoring_mode = MU_MONITORING_MODE_REPORTING;
     item_bad.aggregate_state.aggregate_type = MU_ID_AGGREGATETYPE_PERCENT_BAD;
-    item_bad.aggregate_state.sample_count = 5;
-    item_bad.aggregate_state.accumulator.percent.good_count = 4;
-    item_bad.aggregate_state.accumulator.percent.bad_count = 1;
+
+    item_bad.last_status = MU_STATUS_GOOD;
+    monitored_item_accumulate_aggregate(&item_bad, &sample);
+    item_bad.last_status = MU_STATUS_GOOD;
+    monitored_item_accumulate_aggregate(&item_bad, &sample);
+    item_bad.last_status = MU_STATUS_GOOD;
+    monitored_item_accumulate_aggregate(&item_bad, &sample);
+    item_bad.last_status = MU_STATUS_GOOD;
+    monitored_item_accumulate_aggregate(&item_bad, &sample);
+    item_bad.last_status = MU_STATUS_BAD_NODATA;
+    monitored_item_accumulate_aggregate(&item_bad, &sample);
+
+    TEST_ASSERT_EQUAL_UINT32(5, item_bad.aggregate_state.sample_count);
 
     monitored_item_publish_aggregate(&item_bad, 100);
 
@@ -504,13 +555,25 @@ void test_worst_quality_aggregate_direct(void) {
     item.has_aggregate = true;
     item.monitoring_mode = MU_MONITORING_MODE_REPORTING;
     item.aggregate_state.aggregate_type = MU_ID_AGGREGATETYPE_WORST_QUALITY;
-    item.aggregate_state.sample_count = 1;
+
+    mu_variant_t sample = {MU_TYPE_FLOAT, {.f = 10.0f}};
+
+    item.last_status = MU_STATUS_GOOD;
+    monitored_item_accumulate_aggregate(&item, &sample);
+
+    item.last_status = (opcua_statuscode_t)0x40000000u;
+    monitored_item_accumulate_aggregate(&item, &sample);
+
+    item.last_status = MU_STATUS_BAD_NODATA;
+    monitored_item_accumulate_aggregate(&item, &sample);
+
+    TEST_ASSERT_EQUAL_UINT32(3, item.aggregate_state.sample_count);
 
     monitored_item_publish_aggregate(&item, 100);
 
     TEST_ASSERT_EQUAL(1, item.queue_count);
     TEST_ASSERT_EQUAL(MU_TYPE_STATUSCODE, item.queue[0].value.type);
-    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, item.queue[0].value.value.status);
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_BAD_NODATA, item.queue[0].value.value.status);
 }
 
 /* T052: Interpolative aggregate (OPC-10000-13 §4.2.2.8) */
@@ -675,13 +738,28 @@ void test_worst_quality2_aggregate_direct(void) {
     item.has_aggregate = true;
     item.monitoring_mode = MU_MONITORING_MODE_REPORTING;
     item.aggregate_state.aggregate_type = MU_ID_AGGREGATETYPE_WORST_QUALITY_2;
-    item.aggregate_state.sample_count = 1;
+
+    mu_variant_t good_sample = {MU_TYPE_FLOAT, {.f = 1.0f}};
+    mu_variant_t uncertain_sample = {MU_TYPE_FLOAT, {.f = 2.0f}};
+    mu_variant_t bad_sample = {MU_TYPE_FLOAT, {.f = 3.0f}};
+
+    /* This implementation represents aggregate sample quality only through
+       StatusCode severity; it does not carry separate discrete/analog quality
+       metadata. Cover the OPC UA severity ordering directly: Good < Uncertain < Bad. */
+    item.last_status = MU_STATUS_GOOD;
+    monitored_item_accumulate_aggregate(&item, &good_sample);
+    item.last_status = (opcua_statuscode_t)0x40000000u;
+    monitored_item_accumulate_aggregate(&item, &uncertain_sample);
+    item.last_status = MU_STATUS_BAD_NODATA;
+    monitored_item_accumulate_aggregate(&item, &bad_sample);
+
+    TEST_ASSERT_EQUAL_UINT32(3, item.aggregate_state.sample_count);
 
     monitored_item_publish_aggregate(&item, 100);
 
     TEST_ASSERT_EQUAL(1, item.queue_count);
     TEST_ASSERT_EQUAL(MU_TYPE_STATUSCODE, item.queue[0].value.type);
-    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, item.queue[0].value.value.status);
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_BAD_NODATA, item.queue[0].value.value.status);
 }
 
 /* T052h: AnnotationCount aggregate (OPC-10000-13 §4.2.2.2) */

@@ -128,7 +128,7 @@ static opcua_statuscode_t decode_scalar_field(mu_binary_reader_t *reader, opcua_
     }
 }
 
-static size_t field_type_size(opcua_uint32_t type_id) {
+static size_t scalar_type_size(opcua_uint32_t type_id) {
     switch (type_id) {
     case OPC_DT_BOOLEAN:
         return sizeof(opcua_boolean_t);
@@ -169,9 +169,33 @@ static size_t field_type_size(opcua_uint32_t type_id) {
     }
 }
 
+static size_t structure_value_size(const mu_structure_definition_t *def);
+
+static size_t field_value_size(const mu_structure_field_t *field) {
+    opcua_uint32_t type_id = field_type_id_from_nodeid(&field->data_type);
+    if (type_id != 0)
+        return scalar_type_size(type_id);
+    if (field->nested_structure != NULL)
+        return structure_value_size(field->nested_structure);
+    return 0;
+}
+
+static size_t structure_value_size(const mu_structure_definition_t *def) {
+    size_t size = 0;
+    if (def == NULL)
+        return 0;
+    for (opcua_uint16_t fi = 0; fi < def->field_count; fi++) {
+        const mu_structure_field_t *field = &def->fields[fi];
+        if (field->is_optional && fi % 32 == 0)
+            size += sizeof(opcua_uint32_t);
+        size += field_value_size(field);
+    }
+    return size;
+}
+
 opcua_statuscode_t mu_binary_encode_struct(mu_binary_writer_t *writer, const mu_structure_definition_t *def,
                                            const void *field_values) {
-    if (writer == NULL || def == NULL || field_values == NULL)
+    if (writer == NULL || def == NULL || (field_values == NULL && def->field_count != 0))
         return MU_STATUS_BAD_INVALIDARGUMENT;
     if (writer->status != MU_STATUS_GOOD)
         return writer->status;
@@ -189,15 +213,20 @@ opcua_statuscode_t mu_binary_encode_struct(mu_binary_writer_t *writer, const mu_
             if (fi % 32 == 0) {
                 memcpy(&mask_value, base + offset, sizeof(opcua_uint32_t));
                 offset += sizeof(opcua_uint32_t);
+                opcua_statuscode_t sc = mu_binary_write_uint32(writer, mask_value);
+                if (sc != MU_STATUS_GOOD)
+                    return sc;
             }
             if (!(mask_value & ((opcua_uint32_t)1u << (fi % 32)))) {
-                if (type_id != 0)
-                    offset += (opcua_uint32_t)field_type_size(type_id);
+                size_t skipped_size = field_value_size(f);
+                if (skipped_size == 0)
+                    return MU_STATUS_BAD_INVALIDARGUMENT;
+                offset += (opcua_uint32_t)skipped_size;
                 continue;
             }
         }
 
-        size_t fsize = field_type_size(type_id);
+        size_t fsize = field_value_size(f);
         const void *field_ptr = (const void *)(base + offset);
 
         if (f->value_rank >= 0 && type_id != 0) {
@@ -206,6 +235,8 @@ opcua_statuscode_t mu_binary_encode_struct(mu_binary_writer_t *writer, const mu_
             offset += sizeof(opcua_int32_t);
             field_ptr = (const void *)(base + offset);
             mu_binary_write_int32(writer, arr_len);
+            if (arr_len < 0)
+                continue;
             for (opcua_int32_t ai = 0; ai < arr_len && writer->status == MU_STATUS_GOOD; ai++) {
                 opcua_statuscode_t sc =
                     encode_scalar_field(writer, type_id, (const opcua_byte_t *)field_ptr + (size_t)ai * fsize);
@@ -213,8 +244,28 @@ opcua_statuscode_t mu_binary_encode_struct(mu_binary_writer_t *writer, const mu_
                     return sc;
             }
             offset += (opcua_uint32_t)arr_len * (opcua_uint32_t)fsize;
+        } else if (f->value_rank >= 0 && f->nested_structure != NULL) {
+            opcua_int32_t arr_len = 0;
+            memcpy(&arr_len, base + offset, sizeof(opcua_int32_t));
+            offset += sizeof(opcua_int32_t);
+            field_ptr = (const void *)(base + offset);
+            mu_binary_write_int32(writer, arr_len);
+            if (arr_len < 0)
+                continue;
+            for (opcua_int32_t ai = 0; ai < arr_len && writer->status == MU_STATUS_GOOD; ai++) {
+                opcua_statuscode_t sc = mu_binary_encode_struct(writer, f->nested_structure,
+                                                                (const opcua_byte_t *)field_ptr + (size_t)ai * fsize);
+                if (sc != MU_STATUS_GOOD)
+                    return sc;
+            }
+            offset += (opcua_uint32_t)arr_len * (opcua_uint32_t)fsize;
         } else if (type_id != 0) {
             opcua_statuscode_t sc = encode_scalar_field(writer, type_id, field_ptr);
+            if (sc != MU_STATUS_GOOD)
+                return sc;
+            offset += (opcua_uint32_t)fsize;
+        } else if (f->nested_structure != NULL && f->value_rank < 0) {
+            opcua_statuscode_t sc = mu_binary_encode_struct(writer, f->nested_structure, field_ptr);
             if (sc != MU_STATUS_GOOD)
                 return sc;
             offset += (opcua_uint32_t)fsize;
@@ -227,7 +278,7 @@ opcua_statuscode_t mu_binary_encode_struct(mu_binary_writer_t *writer, const mu_
 
 opcua_statuscode_t mu_binary_decode_struct(mu_binary_reader_t *reader, const mu_structure_definition_t *def,
                                            void *field_values) {
-    if (reader == NULL || def == NULL || field_values == NULL)
+    if (reader == NULL || def == NULL || (field_values == NULL && def->field_count != 0))
         return MU_STATUS_BAD_INVALIDARGUMENT;
     if (reader->status != MU_STATUS_GOOD)
         return reader->status;
@@ -240,18 +291,21 @@ opcua_statuscode_t mu_binary_decode_struct(mu_binary_reader_t *reader, const mu_
     for (fi = 0; fi < def->field_count; fi++) {
         const mu_structure_field_t *f = &def->fields[fi];
         opcua_uint32_t type_id = field_type_id_from_nodeid(&f->data_type);
-        size_t fsize = field_type_size(type_id);
+        size_t fsize = field_value_size(f);
 
         if (f->is_optional) {
             if (fi % 32 == 0) {
-                memcpy(&mask_value, (opcua_byte_t *)field_values + offset, sizeof(opcua_uint32_t));
+                opcua_statuscode_t sc = mu_binary_read_uint32(reader, &mask_value);
+                if (sc != MU_STATUS_GOOD)
+                    return MU_STATUS_BAD_DECODINGERROR;
+                memcpy(base + offset, &mask_value, sizeof(opcua_uint32_t));
                 offset += sizeof(opcua_uint32_t);
             }
             if (!(mask_value & ((opcua_uint32_t)1u << (fi % 32)))) {
-                if (type_id != 0) {
-                    memset((opcua_byte_t *)field_values + offset, 0, fsize);
-                    offset += (opcua_uint32_t)fsize;
-                }
+                if (fsize == 0)
+                    return MU_STATUS_BAD_DECODINGERROR;
+                memset((opcua_byte_t *)field_values + offset, 0, fsize);
+                offset += (opcua_uint32_t)fsize;
                 continue;
             }
         }
@@ -273,13 +327,18 @@ opcua_statuscode_t mu_binary_decode_struct(mu_binary_reader_t *reader, const mu_
                 opcua_statuscode_t sc2 =
                     decode_scalar_field(reader, type_id, (opcua_byte_t *)field_ptr + (size_t)ai * fsize);
                 if (sc2 != MU_STATUS_GOOD)
-                    return sc2;
+                    return MU_STATUS_BAD_DECODINGERROR;
             }
             offset += (opcua_uint32_t)arr_len * (opcua_uint32_t)fsize;
         } else if (type_id != 0) {
             opcua_statuscode_t sc = decode_scalar_field(reader, type_id, field_ptr);
             if (sc != MU_STATUS_GOOD)
-                return sc;
+                return MU_STATUS_BAD_DECODINGERROR;
+            offset += (opcua_uint32_t)fsize;
+        } else if (f->nested_structure != NULL && f->value_rank < 0) {
+            opcua_statuscode_t sc = mu_binary_decode_struct(reader, f->nested_structure, field_ptr);
+            if (sc != MU_STATUS_GOOD)
+                return MU_STATUS_BAD_DECODINGERROR;
             offset += (opcua_uint32_t)fsize;
         } else {
             if (reader->status == MU_STATUS_GOOD)

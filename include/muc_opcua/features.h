@@ -77,4 +77,11 @@
 #endif
 #endif
 
+/* The first client tier is intentionally the only compiled client surface today.
+   Higher tiers are roadmap entries and must not be enabled until their service
+   surfaces exist. */
+#if defined(MUC_OPCUA_CLIENT_MICRO) || defined(MUC_OPCUA_CLIENT_EMBEDDED) || defined(MUC_OPCUA_CLIENT_FULL)
+#error "Only MUC_OPCUA_CLIENT_NANO is implemented"
+#endif
+
 #endif /* MUC_OPCUA_FEATURES_H */

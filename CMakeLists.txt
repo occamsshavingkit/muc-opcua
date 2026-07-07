@@ -11,6 +11,7 @@ else()
     set(MUC_OPCUA_PROFILE_EXPLICIT OFF)
 endif()
 set(MUC_OPCUA_PROFILE "nano" CACHE STRING "Target OPC UA profile (nano, micro, embedded, standard, full, custom)")
+set(MUC_OPCUA_CLIENT_PROFILE "none" CACHE STRING "Target OPC UA client profile (none, nano, micro, embedded, full)")
 
 # Profile resolution
 if((MUC_OPCUA_BUILD_TESTS OR MUC_OPCUA_BUILD_EXAMPLES OR MUC_OPCUA_BUILD_FUZZERS OR MUC_OPCUA_BUILD_BENCHMARKS)
@@ -206,11 +207,24 @@ option(MUC_OPCUA_REVERSE_CONNECT "Build Reverse Connect Facet (server-initiated 
 option(MUC_OPCUA_TIME_SYNC "Build Security Time Synchronization (timestamp population)" OFF)
 option(MUC_OPCUA_NAMESPACES "Build Namespaces metadata node per OPC-10000-5 6.2.10" OFF)
 option(MUC_OPCUA_STANDARD_PROFILE "Apply Standard 2017 profile gates and capacity minima" OFF)
+option(MUC_OPCUA_CLIENT_NANO "Build Nano Embedded UA Client Profile support" OFF)
+option(MUC_OPCUA_ALLOW_HEAP "Allow heap allocation in optional adapters/features" ON)
 option(MUC_OPCUA_SESSION_TIMEOUT "Enable session timeout enforcement" OFF)
 set(MUC_OPCUA_SANITIZERS "" CACHE STRING "Comma-separated list of sanitizers (e.g. address,undefined)")
 if(MUC_OPCUA_SANITIZERS)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fsanitize=${MUC_OPCUA_SANITIZERS}")
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fsanitize=${MUC_OPCUA_SANITIZERS}")
+endif()
+
+if(MUC_OPCUA_CLIENT_PROFILE STREQUAL "none")
+elseif(MUC_OPCUA_CLIENT_PROFILE STREQUAL "nano")
+    set(MUC_OPCUA_CLIENT_NANO ON CACHE BOOL "Build Nano Embedded UA Client Profile support" FORCE)
+elseif(MUC_OPCUA_CLIENT_PROFILE STREQUAL "micro" OR
+       MUC_OPCUA_CLIENT_PROFILE STREQUAL "embedded" OR
+       MUC_OPCUA_CLIENT_PROFILE STREQUAL "full")
+    message(FATAL_ERROR "MUC_OPCUA_CLIENT_PROFILE='${MUC_OPCUA_CLIENT_PROFILE}' is planned but not implemented; use 'nano' or 'none'")
+else()
+    message(FATAL_ERROR "Unknown MUC_OPCUA_CLIENT_PROFILE='${MUC_OPCUA_CLIENT_PROFILE}'")
 endif()
 set(MUC_OPCUA_PLATFORM "host" CACHE STRING "Target platform (host, external, pico, arduino-skeleton)")
 

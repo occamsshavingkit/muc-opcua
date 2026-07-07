@@ -42,7 +42,9 @@ void mu_raise_audit_event(mu_server_t *server, const mu_audit_event_t *event) {
         return;
 
     mu_audit_event_t mutable_event = *event;
-    mutable_event.action_timestamp = 0; /* placeholder — platform time adapter needed for real timestamp */
+    if (server->config.time_adapter.get_time != NULL) {
+        mutable_event.action_timestamp = server->config.time_adapter.get_time(server->config.time_adapter.context);
+    }
 
     size_t i;
     for (i = 0; i < server->audit_callback_count; i++) {

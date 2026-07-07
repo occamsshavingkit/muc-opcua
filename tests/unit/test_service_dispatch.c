@@ -71,7 +71,9 @@ void test_service_dispatch_unsupported_services(void) {
 #ifndef MUC_OPCUA_SERVICE_HISTORY
         MU_ID_HISTORYREADREQUEST,
 #endif
+#if !MUC_OPCUA_REDUNDANCY
         841u /* TransferSubscriptionsRequest_Encoding_DefaultBinary */
+#endif
     };
 
     /* OPC-10000-4 section 7.38.2 defines Bad_ServiceUnsupported for a requested

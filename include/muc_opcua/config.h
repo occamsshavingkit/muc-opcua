@@ -65,6 +65,14 @@
 #define MU_DEFAULT_MAX_CHUNK_COUNT 1
 #define MU_DEFAULT_MAX_MESSAGE_SIZE 8192
 
+#ifndef MU_CLIENT_MAX_SESSIONS
+#define MU_CLIENT_MAX_SESSIONS 1
+#endif
+
+#ifndef MU_CLIENT_DEFAULT_TIMEOUT_MS
+#define MU_CLIENT_DEFAULT_TIMEOUT_MS 5000
+#endif
+
 /**
  * @brief Maximum concurrent TCP connections. Each connection owns exactly one
  * SecureChannel (OPC 10000-6 7.1.2), so this is also the structural ceiling on
@@ -214,7 +222,7 @@
  * the Standard facet is enabled. Covers monitored-item arrays, subscription
  * arrays, parked publish requests, and event infrastructure. */
 #define MU_SUBSCRIPTIONS_STANDARD_STORAGE_BYTES                                                                        \
-    (MU_MAX_MONITORED_ITEMS * (MU_MONITORED_QUEUE_DEPTH * 96 + MU_MAX_TRIGGER_LINKS * 8 + 225) +                       \
+    (MU_MAX_MONITORED_ITEMS * (MU_MONITORED_QUEUE_DEPTH * 96 + MU_MAX_TRIGGER_LINKS * 8 + 368) +                       \
      MU_MAX_SUBSCRIPTIONS * 336 + MU_MAX_PUBLISH_REQUESTS * 48)
 #else
 #define MU_SUBSCRIPTIONS_STANDARD_STORAGE_BYTES 0
@@ -276,6 +284,20 @@
 #define MU_AUDITING_STORAGE_BYTES 0
 #endif
 
+#ifdef MUC_OPCUA_CUSTOM_METHODS
+/* MU_MAX_REGISTERED_METHODS(8) * (method nodeid + callback + context) + count. */
+#define MU_CUSTOM_METHODS_STORAGE_BYTES (8 * 48 + sizeof(size_t))
+#else
+#define MU_CUSTOM_METHODS_STORAGE_BYTES 0
+#endif
+
+#if MUC_OPCUA_SERVER_DIAGNOSTICS
+/* mu_diagnostics_summary_t: 11 uint32 counters. */
+#define MU_SERVER_DIAGNOSTICS_STORAGE_BYTES (11 * sizeof(unsigned int))
+#else
+#define MU_SERVER_DIAGNOSTICS_STORAGE_BYTES 0
+#endif
+
 #ifdef MUC_OPCUA_COMPLEX_TYPES
 /* 8 structures * (def_ptr + nodeid) + 8 enums * (def_ptr + nodeid) + 2 * uint16 */
 #define MU_COMPLEX_TYPES_STORAGE_BYTES (8 * (sizeof(void *) + 24) + 8 * (sizeof(void *) + 24) + 4)
@@ -287,6 +309,7 @@
     (MU_SERVER_STORAGE_BASE_BYTES + MU_SUBSCRIPTIONS_STANDARD_STORAGE_BYTES + MU_SERVER_SECURITY_STORAGE_BYTES +       \
      MU_ADDRESS_SPACE_INDEX_STORAGE_BYTES + MU_MULTIPLE_CONNECTIONS_STORAGE_BYTES + MU_EVENTS_STORAGE_BYTES +          \
      MU_PUBSUB_STORAGE_BYTES + MU_NODEMANAGEMENT_STORAGE_BYTES + MU_ALARMS_CONDITIONS_STORAGE_BYTES +                  \
-     MU_CHUNK_ASSEMBLY_STORAGE_BYTES + MU_AUDITING_STORAGE_BYTES + MU_COMPLEX_TYPES_STORAGE_BYTES)
+     MU_CHUNK_ASSEMBLY_STORAGE_BYTES + MU_AUDITING_STORAGE_BYTES + MU_CUSTOM_METHODS_STORAGE_BYTES +                   \
+     MU_SERVER_DIAGNOSTICS_STORAGE_BYTES + MU_COMPLEX_TYPES_STORAGE_BYTES + MU_QUERY_STORAGE_BYTES)
 
 #endif /* MUC_OPCUA_CONFIG_H */

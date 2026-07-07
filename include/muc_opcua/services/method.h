@@ -27,10 +27,8 @@ typedef struct {
     mu_variant_t *output_arguments;
     size_t output_count;
     /* Per-input-argument status codes returned to the client */
-    mu_status_code_t *input_argument_results;
+    opcua_statuscode_t *input_argument_results;
 } mu_method_call_t;
-
-typedef opcua_statuscode_t (*mu_method_callback_t)(struct mu_server *server, const mu_method_call_t *call);
 
 #define MU_MAX_METHOD_REGISTRATIONS 16
 
@@ -40,7 +38,7 @@ opcua_statuscode_t mu_method_server_register(struct mu_server *server, const mu_
 opcua_statuscode_t mu_method_server_dispatch(struct mu_server *server, const mu_nodeid_t *object_id,
                                              const mu_nodeid_t *method_id, const mu_variant_t *input_args,
                                              size_t input_count, mu_variant_t *output_args, size_t *output_count,
-                                             mu_status_code_t *input_results);
+                                             opcua_statuscode_t *input_results);
 
 #endif /* MUC_OPCUA_METHOD_SERVER */
 

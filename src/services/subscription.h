@@ -111,14 +111,17 @@ typedef struct {
 #if MUC_OPCUA_AGGREGATE_FULL
         struct {
             opcua_uint32_t value;
-        } cnt;
+        } count;
         struct {
             mu_variant_t min_val;
             mu_variant_t max_val;
         } range;
         struct {
             opcua_uint64_t start_ms;
+            opcua_uint64_t previous_ms;
             opcua_uint64_t running_total_ms;
+            opcua_statuscode_t status;
+            bool matches;
         } duration;
         struct {
             opcua_uint32_t good_count;

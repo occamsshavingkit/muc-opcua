@@ -38,6 +38,16 @@ This document maps implementation and test files back to OPC UA normative sectio
 | `src/core/service_context.h` | Service Context | OPC-10000-4 | — | Lightweight header for service-layer modules; incremental core↔services separation |
 | `src/core/message_chunk.c` | MessageChunk | OPC-10000-6 | 6.7.2, 7.1.2.2 | TCP message type, chunk finality, abort chunk, and MessageHeader validation |
 | `src/core/tcp_connection.c` | OPC UA TCP | OPC-10000-6 | 7.1.2.3, 7.1.2.4, 7.2 | Hello/Acknowledge parsing, endpoint URL limits, and negotiated buffer bounds |
+| `include/muc_opcua/client.h` | Nano Client API | OPC-10000-4 / OPC-10000-6 / OPC-10000-7 | 5.4.2, 5.5.2, 5.5.3, 5.6.2, 5.6.3, 5.6.4, 5.8.2, 5.8.3, 5.8.4, 5.10.2 / 7.1.2.3, 7.1.2.4, 7.2 / 4.2 | Caller-owned Nano client API, state, transport adapter contract, and service result types |
+| `src/client/client_internal.h` | Nano Client Internal Interface | OPC-10000-4 / OPC-10000-6 | 5.5.2, 5.5.3 / 7.2 | Internal SecureChannel helper declarations for client lifecycle orchestration |
+| `src/client/client.c` | Nano Client Lifecycle | OPC-10000-4 / OPC-10000-6 | 5.4.2, 5.5.2 / 7.1.2.3, 7.1.2.4 | Client initialization, connect/disconnect orchestration, endpoint metadata |
+| `src/client/client_secure_channel.c` | Nano Client SecureChannel | OPC-10000-4 / OPC-10000-6 | 5.5.2, 5.5.3 / 7.2 | Client-side OpenSecureChannel and CloseSecureChannel state |
+| `src/client/client_session.c` | Nano Client Session | OPC-10000-4 | 5.6.2, 5.6.3, 5.6.4 | Client-side CreateSession, ActivateSession, and CloseSession state |
+| `src/client/client_read.c` | Nano Client Read | OPC-10000-4 | 5.10.2, 7.38.2 | Read API result and per-node StatusCode handling |
+| `src/client/client_browse.c` | Nano Client Browse | OPC-10000-4 | 5.8.2, 5.8.3, 5.8.4, 7.38.2 | Browse, BrowseNext, TranslateBrowsePathsToNodeIds API behavior |
+| `src/client/client_state.c` | Nano Client State Machine | OPC-10000-4 / OPC-10000-6 | 5.5.2, 5.6.2, 5.6.3, 5.6.4 / 7.2 | Client lifecycle state transition guard |
+| `src/client/client_errors.c` | Nano Client StatusCodes | OPC-10000-4 / OPC-10000-6 | 7.38.2 / 7.1.5 | Reserved client-local StatusCode mapping translation unit |
+| `src/platform/posix_client_transport.c` | Nano Client Host Transport | OPC-10000-6 | 7.1.2.3, 7.1.2.4, 7.2 | POSIX socket adapter for client-side opc.tcp connect/send/receive/close |
 | `include/muc_opcua/services/node_management.h` | NodeManagement | OPC-10000-4 | 5.8.2, 5.8.3, 5.8.4, 5.8.5 | NodeManagement services interface |
 | `src/services/node_management/add_nodes.c` | NodeManagement (AddNodes) | OPC-10000-4 | 5.8.2.2, 7.24.2 | AddNodes decoding and bounded ownership of persistent node data |
 | `src/services/node_management/add_references.c` | NodeManagement (AddReferences) | OPC-10000-4 | 5.8.3.2 | AddReferences decoding |
@@ -84,6 +94,7 @@ This document maps implementation and test files back to OPC UA normative sectio
 | `tests/unit/test_session.c` | Tests | OPC-10000-4 | 5.7.2, 5.7.2.1, 5.7.2.2, 5.7.2.3, 7.38.2 | CreateSession truncation, token freshness, channel binding, and nonce tests |
 | `tests/unit/test_subscriptions_errors.c` | Tests | OPC-10000-4 / OPC-10000-6 | 5.13.2.4, 5.13.3.4, 5.14.5.1, 7.22.1, 7.22.2, 7.38.2 / 5.2.2.15 | MonitoringFilter error and oversize Publish response tests |
 | `tests/unit/test_tcp_connection.c` | Tests | OPC-10000-6 | 7.1.2.3, 7.1.2.4 | HEL/ACK negotiated buffer-size boundary tests |
+| `tests/unit/test_nano_client.c` | Tests | OPC-10000-4 / OPC-10000-6 / OPC-10000-7 | 5.4.2, 5.5.2, 5.5.3, 5.6.2, 5.6.3, 5.6.4, 5.8.2, 5.8.3, 5.8.4, 5.10.2, 7.38.2 / 7.1.2.3, 7.1.2.4, 7.2 / 4.2 | Nano client API, state, read, browse, SecurityPolicy None, and connection-loss tests |
 | `tests/unit/test_traceability_docs.c` | Tests | OPC-10000-4 / OPC-10000-6 / OPC-10000-7 / OPC-10000-13 / OPC-10000-14 | 5.5.2, 5.5.4, 5.6.2, 5.7.2, 5.7.3, 5.13.2.4, 5.13.3.4, 5.14, 7.22.1, 7.22.4, 7.38.2 / 5.2, 5.2.2.15, 5.2.2.16, 5.2.5, 6.7.2, 7.1.2.2, 7.1.2.3, 7.1.2.4 / 4.2, 4.3 / 4.2.2.4, 4.2.2.9, 4.2.2.10, 5.4.3.5, 5.4.3.10, 5.4.3.11 / 7.2.4.4.2, 7.2.4.5.2, 7.2.4.5.5 | Files-to-sections, sections-to-files, and feature traceability coverage gate tests |
 | `tests/unit/test_write_errors.c` | Tests | OPC-10000-4 | 5.11.4.2, 5.11.4.3, 5.11.4.4, 7.38.2 | Write request parameter and per-operation StatusCode tests |
 | `tests/fuzz/fuzz_binary_reader.c` | Fuzz Tests | OPC-10000-6 | 5.2, 5.2.5 | Binary reader fuzz coverage for declared lengths and malformed array counts |
