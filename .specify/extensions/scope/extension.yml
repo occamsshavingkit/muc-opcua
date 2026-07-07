@@ -1,0 +1,43 @@
+schema_version: "1.0"
+
+extension:
+  id: scope
+  name: "Spec Scope"
+  version: "1.0.0"
+  description: "Effort estimation and scope tracking — estimate work, detect creep, and budget time per phase"
+  author: "Quratulain-bilal"
+  repository: "https://github.com/Quratulain-bilal/spec-kit-scope"
+  license: "MIT"
+
+requires:
+  speckit_version: ">=0.4.0"
+
+provides:
+  commands:
+    - name: speckit.scope.estimate
+      file: commands/speckit.scope.estimate.md
+      description: "Estimate effort from spec complexity, requirement count, task phases, and technical decisions"
+    - name: speckit.scope.compare
+      file: commands/speckit.scope.compare.md
+      description: "Compare two specs or two versions of a spec to quantify scope differences"
+    - name: speckit.scope.creep
+      file: commands/speckit.scope.creep.md
+      description: "Detect scope creep by comparing current spec against its original version in git history"
+    - name: speckit.scope.budget
+      file: commands/speckit.scope.budget.md
+      description: "Generate a time budget showing estimated hours per phase, requirement, and risk buffer"
+
+hooks:
+  after_specify:
+    command: speckit.scope.estimate
+    optional: true
+    prompt: "Estimate effort for this spec?"
+    description: "Auto-generate effort estimate after spec is written"
+
+tags:
+  - "estimation"
+  - "scope"
+  - "effort"
+  - "planning"
+  - "project-management"
+  - "tracking"

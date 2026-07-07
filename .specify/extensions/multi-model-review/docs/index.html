@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>multi-model-review - Multi-model code review for Spec-Driven Development</title>
+  <meta name="description" content="Route spec authoring, implementation, and review across different models. A Claude Code plugin that turns GitHub Spec Kit artifacts and diffs into compact cross-model handoffs.">
+  <meta property="og:title" content="multi-model-review">
+  <meta property="og:description" content="Compact-first multi-model code review for Spec-Driven Development.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://formin.github.io/multi-model-review/">
+  <style>
+    :root {
+      --bg: #0d1117;
+      --panel: #161b22;
+      --border: #30363d;
+      --text: #e6edf3;
+      --muted: #7d8590;
+      --accent: #58a6ff;
+      --accent-hover: #79c0ff;
+      --code-bg: #1f2428;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", ui-sans-serif, system-ui, sans-serif;
+      font-size: 16px;
+      line-height: 1.6;
+    }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { color: var(--accent-hover); text-decoration: underline; }
+    .container {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 2.5rem 1.25rem;
+    }
+    .hero {
+      text-align: center;
+      padding: 1.5rem 0 2rem;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 2rem;
+    }
+    .hero h1 {
+      margin: 0 0 0.5rem;
+      font-size: 2.5rem;
+      font-weight: 700;
+      font-family: ui-monospace, SFMono-Regular, monospace;
+    }
+    .hero p.tagline {
+      margin: 0.5rem 0 1.25rem;
+      font-size: 1.15rem;
+      color: var(--muted);
+    }
+    .badges {
+      display: flex;
+      justify-content: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin: 1rem 0;
+    }
+    .badge {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+    .cta {
+      display: inline-block;
+      margin-top: 1rem;
+      padding: 0.6rem 1.25rem;
+      background: var(--accent);
+      color: var(--bg);
+      border-radius: 6px;
+      font-weight: 600;
+      transition: background 0.15s;
+    }
+    .cta:hover { background: var(--accent-hover); color: var(--bg); text-decoration: none; }
+    h2 {
+      margin-top: 2.5rem;
+      padding-bottom: 0.4rem;
+      border-bottom: 1px solid var(--border);
+      font-size: 1.5rem;
+    }
+    h3 { margin-top: 1.75rem; font-size: 1.15rem; }
+    code {
+      background: var(--code-bg);
+      padding: 0.15rem 0.4rem;
+      border-radius: 4px;
+      font-size: 0.9em;
+      font-family: ui-monospace, SFMono-Regular, "Consolas", monospace;
+    }
+    pre {
+      background: var(--code-bg);
+      padding: 1rem;
+      border-radius: 6px;
+      overflow-x: auto;
+      border: 1px solid var(--border);
+    }
+    pre code { background: transparent; padding: 0; font-size: 0.88rem; }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin: 1rem 0;
+    }
+    th, td {
+      padding: 0.6rem 0.8rem;
+      border: 1px solid var(--border);
+      text-align: left;
+    }
+    th { background: var(--panel); }
+    blockquote {
+      border-left: 3px solid var(--border);
+      padding: 0.25rem 1rem;
+      color: var(--muted);
+      margin: 1rem 0;
+    }
+    .ad-slot {
+      margin: 2.5rem auto;
+      text-align: center;
+      min-height: 260px;
+    }
+    footer {
+      margin-top: 3rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 0.9rem;
+      text-align: center;
+    }
+    @media (max-width: 600px) {
+      .hero h1 { font-size: 1.8rem; }
+      .container { padding: 1.5rem 1rem; }
+    }
+  </style>
+</head>
+<body>
+  <main class="container">
+    <section class="hero">
+      <h1>multi-model-review</h1>
+      <p class="tagline">Multi-model code review for Spec-Driven Development.</p>
+      <p>Write specs with <strong>one</strong> model, implement with <strong>another</strong>, and review with a <strong>different</strong> one. A Claude Code plugin built on top of <a href="https://github.com/github/spec-kit">GitHub Spec Kit</a>.</p>
+      <div class="badges">
+        <span class="badge">Compact-first</span>
+        <span class="badge">Codex 5.5 / Opus 4.7 specs</span>
+        <span class="badge">Claude Sonnet 4.6 implementation</span>
+        <span class="badge">Auto subagent routing</span>
+        <span class="badge">MIT</span>
+      </div>
+      <div>
+        <a class="cta" href="https://github.com/formin/multi-model-review">View on GitHub</a>
+      </div>
+    </section>
+
+    <section>
+      <h2>Why multi-model?</h2>
+      <p>A model reviewing its own output often rationalizes. A different model can catch different classes of issues, and this project makes that handoff cheap enough to do regularly.</p>
+      <ul>
+        <li>separate model routing for spec authoring, implementation, subagent task slices, and review</li>
+        <li>portable markdown package instead of shared session state</li>
+        <li>compact-first packaging to reduce token cost</li>
+        <li>Codex CLI reviewers can use local OSS providers through <code>--oss</code></li>
+        <li>confidence-gated findings for easier remediation</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Recommended model routing</h2>
+      <table>
+        <thead>
+          <tr><th>Stage</th><th>Default</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Spec authoring</td><td><code>codex-5.5:xhigh@normal</code></td></tr>
+          <tr><td>Heavy spec authoring</td><td><code>opus-4.7:1m@max</code></td></tr>
+          <tr><td>Implementation</td><td><code>sonnet-4.6@high</code>, with silent upgrade disabled</td></tr>
+          <tr><td>Review</td><td><code>codex-5.5:high@normal</code></td></tr>
+          <tr><td>Fast subagent scout</td><td><code>haiku-4.5@normal</code></td></tr>
+          <tr><td>Subagent routing</td><td><code>auto</code>, balanced policy</td></tr>
+        </tbody>
+      </table>
+      <p>Detailed model specs use <code>&lt;model&gt;[:&lt;axis-a&gt;][@&lt;axis-b&gt;]</code>. Codex axes map to <code>reasoning</code> and <code>speed</code>; Claude axes map to <code>context</code> and <code>workload</code>.</p>
+    </section>
+
+    <section>
+      <h2>Codex local providers</h2>
+      <p>Codex CLI review and spec-author handoffs can run through local OSS providers such as Ollama or LM Studio when Codex is configured with <code>oss_provider</code> and invoked with <code>--oss</code>. Provider selection stays in Codex CLI configuration; the extension keeps the selected model string in handoff metadata.</p>
+      <pre><code>codex exec --oss -m &lt;local-model&gt; --file .cross-review/packages/&lt;pkg&gt;/review-package.md &gt; .cross-review/packages/&lt;pkg&gt;/review-report.md</code></pre>
+    </section>
+
+    <section>
+      <h2>Automatic subagent routing</h2>
+      <p>The plugin ships Claude Code subagents for fast scouting, heavy planning, scoped implementation, and local review checks. When <code>subagent_routing.mode</code> is <code>auto</code>, task hints such as <code>[route:scout]</code> or <code>[route:worker]</code> let Claude Code pick the matching subagent and configured role model.</p>
+      <table>
+        <thead>
+          <tr><th>Route</th><th>Subagent</th><th>Default model</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>scout</code></td><td><code>mmr-context-scout</code></td><td><code>haiku</code></td></tr>
+          <tr><td><code>heavy-planner</code></td><td><code>mmr-heavy-planner</code></td><td><code>opus</code></td></tr>
+          <tr><td><code>worker</code></td><td><code>mmr-implementation-worker</code></td><td><code>sonnet</code></td></tr>
+          <tr><td><code>review-checker</code></td><td><code>mmr-review-checker</code></td><td><code>sonnet</code></td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <div class="ad-slot">
+      <ins class="kakao_ad_area" style="display:none;width:100%;"
+        data-ad-unit="DAN-7PRwND7ZMiqSCjr6"
+        data-ad-width="300"
+        data-ad-height="250"
+        data-ad-onfail="adfitOnFail"></ins>
+    </div>
+
+    <section>
+      <h2>Compact-first review packages</h2>
+      <p>The default package is no longer a full dump of <code>spec.md</code>, <code>plan.md</code>, <code>tasks.md</code>, and the raw diff. It now starts with focused summaries and high-signal excerpts inspired by <a href="https://github.com/rtk-ai/rtk">RTK</a>.</p>
+      <table>
+        <thead>
+          <tr><th>Profile</th><th>Use case</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>micro</code></td><td>tiny MCP-sized review loops</td></tr>
+          <tr><td><code>compact</code></td><td>default balanced package</td></tr>
+          <tr><td><code>full</code></td><td>escalation pass when the reviewer needs more context</td></tr>
+        </tbody>
+      </table>
+      <p>If a reviewer needs more information, it can say <code>Context sufficiency: needs-full-package</code> and the builder reruns packaging with <code>--full</code> or narrows the scope with <code>--paths</code>.</p>
+    </section>
+
+    <section>
+      <h2>Install</h2>
+      <p><strong>Slash commands such as <code>/plugin install</code> run inside Claude Code, not at your OS shell.</strong></p>
+      <pre><code>/plugin install multi-model-review@multi-model-review</code></pre>
+      <p>Or at the OS shell:</p>
+      <pre><code>claude plugin install multi-model-review@multi-model-review
+claude plugin list</code></pre>
+      <p>Then run <code>/reload-plugins</code> or restart Claude Code.</p>
+    </section>
+
+    <section>
+      <h2>Commands</h2>
+      <table>
+        <thead>
+          <tr><th>Invocation</th><th>Purpose</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>/multi-model-review:cross-review [init|status|models set] [--spec &lt;model[:axis]@axis&gt;] [--spec-heavy &lt;model[:axis]@axis&gt;] [--dev &lt;model[:axis]@axis&gt;] [--review &lt;model[:axis]@axis&gt;] [--subagents auto|off]</code></td><td>configure model routing, subagent roles, reviewer, base ref, and default package profile</td></tr>
+          <tr><td><code>/multi-model-review:spec-handoff [slug|brief] [--spec-model &lt;model[:axis]@axis&gt;] [--heavy] [--plan] [--subagents auto|off]</code></td><td>export the development spec or plan handoff</td></tr>
+          <tr><td><code>/multi-model-review:review-package [slug|task-id] [--review-model &lt;model[:axis]@axis&gt;] [--base &lt;ref&gt;] [--full] [--paths &lt;glob,...&gt;]</code></td><td>export the compact reviewer handoff</td></tr>
+          <tr><td><code>/multi-model-review:apply-review [path] [--min-confidence N] [--subagents auto|off]</code></td><td>ingest the review report and walk through fixes</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>Quick workflow</h2>
+      <ol>
+        <li>Run <code>/multi-model-review:cross-review init --spec codex-5.5:xhigh@normal --spec-heavy opus-4.7:1m@max --dev sonnet-4.6@high --review codex-5.5:high@normal --subagents auto</code>.</li>
+        <li>Run <code>/multi-model-review:spec-handoff --spec-model codex-5.5:xhigh@normal</code> or add <code>--heavy</code> for a large audit.</li>
+        <li>Implement the feature with your configured implementation model and route clear slices to the matching subagent; silent upgrade is disabled by default.</li>
+        <li>Run <code>/multi-model-review:review-package --review-model codex-5.5:high@normal</code> to create a compact package.</li>
+        <li>Run the reviewer model on that package in another terminal.</li>
+        <li>Run <code>/multi-model-review:apply-review</code> to apply accepted findings.</li>
+      </ol>
+    </section>
+
+    <section>
+      <h2>Learn more</h2>
+      <ul>
+        <li><a href="https://github.com/formin/multi-model-review">GitHub repository</a></li>
+        <li><a href="https://github.com/formin/multi-model-review/blob/main/README.md">README</a></li>
+        <li><a href="https://github.com/formin/multi-model-review/blob/main/docs/USAGE.md">Usage guide</a></li>
+        <li><a href="https://github.com/formin/multi-model-review/blob/main/docs/EXAMPLE.md">Worked example</a></li>
+        <li><a href="https://github.com/formin/multi-model-review/blob/main/docs/TOKEN_EFFICIENCY.md">Token efficiency notes</a></li>
+        <li><a href="https://github.com/github/spec-kit">GitHub Spec Kit</a></li>
+        <li><a href="https://github.com/rtk-ai/rtk">RTK</a></li>
+      </ul>
+    </section>
+
+    <footer>
+      <p>MIT License · 2026 <a href="https://github.com/formin">formin</a> · <a href="https://github.com/formin/multi-model-review/issues">Report an issue</a></p>
+    </footer>
+  </main>
+
+  <script>
+    function adfitOnFail(unitId) {
+      var ins = document.querySelector('ins.kakao_ad_area[data-ad-unit="' + unitId + '"]');
+      if (ins && ins.parentElement) ins.parentElement.style.display = 'none';
+    }
+  </script>
+  <script async type="text/javascript" charset="utf-8" src="https://t1.kakaocdn.net/kas/static/ba.min.js"></script>
+</body>
+</html>

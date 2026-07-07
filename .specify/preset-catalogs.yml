@@ -1,0 +1,6 @@
+catalogs:
+- name: community-presets
+  url: https://raw.githubusercontent.com/github/spec-kit/main/presets/catalog.community.json
+  priority: 2
+  install_allowed: true
+  description: ''

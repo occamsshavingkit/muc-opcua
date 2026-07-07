@@ -8,14 +8,14 @@
       "enabled": true,
       "priority": 10,
       "registered_commands": {
-        "agy": [
+        "claude": [
           "speckit.git.feature",
           "speckit.git.validate",
           "speckit.git.remote",
           "speckit.git.initialize",
           "speckit.git.commit"
         ],
-        "codex": [
+        "opencode": [
           "speckit.git.feature",
           "speckit.git.validate",
           "speckit.git.remote",
@@ -24,7 +24,476 @@
         ]
       },
       "registered_skills": [],
-      "installed_at": "2026-06-25T18:46:47.301404+00:00"
+      "installed_at": "2026-07-06T11:42:00.588596+00:00"
+    },
+    "worktree": {
+      "version": "1.0.0",
+      "source": "local",
+      "manifest_hash": "sha256:7b5d0963fcc6b0f13a38e81448be0604186ab699388b75adbe536387fdd9cf27",
+      "enabled": true,
+      "priority": 10,
+      "registered_commands": {
+        "claude": [
+          "speckit.worktree.create",
+          "speckit.worktree.list",
+          "speckit.worktree.clean"
+        ],
+        "opencode": [
+          "speckit.worktree.create",
+          "speckit.worktree.list",
+          "speckit.worktree.clean"
+        ]
+      },
+      "registered_skills": [],
+      "installed_at": "2026-07-06T11:46:14.785847+00:00"
+    },
+    "branch-convention": {
+      "version": "1.0.0",
+      "source": "local",
+      "manifest_hash": "sha256:7efe1bfce264c25a4eddce6d65aa74ebc63a532b82e2d82264155e82c39d3859",
+      "enabled": true,
+      "priority": 10,
+      "registered_commands": {
+        "claude": [
+          "speckit.branch-convention.configure",
+          "speckit.branch-convention.validate",
+          "speckit.branch-convention.rename"
+        ],
+        "opencode": [
+          "speckit.branch-convention.configure",
+          "speckit.branch-convention.validate",
+          "speckit.branch-convention.rename"
+        ]
+      },
+      "registered_skills": [],
+      "installed_at": "2026-07-06T11:46:15.494122+00:00"
+    },
+    "checkpoint": {
+      "version": "1.0.0",
+      "source": "local",
+      "manifest_hash": "sha256:f1f8587fcfee109d13e5fd2837df498439695218b32d00083f6e98095fca64c0",
+      "enabled": true,
+      "priority": 10,
+      "registered_commands": {
+        "claude": [
+          "speckit.checkpoint.commit"
+        ],
+        "opencode": [
+          "speckit.checkpoint.commit"
+        ]
+      },
+      "registered_skills": [],
+      "installed_at": "2026-07-06T11:46:16.200277+00:00"
+    },
+    "discovery": {
+      "version": "0.2.0",
+      "source": "local",
+      "manifest_hash": "sha256:9e724bc23a6290c9e0e3433282a8bcb4e8f9d432efdd86a60c7c153a6fb718e1",
+      "enabled": true,
+      "priority": 10,
+      "registered_commands": {
+        "claude": [
+          "speckit.discovery.feasibility",
+          "speckit.discovery.techselect",
+          "speckit.discovery.codebase",
+          "speckit.discovery.codebase-api-imp",
+          "speckit.discovery.poc",
+          "speckit.discovery.decision"
+        ],
+        "opencode": [
+          "speckit.discovery.feasibility",
+          "speckit.discovery.techselect",
+          "speckit.discovery.codebase",
+          "speckit.discovery.codebase-api-imp",
+          "speckit.discovery.poc",
+          "speckit.discovery.decision"
+        ]
+      },
+      "registered_skills": [],
+      "installed_at": "2026-07-06T11:46:21.542704+00:00"
+    },
+    "multi-model-review": {
+      "version": "0.1.2",
+      "source": "local",
+      "manifest_hash": "sha256:c8cdb72601548b5d292d26f637621a008788ed74953e97a132f89161c68697f7",
+      "enabled": true,
+      "priority": 10,
+      "registered_commands": {
+        "claude": [
+          "speckit.multi-model-review.cross-review",
+          "speckit.multi-model-review.spec-handoff",
+          "speckit.multi-model-review.review-package",
+          "speckit.multi-model-review.apply-review"
+        ],
+        "opencode": [
+          "speckit.multi-model-review.cross-review",
+          "speckit.multi-model-review.spec-handoff",
+          "speckit.multi-model-review.review-package",
+          "speckit.multi-model-review.apply-review"
+        ]
+      },
+      "registered_skills": [],
+      "installed_at": "2026-07-06T11:46:31.138245+00:00"
+    },
+    "agent-assign": {
+      "version": "1.0.0",
+      "source": "local",
+      "manifest_hash": "sha256:5e5c8ca8e58d032fa4485c4c06f270623911fd12f1e8a7e0dec971531d7a8802",
+      "enabled": true,
+      "priority": 10,
+      "registered_commands": {
+        "claude": [
+          "speckit.agent-assign.assign",
+          "speckit.agent-assign.validate",
+          "speckit.agent-assign.execute"
+        ],
+        "opencode": [
+          "speckit.agent-assign.assign",
+          "speckit.agent-assign.validate",
+          "speckit.agent-assign.execute"
+        ]
+      },
+      "registered_skills": [],
+      "installed_at": "2026-07-06T11:46:32.061240+00:00"
+    },
+    "conduct": {
+      "version": "1.0.1",
+      "source": "local",
+      "manifest_hash": "sha256:0035625ba49176a3cf03680a6168e230db1a6c648337a08b162896d61913cbf3",
+      "enabled": true,
+      "priority": 10,
+      "registered_commands": {
+        "claude": [
+          "speckit.conduct.run"
+        ],
+        "opencode": [
+          "speckit.conduct.run"
+        ]
+      },
+      "registered_skills": [],
+      "installed_at": "2026-07-06T11:46:38.095449+00:00"
+    },
+    "architecture-guard": {
+      "version": "1.8.16",
+      "source": "local",
+      "manifest_hash": "sha256:c21f4ff8ee8b21afcba6bb934246ee7fb281165a8dfb8829e425dfdd0fbfe3c4",
+      "enabled": true,
+      "priority": 10,
+      "registered_commands": {
+        "claude": [
+          "speckit.architecture-guard.governed-plan",
+          "speckit.architecture-guard.governed-tasks",
+          "speckit.architecture-guard.governed-implement",
+          "speckit.architecture-guard.architecture-workflow",
+          "speckit.architecture-guard.architecture-review",
+          "speckit.architecture-guard.violation-detection",
+          "speckit.architecture-guard.refactor-generator",
+          "speckit.architecture-guard.architecture-apply",
+          "speckit.architecture-guard.init",
+          "speckit.architecture-guard.architecture-verify"
+        ],
+        "opencode": [
+          "speckit.architecture-guard.governed-plan",
+          "speckit.architecture-guard.governed-tasks",
+          "speckit.architecture-guard.governed-implement",
+          "speckit.architecture-guard.architecture-workflow",
+          "speckit.architecture-guard.architecture-review",
+          "speckit.architecture-guard.violation-detection",
+          "speckit.architecture-guard.refactor-generator",
+          "speckit.architecture-guard.architecture-apply",
+          "speckit.architecture-guard.init",
+          "speckit.architecture-guard.architecture-verify"
+        ]
+      },
+      "registered_skills": [],
+      "installed_at": "2026-07-06T11:46:42.735805+00:00"
+    },
+    "verify-tasks": {
+      "version": "1.0.0",
+      "source": "local",
+      "manifest_hash": "sha256:6428b6dccaa3daa8aa5d72a73001cd3f82b9908e8c67bedd84697dd7547c96e8",
+      "enabled": true,
+      "priority": 10,
+      "registered_commands": {
+        "claude": [
+          "speckit.verify-tasks.run",
+          "speckit.verify-tasks"
+        ],
+        "opencode": [
+          "speckit.verify-tasks.run",
+          "speckit.verify-tasks"
+        ]
+      },
+      "registered_skills": [],
+      "installed_at": "2026-07-06T11:46:43.596513+00:00"
+    },
+    "cleanup": {
+      "version": "1.0.0",
+      "source": "local",
+      "manifest_hash": "sha256:b15a5e3b4e5b43f867c093d962492f502b01503d0ec174611d0797854b017578",
+      "enabled": true,
+      "priority": 10,
+      "registered_commands": {
+        "claude": [
+          "speckit.cleanup.run",
+          "speckit.cleanup"
+        ],
+        "opencode": [
+          "speckit.cleanup.run",
+          "speckit.cleanup"
+        ]
+      },
+      "registered_skills": [],
+      "installed_at": "2026-07-06T11:46:44.354245+00:00"
+    },
+    "squad": {
+      "version": "1.3.0",
+      "source": "local",
+      "manifest_hash": "sha256:391e942e7465e2bd4ea2fd0040c29d3524855efeb708fbc35f24ed60594207a4",
+      "enabled": true,
+      "priority": 10,
+      "registered_commands": {
+        "claude": [
+          "speckit.squad.init",
+          "speckit.squad.generate",
+          "speckit.squad.route",
+          "speckit.squad.status"
+        ],
+        "opencode": [
+          "speckit.squad.init",
+          "speckit.squad.generate",
+          "speckit.squad.route",
+          "speckit.squad.status"
+        ]
+      },
+      "registered_skills": [],
+      "installed_at": "2026-07-06T11:47:14.034767+00:00"
+    },
+    "roadmap": {
+      "version": "0.1.0",
+      "source": "local",
+      "manifest_hash": "sha256:d8b5c9d56e9d044e9cd5820ad829386ab50ee4e2f112ceb4bb53c7f0cf53651d",
+      "enabled": true,
+      "priority": 10,
+      "registered_commands": {
+        "claude": [
+          "speckit.roadmap.write",
+          "speckit.roadmap.brief",
+          "speckit.roadmap.debrief",
+          "speckit.roadmap.sync"
+        ],
+        "opencode": [
+          "speckit.roadmap.write",
+          "speckit.roadmap.brief",
+          "speckit.roadmap.debrief",
+          "speckit.roadmap.sync"
+        ]
+      },
+      "registered_skills": [],
+      "installed_at": "2026-07-06T11:47:14.655294+00:00"
+    },
+    "refine": {
+      "version": "1.0.0",
+      "source": "local",
+      "manifest_hash": "sha256:f81d942a057a69e00d223e0c2154de0e1040b33f80f9acfc1a15a6e3762ae22b",
+      "enabled": true,
+      "priority": 10,
+      "registered_commands": {
+        "claude": [
+          "speckit.refine.update",
+          "speckit.refine.propagate",
+          "speckit.refine.diff",
+          "speckit.refine.status"
+        ],
+        "opencode": [
+          "speckit.refine.update",
+          "speckit.refine.propagate",
+          "speckit.refine.diff",
+          "speckit.refine.status"
+        ]
+      },
+      "registered_skills": [],
+      "installed_at": "2026-07-06T11:47:20.086577+00:00"
+    },
+    "reconcile": {
+      "version": "1.0.0",
+      "source": "local",
+      "manifest_hash": "sha256:e1674fb7e16923c0e9e32eee78ef5a04626d05f092c56cc7c59e26fab07c210b",
+      "enabled": true,
+      "priority": 10,
+      "registered_commands": {
+        "claude": [
+          "speckit.reconcile.run"
+        ],
+        "opencode": [
+          "speckit.reconcile.run"
+        ]
+      },
+      "registered_skills": [],
+      "installed_at": "2026-07-06T11:47:20.842675+00:00"
+    },
+    "sync": {
+      "version": "0.1.0",
+      "source": "local",
+      "manifest_hash": "sha256:e5f4b9456751e1251693feae987401b3583d67770a43d370741c35182a46d06f",
+      "enabled": true,
+      "priority": 10,
+      "registered_commands": {
+        "claude": [
+          "speckit.sync.analyze",
+          "speckit.drift",
+          "speckit.sync.propose",
+          "speckit.sync.apply",
+          "speckit.sync.conflicts",
+          "speckit.sync.backfill"
+        ],
+        "opencode": [
+          "speckit.sync.analyze",
+          "speckit.drift",
+          "speckit.sync.propose",
+          "speckit.sync.apply",
+          "speckit.sync.conflicts",
+          "speckit.sync.backfill"
+        ]
+      },
+      "registered_skills": [],
+      "installed_at": "2026-07-06T11:47:21.635578+00:00"
+    },
+    "spec-validate": {
+      "version": "1.0.1",
+      "source": "local",
+      "manifest_hash": "sha256:170187e5d80a7d0435b5924e601f65215a18f36914e6cb15cfd1e3662333ac92",
+      "enabled": true,
+      "priority": 10,
+      "registered_commands": {
+        "claude": [
+          "speckit.spec-validate.validate",
+          "speckit.spec-validate.validate-tasks",
+          "speckit.spec-validate.review",
+          "speckit.spec-validate.gate",
+          "speckit.spec-validate.status",
+          "speckit.spec-validate.analytics"
+        ],
+        "opencode": [
+          "speckit.spec-validate.validate",
+          "speckit.spec-validate.validate-tasks",
+          "speckit.spec-validate.review",
+          "speckit.spec-validate.gate",
+          "speckit.spec-validate.status",
+          "speckit.spec-validate.analytics"
+        ]
+      },
+      "registered_skills": [],
+      "installed_at": "2026-07-06T11:47:22.469963+00:00"
+    },
+    "status": {
+      "version": "1.0.0",
+      "source": "local",
+      "manifest_hash": "sha256:25d080d9f1a0ea2fc62de2464479143c7c008b9131d32755f351413605d7946f",
+      "enabled": true,
+      "priority": 10,
+      "registered_commands": {
+        "claude": [
+          "speckit.status.show",
+          "speckit.status"
+        ],
+        "opencode": [
+          "speckit.status.show",
+          "speckit.status"
+        ]
+      },
+      "registered_skills": [],
+      "installed_at": "2026-07-06T11:47:27.282885+00:00"
+    },
+    "doctor": {
+      "version": "1.0.0",
+      "source": "local",
+      "manifest_hash": "sha256:45150c8ac10b6b002ebea9de34a203911951fe3a89cb8635a2a149082c02eeed",
+      "enabled": true,
+      "priority": 10,
+      "registered_commands": {
+        "claude": [
+          "speckit.doctor.check",
+          "speckit.doctor"
+        ],
+        "opencode": [
+          "speckit.doctor.check",
+          "speckit.doctor"
+        ]
+      },
+      "registered_skills": [],
+      "installed_at": "2026-07-06T11:47:28.374910+00:00"
+    },
+    "cost": {
+      "version": "1.0.0",
+      "source": "local",
+      "manifest_hash": "sha256:366789e598074aac218bc4a1aecc910049bef03d2e06bdf0bbb0a74d3a2bdffd",
+      "enabled": true,
+      "priority": 10,
+      "registered_commands": {
+        "claude": [
+          "speckit.cost.track",
+          "speckit.cost.report",
+          "speckit.cost.budget",
+          "speckit.cost.compare",
+          "speckit.cost.export"
+        ],
+        "opencode": [
+          "speckit.cost.track",
+          "speckit.cost.report",
+          "speckit.cost.budget",
+          "speckit.cost.compare",
+          "speckit.cost.export"
+        ]
+      },
+      "registered_skills": [],
+      "installed_at": "2026-07-06T11:47:29.161094+00:00"
+    },
+    "token-budget": {
+      "version": "1.0.1",
+      "source": "local",
+      "manifest_hash": "sha256:2ea8616666abe014ac37b299cbdeea97b9153856eecc0730faabc8c42a1f7111",
+      "enabled": true,
+      "priority": 10,
+      "registered_commands": {
+        "claude": [
+          "speckit.token-budget.compact",
+          "speckit.token-budget.scope",
+          "speckit.token-budget.concise",
+          "speckit.token-budget.usage"
+        ],
+        "opencode": [
+          "speckit.token-budget.compact",
+          "speckit.token-budget.scope",
+          "speckit.token-budget.concise",
+          "speckit.token-budget.usage"
+        ]
+      },
+      "registered_skills": [],
+      "installed_at": "2026-07-06T11:47:30.025422+00:00"
+    },
+    "scope": {
+      "version": "1.0.0",
+      "source": "local",
+      "manifest_hash": "sha256:553f7b3acada294231f8e4790e057463a10372391ab91d168664714bde8a0dc3",
+      "enabled": true,
+      "priority": 10,
+      "registered_commands": {
+        "claude": [
+          "speckit.scope.estimate",
+          "speckit.scope.compare",
+          "speckit.scope.creep",
+          "speckit.scope.budget"
+        ],
+        "opencode": [
+          "speckit.scope.estimate",
+          "speckit.scope.compare",
+          "speckit.scope.creep",
+          "speckit.scope.budget"
+        ]
+      },
+      "registered_skills": [],
+      "installed_at": "2026-07-06T11:47:30.799481+00:00"
     }
   }
 }

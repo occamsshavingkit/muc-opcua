@@ -1,0 +1,237 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "speckit.implement.receipt.v1.schema.json",
+  "title": "Spec Kit Implement Receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract_type",
+    "shard_id",
+    "task_type",
+    "task_ids",
+    "completed_task_ids",
+    "changed_paths",
+    "validation_evidence"
+  ],
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "task_type": {
+            "const": "code_review"
+          }
+        },
+        "required": ["task_type"]
+      },
+      "then": {
+        "required": ["review_conclusion", "data_side_effect_review"]
+      }
+    }
+  ],
+  "properties": {
+    "contract_type": {
+      "const": "speckit.implement.receipt.v1"
+    },
+    "shard_id": {
+      "type": "string",
+      "pattern": "^S[0-9]{2}-(domain-model|api-contract|persistence|service-flow|ui|cli|test-validation|documentation|integration|cleanup)-[0-9]{2}$"
+    },
+    "task_type": {
+      "type": "string",
+      "enum": ["implementation", "code_review"]
+    },
+    "task_ids": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "completed_task_ids": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "changed_paths": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "validation_evidence": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "review_conclusion": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "summary", "checked_sources", "findings"],
+      "properties": {
+        "status": {
+          "enum": ["approved", "changes_requested", "blocked"]
+        },
+        "summary": {
+          "type": "string",
+          "minLength": 1
+        },
+        "checked_sources": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "findings": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "severity", "category", "summary", "resolution"],
+            "properties": {
+              "id": {"type": "string", "minLength": 1},
+              "severity": {"enum": ["low", "medium", "high", "critical"]},
+              "category": {"type": "string", "minLength": 1},
+              "summary": {"type": "string", "minLength": 1},
+              "paths": {
+                "type": "array",
+                "items": {"type": "string"}
+              },
+              "resolution": {
+                "enum": ["repaired", "todo", "accepted", "blocked"]
+              }
+            }
+          }
+        }
+      }
+    },
+    "data_side_effect_review": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "reviewed_diff_paths",
+        "runtime_data_writes_found",
+        "mutation_findings"
+      ],
+      "properties": {
+        "reviewed_diff_paths": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "runtime_data_writes_found": {
+          "type": "boolean"
+        },
+        "mutation_findings": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "severity",
+              "category",
+              "summary",
+              "operation",
+              "tables_or_entities",
+              "fields",
+              "resolution"
+            ],
+            "properties": {
+              "id": {"type": "string", "minLength": 1},
+              "severity": {"enum": ["low", "medium", "high", "critical"]},
+              "category": {"type": "string", "minLength": 1},
+              "summary": {"type": "string", "minLength": 1},
+              "paths": {
+                "type": "array",
+                "items": {"type": "string"}
+              },
+              "operation": {
+                "enum": [
+                  "insert",
+                  "update",
+                  "delete",
+                  "upsert",
+                  "save",
+                  "soft_delete",
+                  "migration",
+                  "backfill",
+                  "external_write",
+                  "unknown"
+                ]
+              },
+              "tables_or_entities": {
+                "type": "array",
+                "items": {"type": "string", "minLength": 1}
+              },
+              "fields": {
+                "type": "array",
+                "items": {"type": "string", "minLength": 1}
+              },
+              "resolution": {
+                "enum": ["repaired", "todo", "accepted", "blocked"]
+              }
+            }
+          }
+        }
+      }
+    },
+    "consistency_repairs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["finding_id", "reason", "changed_paths", "evidence"],
+        "properties": {
+          "finding_id": {"type": "string", "minLength": 1},
+          "reason": {"type": "string", "minLength": 1},
+          "changed_paths": {
+            "type": "array",
+            "minItems": 1,
+            "items": {"type": "string"}
+          },
+          "evidence": {
+            "type": "array",
+            "minItems": 1,
+            "items": {"type": "string", "minLength": 1}
+          }
+        }
+      }
+    },
+    "deferred_validation_todos": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "reason", "missing_environment", "validation_path", "commands", "blocking"],
+        "properties": {
+          "id": {"type": "string", "minLength": 1},
+          "reason": {"type": "string", "minLength": 1},
+          "missing_environment": {
+            "type": "array",
+            "minItems": 1,
+            "items": {"type": "string", "minLength": 1}
+          },
+          "validation_path": {"type": "string", "minLength": 1},
+          "commands": {
+            "type": "array",
+            "minItems": 1,
+            "items": {"type": "string", "minLength": 1}
+          },
+          "blocking": {"type": "boolean"}
+        }
+      }
+    }
+  }
+}

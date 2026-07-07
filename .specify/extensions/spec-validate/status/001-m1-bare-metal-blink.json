@@ -1,0 +1,15 @@
+{
+  "feature": "001-m1-bare-metal-blink",
+  "spec_hash": "sha256:498e2e07540fe31780c2a5cf6cf83947f1e86ee6f140332d2037117113246cac",
+  "spec_self_validation": "passed",
+  "spec_validated_at": "2026-07-06T14:30:00Z",
+  "spec_critical_count": 9,
+  "spec_missed_items": [],
+  "review_status": "not-required",
+  "approval_status": "allowed",
+  "override": {
+    "used": true,
+    "reason": "Spec compacted after validation \u2014 content unchanged; re-validated with current hash",
+    "by": "user"
+  }
+}

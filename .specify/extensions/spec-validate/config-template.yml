@@ -1,0 +1,36 @@
+# Spec Validate Configuration
+
+complexity:
+  low_max_items: 3
+  high_min_items: 8
+
+always_critical_sections:
+  - "Acceptance Criteria"
+  - "Edge Cases"
+  - "Error Handling"
+  - "Security Considerations"
+
+review:
+  require_on_any_miss: true
+  require_on_medium_or_high_complexity: true
+  assignment_mode: manual
+  sla_hours: 24
+  timeout_policy: warning-with-author-reason
+
+gate:
+  block_without_validation: true
+  allow_when_peer_review_approved_even_if_self_validation_stale: true
+  allow_maintainer_override: true
+  require_override_reason: true
+
+privacy:
+  git_store: approval-state-only
+  local_store: attempts-and-analytics
+  personal_metrics_visibility: self-and-maintainers
+  detailed_retention: current-feature-only
+
+question_generation:
+  mode: deterministic-first
+  ai_fallback: true
+  segment_analytics_by_agent: true
+  use_numeric_score_for_gate: false

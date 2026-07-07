@@ -1,0 +1,238 @@
+---
+name: speckit-architecture-guard-governed-implement
+description: Run implementation with memory context, then review the produced implementation
+  against security and architecture constraints.
+compatibility: Requires spec-kit project structure with .specify/ directory
+metadata:
+  author: github-spec-kit
+  source: architecture-guard:commands/governed-implement.md
+---
+
+# Governed Implement Command
+
+You are orchestrating the `governed-implement` workflow for `architecture-guard`.
+
+This command coordinates implementation and post-implementation review to ensure the output respects architectural, historical, and security constraints.
+
+## Flash-Mem-First Architecture Context Retrieval
+
+Try Flash-Mem first: query summary and metadata context before performing architecture analysis.
+
+1. Search Flash-Mem for relevant architecture context:
+   - architecture decisions
+   - ADRs
+   - design constraints
+   - coding conventions
+   - prior guard findings
+   - approved exceptions
+   - architectural patterns
+2. Prefer summary-first retrieval:
+   - use summaries
+   - use metadata
+   - use confidence
+   - use tags
+   - use related files
+3. Load full memory content only when summaries are insufficient.
+4. Reuse approved architectural decisions whenever possible.
+5. Flag conflicts between proposed changes and existing architectural decisions.
+6. After analysis, store durable architecture knowledge back into Flash-Mem:
+   - new architecture decisions
+   - approved exceptions
+   - recurring violations
+   - architectural constraints
+   - project conventions
+   - validated design patterns
+
+If Flash-Mem is unavailable or the retrieved summaries are insufficient, continue with the repository artifacts and constitution files available in the workspace.
+
+## Goal
+
+Provide a single command that ensures:
+1. Implementation is historical-context aware when Flash-Mem is available.
+2. Implementation is performed (`/speckit.implement`).
+3. The output is reviewed for security vulnerabilities (Security Review).
+4. The output is reviewed for architectural drift (Architecture Guard).
+
+## Orchestration Flow
+
+### Step 1 — Detect Optional Integrations
+
+Check for the availability of:
+- `flash-mem` MCP server
+- `spec-kit-security-review` extension
+
+**Detection Logic**:
+1. Detect `flash-mem` as an MCP-backed memory service in the current environment. Do not treat it as a Spec Kit extension or look for it in `.specify/extensions.yml`.
+2. Read `.specify/extensions.yml` and check the `installed` list for `spec-kit-security-review`. Fall back to checking for the extension directory in `.specify/extensions/` only if the YAML is missing or the list is empty.
+3. If either capability is missing, degrade gracefully by skipping only its respective steps.
+
+### Step 2 — Flash-Mem MCP Context Retrieval (Optional)
+
+When Flash-Mem is available, use it first to gather the most relevant architectural context before implementation. Prefer summary-first context and only expand into repository files when needed.
+
+If Flash-Mem is unavailable or the context is insufficient, continue with the repository artifacts and constitution files available in the workspace.
+
+**[OPTIONAL SUB-AGENT DELEGATION]**
+- If the available Flash-Mem context is large or highly branched: Consider sub-agent support for synthesis
+- Sub-agent command: Use the memory synthesis sub-agent when the context is too broad for inline synthesis.
+- Sub-agent benefits: Faster traversal, better filtering, detailed synthesis
+- LLM decides: Inline for quick decisions, sub-agent for complex memory
+
+---
+
+### Step 3 — Orchestrate Spec Kit Implement
+
+You must orchestrate the `/speckit.implement` (core implementation) workflow directly.
+
+**CRITICAL INSTRUCTION**: You must NOT just advise the user or stop here. You must perform the implementation by following the `tasks.md` breakdown:
+1. **Execute Tasks**: Run `/speckit.implement`. If `/speckit.implement` is not available as a registered command, fall back to inline implementation:
+   - Read `specs/<feature>/tasks.md` and execute each unchecked task sequentially.
+   - Read all applicable constitution files and any available Flash-Mem context before coding.
+   - Perform the actual coding work (writing files, running tests) for each task.
+   - Note in the Governance Summary that `/speckit.implement` was unavailable and implementation was performed inline.
+2. **Write Code**: Perform the actual coding work (writing files, running tests) required by the tasks.
+3. **Sync the tasks**: You MUST update `specs/<feature>/tasks.md` to mark completed tasks with `[x]`, check them off, and add any new subtasks discovered during implementation.
+4. The implementation MUST follow current tasks and context. Use Flash-Mem first when available. If Flash-Mem is unavailable or the retrieved context is insufficient, read the constitution files directly with your file-reading tools (absolute or relative paths). Do not rely solely on workspace search or semantic indexers, as these files are often in `.gitignore`:
+   - `specs/<feature>/tasks.md`
+   - `.specify/memory/constitution.md`, `.specify/memory/architecture_constitution.md`, and `.specify/memory/security_constitution.md`.
+   - `specs/<feature>/security-constraints.md` (if available).
+   - Architecture migration plan (if available).
+
+NOTE: The core Spec Kit command is `speckit.implement`. Do not use `speckit.implementation` as it is not a registered command.
+
+### Step 4 — Security Review on Implementation
+
+IF `spec-kit-security-review` is available:
+1. **Execute Review**: Run `/speckit.security-review.branch` to review the produced implementation against security vulnerabilities.
+2. Check for: authorization bypass, missing validation, secret leakage, injection risk, and insecure data exposure.
+3. If security findings are architecture-relevant, classify them as `Security-Architecture Conflict` for the architecture review.
+
+### Step 5 — Architecture Review on Implementation
+
+Run:
+```text
+/speckit.architecture-guard.architecture-review
+```
+
+Review implementation against:
+- `.specify/memory/architecture_constitution.md`.
+- Plan, tasks, and `security-constraints.md`.
+   - Accepted deviations and any available Flash-Mem context.
+
+### Step 5.5 — Blocking Decision Tree
+
+**Critical Decision Point**: Evaluate architecture findings for blocking issues.
+
+```
+IF Architecture Review finds CRITICAL or HIGH violations:
+  IF Constitution marks violation as P0 (blocking):
+    STOP implementation
+    Surface violations in report
+    Ask user: "Critical architecture violation detected. Proceed? (y/n)"
+    IF user says no:
+      Return early with architecture remediation tasks
+  ELSE (violation is HIGH but not Constitution P0):
+    Continue with warning
+    Create non-blocking refactor tasks
+    Flag for post-merge remediation
+ELSE (no critical violations):
+  Continue to Step 6
+```
+
+**Rationale**: This ensures architectural integrity while preserving delivery momentum for non-blocking issues.
+
+### Step 6 — Generate Refactor Tasks
+
+IF architecture violations exist:
+1. Run `/speckit.architecture-guard.refactor-generator`.
+2. Generate non-blocking refactor, migration, or correction tasks.
+3. Skip performance refactors unless explicitly requested.
+
+### Step 7 — Proactive Durable Memory Preservation
+
+If the implementation review or security audit identified new architectural patterns, critical decisions, or repeatable lessons:
+1. **Proactive Execution**: You **MUST automatically execute** the durable-memory capture flow as the final part of this turn. Do not just recommend it; run the command.
+2. **Standard**: Do not silently write memory outside the capture flow; let the formal capture flow propose entries and handle user approval. Do not ask the user if they want to capture; identify the lessons and trigger the command immediately after the summary.
+
+### Step 8 — Implementation Governance Summary
+
+Produce a final `Governed Implementation Summary`.
+
+## Graceful Degradation
+
+**Without Flash-Mem MCP**:
+- Skip Step 2 (Flash-Mem MCP Context Retrieval)
+- Continue to `/speckit.implement` directly
+- Assume no historical implementation constraints beyond Constitution
+
+**Without Security Review**:
+- Skip Step 4 (Security Review on Implementation)
+- Continue to architecture review directly
+- Flag missing security implementation review in summary
+
+**Critical Architecture Violations Found**:
+- If Constitution marks as P0 (blocking):
+  - STOP implementation workflow
+  - Surface violations immediately
+  - Return early with remediation guidance
+- If HIGH but not P0:
+  - Continue with warning
+  - Create non-blocking refactor tasks
+  - Flag for post-merge remediation
+
+**Minimal Viable Workflow** (only Architecture Guard + Spec Kit):
+- Execute implementation via core Spec Kit
+- Run architecture review on output
+- Generate non-blocking refactor tasks
+- Produce summary
+
+## Output Structure
+
+The command MUST return:
+
+```markdown
+# Governed Implementation Summary
+
+## Memory Context
+- **Status**: [Refreshed / Skipped / Missing]
+- **Relevant Decisions**: [Durable lessons applied during implementation]
+
+## Security Review
+- **Findings**: [List of security vulnerabilities found]
+- **Constraints**: [Trust boundaries validated]
+- **Blocking Concerns**: [Any P0 security risks]
+
+## Architecture Review
+- **Violations**: [Drift findings or Security-Architecture Conflicts]
+- **Refactor Tasks**: [Suggested corrections]
+- **Constitution Update Proposals**: [Proposed updates to `.specify/memory/architecture_constitution.md`]
+
+## Implementation Status
+- [Ready to merge / Needs security fix / Needs architecture refactor / Needs constitution update]
+
+## Recommended Next Step
+- [e.g., Merge changes]
+- [e.g., Revise implementation to address Security Conflict]
+- [e.g., Run /speckit.architecture-guard.architecture-apply]
+- **Durable Memory Preservation**: (Proactively triggered) Review the proposed memory entries below.
+- **Verification Gate**: Run `/speckit.architecture-guard.architecture-verify` to ensure all tasks are delivered and requirements are met.
+```
+
+## Security + Architecture Conflict Handling
+
+If Security Review finds an issue affecting architecture, classify it as a `Security-Architecture Conflict`.
+Example:
+- Violation: Pricing decision in client UI.
+- Security Constraint: Pricing authority must remain server-side.
+- Suggested Fix: Move pricing calculation to backend service.
+
+## Architecture Evolution Handling
+
+If implementation repeatedly violates a standard because the standard is outdated, generate a `Constitution Update Proposal` targeting `.specify/memory/architecture_constitution.md`.
+
+## Guardrails
+
+- **Modular**: Do not mix security findings into a generic architecture list.
+- **Framework-Agnostic**: Maintain boundary concepts (Entry, Domain, Data).
+- **Non-Blocking**: Adhere to the non-blocking philosophy for architecture findings.
+- **Memory-First**: Prefer cached synthesis and selected index entries before broad file reads.

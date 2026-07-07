@@ -1,0 +1,19 @@
+schema_version: "1.0"
+preset:
+  id: firmware-development
+  name: Firmware Development
+  version: "1.0.0"
+  description: "Plan templates with flash/RAM budgets, jitter targets, ADR references, risk registers, and SWOT sections for embedded firmware milestones."
+  author: "muc-plc"
+  license: "Apache-2.0"
+requires:
+  speckit_version: ">=0.8.0"
+provides:
+  templates:
+    - type: template
+      name: plan-template
+      file: templates/plan-template.md
+      description: Adds flash/RAM budget, jitter target, ADR reference, risk register, and SWOT sections to the plan template
+      replaces: plan-template
+      strategy: append
+tags: ["firmware", "embedded", "cortex-m", "budget", "jitter"]
