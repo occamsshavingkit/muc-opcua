@@ -10,6 +10,7 @@ add_library(muc_opcua STATIC
     core/message_chunk.c
     core/sequence.c
     core/service_message.c
+    platform/mdns_noop.c
     core/service_dispatch/dispatch_core.c
     core/service_dispatch/response_encode.c
     core/service_dispatch/reader_helpers.c
@@ -278,6 +279,8 @@ endif()
 # The host TCP adapter uses POSIX sockets; only compile it for the host platform.
 if(MUC_OPCUA_IS_HOST)
     target_sources(muc_opcua PRIVATE platform/host_tcp_adapter.c)
+    target_sources(muc_opcua PRIVATE platform/posix_mdns.c)
+    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_MDNS_DISCOVERY=1)
 
     # The host crypto adapter (SecurityPolicy Basic256Sha256) is backed by OpenSSL.
     if(MUC_OPCUA_SECURITY)

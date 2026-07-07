@@ -1,0 +1,1 @@
+{"feature":"specs/048-mdns-discovery","spec_self_validation":"passed","tasks_self_validation":"not-run","spec_validated_at":"2026-07-07T17:45:00Z","spec_hash":"","tasks_hash":"","spec_critical_count":0,"spec_missed_items":[],"review_status":"not-required","approval_status":"override-approved","override":{"used":true,"reason":"Maintainer override.","by":"maintainer"}}
