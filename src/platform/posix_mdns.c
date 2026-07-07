@@ -9,16 +9,16 @@
 #define _GNU_SOURCE
 #include "posix_mdns.h"
 #include "muc_opcua/status.h"
-#include <arpa/inet.h>
-#include <netinet/in.h>
-#include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
+#include <stdlib.h>
+#include <stdio.h>
 #include <sys/socket.h>
+#include <netinet/in.h>
+#include <net/if.h>
 #include <unistd.h>
 
 /* mDNS multicast group and port (RFC 6762) */
-#define MDNS_ADDR "224.0.0.251"
 #define MDNS_PORT 5353
 
 /* DNS record type constants */
@@ -203,17 +203,17 @@ opcua_statuscode_t mu_host_mdns_adapter_init(mu_mdns_adapter_t *adapter) {
         return MU_STATUS_BAD_INTERNALERROR;
     }
 
-    /* Join multicast group */
+    /* Join multicast group 224.0.0.251 */
     struct ip_mreq mreq;
-    inet_pton(AF_INET, MDNS_ADDR, &mreq.imr_multiaddr);
+    mreq.imr_multiaddr.s_addr = htonl(0xE00000FB);
     mreq.imr_interface.s_addr = htonl(INADDR_ANY);
     setsockopt(ctx->fd, IPPROTO_IP, IP_ADD_MEMBERSHIP, &mreq, sizeof(mreq));
 
-    /* Set destination */
+    /* Set destination — mDNS multicast group 224.0.0.251:5353 */
     memset(&ctx->dst, 0, sizeof(ctx->dst));
     ctx->dst.sin_family = AF_INET;
     ctx->dst.sin_port = htons(MDNS_PORT);
-    inet_pton(AF_INET, MDNS_ADDR, &ctx->dst.sin_addr);
+    ctx->dst.sin_addr.s_addr = htonl(0xE00000FB); /* 224.0.0.251 */
 
     adapter->context = ctx;
     adapter->publish = mdns_publish_impl;
