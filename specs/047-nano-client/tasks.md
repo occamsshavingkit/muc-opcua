@@ -75,7 +75,7 @@ implementation and testing.
 - [ ] T009 [US1] Implement `mu_client_connect` in `src/client/client.c` — resolve
   hostname, TCP connect via transport, send Hello, await Acknowledge
   (OPC-10000-6 §7.1.2.3/§7.1.2.4). This is the top-level orchestrator that
-  chains T009 + T011 into a single connect call (HIGH-003)
+  chains T006+T007 + T011 into a single connect call (HIGH-003)
 - [ ] T010 [US1] Implement `mu_client_get_endpoints` in `src/client/client.c`
   — construct GetEndpoints request, send via SecureChannel, parse response
   (OPC-10000-4 §5.4.2)
