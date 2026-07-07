@@ -253,8 +253,8 @@ opcua_statuscode_t mu_binary_encode_struct(mu_binary_writer_t *writer, const mu_
             if (arr_len < 0)
                 continue;
             for (opcua_int32_t ai = 0; ai < arr_len && writer->status == MU_STATUS_GOOD; ai++) {
-                opcua_statuscode_t sc = mu_binary_encode_struct(
-                    writer, f->nested_structure, (const opcua_byte_t *)field_ptr + (size_t)ai * fsize);
+                opcua_statuscode_t sc = mu_binary_encode_struct(writer, f->nested_structure,
+                                                                (const opcua_byte_t *)field_ptr + (size_t)ai * fsize);
                 if (sc != MU_STATUS_GOOD)
                     return sc;
             }
