@@ -47,6 +47,11 @@ This document maps implementation and test files back to OPC UA normative sectio
 | `src/client/client_browse.c` | Nano Client Browse | OPC-10000-4 | 5.8.2, 5.8.3, 5.8.4, 7.38.2 | Browse, BrowseNext, TranslateBrowsePathsToNodeIds API behavior |
 | `src/client/client_state.c` | Nano Client State Machine | OPC-10000-4 / OPC-10000-6 | 5.5.2, 5.6.2, 5.6.3, 5.6.4 / 7.2 | Client lifecycle state transition guard |
 | `src/client/client_errors.c` | Nano Client StatusCodes | OPC-10000-4 / OPC-10000-6 | 7.38.2 / 7.1.5 | Reserved client-local StatusCode mapping translation unit |
+| `src/client/client_subscription.c` | Std Client Subscriptions | OPC-10000-4 | 5.14.2, 5.14.8 | Client CreateSubscription / DeleteSubscriptions |
+| `src/client/client_monitored_item.c` | Std Client MonitoredItem | OPC-10000-4 | 5.13.2, 5.13.6 | Client CreateMonitoredItems / DeleteMonitoredItems |
+| `src/client/client_publish.c` | Std Client Publish | OPC-10000-4 | 5.14.5 | Client Publish request parking and notification dispatch |
+| `src/client/client_write.c` | Std Client Write | OPC-10000-4 | 5.11.4 | Client Write service |
+| `src/client/client_call.c` | Std Client Call | OPC-10000-4 | 5.12.2 | Client Call service |
 | `src/platform/posix_client_transport.c` | Nano Client Host Transport | OPC-10000-6 | 7.1.2.3, 7.1.2.4, 7.2 | POSIX socket adapter for client-side opc.tcp connect/send/receive/close |
 | `include/muc_opcua/services/node_management.h` | NodeManagement | OPC-10000-4 | 5.8.2, 5.8.3, 5.8.4, 5.8.5 | NodeManagement services interface |
 | `src/services/node_management/add_nodes.c` | NodeManagement (AddNodes) | OPC-10000-4 | 5.8.2.2, 7.24.2 | AddNodes decoding and bounded ownership of persistent node data |

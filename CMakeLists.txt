@@ -11,7 +11,7 @@ else()
     set(MUC_OPCUA_PROFILE_EXPLICIT OFF)
 endif()
 set(MUC_OPCUA_PROFILE "nano" CACHE STRING "Target OPC UA profile (nano, micro, embedded, standard, full, custom)")
-set(MUC_OPCUA_CLIENT_PROFILE "none" CACHE STRING "Target OPC UA client profile (none, nano, micro, embedded, full)")
+set(MUC_OPCUA_CLIENT_PROFILE "none" CACHE STRING "Target OPC UA client profile (none, nano, standard)")
 
 # Profile resolution
 if((MUC_OPCUA_BUILD_TESTS OR MUC_OPCUA_BUILD_EXAMPLES OR MUC_OPCUA_BUILD_FUZZERS OR MUC_OPCUA_BUILD_BENCHMARKS)
@@ -219,6 +219,9 @@ endif()
 if(MUC_OPCUA_CLIENT_PROFILE STREQUAL "none")
 elseif(MUC_OPCUA_CLIENT_PROFILE STREQUAL "nano")
     set(MUC_OPCUA_CLIENT_NANO ON CACHE BOOL "Build Nano Embedded UA Client Profile support" FORCE)
+elseif(MUC_OPCUA_CLIENT_PROFILE STREQUAL "standard")
+    set(MUC_OPCUA_CLIENT_NANO ON CACHE BOOL "Build Nano Embedded UA Client Profile support" FORCE)
+    set(MUC_OPCUA_CLIENT_STANDARD ON CACHE BOOL "Build Standard UA Client 2025 Profile support" FORCE)
 elseif(MUC_OPCUA_CLIENT_PROFILE STREQUAL "micro" OR
        MUC_OPCUA_CLIENT_PROFILE STREQUAL "embedded" OR
        MUC_OPCUA_CLIENT_PROFILE STREQUAL "full")

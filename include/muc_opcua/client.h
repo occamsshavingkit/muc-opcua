@@ -155,6 +155,49 @@ opcua_statuscode_t mu_client_posix_transport_init(mu_client_transport_t *transpo
                                                   mu_client_posix_transport_t *storage);
 #endif
 
+#ifdef MUC_OPCUA_CLIENT_STANDARD
+
+/* Subscription management */
+opcua_statuscode_t mu_client_create_subscription(mu_client_t *client, opcua_uint32_t interval_ms,
+                                                 opcua_uint32_t *out_subscription_id);
+opcua_statuscode_t mu_client_delete_subscription(mu_client_t *client, opcua_uint32_t subscription_id);
+
+/* Monitored Item management */
+typedef struct {
+    mu_nodeid_t node_id;
+    opcua_uint32_t attribute_id;
+    opcua_uint32_t sampling_interval_ms;
+    opcua_uint32_t queue_size;
+    opcua_byte_t discard_oldest;
+    opcua_byte_t filter_type; /* 0=none, 1=data change, 2=event */
+} mu_client_monitored_item_create_t;
+
+opcua_statuscode_t mu_client_create_monitored_item(mu_client_t *client, opcua_uint32_t subscription_id,
+                                                   const mu_client_monitored_item_create_t *params,
+                                                   opcua_uint32_t *out_monitored_item_id);
+opcua_statuscode_t mu_client_delete_monitored_item(mu_client_t *client, opcua_uint32_t subscription_id,
+                                                   opcua_uint32_t monitored_item_id);
+
+/* Publish and notification processing */
+opcua_statuscode_t mu_client_poll(mu_client_t *client);
+
+/* Write service */
+typedef struct {
+    mu_nodeid_t node_id;
+    opcua_uint32_t attribute_id;
+    mu_variant_t value;
+} mu_write_item_t;
+
+opcua_statuscode_t mu_client_write(mu_client_t *client, const mu_write_item_t *items, size_t num_items,
+                                   opcua_statuscode_t *item_statuses);
+
+/* Method Call service */
+opcua_statuscode_t mu_client_call(mu_client_t *client, const mu_nodeid_t *object_id, const mu_nodeid_t *method_id,
+                                  const mu_variant_t *input_args, size_t num_input_args, mu_variant_t *output_args,
+                                  size_t *num_output_args);
+
+#endif /* MUC_OPCUA_CLIENT_STANDARD */
+
 #ifdef __cplusplus
 }
 #endif

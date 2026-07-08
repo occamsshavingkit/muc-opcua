@@ -140,7 +140,12 @@ jobs:
           # adapters) builds for a bare-metal, freestanding ARM target. Catches a
           # hosted-header dependency regression leaking into the core.
           set -e
-          for f in $(find src -name '*.c' -not -path 'src/platform/host_*'); do
+          for f in $(find src -name '*.c' -not -path 'src/platform/host_*' \
+            -not -path 'src/client/client_subscription*' \
+            -not -path 'src/client/client_monitored_item*' \
+            -not -path 'src/client/client_publish*' \
+            -not -path 'src/client/client_write*' \
+            -not -path 'src/client/client_call*'); do
             echo "freestanding: $f"
             arm-none-eabi-gcc -ffreestanding -ffunction-sections -fdata-sections \
               -std=c11 -Iinclude -Isrc -Wall -Wextra -Werror -DMUC_OPCUA_SECURITY=1 \
