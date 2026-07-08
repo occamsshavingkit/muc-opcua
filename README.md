@@ -63,7 +63,7 @@ Each profile is a CMake configuration (`make nano|micro|embedded|standard`, or
 | Profile | Storage | Sessions | Subscriptions | Monitored Items | Publish |
 |---------|---------|----------|---------------|-----------------|---------|
 | nano | 1,280 B | 2 | — | — | — |
-| micro | 11,552 B | 2 | 2 | 8 | 2 |
+| micro | 11,552 B | 2 | 2 | 8 | 4 |
 | embedded | 100,792 B | 2 | 2 | 100 | 5 |
 | standard | 457,052 B | 50 | 50 | 1,000 | 50 |
 | full | 820,052 B | 100 | 100 | 2,000 | 100 |
