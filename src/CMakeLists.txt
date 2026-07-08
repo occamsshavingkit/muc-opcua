@@ -249,6 +249,17 @@ if(MUC_OPCUA_CLIENT_NANO)
     endif()
 endif()
 
+if(MUC_OPCUA_CLIENT_STANDARD)
+    target_sources(muc_opcua PRIVATE
+        client/client_subscription.c
+        client/client_monitored_item.c
+        client/client_publish.c
+        client/client_write.c
+        client/client_call.c
+    )
+    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_CLIENT_STANDARD=1)
+endif()
+
 
 foreach(MU_CAPACITY_DEFINE
         MU_MAX_SUBSCRIPTIONS
