@@ -200,7 +200,6 @@ This document maps implementation and test files back to OPC UA normative sectio
 | `src/core/pubsub.c` | OPC UA Part 14 | 5.4.6.2.2, 7.3.2.1 | Cooperative UADP/UDP publisher timing and UDP send dispatch | PubSub runtime |
 | `src/core/server.c` | OPC UA Part 14 | 5.4.6.2.2, 7.3.2.1 | `mu_server_poll()` drives connectionless PubSub publishing independent of TCP Sessions | PubSub runtime |
 | `src/platform/host_udp_adapter.c` | OPC UA Part 14 | 7.3.2.1 | Host UDP datagram transport for UADP | PubSub network |
-| `src/platform/mdns_noop.c` | OPC UA Part 12 | 6.3 | mDNS discovery no-op adapter | F1 mDNS base |
 | `src/platform/posix_mdns.c` | OPC UA Part 12 | 6.3 | mDNS discovery POSIX adapter | F1 mDNS host |
 | `src/platform/posix_mdns.h` | OPC UA Part 12 | 6.3 | mDNS discovery POSIX adapter header | F1 mDNS host |
 | `include/muc_opcua/pubsub.h` | OPC UA Part 14 / Part 6 | 7.2.4.4.2, 7.2.4.5.2, 7.2.4.5.3, 7.2.4.5.4, 7.2.4.5.5, 7.3.2.1 / 5.2.2.16 | Scoped PubSub Publisher API, decoder API, and caller-owned field/output contract | PubSub network |

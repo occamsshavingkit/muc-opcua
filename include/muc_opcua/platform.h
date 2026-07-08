@@ -228,8 +228,9 @@ typedef struct mu_mdns_adapter {
     void (*unpublish)(void *context);
 } mu_mdns_adapter_t;
 
-/* Static no-op adapter. Both callbacks are NULL-safe no-ops. */
-extern mu_mdns_adapter_t mu_mdns_adapter_noop;
+/* A NULL mdns_adapter in the server config disables mDNS entirely; there is no
+   library-provided no-op adapter (it would be a mutable static, which the no-heap
+   / caller-owns-all-memory design disallows). */
 
 /* Initialize the host POSIX mDNS adapter (UDP multicast, 224.0.0.251:5353).
  * Returns MU_STATUS_GOOD on success. */

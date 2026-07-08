@@ -10,7 +10,6 @@ add_library(muc_opcua STATIC
     core/message_chunk.c
     core/sequence.c
     core/service_message.c
-    platform/mdns_noop.c
     core/service_dispatch/dispatch_core.c
     core/service_dispatch/response_encode.c
     core/service_dispatch/reader_helpers.c
