@@ -15,7 +15,10 @@
 #   make embedded  Embedded profile configuration — Micro + Basic256Sha256,
 #                  Standard DataChange Subscription 2017 facet capacities, and
 #                  Base Info Type System exposure.
-#   make all-profiles   build nano, micro and embedded
+#   make standard  Standard profile — everything embedded has plus all optional
+#                  service sets (NodeManagement, Query, History, PubSub, etc.)
+#   make full      Full profile — standard + maximum capacities
+#   make all-profiles   build nano, micro, embedded, standard, full
 #   make test           configure with tests and run the full ctest suite
 #   make clean          remove the profile build directories
 #
@@ -30,17 +33,25 @@ PROFILE_CACHE_RESET := -U MU_MAX_SUBSCRIPTIONS -U MU_MAX_MONITORED_ITEMS \
 EMBEDDED_CAPS := -DMU_MAX_SUBSCRIPTIONS=2 -DMU_MAX_MONITORED_ITEMS=100 \
 	-DMU_MAX_PUBLISH_REQUESTS=5 -DMU_MONITORED_QUEUE_DEPTH=2 \
 	-DMU_MAX_TRIGGER_LINKS=4
+STANDARD_CAPS := -DMU_MAX_SUBSCRIPTIONS=50 -DMU_MAX_MONITORED_ITEMS=1000 \
+	-DMU_MAX_PUBLISH_REQUESTS=50 -DMU_MONITORED_QUEUE_DEPTH=2 \
+	-DMU_MAX_TRIGGER_LINKS=4
+FULL_CAPS := -DMU_MAX_SUBSCRIPTIONS=100 -DMU_MAX_MONITORED_ITEMS=2000 \
+	-DMU_MAX_PUBLISH_REQUESTS=100 -DMU_MONITORED_QUEUE_DEPTH=2 \
+	-DMU_MAX_TRIGGER_LINKS=4
 SPEED_LAB_FLAGS ?= --cpu 11 --use-sudo --require-affinity --require-realtime \
 	--require-isolated-cpu --shield-cpu
 SPEED_SMOKE_FLAGS ?= --cpu 11 --realtime-priority 0
 
-.PHONY: help nano micro embedded all-profiles test test-nano test-micro test-embedded test-full test-profiles speed-matrix speed-smoke speed-current speed-baseline speed-compare clean
+.PHONY: help nano micro embedded standard full all-profiles test test-nano test-micro test-embedded test-standard test-full test-profiles speed-matrix speed-smoke speed-current speed-baseline speed-compare clean
 
 help:
 	@echo "muc-opcua profile builds:"
 	@echo "  make nano      Nano 2017 profile (None, subscriptions OFF)  -> $(BUILD)/nano"
 	@echo "  make micro     Micro profile (None + subscriptions ON)      -> $(BUILD)/micro"
 	@echo "  make embedded  Embedded 2017 profile target                 -> $(BUILD)/embedded"
+	@echo "  make standard  Standard 2017 profile + all optional services -> $(BUILD)/standard"
+	@echo "  make full      Full profile, max capacities                 -> $(BUILD)/full"
 	@echo "  make test      build with tests and run ctest"
 	@echo "  make speed-smoke     run non-strict speed benchmark smoke"
 	@echo "  make speed-current   run lab speed/resource benchmark matrix"
@@ -63,7 +74,17 @@ embedded:
 	$(CMAKE) -S . -B $(BUILD)/embedded $(PROFILE_CACHE_RESET) $(COMMON) -DMUC_OPCUA_PROFILE=embedded $(EMBEDDED_CAPS)
 	$(CMAKE) --build $(BUILD)/embedded
 
-all-profiles: nano micro embedded
+standard:
+	@echo ">> STANDARD profile: All optional services, standard capacities"
+	$(CMAKE) -S . -B $(BUILD)/standard $(PROFILE_CACHE_RESET) $(COMMON) -DMUC_OPCUA_PROFILE=standard $(STANDARD_CAPS)
+	$(CMAKE) --build $(BUILD)/standard
+
+full:
+	@echo ">> FULL profile: All services, maximum capacities"
+	$(CMAKE) -S . -B $(BUILD)/full $(PROFILE_CACHE_RESET) $(COMMON) -DMUC_OPCUA_PROFILE=full $(FULL_CAPS)
+	$(CMAKE) --build $(BUILD)/full
+
+all-profiles: nano micro embedded standard full
 
 test:
 	$(CMAKE) -S . -B $(BUILD)/test -DMUC_OPCUA_BUILD_TESTS=ON
@@ -92,12 +113,17 @@ test-embedded:
 	$(CMAKE) --build $(BUILD)/test-embedded
 	cd $(BUILD)/test-embedded && ctest --output-on-failure
 
+test-standard:
+	$(CMAKE) -S . -B $(BUILD)/test-standard $(PROFILE_CACHE_RESET) $(TEST_COMMON) -DMUC_OPCUA_PROFILE=standard $(STANDARD_CAPS)
+	$(CMAKE) --build $(BUILD)/test-standard
+	cd $(BUILD)/test-standard && ctest --output-on-failure
+
 test-full:
-	$(CMAKE) -S . -B $(BUILD)/test-full $(PROFILE_CACHE_RESET) $(TEST_COMMON) -DMUC_OPCUA_PROFILE=full $(EMBEDDED_CAPS)
+	$(CMAKE) -S . -B $(BUILD)/test-full $(PROFILE_CACHE_RESET) $(TEST_COMMON) -DMUC_OPCUA_PROFILE=full $(FULL_CAPS)
 	$(CMAKE) --build $(BUILD)/test-full
 	cd $(BUILD)/test-full && ctest --output-on-failure
 
-test-profiles: test-nano test-micro test-embedded test-full
+test-profiles: test-nano test-micro test-embedded test-standard test-full
 
 speed-matrix:
 	python3 scripts/run_speed_bench.py --matrix
