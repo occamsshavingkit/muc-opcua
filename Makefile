@@ -6,8 +6,8 @@
 #
 #   make nano      Nano Embedded Device 2017 Server Profile — SecurityPolicy None,
 #                  the full Nano service surface (Discovery, Session, Read, the View
-#                  Service Set) + the standard Base Information node set, subscriptions
-#                  OFF. Complete.
+#                  Service Set), subscriptions OFF and the standard Base Information
+#                  node set OFF (integrator supplies the address space). Complete.
 #   make micro     Micro profile configuration — Nano + the data-change subscription
 #                  engine (MUC_OPCUA_SUBSCRIPTIONS=ON: the Embedded Data Change
 #                  Subscription Server Facet). Distinct from nano, with bounded
@@ -27,18 +27,10 @@
 CMAKE ?= cmake
 BUILD  ?= build
 COMMON := -DMUC_OPCUA_BUILD_EXAMPLES=ON -DMUC_OPCUA_OPTIMIZE_SIZE=ON
-PROFILE_CACHE_RESET := -U MU_MAX_SUBSCRIPTIONS -U MU_MAX_MONITORED_ITEMS \
-	-U MU_MAX_PUBLISH_REQUESTS -U MU_MONITORED_QUEUE_DEPTH \
-	-U MU_MAX_TRIGGER_LINKS
-EMBEDDED_CAPS := -DMU_MAX_SUBSCRIPTIONS=2 -DMU_MAX_MONITORED_ITEMS=100 \
-	-DMU_MAX_PUBLISH_REQUESTS=5 -DMU_MONITORED_QUEUE_DEPTH=2 \
-	-DMU_MAX_TRIGGER_LINKS=4
-STANDARD_CAPS := -DMU_MAX_SUBSCRIPTIONS=50 -DMU_MAX_MONITORED_ITEMS=1000 \
-	-DMU_MAX_PUBLISH_REQUESTS=50 -DMU_MONITORED_QUEUE_DEPTH=2 \
-	-DMU_MAX_TRIGGER_LINKS=4
-FULL_CAPS := -DMU_MAX_SUBSCRIPTIONS=100 -DMU_MAX_MONITORED_ITEMS=2000 \
-	-DMU_MAX_PUBLISH_REQUESTS=100 -DMU_MONITORED_QUEUE_DEPTH=2 \
-	-DMU_MAX_TRIGGER_LINKS=4
+# Per-profile feature sets AND capacity minima (MU_MAX_SESSIONS, MU_MAX_SUBSCRIPTIONS,
+# ...) are owned entirely by CMakeLists.txt, keyed off -DMUC_OPCUA_PROFILE. The
+# Makefile deliberately does NOT restate them here -- doing so previously created a
+# second source of truth that drifted from the CMake values and the README table.
 SPEED_LAB_FLAGS ?= --cpu 11 --use-sudo --require-affinity --require-realtime \
 	--require-isolated-cpu --shield-cpu
 SPEED_SMOKE_FLAGS ?= --cpu 11 --realtime-priority 0
@@ -61,27 +53,27 @@ help:
 
 nano:
 	@echo ">> NANO profile: SecurityPolicy None, full Nano service surface, subscriptions OFF"
-	$(CMAKE) -S . -B $(BUILD)/nano $(PROFILE_CACHE_RESET) $(COMMON) -DMUC_OPCUA_PROFILE=nano
+	$(CMAKE) -S . -B $(BUILD)/nano $(COMMON) -DMUC_OPCUA_PROFILE=nano
 	$(CMAKE) --build $(BUILD)/nano
 
 micro:
 	@echo ">> MICRO profile: Nano + data-change subscriptions (MUC_OPCUA_SUBSCRIPTIONS=ON)"
-	$(CMAKE) -S . -B $(BUILD)/micro $(PROFILE_CACHE_RESET) $(COMMON) -DMUC_OPCUA_PROFILE=micro
+	$(CMAKE) -S . -B $(BUILD)/micro $(COMMON) -DMUC_OPCUA_PROFILE=micro
 	$(CMAKE) --build $(BUILD)/micro
 
 embedded:
 	@echo ">> EMBEDDED profile: Basic256Sha256 + Standard subscriptions + Base Info Type System"
-	$(CMAKE) -S . -B $(BUILD)/embedded $(PROFILE_CACHE_RESET) $(COMMON) -DMUC_OPCUA_PROFILE=embedded $(EMBEDDED_CAPS)
+	$(CMAKE) -S . -B $(BUILD)/embedded $(COMMON) -DMUC_OPCUA_PROFILE=embedded
 	$(CMAKE) --build $(BUILD)/embedded
 
 standard:
 	@echo ">> STANDARD profile: All optional services, standard capacities"
-	$(CMAKE) -S . -B $(BUILD)/standard $(PROFILE_CACHE_RESET) $(COMMON) -DMUC_OPCUA_PROFILE=standard $(STANDARD_CAPS)
+	$(CMAKE) -S . -B $(BUILD)/standard $(COMMON) -DMUC_OPCUA_PROFILE=standard
 	$(CMAKE) --build $(BUILD)/standard
 
 full:
 	@echo ">> FULL profile: All services, maximum capacities"
-	$(CMAKE) -S . -B $(BUILD)/full $(PROFILE_CACHE_RESET) $(COMMON) -DMUC_OPCUA_PROFILE=full $(FULL_CAPS)
+	$(CMAKE) -S . -B $(BUILD)/full $(COMMON) -DMUC_OPCUA_PROFILE=full
 	$(CMAKE) --build $(BUILD)/full
 
 all-profiles: nano micro embedded standard full
@@ -99,27 +91,27 @@ TEST_COMMON := -DMUC_OPCUA_BUILD_TESTS=ON -DMUC_OPCUA_PLATFORM=host \
 	-DMUC_OPCUA_HAVE_MBEDTLS=ON -DMUC_OPCUA_HAVE_WOLFSSL=ON
 
 test-nano:
-	$(CMAKE) -S . -B $(BUILD)/test-nano $(PROFILE_CACHE_RESET) $(TEST_COMMON) -DMUC_OPCUA_PROFILE=nano
+	$(CMAKE) -S . -B $(BUILD)/test-nano $(TEST_COMMON) -DMUC_OPCUA_PROFILE=nano
 	$(CMAKE) --build $(BUILD)/test-nano
 	cd $(BUILD)/test-nano && ctest --output-on-failure
 
 test-micro:
-	$(CMAKE) -S . -B $(BUILD)/test-micro $(PROFILE_CACHE_RESET) $(TEST_COMMON) -DMUC_OPCUA_PROFILE=micro
+	$(CMAKE) -S . -B $(BUILD)/test-micro $(TEST_COMMON) -DMUC_OPCUA_PROFILE=micro
 	$(CMAKE) --build $(BUILD)/test-micro
 	cd $(BUILD)/test-micro && ctest --output-on-failure
 
 test-embedded:
-	$(CMAKE) -S . -B $(BUILD)/test-embedded $(PROFILE_CACHE_RESET) $(TEST_COMMON) -DMUC_OPCUA_PROFILE=embedded $(EMBEDDED_CAPS)
+	$(CMAKE) -S . -B $(BUILD)/test-embedded $(TEST_COMMON) -DMUC_OPCUA_PROFILE=embedded
 	$(CMAKE) --build $(BUILD)/test-embedded
 	cd $(BUILD)/test-embedded && ctest --output-on-failure
 
 test-standard:
-	$(CMAKE) -S . -B $(BUILD)/test-standard $(PROFILE_CACHE_RESET) $(TEST_COMMON) -DMUC_OPCUA_PROFILE=standard $(STANDARD_CAPS)
+	$(CMAKE) -S . -B $(BUILD)/test-standard $(TEST_COMMON) -DMUC_OPCUA_PROFILE=standard
 	$(CMAKE) --build $(BUILD)/test-standard
 	cd $(BUILD)/test-standard && ctest --output-on-failure
 
 test-full:
-	$(CMAKE) -S . -B $(BUILD)/test-full $(PROFILE_CACHE_RESET) $(TEST_COMMON) -DMUC_OPCUA_PROFILE=full $(FULL_CAPS)
+	$(CMAKE) -S . -B $(BUILD)/test-full $(TEST_COMMON) -DMUC_OPCUA_PROFILE=full
 	$(CMAKE) --build $(BUILD)/test-full
 	cd $(BUILD)/test-full && ctest --output-on-failure
 
@@ -141,4 +133,5 @@ speed-compare:
 	python3 scripts/run_speed_bench.py $(SPEED_LAB_FLAGS) --compare
 
 clean:
-	rm -rf $(BUILD)/nano $(BUILD)/micro $(BUILD)/embedded $(BUILD)/test
+	rm -rf $(BUILD)/nano $(BUILD)/micro $(BUILD)/embedded $(BUILD)/standard $(BUILD)/full $(BUILD)/test \
+		$(BUILD)/test-nano $(BUILD)/test-micro $(BUILD)/test-embedded $(BUILD)/test-standard $(BUILD)/test-full
