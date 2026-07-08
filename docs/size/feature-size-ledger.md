@@ -1,6 +1,59 @@
 # Feature Size Ledger
 
-## Current (2026-07-06): Deferred Features (D1-D4) — Spec 045
+## Current (2026-07-09): Profile gating single source of truth — Spec 052
+
+Re-measured after making `MUC_OPCUA_PROFILE` the single source of truth for the
+profile feature sets and capacity minima (branch `052-fix-profile-gating`). That
+fix restored `MU_MAX_SESSIONS` propagation to the compiler — it had been set in the
+CMake cache but never passed as `-D`, so standard/full silently compiled a
+2-session array — and made `full` advertise StandardUA2017. These figures supersede
+the numbers in the older sections below, several of which pre-dated later struct
+growth (a prior section even lists identical `sizeof` for standard and full, which
+cannot hold at 1,000 vs 2,000 monitored items).
+
+- **Toolchain**: `arm-none-eabi-gcc` 13.2.1, Cortex-M0+ Thumb `-Os`
+- **Target**: `MUC_OPCUA_PLATFORM=arduino-skeleton`, no host adapters
+- **Reproduce**: `bash scripts/measure_size.sh all` for archive `.text`; server-object
+  and storage sizes from a `char probe[sizeof(struct mu_server)]` /
+  `char probe[MU_SERVER_STORAGE_BYTES]` TU compiled with each profile's flags and
+  read via `arm-none-eabi-nm --print-size` (pointer size is 4 B on Cortex-M0+).
+
+### ARM Cortex-M0+ `.text` (flash), library archive
+
+| Profile | .text | .data | .bss |
+|---------|-------|-------|------|
+| nano | 18,379 B | 0 | 0 |
+| micro | 29,465 B | 0 | 0 |
+| embedded | 54,418 B | 0 | 0 |
+| standard | 67,824 B | 0 | 0 |
+| full | 67,828 B | 0 | 0 |
+
+`.data` and `.bss` are 0 for every profile — the library declares no mutable static
+state (the no-heap / caller-owns-all-memory constitution requirement, now verifiable
+straight off the archive, not just the linked ELF). This measurement surfaced the one
+prior violation: `mu_mdns_adapter_noop`, an all-NULL `mu_mdns_adapter_t` global added
+by the mDNS feature (F1) that sat in `.bss`. It was redundant — a NULL `mdns_adapter`
+in the server config already disables mDNS — so it was removed (`src/platform/mdns_noop.c`
+deleted, `extern` dropped from `platform.h`) rather than merely `--gc-sections`-hidden.
+
+### Server object and caller storage (ARM, per profile)
+
+| Profile | sizeof(struct mu_server) | MU_SERVER_STORAGE_BYTES | Sessions | Subscriptions | Monitored Items | Publish |
+|---------|--------------------------|-------------------------|----------|---------------|-----------------|---------|
+| nano | 872 B | 1,408 B | 2 | — | — | — |
+| micro | 11,120 B | 11,680 B | 2 | 2 | 8 | 4 |
+| embedded | 102,104 B | 128,232 B | 2 | 2 | 100 | 5 |
+| standard | 680,800 B | 741,300 B | 50 | 50 | 1,000 | 50 |
+| full | 1,270,520 B | 1,387,500 B | 100 | 100 | 2,000 | 100 |
+
+`MU_SERVER_STORAGE_BYTES >= sizeof(struct mu_server)` for every profile: the caller
+storage holds the server object plus scratch, chunk-assembly, and security buffers.
+Both are dominated by `MU_MAX_MONITORED_ITEMS`/`MU_MAX_SUBSCRIPTIONS`, which is why
+the `full` profile — a non-MCU "everything on" target — needs ~1.3 MB of each.
+
+---
+
+## 2026-07-06: Deferred Features (D1-D4) — Spec 045
 
 Measured after implementing complex type binary encode/decode (D1), audit event
 callback dispatch (D2), additional aggregate functions (D3), and binary size

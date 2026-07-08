@@ -25,10 +25,12 @@ in only the surface you need.
 
 - **Zero heap.** No `malloc` anywhere in the protocol path. The application owns all
   memory: one server-storage block plus the RX/TX buffers. Footprint is deterministic.
-- **Tiny flash.** Measured snapshot (2026-07-06, reproduce with
-  `scripts/measure_size.sh all`): a complete Nano server is **17.7 KiB**
-  (18,150 B) of Arm Cortex-M0+ `-Os` core `.text`; Micro is **28.5 KiB**
-  (29,228 B); Standard 2017 is **62.0 KiB** (63,491 B). Static `.bss` is 0 B.
+- **Tiny flash.** Measured snapshot (2026-07-09, reproduce with
+  `scripts/measure_size.sh all`): a complete Nano server is **17.9 KiB**
+  (18,379 B) of Arm Cortex-M0+ `-Os` core `.text`; Micro is **28.8 KiB**
+  (29,465 B); Standard 2017 is **66.2 KiB** (67,824 B). Every profile has
+  0 B `.data` and 0 B `.bss` — the library holds no mutable static state and
+  never calls `malloc`.
 - **Freestanding & portable.** Plain C11 core with no OS assumptions. Hardware and OS
   services are injected via small adapter structs in
   [`include/muc_opcua/platform.h`](include/muc_opcua/platform.h) — bring your own
@@ -48,25 +50,42 @@ Each profile is a CMake configuration (`make nano|micro|embedded|standard`, or
 `-DMUC_OPCUA_PROFILE=...`). All figures are Arm Cortex-M0+ Thumb `-Os`, zero
 `.data`/`.bss`/heap. Reproduce with `scripts/measure_size.sh all`.
 
-**Core `.text` (flash)**
+**Core `.text` (flash)** — compiled library archive (`-Os`). The linked server is
+smaller after `--gc-sections` dead-code elimination.
 
 | Profile | .text | OPC UA Profile |
 |---------|-------|----------------|
-| nano | 18,150 B | Nano Embedded Device 2017 |
-| micro | 29,228 B | Micro Embedded Device 2017 |
-| embedded | 54,187 B | Embedded 2017 UA Server |
-| standard | 63,491 B | Standard 2017 UA Server |
-| full | 63,495 B | — (everything on) |
+| nano | 18,379 B | Nano Embedded Device 2017 |
+| micro | 29,465 B | Micro Embedded Device 2017 |
+| embedded | 54,418 B | Embedded 2017 UA Server |
+| standard | 67,824 B | Standard 2017 UA Server |
+| full | 67,828 B | — (everything on) |
 
-**Caller-provided storage** (`MU_SERVER_STORAGE_BYTES`)
+Every profile has **0 B `.data` and 0 B `.bss`**: the library declares no mutable
+static state and never calls `malloc` (a project-constitution requirement). All
+server state lives in the two caller-owned blocks below.
+
+**Server object** (`sizeof(struct mu_server)`) — the control block `mu_server_init`
+places into your storage. Scales with the compiled capacities.
+
+| Profile | sizeof(struct mu_server) |
+|---------|--------------------------|
+| nano | 872 B |
+| micro | 11,120 B |
+| embedded | 102,104 B |
+| standard | 680,800 B |
+| full | 1,270,520 B |
+
+**Caller-provided storage** (`MU_SERVER_STORAGE_BYTES`) — the single block you hand to
+`mu_server_init`; holds the server object plus its scratch/chunk/security buffers.
 
 | Profile | Storage | Sessions | Subscriptions | Monitored Items | Publish |
 |---------|---------|----------|---------------|-----------------|---------|
-| nano | 1,280 B | 2 | — | — | — |
-| micro | 11,552 B | 2 | 2 | 8 | 4 |
-| embedded | 100,792 B | 2 | 2 | 100 | 5 |
-| standard | 457,052 B | 50 | 50 | 1,000 | 50 |
-| full | 820,052 B | 100 | 100 | 2,000 | 100 |
+| nano | 1,408 B | 2 | — | — | — |
+| micro | 11,680 B | 2 | 2 | 8 | 4 |
+| embedded | 128,232 B | 2 | 2 | 100 | 5 |
+| standard | 741,300 B | 50 | 50 | 1,000 | 50 |
+| full | 1,387,500 B | 100 | 100 | 2,000 | 100 |
 
 Full methodology in [docs/size/feature-size-ledger.md](docs/size/feature-size-ledger.md).
 
