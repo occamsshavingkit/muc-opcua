@@ -41,8 +41,18 @@ unlimited" placeholders). Enforcement landscape (verified):
 | MaxNodesPerBrowse | 11710 | ✅ | `MU_DISPATCH_MAX_BROWSE_NODES`=8 (`view_handler.c`) | 8 (already) |
 | MaxNodesPerWrite | 11707 | ✅ | `MU_DISPATCH_MAX_READ_NODES`=32 (`write.c:25`, shared) | **add node, 32** |
 | MaxMonitoredItemsPerCall | 11714 | ✅ | `MU_DISPATCH_MAX_SUBSCRIPTION_OPERATIONS`=32 | **add node, 32** |
-| MaxStringLength (SC scalar) | 11550 | ✅ | `MU_MAX_ENCODED_STRING_LENGTH`=4096 (`binary_string.c:43`) | **add node, 4096** |
-| MaxArrayLength (SC scalar) | 11549 | ❌ **gap** | none — `binary_variant.c:139` reads length unchecked | **enforce + add node** |
+| MaxStringLength (SC scalar) | **11703** | ✅ | `MU_MAX_ENCODED_STRING_LENGTH`=4096 (`binary_string.c:43`) | **add node, 4096** |
+| MaxArrayLength (SC scalar) | **11702** | ❌ **gap** | none — `binary_variant.c:139` reads length unchecked | **enforce + add node** |
+
+> **NodeId correction (verified against the OPC UA reference — UA-Nodeset
+> `NodeIds.csv`).** MaxArrayLength/MaxStringLength are the **Server instance**
+> nodes `Server_ServerCapabilities_MaxArrayLength` = **11702** /
+> `_MaxStringLength` = **11703**, NOT `ServerCapabilitiesType_*` (11549/11550,
+> the abstract type's declarations) which an earlier draft used. The four
+> OperationLimits IDs (11705/11707/11710/11714) are the correct instance IDs.
+> Also: `MaxMonitoredItemsPerCall` belongs to the *Base Info Server Capabilities
+> Subscriptions* CU, while the other five are *Base Info Server Capabilities 2*
+> (OPC-10000-5 §8.3.2) — a mapping nuance, no code impact.
 
 So the only missing *enforcement* is **MaxArrayLength**; the rest just need
 *advertising*.

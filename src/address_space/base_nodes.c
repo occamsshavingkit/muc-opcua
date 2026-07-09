@@ -211,8 +211,8 @@ static const mu_reference_t s_server_status_refs[] = {
 static const mu_reference_t s_server_capabilities_refs[] = {
     {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {2269}}, true},
     {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {2271}}, true},
-    {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {11549}}, true}, /* MaxArrayLength */
-    {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {11550}}, true}, /* MaxStringLength */
+    {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {11702}}, true}, /* MaxArrayLength */
+    {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {11703}}, true}, /* MaxStringLength */
     {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {11704}}, true},
 #if MUC_OPCUA_BASE_TYPE_SYSTEM
     {{0, MU_NODEID_NUMERIC, {40}}, {0, MU_NODEID_NUMERIC, {58}}, true}
@@ -716,7 +716,7 @@ static const mu_node_t s_base_nodes[] = {
      .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
 #endif
     /* Spec 057: MaxArrayLength/MaxStringLength — sorted slots before 11704. */
-    {{0, MU_NODEID_NUMERIC, {11549}},
+    {{0, MU_NODEID_NUMERIC, {11702}},
      MU_NODECLASS_VARIABLE,
      {14, s_str_MaxArrayLength},
      {14, s_str_MaxArrayLength},
@@ -724,7 +724,7 @@ static const mu_node_t s_base_nodes[] = {
      sizeof(s_property_type_ref) / sizeof(s_property_type_ref[0]),
      &s_max_array_length_value,
      .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
-    {{0, MU_NODEID_NUMERIC, {11550}},
+    {{0, MU_NODEID_NUMERIC, {11703}},
      MU_NODECLASS_VARIABLE,
      {15, s_str_MaxStringLength},
      {15, s_str_MaxStringLength},
@@ -892,7 +892,7 @@ static const mu_node_t s_base_nodes[] = {
      &s_locale_id_array_value,
      .type_definition = {0}},
     /* Spec 057: MaxArrayLength/MaxStringLength — sorted slots before 11704. */
-    {{0, MU_NODEID_NUMERIC, {11549}},
+    {{0, MU_NODEID_NUMERIC, {11702}},
      MU_NODECLASS_VARIABLE,
      {14, s_str_MaxArrayLength},
      {14, s_str_MaxArrayLength},
@@ -900,7 +900,7 @@ static const mu_node_t s_base_nodes[] = {
      0,
      &s_max_array_length_value,
      .type_definition = {0}},
-    {{0, MU_NODEID_NUMERIC, {11550}},
+    {{0, MU_NODEID_NUMERIC, {11703}},
      MU_NODECLASS_VARIABLE,
      {15, s_str_MaxStringLength},
      {15, s_str_MaxStringLength},
