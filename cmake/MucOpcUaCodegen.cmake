@@ -24,7 +24,12 @@ function(muc_opcua_apply_codegen target_name)
         target_link_options(${target_name} INTERFACE -Wl,--gc-sections)
     endif()
 
-    if(MUC_OPCUA_LTO)
+    # LTO targets size-optimized firmware/example builds. Skip it for test,
+    # fuzzer, and sanitizer builds: they gain nothing from it, and a clang LTO
+    # build emits LLVM-bitcode archives that the default linker cannot consume
+    # when the consuming executable is not itself LTO (instrumented test/fuzz
+    # binaries) -- "file format not recognized".
+    if(MUC_OPCUA_LTO AND NOT MUC_OPCUA_BUILD_TESTS AND NOT MUC_OPCUA_BUILD_FUZZERS AND NOT MUC_OPCUA_SANITIZERS)
         include(CheckIPOSupported)
         check_ipo_supported(RESULT _ipo_ok OUTPUT _ipo_err)
         if(_ipo_ok)
