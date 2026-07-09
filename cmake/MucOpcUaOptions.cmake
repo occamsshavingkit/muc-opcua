@@ -4,7 +4,11 @@ if(NOT DEFINED MUC_OPCUA_PLATFORM)
     set(MUC_OPCUA_PLATFORM "host" CACHE STRING "Target platform (host, external, pico, arduino-skeleton)")
 endif()
 
-option(MUC_OPCUA_LTO "Enable link-time optimization (interprocedural optimization) for size-optimized firmware builds" OFF)
+# LTO is ON by default: it recovers cross-translation-unit inlining (notably after
+# the feature-041 file split) and yields the smallest server. Gracefully degrades
+# with a warning if the toolchain lacks IPO support (see MucOpcUaCodegen.cmake).
+# Turn OFF for faster incremental builds during development.
+option(MUC_OPCUA_LTO "Enable link-time optimization (interprocedural optimization) for size-optimized firmware builds" ON)
 option(MUC_OPCUA_STACK_USAGE "Measure secured-OPN worst-case stack usage" OFF)
 set(MUC_OPCUA_STACK_USAGE_LIMIT 10240 CACHE STRING "Maximum secured-OPN stack usage budget in bytes")
 

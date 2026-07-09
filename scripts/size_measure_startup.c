@@ -42,3 +42,11 @@ void _isatty(void) {}
 void _fstat(void) {}
 void _getpid(void) {}
 void _kill(void) {}
+/* No-op heap: satisfies newlib's malloc/sbrk chain so a full-surface server links
+ * for size measurement. Returns failure (we never run this binary), so any code
+ * that reaches malloc gets NULL — the measured .text still reflects that the heap
+ * path was linked in (see MUC_OPCUA_ALLOW_HEAP). */
+void *_sbrk(int incr) {
+    (void)incr;
+    return (void *)-1;
+}
