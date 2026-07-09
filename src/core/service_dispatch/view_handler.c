@@ -2,6 +2,9 @@
 #include "common.h"
 
 #define MU_DISPATCH_MAX_BROWSE_NODES 8
+/* Spec 057: advertised MaxNodesPerBrowse (base_nodes.c) must match enforcement. */
+_Static_assert(MU_DISPATCH_MAX_BROWSE_NODES == MU_MAX_NODES_PER_BROWSE,
+               "advertised MaxNodesPerBrowse must match the enforced dispatch bound");
 #define MU_DISPATCH_MAX_BROWSE_REFS 32
 #define MU_DISPATCH_MAX_BROWSE_CONTINUATION_POINTS 32
 #define MU_DISPATCH_MAX_TRANSLATE_BROWSE_PATHS 16
