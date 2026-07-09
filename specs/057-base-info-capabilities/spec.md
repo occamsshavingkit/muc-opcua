@@ -30,29 +30,50 @@ It contains **two node tables** (full type-system vs. reduced, ~lines 640-720 an
 parent (OperationLimits(11704) for the per-call limits; ServerCapabilities(2268)
 for MaxArrayLength/MaxStringLength).
 
-## Open decisions (must resolve before authoring)
+## Decision (locked): enforce everything, advertise real caps
 
-1. **Exact mandatory set** — which nodes does `Base Info Server Capabilities`
-   require for the Nano/Micro/Embedded targets? Candidate: add `MaxNodesPerWrite`,
-   `MaxMonitoredItemsPerCall`, `MaxArrayLength`, `MaxStringLength` (→ 6 total with
-   the existing two).
-2. **Advertised values** — each must equal what the server actually enforces:
-   - `MaxNodesPerWrite` → the Write dispatch's per-request cap (verify/define)
-   - `MaxMonitoredItemsPerCall` → `subscription_helpers.c` cap
-   - `MaxArrayLength` → the encoder's array-length ceiling
-   - `MaxStringLength` → `MU_MAX_ENCODED_STRING_LENGTH` (4096)
-   Advertising a value the server does not enforce is a false conformance claim.
+Chosen approach: every advertised limit maps to real server enforcement (no "0 =
+unlimited" placeholders). Enforcement landscape (verified):
 
-## Requirements (pending decision confirmation)
+| Limit | NodeId | Enforced today? | Enforcing constant / site | Advertise |
+|-------|--------|-----------------|---------------------------|-----------|
+| MaxNodesPerRead | 11705 | ✅ | `MU_DISPATCH_MAX_READ_NODES`=32 (`read_process.c:119`) | 32 (already) |
+| MaxNodesPerBrowse | 11710 | ✅ | `MU_DISPATCH_MAX_BROWSE_NODES`=8 (`view_handler.c`) | 8 (already) |
+| MaxNodesPerWrite | 11707 | ✅ | `MU_DISPATCH_MAX_READ_NODES`=32 (`write.c:25`, shared) | **add node, 32** |
+| MaxMonitoredItemsPerCall | 11714 | ✅ | `MU_DISPATCH_MAX_SUBSCRIPTION_OPERATIONS`=32 | **add node, 32** |
+| MaxStringLength (SC scalar) | 11550 | ✅ | `MU_MAX_ENCODED_STRING_LENGTH`=4096 (`binary_string.c:43`) | **add node, 4096** |
+| MaxArrayLength (SC scalar) | 11549 | ❌ **gap** | none — `binary_variant.c:139` reads length unchecked | **enforce + add node** |
 
-- **FR-001**: Add the confirmed OperationLimits/ServerCapabilities nodes to both
-  `base_nodes.c` tables with values equal to the enforced limits.
-- **FR-002**: `HasProperty` references wire each new node under its parent.
-- **FR-003**: Tests Read each new node and assert the advertised value equals the
-  compiled/enforced limit.
+So the only missing *enforcement* is **MaxArrayLength**; the rest just need
+*advertising*.
+
+## Requirements
+
+- **FR-001 (single source)**: Add operation-limit macros to `config.h`
+  (`MU_MAX_NODES_PER_READ/_WRITE/_BROWSE`, `MU_MAX_MONITORED_ITEMS_PER_CALL`,
+  `MU_MAX_ARRAY_LENGTH`). Each enforcing site gains a `_Static_assert` tying its
+  local dispatch constant to the config macro, so advertised == enforced can never
+  drift. `base_nodes.c` advertises the config macros (not literals).
+- **FR-002 (array enforcement — the gap)**: `binary_variant` array decode rejects
+  `array_length > MU_MAX_ARRAY_LENGTH` with `Bad_EncodingLimitsExceeded`.
+- **FR-003 (advertise)**: Add `MaxNodesPerWrite`, `MaxMonitoredItemsPerCall`,
+  `MaxArrayLength`, `MaxStringLength` nodes to **both** `base_nodes.c` node tables
+  with `HasProperty` references from OperationLimits(11704) / ServerCapabilities(2268).
+- **FR-004 (tests)**: (a) array over `MU_MAX_ARRAY_LENGTH` → `Bad_EncodingLimitsExceeded`;
+  (b) Read each new node → value equals the enforcement constant;
+  (c) per-request over-limit on Write → `Bad_TooManyOperations`.
+
+## Open value decision
+
+`MU_MAX_ARRAY_LENGTH` default — the DoS ceiling on decoded array element counts.
+Must be large enough for legitimate arrays (Write values, PubSub datasets) yet
+bounded. Candidate default **`8192`** (matches the chunk/message byte ceiling as a
+coarse element cap), `-D`-overridable. Confirm before enforcing (too low breaks
+legitimate large-array clients on the full profile).
 
 ## Out of Scope
 
-- OperationLimits not required by the target profiles (e.g. `MaxNodesPerMethodCall`
-  when Method server is off) — gate per feature.
+- OperationLimits not required by the target profiles (`MaxNodesPerMethodCall`,
+  `MaxNodesPerRegisterNodes`, `MaxNodesPerTranslateBrowsePathsToNodeIds`) — already
+  enforced; advertising them is a follow-up.
 - CTT verification.
