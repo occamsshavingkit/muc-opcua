@@ -166,10 +166,50 @@ static void test_time_sync_null_server_produces_zero_timestamp(void) {
     TEST_ASSERT_EQUAL_INT64(0, ts);
 }
 
+/* Spec 055: OPN clock-skew validation on RequestHeader.timestamp.
+ * opcua_datetime_t is 100ns ticks since 1601; 1 ms = 10000 ticks.
+ * Base = 2021-01-01 00:00:00 UTC. Default skew window is 5 min (300000 ms). */
+#ifdef MUC_OPCUA_TIME_SYNC
+#define TS_BASE 132537600000000000LL
+#define TS_MS(ms) ((opcua_int64_t)(ms) * 10000LL)
+
+static void test_time_sync_within_skew_is_allowed(void) {
+    /* client 1 minute ahead of server — inside the 5-minute window */
+    TEST_ASSERT_TRUE(mu_opn_time_sync_allows(TS_BASE, TS_BASE + TS_MS(60000)));
+    TEST_ASSERT_TRUE(mu_opn_time_sync_allows(TS_BASE, TS_BASE - TS_MS(60000)));
+    /* exactly at the 5-minute boundary is allowed (<=) */
+    TEST_ASSERT_TRUE(mu_opn_time_sync_allows(TS_BASE, TS_BASE + TS_MS(300000)));
+}
+
+static void test_time_sync_far_future_is_rejected(void) {
+    /* client 10 minutes ahead — beyond the window */
+    TEST_ASSERT_FALSE(mu_opn_time_sync_allows(TS_BASE, TS_BASE + TS_MS(600000)));
+    /* one tick beyond the boundary */
+    TEST_ASSERT_FALSE(mu_opn_time_sync_allows(TS_BASE, TS_BASE + TS_MS(300000) + 1));
+}
+
+static void test_time_sync_far_past_is_rejected(void) {
+    TEST_ASSERT_FALSE(mu_opn_time_sync_allows(TS_BASE, TS_BASE - TS_MS(600000)));
+}
+
+static void test_time_sync_zero_timestamp_skips_check(void) {
+    /* Either side 0 = unknown time (clockless peer): allow the channel. */
+    TEST_ASSERT_TRUE(mu_opn_time_sync_allows(TS_BASE, 0));
+    TEST_ASSERT_TRUE(mu_opn_time_sync_allows(0, TS_BASE + TS_MS(600000)));
+    TEST_ASSERT_TRUE(mu_opn_time_sync_allows(0, 0));
+}
+#endif /* MUC_OPCUA_TIME_SYNC */
+
 int main(void) {
     UNITY_BEGIN();
     RUN_TEST(test_time_sync_write_response_prefix_populated);
     RUN_TEST(test_time_sync_service_fault_populated);
     RUN_TEST(test_time_sync_null_server_produces_zero_timestamp);
+#ifdef MUC_OPCUA_TIME_SYNC
+    RUN_TEST(test_time_sync_within_skew_is_allowed);
+    RUN_TEST(test_time_sync_far_future_is_rejected);
+    RUN_TEST(test_time_sync_far_past_is_rejected);
+    RUN_TEST(test_time_sync_zero_timestamp_skips_check);
+#endif
     return UNITY_END();
 }

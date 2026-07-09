@@ -1,5 +1,22 @@
 #include "common.h"
 
+#ifdef MUC_OPCUA_TIME_SYNC
+bool mu_opn_time_sync_allows(opcua_datetime_t server_time, opcua_datetime_t client_time) {
+    /* FR-003: skip when either peer reports no time (0 = unknown / clockless). */
+    if (server_time == 0 || client_time == 0) {
+        return true;
+    }
+    /* opcua_datetime_t is 100ns ticks; convert the ms window to ticks (*10000).
+     * Realistic timestamps (~1.3e17 ticks) keep the difference well inside int64. */
+    const opcua_int64_t max_ticks = (opcua_int64_t)MU_TIME_SYNC_MAX_CLOCK_SKEW_MS * 10000LL;
+    opcua_int64_t diff = server_time - client_time;
+    if (diff < 0) {
+        diff = -diff;
+    }
+    return diff <= max_ticks;
+}
+#endif
+
 static opcua_statuscode_t validate_client_nonce(const mu_bytestring_t *client_nonce) {
     if (client_nonce->length > 0 && (client_nonce->length < 32 || client_nonce->length > 128)) {
         return MU_STATUS_BAD_NONCEINVALID;
@@ -66,6 +83,20 @@ opcua_statuscode_t handle_open_secure_channel(mu_server_t *server, mu_binary_rea
     if (s != MU_STATUS_GOOD) {
         return s;
     }
+
+#ifdef MUC_OPCUA_TIME_SYNC
+    /* Spec 055: reject channel establishment when the client's UTC timestamp
+     * (RequestHeader.timestamp, OPC-10000-4 §7.28) drifts beyond the configured
+     * clock skew from server time -- anti-replay / freshness. */
+    {
+        opcua_datetime_t server_time = server->config.time_adapter.get_time
+                                           ? server->config.time_adapter.get_time(server->config.time_adapter.context)
+                                           : 0;
+        if (!mu_opn_time_sync_allows(server_time, req.timestamp)) {
+            return MU_STATUS_BAD_SECURITYCHECKSFAILED;
+        }
+    }
+#endif
 
     opcua_uint32_t client_proto, request_type, security_mode, requested_lifetime;
     mu_bytestring_t client_nonce;
