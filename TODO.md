@@ -1,6 +1,6 @@
 # TODO — muc-opcua
 
-**Updated**: 2026-07-07 (spec 045 + F1 mDNS complete)
+**Updated**: 2026-07-09 (profiles gap analysis — spec 050 + 051 created)
 **Source**: code review findings, complexity audit, binary size analysis
 
 ## Remaining Active Backlog
@@ -9,7 +9,17 @@
 
 | ID | Feature | Scope | Effort | OPC Ref |
 |----|---------|-------|--------|---------|
-| F1 | **mDNS discovery (server-side)** | ✅ Complete (spec 048) — `mu_mdns_adapter_t` interface, no-op adapter, POSIX host adapter via UDP multicast. Server wiring in `mu_server_init`/`mu_server_close`. Gate: `MUC_OPCUA_SERVICE_DISCOVERY`. OPC-10000-12 §6.3 (LDS-ME). |
+| F1 | **mDNS discovery (server-side)** | ✅ Complete (spec 048) | OPC-10000-12 §6.3 |
+| PG1 | **Security Time Synchronization** | 📝 spec 050 — clientTimestamp validation at OPN | ~1d | OPC-10000-7 §6.6.151 |
+| PG13/PG14 | **ECC Security Policies (curve25519, nist256)** | ⏳ Planned — required for Nano 2022 baseline | ~5d | OPC-10000-7 Mantis 7041/6993 |
+| PG3 | **Data Access Server Facet** | ⏳ Planned — Standard profile prereq | ~3d | OPC-10000-7 §6.6.21 |
+| PG5 | **Method Server Facet** | ⏳ Planned — Standard profile prereq | ~3d | OPC-10000-7 §6.6.39 |
+| PG6 | **Standard Event Subscription (where-clause)** | ⏳ Planned — Standard profile prereq | ~3d | OPC-10000-7 §6.6.24 |
+| PG4 | **Enhanced DataChange Subscription 2017** | ⏳ Planned — Standard profile prereq | ~2d | OPC-10000-7 §6.6.19 |
+| PG10 | **Base Server Behaviour Facet** | ⏳ Planned | ~2d | OPC-10000-7 §6.6.6 |
+| PG12 | **Reverse Connect Server Facet** | ⏳ Planned | ~3d | OPC-10000-7 §6.6.5 |
+| PG11 | **Client Redundancy Server Facet** | ⏳ Planned | ~2d | OPC-10000-7 §6.6.45 |
+| PG17-PG20 | **Auth Service, KeyCredential, User Role Mgmt, GDS Facets** | ⏳ Deferred (v1.05.02 additions) | varies | OPC-10000-7 v1.05.02 |
 
 ### Features with Stub Tests — Feature Implementation Required First
 
@@ -122,6 +132,68 @@ Feature code exists. Only test implementation is needed.
 Archive measurement (`measure_size.sh`) is conservative — measures `.a` without
 `--gc-sections`. The linked ELF better reflects flash usage. See
 `docs/research/binary-size-optimization.md` for full analysis.
+
+## Active Specs
+
+| Spec | Title | Status |
+|------|-------|--------|
+| 050 | Security Time Sync | Draft — spec written, implementation pending |
+| 051 | Update Profile Targets to v1.05.02 | Draft — migration plan defined |
+
+## Profile Gap Analysis (2026-07-09) — Server Facets Not Yet Implemented
+
+Source: OPC-10000-7 v1.04 (2017) vs v1.05.02 (2022) spec comparison + codebase audit.
+
+### Tier 1 — Gaps vs Current 2017 Profile Targets
+
+| ID | Facet / Conformance Unit | Profile Impact | Priority | Effort |
+|----|--------------------------|---------------|----------|--------|
+| PG1 | **Security Time Synchronization** — now mandatory in Core 2017 Server Facet (v1.05.02). `MUC_OPCUA_TIME_SYNC` flag exists, service dispatch in `common.h`, stub test exists (spec 044). **Needs**: NTP config read + time-drift check at SecureChannel OPN validation. Was Optional in v1.04 → now Mandatory. | Nano+ | 🔴 HIGH | ~1d |
+| PG2 | **Base Info Server Capabilities (OperationLimits)** — CU changed Optional→Mandatory in Core 2017 Server Facet (v1.05.02). Check if `Base Info Server Capabilities` CUs (`MaxNodePerRead`, `MaxNodesPerWrite`, `MaxNodesPerSubscription`, `MaxNodesPerBrowse`, `MaxArrayLength`, `MaxStringLength`) are fully advertised via `Server.ServerCapabilities`. | Nano+ | 🔴 HIGH | ~0.5d |
+| PG3 | **Data Access Server Facet** — required for Standard UA 2017 Server Profile. `MUC_OPCUA_DATA_ACCESS` flag exists, no implementation. Needs EURange/AnalogItem/discrete types, percent deadband. | Standard | 🟡 MEDIUM | ~3d |
+| PG4 | **Enhanced DataChange Subscription 2017 Server Facet** — required for Standard 2017 UA Server Profile. Raises MonitoredItem/Subscription/Publish limits above Standard DataChange 2017 Facet. Needs higher capacity limits + Monitor Items 500 CU. | Standard | 🟡 MEDIUM | ~2d |
+
+### Tier 2 — Standard Profile Prerequisites (spec 037, all Pending)
+
+| ID | Facet | Status | Notes |
+|----|-------|--------|-------|
+| PG5 | Method Server Facet (`MUC_OPCUA_METHOD_SERVER`) | ❌ Not started | Arbitrary user methods, not just the two built-in |
+| PG6 | Standard Event Subscription Server Facet (`MUC_OPCUA_EVENT_FILTER_WHERE`) | ❌ Not started | EventFilter where-clause evaluation |
+| PG7 | Auditing Server Facet (`MUC_OPCUA_AUDITING`) | 🟡 D2 (045) | Callback dispatch exists, full audit event types need wiring |
+| PG8 | ComplexType 2017 Server Facet (`MUC_OPCUA_COMPLEX_TYPES`) | 🟡 D1 (045) | Binary encode/decode exists, type discovery + Read/Write/Monitor integration needed |
+| PG9 | Aggregate Subscription Server Facet (`MUC_OPCUA_AGGREGATE_FULL`) | 🟡 D3 (045) | All 42 functions in code, test STUB1 exists (spec 043) |
+| PG10 | Base Server Behaviour Facet (`MUC_OPCUA_SERVER_DIAGNOSTICS`) | ❌ Not started | Diagnostics objects, configuration management |
+| PG11 | Client Redundancy Server Facet (`MUC_OPCUA_REDUNDANCY`) | ❌ Not started | TransferSubscriptions handler exists but not profile-wired |
+| PG12 | Reverse Connect Server Facet (`MUC_OPCUA_REVERSE_CONNECT`) | ❌ Not started | Stub test exists (spec 044) |
+
+### Tier 3 — 2022/2025 Spec Additions Not Yet Addressed
+
+| ID | Facet / CU | New in v1.05.02 | Notes |
+|----|-----------|----------------|-------|
+| PG13 | **ECC Security Policy — curve25519** | Required for Nano (v1.05.02) | New policy for constrained devices; no ECC code exists |
+| PG14 | **ECC Security Policy — nist256** | Required for Nano alternative | Alternative mandated alongside curve25519 |
+| PG15 | **Exposes Type System Server Facet** | New Facet | Covers `Base Info Type System` — partially done in Embedded |
+| PG16 | **Documentation Server Facet** | New Facet | Mandatory documentation CUs for limits |
+| PG17 | **Authorization Service Server Facet** | New in 1.05.02 | OAuth2/JWT access token support |
+| PG18 | **KeyCredential Service Server Facet** | New in 1.05.02 | KeyCredential management for broker auth |
+| PG19 | **User Role Management Server Facet** | New in 1.05.02 | Server user CRUD management |
+| PG20 | **Global Certificate Management Server Facet** | New in 1.05.02 | Certificate enrollment/renewal via GDS |
+
+### Security Profile Facets
+
+| ID | User Token Facet | Status | Notes |
+|----|-----------------|--------|-------|
+| PG21 | User Token — User Name Password Server Facet | ✅ Partial | Unencrypted works; encrypted password with ServerNonce anti-replay done |
+| PG22 | User Token — X509 Certificate Server Facet | ✅ Partial | Works with trust list |
+| PG23 | User Token — JWT Server Facet | ❌ | OAuth2/JWT — new in 1.05.02 |
+| PG24 | User Token — Issued Token Server Facet | ❌ | Kerberos — deprecated in 1.05.02 |
+
+### Summary Counts
+- **Total Server Facets defined in Part 7 (v1.05.02):** 61
+- **Fully implemented (Nano/Micro/Embedded target):** ~10
+- **Partially implemented (045 in-progress):** 4 (PG7, PG8, PG9, PG21)
+- **Planned but not started (Standard profile prereqs):** 8 (PG3-PG6, PG10-PG12)
+- **Not started, not planned (2022/2025 additions):** 8 (PG13-PG20)
 
 ## ✅ Completed in Spec 041 — Split Oversized Files
 
