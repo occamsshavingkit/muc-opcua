@@ -236,6 +236,12 @@ option(MUC_OPCUA_STANDARD_PROFILE "Apply Standard 2017 profile gates and capacit
 option(MUC_OPCUA_CLIENT_NANO "Build Nano Embedded UA Client Profile support" OFF)
 option(MUC_OPCUA_ALLOW_HEAP "Allow heap allocation in optional adapters/features" ON)
 option(MUC_OPCUA_SESSION_TIMEOUT "Enable session timeout enforcement" OFF)
+# Read value cache (OPC-10000-4 5.11.2 maxAge optimization). OFF by default: the
+# cache is a latency optimization, not a conformance requirement (a server may
+# always return a fresh "best effort" value), and it pulls double-precision
+# soft-float into the Read path. Opt in for speed on FPU-capable / non-size-critical
+# targets. Independent of MUC_OPCUA_PROFILE (not reset by the profile machinery).
+option(MUC_OPCUA_READ_CACHE "Build the Read value cache (maxAge optimization; trades size for speed)" OFF)
 set(MUC_OPCUA_SANITIZERS "" CACHE STRING "Comma-separated list of sanitizers (e.g. address,undefined)")
 if(MUC_OPCUA_SANITIZERS)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fsanitize=${MUC_OPCUA_SANITIZERS}")

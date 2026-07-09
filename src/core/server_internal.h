@@ -125,7 +125,9 @@ struct mu_server {
 #endif
     mu_session_t sessions[MU_MAX_SESSIONS];
     mu_session_t *active_session;
+#if MUC_OPCUA_READ_CACHE
     mu_read_cache_t read_cache;
+#endif
 #if defined(MUC_OPCUA_SESSION_TIMEOUT)
     opcua_uint64_t next_session_timeout_ms;
 #endif

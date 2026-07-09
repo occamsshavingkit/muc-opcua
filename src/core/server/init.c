@@ -4,9 +4,11 @@
 #include <stdlib.h>
 #include <string.h>
 
+#ifdef MUC_OPCUA_MDNS_DISCOVERY
 /* Static helper: extract hostname and port from an opc.tcp:// endpoint URL.
  * Hostname is written to the caller-provided buffer; port is written to *port.
- * Returns MU_STATUS_GOOD on success. */
+ * Returns MU_STATUS_GOOD on success. Only needed for mDNS registration, so it is
+ * compiled out (along with its strstr/strchr/atoi pull-ins) when mDNS is off. */
 static opcua_statuscode_t parse_endpoint_url(const char *url, char *hostname, size_t hostname_cap, uint16_t *port) {
     if (url == NULL || *url == '\0')
         return MU_STATUS_BAD_INTERNALERROR;
@@ -45,6 +47,7 @@ static opcua_statuscode_t parse_endpoint_url(const char *url, char *hostname, si
     hostname[len] = '\0';
     return MU_STATUS_GOOD;
 }
+#endif /* MUC_OPCUA_MDNS_DISCOVERY */
 
 opcua_statuscode_t mu_server_config_validate(const mu_server_config_t *config) {
     if (config == NULL) {
@@ -193,6 +196,7 @@ opcua_statuscode_t mu_server_init(void *storage, size_t storage_size, const mu_s
     }
     server->is_running = true;
 
+#ifdef MUC_OPCUA_MDNS_DISCOVERY
     /* Optional mDNS publish */
     if (server->config.mdns_adapter != NULL && server->config.mdns_adapter->publish != NULL) {
         char hostname[256];
@@ -202,6 +206,7 @@ opcua_statuscode_t mu_server_init(void *storage, size_t storage_size, const mu_s
                                                  server->config.application_uri, "/discovery");
         }
     }
+#endif /* MUC_OPCUA_MDNS_DISCOVERY */
 
 #ifdef MUC_OPCUA_MULTIPLE_CONNECTIONS
     for (size_t i = 0; i < MU_MAX_CONNECTIONS; ++i) {
@@ -272,10 +277,12 @@ void mu_server_close(mu_server_t *server) {
     if (server != NULL) {
         server->is_running = false;
 
+#ifdef MUC_OPCUA_MDNS_DISCOVERY
         /* Optional mDNS unpublish — must precede TCP shutdown */
         if (server->config.mdns_adapter != NULL && server->config.mdns_adapter->unpublish != NULL) {
             server->config.mdns_adapter->unpublish(server->config.mdns_adapter->context);
         }
+#endif /* MUC_OPCUA_MDNS_DISCOVERY */
 
 #ifdef MUC_OPCUA_MULTIPLE_CONNECTIONS
         for (size_t i = 0; i < MU_MAX_CONNECTIONS; ++i) {
