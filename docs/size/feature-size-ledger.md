@@ -1,6 +1,42 @@
 # Feature Size Ledger
 
-## Current (2026-07-09): De-bloat nano/micro — remove leaked soft-float + strstr
+## Current (2026-07-09): No-heap embedded profiles + LTO by default
+
+Two changes, both driven by the realistic linked-server measurement:
+
+**LTO on by default** (`MUC_OPCUA_LTO=ON`). Recovers the cross-TU inlining lost to
+the feature-041 file split. The real linked `nano` server (`init`+`poll`+`close`,
+`--gc-sections`) is **15,724 B** `.text`, below the previous ~16.1 KB low.
+
+**nano/micro/embedded are now strictly no-heap.** The linked-server measurement
+revealed micro/embedded/standard were pulling newlib `malloc`+`stdio` (nonzero
+`.data`/`.bss`) — the "no-heap" profiles weren't. Cause: `binary_variant.c` array
+decode uses `calloc` under `MUC_OPCUA_ALLOW_HEAP` (default ON, never disabled by the
+profiles), and the Write/Call array-`free` paths were ungated. Fixed by gating those
+frees, un-gating the host-only crypto adapters (they need a heap and are never in the
+freestanding core), and forcing `ALLOW_HEAP=OFF` for nano/micro/embedded (array
+Write/Call returns `Bad_OutOfMemory` — conformant). standard/full keep the heap.
+
+- **Toolchain**: `arm-none-eabi-gcc` 13.2.1, Cortex-M0+ `-Os`, `arduino-skeleton`, LTO
+- **Reproduce**: `bash scripts/measure_size.sh all` (archive `.text` + linked `elf_text`)
+
+### Library archive `.text` + linked-server `.data`/`.bss`
+
+| Profile | archive .text | linked .data | linked .bss | heap? |
+|---------|---------------|--------------|-------------|-------|
+| nano | 17,790 B | 0 | 0 | no |
+| micro | 28,792 B | 0 | 0 | no |
+| embedded | 53,675 B | 0 | 0 | no |
+| standard | 67,353 B | 1,336 B | 884 B | yes (ALLOW_HEAP) |
+| full | 67,373 B | 1,336 B | 884 B | yes (ALLOW_HEAP) |
+
+(The 512 B `.bss` the linker reserves for the measurement stack is excluded above.
+Real linked `nano` server: 15,724 B `.text` with LTO.) Per-profile ctest matrix
+green: nano 88 / micro 96 / embedded 116 / standard 124 / full 124.
+
+---
+
+## 2026-07-09: De-bloat nano/micro — remove leaked soft-float + strstr
 
 Investigating a ~2 KB archive `.text` creep in nano over the prior week uncovered a
 much larger regression the archive metric could not see. **The archive `.text`
