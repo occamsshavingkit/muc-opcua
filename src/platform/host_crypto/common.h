@@ -19,6 +19,15 @@ struct host_crypto_context {
     EVP_PKEY *key;
     unsigned char *cert_der;
     int cert_der_len;
+    /* spec 059: per-curve server ECC identity, self-signed at init so ECC
+       SecurityPolicies can sign the OPN and user-token proofs. NULL when the ECC
+       feature is not built. */
+    EVP_PKEY *ed25519_key;
+    unsigned char *ed25519_cert_der;
+    int ed25519_cert_der_len;
+    EVP_PKEY *p256_key;
+    unsigned char *p256_cert_der;
+    int p256_cert_der_len;
 };
 
 struct host_cipher_context {
@@ -67,6 +76,29 @@ opcua_statuscode_t h_get_certificate_thumbprint(void *c, const opcua_byte_t *cer
                                                 opcua_byte_t *thumbprint);
 opcua_statuscode_t h_verify_certificate_application_uri(void *c, const opcua_byte_t *cert, size_t cert_len,
                                                         const char *application_uri, size_t application_uri_len);
+
+/* ecc.c (spec 059) */
+#ifdef MUC_OPCUA_ECC
+opcua_statuscode_t h_ecc_generate_ephemeral(void *c, mu_ecc_curve_t curve, opcua_byte_t *pubkey, size_t *pubkey_len,
+                                            opcua_byte_t *keypair_ctx);
+opcua_statuscode_t h_ecc_ecdh_derive(void *c, mu_ecc_curve_t curve, const opcua_byte_t *keypair_ctx,
+                                     const opcua_byte_t *peer_pubkey, size_t peer_pubkey_len, opcua_byte_t *shared,
+                                     size_t *shared_len);
+void h_ecc_keypair_free(void *c, opcua_byte_t *keypair_ctx);
+opcua_statuscode_t h_ecc_sign(void *c, mu_ecc_curve_t curve, const opcua_byte_t *data, size_t len, opcua_byte_t *sig,
+                              size_t *sig_len);
+opcua_statuscode_t h_ecc_verify(void *c, mu_ecc_curve_t curve, const opcua_byte_t *cert, size_t cert_len,
+                                const opcua_byte_t *data, size_t data_len, const opcua_byte_t *sig, size_t sig_len);
+opcua_statuscode_t h_chacha20_poly1305_encrypt(void *c, const opcua_byte_t *key, const opcua_byte_t *nonce,
+                                               const opcua_byte_t *aad, size_t aad_len, const opcua_byte_t *in,
+                                               size_t len, opcua_byte_t *out, opcua_byte_t *tag);
+opcua_statuscode_t h_chacha20_poly1305_decrypt(void *c, const opcua_byte_t *key, const opcua_byte_t *nonce,
+                                               const opcua_byte_t *aad, size_t aad_len, const opcua_byte_t *in,
+                                               size_t len, const opcua_byte_t *tag, opcua_byte_t *out);
+/* Server's own self-signed ECC certificate (DER) for `curve`, used to verify the
+   sign/verify roundtrip and, later, presented during the ECC handshake. */
+opcua_statuscode_t h_get_own_ecc_certificate(void *c, mu_ecc_curve_t curve, const opcua_byte_t **cert, size_t *len);
+#endif /* MUC_OPCUA_ECC */
 
 /* sign.c */
 opcua_statuscode_t h_rsa_sign(void *c, const opcua_byte_t *data, size_t len, opcua_byte_t *sig, size_t *sig_len);

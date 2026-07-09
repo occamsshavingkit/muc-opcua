@@ -6,6 +6,13 @@
    32 bytes for Basic256Sha256; 128 allows for larger nonces (OPC-10000-6 §6.7.6). */
 #define MU_KDF_MAX_SEED 128
 
+#ifdef MUC_OPCUA_ECC
+/* Maximum HKDF `info` we accommodate. The ECC key-derivation salt/info is
+   L | UTF8("opcua-server"|"opcua-client") | Nonce | Nonce; with <=64-byte channel
+   nonces this is well under 256 bytes (OPC-10000-6 §6.8.1). */
+#define MU_HKDF_MAX_INFO 256
+#endif
+
 void mu_secure_zero(void *v, size_t n) {
     volatile unsigned char *p = (volatile unsigned char *)v;
 
@@ -91,3 +98,72 @@ opcua_statuscode_t mu_p_sha256(const mu_crypto_adapter_t *crypto, const opcua_by
     mu_secure_zero(block, sizeof(block));
     return MU_STATUS_GOOD;
 }
+
+#ifdef MUC_OPCUA_ECC
+opcua_statuscode_t mu_hkdf_sha256(const mu_crypto_adapter_t *crypto, const opcua_byte_t *salt, size_t salt_length,
+                                  const opcua_byte_t *ikm, size_t ikm_length, const opcua_byte_t *info,
+                                  size_t info_length, opcua_byte_t *okm, size_t okm_length) {
+    if (!crypto || !crypto->hmac_sha256 || !ikm || !okm) {
+        return MU_STATUS_BAD_INTERNALERROR;
+    }
+    if (info_length > MU_HKDF_MAX_INFO || (info_length != 0u && !info)) {
+        return MU_STATUS_BAD_INTERNALERROR;
+    }
+    /* RFC 5869 caps output at 255 hash blocks. */
+    if (okm_length > (size_t)255 * MU_SHA256_LENGTH) {
+        return MU_STATUS_BAD_INTERNALERROR;
+    }
+
+    /* Extract: PRK = HMAC(salt, IKM). RFC 5869 uses HashLen zero bytes when salt
+       is empty; the adapter's HMAC accepts a zero-length key, so a NULL/empty salt
+       maps to an all-zero key of the same effect via a static zero block. */
+    opcua_byte_t zero_salt[MU_SHA256_LENGTH];
+    if (salt == NULL || salt_length == 0u) {
+        (void)memset(zero_salt, 0, sizeof(zero_salt));
+        salt = zero_salt;
+        salt_length = sizeof(zero_salt);
+    }
+
+    opcua_byte_t prk[MU_SHA256_LENGTH];
+    opcua_byte_t t[MU_SHA256_LENGTH];
+    opcua_byte_t buf[MU_SHA256_LENGTH + MU_HKDF_MAX_INFO + 1];
+    opcua_statuscode_t status = crypto->hmac_sha256(crypto->context, salt, salt_length, ikm, ikm_length, prk);
+    if (status != MU_STATUS_GOOD) {
+        goto done;
+    }
+
+    /* Expand: T(i) = HMAC(PRK, T(i-1) | info | i), i = 1.. */
+    size_t produced = 0;
+    size_t t_len = 0; /* T(0) is empty */
+    unsigned char counter = 0;
+    while (produced < okm_length) {
+        counter++;
+        size_t off = 0;
+        (void)memcpy(buf, t, t_len);
+        off += t_len;
+        if (info_length != 0u) {
+            (void)memcpy(buf + off, info, info_length);
+            off += info_length;
+        }
+        buf[off++] = counter;
+        status = crypto->hmac_sha256(crypto->context, prk, sizeof(prk), buf, off, t);
+        if (status != MU_STATUS_GOOD) {
+            goto done;
+        }
+        t_len = MU_SHA256_LENGTH;
+
+        size_t take = okm_length - produced;
+        if (take > MU_SHA256_LENGTH) {
+            take = MU_SHA256_LENGTH;
+        }
+        (void)memcpy(okm + produced, t, take);
+        produced += take;
+    }
+
+done:
+    mu_secure_zero(prk, sizeof(prk));
+    mu_secure_zero(t, sizeof(t));
+    mu_secure_zero(buf, sizeof(buf));
+    return status;
+}
+#endif /* MUC_OPCUA_ECC */

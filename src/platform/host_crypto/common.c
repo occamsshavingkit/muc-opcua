@@ -2,12 +2,9 @@
  * Adapter init/cleanup and self-signed certificate generation. */
 #include "common.h"
 
-static int build_self_signed(struct host_crypto_context *cx) {
-    cx->key = EVP_RSA_gen(2048);
-    if (!cx->key) {
-        return 0;
-    }
-
+/* Build a self-signed certificate for `key` (signed with `md`; NULL md for
+   Ed25519), returning the DER encoding in a freshly OPENSSL_malloc'd buffer. */
+static int make_self_signed(EVP_PKEY *key, const EVP_MD *md, unsigned char **der_out, int *der_len_out) {
     X509 *x = X509_new();
     if (!x) {
         return 0;
@@ -19,15 +16,20 @@ static int build_self_signed(struct host_crypto_context *cx) {
         X509_gmtime_adj(X509_getm_notAfter(x), 60L * 60L * 24L * 365L);
         X509_NAME *name = X509_get_subject_name(x);
         X509_NAME_add_entry_by_txt(name, "CN", MBSTRING_ASC, (const unsigned char *)"muc-opcua", -1, -1, 0);
-        if (X509_set_issuer_name(x, name) == 1 && X509_set_pubkey(x, cx->key) == 1 &&
-            X509_sign(x, cx->key, EVP_sha256()) != 0) {
+        if (X509_set_issuer_name(x, name) == 1 && X509_set_pubkey(x, key) == 1 && X509_sign(x, key, md) != 0) {
             int len = i2d_X509(x, NULL);
             if (len > 0) {
-                cx->cert_der = (unsigned char *)OPENSSL_malloc((size_t)len);
-                if (cx->cert_der) {
-                    unsigned char *p = cx->cert_der;
-                    cx->cert_der_len = i2d_X509(x, &p);
-                    ok = (cx->cert_der_len > 0);
+                unsigned char *der = (unsigned char *)OPENSSL_malloc((size_t)len);
+                if (der) {
+                    unsigned char *p = der;
+                    int wrote = i2d_X509(x, &p);
+                    if (wrote > 0) {
+                        *der_out = der;
+                        *der_len_out = wrote;
+                        ok = 1;
+                    } else {
+                        OPENSSL_free(der);
+                    }
                 }
             }
         }
@@ -35,6 +37,33 @@ static int build_self_signed(struct host_crypto_context *cx) {
     X509_free(x);
     return ok;
 }
+
+static int build_self_signed(struct host_crypto_context *cx) {
+    cx->key = EVP_RSA_gen(2048);
+    if (!cx->key) {
+        return 0;
+    }
+    return make_self_signed(cx->key, EVP_sha256(), &cx->cert_der, &cx->cert_der_len);
+}
+
+#ifdef MUC_OPCUA_ECC
+/* Generate the per-curve server ECC identities. A failure here is non-fatal to
+   RSA policies, so init keeps the adapter usable and simply leaves the ECC keys
+   NULL (ECC sign then reports Bad_SecurityChecksFailed). */
+static void build_ecc_identities(struct host_crypto_context *cx) {
+    cx->ed25519_key = EVP_PKEY_Q_keygen(NULL, NULL, "ED25519");
+    if (cx->ed25519_key &&
+        !make_self_signed(cx->ed25519_key, NULL, &cx->ed25519_cert_der, &cx->ed25519_cert_der_len)) {
+        EVP_PKEY_free(cx->ed25519_key);
+        cx->ed25519_key = NULL;
+    }
+    cx->p256_key = EVP_PKEY_Q_keygen(NULL, NULL, "EC", "P-256");
+    if (cx->p256_key && !make_self_signed(cx->p256_key, EVP_sha256(), &cx->p256_cert_der, &cx->p256_cert_der_len)) {
+        EVP_PKEY_free(cx->p256_key);
+        cx->p256_key = NULL;
+    }
+}
+#endif
 
 opcua_statuscode_t mu_host_crypto_adapter_init(mu_crypto_adapter_t *adapter) {
     if (!adapter) {
@@ -84,6 +113,16 @@ opcua_statuscode_t mu_host_crypto_adapter_init(mu_crypto_adapter_t *adapter) {
     adapter->get_certificate_thumbprint = h_get_certificate_thumbprint;
     adapter->verify_certificate_validity = h_verify_certificate_validity;
     adapter->verify_certificate_application_uri = h_verify_certificate_application_uri;
+#ifdef MUC_OPCUA_ECC
+    build_ecc_identities(cx);
+    adapter->ecc_generate_ephemeral = h_ecc_generate_ephemeral;
+    adapter->ecc_ecdh_derive = h_ecc_ecdh_derive;
+    adapter->ecc_keypair_free = h_ecc_keypair_free;
+    adapter->ecc_sign = h_ecc_sign;
+    adapter->ecc_verify = h_ecc_verify;
+    adapter->chacha20_poly1305_encrypt = h_chacha20_poly1305_encrypt;
+    adapter->chacha20_poly1305_decrypt = h_chacha20_poly1305_decrypt;
+#endif
     return MU_STATUS_GOOD;
 }
 
@@ -98,6 +137,20 @@ void mu_host_crypto_adapter_cleanup(mu_crypto_adapter_t *adapter) {
     if (cx->cert_der) {
         OPENSSL_free(cx->cert_der);
     }
+#ifdef MUC_OPCUA_ECC
+    if (cx->ed25519_key) {
+        EVP_PKEY_free(cx->ed25519_key);
+    }
+    if (cx->ed25519_cert_der) {
+        OPENSSL_free(cx->ed25519_cert_der);
+    }
+    if (cx->p256_key) {
+        EVP_PKEY_free(cx->p256_key);
+    }
+    if (cx->p256_cert_der) {
+        OPENSSL_free(cx->p256_cert_der);
+    }
+#endif
     free(cx);
     adapter->context = NULL;
 }

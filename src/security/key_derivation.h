@@ -17,4 +17,16 @@ opcua_statuscode_t mu_p_sha256(const mu_crypto_adapter_t *crypto, const opcua_by
                                const opcua_byte_t *seed, size_t seed_length, opcua_byte_t *output,
                                size_t output_length);
 
+#ifdef MUC_OPCUA_ECC
+/* HKDF-SHA256 (RFC 5869), the key-derivation function for the ECC SecurityPolicies
+   (OPC-10000-6 §6.8.1), built on the adapter's HMAC-SHA256:
+     PRK = HMAC(salt, ikm);  OKM = T(1)|T(2)|... truncated to `okm_length`, where
+     T(i) = HMAC(PRK, T(i-1) | info | i).
+   `okm_length` must be <= 255*32. Returns Bad_* on adapter failure, over-long
+   output, or if info is too long for the internal scratch. */
+opcua_statuscode_t mu_hkdf_sha256(const mu_crypto_adapter_t *crypto, const opcua_byte_t *salt, size_t salt_length,
+                                  const opcua_byte_t *ikm, size_t ikm_length, const opcua_byte_t *info,
+                                  size_t info_length, opcua_byte_t *okm, size_t okm_length);
+#endif /* MUC_OPCUA_ECC */
+
 #endif /* MUC_OPCUA_KEY_DERIVATION_H */
