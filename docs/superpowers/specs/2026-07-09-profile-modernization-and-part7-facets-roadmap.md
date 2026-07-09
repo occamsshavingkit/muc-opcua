@@ -19,9 +19,14 @@ before Project B starts):
 
 ## Decisions (locked)
 
-1. **Sequential, A-before-B.** ECC-curve25519 is a hard v1.05.02 Nano mandatory;
-   profiles are not "current" until it ships. Project B waits for Project A to
-   complete (all four A-specs merged, including ECC).
+1. **Sequential, A-before-B.** Project B waits for Project A to complete (all four
+   A-specs merged, including ECC). **CORRECTION (spec-grounded 2026-07-09):** the
+   earlier claim that "ECC-curve25519 is a hard v1.05.02 Nano mandatory" is **WRONG**
+   (inherited from the erroneous spec-051 draft). The live OPC profile database shows
+   the *Security ECC Policy* CU is **OPTIONAL at every server tier, including Embedded
+   2025** — support one of ECC-A/ECC-B, both recommended; RSA (Basic256Sha256) satisfies
+   the mandatory *Security Policy Required* CU. ECC is a product choice, not a conformance
+   obligation. See `docs/conformance/ecc-security-policy.md`.
 2. **Facet priority = deployment-frequency ranking** (see Project B table).
 3. **One spec per facet/feature** — each gets its own `NNN-*` spec → plan →
    implement → PR cycle, matching the existing 001–051 pattern. This lets the
@@ -64,7 +69,7 @@ first, big refactor last so it never stalls the smaller conformance wins.
 | A1 | `055-security-time-sync` | Spec 050 in full: read+validate OPN `clientTimestamp` vs server time within `MU_TIME_SYNC_MAX_CLOCK_SKEW_MS` (default 300000); `Bad_SecurityChecksFailed` on drift | ~1d | +~200 B flash, 0 RAM |
 | A2 | `057-base-info-capabilities` | 051 §2/§7: verify/complete the 6 OperationLimits (`MaxNodePerRead`, `MaxNodesPerWrite`, `MaxNodesPerSubscription`, `MaxNodesPerBrowse`, `MaxArrayLength`, `MaxStringLength`) advertised in `Server.ServerCapabilities` via `base_nodes.c`; now Mandatory | ~0.5d | ~0 |
 | A3 | `058-documentation-facet` | 051 §3: new `docs/conformance/documentation.md` capacity tables per profile; bump profile-doc + traceability spec-version references to v1.05.02 | ~0.5d | 0 (docs only) |
-| A4 | `059-ecc-security-policies` | 051 §4 (PG13/PG14): `SecurityPolicy - ECC-curve25519` (Nano-mandatory) + `ECC-nist256`. **Extend `mu_crypto_adapter_t` with ECDH-derive / ECC-sign / ECC-verify slots; bind to mbedTLS (`mbedtls_ecdh_*`, `mbedtls_ecdsa_*`) and wolfSSL (`wc_ecc_*`, `wc_curve25519_*`). NO hand-rolled crypto.** Wire ECC key derivation into `security_policy.c` / `key_derivation.c`. | **~5d** | measured; gated, standard/full only |
+| A4 | `059-ecc-security-policies` | 051 §4 (PG13/PG14): `SecurityPolicy - ECC-curve25519` + `ECC-nistP256` (both **OPTIONAL** — the *Security ECC Policy* CU, not Nano-mandatory). **Extend `mu_crypto_adapter_t` with ECDH-derive / ECC-sign / ECC-verify slots; bind to mbedTLS (`mbedtls_ecdh_*`, `mbedtls_ecdsa_*`) and wolfSSL (`wc_ecc_*`, `wc_curve25519_*`). NO hand-rolled crypto.** Wire ECC key derivation into `security_policy.c` / `key_derivation.c`. | **~5d** | measured; gated, standard/full only |
 
 **Definition of done for Project A:** A1–A4 PRs merged; per-profile ctest matrix
 green; ECC round-trip tests pass against a known-answer vector; profile
