@@ -32,15 +32,19 @@
 
 /* =====================================================================
  * Profile-varying capacities (all three stages).
- * Baseline == standard values, so the `standard` profile needs no stage-2
- * block -- it falls through to the baseline.
+ * Baseline == the MINIMAL (nano) values: a profile-less / custom build gets the
+ * smallest, storage-consistent footprint and scales UP via a profile or a public
+ * -D. (A standard-sized baseline would give a featureless no-profile build a
+ * 50-session in-struct array with no matching MU_SERVER_STORAGE_BYTES, tripping
+ * the storage-coverage assert in server_internal.h.) Larger profiles therefore
+ * each carry an explicit stage-2 block.
  * ===================================================================== */
 
 /* ---- Max concurrent Sessions ---------------------------------------- */
-#define MU_INTERN_MAX_SESSIONS 50 /* stage 1: standard baseline */
-#if defined(MUC_OPCUA_PROFILE_NANO) || defined(MUC_OPCUA_PROFILE_MICRO) || defined(MUC_OPCUA_PROFILE_EMBEDDED)
+#define MU_INTERN_MAX_SESSIONS 2 /* stage 1: minimal baseline */
+#if defined(MUC_OPCUA_PROFILE_STANDARD)
 #undef MU_INTERN_MAX_SESSIONS
-#define MU_INTERN_MAX_SESSIONS 2 /* stage 2: profile */
+#define MU_INTERN_MAX_SESSIONS 50 /* stage 2: profile */
 #elif defined(MUC_OPCUA_PROFILE_FULL)
 #undef MU_INTERN_MAX_SESSIONS
 #define MU_INTERN_MAX_SESSIONS 100
@@ -57,16 +61,16 @@
  * connection accept path are gated on MUC_OPCUA_MULTIPLE_CONNECTIONS; when
  * that flag is off the single-connection path is used regardless of this
  * value (and MU_MULTIPLE_CONNECTIONS_STORAGE_BYTES contributes 0). */
-#define MU_INTERN_MAX_CONNECTIONS 50 /* stage 1: standard baseline */
-#if defined(MUC_OPCUA_PROFILE_NANO)
-#undef MU_INTERN_MAX_CONNECTIONS
-#define MU_INTERN_MAX_CONNECTIONS 1
-#elif defined(MUC_OPCUA_PROFILE_MICRO)
+#define MU_INTERN_MAX_CONNECTIONS 1 /* stage 1: minimal baseline */
+#if defined(MUC_OPCUA_PROFILE_MICRO)
 #undef MU_INTERN_MAX_CONNECTIONS
 #define MU_INTERN_MAX_CONNECTIONS 2
 #elif defined(MUC_OPCUA_PROFILE_EMBEDDED)
 #undef MU_INTERN_MAX_CONNECTIONS
 #define MU_INTERN_MAX_CONNECTIONS 4
+#elif defined(MUC_OPCUA_PROFILE_STANDARD)
+#undef MU_INTERN_MAX_CONNECTIONS
+#define MU_INTERN_MAX_CONNECTIONS 50
 #elif defined(MUC_OPCUA_PROFILE_FULL)
 #undef MU_INTERN_MAX_CONNECTIONS
 #define MU_INTERN_MAX_CONNECTIONS 100
@@ -77,10 +81,10 @@
 #endif
 
 /* ---- Max concurrent Subscriptions ----------------------------------- */
-#define MU_INTERN_MAX_SUBSCRIPTIONS 50 /* stage 1: standard baseline */
-#if defined(MUC_OPCUA_PROFILE_NANO) || defined(MUC_OPCUA_PROFILE_MICRO) || defined(MUC_OPCUA_PROFILE_EMBEDDED)
+#define MU_INTERN_MAX_SUBSCRIPTIONS 2 /* stage 1: minimal baseline */
+#if defined(MUC_OPCUA_PROFILE_STANDARD)
 #undef MU_INTERN_MAX_SUBSCRIPTIONS
-#define MU_INTERN_MAX_SUBSCRIPTIONS 2
+#define MU_INTERN_MAX_SUBSCRIPTIONS 50
 #elif defined(MUC_OPCUA_PROFILE_FULL)
 #undef MU_INTERN_MAX_SUBSCRIPTIONS
 #define MU_INTERN_MAX_SUBSCRIPTIONS 100
@@ -91,13 +95,13 @@
 #endif
 
 /* ---- Max MonitoredItems --------------------------------------------- */
-#define MU_INTERN_MAX_MONITORED_ITEMS 1000 /* stage 1: standard baseline */
-#if defined(MUC_OPCUA_PROFILE_NANO) || defined(MUC_OPCUA_PROFILE_MICRO)
-#undef MU_INTERN_MAX_MONITORED_ITEMS
-#define MU_INTERN_MAX_MONITORED_ITEMS 8
-#elif defined(MUC_OPCUA_PROFILE_EMBEDDED)
+#define MU_INTERN_MAX_MONITORED_ITEMS 8 /* stage 1: minimal baseline */
+#if defined(MUC_OPCUA_PROFILE_EMBEDDED)
 #undef MU_INTERN_MAX_MONITORED_ITEMS
 #define MU_INTERN_MAX_MONITORED_ITEMS 100
+#elif defined(MUC_OPCUA_PROFILE_STANDARD)
+#undef MU_INTERN_MAX_MONITORED_ITEMS
+#define MU_INTERN_MAX_MONITORED_ITEMS 1000
 #elif defined(MUC_OPCUA_PROFILE_FULL)
 #undef MU_INTERN_MAX_MONITORED_ITEMS
 #define MU_INTERN_MAX_MONITORED_ITEMS 2000
@@ -108,13 +112,13 @@
 #endif
 
 /* ---- Max parallel Publish requests ---------------------------------- */
-#define MU_INTERN_MAX_PUBLISH_REQUESTS 50 /* stage 1: standard baseline */
-#if defined(MUC_OPCUA_PROFILE_NANO) || defined(MUC_OPCUA_PROFILE_MICRO)
-#undef MU_INTERN_MAX_PUBLISH_REQUESTS
-#define MU_INTERN_MAX_PUBLISH_REQUESTS 4
-#elif defined(MUC_OPCUA_PROFILE_EMBEDDED)
+#define MU_INTERN_MAX_PUBLISH_REQUESTS 4 /* stage 1: minimal baseline */
+#if defined(MUC_OPCUA_PROFILE_EMBEDDED)
 #undef MU_INTERN_MAX_PUBLISH_REQUESTS
 #define MU_INTERN_MAX_PUBLISH_REQUESTS 5
+#elif defined(MUC_OPCUA_PROFILE_STANDARD)
+#undef MU_INTERN_MAX_PUBLISH_REQUESTS
+#define MU_INTERN_MAX_PUBLISH_REQUESTS 50
 #elif defined(MUC_OPCUA_PROFILE_FULL)
 #undef MU_INTERN_MAX_PUBLISH_REQUESTS
 #define MU_INTERN_MAX_PUBLISH_REQUESTS 100
@@ -125,10 +129,10 @@
 #endif
 
 /* ---- MonitoredItem queue depth -------------------------------------- */
-#define MU_INTERN_MONITORED_QUEUE_DEPTH 2 /* stage 1: standard baseline */
-#if defined(MUC_OPCUA_PROFILE_NANO) || defined(MUC_OPCUA_PROFILE_MICRO)
+#define MU_INTERN_MONITORED_QUEUE_DEPTH 1 /* stage 1: minimal baseline */
+#if defined(MUC_OPCUA_PROFILE_EMBEDDED) || defined(MUC_OPCUA_PROFILE_STANDARD) || defined(MUC_OPCUA_PROFILE_FULL)
 #undef MU_INTERN_MONITORED_QUEUE_DEPTH
-#define MU_INTERN_MONITORED_QUEUE_DEPTH 1
+#define MU_INTERN_MONITORED_QUEUE_DEPTH 2
 #endif
 #ifdef MU_MONITORED_QUEUE_DEPTH
 #undef MU_INTERN_MONITORED_QUEUE_DEPTH

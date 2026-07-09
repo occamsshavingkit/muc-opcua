@@ -1133,7 +1133,7 @@ raise it, with or without a profile. The library resolves each into an internal
 `MU_INTERN_MAX_*` macro via a `default < profile < user` cascade in
 `include/muc_opcua/capacities.h`, and **all code compiles off `MU_INTERN_*`** — so
 a `MU_MAX_*` you do not define simply takes the selected profile's value (or the
-standard baseline for a profile-less build). Profiles are selected via the
+minimal baseline for a profile-less build). Profiles are selected via the
 `MUC_OPCUA_PROFILE_<NAME>` marker CMake emits. The per-profile values are listed
 in the README size tables.
 

@@ -27,8 +27,12 @@ tell which profile it was compiling for.
 `include/muc_opcua/capacities.h` is the single source of truth. For every capacity
 it resolves an internal `MU_INTERN_*` macro through:
 
-1. **DEFAULT** — an unconditional baseline (the `standard` values). Always runs, so
-   the internal macro is guaranteed defined and silent fallthrough is impossible.
+1. **DEFAULT** — an unconditional **minimal (nano) baseline**. Always runs, so the
+   internal macro is guaranteed defined and silent fallthrough is impossible. A
+   profile-less / custom build therefore gets the smallest, storage-consistent
+   footprint (a standard-sized baseline would give a featureless no-profile build
+   a 50-session in-struct array with no matching `MU_SERVER_STORAGE_BYTES`,
+   tripping the storage-coverage assert) and scales up via a profile or `-D`.
 2. **PROFILE** — if a profile is declared, redefine to that profile's value.
    `src/CMakeLists.txt` emits exactly one `MUC_OPCUA_PROFILE_<NAME>` marker.
 3. **USER** — if the integrator defined the public `MU_MAX_*` knob (e.g.
@@ -60,8 +64,8 @@ stays single-connection (its profile is single-client).
 
 `MU_INTERN_MAX_SECURE_CHANNELS` tracks `MU_INTERN_MAX_CONNECTIONS` 1:1.
 Profile-invariant capacities (address-space, dynamic-node, conditions, query
-continuation points) go through stages 1+3 only. Baseline == standard, so the
-`standard` profile needs no stage-2 block.
+continuation points) go through stages 1+3 only. Baseline == the minimal (nano)
+values, so `nano` needs no stage-2 block and the larger profiles each carry one.
 
 ## Requirements
 
@@ -83,7 +87,7 @@ continuation points) go through stages 1+3 only. Baseline == standard, so the
 
 - Per-profile ctest matrix green: nano 89 / micro 97 / embedded 117 / standard
   125 / full 125.
-- Preprocessor probe confirms: no-profile → standard baseline; each profile →
+- Preprocessor probe confirms: no-profile → minimal baseline; each profile →
   its column; `-DMU_MAX_CONNECTIONS=7` on `standard` → 7 (and channels → 7);
   `-DMU_MAX_SESSIONS=9` with no profile → 9 over the baseline.
 
