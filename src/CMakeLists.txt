@@ -267,17 +267,16 @@ if(MUC_OPCUA_CLIENT_STANDARD)
 endif()
 
 
-foreach(MU_CAPACITY_DEFINE
-        MU_MAX_SESSIONS
-        MU_MAX_SUBSCRIPTIONS
-        MU_MAX_MONITORED_ITEMS
-        MU_MAX_PUBLISH_REQUESTS
-        MU_MONITORED_QUEUE_DEPTH
-        MU_MAX_TRIGGER_LINKS)
-    if(DEFINED ${MU_CAPACITY_DEFINE})
-        target_compile_definitions(muc_opcua PUBLIC ${MU_CAPACITY_DEFINE}=${${MU_CAPACITY_DEFINE}})
-    endif()
-endforeach()
+# Spec 056: capacities are resolved in include/muc_opcua/capacities.h via the
+# default<profile<user cascade, NOT plumbed as per-macro -D from here. CMake's
+# only capacity responsibility is to declare WHICH profile is selected: emit one
+# MUC_OPCUA_PROFILE_<NAME> marker that capacities.h switches on (stage 2). The
+# integrator's public -DMU_MAX_* knobs reach the compiler directly and win
+# (stage 3). custom builds emit no marker and use the standard baseline (stage 1).
+if(NOT MUC_OPCUA_PROFILE STREQUAL "custom")
+    string(TOUPPER "${MUC_OPCUA_PROFILE}" MU_PROFILE_MARKER_SUFFIX)
+    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_PROFILE_${MU_PROFILE_MARKER_SUFFIX}=1)
+endif()
 
 # SecurityPolicy Basic256Sha256: the asym/sym chunk crypto and key derivation.
 # Excluded entirely from a None-only build to keep the embedded footprint minimal.

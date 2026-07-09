@@ -77,11 +77,17 @@ if(NOT MUC_OPCUA_PROFILE STREQUAL "custom")
     endforeach()
 endif()
 
-# MUC_OPCUA_PROFILE is the single source of truth. Each block below sets the
-# feature options, the derived *_PROFILE markers (consumed by code #if gates and
-# features.h dependency checks), and the capacity minima for its tier. Capacities
-# are FORCE-set so the profile fully determines the build; pick
-# -DMUC_OPCUA_PROFILE=custom to hand-select individual features and capacities.
+# MUC_OPCUA_PROFILE is the single source of truth. Each block below sets only the
+# feature options and the derived *_PROFILE markers (consumed by code #if gates
+# and features.h dependency checks) for its tier. Feature options are FORCE-set so
+# the profile fully determines which services are built.
+#
+# CAPACITIES are NOT set here. They are resolved in
+# include/muc_opcua/capacities.h via a default<profile<user cascade, keyed on the
+# MUC_OPCUA_PROFILE_<NAME> marker that src/CMakeLists.txt emits. An integrator's
+# public -DMU_MAX_*=<n> reaches the compiler directly and overrides the profile
+# preset. Pick -DMUC_OPCUA_PROFILE=custom to hand-select features (capacities then
+# come from the standard baseline unless -D'd).
 if(MUC_OPCUA_PROFILE STREQUAL "nano")
     # Nano: keep everything OFF (options default to OFF); default capacities apply.
     # Embedded/MCU tier: the core makes no heap allocations (constitution). Array-
@@ -94,8 +100,11 @@ elseif(MUC_OPCUA_PROFILE STREQUAL "micro")
     set(MUC_OPCUA_MULTI_CHUNK ON CACHE BOOL "" FORCE)
     set(MUC_OPCUA_EXTENDED_NODEIDS ON CACHE BOOL "" FORCE)
     set(MUC_OPCUA_ALLOW_HEAP OFF CACHE BOOL "" FORCE)
-    # Capacities: inherit the subscription-engine defaults (subscriptions 2,
-    # monitored items 8, parallel Publish 4) from src/services/subscription.h.
+    # Micro advertises >=2 concurrent sessions; two independent clients each hold
+    # their own SecureChannel/TCP connection (profile-micro.md). The conns[] array
+    # and multi-connection accept path are gated on this flag, so it must be ON for
+    # the capacities.h MU_INTERN_MAX_CONNECTIONS=2 preset to take runtime effect.
+    set(MUC_OPCUA_MULTIPLE_CONNECTIONS ON CACHE BOOL "" FORCE)
 elseif(MUC_OPCUA_PROFILE STREQUAL "embedded")
     set(MUC_OPCUA_SUBSCRIPTIONS ON CACHE BOOL "" FORCE)
     set(MUC_OPCUA_ALLOW_HEAP OFF CACHE BOOL "" FORCE)
@@ -110,12 +119,7 @@ elseif(MUC_OPCUA_PROFILE STREQUAL "embedded")
     set(MUC_OPCUA_EMBEDDED_PROFILE ON CACHE BOOL "" FORCE)
     set(MUC_OPCUA_MULTI_CHUNK ON CACHE BOOL "" FORCE)
     set(MUC_OPCUA_EXTENDED_NODEIDS ON CACHE BOOL "" FORCE)
-    # Embedded 2017 capacity minima (Sessions stays at the default of 2).
-    set(MU_MAX_SUBSCRIPTIONS 2 CACHE STRING "Embedded profile minimum subscriptions" FORCE)
-    set(MU_MAX_MONITORED_ITEMS 100 CACHE STRING "Embedded profile minimum monitored items" FORCE)
-    set(MU_MAX_PUBLISH_REQUESTS 5 CACHE STRING "Embedded profile minimum parallel Publish requests" FORCE)
-    set(MU_MONITORED_QUEUE_DEPTH 2 CACHE STRING "Embedded profile minimum monitored-item queue depth" FORCE)
-    set(MU_MAX_TRIGGER_LINKS 4 CACHE STRING "Embedded profile triggering link capacity" FORCE)
+    # Embedded 2017 capacity minima: see MU_INTERN_* embedded column in capacities.h.
 elseif(MUC_OPCUA_PROFILE STREQUAL "standard")
     set(MUC_OPCUA_SUBSCRIPTIONS ON CACHE BOOL "" FORCE)
     set(MUC_OPCUA_SUBSCRIPTIONS_STANDARD ON CACHE BOOL "" FORCE)
@@ -148,13 +152,7 @@ elseif(MUC_OPCUA_PROFILE STREQUAL "standard")
     set(MUC_OPCUA_TIME_SYNC ON CACHE BOOL "" FORCE)
     set(MUC_OPCUA_NAMESPACES ON CACHE BOOL "" FORCE)
     set(MUC_OPCUA_STANDARD_PROFILE ON CACHE BOOL "" FORCE)
-    # Standard 2017 capacity minima.
-    set(MU_MAX_SESSIONS 50 CACHE STRING "Standard profile minimum sessions" FORCE)
-    set(MU_MAX_SUBSCRIPTIONS 50 CACHE STRING "Standard profile minimum subscriptions" FORCE)
-    set(MU_MAX_MONITORED_ITEMS 1000 CACHE STRING "Standard profile minimum monitored items" FORCE)
-    set(MU_MAX_PUBLISH_REQUESTS 50 CACHE STRING "Standard profile minimum parallel Publish requests" FORCE)
-    set(MU_MONITORED_QUEUE_DEPTH 2 CACHE STRING "Standard profile minimum monitored-item queue depth" FORCE)
-    set(MU_MAX_TRIGGER_LINKS 4 CACHE STRING "Standard profile triggering link capacity" FORCE)
+    # Standard 2017 capacity minima: see MU_INTERN_* standard column in capacities.h.
 elseif(MUC_OPCUA_PROFILE STREQUAL "full")
     # Full: superset of standard ("everything on") with generous capacities. Not a
     # distinct OPC UA profile -- it still advertises StandardUA2017 via the
@@ -190,13 +188,7 @@ elseif(MUC_OPCUA_PROFILE STREQUAL "full")
     set(MUC_OPCUA_TIME_SYNC ON CACHE BOOL "" FORCE)
     set(MUC_OPCUA_NAMESPACES ON CACHE BOOL "" FORCE)
     set(MUC_OPCUA_STANDARD_PROFILE ON CACHE BOOL "" FORCE)
-    # Full capacities: higher than the Standard minima.
-    set(MU_MAX_SESSIONS 100 CACHE STRING "Full profile session capacity" FORCE)
-    set(MU_MAX_SUBSCRIPTIONS 100 CACHE STRING "Full profile subscription capacity" FORCE)
-    set(MU_MAX_MONITORED_ITEMS 2000 CACHE STRING "Full profile monitored item capacity" FORCE)
-    set(MU_MAX_PUBLISH_REQUESTS 100 CACHE STRING "Full profile parallel Publish capacity" FORCE)
-    set(MU_MONITORED_QUEUE_DEPTH 2 CACHE STRING "Full profile monitored-item queue depth" FORCE)
-    set(MU_MAX_TRIGGER_LINKS 4 CACHE STRING "Full profile triggering link capacity" FORCE)
+    # Full capacities: see MU_INTERN_* full column in capacities.h.
 endif()
 
 # SecurityPolicy Basic256Sha256 support (asym/sym chunk crypto, ~10 KB code).
