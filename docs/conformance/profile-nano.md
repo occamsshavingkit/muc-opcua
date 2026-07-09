@@ -48,6 +48,14 @@ to OPC-10000-7 §4.2/§4.3 evidence.
   from the value captured at init, via runtime-bound value sources in the
   (caller-owned) server struct.
 
+## Security Time Synchronization (spec 055)
+- `Security Time Synch - Configuration` (Mandatory in the v1.05.02 Core 2017
+  Server Facet) is **targeted**: when `MUC_OPCUA_TIME_SYNC` is enabled the server
+  stamps `ServerTimestamp` in response headers and, at OpenSecureChannel,
+  validates the client's `RequestHeader.timestamp` against server time within
+  `MU_TIME_SYNC_MAX_CLOCK_SKEW_MS` (default 5 min), rejecting drift with
+  `Bad_SecurityChecksFailed`. A clockless client (timestamp 0) is exempt.
+
 ## Remaining Nano evidence (see [status.md](status.md))
 - External conformance evidence, including CTT verification, has not been
   produced; status remains `profile-targeting` until OPC-10000-7 §4.2/§4.3

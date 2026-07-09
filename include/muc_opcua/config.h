@@ -76,6 +76,17 @@
 #define MU_CLIENT_DEFAULT_TIMEOUT_MS 5000
 #endif
 
+/* Spec 055: Security Time Synchronization (OPC-10000-7 v1.05.02 Core 2017 Server
+ * Facet, `Security Time Synch - Configuration`). Maximum tolerated difference, in
+ * milliseconds, between a client's RequestHeader.timestamp and server time at
+ * OpenSecureChannel; a larger drift is rejected with Bad_SecurityChecksFailed.
+ * Only meaningful when MUC_OPCUA_TIME_SYNC is defined. Overridable with -D. */
+#ifdef MUC_OPCUA_TIME_SYNC
+#ifndef MU_TIME_SYNC_MAX_CLOCK_SKEW_MS
+#define MU_TIME_SYNC_MAX_CLOCK_SKEW_MS 300000
+#endif
+#endif
+
 /* Concurrent TCP connections, secure channels, dynamic address-space limits,
  * and concurrent Sessions are all resolved in capacities.h as
  * MU_INTERN_MAX_CONNECTIONS / MU_INTERN_MAX_SECURE_CHANNELS (1:1 with

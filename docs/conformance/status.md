@@ -31,7 +31,7 @@ values are listed below.
 | `Bad_SessionNotActivated` | `MU_STATUS_BAD_SESSIONNOTACTIVATED` | Existing session used before activation | OPC-10000-4 section 7.38.2 |
 | `Bad_SessionIdInvalid` | `MU_STATUS_BAD_SESSIONIDINVALID` | Missing, unknown, or invalid session id | OPC-10000-4 section 7.38.2 |
 | `Bad_SecureChannelIdInvalid` | `MU_STATUS_BAD_SECURECHANNELIDINVALID` | Service request not bound to a valid SecureChannel | OPC-10000-4 section 7.38.2 |
-| `Bad_SecurityChecksFailed` | `MU_STATUS_BAD_SECURITYCHECKSFAILED` | Security check failure | OPC-10000-4 section 7.38.2 |
+| `Bad_SecurityChecksFailed` | `MU_STATUS_BAD_SECURITYCHECKSFAILED` | Security check failure, incl. OpenSecureChannel clock-skew rejection when `MUC_OPCUA_TIME_SYNC` is enabled (Security Time Synch - Configuration, spec 055) | OPC-10000-4 section 7.38.2 |
 | `Bad_IdentityTokenRejected` | `MU_STATUS_BAD_IDENTITYTOKENREJECTED` | Rejected user identity token | OPC-10000-4 section 7.38.2 |
 | `Bad_ResponseTooLarge` | `MU_STATUS_BAD_RESPONSETOOLARGE` | Response would exceed supported response limits | OPC-10000-4 section 7.38.2 |
 | `Bad_TcpMessageTypeInvalid` | `MU_STATUS_BAD_TCPMESSAGETYPEINVALID` | Invalid OPC UA TCP message type | OPC-10000-4 section 7.38.2 |
