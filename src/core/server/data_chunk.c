@@ -47,7 +47,7 @@ opcua_statuscode_t mu_server_emit_message(mu_server_t *server, opcua_uint32_t re
 #ifdef MUC_OPCUA_MULTIPLE_CONNECTIONS
     /* If active_conn is NULL, find connection by active session's secure_channel_id */
     if (server->active_conn == NULL && server->active_session != NULL) {
-        for (size_t i = 0; i < MU_MAX_CONNECTIONS; ++i) {
+        for (size_t i = 0; i < MU_INTERN_MAX_CONNECTIONS; ++i) {
             if (server->conns[i].client_handle != NULL &&
                 server->conns[i].secure_channel.channel_id == server->active_session->secure_channel_id) {
                 server->active_conn = &server->conns[i];

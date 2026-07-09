@@ -16,25 +16,25 @@
 #include "muc_opcua/services/alarms_conditions.h"
 
 #ifdef MUC_OPCUA_SERVICE_HISTORY
-static opcua_statuscode_t minimal_read_raw_modified(
-    void *context,
-    const mu_nodeid_t *node_id,
-    opcua_boolean_t is_read_modified,
-    opcua_datetime_t start_time,
-    opcua_datetime_t end_time,
-    opcua_uint32_t num_values_per_node,
-    opcua_boolean_t return_bounds,
-    const opcua_byte_t *continuation_point,
-    size_t continuation_point_length,
-    opcua_byte_t *cp_out,
-    size_t *cp_out_length,
-    mu_historical_data_point_t *data_points,
-    size_t max_data_points,
-    size_t *data_points_count) {
-    (void)context; (void)node_id; (void)is_read_modified; (void)start_time; (void)end_time;
-    (void)num_values_per_node; (void)return_bounds; (void)continuation_point;
-    (void)continuation_point_length; (void)cp_out; (void)cp_out_length;
-    (void)data_points; (void)max_data_points;
+static opcua_statuscode_t
+minimal_read_raw_modified(void *context, const mu_nodeid_t *node_id, opcua_boolean_t is_read_modified,
+                          opcua_datetime_t start_time, opcua_datetime_t end_time, opcua_uint32_t num_values_per_node,
+                          opcua_boolean_t return_bounds, const opcua_byte_t *continuation_point,
+                          size_t continuation_point_length, opcua_byte_t *cp_out, size_t *cp_out_length,
+                          mu_historical_data_point_t *data_points, size_t max_data_points, size_t *data_points_count) {
+    (void)context;
+    (void)node_id;
+    (void)is_read_modified;
+    (void)start_time;
+    (void)end_time;
+    (void)num_values_per_node;
+    (void)return_bounds;
+    (void)continuation_point;
+    (void)continuation_point_length;
+    (void)cp_out;
+    (void)cp_out_length;
+    (void)data_points;
+    (void)max_data_points;
     *data_points_count = 0;
     if (cp_out_length) {
         *cp_out_length = 0;
@@ -42,25 +42,27 @@ static opcua_statuscode_t minimal_read_raw_modified(
     return MU_STATUS_GOOD;
 }
 
-static opcua_statuscode_t minimal_update_data(
-    void *context,
-    const mu_nodeid_t *node_id,
-    opcua_uint32_t perform_insert_replace,
-    const mu_historical_data_point_t *data_points,
-    size_t data_points_count,
-    opcua_statuscode_t *results) {
-    (void)context; (void)node_id; (void)perform_insert_replace; (void)data_points;
-    (void)data_points_count; (void)results;
+static opcua_statuscode_t minimal_update_data(void *context, const mu_nodeid_t *node_id,
+                                              opcua_uint32_t perform_insert_replace,
+                                              const mu_historical_data_point_t *data_points, size_t data_points_count,
+                                              opcua_statuscode_t *results) {
+    (void)context;
+    (void)node_id;
+    (void)perform_insert_replace;
+    (void)data_points;
+    (void)data_points_count;
+    (void)results;
     return MU_STATUS_GOOD;
 }
 
-static opcua_statuscode_t minimal_delete_raw_modified(
-    void *context,
-    const mu_nodeid_t *node_id,
-    opcua_boolean_t is_delete_modified,
-    opcua_datetime_t start_time,
-    opcua_datetime_t end_time) {
-    (void)context; (void)node_id; (void)is_delete_modified; (void)start_time; (void)end_time;
+static opcua_statuscode_t minimal_delete_raw_modified(void *context, const mu_nodeid_t *node_id,
+                                                      opcua_boolean_t is_delete_modified, opcua_datetime_t start_time,
+                                                      opcua_datetime_t end_time) {
+    (void)context;
+    (void)node_id;
+    (void)is_delete_modified;
+    (void)start_time;
+    (void)end_time;
     return MU_STATUS_GOOD;
 }
 #endif
@@ -119,8 +121,8 @@ int main(void) {
 
     config.max_chunk_count = MU_DEFAULT_MAX_CHUNK_COUNT;
     config.max_message_size = MU_DEFAULT_MAX_MESSAGE_SIZE;
-    config.max_sessions = MU_MAX_SESSIONS;
-    config.max_secure_channels = MU_MAX_SECURE_CHANNELS;
+    config.max_sessions = MU_INTERN_MAX_SESSIONS;
+    config.max_secure_channels = MU_INTERN_MAX_SECURE_CHANNELS;
 
     status = mu_host_tcp_adapter_init(&config.tcp_adapter);
     if (status != MU_STATUS_GOOD) {

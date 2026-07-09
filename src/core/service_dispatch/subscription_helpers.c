@@ -158,7 +158,8 @@ opcua_statuscode_t write_monitored_item_create_result(mu_binary_writer_t *w, opc
 mu_monitored_item_t *find_monitored_item(mu_server_t *server, opcua_uint32_t subscription_id,
                                          opcua_uint32_t monitored_item_id) {
     size_t active_checked = 0;
-    for (size_t i = 0; i < MU_MAX_MONITORED_ITEMS && active_checked < server->subs.active_monitored_items_count; ++i) {
+    for (size_t i = 0; i < MU_INTERN_MAX_MONITORED_ITEMS && active_checked < server->subs.active_monitored_items_count;
+         ++i) {
         mu_monitored_item_t *item = &server->subs.monitored_items[i];
         if (!item->in_use) {
             continue;
@@ -323,8 +324,8 @@ opcua_statuscode_t configure_monitored_item(mu_monitored_item_t *item, const mu_
     if (item->queue_size == 0u) {
         item->queue_size = 1u;
     }
-    if (item->queue_size > MU_MONITORED_QUEUE_DEPTH) {
-        item->queue_size = MU_MONITORED_QUEUE_DEPTH;
+    if (item->queue_size > MU_INTERN_MONITORED_QUEUE_DEPTH) {
+        item->queue_size = MU_INTERN_MONITORED_QUEUE_DEPTH;
     }
     item->queue_head = 0u;
     item->queue_tail = 0u;

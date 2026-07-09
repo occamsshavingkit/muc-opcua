@@ -41,19 +41,19 @@ typedef struct {
 } mu_dynamic_reference_t;
 
 typedef struct {
-    mu_node_t nodes[MU_MAX_DYNAMIC_NODES];
-    opcua_byte_t browse_name_storage[MU_MAX_DYNAMIC_NODES][MU_MAX_DYNAMIC_BROWSE_NAME_LENGTH];
-    opcua_byte_t display_name_storage[MU_MAX_DYNAMIC_NODES][MU_MAX_DYNAMIC_DISPLAY_NAME_LENGTH];
-    opcua_byte_t string_nodeid_storage[MU_MAX_DYNAMIC_NODES][MU_MAX_DYNAMIC_STRING_NODEID_LENGTH];
+    mu_node_t nodes[MU_INTERN_MAX_DYNAMIC_NODES];
+    opcua_byte_t browse_name_storage[MU_INTERN_MAX_DYNAMIC_NODES][MU_INTERN_MAX_DYNAMIC_BROWSE_NAME_LENGTH];
+    opcua_byte_t display_name_storage[MU_INTERN_MAX_DYNAMIC_NODES][MU_INTERN_MAX_DYNAMIC_DISPLAY_NAME_LENGTH];
+    opcua_byte_t string_nodeid_storage[MU_INTERN_MAX_DYNAMIC_NODES][MU_INTERN_MAX_DYNAMIC_STRING_NODEID_LENGTH];
     size_t nodes_count;
 
-    mu_dynamic_reference_t references[MU_MAX_DYNAMIC_REFERENCES];
-    opcua_byte_t reference_source_nodeid_storage[MU_MAX_DYNAMIC_REFERENCES]
-                                                [MU_MAX_DYNAMIC_REFERENCE_STRING_NODEID_LENGTH];
-    opcua_byte_t reference_type_nodeid_storage[MU_MAX_DYNAMIC_REFERENCES]
-                                              [MU_MAX_DYNAMIC_REFERENCE_STRING_NODEID_LENGTH];
-    opcua_byte_t reference_target_nodeid_storage[MU_MAX_DYNAMIC_REFERENCES]
-                                                [MU_MAX_DYNAMIC_REFERENCE_STRING_NODEID_LENGTH];
+    mu_dynamic_reference_t references[MU_INTERN_MAX_DYNAMIC_REFERENCES];
+    opcua_byte_t reference_source_nodeid_storage[MU_INTERN_MAX_DYNAMIC_REFERENCES]
+                                                [MU_INTERN_MAX_DYNAMIC_REFERENCE_STRING_NODEID_LENGTH];
+    opcua_byte_t reference_type_nodeid_storage[MU_INTERN_MAX_DYNAMIC_REFERENCES]
+                                              [MU_INTERN_MAX_DYNAMIC_REFERENCE_STRING_NODEID_LENGTH];
+    opcua_byte_t reference_target_nodeid_storage[MU_INTERN_MAX_DYNAMIC_REFERENCES]
+                                                [MU_INTERN_MAX_DYNAMIC_REFERENCE_STRING_NODEID_LENGTH];
     size_t references_count;
 } mu_dynamic_address_space_t;
 #endif
@@ -80,7 +80,7 @@ struct mu_server {
     opcua_boolean_t is_running;
 
 #ifdef MUC_OPCUA_MULTIPLE_CONNECTIONS
-    mu_connection_t conns[MU_MAX_CONNECTIONS];
+    mu_connection_t conns[MU_INTERN_MAX_CONNECTIONS];
     mu_connection_t *active_conn;
 #endif
     void *client_handle;
@@ -123,7 +123,7 @@ struct mu_server {
     opcua_byte_t channel_client_cert[MU_MAX_CLIENT_CERT_SIZE];
     size_t channel_client_cert_len;
 #endif
-    mu_session_t sessions[MU_MAX_SESSIONS];
+    mu_session_t sessions[MU_INTERN_MAX_SESSIONS];
     mu_session_t *active_session;
 #if MUC_OPCUA_READ_CACHE
     mu_read_cache_t read_cache;
@@ -163,12 +163,12 @@ struct mu_server {
             opcua_uint32_t session_id;
             size_t next_index; /* Index into address space to resume from */
             opcua_uint64_t timestamp_ms;
-        } continuation_points[MU_MAX_QUERY_CONTINUATION_POINTS];
+        } continuation_points[MU_INTERN_MAX_QUERY_CONTINUATION_POINTS];
     } query_context;
 #endif
 
 #ifdef MUC_OPCUA_SERVICE_ALARMS_CONDITIONS
-    mu_condition_t conditions[MU_MAX_CONDITIONS];
+    mu_condition_t conditions[MU_INTERN_MAX_CONDITIONS];
     size_t condition_count;
 #endif
 

@@ -29,11 +29,11 @@ void mu_dynamic_nodeid_copy(mu_nodeid_t *target, opcua_byte_t *dest, const mu_no
 }
 
 static opcua_boolean_t mu_dynamic_browse_name_fits(const mu_string_t *name) {
-    return mu_dynamic_string_fits(name, MU_MAX_DYNAMIC_BROWSE_NAME_LENGTH);
+    return mu_dynamic_string_fits(name, MU_INTERN_MAX_DYNAMIC_BROWSE_NAME_LENGTH);
 }
 
 static opcua_boolean_t mu_dynamic_display_name_fits(const mu_string_t *name) {
-    return mu_dynamic_string_fits(name, MU_MAX_DYNAMIC_DISPLAY_NAME_LENGTH);
+    return mu_dynamic_string_fits(name, MU_INTERN_MAX_DYNAMIC_DISPLAY_NAME_LENGTH);
 }
 
 static opcua_boolean_t mu_dynamic_string_nodeid_fits(const mu_nodeid_t *node_id) {
@@ -41,7 +41,7 @@ static opcua_boolean_t mu_dynamic_string_nodeid_fits(const mu_nodeid_t *node_id)
         return true;
     }
 
-    return mu_dynamic_string_fits(&node_id->identifier.string, MU_MAX_DYNAMIC_STRING_NODEID_LENGTH);
+    return mu_dynamic_string_fits(&node_id->identifier.string, MU_INTERN_MAX_DYNAMIC_STRING_NODEID_LENGTH);
 }
 
 static void mu_dynamic_browse_name_copy(mu_dynamic_address_space_t *space, size_t node_index,
@@ -251,7 +251,7 @@ opcua_statuscode_t mu_add_nodes_process(mu_server_t *server, mu_binary_reader_t 
         }
 
         /* Check capacity */
-        if (server->dynamic_address_space.nodes_count >= MU_MAX_DYNAMIC_NODES) {
+        if (server->dynamic_address_space.nodes_count >= MU_INTERN_MAX_DYNAMIC_NODES) {
             results[i].status_code = MU_STATUS_BAD_OUTOFMEMORY;
             continue;
         }

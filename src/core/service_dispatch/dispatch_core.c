@@ -153,9 +153,9 @@ opcua_statuscode_t mu_service_dispatch(mu_server_t *server, opcua_uint32_t reque
         if (auth_token == 0u) {
             return MU_STATUS_BAD_SESSIONIDINVALID;
         }
-        mu_session_t *session = mu_session_find_by_token(server->sessions, MU_MAX_SESSIONS, auth_token);
+        mu_session_t *session = mu_session_find_by_token(server->sessions, MU_INTERN_MAX_SESSIONS, auth_token);
         if (session == NULL) {
-            if (mu_session_find_closed_by_token(server->sessions, MU_MAX_SESSIONS, auth_token) != NULL) {
+            if (mu_session_find_closed_by_token(server->sessions, MU_INTERN_MAX_SESSIONS, auth_token) != NULL) {
                 return MU_STATUS_BAD_SESSIONCLOSED;
             }
             return MU_STATUS_BAD_SESSIONIDINVALID;

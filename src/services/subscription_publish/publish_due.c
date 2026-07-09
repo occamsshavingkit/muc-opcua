@@ -11,7 +11,7 @@ bool publish_request_dequeue(mu_subscriptions_t *subs, opcua_uint32_t session_id
         return false;
     }
 
-    for (size_t i = 0; i < MU_MAX_PUBLISH_REQUESTS; ++i) {
+    for (size_t i = 0; i < MU_INTERN_MAX_PUBLISH_REQUESTS; ++i) {
         const mu_publish_request_t *req = &subs->publish_queue[i];
         if (!req->in_use || req->session_id != session_id) {
             continue;
@@ -316,7 +316,7 @@ void issue_status_change_notification(struct mu_server *server, mu_subscription_
 static bool select_publish_subscription(struct mu_server *server, const mu_subscription_t *sub) {
     mu_connection_t *conn_match = NULL;
     mu_session_t *session = NULL;
-    for (size_t s_idx = 0; s_idx < MU_MAX_SESSIONS; ++s_idx) {
+    for (size_t s_idx = 0; s_idx < MU_INTERN_MAX_SESSIONS; ++s_idx) {
         if (server->sessions[s_idx].state != MU_SESSION_STATE_CLOSED &&
             server->sessions[s_idx].session_id == sub->session_id) {
             session = &server->sessions[s_idx];
@@ -324,7 +324,7 @@ static bool select_publish_subscription(struct mu_server *server, const mu_subsc
         }
     }
     if (session != NULL) {
-        for (size_t c = 0; c < MU_MAX_CONNECTIONS; ++c) {
+        for (size_t c = 0; c < MU_INTERN_MAX_CONNECTIONS; ++c) {
             if (server->conns[c].client_handle != NULL &&
                 server->conns[c].secure_channel.channel_id == session->secure_channel_id) {
                 conn_match = &server->conns[c];
@@ -436,7 +436,7 @@ void publish_response_encode_and_emit(struct mu_server *server, mu_subscription_
 }
 
 void publish_due(struct mu_server *server, opcua_uint64_t now_ms) {
-    for (size_t i = 0; i < MU_MAX_SUBSCRIPTIONS; ++i) {
+    for (size_t i = 0; i < MU_INTERN_MAX_SUBSCRIPTIONS; ++i) {
         mu_subscription_t *sub = &server->subs.subscriptions[i];
         if (!sub->in_use || sub->next_publish_ms > now_ms) {
             continue;

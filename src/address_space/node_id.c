@@ -81,7 +81,7 @@ static void mu_address_space_rebuild_index(const mu_address_space_t *address_spa
     index->count = 0;
     index->indexed = false;
 
-    if (address_space->node_count > MU_MAX_ADDRESS_SPACE_NODES || address_space->node_count > 0xffffu) {
+    if (address_space->node_count > MU_INTERN_MAX_ADDRESS_SPACE_NODES || address_space->node_count > 0xffffu) {
         return;
     }
 

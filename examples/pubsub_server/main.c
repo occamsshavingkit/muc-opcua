@@ -48,8 +48,8 @@ int main(void) {
     config.send_buffer = send_buffer;
     config.send_buffer_size = sizeof(send_buffer);
 
-    config.max_sessions = MU_MAX_SESSIONS;
-    config.max_secure_channels = MU_MAX_SECURE_CHANNELS;
+    config.max_sessions = MU_INTERN_MAX_SESSIONS;
+    config.max_secure_channels = MU_INTERN_MAX_SECURE_CHANNELS;
     config.max_chunk_count = MU_DEFAULT_MAX_CHUNK_COUNT;
     config.max_message_size = MU_DEFAULT_MAX_MESSAGE_SIZE;
 

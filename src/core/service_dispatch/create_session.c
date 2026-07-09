@@ -155,16 +155,17 @@ static opcua_statuscode_t initialize_create_session(mu_server_t *server, mu_bina
                                                     opcua_uint64_t *revised_bits, mu_session_t **out_slot,
                                                     bool *session_created_out) {
     opcua_statuscode_t s;
-    mu_session_t *slot = mu_session_find_free(server->sessions, MU_MAX_SESSIONS);
+    mu_session_t *slot = mu_session_find_free(server->sessions, MU_INTERN_MAX_SESSIONS);
     if (slot == NULL) {
         return MU_STATUS_BAD_TOOMANYSESSIONS;
     }
-    s = mu_session_generate_session_id(server->sessions, MU_MAX_SESSIONS, &server->config.entropy_adapter, session_id);
+    s = mu_session_generate_session_id(server->sessions, MU_INTERN_MAX_SESSIONS, &server->config.entropy_adapter,
+                                       session_id);
     if (s != MU_STATUS_GOOD) {
         return s;
     }
-    s = mu_session_generate_authentication_token(server->sessions, MU_MAX_SESSIONS, &server->config.entropy_adapter,
-                                                 auth_token);
+    s = mu_session_generate_authentication_token(server->sessions, MU_INTERN_MAX_SESSIONS,
+                                                 &server->config.entropy_adapter, auth_token);
     if (s != MU_STATUS_GOOD) {
         return s;
     }

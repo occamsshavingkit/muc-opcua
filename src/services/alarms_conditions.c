@@ -15,7 +15,7 @@ static mu_condition_t *find_or_allocate_condition(mu_server_t *server, const mu_
         }
     }
 
-    if (server->condition_count < MU_MAX_CONDITIONS) {
+    if (server->condition_count < MU_INTERN_MAX_CONDITIONS) {
         mu_condition_t *cond = &server->conditions[server->condition_count++];
         (void)memset(cond, 0, sizeof(*cond));
         cond->is_used = true;

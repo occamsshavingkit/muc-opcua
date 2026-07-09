@@ -109,12 +109,12 @@ static opcua_statuscode_t read_call_input_arguments(mu_binary_reader_t *r, mu_va
 
 static opcua_statuscode_t write_get_monitored_items_result(mu_server_t *server, mu_binary_writer_t *w,
                                                            opcua_uint32_t subscription_id) {
-    opcua_uint32_t server_handles[MU_MAX_MONITORED_ITEMS];
-    opcua_uint32_t client_handles[MU_MAX_MONITORED_ITEMS];
+    opcua_uint32_t server_handles[MU_INTERN_MAX_MONITORED_ITEMS];
+    opcua_uint32_t client_handles[MU_INTERN_MAX_MONITORED_ITEMS];
     size_t handle_count = 0u;
-    opcua_statuscode_t result =
-        mu_subscription_get_monitored_items(&server->subs, server->active_session->session_id, subscription_id,
-                                            server_handles, client_handles, MU_MAX_MONITORED_ITEMS, &handle_count);
+    opcua_statuscode_t result = mu_subscription_get_monitored_items(&server->subs, server->active_session->session_id,
+                                                                    subscription_id, server_handles, client_handles,
+                                                                    MU_INTERN_MAX_MONITORED_ITEMS, &handle_count);
     if (result != MU_STATUS_GOOD) {
         return write_call_method_result(w, result, 0, NULL, 0, NULL);
     }

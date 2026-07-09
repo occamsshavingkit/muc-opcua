@@ -218,7 +218,7 @@ opcua_statuscode_t handle_publish(mu_server_t *server, mu_binary_reader_t *r, mu
     }
 
     opcua_uint32_t sub_count = 0u;
-    for (size_t i = 0; i < MU_MAX_SUBSCRIPTIONS; ++i) {
+    for (size_t i = 0; i < MU_INTERN_MAX_SUBSCRIPTIONS; ++i) {
         const mu_subscription_t *sub = &server->subs.subscriptions[i];
         if (sub->in_use && sub->session_id == server->active_session->session_id) {
             ++sub_count;
