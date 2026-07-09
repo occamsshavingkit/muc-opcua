@@ -82,21 +82,24 @@ places into your storage. Scales with the compiled capacities.
 | Profile | sizeof(struct mu_server) |
 |---------|--------------------------|
 | nano | 784 B |
-| micro | 11,032 B |
-| embedded | 102,016 B |
-| standard | 680,712 B |
-| full | 1,270,432 B |
+| micro | 27,600 B |
+| embedded | 97,216 B |
+| standard | 1,068,200 B |
+| full | 2,084,320 B |
 
 **Caller-provided storage** (`MU_SERVER_STORAGE_BYTES`) — the single block you hand to
 `mu_server_init`; holds the server object plus its scratch/chunk/security buffers.
+Connections scale with sessions (each concurrent session may be an independent
+client holding its own SecureChannel), so the connection pool dominates the
+standard/full storage. Retune per build with `-DMU_MAX_CONNECTIONS=n`.
 
-| Profile | Storage | Sessions | Subscriptions | Monitored Items | Publish |
-|---------|---------|----------|---------------|-----------------|---------|
-| nano | 1,408 B | 2 | — | — | — |
-| micro | 11,680 B | 2 | 2 | 8 | 4 |
-| embedded | 128,232 B | 2 | 2 | 100 | 5 |
-| standard | 741,300 B | 50 | 50 | 1,000 | 50 |
-| full | 1,387,500 B | 100 | 100 | 2,000 | 100 |
+| Profile | Storage | Sessions | Connections | Subscriptions | Monitored Items | Publish |
+|---------|---------|----------|-------------|---------------|-----------------|---------|
+| nano | 1,408 B | 2 | 1 | — | — | — |
+| micro | 30,720 B | 2 | 2 | 2 | 8 | 4 |
+| embedded | 127,272 B | 2 | 4 | 2 | 100 | 5 |
+| standard | 1,178,260 B | 50 | 50 | 50 | 1,000 | 50 |
+| full | 2,300,460 B | 100 | 100 | 100 | 2,000 | 100 |
 
 Full methodology in [docs/size/feature-size-ledger.md](docs/size/feature-size-ledger.md).
 

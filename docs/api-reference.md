@@ -1127,14 +1127,24 @@ embedded profiles; a few are fixed library constants. Feature toggles
 
 ### 8.2 Fixed library constants
 
+**Capacity knobs vs. resolved values (spec 056).** The `MU_MAX_*` capacity macros
+below are the public **override input**: define one with `-DMU_MAX_SESSIONS=N` to
+raise it, with or without a profile. The library resolves each into an internal
+`MU_INTERN_MAX_*` macro via a `default < profile < user` cascade in
+`include/muc_opcua/capacities.h`, and **all code compiles off `MU_INTERN_*`** — so
+a `MU_MAX_*` you do not define simply takes the selected profile's value (or the
+standard baseline for a profile-less build). Profiles are selected via the
+`MUC_OPCUA_PROFILE_<NAME>` marker CMake emits. The per-profile values are listed
+in the README size tables.
+
 | Macro | Value | Meaning |
 |-------|-------|---------|
 | `MU_MIN_CHUNK_SIZE` | `8192` | Minimum chunk size (OPC 10000-6 7.1.2.3/7.1.2.4). |
 | `MU_DEFAULT_MAX_CHUNK_COUNT` | `1` | Default `max_chunk_count`. |
 | `MU_DEFAULT_MAX_MESSAGE_SIZE` | `8192` | Default `max_message_size`. |
-| `MU_MAX_SESSIONS` | `2` | Max sessions (Micro profile requires >=2, `docs/conformance/profile-micro.md`). `#ifndef`-guarded; raise with `-DMU_MAX_SESSIONS=N`. |
-| `MU_MAX_CONNECTIONS` | `1` (`4` if `MUC_OPCUA_MULTIPLE_CONNECTIONS`) | Max concurrent TCP connections/secure channels. `#ifndef`-guarded; raise with `-DMU_MAX_CONNECTIONS=N`. |
-| `MU_MAX_SECURE_CHANNELS` | `1` | Alias of `MU_MAX_CONNECTIONS` (one secure channel per connection); kept as a separate macro for API stability. |
+| `MU_MAX_SESSIONS` | override input | Max sessions (Micro profile requires >=2, `docs/conformance/profile-micro.md`). Raise with `-DMU_MAX_SESSIONS=N`; code reads `MU_INTERN_MAX_SESSIONS`. |
+| `MU_MAX_CONNECTIONS` | override input | Max concurrent TCP connections/secure channels. Scales with sessions per profile. Raise with `-DMU_MAX_CONNECTIONS=N`; code reads `MU_INTERN_MAX_CONNECTIONS`. |
+| `MU_MAX_SECURE_CHANNELS` | override input | Tracks `MU_INTERN_MAX_CONNECTIONS` 1:1 (one secure channel per connection); override with `-DMU_MAX_SECURE_CHANNELS=N`. |
 | `MU_MAX_ENCODED_STRING_LENGTH` | `4096` | Upper bound on any String/ByteString on the wire (must fit the Hello EndpointUrl, which "shall be less than 4096 bytes"). |
 | `MU_MAX_STRING_VALUE_LENGTH` | `64` | Tighter limit for a bounded String *variable value* (UTF-8 bytes); enforced at the value-source layer, not on every wire string. |
 

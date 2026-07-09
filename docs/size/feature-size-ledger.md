@@ -1,5 +1,36 @@
 # Feature Size Ledger
 
+## 2026-07-09: Spec 056 capacity resolution redesign
+
+Capacities now resolve through a single default<profile<user cascade in
+`include/muc_opcua/capacities.h` (code compiles off `MU_INTERN_*`; public
+`MU_MAX_*` is the `-D` override input). Two functional capacity changes ship with
+it: `micro` gains a 2-connection pool (spec 056: ≥2 sessions ⇒ ≥2 SecureChannels),
+and `MU_MAX_CONNECTIONS` now scales with sessions per profile (previously frozen at
+4 for standard/full — the propagation bug).
+
+**Code (`.text`) is flat** — capacity values add no code. ARM `-Os` archive `.text`:
+nano 17,790 (=), embedded 53,675 (=), standard 67,353 (=), full 67,373 (=);
+**micro 28,792 → 29,412 (+620 B)** for the multi-connection accept path it now
+requires. `full` `.text` is unchanged, so the 128 KiB Project-B facet budget is
+unaffected.
+
+**Cost is caller RAM** (`MU_SERVER_STORAGE_BYTES`, ARM target), from the connection
+pool (`conns × (8192 + 1328)`):
+
+| Profile | storage before | storage after | Δ | driver |
+|---------|---------------:|--------------:|--:|--------|
+| nano | 1,408 | 1,408 | 0 | — |
+| micro | 11,680 | 30,720 | +19,040 | new 2-connection pool |
+| embedded | 127,272 | 127,272 | 0 | — (README's prior 128,232 was stale) |
+| standard | 741,300 | 1,178,260 | +436,960 | connections 4 → 50 |
+| full | 1,387,500 | 2,300,460 | +912,960 | connections 4 → 100 |
+
+The standard/full growth is the deliberate connections=sessions scaling; it is
+tunable in one place (the connection column of `capacities.h`) or per build with
+`-DMU_MAX_CONNECTIONS=n`. Reproduce: `bash scripts/measure_size.sh all` (`.text`);
+per-profile `MU_SERVER_STORAGE_BYTES` via an ARM `.bss`-symbol probe.
+
 ## Current (2026-07-09): No-heap embedded profiles + LTO by default
 
 Two changes, both driven by the realistic linked-server measurement:

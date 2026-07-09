@@ -5,6 +5,7 @@ This document maps implementation and test files back to OPC UA normative sectio
 | File | Entity/Component | OPC UA Part | Section | Description |
 |------|------------------|-------------|---------|-------------|
 | `include/muc_opcua/config.h` | Limits | Part 6 | 7.1.2.3, 7.1.2.4 | Compile-time bounds for chunks/messages |
+| `include/muc_opcua/capacities.h` | Limits | Part 7 | 6.5.* | Per-profile capacity resolution (default<profile<user cascade) emitting the MU_INTERN_* macros code compiles off |
 | `include/muc_opcua/features.h` | Profile Configuration | Part 7 | 6.5.* | Feature-gate dependency guards (#error on illegal profile combinations) |
 | `include/muc_opcua/types.h` | Built-in Types | Part 6 | 5.2.1, 5.2.2.* | Numeric, String, NodeId, Variant types |
 | `include/muc_opcua/status.h` | StatusCodes | OPC-10000-4 / OPC-10000-6 | 7.38.2 / 7.1.5 | Public StatusCode constants and TCP-specific StatusCodes |
