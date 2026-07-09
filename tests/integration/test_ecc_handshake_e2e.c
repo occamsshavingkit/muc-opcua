@@ -96,11 +96,27 @@ static void write_request_header(mu_binary_writer_t *w, opcua_uint32_t auth_toke
     mu_binary_write_extension_object_header(w, &null_id, 0);
 }
 
-static opcua_uint32_t parse_type(const opcua_byte_t *body, size_t len) {
+/* Decode a response body: read the type NodeId, then the ResponseHeader, leaving
+   `*out` positioned at the first service-specific field (as the RSA e2e does). */
+static opcua_uint32_t parse_decoded(const opcua_byte_t *body, size_t len, mu_binary_reader_t *out) {
     mu_binary_reader_t r;
     mu_binary_reader_init(&r, body, len);
     mu_nodeid_t type;
     mu_binary_read_nodeid(&r, &type);
+    opcua_int64_t ts;
+    opcua_uint32_t h;
+    opcua_statuscode_t res;
+    opcua_byte_t diag, enc;
+    opcua_int32_t st;
+    mu_nodeid_t addl;
+    mu_binary_read_int64(&r, &ts);
+    mu_binary_read_uint32(&r, &h);
+    mu_binary_read_statuscode(&r, &res);
+    mu_binary_read_byte(&r, &diag);
+    mu_binary_read_int32(&r, &st);
+    mu_binary_read_nodeid(&r, &addl);
+    mu_binary_read_byte(&r, &enc);
+    *out = r;
     return type.identifier.numeric;
 }
 
@@ -110,7 +126,7 @@ static opcua_uint32_t parse_type(const opcua_byte_t *body, size_t len) {
 static void secure_call(mock_t *mock, mu_server_t *server, mu_crypto_adapter_t *cc, mu_sym_mode_t sym_mode,
                         const mu_sym_keys_t *c2s, const mu_sym_keys_t *s2c, opcua_uint32_t scid, opcua_uint32_t token,
                         opcua_uint32_t seq, opcua_uint32_t *srv_last, const opcua_byte_t *body, size_t body_len,
-                        opcua_uint32_t expect_type) {
+                        opcua_uint32_t expect_type, mu_binary_reader_t *resp) {
     opcua_byte_t chunk[CHUNK_CAP];
     size_t mlen = 0;
     if (sym_mode == MU_SYM_MODE_AEAD_CHACHA20POLY1305) {
@@ -139,19 +155,33 @@ static void secure_call(mock_t *mock, mu_server_t *server, mu_crypto_adapter_t *
                                                               mock->last_write, mock->last_write_len, &rbody, &rblen,
                                                               &si));
     }
-    TEST_ASSERT_EQUAL(expect_type, parse_type(rbody, rblen));
+    mu_binary_reader_t r;
+    opcua_uint32_t type = parse_decoded(rbody, rblen, &r);
+    if (resp) {
+        *resp = r;
+    }
+    TEST_ASSERT_EQUAL(expect_type, type);
 }
 
+static const mu_reference_t var_refs[] = {{{0, MU_NODEID_NUMERIC, {35}}, {0, MU_NODEID_NUMERIC, {85}}, false}};
+static const mu_value_source_t var_value = {MU_VALUESOURCE_STATIC, {.static_value = {MU_TYPE_INT32, {.i32 = 42}}}};
 static const mu_node_t nodes[] = {{{0, MU_NODEID_NUMERIC, {85}},
                                    MU_NODECLASS_OBJECT,
                                    {7, (const opcua_byte_t *)"Objects"},
                                    {7, (const opcua_byte_t *)"Objects"},
                                    NULL,
                                    0,
-                                   NULL}};
-static const mu_address_space_t space = {nodes, 1};
+                                   NULL},
+                                  {{1, MU_NODEID_NUMERIC, {1000}},
+                                   MU_NODECLASS_VARIABLE,
+                                   {6, (const opcua_byte_t *)"MyVar1"},
+                                   {6, (const opcua_byte_t *)"MyVar1"},
+                                   var_refs,
+                                   1,
+                                   &var_value}};
+static const mu_address_space_t space = {nodes, 2};
 
-static void run_ecc_handshake(mu_security_policy_id_t policy_id) {
+static void run_ecc_handshake(mu_security_policy_id_t policy_id, int tamper_signature) {
     mock_t mock;
     (void)memset(&mock, 0, sizeof(mock));
 
@@ -371,24 +401,124 @@ static void run_ecc_handshake(mu_security_policy_id_t policy_id) {
         mu_binary_write_int32(&w, 0);
         mu_binary_write_int32(&w, 0);
     }
+    mu_binary_reader_t resp;
     secure_call(&mock, server, &client_crypto, sym_mode, &c2s, &s2c, scid, token_id, 2, &srv_last, tmp, w.position,
-                MU_ID_GETENDPOINTSRESPONSE);
+                MU_ID_GETENDPOINTSRESPONSE, NULL);
 
-    /* A second request confirms the AEAD nonce advances with the SequenceNumber. */
+    /* CreateSession — sends the client's ECC certificate (must match the OPN). */
     mu_binary_writer_init(&w, tmp, sizeof(tmp));
     {
-        mu_nodeid_t t = {0, MU_NODEID_NUMERIC, {MU_ID_GETENDPOINTSREQUEST}};
+        mu_nodeid_t t = {0, MU_NODEID_NUMERIC, {MU_ID_CREATESESSIONREQUEST}};
         mu_binary_write_nodeid(&w, &t);
     }
     write_request_header(&w, 0, 3);
     {
-        mu_string_t null_str = {-1, NULL};
-        mu_binary_write_string(&w, &null_str);
-        mu_binary_write_int32(&w, 0);
-        mu_binary_write_int32(&w, 0);
+        mu_string_t ns = {-1, NULL};
+        mu_binary_write_string(&w, &ns); /* clientDescription.applicationUri */
+        mu_binary_write_string(&w, &ns); /* productUri */
+        mu_binary_write_byte(&w, 0x00);  /* applicationName (null LocalizedText) */
+        mu_binary_write_uint32(&w, 1);   /* applicationType = Client */
+        mu_binary_write_string(&w, &ns); /* gatewayServerUri */
+        mu_binary_write_string(&w, &ns); /* discoveryProfileUri */
+        mu_binary_write_int32(&w, 0);    /* discoveryUrls */
+        mu_binary_write_string(&w, &ns); /* serverUri */
+        mu_binary_write_string(&w, &ns); /* endpointUrl */
+        mu_binary_write_string(&w, &ns); /* sessionName */
+        mu_bytestring_t cn = {(opcua_int32_t)client_nonce_len, client_nonce};
+        mu_binary_write_bytestring(&w, &cn); /* clientNonce */
+        mu_bytestring_t cc = {(opcua_int32_t)client_cert_len, client_cert};
+        mu_binary_write_bytestring(&w, &cc);  /* clientCertificate (ECC) */
+        mu_binary_write_double(&w, 60000.0);  /* requestedSessionTimeout */
+        mu_binary_write_uint32(&w, 0);        /* maxResponseMessageSize */
     }
     secure_call(&mock, server, &client_crypto, sym_mode, &c2s, &s2c, scid, token_id, 3, &srv_last, tmp, w.position,
-                MU_ID_GETENDPOINTSRESPONSE);
+                MU_ID_CREATESESSIONRESPONSE, &resp);
+
+    mu_nodeid_t session_id, auth_token;
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_nodeid(&resp, &session_id));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_nodeid(&resp, &auth_token));
+    TEST_ASSERT_EQUAL(MU_NODEID_NUMERIC, auth_token.identifier_type);
+    TEST_ASSERT_NOT_EQUAL(0, auth_token.identifier.numeric);
+    opcua_uint32_t session_auth_token = auth_token.identifier.numeric;
+    opcua_uint64_t revised_bits;
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_uint64(&resp, &revised_bits)); /* RevisedSessionTimeout */
+    mu_bytestring_t sess_server_nonce;
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_bytestring(&resp, &sess_server_nonce));
+    TEST_ASSERT_EQUAL(32, sess_server_nonce.length);
+    opcua_byte_t sess_nonce[32];
+    (void)memcpy(sess_nonce, sess_server_nonce.data, 32);
+
+    /* ActivateSession (anonymous) with an ECC application ClientSignature over
+       serverEccCertificate || sessionServerNonce (OPC-10000-4 §5.7.3). The
+       SignatureData.Algorithm for ECC is the SecurityPolicy URI. */
+    opcua_byte_t to_sign[1600];
+    TEST_ASSERT_TRUE(server_cert_len + 32 <= sizeof(to_sign));
+    (void)memcpy(to_sign, server_cert, server_cert_len);
+    (void)memcpy(to_sign + server_cert_len, sess_nonce, 32);
+    opcua_byte_t client_sig[MU_ECC_SIGNATURE_LENGTH];
+    size_t client_sig_len = sizeof(client_sig);
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, client_crypto.ecc_sign(client_crypto.context, curve, to_sign,
+                                                             server_cert_len + 32, client_sig, &client_sig_len));
+    /* Negative path: a corrupted ECC ClientSignature must block activation
+       (OPC-10000-4 §5.7.3), so the later Read is answered with a ServiceFault. */
+    if (tamper_signature && client_sig_len > 0) {
+        client_sig[0] ^= 0xFFu;
+    }
+    const char *sig_alg = mu_security_policy_uri(policy_id);
+
+    mu_binary_writer_init(&w, tmp, sizeof(tmp));
+    {
+        mu_nodeid_t t = {0, MU_NODEID_NUMERIC, {MU_ID_ACTIVATESESSIONREQUEST}};
+        mu_binary_write_nodeid(&w, &t);
+    }
+    write_request_header(&w, session_auth_token, 4);
+    {
+        mu_string_t sig_alg_str = {(opcua_int32_t)strlen(sig_alg), (const opcua_byte_t *)sig_alg};
+        mu_bytestring_t sig_bs = {(opcua_int32_t)client_sig_len, client_sig};
+        mu_binary_write_string(&w, &sig_alg_str); /* clientSignature.algorithm */
+        mu_binary_write_bytestring(&w, &sig_bs);  /* clientSignature.signature */
+        mu_binary_write_int32(&w, 0);             /* clientSoftwareCertificates */
+        mu_binary_write_int32(&w, 0);             /* localeIds */
+        mu_nodeid_t anon = {0, MU_NODEID_NUMERIC, {321}};
+        mu_binary_write_extension_object_header(&w, &anon, 0); /* anonymous identity token */
+    }
+    secure_call(&mock, server, &client_crypto, sym_mode, &c2s, &s2c, scid, token_id, 4, &srv_last, tmp, w.position,
+                MU_ID_ACTIVATESESSIONRESPONSE, &resp);
+
+    /* Read MyVar1.Value over the activated ECC session -> 42. */
+    mu_binary_writer_init(&w, tmp, sizeof(tmp));
+    {
+        mu_nodeid_t t = {0, MU_NODEID_NUMERIC, {MU_ID_READREQUEST}};
+        mu_binary_write_nodeid(&w, &t);
+    }
+    write_request_header(&w, session_auth_token, 5);
+    mu_binary_write_double(&w, 0.0);
+    mu_binary_write_uint32(&w, 3);
+    mu_binary_write_int32(&w, 1);
+    {
+        mu_nodeid_t v = {1, MU_NODEID_NUMERIC, {1000}};
+        mu_string_t ns = {-1, NULL};
+        mu_binary_write_nodeid(&w, &v);
+        mu_binary_write_uint32(&w, 13); /* AttributeId = Value */
+        mu_binary_write_string(&w, &ns);
+        mu_binary_write_uint16(&w, 0);
+        mu_binary_write_string(&w, &ns);
+    }
+    secure_call(&mock, server, &client_crypto, sym_mode, &c2s, &s2c, scid, token_id, 5, &srv_last, tmp, w.position,
+                tamper_signature ? MU_ID_SERVICEFAULT : MU_ID_READRESPONSE, &resp);
+    if (!tamper_signature) {
+        opcua_int32_t nres;
+        mu_binary_read_int32(&resp, &nres);
+        TEST_ASSERT_EQUAL(1, nres);
+        opcua_byte_t mask, vt;
+        mu_binary_read_byte(&resp, &mask);
+        TEST_ASSERT_EQUAL(0x01, mask);
+        mu_binary_read_byte(&resp, &vt);
+        TEST_ASSERT_EQUAL(MU_TYPE_INT32, vt);
+        opcua_int32_t val;
+        mu_binary_read_int32(&resp, &val);
+        TEST_ASSERT_EQUAL(42, val);
+    }
 
     mu_sym_keys_release_cipher(&c2s);
     mu_sym_keys_release_cipher(&s2c);
@@ -398,17 +528,27 @@ static void run_ecc_handshake(mu_security_policy_id_t policy_id) {
 }
 
 void test_ecc_handshake_curve25519(void) {
-    run_ecc_handshake(MU_SECURITY_POLICY_ECC_CURVE25519_ID);
+    run_ecc_handshake(MU_SECURITY_POLICY_ECC_CURVE25519_ID, 0);
 }
 
 void test_ecc_handshake_nistp256(void) {
-    run_ecc_handshake(MU_SECURITY_POLICY_ECC_NISTP256_ID);
+    run_ecc_handshake(MU_SECURITY_POLICY_ECC_NISTP256_ID, 0);
+}
+
+void test_ecc_handshake_curve25519_rejects_tampered_signature(void) {
+    run_ecc_handshake(MU_SECURITY_POLICY_ECC_CURVE25519_ID, 1);
+}
+
+void test_ecc_handshake_nistp256_rejects_tampered_signature(void) {
+    run_ecc_handshake(MU_SECURITY_POLICY_ECC_NISTP256_ID, 1);
 }
 
 int main(void) {
     UNITY_BEGIN();
     RUN_TEST(test_ecc_handshake_curve25519);
     RUN_TEST(test_ecc_handshake_nistp256);
+    RUN_TEST(test_ecc_handshake_curve25519_rejects_tampered_signature);
+    RUN_TEST(test_ecc_handshake_nistp256_rejects_tampered_signature);
     return UNITY_END();
 }
 

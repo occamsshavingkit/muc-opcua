@@ -20,6 +20,46 @@ static opcua_statuscode_t verify_activate_client_signature(mu_server_t *server, 
     if (signature == NULL || signature->length <= 0 || signature->data == NULL) {
         return MU_STATUS_BAD_SECURITYCHECKSFAILED;
     }
+#ifdef MUC_OPCUA_ECC
+    mu_ecc_curve_t ecc_curve;
+    if (mu_security_policy_ecc_curve(server_secure_channel.policy, &ecc_curve)) {
+        /* ECC application ClientSignature (OPC-10000-4 §5.7.3): ECDSA/Ed25519 over
+           serverEccCertificate || sessionServerNonce, verified against the client's
+           ECC certificate captured from the OPN. The SignatureData.Algorithm for ECC
+           is, per the .NET/open62541 interop convention, empty OR the SecurityPolicy
+           URI itself — the dedicated xmldsig ecdsa URIs are not used. */
+        if (cr->get_own_ecc_certificate == NULL || cr->ecc_verify == NULL) {
+            return MU_STATUS_BAD_SECURITYCHECKSFAILED;
+        }
+        const char *policy_uri = mu_security_policy_uri(server_secure_channel.policy);
+        size_t policy_uri_len = policy_uri ? strlen(policy_uri) : 0;
+        bool alg_ok = (algorithm == NULL || algorithm->data == NULL || algorithm->length <= 0) ||
+                      (policy_uri != NULL && (size_t)algorithm->length == policy_uri_len &&
+                       memcmp(algorithm->data, policy_uri, policy_uri_len) == 0);
+        if (!alg_ok) {
+            return MU_STATUS_BAD_SECURITYCHECKSFAILED;
+        }
+        if (server->channel_client_cert_len == 0) {
+            return MU_STATUS_BAD_SECURITYCHECKSFAILED;
+        }
+        const opcua_byte_t *ecc_own_cert = NULL;
+        size_t ecc_own_cert_len = 0;
+        if (cr->get_own_ecc_certificate(cr->context, ecc_curve, &ecc_own_cert, &ecc_own_cert_len) != MU_STATUS_GOOD) {
+            return MU_STATUS_BAD_SECURITYCHECKSFAILED;
+        }
+        opcua_byte_t ecc_verify_buf[1536];
+        if (ecc_own_cert_len + sizeof(slot->server_nonce) > sizeof(ecc_verify_buf)) {
+            return MU_STATUS_BAD_SECURITYCHECKSFAILED;
+        }
+        memcpy(ecc_verify_buf, ecc_own_cert, ecc_own_cert_len);
+        memcpy(ecc_verify_buf + ecc_own_cert_len, slot->server_nonce, sizeof(slot->server_nonce));
+        opcua_statuscode_t evs = cr->ecc_verify(cr->context, ecc_curve, server->channel_client_cert,
+                                                server->channel_client_cert_len, ecc_verify_buf,
+                                                ecc_own_cert_len + sizeof(slot->server_nonce), signature->data,
+                                                (size_t)signature->length);
+        return (evs == MU_STATUS_GOOD) ? MU_STATUS_GOOD : MU_STATUS_BAD_SECURITYCHECKSFAILED;
+    }
+#endif
     const char *expected_uri = mu_security_policy_asym_signature_uri(server_secure_channel.policy);
     if (expected_uri == NULL) {
         return MU_STATUS_BAD_SECURITYCHECKSFAILED;
