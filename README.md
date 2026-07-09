@@ -26,9 +26,9 @@ in only the surface you need.
 - **Zero heap.** No `malloc` anywhere in the protocol path. The application owns all
   memory: one server-storage block plus the RX/TX buffers. Footprint is deterministic.
 - **Tiny flash.** Measured snapshot (2026-07-09, reproduce with
-  `scripts/measure_size.sh all`): a complete Nano server is **17.4 KiB**
-  (17,790 B) of Arm Cortex-M0+ `-Os` core `.text`; Micro is **28.1 KiB**
-  (28,792 B); Standard 2017 is **65.8 KiB** (67,353 B). Every profile has
+  `scripts/measure_size.sh all`): a complete Nano server is **17.3 KiB**
+  (17,762 B) of Arm Cortex-M0+ `-Os` core `.text`; Micro is **28.7 KiB**
+  (29,384 B); Standard 2017 is **66.6 KiB** (68,246 B). Every profile has
   0 B `.data` and 0 B `.bss` — the library holds no mutable static state and
   never calls `malloc`.
 - **Freestanding & portable.** Plain C11 core with no OS assumptions. Hardware and OS
@@ -56,11 +56,11 @@ smaller after `--gc-sections` dead-code elimination.
 
 | Profile | .text | OPC UA Profile |
 |---------|-------|----------------|
-| nano | 17,790 B | Nano Embedded Device 2017 |
-| micro | 28,792 B | Micro Embedded Device 2017 |
-| embedded | 53,675 B | Embedded 2017 UA Server |
-| standard | 67,353 B | Standard 2017 UA Server |
-| full | 67,373 B | — (everything on) |
+| nano | 17,762 B | Nano Embedded Device 2017 |
+| micro | 29,384 B | Micro Embedded Device 2017 |
+| embedded | 54,456 B | Embedded 2017 UA Server |
+| standard | 68,246 B | Standard 2017 UA Server |
+| full | 68,266 B | — (everything on) |
 
 Built with LTO (`MUC_OPCUA_LTO=ON`, the default). The `nano`/`micro`/`embedded`
 profiles are strictly no-heap (`MUC_OPCUA_ALLOW_HEAP=OFF`): 0 B `.data`, 0 B `.bss`,

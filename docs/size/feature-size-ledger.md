@@ -1,5 +1,25 @@
 # Feature Size Ledger
 
+## 2026-07-09: Project A (specs 055/057/058) — profile modernization
+
+Cumulative archive `.text` (ARM `-Os`) after Security Time Sync (055), Base Info
+OperationLimits (057), and the documentation CU (058, docs-only). Also a **profile
+gating integrity check**: the growth lands *only* where the feature is compiled.
+
+| Profile | prev (post-056) | now | Δ | why |
+|---------|----------------:|----:|--:|-----|
+| nano | 17,790 | 17,762 | −28 | no `BASE_NODES`/`TIME_SYNC`; only the always-on `MaxArrayLength` check (net down w/ LTO) |
+| micro | 29,412 | 29,384 | −28 | no `BASE_NODES` |
+| embedded | 53,675 | 54,456 | +781 | 057 advertised OperationLimits nodes (`base_nodes.c`) |
+| standard | 67,353 | 68,246 | +893 | 057 nodes + 055 time-sync (`TIME_SYNC` on) |
+| full | 67,373 | 68,266 | +893 | same as standard |
+
+**Gating intact:** 057's server-capability nodes appear only in `BASE_NODES`
+profiles (embedded/standard/full); nano/micro did not gain them. 055's time-sync
+code is absent from nano/micro (no `MUC_OPCUA_TIME_SYNC`). `full` is **68,266 B**
+— ~61 KB under the 128 KiB Project-B facet stopper. RAM (`MU_SERVER_STORAGE_BYTES`,
+`sizeof(struct mu_server)`) is unchanged by 055/057/058 (no new struct fields).
+
 ## 2026-07-09: Spec 056 capacity resolution redesign
 
 Capacities now resolve through a single default<profile<user cascade in
