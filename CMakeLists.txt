@@ -84,16 +84,21 @@ endif()
 # -DMUC_OPCUA_PROFILE=custom to hand-select individual features and capacities.
 if(MUC_OPCUA_PROFILE STREQUAL "nano")
     # Nano: keep everything OFF (options default to OFF); default capacities apply.
+    # Embedded/MCU tier: the core makes no heap allocations (constitution). Array-
+    # valued Write/Call decoding is rejected rather than heap-allocated.
+    set(MUC_OPCUA_ALLOW_HEAP OFF CACHE BOOL "" FORCE)
 elseif(MUC_OPCUA_PROFILE STREQUAL "micro")
     set(MUC_OPCUA_SUBSCRIPTIONS ON CACHE BOOL "" FORCE)
     set(MUC_OPCUA_USER_AUTH ON CACHE BOOL "" FORCE)
     set(MUC_OPCUA_SERVICE_WRITE ON CACHE BOOL "" FORCE)
     set(MUC_OPCUA_MULTI_CHUNK ON CACHE BOOL "" FORCE)
     set(MUC_OPCUA_EXTENDED_NODEIDS ON CACHE BOOL "" FORCE)
+    set(MUC_OPCUA_ALLOW_HEAP OFF CACHE BOOL "" FORCE)
     # Capacities: inherit the subscription-engine defaults (subscriptions 2,
     # monitored items 8, parallel Publish 4) from src/services/subscription.h.
 elseif(MUC_OPCUA_PROFILE STREQUAL "embedded")
     set(MUC_OPCUA_SUBSCRIPTIONS ON CACHE BOOL "" FORCE)
+    set(MUC_OPCUA_ALLOW_HEAP OFF CACHE BOOL "" FORCE)
     set(MUC_OPCUA_SUBSCRIPTIONS_STANDARD ON CACHE BOOL "" FORCE)
     set(MUC_OPCUA_USER_AUTH ON CACHE BOOL "" FORCE)
     set(MUC_OPCUA_SERVICE_WRITE ON CACHE BOOL "" FORCE)

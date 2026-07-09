@@ -265,6 +265,7 @@ void test_binary_variant_int32_array_roundtrip(void) {
     mu_binary_reader_t reader;
     mu_binary_reader_init(&reader, buffer, writer.position);
     mu_variant_t out;
+#if MUC_OPCUA_ALLOW_HEAP
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_variant(&reader, &out));
     TEST_ASSERT_EQUAL(MU_TYPE_INT32, out.type);
     TEST_ASSERT_TRUE(out.is_array);
@@ -276,6 +277,10 @@ void test_binary_variant_int32_array_roundtrip(void) {
     TEST_ASSERT_EQUAL(20, got[1]);
     TEST_ASSERT_EQUAL(30, got[2]);
     free((void *)out.value.array);
+#else
+    /* No-heap build: array decode is rejected — the variant cannot own a buffer. */
+    TEST_ASSERT_EQUAL(MU_STATUS_BAD_OUTOFMEMORY, mu_binary_read_variant(&reader, &out));
+#endif
 }
 
 void test_binary_variant_string_array_roundtrip(void) {
@@ -296,6 +301,7 @@ void test_binary_variant_string_array_roundtrip(void) {
     mu_binary_reader_t reader;
     mu_binary_reader_init(&reader, buffer, writer.position);
     mu_variant_t out;
+#if MUC_OPCUA_ALLOW_HEAP
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_variant(&reader, &out));
     TEST_ASSERT_EQUAL(MU_TYPE_STRING, out.type);
     TEST_ASSERT_TRUE(out.is_array);
@@ -307,6 +313,10 @@ void test_binary_variant_string_array_roundtrip(void) {
     TEST_ASSERT_EQUAL(3, got[1].length);
     TEST_ASSERT_EQUAL_MEMORY("bar", got[1].data, 3);
     free((void *)out.value.array);
+#else
+    /* No-heap build: array decode is rejected — the variant cannot own a buffer. */
+    TEST_ASSERT_EQUAL(MU_STATUS_BAD_OUTOFMEMORY, mu_binary_read_variant(&reader, &out));
+#endif
 }
 
 /* Int32 length of -1 is a null array: is_array set, no element buffer. */
@@ -333,7 +343,13 @@ void test_binary_variant_array_truncated_returns_decoding_error(void) {
     mu_binary_reader_init(&reader, buffer, sizeof(buffer));
 
     mu_variant_t out;
+#if MUC_OPCUA_ALLOW_HEAP
     TEST_ASSERT_EQUAL(MU_STATUS_BAD_DECODINGERROR, mu_binary_read_variant(&reader, &out));
+#else
+    /* No-heap build: array decode is rejected with Bad_OutOfMemory before the
+       per-element truncation check is reached. */
+    TEST_ASSERT_EQUAL(MU_STATUS_BAD_OUTOFMEMORY, mu_binary_read_variant(&reader, &out));
+#endif
 }
 
 /* OPC-10000-6 section 5.2.2.16: the dimensions bit requires the array bit. */

@@ -278,20 +278,25 @@ opcua_statuscode_t handle_call(mu_server_t *server, mu_binary_reader_t *r, mu_bi
         }
         s = read_call_input_arguments(r, args, &arg_count);
         if (s != MU_STATUS_GOOD) {
+#if MUC_OPCUA_ALLOW_HEAP
             for (opcua_int32_t ai = 0; ai < MU_DISPATCH_MAX_CALL_INPUT_ARGUMENTS; ++ai) {
                 if (args[ai].is_array && args[ai].value.array != NULL) {
                     free((void *)args[ai].value.array);
                 }
             }
+#endif
             return s;
         }
 
         s = write_single_call_method_result(server, w, &object_id, &method_id, args, arg_count);
+#if MUC_OPCUA_ALLOW_HEAP
+        /* Release heap-decoded array arguments (only allocated when heap is on). */
         for (opcua_int32_t ai = 0; ai < arg_count; ++ai) {
             if (args[ai].is_array && args[ai].value.array != NULL) {
                 free((void *)args[ai].value.array);
             }
         }
+#endif
         if (s != MU_STATUS_GOOD) {
             return s;
         }
