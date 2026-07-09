@@ -255,7 +255,7 @@ void test_dispatch_truncated_create_session_body_returns_bad_decodingerror_witho
     server.config.time_adapter.get_time = fake_time;
     server.config.entropy_adapter.generate_random = fake_entropy;
 
-    mu_session_t sessions_before[MU_MAX_SESSIONS];
+    mu_session_t sessions_before[MU_INTERN_MAX_SESSIONS];
     (void)memcpy(sessions_before, server.sessions, sizeof(sessions_before));
     mu_session_t *active_session_before = server.active_session;
 
@@ -272,7 +272,7 @@ void test_dispatch_truncated_create_session_body_returns_bad_decodingerror_witho
     TEST_ASSERT_EQUAL_HEX32(MU_STATUS_BAD_DECODINGERROR, mu_service_dispatch(&server, MU_ID_CREATESESSIONREQUEST, req,
                                                                              truncated_req_len, resp, &resp_len));
     TEST_ASSERT_EQUAL_PTR(active_session_before, server.active_session);
-    for (size_t i = 0; i < MU_MAX_SESSIONS; ++i) {
+    for (size_t i = 0; i < MU_INTERN_MAX_SESSIONS; ++i) {
         TEST_ASSERT_EQUAL(sessions_before[i].state, server.sessions[i].state);
         TEST_ASSERT_EQUAL(sessions_before[i].session_id, server.sessions[i].session_id);
         TEST_ASSERT_EQUAL(sessions_before[i].auth_token, server.sessions[i].auth_token);
@@ -605,7 +605,7 @@ static opcua_statuscode_t read_monitored_item_create_result(mu_binary_reader_t *
 
 static mu_monitored_item_t *find_monitored_item_by_id(mu_server_t *server, opcua_uint32_t subscription_id,
                                                       opcua_uint32_t monitored_item_id) {
-    for (size_t i = 0; i < MU_MAX_MONITORED_ITEMS; ++i) {
+    for (size_t i = 0; i < MU_INTERN_MAX_MONITORED_ITEMS; ++i) {
         mu_monitored_item_t *item = &server->subs.monitored_items[i];
         if (item->in_use && item->subscription_id == subscription_id && item->monitored_item_id == monitored_item_id) {
             return item;
@@ -616,7 +616,7 @@ static mu_monitored_item_t *find_monitored_item_by_id(mu_server_t *server, opcua
 
 static mu_monitored_item_t *find_monitored_item_by_node(mu_server_t *server, opcua_uint32_t subscription_id,
                                                         const mu_nodeid_t *node_id) {
-    for (size_t i = 0; i < MU_MAX_MONITORED_ITEMS; ++i) {
+    for (size_t i = 0; i < MU_INTERN_MAX_MONITORED_ITEMS; ++i) {
         mu_monitored_item_t *item = &server->subs.monitored_items[i];
         if (item->in_use && item->subscription_id == subscription_id && mu_nodeid_equal(&item->node_id, node_id)) {
             return item;
@@ -682,7 +682,7 @@ void test_dispatch_create_monitored_item_caches_resolved_node(void) {
     TEST_ASSERT_NULL(missing_item);
 
     size_t items_in_use = 0;
-    for (size_t i = 0; i < MU_MAX_MONITORED_ITEMS; ++i) {
+    for (size_t i = 0; i < MU_INTERN_MAX_MONITORED_ITEMS; ++i) {
         mu_monitored_item_t *item = &server.subs.monitored_items[i];
         if (item->in_use) {
             ++items_in_use;

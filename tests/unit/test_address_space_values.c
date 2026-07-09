@@ -180,7 +180,7 @@ void test_address_space_find_node_index_matches_linear_scan(void) {
     size_t i;
 
     TEST_ASSERT_TRUE(s_index_lookup_space.node_count > 40u);
-    TEST_ASSERT_TRUE(s_index_lookup_space.node_count <= MU_MAX_ADDRESS_SPACE_NODES);
+    TEST_ASSERT_TRUE(s_index_lookup_space.node_count <= MU_INTERN_MAX_ADDRESS_SPACE_NODES);
 
     for (i = 0; i < s_index_lookup_space.node_count; i++) {
         const mu_nodeid_t *node_id = &s_index_lookup_nodes[i].node_id;

@@ -84,7 +84,7 @@ static void prepare_server(mu_server_t *server) {
     TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD,
                             mu_secure_channel_open(&server->secure_channel, NULL, MU_MESSAGE_SECURITY_MODE_NONE,
                                                    3600000u, &server->config.entropy_adapter, &sc_lifetime));
-    for (size_t i = 0u; i < MU_MAX_SESSIONS; ++i) {
+    for (size_t i = 0u; i < MU_INTERN_MAX_SESSIONS; ++i) {
         mu_session_init(&server->sessions[i]);
     }
     TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD,

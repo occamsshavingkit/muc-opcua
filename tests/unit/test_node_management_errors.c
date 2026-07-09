@@ -97,7 +97,7 @@ void tearDown(void) {}
 
 void test_AddNodes_OOM(void) {
     /* Fill address space */
-    server.dynamic_address_space.nodes_count = MU_MAX_DYNAMIC_NODES;
+    server.dynamic_address_space.nodes_count = MU_INTERN_MAX_DYNAMIC_NODES;
 
     opcua_byte_t buffer[512];
     mu_binary_writer_t w;
@@ -388,7 +388,7 @@ void test_AddNodes_StringNodeIdStableAfterRequestBufferOverwrite(void) {
 }
 
 void test_AddReferences_OOM(void) {
-    server.dynamic_address_space.references_count = MU_MAX_DYNAMIC_REFERENCES;
+    server.dynamic_address_space.references_count = MU_INTERN_MAX_DYNAMIC_REFERENCES;
 
     opcua_byte_t buffer[512];
     mu_binary_writer_t w;

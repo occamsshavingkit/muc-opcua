@@ -72,7 +72,7 @@ static void read_response_header(mu_binary_reader_t *r, opcua_uint32_t *handle, 
 
 static opcua_uint32_t count_subscriptions(const mu_subscriptions_t *subs) {
     opcua_uint32_t count = 0u;
-    for (opcua_uint32_t i = 0u; i < MU_MAX_SUBSCRIPTIONS; ++i) {
+    for (opcua_uint32_t i = 0u; i < MU_INTERN_MAX_SUBSCRIPTIONS; ++i) {
         if (subs->subscriptions[i].in_use) {
             ++count;
         }
@@ -95,7 +95,7 @@ static void prepare_server(mu_server_t *server) {
     TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD,
                             mu_secure_channel_open(&server->secure_channel, NULL, MU_MESSAGE_SECURITY_MODE_NONE,
                                                    3600000u, &server->config.entropy_adapter, &sc_lifetime));
-    for (size_t i = 0u; i < MU_MAX_SESSIONS; ++i) {
+    for (size_t i = 0u; i < MU_INTERN_MAX_SESSIONS; ++i) {
         mu_session_init(&server->sessions[i]);
     }
     TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD,
@@ -221,7 +221,7 @@ void test_create_subscription_creates_subscription_in_server_state(void) {
                                                                 w.position, response, &response_len));
 
     opcua_uint32_t count = 0u;
-    for (size_t i = 0u; i < MU_MAX_SUBSCRIPTIONS; ++i) {
+    for (size_t i = 0u; i < MU_INTERN_MAX_SUBSCRIPTIONS; ++i) {
         if (server.subs.subscriptions[i].in_use) {
             ++count;
         }
@@ -285,7 +285,7 @@ void test_create_subscription_duplicate_keeps_first_and_returns_another_id(void)
     TEST_ASSERT_NOT_EQUAL_UINT32(first_id, second_id);
 
     opcua_uint32_t count = 0u;
-    for (size_t i = 0u; i < MU_MAX_SUBSCRIPTIONS; ++i) {
+    for (size_t i = 0u; i < MU_INTERN_MAX_SUBSCRIPTIONS; ++i) {
         if (server.subs.subscriptions[i].in_use) {
             ++count;
         }
