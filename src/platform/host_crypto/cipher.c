@@ -70,14 +70,11 @@ opcua_statuscode_t h_cipher_ctx_init(void *c, const opcua_byte_t *key, opcua_byt
         return MU_STATUS_BAD_INTERNALERROR;
     }
 
-#if MUC_OPCUA_ALLOW_HEAP
+    /* Host crypto adapter (host-only); not gated by MUC_OPCUA_ALLOW_HEAP. */
     struct host_cipher_context *handle = (struct host_cipher_context *)calloc(1, sizeof(*handle));
     if (!handle) {
         return MU_STATUS_BAD_OUTOFMEMORY;
     }
-#else
-    return MU_STATUS_BAD_OUTOFMEMORY;
-#endif
 
     handle->encrypt = EVP_CIPHER_CTX_new();
     handle->decrypt = EVP_CIPHER_CTX_new();

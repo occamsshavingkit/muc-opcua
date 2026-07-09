@@ -49,9 +49,14 @@ opcua_statuscode_t handle_read(mu_server_t *server, mu_binary_reader_t *r, mu_bi
     opcua_datetime_t now = server->config.time_adapter.get_time
                                ? server->config.time_adapter.get_time(server->config.time_adapter.context)
                                : 0;
+#if MUC_OPCUA_READ_CACHE
+    mu_read_cache_t *read_cache = &server->read_cache;
+#else
+    mu_read_cache_t *read_cache = NULL;
+#endif
     s = mu_read_process_with_user_index(server->config.address_space, &server->user_address_space_index,
                                         &server->runtime_base.space, &rreq, now, &rresp, results,
-                                        MU_DISPATCH_MAX_READ_NODES, &server->read_cache);
+                                        MU_DISPATCH_MAX_READ_NODES, read_cache);
     if (s != MU_STATUS_GOOD) {
         return s;
     }
@@ -155,12 +160,16 @@ opcua_statuscode_t handle_write(mu_server_t *server, mu_binary_reader_t *r, mu_b
         s = mu_write_response_encode(w, &wresp);
     }
 
+#if MUC_OPCUA_ALLOW_HEAP
+    /* Release any heap-decoded array values (only ever allocated when
+       MUC_OPCUA_ALLOW_HEAP is on; a no-heap build rejects array writes upstream). */
     for (size_t i = 0; i < wreq.num_nodes_to_write; ++i) {
         if (wreq.nodes_to_write[i].value.has_value && wreq.nodes_to_write[i].value.value.is_array &&
             wreq.nodes_to_write[i].value.value.value.array != NULL) {
             free((void *)wreq.nodes_to_write[i].value.value.value.array);
         }
     }
+#endif
 
     if (s != MU_STATUS_GOOD) {
         return s;

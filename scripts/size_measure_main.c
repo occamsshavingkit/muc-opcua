@@ -1,6 +1,9 @@
-/* scripts/size_measure_main.c — minimal main() that calls mu_server_init()
- * to force the linker to pull in library symbols. --gc-sections strips
- * unreferenced code, so the measured ELF reflects actual linked size. */
+/* scripts/size_measure_main.c — minimal main() that exercises the full server
+ * runtime surface (init + config_validate + poll + close) so the linker retains
+ * everything a real server reaches. --gc-sections then strips only genuinely
+ * unreferenced code, so the measured ELF reflects the actual deployed size.
+ * (Calling only mu_server_init would strip the entire service-dispatch surface
+ * and grossly under-count.) */
 
 #include "muc_opcua/server.h"
 #include "muc_opcua/types.h"
@@ -88,7 +91,13 @@ int main(void) {
     cfg.time_adapter.get_tick_ms = fake_tick;
     cfg.entropy_adapter.generate_random = fake_random;
     mu_server_t *srv = NULL;
+    (void)mu_server_config_validate(&cfg);
     mu_server_init(storage, sizeof(storage), &cfg, &srv);
-    (void)srv;
+    if (srv) {
+        for (int i = 0; i < 3; ++i) {
+            mu_server_poll(srv);
+        }
+        mu_server_close(srv);
+    }
     return 0;
 }

@@ -123,10 +123,11 @@ build_and_measure() {
     if $lto; then suffix="-lto"; fi
     local build_dir="${build_root}/${profile}${suffix}"
     local archive="${build_dir}/src/libmuc_opcua.a"
-    local cflags="-mcpu=cortex-m0plus -mthumb"
-    if $lto; then
-        cflags="$cflags -flto -ffat-lto-objects"
-    fi
+    # LTO is the default build mode (MUC_OPCUA_LTO=ON). -ffat-lto-objects keeps the
+    # archive .text measurable (per-object machine code) while -flto lets the final
+    # ELF link do cross-module optimization -- the elf_text column is the real,
+    # smallest deployed server size; archive .text is the conservative all-code figure.
+    local cflags="-mcpu=cortex-m0plus -mthumb -flto -ffat-lto-objects"
 
     local line
     readarray -t defs < <(get_profile_defs "$profile")
@@ -179,11 +180,11 @@ build_and_measure() {
     fi
 }
 
+# LTO is baked into the default cflags above, so a single measurement per profile
+# already reflects the shipped (smallest) build. The legacy --lto flag is accepted
+# for back-compat but is now a no-op.
 for profile in $profiles; do
     build_and_measure "$profile" false
-    if $lto_flag; then
-        build_and_measure "$profile" true
-    fi
 done
 
 if $json_flag && [ -n "$json_entries" ]; then

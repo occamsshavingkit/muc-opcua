@@ -41,14 +41,13 @@ opcua_statuscode_t mu_host_crypto_adapter_init(mu_crypto_adapter_t *adapter) {
         return MU_STATUS_BAD_INTERNALERROR;
     }
 
-#if MUC_OPCUA_ALLOW_HEAP
+    /* Host crypto adapter: runs only on the host platform where a full heap
+       exists, never on the freestanding no-heap core, so its context allocation
+       is intentionally not gated by MUC_OPCUA_ALLOW_HEAP. */
     struct host_crypto_context *cx = (struct host_crypto_context *)calloc(1, sizeof(*cx));
     if (!cx) {
         return MU_STATUS_BAD_OUTOFMEMORY;
     }
-#else
-    return MU_STATUS_BAD_OUTOFMEMORY;
-#endif
 
     if (!build_self_signed(cx)) {
         if (cx->key) {

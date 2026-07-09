@@ -187,14 +187,12 @@ opcua_statuscode_t mu_wolfssl_crypto_adapter_init(mu_crypto_adapter_t *adapter, 
         return MU_STATUS_BAD_INTERNALERROR;
     }
 
-#if MUC_OPCUA_ALLOW_HEAP
+    /* wolfSSL crypto adapter (host/RTOS platforms with a heap); not gated by
+       MUC_OPCUA_ALLOW_HEAP, which governs the freestanding no-heap core. */
     struct wolfssl_crypto_context *ctx = (struct wolfssl_crypto_context *)calloc(1, sizeof(*ctx));
     if (!ctx) {
         return MU_STATUS_BAD_OUTOFMEMORY;
     }
-#else
-    return MU_STATUS_BAD_OUTOFMEMORY;
-#endif
 
     ctx->cert_der = cert_der;
     ctx->cert_len = cert_len;

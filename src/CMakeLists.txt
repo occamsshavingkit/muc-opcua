@@ -10,7 +10,6 @@ add_library(muc_opcua STATIC
     core/message_chunk.c
     core/sequence.c
     core/service_message.c
-    platform/mdns_noop.c
     core/service_dispatch/dispatch_core.c
     core/service_dispatch/response_encode.c
     core/service_dispatch/reader_helpers.c
@@ -49,8 +48,15 @@ endif()
 
 # Optional services compile out at the source + dispatch-table level.
 if(MUC_OPCUA_SERVICE_READ)
-    target_sources(muc_opcua PRIVATE services/read/cache.c services/read/read_attribute.c services/read/read_process.c)
+    target_sources(muc_opcua PRIVATE services/read/read_attribute.c services/read/read_process.c)
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_SERVICE_READ=1)
+endif()
+# The Read value cache is an opt-in optimization (see MUC_OPCUA_READ_CACHE). Its
+# maxAge handling is the only floating-point in the Read path, so it is compiled
+# only when explicitly enabled.
+if(MUC_OPCUA_READ_CACHE)
+    target_sources(muc_opcua PRIVATE services/read/cache.c)
+    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_READ_CACHE=1)
 endif()
 if(MUC_OPCUA_SERVICE_BROWSE)
     target_sources(muc_opcua PRIVATE services/browse/browse.c services/browse/browse_next.c services/browse/translate_paths.c core/service_dispatch/view_handler.c)
@@ -262,6 +268,7 @@ endif()
 
 
 foreach(MU_CAPACITY_DEFINE
+        MU_MAX_SESSIONS
         MU_MAX_SUBSCRIPTIONS
         MU_MAX_MONITORED_ITEMS
         MU_MAX_PUBLISH_REQUESTS

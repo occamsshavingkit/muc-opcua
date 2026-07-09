@@ -148,6 +148,7 @@ opcua_statuscode_t mu_read_process_with_user_index(const mu_address_space_t *add
             if (node->node_class != MU_NODECLASS_VARIABLE) {
                 status = MU_STATUS_BAD_ATTRIBUTEIDINVALID;
             } else if (node->value) {
+#if MUC_OPCUA_READ_CACHE
                 if (mu_read_cache_lookup(cache, &read_val->node_id, req->max_age, now, &dv->value)) {
                     status = MU_STATUS_GOOD;
                 } else {
@@ -156,6 +157,13 @@ opcua_statuscode_t mu_read_process_with_user_index(const mu_address_space_t *add
                         mu_read_cache_store(cache, &read_val->node_id, &dv->value, now);
                     }
                 }
+#else
+                /* No value cache: always return a fresh "best effort" value.
+                   maxAge is decoded for wire compatibility but not acted upon,
+                   which OPC-10000-4 5.11.2 permits (fresh always satisfies it). */
+                (void)cache;
+                status = mu_value_source_read(node->value, &node->node_id, &dv->value);
+#endif
             } else {
                 status = MU_STATUS_BAD_NOTREADABLE;
             }

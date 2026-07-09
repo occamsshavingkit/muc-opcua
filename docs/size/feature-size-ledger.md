@@ -1,6 +1,157 @@
 # Feature Size Ledger
 
-## Current (2026-07-06): Deferred Features (D1-D4) — Spec 045
+## Current (2026-07-09): No-heap embedded profiles + LTO by default
+
+Two changes, both driven by the realistic linked-server measurement:
+
+**LTO on by default** (`MUC_OPCUA_LTO=ON`). Recovers the cross-TU inlining lost to
+the feature-041 file split. The real linked `nano` server (`init`+`poll`+`close`,
+`--gc-sections`) is **15,724 B** `.text`, below the previous ~16.1 KB low.
+
+**nano/micro/embedded are now strictly no-heap.** The linked-server measurement
+revealed micro/embedded/standard were pulling newlib `malloc`+`stdio` (nonzero
+`.data`/`.bss`) — the "no-heap" profiles weren't. Cause: `binary_variant.c` array
+decode uses `calloc` under `MUC_OPCUA_ALLOW_HEAP` (default ON, never disabled by the
+profiles), and the Write/Call array-`free` paths were ungated. Fixed by gating those
+frees, un-gating the host-only crypto adapters (they need a heap and are never in the
+freestanding core), and forcing `ALLOW_HEAP=OFF` for nano/micro/embedded (array
+Write/Call returns `Bad_OutOfMemory` — conformant). standard/full keep the heap.
+
+- **Toolchain**: `arm-none-eabi-gcc` 13.2.1, Cortex-M0+ `-Os`, `arduino-skeleton`, LTO
+- **Reproduce**: `bash scripts/measure_size.sh all` (archive `.text` + linked `elf_text`)
+
+### Library archive `.text` + linked-server `.data`/`.bss`
+
+| Profile | archive .text | linked .data | linked .bss | heap? |
+|---------|---------------|--------------|-------------|-------|
+| nano | 17,790 B | 0 | 0 | no |
+| micro | 28,792 B | 0 | 0 | no |
+| embedded | 53,675 B | 0 | 0 | no |
+| standard | 67,353 B | 1,336 B | 884 B | yes (ALLOW_HEAP) |
+| full | 67,373 B | 1,336 B | 884 B | yes (ALLOW_HEAP) |
+
+(The 512 B `.bss` the linker reserves for the measurement stack is excluded above.
+Real linked `nano` server: 15,724 B `.text` with LTO.) Per-profile ctest matrix
+green: nano 88 / micro 96 / embedded 116 / standard 124 / full 124.
+
+---
+
+## 2026-07-09: De-bloat nano/micro — remove leaked soft-float + strstr
+
+Investigating a ~2 KB archive `.text` creep in nano over the prior week uncovered a
+much larger regression the archive metric could not see. **The archive `.text`
+figures below count only our code; they do not include libc.** A realistic link of
+the actual server runtime (`mu_server_init` + `mu_server_poll` + `mu_server_close`,
+`--gc-sections`) showed the nano *binary* had grown from 16,064 B to **24,493 B** —
+~7 KB of it double-precision soft-float and `strstr`/`strchr` pulled in from libc:
+
+- `src/services/read/cache.c` (new Read `maxAge` value cache) did `double`
+  arithmetic on `maxAge`, dragging in `__aeabi_dmul` / `dcmp*` / conversions (~5 KB)
+  on the FPU-less Cortex-M0+. OPC-10000-4 §5.11.2 makes the cache optional (a fresh
+  "best effort" value is conformant) and needs only millisecond granularity, so no
+  float is required.
+- `src/core/server/init.c` `parse_endpoint_url` (mDNS-only) used `strstr`/`strchr`
+  but was compiled unconditionally (~2 KB).
+
+**Fixes:** `MUC_OPCUA_READ_CACHE` (default **OFF**) gates the cache out entirely
+(reads always fresh); when enabled its `maxAge` handling is integer-only with the
+spec-correct Int32-max "always cache" threshold. `parse_endpoint_url` + the mDNS
+publish/unpublish are gated behind `MUC_OPCUA_MDNS_DISCOVERY`. nano/micro are now
+soft-float-free; embedded/standard/full retain float only in deadband/aggregate
+subscription math, which is spec-inherent (operates on `Double` values).
+
+- **Toolchain**: `arm-none-eabi-gcc` 13.2.1, Cortex-M0+ Thumb `-Os`, `arduino-skeleton`
+- **Reproduce (archive)**: `bash scripts/measure_size.sh all`
+- **Reproduce (real binary)**: link `scripts/size_measure_startup.c` + a main that
+  calls init/poll/close against `-lmuc_opcua` with `-Wl,--gc-sections`, then
+  `arm-none-eabi-size`. NOTE: the in-tree `size_measure_main.c` only calls
+  `mu_server_init`, so its ELF under-counts (dispatch stripped); the archive `.text`
+  is the reported figure and the linked figure below is measured separately.
+
+### Library archive `.text` (flash) + real linked nano
+
+| Profile | archive .text | .data | .bss |
+|---------|---------------|-------|------|
+| nano | 17,882 B | 0 | 0 |
+| micro | 28,952 B | 0 | 0 |
+| embedded | 53,927 B | 0 | 0 |
+| standard | 67,317 B | 0 | 0 |
+| full | 67,337 B | 0 | 0 |
+
+Real linked nano server (`--gc-sections`): **17,168 B** `.text` — down from 24,493 B
+before the fix (−7,325 B), vs. 16,064 B a week ago (the remaining ~1.1 KB is the
+feature-041 file split losing cross-TU inlining, not a leak).
+
+### Server object and caller storage (ARM, per profile)
+
+| Profile | sizeof(struct mu_server) | MU_SERVER_STORAGE_BYTES | Sessions | Subscriptions | Monitored Items | Publish |
+|---------|--------------------------|-------------------------|----------|---------------|-----------------|---------|
+| nano | 784 B | 1,408 B | 2 | — | — | — |
+| micro | 11,032 B | 11,680 B | 2 | 2 | 8 | 4 |
+| embedded | 102,016 B | 128,232 B | 2 | 2 | 100 | 5 |
+| standard | 680,712 B | 741,300 B | 50 | 50 | 1,000 | 50 |
+| full | 1,270,432 B | 1,387,500 B | 100 | 100 | 2,000 | 100 |
+
+`sizeof(struct mu_server)` dropped 88 B per profile vs. the prior section (the
+`read_cache` field is gone by default). `MU_SERVER_STORAGE_BYTES` is unchanged (it
+never included the cache).
+
+---
+
+## 2026-07-09: Profile gating single source of truth — Spec 052
+
+Re-measured after making `MUC_OPCUA_PROFILE` the single source of truth for the
+profile feature sets and capacity minima (branch `052-fix-profile-gating`). That
+fix restored `MU_MAX_SESSIONS` propagation to the compiler — it had been set in the
+CMake cache but never passed as `-D`, so standard/full silently compiled a
+2-session array — and made `full` advertise StandardUA2017. These figures supersede
+the numbers in the older sections below, several of which pre-dated later struct
+growth (a prior section even lists identical `sizeof` for standard and full, which
+cannot hold at 1,000 vs 2,000 monitored items).
+
+- **Toolchain**: `arm-none-eabi-gcc` 13.2.1, Cortex-M0+ Thumb `-Os`
+- **Target**: `MUC_OPCUA_PLATFORM=arduino-skeleton`, no host adapters
+- **Reproduce**: `bash scripts/measure_size.sh all` for archive `.text`; server-object
+  and storage sizes from a `char probe[sizeof(struct mu_server)]` /
+  `char probe[MU_SERVER_STORAGE_BYTES]` TU compiled with each profile's flags and
+  read via `arm-none-eabi-nm --print-size` (pointer size is 4 B on Cortex-M0+).
+
+### ARM Cortex-M0+ `.text` (flash), library archive
+
+| Profile | .text | .data | .bss |
+|---------|-------|-------|------|
+| nano | 18,379 B | 0 | 0 |
+| micro | 29,465 B | 0 | 0 |
+| embedded | 54,418 B | 0 | 0 |
+| standard | 67,824 B | 0 | 0 |
+| full | 67,828 B | 0 | 0 |
+
+`.data` and `.bss` are 0 for every profile — the library declares no mutable static
+state (the no-heap / caller-owns-all-memory constitution requirement, now verifiable
+straight off the archive, not just the linked ELF). This measurement surfaced the one
+prior violation: `mu_mdns_adapter_noop`, an all-NULL `mu_mdns_adapter_t` global added
+by the mDNS feature (F1) that sat in `.bss`. It was redundant — a NULL `mdns_adapter`
+in the server config already disables mDNS — so it was removed (`src/platform/mdns_noop.c`
+deleted, `extern` dropped from `platform.h`) rather than merely `--gc-sections`-hidden.
+
+### Server object and caller storage (ARM, per profile)
+
+| Profile | sizeof(struct mu_server) | MU_SERVER_STORAGE_BYTES | Sessions | Subscriptions | Monitored Items | Publish |
+|---------|--------------------------|-------------------------|----------|---------------|-----------------|---------|
+| nano | 872 B | 1,408 B | 2 | — | — | — |
+| micro | 11,120 B | 11,680 B | 2 | 2 | 8 | 4 |
+| embedded | 102,104 B | 128,232 B | 2 | 2 | 100 | 5 |
+| standard | 680,800 B | 741,300 B | 50 | 50 | 1,000 | 50 |
+| full | 1,270,520 B | 1,387,500 B | 100 | 100 | 2,000 | 100 |
+
+`MU_SERVER_STORAGE_BYTES >= sizeof(struct mu_server)` for every profile: the caller
+storage holds the server object plus scratch, chunk-assembly, and security buffers.
+Both are dominated by `MU_MAX_MONITORED_ITEMS`/`MU_MAX_SUBSCRIPTIONS`, which is why
+the `full` profile — a non-MCU "everything on" target — needs ~1.3 MB of each.
+
+---
+
+## 2026-07-06: Deferred Features (D1-D4) — Spec 045
 
 Measured after implementing complex type binary encode/decode (D1), audit event
 callback dispatch (D2), additional aggregate functions (D3), and binary size

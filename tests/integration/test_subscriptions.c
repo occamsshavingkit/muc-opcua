@@ -1821,8 +1821,10 @@ static void enqueue_hel_opn(mock_t *mock) {
 }
 
 /* Two concurrent sessions on one secure channel (OPC 10000-4 §5.6.2). Each
-   CreateSession yields a distinct authenticationToken; both can be activated and used;
-   the (MU_MAX_SESSIONS default 2)+1-th CreateSession returns Bad_TooManySessions. */
+   CreateSession yields a distinct authenticationToken; both can be activated and used.
+   When MU_MAX_SESSIONS == 2 (the default / Nano-Micro-Embedded profiles) the test also
+   asserts the 3rd CreateSession returns Bad_TooManySessions; profiles with a larger cap
+   (standard/full) skip that overflow leg since exhausting the pool is impractical here. */
 void test_two_sessions(void) {
     mock_t mock;
     memset(&mock, 0, sizeof(mock));
@@ -1858,7 +1860,9 @@ void test_two_sessions(void) {
     enqueue_activate_session(&mock, 5, tok2);
     enqueue_read_state(&mock, 6, tok1);
     enqueue_read_state(&mock, 7, tok2);
-    enqueue_create_session(&mock, 8);
+#if MU_MAX_SESSIONS <= 2
+    enqueue_create_session(&mock, 8); /* one past the cap */
+#endif
     mu_server_poll(server); /* ActivateSession #2 */
     TEST_ASSERT_EQUAL(MU_ID_ACTIVATESESSIONRESPONSE, parse_response(mock.last_write, mock.last_write_len, &body, &sr));
     TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, sr);
@@ -1870,9 +1874,11 @@ void test_two_sessions(void) {
     TEST_ASSERT_EQUAL(ID_READRESPONSE, parse_response(mock.last_write, mock.last_write_len, &body, &sr));
     TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, sr);
 
+#if MU_MAX_SESSIONS <= 2
     mu_server_poll(server); /* CreateSession #3 -> Bad_TooManySessions */
     TEST_ASSERT_EQUAL(ID_SERVICEFAULT, parse_response(mock.last_write, mock.last_write_len, &body, &sr));
     TEST_ASSERT_EQUAL_HEX32(STATUS_BAD_TOOMANYSESSIONS, sr);
+#endif
 }
 
 /* A subscription created on session 1 is not operable from session 2 (OPC 10000-4
