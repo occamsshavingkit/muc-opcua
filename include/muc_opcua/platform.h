@@ -244,6 +244,13 @@ typedef struct mu_crypto_adapter {
                                      size_t certificate_length, const opcua_byte_t *data, size_t data_length,
                                      const opcua_byte_t *signature, size_t signature_length);
 
+    /* The server's own ECC certificate (DER) for `curve` — the SenderCertificate an
+       ECC OPN chunk carries, matching the ecc_sign key. Distinct from
+       get_own_certificate (the RSA identity): backends supporting ECC hold a
+       separate per-curve identity. */
+    opcua_statuscode_t (*get_own_ecc_certificate)(void *context, mu_ecc_curve_t curve,
+                                                  const opcua_byte_t **certificate, size_t *length);
+
     /* ChaCha20-Poly1305 AEAD (RFC 8439) for the curve25519 SecurityPolicy. `key`
        is 32 B, `nonce` 12 B; the 16-byte authentication tag is written to `tag`
        (encrypt) or verified from `tag` (decrypt, returning

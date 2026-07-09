@@ -100,6 +100,19 @@ opcua_statuscode_t mu_secure_channel_open(mu_secure_channel_t *channel, const mu
             return MU_STATUS_BAD_SECURITYMODEREJECTED;
         }
     }
+#ifdef MUC_OPCUA_ECC
+    /* ECC SecurityPolicies (spec 059): same discipline — the requested URI must
+       match the channel's classified policy and a real security mode is required
+       (ECC never runs None). */
+    else if (mu_security_policy_asym_family(channel->policy) == MU_ASYM_FAMILY_ECC) {
+        if (requested_policy != channel->policy) {
+            return MU_STATUS_BAD_SECURITYPOLICYREJECTED;
+        }
+        if (security_mode == MU_MESSAGE_SECURITY_MODE_NONE) {
+            return MU_STATUS_BAD_SECURITYMODEREJECTED;
+        }
+    }
+#endif
 #endif
     else {
         return MU_STATUS_BAD_SECURITYPOLICYREJECTED;

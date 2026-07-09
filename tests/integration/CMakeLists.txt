@@ -89,6 +89,15 @@ target_link_libraries(test_secure_handshake_modern PRIVATE muc_opcua muc_opcua_t
 target_include_directories(test_secure_handshake_modern PRIVATE ${CMAKE_SOURCE_DIR}/src)
 add_test(NAME test_secure_handshake_modern COMMAND test_secure_handshake_modern)
 
+# ECC SecurityPolicies (spec 059): full client<->server ECC secure-channel handshake
+# (curve25519 + nistP256). Only meaningful when the ECC feature is compiled in.
+if(MUC_OPCUA_ECC)
+    add_executable(test_ecc_handshake_e2e test_ecc_handshake_e2e.c)
+    target_link_libraries(test_ecc_handshake_e2e PRIVATE muc_opcua muc_opcua_test_support unity)
+    target_include_directories(test_ecc_handshake_e2e PRIVATE ${CMAKE_SOURCE_DIR}/src)
+    add_test(NAME test_ecc_handshake_e2e COMMAND test_ecc_handshake_e2e)
+endif()
+
 if(MUC_OPCUA_EVENTS)
     add_executable(test_event_notifications test_event_notifications.c)
     target_link_libraries(test_event_notifications PRIVATE muc_opcua muc_opcua_test_support unity)

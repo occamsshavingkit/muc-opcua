@@ -10,6 +10,20 @@
 #define MU_SYM_SIG_LEN MU_B256S256_SIGNATURE_LENGTH    /* 32 (HMAC-SHA256) */
 #define MU_SYM_BLOCK MU_B256S256_ENCRYPTION_BLOCK_SIZE /* 16 (AES) */
 
+/* Policies whose symmetric cipher is AES-128-CBC (16-byte key): Aes128_Sha256_RsaOaep
+   and the ECC-nistP256 SecurityPolicy. The others in the CBC path use AES-256-CBC. */
+static bool policy_uses_aes128(mu_security_policy_id_t policy) {
+    if (policy == MU_SECURITY_POLICY_AES128_SHA256_RSAOAEP_ID) {
+        return true;
+    }
+#ifdef MUC_OPCUA_ECC
+    if (policy == MU_SECURITY_POLICY_ECC_NISTP256_ID) {
+        return true;
+    }
+#endif
+    return false;
+}
+
 opcua_statuscode_t mu_sym_keys_derive(const mu_crypto_adapter_t *crypto, mu_security_policy_id_t policy,
                                       const opcua_byte_t *secret, size_t secret_len, const opcua_byte_t *seed,
                                       size_t seed_len, mu_sym_keys_t *out_keys) {
@@ -47,7 +61,9 @@ void mu_sym_keys_prepare_cipher(mu_sym_keys_t *keys, const mu_crypto_adapter_t *
     }
     mu_sym_keys_release_cipher(keys);
     keys->crypto = crypto;
-    if (keys->policy == MU_SECURITY_POLICY_AES128_SHA256_RSAOAEP_ID) {
+    /* The AES-128 policies use the direct (keyed) call each chunk; only the AES-256
+       path keeps a persistent cipher context. */
+    if (policy_uses_aes128(keys->policy)) {
         keys->cipher_ctx_valid = false;
         return;
     }
@@ -169,7 +185,7 @@ opcua_statuscode_t mu_sym_chunk_wrap(const mu_crypto_adapter_t *crypto, mu_messa
     mu_secure_zero(mac, sizeof(mac));
 
     /* Encrypt the SequenceHeader..signature region in place (AES-CBC preserves length). */
-    if (keys->policy == MU_SECURITY_POLICY_AES128_SHA256_RSAOAEP_ID) {
+    if (policy_uses_aes128(keys->policy)) {
         if (crypto->aes128_cbc_encrypt) {
             s = crypto->aes128_cbc_encrypt(crypto->context, keys->encrypting_key, keys->iv, out + MU_SYM_HEADER_SIZE,
                                            enc_len, out + MU_SYM_HEADER_SIZE);
@@ -225,7 +241,7 @@ opcua_statuscode_t mu_sym_chunk_unwrap(const mu_crypto_adapter_t *crypto, mu_mes
             return MU_STATUS_BAD_DECODINGERROR;
         }
         opcua_statuscode_t s;
-        if (keys->policy == MU_SECURITY_POLICY_AES128_SHA256_RSAOAEP_ID) {
+        if (policy_uses_aes128(keys->policy)) {
             if (crypto->aes128_cbc_decrypt) {
                 s = crypto->aes128_cbc_decrypt(crypto->context, keys->encrypting_key, keys->iv,
                                                chunk + MU_SYM_HEADER_SIZE, cipher_len, chunk + MU_SYM_HEADER_SIZE);

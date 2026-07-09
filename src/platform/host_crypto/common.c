@@ -120,6 +120,7 @@ opcua_statuscode_t mu_host_crypto_adapter_init(mu_crypto_adapter_t *adapter) {
     adapter->ecc_keypair_free = h_ecc_keypair_free;
     adapter->ecc_sign = h_ecc_sign;
     adapter->ecc_verify = h_ecc_verify;
+    adapter->get_own_ecc_certificate = h_get_own_ecc_certificate;
     adapter->chacha20_poly1305_encrypt = h_chacha20_poly1305_encrypt;
     adapter->chacha20_poly1305_decrypt = h_chacha20_poly1305_decrypt;
 #endif

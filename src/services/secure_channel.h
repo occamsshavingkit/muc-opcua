@@ -20,6 +20,10 @@ typedef struct {
 
     mu_sequence_validator_t sequence;   /* validates inbound SequenceNumbers */
     opcua_uint32_t out_sequence_number; /* monotonic SequenceNumber for responses */
+    /* Previous inbound (client->server) SequenceNumber, for the AEAD per-chunk
+       nonce of the ECC-curve25519 SecurityPolicy (OPC-10000-6 §6.8.1, Table 69:
+       IV XOR TokenId||LastSequenceNumber). Unused by the CBC/None paths. */
+    opcua_uint32_t in_last_sequence_number;
     bool is_open;
 
     /* Negotiated security (None unless a Basic256Sha256 OPN established keys). */
