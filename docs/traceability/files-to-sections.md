@@ -265,6 +265,9 @@ This document maps implementation and test files back to OPC UA normative sectio
 | `subscription.c` | Subscription + MonitoredItem service sets (Micro) | Part 4 | 5.13, 5.14 | No-heap data-change subscription engine |
 | `subscription.h` | Subscription + MonitoredItem service sets (Micro) | Part 4 | 5.13, 5.14, 7.17, 7.21 | Subscription engine data model + contract |
 | `mbedtls_crypto_adapter.c` | Crypto Adapter | Part 7 | 6.x | Mbed TLS primitives for SecurityPolicy Basic256Sha256 |
+| `src/platform/mbedtls_crypto_adapter.h` | Crypto Adapter | Part 7 | 6.x | Mbed TLS ECC identity setter (spec 059, nistP256 only) |
+| `src/platform/wolfssl_crypto_adapter.h` | Crypto Adapter | Part 7 | 6.x | wolfSSL ECC identity setter (spec 059, both curves) |
+| `src/platform/wolfssl_crypto/ecc.c` | ECC SecurityPolicy | Part 6 | 6.8.1 | wolfSSL ECC primitives (P-256/Ed25519/X25519, ChaCha20-Poly1305) |
 | `src/platform/wolfssl_crypto/cipher.c` | Crypto Adapter (Cipher) | Part 7 | 6.x | wolfSSL symmetric cipher primitives |
 | `src/platform/wolfssl_crypto/asymmetric.c` | Crypto Adapter (Asymmetric) | Part 7 | 6.x | wolfSSL asymmetric primitives |
 | `src/platform/wolfssl_crypto/hash.c` | Crypto Adapter (Hash) | Part 7 | 6.x | wolfSSL hash primitives |

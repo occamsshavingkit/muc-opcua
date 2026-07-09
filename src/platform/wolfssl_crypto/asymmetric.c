@@ -251,6 +251,18 @@ opcua_statuscode_t mu_wolfssl_crypto_adapter_init(mu_crypto_adapter_t *adapter, 
     adapter->get_certificate_key_bits = w_get_certificate_key_bits;
     adapter->get_certificate_thumbprint = w_get_certificate_thumbprint;
     adapter->verify_certificate_validity = w_verify_certificate_validity;
+#ifdef MUC_OPCUA_ECC
+    /* ECC identity keys are provisioned later via
+       mu_wolfssl_crypto_adapter_set_ecc_identity; the vtable slots are wired now. */
+    adapter->ecc_generate_ephemeral = w_ecc_generate_ephemeral;
+    adapter->ecc_ecdh_derive = w_ecc_ecdh_derive;
+    adapter->ecc_keypair_free = w_ecc_keypair_free;
+    adapter->ecc_sign = w_ecc_sign;
+    adapter->ecc_verify = w_ecc_verify;
+    adapter->get_own_ecc_certificate = w_get_own_ecc_certificate;
+    adapter->chacha20_poly1305_encrypt = w_chacha20_poly1305_encrypt;
+    adapter->chacha20_poly1305_decrypt = w_chacha20_poly1305_decrypt;
+#endif
 
     return MU_STATUS_GOOD;
 }
@@ -260,6 +272,14 @@ void mu_wolfssl_crypto_adapter_cleanup(mu_crypto_adapter_t *adapter) {
         return;
     }
     struct wolfssl_crypto_context *ctx = (struct wolfssl_crypto_context *)adapter->context;
+#ifdef MUC_OPCUA_ECC
+    if (ctx->p256_key_set) {
+        wc_ecc_free(&ctx->p256_key);
+    }
+    if (ctx->ed_key_set) {
+        wc_ed25519_free(&ctx->ed_key);
+    }
+#endif
     wc_FreeRng(&ctx->rng);
     wc_FreeRsaKey(&ctx->key);
     free(ctx);

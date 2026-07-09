@@ -343,6 +343,9 @@ if(MUC_OPCUA_HAVE_WOLFSSL)
         platform/wolfssl_crypto/hash.c
         platform/wolfssl_crypto/sign.c
     )
+    if(MUC_OPCUA_ECC)
+        target_sources(muc_opcua PRIVATE platform/wolfssl_crypto/ecc.c)
+    endif()
     target_link_libraries(muc_opcua PUBLIC wolfssl)
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_HAVE_WOLFSSL=1)
 endif()
