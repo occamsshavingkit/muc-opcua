@@ -77,31 +77,15 @@ printf '%-14s %10s %8s %8s %10s %10s %8s %8s %10s\n' \
     "profile" "text" "data" "bss" "dec" "elf_text" "elf_data" "elf_bss" "elf_dec"
 
 get_profile_defs() {
+    # Spec 056: the profile string is the only capacity input. capacities.h
+    # resolves every MU_INTERN_* from the MUC_OPCUA_PROFILE_<NAME> marker CMake
+    # emits, so no per-capacity -D is needed here. (An integrator measuring an
+    # override would add -DMU_MAX_*=<n>, which still wins via the cascade.)
     local profile="$1"
     case "$profile" in
-        nano)
-            echo "-DMUC_OPCUA_PROFILE=nano"
-            ;;
-        micro)
-            printf '%s\n' "-DMUC_OPCUA_PROFILE=micro" "-DMU_MAX_MONITORED_ITEMS=8"
-            ;;
-        standard)
-            printf '%s\n' "-DMUC_OPCUA_PROFILE=standard" "-DMUC_OPCUA_STANDARD_PROFILE=ON" \
-                "-DMU_MAX_SUBSCRIPTIONS=50" "-DMU_MAX_MONITORED_ITEMS=1000" \
-                "-DMU_MAX_PUBLISH_REQUESTS=50" "-DMU_MONITORED_QUEUE_DEPTH=2" \
-                "-DMU_MAX_TRIGGER_LINKS=4"
-            ;;
-        embedded)
-            printf '%s\n' "-DMUC_OPCUA_PROFILE=embedded" "-DMU_MAX_SUBSCRIPTIONS=2" \
-                "-DMU_MAX_MONITORED_ITEMS=100" "-DMU_MAX_PUBLISH_REQUESTS=5" \
-                "-DMU_MONITORED_QUEUE_DEPTH=2" "-DMU_MAX_TRIGGER_LINKS=4"
-            ;;
-        full-featured|full)
-            printf '%s\n' "-DMUC_OPCUA_PROFILE=full" "-DMU_MAX_SUBSCRIPTIONS=100" \
-                "-DMU_MAX_MONITORED_ITEMS=2000" "-DMU_MAX_PUBLISH_REQUESTS=100" \
-                "-DMU_MONITORED_QUEUE_DEPTH=2" "-DMU_MAX_TRIGGER_LINKS=4"
-            ;;
+        full-featured) profile="full" ;;
     esac
+    echo "-DMUC_OPCUA_PROFILE=${profile}"
 }
 
 link_elf() {

@@ -773,7 +773,7 @@ static double run_calibration(uint32_t min_ms) {
 
 #ifdef MUC_OPCUA_SUBSCRIPTIONS
 static opcua_statuscode_t setup_active_subscription(mu_server_t *server, size_t item_count) {
-    if (item_count > MU_MAX_MONITORED_ITEMS) {
+    if (item_count > MU_INTERN_MAX_MONITORED_ITEMS) {
         return MU_STATUS_BAD_TOOMANYMONITOREDITEMS;
     }
 
@@ -799,7 +799,7 @@ static opcua_statuscode_t setup_active_subscription(mu_server_t *server, size_t 
         item->trigger = MU_DATACHANGE_TRIGGER_STATUS_VALUE;
         item->last_status = MU_STATUS_GOOD;
 #ifdef MUC_OPCUA_SUBSCRIPTIONS_STANDARD
-        item->queue_size = MU_MONITORED_QUEUE_DEPTH;
+        item->queue_size = MU_INTERN_MONITORED_QUEUE_DEPTH;
         item->discard_oldest = true;
 #endif
     }

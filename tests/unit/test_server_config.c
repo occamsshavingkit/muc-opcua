@@ -61,8 +61,8 @@ static void build_valid_config(mu_server_config_t *config, opcua_byte_t *rx_buf,
     config->send_buffer_size = tx_buf_size;
     config->max_chunk_count = MU_DEFAULT_MAX_CHUNK_COUNT;
     config->max_message_size = MU_DEFAULT_MAX_MESSAGE_SIZE;
-    config->max_sessions = MU_MAX_SESSIONS;
-    config->max_secure_channels = MU_MAX_SECURE_CHANNELS;
+    config->max_sessions = MU_INTERN_MAX_SESSIONS;
+    config->max_secure_channels = MU_INTERN_MAX_SECURE_CHANNELS;
     config->tcp_adapter.listen = stub_listen;
     config->tcp_adapter.accept = stub_accept;
     config->tcp_adapter.read = stub_read;
@@ -101,7 +101,7 @@ void test_server_config_invalid_endpoint(void) {
 }
 
 /* Regression coverage for the dead-config-field bug: raising config.max_sessions
-   above the compiled MU_MAX_SESSIONS ceiling must be rejected, not silently
+   above the compiled MU_INTERN_MAX_SESSIONS ceiling must be rejected, not silently
    accepted and then silently ignored by CreateSession. At the compiled ceiling
    itself, the request must still succeed (this is not a stricter-than-before
    rejection of valid configs, only a new rejection of previously-silently-
@@ -112,7 +112,7 @@ void test_server_config_accepts_max_sessions_at_compiled_limit(void) {
     opcua_byte_t tx_buf[MU_MIN_CHUNK_SIZE];
     build_valid_config(&config, rx_buf, sizeof(rx_buf), tx_buf, sizeof(tx_buf));
 
-    config.max_sessions = MU_MAX_SESSIONS;
+    config.max_sessions = MU_INTERN_MAX_SESSIONS;
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_server_config_validate(&config));
 }
 
@@ -122,11 +122,11 @@ void test_server_config_rejects_max_sessions_exceeding_compiled_limit(void) {
     opcua_byte_t tx_buf[MU_MIN_CHUNK_SIZE];
     build_valid_config(&config, rx_buf, sizeof(rx_buf), tx_buf, sizeof(tx_buf));
 
-    config.max_sessions = MU_MAX_SESSIONS + 1;
+    config.max_sessions = MU_INTERN_MAX_SESSIONS + 1;
     TEST_ASSERT_EQUAL(MU_STATUS_BAD_INTERNALERROR, mu_server_config_validate(&config));
 }
 
-/* Same regression coverage for max_secure_channels vs. MU_MAX_CONNECTIONS (the
+/* Same regression coverage for max_secure_channels vs. MU_INTERN_MAX_CONNECTIONS (the
    structural ceiling: each connection owns exactly one secure channel). */
 void test_server_config_accepts_max_secure_channels_at_compiled_limit(void) {
     mu_server_config_t config;
@@ -134,7 +134,7 @@ void test_server_config_accepts_max_secure_channels_at_compiled_limit(void) {
     opcua_byte_t tx_buf[MU_MIN_CHUNK_SIZE];
     build_valid_config(&config, rx_buf, sizeof(rx_buf), tx_buf, sizeof(tx_buf));
 
-    config.max_secure_channels = MU_MAX_CONNECTIONS;
+    config.max_secure_channels = MU_INTERN_MAX_CONNECTIONS;
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_server_config_validate(&config));
 }
 
@@ -144,7 +144,7 @@ void test_server_config_rejects_max_secure_channels_exceeding_compiled_limit(voi
     opcua_byte_t tx_buf[MU_MIN_CHUNK_SIZE];
     build_valid_config(&config, rx_buf, sizeof(rx_buf), tx_buf, sizeof(tx_buf));
 
-    config.max_secure_channels = MU_MAX_CONNECTIONS + 1;
+    config.max_secure_channels = MU_INTERN_MAX_CONNECTIONS + 1;
     TEST_ASSERT_EQUAL(MU_STATUS_BAD_INTERNALERROR, mu_server_config_validate(&config));
 }
 

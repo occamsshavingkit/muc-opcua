@@ -79,11 +79,11 @@ typedef struct mu_address_space mu_address_space_t;
  * NodeId sort key (namespace, identifier_type, numeric value or string hash);
  * a binary-search hit is confirmed with mu_nodeid_equal. */
 typedef struct {
-    opcua_uint16_t order[MU_MAX_ADDRESS_SPACE_NODES]; /* node indices sorted by NodeId sort key */
-    size_t count;                                     /* number of indexed nodes */
-    opcua_boolean_t indexed;                          /* false => fall back to linear scan (node_count > cap) */
-    const mu_address_space_t *built_for;              /* address space currently represented by order[] */
-    size_t built_count;                               /* node count used when order[] was built */
+    opcua_uint16_t order[MU_INTERN_MAX_ADDRESS_SPACE_NODES]; /* node indices sorted by NodeId sort key */
+    size_t count;                                            /* number of indexed nodes */
+    opcua_boolean_t indexed;                                 /* false => fall back to linear scan (node_count > cap) */
+    const mu_address_space_t *built_for;                     /* address space currently represented by order[] */
+    size_t built_count;                                      /* node count used when order[] was built */
 } mu_address_space_index_t;
 
 struct mu_address_space {

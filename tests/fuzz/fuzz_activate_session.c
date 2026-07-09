@@ -36,7 +36,7 @@ static bool prepare_activate_session_server(mu_server_t *server) {
         return false;
     }
 
-    for (size_t i = 0; i < MU_MAX_SESSIONS; ++i) {
+    for (size_t i = 0; i < MU_INTERN_MAX_SESSIONS; ++i) {
         mu_session_init(&server->sessions[i]);
     }
 

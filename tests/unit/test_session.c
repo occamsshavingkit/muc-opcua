@@ -83,7 +83,7 @@ static size_t build_create_session_body(opcua_byte_t *buffer, size_t capacity, o
 }
 
 static void assert_sessions_unchanged(const mu_session_t *expected, const mu_session_t *actual) {
-    for (size_t i = 0; i < MU_MAX_SESSIONS; ++i) {
+    for (size_t i = 0; i < MU_INTERN_MAX_SESSIONS; ++i) {
         TEST_ASSERT_EQUAL(expected[i].state, actual[i].state);
         TEST_ASSERT_EQUAL(expected[i].session_id, actual[i].session_id);
         TEST_ASSERT_EQUAL(expected[i].auth_token, actual[i].auth_token);
@@ -290,11 +290,11 @@ void test_create_session_truncated_body_returns_bad_decodingerror_without_alloca
     server.secure_channel.is_open = true;
     server.config.time_adapter.get_time = fake_time;
     server.config.entropy_adapter.generate_random = fake_entropy;
-    for (size_t i = 0; i < MU_MAX_SESSIONS; ++i) {
+    for (size_t i = 0; i < MU_INTERN_MAX_SESSIONS; ++i) {
         mu_session_init(&server.sessions[i]);
     }
 
-    mu_session_t sessions_before[MU_MAX_SESSIONS];
+    mu_session_t sessions_before[MU_INTERN_MAX_SESSIONS];
     (void)memcpy(sessions_before, server.sessions, sizeof(sessions_before));
     mu_session_t *active_session_before = server.active_session;
 
@@ -319,11 +319,11 @@ void test_create_session_two_successful_responses_use_fresh_session_ids_and_toke
     server.secure_channel.is_open = true;
     server.config.time_adapter.get_time = fake_time;
     server.config.entropy_adapter.generate_random = fake_entropy;
-    for (size_t i = 0; i < MU_MAX_SESSIONS; ++i) {
+    for (size_t i = 0; i < MU_INTERN_MAX_SESSIONS; ++i) {
         mu_session_init(&server.sessions[i]);
     }
 
-    TEST_ASSERT_GREATER_OR_EQUAL_UINT(2u, MU_MAX_SESSIONS);
+    TEST_ASSERT_GREATER_OR_EQUAL_UINT(2u, MU_INTERN_MAX_SESSIONS);
 
     mu_nodeid_t first_session_id;
     mu_nodeid_t first_authentication_token;
@@ -347,17 +347,17 @@ void test_create_session_overflow_returns_bad_toomanysessions_without_allocating
     server.secure_channel.is_open = true;
     server.config.time_adapter.get_time = fake_time;
     server.config.entropy_adapter.generate_random = fake_entropy;
-    for (size_t i = 0; i < MU_MAX_SESSIONS; ++i) {
+    for (size_t i = 0; i < MU_INTERN_MAX_SESSIONS; ++i) {
         mu_session_init(&server.sessions[i]);
     }
 
-    for (size_t i = 0; i < MU_MAX_SESSIONS; ++i) {
+    for (size_t i = 0; i < MU_INTERN_MAX_SESSIONS; ++i) {
         mu_nodeid_t session_id;
         mu_nodeid_t authentication_token;
         dispatch_create_session_and_read_ids(&server, &session_id, &authentication_token);
     }
 
-    mu_session_t sessions_before[MU_MAX_SESSIONS];
+    mu_session_t sessions_before[MU_INTERN_MAX_SESSIONS];
     (void)memcpy(sessions_before, server.sessions, sizeof(sessions_before));
     mu_session_t *active_session_before = server.active_session;
 
@@ -382,11 +382,11 @@ void test_create_session_server_nonce_entropy_failure_returns_bad_securitychecks
     server.secure_channel.is_open = true;
     server.config.time_adapter.get_time = fake_time;
     server.config.entropy_adapter.generate_random = failing_entropy;
-    for (size_t i = 0; i < MU_MAX_SESSIONS; ++i) {
+    for (size_t i = 0; i < MU_INTERN_MAX_SESSIONS; ++i) {
         mu_session_init(&server.sessions[i]);
     }
 
-    mu_session_t sessions_before[MU_MAX_SESSIONS];
+    mu_session_t sessions_before[MU_INTERN_MAX_SESSIONS];
     (void)memcpy(sessions_before, server.sessions, sizeof(sessions_before));
     mu_session_t *active_session_before = server.active_session;
 

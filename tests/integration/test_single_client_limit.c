@@ -91,7 +91,7 @@ static void mock_shutdown(void *context) {
 
 void test_single_client_limit_second_connection(void) {
 #ifdef MUC_OPCUA_MULTIPLE_CONNECTIONS
-    /* Under multiple connections build, connection limit is MU_MAX_CONNECTIONS (4), not 1 */
+    /* Under multiple connections build, connection limit is MU_INTERN_MAX_CONNECTIONS (4), not 1 */
     return;
 #endif
     mu_server_config_t config;

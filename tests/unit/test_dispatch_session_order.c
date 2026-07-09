@@ -105,7 +105,7 @@ void test_create_session_encode_failure_reclaims_session_slot(void) {
     server.config.entropy_adapter.generate_random = fake_entropy;
 
     /* Sanity: both slots start free. */
-    TEST_ASSERT_NOT_NULL(mu_session_find_free(server.sessions, MU_MAX_SESSIONS));
+    TEST_ASSERT_NOT_NULL(mu_session_find_free(server.sessions, MU_INTERN_MAX_SESSIONS));
     TEST_ASSERT_EQUAL(MU_SESSION_STATE_CLOSED, server.sessions[0].state);
 
     opcua_byte_t req[256];
@@ -127,7 +127,7 @@ void test_create_session_encode_failure_reclaims_session_slot(void) {
 
     /* No leaked slot: a free slot must still be available for the next
      * CreateSession. */
-    TEST_ASSERT_NOT_NULL(mu_session_find_free(server.sessions, MU_MAX_SESSIONS));
+    TEST_ASSERT_NOT_NULL(mu_session_find_free(server.sessions, MU_INTERN_MAX_SESSIONS));
 }
 
 int main(void) {

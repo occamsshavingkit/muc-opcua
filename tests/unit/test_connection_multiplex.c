@@ -121,7 +121,7 @@ static void init_multiplex_server(mu_server_t *server) {
     (void)memset(server, 0, sizeof(*server));
     server->config.time_adapter.get_time = multiplex_fake_time;
     server->config.entropy_adapter.generate_random = multiplex_fake_entropy;
-    for (size_t i = 0; i < MU_MAX_SESSIONS; ++i) {
+    for (size_t i = 0; i < MU_INTERN_MAX_SESSIONS; ++i) {
         mu_session_init(&server->sessions[i]);
     }
 #ifdef MUC_OPCUA_MULTIPLE_CONNECTIONS
@@ -204,27 +204,30 @@ static opcua_statuscode_t mock_write(void *context, void *handle, const opcua_by
 }
 
 void test_connection_limits(void) {
-#ifdef MUC_OPCUA_MULTIPLE_CONNECTIONS
+/* Accept exactly MU_INTERN_MAX_CONNECTIONS, then verify the next connection is
+   rejected+closed. Capacity-aware: the mock handle pool (mock_tcp_t.handles[8])
+   bounds how large a limit we can drive, so profiles whose connection ceiling
+   exceeds it (e.g. full=100) are exercised for this path by the micro/embedded
+   matrix runs instead. */
+#if defined(MUC_OPCUA_MULTIPLE_CONNECTIONS) && (MU_INTERN_MAX_CONNECTIONS + 1) <= 8
     mock_tcp_t tcp;
     (void)memset(&tcp, 0, sizeof(tcp));
 
-    tcp.handles[0] = (void *)0x10;
-    tcp.handles[1] = (void *)0x20;
-    tcp.handles[2] = (void *)0x30;
-    tcp.handles[3] = (void *)0x40;
-    tcp.handles[4] = (void *)0x50;
-    tcp.handle_count = 5;
+    /* One distinct handle per connection slot, plus one extra to be rejected. */
+    for (int i = 0; i <= MU_INTERN_MAX_CONNECTIONS; ++i) {
+        tcp.handles[i] = (void *)((size_t)0x10 * (size_t)(i + 1));
+    }
+    tcp.handle_count = MU_INTERN_MAX_CONNECTIONS + 1;
     tcp.next_handle = 0;
 
     mu_server_config_t config;
     (void)memset(&config, 0, sizeof(config));
     /* This test only exercises TCP/connection-level multiplexing up to
-       MU_MAX_CONNECTIONS (4 sessions were never created here); max_sessions
-       only needs to be a value mu_server_config_validate() accepts, i.e. within
-       the compiled MU_MAX_SESSIONS ceiling, which is independent of connection
-       count (see config.h). */
-    config.max_sessions = MU_MAX_SESSIONS;
-    config.max_secure_channels = MU_MAX_CONNECTIONS;
+       MU_INTERN_MAX_CONNECTIONS (no sessions are created here); max_sessions only
+       needs to be a value mu_server_config_validate() accepts, i.e. within the
+       compiled MU_INTERN_MAX_SESSIONS ceiling. */
+    config.max_sessions = MU_INTERN_MAX_SESSIONS;
+    config.max_secure_channels = MU_INTERN_MAX_CONNECTIONS;
     config.max_chunk_count = 1;
     config.max_message_size = 8192;
     config.endpoint_url = "opc.tcp://localhost:4840";
@@ -250,41 +253,30 @@ void test_connection_limits(void) {
     opcua_statuscode_t status = mu_server_init(storage.bytes, sizeof(storage), &config, &server);
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, status);
 
-    /* Poll to accept connection 1 (0x10) */
-    status = mu_server_poll(server);
-    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, status);
-    TEST_ASSERT_EQUAL_PTR((void *)0x10, server->conns[0].client_handle);
+    /* Fill every connection slot. */
+    for (int i = 0; i < MU_INTERN_MAX_CONNECTIONS; ++i) {
+        status = mu_server_poll(server);
+        TEST_ASSERT_EQUAL(MU_STATUS_GOOD, status);
+        TEST_ASSERT_EQUAL_PTR(tcp.handles[i], server->conns[i].client_handle);
+    }
 
-    /* Poll to accept connection 2 (0x20) */
-    status = mu_server_poll(server);
-    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, status);
-    TEST_ASSERT_EQUAL_PTR((void *)0x20, server->conns[1].client_handle);
-
-    /* Poll to accept connection 3 (0x30) */
-    status = mu_server_poll(server);
-    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, status);
-    TEST_ASSERT_EQUAL_PTR((void *)0x30, server->conns[2].client_handle);
-
-    /* Poll to accept connection 4 (0x40) */
-    status = mu_server_poll(server);
-    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, status);
-    TEST_ASSERT_EQUAL_PTR((void *)0x40, server->conns[3].client_handle);
-
-    /* Now the server is full (MU_MAX_CONNECTIONS = 4).
-       Next poll should reject connection 5 (0x50).
-       Let's verify that close_connection is called for 0x50. */
+    /* The server is now full; the next connection must be rejected and closed. */
+    void *reject_handle = tcp.handles[MU_INTERN_MAX_CONNECTIONS];
     status = mu_server_poll(server);
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, status);
 
-    int closed_50 = 0;
+    int rejected = 0;
     for (int i = 0; i < tcp.close_count; ++i) {
-        if (tcp.closed_handles[i] == (void *)0x50) {
-            closed_50 = 1;
+        if (tcp.closed_handles[i] == reject_handle) {
+            rejected = 1;
         }
     }
-    TEST_ASSERT_EQUAL(1, closed_50);
+    TEST_ASSERT_EQUAL(1, rejected);
 
     mu_server_close(server);
+#else
+    TEST_IGNORE_MESSAGE("MU_INTERN_MAX_CONNECTIONS exceeds mock handle pool; "
+                        "over-limit reject path covered by micro/embedded matrix");
 #endif
 }
 

@@ -34,7 +34,7 @@ opcua_int32_t count_reportable_items(const struct mu_server *server, mu_subscrip
         while (bits != 0u) {
             size_t i = w * 32u + (size_t)mu_ctz_u32(bits);
             bits &= (bits - 1u);
-            if (i >= MU_MAX_MONITORED_ITEMS) {
+            if (i >= MU_INTERN_MAX_MONITORED_ITEMS) {
                 break;
             }
             if (monitored_item_reportable(&server->subs.monitored_items[i], sub)) {
@@ -52,7 +52,7 @@ opcua_int32_t count_reportable_items(const struct mu_server *server, mu_subscrip
         while (bits != 0u) {
             size_t i = w * 32u + (size_t)mu_ctz_u32(bits);
             bits &= (bits - 1u);
-            if (i >= MU_MAX_MONITORED_ITEMS) {
+            if (i >= MU_INTERN_MAX_MONITORED_ITEMS) {
                 break;
             }
             const mu_monitored_item_t *item = &server->subs.monitored_items[i];
@@ -74,7 +74,7 @@ opcua_int32_t count_reportable_items(const struct mu_server *server, mu_subscrip
         while (bits != 0u) {
             size_t i = w * 32u + (size_t)mu_ctz_u32(bits);
             bits &= (bits - 1u);
-            if (i >= MU_MAX_MONITORED_ITEMS) {
+            if (i >= MU_INTERN_MAX_MONITORED_ITEMS) {
                 break;
             }
             if (monitored_item_reportable(&server->subs.monitored_items[i], sub)) {
@@ -88,7 +88,7 @@ opcua_int32_t count_reportable_items(const struct mu_server *server, mu_subscrip
 
 #if MUC_OPCUA_SUBSCRIPTIONS_STANDARD
 void prepare_reportable_queues(struct mu_server *server, const mu_subscription_t *sub) {
-    for (size_t i = 0; i < MU_MAX_MONITORED_ITEMS; ++i) {
+    for (size_t i = 0; i < MU_INTERN_MAX_MONITORED_ITEMS; ++i) {
         mu_monitored_item_t *item = &server->subs.monitored_items[i];
         if (monitored_item_in_subscription(item, sub) && item->monitoring_mode != MU_MONITORING_MODE_DISABLED) {
             monitored_item_prepare_pending_queue(item);
@@ -101,7 +101,7 @@ void enqueue_resend_data(struct mu_server *server, mu_subscription_t *sub) {
         return;
     }
 
-    for (size_t i = 0; i < MU_MAX_MONITORED_ITEMS; ++i) {
+    for (size_t i = 0; i < MU_INTERN_MAX_MONITORED_ITEMS; ++i) {
         mu_monitored_item_t *item = &server->subs.monitored_items[i];
         if (!monitored_item_in_subscription(item, sub) || item->monitoring_mode != MU_MONITORING_MODE_REPORTING) {
             continue;
@@ -152,7 +152,7 @@ void monitored_item_drain_reported_entries(mu_monitored_item_t *item, opcua_int3
 
 void clear_reported_items(struct mu_server *server, const mu_subscription_t *sub, opcua_int32_t report_count) {
     opcua_int32_t remaining = report_count;
-    bool triggered_items[MU_MAX_MONITORED_ITEMS];
+    bool triggered_items[MU_INTERN_MAX_MONITORED_ITEMS];
 
     (void)memset(triggered_items, 0, sizeof(triggered_items));
     for (size_t w = 0; w < MU_REPORTABLE_BITMAP_WORDS; ++w) {
@@ -160,7 +160,7 @@ void clear_reported_items(struct mu_server *server, const mu_subscription_t *sub
         while (bits != 0u) {
             size_t i = w * 32u + (size_t)mu_ctz_u32(bits);
             bits &= (bits - 1u);
-            if (i >= MU_MAX_MONITORED_ITEMS) {
+            if (i >= MU_INTERN_MAX_MONITORED_ITEMS) {
                 break;
             }
             triggered_items[i] = monitored_item_reports_by_trigger(server, sub, &server->subs.monitored_items[i]);
@@ -172,7 +172,7 @@ void clear_reported_items(struct mu_server *server, const mu_subscription_t *sub
         while (bits != 0u && remaining > 0) {
             size_t i = w * 32u + (size_t)mu_ctz_u32(bits);
             bits &= (bits - 1u);
-            if (i >= MU_MAX_MONITORED_ITEMS) {
+            if (i >= MU_INTERN_MAX_MONITORED_ITEMS) {
                 break;
             }
             mu_monitored_item_t *item = &server->subs.monitored_items[i];
@@ -192,7 +192,7 @@ void clear_reported_items(struct mu_server *server, const mu_subscription_t *sub
         while (bits != 0u && remaining > 0) {
             size_t i = w * 32u + (size_t)mu_ctz_u32(bits);
             bits &= (bits - 1u);
-            if (i >= MU_MAX_MONITORED_ITEMS) {
+            if (i >= MU_INTERN_MAX_MONITORED_ITEMS) {
                 break;
             }
             if (triggered_items[i]) {
@@ -211,7 +211,7 @@ void clear_reported_items(struct mu_server *server, const mu_subscription_t *sub
         while (bits != 0u) {
             size_t i = w * 32u + (size_t)mu_ctz_u32(bits);
             bits &= (bits - 1u);
-            if (i >= MU_MAX_MONITORED_ITEMS) {
+            if (i >= MU_INTERN_MAX_MONITORED_ITEMS) {
                 break;
             }
             mu_monitored_item_t *item = &server->subs.monitored_items[i];

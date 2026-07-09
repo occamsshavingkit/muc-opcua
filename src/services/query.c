@@ -49,7 +49,7 @@ static opcua_boolean_t mu_query_continuation_point_matches(const mu_string_t *le
 
 static opcua_boolean_t mu_query_find_continuation_point(mu_server_t *server, const mu_string_t *continuation_point,
                                                         size_t *slot_index) {
-    for (size_t i = 0; i < MU_MAX_QUERY_CONTINUATION_POINTS; ++i) {
+    for (size_t i = 0; i < MU_INTERN_MAX_QUERY_CONTINUATION_POINTS; ++i) {
         if (mu_query_continuation_point_matches(&server->query_context.continuation_points[i].id, continuation_point)) {
             if (slot_index != NULL) {
                 *slot_index = i;
@@ -122,7 +122,7 @@ opcua_statuscode_t mu_query_first_process(mu_server_t *server, const mu_query_fi
 
     if (next_index > 0) {
         /* Generate continuation point */
-        for (size_t i = 0; i < MU_MAX_QUERY_CONTINUATION_POINTS; ++i) {
+        for (size_t i = 0; i < MU_INTERN_MAX_QUERY_CONTINUATION_POINTS; ++i) {
             if (server->query_context.continuation_points[i].id.data == NULL) {
                 /* Let's skip CP string formatting and just return the index encoded in binary! */
                 server->query_context.continuation_points[i].next_index = next_index;

@@ -315,7 +315,7 @@ static mu_monitored_item_t *find_monitored_item_in_subscription(mu_subscriptions
         return NULL;
     }
 
-    for (size_t i = 0; i < MU_MAX_MONITORED_ITEMS; ++i) {
+    for (size_t i = 0; i < MU_INTERN_MAX_MONITORED_ITEMS; ++i) {
         mu_monitored_item_t *item = &subs->monitored_items[i];
         if (item->in_use && item->subscription_id == subscription_id && item->monitored_item_id == monitored_item_id) {
             return item;
@@ -336,7 +336,7 @@ bool monitored_item_reports_by_trigger(const struct mu_server *server, const mu_
         return false;
     }
 
-    for (size_t i = 0; i < MU_MAX_MONITORED_ITEMS; ++i) {
+    for (size_t i = 0; i < MU_INTERN_MAX_MONITORED_ITEMS; ++i) {
         const mu_monitored_item_t *triggering_item = &server->subs.monitored_items[i];
         if (!monitored_item_reportable(triggering_item, sub) || triggering_item->triggered_count == 0u) {
             continue;
@@ -369,7 +369,7 @@ opcua_statuscode_t mu_monitored_item_add_trigger_link(mu_subscriptions_t *subs, 
         }
     }
 
-    if (triggering_item->triggered_count >= MU_MAX_TRIGGER_LINKS) {
+    if (triggering_item->triggered_count >= MU_INTERN_MAX_TRIGGER_LINKS) {
         return MU_LOCAL_STATUS_BAD_TOOMANYOPERATIONS;
     }
 
@@ -420,7 +420,7 @@ opcua_statuscode_t mu_subscription_get_monitored_items(mu_subscriptions_t *subs,
         return MU_STATUS_BAD_SUBSCRIPTIONIDINVALID;
     }
 
-    for (size_t i = 0; i < MU_MAX_MONITORED_ITEMS; ++i) {
+    for (size_t i = 0; i < MU_INTERN_MAX_MONITORED_ITEMS; ++i) {
         const mu_monitored_item_t *item = &subs->monitored_items[i];
         if (!item->in_use || item->subscription_id != subscription_id) {
             continue;

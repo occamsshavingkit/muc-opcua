@@ -450,13 +450,13 @@ void test_create_subscription(void) {
     TEST_ASSERT_NOT_EQUAL(sub_id_1, sub_id_2);
 }
 
-/* The MU_MAX_SUBSCRIPTIONS+1-th CreateSubscription is rejected with the
+/* The MU_INTERN_MAX_SUBSCRIPTIONS+1-th CreateSubscription is rejected with the
    service result Bad_TooManySubscriptions (OPC 10000-4 §5.14.2.3).
-   Only meaningful when MU_MAX_SUBSCRIPTIONS is small enough for the
+   Only meaningful when MU_INTERN_MAX_SUBSCRIPTIONS is small enough for the
    mock queue; skip when the capacity is too large. */
 void test_create_subscription_too_many(void) {
-#if MU_MAX_SUBSCRIPTIONS > 2
-    TEST_PASS_MESSAGE("MU_MAX_SUBSCRIPTIONS too large for overflow test (needs cap <= 2)");
+#if MU_INTERN_MAX_SUBSCRIPTIONS > 2
+    TEST_PASS_MESSAGE("MU_INTERN_MAX_SUBSCRIPTIONS too large for overflow test (needs cap <= 2)");
     return;
 #else
     mock_t mock;
@@ -647,10 +647,10 @@ void test_create_monitored_items_sampling_minus_one_uses_publishing_interval(voi
     TEST_ASSERT_TRUE(revised_sampling >= 999.0 && revised_sampling <= 1001.0);
 }
 
-/* The (default MU_MAX_MONITORED_ITEMS = 8)+1-th item in one request is rejected per-op
+/* The (default MU_INTERN_MAX_MONITORED_ITEMS = 8)+1-th item in one request is rejected per-op
    with Bad_TooManyMonitoredItems (OPC 10000-4 §5.13.2.4). */
 void test_create_monitored_items_too_many(void) {
-#if MUC_OPCUA_SUBSCRIPTIONS_STANDARD && MU_MAX_MONITORED_ITEMS > 32
+#if MUC_OPCUA_SUBSCRIPTIONS_STANDARD && MU_INTERN_MAX_MONITORED_ITEMS > 32
     TEST_PASS_MESSAGE("Standard-facet raised capacity is covered by test_subscriptions_capacity");
     return;
 #endif
@@ -1468,14 +1468,14 @@ void test_modify_monitored_items(void) {
     mu_binary_read_double(&body, &revised);
     TEST_ASSERT_TRUE(revised >= 249.0 && revised <= 251.0);
     /* OPC-10000-4 §5.13.3.2 Table 67: RevisedQueueSize reflects the clamped
-       capacity actually allocated (5 -> MU_MONITORED_QUEUE_DEPTH). */
+       capacity actually allocated (5 -> MU_INTERN_MONITORED_QUEUE_DEPTH). */
     opcua_uint32_t revised_queue_size;
     mu_binary_read_uint32(&body, &revised_queue_size);
-    TEST_ASSERT_EQUAL_UINT32(MU_MONITORED_QUEUE_DEPTH, revised_queue_size);
+    TEST_ASSERT_EQUAL_UINT32(MU_INTERN_MONITORED_QUEUE_DEPTH, revised_queue_size);
     /* The decoded values must be applied to the monitored item, not discarded. */
 #if MUC_OPCUA_SUBSCRIPTIONS_STANDARD
     mu_monitored_item_t *item = &server->subs.monitored_items[0];
-    TEST_ASSERT_EQUAL_UINT32(MU_MONITORED_QUEUE_DEPTH, item->queue_size);
+    TEST_ASSERT_EQUAL_UINT32(MU_INTERN_MONITORED_QUEUE_DEPTH, item->queue_size);
     TEST_ASSERT_TRUE(item->discard_oldest);
 #endif
 }
@@ -1822,7 +1822,7 @@ static void enqueue_hel_opn(mock_t *mock) {
 
 /* Two concurrent sessions on one secure channel (OPC 10000-4 §5.6.2). Each
    CreateSession yields a distinct authenticationToken; both can be activated and used.
-   When MU_MAX_SESSIONS == 2 (the default / Nano-Micro-Embedded profiles) the test also
+   When MU_INTERN_MAX_SESSIONS == 2 (the default / Nano-Micro-Embedded profiles) the test also
    asserts the 3rd CreateSession returns Bad_TooManySessions; profiles with a larger cap
    (standard/full) skip that overflow leg since exhausting the pool is impractical here. */
 void test_two_sessions(void) {
@@ -1860,7 +1860,7 @@ void test_two_sessions(void) {
     enqueue_activate_session(&mock, 5, tok2);
     enqueue_read_state(&mock, 6, tok1);
     enqueue_read_state(&mock, 7, tok2);
-#if MU_MAX_SESSIONS <= 2
+#if MU_INTERN_MAX_SESSIONS <= 2
     enqueue_create_session(&mock, 8); /* one past the cap */
 #endif
     mu_server_poll(server); /* ActivateSession #2 */
@@ -1874,7 +1874,7 @@ void test_two_sessions(void) {
     TEST_ASSERT_EQUAL(ID_READRESPONSE, parse_response(mock.last_write, mock.last_write_len, &body, &sr));
     TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, sr);
 
-#if MU_MAX_SESSIONS <= 2
+#if MU_INTERN_MAX_SESSIONS <= 2
     mu_server_poll(server); /* CreateSession #3 -> Bad_TooManySessions */
     TEST_ASSERT_EQUAL(ID_SERVICEFAULT, parse_response(mock.last_write, mock.last_write_len, &body, &sr));
     TEST_ASSERT_EQUAL_HEX32(STATUS_BAD_TOOMANYSESSIONS, sr);
@@ -2129,7 +2129,7 @@ static opcua_int32_t parse_publish_notifications(mu_binary_reader_t *body, opcua
     return total;
 }
 
-#if MU_MONITORED_QUEUE_DEPTH >= 2
+#if MU_INTERN_MONITORED_QUEUE_DEPTH >= 2
 /* US1 — MonitoredItem notification queue (OPC 10000-4 §5.13.2 queueSize/discardOldest,
    §7.20.1 overflow). queueSize=2, discardOldest=true: three rapid changes (20,30,40) between
    publishes drop the oldest (20) and deliver the two most-recent (30,40); the oldest retained
@@ -2213,7 +2213,7 @@ void test_monitored_item_queue_overflow(void) {
     TEST_ASSERT_EQUAL_HEX32(STATUS_INFO_OVERFLOW, dvs[0].status & STATUS_INFO_OVERFLOW);
     TEST_ASSERT_EQUAL_INT32(40, dvs[1].value.value.i32);
 }
-#endif /* MU_MONITORED_QUEUE_DEPTH >= 2 */
+#endif /* MU_INTERN_MONITORED_QUEUE_DEPTH >= 2 */
 
 #define ID_SETTRIGGERINGREQUEST 773  /* SetTriggeringRequest (i=773), OPC 10000-4 §5.13.5 */
 #define ID_SETTRIGGERINGRESPONSE 776 /* SetTriggeringResponse (i=776) */
@@ -2435,7 +2435,7 @@ int main(void) {
     UNITY_BEGIN();
 #if MUC_OPCUA_SUBSCRIPTIONS_STANDARD
     RUN_TEST(test_monitored_item_absolute_deadband);
-#if MU_MONITORED_QUEUE_DEPTH >= 2
+#if MU_INTERN_MONITORED_QUEUE_DEPTH >= 2
     RUN_TEST(test_monitored_item_queue_overflow);
 #endif
     RUN_TEST(test_set_triggering);

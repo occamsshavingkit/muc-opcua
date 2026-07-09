@@ -48,7 +48,7 @@ static bool prepare_server(mu_server_t *server, opcua_uint32_t *session_id_out) 
                                &server->config.entropy_adapter, &revised_lifetime) != MU_STATUS_GOOD) {
         return false;
     }
-    for (size_t i = 0; i < MU_MAX_SESSIONS; ++i) {
+    for (size_t i = 0; i < MU_INTERN_MAX_SESSIONS; ++i) {
         mu_session_init(&server->sessions[i]);
     }
     if (mu_session_create(&server->sessions[0], 0u, &revised_timeout, &session_id, &auth_token) != MU_STATUS_GOOD) {

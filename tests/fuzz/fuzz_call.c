@@ -56,7 +56,7 @@ static int prepare_server(mu_server_t *server, opcua_byte_t *send_buffer) {
                                &server->config.entropy_adapter, &revised_lifetime) != MU_STATUS_GOOD) {
         return 0;
     }
-    for (size_t i = 0u; i < MU_MAX_SESSIONS; ++i) {
+    for (size_t i = 0u; i < MU_INTERN_MAX_SESSIONS; ++i) {
         mu_session_init(&server->sessions[i]);
     }
     if (mu_session_create(&server->sessions[0], 0u, &revised_timeout, &session_id, &auth_token) != MU_STATUS_GOOD) {

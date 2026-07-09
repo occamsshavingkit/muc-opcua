@@ -309,7 +309,7 @@ static opcua_statuscode_t verify_and_activate_session(mu_server_t *server, const
         return activate_result;
     }
     opcua_uint32_t auth_token = req->authentication_token.identifier.numeric;
-    mu_session_t *slot = mu_session_find_by_token(server->sessions, MU_MAX_SESSIONS, auth_token);
+    mu_session_t *slot = mu_session_find_by_token(server->sessions, MU_INTERN_MAX_SESSIONS, auth_token);
     if (slot == NULL)
         return activate_result;
     (void)auth_token;

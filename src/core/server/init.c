@@ -76,14 +76,14 @@ opcua_statuscode_t mu_server_config_validate(const mu_server_config_t *config) {
 
     /* Validate limits. An upper bound isn't just belt-and-suspenders: without it
        a caller requesting more sessions/channels than this build was compiled
-       for (MU_MAX_SESSIONS / MU_MAX_CONNECTIONS size the static sessions[]/
+       for (MU_INTERN_MAX_SESSIONS / MU_INTERN_MAX_CONNECTIONS size the static sessions[]/
        conns[] arrays) was previously accepted here and then silently capped at
        the compiled size by CreateSession / the connection accept path, with no
        indication the requested capacity was never actually available. */
-    if (config->max_sessions == 0 || config->max_sessions > MU_MAX_SESSIONS) {
+    if (config->max_sessions == 0 || config->max_sessions > MU_INTERN_MAX_SESSIONS) {
         return MU_STATUS_BAD_INTERNALERROR;
     }
-    if (config->max_secure_channels == 0 || config->max_secure_channels > MU_MAX_CONNECTIONS) {
+    if (config->max_secure_channels == 0 || config->max_secure_channels > MU_INTERN_MAX_CONNECTIONS) {
         return MU_STATUS_BAD_INTERNALERROR;
     }
     if (config->max_chunk_count == 0 || config->max_message_size < MU_MIN_CHUNK_SIZE) {
@@ -140,12 +140,12 @@ opcua_statuscode_t mu_server_config_validate(const mu_server_config_t *config) {
             return status;
         }
         /* Feature 025 (F6): the user address-space sort index is a fixed
-           order[MU_MAX_ADDRESS_SPACE_NODES] array. A larger space previously fell
+           order[MU_INTERN_MAX_ADDRESS_SPACE_NODES] array. A larger space previously fell
            back to a silent O(n) linear scan AND made Query return nothing. Fail
            loudly at init instead (Constitution §VII: predictable failure over
            ambiguous degradation). Integrators needing more must raise
-           MU_MAX_ADDRESS_SPACE_NODES, which resizes the index storage. */
-        if (config->address_space->node_count > MU_MAX_ADDRESS_SPACE_NODES) {
+           MU_INTERN_MAX_ADDRESS_SPACE_NODES, which resizes the index storage. */
+        if (config->address_space->node_count > MU_INTERN_MAX_ADDRESS_SPACE_NODES) {
             return MU_STATUS_BAD_INTERNALERROR;
         }
     }
@@ -209,7 +209,7 @@ opcua_statuscode_t mu_server_init(void *storage, size_t storage_size, const mu_s
 #endif /* MUC_OPCUA_MDNS_DISCOVERY */
 
 #ifdef MUC_OPCUA_MULTIPLE_CONNECTIONS
-    for (size_t i = 0; i < MU_MAX_CONNECTIONS; ++i) {
+    for (size_t i = 0; i < MU_INTERN_MAX_CONNECTIONS; ++i) {
         server->conns[i].client_handle = NULL;
         mu_tcp_connection_init(&server->conns[i].tcp_conn);
         mu_secure_channel_init(&server->conns[i].secure_channel);
@@ -225,7 +225,7 @@ opcua_statuscode_t mu_server_init(void *storage, size_t storage_size, const mu_s
     mu_chunk_assembler_init(&server->chunk_assembly);
 #endif
 #endif
-    for (size_t i = 0; i < MU_MAX_SESSIONS; ++i) {
+    for (size_t i = 0; i < MU_INTERN_MAX_SESSIONS; ++i) {
         mu_session_init(&server->sessions[i]);
     }
     server->active_session = NULL;
@@ -236,7 +236,7 @@ opcua_statuscode_t mu_server_init(void *storage, size_t storage_size, const mu_s
     (void)memset(&server->dynamic_address_space, 0, sizeof(server->dynamic_address_space));
 #endif
 #ifdef MUC_OPCUA_SERVICE_QUERY
-    for (size_t i = 0; i < MU_MAX_QUERY_CONTINUATION_POINTS; ++i) {
+    for (size_t i = 0; i < MU_INTERN_MAX_QUERY_CONTINUATION_POINTS; ++i) {
         server->query_context.continuation_points[i].id.length = -1;
         server->query_context.continuation_points[i].id.data = NULL;
         server->query_context.continuation_points[i].session_id = 0;
@@ -285,7 +285,7 @@ void mu_server_close(mu_server_t *server) {
 #endif /* MUC_OPCUA_MDNS_DISCOVERY */
 
 #ifdef MUC_OPCUA_MULTIPLE_CONNECTIONS
-        for (size_t i = 0; i < MU_MAX_CONNECTIONS; ++i) {
+        for (size_t i = 0; i < MU_INTERN_MAX_CONNECTIONS; ++i) {
             if (server->conns[i].client_handle != NULL) {
                 server->config.tcp_adapter.close_connection(server->config.tcp_adapter.context,
                                                             server->conns[i].client_handle);

@@ -3,7 +3,7 @@
 #if MUC_OPCUA_SUBSCRIPTIONS
 
 static bool subscription_id_in_use(const mu_subscriptions_t *subs, opcua_uint32_t subscription_id) {
-    for (size_t i = 0; i < MU_MAX_SUBSCRIPTIONS; ++i) {
+    for (size_t i = 0; i < MU_INTERN_MAX_SUBSCRIPTIONS; ++i) {
         const mu_subscription_t *sub = &subs->subscriptions[i];
         if (sub->in_use && sub->subscription_id == subscription_id) {
             return true;
@@ -13,7 +13,7 @@ static bool subscription_id_in_use(const mu_subscriptions_t *subs, opcua_uint32_
 }
 
 static opcua_uint32_t allocate_subscription_id(mu_subscriptions_t *subs) {
-    for (size_t i = 0; i <= MU_MAX_SUBSCRIPTIONS; ++i) {
+    for (size_t i = 0; i <= MU_INTERN_MAX_SUBSCRIPTIONS; ++i) {
         opcua_uint32_t id = subs->next_subscription_id;
         if (id == 0u) {
             id = 1u;
@@ -33,7 +33,7 @@ static opcua_uint32_t allocate_subscription_id(mu_subscriptions_t *subs) {
 }
 
 static bool monitored_item_id_in_use(const mu_subscriptions_t *subs, opcua_uint32_t monitored_item_id) {
-    for (size_t i = 0; i < MU_MAX_MONITORED_ITEMS; ++i) {
+    for (size_t i = 0; i < MU_INTERN_MAX_MONITORED_ITEMS; ++i) {
         const mu_monitored_item_t *item = &subs->monitored_items[i];
         if (item->in_use && item->monitored_item_id == monitored_item_id) {
             return true;
@@ -43,7 +43,7 @@ static bool monitored_item_id_in_use(const mu_subscriptions_t *subs, opcua_uint3
 }
 
 static opcua_uint32_t allocate_monitored_item_id(mu_subscriptions_t *subs) {
-    for (size_t i = 0; i <= MU_MAX_MONITORED_ITEMS; ++i) {
+    for (size_t i = 0; i <= MU_INTERN_MAX_MONITORED_ITEMS; ++i) {
         opcua_uint32_t id = subs->next_monitored_item_id;
         if (id == 0u) {
             id = 1u;
@@ -86,7 +86,7 @@ static void revise_subscription_counts(opcua_uint32_t requested_lifetime_count,
 
 size_t mu_subscriptions_count_for_session(const mu_subscriptions_t *subs, opcua_uint32_t session_id) {
     size_t count = 0u;
-    for (size_t i = 0u; i < MU_MAX_SUBSCRIPTIONS; ++i) {
+    for (size_t i = 0u; i < MU_INTERN_MAX_SUBSCRIPTIONS; ++i) {
         const mu_subscription_t *sub = &subs->subscriptions[i];
         if (sub->in_use && sub->session_id == session_id) {
             ++count;
@@ -99,7 +99,7 @@ void mu_publish_request_queue_clear(mu_subscriptions_t *subs, opcua_uint32_t ses
     if (subs == NULL) {
         return;
     }
-    for (size_t i = 0u; i < MU_MAX_PUBLISH_REQUESTS; ++i) {
+    for (size_t i = 0u; i < MU_INTERN_MAX_PUBLISH_REQUESTS; ++i) {
         if (subs->publish_queue[i].in_use && subs->publish_queue[i].session_id == session_id) {
             (void)memset(&subs->publish_queue[i], 0, sizeof(subs->publish_queue[i]));
         }
@@ -124,7 +124,7 @@ opcua_statuscode_t mu_publish_request_enqueue(mu_subscriptions_t *subs, opcua_ui
         return MU_STATUS_BAD_INTERNALERROR;
     }
 
-    for (size_t i = 0; i < MU_MAX_PUBLISH_REQUESTS; ++i) {
+    for (size_t i = 0; i < MU_INTERN_MAX_PUBLISH_REQUESTS; ++i) {
         mu_publish_request_t *slot = &subs->publish_queue[i];
         if (!slot->in_use) {
             (void)memset(slot, 0, sizeof(*slot));
@@ -155,7 +155,7 @@ opcua_statuscode_t mu_subscription_create(mu_subscriptions_t *subs, opcua_uint32
     }
 
     mu_subscription_t *slot = NULL;
-    for (size_t i = 0; i < MU_MAX_SUBSCRIPTIONS; ++i) {
+    for (size_t i = 0; i < MU_INTERN_MAX_SUBSCRIPTIONS; ++i) {
         if (!subs->subscriptions[i].in_use) {
             slot = &subs->subscriptions[i];
             break;
@@ -217,7 +217,7 @@ mu_subscription_t *mu_subscription_find(mu_subscriptions_t *subs, opcua_uint32_t
         return NULL;
     }
 
-    for (size_t i = 0; i < MU_MAX_SUBSCRIPTIONS; ++i) {
+    for (size_t i = 0; i < MU_INTERN_MAX_SUBSCRIPTIONS; ++i) {
         mu_subscription_t *sub = &subs->subscriptions[i];
         if (sub->in_use && sub->session_id == session_id && sub->subscription_id == subscription_id) {
             return sub;
@@ -238,7 +238,7 @@ opcua_statuscode_t mu_subscription_delete(mu_subscriptions_t *subs, opcua_uint32
         return MU_STATUS_BAD_SUBSCRIPTIONIDINVALID;
     }
 
-    for (size_t i = 0; i < MU_MAX_MONITORED_ITEMS; ++i) {
+    for (size_t i = 0; i < MU_INTERN_MAX_MONITORED_ITEMS; ++i) {
         mu_monitored_item_t *item = &subs->monitored_items[i];
         if (item->in_use && item->subscription_id == subscription_id) {
             memset(item, 0, sizeof(*item));
@@ -261,7 +261,7 @@ opcua_statuscode_t mu_monitored_item_alloc(mu_subscriptions_t *subs, opcua_uint3
     *out_item = NULL;
 
     mu_monitored_item_t *slot = NULL;
-    for (size_t i = 0; i < MU_MAX_MONITORED_ITEMS; ++i) {
+    for (size_t i = 0; i < MU_INTERN_MAX_MONITORED_ITEMS; ++i) {
         if (!subs->monitored_items[i].in_use) {
             slot = &subs->monitored_items[i];
             break;
@@ -293,7 +293,7 @@ opcua_statuscode_t mu_monitored_item_delete(mu_subscriptions_t *subs, opcua_uint
         return MU_STATUS_BAD_INTERNALERROR;
     }
 
-    for (size_t i = 0; i < MU_MAX_MONITORED_ITEMS; ++i) {
+    for (size_t i = 0; i < MU_INTERN_MAX_MONITORED_ITEMS; ++i) {
         mu_monitored_item_t *item = &subs->monitored_items[i];
         if (item->in_use && item->subscription_id == subscription_id && item->monitored_item_id == monitored_item_id) {
             memset(item, 0, sizeof(*item));
@@ -315,7 +315,8 @@ void mu_subscriptions_tick(struct mu_server *server, opcua_uint64_t now_ms) {
     (void)memset(server->subs.reportable_bitmap, 0, sizeof(server->subs.reportable_bitmap));
 
     size_t active_checked = 0;
-    for (size_t i = 0; i < MU_MAX_MONITORED_ITEMS && active_checked < server->subs.active_monitored_items_count; ++i) {
+    for (size_t i = 0; i < MU_INTERN_MAX_MONITORED_ITEMS && active_checked < server->subs.active_monitored_items_count;
+         ++i) {
         mu_monitored_item_t *item = &server->subs.monitored_items[i];
         if (!item->in_use) {
             continue;

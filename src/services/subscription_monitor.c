@@ -145,8 +145,8 @@ opcua_uint32_t monitored_item_effective_queue_size(mu_monitored_item_t *item) {
     if (queue_size == 0u) {
         queue_size = 1u;
     }
-    if (queue_size > MU_MONITORED_QUEUE_DEPTH) {
-        queue_size = MU_MONITORED_QUEUE_DEPTH;
+    if (queue_size > MU_INTERN_MONITORED_QUEUE_DEPTH) {
+        queue_size = MU_INTERN_MONITORED_QUEUE_DEPTH;
     }
 
     item->queue_size = queue_size;

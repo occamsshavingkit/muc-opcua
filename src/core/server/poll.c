@@ -126,7 +126,7 @@ static void poll_single_read_and_process(mu_server_t *server) {
    occurred (and the caller should immediately return mu_server_poll_background). */
 static bool poll_try_accept_multi(mu_server_t *server) {
     int free_slot = -1;
-    for (size_t i = 0; i < MU_MAX_CONNECTIONS; ++i) {
+    for (size_t i = 0; i < MU_INTERN_MAX_CONNECTIONS; ++i) {
         if (server->conns[i].client_handle == NULL) {
             free_slot = (int)i;
             break;
@@ -166,7 +166,7 @@ static bool poll_try_accept_single(mu_server_t *server) {
 #ifdef MUC_OPCUA_MULTI_CHUNK
         mu_chunk_assembler_init(&server->chunk_assembly);
 #endif
-        for (size_t i = 0; i < MU_MAX_SESSIONS; ++i) {
+        for (size_t i = 0; i < MU_INTERN_MAX_SESSIONS; ++i) {
             mu_session_init(&server->sessions[i]);
         }
         server->active_session = NULL;
@@ -218,7 +218,7 @@ static opcua_statuscode_t mu_server_poll_background(mu_server_t *server) {
     {
         opcua_uint64_t now_ms = server->config.time_adapter.get_tick_ms(server->config.time_adapter.context);
         if (now_ms != 0u) {
-            for (size_t i = 0; i < MU_MAX_SESSIONS; ++i) {
+            for (size_t i = 0; i < MU_INTERN_MAX_SESSIONS; ++i) {
                 mu_session_t *session = &server->sessions[i];
                 if (session->state == MU_SESSION_STATE_CLOSED) {
                     continue;
@@ -230,7 +230,7 @@ static opcua_statuscode_t mu_server_poll_background(mu_server_t *server) {
                     (now_ms - session->last_activity_ms) > session->revised_session_timeout_ms) {
                     mu_session_close_timeout(session);
 #if MUC_OPCUA_SUBSCRIPTIONS
-                    for (size_t j = 0; j < MU_MAX_SUBSCRIPTIONS; ++j) {
+                    for (size_t j = 0; j < MU_INTERN_MAX_SUBSCRIPTIONS; ++j) {
                         mu_subscription_t *sub = &server->subs.subscriptions[j];
                         if (sub->in_use && sub->session_id == session->session_id) {
                             (void)mu_subscription_delete(&server->subs, session->session_id, sub->subscription_id);
@@ -263,7 +263,7 @@ opcua_statuscode_t mu_server_poll(mu_server_t *server) {
         return mu_server_poll_background(server);
     }
 
-    for (size_t i = 0; i < MU_MAX_CONNECTIONS; ++i) {
+    for (size_t i = 0; i < MU_INTERN_MAX_CONNECTIONS; ++i) {
         mu_connection_t *conn = &server->conns[i];
         if (conn->client_handle == NULL) {
             continue;

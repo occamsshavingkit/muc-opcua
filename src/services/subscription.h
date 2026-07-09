@@ -13,6 +13,7 @@
 #define MUC_OPCUA_SERVICES_SUBSCRIPTION_H
 
 #include "muc_opcua/address_space.h"
+#include "muc_opcua/capacities.h"
 #include "muc_opcua/opcua_types.h"
 #include "muc_opcua/status.h"
 #include "muc_opcua/types.h"
@@ -22,38 +23,16 @@
 #if MUC_OPCUA_SUBSCRIPTIONS
 
 /*
- * The embedded build raises these maxima via -D overrides to meet the Standard
- * DataChange Subscription 2017 Server Facet minimums (OPC-10000-7 §6.6.17):
- * MU_MAX_MONITORED_ITEMS >= 100 (Monitor Items 100),
- * MU_MAX_SUBSCRIPTIONS >= 2 (Subscription Minimum 02),
- * MU_MAX_PUBLISH_REQUESTS >= 5 (Subscription Publish Min 05), and
- * MU_MONITORED_QUEUE_DEPTH >= 2 (Monitor MinQueueSize_02).
+ * Subscription-engine capacities (queue depth, triggering links, subscriptions,
+ * monitored items, parallel Publish) are resolved centrally in capacities.h as
+ * MU_INTERN_* via the default<profile<user cascade. The engine compiles off the
+ * MU_INTERN_* macros; the public MU_MAX_* knobs remain the -D override inputs.
+ * OPC refs: §7.21 MonitoringParameters queueSize, §5.13.2, §5.13.5 SetTriggering.
  */
 
-/* OPC-10000-4 §7.21 MonitoringParameters queueSize, §5.13.2. */
-#ifndef MU_MONITORED_QUEUE_DEPTH
-/* Default queue size is 1 for micro; embedded overrides to >=2. */
-#define MU_MONITORED_QUEUE_DEPTH 1
-#endif
-
-/* OPC-10000-4 §5.13.5 SetTriggering. */
-#ifndef MU_MAX_TRIGGER_LINKS
-#define MU_MAX_TRIGGER_LINKS 4
-#endif
-
-/* Fixed engine capacities. Integrator-overridable with -D (e.g. -DMU_MAX_MONITORED_ITEMS=16). */
-#ifndef MU_MAX_SUBSCRIPTIONS
-#define MU_MAX_SUBSCRIPTIONS 2
-#endif
-#ifndef MU_MAX_MONITORED_ITEMS
-#define MU_MAX_MONITORED_ITEMS 8
-#endif
 /* Bitmap words for the per-tick reportable-items scan (T003).
- * Sized for the maximum MU_MAX_MONITORED_ITEMS across all profiles. */
-#define MU_REPORTABLE_BITMAP_WORDS ((MU_MAX_MONITORED_ITEMS + 31u) / 32u)
-#ifndef MU_MAX_PUBLISH_REQUESTS
-#define MU_MAX_PUBLISH_REQUESTS 4
-#endif
+ * Sized for the resolved MU_INTERN_MAX_MONITORED_ITEMS. */
+#define MU_REPORTABLE_BITMAP_WORDS ((MU_INTERN_MAX_MONITORED_ITEMS + 31u) / 32u)
 #ifndef MU_MAX_PUBLISH_ACKS
 #define MU_MAX_PUBLISH_ACKS 4
 #endif
@@ -178,12 +157,12 @@ typedef struct {
     opcua_statuscode_t last_status;
 #if MUC_OPCUA_SUBSCRIPTIONS_STANDARD
     opcua_uint32_t queue_size;
-    opcua_uint32_t triggered_items[MU_MAX_TRIGGER_LINKS];
+    opcua_uint32_t triggered_items[MU_INTERN_MAX_TRIGGER_LINKS];
 
     struct {
         mu_variant_t value;
         opcua_statuscode_t status;
-    } queue[MU_MONITORED_QUEUE_DEPTH];
+    } queue[MU_INTERN_MONITORED_QUEUE_DEPTH];
 #endif
 
     /* 1-byte aligned arrays */
@@ -288,9 +267,9 @@ typedef struct {
 
 /* The whole engine: fixed-size arrays, embedded in struct mu_server. */
 typedef struct {
-    mu_subscription_t subscriptions[MU_MAX_SUBSCRIPTIONS];
-    mu_monitored_item_t monitored_items[MU_MAX_MONITORED_ITEMS];
-    mu_publish_request_t publish_queue[MU_MAX_PUBLISH_REQUESTS];
+    mu_subscription_t subscriptions[MU_INTERN_MAX_SUBSCRIPTIONS];
+    mu_monitored_item_t monitored_items[MU_INTERN_MAX_MONITORED_ITEMS];
+    mu_publish_request_t publish_queue[MU_INTERN_MAX_PUBLISH_REQUESTS];
     opcua_uint32_t next_subscription_id; /* monotonic id allocator */
     opcua_uint32_t next_monitored_item_id;
     opcua_uint32_t active_monitored_items_count;

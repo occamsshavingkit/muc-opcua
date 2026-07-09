@@ -7,7 +7,7 @@ static opcua_boolean_t mu_dynamic_reference_string_nodeid_fits(const mu_nodeid_t
         return true;
     }
 
-    return mu_dynamic_string_fits(&node_id->identifier.string, MU_MAX_DYNAMIC_REFERENCE_STRING_NODEID_LENGTH);
+    return mu_dynamic_string_fits(&node_id->identifier.string, MU_INTERN_MAX_DYNAMIC_REFERENCE_STRING_NODEID_LENGTH);
 }
 
 static opcua_boolean_t mu_dynamic_reference_nodeids_fit(const mu_add_references_item_t *item) {
@@ -117,7 +117,7 @@ opcua_statuscode_t mu_add_references_process(mu_server_t *server, mu_binary_read
 
     mu_add_references_result_t results[8];
     for (size_t i = 0; i < count; ++i) {
-        if (server->dynamic_address_space.references_count >= MU_MAX_DYNAMIC_REFERENCES) {
+        if (server->dynamic_address_space.references_count >= MU_INTERN_MAX_DYNAMIC_REFERENCES) {
             results[i].status_code = MU_STATUS_BAD_OUTOFMEMORY;
             continue;
         }

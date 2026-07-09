@@ -22,7 +22,7 @@ opcua_statuscode_t handle_close_session(mu_server_t *server, mu_binary_reader_t 
 #if MUC_OPCUA_SUBSCRIPTIONS
         if (close_result == MU_STATUS_GOOD) {
             opcua_uint32_t session_id = server->active_session->session_id;
-            for (size_t i = 0; i < MU_MAX_SUBSCRIPTIONS; ++i) {
+            for (size_t i = 0; i < MU_INTERN_MAX_SUBSCRIPTIONS; ++i) {
                 mu_subscription_t *sub = &server->subs.subscriptions[i];
                 if (sub->in_use && sub->session_id == session_id) {
                     (void)mu_subscription_delete(&server->subs, session_id, sub->subscription_id);

@@ -90,7 +90,7 @@ opcua_statuscode_t write_data_change_notification(mu_binary_writer_t *w, const s
         while (bits != 0u) {
             size_t i = bw * 32u + (size_t)mu_ctz_u32(bits);
             bits &= (bits - 1u);
-            if (i >= MU_MAX_MONITORED_ITEMS) {
+            if (i >= MU_INTERN_MAX_MONITORED_ITEMS) {
                 break;
             }
             const mu_monitored_item_t *item = &server->subs.monitored_items[i];
@@ -103,8 +103,8 @@ opcua_statuscode_t write_data_change_notification(mu_binary_writer_t *w, const s
             opcua_byte_t entry_index = item->queue_head;
             if (queue_size == 0u) {
                 queue_size = 1u;
-            } else if (queue_size > MU_MONITORED_QUEUE_DEPTH) {
-                queue_size = MU_MONITORED_QUEUE_DEPTH;
+            } else if (queue_size > MU_INTERN_MONITORED_QUEUE_DEPTH) {
+                queue_size = MU_INTERN_MONITORED_QUEUE_DEPTH;
             }
 
             for (opcua_byte_t queued = 0u; queued < item->queue_count && report_count > 0; ++queued) {
@@ -131,7 +131,7 @@ opcua_statuscode_t write_data_change_notification(mu_binary_writer_t *w, const s
         while (bits != 0u && report_count > 0) {
             size_t i = bw * 32u + (size_t)mu_ctz_u32(bits);
             bits &= (bits - 1u);
-            if (i >= MU_MAX_MONITORED_ITEMS) {
+            if (i >= MU_INTERN_MAX_MONITORED_ITEMS) {
                 break;
             }
             const mu_monitored_item_t *item = &server->subs.monitored_items[i];
@@ -143,8 +143,8 @@ opcua_statuscode_t write_data_change_notification(mu_binary_writer_t *w, const s
             opcua_byte_t entry_index = item->queue_head;
             if (queue_size == 0u) {
                 queue_size = 1u;
-            } else if (queue_size > MU_MONITORED_QUEUE_DEPTH) {
-                queue_size = MU_MONITORED_QUEUE_DEPTH;
+            } else if (queue_size > MU_INTERN_MONITORED_QUEUE_DEPTH) {
+                queue_size = MU_INTERN_MONITORED_QUEUE_DEPTH;
             }
 
             for (opcua_byte_t queued = 0u; queued < item->queue_count && report_count > 0; ++queued) {
@@ -204,7 +204,7 @@ opcua_statuscode_t write_event_notification_list(mu_binary_writer_t *w, struct m
     mu_nodeid_t type_id = {0, MU_NODEID_NUMERIC, {914}};
 
     opcua_int32_t event_monitored_item_count = 0;
-    for (size_t i = 0; i < MU_MAX_MONITORED_ITEMS; ++i) {
+    for (size_t i = 0; i < MU_INTERN_MAX_MONITORED_ITEMS; ++i) {
         const mu_monitored_item_t *item = &server->subs.monitored_items[i];
         if (item->in_use && item->subscription_id == sub->subscription_id && item->attribute_id == 12u &&
             item->monitoring_mode == MU_MONITORING_MODE_REPORTING) {
@@ -226,7 +226,7 @@ opcua_statuscode_t write_event_notification_list(mu_binary_writer_t *w, struct m
         return s;
     }
 
-    for (size_t i = 0; i < MU_MAX_MONITORED_ITEMS; ++i) {
+    for (size_t i = 0; i < MU_INTERN_MAX_MONITORED_ITEMS; ++i) {
         const mu_monitored_item_t *item = &server->subs.monitored_items[i];
         if (item->in_use && item->subscription_id == sub->subscription_id && item->attribute_id == 12u &&
             item->monitoring_mode == MU_MONITORING_MODE_REPORTING) {
@@ -318,7 +318,7 @@ opcua_statuscode_t mu_server_trigger_event(mu_server_t *server, const mu_event_n
     if (server == NULL || event == NULL) {
         return MU_STATUS_BAD_INVALIDARGUMENT;
     }
-    for (size_t i = 0; i < MU_MAX_SUBSCRIPTIONS; ++i) {
+    for (size_t i = 0; i < MU_INTERN_MAX_SUBSCRIPTIONS; ++i) {
         mu_subscription_t *sub = &server->subs.subscriptions[i];
         if (sub->in_use) {
             mu_event_queue_t *eq = &sub->event_queue;

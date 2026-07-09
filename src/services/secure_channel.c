@@ -106,7 +106,7 @@ opcua_statuscode_t mu_secure_channel_open(mu_secure_channel_t *channel, const mu
     }
 
     /* Assign a cryptographically random SecureChannelId on ISSUE (Renew keeps
-       the existing id and only rolls the token). With MU_MAX_CONNECTIONS=1 the
+       the existing id and only rolls the token). With MU_INTERN_MAX_CONNECTIONS=1 the
        id need only be non-zero and restart-unique per OPC-10000-6 section 6.7.2.2. */
     if (!channel->is_open) {
         opcua_statuscode_t id_status = generate_channel_id(entropy, &channel->channel_id);
