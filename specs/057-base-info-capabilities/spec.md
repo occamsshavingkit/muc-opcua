@@ -1,6 +1,6 @@
 # Spec 057: Base Info Server Capabilities (OperationLimits)
 
-**Status**: Draft — scope corrected after investigation | **Branch**: `057-base-info-capabilities`
+**Status**: Implemented | **Branch**: `057-base-info-capabilities`
 **Roadmap**: Project A / A2 | **Implements**: spec 051 §2/§7
 **OPC UA**: OPC-10000-7 v1.05.02 `Base Info Server Capabilities` (Optional→Mandatory,
 Mantis 7003); OPC-10000-5 ServerCapabilities(2268)/OperationLimits(11704)
@@ -70,6 +70,16 @@ Must be large enough for legitimate arrays (Write values, PubSub datasets) yet
 bounded. Candidate default **`8192`** (matches the chunk/message byte ceiling as a
 coarse element cap), `-D`-overridable. Confirm before enforcing (too low breaks
 legitimate large-array clients on the full profile).
+
+## Implementation note (discovered during work)
+
+The base node array is **binary-searched** by `mu_resolve_node` /
+`mu_address_space_find_node_binary_direct`, so it must be **strictly ascending by
+NodeId**. Inserting the new nodes out of order silently broke resolution (the
+existing suite passed by luck since the disorder was localized). Fixed by placing
+each node in its sorted slot in both tables, and added
+`test_base_address_space_is_sorted` as a permanent invariant guard — this bug
+class had no prior test.
 
 ## Out of Scope
 
