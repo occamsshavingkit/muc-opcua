@@ -1,5 +1,10 @@
 #include "common.h"
 
+/* Spec 057: advertised MaxMonitoredItemsPerCall (base_nodes.c) must match the
+ * per-call subscription-operation bound enforced here. */
+_Static_assert(MU_DISPATCH_MAX_SUBSCRIPTION_OPERATIONS == MU_MAX_MONITORED_ITEMS_PER_CALL,
+               "advertised MaxMonitoredItemsPerCall must match the enforced dispatch bound");
+
 #if MUC_OPCUA_SUBSCRIPTIONS
 
 opcua_statuscode_t read_monitored_item_create_body(mu_binary_reader_t *r, mu_monitored_item_create_body_t *body) {

@@ -19,7 +19,7 @@ values are listed below.
 |---|---|---|---|
 | `Good` | `MU_STATUS_GOOD` | Successful service or operation result | OPC-10000-4 section 7.38.2 |
 | `Bad_DecodingError` | `MU_STATUS_BAD_DECODINGERROR` | Malformed or truncated binary input | OPC-10000-4 section 7.38.2 |
-| `Bad_EncodingLimitsExceeded` | `MU_STATUS_BAD_ENCODINGLIMITSEXCEEDED` | Encoded input exceeds supported limits | OPC-10000-4 section 7.38.2 |
+| `Bad_EncodingLimitsExceeded` | `MU_STATUS_BAD_ENCODINGLIMITSEXCEEDED` | Encoded input exceeds supported limits, incl. a value array over `MaxArrayLength` (spec 057) | OPC-10000-4 section 7.38.2 |
 | `Bad_ServiceUnsupported` | `MU_STATUS_BAD_SERVICEUNSUPPORTED` | Unsupported service request | OPC-10000-4 section 7.38.2 |
 | `Bad_NotSupported` | `MU_STATUS_BAD_NOTSUPPORTED` | Unsupported operation, field encoding, or PubSub layout within a supported service/API | OPC-10000-4 section 7.38.2 |
 | `Bad_InvalidArgument` | `MU_STATUS_BAD_INVALIDARGUMENT` | Missing or inconsistent caller-supplied arguments | OPC-10000-4 section 7.38.2 |

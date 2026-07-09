@@ -35,8 +35,12 @@ static const opcua_byte_t s_str_Int32[] = "Int32";
 static const opcua_byte_t s_str_Int64[] = "Int64";
 static const opcua_byte_t s_str_LocaleIdArray[] = "LocaleIdArray";
 static const opcua_byte_t s_str_LocalizedText[] = "LocalizedText";
+static const opcua_byte_t s_str_MaxArrayLength[] = "MaxArrayLength";
+static const opcua_byte_t s_str_MaxMonitoredItemsPerCall[] = "MaxMonitoredItemsPerCall";
 static const opcua_byte_t s_str_MaxNodesPerBrowse[] = "MaxNodesPerBrowse";
 static const opcua_byte_t s_str_MaxNodesPerRead[] = "MaxNodesPerRead";
+static const opcua_byte_t s_str_MaxNodesPerWrite[] = "MaxNodesPerWrite";
+static const opcua_byte_t s_str_MaxStringLength[] = "MaxStringLength";
 static const opcua_byte_t s_str_NamespaceArray[] = "NamespaceArray";
 static const opcua_byte_t s_str_NodeId[] = "NodeId";
 static const opcua_byte_t s_str_NonHierarchicalReferences[] = "NonHierarchicalReferences";
@@ -207,6 +211,8 @@ static const mu_reference_t s_server_status_refs[] = {
 static const mu_reference_t s_server_capabilities_refs[] = {
     {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {2269}}, true},
     {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {2271}}, true},
+    {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {11702}}, true}, /* MaxArrayLength */
+    {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {11703}}, true}, /* MaxStringLength */
     {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {11704}}, true},
 #if MUC_OPCUA_BASE_TYPE_SYSTEM
     {{0, MU_NODEID_NUMERIC, {40}}, {0, MU_NODEID_NUMERIC, {58}}, true}
@@ -215,6 +221,8 @@ static const mu_reference_t s_server_capabilities_refs[] = {
 
 static const mu_reference_t s_operation_limits_refs[] = {
     {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {11705}}, true},
+    {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {11707}}, true}, /* MaxNodesPerWrite */
+    {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {11714}}, true}, /* MaxMonitoredItemsPerCall */
     {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {11710}}, true},
 #if MUC_OPCUA_BASE_TYPE_SYSTEM
     {{0, MU_NODEID_NUMERIC, {40}}, {0, MU_NODEID_NUMERIC, {58}}, true}
@@ -257,11 +265,27 @@ static const mu_value_source_t s_locale_id_array_value = {
     MU_VALUESOURCE_STATIC,
     {.static_value = {.type = MU_TYPE_STRING, .value.array = s_locale_id_array, .is_array = true, .array_length = 1}}};
 
+/* Spec 057: advertised OperationLimits/ServerCapabilities values are the SAME
+ * macros the server enforces with (config.h / capacities.h). Drift is prevented
+ * by _Static_asserts in the enforcing translation units (attribute_handler.c,
+ * view_handler.c, subscription_helpers.c). */
 static const mu_value_source_t s_max_nodes_per_read_value = {
-    MU_VALUESOURCE_STATIC, {.static_value = {.type = MU_TYPE_UINT32, .value.ui32 = 32}}};
+    MU_VALUESOURCE_STATIC, {.static_value = {.type = MU_TYPE_UINT32, .value.ui32 = MU_MAX_NODES_PER_READ}}};
 
 static const mu_value_source_t s_max_nodes_per_browse_value = {
-    MU_VALUESOURCE_STATIC, {.static_value = {.type = MU_TYPE_UINT32, .value.ui32 = 8}}};
+    MU_VALUESOURCE_STATIC, {.static_value = {.type = MU_TYPE_UINT32, .value.ui32 = MU_MAX_NODES_PER_BROWSE}}};
+
+static const mu_value_source_t s_max_nodes_per_write_value = {
+    MU_VALUESOURCE_STATIC, {.static_value = {.type = MU_TYPE_UINT32, .value.ui32 = MU_MAX_NODES_PER_WRITE}}};
+
+static const mu_value_source_t s_max_monitored_items_per_call_value = {
+    MU_VALUESOURCE_STATIC, {.static_value = {.type = MU_TYPE_UINT32, .value.ui32 = MU_MAX_MONITORED_ITEMS_PER_CALL}}};
+
+static const mu_value_source_t s_max_array_length_value = {
+    MU_VALUESOURCE_STATIC, {.static_value = {.type = MU_TYPE_UINT32, .value.ui32 = MU_INTERN_MAX_ARRAY_LENGTH}}};
+
+static const mu_value_source_t s_max_string_length_value = {
+    MU_VALUESOURCE_STATIC, {.static_value = {.type = MU_TYPE_UINT32, .value.ui32 = MU_MAX_ENCODED_STRING_LENGTH}}};
 
 #if MUC_OPCUA_BASE_TYPE_SYSTEM
 static const mu_node_t s_base_nodes[] = {
@@ -691,6 +715,23 @@ static const mu_node_t s_base_nodes[] = {
      NULL,
      .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
 #endif
+    /* Spec 057: MaxArrayLength/MaxStringLength — sorted slots before 11704. */
+    {{0, MU_NODEID_NUMERIC, {11702}},
+     MU_NODECLASS_VARIABLE,
+     {14, s_str_MaxArrayLength},
+     {14, s_str_MaxArrayLength},
+     s_property_type_ref,
+     sizeof(s_property_type_ref) / sizeof(s_property_type_ref[0]),
+     &s_max_array_length_value,
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+    {{0, MU_NODEID_NUMERIC, {11703}},
+     MU_NODECLASS_VARIABLE,
+     {15, s_str_MaxStringLength},
+     {15, s_str_MaxStringLength},
+     s_property_type_ref,
+     sizeof(s_property_type_ref) / sizeof(s_property_type_ref[0]),
+     &s_max_string_length_value,
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
     {{0, MU_NODEID_NUMERIC, {11704}},
      MU_NODECLASS_OBJECT,
      {15, s_str_OperationLimits},
@@ -707,6 +748,15 @@ static const mu_node_t s_base_nodes[] = {
      sizeof(s_property_type_ref) / sizeof(s_property_type_ref[0]),
      &s_max_nodes_per_read_value,
      .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+    /* Spec 057: MaxNodesPerWrite — sorted slot between 11705 and 11710. */
+    {{0, MU_NODEID_NUMERIC, {11707}},
+     MU_NODECLASS_VARIABLE,
+     {16, s_str_MaxNodesPerWrite},
+     {16, s_str_MaxNodesPerWrite},
+     s_property_type_ref,
+     sizeof(s_property_type_ref) / sizeof(s_property_type_ref[0]),
+     &s_max_nodes_per_write_value,
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
     {{0, MU_NODEID_NUMERIC, {11710}},
      MU_NODECLASS_VARIABLE,
      {17, s_str_MaxNodesPerBrowse},
@@ -714,6 +764,15 @@ static const mu_node_t s_base_nodes[] = {
      s_property_type_ref,
      sizeof(s_property_type_ref) / sizeof(s_property_type_ref[0]),
      &s_max_nodes_per_browse_value,
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+    /* Spec 057: MaxMonitoredItemsPerCall — sorted slot after 11710. */
+    {{0, MU_NODEID_NUMERIC, {11714}},
+     MU_NODECLASS_VARIABLE,
+     {24, s_str_MaxMonitoredItemsPerCall},
+     {24, s_str_MaxMonitoredItemsPerCall},
+     s_property_type_ref,
+     sizeof(s_property_type_ref) / sizeof(s_property_type_ref[0]),
+     &s_max_monitored_items_per_call_value,
      .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
 #if MUC_OPCUA_SUBSCRIPTIONS_STANDARD
     {{0, MU_NODEID_NUMERIC, {12873}},
@@ -832,6 +891,23 @@ static const mu_node_t s_base_nodes[] = {
      0,
      &s_locale_id_array_value,
      .type_definition = {0}},
+    /* Spec 057: MaxArrayLength/MaxStringLength — sorted slots before 11704. */
+    {{0, MU_NODEID_NUMERIC, {11702}},
+     MU_NODECLASS_VARIABLE,
+     {14, s_str_MaxArrayLength},
+     {14, s_str_MaxArrayLength},
+     NULL,
+     0,
+     &s_max_array_length_value,
+     .type_definition = {0}},
+    {{0, MU_NODEID_NUMERIC, {11703}},
+     MU_NODECLASS_VARIABLE,
+     {15, s_str_MaxStringLength},
+     {15, s_str_MaxStringLength},
+     NULL,
+     0,
+     &s_max_string_length_value,
+     .type_definition = {0}},
     {{0, MU_NODEID_NUMERIC, {11704}},
      MU_NODECLASS_OBJECT,
      {15, s_str_OperationLimits},
@@ -848,6 +924,15 @@ static const mu_node_t s_base_nodes[] = {
      0,
      &s_max_nodes_per_read_value,
      .type_definition = {0}},
+    /* Spec 057: MaxNodesPerWrite — sorted slot between 11705 and 11710. */
+    {{0, MU_NODEID_NUMERIC, {11707}},
+     MU_NODECLASS_VARIABLE,
+     {16, s_str_MaxNodesPerWrite},
+     {16, s_str_MaxNodesPerWrite},
+     NULL,
+     0,
+     &s_max_nodes_per_write_value,
+     .type_definition = {0}},
     {{0, MU_NODEID_NUMERIC, {11710}},
      MU_NODECLASS_VARIABLE,
      {17, s_str_MaxNodesPerBrowse},
@@ -855,6 +940,15 @@ static const mu_node_t s_base_nodes[] = {
      NULL,
      0,
      &s_max_nodes_per_browse_value,
+     .type_definition = {0}},
+    /* Spec 057: MaxMonitoredItemsPerCall — sorted slot after 11710. */
+    {{0, MU_NODEID_NUMERIC, {11714}},
+     MU_NODECLASS_VARIABLE,
+     {24, s_str_MaxMonitoredItemsPerCall},
+     {24, s_str_MaxMonitoredItemsPerCall},
+     NULL,
+     0,
+     &s_max_monitored_items_per_call_value,
      .type_definition = {0}},
 #if MUC_OPCUA_REDUNDANCY || MUC_OPCUA_STANDARD_PROFILE
     {{0, MU_NODEID_NUMERIC, {2296}},

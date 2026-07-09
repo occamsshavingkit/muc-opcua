@@ -11,6 +11,12 @@
    Bad_NodeIdUnknown, which clients tolerate. */
 #define MU_DISPATCH_MAX_READ_NODES 32
 
+/* Spec 057: the advertised MaxNodesPerRead/MaxNodesPerWrite (base_nodes.c) must
+ * equal the value actually enforced here (Read and Write share this bound). */
+_Static_assert(MU_DISPATCH_MAX_READ_NODES == MU_MAX_NODES_PER_READ &&
+                   MU_DISPATCH_MAX_READ_NODES == MU_MAX_NODES_PER_WRITE,
+               "advertised MaxNodesPerRead/Write must match the enforced dispatch bound");
+
 #ifdef MUC_OPCUA_SERVICE_READ
 /* mu_read_process_with_user_index is defined in src/services/read.c. It is not
    declared in read.h (only mu_read_process is) so forward-declare it here for

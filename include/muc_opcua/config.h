@@ -87,6 +87,25 @@
 #endif
 #endif
 
+/* Spec 057: per-call OperationLimits (OPC-10000-5 OperationLimits). These are the
+ * single source for BOTH enforcement (the dispatch stack-array bounds assert they
+ * match, so a mismatch fails the build) AND the advertised address-space nodes in
+ * base_nodes.c -- the advertised value can never drift from what the server
+ * enforces. Fixed (not profile-scaled) because they bound fixed-size dispatch
+ * arrays; MaxArrayLength scales per profile (capacities.h). */
+#ifndef MU_MAX_NODES_PER_READ
+#define MU_MAX_NODES_PER_READ 32
+#endif
+#ifndef MU_MAX_NODES_PER_WRITE
+#define MU_MAX_NODES_PER_WRITE 32
+#endif
+#ifndef MU_MAX_NODES_PER_BROWSE
+#define MU_MAX_NODES_PER_BROWSE 8
+#endif
+#ifndef MU_MAX_MONITORED_ITEMS_PER_CALL
+#define MU_MAX_MONITORED_ITEMS_PER_CALL 32
+#endif
+
 /* Concurrent TCP connections, secure channels, dynamic address-space limits,
  * and concurrent Sessions are all resolved in capacities.h as
  * MU_INTERN_MAX_CONNECTIONS / MU_INTERN_MAX_SECURE_CHANNELS (1:1 with
