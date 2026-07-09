@@ -1,5 +1,11 @@
 # Conformance Status
 
+**Targeted spec revision:** OPC-10000-7 **v1.05.02** (2022). The 2017 Application
+Profile URIs are retained (v1.05.02 did not mint new ones), but the backing
+conformance units are the v1.05.02 set. Per-profile limits/capacities are
+documented in [documentation.md](documentation.md) (the mandatory documentation
+CU for limits, Mantis 7003).
+
 **Target Profile:** Embedded 2017 UA Server Profile
 (`http://opcfoundation.org/UA-Profile/Server/EmbeddedUA2017`) for the `embedded`
 build. `nano` and `micro` remain available as lower-tier profile builds.
