@@ -26,9 +26,9 @@ in only the surface you need.
 - **Zero heap.** No `malloc` anywhere in the protocol path. The application owns all
   memory: one server-storage block plus the RX/TX buffers. Footprint is deterministic.
 - **Tiny flash.** Measured snapshot (2026-07-09, reproduce with
-  `scripts/measure_size.sh all`): a complete Nano server is **17.9 KiB**
-  (18,379 B) of Arm Cortex-M0+ `-Os` core `.text`; Micro is **28.8 KiB**
-  (29,465 B); Standard 2017 is **66.2 KiB** (67,824 B). Every profile has
+  `scripts/measure_size.sh all`): a complete Nano server is **17.5 KiB**
+  (17,882 B) of Arm Cortex-M0+ `-Os` core `.text`; Micro is **28.3 KiB**
+  (28,952 B); Standard 2017 is **65.7 KiB** (67,317 B). Every profile has
   0 B `.data` and 0 B `.bss` — the library holds no mutable static state and
   never calls `malloc`.
 - **Freestanding & portable.** Plain C11 core with no OS assumptions. Hardware and OS
@@ -55,11 +55,11 @@ smaller after `--gc-sections` dead-code elimination.
 
 | Profile | .text | OPC UA Profile |
 |---------|-------|----------------|
-| nano | 18,379 B | Nano Embedded Device 2017 |
-| micro | 29,465 B | Micro Embedded Device 2017 |
-| embedded | 54,418 B | Embedded 2017 UA Server |
-| standard | 67,824 B | Standard 2017 UA Server |
-| full | 67,828 B | — (everything on) |
+| nano | 17,882 B | Nano Embedded Device 2017 |
+| micro | 28,952 B | Micro Embedded Device 2017 |
+| embedded | 53,927 B | Embedded 2017 UA Server |
+| standard | 67,317 B | Standard 2017 UA Server |
+| full | 67,337 B | — (everything on) |
 
 Every profile has **0 B `.data` and 0 B `.bss`**: the library declares no mutable
 static state and never calls `malloc` (a project-constitution requirement). All
@@ -70,11 +70,11 @@ places into your storage. Scales with the compiled capacities.
 
 | Profile | sizeof(struct mu_server) |
 |---------|--------------------------|
-| nano | 872 B |
-| micro | 11,120 B |
-| embedded | 102,104 B |
-| standard | 680,800 B |
-| full | 1,270,520 B |
+| nano | 784 B |
+| micro | 11,032 B |
+| embedded | 102,016 B |
+| standard | 680,712 B |
+| full | 1,270,432 B |
 
 **Caller-provided storage** (`MU_SERVER_STORAGE_BYTES`) — the single block you hand to
 `mu_server_init`; holds the server object plus its scratch/chunk/security buffers.

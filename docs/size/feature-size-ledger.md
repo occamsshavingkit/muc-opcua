@@ -1,6 +1,68 @@
 # Feature Size Ledger
 
-## Current (2026-07-09): Profile gating single source of truth — Spec 052
+## Current (2026-07-09): De-bloat nano/micro — remove leaked soft-float + strstr
+
+Investigating a ~2 KB archive `.text` creep in nano over the prior week uncovered a
+much larger regression the archive metric could not see. **The archive `.text`
+figures below count only our code; they do not include libc.** A realistic link of
+the actual server runtime (`mu_server_init` + `mu_server_poll` + `mu_server_close`,
+`--gc-sections`) showed the nano *binary* had grown from 16,064 B to **24,493 B** —
+~7 KB of it double-precision soft-float and `strstr`/`strchr` pulled in from libc:
+
+- `src/services/read/cache.c` (new Read `maxAge` value cache) did `double`
+  arithmetic on `maxAge`, dragging in `__aeabi_dmul` / `dcmp*` / conversions (~5 KB)
+  on the FPU-less Cortex-M0+. OPC-10000-4 §5.11.2 makes the cache optional (a fresh
+  "best effort" value is conformant) and needs only millisecond granularity, so no
+  float is required.
+- `src/core/server/init.c` `parse_endpoint_url` (mDNS-only) used `strstr`/`strchr`
+  but was compiled unconditionally (~2 KB).
+
+**Fixes:** `MUC_OPCUA_READ_CACHE` (default **OFF**) gates the cache out entirely
+(reads always fresh); when enabled its `maxAge` handling is integer-only with the
+spec-correct Int32-max "always cache" threshold. `parse_endpoint_url` + the mDNS
+publish/unpublish are gated behind `MUC_OPCUA_MDNS_DISCOVERY`. nano/micro are now
+soft-float-free; embedded/standard/full retain float only in deadband/aggregate
+subscription math, which is spec-inherent (operates on `Double` values).
+
+- **Toolchain**: `arm-none-eabi-gcc` 13.2.1, Cortex-M0+ Thumb `-Os`, `arduino-skeleton`
+- **Reproduce (archive)**: `bash scripts/measure_size.sh all`
+- **Reproduce (real binary)**: link `scripts/size_measure_startup.c` + a main that
+  calls init/poll/close against `-lmuc_opcua` with `-Wl,--gc-sections`, then
+  `arm-none-eabi-size`. NOTE: the in-tree `size_measure_main.c` only calls
+  `mu_server_init`, so its ELF under-counts (dispatch stripped); the archive `.text`
+  is the reported figure and the linked figure below is measured separately.
+
+### Library archive `.text` (flash) + real linked nano
+
+| Profile | archive .text | .data | .bss |
+|---------|---------------|-------|------|
+| nano | 17,882 B | 0 | 0 |
+| micro | 28,952 B | 0 | 0 |
+| embedded | 53,927 B | 0 | 0 |
+| standard | 67,317 B | 0 | 0 |
+| full | 67,337 B | 0 | 0 |
+
+Real linked nano server (`--gc-sections`): **17,168 B** `.text` — down from 24,493 B
+before the fix (−7,325 B), vs. 16,064 B a week ago (the remaining ~1.1 KB is the
+feature-041 file split losing cross-TU inlining, not a leak).
+
+### Server object and caller storage (ARM, per profile)
+
+| Profile | sizeof(struct mu_server) | MU_SERVER_STORAGE_BYTES | Sessions | Subscriptions | Monitored Items | Publish |
+|---------|--------------------------|-------------------------|----------|---------------|-----------------|---------|
+| nano | 784 B | 1,408 B | 2 | — | — | — |
+| micro | 11,032 B | 11,680 B | 2 | 2 | 8 | 4 |
+| embedded | 102,016 B | 128,232 B | 2 | 2 | 100 | 5 |
+| standard | 680,712 B | 741,300 B | 50 | 50 | 1,000 | 50 |
+| full | 1,270,432 B | 1,387,500 B | 100 | 100 | 2,000 | 100 |
+
+`sizeof(struct mu_server)` dropped 88 B per profile vs. the prior section (the
+`read_cache` field is gone by default). `MU_SERVER_STORAGE_BYTES` is unchanged (it
+never included the cache).
+
+---
+
+## 2026-07-09: Profile gating single source of truth — Spec 052
 
 Re-measured after making `MUC_OPCUA_PROFILE` the single source of truth for the
 profile feature sets and capacity minima (branch `052-fix-profile-gating`). That
