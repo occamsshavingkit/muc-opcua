@@ -21,8 +21,11 @@ opcua_boolean_t mu_read_cache_lookup(mu_read_cache_t *cache, const mu_nodeid_t *
                                      opcua_datetime_t now, mu_variant_t *out) {
     if (!cache)
         return false;
-    /* maxAge == 0 (or a nonsensical negative) directs a fresh read (5.11.2.2). */
-    if (max_age_ms <= 0.0) {
+    /* maxAge == 0 (or a nonsensical negative) directs a fresh read (5.11.2.2).
+       Written as !(> 0.0) so a NaN maxAge off the wire also takes this path:
+       every comparison with NaN is false, which would otherwise slip past a
+       plain <= 0.0 and feed NaN into the integer tick cast below (UB). */
+    if (!(max_age_ms > 0.0)) {
         cache->misses++;
         return false;
     }

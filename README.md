@@ -47,8 +47,9 @@ in only the surface you need.
 ## Profiles
 
 Each profile is a CMake configuration (`make nano|micro|embedded|standard`, or
-`-DMUC_OPCUA_PROFILE=...`). All figures are Arm Cortex-M0+ Thumb `-Os`, zero
-`.data`/`.bss`/heap. Reproduce with `scripts/measure_size.sh all`.
+`-DMUC_OPCUA_PROFILE=...`). All figures are Arm Cortex-M0+ Thumb `-Os`; the
+library archive has zero `.data`/`.bss` on every profile (heap use is per-profile,
+detailed below). Reproduce with `scripts/measure_size.sh all`.
 
 **Core `.text` (flash)** — compiled library archive (`-Os`). The linked server is
 smaller after `--gc-sections` dead-code elimination.
@@ -67,9 +68,13 @@ no `malloc` in the linked server. With LTO's cross-module optimization the real
 linked `nano` server is **15,724 B** `.text` (`--gc-sections`), below the archive
 figure above. `standard`/`full` keep the heap enabled for array-valued Write/Call.
 
-Every profile has **0 B `.data` and 0 B `.bss`**: the library declares no mutable
-static state and never calls `malloc` (a project-constitution requirement). All
-server state lives in the two caller-owned blocks below.
+The library declares **no mutable static state** — its archive has 0 B `.data`
+and 0 B `.bss` on every profile. `nano`/`micro`/`embedded` are strictly no-heap
+end-to-end: the linked server never calls `malloc` (a project-constitution
+requirement) and keeps 0 B `.data`/`.bss`. `standard`/`full` retain a bounded
+`malloc` path for array-valued Write/Call, so their linked server shows a small
+nonzero `.data`/`.bss`. All server state otherwise lives in the two caller-owned
+blocks below.
 
 **Server object** (`sizeof(struct mu_server)`) — the control block `mu_server_init`
 places into your storage. Scales with the compiled capacities.
