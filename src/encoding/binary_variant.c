@@ -1,4 +1,5 @@
 /* src/encoding/binary_variant.c */
+#include "muc_opcua/config.h"
 #include "muc_opcua/encoding.h"
 #include <stdlib.h>
 
@@ -135,6 +136,13 @@ opcua_statuscode_t mu_binary_read_variant(mu_binary_reader_t *reader, mu_variant
            -1 meaning a null array. Any other negative value is malformed. */
         if (length < -1) {
             return MU_STATUS_BAD_DECODINGERROR;
+        }
+        /* Spec 057: OperationLimits MaxArrayLength. Reject a value array whose
+           element count exceeds the compiled ceiling, independent of buffer size
+           (a DoS guard the buffer-size check below does not by itself provide).
+           length == -1 (null) is exempt. Advertised via base_nodes.c. */
+        if (length > (opcua_int32_t)MU_INTERN_MAX_ARRAY_LENGTH) {
+            return MU_STATUS_BAD_ENCODINGLIMITSEXCEEDED;
         }
         variant->array_length = length;
 

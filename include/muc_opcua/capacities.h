@@ -139,6 +139,22 @@
 #define MU_INTERN_MONITORED_QUEUE_DEPTH MU_MONITORED_QUEUE_DEPTH
 #endif
 
+/* ---- Max decoded array element count (OperationLimits MaxArrayLength) ----- */
+/* DoS ceiling on decoded array lengths; also advertised via base_nodes.c so the
+ * enforced value == the advertised value. Scales with the profile tier. */
+#define MU_INTERN_MAX_ARRAY_LENGTH 512 /* stage 1: minimal baseline */
+#if defined(MUC_OPCUA_PROFILE_EMBEDDED)
+#undef MU_INTERN_MAX_ARRAY_LENGTH
+#define MU_INTERN_MAX_ARRAY_LENGTH 2048
+#elif defined(MUC_OPCUA_PROFILE_STANDARD) || defined(MUC_OPCUA_PROFILE_FULL)
+#undef MU_INTERN_MAX_ARRAY_LENGTH
+#define MU_INTERN_MAX_ARRAY_LENGTH 8192
+#endif
+#ifdef MU_MAX_ARRAY_LENGTH
+#undef MU_INTERN_MAX_ARRAY_LENGTH
+#define MU_INTERN_MAX_ARRAY_LENGTH MU_MAX_ARRAY_LENGTH
+#endif
+
 /* =====================================================================
  * Profile-invariant capacities (stage 1 baseline + stage 3 user override).
  * These do not vary per profile today; they still funnel through this file so
