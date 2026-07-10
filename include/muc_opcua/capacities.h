@@ -168,6 +168,31 @@
 #define MU_INTERN_MAX_TRIGGER_LINKS MU_MAX_TRIGGER_LINKS
 #endif
 
+/* ---- EventFilter WhereClause (ContentFilter) per MonitoredItem ------
+ * Bounds on the owned operand tree an event MonitoredItem may carry
+ * (MUC_OPCUA_EVENT_FILTER_WHERE). A filter exceeding any of these is
+ * rejected with Bad_EventFilterInvalid / Bad_TooManyOperations rather than
+ * silently truncated (OPC-10000-4 §7.7.1). */
+#define MU_INTERN_MAX_WHERE_ELEMENTS 8
+#ifdef MU_MAX_WHERE_ELEMENTS
+#undef MU_INTERN_MAX_WHERE_ELEMENTS
+#define MU_INTERN_MAX_WHERE_ELEMENTS MU_MAX_WHERE_ELEMENTS
+#endif
+
+#define MU_INTERN_MAX_WHERE_OPERANDS 16
+#ifdef MU_MAX_WHERE_OPERANDS
+#undef MU_INTERN_MAX_WHERE_OPERANDS
+#define MU_INTERN_MAX_WHERE_OPERANDS MU_MAX_WHERE_OPERANDS
+#endif
+
+/* Backing bytes for string/bytestring LiteralOperand payloads (copied out of
+ * the transient request PDU so the filter can outlive the request). */
+#define MU_INTERN_WHERE_BLOB_BYTES 64
+#ifdef MU_WHERE_BLOB_BYTES
+#undef MU_INTERN_WHERE_BLOB_BYTES
+#define MU_INTERN_WHERE_BLOB_BYTES MU_WHERE_BLOB_BYTES
+#endif
+
 /* ---- Address-space index capacity ----------------------------------- */
 #define MU_INTERN_MAX_ADDRESS_SPACE_NODES 64
 #ifdef MU_MAX_ADDRESS_SPACE_NODES

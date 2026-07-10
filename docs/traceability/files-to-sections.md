@@ -70,6 +70,7 @@ This document maps implementation and test files back to OPC UA normative sectio
 | `src/services/subscription_publish/retransmit.c` | Subscription retransmit | OPC-10000-4 | 5.14 | Republish/retransmit handling |
 | `src/services/subscription_aggregate.c` | Subscription aggregate + trigger + resend | OPC-10000-4 / OPC-10000-13 | 5.13.5, 5.14, 7.22.4 / 5.4.3.5, 5.4.3.10, 5.4.3.11 | Aggregate, triggered items, resend data, and standard-only features |
 | `src/services/event_filter.c` | EventFilter where-clause evaluation | OPC-10000-4 / OPC-10000-5 | 7.22.3 / 6.4.2 | ContentFilter evaluation, select-clause extraction for BaseEventType fields |
+| `src/services/event_filter.h` | EventFilter WhereClause model + evaluator API | OPC-10000-4 / OPC-10000-5 | 7.7 / 6.4.2 | Compact ContentFilter operand tree, field resolver, evaluator declaration |
 | `include/muc_opcua/services/method.h` | Method Server Facet API | OPC-10000-4 | 5.12.2.2 | Custom method callback registration and dispatch interface |
 | `include/muc_opcua/services/audit.h` | Audit event type definitions | OPC-10000-5 | 6.5 | Audit event structs for Standard profile |
 | `src/services/audit_events.c` | Audit event construction stub | OPC-10000-5 | 6.5 | Audit event delivery infrastructure |

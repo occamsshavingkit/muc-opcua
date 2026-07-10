@@ -214,19 +214,9 @@ typedef struct {
     opcua_uint16_t severity;
 } mu_event_fields_t;
 
-#if MUC_OPCUA_EVENT_FILTER_WHERE
-#include <stdbool.h>
-/* Evaluate ContentFilter where-clause against event fields.
- * Returns true if the event matches the filter (or filter is empty).
-   OPC-10000-4 §7.22.3 */
-bool mu_evaluate_event_filter_where(const mu_event_fields_t *event_fields, const opcua_uint32_t *operators,
-                                    const opcua_uint32_t *field_indices, const int64_t *filter_values,
-                                    opcua_uint32_t element_count);
-
-/* Resolve a SimpleAttributeOperand BrowsePath to a BaseEventType field index.
- * Returns field index (0-8) or -1 if unknown. OPC-10000-5 §6.4.2 */
-int mu_event_filter_resolve_select_clause(const char *browse_path, size_t len);
-#endif
+/* The EventFilter WhereClause (ContentFilter) model and evaluator live in the
+   internal header src/services/event_filter.h (mu_where_clause_t /
+   mu_where_clause_eval); mu_event_fields_t above is the value carrier they read. */
 #endif
 
 #endif /* MUC_OPCUA_TYPES_H */

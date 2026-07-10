@@ -112,6 +112,9 @@ typedef struct {
 #ifdef MUC_OPCUA_EVENTS
     opcua_byte_t select_clauses[8];
     opcua_byte_t select_clauses_count;
+#if MUC_OPCUA_EVENT_FILTER_WHERE
+    mu_where_clause_t where_clause; /* decoded EventFilter WhereClause */
+#endif
 #endif
 } mu_monitored_item_create_body_t;
 

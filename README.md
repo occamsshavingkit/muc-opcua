@@ -57,10 +57,10 @@ smaller after `--gc-sections` dead-code elimination.
 | Profile | .text | OPC UA Profile |
 |---------|-------|----------------|
 | nano | 17,956 B | Nano Embedded Device 2017 |
-| micro | 29,550 B | Micro Embedded Device 2017 |
-| embedded | 54,616 B | Embedded 2017 UA Server |
-| standard | 75,827 B | Standard 2017 UA Server |
-| full | 75,811 B | — (everything on; also carries `MUC_OPCUA_ECC` + Data Access) |
+| micro | 29,706 B | Micro Embedded Device 2017 |
+| embedded | 54,972 B | Embedded 2017 UA Server |
+| standard | 78,120 B | Standard 2017 UA Server |
+| full | 78,112 B | — (everything on; also carries `MUC_OPCUA_ECC` + Data Access + EventFilter WhereClause) |
 
 Built with LTO (`MUC_OPCUA_LTO=ON`, the default). The `nano`/`micro`/`embedded`
 profiles are strictly no-heap (`MUC_OPCUA_ALLOW_HEAP=OFF`): 0 B `.data`, 0 B `.bss`,
