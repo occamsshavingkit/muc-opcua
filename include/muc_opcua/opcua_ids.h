@@ -97,29 +97,35 @@
 #define MU_ID_AGGREGATETYPE_MAXIMUM 2347
 
 /* Additional OPC-10000-13 AggregateFunctionType IDs (MUC_OPCUA_AGGREGATE_FULL).
- * MaximumActualTime (2346) and MinimumActualTime (2347) are already
- * implemented as MU_ID_AGGREGATETYPE_MAXIMUM / _MINIMUM. */
+ * Every value is the AggregateFunction_<Name> Object NodeId from the OPC
+ * Foundation UA NodeSet NodeIds.csv. MU_ID_AGGREGATETYPE_MINIMUM (2346) /
+ * _MAXIMUM (2347) are AggregateFunction_Minimum / _Maximum. Twelve of the
+ * values below were previously wrong (some swapped, e.g. Count<->AnnotationCount
+ * and Start<->End; PercentGood/PercentBad/WorstQuality collided with the Data
+ * Access DataItemType nodes 2365/2366/2367) — since subscription_aggregate.c
+ * dispatches on these ids, a wrong value mis-handled the client's requested
+ * aggregate. Verified against NodeIds.csv. */
 #define MU_ID_AGGREGATETYPE_INTERPOLATIVE 2341
 #define MU_ID_AGGREGATETYPE_TIME_AVERAGE 2343
 #define MU_ID_AGGREGATETYPE_TOTAL 2344
 #define MU_ID_AGGREGATETYPE_RANGE 2350
-#define MU_ID_AGGREGATETYPE_COUNT 2351
-#define MU_ID_AGGREGATETYPE_ANNOTATION_COUNT 2352
-#define MU_ID_AGGREGATETYPE_END 2357
-#define MU_ID_AGGREGATETYPE_START 2358
+#define MU_ID_AGGREGATETYPE_ANNOTATION_COUNT 2351
+#define MU_ID_AGGREGATETYPE_COUNT 2352
+#define MU_ID_AGGREGATETYPE_START 2357
+#define MU_ID_AGGREGATETYPE_END 2358
 #define MU_ID_AGGREGATETYPE_DELTA 2359
 #define MU_ID_AGGREGATETYPE_DURATION_GOOD 2360
 #define MU_ID_AGGREGATETYPE_DURATION_BAD 2361
-#define MU_ID_AGGREGATETYPE_DURATION_IN_STATE_ZERO 2363
-#define MU_ID_AGGREGATETYPE_PERCENT_GOOD 2365
-#define MU_ID_AGGREGATETYPE_PERCENT_BAD 2366
-#define MU_ID_AGGREGATETYPE_WORST_QUALITY 2367
-#define MU_ID_AGGREGATETYPE_TIME_AVERAGE_2 11286
+#define MU_ID_AGGREGATETYPE_PERCENT_GOOD 2362
+#define MU_ID_AGGREGATETYPE_PERCENT_BAD 2363
+#define MU_ID_AGGREGATETYPE_WORST_QUALITY 2364
+#define MU_ID_AGGREGATETYPE_TIME_AVERAGE_2 11285
+#define MU_ID_AGGREGATETYPE_MINIMUM_2 11286
 #define MU_ID_AGGREGATETYPE_MAXIMUM_2 11287
-#define MU_ID_AGGREGATETYPE_MINIMUM_2 11288
 #define MU_ID_AGGREGATETYPE_WORST_QUALITY_2 11292
-#define MU_ID_AGGREGATETYPE_TOTAL_2 11308
-#define MU_ID_AGGREGATETYPE_DELTA_BOUNDS 11509
+#define MU_ID_AGGREGATETYPE_TOTAL_2 11304
+#define MU_ID_AGGREGATETYPE_DURATION_IN_STATE_ZERO 11307
+#define MU_ID_AGGREGATETYPE_DELTA_BOUNDS 11507
 
 /* Data Access Server Facet (OPC-10000-8 §5.3/§5.6). NOTE: there is no single
    "EURange"/"EngineeringUnits" NodeId — each is a per-type Property instance
