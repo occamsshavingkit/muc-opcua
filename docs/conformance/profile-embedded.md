@@ -66,7 +66,7 @@ OPC-10000-7 §4.2 conformance-unit or §4.3 profile verification.
 | Feature | Reason | Expected behavior |
 |---|---|---|
 | TransferSubscriptions | Client Redundancy Facet, not part of the selected Embedded profile slice | Service unsupported |
-| Percent deadband | Data Access Server Facet, not required by the Standard DataChange Subscription 2017 facet | Filter unsupported |
+| Percent deadband | Data Access Server Facet (`MUC_OPCUA_DATA_ACCESS`, spec 060); not required by the Standard DataChange Subscription 2017 facet | `Bad_MonitoredItemFilterUnsupported` on the embedded profile (DA off by default); supported when the DA facet is built — see [data-access.md](data-access.md) |
 | Arbitrary user methods | Only the two Base Info methods are required for this profile work | `Bad_MethodInvalid` for unknown methods |
 
 ## Validation Snapshot

@@ -241,6 +241,7 @@ Full, spec-section-cited matrices:
 - [docs/conformance/profile-micro.md](docs/conformance/profile-micro.md) — Micro profile
 - [docs/conformance/security.md](docs/conformance/security.md) — security notes
 - [docs/conformance/ecc-security-policy.md](docs/conformance/ecc-security-policy.md) — optional ECC SecurityPolicy CU (ECC-A + ECC-B)
+- [docs/conformance/data-access.md](docs/conformance/data-access.md) — Data Access Server Facet (AnalogItem/discrete types, percent deadband)
 
 ---
 

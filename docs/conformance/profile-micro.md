@@ -66,7 +66,9 @@ Embedded profile gates are enabled:
 
 TransferSubscriptions (§5.14.7) belongs to the Client Redundancy Facet and is not part
 of the selected Micro or Embedded work. Percent deadband belongs to the Data Access
-Server Facet; aggregate filters (Average/Min/Max) are supported.
+Server Facet (`MUC_OPCUA_DATA_ACCESS`, spec 060 — off in the Micro profile, so percent
+deadband returns `Bad_MonitoredItemFilterUnsupported` here); aggregate filters
+(Average/Min/Max) are supported.
 
 **Concurrent ≥2 sessions** — implemented: the server multiplexes up to
 `MU_MAX_SESSIONS` (default 2) logical sessions over a single TCP connection
