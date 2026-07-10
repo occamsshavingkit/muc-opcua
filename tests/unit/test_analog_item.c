@@ -46,6 +46,12 @@ void test_analogitemtype_nodeid(void) {
 }
 #endif
 
+#if !MUC_OPCUA_DATA_ACCESS
+void test_data_access_disabled(void) {
+    TEST_IGNORE_MESSAGE("Data Access feature not enabled");
+}
+#endif
+
 int main(void) {
     UNITY_BEGIN();
 #if MUC_OPCUA_DATA_ACCESS
@@ -54,13 +60,7 @@ int main(void) {
     RUN_TEST(test_deadband_type_enum);
     RUN_TEST(test_analogitemtype_nodeid);
 #else
-    RUN_TEST(test_range_type_is_defined); /* compiled out below */
+    RUN_TEST(test_data_access_disabled);
 #endif
     return UNITY_END();
 }
-
-#if !MUC_OPCUA_DATA_ACCESS
-void test_range_type_is_defined(void) {
-    TEST_IGNORE_MESSAGE("Data Access feature not enabled");
-}
-#endif
