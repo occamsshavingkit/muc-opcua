@@ -11,6 +11,10 @@ void tearDown(void) {}
 #include "../../src/core/uasc.h"
 #include "../../src/services/secure_channel.h"
 
+opcua_statuscode_t handle_open_secure_channel(mu_server_t *server, mu_binary_reader_t *r, mu_binary_writer_t *w,
+                                              size_t *response_length);
+void mu_service_dispatch_set_opn_security_policy(mu_server_t *server, const mu_string_t *security_policy);
+
 #define TEST_MAX_INBOUND 2u
 #define TEST_MAX_WRITES 2u
 
@@ -327,6 +331,71 @@ static void assert_opn_entropy_failure_returns_security_checks_failed(void) {
     TEST_ASSERT_FALSE(server->secure_channel.is_open);
 }
 
+#if defined(MUC_OPCUA_MULTIPLE_CONNECTIONS) && MU_INTERN_MAX_CONNECTIONS > 1
+static size_t build_opn_request_body(opcua_byte_t *out, size_t capacity, opcua_uint32_t request_handle) {
+    mu_binary_writer_t w;
+    mu_binary_writer_init(&w, out, capacity);
+    write_request_header(&w, request_handle);
+    (void)mu_binary_write_uint32(&w, 0); /* clientProtocolVersion */
+    (void)mu_binary_write_uint32(&w, 0); /* requestType = Issue */
+    (void)mu_binary_write_uint32(&w, MU_MESSAGE_SECURITY_MODE_NONE);
+    (void)mu_binary_write_int32(&w, -1); /* clientNonce */
+    (void)mu_binary_write_uint32(&w, 3600000);
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, w.status);
+    return w.position;
+}
+
+void test_open_secure_channel_ids_are_unique_across_connections(void) {
+    static const opcua_byte_t policy_uri[] = "http://opcfoundation.org/UA/SecurityPolicy#None";
+    mu_string_t policy = {(opcua_int32_t)(sizeof(policy_uri) - 1u), policy_uri};
+    mu_server_config_t config;
+    secure_channel_transport_t transport;
+    opcua_byte_t rx[8192];
+    opcua_byte_t tx[8192];
+    opcua_byte_t request[256];
+    opcua_byte_t response[512];
+    union {
+        _Alignas(8) opcua_byte_t bytes[MU_SERVER_STORAGE_BYTES];
+        struct mu_server align;
+    } storage;
+    mu_server_t *server = NULL;
+    size_t request_len;
+    size_t response_len;
+    mu_binary_reader_t reader;
+    mu_binary_writer_t writer;
+
+    (void)memset(&transport, 0, sizeof(transport));
+    configure_transport_server(&config, &transport, rx, tx);
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_server_init(storage.bytes, sizeof(storage.bytes), &config, &server));
+    mu_service_dispatch_set_opn_security_policy(server, &policy);
+
+    server->conns[0].client_handle = (void *)1;
+    server->conns[1].client_handle = (void *)2;
+
+    request_len = build_opn_request_body(request, sizeof(request), 1u);
+    mu_binary_reader_init(&reader, request, request_len);
+    mu_binary_writer_init(&writer, response, sizeof(response));
+    response_len = sizeof(response);
+    server->active_conn = &server->conns[0];
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD,
+                            handle_open_secure_channel(server, &reader, &writer, &response_len));
+    TEST_ASSERT_TRUE(server->conns[0].secure_channel.is_open);
+
+    request_len = build_opn_request_body(request, sizeof(request), 2u);
+    mu_binary_reader_init(&reader, request, request_len);
+    mu_binary_writer_init(&writer, response, sizeof(response));
+    response_len = sizeof(response);
+    server->active_conn = &server->conns[1];
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD,
+                            handle_open_secure_channel(server, &reader, &writer, &response_len));
+    TEST_ASSERT_TRUE(server->conns[1].secure_channel.is_open);
+
+    TEST_ASSERT_NOT_EQUAL_UINT32(server->conns[0].secure_channel.channel_id,
+                                 server->conns[1].secure_channel.channel_id);
+    server->active_conn = NULL;
+}
+#endif
+
 void test_secure_channel_open_none(void) {
     mu_secure_channel_t channel;
     mu_secure_channel_init(&channel);
@@ -484,5 +553,8 @@ int main(void) {
     RUN_TEST(test_opn_rejects_signing_modes_for_security_policy_none);
     RUN_TEST(test_opn_entropy_failure_returns_bad_security_checks_failed);
     RUN_TEST(test_opn_rejects_invalid_request_type);
+#if defined(MUC_OPCUA_MULTIPLE_CONNECTIONS) && MU_INTERN_MAX_CONNECTIONS > 1
+    RUN_TEST(test_open_secure_channel_ids_are_unique_across_connections);
+#endif
     return UNITY_END();
 }

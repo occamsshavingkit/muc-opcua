@@ -27,6 +27,39 @@ static opcua_statuscode_t validate_client_nonce(const mu_bytestring_t *client_no
     return MU_STATUS_GOOD;
 }
 
+#ifdef MUC_OPCUA_MULTIPLE_CONNECTIONS
+static bool secure_channel_id_used_by_other_connection(const mu_server_t *server, opcua_uint32_t channel_id) {
+    if (server == NULL || channel_id == 0u) {
+        return false;
+    }
+    for (size_t i = 0; i < MU_INTERN_MAX_CONNECTIONS; ++i) {
+        const mu_connection_t *conn = &server->conns[i];
+        if (conn == server->active_conn || conn->client_handle == NULL || !conn->secure_channel.is_open) {
+            continue;
+        }
+        if (conn->secure_channel.channel_id == channel_id) {
+            return true;
+        }
+    }
+    return false;
+}
+
+static opcua_statuscode_t ensure_unique_secure_channel_id(mu_server_t *server) {
+    opcua_uint32_t candidate = server_secure_channel.channel_id;
+    for (size_t salt = 0; salt <= MU_INTERN_MAX_CONNECTIONS; ++salt) {
+        if (candidate == 0u) {
+            candidate = 1u;
+        }
+        if (!secure_channel_id_used_by_other_connection(server, candidate)) {
+            server_secure_channel.channel_id = candidate;
+            return MU_STATUS_GOOD;
+        }
+        candidate += 0x9E3779B9u;
+    }
+    return MU_STATUS_BAD_SECURITYCHECKSFAILED;
+}
+#endif
+
 #ifdef MUC_OPCUA_SECURITY
 static opcua_statuscode_t enforce_osc_application_auth(const mu_server_t *server) {
     if (server_secure_channel.policy != MU_SECURITY_POLICY_NONE_ID &&
@@ -126,6 +159,7 @@ opcua_statuscode_t handle_open_secure_channel(mu_server_t *server, mu_binary_rea
     }
 
     opcua_uint32_t revised = 0;
+    bool channel_was_open = server_secure_channel.is_open;
 
     s = mu_secure_channel_open(&server_secure_channel, current_opn_security_policy(server),
                                (mu_message_security_mode_t)security_mode, requested_lifetime,
@@ -133,6 +167,18 @@ opcua_statuscode_t handle_open_secure_channel(mu_server_t *server, mu_binary_rea
     if (s != MU_STATUS_GOOD) {
         return s;
     }
+
+#ifdef MUC_OPCUA_MULTIPLE_CONNECTIONS
+    if (!channel_was_open) {
+        s = ensure_unique_secure_channel_id(server);
+        if (s != MU_STATUS_GOOD) {
+            (void)mu_secure_channel_close(&server_secure_channel);
+            return s;
+        }
+    }
+#else
+    (void)channel_was_open;
+#endif
 
 #ifdef MUC_OPCUA_SECURITY
     s = enforce_osc_application_auth(server);
