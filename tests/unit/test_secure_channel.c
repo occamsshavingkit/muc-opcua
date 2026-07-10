@@ -392,6 +392,110 @@ void test_open_secure_channel_ids_are_unique_across_connections(void) {
                                  server->conns[1].secure_channel.channel_id);
     server->active_conn = NULL;
 }
+
+/* Degenerate entropy: returns the SAME bytes on every call, modelling a
+   misconfigured RP2040 ROSC (issue #288 hardware). generate_channel_id() then
+   derives an identical base channel_id for every OpenSecureChannel. */
+static opcua_statuscode_t degenerate_entropy(void *context, opcua_byte_t *buffer, size_t length) {
+    (void)context;
+    if (buffer != NULL) {
+        (void)memset(buffer, 0x5A, length);
+    }
+    return MU_STATUS_GOOD;
+}
+
+/* The multi-connection async-Publish delivery path (publish_due.c) and the
+   outbound chunk path (data_chunk.c) locate the target connection by matching
+   conn->secure_channel.channel_id == session->secure_channel_id. This mirrors
+   that exact predicate. */
+static int conns_matching_channel_id(const mu_server_t *server, opcua_uint32_t channel_id, int *matched_idx) {
+    int matches = 0;
+    for (size_t i = 0; i < MU_INTERN_MAX_CONNECTIONS; ++i) {
+        if (server->conns[i].client_handle != NULL && server->conns[i].secure_channel.channel_id == channel_id) {
+            ++matches;
+            if (matched_idx != NULL) {
+                *matched_idx = (int)i;
+            }
+        }
+    }
+    return matches;
+}
+
+/* Regression for #288/#289. With a degenerate entropy source (constant bytes,
+   as a misconfigured RP2040 ROSC can produce) two connections' OpenSecureChannel
+   derive the SAME channel_id from generate_channel_id(). Because async Publish
+   delivery (publish_due.c) and outbound chunk routing (data_chunk.c) find the
+   destination connection by matching conn->secure_channel.channel_id against the
+   session's bound secure_channel_id, a channel_id collision routes one session's
+   Publish notifications to the WRONG connection. ensure_unique_secure_channel_id()
+   (osc_handler.c) must force uniqueness regardless of entropy quality; this test
+   fails if that guard is removed (both channel_ids would be 0x5A5A5A5A and the
+   routing predicate would resolve both sessions to conn 0). */
+void test_secure_channel_ids_unique_under_degenerate_entropy(void) {
+    static const opcua_byte_t policy_uri[] = "http://opcfoundation.org/UA/SecurityPolicy#None";
+    mu_string_t policy = {(opcua_int32_t)(sizeof(policy_uri) - 1u), policy_uri};
+    mu_server_config_t config;
+    secure_channel_transport_t transport;
+    opcua_byte_t rx[8192];
+    opcua_byte_t tx[8192];
+    opcua_byte_t request[256];
+    opcua_byte_t response[512];
+    union {
+        _Alignas(8) opcua_byte_t bytes[MU_SERVER_STORAGE_BYTES];
+        struct mu_server align;
+    } storage;
+    mu_server_t *server = NULL;
+    size_t request_len;
+    size_t response_len;
+    mu_binary_reader_t reader;
+    mu_binary_writer_t writer;
+
+    (void)memset(&transport, 0, sizeof(transport));
+    configure_transport_server(&config, &transport, rx, tx);
+    /* Force every channel_id to derive from the same constant entropy. */
+    config.entropy_adapter.generate_random = degenerate_entropy;
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_server_init(storage.bytes, sizeof(storage.bytes), &config, &server));
+    mu_service_dispatch_set_opn_security_policy(server, &policy);
+
+    server->conns[0].client_handle = (void *)1;
+    server->conns[1].client_handle = (void *)2;
+
+    request_len = build_opn_request_body(request, sizeof(request), 1u);
+    mu_binary_reader_init(&reader, request, request_len);
+    mu_binary_writer_init(&writer, response, sizeof(response));
+    response_len = sizeof(response);
+    server->active_conn = &server->conns[0];
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, handle_open_secure_channel(server, &reader, &writer, &response_len));
+    TEST_ASSERT_TRUE(server->conns[0].secure_channel.is_open);
+
+    request_len = build_opn_request_body(request, sizeof(request), 2u);
+    mu_binary_reader_init(&reader, request, request_len);
+    mu_binary_writer_init(&writer, response, sizeof(response));
+    response_len = sizeof(response);
+    server->active_conn = &server->conns[1];
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, handle_open_secure_channel(server, &reader, &writer, &response_len));
+    TEST_ASSERT_TRUE(server->conns[1].secure_channel.is_open);
+
+    opcua_uint32_t id0 = server->conns[0].secure_channel.channel_id;
+    opcua_uint32_t id1 = server->conns[1].secure_channel.channel_id;
+
+    /* The collision was forced by identical entropy — uniqueness must be imposed. */
+    TEST_ASSERT_NOT_EQUAL_UINT32(0u, id0);
+    TEST_ASSERT_NOT_EQUAL_UINT32(0u, id1);
+    TEST_ASSERT_NOT_EQUAL_UINT32(id0, id1);
+
+    /* Routing invariant: each channel_id resolves to exactly one connection —
+       its own. A collision would make one session's notifications route to the
+       wrong (first-matching) connection. */
+    int matched = -1;
+    TEST_ASSERT_EQUAL(1, conns_matching_channel_id(server, id0, &matched));
+    TEST_ASSERT_EQUAL(0, matched);
+    matched = -1;
+    TEST_ASSERT_EQUAL(1, conns_matching_channel_id(server, id1, &matched));
+    TEST_ASSERT_EQUAL(1, matched);
+
+    server->active_conn = NULL;
+}
 #endif
 
 void test_secure_channel_open_none(void) {
@@ -553,6 +657,7 @@ int main(void) {
     RUN_TEST(test_opn_rejects_invalid_request_type);
 #if defined(MUC_OPCUA_MULTIPLE_CONNECTIONS) && MU_INTERN_MAX_CONNECTIONS > 1
     RUN_TEST(test_open_secure_channel_ids_are_unique_across_connections);
+    RUN_TEST(test_secure_channel_ids_unique_under_degenerate_entropy);
 #endif
     return UNITY_END();
 }
