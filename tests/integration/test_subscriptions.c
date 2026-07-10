@@ -799,6 +799,114 @@ static const mu_node_t samp_nodes[] = {{{1, MU_NODEID_NUMERIC, {5000}},
                                         &mon_value}};
 static const mu_address_space_t samp_space = {samp_nodes, 1};
 
+#if MUC_OPCUA_DATA_ACCESS
+/* An AnalogItem (5000) with an EURange Property (5001, value [0,200]) for the
+   Data Access percent-deadband accept path (spec 060). The Property is matched by
+   BrowseName "EURange"; its value is a 2-element Double array {low, high}. */
+static const opcua_double_t s_eurange_vals[2] = {0.0, 200.0};
+static const mu_value_source_t s_eurange_value = {
+    MU_VALUESOURCE_STATIC,
+    {.static_value = {.type = MU_TYPE_DOUBLE, .value.array = s_eurange_vals, .is_array = true, .array_length = 2}}};
+/* HasProperty->EURange only; the AnalogItemType type-definition is carried in the
+   node's cached .type_definition field (an explicit ns=0 HasTypeDefinition ref would
+   fail mu_address_space_validate, which requires ref targets to be in the same
+   user space — the established convention is the cached field). */
+static const mu_reference_t s_analog_item_refs[] = {
+    {{0, MU_NODEID_NUMERIC, {46}}, {1, MU_NODEID_NUMERIC, {5001}}, true}}; /* HasProperty->EURange */
+static const mu_node_t analog_nodes[] = {{{1, MU_NODEID_NUMERIC, {5000}},
+                                          MU_NODECLASS_VARIABLE,
+                                          {7, (const opcua_byte_t *)"SampVar"},
+                                          {7, (const opcua_byte_t *)"SampVar"},
+                                          s_analog_item_refs,
+                                          sizeof(s_analog_item_refs) / sizeof(s_analog_item_refs[0]),
+                                          &mon_value,
+                                          .type_definition = {0, MU_NODEID_NUMERIC, {2368}}},
+                                         {{1, MU_NODEID_NUMERIC, {5001}},
+                                          MU_NODECLASS_VARIABLE,
+                                          {7, (const opcua_byte_t *)"EURange"},
+                                          {7, (const opcua_byte_t *)"EURange"},
+                                          NULL,
+                                          0,
+                                          &s_eurange_value,
+                                          .type_definition = {0, MU_NODEID_NUMERIC, {68}}}};
+static const mu_address_space_t analog_space = {analog_nodes, 2};
+
+static void write_moncreate_item_filter(mu_binary_writer_t *w, opcua_uint16_t ns, opcua_uint32_t ident,
+                                        opcua_uint32_t client_handle, opcua_double_t interval, opcua_uint32_t trigger,
+                                        opcua_uint32_t deadband_type, opcua_double_t deadband_value,
+                                        opcua_uint32_t queue_size, bool discard_oldest);
+
+/* Spec 060 FR-1: CreateMonitoredItems with a percent-deadband filter on an
+   AnalogItem that has an EURange is accepted (Good); an out-of-range percentage
+   (>100) is rejected with Bad_DeadbandFilterInvalid. (The no-EURange rejection is
+   covered by test_standard_facet_errors; the reporting math by
+   test_percent_deadband.c.) */
+void test_percent_deadband_accepted_with_eurange(void) {
+    mock_t mock;
+    memset(&mock, 0, sizeof(mock));
+    enqueue_connect(&mock);
+    _Alignas(8) opcua_byte_t storage[MU_SERVER_STORAGE_BYTES];
+    mu_server_config_t config;
+    s_mon_val = 10;
+    mu_server_t *server = make_server(&mock, storage, sizeof(storage), &config, &analog_space);
+    mu_binary_reader_t body;
+    opcua_statuscode_t sr;
+    run_connect(server, &mock);
+    enqueue_create_subscription(&mock, 4, 200.0, 1000, 1000);
+    mu_server_poll(server);
+    TEST_ASSERT_EQUAL(ID_CREATESUBSCRIPTIONRESPONSE, parse_response(mock.last_write, mock.last_write_len, &body, &sr));
+    opcua_uint32_t sub_id;
+    mu_binary_read_uint32(&body, &sub_id);
+
+    opcua_byte_t tmp[512], chunk[512];
+    mu_binary_writer_t w;
+    size_t clen;
+    opcua_uint32_t dummy;
+
+    /* (1) percent 10% on the AnalogItem with EURange -> Good. */
+    mu_binary_writer_init(&w, tmp, sizeof(tmp));
+    {
+        mu_nodeid_t t = {0, MU_NODEID_NUMERIC, {ID_CREATEMONITOREDITEMSREQUEST}};
+        mu_binary_write_nodeid(&w, &t);
+    }
+    write_request_header(&w, TEST_FIRST_AUTH_TOKEN, 5);
+    mu_binary_write_uint32(&w, sub_id);
+    mu_binary_write_uint32(&w, 3);
+    mu_binary_write_int32(&w, 1);
+    write_moncreate_item_filter(&w, 1, 5000, 9, 100.0, 1, 2 /*Percent*/, 10.0, 1, true);
+    clen = build_msg(chunk, sizeof(chunk), 5, 5, tmp, w.position);
+    enqueue(&mock, chunk, clen);
+    mu_server_poll(server);
+    TEST_ASSERT_EQUAL(ID_CREATEMONITOREDITEMSRESPONSE,
+                      parse_response(mock.last_write, mock.last_write_len, &body, &sr));
+    opcua_int32_t nc;
+    mu_binary_read_int32(&body, &nc);
+    TEST_ASSERT_EQUAL(1, nc);
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, read_moncreate_result(&body, &dummy));
+
+    /* (2) percent 150% (out of [0,100]) -> Bad_DeadbandFilterInvalid. */
+    mu_binary_writer_init(&w, tmp, sizeof(tmp));
+    {
+        mu_nodeid_t t = {0, MU_NODEID_NUMERIC, {ID_CREATEMONITOREDITEMSREQUEST}};
+        mu_binary_write_nodeid(&w, &t);
+    }
+    write_request_header(&w, TEST_FIRST_AUTH_TOKEN, 6);
+    mu_binary_write_uint32(&w, sub_id);
+    mu_binary_write_uint32(&w, 3);
+    mu_binary_write_int32(&w, 1);
+    write_moncreate_item_filter(&w, 1, 5000, 9, 100.0, 1, 2 /*Percent*/, 150.0, 1, true);
+    clen = build_msg(chunk, sizeof(chunk), 6, 6, tmp, w.position);
+    enqueue(&mock, chunk, clen);
+    mu_server_poll(server);
+    TEST_ASSERT_EQUAL(ID_CREATEMONITOREDITEMSRESPONSE,
+                      parse_response(mock.last_write, mock.last_write_len, &body, &sr));
+    mu_binary_read_int32(&body, &nc);
+    TEST_ASSERT_EQUAL_HEX32(0x808E0000u, read_moncreate_result(&body, &dummy)); /* Bad_DeadbandFilterInvalid */
+
+    mu_server_close(server);
+}
+#endif /* MUC_OPCUA_DATA_ACCESS */
+
 /* Poll-driven sampling (OPC 10000-4 §5.12.1.6, §7.17.2): mu_subscriptions_tick samples a
    REPORTING MonitoredItem each sampling interval and flags a pending notification only when
    the value changes (StatusValue trigger). White-box check of the engine state via the
@@ -2363,8 +2471,11 @@ void test_standard_facet_errors(void) {
     mu_binary_writer_t w;
     size_t clen;
 
-    /* (1) CreateMonitoredItems with Percent deadband (seq 6) -> per-item
-       Bad_MonitoredItemFilterUnsupported (0x80440000). */
+    /* (1) CreateMonitoredItems with Percent deadband (seq 6) on a node that has no
+       EURange Property. Without the Data Access facet: percent deadband is
+       unsupported entirely -> Bad_MonitoredItemFilterUnsupported (0x80440000). With
+       the facet (spec 060): percent is supported, but this node lacks an EURange, so
+       it is rejected with Bad_DeadbandFilterInvalid (0x808E0000, OPC-10000-8 §7.3.2). */
     mu_binary_writer_init(&w, tmp, sizeof(tmp));
     {
         mu_nodeid_t t = {0, MU_NODEID_NUMERIC, {ID_CREATEMONITOREDITEMSREQUEST}};
@@ -2385,7 +2496,11 @@ void test_standard_facet_errors(void) {
     TEST_ASSERT_EQUAL(1, nc);
     opcua_uint32_t dummy;
     opcua_statuscode_t pst = read_moncreate_result(&body, &dummy);
-    TEST_ASSERT_EQUAL_HEX32(0x80440000u, pst);
+#if MUC_OPCUA_DATA_ACCESS
+    TEST_ASSERT_EQUAL_HEX32(0x808E0000u, pst); /* Bad_DeadbandFilterInvalid: no EURange */
+#else
+    TEST_ASSERT_EQUAL_HEX32(0x80440000u, pst); /* Bad_MonitoredItemFilterUnsupported */
+#endif
 
     /* (2) SetTriggering with a valid triggering item but unknown link id (seq 7) → per-link
        Bad_MonitoredItemIdInvalid. */
@@ -2440,6 +2555,9 @@ int main(void) {
 #endif
     RUN_TEST(test_set_triggering);
     RUN_TEST(test_standard_facet_errors);
+#if MUC_OPCUA_DATA_ACCESS
+    RUN_TEST(test_percent_deadband_accepted_with_eurange);
+#endif
 #endif
     RUN_TEST(test_create_subscription);
     RUN_TEST(test_create_subscription_too_many);

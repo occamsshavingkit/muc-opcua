@@ -233,5 +233,44 @@ opcua_statuscode_t mu_binary_read_range(mu_binary_reader_t *reader, mu_range_t *
         return s;
     return mu_binary_read_double(reader, &value->high);
 }
+
+opcua_statuscode_t mu_binary_read_localized_text(mu_binary_reader_t *reader, mu_localized_text_t *value) {
+    if (!reader || !value)
+        return MU_STATUS_BAD_INTERNALERROR;
+    value->locale.length = -1;
+    value->locale.data = NULL;
+    value->text.length = -1;
+    value->text.data = NULL;
+    opcua_byte_t mask = 0;
+    opcua_statuscode_t s = mu_binary_read_byte(reader, &mask);
+    if (s != MU_STATUS_GOOD)
+        return s;
+    if (mask & 0x01u) {
+        s = mu_binary_read_string(reader, &value->locale);
+        if (s != MU_STATUS_GOOD)
+            return s;
+    }
+    if (mask & 0x02u) {
+        s = mu_binary_read_string(reader, &value->text);
+        if (s != MU_STATUS_GOOD)
+            return s;
+    }
+    return MU_STATUS_GOOD;
+}
+
+opcua_statuscode_t mu_binary_read_eu_information(mu_binary_reader_t *reader, mu_eu_information_t *value) {
+    if (!reader || !value)
+        return MU_STATUS_BAD_INTERNALERROR;
+    opcua_statuscode_t s = mu_binary_read_string(reader, &value->namespace_uri);
+    if (s != MU_STATUS_GOOD)
+        return s;
+    s = mu_binary_read_int32(reader, &value->unit_id);
+    if (s != MU_STATUS_GOOD)
+        return s;
+    s = mu_binary_read_localized_text(reader, &value->display_name);
+    if (s != MU_STATUS_GOOD)
+        return s;
+    return mu_binary_read_localized_text(reader, &value->description);
+}
 #endif
 #endif

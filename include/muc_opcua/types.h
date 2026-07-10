@@ -89,11 +89,13 @@ typedef struct {
     opcua_double_t high;
 } mu_range_t;
 
+/* EUInformation (OPC-10000-8 §5.6.4.3, DataType 887). displayName/description are
+   LocalizedText per the spec (not plain String). */
 typedef struct {
     mu_string_t namespace_uri;
     opcua_int32_t unit_id;
-    mu_string_t display_name;
-    mu_string_t description;
+    mu_localized_text_t display_name;
+    mu_localized_text_t description;
 } mu_eu_information_t;
 #endif /* MUC_OPCUA_DATA_ACCESS */
 

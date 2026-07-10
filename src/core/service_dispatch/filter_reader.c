@@ -150,9 +150,20 @@ opcua_statuscode_t read_datachange_filter_body(mu_binary_reader_t *r, size_t fil
     case 2u:
         body->deadband_type = MU_DEADBAND_TYPE_PERCENT;
         body->deadband_value = deadband_value;
+#if MUC_OPCUA_DATA_ACCESS
+        /* Data Access Server Facet (spec 060): PercentDeadband is supported. The
+           value must be a percentage in [0.0, 100.0] (OPC-10000-8 §7.2); the
+           EURange presence check happens at item creation (§7.3.2). */
+        if (body->filter_result == MU_STATUS_GOOD && (deadband_value < 0.0 || deadband_value > 100.0)) {
+            body->filter_result = MU_STATUS_BAD_DEADBANDFILTERINVALID;
+        }
+#else
+        /* Without the Data Access facet the server does not support percent
+           deadband (it belongs to that facet, not the base data-change subset). */
         if (body->filter_result == MU_STATUS_GOOD) {
             body->filter_result = MU_STATUS_BAD_MONITOREDITEMFILTERUNSUPPORTED;
         }
+#endif
         break;
     default:
         body->filter_result = MU_STATUS_BAD_MONITOREDITEMFILTERINVALID;

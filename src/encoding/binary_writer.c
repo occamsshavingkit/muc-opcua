@@ -140,4 +140,43 @@ opcua_statuscode_t mu_binary_write_range(mu_binary_writer_t *writer, const mu_ra
         return s;
     return mu_binary_write_double(writer, value->high);
 }
+
+opcua_statuscode_t mu_binary_write_localized_text(mu_binary_writer_t *writer, const mu_localized_text_t *value) {
+    if (!writer || !value)
+        return MU_STATUS_BAD_INTERNALERROR;
+    opcua_byte_t mask = 0;
+    if (value->locale.length >= 0)
+        mask |= 0x01u;
+    if (value->text.length >= 0)
+        mask |= 0x02u;
+    opcua_statuscode_t s = mu_binary_write_byte(writer, mask);
+    if (s != MU_STATUS_GOOD)
+        return s;
+    if (mask & 0x01u) {
+        s = mu_binary_write_string(writer, &value->locale);
+        if (s != MU_STATUS_GOOD)
+            return s;
+    }
+    if (mask & 0x02u) {
+        s = mu_binary_write_string(writer, &value->text);
+        if (s != MU_STATUS_GOOD)
+            return s;
+    }
+    return MU_STATUS_GOOD;
+}
+
+opcua_statuscode_t mu_binary_write_eu_information(mu_binary_writer_t *writer, const mu_eu_information_t *value) {
+    if (!writer || !value)
+        return MU_STATUS_BAD_INTERNALERROR;
+    opcua_statuscode_t s = mu_binary_write_string(writer, &value->namespace_uri);
+    if (s != MU_STATUS_GOOD)
+        return s;
+    s = mu_binary_write_int32(writer, value->unit_id);
+    if (s != MU_STATUS_GOOD)
+        return s;
+    s = mu_binary_write_localized_text(writer, &value->display_name);
+    if (s != MU_STATUS_GOOD)
+        return s;
+    return mu_binary_write_localized_text(writer, &value->description);
+}
 #endif

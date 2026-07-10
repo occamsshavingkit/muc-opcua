@@ -28,7 +28,7 @@ in only the surface you need.
 - **Tiny flash.** Measured snapshot (2026-07-10, reproduce with
   `scripts/measure_size.sh all`): a complete Nano server is **17.5 KiB**
   (17,956 B) of Arm Cortex-M0+ `-Os` core `.text`; Micro is **28.9 KiB**
-  (29,550 B); Standard 2017 is **69.7 KiB** (71,370 B). Every profile has
+  (29,550 B); Standard 2017 is **74.0 KiB** (75,827 B). Every profile has
   0 B `.data` and 0 B `.bss` — the library holds no mutable static state and
   never calls `malloc`.
 - **Freestanding & portable.** Plain C11 core with no OS assumptions. Hardware and OS
@@ -59,8 +59,8 @@ smaller after `--gc-sections` dead-code elimination.
 | nano | 17,956 B | Nano Embedded Device 2017 |
 | micro | 29,550 B | Micro Embedded Device 2017 |
 | embedded | 54,616 B | Embedded 2017 UA Server |
-| standard | 71,370 B | Standard 2017 UA Server |
-| full | 71,354 B | — (everything on; also carries `MUC_OPCUA_ECC`) |
+| standard | 75,827 B | Standard 2017 UA Server |
+| full | 75,811 B | — (everything on; also carries `MUC_OPCUA_ECC` + Data Access) |
 
 Built with LTO (`MUC_OPCUA_LTO=ON`, the default). The `nano`/`micro`/`embedded`
 profiles are strictly no-heap (`MUC_OPCUA_ALLOW_HEAP=OFF`): 0 B `.data`, 0 B `.bss`,
@@ -241,6 +241,7 @@ Full, spec-section-cited matrices:
 - [docs/conformance/profile-micro.md](docs/conformance/profile-micro.md) — Micro profile
 - [docs/conformance/security.md](docs/conformance/security.md) — security notes
 - [docs/conformance/ecc-security-policy.md](docs/conformance/ecc-security-policy.md) — optional ECC SecurityPolicy CU (ECC-A + ECC-B)
+- [docs/conformance/data-access.md](docs/conformance/data-access.md) — Data Access Server Facet (AnalogItem/discrete types, percent deadband)
 
 ---
 

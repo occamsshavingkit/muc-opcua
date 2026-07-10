@@ -2,6 +2,7 @@
 #include "base_nodes.h"
 #include "muc_opcua/opcua_ids.h"
 #include <stddef.h>
+#include <string.h>
 
 #ifdef MUC_OPCUA_BASE_NODES
 
@@ -75,6 +76,29 @@ static const opcua_byte_t s_str_ServerRedundancy[] = "ServerRedundancy";
 static const opcua_byte_t s_str_Namespaces[] = "Namespaces";
 static const opcua_byte_t s_str_RedundancySupport[] = "RedundancySupport";
 static const opcua_byte_t s_str_ServiceLevel[] = "ServiceLevel";
+#if MUC_OPCUA_DATA_ACCESS
+/* Spec 060: Data Access type-system BrowseNames (OPC-10000-8 §5.3). */
+static const opcua_byte_t s_str_AnalogItemType[] = "AnalogItemType";
+static const opcua_byte_t s_str_AnalogUnitType[] = "AnalogUnitType";
+static const opcua_byte_t s_str_BaseAnalogType[] = "BaseAnalogType";
+static const opcua_byte_t s_str_DataItemType[] = "DataItemType";
+static const opcua_byte_t s_str_Definition[] = "Definition";
+static const opcua_byte_t s_str_DiscreteItemType[] = "DiscreteItemType";
+static const opcua_byte_t s_str_EURange[] = "EURange";
+static const opcua_byte_t s_str_EngineeringUnits[] = "EngineeringUnits";
+static const opcua_byte_t s_str_EnumStrings[] = "EnumStrings";
+static const opcua_byte_t s_str_EnumValues[] = "EnumValues";
+static const opcua_byte_t s_str_FalseState[] = "FalseState";
+static const opcua_byte_t s_str_InstrumentRange[] = "InstrumentRange";
+static const opcua_byte_t s_str_Mandatory[] = "Mandatory";
+static const opcua_byte_t s_str_MultiStateDiscreteType[] = "MultiStateDiscreteType";
+static const opcua_byte_t s_str_MultiStateValueDiscreteType[] = "MultiStateValueDiscreteType";
+static const opcua_byte_t s_str_Optional[] = "Optional";
+static const opcua_byte_t s_str_TrueState[] = "TrueState";
+static const opcua_byte_t s_str_TwoStateDiscreteType[] = "TwoStateDiscreteType";
+static const opcua_byte_t s_str_ValueAsText[] = "ValueAsText";
+static const opcua_byte_t s_str_ValuePrecision[] = "ValuePrecision";
+#endif
 static const opcua_byte_t s_str_en[] = "en";
 static const opcua_byte_t s_str_http___opcfoundation_org_UA_Profile_Server_EmbeddedUA2017[] =
     "http://opcfoundation.org/UA-Profile/Server/EmbeddedUA2017";
@@ -170,10 +194,84 @@ static const mu_reference_t s_base_variable_type_refs[] = {
     {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {63}}, true}};
 
 static const mu_reference_t s_base_data_variable_type_refs[] = {
-    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {68}}, true}};
+    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {68}}, true},
+#if MUC_OPCUA_DATA_ACCESS
+    /* Spec 060: BaseDataVariableType HasSubtype-> DataItemType (2365). */
+    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {2365}}, true}
+#endif
+};
 
 static const mu_reference_t s_property_type_ref[] = {
     {{0, MU_NODEID_NUMERIC, {40}}, {0, MU_NODEID_NUMERIC, {68}}, true}};
+
+#if MUC_OPCUA_DATA_ACCESS
+/* Spec 060 (OPC-10000-8 §5.3): Data Access VariableType subtype/property graph.
+ * HasSubtype(45) forward refs live on the PARENT type node (matching the
+ * BaseVariableType(62)->BaseDataVariableType(63) convention above); each type's
+ * HasProperty(46) forward refs point at its property instance-declarations. */
+
+/* Property instance-declarations carry HasTypeDefinition(40)->PropertyType(68)
+ * plus HasModellingRule(37)->Mandatory(78)/Optional(80). Shared by rule. */
+static const mu_reference_t s_da_prop_mandatory_refs[] = {
+    {{0, MU_NODEID_NUMERIC, {40}}, {0, MU_NODEID_NUMERIC, {68}}, true},
+    {{0, MU_NODEID_NUMERIC, {37}}, {0, MU_NODEID_NUMERIC, {78}}, true}};
+
+static const mu_reference_t s_da_prop_optional_refs[] = {
+    {{0, MU_NODEID_NUMERIC, {40}}, {0, MU_NODEID_NUMERIC, {68}}, true},
+    {{0, MU_NODEID_NUMERIC, {37}}, {0, MU_NODEID_NUMERIC, {80}}, true}};
+
+/* DataItemType (2365): HasSubtype-> DiscreteItemType(2372), BaseAnalogType(15318);
+ * optional props Definition(2366), ValuePrecision(2367). */
+static const mu_reference_t s_da_data_item_type_refs[] = {
+    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {2372}}, true},
+    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {15318}}, true},
+    {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {2366}}, true},
+    {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {2367}}, true}};
+
+/* AnalogItemType (2368): mandatory EURange(2369); optional InstrumentRange(2370),
+ * EngineeringUnits(2371). */
+static const mu_reference_t s_da_analog_item_type_refs[] = {
+    {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {2369}}, true},
+    {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {2370}}, true},
+    {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {2371}}, true}};
+
+/* DiscreteItemType (2372, abstract): HasSubtype-> TwoStateDiscreteType(2373),
+ * MultiStateDiscreteType(2376), MultiStateValueDiscreteType(11238). */
+static const mu_reference_t s_da_discrete_item_type_refs[] = {
+    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {2373}}, true},
+    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {2376}}, true},
+    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {11238}}, true}};
+
+/* TwoStateDiscreteType (2373): mandatory FalseState(2374), TrueState(2375). */
+static const mu_reference_t s_da_two_state_discrete_type_refs[] = {
+    {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {2374}}, true},
+    {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {2375}}, true}};
+
+/* MultiStateDiscreteType (2376): mandatory EnumStrings(2377). */
+static const mu_reference_t s_da_multi_state_discrete_type_refs[] = {
+    {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {2377}}, true}};
+
+/* MultiStateValueDiscreteType (11238): mandatory EnumValues(11241), ValueAsText(11461). */
+static const mu_reference_t s_da_multi_state_value_discrete_type_refs[] = {
+    {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {11241}}, true},
+    {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {11461}}, true}};
+
+/* BaseAnalogType (15318): HasSubtype-> AnalogItemType(2368), AnalogUnitType(17497);
+ * optional props InstrumentRange(17567), EURange(17568), EngineeringUnits(17569). */
+static const mu_reference_t s_da_base_analog_type_refs[] = {
+    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {2368}}, true},
+    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {17497}}, true},
+    {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {17567}}, true},
+    {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {17568}}, true},
+    {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {17569}}, true}};
+
+/* AnalogUnitType (17497): mandatory EngineeringUnits(17502); optional
+ * InstrumentRange(17500), EURange(17501). */
+static const mu_reference_t s_da_analog_unit_type_refs[] = {
+    {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {17500}}, true},
+    {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {17501}}, true},
+    {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {17502}}, true}};
+#endif /* MUC_OPCUA_DATA_ACCESS */
 
 #if MUC_OPCUA_SUBSCRIPTIONS_STANDARD
 static const mu_reference_t s_get_monitored_items_refs[] = {
@@ -553,6 +651,25 @@ static const mu_node_t s_base_nodes[] = {
      0,
      NULL,
      .type_definition = {0}},
+#if MUC_OPCUA_DATA_ACCESS
+    /* Spec 060: ModellingRule targets so a property's HasModellingRule resolves. */
+    {{0, MU_NODEID_NUMERIC, {78}},
+     MU_NODECLASS_OBJECT,
+     {9, s_str_Mandatory},
+     {9, s_str_Mandatory},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0}},
+    {{0, MU_NODEID_NUMERIC, {80}},
+     MU_NODECLASS_OBJECT,
+     {8, s_str_Optional},
+     {8, s_str_Optional},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0}},
+#endif
     {{0, MU_NODEID_NUMERIC, {84}},
      MU_NODECLASS_OBJECT,
      {4, s_str_Root},
@@ -689,6 +806,137 @@ static const mu_node_t s_base_nodes[] = {
      sizeof(s_property_type_ref) / sizeof(s_property_type_ref[0]),
      &s_locale_id_array_value,
      .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+#if MUC_OPCUA_DATA_ACCESS
+    /* Spec 060: Data Access types + property instance-declarations (2365..11461). */
+    {{0, MU_NODEID_NUMERIC, {2365}},
+     MU_NODECLASS_VARIABLETYPE,
+     {12, s_str_DataItemType},
+     {12, s_str_DataItemType},
+     s_da_data_item_type_refs,
+     sizeof(s_da_data_item_type_refs) / sizeof(s_da_data_item_type_refs[0]),
+     NULL,
+     .type_definition = {0}},
+    {{0, MU_NODEID_NUMERIC, {2366}},
+     MU_NODECLASS_VARIABLE,
+     {10, s_str_Definition},
+     {10, s_str_Definition},
+     s_da_prop_optional_refs,
+     sizeof(s_da_prop_optional_refs) / sizeof(s_da_prop_optional_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+    {{0, MU_NODEID_NUMERIC, {2367}},
+     MU_NODECLASS_VARIABLE,
+     {14, s_str_ValuePrecision},
+     {14, s_str_ValuePrecision},
+     s_da_prop_optional_refs,
+     sizeof(s_da_prop_optional_refs) / sizeof(s_da_prop_optional_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+    {{0, MU_NODEID_NUMERIC, {2368}},
+     MU_NODECLASS_VARIABLETYPE,
+     {14, s_str_AnalogItemType},
+     {14, s_str_AnalogItemType},
+     s_da_analog_item_type_refs,
+     sizeof(s_da_analog_item_type_refs) / sizeof(s_da_analog_item_type_refs[0]),
+     NULL,
+     .type_definition = {0}},
+    {{0, MU_NODEID_NUMERIC, {2369}},
+     MU_NODECLASS_VARIABLE,
+     {7, s_str_EURange},
+     {7, s_str_EURange},
+     s_da_prop_mandatory_refs,
+     sizeof(s_da_prop_mandatory_refs) / sizeof(s_da_prop_mandatory_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+    {{0, MU_NODEID_NUMERIC, {2370}},
+     MU_NODECLASS_VARIABLE,
+     {15, s_str_InstrumentRange},
+     {15, s_str_InstrumentRange},
+     s_da_prop_optional_refs,
+     sizeof(s_da_prop_optional_refs) / sizeof(s_da_prop_optional_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+    {{0, MU_NODEID_NUMERIC, {2371}},
+     MU_NODECLASS_VARIABLE,
+     {16, s_str_EngineeringUnits},
+     {16, s_str_EngineeringUnits},
+     s_da_prop_optional_refs,
+     sizeof(s_da_prop_optional_refs) / sizeof(s_da_prop_optional_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+    {{0, MU_NODEID_NUMERIC, {2372}},
+     MU_NODECLASS_VARIABLETYPE,
+     {16, s_str_DiscreteItemType},
+     {16, s_str_DiscreteItemType},
+     s_da_discrete_item_type_refs,
+     sizeof(s_da_discrete_item_type_refs) / sizeof(s_da_discrete_item_type_refs[0]),
+     NULL,
+     .type_definition = {0}},
+    {{0, MU_NODEID_NUMERIC, {2373}},
+     MU_NODECLASS_VARIABLETYPE,
+     {20, s_str_TwoStateDiscreteType},
+     {20, s_str_TwoStateDiscreteType},
+     s_da_two_state_discrete_type_refs,
+     sizeof(s_da_two_state_discrete_type_refs) / sizeof(s_da_two_state_discrete_type_refs[0]),
+     NULL,
+     .type_definition = {0}},
+    {{0, MU_NODEID_NUMERIC, {2374}},
+     MU_NODECLASS_VARIABLE,
+     {10, s_str_FalseState},
+     {10, s_str_FalseState},
+     s_da_prop_mandatory_refs,
+     sizeof(s_da_prop_mandatory_refs) / sizeof(s_da_prop_mandatory_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+    {{0, MU_NODEID_NUMERIC, {2375}},
+     MU_NODECLASS_VARIABLE,
+     {9, s_str_TrueState},
+     {9, s_str_TrueState},
+     s_da_prop_mandatory_refs,
+     sizeof(s_da_prop_mandatory_refs) / sizeof(s_da_prop_mandatory_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+    {{0, MU_NODEID_NUMERIC, {2376}},
+     MU_NODECLASS_VARIABLETYPE,
+     {22, s_str_MultiStateDiscreteType},
+     {22, s_str_MultiStateDiscreteType},
+     s_da_multi_state_discrete_type_refs,
+     sizeof(s_da_multi_state_discrete_type_refs) / sizeof(s_da_multi_state_discrete_type_refs[0]),
+     NULL,
+     .type_definition = {0}},
+    {{0, MU_NODEID_NUMERIC, {2377}},
+     MU_NODECLASS_VARIABLE,
+     {11, s_str_EnumStrings},
+     {11, s_str_EnumStrings},
+     s_da_prop_mandatory_refs,
+     sizeof(s_da_prop_mandatory_refs) / sizeof(s_da_prop_mandatory_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+    {{0, MU_NODEID_NUMERIC, {11238}},
+     MU_NODECLASS_VARIABLETYPE,
+     {27, s_str_MultiStateValueDiscreteType},
+     {27, s_str_MultiStateValueDiscreteType},
+     s_da_multi_state_value_discrete_type_refs,
+     sizeof(s_da_multi_state_value_discrete_type_refs) / sizeof(s_da_multi_state_value_discrete_type_refs[0]),
+     NULL,
+     .type_definition = {0}},
+    {{0, MU_NODEID_NUMERIC, {11241}},
+     MU_NODECLASS_VARIABLE,
+     {10, s_str_EnumValues},
+     {10, s_str_EnumValues},
+     s_da_prop_mandatory_refs,
+     sizeof(s_da_prop_mandatory_refs) / sizeof(s_da_prop_mandatory_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+    {{0, MU_NODEID_NUMERIC, {11461}},
+     MU_NODECLASS_VARIABLE,
+     {11, s_str_ValueAsText},
+     {11, s_str_ValueAsText},
+     s_da_prop_mandatory_refs,
+     sizeof(s_da_prop_mandatory_refs) / sizeof(s_da_prop_mandatory_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+#endif /* MUC_OPCUA_DATA_ACCESS */
 #if MUC_OPCUA_SUBSCRIPTIONS_STANDARD
     {{0, MU_NODEID_NUMERIC, {11492}},
      MU_NODECLASS_METHOD,
@@ -792,6 +1040,74 @@ static const mu_node_t s_base_nodes[] = {
      NULL,
      .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
 #endif
+#if MUC_OPCUA_DATA_ACCESS
+    /* Spec 060: BaseAnalogType + AnalogUnitType and their property instances
+     * (15318..17569), sorted after all preceding NodeIds. */
+    {{0, MU_NODEID_NUMERIC, {15318}},
+     MU_NODECLASS_VARIABLETYPE,
+     {14, s_str_BaseAnalogType},
+     {14, s_str_BaseAnalogType},
+     s_da_base_analog_type_refs,
+     sizeof(s_da_base_analog_type_refs) / sizeof(s_da_base_analog_type_refs[0]),
+     NULL,
+     .type_definition = {0}},
+    {{0, MU_NODEID_NUMERIC, {17497}},
+     MU_NODECLASS_VARIABLETYPE,
+     {14, s_str_AnalogUnitType},
+     {14, s_str_AnalogUnitType},
+     s_da_analog_unit_type_refs,
+     sizeof(s_da_analog_unit_type_refs) / sizeof(s_da_analog_unit_type_refs[0]),
+     NULL,
+     .type_definition = {0}},
+    {{0, MU_NODEID_NUMERIC, {17500}},
+     MU_NODECLASS_VARIABLE,
+     {15, s_str_InstrumentRange},
+     {15, s_str_InstrumentRange},
+     s_da_prop_optional_refs,
+     sizeof(s_da_prop_optional_refs) / sizeof(s_da_prop_optional_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+    {{0, MU_NODEID_NUMERIC, {17501}},
+     MU_NODECLASS_VARIABLE,
+     {7, s_str_EURange},
+     {7, s_str_EURange},
+     s_da_prop_optional_refs,
+     sizeof(s_da_prop_optional_refs) / sizeof(s_da_prop_optional_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+    {{0, MU_NODEID_NUMERIC, {17502}},
+     MU_NODECLASS_VARIABLE,
+     {16, s_str_EngineeringUnits},
+     {16, s_str_EngineeringUnits},
+     s_da_prop_mandatory_refs,
+     sizeof(s_da_prop_mandatory_refs) / sizeof(s_da_prop_mandatory_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+    {{0, MU_NODEID_NUMERIC, {17567}},
+     MU_NODECLASS_VARIABLE,
+     {15, s_str_InstrumentRange},
+     {15, s_str_InstrumentRange},
+     s_da_prop_optional_refs,
+     sizeof(s_da_prop_optional_refs) / sizeof(s_da_prop_optional_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+    {{0, MU_NODEID_NUMERIC, {17568}},
+     MU_NODECLASS_VARIABLE,
+     {7, s_str_EURange},
+     {7, s_str_EURange},
+     s_da_prop_optional_refs,
+     sizeof(s_da_prop_optional_refs) / sizeof(s_da_prop_optional_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+    {{0, MU_NODEID_NUMERIC, {17569}},
+     MU_NODECLASS_VARIABLE,
+     {16, s_str_EngineeringUnits},
+     {16, s_str_EngineeringUnits},
+     s_da_prop_optional_refs,
+     sizeof(s_da_prop_optional_refs) / sizeof(s_da_prop_optional_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+#endif /* MUC_OPCUA_DATA_ACCESS */
 };
 #else
 static const mu_node_t s_base_nodes[] = {
@@ -1055,26 +1371,36 @@ const mu_node_t *mu_resolve_node(const mu_address_space_t *user, mu_address_spac
 }
 
 #if MUC_OPCUA_DATA_ACCESS
-double mu_resolve_eurange_span(const struct mu_server *server, const mu_node_t *node) {
-    (void)server;
-    if (node == NULL || node->references == NULL) {
-        return 0.0;
+bool mu_resolve_eurange_span(const mu_address_space_t *user, mu_address_space_index_t *user_index,
+                             const mu_address_space_t *dynamic, const mu_node_t *node, double *out_span) {
+    if (node == NULL || node->references == NULL || out_span == NULL) {
+        return false;
     }
+    /* The EURange Property is identified by its BrowseName "EURange" (OPC-10000-8
+       §5.3.2), NOT a fixed NodeId: on an instance the Property node has an
+       integrator-assigned NodeId. Its value is a Range (low, high) carried as a
+       2-element Double array. */
+    static const opcua_byte_t k_eurange[] = "EURange";
     for (size_t i = 0; i < node->reference_count; ++i) {
-        if (node->references[i].reference_type_id.identifier.numeric == 46u && /* HasProperty */
-            node->references[i].target_id.identifier.numeric == MU_ID_EURANGE) {
-            const mu_node_t *range_node = mu_resolve_node(NULL, NULL, NULL, &node->references[i].target_id);
-            if (range_node != NULL) {
-                if (range_node->value != NULL && range_node->value->type == MU_VALUESOURCE_STATIC) {
-                    const mu_variant_t *sv = &range_node->value->data.static_value;
-                    if (sv->type == MU_TYPE_DOUBLE && sv->value.array != NULL) {
-                        const opcua_double_t *darr = (const opcua_double_t *)sv->value.array;
-                        return darr[1] - darr[0]; /* High - Low */
-                    }
-                }
+        if (node->references[i].reference_type_id.identifier.numeric != 46u) { /* HasProperty */
+            continue;
+        }
+        const mu_node_t *prop = mu_resolve_node(user, user_index, dynamic, &node->references[i].target_id);
+        if (prop == NULL || prop->browse_name.length != (opcua_int32_t)(sizeof(k_eurange) - 1u) ||
+            memcmp(prop->browse_name.data, k_eurange, sizeof(k_eurange) - 1u) != 0) {
+            continue;
+        }
+        if (prop->value != NULL && prop->value->type == MU_VALUESOURCE_STATIC) {
+            const mu_variant_t *sv = &prop->value->data.static_value;
+            if (sv->type == MU_TYPE_DOUBLE && sv->value.array != NULL) {
+                const opcua_double_t *darr = (const opcua_double_t *)sv->value.array;
+                *out_span = darr[1] - darr[0]; /* High - Low; may be 0.0 (valid) */
+                return true;
             }
         }
+        /* EURange Property found but its value is unreadable: treat as absent
+           (cannot compute a percent threshold). */
     }
-    return 0.0;
+    return false;
 }
 #endif

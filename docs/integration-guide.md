@@ -635,6 +635,45 @@ Once enabled, clients can dynamically add variables or objects using `AddNodes` 
 - Lookup is by NodeId. For up to `MU_MAX_ADDRESS_SPACE_NODES` nodes (default 64,
   `-D`-overridable; index costs 2 bytes RAM/node) the library keeps a sorted index
   for binary-search lookup; beyond that it falls back to a linear scan.
+- **Reference targets must be in the SAME address space.** `mu_address_space_validate`
+  rejects a reference whose target is a base (ns=0) node — so to give an instance a
+  TypeDefinition, set the node's cached `type_definition` field rather than adding an
+  explicit `HasTypeDefinition` reference to a ns=0 type node.
+
+### 4.6 Exposing a Data Access AnalogItem (`MUC_OPCUA_DATA_ACCESS`)
+
+The Data Access Server Facet (spec 060) serves the DA VariableType nodes
+(`AnalogItemType` 2368, `DataItemType`, the discrete types, …); the library serves
+the *type system*, you supply the *instances*. To expose an AnalogItem whose value
+supports percent-deadband monitoring, declare a Variable typed `AnalogItemType` with a
+`HasProperty` to an `EURange` Property node (BrowseName **"EURange"**) whose value is a
+2-element `Double` array `{low, high}`:
+
+```c
+static const opcua_double_t k_eurange[2] = {0.0, 200.0};   /* low, high */
+static const mu_value_source_t eurange_value = {
+    MU_VALUESOURCE_STATIC,
+    {.static_value = {.type = MU_TYPE_DOUBLE, .value.array = k_eurange,
+                      .is_array = true, .array_length = 2}}};
+static const mu_reference_t analog_refs[] = {
+    {{0, MU_NODEID_NUMERIC, {46}}, {1, MU_NODEID_NUMERIC, {5001}}, true}}; /* HasProperty->EURange */
+static const mu_node_t da_nodes[] = {
+    {{1, MU_NODEID_NUMERIC, {5000}}, MU_NODECLASS_VARIABLE,
+     {8, (const opcua_byte_t *)"TempSens"}, {8, (const opcua_byte_t *)"TempSens"},
+     analog_refs, 1, &temp_value, .type_definition = {0, MU_NODEID_NUMERIC, {2368}}},
+    {{1, MU_NODEID_NUMERIC, {5001}}, MU_NODECLASS_VARIABLE,
+     {7, (const opcua_byte_t *)"EURange"}, {7, (const opcua_byte_t *)"EURange"},
+     NULL, 0, &eurange_value, .type_definition = {0, MU_NODEID_NUMERIC, {68}}}};
+```
+
+The percent-deadband threshold is then `(deadbandValue/100) × (high − low)`
+(here `high − low = 200`). A client `CreateMonitoredItems` with a percent
+DataChangeFilter on node 5000 is accepted; the same request on a Variable with no
+EURange Property is rejected with `Bad_DeadbandFilterInvalid`. The
+`EngineeringUnits` Property (DataType `EUInformation`) is optional on AnalogItemType;
+encode its value with `mu_binary_write_eu_information`. See
+[docs/conformance/data-access.md](conformance/data-access.md) for the full type
+model and the grounded percent-deadband rules.
 
 ---
 
