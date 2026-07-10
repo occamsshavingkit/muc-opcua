@@ -1,5 +1,30 @@
 # Feature Size Ledger
 
+## 2026-07-10: Spec 061 — Standard Event Subscription Server Facet (Project B, B2)
+
+Cumulative archive `.text` (ARM Cortex-M0+ `-Os`, `scripts/measure_size.sh all`) after
+the EventFilter WhereClause (ContentFilter) evaluator: a real operand-tree decoder +
+typed-value evaluator (`event_filter.c`, `filter_reader.c` where-clause decode), the
+item-owned compact `mu_where_clause_t` storage, and the encode-time count backpatch.
+`MUC_OPCUA_EVENT_FILTER_WHERE` is default **ON for standard/full**, OFF elsewhere;
+it now requires `MUC_OPCUA_SUBSCRIPTIONS_STANDARD` (features.h guard).
+
+| Profile | prev (main) | now | Δ | why |
+|---------|------------:|----:|--:|-----|
+| nano | 17,956 | 17,956 | 0 | no events |
+| micro | 29,706 | 29,706 | 0 | no events |
+| embedded | 54,760 | 54,972 | +212 | events on, WHERE off: only the shared select-clause resolver refactor (`read_simple_attribute_fields` + unified `mu_event_field_from_name`) |
+| standard | 75,927 | 78,120 | +2,193 | **WHERE feature**: operand-tree decode + typed evaluator (Equals/IsNull/relational/Between/InList/And/Or/Not/Like/OfType), backpatched EventFieldList count |
+| full | 75,911 | 78,112 | +2,201 | same as standard |
+
+**Gating intact:** the ~2.2 KB evaluator lands only in WHERE-ON profiles; the +212 B on
+embedded is the events-shared select-resolver consolidation (removed the duplicate
+5-field resolver in favour of the unified 0-8 one). nano/micro byte-for-byte unchanged.
+
+**Headroom:** `full` = **78,112 B** — ~52,960 B under the 128 KiB Project-B facet stopper.
+Per-item RAM grows by the compact `mu_where_clause_t` (~0.5 KB, WHERE-only, accounted in
+`MU_WHERE_CLAUSE_STORAGE_BYTES`).
+
 ## 2026-07-10: Spec 060 — Data Access Server Facet (Project B, B1)
 
 Cumulative archive `.text` (ARM Cortex-M0+ `-Os`, `scripts/measure_size.sh all`) after

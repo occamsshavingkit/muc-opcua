@@ -42,6 +42,13 @@
 #error "MUC_OPCUA_EVENT_FILTER_WHERE requires MUC_OPCUA_EVENTS"
 #endif
 
+/* The Standard Event Subscription facet's WhereClause evaluation is created and
+   flagged through the standard MonitoredItem filter path (per-item filterResult),
+   so it requires the standard subscription facet. */
+#if defined(MUC_OPCUA_EVENT_FILTER_WHERE) && MUC_OPCUA_EVENT_FILTER_WHERE && !MUC_OPCUA_SUBSCRIPTIONS_STANDARD
+#error "MUC_OPCUA_EVENT_FILTER_WHERE requires MUC_OPCUA_SUBSCRIPTIONS_STANDARD"
+#endif
+
 /* Auditing requires events for audit event delivery. */
 #if defined(MUC_OPCUA_AUDITING) && MUC_OPCUA_AUDITING && !MUC_OPCUA_EVENTS
 #error "MUC_OPCUA_AUDITING requires MUC_OPCUA_EVENTS"

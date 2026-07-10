@@ -328,6 +328,9 @@ opcua_statuscode_t configure_monitored_item(mu_monitored_item_t *item, const mu_
 #ifdef MUC_OPCUA_EVENTS
     item->select_clauses_count = body->select_clauses_count;
     memcpy(item->select_clauses, body->select_clauses, sizeof(item->select_clauses));
+#if MUC_OPCUA_EVENT_FILTER_WHERE
+    item->where_clause = body->where_clause; /* compact, self-contained (blob-owned) */
+#endif
 #endif
 #if MUC_OPCUA_SUBSCRIPTIONS_STANDARD
     item->trigger = (opcua_byte_t)body->trigger;

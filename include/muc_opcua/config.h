@@ -210,13 +210,24 @@
 #define MU_CHUNK_ASSEMBLY_STORAGE_BYTES 0
 #endif
 
+/* Per-MonitoredItem owned EventFilter WhereClause (spec 061); zero unless the
+ * where-clause evaluator is compiled in. Over-estimates the compact
+ * mu_where_clause_t (elements + operands + literal blob). */
+#if MUC_OPCUA_EVENT_FILTER_WHERE
+#define MU_WHERE_CLAUSE_STORAGE_BYTES                                                                                  \
+    (MU_INTERN_MAX_WHERE_ELEMENTS * 4 + MU_INTERN_MAX_WHERE_OPERANDS * 40 + MU_INTERN_WHERE_BLOB_BYTES + 16)
+#else
+#define MU_WHERE_CLAUSE_STORAGE_BYTES 0
+#endif
+
 #if defined(MUC_OPCUA_SUBSCRIPTIONS) && MUC_OPCUA_SUBSCRIPTIONS_STANDARD
 /* OPC-10000-7 §6.6.17 Standard DataChange Subscription storage; zero unless
  * the Standard facet is enabled. Covers monitored-item arrays, subscription
  * arrays, parked publish requests, and event infrastructure. Capacities come
  * from capacities.h (MU_INTERN_*). */
 #define MU_SUBSCRIPTIONS_STANDARD_STORAGE_BYTES                                                                        \
-    (MU_INTERN_MAX_MONITORED_ITEMS * (MU_INTERN_MONITORED_QUEUE_DEPTH * 96 + MU_INTERN_MAX_TRIGGER_LINKS * 8 + 368) +  \
+    (MU_INTERN_MAX_MONITORED_ITEMS * (MU_INTERN_MONITORED_QUEUE_DEPTH * 96 + MU_INTERN_MAX_TRIGGER_LINKS * 8 +         \
+                                      MU_WHERE_CLAUSE_STORAGE_BYTES + 368) +                                           \
      MU_INTERN_MAX_SUBSCRIPTIONS * 336 + MU_INTERN_MAX_PUBLISH_REQUESTS * 48)
 #else
 #define MU_SUBSCRIPTIONS_STANDARD_STORAGE_BYTES 0

@@ -220,8 +220,12 @@ opcua_statuscode_t write_event_notification_list(mu_binary_writer_t *w, struct m
     mu_binary_writer_t sub_w;
     mu_binary_writer_init(&sub_w, body_buf, sizeof(body_buf));
 
-    opcua_int32_t total_field_lists = event_monitored_item_count * (opcua_int32_t)sub->event_queue.count;
-    opcua_statuscode_t s = mu_binary_write_int32(&sub_w, total_field_lists);
+    /* EventFieldList array length is written AFTER filtering (backpatched): a
+       WhereClause may drop events, so a pre-filter count would over-run the array
+       and desync the Publish stream. */
+    const size_t count_pos = sub_w.position;
+    opcua_int32_t emitted_field_lists = 0;
+    opcua_statuscode_t s = mu_binary_write_int32(&sub_w, 0);
     if (s != MU_STATUS_GOOD) {
         return s;
     }
@@ -236,19 +240,17 @@ opcua_statuscode_t write_event_notification_list(mu_binary_writer_t *w, struct m
                 const mu_event_notification_t *ev = &sub->event_queue.queue[idx];
                 idx = (idx + 1) % MU_MAX_EVENT_QUEUE_SIZE;
 
+                mu_event_fields_t fields;
+                memset(&fields, 0, sizeof(fields));
+                fields.event_id = ev->event_id;
+                fields.event_type = ev->event_type;
+                fields.time = ev->time;
+                fields.message = ev->message;
+                fields.severity = ev->severity;
+
 #if MUC_OPCUA_EVENT_FILTER_WHERE
-                if (item->where_clause_count > 0) {
-                    mu_event_fields_t fields;
-                    memset(&fields, 0, sizeof(fields));
-                    fields.event_id = ev->event_id;
-                    fields.event_type = ev->event_type;
-                    fields.time = ev->time;
-                    fields.message = ev->message;
-                    fields.severity = ev->severity;
-                    if (!mu_evaluate_event_filter_where(&fields, item->where_operators, item->where_field_indices,
-                                                        item->where_values, item->where_clause_count)) {
-                        continue;
-                    }
+                if (!mu_where_clause_eval(&item->where_clause, &fields)) {
+                    continue;
                 }
 #endif
 
@@ -263,33 +265,35 @@ opcua_statuscode_t write_event_notification_list(mu_binary_writer_t *w, struct m
                 }
 
                 for (opcua_byte_t j = 0; j < item->select_clauses_count; ++j) {
-                    opcua_byte_t field_type = item->select_clauses[j];
+                    opcua_byte_t field = item->select_clauses[j];
                     mu_variant_t var;
                     (void)memset(&var, 0, sizeof(var));
 
-                    switch (field_type) {
-                    case 1:
+                    switch (field) {
+                    case MU_EVENT_FIELD_EVENTID:
                         var.type = MU_TYPE_BYTESTRING;
                         var.value.bytestr = ev->event_id;
                         break;
-                    case 2:
+                    case MU_EVENT_FIELD_EVENTTYPE:
                         var.type = MU_TYPE_NODEID;
                         var.value.nodeid = ev->event_type;
                         break;
-                    case 3:
+                    case MU_EVENT_FIELD_TIME:
                         var.type = MU_TYPE_DATETIME;
                         var.value.dt = ev->time;
                         break;
-                    case 4: {
+                    case MU_EVENT_FIELD_MESSAGE: {
                         var.type = MU_TYPE_LOCALIZEDTEXT;
                         mu_localized_text_t lt = {{-1, NULL}, ev->message};
                         var.value.localized_text = lt;
                     } break;
-                    case 5:
+                    case MU_EVENT_FIELD_SEVERITY:
                         var.type = MU_TYPE_UINT16;
                         var.value.ui16 = ev->severity;
                         break;
                     default:
+                        /* SourceNode/SourceName/ReceiveTime/LocalTime and any
+                           unresolved field: this server emits no value → Null. */
                         var.type = MU_TYPE_NULL;
                         break;
                     }
@@ -298,9 +302,12 @@ opcua_statuscode_t write_event_notification_list(mu_binary_writer_t *w, struct m
                         return s;
                     }
                 }
+                emitted_field_lists++;
             }
         }
     }
+
+    backpatch_int32(sub_w.buffer, count_pos, emitted_field_lists);
 
     s = mu_binary_write_extension_object_header(w, &type_id, sub_w.position);
     if (s != MU_STATUS_GOOD) {

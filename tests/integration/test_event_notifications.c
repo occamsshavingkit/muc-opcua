@@ -525,8 +525,302 @@ void test_alarm_event_generation_and_publishing(void) {
 #endif
 }
 
+#if MUC_OPCUA_EVENT_FILTER_WHERE
+/* SimpleAttributeOperand(BaseEventType, /<field>, Value) ExtensionObject. */
+static void write_simple_attr_operand(mu_binary_writer_t *w, const char *field) {
+    opcua_byte_t buf[128];
+    mu_binary_writer_t b;
+    mu_binary_writer_init(&b, buf, sizeof(buf));
+    mu_nodeid_t typedef_id = {0, MU_NODEID_NUMERIC, {2041}}; /* BaseEventType */
+    mu_binary_write_nodeid(&b, &typedef_id);
+    mu_binary_write_int32(&b, 1); /* browsePath length */
+    mu_binary_write_uint16(&b, 0);
+    mu_string_t name = {(opcua_int32_t)strlen(field), (const opcua_byte_t *)field};
+    mu_binary_write_string(&b, &name);
+    mu_binary_write_uint32(&b, 13); /* attributeId = Value */
+    mu_string_t idx = {-1, NULL};
+    mu_binary_write_string(&b, &idx);
+
+    mu_nodeid_t t = {0, MU_NODEID_NUMERIC, {603}}; /* SimpleAttributeOperand_Encoding_DefaultBinary */
+    mu_binary_write_extension_object_header(w, &t, b.position);
+    (void)memcpy(w->buffer + w->position, buf, b.position);
+    w->position += b.position;
+}
+
+/* LiteralOperand(UInt16) ExtensionObject. */
+static void write_literal_u16(mu_binary_writer_t *w, opcua_uint16_t val) {
+    opcua_byte_t buf[32];
+    mu_binary_writer_t b;
+    mu_binary_writer_init(&b, buf, sizeof(buf));
+    mu_variant_t v;
+    (void)memset(&v, 0, sizeof(v));
+    v.type = MU_TYPE_UINT16;
+    v.value.ui16 = val;
+    mu_binary_write_variant(&b, &v);
+
+    mu_nodeid_t t = {0, MU_NODEID_NUMERIC, {597}}; /* LiteralOperand_Encoding_DefaultBinary */
+    mu_binary_write_extension_object_header(w, &t, b.position);
+    (void)memcpy(w->buffer + w->position, buf, b.position);
+    w->position += b.position;
+}
+
+/* EventFilter: 5 select clauses + WhereClause (Severity >= threshold). */
+static void write_event_filter_where(mu_binary_writer_t *w, opcua_uint32_t op, opcua_uint16_t threshold) {
+    mu_nodeid_t filter_type = {0, MU_NODEID_NUMERIC, {727}};
+    opcua_byte_t filter_buf[1024];
+    mu_binary_writer_t f_w;
+    mu_binary_writer_init(&f_w, filter_buf, sizeof(filter_buf));
+
+    /* SelectClauses are raw SimpleAttributeOperand structures (not ExtensionObjects). */
+    mu_binary_write_int32(&f_w, 5);
+    const char *names[] = {"EventId", "EventType", "Time", "Message", "Severity"};
+    for (int i = 0; i < 5; ++i) {
+        mu_nodeid_t tid = {0, MU_NODEID_NUMERIC, {0}};
+        mu_binary_write_nodeid(&f_w, &tid);
+        mu_binary_write_int32(&f_w, 1);
+        mu_binary_write_uint16(&f_w, 0);
+        mu_string_t nm = {(opcua_int32_t)strlen(names[i]), (const opcua_byte_t *)names[i]};
+        mu_binary_write_string(&f_w, &nm);
+        mu_binary_write_uint32(&f_w, 13);
+        mu_string_t idx = {-1, NULL};
+        mu_binary_write_string(&f_w, &idx);
+    }
+    /* WhereClause FilterOperands ARE ExtensionObjects. 1 element:
+       GreaterThanOrEqual(SimpleAttr(Severity), Literal(threshold)). */
+    mu_binary_write_int32(&f_w, 1);
+    mu_binary_write_uint32(&f_w, op);
+    mu_binary_write_int32(&f_w, 2);
+    write_simple_attr_operand(&f_w, "Severity");
+    write_literal_u16(&f_w, threshold);
+
+    mu_binary_write_extension_object_header(w, &filter_type, f_w.position);
+    (void)memcpy(w->buffer + w->position, filter_buf, f_w.position);
+    w->position += f_w.position;
+}
+
+static void write_event_moncreate_item_where(mu_binary_writer_t *w, opcua_uint32_t op, opcua_uint32_t client_handle) {
+    mu_nodeid_t n = {0, MU_NODEID_NUMERIC, {2253}};
+    mu_binary_write_nodeid(w, &n);
+    mu_binary_write_uint32(w, 12);
+    mu_string_t nul = {-1, NULL};
+    mu_binary_write_string(w, &nul);
+    mu_binary_write_uint16(w, 0);
+    mu_binary_write_string(w, &nul);
+    mu_binary_write_uint32(w, 2);
+    mu_binary_write_uint32(w, client_handle);
+    mu_binary_write_double(w, 0.0);
+    write_event_filter_where(w, op, 500);
+    mu_binary_write_uint32(w, 8);
+    mu_binary_write_boolean(w, true);
+}
+
+static void enqueue_create_monitored_item_where(mock_t *mock, opcua_uint32_t seq, opcua_uint32_t sub_id,
+                                                opcua_uint32_t op, opcua_uint32_t client_handle) {
+    opcua_byte_t tmp[2048], chunk[2048];
+    mu_binary_writer_t w;
+    size_t clen;
+    mu_binary_writer_init(&w, tmp, sizeof(tmp));
+    mu_nodeid_t t = {0, MU_NODEID_NUMERIC, {ID_CREATEMONITOREDITEMSREQUEST}};
+    mu_binary_write_nodeid(&w, &t);
+    write_request_header(&w, TEST_FAKE_FIRST_AUTH_TOKEN, seq);
+    mu_binary_write_uint32(&w, sub_id);
+    mu_binary_write_uint32(&w, 3);
+    mu_binary_write_int32(&w, 1);
+    write_event_moncreate_item_where(&w, op, client_handle);
+    clen = build_msg(chunk, sizeof(chunk), seq, seq, tmp, w.position);
+    enqueue(mock, chunk, clen);
+}
+
+static void trigger_severity_event(mu_server_t *server, opcua_uint16_t severity, const char *id) {
+    mu_event_notification_t ev;
+    (void)memset(&ev, 0, sizeof(ev));
+    ev.event_type.identifier_type = MU_NODEID_NUMERIC;
+    ev.event_type.identifier.numeric = 2782;
+    ev.event_id = (mu_bytestring_t){4, (const opcua_byte_t *)id};
+    ev.severity = severity;
+    ev.message = (mu_string_t){3, (const opcua_byte_t *)"msg"};
+    ev.time = 100;
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_server_trigger_event(server, &ev));
+}
+
+/* The WhereClause (Severity >= 500) must drop the low-severity event, and the
+   EventFieldList count must reflect the filtered total (regression for the
+   pre-filter over-count that desynced the Publish stream). */
+void test_event_where_clause_filters_and_counts(void) {
+    mock_t mock;
+    (void)memset(&mock, 0, sizeof(mock));
+    enqueue_connect(&mock);
+    enqueue_create_subscription(&mock, 4, 200.0);
+
+    _Alignas(8) opcua_byte_t storage[MU_SERVER_STORAGE_BYTES];
+    mu_server_config_t config;
+    (void)memset(&config, 0, sizeof(config));
+    config.endpoint_url = "opc.tcp://host:4840";
+    config.application_uri = "urn:t";
+    config.product_uri = "urn:t";
+    config.application_name = "t";
+    static opcua_byte_t rx[8192], tx[8192];
+    config.receive_buffer = rx;
+    config.receive_buffer_size = sizeof(rx);
+    config.send_buffer = tx;
+    config.send_buffer_size = sizeof(tx);
+    config.max_chunk_count = 1;
+    config.max_message_size = 8192;
+    config.max_sessions = 1;
+    config.max_secure_channels = 1;
+
+    fake_platform_init(NULL, &config.time_adapter, &config.entropy_adapter);
+    s_tick = 0;
+    config.time_adapter.get_tick_ms = test_get_tick_ms;
+    config.tcp_adapter.context = &mock;
+    config.tcp_adapter.listen = mock_listen;
+    config.tcp_adapter.accept = mock_accept;
+    config.tcp_adapter.read = mock_read;
+    config.tcp_adapter.write = mock_write;
+    config.tcp_adapter.close_connection = mock_close;
+    config.tcp_adapter.shutdown = mock_shutdown;
+
+    mu_server_t *server = NULL;
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_server_init(storage, sizeof(storage), &config, &server));
+
+    mu_binary_reader_t body;
+    opcua_statuscode_t sr;
+    run_connect(server, &mock);
+    mu_server_poll(server);
+    TEST_ASSERT_EQUAL(ID_CREATESUBSCRIPTIONRESPONSE, parse_response(mock.last_write, mock.last_write_len, &body, &sr));
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, sr);
+    opcua_uint32_t sub_id;
+    mu_binary_read_uint32(&body, &sub_id);
+
+    enqueue_create_monitored_item_where(&mock, 5, sub_id, 4u, 77);
+    mu_server_poll(server);
+    TEST_ASSERT_EQUAL(ID_CREATEMONITOREDITEMSRESPONSE,
+                      parse_response(mock.last_write, mock.last_write_len, &body, &sr));
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, sr);
+
+    /* One passing (>=500) and one failing (<500) event. */
+    trigger_severity_event(server, 800, "HI01");
+    trigger_severity_event(server, 200, "LO01");
+
+    enqueue_publish(&mock, 6);
+    s_tick = 250;
+    mu_server_poll(server);
+    mu_server_poll(server);
+
+    TEST_ASSERT_EQUAL(ID_PUBLISHRESPONSE, parse_response(mock.last_write, mock.last_write_len, &body, &sr));
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, sr);
+
+    opcua_uint32_t resp_sub_id;
+    mu_binary_read_uint32(&body, &resp_sub_id);
+    opcua_int32_t navail;
+    mu_binary_read_int32(&body, &navail);
+    opcua_byte_t more;
+    mu_binary_read_byte(&body, &more);
+    opcua_uint32_t seq_num;
+    mu_binary_read_uint32(&body, &seq_num);
+    opcua_int64_t pub_time;
+    mu_binary_read_int64(&body, &pub_time);
+    opcua_int32_t ndata;
+    mu_binary_read_int32(&body, &ndata);
+    TEST_ASSERT_EQUAL(1, ndata);
+
+    mu_nodeid_t ext_type;
+    size_t ext_len;
+    mu_binary_read_extension_object_header(&body, &ext_type, &ext_len);
+    TEST_ASSERT_EQUAL(ID_EVENTNOTIFICATIONLIST, ext_type.identifier.numeric);
+
+    /* Only the severity-800 event survives the WhereClause → count is exactly 1. */
+    opcua_int32_t total_events;
+    mu_binary_read_int32(&body, &total_events);
+    TEST_ASSERT_EQUAL(1, total_events);
+
+    opcua_uint32_t client_handle;
+    mu_binary_read_uint32(&body, &client_handle);
+    TEST_ASSERT_EQUAL(77, client_handle);
+
+    opcua_int32_t field_count;
+    mu_binary_read_int32(&body, &field_count);
+    TEST_ASSERT_EQUAL(5, field_count);
+
+    mu_variant_t var_id;
+    mu_binary_read_variant(&body, &var_id);
+    TEST_ASSERT_EQUAL(MU_TYPE_BYTESTRING, var_id.type);
+    TEST_ASSERT_EQUAL_MEMORY("HI01", var_id.value.bytestr.data, 4);
+
+    mu_server_close(server);
+}
+
+/* A WhereClause using an unsupported FilterOperator (Cast) must fail the item at
+   CreateMonitoredItems with Bad_FilterOperatorUnsupported (OPC-10000-4 §7.7.3),
+   not be silently accepted. */
+void test_event_where_unsupported_operator_rejected(void) {
+    mock_t mock;
+    (void)memset(&mock, 0, sizeof(mock));
+    enqueue_connect(&mock);
+    enqueue_create_subscription(&mock, 4, 200.0);
+
+    _Alignas(8) opcua_byte_t storage[MU_SERVER_STORAGE_BYTES];
+    mu_server_config_t config;
+    (void)memset(&config, 0, sizeof(config));
+    config.endpoint_url = "opc.tcp://host:4840";
+    config.application_uri = "urn:t";
+    config.product_uri = "urn:t";
+    config.application_name = "t";
+    static opcua_byte_t rx[8192], tx[8192];
+    config.receive_buffer = rx;
+    config.receive_buffer_size = sizeof(rx);
+    config.send_buffer = tx;
+    config.send_buffer_size = sizeof(tx);
+    config.max_chunk_count = 1;
+    config.max_message_size = 8192;
+    config.max_sessions = 1;
+    config.max_secure_channels = 1;
+
+    fake_platform_init(NULL, &config.time_adapter, &config.entropy_adapter);
+    s_tick = 0;
+    config.time_adapter.get_tick_ms = test_get_tick_ms;
+    config.tcp_adapter.context = &mock;
+    config.tcp_adapter.listen = mock_listen;
+    config.tcp_adapter.accept = mock_accept;
+    config.tcp_adapter.read = mock_read;
+    config.tcp_adapter.write = mock_write;
+    config.tcp_adapter.close_connection = mock_close;
+    config.tcp_adapter.shutdown = mock_shutdown;
+
+    mu_server_t *server = NULL;
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_server_init(storage, sizeof(storage), &config, &server));
+
+    mu_binary_reader_t body;
+    opcua_statuscode_t sr;
+    run_connect(server, &mock);
+    mu_server_poll(server);
+    TEST_ASSERT_EQUAL(ID_CREATESUBSCRIPTIONRESPONSE, parse_response(mock.last_write, mock.last_write_len, &body, &sr));
+    opcua_uint32_t sub_id;
+    mu_binary_read_uint32(&body, &sub_id);
+
+    enqueue_create_monitored_item_where(&mock, 5, sub_id, 12u /* Cast: unsupported */, 88);
+    mu_server_poll(server);
+    TEST_ASSERT_EQUAL(ID_CREATEMONITOREDITEMSRESPONSE,
+                      parse_response(mock.last_write, mock.last_write_len, &body, &sr));
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, sr); /* service ok; item-level failure */
+
+    opcua_int32_t results_count;
+    mu_binary_read_int32(&body, &results_count);
+    TEST_ASSERT_EQUAL(1, results_count);
+    opcua_statuscode_t item_status;
+    mu_binary_read_statuscode(&body, &item_status);
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_BAD_FILTEROPERATORUNSUPPORTED, item_status);
+
+    mu_server_close(server);
+}
+#endif /* MUC_OPCUA_EVENT_FILTER_WHERE */
+
 int main(void) {
     UNITY_BEGIN();
     RUN_TEST(test_alarm_event_generation_and_publishing);
+#if MUC_OPCUA_EVENT_FILTER_WHERE
+    RUN_TEST(test_event_where_clause_filters_and_counts);
+    RUN_TEST(test_event_where_unsupported_operator_rejected);
+#endif
     return UNITY_END();
 }

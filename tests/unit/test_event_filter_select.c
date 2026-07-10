@@ -1,80 +1,64 @@
 /* tests/unit/test_event_filter_select.c
  *
- * Spec Kit 037, T033 (RED phase). Validate select-clause extraction
- * from SimpleAttributeOperand BrowsePaths for all 9 BaseEventType fields
- * per OPC-10000-5 §6.4.2.
+ * Validate the unified SimpleAttributeOperand BrowseName → BaseEventType field
+ * index resolver (spec 061 consolidation) for all 9 fields, OPC-10000-5 §6.4.2.
  */
-#include "muc_opcua/types.h"
+#include "muc_opcua/config.h"
 #include "unity.h"
+#include <string.h>
 
 void setUp(void) {}
 void tearDown(void) {}
 
-#if MUC_OPCUA_EVENT_FILTER_WHERE
+#ifdef MUC_OPCUA_EVENTS
 
-void test_select_clause_event_id_maps_to_0(void) {
-    TEST_ASSERT_EQUAL_INT(0, mu_event_filter_resolve_select_clause("/EventId", 8));
+#include "services/event_filter.h"
+
+static mu_event_field_t resolve(const char *name) {
+    mu_string_t s;
+    s.data = (const opcua_byte_t *)name;
+    s.length = (opcua_int32_t)strlen(name);
+    return mu_event_field_from_name(&s);
 }
 
-void test_select_clause_event_type_maps_to_1(void) {
-    TEST_ASSERT_EQUAL_INT(1, mu_event_filter_resolve_select_clause("/EventType", 9));
+void test_resolve_all_base_event_fields(void) {
+    TEST_ASSERT_EQUAL_INT(MU_EVENT_FIELD_EVENTID, resolve("EventId"));
+    TEST_ASSERT_EQUAL_INT(MU_EVENT_FIELD_EVENTTYPE, resolve("EventType"));
+    TEST_ASSERT_EQUAL_INT(MU_EVENT_FIELD_SOURCENODE, resolve("SourceNode"));
+    TEST_ASSERT_EQUAL_INT(MU_EVENT_FIELD_SOURCENAME, resolve("SourceName"));
+    TEST_ASSERT_EQUAL_INT(MU_EVENT_FIELD_TIME, resolve("Time"));
+    TEST_ASSERT_EQUAL_INT(MU_EVENT_FIELD_RECEIVETIME, resolve("ReceiveTime"));
+    TEST_ASSERT_EQUAL_INT(MU_EVENT_FIELD_LOCALTIME, resolve("LocalTime"));
+    TEST_ASSERT_EQUAL_INT(MU_EVENT_FIELD_MESSAGE, resolve("Message"));
+    TEST_ASSERT_EQUAL_INT(MU_EVENT_FIELD_SEVERITY, resolve("Severity"));
 }
 
-void test_select_clause_source_node_maps_to_2(void) {
-    TEST_ASSERT_EQUAL_INT(2, mu_event_filter_resolve_select_clause("/SourceNode", 10));
+void test_resolve_field_index_values(void) {
+    /* Indices must be the stable 0-8 order (OPC-10000-5 §6.4.2). */
+    TEST_ASSERT_EQUAL_INT(0, resolve("EventId"));
+    TEST_ASSERT_EQUAL_INT(8, resolve("Severity"));
 }
 
-void test_select_clause_source_name_maps_to_3(void) {
-    TEST_ASSERT_EQUAL_INT(3, mu_event_filter_resolve_select_clause("/SourceName", 10));
-}
-
-void test_select_clause_time_maps_to_4(void) {
-    TEST_ASSERT_EQUAL_INT(4, mu_event_filter_resolve_select_clause("/Time", 4));
-}
-
-void test_select_clause_receive_time_maps_to_5(void) {
-    TEST_ASSERT_EQUAL_INT(5, mu_event_filter_resolve_select_clause("/ReceiveTime", 11));
-}
-
-void test_select_clause_local_time_maps_to_6(void) {
-    TEST_ASSERT_EQUAL_INT(6, mu_event_filter_resolve_select_clause("/LocalTime", 9));
-}
-
-void test_select_clause_message_maps_to_7(void) {
-    TEST_ASSERT_EQUAL_INT(7, mu_event_filter_resolve_select_clause("/Message", 7));
-}
-
-void test_select_clause_severity_maps_to_8(void) {
-    TEST_ASSERT_EQUAL_INT(8, mu_event_filter_resolve_select_clause("/Severity", 8));
-}
-
-void test_select_clause_unknown_path_returns_minus_1(void) {
-    TEST_ASSERT_EQUAL_INT(-1, mu_event_filter_resolve_select_clause("/Unknown", 7));
+void test_resolve_unknown_returns_none(void) {
+    TEST_ASSERT_EQUAL_INT(MU_EVENT_FIELD_NONE, resolve("Unknown"));
 }
 
 #else
 
-void test_select_clause_requires_event_filter_build(void) {
-    TEST_PASS_MESSAGE("MUC_OPCUA_EVENT_FILTER_WHERE is disabled in this build");
+void test_select_clause_requires_events_build(void) {
+    TEST_PASS_MESSAGE("MUC_OPCUA_EVENTS is disabled in this build");
 }
 
 #endif
 
 int main(void) {
     UNITY_BEGIN();
-#if MUC_OPCUA_EVENT_FILTER_WHERE
-    RUN_TEST(test_select_clause_event_id_maps_to_0);
-    RUN_TEST(test_select_clause_event_type_maps_to_1);
-    RUN_TEST(test_select_clause_source_node_maps_to_2);
-    RUN_TEST(test_select_clause_source_name_maps_to_3);
-    RUN_TEST(test_select_clause_time_maps_to_4);
-    RUN_TEST(test_select_clause_receive_time_maps_to_5);
-    RUN_TEST(test_select_clause_local_time_maps_to_6);
-    RUN_TEST(test_select_clause_message_maps_to_7);
-    RUN_TEST(test_select_clause_severity_maps_to_8);
-    RUN_TEST(test_select_clause_unknown_path_returns_minus_1);
+#ifdef MUC_OPCUA_EVENTS
+    RUN_TEST(test_resolve_all_base_event_fields);
+    RUN_TEST(test_resolve_field_index_values);
+    RUN_TEST(test_resolve_unknown_returns_none);
 #else
-    RUN_TEST(test_select_clause_requires_event_filter_build);
+    RUN_TEST(test_select_clause_requires_events_build);
 #endif
     return UNITY_END();
 }

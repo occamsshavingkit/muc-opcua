@@ -19,6 +19,9 @@
 #include "muc_opcua/types.h"
 #include <stdbool.h>
 #include <stddef.h>
+#ifdef MUC_OPCUA_EVENTS
+#include "event_filter.h"
+#endif
 
 #if MUC_OPCUA_SUBSCRIPTIONS
 
@@ -190,10 +193,7 @@ typedef struct {
     opcua_byte_t select_clauses[8];
     opcua_byte_t select_clauses_count;
 #if MUC_OPCUA_EVENT_FILTER_WHERE
-    opcua_uint32_t where_operators[8];
-    opcua_uint32_t where_field_indices[8];
-    opcua_int64_t where_values[8];
-    opcua_byte_t where_clause_count;
+    mu_where_clause_t where_clause; /* owned ContentFilter; element_count==0 → match all */
 #endif
 #endif
 } mu_monitored_item_t;
