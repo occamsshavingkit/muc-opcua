@@ -214,8 +214,8 @@ opcua_statuscode_t handle_open_secure_channel(mu_server_t *server, mu_binary_rea
             }
             /* server_keys protect Server->Client (ServerSalt, is_server_direction=1);
                client_keys protect the inbound Client->Server (ClientSalt, =0). */
-            s = mu_ecc_derive_channel_keys(cr, server_secure_channel.policy, shared, shared_len, 1, nonce_buf, nonce_len,
-                                           client_nonce.data, cn_len, &server_secure_channel.server_keys);
+            s = mu_ecc_derive_channel_keys(cr, server_secure_channel.policy, shared, shared_len, 1, nonce_buf,
+                                           nonce_len, client_nonce.data, cn_len, &server_secure_channel.server_keys);
             if (s == MU_STATUS_GOOD) {
                 s = mu_ecc_derive_channel_keys(cr, server_secure_channel.policy, shared, shared_len, 0, nonce_buf,
                                                nonce_len, client_nonce.data, cn_len,

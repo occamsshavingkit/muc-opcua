@@ -263,7 +263,8 @@ static opcua_statuscode_t wrap_ecc(const mu_asym_wrap_params_t *p) {
        key) — not the RSA get_own_certificate. */
     const opcua_byte_t *sender_cert = NULL;
     size_t sender_cert_len = 0;
-    opcua_statuscode_t s = p->crypto->get_own_ecc_certificate(p->crypto->context, curve, &sender_cert, &sender_cert_len);
+    opcua_statuscode_t s =
+        p->crypto->get_own_ecc_certificate(p->crypto->context, curve, &sender_cert, &sender_cert_len);
     if (s != MU_STATUS_GOOD) {
         return s;
     }

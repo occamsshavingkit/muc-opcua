@@ -52,8 +52,7 @@ static int build_self_signed(struct host_crypto_context *cx) {
    NULL (ECC sign then reports Bad_SecurityChecksFailed). */
 static void build_ecc_identities(struct host_crypto_context *cx) {
     cx->ed25519_key = EVP_PKEY_Q_keygen(NULL, NULL, "ED25519");
-    if (cx->ed25519_key &&
-        !make_self_signed(cx->ed25519_key, NULL, &cx->ed25519_cert_der, &cx->ed25519_cert_der_len)) {
+    if (cx->ed25519_key && !make_self_signed(cx->ed25519_key, NULL, &cx->ed25519_cert_der, &cx->ed25519_cert_der_len)) {
         EVP_PKEY_free(cx->ed25519_key);
         cx->ed25519_key = NULL;
     }

@@ -260,9 +260,9 @@ void test_wolfssl_ecc_cross_validation(void) {
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD,
                       mu_wolfssl_crypto_adapter_set_ecc_identity(&wolf_crypto, MU_ECC_CURVE_25519, ed_cert,
                                                                  (size_t)ed_cert_len, ed_key, (size_t)ed_key_len));
-    TEST_ASSERT_EQUAL(MU_STATUS_GOOD,
-                      mu_wolfssl_crypto_adapter_set_ecc_identity(&wolf_crypto, MU_ECC_CURVE_NISTP256, p256_cert,
-                                                                 (size_t)p256_cert_len, p256_key, (size_t)p256_key_len));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_wolfssl_crypto_adapter_set_ecc_identity(&wolf_crypto, MU_ECC_CURVE_NISTP256,
+                                                                                 p256_cert, (size_t)p256_cert_len,
+                                                                                 p256_key, (size_t)p256_key_len));
 
     ecc_cross_validate_curve(&host_crypto, &wolf_crypto, MU_ECC_CURVE_NISTP256, p256_cert, (size_t)p256_cert_len);
     ecc_cross_validate_curve(&host_crypto, &wolf_crypto, MU_ECC_CURVE_25519, ed_cert, (size_t)ed_cert_len);
@@ -274,29 +274,28 @@ void test_wolfssl_ecc_cross_validation(void) {
     const opcua_byte_t cc_plain[] = "ChaCha20-Poly1305 AEAD roundtrip payload";
     opcua_byte_t cc_cipher[sizeof(cc_plain)], cc_tag[MU_CHACHA20_POLY1305_TAG_LENGTH], cc_out[sizeof(cc_plain)];
 
-    TEST_ASSERT_EQUAL(MU_STATUS_GOOD,
-                      wolf_crypto.chacha20_poly1305_encrypt(wolf_crypto.context, cc_key, cc_nonce, cc_aad,
-                                                            sizeof(cc_aad), cc_plain, sizeof(cc_plain), cc_cipher,
-                                                            cc_tag));
-    TEST_ASSERT_EQUAL(MU_STATUS_GOOD,
-                      host_crypto.chacha20_poly1305_decrypt(host_crypto.context, cc_key, cc_nonce, cc_aad,
-                                                            sizeof(cc_aad), cc_cipher, sizeof(cc_plain), cc_tag, cc_out));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, wolf_crypto.chacha20_poly1305_encrypt(wolf_crypto.context, cc_key, cc_nonce,
+                                                                            cc_aad, sizeof(cc_aad), cc_plain,
+                                                                            sizeof(cc_plain), cc_cipher, cc_tag));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, host_crypto.chacha20_poly1305_decrypt(host_crypto.context, cc_key, cc_nonce,
+                                                                            cc_aad, sizeof(cc_aad), cc_cipher,
+                                                                            sizeof(cc_plain), cc_tag, cc_out));
     TEST_ASSERT_EQUAL_MEMORY(cc_plain, cc_out, sizeof(cc_plain));
 
-    TEST_ASSERT_EQUAL(MU_STATUS_GOOD,
-                      host_crypto.chacha20_poly1305_encrypt(host_crypto.context, cc_key, cc_nonce, cc_aad,
-                                                            sizeof(cc_aad), cc_plain, sizeof(cc_plain), cc_cipher,
-                                                            cc_tag));
-    TEST_ASSERT_EQUAL(MU_STATUS_GOOD,
-                      wolf_crypto.chacha20_poly1305_decrypt(wolf_crypto.context, cc_key, cc_nonce, cc_aad,
-                                                            sizeof(cc_aad), cc_cipher, sizeof(cc_plain), cc_tag, cc_out));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, host_crypto.chacha20_poly1305_encrypt(host_crypto.context, cc_key, cc_nonce,
+                                                                            cc_aad, sizeof(cc_aad), cc_plain,
+                                                                            sizeof(cc_plain), cc_cipher, cc_tag));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, wolf_crypto.chacha20_poly1305_decrypt(wolf_crypto.context, cc_key, cc_nonce,
+                                                                            cc_aad, sizeof(cc_aad), cc_cipher,
+                                                                            sizeof(cc_plain), cc_tag, cc_out));
     TEST_ASSERT_EQUAL_MEMORY(cc_plain, cc_out, sizeof(cc_plain));
 
     /* A tampered ciphertext must fail the tag check. */
     cc_cipher[0] ^= 0xFF;
     TEST_ASSERT_EQUAL(MU_STATUS_BAD_SECURITYCHECKSFAILED,
                       wolf_crypto.chacha20_poly1305_decrypt(wolf_crypto.context, cc_key, cc_nonce, cc_aad,
-                                                            sizeof(cc_aad), cc_cipher, sizeof(cc_plain), cc_tag, cc_out));
+                                                            sizeof(cc_aad), cc_cipher, sizeof(cc_plain), cc_tag,
+                                                            cc_out));
 
     mu_wolfssl_crypto_adapter_cleanup(&wolf_crypto);
     mu_host_crypto_adapter_cleanup(&host_crypto);

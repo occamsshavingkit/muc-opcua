@@ -125,7 +125,7 @@ opcua_statuscode_t mu_hkdf_sha256(const mu_crypto_adapter_t *crypto, const opcua
     }
 
     opcua_byte_t prk[MU_SHA256_LENGTH];
-    opcua_byte_t t[MU_SHA256_LENGTH];
+    opcua_byte_t t[MU_SHA256_LENGTH] = {0}; /* T(0) empty; zeroed to satisfy static analysis */
     opcua_byte_t buf[MU_SHA256_LENGTH + MU_HKDF_MAX_INFO + 1];
     opcua_statuscode_t status = crypto->hmac_sha256(crypto->context, salt, salt_length, ikm, ikm_length, prk);
     if (status != MU_STATUS_GOOD) {

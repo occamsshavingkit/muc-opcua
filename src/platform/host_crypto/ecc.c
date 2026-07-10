@@ -51,7 +51,8 @@ opcua_statuscode_t h_ecc_generate_ephemeral(void *c, mu_ecc_curve_t curve, opcua
         (void)memcpy(pubkey, enc + 1, P256_UNCOMPRESSED_LEN - 1); /* strip 0x04 prefix */
         *pubkey_len = P256_UNCOMPRESSED_LEN - 1;
     }
-    _Static_assert(sizeof(EVP_PKEY *) <= MU_ECC_KEYPAIR_CTX_SIZE, "MU_ECC_KEYPAIR_CTX_SIZE must fit an EVP_PKEY handle");
+    _Static_assert(sizeof(EVP_PKEY *) <= MU_ECC_KEYPAIR_CTX_SIZE,
+                   "MU_ECC_KEYPAIR_CTX_SIZE must fit an EVP_PKEY handle");
     (void)memcpy(keypair_ctx, &pk, sizeof(pk));
     return MU_STATUS_GOOD;
 }
@@ -70,9 +71,9 @@ static EVP_PKEY *peer_pubkey(mu_ecc_curve_t curve, const opcua_byte_t *peer, siz
 
     EVP_PKEY *out = NULL;
     EVP_PKEY_CTX *ctx = EVP_PKEY_CTX_new_from_name(NULL, "EC", NULL);
-    OSSL_PARAM params[] = {
-        OSSL_PARAM_construct_utf8_string(OSSL_PKEY_PARAM_GROUP_NAME, (char *)"prime256v1", 0),
-        OSSL_PARAM_construct_octet_string(OSSL_PKEY_PARAM_PUB_KEY, enc, sizeof(enc)), OSSL_PARAM_construct_end()};
+    OSSL_PARAM params[] = {OSSL_PARAM_construct_utf8_string(OSSL_PKEY_PARAM_GROUP_NAME, (char *)"prime256v1", 0),
+                           OSSL_PARAM_construct_octet_string(OSSL_PKEY_PARAM_PUB_KEY, enc, sizeof(enc)),
+                           OSSL_PARAM_construct_end()};
     if (ctx && EVP_PKEY_fromdata_init(ctx) == 1) {
         (void)EVP_PKEY_fromdata(ctx, &out, EVP_PKEY_PUBLIC_KEY, params);
     }
@@ -263,7 +264,8 @@ opcua_statuscode_t h_chacha20_poly1305_encrypt(void *c, const opcua_byte_t *key,
         if (aad && aad_len) {
             ok = (EVP_EncryptUpdate(ctx, NULL, &outl, aad, (int)aad_len) == 1);
         }
-        if (ok && EVP_EncryptUpdate(ctx, out, &outl, in, (int)len) == 1 && EVP_EncryptFinal_ex(ctx, out + outl, &outl) == 1 &&
+        if (ok && EVP_EncryptUpdate(ctx, out, &outl, in, (int)len) == 1 &&
+            EVP_EncryptFinal_ex(ctx, out + outl, &outl) == 1 &&
             EVP_CIPHER_CTX_ctrl(ctx, EVP_CTRL_AEAD_GET_TAG, MU_CHACHA20_POLY1305_TAG_LENGTH, tag) == 1) {
             rc = MU_STATUS_GOOD;
         }

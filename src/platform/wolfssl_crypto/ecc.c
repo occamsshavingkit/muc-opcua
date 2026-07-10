@@ -200,8 +200,7 @@ opcua_statuscode_t w_ecc_ecdh_derive(void *context, mu_ecc_curve_t curve, const 
         word32 out_len = (word32)*shared_length;
         if (wc_ecc_import_private_key_ex(keypair_ctx, ECC_SCALAR_LEN, NULL, 0, &priv, ECC_SECP256R1) == 0 &&
             wc_ecc_import_x963_ex(x963, sizeof(x963), &peer, ECC_SECP256R1) == 0 &&
-            wc_ecc_set_rng(&priv, &ctx->rng) == 0 &&
-            wc_ecc_shared_secret(&priv, &peer, shared, &out_len) == 0) {
+            wc_ecc_set_rng(&priv, &ctx->rng) == 0 && wc_ecc_shared_secret(&priv, &peer, shared, &out_len) == 0) {
             *shared_length = out_len;
             rc = MU_STATUS_GOOD;
         }
@@ -310,7 +309,8 @@ opcua_statuscode_t w_ecc_verify(void *context, mu_ecc_curve_t curve, const opcua
             /* The parsed certificate exposes the raw 32-byte Ed25519 public key
                (not a SubjectPublicKeyInfo), so import it directly. */
             if (wc_ed25519_import_public(decoded.publicKey, decoded.pubKeySize, &key) == 0 &&
-                wc_ed25519_verify_msg(signature, (word32)signature_length, data, (word32)data_length, &res, &key) == 0 &&
+                wc_ed25519_verify_msg(signature, (word32)signature_length, data, (word32)data_length, &res, &key) ==
+                    0 &&
                 res == 1) {
                 rc = MU_STATUS_GOOD;
             }

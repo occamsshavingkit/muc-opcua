@@ -53,10 +53,9 @@ static opcua_statuscode_t verify_activate_client_signature(mu_server_t *server, 
         }
         memcpy(ecc_verify_buf, ecc_own_cert, ecc_own_cert_len);
         memcpy(ecc_verify_buf + ecc_own_cert_len, slot->server_nonce, sizeof(slot->server_nonce));
-        opcua_statuscode_t evs = cr->ecc_verify(cr->context, ecc_curve, server->channel_client_cert,
-                                                server->channel_client_cert_len, ecc_verify_buf,
-                                                ecc_own_cert_len + sizeof(slot->server_nonce), signature->data,
-                                                (size_t)signature->length);
+        opcua_statuscode_t evs = cr->ecc_verify(
+            cr->context, ecc_curve, server->channel_client_cert, server->channel_client_cert_len, ecc_verify_buf,
+            ecc_own_cert_len + sizeof(slot->server_nonce), signature->data, (size_t)signature->length);
         return (evs == MU_STATUS_GOOD) ? MU_STATUS_GOOD : MU_STATUS_BAD_SECURITYCHECKSFAILED;
     }
 #endif

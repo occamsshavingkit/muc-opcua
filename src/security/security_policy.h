@@ -22,19 +22,11 @@ typedef enum {
 
 /* Asymmetric-crypto family of a policy: RSA (the classic policies) or ECC
    (ephemeral-ECDH handshake, spec 059). Determines the OPN handshake shape. */
-typedef enum {
-    MU_ASYM_FAMILY_NONE = 0,
-    MU_ASYM_FAMILY_RSA,
-    MU_ASYM_FAMILY_ECC
-} mu_asym_family_t;
+typedef enum { MU_ASYM_FAMILY_NONE = 0, MU_ASYM_FAMILY_RSA, MU_ASYM_FAMILY_ECC } mu_asym_family_t;
 
 /* Symmetric protection mode: AES-CBC + HMAC-SHA256 (RSA policies and ECC-nistP256)
    or the ChaCha20-Poly1305 AEAD (ECC-curve25519). */
-typedef enum {
-    MU_SYM_MODE_NONE = 0,
-    MU_SYM_MODE_CBC_HMAC,
-    MU_SYM_MODE_AEAD_CHACHA20POLY1305
-} mu_sym_mode_t;
+typedef enum { MU_SYM_MODE_NONE = 0, MU_SYM_MODE_CBC_HMAC, MU_SYM_MODE_AEAD_CHACHA20POLY1305 } mu_sym_mode_t;
 
 /* MessageSecurityMode (OPC 10000-4 §7.15) — values match the wire encoding. */
 typedef enum {

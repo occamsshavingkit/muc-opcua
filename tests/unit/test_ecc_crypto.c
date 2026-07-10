@@ -52,8 +52,10 @@ static void ecdh_roundtrip(mu_ecc_curve_t curve) {
 
     opcua_byte_t s_ab[64], s_ba[64];
     size_t s_ab_len = sizeof(s_ab), s_ba_len = sizeof(s_ba);
-    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, crypto.ecc_ecdh_derive(crypto.context, curve, a_ctx, b_pub, b_len, s_ab, &s_ab_len));
-    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, crypto.ecc_ecdh_derive(crypto.context, curve, b_ctx, a_pub, a_len, s_ba, &s_ba_len));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD,
+                      crypto.ecc_ecdh_derive(crypto.context, curve, a_ctx, b_pub, b_len, s_ab, &s_ab_len));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD,
+                      crypto.ecc_ecdh_derive(crypto.context, curve, b_ctx, a_pub, a_len, s_ba, &s_ba_len));
     TEST_ASSERT_EQUAL(s_ab_len, s_ba_len);
     TEST_ASSERT_EQUAL(32, s_ab_len); /* both curves yield a 32-byte shared secret */
     TEST_ASSERT_EQUAL_MEMORY(s_ab, s_ba, s_ab_len);
@@ -122,10 +124,11 @@ void test_chacha20_poly1305_rfc8439(void) {
     const opcua_byte_t pt[] = "Ladies and Gentlemen of the class of '99: If I could offer you only one tip for "
                               "the future, sunscreen would be it.";
     const size_t pt_len = sizeof(pt) - 1; /* drop the NUL: 114 bytes */
-    (void)from_hex("d31a8d34648e60db7b86afbc53ef7ec2a4aded51296e08fea9e2b5a736ee62d63dbea45e8ca9671282fafb69da92728b1a71"
-                   "de0a9e060b2905d6a5b67ecd3b3692ddbd7f2d778b8c9803aee328091b58fab324e4fad675945585808b4831d7bc3ff4def"
-                   "08e4b7a9de576d26586cec64b6116",
-                   expected_ct);
+    (void)from_hex(
+        "d31a8d34648e60db7b86afbc53ef7ec2a4aded51296e08fea9e2b5a736ee62d63dbea45e8ca9671282fafb69da92728b1a71"
+        "de0a9e060b2905d6a5b67ecd3b3692ddbd7f2d778b8c9803aee328091b58fab324e4fad675945585808b4831d7bc3ff4def"
+        "08e4b7a9de576d26586cec64b6116",
+        expected_ct);
     (void)from_hex("1ae10b594f09e26a7e902ecbd0600691", expected_tag);
 
     opcua_byte_t ct[114], tag[16];
@@ -243,16 +246,18 @@ void test_ecc_channel_key_derivation(void) {
 
     opcua_byte_t shared_srv[64], shared_cli[64];
     size_t ss_len = sizeof(shared_srv), sc_len = sizeof(shared_cli);
-    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, crypto.ecc_ecdh_derive(crypto.context, curve, s_ctx, c_pub, c_len, shared_srv, &ss_len));
-    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, crypto.ecc_ecdh_derive(crypto.context, curve, c_ctx, s_pub, s_len, shared_cli, &sc_len));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD,
+                      crypto.ecc_ecdh_derive(crypto.context, curve, s_ctx, c_pub, c_len, shared_srv, &ss_len));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD,
+                      crypto.ecc_ecdh_derive(crypto.context, curve, c_ctx, s_pub, s_len, shared_cli, &sc_len));
 
     /* Server derives its Server->Client keys from its shared secret; client derives
        the same direction from its (equal) shared secret. They must match. */
     mu_sym_keys_t srv_side, cli_side;
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_ecc_derive_channel_keys(&crypto, policy, shared_srv, ss_len, 1, s_pub, s_len,
-                                                                c_pub, c_len, &srv_side));
+                                                                 c_pub, c_len, &srv_side));
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_ecc_derive_channel_keys(&crypto, policy, shared_cli, sc_len, 1, s_pub, s_len,
-                                                                c_pub, c_len, &cli_side));
+                                                                 c_pub, c_len, &cli_side));
     TEST_ASSERT_EQUAL_MEMORY(srv_side.signing_key, cli_side.signing_key, MU_ECC_NISTP256_SIGNATURE_KEY_LENGTH);
     TEST_ASSERT_EQUAL_MEMORY(srv_side.encrypting_key, cli_side.encrypting_key, MU_ECC_NISTP256_ENCRYPTION_KEY_LENGTH);
     TEST_ASSERT_EQUAL_MEMORY(srv_side.iv, cli_side.iv, MU_ECC_NISTP256_IV_LENGTH);
@@ -260,9 +265,9 @@ void test_ecc_channel_key_derivation(void) {
     /* The Client->Server direction must derive different key material. */
     mu_sym_keys_t client_dir;
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_ecc_derive_channel_keys(&crypto, policy, shared_srv, ss_len, 0, s_pub, s_len,
-                                                                c_pub, c_len, &client_dir));
-    TEST_ASSERT_NOT_EQUAL(0, memcmp(srv_side.encrypting_key, client_dir.encrypting_key,
-                                    MU_ECC_NISTP256_ENCRYPTION_KEY_LENGTH));
+                                                                 c_pub, c_len, &client_dir));
+    TEST_ASSERT_NOT_EQUAL(
+        0, memcmp(srv_side.encrypting_key, client_dir.encrypting_key, MU_ECC_NISTP256_ENCRYPTION_KEY_LENGTH));
 
     crypto.ecc_keypair_free(crypto.context, s_ctx);
     crypto.ecc_keypair_free(crypto.context, c_ctx);

@@ -133,9 +133,9 @@ static void secure_call(mock_t *mock, mu_server_t *server, mu_crypto_adapter_t *
         TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_sym_chunk_wrap_aead(cc, c2s, "MSG", scid, token, seq, seq - 1u, seq, body,
                                                                  body_len, chunk, sizeof(chunk), &mlen));
     } else {
-        TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_sym_chunk_wrap(cc, MU_MESSAGE_SECURITY_MODE_SIGN_AND_ENCRYPT, c2s, "MSG",
-                                                            scid, token, seq, seq, body, body_len, chunk, sizeof(chunk),
-                                                            &mlen));
+        TEST_ASSERT_EQUAL(MU_STATUS_GOOD,
+                          mu_sym_chunk_wrap(cc, MU_MESSAGE_SECURITY_MODE_SIGN_AND_ENCRYPT, c2s, "MSG", scid, token, seq,
+                                            seq, body, body_len, chunk, sizeof(chunk), &mlen));
     }
     mock->inbound_count = 0;
     mock->read_index = 0;
@@ -151,9 +151,9 @@ static void secure_call(mock_t *mock, mu_server_t *server, mu_crypto_adapter_t *
                                                                    *srv_last, &rbody, &rblen, &si));
         *srv_last = si.sequence_number;
     } else {
-        TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_sym_chunk_unwrap(cc, MU_MESSAGE_SECURITY_MODE_SIGN_AND_ENCRYPT, s2c,
-                                                              mock->last_write, mock->last_write_len, &rbody, &rblen,
-                                                              &si));
+        TEST_ASSERT_EQUAL(MU_STATUS_GOOD,
+                          mu_sym_chunk_unwrap(cc, MU_MESSAGE_SECURITY_MODE_SIGN_AND_ENCRYPT, s2c, mock->last_write,
+                                              mock->last_write_len, &rbody, &rblen, &si));
     }
     mu_binary_reader_t r;
     opcua_uint32_t type = parse_decoded(rbody, rblen, &r);
@@ -197,18 +197,17 @@ static void run_ecc_handshake(mu_security_policy_id_t policy_id, int tamper_sign
     /* ECC identities (the RSA get_own_certificate is a different key). */
     const opcua_byte_t *server_cert = NULL, *client_cert = NULL;
     size_t server_cert_len = 0, client_cert_len = 0;
-    TEST_ASSERT_EQUAL(MU_STATUS_GOOD,
-                      server_crypto.get_own_ecc_certificate(server_crypto.context, curve, &server_cert, &server_cert_len));
-    TEST_ASSERT_EQUAL(MU_STATUS_GOOD,
-                      client_crypto.get_own_ecc_certificate(client_crypto.context, curve, &client_cert, &client_cert_len));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, server_crypto.get_own_ecc_certificate(server_crypto.context, curve, &server_cert,
+                                                                            &server_cert_len));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, client_crypto.get_own_ecc_certificate(client_crypto.context, curve, &client_cert,
+                                                                            &client_cert_len));
 
     /* Client ephemeral ECDH keypair; its public key is the ClientNonce. */
     opcua_byte_t client_nonce[MU_ECC_MAX_PUBKEY_LENGTH];
     size_t client_nonce_len = sizeof(client_nonce);
     opcua_byte_t client_keypair[MU_ECC_KEYPAIR_CTX_SIZE];
-    TEST_ASSERT_EQUAL(MU_STATUS_GOOD,
-                      client_crypto.ecc_generate_ephemeral(client_crypto.context, curve, client_nonce,
-                                                           &client_nonce_len, client_keypair));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, client_crypto.ecc_generate_ephemeral(client_crypto.context, curve, client_nonce,
+                                                                           &client_nonce_len, client_keypair));
     TEST_ASSERT_EQUAL(nonce_len, client_nonce_len);
 
     opcua_byte_t tmp[2048], chunk[CHUNK_CAP];
@@ -370,9 +369,9 @@ static void run_ecc_handshake(mu_security_policy_id_t policy_id, int tamper_sign
     /* Client ECDH + HKDF: same shared secret both sides -> matching channel keys. */
     opcua_byte_t shared[MU_ECC_MAX_PUBKEY_LENGTH];
     size_t shared_len = sizeof(shared);
-    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, client_crypto.ecc_ecdh_derive(client_crypto.context, curve, client_keypair,
-                                                                    server_nonce.data, (size_t)server_nonce.length,
-                                                                    shared, &shared_len));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD,
+                      client_crypto.ecc_ecdh_derive(client_crypto.context, curve, client_keypair, server_nonce.data,
+                                                    (size_t)server_nonce.length, shared, &shared_len));
     if (client_crypto.ecc_keypair_free) {
         client_crypto.ecc_keypair_free(client_crypto.context, client_keypair);
     }
@@ -427,9 +426,9 @@ static void run_ecc_handshake(mu_security_policy_id_t policy_id, int tamper_sign
         mu_bytestring_t cn = {(opcua_int32_t)client_nonce_len, client_nonce};
         mu_binary_write_bytestring(&w, &cn); /* clientNonce */
         mu_bytestring_t cc = {(opcua_int32_t)client_cert_len, client_cert};
-        mu_binary_write_bytestring(&w, &cc);  /* clientCertificate (ECC) */
-        mu_binary_write_double(&w, 60000.0);  /* requestedSessionTimeout */
-        mu_binary_write_uint32(&w, 0);        /* maxResponseMessageSize */
+        mu_binary_write_bytestring(&w, &cc); /* clientCertificate (ECC) */
+        mu_binary_write_double(&w, 60000.0); /* requestedSessionTimeout */
+        mu_binary_write_uint32(&w, 0);       /* maxResponseMessageSize */
     }
     secure_call(&mock, server, &client_crypto, sym_mode, &c2s, &s2c, scid, token_id, 3, &srv_last, tmp, w.position,
                 MU_ID_CREATESESSIONRESPONSE, &resp);

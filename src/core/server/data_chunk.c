@@ -444,10 +444,10 @@ void handle_data_chunk_secure(mu_server_t *server, opcua_byte_t *msg, size_t msg
     else if (mu_security_policy_sym_mode(server_secure_channel.policy) == MU_SYM_MODE_AEAD_CHACHA20POLY1305) {
         /* ECC-curve25519 AEAD outbound: nonce uses the previous outbound
            SequenceNumber (out_seq - 1). */
-        ws = mu_sym_chunk_wrap_aead(crypto, &server_secure_channel.server_keys, "MSG",
-                                    server_secure_channel.channel_id, server_secure_channel.token_id, out_seq,
-                                    out_seq - 1u, response_request_id, respbody, resp_len, server->config.send_buffer,
-                                    server->config.send_buffer_size, &total);
+        ws =
+            mu_sym_chunk_wrap_aead(crypto, &server_secure_channel.server_keys, "MSG", server_secure_channel.channel_id,
+                                   server_secure_channel.token_id, out_seq, out_seq - 1u, response_request_id, respbody,
+                                   resp_len, server->config.send_buffer, server->config.send_buffer_size, &total);
     }
 #endif
     else {

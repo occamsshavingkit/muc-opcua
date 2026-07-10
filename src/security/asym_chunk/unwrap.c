@@ -104,8 +104,8 @@ static opcua_statuscode_t unwrap_ecc(const mu_asym_unwrap_params_t *p, size_t hd
         return MU_STATUS_BAD_SECURITYPOLICYREJECTED;
     }
 
-    opcua_statuscode_t s = mu_certificate_validate(p->crypto, p->info->policy, p->info->sender_cert,
-                                                   p->info->sender_cert_len);
+    opcua_statuscode_t s =
+        mu_certificate_validate(p->crypto, p->info->policy, p->info->sender_cert, p->info->sender_cert_len);
     if (s != MU_STATUS_GOOD) {
         return s;
     }
