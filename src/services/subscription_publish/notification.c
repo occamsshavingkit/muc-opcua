@@ -14,8 +14,8 @@ static void datavalue_apply_timestamps(mu_datavalue_t *dv, const mu_monitored_it
     }
 }
 
-static opcua_statuscode_t write_dcn_object_header(mu_binary_writer_t *w, opcua_int32_t report_count,
-                                                  size_t *length_pos) {
+static opcua_statuscode_t write_dcn_object_header(mu_binary_writer_t *w, opcua_int32_t report_count, size_t *length_pos,
+                                                  size_t *body_start) {
     mu_nodeid_t type_id = {0, MU_NODEID_NUMERIC, {MU_ID_DATACHANGENOTIFICATION_ENCODING_DEFAULTBINARY}};
     opcua_statuscode_t s = mu_binary_write_nodeid(w, &type_id);
     if (s != MU_STATUS_GOOD) {
@@ -31,6 +31,12 @@ static opcua_statuscode_t write_dcn_object_header(mu_binary_writer_t *w, opcua_i
     if (s != MU_STATUS_GOOD) {
         return s;
     }
+
+    /* The ExtensionObject body begins here: the DataChangeNotification's
+       monitoredItems array count is its first field and MUST be inside the Length
+       (OPC-10000-6 §5.2.2.15). Capturing body_start after report_count would omit
+       these 4 bytes and truncate the body for any client that slices to Length. */
+    *body_start = w->position;
 
     s = mu_binary_write_int32(w, report_count);
     if (s != MU_STATUS_GOOD) {
@@ -77,11 +83,11 @@ static opcua_statuscode_t write_dcn_object_end(mu_binary_writer_t *w, size_t len
 opcua_statuscode_t write_data_change_notification(mu_binary_writer_t *w, const struct mu_server *server,
                                                   const mu_subscription_t *sub, opcua_int32_t report_count) {
     size_t length_pos = 0;
-    opcua_statuscode_t s = write_dcn_object_header(w, report_count, &length_pos);
+    size_t body_start = 0;
+    opcua_statuscode_t s = write_dcn_object_header(w, report_count, &length_pos, &body_start);
     if (s != MU_STATUS_GOOD) {
         return s;
     }
-    size_t body_start = w->position;
 
     opcua_datetime_t now = publish_time_now(server);
 
