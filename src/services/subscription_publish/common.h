@@ -15,7 +15,10 @@
 
 #define MU_PUBLISH_BODY_BYTES 512u
 #define MU_ID_DATACHANGENOTIFICATION_ENCODING_DEFAULTBINARY 811u
-#define MU_ID_STATUSCHANGENOTIFICATION_ENCODING_DEFAULTBINARY 813u
+/* StatusChangeNotification_Encoding_DefaultBinary = 820 (OPC UA NodeIds.csv). Was
+   813 (a non-existent node), which broke standard clients' decode of the Publish
+   ExtensionObject TypeId → stream desync → spurious Bad_ServerNameMissing (#284). */
+#define MU_ID_STATUSCHANGENOTIFICATION_ENCODING_DEFAULTBINARY 820u
 
 #if MUC_OPCUA_SUBSCRIPTIONS_STANDARD
 #define MU_STATUSCODE_INFOTYPE_DATAVALUE_OVERFLOW 0x00000480u
