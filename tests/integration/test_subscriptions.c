@@ -2363,8 +2363,11 @@ void test_standard_facet_errors(void) {
     mu_binary_writer_t w;
     size_t clen;
 
-    /* (1) CreateMonitoredItems with Percent deadband (seq 6) -> per-item
-       Bad_MonitoredItemFilterUnsupported (0x80440000). */
+    /* (1) CreateMonitoredItems with Percent deadband (seq 6) on a node that has no
+       EURange Property. Without the Data Access facet: percent deadband is
+       unsupported entirely -> Bad_MonitoredItemFilterUnsupported (0x80440000). With
+       the facet (spec 060): percent is supported, but this node lacks an EURange, so
+       it is rejected with Bad_DeadbandFilterInvalid (0x808E0000, OPC-10000-8 §7.3.2). */
     mu_binary_writer_init(&w, tmp, sizeof(tmp));
     {
         mu_nodeid_t t = {0, MU_NODEID_NUMERIC, {ID_CREATEMONITOREDITEMSREQUEST}};
@@ -2385,7 +2388,11 @@ void test_standard_facet_errors(void) {
     TEST_ASSERT_EQUAL(1, nc);
     opcua_uint32_t dummy;
     opcua_statuscode_t pst = read_moncreate_result(&body, &dummy);
-    TEST_ASSERT_EQUAL_HEX32(0x80440000u, pst);
+#if MUC_OPCUA_DATA_ACCESS
+    TEST_ASSERT_EQUAL_HEX32(0x808E0000u, pst); /* Bad_DeadbandFilterInvalid: no EURange */
+#else
+    TEST_ASSERT_EQUAL_HEX32(0x80440000u, pst); /* Bad_MonitoredItemFilterUnsupported */
+#endif
 
     /* (2) SetTriggering with a valid triggering item but unknown link id (seq 7) → per-link
        Bad_MonitoredItemIdInvalid. */

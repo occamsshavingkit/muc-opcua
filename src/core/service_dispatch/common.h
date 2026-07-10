@@ -283,7 +283,8 @@ opcua_statuscode_t read_event_filter_body(mu_binary_reader_t *r, size_t filter_l
 opcua_statuscode_t set_monitoring_mode_result(mu_server_t *server, opcua_uint32_t monitored_item_id, void *context);
 opcua_statuscode_t delete_monitored_item_result(mu_server_t *server, opcua_uint32_t monitored_item_id, void *context);
 #if MUC_OPCUA_SUBSCRIPTIONS_STANDARD
-opcua_statuscode_t validate_create_item_filter(const mu_monitored_item_create_body_t *body, const mu_node_t *node);
+opcua_statuscode_t validate_create_item_filter(mu_server_t *server, const mu_monitored_item_create_body_t *body,
+                                               const mu_node_t *node);
 bool monitored_node_has_numeric_static_value(const mu_node_t *node);
 #endif
 #endif

@@ -30,7 +30,7 @@ bool resolve_and_validate_create_item(mu_server_t *server, mu_monitored_item_cre
 
 #if MUC_OPCUA_SUBSCRIPTIONS_STANDARD
     {
-        opcua_statuscode_t filter_status = validate_create_item_filter(body, node);
+        opcua_statuscode_t filter_status = validate_create_item_filter(server, body, node);
         if (filter_status != MU_STATUS_GOOD) {
             opcua_statuscode_t s = write_monitored_item_create_result(w, filter_status, 0u, 0u, 0u);
             (void)s;

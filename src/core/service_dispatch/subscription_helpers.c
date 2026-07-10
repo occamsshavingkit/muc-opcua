@@ -278,13 +278,27 @@ opcua_statuscode_t delete_monitored_item_result(mu_server_t *server, opcua_uint3
 }
 
 #if MUC_OPCUA_SUBSCRIPTIONS_STANDARD
-opcua_statuscode_t validate_create_item_filter(const mu_monitored_item_create_body_t *body, const mu_node_t *node) {
+opcua_statuscode_t validate_create_item_filter(mu_server_t *server, const mu_monitored_item_create_body_t *body,
+                                               const mu_node_t *node) {
     if (body->filter_result != MU_STATUS_GOOD)
         return body->filter_result;
     if (body->has_datachange_filter && body->attribute_id != MU_MONITORED_VALUE_ATTRIBUTE_ID)
         return MU_STATUS_BAD_FILTERNOTALLOWED;
     if (body->deadband_type == MU_DEADBAND_TYPE_ABSOLUTE && !monitored_node_has_numeric_static_value(node))
         return MU_STATUS_BAD_MONITOREDITEMFILTERUNSUPPORTED;
+#if MUC_OPCUA_DATA_ACCESS
+    /* PercentDeadband applies only to items with an EURange Property; without one
+       the server must reject with Bad_DeadbandFilterInvalid (OPC-10000-8 §7.3.2). */
+    if (body->deadband_type == MU_DEADBAND_TYPE_PERCENT) {
+        double span = 0.0;
+        if (!mu_resolve_eurange_span(server->config.address_space, &server->user_address_space_index,
+                                     &server->runtime_base.space, node, &span)) {
+            return MU_STATUS_BAD_DEADBANDFILTERINVALID;
+        }
+    }
+#else
+    (void)server;
+#endif
     if (body->has_aggregate && !monitored_node_has_numeric_static_value(node))
         return MU_STATUS_BAD_FILTERNOTALLOWED;
     return MU_STATUS_GOOD;
@@ -320,9 +334,16 @@ opcua_statuscode_t configure_monitored_item(mu_monitored_item_t *item, const mu_
     item->deadband_type = (opcua_byte_t)body->deadband_type;
     item->deadband_value = body->deadband_value;
 #if MUC_OPCUA_DATA_ACCESS
+    /* Percent deadband threshold is a fraction of the EURange span; a percent item
+       only reaches here after validate_create_item_filter confirmed the EURange
+       Property exists (else it was rejected with Bad_DeadbandFilterInvalid). */
     item->deadband_span = 0.0;
     if (item->deadband_type == MU_DEADBAND_TYPE_PERCENT && node != NULL) {
-        item->deadband_span = mu_resolve_eurange_span(server, node);
+        double span = 0.0;
+        if (mu_resolve_eurange_span(server->config.address_space, &server->user_address_space_index,
+                                    &server->runtime_base.space, node, &span)) {
+            item->deadband_span = span;
+        }
     }
 #endif
     item->queue_size = body->queue_size;

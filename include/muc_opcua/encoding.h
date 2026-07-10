@@ -91,6 +91,17 @@ opcua_statuscode_t mu_binary_read_certificate_identity_token(mu_binary_reader_t 
 #if MUC_OPCUA_DATA_ACCESS
 opcua_statuscode_t mu_binary_read_range(mu_binary_reader_t *reader, mu_range_t *value);
 opcua_statuscode_t mu_binary_write_range(mu_binary_writer_t *writer, const mu_range_t *value);
+/* LocalizedText (OPC-10000-6 §5.2.2.14): EncodingMask byte (bit0 Locale, bit1
+   Text present), then each present field as a String. A field with length < 0
+   (null) is absent (its mask bit is clear). Currently used by EUInformation and
+   the Data Access discrete types; gated with DATA_ACCESS until another feature
+   needs it. */
+opcua_statuscode_t mu_binary_read_localized_text(mu_binary_reader_t *reader, mu_localized_text_t *value);
+opcua_statuscode_t mu_binary_write_localized_text(mu_binary_writer_t *writer, const mu_localized_text_t *value);
+/* EUInformation (OPC-10000-8 §5.6.4.3): namespaceUri String, unitId Int32,
+   displayName LocalizedText, description LocalizedText. */
+opcua_statuscode_t mu_binary_read_eu_information(mu_binary_reader_t *reader, mu_eu_information_t *value);
+opcua_statuscode_t mu_binary_write_eu_information(mu_binary_writer_t *writer, const mu_eu_information_t *value);
 #endif
 
 #if MUC_OPCUA_COMPLEX_TYPES

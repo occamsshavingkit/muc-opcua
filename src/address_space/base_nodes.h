@@ -58,10 +58,14 @@ const mu_node_t *mu_resolve_node(const mu_address_space_t *user, mu_address_spac
                                  const mu_address_space_t *dynamic, const mu_nodeid_t *node_id);
 
 #if MUC_OPCUA_DATA_ACCESS
-/* Resolve the EURange span (High - Low) for a Variable node. Returns 0.0 if
-   the node has no EURange Property or the value cannot be read.
-   OPC-10000-4 §7.22.2, OPC-10000-3 §5.6.2. */
-double mu_resolve_eurange_span(const struct mu_server *server, const mu_node_t *node);
+/* Resolve the EURange span (High - Low) for a Variable node, searching the same
+   user/dynamic/base spaces as mu_resolve_node for the EURange Property node.
+   Returns true and sets *out_span when the node has a readable EURange Property
+   (a zero-width EURange High==Low is a valid span of 0.0); returns false when
+   the node has NO EURange Property — the caller must then reject a
+   PercentDeadband with Bad_DeadbandFilterInvalid (OPC-10000-8 §7.2/§7.3.2). */
+bool mu_resolve_eurange_span(const mu_address_space_t *user, mu_address_space_index_t *user_index,
+                             const mu_address_space_t *dynamic, const mu_node_t *node, double *out_span);
 #endif
 
 #endif /* MUC_OPCUA_BASE_NODES_H */

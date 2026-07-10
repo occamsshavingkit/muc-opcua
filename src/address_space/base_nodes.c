@@ -1055,26 +1055,27 @@ const mu_node_t *mu_resolve_node(const mu_address_space_t *user, mu_address_spac
 }
 
 #if MUC_OPCUA_DATA_ACCESS
-double mu_resolve_eurange_span(const struct mu_server *server, const mu_node_t *node) {
-    (void)server;
-    if (node == NULL || node->references == NULL) {
-        return 0.0;
+bool mu_resolve_eurange_span(const mu_address_space_t *user, mu_address_space_index_t *user_index,
+                             const mu_address_space_t *dynamic, const mu_node_t *node, double *out_span) {
+    if (node == NULL || node->references == NULL || out_span == NULL) {
+        return false;
     }
     for (size_t i = 0; i < node->reference_count; ++i) {
         if (node->references[i].reference_type_id.identifier.numeric == 46u && /* HasProperty */
             node->references[i].target_id.identifier.numeric == MU_ID_EURANGE) {
-            const mu_node_t *range_node = mu_resolve_node(NULL, NULL, NULL, &node->references[i].target_id);
-            if (range_node != NULL) {
-                if (range_node->value != NULL && range_node->value->type == MU_VALUESOURCE_STATIC) {
-                    const mu_variant_t *sv = &range_node->value->data.static_value;
-                    if (sv->type == MU_TYPE_DOUBLE && sv->value.array != NULL) {
-                        const opcua_double_t *darr = (const opcua_double_t *)sv->value.array;
-                        return darr[1] - darr[0]; /* High - Low */
-                    }
+            const mu_node_t *range_node = mu_resolve_node(user, user_index, dynamic, &node->references[i].target_id);
+            if (range_node != NULL && range_node->value != NULL && range_node->value->type == MU_VALUESOURCE_STATIC) {
+                const mu_variant_t *sv = &range_node->value->data.static_value;
+                if (sv->type == MU_TYPE_DOUBLE && sv->value.array != NULL) {
+                    const opcua_double_t *darr = (const opcua_double_t *)sv->value.array;
+                    *out_span = darr[1] - darr[0]; /* High - Low; may be 0.0 (valid) */
+                    return true;
                 }
             }
+            /* An EURange Property reference exists but its value is unreadable:
+               treat as absent (cannot compute a percent threshold). */
         }
     }
-    return 0.0;
+    return false;
 }
 #endif
