@@ -1003,9 +1003,15 @@ typedef struct mu_persistence_adapter {
 
 ### 7.5 `mu_crypto_adapter_t` (optional)
 
-Primitives required by SecurityPolicy **Basic256Sha256** (OPC 10000-7). Set the config
-field to `NULL` when only SecurityPolicy None is used. All buffers are caller-owned;
-the server's own certificate and private key live in the adapter's `context`.
+Primitives required by the RSA SecurityPolicies (**Basic256Sha256**,
+**Aes128_Sha256_RsaOaep**, **Aes256_Sha256_RsaPss** — OPC 10000-7) and, if
+`MUC_OPCUA_ECC` is built, the ECC SecurityPolicies (**`#ECC_curve25519`**,
+**`#ECC_nistP256`** — spec 059). Set the config field to `NULL` when only
+SecurityPolicy None is used. All buffers are caller-owned; the server's own
+certificate(s) and private key(s) live in the adapter's `context`. Every
+member below is `#include "muc_opcua/platform.h"`'s `mu_crypto_adapter_t`,
+transcribed field-for-field — that header is the normative source if this
+section and the code ever drift.
 
 ```c
 typedef struct mu_crypto_adapter {
@@ -1022,6 +1028,13 @@ typedef struct mu_crypto_adapter {
         const opcua_byte_t *key, const opcua_byte_t *iv,
         const opcua_byte_t *input, size_t length, opcua_byte_t *output);
     opcua_statuscode_t (*aes256_cbc_decrypt)(void *context,
+        const opcua_byte_t *key, const opcua_byte_t *iv,
+        const opcua_byte_t *input, size_t length, opcua_byte_t *output);
+
+    opcua_statuscode_t (*aes128_cbc_encrypt)(void *context,
+        const opcua_byte_t *key, const opcua_byte_t *iv,
+        const opcua_byte_t *input, size_t length, opcua_byte_t *output);
+    opcua_statuscode_t (*aes128_cbc_decrypt)(void *context,
         const opcua_byte_t *key, const opcua_byte_t *iv,
         const opcua_byte_t *input, size_t length, opcua_byte_t *output);
 
@@ -1052,6 +1065,22 @@ typedef struct mu_crypto_adapter {
         const opcua_byte_t *input, size_t length,
         opcua_byte_t *output, size_t *output_length);
 
+    opcua_statuscode_t (*rsa_pss_sha256_sign)(void *context,
+        const opcua_byte_t *data, size_t length,
+        opcua_byte_t *signature, size_t *signature_length);
+    opcua_statuscode_t (*rsa_pss_sha256_verify)(void *context,
+        const opcua_byte_t *certificate, size_t certificate_length,
+        const opcua_byte_t *data, size_t data_length,
+        const opcua_byte_t *signature, size_t signature_length);
+
+    opcua_statuscode_t (*rsa_oaep_sha256_decrypt)(void *context,
+        const opcua_byte_t *input, size_t length,
+        opcua_byte_t *output, size_t *output_length);
+    opcua_statuscode_t (*rsa_oaep_sha256_encrypt)(void *context,
+        const opcua_byte_t *certificate, size_t certificate_length,
+        const opcua_byte_t *input, size_t length,
+        opcua_byte_t *output, size_t *output_length);
+
     opcua_statuscode_t (*get_own_certificate)(void *context,
         const opcua_byte_t **certificate, size_t *length);
     opcua_statuscode_t (*get_certificate_key_bits)(void *context,
@@ -1059,6 +1088,44 @@ typedef struct mu_crypto_adapter {
 
     opcua_statuscode_t (*get_certificate_thumbprint)(void *context,
         const opcua_byte_t *certificate, size_t certificate_length, opcua_byte_t *thumbprint);
+
+    opcua_statuscode_t (*verify_certificate_validity)(void *context,
+        const opcua_byte_t *certificate, size_t certificate_length);
+
+    opcua_statuscode_t (*verify_certificate_application_uri)(void *context,
+        const opcua_byte_t *certificate, size_t certificate_length,
+        const char *application_uri, size_t application_uri_length);
+
+    /* ---- ECC SecurityPolicies (spec 059); all OPTIONAL, NULL on RSA-only backends ---- */
+
+    opcua_statuscode_t (*ecc_generate_ephemeral)(void *context, mu_ecc_curve_t curve,
+        opcua_byte_t *pubkey, size_t *pubkey_length, opcua_byte_t *keypair_ctx);
+    opcua_statuscode_t (*ecc_ecdh_derive)(void *context, mu_ecc_curve_t curve,
+        const opcua_byte_t *keypair_ctx, const opcua_byte_t *peer_pubkey,
+        size_t peer_pubkey_length, opcua_byte_t *shared, size_t *shared_length);
+    void (*ecc_keypair_free)(void *context, opcua_byte_t *keypair_ctx);
+
+    opcua_statuscode_t (*ecc_sign)(void *context, mu_ecc_curve_t curve,
+        const opcua_byte_t *data, size_t length,
+        opcua_byte_t *signature, size_t *signature_length);
+    opcua_statuscode_t (*ecc_verify)(void *context, mu_ecc_curve_t curve,
+        const opcua_byte_t *certificate, size_t certificate_length,
+        const opcua_byte_t *data, size_t data_length,
+        const opcua_byte_t *signature, size_t signature_length);
+
+    opcua_statuscode_t (*get_own_ecc_certificate)(void *context, mu_ecc_curve_t curve,
+        const opcua_byte_t **certificate, size_t *length);
+
+    opcua_statuscode_t (*chacha20_poly1305_encrypt)(void *context,
+        const opcua_byte_t *key, const opcua_byte_t *nonce,
+        const opcua_byte_t *aad, size_t aad_length,
+        const opcua_byte_t *input, size_t length,
+        opcua_byte_t *output, opcua_byte_t *tag);
+    opcua_statuscode_t (*chacha20_poly1305_decrypt)(void *context,
+        const opcua_byte_t *key, const opcua_byte_t *nonce,
+        const opcua_byte_t *aad, size_t aad_length,
+        const opcua_byte_t *input, size_t length,
+        const opcua_byte_t *tag, opcua_byte_t *output);
 } mu_crypto_adapter_t;
 ```
 
@@ -1075,6 +1142,8 @@ typedef struct mu_crypto_adapter {
 |--------|----------|
 | `aes256_cbc_encrypt(context, key, iv, input, length, output)` | AES-256-CBC, no padding. `key` 32 bytes, `iv` 16 bytes, `length` a multiple of `MU_AES_BLOCK_SIZE` (16). Encrypt `input` → `output`. |
 | `aes256_cbc_decrypt(...)` | Same parameters; decrypt `input` → `output`. |
+| `aes128_cbc_encrypt(context, key, iv, input, length, output)` | AES-128-CBC, no padding. `key` 16 bytes, `iv` 16 bytes. Used by `Aes128_Sha256_RsaOaep` and the ECC-nistP256 SecurityPolicy. |
+| `aes128_cbc_decrypt(...)` | Same parameters; decrypt `input` → `output`. |
 
 **Symmetric AES (optional per-channel context form):**
 
@@ -1098,14 +1167,33 @@ buffer of `MU_CIPHER_CTX_SIZE` bytes.
 | `rsa_sha256_verify(context, certificate, certificate_length, data, data_length, signature, signature_length)` | Verify a signature using a peer certificate (DER). Returns `MU_STATUS_GOOD` if valid. |
 | `rsa_oaep_decrypt(context, input, length, output, output_length)` | RSA-OAEP (MGF1-SHA1) decrypt with the server private key. |
 | `rsa_oaep_encrypt(context, certificate, certificate_length, input, length, output, output_length)` | RSA-OAEP (MGF1-SHA1) encrypt with a peer certificate (DER). |
+| `rsa_pss_sha256_sign(context, data, length, signature, signature_length)` | RSASSA-PSS with SHA-256 (salt length 32 B), signing with the server private key. Used by `Aes256_Sha256_RsaPss`. |
+| `rsa_pss_sha256_verify(context, certificate, certificate_length, data, data_length, signature, signature_length)` | Verify an RSA-PSS-SHA256 signature against a peer certificate (DER). |
+| `rsa_oaep_sha256_decrypt(context, input, length, output, output_length)` | RSA-OAEP (MGF1-SHA256) decrypt with the server private key. Used by `Aes128_Sha256_RsaOaep`/`Aes256_Sha256_RsaPss`. |
+| `rsa_oaep_sha256_encrypt(context, certificate, certificate_length, input, length, output, output_length)` | RSA-OAEP (MGF1-SHA256) encrypt with a peer certificate (DER). |
 
 **Certificate helpers:**
 
 | Member | Contract |
 |--------|----------|
-| `get_own_certificate(context, certificate, length)` | Return a pointer to the server's own DER certificate and its length (no copy; `*certificate` points to adapter-owned memory). |
+| `get_own_certificate(context, certificate, length)` | Return a pointer to the server's own DER certificate and its length (no copy; `*certificate` points to adapter-owned memory). This is the **RSA** identity — see `get_own_ecc_certificate` below for the ECC identity. |
 | `get_certificate_key_bits(context, certificate, certificate_length, bits)` | Return the RSA modulus size in bits for the given DER certificate. |
 | `get_certificate_thumbprint(context, certificate, certificate_length, thumbprint)` | Compute the cert thumbprint = SHA-1 of the DER cert → `thumbprint` (`MU_THUMBPRINT_LENGTH` = 20 bytes). |
+| `verify_certificate_validity(context, certificate, certificate_length)` | OPC-10000-4 §5.5: `MU_STATUS_GOOD` when the current time is within `[notBefore, notAfter]`, `MU_STATUS_BAD_CERTIFICATETIMEINVALID` if expired/not-yet-valid, `MU_STATUS_BAD_CERTIFICATEINVALID` if unparseable. **OPTIONAL**: `NULL` means the backend cannot check — secured policies then fail closed. |
+| `verify_certificate_application_uri(context, certificate, certificate_length, application_uri, application_uri_length)` | OPC-10000-4 §5.7.2.1: verify `clientDescription.applicationUri` matches a SAN/CN entry in the certificate. **OPTIONAL**: `NULL` means callers skip the check. |
+
+**ECC (spec 059, `MUC_OPCUA_ECC`; all members OPTIONAL — RSA-only backends leave every one of these `NULL`, and callers gate on the negotiated policy's asymmetric family):**
+
+| Member | Contract |
+|--------|----------|
+| `ecc_generate_ephemeral(context, curve, pubkey, pubkey_length, keypair_ctx)` | Generate an ephemeral ECC keypair for `curve` (`MU_ECC_CURVE_25519` or `MU_ECC_CURVE_NISTP256`). Writes the SecurityPolicy-encoded public key (32-byte little-endian for curve25519; 64-byte uncompressed big-endian x‖y for nistP256) to `pubkey`, sets `*pubkey_length`. The private key is retained in the opaque `keypair_ctx` (`MU_ECC_KEYPAIR_CTX_SIZE` bytes), consumed by `ecc_ecdh_derive` and released by `ecc_keypair_free`. |
+| `ecc_ecdh_derive(context, curve, keypair_ctx, peer_pubkey, peer_pubkey_length, shared, shared_length)` | ECDH: combine the local ephemeral private key with the peer's encoded public key → the raw shared secret (the x-coordinate for nistP256; the RFC-7748 output for curve25519). |
+| `ecc_keypair_free(context, keypair_ctx)` | Release the opaque ephemeral keypair held in `keypair_ctx`. |
+| `ecc_sign(context, curve, data, length, signature, signature_length)` | Sign with the server's private key for `curve`: Ed25519 (curve25519) or ECDSA-SHA2-256 (nistP256). Signature is `MU_ECC_SIGNATURE_LENGTH` (64) bytes. |
+| `ecc_verify(context, curve, certificate, certificate_length, data, data_length, signature, signature_length)` | Verify an ECC signature against a peer certificate (DER). |
+| `get_own_ecc_certificate(context, curve, certificate, length)` | Return the server's own **ECC** DER certificate for `curve` — the SenderCertificate an ECC OPN chunk carries, matching the `ecc_sign` key. Distinct from `get_own_certificate` (the RSA identity); ECC-capable backends hold a separate per-curve identity. |
+| `chacha20_poly1305_encrypt(context, key, nonce, aad, aad_length, input, length, output, tag)` | ChaCha20-Poly1305 AEAD (RFC 8439) for the curve25519 SecurityPolicy. `key` 32 B, `nonce` 12 B; writes the 16-byte tag to `tag`. |
+| `chacha20_poly1305_decrypt(context, key, nonce, aad, aad_length, input, length, tag, output)` | Decrypt + verify; returns `MU_STATUS_BAD_SECURITYCHECKSFAILED` on tag mismatch. |
 
 ---
 
@@ -1114,7 +1202,9 @@ buffer of `MU_CIPHER_CTX_SIZE` bytes.
 These macros are **compile-time knobs**. Most are overridable with `-D` for tuning
 embedded profiles; a few are fixed library constants. Feature toggles
 (`MUC_OPCUA_*`) are normally set by the CMake build (see
-[section 11](#11-build-time-feature-macros-cmake)).
+[section 12](#12-build-time-feature-macros--profiles-cmake), and
+[docs/build-and-gating.md](build-and-gating.md) for the full flag reference
+and how to override a profile's defaults).
 
 ### 8.1 Overridable knobs (`-D`)
 

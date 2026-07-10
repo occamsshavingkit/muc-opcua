@@ -46,22 +46,34 @@ This tutorial was validated against CMake 3.28, GCC (host), and `asyncua` 2.0.
 
 ---
 
-## 2. The three profiles (pick what you build)
+## 2. The five profiles (pick what you build)
 
 muc-opcua compiles to a different feature set depending on the **profile**.
-Each profile maps to one `make` target and turns specific `MUC_OPCUA_*` CMake
-options on or off:
+Each named profile maps to one `make` target (or `-DMUC_OPCUA_PROFILE=...`)
+and turns specific `MUC_OPCUA_*` CMake options on or off. Any individual flag
+can be added or removed on top of a profile's defaults — see
+[docs/build-and-gating.md](build-and-gating.md) for the full flag reference
+and override mechanics.
 
 | Profile | Command | SecurityPolicy | Subscriptions | Core flash (Cortex-M0+ `-Os`) |
 |---|---|---|---|---|
-| **nano** | `make nano` | None | off | ~16.3 KiB |
-| **micro** | `make micro` | None | **on** (data-change) | ~22.4 KiB |
-| **embedded** | `make embedded` | **Basic256Sha256** (sign/encrypt) | Standard DataChange 2017 | ~34.8 KiB |
+| **nano** | `make nano` | None | off | 17,956 B |
+| **micro** | `make micro` | None | **on** (data-change) | 29,550 B |
+| **embedded** | `make embedded` | **Basic256Sha256** (sign/encrypt) | Standard DataChange 2017 | 54,616 B |
+| **standard** | `-DMUC_OPCUA_PROFILE=standard` | + Aes128/256 RsaOaep/RsaPss, optional ECC | + full Aggregate set | 71,370 B |
+| **full** | `-DMUC_OPCUA_PROFILE=full` | Same as standard | Same as standard | 71,354 B |
 
 - **nano** — the OPC UA *Nano Embedded Device 2017* surface: Discovery, Session,
   Read, and the View (Browse) service set over **SecurityPolicy None**. Smallest build.
 - **micro** — nano **plus** the data-change subscription engine (the Embedded Data
   Change Subscription Server Facet). Choose this if your client polls via subscriptions.
+- **standard**/**full** — the OPC-10000-7 *Standard 2017 UA Server* facet bundle:
+  Write, History, Query, NodeManagement, PubSub, Data Access, Method Server,
+  Auditing, Complex Types, Redundancy, Reverse Connect, and the optional ECC
+  SecurityPolicies (`#ECC_curve25519`/`#ECC_nistP256`, spec 059 — see
+  [docs/conformance/ecc-security-policy.md](conformance/ecc-security-policy.md)).
+  `full` is not a distinct OPC UA profile — same feature set as `standard`,
+  larger capacity presets.
 - **embedded** — micro **plus** SecurityPolicy **Basic256Sha256**, Standard DataChange
   2017, Base Info Type System exposure, and the required GetMonitoredItems/ResendData
   methods. The host build links OpenSSL to provide the crypto primitives; on an MCU you
@@ -295,10 +307,15 @@ make test
 Expected tail:
 
 ```
-100% tests passed, 0 tests failed out of 56
+100% tests passed, 0 tests failed out of 128
 
-Total Test time (real) =   2.85 sec
+Total Test time (real) =   3.5 sec
 ```
+
+(`make test` doesn't pass `-DMUC_OPCUA_PROFILE`, so it resolves to `full` — the
+most exhaustive test count. Building tests against a specific profile, e.g.
+`-DMUC_OPCUA_PROFILE=nano -DMUC_OPCUA_BUILD_TESTS=ON`, runs fewer tests: only
+the ones meaningful for what that profile actually compiles in.)
 
 Under the hood this is:
 
@@ -341,7 +358,7 @@ client, and clean up the server process when done.
 
 ## Checkpoint 3: You should be able to...
 
-- [ ] See `100% tests passed ... out of 56` from `make test`
+- [ ] See `100% tests passed ... out of 128` from `make test`
 - [ ] See `INTEROP PASS` from `run_interop.sh`
 
 ---

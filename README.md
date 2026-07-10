@@ -25,10 +25,10 @@ in only the surface you need.
 
 - **Zero heap.** No `malloc` anywhere in the protocol path. The application owns all
   memory: one server-storage block plus the RX/TX buffers. Footprint is deterministic.
-- **Tiny flash.** Measured snapshot (2026-07-09, reproduce with
-  `scripts/measure_size.sh all`): a complete Nano server is **17.3 KiB**
-  (17,762 B) of Arm Cortex-M0+ `-Os` core `.text`; Micro is **28.7 KiB**
-  (29,384 B); Standard 2017 is **66.6 KiB** (68,246 B). Every profile has
+- **Tiny flash.** Measured snapshot (2026-07-10, reproduce with
+  `scripts/measure_size.sh all`): a complete Nano server is **17.5 KiB**
+  (17,956 B) of Arm Cortex-M0+ `-Os` core `.text`; Micro is **28.9 KiB**
+  (29,550 B); Standard 2017 is **69.7 KiB** (71,370 B). Every profile has
   0 B `.data` and 0 B `.bss` — the library holds no mutable static state and
   never calls `malloc`.
 - **Freestanding & portable.** Plain C11 core with no OS assumptions. Hardware and OS
@@ -56,17 +56,20 @@ smaller after `--gc-sections` dead-code elimination.
 
 | Profile | .text | OPC UA Profile |
 |---------|-------|----------------|
-| nano | 17,762 B | Nano Embedded Device 2017 |
-| micro | 29,384 B | Micro Embedded Device 2017 |
-| embedded | 54,456 B | Embedded 2017 UA Server |
-| standard | 68,246 B | Standard 2017 UA Server |
-| full | 68,266 B | — (everything on) |
+| nano | 17,956 B | Nano Embedded Device 2017 |
+| micro | 29,550 B | Micro Embedded Device 2017 |
+| embedded | 54,616 B | Embedded 2017 UA Server |
+| standard | 71,370 B | Standard 2017 UA Server |
+| full | 71,354 B | — (everything on; also carries `MUC_OPCUA_ECC`) |
 
 Built with LTO (`MUC_OPCUA_LTO=ON`, the default). The `nano`/`micro`/`embedded`
 profiles are strictly no-heap (`MUC_OPCUA_ALLOW_HEAP=OFF`): 0 B `.data`, 0 B `.bss`,
 no `malloc` in the linked server. With LTO's cross-module optimization the real
-linked `nano` server is **15,724 B** `.text` (`--gc-sections`), below the archive
+linked `nano` server is **15,764 B** `.text` (`--gc-sections`), below the archive
 figure above. `standard`/`full` keep the heap enabled for array-valued Write/Call.
+`standard`/`full` also carry the optional ECC SecurityPolicies (spec 059, ~3.1 KB);
+see [docs/conformance/ecc-security-policy.md](docs/conformance/ecc-security-policy.md)
+and [docs/build-and-gating.md](docs/build-and-gating.md) to build without them.
 
 The library declares **no mutable static state** — its archive has 0 B `.data`
 and 0 B `.bss` on every profile. `nano`/`micro`/`embedded` are strictly no-heap
@@ -295,9 +298,9 @@ Set `-DMUC_OPCUA_PLATFORM=pico` with `PICO_SDK_PATH` pointing at a Pico SDK chec
 - **The `embedded` profile targets Embedded 2017.** It includes Basic256Sha256,
   Standard DataChange 2017, Base Info Type System exposure, and the required
   GetMonitoredItems/ResendData methods, but it is not CTT-verified.
-- **The `full-featured` profile** adds multiplexed client connections, the Write service,
-  username/X509 user tokens, dynamic nodes, arbitrary user methods, Alarms & Conditions
-  events, and server diagnostics.
+- **The `standard`/`full` profiles** add multiplexed client connections, the Write
+  service, username/X509 user tokens, dynamic nodes, arbitrary user methods,
+  Alarms & Conditions events, server diagnostics, and (optionally) ECC SecurityPolicies.
 - **SecurityPolicy None is for trusted/isolated networks or testing only.** Use
   Basic256Sha256 (embedded profile + crypto adapter) for anything exposed.
 - **Optional services are build-gated.** History, NodeManagement, Query, Write,
@@ -337,9 +340,11 @@ Makefile               Profile build presets (nano/micro/embedded)
 
 - [docs/getting-started.md](docs/getting-started.md) — install, build, first run
 - [docs/integration-guide.md](docs/integration-guide.md) — implementing platform adapters & your address space
+- [docs/build-and-gating.md](docs/build-and-gating.md) — every `MUC_OPCUA_*` CMake flag, profile composition, and how to override a profile default (add/remove a feature)
 - [docs/architecture.md](docs/architecture.md) — internals, memory model, poll loop
 - [docs/api-reference.md](docs/api-reference.md) — full API reference
 - [docs/conformance/](docs/conformance/) — service & profile conformance matrices
+- [docs/conformance/ecc-security-policy.md](docs/conformance/ecc-security-policy.md) — optional ECC SecurityPolicy CU
 - [docs/size/feature-size-ledger.md](docs/size/feature-size-ledger.md) — measured footprint
 
 ---
