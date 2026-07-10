@@ -296,10 +296,10 @@ endif()
 # ECC SecurityPolicies (spec 059). Droppable translation unit: absent unless
 # MUC_OPCUA_ECC is on, so profiles that exclude ECC pay no .text. Backend-specific
 # ECC implementations are added inside each MUC_OPCUA_HAVE_* block below.
+# MUC_OPCUA_ECC requiring MUC_OPCUA_SECURITY is enforced earlier, at the top of
+# CMakeLists.txt (MUC_OPCUA_FEATURE_DEPENDENCIES), before add_subdirectory(src)
+# ever runs -- this file can assume that invariant already holds.
 if(MUC_OPCUA_ECC)
-    if(NOT MUC_OPCUA_SECURITY)
-        message(FATAL_ERROR "MUC_OPCUA_ECC requires MUC_OPCUA_SECURITY")
-    endif()
     target_sources(muc_opcua PRIVATE security/asym_ecc.c)
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_ECC=1)
 endif()

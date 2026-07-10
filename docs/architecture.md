@@ -252,7 +252,8 @@ The dispatch table (`g_supported_services[]` in `service_dispatch.c`) is built w
 table and its request returns a fault. `OpenSecureChannel` and the Session services
 are always present.
 
-Profile shorthand (the `Makefile` wires these into `make nano` / `make micro`):
+Profile shorthand (the `Makefile` wires the first three into `make nano` /
+`make micro` / `make embedded`; `standard`/`full` are `-DMUC_OPCUA_PROFILE=...`):
 
 - **Nano** = Core Server Facet + UA-TCP/UA-SC/UA-Binary + SecurityPolicy None +
   Anonymous identity. Subscriptions OFF.
@@ -261,11 +262,26 @@ Profile shorthand (the `Makefile` wires these into `make nano` / `make micro`):
   `MU_MAX_CONNECTIONS` TCP connections — it is a core capability, not profile-specific.)
 - **Embedded (2017)** = security policies on top, i.e.
   `MUC_OPCUA_SECURITY` (Basic256Sha256) and Standard DataChange subscriptions.
-- **Full-Featured** = Embedded + Write service, Events, Methods, Diagnostics, and Dynamic Nodes.
+- **Standard (2017)** = Embedded + Write, History, Query, NodeManagement, PubSub,
+  Data Access, Method Server, Auditing, Complex Types, Redundancy, Reverse Connect,
+  the full Aggregate set, and the optional ECC SecurityPolicies (`MUC_OPCUA_ECC`,
+  spec 059 — `#ECC_curve25519`/`#ECC_nistP256` alongside Basic256Sha256/
+  Aes128_Sha256_RsaOaep/Aes256_Sha256_RsaPss; see §7).
+- **Full** = same feature set as Standard, not a distinct OPC UA profile — larger
+  capacity presets (`MU_MAX_*`) only.
+
+Every named profile is a preset; any individual flag can be added on top of or
+removed from a profile's defaults on the same `cmake` invocation (e.g. "standard
+minus the crypto layer") — this is a separate mechanism from the profile
+selection above. See [`build-and-gating.md`](build-and-gating.md) for the full
+`MUC_OPCUA_*` flag reference, the override/subtraction semantics, and the
+cross-feature dependency checks that keep an overridden combination from
+silently building something inconsistent.
 
 Profile definitions and current status:
 [`conformance/profile-nano.md`](conformance/profile-nano.md),
-[`conformance/profile-micro.md`](conformance/profile-micro.md).
+[`conformance/profile-micro.md`](conformance/profile-micro.md),
+[`conformance/profile-embedded.md`](conformance/profile-embedded.md).
 
 ---
 
@@ -306,34 +322,51 @@ the cap, it falls back to a linear scan. The standard Base Information node set
 
 Security is entirely optional and compiles out under `MUC_OPCUA_SECURITY=OFF`,
 leaving a SecurityPolicy-None-only build with no crypto code. When enabled, the
-server supports **SecurityPolicy None and Basic256Sha256** (OPC 10000-7).
+server supports **None, Basic256Sha256, Aes128_Sha256_RsaOaep, and
+Aes256_Sha256_RsaPss** (OPC 10000-7), plus, under the further-optional
+`MUC_OPCUA_ECC` (spec 059, default ON for standard/full, requires
+`MUC_OPCUA_SECURITY`), the **ECC SecurityPolicies** `#ECC_curve25519` and
+`#ECC_nistP256` (the optional "Security ECC Policy" CU).
 
 - **Pluggable crypto adapter.** All primitives are function pointers on
-  `mu_crypto_adapter_t` (`platform.h`): SHA-256, HMAC-SHA256, AES-256-CBC (one-shot
-  *and* an optional per-channel cipher context), RSA-PKCS1.5-SHA256 sign/verify,
-  RSA-OAEP encrypt/decrypt, and certificate accessors (own cert, key bits,
-  thumbprint). The server's own certificate and private key live in the adapter's
-  `context`; the library never owns key material. The host reference backend is
-  OpenSSL (`src/platform/host_crypto_adapter.c`).
-- **Key derivation.** `key_derivation.c` implements **P-SHA256** (RFC 5246 §5).
-  `OpenSecureChannel` derives two `mu_sym_keys_t` sets from the client/server nonces
-  (signing key ‖ encrypting key ‖ IV per direction, OPC 10000-6 §6.7.5).
+  `mu_crypto_adapter_t` (`platform.h`): SHA-256, HMAC-SHA256, AES-256/128-CBC
+  (one-shot *and* an optional per-channel cipher context), RSA-PKCS1.5-SHA256 and
+  RSA-PSS-SHA256 sign/verify, RSA-OAEP (MGF1-SHA1 and MGF1-SHA256) encrypt/decrypt,
+  certificate accessors (own cert, key bits, thumbprint, validity/application-URI
+  checks), and — when `MUC_OPCUA_ECC` — ephemeral ECDH keygen/derive, ECC
+  sign/verify, a per-curve certificate accessor, and ChaCha20-Poly1305 AEAD. The
+  server's own certificate(s) and private key(s) live in the adapter's `context`;
+  the library never owns key material. Three backends ship: OpenSSL (host,
+  `src/platform/host_crypto/`, both ECC curves), wolfSSL
+  (`src/platform/wolfssl_crypto/`, both ECC curves), and mbedTLS
+  (`src/platform/mbedtls_crypto_adapter.c`, ECC-nistP256 only — mbedTLS has no
+  Ed25519, which curve25519's OPN signature requires).
+- **Key derivation.** `key_derivation.c` implements **P-SHA256** (RFC 5246 §5) for
+  the RSA policies, and **HKDF-SHA256** (RFC 5869) for ECC. `OpenSecureChannel`
+  derives two `mu_sym_keys_t` sets from the client/server nonces (RSA: signing key ‖
+  encrypting key ‖ IV per direction, OPC 10000-6 §6.7.5; ECC: ephemeral-ECDH shared
+  secret through HKDF with the `ServerSalt`/`ClientSalt` construction, §6.8.1).
 - **Per-channel cipher context.** Each direction's `mu_sym_keys_t` carries an opaque
   `cipher_ctx[MU_CIPHER_CTX_SIZE]` (default 512 B) prepared once via
   `cipher_ctx_init`, so a backend can keep its AES key schedule instead of re-keying
   per chunk. If the adapter leaves those callbacks NULL, the codec falls back to the
-  one-shot `aes256_cbc_*`.
-- **Chunk protection.** `asym_chunk.c` protects the OPN handshake (RSA-OAEP encrypt
-  to the peer cert, RSA-PKCS1.5-SHA256 sign with the own key, thumbprint check);
-  `sym_chunk.c` protects MSG/CLO chunks (HMAC-SHA256 sign, AES-256-CBC encrypt,
-  sign-then-encrypt so the signature is inside the ciphertext).
+  one-shot `aes256_cbc_*`/`aes128_cbc_*`.
+- **Chunk protection.** `asym_chunk/{wrap,unwrap}.c` protects the OPN handshake: for
+  the RSA policies, OAEP-encrypt to the peer cert + PKCS1.5/PSS-sign with the own
+  key + thumbprint check; for ECC, **signed-only** (ECC provides no asymmetric
+  encryption — the ephemeral public keys ride in the Client/ServerNonce instead,
+  §6.8.1). `sym_chunk.c` protects MSG/CLO chunks two ways: HMAC-SHA256-sign +
+  AES-CBC-encrypt (sign-then-encrypt, signature inside the ciphertext) for the RSA
+  policies and ECC-nistP256; ChaCha20-Poly1305 AEAD for ECC-curve25519 (nonce = the
+  derived IV XOR `TokenId‖LastSequenceNumber`, Table 69).
 - **In-place decrypt.** Inbound MSG chunks are decrypted within the receive buffer
   (no per-request scratch); only response bodies use `secure_scratch`.
 - **Secret zeroization.** `mu_secure_zero()` (in `key_derivation.c`) clears derived
   key material and transient secrets so they do not linger in RAM.
 
 Details and the threat-model caveats (e.g. None is for trusted/isolated networks
-only) are in [`conformance/security.md`](conformance/security.md).
+only) are in [`conformance/security.md`](conformance/security.md) and
+[`conformance/ecc-security-policy.md`](conformance/ecc-security-policy.md).
 
 ---
 
@@ -355,18 +388,20 @@ only) are in [`conformance/security.md`](conformance/security.md).
 | `src/services/read.c` | Attribute Read over the address space. |
 | `src/services/browse.c` | Browse / BrowseNext / TranslateBrowsePathsToNodeIds (the View set). |
 | `src/services/subscription.c` | No-heap subscription + MonitoredItem engine, sampling, Publish/Republish (Micro). |
-| `src/security/security_policy.c` | Policy/mode enums + URI mapping + Basic256Sha256 parameter table (always built). |
-| `src/security/asym_chunk.c` | OPN asymmetric sign+encrypt/unwrap (RSA). |
-| `src/security/sym_chunk.c` | MSG/CLO symmetric sign+encrypt/unwrap (AES/HMAC) + key-set storage. |
-| `src/security/key_derivation.c` | P-SHA256 channel-key derivation + `mu_secure_zero`. |
+| `src/security/security_policy.c` | Policy/mode enums + URI mapping + per-policy parameter table (RSA + ECC rows; always built). |
+| `src/security/asym_chunk/{wrap,unwrap}.c` | OPN asymmetric sign+encrypt/unwrap (RSA) and signed-only sign/verify (ECC). |
+| `src/security/sym_chunk.c` | MSG/CLO symmetric sign+encrypt/unwrap (AES/HMAC for RSA + ECC-nistP256; ChaCha20-Poly1305 AEAD for ECC-curve25519) + key-set storage. |
+| `src/security/key_derivation.c` | P-SHA256 (RSA) + HKDF-SHA256 (ECC) channel-key derivation + `mu_secure_zero`. |
+| `src/security/asym_ecc.c` | ECC ephemeral-ECDH channel-key derivation (HKDF salt/info construction, spec 059; `MUC_OPCUA_ECC` only). |
 | `src/security/certificate.c` | Certificate helpers used by the secure handshake. |
 | `src/encoding/` | OPC UA Binary reader/writer for scalars, strings, NodeIds, ExtensionObjects, Variants, DataValues; `binary_le.h` endian-portable primitives. |
 | `src/address_space/` | Node model, bounded NodeId index, NodeId helpers, value sources, and the standard Base Information node set (`base_nodes.c`). |
 | `src/generated/opcua_ids.c` | Generated well-known ns=0 NodeId constants. |
-| `src/platform/` | Host reference adapters: POSIX TCP (`host_tcp_adapter.c`) and OpenSSL crypto (`host_crypto_adapter.c`). |
+| `src/platform/` | Host reference adapters: POSIX TCP (`host_tcp_adapter.c`); crypto backends OpenSSL (`host_crypto/`, both ECC curves), mbedTLS (`mbedtls_crypto_adapter.c`, ECC-nistP256 only), wolfSSL (`wolfssl_crypto/`, both ECC curves). |
 | `examples/` | `minimal_server` reference app → built at `build/<profile>/examples/minimal_server`. |
 | `platform/` | Non-host platform integration (e.g. Pico SDK). |
-| `docs/conformance/` | Profile and service/security conformance: `profile-nano.md`, `profile-micro.md`, `services.md`, `security.md`. |
+| `docs/conformance/` | Profile and service/security conformance: `profile-nano.md`, `profile-micro.md`, `profile-embedded.md`, `services.md`, `security.md`, `ecc-security-policy.md`. |
+| `docs/build-and-gating.md` | Every `MUC_OPCUA_*` CMake flag, profile composition, and how to override a profile's defaults. |
 
 ---
 

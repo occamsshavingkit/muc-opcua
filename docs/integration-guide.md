@@ -713,7 +713,15 @@ The authoritative conformance reference is
 - **Crypto primitives:** Basic256Sha256 = SHA-256, HMAC-SHA-256, AES-256-CBC,
   RSA PKCS#1 v1.5 (SHA-256) for signatures, RSA-OAEP (MGF1-SHA1) for the
   asymmetric secret exchange — see §3.4. On an MCU, implement these over mbedTLS
-  or ARM PSA Crypto / a hardware crypto block.
+  or ARM PSA Crypto / a hardware crypto block. muc-opcua ships ready-made adapters
+  for OpenSSL (host), mbedTLS, and wolfSSL (`MUC_OPCUA_HAVE_{MBEDTLS,WOLFSSL}`).
+- **Optional ECC SecurityPolicies** (`#ECC_curve25519`, `#ECC_nistP256`; spec 059,
+  `MUC_OPCUA_ECC`, default ON for standard/full) add ephemeral-ECDH secure channels
+  (X25519+Ed25519 or P-256+ECDSA) alongside the RSA policies above — same crypto
+  adapter interface, an extra per-curve certificate/key via
+  `get_own_ecc_certificate`. The mbedTLS backend only implements the nistP256 half
+  (no Ed25519 in that library); OpenSSL and wolfSSL implement both. See
+  [`docs/conformance/ecc-security-policy.md`](conformance/ecc-security-policy.md).
 - **Entropy quality is part of the security model** — nonces and derived keys are
   only as strong as `generate_random`. Use a real TRNG (§3.3).
 
@@ -723,14 +731,20 @@ The authoritative conformance reference is
 
 ### 7.1 Choosing a profile
 
-muc-opcua ships three profiles, selected via CMake options (or the
-`make nano` / `make micro` / `make embedded` convenience targets):
+muc-opcua ships five named profiles, selected via `-DMUC_OPCUA_PROFILE=...`
+(or the `make nano` / `make micro` / `make embedded` convenience targets for
+the first three). Any individual flag can be added to or removed from a
+profile's defaults on the same `cmake` invocation — see
+[`docs/build-and-gating.md`](build-and-gating.md) for the full flag reference
+and override mechanics (e.g. "standard minus the crypto layer").
 
 | Profile | Service set | Key options |
 |---|---|---|
 | **Nano** | Core + View (Browse) + Read, SecurityPolicy None | subscriptions OFF, security OFF |
 | **Micro** | Nano + data-change Subscriptions / MonitoredItems | `MUC_OPCUA_SUBSCRIPTIONS=ON` |
 | **Embedded** | Micro + Basic256Sha256 | `+ MUC_OPCUA_SECURITY=ON` |
+| **Standard** | Embedded + Write/History/Query/NodeManagement/PubSub/Data Access/Method Server/Auditing/Complex Types/Redundancy/Reverse Connect, optional ECC | `+ MUC_OPCUA_DATA_ACCESS=ON MUC_OPCUA_METHOD_SERVER=ON MUC_OPCUA_ECC=ON` (and more) |
+| **Full** | Same feature set as Standard, larger capacity presets | same flags, larger `MU_MAX_*` defaults |
 
 ### 7.2 CMake options
 
@@ -788,7 +802,7 @@ cmake -B build -DMUC_OPCUA_SUBSCRIPTIONS=ON \
 
 ### 7.4 Flash / RAM budget
 
-Measured 2026-06-30 on ARM Cortex-M0+ (RP2040), `arm-none-eabi-gcc -Os
+Measured 2026-07-10 on ARM Cortex-M0+ (RP2040), `arm-none-eabi-gcc -Os
 -mcpu=cortex-m0plus -mthumb -ffunction-sections -fdata-sections`; your board TCP/IP
 stack and crypto backend are extra. Reproduce with `scripts/measure_size.sh all`.
 Full details in
@@ -796,17 +810,30 @@ Full details in
 
 | Profile | Core `.text` (flash) | Caller RAM = storage + 2×8 KiB buffers | Heap |
 |---|---|---|---|
-| **Nano** | **15.9 KiB** (16,278 B) | 1,280 B + 16 KiB ≈ **17.3 KiB** | **0** |
-| **Micro** | **23.2 KiB** (23,785 B) | 3,328 B + 16 KiB ≈ **19.3 KiB** | **0** |
-| **Embedded 2017** | **42.0 KiB** (42,990 B) | 63,240 B + 16 KiB ≈ **79.3 KiB** | **0** |
-| **Full Featured** | **50.4 KiB** (51,612 B) | 63,240 B + 16 KiB ≈ **79.6 KiB** | **0** |
+| **Nano** | **17.5 KiB** (17,956 B) | 1,408 B + 16 KiB ≈ **17.4 KiB** | **0** |
+| **Micro** | **28.9 KiB** (29,550 B) | 11,680 B + 16 KiB ≈ **27.4 KiB** | **0** |
+| **Embedded 2017** | **53.3 KiB** (54,616 B) | 128,232 B + 16 KiB ≈ **141.2 KiB** | **0** |
+| **Standard 2017** | **69.7 KiB** (71,370 B) | 741,300 B + 16 KiB ≈ **740.0 KiB** | array-valued Write/Call |
+| **Full** | **69.7 KiB** (71,354 B) | 1,387,500 B + 16 KiB ≈ **1.34 MiB** | array-valued Write/Call |
 
 Additional notes for budgeting:
 
-- **`.bss`** and **`.data`** are 0; **heap is 0** everywhere — the subscription engine
-  is fixed-size, no `malloc`.
-- **Crypto backend flash** (mbedTLS/PSA) is *not* included above and is typically
-  the largest single addition on an Embedded build — size it from your TLS library.
+- **`.bss`** and **`.data`** are 0 for `.text`; **heap is 0** on nano/micro/embedded —
+  the subscription engine is fixed-size, no `malloc`. Standard/full keep the heap
+  enabled specifically for array-valued Write/Call decoding.
+- **Caller RAM scales with capacity presets**, not just feature flags: standard/full
+  default to far larger session/subscription/monitored-item counts than
+  embedded (see `MU_SERVER_STORAGE_BYTES` per profile in
+  [`docs/size/feature-size-ledger.md`](size/feature-size-ledger.md)) — this is why
+  Embedded→Standard is a ~5× RAM jump despite a much smaller `.text` jump. Every
+  capacity is overridable independent of profile with `-DMU_MAX_*=<n>` (e.g.
+  `-DMU_MAX_SESSIONS=4`) if the profile default is more than your target needs.
+- **Crypto backend flash** (mbedTLS/wolfSSL/OpenSSL) is *not* included above and is
+  typically the largest single addition on a Standard/Full build; ECC adds a further
+  ~3.1 KB of protocol code on top when `MUC_OPCUA_ECC` is on (default for
+  standard/full) — see
+  [`docs/conformance/ecc-security-policy.md`](conformance/ecc-security-policy.md).
+  Size it from your TLS library plus the ECC delta.
 - **Peak stack:** ~5.5 KiB on the plaintext (None) path; ~12 KiB on the secured
   path (response buffer + 32-deep dispatch arrays). **Provision ≥16 KiB of stack
   for a security build.** Secured-channel scratch was moved off the stack into the
