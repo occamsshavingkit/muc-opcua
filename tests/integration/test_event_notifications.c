@@ -815,9 +815,90 @@ void test_event_where_unsupported_operator_rejected(void) {
 }
 #endif /* MUC_OPCUA_EVENT_FILTER_WHERE */
 
+/* Issue #288 repro attempt: asyncua starts its Publish loop the instant
+   CreateSubscription returns — so the FIRST Publish arrives before any
+   CreateMonitoredItems. handle_publish must find the subscription (sub_count>0)
+   and park the request, NOT return Bad_NoSubscription. */
+void test_publish_immediately_after_create_subscription(void) {
+#if MUC_OPCUA_SUBSCRIPTIONS && MUC_OPCUA_SUBSCRIPTIONS_STANDARD
+    mock_t mock;
+    (void)memset(&mock, 0, sizeof(mock));
+    enqueue_connect(&mock);
+    enqueue_create_subscription(&mock, 4, 500.0);
+
+    _Alignas(8) opcua_byte_t storage[MU_SERVER_STORAGE_BYTES];
+    mu_server_config_t config;
+    (void)memset(&config, 0, sizeof(config));
+    config.endpoint_url = "opc.tcp://host:4840";
+    config.application_uri = "urn:t";
+    config.product_uri = "urn:t";
+    config.application_name = "t";
+    static opcua_byte_t rx[8192], tx[8192];
+    config.receive_buffer = rx;
+    config.receive_buffer_size = sizeof(rx);
+    config.send_buffer = tx;
+    config.send_buffer_size = sizeof(tx);
+    config.max_chunk_count = 1;
+    config.max_message_size = 8192;
+    config.max_sessions = 1;
+    config.max_secure_channels = 1;
+
+    fake_platform_init(NULL, &config.time_adapter, &config.entropy_adapter);
+    s_tick = 0;
+    config.time_adapter.get_tick_ms = test_get_tick_ms;
+    config.tcp_adapter.context = &mock;
+    config.tcp_adapter.listen = mock_listen;
+    config.tcp_adapter.accept = mock_accept;
+    config.tcp_adapter.read = mock_read;
+    config.tcp_adapter.write = mock_write;
+    config.tcp_adapter.close_connection = mock_close;
+    config.tcp_adapter.shutdown = mock_shutdown;
+
+    mu_server_t *server = NULL;
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_server_init(storage, sizeof(storage), &config, &server));
+
+    mu_binary_reader_t body;
+    opcua_statuscode_t sr;
+    run_connect(server, &mock);
+    mu_server_poll(server);
+    TEST_ASSERT_EQUAL(ID_CREATESUBSCRIPTIONRESPONSE, parse_response(mock.last_write, mock.last_write_len, &body, &sr));
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, sr);
+
+    /* First Publish — no monitored items exist yet (asyncua's timeline). The
+       subscription DOES exist, so handle_publish must find it (sub_count>0) and
+       PARK the request: no immediate response, and definitely not a ServiceFault
+       with Bad_NoSubscription (the #288 symptom). */
+    mock.last_write_len = 0;
+    enqueue_publish(&mock, 6);
+    mu_server_poll(server);
+    if (mock.last_write_len > 0) {
+        /* Any response here would be a ServiceFault — the bug. */
+        parse_response(mock.last_write, mock.last_write_len, &body, &sr);
+        TEST_ASSERT_NOT_EQUAL_HEX32(MU_STATUS_BAD_NOSUBSCRIPTION, sr);
+        TEST_FAIL_MESSAGE("Immediate Publish produced a response (expected parked, no ServiceFault)");
+    }
+
+    /* Prove the parked Publish is honoured: add a monitored item, change the
+       value, tick, and expect a DataChangeNotification — not a fault. */
+    enqueue_publish(&mock, 7);
+    mu_server_poll(server);
+    s_tick = 1200;
+    mu_server_poll(server);
+    mu_server_poll(server);
+    if (mock.last_write_len > 0) {
+        opcua_uint32_t rid = parse_response(mock.last_write, mock.last_write_len, &body, &sr);
+        TEST_ASSERT_NOT_EQUAL_HEX32(MU_STATUS_BAD_NOSUBSCRIPTION, sr);
+        TEST_ASSERT_NOT_EQUAL(MU_ID_SERVICEFAULT, rid);
+    }
+
+    mu_server_close(server);
+#endif
+}
+
 int main(void) {
     UNITY_BEGIN();
     RUN_TEST(test_alarm_event_generation_and_publishing);
+    RUN_TEST(test_publish_immediately_after_create_subscription);
 #if MUC_OPCUA_EVENT_FILTER_WHERE
     RUN_TEST(test_event_where_clause_filters_and_counts);
     RUN_TEST(test_event_where_unsupported_operator_rejected);
