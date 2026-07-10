@@ -121,13 +121,14 @@
 #define MU_ID_AGGREGATETYPE_TOTAL_2 11308
 #define MU_ID_AGGREGATETYPE_DELTA_BOUNDS 11509
 
-/* Data Access Server Facet — OPC-10000-3 §5.6.2 */
-#define MU_ID_EURANGE 113                              /* EURange Property on AnalogItemType */
-#define MU_ID_ENGINEERINGUNITS 115                     /* EngineeringUnits Property */
-#define MU_ID_INSTRUMENTRANGE 117                      /* InstrumentRange Property */
-#define MU_ID_ANALOGITEMTYPE 2368                      /* AnalogItemType ObjectType */
-#define MU_ID_RANGE_ENCODING_DEFAULTBINARY 121         /* Range data type encoding */
-#define MU_ID_EUINFORMATION_ENCODING_DEFAULTBINARY 125 /* EUInformation encoding */
-#define MU_ID_PERCENTDEADBAND 3                        /* PercentDeadband type in DataChangeFilter */
+/* Data Access Server Facet (OPC-10000-8 §5.3/§5.6). NOTE: there is no single
+   "EURange"/"EngineeringUnits" NodeId — each is a per-type Property instance
+   declaration (AnalogItemType EURange=2369, EngineeringUnits=2371, ...; see
+   base_nodes.c) and on an instance the Property carries an integrator-assigned
+   NodeId, matched by its BrowseName. Only the type/DataType NodeIds are globally
+   fixed and grounded here. */
+#define MU_ID_ANALOGITEMTYPE 2368        /* AnalogItemType VariableType */
+#define MU_ID_RANGE_DATATYPE 884         /* Range DataType (low, high) */
+#define MU_ID_EUINFORMATION_DATATYPE 887 /* EUInformation DataType */
 
 #endif /* MUC_OPCUA_OPCUA_IDS_H */

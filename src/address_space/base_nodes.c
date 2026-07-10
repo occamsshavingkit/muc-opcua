@@ -2,6 +2,7 @@
 #include "base_nodes.h"
 #include "muc_opcua/opcua_ids.h"
 #include <stddef.h>
+#include <string.h>
 
 #ifdef MUC_OPCUA_BASE_NODES
 
@@ -1375,21 +1376,30 @@ bool mu_resolve_eurange_span(const mu_address_space_t *user, mu_address_space_in
     if (node == NULL || node->references == NULL || out_span == NULL) {
         return false;
     }
+    /* The EURange Property is identified by its BrowseName "EURange" (OPC-10000-8
+       §5.3.2), NOT a fixed NodeId: on an instance the Property node has an
+       integrator-assigned NodeId. Its value is a Range (low, high) carried as a
+       2-element Double array. */
+    static const opcua_byte_t k_eurange[] = "EURange";
     for (size_t i = 0; i < node->reference_count; ++i) {
-        if (node->references[i].reference_type_id.identifier.numeric == 46u && /* HasProperty */
-            node->references[i].target_id.identifier.numeric == MU_ID_EURANGE) {
-            const mu_node_t *range_node = mu_resolve_node(user, user_index, dynamic, &node->references[i].target_id);
-            if (range_node != NULL && range_node->value != NULL && range_node->value->type == MU_VALUESOURCE_STATIC) {
-                const mu_variant_t *sv = &range_node->value->data.static_value;
-                if (sv->type == MU_TYPE_DOUBLE && sv->value.array != NULL) {
-                    const opcua_double_t *darr = (const opcua_double_t *)sv->value.array;
-                    *out_span = darr[1] - darr[0]; /* High - Low; may be 0.0 (valid) */
-                    return true;
-                }
-            }
-            /* An EURange Property reference exists but its value is unreadable:
-               treat as absent (cannot compute a percent threshold). */
+        if (node->references[i].reference_type_id.identifier.numeric != 46u) { /* HasProperty */
+            continue;
         }
+        const mu_node_t *prop = mu_resolve_node(user, user_index, dynamic, &node->references[i].target_id);
+        if (prop == NULL || prop->browse_name.length != (opcua_int32_t)(sizeof(k_eurange) - 1u) ||
+            memcmp(prop->browse_name.data, k_eurange, sizeof(k_eurange) - 1u) != 0) {
+            continue;
+        }
+        if (prop->value != NULL && prop->value->type == MU_VALUESOURCE_STATIC) {
+            const mu_variant_t *sv = &prop->value->data.static_value;
+            if (sv->type == MU_TYPE_DOUBLE && sv->value.array != NULL) {
+                const opcua_double_t *darr = (const opcua_double_t *)sv->value.array;
+                *out_span = darr[1] - darr[0]; /* High - Low; may be 0.0 (valid) */
+                return true;
+            }
+        }
+        /* EURange Property found but its value is unreadable: treat as absent
+           (cannot compute a percent threshold). */
     }
     return false;
 }
