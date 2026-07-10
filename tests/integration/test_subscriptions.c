@@ -1097,6 +1097,99 @@ void test_publish_delivers_data_change(void) {
     TEST_ASSERT_EQUAL(2, seqn);
 }
 
+/* Regression for the malformed DataChangeNotification (#288 real cause): the
+   ExtensionObject Length prefix must EXACTLY cover its body — the MonitoredItems
+   array count, every MonitoredItemNotification, and the trailing DiagnosticInfos
+   array count. A client that slices the body to Length (asyncua, and any spec
+   client) fails with "not enough data" if Length omits the leading array count.
+   parse_publish_response above reads from the unsliced buffer, so it does NOT
+   catch this — here we decode the full body and assert consumed bytes == Length. */
+void test_publish_datachange_extension_object_length_is_exact(void) {
+    mock_t mock;
+    memset(&mock, 0, sizeof(mock));
+    enqueue_connect(&mock);
+
+    _Alignas(8) opcua_byte_t storage[MU_SERVER_STORAGE_BYTES];
+    mu_server_config_t config;
+    s_mon_val = 10;
+    mu_server_t *server = make_server(&mock, storage, sizeof(storage), &config, &samp_space);
+    mu_binary_reader_t body;
+    opcua_statuscode_t sr;
+
+    run_connect(server, &mock);
+    enqueue_create_subscription(&mock, 4, 200.0, 1000, 1000);
+    mu_server_poll(server);
+    TEST_ASSERT_EQUAL(ID_CREATESUBSCRIPTIONRESPONSE, parse_response(mock.last_write, mock.last_write_len, &body, &sr));
+    opcua_uint32_t sub_id;
+    mu_binary_read_uint32(&body, &sub_id);
+
+    opcua_byte_t tmp[1024], chunk[1024];
+    mu_binary_writer_t w;
+    size_t clen;
+    mu_binary_writer_init(&w, tmp, sizeof(tmp));
+    {
+        mu_nodeid_t t = {0, MU_NODEID_NUMERIC, {ID_CREATEMONITOREDITEMSREQUEST}};
+        mu_binary_write_nodeid(&w, &t);
+    }
+    write_request_header(&w, TEST_FIRST_AUTH_TOKEN, 5);
+    mu_binary_write_uint32(&w, sub_id);
+    mu_binary_write_uint32(&w, 3);
+    mu_binary_write_int32(&w, 1);
+    write_moncreate_item(&w, 1, 5000, 7, 100.0);
+    clen = build_msg(chunk, sizeof(chunk), 5, 5, tmp, w.position);
+    enqueue(&mock, chunk, clen);
+    mu_server_poll(server);
+
+    enqueue_publish(&mock, 6);
+    mu_server_poll(server);
+    tick_to(server, 300);
+    TEST_ASSERT_EQUAL(ID_PUBLISHRESPONSE, parse_response(mock.last_write, mock.last_write_len, &body, &sr));
+
+    /* Walk the PublishResponse header down to the NotificationData ExtensionObject. */
+    opcua_uint32_t sid;
+    mu_binary_read_uint32(&body, &sid);
+    opcua_int32_t navail;
+    mu_binary_read_int32(&body, &navail);
+    for (opcua_int32_t i = 0; i < navail; ++i) {
+        opcua_uint32_t a;
+        mu_binary_read_uint32(&body, &a);
+    }
+    opcua_byte_t more;
+    mu_binary_read_byte(&body, &more);
+    opcua_uint32_t seqn;
+    mu_binary_read_uint32(&body, &seqn);
+    opcua_int64_t publish_time;
+    mu_binary_read_int64(&body, &publish_time);
+    opcua_int32_t ndata;
+    mu_binary_read_int32(&body, &ndata);
+    TEST_ASSERT_EQUAL(1, ndata);
+
+    mu_nodeid_t type;
+    size_t declared_len;
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_extension_object_header(&body, &type, &declared_len));
+    TEST_ASSERT_EQUAL(ID_DATACHANGENOTIFICATION, type.identifier.numeric);
+
+    /* Decode the ENTIRE DataChangeNotification body and measure how many bytes it
+       actually spans, exactly as a slicing client does. */
+    size_t body_start = body.position;
+    opcua_int32_t nitems;
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_int32(&body, &nitems)); /* monitoredItems[] */
+    TEST_ASSERT_EQUAL(1, nitems);
+    for (opcua_int32_t i = 0; i < nitems; ++i) {
+        opcua_uint32_t handle;
+        mu_datavalue_t dv;
+        TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_uint32(&body, &handle));
+        TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_datavalue(&body, &dv));
+    }
+    opcua_int32_t ndiag;
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_int32(&body, &ndiag)); /* diagnosticInfos[] */
+    size_t actual_len = body.position - body_start;
+
+    /* The declared ExtensionObject Length must cover the whole body — no more, no
+       less. Before the fix, declared_len omits the 4-byte monitoredItems count. */
+    TEST_ASSERT_EQUAL_UINT32((opcua_uint32_t)actual_len, (opcua_uint32_t)declared_len);
+}
+
 /* Keep-alive (OPC 10000-4 §5.14.1.1/§5.14.1.2): with no data changes, after
    max_keep_alive_count publishing intervals a parked PublishRequest is answered with an
    empty NotificationMessage (no notificationData). */
@@ -2570,6 +2663,7 @@ int main(void) {
 #endif
     RUN_TEST(test_sampling_detects_change);
     RUN_TEST(test_publish_delivers_data_change);
+    RUN_TEST(test_publish_datachange_extension_object_length_is_exact);
     RUN_TEST(test_publish_keep_alive);
     RUN_TEST(test_publish_acknowledgement_unknown_sequence_returns_result);
     RUN_TEST(test_republish_and_acknowledge);
