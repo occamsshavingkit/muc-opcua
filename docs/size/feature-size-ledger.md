@@ -1,5 +1,30 @@
 # Feature Size Ledger
 
+## 2026-07-10: Spec 060 — Data Access Server Facet (Project B, B1)
+
+Cumulative archive `.text` (ARM Cortex-M0+ `-Os`, `scripts/measure_size.sh all`) after
+the Data Access Server Facet: the DA VariableType nodes + property instance-declarations
+served in `base_nodes.c`, the EUInformation/LocalizedText/Range codecs, and the
+percent-deadband accept path. `MUC_OPCUA_DATA_ACCESS` is default **ON for standard/full**,
+OFF for nano/micro/embedded.
+
+| Profile | prev (post-059) | now | Δ | why |
+|---------|----------------:|----:|--:|-----|
+| nano | 17,956 | 17,956 | 0 | DA off |
+| micro | 29,550 | 29,550 | 0 | DA off |
+| embedded | 54,616 | 54,624 | +8 | DA off; negligible shared-path delta |
+| standard | 71,370 | 75,827 | +4,457 | **DA feature**: 8 DA type nodes + 16 property instance-decl nodes + 2 ModellingRule objects in `base_nodes.c`, EUInformation/LocalizedText codecs, percent-deadband accept path + BrowseName EURange resolver |
+| full | 71,354 | 75,811 | +4,457 | same as standard |
+
+**Gating intact:** the ~4.5 KB DA facet code lands *only* in the DA-ON profiles;
+nano/micro are byte-for-byte unchanged. Most of the delta is the served type-system
+node table (24 nodes + their reference arrays + pooled BrowseName strings), which is
+`#if MUC_OPCUA_DATA_ACCESS` inside the BASE_TYPE_SYSTEM node array.
+
+**Headroom:** `full` = **75,811 B** — ~55,261 B (54 KB) under the 128 KiB Project-B
+facet stopper. No new `struct mu_server` fields (the `deadband_span` monitored-item
+field predates this spec).
+
 ## 2026-07-09: Spec 059 — ECC SecurityPolicies (curve25519 + nistP256)
 
 Cumulative archive `.text` (ARM Cortex-M0+ `-Os`, `scripts/measure_size.sh all`) after
