@@ -2,6 +2,9 @@
  * mu_asym_chunk_wrap and its helpers. */
 #include "../asym_chunk.h"
 #include "common.h"
+#ifdef MUC_OPCUA_ECC
+#include "muc_opcua/config.h" /* MU_ECC_SIGNATURE_LENGTH */
+#endif
 
 /* Write the cleartext OPN header: "OPNF", a zero MessageSize placeholder,
    SecureChannelId, then the AsymmetricAlgorithmSecurityHeader. */
@@ -238,6 +241,86 @@ static opcua_statuscode_t encrypt_wrap_blocks(const mu_crypto_adapter_t *crypto,
     return MU_STATUS_GOOD;
 }
 
+#ifdef MUC_OPCUA_ECC
+/* ECC OPN chunk (OPC-10000-6 §6.8.1): ECC supports digital signatures only, so the
+   chunk is signed but NOT asymmetrically encrypted — the ephemeral public keys ride
+   in the Client/ServerNonce inside `body`. Layout: [cleartext AsymHeader]
+   [SequenceHeader | body | Signature], no padding. The header still carries our
+   SenderCertificate and the recipient's 20-byte ReceiverCertificateThumbprint
+   (§6.7.2.3: present for ECC to identify the intended recipient). The signature
+   covers the whole chunk from "OPNF" through the body (incl. the MessageSize). */
+static opcua_statuscode_t wrap_ecc(const mu_asym_wrap_params_t *p) {
+    mu_ecc_curve_t curve;
+    if (!mu_security_policy_ecc_curve(p->policy, &curve)) {
+        return MU_STATUS_BAD_SECURITYPOLICYREJECTED;
+    }
+    if (!p->crypto || !p->crypto->ecc_sign || !p->crypto->get_own_ecc_certificate || !p->receiver_cert ||
+        p->receiver_cert_len == 0) {
+        return MU_STATUS_BAD_INTERNALERROR;
+    }
+
+    /* SenderCertificate is our ECC identity for this curve (matches the ecc_sign
+       key) — not the RSA get_own_certificate. */
+    const opcua_byte_t *sender_cert = NULL;
+    size_t sender_cert_len = 0;
+    opcua_statuscode_t s =
+        p->crypto->get_own_ecc_certificate(p->crypto->context, curve, &sender_cert, &sender_cert_len);
+    if (s != MU_STATUS_GOOD) {
+        return s;
+    }
+    opcua_byte_t thumb[MU_THUMBPRINT_LENGTH];
+    s = mu_certificate_thumbprint(p->crypto, p->receiver_cert, p->receiver_cert_len, thumb);
+    if (s != MU_STATUS_GOOD) {
+        return s;
+    }
+
+    mu_binary_writer_t w;
+    mu_binary_writer_init(&w, p->out, p->out_cap);
+    s = write_header(&w, p->policy, p->secure_channel_id, sender_cert, sender_cert_len, thumb, sizeof(thumb));
+    if (s != MU_STATUS_GOOD) {
+        return s;
+    }
+    s = mu_binary_write_uint32(&w, p->sequence_number);
+    if (s != MU_STATUS_GOOD) {
+        return s;
+    }
+    s = mu_binary_write_uint32(&w, p->request_id);
+    if (s != MU_STATUS_GOOD) {
+        return s;
+    }
+    if (!mu_checked_memcpy_off(p->out, p->out_cap, w.position, p->body, p->body_len)) {
+        return MU_STATUS_BAD_RESPONSETOOLARGE;
+    }
+    size_t signed_len = w.position + p->body_len;
+    size_t total = signed_len + MU_ECC_SIGNATURE_LENGTH;
+    if (total > p->out_cap) {
+        return MU_STATUS_BAD_RESPONSETOOLARGE;
+    }
+
+    /* Patch MessageSize before signing (the signature covers it). */
+    p->out[4] = (opcua_byte_t)(total);
+    p->out[5] = (opcua_byte_t)(total >> 8);
+    p->out[6] = (opcua_byte_t)(total >> 16);
+    p->out[7] = (opcua_byte_t)(total >> 24);
+
+    opcua_byte_t sig[MU_ECC_SIGNATURE_LENGTH];
+    size_t produced = sizeof(sig);
+    s = p->crypto->ecc_sign(p->crypto->context, curve, p->out, signed_len, sig, &produced);
+    if (s != MU_STATUS_GOOD) {
+        mu_secure_zero(sig, sizeof(sig));
+        return s;
+    }
+    if (produced != MU_ECC_SIGNATURE_LENGTH) {
+        mu_secure_zero(sig, sizeof(sig));
+        return MU_STATUS_BAD_INTERNALERROR;
+    }
+    (void)memcpy(p->out + signed_len, sig, MU_ECC_SIGNATURE_LENGTH);
+    mu_secure_zero(sig, sizeof(sig));
+    *p->out_len = total;
+    return MU_STATUS_GOOD;
+}
+#endif /* MUC_OPCUA_ECC */
+
 opcua_statuscode_t mu_asym_chunk_wrap(const mu_asym_wrap_params_t *p) {
     if (!p || !p->out || !p->out_len || (!p->body && p->body_len)) {
         return MU_STATUS_BAD_INTERNALERROR;
@@ -247,6 +330,12 @@ opcua_statuscode_t mu_asym_chunk_wrap(const mu_asym_wrap_params_t *p) {
         return wrap_none(p->secure_channel_id, p->sequence_number, p->request_id, p->body, p->body_len, p->out,
                          p->out_cap, p->out_len);
     }
+
+#ifdef MUC_OPCUA_ECC
+    if (mu_security_policy_asym_family(p->policy) == MU_ASYM_FAMILY_ECC) {
+        return wrap_ecc(p);
+    }
+#endif
 
     opcua_statuscode_t s = validate_wrap_policy(p->crypto, p->policy, p->receiver_cert, p->receiver_cert_len);
     if (s != MU_STATUS_GOOD) {

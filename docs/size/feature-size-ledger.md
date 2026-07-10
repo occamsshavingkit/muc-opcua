@@ -1,5 +1,37 @@
 # Feature Size Ledger
 
+## 2026-07-09: Spec 059 — ECC SecurityPolicies (curve25519 + nistP256)
+
+Cumulative archive `.text` (ARM Cortex-M0+ `-Os`, `scripts/measure_size.sh all`) after
+the full ECC secure channel: OPN ephemeral-ECDH handshake + HKDF, ECC OPN asym-chunk
+(sign-only), ChaCha20-Poly1305 AEAD MSG path (curve25519) / AES-128-CBC (nistP256), and
+the ECC ActivateSession application signature. `MUC_OPCUA_ECC` is default **ON for
+standard/full**, **OFF for nano/micro/embedded**.
+
+| Profile | prev (post-058) | now | Δ | why |
+|---------|----------------:|----:|--:|-----|
+| nano | 17,762 | 17,956 | +194 | ECC-OFF: only the always-compiled policy accessors (`asym_family`/`sym_mode`/`ecc_curve`, kept total for switch coverage) + `certificate.c`/`sym_chunk.c` family-branch refactors |
+| micro | 29,384 | 29,550 | +166 | ECC-OFF: same always-on accessors |
+| embedded | 54,456 | 54,616 | +160 | ECC-OFF: same always-on accessors |
+| standard | 68,246 | 71,370 | +3,124 | **ECC feature**: `asym_ecc.c` (HKDF salt), AEAD sym-chunk, ECC branches in osc_handler/asym_chunk/data_chunk/activate_session, `mu_hkdf_sha256` |
+| full | 68,266 | 71,354 | +3,088 | same as standard |
+
+**Gating intact:** the ~3.1 KB ECC secure-channel code lands *only* in the ECC-ON
+profiles. ECC-OFF profiles gained just ~160–194 B — the policy accessors that exist
+regardless of build so `switch`es over `mu_security_policy_id_t` stay total (the ECC
+enum values are always present; only the crypto/handshake is `#ifdef MUC_OPCUA_ECC`).
+A `--gc-sections` link of an ECC-OFF ELF carries **zero** ECC crypto symbols
+(`mu_ecc_derive_channel_keys`, `mu_sym_chunk_wrap_aead`, `mu_hkdf_sha256`, and the
+mbedTLS/wolfSSL/OpenSSL `*ecc*`/`*chacha*` primitives all drop out).
+
+**Headroom:** `full` is **71,354 B** — ~59,718 B (58 KB) under the 128 KiB Project-B
+facet stopper. **RAM:** `mu_secure_channel_t` gained one `opcua_uint32_t`
+(`in_last_sequence_number`, the AEAD previous-SequenceNumber for the Table-69 nonce) =
++4 B per SecureChannel; no other struct growth.
+
+The ECC crypto backends (OpenSSL host, mbedTLS nistP256-only, wolfSSL both curves) are
+platform adapters and are not part of this freestanding-core ARM measurement.
+
 ## 2026-07-09: Project A (specs 055/057/058) — profile modernization
 
 Cumulative archive `.text` (ARM `-Os`) after Security Time Sync (055), Base Info

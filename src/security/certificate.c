@@ -15,8 +15,8 @@ opcua_statuscode_t mu_certificate_validate(const mu_crypto_adapter_t *crypto, mu
     if (policy == MU_SECURITY_POLICY_NONE_ID) {
         return MU_STATUS_GOOD;
     }
-    if (policy != MU_SECURITY_POLICY_BASIC256SHA256_ID && policy != MU_SECURITY_POLICY_AES128_SHA256_RSAOAEP_ID &&
-        policy != MU_SECURITY_POLICY_AES256_SHA256_RSAPSS_ID) {
+    mu_asym_family_t family = mu_security_policy_asym_family(policy);
+    if (family != MU_ASYM_FAMILY_RSA && family != MU_ASYM_FAMILY_ECC) {
         return MU_STATUS_BAD_SECURITYPOLICYREJECTED;
     }
     if (!crypto || !crypto->get_certificate_key_bits) {
@@ -27,13 +27,17 @@ opcua_statuscode_t mu_certificate_validate(const mu_crypto_adapter_t *crypto, mu
         return MU_STATUS_BAD_CERTIFICATEINVALID;
     }
 
-    /* Parseable with an RSA key inside the profile's key-size bounds. */
+    /* Parseable with a key inside the policy family's size bounds. RSA policies
+       use the Basic256Sha256 2048..4096-bit band; the ECC SecurityPolicies (spec
+       059) carry curve keys (P-256 / Curve25519, ~255-256 bits) and only require
+       the certificate to parse — the curve is fixed by the negotiated policy. */
     size_t bits = 0;
     opcua_statuscode_t s = crypto->get_certificate_key_bits(crypto->context, certificate, length, &bits);
     if (s != MU_STATUS_GOOD) {
         return MU_STATUS_BAD_CERTIFICATEINVALID;
     }
-    if (bits < MU_B256S256_MIN_ASYMMETRIC_KEY_BITS || bits > MU_B256S256_MAX_ASYMMETRIC_KEY_BITS) {
+    if (family == MU_ASYM_FAMILY_RSA &&
+        (bits < MU_B256S256_MIN_ASYMMETRIC_KEY_BITS || bits > MU_B256S256_MAX_ASYMMETRIC_KEY_BITS)) {
         return MU_STATUS_BAD_SECURITYCHECKSFAILED;
     }
 

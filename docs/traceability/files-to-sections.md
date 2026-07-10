@@ -148,12 +148,16 @@ This document maps implementation and test files back to OPC UA normative sectio
 | `tests/unit/test_security_policy.c` | Traceability mapped | OPC UA Part 4 / 6 | 5.5.4.2, 5.7, 5.11, 5.13, 5.14 / 5.2, 6.7, 7.2 | Placeholder replaced; see feature-specific rows and tests for exact service/encoding coverage |
 | `tests/unit/test_certificate.c` | Tests | Part 6 / 4 | 6.7.4 / 7.2 | Thumbprint + cert validation tests |
 | `src/security/key_derivation.h` | Key Derivation | Part 6 | 6.7.5 | P-SHA256 PRF interface for channel keys |
-| `src/security/key_derivation.c` | Key Derivation | Part 6 | 6.7.5 | P-SHA256 (RFC 5246) key material expansion |
+| `src/security/key_derivation.c` | Key Derivation | Part 6 | 6.7.5, 6.8.1 | P-SHA256 (RFC 5246) key material expansion; HKDF-SHA256 (RFC 5869) for ECC SecurityPolicies |
 | `src/platform/host_crypto_adapter.h` | Crypto Adapter | Part 7 | 6.x | Host crypto backend interface (Basic256Sha256) |
 | `src/platform/host_crypto/cipher.c` | Crypto Adapter (Cipher) | Part 7 | 6.x | OpenSSL symmetric cipher primitives |
 | `src/platform/host_crypto/asymmetric.c` | Crypto Adapter (Asymmetric) | Part 7 | 6.x | OpenSSL asymmetric primitives |
 | `src/platform/host_crypto/hash.c` | Crypto Adapter (Hash) | Part 7 | 6.x | OpenSSL hash primitives |
 | `src/platform/host_crypto/sign.c` | Crypto Adapter (Sign) | Part 7 | 6.x | OpenSSL sign/verify primitives |
+| `src/platform/host_crypto/ecc.c` | Crypto Adapter (ECC) | Part 6 | 6.8.1 | OpenSSL ECC primitives (X25519/P-256 ECDH, Ed25519/ECDSA, ChaCha20-Poly1305) for the ECC SecurityPolicies |
+| `src/security/asym_ecc.c` | ECC SecurityPolicy | Part 6 | 6.8.1 | ECC handshake ephemeral-ECDH channel key derivation (HKDF salt/info construction) |
+| `src/security/asym_ecc.h` | ECC SecurityPolicy | Part 6 | 6.8.1 | ECC channel key-derivation interface (spec 059) |
+| `tests/unit/test_ecc_crypto.c` | Tests | Part 6 | 6.8.1 | ECC primitive KATs (X25519/P-256 ECDH, Ed25519/ECDSA sign+verify, HKDF RFC 5869, ChaCha20-Poly1305 RFC 8439) |
 | `tests/unit/test_crypto.c` | Tests | Part 6 / 7 | 6.7.5 / 6.x | Known-answer crypto + P-SHA256 tests |
 | `tests/unit/test_status.c` | Tests | OPC-10000-4 / OPC-10000-6 | 7.38.2 / 7.1.5 | Exact StatusCode numeric values and status-name helper tests |
 | `tests/unit/test_server_config.c` | Tests | Part 6 | 7.1.2.3, 7.1.2.4 | Test config validation |
@@ -261,6 +265,9 @@ This document maps implementation and test files back to OPC UA normative sectio
 | `subscription.c` | Subscription + MonitoredItem service sets (Micro) | Part 4 | 5.13, 5.14 | No-heap data-change subscription engine |
 | `subscription.h` | Subscription + MonitoredItem service sets (Micro) | Part 4 | 5.13, 5.14, 7.17, 7.21 | Subscription engine data model + contract |
 | `mbedtls_crypto_adapter.c` | Crypto Adapter | Part 7 | 6.x | Mbed TLS primitives for SecurityPolicy Basic256Sha256 |
+| `src/platform/mbedtls_crypto_adapter.h` | Crypto Adapter | Part 7 | 6.x | Mbed TLS ECC identity setter (spec 059, nistP256 only) |
+| `src/platform/wolfssl_crypto_adapter.h` | Crypto Adapter | Part 7 | 6.x | wolfSSL ECC identity setter (spec 059, both curves) |
+| `src/platform/wolfssl_crypto/ecc.c` | ECC SecurityPolicy | Part 6 | 6.8.1 | wolfSSL ECC primitives (P-256/Ed25519/X25519, ChaCha20-Poly1305) |
 | `src/platform/wolfssl_crypto/cipher.c` | Crypto Adapter (Cipher) | Part 7 | 6.x | wolfSSL symmetric cipher primitives |
 | `src/platform/wolfssl_crypto/asymmetric.c` | Crypto Adapter (Asymmetric) | Part 7 | 6.x | wolfSSL asymmetric primitives |
 | `src/platform/wolfssl_crypto/hash.c` | Crypto Adapter (Hash) | Part 7 | 6.x | wolfSSL hash primitives |

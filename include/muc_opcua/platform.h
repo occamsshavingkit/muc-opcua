@@ -108,6 +108,12 @@ typedef struct mu_persistence_adapter {
 #define MU_AES_BLOCK_SIZE 16    /* AES-CBC block / IV size */
 #define MU_THUMBPRINT_LENGTH 20 /* certificate thumbprint = SHA-1 of DER */
 
+/* ECC named curve selector for the ECC SecurityPolicies (spec 059). Each value
+   binds a key-agreement and a signature algorithm per its OPC-10000-7 facet:
+   CURVE25519 -> X25519 ECDH + Ed25519 (PureEdDSA); NISTP256 -> P-256 ECDH +
+   ECDSA-SHA2-256. */
+typedef enum mu_ecc_curve { MU_ECC_CURVE_25519 = 0, MU_ECC_CURVE_NISTP256 = 1 } mu_ecc_curve_t;
+
 typedef struct mu_crypto_adapter {
     void *context;
 
@@ -201,6 +207,59 @@ typedef struct mu_crypto_adapter {
     opcua_statuscode_t (*verify_certificate_application_uri)(void *context, const opcua_byte_t *certificate,
                                                              size_t certificate_length, const char *application_uri,
                                                              size_t application_uri_length);
+
+    /* ---- ECC SecurityPolicies (spec 059). All OPTIONAL: RSA-only backends leave
+       these NULL, and callers gate on the negotiated policy's asym family. No
+       hand-rolled crypto — backends bind mbedTLS/wolfSSL/OpenSSL primitives. ---- */
+
+    /* Generate an ephemeral ECC keypair for `curve`. The encoded public key is
+       written to `pubkey` (per the curve's SecurityPolicy encoding: 32-byte
+       little-endian for curve25519; 64-byte uncompressed big-endian x||y for
+       nistP256), with `*pubkey_length` set to the byte count. The private key is
+       retained in the opaque `keypair_ctx` (MU_ECC_KEYPAIR_CTX_SIZE bytes), later
+       consumed by ecc_ecdh_derive and released by ecc_keypair_free. */
+    opcua_statuscode_t (*ecc_generate_ephemeral)(void *context, mu_ecc_curve_t curve, opcua_byte_t *pubkey,
+                                                 size_t *pubkey_length, opcua_byte_t *keypair_ctx);
+
+    /* ECDH: combine the local ephemeral private key (`keypair_ctx`) with the peer's
+       encoded public key to produce the raw shared secret (the x-coordinate for
+       nistP256; the RFC-7748 output for curve25519). */
+    opcua_statuscode_t (*ecc_ecdh_derive)(void *context, mu_ecc_curve_t curve, const opcua_byte_t *keypair_ctx,
+                                          const opcua_byte_t *peer_pubkey, size_t peer_pubkey_length,
+                                          opcua_byte_t *shared, size_t *shared_length);
+
+    /* Release the opaque ephemeral keypair held in `keypair_ctx`. */
+    void (*ecc_keypair_free)(void *context, opcua_byte_t *keypair_ctx);
+
+    /* ECC signature with the server private key (context). `curve` selects the
+       algorithm: Ed25519 over the raw message (curve25519) or ECDSA-SHA2-256
+       (nistP256). Signature is MU_ECC_SIGNATURE_LENGTH bytes. */
+    opcua_statuscode_t (*ecc_sign)(void *context, mu_ecc_curve_t curve, const opcua_byte_t *data, size_t length,
+                                   opcua_byte_t *signature, size_t *signature_length);
+    /* Verify an ECC signature against a peer certificate (DER). */
+    opcua_statuscode_t (*ecc_verify)(void *context, mu_ecc_curve_t curve, const opcua_byte_t *certificate,
+                                     size_t certificate_length, const opcua_byte_t *data, size_t data_length,
+                                     const opcua_byte_t *signature, size_t signature_length);
+
+    /* The server's own ECC certificate (DER) for `curve` — the SenderCertificate an
+       ECC OPN chunk carries, matching the ecc_sign key. Distinct from
+       get_own_certificate (the RSA identity): backends supporting ECC hold a
+       separate per-curve identity. */
+    opcua_statuscode_t (*get_own_ecc_certificate)(void *context, mu_ecc_curve_t curve, const opcua_byte_t **certificate,
+                                                  size_t *length);
+
+    /* ChaCha20-Poly1305 AEAD (RFC 8439) for the curve25519 SecurityPolicy. `key`
+       is 32 B, `nonce` 12 B; the 16-byte authentication tag is written to `tag`
+       (encrypt) or verified from `tag` (decrypt, returning
+       Bad_SecurityChecksFailed on mismatch). `output` holds `length` bytes. */
+    opcua_statuscode_t (*chacha20_poly1305_encrypt)(void *context, const opcua_byte_t *key, const opcua_byte_t *nonce,
+                                                    const opcua_byte_t *aad, size_t aad_length,
+                                                    const opcua_byte_t *input, size_t length, opcua_byte_t *output,
+                                                    opcua_byte_t *tag);
+    opcua_statuscode_t (*chacha20_poly1305_decrypt)(void *context, const opcua_byte_t *key, const opcua_byte_t *nonce,
+                                                    const opcua_byte_t *aad, size_t aad_length,
+                                                    const opcua_byte_t *input, size_t length, const opcua_byte_t *tag,
+                                                    opcua_byte_t *output);
 } mu_crypto_adapter_t;
 
 opcua_statuscode_t mu_mbedtls_crypto_adapter_init(mu_crypto_adapter_t *adapter, const opcua_byte_t *cert_der,

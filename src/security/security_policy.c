@@ -8,6 +8,10 @@ static const char POLICY_B256S256_URI[] = "http://opcfoundation.org/UA/SecurityP
 static const char POLICY_AES128_OAEP_URI[] = "http://opcfoundation.org/UA/SecurityPolicy#Aes128_Sha256_RsaOaep";
 static const char POLICY_AES256_PSS_URI[] = "http://opcfoundation.org/UA/SecurityPolicy#Aes256_Sha256_RsaPss";
 #endif
+#ifdef MUC_OPCUA_ECC
+static const char POLICY_ECC_NISTP256_URI[] = "http://opcfoundation.org/UA/SecurityPolicy#ECC_nistP256";
+static const char POLICY_ECC_CURVE25519_URI[] = "http://opcfoundation.org/UA/SecurityPolicy#ECC_curve25519";
+#endif
 
 /* Feature 025 (F12): one parameter row per SecurityPolicy replaces the parallel
    switch statements each accessor used to carry. Adding a policy is now one row
@@ -17,20 +21,37 @@ static const char POLICY_AES256_PSS_URI[] = "http://opcfoundation.org/UA/Securit
 typedef struct {
     mu_security_policy_id_t id;
     const char *uri;
-    opcua_uint16_t sig_key_len;   /* HMAC-SHA256 key length */
+    opcua_uint16_t sig_key_len;   /* HMAC key length (0 for AEAD, no separate MAC key) */
     opcua_uint16_t enc_key_len;   /* symmetric encryption key length */
-    opcua_uint16_t block_size;    /* symmetric cipher block size */
-    opcua_uint16_t sig_len;       /* symmetric signature (MAC) length */
-    opcua_uint16_t nonce_len;     /* per-channel nonce length */
+    opcua_uint16_t block_size;    /* CBC block size for padding (1 = stream/AEAD, no padding) */
+    opcua_uint16_t sig_len;       /* symmetric signature/tag length (MAC or AEAD tag) */
+    opcua_uint16_t nonce_len;     /* per-channel nonce length (== ephemeral pubkey for ECC) */
+    opcua_uint16_t iv_len;        /* symmetric IV length */
     opcua_byte_t allows_username; /* password-bearing UserNameIdentityToken allowed */
+    opcua_byte_t asym_family;     /* mu_asym_family_t */
+    opcua_byte_t sym_mode;        /* mu_sym_mode_t */
+    opcua_byte_t ecc_curve;       /* mu_ecc_curve_t (ECC policies only) */
 } mu_security_policy_params_t;
 
 static const mu_security_policy_params_t POLICY_TABLE[] = {
-    {MU_SECURITY_POLICY_NONE_ID, POLICY_NONE_URI, 0, 0, 0, 0, 0, 0},
+    {MU_SECURITY_POLICY_NONE_ID, POLICY_NONE_URI, 0, 0, 0, 0, 0, 0, 0, MU_ASYM_FAMILY_NONE, MU_SYM_MODE_NONE, 0},
 #ifdef MUC_OPCUA_SECURITY
-    {MU_SECURITY_POLICY_BASIC256SHA256_ID, POLICY_B256S256_URI, 32, 32, 16, 32, 32, 1},
-    {MU_SECURITY_POLICY_AES128_SHA256_RSAOAEP_ID, POLICY_AES128_OAEP_URI, 32, 16, 16, 32, 32, 1},
-    {MU_SECURITY_POLICY_AES256_SHA256_RSAPSS_ID, POLICY_AES256_PSS_URI, 32, 32, 16, 32, 32, 1},
+    {MU_SECURITY_POLICY_BASIC256SHA256_ID, POLICY_B256S256_URI, 32, 32, 16, 32, 32, 16, 1, MU_ASYM_FAMILY_RSA,
+     MU_SYM_MODE_CBC_HMAC, 0},
+    {MU_SECURITY_POLICY_AES128_SHA256_RSAOAEP_ID, POLICY_AES128_OAEP_URI, 32, 16, 16, 32, 32, 16, 1, MU_ASYM_FAMILY_RSA,
+     MU_SYM_MODE_CBC_HMAC, 0},
+    {MU_SECURITY_POLICY_AES256_SHA256_RSAPSS_ID, POLICY_AES256_PSS_URI, 32, 32, 16, 32, 32, 16, 1, MU_ASYM_FAMILY_RSA,
+     MU_SYM_MODE_CBC_HMAC, 0},
+#endif
+#ifdef MUC_OPCUA_ECC
+    /* ECC-nistP256 [ECC-B]: ECDSA + AES128-CBC + HMAC-SHA256, 64-byte nonce. */
+    {MU_SECURITY_POLICY_ECC_NISTP256_ID, POLICY_ECC_NISTP256_URI, MU_ECC_NISTP256_SIGNATURE_KEY_LENGTH,
+     MU_ECC_NISTP256_ENCRYPTION_KEY_LENGTH, 16, MU_ECC_NISTP256_MAC_LENGTH, MU_ECC_NISTP256_NONCE_LENGTH,
+     MU_ECC_NISTP256_IV_LENGTH, 1, MU_ASYM_FAMILY_ECC, MU_SYM_MODE_CBC_HMAC, MU_ECC_CURVE_NISTP256},
+    /* ECC-curve25519 [ECC-A]: Ed25519 + ChaCha20-Poly1305 AEAD, 32-byte nonce, no MAC key. */
+    {MU_SECURITY_POLICY_ECC_CURVE25519_ID, POLICY_ECC_CURVE25519_URI, 0, MU_ECC_CURVE25519_ENCRYPTION_KEY_LENGTH, 1,
+     MU_ECC_CURVE25519_MAC_LENGTH, MU_ECC_CURVE25519_NONCE_LENGTH, MU_ECC_CURVE25519_IV_LENGTH, 1, MU_ASYM_FAMILY_ECC,
+     MU_SYM_MODE_AEAD_CHACHA20POLY1305, MU_ECC_CURVE_25519},
 #endif
 };
 
@@ -95,6 +116,32 @@ size_t mu_security_policy_signature_length(mu_security_policy_id_t policy) {
 size_t mu_security_policy_nonce_length(mu_security_policy_id_t policy) {
     const mu_security_policy_params_t *row = policy_row(policy);
     return row ? row->nonce_len : 0;
+}
+
+size_t mu_security_policy_iv_length(mu_security_policy_id_t policy) {
+    const mu_security_policy_params_t *row = policy_row(policy);
+    return row ? row->iv_len : 0;
+}
+
+mu_asym_family_t mu_security_policy_asym_family(mu_security_policy_id_t policy) {
+    const mu_security_policy_params_t *row = policy_row(policy);
+    return row ? (mu_asym_family_t)row->asym_family : MU_ASYM_FAMILY_NONE;
+}
+
+mu_sym_mode_t mu_security_policy_sym_mode(mu_security_policy_id_t policy) {
+    const mu_security_policy_params_t *row = policy_row(policy);
+    return row ? (mu_sym_mode_t)row->sym_mode : MU_SYM_MODE_NONE;
+}
+
+int mu_security_policy_ecc_curve(mu_security_policy_id_t policy, mu_ecc_curve_t *curve) {
+    const mu_security_policy_params_t *row = policy_row(policy);
+    if (!row || row->asym_family != MU_ASYM_FAMILY_ECC) {
+        return 0;
+    }
+    if (curve) {
+        *curve = (mu_ecc_curve_t)row->ecc_curve;
+    }
+    return 1;
 }
 
 #ifdef MUC_OPCUA_SECURITY

@@ -10,6 +10,20 @@
 #define MU_SYM_SIG_LEN MU_B256S256_SIGNATURE_LENGTH    /* 32 (HMAC-SHA256) */
 #define MU_SYM_BLOCK MU_B256S256_ENCRYPTION_BLOCK_SIZE /* 16 (AES) */
 
+/* Policies whose symmetric cipher is AES-128-CBC (16-byte key): Aes128_Sha256_RsaOaep
+   and the ECC-nistP256 SecurityPolicy. The others in the CBC path use AES-256-CBC. */
+static bool policy_uses_aes128(mu_security_policy_id_t policy) {
+    if (policy == MU_SECURITY_POLICY_AES128_SHA256_RSAOAEP_ID) {
+        return true;
+    }
+#ifdef MUC_OPCUA_ECC
+    if (policy == MU_SECURITY_POLICY_ECC_NISTP256_ID) {
+        return true;
+    }
+#endif
+    return false;
+}
+
 opcua_statuscode_t mu_sym_keys_derive(const mu_crypto_adapter_t *crypto, mu_security_policy_id_t policy,
                                       const opcua_byte_t *secret, size_t secret_len, const opcua_byte_t *seed,
                                       size_t seed_len, mu_sym_keys_t *out_keys) {
@@ -47,7 +61,9 @@ void mu_sym_keys_prepare_cipher(mu_sym_keys_t *keys, const mu_crypto_adapter_t *
     }
     mu_sym_keys_release_cipher(keys);
     keys->crypto = crypto;
-    if (keys->policy == MU_SECURITY_POLICY_AES128_SHA256_RSAOAEP_ID) {
+    /* The AES-128 policies use the direct (keyed) call each chunk; only the AES-256
+       path keeps a persistent cipher context. */
+    if (policy_uses_aes128(keys->policy)) {
         keys->cipher_ctx_valid = false;
         return;
     }
@@ -169,7 +185,7 @@ opcua_statuscode_t mu_sym_chunk_wrap(const mu_crypto_adapter_t *crypto, mu_messa
     mu_secure_zero(mac, sizeof(mac));
 
     /* Encrypt the SequenceHeader..signature region in place (AES-CBC preserves length). */
-    if (keys->policy == MU_SECURITY_POLICY_AES128_SHA256_RSAOAEP_ID) {
+    if (policy_uses_aes128(keys->policy)) {
         if (crypto->aes128_cbc_encrypt) {
             s = crypto->aes128_cbc_encrypt(crypto->context, keys->encrypting_key, keys->iv, out + MU_SYM_HEADER_SIZE,
                                            enc_len, out + MU_SYM_HEADER_SIZE);
@@ -225,7 +241,7 @@ opcua_statuscode_t mu_sym_chunk_unwrap(const mu_crypto_adapter_t *crypto, mu_mes
             return MU_STATUS_BAD_DECODINGERROR;
         }
         opcua_statuscode_t s;
-        if (keys->policy == MU_SECURITY_POLICY_AES128_SHA256_RSAOAEP_ID) {
+        if (policy_uses_aes128(keys->policy)) {
             if (crypto->aes128_cbc_decrypt) {
                 s = crypto->aes128_cbc_decrypt(crypto->context, keys->encrypting_key, keys->iv,
                                                chunk + MU_SYM_HEADER_SIZE, cipher_len, chunk + MU_SYM_HEADER_SIZE);
@@ -287,3 +303,98 @@ opcua_statuscode_t mu_sym_chunk_unwrap(const mu_crypto_adapter_t *crypto, mu_mes
     *out_body_len = seqbody_len - 8;
     return MU_STATUS_GOOD;
 }
+
+#ifdef MUC_OPCUA_ECC
+#define MU_AEAD_TAG_LEN MU_CHACHA20_POLY1305_TAG_LENGTH /* 16 (Poly1305) */
+
+/* Build the per-chunk AEAD nonce (OPC-10000-6 §6.8.1, Table 69): the derived
+   12-byte IV with its first 8 bytes XORed with TokenId||LastSequenceNumber. */
+static void aead_build_iv(const opcua_byte_t *derived_iv, opcua_uint32_t token_id, opcua_uint32_t last_seq,
+                          opcua_byte_t *iv_out) {
+    (void)memcpy(iv_out, derived_iv, MU_CHACHA20_POLY1305_NONCE_LENGTH);
+    opcua_byte_t x[8];
+    put_u32(x, token_id);
+    put_u32(x + 4, last_seq);
+    for (size_t i = 0; i < 8; i++) {
+        iv_out[i] ^= x[i];
+    }
+}
+
+opcua_statuscode_t mu_sym_chunk_wrap_aead(const mu_crypto_adapter_t *crypto, const mu_sym_keys_t *keys,
+                                          const char message_type[3], opcua_uint32_t secure_channel_id,
+                                          opcua_uint32_t token_id, opcua_uint32_t sequence_number,
+                                          opcua_uint32_t last_sequence_number, opcua_uint32_t request_id,
+                                          const opcua_byte_t *body, size_t body_len, opcua_byte_t *out, size_t out_cap,
+                                          size_t *out_len) {
+    if (!crypto || !crypto->chacha20_poly1305_encrypt || !keys || !out || !out_len || (!body && body_len)) {
+        return MU_STATUS_BAD_INTERNALERROR;
+    }
+    size_t plain_len = 8 + body_len; /* SequenceHeader + body (encrypted, no padding) */
+    size_t total = MU_SYM_HEADER_SIZE + plain_len + MU_AEAD_TAG_LEN;
+    if (total > out_cap) {
+        return MU_STATUS_BAD_RESPONSETOOLARGE;
+    }
+
+    write_header(out, message_type, secure_channel_id, token_id);
+    put_u32(out + 4, (opcua_uint32_t)total); /* MessageSize — part of the AAD */
+    put_u32(out + MU_SYM_HEADER_SIZE, sequence_number);
+    put_u32(out + MU_SYM_HEADER_SIZE + 4, request_id);
+    if (!mu_checked_memcpy_off(out, out_cap, MU_SYM_HEADER_SIZE + 8, body, body_len)) {
+        return MU_STATUS_BAD_RESPONSETOOLARGE;
+    }
+
+    opcua_byte_t iv[MU_CHACHA20_POLY1305_NONCE_LENGTH];
+    aead_build_iv(keys->iv, token_id, last_sequence_number, iv);
+    /* AAD = the cleartext headers; encrypt SequenceHeader+body in place; tag tails. */
+    opcua_statuscode_t s = crypto->chacha20_poly1305_encrypt(
+        crypto->context, keys->encrypting_key, iv, out, MU_SYM_HEADER_SIZE, out + MU_SYM_HEADER_SIZE, plain_len,
+        out + MU_SYM_HEADER_SIZE, out + MU_SYM_HEADER_SIZE + plain_len);
+    mu_secure_zero(iv, sizeof(iv));
+    if (s != MU_STATUS_GOOD) {
+        return s;
+    }
+    *out_len = total;
+    return MU_STATUS_GOOD;
+}
+
+opcua_statuscode_t mu_sym_chunk_unwrap_aead(const mu_crypto_adapter_t *crypto, const mu_sym_keys_t *keys,
+                                            opcua_byte_t *chunk, size_t chunk_len, opcua_uint32_t last_sequence_number,
+                                            const opcua_byte_t **out_body, size_t *out_body_len,
+                                            mu_sym_chunk_info_t *info) {
+    if (!crypto || !crypto->chacha20_poly1305_decrypt || !keys || !chunk || !out_body || !out_body_len || !info) {
+        return MU_STATUS_BAD_INTERNALERROR;
+    }
+    if (chunk_len < MU_SYM_HEADER_SIZE) {
+        return MU_STATUS_BAD_DECODINGERROR;
+    }
+    size_t msg_size = get_u32(chunk + 4);
+    if (msg_size > chunk_len || msg_size < MU_SYM_HEADER_SIZE + 8 + MU_AEAD_TAG_LEN) {
+        return MU_STATUS_BAD_DECODINGERROR;
+    }
+
+    info->message_type[0] = (char)chunk[0];
+    info->message_type[1] = (char)chunk[1];
+    info->message_type[2] = (char)chunk[2];
+    info->secure_channel_id = get_u32(chunk + 8);
+    info->token_id = get_u32(chunk + 12);
+    info->mode = MU_MESSAGE_SECURITY_MODE_SIGN_AND_ENCRYPT;
+
+    size_t plain_len = msg_size - MU_SYM_HEADER_SIZE - MU_AEAD_TAG_LEN;
+    opcua_byte_t iv[MU_CHACHA20_POLY1305_NONCE_LENGTH];
+    aead_build_iv(keys->iv, info->token_id, last_sequence_number, iv);
+    /* Decrypt+authenticate in place; a tag mismatch fails closed. */
+    opcua_statuscode_t s = crypto->chacha20_poly1305_decrypt(
+        crypto->context, keys->encrypting_key, iv, chunk, MU_SYM_HEADER_SIZE, chunk + MU_SYM_HEADER_SIZE, plain_len,
+        chunk + MU_SYM_HEADER_SIZE + plain_len, chunk + MU_SYM_HEADER_SIZE);
+    mu_secure_zero(iv, sizeof(iv));
+    if (s != MU_STATUS_GOOD) {
+        return s;
+    }
+
+    info->sequence_number = get_u32(chunk + MU_SYM_HEADER_SIZE);
+    info->request_id = get_u32(chunk + MU_SYM_HEADER_SIZE + 4);
+    *out_body = chunk + MU_SYM_HEADER_SIZE + 8;
+    *out_body_len = plain_len - 8;
+    return MU_STATUS_GOOD;
+}
+#endif /* MUC_OPCUA_ECC */

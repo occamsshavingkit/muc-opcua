@@ -1,4 +1,7 @@
 #include "common.h"
+#ifdef MUC_OPCUA_ECC
+#include "../../security/asym_ecc.h"
+#endif
 
 #ifdef MUC_OPCUA_TIME_SYNC
 bool mu_opn_time_sync_allows(opcua_datetime_t server_time, opcua_datetime_t client_time) {
@@ -123,13 +126,6 @@ opcua_statuscode_t handle_open_secure_channel(mu_server_t *server, mu_binary_rea
     }
 
     opcua_uint32_t revised = 0;
-    opcua_byte_t nonce_buf[MU_SERVER_NONCE_LENGTH];
-
-    if (server->config.entropy_adapter.generate_random == NULL ||
-        server->config.entropy_adapter.generate_random(server->config.entropy_adapter.context, nonce_buf,
-                                                       sizeof(nonce_buf)) != MU_STATUS_GOOD) {
-        return MU_STATUS_BAD_SECURITYCHECKSFAILED;
-    }
 
     s = mu_secure_channel_open(&server_secure_channel, current_opn_security_policy(server),
                                (mu_message_security_mode_t)security_mode, requested_lifetime,
@@ -145,7 +141,49 @@ opcua_statuscode_t handle_open_secure_channel(mu_server_t *server, mu_binary_rea
     }
 #endif
 
-    s = encode_osc_security_token(w, req.request_handle, revised, nonce_buf, sizeof(nonce_buf), server);
+    /* ServerNonce: 32 random bytes for None/RSA; for the ECC SecurityPolicies
+       (spec 059) it is the server's ephemeral public key (<= 64 B) — the peers'
+       ephemeral ECDH pubkeys travel as the Client/ServerNonce (OPC-10000-6 §6.8.1). */
+#ifdef MUC_OPCUA_ECC
+    opcua_byte_t nonce_buf[MU_ECC_MAX_PUBKEY_LENGTH];
+    opcua_byte_t ecc_keypair_ctx[MU_ECC_KEYPAIR_CTX_SIZE];
+    mu_ecc_curve_t ecc_curve = MU_ECC_CURVE_25519;
+    const bool ecc_channel = server->config.crypto_adapter != NULL &&
+                             mu_security_policy_asym_family(server_secure_channel.policy) == MU_ASYM_FAMILY_ECC;
+#else
+    opcua_byte_t nonce_buf[MU_SERVER_NONCE_LENGTH];
+#endif
+    size_t nonce_len = MU_SERVER_NONCE_LENGTH;
+
+#ifdef MUC_OPCUA_ECC
+    if (ecc_channel) {
+        const mu_crypto_adapter_t *cr = server->config.crypto_adapter;
+        if (cr->ecc_generate_ephemeral == NULL || cr->ecc_ecdh_derive == NULL ||
+            !mu_security_policy_ecc_curve(server_secure_channel.policy, &ecc_curve)) {
+            return MU_STATUS_BAD_SECURITYPOLICYREJECTED;
+        }
+        nonce_len = sizeof(nonce_buf);
+        s = cr->ecc_generate_ephemeral(cr->context, ecc_curve, nonce_buf, &nonce_len, ecc_keypair_ctx);
+        if (s != MU_STATUS_GOOD) {
+            return s;
+        }
+        /* The ClientNonce must be the peer's ephemeral pubkey at the curve's exact size. */
+        if (nonce_len != mu_security_policy_nonce_length(server_secure_channel.policy) ||
+            client_nonce.length != (opcua_int32_t)nonce_len) {
+            return MU_STATUS_BAD_NONCEINVALID;
+        }
+    } else
+#endif
+    {
+        nonce_len = MU_SERVER_NONCE_LENGTH;
+        if (server->config.entropy_adapter.generate_random == NULL ||
+            server->config.entropy_adapter.generate_random(server->config.entropy_adapter.context, nonce_buf,
+                                                           nonce_len) != MU_STATUS_GOOD) {
+            return MU_STATUS_BAD_SECURITYCHECKSFAILED;
+        }
+    }
+
+    s = encode_osc_security_token(w, req.request_handle, revised, nonce_buf, nonce_len, server);
     if (s != MU_STATUS_GOOD) {
         return s;
     }
@@ -159,15 +197,47 @@ opcua_statuscode_t handle_open_secure_channel(mu_server_t *server, mu_binary_rea
         if (cn_len == 0) {
             return MU_STATUS_BAD_SECURITYCHECKSFAILED;
         }
-        s = mu_sym_keys_derive(cr, server_secure_channel.policy, nonce_buf, sizeof(nonce_buf), client_nonce.data,
-                               cn_len, &server_secure_channel.client_keys);
-        if (s != MU_STATUS_GOOD) {
-            return s;
-        }
-        s = mu_sym_keys_derive(cr, server_secure_channel.policy, client_nonce.data, cn_len, nonce_buf,
-                               sizeof(nonce_buf), &server_secure_channel.server_keys);
-        if (s != MU_STATUS_GOOD) {
-            return s;
+#ifdef MUC_OPCUA_ECC
+        if (ecc_channel) {
+            /* ECDH(server ephemeral private, client ephemeral pubkey) -> shared
+               secret; HKDF the per-direction channel keys from it (§6.8.1). */
+            opcua_byte_t shared[MU_ECC_MAX_PUBKEY_LENGTH];
+            size_t shared_len = sizeof(shared);
+            s = cr->ecc_ecdh_derive(cr->context, ecc_curve, ecc_keypair_ctx, client_nonce.data, cn_len, shared,
+                                    &shared_len);
+            if (cr->ecc_keypair_free != NULL) {
+                cr->ecc_keypair_free(cr->context, ecc_keypair_ctx);
+            }
+            if (s != MU_STATUS_GOOD) {
+                mu_secure_zero(shared, sizeof(shared));
+                return s;
+            }
+            /* server_keys protect Server->Client (ServerSalt, is_server_direction=1);
+               client_keys protect the inbound Client->Server (ClientSalt, =0). */
+            s = mu_ecc_derive_channel_keys(cr, server_secure_channel.policy, shared, shared_len, 1, nonce_buf,
+                                           nonce_len, client_nonce.data, cn_len, &server_secure_channel.server_keys);
+            if (s == MU_STATUS_GOOD) {
+                s = mu_ecc_derive_channel_keys(cr, server_secure_channel.policy, shared, shared_len, 0, nonce_buf,
+                                               nonce_len, client_nonce.data, cn_len,
+                                               &server_secure_channel.client_keys);
+            }
+            mu_secure_zero(shared, sizeof(shared));
+            if (s != MU_STATUS_GOOD) {
+                return s;
+            }
+        } else
+#endif
+        {
+            s = mu_sym_keys_derive(cr, server_secure_channel.policy, nonce_buf, nonce_len, client_nonce.data, cn_len,
+                                   &server_secure_channel.client_keys);
+            if (s != MU_STATUS_GOOD) {
+                return s;
+            }
+            s = mu_sym_keys_derive(cr, server_secure_channel.policy, client_nonce.data, cn_len, nonce_buf, nonce_len,
+                                   &server_secure_channel.server_keys);
+            if (s != MU_STATUS_GOOD) {
+                return s;
+            }
         }
         server_secure_channel.keys_valid = true;
         mu_sym_keys_prepare_cipher(&server_secure_channel.client_keys, cr);

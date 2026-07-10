@@ -293,6 +293,17 @@ if(MUC_OPCUA_SECURITY)
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_SECURITY=1)
 endif()
 
+# ECC SecurityPolicies (spec 059). Droppable translation unit: absent unless
+# MUC_OPCUA_ECC is on, so profiles that exclude ECC pay no .text. Backend-specific
+# ECC implementations are added inside each MUC_OPCUA_HAVE_* block below.
+if(MUC_OPCUA_ECC)
+    if(NOT MUC_OPCUA_SECURITY)
+        message(FATAL_ERROR "MUC_OPCUA_ECC requires MUC_OPCUA_SECURITY")
+    endif()
+    target_sources(muc_opcua PRIVATE security/asym_ecc.c)
+    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_ECC=1)
+endif()
+
 # The host TCP adapter uses POSIX sockets; only compile it for the host platform.
 if(MUC_OPCUA_IS_HOST)
     target_sources(muc_opcua PRIVATE platform/host_tcp_adapter.c)
@@ -310,6 +321,9 @@ if(MUC_OPCUA_IS_HOST)
                 platform/host_crypto/asymmetric.c
                 platform/host_crypto/sign.c
             )
+            if(MUC_OPCUA_ECC)
+                target_sources(muc_opcua PRIVATE platform/host_crypto/ecc.c)
+            endif()
             target_link_libraries(muc_opcua PUBLIC OpenSSL::Crypto)
             target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_HAVE_OPENSSL=1)
         endif()
@@ -329,6 +343,9 @@ if(MUC_OPCUA_HAVE_WOLFSSL)
         platform/wolfssl_crypto/hash.c
         platform/wolfssl_crypto/sign.c
     )
+    if(MUC_OPCUA_ECC)
+        target_sources(muc_opcua PRIVATE platform/wolfssl_crypto/ecc.c)
+    endif()
     target_link_libraries(muc_opcua PUBLIC wolfssl)
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_HAVE_WOLFSSL=1)
 endif()

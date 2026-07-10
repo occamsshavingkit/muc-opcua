@@ -79,6 +79,12 @@ foreach(TEST_SOURCE ${UNIT_TEST_SOURCES})
         if(NOT MUC_OPCUA_SECURITY)
             set(RUN_TEST OFF)
         endif()
+    elseif(TEST_NAME STREQUAL "test_ecc_crypto")
+        # ECC SecurityPolicy primitives (spec 059): only meaningful when the ECC
+        # feature is built (which also implies MUC_OPCUA_SECURITY).
+        if(NOT MUC_OPCUA_ECC)
+            set(RUN_TEST OFF)
+        endif()
     elseif(TEST_NAME STREQUAL "test_user_token_decoder")
         # mu_binary_read_username_identity_token is gated on
         # `defined(MUC_OPCUA_USER_AUTH) || defined(MUC_OPCUA_SECURITY)`

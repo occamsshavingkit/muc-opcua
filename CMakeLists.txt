@@ -43,6 +43,7 @@ set(MUC_OPCUA_PROFILE_CONTROLLED_OPTIONS
     MUC_OPCUA_USER_AUTH
     MUC_OPCUA_SERVICE_WRITE
     MUC_OPCUA_SECURITY
+    MUC_OPCUA_ECC
     MUC_OPCUA_BASE_NODES
     MUC_OPCUA_BASE_TYPE_SYSTEM
     MUC_OPCUA_MULTIPLE_CONNECTIONS
@@ -151,6 +152,7 @@ elseif(MUC_OPCUA_PROFILE STREQUAL "standard")
     set(MUC_OPCUA_REVERSE_CONNECT ON CACHE BOOL "" FORCE)
     set(MUC_OPCUA_TIME_SYNC ON CACHE BOOL "" FORCE)
     set(MUC_OPCUA_NAMESPACES ON CACHE BOOL "" FORCE)
+    set(MUC_OPCUA_ECC ON CACHE BOOL "" FORCE)
     set(MUC_OPCUA_STANDARD_PROFILE ON CACHE BOOL "" FORCE)
     # Standard 2017 capacity minima: see MU_INTERN_* standard column in capacities.h.
 elseif(MUC_OPCUA_PROFILE STREQUAL "full")
@@ -187,6 +189,7 @@ elseif(MUC_OPCUA_PROFILE STREQUAL "full")
     set(MUC_OPCUA_REVERSE_CONNECT ON CACHE BOOL "" FORCE)
     set(MUC_OPCUA_TIME_SYNC ON CACHE BOOL "" FORCE)
     set(MUC_OPCUA_NAMESPACES ON CACHE BOOL "" FORCE)
+    set(MUC_OPCUA_ECC ON CACHE BOOL "" FORCE)
     set(MUC_OPCUA_STANDARD_PROFILE ON CACHE BOOL "" FORCE)
     # Full capacities: see MU_INTERN_* full column in capacities.h.
 endif()
@@ -194,6 +197,12 @@ endif()
 # SecurityPolicy Basic256Sha256 support (asym/sym chunk crypto, ~10 KB code).
 # Turn OFF for a SecurityPolicy-None-only build to drop the crypto layer entirely.
 option(MUC_OPCUA_SECURITY "Build SecurityPolicy Basic256Sha256 support" OFF)
+
+# ECC SecurityPolicies (spec 059): ECC-curve25519 (Ed25519 + X25519 +
+# ChaCha20-Poly1305) and ECC-nistP256 (ECDSA + P-256 + AES128-CBC/HMAC). Optional
+# at every OPC UA server profile (the "Security ECC Policy" CU is optional); this
+# implements it so the optional CU can be advertised. Requires MUC_OPCUA_SECURITY.
+option(MUC_OPCUA_ECC "Build ECC SecurityPolicies (curve25519 + nistP256)" OFF)
 
 # Optional services — turn OFF to drop a service's code from a minimal build.
 # (OpenSecureChannel / Session services are always present.)

@@ -35,6 +35,38 @@
 #endif
 #endif
 
+/* E3 (spec 059): opaque per-handshake ephemeral ECC keypair storage. The host
+ * OpenSSL backend stores an EVP_PKEY* here; embedded backends store a small key
+ * context. Sized like MU_CIPHER_CTX_SIZE: a pointer suffices on the host, more
+ * headroom otherwise. Backend size asserts are added with adapter use. */
+#ifndef MU_ECC_KEYPAIR_CTX_SIZE
+#ifdef MUC_OPCUA_HAVE_OPENSSL
+#define MU_ECC_KEYPAIR_CTX_SIZE 32
+#else
+#define MU_ECC_KEYPAIR_CTX_SIZE 512
+#endif
+#endif
+
+/* ECC public-key and signature sizes (OPC-10000-7 ECC SecurityPolicy facets):
+ * curve25519 pubkey = 32 B; nistP256 uncompressed x||y = 64 B. Both policies use
+ * 64-byte signatures (Ed25519, and ECDSA-P256 raw r||s). ChaCha20-Poly1305 (RFC
+ * 8439) uses a 32-byte key, 12-byte nonce, 16-byte tag. */
+#ifndef MU_ECC_MAX_PUBKEY_LENGTH
+#define MU_ECC_MAX_PUBKEY_LENGTH 64
+#endif
+#ifndef MU_ECC_SIGNATURE_LENGTH
+#define MU_ECC_SIGNATURE_LENGTH 64
+#endif
+#ifndef MU_CHACHA20_POLY1305_KEY_LENGTH
+#define MU_CHACHA20_POLY1305_KEY_LENGTH 32
+#endif
+#ifndef MU_CHACHA20_POLY1305_NONCE_LENGTH
+#define MU_CHACHA20_POLY1305_NONCE_LENGTH 12
+#endif
+#ifndef MU_CHACHA20_POLY1305_TAG_LENGTH
+#define MU_CHACHA20_POLY1305_TAG_LENGTH 16
+#endif
+
 /* E4: shared secure-path scratch owned by struct mu_server when
  * MUC_OPCUA_SECURITY is enabled. Sized for the worst-case secure response /
  * OPN scratch + session-handshake buffers (CreateSession/ActivateSession). */

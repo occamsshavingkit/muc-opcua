@@ -61,4 +61,24 @@ opcua_statuscode_t mu_sym_chunk_unwrap(const mu_crypto_adapter_t *crypto, mu_mes
                                        const mu_sym_keys_t *keys, opcua_byte_t *chunk, size_t chunk_len,
                                        const opcua_byte_t **out_body, size_t *out_body_len, mu_sym_chunk_info_t *info);
 
+#ifdef MUC_OPCUA_ECC
+/* AEAD (ChaCha20-Poly1305) symmetric chunk protection for the ECC-curve25519
+   SecurityPolicy (OPC-10000-6 §6.7.2.5.2). Unlike the CBC+HMAC path there is no
+   padding: [Header | TokenId] [enc: SequenceHeader+body] [16-byte tag]. The
+   per-chunk IV is keys->iv with its first 8 bytes XORed with TokenId||last_seq
+   (Table 69, §6.8.1); `last_sequence_number` is the previous chunk's sequence
+   number in this direction (0 for the first). Always Sign+Encrypt (AEAD). */
+opcua_statuscode_t mu_sym_chunk_wrap_aead(const mu_crypto_adapter_t *crypto, const mu_sym_keys_t *keys,
+                                          const char message_type[3], opcua_uint32_t secure_channel_id,
+                                          opcua_uint32_t token_id, opcua_uint32_t sequence_number,
+                                          opcua_uint32_t last_sequence_number, opcua_uint32_t request_id,
+                                          const opcua_byte_t *body, size_t body_len, opcua_byte_t *out, size_t out_cap,
+                                          size_t *out_len);
+
+opcua_statuscode_t mu_sym_chunk_unwrap_aead(const mu_crypto_adapter_t *crypto, const mu_sym_keys_t *keys,
+                                            opcua_byte_t *chunk, size_t chunk_len, opcua_uint32_t last_sequence_number,
+                                            const opcua_byte_t **out_body, size_t *out_body_len,
+                                            mu_sym_chunk_info_t *info);
+#endif /* MUC_OPCUA_ECC */
+
 #endif /* MUC_OPCUA_SYM_CHUNK_H */

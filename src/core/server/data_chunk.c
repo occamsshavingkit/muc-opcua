@@ -69,11 +69,19 @@ opcua_statuscode_t mu_server_emit_message(mu_server_t *server, opcua_uint32_t re
             return MU_STATUS_BAD_SECURITYCHECKSFAILED;
         }
 
-        status =
-            mu_sym_chunk_wrap(server->config.crypto_adapter, server_secure_channel.mode,
-                              &server_secure_channel.server_keys, "MSG", server_secure_channel.channel_id,
-                              server_secure_channel.token_id, ++server_secure_channel.out_sequence_number, request_id,
-                              body, body_len, server->config.send_buffer, server->config.send_buffer_size, &total);
+        opcua_uint32_t emit_seq = ++server_secure_channel.out_sequence_number;
+#ifdef MUC_OPCUA_ECC
+        if (mu_security_policy_sym_mode(server_secure_channel.policy) == MU_SYM_MODE_AEAD_CHACHA20POLY1305) {
+            status = mu_sym_chunk_wrap_aead(server->config.crypto_adapter, &server_secure_channel.server_keys, "MSG",
+                                            server_secure_channel.channel_id, server_secure_channel.token_id, emit_seq,
+                                            emit_seq - 1u, request_id, body, body_len, server->config.send_buffer,
+                                            server->config.send_buffer_size, &total);
+        } else
+#endif
+            status = mu_sym_chunk_wrap(server->config.crypto_adapter, server_secure_channel.mode,
+                                       &server_secure_channel.server_keys, "MSG", server_secure_channel.channel_id,
+                                       server_secure_channel.token_id, emit_seq, request_id, body, body_len,
+                                       server->config.send_buffer, server->config.send_buffer_size, &total);
         if (status != MU_STATUS_GOOD) {
             return status;
         }
@@ -302,8 +310,19 @@ static bool secure_unwrap_msg(mu_server_t *server, const mu_crypto_adapter_t *cr
     }
     mu_sym_chunk_info_t si;
     (void)memset(&si, 0, sizeof(si));
-    if (mu_sym_chunk_unwrap(crypto, server_secure_channel.mode, &server_secure_channel.client_keys, msg, msg_len,
-                            out_req_full, out_req_len, &si) != MU_STATUS_GOOD) {
+#ifdef MUC_OPCUA_ECC
+    if (mu_security_policy_sym_mode(server_secure_channel.policy) == MU_SYM_MODE_AEAD_CHACHA20POLY1305) {
+        /* ECC-curve25519 AEAD: the per-chunk nonce derives from the previous
+           inbound SequenceNumber (Table 69). */
+        if (mu_sym_chunk_unwrap_aead(crypto, &server_secure_channel.client_keys, msg, msg_len,
+                                     server_secure_channel.in_last_sequence_number, out_req_full, out_req_len,
+                                     &si) != MU_STATUS_GOOD) {
+            return false;
+        }
+    } else
+#endif
+        if (mu_sym_chunk_unwrap(crypto, server_secure_channel.mode, &server_secure_channel.client_keys, msg, msg_len,
+                                out_req_full, out_req_len, &si) != MU_STATUS_GOOD) {
         return false;
     }
     *out_request_id = si.request_id;
@@ -352,6 +371,8 @@ void handle_data_chunk_secure(mu_server_t *server, opcua_byte_t *msg, size_t msg
         abort_connection(server);
         return;
     }
+    /* Record this inbound SequenceNumber for the next AEAD chunk's nonce. */
+    server_secure_channel.in_last_sequence_number = in_seq;
 
     mu_binary_reader_t rr;
     mu_binary_reader_init(&rr, req_full, req_len);
@@ -418,7 +439,18 @@ void handle_data_chunk_secure(mu_server_t *server, opcua_byte_t *msg, size_t msg
                                      .out_cap = server->config.send_buffer_size,
                                      .out_len = &total};
         ws = mu_asym_chunk_wrap(&awp);
-    } else {
+    }
+#ifdef MUC_OPCUA_ECC
+    else if (mu_security_policy_sym_mode(server_secure_channel.policy) == MU_SYM_MODE_AEAD_CHACHA20POLY1305) {
+        /* ECC-curve25519 AEAD outbound: nonce uses the previous outbound
+           SequenceNumber (out_seq - 1). */
+        ws =
+            mu_sym_chunk_wrap_aead(crypto, &server_secure_channel.server_keys, "MSG", server_secure_channel.channel_id,
+                                   server_secure_channel.token_id, out_seq, out_seq - 1u, response_request_id, respbody,
+                                   resp_len, server->config.send_buffer, server->config.send_buffer_size, &total);
+    }
+#endif
+    else {
         ws = mu_sym_chunk_wrap(crypto, server_secure_channel.mode, &server_secure_channel.server_keys, "MSG",
                                server_secure_channel.channel_id, server_secure_channel.token_id, out_seq,
                                response_request_id, respbody, resp_len, server->config.send_buffer,
