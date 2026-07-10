@@ -377,8 +377,7 @@ void test_open_secure_channel_ids_are_unique_across_connections(void) {
     mu_binary_writer_init(&writer, response, sizeof(response));
     response_len = sizeof(response);
     server->active_conn = &server->conns[0];
-    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD,
-                            handle_open_secure_channel(server, &reader, &writer, &response_len));
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, handle_open_secure_channel(server, &reader, &writer, &response_len));
     TEST_ASSERT_TRUE(server->conns[0].secure_channel.is_open);
 
     request_len = build_opn_request_body(request, sizeof(request), 2u);
@@ -386,8 +385,7 @@ void test_open_secure_channel_ids_are_unique_across_connections(void) {
     mu_binary_writer_init(&writer, response, sizeof(response));
     response_len = sizeof(response);
     server->active_conn = &server->conns[1];
-    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD,
-                            handle_open_secure_channel(server, &reader, &writer, &response_len));
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, handle_open_secure_channel(server, &reader, &writer, &response_len));
     TEST_ASSERT_TRUE(server->conns[1].secure_channel.is_open);
 
     TEST_ASSERT_NOT_EQUAL_UINT32(server->conns[0].secure_channel.channel_id,
