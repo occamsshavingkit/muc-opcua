@@ -229,6 +229,85 @@ void test_monitored_item_queue_clamps_to_fixed_depth_and_marks_overflow(void) {
     TEST_ASSERT_EQUAL_HEX32(STATUS_INFO_OVERFLOW, item->queue[item->queue_head].status & STATUS_INFO_OVERFLOW);
 }
 
+#if MUC_OPCUA_ENHANCED_DATACHANGE
+/* Enhanced DataChange Subscription 2017 Server Facet (profile-DB id 1678), mandated
+   by the StandardUA2017 profile our standard/full builds advertise. All four minima
+   are grounded from the OPC profile DB; see docs/conformance/enhanced-datachange.md. */
+static void assert_enhanced_capacity_configuration(void) {
+    TEST_ASSERT_TRUE_MESSAGE(MU_INTERN_MAX_MONITORED_ITEMS >= 500u,
+                             "Enhanced facet requires at least 500 MonitoredItems per Subscription");
+    TEST_ASSERT_TRUE_MESSAGE(MU_INTERN_MONITORED_QUEUE_DEPTH >= 5u,
+                             "Enhanced facet requires monitored-item queue depth at least 5 (MinQueueSize_05)");
+    TEST_ASSERT_TRUE_MESSAGE(MU_INTERN_MAX_SUBSCRIPTIONS >= 5u,
+                             "Enhanced facet requires at least 5 Subscriptions per Session");
+    TEST_ASSERT_TRUE_MESSAGE(MU_INTERN_MAX_PUBLISH_REQUESTS >= 10u,
+                             "Enhanced facet requires at least 10 parked Publish requests");
+}
+
+void test_enhanced_capacity_macros_meet_profile_minimums(void) {
+    assert_enhanced_capacity_configuration();
+}
+
+/* Behavioral proof of MinQueueSize_05: a monitored item whose client-requested queue
+   size is 5 must actually retain 5 distinct samples before discarding — not clamp to the
+   Standard-tier depth of 2. Fills the queue one sample per tick and asserts the fifth
+   sample is held with no overflow, then the sixth overflows (discard_oldest). */
+void test_enhanced_monitored_item_queue_holds_five_before_overflow(void) {
+    mu_server_t server;
+    (void)memset(&server, 0, sizeof(server));
+    mu_subscriptions_init(&server.subs);
+    assert_enhanced_capacity_configuration();
+
+    mu_subscription_t *sub = NULL;
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD,
+                            mu_subscription_create(&server.subs, 1u, 10000u, 30u, 10u, 0u, 0u, true, 0u, &sub));
+    TEST_ASSERT_NOT_NULL(sub);
+
+    mu_value_source_t value_source = {MU_VALUESOURCE_CALLBACK, {.callback = {read_queue_value, NULL}}};
+    mu_node_t node = {{1u, MU_NODEID_NUMERIC, {.numeric = 1000u}},
+                      MU_NODECLASS_VARIABLE,
+                      {0, NULL},
+                      {0, NULL},
+                      NULL,
+                      0u,
+                      &value_source};
+
+    mu_monitored_item_t *item = NULL;
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_monitored_item_alloc(&server.subs, sub->subscription_id, &item));
+    TEST_ASSERT_NOT_NULL(item);
+    item->resolved_node = &node;
+    item->node_id = node.node_id;
+    item->attribute_id = 13u;
+    item->sampling_interval_ms = 1u;
+    item->monitoring_mode = MU_MONITORING_MODE_REPORTING;
+    item->trigger = MU_DATACHANGE_TRIGGER_STATUS_VALUE;
+    item->queue_size = 5u; /* client requests the Enhanced minimum */
+    item->discard_oldest = true;
+    item->last_status = MU_STATUS_GOOD;
+    item->last_value.type = MU_TYPE_INT32;
+    item->last_value.value.i32 = 0;
+    item->has_value = true;
+    item->has_reported = true;
+    item->next_sample_ms = 1u;
+
+    /* Five distinct samples fit without overflow. */
+    for (opcua_uint32_t i = 1u; i <= 5u; ++i) {
+        s_queue_value = (opcua_int32_t)i;
+        mu_subscriptions_tick(&server, i);
+    }
+    TEST_ASSERT_EQUAL_UINT32(5u, item->queue_size);
+    TEST_ASSERT_EQUAL_UINT8(5u, item->queue_count);
+    TEST_ASSERT_FALSE(item->queue_overflow);
+
+    /* The sixth sample overflows the depth-5 queue. */
+    s_queue_value = 6;
+    mu_subscriptions_tick(&server, 6u);
+    TEST_ASSERT_EQUAL_UINT8(5u, item->queue_count);
+    TEST_ASSERT_TRUE(item->queue_overflow);
+    TEST_ASSERT_EQUAL_HEX32(STATUS_INFO_OVERFLOW, item->queue[item->queue_head].status & STATUS_INFO_OVERFLOW);
+}
+#endif /* MUC_OPCUA_ENHANCED_DATACHANGE */
+
 #else
 
 void test_standard_capacity_tests_require_standard_subscription_build(void) {
@@ -246,6 +325,10 @@ int main(void) {
     RUN_TEST(test_set_triggering_rejects_link_capacity_exhaustion_without_corrupting_existing_links);
     RUN_TEST(test_rejects_publish_request_queue_capacity_exhaustion_without_storage_growth);
     RUN_TEST(test_monitored_item_queue_clamps_to_fixed_depth_and_marks_overflow);
+#if MUC_OPCUA_ENHANCED_DATACHANGE
+    RUN_TEST(test_enhanced_capacity_macros_meet_profile_minimums);
+    RUN_TEST(test_enhanced_monitored_item_queue_holds_five_before_overflow);
+#endif
 #else
     RUN_TEST(test_standard_capacity_tests_require_standard_subscription_build);
 #endif

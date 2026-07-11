@@ -14,6 +14,7 @@
 
 #include "muc_opcua/address_space.h"
 #include "muc_opcua/capacities.h"
+#include "muc_opcua/config.h"
 #include "muc_opcua/opcua_types.h"
 #include "muc_opcua/status.h"
 #include "muc_opcua/types.h"
@@ -24,6 +25,24 @@
 #endif
 
 #if MUC_OPCUA_SUBSCRIPTIONS
+
+/* Enhanced DataChange Subscription 2017 Server Facet: advertised == enforced.
+ * When a build advertises StandardUA2017 (MUC_OPCUA_ENHANCED_DATACHANGE, see
+ * features.h) it CLAIMS this facet, so the resolved capacities must meet all four
+ * of its mandatory minima (OPC profile-DB id 1678). These _Static_asserts make a
+ * capacity override that drops below the claimed facet a compile error rather than
+ * a silently mis-advertised profile. Minima grounded in
+ * docs/conformance/enhanced-datachange.md. */
+#if MUC_OPCUA_ENHANCED_DATACHANGE
+_Static_assert(MU_INTERN_MAX_MONITORED_ITEMS >= 500,
+               "Enhanced DataChange facet (StandardUA2017) requires >= 500 MonitoredItems per Subscription");
+_Static_assert(MU_INTERN_MONITORED_QUEUE_DEPTH >= 5,
+               "Enhanced DataChange facet (StandardUA2017) requires monitored-item queue depth >= 5");
+_Static_assert(MU_INTERN_MAX_SUBSCRIPTIONS >= 5,
+               "Enhanced DataChange facet (StandardUA2017) requires >= 5 Subscriptions per Session");
+_Static_assert(MU_INTERN_MAX_PUBLISH_REQUESTS >= 10,
+               "Enhanced DataChange facet (StandardUA2017) requires >= 10 parked Publish requests");
+#endif
 
 /*
  * Subscription-engine capacities (queue depth, triggering links, subscriptions,

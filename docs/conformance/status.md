@@ -122,6 +122,7 @@ conformance-unit map.
 | SecurityPolicy Basic256Sha256 | Implemented | `test_asym_chunk`, `test_sym_chunk`, `test_server_handshake_secure` |
 | Security Default ApplicationInstance Certificate | Satisfied | `test_certificate`, existing certificate handling |
 | Standard DataChange Subscription 2017 facet | Implemented | `test_subscriptions_capacity`, `test_subscriptions` |
+| Enhanced DataChange Subscription 2017 facet (standard/full; mandated by StandardUA2017) | Implemented | `test_subscriptions_capacity` (`test_enhanced_*`); see `enhanced-datachange.md` |
 | Base Info Type System | Implemented | `test_type_system`, `test_view_services` |
 | Method Call: GetMonitoredItems / ResendData | Implemented | `test_method_call`, `test_method_call_errors` |
 | Write Service | Implemented | Optional feature via `MUC_OPCUA_SERVICE_WRITE` |

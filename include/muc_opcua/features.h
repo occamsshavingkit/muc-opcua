@@ -84,6 +84,23 @@
 #endif
 #endif
 
+/* Enhanced DataChange Subscription 2017 Server Facet (OPC-10000-7, facet
+   `EnhancedDataChangeSubscription2017`, profile-DB id 1678). The Standard 2017 UA
+   Server Profile (id 1663) lists this facet as MANDATORY (isOptional=false), and
+   every `standard`/`full` build advertises StandardUA2017 (via
+   MUC_OPCUA_STANDARD_PROFILE, see base_nodes.c s_server_profile_array). So any build
+   that advertises StandardUA2017 CLAIMS Enhanced and must meet its four mandatory
+   minima: >=500 MonitoredItems/Subscription, >=5 queue entries/MonitoredItem,
+   >=5 Subscriptions/Session, >=10 Publish requests/Session. Enforced (advertised ==
+   enforced) by the _Static_asserts in src/services/subscription.h. `embedded`
+   advertises EmbeddedUA2017 -> the plain Standard DataChange 2017 facet (MinQueueSize_02)
+   and does NOT define this marker. */
+#if defined(MUC_OPCUA_STANDARD_PROFILE) && MUC_OPCUA_STANDARD_PROFILE
+#define MUC_OPCUA_ENHANCED_DATACHANGE 1
+#else
+#define MUC_OPCUA_ENHANCED_DATACHANGE 0
+#endif
+
 /* The first client tier is intentionally the only compiled client surface today.
    Higher tiers are roadmap entries and must not be enabled until their service
    surfaces exist. */

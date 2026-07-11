@@ -59,8 +59,8 @@ smaller after `--gc-sections` dead-code elimination.
 | nano | 17,956 B | Nano Embedded Device 2017 |
 | micro | 29,706 B | Micro Embedded Device 2017 |
 | embedded | 54,972 B | Embedded 2017 UA Server |
-| standard | 79,039 B | Standard 2017 UA Server |
-| full | 79,039 B | — (everything on; also carries `MUC_OPCUA_ECC` + Data Access + EventFilter WhereClause + Method Server) |
+| standard | 79,107 B | Standard 2017 UA Server (Enhanced DataChange 2017 facet) |
+| full | 79,107 B | — (everything on; also carries `MUC_OPCUA_ECC` + Data Access + EventFilter WhereClause + Method Server) |
 
 Built with LTO (`MUC_OPCUA_LTO=ON`, the default). The `nano`/`micro`/`embedded`
 profiles are strictly no-heap (`MUC_OPCUA_ALLOW_HEAP=OFF`): 0 B `.data`, 0 B `.bss`,
@@ -84,11 +84,11 @@ places into your storage. Scales with the compiled capacities.
 
 | Profile | sizeof(struct mu_server) |
 |---------|--------------------------|
-| nano | 784 B |
-| micro | 27,600 B |
-| embedded | 97,216 B |
-| standard | 1,068,200 B |
-| full | 2,084,320 B |
+| nano | 792 B |
+| micro | 27,624 B |
+| embedded | 97,224 B |
+| standard | 1,556,368 B |
+| full | 3,060,488 B |
 
 **Caller-provided storage** (`MU_SERVER_STORAGE_BYTES`) — the single block you hand to
 `mu_server_init`; holds the server object plus its scratch/chunk/security buffers.
@@ -96,13 +96,19 @@ Connections scale with sessions (each concurrent session may be an independent
 client holding its own SecureChannel), so the connection pool dominates the
 standard/full storage. Retune per build with `-DMU_MAX_CONNECTIONS=n`.
 
-| Profile | Storage | Sessions | Connections | Subscriptions | Monitored Items | Publish |
-|---------|---------|----------|-------------|---------------|-----------------|---------|
-| nano | 1,408 B | 2 | 1 | — | — | — |
-| micro | 30,720 B | 2 | 2 | 2 | 8 | 4 |
-| embedded | 127,272 B | 2 | 4 | 2 | 100 | 5 |
-| standard | 1,178,260 B | 50 | 50 | 50 | 1,000 | 50 |
-| full | 2,300,460 B | 100 | 100 | 100 | 2,000 | 100 |
+| Profile | Storage | Sessions | Connections | Subscriptions | Monitored Items | Queue depth | Publish |
+|---------|---------|----------|-------------|---------------|-----------------|-------------|---------|
+| nano | 1,408 B | 2 | 1 | — | — | 1 | — |
+| micro | 30,720 B | 2 | 2 | 2 | 8 | 1 | 4 |
+| embedded | 127,272 B | 2 | 4 | 2 | 100 | 2 | 5 |
+| standard | 2,218,644 B | 50 | 50 | 50 | 1,000 | 5 | 50 |
+| full | 4,380,844 B | 100 | 100 | 100 | 2,000 | 5 | 100 |
+
+The `standard`/`full` monitored-item queue depth is **5** (not 2): they advertise
+`StandardUA2017`, which mandates the **Enhanced DataChange Subscription 2017** facet
+(`MinQueueSize_05`). The deeper fixed inline queue adds +144 KiB (standard) / +288 KiB
+(full) of static RAM vs a depth-2 build — see
+[docs/conformance/enhanced-datachange.md](docs/conformance/enhanced-datachange.md).
 
 Full methodology in [docs/size/feature-size-ledger.md](docs/size/feature-size-ledger.md).
 

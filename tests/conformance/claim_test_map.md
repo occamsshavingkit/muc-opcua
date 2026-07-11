@@ -41,6 +41,7 @@ Backing test column: comma-separated ctest names (as registered), no `test_` typ
 | Transport: HEL EndpointUrl over-length → Bad_TcpEndpointUrlInvalid | OPC-10000-6 §7.1.2.3 | all | test_tcp_connection |
 | Transport: CloseSecureChannel CLO closes channel | OPC-10000-4 §5.6.3 / OPC-10000-6 §6.7.3 | all | test_server_handshake |
 | Data-change Subscriptions / MonitoredItems | OPC-10000-4 §5.13 / §5.14 | micro,embedded,full | test_subscriptions |
+| Enhanced DataChange Subscription 2017 facet minima (queue depth ≥5, items ≥500, subs ≥5, publish ≥10) | OPC-10000-7 (EnhancedDataChangeSubscription2017, id 1678) | standard,full | test_subscriptions_capacity |
 | Republish unavailable NotificationMessage → Bad_MessageNotAvailable | OPC-10000-4 §5.14.6.3 | micro,embedded,full | test_subscriptions |
 | SetMonitoringMode invalid MonitoredItemId | OPC-10000-4 §5.13.4 / §7.38.2 | micro,embedded,full | test_subscriptions |
 | SetPublishingMode invalid SubscriptionId | OPC-10000-4 §5.14.4 / §7.38.2 | micro,embedded,full | test_subscriptions |
