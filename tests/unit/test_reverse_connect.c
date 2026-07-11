@@ -1,14 +1,19 @@
 /* tests/unit/test_reverse_connect.c
  *
- * Server-initiated TCP connections per OPC-10000-6 §7.5.
+ * Server-initiated TCP connections + ReverseHello (RHE) per OPC-10000-6 §7.1.3 / §7.1.2.6.
  */
 
+#include "muc_opcua/encoding.h"
 #include "muc_opcua/platform.h"
 #include "muc_opcua/server.h"
 #include "muc_opcua/status.h"
 #include <stddef.h>
 #include <string.h>
 #include <unity.h>
+
+#ifdef MUC_OPCUA_REVERSE_CONNECT
+#include "../../src/core/tcp_connection.h"
+#endif
 
 void setUp(void) {}
 void tearDown(void) {}
@@ -68,10 +73,19 @@ static opcua_statuscode_t mock_read(void *ctx, void *h, opcua_byte_t *buf, size_
     return MU_STATUS_GOOD;
 }
 
+/* Capture the first message written to the outbound connection (the ReverseHello). */
+static opcua_byte_t g_write_capture[512];
+static size_t g_write_capture_len;
+static int g_write_called;
+
 static opcua_statuscode_t mock_write(void *ctx, void *h, const opcua_byte_t *buf, size_t len, size_t *n) {
     (void)ctx;
     (void)h;
-    (void)buf;
+    if (g_write_called == 0 && len <= sizeof(g_write_capture)) {
+        (void)memcpy(g_write_capture, buf, len);
+        g_write_capture_len = len;
+    }
+    g_write_called++;
     *n = len;
     return MU_STATUS_GOOD;
 }
@@ -100,6 +114,7 @@ static void build_valid_config(mu_server_config_t *cfg, opcua_byte_t *rx, size_t
                                size_t tx_sz) {
     (void)memset(cfg, 0, sizeof(*cfg));
     cfg->endpoint_url = "opc.tcp://localhost:4840";
+    cfg->application_uri = "urn:muc-opcua:server";
     cfg->receive_buffer = rx;
     cfg->receive_buffer_size = rx_sz;
     cfg->send_buffer = tx;
@@ -177,6 +192,80 @@ void test_reverse_connect_url_requires_connect_callback(void) {
     TEST_ASSERT_NOT_EQUAL(MU_STATUS_GOOD, s);
 }
 
+/* Reverse connect needs a ServerUri (ApplicationUri) for the ReverseHello. */
+void test_reverse_connect_requires_application_uri(void) {
+    opcua_byte_t rx[MU_MIN_CHUNK_SIZE];
+    opcua_byte_t tx[MU_MIN_CHUNK_SIZE];
+    mu_server_config_t cfg;
+    build_valid_config(&cfg, rx, sizeof(rx), tx, sizeof(tx));
+    build_tcp_adapter(&cfg.tcp_adapter);
+    cfg.reverse_connect_url = "opc.tcp://192.168.1.100:4840";
+    cfg.application_uri = NULL;
+
+    TEST_ASSERT_NOT_EQUAL(MU_STATUS_GOOD, mu_server_config_validate(&cfg));
+}
+
+/* FR-1: the ReverseHello encoder produces a spec RHEF message (OPC-10000-6 §7.1.2.6):
+   'R','H','E','F', declared MessageSize == actual length, then ServerUri + EndpointUrl. */
+void test_reverse_hello_encoder_produces_valid_rhe(void) {
+    mu_server_config_t cfg;
+    (void)memset(&cfg, 0, sizeof(cfg));
+    cfg.application_uri = "urn:muc-opcua:server";
+    cfg.endpoint_url = "opc.tcp://localhost:4840";
+
+    opcua_byte_t buf[256];
+    size_t len = sizeof(buf);
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_tcp_create_reverse_hello(&cfg, buf, &len));
+
+    TEST_ASSERT_EQUAL_UINT8('R', buf[0]);
+    TEST_ASSERT_EQUAL_UINT8('H', buf[1]);
+    TEST_ASSERT_EQUAL_UINT8('E', buf[2]);
+    TEST_ASSERT_EQUAL_UINT8('F', buf[3]);
+    opcua_uint32_t declared = (opcua_uint32_t)buf[4] | ((opcua_uint32_t)buf[5] << 8) | ((opcua_uint32_t)buf[6] << 16) |
+                              ((opcua_uint32_t)buf[7] << 24);
+    TEST_ASSERT_EQUAL_UINT32((opcua_uint32_t)len, declared);
+
+    mu_binary_reader_t r;
+    mu_binary_reader_init(&r, buf + 8, len - 8);
+    mu_string_t server_uri, endpoint;
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_binary_read_string(&r, &server_uri));
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_binary_read_string(&r, &endpoint));
+    TEST_ASSERT_EQUAL_INT(20, server_uri.length); /* "urn:muc-opcua:server" */
+    TEST_ASSERT_EQUAL_MEMORY("urn:muc-opcua:server", server_uri.data, 20);
+    TEST_ASSERT_EQUAL_INT(24, endpoint.length); /* "opc.tcp://localhost:4840" */
+    TEST_ASSERT_EQUAL_MEMORY("opc.tcp://localhost:4840", endpoint.data, 24);
+    TEST_ASSERT_EQUAL_size_t(len - 8, r.position); /* body fully consumed */
+}
+
+/* FR-2: a server-initiated connection sends the ReverseHello as its FIRST message
+   (OPC-10000-6 §7.1.3) — not the previous broken behaviour of connecting then waiting. */
+void test_reverse_connect_emits_reverse_hello_first(void) {
+    opcua_byte_t rx[MU_MIN_CHUNK_SIZE];
+    opcua_byte_t tx[MU_MIN_CHUNK_SIZE];
+    mu_server_config_t cfg;
+    build_valid_config(&cfg, rx, sizeof(rx), tx, sizeof(tx));
+    build_tcp_adapter(&cfg.tcp_adapter);
+    cfg.reverse_connect_url = "opc.tcp://192.168.1.100:4840";
+
+    g_connect_called = 0;
+    g_write_called = 0;
+    g_write_capture_len = 0;
+
+    _Alignas(8) opcua_byte_t storage[MU_SERVER_STORAGE_BYTES];
+    mu_server_t *server = NULL;
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_server_init(storage, sizeof(storage), &cfg, &server));
+
+    TEST_ASSERT_EQUAL_INT(1, g_connect_called);
+    TEST_ASSERT_GREATER_THAN_UINT32(0u, g_write_capture_len);
+    /* First bytes on the wire are an RHEF ReverseHello. */
+    TEST_ASSERT_EQUAL_UINT8('R', g_write_capture[0]);
+    TEST_ASSERT_EQUAL_UINT8('H', g_write_capture[1]);
+    TEST_ASSERT_EQUAL_UINT8('E', g_write_capture[2]);
+    TEST_ASSERT_EQUAL_UINT8('F', g_write_capture[3]);
+
+    mu_server_close(server);
+}
+
 #else /* !MUC_OPCUA_REVERSE_CONNECT */
 
 void test_reverse_connect_requires_build_flag(void) {
@@ -191,6 +280,9 @@ int main(void) {
     RUN_TEST(test_reverse_connect_url_calls_connect_not_listen);
     RUN_TEST(test_null_reverse_connect_url_calls_listen);
     RUN_TEST(test_reverse_connect_url_requires_connect_callback);
+    RUN_TEST(test_reverse_connect_requires_application_uri);
+    RUN_TEST(test_reverse_hello_encoder_produces_valid_rhe);
+    RUN_TEST(test_reverse_connect_emits_reverse_hello_first);
 #else
     RUN_TEST(test_reverse_connect_requires_build_flag);
 #endif
