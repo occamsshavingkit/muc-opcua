@@ -1,0 +1,281 @@
+# muc-opcua feature configuration (Kconfig, consumed via kconfiglib).
+#
+# Symbol names are bare here; the build sets CONFIG_=MUC_OPCUA_ so the generated
+# autoconf.h emits `#define MUC_OPCUA_<SYM> 1` (undefined for n -- #ifdef-safe) and
+# .config/defconfig lines read `MUC_OPCUA_<SYM>=y`. So the C sources keep their
+# existing `MUC_OPCUA_*` macro names verbatim (no #ifdef-site changes).
+#
+# Model (spec: docs/superpowers/specs/2026-07-10-kconfig-style-feature-configuration.md):
+#   - `depends on`        = hard facet containment (replaces FEATURE_DEPENDENCIES + the
+#                           features.h #error guards).
+#   - `default y if PROFILE_X` (per-child, NOT select) = the soft profile preset; the
+#                           additive nano <= micro <= embedded <= standard <= full chain
+#                           falls out automatically.
+#   - Profiles are defconfigs (configs/<profile>.defconfig) selecting the choice below.
+#
+# NOTE: ALLOW_HEAP, platform flags (MDNS/HAVE_*/IS_*) and build knobs (BUILD_TESTS,
+# LTO, ...) are NOT here -- they stay CMake-derived (memory-model / platform / tooling).
+
+mainmenu "muc-opcua configuration"
+
+choice
+	prompt "Server profile"
+	default PROFILE_NANO
+	help
+	  Starting facet set for the OPC UA Server. Each named tier equals exactly its
+	  namesake OPC UA Server Profile's mandatory facet set (spec 067); individual
+	  facets below remain togglable. "custom" starts from nothing.
+
+config PROFILE_NANO
+	bool "nano - NanoEmbeddedDevice2017"
+config PROFILE_MICRO
+	bool "micro - MicroEmbeddedDevice2017"
+config PROFILE_EMBEDDED
+	bool "embedded - EmbeddedUA2017"
+config PROFILE_STANDARD
+	bool "standard - StandardUA2017"
+config PROFILE_FULL
+	bool "full - everything on (StandardUA2017 URI, generous capacities)"
+config PROFILE_CUSTOM
+	bool "custom - hand-select facets"
+
+endchoice
+
+# Advertised-profile marker (drives base_nodes.c ServerProfileArray + capacities.h tier).
+# (MUC_OPCUA_EMBEDDED_PROFILE is intentionally absent: it was a CMake-only option never
+#  emitted as a C compile define, so it has no autoconf symbol.)
+config STANDARD_PROFILE
+	bool
+	default y if PROFILE_STANDARD || PROFILE_FULL
+
+menu "Server"
+
+comment "Core services"
+
+config SERVICE_READ
+	bool "Read service"
+	default y
+	help
+	  OPC-10000-4 §5.10.2 Read / Core 2017 Server Facet (id 1673, Attribute Read).
+
+config SERVICE_BROWSE
+	bool "Browse + BrowseNext + TranslateBrowsePaths"
+	default y
+	help
+	  OPC-10000-4 §5.8 View services / Core 2017 (View Basic, TranslateBrowsePath).
+
+config SERVICE_DISCOVERY
+	bool "Discovery (FindServers / GetEndpoints)"
+	default y
+	help
+	  OPC-10000-4 §5.4 Discovery / Core 2017 (Discovery Find Servers Self, Get Endpoints).
+
+config SERVICE_REGISTER_NODES
+	bool "RegisterNodes / UnregisterNodes"
+	default y if PROFILE_NANO || PROFILE_MICRO || PROFILE_EMBEDDED || PROFILE_STANDARD || PROFILE_FULL
+	help
+	  OPC-10000-4 §5.9 / Core 2017 (View RegisterNodes).
+
+config SERVICE_WRITE
+	bool "Attribute Write service"
+	default y if PROFILE_FULL
+	help
+	  OPC-10000-4 §5.10.4 Write (optional; Core 2017 Attribute Write is opt=T).
+	  Backing test: test_write_service.
+
+config SERVICE_HISTORY
+	bool "Historical Access (HistoryRead/HistoryUpdate)"
+	default y if PROFILE_FULL
+	help
+	  OPC-10000-11 Historical Access (optional facet). Backing test: test_history.
+
+config SERVICE_QUERY
+	bool "Query (QueryFirst/QueryNext)"
+	default y if PROFILE_FULL
+	help
+	  OPC-10000-4 §5.9 Query (optional facet). Backing test: test_query_service.
+
+config SERVICE_NODEMANAGEMENT
+	bool "NodeManagement (AddNodes/DeleteNodes/...)"
+	default y if PROFILE_FULL
+	help
+	  OPC-10000-4 §5.7 NodeManagement (optional facet).
+
+comment "Address space"
+
+config BASE_NODES
+	bool "Base Information node set (Server object)"
+	default y if PROFILE_NANO || PROFILE_MICRO || PROFILE_EMBEDDED || PROFILE_STANDARD || PROFILE_FULL
+	help
+	  OPC-10000-5 §6.3 / Core 2017 (Address Space Base, Base Info Core Structure) --
+	  the mandatory Server object hierarchy. Backing: test_base_address_space_is_sorted.
+
+config BASE_TYPE_SYSTEM
+	bool "Base Info Type System"
+	depends on BASE_NODES
+	default y if PROFILE_EMBEDDED || PROFILE_STANDARD || PROFILE_FULL
+	help
+	  OPC-10000-5 Base Info Type System (EmbeddedUA2017 direct CU, id 1661).
+
+config EXTENDED_NODEIDS
+	bool "Extended (string/GUID) NodeIds"
+	default y if PROFILE_FULL
+
+config NAMESPACES
+	bool "Namespace metadata"
+	depends on BASE_NODES
+	default y if PROFILE_FULL
+
+config DYNAMIC_NODES
+	bool "Runtime node addition (dynamic address space)"
+	default y if PROFILE_FULL
+
+config COMPLEX_TYPES
+	bool "Structure/complex type encoding"
+	depends on BASE_NODES
+	default y if PROFILE_FULL
+
+comment "Sessions / security"
+
+config USER_AUTH
+	bool "User token authentication (UserName/Password, X509)"
+	default y if PROFILE_NANO || PROFILE_MICRO || PROFILE_EMBEDDED || PROFILE_STANDARD || PROFILE_FULL
+	help
+	  OPC-10000-4 §7.36 user identity tokens / Core 2017 (UserNamePassword id 1096),
+	  X509 (id 1097).
+
+config MULTIPLE_CONNECTIONS
+	bool "Multiple concurrent connections/sessions"
+	default y if PROFILE_MICRO || PROFILE_EMBEDDED || PROFILE_STANDARD || PROFILE_FULL
+	help
+	  MicroEmbeddedDevice2017 (id 1659) mandates Session Minimum 2 Parallel.
+
+config SESSION_TIMEOUT
+	bool "Session idle timeout"
+	default y if MULTIPLE_CONNECTIONS || MULTI_CHUNK
+	help
+	  Implicit coupling: required whenever multiple connections or multi-chunk are on.
+
+config SECURITY
+	bool "SecurityPolicy Basic256Sha256"
+	default y if PROFILE_EMBEDDED || PROFILE_STANDARD || PROFILE_FULL
+	help
+	  OPC-10000-7 Security Policy Required + Default AppInstance Certificate
+	  (EmbeddedUA2017 direct CUs).
+
+config ECC
+	bool "ECC SecurityPolicies (curve25519 / nistP256)"
+	depends on SECURITY
+	default y if PROFILE_FULL
+	help
+	  OPC-10000-7 Security ECC Policy (OPTIONAL at every tier; spec 059). Requires
+	  SecurityPolicy support. See docs/conformance/ecc-security-policy.md.
+
+config MULTI_CHUNK
+	bool "Multi-chunk messages / index-range Read"
+	default y if PROFILE_FULL
+
+config TIME_SYNC
+	bool "Security time synchronization (clock-skew validation)"
+	default y if PROFILE_FULL
+	help
+	  OPC-10000-4 §7.28 RequestHeader timestamp validation (spec 055).
+
+config AUDITING
+	bool "Audit events"
+	depends on EVENTS
+	default y if PROFILE_FULL
+
+comment "Subscriptions & monitoring"
+
+config SUBSCRIPTIONS
+	bool "Data-change subscriptions & MonitoredItems"
+	default y if PROFILE_MICRO || PROFILE_EMBEDDED || PROFILE_STANDARD || PROFILE_FULL
+	help
+	  OPC-10000-4 §5.12/§5.13 / EmbeddedDataChangeSubscription (id 141, basic).
+
+config SUBSCRIPTIONS_STANDARD
+	bool "Standard/Enhanced DataChange facet (deadband, triggering, built-in methods)"
+	depends on SUBSCRIPTIONS
+	default y if PROFILE_EMBEDDED || PROFILE_STANDARD || PROFILE_FULL
+	help
+	  OPC-10000-7 Standard/Enhanced DataChange Subscription 2017 (ids 1675/1678):
+	  GetMonitoredItems/ResendData, deadband, triggering, Republish.
+
+config EVENTS
+	bool "Event notifications & Alarms/Conditions"
+	depends on SUBSCRIPTIONS
+	default y if PROFILE_FULL
+
+config EVENT_FILTER_WHERE
+	bool "EventFilter WhereClause (ContentFilter) evaluation"
+	depends on EVENTS && SUBSCRIPTIONS_STANDARD
+	default y if PROFILE_FULL
+	help
+	  OPC-10000-4 §7.4 ContentFilter / Standard Event Subscription facet (spec 061).
+
+config AGGREGATE_FULL
+	bool "Aggregate subscriptions"
+	depends on SUBSCRIPTIONS_STANDARD
+	default y if PROFILE_FULL
+	help
+	  OPC-10000-13 Aggregate Subscription facet (optional).
+
+config REDUNDANCY
+	bool "Client Redundancy (TransferSubscriptions)"
+	depends on SUBSCRIPTIONS
+	default y if PROFILE_FULL
+	help
+	  OPC-10000-4 §5.14.7 / §6.6.3 (optional; spec 066). See docs/conformance/redundancy.md.
+
+comment "Methods & extensions"
+
+config METHOD_SERVER
+	bool "Method Server facet (arbitrary Call)"
+	default y if PROFILE_FULL
+	help
+	  OPC-10000-4 §5.11 Call for integrator-registered methods (optional; spec 062).
+	  The built-in GetMonitoredItems/ResendData work WITHOUT this (SUBSCRIPTIONS_STANDARD).
+
+config CUSTOM_METHODS
+	bool "Custom method registration (alias of Method Server)"
+	default y if PROFILE_FULL
+
+config PUBSUB
+	bool "PubSub (OPC-10000-14)"
+	default y if PROFILE_FULL
+
+config DATA_ACCESS
+	bool "Data Access facet"
+	depends on BASE_NODES
+	default y if PROFILE_FULL
+	help
+	  OPC-10000-8 §5.3 Data Access Server Facet (optional; spec 060). Requires Base Nodes.
+
+config REVERSE_CONNECT
+	bool "Reverse Connect (server-initiated ReverseHello)"
+	default y if PROFILE_FULL
+	help
+	  OPC-10000-6 §7.1.3 (optional; spec 065). See docs/conformance/reverse-connect.md.
+
+config SERVER_DIAGNOSTICS
+	bool "ServerDiagnostics object + counters"
+	default y if PROFILE_FULL
+	help
+	  OPC-10000-5 §6.3 ServerDiagnostics (optional; spec 064).
+
+config READ_CACHE
+	bool "Read value cache (maxAge optimization)"
+	default n
+
+endmenu
+
+menu "Client"
+
+config CLIENT_NANO
+	bool "Nano client surface"
+	default n
+	help
+	  The only implemented client tier (features.h enforces this).
+
+endmenu

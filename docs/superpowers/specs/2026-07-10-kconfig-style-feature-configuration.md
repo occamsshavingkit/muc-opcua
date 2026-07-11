@@ -1,7 +1,47 @@
 # Kconfig-style feature configuration — plan for next sprint
 
-**Status:** planning only, no code written. This document exists so the decision and
-design are captured before implementation starts, not decided ad hoc mid-sprint.
+**Status:** IN PROGRESS (2026-07-11). Execution plan: `~/.claude/plans/calm-dreaming-lynx.md`.
+
+## Implementation status (2026-07-11)
+
+Decisions updated from this doc after execution began:
+- **Tool = kconfiglib (pure Python)**, not the vendored kernel-C sources. Justification: Python
+  is already a build/CI dep here (`check_claim_map.py`, `measure_size.sh`), so the kernel-C
+  "no Python" advantage buys nothing, while kconfiglib is pip-installable / vendorable with zero
+  ncurses/GPL-vendoring overhead. (This doc's designated fallback becomes the primary.)
+- **Gates at the CU/feature leaf**, OPC Part/§/paragraph citations as help-text metadata
+  (as this doc already specified) — *not* paragraph-level gates.
+- **Sequencing = after Project B** (B1–B7 all merged) — the doc's open sequencing question is moot.
+- **ALLOW_HEAP, platform flags (MDNS/HAVE_*/IS_*), build knobs stay CMake-derived** — not in
+  Kconfig (memory-model / platform / tooling, not togglable facets).
+
+**Phase 0 (spike) — DONE, all claims confirmed against this codebase:**
+- The `#ifdef`-preservation open question is **RESOLVED**: with bare Kconfig symbol names +
+  `CONFIG_=MUC_OPCUA_`, `genconfig`/`write_autoconf` emits `#define MUC_OPCUA_<X> 1` for `y` and
+  leaves it **undefined** for `n` — `#ifdef`-safe, macro names kept verbatim, **no `#ifdef`-site
+  rewrite**. `.config`/defconfig lines read `MUC_OPCUA_<X>=y`.
+- `depends on` enforces hard dependencies (a defconfig forcing `DATA_ACCESS=y` without
+  `BASE_NODES` is refused — `n` in output).
+- A single generator (`scripts/kconfig/gen_config.py`) emits both `autoconf.h` (compiler) and a
+  `config.cmake` (`set(MUC_OPCUA_X ON/OFF)` for source selection).
+
+**Phase 1 (tree) — IN PROGRESS.** The full Kconfig tree (`/Kconfig`, 43 symbols: profile choice +
+~37 feature facets + STANDARD_PROFILE marker + CLIENT_NANO) is authored with per-child
+`default y if PROFILE_*` (derived from the current per-profile flag matrix) and every dependency
+edge (the 11 `FEATURE_DEPENDENCIES` + the 2 divergent edges + the implicit `SESSION_TIMEOUT`
+coupling) as `depends on`. `configs/<profile>.defconfig` (×6) select the choice.
+**Acid test passes:** `scripts/kconfig/check_baseline.py` confirms the Kconfig-resolved feature
+set == today's CMake-resolved set for all six profiles (byte-identical, excluding the
+CMake-derived ALLOW_HEAP/MDNS and the behavior-neutral unread `PROFILE_CUSTOM`).
+**Remaining Phase 1:** wire CMake to consume `gen_config.py` output (include `autoconf.h`, source
+selection via `config.cmake`), then retire the `option()`/`apply_profile_option`/reset-loop +
+`FEATURE_DEPENDENCIES` machinery and the `features.h` dependency `#error`s; re-run the full build
+matrix for behavior-neutrality.
+
+---
+
+**Original plan (planning only, no code written) follows.** This document captured the decision
+and design before implementation started.
 
 ## Problem
 
