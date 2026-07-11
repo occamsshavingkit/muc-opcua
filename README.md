@@ -64,7 +64,7 @@ Server Profile (strict, spec 067) — optional facets are `-D` opt-ins. `full` i
 | micro | 31,961 B | Micro Embedded Device 2017 (Nano + basic subscriptions + 2 parallel sessions) |
 | embedded | 51,773 B | Embedded 2017 UA Server (Micro + Standard DataChange + Security + Type System) |
 | standard | 52,023 B | Standard 2017 UA Server (Embedded + Enhanced DataChange capacity + X509) |
-| full | 80,187 B | — (everything on: Write, Events, Data Access, Method Server, History, Query, NodeManagement, PubSub, Aggregate, Diagnostics, Reverse Connect, Redundancy, ECC, …) |
+| full | 80,831 B | — (everything on: Write, Events, Data Access, Method Server, History, Query, NodeManagement, PubSub, Aggregate, Diagnostics, Reverse Connect, Client Redundancy, ECC, …) |
 
 Built with LTO (`MUC_OPCUA_LTO=ON`, the default). The `nano`/`micro`/`embedded`
 profiles are strictly no-heap (`MUC_OPCUA_ALLOW_HEAP=OFF`): 0 B `.data`, 0 B `.bss`,
@@ -93,7 +93,7 @@ places into your storage. Scales with the compiled capacities.
 | micro | 19,408 B |
 | embedded | 87,280 B |
 | standard | 961,840 B |
-| full | 3,060,904 B |
+| full | 3,067,432 B |
 
 **Caller-provided storage** (`MU_SERVER_STORAGE_BYTES`) — the single block you hand to
 `mu_server_init`; holds the server object plus its scratch/chunk/security buffers.

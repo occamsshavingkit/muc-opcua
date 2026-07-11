@@ -328,6 +328,17 @@ opcua_statuscode_t mu_subscription_delete(mu_subscriptions_t *subs, opcua_uint32
 mu_subscription_t *mu_subscription_find(mu_subscriptions_t *subs, opcua_uint32_t session_id,
                                         opcua_uint32_t subscription_id);
 
+#if MUC_OPCUA_REDUNDANCY
+/* Look up a Subscription by id regardless of owning session — the TransferSubscriptions
+   service (OPC-10000-4 §5.14.7) must find subscriptions owned by another Session. */
+mu_subscription_t *mu_subscription_find_any(mu_subscriptions_t *subs, opcua_uint32_t subscription_id);
+
+/* SetSession(): re-home a Subscription to new_session_id and re-target the old owner's
+   publish queue (§5.14.1.4). */
+opcua_statuscode_t mu_subscription_transfer(mu_subscriptions_t *subs, mu_subscription_t *sub,
+                                            opcua_uint32_t new_session_id);
+#endif
+
 /* Allocate a MonitoredItem slot under a subscription (OPC 10000-4 §5.13.2). Assigns a
    unique non-zero monitored_item_id and records the owning subscription; returns
    Bad_TooManyMonitoredItems when the array is full. The caller fills the node/attribute/

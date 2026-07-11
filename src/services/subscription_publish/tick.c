@@ -227,6 +227,38 @@ mu_subscription_t *mu_subscription_find(mu_subscriptions_t *subs, opcua_uint32_t
     return NULL;
 }
 
+#if MUC_OPCUA_REDUNDANCY
+mu_subscription_t *mu_subscription_find_any(mu_subscriptions_t *subs, opcua_uint32_t subscription_id) {
+    if (subs == NULL) {
+        return NULL;
+    }
+    for (size_t i = 0; i < MU_INTERN_MAX_SUBSCRIPTIONS; ++i) {
+        mu_subscription_t *sub = &subs->subscriptions[i];
+        if (sub->in_use && sub->subscription_id == subscription_id) {
+            return sub;
+        }
+    }
+    return NULL;
+}
+
+opcua_statuscode_t mu_subscription_transfer(mu_subscriptions_t *subs, mu_subscription_t *sub,
+                                            opcua_uint32_t new_session_id) {
+    if (subs == NULL || sub == NULL || !sub->in_use) {
+        return MU_STATUS_BAD_SUBSCRIPTIONIDINVALID;
+    }
+    /* SetSession() (OPC-10000-4 §5.14.1.4): re-home the Subscription to the new owner.
+       Future notifications route to the new session (publish routing resolves via
+       sub->session_id). Drop the old owner's parked Publish requests once it holds no
+       more subscriptions, so queued publishes (keyed by session_id) don't strand. */
+    opcua_uint32_t old_session_id = sub->session_id;
+    sub->session_id = new_session_id;
+    if (old_session_id != new_session_id && mu_subscriptions_count_for_session(subs, old_session_id) == 0u) {
+        mu_publish_request_queue_clear(subs, old_session_id);
+    }
+    return MU_STATUS_GOOD;
+}
+#endif
+
 opcua_statuscode_t mu_subscription_delete(mu_subscriptions_t *subs, opcua_uint32_t session_id,
                                           opcua_uint32_t subscription_id) {
     if (subs == NULL) {

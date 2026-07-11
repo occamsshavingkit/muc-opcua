@@ -387,6 +387,36 @@ static opcua_statuscode_t verify_and_activate_session(mu_server_t *server, const
     }
     if (activate_result == MU_STATUS_GOOD) {
         activate_result = mu_session_activate(slot, auth_token, token_type_numeric);
+#if MUC_OPCUA_REDUNDANCY
+        if (activate_result == MU_STATUS_GOOD) {
+            /* Fingerprint the user for the TransferSubscriptions same-user check. Store a
+               compact identity kind (1 anonymous, 2 username, 3 x509) that fits a byte. */
+            slot->user_identity_kind = (token_type_numeric == 324u) ? 2u : (token_type_numeric == 327u) ? 3u : 1u;
+            slot->user_identity_len = 0;
+            const mu_bytestring_t *disc = NULL;
+#ifdef MUC_OPCUA_USER_AUTH
+            mu_bytestring_t uname;
+            if (token_type_numeric == 324u && user_token != NULL) {
+                uname.length = user_token->username.length;
+                uname.data = user_token->username.data;
+                disc = &uname;
+            }
+#endif
+#ifdef MUC_OPCUA_SECURITY
+            if (token_type_numeric == 327u && cert_token != NULL) {
+                disc = &cert_token->certificate_data;
+            }
+#endif
+            if (disc != NULL && disc->length > 0 && disc->data != NULL) {
+                size_t n = (size_t)disc->length;
+                if (n > sizeof(slot->user_identity)) {
+                    n = sizeof(slot->user_identity);
+                }
+                (void)memcpy(slot->user_identity, disc->data, n);
+                slot->user_identity_len = (opcua_byte_t)n;
+            }
+        }
+#endif
         if (activate_result == MU_STATUS_GOOD && server->config.time_adapter.get_tick_ms != NULL) {
             slot->last_activity_ms = server->config.time_adapter.get_tick_ms(server->config.time_adapter.context);
 #if defined(MUC_OPCUA_SESSION_TIMEOUT)

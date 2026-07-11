@@ -1465,6 +1465,26 @@ void mu_base_runtime_init(mu_base_runtime_nodes_t *s, const mu_time_adapter_t *t
         .type_definition = {0, MU_NODEID_NUMERIC, {.numeric = 68u}}}; /* PropertyType */
 #endif
 
+#if MUC_OPCUA_REDUNDANCY
+    /* Client Redundancy facet (spec 066): Server.ServerRedundancy.RedundancySupport
+       (i=3709) advertises the redundancy mode. This server supports client redundancy
+       via TransferSubscriptions without being itself redundant -> None (0), the
+       RedundancySupport enum (OPC-10000-5 §12.5) encoded as Int32. */
+    s->values[MU_BASE_RUNTIME_REDUNDANCY_INDEX].type = MU_VALUESOURCE_STATIC;
+    s->values[MU_BASE_RUNTIME_REDUNDANCY_INDEX].data.static_value = (mu_variant_t){0};
+    s->values[MU_BASE_RUNTIME_REDUNDANCY_INDEX].data.static_value.type = MU_TYPE_INT32;
+    s->values[MU_BASE_RUNTIME_REDUNDANCY_INDEX].data.static_value.value.i32 = 0;
+    s->nodes[MU_BASE_RUNTIME_REDUNDANCY_INDEX] = (mu_node_t){
+        .node_id = {.namespace_index = 0, .identifier_type = MU_NODEID_NUMERIC, .identifier.numeric = 3709u},
+        .node_class = MU_NODECLASS_VARIABLE,
+        .browse_name = {.length = (opcua_int32_t)17, .data = (const opcua_byte_t *)"RedundancySupport"},
+        .display_name = {.length = (opcua_int32_t)17, .data = (const opcua_byte_t *)"RedundancySupport"},
+        .references = NULL,
+        .reference_count = 0,
+        .value = &s->values[MU_BASE_RUNTIME_REDUNDANCY_INDEX],
+        .type_definition = {0, MU_NODEID_NUMERIC, {.numeric = 68u}}}; /* PropertyType */
+#endif
+
     s->space.nodes = s->nodes;
     s->space.node_count = MU_BASE_RUNTIME_NODE_COUNT;
 #else
