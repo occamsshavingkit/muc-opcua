@@ -1,5 +1,28 @@
 # Feature Size Ledger
 
+## 2026-07-11: Spec 062 — Method Server Facet (Project B, B3)
+
+Cumulative archive `.text` (ARM Cortex-M0+ `-Os`, `scripts/measure_size.sh all`) after
+unifying the method API under `MUC_OPCUA_METHOD_SERVER` (context-carrying callback +
+declared signature), serving/enforcing Executable (Bad_NotExecutable), per-argument
+validation, `Bad_NodeIdUnknown` lookup, and the `Argument`(296) encoder serving the
+built-in methods' InputArguments/OutputArguments `Argument[]` metadata.
+`MUC_OPCUA_METHOD_SERVER` is default **ON standard/full**; `MUC_OPCUA_CUSTOM_METHODS`
+aliases it.
+
+| Profile | prev (post-061) | now | Δ | why |
+|---------|----------------:|----:|--:|-----|
+| nano | 17,956 | 17,956 | 0 | facet off; Executable cases gated on METHOD_SERVER |
+| micro | 29,706 | 29,706 | 0 | facet off |
+| embedded | 54,972 | 54,972 | 0 | facet off |
+| standard | 78,120 | 79,039 | +919 | **METHOD_SERVER**: Argument encoder + ExtensionObject-array Variant path, served built-in Argument[] values, Executable attribute + Bad_NotExecutable, per-argument validation |
+| full | 78,112 | 79,039 | +927 | same as standard |
+
+(The prev column is the spec-061 figure; the negligible spec-#293 DataChangeNotification
+length fix is folded in.) **Headroom:** `full` = **79,039 B** — ~52,033 B under the 128 KiB
+Project-B facet stopper. nano/micro/embedded byte-for-byte unchanged (the `read_attribute`
+Executable/UserExecutable cases are `#if MUC_OPCUA_METHOD_SERVER`).
+
 ## 2026-07-10: Spec 061 — Standard Event Subscription Server Facet (Project B, B2)
 
 Cumulative archive `.text` (ARM Cortex-M0+ `-Os`, `scripts/measure_size.sh all`) after

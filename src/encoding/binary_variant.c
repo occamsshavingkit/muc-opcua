@@ -1,6 +1,7 @@
 /* src/encoding/binary_variant.c */
 #include "muc_opcua/config.h"
 #include "muc_opcua/encoding.h"
+#include "muc_opcua/services/method.h"
 #include <stdlib.h>
 
 /* In-memory element stride for a built-in type, for indexing array values. */
@@ -318,6 +319,21 @@ opcua_statuscode_t mu_binary_write_variant(mu_binary_writer_t *writer, const mu_
         if (variant->array_length < 0 || variant->value.array == NULL) {
             return MU_STATUS_GOOD; /* null array */
         }
+#if MUC_OPCUA_METHOD_SERVER
+        if (variant->type == MU_TYPE_EXTENSIONOBJECT) {
+            /* The only ExtensionObject-array Value this server encodes is the
+               Method Server Facet's InputArguments/OutputArguments Argument[]
+               (spec 062); value.array is a mu_argument_t[]. */
+            const mu_argument_t *args = (const mu_argument_t *)variant->value.array;
+            for (opcua_int32_t i = 0; i < variant->array_length; ++i) {
+                status = mu_binary_write_argument(writer, &args[i]);
+                if (status != MU_STATUS_GOOD) {
+                    return status;
+                }
+            }
+            return MU_STATUS_GOOD;
+        }
+#endif
         size_t stride = element_size(variant->type);
         if (stride == 0) {
             return MU_STATUS_BAD_ENCODINGERROR;

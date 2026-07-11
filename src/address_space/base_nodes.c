@@ -1,6 +1,7 @@
 /* src/address_space/base_nodes.c */
 #include "base_nodes.h"
 #include "muc_opcua/opcua_ids.h"
+#include "muc_opcua/services/method.h"
 #include <stddef.h>
 #include <string.h>
 
@@ -280,6 +281,50 @@ static const mu_reference_t s_get_monitored_items_refs[] = {
 
 static const mu_reference_t s_resend_data_refs[] = {
     {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {12874}}, true}};
+
+/* Method Server Facet (spec 062): the built-in Server methods' InputArguments/
+   OutputArguments Property Values, served as Argument[] so a client can browse the
+   signature. GetMonitoredItems(subscriptionId:UInt32) -> (serverHandles:UInt32[],
+   clientHandles:UInt32[]); ResendData(subscriptionId:UInt32). ns0 UInt32 = i=7. */
+#if MUC_OPCUA_METHOD_SERVER
+static const opcua_byte_t s_arg_subscription_id[] = "SubscriptionId";
+static const opcua_byte_t s_arg_server_handles[] = "ServerHandles";
+static const opcua_byte_t s_arg_client_handles[] = "ClientHandles";
+
+#define MU_ARG_UINT32_DT                                                                                               \
+    {                                                                                                                  \
+        0, MU_NODEID_NUMERIC, {                                                                                        \
+            7                                                                                                          \
+        }                                                                                                              \
+    }
+#define MU_ARG_NO_DESC                                                                                                 \
+    {                                                                                                                  \
+        {-1, NULL}, {                                                                                                  \
+            -1, NULL                                                                                                   \
+        }                                                                                                              \
+    }
+
+static const mu_argument_t s_gmi_input_args[] = {{{14, s_arg_subscription_id}, MU_ARG_UINT32_DT, -1, MU_ARG_NO_DESC}};
+static const mu_argument_t s_gmi_output_args[] = {{{13, s_arg_server_handles}, MU_ARG_UINT32_DT, 1, MU_ARG_NO_DESC},
+                                                  {{13, s_arg_client_handles}, MU_ARG_UINT32_DT, 1, MU_ARG_NO_DESC}};
+static const mu_argument_t s_resend_input_args[] = {
+    {{14, s_arg_subscription_id}, MU_ARG_UINT32_DT, -1, MU_ARG_NO_DESC}};
+
+static const mu_value_source_t s_gmi_input_value = {
+    MU_VALUESOURCE_STATIC, {.static_value = {MU_TYPE_EXTENSIONOBJECT, {.array = s_gmi_input_args}, true, 1}}};
+static const mu_value_source_t s_gmi_output_value = {
+    MU_VALUESOURCE_STATIC, {.static_value = {MU_TYPE_EXTENSIONOBJECT, {.array = s_gmi_output_args}, true, 2}}};
+static const mu_value_source_t s_resend_input_value = {
+    MU_VALUESOURCE_STATIC, {.static_value = {MU_TYPE_EXTENSIONOBJECT, {.array = s_resend_input_args}, true, 1}}};
+
+#define MU_GMI_INPUT_VALUE &s_gmi_input_value
+#define MU_GMI_OUTPUT_VALUE &s_gmi_output_value
+#define MU_RESEND_INPUT_VALUE &s_resend_input_value
+#else
+#define MU_GMI_INPUT_VALUE NULL
+#define MU_GMI_OUTPUT_VALUE NULL
+#define MU_RESEND_INPUT_VALUE NULL
+#endif
 #endif
 
 #endif
@@ -952,7 +997,7 @@ static const mu_node_t s_base_nodes[] = {
      {14, s_str_InputArguments},
      s_property_type_ref,
      sizeof(s_property_type_ref) / sizeof(s_property_type_ref[0]),
-     NULL,
+     MU_GMI_INPUT_VALUE,
      .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
     {{0, MU_NODEID_NUMERIC, {11494}},
      MU_NODECLASS_VARIABLE,
@@ -960,7 +1005,7 @@ static const mu_node_t s_base_nodes[] = {
      {15, s_str_OutputArguments},
      s_property_type_ref,
      sizeof(s_property_type_ref) / sizeof(s_property_type_ref[0]),
-     NULL,
+     MU_GMI_OUTPUT_VALUE,
      .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
 #endif
     /* Spec 057: MaxArrayLength/MaxStringLength — sorted slots before 11704. */
@@ -1037,7 +1082,7 @@ static const mu_node_t s_base_nodes[] = {
      {14, s_str_InputArguments},
      s_property_type_ref,
      sizeof(s_property_type_ref) / sizeof(s_property_type_ref[0]),
-     NULL,
+     MU_RESEND_INPUT_VALUE,
      .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
 #endif
 #if MUC_OPCUA_DATA_ACCESS

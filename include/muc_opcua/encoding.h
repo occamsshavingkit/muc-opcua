@@ -98,6 +98,13 @@ opcua_statuscode_t mu_binary_write_range(mu_binary_writer_t *writer, const mu_ra
    needs it. */
 opcua_statuscode_t mu_binary_read_localized_text(mu_binary_reader_t *reader, mu_localized_text_t *value);
 opcua_statuscode_t mu_binary_write_localized_text(mu_binary_writer_t *writer, const mu_localized_text_t *value);
+
+#if MUC_OPCUA_METHOD_SERVER
+struct mu_argument; /* fwd; defined in services/method.h */
+/* Encode one Argument as an ExtensionObject (Argument_Encoding_DefaultBinary,
+   ns0 i=298; OPC-10000-5 §12.2.12.1) — the Method Server Facet's signature metadata. */
+opcua_statuscode_t mu_binary_write_argument(mu_binary_writer_t *writer, const struct mu_argument *arg);
+#endif
 /* EUInformation (OPC-10000-8 §5.6.4.3): namespaceUri String, unitId Int32,
    displayName LocalizedText, description LocalizedText. */
 opcua_statuscode_t mu_binary_read_eu_information(mu_binary_reader_t *reader, mu_eu_information_t *value);

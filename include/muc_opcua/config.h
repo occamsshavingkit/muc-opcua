@@ -4,6 +4,13 @@
 
 #include <stddef.h>
 
+/* Spec 062: MUC_OPCUA_METHOD_SERVER is the canonical Method Server Facet flag.
+   MUC_OPCUA_CUSTOM_METHODS is the legacy name — alias it so existing -D builds
+   keep working. Must precede features.h and every `#if MUC_OPCUA_METHOD_SERVER`. */
+#if defined(MUC_OPCUA_CUSTOM_METHODS) && MUC_OPCUA_CUSTOM_METHODS && !defined(MUC_OPCUA_METHOD_SERVER)
+#define MUC_OPCUA_METHOD_SERVER 1
+#endif
+
 /* Feature 025 (F9): reject illegal feature-gate combinations at compile time. */
 #include "muc_opcua/features.h"
 
@@ -281,9 +288,10 @@
 #define MU_AUDITING_STORAGE_BYTES 0
 #endif
 
-#ifdef MUC_OPCUA_CUSTOM_METHODS
-/* MU_MAX_REGISTERED_METHODS(8) * (method nodeid + callback + context) + count. */
-#define MU_CUSTOM_METHODS_STORAGE_BYTES (8 * 48 + sizeof(size_t))
+#if MUC_OPCUA_METHOD_SERVER
+/* MU_MAX_REGISTERED_METHODS(8) * (method nodeid + callback + context + in/out
+   signature pointers + counts + executable, padded) + count. */
+#define MU_CUSTOM_METHODS_STORAGE_BYTES (8 * 96 + sizeof(size_t))
 #else
 #define MU_CUSTOM_METHODS_STORAGE_BYTES 0
 #endif

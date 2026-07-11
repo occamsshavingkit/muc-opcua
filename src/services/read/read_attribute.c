@@ -231,6 +231,20 @@ opcua_statuscode_t read_attribute(const mu_address_space_t *address_space, const
             return mu_value_source_read(node->value, &node->node_id, value);
         }
         return MU_STATUS_BAD_NOTREADABLE;
+
+#if MUC_OPCUA_METHOD_SERVER
+    case MU_ATTRIBUTEID_EXECUTABLE:
+    case MU_ATTRIBUTEID_USEREXECUTABLE:
+        /* Executable/UserExecutable apply only to Method nodes (OPC-10000-3 §5.7).
+           A served Method is executable; per-registration non-executability is
+           enforced at Call time (Bad_NotExecutable). Method Server Facet only. */
+        if (node->node_class != MU_NODECLASS_METHOD) {
+            return MU_STATUS_BAD_ATTRIBUTEIDINVALID;
+        }
+        value->type = MU_TYPE_BOOLEAN;
+        value->value.b = true;
+        return MU_STATUS_GOOD;
+#endif
 #ifdef MUC_OPCUA_MULTI_CHUNK
     default:
         return read_multichunk_attribute(node, attribute_id, value);

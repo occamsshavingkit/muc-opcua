@@ -13,6 +13,7 @@
 #include "../../src/address_space/base_nodes.h"
 #include "../../src/core/server_internal.h"
 #include "../../src/core/uasc.h"
+#include "../../src/services/read/common.h"
 #include "../../src/services/secure_channel.h"
 #include "../../src/services/session.h"
 #include "muc_opcua/encoding.h"
@@ -456,7 +457,7 @@ void test_resend_data_reissues_current_values_on_next_publish(void) {
     parse_publish_value(io.last_write, io.last_write_len, 71u, sub->subscription_id, 9001u, 10);
 }
 
-#ifdef MUC_OPCUA_CUSTOM_METHODS
+#if MUC_OPCUA_METHOD_SERVER
 static size_t write_custom_call_request(opcua_byte_t *buffer, size_t capacity, opcua_uint32_t request_handle,
                                         const mu_nodeid_t *object_id, const mu_nodeid_t *method_id,
                                         const mu_variant_t *args, opcua_int32_t arg_count) {
@@ -474,13 +475,17 @@ static size_t write_custom_call_request(opcua_byte_t *buffer, size_t capacity, o
     return writer.position;
 }
 
-static opcua_statuscode_t custom_test_method_cb(struct mu_server *server, const mu_nodeid_t *object_id,
+static opcua_statuscode_t custom_test_method_cb(struct mu_server *server, void *context, const mu_nodeid_t *object_id,
                                                 const mu_nodeid_t *method_id, const mu_variant_t *input_args,
                                                 size_t input_args_count, mu_variant_t *output_args,
                                                 size_t *output_args_count) {
     (void)server;
     (void)object_id;
     (void)method_id;
+
+    /* Registered with a sentinel context — the facet must deliver it. */
+    TEST_ASSERT_NOT_NULL(context);
+    TEST_ASSERT_EQUAL(0xABCD, *(const int *)context);
 
     TEST_ASSERT_EQUAL(1, input_args_count);
     TEST_ASSERT_EQUAL(MU_TYPE_INT32, input_args[0].type);
@@ -523,8 +528,10 @@ void test_custom_method_callback_execution(void) {
     server.config.address_space = &custom_as;
 
     mu_nodeid_t method_id = {1u, MU_NODEID_NUMERIC, {9999u}};
+    static int cb_context = 0xABCD;
     TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD,
-                            mu_server_register_method_callback(&server, &method_id, custom_test_method_cb, NULL));
+                            mu_server_register_method_callback(&server, &method_id, custom_test_method_cb, &cb_context,
+                                                               NULL, 0, NULL, 0, true));
 
     mu_nodeid_t object_id = {1u, MU_NODEID_NUMERIC, {8888u}};
     mu_variant_t input_arg;
@@ -550,6 +557,190 @@ void test_custom_method_callback_execution(void) {
     TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_binary_read_int32(&reader, &val));
     TEST_ASSERT_EQUAL_INT32(999, val);
 }
+
+/* FR-3: Method nodes must expose the Executable/UserExecutable attributes as
+   Boolean; non-Method nodes must reject them with Bad_AttributeIdInvalid. */
+void test_method_node_executable_attribute_is_boolean_true(void) {
+    const mu_node_t *method = base_node(ID_SERVER_GETMONITOREDITEMS);
+    const mu_node_t *non_method = base_node(ID_SERVER_OBJECT); /* Server object, not a method */
+    TEST_ASSERT_NOT_NULL(method);
+
+    mu_variant_t v;
+    memset(&v, 0, sizeof(v));
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, read_attribute(NULL, method, MU_ATTRIBUTEID_EXECUTABLE, &v));
+    TEST_ASSERT_EQUAL(MU_TYPE_BOOLEAN, v.type);
+    TEST_ASSERT_TRUE(v.value.b);
+
+    memset(&v, 0, sizeof(v));
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, read_attribute(NULL, method, MU_ATTRIBUTEID_USEREXECUTABLE, &v));
+    TEST_ASSERT_EQUAL(MU_TYPE_BOOLEAN, v.type);
+    TEST_ASSERT_TRUE(v.value.b);
+
+    if (non_method != NULL) {
+        TEST_ASSERT_EQUAL_HEX32(MU_STATUS_BAD_ATTRIBUTEIDINVALID,
+                                read_attribute(NULL, non_method, MU_ATTRIBUTEID_EXECUTABLE, &v));
+    }
+}
+
+/* FR-3: a Call to a registered-but-non-executable method → Bad_NotExecutable. */
+void test_call_non_executable_method_returns_bad_notexecutable(void) {
+    mu_server_t server;
+    test_io_t io;
+    opcua_byte_t request_body[256];
+    opcua_byte_t response_body[1024];
+    size_t response_len = sizeof(response_body);
+    opcua_int32_t input_result_count;
+    opcua_int32_t output_arg_count;
+
+    prepare_server(&server, &io);
+
+    static const mu_node_t custom_nodes[] = {{{1u, MU_NODEID_NUMERIC, {8888u}},
+                                              MU_NODECLASS_OBJECT,
+                                              {10, (const opcua_byte_t *)"TestObject"},
+                                              {10, (const opcua_byte_t *)"TestObject"},
+                                              NULL,
+                                              0,
+                                              NULL},
+                                             {{1u, MU_NODEID_NUMERIC, {9999u}},
+                                              MU_NODECLASS_METHOD,
+                                              {10, (const opcua_byte_t *)"TestMethod"},
+                                              {10, (const opcua_byte_t *)"TestMethod"},
+                                              NULL,
+                                              0,
+                                              NULL}};
+    mu_address_space_t custom_as = {custom_nodes, sizeof(custom_nodes) / sizeof(custom_nodes[0])};
+    server.config.address_space = &custom_as;
+
+    mu_nodeid_t method_id = {1u, MU_NODEID_NUMERIC, {9999u}};
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD,
+                            mu_server_register_method_callback(&server, &method_id, custom_test_method_cb, NULL, NULL,
+                                                               0, NULL, 0, false /* not executable */));
+
+    mu_nodeid_t object_id = {1u, MU_NODEID_NUMERIC, {8888u}};
+    mu_variant_t input_arg;
+    memset(&input_arg, 0, sizeof(input_arg));
+    input_arg.type = MU_TYPE_INT32;
+    input_arg.value.i32 = 42;
+
+    size_t request_len =
+        write_custom_call_request(request_body, sizeof(request_body), 13u, &object_id, &method_id, &input_arg, 1);
+    dispatch_call(&server, request_body, request_len, response_body, &response_len);
+
+    mu_binary_reader_t reader;
+    mu_binary_reader_init(&reader, response_body, response_len);
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_BAD_NOTEXECUTABLE,
+                            read_call_result_prefix(&reader, 13u, &input_result_count, &output_arg_count));
+}
+
+/* FR-5: a wrong-typed input argument (declared Int32, sent UInt32) → operation
+   Bad_InvalidArgument with one per-input result (Bad_TypeMismatch). */
+void test_call_argument_type_mismatch_returns_bad_invalidargument(void) {
+    mu_server_t server;
+    test_io_t io;
+    opcua_byte_t request_body[256];
+    opcua_byte_t response_body[1024];
+    size_t response_len = sizeof(response_body);
+    opcua_int32_t input_result_count;
+    opcua_int32_t output_arg_count;
+
+    prepare_server(&server, &io);
+
+    static const mu_node_t custom_nodes[] = {{{1u, MU_NODEID_NUMERIC, {8888u}},
+                                              MU_NODECLASS_OBJECT,
+                                              {10, (const opcua_byte_t *)"TestObject"},
+                                              {10, (const opcua_byte_t *)"TestObject"},
+                                              NULL,
+                                              0,
+                                              NULL},
+                                             {{1u, MU_NODEID_NUMERIC, {9999u}},
+                                              MU_NODECLASS_METHOD,
+                                              {10, (const opcua_byte_t *)"TestMethod"},
+                                              {10, (const opcua_byte_t *)"TestMethod"},
+                                              NULL,
+                                              0,
+                                              NULL}};
+    mu_address_space_t custom_as = {custom_nodes, sizeof(custom_nodes) / sizeof(custom_nodes[0])};
+    server.config.address_space = &custom_as;
+
+    /* Declared signature: one scalar Int32 (ns0 DataType i=6, valueRank -1). */
+    static const mu_argument_t in_sig[] = {
+        {{4, (const opcua_byte_t *)"arg0"}, {0u, MU_NODEID_NUMERIC, {6u}}, -1, {{-1, NULL}, {-1, NULL}}}};
+    mu_nodeid_t method_id = {1u, MU_NODEID_NUMERIC, {9999u}};
+    static int cb_context = 0xABCD;
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD,
+                            mu_server_register_method_callback(&server, &method_id, custom_test_method_cb, &cb_context,
+                                                               in_sig, 1, NULL, 0, true));
+
+    mu_nodeid_t object_id = {1u, MU_NODEID_NUMERIC, {8888u}};
+    mu_variant_t bad_arg; /* UInt32 where Int32 is declared */
+    memset(&bad_arg, 0, sizeof(bad_arg));
+    bad_arg.type = MU_TYPE_UINT32;
+    bad_arg.value.ui32 = 42u;
+
+    size_t request_len =
+        write_custom_call_request(request_body, sizeof(request_body), 14u, &object_id, &method_id, &bad_arg, 1);
+    dispatch_call(&server, request_body, request_len, response_body, &response_len);
+
+    mu_binary_reader_t reader;
+    mu_binary_reader_init(&reader, response_body, response_len);
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_BAD_INVALIDARGUMENT,
+                            read_call_result_prefix(&reader, 14u, &input_result_count, &output_arg_count));
+    TEST_ASSERT_EQUAL_INT32(1, input_result_count); /* one per-input result reported */
+}
+
+/* FR-4: the InputArguments Property Value of a built-in method encodes a
+   browsable Argument[] a client can decode (round-trips through the wire form). */
+void test_getmonitoreditems_inputarguments_encodes_decodable_argument(void) {
+    const mu_node_t *in_args = base_node(ID_SERVER_GETMONITOREDITEMS_INPUTARGUMENTS);
+    TEST_ASSERT_NOT_NULL(in_args);
+
+    mu_variant_t v;
+    memset(&v, 0, sizeof(v));
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, read_attribute(NULL, in_args, MU_ATTRIBUTEID_VALUE, &v));
+    TEST_ASSERT_EQUAL(MU_TYPE_EXTENSIONOBJECT, v.type);
+    TEST_ASSERT_TRUE(v.is_array);
+    TEST_ASSERT_EQUAL_INT32(1, v.array_length);
+
+    /* Encode as a client would receive it, then decode the Argument[]. */
+    opcua_byte_t buf[256];
+    mu_binary_writer_t w;
+    mu_binary_writer_init(&w, buf, sizeof(buf));
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_binary_write_variant(&w, &v));
+
+    mu_binary_reader_t r;
+    mu_binary_reader_init(&r, buf, w.position);
+    opcua_byte_t enc_mask;
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_binary_read_byte(&r, &enc_mask));
+    TEST_ASSERT_EQUAL_UINT8(MU_TYPE_EXTENSIONOBJECT | 0x80u, enc_mask); /* ExtensionObject array */
+    opcua_int32_t n;
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_binary_read_int32(&r, &n));
+    TEST_ASSERT_EQUAL_INT32(1, n);
+
+    mu_nodeid_t enc_type;
+    size_t body_len;
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_binary_read_extension_object_header(&r, &enc_type, &body_len));
+    TEST_ASSERT_EQUAL_UINT32(298u, enc_type.identifier.numeric); /* Argument_Encoding_DefaultBinary */
+    size_t body_start = r.position;
+
+    mu_string_t name;
+    mu_nodeid_t data_type;
+    opcua_int32_t value_rank;
+    opcua_int32_t array_dims;
+    mu_localized_text_t desc;
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_binary_read_string(&r, &name));
+    TEST_ASSERT_EQUAL_INT32(14, name.length);
+    TEST_ASSERT_EQUAL_MEMORY("SubscriptionId", name.data, 14);
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_binary_read_nodeid(&r, &data_type));
+    TEST_ASSERT_EQUAL_UINT32(7u, data_type.identifier.numeric); /* UInt32 */
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_binary_read_int32(&r, &value_rank));
+    TEST_ASSERT_EQUAL_INT32(-1, value_rank); /* scalar */
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_binary_read_int32(&r, &array_dims));
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_binary_read_localized_text(&r, &desc));
+
+    /* The declared ExtensionObject length must exactly cover the Argument body
+       (the #288 slicing-client lesson). */
+    TEST_ASSERT_EQUAL_UINT32((opcua_uint32_t)body_len, (opcua_uint32_t)(r.position - body_start));
+}
 #endif
 
 #else
@@ -566,8 +757,12 @@ int main(void) {
     RUN_TEST(test_server_call_method_nodes_are_browsable);
     RUN_TEST(test_get_monitored_items_returns_server_and_client_handles);
     RUN_TEST(test_resend_data_reissues_current_values_on_next_publish);
-#ifdef MUC_OPCUA_CUSTOM_METHODS
+#if MUC_OPCUA_METHOD_SERVER
     RUN_TEST(test_custom_method_callback_execution);
+    RUN_TEST(test_method_node_executable_attribute_is_boolean_true);
+    RUN_TEST(test_call_non_executable_method_returns_bad_notexecutable);
+    RUN_TEST(test_call_argument_type_mismatch_returns_bad_invalidargument);
+    RUN_TEST(test_getmonitoreditems_inputarguments_encodes_decodable_argument);
 #endif
 #else
     RUN_TEST(test_method_call_us3_is_gated_to_embedded_standard_builds);
