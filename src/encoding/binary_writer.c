@@ -1,6 +1,7 @@
 /* src/encoding/binary_writer.c */
 #include "binary_le.h"
 #include "muc_opcua/encoding.h"
+#include "muc_opcua/services/diagnostics.h"
 #include "muc_opcua/services/method.h"
 #include <string.h>
 
@@ -203,6 +204,48 @@ opcua_statuscode_t mu_binary_write_argument(mu_binary_writer_t *writer, const mu
     }
 
     mu_nodeid_t type_id = {0, MU_NODEID_NUMERIC, {298u}};
+    opcua_statuscode_t s = mu_binary_write_extension_object_header(writer, &type_id, bw.position);
+    if (s != MU_STATUS_GOOD) {
+        return s;
+    }
+    if (writer->position + bw.position > writer->length) {
+        return MU_STATUS_BAD_OUTOFMEMORY;
+    }
+    (void)memcpy(writer->buffer + writer->position, body, bw.position);
+    writer->position += bw.position;
+    return MU_STATUS_GOOD;
+}
+#endif
+
+#if MUC_OPCUA_SERVER_DIAGNOSTICS
+opcua_statuscode_t mu_binary_write_server_diagnostics_summary(mu_binary_writer_t *writer,
+                                                              const mu_diagnostics_summary_t *diag) {
+    if (!writer || !diag) {
+        return MU_STATUS_BAD_INTERNALERROR;
+    }
+    /* ServerDiagnosticsSummaryDataType (OPC-10000-5 §12.9): 12 x UInt32 in the exact
+       field order, which the struct mirrors. Wrapped as an ExtensionObject with
+       Encoding DefaultBinary = ns0 i=861. */
+    opcua_byte_t body[48];
+    mu_binary_writer_t bw;
+    mu_binary_writer_init(&bw, body, sizeof(body));
+    (void)mu_binary_write_uint32(&bw, diag->server_view_count);
+    (void)mu_binary_write_uint32(&bw, diag->current_session_count);
+    (void)mu_binary_write_uint32(&bw, diag->cumulated_session_count);
+    (void)mu_binary_write_uint32(&bw, diag->security_rejected_session_count);
+    (void)mu_binary_write_uint32(&bw, diag->rejected_session_count);
+    (void)mu_binary_write_uint32(&bw, diag->session_timeout_count);
+    (void)mu_binary_write_uint32(&bw, diag->session_abort_count);
+    (void)mu_binary_write_uint32(&bw, diag->current_subscription_count);
+    (void)mu_binary_write_uint32(&bw, diag->cumulated_subscription_count);
+    (void)mu_binary_write_uint32(&bw, diag->publishing_interval_count);
+    (void)mu_binary_write_uint32(&bw, diag->security_rejected_requests_count);
+    (void)mu_binary_write_uint32(&bw, diag->rejected_requests_count);
+    if (bw.status != MU_STATUS_GOOD) {
+        return bw.status;
+    }
+
+    mu_nodeid_t type_id = {0, MU_NODEID_NUMERIC, {861u}};
     opcua_statuscode_t s = mu_binary_write_extension_object_header(writer, &type_id, bw.position);
     if (s != MU_STATUS_GOOD) {
         return s;

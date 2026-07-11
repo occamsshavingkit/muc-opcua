@@ -1349,9 +1349,43 @@ static opcua_statuscode_t base_status_time_read(void *ctx, const mu_nodeid_t *id
 }
 #endif /* MUC_OPCUA_BASE_NODES */
 
-void mu_base_runtime_init(mu_base_runtime_nodes_t *s, const mu_time_adapter_t *time, opcua_datetime_t start_time) {
+#if defined(MUC_OPCUA_BASE_NODES) && MUC_OPCUA_SERVER_DIAGNOSTICS
+/* Live ServerDiagnosticsSummary (2275): emit the caller-owned counter struct as a scalar
+   ServerDiagnosticsSummaryDataType ExtensionObject. The encoder reads value.array as a
+   const mu_diagnostics_summary_t* (12 x UInt32, OPC-10000-5 §12.9). */
+static opcua_statuscode_t base_diagnostics_summary_read(void *context, const mu_nodeid_t *id, mu_variant_t *v) {
+    const mu_base_runtime_t *rt = (const mu_base_runtime_t *)context;
+    (void)id;
+    *v = (mu_variant_t){0};
+    v->type = MU_TYPE_EXTENSIONOBJECT;
+    v->is_array = false;
+    v->array_length = 0;
+    v->value.array = rt->diag;
+    return (rt->diag != NULL) ? MU_STATUS_GOOD : MU_STATUS_BAD_NOTREADABLE;
+}
+
+/* ServerDiagnostics.EnabledFlag (2294): diagnostics are always collected -> Boolean true. */
+static opcua_statuscode_t base_diagnostics_enabled_read(void *context, const mu_nodeid_t *id, mu_variant_t *v) {
+    (void)context;
+    (void)id;
+    *v = (mu_variant_t){0};
+    v->type = MU_TYPE_BOOLEAN;
+    v->value.b = true;
+    return MU_STATUS_GOOD;
+}
+#endif
+
+void mu_base_runtime_init(mu_base_runtime_nodes_t *s, const mu_time_adapter_t *time, opcua_datetime_t start_time
+#if MUC_OPCUA_SERVER_DIAGNOSTICS
+                          ,
+                          const mu_diagnostics_summary_t *diag
+#endif
+) {
     s->rt.time = time;
     s->rt.start_time = start_time;
+#if MUC_OPCUA_SERVER_DIAGNOSTICS
+    s->rt.diag = diag;
+#endif
 
 #ifdef MUC_OPCUA_BASE_NODES
     s->values[0].type = MU_VALUESOURCE_CALLBACK;
@@ -1390,8 +1424,49 @@ void mu_base_runtime_init(mu_base_runtime_nodes_t *s, const mu_time_adapter_t *t
         .value = &s->values[1],
         .type_definition = type_def};
 
+#if MUC_OPCUA_SERVER_DIAGNOSTICS
+    /* Base Server Behaviour facet (spec 064): the ServerDiagnostics object tree.
+       ServerDiagnostics(2274) Object, ServerDiagnosticsSummary(2275) live Variable,
+       EnabledFlag(2294) Variable. Read-addressable by NodeId (OPC-10000-5 §6.3.3). */
+    s->values[2] = (mu_value_source_t){0}; /* Object has no Value */
+    s->values[3].type = MU_VALUESOURCE_CALLBACK;
+    s->values[3].data.callback.read = base_diagnostics_summary_read;
+    s->values[3].data.callback.context = &s->rt;
+    s->values[4].type = MU_VALUESOURCE_CALLBACK;
+    s->values[4].data.callback.read = base_diagnostics_enabled_read;
+    s->values[4].data.callback.context = &s->rt;
+
+    s->nodes[2] = (mu_node_t){
+        .node_id = {.namespace_index = 0, .identifier_type = MU_NODEID_NUMERIC, .identifier.numeric = 2274u},
+        .node_class = MU_NODECLASS_OBJECT,
+        .browse_name = {.length = (opcua_int32_t)17, .data = (const opcua_byte_t *)"ServerDiagnostics"},
+        .display_name = {.length = (opcua_int32_t)17, .data = (const opcua_byte_t *)"ServerDiagnostics"},
+        .references = NULL,
+        .reference_count = 0,
+        .value = NULL,
+        .type_definition = {0, MU_NODEID_NUMERIC, {.numeric = 2020u}}}; /* ServerDiagnosticsType */
+    s->nodes[3] = (mu_node_t){
+        .node_id = {.namespace_index = 0, .identifier_type = MU_NODEID_NUMERIC, .identifier.numeric = 2275u},
+        .node_class = MU_NODECLASS_VARIABLE,
+        .browse_name = {.length = (opcua_int32_t)24, .data = (const opcua_byte_t *)"ServerDiagnosticsSummary"},
+        .display_name = {.length = (opcua_int32_t)24, .data = (const opcua_byte_t *)"ServerDiagnosticsSummary"},
+        .references = NULL,
+        .reference_count = 0,
+        .value = &s->values[3],
+        .type_definition = {0, MU_NODEID_NUMERIC, {.numeric = 63u}}}; /* BaseDataVariableType */
+    s->nodes[4] = (mu_node_t){
+        .node_id = {.namespace_index = 0, .identifier_type = MU_NODEID_NUMERIC, .identifier.numeric = 2294u},
+        .node_class = MU_NODECLASS_VARIABLE,
+        .browse_name = {.length = (opcua_int32_t)11, .data = (const opcua_byte_t *)"EnabledFlag"},
+        .display_name = {.length = (opcua_int32_t)11, .data = (const opcua_byte_t *)"EnabledFlag"},
+        .references = NULL,
+        .reference_count = 0,
+        .value = &s->values[4],
+        .type_definition = {0, MU_NODEID_NUMERIC, {.numeric = 68u}}}; /* PropertyType */
+#endif
+
     s->space.nodes = s->nodes;
-    s->space.node_count = 2;
+    s->space.node_count = MU_BASE_RUNTIME_NODE_COUNT;
 #else
     s->space.nodes = NULL;
     s->space.node_count = 0;

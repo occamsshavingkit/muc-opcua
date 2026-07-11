@@ -1,6 +1,7 @@
 /* src/encoding/binary_variant.c */
 #include "muc_opcua/config.h"
 #include "muc_opcua/encoding.h"
+#include "muc_opcua/services/diagnostics.h"
 #include "muc_opcua/services/method.h"
 #include <stdlib.h>
 
@@ -348,5 +349,14 @@ opcua_statuscode_t mu_binary_write_variant(mu_binary_writer_t *writer, const mu_
         return MU_STATUS_GOOD;
     }
 
+#if MUC_OPCUA_SERVER_DIAGNOSTICS
+    if (variant->type == MU_TYPE_EXTENSIONOBJECT) {
+        /* The only scalar ExtensionObject Value this server encodes is the Base Server
+           Behaviour facet's ServerDiagnosticsSummary (spec 064); value.array holds a
+           const mu_diagnostics_summary_t* (OPC-10000-5 §12.9). */
+        return mu_binary_write_server_diagnostics_summary(writer,
+                                                          (const mu_diagnostics_summary_t *)variant->value.array);
+    }
+#endif
     return write_scalar_value(writer, variant->type, &variant->value);
 }

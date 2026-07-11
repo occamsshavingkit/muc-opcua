@@ -21,6 +21,16 @@
 
 #include "muc_opcua/address_space.h"
 #include "muc_opcua/platform.h" /* mu_time_adapter_t */
+#include "muc_opcua/services/diagnostics.h"
+
+/* Dynamic runtime-bound node count: CurrentTime + StartTime, plus (when the Base
+   Server Behaviour diagnostics facet is compiled) the ServerDiagnostics Object
+   (2274), ServerDiagnosticsSummary (2275), and EnabledFlag (2294). */
+#if MUC_OPCUA_SERVER_DIAGNOSTICS
+#define MU_BASE_RUNTIME_NODE_COUNT 5
+#else
+#define MU_BASE_RUNTIME_NODE_COUNT 2
+#endif
 
 /* The const, static Base Information address space described above. Never NULL. */
 const mu_address_space_t *mu_base_address_space(void);
@@ -34,6 +44,9 @@ const mu_address_space_t *mu_base_address_space(void);
 typedef struct {
     const mu_time_adapter_t *time; /* CurrentTime source */
     opcua_datetime_t start_time;   /* StartTime value (captured at init) */
+#if MUC_OPCUA_SERVER_DIAGNOSTICS
+    const mu_diagnostics_summary_t *diag; /* live ServerDiagnosticsSummary source */
+#endif
 } mu_base_runtime_t;
 
 /* Storage for the runtime-bound dynamic Server status nodes. Place an instance in
@@ -41,15 +54,20 @@ typedef struct {
    `space` is the address-space view over the two dynamic nodes. */
 typedef struct {
     mu_base_runtime_t rt;
-    mu_node_t nodes[2]; /* CurrentTime (2258), StartTime (2257) */
-    mu_value_source_t values[2];
+    mu_node_t nodes[MU_BASE_RUNTIME_NODE_COUNT]; /* CurrentTime(2258), StartTime(2257)[, ServerDiagnostics facet] */
+    mu_value_source_t values[MU_BASE_RUNTIME_NODE_COUNT];
     mu_address_space_t space;
 } mu_base_runtime_nodes_t;
 
 /* Populate `storage` with the CurrentTime/StartTime nodes whose value sources are
    CALLBACKs bound to `&storage->rt` (so CurrentTime reads `time` live). Call once at
    server init; `start_time` is typically time->get_time() at startup. */
-void mu_base_runtime_init(mu_base_runtime_nodes_t *storage, const mu_time_adapter_t *time, opcua_datetime_t start_time);
+void mu_base_runtime_init(mu_base_runtime_nodes_t *storage, const mu_time_adapter_t *time, opcua_datetime_t start_time
+#if MUC_OPCUA_SERVER_DIAGNOSTICS
+                          ,
+                          const mu_diagnostics_summary_t *diag
+#endif
+);
 
 /* Resolve a NodeId against the integrator's address space first (if any), then the
    runtime-bound dynamic space `dynamic` (if any), then the const base set. `dynamic`

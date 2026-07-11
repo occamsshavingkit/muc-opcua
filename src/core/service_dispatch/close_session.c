@@ -25,12 +25,15 @@ opcua_statuscode_t handle_close_session(mu_server_t *server, mu_binary_reader_t 
             for (size_t i = 0; i < MU_INTERN_MAX_SUBSCRIPTIONS; ++i) {
                 mu_subscription_t *sub = &server->subs.subscriptions[i];
                 if (sub->in_use && sub->session_id == session_id) {
-                    (void)mu_subscription_delete(&server->subs, session_id, sub->subscription_id);
+                    if (mu_subscription_delete(&server->subs, session_id, sub->subscription_id) == MU_STATUS_GOOD) {
+                        mu_diagnostics_subscription_closed(server);
+                    }
                 }
             }
         }
 #endif
         if (close_result == MU_STATUS_GOOD) {
+            mu_diagnostics_session_closed(server);
             server->active_session = NULL;
         }
     }

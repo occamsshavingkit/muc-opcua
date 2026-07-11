@@ -151,10 +151,12 @@ opcua_statuscode_t mu_service_dispatch(mu_server_t *server, opcua_uint32_t reque
             return s;
         }
         if (auth_token == 0u) {
+            mu_diagnostics_request_rejected(server, false);
             return MU_STATUS_BAD_SESSIONIDINVALID;
         }
         mu_session_t *session = mu_session_find_by_token(server->sessions, MU_INTERN_MAX_SESSIONS, auth_token);
         if (session == NULL) {
+            mu_diagnostics_request_rejected(server, false);
             if (mu_session_find_closed_by_token(server->sessions, MU_INTERN_MAX_SESSIONS, auth_token) != NULL) {
                 return MU_STATUS_BAD_SESSIONCLOSED;
             }
@@ -162,9 +164,12 @@ opcua_statuscode_t mu_service_dispatch(mu_server_t *server, opcua_uint32_t reque
         }
         s = mu_session_validate_secure_channel(session, server_secure_channel.channel_id);
         if (s != MU_STATUS_GOOD) {
+            /* wrong SecureChannel for this Session -> a security-related rejection. */
+            mu_diagnostics_request_rejected(server, true);
             return s;
         }
         if (session->state != MU_SESSION_STATE_ACTIVATED) {
+            mu_diagnostics_request_rejected(server, false);
             return MU_STATUS_BAD_SESSIONNOTACTIVATED;
         }
         server->active_session = session;
