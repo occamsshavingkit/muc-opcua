@@ -1,45 +1,51 @@
 #!/usr/bin/env python3
-"""Generate autoconf.h + config.cmake from a Kconfig + .config (kconfiglib).
+"""Resolve a Kconfig for a profile (+ optional overrides) and emit config.cmake [+ autoconf.h].
 
-Symbol names in Kconfig are bare (e.g. DATA_ACCESS); we set the config prefix to
-MUC_OPCUA_ so the outputs use the existing C macro names verbatim:
-  - autoconf.h : `#define MUC_OPCUA_<SYM> 1` for y, UNDEFINED for n (#ifdef-safe).
-  - config.cmake: `set(MUC_OPCUA_<SYM> ON|OFF)` for CMake source selection.
+Symbol names in Kconfig are bare (e.g. DATA_ACCESS); the config prefix is MUC_OPCUA_, so
+outputs use the existing C macro names verbatim:
+  - config.cmake : `set(MUC_OPCUA_<SYM> ON|OFF)` -- drives src/CMakeLists.txt source
+                   selection AND its target_compile_definitions (so the -D the compiler
+                   sees is byte-identical to the pre-Kconfig build).
+  - autoconf.h   : `#define MUC_OPCUA_<SYM> 1` for y / UNDEFINED for n (#ifdef-safe).
+                   Emitted for completeness / non-CMake consumers; not force-included.
 
 Usage:
-  gen_config.py <Kconfig> <config-in> <autoconf.h-out> <config.cmake-out>
+  gen_config.py <Kconfig> <defconfig> <config.cmake-out> [autoconf.h-out] [overrides-fragment]
 
-The build is expected to have produced <config-in> already (from a profile defconfig
-merged with any user fragments) via kconfiglib's defconfig/alldefconfig tools, which use
-the same CONFIG_=MUC_OPCUA_ prefix.
+<defconfig> selects the profile (a configs/<profile>.defconfig). <overrides-fragment>, if
+given, is merged ON TOP (legacy -DMUC_OPCUA_X=ON/OFF translated to Kconfig assignments);
+Kconfig's `depends on` still vetoes any override that violates a dependency.
 """
 import os
 import sys
 
-# kconfiglib reads the symbol prefix from the CONFIG_ env var; set it before import use.
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))  # vendored kconfiglib.py
 os.environ.setdefault("CONFIG_", "MUC_OPCUA_")
 
 import kconfiglib  # noqa: E402
 
 
 def main(argv):
-    if len(argv) != 5:
+    if len(argv) < 4:
         sys.stderr.write(__doc__)
         return 2
-    kconfig_path, config_in, autoconf_out, cmake_out = argv[1:]
+    kconfig_path, defconfig, cmake_out = argv[1], argv[2], argv[3]
+    autoconf_out = argv[4] if len(argv) > 4 and argv[4] else None
+    fragment = argv[5] if len(argv) > 5 and argv[5] else None
 
     kconf = kconfiglib.Kconfig(kconfig_path, warn=True, warn_to_stderr=True)
-    kconf.load_config(config_in)
+    kconf.load_config(defconfig)                       # profile base
+    if fragment and os.path.exists(fragment):
+        kconf.load_config(fragment, replace=False)     # user overrides on top
 
-    # C header (kconfiglib emits `#define MUC_OPCUA_X 1` / undefined for n).
-    kconf.write_autoconf(autoconf_out)
-
-    # CMake fragment for per-feature source selection.
     with open(cmake_out, "w") as f:
         f.write("# Generated from Kconfig by scripts/kconfig/gen_config.py -- do not edit.\n")
         for sym in kconf.unique_defined_syms:
             if sym.type == kconfiglib.BOOL:
                 f.write("set(MUC_OPCUA_%s %s)\n" % (sym.name, "ON" if sym.tri_value else "OFF"))
+
+    if autoconf_out:
+        kconf.write_autoconf(autoconf_out)
     return 0
 
 

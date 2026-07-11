@@ -270,12 +270,6 @@ config READ_CACHE
 
 endmenu
 
-menu "Client"
-
-config CLIENT_NANO
-	bool "Nano client surface"
-	default n
-	help
-	  The only implemented client tier (features.h enforces this).
-
-endmenu
+# The Client surface (MUC_OPCUA_CLIENT_NANO) is driven by the separate
+# MUC_OPCUA_CLIENT_PROFILE axis in CMake, not this Server tree (deferred to a later
+# phase).

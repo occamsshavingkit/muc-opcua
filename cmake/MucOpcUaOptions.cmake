@@ -38,13 +38,6 @@ else()
     message(FATAL_ERROR "Unsupported MUC_OPCUA_PLATFORM: ${MUC_OPCUA_PLATFORM}")
 endif()
 
-option(MUC_OPCUA_USER_AUTH "Build UserName/Password user identity authentication" OFF)
-option(MUC_OPCUA_SERVICE_WRITE "Build the Write service" OFF)
-option(MUC_OPCUA_MULTIPLE_CONNECTIONS "Support concurrent client TCP connections" OFF)
-option(MUC_OPCUA_EVENTS "Build event and Alarm & Condition support" OFF)
 option(MUC_OPCUA_HAVE_MBEDTLS "Build with Mbed TLS cryptographic platform adapter" OFF)
 option(MUC_OPCUA_HAVE_WOLFSSL "Build with wolfSSL cryptographic platform adapter" OFF)
-option(MUC_OPCUA_CUSTOM_METHODS "Build support for custom method calls" OFF)
-option(MUC_OPCUA_SERVER_DIAGNOSTICS "Build support for server diagnostics summary nodes" OFF)
-option(MUC_OPCUA_DYNAMIC_NODES "Build support for AddNodes/DeleteNodes dynamic node management" OFF)
 
