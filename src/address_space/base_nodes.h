@@ -23,14 +23,21 @@
 #include "muc_opcua/platform.h" /* mu_time_adapter_t */
 #include "muc_opcua/services/diagnostics.h"
 
-/* Dynamic runtime-bound node count: CurrentTime + StartTime, plus (when the Base
-   Server Behaviour diagnostics facet is compiled) the ServerDiagnostics Object
-   (2274), ServerDiagnosticsSummary (2275), and EnabledFlag (2294). */
+/* Dynamic runtime-bound nodes: CurrentTime + StartTime (2), plus the ServerDiagnostics
+   objects (3, Base Server Behaviour facet) and Server.ServerRedundancy.RedundancySupport
+   (1, i=3709, Client Redundancy facet) when those facets are compiled. */
 #if MUC_OPCUA_SERVER_DIAGNOSTICS
-#define MU_BASE_RUNTIME_NODE_COUNT 5
+#define MU_BASE_RUNTIME_DIAG_NODES 3
 #else
-#define MU_BASE_RUNTIME_NODE_COUNT 2
+#define MU_BASE_RUNTIME_DIAG_NODES 0
 #endif
+#if MUC_OPCUA_REDUNDANCY
+#define MU_BASE_RUNTIME_REDUNDANCY_NODES 1
+#else
+#define MU_BASE_RUNTIME_REDUNDANCY_NODES 0
+#endif
+#define MU_BASE_RUNTIME_REDUNDANCY_INDEX (2 + MU_BASE_RUNTIME_DIAG_NODES)
+#define MU_BASE_RUNTIME_NODE_COUNT (2 + MU_BASE_RUNTIME_DIAG_NODES + MU_BASE_RUNTIME_REDUNDANCY_NODES)
 
 /* The const, static Base Information address space described above. Never NULL. */
 const mu_address_space_t *mu_base_address_space(void);

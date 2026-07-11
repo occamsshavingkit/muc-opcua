@@ -45,6 +45,7 @@ Backing test column: comma-separated ctest names (as registered), no `test_` typ
 | Session General Service Behaviour: expired timeoutHint drops parked Publish (Bad_Timeout) | OPC-10000-4 §7.32 / OPC-10000-7 (Core 2017 Server Facet id 1673) | micro,embedded,full | test_base_server_behaviour |
 | ServerDiagnostics object: ServerDiagnosticsSummary (i=2275) encodes live counters | OPC-10000-5 §6.3.3 / §12.9 | full | test_diagnostics |
 | Reverse Connect: server sends ReverseHello (RHE) first on a server-initiated connection | OPC-10000-6 §7.1.2.6 / §7.1.3 | full | test_reverse_connect |
+| Client Redundancy: TransferSubscriptions moves a subscription cross-session (same user) | OPC-10000-4 §5.14.7 / §6.6.3 | full | test_transfer_subscriptions |
 | Republish unavailable NotificationMessage → Bad_MessageNotAvailable | OPC-10000-4 §5.14.6.3 | micro,embedded,full | test_subscriptions |
 | SetMonitoringMode invalid MonitoredItemId | OPC-10000-4 §5.13.4 / §7.38.2 | micro,embedded,full | test_subscriptions |
 | SetPublishingMode invalid SubscriptionId | OPC-10000-4 §5.14.4 / §7.38.2 | micro,embedded,full | test_subscriptions |

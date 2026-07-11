@@ -1,5 +1,28 @@
 # Feature Size Ledger
 
+## 2026-07-11: Spec 066 — Client Redundancy Facet (Project B, B7)
+
+Made `MUC_OPCUA_REDUNDANCY` real: TransferSubscriptions was a no-op self-transfer (found the
+subscription keyed on the caller's session, reassigned the same session_id, 0 available
+sequence numbers). Now a real cross-session transfer per OPC-10000-4 §5.14.7 —
+`mu_subscription_find_any` + `mu_subscription_transfer`, `Bad_NothingToDo`/`Bad_UserAccessDenied`,
+StatusChangeNotification to the old session, availableSequenceNumbers — plus per-session user
+identity for the mandatory same-user check, and the `RedundancySupport` (3709) node. `full`-only.
+
+**`.text`** (ARM Cortex-M0+ `-Os`):
+
+| Profile | prev (post-067) | now | Δ | why |
+|---------|----------------:|----:|--:|-----|
+| nano / micro / embedded / standard | 22,531 / 31,961 / 51,773 / 52,023 | (unchanged) | 0 | REDUNDANCY is full-only |
+| full | 80,187 | 80,831 | +644 | real transfer + session identity + RedundancySupport node |
+
+**Headroom:** `full` = **80,831 B** — ~50,241 B under the 128 KiB Project-B facet stopper.
+**RAM:** full `sizeof(struct mu_server)` 3,060,904 → **3,067,432** (+6,528 B — the per-session
+user-identity fingerprint, `MU_INTERN_MAX_SESSIONS`=100 × ~66 B); `MU_SERVER_STORAGE_BYTES`
+unchanged. nano/micro/embedded/standard byte- and RAM-identical.
+
+**Project B complete: all seven Part-7 facets (B1–B7) grounded and formalized.**
+
 ## 2026-07-11: Spec 067 — Strict Profile Grounding
 
 Redefined `nano`/`micro`/`embedded`/`standard` to equal exactly their namesake OPC UA

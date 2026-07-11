@@ -10,8 +10,10 @@
 
 #include "unity.h"
 
+#include "../../src/address_space/base_nodes.h"
 #include "../../src/core/server_internal.h"
 #include "../../src/core/service_dispatch.h"
+#include "../../src/core/service_dispatch/common.h"
 #include "../../src/services/subscription.h"
 #include "muc_opcua/muc_opcua.h"
 #include <string.h>
@@ -131,11 +133,40 @@ static opcua_uint32_t create_subscription(mu_server_t *server) {
     return subscription_id;
 }
 
+#if MUC_OPCUA_BASE_NODES
+/* FR-3: Server.ServerRedundancy.RedundancySupport (i=3709) reads None(0) — this server
+   supports client redundancy (TransferSubscriptions) without being itself redundant. */
+void test_redundancy_support_reads_none(void) {
+    mu_base_runtime_nodes_t rn;
+    (void)memset(&rn, 0, sizeof(rn));
+#if MUC_OPCUA_SERVER_DIAGNOSTICS
+    mu_diagnostics_summary_t diag;
+    (void)memset(&diag, 0, sizeof(diag));
+    mu_base_runtime_init(&rn, NULL, 0, &diag);
+#else
+    mu_base_runtime_init(&rn, NULL, 0);
+#endif
+    const mu_node_t *node = NULL;
+    for (size_t i = 0; i < rn.space.node_count; ++i) {
+        if (rn.space.nodes[i].node_id.identifier.numeric == 3709u) {
+            node = &rn.space.nodes[i];
+            break;
+        }
+    }
+    TEST_ASSERT_NOT_NULL_MESSAGE(node, "RedundancySupport (3709) must be resolvable");
+    mu_variant_t v;
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_value_source_read(node->value, &node->node_id, &v));
+    TEST_ASSERT_EQUAL(MU_TYPE_INT32, v.type);
+    TEST_ASSERT_EQUAL_INT32(0, v.value.i32); /* RedundancySupport None */
+}
+#endif
+
 /* ------------------------------------------------------------------ */
-/*  Valid Transfer: existing subscription                             */
+/*  Transferring your OWN subscription -> Bad_NothingToDo              */
+/*  (SessionChanged() == FALSE, OPC-10000-4 §5.14.7.4)                 */
 /* ------------------------------------------------------------------ */
 
-void test_transfer_subscriptions_valid_existing_subscription(void) {
+void test_transfer_subscriptions_own_returns_nothing_to_do(void) {
     mu_server_t server;
     opcua_byte_t request[256];
     opcua_byte_t response[256];
@@ -173,12 +204,137 @@ void test_transfer_subscriptions_valid_existing_subscription(void) {
     TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_binary_read_int32(&r, &result_count));
     TEST_ASSERT_EQUAL_INT32(1, result_count);
     TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_binary_read_uint32(&r, &status_code));
-    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, status_code);
+    /* The subscription is already owned by the calling session -> Bad_NothingToDo. */
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_BAD_NOTHINGTODO, status_code);
     TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_binary_read_int32(&r, &avail_seq));
     TEST_ASSERT_EQUAL_INT32(0, avail_seq);
     TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_binary_read_int32(&r, &diag_count));
     TEST_ASSERT_EQUAL_INT32(0, diag_count);
     TEST_ASSERT_EQUAL_size_t(response_len, r.position);
+}
+
+/* ------------------------------------------------------------------ */
+/*  Real cross-session transfer (the load-bearing case): a subscription  */
+/*  owned by session A moves to session B (same user). Direct handler   */
+/*  call to control the active session (OPC-10000-4 §5.14.7, row 23).   */
+/* ------------------------------------------------------------------ */
+
+/* Set up a second activated session (index 1) sharing session 0's user identity. */
+static void add_same_user_session(mu_server_t *server) {
+    opcua_uint64_t revised_timeout = 0u;
+    opcua_uint32_t session_id = 0u;
+    opcua_uint32_t auth_token = 0u;
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD,
+                            mu_session_create(&server->sessions[1], 0u, &revised_timeout, &session_id, &auth_token));
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_session_activate(&server->sessions[1], auth_token, 321u));
+    server->sessions[1].secure_channel_id = server->secure_channel.channel_id;
+    /* The constant-entropy test harness collides session_ids; force a distinct id so
+       SessionChanged() is TRUE (this is a genuinely different Session). */
+    server->sessions[1].session_id = server->sessions[0].session_id + 1000u;
+    /* Both anonymous (kind 321, empty discriminator) -> same user. */
+    server->sessions[1].user_identity_kind = server->sessions[0].user_identity_kind;
+    server->sessions[1].user_identity_len = server->sessions[0].user_identity_len;
+}
+
+void test_transfer_cross_session_succeeds(void) {
+    mu_server_t server;
+    opcua_byte_t request[256];
+    opcua_byte_t response[256];
+    size_t response_len = sizeof(response);
+    mu_binary_writer_t w;
+    mu_binary_reader_t r;
+    opcua_uint32_t status_code = 0u;
+    opcua_int32_t result_count = 0, avail_seq = 0, diag_count = 0;
+    mu_nodeid_t response_type = {0u, MU_NODEID_NUMERIC, {0u}};
+    opcua_uint32_t handle = 0u;
+    opcua_statuscode_t service_result = 0u;
+
+    prepare_server(&server);
+    server.sessions[0].user_identity_kind = 321u;         /* anonymous */
+    opcua_uint32_t sub_id = create_subscription(&server); /* owned by session 0 */
+    add_same_user_session(&server);
+
+    /* Session B (index 1) is now the caller. */
+    server.active_session = &server.sessions[1];
+
+    mu_binary_writer_init(&w, request, sizeof(request));
+    write_request_header(&w, 7u);
+    mu_binary_write_int32(&w, 1);
+    mu_binary_write_uint32(&w, sub_id);
+    mu_binary_write_boolean(&w, false);
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, w.status);
+
+    mu_binary_reader_t req_r;
+    mu_binary_reader_init(&req_r, request, w.position);
+    mu_binary_writer_t resp_w;
+    mu_binary_writer_init(&resp_w, response, sizeof(response));
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, handle_transfer_subscriptions(&server, &req_r, &resp_w, &response_len));
+
+    mu_binary_reader_init(&r, response, response_len);
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_binary_read_nodeid(&r, &response_type));
+    read_response_header(&r, &handle, &service_result);
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, service_result);
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_binary_read_int32(&r, &result_count));
+    TEST_ASSERT_EQUAL_INT32(1, result_count);
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_binary_read_uint32(&r, &status_code));
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, status_code); /* transferred */
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_binary_read_int32(&r, &avail_seq));
+    TEST_ASSERT_EQUAL_INT32(0, avail_seq); /* no retransmit yet */
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_binary_read_int32(&r, &diag_count));
+
+    /* The subscription is now owned by session B. */
+    mu_subscription_t *moved = mu_subscription_find_any(&server.subs, sub_id);
+    TEST_ASSERT_NOT_NULL(moved);
+    TEST_ASSERT_EQUAL_UINT32(server.sessions[1].session_id, moved->session_id);
+}
+
+/* A different-user session cannot steal the subscription -> Bad_UserAccessDenied. */
+void test_transfer_different_user_denied(void) {
+    mu_server_t server;
+    opcua_byte_t request[256];
+    opcua_byte_t response[256];
+    size_t response_len = sizeof(response);
+    mu_binary_writer_t w, resp_w;
+    mu_binary_reader_t r, req_r;
+    opcua_uint32_t status_code = 0u;
+    opcua_int32_t result_count = 0;
+    mu_nodeid_t response_type = {0u, MU_NODEID_NUMERIC, {0u}};
+    opcua_uint32_t handle = 0u;
+    opcua_statuscode_t service_result = 0u;
+
+    prepare_server(&server);
+    server.sessions[0].user_identity_kind = 324u; /* username "alice" */
+    server.sessions[0].user_identity_len = 5u;
+    (void)memcpy(server.sessions[0].user_identity, "alice", 5u);
+    opcua_uint32_t sub_id = create_subscription(&server);
+    add_same_user_session(&server);
+    /* Session B is a DIFFERENT user ("bob"). */
+    server.sessions[1].user_identity_kind = 324u;
+    server.sessions[1].user_identity_len = 3u;
+    (void)memcpy(server.sessions[1].user_identity, "bob", 3u);
+    server.active_session = &server.sessions[1];
+
+    mu_binary_writer_init(&w, request, sizeof(request));
+    write_request_header(&w, 8u);
+    mu_binary_write_int32(&w, 1);
+    mu_binary_write_uint32(&w, sub_id);
+    mu_binary_write_boolean(&w, false);
+
+    mu_binary_reader_init(&req_r, request, w.position);
+    mu_binary_writer_init(&resp_w, response, sizeof(response));
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, handle_transfer_subscriptions(&server, &req_r, &resp_w, &response_len));
+
+    mu_binary_reader_init(&r, response, response_len);
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_binary_read_nodeid(&r, &response_type));
+    read_response_header(&r, &handle, &service_result);
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_binary_read_int32(&r, &result_count));
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_binary_read_uint32(&r, &status_code));
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_BAD_USERACCESSDENIED, status_code);
+
+    /* Ownership unchanged (still session A). */
+    mu_subscription_t *sub = mu_subscription_find_any(&server.subs, sub_id);
+    TEST_ASSERT_NOT_NULL(sub);
+    TEST_ASSERT_EQUAL_UINT32(server.sessions[0].session_id, sub->session_id);
 }
 
 /* ------------------------------------------------------------------ */
@@ -328,9 +484,9 @@ void test_transfer_subscriptions_mixed_ids_response_encoding(void) {
     TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_binary_read_int32(&r, &result_count));
     TEST_ASSERT_EQUAL_INT32(2, result_count);
 
-    /* First: valid subscription -> GOOD */
+    /* First: own subscription (same session) -> Bad_NothingToDo */
     TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_binary_read_uint32(&r, &status_code));
-    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, status_code);
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_BAD_NOTHINGTODO, status_code);
     TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_binary_read_int32(&r, &avail_seq));
     TEST_ASSERT_EQUAL_INT32(0, avail_seq);
 
@@ -377,7 +533,8 @@ void test_transfer_subscriptions_zero_count(void) {
     TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_binary_read_nodeid(&r, &response_type));
     TEST_ASSERT_EQUAL_UINT32(MU_ID_TRANSFERSUBSCRIPTIONSRESPONSE, response_type.identifier.numeric);
     read_response_header(&r, &handle, &service_result);
-    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, service_result);
+    /* Empty subscriptionIds -> service-level Bad_NothingToDo (§5.14.7.3). */
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_BAD_NOTHINGTODO, service_result);
 
     TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_binary_read_int32(&r, &result_count));
     TEST_ASSERT_EQUAL_INT32(0, result_count);
@@ -436,7 +593,12 @@ void test_transfer_subscriptions_tests_require_redundancy_build(void) {
 int main(void) {
     UNITY_BEGIN();
 #if MUC_OPCUA_REDUNDANCY
-    RUN_TEST(test_transfer_subscriptions_valid_existing_subscription);
+#if MUC_OPCUA_BASE_NODES
+    RUN_TEST(test_redundancy_support_reads_none);
+#endif
+    RUN_TEST(test_transfer_subscriptions_own_returns_nothing_to_do);
+    RUN_TEST(test_transfer_cross_session_succeeds);
+    RUN_TEST(test_transfer_different_user_denied);
     RUN_TEST(test_transfer_subscriptions_unknown_id_returns_bad_id);
     RUN_TEST(test_transfer_subscriptions_16_item_cap_overflow);
     RUN_TEST(test_transfer_subscriptions_mixed_ids_response_encoding);

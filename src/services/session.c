@@ -51,8 +51,25 @@ void mu_session_init(mu_session_t *session) {
 #ifdef MUC_OPCUA_MULTIPLE_CONNECTIONS
         session->secure_channel_id = 0;
 #endif
+#if MUC_OPCUA_REDUNDANCY
+        session->user_identity_kind = 0;
+        session->user_identity_len = 0;
+        (void)memset(session->user_identity, 0, sizeof(session->user_identity));
+#endif
     }
 }
+
+#if MUC_OPCUA_REDUNDANCY
+bool mu_session_same_user(const mu_session_t *a, const mu_session_t *b) {
+    if (a == NULL || b == NULL) {
+        return false;
+    }
+    if (a->user_identity_kind != b->user_identity_kind || a->user_identity_len != b->user_identity_len) {
+        return false;
+    }
+    return memcmp(a->user_identity, b->user_identity, a->user_identity_len) == 0;
+}
+#endif
 
 mu_session_t *mu_session_find_by_token(mu_session_t *sessions, size_t count, opcua_uint32_t auth_token) {
     if (sessions == NULL) {

@@ -2,9 +2,11 @@
 #ifndef MUC_OPCUA_SERVICES_SESSION_H
 #define MUC_OPCUA_SERVICES_SESSION_H
 
+#include "muc_opcua/config.h"
 #include "muc_opcua/opcua_types.h"
 #include "muc_opcua/platform.h"
 #include "muc_opcua/status.h"
+#include <stdbool.h>
 #include <stddef.h>
 
 typedef enum { MU_SESSION_STATE_CLOSED = 0, MU_SESSION_STATE_CREATED, MU_SESSION_STATE_ACTIVATED } mu_session_state_t;
@@ -22,7 +24,22 @@ typedef struct {
 #ifdef MUC_OPCUA_MULTIPLE_CONNECTIONS
     opcua_uint32_t secure_channel_id;
 #endif
+#if MUC_OPCUA_REDUNDANCY
+    /* User-identity fingerprint captured at ActivateSession, for the same-user
+       (ClientValidated) check in TransferSubscriptions (OPC-10000-4 §5.14.1.4 /
+       §6.6.3). kind = the identity-token type (321 anonymous, 324 username, 327
+       x509); the bounded discriminator is the username bytes / cert prefix. */
+    opcua_byte_t user_identity_kind;
+    opcua_byte_t user_identity_len;
+    opcua_byte_t user_identity[64];
+#endif
 } mu_session_t;
+
+#if MUC_OPCUA_REDUNDANCY
+/* TRUE only when both Sessions were activated on behalf of the same user (same
+   identity kind and discriminator). Anonymous == anonymous. */
+bool mu_session_same_user(const mu_session_t *a, const mu_session_t *b);
+#endif
 
 void mu_session_init(mu_session_t *session);
 
