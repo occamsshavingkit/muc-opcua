@@ -25,6 +25,10 @@ claims are out of scope for this profile-targeting build.
 
 - SecurityPolicy Basic256Sha256 and SecurityPolicy None.
 - Data-change subscriptions with Standard DataChange Subscription 2017 facet additions.
+  This is the **Standard** DataChange tier (queue depth 2, `MinQueueSize_02`) — embedded
+  advertises `EmbeddedUA2017`. The higher **Enhanced** DataChange 2017 tier (queue depth 5)
+  is claimed only by the `standard`/`full` builds that advertise `StandardUA2017`; see
+  `enhanced-datachange.md`.
 - Raised Standard capacity minima:
   `MU_MAX_MONITORED_ITEMS=100`, `MU_MAX_SUBSCRIPTIONS=2`,
   `MU_MAX_PUBLISH_REQUESTS=5`, `MU_MONITORED_QUEUE_DEPTH=2`.

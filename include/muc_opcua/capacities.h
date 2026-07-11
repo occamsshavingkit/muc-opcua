@@ -129,10 +129,23 @@
 #endif
 
 /* ---- MonitoredItem queue depth -------------------------------------- */
+/* The Server Facet the profile advertises sets the floor:
+ *   embedded  -> EmbeddedUA2017  -> Standard DataChange 2017 (MinQueueSize_02) => 2
+ *   standard  -> StandardUA2017  -> Enhanced DataChange 2017 (MinQueueSize_05) => 5
+ *   full      -> StandardUA2017  -> Enhanced DataChange 2017 (MinQueueSize_05) => 5
+ * The standard/full raise to 5 is MANDATORY: StandardUA2017 (profile-DB id 1663)
+ * lists the Enhanced facet (id 1678) as non-optional. The queue is a fixed inline
+ * ring per MonitoredItem, so depth 5 costs 3 extra queue entries per item
+ * (48 B/entry on ARM => +144 KiB standard / +288 KiB full RAM) -- documented in
+ * docs/conformance/enhanced-datachange.md. Enforced by the _Static_asserts in
+ * services/subscription.h. */
 #define MU_INTERN_MONITORED_QUEUE_DEPTH 1 /* stage 1: minimal baseline */
-#if defined(MUC_OPCUA_PROFILE_EMBEDDED) || defined(MUC_OPCUA_PROFILE_STANDARD) || defined(MUC_OPCUA_PROFILE_FULL)
+#if defined(MUC_OPCUA_PROFILE_EMBEDDED)
 #undef MU_INTERN_MONITORED_QUEUE_DEPTH
-#define MU_INTERN_MONITORED_QUEUE_DEPTH 2
+#define MU_INTERN_MONITORED_QUEUE_DEPTH 2 /* Standard DataChange 2017 */
+#elif defined(MUC_OPCUA_PROFILE_STANDARD) || defined(MUC_OPCUA_PROFILE_FULL)
+#undef MU_INTERN_MONITORED_QUEUE_DEPTH
+#define MU_INTERN_MONITORED_QUEUE_DEPTH 5 /* Enhanced DataChange 2017 */
 #endif
 #ifdef MU_MONITORED_QUEUE_DEPTH
 #undef MU_INTERN_MONITORED_QUEUE_DEPTH

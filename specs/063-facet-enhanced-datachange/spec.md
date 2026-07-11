@@ -27,14 +27,48 @@ neither named, asserted, nor documented**, so:
 - `docs/conformance/status.md` lists only the Standard facet; there is no Enhanced entry
   or conformance doc.
 
-## Grounding task (do first, before requirements are final)
+## Grounding OUTCOME (grounding task done — it overturned this spec's premise)
 
-The exact Enhanced DataChange Subscription 2017 minima must be confirmed from OPC-10000-7 /
-the OPC profile DB ([[opc-profile-reporting-api]]) rather than memory — this is the one
-un-pinned constant. The roadmap figure (MonitoredItems ≥ 500) is the working value; verify
-and pin the full minima set (MonitoredItems, Subscriptions, MaxNotificationsPerPublish,
-queue depth, MinSupportedSampleRate) before finalizing FR-2. Per project convention
-([[ground-spec-constants-in-opc-ua-reference]]), no minimum ships un-grounded.
+Grounded against the live OPC profile DB ([[opc-profile-reporting-api]]), facet
+`EnhancedDataChangeSubscription2017` = **profile-DB id 1678**. Its four conformance units
+are **all mandatory** (`isOptional=false`):
+
+| CU | Minimum |
+| --- | --- |
+| `Monitor Items 500` | ≥ 500 MonitoredItems **per Subscription** |
+| `Monitor MinQueueSize_05` | ≥ 5 queue entries **per MonitoredItem** |
+| `Subscription Minimum 05` | ≥ 5 Subscriptions **per Session** |
+| `Subscription Publish Min 10` | ≥ 10 Publish requests **per Session** |
+
+Enhanced *includes* the Standard DataChange Subscription 2017 facet (id 1675) as its base.
+There is **no** `MaxNotificationsPerPublish` or `MinSupportedSampleRate` CU in this facet —
+the spec's earlier candidate list was wrong; the set above is exhaustive.
+
+**The decisive fact — Enhanced is MANDATORY for the profile we advertise, not optional.**
+`standard` and `full` builds advertise `http://opcfoundation.org/UA-Profile/Server/StandardUA2017`
+(`base_nodes.c`, gated on `MUC_OPCUA_STANDARD_PROFILE`). The **Standard 2017 UA Server
+Profile (id 1663)** lists the Enhanced DataChange 2017 facet directly with `isOptional=false`.
+So a server advertising StandardUA2017 **must** meet the Enhanced minima.
+
+Current provisioning vs. the grounded minima:
+
+| Minimum | required | standard | full | met? |
+| --- | --- | --- | --- | --- |
+| MonitoredItems / Subscription | ≥ 500 | 1000 | 2000 | ✅ |
+| Subscriptions / Session | ≥ 5 | 50 | 100 | ✅ |
+| Publish / Session | ≥ 10 | 50 | 100 | ✅ |
+| **Queue entries / MonitoredItem** | **≥ 5** | **2** | **2** | ❌ |
+
+This **refutes** the original premise ("standard/full already exceed the minimum; assert
+only, do not enlarge" — see revised Out-of-scope below). The monitored-item queue is a
+fixed inline ring (`MU_INTERN_MONITORED_QUEUE_DEPTH`, 56 B/entry); we clamp any
+client-requested `queueSize > 2` down to 2, so we do **not** satisfy `MinQueueSize_05` and
+have been advertising StandardUA2017 while under-provisioning one of its mandatory facets.
+The fix: raise the queue depth **2 → 5 for standard/full** (the StandardUA2017 claimants).
+`embedded` advertises EmbeddedUA2017 → Standard DataChange 2017 (`MinQueueSize_02`), so it
+correctly stays at depth 2. RAM cost of the fix (fixed-size model, no heap): +3 entries ×
+56 B × MonitoredItems = **+164 KiB (standard, 1000 items) / +328 KiB (full, 2000 items)**;
+`.text` is ~flat (a capacity constant, not code). nano/micro/embedded unchanged.
 
 ## Requirements
 
@@ -44,20 +78,28 @@ DataChange Subscription facet (a documented predicate over the capacity macros, 
 `-D` feature flag — the facet is a capacity tier, keyed off `MUC_OPCUA_SUBSCRIPTIONS_STANDARD`
 + the resolved `MU_INTERN_MAX_*` values.
 
-**FR-2 — Assert the Enhanced minima where the facet is claimed.** A compile-time
-`_Static_assert` (or the capacity test) that, for profiles claiming Enhanced, the resolved
-`MU_INTERN_MAX_MONITORED_ITEMS` ≥ (grounded minimum, ~500), and the other grounded minima
-hold — so a capacity override that drops below the claimed facet fails the build/test
-rather than silently mis-advertising. Mirrors spec 057's "advertised == enforced" rule.
+**FR-2 — Raise the queue depth, then assert all four minima where the facet is claimed.**
+First close the gap: split the queue-depth cascade so `standard`/`full` resolve
+`MU_INTERN_MONITORED_QUEUE_DEPTH` to 5 (embedded stays 2). Then a compile-time
+`_Static_assert` block, active when `MUC_OPCUA_ENHANCED_DATACHANGE` is claimed, that all
+four grounded minima hold: `MU_INTERN_MAX_MONITORED_ITEMS` ≥ 500,
+`MU_INTERN_MONITORED_QUEUE_DEPTH` ≥ 5, `MU_INTERN_MAX_SUBSCRIPTIONS` ≥ 5,
+`MU_INTERN_MAX_PUBLISH_REQUESTS` ≥ 10 — so a capacity override (e.g.
+`-DMU_MONITORED_QUEUE_DEPTH=2`) that drops below the claimed facet fails the build rather
+than silently mis-advertising StandardUA2017. Mirrors spec 057's "advertised == enforced".
+Verified behaviorally: a client requesting `queueSize = 5` on standard/full is honored, not
+clamped.
 
 **FR-3 — Conformance doc + status.** `docs/conformance/enhanced-datachange.md` (the facet,
 its grounded minima, which profiles claim it, the assertion); add the Enhanced row to
 `docs/conformance/status.md` alongside the Standard one; note it in the profile docs
 (profile-embedded = Standard tier; standard/full = Enhanced).
 
-**FR-4 — Size + matrix.** No functional code change expected (capacities already suffice),
-so `.text` should be ~flat; record the (near-zero) delta in the size ledger; full stays
-under the 128 KiB stopper; all-profile matrix green.
+**FR-4 — Size + RAM + matrix.** `.text` is ~flat (the change is a capacity constant, not
+code); record the near-zero `.text` delta in the size ledger and the **RAM** delta
+(+164 KiB standard / +328 KiB full from the deeper inline queue) so the cost is documented,
+not silent; full stays under the 128 KiB `.text` stopper; all-profile matrix green;
+nano/micro/embedded byte- and RAM-identical.
 
 ## Verification (test-first)
 
@@ -73,8 +115,14 @@ under the 128 KiB stopper; all-profile matrix green.
 
 ## Out of scope
 
-- Raising any profile's actual capacities (standard/full already exceed the Enhanced
-  minimum; this facet asserts, it does not enlarge).
+- Raising capacities *beyond* what StandardUA2017 mandates. (The original "assert only,
+  never enlarge" stance is withdrawn: grounding proved the queue depth was below the
+  mandatory `MinQueueSize_05`, so a single bounded raise — 2→5, standard/full — is in
+  scope and required. MonitoredItems/Subscriptions/Publish already exceed their minima and
+  are left untouched.)
+- A dynamic / shared-pool queue that could support depth-5 without paying 5× storage on
+  every item. Our no-heap model uses a fixed inline ring; a shared pool is a larger
+  architectural change, deferred.
 - New subscription features (deadband/aggregate are prior facets); this is capacity tiering.
 
 ## On approval

@@ -1,5 +1,46 @@
 # Feature Size Ledger
 
+## 2026-07-11: Spec 063 — Enhanced DataChange Subscription 2017 Facet (Project B, B4)
+
+Grounding (OPC profile DB, facet `EnhancedDataChangeSubscription2017` id 1678) showed the
+`StandardUA2017` profile our `standard`/`full` builds advertise **mandates** this facet,
+whose `Monitor MinQueueSize_05` CU requires monitored-item queue depth ≥ 5. We shipped
+depth 2, so the fix raises `MU_INTERN_MONITORED_QUEUE_DEPTH` **2 → 5 for standard/full**
+(embedded stays 2 for its Standard DataChange 2017 tier). Named as
+`MUC_OPCUA_ENHANCED_DATACHANGE`; minima guarded by `_Static_assert`s in `subscription.h`.
+
+**`.text`** (ARM Cortex-M0+ `-Os`, `scripts/measure_size.sh all`) — a capacity constant,
+not code, so essentially flat:
+
+| Profile | prev (post-062) | now | Δ | why |
+|---------|----------------:|----:|--:|-----|
+| nano | 17,956 | 17,956 | 0 | facet not claimed |
+| micro | 29,706 | 29,706 | 0 | facet not claimed |
+| embedded | 54,972 | 54,972 | 0 | Standard DataChange tier (depth 2) unchanged |
+| standard | 79,039 | 79,107 | +68 | deeper queue loop bound / struct memset codegen |
+| full | 79,039 | 79,107 | +68 | same as standard |
+
+**Headroom:** `full` = **79,107 B** — ~51,965 B under the 128 KiB Project-B facet stopper.
+
+**RAM** (ARM `arm-none-eabi`, `sizeof(struct mu_server)` / `MU_SERVER_STORAGE_BYTES`). The
+queue is a fixed inline ring (48 B/entry on ARM); depth 2 → 5 adds 3 entries × 48 B × the
+per-profile MonitoredItems count:
+
+| Profile | sizeof(mu_server) prev → now | of which spec 063 | STORAGE_BYTES prev → now |
+|---------|------------------------------:|------------------:|-------------------------:|
+| nano | 784 → 792 | 0 | 1,408 → 1,408 |
+| micro | 27,600 → 27,624 | 0 | 30,720 → 30,720 |
+| embedded | 97,216 → 97,224 | 0 | 127,272 → 127,272 |
+| standard | 1,068,200 → 1,556,368 | **+144,000** (3×48×1000) | 1,178,260 → 2,218,644 |
+| full | 2,084,320 → 3,060,488 | **+288,000** (3×48×2000) | 2,300,460 → 4,380,844 |
+
+Spec 063 contributes only the **+144 KiB (standard) / +288 KiB (full)** `sizeof` growth
+above. The remainder of the standard/full jump reconciles **pre-existing struct-table
+drift** (the README RAM tables predated monitored-item struct growth from earlier event /
+aggregate features); this pass re-measures all five profiles fresh so the README tables are
+current. nano/micro/embedded moved only by prior drift (≤ 24 B) and are unaffected by this
+facet. `.text` `.data`/`.bss` no-heap invariants preserved (nano/micro/embedded).
+
 ## 2026-07-11: Spec 062 — Method Server Facet (Project B, B3)
 
 Cumulative archive `.text` (ARM Cortex-M0+ `-Os`, `scripts/measure_size.sh all`) after
