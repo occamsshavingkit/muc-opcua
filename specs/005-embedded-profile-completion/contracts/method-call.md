@@ -1,5 +1,13 @@
 # Contract: Call service — GetMonitoredItems & ResendData
 
+
+> **Superseded by spec 062 (Method Server Facet).** The shipped API is
+> `mu_server_register_method_callback(server, method_id, callback, context,
+> input_args, input_count, output_args, output_count, executable)` with a
+> `void *context`-carrying `mu_method_callback_t`, gated on `MUC_OPCUA_METHOD_SERVER`
+> (`MUC_OPCUA_CUSTOM_METHODS` is an alias). See `docs/conformance/method-server.md`
+> for the authoritative contract; the API shapes described below are historical.
+
 **Service**: Call — OPC-10000-4 §5.12.2.2 (CallRequest / CallResponse / CallMethodResult).
 **Methods**: GetMonitoredItems, ResendData — defined on the Server object in OPC-10000-5.
 **Facet**: `Method Call`, `Base Info GetMonitoredItems Method`, `Base Info ResendData Method`

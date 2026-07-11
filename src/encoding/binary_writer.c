@@ -1,6 +1,7 @@
 /* src/encoding/binary_writer.c */
 #include "binary_le.h"
 #include "muc_opcua/encoding.h"
+#include "muc_opcua/services/method.h"
 #include <string.h>
 
 void mu_binary_writer_init(mu_binary_writer_t *writer, opcua_byte_t *buffer, size_t length) {
@@ -178,5 +179,39 @@ opcua_statuscode_t mu_binary_write_eu_information(mu_binary_writer_t *writer, co
     if (s != MU_STATUS_GOOD)
         return s;
     return mu_binary_write_localized_text(writer, &value->description);
+}
+#endif
+
+#if MUC_OPCUA_METHOD_SERVER
+opcua_statuscode_t mu_binary_write_argument(mu_binary_writer_t *writer, const mu_argument_t *arg) {
+    if (!writer || !arg) {
+        return MU_STATUS_BAD_INTERNALERROR;
+    }
+    /* Encode the Argument body (OPC-10000-5 §12.2.12.1) into scratch, then wrap
+       it in an ExtensionObject with the exact body length. Argument_Encoding_
+       DefaultBinary = ns0 i=298 (296 DataType + 2, the standard triple). */
+    opcua_byte_t body[256];
+    mu_binary_writer_t bw;
+    mu_binary_writer_init(&bw, body, sizeof(body));
+    (void)mu_binary_write_string(&bw, &arg->name);
+    (void)mu_binary_write_nodeid(&bw, &arg->data_type);
+    (void)mu_binary_write_int32(&bw, arg->value_rank);
+    (void)mu_binary_write_int32(&bw, -1); /* arrayDimensions: null (not modelled) */
+    (void)mu_binary_write_localized_text(&bw, &arg->description);
+    if (bw.status != MU_STATUS_GOOD) {
+        return bw.status;
+    }
+
+    mu_nodeid_t type_id = {0, MU_NODEID_NUMERIC, {298u}};
+    opcua_statuscode_t s = mu_binary_write_extension_object_header(writer, &type_id, bw.position);
+    if (s != MU_STATUS_GOOD) {
+        return s;
+    }
+    if (writer->position + bw.position > writer->length) {
+        return MU_STATUS_BAD_OUTOFMEMORY;
+    }
+    (void)memcpy(writer->buffer + writer->position, body, bw.position);
+    writer->position += bw.position;
+    return MU_STATUS_GOOD;
 }
 #endif

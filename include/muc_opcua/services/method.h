@@ -19,26 +19,18 @@ extern "C" {
 
 struct mu_server;
 
-typedef struct {
-    mu_nodeid_t object_id;
-    mu_nodeid_t method_id;
-    mu_variant_t *input_arguments;
-    size_t input_count;
-    mu_variant_t *output_arguments;
-    size_t output_count;
-    /* Per-input-argument status codes returned to the client */
-    opcua_statuscode_t *input_argument_results;
-} mu_method_call_t;
-
-#define MU_MAX_METHOD_REGISTRATIONS 16
-
-opcua_statuscode_t mu_method_server_register(struct mu_server *server, const mu_nodeid_t *method_id,
-                                             mu_method_callback_t callback);
-
-opcua_statuscode_t mu_method_server_dispatch(struct mu_server *server, const mu_nodeid_t *object_id,
-                                             const mu_nodeid_t *method_id, const mu_variant_t *input_args,
-                                             size_t input_count, mu_variant_t *output_args, size_t *output_count,
-                                             opcua_statuscode_t *input_results);
+/* Argument metadata (OPC-10000-5 §12.2.12.1, DataType i=296). An integrator
+   declares a method's input/output signature with an array of these; the server
+   uses it to validate incoming CallMethodRequest arguments and to serve the
+   InputArguments/OutputArguments Property Value so clients can browse the
+   signature. arrayDimensions is not modelled — value_rank (-1 scalar, >=1 array
+   rank, per OPC-10000-3) is the validated dimension. */
+typedef struct mu_argument {
+    mu_string_t name;
+    mu_nodeid_t data_type;
+    opcua_int32_t value_rank;
+    mu_localized_text_t description;
+} mu_argument_t;
 
 #endif /* MUC_OPCUA_METHOD_SERVER */
 

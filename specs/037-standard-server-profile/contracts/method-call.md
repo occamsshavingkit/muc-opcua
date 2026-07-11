@@ -1,5 +1,13 @@
 # Contract: Method Call Service
 
+
+> **Superseded by spec 062 (Method Server Facet).** The shipped API is
+> `mu_server_register_method_callback(server, method_id, callback, context,
+> input_args, input_count, output_args, output_count, executable)` with a
+> `void *context`-carrying `mu_method_callback_t`, gated on `MUC_OPCUA_METHOD_SERVER`
+> (`MUC_OPCUA_CUSTOM_METHODS` is an alias). See `docs/conformance/method-server.md`
+> for the authoritative contract; the API shapes described below are historical.
+
 **Feature**: 037-standard-server-profile | **OPC Reference**: OPC-10000-4 §5.12.2.2
 
 ## Registration API

@@ -135,12 +135,17 @@ struct mu_server {
     mu_subscriptions_t subs;
     opcua_uint32_t current_request_id;
 #endif
-#ifdef MUC_OPCUA_CUSTOM_METHODS
+#if MUC_OPCUA_METHOD_SERVER
 #define MU_MAX_REGISTERED_METHODS 8
     struct {
         mu_nodeid_t method_id;
         mu_method_callback_t callback;
         void *context;
+        const mu_argument_t *input_args;
+        size_t input_count;
+        const mu_argument_t *output_args;
+        size_t output_count;
+        opcua_boolean_t executable;
     } registered_methods[MU_MAX_REGISTERED_METHODS];
     size_t registered_method_count;
 #endif

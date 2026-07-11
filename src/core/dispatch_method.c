@@ -15,6 +15,7 @@
 #include "../services/subscription.h"
 #include "muc_opcua/address_space.h"
 #include "muc_opcua/encoding.h"
+#include "muc_opcua/services/method.h"
 #include "server_internal.h"
 #include "service_dispatch.h"
 #include <stddef.h>
@@ -35,6 +36,26 @@ static bool nodeid_is_ns0_numeric(const mu_nodeid_t *node_id, opcua_uint32_t num
     return node_id->identifier_type == MU_NODEID_NUMERIC && node_id->namespace_index == 0u &&
            node_id->identifier.numeric == numeric_id;
 }
+
+#if MUC_OPCUA_METHOD_SERVER
+/* Validate one input argument against its declared Argument (OPC-10000-4 §5.11.2).
+   Builtin DataType NodeIds (ns0 numeric) equal the mu_builtin_type_t enum values,
+   so a scalar type-check is a numeric compare; non-ns0/complex declared types are
+   not type-checked here (documented subset). value_rank: -1 scalar, >=1 array. */
+static opcua_statuscode_t validate_call_argument(const mu_variant_t *arg, const mu_argument_t *decl) {
+    bool wants_array = decl->value_rank >= 1;
+    if ((bool)arg->is_array != wants_array) {
+        return MU_STATUS_BAD_TYPEMISMATCH;
+    }
+    if (decl->data_type.identifier_type == MU_NODEID_NUMERIC && decl->data_type.namespace_index == 0u &&
+        decl->data_type.identifier.numeric != 0u) {
+        if ((opcua_uint32_t)arg->type != decl->data_type.identifier.numeric) {
+            return MU_STATUS_BAD_TYPEMISMATCH;
+        }
+    }
+    return MU_STATUS_GOOD;
+}
+#endif
 
 static opcua_statuscode_t write_call_method_result(mu_binary_writer_t *w, opcua_statuscode_t status,
                                                    opcua_int32_t input_argument_result_count,
@@ -178,40 +199,70 @@ static opcua_statuscode_t write_single_call_method_result(mu_server_t *server, m
     }
 #endif
 
-#ifdef MUC_OPCUA_CUSTOM_METHODS
-    /* Verify object exists in address space */
+#if MUC_OPCUA_METHOD_SERVER
+    /* Object must exist. §5.11: a NodeId that is well-formed but not in the address
+       space is Bad_NodeIdUnknown (Bad_NodeIdInvalid is for a malformed NodeId). */
     const mu_node_t *obj_node =
         mu_address_space_find_node(server->config.address_space, &server->user_address_space_index, object_id);
     if (obj_node == NULL) {
-        return write_call_method_result(w, MU_STATUS_BAD_NODEIDINVALID, 0, NULL, 0, NULL);
+        return write_call_method_result(w, MU_STATUS_BAD_NODEIDUNKNOWN, 0, NULL, 0, NULL);
     }
 
-    /* Verify method node exists in address space */
+    /* Method node must exist. */
     const mu_node_t *method_node =
         mu_address_space_find_node(server->config.address_space, &server->user_address_space_index, method_id);
     if (method_node == NULL) {
         return write_call_method_result(w, MU_STATUS_BAD_METHODINVALID, 0, NULL, 0, NULL);
     }
 
-    /* Lookup registered callback */
-    mu_method_callback_t callback = NULL;
+    /* Locate the registration for this method. */
+    size_t reg_index = server->registered_method_count;
     for (size_t i = 0; i < server->registered_method_count; ++i) {
         if (mu_nodeid_equal(&server->registered_methods[i].method_id, method_id)) {
-            callback = server->registered_methods[i].callback;
+            reg_index = i;
             break;
         }
     }
-
-    if (callback == NULL) {
+    if (reg_index == server->registered_method_count) {
         return write_call_method_result(w, MU_STATUS_BAD_METHODINVALID, 0, NULL, 0, NULL);
     }
 
-    /* Invoke the custom callback */
+    /* Executable attribute (OPC-10000-4 §5.11): a non-executable method is rejected. */
+    if (!server->registered_methods[reg_index].executable) {
+        return write_call_method_result(w, MU_STATUS_BAD_NOTEXECUTABLE, 0, NULL, 0, NULL);
+    }
+
+    /* Argument validation against the declared signature (§5.11.2). Skipped when
+       the method registered no input signature (input_args == NULL). */
+    const mu_argument_t *in_sig = server->registered_methods[reg_index].input_args;
+    size_t in_declared = server->registered_methods[reg_index].input_count;
+    if (in_sig != NULL) {
+        if ((size_t)arg_count < in_declared) {
+            return write_call_method_result(w, MU_STATUS_BAD_ARGUMENTSMISSING, 0, NULL, 0, NULL);
+        }
+        if ((size_t)arg_count > in_declared) {
+            return write_call_method_result(w, MU_STATUS_BAD_TOOMANYARGUMENTS, 0, NULL, 0, NULL);
+        }
+        opcua_statuscode_t in_results[MU_DISPATCH_MAX_CALL_INPUT_ARGUMENTS];
+        bool any_bad = false;
+        for (opcua_int32_t i = 0; i < arg_count; ++i) {
+            in_results[i] = validate_call_argument(&args[i], &in_sig[i]);
+            if (in_results[i] != MU_STATUS_GOOD) {
+                any_bad = true;
+            }
+        }
+        if (any_bad) {
+            return write_call_method_result(w, MU_STATUS_BAD_INVALIDARGUMENT, arg_count, in_results, 0, NULL);
+        }
+    }
+
+    /* Invoke the callback, delivering its registered context. */
     mu_variant_t output_args[8];
     size_t output_args_count = 8;
     memset(output_args, 0, sizeof(output_args));
-    opcua_statuscode_t handler_status =
-        callback(server, object_id, method_id, args, (size_t)arg_count, output_args, &output_args_count);
+    opcua_statuscode_t handler_status = server->registered_methods[reg_index].callback(
+        server, server->registered_methods[reg_index].context, object_id, method_id, args, (size_t)arg_count,
+        output_args, &output_args_count);
     if (handler_status != MU_STATUS_GOOD) {
         return write_call_method_result(w, handler_status, 0, NULL, 0, NULL);
     }

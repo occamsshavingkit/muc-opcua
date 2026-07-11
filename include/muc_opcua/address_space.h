@@ -45,11 +45,13 @@ typedef struct {
 
 struct mu_server;
 
-/* Method callback function signature (OPC-10000-4 §5.12.2) */
-typedef opcua_statuscode_t (*mu_method_callback_t)(struct mu_server *server, const mu_nodeid_t *object_id,
-                                                   const mu_nodeid_t *method_id, const mu_variant_t *input_args,
-                                                   size_t input_args_count, mu_variant_t *output_args,
-                                                   size_t *output_args_count);
+/* Method callback function signature (OPC-10000-4 §5.11 Call). `context` is the
+   opaque pointer supplied at registration, delivered to the callback so methods
+   can be stateful (spec 062 / Method Server Facet). */
+typedef opcua_statuscode_t (*mu_method_callback_t)(struct mu_server *server, void *context,
+                                                   const mu_nodeid_t *object_id, const mu_nodeid_t *method_id,
+                                                   const mu_variant_t *input_args, size_t input_args_count,
+                                                   mu_variant_t *output_args, size_t *output_args_count);
 
 typedef struct {
     mu_nodeid_t node_id;

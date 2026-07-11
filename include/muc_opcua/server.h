@@ -11,6 +11,7 @@
 #include "muc_opcua/config.h"
 #include "muc_opcua/platform.h"
 #include "muc_opcua/security.h"
+#include "muc_opcua/services/method.h"
 #include "muc_opcua/status.h"
 #ifdef MUC_OPCUA_PUBSUB
 #include "muc_opcua/pubsub.h"
@@ -140,12 +141,20 @@ void mu_server_close(mu_server_t *server);
  */
 opcua_statuscode_t mu_server_config_validate(const mu_server_config_t *config);
 
-#ifdef MUC_OPCUA_CUSTOM_METHODS
+#if MUC_OPCUA_METHOD_SERVER
 /*
- * Register a callback handler for a method node.
+ * Register a callback handler for a Method node (Method Server Facet, spec 062).
+ * `context` is delivered to the callback. The optional input/output `mu_argument_t`
+ * signature arrays (caller-owned, must outlive the server) drive per-argument
+ * validation and the browsable InputArguments/OutputArguments metadata; pass NULL/0
+ * to skip validation. `executable` sets the method's Executable attribute — a call to
+ * a non-executable method is rejected with Bad_NotExecutable (OPC-10000-4 §5.11).
  */
 opcua_statuscode_t mu_server_register_method_callback(mu_server_t *server, const mu_nodeid_t *method_id,
-                                                      mu_method_callback_t callback, void *context);
+                                                      mu_method_callback_t callback, void *context,
+                                                      const mu_argument_t *input_args, size_t input_count,
+                                                      const mu_argument_t *output_args, size_t output_count,
+                                                      opcua_boolean_t executable);
 #endif
 
 #ifdef MUC_OPCUA_EVENTS
