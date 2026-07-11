@@ -2,7 +2,14 @@
 
 This server targets the **Micro Embedded Device 2017 Server Profile**
 (`http://opcfoundation.org/UA-Profile/Server/MicroEmbeddedDevice2017`, OPC 10000-7,
-OPC Foundation profile id 1659). Per the profile definition, Micro *builds upon the
+OPC Foundation profile id 1659).
+>
+> **Strict profile (spec 067).** The `micro` build now equals exactly Nano + the
+> EmbeddedDataChangeSubscription facet + Session-Minimum-2-Parallel (`MULTIPLE_CONNECTIONS`).
+> The previously-bundled Attribute Write, Multi-chunk, and Extended NodeIds are **not**
+> mandated by MicroEmbeddedDevice2017 and are now `-D` opt-ins.
+
+Per the profile definition, Micro *builds upon the
 Nano Embedded Device Server Profile; the most important additions are support for
 subscriptions via the Embedded Data Change Subscription Server Facet and support for at
 least two sessions.*

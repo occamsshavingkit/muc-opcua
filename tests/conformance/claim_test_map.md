@@ -43,12 +43,12 @@ Backing test column: comma-separated ctest names (as registered), no `test_` typ
 | Data-change Subscriptions / MonitoredItems | OPC-10000-4 §5.13 / §5.14 | micro,embedded,full | test_subscriptions |
 | Enhanced DataChange Subscription 2017 facet minima (queue depth ≥5, items ≥500, subs ≥5, publish ≥10) | OPC-10000-7 (EnhancedDataChangeSubscription2017, id 1678) | standard,full | test_subscriptions_capacity |
 | Session General Service Behaviour: expired timeoutHint drops parked Publish (Bad_Timeout) | OPC-10000-4 §7.32 / OPC-10000-7 (Core 2017 Server Facet id 1673) | micro,embedded,full | test_base_server_behaviour |
-| ServerDiagnostics object: ServerDiagnosticsSummary (i=2275) encodes live counters | OPC-10000-5 §6.3.3 / §12.9 | standard,full | test_diagnostics |
-| Reverse Connect: server sends ReverseHello (RHE) first on a server-initiated connection | OPC-10000-6 §7.1.2.6 / §7.1.3 | standard,full | test_reverse_connect |
+| ServerDiagnostics object: ServerDiagnosticsSummary (i=2275) encodes live counters | OPC-10000-5 §6.3.3 / §12.9 | full | test_diagnostics |
+| Reverse Connect: server sends ReverseHello (RHE) first on a server-initiated connection | OPC-10000-6 §7.1.2.6 / §7.1.3 | full | test_reverse_connect |
 | Republish unavailable NotificationMessage → Bad_MessageNotAvailable | OPC-10000-4 §5.14.6.3 | micro,embedded,full | test_subscriptions |
 | SetMonitoringMode invalid MonitoredItemId | OPC-10000-4 §5.13.4 / §7.38.2 | micro,embedded,full | test_subscriptions |
 | SetPublishingMode invalid SubscriptionId | OPC-10000-4 §5.14.4 / §7.38.2 | micro,embedded,full | test_subscriptions |
-| Attribute Write service | OPC-10000-4 §5.11.4 | micro,embedded,full | test_write_service |
+| Attribute Write service | OPC-10000-4 §5.11.4 | full | test_write_service |
 | UserName identity token (auth) | OPC-10000-4 §5.7.3 / §7.37 | micro,embedded,full | test_user_auth_plaintext |
 | SecurityPolicy Basic256Sha256 asym chunk | OPC-10000-6 §6.7 / OPC-10000-7 | embedded,full | test_asym_chunk |
 | SecurityPolicy Basic256Sha256 oversized OPN → Bad_RequestTooLarge | OPC-10000-6 §6.7.2 / §7.1.5 | embedded,full | test_asym_chunk |
@@ -62,8 +62,8 @@ Backing test column: comma-separated ctest names (as registered), no `test_` typ
 | Encrypted password + ServerNonce anti-replay | OPC-10000-4 §5.6.3.2 / §7.40.2.2 | embedded,full | test_user_auth_secure_e2e |
 | Fail-closed application trust at OPN | OPC-10000-4 §5.5 / §6.1.3 | embedded,full | test_user_auth_secure_e2e |
 | ClientSignature algorithm URI must match negotiated policy | OPC-10000-4 §7.37 / OPC-10000-7 SecurityPolicy | embedded,full | test_secure_handshake_modern |
-| Aggregate subscriptions | OPC-10000-4 §7.22 / OPC-10000-13 | embedded,full | test_aggregate |
-| Alarms & Conditions / Events | OPC-10000-9 | embedded,full | test_alarms_conditions |
+| Aggregate subscriptions | OPC-10000-4 §7.22 / OPC-10000-13 | full | test_aggregate |
+| Alarms & Conditions / Events | OPC-10000-9 | full | test_alarms_conditions |
 | Historical Access (HistoryRead/Update) | OPC-10000-11 | full | test_history |
 | HistoryRead unsupported details → Bad_HistoryOperationUnsupported | OPC-10000-4 §5.11.3 / OPC-10000-11 | full | test_history |
 | Query services (QueryFirst/QueryNext) | OPC-10000-4 §5.9 | full | test_query_service |

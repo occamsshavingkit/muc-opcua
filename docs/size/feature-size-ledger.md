@@ -1,5 +1,32 @@
 # Feature Size Ledger
 
+## 2026-07-11: Spec 067 — Strict Profile Grounding
+
+Redefined `nano`/`micro`/`embedded`/`standard` to equal exactly their namesake OPC UA
+Server Profile's mandatory facet set (grounded against the OPC profile DB); `full`
+unchanged. Fixes the standard==full defect (they were feature-identical) plus grounded
+over-provisioning (extras stripped) and under-provisioning (nano/micro/embedded gained the
+mandated Base Info Server object, RegisterNodes, and UserName/Password). `standard` is now a
+strict subset of `full` (which adds 22 optional facets).
+
+**`.text`** (ARM Cortex-M0+ `-Os`, `scripts/measure_size.sh all`):
+
+| Profile | prev | now | Δ | why |
+|---------|-----:|----:|--:|-----|
+| nano | 17,956 | 22,531 | **+4,575** | strict: added BASE_NODES + USER_AUTH + REGISTER_NODES (mandated by NanoEmbeddedDevice2017) |
+| micro | 29,706 | 31,961 | +2,255 | + BASE_NODES/REGISTER_NODES; − WRITE/MULTI_CHUNK/EXTENDED_NODEIDS (not mandated) |
+| embedded | 54,972 | 51,773 | −3,199 | − EVENTS/WRITE/MULTI_CHUNK/EXTENDED_NODEIDS (not mandated by EmbeddedUA2017); + REGISTER_NODES |
+| standard | 80,175 | 52,023 | **−28,152** | − 22 optional facets (Write, History, Query, NodeMgmt, PubSub, DataAccess, Events, Diagnostics, ReverseConnect, Redundancy, Aggregate, ECC, MethodServer, MultiChunk, ExtendedNodeIds, ComplexTypes, TimeSync, Auditing, DynamicNodes, Namespaces, EventFilterWhere, CustomMethods) → now a strict StandardUA2017 |
+| full | 80,187 | 80,187 | 0 | unchanged (its feature set is untouched) |
+
+`standard` is now only ~250 B of `.text` above `embedded` — the honest strict delta is X509
++ Enhanced-DataChange capacity + the profile marker (mostly RAM/capacity, not code).
+
+**RAM** `sizeof(struct mu_server)` / `MU_SERVER_STORAGE_BYTES` (ARM): micro 27,624→19,408 /
+30,720→22,496; embedded 97,224→87,280 / 127,272→117,648; standard 1,556,784→**961,840** /
+2,218,644→**1,394,656**; nano and full unchanged. Optional facets are `-D` opt-ins on any
+profile; `full` byte- and RAM-identical to before.
+
 ## 2026-07-11: Spec 065 — Reverse Connect Facet (Project B, B6)
 
 Grounding: Reverse Connect is an OPTIONAL transport capability (OPC-10000-6 §7.1.3) but the

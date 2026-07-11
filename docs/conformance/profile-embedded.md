@@ -9,6 +9,14 @@ conformance-group claims, and OPC-10000-7 §4.3 governs profile claims. This
 document is a traceability map for the selected embedded target; the repo is not
 profile-compliant and not CTT-verified without external CTT evidence.
 
+> **Strict profile (spec 067).** As of spec 067 the `embedded` build equals *exactly* the
+> mandatory facet set of EmbeddedUA2017 (Micro + Standard DataChange 2017 + Security + Base
+> Info Type System). Features listed below that are **optional facets** — Attribute Write,
+> Events/Alarms, Historical Access, Query, Data Access, arbitrary Method Server, PubSub,
+> etc. — are **no longer enabled by default** in this profile; enable them per build with
+> `-DMUC_OPCUA_<FEATURE>=ON` (or use the `full` profile). Only the mandated built-in
+> `GetMonitoredItems`/`ResendData` methods and Standard DataChange behaviour ship by default.
+
 ## Transport and Encoding
 
 The embedded build targets OPC UA TCP over `opc.tcp` with UA Secure Conversation

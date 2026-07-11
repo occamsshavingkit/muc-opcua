@@ -74,15 +74,11 @@
 #error "MUC_OPCUA_NAMESPACES requires MUC_OPCUA_BASE_NODES"
 #endif
 
-/* Standard profile implies all mandatory standard facets. */
-#if defined(MUC_OPCUA_STANDARD_PROFILE) && MUC_OPCUA_STANDARD_PROFILE
-#if !MUC_OPCUA_DATA_ACCESS
-#error "MUC_OPCUA_STANDARD_PROFILE requires MUC_OPCUA_DATA_ACCESS"
-#endif
-#if !MUC_OPCUA_METHOD_SERVER
-#error "MUC_OPCUA_STANDARD_PROFILE requires MUC_OPCUA_METHOD_SERVER"
-#endif
-#endif
+/* The StandardUA2017 profile mandates neither the Data Access facet nor the Method
+   Server (arbitrary Call) facet -- both are optional facets an integrator opts into
+   (spec 067). The mandated built-in GetMonitoredItems/ResendData methods are served by
+   dispatch_method.c under SUBSCRIPTIONS_STANDARD + BASE_TYPE_SYSTEM, not METHOD_SERVER.
+   So there is intentionally no STANDARD_PROFILE -> DATA_ACCESS / METHOD_SERVER guard. */
 
 /* Enhanced DataChange Subscription 2017 Server Facet (OPC-10000-7, facet
    `EnhancedDataChangeSubscription2017`, profile-DB id 1678). The Standard 2017 UA
