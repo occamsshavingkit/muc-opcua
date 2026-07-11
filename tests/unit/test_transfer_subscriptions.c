@@ -250,7 +250,7 @@ void test_transfer_cross_session_succeeds(void) {
     opcua_statuscode_t service_result = 0u;
 
     prepare_server(&server);
-    server.sessions[0].user_identity_kind = 321u;         /* anonymous */
+    server.sessions[0].user_identity_kind = 1u;           /* anonymous */
     opcua_uint32_t sub_id = create_subscription(&server); /* owned by session 0 */
     add_same_user_session(&server);
 
@@ -303,13 +303,13 @@ void test_transfer_different_user_denied(void) {
     opcua_statuscode_t service_result = 0u;
 
     prepare_server(&server);
-    server.sessions[0].user_identity_kind = 324u; /* username "alice" */
+    server.sessions[0].user_identity_kind = 2u; /* username "alice" */
     server.sessions[0].user_identity_len = 5u;
     (void)memcpy(server.sessions[0].user_identity, "alice", 5u);
     opcua_uint32_t sub_id = create_subscription(&server);
     add_same_user_session(&server);
     /* Session B is a DIFFERENT user ("bob"). */
-    server.sessions[1].user_identity_kind = 324u;
+    server.sessions[1].user_identity_kind = 2u;
     server.sessions[1].user_identity_len = 3u;
     (void)memcpy(server.sessions[1].user_identity, "bob", 3u);
     server.active_session = &server.sessions[1];

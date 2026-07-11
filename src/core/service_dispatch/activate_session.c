@@ -389,8 +389,9 @@ static opcua_statuscode_t verify_and_activate_session(mu_server_t *server, const
         activate_result = mu_session_activate(slot, auth_token, token_type_numeric);
 #if MUC_OPCUA_REDUNDANCY
         if (activate_result == MU_STATUS_GOOD) {
-            /* Fingerprint the user for the TransferSubscriptions same-user check. */
-            slot->user_identity_kind = (opcua_byte_t)token_type_numeric;
+            /* Fingerprint the user for the TransferSubscriptions same-user check. Store a
+               compact identity kind (1 anonymous, 2 username, 3 x509) that fits a byte. */
+            slot->user_identity_kind = (token_type_numeric == 324u) ? 2u : (token_type_numeric == 327u) ? 3u : 1u;
             slot->user_identity_len = 0;
             const mu_bytestring_t *disc = NULL;
 #ifdef MUC_OPCUA_USER_AUTH
