@@ -75,11 +75,22 @@ foreach(_sym IN LISTS MUC_OPCUA_KCONFIG_FEATURES)
 endforeach()
 
 find_package(Python3 REQUIRED COMPONENTS Interpreter)
+
+# Base config: a user-supplied .config (e.g. saved from `menuconfig`) wins over the
+# profile defconfig, so custom edits persist across reconfigures.
+set(MUC_OPCUA_KCONFIG_CONFIG "" CACHE FILEPATH
+    "Path to a Kconfig .config to build from (overrides the profile defconfig; e.g. one saved by the menuconfig target)")
+if(MUC_OPCUA_KCONFIG_CONFIG AND EXISTS "${MUC_OPCUA_KCONFIG_CONFIG}")
+    set(_MUC_OPCUA_KCFG_BASE "${MUC_OPCUA_KCONFIG_CONFIG}")
+else()
+    set(_MUC_OPCUA_KCFG_BASE "${CMAKE_CURRENT_SOURCE_DIR}/configs/${MUC_OPCUA_PROFILE}.defconfig")
+endif()
+
 set(_MUC_OPCUA_CONFIG_CMAKE "${CMAKE_BINARY_DIR}/muc_opcua_config.cmake")
 execute_process(
     COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/scripts/kconfig/gen_config.py
             ${CMAKE_CURRENT_SOURCE_DIR}/Kconfig
-            ${CMAKE_CURRENT_SOURCE_DIR}/configs/${MUC_OPCUA_PROFILE}.defconfig
+            ${_MUC_OPCUA_KCFG_BASE}
             ${_MUC_OPCUA_CONFIG_CMAKE}
             ${CMAKE_BINARY_DIR}/muc_opcua_autoconf.h
             ${_MUC_OPCUA_KCFG_FRAG}
@@ -90,8 +101,24 @@ if(NOT _muc_opcua_kcfg_rc EQUAL 0)
 endif()
 include(${_MUC_OPCUA_CONFIG_CMAKE})
 set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
-    ${CMAKE_CURRENT_SOURCE_DIR}/Kconfig
-    ${CMAKE_CURRENT_SOURCE_DIR}/configs/${MUC_OPCUA_PROFILE}.defconfig)
+    ${CMAKE_CURRENT_SOURCE_DIR}/Kconfig ${_MUC_OPCUA_KCFG_BASE})
+
+# Dependency-aware config browsing/editing. `menuconfig` edits ${BUILD}/.config (seeded
+# from the resolved config above); reconfigure with -DMUC_OPCUA_KCONFIG_CONFIG=${BUILD}/.config
+# to apply. `savedefconfig` exports a minimal defconfig for committing under configs/.
+add_custom_target(menuconfig
+    COMMAND ${CMAKE_COMMAND} -E env CONFIG_=MUC_OPCUA_ KCONFIG_CONFIG=${CMAKE_BINARY_DIR}/.config
+            ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/scripts/kconfig/menuconfig.py
+            ${CMAKE_CURRENT_SOURCE_DIR}/Kconfig
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+    COMMENT "Editing ${CMAKE_BINARY_DIR}/.config -- reconfigure with -DMUC_OPCUA_KCONFIG_CONFIG=${CMAKE_BINARY_DIR}/.config to apply"
+    USES_TERMINAL VERBATIM)
+add_custom_target(savedefconfig
+    COMMAND ${CMAKE_COMMAND} -E env CONFIG_=MUC_OPCUA_
+            ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/scripts/kconfig/savedefconfig.py
+            ${CMAKE_CURRENT_SOURCE_DIR}/Kconfig ${CMAKE_BINARY_DIR}/.config ${CMAKE_BINARY_DIR}/defconfig
+    COMMENT "Minimal defconfig written to ${CMAKE_BINARY_DIR}/defconfig"
+    VERBATIM)
 
 # ALLOW_HEAP is derived from the profile tier (MCU tiers are strictly no-heap per the
 # constitution) -- not a Kconfig facet. option() below provides the default; force OFF
@@ -101,22 +128,10 @@ if(MUC_OPCUA_PROFILE STREQUAL "nano" OR MUC_OPCUA_PROFILE STREQUAL "micro"
     set(MUC_OPCUA_ALLOW_HEAP OFF CACHE BOOL "" FORCE)
 endif()
 
-# SecurityPolicy Basic256Sha256 support (asym/sym chunk crypto, ~10 KB code).
-# Turn OFF for a SecurityPolicy-None-only build to drop the crypto layer entirely.
-
-# ECC SecurityPolicies (spec 059): ECC-curve25519 (Ed25519 + X25519 +
-# ChaCha20-Poly1305) and ECC-nistP256 (ECDSA + P-256 + AES128-CBC/HMAC). Optional
-# at every OPC UA server profile (the "Security ECC Policy" CU is optional); this
-# implements it so the optional CU can be advertised. Requires MUC_OPCUA_SECURITY.
-
-# Optional services — turn OFF to drop a service's code from a minimal build.
-# (OpenSecureChannel / Session services are always present.)
-# The library's standard Base Information node set (Server object hierarchy,
-# ServerStatus, ServerCapabilities). Turn OFF if the integrator supplies a complete
-# address space and does not want the default nodes.
-# Data-change subscriptions (the Micro profile: Subscription + MonitoredItem service
-# sets, the Embedded Data Change Subscription Server Facet). Turn OFF for a Nano-only
-# build to drop the subscription engine and its fixed-size state entirely.
+# Feature flags (SECURITY, services, facets, subscriptions, ...) are declared in /Kconfig
+# and resolved above -- see `menuconfig` for the browsable tree with help + dependencies.
+# The remaining options below are NOT Kconfig facets: the client tier and the ALLOW_HEAP
+# memory-model knob.
 option(MUC_OPCUA_CLIENT_NANO "Build Nano Embedded UA Client Profile support" OFF)
 option(MUC_OPCUA_ALLOW_HEAP "Allow heap allocation in optional adapters/features" ON)
 # Read value cache (OPC-10000-4 5.11.2 maxAge optimization). OFF by default: the

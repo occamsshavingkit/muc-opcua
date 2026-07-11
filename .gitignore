@@ -26,3 +26,4 @@ docs/benchmarks/speed-current.json
 .opencode/command/speckit.tasks.md
 .opencode/command/speckit.plan.md
 .worktrees/
+scripts/kconfig/__pycache__/
