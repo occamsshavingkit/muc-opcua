@@ -13,6 +13,29 @@ This document is the single reference for that gating system: what
 and — the question that prompted this doc — **how to build a profile with one
 feature removed** ("standard minus encryption").
 
+> **Now Kconfig-based (2026-07).** The feature flags and their dependencies are
+> declared in **`/Kconfig`** (resolved by the vendored `kconfiglib` in
+> `scripts/kconfig/`), replacing the hand-rolled CMake `option()` / profile-block /
+> `FEATURE_DEPENDENCIES` machinery. The **user-facing contract is unchanged**:
+> `-DMUC_OPCUA_PROFILE=<tier>` selects a profile (a `configs/<tier>.defconfig`), and
+> `-DMUC_OPCUA_<FLAG>=ON/OFF` still subtracts/adds a single flag. Two things changed:
+> (1) an override that violates a dependency now **cascades** — the dependents are
+> disabled too — instead of failing with an error (Kconfig's model, see
+> [Dependencies](#dependencies-between-flags)); (2) you can browse/edit the whole tree
+> interactively:
+>
+> ```sh
+> cmake -B build -DMUC_OPCUA_PROFILE=standard   # seeds build/.config
+> cmake --build build --target menuconfig        # edit build/.config (help + deps live)
+> cmake -B build -DMUC_OPCUA_KCONFIG_CONFIG=build/.config   # apply the edits
+> cmake --build build --target savedefconfig     # export a minimal build/defconfig
+> ```
+>
+> Sections below that describe the old `MUC_OPCUA_PROFILE_CONTROLLED_OPTIONS` list and
+> the `_LAST_FORCED` override mechanism are superseded by Kconfig's native `depends on`
+> + `default y if PROFILE_X`; the *behavior* they describe (per-flag override wins over
+> the profile default) still holds.
+
 ## Quick answer: can I subtract a feature from a profile?
 
 **Yes**, as of the profile-option override mechanism added alongside this
@@ -33,15 +56,13 @@ wins over that profile's default for that one flag — everything else still
 comes from the profile. This works for **adding** a flag a profile doesn't
 default to as well as **removing** one the profile does.
 
-If you try to remove a flag something else still requires, configure fails
-loudly instead of silently building an inconsistent binary:
-
-```
-$ cmake -S . -B build/bad -DMUC_OPCUA_PROFILE=standard -DMUC_OPCUA_SECURITY=OFF
-CMake Error at CMakeLists.txt:370 (message):
-  MUC_OPCUA_ECC requires MUC_OPCUA_SECURITY (pass -DMUC_OPCUA_ECC=OFF
-  alongside your override, or also enable MUC_OPCUA_SECURITY)
-```
+If you remove a flag something else still requires, Kconfig **cascades** — the
+dependent features are turned off too, so the build stays consistent (no inconsistent
+binary, no error). E.g. `-DMUC_OPCUA_PROFILE=full -DMUC_OPCUA_BASE_NODES=OFF` also
+disables `BASE_TYPE_SYSTEM`, `DATA_ACCESS`, `NAMESPACES`, `COMPLEX_TYPES` (all
+`depends on BASE_NODES`). Use `menuconfig` to see, live, what a candidate override
+would take down with it. (The `features.h` `#error` guards remain as a compile-time
+backstop for anyone building with raw `-D`s outside this CMake path.)
 
 See [Overriding a profile default](#overriding-a-profile-default-subtraction--addition)
 for the full mechanics and more worked examples, and
@@ -60,87 +81,86 @@ which named tier you're building. It resolves to one of:
 | `embedded` | Embedded 2025 UA Server Profile | + Security (Basic256Sha256), base node set, events, multi-chunk |
 | `standard` | Standard UA Server 2017 | + all optional services/facets (History, Query, NodeManagement, PubSub, Data Access, Method Server, Auditing, Complex Types, Redundancy, full Aggregates, Reverse Connect, ECC) |
 | `full` | Not a distinct OPC UA profile | Same feature set as `standard`, larger capacity presets |
-| `custom` | You hand-pick every flag | Nothing is forced; every `option()` keeps its own bare default (mostly OFF) unless you `-D` it |
+| `custom` | You hand-pick every flag | Nothing is preset beyond the always-on core services (Read/Browse/Discovery); every feature stays OFF unless you `-D` it |
 
-Each named profile (everything except `custom`) is implemented as one block
-in `CMakeLists.txt` that forces a specific set of feature options `ON`
-(everything else in the controlled set is forced `OFF`). Profiles are
-strictly additive tiers — `standard`/`full` is a superset of `embedded`,
-which is a superset of `micro`, which is a superset of `nano` — **except**
-where the override mechanism above is used to subtract from that.
+Each named profile (everything except `custom`) is a
+`configs/<profile>.defconfig` selecting the profile choice; the resolved feature
+set falls out of the per-child `default y if PROFILE_*` presets in `/Kconfig`.
+Profiles are strictly additive tiers — `standard`/`full` is a superset of
+`embedded`, which is a superset of `micro`, which is a superset of `nano` —
+**except** where the override mechanism above is used to subtract from that.
 
 **Capacities are separate from feature gating** and are not covered by this
 doc: session/connection/subscription/array-length limits resolve through a
 default → profile → user cascade in `include/muc_opcua/capacities.h`, keyed
-off the `MUC_OPCUA_EMBEDDED_PROFILE`/`MUC_OPCUA_STANDARD_PROFILE` markers.
+off the `MUC_OPCUA_PROFILE_{MICRO,EMBEDDED,STANDARD,FULL}` choice symbols
+(the Kconfig profile tier, still emitted as compile defs).
 Override any capacity directly with `-DMU_MAX_*=<n>` regardless of profile.
 See [docs/conformance/documentation.md](conformance/documentation.md) for the
 per-profile capacity table.
 
-### The `MUC_OPCUA_PROFILE_CONTROLLED_OPTIONS` list
+### Where the flags live (Kconfig)
 
-Every flag a named profile forces is enumerated in one CMake list
-(`MUC_OPCUA_PROFILE_CONTROLLED_OPTIONS` near the top of `CMakeLists.txt`).
-Anything **not** in that list — `MUC_OPCUA_ALLOW_HEAP`,
-`MUC_OPCUA_SESSION_TIMEOUT`, `MUC_OPCUA_READ_CACHE`, the
-`MUC_OPCUA_HAVE_{MBEDTLS,WOLFSSL}` backend switches, `MUC_OPCUA_PLATFORM`,
-the `MUC_OPCUA_BUILD_*` toggles — is either always independently settable, or
-(for `MUC_OPCUA_ALLOW_HEAP` specifically) forced by nano/micro/embedded as a
-memory-model consequence of the profile, not a facet you subtract. Everything
-in the controlled list supports the override mechanism below.
+Every gated feature is now one `config` symbol in **`/Kconfig`** — its
+`bool` prompt, its `depends on` edges, its per-profile `default y if PROFILE_*`
+presets, and (increasingly) its OPC Part/§/facet-id help text. A profile is a
+`configs/<profile>.defconfig` that just sets the profile choice
+(`MUC_OPCUA_PROFILE_<X>=y`); everything else falls out of the per-child
+`default y if …` presets, so the additive nano⊆micro⊆embedded⊆standard chain is
+data in `/Kconfig` rather than five hand-maintained CMake blocks.
+
+Flags **not** in the Kconfig feature tree — `MUC_OPCUA_ALLOW_HEAP` (forced OFF
+for nano/micro/embedded in `CMakeLists.txt` as a memory-model consequence, not a
+subtractable facet), `MUC_OPCUA_HAVE_{MBEDTLS,WOLFSSL}`, `MUC_OPCUA_PLATFORM`,
+the `MUC_OPCUA_BUILD_*`/LTO/stack-usage knobs, and the CMake-driven
+`MUC_OPCUA_CLIENT_PROFILE` axis — stay plain CMake options in
+`cmake/MucOpcUaOptions.cmake`. Everything in the Kconfig tree supports the
+`-D` override mechanism below.
 
 ## Overriding a profile default (subtraction / addition)
 
 ### The mechanism
 
-Naively, "the profile forces every flag" and "a `-D` overrides the profile"
-are in tension: if the profile block always wins, your `-D` is silently
-discarded; if your `-D` always wins, a fresh `cmake -B build -DMUC_OPCUA_PROFILE=full`
-with no other flags wouldn't reliably turn *on* full's defaults on a build
-directory that happens to have stale cache entries from a previous run.
+**The profile is a base `.config`; your `-D`s are a fragment merged on top.**
+On every configure, `CMakeLists.txt`:
 
-The resolution: **a per-option `-D` on the same invocation as the profile
-choice wins for that option; anything you don't `-D` still comes from the
-profile.** Concretely:
+1. picks the base config — `configs/<profile>.defconfig` (or a
+   `-DMUC_OPCUA_KCONFIG_CONFIG=<file>` you point it at);
+2. collects any `-DMUC_OPCUA_<FLAG>=ON/OFF` you passed this invocation into a
+   `kconfig_overrides.config` fragment (it only writes a flag into the fragment
+   when the cache entry is actually present, so unspecified flags stay
+   profile-derived);
+3. runs `scripts/kconfig/gen_config.py Kconfig <base> muc_opcua_config.cmake
+   [autoconf.h] <fragment>`, which does `load_config(base)` then
+   `load_config(fragment, replace=False)`. kconfiglib resolves `depends on`,
+   applies the profile's `default y if PROFILE_*` presets, and — crucially —
+   **cascades**: an override that turns a prerequisite off drags its dependents
+   off too, so the resolved set is always internally consistent.
 
-- Every controlled option's cache entry is snapshotted **before** anything in
-  `CMakeLists.txt` touches it. On a fresh build directory, this exactly
-  captures "did the user pass `-D<OPT>=...` this invocation".
-- On a **reconfigure** of an existing build directory, mere presence in the
-  cache is not enough — a value the *previous* profile forced is *also*
-  always present, and indistinguishable from a fresh `-D` by presence alone.
-  So the snapshot instead compares the option's current value against the
-  value **this file itself last forced it to** (tracked internally per
-  option): unchanged since our own last force ⇒ still profile-controlled,
-  free to re-derive; changed since ⇒ something (a `-D`, or hand-editing the
-  cache) overrode it deliberately, and that wins. This is the "check the
-  *value*, not just whether the macro/cache-entry is defined" rule — checking
-  bare definedness gives a false positive on every reconfigure, since
-  `option()`/`set(...CACHE...)` make a variable permanently "defined" the
-  moment they first run, regardless of who chose the value.
-- Options are only re-derived at all when `MUC_OPCUA_PROFILE` itself changes
-  (including a build directory's first-ever configure). Reconfiguring the
-  *same* profile with one new `-D<OPT>=...` and nothing else is a no-op for
-  every other option — nothing in the forcing machinery runs, so your new `-D`
-  just sits in the cache.
+Because the base is re-read from the defconfig every configure and the fragment
+is rebuilt from the current `-D`s, switching profiles in an existing build dir
+re-derives cleanly (no stale flags survive) and adding one `-D` on a reconfigure
+changes exactly that flag and its dependents — no hand-rolled "last forced"
+bookkeeping needed; Kconfig's declarative resolution gives it for free.
 
-The behavioral contract this guarantees, verified by
-`scripts/test_profile_gating.sh`:
+The behavioral contract, verified by `scripts/test_profile_gating.sh`
+(21 assertions against live `cmake` configures):
 
 | Scenario | Result |
 |---|---|
-| `-DMUC_OPCUA_PROFILE=standard` alone | Every standard default, unchanged from before this mechanism existed |
-| `-DMUC_OPCUA_PROFILE=standard -DMUC_OPCUA_SECURITY=OFF -DMUC_OPCUA_ECC=OFF` | Standard minus crypto; everything else still ON |
-| `-DMUC_OPCUA_PROFILE=standard -DMUC_OPCUA_SECURITY=OFF` (ECC left implicit) | Configure fails: `MUC_OPCUA_ECC requires MUC_OPCUA_SECURITY` |
-| Reconfigure the same build dir, same profile, `-DMUC_OPCUA_AUDITING=OFF` only | Only `AUDITING` changes; everything else untouched |
+| `-DMUC_OPCUA_PROFILE=standard` alone | Every standard default, byte-identical to the pre-Kconfig build |
+| `-DMUC_OPCUA_PROFILE=standard -DMUC_OPCUA_SECURITY=OFF` | Standard minus crypto; `ECC` **cascades off** (it `depends on SECURITY`); everything else still ON |
+| `-DMUC_OPCUA_PROFILE=full -DMUC_OPCUA_BASE_NODES=OFF` | `BASE_TYPE_SYSTEM`, `DATA_ACCESS`, `NAMESPACES`, `COMPLEX_TYPES` all cascade off; no error |
+| Reconfigure the same build dir, same profile, `-DMUC_OPCUA_AUDITING=OFF` only | Only `AUDITING` (and anything depending on it) changes |
 | Reconfigure an existing `full` build dir with `-DMUC_OPCUA_PROFILE=nano` | Fully re-derives nano's defaults — no leftover `full` flags survive |
 | Switch back to `-DMUC_OPCUA_PROFILE=full` | Fully restores full's defaults |
-| `-DMUC_OPCUA_PROFILE=custom` | Nothing forced; every flag is exactly what you `-D`'d (or its bare `option()` default) |
+| `-DMUC_OPCUA_PROFILE=custom` | Nothing preset beyond the always-on core services; every flag is what you `-D`'d |
 
 Run `scripts/test_profile_gating.sh` yourself to see all of the above
 demonstrated against live `cmake` configures (it also builds one subtraction
 config and checks with `nm` that the dropped feature's symbols are genuinely
-absent from the archive, not just flagged off in the cache).
+absent from the archive, not just flagged off — e.g. `mu_sym_chunk_wrap` gone
+when `SECURITY=OFF`).
 
 ### More worked examples
 
@@ -183,54 +203,62 @@ flag name if you want to build up a custom set incrementally.
 
 ## Full flag reference
 
-### Feature / facet flags (profile-controlled — support the override mechanism above)
+### Feature / facet flags (in the Kconfig tree — support the override mechanism above)
 
-| Flag | What it builds | nano | micro | embedded | standard/full | Depends on |
-|---|---|:-:|:-:|:-:|:-:|---|
-| `MUC_OPCUA_SUBSCRIPTIONS` | Data-change subscription engine (Subscription + MonitoredItem service sets) | | ✅ | ✅ | ✅ | |
-| `MUC_OPCUA_SUBSCRIPTIONS_STANDARD` | Standard DataChange Subscription 2017 facet additions | | | ✅ | ✅ | `SUBSCRIPTIONS` |
-| `MUC_OPCUA_USER_AUTH` | Username/certificate user identity tokens | | ✅ | ✅ | ✅ | |
-| `MUC_OPCUA_SERVICE_WRITE` | Write service (Value attribute) | | ✅ | ✅ | ✅ | |
-| `MUC_OPCUA_SECURITY` | SecurityPolicy Basic256Sha256 / Aes128_Sha256_RsaOaep / Aes256_Sha256_RsaPss (asym+sym crypto, ~10 KB) | | | ✅ | ✅ | |
-| `MUC_OPCUA_ECC` | ECC SecurityPolicies `#ECC_curve25519` + `#ECC_nistP256` (optional CU, spec 059) | | | | ✅ | `SECURITY` |
-| `MUC_OPCUA_BASE_NODES` | Standard Base Information node set (Server object, ServerStatus, ServerCapabilities) | | | ✅ | ✅ | |
-| `MUC_OPCUA_BASE_TYPE_SYSTEM` | Base Info Type System node subtree | | | ✅ | ✅ | `BASE_NODES` |
-| `MUC_OPCUA_MULTIPLE_CONNECTIONS` | Multiple concurrent TCP connections / SecureChannels | | ✅ | ✅ | ✅ | |
-| `MUC_OPCUA_EVENTS` | Event notifications | | | ✅ | ✅ | `SUBSCRIPTIONS` |
-| `MUC_OPCUA_EMBEDDED_PROFILE` | Embedded 2017 profile gates + capacity minima marker | | | ✅ | ✅ | |
-| `MUC_OPCUA_SERVICE_REGISTER_NODES` | RegisterNodes/UnregisterNodes | | | | ✅ | |
-| `MUC_OPCUA_SERVICE_HISTORY` | Historical Access | | | | ✅ | |
-| `MUC_OPCUA_SERVICE_QUERY` | Query services | | | | ✅ | |
-| `MUC_OPCUA_SERVICE_NODEMANAGEMENT` | Optional NodeManagement service set | | | | ✅ | |
-| `MUC_OPCUA_DYNAMIC_NODES` | Runtime-added address-space nodes | | | | ✅ | |
-| `MUC_OPCUA_PUBSUB` | Publish/Subscribe capabilities | | | | ✅ | |
-| `MUC_OPCUA_CUSTOM_METHODS` | Arbitrary custom Call method dispatch (paired with `METHOD_SERVER`) | | | | ✅ | |
-| `MUC_OPCUA_SERVER_DIAGNOSTICS` | Server diagnostics node set | | | | ✅ | |
-| `MUC_OPCUA_MULTI_CHUNK` | Multi-chunk (continuation) message support | | ✅ | ✅ | ✅ | |
-| `MUC_OPCUA_EXTENDED_NODEIDS` | GUID / Opaque NodeId formats | | ✅ | ✅ | ✅ | |
-| `MUC_OPCUA_DATA_ACCESS` | Data Access Server Facet (deadband, EURange, AnalogItem metadata) | | | | ✅ | `BASE_NODES`; **required by** `STANDARD_PROFILE` |
-| `MUC_OPCUA_METHOD_SERVER` | Method Server Facet | | | | ✅ | **required by** `STANDARD_PROFILE` |
-| `MUC_OPCUA_EVENT_FILTER_WHERE` | EventFilter where-clause evaluation engine | | | | ✅ | `EVENTS` |
-| `MUC_OPCUA_AUDITING` | Auditing Server Facet (audit event types) | | | | ✅ | `EVENTS` |
-| `MUC_OPCUA_COMPLEX_TYPES` | ComplexType Server Facet (custom structs/enums) | | | | ✅ | `BASE_NODES` |
-| `MUC_OPCUA_REDUNDANCY` | Client Redundancy Facet (TransferSubscriptions) | | | | ✅ | `SUBSCRIPTIONS` |
-| `MUC_OPCUA_AGGREGATE_FULL` | Full 42-aggregate set (OPC-10000-13) | | | | ✅ | `SUBSCRIPTIONS_STANDARD` |
-| `MUC_OPCUA_REVERSE_CONNECT` | Reverse Connect Facet (server-initiated connections) | | | | ✅ | |
-| `MUC_OPCUA_TIME_SYNC` | Security Time Synchronization (timestamp population) | | | | ✅ | |
-| `MUC_OPCUA_NAMESPACES` | Namespaces metadata node (OPC-10000-5 §6.2.10) | | | | ✅ | `BASE_NODES` |
-| `MUC_OPCUA_STANDARD_PROFILE` | Standard 2017 profile gates + capacity minima marker | | | | ✅ | requires `DATA_ACCESS` + `METHOD_SERVER` |
+Membership below is the resolved `default y if PROFILE_*` matrix from `/Kconfig`
+(regenerate with `python3 scripts/kconfig/gen_config.py Kconfig configs/<p>.defconfig -`).
+Since **spec 067** rebased each named profile onto exactly its OPC-namesake's
+*mandatory* facet set, `standard` is much leaner than `full` — the two are no
+longer the same column. In features `embedded` and `standard` are nearly
+identical (the difference is capacity markers, driving `capacities.h`); the many
+optional facets live only in `full`.
 
-`embedded` and `standard`/`full` also each force `MUC_OPCUA_ALLOW_HEAP=OFF`
-for nano/micro/embedded — **not** in the table above because it isn't a
-profile-controlled option (see [above](#the-muc_opcua_profile_controlled_options-list)):
-it can't be individually overridden via the same mechanism, only by choosing
+| Flag | What it builds | nano | micro | embedded | standard | full | Depends on |
+|---|---|:-:|:-:|:-:|:-:|:-:|---|
+| `MUC_OPCUA_BASE_NODES` | Standard Base Information node set (Server object, ServerStatus, ServerCapabilities) | ✅ | ✅ | ✅ | ✅ | ✅ | |
+| `MUC_OPCUA_USER_AUTH` | Username/certificate user identity tokens | ✅ | ✅ | ✅ | ✅ | ✅ | |
+| `MUC_OPCUA_SERVICE_REGISTER_NODES` | RegisterNodes/UnregisterNodes | ✅ | ✅ | ✅ | ✅ | ✅ | |
+| `MUC_OPCUA_SUBSCRIPTIONS` | Data-change subscription engine (Subscription + MonitoredItem service sets) | | ✅ | ✅ | ✅ | ✅ | |
+| `MUC_OPCUA_MULTIPLE_CONNECTIONS` | Multiple concurrent TCP connections / SecureChannels | | ✅ | ✅ | ✅ | ✅ | |
+| `MUC_OPCUA_SECURITY` | SecurityPolicy Basic256Sha256 / Aes128_Sha256_RsaOaep / Aes256_Sha256_RsaPss (asym+sym crypto, ~10 KB) | | | ✅ | ✅ | ✅ | |
+| `MUC_OPCUA_BASE_TYPE_SYSTEM` | Base Info Type System node subtree | | | ✅ | ✅ | ✅ | `BASE_NODES` |
+| `MUC_OPCUA_SUBSCRIPTIONS_STANDARD` | Standard DataChange Subscription 2017 facet additions | | | ✅ | ✅ | ✅ | `SUBSCRIPTIONS` |
+| `MUC_OPCUA_STANDARD_PROFILE` | Standard 2017 capacity-minima marker (drives `capacities.h`) | | | | ✅ | ✅ | |
+| `MUC_OPCUA_SERVICE_WRITE` | Write service (Value attribute) | | | | | ✅ | |
+| `MUC_OPCUA_ECC` | ECC SecurityPolicies `#ECC_curve25519` + `#ECC_nistP256` (optional CU, spec 059) | | | | | ✅ | `SECURITY` |
+| `MUC_OPCUA_EVENTS` | Event notifications | | | | | ✅ | `SUBSCRIPTIONS` |
+| `MUC_OPCUA_MULTI_CHUNK` | Multi-chunk (continuation) message support | | | | | ✅ | |
+| `MUC_OPCUA_EXTENDED_NODEIDS` | GUID / Opaque NodeId formats | | | | | ✅ | |
+| `MUC_OPCUA_SERVICE_HISTORY` | Historical Access | | | | | ✅ | |
+| `MUC_OPCUA_SERVICE_QUERY` | Query services | | | | | ✅ | |
+| `MUC_OPCUA_SERVICE_NODEMANAGEMENT` | Optional NodeManagement service set | | | | | ✅ | |
+| `MUC_OPCUA_DYNAMIC_NODES` | Runtime-added address-space nodes | | | | | ✅ | |
+| `MUC_OPCUA_PUBSUB` | Publish/Subscribe capabilities | | | | | ✅ | |
+| `MUC_OPCUA_CUSTOM_METHODS` | Arbitrary custom Call method dispatch (paired with `METHOD_SERVER`) | | | | | ✅ | |
+| `MUC_OPCUA_SERVER_DIAGNOSTICS` | Server diagnostics node set | | | | | ✅ | |
+| `MUC_OPCUA_DATA_ACCESS` | Data Access Server Facet (deadband, EURange, AnalogItem metadata) | | | | | ✅ | `BASE_NODES` |
+| `MUC_OPCUA_METHOD_SERVER` | Method Server Facet | | | | | ✅ | |
+| `MUC_OPCUA_EVENT_FILTER_WHERE` | EventFilter where-clause evaluation engine | | | | | ✅ | `EVENTS && SUBSCRIPTIONS_STANDARD` |
+| `MUC_OPCUA_AUDITING` | Auditing Server Facet (audit event types) | | | | | ✅ | `EVENTS` |
+| `MUC_OPCUA_COMPLEX_TYPES` | ComplexType Server Facet (custom structs/enums) | | | | | ✅ | `BASE_NODES` |
+| `MUC_OPCUA_REDUNDANCY` | Client Redundancy Facet (TransferSubscriptions) | | | | | ✅ | `SUBSCRIPTIONS` |
+| `MUC_OPCUA_AGGREGATE_FULL` | Full 42-aggregate set (OPC-10000-13) | | | | | ✅ | `SUBSCRIPTIONS_STANDARD` |
+| `MUC_OPCUA_REVERSE_CONNECT` | Reverse Connect Facet (server-initiated connections) | | | | | ✅ | |
+| `MUC_OPCUA_TIME_SYNC` | Security Time Synchronization (timestamp population) | | | | | ✅ | |
+| `MUC_OPCUA_NAMESPACES` | Namespaces metadata node (OPC-10000-5 §6.2.10) | | | | | ✅ | `BASE_NODES` |
+
+`MUC_OPCUA_ALLOW_HEAP` is forced `OFF` for `nano`/`micro`/`embedded` in
+`CMakeLists.txt` as a memory-model consequence of those tiers — **not** in the
+table above because it isn't in the Kconfig feature tree
+(see [above](#where-the-flags-live-kconfig)): override it only by choosing
 `custom` or editing `CMakeLists.txt`.
 
 ### Base services (independent of `MUC_OPCUA_PROFILE`, mostly default ON)
 
-These are not in the profile-controlled list at all — they're always
-individually settable regardless of which profile you choose, because
-OpenSecureChannel/Session/Read/Browse/Discovery are close to universal:
+These are Kconfig symbols with an **unconditional `default y`** (not gated on a
+profile), because OpenSecureChannel/Session/Read/Browse/Discovery are close to
+universal — so every profile, including `custom`, gets them ON, and you subtract
+one with `-DMUC_OPCUA_SERVICE_<X>=OFF` like any other flag:
 
 | Flag | What it builds | Default |
 |---|---|:-:|
@@ -253,52 +281,52 @@ OpenSecureChannel/Session/Read/Browse/Discovery are close to universal:
 
 ## Dependencies between flags
 
-This is the same problem Kconfig (Linux, Zephyr, ESP-IDF) calls out by name:
-a preset that force-selects a feature without checking *that feature's own*
-dependencies can silently produce an inconsistent config the moment presets
-stop being all-or-nothing. Kconfig's own documented answer is to prefer
-`depends on` (fail/hide rather than silently cascade) over blind `select`;
-this project follows the same rule — **every dependency violation fails
-loudly at `cmake` configure time**, it never gets silently dropped or
-silently auto-disables the thing that requires it.
+Dependency edges now live in **one place**: `depends on` clauses in `/Kconfig`
+(the migration unified the two lists that used to drift — the CMake
+`FEATURE_DEPENDENCIES` table and the `features.h` `#error`s). Kconfig is the
+mechanism the Linux/Zephyr/ESP-IDF ecosystems use for exactly this: a symbol
+whose `depends on` is unmet cannot be `y`. So when you subtract a prerequisite,
+its dependents **cascade off** rather than erroring — the resolved config is
+always internally consistent by construction.
 
-Two enforcement layers exist (both fail loud, at different points in the
-pipeline — subtraction is what makes both load-bearing; before the override
-mechanism, the FORCE-everything-together approach made invalid combinations
-structurally unreachable):
+Two layers still cooperate, at different points in the pipeline:
 
-1. **CMake configure-time (primary)**: `MUC_OPCUA_FEATURE_DEPENDENCIES` near
-   the top of `CMakeLists.txt` is an explicit `OPTION:REQUIRES` table,
-   checked with `message(FATAL_ERROR ...)` right after every profile-controlled
-   option resolves — so a violation is caught before a single file compiles,
-   with a message that tells you exactly which extra `-D` to add. This is
-   the list in the [flag table](#feature--facet-flags-profile-controlled--support-the-override-mechanism-above)'s
-   "Depends on" column.
-2. **C preprocessor, compile-time (backstop)**: the identical set of
-   requirements is *also* an `#error` in `include/muc_opcua/features.h`,
-   included first from `muc_opcua/config.h` so every translation unit sees
-   it. This exists for anyone who bypasses this project's own CMake profile
-   logic entirely (a build system wrapping this one with raw `-D`s that
-   skips `CMakeLists.txt`'s checks) — belt and suspenders, one layer
-   deliberately redundant with the other. Keep `MUC_OPCUA_FEATURE_DEPENDENCIES`
-   and `features.h` in sync; `features.h` is the normative source if they
-   ever drift, since it's what the compiler actually enforces regardless of
-   how the build was invoked.
+1. **Kconfig resolution (primary)**: every edge is a `depends on` in `/Kconfig`
+   (e.g. `BASE_TYPE_SYSTEM depends on BASE_NODES`, `ECC depends on SECURITY`,
+   `EVENT_FILTER_WHERE depends on EVENTS && SUBSCRIPTIONS_STANDARD`). `gen_config.py`
+   resolves them at configure time; a disabled prerequisite drags its dependents
+   off. This is the "Depends on" column in the
+   [flag table](#feature--facet-flags-in-the-kconfig-tree--support-the-override-mechanism-above).
+   Use `menuconfig` to see, before you commit to an override, exactly which
+   dependents a candidate change would disable.
+2. **C preprocessor, compile-time (backstop)**: the same requirements remain as
+   `#error`s in `include/muc_opcua/features.h`, included first from
+   `muc_opcua/config.h`. This is *only* a backstop for a build that bypasses
+   this project's CMake path entirely (a wrapper feeding raw `-D`s straight to
+   the compiler, skipping `gen_config.py`) — the cascade means the normal CMake
+   path never trips it. `features.h` stays the normative statement of a
+   dependency if the two ever drift, since it's what the compiler enforces
+   regardless of how the build was invoked.
 
 None of the named profiles (`nano` through `full`) can produce an invalid
-combination on their own — every dependency above is satisfied by
-construction in each profile block. Invalid combinations only become
-reachable once you start overriding individual flags (via the mechanism in
-this doc) or via `custom`.
+combination on their own — each defconfig's presets satisfy every `depends on`.
+Cascades only come into play once you override individual flags or use `custom`.
 
 ## Verifying gating behavior
 
-- `scripts/test_profile_gating.sh` — runs the CMake-level scenarios in the
-  table [above](#the-mechanism) against live `cmake` configures and asserts
-  the resulting `CMakeCache.txt` (plus one `nm`-based check that a subtracted
-  feature's code is truly absent from the archive). Run it directly; it's
-  not wired into CTest because each scenario is a full `cmake` configure and
-  that's too slow for the unit/integration suite.
+- `scripts/test_profile_gating.sh` — runs the scenarios in the table
+  [above](#the-mechanism) against live `cmake` configures and asserts the
+  resolved feature values in the generated `muc_opcua_config.cmake` (they are no
+  longer CMake cache vars), including the dependency **cascade** (not error) and
+  an `nm`-based check that a subtracted feature's code is truly absent from the
+  archive. Run it directly; it's not wired into CTest because each scenario is a
+  full `cmake` configure and that's too slow for the unit/integration suite.
+- `scripts/kconfig/check_baseline.py` — the byte-identity acid test: asserts
+  each profile's Kconfig-resolved flag set equals the pre-migration baseline, so
+  the migration stays behavior-neutral.
+- `cmake --build <dir> --target menuconfig` — browse/edit the whole tree with
+  live dependency and help-text feedback; `--target savedefconfig` exports the
+  minimal defconfig for a config you arrived at interactively.
 - [`scripts/measure_size.sh`](../scripts/measure_size.sh) — cross-compiles
   each named profile for ARM Cortex-M0+ and reports `.text`/`.data`/`.bss`.
   Use it to size any subtraction/addition you make (e.g. confirm "standard

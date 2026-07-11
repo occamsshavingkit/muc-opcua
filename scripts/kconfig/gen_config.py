@@ -46,6 +46,9 @@ def main(argv):
 
     if autoconf_out:
         kconf.write_autoconf(autoconf_out)
+
+    # Write the resolved .config next to config.cmake so `menuconfig` can seed/edit it.
+    kconf.write_config(os.path.join(os.path.dirname(os.path.abspath(cmake_out)), ".config"))
     return 0
 
 
