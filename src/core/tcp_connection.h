@@ -24,4 +24,12 @@ opcua_statuscode_t mu_tcp_process_hello(mu_tcp_connection_t *connection, const o
 opcua_statuscode_t mu_tcp_create_error_message(opcua_statuscode_t error_code, const char *reason,
                                                opcua_byte_t *err_message, size_t *err_length);
 
+#if MUC_OPCUA_REVERSE_CONNECT
+/* Build the ReverseHello (RHE) message a server-initiated connection must send as its
+   first Message (OPC-10000-6 §7.1.3 / §7.1.2.6). Header 'RHE'+'F'+MessageSize, then body
+   ServerUri = config->application_uri and EndpointUrl = config->endpoint_url (each an OPC UA
+   String whose encoded value shall be < 4096 bytes). On success *length is the RHE size. */
+opcua_statuscode_t mu_tcp_create_reverse_hello(const mu_server_config_t *config, opcua_byte_t *buffer, size_t *length);
+#endif
+
 #endif /* MUC_OPCUA_TCP_CONNECTION_H */

@@ -98,6 +98,12 @@ opcua_statuscode_t mu_server_config_validate(const mu_server_config_t *config) {
             config->tcp_adapter.close_connection == NULL || config->tcp_adapter.shutdown == NULL) {
             return MU_STATUS_BAD_INTERNALERROR;
         }
+        /* The ReverseHello (OPC-10000-6 §7.1.2.6) carries ServerUri (the ApplicationUri)
+           and EndpointUrl; both must be configured for a conformant server-initiated
+           connection. */
+        if (config->application_uri == NULL || config->endpoint_url == NULL) {
+            return MU_STATUS_BAD_INTERNALERROR;
+        }
     } else
 #endif
         if (config->tcp_adapter.listen == NULL || config->tcp_adapter.accept == NULL ||
@@ -265,6 +271,21 @@ opcua_statuscode_t mu_server_init(void *storage, size_t storage_size, const mu_s
 #else
         server->client_handle = handle;
 #endif
+        /* OPC-10000-6 §7.1.3: the Server created the TransportConnection, so the first
+           Message it sends shall be a ReverseHello; the Client replies with a Hello. */
+        {
+            size_t rhe_len = server->config.send_buffer_size;
+            status = mu_tcp_create_reverse_hello(&server->config, server->config.send_buffer, &rhe_len);
+            if (status != MU_STATUS_GOOD) {
+                return status;
+            }
+            size_t written = 0;
+            status = server->config.tcp_adapter.write(server->config.tcp_adapter.context, handle,
+                                                      server->config.send_buffer, rhe_len, &written);
+            if (status != MU_STATUS_GOOD) {
+                return status;
+            }
+        }
     } else
 #endif
     {

@@ -1,5 +1,27 @@
 # Feature Size Ledger
 
+## 2026-07-11: Spec 065 — Reverse Connect Facet (Project B, B6)
+
+Grounding: Reverse Connect is an OPTIONAL transport capability (OPC-10000-6 §7.1.3) but the
+existing `MUC_OPCUA_REVERSE_CONNECT` was **broken** — it dispatched `connect()` but never sent
+the mandatory-first ReverseHello, so server-initiated connections never completed. FR-1/FR-2
+add the ReverseHello (RHE) encoder (`mu_tcp_create_reverse_hello`) and emit it after
+`connect()` (`init.c`) before the receive loop.
+
+**`.text`** (ARM Cortex-M0+ `-Os`, `scripts/measure_size.sh all`):
+
+| Profile | prev (post-064) | now | Δ | why |
+|---------|----------------:|----:|--:|-----|
+| nano | 17,956 | 17,956 | 0 | facet off |
+| micro | 29,706 | 29,706 | 0 | facet off |
+| embedded | 54,972 | 54,972 | 0 | facet off (REVERSE_CONNECT not enabled) |
+| standard | 79,910 | 80,175 | +265 | ReverseHello encoder + emit-on-connect |
+| full | 79,922 | 80,187 | +265 | same as standard |
+
+**Headroom:** `full` = **80,187 B** — ~50,885 B under the 128 KiB Project-B facet stopper.
+**RAM:** unchanged — the encoder writes into the existing `send_buffer`; no new struct fields.
+nano/micro/embedded byte-identical; no-heap `.data`/`.bss` invariants preserved.
+
 ## 2026-07-11: Spec 064 — Base Server Behaviour Facet (Project B, B5)
 
 Grounding showed the mandatory base-behaviour CU ("Session General Service Behaviour":

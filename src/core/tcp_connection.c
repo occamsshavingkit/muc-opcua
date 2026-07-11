@@ -168,3 +168,50 @@ opcua_statuscode_t mu_tcp_create_error_message(opcua_statuscode_t error_code, co
     *err_length = writer.position;
     return MU_STATUS_GOOD;
 }
+
+#if MUC_OPCUA_REVERSE_CONNECT
+opcua_statuscode_t mu_tcp_create_reverse_hello(const mu_server_config_t *config, opcua_byte_t *buffer, size_t *length) {
+    if (!config || !buffer || !length) {
+        return MU_STATUS_BAD_INTERNALERROR;
+    }
+    const char *server_uri = config->application_uri ? config->application_uri : "";
+    const char *endpoint = config->endpoint_url ? config->endpoint_url : "";
+    size_t server_uri_len = strlen(server_uri);
+    size_t endpoint_len = strlen(endpoint);
+    /* OPC-10000-6 §7.1.2.6: each String's encoded value shall be < 4096 bytes. */
+    if (server_uri_len >= 4096u || endpoint_len >= 4096u) {
+        return MU_STATUS_BAD_TCPMESSAGETOOLARGE;
+    }
+
+    /* Header(8) + ServerUri(4 + len) + EndpointUrl(4 + len). */
+    size_t total = 8u + 4u + server_uri_len + 4u + endpoint_len;
+    if (*length < total) {
+        return MU_STATUS_BAD_INTERNALERROR;
+    }
+
+    /* OPC-10000-6 §7.1.2.2/§7.1.2.6: fixed RHEF header + ServerUri/EndpointUrl body. */
+    buffer[0] = 'R';
+    buffer[1] = 'H';
+    buffer[2] = 'E';
+    buffer[3] = 'F';
+    mu_binary_le_put_u32(&buffer[4u], (opcua_uint32_t)total);
+
+    mu_binary_writer_t writer;
+    mu_binary_writer_init(&writer, buffer, *length);
+    writer.position = 8u;
+
+    mu_string_t s_server_uri = {(opcua_int32_t)server_uri_len, (opcua_byte_t *)server_uri};
+    mu_string_t s_endpoint = {(opcua_int32_t)endpoint_len, (opcua_byte_t *)endpoint};
+    opcua_statuscode_t status = mu_binary_write_string(&writer, &s_server_uri);
+    if (status != MU_STATUS_GOOD) {
+        return status;
+    }
+    status = mu_binary_write_string(&writer, &s_endpoint);
+    if (status != MU_STATUS_GOOD) {
+        return status;
+    }
+
+    *length = writer.position;
+    return MU_STATUS_GOOD;
+}
+#endif

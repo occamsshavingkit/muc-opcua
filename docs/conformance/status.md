@@ -125,6 +125,7 @@ conformance-unit map.
 | Enhanced DataChange Subscription 2017 facet (standard/full; mandated by StandardUA2017) | Implemented | `test_subscriptions_capacity` (`test_enhanced_*`); see `enhanced-datachange.md` |
 | Base Server Behaviour: Session General Service Behaviour (auth token · requestHandle · timeoutHint) | Implemented | `test_service_state_errors`, `test_write_response`, `test_base_server_behaviour`; see `base-server-behaviour.md` |
 | ServerDiagnostics object (optional; `ServerDiagnosticsSummary` i=2275, standard/full) | Implemented | `test_diagnostics`; see `base-server-behaviour.md` |
+| Reverse Connect (optional; server-initiated, ReverseHello first per §7.1.3, standard/full) | Implemented | `test_reverse_connect`; see `reverse-connect.md` |
 | Base Info Type System | Implemented | `test_type_system`, `test_view_services` |
 | Method Call: GetMonitoredItems / ResendData | Implemented | `test_method_call`, `test_method_call_errors` |
 | Write Service | Implemented | Optional feature via `MUC_OPCUA_SERVICE_WRITE` |
