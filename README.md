@@ -54,22 +54,27 @@ detailed below). Reproduce with `scripts/measure_size.sh all`.
 **Core `.text` (flash)** — compiled library archive (`-Os`). The linked server is
 smaller after `--gc-sections` dead-code elimination.
 
-| Profile | .text | OPC UA Profile |
+Each named profile equals **exactly** the mandatory facet set of its namesake OPC UA
+Server Profile (strict, spec 067) — optional facets are `-D` opt-ins. `full` is the only
+"everything on" build.
+
+| Profile | .text | OPC UA Profile (strict mandatory set) |
 |---------|-------|----------------|
-| nano | 17,956 B | Nano Embedded Device 2017 |
-| micro | 29,706 B | Micro Embedded Device 2017 |
-| embedded | 54,972 B | Embedded 2017 UA Server |
-| standard | 80,175 B | Standard 2017 UA Server (Enhanced DataChange + Base Server Behaviour + Reverse Connect) |
-| full | 80,187 B | — (everything on; also carries `MUC_OPCUA_ECC` + Data Access + EventFilter WhereClause + Method Server) |
+| nano | 22,531 B | Nano Embedded Device 2017 (Core: Read/Browse/Discovery/RegisterNodes + Base Info + UserName/Password) |
+| micro | 31,961 B | Micro Embedded Device 2017 (Nano + basic subscriptions + 2 parallel sessions) |
+| embedded | 51,773 B | Embedded 2017 UA Server (Micro + Standard DataChange + Security + Type System) |
+| standard | 52,023 B | Standard 2017 UA Server (Embedded + Enhanced DataChange capacity + X509) |
+| full | 80,187 B | — (everything on: Write, Events, Data Access, Method Server, History, Query, NodeManagement, PubSub, Aggregate, Diagnostics, Reverse Connect, Redundancy, ECC, …) |
 
 Built with LTO (`MUC_OPCUA_LTO=ON`, the default). The `nano`/`micro`/`embedded`
 profiles are strictly no-heap (`MUC_OPCUA_ALLOW_HEAP=OFF`): 0 B `.data`, 0 B `.bss`,
 no `malloc` in the linked server. With LTO's cross-module optimization the real
-linked `nano` server is **15,764 B** `.text` (`--gc-sections`), below the archive
-figure above. `standard`/`full` keep the heap enabled for array-valued Write/Call.
-`standard`/`full` also carry the optional ECC SecurityPolicies (spec 059, ~3.1 KB);
-see [docs/conformance/ecc-security-policy.md](docs/conformance/ecc-security-policy.md)
-and [docs/build-and-gating.md](docs/build-and-gating.md) to build without them.
+linked `nano` server is smaller after `--gc-sections`, below the archive figure above.
+`standard`/`full` keep the heap enabled for array-valued responses. The optional ECC
+SecurityPolicies (spec 059, ~3.1 KB) are `full`-only by default and available on any build
+via `-DMUC_OPCUA_ECC=ON`; see
+[docs/conformance/ecc-security-policy.md](docs/conformance/ecc-security-policy.md) and
+[docs/build-and-gating.md](docs/build-and-gating.md).
 
 The library declares **no mutable static state** — its archive has 0 B `.data`
 and 0 B `.bss` on every profile. `nano`/`micro`/`embedded` are strictly no-heap
@@ -85,9 +90,9 @@ places into your storage. Scales with the compiled capacities.
 | Profile | sizeof(struct mu_server) |
 |---------|--------------------------|
 | nano | 792 B |
-| micro | 27,624 B |
-| embedded | 97,224 B |
-| standard | 1,556,784 B |
+| micro | 19,408 B |
+| embedded | 87,280 B |
+| standard | 961,840 B |
 | full | 3,060,904 B |
 
 **Caller-provided storage** (`MU_SERVER_STORAGE_BYTES`) — the single block you hand to
@@ -99,9 +104,9 @@ standard/full storage. Retune per build with `-DMU_MAX_CONNECTIONS=n`.
 | Profile | Storage | Sessions | Connections | Subscriptions | Monitored Items | Queue depth | Publish |
 |---------|---------|----------|-------------|---------------|-----------------|-------------|---------|
 | nano | 1,408 B | 2 | 1 | — | — | 1 | — |
-| micro | 30,720 B | 2 | 2 | 2 | 8 | 1 | 4 |
-| embedded | 127,272 B | 2 | 4 | 2 | 100 | 2 | 5 |
-| standard | 2,218,644 B | 50 | 50 | 50 | 1,000 | 5 | 50 |
+| micro | 22,496 B | 2 | 2 | 2 | 8 | 1 | 4 |
+| embedded | 117,648 B | 2 | 4 | 2 | 100 | 2 | 5 |
+| standard | 1,394,656 B | 50 | 50 | 50 | 1,000 | 5 | 50 |
 | full | 4,380,844 B | 100 | 100 | 100 | 2,000 | 5 | 100 |
 
 The `standard`/`full` monitored-item queue depth is **5** (not 2): they advertise

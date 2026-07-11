@@ -5,6 +5,12 @@ This server targets the **Nano Embedded Device 2017 Server Profile**
 Per the OPC Foundation profile definition, Nano is *functionally equivalent to the
 Core 2017 Server Facet* and requires the OPC UA TCP binary transport.
 
+> **Strict profile (spec 067).** The `nano` build now equals exactly the mandatory Core 2017
+> facet set: Read/Browse/Discovery/**RegisterNodes**, the **Base Info Server object**
+> (`BASE_NODES`), and **UserName/Password** user tokens (`USER_AUTH`) — the last two were
+> previously integrator-supplied and are now built in for standalone conformance. Everything
+> else (subscriptions, security, write, …) remains a `-D` opt-in.
+
 ## The profile ladder (for orientation)
 - **Nano** = Core Server Facet + UA-TCP UA-SC UA-Binary + SecurityPolicy None + Anonymous.
 - **Micro** = Nano + subscriptions (Embedded Data Change Subscription facet) + ≥2 sessions.

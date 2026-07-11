@@ -232,12 +232,14 @@ opcua_statuscode_t read_attribute(const mu_address_space_t *address_space, const
         }
         return MU_STATUS_BAD_NOTREADABLE;
 
-#if MUC_OPCUA_METHOD_SERVER
+#if MUC_OPCUA_SUBSCRIPTIONS_STANDARD || MUC_OPCUA_METHOD_SERVER
     case MU_ATTRIBUTEID_EXECUTABLE:
     case MU_ATTRIBUTEID_USEREXECUTABLE:
-        /* Executable/UserExecutable apply only to Method nodes (OPC-10000-3 §5.7).
-           A served Method is executable; per-registration non-executability is
-           enforced at Call time (Bad_NotExecutable). Method Server Facet only. */
+        /* Executable/UserExecutable are mandatory attributes of Method nodes
+           (OPC-10000-3 §5.7). Present wherever Method nodes exist: the built-in
+           GetMonitoredItems/ResendData (SUBSCRIPTIONS_STANDARD) and any integrator
+           methods (METHOD_SERVER). Per-registration non-executability is enforced at
+           Call time (Bad_NotExecutable). */
         if (node->node_class != MU_NODECLASS_METHOD) {
             return MU_STATUS_BAD_ATTRIBUTEIDINVALID;
         }

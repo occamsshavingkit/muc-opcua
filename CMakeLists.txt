@@ -161,79 +161,59 @@ endif()
 # public -DMU_MAX_*=<n> reaches the compiler directly and overrides the profile
 # preset. Pick -DMUC_OPCUA_PROFILE=custom to hand-select features (capacities then
 # come from the standard baseline unless -D'd).
+# Named profiles are STRICT: each equals exactly the mandatory facet set of its
+# namesake OPC UA Server Profile (spec 067, grounded against the OPC profile DB).
+# Optional facets are integrator opt-ins via -DMUC_OPCUA_<FEATURE>=ON. Only `full`
+# turns everything on. Do NOT add "nice to have" extras to a named profile.
 if(MUC_OPCUA_PROFILE STREQUAL "nano")
-    # Nano: keep everything OFF (options default to OFF); default capacities apply.
-    # Embedded/MCU tier: the core makes no heap allocations (constitution). Array-
-    # valued Write/Call decoding is rejected rather than heap-allocated. Not a
-    # profile-controlled option (not subtractable) -- it is a memory-model
-    # decision derived from the profile, not a facet a user disables piecemeal.
+    # NanoEmbeddedDevice2017 = Core2017Facet + UserNamePassword + UA-TCP.
+    # SERVICE_READ/BROWSE/DISCOVERY default ON. No subscriptions/security/write.
+    muc_opcua_apply_profile_option(MUC_OPCUA_BASE_NODES ON)              # Base Info Core Structure (Server object)
+    muc_opcua_apply_profile_option(MUC_OPCUA_SERVICE_REGISTER_NODES ON) # Core: View RegisterNodes
+    muc_opcua_apply_profile_option(MUC_OPCUA_USER_AUTH ON)              # Core: UserName/Password (facet 1096)
+    # Embedded/MCU tier: the core makes no heap allocations (constitution).
     if(MUC_OPCUA_PROFILE_CHANGED)
         set(MUC_OPCUA_ALLOW_HEAP OFF CACHE BOOL "" FORCE)
     endif()
 elseif(MUC_OPCUA_PROFILE STREQUAL "micro")
-    muc_opcua_apply_profile_option(MUC_OPCUA_SUBSCRIPTIONS ON)
-    muc_opcua_apply_profile_option(MUC_OPCUA_USER_AUTH ON)
-    muc_opcua_apply_profile_option(MUC_OPCUA_SERVICE_WRITE ON)
-    muc_opcua_apply_profile_option(MUC_OPCUA_MULTI_CHUNK ON)
-    muc_opcua_apply_profile_option(MUC_OPCUA_EXTENDED_NODEIDS ON)
-    if(MUC_OPCUA_PROFILE_CHANGED)
-        set(MUC_OPCUA_ALLOW_HEAP OFF CACHE BOOL "" FORCE)
-    endif()
-    # Micro advertises >=2 concurrent sessions; two independent clients each hold
-    # their own SecureChannel/TCP connection (profile-micro.md). The conns[] array
-    # and multi-connection accept path are gated on this flag, so it must be ON for
-    # the capacities.h MU_INTERN_MAX_CONNECTIONS=2 preset to take runtime effect.
-    muc_opcua_apply_profile_option(MUC_OPCUA_MULTIPLE_CONNECTIONS ON)
-elseif(MUC_OPCUA_PROFILE STREQUAL "embedded")
-    muc_opcua_apply_profile_option(MUC_OPCUA_SUBSCRIPTIONS ON)
-    if(MUC_OPCUA_PROFILE_CHANGED)
-        set(MUC_OPCUA_ALLOW_HEAP OFF CACHE BOOL "" FORCE)
-    endif()
-    muc_opcua_apply_profile_option(MUC_OPCUA_SUBSCRIPTIONS_STANDARD ON)
-    muc_opcua_apply_profile_option(MUC_OPCUA_USER_AUTH ON)
-    muc_opcua_apply_profile_option(MUC_OPCUA_SERVICE_WRITE ON)
-    muc_opcua_apply_profile_option(MUC_OPCUA_SECURITY ON)
+    # MicroEmbeddedDevice2017 = Nano + EmbeddedDataChangeSubscription + Session Min 2 Parallel.
     muc_opcua_apply_profile_option(MUC_OPCUA_BASE_NODES ON)
-    muc_opcua_apply_profile_option(MUC_OPCUA_BASE_TYPE_SYSTEM ON)
+    muc_opcua_apply_profile_option(MUC_OPCUA_SERVICE_REGISTER_NODES ON)
+    muc_opcua_apply_profile_option(MUC_OPCUA_USER_AUTH ON)
+    muc_opcua_apply_profile_option(MUC_OPCUA_SUBSCRIPTIONS ON)          # EmbeddedDataChangeSubscription (basic)
+    muc_opcua_apply_profile_option(MUC_OPCUA_MULTIPLE_CONNECTIONS ON)   # Session Minimum 2 Parallel
+    if(MUC_OPCUA_PROFILE_CHANGED)
+        set(MUC_OPCUA_ALLOW_HEAP OFF CACHE BOOL "" FORCE)
+    endif()
+elseif(MUC_OPCUA_PROFILE STREQUAL "embedded")
+    # EmbeddedUA2017 = Micro + StandardDataChangeSubscription2017 + Security + Base Info Type System.
+    muc_opcua_apply_profile_option(MUC_OPCUA_BASE_NODES ON)
+    muc_opcua_apply_profile_option(MUC_OPCUA_SERVICE_REGISTER_NODES ON)
+    muc_opcua_apply_profile_option(MUC_OPCUA_USER_AUTH ON)
+    muc_opcua_apply_profile_option(MUC_OPCUA_SUBSCRIPTIONS ON)
+    muc_opcua_apply_profile_option(MUC_OPCUA_SUBSCRIPTIONS_STANDARD ON) # + built-in GetMonitoredItems/ResendData, deadband, triggering
     muc_opcua_apply_profile_option(MUC_OPCUA_MULTIPLE_CONNECTIONS ON)
-    muc_opcua_apply_profile_option(MUC_OPCUA_EVENTS ON)
+    muc_opcua_apply_profile_option(MUC_OPCUA_SECURITY ON)               # Security Policy Required + AppInstance cert
+    muc_opcua_apply_profile_option(MUC_OPCUA_BASE_TYPE_SYSTEM ON)       # Base Info Type System
     muc_opcua_apply_profile_option(MUC_OPCUA_EMBEDDED_PROFILE ON)
-    muc_opcua_apply_profile_option(MUC_OPCUA_MULTI_CHUNK ON)
-    muc_opcua_apply_profile_option(MUC_OPCUA_EXTENDED_NODEIDS ON)
+    if(MUC_OPCUA_PROFILE_CHANGED)
+        set(MUC_OPCUA_ALLOW_HEAP OFF CACHE BOOL "" FORCE)
+    endif()
     # Embedded 2017 capacity minima: see MU_INTERN_* embedded column in capacities.h.
 elseif(MUC_OPCUA_PROFILE STREQUAL "standard")
+    # StandardUA2017 = Embedded + EnhancedDataChangeSubscription2017 (capacity) + X509 user token.
+    # STRICT: no Write/History/Query/NodeManagement/PubSub/DataAccess/Events/Diagnostics/
+    # ReverseConnect/Redundancy/Aggregate/ECC/etc. -- those are optional facets (opt-in).
+    muc_opcua_apply_profile_option(MUC_OPCUA_BASE_NODES ON)
+    muc_opcua_apply_profile_option(MUC_OPCUA_SERVICE_REGISTER_NODES ON)
+    muc_opcua_apply_profile_option(MUC_OPCUA_USER_AUTH ON)
     muc_opcua_apply_profile_option(MUC_OPCUA_SUBSCRIPTIONS ON)
     muc_opcua_apply_profile_option(MUC_OPCUA_SUBSCRIPTIONS_STANDARD ON)
-    muc_opcua_apply_profile_option(MUC_OPCUA_USER_AUTH ON)
-    muc_opcua_apply_profile_option(MUC_OPCUA_SERVICE_WRITE ON)
-    muc_opcua_apply_profile_option(MUC_OPCUA_SECURITY ON)
-    muc_opcua_apply_profile_option(MUC_OPCUA_BASE_NODES ON)
-    muc_opcua_apply_profile_option(MUC_OPCUA_BASE_TYPE_SYSTEM ON)
     muc_opcua_apply_profile_option(MUC_OPCUA_MULTIPLE_CONNECTIONS ON)
-    muc_opcua_apply_profile_option(MUC_OPCUA_EVENTS ON)
+    muc_opcua_apply_profile_option(MUC_OPCUA_SECURITY ON)
+    muc_opcua_apply_profile_option(MUC_OPCUA_BASE_TYPE_SYSTEM ON)
     muc_opcua_apply_profile_option(MUC_OPCUA_EMBEDDED_PROFILE ON)
-    muc_opcua_apply_profile_option(MUC_OPCUA_SERVICE_REGISTER_NODES ON)
-    muc_opcua_apply_profile_option(MUC_OPCUA_SERVICE_HISTORY ON)
-    muc_opcua_apply_profile_option(MUC_OPCUA_SERVICE_QUERY ON)
-    muc_opcua_apply_profile_option(MUC_OPCUA_SERVICE_NODEMANAGEMENT ON)
-    muc_opcua_apply_profile_option(MUC_OPCUA_DYNAMIC_NODES ON)
-    muc_opcua_apply_profile_option(MUC_OPCUA_PUBSUB ON)
-    muc_opcua_apply_profile_option(MUC_OPCUA_CUSTOM_METHODS ON)
-    muc_opcua_apply_profile_option(MUC_OPCUA_SERVER_DIAGNOSTICS ON)
-    muc_opcua_apply_profile_option(MUC_OPCUA_MULTI_CHUNK ON)
-    muc_opcua_apply_profile_option(MUC_OPCUA_EXTENDED_NODEIDS ON)
-    muc_opcua_apply_profile_option(MUC_OPCUA_DATA_ACCESS ON)
-    muc_opcua_apply_profile_option(MUC_OPCUA_METHOD_SERVER ON)
-    muc_opcua_apply_profile_option(MUC_OPCUA_EVENT_FILTER_WHERE ON)
-    muc_opcua_apply_profile_option(MUC_OPCUA_AUDITING ON)
-    muc_opcua_apply_profile_option(MUC_OPCUA_COMPLEX_TYPES ON)
-    muc_opcua_apply_profile_option(MUC_OPCUA_REDUNDANCY ON)
-    muc_opcua_apply_profile_option(MUC_OPCUA_AGGREGATE_FULL ON)
-    muc_opcua_apply_profile_option(MUC_OPCUA_REVERSE_CONNECT ON)
-    muc_opcua_apply_profile_option(MUC_OPCUA_TIME_SYNC ON)
-    muc_opcua_apply_profile_option(MUC_OPCUA_NAMESPACES ON)
-    muc_opcua_apply_profile_option(MUC_OPCUA_ECC ON)
-    muc_opcua_apply_profile_option(MUC_OPCUA_STANDARD_PROFILE ON)
+    muc_opcua_apply_profile_option(MUC_OPCUA_STANDARD_PROFILE ON)       # advertises StandardUA2017; Enhanced capacity + X509
     # Standard 2017 capacity minima: see MU_INTERN_* standard column in capacities.h.
 elseif(MUC_OPCUA_PROFILE STREQUAL "full")
     # Full: superset of standard ("everything on") with generous capacities. Not a
@@ -359,8 +339,8 @@ set(MUC_OPCUA_FEATURE_DEPENDENCIES
     "MUC_OPCUA_AGGREGATE_FULL:MUC_OPCUA_SUBSCRIPTIONS_STANDARD"
     "MUC_OPCUA_REDUNDANCY:MUC_OPCUA_SUBSCRIPTIONS"
     "MUC_OPCUA_NAMESPACES:MUC_OPCUA_BASE_NODES"
-    "MUC_OPCUA_STANDARD_PROFILE:MUC_OPCUA_DATA_ACCESS"
-    "MUC_OPCUA_STANDARD_PROFILE:MUC_OPCUA_METHOD_SERVER"
+    # StandardUA2017 mandates neither Data Access nor the Method Server (arbitrary Call)
+    # facet -- both are optional opt-ins (spec 067). No STANDARD_PROFILE dependency here.
 )
 foreach(MUC_OPCUA_DEP_PAIR IN LISTS MUC_OPCUA_FEATURE_DEPENDENCIES)
     string(REPLACE ":" ";" MUC_OPCUA_DEP_PAIR_LIST "${MUC_OPCUA_DEP_PAIR}")
