@@ -345,6 +345,8 @@ opcua_statuscode_t handle_create_session(mu_server_t *server, mu_binary_reader_t
     s = initialize_create_session(server, w, &req, requested_bits, &session_id, &auth_token, &revised_bits, &slot,
                                   &session_created);
     if (s != MU_STATUS_GOOD) {
+        /* Session could not be created (capacity/validation) -> rejectedSessionCount. */
+        mu_diagnostics_session_rejected(server);
         return s;
     }
 
@@ -388,6 +390,11 @@ opcua_statuscode_t handle_create_session(mu_server_t *server, mu_binary_reader_t
     if (s != MU_STATUS_GOOD) {
         goto cleanup; /* MaxRequestMessageSize */
     }
+
+    /* Session is fully created and the response is committed (no path to cleanup below):
+       count it. Balanced by mu_diagnostics_session_closed at CloseSession / idle timeout.
+       ServerDiagnosticsSummary current/cumulatedSessionCount (OPC-10000-5 §12.9). */
+    mu_diagnostics_session_created(server);
 
     *response_length = w->position;
     return MU_STATUS_GOOD;

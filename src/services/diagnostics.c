@@ -35,6 +35,21 @@ void mu_diagnostics_session_rejected(mu_server_t *server) {
         server->diag.rejected_session_count++;
 }
 
+void mu_diagnostics_session_security_rejected(mu_server_t *server) {
+    if (server) {
+        server->diag.security_rejected_session_count++;
+        server->diag.rejected_session_count++;
+    }
+}
+
+void mu_diagnostics_request_rejected(mu_server_t *server, bool security) {
+    if (server) {
+        server->diag.rejected_requests_count++;
+        if (security)
+            server->diag.security_rejected_requests_count++;
+    }
+}
+
 void mu_diagnostics_subscription_created(mu_server_t *server) {
     if (server) {
         server->diag.cumulated_subscription_count++;

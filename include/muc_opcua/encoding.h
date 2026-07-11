@@ -80,6 +80,14 @@ opcua_statuscode_t mu_binary_skip_extension_object(mu_binary_reader_t *reader);
 opcua_statuscode_t mu_binary_read_variant(mu_binary_reader_t *reader, mu_variant_t *value);
 opcua_statuscode_t mu_binary_write_variant(mu_binary_writer_t *writer, const mu_variant_t *value);
 
+#if MUC_OPCUA_SERVER_DIAGNOSTICS
+#include "muc_opcua/services/diagnostics.h"
+/* Encode ServerDiagnosticsSummaryDataType (i=859) as an ExtensionObject
+   (Encoding DefaultBinary = ns0 i=861; OPC-10000-5 §12.9) — Base Server Behaviour facet. */
+opcua_statuscode_t mu_binary_write_server_diagnostics_summary(mu_binary_writer_t *writer,
+                                                              const mu_diagnostics_summary_t *diag);
+#endif
+
 opcua_statuscode_t mu_binary_read_datavalue(mu_binary_reader_t *reader, mu_datavalue_t *value);
 opcua_statuscode_t mu_binary_write_datavalue(mu_binary_writer_t *writer, const mu_datavalue_t *value);
 

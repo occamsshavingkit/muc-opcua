@@ -123,6 +123,8 @@ conformance-unit map.
 | Security Default ApplicationInstance Certificate | Satisfied | `test_certificate`, existing certificate handling |
 | Standard DataChange Subscription 2017 facet | Implemented | `test_subscriptions_capacity`, `test_subscriptions` |
 | Enhanced DataChange Subscription 2017 facet (standard/full; mandated by StandardUA2017) | Implemented | `test_subscriptions_capacity` (`test_enhanced_*`); see `enhanced-datachange.md` |
+| Base Server Behaviour: Session General Service Behaviour (auth token · requestHandle · timeoutHint) | Implemented | `test_service_state_errors`, `test_write_response`, `test_base_server_behaviour`; see `base-server-behaviour.md` |
+| ServerDiagnostics object (optional; `ServerDiagnosticsSummary` i=2275, standard/full) | Implemented | `test_diagnostics`; see `base-server-behaviour.md` |
 | Base Info Type System | Implemented | `test_type_system`, `test_view_services` |
 | Method Call: GetMonitoredItems / ResendData | Implemented | `test_method_call`, `test_method_call_errors` |
 | Write Service | Implemented | Optional feature via `MUC_OPCUA_SERVICE_WRITE` |

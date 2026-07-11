@@ -33,6 +33,9 @@ static opcua_statuscode_t delete_subscription_result(mu_server_t *server, opcua_
         issue_status_change_notification(server, sub, MU_STATUS_BAD_TIMEOUT);
     }
     opcua_statuscode_t s = mu_subscription_delete(&server->subs, server->active_session->session_id, subscription_id);
+    if (s == MU_STATUS_GOOD) {
+        mu_diagnostics_subscription_closed(server);
+    }
     if (mu_subscriptions_count_for_session(&server->subs, server->active_session->session_id) == 0u) {
         mu_publish_request_queue_clear(&server->subs, server->active_session->session_id);
     }
@@ -74,6 +77,7 @@ opcua_statuscode_t handle_create_subscription(mu_server_t *server, mu_binary_rea
     if (s != MU_STATUS_GOOD) {
         return s;
     }
+    mu_diagnostics_subscription_created(server);
 
     s = write_response_prefix(w, MU_ID_CREATESUBSCRIPTIONRESPONSE, req.request_handle, MU_STATUS_GOOD
 #ifdef MUC_OPCUA_TIME_SYNC

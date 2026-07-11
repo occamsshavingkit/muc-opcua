@@ -1,5 +1,32 @@
 # Feature Size Ledger
 
+## 2026-07-11: Spec 064 — Base Server Behaviour Facet (Project B, B5)
+
+Grounding showed the mandatory base-behaviour CU ("Session General Service Behaviour":
+auth-token check, requestHandle echo, timeoutHint) was already implemented — FR-1 adds
+conformance tests only. The size cost is FR-2: making the previously-dead
+`MUC_OPCUA_SERVER_DIAGNOSTICS` real — wiring the counters at session/subscription/dispatch
+sites and exposing `Server.ServerDiagnostics`(2274)/`ServerDiagnosticsSummary`(2275, live
+`ServerDiagnosticsSummaryDataType` i=861)/`EnabledFlag`(2294) with an ExtensionObject encoder.
+
+**`.text`** (ARM Cortex-M0+ `-Os`, `scripts/measure_size.sh all`):
+
+| Profile | prev (post-063) | now | Δ | why |
+|---------|----------------:|----:|--:|-----|
+| nano | 17,956 | 17,956 | 0 | facet off; hooks are no-op inline stubs |
+| micro | 29,706 | 29,706 | 0 | facet off |
+| embedded | 54,972 | 54,972 | 0 | facet off (SERVER_DIAGNOSTICS not enabled) |
+| standard | 79,107 | 79,910 | +803 | counter wiring + 3 runtime nodes + summary ExtensionObject encoder |
+| full | 79,107 | 79,922 | +815 | same as standard |
+
+**Headroom:** `full` = **79,922 B** — ~51,150 B under the 128 KiB Project-B facet stopper.
+
+**RAM** (ARM `arm-none-eabi`, `sizeof(struct mu_server)`): standard 1,556,368 → **1,556,784**
+(+416 B), full 3,060,488 → **3,060,904** (+416 B) — the added `serverViewCount` counter
+field plus the 3 ServerDiagnostics nodes/value-sources in the runtime-bound base space.
+`MU_SERVER_STORAGE_BYTES` is unchanged (existing headroom absorbs it). nano/micro/embedded
+byte- and RAM-identical; no-heap `.data`/`.bss` invariants preserved.
+
 ## 2026-07-11: Spec 063 — Enhanced DataChange Subscription 2017 Facet (Project B, B4)
 
 Grounding (OPC profile DB, facet `EnhancedDataChangeSubscription2017` id 1678) showed the

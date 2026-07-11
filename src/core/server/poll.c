@@ -229,11 +229,16 @@ static opcua_statuscode_t mu_server_poll_background(mu_server_t *server) {
                 if (now_ms > session->last_activity_ms &&
                     (now_ms - session->last_activity_ms) > session->revised_session_timeout_ms) {
                     mu_session_close_timeout(session);
+                    mu_diagnostics_session_timeout(server);
+                    mu_diagnostics_session_closed(server);
 #if MUC_OPCUA_SUBSCRIPTIONS
                     for (size_t j = 0; j < MU_INTERN_MAX_SUBSCRIPTIONS; ++j) {
                         mu_subscription_t *sub = &server->subs.subscriptions[j];
                         if (sub->in_use && sub->session_id == session->session_id) {
-                            (void)mu_subscription_delete(&server->subs, session->session_id, sub->subscription_id);
+                            if (mu_subscription_delete(&server->subs, session->session_id, sub->subscription_id) ==
+                                MU_STATUS_GOOD) {
+                                mu_diagnostics_subscription_closed(server);
+                            }
                         }
                     }
 #endif
