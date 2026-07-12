@@ -148,7 +148,7 @@ jobs:
             -not -path 'src/client/client_call*'); do
             echo "freestanding: $f"
             arm-none-eabi-gcc -ffreestanding -ffunction-sections -fdata-sections \
-              -std=c11 -Iinclude -Isrc -Wall -Wextra -Werror -DMUC_OPCUA_HAVE_OPENSSL=1 \
+              -std=c11 -Iinclude -Isrc -Wall -Wextra -Werror \
               -c "$f" -o /dev/null
           done
 
