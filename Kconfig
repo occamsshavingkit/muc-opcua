@@ -1198,64 +1198,6 @@ comment "No unique implemented Facets or CUs at this profile level"
 
 endmenu
 
-comment "Legacy compatibility symbols (C source gates)"
-
-config MUC_OPCUA_FACET_CORE_2022_SERVER
-	bool "Core 2022 Server Facet"
-	default y if MUC_OPCUA_INTERN_PROFILE_NANO_EMBEDDED_DEVICE_2025_SERVER
-	help
-	  Implementation state: deferred.
-	  OPC source: OPC-10000-7 §4.2.
-	  Notes: This Facet defines the core functionality required for any UA Server implementation. The core functionality includes the ability to discover endpoints, establish secure communication channels, create Sessions, browse the AddressSpace and read and/or write to Attributes of Nodes. The key requirements are: support for minimum one Session, support for the core AddressSpace structure, and the Server Capabilities Object, and authentication with UserName and Password. For broad applicability, it is recommended that Servers support multiple transport and security Profiles. It supersedes the Core 2017 Server Facet.
-
-config MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER
-	bool "Exposes Type System Server Facet"
-	default y if MUC_OPCUA_INTERN_PROFILE_EMBEDDED_2025_UA_SERVER
-	help
-	  Implementation state: deferred.
-	  OPC source: OPC-10000-7 §4.2.
-	  Notes: This Facet defines the ability to expose meta data in the AddressSpace, i.e. data that describe the various OPC UA Types used by the Server. Note that each Node defined in the core specification parts has ConformanceUnits defined that require the Node to be in the AddressSpace. If a Server supports such a ConformanceUnit, it shall expose the Nodes related to the ConformanceUnit in its AddressSpace.
-
-config MUC_OPCUA_FACET_STANDARD_DATACHANGE_SUBSCRIPTION_2022_SERVER
-	bool "Standard DataChange Subscription 2022 Server Facet"
-	default y if MUC_OPCUA_INTERN_PROFILE_EMBEDDED_2025_UA_SERVER
-	help
-	  Implementation state: deferred.
-	  OPC source: OPC-10000-7 §4.2.
-	  Notes: This Facet specifies the standard support of subscribing to data changes and extends features defined by the Embedded Data Change Subscription 2021 Facet. Note that the Method Call Service is only required for the Methods defined in this Facet. This Facet supersedes the Standard DataChange Subscription 2017 Server Facet.
-
-config MUC_OPCUA_FACET_GLOBAL_CERTIFICATE_MANAGEMENT_SERVER
-	bool "Global Certificate Management Server Facet"
-	default y if MUC_OPCUA_INTERN_PROFILE_EMBEDDED_2025_UA_SERVER
-	help
-	  Implementation state: deferred.
-	  OPC source: OPC-10000-7 §4.2.
-	  Notes: This Facet defines the capability to interact with a Global Certificate Management Server to obtain an initial or renewed Certificate and Trust Lists.
-
-config MUC_OPCUA_FACET_USER_TOKEN_USER_NAME_PASSWORD_SERVER
-	bool "User Token – User Name Password Server Facet"
-	default y if MUC_OPCUA_INTERN_PROFILE_EMBEDDED_2025_UA_SERVER
-	help
-	  Implementation state: deferred.
-	  OPC source: OPC-10000-7 §4.2.
-	  Notes: This Facet indicates that a user token that is comprised of a username and password is supported. This user token can affect the behaviour of the ActivateSession Service.
-
-config MUC_OPCUA_FACET_USER_TOKEN_X509_CERTIFICATE_SERVER
-	bool "User Token – X509 Certificate Server Facet"
-	default y if MUC_OPCUA_INTERN_PROFILE_STANDARD_2025_UA_SERVER
-	help
-	  Implementation state: deferred.
-	  OPC source: OPC-10000-7 §4.2.
-	  Notes: This Facet indicates that the use of an X509 certificates to identify users is supported.
-
-config MUC_OPCUA_FACET_EMBEDDED_DATACHANGE_SUBSCRIPTION_2022_SERVER
-	bool "Embedded DataChange Subscription 2022 Server Facet"
-	default y if MUC_OPCUA_INTERN_PROFILE_MICRO_EMBEDDED_DEVICE_2025_SERVER
-	help
-	  Implementation state: deferred.
-	  OPC source: OPC-10000-7 §4.2.
-	  Notes: This Facet specifies the minimum level of support for data change notifications within subscriptions. It minimizes memory and processing overhead required to implement the Facet. This Facet includes functionality to create, modify and delete Subscriptions and to add, modify and remove Monitored Items. It is recommended that Servers shall support one Subscription with up to two items for each Session. In addition, support for two parallel Publish requests is suggested. This Facet is geared for a platform such as the Nano or Micro Embedded Device Server Profiles in which memory is limited and will be managed. It supersedes the Embedded DataChange Subscription Server Facet.
-
 comment "Unimplemented OPC items (visible but not selectable)"
 
 # File Server Facet (opc_file_server_facet)

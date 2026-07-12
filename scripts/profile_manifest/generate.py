@@ -592,23 +592,24 @@ def generate_kconfig(manifest: dict) -> str:
     # These project-centric symbols (BASE_NODES, SECURITY, etc.) are emitted
     # alongside the OPC-named symbols until source migration removes them.
     # They follow the same internal-cascade default logic.
+    # Exclude facet items already shown in profile sections (facet_containment keys).
+    facet_ids = set(manifest.get("facet_containment", {}).keys()) if isinstance(
+        manifest.get("facet_containment"), dict
+    ) else set()
     selectable_flat = [
         i for i in items
         if i.get("implementation_state") in _SELECTABLE_STATES
         and i.get("kind") != "optimization"
         and i.get("id") not in contained_cus
+        and i.get("id") not in facet_ids
     ]
     if selectable_flat:
-        lines.append('comment "Legacy compatibility symbols (C source gates)"')
+        lines.append('comment "Additional selectable items"')
         lines.append("")
         for item in selectable_flat:
             _emit_selectable(lines, item, profile_symbols)
 
     # -- Unimplemented items (visible comments, not selectable) ----------
-    # Exclude facet items already shown in profile sections (facet_containment keys).
-    facet_ids = set(manifest.get("facet_containment", {}).keys()) if isinstance(
-        manifest.get("facet_containment"), dict
-    ) else set()
     unselectable_flat = [
         i for i in items
         if i.get("implementation_state") in _UNSELECTABLE_STATES
