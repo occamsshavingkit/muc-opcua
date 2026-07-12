@@ -796,17 +796,13 @@ comment "Monitor MinQueueSize_05 (NOT IMPLEMENTED) [OPC-10000-4 §5.13.2]"
 
 endif
 
-menuconfig MUC_OPCUA_FACET_SECURITY_TIME_SYNCHRONIZATION
+config MUC_OPCUA_FACET_SECURITY_TIME_SYNCHRONIZATION
 	bool "Security Time Synchronization"
 	default y if MUC_OPCUA_INTERN_PROFILE_NANO_EMBEDDED_DEVICE_2025_SERVER
 	help
 	  Implementation state: deferred.
 	  OPC source: OPC-10000-7 §4.2.
 	  Notes: This Facet defines the possible time synchronization options required for OPC UA Security.
-
-if MUC_OPCUA_FACET_SECURITY_TIME_SYNCHRONIZATION
-
-endif
 
 endmenu
 

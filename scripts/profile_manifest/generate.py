@@ -959,9 +959,19 @@ def _emit_one_facet_menu(
     )
 
     # -- Facet header -------------------------------------------------------
-    use_menuconfig = state in _SELECTABLE_STATES and facet_symbol is not None
+    has_children = any(
+        cu_item.get("implementation_state") in _SELECTABLE_STATES
+        or cu_item.get("implementation_state") in _UNSELECTABLE_STATES
+        for cu_item in contained_cu_items
+    )
+    use_menuconfig = (
+        state in _SELECTABLE_STATES and facet_symbol is not None and has_children
+    )
+    use_plain_config = (
+        state in _SELECTABLE_STATES and facet_symbol is not None and not has_children
+    )
     if use_menuconfig:
-        assert facet_symbol is not None  # narrowed by use_menuconfig
+        assert facet_symbol is not None
         if facet_symbol not in emitted_facet_symbols:
             emitted_facet_symbols.add(facet_symbol)
             lines.append("menuconfig " + facet_symbol)
@@ -973,6 +983,16 @@ def _emit_one_facet_menu(
             lines.append("")
         lines.append("if " + facet_symbol)
         lines.append("")
+    elif use_plain_config:
+        if facet_symbol not in emitted_facet_symbols:
+            emitted_facet_symbols.add(facet_symbol)
+            lines.append("config " + facet_symbol)
+            lines.append('\tbool "' + prompt + '"')
+            _emit_facet_toggle_default(
+                lines, facet_item, contained_cu_items, profile_symbols,
+            )
+            _emit_help(lines, facet_item)
+            lines.append("")
     else:
         # Unimplemented facet: no toggle symbol, keep menu/comment/endmenu
         # so the item is traceable in the generated Kconfig (its item_id and
@@ -996,7 +1016,7 @@ def _emit_one_facet_menu(
         cu_item for cu_item in contained_cu_items
         if cu_item.get("implementation_state") in _UNSELECTABLE_STATES
     ]
-    cu_facet_gate: str | None = None if use_menuconfig else facet_symbol
+    cu_facet_gate: str | None = None if (use_menuconfig or use_plain_config) else facet_symbol
     for cu_item in selectable_in_facet:
         _emit_selectable(
             lines, cu_item, profile_symbols,
@@ -1009,6 +1029,8 @@ def _emit_one_facet_menu(
     if use_menuconfig:
         lines.append("endif")
         lines.append("")
+    elif use_plain_config:
+        pass  # config with no children -- no block to close
     else:
         lines.append("endmenu")
         lines.append("")
