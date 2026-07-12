@@ -132,14 +132,14 @@ else
     echo "  PASS  publish_due absent with CU_SUBSCRIPTION_BASIC=OFF"; PASS=$((PASS + 1))
 fi
 
-echo "### 5. Independent CUs: turning off FACET_CORE_2022_SERVER does not cascade CUs off ###"
+echo "### 5. Dependency CASCADE: turning off FACET_CORE_2022_SERVER cascades CUs off (if block) ###"
 D5="$WORKDIR/g5"
 printf 'MUC_OPCUA_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES=y\n# MUC_OPCUA_FACET_CORE_2022_SERVER is not set\n' > "$WORKDIR/cascade_facet.config"
 cmake -S . -B "$D5" -DMUC_OPCUA_KCONFIG_CONFIG="$WORKDIR/cascade_facet.config" -DMUC_OPCUA_PLATFORM=host >/dev/null 2>&1
 assert_cfg "$D5" FACET_CORE_2022_SERVER OFF
-assert_cfg "$D5" CU_ATTRIBUTE_READ ON    # CUs independent of facet toggle
-assert_cfg "$D5" CU_VIEW_BASIC_TRANSLATEBROWSEPATH ON
-assert_cfg "$D5" CU_DISCOVERY_FIND_SERVERS_SELF_GET_ENDPOINTS ON
+assert_cfg "$D5" CU_ATTRIBUTE_READ OFF
+assert_cfg "$D5" CU_VIEW_BASIC_TRANSLATEBROWSEPATH OFF
+assert_cfg "$D5" CU_DISCOVERY_FIND_SERVERS_SELF_GET_ENDPOINTS OFF
 
 echo "### 5b. CU_SUBSCRIPTION_STANDARD is independent of CU_SUBSCRIPTION_BASIC ###"
 D5B="$WORKDIR/g5b"

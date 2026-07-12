@@ -194,8 +194,9 @@ def _check_generated(manifest: dict, manifest_path: str) -> list[str]:
             )
             break
 
-    # CUs and facets are independently togglable.  The facet shows a
-    # tristate indicator (all-on / all-off / partial) via its children.
+    # CUs inside ``if FACET``/``endif`` blocks depend on the facet.
+    # The ``if`` block enforces facet-off → CU-off. No per-CU
+    # ``depends on`` or ``select`` needed.
 
     # Defconfig drift check.
     for pk in _DEFAULT_PROFILES:

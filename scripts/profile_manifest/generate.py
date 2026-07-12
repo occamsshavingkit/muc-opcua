@@ -973,6 +973,8 @@ def _emit_one_facet_menu(
             )
             _emit_help(lines, facet_item)
             lines.append("")
+        lines.append("if " + facet_symbol)
+        lines.append("")
     elif use_plain_config:
         if facet_symbol not in emitted_facet_symbols:
             emitted_facet_symbols.add(facet_symbol)
@@ -1006,7 +1008,7 @@ def _emit_one_facet_menu(
         cu_item for cu_item in contained_cu_items
         if cu_item.get("implementation_state") in _UNSELECTABLE_STATES
     ]
-    cu_facet_gate: str | None = facet_symbol  # pass facet symbol for 'select' back-reference
+    cu_facet_gate: str | None = None  # if-block handles the dependency
     for cu_item in selectable_in_facet:
         _emit_selectable(
             lines, cu_item, profile_symbols,
@@ -1016,8 +1018,11 @@ def _emit_one_facet_menu(
         _emit_unselectable(lines, cu_item)
 
     # -- Close block -------------------------------------------------------
-    if use_menuconfig or use_plain_config:
-        pass  # menuconfig/config with select -- no block to close
+    if use_menuconfig:
+        lines.append("endif")
+        lines.append("")
+    elif use_plain_config:
+        pass  # config with no children -- no block to close
     else:
         lines.append("endmenu")
         lines.append("")
