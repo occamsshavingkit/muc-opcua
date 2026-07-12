@@ -15,10 +15,10 @@ remains future work.
 
 | State | Count |
 |-------|-------|
-| claimed | 31 |
+| claimed | 41 |
 | implemented | 1 |
-| deferred | 7 |
-| unimplemented | 88 |
+| deferred | 9 |
+| unimplemented | 123 |
 
 ## Item matrix
 
@@ -151,6 +151,53 @@ remains future work.
 | service_history | conformance_unit | claimed | OPC-10000-11 Historical Access Server Facet | MUC_OPCUA_CU_HISTORICAL_ACCESS_SERVER_FACET | full | test_history |
 | service_query | conformance_unit | claimed | OPC-10000-4 §5.9 Query | MUC_OPCUA_CU_QUERY | full | test_query_service |
 | service_nodemanagement | conformance_unit | claimed | OPC-10000-4 §5.7 NodeManagement | MUC_OPCUA_CU_NODEMANAGEMENT | full | test_node_management, test_node_management_errors |
+| opc_facet_2242 | facet | unimplemented | OPC-10000-7 §4.2 | — | — | — |
+| opc_facet_2322 | facet | unimplemented | OPC-10000-7 §4.2 | — | — | — |
+| opc_facet_2323 | facet | unimplemented | OPC-10000-7 §4.2 | — | — | — |
+| opc_facet_837 | facet | deferred | OPC-10000-7 §4.2 | MUC_OPCUA_FACET_UA_TCP_UA_SC_UA_BINARY | all | — |
+| opc_facet_1760 | facet | deferred | OPC-10000-7 §4.2 | MUC_OPCUA_FACET_SECURITY_TIME_SYNCHRONIZATION | all | — |
+| opc_cu_2317 | conformance_unit | unimplemented |  | — | all | — |
+| opc_cu_2328 | conformance_unit | unimplemented |  | — | all | — |
+| opc_cu_2352 | conformance_unit | unimplemented |  | — | all | — |
+| opc_cu_2389 | conformance_unit | unimplemented |  | — | all | — |
+| opc_cu_2400 | conformance_unit | unimplemented |  | — | all | — |
+| opc_cu_2407 | conformance_unit | unimplemented |  | — | all | — |
+| opc_cu_2478 | conformance_unit | unimplemented |  | — | all | — |
+| opc_cu_2479 | conformance_unit | unimplemented |  | — | all | — |
+| opc_cu_2480 | conformance_unit | unimplemented |  | — | all | — |
+| opc_cu_2786 | conformance_unit | unimplemented |  | — | all | — |
+| opc_cu_2808 | conformance_unit | unimplemented |  | — | all | — |
+| opc_cu_2823 | conformance_unit | unimplemented |  | — | embedded, standard, full | — |
+| opc_cu_2936 | conformance_unit | unimplemented |  | — | all | — |
+| opc_cu_3072 | conformance_unit | unimplemented |  | — | all | — |
+| opc_cu_3073 | conformance_unit | unimplemented |  | — | all | — |
+| opc_cu_3125 | conformance_unit | unimplemented |  | — | standard, full | — |
+| opc_cu_3143 | conformance_unit | unimplemented |  | — | micro, embedded, standard, full | — |
+| opc_cu_3147 | conformance_unit | unimplemented |  | — | all | — |
+| opc_cu_3175 | conformance_unit | unimplemented |  | — | all | — |
+| opc_cu_3192 | conformance_unit | unimplemented |  | — | all | — |
+| opc_cu_3530 | conformance_unit | unimplemented |  | — | all | — |
+| opc_cu_3534 | conformance_unit | unimplemented |  | — | embedded, standard, full | — |
+| opc_cu_3535 | conformance_unit | unimplemented |  | — | embedded, standard, full | — |
+| opc_cu_3536 | conformance_unit | unimplemented |  | — | embedded, standard, full | — |
+| opc_cu_3645 | conformance_unit | unimplemented |  | — | embedded, standard, full | — |
+| opc_cu_3727 | conformance_unit | unimplemented |  | — | micro, embedded, standard, full | — |
+| opc_cu_3802 | conformance_unit | unimplemented |  | — | all | — |
+| opc_cu_3913 | conformance_unit | unimplemented |  | — | micro, embedded, standard, full | — |
+| opc_cu_3983 | conformance_unit | unimplemented |  | — | all | — |
+| opc_cu_3985 | conformance_unit | unimplemented |  | — | all | — |
+| opc_cu_5505 | conformance_unit | unimplemented |  | — | all | — |
+| opc_cu_5793 | conformance_unit | unimplemented |  | — | all | — |
+| opc_cu_protocol_ua_tcp | conformance_unit | claimed | OPC-10000-6 §7.1 | MUC_OPCUA_CU_PROTOCOL_UA_TCP | all | test_tcp_connection |
+| opc_cu_ua_binary_encoding | conformance_unit | claimed | OPC-10000-6 §5 | MUC_OPCUA_CU_UA_BINARY_ENCODING | all | test_binary_primitives, test_binary_nodeid |
+| opc_cu_ua_secure_conversation | conformance_unit | claimed | OPC-10000-6 §6 | MUC_OPCUA_CU_UA_SECURE_CONVERSATION | all | test_secure_channel |
+| opc_cu_address_space_base | conformance_unit | claimed | OPC-10000-3 §4 | MUC_OPCUA_CU_ADDRESS_SPACE_BASE | all | test_address_space_validation, test_base_server_behaviour |
+| opc_cu_session_base | conformance_unit | claimed | OPC-10000-4 §5.6 | MUC_OPCUA_CU_SESSION_BASE | all | test_session, test_session_auth |
+| opc_cu_core_structure_2 | conformance_unit | claimed | OPC-10000-3 §4 | MUC_OPCUA_CU_CORE_STRUCTURE_2 | all | test_base_server_behaviour |
+| opc_cu_core_views_folder | conformance_unit | claimed | OPC-10000-3 §4 | MUC_OPCUA_CU_CORE_VIEWS_FOLDER | all | test_browse_service, test_view_services |
+| opc_cu_server_capabilities_2 | conformance_unit | claimed | OPC-10000-3 §4 | MUC_OPCUA_CU_SERVER_CAPABILITIES_2 | all | test_base_server_behaviour |
+| opc_cu_session_general_service | conformance_unit | claimed | OPC-10000-4 §5.6 | MUC_OPCUA_CU_SESSION_GENERAL_SERVICE | all | test_dispatch_session_order, test_base_server_behaviour |
+| opc_cu_namespace_metadata | conformance_unit | claimed | OPC-10000-3 §4 | MUC_OPCUA_CU_NAMESPACE_METADATA | all | test_base_server_behaviour, test_read_browsename_namespace |
 
 ## Capacities
 

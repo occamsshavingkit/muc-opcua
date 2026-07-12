@@ -50,3 +50,13 @@ Backing test column: comma-separated ctest names (as registered).
 | Historical Access Server Facet | OPC-10000-11 | full | test_history |
 | Query | OPC-10000-4 §5.9 | full | test_query_service |
 | NodeManagement | OPC-10000-4 §5.7 | full | test_node_management, test_node_management_errors |
+| Protocol UA TCP | OPC-10000-6 §7.1 | all | test_tcp_connection |
+| UA Binary Encoding | OPC-10000-6 §5 | all | test_binary_primitives, test_binary_nodeid |
+| UA Secure Conversation | OPC-10000-6 §6 | all | test_secure_channel |
+| Address Space Base | OPC-10000-3 §4 | all | test_address_space_validation, test_base_server_behaviour |
+| Session Base | OPC-10000-4 §5.6 | all | test_session, test_session_auth |
+| Base Info Core Structure 2 | OPC-10000-3 §4 | all | test_base_server_behaviour |
+| Base Info Core Views Folder | OPC-10000-3 §4 | all | test_browse_service, test_view_services |
+| Base Info Server Capabilities 2 | OPC-10000-3 §4 | all | test_base_server_behaviour |
+| Session General Service Behaviour | OPC-10000-4 §5.6 | all | test_dispatch_session_order, test_base_server_behaviour |
+| Base Info Namespace Metadata | OPC-10000-3 §4 | all | test_base_server_behaviour, test_read_browsename_namespace |

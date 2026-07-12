@@ -9,6 +9,7 @@
 """
 
 import json
+import os
 import sys
 
 _DEFAULT_PROFILES = ("nano", "micro", "embedded", "standard", "full", "custom")
@@ -26,6 +27,50 @@ def save_json(path, data):
         text += "\n"
     with open(path, "w", encoding="utf-8") as fh:
         fh.write(text)
+
+
+_RAW_CATALOG_PATH = "profiles/opcua-1.05-api/profile-catalog.pg171.json"
+
+
+def _load_raw_catalog_rows():
+    """Return raw OPC API profile catalog rows keyed by id (as str).
+
+    The normalized snapshot only captures Server Facet records (URIs with
+    ``Facet`` in them). Transport and security profiles such as
+    id 837 (``UA-TCP UA-SC UA-Binary``) and id 1760
+    (``Security Time Synchronization``) are required sub-profiles for the
+    Nano 2025 profile but are filtered out during normalization because
+    their URIs live under ``/Transport/`` and ``/Security/`` rather than
+    ``/Server/``. The raw catalog at
+    ``profiles/opcua-1.05-api/profile-catalog.pg171.json`` has the full
+    profile list (loaded as ``{"result": [...]}``) and is the
+    authoritative source for these rows. This helper exposes them in the
+    same shape as normalized snapshot rows so the rest of the realign
+    pipeline can consume them transparently.
+    """
+    if not os.path.isfile(_RAW_CATALOG_PATH):
+        return {}
+    with open(_RAW_CATALOG_PATH, "r", encoding="utf-8") as fh:
+        payload = json.load(fh)
+    rows = {}
+    for entry in payload.get("result", []) or []:
+        rid = entry.get("id")
+        if rid is None:
+            continue
+        rows[str(rid)] = {
+            "opc_id": rid,
+            "name": entry.get("name"),
+            "display_name": entry.get("name"),
+            "opc_profile_uri": entry.get("profileUri"),
+            "release_status": entry.get("releaseStatus"),
+            "description": entry.get("description") or "",
+            "source_metadata": {
+                "profile_group_id": entry.get("profileGroupId"),
+                "source_endpoint": "profile/?pg=171&all=1",
+                "imported_from_raw_catalog": True,
+            },
+        }
+    return rows
 
 
 def main():
@@ -71,13 +116,21 @@ def main():
                 defaults[pk] = True
         return defaults
 
-    # Build lookup of all snapshot items by opc_id
+    # Build lookup of all snapshot items by opc_id. The normalized snapshot
+    # filters out non-Facet server records, so transport/security sub-profiles
+    # required by Nano 2025 (e.g. id 837 "UA-TCP UA-SC UA-Binary" and
+    # id 1760 "Security Time Synchronization") are missing. Augment with the
+    # raw catalog rows for any id not already covered so the realignment can
+    # populate their name/URI/description and import them as facets.
     all_snapshot_items = {}
     for source in ("profiles", "facets", "conformance_units"):
         for row in snapshot.get(source, []):
             oid = row.get("opc_id")
             if oid is not None:
                 all_snapshot_items[str(oid)] = row
+    for rid, row in _load_raw_catalog_rows().items():
+        if rid not in all_snapshot_items:
+            all_snapshot_items[rid] = row
 
     items = list(manifest.get("items", []))
     existing_ids = {item.get("id") for item in items if isinstance(item.get("id"), str)}
@@ -174,6 +227,13 @@ def main():
         cus_added += 1
 
     # --- Rebuild facet_containment for ALL facets ---
+    # Preserve project-level friendly-name CU assignments (items whose id is
+    # not of the form ``opc_cu_<numeric>``) from the existing manifest --
+    # these are hand-curated mappings (e.g. ``service_read``,
+    # ``opc_cu_subscription_basic``) that are not derivable from OPC API
+    # relationship data. Only the ``opc_cu_<numeric>`` assignments are
+    # re-derived from the OPC included_conformance_units relationships.
+    existing_facet_containment = manifest.get("facet_containment") or {}
     facet_containment = {}
     for fid in sorted(facet_lowest_profile.keys(), key=int):
         facet_item_id = "opc_facet_" + fid
@@ -186,6 +246,15 @@ def main():
             if cu_item_id in existing_ids and cu_to_parent.get(str(cid)) == fid:
                 if cu_item_id not in contained:
                     contained.append(cu_item_id)
+        # Merge in preserved friendly-name CU assignments for this facet.
+        # Only non-``opc_cu_<numeric>`` ids are preserved: numeric ids are
+        # fully re-derived from OPC relationship data above, so a stale
+        # numeric assignment is dropped when the OPC hierarchy changes.
+        for cu_item_id in existing_facet_containment.get(facet_item_id, []):
+            if cu_item_id.startswith("opc_cu_") and cu_item_id[7:].isdigit():
+                continue  # numeric ids are authoritative from OPC data
+            if cu_item_id not in contained and cu_item_id in existing_ids:
+                contained.append(cu_item_id)
         if contained:
             contained.sort()
         facet_containment[facet_item_id] = contained

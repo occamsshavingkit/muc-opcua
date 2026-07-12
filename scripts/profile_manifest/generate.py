@@ -899,16 +899,34 @@ def _emit_one_facet_menu(
             )
             _emit_help(lines, facet_item)
             lines.append("")
+    elif state in _UNSELECTABLE_STATES:
+        # Unimplemented facet: emit a NOT IMPLEMENTED comment for the facet
+        # itself so the item is traceable in the generated Kconfig (its
+        # item_id and state are visible) even when the facet has zero
+        # contained CUs. The validator expects every unimplemented OPC
+        # item to surface as a comment directive (OPC-10000-7 §4.2).
+        _emit_unselectable(lines, facet_item)
 
-    for cu_item in contained_cu_items:
-        cu_state = cu_item.get("implementation_state")
-        if cu_state in _SELECTABLE_STATES:
-            _emit_selectable(
-                lines, cu_item, profile_symbols,
-                facet_symbol=facet_symbol,
-            )
-        elif cu_state in _UNSELECTABLE_STATES:
-            _emit_unselectable(lines, cu_item)
+    # Emit selectable (claimed/implemented/deferred) CUs FIRST so the working
+    # toggles lead the facet menu, then emit unselectable (unimplemented) CUs
+    # as trailing NOT IMPLEMENTED comments. This keeps the actionable surface
+    # at the top of each ``menu "Facet: ..."`` block and pushes the roadmap
+    # noise to the end (Fix 3: unimplemented at END of facet menus).
+    selectable_in_facet = [
+        cu_item for cu_item in contained_cu_items
+        if cu_item.get("implementation_state") in _SELECTABLE_STATES
+    ]
+    unselectable_in_facet = [
+        cu_item for cu_item in contained_cu_items
+        if cu_item.get("implementation_state") in _UNSELECTABLE_STATES
+    ]
+    for cu_item in selectable_in_facet:
+        _emit_selectable(
+            lines, cu_item, profile_symbols,
+            facet_symbol=facet_symbol,
+        )
+    for cu_item in unselectable_in_facet:
+        _emit_unselectable(lines, cu_item)
 
     lines.append("endmenu")
     lines.append("")
