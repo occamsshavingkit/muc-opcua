@@ -9,7 +9,7 @@ static opcua_byte_t rx_buffer[1024];
 static opcua_byte_t tx_buffer[1024];
 
 void setUp(void) {
-#ifdef MUC_OPCUA_FACET_CORE_2022_SERVER
+#ifdef MUC_OPCUA_SERVICE_ALARMS_CONDITIONS
     fake_platform_init();
 
     mu_server_config_t config = {.endpoint_url = "opc.tcp://localhost:4840",
@@ -27,7 +27,7 @@ void setUp(void) {
 
 void tearDown(void) {}
 
-#ifdef MUC_OPCUA_FACET_CORE_2022_SERVER
+#ifdef MUC_OPCUA_SERVICE_ALARMS_CONDITIONS
 
 void test_mu_alarms_set_active_triggers_event(void) {
     mu_condition_id_t alarm_id;
@@ -92,11 +92,11 @@ void test_mu_alarms_dialog_respond_method(void) {
     TEST_ASSERT_EQUAL(1, server.conditions[1].expected_response);
 }
 
-#endif /* MUC_OPCUA_FACET_CORE_2022_SERVER */
+#endif /* MUC_OPCUA_SERVICE_ALARMS_CONDITIONS */
 
 int main(void) {
     UNITY_BEGIN();
-#ifdef MUC_OPCUA_FACET_CORE_2022_SERVER
+#ifdef MUC_OPCUA_SERVICE_ALARMS_CONDITIONS
     RUN_TEST(test_mu_alarms_set_active_triggers_event);
     RUN_TEST(test_mu_alarms_acknowledge_method_call);
     RUN_TEST(test_mu_alarms_trigger_dialog);
