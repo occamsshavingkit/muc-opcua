@@ -2,3 +2,4 @@
 #ifdef MUC_OPCUA_CU_SUBSCRIPTION_PUBLISHREQUEST_QUEUE_OVERFLOW
 #error "This CU is not yet implemented"
 #endif
+static int _stub_unused = 0;

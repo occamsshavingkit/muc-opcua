@@ -2,3 +2,4 @@
 #ifdef MUC_OPCUA_CU_SECURITY_ROLE_SERVER_AUTHORIZATION
 #error "This CU is not yet implemented"
 #endif
+static int _stub_unused = 0;
