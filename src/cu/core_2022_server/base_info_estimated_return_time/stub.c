@@ -2,4 +2,4 @@
 #ifdef MUC_OPCUA_CU_BASE_INFO_ESTIMATED_RETURN_TIME
 #error "This CU is not yet implemented"
 #endif
-static int _stub_unused = 0;
+typedef int _stub_type;

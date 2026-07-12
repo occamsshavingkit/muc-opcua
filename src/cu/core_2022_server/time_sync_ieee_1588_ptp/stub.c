@@ -2,4 +2,4 @@
 #ifdef MUC_OPCUA_CU_TIME_SYNC_IEEE_1588_PTP
 #error "This CU is not yet implemented"
 #endif
-static int _stub_unused = 0;
+typedef int _stub_type;
