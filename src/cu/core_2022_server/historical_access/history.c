@@ -7,8 +7,8 @@
 #include "muc_opcua/encoding.h"
 #include "muc_opcua/services/history.h"
 
-#include "services/history.h"
 #include "muc_opcua/opcua_ids.h"
+#include "services/history.h"
 #include <string.h>
 
 static opcua_statuscode_t mu_history_read_store_continuation_point(mu_history_read_value_id_t *node,

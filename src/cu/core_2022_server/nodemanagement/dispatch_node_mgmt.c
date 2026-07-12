@@ -4,11 +4,11 @@
  * DeleteNodes (5.8.4), and DeleteReferences (5.8.5). These handlers compile
  * under MUC_OPCUA_CU_NODEMANAGEMENT; the dispatch table in
  * service_dispatch.c references them by name. */
-#include "services/node_management.h"
-#include "services/service_header.h"
-#include "muc_opcua/encoding.h"
 #include "core/server_internal.h"
 #include "core/service_dispatch.h"
+#include "muc_opcua/encoding.h"
+#include "services/node_management.h"
+#include "services/service_header.h"
 #include <stddef.h>
 #include <string.h>
 

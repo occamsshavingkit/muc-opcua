@@ -11,13 +11,13 @@
  * underlying condition is reproduced verbatim here; the tasks.md token
  * "MUC_OPCUA_METHOD_CALL" is not defined anywhere in the codebase, so using
  * it would silently exclude the handler and break the dispatch table. */
-#include "services/service_header.h"
-#include "services/subscription.h"
+#include "core/server_internal.h"
+#include "core/service_dispatch.h"
 #include "muc_opcua/address_space.h"
 #include "muc_opcua/encoding.h"
 #include "muc_opcua/services/method.h"
-#include "core/server_internal.h"
-#include "core/service_dispatch.h"
+#include "services/service_header.h"
+#include "services/subscription.h"
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
@@ -362,4 +362,5 @@ opcua_statuscode_t handle_call(mu_server_t *server, mu_binary_reader_t *r, mu_bi
     return MU_STATUS_GOOD;
 }
 
-#endif /* MUC_OPCUA_CU_SUBSCRIPTION_BASIC && MUC_OPCUA_CU_SUBSCRIPTION_STANDARD && MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER */
+#endif /* MUC_OPCUA_CU_SUBSCRIPTION_BASIC && MUC_OPCUA_CU_SUBSCRIPTION_STANDARD &&                                     \
+          MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER */

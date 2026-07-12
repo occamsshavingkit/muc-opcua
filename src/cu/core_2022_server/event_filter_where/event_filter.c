@@ -14,8 +14,8 @@
 
 #if MUC_OPCUA_CU_EVENT_FILTER_WHERE
 
-#include "services/event_filter.h"
 #include "muc_opcua/address_space.h" /* mu_nodeid_equal */
+#include "services/event_filter.h"
 #include <stdbool.h>
 #include <string.h>
 
