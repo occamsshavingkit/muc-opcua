@@ -1,6 +1,6 @@
 # OPC Latest Active Profile Migration Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking. Worker agents must not commit in this dirty worktree; the controller owns verification and commits with explicit pathspecs.
 
 **Goal:** Migrate the canonical OPC profile manifest from 2017-era seed data to the latest active OPC UA 1.05 server profile surface, using active 2025 named profiles and keeping superseded 2022 profiles non-canonical.
 
@@ -19,8 +19,44 @@
 - Profile selection remains a default preset only; it must not hide unrelated Profile/Facet/CU menus.
 - Generated `.config`, `muc_opcua_config.cmake`, and `autoconf.h` must expose selected 2025 profile/facet/CU/capacity symbols.
 - Validation must include `validate.py --all`, `test_profile_gating.sh`, standard/full CTest, and `git diff --check`.
+- CLI modes must be mutually exclusive: `--dry-run`, `--write`, `--write-normalized-snapshot PATH`, and `--fetch-relationships`. Write/fetch modes must not be combined with `--dry-run`.
+- Raw API ignore policy must be checked before any task fetches or writes ignored raw API files.
 
 ---
+
+## Execution Amendment
+
+The current branch has extensive staged and unstaged feature work. To avoid mixing unrelated work into task commits, implementer subagents must not run `git add` or `git commit`. Treat each task's commit step as a controller-only checkpoint: the controller reviews status, stages explicit pathspecs, and commits only intended migration files when safe.
+
+## Task 0: Establish Baseline and Ignore Guard
+
+**Files:**
+- Read: `.gitignore`
+- Read: `git status --short`
+
+**Interfaces:**
+- Consumes: existing `.gitignore` raw API ignore rule.
+- Produces: verified raw API ignore guard before relationship fetch tasks.
+
+- [ ] **Step 1: Record worktree state**
+
+Run: `git status --short`
+
+Expected: dirty worktree is visible and no worker-owned commit is attempted.
+
+- [ ] **Step 2: Verify raw API path is ignored**
+
+Run:
+
+```bash
+git check-ignore -v profiles/opcua-1.05-api/relationships/includedprofiles-2269.json
+```
+
+Expected: output references `.gitignore` entry `profiles/opcua-1.05-api/`.
+
+- [ ] **Step 3: Apply no-worker-commit mode**
+
+For every later task, skip task-local `git add` and `git commit` commands inside subagents. The controller will perform explicit pathspec commits after reviews.
 
 ## File Structure
 
@@ -46,12 +82,21 @@
   - `_is_server_record(record: dict) -> bool`
   - `_select_canonical_server_profiles(records: list[dict]) -> dict[str, dict]`
 
+**OPC grounding:** OPC-10000-7 §4.3 defines Profiles as named aggregations; §4.7 defines year-based profile versioning. OPC API `releaseStatus` is OPC Foundation API metadata, not a normative OPC UA section.
+
 - [ ] **Step 1: Write the failing tests**
 
 Create `scripts/profile_manifest/test_import_opc_profiles.py` with this content:
 
 ```python
+import os
+import sys
 import unittest
+
+_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+_SCRIPTS = os.path.join(_ROOT, "scripts")
+if _SCRIPTS not in sys.path:
+    sys.path.insert(0, _SCRIPTS)
 
 from profile_manifest import import_opc_profiles as importer
 
@@ -181,20 +226,32 @@ def _is_server_record(record: dict) -> bool:
 
 def _select_canonical_server_profiles(records: list[dict]) -> dict[str, dict]:
     patterns = {
-        "nano": "Nano Embedded Device 2025 Server Profile",
-        "micro": "Micro Embedded Device 2025 Server Profile",
-        "embedded": "Embedded 2025 UA Server Profile",
-        "standard": "Standard 2025 UA Server Profile",
+        "nano": (2266, "Nano Embedded Device 2025 Server Profile"),
+        "micro": (2267, "Micro Embedded Device 2025 Server Profile"),
+        "embedded": (2268, "Embedded 2025 UA Server Profile"),
+        "standard": (2269, "Standard 2025 UA Server Profile"),
     }
     selected: dict[str, dict] = {}
     active_server_records = [
         r for r in records
         if _is_server_record(r) and r.get("releaseStatus") == 3
     ]
-    for key, name in patterns.items():
-        match = next((r for r in active_server_records if r.get("name") == name), None)
+    for key, (expected_id, name) in patterns.items():
+        match = next(
+            (
+                r for r in active_server_records
+                if r.get("id") == expected_id and r.get("name") == name
+            ),
+            None,
+        )
         if match is None:
-            raise ValueError("missing active canonical server profile: " + name)
+            raise ValueError(
+                "missing active canonical server profile: "
+                + name
+                + " (id "
+                + str(expected_id)
+                + ")"
+            )
         selected[key] = match
     return selected
 ```
@@ -207,11 +264,10 @@ Expected: all tests pass.
 
 - [ ] **Step 5: Commit**
 
-Commit only these two files:
+Controller checkpoint only. Worker agents must not run this command. The controller may stage only these two files after review:
 
 ```bash
 git add scripts/profile_manifest/import_opc_profiles.py scripts/profile_manifest/test_import_opc_profiles.py
-git commit -m "test(opc): Add active profile importer tests"
 ```
 
 ## Task 2: Normalize API Catalog and Relationship Data
@@ -219,13 +275,14 @@ git commit -m "test(opc): Add active profile importer tests"
 **Files:**
 - Modify: `scripts/profile_manifest/import_opc_profiles.py`
 - Modify: `scripts/profile_manifest/test_import_opc_profiles.py`
-- Create: `profiles/opcua-profile-normalized-snapshot.json`
 
 **Interfaces:**
 - Consumes: `_select_canonical_server_profiles(records: list[dict]) -> dict[str, dict]`
 - Produces:
   - `_normalize_api_snapshot(profile_rows: list[dict], cu_rows: list[dict], included_profiles: dict[str, list[dict]], included_cus: dict[str, list[dict]]) -> dict`
-  - JSON object with keys `metadata`, `canonical_profiles`, `profiles`, `conformance_units`, and `relationships`.
+  - JSON object with keys `metadata`, `canonical_profiles`, `profiles`, `facets`, `superseded_profiles`, `conformance_units`, `relationships`, and `minimum_profile_defaults`.
+
+**OPC grounding:** OPC-10000-7 §4.2 defines ConformanceUnits as Profile building blocks; §4.3 states Profiles aggregate ConformanceUnits and other Profiles; §4.5 states included Profiles are mandatory for conformance.
 
 - [ ] **Step 1: Add failing normalization test**
 
@@ -285,6 +342,9 @@ Append this test method to `ImportOpcProfilesTests`:
             normalized["relationships"]["included_conformance_units"]["1322"],
             [100],
         )
+        self.assertEqual(normalized["facets"][0]["opc_id"], 1322)
+        self.assertIn(100, normalized["relationships"]["transitive_cu_closure"]["2266"])
+        self.assertEqual(normalized["minimum_profile_defaults"]["100"], "nano")
 ```
 
 - [ ] **Step 2: Run the new test and confirm it fails**
@@ -341,7 +401,12 @@ def _normalize_api_snapshot(
     included_cus: dict[str, list[dict]],
 ) -> dict:
     canonical = _select_canonical_server_profiles(profile_rows)
-    server_profiles = [row for row in profile_rows if _is_server_record(row)]
+    server_records = [row for row in profile_rows if _is_server_record(row)]
+    facet_records = [
+        row for row in server_records
+        if isinstance(row.get("profileUri"), str) and "Facet" in row.get("profileUri")
+    ]
+    profile_records = [row for row in server_records if row not in facet_records]
     normalized = {
         "snapshot_version": "2",
         "metadata": {
@@ -353,7 +418,21 @@ def _normalize_api_snapshot(
             key: _normalize_profile_row(row)
             for key, row in sorted(canonical.items())
         },
-        "profiles": [_normalize_profile_row(row) for row in sorted(server_profiles, key=lambda r: (r.get("id") or 0))],
+        "profiles": [
+            _normalize_profile_row(row)
+            for row in sorted(profile_records, key=lambda r: (r.get("id") or 0))
+            if row.get("releaseStatus") == 3
+        ],
+        "facets": [
+            _normalize_profile_row(row)
+            for row in sorted(facet_records, key=lambda r: (r.get("id") or 0))
+            if row.get("releaseStatus") == 3
+        ],
+        "superseded_profiles": [
+            _normalize_profile_row(row)
+            for row in sorted(profile_records, key=lambda r: (r.get("id") or 0))
+            if row.get("releaseStatus") == 4
+        ],
         "conformance_units": [_normalize_cu_row(row) for row in sorted(cu_rows, key=lambda r: (r.get("id") or 0))],
         "relationships": {
             "included_profiles": {
@@ -364,16 +443,72 @@ def _normalize_api_snapshot(
                 str(key): _ids(rows)
                 for key, rows in sorted(included_cus.items())
             },
+            "transitive_profile_closure": {},
+            "transitive_cu_closure": {},
         },
+        "minimum_profile_defaults": {},
     }
+    _populate_relationship_closures(normalized)
     return normalized
 ```
 
-- [ ] **Step 4: Add CLI option to write normalized snapshot**
-
-Extend `_parse_args()` with optional arguments:
+Add this closure helper before `_normalize_api_snapshot()`:
 
 ```python
+def _populate_relationship_closures(snapshot: dict) -> None:
+    included_profiles = snapshot["relationships"]["included_profiles"]
+    included_cus = snapshot["relationships"]["included_conformance_units"]
+
+    def profile_closure(profile_id: int, seen: set[int] | None = None) -> list[int]:
+        if seen is None:
+            seen = set()
+        if profile_id in seen:
+            return []
+        seen.add(profile_id)
+        result: list[int] = []
+        for child in included_profiles.get(str(profile_id), []):
+            result.append(child)
+            result.extend(profile_closure(child, seen))
+        return sorted(set(result))
+
+    def cu_closure(profile_id: int) -> list[int]:
+        profile_ids = [profile_id] + profile_closure(profile_id)
+        result: set[int] = set()
+        for pid in profile_ids:
+            result.update(included_cus.get(str(pid), []))
+        return sorted(result)
+
+    canonical = snapshot.get("canonical_profiles") or {}
+    for profile in canonical.values():
+        opc_id = profile.get("opc_id")
+        if not isinstance(opc_id, int):
+            continue
+        snapshot["relationships"]["transitive_profile_closure"][str(opc_id)] = profile_closure(opc_id)
+        snapshot["relationships"]["transitive_cu_closure"][str(opc_id)] = cu_closure(opc_id)
+
+    order = ("nano", "micro", "embedded", "standard")
+    for key in order:
+        profile = canonical.get(key) or {}
+        opc_id = profile.get("opc_id")
+        if not isinstance(opc_id, int):
+            continue
+        for cu_id in snapshot["relationships"]["transitive_cu_closure"].get(str(opc_id), []):
+            snapshot["minimum_profile_defaults"].setdefault(str(cu_id), key)
+```
+
+- [ ] **Step 4: Rework CLI modes and add normalized snapshot mode**
+
+In `_parse_args()`, make `--snapshot` and `--manifest` optional parser arguments, keep `--profile-catalog`, `--cu-catalog`, and `--relationship-dir` as optional parser arguments, and put all modes in the existing required mutually-exclusive group:
+
+```python
+    parser.add_argument(
+        "--snapshot",
+        help="Path to the pinned OPC snapshot JSON file for manifest merge modes.",
+    )
+    parser.add_argument(
+        "--manifest",
+        help="Path to the manifest .yaml/.json file for manifest merge modes.",
+    )
     parser.add_argument(
         "--profile-catalog",
         help="Raw OPC API profile catalog JSON to normalize.",
@@ -386,26 +521,62 @@ Extend `_parse_args()` with optional arguments:
         "--relationship-dir",
         help="Directory containing includedprofiles-<id>.json and includedconformanceunits-<id>.json files.",
     )
-    parser.add_argument(
+    mode = parser.add_mutually_exclusive_group(required=True)
+    mode.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Read the snapshot and print a summary without modifying the manifest.",
+    )
+    mode.add_argument(
+        "--write",
+        action="store_true",
+        help="Merge snapshot OPC facts into the manifest file in place.",
+    )
+    mode.add_argument(
         "--write-normalized-snapshot",
         help="Path to write deterministic normalized snapshot JSON.",
     )
 ```
 
-Then add a branch in `main()` before the manifest merge path:
+Then add mode-specific validation helpers and branch in `main()` before any access to `args.snapshot` or `args.manifest`:
 
 ```python
+def _require_args(args: argparse.Namespace, names: tuple[str, ...], mode: str) -> bool:
+    missing = [name for name in names if not getattr(args, name)]
+    if missing:
+        print(mode + ": FAIL")
+        print("  missing required option(s): " + ", ".join("--" + name.replace("_", "-") for name in missing))
+        return False
+    return True
+
+
+def _write_normalized_snapshot(args: argparse.Namespace) -> int:
+    if not _require_args(
+        args,
+        ("profile_catalog", "cu_catalog", "relationship_dir", "write_normalized_snapshot"),
+        "normalized snapshot",
+    ):
+        return 1
+    profile_catalog = _load_snapshot(args.profile_catalog)
+    cu_catalog = _load_snapshot(args.cu_catalog)
+    profile_rows = profile_catalog.get("result") or []
+    cu_rows = cu_catalog.get("result") or []
+    included_profiles, included_cus = _load_relationship_dir(args.relationship_dir)
+    normalized = _normalize_api_snapshot(profile_rows, cu_rows, included_profiles, included_cus)
+    with open(args.write_normalized_snapshot, "w", encoding="utf-8") as fh:
+        json.dump(normalized, fh, indent=2, sort_keys=True)
+        fh.write("\n")
+    return 0
+
+
+def main(argv: list[str] | None = None) -> int:
+    args = _parse_args(sys.argv[1:] if argv is None else argv)
+
     if args.write_normalized_snapshot:
-        profile_catalog = _load_snapshot(args.profile_catalog)
-        cu_catalog = _load_snapshot(args.cu_catalog)
-        profile_rows = profile_catalog.get("result") or []
-        cu_rows = cu_catalog.get("result") or []
-        included_profiles, included_cus = _load_relationship_dir(args.relationship_dir)
-        normalized = _normalize_api_snapshot(profile_rows, cu_rows, included_profiles, included_cus)
-        with open(args.write_normalized_snapshot, "w", encoding="utf-8") as fh:
-            json.dump(normalized, fh, indent=2, sort_keys=True)
-            fh.write("\n")
-        return 0
+        return _write_normalized_snapshot(args)
+
+    if not _require_args(args, ("snapshot", "manifest"), "manifest merge"):
+        return 1
 ```
 
 Add this loader near `_load_snapshot()`:
@@ -435,28 +606,16 @@ Run: `python3 -m unittest scripts.profile_manifest.test_import_opc_profiles -v`
 
 Expected: all tests pass.
 
-- [ ] **Step 6: Produce the normalized snapshot from local ignored evidence**
+- [ ] **Step 6: Do not produce the project snapshot yet**
 
-Run this only after relationship files exist in the ignored relationship directory:
+Task 2 intentionally stops after adding normalization code and tests. Task 3 fetches ignored relationship evidence and writes `profiles/opcua-profile-normalized-snapshot.json` after the relationship directory exists.
 
-```bash
-python3 scripts/profile_manifest/import_opc_profiles.py \
-  --snapshot profiles/opcua-profile-snapshot.json \
-  --manifest profiles/opcua-profile-manifest.yaml \
-  --dry-run \
-  --profile-catalog profiles/opcua-1.05-api/profile-catalog.pg171.json \
-  --cu-catalog profiles/opcua-1.05-api/conformance-unit-catalog.pg171.json \
-  --relationship-dir profiles/opcua-1.05-api/relationships \
-  --write-normalized-snapshot profiles/opcua-profile-normalized-snapshot.json
-```
+- [ ] **Step 7: Controller checkpoint**
 
-Expected: `profiles/opcua-profile-normalized-snapshot.json` exists and contains `canonical_profiles.standard.opc_id` equal to `2269`.
-
-- [ ] **Step 7: Commit**
+Worker agents must not commit. The controller may stage only these paths after review:
 
 ```bash
-git add scripts/profile_manifest/import_opc_profiles.py scripts/profile_manifest/test_import_opc_profiles.py profiles/opcua-profile-normalized-snapshot.json
-git commit -m "feat(opc): Normalize latest active profile snapshot"
+git add scripts/profile_manifest/import_opc_profiles.py scripts/profile_manifest/test_import_opc_profiles.py
 ```
 
 ## Task 3: Fetch Missing Relationship Evidence Without Committing Raw Dumps
@@ -464,10 +623,13 @@ git commit -m "feat(opc): Normalize latest active profile snapshot"
 **Files:**
 - Modify: `scripts/profile_manifest/import_opc_profiles.py`
 - Modify: `.gitignore` only if relationship raw files are not already ignored by `profiles/opcua-1.05-api/`
+- Create: `profiles/opcua-profile-normalized-snapshot.json`
 
 **Interfaces:**
 - Consumes: `_load_snapshot(path: str) -> dict`
 - Produces: `fetch_relationships(profile_ids: list[int], output_dir: str) -> None`
+
+**OPC grounding:** Relationship endpoints are OPC Foundation API evidence for OPC-10000-7 §4.3 profile aggregation and §4.5 included-profile conformance semantics.
 
 - [ ] **Step 1: Add relationship fetch helper**
 
@@ -499,12 +661,12 @@ def fetch_relationships(profile_ids: list[int], output_dir: str) -> None:
                 fh.write("\n")
 ```
 
-- [ ] **Step 2: Add CLI option**
+- [ ] **Step 2: Add fetch mode to the existing CLI mode group**
 
-Extend `_parse_args()`:
+Add `--fetch-relationships` to the same required mutually-exclusive mode group that contains `--dry-run`, `--write`, and `--write-normalized-snapshot`:
 
 ```python
-    parser.add_argument(
+    mode.add_argument(
         "--fetch-relationships",
         action="store_true",
         help="Fetch included profile/CU relationship JSON for server profiles into --relationship-dir.",
@@ -515,6 +677,8 @@ Add a branch in `main()` before normalized snapshot writing:
 
 ```python
     if args.fetch_relationships:
+        if not _require_args(args, ("profile_catalog", "relationship_dir"), "relationship fetch"):
+            return 1
         profile_catalog = _load_snapshot(args.profile_catalog)
         profile_rows = profile_catalog.get("result") or []
         server_ids = [row.get("id") for row in profile_rows if _is_server_record(row)]
@@ -538,9 +702,6 @@ Run:
 
 ```bash
 python3 scripts/profile_manifest/import_opc_profiles.py \
-  --snapshot profiles/opcua-profile-snapshot.json \
-  --manifest profiles/opcua-profile-manifest.yaml \
-  --dry-run \
   --profile-catalog profiles/opcua-1.05-api/profile-catalog.pg171.json \
   --relationship-dir profiles/opcua-1.05-api/relationships \
   --fetch-relationships
@@ -548,11 +709,19 @@ python3 scripts/profile_manifest/import_opc_profiles.py \
 
 Expected: ignored files are created under `profiles/opcua-1.05-api/relationships/`.
 
-- [ ] **Step 5: Regenerate normalized snapshot**
+- [ ] **Step 5: Generate normalized snapshot after relationship fetch**
 
-Run the Task 2 Step 6 command again.
+Run:
 
-Expected: normalized snapshot includes non-empty `relationships.included_profiles` and `relationships.included_conformance_units`.
+```bash
+python3 scripts/profile_manifest/import_opc_profiles.py \
+  --profile-catalog profiles/opcua-1.05-api/profile-catalog.pg171.json \
+  --cu-catalog profiles/opcua-1.05-api/conformance-unit-catalog.pg171.json \
+  --relationship-dir profiles/opcua-1.05-api/relationships \
+  --write-normalized-snapshot profiles/opcua-profile-normalized-snapshot.json
+```
+
+Expected: normalized snapshot includes `canonical_profiles.standard.opc_id` equal to `2269`, plus non-empty `relationships.included_profiles` and `relationships.included_conformance_units`.
 
 - [ ] **Step 6: Run tests**
 
@@ -560,11 +729,12 @@ Run: `python3 -m unittest scripts.profile_manifest.test_import_opc_profiles -v`
 
 Expected: all tests pass.
 
-- [ ] **Step 7: Commit**
+- [ ] **Step 7: Controller checkpoint**
+
+Worker agents must not commit. The controller may stage only these paths after review:
 
 ```bash
 git add scripts/profile_manifest/import_opc_profiles.py profiles/opcua-profile-normalized-snapshot.json
-git commit -m "feat(opc): Capture profile relationship snapshot"
 ```
 
 ## Task 4: Merge Active 2025 Profiles Into the Manifest
@@ -577,6 +747,8 @@ git commit -m "feat(opc): Capture profile relationship snapshot"
 **Interfaces:**
 - Consumes: normalized snapshot keys from Task 2.
 - Produces: `_merge_normalized_snapshot_into_manifest(snapshot: dict, manifest: dict) -> tuple[dict, dict[str, int]]`
+
+**OPC grounding:** OPC-10000-7 §4.2 governs Facets/ConformanceUnits as conformance building blocks; §4.3 governs Profile aggregation; §4.5 governs mandatory included Profiles and CUs for profile conformance.
 
 - [ ] **Step 1: Add failing merge test**
 
@@ -596,6 +768,15 @@ Append this test method:
                 }
             },
             "profiles": [],
+            "facets": [
+                {
+                    "opc_id": 9100,
+                    "name": "New Test Facet",
+                    "release_status": 3,
+                    "release_status_name": "active",
+                    "description": "contains the new CU",
+                }
+            ],
             "conformance_units": [
                 {
                     "opc_id": 9001,
@@ -605,7 +786,12 @@ Append this test method:
                     "description": "not implemented here",
                 }
             ],
-            "relationships": {"included_profiles": {}, "included_conformance_units": {}},
+            "relationships": {
+                "included_profiles": {"2269": [9100]},
+                "included_conformance_units": {"9100": [9001]},
+                "transitive_cu_closure": {"2269": [9001]},
+            },
+            "minimum_profile_defaults": {"9001": "standard"},
         }
         manifest = {
             "schema_version": "1",
@@ -630,6 +816,14 @@ Append this test method:
         self.assertEqual(merged["profiles"]["standard"]["release_status_name"], "active")
         imported = [item for item in merged["items"] if item["id"] == "opc_cu_9001"]
         self.assertEqual(imported[0]["implementation_state"], "unimplemented")
+        self.assertEqual(
+            merged["facet_containment"]["opc_facet_9100"],
+            ["opc_cu_9001"],
+        )
+        self.assertFalse(imported[0]["profile_defaults"]["nano"])
+        self.assertFalse(imported[0]["profile_defaults"]["embedded"])
+        self.assertTrue(imported[0]["profile_defaults"]["standard"])
+        self.assertTrue(imported[0]["profile_defaults"]["full"])
         self.assertEqual(counts["conformance_units_added"], 1)
 ```
 
@@ -650,10 +844,16 @@ def _merge_normalized_snapshot_into_manifest(
 ) -> tuple[dict, dict[str, int]]:
     counts = {
         "profiles_updated": 0,
+        "facets_added": 0,
         "conformance_units_added": 0,
         "claimed_items_preserved": 0,
+        "implemented_items_preserved": 0,
+        "unimplemented_items_imported": 0,
     }
     new_manifest = json.loads(json.dumps(manifest))
+
+    metadata = new_manifest.setdefault("metadata", {})
+    metadata["superseded_profiles"] = snapshot.get("superseded_profiles", [])
 
     profiles = new_manifest.setdefault("profiles", {})
     for key, profile_data in (snapshot.get("canonical_profiles") or {}).items():
@@ -668,18 +868,83 @@ def _merge_normalized_snapshot_into_manifest(
         counts["profiles_updated"] += 1
 
     items = new_manifest.setdefault("items", [])
+    facet_containment = new_manifest.setdefault("facet_containment", {})
     existing_cu_ids = set()
+    existing_item_ids = {item.get("id") for item in items if isinstance(item.get("id"), str)}
     for item in items:
         if item.get("implementation_state") == "claimed":
             counts["claimed_items_preserved"] += 1
+        if item.get("implementation_state") == "implemented":
+            counts["implemented_items_preserved"] += 1
         opc_ref = item.get("opc_reference") if isinstance(item.get("opc_reference"), dict) else {}
         cu_id = opc_ref.get("cu_id")
         if cu_id is not None:
             existing_cu_ids.add(str(cu_id))
 
+    minimum_defaults = snapshot.get("minimum_profile_defaults") or {}
+    profile_order = ("nano", "micro", "embedded", "standard", "full")
+    relationships = snapshot.get("relationships") or {}
+    included_cus = relationships.get("included_conformance_units") or {}
+    transitive_cu_closure = relationships.get("transitive_cu_closure") or {}
+    reachable_cu_ids = {
+        str(cu_id)
+        for cu_ids in transitive_cu_closure.values()
+        for cu_id in cu_ids
+    }
+    facet_ids = {
+        str(facet.get("opc_id"))
+        for facet in snapshot.get("facets") or []
+        if facet.get("opc_id") is not None
+    }
+    cu_to_facet: dict[str, str] = {}
+    for facet_id, cu_ids in sorted(included_cus.items()):
+        if str(facet_id) not in facet_ids:
+            continue
+        for cu_id in cu_ids:
+            cu_to_facet.setdefault(str(cu_id), str(facet_id))
+
+    def defaults_for_cu(cu_id: int) -> dict[str, bool]:
+        minimum = minimum_defaults.get(str(cu_id))
+        defaults = {pk: False for pk in _DEFAULT_PROFILES}
+        if minimum in profile_order:
+            start = profile_order.index(minimum)
+            for pk in profile_order[start:]:
+                defaults[pk] = True
+        return defaults
+
+    for facet in snapshot.get("facets") or []:
+        opc_id = facet.get("opc_id")
+        if opc_id is None:
+            continue
+        facet_id = "opc_facet_" + str(opc_id)
+        if facet_id not in existing_item_ids:
+            items.append({
+                "id": facet_id,
+                "kind": "facet",
+                "opc_display_name": facet.get("name"),
+                "kconfig_symbol": None,
+                "implementation_state": "unimplemented",
+                "depends_on": [],
+                "profile_defaults": {pk: False for pk in _DEFAULT_PROFILES},
+                "backing_tests": [],
+                "opc_reference": {
+                    "spec": "OPC-10000-7",
+                    "section": "4.2",
+                    "profile_id": str(opc_id),
+                    "profile_uri": None,
+                    "source_url": "https://profiles.opcfoundation.org",
+                },
+                "source_metadata": facet.get("source_metadata", {}),
+                "notes": facet.get("description") or "Imported from OPC API as unimplemented.",
+            })
+            existing_item_ids.add(facet_id)
+            counts["facets_added"] += 1
+
     for cu in snapshot.get("conformance_units") or []:
         opc_id = cu.get("opc_id")
         if opc_id is None or str(opc_id) in existing_cu_ids:
+            continue
+        if str(opc_id) not in reachable_cu_ids or str(opc_id) not in cu_to_facet:
             continue
         item_id = "opc_cu_" + str(opc_id)
         if any(item.get("id") == item_id for item in items):
@@ -691,7 +956,7 @@ def _merge_normalized_snapshot_into_manifest(
             "kconfig_symbol": None,
             "implementation_state": "unimplemented",
             "depends_on": [],
-            "profile_defaults": {pk: False for pk in _DEFAULT_PROFILES},
+            "profile_defaults": defaults_for_cu(opc_id),
             "backing_tests": [],
             "opc_reference": {
                 "spec": None,
@@ -703,9 +968,35 @@ def _merge_normalized_snapshot_into_manifest(
             "source_metadata": cu.get("source_metadata", {}),
             "notes": cu.get("description") or "Imported from OPC API as unimplemented.",
         })
+        counts["unimplemented_items_imported"] += 1
+        existing_item_ids.add(item_id)
         counts["conformance_units_added"] += 1
+        facet_item_id = "opc_facet_" + cu_to_facet[str(opc_id)]
+        contained = facet_containment.setdefault(facet_item_id, [])
+        if item_id not in contained:
+            contained.append(item_id)
+        contained.sort()
 
     return new_manifest, counts
+```
+
+Also replace `_print_summary(counts)` with this tolerant shared printer so legacy and normalized merge summaries cannot raise `KeyError`:
+
+```python
+def _print_summary(counts: dict[str, int]) -> None:
+    print("OPC snapshot import summary")
+    print(f"  profiles in snapshot:          {counts.get('profiles_in_snapshot', 0)}")
+    print(f"  profiles matched in manifest:   {counts.get('profiles_matched', 0)}")
+    print(f"  profiles updated:               {counts.get('profiles_updated', 0)}")
+    print(f"  facets in snapshot:             {counts.get('facets_in_snapshot', 0)}")
+    print(f"  facets matched (preserved):     {counts.get('facets_matched', 0)}")
+    print(f"  facets added (unimplemented):   {counts.get('facets_added', 0)}")
+    print(f"  CUs in snapshot:                {counts.get('conformance_units_in_snapshot', 0)}")
+    print(f"  CUs matched (preserved):        {counts.get('conformance_units_matched', 0)}")
+    print(f"  CUs added (unimplemented):      {counts.get('conformance_units_added', 0)}")
+    print(f"  claimed items preserved:        {counts.get('claimed_items_preserved', 0)}")
+    print(f"  implemented items preserved:    {counts.get('implemented_items_preserved', 0)}")
+    print(f"  unimplemented items imported:   {counts.get('unimplemented_items_imported', 0)}")
 ```
 
 - [ ] **Step 4: Wire merge mode to normalized snapshots**
@@ -746,11 +1037,12 @@ Run: `python3 scripts/profile_manifest/validate.py --manifest-only`
 
 Expected: `manifest: OK`.
 
-- [ ] **Step 8: Commit**
+- [ ] **Step 8: Controller checkpoint**
+
+Worker agents must not commit. The controller may stage only these paths after review:
 
 ```bash
 git add scripts/profile_manifest/import_opc_profiles.py scripts/profile_manifest/test_import_opc_profiles.py profiles/opcua-profile-manifest.yaml
-git commit -m "feat(opc): Migrate canonical profiles to active 2025"
 ```
 
 ## Task 5: Validate Superseded Profile and Generated 2025 Surface Rules
@@ -765,6 +1057,8 @@ git commit -m "feat(opc): Migrate canonical profiles to active 2025"
   - active canonical profile entries exist for `nano`, `micro`, `embedded`, `standard`.
   - canonical profile choice symbols contain `2025`.
   - superseded `2022` profile symbols are not selectable profile-choice defaults.
+
+**OPC grounding:** OPC-10000-7 §4.3 defines named Profiles, and §4.7 defines versioned profile names. OPC API release status remains OPC Foundation API metadata used to choose active records.
 
 - [ ] **Step 1: Add model validation for release metadata**
 
@@ -790,9 +1084,9 @@ In `scripts/profile_manifest/model.py`, inside the profile loop after `selectabl
 In `scripts/profile_manifest/validate.py`, add a function near other generated checks:
 
 ```python
-def _check_latest_active_profile_surface(root: str, errors: list[str]) -> None:
-    kconfig_path = os.path.join(root, "Kconfig")
-    config_dir = os.path.join(root, "configs")
+def _check_latest_active_profile_surface(errors: list[str]) -> None:
+    kconfig_path = os.path.join(_REPO_ROOT, "Kconfig")
+    config_dir = os.path.join(_REPO_ROOT, "configs")
     with open(kconfig_path, "r", encoding="utf-8") as fh:
         kconfig = fh.read()
     required = (
@@ -827,7 +1121,7 @@ def _check_latest_active_profile_surface(root: str, errors: list[str]) -> None:
             errors.append(path + " does not select " + sym)
 ```
 
-Call `_check_latest_active_profile_surface(root, errors)` from the generated validation path after Kconfig exists.
+Call `_check_latest_active_profile_surface(errors)` from the generated validation path after Kconfig exists.
 
 - [ ] **Step 3: Run validation and confirm current generated files fail until regeneration**
 
@@ -835,11 +1129,12 @@ Run: `python3 scripts/profile_manifest/validate.py --all`
 
 Expected before regeneration: validation may fail for missing 2025 generated symbols. If it already passes because artifacts were regenerated by Task 4, continue.
 
-- [ ] **Step 4: Commit validation changes**
+- [ ] **Step 4: Controller checkpoint**
+
+Worker agents must not commit. The controller may stage only these paths after review:
 
 ```bash
 git add scripts/profile_manifest/model.py scripts/profile_manifest/validate.py
-git commit -m "test(opc): Validate latest active profile surface"
 ```
 
 ## Task 6: Regenerate Kconfig Artifacts From Migrated Manifest
@@ -859,6 +1154,8 @@ git commit -m "test(opc): Validate latest active profile surface"
 **Interfaces:**
 - Consumes: migrated `profiles/opcua-profile-manifest.yaml`.
 - Produces: generated files using active 2025 profile symbols.
+
+**OPC grounding:** Generated defaults implement OPC-10000-7 §4.3 profile aggregation and §4.5 profile conformance as project Kconfig presets; selections remain editable and do not assert external certification.
 
 - [ ] **Step 1: Regenerate all generated artifacts**
 
@@ -923,11 +1220,21 @@ Run: `python3 scripts/profile_manifest/validate.py --all`
 
 Expected: `manifest: OK`.
 
-- [ ] **Step 5: Commit generated artifacts**
+- [ ] **Step 5: Controller checkpoint**
+
+Worker agents must not commit. The controller may stage only these paths after review:
 
 ```bash
-git add Kconfig configs include/muc_opcua/capacities.h tests/conformance/claim_test_map.md docs/conformance/opc-profile-roadmap.md docs/build-and-gating.md
-git commit -m "build(opc): Regenerate latest active profile surface"
+git add Kconfig \
+  configs/nano.defconfig \
+  configs/micro.defconfig \
+  configs/embedded.defconfig \
+  configs/standard.defconfig \
+  configs/full.defconfig \
+  include/muc_opcua/capacities.h \
+  tests/conformance/claim_test_map.md \
+  docs/conformance/opc-profile-roadmap.md \
+  docs/build-and-gating.md
 ```
 
 ## Task 7: Update Profile Gating Tests for 2025 Canonical Defaults
@@ -938,6 +1245,8 @@ git commit -m "build(opc): Regenerate latest active profile surface"
 **Interfaces:**
 - Consumes: generated 2025 profile symbols.
 - Produces: profile-gating scenarios that verify active 2025 symbols, superseded 2022 absence, cross-profile activation, and capacity propagation.
+
+**OPC grounding:** Tests verify project behavior for OPC-10000-7 §4.3 aggregation, §4.5 included-profile conformance, and §4.7 versioned profile names.
 
 - [ ] **Step 1: Update expected profile symbols in gating script**
 
@@ -973,11 +1282,12 @@ Run: `bash scripts/test_profile_gating.sh`
 
 Expected: all checks pass, with one explicit PASS for superseded Standard 2022 profile not selectable.
 
-- [ ] **Step 4: Commit**
+- [ ] **Step 4: Controller checkpoint**
+
+Worker agents must not commit. The controller may stage only this path after review:
 
 ```bash
 git add scripts/test_profile_gating.sh
-git commit -m "test(opc): Gate latest active profile defaults"
 ```
 
 ## Task 8: End-to-End Build Verification
@@ -989,6 +1299,8 @@ git commit -m "test(opc): Gate latest active profile defaults"
 **Interfaces:**
 - Consumes: regenerated Kconfig, CMake integration, and profile-gating tests.
 - Produces: verified standard/full build and test evidence.
+
+**OPC grounding:** Build verification checks the generated surfaces that encode OPC-10000-7 §4.3, §4.5, and §4.7 profile semantics as build-time presets.
 
 - [ ] **Step 1: Configure standard profile**
 
@@ -1060,13 +1372,14 @@ git diff --check
 
 Expected: validation passes, profile gating passes, and `git diff --check` has no output.
 
-- [ ] **Step 7: Commit verification-only docs if any generated docs changed**
+- [ ] **Step 7: Controller checkpoint for verification-only docs if any generated docs changed**
 
-If verification updates docs or generated reports, commit them:
+Worker agents must not commit. If verification updates docs or generated reports, the controller may stage only these paths after review:
 
 ```bash
-git add docs tests/conformance/claim_test_map.md
-git commit -m "docs(opc): Record latest active profile migration evidence"
+git add docs/conformance/opc-profile-roadmap.md \
+  docs/build-and-gating.md \
+  tests/conformance/claim_test_map.md
 ```
 
 If no files changed, do not create an empty commit.

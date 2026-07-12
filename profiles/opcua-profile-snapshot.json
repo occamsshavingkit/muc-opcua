@@ -1,0 +1,358 @@
+{
+  "snapshot_version": "1",
+  "metadata": {
+    "description": "Pinned OPC UA Server profile/facet/CU source data for deterministic manifest import. Every entry is grounded in explicitly cited repository documentation or OPC Foundation specification references.",
+    "source_type": "pinned_repository_docs",
+    "retrieved_at": "2026-07-11T00:00:00Z",
+    "live_api_attempted": true,
+    "live_api_notes": "profiles.opcfoundation.org/api returns a JavaScript single-page application (React SPA) at its root and at /api/profiles, /api/v1/profiles. No deterministic, machine-readable JSON discovery endpoint is exposed from the API root without a JavaScript runtime. Per task-2-brief.md, the snapshot is seeded from pinned, explicitly sourced data already present in repository docs/specs.",
+    "source_uris": [
+      "https://profiles.opcfoundation.org"
+    ],
+    "source_paths": [
+      "docs/conformance/profile-nano.md",
+      "docs/conformance/profile-micro.md",
+      "docs/conformance/profile-embedded.md",
+      "docs/conformance/enhanced-datachange.md",
+      "docs/conformance/base-server-behaviour.md",
+      "docs/conformance/services.md",
+      "docs/conformance/status.md",
+      "docs/conformance/data-access.md",
+      "docs/conformance/event-subscription.md",
+      "docs/conformance/method-server.md",
+      "docs/conformance/reverse-connect.md",
+      "docs/conformance/redundancy.md",
+      "docs/conformance/ecc-security-policy.md",
+      "docs/conformance/security.md",
+      "profiles/opcua-profile-manifest.yaml"
+    ],
+    "spec_references": [
+      "OPC-10000-3",
+      "OPC-10000-4",
+      "OPC-10000-5",
+      "OPC-10000-6",
+      "OPC-10000-7",
+      "OPC-10000-8",
+      "OPC-10000-9",
+      "OPC-10000-11",
+      "OPC-10000-13",
+      "OPC-10000-14",
+      "OPC-10000-20"
+    ]
+  },
+  "profiles": [
+    {
+      "snapshot_id": "profile_nano_embedded_2017",
+      "opc_id": null,
+      "opc_uri": "http://opcfoundation.org/UA-Profile/Server/NanoEmbeddedDevice2017",
+      "name": "NanoEmbeddedDevice2017",
+      "display_name": "Nano Embedded Device 2017 Server Profile",
+      "description": "Functionally equivalent to the Core 2017 Server Facet. Requires OPC UA TCP binary transport, SecurityPolicy None, and Anonymous identity. Single client/SecureChannel/Session baseline.",
+      "source": {
+        "doc_path": "docs/conformance/profile-nano.md",
+        "spec": "OPC-10000-7",
+        "section": "4.3",
+        "profile_db_url": "https://profiles.opcfoundation.org"
+      },
+      "is_optional": false
+    },
+    {
+      "snapshot_id": "profile_micro_embedded_2017",
+      "opc_id": "1659",
+      "opc_uri": "http://opcfoundation.org/UA-Profile/Server/MicroEmbeddedDevice2017",
+      "name": "MicroEmbeddedDevice2017",
+      "display_name": "Micro Embedded Device 2017 Server Profile",
+      "description": "Builds upon NanoEmbeddedDevice2017: adds the Embedded Data Change Subscription Server Facet and support for at least two sessions.",
+      "source": {
+        "doc_path": "docs/conformance/profile-micro.md",
+        "spec": "OPC-10000-7",
+        "section": "4.3",
+        "profile_db_url": "https://profiles.opcfoundation.org"
+      },
+      "is_optional": false
+    },
+    {
+      "snapshot_id": "profile_embedded_ua_2017",
+      "opc_id": null,
+      "opc_uri": "http://opcfoundation.org/UA-Profile/Server/EmbeddedUA2017",
+      "name": "EmbeddedUA2017",
+      "display_name": "Embedded 2017 UA Server Profile",
+      "description": "Builds upon Micro: adds security policies (Basic256Sha256), the Standard DataChange Subscription 2017 facet, and full Base Info Type System exposure.",
+      "source": {
+        "doc_path": "docs/conformance/profile-embedded.md",
+        "spec": "OPC-10000-7",
+        "section": "6.6.69",
+        "profile_db_url": "https://profiles.opcfoundation.org"
+      },
+      "is_optional": false
+    },
+    {
+      "snapshot_id": "profile_standard_ua_2017",
+      "opc_id": "1663",
+      "opc_uri": "http://opcfoundation.org/UA-Profile/Server/StandardUA2017",
+      "name": "StandardUA2017",
+      "display_name": "Standard 2017 UA Server Profile",
+      "description": "Standard server profile. Mandates the Enhanced DataChange Subscription 2017 facet (id 1678) with isOptional=false. The full and standard builds advertise this URI.",
+      "source": {
+        "doc_path": "docs/conformance/enhanced-datachange.md",
+        "spec": "OPC-10000-7",
+        "section": "4.3",
+        "profile_db_url": "https://profiles.opcfoundation.org"
+      },
+      "is_optional": false
+    }
+  ],
+  "facets": [
+    {
+      "snapshot_id": "facet_core_2017_server",
+      "opc_id": "1673",
+      "opc_uri": null,
+      "name": "Core 2017 Server Facet",
+      "display_name": "Core 2017 Server Facet",
+      "description": "The mandatory base facet of every server profile (Nano through Standard). Contains base session behaviour, transport, discovery, Read, Browse, and RegisterNodes conformance units.",
+      "source": {
+        "doc_path": "docs/conformance/base-server-behaviour.md",
+        "spec": "OPC-10000-7",
+        "section": "4.2",
+        "profile_db_url": "https://profiles.opcfoundation.org"
+      },
+      "is_optional": false,
+      "conformance_units": [
+        { "opc_id": null, "name": "Attribute Read", "spec": "OPC-10000-4", "section": "5.10.2" },
+        { "opc_id": null, "name": "View Basic / TranslateBrowsePath", "spec": "OPC-10000-4", "section": "5.8" },
+        { "opc_id": null, "name": "Discovery Find Servers Self / Get Endpoints", "spec": "OPC-10000-4", "section": "5.4" },
+        { "opc_id": null, "name": "View RegisterNodes", "spec": "OPC-10000-4", "section": "5.9" },
+        { "opc_id": null, "name": "Session General Service Behaviour", "spec": "OPC-10000-4", "section": null }
+      ]
+    },
+    {
+      "snapshot_id": "facet_standard_datachange_2017",
+      "opc_id": "1675",
+      "opc_uri": null,
+      "name": "Standard DataChange Subscription 2017",
+      "display_name": "Standard DataChange Subscription 2017 Server Facet",
+      "description": "Standard-tier DataChange subscription facet. Mandates MinQueueSize_02 (queue depth >= 2). Required by EmbeddedUA2017.",
+      "source": {
+        "doc_path": "docs/conformance/enhanced-datachange.md",
+        "spec": "OPC-10000-7",
+        "section": "6.6.17",
+        "profile_db_url": "https://profiles.opcfoundation.org"
+      },
+      "is_optional": false,
+      "conformance_units": [
+        { "opc_id": null, "name": "Monitor MinQueueSize_02", "spec": "OPC-10000-4", "section": "5.13.2" },
+        { "opc_id": null, "name": "Subscription Minimum 02", "spec": "OPC-10000-4", "section": "5.14.2" },
+        { "opc_id": null, "name": "Subscription Publish Min 05", "spec": "OPC-10000-4", "section": "5.14.5" }
+      ]
+    },
+    {
+      "snapshot_id": "facet_enhanced_datachange_2017",
+      "opc_id": "1678",
+      "opc_uri": null,
+      "name": "EnhancedDataChangeSubscription2017",
+      "display_name": "Enhanced DataChange Subscription 2017 Server Facet",
+      "description": "Enhanced-tier DataChange subscription facet. Includes the Standard facet (id 1675) and raises mandatory minima: Monitor Items 500, MinQueueSize_05, Subscription Minimum 05, Subscription Publish Min 10. All four CUs are mandatory (isOptional=false). Mandatory for StandardUA2017.",
+      "source": {
+        "doc_path": "docs/conformance/enhanced-datachange.md",
+        "spec": "OPC-10000-7",
+        "section": null,
+        "profile_db_url": "https://profiles.opcfoundation.org"
+      },
+      "is_optional": false,
+      "conformance_units": [
+        { "opc_id": null, "name": "Monitor Items 500", "spec": "OPC-10000-4", "section": "5.13.2", "minimum": ">= 500 MonitoredItems/Subscription" },
+        { "opc_id": null, "name": "Monitor MinQueueSize_05", "spec": "OPC-10000-4", "section": "5.13.2", "minimum": ">= 5 queue entries/MonitoredItem" },
+        { "opc_id": null, "name": "Subscription Minimum 05", "spec": "OPC-10000-4", "section": "5.14.2", "minimum": ">= 5 Subscriptions/Session" },
+        { "opc_id": null, "name": "Subscription Publish Min 10", "spec": "OPC-10000-4", "section": "5.14.5", "minimum": ">= 10 Publish requests/Session" }
+      ]
+    },
+    {
+      "snapshot_id": "facet_base_info_type_system",
+      "opc_id": "1661",
+      "opc_uri": null,
+      "name": "Base Info Type System",
+      "display_name": "Base Info Type System",
+      "description": "Exposes the standard OPC UA type system (Type hierarchy and encoding definitions). Required by EmbeddedUA2017.",
+      "source": {
+        "doc_path": "docs/conformance/profile-embedded.md",
+        "spec": "OPC-10000-5",
+        "section": null,
+        "profile_db_url": "https://profiles.opcfoundation.org"
+      },
+      "is_optional": false,
+      "conformance_units": []
+    },
+    {
+      "snapshot_id": "facet_file_server",
+      "opc_id": null,
+      "opc_uri": null,
+      "name": "File Server Facet",
+      "display_name": "File Server Facet",
+      "description": "OPC UA File Server Facet providing file-based access to the server address space. Not implemented by this project.",
+      "source": {
+        "doc_path": "profiles/opcua-profile-manifest.yaml",
+        "spec": "OPC-10000-20",
+        "section": null,
+        "profile_db_url": "https://profiles.opcfoundation.org"
+      },
+      "is_optional": true,
+      "conformance_units": []
+    },
+    {
+      "snapshot_id": "facet_json_encoding",
+      "opc_id": null,
+      "opc_uri": null,
+      "name": "JSON Encoding",
+      "display_name": "JSON Encoding Facet",
+      "description": "OPC UA JSON encoding for service payloads. Explicitly out of scope for this project per profile-embedded.md: 'XML, JSON, HTTPS, WebSocket, and alternate transport profile claims are out of scope.'",
+      "source": {
+        "doc_path": "docs/conformance/profile-embedded.md",
+        "spec": "OPC-10000-6",
+        "section": "5.3",
+        "profile_db_url": "https://profiles.opcfoundation.org"
+      },
+      "is_optional": true,
+      "conformance_units": []
+    },
+    {
+      "snapshot_id": "facet_xml_encoding",
+      "opc_id": null,
+      "opc_uri": null,
+      "name": "XML Encoding",
+      "display_name": "XML Encoding Facet",
+      "description": "OPC UA XML encoding for service payloads. Explicitly out of scope for this project per profile-embedded.md.",
+      "source": {
+        "doc_path": "docs/conformance/profile-embedded.md",
+        "spec": "OPC-10000-6",
+        "section": "5.4",
+        "profile_db_url": "https://profiles.opcfoundation.org"
+      },
+      "is_optional": true,
+      "conformance_units": []
+    },
+    {
+      "snapshot_id": "facet_https_transport",
+      "opc_id": null,
+      "opc_uri": null,
+      "name": "HTTPS Transport",
+      "display_name": "HTTPS Transport Profile",
+      "description": "OPC UA HTTPS transport profile. Explicitly out of scope for this project per profile-embedded.md.",
+      "source": {
+        "doc_path": "docs/conformance/profile-embedded.md",
+        "spec": "OPC-10000-7",
+        "section": null,
+        "profile_db_url": "https://profiles.opcfoundation.org"
+      },
+      "is_optional": true,
+      "conformance_units": []
+    },
+    {
+      "snapshot_id": "facet_websocket_transport",
+      "opc_id": null,
+      "opc_uri": null,
+      "name": "WebSocket Transport",
+      "display_name": "WebSocket Transport Profile",
+      "description": "OPC UA WebSocket transport profile. Explicitly out of scope for this project per profile-embedded.md.",
+      "source": {
+        "doc_path": "docs/conformance/profile-embedded.md",
+        "spec": "OPC-10000-7",
+        "section": null,
+        "profile_db_url": "https://profiles.opcfoundation.org"
+      },
+      "is_optional": true,
+      "conformance_units": []
+    }
+  ],
+  "conformance_units": [
+    {
+      "snapshot_id": "cu_attribute_read",
+      "opc_id": "1673",
+      "opc_uri": null,
+      "name": "Attribute Read",
+      "display_name": "Attribute Read",
+      "description": "Read service for node attributes. Part of the Core 2017 Server Facet.",
+      "source": {
+        "doc_path": "docs/conformance/services.md",
+        "spec": "OPC-10000-4",
+        "section": "5.10.2",
+        "profile_db_url": "https://profiles.opcfoundation.org"
+      },
+      "is_optional": false
+    },
+    {
+      "snapshot_id": "cu_view_browse",
+      "opc_id": null,
+      "opc_uri": null,
+      "name": "View Basic / TranslateBrowsePath",
+      "display_name": "View Basic / TranslateBrowsePath",
+      "description": "Browse, BrowseNext, TranslateBrowsePathsToNodeIds. Part of the Core 2017 Server Facet.",
+      "source": {
+        "doc_path": "docs/conformance/services.md",
+        "spec": "OPC-10000-4",
+        "section": "5.8",
+        "profile_db_url": "https://profiles.opcfoundation.org"
+      },
+      "is_optional": false
+    },
+    {
+      "snapshot_id": "cu_discovery_find_servers",
+      "opc_id": null,
+      "opc_uri": null,
+      "name": "Discovery Find Servers Self / Get Endpoints",
+      "display_name": "Discovery Find Servers Self / Get Endpoints",
+      "description": "FindServers and GetEndpoints discovery services. Part of the Core 2017 Server Facet.",
+      "source": {
+        "doc_path": "docs/conformance/services.md",
+        "spec": "OPC-10000-4",
+        "section": "5.4",
+        "profile_db_url": "https://profiles.opcfoundation.org"
+      },
+      "is_optional": false
+    },
+    {
+      "snapshot_id": "cu_session_min_2_parallel",
+      "opc_id": "1659",
+      "opc_uri": null,
+      "name": "Session Minimum 2 Parallel",
+      "display_name": "Session Minimum 2 Parallel",
+      "description": "Support for at least two concurrent sessions. Required by MicroEmbeddedDevice2017.",
+      "source": {
+        "doc_path": "docs/conformance/profile-micro.md",
+        "spec": "OPC-10000-7",
+        "section": null,
+        "profile_db_url": "https://profiles.opcfoundation.org"
+      },
+      "is_optional": false
+    },
+    {
+      "snapshot_id": "cu_monitor_items_500",
+      "opc_id": null,
+      "opc_uri": null,
+      "name": "Monitor Items 500",
+      "display_name": "Monitor Items 500",
+      "description": "At least 500 MonitoredItems per Subscription. Mandatory CU of the Enhanced DataChange Subscription 2017 facet.",
+      "source": {
+        "doc_path": "docs/conformance/enhanced-datachange.md",
+        "spec": "OPC-10000-4",
+        "section": "5.13.2",
+        "profile_db_url": "https://profiles.opcfoundation.org"
+      },
+      "is_optional": false
+    },
+    {
+      "snapshot_id": "cu_monitor_min_queue_05",
+      "opc_id": null,
+      "opc_uri": null,
+      "name": "Monitor MinQueueSize_05",
+      "display_name": "Monitor MinQueueSize_05",
+      "description": "At least 5 queue entries per MonitoredItem. Mandatory CU of the Enhanced DataChange Subscription 2017 facet.",
+      "source": {
+        "doc_path": "docs/conformance/enhanced-datachange.md",
+        "spec": "OPC-10000-4",
+        "section": "5.13.2",
+        "profile_db_url": "https://profiles.opcfoundation.org"
+      },
+      "is_optional": false
+    }
+  ]
+}

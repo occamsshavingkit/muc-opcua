@@ -27,3 +27,5 @@ docs/benchmarks/speed-current.json
 .opencode/command/speckit.plan.md
 .worktrees/
 scripts/kconfig/__pycache__/
+profiles/opcua-1.05-api/
+specs/068-opc-named-kconfig-redesign/playbook-opc-api.md
