@@ -574,6 +574,13 @@ The following OPC items are tracked in the manifest but are NOT implemented. The
 
 
 
+
+
+
+
+
+
+
 ## Manifest regeneration and validation
 
 All generated files (Kconfig, defconfigs, `capacities.h`, claim map, roadmap,

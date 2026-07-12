@@ -49,7 +49,7 @@ void setUp(void) {}
 void tearDown(void) {}
 
 void test_write_response_encode_matches_fixture(void) {
-#ifdef MUC_OPCUA_SERVICE_WRITE
+#ifdef MUC_OPCUA_CU_CORE_2017_ATTRIBUTE_WRITE
     opcua_byte_t buf[FIXTURE_SIZE];
     mu_binary_writer_t w;
     mu_binary_writer_init(&w, buf, sizeof(buf));
@@ -75,7 +75,7 @@ void test_write_response_encode_matches_fixture(void) {
 }
 
 void test_write_response_fixture_decode_verify_fields(void) {
-#ifdef MUC_OPCUA_SERVICE_WRITE
+#ifdef MUC_OPCUA_CU_CORE_2017_ATTRIBUTE_WRITE
     FILE *f = fopen(FIXTURE_PATH, "rb");
     TEST_ASSERT_NOT_NULL(f);
     opcua_byte_t file_buf[FIXTURE_SIZE];
@@ -139,7 +139,7 @@ void test_write_response_fixture_decode_verify_fields(void) {
 }
 
 void test_write_response_encode_with_two_results(void) {
-#ifdef MUC_OPCUA_SERVICE_WRITE
+#ifdef MUC_OPCUA_CU_CORE_2017_ATTRIBUTE_WRITE
     opcua_byte_t buf[128];
     mu_binary_writer_t w;
     mu_binary_writer_init(&w, buf, sizeof(buf));
@@ -171,7 +171,7 @@ void test_write_response_encode_with_two_results(void) {
 }
 
 void test_write_response_decode_null_results(void) {
-#ifdef MUC_OPCUA_SERVICE_WRITE
+#ifdef MUC_OPCUA_CU_CORE_2017_ATTRIBUTE_WRITE
     opcua_byte_t buf[32];
     mu_binary_writer_t w;
     mu_binary_writer_init(&w, buf, sizeof(buf));

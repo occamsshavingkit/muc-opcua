@@ -1,7 +1,16 @@
 # TODO — muc-opcua
 
-**Updated**: 2026-07-09 (profiles gap analysis — spec 050 + 051 created)
+**Updated**: 2026-07-12 (Task 4 CU reorg — stub.c traceability gap from Task 1)
 **Source**: code review findings, complexity audit, binary size analysis
+
+## Task 1 Follow-up — Traceability Gap
+
+The ~60+ `stub.c` files created by Task 1 of the CU-aligned code reorg plan
+under `src/cu/**/*.c` are not yet listed in `docs/traceability/files-to-sections.md`.
+`test_traceability_docs` fails with "File stub.c missing from files-to-sections.md".
+Each stub needs a row mapping it to its CU's OPC Part/Section (the stub itself
+is a `#error` directive, but the traceability test scans for every `.c` file).
+This is a Task 1 cleanup item, not a Task 4 regression.
 
 ## Remaining Active Backlog
 

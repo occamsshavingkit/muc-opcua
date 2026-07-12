@@ -53,7 +53,7 @@ trap cleanup EXIT
 
 is_matrix_toggle() {
     case "$1" in
-        MUC_OPCUA_SERVICE_*|MUC_OPCUA_SUBSCRIPTIONS|MUC_OPCUA_SECURITY)
+        MUC_OPCUA_CU_*|MUC_OPCUA_SUBSCRIPTIONS|MUC_OPCUA_SECURITY)
             return 0
             ;;
         *)
@@ -118,14 +118,14 @@ join_by() {
 
 symbols_for_option() {
     case "$1" in
-        MUC_OPCUA_SERVICE_READ)
+        MUC_OPCUA_CU_ATTRIBUTE_READ)
             printf '%s\n' \
                 handle_read \
                 mu_read_request_decode \
                 mu_read_process \
                 mu_read_response_encode
             ;;
-        MUC_OPCUA_SERVICE_BROWSE)
+        MUC_OPCUA_CU_VIEW_BASIC_TRANSLATEBROWSEPATH)
             printf '%s\n' \
                 handle_browse \
                 handle_browse_next \
@@ -134,12 +134,12 @@ symbols_for_option() {
                 mu_browse_process \
                 mu_browse_response_encode
             ;;
-        MUC_OPCUA_SERVICE_DISCOVERY)
+        MUC_OPCUA_CU_DISCOVERY_FIND_SERVERS_SELF_GET_ENDPOINTS)
             printf '%s\n' \
                 handle_find_servers \
                 handle_get_endpoints
             ;;
-        MUC_OPCUA_SERVICE_REGISTER_NODES)
+        MUC_OPCUA_CU_VIEW_REGISTERNODES)
             printf '%s\n' \
                 handle_register_nodes \
                 handle_unregister_nodes

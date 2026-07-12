@@ -161,7 +161,7 @@ static void run_write_items(mu_server_t *server, const write_request_item_t *ite
     decode_write_response_results(resp_buffer, resp_len, request_handle, results, item_count);
 }
 
-#ifdef MUC_OPCUA_SERVICE_WRITE
+#ifdef MUC_OPCUA_CU_CORE_2017_ATTRIBUTE_WRITE
 void test_write_service_basic(void) {
     /* Initialize mock server structure */
     mu_server_t server;
@@ -642,7 +642,7 @@ void test_write_service_batch_matches_individual_operation_results_and_callback_
 
 int main(void) {
     UNITY_BEGIN();
-#ifdef MUC_OPCUA_SERVICE_WRITE
+#ifdef MUC_OPCUA_CU_CORE_2017_ATTRIBUTE_WRITE
     RUN_TEST(test_write_service_basic);
     RUN_TEST(test_write_service_type_mismatch);
     RUN_TEST(test_write_service_batch);

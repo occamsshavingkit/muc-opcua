@@ -140,7 +140,7 @@ static opcua_statuscode_t mock_write_handler(void *handle, const mu_nodeid_t *no
     return MU_STATUS_GOOD;
 }
 
-#ifdef MUC_OPCUA_SERVICE_WRITE
+#ifdef MUC_OPCUA_CU_CORE_2017_ATTRIBUTE_WRITE
 void test_integration_write_happy_path(void) {
     mock_t mock;
     (void)memset(&mock, 0, sizeof(mock));
@@ -336,7 +336,7 @@ void test_integration_write_happy_path(void) {
 
 int main(void) {
     UNITY_BEGIN();
-#ifdef MUC_OPCUA_SERVICE_WRITE
+#ifdef MUC_OPCUA_CU_CORE_2017_ATTRIBUTE_WRITE
     RUN_TEST(test_integration_write_happy_path);
 #endif
     return UNITY_END();
