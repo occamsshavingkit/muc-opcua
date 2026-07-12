@@ -415,6 +415,7 @@ def _facet_match_expression(
 
 def _emit_internal_profile_symbols(
     lines: list[str], profile_symbols: dict[str, str], profiles: dict,
+    facet_implies: dict[str, list[str]] | None = None,
 ) -> None:
     """Emit invisible ``MUC_OPCUA_INTERN_PROFILE_<TOKEN>`` cascade symbols.
 
@@ -429,12 +430,24 @@ def _emit_internal_profile_symbols(
     (e.g. ``default y if MUC_OPCUA_INTERN_PROFILE_NANO_<TOKEN>``) covers
     every profile at that tier and above.  ``custom`` has no internal symbol;
     it uses the effective choice symbol directly.
+
+    When *facet_implies* is provided, each cascade symbol also carries
+    ``imply <facet>`` lines for every facet whose minimum (lowest) named
+    profile matches that cascade level.  Because higher named profiles
+    activate lower cascade symbols, selecting a higher profile transitively
+    implies all facets at or below that tier -- exactly the "changing profile
+    resets facet defaults" behaviour (OPC-10000-7 §4.3).  ``imply`` nudges
+    the default to ``y`` while still letting the user turn a facet off, so
+    it composes safely with the facet's own ``default y if`` line.
     """
     lines.append("# -- Internal profile cascade symbols (OPC-10000-7 §4.3) --------------")
     lines.append("# Invisible bool symbols encoding the profile inclusion hierarchy.")
     lines.append("# Selecting a higher named profile auto-activates all lower cascade")
     lines.append("# symbols.  Facet / CU / capacity defaults reference the lowest internal")
     lines.append("# profile symbol that reaches them.  custom has no cascade symbol.")
+    if facet_implies:
+        lines.append("# Each cascade symbol also implies the Facet toggles whose minimum")
+        lines.append("# profile matches this level so a profile switch re-seeds facet defaults.")
     lines.append("")
 
     # Emit in reverse cascade order (full -> nano) so each symbol can
@@ -450,6 +463,10 @@ def _emit_internal_profile_symbols(
         if higher is not None:
             higher_intern = _internal_profile_symbol(profile_symbols[higher])
             lines.append("\tdefault y if " + higher_intern)
+        # imply: nudge facet defaults so a profile switch re-seeds them.
+        if facet_implies:
+            for facet_sym in facet_implies.get(pk, []):
+                lines.append("\timply " + facet_sym)
         lines.append("")
 
     lines.append("")
@@ -568,22 +585,26 @@ def generate_kconfig(manifest: dict) -> str:
     # -- Internal profile cascade symbols --------------------------------
     # Invisible bool symbols encoding the profile inclusion hierarchy.
     # Facet / CU / capacity defaults reference these so a single condition
-    # covers every profile at that tier and above.
-    _emit_internal_profile_symbols(lines, profile_symbols, profiles)
+    # covers every profile at that tier and above.  Each cascade symbol also
+    # implies the Facet toggles whose minimum profile matches this level so a
+    # profile switch re-seeds facet defaults (OPC-10000-7 §4.3).
+    items = manifest.get("items", [])
+    items_by_id = {
+        i.get("id"): i for i in items if isinstance(i, dict) and i.get("id")
+    }
+    facet_implies = _compute_facet_implies(manifest, items_by_id)
+    _emit_internal_profile_symbols(
+        lines, profile_symbols, profiles, facet_implies,
+    )
 
     # -- Server menu ------------------------------------------------------
     lines.append('menu "OPC UA Facets and Conformance Units"')
     lines.append("")
 
-    items = manifest.get("items", [])
-
     # Contained CUs are emitted under their canonical Facet menu below
     # (OPC-10000-7 §4.2); they are skipped in the flat emission to avoid
     # duplicate Kconfig ``config`` entries.
     contained_cus = _contained_cu_ids(manifest)
-    items_by_id = {
-        i.get("id"): i for i in items if isinstance(i, dict) and i.get("id")
-    }
 
     # -- Profile drilldown sections (OPC-named facet/CU symbols) ----------
     _emit_profile_sections(lines, manifest, items_by_id, profile_symbols, profiles)
@@ -859,19 +880,67 @@ def _facet_lowest_profile(
     return None
 
 
+def _compute_facet_implies(
+    manifest: dict, items_by_id: dict[str, dict],
+) -> dict[str, list[str]]:
+    """Map each cascade profile key to the facet symbols it should imply.
+
+    For every selectable facet, finds its lowest named profile (the cascade
+    level where it first defaults to y) and maps that level to the facet's
+    Kconfig toggle symbol.  The resulting dict is consumed by
+    :func:`_emit_internal_profile_symbols` to emit ``imply`` directives on
+    each internal cascade symbol so a profile switch re-seeds facet defaults
+    (OPC-10000-7 §4.3).  Facet symbols within each level are sorted for
+    deterministic output.
+    """
+    facet_containment = manifest.get("facet_containment")
+    result: dict[str, list[str]] = {pk: [] for pk in _CASCADE_ORDER}
+    if not isinstance(facet_containment, dict):
+        return result
+    for facet_id in facet_containment:
+        facet_item = items_by_id.get(facet_id)
+        if not isinstance(facet_item, dict):
+            continue
+        if facet_item.get("implementation_state") not in _SELECTABLE_STATES:
+            continue
+        facet_symbol = _facet_toggle_symbol(facet_item)
+        if not facet_symbol:
+            continue
+        cu_ids = facet_containment[facet_id]
+        contained_cu_items: list[dict] = []
+        if isinstance(cu_ids, list):
+            for cu_id in cu_ids:
+                cu_item = items_by_id.get(cu_id)
+                if isinstance(cu_item, dict):
+                    contained_cu_items.append(cu_item)
+        lowest = _facet_lowest_profile(facet_item, contained_cu_items)
+        if lowest is not None and lowest in result:
+            result[lowest].append(facet_symbol)
+    for pk in result:
+        result[pk].sort()
+    return result
+
+
 def _emit_one_facet_menu(
     lines: list[str], facet_id: str, facet_item: dict,
     facet_containment: dict, items_by_id: dict,
     profile_symbols: dict[str, str],
     emitted_facet_symbols: set[str],
 ) -> None:
-    """Emit a single ``menu "Facet: ..."`` with its toggle and contained CUs."""
+    """Emit a single facet as ``menuconfig`` with its toggle and contained CUs.
+
+    Selectable facets use the ``menuconfig <SYM>`` / ``if <SYM>`` / ``endif``
+    pattern (OPC-10000-7 §4.2).  The ``if`` block gates every contained CU so
+    CU entries inside the block omit the per-CU ``depends on <SYM>`` (the
+    ``if`` already enforces facet-off → CU-off, preserving group-off
+    behaviour).  Unselectable (unimplemented) facets retain the ``menu`` /
+    ``comment`` / ``endmenu`` wrapper because they have no toggle symbol to
+    drive a ``menuconfig`` header.
+    """
     state = facet_item.get("implementation_state")
     if state not in _SELECTABLE_STATES and state not in _UNSELECTABLE_STATES:
         return
     prompt = _item_prompt(facet_item)
-    lines.append('menu "Facet: ' + prompt + '"')
-    lines.append("")
 
     cu_ids = facet_containment[facet_id]
     contained_cu_items: list[dict] = []
@@ -889,29 +958,36 @@ def _emit_one_facet_menu(
         else None
     )
 
-    if state in _SELECTABLE_STATES and facet_symbol:
+    # -- Facet header -------------------------------------------------------
+    use_menuconfig = state in _SELECTABLE_STATES and facet_symbol is not None
+    if use_menuconfig:
+        assert facet_symbol is not None  # narrowed by use_menuconfig
         if facet_symbol not in emitted_facet_symbols:
             emitted_facet_symbols.add(facet_symbol)
-            lines.append("config " + facet_symbol)
-            lines.append('\tbool "Enable ' + prompt + '"')
+            lines.append("menuconfig " + facet_symbol)
+            lines.append('\tbool "' + prompt + '"')
             _emit_facet_toggle_default(
                 lines, facet_item, contained_cu_items, profile_symbols,
             )
             _emit_help(lines, facet_item)
             lines.append("")
-    elif state in _UNSELECTABLE_STATES:
-        # Unimplemented facet: emit a NOT IMPLEMENTED comment for the facet
-        # itself so the item is traceable in the generated Kconfig (its
-        # item_id and state are visible) even when the facet has zero
-        # contained CUs. The validator expects every unimplemented OPC
-        # item to surface as a comment directive (OPC-10000-7 §4.2).
+        lines.append("if " + facet_symbol)
+        lines.append("")
+    else:
+        # Unimplemented facet: no toggle symbol, keep menu/comment/endmenu
+        # so the item is traceable in the generated Kconfig (its item_id and
+        # state are visible) even when the facet has zero contained CUs.
+        lines.append('menu "Facet: ' + prompt + '"')
+        lines.append("")
         _emit_unselectable(lines, facet_item)
 
+    # -- Contained CUs -----------------------------------------------------
     # Emit selectable (claimed/implemented/deferred) CUs FIRST so the working
-    # toggles lead the facet menu, then emit unselectable (unimplemented) CUs
-    # as trailing NOT IMPLEMENTED comments. This keeps the actionable surface
-    # at the top of each ``menu "Facet: ..."`` block and pushes the roadmap
-    # noise to the end (Fix 3: unimplemented at END of facet menus).
+    # toggles lead the facet block, then emit unselectable (unimplemented) CUs
+    # as trailing NOT IMPLEMENTED comments.  Inside a ``menuconfig``/``if``
+    # block the block-level condition already gates the CUs, so the per-CU
+    # ``depends on <facet>`` is suppressed (facet_symbol=None) to avoid
+    # redundancy; the ``if`` enforces facet-off → CU-off.
     selectable_in_facet = [
         cu_item for cu_item in contained_cu_items
         if cu_item.get("implementation_state") in _SELECTABLE_STATES
@@ -920,16 +996,22 @@ def _emit_one_facet_menu(
         cu_item for cu_item in contained_cu_items
         if cu_item.get("implementation_state") in _UNSELECTABLE_STATES
     ]
+    cu_facet_gate: str | None = None if use_menuconfig else facet_symbol
     for cu_item in selectable_in_facet:
         _emit_selectable(
             lines, cu_item, profile_symbols,
-            facet_symbol=facet_symbol,
+            facet_symbol=cu_facet_gate,
         )
     for cu_item in unselectable_in_facet:
         _emit_unselectable(lines, cu_item)
 
-    lines.append("endmenu")
-    lines.append("")
+    # -- Close block -------------------------------------------------------
+    if use_menuconfig:
+        lines.append("endif")
+        lines.append("")
+    else:
+        lines.append("endmenu")
+        lines.append("")
 
 
 def _emit_profile_sections(

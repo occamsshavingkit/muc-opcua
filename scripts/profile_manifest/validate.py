@@ -163,11 +163,11 @@ def _check_generated(manifest: dict, manifest_path: str) -> list[str]:
                 "even if empty; OPC-10000-7 §4.3; run generate.py "
                 "--outputs kconfig to regenerate)"
             )
-    if 'menu "Facet:' not in expected_kconfig:
+    if 'menu "Facet:' not in expected_kconfig and 'menuconfig MUC_OPCUA_FACET_' not in expected_kconfig:
         errors.append(
-            "Kconfig: no 'Facet:' menu found in generated Kconfig "
-            "(expected at least one menu \"Facet: ...\" per OPC-10000-7 §4.2; "
-            "run generate.py --outputs kconfig to regenerate)"
+            "Kconfig: no Facet menu or menuconfig found in generated Kconfig "
+            "(expected at least one menu \"Facet: ...\" or menuconfig MUC_OPCUA_FACET_* "
+            "per OPC-10000-7 §4.2; run generate.py --outputs kconfig to regenerate)"
         )
     if '"CU:' not in expected_kconfig:
         errors.append(
@@ -901,20 +901,21 @@ def _check_naming_conventions(manifest: dict) -> list[str]:
 
 
 def _extract_config_help(kconfig_lines: list[str], symbol: str) -> str | None:
-    """Extract the help text for a Kconfig ``config`` symbol.
+    """Extract the help text for a Kconfig ``config``/``menuconfig`` symbol.
 
-    Scans *kconfig_lines* for ``config <symbol>``, then looks for a
-    ``\\thelp`` line within that config block and collects the subsequent
-    help-body lines (those indented deeper than ``help``).
+    Scans *kconfig_lines* for ``config <symbol>`` or ``menuconfig <symbol>``,
+    then looks for a ``\\thelp`` line within that config block and collects
+    the subsequent help-body lines (those indented deeper than ``help``).
 
     Returns the concatenated help text, or ``None`` if the symbol has no
     config block or the block has no ``help`` section.
     """
     config_marker = "config " + symbol
+    menuconfig_marker = "menuconfig " + symbol
     n = len(kconfig_lines)
     i = 0
     while i < n:
-        if kconfig_lines[i] == config_marker:
+        if kconfig_lines[i] == config_marker or kconfig_lines[i] == menuconfig_marker:
             j = i + 1
             while j < n:
                 line = kconfig_lines[j]
@@ -1042,7 +1043,8 @@ def _check_opc_references_in_help(manifest: dict) -> list[str]:
             continue
 
         config_line = "config " + symbol
-        if not any(ln == config_line for ln in kconfig_lines):
+        menuconfig_line = "menuconfig " + symbol
+        if not any(ln == config_line or ln == menuconfig_line for ln in kconfig_lines):
             continue
 
         help_text = _extract_config_help(kconfig_lines, symbol)
