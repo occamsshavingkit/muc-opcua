@@ -2,8 +2,8 @@
  * Symmetric (MSG/CLO) chunk protection for Basic256Sha256 (OPC 10000-6 §6.7.2). */
 #include "security/sym_chunk.h"
 #include "core/safe_mem.h"
-#include "security/key_derivation.h"
 #include "muc_opcua/encoding.h"
+#include "security/key_derivation.h"
 #include <string.h>
 
 #define MU_SYM_HEADER_SIZE 16 /* type+IsFinal(4) + MessageSize(4) + SecureChannelId(4) + TokenId(4) */

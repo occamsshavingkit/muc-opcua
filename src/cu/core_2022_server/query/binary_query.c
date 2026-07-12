@@ -1,8 +1,8 @@
 #include "muc_opcua/config.h"
 #ifdef MUC_OPCUA_CU_QUERY
 
-#include "services/query.h"
 #include "muc_opcua/encoding.h"
+#include "services/query.h"
 
 static opcua_statuscode_t query_reader_fail(mu_binary_reader_t *reader, opcua_statuscode_t status) {
     if (reader) {
