@@ -18,7 +18,7 @@ remains future work.
 | claimed | 31 |
 | implemented | 1 |
 | deferred | 7 |
-| unimplemented | 121 |
+| unimplemented | 88 |
 
 ## Item matrix
 
@@ -36,56 +36,31 @@ remains future work.
 | opc_facet_1322 | facet | deferred | OPC-10000-7 §4.2 | MUC_OPCUA_FACET_CORE_2022_SERVER | all | — |
 | opc_facet_1636 | facet | unimplemented | OPC-10000-7 §4.2 | — | — | — |
 | opc_facet_1637 | facet | unimplemented | OPC-10000-7 §4.2 | — | — | — |
-| opc_cu_2317 | conformance_unit | unimplemented |  | — | all | — |
-| opc_cu_2328 | conformance_unit | unimplemented |  | — | all | — |
-| opc_cu_2352 | conformance_unit | unimplemented |  | — | all | — |
-| opc_cu_2389 | conformance_unit | unimplemented |  | — | all | — |
-| opc_cu_2400 | conformance_unit | unimplemented |  | — | all | — |
-| opc_cu_2407 | conformance_unit | unimplemented |  | — | all | — |
 | opc_cu_2446 | conformance_unit | unimplemented |  | — | all | — |
 | opc_cu_2447 | conformance_unit | unimplemented |  | — | all | — |
 | opc_cu_2476 | conformance_unit | unimplemented |  | — | all | — |
-| opc_cu_2478 | conformance_unit | unimplemented |  | — | all | — |
-| opc_cu_2479 | conformance_unit | unimplemented |  | — | all | — |
-| opc_cu_2480 | conformance_unit | unimplemented |  | — | all | — |
 | opc_cu_2600 | conformance_unit | unimplemented |  | — | all | — |
 | opc_cu_2711 | conformance_unit | unimplemented |  | — | all | — |
-| opc_cu_2786 | conformance_unit | unimplemented |  | — | all | — |
-| opc_cu_2808 | conformance_unit | unimplemented |  | — | all | — |
 | opc_cu_2809 | conformance_unit | unimplemented |  | — | all | — |
 | opc_cu_2820 | conformance_unit | unimplemented |  | — | all | — |
-| opc_cu_2936 | conformance_unit | unimplemented |  | — | all | — |
 | opc_cu_2969 | conformance_unit | unimplemented |  | — | all | — |
-| opc_cu_3072 | conformance_unit | unimplemented |  | — | all | — |
-| opc_cu_3073 | conformance_unit | unimplemented |  | — | all | — |
 | opc_cu_3127 | conformance_unit | unimplemented |  | — | all | — |
-| opc_cu_3147 | conformance_unit | unimplemented |  | — | all | — |
-| opc_cu_3175 | conformance_unit | unimplemented |  | — | all | — |
 | opc_cu_3184 | conformance_unit | unimplemented |  | — | all | — |
 | opc_cu_3186 | conformance_unit | unimplemented |  | — | all | — |
-| opc_cu_3192 | conformance_unit | unimplemented |  | — | all | — |
 | opc_cu_3198 | conformance_unit | unimplemented |  | — | all | — |
-| opc_cu_3530 | conformance_unit | unimplemented |  | — | all | — |
 | opc_cu_3545 | conformance_unit | unimplemented |  | — | all | — |
 | opc_cu_3554 | conformance_unit | unimplemented |  | — | all | — |
 | opc_cu_3560 | conformance_unit | unimplemented |  | — | all | — |
-| opc_cu_3802 | conformance_unit | unimplemented |  | — | all | — |
 | opc_cu_3808 | conformance_unit | unimplemented |  | — | all | — |
 | opc_cu_3912 | conformance_unit | unimplemented |  | — | all | — |
-| opc_cu_3983 | conformance_unit | unimplemented |  | — | all | — |
-| opc_cu_3985 | conformance_unit | unimplemented |  | — | all | — |
 | opc_cu_4053 | conformance_unit | unimplemented |  | — | all | — |
 | opc_cu_4237 | conformance_unit | unimplemented |  | — | all | — |
 | opc_cu_5240 | conformance_unit | unimplemented |  | — | all | — |
-| opc_cu_5505 | conformance_unit | unimplemented |  | — | all | — |
-| opc_cu_5793 | conformance_unit | unimplemented |  | — | all | — |
 | opc_facet_1219 | facet | deferred | OPC-10000-7 §4.2 | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER | embedded, standard, full | — |
 | opc_facet_1324 | facet | deferred | OPC-10000-7 §4.2 | MUC_OPCUA_FACET_STANDARD_DATACHANGE_SUBSCRIPTION_2022_SERVER | embedded, standard, full | — |
 | opc_facet_1631 | facet | deferred | OPC-10000-7 §4.2 | MUC_OPCUA_FACET_GLOBAL_CERTIFICATE_MANAGEMENT_SERVER | embedded, standard, full | — |
 | opc_facet_1695 | facet | deferred | OPC-10000-7 §4.2 | MUC_OPCUA_FACET_USER_TOKEN_USER_NAME_PASSWORD_SERVER | embedded, standard, full | — |
 | opc_facet_1696 | facet | deferred | OPC-10000-7 §4.2 | MUC_OPCUA_FACET_USER_TOKEN_X509_CERTIFICATE_SERVER | standard, full | — |
-| opc_cu_2863 | conformance_unit | unimplemented |  | — | embedded, standard, full | — |
-| opc_cu_3125 | conformance_unit | unimplemented |  | — | standard, full | — |
 | opc_facet_2250 | facet | deferred | OPC-10000-7 §4.2 | MUC_OPCUA_FACET_EMBEDDED_DATACHANGE_SUBSCRIPTION_2022_SERVER | micro, embedded, standard, full | — |
 | opc_cu_2231 | conformance_unit | unimplemented |  | — | embedded, standard, full | — |
 | opc_cu_2423 | conformance_unit | unimplemented |  | — | embedded, standard, full | — |
@@ -104,11 +79,9 @@ remains future work.
 | opc_cu_2517 | conformance_unit | unimplemented |  | — | embedded, standard, full | — |
 | opc_cu_2518 | conformance_unit | unimplemented |  | — | embedded, standard, full | — |
 | opc_cu_2536 | conformance_unit | unimplemented |  | — | embedded, standard, full | — |
-| opc_cu_2823 | conformance_unit | unimplemented |  | — | embedded, standard, full | — |
 | opc_cu_2928 | conformance_unit | unimplemented |  | — | embedded, standard, full | — |
 | opc_cu_2940 | conformance_unit | unimplemented |  | — | embedded, standard, full | — |
 | opc_cu_2963 | conformance_unit | unimplemented |  | — | micro, embedded, standard, full | — |
-| opc_cu_3143 | conformance_unit | unimplemented |  | — | micro, embedded, standard, full | — |
 | opc_cu_3146 | conformance_unit | unimplemented |  | — | embedded, standard, full | — |
 | opc_cu_3185 | conformance_unit | unimplemented |  | — | embedded, standard, full | — |
 | opc_cu_3188 | conformance_unit | unimplemented |  | — | embedded, standard, full | — |
@@ -117,17 +90,12 @@ remains future work.
 | opc_cu_3207 | conformance_unit | unimplemented |  | — | embedded, standard, full | — |
 | opc_cu_3214 | conformance_unit | unimplemented |  | — | embedded, standard, full | — |
 | opc_cu_3532 | conformance_unit | unimplemented |  | — | embedded, standard, full | — |
-| opc_cu_3534 | conformance_unit | unimplemented |  | — | embedded, standard, full | — |
-| opc_cu_3535 | conformance_unit | unimplemented |  | — | embedded, standard, full | — |
-| opc_cu_3536 | conformance_unit | unimplemented |  | — | embedded, standard, full | — |
 | opc_cu_3544 | conformance_unit | unimplemented |  | — | embedded, standard, full | — |
 | opc_cu_3547 | conformance_unit | unimplemented |  | — | embedded, standard, full | — |
 | opc_cu_3550 | conformance_unit | unimplemented |  | — | embedded, standard, full | — |
 | opc_cu_3551 | conformance_unit | unimplemented |  | — | embedded, standard, full | — |
 | opc_cu_3641 | conformance_unit | unimplemented |  | — | embedded, standard, full | — |
 | opc_cu_3644 | conformance_unit | unimplemented |  | — | embedded, standard, full | — |
-| opc_cu_3645 | conformance_unit | unimplemented |  | — | embedded, standard, full | — |
-| opc_cu_3727 | conformance_unit | unimplemented |  | — | micro, embedded, standard, full | — |
 | opc_cu_3747 | conformance_unit | unimplemented |  | — | embedded, standard, full | — |
 | opc_cu_3748 | conformance_unit | unimplemented |  | — | embedded, standard, full | — |
 | opc_cu_3749 | conformance_unit | unimplemented |  | — | embedded, standard, full | — |
@@ -142,7 +110,6 @@ remains future work.
 | opc_cu_3758 | conformance_unit | unimplemented |  | — | embedded, standard, full | — |
 | opc_cu_3759 | conformance_unit | unimplemented |  | — | embedded, standard, full | — |
 | opc_cu_3911 | conformance_unit | unimplemented |  | — | micro, embedded, standard, full | — |
-| opc_cu_3913 | conformance_unit | unimplemented |  | — | micro, embedded, standard, full | — |
 | opc_cu_3922 | conformance_unit | unimplemented |  | — | micro, embedded, standard, full | — |
 | opc_cu_3996 | conformance_unit | unimplemented |  | — | embedded, standard, full | — |
 | opc_cu_4052 | conformance_unit | unimplemented |  | — | embedded, standard, full | — |

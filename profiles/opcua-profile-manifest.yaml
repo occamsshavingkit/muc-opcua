@@ -125,49 +125,25 @@
       "opc_cu_5868"
     ],
     "opc_facet_1322": [
-      "opc_cu_2317",
-      "opc_cu_2328",
-      "opc_cu_2352",
-      "opc_cu_2389",
-      "opc_cu_2400",
-      "opc_cu_2407",
       "opc_cu_2446",
       "opc_cu_2447",
       "opc_cu_2476",
-      "opc_cu_2478",
-      "opc_cu_2479",
-      "opc_cu_2480",
       "opc_cu_2600",
       "opc_cu_2711",
-      "opc_cu_2786",
-      "opc_cu_2808",
       "opc_cu_2809",
       "opc_cu_2820",
-      "opc_cu_2863",
-      "opc_cu_2936",
       "opc_cu_2969",
-      "opc_cu_3072",
-      "opc_cu_3073",
       "opc_cu_3127",
-      "opc_cu_3147",
-      "opc_cu_3175",
       "opc_cu_3184",
       "opc_cu_3186",
-      "opc_cu_3192",
       "opc_cu_3198",
-      "opc_cu_3530",
       "opc_cu_3545",
       "opc_cu_3554",
-      "opc_cu_3802",
       "opc_cu_3808",
       "opc_cu_3912",
-      "opc_cu_3983",
-      "opc_cu_3985",
       "opc_cu_4053",
       "opc_cu_4237",
       "opc_cu_5240",
-      "opc_cu_5505",
-      "opc_cu_5793",
       "opc_monitor_items_500",
       "opc_monitor_minqueuesize_05",
       "service_read",
@@ -207,28 +183,15 @@
       "opc_cu_2940",
       "opc_cu_3146",
       "opc_cu_3532",
-      "opc_cu_3534",
-      "opc_cu_3535",
       "opc_cu_3544"
     ],
     "opc_facet_1631": [
       "opc_cu_2231"
     ],
-    "opc_facet_1695": [
-      "opc_cu_2823",
-      "opc_cu_3536",
-      "opc_cu_3645"
-    ],
-    "opc_facet_1696": [
-      "opc_cu_3125"
-    ],
     "opc_facet_2250": [
       "opc_cu_2963",
-      "opc_cu_3143",
       "opc_cu_3196",
-      "opc_cu_3727",
       "opc_cu_3911",
-      "opc_cu_3913",
       "opc_cu_3922",
       "opc_cu_4055",
       "opc_cu_5207",
@@ -601,180 +564,6 @@
       "notes": "Defines the use of AliasNames in an aggregating Server."
     },
     {
-      "id": "opc_cu_2317",
-      "kind": "conformance_unit",
-      "opc_display_name": "View TranslateBrowsePath",
-      "kconfig_symbol": null,
-      "implementation_state": "unimplemented",
-      "depends_on": [],
-      "profile_defaults": {
-        "nano": true,
-        "micro": true,
-        "embedded": true,
-        "standard": true,
-        "full": true,
-        "custom": false
-      },
-      "backing_tests": [],
-      "opc_reference": {
-        "spec": null,
-        "section": null,
-        "cu_id": "2317",
-        "cu_name": "View TranslateBrowsePath",
-        "source_url": "https://profiles.opcfoundation.org"
-      },
-      "source_metadata": {
-        "profile_group_id": 171,
-        "source_endpoint": "conformanceunit/?pg=171&all=1"
-      },
-      "notes": "Support TranslateBrowsePathsToNodeIds Service."
-    },
-    {
-      "id": "opc_cu_2328",
-      "kind": "conformance_unit",
-      "opc_display_name": "Discovery Get Endpoints",
-      "kconfig_symbol": null,
-      "implementation_state": "unimplemented",
-      "depends_on": [],
-      "profile_defaults": {
-        "nano": true,
-        "micro": true,
-        "embedded": true,
-        "standard": true,
-        "full": true,
-        "custom": false
-      },
-      "backing_tests": [],
-      "opc_reference": {
-        "spec": null,
-        "section": null,
-        "cu_id": "2328",
-        "cu_name": "Discovery Get Endpoints",
-        "source_url": "https://profiles.opcfoundation.org"
-      },
-      "source_metadata": {
-        "profile_group_id": 171,
-        "source_endpoint": "conformanceunit/?pg=171&all=1"
-      },
-      "notes": "Support the GetEndpoints Service to obtain all Endpoints of the Server.\r\nThis includes filtering based on Profiles."
-    },
-    {
-      "id": "opc_cu_2352",
-      "kind": "conformance_unit",
-      "opc_display_name": "Discovery Find Servers Self",
-      "kconfig_symbol": null,
-      "implementation_state": "unimplemented",
-      "depends_on": [],
-      "profile_defaults": {
-        "nano": true,
-        "micro": true,
-        "embedded": true,
-        "standard": true,
-        "full": true,
-        "custom": false
-      },
-      "backing_tests": [],
-      "opc_reference": {
-        "spec": null,
-        "section": null,
-        "cu_id": "2352",
-        "cu_name": "Discovery Find Servers Self",
-        "source_url": "https://profiles.opcfoundation.org"
-      },
-      "source_metadata": {
-        "profile_group_id": 171,
-        "source_endpoint": "conformanceunit/?pg=171&all=1"
-      },
-      "notes": "Support the FindServers Service only for itself."
-    },
-    {
-      "id": "opc_cu_2389",
-      "kind": "conformance_unit",
-      "opc_display_name": "Attribute Write Values",
-      "kconfig_symbol": null,
-      "implementation_state": "unimplemented",
-      "depends_on": [],
-      "profile_defaults": {
-        "nano": true,
-        "micro": true,
-        "embedded": true,
-        "standard": true,
-        "full": true,
-        "custom": false
-      },
-      "backing_tests": [],
-      "opc_reference": {
-        "spec": null,
-        "section": null,
-        "cu_id": "2389",
-        "cu_name": "Attribute Write Values",
-        "source_url": "https://profiles.opcfoundation.org"
-      },
-      "source_metadata": {
-        "profile_group_id": 171,
-        "source_endpoint": "conformanceunit/?pg=171&all=1"
-      },
-      "notes": "Supports writing to values to one or more Attributes of one or more Nodes."
-    },
-    {
-      "id": "opc_cu_2400",
-      "kind": "conformance_unit",
-      "opc_display_name": "Session Change User",
-      "kconfig_symbol": null,
-      "implementation_state": "unimplemented",
-      "depends_on": [],
-      "profile_defaults": {
-        "nano": true,
-        "micro": true,
-        "embedded": true,
-        "standard": true,
-        "full": true,
-        "custom": false
-      },
-      "backing_tests": [],
-      "opc_reference": {
-        "spec": null,
-        "section": null,
-        "cu_id": "2400",
-        "cu_name": "Session Change User",
-        "source_url": "https://profiles.opcfoundation.org"
-      },
-      "source_metadata": {
-        "profile_group_id": 171,
-        "source_endpoint": "conformanceunit/?pg=171&all=1"
-      },
-      "notes": "Support the use of ActivateSession to change the Session user."
-    },
-    {
-      "id": "opc_cu_2407",
-      "kind": "conformance_unit",
-      "opc_display_name": "Security Administration",
-      "kconfig_symbol": null,
-      "implementation_state": "unimplemented",
-      "depends_on": [],
-      "profile_defaults": {
-        "nano": true,
-        "micro": true,
-        "embedded": true,
-        "standard": true,
-        "full": true,
-        "custom": false
-      },
-      "backing_tests": [],
-      "opc_reference": {
-        "spec": null,
-        "section": null,
-        "cu_id": "2407",
-        "cu_name": "Security Administration",
-        "source_url": "https://profiles.opcfoundation.org"
-      },
-      "source_metadata": {
-        "profile_group_id": 171,
-        "source_endpoint": "conformanceunit/?pg=171&all=1"
-      },
-      "notes": "Allow configuration of the following Security related items (when they apply).\r\n    * select the allowed/used User identification policy or policies (e.g. User Name/Password or X509).\r\n    * enable/disable or select the security policy \"None\" or other security policies.\r\n    * enable/disable or select endpoints with MessageSecurityMode SIGN or SIGNANDENCRYPT.\r\n    * set the permitted certification authorities.\r\n    * define how to react to unknown Certificates.\r\n    * allow accepting any valid Certificate"
-    },
-    {
       "id": "opc_cu_2446",
       "kind": "conformance_unit",
       "opc_display_name": "Address Space AddIn Reference",
@@ -862,93 +651,6 @@
       "notes": "Exposes local time information by providing the LocalTime Variable on the Server Object. Exposes the TimeZoneDataType, its Encoding Object and all its supertypes in the AddressSpace."
     },
     {
-      "id": "opc_cu_2478",
-      "kind": "conformance_unit",
-      "opc_display_name": "Time Sync – OS based support",
-      "kconfig_symbol": null,
-      "implementation_state": "unimplemented",
-      "depends_on": [],
-      "profile_defaults": {
-        "nano": true,
-        "micro": true,
-        "embedded": true,
-        "standard": true,
-        "full": true,
-        "custom": false
-      },
-      "backing_tests": [],
-      "opc_reference": {
-        "spec": null,
-        "section": null,
-        "cu_id": "2478",
-        "cu_name": "Time Sync – OS based support",
-        "source_url": "https://profiles.opcfoundation.org"
-      },
-      "source_metadata": {
-        "profile_group_id": 171,
-        "source_endpoint": "conformanceunit/?pg=171&all=1"
-      },
-      "notes": "Application supports time synchronization via features of a standard operating system."
-    },
-    {
-      "id": "opc_cu_2479",
-      "kind": "conformance_unit",
-      "opc_display_name": "Time Sync – IEEE 1588 (PTP)",
-      "kconfig_symbol": null,
-      "implementation_state": "unimplemented",
-      "depends_on": [],
-      "profile_defaults": {
-        "nano": true,
-        "micro": true,
-        "embedded": true,
-        "standard": true,
-        "full": true,
-        "custom": false
-      },
-      "backing_tests": [],
-      "opc_reference": {
-        "spec": null,
-        "section": null,
-        "cu_id": "2479",
-        "cu_name": "Time Sync – IEEE 1588 (PTP)",
-        "source_url": "https://profiles.opcfoundation.org"
-      },
-      "source_metadata": {
-        "profile_group_id": 171,
-        "source_endpoint": "conformanceunit/?pg=171&all=1"
-      },
-      "notes": "Application supports time synchronization via the Precision Time Protocol (PTP)."
-    },
-    {
-      "id": "opc_cu_2480",
-      "kind": "conformance_unit",
-      "opc_display_name": "Time Sync – IEEE 802.1AS",
-      "kconfig_symbol": null,
-      "implementation_state": "unimplemented",
-      "depends_on": [],
-      "profile_defaults": {
-        "nano": true,
-        "micro": true,
-        "embedded": true,
-        "standard": true,
-        "full": true,
-        "custom": false
-      },
-      "backing_tests": [],
-      "opc_reference": {
-        "spec": null,
-        "section": null,
-        "cu_id": "2480",
-        "cu_name": "Time Sync – IEEE 802.1AS",
-        "source_url": "https://profiles.opcfoundation.org"
-      },
-      "source_metadata": {
-        "profile_group_id": 171,
-        "source_endpoint": "conformanceunit/?pg=171&all=1"
-      },
-      "notes": "Application supports time synchronization via the features described in IEEE 802.1AS."
-    },
-    {
       "id": "opc_cu_2600",
       "kind": "conformance_unit",
       "opc_display_name": "SecurityPolicy Support",
@@ -1005,64 +707,6 @@
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
       "notes": "The Server supports Variables of the SelectionListType VariableType."
-    },
-    {
-      "id": "opc_cu_2786",
-      "kind": "conformance_unit",
-      "opc_display_name": "Time Sync – NTP",
-      "kconfig_symbol": null,
-      "implementation_state": "unimplemented",
-      "depends_on": [],
-      "profile_defaults": {
-        "nano": true,
-        "micro": true,
-        "embedded": true,
-        "standard": true,
-        "full": true,
-        "custom": false
-      },
-      "backing_tests": [],
-      "opc_reference": {
-        "spec": null,
-        "section": null,
-        "cu_id": "2786",
-        "cu_name": "Time Sync – NTP",
-        "source_url": "https://profiles.opcfoundation.org"
-      },
-      "source_metadata": {
-        "profile_group_id": 171,
-        "source_endpoint": "conformanceunit/?pg=171&all=1"
-      },
-      "notes": "Application supports time synchronization via the Network Time Protocol (NTP)."
-    },
-    {
-      "id": "opc_cu_2808",
-      "kind": "conformance_unit",
-      "opc_display_name": "Security Role Server Authorization",
-      "kconfig_symbol": null,
-      "implementation_state": "unimplemented",
-      "depends_on": [],
-      "profile_defaults": {
-        "nano": true,
-        "micro": true,
-        "embedded": true,
-        "standard": true,
-        "full": true,
-        "custom": false
-      },
-      "backing_tests": [],
-      "opc_reference": {
-        "spec": null,
-        "section": null,
-        "cu_id": "2808",
-        "cu_name": "Security Role Server Authorization",
-        "source_url": "https://profiles.opcfoundation.org"
-      },
-      "source_metadata": {
-        "profile_group_id": 171,
-        "source_endpoint": "conformanceunit/?pg=171&all=1"
-      },
-      "notes": "Restrict access based on the configured Roles and permissions."
     },
     {
       "id": "opc_cu_2809",
@@ -1123,35 +767,6 @@
       "notes": "Support setting the WriteFullArrayOnly flag in the AccessLevelEx Attribute for Variable Nodes of non-scalar data types to indicate whether write operations for an array can be performed with an IndexRange."
     },
     {
-      "id": "opc_cu_2936",
-      "kind": "conformance_unit",
-      "opc_display_name": "Attribute Write StatusCode & Timestamp",
-      "kconfig_symbol": null,
-      "implementation_state": "unimplemented",
-      "depends_on": [],
-      "profile_defaults": {
-        "nano": true,
-        "micro": true,
-        "embedded": true,
-        "standard": true,
-        "full": true,
-        "custom": false
-      },
-      "backing_tests": [],
-      "opc_reference": {
-        "spec": null,
-        "section": null,
-        "cu_id": "2936",
-        "cu_name": "Attribute Write StatusCode & Timestamp",
-        "source_url": "https://profiles.opcfoundation.org"
-      },
-      "source_metadata": {
-        "profile_group_id": 171,
-        "source_endpoint": "conformanceunit/?pg=171&all=1"
-      },
-      "notes": "Supports writing of StatusCode and Timestamps along with the Value."
-    },
-    {
       "id": "opc_cu_2969",
       "kind": "conformance_unit",
       "opc_display_name": "Base Info ValueAsText",
@@ -1181,64 +796,6 @@
       "notes": "The Server supports the Property ValueAsText for enumerated DataTypes."
     },
     {
-      "id": "opc_cu_3072",
-      "kind": "conformance_unit",
-      "opc_display_name": "Attribute Read",
-      "kconfig_symbol": null,
-      "implementation_state": "unimplemented",
-      "depends_on": [],
-      "profile_defaults": {
-        "nano": true,
-        "micro": true,
-        "embedded": true,
-        "standard": true,
-        "full": true,
-        "custom": false
-      },
-      "backing_tests": [],
-      "opc_reference": {
-        "spec": null,
-        "section": null,
-        "cu_id": "3072",
-        "cu_name": "Attribute Read",
-        "source_url": "https://profiles.opcfoundation.org"
-      },
-      "source_metadata": {
-        "profile_group_id": 171,
-        "source_endpoint": "conformanceunit/?pg=171&all=1"
-      },
-      "notes": "Supports the Read Service to read one or more Attributes of one or more Nodes. This includes support of the IndexRange parameter to read a single element or a range of elements when the Attribute value is an array."
-    },
-    {
-      "id": "opc_cu_3073",
-      "kind": "conformance_unit",
-      "opc_display_name": "View RegisterNodes",
-      "kconfig_symbol": null,
-      "implementation_state": "unimplemented",
-      "depends_on": [],
-      "profile_defaults": {
-        "nano": true,
-        "micro": true,
-        "embedded": true,
-        "standard": true,
-        "full": true,
-        "custom": false
-      },
-      "backing_tests": [],
-      "opc_reference": {
-        "spec": null,
-        "section": null,
-        "cu_id": "3073",
-        "cu_name": "View RegisterNodes",
-        "source_url": "https://profiles.opcfoundation.org"
-      },
-      "source_metadata": {
-        "profile_group_id": 171,
-        "source_endpoint": "conformanceunit/?pg=171&all=1"
-      },
-      "notes": "Support the RegisterNodes and UnregisterNodes Services as a way to optimize access to repeatedly used Nodes in the Server's OPC UA AddressSpace."
-    },
-    {
       "id": "opc_cu_3127",
       "kind": "conformance_unit",
       "opc_display_name": "Base Info OptionSet",
@@ -1266,64 +823,6 @@
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
       "notes": "The Server supports the VariableType OptionSetType."
-    },
-    {
-      "id": "opc_cu_3147",
-      "kind": "conformance_unit",
-      "opc_display_name": "Attribute Write Index",
-      "kconfig_symbol": null,
-      "implementation_state": "unimplemented",
-      "depends_on": [],
-      "profile_defaults": {
-        "nano": true,
-        "micro": true,
-        "embedded": true,
-        "standard": true,
-        "full": true,
-        "custom": false
-      },
-      "backing_tests": [],
-      "opc_reference": {
-        "spec": null,
-        "section": null,
-        "cu_id": "3147",
-        "cu_name": "Attribute Write Index",
-        "source_url": "https://profiles.opcfoundation.org"
-      },
-      "source_metadata": {
-        "profile_group_id": 171,
-        "source_endpoint": "conformanceunit/?pg=171&all=1"
-      },
-      "notes": "Supports the IndexRange to write a single element or a range of elements when the Attribute value is an array and partial updates is allowed for this array."
-    },
-    {
-      "id": "opc_cu_3175",
-      "kind": "conformance_unit",
-      "opc_display_name": "Session Base",
-      "kconfig_symbol": null,
-      "implementation_state": "unimplemented",
-      "depends_on": [],
-      "profile_defaults": {
-        "nano": true,
-        "micro": true,
-        "embedded": true,
-        "standard": true,
-        "full": true,
-        "custom": false
-      },
-      "backing_tests": [],
-      "opc_reference": {
-        "spec": null,
-        "section": null,
-        "cu_id": "3175",
-        "cu_name": "Session Base",
-        "source_url": "https://profiles.opcfoundation.org"
-      },
-      "source_metadata": {
-        "profile_group_id": 171,
-        "source_endpoint": "conformanceunit/?pg=171&all=1"
-      },
-      "notes": "Support the Session Service Set (CreateSession, ActivateSession, CloseSession) except the use of ActivateSession to change the Session user. This includes correct handling of all parameters that are provided.\nNote that for the CreateSession and ActivateSession services, if the SecurityMode = None then:\n1) The Application Certificate and Nonce are optional.\n2) The signatures are null/empty."
     },
     {
       "id": "opc_cu_3184",
@@ -1384,35 +883,6 @@
       "notes": "Exposes the entry point into views in the AddressSpace. This is the Views Object."
     },
     {
-      "id": "opc_cu_3192",
-      "kind": "conformance_unit",
-      "opc_display_name": "Base Info Diagnostics",
-      "kconfig_symbol": null,
-      "implementation_state": "unimplemented",
-      "depends_on": [],
-      "profile_defaults": {
-        "nano": true,
-        "micro": true,
-        "embedded": true,
-        "standard": true,
-        "full": true,
-        "custom": false
-      },
-      "backing_tests": [],
-      "opc_reference": {
-        "spec": null,
-        "section": null,
-        "cu_id": "3192",
-        "cu_name": "Base Info Diagnostics",
-        "source_url": "https://profiles.opcfoundation.org"
-      },
-      "source_metadata": {
-        "profile_group_id": 171,
-        "source_endpoint": "conformanceunit/?pg=171&all=1"
-      },
-      "notes": "The Server supports the collection of diagnostic information and exposes it in the AddressSpace. This includes always the ServerDiagnostics Object of the Server Object and its EnabledFlag Variable. The EnabledFlag in the ServerDiagnostics Object can be set TRUE and in that case the following Objects and Variables for diagnostic data as defined in the ServerDiagnosticsType are exposed: ServerDiagnosticsSummary with all its subcomponents, SubscriptionDiagnosticsArray, and SessionsDiagnosticsSummary with all its subcomponents."
-    },
-    {
       "id": "opc_cu_3198",
       "kind": "conformance_unit",
       "opc_display_name": "Base Info Estimated Return Time",
@@ -1440,35 +910,6 @@
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
       "notes": "Server supports the EstimatedReturnTime Property. It indicates the time at which the Server is expected to have a ServerStatus.State of RUNNING_0. Clients can use this information to govern the reconnect logic."
-    },
-    {
-      "id": "opc_cu_3530",
-      "kind": "conformance_unit",
-      "opc_display_name": "View Basic 2",
-      "kconfig_symbol": null,
-      "implementation_state": "unimplemented",
-      "depends_on": [],
-      "profile_defaults": {
-        "nano": true,
-        "micro": true,
-        "embedded": true,
-        "standard": true,
-        "full": true,
-        "custom": false
-      },
-      "backing_tests": [],
-      "opc_reference": {
-        "spec": null,
-        "section": null,
-        "cu_id": "3530",
-        "cu_name": "View Basic 2",
-        "source_url": "https://profiles.opcfoundation.org"
-      },
-      "source_metadata": {
-        "profile_group_id": 171,
-        "source_endpoint": "conformanceunit/?pg=171&all=1"
-      },
-      "notes": "Support the View Service Set (Browse, BrowseNext). This includes the support of minimum 1 continuation point per Session."
     },
     {
       "id": "opc_cu_3545",
@@ -1558,35 +999,6 @@
       "notes": "Support Interfaces and associated rules. Includes exposing the entry point InterfaceTypes and the types BaseInterfaceType and HasInterface and all their supertypes in the AddressSpace."
     },
     {
-      "id": "opc_cu_3802",
-      "kind": "conformance_unit",
-      "opc_display_name": "Time Sync - Configure Clock Skew",
-      "kconfig_symbol": null,
-      "implementation_state": "unimplemented",
-      "depends_on": [],
-      "profile_defaults": {
-        "nano": true,
-        "micro": true,
-        "embedded": true,
-        "standard": true,
-        "full": true,
-        "custom": false
-      },
-      "backing_tests": [],
-      "opc_reference": {
-        "spec": null,
-        "section": null,
-        "cu_id": "3802",
-        "cu_name": "Time Sync - Configure Clock Skew",
-        "source_url": "https://profiles.opcfoundation.org"
-      },
-      "source_metadata": {
-        "profile_group_id": 171,
-        "source_endpoint": "conformanceunit/?pg=171&all=1"
-      },
-      "notes": "Supports configuration of the acceptable clock skew."
-    },
-    {
       "id": "opc_cu_3808",
       "kind": "conformance_unit",
       "opc_display_name": "Documentation - Core Capacities",
@@ -1643,64 +1055,6 @@
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
       "notes": "Exposes ServerProfileArray, LocaleIdArray, MinSupportedSampleRate, MaxBrowseContinuationPoints, ModellingRules, MaxArrayLength, MaxStringLength, MaxByteStringLength and MaxSessions of the ServerCapabilities Object, as well as MaxNodesPerRead, MaxNodesPerWrite, MaxNodesPerBrowse, MaxNodesPerRegisterNodes, MaxNodesPerTranslateBrowsePathsToNodesIds of the OperationLimits Object."
-    },
-    {
-      "id": "opc_cu_3983",
-      "kind": "conformance_unit",
-      "opc_display_name": "Base Services Diagnostics",
-      "kconfig_symbol": null,
-      "implementation_state": "unimplemented",
-      "depends_on": [],
-      "profile_defaults": {
-        "nano": true,
-        "micro": true,
-        "embedded": true,
-        "standard": true,
-        "full": true,
-        "custom": false
-      },
-      "backing_tests": [],
-      "opc_reference": {
-        "spec": null,
-        "section": null,
-        "cu_id": "3983",
-        "cu_name": "Base Services Diagnostics",
-        "source_url": "https://profiles.opcfoundation.org"
-      },
-      "source_metadata": {
-        "profile_group_id": 171,
-        "source_endpoint": "conformanceunit/?pg=171&all=1"
-      },
-      "notes": "The Server returns available diagnostic information as requested with the 'returnDiagnostics' parameter."
-    },
-    {
-      "id": "opc_cu_3985",
-      "kind": "conformance_unit",
-      "opc_display_name": "Session General Service Behaviour",
-      "kconfig_symbol": null,
-      "implementation_state": "unimplemented",
-      "depends_on": [],
-      "profile_defaults": {
-        "nano": true,
-        "micro": true,
-        "embedded": true,
-        "standard": true,
-        "full": true,
-        "custom": false
-      },
-      "backing_tests": [],
-      "opc_reference": {
-        "spec": null,
-        "section": null,
-        "cu_id": "3985",
-        "cu_name": "Session General Service Behaviour",
-        "source_url": "https://profiles.opcfoundation.org"
-      },
-      "source_metadata": {
-        "profile_group_id": 171,
-        "source_endpoint": "conformanceunit/?pg=171&all=1"
-      },
-      "notes": "Implement basic Service behaviour. This includes in particular:\n – checking the authentication token\n – returning the requestHandle in responses\n – respecting a timeoutHint"
     },
     {
       "id": "opc_cu_4053",
@@ -1788,64 +1142,6 @@
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
       "notes": "Support the CurrencyUnit Property on DataVariables that represent currency."
-    },
-    {
-      "id": "opc_cu_5505",
-      "kind": "conformance_unit",
-      "opc_display_name": "Time Sync – UA based support",
-      "kconfig_symbol": null,
-      "implementation_state": "unimplemented",
-      "depends_on": [],
-      "profile_defaults": {
-        "nano": true,
-        "micro": true,
-        "embedded": true,
-        "standard": true,
-        "full": true,
-        "custom": false
-      },
-      "backing_tests": [],
-      "opc_reference": {
-        "spec": null,
-        "section": null,
-        "cu_id": "5505",
-        "cu_name": "Time Sync – UA based support",
-        "source_url": "https://profiles.opcfoundation.org"
-      },
-      "source_metadata": {
-        "profile_group_id": 171,
-        "source_endpoint": "conformanceunit/?pg=171&all=1"
-      },
-      "notes": "Application supports time synchronization by use of the request or response header timestamps provided by a configured well known source, such as a Discovery Server to synchronize the time on the application and that this time synchronization occurs periodically. Use of this TimeSyncing can be configured."
-    },
-    {
-      "id": "opc_cu_5793",
-      "kind": "conformance_unit",
-      "opc_display_name": "Time Sync - Support",
-      "kconfig_symbol": null,
-      "implementation_state": "unimplemented",
-      "depends_on": [],
-      "profile_defaults": {
-        "nano": true,
-        "micro": true,
-        "embedded": true,
-        "standard": true,
-        "full": true,
-        "custom": false
-      },
-      "backing_tests": [],
-      "opc_reference": {
-        "spec": null,
-        "section": null,
-        "cu_id": "5793",
-        "cu_name": "Time Sync - Support",
-        "source_url": "https://profiles.opcfoundation.org"
-      },
-      "source_metadata": {
-        "profile_group_id": 171,
-        "source_endpoint": "conformanceunit/?pg=171&all=1"
-      },
-      "notes": "Support at least one of the optional ConformanceUnits for time synchronization mechanisms in the Security Time Synchronization Facet.\nThe application documentation shall specify which synchronization mechanisms with which profiles are supported."
     },
     {
       "id": "opc_facet_1219",
@@ -1937,7 +1233,7 @@
     {
       "id": "opc_facet_1695",
       "kind": "facet",
-      "opc_display_name": "User Token – User Name Password Server Facet",
+      "opc_display_name": "User Token \u2013 User Name Password Server Facet",
       "kconfig_symbol": "MUC_OPCUA_FACET_USER_TOKEN_USER_NAME_PASSWORD_SERVER",
       "implementation_state": "deferred",
       "depends_on": [],
@@ -1966,7 +1262,7 @@
     {
       "id": "opc_facet_1696",
       "kind": "facet",
-      "opc_display_name": "User Token – X509 Certificate Server Facet",
+      "opc_display_name": "User Token \u2013 X509 Certificate Server Facet",
       "kconfig_symbol": "MUC_OPCUA_FACET_USER_TOKEN_X509_CERTIFICATE_SERVER",
       "implementation_state": "deferred",
       "depends_on": [],
@@ -1991,64 +1287,6 @@
         "source_endpoint": "profile/?pg=171&all=1"
       },
       "notes": "This Facet indicates that the use of an X509 certificates to identify users is supported."
-    },
-    {
-      "id": "opc_cu_2863",
-      "kind": "conformance_unit",
-      "opc_display_name": "Security Policy Required",
-      "kconfig_symbol": null,
-      "implementation_state": "unimplemented",
-      "depends_on": [],
-      "profile_defaults": {
-        "nano": false,
-        "micro": false,
-        "embedded": true,
-        "standard": true,
-        "full": true,
-        "custom": false
-      },
-      "backing_tests": [],
-      "opc_reference": {
-        "spec": null,
-        "section": null,
-        "cu_id": "2863",
-        "cu_name": "Security Policy Required",
-        "source_url": "https://profiles.opcfoundation.org"
-      },
-      "source_metadata": {
-        "profile_group_id": 171,
-        "source_endpoint": "conformanceunit/?pg=171&all=1"
-      },
-      "notes": "Support at least Security Policy [A] and Security Policy [B].\r\nSupport of multiple Security Policies - even obsolete ones - is recommended. This will provide best interoperability and allows the end user to choose the required level of security.\r\nObsolete Security Policies shall not be enabled / usable without administrative intervention."
-    },
-    {
-      "id": "opc_cu_3125",
-      "kind": "conformance_unit",
-      "opc_display_name": "Security User X509",
-      "kconfig_symbol": null,
-      "implementation_state": "unimplemented",
-      "depends_on": [],
-      "profile_defaults": {
-        "nano": false,
-        "micro": false,
-        "embedded": false,
-        "standard": true,
-        "full": true,
-        "custom": false
-      },
-      "backing_tests": [],
-      "opc_reference": {
-        "spec": null,
-        "section": null,
-        "cu_id": "3125",
-        "cu_name": "Security User X509",
-        "source_url": "https://profiles.opcfoundation.org"
-      },
-      "source_metadata": {
-        "profile_group_id": 171,
-        "source_endpoint": "conformanceunit/?pg=171&all=1"
-      },
-      "notes": "The Server supports a public/private key pair for user identity. The administrator shall be able to enable or disable the use of this feature including all validation steps which are defined for application instance certificates."
     },
     {
       "id": "opc_facet_2250",
@@ -2573,35 +1811,6 @@
       "notes": "Exposes the ContentFilter DataType and its encoding Objects and all its supertypes in the AddressSpace"
     },
     {
-      "id": "opc_cu_2823",
-      "kind": "conformance_unit",
-      "opc_display_name": "Security Invalid user token",
-      "kconfig_symbol": null,
-      "implementation_state": "unimplemented",
-      "depends_on": [],
-      "profile_defaults": {
-        "nano": false,
-        "micro": false,
-        "embedded": true,
-        "standard": true,
-        "full": true,
-        "custom": false
-      },
-      "backing_tests": [],
-      "opc_reference": {
-        "spec": null,
-        "section": null,
-        "cu_id": "2823",
-        "cu_name": "Security Invalid user token",
-        "source_url": "https://profiles.opcfoundation.org"
-      },
-      "source_metadata": {
-        "profile_group_id": 171,
-        "source_endpoint": "conformanceunit/?pg=171&all=1"
-      },
-      "notes": "Servers shall take proper measures to protect against attacks on user identity tokens. Such an attack is assumed if repeated connection attempts with invalid user identity tokens happen. See ActivateSession Service in UA Part 4."
-    },
-    {
       "id": "opc_cu_2928",
       "kind": "conformance_unit",
       "opc_display_name": "Monitored Items Deadband Filter",
@@ -2687,35 +1896,6 @@
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
       "notes": "Support the following MonitoredItem Services: CreateMonitoredItems, ModifyMonitoredItems, DeleteMonitoredItems and SetMonitoringMode."
-    },
-    {
-      "id": "opc_cu_3143",
-      "kind": "conformance_unit",
-      "opc_display_name": "Subscription PublishRequest Queue Overflow",
-      "kconfig_symbol": null,
-      "implementation_state": "unimplemented",
-      "depends_on": [],
-      "profile_defaults": {
-        "nano": false,
-        "micro": true,
-        "embedded": true,
-        "standard": true,
-        "full": true,
-        "custom": false
-      },
-      "backing_tests": [],
-      "opc_reference": {
-        "spec": null,
-        "section": null,
-        "cu_id": "3143",
-        "cu_name": "Subscription PublishRequest Queue Overflow",
-        "source_url": "https://profiles.opcfoundation.org"
-      },
-      "source_metadata": {
-        "profile_group_id": 171,
-        "source_endpoint": "conformanceunit/?pg=171&all=1"
-      },
-      "notes": "If the maximum supported number of PublishRequests has been queued and a new PublishRequest arrives, the \"oldest\" PublishRequest has to be discarded by returning the proper error."
     },
     {
       "id": "opc_cu_3146",
@@ -2950,93 +2130,6 @@
       "notes": "Support at least 2 queue entries for MonitoredItems.\nServers often will adapt the queue size to the number of currently monitored Items. It is expected that Servers support the documented queue capacity for at least one third of the supported MonitoredItems.\n"
     },
     {
-      "id": "opc_cu_3534",
-      "kind": "conformance_unit",
-      "opc_display_name": "Subscription Multiple",
-      "kconfig_symbol": null,
-      "implementation_state": "unimplemented",
-      "depends_on": [],
-      "profile_defaults": {
-        "nano": false,
-        "micro": false,
-        "embedded": true,
-        "standard": true,
-        "full": true,
-        "custom": false
-      },
-      "backing_tests": [],
-      "opc_reference": {
-        "spec": null,
-        "section": null,
-        "cu_id": "3534",
-        "cu_name": "Subscription Multiple",
-        "source_url": "https://profiles.opcfoundation.org"
-      },
-      "source_metadata": {
-        "profile_group_id": 171,
-        "source_endpoint": "conformanceunit/?pg=171&all=1"
-      },
-      "notes": "Server supports at least 2 Subscriptions in a single Session."
-    },
-    {
-      "id": "opc_cu_3535",
-      "kind": "conformance_unit",
-      "opc_display_name": "Subscription Retransmission Queue",
-      "kconfig_symbol": null,
-      "implementation_state": "unimplemented",
-      "depends_on": [],
-      "profile_defaults": {
-        "nano": false,
-        "micro": false,
-        "embedded": true,
-        "standard": true,
-        "full": true,
-        "custom": false
-      },
-      "backing_tests": [],
-      "opc_reference": {
-        "spec": null,
-        "section": null,
-        "cu_id": "3535",
-        "cu_name": "Subscription Retransmission Queue",
-        "source_url": "https://profiles.opcfoundation.org"
-      },
-      "source_metadata": {
-        "profile_group_id": 171,
-        "source_endpoint": "conformanceunit/?pg=171&all=1"
-      },
-      "notes": "Support a retransmission queue of sent NotificationMessages and the Republish Service. See UA Part 4 for the required size of the retransmission queue."
-    },
-    {
-      "id": "opc_cu_3536",
-      "kind": "conformance_unit",
-      "opc_display_name": "Security User Name Password 2",
-      "kconfig_symbol": null,
-      "implementation_state": "unimplemented",
-      "depends_on": [],
-      "profile_defaults": {
-        "nano": false,
-        "micro": false,
-        "embedded": true,
-        "standard": true,
-        "full": true,
-        "custom": false
-      },
-      "backing_tests": [],
-      "opc_reference": {
-        "spec": null,
-        "section": null,
-        "cu_id": "3536",
-        "cu_name": "Security User Name Password 2",
-        "source_url": "https://profiles.opcfoundation.org"
-      },
-      "source_metadata": {
-        "profile_group_id": 171,
-        "source_endpoint": "conformanceunit/?pg=171&all=1"
-      },
-      "notes": "The Server supports User Name/Password combination(s). The token will be encrypted as required by the security policy of the User Token Policy or by the security policy of the endpoint."
-    },
-    {
       "id": "opc_cu_3544",
       "kind": "conformance_unit",
       "opc_display_name": "Base Info ResendData Method",
@@ -3209,64 +2302,6 @@
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
       "notes": "Exposes the SemanticVersionString DataType and all its supertypes in the AddressSpace."
-    },
-    {
-      "id": "opc_cu_3645",
-      "kind": "conformance_unit",
-      "opc_display_name": "Security User Token Unencrypted",
-      "kconfig_symbol": null,
-      "implementation_state": "unimplemented",
-      "depends_on": [],
-      "profile_defaults": {
-        "nano": false,
-        "micro": false,
-        "embedded": true,
-        "standard": true,
-        "full": true,
-        "custom": false
-      },
-      "backing_tests": [],
-      "opc_reference": {
-        "spec": null,
-        "section": null,
-        "cu_id": "3645",
-        "cu_name": "Security User Token Unencrypted",
-        "source_url": "https://profiles.opcfoundation.org"
-      },
-      "source_metadata": {
-        "profile_group_id": 171,
-        "source_endpoint": "conformanceunit/?pg=171&all=1"
-      },
-      "notes": "The Server allows unencrypted tokens. An unencrypted token either requires message encryption or means outside the scope of OPC UA to secure the identity token so that it cannot be retrieved by sniffing the communication. One option would be a secure transport like a VPN."
-    },
-    {
-      "id": "opc_cu_3727",
-      "kind": "conformance_unit",
-      "opc_display_name": "Subscription Basic",
-      "kconfig_symbol": null,
-      "implementation_state": "unimplemented",
-      "depends_on": [],
-      "profile_defaults": {
-        "nano": false,
-        "micro": true,
-        "embedded": true,
-        "standard": true,
-        "full": true,
-        "custom": false
-      },
-      "backing_tests": [],
-      "opc_reference": {
-        "spec": null,
-        "section": null,
-        "cu_id": "3727",
-        "cu_name": "Subscription Basic",
-        "source_url": "https://profiles.opcfoundation.org"
-      },
-      "source_metadata": {
-        "profile_group_id": 171,
-        "source_endpoint": "conformanceunit/?pg=171&all=1"
-      },
-      "notes": "Support the following Subscription Services: CreateSubscription, ModifySubscription, DeleteSubscriptions, Publish, Republish and SetPublishingMode."
     },
     {
       "id": "opc_cu_3747",
@@ -3673,35 +2708,6 @@
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
       "notes": "Exposes AggregateFunctions, MaxSubscriptions, MaxMonitoredItems, MaxSubscriptionsPerSession and MaxMonitoredItemsPerSubscription of the ServerCapabilities Object as well as MaxMonitoredItemsPerCall of the OperationLimits Object."
-    },
-    {
-      "id": "opc_cu_3913",
-      "kind": "conformance_unit",
-      "opc_display_name": "Subscription Publish Basic",
-      "kconfig_symbol": null,
-      "implementation_state": "unimplemented",
-      "depends_on": [],
-      "profile_defaults": {
-        "nano": false,
-        "micro": true,
-        "embedded": true,
-        "standard": true,
-        "full": true,
-        "custom": false
-      },
-      "backing_tests": [],
-      "opc_reference": {
-        "spec": null,
-        "section": null,
-        "cu_id": "3913",
-        "cu_name": "Subscription Publish Basic",
-        "source_url": "https://profiles.opcfoundation.org"
-      },
-      "source_metadata": {
-        "profile_group_id": 171,
-        "source_endpoint": "conformanceunit/?pg=171&all=1"
-      },
-      "notes": "Support at least 2 Publish Service requests per Session."
     },
     {
       "id": "opc_cu_3922",
@@ -5312,7 +4318,7 @@
   "metadata": {
     "superseded_profiles": [
       {
-        "description": "This Profile is a collection of Facets necessary to build a functional OPC UA Server Application specifically for chip level devices with limited resources. This Profile is functionally equivalent to the Core Server Facet and defines the \"UA-TCP UA-SC UA-Binary\" as the required transport profile including an ECC Security Policy. The support of Diagnostic Objects and Variables is optional for this Profile despite it being defined as “mandatory” in UA Part 5. Support of Diagnostic Objects and Variables is mandatory in some higher-level Profiles. Exposing types in the AddressSpace is optional for this Profile except if custom types (i.e., types that are derived from well-known ObjectTypes, VariableTypes, ReferenceType or DataTypes) are used. Exposing all supported types in the AddressSpace is mandatory in some higher-level Profiles.<br>\nThis Profile supersedes the <a href=\"http://opcfoundation.org/UA-Profile/Server/NanoEmbeddedDevice2017\">Nano Embedded Device 2017 Server Profile</a>.",
+        "description": "This Profile is a collection of Facets necessary to build a functional OPC UA Server Application specifically for chip level devices with limited resources. This Profile is functionally equivalent to the Core Server Facet and defines the \"UA-TCP UA-SC UA-Binary\" as the required transport profile including an ECC Security Policy. The support of Diagnostic Objects and Variables is optional for this Profile despite it being defined as \u201cmandatory\u201d in UA Part 5. Support of Diagnostic Objects and Variables is mandatory in some higher-level Profiles. Exposing types in the AddressSpace is optional for this Profile except if custom types (i.e., types that are derived from well-known ObjectTypes, VariableTypes, ReferenceType or DataTypes) are used. Exposing all supported types in the AddressSpace is mandatory in some higher-level Profiles.<br>\nThis Profile supersedes the <a href=\"http://opcfoundation.org/UA-Profile/Server/NanoEmbeddedDevice2017\">Nano Embedded Device 2017 Server Profile</a>.",
         "display_name": "Nano Embedded Device 2022 Server Profile",
         "last_update_time": "2025-11-12T15:47:17",
         "name": "Nano Embedded Device 2022 Server Profile",
@@ -5369,9 +4375,9 @@
       },
       {
         "description": "<b>This User Token has been deprecated with OPC UA Specification Version 1.05.</b><br>\nThis Facet indicates that a User Token that is comprised of an issued token is supported.",
-        "display_name": "User Token – Issued Token Server Facet",
+        "display_name": "User Token \u2013 Issued Token Server Facet",
         "last_update_time": "2022-03-10T16:02:39",
-        "name": "User Token – Issued Token Server Facet",
+        "name": "User Token \u2013 Issued Token Server Facet",
         "opc_id": 1698,
         "opc_profile_uri": "http://opcfoundation.org/UA-Profile/Security/UserToken/Server/IssuedToken",
         "release_status": 4,
@@ -5383,9 +4389,9 @@
       },
       {
         "description": "<b>This User Token has been deprecated with OPC UA Specification Version 1.05.</b><br>\nThis Facet further refines the User Token - Issued Token to indicate a windows implementation of Kerberos",
-        "display_name": "User Token – Issued Token Windows Server Facet",
+        "display_name": "User Token \u2013 Issued Token Windows Server Facet",
         "last_update_time": "2022-03-10T16:02:49",
-        "name": "User Token – Issued Token Windows Server Facet",
+        "name": "User Token \u2013 Issued Token Windows Server Facet",
         "opc_id": 1699,
         "opc_profile_uri": "http://opcfoundation.org/UA-Profile/Security/UserToken/Server/IssuedTokenWindows",
         "release_status": 4,
