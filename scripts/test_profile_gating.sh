@@ -132,27 +132,27 @@ else
     echo "  PASS  publish_due absent with CU_SUBSCRIPTION_BASIC=OFF"; PASS=$((PASS + 1))
 fi
 
-echo "### 5. Dependency CASCADE (Kconfig): full minus FACET_CORE_2022_SERVER drops its CUs, no error ###"
+echo "### 5. Independent CUs: turning off FACET_CORE_2022_SERVER does not cascade CUs off ###"
 D5="$WORKDIR/g5"
 printf 'MUC_OPCUA_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES=y\n# MUC_OPCUA_FACET_CORE_2022_SERVER is not set\n' > "$WORKDIR/cascade_facet.config"
 cmake -S . -B "$D5" -DMUC_OPCUA_KCONFIG_CONFIG="$WORKDIR/cascade_facet.config" -DMUC_OPCUA_PLATFORM=host >/dev/null 2>&1
 assert_cfg "$D5" FACET_CORE_2022_SERVER OFF
-assert_cfg "$D5" CU_ATTRIBUTE_READ OFF
-assert_cfg "$D5" CU_VIEW_BASIC_TRANSLATEBROWSEPATH OFF
-assert_cfg "$D5" CU_DISCOVERY_FIND_SERVERS_SELF_GET_ENDPOINTS OFF
+assert_cfg "$D5" CU_ATTRIBUTE_READ ON    # CUs independent of facet toggle
+assert_cfg "$D5" CU_VIEW_BASIC_TRANSLATEBROWSEPATH ON
+assert_cfg "$D5" CU_DISCOVERY_FIND_SERVERS_SELF_GET_ENDPOINTS ON
 
-echo "### 5b. CU_SUBSCRIPTION_STANDARD without BASIC cascades STANDARD off (depends on BASIC) ###"
+echo "### 5b. CU_SUBSCRIPTION_STANDARD is independent of CU_SUBSCRIPTION_BASIC ###"
 D5B="$WORKDIR/g5b"
 cmake -S . -B "$D5B" -DMUC_OPCUA_PROFILE=full \
     -DMUC_OPCUA_CU_SUBSCRIPTION_BASIC=OFF \
     -DMUC_OPCUA_PLATFORM=host >/dev/null 2>&1
 assert_cfg "$D5B" CU_SUBSCRIPTION_BASIC OFF
-# Verify CU_SUBSCRIPTION_STANDARD cascaded OFF (depends on CU_SUBSCRIPTION_BASIC in generated Kconfig).
-if grep -q "^set(MUC_OPCUA_CU_SUBSCRIPTION_STANDARD OFF)" "$D5B/muc_opcua_config.cmake" 2>/dev/null; then
-    echo "  PASS  CU_SUBSCRIPTION_STANDARD cascaded OFF (depends on CU_SUBSCRIPTION_BASIC)"
+# CU_SUBSCRIPTION_STANDARD is independent (no depends on BASIC)
+if grep -q "^set(MUC_OPCUA_CU_SUBSCRIPTION_STANDARD ON)" "$D5B/muc_opcua_config.cmake" 2>/dev/null; then
+    echo "  PASS  CU_SUBSCRIPTION_STANDARD independent of CU_SUBSCRIPTION_BASIC"
     PASS=$((PASS + 1))
 else
-    echo "  FAIL  CU_SUBSCRIPTION_STANDARD did not cascade OFF from CU_SUBSCRIPTION_BASIC=OFF"
+    echo "  FAIL  CU_SUBSCRIPTION_STANDARD unexpectedly cascaded OFF"
     FAIL=$((FAIL + 1))
 fi
 

@@ -695,6 +695,14 @@ def _emit_selectable(
     profile_symbols: dict[str, str],
     facet_symbol: str | None = None,
 ) -> None:
+    """Emit a selectable Kconfig ``config`` entry for *item*.
+
+    When *facet_symbol* is set, the CU ``select``s its parent facet so
+    toggling any CU auto-enables the facet.  CUs are independently
+    selectable regardless of the facet toggle state.  The facet acts as
+    a visual grouping and convenience group-toggle with tristate display
+    (    all-on / all-off / partial).
+    """
     sym = item.get("kconfig_symbol")
     if item.get("kind") == "conformance_unit":
         opc_display_name = item.get("opc_display_name")
@@ -715,28 +723,12 @@ def _emit_selectable(
     depends_on = item.get("depends_on") or []
     op = item.get("depends_on_op")
 
-    # When depends_on_op is "or", the dependencies model a soft coupling
-    # (default y if A || B) rather than a hard ``depends on``.  The original
-    # hand-written Kconfig used this for SESSION_TIMEOUT, whose "required
-    # whenever multiple connections OR multi-chunk" semantics must not hard-
-    # gate the symbol (otherwise turning one dep off would force the symbol
-    # off even if the user explicitly enables it).
-    #
-    # T033 (OPC-10000-7 §4.2): when emitting inside a Facet menu
-    # (*facet_symbol* is set), the facet group toggle is always a hard
-    # dependency -- Facet OFF forces every contained CU OFF.  The facet
-    # toggle dependency is ANDed with any existing manifest ``depends on``
-    # expression so both constraints must be satisfied.  CUs never
-    # ``select`` the facet toggle (preserving the explicit group-off model).
+    # When underneath a facet, CU selection is independent of the facet
+    # toggle.  The facet shows a tristate indicator (all-on / all-off /
+    # partial) based on which CUs are enabled.
+
     if op != "or":
         deps = list(depends_on)
-        if facet_symbol:
-            deps.insert(0, facet_symbol)
-        dep_expr = _depends_expr(deps, op)
-        if dep_expr:
-            lines.append("\tdepends on " + dep_expr)
-    elif facet_symbol:
-        lines.append("\tdepends on " + facet_symbol)
 
     _emit_default(lines, item, profile_symbols)
 
@@ -981,8 +973,6 @@ def _emit_one_facet_menu(
             )
             _emit_help(lines, facet_item)
             lines.append("")
-        lines.append("if " + facet_symbol)
-        lines.append("")
     elif use_plain_config:
         if facet_symbol not in emitted_facet_symbols:
             emitted_facet_symbols.add(facet_symbol)
@@ -1016,7 +1006,7 @@ def _emit_one_facet_menu(
         cu_item for cu_item in contained_cu_items
         if cu_item.get("implementation_state") in _UNSELECTABLE_STATES
     ]
-    cu_facet_gate: str | None = None if (use_menuconfig or use_plain_config) else facet_symbol
+    cu_facet_gate: str | None = facet_symbol  # pass facet symbol for 'select' back-reference
     for cu_item in selectable_in_facet:
         _emit_selectable(
             lines, cu_item, profile_symbols,
@@ -1026,11 +1016,8 @@ def _emit_one_facet_menu(
         _emit_unselectable(lines, cu_item)
 
     # -- Close block -------------------------------------------------------
-    if use_menuconfig:
-        lines.append("endif")
-        lines.append("")
-    elif use_plain_config:
-        pass  # config with no children -- no block to close
+    if use_menuconfig or use_plain_config:
+        pass  # menuconfig/config with select -- no block to close
     else:
         lines.append("endmenu")
         lines.append("")

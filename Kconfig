@@ -121,8 +121,6 @@ menuconfig MUC_OPCUA_FACET_UA_TCP_UA_SC_UA_BINARY
 	  OPC source: OPC-10000-7 §4.2.
 	  Notes: This transport Facet defines a combination of network protocol, security protocol and message encoding that is optimized for low resource consumption and high performance. It combines the simple TCP based network protocol UA-TCP 1.0 with the binary security protocol UA-SecureConversation 1.0 and the binary message encoding UA-Binary 1.0.
 
-if MUC_OPCUA_FACET_UA_TCP_UA_SC_UA_BINARY
-
 config MUC_OPCUA_CU_PROTOCOL_UA_TCP
 	bool "CU: Protocol UA TCP"
 	default y if MUC_OPCUA_INTERN_PROFILE_NANO_EMBEDDED_DEVICE_2025_SERVER || MUC_OPCUA_PROFILE_CUSTOM
@@ -153,8 +151,6 @@ config MUC_OPCUA_CU_UA_SECURE_CONVERSATION
 	  Imported from: comprehensive-fix (Fix 2).
 	  Notes: Already-implemented CU added to manifest as claimed so the feature is tracked, gated by its Kconfig symbol, and covered by the claim/test map.
 
-endif
-
 menuconfig MUC_OPCUA_FACET_CORE_2022_SERVER
 	bool "Core 2022 Server Facet"
 	default y if MUC_OPCUA_INTERN_PROFILE_NANO_EMBEDDED_DEVICE_2025_SERVER
@@ -162,8 +158,6 @@ menuconfig MUC_OPCUA_FACET_CORE_2022_SERVER
 	  Implementation state: deferred.
 	  OPC source: OPC-10000-7 §4.2.
 	  Notes: This Facet defines the core functionality required for any UA Server implementation. The core functionality includes the ability to discover endpoints, establish secure communication channels, create Sessions, browse the AddressSpace and read and/or write to Attributes of Nodes. The key requirements are: support for minimum one Session, support for the core AddressSpace structure, and the Server Capabilities Object, and authentication with UserName and Password. For broad applicability, it is recommended that Servers support multiple transport and security Profiles. It supersedes the Core 2017 Server Facet.
-
-if MUC_OPCUA_FACET_CORE_2022_SERVER
 
 config MUC_OPCUA_CU_ADDRESS_SPACE_BASE
 	bool "CU: Address Space Base"
@@ -177,7 +171,6 @@ config MUC_OPCUA_CU_ADDRESS_SPACE_BASE
 
 config MUC_OPCUA_CU_AGGREGATE_FULL
 	bool "CU: Aggregate Full"
-	depends on MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
 	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
 	help
 	  Implementation state: claimed.
@@ -187,7 +180,6 @@ config MUC_OPCUA_CU_AGGREGATE_FULL
 
 config MUC_OPCUA_CU_AUDITING
 	bool "CU: Auditing"
-	depends on MUC_OPCUA_CU_EVENTS
 	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
 	help
 	  Implementation state: claimed.
@@ -262,7 +254,6 @@ config MUC_OPCUA_CU_DYNAMIC_NODES
 
 config MUC_OPCUA_CU_EVENT_FILTER_WHERE
 	bool "CU: Event Filter Where"
-	depends on MUC_OPCUA_CU_EVENTS && MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
 	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
 	help
 	  Implementation state: claimed.
@@ -272,7 +263,6 @@ config MUC_OPCUA_CU_EVENT_FILTER_WHERE
 
 config MUC_OPCUA_CU_EVENTS
 	bool "CU: Events"
-	depends on MUC_OPCUA_CU_SUBSCRIPTION_BASIC
 	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
 	help
 	  Implementation state: claimed.
@@ -346,7 +336,6 @@ config MUC_OPCUA_CU_PUBSUB
 
 config MUC_OPCUA_CU_REDUNDANCY
 	bool "CU: Redundancy"
-	depends on MUC_OPCUA_CU_SUBSCRIPTION_BASIC
 	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
 	help
 	  Implementation state: claimed.
@@ -422,7 +411,6 @@ config MUC_OPCUA_CU_SUBSCRIPTION_BASIC
 
 config MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
 	bool "CU: Subscription Standard"
-	depends on MUC_OPCUA_CU_SUBSCRIPTION_BASIC
 	default y if MUC_OPCUA_INTERN_PROFILE_EMBEDDED_2025_UA_SERVER
 	help
 	  Implementation state: claimed.
@@ -794,8 +782,6 @@ comment "Monitor Items 500 (NOT IMPLEMENTED) [OPC-10000-4 §5.13.2]"
 #   Notes: Imported from OPC snapshot. At least 5 queue entries per MonitoredItem. Mandatory CU of the Enhanced DataChange Subscription 2017 facet.
 comment "Monitor MinQueueSize_05 (NOT IMPLEMENTED) [OPC-10000-4 §5.13.2]"
 
-endif
-
 config MUC_OPCUA_FACET_SECURITY_TIME_SYNCHRONIZATION
 	bool "Security Time Synchronization"
 	default y if MUC_OPCUA_INTERN_PROFILE_NANO_EMBEDDED_DEVICE_2025_SERVER
@@ -815,8 +801,6 @@ menuconfig MUC_OPCUA_FACET_EMBEDDED_DATACHANGE_SUBSCRIPTION_2022_SERVER
 	  Implementation state: deferred.
 	  OPC source: OPC-10000-7 §4.2.
 	  Notes: This Facet specifies the minimum level of support for data change notifications within subscriptions. It minimizes memory and processing overhead required to implement the Facet. This Facet includes functionality to create, modify and delete Subscriptions and to add, modify and remove Monitored Items. It is recommended that Servers shall support one Subscription with up to two items for each Session. In addition, support for two parallel Publish requests is suggested. This Facet is geared for a platform such as the Nano or Micro Embedded Device Server Profiles in which memory is limited and will be managed. It supersedes the Embedded DataChange Subscription Server Facet.
-
-if MUC_OPCUA_FACET_EMBEDDED_DATACHANGE_SUBSCRIPTION_2022_SERVER
 
 # Monitor Basic (opc_cu_2963)
 #   Implementation state: unimplemented -- visible but not selectable.
@@ -878,8 +862,6 @@ comment "Monitor Items 2 (NOT IMPLEMENTED)"
 #   Notes: Support creation of MonitoredItems for Attribute value changes. This includes support of the IndexRange to select a single element or a range of elements when the Attribute value is an array. This ConformanceUnit does not require queuing when multiple value changes occur during a "publish period". I.e. the latest change will be sent in the Notification.
 comment "Monitor Value Change V2 (NOT IMPLEMENTED)"
 
-endif
-
 endmenu
 
 menu "Profile: Embedded 2025 UA Server Profile"
@@ -891,8 +873,6 @@ menuconfig MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER
 	  Implementation state: deferred.
 	  OPC source: OPC-10000-7 §4.2.
 	  Notes: This Facet defines the ability to expose meta data in the AddressSpace, i.e. data that describe the various OPC UA Types used by the Server. Note that each Node defined in the core specification parts has ConformanceUnits defined that require the Node to be in the AddressSpace. If a Server supports such a ConformanceUnit, it shall expose the Nodes related to the ConformanceUnit in its AddressSpace.
-
-if MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER
 
 # Base Info Rational Number (opc_cu_2423)
 #   Implementation state: unimplemented -- visible but not selectable.
@@ -1164,8 +1144,6 @@ comment "Base Info Type Information (NOT IMPLEMENTED)"
 #   Notes: Supports portable IDs by exposing the DataTypes PortableQualifiedName and PortableNodeId, their Encoding Objects and all their supertypes in the AddressSpace.
 comment "Base Info Portable IDs (NOT IMPLEMENTED)"
 
-endif
-
 menuconfig MUC_OPCUA_FACET_STANDARD_DATACHANGE_SUBSCRIPTION_2022_SERVER
 	bool "Standard DataChange Subscription 2022 Server Facet"
 	default y if MUC_OPCUA_INTERN_PROFILE_EMBEDDED_2025_UA_SERVER
@@ -1173,8 +1151,6 @@ menuconfig MUC_OPCUA_FACET_STANDARD_DATACHANGE_SUBSCRIPTION_2022_SERVER
 	  Implementation state: deferred.
 	  OPC source: OPC-10000-7 §4.2.
 	  Notes: This Facet specifies the standard support of subscribing to data changes and extends features defined by the Embedded Data Change Subscription 2021 Facet. Note that the Method Call Service is only required for the Methods defined in this Facet. This Facet supersedes the Standard DataChange Subscription 2017 Server Facet.
-
-if MUC_OPCUA_FACET_STANDARD_DATACHANGE_SUBSCRIPTION_2022_SERVER
 
 # Monitored Items Deadband Filter (opc_cu_2928)
 #   Implementation state: unimplemented -- visible but not selectable.
@@ -1218,8 +1194,6 @@ comment "Subscription Retransmission Queue (NOT IMPLEMENTED)"
 #   Notes: Support the standard Method ResendData to get the latest value of the monitored items of a Subscription.
 comment "Base Info ResendData Method (NOT IMPLEMENTED)"
 
-endif
-
 menuconfig MUC_OPCUA_FACET_GLOBAL_CERTIFICATE_MANAGEMENT_SERVER
 	bool "Global Certificate Management Server Facet"
 	default y if MUC_OPCUA_INTERN_PROFILE_EMBEDDED_2025_UA_SERVER
@@ -1228,15 +1202,11 @@ menuconfig MUC_OPCUA_FACET_GLOBAL_CERTIFICATE_MANAGEMENT_SERVER
 	  OPC source: OPC-10000-7 §4.2.
 	  Notes: This Facet defines the capability to interact with a Global Certificate Management Server to obtain an initial or renewed Certificate and Trust Lists.
 
-if MUC_OPCUA_FACET_GLOBAL_CERTIFICATE_MANAGEMENT_SERVER
-
 # Push Model for Global Certificate and TrustList Management (opc_cu_2231)
 #   Implementation state: unimplemented -- visible but not selectable.
 #   Detail: CU 2231:Push Model for Global Certificate and TrustList Management.
 #   Notes: Support the Certificate Management Services of UA Part 12 for the Push model to manage Application Instance Certificates and Trust Lists including Revocation Lists.
 comment "Push Model for Global Certificate and TrustList Management (NOT IMPLEMENTED)"
-
-endif
 
 menuconfig MUC_OPCUA_FACET_USER_TOKEN_USER_NAME_PASSWORD_SERVER
 	bool "User Token – User Name Password Server Facet"
@@ -1245,8 +1215,6 @@ menuconfig MUC_OPCUA_FACET_USER_TOKEN_USER_NAME_PASSWORD_SERVER
 	  Implementation state: deferred.
 	  OPC source: OPC-10000-7 §4.2.
 	  Notes: This Facet indicates that a user token that is comprised of a username and password is supported. This user token can affect the behaviour of the ActivateSession Service.
-
-if MUC_OPCUA_FACET_USER_TOKEN_USER_NAME_PASSWORD_SERVER
 
 # Security Invalid user token (opc_cu_2823)
 #   Implementation state: unimplemented -- visible but not selectable.
@@ -1266,8 +1234,6 @@ comment "Security User Name Password 2 (NOT IMPLEMENTED)"
 #   Notes: The Server allows unencrypted tokens. An unencrypted token either requires message encryption or means outside the scope of OPC UA to secure the identity token so that it cannot be retrieved by sniffing the communication. One option would be a secure transport like a VPN.
 comment "Security User Token Unencrypted (NOT IMPLEMENTED)"
 
-endif
-
 endmenu
 
 menu "Profile: Standard 2025 UA Server Profile"
@@ -1280,15 +1246,11 @@ menuconfig MUC_OPCUA_FACET_USER_TOKEN_X509_CERTIFICATE_SERVER
 	  OPC source: OPC-10000-7 §4.2.
 	  Notes: This Facet indicates that the use of an X509 certificates to identify users is supported.
 
-if MUC_OPCUA_FACET_USER_TOKEN_X509_CERTIFICATE_SERVER
-
 # Security User X509 (opc_cu_3125)
 #   Implementation state: unimplemented -- visible but not selectable.
 #   Detail: CU 3125:Security User X509.
 #   Notes: The Server supports a public/private key pair for user identity. The administrator shall be able to enable or disable the use of this feature including all validation steps which are defined for application instance certificates.
 comment "Security User X509 (NOT IMPLEMENTED)"
-
-endif
 
 endmenu
 

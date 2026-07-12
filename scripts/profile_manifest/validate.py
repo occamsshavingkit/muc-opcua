@@ -194,20 +194,8 @@ def _check_generated(manifest: dict, manifest_path: str) -> list[str]:
             )
             break
 
-    # CU configs must express Facet containment via ``depends on``, never
-    # ``select`` (OPC-10000-7 §4.2).  ``select`` would force-enable the Facet
-    # whenever a CU is chosen, breaking the researched group-off behaviour
-    # (turning a Facet off must disable all of its CUs).  Checked against the
-    # regenerated expected content so this holds even when the committed
-    # Kconfig is temporarily stale.
-    for line in expected_kconfig.splitlines():
-        if "select MUC_OPCUA_FACET_" in line:
-            errors.append(
-                "Kconfig: CU config must use 'depends on', not 'select', "
-                "for Facet containment (found '" + line.strip()
-                + "'; OPC-10000-7 §4.2 preserves group-off behaviour)"
-            )
-            break
+    # CUs and facets are independently togglable.  The facet shows a
+    # tristate indicator (all-on / all-off / partial) via its children.
 
     # Defconfig drift check.
     for pk in _DEFAULT_PROFILES:
