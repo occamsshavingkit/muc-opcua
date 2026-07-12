@@ -325,40 +325,6 @@ to refresh.
 
 | Kconfig | Item | State | nano | micro | embedded | standard | full | Depends on |
 |---------|------|-------|------|-------|----------|----------|------|------------|
-| SERVICE_READ | service_read | claimed | ✅ | ✅ | ✅ | ✅ | ✅ |  |
-| SERVICE_BROWSE | service_browse | claimed | ✅ | ✅ | ✅ | ✅ | ✅ |  |
-| SERVICE_DISCOVERY | service_discovery | claimed | ✅ | ✅ | ✅ | ✅ | ✅ |  |
-| SERVICE_REGISTER_NODES | service_register_nodes | claimed | ✅ | ✅ | ✅ | ✅ | ✅ |  |
-| SERVICE_WRITE | service_write | claimed |  |  |  |  | ✅ |  |
-| SERVICE_HISTORY | service_history | claimed |  |  |  |  | ✅ |  |
-| SERVICE_QUERY | service_query | claimed |  |  |  |  | ✅ |  |
-| SERVICE_NODEMANAGEMENT | service_nodemanagement | claimed |  |  |  |  | ✅ |  |
-| BASE_NODES | base_nodes | claimed | ✅ | ✅ | ✅ | ✅ | ✅ |  |
-| BASE_TYPE_SYSTEM | base_type_system | claimed |  |  | ✅ | ✅ | ✅ | BASE_NODES |
-| EXTENDED_NODEIDS | extended_nodeids | claimed |  |  |  |  | ✅ |  |
-| NAMESPACES | namespaces | claimed |  |  |  |  | ✅ | BASE_NODES |
-| DYNAMIC_NODES | dynamic_nodes | claimed |  |  |  |  | ✅ |  |
-| COMPLEX_TYPES | complex_types | claimed |  |  |  |  | ✅ | BASE_NODES |
-| USER_AUTH | user_auth | claimed | ✅ | ✅ | ✅ | ✅ | ✅ |  |
-| MULTIPLE_CONNECTIONS | multiple_connections | claimed |  | ✅ | ✅ | ✅ | ✅ |  |
-| SESSION_TIMEOUT | session_timeout | claimed |  | ✅ | ✅ | ✅ | ✅ | MULTIPLE_CONNECTIONS, MULTI_CHUNK |
-| SECURITY | security | claimed |  |  | ✅ | ✅ | ✅ |  |
-| ECC | ecc | claimed |  |  |  |  | ✅ | SECURITY |
-| MULTI_CHUNK | multi_chunk | claimed |  |  |  |  | ✅ |  |
-| TIME_SYNC | time_sync | claimed |  |  |  |  | ✅ |  |
-| AUDITING | auditing | claimed |  |  |  |  | ✅ | EVENTS |
-| SUBSCRIPTIONS | subscriptions | claimed |  | ✅ | ✅ | ✅ | ✅ |  |
-| SUBSCRIPTIONS_STANDARD | subscriptions_standard | claimed |  |  | ✅ | ✅ | ✅ | SUBSCRIPTIONS |
-| EVENTS | events | claimed |  |  |  |  | ✅ | SUBSCRIPTIONS |
-| EVENT_FILTER_WHERE | event_filter_where | claimed |  |  |  |  | ✅ | EVENTS, SUBSCRIPTIONS_STANDARD |
-| AGGREGATE_FULL | aggregate_full | claimed |  |  |  |  | ✅ | SUBSCRIPTIONS_STANDARD |
-| REDUNDANCY | redundancy | claimed |  |  |  |  | ✅ | SUBSCRIPTIONS |
-| METHOD_SERVER | method_server | claimed |  |  |  |  | ✅ |  |
-| CUSTOM_METHODS | custom_methods | claimed |  |  |  |  | ✅ |  |
-| PUBSUB | pubsub | claimed |  |  |  |  | ✅ |  |
-| DATA_ACCESS | data_access | claimed |  |  |  |  | ✅ | BASE_NODES |
-| REVERSE_CONNECT | reverse_connect | claimed |  |  |  |  | ✅ |  |
-| SERVER_DIAGNOSTICS | server_diagnostics | claimed |  |  |  |  | ✅ |  |
 | READ_CACHE | read_cache | implemented |  |  |  |  |  |  |
 | MUC_OPCUA_FACET_CORE_2022_SERVER | opc_facet_1322 | deferred | ✅ | ✅ | ✅ | ✅ | ✅ |  |
 | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER | opc_facet_1219 | deferred |  |  | ✅ | ✅ | ✅ |  |
@@ -367,6 +333,37 @@ to refresh.
 | MUC_OPCUA_FACET_USER_TOKEN_USER_NAME_PASSWORD_SERVER | opc_facet_1695 | deferred |  |  | ✅ | ✅ | ✅ |  |
 | MUC_OPCUA_FACET_USER_TOKEN_X509_CERTIFICATE_SERVER | opc_facet_1696 | deferred |  |  |  | ✅ | ✅ |  |
 | MUC_OPCUA_FACET_EMBEDDED_DATACHANGE_SUBSCRIPTION_2022_SERVER | opc_facet_2250 | deferred |  | ✅ | ✅ | ✅ | ✅ |  |
+| MUC_OPCUA_CU_SUBSCRIPTION_BASIC | opc_cu_subscription_basic | claimed |  | ✅ | ✅ | ✅ | ✅ |  |
+| MUC_OPCUA_CU_SUBSCRIPTION_STANDARD | opc_cu_subscription_standard | claimed |  |  | ✅ | ✅ | ✅ | MUC_OPCUA_CU_SUBSCRIPTION_BASIC |
+| MUC_OPCUA_CU_SECURITY_ECC | opc_cu_security_ecc | claimed |  |  |  |  | ✅ |  |
+| MUC_OPCUA_CU_EVENTS | opc_cu_events | claimed |  |  |  |  | ✅ | MUC_OPCUA_CU_SUBSCRIPTION_BASIC |
+| MUC_OPCUA_CU_DATA_ACCESS | opc_cu_data_access | claimed |  |  |  |  | ✅ |  |
+| MUC_OPCUA_CU_METHOD_SERVER | opc_cu_method_server | claimed |  |  |  |  | ✅ |  |
+| MUC_OPCUA_CU_CUSTOM_METHODS | opc_cu_custom_methods | claimed |  |  |  |  | ✅ |  |
+| MUC_OPCUA_CU_USER_AUTH | opc_cu_user_auth | claimed | ✅ | ✅ | ✅ | ✅ | ✅ |  |
+| MUC_OPCUA_CU_MULTIPLE_CONNECTIONS | opc_cu_multiple_connections | claimed |  | ✅ | ✅ | ✅ | ✅ |  |
+| MUC_OPCUA_CU_EVENT_FILTER_WHERE | opc_cu_event_filter_where | claimed |  |  |  |  | ✅ | MUC_OPCUA_CU_EVENTS, MUC_OPCUA_CU_SUBSCRIPTION_STANDARD |
+| MUC_OPCUA_CU_REDUNDANCY | opc_cu_redundancy | claimed |  |  |  |  | ✅ | MUC_OPCUA_CU_SUBSCRIPTION_BASIC |
+| MUC_OPCUA_CU_DIAGNOSTICS | opc_cu_diagnostics | claimed |  |  |  |  | ✅ |  |
+| MUC_OPCUA_CU_COMPLEX_TYPES | opc_cu_complex_types | claimed |  |  |  |  | ✅ |  |
+| MUC_OPCUA_CU_AUDITING | opc_cu_auditing | claimed |  |  |  |  | ✅ | MUC_OPCUA_CU_EVENTS |
+| MUC_OPCUA_CU_DYNAMIC_NODES | opc_cu_dynamic_nodes | claimed |  |  |  |  | ✅ |  |
+| MUC_OPCUA_CU_MULTI_CHUNK | opc_cu_multi_chunk | claimed |  |  |  |  | ✅ |  |
+| MUC_OPCUA_CU_SESSION_TIMEOUT | opc_cu_session_timeout | claimed |  | ✅ | ✅ | ✅ | ✅ | MUC_OPCUA_CU_MULTIPLE_CONNECTIONS, MUC_OPCUA_CU_MULTI_CHUNK |
+| MUC_OPCUA_CU_TIME_SYNC | opc_cu_time_sync | claimed |  |  |  |  | ✅ |  |
+| MUC_OPCUA_CU_EXTENDED_NODEIDS | opc_cu_extended_nodeids | claimed |  |  |  |  | ✅ |  |
+| MUC_OPCUA_CU_AGGREGATE_FULL | opc_cu_aggregate_full | claimed |  |  |  |  | ✅ | MUC_OPCUA_CU_SUBSCRIPTION_STANDARD |
+| MUC_OPCUA_CU_PUBSUB | opc_cu_pubsub | claimed |  |  |  |  | ✅ |  |
+| MUC_OPCUA_CU_REVERSE_CONNECT | opc_cu_reverse_connect | claimed |  |  |  |  | ✅ |  |
+| MUC_OPCUA_CU_NAMESPACES | opc_cu_namespaces | claimed |  |  |  |  | ✅ |  |
+| MUC_OPCUA_CU_ATTRIBUTE_READ | service_read | claimed | ✅ | ✅ | ✅ | ✅ | ✅ |  |
+| MUC_OPCUA_CU_VIEW_BASIC_TRANSLATEBROWSEPATH | service_browse | claimed | ✅ | ✅ | ✅ | ✅ | ✅ |  |
+| MUC_OPCUA_CU_DISCOVERY_FIND_SERVERS_SELF_GET_ENDPOINTS | service_discovery | claimed | ✅ | ✅ | ✅ | ✅ | ✅ |  |
+| MUC_OPCUA_CU_VIEW_REGISTERNODES | service_register_nodes | claimed | ✅ | ✅ | ✅ | ✅ | ✅ |  |
+| MUC_OPCUA_CU_CORE_2017_ATTRIBUTE_WRITE | service_write | claimed |  |  |  |  | ✅ |  |
+| MUC_OPCUA_CU_HISTORICAL_ACCESS_SERVER_FACET | service_history | claimed |  |  |  |  | ✅ |  |
+| MUC_OPCUA_CU_QUERY | service_query | claimed |  |  |  |  | ✅ |  |
+| MUC_OPCUA_CU_NODEMANAGEMENT | service_nodemanagement | claimed |  |  |  |  | ✅ |  |
 
 ### Capacity symbols
 
@@ -522,6 +519,9 @@ The following OPC items are tracked in the manifest but are NOT implemented. The
 | opc_cu_5801 |  | unimplemented | For each Object provided in the AddressSpace of the Server the ObjectType of the Object shall be provided in the AddressSpace of the Server. For each Variable provided in the AddressSpace of the Server the VariableType and the DataType of the Variable shall be provided in the AddressSpace of the Server. For each Value provided by the Server, which can be a subtype of the one defined in the Variable, the DataType of the Value shall be provided in the AddressSpace of the Server. For each Method Argument provided by the Server the DataType of the Value shall be provided in the AddressSpace of the Server. For each Structure DataType provided by the Server, each DataType used in the Structure shall be provided in the AddressSpace of the Server. For each Reference provided in the AddressSpace of the Server the ReferenceType shall be provided in the AddressSpace of the Server. For each ObjectType, VariableType, ReferenceType, and DataType provided in the AddressSpace of the Server the direct supertype shall be provided in the AddressSpace of the Server. This requires that all supertypes shall be provided in the AddressSpace. For each DataType having encoding information (Structured DataTypes) the Encoding Objects shall be provided in the AddressSpace of the Server. For each VariableType and ObjectType provided in the AddressSpace of the Server, all InstanceDeclarations shall be provided in the AddressSpace of the Server, even if they are optional and not used in any instance of the Server. For each VariableType, ObjectType and DataType all Methods, Objects and Variables that are referenced with a hierarchical Reference either from the VariableType, ObjectType or DataType or an InstanceDeclaration of the ObjectType or VariableType, either directly or indirectly, shall be provided in the AddressSpace of the Server. For all Events provided by the Server, the EventType shall be provided in the AddressSpace of the Server. |
 | opc_cu_5868 |  | unimplemented | Supports portable IDs by exposing the DataTypes PortableQualifiedName and PortableNodeId, their Encoding Objects and all their supertypes in the AddressSpace. |
 <!-- END GENERATED MANIFEST TABLES -->
+
+
+
 
 
 

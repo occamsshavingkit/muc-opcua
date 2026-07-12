@@ -165,7 +165,7 @@ opcua_statuscode_t mu_discovery_get_application_description(const mu_server_conf
 static void fill_endpoint(const mu_server_config_t *config, mu_endpoint_description_t *desc,
                           mu_message_security_mode_t mode, const char *policy_uri, const opcua_byte_t *cert,
                           size_t cert_len, opcua_byte_t level) {
-#ifdef MUC_OPCUA_USER_AUTH
+#ifdef MUC_OPCUA_CU_USER_AUTH
     mu_security_policy_id_t policy = MU_SECURITY_POLICY_INVALID_ID;
     if (policy_uri != NULL) {
         policy = mu_security_policy_from_uri((const opcua_byte_t *)policy_uri, strlen(policy_uri));
@@ -186,7 +186,7 @@ static void fill_endpoint(const mu_server_config_t *config, mu_endpoint_descript
     desc->user_identity_tokens[0].issuer_endpoint_url = NULL;
     desc->user_identity_tokens[0].security_policy_uri = NULL;
 
-#ifdef MUC_OPCUA_USER_AUTH
+#ifdef MUC_OPCUA_CU_USER_AUTH
     /* OPC-10000-4 sections 5.5.4.2 and 7.40.2.1: advertise username/password
        tokens only on endpoints whose SecurityPolicy can protect those secrets. */
     if (mu_security_policy_allows_username_password_tokens(policy)) {
@@ -226,7 +226,7 @@ opcua_statuscode_t mu_discovery_get_endpoints(const mu_server_config_t *config, 
                            MU_STATUS_GOOD;
 
     const char *none_uri = mu_security_policy_uri(MU_SECURITY_POLICY_NONE_ID);
-#ifdef MUC_OPCUA_SECURITY
+#ifdef MUC_OPCUA_FACET_CORE_2022_SERVER
     const char *b256_uri = mu_security_policy_uri(MU_SECURITY_POLICY_BASIC256SHA256_ID);
     const char *aes128_uri = mu_security_policy_uri(MU_SECURITY_POLICY_AES128_SHA256_RSAOAEP_ID);
 #endif
@@ -234,7 +234,7 @@ opcua_statuscode_t mu_discovery_get_endpoints(const mu_server_config_t *config, 
 
     fill_endpoint(config, &eps[n++], MU_MESSAGE_SECURITY_MODE_NONE, none_uri, have_crypto ? cert : NULL,
                   have_crypto ? cert_len : 0, 0);
-#ifdef MUC_OPCUA_SECURITY
+#ifdef MUC_OPCUA_FACET_CORE_2022_SERVER
     if (have_crypto) {
         if (n < max) {
             fill_endpoint(config, &eps[n++], MU_MESSAGE_SECURITY_MODE_SIGN, b256_uri, cert, cert_len, 1);

@@ -1,0 +1,4 @@
+/* Stub: CU not yet implemented */
+#ifdef MUC_OPCUA_CU_SECURITY_POLICY_REQUIRED
+#error "This CU is not yet implemented"
+#endif

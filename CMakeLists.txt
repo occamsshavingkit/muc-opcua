@@ -92,17 +92,32 @@ set(MUC_OPCUA_KCONFIG_FEATURES
     MUC_OPCUA_CU_HISTORICAL_ACCESS_SERVER_FACET
     MUC_OPCUA_CU_QUERY
     MUC_OPCUA_CU_NODEMANAGEMENT
-    # --- Legacy project-centric symbols still emitted by the generator ---
-    # These remain in generated Kconfig and are needed for existing source
-    # gating (#ifdef MUC_OPCUA_<NAME>) and build gating until T050/T051
-    # migrate source gates to the OPC-name-derived symbols above.  Do not
-    # remove prematurely -- doing so would silently drop legacy
-    # -DMUC_OPCUA_<NAME>=ON/OFF overrides.
-    BASE_NODES BASE_TYPE_SYSTEM EXTENDED_NODEIDS NAMESPACES DYNAMIC_NODES
-    COMPLEX_TYPES USER_AUTH MULTIPLE_CONNECTIONS SESSION_TIMEOUT SECURITY ECC
-    MULTI_CHUNK TIME_SYNC AUDITING SUBSCRIPTIONS SUBSCRIPTIONS_STANDARD EVENTS
-    EVENT_FILTER_WHERE AGGREGATE_FULL REDUNDANCY METHOD_SERVER CUSTOM_METHODS
-    PUBSUB DATA_ACCESS REVERSE_CONNECT SERVER_DIAGNOSTICS
+    # --- CU-level symbols introduced by the CU-aligned code reorganisation ---
+    # These mirror the legacy project-centric facets below and drive the
+    # renamed #ifdef guards in src/cu/**/*.c (Task 3 of the CU reorg plan).
+    MUC_OPCUA_CU_SUBSCRIPTION_BASIC
+    MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
+    MUC_OPCUA_CU_SECURITY_ECC
+    MUC_OPCUA_CU_EVENTS
+    MUC_OPCUA_CU_DATA_ACCESS
+    MUC_OPCUA_CU_METHOD_SERVER
+    MUC_OPCUA_CU_CUSTOM_METHODS
+    MUC_OPCUA_CU_USER_AUTH
+    MUC_OPCUA_CU_MULTIPLE_CONNECTIONS
+    MUC_OPCUA_CU_EVENT_FILTER_WHERE
+    MUC_OPCUA_CU_REDUNDANCY
+    MUC_OPCUA_CU_DIAGNOSTICS
+    MUC_OPCUA_CU_COMPLEX_TYPES
+    MUC_OPCUA_CU_AUDITING
+    MUC_OPCUA_CU_DYNAMIC_NODES
+    MUC_OPCUA_CU_MULTI_CHUNK
+    MUC_OPCUA_CU_SESSION_TIMEOUT
+    MUC_OPCUA_CU_TIME_SYNC
+    MUC_OPCUA_CU_EXTENDED_NODEIDS
+    MUC_OPCUA_CU_AGGREGATE_FULL
+    MUC_OPCUA_CU_PUBSUB
+    MUC_OPCUA_CU_REVERSE_CONNECT
+    MUC_OPCUA_CU_NAMESPACES
     # Project options (non-OPC implementation controls)
     READ_CACHE)
 

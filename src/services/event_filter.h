@@ -15,7 +15,7 @@
 
 #include "muc_opcua/config.h"
 
-#ifdef MUC_OPCUA_EVENTS
+#ifdef MUC_OPCUA_CU_EVENTS
 
 #include "muc_opcua/capacities.h"
 #include "muc_opcua/types.h"
@@ -42,7 +42,7 @@ typedef enum {
    Shared by the select-clause and where-clause decoders (filter_reader.c). */
 mu_event_field_t mu_event_field_from_name(const mu_string_t *name);
 
-#if MUC_OPCUA_EVENT_FILTER_WHERE
+#if MUC_OPCUA_CU_EVENT_FILTER_WHERE
 
 /* SimpleAttributeOperand_Encoding_DefaultBinary (OPC UA NodeIds.csv; the
    DataType/Xml/Binary triple is contiguous, matching ElementOperand 592/594
@@ -96,8 +96,8 @@ typedef struct {
    Returns whether the event passes the filter. OPC-10000-4 §7.7.1. */
 bool mu_where_clause_eval(const mu_where_clause_t *filter, const mu_event_fields_t *fields);
 
-#endif /* MUC_OPCUA_EVENT_FILTER_WHERE */
+#endif /* MUC_OPCUA_CU_EVENT_FILTER_WHERE */
 
-#endif /* MUC_OPCUA_EVENTS */
+#endif /* MUC_OPCUA_CU_EVENTS */
 
 #endif /* MU_SERVICES_EVENT_FILTER_H */

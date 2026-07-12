@@ -5,7 +5,7 @@ static opcua_statuscode_t fill_server_nonce(mu_server_t *server, opcua_byte_t *n
     return mu_session_generate_server_nonce(&server->config.entropy_adapter, nonce, len);
 }
 
-#ifdef MUC_OPCUA_SECURITY
+#ifdef MUC_OPCUA_FACET_CORE_2022_SERVER
 static opcua_statuscode_t verify_activate_client_signature(mu_server_t *server, const mu_session_t *slot,
                                                            const mu_string_t *algorithm,
                                                            const mu_bytestring_t *signature) {
@@ -20,7 +20,7 @@ static opcua_statuscode_t verify_activate_client_signature(mu_server_t *server, 
     if (signature == NULL || signature->length <= 0 || signature->data == NULL) {
         return MU_STATUS_BAD_SECURITYCHECKSFAILED;
     }
-#ifdef MUC_OPCUA_ECC
+#ifdef MUC_OPCUA_CU_SECURITY_ECC
     mu_ecc_curve_t ecc_curve;
     if (mu_security_policy_ecc_curve(server_secure_channel.policy, &ecc_curve)) {
         /* ECC application ClientSignature (OPC-10000-4 §5.7.3): ECDSA/Ed25519 over
@@ -96,7 +96,7 @@ static opcua_statuscode_t handle_activate_anonymous(mu_server_t *server, const m
     return MU_STATUS_GOOD;
 }
 
-#ifdef MUC_OPCUA_USER_AUTH
+#ifdef MUC_OPCUA_CU_USER_AUTH
 static opcua_statuscode_t handle_activate_username(mu_server_t *server, mu_session_t *slot,
                                                    mu_username_identity_token_t *user_token) {
     if (!mu_security_policy_allows_username_password_tokens(server_secure_channel.policy)) {
@@ -151,14 +151,14 @@ static opcua_statuscode_t handle_activate_username(mu_server_t *server, mu_sessi
     }
 
 cleanup:
-#ifdef MUC_OPCUA_SECURITY
+#ifdef MUC_OPCUA_FACET_CORE_2022_SERVER
     mu_secure_zero(decrypt_buf, sizeof(decrypt_buf));
 #endif
     return result;
 }
-#endif /* MUC_OPCUA_USER_AUTH */
+#endif /* MUC_OPCUA_CU_USER_AUTH */
 
-#ifdef MUC_OPCUA_SECURITY
+#ifdef MUC_OPCUA_FACET_CORE_2022_SERVER
 static opcua_statuscode_t handle_activate_certificate(mu_server_t *server, mu_session_t *slot,
                                                       const mu_certificate_identity_token_t *cert_token,
                                                       const mu_bytestring_t *user_token_signature) {
@@ -200,7 +200,7 @@ static opcua_statuscode_t handle_activate_certificate(mu_server_t *server, mu_se
     }
     return MU_STATUS_GOOD;
 }
-#endif /* MUC_OPCUA_SECURITY */
+#endif /* MUC_OPCUA_FACET_CORE_2022_SERVER */
 
 static opcua_statuscode_t decode_client_software_certs_and_locales(mu_binary_reader_t *r) {
     opcua_int32_t cert_count;
@@ -251,7 +251,7 @@ static opcua_statuscode_t decode_anonymous_identity_body(mu_binary_reader_t *r, 
     return MU_STATUS_GOOD;
 }
 
-#ifdef MUC_OPCUA_USER_AUTH
+#ifdef MUC_OPCUA_CU_USER_AUTH
 static opcua_statuscode_t decode_username_identity_body(mu_binary_reader_t *r, size_t token_body_len,
                                                         mu_username_identity_token_t *user_token) {
     opcua_statuscode_t s = ensure_reader_bytes_remaining(r, token_body_len);
@@ -269,7 +269,7 @@ static opcua_statuscode_t decode_username_identity_body(mu_binary_reader_t *r, s
 }
 #endif
 
-#ifdef MUC_OPCUA_SECURITY
+#ifdef MUC_OPCUA_FACET_CORE_2022_SERVER
 static opcua_statuscode_t decode_certificate_identity_body(mu_binary_reader_t *r, size_t token_body_len,
                                                            mu_certificate_identity_token_t *cert_token) {
     opcua_statuscode_t s = ensure_reader_bytes_remaining(r, token_body_len);
@@ -289,11 +289,11 @@ static opcua_statuscode_t decode_certificate_identity_body(mu_binary_reader_t *r
 
 static opcua_statuscode_t decode_user_identity_token(mu_binary_reader_t *r, opcua_uint32_t *out_token_numeric,
                                                      mu_string_t *anon_policy_id
-#ifdef MUC_OPCUA_USER_AUTH
+#ifdef MUC_OPCUA_CU_USER_AUTH
                                                      ,
                                                      mu_username_identity_token_t *user_token
 #endif
-#ifdef MUC_OPCUA_SECURITY
+#ifdef MUC_OPCUA_FACET_CORE_2022_SERVER
                                                      ,
                                                      mu_certificate_identity_token_t *cert_token
 #endif
@@ -311,13 +311,13 @@ static opcua_statuscode_t decode_user_identity_token(mu_binary_reader_t *r, opcu
     if (is_ns0_numeric && num == 321) {
         s = decode_anonymous_identity_body(r, token_body_len, anon_policy_id);
     } else if (is_ns0_numeric && num == 324) {
-#ifdef MUC_OPCUA_USER_AUTH
+#ifdef MUC_OPCUA_CU_USER_AUTH
         s = decode_username_identity_body(r, token_body_len, user_token);
 #else
         s = skip_extension_object_body(r, token_body_len);
 #endif
     } else if (is_ns0_numeric && num == 327) {
-#ifdef MUC_OPCUA_SECURITY
+#ifdef MUC_OPCUA_FACET_CORE_2022_SERVER
         s = decode_certificate_identity_body(r, token_body_len, cert_token);
 #else
         s = skip_extension_object_body(r, token_body_len);
@@ -332,11 +332,11 @@ static opcua_statuscode_t verify_and_activate_session(mu_server_t *server, const
                                                       const mu_string_t *algorithm, const mu_bytestring_t *signature,
                                                       opcua_uint32_t token_type_numeric,
                                                       const mu_string_t *anon_policy_id
-#ifdef MUC_OPCUA_USER_AUTH
+#ifdef MUC_OPCUA_CU_USER_AUTH
                                                       ,
                                                       mu_username_identity_token_t *user_token
 #endif
-#ifdef MUC_OPCUA_SECURITY
+#ifdef MUC_OPCUA_FACET_CORE_2022_SERVER
                                                       ,
                                                       const mu_certificate_identity_token_t *cert_token
 #endif
@@ -363,7 +363,7 @@ static opcua_statuscode_t verify_and_activate_session(mu_server_t *server, const
     (void)algorithm;
     (void)signature;
     (void)user_token_signature;
-#ifdef MUC_OPCUA_SECURITY
+#ifdef MUC_OPCUA_FACET_CORE_2022_SERVER
     client_sig_result = verify_activate_client_signature(server, slot, algorithm, signature);
 #endif
     if (client_sig_result != MU_STATUS_GOOD) {
@@ -371,13 +371,13 @@ static opcua_statuscode_t verify_and_activate_session(mu_server_t *server, const
     } else if (token_type_numeric == 321) {
         activate_result = handle_activate_anonymous(server, anon_policy_id);
     } else if (token_type_numeric == 324) {
-#ifdef MUC_OPCUA_USER_AUTH
+#ifdef MUC_OPCUA_CU_USER_AUTH
         activate_result = handle_activate_username(server, slot, user_token);
 #else
         activate_result = MU_STATUS_BAD_IDENTITYTOKENINVALID;
 #endif
     } else if (token_type_numeric == 327) {
-#ifdef MUC_OPCUA_SECURITY
+#ifdef MUC_OPCUA_FACET_CORE_2022_SERVER
         activate_result = handle_activate_certificate(server, slot, cert_token, user_token_signature);
 #else
         activate_result = MU_STATUS_BAD_IDENTITYTOKENINVALID;
@@ -387,14 +387,14 @@ static opcua_statuscode_t verify_and_activate_session(mu_server_t *server, const
     }
     if (activate_result == MU_STATUS_GOOD) {
         activate_result = mu_session_activate(slot, auth_token, token_type_numeric);
-#if MUC_OPCUA_REDUNDANCY
+#if MUC_OPCUA_CU_REDUNDANCY
         if (activate_result == MU_STATUS_GOOD) {
             /* Fingerprint the user for the TransferSubscriptions same-user check. Store a
                compact identity kind (1 anonymous, 2 username, 3 x509) that fits a byte. */
             slot->user_identity_kind = (token_type_numeric == 324u) ? 2u : (token_type_numeric == 327u) ? 3u : 1u;
             slot->user_identity_len = 0;
             const mu_bytestring_t *disc = NULL;
-#ifdef MUC_OPCUA_USER_AUTH
+#ifdef MUC_OPCUA_CU_USER_AUTH
             mu_bytestring_t uname;
             if (token_type_numeric == 324u && user_token != NULL) {
                 uname.length = user_token->username.length;
@@ -402,7 +402,7 @@ static opcua_statuscode_t verify_and_activate_session(mu_server_t *server, const
                 disc = &uname;
             }
 #endif
-#ifdef MUC_OPCUA_SECURITY
+#ifdef MUC_OPCUA_FACET_CORE_2022_SERVER
             if (token_type_numeric == 327u && cert_token != NULL) {
                 disc = &cert_token->certificate_data;
             }
@@ -419,7 +419,7 @@ static opcua_statuscode_t verify_and_activate_session(mu_server_t *server, const
 #endif
         if (activate_result == MU_STATUS_GOOD && server->config.time_adapter.get_tick_ms != NULL) {
             slot->last_activity_ms = server->config.time_adapter.get_tick_ms(server->config.time_adapter.context);
-#if defined(MUC_OPCUA_SESSION_TIMEOUT)
+#if defined(MUC_OPCUA_CU_SESSION_TIMEOUT)
             server->next_session_timeout_ms = 0;
 #endif
         }
@@ -448,21 +448,21 @@ opcua_statuscode_t handle_activate_session(mu_server_t *server, mu_binary_reader
     if (s != MU_STATUS_GOOD)
         return s;
 
-#ifdef MUC_OPCUA_USER_AUTH
+#ifdef MUC_OPCUA_CU_USER_AUTH
     mu_username_identity_token_t user_token = {{-1, NULL}, {-1, NULL}, {-1, NULL}, {-1, NULL}};
 #endif
-#ifdef MUC_OPCUA_SECURITY
+#ifdef MUC_OPCUA_FACET_CORE_2022_SERVER
     mu_certificate_identity_token_t cert_token = {{-1, NULL}, {-1, NULL}};
 #endif
     mu_string_t anon_policy_id = {-1, NULL};
     opcua_uint32_t token_type_numeric = 0u;
 
     s = decode_user_identity_token(r, &token_type_numeric, &anon_policy_id
-#ifdef MUC_OPCUA_USER_AUTH
+#ifdef MUC_OPCUA_CU_USER_AUTH
                                    ,
                                    &user_token
 #endif
-#ifdef MUC_OPCUA_SECURITY
+#ifdef MUC_OPCUA_FACET_CORE_2022_SERVER
                                    ,
                                    &cert_token
 #endif
@@ -483,11 +483,11 @@ opcua_statuscode_t handle_activate_session(mu_server_t *server, mu_binary_reader
 
     opcua_statuscode_t activate_result =
         verify_and_activate_session(server, &req, &algorithm, &signature, token_type_numeric, &anon_policy_id
-#ifdef MUC_OPCUA_USER_AUTH
+#ifdef MUC_OPCUA_CU_USER_AUTH
                                     ,
                                     &user_token
 #endif
-#ifdef MUC_OPCUA_SECURITY
+#ifdef MUC_OPCUA_FACET_CORE_2022_SERVER
                                     ,
                                     &cert_token
 #endif
@@ -501,7 +501,7 @@ opcua_statuscode_t handle_activate_session(mu_server_t *server, mu_binary_reader
 
     mu_bytestring_t server_nonce = {(opcua_int32_t)sizeof(nonce_buf), nonce_buf};
     s = write_response_prefix(w, MU_ID_ACTIVATESESSIONRESPONSE, req.request_handle, activate_result
-#ifdef MUC_OPCUA_TIME_SYNC
+#ifdef MUC_OPCUA_CU_TIME_SYNC
                               ,
                               server
 #endif
@@ -512,7 +512,7 @@ opcua_statuscode_t handle_activate_session(mu_server_t *server, mu_binary_reader
     s = mu_binary_write_bytestring(w, &server_nonce);
     if (s != MU_STATUS_GOOD)
         return s;
-#ifdef MUC_OPCUA_SECURITY
+#ifdef MUC_OPCUA_FACET_CORE_2022_SERVER
     mu_secure_zero(nonce_buf, sizeof(nonce_buf));
 #endif
     mu_binary_write_int32(w, 0);

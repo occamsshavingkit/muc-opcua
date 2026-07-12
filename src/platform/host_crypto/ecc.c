@@ -7,7 +7,7 @@
  * 64-byte signatures (Ed25519 native; ECDSA as raw r||s, converted from DER). */
 #include "common.h"
 
-#ifdef MUC_OPCUA_ECC
+#ifdef MUC_OPCUA_CU_SECURITY_ECC
 
 #include <openssl/core_names.h>
 #include <openssl/ec.h>
@@ -302,4 +302,4 @@ opcua_statuscode_t h_chacha20_poly1305_decrypt(void *c, const opcua_byte_t *key,
     return rc;
 }
 
-#endif /* MUC_OPCUA_ECC */
+#endif /* MUC_OPCUA_CU_SECURITY_ECC */

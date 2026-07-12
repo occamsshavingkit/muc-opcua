@@ -15,7 +15,7 @@ remains future work.
 
 | State | Count |
 |-------|-------|
-| claimed | 34 |
+| claimed | 31 |
 | implemented | 1 |
 | deferred | 7 |
 | unimplemented | 121 |
@@ -24,40 +24,6 @@ remains future work.
 
 | Item | Kind | State | OPC reference | Kconfig | Profiles | Backing tests |
 |------|------|-------|---------------|---------|----------|---------------|
-| service_read | conformance_unit | claimed | OPC-10000-4 §5.10.2 Core 2017 Server Facet | SERVICE_READ | all | test_read_service |
-| service_browse | conformance_unit | claimed | OPC-10000-4 §5.8 Core 2017 | SERVICE_BROWSE | all | test_browse_service, test_browse_limits, test_view_services |
-| service_discovery | conformance_unit | claimed | OPC-10000-4 §5.4 Core 2017 | SERVICE_DISCOVERY | all | test_discovery_endpoint |
-| service_register_nodes | conformance_unit | claimed | OPC-10000-4 §5.9 Core 2017 | SERVICE_REGISTER_NODES | all | test_view_services, test_profile_surface |
-| service_write | conformance_unit | claimed | OPC-10000-4 §5.10.4 Core 2017 Attribute Write | SERVICE_WRITE | full | test_write_service |
-| service_history | conformance_unit | claimed | OPC-10000-11 Historical Access Server Facet | SERVICE_HISTORY | full | test_history |
-| service_query | conformance_unit | claimed | OPC-10000-4 §5.9 Query | SERVICE_QUERY | full | test_query_service |
-| service_nodemanagement | conformance_unit | claimed | OPC-10000-4 §5.7 NodeManagement | SERVICE_NODEMANAGEMENT | full | test_node_management, test_node_management_errors |
-| base_nodes | facet | claimed | OPC-10000-7 §4.2 Core 2017 Server Facet | BASE_NODES | all | test_profile_surface |
-| base_type_system | facet | claimed | OPC-10000-5 Base Info Type System | BASE_TYPE_SYSTEM | embedded, standard, full | test_type_system, test_method_call |
-| extended_nodeids | facet | claimed | OPC-10000-3 Extended (string/GUID) NodeIds | EXTENDED_NODEIDS | full | test_address_space_string_limits, test_binary_nodeid_errors |
-| namespaces | facet | claimed | OPC-10000-4 Namespace metadata | NAMESPACES | full | test_read_browsename_namespace |
-| dynamic_nodes | facet | claimed | OPC-10000-3 Dynamic address space | DYNAMIC_NODES | full | test_address_space_dynamic |
-| complex_types | facet | claimed | OPC-10000-6 Structure/complex type encoding | COMPLEX_TYPES | full | test_complex_types |
-| user_auth | facet | claimed | OPC-10000-4 §7.36 UserNamePassword (id 1096) / X509 (id 1097) | USER_AUTH | all | test_user_auth_plaintext, test_user_auth_certificate, test_user_auth_secure_e2e |
-| multiple_connections | facet | claimed | OPC-10000-7 MicroEmbeddedDevice2017 Session Minimum 2 Parallel | MULTIPLE_CONNECTIONS | micro, embedded, standard, full | test_connection_multiplex |
-| session_timeout | facet | claimed | OPC-10000-4 Session idle timeout | SESSION_TIMEOUT | micro, embedded, standard, full | test_base_server_behaviour |
-| security | facet | claimed | OPC-10000-7 Security Policy Required + Default AppInstance Certificate | SECURITY | embedded, standard, full | test_asym_chunk, test_sym_chunk, test_certificate, test_certificate_validity, test_security_trustlist, test_server_handshake_secure, test_secure_handshake_modern |
-| ecc | facet | claimed | OPC-10000-7 Security ECC Policy (curve25519 / nistP256) | ECC | full | test_ecc_crypto |
-| multi_chunk | facet | claimed | OPC-10000-6 Multi-chunk messages / index-range Read | MULTI_CHUNK | full | test_message_chunk_errors |
-| time_sync | facet | claimed | OPC-10000-4 §7.28 Security time synchronization (clock-skew validation) | TIME_SYNC | full | test_time_sync, test_dispatch_services |
-| auditing | facet | claimed | OPC-10000-4 §7.x Audit events | AUDITING | full | test_audit_events |
-| subscriptions | facet | claimed | OPC-10000-4 §5.12/5.13 EmbeddedDataChangeSubscription | SUBSCRIPTIONS | micro, embedded, standard, full | test_subscriptions, test_subscriptions_errors |
-| subscriptions_standard | facet | claimed | OPC-10000-7 Standard/Enhanced DataChange Subscription 2017 | SUBSCRIPTIONS_STANDARD | embedded, standard, full | test_subscriptions_capacity, test_subscription_deadband, test_subscription_publish |
-| events | facet | claimed | OPC-10000-9 Event notifications & Alarms/Conditions | EVENTS | full | test_alarms_conditions, test_event_notifier, test_event_serializer |
-| event_filter_where | facet | claimed | OPC-10000-4 §7.4 Standard Event Subscription facet / ContentFilter | EVENT_FILTER_WHERE | full | test_event_filter_where, test_event_filter_select |
-| aggregate_full | facet | claimed | OPC-10000-13 Aggregate Subscription facet | AGGREGATE_FULL | full | test_aggregate, test_aggregate_full |
-| redundancy | facet | claimed | OPC-10000-4 §5.14.7 Client Redundancy (TransferSubscriptions) | REDUNDANCY | full | test_transfer_subscriptions |
-| method_server | facet | claimed | OPC-10000-4 §5.11 Method Server facet (arbitrary Call) | METHOD_SERVER | full | test_method_call_arbitrary, test_method_call_errors |
-| custom_methods | facet | claimed | OPC-10000-4 §5.11 Custom method registration (alias of Method Server) | CUSTOM_METHODS | full | test_method_call |
-| pubsub | facet | claimed | OPC-10000-14 PubSub | PUBSUB | full | test_uadp_encoding, test_pubsub |
-| data_access | facet | claimed | OPC-10000-8 §5.3 Data Access Server Facet | DATA_ACCESS | full | test_analog_item, test_da_type_nodes, test_eu_information |
-| reverse_connect | facet | claimed | OPC-10000-6 §7.1.3 Reverse Connect (server-initiated ReverseHello) | REVERSE_CONNECT | full | test_reverse_connect |
-| server_diagnostics | facet | claimed | OPC-10000-5 §6.3 ServerDiagnostics object + counters | SERVER_DIAGNOSTICS | full | test_diagnostics |
 | read_cache | optimization | implemented |  | READ_CACHE | — | — |
 | opc_file_server_facet | facet | unimplemented | OPC-10000-20 File Server Facet | — | — | — |
 | opc_json_encoding | facet | unimplemented | OPC-10000-6 §5.3 JSON Encoding | — | — | — |
@@ -187,6 +153,37 @@ remains future work.
 | opc_cu_5208 | conformance_unit | unimplemented |  | — | micro, embedded, standard, full | — |
 | opc_cu_5801 | conformance_unit | unimplemented |  | — | embedded, standard, full | — |
 | opc_cu_5868 | conformance_unit | unimplemented |  | — | embedded, standard, full | — |
+| opc_cu_subscription_basic | conformance_unit | claimed | OPC-10000-4 §5.12/5.13 Core 2022 Server Facet | MUC_OPCUA_CU_SUBSCRIPTION_BASIC | micro, embedded, standard, full | test_subscriptions, test_subscriptions_errors |
+| opc_cu_subscription_standard | conformance_unit | claimed | OPC-10000-7 Core 2022 Server Facet | MUC_OPCUA_CU_SUBSCRIPTION_STANDARD | embedded, standard, full | test_subscriptions_capacity, test_subscription_deadband, test_subscription_publish |
+| opc_cu_security_ecc | conformance_unit | claimed | OPC-10000-7 Core 2022 Server Facet | MUC_OPCUA_CU_SECURITY_ECC | full | test_ecc_crypto |
+| opc_cu_events | conformance_unit | claimed | OPC-10000-9 Core 2022 Server Facet | MUC_OPCUA_CU_EVENTS | full | test_alarms_conditions, test_event_notifier, test_event_serializer |
+| opc_cu_data_access | conformance_unit | claimed | OPC-10000-8 §5.3 Core 2022 Server Facet | MUC_OPCUA_CU_DATA_ACCESS | full | test_analog_item, test_da_type_nodes, test_eu_information |
+| opc_cu_method_server | conformance_unit | claimed | OPC-10000-4 §5.11 Core 2022 Server Facet | MUC_OPCUA_CU_METHOD_SERVER | full | test_method_call_arbitrary, test_method_call_errors |
+| opc_cu_custom_methods | conformance_unit | claimed | OPC-10000-4 §5.11 Core 2022 Server Facet | MUC_OPCUA_CU_CUSTOM_METHODS | full | test_method_call |
+| opc_cu_user_auth | conformance_unit | claimed | OPC-10000-4 §7.36 Core 2022 Server Facet | MUC_OPCUA_CU_USER_AUTH | all | test_user_auth_plaintext, test_user_auth_certificate, test_user_auth_secure_e2e |
+| opc_cu_multiple_connections | conformance_unit | claimed | OPC-10000-7 Core 2022 Server Facet | MUC_OPCUA_CU_MULTIPLE_CONNECTIONS | micro, embedded, standard, full | test_connection_multiplex |
+| opc_cu_event_filter_where | conformance_unit | claimed | OPC-10000-4 §7.4 Core 2022 Server Facet | MUC_OPCUA_CU_EVENT_FILTER_WHERE | full | test_event_filter_where, test_event_filter_select |
+| opc_cu_redundancy | conformance_unit | claimed | OPC-10000-4 §5.14.7 Core 2022 Server Facet | MUC_OPCUA_CU_REDUNDANCY | full | test_transfer_subscriptions |
+| opc_cu_diagnostics | conformance_unit | claimed | OPC-10000-5 §6.3 Core 2022 Server Facet | MUC_OPCUA_CU_DIAGNOSTICS | full | test_diagnostics |
+| opc_cu_complex_types | conformance_unit | claimed | OPC-10000-6 Core 2022 Server Facet | MUC_OPCUA_CU_COMPLEX_TYPES | full | test_complex_types |
+| opc_cu_auditing | conformance_unit | claimed | OPC-10000-4 §7.x Core 2022 Server Facet | MUC_OPCUA_CU_AUDITING | full | test_audit_events |
+| opc_cu_dynamic_nodes | conformance_unit | claimed | OPC-10000-3 Core 2022 Server Facet | MUC_OPCUA_CU_DYNAMIC_NODES | full | test_address_space_dynamic |
+| opc_cu_multi_chunk | conformance_unit | claimed | OPC-10000-6 Core 2022 Server Facet | MUC_OPCUA_CU_MULTI_CHUNK | full | test_message_chunk_errors |
+| opc_cu_session_timeout | conformance_unit | claimed | OPC-10000-4 Core 2022 Server Facet | MUC_OPCUA_CU_SESSION_TIMEOUT | micro, embedded, standard, full | test_base_server_behaviour |
+| opc_cu_time_sync | conformance_unit | claimed | OPC-10000-4 §7.28 Core 2022 Server Facet | MUC_OPCUA_CU_TIME_SYNC | full | test_time_sync, test_dispatch_services |
+| opc_cu_extended_nodeids | conformance_unit | claimed | OPC-10000-3 Core 2022 Server Facet | MUC_OPCUA_CU_EXTENDED_NODEIDS | full | test_address_space_string_limits, test_binary_nodeid_errors |
+| opc_cu_aggregate_full | conformance_unit | claimed | OPC-10000-13 Core 2022 Server Facet | MUC_OPCUA_CU_AGGREGATE_FULL | full | test_aggregate, test_aggregate_full |
+| opc_cu_pubsub | conformance_unit | claimed | OPC-10000-14 Core 2022 Server Facet | MUC_OPCUA_CU_PUBSUB | full | test_uadp_encoding, test_pubsub |
+| opc_cu_reverse_connect | conformance_unit | claimed | OPC-10000-6 §7.1.3 Core 2022 Server Facet | MUC_OPCUA_CU_REVERSE_CONNECT | full | test_reverse_connect |
+| opc_cu_namespaces | conformance_unit | claimed | OPC-10000-4 Core 2022 Server Facet | MUC_OPCUA_CU_NAMESPACES | full | test_read_browsename_namespace |
+| service_read | conformance_unit | claimed | OPC-10000-4 §5.10.2 Core 2017 Server Facet | MUC_OPCUA_CU_ATTRIBUTE_READ | all | test_read_service |
+| service_browse | conformance_unit | claimed | OPC-10000-4 §5.8 Core 2017 | MUC_OPCUA_CU_VIEW_BASIC_TRANSLATEBROWSEPATH | all | test_browse_service, test_browse_limits, test_view_services |
+| service_discovery | conformance_unit | claimed | OPC-10000-4 §5.4 Core 2017 | MUC_OPCUA_CU_DISCOVERY_FIND_SERVERS_SELF_GET_ENDPOINTS | all | test_discovery_endpoint |
+| service_register_nodes | conformance_unit | claimed | OPC-10000-4 §5.9 Core 2017 | MUC_OPCUA_CU_VIEW_REGISTERNODES | all | test_view_services, test_profile_surface |
+| service_write | conformance_unit | claimed | OPC-10000-4 §5.10.4 Core 2017 Attribute Write | MUC_OPCUA_CU_CORE_2017_ATTRIBUTE_WRITE | full | test_write_service |
+| service_history | conformance_unit | claimed | OPC-10000-11 Historical Access Server Facet | MUC_OPCUA_CU_HISTORICAL_ACCESS_SERVER_FACET | full | test_history |
+| service_query | conformance_unit | claimed | OPC-10000-4 §5.9 Query | MUC_OPCUA_CU_QUERY | full | test_query_service |
+| service_nodemanagement | conformance_unit | claimed | OPC-10000-4 §5.7 NodeManagement | MUC_OPCUA_CU_NODEMANAGEMENT | full | test_node_management, test_node_management_errors |
 
 ## Capacities
 

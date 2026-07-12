@@ -61,7 +61,7 @@ opcua_statuscode_t mu_sym_chunk_unwrap(const mu_crypto_adapter_t *crypto, mu_mes
                                        const mu_sym_keys_t *keys, opcua_byte_t *chunk, size_t chunk_len,
                                        const opcua_byte_t **out_body, size_t *out_body_len, mu_sym_chunk_info_t *info);
 
-#ifdef MUC_OPCUA_ECC
+#ifdef MUC_OPCUA_CU_SECURITY_ECC
 /* AEAD (ChaCha20-Poly1305) symmetric chunk protection for the ECC-curve25519
    SecurityPolicy (OPC-10000-6 §6.7.2.5.2). Unlike the CBC+HMAC path there is no
    padding: [Header | TokenId] [enc: SequenceHeader+body] [16-byte tag]. The
@@ -79,6 +79,6 @@ opcua_statuscode_t mu_sym_chunk_unwrap_aead(const mu_crypto_adapter_t *crypto, c
                                             opcua_byte_t *chunk, size_t chunk_len, opcua_uint32_t last_sequence_number,
                                             const opcua_byte_t **out_body, size_t *out_body_len,
                                             mu_sym_chunk_info_t *info);
-#endif /* MUC_OPCUA_ECC */
+#endif /* MUC_OPCUA_CU_SECURITY_ECC */
 
 #endif /* MUC_OPCUA_SYM_CHUNK_H */

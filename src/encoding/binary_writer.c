@@ -133,7 +133,7 @@ opcua_statuscode_t mu_binary_write_statuscode(mu_binary_writer_t *writer, opcua_
     return mu_binary_write_uint32(writer, value);
 }
 
-#if MUC_OPCUA_DATA_ACCESS
+#if MUC_OPCUA_CU_DATA_ACCESS
 opcua_statuscode_t mu_binary_write_range(mu_binary_writer_t *writer, const mu_range_t *value) {
     if (!writer || !value)
         return MU_STATUS_BAD_INTERNALERROR;
@@ -183,7 +183,7 @@ opcua_statuscode_t mu_binary_write_eu_information(mu_binary_writer_t *writer, co
 }
 #endif
 
-#if MUC_OPCUA_METHOD_SERVER
+#if MUC_OPCUA_CU_METHOD_SERVER
 opcua_statuscode_t mu_binary_write_argument(mu_binary_writer_t *writer, const mu_argument_t *arg) {
     if (!writer || !arg) {
         return MU_STATUS_BAD_INTERNALERROR;
@@ -217,7 +217,7 @@ opcua_statuscode_t mu_binary_write_argument(mu_binary_writer_t *writer, const mu
 }
 #endif
 
-#if MUC_OPCUA_SERVER_DIAGNOSTICS
+#if MUC_OPCUA_CU_DIAGNOSTICS
 opcua_statuscode_t mu_binary_write_server_diagnostics_summary(mu_binary_writer_t *writer,
                                                               const mu_diagnostics_summary_t *diag) {
     if (!writer || !diag) {

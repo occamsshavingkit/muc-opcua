@@ -1,9 +1,9 @@
 #include "common.h"
-#ifdef MUC_OPCUA_ECC
+#ifdef MUC_OPCUA_CU_SECURITY_ECC
 #include "../../security/asym_ecc.h"
 #endif
 
-#ifdef MUC_OPCUA_TIME_SYNC
+#ifdef MUC_OPCUA_CU_TIME_SYNC
 bool mu_opn_time_sync_allows(opcua_datetime_t server_time, opcua_datetime_t client_time) {
     /* FR-003: skip when either peer reports no time (0 = unknown / clockless). */
     if (server_time == 0 || client_time == 0) {
@@ -27,7 +27,7 @@ static opcua_statuscode_t validate_client_nonce(const mu_bytestring_t *client_no
     return MU_STATUS_GOOD;
 }
 
-#ifdef MUC_OPCUA_MULTIPLE_CONNECTIONS
+#ifdef MUC_OPCUA_CU_MULTIPLE_CONNECTIONS
 static bool secure_channel_id_used_by_other_connection(const mu_server_t *server, opcua_uint32_t channel_id) {
     if (server == NULL || channel_id == 0u) {
         return false;
@@ -60,7 +60,7 @@ static opcua_statuscode_t ensure_unique_secure_channel_id(mu_server_t *server) {
 }
 #endif
 
-#ifdef MUC_OPCUA_SECURITY
+#ifdef MUC_OPCUA_FACET_CORE_2022_SERVER
 static opcua_statuscode_t enforce_osc_application_auth(const mu_server_t *server) {
     if (server_secure_channel.policy != MU_SECURITY_POLICY_NONE_ID &&
         server_secure_channel.policy != MU_SECURITY_POLICY_INVALID_ID) {
@@ -86,7 +86,7 @@ static opcua_statuscode_t encode_osc_security_token(mu_binary_writer_t *w, opcua
                                                     opcua_uint32_t revised, const opcua_byte_t *nonce_buf,
                                                     size_t nonce_len, const mu_server_t *server) {
     opcua_statuscode_t s = write_response_prefix(w, MU_ID_OPENSECURECHANNELRESPONSE, request_handle, MU_STATUS_GOOD
-#ifdef MUC_OPCUA_TIME_SYNC
+#ifdef MUC_OPCUA_CU_TIME_SYNC
                                                  ,
                                                  server
 #endif
@@ -120,7 +120,7 @@ opcua_statuscode_t handle_open_secure_channel(mu_server_t *server, mu_binary_rea
         return s;
     }
 
-#ifdef MUC_OPCUA_TIME_SYNC
+#ifdef MUC_OPCUA_CU_TIME_SYNC
     /* Spec 055: reject channel establishment when the client's UTC timestamp
      * (RequestHeader.timestamp, OPC-10000-4 §7.28) drifts beyond the configured
      * clock skew from server time -- anti-replay / freshness. */
@@ -168,7 +168,7 @@ opcua_statuscode_t handle_open_secure_channel(mu_server_t *server, mu_binary_rea
         return s;
     }
 
-#ifdef MUC_OPCUA_MULTIPLE_CONNECTIONS
+#ifdef MUC_OPCUA_CU_MULTIPLE_CONNECTIONS
     if (!channel_was_open) {
         s = ensure_unique_secure_channel_id(server);
         if (s != MU_STATUS_GOOD) {
@@ -180,7 +180,7 @@ opcua_statuscode_t handle_open_secure_channel(mu_server_t *server, mu_binary_rea
     (void)channel_was_open;
 #endif
 
-#ifdef MUC_OPCUA_SECURITY
+#ifdef MUC_OPCUA_FACET_CORE_2022_SERVER
     s = enforce_osc_application_auth(server);
     if (s != MU_STATUS_GOOD) {
         return s;
@@ -190,7 +190,7 @@ opcua_statuscode_t handle_open_secure_channel(mu_server_t *server, mu_binary_rea
     /* ServerNonce: 32 random bytes for None/RSA; for the ECC SecurityPolicies
        (spec 059) it is the server's ephemeral public key (<= 64 B) — the peers'
        ephemeral ECDH pubkeys travel as the Client/ServerNonce (OPC-10000-6 §6.8.1). */
-#ifdef MUC_OPCUA_ECC
+#ifdef MUC_OPCUA_CU_SECURITY_ECC
     opcua_byte_t nonce_buf[MU_ECC_MAX_PUBKEY_LENGTH];
     opcua_byte_t ecc_keypair_ctx[MU_ECC_KEYPAIR_CTX_SIZE];
     mu_ecc_curve_t ecc_curve = MU_ECC_CURVE_25519;
@@ -201,7 +201,7 @@ opcua_statuscode_t handle_open_secure_channel(mu_server_t *server, mu_binary_rea
 #endif
     size_t nonce_len = MU_SERVER_NONCE_LENGTH;
 
-#ifdef MUC_OPCUA_ECC
+#ifdef MUC_OPCUA_CU_SECURITY_ECC
     if (ecc_channel) {
         const mu_crypto_adapter_t *cr = server->config.crypto_adapter;
         if (cr->ecc_generate_ephemeral == NULL || cr->ecc_ecdh_derive == NULL ||
@@ -235,7 +235,7 @@ opcua_statuscode_t handle_open_secure_channel(mu_server_t *server, mu_binary_rea
     }
 
     server_secure_channel.mode = (mu_message_security_mode_t)security_mode;
-#ifdef MUC_OPCUA_SECURITY
+#ifdef MUC_OPCUA_FACET_CORE_2022_SERVER
     if (server_secure_channel.policy != MU_SECURITY_POLICY_NONE_ID &&
         server_secure_channel.policy != MU_SECURITY_POLICY_INVALID_ID && server->config.crypto_adapter != NULL) {
         const mu_crypto_adapter_t *cr = server->config.crypto_adapter;
@@ -243,7 +243,7 @@ opcua_statuscode_t handle_open_secure_channel(mu_server_t *server, mu_binary_rea
         if (cn_len == 0) {
             return MU_STATUS_BAD_SECURITYCHECKSFAILED;
         }
-#ifdef MUC_OPCUA_ECC
+#ifdef MUC_OPCUA_CU_SECURITY_ECC
         if (ecc_channel) {
             /* ECDH(server ephemeral private, client ephemeral pubkey) -> shared
                secret; HKDF the per-direction channel keys from it (§6.8.1). */
@@ -311,7 +311,7 @@ opcua_statuscode_t handle_close_secure_channel(mu_server_t *server, mu_binary_re
     }
 
     s = write_response_prefix(w, MU_ID_CLOSESECURECHANNELRESPONSE, req.request_handle, MU_STATUS_GOOD
-#ifdef MUC_OPCUA_TIME_SYNC
+#ifdef MUC_OPCUA_CU_TIME_SYNC
                               ,
                               server
 #endif

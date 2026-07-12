@@ -170,14 +170,37 @@
       "opc_cu_5793",
       "opc_monitor_items_500",
       "opc_monitor_minqueuesize_05",
+      "service_read",
       "service_browse",
       "service_discovery",
-      "service_history",
-      "service_nodemanagement",
-      "service_query",
-      "service_read",
       "service_register_nodes",
-      "service_write"
+      "service_write",
+      "service_history",
+      "service_query",
+      "service_nodemanagement",
+      "opc_cu_subscription_basic",
+      "opc_cu_subscription_standard",
+      "opc_cu_security_ecc",
+      "opc_cu_events",
+      "opc_cu_data_access",
+      "opc_cu_method_server",
+      "opc_cu_custom_methods",
+      "opc_cu_user_auth",
+      "opc_cu_multiple_connections",
+      "opc_cu_event_filter_where",
+      "opc_cu_redundancy",
+      "opc_cu_diagnostics",
+      "opc_cu_complex_types",
+      "opc_cu_auditing",
+      "opc_cu_dynamic_nodes",
+      "opc_cu_multi_chunk",
+      "opc_cu_session_timeout",
+      "opc_cu_time_sync",
+      "opc_cu_extended_nodeids",
+      "opc_cu_aggregate_full",
+      "opc_cu_pubsub",
+      "opc_cu_reverse_connect",
+      "opc_cu_namespaces"
     ],
     "opc_facet_1324": [
       "opc_cu_2928",
@@ -214,936 +237,6 @@
   },
   "items": [
     {
-      "id": "service_read",
-      "kind": "conformance_unit",
-      "opc_display_name": "Attribute Read",
-      "kconfig_symbol": "SERVICE_READ",
-      "implementation_state": "claimed",
-      "depends_on": [],
-      "profile_defaults": {
-        "nano": true,
-        "micro": true,
-        "embedded": true,
-        "standard": true,
-        "full": true,
-        "custom": true
-      },
-      "default_unconditional": true,
-      "backing_tests": [
-        "test_read_service"
-      ],
-      "opc_reference": {
-        "spec": "OPC-10000-4",
-        "section": "5.10.2",
-        "facet": "Core 2017 Server Facet",
-        "cu_id": "1673",
-        "cu_name": "Attribute Read"
-      },
-      "notes": "Current Kconfig help text."
-    },
-    {
-      "id": "service_browse",
-      "kind": "conformance_unit",
-      "opc_display_name": "View Basic / TranslateBrowsePath",
-      "kconfig_symbol": "SERVICE_BROWSE",
-      "implementation_state": "claimed",
-      "depends_on": [],
-      "profile_defaults": {
-        "nano": true,
-        "micro": true,
-        "embedded": true,
-        "standard": true,
-        "full": true,
-        "custom": true
-      },
-      "default_unconditional": true,
-      "backing_tests": [
-        "test_browse_service",
-        "test_browse_limits",
-        "test_view_services"
-      ],
-      "opc_reference": {
-        "spec": "OPC-10000-4",
-        "section": "5.8",
-        "facet": "Core 2017",
-        "cu_name": "View Basic / TranslateBrowsePath"
-      },
-      "notes": "Browse + BrowseNext + TranslateBrowsePaths."
-    },
-    {
-      "id": "service_discovery",
-      "kind": "conformance_unit",
-      "opc_display_name": "Discovery Find Servers Self / Get Endpoints",
-      "kconfig_symbol": "SERVICE_DISCOVERY",
-      "implementation_state": "claimed",
-      "depends_on": [],
-      "profile_defaults": {
-        "nano": true,
-        "micro": true,
-        "embedded": true,
-        "standard": true,
-        "full": true,
-        "custom": true
-      },
-      "default_unconditional": true,
-      "backing_tests": [
-        "test_discovery_endpoint"
-      ],
-      "opc_reference": {
-        "spec": "OPC-10000-4",
-        "section": "5.4",
-        "facet": "Core 2017",
-        "cu_name": "Discovery Find Servers Self / Get Endpoints"
-      },
-      "notes": "FindServers / GetEndpoints."
-    },
-    {
-      "id": "service_register_nodes",
-      "kind": "conformance_unit",
-      "opc_display_name": "View RegisterNodes",
-      "kconfig_symbol": "SERVICE_REGISTER_NODES",
-      "implementation_state": "claimed",
-      "depends_on": [],
-      "profile_defaults": {
-        "nano": true,
-        "micro": true,
-        "embedded": true,
-        "standard": true,
-        "full": true,
-        "custom": false
-      },
-      "backing_tests": [
-        "test_view_services",
-        "test_profile_surface"
-      ],
-      "opc_reference": {
-        "spec": "OPC-10000-4",
-        "section": "5.9",
-        "facet": "Core 2017",
-        "cu_name": "View RegisterNodes"
-      },
-      "notes": "RegisterNodes / UnregisterNodes."
-    },
-    {
-      "id": "service_write",
-      "kind": "conformance_unit",
-      "opc_display_name": "Core 2017 Attribute Write",
-      "kconfig_symbol": "SERVICE_WRITE",
-      "implementation_state": "claimed",
-      "depends_on": [],
-      "profile_defaults": {
-        "nano": false,
-        "micro": false,
-        "embedded": false,
-        "standard": false,
-        "full": true,
-        "custom": false
-      },
-      "backing_tests": [
-        "test_write_service"
-      ],
-      "opc_reference": {
-        "spec": "OPC-10000-4",
-        "section": "5.10.4",
-        "facet": "Core 2017 Attribute Write",
-        "cu_optional": true
-      },
-      "notes": "Optional facet; only on full."
-    },
-    {
-      "id": "service_history",
-      "kind": "conformance_unit",
-      "opc_display_name": "Historical Access Server Facet",
-      "kconfig_symbol": "SERVICE_HISTORY",
-      "implementation_state": "claimed",
-      "depends_on": [],
-      "profile_defaults": {
-        "nano": false,
-        "micro": false,
-        "embedded": false,
-        "standard": false,
-        "full": true,
-        "custom": false
-      },
-      "backing_tests": [
-        "test_history"
-      ],
-      "opc_reference": {
-        "spec": "OPC-10000-11",
-        "section": null,
-        "facet": "Historical Access Server Facet",
-        "cu_optional": true
-      },
-      "notes": "HistoryRead/HistoryUpdate."
-    },
-    {
-      "id": "service_query",
-      "kind": "conformance_unit",
-      "opc_display_name": "Query",
-      "kconfig_symbol": "SERVICE_QUERY",
-      "implementation_state": "claimed",
-      "depends_on": [],
-      "profile_defaults": {
-        "nano": false,
-        "micro": false,
-        "embedded": false,
-        "standard": false,
-        "full": true,
-        "custom": false
-      },
-      "backing_tests": [
-        "test_query_service"
-      ],
-      "opc_reference": {
-        "spec": "OPC-10000-4",
-        "section": "5.9",
-        "facet": "Query",
-        "cu_optional": true
-      },
-      "notes": "QueryFirst/QueryNext."
-    },
-    {
-      "id": "service_nodemanagement",
-      "kind": "conformance_unit",
-      "opc_display_name": "NodeManagement",
-      "kconfig_symbol": "SERVICE_NODEMANAGEMENT",
-      "implementation_state": "claimed",
-      "depends_on": [],
-      "profile_defaults": {
-        "nano": false,
-        "micro": false,
-        "embedded": false,
-        "standard": false,
-        "full": true,
-        "custom": false
-      },
-      "backing_tests": [
-        "test_node_management",
-        "test_node_management_errors"
-      ],
-      "opc_reference": {
-        "spec": "OPC-10000-4",
-        "section": "5.7",
-        "facet": "NodeManagement",
-        "cu_optional": true
-      },
-      "notes": "AddNodes/DeleteNodes/..."
-    },
-    {
-      "id": "base_nodes",
-      "kind": "facet",
-      "opc_display_name": "Core 2017 Server Facet",
-      "kconfig_symbol": "BASE_NODES",
-      "implementation_state": "claimed",
-      "depends_on": [],
-      "profile_defaults": {
-        "nano": true,
-        "micro": true,
-        "embedded": true,
-        "standard": true,
-        "full": true,
-        "custom": false
-      },
-      "backing_tests": [
-        "test_profile_surface"
-      ],
-      "opc_reference": {
-        "spec": "OPC-10000-7",
-        "section": "4.2",
-        "facet": "Core 2017 Server Facet"
-      },
-      "notes": "Mandatory Server object hierarchy."
-    },
-    {
-      "id": "base_type_system",
-      "kind": "facet",
-      "opc_display_name": "Base Info Type System",
-      "kconfig_symbol": "BASE_TYPE_SYSTEM",
-      "implementation_state": "claimed",
-      "depends_on": [
-        "BASE_NODES"
-      ],
-      "profile_defaults": {
-        "nano": false,
-        "micro": false,
-        "embedded": true,
-        "standard": true,
-        "full": true,
-        "custom": false
-      },
-      "backing_tests": [
-        "test_type_system",
-        "test_method_call"
-      ],
-      "opc_reference": {
-        "spec": "OPC-10000-5",
-        "section": null,
-        "facet": "Base Info Type System",
-        "cu_id": "1661"
-      },
-      "notes": "EmbeddedUA2017 direct CU."
-    },
-    {
-      "id": "extended_nodeids",
-      "kind": "facet",
-      "opc_display_name": "Extended (string/GUID) NodeIds",
-      "kconfig_symbol": "EXTENDED_NODEIDS",
-      "implementation_state": "claimed",
-      "depends_on": [],
-      "profile_defaults": {
-        "nano": false,
-        "micro": false,
-        "embedded": false,
-        "standard": false,
-        "full": true,
-        "custom": false
-      },
-      "backing_tests": [
-        "test_address_space_string_limits",
-        "test_binary_nodeid_errors"
-      ],
-      "opc_reference": {
-        "spec": "OPC-10000-3",
-        "section": null,
-        "facet": "Extended (string/GUID) NodeIds"
-      },
-      "notes": "Extended NodeId support."
-    },
-    {
-      "id": "namespaces",
-      "kind": "facet",
-      "opc_display_name": "Namespace metadata",
-      "kconfig_symbol": "NAMESPACES",
-      "implementation_state": "claimed",
-      "depends_on": [
-        "BASE_NODES"
-      ],
-      "profile_defaults": {
-        "nano": false,
-        "micro": false,
-        "embedded": false,
-        "standard": false,
-        "full": true,
-        "custom": false
-      },
-      "backing_tests": [
-        "test_read_browsename_namespace"
-      ],
-      "opc_reference": {
-        "spec": "OPC-10000-4",
-        "section": null,
-        "facet": "Namespace metadata"
-      },
-      "notes": "NamespaceArray / ServerArray metadata."
-    },
-    {
-      "id": "dynamic_nodes",
-      "kind": "facet",
-      "opc_display_name": "Dynamic address space",
-      "kconfig_symbol": "DYNAMIC_NODES",
-      "implementation_state": "claimed",
-      "depends_on": [],
-      "profile_defaults": {
-        "nano": false,
-        "micro": false,
-        "embedded": false,
-        "standard": false,
-        "full": true,
-        "custom": false
-      },
-      "backing_tests": [
-        "test_address_space_dynamic"
-      ],
-      "opc_reference": {
-        "spec": "OPC-10000-3",
-        "section": null,
-        "facet": "Dynamic address space"
-      },
-      "notes": "Runtime node addition."
-    },
-    {
-      "id": "complex_types",
-      "kind": "facet",
-      "opc_display_name": "Structure/complex type encoding",
-      "kconfig_symbol": "COMPLEX_TYPES",
-      "implementation_state": "claimed",
-      "depends_on": [
-        "BASE_NODES"
-      ],
-      "profile_defaults": {
-        "nano": false,
-        "micro": false,
-        "embedded": false,
-        "standard": false,
-        "full": true,
-        "custom": false
-      },
-      "backing_tests": [
-        "test_complex_types"
-      ],
-      "opc_reference": {
-        "spec": "OPC-10000-6",
-        "section": null,
-        "facet": "Structure/complex type encoding"
-      },
-      "notes": null
-    },
-    {
-      "id": "user_auth",
-      "kind": "facet",
-      "opc_display_name": "UserNamePassword (id 1096) / X509 (id 1097)",
-      "kconfig_symbol": "USER_AUTH",
-      "implementation_state": "claimed",
-      "depends_on": [],
-      "profile_defaults": {
-        "nano": true,
-        "micro": true,
-        "embedded": true,
-        "standard": true,
-        "full": true,
-        "custom": false
-      },
-      "backing_tests": [
-        "test_user_auth_plaintext",
-        "test_user_auth_certificate",
-        "test_user_auth_secure_e2e"
-      ],
-      "opc_reference": {
-        "spec": "OPC-10000-4",
-        "section": "7.36",
-        "facet": "UserNamePassword (id 1096) / X509 (id 1097)"
-      },
-      "notes": "User token authentication."
-    },
-    {
-      "id": "multiple_connections",
-      "kind": "facet",
-      "opc_display_name": "MicroEmbeddedDevice2017 Session Minimum 2 Parallel",
-      "kconfig_symbol": "MULTIPLE_CONNECTIONS",
-      "implementation_state": "claimed",
-      "depends_on": [],
-      "profile_defaults": {
-        "nano": false,
-        "micro": true,
-        "embedded": true,
-        "standard": true,
-        "full": true,
-        "custom": false
-      },
-      "backing_tests": [
-        "test_connection_multiplex"
-      ],
-      "opc_reference": {
-        "spec": "OPC-10000-7",
-        "section": null,
-        "facet": "MicroEmbeddedDevice2017 Session Minimum 2 Parallel",
-        "cu_id": "1659"
-      },
-      "notes": "Multiple concurrent connections/sessions."
-    },
-    {
-      "id": "session_timeout",
-      "kind": "facet",
-      "opc_display_name": "Session idle timeout",
-      "kconfig_symbol": "SESSION_TIMEOUT",
-      "implementation_state": "claimed",
-      "depends_on": [
-        "MULTIPLE_CONNECTIONS",
-        "MULTI_CHUNK"
-      ],
-      "depends_on_op": "or",
-      "profile_defaults": {
-        "nano": false,
-        "micro": true,
-        "embedded": true,
-        "standard": true,
-        "full": true,
-        "custom": false
-      },
-      "backing_tests": [
-        "test_base_server_behaviour"
-      ],
-      "opc_reference": {
-        "spec": "OPC-10000-4",
-        "section": null,
-        "facet": "Session idle timeout"
-      },
-      "notes": "Implicit coupling: required whenever multiple connections or multi-chunk are on."
-    },
-    {
-      "id": "security",
-      "kind": "facet",
-      "opc_display_name": "Security Policy Required + Default AppInstance Certificate",
-      "kconfig_symbol": "SECURITY",
-      "implementation_state": "claimed",
-      "depends_on": [],
-      "profile_defaults": {
-        "nano": false,
-        "micro": false,
-        "embedded": true,
-        "standard": true,
-        "full": true,
-        "custom": false
-      },
-      "backing_tests": [
-        "test_asym_chunk",
-        "test_sym_chunk",
-        "test_certificate",
-        "test_certificate_validity",
-        "test_security_trustlist",
-        "test_server_handshake_secure",
-        "test_secure_handshake_modern"
-      ],
-      "opc_reference": {
-        "spec": "OPC-10000-7",
-        "section": null,
-        "facet": "Security Policy Required + Default AppInstance Certificate"
-      },
-      "notes": "SecurityPolicy Basic256Sha256."
-    },
-    {
-      "id": "ecc",
-      "kind": "facet",
-      "opc_display_name": "Security ECC Policy (curve25519 / nistP256)",
-      "kconfig_symbol": "ECC",
-      "implementation_state": "claimed",
-      "depends_on": [
-        "SECURITY"
-      ],
-      "profile_defaults": {
-        "nano": false,
-        "micro": false,
-        "embedded": false,
-        "standard": false,
-        "full": true,
-        "custom": false
-      },
-      "backing_tests": [
-        "test_ecc_crypto"
-      ],
-      "opc_reference": {
-        "spec": "OPC-10000-7",
-        "section": null,
-        "facet": "Security ECC Policy (curve25519 / nistP256)",
-        "cu_optional": true
-      },
-      "notes": "See docs/conformance/ecc-security-policy.md."
-    },
-    {
-      "id": "multi_chunk",
-      "kind": "facet",
-      "opc_display_name": "Multi-chunk messages / index-range Read",
-      "kconfig_symbol": "MULTI_CHUNK",
-      "implementation_state": "claimed",
-      "depends_on": [],
-      "profile_defaults": {
-        "nano": false,
-        "micro": false,
-        "embedded": false,
-        "standard": false,
-        "full": true,
-        "custom": false
-      },
-      "backing_tests": [
-        "test_message_chunk_errors"
-      ],
-      "opc_reference": {
-        "spec": "OPC-10000-6",
-        "section": null,
-        "facet": "Multi-chunk messages / index-range Read"
-      },
-      "notes": null
-    },
-    {
-      "id": "time_sync",
-      "kind": "facet",
-      "opc_display_name": "Security time synchronization (clock-skew validation)",
-      "kconfig_symbol": "TIME_SYNC",
-      "implementation_state": "claimed",
-      "depends_on": [],
-      "profile_defaults": {
-        "nano": false,
-        "micro": false,
-        "embedded": false,
-        "standard": false,
-        "full": true,
-        "custom": false
-      },
-      "backing_tests": [
-        "test_time_sync",
-        "test_dispatch_services"
-      ],
-      "opc_reference": {
-        "spec": "OPC-10000-4",
-        "section": "7.28",
-        "facet": "Security time synchronization (clock-skew validation)"
-      },
-      "notes": null
-    },
-    {
-      "id": "auditing",
-      "kind": "facet",
-      "opc_display_name": "Audit events",
-      "kconfig_symbol": "AUDITING",
-      "implementation_state": "claimed",
-      "depends_on": [
-        "EVENTS"
-      ],
-      "profile_defaults": {
-        "nano": false,
-        "micro": false,
-        "embedded": false,
-        "standard": false,
-        "full": true,
-        "custom": false
-      },
-      "backing_tests": [
-        "test_audit_events"
-      ],
-      "opc_reference": {
-        "spec": "OPC-10000-4",
-        "section": "7.x",
-        "facet": "Audit events"
-      },
-      "notes": null
-    },
-    {
-      "id": "subscriptions",
-      "kind": "facet",
-      "opc_display_name": "EmbeddedDataChangeSubscription",
-      "kconfig_symbol": "SUBSCRIPTIONS",
-      "implementation_state": "claimed",
-      "depends_on": [],
-      "profile_defaults": {
-        "nano": false,
-        "micro": true,
-        "embedded": true,
-        "standard": true,
-        "full": true,
-        "custom": false
-      },
-      "backing_tests": [
-        "test_subscriptions",
-        "test_subscriptions_errors"
-      ],
-      "opc_reference": {
-        "spec": "OPC-10000-4",
-        "section": "5.12/5.13",
-        "facet": "EmbeddedDataChangeSubscription",
-        "cu_id": "141"
-      },
-      "notes": "Data-change subscriptions & MonitoredItems."
-    },
-    {
-      "id": "subscriptions_standard",
-      "kind": "facet",
-      "opc_display_name": "Standard/Enhanced DataChange Subscription 2017",
-      "kconfig_symbol": "SUBSCRIPTIONS_STANDARD",
-      "implementation_state": "claimed",
-      "depends_on": [
-        "SUBSCRIPTIONS"
-      ],
-      "profile_defaults": {
-        "nano": false,
-        "micro": false,
-        "embedded": true,
-        "standard": true,
-        "full": true,
-        "custom": false
-      },
-      "backing_tests": [
-        "test_subscriptions_capacity",
-        "test_subscription_deadband",
-        "test_subscription_publish"
-      ],
-      "opc_reference": {
-        "spec": "OPC-10000-7",
-        "section": null,
-        "facet": "Standard/Enhanced DataChange Subscription 2017",
-        "cu_ids": [
-          "1675",
-          "1678"
-        ]
-      },
-      "notes": "GetMonitoredItems/ResendData, deadband, triggering, Republish."
-    },
-    {
-      "id": "events",
-      "kind": "facet",
-      "opc_display_name": "Event notifications & Alarms/Conditions",
-      "kconfig_symbol": "EVENTS",
-      "implementation_state": "claimed",
-      "depends_on": [
-        "SUBSCRIPTIONS"
-      ],
-      "profile_defaults": {
-        "nano": false,
-        "micro": false,
-        "embedded": false,
-        "standard": false,
-        "full": true,
-        "custom": false
-      },
-      "backing_tests": [
-        "test_alarms_conditions",
-        "test_event_notifier",
-        "test_event_serializer"
-      ],
-      "opc_reference": {
-        "spec": "OPC-10000-9",
-        "section": null,
-        "facet": "Event notifications & Alarms/Conditions"
-      },
-      "notes": null
-    },
-    {
-      "id": "event_filter_where",
-      "kind": "facet",
-      "opc_display_name": "Standard Event Subscription facet / ContentFilter",
-      "kconfig_symbol": "EVENT_FILTER_WHERE",
-      "implementation_state": "claimed",
-      "depends_on": [
-        "EVENTS",
-        "SUBSCRIPTIONS_STANDARD"
-      ],
-      "depends_on_op": "and",
-      "profile_defaults": {
-        "nano": false,
-        "micro": false,
-        "embedded": false,
-        "standard": false,
-        "full": true,
-        "custom": false
-      },
-      "backing_tests": [
-        "test_event_filter_where",
-        "test_event_filter_select"
-      ],
-      "opc_reference": {
-        "spec": "OPC-10000-4",
-        "section": "7.4",
-        "facet": "Standard Event Subscription facet / ContentFilter"
-      },
-      "notes": null
-    },
-    {
-      "id": "aggregate_full",
-      "kind": "facet",
-      "opc_display_name": "Aggregate Subscription facet",
-      "kconfig_symbol": "AGGREGATE_FULL",
-      "implementation_state": "claimed",
-      "depends_on": [
-        "SUBSCRIPTIONS_STANDARD"
-      ],
-      "profile_defaults": {
-        "nano": false,
-        "micro": false,
-        "embedded": false,
-        "standard": false,
-        "full": true,
-        "custom": false
-      },
-      "backing_tests": [
-        "test_aggregate",
-        "test_aggregate_full"
-      ],
-      "opc_reference": {
-        "spec": "OPC-10000-13",
-        "section": null,
-        "facet": "Aggregate Subscription facet",
-        "cu_optional": true
-      },
-      "notes": null
-    },
-    {
-      "id": "redundancy",
-      "kind": "facet",
-      "opc_display_name": "Client Redundancy (TransferSubscriptions)",
-      "kconfig_symbol": "REDUNDANCY",
-      "implementation_state": "claimed",
-      "depends_on": [
-        "SUBSCRIPTIONS"
-      ],
-      "profile_defaults": {
-        "nano": false,
-        "micro": false,
-        "embedded": false,
-        "standard": false,
-        "full": true,
-        "custom": false
-      },
-      "backing_tests": [
-        "test_transfer_subscriptions"
-      ],
-      "opc_reference": {
-        "spec": "OPC-10000-4",
-        "section": "5.14.7",
-        "facet": "Client Redundancy (TransferSubscriptions)",
-        "cu_optional": true
-      },
-      "notes": "See docs/conformance/redundancy.md."
-    },
-    {
-      "id": "method_server",
-      "kind": "facet",
-      "opc_display_name": "Method Server facet (arbitrary Call)",
-      "kconfig_symbol": "METHOD_SERVER",
-      "implementation_state": "claimed",
-      "depends_on": [],
-      "profile_defaults": {
-        "nano": false,
-        "micro": false,
-        "embedded": false,
-        "standard": false,
-        "full": true,
-        "custom": false
-      },
-      "backing_tests": [
-        "test_method_call_arbitrary",
-        "test_method_call_errors"
-      ],
-      "opc_reference": {
-        "spec": "OPC-10000-4",
-        "section": "5.11",
-        "facet": "Method Server facet (arbitrary Call)",
-        "cu_optional": true
-      },
-      "notes": "Built-in GetMonitoredItems/ResendData work WITHOUT this."
-    },
-    {
-      "id": "custom_methods",
-      "kind": "facet",
-      "opc_display_name": "Custom method registration (alias of Method Server)",
-      "kconfig_symbol": "CUSTOM_METHODS",
-      "implementation_state": "claimed",
-      "depends_on": [],
-      "profile_defaults": {
-        "nano": false,
-        "micro": false,
-        "embedded": false,
-        "standard": false,
-        "full": true,
-        "custom": false
-      },
-      "backing_tests": [
-        "test_method_call"
-      ],
-      "opc_reference": {
-        "spec": "OPC-10000-4",
-        "section": "5.11",
-        "facet": "Custom method registration (alias of Method Server)"
-      },
-      "notes": "Alias of Method Server; kept separate for legacy reasons."
-    },
-    {
-      "id": "pubsub",
-      "kind": "facet",
-      "opc_display_name": "PubSub",
-      "kconfig_symbol": "PUBSUB",
-      "implementation_state": "claimed",
-      "depends_on": [],
-      "profile_defaults": {
-        "nano": false,
-        "micro": false,
-        "embedded": false,
-        "standard": false,
-        "full": true,
-        "custom": false
-      },
-      "backing_tests": [
-        "test_uadp_encoding",
-        "test_pubsub"
-      ],
-      "opc_reference": {
-        "spec": "OPC-10000-14",
-        "section": null,
-        "facet": "PubSub"
-      },
-      "notes": null
-    },
-    {
-      "id": "data_access",
-      "kind": "facet",
-      "opc_display_name": "Data Access Server Facet",
-      "kconfig_symbol": "DATA_ACCESS",
-      "implementation_state": "claimed",
-      "depends_on": [
-        "BASE_NODES"
-      ],
-      "profile_defaults": {
-        "nano": false,
-        "micro": false,
-        "embedded": false,
-        "standard": false,
-        "full": true,
-        "custom": false
-      },
-      "backing_tests": [
-        "test_analog_item",
-        "test_da_type_nodes",
-        "test_eu_information"
-      ],
-      "opc_reference": {
-        "spec": "OPC-10000-8",
-        "section": "5.3",
-        "facet": "Data Access Server Facet",
-        "cu_optional": true
-      },
-      "notes": "See docs/conformance/data-access.md. Requires Base Nodes."
-    },
-    {
-      "id": "reverse_connect",
-      "kind": "facet",
-      "opc_display_name": "Reverse Connect (server-initiated ReverseHello)",
-      "kconfig_symbol": "REVERSE_CONNECT",
-      "implementation_state": "claimed",
-      "depends_on": [],
-      "profile_defaults": {
-        "nano": false,
-        "micro": false,
-        "embedded": false,
-        "standard": false,
-        "full": true,
-        "custom": false
-      },
-      "backing_tests": [
-        "test_reverse_connect"
-      ],
-      "opc_reference": {
-        "spec": "OPC-10000-6",
-        "section": "7.1.3",
-        "facet": "Reverse Connect (server-initiated ReverseHello)",
-        "cu_optional": true
-      },
-      "notes": "See docs/conformance/reverse-connect.md."
-    },
-    {
-      "id": "server_diagnostics",
-      "kind": "facet",
-      "opc_display_name": "ServerDiagnostics object + counters",
-      "kconfig_symbol": "SERVER_DIAGNOSTICS",
-      "implementation_state": "claimed",
-      "depends_on": [],
-      "profile_defaults": {
-        "nano": false,
-        "micro": false,
-        "embedded": false,
-        "standard": false,
-        "full": true,
-        "custom": false
-      },
-      "backing_tests": [
-        "test_diagnostics"
-      ],
-      "opc_reference": {
-        "spec": "OPC-10000-5",
-        "section": "6.3",
-        "facet": "ServerDiagnostics object + counters",
-        "cu_optional": true
-      },
-      "notes": null
-    },
-    {
       "id": "read_cache",
       "kind": "optimization",
       "opc_display_name": "Read value cache (maxAge optimization)",
@@ -1174,7 +267,7 @@
       "kconfig_symbol": null,
       "implementation_state": "unimplemented",
       "depends_on": [
-        "BASE_NODES"
+        "MUC_OPCUA_FACET_CORE_2022_SERVER"
       ],
       "profile_defaults": {
         "nano": false,
@@ -1771,7 +864,7 @@
     {
       "id": "opc_cu_2478",
       "kind": "conformance_unit",
-      "opc_display_name": "Time Sync \u2013 OS based support",
+      "opc_display_name": "Time Sync – OS based support",
       "kconfig_symbol": null,
       "implementation_state": "unimplemented",
       "depends_on": [],
@@ -1788,7 +881,7 @@
         "spec": null,
         "section": null,
         "cu_id": "2478",
-        "cu_name": "Time Sync \u2013 OS based support",
+        "cu_name": "Time Sync – OS based support",
         "source_url": "https://profiles.opcfoundation.org"
       },
       "source_metadata": {
@@ -1800,7 +893,7 @@
     {
       "id": "opc_cu_2479",
       "kind": "conformance_unit",
-      "opc_display_name": "Time Sync \u2013 IEEE 1588 (PTP)",
+      "opc_display_name": "Time Sync – IEEE 1588 (PTP)",
       "kconfig_symbol": null,
       "implementation_state": "unimplemented",
       "depends_on": [],
@@ -1817,7 +910,7 @@
         "spec": null,
         "section": null,
         "cu_id": "2479",
-        "cu_name": "Time Sync \u2013 IEEE 1588 (PTP)",
+        "cu_name": "Time Sync – IEEE 1588 (PTP)",
         "source_url": "https://profiles.opcfoundation.org"
       },
       "source_metadata": {
@@ -1829,7 +922,7 @@
     {
       "id": "opc_cu_2480",
       "kind": "conformance_unit",
-      "opc_display_name": "Time Sync \u2013 IEEE 802.1AS",
+      "opc_display_name": "Time Sync – IEEE 802.1AS",
       "kconfig_symbol": null,
       "implementation_state": "unimplemented",
       "depends_on": [],
@@ -1846,7 +939,7 @@
         "spec": null,
         "section": null,
         "cu_id": "2480",
-        "cu_name": "Time Sync \u2013 IEEE 802.1AS",
+        "cu_name": "Time Sync – IEEE 802.1AS",
         "source_url": "https://profiles.opcfoundation.org"
       },
       "source_metadata": {
@@ -1916,7 +1009,7 @@
     {
       "id": "opc_cu_2786",
       "kind": "conformance_unit",
-      "opc_display_name": "Time Sync \u2013 NTP",
+      "opc_display_name": "Time Sync – NTP",
       "kconfig_symbol": null,
       "implementation_state": "unimplemented",
       "depends_on": [],
@@ -1933,7 +1026,7 @@
         "spec": null,
         "section": null,
         "cu_id": "2786",
-        "cu_name": "Time Sync \u2013 NTP",
+        "cu_name": "Time Sync – NTP",
         "source_url": "https://profiles.opcfoundation.org"
       },
       "source_metadata": {
@@ -2607,7 +1700,7 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "Implement basic Service behaviour. This includes in particular:\n \u2013 checking the authentication token\n \u2013 returning the requestHandle in responses\n \u2013 respecting a timeoutHint"
+      "notes": "Implement basic Service behaviour. This includes in particular:\n – checking the authentication token\n – returning the requestHandle in responses\n – respecting a timeoutHint"
     },
     {
       "id": "opc_cu_4053",
@@ -2699,7 +1792,7 @@
     {
       "id": "opc_cu_5505",
       "kind": "conformance_unit",
-      "opc_display_name": "Time Sync \u2013 UA based support",
+      "opc_display_name": "Time Sync – UA based support",
       "kconfig_symbol": null,
       "implementation_state": "unimplemented",
       "depends_on": [],
@@ -2716,7 +1809,7 @@
         "spec": null,
         "section": null,
         "cu_id": "5505",
-        "cu_name": "Time Sync \u2013 UA based support",
+        "cu_name": "Time Sync – UA based support",
         "source_url": "https://profiles.opcfoundation.org"
       },
       "source_metadata": {
@@ -2844,7 +1937,7 @@
     {
       "id": "opc_facet_1695",
       "kind": "facet",
-      "opc_display_name": "User Token \u2013 User Name Password Server Facet",
+      "opc_display_name": "User Token – User Name Password Server Facet",
       "kconfig_symbol": "MUC_OPCUA_FACET_USER_TOKEN_USER_NAME_PASSWORD_SERVER",
       "implementation_state": "deferred",
       "depends_on": [],
@@ -2873,7 +1966,7 @@
     {
       "id": "opc_facet_1696",
       "kind": "facet",
-      "opc_display_name": "User Token \u2013 X509 Certificate Server Facet",
+      "opc_display_name": "User Token – X509 Certificate Server Facet",
       "kconfig_symbol": "MUC_OPCUA_FACET_USER_TOKEN_X509_CERTIFICATE_SERVER",
       "implementation_state": "deferred",
       "depends_on": [],
@@ -4899,6 +3992,830 @@
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
       "notes": "Supports portable IDs by exposing the DataTypes PortableQualifiedName and PortableNodeId, their Encoding Objects and all their supertypes in the AddressSpace."
+    },
+    {
+      "id": "opc_cu_subscription_basic",
+      "kind": "conformance_unit",
+      "opc_display_name": "Subscription Basic",
+      "kconfig_symbol": "MUC_OPCUA_CU_SUBSCRIPTION_BASIC",
+      "implementation_state": "claimed",
+      "depends_on": [],
+      "profile_defaults": {
+        "nano": false,
+        "micro": true,
+        "embedded": true,
+        "standard": true,
+        "full": true,
+        "custom": false
+      },
+      "backing_tests": [
+        "test_subscriptions",
+        "test_subscriptions_errors"
+      ],
+      "opc_reference": {
+        "spec": "OPC-10000-4",
+        "section": "5.12/5.13",
+        "facet": "Core 2022 Server Facet"
+      },
+      "notes": "Project-level Conformance Unit mirroring the legacy 'subscriptions' item; emits Kconfig symbol MUC_OPCUA_CU_SUBSCRIPTION_BASIC matching the #ifdef guard renamed in Task 3 of the CU-aligned code reorganisation plan."
+    },
+    {
+      "id": "opc_cu_subscription_standard",
+      "kind": "conformance_unit",
+      "opc_display_name": "Subscription Standard",
+      "kconfig_symbol": "MUC_OPCUA_CU_SUBSCRIPTION_STANDARD",
+      "implementation_state": "claimed",
+      "depends_on": [
+        "MUC_OPCUA_CU_SUBSCRIPTION_BASIC"
+      ],
+      "profile_defaults": {
+        "nano": false,
+        "micro": false,
+        "embedded": true,
+        "standard": true,
+        "full": true,
+        "custom": false
+      },
+      "backing_tests": [
+        "test_subscriptions_capacity",
+        "test_subscription_deadband",
+        "test_subscription_publish"
+      ],
+      "opc_reference": {
+        "spec": "OPC-10000-7",
+        "section": null,
+        "facet": "Core 2022 Server Facet"
+      },
+      "notes": "Project-level Conformance Unit mirroring the legacy 'subscriptions_standard' item; emits Kconfig symbol MUC_OPCUA_CU_SUBSCRIPTION_STANDARD matching the #ifdef guard renamed in Task 3 of the CU-aligned code reorganisation plan."
+    },
+    {
+      "id": "opc_cu_security_ecc",
+      "kind": "conformance_unit",
+      "opc_display_name": "Security ECC",
+      "kconfig_symbol": "MUC_OPCUA_CU_SECURITY_ECC",
+      "implementation_state": "claimed",
+      "depends_on": [],
+      "profile_defaults": {
+        "nano": false,
+        "micro": false,
+        "embedded": false,
+        "standard": false,
+        "full": true,
+        "custom": false
+      },
+      "backing_tests": [
+        "test_ecc_crypto"
+      ],
+      "opc_reference": {
+        "spec": "OPC-10000-7",
+        "section": null,
+        "facet": "Core 2022 Server Facet"
+      },
+      "notes": "Project-level Conformance Unit mirroring the legacy 'ecc' item; emits Kconfig symbol MUC_OPCUA_CU_SECURITY_ECC matching the #ifdef guard renamed in Task 3 of the CU-aligned code reorganisation plan."
+    },
+    {
+      "id": "opc_cu_events",
+      "kind": "conformance_unit",
+      "opc_display_name": "Events",
+      "kconfig_symbol": "MUC_OPCUA_CU_EVENTS",
+      "implementation_state": "claimed",
+      "depends_on": [
+        "MUC_OPCUA_CU_SUBSCRIPTION_BASIC"
+      ],
+      "profile_defaults": {
+        "nano": false,
+        "micro": false,
+        "embedded": false,
+        "standard": false,
+        "full": true,
+        "custom": false
+      },
+      "backing_tests": [
+        "test_alarms_conditions",
+        "test_event_notifier",
+        "test_event_serializer"
+      ],
+      "opc_reference": {
+        "spec": "OPC-10000-9",
+        "section": null,
+        "facet": "Core 2022 Server Facet"
+      },
+      "notes": "Project-level Conformance Unit mirroring the legacy 'events' item; emits Kconfig symbol MUC_OPCUA_CU_EVENTS matching the #ifdef guard renamed in Task 3 of the CU-aligned code reorganisation plan."
+    },
+    {
+      "id": "opc_cu_data_access",
+      "kind": "conformance_unit",
+      "opc_display_name": "Data Access",
+      "kconfig_symbol": "MUC_OPCUA_CU_DATA_ACCESS",
+      "implementation_state": "claimed",
+      "depends_on": [],
+      "profile_defaults": {
+        "nano": false,
+        "micro": false,
+        "embedded": false,
+        "standard": false,
+        "full": true,
+        "custom": false
+      },
+      "backing_tests": [
+        "test_analog_item",
+        "test_da_type_nodes",
+        "test_eu_information"
+      ],
+      "opc_reference": {
+        "spec": "OPC-10000-8",
+        "section": "5.3",
+        "facet": "Core 2022 Server Facet"
+      },
+      "notes": "Project-level Conformance Unit mirroring the legacy 'data_access' item; emits Kconfig symbol MUC_OPCUA_CU_DATA_ACCESS matching the #ifdef guard renamed in Task 3 of the CU-aligned code reorganisation plan."
+    },
+    {
+      "id": "opc_cu_method_server",
+      "kind": "conformance_unit",
+      "opc_display_name": "Method Server",
+      "kconfig_symbol": "MUC_OPCUA_CU_METHOD_SERVER",
+      "implementation_state": "claimed",
+      "depends_on": [],
+      "profile_defaults": {
+        "nano": false,
+        "micro": false,
+        "embedded": false,
+        "standard": false,
+        "full": true,
+        "custom": false
+      },
+      "backing_tests": [
+        "test_method_call_arbitrary",
+        "test_method_call_errors"
+      ],
+      "opc_reference": {
+        "spec": "OPC-10000-4",
+        "section": "5.11",
+        "facet": "Core 2022 Server Facet"
+      },
+      "notes": "Project-level Conformance Unit mirroring the legacy 'method_server' item; emits Kconfig symbol MUC_OPCUA_CU_METHOD_SERVER matching the #ifdef guard renamed in Task 3 of the CU-aligned code reorganisation plan."
+    },
+    {
+      "id": "opc_cu_custom_methods",
+      "kind": "conformance_unit",
+      "opc_display_name": "Custom Methods",
+      "kconfig_symbol": "MUC_OPCUA_CU_CUSTOM_METHODS",
+      "implementation_state": "claimed",
+      "depends_on": [],
+      "profile_defaults": {
+        "nano": false,
+        "micro": false,
+        "embedded": false,
+        "standard": false,
+        "full": true,
+        "custom": false
+      },
+      "backing_tests": [
+        "test_method_call"
+      ],
+      "opc_reference": {
+        "spec": "OPC-10000-4",
+        "section": "5.11",
+        "facet": "Core 2022 Server Facet"
+      },
+      "notes": "Project-level Conformance Unit mirroring the legacy 'custom_methods' item; emits Kconfig symbol MUC_OPCUA_CU_CUSTOM_METHODS matching the #ifdef guard renamed in Task 3 of the CU-aligned code reorganisation plan."
+    },
+    {
+      "id": "opc_cu_user_auth",
+      "kind": "conformance_unit",
+      "opc_display_name": "User Auth",
+      "kconfig_symbol": "MUC_OPCUA_CU_USER_AUTH",
+      "implementation_state": "claimed",
+      "depends_on": [],
+      "profile_defaults": {
+        "nano": true,
+        "micro": true,
+        "embedded": true,
+        "standard": true,
+        "full": true,
+        "custom": false
+      },
+      "backing_tests": [
+        "test_user_auth_plaintext",
+        "test_user_auth_certificate",
+        "test_user_auth_secure_e2e"
+      ],
+      "opc_reference": {
+        "spec": "OPC-10000-4",
+        "section": "7.36",
+        "facet": "Core 2022 Server Facet"
+      },
+      "notes": "Project-level Conformance Unit mirroring the legacy 'user_auth' item; emits Kconfig symbol MUC_OPCUA_CU_USER_AUTH matching the #ifdef guard renamed in Task 3 of the CU-aligned code reorganisation plan."
+    },
+    {
+      "id": "opc_cu_multiple_connections",
+      "kind": "conformance_unit",
+      "opc_display_name": "Multiple Connections",
+      "kconfig_symbol": "MUC_OPCUA_CU_MULTIPLE_CONNECTIONS",
+      "implementation_state": "claimed",
+      "depends_on": [],
+      "profile_defaults": {
+        "nano": false,
+        "micro": true,
+        "embedded": true,
+        "standard": true,
+        "full": true,
+        "custom": false
+      },
+      "backing_tests": [
+        "test_connection_multiplex"
+      ],
+      "opc_reference": {
+        "spec": "OPC-10000-7",
+        "section": null,
+        "facet": "Core 2022 Server Facet"
+      },
+      "notes": "Project-level Conformance Unit mirroring the legacy 'multiple_connections' item; emits Kconfig symbol MUC_OPCUA_CU_MULTIPLE_CONNECTIONS matching the #ifdef guard renamed in Task 3 of the CU-aligned code reorganisation plan."
+    },
+    {
+      "id": "opc_cu_event_filter_where",
+      "kind": "conformance_unit",
+      "opc_display_name": "Event Filter Where",
+      "kconfig_symbol": "MUC_OPCUA_CU_EVENT_FILTER_WHERE",
+      "implementation_state": "claimed",
+      "depends_on": [
+        "MUC_OPCUA_CU_EVENTS",
+        "MUC_OPCUA_CU_SUBSCRIPTION_STANDARD"
+      ],
+      "profile_defaults": {
+        "nano": false,
+        "micro": false,
+        "embedded": false,
+        "standard": false,
+        "full": true,
+        "custom": false
+      },
+      "backing_tests": [
+        "test_event_filter_where",
+        "test_event_filter_select"
+      ],
+      "opc_reference": {
+        "spec": "OPC-10000-4",
+        "section": "7.4",
+        "facet": "Core 2022 Server Facet"
+      },
+      "notes": "Project-level Conformance Unit mirroring the legacy 'event_filter_where' item; emits Kconfig symbol MUC_OPCUA_CU_EVENT_FILTER_WHERE matching the #ifdef guard renamed in Task 3 of the CU-aligned code reorganisation plan.",
+      "depends_on_op": "and"
+    },
+    {
+      "id": "opc_cu_redundancy",
+      "kind": "conformance_unit",
+      "opc_display_name": "Redundancy",
+      "kconfig_symbol": "MUC_OPCUA_CU_REDUNDANCY",
+      "implementation_state": "claimed",
+      "depends_on": [
+        "MUC_OPCUA_CU_SUBSCRIPTION_BASIC"
+      ],
+      "profile_defaults": {
+        "nano": false,
+        "micro": false,
+        "embedded": false,
+        "standard": false,
+        "full": true,
+        "custom": false
+      },
+      "backing_tests": [
+        "test_transfer_subscriptions"
+      ],
+      "opc_reference": {
+        "spec": "OPC-10000-4",
+        "section": "5.14.7",
+        "facet": "Core 2022 Server Facet"
+      },
+      "notes": "Project-level Conformance Unit mirroring the legacy 'redundancy' item; emits Kconfig symbol MUC_OPCUA_CU_REDUNDANCY matching the #ifdef guard renamed in Task 3 of the CU-aligned code reorganisation plan."
+    },
+    {
+      "id": "opc_cu_diagnostics",
+      "kind": "conformance_unit",
+      "opc_display_name": "Diagnostics",
+      "kconfig_symbol": "MUC_OPCUA_CU_DIAGNOSTICS",
+      "implementation_state": "claimed",
+      "depends_on": [],
+      "profile_defaults": {
+        "nano": false,
+        "micro": false,
+        "embedded": false,
+        "standard": false,
+        "full": true,
+        "custom": false
+      },
+      "backing_tests": [
+        "test_diagnostics"
+      ],
+      "opc_reference": {
+        "spec": "OPC-10000-5",
+        "section": "6.3",
+        "facet": "Core 2022 Server Facet"
+      },
+      "notes": "Project-level Conformance Unit mirroring the legacy 'server_diagnostics' item; emits Kconfig symbol MUC_OPCUA_CU_DIAGNOSTICS matching the #ifdef guard renamed in Task 3 of the CU-aligned code reorganisation plan."
+    },
+    {
+      "id": "opc_cu_complex_types",
+      "kind": "conformance_unit",
+      "opc_display_name": "Complex Types",
+      "kconfig_symbol": "MUC_OPCUA_CU_COMPLEX_TYPES",
+      "implementation_state": "claimed",
+      "depends_on": [],
+      "profile_defaults": {
+        "nano": false,
+        "micro": false,
+        "embedded": false,
+        "standard": false,
+        "full": true,
+        "custom": false
+      },
+      "backing_tests": [
+        "test_complex_types"
+      ],
+      "opc_reference": {
+        "spec": "OPC-10000-6",
+        "section": null,
+        "facet": "Core 2022 Server Facet"
+      },
+      "notes": "Project-level Conformance Unit mirroring the legacy 'complex_types' item; emits Kconfig symbol MUC_OPCUA_CU_COMPLEX_TYPES matching the #ifdef guard renamed in Task 3 of the CU-aligned code reorganisation plan."
+    },
+    {
+      "id": "opc_cu_auditing",
+      "kind": "conformance_unit",
+      "opc_display_name": "Auditing",
+      "kconfig_symbol": "MUC_OPCUA_CU_AUDITING",
+      "implementation_state": "claimed",
+      "depends_on": [
+        "MUC_OPCUA_CU_EVENTS"
+      ],
+      "profile_defaults": {
+        "nano": false,
+        "micro": false,
+        "embedded": false,
+        "standard": false,
+        "full": true,
+        "custom": false
+      },
+      "backing_tests": [
+        "test_audit_events"
+      ],
+      "opc_reference": {
+        "spec": "OPC-10000-4",
+        "section": "7.x",
+        "facet": "Core 2022 Server Facet"
+      },
+      "notes": "Project-level Conformance Unit mirroring the legacy 'auditing' item; emits Kconfig symbol MUC_OPCUA_CU_AUDITING matching the #ifdef guard renamed in Task 3 of the CU-aligned code reorganisation plan."
+    },
+    {
+      "id": "opc_cu_dynamic_nodes",
+      "kind": "conformance_unit",
+      "opc_display_name": "Dynamic Nodes",
+      "kconfig_symbol": "MUC_OPCUA_CU_DYNAMIC_NODES",
+      "implementation_state": "claimed",
+      "depends_on": [],
+      "profile_defaults": {
+        "nano": false,
+        "micro": false,
+        "embedded": false,
+        "standard": false,
+        "full": true,
+        "custom": false
+      },
+      "backing_tests": [
+        "test_address_space_dynamic"
+      ],
+      "opc_reference": {
+        "spec": "OPC-10000-3",
+        "section": null,
+        "facet": "Core 2022 Server Facet"
+      },
+      "notes": "Project-level Conformance Unit mirroring the legacy 'dynamic_nodes' item; emits Kconfig symbol MUC_OPCUA_CU_DYNAMIC_NODES matching the #ifdef guard renamed in Task 3 of the CU-aligned code reorganisation plan."
+    },
+    {
+      "id": "opc_cu_multi_chunk",
+      "kind": "conformance_unit",
+      "opc_display_name": "Multi Chunk",
+      "kconfig_symbol": "MUC_OPCUA_CU_MULTI_CHUNK",
+      "implementation_state": "claimed",
+      "depends_on": [],
+      "profile_defaults": {
+        "nano": false,
+        "micro": false,
+        "embedded": false,
+        "standard": false,
+        "full": true,
+        "custom": false
+      },
+      "backing_tests": [
+        "test_message_chunk_errors"
+      ],
+      "opc_reference": {
+        "spec": "OPC-10000-6",
+        "section": null,
+        "facet": "Core 2022 Server Facet"
+      },
+      "notes": "Project-level Conformance Unit mirroring the legacy 'multi_chunk' item; emits Kconfig symbol MUC_OPCUA_CU_MULTI_CHUNK matching the #ifdef guard renamed in Task 3 of the CU-aligned code reorganisation plan."
+    },
+    {
+      "id": "opc_cu_session_timeout",
+      "kind": "conformance_unit",
+      "opc_display_name": "Session Timeout",
+      "kconfig_symbol": "MUC_OPCUA_CU_SESSION_TIMEOUT",
+      "implementation_state": "claimed",
+      "depends_on": [
+        "MUC_OPCUA_CU_MULTIPLE_CONNECTIONS",
+        "MUC_OPCUA_CU_MULTI_CHUNK"
+      ],
+      "profile_defaults": {
+        "nano": false,
+        "micro": true,
+        "embedded": true,
+        "standard": true,
+        "full": true,
+        "custom": false
+      },
+      "backing_tests": [
+        "test_base_server_behaviour"
+      ],
+      "opc_reference": {
+        "spec": "OPC-10000-4",
+        "section": null,
+        "facet": "Core 2022 Server Facet"
+      },
+      "notes": "Project-level Conformance Unit mirroring the legacy 'session_timeout' item; emits Kconfig symbol MUC_OPCUA_CU_SESSION_TIMEOUT matching the #ifdef guard renamed in Task 3 of the CU-aligned code reorganisation plan.",
+      "depends_on_op": "or"
+    },
+    {
+      "id": "opc_cu_time_sync",
+      "kind": "conformance_unit",
+      "opc_display_name": "Time Sync",
+      "kconfig_symbol": "MUC_OPCUA_CU_TIME_SYNC",
+      "implementation_state": "claimed",
+      "depends_on": [],
+      "profile_defaults": {
+        "nano": false,
+        "micro": false,
+        "embedded": false,
+        "standard": false,
+        "full": true,
+        "custom": false
+      },
+      "backing_tests": [
+        "test_time_sync",
+        "test_dispatch_services"
+      ],
+      "opc_reference": {
+        "spec": "OPC-10000-4",
+        "section": "7.28",
+        "facet": "Core 2022 Server Facet"
+      },
+      "notes": "Project-level Conformance Unit mirroring the legacy 'time_sync' item; emits Kconfig symbol MUC_OPCUA_CU_TIME_SYNC matching the #ifdef guard renamed in Task 3 of the CU-aligned code reorganisation plan."
+    },
+    {
+      "id": "opc_cu_extended_nodeids",
+      "kind": "conformance_unit",
+      "opc_display_name": "Extended Nodeids",
+      "kconfig_symbol": "MUC_OPCUA_CU_EXTENDED_NODEIDS",
+      "implementation_state": "claimed",
+      "depends_on": [],
+      "profile_defaults": {
+        "nano": false,
+        "micro": false,
+        "embedded": false,
+        "standard": false,
+        "full": true,
+        "custom": false
+      },
+      "backing_tests": [
+        "test_address_space_string_limits",
+        "test_binary_nodeid_errors"
+      ],
+      "opc_reference": {
+        "spec": "OPC-10000-3",
+        "section": null,
+        "facet": "Core 2022 Server Facet"
+      },
+      "notes": "Project-level Conformance Unit mirroring the legacy 'extended_nodeids' item; emits Kconfig symbol MUC_OPCUA_CU_EXTENDED_NODEIDS matching the #ifdef guard renamed in Task 3 of the CU-aligned code reorganisation plan."
+    },
+    {
+      "id": "opc_cu_aggregate_full",
+      "kind": "conformance_unit",
+      "opc_display_name": "Aggregate Full",
+      "kconfig_symbol": "MUC_OPCUA_CU_AGGREGATE_FULL",
+      "implementation_state": "claimed",
+      "depends_on": [
+        "MUC_OPCUA_CU_SUBSCRIPTION_STANDARD"
+      ],
+      "profile_defaults": {
+        "nano": false,
+        "micro": false,
+        "embedded": false,
+        "standard": false,
+        "full": true,
+        "custom": false
+      },
+      "backing_tests": [
+        "test_aggregate",
+        "test_aggregate_full"
+      ],
+      "opc_reference": {
+        "spec": "OPC-10000-13",
+        "section": null,
+        "facet": "Core 2022 Server Facet"
+      },
+      "notes": "Project-level Conformance Unit mirroring the legacy 'aggregate_full' item; emits Kconfig symbol MUC_OPCUA_CU_AGGREGATE_FULL matching the #ifdef guard renamed in Task 3 of the CU-aligned code reorganisation plan."
+    },
+    {
+      "id": "opc_cu_pubsub",
+      "kind": "conformance_unit",
+      "opc_display_name": "PubSub",
+      "kconfig_symbol": "MUC_OPCUA_CU_PUBSUB",
+      "implementation_state": "claimed",
+      "depends_on": [],
+      "profile_defaults": {
+        "nano": false,
+        "micro": false,
+        "embedded": false,
+        "standard": false,
+        "full": true,
+        "custom": false
+      },
+      "backing_tests": [
+        "test_uadp_encoding",
+        "test_pubsub"
+      ],
+      "opc_reference": {
+        "spec": "OPC-10000-14",
+        "section": null,
+        "facet": "Core 2022 Server Facet"
+      },
+      "notes": "Project-level Conformance Unit mirroring the legacy 'pubsub' item; emits Kconfig symbol MUC_OPCUA_CU_PUBSUB matching the #ifdef guard renamed in Task 3 of the CU-aligned code reorganisation plan."
+    },
+    {
+      "id": "opc_cu_reverse_connect",
+      "kind": "conformance_unit",
+      "opc_display_name": "Reverse Connect",
+      "kconfig_symbol": "MUC_OPCUA_CU_REVERSE_CONNECT",
+      "implementation_state": "claimed",
+      "depends_on": [],
+      "profile_defaults": {
+        "nano": false,
+        "micro": false,
+        "embedded": false,
+        "standard": false,
+        "full": true,
+        "custom": false
+      },
+      "backing_tests": [
+        "test_reverse_connect"
+      ],
+      "opc_reference": {
+        "spec": "OPC-10000-6",
+        "section": "7.1.3",
+        "facet": "Core 2022 Server Facet"
+      },
+      "notes": "Project-level Conformance Unit mirroring the legacy 'reverse_connect' item; emits Kconfig symbol MUC_OPCUA_CU_REVERSE_CONNECT matching the #ifdef guard renamed in Task 3 of the CU-aligned code reorganisation plan."
+    },
+    {
+      "id": "opc_cu_namespaces",
+      "kind": "conformance_unit",
+      "opc_display_name": "Namespaces",
+      "kconfig_symbol": "MUC_OPCUA_CU_NAMESPACES",
+      "implementation_state": "claimed",
+      "depends_on": [],
+      "profile_defaults": {
+        "nano": false,
+        "micro": false,
+        "embedded": false,
+        "standard": false,
+        "full": true,
+        "custom": false
+      },
+      "backing_tests": [
+        "test_read_browsename_namespace"
+      ],
+      "opc_reference": {
+        "spec": "OPC-10000-4",
+        "section": null,
+        "facet": "Core 2022 Server Facet"
+      },
+      "notes": "Project-level Conformance Unit mirroring the legacy 'namespaces' item; emits Kconfig symbol MUC_OPCUA_CU_NAMESPACES matching the #ifdef guard renamed in Task 3 of the CU-aligned code reorganisation plan."
+    },
+    {
+      "id": "service_read",
+      "kind": "conformance_unit",
+      "opc_display_name": "Attribute Read",
+      "kconfig_symbol": "MUC_OPCUA_CU_ATTRIBUTE_READ",
+      "implementation_state": "claimed",
+      "depends_on": [],
+      "profile_defaults": {
+        "nano": true,
+        "micro": true,
+        "embedded": true,
+        "standard": true,
+        "full": true,
+        "custom": true
+      },
+      "default_unconditional": true,
+      "backing_tests": [
+        "test_read_service"
+      ],
+      "opc_reference": {
+        "spec": "OPC-10000-4",
+        "section": "5.10.2",
+        "facet": "Core 2017 Server Facet",
+        "cu_id": "1673",
+        "cu_name": "Attribute Read"
+      },
+      "notes": "Current Kconfig help text."
+    },
+    {
+      "id": "service_browse",
+      "kind": "conformance_unit",
+      "opc_display_name": "View Basic / TranslateBrowsePath",
+      "kconfig_symbol": "MUC_OPCUA_CU_VIEW_BASIC_TRANSLATEBROWSEPATH",
+      "implementation_state": "claimed",
+      "depends_on": [],
+      "profile_defaults": {
+        "nano": true,
+        "micro": true,
+        "embedded": true,
+        "standard": true,
+        "full": true,
+        "custom": true
+      },
+      "default_unconditional": true,
+      "backing_tests": [
+        "test_browse_service",
+        "test_browse_limits",
+        "test_view_services"
+      ],
+      "opc_reference": {
+        "spec": "OPC-10000-4",
+        "section": "5.8",
+        "facet": "Core 2017",
+        "cu_name": "View Basic / TranslateBrowsePath"
+      },
+      "notes": "Browse + BrowseNext + TranslateBrowsePaths."
+    },
+    {
+      "id": "service_discovery",
+      "kind": "conformance_unit",
+      "opc_display_name": "Discovery Find Servers Self / Get Endpoints",
+      "kconfig_symbol": "MUC_OPCUA_CU_DISCOVERY_FIND_SERVERS_SELF_GET_ENDPOINTS",
+      "implementation_state": "claimed",
+      "depends_on": [],
+      "profile_defaults": {
+        "nano": true,
+        "micro": true,
+        "embedded": true,
+        "standard": true,
+        "full": true,
+        "custom": true
+      },
+      "default_unconditional": true,
+      "backing_tests": [
+        "test_discovery_endpoint"
+      ],
+      "opc_reference": {
+        "spec": "OPC-10000-4",
+        "section": "5.4",
+        "facet": "Core 2017",
+        "cu_name": "Discovery Find Servers Self / Get Endpoints"
+      },
+      "notes": "FindServers / GetEndpoints."
+    },
+    {
+      "id": "service_register_nodes",
+      "kind": "conformance_unit",
+      "opc_display_name": "View RegisterNodes",
+      "kconfig_symbol": "MUC_OPCUA_CU_VIEW_REGISTERNODES",
+      "implementation_state": "claimed",
+      "depends_on": [],
+      "profile_defaults": {
+        "nano": true,
+        "micro": true,
+        "embedded": true,
+        "standard": true,
+        "full": true,
+        "custom": false
+      },
+      "backing_tests": [
+        "test_view_services",
+        "test_profile_surface"
+      ],
+      "opc_reference": {
+        "spec": "OPC-10000-4",
+        "section": "5.9",
+        "facet": "Core 2017",
+        "cu_name": "View RegisterNodes"
+      },
+      "notes": "RegisterNodes / UnregisterNodes."
+    },
+    {
+      "id": "service_write",
+      "kind": "conformance_unit",
+      "opc_display_name": "Core 2017 Attribute Write",
+      "kconfig_symbol": "MUC_OPCUA_CU_CORE_2017_ATTRIBUTE_WRITE",
+      "implementation_state": "claimed",
+      "depends_on": [],
+      "profile_defaults": {
+        "nano": false,
+        "micro": false,
+        "embedded": false,
+        "standard": false,
+        "full": true,
+        "custom": false
+      },
+      "backing_tests": [
+        "test_write_service"
+      ],
+      "opc_reference": {
+        "spec": "OPC-10000-4",
+        "section": "5.10.4",
+        "facet": "Core 2017 Attribute Write",
+        "cu_optional": true
+      },
+      "notes": "Optional facet; only on full."
+    },
+    {
+      "id": "service_history",
+      "kind": "conformance_unit",
+      "opc_display_name": "Historical Access Server Facet",
+      "kconfig_symbol": "MUC_OPCUA_CU_HISTORICAL_ACCESS_SERVER_FACET",
+      "implementation_state": "claimed",
+      "depends_on": [],
+      "profile_defaults": {
+        "nano": false,
+        "micro": false,
+        "embedded": false,
+        "standard": false,
+        "full": true,
+        "custom": false
+      },
+      "backing_tests": [
+        "test_history"
+      ],
+      "opc_reference": {
+        "spec": "OPC-10000-11",
+        "section": null,
+        "facet": "Historical Access Server Facet",
+        "cu_optional": true
+      },
+      "notes": "HistoryRead/HistoryUpdate."
+    },
+    {
+      "id": "service_query",
+      "kind": "conformance_unit",
+      "opc_display_name": "Query",
+      "kconfig_symbol": "MUC_OPCUA_CU_QUERY",
+      "implementation_state": "claimed",
+      "depends_on": [],
+      "profile_defaults": {
+        "nano": false,
+        "micro": false,
+        "embedded": false,
+        "standard": false,
+        "full": true,
+        "custom": false
+      },
+      "backing_tests": [
+        "test_query_service"
+      ],
+      "opc_reference": {
+        "spec": "OPC-10000-4",
+        "section": "5.9",
+        "facet": "Query",
+        "cu_optional": true
+      },
+      "notes": "QueryFirst/QueryNext."
+    },
+    {
+      "id": "service_nodemanagement",
+      "kind": "conformance_unit",
+      "opc_display_name": "NodeManagement",
+      "kconfig_symbol": "MUC_OPCUA_CU_NODEMANAGEMENT",
+      "implementation_state": "claimed",
+      "depends_on": [],
+      "profile_defaults": {
+        "nano": false,
+        "micro": false,
+        "embedded": false,
+        "standard": false,
+        "full": true,
+        "custom": false
+      },
+      "backing_tests": [
+        "test_node_management",
+        "test_node_management_errors"
+      ],
+      "opc_reference": {
+        "spec": "OPC-10000-4",
+        "section": "5.7",
+        "facet": "NodeManagement",
+        "cu_optional": true
+      },
+      "notes": "AddNodes/DeleteNodes/..."
     }
   ],
   "capacities": [
@@ -5395,7 +5312,7 @@
   "metadata": {
     "superseded_profiles": [
       {
-        "description": "This Profile is a collection of Facets necessary to build a functional OPC UA Server Application specifically for chip level devices with limited resources. This Profile is functionally equivalent to the Core Server Facet and defines the \"UA-TCP UA-SC UA-Binary\" as the required transport profile including an ECC Security Policy. The support of Diagnostic Objects and Variables is optional for this Profile despite it being defined as \u201cmandatory\u201d in UA Part 5. Support of Diagnostic Objects and Variables is mandatory in some higher-level Profiles. Exposing types in the AddressSpace is optional for this Profile except if custom types (i.e., types that are derived from well-known ObjectTypes, VariableTypes, ReferenceType or DataTypes) are used. Exposing all supported types in the AddressSpace is mandatory in some higher-level Profiles.<br>\nThis Profile supersedes the <a href=\"http://opcfoundation.org/UA-Profile/Server/NanoEmbeddedDevice2017\">Nano Embedded Device 2017 Server Profile</a>.",
+        "description": "This Profile is a collection of Facets necessary to build a functional OPC UA Server Application specifically for chip level devices with limited resources. This Profile is functionally equivalent to the Core Server Facet and defines the \"UA-TCP UA-SC UA-Binary\" as the required transport profile including an ECC Security Policy. The support of Diagnostic Objects and Variables is optional for this Profile despite it being defined as “mandatory” in UA Part 5. Support of Diagnostic Objects and Variables is mandatory in some higher-level Profiles. Exposing types in the AddressSpace is optional for this Profile except if custom types (i.e., types that are derived from well-known ObjectTypes, VariableTypes, ReferenceType or DataTypes) are used. Exposing all supported types in the AddressSpace is mandatory in some higher-level Profiles.<br>\nThis Profile supersedes the <a href=\"http://opcfoundation.org/UA-Profile/Server/NanoEmbeddedDevice2017\">Nano Embedded Device 2017 Server Profile</a>.",
         "display_name": "Nano Embedded Device 2022 Server Profile",
         "last_update_time": "2025-11-12T15:47:17",
         "name": "Nano Embedded Device 2022 Server Profile",
@@ -5452,9 +5369,9 @@
       },
       {
         "description": "<b>This User Token has been deprecated with OPC UA Specification Version 1.05.</b><br>\nThis Facet indicates that a User Token that is comprised of an issued token is supported.",
-        "display_name": "User Token \u2013 Issued Token Server Facet",
+        "display_name": "User Token – Issued Token Server Facet",
         "last_update_time": "2022-03-10T16:02:39",
-        "name": "User Token \u2013 Issued Token Server Facet",
+        "name": "User Token – Issued Token Server Facet",
         "opc_id": 1698,
         "opc_profile_uri": "http://opcfoundation.org/UA-Profile/Security/UserToken/Server/IssuedToken",
         "release_status": 4,
@@ -5466,9 +5383,9 @@
       },
       {
         "description": "<b>This User Token has been deprecated with OPC UA Specification Version 1.05.</b><br>\nThis Facet further refines the User Token - Issued Token to indicate a windows implementation of Kerberos",
-        "display_name": "User Token \u2013 Issued Token Windows Server Facet",
+        "display_name": "User Token – Issued Token Windows Server Facet",
         "last_update_time": "2022-03-10T16:02:49",
-        "name": "User Token \u2013 Issued Token Windows Server Facet",
+        "name": "User Token – Issued Token Windows Server Facet",
         "opc_id": 1699,
         "opc_profile_uri": "http://opcfoundation.org/UA-Profile/Security/UserToken/Server/IssuedTokenWindows",
         "release_status": 4,

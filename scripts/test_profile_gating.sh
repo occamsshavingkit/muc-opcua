@@ -61,9 +61,9 @@ assert_cfg "$D1" CU_CORE_2017_ATTRIBUTE_WRITE OFF
 assert_cfg "$D1" CU_HISTORICAL_ACCESS_SERVER_FACET OFF
 assert_cfg "$D1" CU_NODEMANAGEMENT OFF
 assert_cfg "$D1" CU_QUERY OFF
-# Legacy: SECURITY on from embedded up; ECC full-only
-assert_cfg "$D1" SECURITY ON
-assert_cfg "$D1" ECC OFF
+# CU: Subscription basic on (micro+); CU: Security ECC off (full only)
+assert_cfg "$D1" CU_SUBSCRIPTION_BASIC ON
+assert_cfg "$D1" CU_SECURITY_ECC OFF
 
 echo "### 2. 'nano' baseline: profile symbol, cascade, minimal facets, CUs ###"
 D2="$WORKDIR/g2"
@@ -86,9 +86,9 @@ assert_cfg "$D2" CU_VIEW_BASIC_TRANSLATEBROWSEPATH ON
 assert_cfg "$D2" CU_DISCOVERY_FIND_SERVERS_SELF_GET_ENDPOINTS ON
 assert_cfg "$D2" CU_VIEW_REGISTERNODES ON
 assert_cfg "$D2" CU_CORE_2017_ATTRIBUTE_WRITE OFF
-# Legacy: SECURITY off (embedded+); BASE_NODES on (nano default)
-assert_cfg "$D2" SECURITY OFF
-assert_cfg "$D2" BASE_NODES ON
+# CU: Subscription basic off (micro+); CU: Security ECC off (full only)
+assert_cfg "$D2" CU_SUBSCRIPTION_BASIC OFF
+assert_cfg "$D2" CU_SECURITY_ECC OFF
 
 echo "### 3. 'embedded' baseline: profile symbol, cascade, facets, CUs ###"
 D3="$WORKDIR/g3"
@@ -112,24 +112,24 @@ assert_cfg "$D3" CU_DISCOVERY_FIND_SERVERS_SELF_GET_ENDPOINTS ON
 assert_cfg "$D3" CU_VIEW_REGISTERNODES ON
 assert_cfg "$D3" CU_HISTORICAL_ACCESS_SERVER_FACET OFF
 assert_cfg "$D3" CU_NODEMANAGEMENT OFF
-# Legacy: SECURITY on (embedded+); ECC off (full only)
-assert_cfg "$D3" SECURITY ON
-assert_cfg "$D3" ECC OFF
+# CU: Subscription basic on (micro+); CU: Security ECC off (full only)
+assert_cfg "$D3" CU_SUBSCRIPTION_BASIC ON
+assert_cfg "$D3" CU_SECURITY_ECC OFF
 
-echo "### 4. Subtraction: standard minus SECURITY (-DMUC_OPCUA_SECURITY=OFF) drops the code ###"
+echo "### 4. Subtraction: standard minus CU_SUBSCRIPTION_BASIC drops the code ###"
 D4="$WORKDIR/g4"
 cmake -S . -B "$D4" -DMUC_OPCUA_PROFILE=standard \
-    -DMUC_OPCUA_SECURITY=OFF \
+    -DMUC_OPCUA_CU_SUBSCRIPTION_BASIC=OFF \
     -DMUC_OPCUA_PLATFORM=host >/dev/null 2>&1
-assert_cfg "$D4" SECURITY OFF
+assert_cfg "$D4" CU_SUBSCRIPTION_BASIC OFF
 assert_cfg "$D4" PROFILE_STANDARD_2025_UA_SERVER ON   # profile choice preserved
 assert_cfg "$D4" FACET_CORE_2022_SERVER ON   # everything else stays profile-default
 echo "  -- confirm the subtraction drops the code, not just the flag --"
 cmake --build "$D4" -j4 >/dev/null 2>&1
-if nm "$D4/src/libmuc_opcua.a" 2>/dev/null | grep -q "mu_sym_chunk_wrap"; then
-    echo "  FAIL  mu_sym_chunk_wrap still present with SECURITY=OFF"; FAIL=$((FAIL + 1))
+if nm "$D4/src/libmuc_opcua.a" 2>/dev/null | grep -q "publish_due"; then
+    echo "  FAIL  publish_due still present with CU_SUBSCRIPTION_BASIC=OFF"; FAIL=$((FAIL + 1))
 else
-    echo "  PASS  mu_sym_chunk_wrap absent with SECURITY=OFF"; PASS=$((PASS + 1))
+    echo "  PASS  publish_due absent with CU_SUBSCRIPTION_BASIC=OFF"; PASS=$((PASS + 1))
 fi
 
 echo "### 5. Dependency CASCADE (Kconfig): full minus FACET_CORE_2022_SERVER drops its CUs, no error ###"
@@ -141,18 +141,18 @@ assert_cfg "$D5" CU_ATTRIBUTE_READ OFF
 assert_cfg "$D5" CU_VIEW_BASIC_TRANSLATEBROWSEPATH OFF
 assert_cfg "$D5" CU_DISCOVERY_FIND_SERVERS_SELF_GET_ENDPOINTS OFF
 
-echo "### 5b. ECC without SECURITY cascades ECC off (ECC depends on SECURITY) ###"
+echo "### 5b. CU_SUBSCRIPTION_STANDARD without BASIC cascades STANDARD off (depends on BASIC) ###"
 D5B="$WORKDIR/g5b"
 cmake -S . -B "$D5B" -DMUC_OPCUA_PROFILE=full \
-    -DMUC_OPCUA_SECURITY=OFF \
+    -DMUC_OPCUA_CU_SUBSCRIPTION_BASIC=OFF \
     -DMUC_OPCUA_PLATFORM=host >/dev/null 2>&1
-assert_cfg "$D5B" SECURITY OFF
-# Verify flat ECC cascaded OFF (depends on SECURITY in generated Kconfig).
-if grep -q "^set(MUC_OPCUA_ECC OFF)" "$D5B/muc_opcua_config.cmake" 2>/dev/null; then
-    echo "  PASS  ECC cascaded OFF (depends on SECURITY)"
+assert_cfg "$D5B" CU_SUBSCRIPTION_BASIC OFF
+# Verify CU_SUBSCRIPTION_STANDARD cascaded OFF (depends on CU_SUBSCRIPTION_BASIC in generated Kconfig).
+if grep -q "^set(MUC_OPCUA_CU_SUBSCRIPTION_STANDARD OFF)" "$D5B/muc_opcua_config.cmake" 2>/dev/null; then
+    echo "  PASS  CU_SUBSCRIPTION_STANDARD cascaded OFF (depends on CU_SUBSCRIPTION_BASIC)"
     PASS=$((PASS + 1))
 else
-    echo "  FAIL  ECC did not cascade OFF from SECURITY=OFF"
+    echo "  FAIL  CU_SUBSCRIPTION_STANDARD did not cascade OFF from CU_SUBSCRIPTION_BASIC=OFF"
     FAIL=$((FAIL + 1))
 fi
 
@@ -167,10 +167,10 @@ assert_cfg "$D6" FACET_USER_TOKEN_X509_CERTIFICATE_SERVER OFF   # not pulled in
 echo "### 7. Profile switch in an EXISTING build dir (full -> nano) fully re-derives ###"
 D7="$WORKDIR/g7"
 cmake -S . -B "$D7" -DMUC_OPCUA_PROFILE=full -DMUC_OPCUA_PLATFORM=host >/dev/null 2>&1
-assert_cfg "$D7" ECC ON
+assert_cfg "$D7" CU_SECURITY_ECC ON
 assert_cfg "$D7" FACET_USER_TOKEN_X509_CERTIFICATE_SERVER ON
 cmake -S . -B "$D7" -DMUC_OPCUA_PROFILE=nano >/dev/null 2>&1
-assert_cfg "$D7" ECC OFF
+assert_cfg "$D7" CU_SECURITY_ECC OFF
 assert_cfg "$D7" FACET_USER_TOKEN_X509_CERTIFICATE_SERVER OFF
 assert_cfg "$D7" FACET_EXPOSES_TYPE_SYSTEM_SERVER OFF
 
@@ -181,8 +181,7 @@ assert_cfg "$D8" PROFILE_CUSTOM ON
 assert_cfg "$D8" FACET_CORE_2022_SERVER OFF
 assert_cfg "$D8" FACET_EXPOSES_TYPE_SYSTEM_SERVER OFF
 assert_cfg "$D8" FACET_USER_TOKEN_X509_CERTIFICATE_SERVER OFF
-assert_cfg "$D8" SECURITY OFF
-assert_cfg "$D8" ECC OFF
+assert_cfg "$D8" CU_SECURITY_ECC OFF
 assert_cfg "$D8" CU_ATTRIBUTE_READ OFF  # no cascade, facet off
 
 echo "### 9. menuconfig / savedefconfig tooling targets exist ###"

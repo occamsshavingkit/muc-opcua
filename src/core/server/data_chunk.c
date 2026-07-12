@@ -3,7 +3,7 @@
 #include "../service_message.h"
 #include "../uasc.h"
 #include "common.h"
-#ifdef MUC_OPCUA_SECURITY
+#ifdef MUC_OPCUA_FACET_CORE_2022_SERVER
 #include "../../security/asym_chunk.h"
 #include "../../security/sym_chunk.h"
 #endif
@@ -12,7 +12,7 @@
 void mu_service_dispatch_set_opn_security_policy(mu_server_t *server, const mu_string_t *security_policy);
 void mu_service_dispatch_set_opn_client_cert(mu_server_t *server, const mu_bytestring_t *client_cert);
 
-#ifdef MUC_OPCUA_SECURITY
+#ifdef MUC_OPCUA_FACET_CORE_2022_SERVER
 _Static_assert(MU_SECURE_RESP_MAX + MU_SECURE_OPN_REQ_MAX + MU_SECURE_SESSION_MAX <= MU_SECURE_SCRATCH_SIZE,
                "secure scratch must hold response, OPN request, and session-handshake buffers");
 #endif
@@ -37,14 +37,14 @@ void send_tcp_error_chunk(mu_server_t *server, opcua_statuscode_t error_code) {
     }
 }
 
-#if MUC_OPCUA_SUBSCRIPTIONS
+#if MUC_OPCUA_CU_SUBSCRIPTION_BASIC
 opcua_statuscode_t mu_server_emit_message(mu_server_t *server, opcua_uint32_t request_id, const opcua_byte_t *body,
                                           size_t body_len) {
     if (server == NULL || body == NULL) {
         return MU_STATUS_BAD_INTERNALERROR;
     }
 
-#ifdef MUC_OPCUA_MULTIPLE_CONNECTIONS
+#ifdef MUC_OPCUA_CU_MULTIPLE_CONNECTIONS
     /* If active_conn is NULL, find connection by active session's secure_channel_id */
     if (server->active_conn == NULL && server->active_session != NULL) {
         for (size_t i = 0; i < MU_INTERN_MAX_CONNECTIONS; ++i) {
@@ -60,7 +60,7 @@ opcua_statuscode_t mu_server_emit_message(mu_server_t *server, opcua_uint32_t re
     }
 #endif
 
-#ifdef MUC_OPCUA_SECURITY
+#ifdef MUC_OPCUA_FACET_CORE_2022_SERVER
     if (server_secure_channel.mode != MU_MESSAGE_SECURITY_MODE_NONE) {
         size_t total = 0;
         opcua_statuscode_t status;
@@ -70,7 +70,7 @@ opcua_statuscode_t mu_server_emit_message(mu_server_t *server, opcua_uint32_t re
         }
 
         opcua_uint32_t emit_seq = ++server_secure_channel.out_sequence_number;
-#ifdef MUC_OPCUA_ECC
+#ifdef MUC_OPCUA_CU_SECURITY_ECC
         if (mu_security_policy_sym_mode(server_secure_channel.policy) == MU_SYM_MODE_AEAD_CHACHA20POLY1305) {
             status = mu_sym_chunk_wrap_aead(server->config.crypto_adapter, &server_secure_channel.server_keys, "MSG",
                                             server_secure_channel.channel_id, server_secure_channel.token_id, emit_seq,
@@ -204,7 +204,7 @@ void handle_data_chunk_plaintext(mu_server_t *server, const opcua_byte_t *msg, s
     opcua_byte_t *resp_body = server->config.send_buffer + body_offset;
     size_t payload_len = server->config.send_buffer_size - body_offset;
 
-#if MUC_OPCUA_SUBSCRIPTIONS
+#if MUC_OPCUA_CU_SUBSCRIPTION_BASIC
     server->current_request_id = seq.request_id;
 #endif
     if (!is_ns0_numeric_nodeid(&request_type)) {
@@ -227,7 +227,7 @@ void handle_data_chunk_plaintext(mu_server_t *server, const opcua_byte_t *msg, s
         /* Always answer: send a ServiceFault rather than letting the client time out. */
         payload_len = server->config.send_buffer_size - body_offset;
         if (mu_write_service_fault(resp_body, &payload_len, 0, status
-#ifdef MUC_OPCUA_TIME_SYNC
+#ifdef MUC_OPCUA_CU_TIME_SYNC
                                    ,
                                    server
 #endif
@@ -259,7 +259,7 @@ void handle_data_chunk_plaintext(mu_server_t *server, const opcua_byte_t *msg, s
     }
 }
 
-#ifdef MUC_OPCUA_SECURITY
+#ifdef MUC_OPCUA_FACET_CORE_2022_SERVER
 /* Unwrap an incoming asymmetric OPN chunk and extract its metadata. */
 static bool secure_unwrap_opn(mu_server_t *server, const mu_crypto_adapter_t *crypto, opcua_byte_t *msg, size_t msg_len,
                               opcua_byte_t *opn_buf, mu_string_t *out_security_policy,
@@ -310,7 +310,7 @@ static bool secure_unwrap_msg(mu_server_t *server, const mu_crypto_adapter_t *cr
     }
     mu_sym_chunk_info_t si;
     (void)memset(&si, 0, sizeof(si));
-#ifdef MUC_OPCUA_ECC
+#ifdef MUC_OPCUA_CU_SECURITY_ECC
     if (mu_security_policy_sym_mode(server_secure_channel.policy) == MU_SYM_MODE_AEAD_CHACHA20POLY1305) {
         /* ECC-curve25519 AEAD: the per-chunk nonce derives from the previous
            inbound SequenceNumber (Table 69). */
@@ -384,7 +384,7 @@ void handle_data_chunk_secure(mu_server_t *server, opcua_byte_t *msg, size_t msg
     size_t req_body_len = req_len - rr.position;
 
     size_t resp_len = MU_SECURE_RESP_MAX;
-#if MUC_OPCUA_SUBSCRIPTIONS
+#if MUC_OPCUA_CU_SUBSCRIPTION_BASIC
     server->current_request_id = response_request_id;
 #endif
     opcua_statuscode_t status;
@@ -408,7 +408,7 @@ void handle_data_chunk_secure(mu_server_t *server, opcua_byte_t *msg, size_t msg
     if (status != MU_STATUS_GOOD) {
         resp_len = MU_SECURE_RESP_MAX;
         if (mu_write_service_fault(respbody, &resp_len, 0, status
-#ifdef MUC_OPCUA_TIME_SYNC
+#ifdef MUC_OPCUA_CU_TIME_SYNC
                                    ,
                                    server
 #endif
@@ -440,7 +440,7 @@ void handle_data_chunk_secure(mu_server_t *server, opcua_byte_t *msg, size_t msg
                                      .out_len = &total};
         ws = mu_asym_chunk_wrap(&awp);
     }
-#ifdef MUC_OPCUA_ECC
+#ifdef MUC_OPCUA_CU_SECURITY_ECC
     else if (mu_security_policy_sym_mode(server_secure_channel.policy) == MU_SYM_MODE_AEAD_CHACHA20POLY1305) {
         /* ECC-curve25519 AEAD outbound: nonce uses the previous outbound
            SequenceNumber (out_seq - 1). */
@@ -463,4 +463,4 @@ void handle_data_chunk_secure(mu_server_t *server, opcua_byte_t *msg, size_t msg
         (void)mu_secure_channel_close(&server_secure_channel);
     }
 }
-#endif /* MUC_OPCUA_SECURITY */
+#endif /* MUC_OPCUA_FACET_CORE_2022_SERVER */

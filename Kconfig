@@ -386,6 +386,16 @@ comment "Monitor Items 500 (NOT IMPLEMENTED) [OPC-10000-4 §5.13.2]"
 #   Notes: Imported from OPC snapshot. At least 5 queue entries per MonitoredItem. Mandatory CU of the Enhanced DataChange Subscription 2017 facet.
 comment "Monitor MinQueueSize_05 (NOT IMPLEMENTED) [OPC-10000-4 §5.13.2]"
 
+config MUC_OPCUA_CU_ATTRIBUTE_READ
+	bool "CU: Attribute Read"
+	depends on MUC_OPCUA_FACET_CORE_2022_SERVER
+	default y
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-4 §5.10.2 -- Core 2017 Server Facet -- CU 1673:Attribute Read.
+	  Backing tests: test_read_service.
+	  Notes: Current Kconfig help text.
+
 config MUC_OPCUA_CU_VIEW_BASIC_TRANSLATEBROWSEPATH
 	bool "CU: View Basic / TranslateBrowsePath"
 	depends on MUC_OPCUA_FACET_CORE_2022_SERVER
@@ -406,46 +416,6 @@ config MUC_OPCUA_CU_DISCOVERY_FIND_SERVERS_SELF_GET_ENDPOINTS
 	  Backing tests: test_discovery_endpoint.
 	  Notes: FindServers / GetEndpoints.
 
-config MUC_OPCUA_CU_HISTORICAL_ACCESS_SERVER_FACET
-	bool "CU: Historical Access Server Facet"
-	depends on MUC_OPCUA_FACET_CORE_2022_SERVER
-	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
-	help
-	  Implementation state: claimed.
-	  OPC source: OPC-10000-11 -- Historical Access Server Facet.
-	  Backing tests: test_history.
-	  Notes: HistoryRead/HistoryUpdate.
-
-config MUC_OPCUA_CU_NODEMANAGEMENT
-	bool "CU: NodeManagement"
-	depends on MUC_OPCUA_FACET_CORE_2022_SERVER
-	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
-	help
-	  Implementation state: claimed.
-	  OPC source: OPC-10000-4 §5.7 -- NodeManagement.
-	  Backing tests: test_node_management, test_node_management_errors.
-	  Notes: AddNodes/DeleteNodes/...
-
-config MUC_OPCUA_CU_QUERY
-	bool "CU: Query"
-	depends on MUC_OPCUA_FACET_CORE_2022_SERVER
-	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
-	help
-	  Implementation state: claimed.
-	  OPC source: OPC-10000-4 §5.9 -- Query.
-	  Backing tests: test_query_service.
-	  Notes: QueryFirst/QueryNext.
-
-config MUC_OPCUA_CU_ATTRIBUTE_READ
-	bool "CU: Attribute Read"
-	depends on MUC_OPCUA_FACET_CORE_2022_SERVER
-	default y
-	help
-	  Implementation state: claimed.
-	  OPC source: OPC-10000-4 §5.10.2 -- Core 2017 Server Facet -- CU 1673:Attribute Read.
-	  Backing tests: test_read_service.
-	  Notes: Current Kconfig help text.
-
 config MUC_OPCUA_CU_VIEW_REGISTERNODES
 	bool "CU: View RegisterNodes"
 	depends on MUC_OPCUA_FACET_CORE_2022_SERVER
@@ -465,6 +435,266 @@ config MUC_OPCUA_CU_CORE_2017_ATTRIBUTE_WRITE
 	  OPC source: OPC-10000-4 §5.10.4 -- Core 2017 Attribute Write.
 	  Backing tests: test_write_service.
 	  Notes: Optional facet; only on full.
+
+config MUC_OPCUA_CU_HISTORICAL_ACCESS_SERVER_FACET
+	bool "CU: Historical Access Server Facet"
+	depends on MUC_OPCUA_FACET_CORE_2022_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-11 -- Historical Access Server Facet.
+	  Backing tests: test_history.
+	  Notes: HistoryRead/HistoryUpdate.
+
+config MUC_OPCUA_CU_QUERY
+	bool "CU: Query"
+	depends on MUC_OPCUA_FACET_CORE_2022_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-4 §5.9 -- Query.
+	  Backing tests: test_query_service.
+	  Notes: QueryFirst/QueryNext.
+
+config MUC_OPCUA_CU_NODEMANAGEMENT
+	bool "CU: NodeManagement"
+	depends on MUC_OPCUA_FACET_CORE_2022_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-4 §5.7 -- NodeManagement.
+	  Backing tests: test_node_management, test_node_management_errors.
+	  Notes: AddNodes/DeleteNodes/...
+
+config MUC_OPCUA_CU_SUBSCRIPTION_BASIC
+	bool "CU: Subscription Basic"
+	depends on MUC_OPCUA_FACET_CORE_2022_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_MICRO_EMBEDDED_DEVICE_2025_SERVER
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-4 §5.12/5.13 -- Core 2022 Server Facet.
+	  Backing tests: test_subscriptions, test_subscriptions_errors.
+	  Notes: Project-level Conformance Unit mirroring the legacy 'subscriptions' item; emits Kconfig symbol MUC_OPCUA_CU_SUBSCRIPTION_BASIC matching the #ifdef guard renamed in Task 3 of the CU-aligned code reorganisation plan.
+
+config MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
+	bool "CU: Subscription Standard"
+	depends on MUC_OPCUA_FACET_CORE_2022_SERVER && MUC_OPCUA_CU_SUBSCRIPTION_BASIC
+	default y if MUC_OPCUA_INTERN_PROFILE_EMBEDDED_2025_UA_SERVER
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-7 -- Core 2022 Server Facet.
+	  Backing tests: test_subscriptions_capacity, test_subscription_deadband, test_subscription_publish.
+	  Notes: Project-level Conformance Unit mirroring the legacy 'subscriptions_standard' item; emits Kconfig symbol MUC_OPCUA_CU_SUBSCRIPTION_STANDARD matching the #ifdef guard renamed in Task 3 of the CU-aligned code reorganisation plan.
+
+config MUC_OPCUA_CU_SECURITY_ECC
+	bool "CU: Security ECC"
+	depends on MUC_OPCUA_FACET_CORE_2022_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-7 -- Core 2022 Server Facet.
+	  Backing tests: test_ecc_crypto.
+	  Notes: Project-level Conformance Unit mirroring the legacy 'ecc' item; emits Kconfig symbol MUC_OPCUA_CU_SECURITY_ECC matching the #ifdef guard renamed in Task 3 of the CU-aligned code reorganisation plan.
+
+config MUC_OPCUA_CU_EVENTS
+	bool "CU: Events"
+	depends on MUC_OPCUA_FACET_CORE_2022_SERVER && MUC_OPCUA_CU_SUBSCRIPTION_BASIC
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-9 -- Core 2022 Server Facet.
+	  Backing tests: test_alarms_conditions, test_event_notifier, test_event_serializer.
+	  Notes: Project-level Conformance Unit mirroring the legacy 'events' item; emits Kconfig symbol MUC_OPCUA_CU_EVENTS matching the #ifdef guard renamed in Task 3 of the CU-aligned code reorganisation plan.
+
+config MUC_OPCUA_CU_DATA_ACCESS
+	bool "CU: Data Access"
+	depends on MUC_OPCUA_FACET_CORE_2022_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-8 §5.3 -- Core 2022 Server Facet.
+	  Backing tests: test_analog_item, test_da_type_nodes, test_eu_information.
+	  Notes: Project-level Conformance Unit mirroring the legacy 'data_access' item; emits Kconfig symbol MUC_OPCUA_CU_DATA_ACCESS matching the #ifdef guard renamed in Task 3 of the CU-aligned code reorganisation plan.
+
+config MUC_OPCUA_CU_METHOD_SERVER
+	bool "CU: Method Server"
+	depends on MUC_OPCUA_FACET_CORE_2022_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-4 §5.11 -- Core 2022 Server Facet.
+	  Backing tests: test_method_call_arbitrary, test_method_call_errors.
+	  Notes: Project-level Conformance Unit mirroring the legacy 'method_server' item; emits Kconfig symbol MUC_OPCUA_CU_METHOD_SERVER matching the #ifdef guard renamed in Task 3 of the CU-aligned code reorganisation plan.
+
+config MUC_OPCUA_CU_CUSTOM_METHODS
+	bool "CU: Custom Methods"
+	depends on MUC_OPCUA_FACET_CORE_2022_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-4 §5.11 -- Core 2022 Server Facet.
+	  Backing tests: test_method_call.
+	  Notes: Project-level Conformance Unit mirroring the legacy 'custom_methods' item; emits Kconfig symbol MUC_OPCUA_CU_CUSTOM_METHODS matching the #ifdef guard renamed in Task 3 of the CU-aligned code reorganisation plan.
+
+config MUC_OPCUA_CU_USER_AUTH
+	bool "CU: User Auth"
+	depends on MUC_OPCUA_FACET_CORE_2022_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_NANO_EMBEDDED_DEVICE_2025_SERVER
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-4 §7.36 -- Core 2022 Server Facet.
+	  Backing tests: test_user_auth_plaintext, test_user_auth_certificate, test_user_auth_secure_e2e.
+	  Notes: Project-level Conformance Unit mirroring the legacy 'user_auth' item; emits Kconfig symbol MUC_OPCUA_CU_USER_AUTH matching the #ifdef guard renamed in Task 3 of the CU-aligned code reorganisation plan.
+
+config MUC_OPCUA_CU_MULTIPLE_CONNECTIONS
+	bool "CU: Multiple Connections"
+	depends on MUC_OPCUA_FACET_CORE_2022_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_MICRO_EMBEDDED_DEVICE_2025_SERVER
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-7 -- Core 2022 Server Facet.
+	  Backing tests: test_connection_multiplex.
+	  Notes: Project-level Conformance Unit mirroring the legacy 'multiple_connections' item; emits Kconfig symbol MUC_OPCUA_CU_MULTIPLE_CONNECTIONS matching the #ifdef guard renamed in Task 3 of the CU-aligned code reorganisation plan.
+
+config MUC_OPCUA_CU_EVENT_FILTER_WHERE
+	bool "CU: Event Filter Where"
+	depends on MUC_OPCUA_FACET_CORE_2022_SERVER && MUC_OPCUA_CU_EVENTS && MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-4 §7.4 -- Core 2022 Server Facet.
+	  Backing tests: test_event_filter_where, test_event_filter_select.
+	  Notes: Project-level Conformance Unit mirroring the legacy 'event_filter_where' item; emits Kconfig symbol MUC_OPCUA_CU_EVENT_FILTER_WHERE matching the #ifdef guard renamed in Task 3 of the CU-aligned code reorganisation plan.
+
+config MUC_OPCUA_CU_REDUNDANCY
+	bool "CU: Redundancy"
+	depends on MUC_OPCUA_FACET_CORE_2022_SERVER && MUC_OPCUA_CU_SUBSCRIPTION_BASIC
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-4 §5.14.7 -- Core 2022 Server Facet.
+	  Backing tests: test_transfer_subscriptions.
+	  Notes: Project-level Conformance Unit mirroring the legacy 'redundancy' item; emits Kconfig symbol MUC_OPCUA_CU_REDUNDANCY matching the #ifdef guard renamed in Task 3 of the CU-aligned code reorganisation plan.
+
+config MUC_OPCUA_CU_DIAGNOSTICS
+	bool "CU: Diagnostics"
+	depends on MUC_OPCUA_FACET_CORE_2022_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-5 §6.3 -- Core 2022 Server Facet.
+	  Backing tests: test_diagnostics.
+	  Notes: Project-level Conformance Unit mirroring the legacy 'server_diagnostics' item; emits Kconfig symbol MUC_OPCUA_CU_DIAGNOSTICS matching the #ifdef guard renamed in Task 3 of the CU-aligned code reorganisation plan.
+
+config MUC_OPCUA_CU_COMPLEX_TYPES
+	bool "CU: Complex Types"
+	depends on MUC_OPCUA_FACET_CORE_2022_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-6 -- Core 2022 Server Facet.
+	  Backing tests: test_complex_types.
+	  Notes: Project-level Conformance Unit mirroring the legacy 'complex_types' item; emits Kconfig symbol MUC_OPCUA_CU_COMPLEX_TYPES matching the #ifdef guard renamed in Task 3 of the CU-aligned code reorganisation plan.
+
+config MUC_OPCUA_CU_AUDITING
+	bool "CU: Auditing"
+	depends on MUC_OPCUA_FACET_CORE_2022_SERVER && MUC_OPCUA_CU_EVENTS
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-4 §7.x -- Core 2022 Server Facet.
+	  Backing tests: test_audit_events.
+	  Notes: Project-level Conformance Unit mirroring the legacy 'auditing' item; emits Kconfig symbol MUC_OPCUA_CU_AUDITING matching the #ifdef guard renamed in Task 3 of the CU-aligned code reorganisation plan.
+
+config MUC_OPCUA_CU_DYNAMIC_NODES
+	bool "CU: Dynamic Nodes"
+	depends on MUC_OPCUA_FACET_CORE_2022_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-3 -- Core 2022 Server Facet.
+	  Backing tests: test_address_space_dynamic.
+	  Notes: Project-level Conformance Unit mirroring the legacy 'dynamic_nodes' item; emits Kconfig symbol MUC_OPCUA_CU_DYNAMIC_NODES matching the #ifdef guard renamed in Task 3 of the CU-aligned code reorganisation plan.
+
+config MUC_OPCUA_CU_MULTI_CHUNK
+	bool "CU: Multi Chunk"
+	depends on MUC_OPCUA_FACET_CORE_2022_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-6 -- Core 2022 Server Facet.
+	  Backing tests: test_message_chunk_errors.
+	  Notes: Project-level Conformance Unit mirroring the legacy 'multi_chunk' item; emits Kconfig symbol MUC_OPCUA_CU_MULTI_CHUNK matching the #ifdef guard renamed in Task 3 of the CU-aligned code reorganisation plan.
+
+config MUC_OPCUA_CU_SESSION_TIMEOUT
+	bool "CU: Session Timeout"
+	depends on MUC_OPCUA_FACET_CORE_2022_SERVER
+	default y if MUC_OPCUA_CU_MULTIPLE_CONNECTIONS || MUC_OPCUA_CU_MULTI_CHUNK
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-4 -- Core 2022 Server Facet.
+	  Backing tests: test_base_server_behaviour.
+	  Notes: Project-level Conformance Unit mirroring the legacy 'session_timeout' item; emits Kconfig symbol MUC_OPCUA_CU_SESSION_TIMEOUT matching the #ifdef guard renamed in Task 3 of the CU-aligned code reorganisation plan.
+
+config MUC_OPCUA_CU_TIME_SYNC
+	bool "CU: Time Sync"
+	depends on MUC_OPCUA_FACET_CORE_2022_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-4 §7.28 -- Core 2022 Server Facet.
+	  Backing tests: test_time_sync, test_dispatch_services.
+	  Notes: Project-level Conformance Unit mirroring the legacy 'time_sync' item; emits Kconfig symbol MUC_OPCUA_CU_TIME_SYNC matching the #ifdef guard renamed in Task 3 of the CU-aligned code reorganisation plan.
+
+config MUC_OPCUA_CU_EXTENDED_NODEIDS
+	bool "CU: Extended Nodeids"
+	depends on MUC_OPCUA_FACET_CORE_2022_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-3 -- Core 2022 Server Facet.
+	  Backing tests: test_address_space_string_limits, test_binary_nodeid_errors.
+	  Notes: Project-level Conformance Unit mirroring the legacy 'extended_nodeids' item; emits Kconfig symbol MUC_OPCUA_CU_EXTENDED_NODEIDS matching the #ifdef guard renamed in Task 3 of the CU-aligned code reorganisation plan.
+
+config MUC_OPCUA_CU_AGGREGATE_FULL
+	bool "CU: Aggregate Full"
+	depends on MUC_OPCUA_FACET_CORE_2022_SERVER && MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-13 -- Core 2022 Server Facet.
+	  Backing tests: test_aggregate, test_aggregate_full.
+	  Notes: Project-level Conformance Unit mirroring the legacy 'aggregate_full' item; emits Kconfig symbol MUC_OPCUA_CU_AGGREGATE_FULL matching the #ifdef guard renamed in Task 3 of the CU-aligned code reorganisation plan.
+
+config MUC_OPCUA_CU_PUBSUB
+	bool "CU: PubSub"
+	depends on MUC_OPCUA_FACET_CORE_2022_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-14 -- Core 2022 Server Facet.
+	  Backing tests: test_uadp_encoding, test_pubsub.
+	  Notes: Project-level Conformance Unit mirroring the legacy 'pubsub' item; emits Kconfig symbol MUC_OPCUA_CU_PUBSUB matching the #ifdef guard renamed in Task 3 of the CU-aligned code reorganisation plan.
+
+config MUC_OPCUA_CU_REVERSE_CONNECT
+	bool "CU: Reverse Connect"
+	depends on MUC_OPCUA_FACET_CORE_2022_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-6 §7.1.3 -- Core 2022 Server Facet.
+	  Backing tests: test_reverse_connect.
+	  Notes: Project-level Conformance Unit mirroring the legacy 'reverse_connect' item; emits Kconfig symbol MUC_OPCUA_CU_REVERSE_CONNECT matching the #ifdef guard renamed in Task 3 of the CU-aligned code reorganisation plan.
+
+config MUC_OPCUA_CU_NAMESPACES
+	bool "CU: Namespaces"
+	depends on MUC_OPCUA_FACET_CORE_2022_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-4 -- Core 2022 Server Facet.
+	  Backing tests: test_read_browsename_namespace.
+	  Notes: Project-level Conformance Unit mirroring the legacy 'namespaces' item; emits Kconfig symbol MUC_OPCUA_CU_NAMESPACES matching the #ifdef guard renamed in Task 3 of the CU-aligned code reorganisation plan.
 
 endmenu
 
@@ -969,242 +1199,6 @@ comment "No unique implemented Facets or CUs at this profile level"
 endmenu
 
 comment "Legacy compatibility symbols (C source gates)"
-
-config BASE_NODES
-	bool "Core 2017 Server Facet"
-	default y if MUC_OPCUA_INTERN_PROFILE_NANO_EMBEDDED_DEVICE_2025_SERVER
-	help
-	  Implementation state: claimed.
-	  OPC source: OPC-10000-7 §4.2 -- Core 2017 Server Facet.
-	  Backing tests: test_profile_surface.
-	  Notes: Mandatory Server object hierarchy.
-
-config BASE_TYPE_SYSTEM
-	bool "Base Info Type System"
-	depends on BASE_NODES
-	default y if MUC_OPCUA_INTERN_PROFILE_EMBEDDED_2025_UA_SERVER
-	help
-	  Implementation state: claimed.
-	  OPC source: OPC-10000-5 -- Base Info Type System -- CU 1661.
-	  Backing tests: test_type_system, test_method_call.
-	  Notes: EmbeddedUA2017 direct CU.
-
-config EXTENDED_NODEIDS
-	bool "Extended (string/GUID) NodeIds"
-	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
-	help
-	  Implementation state: claimed.
-	  OPC source: OPC-10000-3 -- Extended (string/GUID) NodeIds.
-	  Backing tests: test_address_space_string_limits, test_binary_nodeid_errors.
-	  Notes: Extended NodeId support.
-
-config NAMESPACES
-	bool "Namespace metadata"
-	depends on BASE_NODES
-	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
-	help
-	  Implementation state: claimed.
-	  OPC source: OPC-10000-4 -- Namespace metadata.
-	  Backing tests: test_read_browsename_namespace.
-	  Notes: NamespaceArray / ServerArray metadata.
-
-config DYNAMIC_NODES
-	bool "Dynamic address space"
-	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
-	help
-	  Implementation state: claimed.
-	  OPC source: OPC-10000-3 -- Dynamic address space.
-	  Backing tests: test_address_space_dynamic.
-	  Notes: Runtime node addition.
-
-config COMPLEX_TYPES
-	bool "Structure/complex type encoding"
-	depends on BASE_NODES
-	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
-	help
-	  Implementation state: claimed.
-	  OPC source: OPC-10000-6 -- Structure/complex type encoding.
-	  Backing tests: test_complex_types.
-
-config USER_AUTH
-	bool "UserNamePassword (id 1096) / X509 (id 1097)"
-	default y if MUC_OPCUA_INTERN_PROFILE_NANO_EMBEDDED_DEVICE_2025_SERVER
-	help
-	  Implementation state: claimed.
-	  OPC source: OPC-10000-4 §7.36 -- UserNamePassword (id 1096) / X509 (id 1097).
-	  Backing tests: test_user_auth_plaintext, test_user_auth_certificate, test_user_auth_secure_e2e.
-	  Notes: User token authentication.
-
-config MULTIPLE_CONNECTIONS
-	bool "MicroEmbeddedDevice2017 Session Minimum 2 Parallel"
-	default y if MUC_OPCUA_INTERN_PROFILE_MICRO_EMBEDDED_DEVICE_2025_SERVER
-	help
-	  Implementation state: claimed.
-	  OPC source: OPC-10000-7 -- MicroEmbeddedDevice2017 Session Minimum 2 Parallel -- CU 1659.
-	  Backing tests: test_connection_multiplex.
-	  Notes: Multiple concurrent connections/sessions.
-
-config SESSION_TIMEOUT
-	bool "Session idle timeout"
-	default y if MULTIPLE_CONNECTIONS || MULTI_CHUNK
-	help
-	  Implementation state: claimed.
-	  OPC source: OPC-10000-4 -- Session idle timeout.
-	  Backing tests: test_base_server_behaviour.
-	  Notes: Implicit coupling: required whenever multiple connections or multi-chunk are on.
-
-config SECURITY
-	bool "Security Policy Required + Default AppInstance Certificate"
-	default y if MUC_OPCUA_INTERN_PROFILE_EMBEDDED_2025_UA_SERVER
-	help
-	  Implementation state: claimed.
-	  OPC source: OPC-10000-7 -- Security Policy Required + Default AppInstance Certificate.
-	  Backing tests: test_asym_chunk, test_sym_chunk, test_certificate, test_certificate_validity, test_security_trustlist, test_server_handshake_secure, test_secure_handshake_modern.
-	  Notes: SecurityPolicy Basic256Sha256.
-
-config ECC
-	bool "Security ECC Policy (curve25519 / nistP256)"
-	depends on SECURITY
-	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
-	help
-	  Implementation state: claimed.
-	  OPC source: OPC-10000-7 -- Security ECC Policy (curve25519 / nistP256).
-	  Backing tests: test_ecc_crypto.
-	  Notes: See docs/conformance/ecc-security-policy.md.
-
-config MULTI_CHUNK
-	bool "Multi-chunk messages / index-range Read"
-	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
-	help
-	  Implementation state: claimed.
-	  OPC source: OPC-10000-6 -- Multi-chunk messages / index-range Read.
-	  Backing tests: test_message_chunk_errors.
-
-config TIME_SYNC
-	bool "Security time synchronization (clock-skew validation)"
-	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
-	help
-	  Implementation state: claimed.
-	  OPC source: OPC-10000-4 §7.28 -- Security time synchronization (clock-skew validation).
-	  Backing tests: test_time_sync, test_dispatch_services.
-
-config AUDITING
-	bool "Audit events"
-	depends on EVENTS
-	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
-	help
-	  Implementation state: claimed.
-	  OPC source: OPC-10000-4 §7.x -- Audit events.
-	  Backing tests: test_audit_events.
-
-config SUBSCRIPTIONS
-	bool "EmbeddedDataChangeSubscription"
-	default y if MUC_OPCUA_INTERN_PROFILE_MICRO_EMBEDDED_DEVICE_2025_SERVER
-	help
-	  Implementation state: claimed.
-	  OPC source: OPC-10000-4 §5.12/5.13 -- EmbeddedDataChangeSubscription -- CU 141.
-	  Backing tests: test_subscriptions, test_subscriptions_errors.
-	  Notes: Data-change subscriptions & MonitoredItems.
-
-config SUBSCRIPTIONS_STANDARD
-	bool "Standard/Enhanced DataChange Subscription 2017"
-	depends on SUBSCRIPTIONS
-	default y if MUC_OPCUA_INTERN_PROFILE_EMBEDDED_2025_UA_SERVER
-	help
-	  Implementation state: claimed.
-	  OPC source: OPC-10000-7 -- Standard/Enhanced DataChange Subscription 2017 -- CUs 1675, 1678.
-	  Backing tests: test_subscriptions_capacity, test_subscription_deadband, test_subscription_publish.
-	  Notes: GetMonitoredItems/ResendData, deadband, triggering, Republish.
-
-config EVENTS
-	bool "Event notifications & Alarms/Conditions"
-	depends on SUBSCRIPTIONS
-	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
-	help
-	  Implementation state: claimed.
-	  OPC source: OPC-10000-9 -- Event notifications & Alarms/Conditions.
-	  Backing tests: test_alarms_conditions, test_event_notifier, test_event_serializer.
-
-config EVENT_FILTER_WHERE
-	bool "Standard Event Subscription facet / ContentFilter"
-	depends on EVENTS && SUBSCRIPTIONS_STANDARD
-	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
-	help
-	  Implementation state: claimed.
-	  OPC source: OPC-10000-4 §7.4 -- Standard Event Subscription facet / ContentFilter.
-	  Backing tests: test_event_filter_where, test_event_filter_select.
-
-config AGGREGATE_FULL
-	bool "Aggregate Subscription facet"
-	depends on SUBSCRIPTIONS_STANDARD
-	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
-	help
-	  Implementation state: claimed.
-	  OPC source: OPC-10000-13 -- Aggregate Subscription facet.
-	  Backing tests: test_aggregate, test_aggregate_full.
-
-config REDUNDANCY
-	bool "Client Redundancy (TransferSubscriptions)"
-	depends on SUBSCRIPTIONS
-	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
-	help
-	  Implementation state: claimed.
-	  OPC source: OPC-10000-4 §5.14.7 -- Client Redundancy (TransferSubscriptions).
-	  Backing tests: test_transfer_subscriptions.
-	  Notes: See docs/conformance/redundancy.md.
-
-config METHOD_SERVER
-	bool "Method Server facet (arbitrary Call)"
-	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
-	help
-	  Implementation state: claimed.
-	  OPC source: OPC-10000-4 §5.11 -- Method Server facet (arbitrary Call).
-	  Backing tests: test_method_call_arbitrary, test_method_call_errors.
-	  Notes: Built-in GetMonitoredItems/ResendData work WITHOUT this.
-
-config CUSTOM_METHODS
-	bool "Custom method registration (alias of Method Server)"
-	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
-	help
-	  Implementation state: claimed.
-	  OPC source: OPC-10000-4 §5.11 -- Custom method registration (alias of Method Server).
-	  Backing tests: test_method_call.
-	  Notes: Alias of Method Server; kept separate for legacy reasons.
-
-config PUBSUB
-	bool "PubSub"
-	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
-	help
-	  Implementation state: claimed.
-	  OPC source: OPC-10000-14 -- PubSub.
-	  Backing tests: test_uadp_encoding, test_pubsub.
-
-config DATA_ACCESS
-	bool "Data Access Server Facet"
-	depends on BASE_NODES
-	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
-	help
-	  Implementation state: claimed.
-	  OPC source: OPC-10000-8 §5.3 -- Data Access Server Facet.
-	  Backing tests: test_analog_item, test_da_type_nodes, test_eu_information.
-	  Notes: See docs/conformance/data-access.md. Requires Base Nodes.
-
-config REVERSE_CONNECT
-	bool "Reverse Connect (server-initiated ReverseHello)"
-	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
-	help
-	  Implementation state: claimed.
-	  OPC source: OPC-10000-6 §7.1.3 -- Reverse Connect (server-initiated ReverseHello).
-	  Backing tests: test_reverse_connect.
-	  Notes: See docs/conformance/reverse-connect.md.
-
-config SERVER_DIAGNOSTICS
-	bool "ServerDiagnostics object + counters"
-	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
-	help
-	  Implementation state: claimed.
-	  OPC source: OPC-10000-5 §6.3 -- ServerDiagnostics object + counters.
-	  Backing tests: test_diagnostics.
 
 config MUC_OPCUA_FACET_CORE_2022_SERVER
 	bool "Core 2022 Server Facet"

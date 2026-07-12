@@ -1,7 +1,7 @@
 #ifndef MUC_OPCUA_SERVICES_SUBSCRIPTION_PUBLISH_COMMON_H
 #define MUC_OPCUA_SERVICES_SUBSCRIPTION_PUBLISH_COMMON_H
 
-#if MUC_OPCUA_SUBSCRIPTIONS
+#if MUC_OPCUA_CU_SUBSCRIPTION_BASIC
 
 #include "../subscription.h"
 #include <string.h>
@@ -20,7 +20,7 @@
    ExtensionObject TypeId → stream desync → spurious Bad_ServerNameMissing (#284). */
 #define MU_ID_STATUSCHANGENOTIFICATION_ENCODING_DEFAULTBINARY 820u
 
-#if MUC_OPCUA_SUBSCRIPTIONS_STANDARD
+#if MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
 #define MU_STATUSCODE_INFOTYPE_DATAVALUE_OVERFLOW 0x00000480u
 #ifndef MU_STATUS_BAD_TOOMANYOPERATIONS
 #define MU_LOCAL_STATUS_BAD_TOOMANYOPERATIONS ((opcua_statuscode_t)0x80100000u)
@@ -34,13 +34,13 @@
 /* deadband.c (filter evaluation) */
 bool monitored_item_reportable(const mu_monitored_item_t *item, const mu_subscription_t *sub);
 opcua_int32_t count_reportable_items(const struct mu_server *server, mu_subscription_t *sub);
-#if MUC_OPCUA_SUBSCRIPTIONS_STANDARD
+#if MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
 void prepare_reportable_queues(struct mu_server *server, const mu_subscription_t *sub);
 void enqueue_resend_data(struct mu_server *server, mu_subscription_t *sub);
 void monitored_item_drain_reported_entries(mu_monitored_item_t *item, opcua_int32_t *remaining);
 #endif
 void clear_reported_items(struct mu_server *server, const mu_subscription_t *sub
-#if MUC_OPCUA_SUBSCRIPTIONS_STANDARD
+#if MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
                           ,
                           opcua_int32_t report_count
 #endif
@@ -50,7 +50,7 @@ void clear_reported_items(struct mu_server *server, const mu_subscription_t *sub
 opcua_statuscode_t write_data_change_notification(mu_binary_writer_t *w, const struct mu_server *server,
                                                   const mu_subscription_t *sub, opcua_int32_t report_count);
 opcua_statuscode_t write_status_change_notification(mu_binary_writer_t *w, opcua_statuscode_t status);
-#ifdef MUC_OPCUA_EVENTS
+#ifdef MUC_OPCUA_CU_EVENTS
 opcua_statuscode_t write_event_notification_list(mu_binary_writer_t *w, struct mu_server *server,
                                                  const mu_subscription_t *sub);
 #endif
@@ -76,6 +76,6 @@ void store_retransmit(mu_subscription_t *sub, opcua_uint32_t sequence_number, op
                       const opcua_byte_t *body, size_t body_length);
 bool publish_response_oversize_status(opcua_statuscode_t status);
 
-#endif /* MUC_OPCUA_SUBSCRIPTIONS */
+#endif /* MUC_OPCUA_CU_SUBSCRIPTION_BASIC */
 
 #endif /* MUC_OPCUA_SERVICES_SUBSCRIPTION_PUBLISH_COMMON_H */

@@ -1,6 +1,6 @@
 #include "common.h"
 
-#if MUC_OPCUA_SUBSCRIPTIONS_STANDARD
+#if MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
 #include "../../services/subscription.h"
 #endif
 
@@ -32,7 +32,7 @@ static opcua_statuscode_t read_auth_token_from_request(const opcua_byte_t *reque
    Each entry retains its own feature-guard so any subset produced by the
    preprocessor remains a sorted subsequence. */
 static const mu_service_descriptor_t g_supported_services[] = {
-#ifdef MUC_OPCUA_SERVICE_DISCOVERY
+#ifdef MUC_OPCUA_CU_DISCOVERY_FIND_SERVERS_SELF_GET_ENDPOINTS
     {{MU_ID_FINDSERVERSREQUEST, MU_ID_FINDSERVERSRESPONSE, false}, handle_find_servers},
     {{MU_ID_GETENDPOINTSREQUEST, MU_ID_GETENDPOINTSRESPONSE, false}, handle_get_endpoints},
 #endif
@@ -41,46 +41,46 @@ static const mu_service_descriptor_t g_supported_services[] = {
     {{MU_ID_CREATESESSIONREQUEST, MU_ID_CREATESESSIONRESPONSE, false}, handle_create_session},
     {{MU_ID_ACTIVATESESSIONREQUEST, MU_ID_ACTIVATESESSIONRESPONSE, false}, handle_activate_session},
     {{MU_ID_CLOSESESSIONREQUEST, MU_ID_CLOSESESSIONRESPONSE, true}, handle_close_session},
-#ifdef MUC_OPCUA_SERVICE_NODEMANAGEMENT
+#ifdef MUC_OPCUA_CU_NODEMANAGEMENT
     {{MU_ID_ADDNODESREQUEST, MU_ID_ADDNODESRESPONSE, true}, handle_add_nodes},
     {{MU_ID_ADDREFERENCESREQUEST, MU_ID_ADDREFERENCESRESPONSE, true}, handle_add_references},
     {{MU_ID_DELETENODESREQUEST, MU_ID_DELETENODESRESPONSE, true}, handle_delete_nodes},
     {{MU_ID_DELETEREFERENCESREQUEST, MU_ID_DELETEREFERENCESRESPONSE, true}, handle_delete_references},
 #endif
-#ifdef MUC_OPCUA_SERVICE_BROWSE
+#ifdef MUC_OPCUA_CU_VIEW_BASIC_TRANSLATEBROWSEPATH
     {{MU_ID_BROWSEREQUEST, MU_ID_BROWSERESPONSE, true}, handle_browse},
     {{MU_ID_BROWSENEXTREQUEST, MU_ID_BROWSENEXTRESPONSE, true}, handle_browse_next},
     {{MU_ID_TRANSLATEBROWSEPATHSTONODEIDSREQUEST, MU_ID_TRANSLATEBROWSEPATHSTONODEIDSRESPONSE, true},
      handle_translate_browse_paths},
 #endif
-#ifdef MUC_OPCUA_SERVICE_REGISTER_NODES
+#ifdef MUC_OPCUA_CU_VIEW_REGISTERNODES
     {{MU_ID_REGISTERNODESREQUEST, MU_ID_REGISTERNODESRESPONSE, true}, handle_register_nodes},
     {{MU_ID_UNREGISTERNODESREQUEST, MU_ID_UNREGISTERNODESRESPONSE, true}, handle_unregister_nodes},
 #endif
-#ifdef MUC_OPCUA_SERVICE_QUERY
+#ifdef MUC_OPCUA_CU_QUERY
     {{MU_ID_QUERYFIRSTREQUEST, MU_ID_QUERYFIRSTRESPONSE, true}, handle_query_first},
     {{MU_ID_QUERYNEXTREQUEST, MU_ID_QUERYNEXTRESPONSE, true}, handle_query_next},
 #endif
-#ifdef MUC_OPCUA_SERVICE_READ
+#ifdef MUC_OPCUA_CU_ATTRIBUTE_READ
     {{MU_ID_READREQUEST, MU_ID_READRESPONSE, true}, handle_read},
 #endif
-#ifdef MUC_OPCUA_SERVICE_HISTORY
+#ifdef MUC_OPCUA_CU_HISTORICAL_ACCESS_SERVER_FACET
     {{MU_ID_HISTORYREADREQUEST, MU_ID_HISTORYREADRESPONSE, true}, handle_history_read},
 #endif
-#ifdef MUC_OPCUA_SERVICE_WRITE
+#ifdef MUC_OPCUA_CU_CORE_2017_ATTRIBUTE_WRITE
     {{MU_ID_WRITEREQUEST, MU_ID_WRITERESPONSE, true}, handle_write},
 #endif
-#ifdef MUC_OPCUA_SERVICE_HISTORY
+#ifdef MUC_OPCUA_CU_HISTORICAL_ACCESS_SERVER_FACET
     {{MU_ID_HISTORYUPDATEREQUEST, MU_ID_HISTORYUPDATEREQUEST, true}, handle_history_update},
 #endif
 #if MU_DISPATCH_CALL_ENABLED
     {{MU_ID_CALLREQUEST, MU_ID_CALLRESPONSE, true}, handle_call},
 #endif
-#if MUC_OPCUA_SUBSCRIPTIONS
+#if MUC_OPCUA_CU_SUBSCRIPTION_BASIC
     {{MU_ID_CREATEMONITOREDITEMSREQUEST, MU_ID_CREATEMONITOREDITEMSRESPONSE, true}, handle_create_monitored_items},
     {{MU_ID_MODIFYMONITOREDITEMSREQUEST, MU_ID_MODIFYMONITOREDITEMSRESPONSE, true}, handle_modify_monitored_items},
     {{MU_ID_SETMONITORINGMODEREQUEST, MU_ID_SETMONITORINGMODERESPONSE, true}, handle_set_monitoring_mode},
-#if MUC_OPCUA_SUBSCRIPTIONS_STANDARD
+#if MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
     {{MU_ID_SETTRIGGERINGREQUEST, MU_ID_SETTRIGGERINGRESPONSE, true}, handle_set_triggering},
 #endif
     {{MU_ID_DELETEMONITOREDITEMSREQUEST, MU_ID_DELETEMONITOREDITEMSRESPONSE, true}, handle_delete_monitored_items},
@@ -89,7 +89,7 @@ static const mu_service_descriptor_t g_supported_services[] = {
     {{MU_ID_SETPUBLISHINGMODEREQUEST, MU_ID_SETPUBLISHINGMODERESPONSE, true}, handle_set_publishing_mode},
     {{MU_ID_PUBLISHREQUEST, MU_ID_PUBLISHRESPONSE, true}, handle_publish},
     {{MU_ID_REPUBLISHREQUEST, MU_ID_REPUBLISHRESPONSE, true}, handle_republish},
-#if MUC_OPCUA_REDUNDANCY
+#if MUC_OPCUA_CU_REDUNDANCY
     {{MU_ID_TRANSFERSUBSCRIPTIONSREQUEST, MU_ID_TRANSFERSUBSCRIPTIONSRESPONSE, true}, handle_transfer_subscriptions},
 #endif
     {{MU_ID_DELETESUBSCRIPTIONSREQUEST, MU_ID_DELETESUBSCRIPTIONSRESPONSE, true}, handle_delete_subscriptions},
