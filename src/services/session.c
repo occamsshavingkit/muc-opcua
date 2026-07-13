@@ -48,10 +48,10 @@ void mu_session_init(mu_session_t *session) {
         session->revised_session_timeout_ms = 0;
         session->last_activity_ms = 0;
         (void)memset(session->server_nonce, 0, sizeof(session->server_nonce));
-#ifdef MUC_OPCUA_MULTIPLE_CONNECTIONS
+#ifdef MUC_OPCUA_CU_MULTIPLE_CONNECTIONS
         session->secure_channel_id = 0;
 #endif
-#if MUC_OPCUA_REDUNDANCY
+#if MUC_OPCUA_CU_REDUNDANCY
         session->user_identity_kind = 0;
         session->user_identity_len = 0;
         (void)memset(session->user_identity, 0, sizeof(session->user_identity));
@@ -59,7 +59,7 @@ void mu_session_init(mu_session_t *session) {
     }
 }
 
-#if MUC_OPCUA_REDUNDANCY
+#if MUC_OPCUA_CU_REDUNDANCY
 bool mu_session_same_user(const mu_session_t *a, const mu_session_t *b) {
     if (a == NULL || b == NULL) {
         return false;
@@ -223,7 +223,7 @@ opcua_statuscode_t mu_session_create_with_identifiers(mu_session_t *session, opc
 
     session->session_id = assigned_session_id;
     session->auth_token = assigned_auth_token;
-#ifdef MUC_OPCUA_MULTIPLE_CONNECTIONS
+#ifdef MUC_OPCUA_CU_MULTIPLE_CONNECTIONS
     /* OPC-10000-4 section 5.7.2.1 binds a Session to the SecureChannel that
        created it; later service checks validate use through that channel. */
     session->secure_channel_id = creating_secure_channel_id;
@@ -254,7 +254,7 @@ opcua_statuscode_t mu_session_validate_secure_channel(const mu_session_t *sessio
         return MU_STATUS_BAD_INTERNALERROR;
     }
 
-#ifdef MUC_OPCUA_MULTIPLE_CONNECTIONS
+#ifdef MUC_OPCUA_CU_MULTIPLE_CONNECTIONS
     /* OPC-10000-4 section 7.38.2: reject Session use through a SecureChannel
        different from the one that created the Session. */
     if (session->secure_channel_id != active_secure_channel_id) {
@@ -330,7 +330,7 @@ mu_session_t *mu_session_find_closed_by_token(mu_session_t *sessions, size_t cou
     return NULL;
 }
 
-#ifdef MUC_OPCUA_SESSION_TIMEOUT
+#ifdef MUC_OPCUA_CU_SESSION_TIMEOUT
 void mu_session_close_timeout(mu_session_t *session) {
     if (session == NULL) {
         return;
@@ -348,4 +348,4 @@ void mu_session_close_timeout(mu_session_t *session) {
     session->state = MU_SESSION_STATE_CLOSED;
     (void)memset(session->server_nonce, 0, sizeof(session->server_nonce));
 }
-#endif /* MUC_OPCUA_SESSION_TIMEOUT */
+#endif /* MUC_OPCUA_CU_SESSION_TIMEOUT */

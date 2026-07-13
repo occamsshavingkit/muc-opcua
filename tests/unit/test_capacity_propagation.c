@@ -27,16 +27,16 @@ _Static_assert(MU_INTERN_MAX_CONNECTIONS >= MU_INTERN_MAX_SESSIONS,
 
 /* Exact per-profile values, proving the profile selector reaches capacities.h
  * and each column resolves as intended. */
-#if defined(MUC_OPCUA_PROFILE_FULL)
+#if defined(MUC_OPCUA_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES)
 _Static_assert(MU_INTERN_MAX_SESSIONS == 100 && MU_INTERN_MAX_CONNECTIONS == 100, "full: sessions=connections=100");
-#elif defined(MUC_OPCUA_PROFILE_STANDARD)
+#elif defined(MUC_OPCUA_PROFILE_STANDARD_2025_UA_SERVER)
 _Static_assert(MU_INTERN_MAX_SESSIONS == 50 && MU_INTERN_MAX_CONNECTIONS == 50, "standard: sessions=connections=50");
-#elif defined(MUC_OPCUA_PROFILE_EMBEDDED)
+#elif defined(MUC_OPCUA_PROFILE_EMBEDDED_2025_UA_SERVER)
 _Static_assert(MU_INTERN_MAX_SESSIONS == 2 && MU_INTERN_MAX_CONNECTIONS == 4, "embedded: sessions=2, connections=4");
-#elif defined(MUC_OPCUA_PROFILE_MICRO)
+#elif defined(MUC_OPCUA_PROFILE_MICRO_EMBEDDED_DEVICE_2025_SERVER)
 _Static_assert(MU_INTERN_MAX_SESSIONS == 2 && MU_INTERN_MAX_CONNECTIONS == 2,
                "micro: sessions=2, connections=2 (>=2 clients each with own channel)");
-#elif defined(MUC_OPCUA_PROFILE_NANO)
+#elif defined(MUC_OPCUA_PROFILE_NANO_EMBEDDED_DEVICE_2025_SERVER)
 _Static_assert(MU_INTERN_MAX_SESSIONS == 2 && MU_INTERN_MAX_CONNECTIONS == 1,
                "nano: single connection, sessions multiplexed");
 #endif

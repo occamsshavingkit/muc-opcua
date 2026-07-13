@@ -26,12 +26,12 @@
 /* Dynamic runtime-bound nodes: CurrentTime + StartTime (2), plus the ServerDiagnostics
    objects (3, Base Server Behaviour facet) and Server.ServerRedundancy.RedundancySupport
    (1, i=3709, Client Redundancy facet) when those facets are compiled. */
-#if MUC_OPCUA_SERVER_DIAGNOSTICS
+#if MUC_OPCUA_CU_DIAGNOSTICS
 #define MU_BASE_RUNTIME_DIAG_NODES 3
 #else
 #define MU_BASE_RUNTIME_DIAG_NODES 0
 #endif
-#if MUC_OPCUA_REDUNDANCY
+#if MUC_OPCUA_CU_REDUNDANCY
 #define MU_BASE_RUNTIME_REDUNDANCY_NODES 1
 #else
 #define MU_BASE_RUNTIME_REDUNDANCY_NODES 0
@@ -51,7 +51,7 @@ const mu_address_space_t *mu_base_address_space(void);
 typedef struct {
     const mu_time_adapter_t *time; /* CurrentTime source */
     opcua_datetime_t start_time;   /* StartTime value (captured at init) */
-#if MUC_OPCUA_SERVER_DIAGNOSTICS
+#if MUC_OPCUA_CU_DIAGNOSTICS
     const mu_diagnostics_summary_t *diag; /* live ServerDiagnosticsSummary source */
 #endif
 } mu_base_runtime_t;
@@ -70,7 +70,7 @@ typedef struct {
    CALLBACKs bound to `&storage->rt` (so CurrentTime reads `time` live). Call once at
    server init; `start_time` is typically time->get_time() at startup. */
 void mu_base_runtime_init(mu_base_runtime_nodes_t *storage, const mu_time_adapter_t *time, opcua_datetime_t start_time
-#if MUC_OPCUA_SERVER_DIAGNOSTICS
+#if MUC_OPCUA_CU_DIAGNOSTICS
                           ,
                           const mu_diagnostics_summary_t *diag
 #endif
@@ -82,7 +82,7 @@ void mu_base_runtime_init(mu_base_runtime_nodes_t *storage, const mu_time_adapte
 const mu_node_t *mu_resolve_node(const mu_address_space_t *user, mu_address_space_index_t *user_index,
                                  const mu_address_space_t *dynamic, const mu_nodeid_t *node_id);
 
-#if MUC_OPCUA_DATA_ACCESS
+#if MUC_OPCUA_CU_DATA_ACCESS
 /* Resolve the EURange span (High - Low) for a Variable node, searching the same
    user/dynamic/base spaces as mu_resolve_node for the EURange Property node.
    Returns true and sets *out_span when the node has a readable EURange Property

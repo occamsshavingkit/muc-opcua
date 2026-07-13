@@ -16,7 +16,7 @@ static void process_message_hello(mu_server_t *server, opcua_byte_t *msg, size_t
     }
 }
 
-#ifdef MUC_OPCUA_MULTI_CHUNK
+#ifdef MUC_OPCUA_CU_MULTI_CHUNK
 /* Buffer body bytes from a multi-chunk MSG continuation chunk. */
 static void process_message_multi_chunk_continuation(mu_server_t *server, const opcua_byte_t *msg, size_t msg_len) {
     size_t body_offset = MU_UASC_SYMMETRIC_HEADER_SIZE;
@@ -52,7 +52,7 @@ static void process_message_multi_chunk_final_dispatch(mu_server_t *server, cons
     opcua_byte_t *resp_body = server->config.send_buffer + body_offset;
     size_t payload_len = server->config.send_buffer_size - body_offset;
 
-#if MUC_OPCUA_SUBSCRIPTIONS
+#if MUC_OPCUA_CU_SUBSCRIPTION_BASIC
     server->current_request_id = response_request_id;
 #endif
     opcua_statuscode_t status;
@@ -66,7 +66,7 @@ static void process_message_multi_chunk_final_dispatch(mu_server_t *server, cons
     if (status != MU_STATUS_GOOD) {
         payload_len = server->config.send_buffer_size - body_offset;
         if (mu_write_service_fault(resp_body, &payload_len, 0, status
-#ifdef MUC_OPCUA_TIME_SYNC
+#ifdef MUC_OPCUA_CU_TIME_SYNC
                                    ,
                                    server
 #endif
@@ -90,12 +90,12 @@ static void process_message_multi_chunk_final_dispatch(mu_server_t *server, cons
 
     mu_chunk_assembler_reset(&server_chunk_assembly);
 }
-#endif /* MUC_OPCUA_MULTI_CHUNK */
+#endif /* MUC_OPCUA_CU_MULTI_CHUNK */
 
 /* Route an OPN or MSG chunk to the appropriate handler based on the
    configured security policy. */
 static void process_message_opn_or_msg(mu_server_t *server, opcua_byte_t *msg, size_t msg_len, bool is_opn) {
-#ifdef MUC_OPCUA_SECURITY
+#ifdef MUC_OPCUA_FACET_CORE_2022_SERVER
     if (server->config.crypto_adapter != NULL) {
         handle_data_chunk_secure(server, msg, msg_len, is_opn);
         return;
@@ -119,13 +119,13 @@ void process_message(mu_server_t *server, opcua_byte_t *msg, size_t msg_len) {
     status = mu_parse_message_header(msg, msg_len, &header);
     if (status != MU_STATUS_GOOD) {
         if (header.chunk_type == 'C') {
-#ifndef MUC_OPCUA_MULTI_CHUNK
+#ifndef MUC_OPCUA_CU_MULTI_CHUNK
             send_tcp_error_chunk(server, MU_STATUS_BAD_TCPMESSAGETYPEINVALID);
 #else
             send_tcp_error_chunk(server, status);
 #endif
         }
-#ifdef MUC_OPCUA_MULTI_CHUNK
+#ifdef MUC_OPCUA_CU_MULTI_CHUNK
         mu_chunk_assembler_reset(&server_chunk_assembly);
 #endif
         return;
@@ -135,7 +135,7 @@ void process_message(mu_server_t *server, opcua_byte_t *msg, size_t msg_len) {
     bool is_msg = header.message_type[0] == 'M' && header.message_type[1] == 'S' && header.message_type[2] == 'G';
     bool is_clo = header.message_type[0] == 'C' && header.message_type[1] == 'L' && header.message_type[2] == 'O';
 
-#ifdef MUC_OPCUA_MULTI_CHUNK
+#ifdef MUC_OPCUA_CU_MULTI_CHUNK
     if (is_msg && header.chunk_type == 'C') {
         process_message_multi_chunk_continuation(server, msg, msg_len);
         return;
@@ -201,7 +201,7 @@ void process_message(mu_server_t *server, opcua_byte_t *msg, size_t msg_len) {
         process_message_multi_chunk_final_dispatch(server, &request_type, seq.request_id, req_body, req_body_len);
         return;
     }
-#endif /* MUC_OPCUA_MULTI_CHUNK */
+#endif /* MUC_OPCUA_CU_MULTI_CHUNK */
 
     if (is_clo) {
         mu_secure_channel_close(&server_secure_channel);

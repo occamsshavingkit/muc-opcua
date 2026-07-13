@@ -19,7 +19,7 @@ opcua_statuscode_t handle_close_session(mu_server_t *server, mu_binary_reader_t 
     if (server->active_session != NULL && req.authentication_token.identifier_type == MU_NODEID_NUMERIC) {
         close_result =
             mu_session_close(server->active_session, req.authentication_token.identifier.numeric, delete_subscriptions);
-#if MUC_OPCUA_SUBSCRIPTIONS
+#if MUC_OPCUA_CU_SUBSCRIPTION_BASIC
         if (close_result == MU_STATUS_GOOD) {
             opcua_uint32_t session_id = server->active_session->session_id;
             for (size_t i = 0; i < MU_INTERN_MAX_SUBSCRIPTIONS; ++i) {
@@ -39,7 +39,7 @@ opcua_statuscode_t handle_close_session(mu_server_t *server, mu_binary_reader_t 
     }
 
     s = write_response_prefix(w, MU_ID_CLOSESESSIONRESPONSE, req.request_handle, close_result
-#ifdef MUC_OPCUA_TIME_SYNC
+#ifdef MUC_OPCUA_CU_TIME_SYNC
                               ,
                               server
 #endif

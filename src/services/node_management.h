@@ -6,7 +6,7 @@
 #include "muc_opcua/encoding.h"
 #include "muc_opcua/server.h"
 
-#ifdef MUC_OPCUA_SERVICE_NODEMANAGEMENT
+#ifdef MUC_OPCUA_CU_NODEMANAGEMENT
 
 /* AddNodesItem */
 typedef struct {
@@ -125,5 +125,5 @@ opcua_statuscode_t mu_add_references_process(mu_server_t *server, mu_binary_read
 opcua_statuscode_t mu_delete_nodes_process(mu_server_t *server, mu_binary_reader_t *r, mu_binary_writer_t *w);
 opcua_statuscode_t mu_delete_references_process(mu_server_t *server, mu_binary_reader_t *r, mu_binary_writer_t *w);
 
-#endif /* MUC_OPCUA_SERVICE_NODEMANAGEMENT */
+#endif /* MUC_OPCUA_CU_NODEMANAGEMENT */
 #endif /* MUC_OPCUA_NODE_MANAGEMENT_H */

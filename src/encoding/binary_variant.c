@@ -320,7 +320,7 @@ opcua_statuscode_t mu_binary_write_variant(mu_binary_writer_t *writer, const mu_
         if (variant->array_length < 0 || variant->value.array == NULL) {
             return MU_STATUS_GOOD; /* null array */
         }
-#if MUC_OPCUA_METHOD_SERVER
+#if MUC_OPCUA_CU_METHOD_SERVER
         if (variant->type == MU_TYPE_EXTENSIONOBJECT) {
             /* The only ExtensionObject-array Value this server encodes is the
                Method Server Facet's InputArguments/OutputArguments Argument[]
@@ -349,7 +349,7 @@ opcua_statuscode_t mu_binary_write_variant(mu_binary_writer_t *writer, const mu_
         return MU_STATUS_GOOD;
     }
 
-#if MUC_OPCUA_SERVER_DIAGNOSTICS
+#if MUC_OPCUA_CU_DIAGNOSTICS
     if (variant->type == MU_TYPE_EXTENSIONOBJECT) {
         /* The only scalar ExtensionObject Value this server encodes is the Base Server
            Behaviour facet's ServerDiagnosticsSummary (spec 064); value.array holds a

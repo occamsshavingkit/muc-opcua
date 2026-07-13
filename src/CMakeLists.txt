@@ -40,84 +40,131 @@ add_library(muc_opcua STATIC
     generated/opcua_ids.c
 )
 
+# Make src/ the include root so moved CU sources can resolve headers via
+# src-rooted paths (e.g. "core/server/common.h") regardless of directory depth.
+target_include_directories(muc_opcua PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+
 if(MUC_OPCUA_ALLOW_HEAP)
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_ALLOW_HEAP=1)
 else()
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_ALLOW_HEAP=0)
 endif()
 
-# Optional services compile out at the source + dispatch-table level.
-if(MUC_OPCUA_SERVICE_READ)
-    target_sources(muc_opcua PRIVATE services/read/read_attribute.c services/read/read_process.c)
-    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_SERVICE_READ=1)
+# =============================================================================
+# Per-Conformance-Unit (CU) source gating.
+# One if() block per CU/facet symbol. Each block:
+#   1. file(GLOB[_RECURSE]) on the CU directory under src/cu/<facet>/<cu>/
+#   2. Adds the sources to muc_opcua
+#   3. Emits the CU/facet compile definition
+# Legacy symbol aliases (MUC_OPCUA_<OLD_NAME>=1) are emitted alongside CU
+# defines where include/ or tests/ still reference them. SERVICE_* bridge
+# defines that were unreferenced outside src/CMakeLists.txt have been removed.
+# =============================================================================
+
+# -- CU: Attribute Read (facet: Core 2022 Server) --
+if(MUC_OPCUA_CU_ATTRIBUTE_READ)
+    file(GLOB _sources cu/core_2022_server/attribute_read/*.c)
+    list(REMOVE_ITEM _sources
+        ${CMAKE_CURRENT_SOURCE_DIR}/cu/core_2022_server/attribute_read/cache.c)
+    target_sources(muc_opcua PRIVATE ${_sources})
+    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_CU_ATTRIBUTE_READ=1)
 endif()
-# The Read value cache is an opt-in optimization (see MUC_OPCUA_READ_CACHE). Its
-# maxAge handling is the only floating-point in the Read path, so it is compiled
-# only when explicitly enabled.
+
+# Opt-in Read value cache (maxAge optimization, OPC-10000-4 5.11.2). Compiled
+# only when explicitly enabled because its maxAge handling is the only
+# floating-point in the Read path.
 if(MUC_OPCUA_READ_CACHE)
-    target_sources(muc_opcua PRIVATE services/read/cache.c)
+    target_sources(muc_opcua PRIVATE cu/core_2022_server/attribute_read/cache.c)
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_READ_CACHE=1)
 endif()
-if(MUC_OPCUA_SERVICE_BROWSE)
-    target_sources(muc_opcua PRIVATE services/browse/browse.c services/browse/browse_next.c services/browse/translate_paths.c core/service_dispatch/view_handler.c)
-    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_SERVICE_BROWSE=1)
+
+# -- CU: View Basic TranslateBrowsePath (facet: Core 2022 Server) --
+if(MUC_OPCUA_CU_VIEW_BASIC_TRANSLATEBROWSEPATH)
+    file(GLOB _sources cu/core_2022_server/view_basic_translate/*.c)
+    target_sources(muc_opcua PRIVATE ${_sources})
+    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_CU_VIEW_BASIC_TRANSLATEBROWSEPATH=1)
 endif()
-if(MUC_OPCUA_SERVICE_DISCOVERY)
-    target_sources(muc_opcua PRIVATE
-        core/dispatch_discovery/common.c
-        core/dispatch_discovery/get_endpoints.c
-        core/dispatch_discovery/find_servers.c
-        core/dispatch_discovery/register_server.c
-    )
-    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_SERVICE_DISCOVERY=1)
+
+# -- CU: Discovery FindServers-Self-GetEndpoints (facet: Core 2022 Server) --
+if(MUC_OPCUA_CU_DISCOVERY_FIND_SERVERS_SELF_GET_ENDPOINTS)
+    file(GLOB _sources cu/core_2022_server/discovery/*.c)
+    target_sources(muc_opcua PRIVATE ${_sources})
+    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_CU_DISCOVERY_FIND_SERVERS_SELF_GET_ENDPOINTS=1)
 endif()
-if(MUC_OPCUA_SERVICE_REGISTER_NODES)
-    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_SERVICE_REGISTER_NODES=1)
+
+# -- CU: View RegisterNodes (define-only, no source files yet) --
+if(MUC_OPCUA_CU_VIEW_REGISTERNODES)
+    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_CU_VIEW_REGISTERNODES=1)
 endif()
-if(MUC_OPCUA_SERVICE_WRITE)
+
+# -- CU: Core 2017 Attribute Write --
+if(MUC_OPCUA_CU_CORE_2017_ATTRIBUTE_WRITE)
+    file(GLOB _sources cu/core_2022_server/attribute_write/*.c)
+    target_sources(muc_opcua PRIVATE ${_sources})
+    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_CU_CORE_2017_ATTRIBUTE_WRITE=1)
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_SERVICE_WRITE=1)
 endif()
-# Read/Write attribute dispatch handlers. dispatch_attribute.c carries both
-# sets internally (#ifdef MUC_OPCUA_SERVICE_READ / ..._WRITE), so compile it
-# whenever either service is enabled.
-if(MUC_OPCUA_SERVICE_READ OR MUC_OPCUA_SERVICE_WRITE)
+
+# Read/Write attribute dispatch handler. attribute_handler.c carries both sets
+# internally (#ifdef MUC_OPCUA_CU_ATTRIBUTE_READ / MUC_OPCUA_CU_CORE_2017_ATTRIBUTE_WRITE),
+# so compile it whenever either CU is enabled. File is shared infrastructure
+# and remains at src/core/service_dispatch/.
+if(MUC_OPCUA_CU_ATTRIBUTE_READ OR MUC_OPCUA_CU_CORE_2017_ATTRIBUTE_WRITE)
     target_sources(muc_opcua PRIVATE core/service_dispatch/attribute_handler.c)
 endif()
-if(MUC_OPCUA_SERVICE_NODEMANAGEMENT)
-    target_sources(muc_opcua PRIVATE services/node_management/add_nodes.c services/node_management/add_references.c services/node_management/delete.c core/dispatch_node_mgmt.c)
+
+# -- CU: NodeManagement (facet: Core 2022 Server) --
+if(MUC_OPCUA_CU_NODEMANAGEMENT)
+    file(GLOB _sources cu/core_2022_server/nodemanagement/*.c)
+    target_sources(muc_opcua PRIVATE ${_sources})
+    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_CU_NODEMANAGEMENT=1)
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_SERVICE_NODEMANAGEMENT=1)
 endif()
-if(MUC_OPCUA_SERVICE_QUERY)
-    target_sources(muc_opcua PRIVATE services/query.c encoding/binary_query.c)
+
+# -- CU: Query (facet: Core 2022 Server) --
+if(MUC_OPCUA_CU_QUERY)
+    file(GLOB _sources cu/core_2022_server/query/*.c)
+    target_sources(muc_opcua PRIVATE ${_sources})
+    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_CU_QUERY=1)
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_SERVICE_QUERY=1)
 endif()
-# base_nodes.c is always compiled (it owns the always-available mu_resolve_node);
-# this flag gates the node-table *content* so the standard node set is dropped.
-if(MUC_OPCUA_BASE_NODES)
+
+# -- Facet: Core 2022 Server (supersedes legacy BASE_NODES) --
+# base_nodes.c is always compiled (owns mu_resolve_node); this flag gates the
+# node-table *content* so the standard node set is dropped.
+if(MUC_OPCUA_FACET_CORE_2022_SERVER)
+    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_FACET_CORE_2022_SERVER=1)
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_BASE_NODES=1)
 endif()
-if(MUC_OPCUA_BASE_TYPE_SYSTEM)
+
+# -- Facet: Exposes Type System Server (supersedes legacy BASE_TYPE_SYSTEM) --
+if(MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER)
+    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER=1)
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_BASE_TYPE_SYSTEM=1)
 endif()
 
-# The data-change subscription engine (Micro profile). Source + dispatch handlers are
-# gated under MUC_OPCUA_SUBSCRIPTIONS so a Nano build drops them at the source level.
-if(MUC_OPCUA_SUBSCRIPTIONS)
-    target_sources(muc_opcua PRIVATE
-        services/subscription_monitor.c
-        services/subscription_publish/publish_due.c
-        services/subscription_publish/tick.c
-        services/subscription_publish/notification.c
-        services/subscription_publish/deadband.c
-        services/subscription_publish/retransmit.c
-        core/service_dispatch/subscription_crud.c
-        core/service_dispatch/monitored_items.c
-        core/service_dispatch/filter_reader.c
-        core/service_dispatch/subscription_helpers.c
-    )
+# -- CU: Subscription Basic (Micro profile data-change engine) --
+# Sources live under src/cu/core_2022_server/subscription/basic/; pubsub/uadp
+# files at the same level are excluded here and gated separately by CU_PUBSUB.
+if(MUC_OPCUA_CU_SUBSCRIPTION_BASIC)
+    file(GLOB _sources cu/core_2022_server/subscription/basic/*.c)
+    list(REMOVE_ITEM _sources
+        ${CMAKE_CURRENT_SOURCE_DIR}/cu/core_2022_server/subscription/basic/pubsub.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/cu/core_2022_server/subscription/basic/uadp_encoder.c)
+    target_sources(muc_opcua PRIVATE ${_sources})
+    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_CU_SUBSCRIPTION_BASIC=1)
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_SUBSCRIPTIONS=1)
-    if(MUC_OPCUA_SUBSCRIPTIONS_STANDARD)
-        target_sources(muc_opcua PRIVATE services/subscription_aggregate.c core/service_dispatch/triggering.c)
+
+    # -- CU: Subscription Standard (aggregates, triggering) --
+    # dispatch_method.c requires the triple condition (Subscriptions + Standard
+    # + BaseInfo type system) and is excluded from the STANDARD glob to preserve
+    # the original MU_DISPATCH_CALL_ENABLED gating; see the dedicated block below.
+    if(MUC_OPCUA_CU_SUBSCRIPTION_STANDARD)
+        file(GLOB _sources cu/core_2022_server/subscription/standard/*.c)
+        list(REMOVE_ITEM _sources
+            ${CMAKE_CURRENT_SOURCE_DIR}/cu/core_2022_server/subscription/standard/dispatch_method.c)
+        target_sources(muc_opcua PRIVATE ${_sources})
+        target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_CU_SUBSCRIPTION_STANDARD=1)
         target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_SUBSCRIPTIONS_STANDARD=1)
     endif()
 endif()
@@ -126,116 +173,139 @@ endif()
 # the same compound condition as the original MU_DISPATCH_CALL_ENABLED macro
 # in service_dispatch.c: Subscriptions + STANDARD aggregates + BaseInfo
 # type system. The file also wraps itself in the matching #if internally.
-if(MUC_OPCUA_SUBSCRIPTIONS AND MUC_OPCUA_SUBSCRIPTIONS_STANDARD AND MUC_OPCUA_BASE_TYPE_SYSTEM)
-    target_sources(muc_opcua PRIVATE core/dispatch_method.c)
+if(MUC_OPCUA_CU_SUBSCRIPTION_BASIC AND MUC_OPCUA_CU_SUBSCRIPTION_STANDARD AND MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER)
+    target_sources(muc_opcua PRIVATE cu/core_2022_server/subscription/standard/dispatch_method.c)
 endif()
 
-if(MUC_OPCUA_PUBSUB)
+# -- CU: PubSub (facet: Core 2022 Server) --
+# pubsub.c + uadp_encoder.c live alongside the Subscription Basic sources but
+# are independently gated by MUC_OPCUA_CU_PUBSUB.
+if(MUC_OPCUA_CU_PUBSUB)
     target_sources(muc_opcua PRIVATE
-        core/pubsub.c
-        encoding/uadp_encoder.c
+        cu/core_2022_server/subscription/basic/pubsub.c
+        cu/core_2022_server/subscription/basic/uadp_encoder.c
     )
+    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_CU_PUBSUB=1)
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_PUBSUB=1)
     if(MUC_OPCUA_IS_HOST)
         target_sources(muc_opcua PRIVATE platform/host_udp_adapter.c)
     endif()
 endif()
 
-if(MUC_OPCUA_USER_AUTH)
-    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_USER_AUTH=1)
-endif()
-
-if(MUC_OPCUA_SERVICE_WRITE)
-    target_sources(muc_opcua PRIVATE services/write.c)
-    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_SERVICE_WRITE=1)
-endif()
-
-if(MUC_OPCUA_SERVICE_HISTORY)
-    target_sources(muc_opcua PRIVATE services/history.c core/service_dispatch/history_handler.c)
+# -- CU: Historical Access Server Facet --
+if(MUC_OPCUA_CU_HISTORICAL_ACCESS_SERVER_FACET)
+    file(GLOB _sources cu/core_2022_server/historical_access/*.c)
+    target_sources(muc_opcua PRIVATE ${_sources})
+    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_CU_HISTORICAL_ACCESS_SERVER_FACET=1)
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_SERVICE_HISTORY=1)
 endif()
 
-if(MUC_OPCUA_MULTIPLE_CONNECTIONS)
+# -- Define-only CU flags (gated entirely on CU symbols; legacy aliases kept
+# for include/ and tests/ backward compatibility) --
+if(MUC_OPCUA_CU_USER_AUTH)
+    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_CU_USER_AUTH=1)
+    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_USER_AUTH=1)
+endif()
+if(MUC_OPCUA_CU_MULTIPLE_CONNECTIONS)
+    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_CU_MULTIPLE_CONNECTIONS=1)
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_MULTIPLE_CONNECTIONS=1)
 endif()
-
-if(MUC_OPCUA_EVENTS)
+if(MUC_OPCUA_CU_EVENTS)
+    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_CU_EVENTS=1)
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_EVENTS=1)
 endif()
-
-if(MUC_OPCUA_DATA_ACCESS)
+if(MUC_OPCUA_CU_DATA_ACCESS)
+    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_CU_DATA_ACCESS=1)
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_DATA_ACCESS=1)
 endif()
-
-if(MUC_OPCUA_METHOD_SERVER)
+if(MUC_OPCUA_CU_METHOD_SERVER)
+    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_CU_METHOD_SERVER=1)
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_METHOD_SERVER=1)
 endif()
 
-if(MUC_OPCUA_EVENT_FILTER_WHERE)
-    target_sources(muc_opcua PRIVATE services/event_filter.c)
+# -- CU: Event Filter Where --
+if(MUC_OPCUA_CU_EVENT_FILTER_WHERE)
+    file(GLOB _sources cu/core_2022_server/event_filter_where/*.c)
+    target_sources(muc_opcua PRIVATE ${_sources})
+    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_CU_EVENT_FILTER_WHERE=1)
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_EVENT_FILTER_WHERE=1)
 endif()
 
-if(MUC_OPCUA_CUSTOM_METHODS)
+if(MUC_OPCUA_CU_CUSTOM_METHODS)
+    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_CU_CUSTOM_METHODS=1)
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_CUSTOM_METHODS=1)
 endif()
 
-if(MUC_OPCUA_REDUNDANCY)
-    target_sources(muc_opcua PRIVATE core/service_dispatch/transfer_handler.c)
+# -- CU: Redundancy (transfer subscriptions, OPC-10000-4 5.14) --
+if(MUC_OPCUA_CU_REDUNDANCY)
+    file(GLOB _sources cu/core_2022_server/redundancy/*.c)
+    target_sources(muc_opcua PRIVATE ${_sources})
+    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_CU_REDUNDANCY=1)
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_REDUNDANCY=1)
 endif()
 
-if(MUC_OPCUA_NAMESPACES)
+if(MUC_OPCUA_CU_NAMESPACES)
+    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_CU_NAMESPACES=1)
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_NAMESPACES=1)
 endif()
 
-if(MUC_OPCUA_STANDARD_PROFILE)
+if(MUC_OPCUA_MARKER_STANDARD_PROFILE)
+    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_MARKER_STANDARD_PROFILE=1)
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_STANDARD_PROFILE=1)
 endif()
 
-if(MUC_OPCUA_REVERSE_CONNECT)
+if(MUC_OPCUA_CU_REVERSE_CONNECT)
+    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_CU_REVERSE_CONNECT=1)
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_REVERSE_CONNECT=1)
 endif()
 
-if(MUC_OPCUA_SERVER_DIAGNOSTICS)
-    target_sources(muc_opcua PRIVATE services/diagnostics.c)
+# -- CU: Server Diagnostics --
+if(MUC_OPCUA_CU_DIAGNOSTICS)
+    file(GLOB _sources cu/core_2022_server/diagnostics/*.c)
+    target_sources(muc_opcua PRIVATE ${_sources})
+    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_CU_DIAGNOSTICS=1)
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_SERVER_DIAGNOSTICS=1)
 endif()
 
-if(MUC_OPCUA_DYNAMIC_NODES)
+if(MUC_OPCUA_CU_DYNAMIC_NODES)
+    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_CU_DYNAMIC_NODES=1)
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_DYNAMIC_NODES=1)
 endif()
-
-if(MUC_OPCUA_MULTI_CHUNK)
+if(MUC_OPCUA_CU_MULTI_CHUNK)
+    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_CU_MULTI_CHUNK=1)
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_MULTI_CHUNK=1)
 endif()
-
-if(MUC_OPCUA_SESSION_TIMEOUT)
+if(MUC_OPCUA_CU_SESSION_TIMEOUT)
+    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_CU_SESSION_TIMEOUT=1)
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_SESSION_TIMEOUT=1)
 endif()
-
-if(MUC_OPCUA_TIME_SYNC)
+if(MUC_OPCUA_CU_TIME_SYNC)
+    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_CU_TIME_SYNC=1)
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_TIME_SYNC=1)
 endif()
-
-if(MUC_OPCUA_EXTENDED_NODEIDS)
+if(MUC_OPCUA_CU_EXTENDED_NODEIDS)
+    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_CU_EXTENDED_NODEIDS=1)
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_EXTENDED_NODEIDS=1)
 endif()
 
-if(MUC_OPCUA_COMPLEX_TYPES)
-    target_sources(muc_opcua PRIVATE
-        address_space/complex_types.c
-        encoding/binary_complex.c
-    )
+# -- CU: Complex Types (address_space + encoding binary_complex) --
+if(MUC_OPCUA_CU_COMPLEX_TYPES)
+    file(GLOB _sources cu/core_2022_server/complex_types/*.c)
+    target_sources(muc_opcua PRIVATE ${_sources})
+    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_CU_COMPLEX_TYPES=1)
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_COMPLEX_TYPES=1)
 endif()
 
-if(MUC_OPCUA_AUDITING)
-    target_sources(muc_opcua PRIVATE services/audit_events.c)
+# -- CU: Auditing (server-side audit event generation) --
+if(MUC_OPCUA_CU_AUDITING)
+    file(GLOB _sources cu/core_2022_server/auditing/*.c)
+    target_sources(muc_opcua PRIVATE ${_sources})
+    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_CU_AUDITING=1)
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_AUDITING=1)
 endif()
 
-if(MUC_OPCUA_AGGREGATE_FULL)
+if(MUC_OPCUA_CU_AGGREGATE_FULL)
+    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_CU_AGGREGATE_FULL=1)
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_AGGREGATE_FULL=1)
 endif()
 
@@ -267,40 +337,52 @@ if(MUC_OPCUA_CLIENT_STANDARD)
 endif()
 
 
-# Spec 056: capacities are resolved in include/muc_opcua/capacities.h via the
-# default<profile<user cascade, NOT plumbed as per-macro -D from here. CMake's
-# only capacity responsibility is to declare WHICH profile is selected: emit one
-# MUC_OPCUA_PROFILE_<NAME> marker that capacities.h switches on (stage 2). The
-# integrator's public -DMU_MAX_* knobs reach the compiler directly and win
-# (stage 3). custom builds emit no marker and use the standard baseline (stage 1).
+# Capacities are resolved by Kconfig (int symbols in /Kconfig, sourced from the
+# manifest). gen_config.py writes resolved values to muc_opcua_config.cmake as
+# set(MUC_OPCUA_<SYM> <N>), which CMakeLists.txt includes before add_subdirectory(src).
+# Here we emit the public MU_MAX_* (and MU_MONITORED_*, MU_WHERE_*) compile
+# definitions that capacities.h stage 3 consumes, so any capacity change -- whether
+# via -DMU_MAX_SESSIONS=N (translated to the Kconfig fragment), menuconfig, or a
+# custom .config -- reaches the compiler through one path: Kconfig resolution.
+#
+# Legacy -DMU_MAX_*=N still works: CMakeLists.txt translates it to the Kconfig
+# fragment, Kconfig resolves it, and the resolved value becomes the compile definition.
 if(NOT MUC_OPCUA_PROFILE STREQUAL "custom")
     string(TOUPPER "${MUC_OPCUA_PROFILE}" MU_PROFILE_MARKER_SUFFIX)
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_PROFILE_${MU_PROFILE_MARKER_SUFFIX}=1)
 endif()
 
-# SecurityPolicy Basic256Sha256: the asym/sym chunk crypto and key derivation.
-# Excluded entirely from a None-only build to keep the embedded footprint minimal.
-# (security_policy.c stays in the core: it only provides shared policy/mode enums.)
-if(MUC_OPCUA_SECURITY)
-    target_sources(muc_opcua PRIVATE
-        security/key_derivation.c
-        security/certificate.c
-        security/asym_chunk/wrap.c
-        security/asym_chunk/unwrap.c
-        security/sym_chunk.c
-        security/trustlist.c
-    )
+# Emit resolved Kconfig capacity values as the public override macros consumed by
+# capacities.h stage 3 (#ifdef MU_MAX_SESSIONS -> #define MU_INTERN_* MU_MAX_*).
+foreach(_pair IN LISTS MUC_OPCUA_KCONFIG_CAPACITIES)
+    string(REPLACE "=" ";" _kv "${_pair}")
+    list(GET _kv 0 _kcfg_sym)
+    list(GET _kv 1 _legacy_var)
+    if(DEFINED MUC_OPCUA_${_kcfg_sym})
+        target_compile_definitions(muc_opcua PUBLIC ${_legacy_var}=${MUC_OPCUA_${_kcfg_sym}})
+    endif()
+endforeach()
+
+# -- Facet: Core 2022 Server security (Basic256Sha256 chunk crypto + key derivation) --
+# Security code is part of the Core 2022 Server Facet. security_policy.c stays
+# in the always-compiled core (shared policy/mode enums only). ECC
+# (security/ecc.c) is droppable and gated separately by CU_SECURITY_ECC below;
+# excluded from the FACET glob so non-ECC profiles pay no .text.
+if(MUC_OPCUA_FACET_CORE_2022_SERVER)
+    file(GLOB_RECURSE _sources cu/core_2022_server/security/*.c)
+    list(REMOVE_ITEM _sources
+        ${CMAKE_CURRENT_SOURCE_DIR}/cu/core_2022_server/security/ecc.c)
+    target_sources(muc_opcua PRIVATE ${_sources})
+    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_FACET_CORE_2022_SERVER=1)
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_SECURITY=1)
 endif()
 
-# ECC SecurityPolicies (spec 059). Droppable translation unit: absent unless
-# MUC_OPCUA_ECC is on, so profiles that exclude ECC pay no .text. Backend-specific
-# ECC implementations are added inside each MUC_OPCUA_HAVE_* block below.
-# MUC_OPCUA_ECC requiring MUC_OPCUA_SECURITY is enforced earlier, at the top of
-# CMakeLists.txt (MUC_OPCUA_FEATURE_DEPENDENCIES), before add_subdirectory(src)
-# ever runs -- this file can assume that invariant already holds.
-if(MUC_OPCUA_ECC)
-    target_sources(muc_opcua PRIVATE security/asym_ecc.c)
+# -- CU: Security ECC (spec 059) --
+# Droppable translation unit: absent unless MUC_OPCUA_CU_SECURITY_ECC is on.
+# Backend-specific ECC implementations are added inside each HAVE_* block below.
+if(MUC_OPCUA_CU_SECURITY_ECC)
+    target_sources(muc_opcua PRIVATE cu/core_2022_server/security/ecc.c)
+    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_CU_SECURITY_ECC=1)
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_ECC=1)
 endif()
 
@@ -311,7 +393,7 @@ if(MUC_OPCUA_IS_HOST)
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_MDNS_DISCOVERY=1)
 
     # The host crypto adapter (SecurityPolicy Basic256Sha256) is backed by OpenSSL.
-    if(MUC_OPCUA_SECURITY)
+    if(MUC_OPCUA_FACET_CORE_2022_SERVER)
         find_package(OpenSSL)
         if(OpenSSL_FOUND)
             target_sources(muc_opcua PRIVATE
@@ -321,7 +403,7 @@ if(MUC_OPCUA_IS_HOST)
                 platform/host_crypto/asymmetric.c
                 platform/host_crypto/sign.c
             )
-            if(MUC_OPCUA_ECC)
+            if(MUC_OPCUA_CU_SECURITY_ECC)
                 target_sources(muc_opcua PRIVATE platform/host_crypto/ecc.c)
             endif()
             target_link_libraries(muc_opcua PUBLIC OpenSSL::Crypto)
@@ -343,7 +425,7 @@ if(MUC_OPCUA_HAVE_WOLFSSL)
         platform/wolfssl_crypto/hash.c
         platform/wolfssl_crypto/sign.c
     )
-    if(MUC_OPCUA_ECC)
+    if(MUC_OPCUA_CU_SECURITY_ECC)
         target_sources(muc_opcua PRIVATE platform/wolfssl_crypto/ecc.c)
     endif()
     target_link_libraries(muc_opcua PUBLIC wolfssl)

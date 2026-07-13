@@ -11,7 +11,7 @@
 #include <mbedtls/sha1.h>
 #include <mbedtls/sha256.h>
 #include <mbedtls/x509_crt.h>
-#ifdef MUC_OPCUA_ECC
+#ifdef MUC_OPCUA_CU_SECURITY_ECC
 #include <mbedtls/chachapoly.h>
 #include <mbedtls/ecdh.h>
 #include <mbedtls/ecdsa.h>
@@ -27,7 +27,7 @@ struct mbedtls_crypto_context {
     const opcua_byte_t *key_der;
     size_t key_len;
     mbedtls_pk_context pk;
-#ifdef MUC_OPCUA_ECC
+#ifdef MUC_OPCUA_CU_SECURITY_ECC
     /* Optional ECC signing identity (spec 059), provisioned by
        mu_mbedtls_crypto_adapter_set_ecc_identity. Only nistP256 is supported;
        mbedTLS 2.x has no Ed25519, so curve25519 is never provisioned here. */
@@ -420,7 +420,7 @@ static opcua_statuscode_t m_get_certificate_thumbprint(void *context, const opcu
     return (ret == 0) ? MU_STATUS_GOOD : MU_STATUS_BAD_INTERNALERROR;
 }
 
-#ifdef MUC_OPCUA_ECC
+#ifdef MUC_OPCUA_CU_SECURITY_ECC
 
 /* mbedTLS 2.x has X25519 ECDH but no Ed25519 signatures, and the curve25519
    SecurityPolicy mandates Ed25519 — so a mbedTLS server can never complete a
@@ -711,7 +711,7 @@ opcua_statuscode_t mu_mbedtls_crypto_adapter_set_ecc_identity(mu_crypto_adapter_
     return MU_STATUS_GOOD;
 }
 
-#endif /* MUC_OPCUA_ECC */
+#endif /* MUC_OPCUA_CU_SECURITY_ECC */
 
 opcua_statuscode_t mu_mbedtls_crypto_adapter_init(mu_crypto_adapter_t *adapter, const opcua_byte_t *cert_der,
                                                   size_t cert_len, const opcua_byte_t *key_der, size_t key_len) {
@@ -762,7 +762,7 @@ opcua_statuscode_t mu_mbedtls_crypto_adapter_init(mu_crypto_adapter_t *adapter, 
     adapter->get_certificate_key_bits = m_get_certificate_key_bits;
     adapter->get_certificate_thumbprint = m_get_certificate_thumbprint;
     adapter->verify_certificate_validity = m_verify_certificate_validity;
-#ifdef MUC_OPCUA_ECC
+#ifdef MUC_OPCUA_CU_SECURITY_ECC
     /* ECC identity is provisioned separately via
        mu_mbedtls_crypto_adapter_set_ecc_identity; the vtable slots are wired
        unconditionally (nistP256 works; curve25519 fails closed — no Ed25519). */
@@ -786,7 +786,7 @@ void mu_mbedtls_crypto_adapter_cleanup(mu_crypto_adapter_t *adapter) {
     }
     struct mbedtls_crypto_context *ctx = (struct mbedtls_crypto_context *)adapter->context;
     mbedtls_pk_free(&ctx->pk);
-#ifdef MUC_OPCUA_ECC
+#ifdef MUC_OPCUA_CU_SECURITY_ECC
     if (ctx->ecc_provisioned) {
         mbedtls_pk_free(&ctx->ecc_pk);
     }

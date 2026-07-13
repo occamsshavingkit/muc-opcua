@@ -8,7 +8,7 @@
 #include "muc_opcua/platform.h" /* mu_entropy_adapter_t */
 #include "muc_opcua/status.h"
 #include "muc_opcua/types.h"
-#ifdef MUC_OPCUA_SECURITY
+#ifdef MUC_OPCUA_FACET_CORE_2022_SERVER
 #include "../security/sym_chunk.h" /* mu_sym_keys_t */
 #endif
 
@@ -29,7 +29,7 @@ typedef struct {
     /* Negotiated security (None unless a Basic256Sha256 OPN established keys). */
     mu_security_policy_id_t policy;
     mu_message_security_mode_t mode;
-#ifdef MUC_OPCUA_SECURITY
+#ifdef MUC_OPCUA_FACET_CORE_2022_SERVER
     mu_sym_keys_t client_keys; /* verify/decrypt inbound MSG (client->server) */
     mu_sym_keys_t server_keys; /* sign/encrypt outbound MSG (server->client) */
     bool keys_valid;

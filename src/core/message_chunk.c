@@ -4,7 +4,7 @@
 #include "uasc.h"
 #include <string.h>
 
-#ifdef MUC_OPCUA_MULTI_CHUNK
+#ifdef MUC_OPCUA_CU_MULTI_CHUNK
 void mu_chunk_assembler_init(mu_chunk_assembler_t *assembler) {
     if (!assembler)
         return;
@@ -17,7 +17,7 @@ void mu_chunk_assembler_reset(mu_chunk_assembler_t *assembler) {
     assembler->is_active = false;
     assembler->length = 0;
 }
-#endif /* MUC_OPCUA_MULTI_CHUNK */
+#endif /* MUC_OPCUA_CU_MULTI_CHUNK */
 
 opcua_statuscode_t mu_parse_message_header(const opcua_byte_t *buffer, size_t length, mu_message_header_t *header) {
     if (!buffer || !header) {
@@ -41,7 +41,7 @@ opcua_statuscode_t mu_parse_message_header(const opcua_byte_t *buffer, size_t le
         return MU_STATUS_BAD_TCPMESSAGETYPEINVALID;
     }
 
-#ifdef MUC_OPCUA_MULTI_CHUNK
+#ifdef MUC_OPCUA_CU_MULTI_CHUNK
     if (header->chunk_type != 'C' && header->chunk_type != 'F' && header->chunk_type != 'A') {
 #else
     if (header->chunk_type != 'F' && header->chunk_type != 'A') {
@@ -59,7 +59,7 @@ opcua_statuscode_t mu_parse_message_header(const opcua_byte_t *buffer, size_t le
         return MU_STATUS_BAD_TCPMESSAGETOOLARGE;
     }
 
-#ifdef MUC_OPCUA_MULTI_CHUNK
+#ifdef MUC_OPCUA_CU_MULTI_CHUNK
     if (header->chunk_type == 'C' && header->message_type[0] != 'M') {
         return MU_STATUS_BAD_TCPINTERNALERROR;
     }

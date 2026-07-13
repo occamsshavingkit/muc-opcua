@@ -53,7 +53,7 @@ static int mu_nodeid_compare_direct(const mu_nodeid_t *left, const mu_nodeid_t *
         }
         return memcmp(left->identifier.string.data, right->identifier.string.data, (size_t)len1);
     }
-#ifdef MUC_OPCUA_EXTENDED_NODEIDS
+#ifdef MUC_OPCUA_CU_EXTENDED_NODEIDS
     case MU_NODEID_GUID:
         return memcmp(left->identifier.guid, right->identifier.guid, 16);
     case MU_NODEID_OPAQUE:
@@ -67,7 +67,7 @@ static int mu_nodeid_compare_direct(const mu_nodeid_t *left, const mu_nodeid_t *
             return 0;
         }
         return memcmp(left->identifier.opaque.data, right->identifier.opaque.data, left->identifier.opaque.length);
-#endif /* MUC_OPCUA_EXTENDED_NODEIDS */
+#endif /* MUC_OPCUA_CU_EXTENDED_NODEIDS */
     default:
         return 0;
     }
@@ -174,7 +174,7 @@ opcua_boolean_t mu_nodeid_equal(const mu_nodeid_t *n1, const mu_nodeid_t *n2) {
         return memcmp(n1->identifier.string.data, n2->identifier.string.data, (size_t)n1->identifier.string.length) ==
                0;
 
-#ifdef MUC_OPCUA_EXTENDED_NODEIDS
+#ifdef MUC_OPCUA_CU_EXTENDED_NODEIDS
     case MU_NODEID_GUID:
         return memcmp(n1->identifier.guid, n2->identifier.guid, 16) == 0;
 
@@ -186,7 +186,7 @@ opcua_boolean_t mu_nodeid_equal(const mu_nodeid_t *n1, const mu_nodeid_t *n2) {
             return true;
         }
         return memcmp(n1->identifier.opaque.data, n2->identifier.opaque.data, n1->identifier.opaque.length) == 0;
-#endif /* MUC_OPCUA_EXTENDED_NODEIDS */
+#endif /* MUC_OPCUA_CU_EXTENDED_NODEIDS */
 
     default:
         return false;

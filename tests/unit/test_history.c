@@ -8,7 +8,7 @@
 void setUp(void) {}
 void tearDown(void) {}
 
-#ifdef MUC_OPCUA_SERVICE_HISTORY
+#ifdef MUC_OPCUA_CU_HISTORICAL_ACCESS_SERVER_FACET
 
 #include "../../src/core/server_internal.h"
 #include "../../src/services/history.h"
@@ -60,7 +60,7 @@ static void write_history_read_request_with_continuation_point(mu_binary_writer_
 }
 
 void test_history_read_decode(void) {
-#ifdef MUC_OPCUA_SERVICE_HISTORY
+#ifdef MUC_OPCUA_CU_HISTORICAL_ACCESS_SERVER_FACET
     opcua_byte_t buf[256];
     mu_binary_writer_t w;
     mu_binary_writer_init(&w, buf, sizeof(buf));
@@ -134,7 +134,7 @@ void test_history_read_decode(void) {
 }
 
 void test_history_read_details_extension_object_truncated_body_returns_decoding_error(void) {
-#ifdef MUC_OPCUA_SERVICE_HISTORY
+#ifdef MUC_OPCUA_CU_HISTORICAL_ACCESS_SERVER_FACET
     opcua_byte_t buf[256];
     mu_binary_writer_t w;
     const opcua_int32_t encoded_details_body_len = 22;
@@ -176,7 +176,7 @@ void test_history_read_details_extension_object_truncated_body_returns_decoding_
 }
 
 void test_history_read_decode_continuation_point_is_owned_from_request_buffer(void) {
-#ifdef MUC_OPCUA_SERVICE_HISTORY
+#ifdef MUC_OPCUA_CU_HISTORICAL_ACCESS_SERVER_FACET
     opcua_byte_t buf[256];
     const opcua_byte_t continuation_point[] = {'O', 'W', 'N', '1'};
     mu_binary_writer_t w;
@@ -233,7 +233,7 @@ void test_history_read_decode_continuation_point_is_owned_from_request_buffer(vo
 }
 
 void test_history_read_decode_continuation_point_stable_after_later_request_reuses_buffer(void) {
-#ifdef MUC_OPCUA_SERVICE_HISTORY
+#ifdef MUC_OPCUA_CU_HISTORICAL_ACCESS_SERVER_FACET
     opcua_byte_t buf[256];
     const opcua_byte_t first_continuation_point[] = {'F', 'I', 'R', 'S', 'T', '1'};
     const opcua_byte_t later_continuation_point[] = {'L', 'A', 'T', 'E', 'R', '2'};
@@ -279,7 +279,7 @@ void test_history_read_decode_continuation_point_stable_after_later_request_reus
 }
 
 void test_history_read_encode(void) {
-#ifdef MUC_OPCUA_SERVICE_HISTORY
+#ifdef MUC_OPCUA_CU_HISTORICAL_ACCESS_SERVER_FACET
     opcua_byte_t buf[256];
     mu_binary_writer_t w;
     mu_binary_writer_init(&w, buf, sizeof(buf));
@@ -411,7 +411,7 @@ static opcua_statuscode_t mock_read_raw_modified(void *context, const mu_nodeid_
 }
 
 void test_history_read_dispatch(void) {
-#ifdef MUC_OPCUA_SERVICE_HISTORY
+#ifdef MUC_OPCUA_CU_HISTORICAL_ACCESS_SERVER_FACET
     mu_history_adapter_t adapter;
     (void)memset(&adapter, 0, sizeof(adapter));
     adapter.read_raw_modified = mock_read_raw_modified;
@@ -566,7 +566,7 @@ void test_history_read_dispatch(void) {
 }
 
 void test_history_read_pagination(void) {
-#ifdef MUC_OPCUA_SERVICE_HISTORY
+#ifdef MUC_OPCUA_CU_HISTORICAL_ACCESS_SERVER_FACET
     mu_history_adapter_t adapter;
     (void)memset(&adapter, 0, sizeof(adapter));
     adapter.read_raw_modified = mock_read_raw_modified;
@@ -808,7 +808,7 @@ static opcua_statuscode_t mock_delete_raw_modified(void *context, const mu_nodei
 }
 
 void test_history_update_decode(void) {
-#ifdef MUC_OPCUA_SERVICE_HISTORY
+#ifdef MUC_OPCUA_CU_HISTORICAL_ACCESS_SERVER_FACET
     opcua_byte_t buf[256];
     mu_binary_writer_t w;
     mu_binary_writer_init(&w, buf, sizeof(buf));
@@ -881,7 +881,7 @@ void test_history_update_decode(void) {
 /* Feature 025 (F11): a negative ExtensionObject body length must be rejected as a
    decoding error, not used in (size_t) skip math. OPC-10000-6 §5.2.2.15. */
 void test_history_update_decode_rejects_negative_length(void) {
-#ifdef MUC_OPCUA_SERVICE_HISTORY
+#ifdef MUC_OPCUA_CU_HISTORICAL_ACCESS_SERVER_FACET
     opcua_byte_t buf[64];
     mu_binary_writer_t w;
     mu_binary_writer_init(&w, buf, sizeof(buf));
@@ -904,7 +904,7 @@ void test_history_update_decode_rejects_negative_length(void) {
 }
 
 void test_history_update_dispatch(void) {
-#ifdef MUC_OPCUA_SERVICE_HISTORY
+#ifdef MUC_OPCUA_CU_HISTORICAL_ACCESS_SERVER_FACET
     mu_history_adapter_t adapter;
     (void)memset(&adapter, 0, sizeof(adapter));
     adapter.update_data = mock_update_data;
@@ -1050,13 +1050,13 @@ void test_history_update_dispatch(void) {
 #endif
 }
 
-#endif // MUC_OPCUA_SERVICE_HISTORY
+#endif // MUC_OPCUA_CU_HISTORICAL_ACCESS_SERVER_FACET
 
 /* Feature 028 (T037): only ReadRawModifiedDetails is supported; a HistoryRead whose
    historyReadDetails ExtensionObject is any other type decodes to
    Bad_HistoryOperationUnsupported. OPC-10000-4 §5.11.3 (HistoryRead) / OPC-10000-11. */
 void test_history_read_unsupported_details_is_operation_unsupported(void) {
-#ifdef MUC_OPCUA_SERVICE_HISTORY
+#ifdef MUC_OPCUA_CU_HISTORICAL_ACCESS_SERVER_FACET
     opcua_byte_t buf[64];
     mu_binary_writer_t w;
     mu_binary_writer_init(&w, buf, sizeof(buf));
@@ -1075,7 +1075,7 @@ void test_history_read_unsupported_details_is_operation_unsupported(void) {
 
 int main(void) {
     UNITY_BEGIN();
-#ifdef MUC_OPCUA_SERVICE_HISTORY
+#ifdef MUC_OPCUA_CU_HISTORICAL_ACCESS_SERVER_FACET
     RUN_TEST(test_history_read_decode);
     RUN_TEST(test_history_read_unsupported_details_is_operation_unsupported);
     RUN_TEST(test_history_read_details_extension_object_truncated_body_returns_decoding_error);

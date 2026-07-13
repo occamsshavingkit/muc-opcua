@@ -31,38 +31,38 @@ foreach(TEST_SOURCE ${UNIT_TEST_SOURCES})
     set(RUN_TEST ON)
     if(TEST_NAME STREQUAL "test_node_management" OR TEST_NAME STREQUAL "test_node_management_errors" OR
        TEST_NAME STREQUAL "test_address_space_dynamic")
-        # These force-#define MUC_OPCUA_SERVICE_NODEMANAGEMENT 1 before including
+        # These force-#define MUC_OPCUA_CU_NODEMANAGEMENT 1 before including
         # server_internal.h so the test's own translation unit can see the
         # NodeManagement-only struct fields/prototypes -- safe ONLY when the
         # muc_opcua library itself is also built with this option on; otherwise
         # struct mu_server's layout and mu_browse_process_with_user_index's
         # signature disagree between the test and the library, corrupting the
         # call (this crashed test_address_space_dynamic before it was added here).
-        if(NOT MUC_OPCUA_SERVICE_NODEMANAGEMENT)
+        if(NOT MUC_OPCUA_CU_NODEMANAGEMENT)
             set(RUN_TEST OFF)
         endif()
     elseif(TEST_NAME STREQUAL "test_query_service" OR TEST_NAME STREQUAL "test_query_encoding")
-        if(NOT MUC_OPCUA_SERVICE_QUERY)
+        if(NOT MUC_OPCUA_CU_QUERY)
             set(RUN_TEST OFF)
         endif()
     elseif(TEST_NAME STREQUAL "test_history")
-        if(NOT MUC_OPCUA_SERVICE_HISTORY)
+        if(NOT MUC_OPCUA_CU_HISTORICAL_ACCESS_SERVER_FACET)
             set(RUN_TEST OFF)
         endif()
     elseif(TEST_NAME STREQUAL "test_alarms_conditions")
-        if(NOT MUC_OPCUA_EVENTS)
+        if(NOT MUC_OPCUA_CU_EVENTS)
             set(RUN_TEST OFF)
         endif()
     elseif(TEST_NAME STREQUAL "test_pubsub" OR TEST_NAME STREQUAL "test_uadp_encoding")
-        if(NOT MUC_OPCUA_PUBSUB)
+        if(NOT MUC_OPCUA_CU_PUBSUB)
             set(RUN_TEST OFF)
         endif()
     elseif(TEST_NAME STREQUAL "test_aggregate")
-        if(NOT MUC_OPCUA_SUBSCRIPTIONS_STANDARD)
+        if(NOT MUC_OPCUA_CU_SUBSCRIPTION_STANDARD)
             set(RUN_TEST OFF)
         endif()
     elseif(TEST_NAME STREQUAL "test_write_decoder" OR TEST_NAME STREQUAL "test_write_errors" OR TEST_NAME STREQUAL "test_write_service")
-        if(NOT MUC_OPCUA_SERVICE_WRITE)
+        if(NOT MUC_OPCUA_CU_CORE_2017_ATTRIBUTE_WRITE)
             set(RUN_TEST OFF)
         endif()
     elseif(TEST_NAME STREQUAL "test_cert_token_decoder" OR TEST_NAME STREQUAL "test_asym_chunk" OR
@@ -73,34 +73,36 @@ foreach(TEST_SOURCE ${UNIT_TEST_SOURCES})
            TEST_NAME STREQUAL "test_sym_chunk" OR TEST_NAME STREQUAL "test_wolfssl_adapter" OR
            TEST_NAME STREQUAL "test_security_policy_selection" OR TEST_NAME STREQUAL "test_certificate_validity")
         # These exercise src/security/**, src/platform/host_crypto_adapter.c, and
-        # mu_binary_read_certificate_identity_token, all excluded from the library
-        # entirely when MUC_OPCUA_SECURITY is off (nano/micro profiles) -- see
-        # src/CMakeLists.txt's `if(MUC_OPCUA_SECURITY) target_sources(...)` block.
-        if(NOT MUC_OPCUA_SECURITY)
+        # mu_binary_read_certificate_identity_token, all compiled as part of
+        # FACET_CORE_2022_SERVER (security code is always compiled for named
+        # profiles) -- see src/CMakeLists.txt's
+        # `if(MUC_OPCUA_FACET_CORE_2022_SERVER) target_sources(...)` block.
+        if(NOT MUC_OPCUA_FACET_CORE_2022_SERVER)
             set(RUN_TEST OFF)
         endif()
     elseif(TEST_NAME STREQUAL "test_ecc_crypto")
         # ECC SecurityPolicy primitives (spec 059): only meaningful when the ECC
-        # feature is built (which also implies MUC_OPCUA_SECURITY).
-        if(NOT MUC_OPCUA_ECC)
+        # feature is built (CU_SECURITY_ECC).
+        if(NOT MUC_OPCUA_CU_SECURITY_ECC)
             set(RUN_TEST OFF)
         endif()
     elseif(TEST_NAME STREQUAL "test_user_token_decoder")
         # mu_binary_read_username_identity_token is gated on
         # `defined(MUC_OPCUA_USER_AUTH) || defined(MUC_OPCUA_SECURITY)`
-        # (encoding/binary_reader.c), unlike the other security-only symbols above.
-        if(NOT MUC_OPCUA_USER_AUTH AND NOT MUC_OPCUA_SECURITY)
+        # (encoding/binary_reader.c).  Security code is always compiled now
+        # (FACET_CORE_2022_SERVER), so this test runs when either is on.
+        if(NOT MUC_OPCUA_CU_USER_AUTH AND NOT MUC_OPCUA_FACET_CORE_2022_SERVER)
             set(RUN_TEST OFF)
         endif()
     elseif(TEST_NAME STREQUAL "test_password_decrypt_zeroize")
-        # Uses mu_secure_zero from security/key_derivation.c (MUC_OPCUA_SECURITY).
-        if(NOT MUC_OPCUA_SECURITY)
+        # Uses mu_secure_zero from security/key_derivation.c (security code).
+        if(NOT MUC_OPCUA_FACET_CORE_2022_SERVER)
             set(RUN_TEST OFF)
         endif()
     elseif(TEST_NAME STREQUAL "test_read_browsename_namespace" OR
            TEST_NAME STREQUAL "test_read_timestamps_to_return")
         # Exercise browse/read service APIs.
-        if(NOT MUC_OPCUA_SERVICE_READ)
+        if(NOT MUC_OPCUA_CU_ATTRIBUTE_READ)
             set(RUN_TEST OFF)
         endif()
     elseif(TEST_NAME STREQUAL "test_nano_client")

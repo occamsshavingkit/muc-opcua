@@ -7,7 +7,7 @@
 void setUp(void) {}
 void tearDown(void) {}
 
-#ifdef MUC_OPCUA_SERVICE_QUERY
+#ifdef MUC_OPCUA_CU_QUERY
 
 static opcua_byte_t rx_buf[8192];
 static opcua_byte_t tx_buf[8192];
@@ -162,11 +162,11 @@ void test_query_first_content_filter_exceeding_fixed_capacity_returns_too_many_o
         mu_query_first_request_decode(&reader, &req, NULL, 0, filter_elements, 1, filter_operands, 1));
 }
 
-#endif /* MUC_OPCUA_SERVICE_QUERY */
+#endif /* MUC_OPCUA_CU_QUERY */
 
 int main(void) {
     UNITY_BEGIN();
-#ifdef MUC_OPCUA_SERVICE_QUERY
+#ifdef MUC_OPCUA_CU_QUERY
     RUN_TEST(test_query_first_empty_address_space);
     RUN_TEST(test_query_next_release);
     RUN_TEST(test_query_next_invalid_continuation_point_returns_bad_continuation_point_invalid);

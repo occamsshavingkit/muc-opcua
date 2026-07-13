@@ -331,7 +331,7 @@ void test_register_and_unregister_nodes(void) {
     mu_server_poll(server); /* ActivateSession */
 
     mu_server_poll(server); /* RegisterNodes */
-#ifdef MUC_OPCUA_SERVICE_REGISTER_NODES
+#ifdef MUC_OPCUA_CU_VIEW_REGISTERNODES
     TEST_ASSERT_EQUAL(ID_REGISTERNODESRESPONSE, parse_response(mock.last_write, mock.last_write_len, &body));
     {
         opcua_int32_t n;
@@ -347,7 +347,7 @@ void test_register_and_unregister_nodes(void) {
     TEST_ASSERT_EQUAL(ID_UNREGISTERNODESRESPONSE, parse_response(mock.last_write, mock.last_write_len, &body));
 #else
     /* RegisterNodes/UnregisterNodes aren't compiled into this profile at all
-       (their dispatch-table rows are #ifdef MUC_OPCUA_SERVICE_REGISTER_NODES),
+       (their dispatch-table rows are #ifdef MUC_OPCUA_CU_VIEW_REGISTERNODES),
        so both requests are correctly rejected as unsupported services. */
     TEST_ASSERT_EQUAL(MU_ID_SERVICEFAULT, parse_response(mock.last_write, mock.last_write_len, &body));
 

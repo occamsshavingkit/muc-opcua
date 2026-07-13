@@ -5,7 +5,7 @@
 #include <stddef.h>
 #include <string.h>
 
-#ifdef MUC_OPCUA_BASE_NODES
+#ifdef MUC_OPCUA_FACET_CORE_2022_SERVER
 
 /* Pooled strings to save flash */
 #if defined(__GNUC__) || defined(__clang__)
@@ -77,7 +77,7 @@ static const opcua_byte_t s_str_ServerRedundancy[] = "ServerRedundancy";
 static const opcua_byte_t s_str_Namespaces[] = "Namespaces";
 static const opcua_byte_t s_str_RedundancySupport[] = "RedundancySupport";
 static const opcua_byte_t s_str_ServiceLevel[] = "ServiceLevel";
-#if MUC_OPCUA_DATA_ACCESS
+#if MUC_OPCUA_CU_DATA_ACCESS
 /* Spec 060: Data Access type-system BrowseNames (OPC-10000-8 §5.3). */
 static const opcua_byte_t s_str_AnalogItemType[] = "AnalogItemType";
 static const opcua_byte_t s_str_AnalogUnitType[] = "AnalogUnitType";
@@ -116,18 +116,18 @@ static const opcua_byte_t s_str_urn_muc_opcua_server[] = "urn:muc-opcua:server";
 static const mu_reference_t s_root_refs[] = {{{0, MU_NODEID_NUMERIC, {35}}, {0, MU_NODEID_NUMERIC, {85}}, true},
                                              {{0, MU_NODEID_NUMERIC, {35}}, {0, MU_NODEID_NUMERIC, {86}}, true},
                                              {{0, MU_NODEID_NUMERIC, {35}}, {0, MU_NODEID_NUMERIC, {87}}, true},
-#if MUC_OPCUA_BASE_TYPE_SYSTEM
+#if MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER
                                              {{0, MU_NODEID_NUMERIC, {40}}, {0, MU_NODEID_NUMERIC, {61}}, true}
 #endif
 };
 
 static const mu_reference_t s_objects_refs[] = {{{0, MU_NODEID_NUMERIC, {35}}, {0, MU_NODEID_NUMERIC, {2253}}, true},
-#if MUC_OPCUA_BASE_TYPE_SYSTEM
+#if MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER
                                                 {{0, MU_NODEID_NUMERIC, {40}}, {0, MU_NODEID_NUMERIC, {61}}, true}
 #endif
 };
 
-#if MUC_OPCUA_BASE_TYPE_SYSTEM
+#if MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER
 static const mu_reference_t s_views_refs[] = {{{0, MU_NODEID_NUMERIC, {40}}, {0, MU_NODEID_NUMERIC, {61}}, true}};
 
 static const mu_reference_t s_types_refs[] = {{{0, MU_NODEID_NUMERIC, {35}}, {0, MU_NODEID_NUMERIC, {88}}, true},
@@ -196,7 +196,7 @@ static const mu_reference_t s_base_variable_type_refs[] = {
 
 static const mu_reference_t s_base_data_variable_type_refs[] = {
     {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {68}}, true},
-#if MUC_OPCUA_DATA_ACCESS
+#if MUC_OPCUA_CU_DATA_ACCESS
     /* Spec 060: BaseDataVariableType HasSubtype-> DataItemType (2365). */
     {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {2365}}, true}
 #endif
@@ -205,7 +205,7 @@ static const mu_reference_t s_base_data_variable_type_refs[] = {
 static const mu_reference_t s_property_type_ref[] = {
     {{0, MU_NODEID_NUMERIC, {40}}, {0, MU_NODEID_NUMERIC, {68}}, true}};
 
-#if MUC_OPCUA_DATA_ACCESS
+#if MUC_OPCUA_CU_DATA_ACCESS
 /* Spec 060 (OPC-10000-8 §5.3): Data Access VariableType subtype/property graph.
  * HasSubtype(45) forward refs live on the PARENT type node (matching the
  * BaseVariableType(62)->BaseDataVariableType(63) convention above); each type's
@@ -272,9 +272,9 @@ static const mu_reference_t s_da_analog_unit_type_refs[] = {
     {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {17500}}, true},
     {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {17501}}, true},
     {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {17502}}, true}};
-#endif /* MUC_OPCUA_DATA_ACCESS */
+#endif /* MUC_OPCUA_CU_DATA_ACCESS */
 
-#if MUC_OPCUA_SUBSCRIPTIONS_STANDARD
+#if MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
 static const mu_reference_t s_get_monitored_items_refs[] = {
     {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {11493}}, true},
     {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {11494}}, true}};
@@ -286,7 +286,7 @@ static const mu_reference_t s_resend_data_refs[] = {
    OutputArguments Property Values, served as Argument[] so a client can browse the
    signature. GetMonitoredItems(subscriptionId:UInt32) -> (serverHandles:UInt32[],
    clientHandles:UInt32[]); ResendData(subscriptionId:UInt32). ns0 UInt32 = i=7. */
-#if MUC_OPCUA_METHOD_SERVER
+#if MUC_OPCUA_CU_METHOD_SERVER
 static const opcua_byte_t s_arg_subscription_id[] = "SubscriptionId";
 static const opcua_byte_t s_arg_server_handles[] = "ServerHandles";
 static const opcua_byte_t s_arg_client_handles[] = "ClientHandles";
@@ -333,11 +333,11 @@ static const mu_reference_t s_server_refs[] = {{{0, MU_NODEID_NUMERIC, {47}}, {0
                                                {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {2255}}, true},
                                                {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {2256}}, true},
                                                {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {2268}}, true},
-#if MUC_OPCUA_BASE_TYPE_SYSTEM && MUC_OPCUA_SUBSCRIPTIONS_STANDARD
+#if MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER && MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
                                                {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {11492}}, true},
                                                {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {12873}}, true},
 #endif
-#if MUC_OPCUA_BASE_TYPE_SYSTEM
+#if MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER
                                                {{0, MU_NODEID_NUMERIC, {40}}, {0, MU_NODEID_NUMERIC, {2004}}, true}
 #endif
 };
@@ -346,7 +346,7 @@ static const mu_reference_t s_server_status_refs[] = {
     {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {2259}}, true},
     {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {2258}}, true},
     {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {2257}}, true},
-#if MUC_OPCUA_BASE_TYPE_SYSTEM
+#if MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER
     {{0, MU_NODEID_NUMERIC, {40}}, {0, MU_NODEID_NUMERIC, {63}}, true}
 #endif
 };
@@ -357,7 +357,7 @@ static const mu_reference_t s_server_capabilities_refs[] = {
     {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {11702}}, true}, /* MaxArrayLength */
     {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {11703}}, true}, /* MaxStringLength */
     {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {11704}}, true},
-#if MUC_OPCUA_BASE_TYPE_SYSTEM
+#if MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER
     {{0, MU_NODEID_NUMERIC, {40}}, {0, MU_NODEID_NUMERIC, {58}}, true}
 #endif
 };
@@ -367,7 +367,7 @@ static const mu_reference_t s_operation_limits_refs[] = {
     {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {11707}}, true}, /* MaxNodesPerWrite */
     {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {11714}}, true}, /* MaxMonitoredItemsPerCall */
     {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {11710}}, true},
-#if MUC_OPCUA_BASE_TYPE_SYSTEM
+#if MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER
     {{0, MU_NODEID_NUMERIC, {40}}, {0, MU_NODEID_NUMERIC, {58}}, true}
 #endif
 };
@@ -388,9 +388,9 @@ static const mu_value_source_t s_server_status_state_value = {
     MU_VALUESOURCE_STATIC, {.static_value = {.type = MU_TYPE_INT32, .value.i32 = 0}}};
 
 static const mu_string_t s_server_profile_array[] = {
-#if MUC_OPCUA_STANDARD_PROFILE
+#if MUC_OPCUA_MARKER_STANDARD_PROFILE
     {57, s_str_http___opcfoundation_org_UA_Profile_Server_StandardUA2017}
-#elif MUC_OPCUA_BASE_TYPE_SYSTEM
+#elif MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER
     {57, s_str_http___opcfoundation_org_UA_Profile_Server_EmbeddedUA2017}
 #else
     {65, s_str_http___opcfoundation_org_UA_Profile_Server_NanoEmbeddedDevice2017}
@@ -430,7 +430,7 @@ static const mu_value_source_t s_max_array_length_value = {
 static const mu_value_source_t s_max_string_length_value = {
     MU_VALUESOURCE_STATIC, {.static_value = {.type = MU_TYPE_UINT32, .value.ui32 = MU_MAX_ENCODED_STRING_LENGTH}}};
 
-#if MUC_OPCUA_BASE_TYPE_SYSTEM
+#if MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER
 static const mu_node_t s_base_nodes[] = {
     {{0, MU_NODEID_NUMERIC, {1}},
      MU_NODECLASS_DATATYPE,
@@ -696,7 +696,7 @@ static const mu_node_t s_base_nodes[] = {
      0,
      NULL,
      .type_definition = {0}},
-#if MUC_OPCUA_DATA_ACCESS
+#if MUC_OPCUA_CU_DATA_ACCESS
     /* Spec 060: ModellingRule targets so a property's HasModellingRule resolves. */
     {{0, MU_NODEID_NUMERIC, {78}},
      MU_NODECLASS_OBJECT,
@@ -851,7 +851,7 @@ static const mu_node_t s_base_nodes[] = {
      sizeof(s_property_type_ref) / sizeof(s_property_type_ref[0]),
      &s_locale_id_array_value,
      .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
-#if MUC_OPCUA_DATA_ACCESS
+#if MUC_OPCUA_CU_DATA_ACCESS
     /* Spec 060: Data Access types + property instance-declarations (2365..11461). */
     {{0, MU_NODEID_NUMERIC, {2365}},
      MU_NODECLASS_VARIABLETYPE,
@@ -981,8 +981,8 @@ static const mu_node_t s_base_nodes[] = {
      sizeof(s_da_prop_mandatory_refs) / sizeof(s_da_prop_mandatory_refs[0]),
      NULL,
      .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
-#endif /* MUC_OPCUA_DATA_ACCESS */
-#if MUC_OPCUA_SUBSCRIPTIONS_STANDARD
+#endif /* MUC_OPCUA_CU_DATA_ACCESS */
+#if MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
     {{0, MU_NODEID_NUMERIC, {11492}},
      MU_NODECLASS_METHOD,
      {17, s_str_GetMonitoredItems},
@@ -1067,7 +1067,7 @@ static const mu_node_t s_base_nodes[] = {
      sizeof(s_property_type_ref) / sizeof(s_property_type_ref[0]),
      &s_max_monitored_items_per_call_value,
      .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
-#if MUC_OPCUA_SUBSCRIPTIONS_STANDARD
+#if MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
     {{0, MU_NODEID_NUMERIC, {12873}},
      MU_NODECLASS_METHOD,
      {10, s_str_ResendData},
@@ -1085,7 +1085,7 @@ static const mu_node_t s_base_nodes[] = {
      MU_RESEND_INPUT_VALUE,
      .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
 #endif
-#if MUC_OPCUA_DATA_ACCESS
+#if MUC_OPCUA_CU_DATA_ACCESS
     /* Spec 060: BaseAnalogType + AnalogUnitType and their property instances
      * (15318..17569), sorted after all preceding NodeIds. */
     {{0, MU_NODEID_NUMERIC, {15318}},
@@ -1152,7 +1152,7 @@ static const mu_node_t s_base_nodes[] = {
      sizeof(s_da_prop_optional_refs) / sizeof(s_da_prop_optional_refs[0]),
      NULL,
      .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
-#endif /* MUC_OPCUA_DATA_ACCESS */
+#endif /* MUC_OPCUA_CU_DATA_ACCESS */
 };
 #else
 static const mu_node_t s_base_nodes[] = {
@@ -1311,7 +1311,7 @@ static const mu_node_t s_base_nodes[] = {
      0,
      &s_max_monitored_items_per_call_value,
      .type_definition = {0}},
-#if MUC_OPCUA_REDUNDANCY || MUC_OPCUA_STANDARD_PROFILE
+#if MUC_OPCUA_CU_REDUNDANCY || MUC_OPCUA_MARKER_STANDARD_PROFILE
     {{0, MU_NODEID_NUMERIC, {2296}},
      MU_NODECLASS_OBJECT,
      {16, s_str_ServerRedundancy},
@@ -1328,13 +1328,13 @@ static const mu_node_t s_base_nodes[] = {
 static const mu_address_space_t s_base_space = {s_base_nodes, sizeof(s_base_nodes) / sizeof(s_base_nodes[0])};
 #else
 static const mu_address_space_t s_base_space = {NULL, 0};
-#endif /* MUC_OPCUA_BASE_NODES */
+#endif /* MUC_OPCUA_FACET_CORE_2022_SERVER */
 
 const mu_address_space_t *mu_base_address_space(void) {
     return &s_base_space;
 }
 
-#ifdef MUC_OPCUA_BASE_NODES
+#ifdef MUC_OPCUA_FACET_CORE_2022_SERVER
 static opcua_statuscode_t base_status_time_read(void *ctx, const mu_nodeid_t *id, mu_variant_t *v) {
     const mu_base_runtime_t *rt = (const mu_base_runtime_t *)ctx;
 
@@ -1347,9 +1347,9 @@ static opcua_statuscode_t base_status_time_read(void *ctx, const mu_nodeid_t *id
     }
     return MU_STATUS_GOOD;
 }
-#endif /* MUC_OPCUA_BASE_NODES */
+#endif /* MUC_OPCUA_FACET_CORE_2022_SERVER */
 
-#if defined(MUC_OPCUA_BASE_NODES) && MUC_OPCUA_SERVER_DIAGNOSTICS
+#if defined(MUC_OPCUA_FACET_CORE_2022_SERVER) && MUC_OPCUA_CU_DIAGNOSTICS
 /* Live ServerDiagnosticsSummary (2275): emit the caller-owned counter struct as a scalar
    ServerDiagnosticsSummaryDataType ExtensionObject. The encoder reads value.array as a
    const mu_diagnostics_summary_t* (12 x UInt32, OPC-10000-5 §12.9). */
@@ -1376,18 +1376,18 @@ static opcua_statuscode_t base_diagnostics_enabled_read(void *context, const mu_
 #endif
 
 void mu_base_runtime_init(mu_base_runtime_nodes_t *s, const mu_time_adapter_t *time, opcua_datetime_t start_time
-#if MUC_OPCUA_SERVER_DIAGNOSTICS
+#if MUC_OPCUA_CU_DIAGNOSTICS
                           ,
                           const mu_diagnostics_summary_t *diag
 #endif
 ) {
     s->rt.time = time;
     s->rt.start_time = start_time;
-#if MUC_OPCUA_SERVER_DIAGNOSTICS
+#if MUC_OPCUA_CU_DIAGNOSTICS
     s->rt.diag = diag;
 #endif
 
-#ifdef MUC_OPCUA_BASE_NODES
+#ifdef MUC_OPCUA_FACET_CORE_2022_SERVER
     s->values[0].type = MU_VALUESOURCE_CALLBACK;
     s->values[0].data.callback.read = base_status_time_read;
     s->values[0].data.callback.context = &s->rt;
@@ -1395,7 +1395,7 @@ void mu_base_runtime_init(mu_base_runtime_nodes_t *s, const mu_time_adapter_t *t
     s->values[1].data.callback.read = base_status_time_read;
     s->values[1].data.callback.context = &s->rt;
 
-#if MUC_OPCUA_BASE_TYPE_SYSTEM
+#if MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER
     const mu_reference_t *const type_ref = s_property_type_ref;
     const size_t type_ref_cnt = sizeof(s_property_type_ref) / sizeof(s_property_type_ref[0]);
     const mu_nodeid_t type_def = {0, MU_NODEID_NUMERIC, {.numeric = 68}};
@@ -1424,7 +1424,7 @@ void mu_base_runtime_init(mu_base_runtime_nodes_t *s, const mu_time_adapter_t *t
         .value = &s->values[1],
         .type_definition = type_def};
 
-#if MUC_OPCUA_SERVER_DIAGNOSTICS
+#if MUC_OPCUA_CU_DIAGNOSTICS
     /* Base Server Behaviour facet (spec 064): the ServerDiagnostics object tree.
        ServerDiagnostics(2274) Object, ServerDiagnosticsSummary(2275) live Variable,
        EnabledFlag(2294) Variable. Read-addressable by NodeId (OPC-10000-5 §6.3.3). */
@@ -1465,7 +1465,7 @@ void mu_base_runtime_init(mu_base_runtime_nodes_t *s, const mu_time_adapter_t *t
         .type_definition = {0, MU_NODEID_NUMERIC, {.numeric = 68u}}}; /* PropertyType */
 #endif
 
-#if MUC_OPCUA_REDUNDANCY
+#if MUC_OPCUA_CU_REDUNDANCY
     /* Client Redundancy facet (spec 066): Server.ServerRedundancy.RedundancySupport
        (i=3709) advertises the redundancy mode. This server supports client redundancy
        via TransferSubscriptions without being itself redundant -> None (0), the
@@ -1490,7 +1490,7 @@ void mu_base_runtime_init(mu_base_runtime_nodes_t *s, const mu_time_adapter_t *t
 #else
     s->space.nodes = NULL;
     s->space.node_count = 0;
-#endif /* MUC_OPCUA_BASE_NODES */
+#endif /* MUC_OPCUA_FACET_CORE_2022_SERVER */
 }
 
 const mu_node_t *mu_resolve_node(const mu_address_space_t *user, mu_address_space_index_t *user_index,
@@ -1510,7 +1510,7 @@ const mu_node_t *mu_resolve_node(const mu_address_space_t *user, mu_address_spac
     return mu_address_space_find_node(mu_base_address_space(), NULL, node_id);
 }
 
-#if MUC_OPCUA_DATA_ACCESS
+#if MUC_OPCUA_CU_DATA_ACCESS
 bool mu_resolve_eurange_span(const mu_address_space_t *user, mu_address_space_index_t *user_index,
                              const mu_address_space_t *dynamic, const mu_node_t *node, double *out_span) {
     if (node == NULL || node->references == NULL || out_span == NULL) {

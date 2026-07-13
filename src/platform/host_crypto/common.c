@@ -46,7 +46,7 @@ static int build_self_signed(struct host_crypto_context *cx) {
     return make_self_signed(cx->key, EVP_sha256(), &cx->cert_der, &cx->cert_der_len);
 }
 
-#ifdef MUC_OPCUA_ECC
+#ifdef MUC_OPCUA_CU_SECURITY_ECC
 /* Generate the per-curve server ECC identities. A failure here is non-fatal to
    RSA policies, so init keeps the adapter usable and simply leaves the ECC keys
    NULL (ECC sign then reports Bad_SecurityChecksFailed). */
@@ -112,7 +112,7 @@ opcua_statuscode_t mu_host_crypto_adapter_init(mu_crypto_adapter_t *adapter) {
     adapter->get_certificate_thumbprint = h_get_certificate_thumbprint;
     adapter->verify_certificate_validity = h_verify_certificate_validity;
     adapter->verify_certificate_application_uri = h_verify_certificate_application_uri;
-#ifdef MUC_OPCUA_ECC
+#ifdef MUC_OPCUA_CU_SECURITY_ECC
     build_ecc_identities(cx);
     adapter->ecc_generate_ephemeral = h_ecc_generate_ephemeral;
     adapter->ecc_ecdh_derive = h_ecc_ecdh_derive;
@@ -137,7 +137,7 @@ void mu_host_crypto_adapter_cleanup(mu_crypto_adapter_t *adapter) {
     if (cx->cert_der) {
         OPENSSL_free(cx->cert_der);
     }
-#ifdef MUC_OPCUA_ECC
+#ifdef MUC_OPCUA_CU_SECURITY_ECC
     if (cx->ed25519_key) {
         EVP_PKEY_free(cx->ed25519_key);
     }

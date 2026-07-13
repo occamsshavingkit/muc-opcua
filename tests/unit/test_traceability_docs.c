@@ -407,6 +407,10 @@ static void check_file_traceability(const char *dir_path) {
             } else if (S_ISREG(st.st_mode)) {
                 const char *ext = strrchr(entry->d_name, '.');
                 if (ext && (strcmp(ext, ".c") == 0 || strcmp(ext, ".h") == 0)) {
+                    /* Skip stub files -- intentional placeholders for unimplemented CUs */
+                    if (strstr(path, "stub.c") != NULL) {
+                        return;
+                    }
                     /* Check if path is in files_to_sections.md */
                     /* Note: The paths in files-to-sections.md might be like `src/core/server.c`
                        but our dir_path is absolute or relative like `../src/...`

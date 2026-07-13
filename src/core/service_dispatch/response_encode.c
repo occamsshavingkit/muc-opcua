@@ -1,6 +1,6 @@
 #include "common.h"
 
-#ifdef MUC_OPCUA_TIME_SYNC
+#ifdef MUC_OPCUA_CU_TIME_SYNC
 static opcua_datetime_t resolve_timestamp(const mu_server_t *server) {
     if (server && server->config.time_adapter.get_time) {
         return server->config.time_adapter.get_time(server->config.time_adapter.context);
@@ -11,7 +11,7 @@ static opcua_datetime_t resolve_timestamp(const mu_server_t *server) {
 
 opcua_statuscode_t write_response_prefix(mu_binary_writer_t *w, opcua_uint32_t response_type_id,
                                          opcua_uint32_t request_handle, opcua_statuscode_t service_result
-#ifdef MUC_OPCUA_TIME_SYNC
+#ifdef MUC_OPCUA_CU_TIME_SYNC
                                          ,
                                          const mu_server_t *server
 #endif
@@ -23,7 +23,7 @@ opcua_statuscode_t write_response_prefix(mu_binary_writer_t *w, opcua_uint32_t r
     }
 
     mu_response_header_t rh;
-#ifdef MUC_OPCUA_TIME_SYNC
+#ifdef MUC_OPCUA_CU_TIME_SYNC
     rh.timestamp = resolve_timestamp(server);
 #else
     rh.timestamp = 0;
@@ -35,7 +35,7 @@ opcua_statuscode_t write_response_prefix(mu_binary_writer_t *w, opcua_uint32_t r
 
 opcua_statuscode_t mu_write_service_fault(opcua_byte_t *buffer, size_t *length, opcua_uint32_t request_handle,
                                           opcua_statuscode_t service_result
-#ifdef MUC_OPCUA_TIME_SYNC
+#ifdef MUC_OPCUA_CU_TIME_SYNC
                                           ,
                                           const mu_server_t *server
 #endif
@@ -54,7 +54,7 @@ opcua_statuscode_t mu_write_service_fault(opcua_byte_t *buffer, size_t *length, 
     }
 
     mu_response_header_t rh;
-#ifdef MUC_OPCUA_TIME_SYNC
+#ifdef MUC_OPCUA_CU_TIME_SYNC
     rh.timestamp = resolve_timestamp(server);
 #else
     rh.timestamp = 0;

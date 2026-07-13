@@ -39,14 +39,14 @@ target_link_libraries(test_view_services PRIVATE muc_opcua muc_opcua_test_suppor
 target_include_directories(test_view_services PRIVATE ${CMAKE_SOURCE_DIR}/src)
 add_test(NAME test_view_services COMMAND test_view_services)
 
-if(MUC_OPCUA_SUBSCRIPTIONS)
+if(MUC_OPCUA_CU_SUBSCRIPTION_BASIC)
     add_executable(test_subscriptions test_subscriptions.c)
     target_link_libraries(test_subscriptions PRIVATE muc_opcua muc_opcua_test_support unity)
     target_include_directories(test_subscriptions PRIVATE ${CMAKE_SOURCE_DIR}/src)
     add_test(NAME test_subscriptions COMMAND test_subscriptions)
 endif()
 
-if(MUC_OPCUA_USER_AUTH)
+if(MUC_OPCUA_CU_USER_AUTH)
     add_executable(test_user_auth_plaintext test_user_auth_plaintext.c)
     target_link_libraries(test_user_auth_plaintext PRIVATE muc_opcua muc_opcua_test_support unity)
     target_include_directories(test_user_auth_plaintext PRIVATE ${CMAKE_SOURCE_DIR}/src)
@@ -58,14 +58,12 @@ if(MUC_OPCUA_USER_AUTH)
     add_test(NAME test_user_auth_encrypted COMMAND test_user_auth_encrypted)
 endif()
 
-if(MUC_OPCUA_USER_AUTH AND MUC_OPCUA_SECURITY)
-    # Certificate user tokens need both: MUC_OPCUA_USER_AUTH for ActivateSession's
-    # username/certificate token dispatch, and MUC_OPCUA_SECURITY for
-    # mu_binary_read_certificate_identity_token (encoding/binary_reader.c is
-    # #ifdef MUC_OPCUA_SECURITY for that decoder, a separate condition from the
-    # username-token decoder above which only needs MUC_OPCUA_USER_AUTH). The
-    # Micro profile enables USER_AUTH but not SECURITY, so this test does not
-    # apply there.
+if(MUC_OPCUA_CU_USER_AUTH)
+    # Certificate user tokens need CU_USER_AUTH for ActivateSession's
+    # username/certificate token dispatch. The security code (certificate
+    # identity token decoder in encoding/binary_reader.c) is now always
+    # compiled as part of FACET_CORE_2022_SERVER, so this test applies to all
+    # profiles where user auth is enabled.
     add_executable(test_user_auth_certificate test_user_auth_certificate.c)
     target_link_libraries(test_user_auth_certificate PRIVATE muc_opcua muc_opcua_test_support unity)
     target_include_directories(test_user_auth_certificate PRIVATE ${CMAKE_SOURCE_DIR}/src)
@@ -77,7 +75,7 @@ if(MUC_OPCUA_USER_AUTH AND MUC_OPCUA_SECURITY)
     add_test(NAME test_user_auth_secure_e2e COMMAND test_user_auth_secure_e2e)
 endif()
 
-if(MUC_OPCUA_SERVICE_WRITE)
+if(MUC_OPCUA_CU_CORE_2017_ATTRIBUTE_WRITE)
     add_executable(test_write_service_integration test_write_service.c)
     target_link_libraries(test_write_service_integration PRIVATE muc_opcua muc_opcua_test_support unity)
     target_include_directories(test_write_service_integration PRIVATE ${CMAKE_SOURCE_DIR}/src)
@@ -91,14 +89,14 @@ add_test(NAME test_secure_handshake_modern COMMAND test_secure_handshake_modern)
 
 # ECC SecurityPolicies (spec 059): full client<->server ECC secure-channel handshake
 # (curve25519 + nistP256). Only meaningful when the ECC feature is compiled in.
-if(MUC_OPCUA_ECC)
+if(MUC_OPCUA_CU_SECURITY_ECC)
     add_executable(test_ecc_handshake_e2e test_ecc_handshake_e2e.c)
     target_link_libraries(test_ecc_handshake_e2e PRIVATE muc_opcua muc_opcua_test_support unity)
     target_include_directories(test_ecc_handshake_e2e PRIVATE ${CMAKE_SOURCE_DIR}/src)
     add_test(NAME test_ecc_handshake_e2e COMMAND test_ecc_handshake_e2e)
 endif()
 
-if(MUC_OPCUA_EVENTS)
+if(MUC_OPCUA_CU_EVENTS)
     add_executable(test_event_notifications test_event_notifications.c)
     target_link_libraries(test_event_notifications PRIVATE muc_opcua muc_opcua_test_support unity)
     target_include_directories(test_event_notifications PRIVATE ${CMAKE_SOURCE_DIR}/src)

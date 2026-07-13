@@ -68,7 +68,7 @@ void mu_service_dispatch_set_opn_client_cert(mu_server_t *server, const mu_bytes
     }
 
     server->opn_pending_client_cert = *client_cert;
-#ifdef MUC_OPCUA_SECURITY
+#ifdef MUC_OPCUA_FACET_CORE_2022_SERVER
     if (client_cert->length > 0 && client_cert->data != NULL &&
         (size_t)client_cert->length <= sizeof(server->channel_client_cert)) {
         memcpy(server->channel_client_cert, client_cert->data, (size_t)client_cert->length);
@@ -79,7 +79,7 @@ void mu_service_dispatch_set_opn_client_cert(mu_server_t *server, const mu_bytes
 #endif
 }
 
-#ifdef MUC_OPCUA_SECURITY
+#ifdef MUC_OPCUA_FACET_CORE_2022_SERVER
 const mu_bytestring_t *current_opn_client_cert(const mu_server_t *server) {
     if (server == NULL) {
         return NULL;

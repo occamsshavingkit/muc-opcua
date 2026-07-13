@@ -11,7 +11,7 @@
 #ifdef MUC_OPCUA_HAVE_WOLFSSL
 #include "common.h"
 
-#ifdef MUC_OPCUA_ECC
+#ifdef MUC_OPCUA_CU_SECURITY_ECC
 #include "../wolfssl_crypto_adapter.h"
 #include <wolfssl/wolfcrypt/asn_public.h>
 
@@ -381,7 +381,7 @@ opcua_statuscode_t w_chacha20_poly1305_decrypt(void *context, const opcua_byte_t
     return MU_STATUS_GOOD;
 }
 
-#endif /* MUC_OPCUA_ECC */
+#endif /* MUC_OPCUA_CU_SECURITY_ECC */
 #else
 typedef int mu_wolfssl_dummy_ecc;
 #endif /* MUC_OPCUA_HAVE_WOLFSSL */

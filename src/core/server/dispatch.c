@@ -1,7 +1,7 @@
 /* src/core/server/dispatch.c */
 #include "common.h"
 
-#if MUC_OPCUA_METHOD_SERVER
+#if MUC_OPCUA_CU_METHOD_SERVER
 static void store_method_registration(mu_server_t *server, size_t idx, const mu_nodeid_t *method_id,
                                       mu_method_callback_t callback, void *context, const mu_argument_t *input_args,
                                       size_t input_count, const mu_argument_t *output_args, size_t output_count,

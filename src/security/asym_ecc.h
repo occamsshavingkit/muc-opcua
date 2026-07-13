@@ -1,12 +1,12 @@
 /* src/security/asym_ecc.h
  * ECC SecurityPolicy handshake helpers (spec 059): ephemeral-ECDH channel key
- * derivation per OPC-10000-6 §6.8.1. Compiled only under MUC_OPCUA_ECC. */
+ * derivation per OPC-10000-6 §6.8.1. Compiled only under MUC_OPCUA_CU_SECURITY_ECC. */
 #ifndef MUC_OPCUA_ASYM_ECC_H
 #define MUC_OPCUA_ASYM_ECC_H
 
 #include "muc_opcua/config.h"
 
-#ifdef MUC_OPCUA_ECC
+#ifdef MUC_OPCUA_CU_SECURITY_ECC
 
 #include "muc_opcua/platform.h"
 #include "muc_opcua/status.h"
@@ -27,5 +27,5 @@ opcua_statuscode_t mu_ecc_derive_channel_keys(const mu_crypto_adapter_t *crypto,
                                               const opcua_byte_t *client_nonce, size_t client_nonce_len,
                                               mu_sym_keys_t *out_keys);
 
-#endif /* MUC_OPCUA_ECC */
+#endif /* MUC_OPCUA_CU_SECURITY_ECC */
 #endif /* MUC_OPCUA_ASYM_ECC_H */

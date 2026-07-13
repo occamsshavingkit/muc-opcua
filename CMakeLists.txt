@@ -15,11 +15,12 @@ set(MUC_OPCUA_CLIENT_PROFILE "none" CACHE STRING "Target OPC UA client profile (
 
 # Legacy shorthand: -DMUC_OPCUA_EMBEDDED_PROFILE=ON / -DMUC_OPCUA_STANDARD_PROFILE=ON
 # select a profile without naming MUC_OPCUA_PROFILE. Promote them to the string
-# profile here, BEFORE the reset loop below -- that loop force-clears every
-# profile-controlled option (including these booleans) whenever the profile is not
-# "custom", so a boolean passed on its own would otherwise be silently clobbered
-# back to OFF and produce a nano build. STANDARD wins over EMBEDDED (it is the
-# larger superset).
+# profile here, which in turn selects configs/<profile>.defconfig as the Kconfig
+# base. The defconfig sets the corresponding OPC-named profile choice symbol
+# (MUC_OPCUA_PROFILE_STANDARD_2017_UA_SERVER /
+# MUC_OPCUA_PROFILE_EMBEDDED_2017_UA_SERVER; OPC-10000-7 §4.3) that drives the
+# internal cascade symbols seeding Facet/CU/capacity defaults. STANDARD wins
+# over EMBEDDED (it is the larger superset).
 if(NOT MUC_OPCUA_PROFILE_EXPLICIT)
     if(MUC_OPCUA_STANDARD_PROFILE)
         set(MUC_OPCUA_PROFILE "standard" CACHE STRING "Target OPC UA profile" FORCE)
@@ -37,40 +38,146 @@ if((MUC_OPCUA_BUILD_TESTS OR MUC_OPCUA_BUILD_EXAMPLES OR MUC_OPCUA_BUILD_FUZZERS
     set(MUC_OPCUA_PROFILE "full" CACHE STRING "Target OPC UA profile" FORCE)
 endif()
 
-# --- Kconfig-driven feature resolution (kconfiglib, vendored) ----------------
+# --- Kconfig-driven feature + capacity resolution (kconfiglib, vendored) ------
 # Feature symbol values come from /Kconfig. The profile string selects
 # configs/<profile>.defconfig; any legacy -DMUC_OPCUA_<X>=ON/OFF is translated to a
 # Kconfig override fragment merged on top (Kconfig `depends on` still vetoes a
 # dependency-violating override). The generated muc_opcua_config.cmake sets
-# MUC_OPCUA_<X> ON/OFF, which src/CMakeLists.txt uses for source selection AND its
-# target_compile_definitions -- so the -D the compiler sees is byte-identical to the
-# pre-Kconfig build. This replaces the option()/apply_profile_option/reset-loop +
-# per-profile blocks + FEATURE_DEPENDENCIES machinery. Capacities stay in
-# capacities.h (keyed on the MUC_OPCUA_PROFILE_<NAME> marker src/CMakeLists.txt emits).
+# MUC_OPCUA_<X> ON/OFF for bool symbols and MUC_OPCUA_<X> <N> for int symbols
+# (capacities). src/CMakeLists.txt consumes both: bools drive source selection
+# and target_compile_definitions; capacity ints are emitted as the public
+# MU_MAX_* compile definitions that capacities.h stage 3 consumes. Legacy
+# -DMU_MAX_*=N overrides are translated to the Kconfig fragment below, so the
+# resolved Kconfig value is the single compile-time source of truth.
 if(NOT MUC_OPCUA_PROFILE MATCHES "^(nano|micro|embedded|standard|full|custom)$")
     message(FATAL_ERROR "Unknown MUC_OPCUA_PROFILE='${MUC_OPCUA_PROFILE}'")
 endif()
 
 set(MUC_OPCUA_KCONFIG_FEATURES
-    SERVICE_READ SERVICE_BROWSE SERVICE_DISCOVERY SERVICE_REGISTER_NODES SERVICE_WRITE
-    SERVICE_HISTORY SERVICE_QUERY SERVICE_NODEMANAGEMENT BASE_NODES BASE_TYPE_SYSTEM
-    EXTENDED_NODEIDS NAMESPACES DYNAMIC_NODES COMPLEX_TYPES USER_AUTH MULTIPLE_CONNECTIONS
-    SESSION_TIMEOUT SECURITY ECC MULTI_CHUNK TIME_SYNC AUDITING SUBSCRIPTIONS
-    SUBSCRIPTIONS_STANDARD EVENTS EVENT_FILTER_WHERE AGGREGATE_FULL REDUNDANCY METHOD_SERVER
-    CUSTOM_METHODS PUBSUB DATA_ACCESS REVERSE_CONNECT SERVER_DIAGNOSTICS READ_CACHE
-    STANDARD_PROFILE)
+    # --- Computed OPC-name-derived symbols (OPC-10000-7 §4.2, §4.3) ---
+    # Prefixed entries use the symbol name as both the cache variable and the
+    # override fragment line (CONFIG_ is empty).  Bare entries below are legacy
+    # project-centric symbols whose cache variable is MUC_OPCUA_<NAME>.
+    #
+    # Profile effective choice symbols (OPC-10000-7 §4.3)
+    MUC_OPCUA_PROFILE_NANO_EMBEDDED_DEVICE_2025_SERVER
+    MUC_OPCUA_PROFILE_MICRO_EMBEDDED_DEVICE_2025_SERVER
+    MUC_OPCUA_PROFILE_EMBEDDED_2025_UA_SERVER
+    MUC_OPCUA_PROFILE_STANDARD_2025_UA_SERVER
+    MUC_OPCUA_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+    MUC_OPCUA_PROFILE_CUSTOM
+    # Internal profile cascade symbols (OPC-10000-7 §4.3)
+    MUC_OPCUA_INTERN_PROFILE_NANO_EMBEDDED_DEVICE_2025_SERVER
+    MUC_OPCUA_INTERN_PROFILE_MICRO_EMBEDDED_DEVICE_2025_SERVER
+    MUC_OPCUA_INTERN_PROFILE_EMBEDDED_2025_UA_SERVER
+    MUC_OPCUA_INTERN_PROFILE_STANDARD_2025_UA_SERVER
+    MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+    # Advertised-profile marker (internal build marker, drives base_nodes.c
+    # ServerProfileArray + capacities.h tier; CMake-only, never a C define)
+    MUC_OPCUA_MARKER_STANDARD_PROFILE
+    # Facet group toggles (OPC-10000-7 §4.2)
+    MUC_OPCUA_FACET_CORE_2022_SERVER
+    MUC_OPCUA_FACET_EMBEDDED_DATACHANGE_SUBSCRIPTION_2022_SERVER
+    MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER
+    MUC_OPCUA_FACET_STANDARD_DATACHANGE_SUBSCRIPTION_2022_SERVER
+    MUC_OPCUA_FACET_GLOBAL_CERTIFICATE_MANAGEMENT_SERVER
+    MUC_OPCUA_FACET_USER_TOKEN_USER_NAME_PASSWORD_SERVER
+    MUC_OPCUA_FACET_USER_TOKEN_X509_CERTIFICATE_SERVER
+    # Conformance Unit symbols (OPC-10000-7 §4.2)
+    MUC_OPCUA_CU_ATTRIBUTE_READ
+    MUC_OPCUA_CU_VIEW_BASIC_TRANSLATEBROWSEPATH
+    MUC_OPCUA_CU_DISCOVERY_FIND_SERVERS_SELF_GET_ENDPOINTS
+    MUC_OPCUA_CU_VIEW_REGISTERNODES
+    MUC_OPCUA_CU_CORE_2017_ATTRIBUTE_WRITE
+    MUC_OPCUA_CU_HISTORICAL_ACCESS_SERVER_FACET
+    MUC_OPCUA_CU_QUERY
+    MUC_OPCUA_CU_NODEMANAGEMENT
+    # --- CU-level symbols introduced by the CU-aligned code reorganisation ---
+    # These mirror the legacy project-centric facets below and drive the
+    # renamed #ifdef guards in src/cu/**/*.c (Task 3 of the CU reorg plan).
+    MUC_OPCUA_CU_SUBSCRIPTION_BASIC
+    MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
+    MUC_OPCUA_CU_SECURITY_ECC
+    MUC_OPCUA_CU_EVENTS
+    MUC_OPCUA_CU_DATA_ACCESS
+    MUC_OPCUA_CU_METHOD_SERVER
+    MUC_OPCUA_CU_CUSTOM_METHODS
+    MUC_OPCUA_CU_USER_AUTH
+    MUC_OPCUA_CU_MULTIPLE_CONNECTIONS
+    MUC_OPCUA_CU_EVENT_FILTER_WHERE
+    MUC_OPCUA_CU_REDUNDANCY
+    MUC_OPCUA_CU_DIAGNOSTICS
+    MUC_OPCUA_CU_COMPLEX_TYPES
+    MUC_OPCUA_CU_AUDITING
+    MUC_OPCUA_CU_DYNAMIC_NODES
+    MUC_OPCUA_CU_MULTI_CHUNK
+    MUC_OPCUA_CU_SESSION_TIMEOUT
+    MUC_OPCUA_CU_TIME_SYNC
+    MUC_OPCUA_CU_EXTENDED_NODEIDS
+    MUC_OPCUA_CU_AGGREGATE_FULL
+    MUC_OPCUA_CU_PUBSUB
+    MUC_OPCUA_CU_REVERSE_CONNECT
+    MUC_OPCUA_CU_NAMESPACES
+    # Project options (non-OPC implementation controls)
+    READ_CACHE)
 
 # Legacy -D overrides are the ONLY cache entries for these symbols (option() is gone),
 # so DEFINED CACHE{} reliably detects a user-supplied -DMUC_OPCUA_<X>=ON/OFF.
+# CONFIG_ is empty, so the fragment line uses the bare Kconfig symbol name.  Fully
+# prefixed entries (MUC_OPCUA_...) also use the same name as the cache variable.
 set(_MUC_OPCUA_KCFG_FRAG "${CMAKE_BINARY_DIR}/kconfig_overrides.config")
 file(WRITE ${_MUC_OPCUA_KCFG_FRAG} "")
 foreach(_sym IN LISTS MUC_OPCUA_KCONFIG_FEATURES)
-    if(DEFINED CACHE{MUC_OPCUA_${_sym}})
-        if(${MUC_OPCUA_${_sym}})
-            file(APPEND ${_MUC_OPCUA_KCFG_FRAG} "MUC_OPCUA_${_sym}=y\n")
+    if(_sym MATCHES "^MUC_OPCUA_")
+        set(_cache_sym "${_sym}")
+    else()
+        set(_cache_sym "MUC_OPCUA_${_sym}")
+    endif()
+    if(DEFINED CACHE{${_cache_sym}})
+        if(${${_cache_sym}})
+            file(APPEND ${_MUC_OPCUA_KCFG_FRAG} "${_sym}=y\n")
         else()
-            file(APPEND ${_MUC_OPCUA_KCFG_FRAG} "# MUC_OPCUA_${_sym} is not set\n")
+            file(APPEND ${_MUC_OPCUA_KCFG_FRAG} "# ${_sym} is not set\n")
         endif()
+    endif()
+endforeach()
+
+# Capacity int symbols (generated Kconfig + generated capacities.h).  Legacy
+# -DMU_MAX_*=N overrides are translated into the Kconfig fragment as
+# <SYM>=N (bare Kconfig symbol; CONFIG_ is empty) so the resolved value is
+# visible in .config / menuconfig.  The compile-time capacity still comes
+# from the generated capacities.h cascade (default < profile < user), which
+# reads the same -DMU_MAX_* directly at stage 3.
+# Format: "KCONFIG_SYMBOL=LEGACY_CACHE_VAR" pairs.
+set(MUC_OPCUA_KCONFIG_CAPACITIES
+    "MAX_SESSIONS=MU_MAX_SESSIONS"
+    "MAX_CONNECTIONS=MU_MAX_CONNECTIONS"
+    "MAX_SUBSCRIPTIONS=MU_MAX_SUBSCRIPTIONS"
+    "MAX_MONITORED_ITEMS=MU_MAX_MONITORED_ITEMS"
+    "MAX_PUBLISH_REQUESTS=MU_MAX_PUBLISH_REQUESTS"
+    "MONITORED_QUEUE_DEPTH=MU_MONITORED_QUEUE_DEPTH"
+    "MAX_ARRAY_LENGTH=MU_MAX_ARRAY_LENGTH"
+    "MAX_TRIGGER_LINKS=MU_MAX_TRIGGER_LINKS"
+    "MAX_WHERE_ELEMENTS=MU_MAX_WHERE_ELEMENTS"
+    "MAX_WHERE_OPERANDS=MU_MAX_WHERE_OPERANDS"
+    "WHERE_BLOB_BYTES=MU_WHERE_BLOB_BYTES"
+    "MAX_ADDRESS_SPACE_NODES=MU_MAX_ADDRESS_SPACE_NODES"
+    "MAX_DYNAMIC_NODES=MU_MAX_DYNAMIC_NODES"
+    "MAX_DYNAMIC_REFERENCES=MU_MAX_DYNAMIC_REFERENCES"
+    "MAX_DYNAMIC_BROWSE_NAME_LENGTH=MU_MAX_DYNAMIC_BROWSE_NAME_LENGTH"
+    "MAX_DYNAMIC_DISPLAY_NAME_LENGTH=MU_MAX_DYNAMIC_DISPLAY_NAME_LENGTH"
+    "MAX_DYNAMIC_STRING_NODEID_LENGTH=MU_MAX_DYNAMIC_STRING_NODEID_LENGTH"
+    "MAX_QUERY_CONTINUATION_POINTS=MU_MAX_QUERY_CONTINUATION_POINTS"
+    "MAX_CONDITIONS=MU_MAX_CONDITIONS"
+    "MAX_SECURE_CHANNELS=MU_MAX_SECURE_CHANNELS"
+    "MAX_DYNAMIC_REFERENCE_STRING_NODEID_LENGTH=MU_MAX_DYNAMIC_REFERENCE_STRING_NODEID_LENGTH"
+)
+foreach(_pair IN LISTS MUC_OPCUA_KCONFIG_CAPACITIES)
+    string(REPLACE "=" ";" _kv "${_pair}")
+    list(GET _kv 0 _kcfg_sym)
+    list(GET _kv 1 _legacy_var)
+    if(DEFINED CACHE{${_legacy_var}})
+        file(APPEND ${_MUC_OPCUA_KCFG_FRAG} "${_kcfg_sym}=${${_legacy_var}}\n")
     endif()
 endforeach()
 
@@ -182,10 +289,14 @@ set(MUC_OPCUA_PLATFORM "host" CACHE STRING "Target platform (host, external, pic
 
 # The MUC_OPCUA_{EMBEDDED,STANDARD}_PROFILE feature/capacity fan-out lived here in
 # two standalone blocks that re-derived what the MUC_OPCUA_PROFILE string blocks
-# above already set -- and had drifted out of sync. They are now folded into those
-# blocks (the single source of truth). Direct -DMUC_OPCUA_{EMBEDDED,STANDARD}_PROFILE=ON
-# use is promoted to the matching profile near the top of this file; illegal
-# custom-profile combinations are still caught at compile time by features.h.
+# above already set -- and had drifted out of sync. They are now folded into the
+# shorthand block near the top of this file (the single source of truth), which
+# promotes the profile string. The internal cascade symbols
+# (MUC_OPCUA_INTERN_PROFILE_*; OPC-10000-7 §4.3) are derived automatically by
+# Kconfig from the profile choice symbol. Direct
+# -DMUC_OPCUA_{EMBEDDED,STANDARD}_PROFILE=ON use is promoted to the matching
+# profile near the top of this file; illegal custom-profile combinations are still
+# caught at compile time by features.h.
 
 
 # The Pico SDK installs its cross-compilation toolchain, so it must be imported

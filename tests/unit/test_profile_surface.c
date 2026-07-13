@@ -20,7 +20,7 @@
 #include "../../src/core/server_internal.h"
 #include "../../src/core/service_dispatch.h"
 
-#if defined(MUC_OPCUA_BASE_NODES) && MUC_OPCUA_BASE_NODES
+#if defined(MUC_OPCUA_FACET_CORE_2022_SERVER) && MUC_OPCUA_FACET_CORE_2022_SERVER
 #include "../../src/address_space/base_nodes.h"
 #endif
 
@@ -29,7 +29,7 @@ void tearDown(void) {}
 
 /* --- T015: Base Information node presence tracks the build ---------------- */
 
-#if defined(MUC_OPCUA_BASE_NODES) && MUC_OPCUA_BASE_NODES
+#if defined(MUC_OPCUA_FACET_CORE_2022_SERVER) && MUC_OPCUA_FACET_CORE_2022_SERVER
 static const mu_node_t *base_find(opcua_uint32_t numeric) {
     const mu_address_space_t *bs = mu_base_address_space();
     mu_nodeid_t id = {0, MU_NODEID_NUMERIC, {0}};
@@ -66,7 +66,7 @@ void test_register_nodes_support_matches_build(void) {
     size_t resp_len = 0;
     opcua_statuscode_t rc = mu_service_dispatch(&srv, MU_ID_REGISTERNODESREQUEST, body, sizeof(body), resp, &resp_len);
 
-#if defined(MUC_OPCUA_SERVICE_REGISTER_NODES) && MUC_OPCUA_SERVICE_REGISTER_NODES
+#if defined(MUC_OPCUA_CU_VIEW_REGISTERNODES) && MUC_OPCUA_CU_VIEW_REGISTERNODES
     TEST_ASSERT_NOT_EQUAL(MU_STATUS_BAD_SERVICEUNSUPPORTED, rc); /* dispatchable */
 #else
     TEST_ASSERT_EQUAL_HEX32(MU_STATUS_BAD_SERVICEUNSUPPORTED, rc); /* not built */
@@ -75,7 +75,7 @@ void test_register_nodes_support_matches_build(void) {
 
 int main(void) {
     UNITY_BEGIN();
-#if defined(MUC_OPCUA_BASE_NODES) && MUC_OPCUA_BASE_NODES
+#if defined(MUC_OPCUA_FACET_CORE_2022_SERVER) && MUC_OPCUA_FACET_CORE_2022_SERVER
     RUN_TEST(test_base_info_nodes_present_when_built);
 #else
     RUN_TEST(test_base_info_nodes_absent_in_minimal_build);

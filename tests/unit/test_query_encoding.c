@@ -6,7 +6,7 @@
 void setUp(void) {}
 void tearDown(void) {}
 
-#ifdef MUC_OPCUA_SERVICE_QUERY
+#ifdef MUC_OPCUA_CU_QUERY
 
 void test_content_filter_decode(void) {
     /* Create a binary buffer containing a ContentFilter with 1 element: ElementOperand */
@@ -75,11 +75,11 @@ void test_query_next_request_decode(void) {
     TEST_ASSERT_EQUAL_STRING_LEN("Test", req.continuation_point.data, 4);
 }
 
-#endif /* MUC_OPCUA_SERVICE_QUERY */
+#endif /* MUC_OPCUA_CU_QUERY */
 
 int main(void) {
     UNITY_BEGIN();
-#ifdef MUC_OPCUA_SERVICE_QUERY
+#ifdef MUC_OPCUA_CU_QUERY
     RUN_TEST(test_content_filter_decode);
     RUN_TEST(test_content_filter_rejects_unsupported_operand_oversized_length);
     RUN_TEST(test_query_next_request_decode);
