@@ -113,9 +113,9 @@ The Micro Embedded Device 2017 Server Profile builds on Nano (see
 
 ## Embedded profile progress
 
-The Embedded 2017 profile surface is implemented behind `make embedded` /
-`MUC_OPCUA_EMBEDDED_PROFILE=ON`. See [profile-embedded.md](profile-embedded.md) for the
-conformance-unit map.
+The Embedded 2017 profile surface is selected with `MUC_OPCUA_PROFILE=embedded`
+or the `configs/embedded.defconfig` seed. See [profile-embedded.md](profile-embedded.md)
+for the conformance-unit map.
 
 | Conformance group / unit | Status | Evidence |
 |---|---|---|

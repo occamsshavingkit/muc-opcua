@@ -8,7 +8,7 @@ they are not profile-compliant and not CTT-verified claims. `Implemented
 subset` means the documented behavior is handled with a cited service response
 and covered by project tests. `Optional implemented subset` means the behavior
 is available only when the named build option is enabled. `Unsupported` returns
-`Bad_ServiceUnsupported`. Concurrent sessions (up to MU_MAX_SESSIONS, default
+`Bad_ServiceUnsupported`. Concurrent sessions (up to `MU_MAX_SESSIONS`, default
 2) are an implemented subset of session handling, not a profile claim.
 
 | Service | OPC 10000-4 § | Status | Notes |
@@ -24,10 +24,10 @@ is available only when the named build option is enabled. `Unsupported` returns
 | Browse | 5.9.2 | Implemented subset | HierarchicalReferences + includeSubtypes |
 | BrowseNext | 5.9.3 | Implemented subset | No continuation points issued -> `Bad_ContinuationPointInvalid` |
 | TranslateBrowsePathsToNodeIds | 5.9.4 | Implemented subset | RelativePath walk over the address space; `Bad_NoMatch` |
-| RegisterNodes | 5.9.5 | Optional implemented subset | Behind `MUC_OPCUA_SERVICE_REGISTER_NODES` (full profile only); identity mapping (NodeIds copied back). Nano/Micro/Embedded return `Bad_ServiceUnsupported` (`test_profile_surface`) |
-| UnregisterNodes | 5.9.6 | Optional implemented subset | Behind `MUC_OPCUA_SERVICE_REGISTER_NODES` (full profile only); no-op, returns Good. Nano/Micro/Embedded return `Bad_ServiceUnsupported` |
+| RegisterNodes | 5.9.5 | Implemented subset | Behind `MUC_OPCUA_SERVICE_REGISTER_NODES`; enabled by all named server profiles. Identity mapping (NodeIds copied back). |
+| UnregisterNodes | 5.9.6 | Implemented subset | Behind `MUC_OPCUA_SERVICE_REGISTER_NODES`; enabled by all named server profiles. No-op, returns Good. |
 | Write | 5.11.4 | Optional implemented subset | Behind `MUC_OPCUA_SERVICE_WRITE`. Only the Value attribute (AttributeId 13) is writable; all other attributes reject with `Bad_NotWritable`. Write of index ranges (NumericRange) is not supported and returns `Bad_WriteNotSupported`. Under OPC-10000-4 §5.11.4, the micro/embedded profiles scope Write to Value attribute writes only. |
-| Call | 5.12.2 | Optional implemented subset | Behind `MUC_OPCUA_EMBEDDED_PROFILE` (GetMonitoredItems/ResendData + custom methods only) |
+| Call | 5.12.2 | Optional implemented subset | Built-in GetMonitoredItems/ResendData are behind `MUC_OPCUA_SUBSCRIPTIONS_STANDARD`; arbitrary custom methods are behind `MUC_OPCUA_METHOD_SERVER`. |
 | CreateMonitoredItems | 5.13.2 | Implemented subset | Data-change monitoring; initial sample; `Bad_NodeIdUnknown` / `Bad_TooManyMonitoredItems`; queue bounds |
 | ModifyMonitoredItems | 5.13.3 | Implemented subset | Revised sampling interval / clientHandle; invalid MonitoredItemId -> `Bad_MonitoredItemIdInvalid` |
 | SetMonitoringMode | 5.13.4 | Implemented subset | Disabled / Sampling / Reporting |
@@ -37,20 +37,18 @@ is available only when the named build option is enabled. `Unsupported` returns
 | SetPublishingMode | 5.14.4 | Implemented subset | Disabled -> keep-alives only |
 | Publish | 5.14.5 | Implemented subset | Parked + answered asynchronously by the publishing timer; keep-alive; ack processing; `Bad_TooManyPublishRequests` |
 | Republish | 5.14.6 | Implemented subset | Resends the retained NotificationMessage; invalid sequence -> `Bad_MessageNotAvailable` |
-| TransferSubscriptions | 5.14.7 | Unsupported | Dispatch returns `Bad_ServiceUnsupported`; `TransferSubscriptionsRequest_Encoding_DefaultBinary` ns=0;i=841 tested |
+| TransferSubscriptions | 5.14.7 | Optional implemented subset | Behind `MUC_OPCUA_REDUNDANCY` (full profile by default); otherwise dispatch returns `Bad_ServiceUnsupported`. |
 | DeleteSubscriptions | 5.14.8 | Implemented subset | Deletes the subscription and its MonitoredItems; invalid SubscriptionId -> `Bad_SubscriptionIdInvalid` |
-| SetTriggering | 5.13.5 | Optional implemented subset | Behind `MUC_OPCUA_EMBEDDED_PROFILE` (links monitored items within a subscription; link capacity -> `Bad_TooManyOperations`) |
+| SetTriggering | 5.13.5 | Optional implemented subset | Behind `MUC_OPCUA_SUBSCRIPTIONS_STANDARD` (links monitored items within a subscription; link capacity -> `Bad_TooManyOperations`) |
 | HistoryRead / HistoryUpdate | 5.11.3 / 5.11.5 | Optional implemented subset | Behind `MUC_OPCUA_SERVICE_HISTORY`, persistence adapter based |
 | AddNodes / DeleteNodes / AddReferences / DeleteReferences | 5.8 | Optional implemented subset | Behind `MUC_OPCUA_SERVICE_NODEMANAGEMENT` and `MUC_OPCUA_DYNAMIC_NODES` |
 | QueryFirst / QueryNext | B.2.3 / B.2.4 | Optional implemented subset | Behind `MUC_OPCUA_SERVICE_QUERY`; OPC-10000-4 Appendix B §B.2.3/§B.2.4 |
 
-The core View Service Set entries (Browse, BrowseNext, TranslateBrowsePaths) are
-documented as profile-targeting service subsets for OPC-10000-7 section 4.2
-ConformanceUnit analysis and section 4.3 Profile analysis. RegisterNodes /
-UnregisterNodes (§5.9.5 / §5.9.6) are optional for Nano and are compiled only in
-the full profile; the Nano/Micro/Embedded builds return `Bad_ServiceUnsupported`
-for them (`test_profile_surface`). Current project evidence is
-`tests/integration/test_view_services.c`; this does not assert Nano profile completion.
+The core View Service Set entries (Browse, BrowseNext, TranslateBrowsePaths,
+RegisterNodes, UnregisterNodes) are documented as profile-targeting service
+subsets for OPC-10000-7 section 4.2 ConformanceUnit analysis and section 4.3
+Profile analysis. Current project evidence is `tests/integration/test_view_services.c`;
+this does not assert Nano profile completion.
 
 PubSub is outside the Part 4 Service Set matrix, so it is not listed as a Part
 4 service. The documented optional `MUC_OPCUA_PUBSUB` status is scoped
@@ -68,12 +66,13 @@ The Subscription Service Set (OPC 10000-4 §5.14) and MonitoredItem Service Set
 (OPC 10000-4 §5.13) are implemented as a profile-targeting data-change subset:
 data-change monitoring, an asynchronous Publish flow driven by `mu_server_poll`,
 keep-alives, and Republish, all no-heap and behind the `MUC_OPCUA_SUBSCRIPTIONS`
-build option (`tests/integration/test_subscriptions.c`). Under OPC-10000-7
+Kconfig feature (`tests/integration/test_subscriptions.c`). Under OPC-10000-7
 section 4.2 and section 4.3 this is only evidence for selected ConformanceUnit
 and Profile targeting, not a Micro profile or facet completion claim. The
-`MUC_OPCUA_EMBEDDED_PROFILE=ON` build adds an optional implemented subset for
-SetTriggering, Call (with GetMonitoredItems/ResendData methods), and larger
-monitored-item/queue bounds. The TransferSubscriptions service remains unsupported.
+`MUC_OPCUA_SUBSCRIPTIONS_STANDARD=ON` adds SetTriggering, built-in Call methods
+(GetMonitoredItems/ResendData), and larger monitored-item/queue bounds.
+TransferSubscriptions is implemented only when `MUC_OPCUA_REDUNDANCY` is built;
+other builds continue to dispatch `Bad_ServiceUnsupported`.
 
 Subscription and MonitoredItem negative-path evidence is scoped to the tested
 profile-targeting behavior. `tests/unit/test_subscriptions_errors.c` covers
@@ -112,8 +111,9 @@ OPC-10000-4 section 5.14.5.4 by returning per-ack
 `Bad_SequenceNumberUnknown` results in PublishResponse. Republish invalid
 sequence handling follows OPC-10000-4 section 5.14.6.3 by returning
 service-level `Bad_MessageNotAvailable`. TransferSubscriptions remains outside
-the implemented subset and dispatches `Bad_ServiceUnsupported` for
-`TransferSubscriptionsRequest_Encoding_DefaultBinary` (ns=0;i=841).
+the non-redundancy subset and dispatches `Bad_ServiceUnsupported` for
+`TransferSubscriptionsRequest_Encoding_DefaultBinary` (ns=0;i=841) unless
+`MUC_OPCUA_REDUNDANCY` is built.
 Aggregate filters remain scoped `AggregateFilter` support under
 `MUC_OPCUA_SUBSCRIPTIONS_STANDARD`, not full OPC-10000-13 aggregate coverage.
 Average is supported only within the implementation's verified subset and

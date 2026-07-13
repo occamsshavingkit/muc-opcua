@@ -64,7 +64,7 @@ for that feature is recorded separately by T085b.
   - Result: all built `examples/minimal_server` successfully.
 - Embedded profile Makefile flags:
   `make embedded`
-  - Confirmed: `MUC_OPCUA_EMBEDDED_PROFILE=ON`,
+  - Confirmed: `MUC_OPCUA_PROFILE=embedded`,
     `MU_MAX_MONITORED_ITEMS=100`, `MU_MAX_SUBSCRIPTIONS=2`,
     `MU_MAX_PUBLISH_REQUESTS=5`, `MU_MONITORED_QUEUE_DEPTH=2`,
     `MU_MAX_TRIGGER_LINKS=4`.

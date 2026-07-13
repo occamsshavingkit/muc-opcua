@@ -29,8 +29,9 @@ muc-opcua currently targets the Nano surface documented in
 (an Embedded-tier feature).
 
 ## Micro-targeted surface (the Embedded Data Change Subscription Server Facet)
-A no-heap subscription engine (`src/services/subscription.{c,h}`, compiled behind the
-`MUC_OPCUA_SUBSCRIPTIONS` build option, ON for `make micro`). All state is fixed-size
+A no-heap subscription engine (`src/services/subscription*.c` and
+`src/services/subscription_publish/`, compiled behind the `MUC_OPCUA_SUBSCRIPTIONS`
+Kconfig feature, ON for `make micro`). All state is fixed-size
 and lives in the caller-owned server struct; sampling and Publish delivery are driven
 cooperatively by `mu_server_poll`.
 
@@ -64,11 +65,9 @@ Embedded profile gates are enabled:
 - Method Call for `Server.GetMonitoredItems` and `Server.ResendData`
   (OPC-10000-4 §5.12.2.2; OPC-10000-5 §9.1, §9.2).
 - Base Info Type System exposure.
-- Base Information nodes and the `ServerProfileArray` (`MUC_OPCUA_BASE_NODES` is OFF
-  for Micro, like Nano): the `MicroEmbeddedDevice2017` URI names the profile *target*
-  and is **not** emitted anywhere as a runtime `ServerProfileArray` value; the
-  integrator supplies the address space (`test_profile_surface`). OPC-10000-7 §4.3
-  (ServerProfileArray / profile URIs), OPC-10000-5.
+- Full Base Info Type System exposure. The smaller Base Information node set
+  (`MUC_OPCUA_BASE_NODES`) is compiled in for Micro; `MUC_OPCUA_BASE_TYPE_SYSTEM`
+  remains embedded-and-above.
 - Security policies beyond None. Basic256Sha256 is available in the embedded build.
 
 TransferSubscriptions (§5.14.7) belongs to the Client Redundancy Facet and is not part
@@ -78,7 +77,7 @@ deadband returns `Bad_MonitoredItemFilterUnsupported` here); aggregate filters
 (Average/Min/Max) are supported.
 
 **Concurrent ≥2 sessions** — implemented: the server multiplexes up to
-`MU_MAX_SESSIONS` (default 2) logical sessions over a single TCP connection
+`MU_MAX_SESSIONS` (default 2) logical sessions over the configured TCP connection pool
 (`test_session`, `test_single_client_limit`).
 
 ## Remaining evidence for Micro profile status (see [status.md](status.md))

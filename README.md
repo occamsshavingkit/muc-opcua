@@ -9,12 +9,12 @@ all of its OS/hardware services (TCP, clock, entropy, crypto, persistence) throu
 narrow caller-supplied adapter structs. A host build (POSIX + OpenSSL) is provided for
 development, tests, and interop against standard OPC UA clients.
 
-It ships in five feature tiers — **nano**, **micro**, **embedded**, **standard**,
-**full** — that map to the OPC Foundation 2017 device server profiles, so you compile
-in only the surface you need.
+It ships with Kconfig-backed server profiles — **nano**, **micro**, **embedded**,
+**standard**, **full**, and **custom** — so you compile in only the surface you
+need and can inspect or trim the resolved feature set with `menuconfig`.
 
 > **Status:** profile-*targeting*. The Nano surface is complete; Micro adds data-change
-> subscriptions; Standard targets the full OPC-10000-7 Standard 2017 UA Server face.
+> subscriptions; Standard targets the OPC-10000-7 Standard 2017 UA Server surface.
 > SecurityPolicy Basic256Sha256 has been validated against the OPC Foundation .NET
 > reference client. No formal profile-compliance claim is made until the OPC UA CTT
 > passes — see [docs/conformance/](docs/conformance/).
@@ -39,24 +39,26 @@ in only the surface you need.
   dispatch, write, and subscription sampling/publishing. No threads required.
 - **Spec-cited surface.** Services and security are documented against the OPC UA spec
   (OPC 10000-4 / -6 / -7); see [docs/conformance/](docs/conformance/).
-- **Pay for what you use.** Per-service and per-feature CMake options drop unused code
+- **Pay for what you use.** Kconfig feature symbols drop unused code
   (Read, Browse, Discovery, subscriptions, crypto, base nodes) from the binary.
 
 ---
 
 ## Profiles
 
-Each profile is a CMake configuration (`make nano|micro|embedded|standard`, or
-`-DMUC_OPCUA_PROFILE=...`). All figures are Arm Cortex-M0+ Thumb `-Os`; the
+Each profile is a CMake/Kconfig configuration (`make nano|micro|embedded|standard|full`,
+or `-DMUC_OPCUA_PROFILE=...`). All figures are Arm Cortex-M0+ Thumb `-Os`; the
 library archive has zero `.data`/`.bss` on every profile (heap use is per-profile,
 detailed below). Reproduce with `scripts/measure_size.sh all`.
 
 **Core `.text` (flash)** — compiled library archive (`-Os`). The linked server is
 smaller after `--gc-sections` dead-code elimination.
 
-Each named profile equals **exactly** the mandatory facet set of its namesake OPC UA
-Server Profile (strict, spec 067) — optional facets are `-D` opt-ins. `full` is the only
-"everything on" build.
+Each named profile is seeded from `configs/<profile>.defconfig` and resolved through
+`/Kconfig`. Optional facets remain `-DMUC_OPCUA_<SYMBOL>=ON/OFF` opt-ins or opt-outs,
+and invalid combinations cascade through Kconfig `depends on` rules. `full` is the
+only "everything on" build; `custom` starts from the always-on core services and lets
+you hand-select the rest.
 
 | Profile | .text | OPC UA Profile (strict mandatory set) |
 |---------|-------|----------------|
@@ -146,9 +148,18 @@ the OPC Foundation .NET reference client, or `opcua-client` from `python-opcua` 
 `asyncua` — connect anonymously, and browse the `Server` object, read `ServerStatus`,
 or (on the micro/embedded profiles) create a subscription on a variable.
 
-To build the other tiers: `make nano`, `make embedded`, `make standard`, or
-`make all-profiles`. Run `make help` for a summary. The example binary always lands
+To build the other tiers: `make nano`, `make embedded`, `make standard`, `make full`,
+or `make all-profiles`. Run `make help` for a summary. The example binary always lands
 at `build/<profile>/examples/minimal_server`.
+
+To inspect or edit a profile interactively:
+
+```bash
+cmake -S . -B build/menu -DMUC_OPCUA_PROFILE=standard
+cmake --build build/menu --target menuconfig
+cmake -S . -B build/menu -DMUC_OPCUA_KCONFIG_CONFIG=build/menu/.config
+cmake --build build/menu
+```
 
 ---
 
@@ -265,20 +276,18 @@ The `make` targets are thin wrappers over CMake. To configure directly:
 ```bash
 cmake -S . -B build \
   -DMUC_OPCUA_BUILD_EXAMPLES=ON \
-  -DMUC_OPCUA_SUBSCRIPTIONS=ON \    # micro profile
-  -DMUC_OPCUA_SECURITY=OFF          # ON adds Basic256Sha256 (embedded)
+  -DMUC_OPCUA_PROFILE=micro
 cmake --build build
 ```
 
-Selected options (see [CMakeLists.txt](CMakeLists.txt) and
-[cmake/MucOpcUaOptions.cmake](cmake/MucOpcUaOptions.cmake)):
+Selected settings (see [CMakeLists.txt](CMakeLists.txt),
+[Kconfig](Kconfig), and [cmake/MucOpcUaOptions.cmake](cmake/MucOpcUaOptions.cmake)):
 
 | Option | Default | Purpose |
 |---|---|---|
-| `MUC_OPCUA_SUBSCRIPTIONS` | ON | Data-change subscription engine (Micro tier) |
-| `MUC_OPCUA_SECURITY` | ON | SecurityPolicy Basic256Sha256 (Embedded tier) |
-| `MUC_OPCUA_BASE_NODES` | ON | Standard Base Information node set |
-| `MUC_OPCUA_SERVICE_READ` / `_BROWSE` / `_DISCOVERY` / `_REGISTER_NODES` | ON | Per-service code gating |
+| `MUC_OPCUA_PROFILE` | `nano` | Profile seed: `nano`, `micro`, `embedded`, `standard`, `full`, or `custom` |
+| `MUC_OPCUA_KCONFIG_CONFIG` | empty | Reuse a `.config` saved from `menuconfig` |
+| `MUC_OPCUA_<KCONFIG_SYMBOL>` | profile-derived | Override one Kconfig feature, e.g. `MUC_OPCUA_SECURITY=OFF` or `MUC_OPCUA_PUBSUB=ON` |
 | `MUC_OPCUA_BUILD_EXAMPLES` / `_BUILD_TESTS` / `_BUILD_FUZZERS` | OFF | Build extras |
 | `MUC_OPCUA_PLATFORM` | `host` | Target: `host`, `external`, `pico`, `arduino-skeleton` |
 
@@ -338,6 +347,7 @@ src/
   address_space/       Base Information node set + address-space helpers
   platform/            Host POSIX TCP + OpenSSL crypto adapters (dev/interop)
   generated/           Code-generated OPC UA type/id tables
+  cu/                  Reserved CU-aligned namespace for generated/experimental slices
 examples/minimal_server/   Runnable example server
 platform/pico|arduino/     MCU platform integration
 docs/                  conformance/, size/, adr/, validation/, traceability/
@@ -352,7 +362,7 @@ Makefile               Profile build presets (nano/micro/embedded)
 
 - [docs/getting-started.md](docs/getting-started.md) — install, build, first run
 - [docs/integration-guide.md](docs/integration-guide.md) — implementing platform adapters & your address space
-- [docs/build-and-gating.md](docs/build-and-gating.md) — every `MUC_OPCUA_*` CMake flag, profile composition, and how to override a profile default (add/remove a feature)
+- [docs/build-and-gating.md](docs/build-and-gating.md) — Kconfig profile composition, feature symbols, `menuconfig`, and how to override a profile default (add/remove a feature)
 - [docs/architecture.md](docs/architecture.md) — internals, memory model, poll loop
 - [docs/api-reference.md](docs/api-reference.md) — full API reference
 - [docs/conformance/](docs/conformance/) — service & profile conformance matrices

@@ -231,52 +231,54 @@ status in [`conformance/services.md`](conformance/services.md).
 
 ## 5. Profiles as compile-time feature composition
 
-There is no runtime profile switch. A profile is a **set of CMake options** that
-gate source files (via `target_sources`) and dispatch-table rows (via
-`MUC_OPCUA_*` compile definitions). Dropping a feature removes both its code and
-its fixed-size state. The options live in the root `CMakeLists.txt`; the source
-gating is in `src/CMakeLists.txt`.
+There is no runtime profile switch. A profile is a **Kconfig-resolved feature
+set** that gates source files (via `src/CMakeLists.txt`) and dispatch-table rows
+(via generated `MUC_OPCUA_*` compile definitions). Dropping a feature removes both
+its code and its fixed-size state. The profile seed lives in
+`configs/<profile>.defconfig`; the symbol prompts, help text, and dependency
+rules live in `/Kconfig`.
 
-| CMake option | Compile define | Gates |
+| Kconfig symbol / CMake override | Compile define | Gates |
 |--------------|----------------|-------|
-| `MUC_OPCUA_SERVICE_READ` | `MUC_OPCUA_SERVICE_READ` | `read.c` + the Read dispatch row |
-| `MUC_OPCUA_SERVICE_BROWSE` | `MUC_OPCUA_SERVICE_BROWSE` | `browse.c` + Browse/BrowseNext/Translate rows |
+| `MUC_OPCUA_SERVICE_READ` | `MUC_OPCUA_SERVICE_READ` | `src/services/read/*` + the Read dispatch row |
+| `MUC_OPCUA_SERVICE_BROWSE` | `MUC_OPCUA_SERVICE_BROWSE` | `src/services/browse/*` + Browse/BrowseNext/Translate rows |
 | `MUC_OPCUA_SERVICE_DISCOVERY` | `MUC_OPCUA_SERVICE_DISCOVERY` | GetEndpoints/FindServers rows |
 | `MUC_OPCUA_SERVICE_REGISTER_NODES` | `MUC_OPCUA_SERVICE_REGISTER_NODES` | RegisterNodes/UnregisterNodes rows |
 | `MUC_OPCUA_BASE_NODES` | `MUC_OPCUA_BASE_NODES` | the standard Base Information node-set content |
-| `MUC_OPCUA_SUBSCRIPTIONS` | `MUC_OPCUA_SUBSCRIPTIONS` | `subscription.c` + all subscription/MonitoredItem rows + engine state |
-| `MUC_OPCUA_SECURITY` | `MUC_OPCUA_SECURITY` | `asym_chunk.c`, `sym_chunk.c`, `key_derivation.c`, `certificate.c` + secure paths + `secure_scratch` |
+| `MUC_OPCUA_SUBSCRIPTIONS` | `MUC_OPCUA_SUBSCRIPTIONS` | subscription/MonitoredItem handlers + engine state |
+| `MUC_OPCUA_SECURITY` | `MUC_OPCUA_SECURITY` | secure-channel crypto chunks, key derivation, certificate helpers + `secure_scratch` |
 
 The dispatch table (`g_supported_services[]` in `service_dispatch.c`) is built with
 `#ifdef`/`#if` around each row, so an unbuilt service is simply absent from the
 table and its request returns a fault. `OpenSecureChannel` and the Session services
 are always present.
 
-Profile shorthand (the `Makefile` wires the first three into `make nano` /
-`make micro` / `make embedded`; `standard`/`full` are `-DMUC_OPCUA_PROFILE=...`):
+Profile shorthand (the `Makefile` wires all named profiles into `make <profile>`;
+raw CMake uses `-DMUC_OPCUA_PROFILE=...`):
 
 - **Nano** = Core Server Facet + UA-TCP/UA-SC/UA-Binary + SecurityPolicy None +
   Anonymous identity. Subscriptions OFF.
-- **Micro** = Nano + data-change subscriptions (`MUC_OPCUA_SUBSCRIPTIONS`).
+- **Micro** = Nano + data-change subscriptions (`MUC_OPCUA_SUBSCRIPTIONS`) and
+  multiple concurrent connections/sessions.
 - (All profiles multiplex up to `MU_MAX_SESSIONS` (default 2) logical sessions over the
   `MU_MAX_CONNECTIONS` TCP connections — it is a core capability, not profile-specific.)
 - **Embedded (2017)** = security policies on top, i.e.
   `MUC_OPCUA_SECURITY` (Basic256Sha256) and Standard DataChange subscriptions.
-- **Standard (2017)** = Embedded + Write, History, Query, NodeManagement, PubSub,
-  Data Access, Method Server, Auditing, Complex Types, Redundancy, Reverse Connect,
-  the full Aggregate set, and the optional ECC SecurityPolicies (`MUC_OPCUA_ECC`,
-  spec 059 — `#ECC_curve25519`/`#ECC_nistP256` alongside Basic256Sha256/
+- **Standard (2017)** = Embedded-level feature surface plus the Standard profile
+  marker and Standard capacity minima.
+- **Full** = Standard profile URI/capacity family plus optional services/facets:
+  Write, History, Query, NodeManagement, PubSub, Data Access, Method Server,
+  Auditing, Complex Types, Redundancy, Reverse Connect, the full Aggregate set,
+  and optional ECC SecurityPolicies (`MUC_OPCUA_ECC`, spec 059 —
+  `#ECC_curve25519`/`#ECC_nistP256` alongside Basic256Sha256/
   Aes128_Sha256_RsaOaep/Aes256_Sha256_RsaPss; see §7).
-- **Full** = same feature set as Standard, not a distinct OPC UA profile — larger
-  capacity presets (`MU_MAX_*`) only.
 
-Every named profile is a preset; any individual flag can be added on top of or
-removed from a profile's defaults on the same `cmake` invocation (e.g. "standard
-minus the crypto layer") — this is a separate mechanism from the profile
-selection above. See [`build-and-gating.md`](build-and-gating.md) for the full
-`MUC_OPCUA_*` flag reference, the override/subtraction semantics, and the
-cross-feature dependency checks that keep an overridden combination from
-silently building something inconsistent.
+Every named profile is a preset; any individual Kconfig feature can be added on
+top of or removed from a profile's defaults on the same `cmake` invocation (e.g.
+"standard minus the crypto layer"). Kconfig dependency rules cascade dependents
+off when you remove a prerequisite. See [`build-and-gating.md`](build-and-gating.md)
+for the full `MUC_OPCUA_*` symbol reference, `menuconfig` flow, and override
+semantics.
 
 Profile definitions and current status:
 [`conformance/profile-nano.md`](conformance/profile-nano.md),
@@ -385,9 +387,9 @@ only) are in [`conformance/security.md`](conformance/security.md) and
 | `src/services/secure_channel.c` | SecureChannel open/renew/close, token + key lifetime. |
 | `src/services/session.c` | Session slot allocation and Created/Activated/Closed state machine. |
 | `src/services/discovery.c` | GetEndpoints / FindServers; endpoint + application descriptions. |
-| `src/services/read.c` | Attribute Read over the address space. |
-| `src/services/browse.c` | Browse / BrowseNext / TranslateBrowsePathsToNodeIds (the View set). |
-| `src/services/subscription.c` | No-heap subscription + MonitoredItem engine, sampling, Publish/Republish (Micro). |
+| `src/services/read/` | Attribute Read over the address space. |
+| `src/services/browse/` | Browse / BrowseNext / TranslateBrowsePathsToNodeIds (the View set). |
+| `src/services/subscription*.c`, `src/services/subscription_publish/` | No-heap subscription + MonitoredItem engine, sampling, Publish/Republish (Micro and above). |
 | `src/security/security_policy.c` | Policy/mode enums + URI mapping + per-policy parameter table (RSA + ECC rows; always built). |
 | `src/security/asym_chunk/{wrap,unwrap}.c` | OPN asymmetric sign+encrypt/unwrap (RSA) and signed-only sign/verify (ECC). |
 | `src/security/sym_chunk.c` | MSG/CLO symmetric sign+encrypt/unwrap (AES/HMAC for RSA + ECC-nistP256; ChaCha20-Poly1305 AEAD for ECC-curve25519) + key-set storage. |
@@ -398,6 +400,7 @@ only) are in [`conformance/security.md`](conformance/security.md) and
 | `src/address_space/` | Node model, bounded NodeId index, NodeId helpers, value sources, and the standard Base Information node set (`base_nodes.c`). |
 | `src/generated/opcua_ids.c` | Generated well-known ns=0 NodeId constants. |
 | `src/platform/` | Host reference adapters: POSIX TCP (`host_tcp_adapter.c`); crypto backends OpenSSL (`host_crypto/`, both ECC curves), mbedTLS (`mbedtls_crypto_adapter.c`, ECC-nistP256 only), wolfSSL (`wolfssl_crypto/`, both ECC curves). |
+| `src/cu/` | Reserved CU-aligned namespace for generated or experimental conformance-unit slices; the production library still primarily builds from `src/core`, `src/services`, `src/security`, `src/address_space`, and `src/encoding`. |
 | `examples/` | `minimal_server` reference app → built at `build/<profile>/examples/minimal_server`. |
 | `platform/` | Non-host platform integration (e.g. Pico SDK). |
 | `docs/conformance/` | Profile and service/security conformance: `profile-nano.md`, `profile-micro.md`, `profile-embedded.md`, `services.md`, `security.md`, `ecc-security-policy.md`. |

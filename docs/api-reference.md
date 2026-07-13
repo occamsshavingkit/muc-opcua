@@ -1528,33 +1528,39 @@ The interface mapping the server dispatcher to the platform-specific persistence
 
 ---
 
-## 12. Build-Time Feature Macros & Profiles (CMake)
+## 12. Build-Time Feature Macros & Profiles (Kconfig + CMake)
 
-These are CMake options that configure which code is compiled. All features default **OFF** unless activated via a profile.
+Feature selection is Kconfig-backed. `MUC_OPCUA_PROFILE` selects a base
+`configs/<profile>.defconfig`; CMake may add `-DMUC_OPCUA_<SYMBOL>=ON/OFF`
+override fragments; `scripts/kconfig/gen_config.py` resolves dependencies and
+emits the feature macros used by the C compiler. Non-CMake consumers can use the
+same script to generate `muc_opcua_autoconf.h` and force-include it before
+`muc_opcua/config.h`. See [build-and-gating.md](build-and-gating.md) for the full
+configuration workflow.
 
-| CMake option | Define when ON | Default | Effect |
+| Setting / feature symbol | Define when ON | Default source | Effect |
 |--------------|----------------|---------|--------|
-| `MUC_OPCUA_PROFILE` | *(string)* | `nano` | Target OPC UA profile (`nano`, `micro`, `embedded`, `full`, `custom`). Automatically turns on the relevant set of services. |
-| `MUC_OPCUA_SECURITY` | `MUC_OPCUA_SECURITY=1` | OFF | Build SecurityPolicy Basic256Sha256. |
-| `MUC_OPCUA_SUBSCRIPTIONS` | `MUC_OPCUA_SUBSCRIPTIONS=1` | OFF | Build the data-change subscription engine. |
-| `MUC_OPCUA_SUBSCRIPTIONS_STANDARD` | `MUC_OPCUA_SUBSCRIPTIONS_STANDARD=1` | OFF | Build standard subscription additions. |
+| `MUC_OPCUA_PROFILE` | *(string)* | `nano` | Target OPC UA profile (`nano`, `micro`, `embedded`, `standard`, `full`, `custom`). Seeds Kconfig. |
+| `MUC_OPCUA_KCONFIG_CONFIG` | *(path)* | empty | Uses a saved `.config` instead of `configs/<profile>.defconfig`; pass the matching `MUC_OPCUA_PROFILE` too so capacity profile markers stay aligned. |
+| `MUC_OPCUA_SECURITY` | `MUC_OPCUA_SECURITY=1` | profile-derived | Build SecurityPolicy Basic256Sha256 and related modern RSA policies. |
+| `MUC_OPCUA_SUBSCRIPTIONS` | `MUC_OPCUA_SUBSCRIPTIONS=1` | profile-derived | Build the data-change subscription engine. |
+| `MUC_OPCUA_SUBSCRIPTIONS_STANDARD` | `MUC_OPCUA_SUBSCRIPTIONS_STANDARD=1` | profile-derived | Build Standard DataChange subscription additions. |
 | `MUC_OPCUA_SERVICE_READ` | `MUC_OPCUA_SERVICE_READ=1` | ON | Build the Read service. |
 | `MUC_OPCUA_SERVICE_BROWSE` | `MUC_OPCUA_SERVICE_BROWSE=1` | ON | Build Browse + BrowseNext + TranslateBrowsePaths. |
 | `MUC_OPCUA_SERVICE_DISCOVERY` | `MUC_OPCUA_SERVICE_DISCOVERY=1` | ON | Build GetEndpoints/FindServers. |
-| `MUC_OPCUA_SERVICE_REGISTER_NODES` | `MUC_OPCUA_SERVICE_REGISTER_NODES=1` | OFF | Build RegisterNodes/UnregisterNodes. |
-| `MUC_OPCUA_SERVICE_WRITE` | `MUC_OPCUA_SERVICE_WRITE=1` | OFF | Build the Write service. |
-| `MUC_OPCUA_SERVICE_HISTORY` | `MUC_OPCUA_SERVICE_HISTORY=1` | OFF | Build Historical Access (HistoryRead/HistoryUpdate). |
-| `MUC_OPCUA_SERVICE_QUERY` | `MUC_OPCUA_SERVICE_QUERY=1` | OFF | Build QueryFirst/QueryNext (OPC-10000-4 Appendix B §B.2.3/§B.2.4). |
-| `MUC_OPCUA_SERVICE_NODEMANAGEMENT` | `MUC_OPCUA_SERVICE_NODEMANAGEMENT=1` | OFF | Build the NodeManagement service set: AddNodes, AddReferences, DeleteNodes, and DeleteReferences (OPC-10000-4 §5.8). |
-| `MUC_OPCUA_DYNAMIC_NODES` | `MUC_OPCUA_DYNAMIC_NODES=1` | OFF | Profile flag for dynamic AddNodes/DeleteNodes support; the `full` profile enables it with `MUC_OPCUA_SERVICE_NODEMANAGEMENT`. |
-| `MUC_OPCUA_PUBSUB` | `MUC_OPCUA_PUBSUB=1` | OFF | Build the scoped UADP/UDP PubSub publisher and caller-storage decoder; does not claim full PubSub Subscriber profile compliance. |
-| `MUC_OPCUA_CUSTOM_METHODS` | `MUC_OPCUA_CUSTOM_METHODS=1` | OFF | Build support for custom method calls. |
-| `MUC_OPCUA_SERVER_DIAGNOSTICS` | `MUC_OPCUA_SERVER_DIAGNOSTICS=1` | OFF | Build support for server diagnostics summary nodes. |
-| `MUC_OPCUA_EVENTS` | `MUC_OPCUA_EVENTS=1` | OFF | Build support for event notifications. |
-| `MUC_OPCUA_BASE_NODES` | `MUC_OPCUA_BASE_NODES=1` | OFF | Build the standard Base Information node set. |
-| `MUC_OPCUA_BASE_TYPE_SYSTEM` | `MUC_OPCUA_BASE_TYPE_SYSTEM=1` | OFF | Expose the Base Info Type System node set. |
-| `MUC_OPCUA_LTO` | *(toolchain LTO)* | OFF | Enable link-time / interprocedural optimization. |
-| `MUC_OPCUA_OPTIMIZE_SIZE` | `-Os` | OFF | Optimize the library for size. |
+| `MUC_OPCUA_SERVICE_REGISTER_NODES` | `MUC_OPCUA_SERVICE_REGISTER_NODES=1` | profile-derived | Build RegisterNodes/UnregisterNodes. |
+| `MUC_OPCUA_SERVICE_WRITE` | `MUC_OPCUA_SERVICE_WRITE=1` | profile-derived | Build the Write service. |
+| `MUC_OPCUA_SERVICE_HISTORY` | `MUC_OPCUA_SERVICE_HISTORY=1` | profile-derived | Build Historical Access (HistoryRead/HistoryUpdate). |
+| `MUC_OPCUA_SERVICE_QUERY` | `MUC_OPCUA_SERVICE_QUERY=1` | profile-derived | Build QueryFirst/QueryNext (OPC-10000-4 Appendix B §B.2.3/§B.2.4). |
+| `MUC_OPCUA_SERVICE_NODEMANAGEMENT` | `MUC_OPCUA_SERVICE_NODEMANAGEMENT=1` | profile-derived | Build the NodeManagement service set: AddNodes, AddReferences, DeleteNodes, and DeleteReferences (OPC-10000-4 §5.8). |
+| `MUC_OPCUA_DYNAMIC_NODES` | `MUC_OPCUA_DYNAMIC_NODES=1` | profile-derived | Runtime-added address-space nodes; `full` enables it with NodeManagement. |
+| `MUC_OPCUA_PUBSUB` | `MUC_OPCUA_PUBSUB=1` | profile-derived | Build the scoped UADP/UDP PubSub publisher and caller-storage decoder; does not claim full PubSub Subscriber profile compliance. |
+| `MUC_OPCUA_METHOD_SERVER` / `MUC_OPCUA_CUSTOM_METHODS` | `=1` | profile-derived | Build support for arbitrary custom method calls. |
+| `MUC_OPCUA_SERVER_DIAGNOSTICS` | `MUC_OPCUA_SERVER_DIAGNOSTICS=1` | profile-derived | Build support for server diagnostics summary nodes. |
+| `MUC_OPCUA_EVENTS` | `MUC_OPCUA_EVENTS=1` | profile-derived | Build support for event notifications. |
+| `MUC_OPCUA_BASE_NODES` | `MUC_OPCUA_BASE_NODES=1` | profile-derived | Build the standard Base Information node set. |
+| `MUC_OPCUA_BASE_TYPE_SYSTEM` | `MUC_OPCUA_BASE_TYPE_SYSTEM=1` | profile-derived | Expose the Base Info Type System node set. |
+| `MUC_OPCUA_LTO` | *(toolchain LTO)* | ON | Enable link-time / interprocedural optimization. |
 | `MUC_OPCUA_PLATFORM` | *(string)* | `host` | Target platform: `host`, `external`, `pico`, or `arduino-skeleton`. |
 
 **Notes:**
