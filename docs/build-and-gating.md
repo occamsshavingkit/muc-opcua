@@ -293,10 +293,19 @@ set incrementally.
 
 ## Full flag reference
 
-### Feature / facet flags (in the Kconfig tree — support the override mechanism above)
+### Feature / facet flags
 
 Membership below is the resolved `default y if PROFILE_*` matrix from `/Kconfig`
-(regenerate a temporary config with `python3 scripts/kconfig/gen_config.py Kconfig configs/<p>.defconfig /tmp/muc_opcua_config.cmake /tmp/muc_opcua_autoconf.h`).
+and supports the override mechanism described above. To regenerate a temporary
+config, run:
+
+```sh
+python3 scripts/kconfig/gen_config.py \
+  Kconfig configs/<p>.defconfig \
+  /tmp/muc_opcua_config.cmake \
+  /tmp/muc_opcua_autoconf.h
+```
+
 Since **spec 067** rebased each named profile onto exactly its OPC-namesake's
 *mandatory* facet set, `standard` is much leaner than `full` — the two are no
 longer the same column. In features `embedded` and `standard` are nearly
