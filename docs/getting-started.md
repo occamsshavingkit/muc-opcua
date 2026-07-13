@@ -67,6 +67,9 @@ dependency cascade behavior, and override mechanics.
 - **full**: `make full`; same as standard, plus optional ECC by default;
   optional services/facets enabled; 80,831 B core flash.
 
+OpenSSL is needed for host builds of secure profiles (`embedded`, `standard`,
+`full`) and any custom configuration that enables `MUC_OPCUA_SECURITY`.
+
 - **nano** — the OPC UA *Nano Embedded Device 2017* surface: Discovery,
   Session, Read, and the View (Browse) service set over **SecurityPolicy None**.
   Smallest build.

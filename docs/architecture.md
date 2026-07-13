@@ -280,12 +280,12 @@ raw CMake uses `-DMUC_OPCUA_PROFILE=...`):
   `#ECC_curve25519`/`#ECC_nistP256` alongside Basic256Sha256/
   Aes128_Sha256_RsaOaep/Aes256_Sha256_RsaPss; see §7).
 
-Every named profile is a preset; any individual Kconfig feature can be added on
-top of or removed from a profile's defaults on the same `cmake` invocation (e.g.
-"standard minus the crypto layer"). Kconfig dependency rules cascade dependents
-off when you remove a prerequisite. See [`build-and-gating.md`](build-and-gating.md)
-for the full `MUC_OPCUA_*` symbol reference, `menuconfig` flow, and override
-semantics.
+Every named profile except `custom` is a preset; `custom` is the hand-selected
+escape hatch. Any individual Kconfig feature can be added on top of or removed
+from a preset profile's defaults on the same `cmake` invocation. Kconfig
+dependency rules cascade dependents off when you remove a prerequisite. See
+[`build-and-gating.md`](build-and-gating.md) for the full `MUC_OPCUA_*` symbol
+reference, `menuconfig` flow, and override semantics.
 
 Profile definitions and current status:
 [`conformance/profile-nano.md`](conformance/profile-nano.md),

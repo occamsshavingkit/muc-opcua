@@ -54,11 +54,12 @@ detailed below). Reproduce with `scripts/measure_size.sh all`.
 **Core `.text` (flash)** — compiled library archive (`-Os`). The linked server is
 smaller after `--gc-sections` dead-code elimination.
 
-Each named profile is seeded from `configs/<profile>.defconfig` and resolved through
-`/Kconfig`. Optional facets remain `-DMUC_OPCUA_<SYMBOL>=ON/OFF` opt-ins or opt-outs,
-and invalid combinations cascade through Kconfig `depends on` rules. `full` is
-the only "everything on" build; `custom` starts from the always-on core services
-and lets you hand-select the rest.
+Each named profile except `custom` is seeded from `configs/<profile>.defconfig`
+and resolved through `/Kconfig`. Optional facets remain
+`-DMUC_OPCUA_<SYMBOL>=ON/OFF` opt-ins or opt-outs, and invalid combinations
+cascade through Kconfig `depends on` rules. `full` is the only "everything on"
+build; `custom` starts from the always-on core services and lets you hand-select
+the rest.
 
 | Profile | .text | OPC UA Profile (strict mandatory set) |
 |---------|-------|----------------|

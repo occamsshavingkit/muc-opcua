@@ -9,8 +9,23 @@ Micro-opcua serves integrators with wildly different requirements: a tiny sensor
 
 ## Decision
 
-Feature gating uses a tiered Kconfig profile system. The `MUC_OPCUA_PROFILE` CMake cache variable accepts `nano`, `micro`, `embedded`, `standard`, `full`, or `custom`, then seeds Kconfig from `configs/<profile>.defconfig`. Kconfig owns feature defaults, dependency containment, and profile-derived compile definitions; CMake consumes the generated `muc_opcua_config.cmake` for source selection and `muc_opcua_autoconf.h` for non-CMake/external builds. Integrators can refine the seed with `menuconfig`, additional defconfig fragments via `MUC_OPCUA_KCONFIG_CONFIG`, or by selecting `custom` and enabling facets directly.
+Feature gating uses a tiered Kconfig profile system. The `MUC_OPCUA_PROFILE`
+CMake cache variable accepts `nano`, `micro`, `embedded`, `standard`, `full`, or
+`custom`; named profiles seed Kconfig from `configs/<profile>.defconfig`, while
+`custom` starts from hand-selected options. Kconfig owns feature defaults,
+dependency containment, and profile-derived compile definitions; CMake consumes
+the generated `muc_opcua_config.cmake` for source selection and
+`muc_opcua_autoconf.h` for non-CMake/external builds. Integrators can refine the
+seed with `menuconfig`, replay a saved `.config` via `MUC_OPCUA_KCONFIG_CONFIG`,
+pass explicit override fragments to `scripts/kconfig/gen_config.py`, or select
+`custom` and enable facets directly.
 
 ## Consequences
 
-Integrators get exactly the footprint they need while keeping feature dependencies in one declarative configuration graph. The `custom` escape hatch allows hand-picked facets not covered by a predefined tier. The trade-off is that adding a new feature now requires updating `Kconfig`, the relevant defconfig/profile defaults, and any source-selection consumers; this is preferable to duplicating profile state across CMake option lists and compile-time guard macros.
+Integrators get exactly the footprint they need while keeping feature
+dependencies in one declarative configuration graph. The `custom` escape hatch
+allows hand-picked facets not covered by a predefined tier. The trade-off is
+that adding a new feature now requires updating `Kconfig`, the relevant
+defconfig/profile defaults, and any source-selection consumers; this is
+preferable to duplicating profile state across CMake option lists and
+compile-time guard macros.
