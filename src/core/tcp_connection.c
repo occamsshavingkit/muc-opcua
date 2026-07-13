@@ -169,7 +169,7 @@ opcua_statuscode_t mu_tcp_create_error_message(opcua_statuscode_t error_code, co
     return MU_STATUS_GOOD;
 }
 
-#if MUC_OPCUA_REVERSE_CONNECT
+#if MUC_OPCUA_CU_REVERSE_CONNECT
 opcua_statuscode_t mu_tcp_create_reverse_hello(const mu_server_config_t *config, opcua_byte_t *buffer, size_t *length) {
     if (!config || !buffer || !length) {
         return MU_STATUS_BAD_INTERNALERROR;

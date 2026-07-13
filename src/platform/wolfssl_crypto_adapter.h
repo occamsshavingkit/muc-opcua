@@ -13,7 +13,7 @@
 extern "C" {
 #endif
 
-#ifdef MUC_OPCUA_ECC
+#ifdef MUC_OPCUA_CU_SECURITY_ECC
 /* Provision the server's ECC signing identity for `curve` on an already
    initialized wolfSSL adapter. `key_der` is the DER-encoded private key
    (PKCS#8 or SEC1 for nistP256; PKCS#8 for curve25519/Ed25519) and `cert_der`
@@ -23,7 +23,7 @@ extern "C" {
 opcua_statuscode_t mu_wolfssl_crypto_adapter_set_ecc_identity(mu_crypto_adapter_t *adapter, mu_ecc_curve_t curve,
                                                               const opcua_byte_t *cert_der, size_t cert_len,
                                                               const opcua_byte_t *key_der, size_t key_len);
-#endif /* MUC_OPCUA_ECC */
+#endif /* MUC_OPCUA_CU_SECURITY_ECC */
 
 #ifdef __cplusplus
 }

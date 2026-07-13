@@ -11,7 +11,7 @@ static void poll_close_connection(mu_server_t *server, void **handle_ptr, size_t
     }
 }
 
-#ifdef MUC_OPCUA_MULTIPLE_CONNECTIONS
+#ifdef MUC_OPCUA_CU_MULTIPLE_CONNECTIONS
 static void poll_send_error_and_close(mu_server_t *server, void *handle) {
     opcua_byte_t buf[256];
     size_t err_len = sizeof(buf);
@@ -22,7 +22,7 @@ static void poll_send_error_and_close(mu_server_t *server, void *handle) {
     }
     server->config.tcp_adapter.close_connection(server->config.tcp_adapter.context, handle);
 }
-#endif /* MUC_OPCUA_MULTIPLE_CONNECTIONS */
+#endif /* MUC_OPCUA_CU_MULTIPLE_CONNECTIONS */
 
 static bool poll_check_idle_timeout(mu_server_t *server, void **handle_ptr, size_t *rx_len_ptr, size_t *read_pos_ptr,
                                     opcua_uint64_t *last_activity_ptr, const mu_secure_channel_t *channel) {
@@ -101,7 +101,7 @@ static opcua_statuscode_t poll_read_data(mu_server_t *server, void **handle_ptr,
     return MU_STATUS_GOOD;
 }
 
-#ifdef MUC_OPCUA_MULTIPLE_CONNECTIONS
+#ifdef MUC_OPCUA_CU_MULTIPLE_CONNECTIONS
 static void poll_conn_read_and_process(mu_server_t *server, mu_connection_t *conn) {
     poll_read_data(server, &conn->client_handle, &conn->rx_read_pos, &conn->rx_len, &conn->last_activity_ms,
                    conn->rx_buffer, sizeof(conn->rx_buffer));
@@ -121,7 +121,7 @@ static void poll_single_read_and_process(mu_server_t *server) {
 }
 #endif
 
-#ifdef MUC_OPCUA_MULTIPLE_CONNECTIONS
+#ifdef MUC_OPCUA_CU_MULTIPLE_CONNECTIONS
 /* Try to accept a new connection into a free slot. Returns true when an accept
    occurred (and the caller should immediately return mu_server_poll_background). */
 static bool poll_try_accept_multi(mu_server_t *server) {
@@ -163,14 +163,14 @@ static bool poll_try_accept_single(mu_server_t *server) {
     if (status == MU_STATUS_GOOD && server_client_handle != NULL) {
         mu_tcp_connection_init(&server_tcp_conn);
         mu_secure_channel_init(&server_secure_channel);
-#ifdef MUC_OPCUA_MULTI_CHUNK
+#ifdef MUC_OPCUA_CU_MULTI_CHUNK
         mu_chunk_assembler_init(&server->chunk_assembly);
 #endif
         for (size_t i = 0; i < MU_INTERN_MAX_SESSIONS; ++i) {
             mu_session_init(&server->sessions[i]);
         }
         server->active_session = NULL;
-#if MUC_OPCUA_SUBSCRIPTIONS
+#if MUC_OPCUA_CU_SUBSCRIPTION_BASIC
         mu_subscriptions_init(&server->subs);
 #endif
         server_rx_len = 0;
@@ -202,19 +202,19 @@ static void poll_reject_second_connection(mu_server_t *server) {
         server->config.tcp_adapter.close_connection(server->config.tcp_adapter.context, second_handle);
     }
 }
-#endif /* MUC_OPCUA_MULTIPLE_CONNECTIONS (else branch helpers) */
+#endif /* MUC_OPCUA_CU_MULTIPLE_CONNECTIONS (else branch helpers) */
 
 static opcua_statuscode_t mu_server_poll_background(mu_server_t *server) {
     (void)server;
 
-#ifdef MUC_OPCUA_PUBSUB
+#ifdef MUC_OPCUA_CU_PUBSUB
     opcua_statuscode_t status = mu_pubsub_poll(server);
     if (status != MU_STATUS_GOOD) {
         return status;
     }
 #endif
 
-#if defined(MUC_OPCUA_SESSION_TIMEOUT)
+#if defined(MUC_OPCUA_CU_SESSION_TIMEOUT)
     {
         opcua_uint64_t now_ms = server->config.time_adapter.get_tick_ms(server->config.time_adapter.context);
         if (now_ms != 0u) {
@@ -231,7 +231,7 @@ static opcua_statuscode_t mu_server_poll_background(mu_server_t *server) {
                     mu_session_close_timeout(session);
                     mu_diagnostics_session_timeout(server);
                     mu_diagnostics_session_closed(server);
-#if MUC_OPCUA_SUBSCRIPTIONS
+#if MUC_OPCUA_CU_SUBSCRIPTION_BASIC
                     for (size_t j = 0; j < MU_INTERN_MAX_SUBSCRIPTIONS; ++j) {
                         mu_subscription_t *sub = &server->subs.subscriptions[j];
                         if (sub->in_use && sub->session_id == session->session_id) {
@@ -249,9 +249,9 @@ static opcua_statuscode_t mu_server_poll_background(mu_server_t *server) {
             }
         }
     }
-#endif /* defined(MUC_OPCUA_SESSION_TIMEOUT) */
+#endif /* defined(MUC_OPCUA_CU_SESSION_TIMEOUT) */
 
-#if MUC_OPCUA_SUBSCRIPTIONS
+#if MUC_OPCUA_CU_SUBSCRIPTION_BASIC
     mu_subscriptions_tick(server, server->config.time_adapter.get_tick_ms(server->config.time_adapter.context));
 #endif
 
@@ -263,7 +263,7 @@ opcua_statuscode_t mu_server_poll(mu_server_t *server) {
         return MU_STATUS_BAD_INTERNALERROR;
     }
 
-#ifdef MUC_OPCUA_MULTIPLE_CONNECTIONS
+#ifdef MUC_OPCUA_CU_MULTIPLE_CONNECTIONS
     if (poll_try_accept_multi(server)) {
         return mu_server_poll_background(server);
     }

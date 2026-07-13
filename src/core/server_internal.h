@@ -16,12 +16,12 @@
 #include "service_dispatch.h"
 #include "tcp_connection.h"
 
-/* Scratch layout within server->secure_scratch (all under MUC_OPCUA_SECURITY):
+/* Scratch layout within server->secure_scratch (all under MUC_OPCUA_FACET_CORE_2022_SERVER):
    [0,                  MU_SECURE_RESP_MAX)           response body
    [MU_SECURE_RESP_MAX, MU_SECURE_RESP_MAX + OPN_MAX) OPN request unwrap
    [RESP_MAX + OPN_MAX, end)                          session handshake buffers
    Details and _Static_asserts in server.c. */
-#ifdef MUC_OPCUA_SECURITY
+#ifdef MUC_OPCUA_FACET_CORE_2022_SERVER
 #define MU_SECURE_RESP_MAX 11264
 #define MU_SECURE_OPN_REQ_MAX 1024
 #define MU_SECURE_SESSION_OFFSET (MU_SECURE_RESP_MAX + MU_SECURE_OPN_REQ_MAX)
@@ -34,7 +34,7 @@
 #define MU_SESSION_SIG_SIZE 512
 #endif
 
-#ifdef MUC_OPCUA_SERVICE_NODEMANAGEMENT
+#ifdef MUC_OPCUA_CU_NODEMANAGEMENT
 typedef struct {
     mu_nodeid_t source_node_id;
     mu_reference_t ref;
@@ -58,7 +58,7 @@ typedef struct {
 } mu_dynamic_address_space_t;
 #endif
 
-#ifdef MUC_OPCUA_MULTIPLE_CONNECTIONS
+#ifdef MUC_OPCUA_CU_MULTIPLE_CONNECTIONS
 typedef struct {
     void *client_handle;
     size_t rx_len;
@@ -79,7 +79,7 @@ struct mu_server {
     mu_address_space_index_t user_address_space_index;
     opcua_boolean_t is_running;
 
-#ifdef MUC_OPCUA_MULTIPLE_CONNECTIONS
+#ifdef MUC_OPCUA_CU_MULTIPLE_CONNECTIONS
     mu_connection_t conns[MU_INTERN_MAX_CONNECTIONS];
     mu_connection_t *active_conn;
 #endif
@@ -89,11 +89,11 @@ struct mu_server {
     opcua_uint64_t last_activity_ms; /* monotonic tick of last inbound traffic (idle timeout) */
     mu_tcp_connection_t tcp_conn;
     mu_secure_channel_t secure_channel;
-#ifdef MUC_OPCUA_MULTI_CHUNK
+#ifdef MUC_OPCUA_CU_MULTI_CHUNK
     mu_chunk_assembler_t chunk_assembly;
 #endif
 
-#ifdef MUC_OPCUA_MULTIPLE_CONNECTIONS
+#ifdef MUC_OPCUA_CU_MULTIPLE_CONNECTIONS
 #define server_secure_channel (*(server->active_conn ? &server->active_conn->secure_channel : &server->secure_channel))
 #define server_tcp_conn (*(server->active_conn ? &server->active_conn->tcp_conn : &server->tcp_conn))
 #define server_client_handle (*(server->active_conn ? &server->active_conn->client_handle : &server->client_handle))
@@ -114,7 +114,7 @@ struct mu_server {
 
     mu_string_t opn_pending_security_policy;
     mu_bytestring_t opn_pending_client_cert;
-#ifdef MUC_OPCUA_SECURITY
+#ifdef MUC_OPCUA_FACET_CORE_2022_SERVER
     opcua_byte_t secure_scratch[MU_SECURE_SCRATCH_SIZE];
     /* Persistent copy of the current SecureChannel's client application-instance
        certificate, populated at OpenSecureChannel and used to verify the
@@ -128,14 +128,14 @@ struct mu_server {
 #if MUC_OPCUA_READ_CACHE
     mu_read_cache_t read_cache;
 #endif
-#if defined(MUC_OPCUA_SESSION_TIMEOUT)
+#if defined(MUC_OPCUA_CU_SESSION_TIMEOUT)
     opcua_uint64_t next_session_timeout_ms;
 #endif
-#if MUC_OPCUA_SUBSCRIPTIONS
+#if MUC_OPCUA_CU_SUBSCRIPTION_BASIC
     mu_subscriptions_t subs;
     opcua_uint32_t current_request_id;
 #endif
-#if MUC_OPCUA_METHOD_SERVER
+#if MUC_OPCUA_CU_METHOD_SERVER
 #define MU_MAX_REGISTERED_METHODS 8
     struct {
         mu_nodeid_t method_id;
@@ -150,17 +150,17 @@ struct mu_server {
     size_t registered_method_count;
 #endif
 
-#ifdef MUC_OPCUA_PUBSUB
+#ifdef MUC_OPCUA_CU_PUBSUB
 #define MU_MAX_WRITER_GROUPS 2
     mu_pubsub_writer_group_t writer_groups[MU_MAX_WRITER_GROUPS];
     size_t writer_group_count;
 #endif
 
-#ifdef MUC_OPCUA_SERVICE_NODEMANAGEMENT
+#ifdef MUC_OPCUA_CU_NODEMANAGEMENT
     mu_dynamic_address_space_t dynamic_address_space;
 #endif
 
-#ifdef MUC_OPCUA_SERVICE_QUERY
+#ifdef MUC_OPCUA_CU_QUERY
     struct {
         struct {
             opcua_byte_t id_buf[8];
@@ -177,11 +177,11 @@ struct mu_server {
     size_t condition_count;
 #endif
 
-#if MUC_OPCUA_SERVER_DIAGNOSTICS
+#if MUC_OPCUA_CU_DIAGNOSTICS
     mu_diagnostics_summary_t diag;
 #endif
 
-#if MUC_OPCUA_COMPLEX_TYPES
+#if MUC_OPCUA_CU_COMPLEX_TYPES
 #define MU_MAX_COMPLEX_TYPE_ENTRIES 8
     struct {
         const mu_structure_definition_t *structures[MU_MAX_COMPLEX_TYPE_ENTRIES];
@@ -193,7 +193,7 @@ struct mu_server {
     } complex_types;
 #endif
 
-#ifdef MUC_OPCUA_AUDITING
+#ifdef MUC_OPCUA_CU_AUDITING
 #define MU_MAX_AUDIT_CALLBACKS 4
     struct {
         mu_audit_callback_t callback;
@@ -206,7 +206,7 @@ struct mu_server {
 _Static_assert(MU_SERVER_STORAGE_BYTES >= sizeof(struct mu_server),
                "MU_SERVER_STORAGE_BYTES must cover struct mu_server for enabled feature gates");
 
-#if MUC_OPCUA_SUBSCRIPTIONS
+#if MUC_OPCUA_CU_SUBSCRIPTION_BASIC
 opcua_statuscode_t mu_server_emit_message(mu_server_t *server, opcua_uint32_t request_id, const opcua_byte_t *body,
                                           size_t body_len);
 
@@ -221,7 +221,7 @@ bool monitored_item_sample_changed(const mu_monitored_item_t *item, const mu_var
 bool monitored_item_reportable(const mu_monitored_item_t *item, const mu_subscription_t *sub);
 #endif
 
-#if MUC_OPCUA_SUBSCRIPTIONS_STANDARD
+#if MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
 bool variant_numeric_to_double(const mu_variant_t *value, opcua_double_t *out);
 bool monitored_item_change_reportable(const mu_monitored_item_t *item, const mu_variant_t *cur,
                                       opcua_statuscode_t status);
@@ -240,7 +240,7 @@ bool monitored_item_reports_by_trigger(const struct mu_server *server, const mu_
  * boundaries (T008+). Definitions live in service_dispatch.c. */
 opcua_statuscode_t write_response_prefix(mu_binary_writer_t *w, opcua_uint32_t response_type_id,
                                          opcua_uint32_t request_handle, opcua_statuscode_t service_result
-#ifdef MUC_OPCUA_TIME_SYNC
+#ifdef MUC_OPCUA_CU_TIME_SYNC
                                          ,
                                          const mu_server_t *server
 #endif
@@ -265,9 +265,9 @@ opcua_statuscode_t handle_close_session(mu_server_t *server, mu_binary_reader_t 
                                         size_t *response_length);
 
 /* Discovery service handlers — implemented in dispatch_discovery.c (T009).
- * Compiled under MUC_OPCUA_SERVICE_DISCOVERY; the dispatch table in
+ * Compiled under MUC_OPCUA_CU_DISCOVERY_FIND_SERVERS_SELF_GET_ENDPOINTS; the dispatch table in
  * service_dispatch.c references these by name. */
-#ifdef MUC_OPCUA_SERVICE_DISCOVERY
+#ifdef MUC_OPCUA_CU_DISCOVERY_FIND_SERVERS_SELF_GET_ENDPOINTS
 opcua_statuscode_t handle_get_endpoints(mu_server_t *server, mu_binary_reader_t *r, mu_binary_writer_t *w,
                                         size_t *response_length);
 opcua_statuscode_t handle_find_servers(mu_server_t *server, mu_binary_reader_t *r, mu_binary_writer_t *w,
@@ -276,18 +276,18 @@ opcua_statuscode_t handle_find_servers(mu_server_t *server, mu_binary_reader_t *
 
 /* Read/Write attribute service handlers — implemented in dispatch_attribute.c
  * (T010). The dispatch table in service_dispatch.c references these by name. */
-#ifdef MUC_OPCUA_SERVICE_READ
+#ifdef MUC_OPCUA_CU_ATTRIBUTE_READ
 opcua_statuscode_t handle_read(mu_server_t *server, mu_binary_reader_t *r, mu_binary_writer_t *w,
                                size_t *response_length);
 #endif
-#ifdef MUC_OPCUA_SERVICE_WRITE
+#ifdef MUC_OPCUA_CU_CORE_2017_ATTRIBUTE_WRITE
 opcua_statuscode_t handle_write(mu_server_t *server, mu_binary_reader_t *r, mu_binary_writer_t *w,
                                 size_t *response_length);
 #endif
 
 /* Browse-family service handlers — implemented in dispatch_view.c (T011).
  * The dispatch table in service_dispatch.c references these by name. */
-#ifdef MUC_OPCUA_SERVICE_BROWSE
+#ifdef MUC_OPCUA_CU_VIEW_BASIC_TRANSLATEBROWSEPATH
 opcua_statuscode_t handle_browse(mu_server_t *server, mu_binary_reader_t *r, mu_binary_writer_t *w,
                                  size_t *response_length);
 opcua_statuscode_t handle_browse_next(mu_server_t *server, mu_binary_reader_t *r, mu_binary_writer_t *w,
@@ -299,7 +299,7 @@ opcua_statuscode_t handle_translate_browse_paths(mu_server_t *server, mu_binary_
 /* Subscription service-set handlers — implemented in dispatch_subscription.c
  * (T012). The dispatch table in service_dispatch.c references these by name;
  * the MonitoredItems handlers remain in service_dispatch.c. */
-#if MUC_OPCUA_SUBSCRIPTIONS
+#if MUC_OPCUA_CU_SUBSCRIPTION_BASIC
 opcua_statuscode_t handle_create_subscription(mu_server_t *server, mu_binary_reader_t *r, mu_binary_writer_t *w,
                                               size_t *response_length);
 opcua_statuscode_t handle_modify_subscription(mu_server_t *server, mu_binary_reader_t *r, mu_binary_writer_t *w,
@@ -326,7 +326,7 @@ opcua_statuscode_t drive_subscription_id_status_array(
 
 /* NodeManagement service-set handlers — implemented in dispatch_node_mgmt.c
  * (T013). The dispatch table in service_dispatch.c references these by name. */
-#ifdef MUC_OPCUA_SERVICE_NODEMANAGEMENT
+#ifdef MUC_OPCUA_CU_NODEMANAGEMENT
 opcua_statuscode_t handle_add_nodes(mu_server_t *server, mu_binary_reader_t *r, mu_binary_writer_t *w,
                                     size_t *response_length);
 opcua_statuscode_t handle_add_references(mu_server_t *server, mu_binary_reader_t *r, mu_binary_writer_t *w,
@@ -341,12 +341,12 @@ opcua_statuscode_t handle_delete_references(mu_server_t *server, mu_binary_reade
  * table in service_dispatch.c references this by name. The guard matches the
  * original MU_DISPATCH_CALL_ENABLED condition in service_dispatch.c
  * (MUC_OPCUA_METHOD_CALL is not defined in this codebase). */
-#if MUC_OPCUA_SUBSCRIPTIONS && MUC_OPCUA_SUBSCRIPTIONS_STANDARD && MUC_OPCUA_BASE_TYPE_SYSTEM
+#if MUC_OPCUA_CU_SUBSCRIPTION_BASIC && MUC_OPCUA_CU_SUBSCRIPTION_STANDARD && MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER
 opcua_statuscode_t handle_call(mu_server_t *server, mu_binary_reader_t *r, mu_binary_writer_t *w,
                                size_t *response_length);
 #endif
 
-#if MUC_OPCUA_REDUNDANCY
+#if MUC_OPCUA_CU_REDUNDANCY
 opcua_statuscode_t handle_transfer_subscriptions(mu_server_t *server, mu_binary_reader_t *r, mu_binary_writer_t *w,
                                                  size_t *response_length);
 #endif

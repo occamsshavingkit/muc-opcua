@@ -12,7 +12,7 @@ void mu_binary_reader_init(mu_binary_reader_t *reader, const opcua_byte_t *buffe
     }
 }
 
-#if defined(MUC_OPCUA_USER_AUTH) || defined(MUC_OPCUA_SECURITY)
+#if defined(MUC_OPCUA_CU_USER_AUTH) || defined(MUC_OPCUA_FACET_CORE_2022_SERVER)
 static opcua_statuscode_t reader_status(const mu_binary_reader_t *reader) {
     if (!reader) {
         return MU_STATUS_BAD_INTERNALERROR;
@@ -179,7 +179,7 @@ opcua_statuscode_t mu_binary_read_statuscode(mu_binary_reader_t *reader, opcua_s
     return mu_binary_read_uint32(reader, value);
 }
 
-#ifdef MUC_OPCUA_USER_AUTH
+#ifdef MUC_OPCUA_CU_USER_AUTH
 opcua_statuscode_t mu_binary_read_username_identity_token(mu_binary_reader_t *reader,
                                                           mu_username_identity_token_t *value) {
     opcua_statuscode_t status = reader_status(reader);
@@ -207,7 +207,7 @@ opcua_statuscode_t mu_binary_read_username_identity_token(mu_binary_reader_t *re
 }
 #endif
 
-#ifdef MUC_OPCUA_SECURITY
+#ifdef MUC_OPCUA_FACET_CORE_2022_SERVER
 opcua_statuscode_t mu_binary_read_certificate_identity_token(mu_binary_reader_t *reader,
                                                              mu_certificate_identity_token_t *value) {
     opcua_statuscode_t status = reader_status(reader);
@@ -224,7 +224,7 @@ opcua_statuscode_t mu_binary_read_certificate_identity_token(mu_binary_reader_t 
     return status;
 }
 
-#if MUC_OPCUA_DATA_ACCESS
+#if MUC_OPCUA_CU_DATA_ACCESS
 opcua_statuscode_t mu_binary_read_range(mu_binary_reader_t *reader, mu_range_t *value) {
     if (!reader || !value)
         return MU_STATUS_BAD_INTERNALERROR;

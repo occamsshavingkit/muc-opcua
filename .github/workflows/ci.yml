@@ -14,7 +14,7 @@ jobs:
       - name: Install dependencies
         run: sudo apt-get update && sudo apt-get install -y cmake build-essential cppcheck clang-tidy clang-format libssl-dev libmbedtls-dev libwolfssl-dev
       - name: Configure CMake
-        run: cmake -S . -B build/host -DCMAKE_BUILD_TYPE=Debug -DMUC_OPCUA_BUILD_TESTS=ON -DMUC_OPCUA_BUILD_EXAMPLES=ON -DMUC_OPCUA_PLATFORM=host -DMUC_OPCUA_HAVE_MBEDTLS=ON -DMUC_OPCUA_HAVE_WOLFSSL=ON -DMUC_OPCUA_PUBSUB=ON
+        run: cmake -S . -B build/host -DCMAKE_BUILD_TYPE=Debug -DMUC_OPCUA_BUILD_TESTS=ON -DMUC_OPCUA_BUILD_EXAMPLES=ON -DMUC_OPCUA_PLATFORM=host -DMUC_OPCUA_HAVE_MBEDTLS=ON -DMUC_OPCUA_HAVE_WOLFSSL=ON -DMUC_OPCUA_PROFILE=full
       - name: Build
         run: cmake --build build/host
       - name: Test
@@ -49,7 +49,7 @@ jobs:
           sudo apt-get update && sudo apt-get install -y cmake build-essential python3-venv
           python3 -m venv /tmp/venv && /tmp/venv/bin/pip install --quiet asyncua
       - name: Build host example
-        run: cmake -S . -B build/host -DMUC_OPCUA_BUILD_EXAMPLES=ON -DMUC_OPCUA_PLATFORM=host -DMUC_OPCUA_PUBSUB=ON && cmake --build build/host --target minimal_server
+        run: cmake -S . -B build/host -DMUC_OPCUA_BUILD_EXAMPLES=ON -DMUC_OPCUA_PLATFORM=host -DMUC_OPCUA_PROFILE=full && cmake --build build/host --target minimal_server
       - name: Interop smoke test (asyncua client)
         run: PATH="/tmp/venv/bin:$PATH" tests/interop/run_interop.sh
 
@@ -63,7 +63,7 @@ jobs:
       - name: Install build dependencies
         run: sudo apt-get update && sudo apt-get install -y cmake build-essential libssl-dev
       - name: Build host example
-        run: cmake -S . -B build/host -DMUC_OPCUA_BUILD_EXAMPLES=ON -DMUC_OPCUA_PLATFORM=host -DMUC_OPCUA_PUBSUB=ON && cmake --build build/host --target minimal_server
+        run: cmake -S . -B build/host -DMUC_OPCUA_BUILD_EXAMPLES=ON -DMUC_OPCUA_PLATFORM=host -DMUC_OPCUA_PROFILE=full && cmake --build build/host --target minimal_server
       - name: OPC Foundation .NET reference-client interop
         run: tests/interop/run_interop_dotnet.sh
 
@@ -74,7 +74,7 @@ jobs:
       - name: Install dependencies
         run: sudo apt-get update && sudo apt-get install -y cmake clang-format cppcheck clang-tidy libssl-dev
       - name: Configure CMake
-        run: cmake -S . -B build/host -DMUC_OPCUA_BUILD_TESTS=ON -DMUC_OPCUA_PLATFORM=host -DMUC_OPCUA_PUBSUB=ON
+        run: cmake -S . -B build/host -DMUC_OPCUA_BUILD_TESTS=ON -DMUC_OPCUA_PLATFORM=host -DMUC_OPCUA_PROFILE=full
       - name: Format Check
         run: cmake --build build/host --target format-check
       - name: CppCheck
@@ -89,7 +89,7 @@ jobs:
       - name: Install dependencies
         run: sudo apt-get update && sudo apt-get install -y cmake clang libssl-dev libmbedtls-dev libwolfssl-dev
       - name: Configure CMake
-        run: CC=clang CXX=clang++ cmake -S . -B build/asan -DMUC_OPCUA_BUILD_TESTS=ON -DMUC_OPCUA_SANITIZERS="address,undefined" -DMUC_OPCUA_PLATFORM=host -DMUC_OPCUA_HAVE_MBEDTLS=ON -DMUC_OPCUA_HAVE_WOLFSSL=ON -DMUC_OPCUA_PUBSUB=ON
+        run: CC=clang CXX=clang++ cmake -S . -B build/asan -DMUC_OPCUA_BUILD_TESTS=ON -DMUC_OPCUA_SANITIZERS="address,undefined" -DMUC_OPCUA_PLATFORM=host -DMUC_OPCUA_HAVE_MBEDTLS=ON -DMUC_OPCUA_HAVE_WOLFSSL=ON -DMUC_OPCUA_PROFILE=full
       - name: Build
         run: cmake --build build/asan
       - name: Test
@@ -102,7 +102,7 @@ jobs:
       - name: Install dependencies
         run: sudo apt-get update && sudo apt-get install -y cmake clang
       - name: Configure CMake
-        run: CC=clang CXX=clang++ cmake -S . -B build/fuzz -DMUC_OPCUA_BUILD_FUZZERS=ON -DMUC_OPCUA_PLATFORM=host -DMUC_OPCUA_PUBSUB=ON
+        run: CC=clang CXX=clang++ cmake -S . -B build/fuzz -DMUC_OPCUA_BUILD_FUZZERS=ON -DMUC_OPCUA_PLATFORM=host -DMUC_OPCUA_PROFILE=full
       - name: Build
         run: cmake --build build/fuzz
       - name: Run fuzzers (60s each)
@@ -124,7 +124,7 @@ jobs:
           git clone --depth 1 --branch master https://github.com/raspberrypi/pico-sdk.git ~/pico-sdk
           cd ~/pico-sdk && git submodule update --init
       - name: Configure CMake
-        run: PICO_SDK_PATH=~/pico-sdk cmake -S . -B build/pico -DMUC_OPCUA_PLATFORM=pico -DMUC_OPCUA_BUILD_EXAMPLES=ON -DMUC_OPCUA_PUBSUB=ON
+        run: PICO_SDK_PATH=~/pico-sdk cmake -S . -B build/pico -DMUC_OPCUA_PLATFORM=pico -DMUC_OPCUA_BUILD_EXAMPLES=ON -DMUC_OPCUA_PROFILE=full
       - name: Build
         run: cmake --build build/pico || true
 
@@ -148,7 +148,7 @@ jobs:
             -not -path 'src/client/client_call*'); do
             echo "freestanding: $f"
             arm-none-eabi-gcc -ffreestanding -ffunction-sections -fdata-sections \
-              -std=c11 -Iinclude -Isrc -Wall -Wextra -Werror -DMUC_OPCUA_SECURITY=1 \
+              -std=c11 -Iinclude -Isrc -Wall -Wextra -Werror \
               -c "$f" -o /dev/null
           done
 

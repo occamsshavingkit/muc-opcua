@@ -21,10 +21,10 @@ typedef struct {
     opcua_uint32_t revised_session_timeout_ms;
     opcua_uint64_t last_activity_ms;
     opcua_byte_t server_nonce[32];
-#ifdef MUC_OPCUA_MULTIPLE_CONNECTIONS
+#ifdef MUC_OPCUA_CU_MULTIPLE_CONNECTIONS
     opcua_uint32_t secure_channel_id;
 #endif
-#if MUC_OPCUA_REDUNDANCY
+#if MUC_OPCUA_CU_REDUNDANCY
     /* User-identity fingerprint captured at ActivateSession, for the same-user
        (ClientValidated) check in TransferSubscriptions (OPC-10000-4 §5.14.1.4 /
        §6.6.3). kind = the identity-token type (321 anonymous, 324 username, 327
@@ -35,7 +35,7 @@ typedef struct {
 #endif
 } mu_session_t;
 
-#if MUC_OPCUA_REDUNDANCY
+#if MUC_OPCUA_CU_REDUNDANCY
 /* TRUE only when both Sessions were activated on behalf of the same user (same
    identity kind and discriminator). Anonymous == anonymous. */
 bool mu_session_same_user(const mu_session_t *a, const mu_session_t *b);
@@ -91,9 +91,9 @@ opcua_statuscode_t mu_session_close(mu_session_t *session, opcua_uint32_t auth_t
    itself is closing the idle Session. As with CloseSession, the state is set to
    CLOSED and the serverNonce is zeroed, while the session_id and auth_token are
    preserved so subsequent requests on the stale token return Bad_SessionClosed.
-   When MUC_OPCUA_SESSION_TIMEOUT is off, session timeout is not
+   When MUC_OPCUA_CU_SESSION_TIMEOUT is off, session timeout is not
    tracked; the inline no-op satisfies callers that are compiled out. */
-#if defined(MUC_OPCUA_SESSION_TIMEOUT)
+#if defined(MUC_OPCUA_CU_SESSION_TIMEOUT)
 void mu_session_close_timeout(mu_session_t *session);
 #else
 static inline void mu_session_close_timeout(mu_session_t *session) {

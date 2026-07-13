@@ -55,7 +55,7 @@ opcua_statuscode_t mu_server_config_validate(const mu_server_config_t *config) {
     }
 
     /* Validate Endpoints */
-#if MUC_OPCUA_REVERSE_CONNECT
+#if MUC_OPCUA_CU_REVERSE_CONNECT
     if (config->reverse_connect_url != NULL) {
         if (strncmp(config->reverse_connect_url, "opc.tcp://", 10) != 0) {
             return MU_STATUS_BAD_TCPENDPOINTURLINVALID;
@@ -91,7 +91,7 @@ opcua_statuscode_t mu_server_config_validate(const mu_server_config_t *config) {
     }
 
     /* Validate Platform Adapters */
-#if MUC_OPCUA_REVERSE_CONNECT
+#if MUC_OPCUA_CU_REVERSE_CONNECT
     if (config->reverse_connect_url != NULL) {
         if (config->tcp_adapter.connect == NULL || config->tcp_adapter.accept == NULL ||
             config->tcp_adapter.read == NULL || config->tcp_adapter.write == NULL ||
@@ -199,7 +199,7 @@ opcua_statuscode_t mu_server_init(void *storage, size_t storage_size, const mu_s
                                      ? server->config.time_adapter.get_time(server->config.time_adapter.context)
                                      : 0;
         mu_base_runtime_init(&server->runtime_base, &server->config.time_adapter, start
-#if MUC_OPCUA_SERVER_DIAGNOSTICS
+#if MUC_OPCUA_CU_DIAGNOSTICS
                              ,
                              &server->diag
 #endif
@@ -219,7 +219,7 @@ opcua_statuscode_t mu_server_init(void *storage, size_t storage_size, const mu_s
     }
 #endif /* MUC_OPCUA_MDNS_DISCOVERY */
 
-#ifdef MUC_OPCUA_MULTIPLE_CONNECTIONS
+#ifdef MUC_OPCUA_CU_MULTIPLE_CONNECTIONS
     for (size_t i = 0; i < MU_INTERN_MAX_CONNECTIONS; ++i) {
         server->conns[i].client_handle = NULL;
         mu_tcp_connection_init(&server->conns[i].tcp_conn);
@@ -232,7 +232,7 @@ opcua_statuscode_t mu_server_init(void *storage, size_t storage_size, const mu_s
     server_client_handle = NULL;
     mu_tcp_connection_init(&server_tcp_conn);
     mu_secure_channel_init(&server_secure_channel);
-#ifdef MUC_OPCUA_MULTI_CHUNK
+#ifdef MUC_OPCUA_CU_MULTI_CHUNK
     mu_chunk_assembler_init(&server->chunk_assembly);
 #endif
 #endif
@@ -240,13 +240,13 @@ opcua_statuscode_t mu_server_init(void *storage, size_t storage_size, const mu_s
         mu_session_init(&server->sessions[i]);
     }
     server->active_session = NULL;
-#if MUC_OPCUA_SUBSCRIPTIONS
+#if MUC_OPCUA_CU_SUBSCRIPTION_BASIC
     mu_subscriptions_init(&server->subs);
 #endif
-#ifdef MUC_OPCUA_SERVICE_NODEMANAGEMENT
+#ifdef MUC_OPCUA_CU_NODEMANAGEMENT
     (void)memset(&server->dynamic_address_space, 0, sizeof(server->dynamic_address_space));
 #endif
-#ifdef MUC_OPCUA_SERVICE_QUERY
+#ifdef MUC_OPCUA_CU_QUERY
     for (size_t i = 0; i < MU_INTERN_MAX_QUERY_CONTINUATION_POINTS; ++i) {
         server->query_context.continuation_points[i].id.length = -1;
         server->query_context.continuation_points[i].id.data = NULL;
@@ -257,7 +257,7 @@ opcua_statuscode_t mu_server_init(void *storage, size_t storage_size, const mu_s
 #endif
 
     /* Initialize platform TCP adapter */
-#if MUC_OPCUA_REVERSE_CONNECT
+#if MUC_OPCUA_CU_REVERSE_CONNECT
     if (config->reverse_connect_url != NULL) {
         void *handle = NULL;
         status = server->config.tcp_adapter.connect(server->config.tcp_adapter.context, config->reverse_connect_url,
@@ -265,7 +265,7 @@ opcua_statuscode_t mu_server_init(void *storage, size_t storage_size, const mu_s
         if (status != MU_STATUS_GOOD) {
             return status;
         }
-#ifdef MUC_OPCUA_MULTIPLE_CONNECTIONS
+#ifdef MUC_OPCUA_CU_MULTIPLE_CONNECTIONS
         server->conns[0].client_handle = handle;
         server->active_conn = &server->conns[0];
 #else
@@ -310,7 +310,7 @@ void mu_server_close(mu_server_t *server) {
         }
 #endif /* MUC_OPCUA_MDNS_DISCOVERY */
 
-#ifdef MUC_OPCUA_MULTIPLE_CONNECTIONS
+#ifdef MUC_OPCUA_CU_MULTIPLE_CONNECTIONS
         for (size_t i = 0; i < MU_INTERN_MAX_CONNECTIONS; ++i) {
             if (server->conns[i].client_handle != NULL) {
                 server->config.tcp_adapter.close_connection(server->config.tcp_adapter.context,

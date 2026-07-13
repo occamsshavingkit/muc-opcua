@@ -15,7 +15,7 @@
 void setUp(void) {}
 void tearDown(void) {}
 
-#ifdef MUC_OPCUA_SERVICE_WRITE
+#ifdef MUC_OPCUA_CU_CORE_2017_ATTRIBUTE_WRITE
 static opcua_statuscode_t dummy_write_handler(void *handle, const mu_nodeid_t *node_id, opcua_uint32_t attribute_id,
                                               const mu_datavalue_t *value) {
     (void)handle;
@@ -546,7 +546,7 @@ void test_write_too_many_operations_is_service_level_bad_toomanyoperations(void)
 
 int main(void) {
     UNITY_BEGIN();
-#ifdef MUC_OPCUA_SERVICE_WRITE
+#ifdef MUC_OPCUA_CU_CORE_2017_ATTRIBUTE_WRITE
     RUN_TEST(test_write_service_empty_array);
     RUN_TEST(test_write_datavalue_without_value_returns_type_mismatch_without_callback);
     RUN_TEST(test_write_service_non_value_attribute);

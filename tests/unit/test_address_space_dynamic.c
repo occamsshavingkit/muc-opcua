@@ -1,5 +1,5 @@
 /* tests/unit/test_address_space_dynamic.c */
-#define MUC_OPCUA_SERVICE_NODEMANAGEMENT 1
+#define MUC_OPCUA_CU_NODEMANAGEMENT 1
 #include "../../src/core/server_internal.h"
 #include "../../src/services/browse.h"
 #include "muc_opcua/server.h"
@@ -198,14 +198,14 @@ void test_Browse_DynamicReferences(void) {
     extern opcua_statuscode_t mu_browse_process_with_user_index(
         const mu_address_space_t *address_space, const mu_address_space_index_t *user_index,
         const mu_address_space_t *dynamic,
-#ifdef MUC_OPCUA_SERVICE_NODEMANAGEMENT
+#ifdef MUC_OPCUA_CU_NODEMANAGEMENT
         const mu_dynamic_reference_t *dyn_refs, size_t dyn_refs_count,
 #endif
         const mu_browse_request_t *req, mu_browse_result_t *results, size_t max_results,
         mu_reference_description_t *ref_pool, size_t max_total_refs);
 
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_browse_process_with_user_index(NULL, NULL, &dyn_space,
-#ifdef MUC_OPCUA_SERVICE_NODEMANAGEMENT
+#ifdef MUC_OPCUA_CU_NODEMANAGEMENT
                                                                         server.dynamic_address_space.references,
                                                                         server.dynamic_address_space.references_count,
 #endif

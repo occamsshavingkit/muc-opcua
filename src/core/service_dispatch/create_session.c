@@ -128,7 +128,7 @@ static opcua_statuscode_t read_create_session_request(mu_binary_reader_t *r, mu_
     return MU_STATUS_GOOD;
 }
 
-#ifdef MUC_OPCUA_SECURITY
+#ifdef MUC_OPCUA_FACET_CORE_2022_SERVER
 static opcua_statuscode_t validate_create_session_security(mu_server_t *server, const mu_bytestring_t *client_cert,
                                                            const mu_string_t *application_uri) {
     if (server_secure_channel.policy != MU_SECURITY_POLICY_NONE_ID &&
@@ -170,7 +170,7 @@ static opcua_statuscode_t initialize_create_session(mu_server_t *server, mu_bina
         return s;
     }
     s = write_response_prefix(w, MU_ID_CREATESESSIONRESPONSE, req->request_handle, MU_STATUS_GOOD
-#ifdef MUC_OPCUA_TIME_SYNC
+#ifdef MUC_OPCUA_CU_TIME_SYNC
                               ,
                               server
 #endif
@@ -187,7 +187,7 @@ static opcua_statuscode_t initialize_create_session(mu_server_t *server, mu_bina
     *out_slot = slot;
     if (server->config.time_adapter.get_tick_ms != NULL) {
         slot->last_activity_ms = server->config.time_adapter.get_tick_ms(server->config.time_adapter.context);
-#if defined(MUC_OPCUA_SESSION_TIMEOUT)
+#if defined(MUC_OPCUA_CU_SESSION_TIMEOUT)
         server->next_session_timeout_ms = 0;
 #endif
     }
@@ -260,7 +260,7 @@ static opcua_statuscode_t encode_server_signature(mu_binary_writer_t *w, mu_serv
     (void)server;
     (void)client_cert;
     (void)client_nonce;
-#ifdef MUC_OPCUA_SECURITY
+#ifdef MUC_OPCUA_FACET_CORE_2022_SERVER
     const char *sig_uri = mu_security_policy_asym_signature_uri(server_secure_channel.policy);
     if (server_secure_channel.policy != MU_SECURITY_POLICY_NONE_ID &&
         server_secure_channel.policy != MU_SECURITY_POLICY_INVALID_ID && server->config.crypto_adapter != NULL &&
@@ -325,7 +325,7 @@ opcua_statuscode_t handle_create_session(mu_server_t *server, mu_binary_reader_t
         return MU_STATUS_BAD_DECODINGERROR;
     }
 
-#ifdef MUC_OPCUA_SECURITY
+#ifdef MUC_OPCUA_FACET_CORE_2022_SERVER
     s = validate_create_session_security(server, &client_cert, &application_uri);
     if (s != MU_STATUS_GOOD) {
         return s;
@@ -362,7 +362,7 @@ opcua_statuscode_t handle_create_session(mu_server_t *server, mu_binary_reader_t
     if (s != MU_STATUS_GOOD) {
         goto cleanup;
     }
-#ifdef MUC_OPCUA_SECURITY
+#ifdef MUC_OPCUA_FACET_CORE_2022_SERVER
     mu_secure_zero(nonce_buf, sizeof(nonce_buf));
 #endif
 

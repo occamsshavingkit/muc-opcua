@@ -1,167 +1,154 @@
 /* include/muc_opcua/capacities.h
  *
+ * GENERATED from profiles/opcua-profile-manifest.yaml by
+ * scripts/profile_manifest/generate.py -- do not edit; regenerate with:
+ *   python3 scripts/profile_manifest/generate.py \
+ *       --manifest profiles/opcua-profile-manifest.yaml --outputs capacities_h
+ *
  * SINGLE SOURCE OF TRUTH for every tunable capacity dimension.
  *
  * Each capacity is resolved by a three-stage cascade, in order:
  *
- *   1. DEFAULT  -- an unconditional baseline (the `standard` profile values).
- *                  Because this stage always runs, the internal macro is
- *                  ALWAYS defined: a build with no profile and no overrides is
- *                  fully specified, and silent fallthrough is impossible.
- *   2. PROFILE  -- if a profile is declared (CMake emits exactly one
- *                  MUC_OPCUA_PROFILE_<NAME>), redefine to that profile's value.
- *   3. USER     -- if the integrator defined the PUBLIC MU_MAX_* knob (e.g.
- *                  -DMU_MAX_SESSIONS=32), redefine to it. The public knob wins
- *                  over any profile, with or without a profile selected.
+ *   1. DEFAULT  -- an unconditional baseline (the minimal/nano values).
+ *   2. PROFILE  -- if an internal cascade symbol is active (Kconfig emits
+ *                  MUC_OPCUA_INTERN_PROFILE_<TOKEN>), redefine to that
+ *                  profile's value.  The cascade follows the selected
+ *                  base profile (OPC-10000-7 §4.3).
+ *   3. USER     -- if the public MU_MAX_* macro is defined (emitted by
+ *                  src/CMakeLists.txt from the Kconfig-resolved int symbol),
+ *                  redefine to it. The public knob wins over any profile.
  *
- * Precedence: default < profile < user.
+ * Precedence: default < profile < user (Kconfig-resolved).
  *
  * ALL library/application/test code compiles off the MU_INTERN_* macros below.
- * The public MU_MAX_* macros are pure INPUT: they are read only in stage 3 here
- * and are otherwise never referenced by code. They remain the documented -D
- * override knob (docs/api-reference.md). Adding or retuning a capacity is a
- * localized edit in this one file.
- *
- * The profile selector MUC_OPCUA_PROFILE_<NAME> is emitted by src/CMakeLists.txt
- * for nano/micro/embedded/standard/full. For MUC_OPCUA_PROFILE=custom (or a
- * build that never ran the project's CMake), no selector is defined and stage 1
- * applies unless the integrator -D's the public knob.
+ * The public MU_MAX_* macros are INPUT: they are emitted from resolved Kconfig
+ * capacity int symbols by src/CMakeLists.txt, so changes via -DMU_MAX_*=N,
+ * menuconfig, or MUC_OPCUA_KCONFIG_CONFIG all reach the compiler here.
  */
 #ifndef MUC_OPCUA_CAPACITIES_H
 #define MUC_OPCUA_CAPACITIES_H
 
 /* =====================================================================
  * Profile-varying capacities (all three stages).
- * Baseline == the MINIMAL (nano) values: a profile-less / custom build gets the
- * smallest, storage-consistent footprint and scales UP via a profile or a public
- * -D. (A standard-sized baseline would give a featureless no-profile build a
- * 50-session in-struct array with no matching MU_SERVER_STORAGE_BYTES, tripping
- * the storage-coverage assert in server_internal.h.) Larger profiles therefore
- * each carry an explicit stage-2 block.
  * ===================================================================== */
 
-/* ---- Max concurrent Sessions ---------------------------------------- */
-#define MU_INTERN_MAX_SESSIONS 2 /* stage 1: minimal baseline */
-#if defined(MUC_OPCUA_PROFILE_STANDARD)
-#undef MU_INTERN_MAX_SESSIONS
-#define MU_INTERN_MAX_SESSIONS 50 /* stage 2: profile */
-#elif defined(MUC_OPCUA_PROFILE_FULL)
+/* ---- Max sessions ------------------------------------------------ */
+/* Public override: MU_MAX_SESSIONS */
+#define MU_INTERN_MAX_SESSIONS 2
+#if defined(MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES)
 #undef MU_INTERN_MAX_SESSIONS
 #define MU_INTERN_MAX_SESSIONS 100
+#elif defined(MUC_OPCUA_INTERN_PROFILE_STANDARD_2025_UA_SERVER)
+#undef MU_INTERN_MAX_SESSIONS
+#define MU_INTERN_MAX_SESSIONS 50
 #endif
 #ifdef MU_MAX_SESSIONS
 #undef MU_INTERN_MAX_SESSIONS
-#define MU_INTERN_MAX_SESSIONS MU_MAX_SESSIONS /* stage 3: integrator override */
+#define MU_INTERN_MAX_SESSIONS MU_MAX_SESSIONS
 #endif
 
-/* ---- Max concurrent TCP connections --------------------------------- */
-/* connections >= sessions: each concurrent session may be an independent
- * client holding its own SecureChannel (docs/conformance/profile-micro.md).
- * NOTE: the connection pool array (mu_connection_t conns[]) and the multi-
- * connection accept path are gated on MUC_OPCUA_MULTIPLE_CONNECTIONS; when
- * that flag is off the single-connection path is used regardless of this
- * value (and MU_MULTIPLE_CONNECTIONS_STORAGE_BYTES contributes 0). */
-#define MU_INTERN_MAX_CONNECTIONS 1 /* stage 1: minimal baseline */
-#if defined(MUC_OPCUA_PROFILE_MICRO)
-#undef MU_INTERN_MAX_CONNECTIONS
-#define MU_INTERN_MAX_CONNECTIONS 2
-#elif defined(MUC_OPCUA_PROFILE_EMBEDDED)
-#undef MU_INTERN_MAX_CONNECTIONS
-#define MU_INTERN_MAX_CONNECTIONS 4
-#elif defined(MUC_OPCUA_PROFILE_STANDARD)
-#undef MU_INTERN_MAX_CONNECTIONS
-#define MU_INTERN_MAX_CONNECTIONS 50
-#elif defined(MUC_OPCUA_PROFILE_FULL)
+/* ---- Max connections --------------------------------------------- */
+/* Public override: MU_MAX_CONNECTIONS */
+#define MU_INTERN_MAX_CONNECTIONS 1
+#if defined(MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES)
 #undef MU_INTERN_MAX_CONNECTIONS
 #define MU_INTERN_MAX_CONNECTIONS 100
+#elif defined(MUC_OPCUA_INTERN_PROFILE_STANDARD_2025_UA_SERVER)
+#undef MU_INTERN_MAX_CONNECTIONS
+#define MU_INTERN_MAX_CONNECTIONS 50
+#elif defined(MUC_OPCUA_INTERN_PROFILE_EMBEDDED_2025_UA_SERVER)
+#undef MU_INTERN_MAX_CONNECTIONS
+#define MU_INTERN_MAX_CONNECTIONS 4
+#elif defined(MUC_OPCUA_INTERN_PROFILE_MICRO_EMBEDDED_DEVICE_2025_SERVER)
+#undef MU_INTERN_MAX_CONNECTIONS
+#define MU_INTERN_MAX_CONNECTIONS 2
 #endif
 #ifdef MU_MAX_CONNECTIONS
 #undef MU_INTERN_MAX_CONNECTIONS
 #define MU_INTERN_MAX_CONNECTIONS MU_MAX_CONNECTIONS
 #endif
 
-/* ---- Max concurrent Subscriptions ----------------------------------- */
-#define MU_INTERN_MAX_SUBSCRIPTIONS 2 /* stage 1: minimal baseline */
-#if defined(MUC_OPCUA_PROFILE_STANDARD)
-#undef MU_INTERN_MAX_SUBSCRIPTIONS
-#define MU_INTERN_MAX_SUBSCRIPTIONS 50
-#elif defined(MUC_OPCUA_PROFILE_FULL)
+/* ---- Max subscriptions ------------------------------------------- */
+/* Public override: MU_MAX_SUBSCRIPTIONS */
+#define MU_INTERN_MAX_SUBSCRIPTIONS 2
+#if defined(MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES)
 #undef MU_INTERN_MAX_SUBSCRIPTIONS
 #define MU_INTERN_MAX_SUBSCRIPTIONS 100
+#elif defined(MUC_OPCUA_INTERN_PROFILE_STANDARD_2025_UA_SERVER)
+#undef MU_INTERN_MAX_SUBSCRIPTIONS
+#define MU_INTERN_MAX_SUBSCRIPTIONS 50
 #endif
 #ifdef MU_MAX_SUBSCRIPTIONS
 #undef MU_INTERN_MAX_SUBSCRIPTIONS
 #define MU_INTERN_MAX_SUBSCRIPTIONS MU_MAX_SUBSCRIPTIONS
 #endif
 
-/* ---- Max MonitoredItems --------------------------------------------- */
-#define MU_INTERN_MAX_MONITORED_ITEMS 8 /* stage 1: minimal baseline */
-#if defined(MUC_OPCUA_PROFILE_EMBEDDED)
-#undef MU_INTERN_MAX_MONITORED_ITEMS
-#define MU_INTERN_MAX_MONITORED_ITEMS 100
-#elif defined(MUC_OPCUA_PROFILE_STANDARD)
-#undef MU_INTERN_MAX_MONITORED_ITEMS
-#define MU_INTERN_MAX_MONITORED_ITEMS 1000
-#elif defined(MUC_OPCUA_PROFILE_FULL)
+/* ---- Max monitored items ----------------------------------------- */
+/* Public override: MU_MAX_MONITORED_ITEMS */
+#define MU_INTERN_MAX_MONITORED_ITEMS 8
+#if defined(MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES)
 #undef MU_INTERN_MAX_MONITORED_ITEMS
 #define MU_INTERN_MAX_MONITORED_ITEMS 2000
+#elif defined(MUC_OPCUA_INTERN_PROFILE_STANDARD_2025_UA_SERVER)
+#undef MU_INTERN_MAX_MONITORED_ITEMS
+#define MU_INTERN_MAX_MONITORED_ITEMS 1000
+#elif defined(MUC_OPCUA_INTERN_PROFILE_EMBEDDED_2025_UA_SERVER)
+#undef MU_INTERN_MAX_MONITORED_ITEMS
+#define MU_INTERN_MAX_MONITORED_ITEMS 100
 #endif
 #ifdef MU_MAX_MONITORED_ITEMS
 #undef MU_INTERN_MAX_MONITORED_ITEMS
 #define MU_INTERN_MAX_MONITORED_ITEMS MU_MAX_MONITORED_ITEMS
 #endif
 
-/* ---- Max parallel Publish requests ---------------------------------- */
-#define MU_INTERN_MAX_PUBLISH_REQUESTS 4 /* stage 1: minimal baseline */
-#if defined(MUC_OPCUA_PROFILE_EMBEDDED)
-#undef MU_INTERN_MAX_PUBLISH_REQUESTS
-#define MU_INTERN_MAX_PUBLISH_REQUESTS 5
-#elif defined(MUC_OPCUA_PROFILE_STANDARD)
-#undef MU_INTERN_MAX_PUBLISH_REQUESTS
-#define MU_INTERN_MAX_PUBLISH_REQUESTS 50
-#elif defined(MUC_OPCUA_PROFILE_FULL)
+/* ---- Max publish requests ---------------------------------------- */
+/* Public override: MU_MAX_PUBLISH_REQUESTS */
+#define MU_INTERN_MAX_PUBLISH_REQUESTS 4
+#if defined(MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES)
 #undef MU_INTERN_MAX_PUBLISH_REQUESTS
 #define MU_INTERN_MAX_PUBLISH_REQUESTS 100
+#elif defined(MUC_OPCUA_INTERN_PROFILE_STANDARD_2025_UA_SERVER)
+#undef MU_INTERN_MAX_PUBLISH_REQUESTS
+#define MU_INTERN_MAX_PUBLISH_REQUESTS 50
+#elif defined(MUC_OPCUA_INTERN_PROFILE_EMBEDDED_2025_UA_SERVER)
+#undef MU_INTERN_MAX_PUBLISH_REQUESTS
+#define MU_INTERN_MAX_PUBLISH_REQUESTS 5
 #endif
 #ifdef MU_MAX_PUBLISH_REQUESTS
 #undef MU_INTERN_MAX_PUBLISH_REQUESTS
 #define MU_INTERN_MAX_PUBLISH_REQUESTS MU_MAX_PUBLISH_REQUESTS
 #endif
 
-/* ---- MonitoredItem queue depth -------------------------------------- */
-/* The Server Facet the profile advertises sets the floor:
- *   embedded  -> EmbeddedUA2017  -> Standard DataChange 2017 (MinQueueSize_02) => 2
- *   standard  -> StandardUA2017  -> Enhanced DataChange 2017 (MinQueueSize_05) => 5
- *   full      -> StandardUA2017  -> Enhanced DataChange 2017 (MinQueueSize_05) => 5
- * The standard/full raise to 5 is MANDATORY: StandardUA2017 (profile-DB id 1663)
- * lists the Enhanced facet (id 1678) as non-optional. The queue is a fixed inline
- * ring per MonitoredItem, so depth 5 costs 3 extra queue entries per item
- * (48 B/entry on ARM => +144 KiB standard / +288 KiB full RAM) -- documented in
- * docs/conformance/enhanced-datachange.md. Enforced by the _Static_asserts in
- * services/subscription.h. */
-#define MU_INTERN_MONITORED_QUEUE_DEPTH 1 /* stage 1: minimal baseline */
-#if defined(MUC_OPCUA_PROFILE_EMBEDDED)
+/* ---- Monitored queue depth --------------------------------------- */
+/* Public override: MU_MONITORED_QUEUE_DEPTH */
+#define MU_INTERN_MONITORED_QUEUE_DEPTH 1
+#if defined(MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES)
 #undef MU_INTERN_MONITORED_QUEUE_DEPTH
-#define MU_INTERN_MONITORED_QUEUE_DEPTH 2 /* Standard DataChange 2017 */
-#elif defined(MUC_OPCUA_PROFILE_STANDARD) || defined(MUC_OPCUA_PROFILE_FULL)
+#define MU_INTERN_MONITORED_QUEUE_DEPTH 5
+#elif defined(MUC_OPCUA_INTERN_PROFILE_STANDARD_2025_UA_SERVER)
 #undef MU_INTERN_MONITORED_QUEUE_DEPTH
-#define MU_INTERN_MONITORED_QUEUE_DEPTH 5 /* Enhanced DataChange 2017 */
+#define MU_INTERN_MONITORED_QUEUE_DEPTH 5
+#elif defined(MUC_OPCUA_INTERN_PROFILE_EMBEDDED_2025_UA_SERVER)
+#undef MU_INTERN_MONITORED_QUEUE_DEPTH
+#define MU_INTERN_MONITORED_QUEUE_DEPTH 2
 #endif
 #ifdef MU_MONITORED_QUEUE_DEPTH
 #undef MU_INTERN_MONITORED_QUEUE_DEPTH
 #define MU_INTERN_MONITORED_QUEUE_DEPTH MU_MONITORED_QUEUE_DEPTH
 #endif
 
-/* ---- Max decoded array element count (OperationLimits MaxArrayLength) ----- */
-/* DoS ceiling on decoded array lengths; also advertised via base_nodes.c so the
- * enforced value == the advertised value. Scales with the profile tier. */
-#define MU_INTERN_MAX_ARRAY_LENGTH 512 /* stage 1: minimal baseline */
-#if defined(MUC_OPCUA_PROFILE_EMBEDDED)
-#undef MU_INTERN_MAX_ARRAY_LENGTH
-#define MU_INTERN_MAX_ARRAY_LENGTH 2048
-#elif defined(MUC_OPCUA_PROFILE_STANDARD) || defined(MUC_OPCUA_PROFILE_FULL)
+/* ---- Max array length -------------------------------------------- */
+/* Public override: MU_MAX_ARRAY_LENGTH */
+#define MU_INTERN_MAX_ARRAY_LENGTH 512
+#if defined(MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES)
 #undef MU_INTERN_MAX_ARRAY_LENGTH
 #define MU_INTERN_MAX_ARRAY_LENGTH 8192
+#elif defined(MUC_OPCUA_INTERN_PROFILE_STANDARD_2025_UA_SERVER)
+#undef MU_INTERN_MAX_ARRAY_LENGTH
+#define MU_INTERN_MAX_ARRAY_LENGTH 8192
+#elif defined(MUC_OPCUA_INTERN_PROFILE_EMBEDDED_2025_UA_SERVER)
+#undef MU_INTERN_MAX_ARRAY_LENGTH
+#define MU_INTERN_MAX_ARRAY_LENGTH 2048
 #endif
 #ifdef MU_MAX_ARRAY_LENGTH
 #undef MU_INTERN_MAX_ARRAY_LENGTH
@@ -170,88 +157,98 @@
 
 /* =====================================================================
  * Profile-invariant capacities (stage 1 baseline + stage 3 user override).
- * These do not vary per profile today; they still funnel through this file so
- * every capacity is resolved in one place and is -D-overridable.
  * ===================================================================== */
 
-/* ---- Triggering links per MonitoredItem ----------------------------- */
+/* ---- Max trigger links ------------------------------------------- */
+/* Public override: MU_MAX_TRIGGER_LINKS */
 #define MU_INTERN_MAX_TRIGGER_LINKS 4
 #ifdef MU_MAX_TRIGGER_LINKS
 #undef MU_INTERN_MAX_TRIGGER_LINKS
 #define MU_INTERN_MAX_TRIGGER_LINKS MU_MAX_TRIGGER_LINKS
 #endif
 
-/* ---- EventFilter WhereClause (ContentFilter) per MonitoredItem ------
- * Bounds on the owned operand tree an event MonitoredItem may carry
- * (MUC_OPCUA_EVENT_FILTER_WHERE). A filter exceeding any of these is
- * rejected with Bad_EventFilterInvalid / Bad_TooManyOperations rather than
- * silently truncated (OPC-10000-4 §7.7.1). */
+/* ---- Max where elements ------------------------------------------ */
+/* Public override: MU_MAX_WHERE_ELEMENTS */
 #define MU_INTERN_MAX_WHERE_ELEMENTS 8
 #ifdef MU_MAX_WHERE_ELEMENTS
 #undef MU_INTERN_MAX_WHERE_ELEMENTS
 #define MU_INTERN_MAX_WHERE_ELEMENTS MU_MAX_WHERE_ELEMENTS
 #endif
 
+/* ---- Max where operands ------------------------------------------ */
+/* Public override: MU_MAX_WHERE_OPERANDS */
 #define MU_INTERN_MAX_WHERE_OPERANDS 16
 #ifdef MU_MAX_WHERE_OPERANDS
 #undef MU_INTERN_MAX_WHERE_OPERANDS
 #define MU_INTERN_MAX_WHERE_OPERANDS MU_MAX_WHERE_OPERANDS
 #endif
 
-/* Backing bytes for string/bytestring LiteralOperand payloads (copied out of
- * the transient request PDU so the filter can outlive the request). */
+/* ---- Where blob bytes -------------------------------------------- */
+/* Public override: MU_WHERE_BLOB_BYTES */
 #define MU_INTERN_WHERE_BLOB_BYTES 64
 #ifdef MU_WHERE_BLOB_BYTES
 #undef MU_INTERN_WHERE_BLOB_BYTES
 #define MU_INTERN_WHERE_BLOB_BYTES MU_WHERE_BLOB_BYTES
 #endif
 
-/* ---- Address-space index capacity ----------------------------------- */
+/* ---- Max address space nodes ------------------------------------- */
+/* Public override: MU_MAX_ADDRESS_SPACE_NODES */
 #define MU_INTERN_MAX_ADDRESS_SPACE_NODES 64
 #ifdef MU_MAX_ADDRESS_SPACE_NODES
 #undef MU_INTERN_MAX_ADDRESS_SPACE_NODES
 #define MU_INTERN_MAX_ADDRESS_SPACE_NODES MU_MAX_ADDRESS_SPACE_NODES
 #endif
 
-/* ---- Dynamic (NodeManagement) address-space limits ------------------ */
+/* ---- Max dynamic nodes ------------------------------------------- */
+/* Public override: MU_MAX_DYNAMIC_NODES */
 #define MU_INTERN_MAX_DYNAMIC_NODES 32
 #ifdef MU_MAX_DYNAMIC_NODES
 #undef MU_INTERN_MAX_DYNAMIC_NODES
 #define MU_INTERN_MAX_DYNAMIC_NODES MU_MAX_DYNAMIC_NODES
 #endif
 
+/* ---- Max dynamic references -------------------------------------- */
+/* Public override: MU_MAX_DYNAMIC_REFERENCES */
 #define MU_INTERN_MAX_DYNAMIC_REFERENCES 64
 #ifdef MU_MAX_DYNAMIC_REFERENCES
 #undef MU_INTERN_MAX_DYNAMIC_REFERENCES
 #define MU_INTERN_MAX_DYNAMIC_REFERENCES MU_MAX_DYNAMIC_REFERENCES
 #endif
 
+/* ---- Max dynamic browse name length ------------------------------ */
+/* Public override: MU_MAX_DYNAMIC_BROWSE_NAME_LENGTH */
 #define MU_INTERN_MAX_DYNAMIC_BROWSE_NAME_LENGTH 64
 #ifdef MU_MAX_DYNAMIC_BROWSE_NAME_LENGTH
 #undef MU_INTERN_MAX_DYNAMIC_BROWSE_NAME_LENGTH
 #define MU_INTERN_MAX_DYNAMIC_BROWSE_NAME_LENGTH MU_MAX_DYNAMIC_BROWSE_NAME_LENGTH
 #endif
 
+/* ---- Max dynamic display name length ----------------------------- */
+/* Public override: MU_MAX_DYNAMIC_DISPLAY_NAME_LENGTH */
 #define MU_INTERN_MAX_DYNAMIC_DISPLAY_NAME_LENGTH 64
 #ifdef MU_MAX_DYNAMIC_DISPLAY_NAME_LENGTH
 #undef MU_INTERN_MAX_DYNAMIC_DISPLAY_NAME_LENGTH
 #define MU_INTERN_MAX_DYNAMIC_DISPLAY_NAME_LENGTH MU_MAX_DYNAMIC_DISPLAY_NAME_LENGTH
 #endif
 
+/* ---- Max dynamic string nodeid length ---------------------------- */
+/* Public override: MU_MAX_DYNAMIC_STRING_NODEID_LENGTH */
 #define MU_INTERN_MAX_DYNAMIC_STRING_NODEID_LENGTH 64
 #ifdef MU_MAX_DYNAMIC_STRING_NODEID_LENGTH
 #undef MU_INTERN_MAX_DYNAMIC_STRING_NODEID_LENGTH
 #define MU_INTERN_MAX_DYNAMIC_STRING_NODEID_LENGTH MU_MAX_DYNAMIC_STRING_NODEID_LENGTH
 #endif
 
-/* ---- Max Query continuation points ---------------------------------- */
+/* ---- Max query continuation points ------------------------------- */
+/* Public override: MU_MAX_QUERY_CONTINUATION_POINTS */
 #define MU_INTERN_MAX_QUERY_CONTINUATION_POINTS 2
 #ifdef MU_MAX_QUERY_CONTINUATION_POINTS
 #undef MU_INTERN_MAX_QUERY_CONTINUATION_POINTS
 #define MU_INTERN_MAX_QUERY_CONTINUATION_POINTS MU_MAX_QUERY_CONTINUATION_POINTS
 #endif
 
-/* ---- Max Alarms & Conditions ---------------------------------------- */
+/* ---- Max conditions ---------------------------------------------- */
+/* Public override: MU_MAX_CONDITIONS */
 #define MU_INTERN_MAX_CONDITIONS 10
 #ifdef MU_MAX_CONDITIONS
 #undef MU_INTERN_MAX_CONDITIONS
@@ -262,15 +259,16 @@
  * Derived capacities (depend on a resolved capacity above; must come last).
  * ===================================================================== */
 
-/* Secure channels track connections 1:1 (one channel per connection, see
- * mu_connection_t). Integrator may still override the public knob directly. */
+/* ---- Max secure channels ----------------------------------------- */
+/* Public override: MU_MAX_SECURE_CHANNELS */
 #define MU_INTERN_MAX_SECURE_CHANNELS MU_INTERN_MAX_CONNECTIONS
 #ifdef MU_MAX_SECURE_CHANNELS
 #undef MU_INTERN_MAX_SECURE_CHANNELS
 #define MU_INTERN_MAX_SECURE_CHANNELS MU_MAX_SECURE_CHANNELS
 #endif
 
-/* Reference string-NodeId length defaults to the string-NodeId length. */
+/* ---- Max dynamic reference string nodeid length ------------------ */
+/* Public override: MU_MAX_DYNAMIC_REFERENCE_STRING_NODEID_LENGTH */
 #define MU_INTERN_MAX_DYNAMIC_REFERENCE_STRING_NODEID_LENGTH MU_INTERN_MAX_DYNAMIC_STRING_NODEID_LENGTH
 #ifdef MU_MAX_DYNAMIC_REFERENCE_STRING_NODEID_LENGTH
 #undef MU_INTERN_MAX_DYNAMIC_REFERENCE_STRING_NODEID_LENGTH

@@ -15,7 +15,7 @@
 #include <wolfssl/wolfcrypt/rsa.h>
 #include <wolfssl/wolfcrypt/sha.h>
 #include <wolfssl/wolfcrypt/sha256.h>
-#ifdef MUC_OPCUA_ECC
+#ifdef MUC_OPCUA_CU_SECURITY_ECC
 #include <wolfssl/wolfcrypt/chacha20_poly1305.h>
 #include <wolfssl/wolfcrypt/curve25519.h>
 #include <wolfssl/wolfcrypt/ecc.h>
@@ -29,7 +29,7 @@ struct wolfssl_crypto_context {
     size_t key_len;
     RsaKey key;
     WC_RNG rng;
-#ifdef MUC_OPCUA_ECC
+#ifdef MUC_OPCUA_CU_SECURITY_ECC
     /* spec 059: per-curve server ECC signing identity, provisioned by
        mu_wolfssl_crypto_adapter_set_ecc_identity. The DER pointers are
        caller-owned (borrowed, not copied). */
@@ -85,7 +85,7 @@ opcua_statuscode_t w_verify_certificate_validity(void *context, const opcua_byte
 opcua_statuscode_t w_get_certificate_thumbprint(void *context, const opcua_byte_t *certificate,
                                                 size_t certificate_length, opcua_byte_t *thumbprint);
 
-#ifdef MUC_OPCUA_ECC
+#ifdef MUC_OPCUA_CU_SECURITY_ECC
 /* ecc.c (spec 059) */
 opcua_statuscode_t w_ecc_generate_ephemeral(void *context, mu_ecc_curve_t curve, opcua_byte_t *pubkey,
                                             size_t *pubkey_length, opcua_byte_t *keypair_ctx);
@@ -106,7 +106,7 @@ opcua_statuscode_t w_chacha20_poly1305_encrypt(void *context, const opcua_byte_t
 opcua_statuscode_t w_chacha20_poly1305_decrypt(void *context, const opcua_byte_t *key, const opcua_byte_t *nonce,
                                                const opcua_byte_t *aad, size_t aad_length, const opcua_byte_t *input,
                                                size_t length, const opcua_byte_t *tag, opcua_byte_t *output);
-#endif /* MUC_OPCUA_ECC */
+#endif /* MUC_OPCUA_CU_SECURITY_ECC */
 
 #endif
 #endif

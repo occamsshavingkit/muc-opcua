@@ -4,7 +4,7 @@
 #include "muc_opcua/encoding.h"
 #include "muc_opcua/services/history.h"
 
-#ifdef MUC_OPCUA_SERVICE_HISTORY
+#ifdef MUC_OPCUA_CU_HISTORICAL_ACCESS_SERVER_FACET
 
 #ifndef MU_MAX_HISTORY_READ_CONTINUATION_POINT_LENGTH
 #define MU_MAX_HISTORY_READ_CONTINUATION_POINT_LENGTH 32
@@ -110,6 +110,6 @@ opcua_statuscode_t mu_history_update_request_decode(mu_binary_reader_t *reader, 
 opcua_statuscode_t mu_history_update_response_encode(mu_binary_writer_t *writer,
                                                      const mu_history_update_response_t *resp);
 
-#endif /* MUC_OPCUA_SERVICE_HISTORY */
+#endif /* MUC_OPCUA_CU_HISTORICAL_ACCESS_SERVER_FACET */
 
 #endif /* MUC_OPCUA_SERVICES_HISTORY_INTERNAL_H */

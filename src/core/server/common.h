@@ -19,7 +19,7 @@ bool accept_inbound_chunk(struct mu_server *server, bool is_opn, opcua_uint32_t 
                           opcua_uint32_t sequence_number);
 bool is_ns0_numeric_nodeid(const mu_nodeid_t *nodeid);
 void handle_data_chunk_plaintext(struct mu_server *server, const opcua_byte_t *msg, size_t msg_len, bool is_opn);
-#ifdef MUC_OPCUA_SECURITY
+#ifdef MUC_OPCUA_FACET_CORE_2022_SERVER
 void handle_data_chunk_secure(struct mu_server *server, opcua_byte_t *msg, size_t msg_len, bool is_opn);
 #endif
 

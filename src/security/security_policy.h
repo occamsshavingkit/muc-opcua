@@ -15,7 +15,7 @@ typedef enum {
     MU_SECURITY_POLICY_AES128_SHA256_RSAOAEP_ID,
     MU_SECURITY_POLICY_AES256_SHA256_RSAPSS_ID,
     /* ECC SecurityPolicies (spec 059). Present in the enum regardless of build so
-       switch statements stay total; only advertised/selectable when MUC_OPCUA_ECC. */
+       switch statements stay total; only advertised/selectable when MUC_OPCUA_CU_SECURITY_ECC. */
     MU_SECURITY_POLICY_ECC_NISTP256_ID,
     MU_SECURITY_POLICY_ECC_CURVE25519_ID
 } mu_security_policy_id_t;

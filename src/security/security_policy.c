@@ -3,12 +3,12 @@
 #include <string.h>
 
 static const char POLICY_NONE_URI[] = "http://opcfoundation.org/UA/SecurityPolicy#None";
-#ifdef MUC_OPCUA_SECURITY
+#ifdef MUC_OPCUA_FACET_CORE_2022_SERVER
 static const char POLICY_B256S256_URI[] = "http://opcfoundation.org/UA/SecurityPolicy#Basic256Sha256";
 static const char POLICY_AES128_OAEP_URI[] = "http://opcfoundation.org/UA/SecurityPolicy#Aes128_Sha256_RsaOaep";
 static const char POLICY_AES256_PSS_URI[] = "http://opcfoundation.org/UA/SecurityPolicy#Aes256_Sha256_RsaPss";
 #endif
-#ifdef MUC_OPCUA_ECC
+#ifdef MUC_OPCUA_CU_SECURITY_ECC
 static const char POLICY_ECC_NISTP256_URI[] = "http://opcfoundation.org/UA/SecurityPolicy#ECC_nistP256";
 static const char POLICY_ECC_CURVE25519_URI[] = "http://opcfoundation.org/UA/SecurityPolicy#ECC_curve25519";
 #endif
@@ -16,7 +16,7 @@ static const char POLICY_ECC_CURVE25519_URI[] = "http://opcfoundation.org/UA/Sec
 /* Feature 025 (F12): one parameter row per SecurityPolicy replaces the parallel
    switch statements each accessor used to carry. Adding a policy is now one row
    plus its enum value. Values are unchanged from the prior switches (OPC-10000-7
-   SecurityPolicy definitions). Secured rows exist only when MUC_OPCUA_SECURITY
+   SecurityPolicy definitions). Secured rows exist only when MUC_OPCUA_FACET_CORE_2022_SERVER
    is built. */
 typedef struct {
     mu_security_policy_id_t id;
@@ -35,7 +35,7 @@ typedef struct {
 
 static const mu_security_policy_params_t POLICY_TABLE[] = {
     {MU_SECURITY_POLICY_NONE_ID, POLICY_NONE_URI, 0, 0, 0, 0, 0, 0, 0, MU_ASYM_FAMILY_NONE, MU_SYM_MODE_NONE, 0},
-#ifdef MUC_OPCUA_SECURITY
+#ifdef MUC_OPCUA_FACET_CORE_2022_SERVER
     {MU_SECURITY_POLICY_BASIC256SHA256_ID, POLICY_B256S256_URI, 32, 32, 16, 32, 32, 16, 1, MU_ASYM_FAMILY_RSA,
      MU_SYM_MODE_CBC_HMAC, 0},
     {MU_SECURITY_POLICY_AES128_SHA256_RSAOAEP_ID, POLICY_AES128_OAEP_URI, 32, 16, 16, 32, 32, 16, 1, MU_ASYM_FAMILY_RSA,
@@ -43,7 +43,7 @@ static const mu_security_policy_params_t POLICY_TABLE[] = {
     {MU_SECURITY_POLICY_AES256_SHA256_RSAPSS_ID, POLICY_AES256_PSS_URI, 32, 32, 16, 32, 32, 16, 1, MU_ASYM_FAMILY_RSA,
      MU_SYM_MODE_CBC_HMAC, 0},
 #endif
-#ifdef MUC_OPCUA_ECC
+#ifdef MUC_OPCUA_CU_SECURITY_ECC
     /* ECC-nistP256 [ECC-B]: ECDSA + AES128-CBC + HMAC-SHA256, 64-byte nonce. */
     {MU_SECURITY_POLICY_ECC_NISTP256_ID, POLICY_ECC_NISTP256_URI, MU_ECC_NISTP256_SIGNATURE_KEY_LENGTH,
      MU_ECC_NISTP256_ENCRYPTION_KEY_LENGTH, 16, MU_ECC_NISTP256_MAC_LENGTH, MU_ECC_NISTP256_NONCE_LENGTH,
@@ -144,14 +144,14 @@ int mu_security_policy_ecc_curve(mu_security_policy_id_t policy, mu_ecc_curve_t 
     return 1;
 }
 
-#ifdef MUC_OPCUA_SECURITY
+#ifdef MUC_OPCUA_FACET_CORE_2022_SERVER
 /* OPC-10000-7 SecurityPolicy asymmetric-signature algorithm URIs (feature 026). */
 static const char SIG_URI_RSA_SHA256[] = "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256";
 static const char SIG_URI_RSA_PSS_SHA256[] = "http://opcfoundation.org/UA/security/rsa-pss-sha2-256";
 #endif
 
 const char *mu_security_policy_asym_signature_uri(mu_security_policy_id_t policy) {
-#ifdef MUC_OPCUA_SECURITY
+#ifdef MUC_OPCUA_FACET_CORE_2022_SERVER
     switch (policy) {
     case MU_SECURITY_POLICY_BASIC256SHA256_ID:
     case MU_SECURITY_POLICY_AES128_SHA256_RSAOAEP_ID:
@@ -168,7 +168,7 @@ const char *mu_security_policy_asym_signature_uri(mu_security_policy_id_t policy
 }
 
 opcua_boolean_t mu_security_policy_uses_pss(mu_security_policy_id_t policy) {
-#ifdef MUC_OPCUA_SECURITY
+#ifdef MUC_OPCUA_FACET_CORE_2022_SERVER
     return policy == MU_SECURITY_POLICY_AES256_SHA256_RSAPSS_ID;
 #else
     (void)policy;

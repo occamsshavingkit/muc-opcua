@@ -40,7 +40,7 @@ opcua_boolean_t mu_read_cache_lookup(mu_read_cache_t *cache, const mu_nodeid_t *
 void mu_read_cache_store(mu_read_cache_t *cache, const mu_nodeid_t *node_id, const mu_variant_t *val,
                          opcua_datetime_t read_time);
 
-#ifdef MUC_OPCUA_MULTI_CHUNK
+#ifdef MUC_OPCUA_CU_MULTI_CHUNK
 opcua_statuscode_t apply_index_range(const mu_string_t *index_range, mu_variant_t *value);
 #endif
 

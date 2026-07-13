@@ -17,7 +17,7 @@ _Static_assert(MU_DISPATCH_MAX_READ_NODES == MU_MAX_NODES_PER_READ &&
                    MU_DISPATCH_MAX_READ_NODES == MU_MAX_NODES_PER_WRITE,
                "advertised MaxNodesPerRead/Write must match the enforced dispatch bound");
 
-#ifdef MUC_OPCUA_SERVICE_READ
+#ifdef MUC_OPCUA_CU_ATTRIBUTE_READ
 /* mu_read_process_with_user_index is defined in src/services/read.c. It is not
    declared in read.h (only mu_read_process is) so forward-declare it here for
    the dispatch handler. OPC-10000-4 5.11.2. */
@@ -29,7 +29,7 @@ extern opcua_statuscode_t mu_read_process_with_user_index(const mu_address_space
                                                           size_t max_results, mu_read_cache_t *cache);
 #endif
 
-#ifdef MUC_OPCUA_SERVICE_READ
+#ifdef MUC_OPCUA_CU_ATTRIBUTE_READ
 /* Read (OPC 10000-4 5.11.2): decode the request after the RequestHeader, read each
    attribute from the address space, and encode the ReadResponse. */
 opcua_statuscode_t handle_read(mu_server_t *server, mu_binary_reader_t *r, mu_binary_writer_t *w,
@@ -68,7 +68,7 @@ opcua_statuscode_t handle_read(mu_server_t *server, mu_binary_reader_t *r, mu_bi
     }
 
     s = write_response_prefix(w, MU_ID_READRESPONSE, req.request_handle, MU_STATUS_GOOD
-#ifdef MUC_OPCUA_TIME_SYNC
+#ifdef MUC_OPCUA_CU_TIME_SYNC
                               ,
                               server
 #endif
@@ -84,9 +84,9 @@ opcua_statuscode_t handle_read(mu_server_t *server, mu_binary_reader_t *r, mu_bi
     *response_length = w->position;
     return MU_STATUS_GOOD;
 }
-#endif /* MUC_OPCUA_SERVICE_READ */
+#endif /* MUC_OPCUA_CU_ATTRIBUTE_READ */
 
-#ifdef MUC_OPCUA_SERVICE_WRITE
+#ifdef MUC_OPCUA_CU_CORE_2017_ATTRIBUTE_WRITE
 opcua_statuscode_t handle_write(mu_server_t *server, mu_binary_reader_t *r, mu_binary_writer_t *w,
                                 size_t *response_length) {
     mu_request_header_t req;
@@ -157,7 +157,7 @@ opcua_statuscode_t handle_write(mu_server_t *server, mu_binary_reader_t *r, mu_b
     }
 
     s = write_response_prefix(w, MU_ID_WRITERESPONSE, req.request_handle, MU_STATUS_GOOD
-#ifdef MUC_OPCUA_TIME_SYNC
+#ifdef MUC_OPCUA_CU_TIME_SYNC
                               ,
                               server
 #endif
@@ -184,4 +184,4 @@ opcua_statuscode_t handle_write(mu_server_t *server, mu_binary_reader_t *r, mu_b
     *response_length = w->position;
     return MU_STATUS_GOOD;
 }
-#endif /* MUC_OPCUA_SERVICE_WRITE */
+#endif /* MUC_OPCUA_CU_CORE_2017_ATTRIBUTE_WRITE */

@@ -732,7 +732,7 @@ void test_dispatch_delete_subscriptions_rejects_too_many_operations_before_resul
     TEST_ASSERT_EQUAL_UINT8(0xA5, resp[0]);
 }
 
-#ifdef MUC_OPCUA_SERVICE_WRITE
+#ifdef MUC_OPCUA_CU_CORE_2017_ATTRIBUTE_WRITE
 static opcua_statuscode_t counting_write_handler(void *handle, const mu_nodeid_t *node_id, opcua_uint32_t attribute_id,
                                                  const mu_datavalue_t *value) {
     int *count = (int *)handle;
@@ -1052,7 +1052,7 @@ int main(void) {
 #if MUC_OPCUA_SUBSCRIPTIONS
     RUN_TEST(test_dispatch_create_monitored_item_caches_resolved_node);
 #endif
-#ifdef MUC_OPCUA_SERVICE_WRITE
+#ifdef MUC_OPCUA_CU_CORE_2017_ATTRIBUTE_WRITE
     RUN_TEST(test_dispatch_truncated_write_body_returns_bad_decodingerror_without_callback);
 #endif
     RUN_TEST(test_dispatch_read_value);

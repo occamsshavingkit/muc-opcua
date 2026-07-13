@@ -81,7 +81,7 @@ const char *mu_status_name(opcua_statuscode_t status) {
         return "Bad_TooManySubscriptions";
     case MU_STATUS_BAD_SUBSCRIPTIONIDINVALID:
         return "Bad_SubscriptionIdInvalid";
-#if MUC_OPCUA_SUBSCRIPTIONS
+#if MUC_OPCUA_CU_SUBSCRIPTION_BASIC
     case MU_STATUS_BAD_MESSAGENOTAVAILABLE:
         return "Bad_MessageNotAvailable";
     case MU_STATUS_BAD_SEQUENCENUMBERUNKNOWN:

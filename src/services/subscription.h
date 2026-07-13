@@ -3,7 +3,7 @@
  * No-heap data-change subscription engine for the Micro Embedded Device 2017 Server
  * Profile (the Embedded Data Change Subscription Server Facet). All state is fixed-size
  * and lives in the caller-owned struct mu_server; nothing here allocates. Compiled only
- * when MUC_OPCUA_SUBSCRIPTIONS is defined.
+ * when MUC_OPCUA_CU_SUBSCRIPTION_BASIC is defined.
  *
  * Service mapping: Subscription Service Set OPC 10000-4 §5.14, MonitoredItem Service Set
  * §5.13, MonitoringParameters §7.21, DataChangeFilter §7.17, NotificationMessage /
@@ -20,11 +20,11 @@
 #include "muc_opcua/types.h"
 #include <stdbool.h>
 #include <stddef.h>
-#ifdef MUC_OPCUA_EVENTS
+#ifdef MUC_OPCUA_CU_EVENTS
 #include "event_filter.h"
 #endif
 
-#if MUC_OPCUA_SUBSCRIPTIONS
+#if MUC_OPCUA_CU_SUBSCRIPTION_BASIC
 
 /* Enhanced DataChange Subscription 2017 Server Facet: advertised == enforced.
  * When a build advertises StandardUA2017 (MUC_OPCUA_ENHANCED_DATACHANGE, see
@@ -109,7 +109,7 @@ typedef struct {
         struct {
             mu_variant_t max_val;
         } max;
-#if MUC_OPCUA_AGGREGATE_FULL
+#if MUC_OPCUA_CU_AGGREGATE_FULL
         struct {
             opcua_uint32_t value;
         } count;
@@ -156,10 +156,10 @@ typedef struct {
 typedef struct {
     /* 8-byte aligned fields */
     opcua_uint64_t next_sample_ms; /* monotonic tick of the next sample */
-#if MUC_OPCUA_SUBSCRIPTIONS_STANDARD
+#if MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
     opcua_double_t deadband_value;
     opcua_double_t last_reported_numeric;
-#if MUC_OPCUA_DATA_ACCESS
+#if MUC_OPCUA_CU_DATA_ACCESS
     opcua_double_t deadband_span; /* EURange.High - EURange.Low for percent deadband */
 #endif
     mu_aggregate_state_t aggregate_state;
@@ -177,7 +177,7 @@ typedef struct {
     opcua_uint32_t attribute_id;         /* usually Value (13) */
     opcua_uint32_t sampling_interval_ms; /* revised */
     opcua_statuscode_t last_status;
-#if MUC_OPCUA_SUBSCRIPTIONS_STANDARD
+#if MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
     opcua_uint32_t queue_size;
     opcua_uint32_t triggered_items[MU_INTERN_MAX_TRIGGER_LINKS];
 
@@ -197,7 +197,7 @@ typedef struct {
     bool in_use;
     bool has_value; /* a baseline sample has been taken */
     bool pending;   /* a change is queued, awaiting the next Publish */
-#if MUC_OPCUA_SUBSCRIPTIONS_STANDARD
+#if MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
     opcua_byte_t deadband_type; /* mu_deadband_type_t */
     bool has_reported;
     bool has_aggregate;
@@ -208,10 +208,10 @@ typedef struct {
     bool queue_overflow;
     opcua_byte_t triggered_count;
 #endif
-#ifdef MUC_OPCUA_EVENTS
+#ifdef MUC_OPCUA_CU_EVENTS
     opcua_byte_t select_clauses[8];
     opcua_byte_t select_clauses_count;
-#if MUC_OPCUA_EVENT_FILTER_WHERE
+#if MUC_OPCUA_CU_EVENT_FILTER_WHERE
     mu_where_clause_t where_clause; /* owned ContentFilter; element_count==0 → match all */
 #endif
 #endif
@@ -227,7 +227,7 @@ typedef struct {
     size_t message_len;
 } mu_retransmit_slot_t;
 
-#ifdef MUC_OPCUA_EVENTS
+#ifdef MUC_OPCUA_CU_EVENTS
 #define MU_MAX_EVENT_QUEUE_SIZE 8
 typedef struct {
     mu_event_notification_t queue[MU_MAX_EVENT_QUEUE_SIZE];
@@ -261,10 +261,10 @@ typedef struct {
     bool in_use;
     bool publishing_enabled;
     bool more_notifications;
-#if MUC_OPCUA_SUBSCRIPTIONS_STANDARD
+#if MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
     bool resend_data_pending; /* OPC-10000-5 §9.2 ResendData method latch */
 #endif
-#ifdef MUC_OPCUA_EVENTS
+#ifdef MUC_OPCUA_CU_EVENTS
     mu_event_queue_t event_queue;
 #endif
 } mu_subscription_t;
@@ -328,7 +328,7 @@ opcua_statuscode_t mu_subscription_delete(mu_subscriptions_t *subs, opcua_uint32
 mu_subscription_t *mu_subscription_find(mu_subscriptions_t *subs, opcua_uint32_t session_id,
                                         opcua_uint32_t subscription_id);
 
-#if MUC_OPCUA_REDUNDANCY
+#if MUC_OPCUA_CU_REDUNDANCY
 /* Look up a Subscription by id regardless of owning session — the TransferSubscriptions
    service (OPC-10000-4 §5.14.7) must find subscriptions owned by another Session. */
 mu_subscription_t *mu_subscription_find_any(mu_subscriptions_t *subs, opcua_uint32_t subscription_id);
@@ -351,7 +351,7 @@ opcua_statuscode_t mu_monitored_item_alloc(mu_subscriptions_t *subs, opcua_uint3
 opcua_statuscode_t mu_monitored_item_delete(mu_subscriptions_t *subs, opcua_uint32_t subscription_id,
                                             opcua_uint32_t monitored_item_id);
 
-#if MUC_OPCUA_SUBSCRIPTIONS_STANDARD
+#if MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
 /* SetTriggering link storage (OPC-10000-4 §5.13.5). Both MonitoredItems must
    belong to the named Subscription. */
 opcua_statuscode_t mu_monitored_item_add_trigger_link(mu_subscriptions_t *subs, opcua_uint32_t subscription_id,
@@ -413,6 +413,6 @@ void issue_status_change_notification(struct mu_server *server, mu_subscription_
    and emits parked Publish responses (US2/US3). A no-op until those land. */
 void mu_subscriptions_tick(struct mu_server *server, opcua_uint64_t now_ms);
 
-#endif /* MUC_OPCUA_SUBSCRIPTIONS */
+#endif /* MUC_OPCUA_CU_SUBSCRIPTION_BASIC */
 
 #endif /* MUC_OPCUA_SERVICES_SUBSCRIPTION_H */
