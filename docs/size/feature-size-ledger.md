@@ -723,7 +723,7 @@ The US3 resend latch fits existing `mu_subscription_t` padding, so Call does not
 ### Feature 005 US4 host profile build (`make embedded`)
 
 Measured with the Makefile profile wiring:
-`MUC_OPCUA_EMBEDDED_PROFILE=ON`, `MUC_OPCUA_OPTIMIZE_SIZE=ON`, and the embedded capacity
+`MUC_OPCUA_PROFILE=embedded`, `MUC_OPCUA_OPTIMIZE_SIZE=ON`, and the embedded capacity
 defines (`MU_MAX_MONITORED_ITEMS=100`, `MU_MAX_SUBSCRIPTIONS=2`,
 `MU_MAX_PUBLISH_REQUESTS=5`, `MU_MONITORED_QUEUE_DEPTH=2`, `MU_MAX_TRIGGER_LINKS=4`).
 
@@ -1072,8 +1072,7 @@ T088a records host/full flash over the +8 KiB budget, and T088b/T088c record
 current embedded/nano size and static-RAM evidence as blocked or incomplete.
 
 Build/profile knobs from `build/audit-embedded-stack/CMakeCache.txt`:
-`MUC_OPCUA_PROFILE=embedded`, `MUC_OPCUA_EMBEDDED_PROFILE=ON`,
-`MUC_OPCUA_OPTIMIZE_SIZE=ON`, `MUC_OPCUA_STACK_USAGE=ON`,
+`MUC_OPCUA_PROFILE=embedded`, `MUC_OPCUA_OPTIMIZE_SIZE=ON`, `MUC_OPCUA_STACK_USAGE=ON`,
 `MUC_OPCUA_STACK_USAGE_LIMIT=10240`, `MUC_OPCUA_PLATFORM=host`,
 `CMAKE_BUILD_TYPE=Release`, compiler `/usr/bin/cc`, `MUC_OPCUA_SECURITY=ON`,
 `MUC_OPCUA_SUBSCRIPTIONS_STANDARD=ON`, `MUC_OPCUA_MULTIPLE_CONNECTIONS=ON`,
@@ -1514,4 +1513,3 @@ full-featured      53514        0        0      53514 build/size-031/full-featur
 - Service_dispatch.c shared growth: ~+145 B across all profiles (binary search + cleanup + ifdef)
 - **`<math.h>` removed from subscription.c** — double-precision software emulation library (~12 KB) no longer linked for profiles with subscriptions. The net effect is that the code-size additions above are partially offset for micro/embedded/full, keeping `.text` growth modest.
 - `.data = 0`, `.bss = 0`, heap = 0 across all profiles (no-heap invariant preserved).
-

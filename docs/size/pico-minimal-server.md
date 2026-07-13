@@ -137,7 +137,6 @@ Profile/toolchain knobs for the current embedded-profile attempt:
 
 - `MUC_OPCUA_PLATFORM=pico`
 - `MUC_OPCUA_PROFILE=embedded`
-- `MUC_OPCUA_EMBEDDED_PROFILE=ON`
 - `MUC_OPCUA_OPTIMIZE_SIZE=ON`
 - `MUC_OPCUA_BUILD_EXAMPLES=ON`
 - `MUC_OPCUA_SECURITY=ON`
@@ -300,7 +299,6 @@ Profile/toolchain knobs from `build/t089b-pico-stack/CMakeCache.txt`:
 
 - `MUC_OPCUA_PLATFORM=pico`
 - `MUC_OPCUA_PROFILE=embedded`
-- `MUC_OPCUA_EMBEDDED_PROFILE=ON`
 - `MUC_OPCUA_OPTIMIZE_SIZE=ON`
 - `MUC_OPCUA_STACK_USAGE=ON`
 - `MUC_OPCUA_STACK_USAGE_LIMIT=10240`

@@ -13,11 +13,11 @@ dependencies, no Pico SDK). Running it wrong (host x86-64, missing `-Os`,
 |------------|--------------|---------------|
 | `nano` | `MUC_OPCUA_PROFILE=nano` | Discovery + Session + Read + Browse (None) |
 | `micro` | `MUC_OPCUA_PROFILE=micro` | nano + data-change subscriptions |
-| `standard` | `MUC_OPCUA_PROFILE=standard` + `MUC_OPCUA_STANDARD_PROFILE=ON` | embedded + DataAccess + Methods + Auditing + ComplexTypes + Aggregates + ReverseConnect + TimeSync |
-| `embedded` | `MUC_OPCUA_PROFILE=embedded` | micro + Basic256Sha256 + Events + MultiConnection |
+| `embedded` | `MUC_OPCUA_PROFILE=embedded` | micro + Basic256Sha256 + Base Type System + Standard DataChange capacities + MultiConnection |
+| `standard` | `MUC_OPCUA_PROFILE=standard` | embedded surface + StandardUA2017 advertised-profile marker and Standard capacity minima |
 | `full` | `MUC_OPCUA_PROFILE=full` | everything ON |
 
-The `full` profile in the script is the legacy `full-featured` alias.
+The script accepts `full-featured` as a legacy alias for the real `full` profile.
 
 ## How to run
 

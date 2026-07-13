@@ -1,7 +1,7 @@
 # Getting Started with muc-opcua
 
 > **What you'll learn:**
-> - Build the server in each of its three profiles (`nano`, `micro`, `embedded`) and find the resulting binary
+> - Build the server profiles (`nano`, `micro`, `embedded`, `standard`, `full`) and find the resulting binary
 > - Run the host `minimal_server` example and connect to it with a real OPC UA client
 > - Browse and read the example's node set from Python (`asyncua`), and with generic clients (UAExpert, the .NET reference client)
 > - Run the test suite and the interop scripts to prove your build works
@@ -46,42 +46,54 @@ This tutorial was validated against CMake 3.28, GCC (host), and `asyncua` 2.0.
 
 ---
 
-## 2. The five profiles (pick what you build)
+## 2. The profile system (pick what you build)
 
 muc-opcua compiles to a different feature set depending on the **profile**.
-Each named profile maps to one `make` target (or `-DMUC_OPCUA_PROFILE=...`)
-and turns specific `MUC_OPCUA_*` CMake options on or off. Any individual flag
-can be added or removed on top of a profile's defaults — see
-[docs/build-and-gating.md](build-and-gating.md) for the full flag reference
-and override mechanics.
+Each named profile maps to one `make` target (or `-DMUC_OPCUA_PROFILE=...`).
+CMake seeds Kconfig from `configs/<profile>.defconfig`, resolves dependencies,
+and then compiles only the enabled source files. Any individual Kconfig symbol can
+be added or removed on top of a profile's defaults — see
+[docs/build-and-gating.md](build-and-gating.md) for the full symbol reference,
+dependency cascade behavior, and override mechanics.
 
-| Profile | Command | SecurityPolicy | Subscriptions | Core flash (Cortex-M0+ `-Os`) |
-|---|---|---|---|---|
-| **nano** | `make nano` | None | off | 17,956 B |
-| **micro** | `make micro` | None | **on** (data-change) | 29,550 B |
-| **embedded** | `make embedded` | **Basic256Sha256** (sign/encrypt) | Standard DataChange 2017 | 54,616 B |
-| **standard** | `-DMUC_OPCUA_PROFILE=standard` | + Aes128/256 RsaOaep/RsaPss, optional ECC | + full Aggregate set | 71,370 B |
-| **full** | `-DMUC_OPCUA_PROFILE=full` | Same as standard | Same as standard | 71,354 B |
+- **nano**: `make nano`; SecurityPolicy None; subscriptions off; 22,531 B
+  core flash.
+- **micro**: `make micro`; SecurityPolicy None; data-change subscriptions on;
+  31,961 B core flash.
+- **embedded**: `make embedded`; Basic256Sha256 sign/encrypt; Standard
+  DataChange 2017; 51,773 B core flash.
+- **standard**: `make standard`; Aes128/256 RsaOaep/RsaPss; Standard profile
+  capacity marker; 52,023 B core flash.
+- **full**: `make full`; same as standard, plus optional ECC by default;
+  optional services/facets enabled; 80,831 B core flash.
 
-- **nano** — the OPC UA *Nano Embedded Device 2017* surface: Discovery, Session,
-  Read, and the View (Browse) service set over **SecurityPolicy None**. Smallest build.
-- **micro** — nano **plus** the data-change subscription engine (the Embedded Data
-  Change Subscription Server Facet). Choose this if your client polls via subscriptions.
-- **standard**/**full** — the OPC-10000-7 *Standard 2017 UA Server* facet bundle:
-  Write, History, Query, NodeManagement, PubSub, Data Access, Method Server,
-  Auditing, Complex Types, Redundancy, Reverse Connect, and the optional ECC
-  SecurityPolicies (`#ECC_curve25519`/`#ECC_nistP256`, spec 059 — see
+OpenSSL is needed for host builds of secure profiles (`embedded`, `standard`,
+`full`) and any custom configuration that enables `MUC_OPCUA_SECURITY`.
+
+- **nano** — the OPC UA *Nano Embedded Device 2017* surface: Discovery,
+  Session, Read, and the View (Browse) service set over **SecurityPolicy None**.
+  Smallest build.
+- **micro** — nano **plus** the data-change subscription engine (the Embedded
+  Data Change Subscription Server Facet). Choose this if your client polls via
+  subscriptions.
+- **standard** — the OPC-10000-7 *Standard 2017 UA Server* target with standard
+  profile capacity markers and the mandatory embedded-level surface.
+- **full** — not a distinct OPC UA profile; it is the developer/integration build
+  that enables optional services/facets such as Write, History, Query,
+  NodeManagement, PubSub, Data Access, Method Server, Auditing, Complex Types,
+  Redundancy, Reverse Connect, Aggregates, and optional ECC SecurityPolicies
+  (`#ECC_curve25519`/`#ECC_nistP256`, spec 059 — see
   [docs/conformance/ecc-security-policy.md](conformance/ecc-security-policy.md)).
-  `full` is not a distinct OPC UA profile — same feature set as `standard`,
-  larger capacity presets.
-- **embedded** — micro **plus** SecurityPolicy **Basic256Sha256**, Standard DataChange
-  2017, Base Info Type System exposure, and the required GetMonitoredItems/ResendData
-  methods. The host build links OpenSSL to provide the crypto primitives; on an MCU you
-  would swap in mbedTLS/PSA.
+- **embedded** — micro **plus** SecurityPolicy **Basic256Sha256**, Standard
+  DataChange 2017, Base Info Type System exposure, and the required
+  GetMonitoredItems/ResendData methods. The host build links OpenSSL to provide
+  the crypto primitives; on an MCU you would swap in mbedTLS/PSA.
 
-> **Note:** All RAM is caller-provided and **heap is zero** in every profile. The
-> figures above are flash (code size); see [docs/size/feature-size-ledger.md](size/feature-size-ledger.md)
-> for the full memory breakdown.
+> **Note:** `nano`, `micro`, and `embedded` are strict no-heap builds. `standard`
+> and `full` keep heap-enabled optional paths for larger array-valued services.
+> The figures above are flash (code size); see
+> [docs/size/feature-size-ledger.md](size/feature-size-ledger.md) for the full
+> memory breakdown.
 
 ---
 
@@ -96,8 +108,9 @@ make nano
 Expected (trimmed) output:
 
 ```
->> NANO profile: SecurityPolicy None, full Nano service surface, subscriptions OFF
-cmake -S . -B build/nano -DMUC_OPCUA_BUILD_EXAMPLES=ON -DMUC_OPCUA_OPTIMIZE_SIZE=ON -DMUC_OPCUA_SECURITY=OFF -DMUC_OPCUA_SUBSCRIPTIONS=OFF
+>> NANO profile: SecurityPolicy None, full Nano service surface,
+>> subscriptions OFF
+cmake -S . -B build/nano ... -DMUC_OPCUA_PROFILE=nano
 ...
 [100%] Built target minimal_server
 ```
@@ -109,7 +122,7 @@ command, so you can always drop down to raw CMake if you need to:
 # Equivalent to `make nano`, written out longhand:
 cmake -S . -B build/nano \
     -DMUC_OPCUA_BUILD_EXAMPLES=ON -DMUC_OPCUA_OPTIMIZE_SIZE=ON \
-    -DMUC_OPCUA_SECURITY=OFF -DMUC_OPCUA_SUBSCRIPTIONS=OFF
+    -DMUC_OPCUA_PROFILE=nano
 cmake --build build/nano
 ```
 
@@ -118,8 +131,24 @@ The other profiles work the same way:
 ```bash
 make micro            # None + subscriptions
 make embedded         # Basic256Sha256 + subscriptions (needs OpenSSL)
-make all-profiles     # build all three
+make standard         # standard server profile target
+make full             # optional-service developer/integration build
+make all-profiles     # build all five named profiles
 ```
+
+To browse and edit the resolved Kconfig tree:
+
+```bash
+cmake -S . -B build/custom-standard -DMUC_OPCUA_PROFILE=standard
+cmake --build build/custom-standard --target menuconfig
+cmake -S . -B build/custom-standard \
+    -DMUC_OPCUA_KCONFIG_CONFIG=build/custom-standard/.config
+cmake --build build/custom-standard
+```
+
+`menuconfig` shows each feature's help text and dependency edges. If you turn off
+a prerequisite, dependent symbols cascade off instead of producing an inconsistent
+binary.
 
 > **Warning:** A clang vs gcc warning policy and CMake warnings about missing
 > `clang-format` / `cppcheck` / `clang-tidy` are harmless — those are optional
@@ -134,6 +163,8 @@ named `minimal_server` directly under `examples/`:
 build/nano/examples/minimal_server
 build/micro/examples/minimal_server
 build/embedded/examples/minimal_server
+build/standard/examples/minimal_server
+build/full/examples/minimal_server
 ```
 
 Confirm it exists and is executable:
@@ -307,9 +338,7 @@ make test
 Expected tail:
 
 ```
-100% tests passed, 0 tests failed out of 128
-
-Total Test time (real) =   3.5 sec
+100% tests passed, 0 tests failed out of <N>
 ```
 
 (`make test` doesn't pass `-DMUC_OPCUA_PROFILE`, so it resolves to `full` — the
@@ -358,7 +387,7 @@ client, and clean up the server process when done.
 
 ## Checkpoint 3: You should be able to...
 
-- [ ] See `100% tests passed ... out of 128` from `make test`
+- [ ] See `100% tests passed ...` from `make test`
 - [ ] See `INTEROP PASS` from `run_interop.sh`
 
 ---
@@ -561,17 +590,19 @@ layout, continue with [the integration guide](integration-guide.md#3-implementin
 
 ## Summary
 
-- muc-opcua builds in three profiles — `make nano` (None), `make micro`
-  (+ subscriptions), `make embedded` (+ Basic256Sha256) — each into
+- muc-opcua builds in named profiles — `make nano` (None), `make micro`
+  (+ subscriptions), `make embedded` (+ Basic256Sha256), `make standard`, and
+  `make full` — each into
   `build/<profile>/examples/minimal_server`.
 - The host example listens on `opc.tcp://localhost:4840` and serves a tiny
   address space whose `MyVar1` (`ns=1;i=1000`) reads back as `42`.
 - Any standards-compliant client connects: an `asyncua` Python snippet,
   UAExpert, or the OPC Foundation .NET reference client.
-- `make test` runs 56 ctest cases; `tests/interop/run_interop.sh` proves the
+- `make test` runs the CTest suite; `tests/interop/run_interop.sh` proves the
   full client round-trip.
-- Memory is entirely caller-provided (storage sized by `MU_SERVER_STORAGE_BYTES`
-  plus two `MU_MIN_CHUNK_SIZE` buffers); there is **no `malloc`**.
+- Memory for the core server is caller-provided (storage sized by
+  `MU_SERVER_STORAGE_BYTES` plus two `MU_MIN_CHUNK_SIZE` buffers). The
+  `nano`/`micro`/`embedded` profiles are strict no-heap builds.
 
 ## Next steps
 

@@ -1,4 +1,4 @@
-# ADR 0003: Profile Tier System via CMake Feature Flags
+# ADR 0003: Profile Tier System via Kconfig Feature Flags
 
 **Date**: 2026-07-05
 **Status**: Accepted
@@ -9,8 +9,23 @@ Micro-opcua serves integrators with wildly different requirements: a tiny sensor
 
 ## Decision
 
-Feature gating uses a tiered CMake profile system. The `MUC_OPCUA_PROFILE` cache variable accepts `nano`, `micro`, `embedded`, `standard`, `full`, or `custom`, and maps each tier to a set of `MUC_OPCUA_*` compile definitions. The mapping is centralized in `CMakeLists.txt` and the `MUC_OPCUA_PROFILE_CONTROLLED_OPTIONS` list. For non-`custom` profiles, all controlled options are first set to `OFF`, then the tier-specific subset is enabled. This guarantees that unrequested features are definitively off rather than inheriting stale CMake cache values. Dependency guards in `include/muc_opcua/features.h` use `#error` to reject illegal combinations at compile time (e.g., `MUC_OPCUA_EVENTS` without `MUC_OPCUA_SUBSCRIPTIONS`, `MUC_OPCUA_STANDARD_PROFILE` without `MUC_OPCUA_PROFILE=standard` or `full`). When tests or examples are built and no explicit profile is given, the default silently promotes from `nano` to `full` for the broadest test coverage.
+Feature gating uses a tiered Kconfig profile system. The `MUC_OPCUA_PROFILE`
+CMake cache variable accepts `nano`, `micro`, `embedded`, `standard`, `full`, or
+`custom`; named profiles seed Kconfig from `configs/<profile>.defconfig`, while
+`custom` starts from hand-selected options. Kconfig owns feature defaults,
+dependency containment, and profile-derived compile definitions; CMake consumes
+the generated `muc_opcua_config.cmake` for source selection and
+`muc_opcua_autoconf.h` for non-CMake/external builds. Integrators can refine the
+seed with `menuconfig`, replay a saved `.config` via `MUC_OPCUA_KCONFIG_CONFIG`,
+pass explicit override fragments to `scripts/kconfig/gen_config.py`, or select
+`custom` and enable facets directly.
 
 ## Consequences
 
-Integrators get exactly the footprint they need: `nano` fits in under 16 KB flash; `full` includes the entire feature set for host development and certification testing. The `custom` escape hatch allows integrators to hand-pick features not covered by any predefined tier. The explicit-reset-then-enable pattern prevents stale cache poisoning. The trade-off is that adding a new feature flag requires touching three places: the controlled-options list, the tier assignments, and `features.h` guard rules — a manual coordination cost that has been manageable to date.
+Integrators get exactly the footprint they need while keeping feature
+dependencies in one declarative configuration graph. The `custom` escape hatch
+allows hand-picked facets not covered by a predefined tier. The trade-off is
+that adding a new feature now requires updating `Kconfig`, the relevant
+defconfig/profile defaults, and any source-selection consumers; this is
+preferable to duplicating profile state across CMake option lists and
+compile-time guard macros.

@@ -1,8 +1,8 @@
 # Build Configuration & Feature Gating
 
 muc-opcua is one C library that compiles into many different servers: a
-few-hundred-byte Nano stub through a full-featured Standard 2017 server.
-Every service, facet, and security layer is gated behind a CMake option that
+few-hundred-byte Nano stub through a full-featured optional-service build.
+Every service, facet, and security layer is gated behind a Kconfig feature that
 either compiles a translation unit in or leaves it out entirely — there is no
 runtime dispatch on a disabled feature; the code for it is not in the binary
 (verified in CI by symbol-checking an ECC-off archive, see
@@ -12,6 +12,12 @@ This document is the single reference for that gating system: what
 `MUC_OPCUA_PROFILE` does, the full flag list, how flags depend on each other,
 and — the question that prompted this doc — **how to build a profile with one
 feature removed** ("standard minus encryption").
+
+You do **not** have to use interactive `menuconfig`. It is a convenience UI over
+the same Kconfig model used by the non-interactive build. Profiles, checked-in
+defconfigs, CI jobs, and downstream non-CMake builds can all resolve Kconfig
+programmatically and produce a valid `muc_opcua_autoconf.h`; see
+[Programmatic configuration and autoconf.h](#programmatic-configuration-and-autoconfh).
 
 > **Now Kconfig-based (2026-07).** The feature flags and their dependencies are
 > declared in **`/Kconfig`** (resolved by the vendored `kconfiglib` in
@@ -49,9 +55,8 @@ cmake -S . -B build/standard-no-crypto \
     -DMUC_OPCUA_ECC=OFF          # ECC requires SECURITY; drop both together
 ```
 
-This builds every other `standard` default (Write, Subscriptions, Data
-Access, Method Server, …) with the RSA/ECC crypto layer entirely compiled
-out. Any `-D<FLAG>=<value>` on the same invocation as `-DMUC_OPCUA_PROFILE=X`
+This builds every other `standard` default with the RSA crypto layer entirely
+compiled out. Any `-D<FLAG>=<value>` on the same invocation as `-DMUC_OPCUA_PROFILE=X`
 wins over that profile's default for that one flag — everything else still
 comes from the profile. This works for **adding** a flag a profile doesn't
 default to as well as **removing** one the profile does.
@@ -74,21 +79,28 @@ list of what requires what.
 `MUC_OPCUA_PROFILE` (a CMake cache string) is the single source of truth for
 which named tier you're building. It resolves to one of:
 
-| Profile | What it targets | Roughly |
-|---|---|---|
-| `nano` | Nano Embedded Device 2025 Server Profile | Read/Browse/discovery only, no heap, no security |
-| `micro` | Micro Embedded Device 2025 Server Profile | + data-change Subscriptions, Write, 2 concurrent sessions |
-| `embedded` | Embedded 2025 UA Server Profile | + Security (Basic256Sha256), base node set, events, multi-chunk |
-| `standard` | Standard UA Server 2017 | + all optional services/facets (History, Query, NodeManagement, PubSub, Data Access, Method Server, Auditing, Complex Types, Redundancy, full Aggregates, Reverse Connect, ECC) |
-| `full` | Not a distinct OPC UA profile | Same feature set as `standard`, larger capacity presets |
-| `custom` | You hand-pick every flag | Nothing is preset beyond the always-on core services (Read/Browse/Discovery); every feature stays OFF unless you `-D` it |
++ `nano`: Nano Embedded Device 2017 Server Profile. Read/Browse/discovery only,
+  no heap, no security.
++ `micro`: Micro Embedded Device 2017 Server Profile. Adds data-change
+  subscriptions and multiple sessions/connections.
++ `embedded`: Embedded 2017 UA Server Profile. Adds Security
+  (Basic256Sha256), the base node set, and Standard DataChange additions.
++ `standard`: Standard UA Server 2017. Adds the Standard profile marker and
+  standard capacity minima to the Embedded-level feature surface.
++ `full`: not a distinct OPC UA profile. Uses the Standard profile/capacity
+  family plus optional services/facets: History, Query, NodeManagement, PubSub,
+  Data Access, Method Server, Auditing, Complex Types, Redundancy, full
+  Aggregates, Reverse Connect, and ECC.
++ `custom`: you hand-pick every flag. Nothing is preset beyond the always-on
+  core services (Read/Browse/Discovery); every feature stays OFF unless you
+  `-D` it.
 
 Each named profile (everything except `custom`) is a
 `configs/<profile>.defconfig` selecting the profile choice; the resolved feature
 set falls out of the per-child `default y if PROFILE_*` presets in `/Kconfig`.
-Profiles are strictly additive tiers — `standard`/`full` is a superset of
-`embedded`, which is a superset of `micro`, which is a superset of `nano` —
-**except** where the override mechanism above is used to subtract from that.
+Profiles are additive through `standard`; `full` then enables the optional
+services/facets used for integration and development coverage. Any profile can
+be further adjusted by the override mechanism above.
 
 **Capacities are separate from feature gating** and are not covered by this
 doc: session/connection/subscription/array-length limits resolve through a
@@ -117,6 +129,94 @@ the `MUC_OPCUA_BUILD_*`/LTO/stack-usage knobs, and the CMake-driven
 `cmake/MucOpcUaOptions.cmake`. Everything in the Kconfig tree supports the
 `-D` override mechanism below.
 
+### Programmatic configuration and autoconf.h
+
+`menuconfig` is optional. The underlying resolver is
+`scripts/kconfig/gen_config.py`, which takes a Kconfig file, a base defconfig,
+and an optional override fragment. It emits two useful artifacts:
+
++ `muc_opcua_config.cmake`: used by this repository's CMake build. It emits
+  `set(MUC_OPCUA_<SYM> ON/OFF)` values consumed by `src/CMakeLists.txt` for
+  source selection and the legacy C alias compile definitions added by CMake.
++ `muc_opcua_autoconf.h`: a raw Kconfig export for non-CMake / external
+  consumers. It defines enabled Kconfig symbols, such as
+  `MUC_OPCUA_CU_SUBSCRIPTION_BASIC`, and raw capacity names, such as
+  `MAX_SESSIONS`. It does **not** generate the legacy C aliases that
+  `src/CMakeLists.txt` adds for CMake builds, such as `MUC_OPCUA_SUBSCRIPTIONS`
+  or `MU_MAX_SESSIONS`.
+
+Generate a standard profile configuration without any interactive step:
+
+```sh
+mkdir -p build/kconfig
+python3 scripts/kconfig/gen_config.py \
+    Kconfig \
+    configs/standard.defconfig \
+    build/kconfig/muc_opcua_config.cmake \
+    build/kconfig/muc_opcua_autoconf.h
+```
+
+Add or subtract individual symbols with an override fragment. The fragment uses
+Kconfig syntax and is merged on top of the base defconfig; `depends on` rules
+still apply, so dependency-violating requests cascade or are vetoed by Kconfig
+instead of creating an invalid header.
+
+```sh
+cat > build/kconfig/full-no-pubsub.fragment <<'EOF'
+# MUC_OPCUA_CU_PUBSUB is not set
+EOF
+
+python3 scripts/kconfig/gen_config.py \
+    Kconfig \
+    configs/full.defconfig \
+    build/kconfig/muc_opcua_config.cmake \
+    build/kconfig/muc_opcua_autoconf.h \
+    build/kconfig/full-no-pubsub.fragment
+```
+
+For a downstream build that does not call this repository's CMake, do not rely
+on `muc_opcua_autoconf.h` alone unless the downstream build consumes the raw
+Kconfig symbol names directly. Either map the raw Kconfig symbols and capacities
+to the public C aliases used by the source tree, or provide an equivalent
+project configuration header before any `muc_opcua` header or source includes
+`muc_opcua/config.h`.
+
+For example, a downstream alias header can include the generated export and add
+the compatibility names needed by non-CMake builds:
+
+```sh
+cc -Iinclude -include build/kconfig/muc_opcua_external_config.h ...
+```
+
+The generated header is not included automatically by `muc_opcua/config.h` because
+many embedded build systems have their own configuration include convention.
+The contract is simple: enabled public feature macros must be defined to `1`;
+disabled feature macros must be undefined; capacity aliases such as
+`MU_MAX_SESSIONS` must be set when overriding defaults.
+`include/muc_opcua/features.h` remains the compiler backstop for illegal
+hand-written combinations.
+
+For repeatable custom configurations, either commit a minimal defconfig under
+`configs/` or pass a saved `.config` through CMake:
+
+```sh
+# Produce a minimal defconfig from a resolved .config.
+python3 scripts/kconfig/savedefconfig.py \
+    Kconfig build/kconfig/.config configs/my-board.defconfig
+
+# Use a saved .config directly in CMake. Keep MUC_OPCUA_PROFILE aligned with
+# the saved .config's profile choice so capacity/profile marker macros match.
+cmake -S . -B build/my-board \
+    -DMUC_OPCUA_PROFILE=embedded \
+    -DMUC_OPCUA_KCONFIG_CONFIG=path/to/.config
+```
+
+Use `configs/<profile>.defconfig` for named profiles, a committed custom
+defconfig for product builds, and `menuconfig` only when you want an interactive
+editor for the same data. A saved `.config` overrides the Kconfig input, but
+CMake still emits capacity profile markers from `MUC_OPCUA_PROFILE`; pass the
+matching profile explicitly when replaying a saved named-profile config.
+
 ## Overriding a profile default (subtraction / addition)
 
 ### The mechanism
@@ -143,8 +243,8 @@ re-derives cleanly (no stale flags survive) and adding one `-D` on a reconfigure
 changes exactly that flag and its dependents — no hand-rolled "last forced"
 bookkeeping needed; Kconfig's declarative resolution gives it for free.
 
-The behavioral contract, verified by `scripts/test_profile_gating.sh`
-(21 assertions against live `cmake` configures):
+The behavioral contract is verified by `scripts/test_profile_gating.sh` against
+live `cmake` configures:
 
 | Scenario | Result |
 |---|---|
@@ -164,12 +264,12 @@ when `SECURITY=OFF`).
 
 ### More worked examples
 
-Standard, but without the optional Redundancy and Reverse Connect facets
+Full, but without the optional Redundancy and Reverse Connect facets
 (smaller `.text`, same everything else):
 
 ```sh
-cmake -S . -B build/standard-lean \
-    -DMUC_OPCUA_PROFILE=standard \
+cmake -S . -B build/full-lean \
+    -DMUC_OPCUA_PROFILE=full \
     -DMUC_OPCUA_REDUNDANCY=OFF \
     -DMUC_OPCUA_REVERSE_CONNECT=OFF
 ```
@@ -197,16 +297,25 @@ The override mechanism is for **small deltas off a named profile**. If you
 want a feature set that looks nothing like any named profile — e.g. Write +
 PubSub but nothing else, skipping the entire Standard facet bundle — hand-select
 every flag with `-DMUC_OPCUA_PROFILE=custom`. Capacities then come from the
-`standard` baseline unless you also `-DMU_MAX_*=<n>` them. The `standard`
-profile block in `CMakeLists.txt` is the copy-paste starting list of every
-flag name if you want to build up a custom set incrementally.
+minimal baseline unless you also `-DMU_MAX_*=<n>` them. The flag reference below
+is the copy-paste starting list of symbol names if you want to build up a custom
+set incrementally.
 
 ## Full flag reference
 
-### Feature / facet flags (in the Kconfig tree — support the override mechanism above)
+### Feature / facet flags
 
 Membership below is the resolved `default y if PROFILE_*` matrix from `/Kconfig`
-(regenerate with `python3 scripts/kconfig/gen_config.py Kconfig configs/<p>.defconfig -`).
+and supports the override mechanism described above. To regenerate a temporary
+config, run:
+
+```sh
+python3 scripts/kconfig/gen_config.py \
+  Kconfig configs/<p>.defconfig \
+  /tmp/muc_opcua_config.cmake \
+  /tmp/muc_opcua_autoconf.h
+```
+
 Since **spec 067** rebased each named profile onto exactly its OPC-namesake's
 *mandatory* facet set, `standard` is much leaner than `full` — the two are no
 longer the same column. In features `embedded` and `standard` are nearly
@@ -266,13 +375,18 @@ one with `-DMUC_OPCUA_SERVICE_<X>=OFF` like any other flag:
 | `MUC_OPCUA_SERVICE_BROWSE` | Browse + BrowseNext + TranslateBrowsePaths | ON |
 | `MUC_OPCUA_SERVICE_DISCOVERY` | GetEndpoints/FindServers | ON |
 
+### Additional Kconfig toggles
+
+| Flag | What it does | Default |
+|---|---|:-:|
+| `MUC_OPCUA_SESSION_TIMEOUT` | Session timeout enforcement (auto-forced ON when `MULTI_CHUNK` or `MULTIPLE_CONNECTIONS` is on) | OFF |
+| `MUC_OPCUA_READ_CACHE` | Read value cache (`maxAge` optimization) — a latency/size tradeoff, not a conformance requirement, so it's opt-in independent of profile | OFF |
+
 ### Non-feature build settings
 
 | Flag | What it does | Default |
 |---|---|:-:|
 | `MUC_OPCUA_ALLOW_HEAP` | Permits heap allocation in optional adapters/features (embedded/MCU tiers force OFF: no-heap is a project constitution rule) | ON |
-| `MUC_OPCUA_SESSION_TIMEOUT` | Session timeout enforcement (auto-forced ON when `MULTI_CHUNK` or `MULTIPLE_CONNECTIONS` is on) | OFF |
-| `MUC_OPCUA_READ_CACHE` | Read value cache (`maxAge` optimization) — a latency/size tradeoff, not a conformance requirement, so it's opt-in independent of profile | OFF |
 | `MUC_OPCUA_HAVE_MBEDTLS` / `MUC_OPCUA_HAVE_WOLFSSL` | Compile in the mbedTLS / wolfSSL crypto backend (OpenSSL is auto-detected via `find_package`) | OFF |
 | `MUC_OPCUA_PLATFORM` | `host`, `external`, `pico`, `arduino-skeleton` — selects the TCP/entropy/time adapters | `host` |
 | `MUC_OPCUA_CLIENT_PROFILE` | `none`/`nano`/`standard` — client-side feature tier (`micro`/`embedded`/`full` are planned, not implemented; passing them is a hard `FATAL_ERROR`) | `none` |

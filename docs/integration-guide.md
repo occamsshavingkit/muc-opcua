@@ -134,35 +134,12 @@ chunk count of 1 there is no benefit.
 ### 2.2 `MU_SERVER_STORAGE_BYTES` grows with the feature set
 
 The single most important rule: **size the storage block from the macro, never
-from a literal.** The macro is computed at compile time from the options you
-enabled, so it automatically tracks the cost of subscriptions and security
-(`include/muc_opcua/config.h`):
-
-```c
-#ifdef MUC_OPCUA_SECURITY
-#define MU_SERVER_SECURITY_STORAGE_BYTES (MU_SECURE_SCRATCH_SIZE + 2 * MU_CIPHER_CTX_SIZE)
-#else
-#define MU_SERVER_SECURITY_STORAGE_BYTES 0
-#endif
-
-#ifdef MUC_OPCUA_SUBSCRIPTIONS
-#define MU_SERVER_STORAGE_BYTES \
-    (3072 + MU_SUBSCRIPTIONS_STANDARD_STORAGE_BYTES + \
-     MU_SERVER_SECURITY_STORAGE_BYTES + MU_ADDRESS_SPACE_INDEX_STORAGE_BYTES)
-#else
-#define MU_SERVER_STORAGE_BYTES \
-    (1024 + MU_SERVER_SECURITY_STORAGE_BYTES + MU_ADDRESS_SPACE_INDEX_STORAGE_BYTES)
-#endif
-```
-
-This yields the per-profile sizes you must budget for:
-
-| Profile | Options | `MU_SERVER_STORAGE_BYTES` |
-|---|---|---|
-| Nano | base | **1,280** |
-| Micro | `+ MUC_OPCUA_SUBSCRIPTIONS` | **3,328** |
-| Embedded 2017 | `+ MUC_OPCUA_EMBEDDED_PROFILE`, 100 monitored items, queue depth 2 | **63,240** |
-| Full Featured | embedded + methods + diagnostics + dynamic nodes | **63,240** |
+from a literal.** `MU_SERVER_STORAGE_BYTES` is computed at compile time from the
+resolved Kconfig features, profile capacity markers, and any `MU_MAX_*` overrides,
+so it automatically tracks the cost of subscriptions, security scratch, multiple
+connections, address-space index storage, and larger profile capacity presets.
+The formula lives in `include/muc_opcua/config.h`, `include/muc_opcua/capacities.h`,
+and `src/core/server_internal.h`; do not copy it into application code.
 
 > **Pitfall.** If you hardcode `static opcua_byte_t storage[1024]` and later turn
 > on security, `mu_server_init` returns `Bad_OutOfMemory` at runtime. The example
@@ -770,45 +747,61 @@ The authoritative conformance reference is
 
 ### 7.1 Choosing a profile
 
-muc-opcua ships five named profiles, selected via `-DMUC_OPCUA_PROFILE=...`
-(or the `make nano` / `make micro` / `make embedded` convenience targets for
-the first three). Any individual flag can be added to or removed from a
-profile's defaults on the same `cmake` invocation — see
-[`docs/build-and-gating.md`](build-and-gating.md) for the full flag reference
-and override mechanics (e.g. "standard minus the crypto layer").
+muc-opcua ships five named profiles plus `custom`, selected via
+`-DMUC_OPCUA_PROFILE=...` (or the `make nano` / `make micro` / `make embedded` /
+`make standard` / `make full` convenience targets). CMake seeds Kconfig from
+`configs/<profile>.defconfig`, resolves the `depends on` graph, and compiles only
+the enabled source files. Any individual Kconfig feature can be added to or
+removed from a profile's defaults on the same `cmake` invocation — see
+[`docs/build-and-gating.md`](build-and-gating.md) for the full symbol reference,
+`menuconfig`, programmatic config generation, and override mechanics.
 
-| Profile | Service set | Key options |
+| Profile | Service set | Build selector |
 |---|---|---|
-| **Nano** | Core + View (Browse) + Read, SecurityPolicy None | subscriptions OFF, security OFF |
-| **Micro** | Nano + data-change Subscriptions / MonitoredItems | `MUC_OPCUA_SUBSCRIPTIONS=ON` |
-| **Embedded** | Micro + Basic256Sha256 | `+ MUC_OPCUA_SECURITY=ON` |
-| **Standard** | Embedded + Write/History/Query/NodeManagement/PubSub/Data Access/Method Server/Auditing/Complex Types/Redundancy/Reverse Connect, optional ECC | `+ MUC_OPCUA_DATA_ACCESS=ON MUC_OPCUA_METHOD_SERVER=ON MUC_OPCUA_ECC=ON` (and more) |
-| **Full** | Same feature set as Standard, larger capacity presets | same flags, larger `MU_MAX_*` defaults |
+| **Nano** | Core + View (Browse) + Read, SecurityPolicy None | `MUC_OPCUA_PROFILE=nano` |
+| **Micro** | Nano + data-change Subscriptions / MonitoredItems + multiple sessions/connections | `MUC_OPCUA_PROFILE=micro` |
+| **Embedded** | Micro + Basic256Sha256 + Standard DataChange additions + Base Info Type System | `MUC_OPCUA_PROFILE=embedded` |
+| **Standard** | Embedded-level surface plus Standard profile marker and standard capacity minima | `MUC_OPCUA_PROFILE=standard` |
+| **Full** | Standard profile/capacity family plus optional services/facets | `MUC_OPCUA_PROFILE=full` |
+| **Custom** | Always-on core services plus only the features you select | `MUC_OPCUA_PROFILE=custom` |
 
-### 7.2 CMake options
+### 7.2 CMake and Kconfig settings
 
-From the top-level `CMakeLists.txt` and `cmake/MucOpcUaOptions.cmake`
-(defaults shown):
+The top-level build has two classes of settings:
 
-| Option | Default | Effect |
-|---|---|---|
-| `MUC_OPCUA_SECURITY` | ON | Compile advanced security policies (and grow `MU_SERVER_STORAGE_BYTES`) |
-| `MUC_OPCUA_SUBSCRIPTIONS` | ON | Data-change subscription engine (Micro profile) |
-| `MUC_OPCUA_PUBSUB` | OFF | OPC UA PubSub UADP/UDP Publisher and scoped decoder |
-| `MUC_OPCUA_BASE_NODES` | ON | Standard Base Information node set (ServerStatus, CurrentTime, …) |
-| `MUC_OPCUA_SERVICE_READ` | ON | Read service |
-| `MUC_OPCUA_SERVICE_BROWSE` | ON | Browse / BrowseNext / TranslateBrowsePaths |
-| `MUC_OPCUA_SERVICE_DISCOVERY` | ON | GetEndpoints / FindServers |
-| `MUC_OPCUA_SERVICE_REGISTER_NODES` | ON | RegisterNodes / UnregisterNodes |
-| `MUC_OPCUA_LTO` | OFF | Link-time / interprocedural optimization for smaller firmware |
-| `MUC_OPCUA_PLATFORM` | `host` | Target platform: `host`, `external`, `pico`, `arduino-skeleton` |
-| `MUC_OPCUA_BUILD_EXAMPLES` | OFF | Build the example servers |
+- `MUC_OPCUA_PROFILE` selects the base Kconfig profile defconfig. It defaults to
+  `nano`.
+- `MUC_OPCUA_KCONFIG_CONFIG` uses a saved `.config` instead of
+  `configs/<profile>.defconfig` when set.
+- `MUC_OPCUA_<KCONFIG_SYMBOL>` overrides one feature symbol. Use the actual
+  Kconfig symbol names from the flag reference, such as
+  `MUC_OPCUA_CU_PUBSUB` or `MUC_OPCUA_FACET_CORE_2022_SERVER`, not legacy C
+  aliases such as `MUC_OPCUA_PUBSUB` or `MUC_OPCUA_SECURITY`.
+- `MUC_OPCUA_LTO` controls link-time / interprocedural optimization and defaults
+  to `ON`.
+- `MUC_OPCUA_PLATFORM` selects `host`, `external`, `pico`, or
+  `arduino-skeleton`; the default is `host`.
+- `MUC_OPCUA_BUILD_EXAMPLES` builds the example servers when set to `ON`.
+- `MUC_OPCUA_BUILD_TESTS`, `MUC_OPCUA_BUILD_FUZZERS`, and
+  `MUC_OPCUA_BUILD_BENCHMARKS` build verification targets when enabled.
 
-Turn features **off** to shrink the build for Nano-class targets, e.g.:
+Turn features **off** to shrink a build, e.g. Full without PubSub:
 
 ```sh
-cmake -B build -DMUC_OPCUA_SUBSCRIPTIONS=OFF -DMUC_OPCUA_SECURITY=OFF \
+cmake -S . -B build/full-no-pubsub \
+      -DMUC_OPCUA_PROFILE=full \
+      -DMUC_OPCUA_CU_PUBSUB=OFF \
       -DMUC_OPCUA_LTO=ON
+cmake --build build/full-no-pubsub
+```
+
+Use `menuconfig` when you want an interactive view of dependencies:
+
+```sh
+cmake -S . -B build/menu -DMUC_OPCUA_PROFILE=embedded
+cmake --build build/menu --target menuconfig
+cmake -S . -B build/menu -DMUC_OPCUA_KCONFIG_CONFIG=build/menu/.config
+cmake --build build/menu
 ```
 
 ### 7.3 Capacity and sizing `-D` knobs
@@ -824,7 +817,7 @@ These are plain `#define`s overridable with `-D…` at compile time. They trade 
 | `MU_MAX_PUBLISH_REQUESTS` | 4 | Parked Publish requests |
 | `MU_RETRANSMIT_BYTES` | 256 | Republish buffer per subscription |
 | `MU_CIPHER_CTX_SIZE` | 32 / 512 | Per-channel AES context scratch (32 with pointer-based/OpenSSL adaptors, 512 otherwise) |
-| `MU_SECURE_SCRATCH_SIZE` | 6144 | Server-owned secure-channel scratch (security builds) |
+| `MU_SECURE_SCRATCH_SIZE` | 14336 | Server-owned secure-channel scratch (security builds) |
 | `MUC_OPCUA_STATUS_STRINGS` | *(undefined)* | Define to compile `mu_status_name()` human-readable strings (costs flash; off by default for embedded). Guard logging with `#ifdef`. |
 
 Note the subscription, cipher, and scratch knobs feed `MU_SERVER_STORAGE_BYTES`
@@ -834,7 +827,7 @@ from the macro so changes propagate.
 Example tightening RAM on a constrained Micro build:
 
 ```sh
-cmake -B build -DMUC_OPCUA_SUBSCRIPTIONS=ON \
+cmake -S . -B build/micro-small -DMUC_OPCUA_PROFILE=micro \
       -DMU_MAX_MONITORED_ITEMS=4 -DMU_MAX_SUBSCRIPTIONS=1 \
       -DMU_MAX_ADDRESS_SPACE_NODES=32
 ```
@@ -847,17 +840,17 @@ stack and crypto backend are extra. Reproduce with `scripts/measure_size.sh all`
 Full details in
 [`docs/size/feature-size-ledger.md`](size/feature-size-ledger.md).
 
-| Profile | Core `.text` (flash) | Caller RAM = storage + 2×8 KiB buffers | Heap |
-|---|---|---|---|
-| **Nano** | **17.5 KiB** (17,956 B) | 1,408 B + 16 KiB ≈ **17.4 KiB** | **0** |
-| **Micro** | **28.9 KiB** (29,550 B) | 11,680 B + 16 KiB ≈ **27.4 KiB** | **0** |
-| **Embedded 2017** | **53.3 KiB** (54,616 B) | 128,232 B + 16 KiB ≈ **141.2 KiB** | **0** |
-| **Standard 2017** | **69.7 KiB** (71,370 B) | 741,300 B + 16 KiB ≈ **740.0 KiB** | array-valued Write/Call |
-| **Full** | **69.7 KiB** (71,354 B) | 1,387,500 B + 16 KiB ≈ **1.34 MiB** | array-valued Write/Call |
+| Profile | Flash/RAM character | Heap |
+|---|---|---|
+| **Nano** | Smallest Read/Browse/discovery server; one connection, no subscriptions | **0** |
+| **Micro** | Adds fixed-size subscription state and multiple connections/sessions | **0** |
+| **Embedded** | Adds security scratch, Standard DataChange state, and Base Info Type System | **0** |
+| **Standard** | Adds standard capacity minima; much larger caller storage than embedded | array-valued Write/Call |
+| **Full** | Enables optional services/facets and the largest default capacities | array-valued Write/Call |
 
 Additional notes for budgeting:
 
-- **`.bss`** and **`.data`** are 0 for `.text`; **heap is 0** on nano/micro/embedded —
+- **`.bss`** and **`.data`** are 0 for the library archive; **heap is 0** on nano/micro/embedded —
   the subscription engine is fixed-size, no `malloc`. Standard/full keep the heap
   enabled specifically for array-valued Write/Call decoding.
 - **Caller RAM scales with capacity presets**, not just feature flags: standard/full
@@ -873,14 +866,11 @@ Additional notes for budgeting:
   standard/full) — see
   [`docs/conformance/ecc-security-policy.md`](conformance/ecc-security-policy.md).
   Size it from your TLS library plus the ECC delta.
-- **Peak stack:** ~5.5 KiB on the plaintext (None) path; ~12 KiB on the secured
-  path (response buffer + 32-deep dispatch arrays). **Provision ≥16 KiB of stack
-  for a security build.** Secured-channel scratch was moved off the stack into the
-  caller storage block, capping secured-OPN stack at ~7 KiB. Full Embedded 2017
-  storage is larger because it also carries the 100-item Standard DataChange capacity.
-- On a 264 KiB-RAM RP2040, a full Embedded 2017 server leaves roughly 200 KiB for your
-  application and network stack after protocol storage and the two default transport
-  buffers.
+- **Peak stack:** budget at least 16 KiB for a security build unless you have
+  measured your exact toolchain/profile combination. The secured path has
+  historically been the largest stack user. Secured-channel scratch now lives in
+  the caller storage block (`MU_SECURE_SCRATCH_SIZE`, default 14336 B) rather than
+  in large automatic buffers.
 - If RAM/stack constrained: lower the `MU_MAX_*` subscription capacities, shrink
   `MU_RETRANSMIT_BYTES`, or reduce `MU_DISPATCH_MAX_READ_NODES` (and advertise a
   smaller `MaxNodesPerRead`).

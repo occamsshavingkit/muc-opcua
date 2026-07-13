@@ -8,10 +8,10 @@ raises the mandatory minima of the base **Standard DataChange Subscription 2017*
 
 ## Why the server claims it (it is mandatory, not optional)
 
-The `standard` and `full` builds advertise
+The `standard` and `full` Kconfig profiles advertise
 `http://opcfoundation.org/UA-Profile/Server/StandardUA2017` (see
-`src/address_space/base_nodes.c`, `s_server_profile_array`, gated on
-`MUC_OPCUA_STANDARD_PROFILE`). The **Standard 2017 UA Server Profile (id 1663)** lists the
+`src/address_space/base_nodes.c`, `s_server_profile_array`, gated by the generated
+`MUC_OPCUA_STANDARD_PROFILE` marker). The **Standard 2017 UA Server Profile (id 1663)** lists the
 Enhanced DataChange 2017 facet with `isOptional = false` — so any server advertising
 StandardUA2017 **must** meet the Enhanced minima. `embedded` advertises `EmbeddedUA2017`,
 which mandates only the plain **Standard DataChange 2017** facet (a lower queue-depth
@@ -40,9 +40,9 @@ CU in this facet — the set below is exhaustive.
 
 ## Advertised == enforced
 
-The facet marker is `MUC_OPCUA_ENHANCED_DATACHANGE` (defined in
-`include/muc_opcua/features.h` exactly when `MUC_OPCUA_STANDARD_PROFILE` is set — i.e. when
-the build advertises StandardUA2017). When it is set, `src/services/subscription.h` carries
+The facet marker is `MUC_OPCUA_ENHANCED_DATACHANGE` (derived in
+`include/muc_opcua/features.h` when the generated `MUC_OPCUA_STANDARD_PROFILE` marker is set —
+i.e. when the build advertises StandardUA2017). When it is set, `src/services/subscription.h` carries
 four `_Static_assert`s that fail the build if any resolved capacity drops below the claimed
 minima. So a capacity override such as `-DMU_MONITORED_QUEUE_DEPTH=2` on a standard build is
 a **compile error**, not a silently mis-advertised profile. Mirrors the "advertised ==
