@@ -79,19 +79,19 @@ list of what requires what.
 `MUC_OPCUA_PROFILE` (a CMake cache string) is the single source of truth for
 which named tier you're building. It resolves to one of:
 
-- `nano`: Nano Embedded Device 2017 Server Profile. Read/Browse/discovery only,
++ `nano`: Nano Embedded Device 2017 Server Profile. Read/Browse/discovery only,
   no heap, no security.
-- `micro`: Micro Embedded Device 2017 Server Profile. Adds data-change
++ `micro`: Micro Embedded Device 2017 Server Profile. Adds data-change
   subscriptions and multiple sessions/connections.
-- `embedded`: Embedded 2017 UA Server Profile. Adds Security
++ `embedded`: Embedded 2017 UA Server Profile. Adds Security
   (Basic256Sha256), the base node set, and Standard DataChange additions.
-- `standard`: Standard UA Server 2017. Adds the Standard profile marker and
++ `standard`: Standard UA Server 2017. Adds the Standard profile marker and
   standard capacity minima to the Embedded-level feature surface.
-- `full`: not a distinct OPC UA profile. Uses the Standard profile/capacity
++ `full`: not a distinct OPC UA profile. Uses the Standard profile/capacity
   family plus optional services/facets: History, Query, NodeManagement, PubSub,
   Data Access, Method Server, Auditing, Complex Types, Redundancy, full
   Aggregates, Reverse Connect, and ECC.
-- `custom`: you hand-pick every flag. Nothing is preset beyond the always-on
++ `custom`: you hand-pick every flag. Nothing is preset beyond the always-on
   core services (Read/Browse/Discovery); every feature stays OFF unless you
   `-D` it.
 
@@ -135,10 +135,10 @@ the `MUC_OPCUA_BUILD_*`/LTO/stack-usage knobs, and the CMake-driven
 `scripts/kconfig/gen_config.py`, which takes a Kconfig file, a base defconfig,
 and an optional override fragment. It emits two useful artifacts:
 
-- `muc_opcua_config.cmake`: used by this repository's CMake build. It emits
++ `muc_opcua_config.cmake`: used by this repository's CMake build. It emits
   `set(MUC_OPCUA_<SYM> ON/OFF)` values consumed by `src/CMakeLists.txt` for
   source selection.
-- `muc_opcua_autoconf.h`: used by non-CMake / external consumers. It emits
++ `muc_opcua_autoconf.h`: used by non-CMake / external consumers. It emits
   `#define MUC_OPCUA_<SYM> 1` for enabled symbols; disabled symbols are left
   undefined, which matches this codebase's `#ifdef` and `#if` feature tests.
 
