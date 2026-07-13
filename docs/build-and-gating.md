@@ -137,10 +137,13 @@ and an optional override fragment. It emits two useful artifacts:
 
 + `muc_opcua_config.cmake`: used by this repository's CMake build. It emits
   `set(MUC_OPCUA_<SYM> ON/OFF)` values consumed by `src/CMakeLists.txt` for
-  source selection.
-+ `muc_opcua_autoconf.h`: used by non-CMake / external consumers. It emits
-  `#define MUC_OPCUA_<SYM> 1` for enabled symbols; disabled symbols are left
-  undefined, which matches this codebase's `#ifdef` and `#if` feature tests.
+  source selection and the legacy C alias compile definitions added by CMake.
++ `muc_opcua_autoconf.h`: a raw Kconfig export for non-CMake / external
+  consumers. It defines enabled Kconfig symbols, such as
+  `MUC_OPCUA_CU_SUBSCRIPTION_BASIC`, and raw capacity names, such as
+  `MAX_SESSIONS`. It does **not** generate the legacy C aliases that
+  `src/CMakeLists.txt` adds for CMake builds, such as `MUC_OPCUA_SUBSCRIPTIONS`
+  or `MU_MAX_SESSIONS`.
 
 Generate a standard profile configuration without any interactive step:
 
@@ -159,32 +162,39 @@ still apply, so dependency-violating requests cascade or are vetoed by Kconfig
 instead of creating an invalid header.
 
 ```sh
-cat > build/kconfig/standard-no-crypto.fragment <<'EOF'
-# MUC_OPCUA_SECURITY is not set
-# MUC_OPCUA_ECC is not set
+cat > build/kconfig/full-no-pubsub.fragment <<'EOF'
+# MUC_OPCUA_CU_PUBSUB is not set
 EOF
 
 python3 scripts/kconfig/gen_config.py \
     Kconfig \
-    configs/standard.defconfig \
+    configs/full.defconfig \
     build/kconfig/muc_opcua_config.cmake \
     build/kconfig/muc_opcua_autoconf.h \
-    build/kconfig/standard-no-crypto.fragment
+    build/kconfig/full-no-pubsub.fragment
 ```
 
-For a downstream build that does not call this repository's CMake, force-include
-the generated header before any `muc_opcua` header or source includes
-`muc_opcua/config.h`:
+For a downstream build that does not call this repository's CMake, do not rely
+on `muc_opcua_autoconf.h` alone unless the downstream build consumes the raw
+Kconfig symbol names directly. Either map the raw Kconfig symbols and capacities
+to the public C aliases used by the source tree, or provide an equivalent
+project configuration header before any `muc_opcua` header or source includes
+`muc_opcua/config.h`.
+
+For example, a downstream alias header can include the generated export and add
+the compatibility names needed by non-CMake builds:
 
 ```sh
-cc -Iinclude -include build/kconfig/muc_opcua_autoconf.h ...
+cc -Iinclude -include build/kconfig/muc_opcua_external_config.h ...
 ```
 
 The generated header is not included automatically by `muc_opcua/config.h` because
-many embedded build systems have their own configuration include convention. The
-contract is simple: enabled feature macros must be defined to `1`; disabled
-feature macros must be undefined. `include/muc_opcua/features.h` remains the
-compiler backstop for illegal hand-written combinations.
+many embedded build systems have their own configuration include convention.
+The contract is simple: enabled public feature macros must be defined to `1`;
+disabled feature macros must be undefined; capacity aliases such as
+`MU_MAX_SESSIONS` must be set when overriding defaults.
+`include/muc_opcua/features.h` remains the compiler backstop for illegal
+hand-written combinations.
 
 For repeatable custom configurations, either commit a minimal defconfig under
 `configs/` or pass a saved `.config` through CMake:

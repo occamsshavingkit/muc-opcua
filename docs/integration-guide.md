@@ -769,24 +769,30 @@ removed from a profile's defaults on the same `cmake` invocation — see
 
 The top-level build has two classes of settings:
 
-| Setting | Default | Effect |
-|---|---|---|
-| `MUC_OPCUA_PROFILE` | `nano` | Selects the base Kconfig profile defconfig. |
-| `MUC_OPCUA_KCONFIG_CONFIG` | empty | Uses a saved `.config` instead of `configs/<profile>.defconfig`. |
-| `MUC_OPCUA_<KCONFIG_SYMBOL>` | profile-derived | Overrides one feature symbol, e.g. `MUC_OPCUA_SECURITY=OFF` or `MUC_OPCUA_PUBSUB=ON`. |
-| `MUC_OPCUA_LTO` | ON | Link-time / interprocedural optimization for smaller firmware. |
-| `MUC_OPCUA_PLATFORM` | `host` | Target platform: `host`, `external`, `pico`, `arduino-skeleton`. |
-| `MUC_OPCUA_BUILD_EXAMPLES` | OFF | Build the example servers. |
-| `MUC_OPCUA_BUILD_TESTS` / `_FUZZERS` / `_BENCHMARKS` | OFF | Build verification targets. |
+- `MUC_OPCUA_PROFILE` selects the base Kconfig profile defconfig. It defaults to
+  `nano`.
+- `MUC_OPCUA_KCONFIG_CONFIG` uses a saved `.config` instead of
+  `configs/<profile>.defconfig` when set.
+- `MUC_OPCUA_<KCONFIG_SYMBOL>` overrides one feature symbol. Use the actual
+  Kconfig symbol names from the flag reference, such as
+  `MUC_OPCUA_CU_PUBSUB` or `MUC_OPCUA_FACET_CORE_2022_SERVER`, not legacy C
+  aliases such as `MUC_OPCUA_PUBSUB` or `MUC_OPCUA_SECURITY`.
+- `MUC_OPCUA_LTO` controls link-time / interprocedural optimization and defaults
+  to `ON`.
+- `MUC_OPCUA_PLATFORM` selects `host`, `external`, `pico`, or
+  `arduino-skeleton`; the default is `host`.
+- `MUC_OPCUA_BUILD_EXAMPLES` builds the example servers when set to `ON`.
+- `MUC_OPCUA_BUILD_TESTS`, `MUC_OPCUA_BUILD_FUZZERS`, and
+  `MUC_OPCUA_BUILD_BENCHMARKS` build verification targets when enabled.
 
-Turn features **off** to shrink a build, e.g. Standard without crypto:
+Turn features **off** to shrink a build, e.g. Full without PubSub:
 
 ```sh
-cmake -S . -B build/standard-no-crypto \
-      -DMUC_OPCUA_PROFILE=standard \
-      -DMUC_OPCUA_SECURITY=OFF \
+cmake -S . -B build/full-no-pubsub \
+      -DMUC_OPCUA_PROFILE=full \
+      -DMUC_OPCUA_CU_PUBSUB=OFF \
       -DMUC_OPCUA_LTO=ON
-cmake --build build/standard-no-crypto
+cmake --build build/full-no-pubsub
 ```
 
 Use `menuconfig` when you want an interactive view of dependencies:
