@@ -77,8 +77,8 @@ deadband returns `Bad_MonitoredItemFilterUnsupported` here); aggregate filters
 (Average/Min/Max) are supported.
 
 **Concurrent ≥2 sessions** — implemented: the server multiplexes up to
-`MU_MAX_SESSIONS` (default 2) logical sessions over the configured TCP connection pool
-(`test_session`, `test_single_client_limit`).
+`MU_MAX_SESSIONS` (default 2) logical sessions over the configured TCP
+connection pool (`test_session`, `test_single_client_limit`).
 
 ## Remaining evidence for Micro profile status (see [status.md](status.md))
 - **CTT verification** — not yet run; `profile-targeting` until it passes. No

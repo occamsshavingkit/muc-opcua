@@ -79,14 +79,21 @@ list of what requires what.
 `MUC_OPCUA_PROFILE` (a CMake cache string) is the single source of truth for
 which named tier you're building. It resolves to one of:
 
-| Profile | What it targets | Roughly |
-|---|---|---|
-| `nano` | Nano Embedded Device 2017 Server Profile | Read/Browse/discovery only, no heap, no security |
-| `micro` | Micro Embedded Device 2017 Server Profile | + data-change subscriptions, multiple sessions/connections |
-| `embedded` | Embedded 2017 UA Server Profile | + Security (Basic256Sha256), base node set, Standard DataChange additions |
-| `standard` | Standard UA Server 2017 | Embedded-level feature surface plus the Standard profile marker and standard capacity minima |
-| `full` | Not a distinct OPC UA profile | Standard profile/capacity family plus optional services/facets (History, Query, NodeManagement, PubSub, Data Access, Method Server, Auditing, Complex Types, Redundancy, full Aggregates, Reverse Connect, ECC) |
-| `custom` | You hand-pick every flag | Nothing is preset beyond the always-on core services (Read/Browse/Discovery); every feature stays OFF unless you `-D` it |
+- `nano`: Nano Embedded Device 2017 Server Profile. Read/Browse/discovery only,
+  no heap, no security.
+- `micro`: Micro Embedded Device 2017 Server Profile. Adds data-change
+  subscriptions and multiple sessions/connections.
+- `embedded`: Embedded 2017 UA Server Profile. Adds Security
+  (Basic256Sha256), the base node set, and Standard DataChange additions.
+- `standard`: Standard UA Server 2017. Adds the Standard profile marker and
+  standard capacity minima to the Embedded-level feature surface.
+- `full`: not a distinct OPC UA profile. Uses the Standard profile/capacity
+  family plus optional services/facets: History, Query, NodeManagement, PubSub,
+  Data Access, Method Server, Auditing, Complex Types, Redundancy, full
+  Aggregates, Reverse Connect, and ECC.
+- `custom`: you hand-pick every flag. Nothing is preset beyond the always-on
+  core services (Read/Browse/Discovery); every feature stays OFF unless you
+  `-D` it.
 
 Each named profile (everything except `custom`) is a
 `configs/<profile>.defconfig` selecting the profile choice; the resolved feature
@@ -128,10 +135,12 @@ the `MUC_OPCUA_BUILD_*`/LTO/stack-usage knobs, and the CMake-driven
 `scripts/kconfig/gen_config.py`, which takes a Kconfig file, a base defconfig,
 and an optional override fragment. It emits two useful artifacts:
 
-| Output | Used by | Purpose |
-|---|---|---|
-| `muc_opcua_config.cmake` | This repository's CMake build | `set(MUC_OPCUA_<SYM> ON/OFF)` values consumed by `src/CMakeLists.txt` for source selection. |
-| `muc_opcua_autoconf.h` | Non-CMake / external consumers | `#define MUC_OPCUA_<SYM> 1` for enabled symbols; disabled symbols are left undefined, which matches this codebase's `#ifdef` and `#if` feature tests. |
+- `muc_opcua_config.cmake`: used by this repository's CMake build. It emits
+  `set(MUC_OPCUA_<SYM> ON/OFF)` values consumed by `src/CMakeLists.txt` for
+  source selection.
+- `muc_opcua_autoconf.h`: used by non-CMake / external consumers. It emits
+  `#define MUC_OPCUA_<SYM> 1` for enabled symbols; disabled symbols are left
+  undefined, which matches this codebase's `#ifdef` and `#if` feature tests.
 
 Generate a standard profile configuration without any interactive step:
 

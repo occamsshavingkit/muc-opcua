@@ -56,18 +56,23 @@ be added or removed on top of a profile's defaults — see
 [docs/build-and-gating.md](build-and-gating.md) for the full symbol reference,
 dependency cascade behavior, and override mechanics.
 
-| Profile | Command | SecurityPolicy | Subscriptions | Core flash (Cortex-M0+ `-Os`) |
-|---|---|---|---|---|
-| **nano** | `make nano` | None | off | 22,531 B |
-| **micro** | `make micro` | None | **on** (data-change) | 31,961 B |
-| **embedded** | `make embedded` | **Basic256Sha256** (sign/encrypt) | Standard DataChange 2017 | 51,773 B |
-| **standard** | `make standard` | + Aes128/256 RsaOaep/RsaPss | Standard profile capacity marker | 52,023 B |
-| **full** | `make full` | Same as standard, plus optional ECC by default | Optional services/facets enabled | 80,831 B |
+- **nano**: `make nano`; SecurityPolicy None; subscriptions off; 22,531 B
+  core flash.
+- **micro**: `make micro`; SecurityPolicy None; data-change subscriptions on;
+  31,961 B core flash.
+- **embedded**: `make embedded`; Basic256Sha256 sign/encrypt; Standard
+  DataChange 2017; 51,773 B core flash.
+- **standard**: `make standard`; Aes128/256 RsaOaep/RsaPss; Standard profile
+  capacity marker; 52,023 B core flash.
+- **full**: `make full`; same as standard, plus optional ECC by default;
+  optional services/facets enabled; 80,831 B core flash.
 
-- **nano** — the OPC UA *Nano Embedded Device 2017* surface: Discovery, Session,
-  Read, and the View (Browse) service set over **SecurityPolicy None**. Smallest build.
-- **micro** — nano **plus** the data-change subscription engine (the Embedded Data
-  Change Subscription Server Facet). Choose this if your client polls via subscriptions.
+- **nano** — the OPC UA *Nano Embedded Device 2017* surface: Discovery,
+  Session, Read, and the View (Browse) service set over **SecurityPolicy None**.
+  Smallest build.
+- **micro** — nano **plus** the data-change subscription engine (the Embedded
+  Data Change Subscription Server Facet). Choose this if your client polls via
+  subscriptions.
 - **standard** — the OPC-10000-7 *Standard 2017 UA Server* target with standard
   profile capacity markers and the mandatory embedded-level surface.
 - **full** — not a distinct OPC UA profile; it is the developer/integration build
@@ -76,15 +81,16 @@ dependency cascade behavior, and override mechanics.
   Redundancy, Reverse Connect, Aggregates, and optional ECC SecurityPolicies
   (`#ECC_curve25519`/`#ECC_nistP256`, spec 059 — see
   [docs/conformance/ecc-security-policy.md](conformance/ecc-security-policy.md)).
-- **embedded** — micro **plus** SecurityPolicy **Basic256Sha256**, Standard DataChange
-  2017, Base Info Type System exposure, and the required GetMonitoredItems/ResendData
-  methods. The host build links OpenSSL to provide the crypto primitives; on an MCU you
-  would swap in mbedTLS/PSA.
+- **embedded** — micro **plus** SecurityPolicy **Basic256Sha256**, Standard
+  DataChange 2017, Base Info Type System exposure, and the required
+  GetMonitoredItems/ResendData methods. The host build links OpenSSL to provide
+  the crypto primitives; on an MCU you would swap in mbedTLS/PSA.
 
 > **Note:** `nano`, `micro`, and `embedded` are strict no-heap builds. `standard`
 > and `full` keep heap-enabled optional paths for larger array-valued services.
-> The figures above are flash (code size); see [docs/size/feature-size-ledger.md](size/feature-size-ledger.md)
-> for the full memory breakdown.
+> The figures above are flash (code size); see
+> [docs/size/feature-size-ledger.md](size/feature-size-ledger.md) for the full
+> memory breakdown.
 
 ---
 
@@ -99,8 +105,9 @@ make nano
 Expected (trimmed) output:
 
 ```
->> NANO profile: SecurityPolicy None, full Nano service surface, subscriptions OFF
-cmake -S . -B build/nano -DMUC_OPCUA_BUILD_EXAMPLES=ON -DMUC_OPCUA_OPTIMIZE_SIZE=ON -DMUC_OPCUA_PROFILE=nano
+>> NANO profile: SecurityPolicy None, full Nano service surface,
+>> subscriptions OFF
+cmake -S . -B build/nano ... -DMUC_OPCUA_PROFILE=nano
 ...
 [100%] Built target minimal_server
 ```

@@ -56,9 +56,9 @@ smaller after `--gc-sections` dead-code elimination.
 
 Each named profile is seeded from `configs/<profile>.defconfig` and resolved through
 `/Kconfig`. Optional facets remain `-DMUC_OPCUA_<SYMBOL>=ON/OFF` opt-ins or opt-outs,
-and invalid combinations cascade through Kconfig `depends on` rules. `full` is the
-only "everything on" build; `custom` starts from the always-on core services and lets
-you hand-select the rest.
+and invalid combinations cascade through Kconfig `depends on` rules. `full` is
+the only "everything on" build; `custom` starts from the always-on core services
+and lets you hand-select the rest.
 
 | Profile | .text | OPC UA Profile (strict mandatory set) |
 |---------|-------|----------------|
@@ -73,8 +73,8 @@ profiles are strictly no-heap (`MUC_OPCUA_ALLOW_HEAP=OFF`): 0 B `.data`, 0 B `.b
 no `malloc` in the linked server. With LTO's cross-module optimization the real
 linked `nano` server is smaller after `--gc-sections`, below the archive figure above.
 `standard`/`full` keep the heap enabled for array-valued responses. The optional ECC
-SecurityPolicies (spec 059, ~3.1 KB) are `full`-only by default and available on any build
-via `-DMUC_OPCUA_ECC=ON`; see
+SecurityPolicies (spec 059, ~3.1 KB) are `full`-only by default and available
+on any build via `-DMUC_OPCUA_ECC=ON`; see
 [docs/conformance/ecc-security-policy.md](docs/conformance/ecc-security-policy.md) and
 [docs/build-and-gating.md](docs/build-and-gating.md).
 
@@ -148,9 +148,9 @@ the OPC Foundation .NET reference client, or `opcua-client` from `python-opcua` 
 `asyncua` — connect anonymously, and browse the `Server` object, read `ServerStatus`,
 or (on the micro/embedded profiles) create a subscription on a variable.
 
-To build the other tiers: `make nano`, `make embedded`, `make standard`, `make full`,
-or `make all-profiles`. Run `make help` for a summary. The example binary always lands
-at `build/<profile>/examples/minimal_server`.
+To build the other tiers: `make nano`, `make embedded`, `make standard`,
+`make full`, or `make all-profiles`. Run `make help` for a summary. The
+example binary always lands at `build/<profile>/examples/minimal_server`.
 
 To inspect or edit a profile interactively:
 
@@ -280,16 +280,19 @@ cmake -S . -B build \
 cmake --build build
 ```
 
-Selected settings (see [CMakeLists.txt](CMakeLists.txt),
-[Kconfig](Kconfig), and [cmake/MucOpcUaOptions.cmake](cmake/MucOpcUaOptions.cmake)):
+Selected settings (see [CMakeLists.txt](CMakeLists.txt), [Kconfig](Kconfig),
+and [cmake/MucOpcUaOptions.cmake](cmake/MucOpcUaOptions.cmake)):
 
-| Option | Default | Purpose |
-|---|---|---|
-| `MUC_OPCUA_PROFILE` | `nano` | Profile seed: `nano`, `micro`, `embedded`, `standard`, `full`, or `custom` |
-| `MUC_OPCUA_KCONFIG_CONFIG` | empty | Reuse a `.config` saved from `menuconfig` |
-| `MUC_OPCUA_<KCONFIG_SYMBOL>` | profile-derived | Override one Kconfig feature, e.g. `MUC_OPCUA_SECURITY=OFF` or `MUC_OPCUA_PUBSUB=ON` |
-| `MUC_OPCUA_BUILD_EXAMPLES` / `_BUILD_TESTS` / `_BUILD_FUZZERS` | OFF | Build extras |
-| `MUC_OPCUA_PLATFORM` | `host` | Target: `host`, `external`, `pico`, `arduino-skeleton` |
+- `MUC_OPCUA_PROFILE` (default `nano`) seeds the profile: `nano`, `micro`,
+  `embedded`, `standard`, `full`, or `custom`.
+- `MUC_OPCUA_KCONFIG_CONFIG` (default empty) reuses a `.config` saved from
+  `menuconfig`.
+- `MUC_OPCUA_<KCONFIG_SYMBOL>` (default profile-derived) overrides one
+  Kconfig feature, e.g. `MUC_OPCUA_SECURITY=OFF` or `MUC_OPCUA_PUBSUB=ON`.
+- `MUC_OPCUA_BUILD_EXAMPLES` / `_BUILD_TESTS` / `_BUILD_FUZZERS` (default
+  OFF) build extras.
+- `MUC_OPCUA_PLATFORM` (default `host`) selects `host`, `external`, `pico`, or
+  `arduino-skeleton`.
 
 ### Tests
 
@@ -347,7 +350,8 @@ src/
   address_space/       Base Information node set + address-space helpers
   platform/            Host POSIX TCP + OpenSSL crypto adapters (dev/interop)
   generated/           Code-generated OPC UA type/id tables
-  cu/                  Reserved CU-aligned namespace for generated/experimental slices
+  cu/                  Reserved CU-aligned namespace for generated/experimental
+                       slices
 examples/minimal_server/   Runnable example server
 platform/pico|arduino/     MCU platform integration
 docs/                  conformance/, size/, adr/, validation/, traceability/
@@ -361,8 +365,11 @@ Makefile               Profile build presets (nano/micro/embedded)
 ## Documentation
 
 - [docs/getting-started.md](docs/getting-started.md) — install, build, first run
-- [docs/integration-guide.md](docs/integration-guide.md) — implementing platform adapters & your address space
-- [docs/build-and-gating.md](docs/build-and-gating.md) — Kconfig profile composition, feature symbols, `menuconfig`, and how to override a profile default (add/remove a feature)
+- [docs/integration-guide.md](docs/integration-guide.md) — integration guide
+  for platform adapters & your address space
+- [docs/build-and-gating.md](docs/build-and-gating.md) — Kconfig profile
+  composition, feature symbols, `menuconfig`, and how to override a profile
+  default (add/remove a feature)
 - [docs/architecture.md](docs/architecture.md) — internals, memory model, poll loop
 - [docs/api-reference.md](docs/api-reference.md) — full API reference
 - [docs/conformance/](docs/conformance/) — service & profile conformance matrices
