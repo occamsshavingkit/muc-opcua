@@ -17,6 +17,8 @@
 #include "muc_opcua/muc_opcua.h"
 #include "unity.h"
 
+#include <string.h>
+
 #include "../../src/core/server_internal.h"
 #include "../../src/core/service_dispatch.h"
 
@@ -37,11 +39,50 @@ static const mu_node_t *base_find(opcua_uint32_t numeric) {
     return mu_address_space_find_node(bs, (mu_address_space_index_t *)0, &id);
 }
 
+static const mu_node_t *base_find_string(const char *text) {
+    const mu_address_space_t *bs = mu_base_address_space();
+    mu_nodeid_t id = {0, MU_NODEID_STRING, {.string = {(opcua_int32_t)strlen(text), (const opcua_byte_t *)text}}};
+    return mu_address_space_find_node(bs, (mu_address_space_index_t *)0, &id);
+}
+
 void test_base_info_nodes_present_when_built(void) {
     TEST_ASSERT_NOT_NULL(base_find(2253)); /* Server */
     TEST_ASSERT_NOT_NULL(base_find(2256)); /* ServerStatus */
     TEST_ASSERT_NOT_NULL(base_find(2255)); /* NamespaceArray */
     TEST_ASSERT_NOT_NULL(base_find(2268)); /* ServerCapabilities (ServerProfileArray) */
+}
+
+void test_claimed_cu_nodes_present_when_enabled(void) {
+#if defined(MUC_OPCUA_CU_ADDRESS_SPACE_INTERFACES) && MUC_OPCUA_CU_ADDRESS_SPACE_INTERFACES
+    TEST_ASSERT_NOT_NULL(base_find(17602)); /* BaseInterfaceType */
+    TEST_ASSERT_NOT_NULL(base_find(17603)); /* HasInterface */
+    TEST_ASSERT_NOT_NULL(base_find(17708)); /* InterfaceTypes */
+#endif
+#if defined(MUC_OPCUA_CU_ADDRESS_SPACE_ADDIN_REFERENCE) && MUC_OPCUA_CU_ADDRESS_SPACE_ADDIN_REFERENCE
+    TEST_ASSERT_NOT_NULL(base_find(17604)); /* HasAddIn */
+#endif
+#if defined(MUC_OPCUA_CU_ADDRESS_SPACE_ADDIN_DEFAULTINSTANCEBROWSENAME)
+    TEST_ASSERT_NOT_NULL(base_find(17605)); /* DefaultInstanceBrowseName */
+#endif
+#if defined(MUC_OPCUA_CU_BASE_INFO_LOCALTIME) && MUC_OPCUA_CU_BASE_INFO_LOCALTIME
+    TEST_ASSERT_NOT_NULL(base_find(8912));  /* TimeZoneDataType */
+    TEST_ASSERT_NOT_NULL(base_find(8917));  /* Default Binary */
+    TEST_ASSERT_NOT_NULL(base_find(17634)); /* Server.LocalTime */
+#endif
+#if defined(MUC_OPCUA_CU_BASE_INFO_OPTIONSET) && MUC_OPCUA_CU_BASE_INFO_OPTIONSET
+    TEST_ASSERT_NOT_NULL(base_find(11487)); /* OptionSetType */
+#endif
+#if defined(MUC_OPCUA_CU_BASE_INFO_SELECTION_LIST)
+    TEST_ASSERT_NOT_NULL(base_find(16309)); /* SelectionListType */
+#endif
+#if defined(MUC_OPCUA_CU_BASE_INFO_ENGINEERING_UNITS)
+    TEST_ASSERT_NOT_NULL(base_find(887)); /* EUInformation */
+#endif
+#if defined(MUC_OPCUA_CU_BASE_INFO_CURRENCY)
+    TEST_ASSERT_NOT_NULL(base_find(23498));                 /* CurrencyUnitType */
+    TEST_ASSERT_NOT_NULL(base_find(23507));                 /* Default Binary */
+    TEST_ASSERT_NOT_NULL(base_find_string("CurrencyUnit")); /* CurrencyUnit */
+#endif
 }
 #else
 void test_base_info_nodes_absent_in_minimal_build(void) {
@@ -77,6 +118,7 @@ int main(void) {
     UNITY_BEGIN();
 #if defined(MUC_OPCUA_FACET_CORE_2022_SERVER) && MUC_OPCUA_FACET_CORE_2022_SERVER
     RUN_TEST(test_base_info_nodes_present_when_built);
+    RUN_TEST(test_claimed_cu_nodes_present_when_enabled);
 #else
     RUN_TEST(test_base_info_nodes_absent_in_minimal_build);
 #endif

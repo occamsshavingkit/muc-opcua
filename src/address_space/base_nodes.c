@@ -1563,6 +1563,17 @@ static const mu_node_t s_base_nodes[] = {
      0,
      NULL,
      .type_definition = {0}},
+#ifdef MUC_OPCUA_CU_BASE_INFO_ENGINEERING_UNITS
+    /* OPC-10000-7 CU 5592: EUInformation DataType (887), subtype of Structure (22). */
+    {{0, MU_NODEID_NUMERIC, {MU_ID_EUINFORMATION_DATATYPE}},
+     MU_NODECLASS_DATATYPE,
+     {13, s_str_EUInformation},
+     {13, s_str_EUInformation},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0}},
+#endif
     {{0, MU_NODEID_NUMERIC, {2253}},
      MU_NODECLASS_OBJECT,
      {6, s_str_Server},
@@ -1627,6 +1638,26 @@ static const mu_node_t s_base_nodes[] = {
      0,
      &s_locale_id_array_value,
      .type_definition = {0}},
+#if MUC_OPCUA_CU_BASE_INFO_LOCALTIME
+    /* OPC-10000-5 §12.2.12.11, OPC-10000-7 CU 2476: TimeZoneDataType (8912),
+     * subtype of Structure (22), with its Default Binary encoding Object (8917). */
+    {{0, MU_NODEID_NUMERIC, {MU_NODEID_TIMEZONEDATATYPE}},
+     MU_NODECLASS_DATATYPE,
+     {16, s_str_TimeZoneDataType},
+     {16, s_str_TimeZoneDataType},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0}},
+    {{0, MU_NODEID_NUMERIC, {8917}},
+     MU_NODECLASS_OBJECT,
+     {14, s_str_Default_Binary},
+     {14, s_str_Default_Binary},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {76}}},
+#endif
 #ifdef MUC_OPCUA_CU_BASE_INFO_VALUEASTEXT
 #ifndef MUC_OPCUA_CU_DATA_ACCESS
     /* OPC-10000-7 CU 2969: ValueAsText applies to Variables with enumerated
@@ -1640,6 +1671,18 @@ static const mu_node_t s_base_nodes[] = {
      NULL,
      .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
 #endif
+#endif
+#if MUC_OPCUA_CU_BASE_INFO_OPTIONSET
+    /* OPC-10000-5 §7.17, OPC-10000-7 CU 3127: OptionSetType (11487),
+     * subtype of BaseDataVariableType (63). */
+    {{0, MU_NODEID_NUMERIC, {MU_NODEID_OPTIONSETTYPE}},
+     MU_NODECLASS_VARIABLETYPE,
+     {13, s_str_OptionSetType},
+     {13, s_str_OptionSetType},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0}},
 #endif
     /* Spec 057: MaxArrayLength/MaxStringLength — sorted slots before 11704. */
     {{0, MU_NODEID_NUMERIC, {11702}},
@@ -1712,6 +1755,64 @@ static const mu_node_t s_base_nodes[] = {
      NULL,
      .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
 #endif
+#ifdef MUC_OPCUA_CU_BASE_INFO_SELECTION_LIST
+    /* OPC-10000-5 §7.18, OPC-10000-7 CU 2711: SelectionListType (16309),
+     * subtype of BaseDataVariableType (63). */
+    {{0, MU_NODEID_NUMERIC, {MU_NODEID_SELECTIONLISTTYPE}},
+     MU_NODECLASS_VARIABLETYPE,
+     {17, s_str_SelectionListType},
+     {17, s_str_SelectionListType},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0}},
+#endif
+#if MUC_OPCUA_CU_ADDRESS_SPACE_INTERFACES
+    /* OPC-10000-5 §6.9, OPC-10000-7 CU 3560: BaseInterfaceType ObjectType,
+     * subtype of BaseObjectType (58). */
+    {{0, MU_NODEID_NUMERIC, {17602}},
+     MU_NODECLASS_OBJECTTYPE,
+     {17, s_str_BaseInterfaceType},
+     {17, s_str_BaseInterfaceType},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0}},
+    /* OPC-10000-5 §11.20, OPC-10000-7 CU 3560: HasInterface ReferenceType,
+     * subtype of NonHierarchicalReferences (32). */
+    {{0, MU_NODEID_NUMERIC, {17603}},
+     MU_NODECLASS_REFERENCETYPE,
+     {12, s_str_HasInterface},
+     {12, s_str_HasInterface},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0}},
+#endif
+#if MUC_OPCUA_CU_ADDRESS_SPACE_ADDIN_REFERENCE
+    /* OPC-10000-5 §11.21, OPC-10000-7 CU 2446: HasAddIn ReferenceType (17604),
+     * subtype of NonHierarchicalReferences (32). */
+    {{0, MU_NODEID_NUMERIC, {17604}},
+     MU_NODECLASS_REFERENCETYPE,
+     {8, s_str_HasAddIn},
+     {8, s_str_HasAddIn},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0}},
+#endif
+#ifdef MUC_OPCUA_CU_ADDRESS_SPACE_ADDIN_DEFAULTINSTANCEBROWSENAME
+    /* OPC-10000-7 CU 2447: ObjectTypes may carry DefaultInstanceBrowseName
+     * (i=17605) to define the default BrowseName for their instances. */
+    {{0, MU_NODEID_NUMERIC, {17605}},
+     MU_NODECLASS_VARIABLE,
+     {25, s_str_DefaultInstanceBrowseName},
+     {25, s_str_DefaultInstanceBrowseName},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+#endif
 #if MUC_OPCUA_CU_BASE_INFO_LOCALTIME
     /* OPC-10000-5 §6.3.1: Server.LocalTime (i=17634) is a Property using
      * TimeZoneDataType (i=8912); this node model records PropertyType (i=68). */
@@ -1719,6 +1820,49 @@ static const mu_node_t s_base_nodes[] = {
      MU_NODECLASS_VARIABLE,
      {9, s_str_LocalTime},
      {9, s_str_LocalTime},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+#endif
+#if MUC_OPCUA_CU_ADDRESS_SPACE_INTERFACES
+    /* OPC UA NodeIds.csv: InterfaceTypes Folder (i=17708), organized by Types (86). */
+    {{0, MU_NODEID_NUMERIC, {17708}},
+     MU_NODECLASS_OBJECT,
+     {14, s_str_InterfaceTypes},
+     {14, s_str_InterfaceTypes},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {61}}},
+#endif
+#ifdef MUC_OPCUA_CU_BASE_INFO_CURRENCY
+    /* OPC-10000-5 §12.2.12.2, OPC-10000-7 CU 5240: CurrencyUnitType (23498),
+     * subtype of Structure (22), with its Default Binary encoding Object (23507). */
+    {{0, MU_NODEID_NUMERIC, {MU_NODEID_CURRENCYUNITTYPE}},
+     MU_NODECLASS_DATATYPE,
+     {16, s_str_CurrencyUnitType},
+     {16, s_str_CurrencyUnitType},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0}},
+    {{0, MU_NODEID_NUMERIC, {23507}},
+     MU_NODECLASS_OBJECT,
+     {14, s_str_Default_Binary},
+     {14, s_str_Default_Binary},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {76}}},
+    /* OPC-10000-7 CU 5240: DataVariables representing currency may carry a
+     * CurrencyUnit Property. OPC-10000-5 §12.2.12.2 defines it by BrowseName;
+     * no single global numeric NodeId is assigned, so expose the declaration
+     * with a stable string NodeId and PropertyType (68). */
+    {{0, MU_NODEID_STRING, {.string = {12, s_str_CurrencyUnit}}},
+     MU_NODECLASS_VARIABLE,
+     {12, s_str_CurrencyUnit},
+     {12, s_str_CurrencyUnit},
      NULL,
      0,
      NULL,
@@ -1746,21 +1890,6 @@ static const mu_node_t s_base_nodes[] = {
      NULL,
      .type_definition = {0, MU_NODEID_NUMERIC, {2034u}}},
 #endif
-#ifdef MUC_OPCUA_CU_BASE_INFO_CURRENCY
-    /* OPC-10000-7 CU 5240: DataVariables representing currency may carry a
-     * CurrencyUnit Property. OPC-10000-5 §12.2.12.2 defines it by BrowseName;
-     * no single global numeric NodeId is assigned, so expose the declaration
-     * with a stable string NodeId and PropertyType (68). */
-    {{0, MU_NODEID_STRING, {.string = {12, s_str_CurrencyUnit}}},
-     MU_NODECLASS_VARIABLE,
-     {12, s_str_CurrencyUnit},
-     {12, s_str_CurrencyUnit},
-     NULL,
-     0,
-     NULL,
-     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
-#endif
-
 };
 #endif
 
