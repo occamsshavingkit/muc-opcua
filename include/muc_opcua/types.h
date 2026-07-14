@@ -219,4 +219,29 @@ typedef struct {
    mu_where_clause_eval); mu_event_fields_t above is the value carrier they read. */
 #endif
 
+#ifdef MUC_OPCUA_CU_ADDRESS_SPACE_ATOMICITY
+/* AccessLevelEx bitmask flags (OPC-10000-7 CU 2809:Address Space Atomicity).
+   Set these bits in a Variable's AccessLevelEx Attribute when Read or Write
+   operations on that Variable cannot be guaranteed atomic. When the bit is '1',
+   atomicity is not assured. */
+#define MU_ACCESS_LEVEL_EX_NONATOMIC_READ (1u << 8)
+#define MU_ACCESS_LEVEL_EX_NONATOMIC_WRITE (1u << 9)
+#endif /* MUC_OPCUA_CU_ADDRESS_SPACE_ATOMICITY */
+
+#ifdef MUC_OPCUA_CU_ADDRESS_SPACE_FULL_ARRAY_ONLY
+/* AccessLevelEx bitmask flag (OPC-10000-7 CU 2820:Address Space Full Array
+   Only). Set this bit in a Variable's AccessLevelEx Attribute to indicate that
+   write operations for an array can only be performed on the full array (i.e.
+   IndexRange partial writes are not permitted). */
+#define MU_ACCESS_LEVEL_EX_WRITE_FULL_ARRAY_ONLY (1u << 10)
+#endif /* MUC_OPCUA_CU_ADDRESS_SPACE_FULL_ARRAY_ONLY */
+
+#ifdef MUC_OPCUA_CU_ADDRESS_SPACE_NONVOLATILE_CONSTANT
+/* AccessLevelEx bitmask flags (OPC-10000-7 CU 4237:Address Space NonVolatile
+   and Constant). Set these bits in a Variable's AccessLevelEx Attribute to
+   indicate persisted values and configuration-version-relevant constants. */
+#define MU_ACCESS_LEVEL_EX_NON_VOLATILE (1u << 12)
+#define MU_ACCESS_LEVEL_EX_CONSTANT (1u << 13)
+#endif /* MUC_OPCUA_CU_ADDRESS_SPACE_NONVOLATILE_CONSTANT */
+
 #endif /* MUC_OPCUA_TYPES_H */

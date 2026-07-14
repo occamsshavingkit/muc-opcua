@@ -19,6 +19,19 @@ Backing test column: comma-separated ctest names (as registered).
 
 | Claim / conformance unit | OPC UA § | Profiles | Backing test |
 |--------------------------|----------|----------|--------------|
+| Address Space AddIn Reference |  | micro, embedded, standard, full | test_profile_surface |
+| Address Space AddIn DefaultInstanceBrowsename |  | micro, embedded, standard, full | test_profile_surface |
+| Base Info LocalTime |  | micro, embedded, standard, full | test_profile_surface |
+| Base Info Selection List |  | micro, embedded, standard, full | test_profile_surface |
+| Address Space Atomicity |  | all | test_profile_surface |
+| Address Space Full Array Only |  | all | test_profile_surface |
+| Base Info ValueAsText |  | micro, embedded, standard, full | test_profile_surface |
+| Base Info OptionSet |  | micro, embedded, standard, full | test_profile_surface |
+| Base Info Estimated Return Time |  | micro, embedded, standard, full | test_profile_surface |
+| Address Space Interfaces |  | micro, embedded, standard, full | test_profile_surface |
+| Base Info Locations Object |  | micro, embedded, standard, full | test_profile_surface |
+| Address Space NonVolatile and Constant |  | micro, embedded, standard, full | test_profile_surface |
+| Base Info Currency |  | micro, embedded, standard, full | test_profile_surface |
 | Core 2022 Server Facet | OPC-10000-4 §5.12/5.13 | micro, embedded, standard, full | test_subscriptions, test_subscriptions_errors |
 | Core 2022 Server Facet | OPC-10000-7 | embedded, standard, full | test_subscriptions_capacity, test_subscription_deadband, test_subscription_publish |
 | Core 2022 Server Facet | OPC-10000-7 | full | test_ecc_crypto |
@@ -60,3 +73,4 @@ Backing test column: comma-separated ctest names (as registered).
 | Base Info Server Capabilities 2 | OPC-10000-3 §4 | all | test_base_server_behaviour |
 | Session General Service Behaviour | OPC-10000-4 §5.6 | all | test_dispatch_session_order, test_base_server_behaviour |
 | Base Info Namespace Metadata | OPC-10000-3 §4 | all | test_base_server_behaviour, test_read_browsename_namespace |
+| Base Info Engineering Units |  | micro, embedded, standard, full | test_profile_surface |

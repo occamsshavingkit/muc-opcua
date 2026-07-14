@@ -211,7 +211,11 @@
       "service_query",
       "service_read",
       "service_register_nodes",
-      "service_write"
+      "service_write",
+      "opc_cu_3080",
+      "opc_cu_3201",
+      "opc_cu_5592",
+      "opc_cu_5814"
     ],
     "opc_facet_1324": [
       "opc_cu_2928",
@@ -616,18 +620,20 @@
       "id": "opc_cu_2446",
       "kind": "conformance_unit",
       "opc_display_name": "Address Space AddIn Reference",
-      "kconfig_symbol": null,
-      "implementation_state": "unimplemented",
+      "kconfig_symbol": "MUC_OPCUA_CU_ADDRESS_SPACE_ADDIN_REFERENCE",
+      "implementation_state": "claimed",
       "depends_on": [],
       "profile_defaults": {
-        "nano": true,
+        "nano": false,
         "micro": true,
         "embedded": true,
         "standard": true,
         "full": true,
         "custom": false
       },
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "opc_reference": {
         "spec": null,
         "section": null,
@@ -639,24 +645,27 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "Support the HasAddIn Reference to bind an AddIn to an Object or ObjectType."
+      "notes": "Support the HasAddIn Reference to bind an AddIn to an Object or ObjectType.",
+      "cu_optional": true
     },
     {
       "id": "opc_cu_2447",
       "kind": "conformance_unit",
       "opc_display_name": "Address Space AddIn DefaultInstanceBrowsename",
-      "kconfig_symbol": null,
-      "implementation_state": "unimplemented",
+      "kconfig_symbol": "MUC_OPCUA_CU_ADDRESS_SPACE_ADDIN_DEFAULTINSTANCEBROWSENAME",
+      "implementation_state": "claimed",
       "depends_on": [],
       "profile_defaults": {
-        "nano": true,
+        "nano": false,
         "micro": true,
         "embedded": true,
         "standard": true,
         "full": true,
         "custom": false
       },
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "opc_reference": {
         "spec": null,
         "section": null,
@@ -668,24 +677,27 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "Support the DefaultInstanceBrowseName Property for ObjectTypes."
+      "notes": "Support the DefaultInstanceBrowseName Property for ObjectTypes.",
+      "cu_optional": true
     },
     {
       "id": "opc_cu_2476",
       "kind": "conformance_unit",
       "opc_display_name": "Base Info LocalTime",
-      "kconfig_symbol": null,
-      "implementation_state": "unimplemented",
+      "kconfig_symbol": "MUC_OPCUA_CU_BASE_INFO_LOCALTIME",
+      "implementation_state": "claimed",
       "depends_on": [],
       "profile_defaults": {
-        "nano": true,
+        "nano": false,
         "micro": true,
         "embedded": true,
         "standard": true,
         "full": true,
         "custom": false
       },
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "opc_reference": {
         "spec": null,
         "section": null,
@@ -697,7 +709,8 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "Exposes local time information by providing the LocalTime Variable on the Server Object. Exposes the TimeZoneDataType, its Encoding Object and all its supertypes in the AddressSpace."
+      "notes": "Exposes local time information by providing the LocalTime Variable on the Server Object. Exposes the TimeZoneDataType, its Encoding Object and all its supertypes in the AddressSpace.",
+      "cu_optional": true
     },
     {
       "id": "opc_cu_2600",
@@ -726,24 +739,27 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "Support at least one Security Policy.\r\nSupport of SecurityPolicy None is recommended for testing and compatibility reasons even if the UA Server supports a more secure policy."
+      "notes": "Support at least one Security Policy.\r\nSupport of SecurityPolicy None is recommended for testing and compatibility reasons even if the UA Server supports a more secure policy.",
+      "cu_optional": false
     },
     {
       "id": "opc_cu_2711",
       "kind": "conformance_unit",
       "opc_display_name": "Base Info Selection List",
-      "kconfig_symbol": null,
-      "implementation_state": "unimplemented",
+      "kconfig_symbol": "MUC_OPCUA_CU_BASE_INFO_SELECTION_LIST",
+      "implementation_state": "claimed",
       "depends_on": [],
       "profile_defaults": {
-        "nano": true,
+        "nano": false,
         "micro": true,
         "embedded": true,
         "standard": true,
         "full": true,
         "custom": false
       },
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "opc_reference": {
         "spec": null,
         "section": null,
@@ -755,14 +771,15 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "The Server supports Variables of the SelectionListType VariableType."
+      "notes": "The Server supports Variables of the SelectionListType VariableType.",
+      "cu_optional": true
     },
     {
       "id": "opc_cu_2809",
       "kind": "conformance_unit",
       "opc_display_name": "Address Space Atomicity",
-      "kconfig_symbol": null,
-      "implementation_state": "unimplemented",
+      "kconfig_symbol": "MUC_OPCUA_CU_ADDRESS_SPACE_ATOMICITY",
+      "implementation_state": "claimed",
       "depends_on": [],
       "profile_defaults": {
         "nano": true,
@@ -772,7 +789,9 @@
         "full": true,
         "custom": false
       },
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "opc_reference": {
         "spec": null,
         "section": null,
@@ -784,14 +803,15 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "Support setting the NonatomicRead and NonatomicWrite flags in the AccessLevelEx Attribute for Variable Nodes to indicate whether Read or Write operations can be performed in atomic manner. If the flags are set to '1', atomicity cannot be assured."
+      "notes": "Support setting the NonatomicRead and NonatomicWrite flags in the AccessLevelEx Attribute for Variable Nodes to indicate whether Read or Write operations can be performed in atomic manner. If the flags are set to '1', atomicity cannot be assured.",
+      "cu_optional": false
     },
     {
       "id": "opc_cu_2820",
       "kind": "conformance_unit",
       "opc_display_name": "Address Space Full Array Only",
-      "kconfig_symbol": null,
-      "implementation_state": "unimplemented",
+      "kconfig_symbol": "MUC_OPCUA_CU_ADDRESS_SPACE_FULL_ARRAY_ONLY",
+      "implementation_state": "claimed",
       "depends_on": [],
       "profile_defaults": {
         "nano": true,
@@ -801,7 +821,9 @@
         "full": true,
         "custom": false
       },
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "opc_reference": {
         "spec": null,
         "section": null,
@@ -813,24 +835,27 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "Support setting the WriteFullArrayOnly flag in the AccessLevelEx Attribute for Variable Nodes of non-scalar data types to indicate whether write operations for an array can be performed with an IndexRange."
+      "notes": "Support setting the WriteFullArrayOnly flag in the AccessLevelEx Attribute for Variable Nodes of non-scalar data types to indicate whether write operations for an array can be performed with an IndexRange.",
+      "cu_optional": false
     },
     {
       "id": "opc_cu_2969",
       "kind": "conformance_unit",
       "opc_display_name": "Base Info ValueAsText",
-      "kconfig_symbol": null,
-      "implementation_state": "unimplemented",
+      "kconfig_symbol": "MUC_OPCUA_CU_BASE_INFO_VALUEASTEXT",
+      "implementation_state": "claimed",
       "depends_on": [],
       "profile_defaults": {
-        "nano": true,
+        "nano": false,
         "micro": true,
         "embedded": true,
         "standard": true,
         "full": true,
         "custom": false
       },
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "opc_reference": {
         "spec": null,
         "section": null,
@@ -842,24 +867,27 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "The Server supports the Property ValueAsText for enumerated DataTypes."
+      "notes": "The Server supports the Property ValueAsText for enumerated DataTypes.",
+      "cu_optional": true
     },
     {
       "id": "opc_cu_3127",
       "kind": "conformance_unit",
       "opc_display_name": "Base Info OptionSet",
-      "kconfig_symbol": null,
-      "implementation_state": "unimplemented",
+      "kconfig_symbol": "MUC_OPCUA_CU_BASE_INFO_OPTIONSET",
+      "implementation_state": "claimed",
       "depends_on": [],
       "profile_defaults": {
-        "nano": true,
+        "nano": false,
         "micro": true,
         "embedded": true,
         "standard": true,
         "full": true,
         "custom": false
       },
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "opc_reference": {
         "spec": null,
         "section": null,
@@ -871,7 +899,8 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "The Server supports the VariableType OptionSetType."
+      "notes": "The Server supports the VariableType OptionSetType.",
+      "cu_optional": true
     },
     {
       "id": "opc_cu_3184",
@@ -881,7 +910,7 @@
       "implementation_state": "unimplemented",
       "depends_on": [],
       "profile_defaults": {
-        "nano": true,
+        "nano": false,
         "micro": true,
         "embedded": true,
         "standard": true,
@@ -900,7 +929,8 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "Exposes the base entry points Root and Objects and the Server Object with its base content ServerArray, NamespaceArray, ServerStatus, ServiceLevel, Auditing indication, entry point to VendorServerInfo and ServerRedundancy indication in the AddressSpace."
+      "notes": "Exposes the base entry points Root and Objects and the Server Object with its base content ServerArray, NamespaceArray, ServerStatus, ServiceLevel, Auditing indication, entry point to VendorServerInfo and ServerRedundancy indication in the AddressSpace.",
+      "cu_optional": false
     },
     {
       "id": "opc_cu_3186",
@@ -910,7 +940,7 @@
       "implementation_state": "unimplemented",
       "depends_on": [],
       "profile_defaults": {
-        "nano": true,
+        "nano": false,
         "micro": true,
         "embedded": true,
         "standard": true,
@@ -929,24 +959,27 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "Exposes the entry point into views in the AddressSpace. This is the Views Object."
+      "notes": "Exposes the entry point into views in the AddressSpace. This is the Views Object.",
+      "cu_optional": true
     },
     {
       "id": "opc_cu_3198",
       "kind": "conformance_unit",
       "opc_display_name": "Base Info Estimated Return Time",
-      "kconfig_symbol": null,
-      "implementation_state": "unimplemented",
+      "kconfig_symbol": "MUC_OPCUA_CU_BASE_INFO_ESTIMATED_RETURN_TIME",
+      "implementation_state": "claimed",
       "depends_on": [],
       "profile_defaults": {
-        "nano": true,
+        "nano": false,
         "micro": true,
         "embedded": true,
         "standard": true,
         "full": true,
         "custom": false
       },
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "opc_reference": {
         "spec": null,
         "section": null,
@@ -958,7 +991,8 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "Server supports the EstimatedReturnTime Property. It indicates the time at which the Server is expected to have a ServerStatus.State of RUNNING_0. Clients can use this information to govern the reconnect logic."
+      "notes": "Server supports the EstimatedReturnTime Property. It indicates the time at which the Server is expected to have a ServerStatus.State of RUNNING_0. Clients can use this information to govern the reconnect logic.",
+      "cu_optional": true
     },
     {
       "id": "opc_cu_3545",
@@ -968,7 +1002,7 @@
       "implementation_state": "unimplemented",
       "depends_on": [],
       "profile_defaults": {
-        "nano": true,
+        "nano": false,
         "micro": true,
         "embedded": true,
         "standard": true,
@@ -987,7 +1021,8 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "Supports the NamespaceMetaData Object for all Namespaces in the Server that have static NodeIds."
+      "notes": "Supports the NamespaceMetaData Object for all Namespaces in the Server that have static NodeIds.",
+      "cu_optional": true
     },
     {
       "id": "opc_cu_3554",
@@ -997,7 +1032,7 @@
       "implementation_state": "unimplemented",
       "depends_on": [],
       "profile_defaults": {
-        "nano": true,
+        "nano": false,
         "micro": true,
         "embedded": true,
         "standard": true,
@@ -1016,24 +1051,27 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "Support the NodeClasses with their Attributes and References. This includes for instance: Object, ObjectType, Variable, VariableType, References and DataType. "
+      "notes": "Support the NodeClasses with their Attributes and References. This includes for instance: Object, ObjectType, Variable, VariableType, References and DataType. ",
+      "cu_optional": false
     },
     {
       "id": "opc_cu_3560",
       "kind": "conformance_unit",
       "opc_display_name": "Address Space Interfaces",
-      "kconfig_symbol": null,
-      "implementation_state": "unimplemented",
+      "kconfig_symbol": "MUC_OPCUA_CU_ADDRESS_SPACE_INTERFACES",
+      "implementation_state": "claimed",
       "depends_on": [],
       "profile_defaults": {
-        "nano": true,
+        "nano": false,
         "micro": true,
         "embedded": true,
         "standard": true,
         "full": true,
         "custom": false
       },
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "opc_reference": {
         "spec": null,
         "section": null,
@@ -1045,7 +1083,8 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "Support Interfaces and associated rules. Includes exposing the entry point InterfaceTypes and the types BaseInterfaceType and HasInterface and all their supertypes in the AddressSpace."
+      "notes": "Support Interfaces and associated rules. Includes exposing the entry point InterfaceTypes and the types BaseInterfaceType and HasInterface and all their supertypes in the AddressSpace.",
+      "cu_optional": true
     },
     {
       "id": "opc_cu_3808",
@@ -1074,7 +1113,8 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "The application documentation shall specify the core OPC UA related capacities. This includes the number of supported SecureChannels, Sessions, and Continuation Points for the View Services.\nIf Subscriptions are supported, it shall also include capacity information for Subscriptions and Publish requests, MonitoredItems, retransmission queue, and the queue for sampled MonitoredItems."
+      "notes": "The application documentation shall specify the core OPC UA related capacities. This includes the number of supported SecureChannels, Sessions, and Continuation Points for the View Services.\nIf Subscriptions are supported, it shall also include capacity information for Subscriptions and Publish requests, MonitoredItems, retransmission queue, and the queue for sampled MonitoredItems. (Documentation complete; no code change needed.)",
+      "cu_optional": false
     },
     {
       "id": "opc_cu_3912",
@@ -1103,24 +1143,27 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "Exposes ServerProfileArray, LocaleIdArray, MinSupportedSampleRate, MaxBrowseContinuationPoints, ModellingRules, MaxArrayLength, MaxStringLength, MaxByteStringLength and MaxSessions of the ServerCapabilities Object, as well as MaxNodesPerRead, MaxNodesPerWrite, MaxNodesPerBrowse, MaxNodesPerRegisterNodes, MaxNodesPerTranslateBrowsePathsToNodesIds of the OperationLimits Object."
+      "notes": "Exposes ServerProfileArray, LocaleIdArray, MinSupportedSampleRate, MaxBrowseContinuationPoints, ModellingRules, MaxArrayLength, MaxStringLength, MaxByteStringLength and MaxSessions of the ServerCapabilities Object, as well as MaxNodesPerRead, MaxNodesPerWrite, MaxNodesPerBrowse, MaxNodesPerRegisterNodes, MaxNodesPerTranslateBrowsePathsToNodesIds of the OperationLimits Object.",
+      "cu_optional": false
     },
     {
       "id": "opc_cu_4053",
       "kind": "conformance_unit",
       "opc_display_name": "Base Info Locations Object",
-      "kconfig_symbol": null,
-      "implementation_state": "unimplemented",
+      "kconfig_symbol": "MUC_OPCUA_CU_BASE_INFO_LOCATIONS_OBJECT",
+      "implementation_state": "claimed",
       "depends_on": [],
       "profile_defaults": {
-        "nano": true,
+        "nano": false,
         "micro": true,
         "embedded": true,
         "standard": true,
         "full": true,
         "custom": false
       },
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "opc_reference": {
         "spec": null,
         "section": null,
@@ -1132,24 +1175,27 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": " Exposes the entry point for different types of locations in the AddressSpace."
+      "notes": " Exposes the entry point for different types of locations in the AddressSpace.",
+      "cu_optional": true
     },
     {
       "id": "opc_cu_4237",
       "kind": "conformance_unit",
       "opc_display_name": "Address Space NonVolatile and Constant",
-      "kconfig_symbol": null,
-      "implementation_state": "unimplemented",
+      "kconfig_symbol": "MUC_OPCUA_CU_ADDRESS_SPACE_NONVOLATILE_CONSTANT",
+      "implementation_state": "claimed",
       "depends_on": [],
       "profile_defaults": {
-        "nano": true,
+        "nano": false,
         "micro": true,
         "embedded": true,
         "standard": true,
         "full": true,
         "custom": false
       },
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "opc_reference": {
         "spec": null,
         "section": null,
@@ -1161,24 +1207,27 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": " Support setting the NonVolatile and Constant flags in the AccessLevelEx Attribute for Variable Nodes to indicate whether persistent storage is supported."
+      "notes": " Support setting the NonVolatile and Constant flags in the AccessLevelEx Attribute for Variable Nodes to indicate whether persistent storage is supported.",
+      "cu_optional": true
     },
     {
       "id": "opc_cu_5240",
       "kind": "conformance_unit",
       "opc_display_name": "Base Info Currency",
-      "kconfig_symbol": null,
-      "implementation_state": "unimplemented",
+      "kconfig_symbol": "MUC_OPCUA_CU_BASE_INFO_CURRENCY",
+      "implementation_state": "claimed",
       "depends_on": [],
       "profile_defaults": {
-        "nano": true,
+        "nano": false,
         "micro": true,
         "embedded": true,
         "standard": true,
         "full": true,
         "custom": false
       },
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "opc_reference": {
         "spec": null,
         "section": null,
@@ -1190,7 +1239,8 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "Support the CurrencyUnit Property on DataVariables that represent currency."
+      "notes": "Support the CurrencyUnit Property on DataVariables that represent currency.",
+      "cu_optional": true
     },
     {
       "id": "opc_facet_1219",
@@ -1393,7 +1443,8 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "Support the Certificate Management Services of UA Part 12 for the Push model to manage Application Instance Certificates and Trust Lists including Revocation Lists."
+      "notes": "Support the Certificate Management Services of UA Part 12 for the Push model to manage Application Instance Certificates and Trust Lists including Revocation Lists.",
+      "cu_optional": false
     },
     {
       "id": "opc_cu_2423",
@@ -1422,7 +1473,8 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "Exposes the RationalNumberType and RationalNumber, all their supertypes and for the DataType the Encoding Objects in the AddressSpace."
+      "notes": "Exposes the RationalNumberType and RationalNumber, all their supertypes and for the DataType the Encoding Objects in the AddressSpace.",
+      "cu_optional": true
     },
     {
       "id": "opc_cu_2481",
@@ -1451,7 +1503,8 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "Exposes the NormalizedString DataType and all its supertypes in the AddressSpace"
+      "notes": "Exposes the NormalizedString DataType and all its supertypes in the AddressSpace",
+      "cu_optional": true
     },
     {
       "id": "opc_cu_2482",
@@ -1480,7 +1533,8 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "Exposes the DecimalString DataType and all its supertypes in the AddressSpace"
+      "notes": "Exposes the DecimalString DataType and all its supertypes in the AddressSpace",
+      "cu_optional": true
     },
     {
       "id": "opc_cu_2483",
@@ -1509,7 +1563,8 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "Exposes the DurationString, TimeString, and DateString DataTypes and all their supertypes in the AddressSpace"
+      "notes": "Exposes the DurationString, TimeString, and DateString DataTypes and all their supertypes in the AddressSpace",
+      "cu_optional": false
     },
     {
       "id": "opc_cu_2484",
@@ -1538,7 +1593,8 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "Exposes the BitFieldMaskDataType DataType and all its supertypes in the AddressSpace"
+      "notes": "Exposes the BitFieldMaskDataType DataType and all its supertypes in the AddressSpace",
+      "cu_optional": true
     },
     {
       "id": "opc_cu_2485",
@@ -1567,7 +1623,8 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "Exposes the KeyValuePair DataType and its encoding Objects and all its supertypes in the AddressSpace."
+      "notes": "Exposes the KeyValuePair DataType and its encoding Objects and all its supertypes in the AddressSpace.",
+      "cu_optional": true
     },
     {
       "id": "opc_cu_2490",
@@ -1596,7 +1653,8 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "Exposes the ReferenceType HasStructuredComponent and all its supertypes in the AddressSpace."
+      "notes": "Exposes the ReferenceType HasStructuredComponent and all its supertypes in the AddressSpace.",
+      "cu_optional": true
     },
     {
       "id": "opc_cu_2491",
@@ -1625,7 +1683,8 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "Exposes the ReferenceType AssociatedWith and all its supertypes in the AddressSpace."
+      "notes": "Exposes the ReferenceType AssociatedWith and all its supertypes in the AddressSpace.",
+      "cu_optional": true
     },
     {
       "id": "opc_cu_2500",
@@ -1654,7 +1713,8 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "Exposes the EUInformation DataType and its encoding Objects and all its supertypes in the AddressSpace."
+      "notes": "Exposes the EUInformation DataType and its encoding Objects and all its supertypes in the AddressSpace.",
+      "cu_optional": true
     },
     {
       "id": "opc_cu_2512",
@@ -1683,7 +1743,8 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "Supports ordered lists by exposing OrderedListType and IorderedObjectType, including all their supertypes in the AddressSpace."
+      "notes": "Supports ordered lists by exposing OrderedListType and IorderedObjectType, including all their supertypes in the AddressSpace.",
+      "cu_optional": true
     },
     {
       "id": "opc_cu_2513",
@@ -1712,7 +1773,8 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "Exposes the AudioVariableType VariableType and all its supertypes in the AddressSpace.\r\nExposes the AudioDataType DataType and its encoding Objects and all its supertypes in the AddressSpace.\r\n"
+      "notes": "Exposes the AudioVariableType VariableType and all its supertypes in the AddressSpace.\r\nExposes the AudioDataType DataType and its encoding Objects and all its supertypes in the AddressSpace.\r\n",
+      "cu_optional": true
     },
     {
       "id": "opc_cu_2514",
@@ -1741,7 +1803,8 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "Exposes DataTypes and VariableTypes used to expose spatial information, that is, the VariableTypes VectorType, 3DvectorType, CartesianCoordinatesType, 3DcartesianCoordinatesType, OrientationType, 3DorientationType, FrameType, 3DframeType, and the DataTypes Vector, 3Dvector, CartesianCoordinates, 3DcartesianCoordinates, Orientation, 3Dorientation, Frame and 3Dframe including all their supertypes and for the DataTypes the Encoding Objects in the AddressSpace."
+      "notes": "Exposes DataTypes and VariableTypes used to expose spatial information, that is, the VariableTypes VectorType, 3DvectorType, CartesianCoordinatesType, 3DcartesianCoordinatesType, OrientationType, 3DorientationType, FrameType, 3DframeType, and the DataTypes Vector, 3Dvector, CartesianCoordinates, 3DcartesianCoordinates, Orientation, 3Dorientation, Frame and 3Dframe including all their supertypes and for the DataTypes the Encoding Objects in the AddressSpace.",
+      "cu_optional": true
     },
     {
       "id": "opc_cu_2516",
@@ -1770,7 +1833,8 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "Exposes the ReferenceType HasOrderedComponent and all its supertypes in the AddressSpace."
+      "notes": "Exposes the ReferenceType HasOrderedComponent and all its supertypes in the AddressSpace.",
+      "cu_optional": true
     },
     {
       "id": "opc_cu_2517",
@@ -1799,7 +1863,8 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "Exposes the ReferenceType IsDeprecated and all its supertypes in the AddressSpace."
+      "notes": "Exposes the ReferenceType IsDeprecated and all its supertypes in the AddressSpace.",
+      "cu_optional": true
     },
     {
       "id": "opc_cu_2518",
@@ -1828,7 +1893,8 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "Exposes the DataTypes Image, ImageBMP, ImageGIF, ImageJPG, ImagePNG and their supertypes in the AddressSpace."
+      "notes": "Exposes the DataTypes Image, ImageBMP, ImageGIF, ImageJPG, ImagePNG and their supertypes in the AddressSpace.",
+      "cu_optional": true
     },
     {
       "id": "opc_cu_2536",
@@ -1857,7 +1923,8 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "Exposes the ContentFilter DataType and its encoding Objects and all its supertypes in the AddressSpace"
+      "notes": "Exposes the ContentFilter DataType and its encoding Objects and all its supertypes in the AddressSpace",
+      "cu_optional": true
     },
     {
       "id": "opc_cu_2928",
@@ -1886,7 +1953,8 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "Supports an absolute Deadband filter as a DataChangeFilter for numeric data types.  "
+      "notes": "Supports an absolute Deadband filter as a DataChangeFilter for numeric data types.  ",
+      "cu_optional": false
     },
     {
       "id": "opc_cu_2940",
@@ -1915,7 +1983,8 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "The Server supports obtaining subscription information via GetMonitoredItems Method on the Server object."
+      "notes": "The Server supports obtaining subscription information via GetMonitoredItems Method on the Server object.",
+      "cu_optional": false
     },
     {
       "id": "opc_cu_2963",
@@ -1944,7 +2013,8 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "Support the following MonitoredItem Services: CreateMonitoredItems, ModifyMonitoredItems, DeleteMonitoredItems and SetMonitoringMode."
+      "notes": "Support the following MonitoredItem Services: CreateMonitoredItems, ModifyMonitoredItems, DeleteMonitoredItems and SetMonitoringMode.",
+      "cu_optional": false
     },
     {
       "id": "opc_cu_3146",
@@ -1973,7 +2043,8 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "Support the SetTriggering Service to create and/or delete triggering links for a triggering item."
+      "notes": "Support the SetTriggering Service to create and/or delete triggering links for a triggering item.",
+      "cu_optional": false
     },
     {
       "id": "opc_cu_3185",
@@ -2002,7 +2073,8 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "Exposes entry points into the type system in the AddressSpace. Specifically, these are the Folder Nodes: Types, ObjectTypes, DataTypes, VariableTypes, and ReferenceTypes."
+      "notes": "Exposes entry points into the type system in the AddressSpace. Specifically, these are the Folder Nodes: Types, ObjectTypes, DataTypes, VariableTypes, and ReferenceTypes.",
+      "cu_optional": false
     },
     {
       "id": "opc_cu_3188",
@@ -2031,7 +2103,8 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "Supports type information of the base OPC UA concepts, like build-in DataTypes, base Object- and VariableTypes, and base ReferenceTypes. Includes the Encoding Objects for the DataTypes that are not Build-in or abstract DataTypes.\r\nExposes the ObjectTypes BaseObjectType, FolderType, DataTypeEncodingType and ModellingRuleType in the AddressSpace.\r\nExposes the VariableTypes BaseVariableType, PropertyType, and BaseDataVariableType in the AddressSpace.\r\nExposes the DataTypes BaseDataType Boolean, ByteString, DateTime, DataValue, DiagnosticsInfo, Enumeration, ExpandedNodeId, Guid, LocalizedText, NodeId, Number, QualifiedName, String, Structure, XmlElement, Integer, UInteger, Double, Float, Sbyte, Int16, Int32, Int64, Byte, Uint16, Uint32, Uint64, StatusCode, UtcTime, Duration, NumericRange, EnumValueType, and Union and their Encoding Objects in the AddressSpace.\r\nExposes the ReferenceTypes References, HierarchicalReferences, NonHierarchicalReferences, HasChild, Organizes, HasModellingRule, HasTypeDefinition, HasEncoding, Aggregates, HasSubtype, HasComponent, and HasProperty in the AddressSpace\r\nExposes the Objects Optional, Mandatory, OptionalPlaceholder, MandatoryPlaceholder and ExposesItsArrayin the AddressSpace.\r\n"
+      "notes": "Supports type information of the base OPC UA concepts, like build-in DataTypes, base Object- and VariableTypes, and base ReferenceTypes. Includes the Encoding Objects for the DataTypes that are not Build-in or abstract DataTypes.\r\nExposes the ObjectTypes BaseObjectType, FolderType, DataTypeEncodingType and ModellingRuleType in the AddressSpace.\r\nExposes the VariableTypes BaseVariableType, PropertyType, and BaseDataVariableType in the AddressSpace.\r\nExposes the DataTypes BaseDataType Boolean, ByteString, DateTime, DataValue, DiagnosticsInfo, Enumeration, ExpandedNodeId, Guid, LocalizedText, NodeId, Number, QualifiedName, String, Structure, XmlElement, Integer, UInteger, Double, Float, Sbyte, Int16, Int32, Int64, Byte, Uint16, Uint32, Uint64, StatusCode, UtcTime, Duration, NumericRange, EnumValueType, and Union and their Encoding Objects in the AddressSpace.\r\nExposes the ReferenceTypes References, HierarchicalReferences, NonHierarchicalReferences, HasChild, Organizes, HasModellingRule, HasTypeDefinition, HasEncoding, Aggregates, HasSubtype, HasComponent, and HasProperty in the AddressSpace\r\nExposes the Objects Optional, Mandatory, OptionalPlaceholder, MandatoryPlaceholder and ExposesItsArrayin the AddressSpace.\r\n",
+      "cu_optional": false
     },
     {
       "id": "opc_cu_3189",
@@ -2060,7 +2133,8 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "Exposes the type information of the ServerType and its containing types in the AddressSpace, including all their supertypes. It includes the Encoding Objects for its DataTypes. "
+      "notes": "Exposes the type information of the ServerType and its containing types in the AddressSpace, including all their supertypes. It includes the Encoding Objects for its DataTypes. ",
+      "cu_optional": false
     },
     {
       "id": "opc_cu_3196",
@@ -2089,7 +2163,8 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "Exposes diagnostic information on fixed sampling intervals (SamplingIntervalDiagnosticsArray) when the Server is handling subscriptions with fixed sampling intervals and the EnabledFlag in the ServerDiagnostics Object is set to TRUE. "
+      "notes": "Exposes diagnostic information on fixed sampling intervals (SamplingIntervalDiagnosticsArray) when the Server is handling subscriptions with fixed sampling intervals and the EnabledFlag in the ServerDiagnostics Object is set to TRUE. ",
+      "cu_optional": true
     },
     {
       "id": "opc_cu_3207",
@@ -2118,7 +2193,8 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "Exposes the OptionSet DataType and its encoding Objects and all its supertypes in the AddressSpace."
+      "notes": "Exposes the OptionSet DataType and its encoding Objects and all its supertypes in the AddressSpace.",
+      "cu_optional": true
     },
     {
       "id": "opc_cu_3214",
@@ -2147,7 +2223,8 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "Exposes the Range DataType and its encoding Objects and all its supertypes in the AddressSpace."
+      "notes": "Exposes the Range DataType and its encoding Objects and all its supertypes in the AddressSpace.",
+      "cu_optional": true
     },
     {
       "id": "opc_cu_3532",
@@ -2176,7 +2253,8 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "Support at least 2 queue entries for MonitoredItems.\nServers often will adapt the queue size to the number of currently monitored Items. It is expected that Servers support the documented queue capacity for at least one third of the supported MonitoredItems.\n"
+      "notes": "Support at least 2 queue entries for MonitoredItems.\nServers often will adapt the queue size to the number of currently monitored Items. It is expected that Servers support the documented queue capacity for at least one third of the supported MonitoredItems.\n",
+      "cu_optional": false
     },
     {
       "id": "opc_cu_3544",
@@ -2205,7 +2283,8 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "Support the standard Method ResendData to get the latest value of the monitored items of a Subscription."
+      "notes": "Support the standard Method ResendData to get the latest value of the monitored items of a Subscription.",
+      "cu_optional": false
     },
     {
       "id": "opc_cu_3547",
@@ -2234,7 +2313,8 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "Supports UaBinary Files by Exposing the DataTypes DataTypeSchemaHeader, UaBinaryFileDataType, DataTypeDescription, StructureDescription, EnumDescription and SimpleTypeDescription, all their Encoding Objects and their supertypes in the AddressSpace."
+      "notes": "Supports UaBinary Files by Exposing the DataTypes DataTypeSchemaHeader, UaBinaryFileDataType, DataTypeDescription, StructureDescription, EnumDescription and SimpleTypeDescription, all their Encoding Objects and their supertypes in the AddressSpace.",
+      "cu_optional": true
     },
     {
       "id": "opc_cu_3550",
@@ -2263,7 +2343,8 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "Exposes the StatusResult DataType and its encoding Objects and all its supertypes in the AddressSpace"
+      "notes": "Exposes the StatusResult DataType and its encoding Objects and all its supertypes in the AddressSpace",
+      "cu_optional": true
     },
     {
       "id": "opc_cu_3551",
@@ -2292,7 +2373,8 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "Exposes the UriString DataType and all its supertypes in the AddressSpace."
+      "notes": "Exposes the UriString DataType and all its supertypes in the AddressSpace.",
+      "cu_optional": true
     },
     {
       "id": "opc_cu_3641",
@@ -2321,7 +2403,8 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "Exposes the Argument DataType, its Encoding Objects and all its supertypes in the AddressSpace."
+      "notes": "Exposes the Argument DataType, its Encoding Objects and all its supertypes in the AddressSpace.",
+      "cu_optional": false
     },
     {
       "id": "opc_cu_3644",
@@ -2350,7 +2433,8 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "Exposes the SemanticVersionString DataType and all its supertypes in the AddressSpace."
+      "notes": "Exposes the SemanticVersionString DataType and all its supertypes in the AddressSpace.",
+      "cu_optional": true
     },
     {
       "id": "opc_cu_3747",
@@ -2379,7 +2463,8 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "The Server exposes the ReferenceType IsExecutableOn and all its supertypes in the AddressSpace."
+      "notes": "The Server exposes the ReferenceType IsExecutableOn and all its supertypes in the AddressSpace.",
+      "cu_optional": true
     },
     {
       "id": "opc_cu_3748",
@@ -2408,7 +2493,8 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "The Server exposes the ReferenceType IsExecutingOn and all its supertypes in the AddressSpace."
+      "notes": "The Server exposes the ReferenceType IsExecutingOn and all its supertypes in the AddressSpace.",
+      "cu_optional": true
     },
     {
       "id": "opc_cu_3749",
@@ -2437,7 +2523,8 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "The Server exposes the ReferenceType Controls and all its supertypes in the AddressSpace."
+      "notes": "The Server exposes the ReferenceType Controls and all its supertypes in the AddressSpace.",
+      "cu_optional": true
     },
     {
       "id": "opc_cu_3750",
@@ -2466,7 +2553,8 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "The Server exposes the ReferenceType Utilizes and all its supertypes in the AddressSpace."
+      "notes": "The Server exposes the ReferenceType Utilizes and all its supertypes in the AddressSpace.",
+      "cu_optional": true
     },
     {
       "id": "opc_cu_3751",
@@ -2495,7 +2583,8 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "The Server exposes the ReferenceType Requires and all its supertypes in the AddressSpace."
+      "notes": "The Server exposes the ReferenceType Requires and all its supertypes in the AddressSpace.",
+      "cu_optional": true
     },
     {
       "id": "opc_cu_3752",
@@ -2524,7 +2613,8 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "The Server exposes the ReferenceType IsPhysicallyConnectedTo and all its supertypes in the AddressSpace."
+      "notes": "The Server exposes the ReferenceType IsPhysicallyConnectedTo and all its supertypes in the AddressSpace.",
+      "cu_optional": true
     },
     {
       "id": "opc_cu_3753",
@@ -2553,7 +2643,8 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "The Server exposes the ReferenceType RepresentsSameEntityAs and all its supertypes in the AddressSpace."
+      "notes": "The Server exposes the ReferenceType RepresentsSameEntityAs and all its supertypes in the AddressSpace.",
+      "cu_optional": true
     },
     {
       "id": "opc_cu_3754",
@@ -2582,7 +2673,8 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "The Server exposes the ReferenceType RepresentsSameHardwareAs and all its supertypes in the AddressSpace."
+      "notes": "The Server exposes the ReferenceType RepresentsSameHardwareAs and all its supertypes in the AddressSpace.",
+      "cu_optional": true
     },
     {
       "id": "opc_cu_3755",
@@ -2611,7 +2703,8 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "The Server exposes the ReferenceType RepresentsSameFunctionalityAs and all its supertypes in the AddressSpace."
+      "notes": "The Server exposes the ReferenceType RepresentsSameFunctionalityAs and all its supertypes in the AddressSpace.",
+      "cu_optional": true
     },
     {
       "id": "opc_cu_3756",
@@ -2640,7 +2733,8 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "The Server exposes the ReferenceType IsHostedBy and all its supertypes in the AddressSpace."
+      "notes": "The Server exposes the ReferenceType IsHostedBy and all its supertypes in the AddressSpace.",
+      "cu_optional": true
     },
     {
       "id": "opc_cu_3757",
@@ -2669,7 +2763,8 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "The Server exposes the ReferenceType HasPhysicalComponent and all its supertypes in the AddressSpace."
+      "notes": "The Server exposes the ReferenceType HasPhysicalComponent and all its supertypes in the AddressSpace.",
+      "cu_optional": true
     },
     {
       "id": "opc_cu_3758",
@@ -2698,7 +2793,8 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "The Server exposes the ReferenceType HasContainedComponent and all its supertypes in the AddressSpace."
+      "notes": "The Server exposes the ReferenceType HasContainedComponent and all its supertypes in the AddressSpace.",
+      "cu_optional": true
     },
     {
       "id": "opc_cu_3759",
@@ -2727,7 +2823,8 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "The Server exposes the ReferenceType HasAttachedComponent and all its supertypes in the AddressSpace."
+      "notes": "The Server exposes the ReferenceType HasAttachedComponent and all its supertypes in the AddressSpace.",
+      "cu_optional": true
     },
     {
       "id": "opc_cu_3911",
@@ -2756,7 +2853,8 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "Exposes AggregateFunctions, MaxSubscriptions, MaxMonitoredItems, MaxSubscriptionsPerSession and MaxMonitoredItemsPerSubscription of the ServerCapabilities Object as well as MaxMonitoredItemsPerCall of the OperationLimits Object."
+      "notes": "Exposes AggregateFunctions, MaxSubscriptions, MaxMonitoredItems, MaxSubscriptionsPerSession and MaxMonitoredItemsPerSubscription of the ServerCapabilities Object as well as MaxMonitoredItemsPerCall of the OperationLimits Object.",
+      "cu_optional": false
     },
     {
       "id": "opc_cu_3922",
@@ -2785,7 +2883,8 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "Supports setting the SemanticsChanged Bit in the statusCode when a semantic change occurs, such as a change in the engineering unit associated with the Value Attribute."
+      "notes": "Supports setting the SemanticsChanged Bit in the statusCode when a semantic change occurs, such as a change in the engineering unit associated with the Value Attribute.",
+      "cu_optional": false
     },
     {
       "id": "opc_cu_3996",
@@ -2814,7 +2913,8 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "Exposes the VariableType ReferenceDescriptionVariableType, the ReferenceType HasReferenceDescription, the DataTypes ReferenceDescriptionDataType and ReferenceListEntryDataType and all their supertypes in the AddressSpace."
+      "notes": "Exposes the VariableType ReferenceDescriptionVariableType, the ReferenceType HasReferenceDescription, the DataTypes ReferenceDescriptionDataType and ReferenceListEntryDataType and all their supertypes in the AddressSpace.",
+      "cu_optional": true
     },
     {
       "id": "opc_cu_4052",
@@ -2843,7 +2943,8 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": " Exposes the TrimmedString DataType and all its supertypes in the AddressSpace."
+      "notes": " Exposes the TrimmedString DataType and all its supertypes in the AddressSpace.",
+      "cu_optional": true
     },
     {
       "id": "opc_cu_4054",
@@ -2872,7 +2973,8 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": " Exposes the Handle DataType and all its supertypes in the AddressSpace."
+      "notes": " Exposes the Handle DataType and all its supertypes in the AddressSpace.",
+      "cu_optional": true
     },
     {
       "id": "opc_cu_4055",
@@ -2901,7 +3003,8 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": " Exposes MaxMonitoredItemsQueueSize of the ServerCapabilities Object."
+      "notes": " Exposes MaxMonitoredItemsQueueSize of the ServerCapabilities Object.",
+      "cu_optional": false
     },
     {
       "id": "opc_cu_4426",
@@ -2930,7 +3033,8 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "Exposes the DataType Decimal and all its supertypes in the AddressSpace."
+      "notes": "Exposes the DataType Decimal and all its supertypes in the AddressSpace.",
+      "cu_optional": false
     },
     {
       "id": "opc_cu_5207",
@@ -2959,7 +3063,8 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "Support at least 2 MonitoredItems per Subscription where the size of each MonitoredItem is at least equal to size of Double."
+      "notes": "Support at least 2 MonitoredItems per Subscription where the size of each MonitoredItem is at least equal to size of Double.",
+      "cu_optional": false
     },
     {
       "id": "opc_cu_5208",
@@ -2988,7 +3093,8 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "Support creation of MonitoredItems for Attribute value changes. This includes support of the IndexRange to select a single element or a range of elements when the Attribute value is an array.\nThis ConformanceUnit does not require queuing when multiple value changes occur during a \"publish period\".\nI.e. the latest change will be sent in the Notification."
+      "notes": "Support creation of MonitoredItems for Attribute value changes. This includes support of the IndexRange to select a single element or a range of elements when the Attribute value is an array.\nThis ConformanceUnit does not require queuing when multiple value changes occur during a \"publish period\".\nI.e. the latest change will be sent in the Notification.",
+      "cu_optional": false
     },
     {
       "id": "opc_cu_5801",
@@ -3017,7 +3123,8 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "For each Object provided in the AddressSpace of the Server the ObjectType of the Object shall be provided in the AddressSpace of the Server.\nFor each Variable provided in the AddressSpace of the Server the VariableType and the DataType of the Variable shall be provided in the AddressSpace of the Server.\nFor each Value provided by the Server, which can be a subtype of the one defined in the Variable, the DataType of the Value shall be provided in the AddressSpace of the Server.\nFor each Method Argument provided by the Server the DataType of the Value shall be provided in the AddressSpace of the Server.\nFor each Structure DataType provided by the Server, each DataType used in the Structure shall be provided in the AddressSpace of the Server. \nFor each Reference provided in the AddressSpace of the Server the ReferenceType shall be provided in the AddressSpace of the Server.\nFor each ObjectType, VariableType, ReferenceType, and DataType provided in the AddressSpace of the Server the direct supertype shall be provided in the AddressSpace of the Server. This requires that all supertypes shall be provided in the AddressSpace.\nFor each DataType having encoding information (Structured DataTypes) the Encoding Objects shall be provided in the AddressSpace of the Server.\nFor each VariableType and ObjectType provided in the AddressSpace of the Server, all InstanceDeclarations shall be provided in the AddressSpace of the Server, even if they are optional and not used in any instance of the Server.\nFor each VariableType, ObjectType and DataType all Methods, Objects and Variables that are referenced with a hierarchical Reference either from the VariableType, ObjectType or DataType or an InstanceDeclaration of the ObjectType or VariableType, either directly or indirectly, shall be provided in the AddressSpace of the Server.\nFor all Events provided by the Server, the EventType shall be provided in the AddressSpace of the Server.\n"
+      "notes": "For each Object provided in the AddressSpace of the Server the ObjectType of the Object shall be provided in the AddressSpace of the Server.\nFor each Variable provided in the AddressSpace of the Server the VariableType and the DataType of the Variable shall be provided in the AddressSpace of the Server.\nFor each Value provided by the Server, which can be a subtype of the one defined in the Variable, the DataType of the Value shall be provided in the AddressSpace of the Server.\nFor each Method Argument provided by the Server the DataType of the Value shall be provided in the AddressSpace of the Server.\nFor each Structure DataType provided by the Server, each DataType used in the Structure shall be provided in the AddressSpace of the Server. \nFor each Reference provided in the AddressSpace of the Server the ReferenceType shall be provided in the AddressSpace of the Server.\nFor each ObjectType, VariableType, ReferenceType, and DataType provided in the AddressSpace of the Server the direct supertype shall be provided in the AddressSpace of the Server. This requires that all supertypes shall be provided in the AddressSpace.\nFor each DataType having encoding information (Structured DataTypes) the Encoding Objects shall be provided in the AddressSpace of the Server.\nFor each VariableType and ObjectType provided in the AddressSpace of the Server, all InstanceDeclarations shall be provided in the AddressSpace of the Server, even if they are optional and not used in any instance of the Server.\nFor each VariableType, ObjectType and DataType all Methods, Objects and Variables that are referenced with a hierarchical Reference either from the VariableType, ObjectType or DataType or an InstanceDeclaration of the ObjectType or VariableType, either directly or indirectly, shall be provided in the AddressSpace of the Server.\nFor all Events provided by the Server, the EventType shall be provided in the AddressSpace of the Server.\n",
+      "cu_optional": false
     },
     {
       "id": "opc_cu_5868",
@@ -3046,7 +3153,8 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "Supports portable IDs by exposing the DataTypes PortableQualifiedName and PortableNodeId, their Encoding Objects and all their supertypes in the AddressSpace."
+      "notes": "Supports portable IDs by exposing the DataTypes PortableQualifiedName and PortableNodeId, their Encoding Objects and all their supertypes in the AddressSpace.",
+      "cu_optional": true
     },
     {
       "id": "opc_cu_subscription_basic",
@@ -4046,7 +4154,8 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "Support TranslateBrowsePathsToNodeIds Service."
+      "notes": "Support TranslateBrowsePathsToNodeIds Service.",
+      "cu_optional": false
     },
     {
       "id": "opc_cu_2328",
@@ -4075,7 +4184,8 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "Support the GetEndpoints Service to obtain all Endpoints of the Server.\r\nThis includes filtering based on Profiles."
+      "notes": "Support the GetEndpoints Service to obtain all Endpoints of the Server.\r\nThis includes filtering based on Profiles.",
+      "cu_optional": false
     },
     {
       "id": "opc_cu_2352",
@@ -4104,7 +4214,8 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "Support the FindServers Service only for itself."
+      "notes": "Support the FindServers Service only for itself.",
+      "cu_optional": false
     },
     {
       "id": "opc_cu_2389",
@@ -4114,7 +4225,7 @@
       "implementation_state": "unimplemented",
       "depends_on": [],
       "profile_defaults": {
-        "nano": true,
+        "nano": false,
         "micro": true,
         "embedded": true,
         "standard": true,
@@ -4133,7 +4244,8 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "Supports writing to values to one or more Attributes of one or more Nodes."
+      "notes": "Supports writing to values to one or more Attributes of one or more Nodes.",
+      "cu_optional": true
     },
     {
       "id": "opc_cu_2400",
@@ -4143,7 +4255,7 @@
       "implementation_state": "unimplemented",
       "depends_on": [],
       "profile_defaults": {
-        "nano": true,
+        "nano": false,
         "micro": true,
         "embedded": true,
         "standard": true,
@@ -4162,7 +4274,8 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "Support the use of ActivateSession to change the Session user."
+      "notes": "Support the use of ActivateSession to change the Session user.",
+      "cu_optional": true
     },
     {
       "id": "opc_cu_2407",
@@ -4172,7 +4285,7 @@
       "implementation_state": "unimplemented",
       "depends_on": [],
       "profile_defaults": {
-        "nano": true,
+        "nano": false,
         "micro": true,
         "embedded": true,
         "standard": true,
@@ -4191,7 +4304,8 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "Allow configuration of the following Security related items (when they apply).\r\n    * select the allowed/used User identification policy or policies (e.g. User Name/Password or X509).\r\n    * enable/disable or select the security policy \"None\" or other security policies.\r\n    * enable/disable or select endpoints with MessageSecurityMode SIGN or SIGNANDENCRYPT.\r\n    * set the permitted certification authorities.\r\n    * define how to react to unknown Certificates.\r\n    * allow accepting any valid Certificate"
+      "notes": "Allow configuration of the following Security related items (when they apply).\r\n    * select the allowed/used User identification policy or policies (e.g. User Name/Password or X509).\r\n    * enable/disable or select the security policy \"None\" or other security policies.\r\n    * enable/disable or select endpoints with MessageSecurityMode SIGN or SIGNANDENCRYPT.\r\n    * set the permitted certification authorities.\r\n    * define how to react to unknown Certificates.\r\n    * allow accepting any valid Certificate",
+      "cu_optional": true
     },
     {
       "id": "opc_cu_2478",
@@ -4201,7 +4315,7 @@
       "implementation_state": "unimplemented",
       "depends_on": [],
       "profile_defaults": {
-        "nano": true,
+        "nano": false,
         "micro": true,
         "embedded": true,
         "standard": true,
@@ -4220,7 +4334,8 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "Application supports time synchronization via features of a standard operating system."
+      "notes": "Application supports time synchronization via features of a standard operating system.",
+      "cu_optional": true
     },
     {
       "id": "opc_cu_2479",
@@ -4230,7 +4345,7 @@
       "implementation_state": "unimplemented",
       "depends_on": [],
       "profile_defaults": {
-        "nano": true,
+        "nano": false,
         "micro": true,
         "embedded": true,
         "standard": true,
@@ -4249,7 +4364,8 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "Application supports time synchronization via the Precision Time Protocol (PTP)."
+      "notes": "Application supports time synchronization via the Precision Time Protocol (PTP).",
+      "cu_optional": true
     },
     {
       "id": "opc_cu_2480",
@@ -4259,7 +4375,7 @@
       "implementation_state": "unimplemented",
       "depends_on": [],
       "profile_defaults": {
-        "nano": true,
+        "nano": false,
         "micro": true,
         "embedded": true,
         "standard": true,
@@ -4278,7 +4394,8 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "Application supports time synchronization via the features described in IEEE 802.1AS."
+      "notes": "Application supports time synchronization via the features described in IEEE 802.1AS.",
+      "cu_optional": true
     },
     {
       "id": "opc_cu_2786",
@@ -4288,7 +4405,7 @@
       "implementation_state": "unimplemented",
       "depends_on": [],
       "profile_defaults": {
-        "nano": true,
+        "nano": false,
         "micro": true,
         "embedded": true,
         "standard": true,
@@ -4307,7 +4424,8 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "Application supports time synchronization via the Network Time Protocol (NTP)."
+      "notes": "Application supports time synchronization via the Network Time Protocol (NTP).",
+      "cu_optional": true
     },
     {
       "id": "opc_cu_2808",
@@ -4317,7 +4435,7 @@
       "implementation_state": "unimplemented",
       "depends_on": [],
       "profile_defaults": {
-        "nano": true,
+        "nano": false,
         "micro": true,
         "embedded": true,
         "standard": true,
@@ -4336,7 +4454,8 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "Restrict access based on the configured Roles and permissions."
+      "notes": "Restrict access based on the configured Roles and permissions.",
+      "cu_optional": true
     },
     {
       "id": "opc_cu_2823",
@@ -4365,7 +4484,8 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "Servers shall take proper measures to protect against attacks on user identity tokens. Such an attack is assumed if repeated connection attempts with invalid user identity tokens happen. See ActivateSession Service in UA Part 4."
+      "notes": "Servers shall take proper measures to protect against attacks on user identity tokens. Such an attack is assumed if repeated connection attempts with invalid user identity tokens happen. See ActivateSession Service in UA Part 4.",
+      "cu_optional": false
     },
     {
       "id": "opc_cu_2936",
@@ -4375,7 +4495,7 @@
       "implementation_state": "unimplemented",
       "depends_on": [],
       "profile_defaults": {
-        "nano": true,
+        "nano": false,
         "micro": true,
         "embedded": true,
         "standard": true,
@@ -4394,7 +4514,8 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "Supports writing of StatusCode and Timestamps along with the Value."
+      "notes": "Supports writing of StatusCode and Timestamps along with the Value.",
+      "cu_optional": true
     },
     {
       "id": "opc_cu_3072",
@@ -4423,7 +4544,8 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "Supports the Read Service to read one or more Attributes of one or more Nodes. This includes support of the IndexRange parameter to read a single element or a range of elements when the Attribute value is an array."
+      "notes": "Supports the Read Service to read one or more Attributes of one or more Nodes. This includes support of the IndexRange parameter to read a single element or a range of elements when the Attribute value is an array.",
+      "cu_optional": false
     },
     {
       "id": "opc_cu_3073",
@@ -4452,7 +4574,8 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "Support the RegisterNodes and UnregisterNodes Services as a way to optimize access to repeatedly used Nodes in the Server's OPC UA AddressSpace."
+      "notes": "Support the RegisterNodes and UnregisterNodes Services as a way to optimize access to repeatedly used Nodes in the Server's OPC UA AddressSpace.",
+      "cu_optional": false
     },
     {
       "id": "opc_cu_3125",
@@ -4481,7 +4604,8 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "The Server supports a public/private key pair for user identity. The administrator shall be able to enable or disable the use of this feature including all validation steps which are defined for application instance certificates."
+      "notes": "The Server supports a public/private key pair for user identity. The administrator shall be able to enable or disable the use of this feature including all validation steps which are defined for application instance certificates.",
+      "cu_optional": false
     },
     {
       "id": "opc_cu_3143",
@@ -4510,7 +4634,8 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "If the maximum supported number of PublishRequests has been queued and a new PublishRequest arrives, the \"oldest\" PublishRequest has to be discarded by returning the proper error."
+      "notes": "If the maximum supported number of PublishRequests has been queued and a new PublishRequest arrives, the \"oldest\" PublishRequest has to be discarded by returning the proper error.",
+      "cu_optional": false
     },
     {
       "id": "opc_cu_3147",
@@ -4520,7 +4645,7 @@
       "implementation_state": "unimplemented",
       "depends_on": [],
       "profile_defaults": {
-        "nano": true,
+        "nano": false,
         "micro": true,
         "embedded": true,
         "standard": true,
@@ -4539,7 +4664,8 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "Supports the IndexRange to write a single element or a range of elements when the Attribute value is an array and partial updates is allowed for this array."
+      "notes": "Supports the IndexRange to write a single element or a range of elements when the Attribute value is an array and partial updates is allowed for this array.",
+      "cu_optional": true
     },
     {
       "id": "opc_cu_3175",
@@ -4568,7 +4694,8 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "Support the Session Service Set (CreateSession, ActivateSession, CloseSession) except the use of ActivateSession to change the Session user. This includes correct handling of all parameters that are provided.\nNote that for the CreateSession and ActivateSession services, if the SecurityMode = None then:\n1) The Application Certificate and Nonce are optional.\n2) The signatures are null/empty."
+      "notes": "Support the Session Service Set (CreateSession, ActivateSession, CloseSession) except the use of ActivateSession to change the Session user. This includes correct handling of all parameters that are provided.\nNote that for the CreateSession and ActivateSession services, if the SecurityMode = None then:\n1) The Application Certificate and Nonce are optional.\n2) The signatures are null/empty.",
+      "cu_optional": false
     },
     {
       "id": "opc_cu_3192",
@@ -4578,7 +4705,7 @@
       "implementation_state": "unimplemented",
       "depends_on": [],
       "profile_defaults": {
-        "nano": true,
+        "nano": false,
         "micro": true,
         "embedded": true,
         "standard": true,
@@ -4597,7 +4724,8 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "The Server supports the collection of diagnostic information and exposes it in the AddressSpace. This includes always the ServerDiagnostics Object of the Server Object and its EnabledFlag Variable. The EnabledFlag in the ServerDiagnostics Object can be set TRUE and in that case the following Objects and Variables for diagnostic data as defined in the ServerDiagnosticsType are exposed: ServerDiagnosticsSummary with all its subcomponents, SubscriptionDiagnosticsArray, and SessionsDiagnosticsSummary with all its subcomponents."
+      "notes": "The Server supports the collection of diagnostic information and exposes it in the AddressSpace. This includes always the ServerDiagnostics Object of the Server Object and its EnabledFlag Variable. The EnabledFlag in the ServerDiagnostics Object can be set TRUE and in that case the following Objects and Variables for diagnostic data as defined in the ServerDiagnosticsType are exposed: ServerDiagnosticsSummary with all its subcomponents, SubscriptionDiagnosticsArray, and SessionsDiagnosticsSummary with all its subcomponents.",
+      "cu_optional": true
     },
     {
       "id": "opc_cu_3530",
@@ -4626,7 +4754,8 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "Support the View Service Set (Browse, BrowseNext). This includes the support of minimum 1 continuation point per Session."
+      "notes": "Support the View Service Set (Browse, BrowseNext). This includes the support of minimum 1 continuation point per Session.",
+      "cu_optional": false
     },
     {
       "id": "opc_cu_3534",
@@ -4655,7 +4784,8 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "Server supports at least 2 Subscriptions in a single Session."
+      "notes": "Server supports at least 2 Subscriptions in a single Session.",
+      "cu_optional": false
     },
     {
       "id": "opc_cu_3535",
@@ -4684,7 +4814,8 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "Support a retransmission queue of sent NotificationMessages and the Republish Service. See UA Part 4 for the required size of the retransmission queue."
+      "notes": "Support a retransmission queue of sent NotificationMessages and the Republish Service. See UA Part 4 for the required size of the retransmission queue.",
+      "cu_optional": false
     },
     {
       "id": "opc_cu_3536",
@@ -4713,7 +4844,8 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "The Server supports User Name/Password combination(s). The token will be encrypted as required by the security policy of the User Token Policy or by the security policy of the endpoint."
+      "notes": "The Server supports User Name/Password combination(s). The token will be encrypted as required by the security policy of the User Token Policy or by the security policy of the endpoint.",
+      "cu_optional": false
     },
     {
       "id": "opc_cu_3645",
@@ -4742,7 +4874,8 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "The Server allows unencrypted tokens. An unencrypted token either requires message encryption or means outside the scope of OPC UA to secure the identity token so that it cannot be retrieved by sniffing the communication. One option would be a secure transport like a VPN."
+      "notes": "The Server allows unencrypted tokens. An unencrypted token either requires message encryption or means outside the scope of OPC UA to secure the identity token so that it cannot be retrieved by sniffing the communication. One option would be a secure transport like a VPN.",
+      "cu_optional": true
     },
     {
       "id": "opc_cu_3727",
@@ -4771,7 +4904,8 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "Support the following Subscription Services: CreateSubscription, ModifySubscription, DeleteSubscriptions, Publish, Republish and SetPublishingMode."
+      "notes": "Support the following Subscription Services: CreateSubscription, ModifySubscription, DeleteSubscriptions, Publish, Republish and SetPublishingMode.",
+      "cu_optional": false
     },
     {
       "id": "opc_cu_3802",
@@ -4781,7 +4915,7 @@
       "implementation_state": "unimplemented",
       "depends_on": [],
       "profile_defaults": {
-        "nano": true,
+        "nano": false,
         "micro": true,
         "embedded": true,
         "standard": true,
@@ -4800,7 +4934,8 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "Supports configuration of the acceptable clock skew."
+      "notes": "Supports configuration of the acceptable clock skew.",
+      "cu_optional": true
     },
     {
       "id": "opc_cu_3913",
@@ -4829,7 +4964,8 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "Support at least 2 Publish Service requests per Session."
+      "notes": "Support at least 2 Publish Service requests per Session.",
+      "cu_optional": false
     },
     {
       "id": "opc_cu_3983",
@@ -4839,7 +4975,7 @@
       "implementation_state": "unimplemented",
       "depends_on": [],
       "profile_defaults": {
-        "nano": true,
+        "nano": false,
         "micro": true,
         "embedded": true,
         "standard": true,
@@ -4858,7 +4994,8 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "The Server returns available diagnostic information as requested with the 'returnDiagnostics' parameter."
+      "notes": "The Server returns available diagnostic information as requested with the 'returnDiagnostics' parameter.",
+      "cu_optional": true
     },
     {
       "id": "opc_cu_3985",
@@ -4887,7 +5024,8 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "Implement basic Service behaviour. This includes in particular:\n \u2013 checking the authentication token\n \u2013 returning the requestHandle in responses\n \u2013 respecting a timeoutHint"
+      "notes": "Implement basic Service behaviour. This includes in particular:\n \u2013 checking the authentication token\n \u2013 returning the requestHandle in responses\n \u2013 respecting a timeoutHint",
+      "cu_optional": false
     },
     {
       "id": "opc_cu_5505",
@@ -4897,7 +5035,7 @@
       "implementation_state": "unimplemented",
       "depends_on": [],
       "profile_defaults": {
-        "nano": true,
+        "nano": false,
         "micro": true,
         "embedded": true,
         "standard": true,
@@ -4916,7 +5054,8 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "Application supports time synchronization by use of the request or response header timestamps provided by a configured well known source, such as a Discovery Server to synchronize the time on the application and that this time synchronization occurs periodically. Use of this TimeSyncing can be configured."
+      "notes": "Application supports time synchronization by use of the request or response header timestamps provided by a configured well known source, such as a Discovery Server to synchronize the time on the application and that this time synchronization occurs periodically. Use of this TimeSyncing can be configured.",
+      "cu_optional": true
     },
     {
       "id": "opc_cu_5793",
@@ -4945,7 +5084,8 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "Support at least one of the optional ConformanceUnits for time synchronization mechanisms in the Security Time Synchronization Facet.\nThe application documentation shall specify which synchronization mechanisms with which profiles are supported."
+      "notes": "Support at least one of the optional ConformanceUnits for time synchronization mechanisms in the Security Time Synchronization Facet.\nThe application documentation shall specify which synchronization mechanisms with which profiles are supported.",
+      "cu_optional": false
     },
     {
       "id": "opc_cu_protocol_ua_tcp",
@@ -5262,6 +5402,128 @@
         "profile_group_id": 171
       },
       "notes": "Already-implemented CU added to manifest as claimed so the feature is tracked, gated by its Kconfig symbol, and covered by the claim/test map."
+    },
+    {
+      "id": "opc_cu_3080",
+      "kind": "conformance_unit",
+      "opc_display_name": "Security Default ApplicationInstance Certificate",
+      "kconfig_symbol": null,
+      "implementation_state": "unimplemented",
+      "depends_on": [],
+      "profile_defaults": {
+        "nano": true,
+        "micro": true,
+        "embedded": true,
+        "standard": true,
+        "full": true,
+        "custom": false
+      },
+      "backing_tests": [],
+      "opc_reference": {
+        "spec": null,
+        "section": null,
+        "cu_id": "3080",
+        "cu_name": "Security Default ApplicationInstance Certificate",
+        "source_url": "https://profiles.opcfoundation.org"
+      },
+      "source_metadata": {
+        "api_fetch": "profiles.opcfoundation.org/api/profile/includedconformanceunits/2266/",
+        "isOptional": false
+      },
+      "cu_optional": false,
+      "notes": "An application, when installed, has a default ApplicationInstanceCertificate that is valid. The default ApplicationInstanceCertificate shall either be created as part of the installation or installation instructions explicitly describe the process to create and apply a default ApplicationInstanceCertificate to the application.  (Documentation complete; no code change needed.)"
+    },
+    {
+      "id": "opc_cu_3201",
+      "kind": "conformance_unit",
+      "opc_display_name": "Base Info Custom Type System",
+      "kconfig_symbol": null,
+      "implementation_state": "unimplemented",
+      "depends_on": [],
+      "profile_defaults": {
+        "nano": false,
+        "micro": true,
+        "embedded": true,
+        "standard": true,
+        "full": true,
+        "custom": false
+      },
+      "backing_tests": [],
+      "opc_reference": {
+        "spec": null,
+        "section": null,
+        "cu_id": "3201",
+        "cu_name": "Base Info Custom Type System",
+        "source_url": "https://profiles.opcfoundation.org"
+      },
+      "source_metadata": {
+        "api_fetch": "profiles.opcfoundation.org/api/profile/includedconformanceunits/2266/",
+        "isOptional": true
+      },
+      "cu_optional": true,
+      "notes": "The Server supports custom types (i.e. types that are derived from well-known ObjectTypes, VariableTypes, ReferenceTypes or DataTypes). Supporting this ConformanceUnit requires that the custom types with their full inheritance tree are exposed in the AddressSpace.\nFor each DataType having encoding information (Structured DataTypes) the Encoding Objects shall be exposed as well.\nFor all Events supported by the Server, the EventType shall be exposed.\n (Documentation complete; no code change needed.)"
+    },
+    {
+      "id": "opc_cu_5592",
+      "kind": "conformance_unit",
+      "opc_display_name": "Base Info Engineering Units",
+      "kconfig_symbol": "MUC_OPCUA_CU_BASE_INFO_ENGINEERING_UNITS",
+      "implementation_state": "claimed",
+      "depends_on": [],
+      "profile_defaults": {
+        "nano": false,
+        "micro": true,
+        "embedded": true,
+        "standard": true,
+        "full": true,
+        "custom": false
+      },
+      "backing_tests": [
+        "test_profile_surface"
+      ],
+      "opc_reference": {
+        "spec": null,
+        "section": null,
+        "cu_id": "5592",
+        "cu_name": "Base Info Engineering Units",
+        "source_url": "https://profiles.opcfoundation.org"
+      },
+      "source_metadata": {
+        "api_fetch": "profiles.opcfoundation.org/api/profile/includedconformanceunits/2266/",
+        "isOptional": true
+      },
+      "cu_optional": true,
+      "notes": "The Server supports defining Variables that include the Engineering Units Property. This property makes use of the EUInformation data structure. This structure by default represents the UN/CEFACT \"Codes for Units of Measurement\" or the Common Data Dictionary (IEC CDD). If a different EU representation is required then the EUInformation.namespaceUri will indicate the alternate namespace."
+    },
+    {
+      "id": "opc_cu_5814",
+      "kind": "conformance_unit",
+      "opc_display_name": "Security \u2013 No Application Authentication",
+      "kconfig_symbol": null,
+      "implementation_state": "unimplemented",
+      "depends_on": [],
+      "profile_defaults": {
+        "nano": false,
+        "micro": true,
+        "embedded": true,
+        "standard": true,
+        "full": true,
+        "custom": false
+      },
+      "backing_tests": [],
+      "opc_reference": {
+        "spec": null,
+        "section": null,
+        "cu_id": "5814",
+        "cu_name": "Security \u2013 No Application Authentication",
+        "source_url": "https://profiles.opcfoundation.org"
+      },
+      "source_metadata": {
+        "api_fetch": "profiles.opcfoundation.org/api/profile/includedconformanceunits/2266/",
+        "isOptional": true
+      },
+      "cu_optional": true,
+      "notes": "The Server supports being able to be configured for no application authentication, just User authentication and normal encryption/signing:\n\u2013 Configure Server to skip the trust check when validating certificates\n\u2013 Certificates are just used for message security (signing and encryption)\n\u2013 Users level is used for authentication  (Documentation complete; no code change needed.)"
     }
   ],
   "capacities": [

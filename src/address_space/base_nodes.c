@@ -15,18 +15,44 @@
 static const opcua_byte_t s_str_Aggregates[] = "Aggregates";
 static const opcua_byte_t s_str_BaseDataType[] = "BaseDataType";
 static const opcua_byte_t s_str_BaseDataVariableType[] = "BaseDataVariableType";
+#if MUC_OPCUA_CU_ADDRESS_SPACE_INTERFACES
+static const opcua_byte_t s_str_BaseInterfaceType[] = "BaseInterfaceType";
+#endif
 static const opcua_byte_t s_str_BaseObjectType[] = "BaseObjectType";
 static const opcua_byte_t s_str_BaseVariableType[] = "BaseVariableType";
 static const opcua_byte_t s_str_Boolean[] = "Boolean";
 static const opcua_byte_t s_str_Byte[] = "Byte";
+#ifdef MUC_OPCUA_CU_BASE_INFO_CURRENCY
+static const opcua_byte_t s_str_CurrencyUnit[] = "CurrencyUnit";
+static const opcua_byte_t s_str_CurrencyUnitType[] = "CurrencyUnitType";
+#endif
 static const opcua_byte_t s_str_DataTypes[] = "DataTypes";
 static const opcua_byte_t s_str_DateTime[] = "DateTime";
+#ifdef MUC_OPCUA_CU_ADDRESS_SPACE_ADDIN_DEFAULTINSTANCEBROWSENAME
+static const opcua_byte_t s_str_DefaultInstanceBrowseName[] = "DefaultInstanceBrowseName";
+#endif
+#if MUC_OPCUA_CU_BASE_INFO_LOCALTIME || defined(MUC_OPCUA_CU_BASE_INFO_CURRENCY)
+static const opcua_byte_t s_str_Default_Binary[] = "Default Binary";
+#endif
 static const opcua_byte_t s_str_Double[] = "Double";
+#ifdef MUC_OPCUA_CU_BASE_INFO_ENGINEERING_UNITS
+static const opcua_byte_t s_str_EUInformation[] = "EUInformation";
+#endif
+#ifdef MUC_OPCUA_CU_BASE_INFO_ESTIMATED_RETURN_TIME
+static const opcua_byte_t s_str_EstimatedReturnTime[] = "EstimatedReturnTime";
+#endif
 static const opcua_byte_t s_str_Float[] = "Float";
 static const opcua_byte_t s_str_FolderType[] = "FolderType";
 static const opcua_byte_t s_str_GetMonitoredItems[] = "GetMonitoredItems";
+#if MUC_OPCUA_CU_ADDRESS_SPACE_ADDIN_REFERENCE
+/* OPC-10000-5 §11.21, OPC-10000-7 CU 2446: HasAddIn ReferenceType BrowseName. */
+static const opcua_byte_t s_str_HasAddIn[] = "HasAddIn";
+#endif
 static const opcua_byte_t s_str_HasChild[] = "HasChild";
 static const opcua_byte_t s_str_HasComponent[] = "HasComponent";
+#if MUC_OPCUA_CU_ADDRESS_SPACE_INTERFACES
+static const opcua_byte_t s_str_HasInterface[] = "HasInterface";
+#endif
 static const opcua_byte_t s_str_HasProperty[] = "HasProperty";
 static const opcua_byte_t s_str_HasSubtype[] = "HasSubtype";
 static const opcua_byte_t s_str_HasTypeDefinition[] = "HasTypeDefinition";
@@ -35,7 +61,16 @@ static const opcua_byte_t s_str_InputArguments[] = "InputArguments";
 static const opcua_byte_t s_str_Int16[] = "Int16";
 static const opcua_byte_t s_str_Int32[] = "Int32";
 static const opcua_byte_t s_str_Int64[] = "Int64";
+#if MUC_OPCUA_CU_ADDRESS_SPACE_INTERFACES
+static const opcua_byte_t s_str_InterfaceTypes[] = "InterfaceTypes";
+#endif
 static const opcua_byte_t s_str_LocaleIdArray[] = "LocaleIdArray";
+#ifdef MUC_OPCUA_CU_BASE_INFO_LOCATIONS_OBJECT
+static const opcua_byte_t s_str_Locations[] = "Locations";
+#endif
+#if MUC_OPCUA_CU_BASE_INFO_LOCALTIME
+static const opcua_byte_t s_str_LocalTime[] = "LocalTime";
+#endif
 static const opcua_byte_t s_str_LocalizedText[] = "LocalizedText";
 static const opcua_byte_t s_str_MaxArrayLength[] = "MaxArrayLength";
 static const opcua_byte_t s_str_MaxMonitoredItemsPerCall[] = "MaxMonitoredItemsPerCall";
@@ -49,6 +84,12 @@ static const opcua_byte_t s_str_NonHierarchicalReferences[] = "NonHierarchicalRe
 static const opcua_byte_t s_str_ObjectTypes[] = "ObjectTypes";
 static const opcua_byte_t s_str_Objects[] = "Objects";
 static const opcua_byte_t s_str_OperationLimits[] = "OperationLimits";
+#if MUC_OPCUA_CU_BASE_INFO_OPTIONSET
+static const opcua_byte_t s_str_OptionSetType[] = "OptionSetType";
+#endif
+#ifdef MUC_OPCUA_CU_BASE_INFO_SELECTION_LIST
+static const opcua_byte_t s_str_SelectionListType[] = "SelectionListType";
+#endif
 static const opcua_byte_t s_str_Organizes[] = "Organizes";
 static const opcua_byte_t s_str_OutputArguments[] = "OutputArguments";
 static const opcua_byte_t s_str_PropertyType[] = "PropertyType";
@@ -67,6 +108,13 @@ static const opcua_byte_t s_str_ServerType[] = "ServerType";
 static const opcua_byte_t s_str_State[] = "State";
 static const opcua_byte_t s_str_StatusCode[] = "StatusCode";
 static const opcua_byte_t s_str_String[] = "String";
+#if MUC_OPCUA_CU_BASE_INFO_LOCALTIME || defined(MUC_OPCUA_CU_BASE_INFO_ENGINEERING_UNITS) ||                           \
+    defined(MUC_OPCUA_CU_BASE_INFO_CURRENCY)
+static const opcua_byte_t s_str_Structure[] = "Structure";
+#endif
+#if MUC_OPCUA_CU_BASE_INFO_LOCALTIME
+static const opcua_byte_t s_str_TimeZoneDataType[] = "TimeZoneDataType";
+#endif
 static const opcua_byte_t s_str_Types[] = "Types";
 static const opcua_byte_t s_str_UInt16[] = "UInt16";
 static const opcua_byte_t s_str_UInt32[] = "UInt32";
@@ -97,8 +145,10 @@ static const opcua_byte_t s_str_MultiStateValueDiscreteType[] = "MultiStateValue
 static const opcua_byte_t s_str_Optional[] = "Optional";
 static const opcua_byte_t s_str_TrueState[] = "TrueState";
 static const opcua_byte_t s_str_TwoStateDiscreteType[] = "TwoStateDiscreteType";
-static const opcua_byte_t s_str_ValueAsText[] = "ValueAsText";
 static const opcua_byte_t s_str_ValuePrecision[] = "ValuePrecision";
+#endif
+#if MUC_OPCUA_CU_DATA_ACCESS || defined(MUC_OPCUA_CU_BASE_INFO_VALUEASTEXT)
+static const opcua_byte_t s_str_ValueAsText[] = "ValueAsText";
 #endif
 static const opcua_byte_t s_str_en[] = "en";
 static const opcua_byte_t s_str_http___opcfoundation_org_UA_Profile_Server_EmbeddedUA2017[] =
@@ -122,6 +172,9 @@ static const mu_reference_t s_root_refs[] = {{{0, MU_NODEID_NUMERIC, {35}}, {0, 
 };
 
 static const mu_reference_t s_objects_refs[] = {{{0, MU_NODEID_NUMERIC, {35}}, {0, MU_NODEID_NUMERIC, {2253}}, true},
+#ifdef MUC_OPCUA_CU_BASE_INFO_LOCATIONS_OBJECT
+                                                {{0, MU_NODEID_NUMERIC, {35}}, {0, MU_NODEID_NUMERIC, {31915}}, true},
+#endif
 #if MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER
                                                 {{0, MU_NODEID_NUMERIC, {40}}, {0, MU_NODEID_NUMERIC, {61}}, true}
 #endif
@@ -134,18 +187,39 @@ static const mu_reference_t s_types_refs[] = {{{0, MU_NODEID_NUMERIC, {35}}, {0,
                                               {{0, MU_NODEID_NUMERIC, {35}}, {0, MU_NODEID_NUMERIC, {89}}, true},
                                               {{0, MU_NODEID_NUMERIC, {35}}, {0, MU_NODEID_NUMERIC, {90}}, true},
                                               {{0, MU_NODEID_NUMERIC, {35}}, {0, MU_NODEID_NUMERIC, {91}}, true},
+#if MUC_OPCUA_CU_ADDRESS_SPACE_INTERFACES
+                                              {{0, MU_NODEID_NUMERIC, {35}}, {0, MU_NODEID_NUMERIC, {17708}}, true},
+#endif
                                               {{0, MU_NODEID_NUMERIC, {40}}, {0, MU_NODEID_NUMERIC, {61}}, true}};
 
 static const mu_reference_t s_type_folder_object_refs[] = {
     {{0, MU_NODEID_NUMERIC, {35}}, {0, MU_NODEID_NUMERIC, {58}}, true},
+#if MUC_OPCUA_CU_ADDRESS_SPACE_INTERFACES
+    {{0, MU_NODEID_NUMERIC, {35}}, {0, MU_NODEID_NUMERIC, {17602}}, true},
+#endif
     {{0, MU_NODEID_NUMERIC, {40}}, {0, MU_NODEID_NUMERIC, {61}}, true}};
 
 static const mu_reference_t s_type_folder_variable_refs[] = {
     {{0, MU_NODEID_NUMERIC, {35}}, {0, MU_NODEID_NUMERIC, {62}}, true},
+#if MUC_OPCUA_CU_BASE_INFO_OPTIONSET
+    {{0, MU_NODEID_NUMERIC, {35}}, {0, MU_NODEID_NUMERIC, {MU_NODEID_OPTIONSETTYPE}}, true},
+#endif
+#ifdef MUC_OPCUA_CU_BASE_INFO_SELECTION_LIST
+    {{0, MU_NODEID_NUMERIC, {35}}, {0, MU_NODEID_NUMERIC, {MU_NODEID_SELECTIONLISTTYPE}}, true},
+#endif
     {{0, MU_NODEID_NUMERIC, {40}}, {0, MU_NODEID_NUMERIC, {61}}, true}};
 
 static const mu_reference_t s_type_folder_data_refs[] = {
     {{0, MU_NODEID_NUMERIC, {35}}, {0, MU_NODEID_NUMERIC, {24}}, true},
+#ifdef MUC_OPCUA_CU_BASE_INFO_ENGINEERING_UNITS
+    {{0, MU_NODEID_NUMERIC, {35}}, {0, MU_NODEID_NUMERIC, {MU_ID_EUINFORMATION_DATATYPE}}, true},
+#endif
+#if MUC_OPCUA_CU_BASE_INFO_LOCALTIME
+    {{0, MU_NODEID_NUMERIC, {35}}, {0, MU_NODEID_NUMERIC, {MU_NODEID_TIMEZONEDATATYPE}}, true},
+#endif
+#ifdef MUC_OPCUA_CU_BASE_INFO_CURRENCY
+    {{0, MU_NODEID_NUMERIC, {35}}, {0, MU_NODEID_NUMERIC, {MU_NODEID_CURRENCYUNITTYPE}}, true},
+#endif
     {{0, MU_NODEID_NUMERIC, {40}}, {0, MU_NODEID_NUMERIC, {61}}, true}};
 
 static const mu_reference_t s_type_folder_reference_refs[] = {
@@ -156,7 +230,15 @@ static const mu_reference_t s_references_refs[] = {{{0, MU_NODEID_NUMERIC, {45}}
                                                    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {33}}, true}};
 
 static const mu_reference_t s_nonhierarchical_refs[] = {
-    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {40}}, true}};
+    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {40}}, true},
+#if MUC_OPCUA_CU_ADDRESS_SPACE_INTERFACES
+    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {17603}}, true},
+#endif
+#if MUC_OPCUA_CU_ADDRESS_SPACE_ADDIN_REFERENCE
+    /* OPC-10000-5 §11.21, OPC-10000-7 CU 2446: HasAddIn (17604) subtype. */
+    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {17604}}, true}
+#endif
+};
 
 static const mu_reference_t s_hierarchical_refs[] = {
     {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {34}}, true},
@@ -185,17 +267,72 @@ static const mu_reference_t s_base_data_type_refs[] = {
     {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {17}}, true},
     {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {19}}, true},
     {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {20}}, true},
-    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {21}}, true}};
+    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {21}}, true},
+#if MUC_OPCUA_CU_BASE_INFO_LOCALTIME || defined(MUC_OPCUA_CU_BASE_INFO_ENGINEERING_UNITS) ||                           \
+    defined(MUC_OPCUA_CU_BASE_INFO_CURRENCY)
+    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {22}}, true}
+#endif
+};
+
+#if MUC_OPCUA_CU_BASE_INFO_LOCALTIME || defined(MUC_OPCUA_CU_BASE_INFO_ENGINEERING_UNITS) ||                           \
+    defined(MUC_OPCUA_CU_BASE_INFO_CURRENCY)
+static const mu_reference_t s_structure_refs[] = {
+#ifdef MUC_OPCUA_CU_BASE_INFO_ENGINEERING_UNITS
+    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {MU_ID_EUINFORMATION_DATATYPE}}, true},
+#endif
+#if MUC_OPCUA_CU_BASE_INFO_LOCALTIME
+    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {MU_NODEID_TIMEZONEDATATYPE}}, true},
+#endif
+#ifdef MUC_OPCUA_CU_BASE_INFO_CURRENCY
+    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {MU_NODEID_CURRENCYUNITTYPE}}, true},
+#endif
+};
+#endif
+
+#if MUC_OPCUA_CU_BASE_INFO_LOCALTIME
+static const mu_reference_t s_time_zone_data_type_refs[] = {
+    {{0, MU_NODEID_NUMERIC, {38}}, {0, MU_NODEID_NUMERIC, {8917}}, true}};
+#endif
+
+#ifdef MUC_OPCUA_CU_BASE_INFO_CURRENCY
+static const mu_reference_t s_currency_unit_type_refs[] = {
+    {{0, MU_NODEID_NUMERIC, {38}}, {0, MU_NODEID_NUMERIC, {23507}}, true}};
+#endif
 
 static const mu_reference_t s_base_object_type_refs[] = {
     {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {61}}, true},
+#ifdef MUC_OPCUA_CU_ADDRESS_SPACE_ADDIN_DEFAULTINSTANCEBROWSENAME
+    {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {17605}}, true},
+#endif
+#if MUC_OPCUA_CU_ADDRESS_SPACE_INTERFACES
+    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {17602}}, true},
+#endif
     {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {2004}}, true}};
+
+#if MUC_OPCUA_CU_ADDRESS_SPACE_INTERFACES
+static const mu_reference_t s_base_interface_type_refs[] = {
+    {{0, MU_NODEID_NUMERIC, {35}}, {0, MU_NODEID_NUMERIC, {88}}, false},
+    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {58}}, false}};
+
+static const mu_reference_t s_has_interface_refs[] = {
+    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {32}}, false}};
+
+static const mu_reference_t s_interface_types_refs[] = {
+    {{0, MU_NODEID_NUMERIC, {35}}, {0, MU_NODEID_NUMERIC, {86}}, false},
+    {{0, MU_NODEID_NUMERIC, {40}}, {0, MU_NODEID_NUMERIC, {61}}, true}};
+#endif
 
 static const mu_reference_t s_base_variable_type_refs[] = {
     {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {63}}, true}};
 
 static const mu_reference_t s_base_data_variable_type_refs[] = {
     {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {68}}, true},
+#if MUC_OPCUA_CU_BASE_INFO_OPTIONSET
+    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {MU_NODEID_OPTIONSETTYPE}}, true},
+#endif
+#ifdef MUC_OPCUA_CU_BASE_INFO_SELECTION_LIST
+    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {MU_NODEID_SELECTIONLISTTYPE}}, true},
+#endif
 #if MUC_OPCUA_CU_DATA_ACCESS
     /* Spec 060: BaseDataVariableType HasSubtype-> DataItemType (2365). */
     {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {2365}}, true}
@@ -329,16 +466,25 @@ static const mu_value_source_t s_resend_input_value = {
 
 #endif
 
-static const mu_reference_t s_server_refs[] = {{{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {2254}}, true},
-                                               {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {2255}}, true},
-                                               {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {2256}}, true},
-                                               {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {2268}}, true},
+static const mu_reference_t s_server_refs[] = {
+    {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {2254}}, true},
+    {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {2255}}, true},
+    {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {2256}}, true},
+    {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {2268}}, true},
 #if MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER && MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
-                                               {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {11492}}, true},
-                                               {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {12873}}, true},
+    {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {11492}}, true},
+    {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {12873}}, true},
+#endif
+#ifdef MUC_OPCUA_CU_BASE_INFO_ESTIMATED_RETURN_TIME
+    /* OPC-10000-5 §6.3.1, OPC-10000-7 CU 3198: Server.EstimatedReturnTime Property. */
+    {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {12885}}, true},
+#endif
+#if MUC_OPCUA_CU_BASE_INFO_LOCALTIME
+    /* OPC-10000-5 §6.3.1: Server.LocalTime Property. */
+    {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {17634}}, true},
 #endif
 #if MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER
-                                               {{0, MU_NODEID_NUMERIC, {40}}, {0, MU_NODEID_NUMERIC, {2004}}, true}
+    {{0, MU_NODEID_NUMERIC, {40}}, {0, MU_NODEID_NUMERIC, {2004}}, true}
 #endif
 };
 
@@ -568,6 +714,17 @@ static const mu_node_t s_base_nodes[] = {
      0,
      NULL,
      .type_definition = {0}},
+#if MUC_OPCUA_CU_BASE_INFO_LOCALTIME || defined(MUC_OPCUA_CU_BASE_INFO_ENGINEERING_UNITS) ||                           \
+    defined(MUC_OPCUA_CU_BASE_INFO_CURRENCY)
+    {{0, MU_NODEID_NUMERIC, {22}},
+     MU_NODECLASS_DATATYPE,
+     {9, s_str_Structure},
+     {9, s_str_Structure},
+     s_structure_refs,
+     sizeof(s_structure_refs) / sizeof(s_structure_refs[0]),
+     NULL,
+     .type_definition = {0}},
+#endif
     {{0, MU_NODEID_NUMERIC, {24}},
      MU_NODECLASS_DATATYPE,
      {12, s_str_BaseDataType},
@@ -957,6 +1114,26 @@ static const mu_node_t s_base_nodes[] = {
      sizeof(s_da_prop_mandatory_refs) / sizeof(s_da_prop_mandatory_refs[0]),
      NULL,
      .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+#if MUC_OPCUA_CU_BASE_INFO_LOCALTIME
+    /* OPC-10000-5 §12.2.12.11, OPC-10000-7 CU 2476: TimeZoneDataType (8912),
+     * subtype of Structure (22), with its Default Binary encoding Object (8917). */
+    {{0, MU_NODEID_NUMERIC, {MU_NODEID_TIMEZONEDATATYPE}},
+     MU_NODECLASS_DATATYPE,
+     {16, s_str_TimeZoneDataType},
+     {16, s_str_TimeZoneDataType},
+     s_time_zone_data_type_refs,
+     sizeof(s_time_zone_data_type_refs) / sizeof(s_time_zone_data_type_refs[0]),
+     NULL,
+     .type_definition = {0}},
+    {{0, MU_NODEID_NUMERIC, {8917}},
+     MU_NODECLASS_OBJECT,
+     {14, s_str_Default_Binary},
+     {14, s_str_Default_Binary},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {76}}},
+#endif
     {{0, MU_NODEID_NUMERIC, {11238}},
      MU_NODECLASS_VARIABLETYPE,
      {27, s_str_MultiStateValueDiscreteType},
@@ -982,6 +1159,65 @@ static const mu_node_t s_base_nodes[] = {
      NULL,
      .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
 #endif /* MUC_OPCUA_CU_DATA_ACCESS */
+#ifdef MUC_OPCUA_CU_BASE_INFO_VALUEASTEXT
+#ifndef MUC_OPCUA_CU_DATA_ACCESS
+    /* OPC-10000-7 CU 2969: ValueAsText is a PropertyType instance declaration
+     * for Variables with enumerated DataTypes. There is no single global
+     * numeric NodeId; i=11461 is the standard declaration used by
+     * MultiStateValueDiscreteType and is already provided by Data Access. */
+    {{0, MU_NODEID_NUMERIC, {11461}},
+     MU_NODECLASS_VARIABLE,
+     {11, s_str_ValueAsText},
+     {11, s_str_ValueAsText},
+     s_property_type_ref,
+     sizeof(s_property_type_ref) / sizeof(s_property_type_ref[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+#endif
+#endif
+#ifdef MUC_OPCUA_CU_BASE_INFO_ENGINEERING_UNITS
+    /* OPC-10000-7 CU 5592: EUInformation DataType (887), subtype of Structure (22). */
+    {{0, MU_NODEID_NUMERIC, {MU_ID_EUINFORMATION_DATATYPE}},
+     MU_NODECLASS_DATATYPE,
+     {13, s_str_EUInformation},
+     {13, s_str_EUInformation},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0}},
+#endif
+#if MUC_OPCUA_CU_BASE_INFO_LOCALTIME && !MUC_OPCUA_CU_DATA_ACCESS
+    /* OPC-10000-5 §12.2.12.11, OPC-10000-7 CU 2476: TimeZoneDataType (8912),
+     * subtype of Structure (22), with its Default Binary encoding Object (8917). */
+    {{0, MU_NODEID_NUMERIC, {MU_NODEID_TIMEZONEDATATYPE}},
+     MU_NODECLASS_DATATYPE,
+     {16, s_str_TimeZoneDataType},
+     {16, s_str_TimeZoneDataType},
+     s_time_zone_data_type_refs,
+     sizeof(s_time_zone_data_type_refs) / sizeof(s_time_zone_data_type_refs[0]),
+     NULL,
+     .type_definition = {0}},
+    {{0, MU_NODEID_NUMERIC, {8917}},
+     MU_NODECLASS_OBJECT,
+     {14, s_str_Default_Binary},
+     {14, s_str_Default_Binary},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {76}}},
+#endif
+#if MUC_OPCUA_CU_BASE_INFO_OPTIONSET
+    /* OPC-10000-5 §7.17, OPC-10000-7 CU 3127: OptionSetType (11487),
+     * subtype of BaseDataVariableType (63). */
+    {{0, MU_NODEID_NUMERIC, {MU_NODEID_OPTIONSETTYPE}},
+     MU_NODECLASS_VARIABLETYPE,
+     {13, s_str_OptionSetType},
+     {13, s_str_OptionSetType},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0}},
+#endif
 #if MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
     {{0, MU_NODEID_NUMERIC, {11492}},
      MU_NODECLASS_METHOD,
@@ -1085,6 +1321,18 @@ static const mu_node_t s_base_nodes[] = {
      MU_RESEND_INPUT_VALUE,
      .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
 #endif
+#ifdef MUC_OPCUA_CU_BASE_INFO_ESTIMATED_RETURN_TIME
+    /* OPC-10000-5 §6.3.1, OPC-10000-7 CU 3198: Server.EstimatedReturnTime
+     * (i=12885) is a DateTime (i=13) Property using PropertyType (i=68). */
+    {{0, MU_NODEID_NUMERIC, {12885}},
+     MU_NODECLASS_VARIABLE,
+     {19, s_str_EstimatedReturnTime},
+     {19, s_str_EstimatedReturnTime},
+     s_property_type_ref,
+     sizeof(s_property_type_ref) / sizeof(s_property_type_ref[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+#endif
 #if MUC_OPCUA_CU_DATA_ACCESS
     /* Spec 060: BaseAnalogType + AnalogUnitType and their property instances
      * (15318..17569), sorted after all preceding NodeIds. */
@@ -1096,6 +1344,20 @@ static const mu_node_t s_base_nodes[] = {
      sizeof(s_da_base_analog_type_refs) / sizeof(s_da_base_analog_type_refs[0]),
      NULL,
      .type_definition = {0}},
+#endif
+#ifdef MUC_OPCUA_CU_BASE_INFO_SELECTION_LIST
+    /* OPC-10000-5 §7.18, OPC-10000-7 CU 2711: SelectionListType (16309),
+     * subtype of BaseDataVariableType (63). */
+    {{0, MU_NODEID_NUMERIC, {MU_NODEID_SELECTIONLISTTYPE}},
+     MU_NODECLASS_VARIABLETYPE,
+     {17, s_str_SelectionListType},
+     {17, s_str_SelectionListType},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0}},
+#endif
+#if MUC_OPCUA_CU_DATA_ACCESS
     {{0, MU_NODEID_NUMERIC, {17497}},
      MU_NODECLASS_VARIABLETYPE,
      {14, s_str_AnalogUnitType},
@@ -1153,6 +1415,119 @@ static const mu_node_t s_base_nodes[] = {
      NULL,
      .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
 #endif /* MUC_OPCUA_CU_DATA_ACCESS */
+#if MUC_OPCUA_CU_ADDRESS_SPACE_INTERFACES
+    /* OPC-10000-5 §6.9, OPC-10000-7 CU 3560: BaseInterfaceType ObjectType,
+     * subtype of BaseObjectType (58). */
+    {{0, MU_NODEID_NUMERIC, {17602}},
+     MU_NODECLASS_OBJECTTYPE,
+     {17, s_str_BaseInterfaceType},
+     {17, s_str_BaseInterfaceType},
+     s_base_interface_type_refs,
+     sizeof(s_base_interface_type_refs) / sizeof(s_base_interface_type_refs[0]),
+     NULL,
+     .type_definition = {0}},
+    /* OPC-10000-5 §11.20, OPC-10000-7 CU 3560: HasInterface ReferenceType,
+     * subtype of NonHierarchicalReferences (32). */
+    {{0, MU_NODEID_NUMERIC, {17603}},
+     MU_NODECLASS_REFERENCETYPE,
+     {12, s_str_HasInterface},
+     {12, s_str_HasInterface},
+     s_has_interface_refs,
+     sizeof(s_has_interface_refs) / sizeof(s_has_interface_refs[0]),
+     NULL,
+     .type_definition = {0}},
+#endif
+#if MUC_OPCUA_CU_ADDRESS_SPACE_ADDIN_REFERENCE
+    /* OPC-10000-5 §11.21, OPC-10000-7 CU 2446: HasAddIn ReferenceType (17604),
+     * subtype of NonHierarchicalReferences (32). */
+    {{0, MU_NODEID_NUMERIC, {17604}},
+     MU_NODECLASS_REFERENCETYPE,
+     {8, s_str_HasAddIn},
+     {8, s_str_HasAddIn},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0}},
+#endif
+#ifdef MUC_OPCUA_CU_ADDRESS_SPACE_ADDIN_DEFAULTINSTANCEBROWSENAME
+    /* OPC-10000-7 CU 2447: ObjectTypes may carry DefaultInstanceBrowseName
+     * (i=17605) to define the default BrowseName for their instances. */
+    {{0, MU_NODEID_NUMERIC, {17605}},
+     MU_NODECLASS_VARIABLE,
+     {25, s_str_DefaultInstanceBrowseName},
+     {25, s_str_DefaultInstanceBrowseName},
+     s_property_type_ref,
+     sizeof(s_property_type_ref) / sizeof(s_property_type_ref[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+#endif
+#if MUC_OPCUA_CU_BASE_INFO_LOCALTIME
+    /* OPC-10000-5 §6.3.1: Server.LocalTime (i=17634) is a Property using
+     * TimeZoneDataType (i=8912); this node model records PropertyType (i=68). */
+    {{0, MU_NODEID_NUMERIC, {17634}},
+     MU_NODECLASS_VARIABLE,
+     {9, s_str_LocalTime},
+     {9, s_str_LocalTime},
+     s_property_type_ref,
+     sizeof(s_property_type_ref) / sizeof(s_property_type_ref[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+#endif
+#if MUC_OPCUA_CU_ADDRESS_SPACE_INTERFACES
+    /* OPC UA NodeIds.csv: InterfaceTypes Folder (i=17708), organized by Types (86). */
+    {{0, MU_NODEID_NUMERIC, {17708}},
+     MU_NODECLASS_OBJECT,
+     {14, s_str_InterfaceTypes},
+     {14, s_str_InterfaceTypes},
+     s_interface_types_refs,
+     sizeof(s_interface_types_refs) / sizeof(s_interface_types_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {61}}},
+#endif
+#ifdef MUC_OPCUA_CU_BASE_INFO_LOCATIONS_OBJECT
+    /* OPC-10000-5 §8.2.12, OPC-10000-7 CU 4053: Locations Folder (i=31915),
+     * organized by Objects (85), with FolderType (61). */
+    {{0, MU_NODEID_NUMERIC, {31915}},
+     MU_NODECLASS_OBJECT,
+     {9, s_str_Locations},
+     {9, s_str_Locations},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {61}}},
+#endif
+#ifdef MUC_OPCUA_CU_BASE_INFO_CURRENCY
+    /* OPC-10000-5 §12.2.12.2, OPC-10000-7 CU 5240: CurrencyUnitType (23498),
+     * subtype of Structure (22), with its Default Binary encoding Object (23507). */
+    {{0, MU_NODEID_NUMERIC, {MU_NODEID_CURRENCYUNITTYPE}},
+     MU_NODECLASS_DATATYPE,
+     {16, s_str_CurrencyUnitType},
+     {16, s_str_CurrencyUnitType},
+     s_currency_unit_type_refs,
+     sizeof(s_currency_unit_type_refs) / sizeof(s_currency_unit_type_refs[0]),
+     NULL,
+     .type_definition = {0}},
+    {{0, MU_NODEID_NUMERIC, {23507}},
+     MU_NODECLASS_OBJECT,
+     {14, s_str_Default_Binary},
+     {14, s_str_Default_Binary},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {76}}},
+    /* OPC-10000-7 CU 5240: DataVariables representing currency may carry a
+     * CurrencyUnit Property. OPC-10000-5 §12.2.12.2 defines it by BrowseName;
+     * no single global numeric NodeId is assigned, so expose the declaration
+     * with a stable string NodeId and PropertyType (68). */
+    {{0, MU_NODEID_STRING, {.string = {12, s_str_CurrencyUnit}}},
+     MU_NODECLASS_VARIABLE,
+     {12, s_str_CurrencyUnit},
+     {12, s_str_CurrencyUnit},
+     s_property_type_ref,
+     sizeof(s_property_type_ref) / sizeof(s_property_type_ref[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+#endif
 };
 #else
 static const mu_node_t s_base_nodes[] = {
@@ -1188,6 +1563,17 @@ static const mu_node_t s_base_nodes[] = {
      0,
      NULL,
      .type_definition = {0}},
+#ifdef MUC_OPCUA_CU_BASE_INFO_ENGINEERING_UNITS
+    /* OPC-10000-7 CU 5592: EUInformation DataType (887), subtype of Structure (22). */
+    {{0, MU_NODEID_NUMERIC, {MU_ID_EUINFORMATION_DATATYPE}},
+     MU_NODECLASS_DATATYPE,
+     {13, s_str_EUInformation},
+     {13, s_str_EUInformation},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0}},
+#endif
     {{0, MU_NODEID_NUMERIC, {2253}},
      MU_NODECLASS_OBJECT,
      {6, s_str_Server},
@@ -1252,6 +1638,52 @@ static const mu_node_t s_base_nodes[] = {
      0,
      &s_locale_id_array_value,
      .type_definition = {0}},
+#if MUC_OPCUA_CU_BASE_INFO_LOCALTIME
+    /* OPC-10000-5 §12.2.12.11, OPC-10000-7 CU 2476: TimeZoneDataType (8912),
+     * subtype of Structure (22), with its Default Binary encoding Object (8917). */
+    {{0, MU_NODEID_NUMERIC, {MU_NODEID_TIMEZONEDATATYPE}},
+     MU_NODECLASS_DATATYPE,
+     {16, s_str_TimeZoneDataType},
+     {16, s_str_TimeZoneDataType},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0}},
+    {{0, MU_NODEID_NUMERIC, {8917}},
+     MU_NODECLASS_OBJECT,
+     {14, s_str_Default_Binary},
+     {14, s_str_Default_Binary},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {76}}},
+#endif
+#ifdef MUC_OPCUA_CU_BASE_INFO_VALUEASTEXT
+#ifndef MUC_OPCUA_CU_DATA_ACCESS
+    /* OPC-10000-7 CU 2969: ValueAsText applies to Variables with enumerated
+     * DataTypes. This minimal node model records PropertyType (i=68). */
+    {{0, MU_NODEID_NUMERIC, {11461}},
+     MU_NODECLASS_VARIABLE,
+     {11, s_str_ValueAsText},
+     {11, s_str_ValueAsText},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+#endif
+#endif
+#if MUC_OPCUA_CU_BASE_INFO_OPTIONSET
+    /* OPC-10000-5 §7.17, OPC-10000-7 CU 3127: OptionSetType (11487),
+     * subtype of BaseDataVariableType (63). */
+    {{0, MU_NODEID_NUMERIC, {MU_NODEID_OPTIONSETTYPE}},
+     MU_NODECLASS_VARIABLETYPE,
+     {13, s_str_OptionSetType},
+     {13, s_str_OptionSetType},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0}},
+#endif
     /* Spec 057: MaxArrayLength/MaxStringLength — sorted slots before 11704. */
     {{0, MU_NODEID_NUMERIC, {11702}},
      MU_NODECLASS_VARIABLE,
@@ -1311,6 +1743,143 @@ static const mu_node_t s_base_nodes[] = {
      0,
      &s_max_monitored_items_per_call_value,
      .type_definition = {0}},
+#ifdef MUC_OPCUA_CU_BASE_INFO_ESTIMATED_RETURN_TIME
+    /* OPC-10000-5 §6.3.1, OPC-10000-7 CU 3198: Server.EstimatedReturnTime
+     * (i=12885) is a DateTime (i=13) Property using PropertyType (i=68). */
+    {{0, MU_NODEID_NUMERIC, {12885}},
+     MU_NODECLASS_VARIABLE,
+     {19, s_str_EstimatedReturnTime},
+     {19, s_str_EstimatedReturnTime},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+#endif
+#ifdef MUC_OPCUA_CU_BASE_INFO_SELECTION_LIST
+    /* OPC-10000-5 §7.18, OPC-10000-7 CU 2711: SelectionListType (16309),
+     * subtype of BaseDataVariableType (63). */
+    {{0, MU_NODEID_NUMERIC, {MU_NODEID_SELECTIONLISTTYPE}},
+     MU_NODECLASS_VARIABLETYPE,
+     {17, s_str_SelectionListType},
+     {17, s_str_SelectionListType},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0}},
+#endif
+#if MUC_OPCUA_CU_ADDRESS_SPACE_INTERFACES
+    /* OPC-10000-5 §6.9, OPC-10000-7 CU 3560: BaseInterfaceType ObjectType,
+     * subtype of BaseObjectType (58). */
+    {{0, MU_NODEID_NUMERIC, {17602}},
+     MU_NODECLASS_OBJECTTYPE,
+     {17, s_str_BaseInterfaceType},
+     {17, s_str_BaseInterfaceType},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0}},
+    /* OPC-10000-5 §11.20, OPC-10000-7 CU 3560: HasInterface ReferenceType,
+     * subtype of NonHierarchicalReferences (32). */
+    {{0, MU_NODEID_NUMERIC, {17603}},
+     MU_NODECLASS_REFERENCETYPE,
+     {12, s_str_HasInterface},
+     {12, s_str_HasInterface},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0}},
+#endif
+#if MUC_OPCUA_CU_ADDRESS_SPACE_ADDIN_REFERENCE
+    /* OPC-10000-5 §11.21, OPC-10000-7 CU 2446: HasAddIn ReferenceType (17604),
+     * subtype of NonHierarchicalReferences (32). */
+    {{0, MU_NODEID_NUMERIC, {17604}},
+     MU_NODECLASS_REFERENCETYPE,
+     {8, s_str_HasAddIn},
+     {8, s_str_HasAddIn},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0}},
+#endif
+#ifdef MUC_OPCUA_CU_ADDRESS_SPACE_ADDIN_DEFAULTINSTANCEBROWSENAME
+    /* OPC-10000-7 CU 2447: ObjectTypes may carry DefaultInstanceBrowseName
+     * (i=17605) to define the default BrowseName for their instances. */
+    {{0, MU_NODEID_NUMERIC, {17605}},
+     MU_NODECLASS_VARIABLE,
+     {25, s_str_DefaultInstanceBrowseName},
+     {25, s_str_DefaultInstanceBrowseName},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+#endif
+#if MUC_OPCUA_CU_BASE_INFO_LOCALTIME
+    /* OPC-10000-5 §6.3.1: Server.LocalTime (i=17634) is a Property using
+     * TimeZoneDataType (i=8912); this node model records PropertyType (i=68). */
+    {{0, MU_NODEID_NUMERIC, {17634}},
+     MU_NODECLASS_VARIABLE,
+     {9, s_str_LocalTime},
+     {9, s_str_LocalTime},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+#endif
+#if MUC_OPCUA_CU_ADDRESS_SPACE_INTERFACES
+    /* OPC UA NodeIds.csv: InterfaceTypes Folder (i=17708), organized by Types (86). */
+    {{0, MU_NODEID_NUMERIC, {17708}},
+     MU_NODECLASS_OBJECT,
+     {14, s_str_InterfaceTypes},
+     {14, s_str_InterfaceTypes},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {61}}},
+#endif
+#ifdef MUC_OPCUA_CU_BASE_INFO_CURRENCY
+    /* OPC-10000-5 §12.2.12.2, OPC-10000-7 CU 5240: CurrencyUnitType (23498),
+     * subtype of Structure (22), with its Default Binary encoding Object (23507). */
+    {{0, MU_NODEID_NUMERIC, {MU_NODEID_CURRENCYUNITTYPE}},
+     MU_NODECLASS_DATATYPE,
+     {16, s_str_CurrencyUnitType},
+     {16, s_str_CurrencyUnitType},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0}},
+    {{0, MU_NODEID_NUMERIC, {23507}},
+     MU_NODECLASS_OBJECT,
+     {14, s_str_Default_Binary},
+     {14, s_str_Default_Binary},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {76}}},
+    /* OPC-10000-7 CU 5240: DataVariables representing currency may carry a
+     * CurrencyUnit Property. OPC-10000-5 §12.2.12.2 defines it by BrowseName;
+     * no single global numeric NodeId is assigned, so expose the declaration
+     * with a stable string NodeId and PropertyType (68). */
+    {{0, MU_NODEID_STRING, {.string = {12, s_str_CurrencyUnit}}},
+     MU_NODECLASS_VARIABLE,
+     {12, s_str_CurrencyUnit},
+     {12, s_str_CurrencyUnit},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+#endif
+#ifdef MUC_OPCUA_CU_BASE_INFO_LOCATIONS_OBJECT
+    /* OPC-10000-5 §8.2.12, OPC-10000-7 CU 4053: Locations Folder (i=31915),
+     * organized by Objects (85), with FolderType (61). */
+    {{0, MU_NODEID_NUMERIC, {31915}},
+     MU_NODECLASS_OBJECT,
+     {9, s_str_Locations},
+     {9, s_str_Locations},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {61}}},
+#endif
 #if MUC_OPCUA_CU_REDUNDANCY || MUC_OPCUA_MARKER_STANDARD_PROFILE
     {{0, MU_NODEID_NUMERIC, {2296}},
      MU_NODECLASS_OBJECT,
@@ -1321,7 +1890,6 @@ static const mu_node_t s_base_nodes[] = {
      NULL,
      .type_definition = {0, MU_NODEID_NUMERIC, {2034u}}},
 #endif
-
 };
 #endif
 

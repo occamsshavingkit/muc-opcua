@@ -143,6 +143,20 @@ if(MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER)
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_BASE_TYPE_SYSTEM=1)
 endif()
 
+# -- Define-only nano/type-system CUs backed by base_nodes.c / public flags --
+if(MUC_OPCUA_CU_ADDRESS_SPACE_ADDIN_REFERENCE)
+    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_CU_ADDRESS_SPACE_ADDIN_REFERENCE=1)
+endif()
+if(MUC_OPCUA_CU_BASE_INFO_LOCALTIME)
+    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_CU_BASE_INFO_LOCALTIME=1)
+endif()
+if(MUC_OPCUA_CU_ADDRESS_SPACE_ATOMICITY)
+    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_CU_ADDRESS_SPACE_ATOMICITY=1)
+endif()
+if(MUC_OPCUA_CU_ADDRESS_SPACE_NONVOLATILE_CONSTANT)
+    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_CU_ADDRESS_SPACE_NONVOLATILE_CONSTANT=1)
+endif()
+
 # -- CU: Subscription Basic (Micro profile data-change engine) --
 # Sources live under src/cu/core_2022_server/subscription/basic/; pubsub/uadp
 # files at the same level are excluded here and gated separately by CU_PUBSUB.

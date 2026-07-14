@@ -62,6 +62,7 @@ This document maps implementation and test files back to OPC UA normative sectio
 | `src/services/query.c` | Query | OPC-10000-4 | B.2.3, B.2.4, 7.9 | QueryFirst processing and QueryNext continuation-point validation |
 | `src/services/discovery.c` | Discovery | OPC-10000-4 | 5.5.2.2, 5.5.4.2, 7.40.2.1 | FindServers/GetEndpoints endpoint metadata and user identity token advertisement |
 | `src/services/history.c` | Historical Access | OPC-10000-4 / OPC-10000-6 | 5.11.3.2, 7.9 / 5.2.2.15 | HistoryRead details ExtensionObject bounds and owned continuation-point storage |
+| `src/services/history_memstore.c` | Historical Access Test Adapter | OPC-10000-4 / OPC-10000-11 | 5.11.3.2 / 6.4 | Caller-owned in-memory history adapter for HistoryRead and HistoryUpdate test/reference storage |
 | `src/services/session.c` | Session | OPC-10000-4 | 5.7.2.1, 5.7.2.2, 5.7.2.3, 5.7.3, 7.38.2 | Session token/nonce generation, SecureChannel binding, and session StatusCodes |
 | `src/services/subscription_monitor.c` | Subscription MonitoredItem sampling + deadband | OPC-10000-4 | 5.13, 7.21, 7.22.2 | Monitored item lifecycle, sampling, deadband, and queue functions |
 | `src/services/subscription_publish/publish.c` | Subscription publish cycle | OPC-10000-4 / OPC-10000-6 | 5.13, 5.14, 5.14.5.1, 7.20.1, 7.22.1 | Publish response encoding and publish timer |
@@ -223,6 +224,7 @@ This document maps implementation and test files back to OPC UA normative sectio
 | `browse.h` | Traceability mapped | OPC UA Part 4 / 6 | 5.5.4.2, 5.7, 5.11, 5.13, 5.14 / 5.2, 6.7, 7.2 | Placeholder replaced; see feature-specific rows and tests for exact service/encoding coverage |
 | `services/alarms_conditions.h` | Alarms and Conditions | Part 9 | 5.11 | Advanced alarms and conditions |
 | `services/history.h` | Historical Access | Part 4 / 11 | 5.10.3, 5.10.4 | Historical Access structures and types |
+| `services/history_memstore.h` | Historical Access Test Adapter | Part 4 / 11 | 5.10.3, 5.10.4 | In-memory history adapter declarations for tests and examples |
 | `session.c` | Traceability mapped | OPC UA Part 4 / 6 | 5.5.4.2, 5.7, 5.11, 5.13, 5.14 / 5.2, 6.7, 7.2 | Placeholder replaced; see feature-specific rows and tests for exact service/encoding coverage |
 | `read.c` | Traceability mapped | OPC UA Part 4 / 6 | 5.5.4.2, 5.7, 5.11, 5.13, 5.14 / 5.2, 6.7, 7.2 | Placeholder replaced; see feature-specific rows and tests for exact service/encoding coverage |
 | `write.h` | Attribute Write | Part 4 | 5.10.4 | Write service interface |
