@@ -140,13 +140,13 @@
 /* Server Nano Core Type System & Base Info NodeIds (OPC-10000-5).
  * Consumed by the optional CU implementations in base_nodes.c; each is
  * gated by its corresponding MUC_OPCUA_CU_* Kconfig symbol. */
-#define MU_NODEID_TIMEZONEDATATYPE  8912  /* TimeZoneDataType DataType, OPC-10000-5 §12.2.12.11 */
-#define MU_NODEID_OPTIONSETTYPE     11487 /* OptionSetType VariableType, OPC-10000-5 §7.17 */
+#define MU_NODEID_TIMEZONEDATATYPE 8912   /* TimeZoneDataType DataType, OPC-10000-5 §12.2.12.11 */
+#define MU_NODEID_OPTIONSETTYPE 11487     /* OptionSetType VariableType, OPC-10000-5 §7.17 */
 #define MU_NODEID_SELECTIONLISTTYPE 16309 /* SelectionListType VariableType, OPC-10000-5 §7.18 */
 #define MU_NODEID_BASEINTERFACETYPE 17602 /* BaseInterfaceType ObjectType, OPC-10000-5 §6.9 */
-#define MU_NODEID_HASINTERFACE      17603 /* HasInterface ReferenceType, OPC-10000-5 §11.20 */
-#define MU_NODEID_HASADDIN          17604 /* HasAddIn ReferenceType, OPC-10000-5 §11.21 */
-#define MU_NODEID_CURRENCYUNITTYPE  23498 /* CurrencyUnitType DataType, OPC-10000-5 §12.2.12.2 */
+#define MU_NODEID_HASINTERFACE 17603      /* HasInterface ReferenceType, OPC-10000-5 §11.20 */
+#define MU_NODEID_HASADDIN 17604          /* HasAddIn ReferenceType, OPC-10000-5 §11.21 */
+#define MU_NODEID_CURRENCYUNITTYPE 23498  /* CurrencyUnitType DataType, OPC-10000-5 §12.2.12.2 */
 
 /* T002 lookup outcome (OPC-10000-5 via opc-ua-reference MCP, 2026-07).
  * The following instance-declaration / folder NodeIds are NOT numerically

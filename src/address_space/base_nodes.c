@@ -108,7 +108,7 @@ static const opcua_byte_t s_str_ServerType[] = "ServerType";
 static const opcua_byte_t s_str_State[] = "State";
 static const opcua_byte_t s_str_StatusCode[] = "StatusCode";
 static const opcua_byte_t s_str_String[] = "String";
-#if MUC_OPCUA_CU_BASE_INFO_LOCALTIME || defined(MUC_OPCUA_CU_BASE_INFO_ENGINEERING_UNITS) ||                             \
+#if MUC_OPCUA_CU_BASE_INFO_LOCALTIME || defined(MUC_OPCUA_CU_BASE_INFO_ENGINEERING_UNITS) ||                           \
     defined(MUC_OPCUA_CU_BASE_INFO_CURRENCY)
 static const opcua_byte_t s_str_Structure[] = "Structure";
 #endif
@@ -268,13 +268,13 @@ static const mu_reference_t s_base_data_type_refs[] = {
     {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {19}}, true},
     {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {20}}, true},
     {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {21}}, true},
-#if MUC_OPCUA_CU_BASE_INFO_LOCALTIME || defined(MUC_OPCUA_CU_BASE_INFO_ENGINEERING_UNITS) ||                             \
+#if MUC_OPCUA_CU_BASE_INFO_LOCALTIME || defined(MUC_OPCUA_CU_BASE_INFO_ENGINEERING_UNITS) ||                           \
     defined(MUC_OPCUA_CU_BASE_INFO_CURRENCY)
     {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {22}}, true}
 #endif
 };
 
-#if MUC_OPCUA_CU_BASE_INFO_LOCALTIME || defined(MUC_OPCUA_CU_BASE_INFO_ENGINEERING_UNITS) ||                             \
+#if MUC_OPCUA_CU_BASE_INFO_LOCALTIME || defined(MUC_OPCUA_CU_BASE_INFO_ENGINEERING_UNITS) ||                           \
     defined(MUC_OPCUA_CU_BASE_INFO_CURRENCY)
 static const mu_reference_t s_structure_refs[] = {
 #ifdef MUC_OPCUA_CU_BASE_INFO_ENGINEERING_UNITS
@@ -317,12 +317,9 @@ static const mu_reference_t s_base_interface_type_refs[] = {
 static const mu_reference_t s_has_interface_refs[] = {
     {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {32}}, false}};
 
-static const mu_reference_t s_interface_types_refs[] = {{{0, MU_NODEID_NUMERIC, {35}},
-                                                        {0, MU_NODEID_NUMERIC, {86}},
-                                                        false},
-                                                       {{0, MU_NODEID_NUMERIC, {40}},
-                                                        {0, MU_NODEID_NUMERIC, {61}},
-                                                        true}};
+static const mu_reference_t s_interface_types_refs[] = {
+    {{0, MU_NODEID_NUMERIC, {35}}, {0, MU_NODEID_NUMERIC, {86}}, false},
+    {{0, MU_NODEID_NUMERIC, {40}}, {0, MU_NODEID_NUMERIC, {61}}, true}};
 #endif
 
 static const mu_reference_t s_base_variable_type_refs[] = {
@@ -469,24 +466,25 @@ static const mu_value_source_t s_resend_input_value = {
 
 #endif
 
-static const mu_reference_t s_server_refs[] = {{{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {2254}}, true},
-                                               {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {2255}}, true},
-                                               {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {2256}}, true},
-                                               {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {2268}}, true},
+static const mu_reference_t s_server_refs[] = {
+    {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {2254}}, true},
+    {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {2255}}, true},
+    {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {2256}}, true},
+    {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {2268}}, true},
 #if MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER && MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
-                                               {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {11492}}, true},
-                                               {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {12873}}, true},
+    {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {11492}}, true},
+    {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {12873}}, true},
 #endif
 #ifdef MUC_OPCUA_CU_BASE_INFO_ESTIMATED_RETURN_TIME
-                                               /* OPC-10000-5 §6.3.1, OPC-10000-7 CU 3198: Server.EstimatedReturnTime Property. */
-                                               {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {12885}}, true},
+    /* OPC-10000-5 §6.3.1, OPC-10000-7 CU 3198: Server.EstimatedReturnTime Property. */
+    {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {12885}}, true},
 #endif
 #if MUC_OPCUA_CU_BASE_INFO_LOCALTIME
-                                               /* OPC-10000-5 §6.3.1: Server.LocalTime Property. */
-                                               {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {17634}}, true},
+    /* OPC-10000-5 §6.3.1: Server.LocalTime Property. */
+    {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {17634}}, true},
 #endif
 #if MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER
-                                               {{0, MU_NODEID_NUMERIC, {40}}, {0, MU_NODEID_NUMERIC, {2004}}, true}
+    {{0, MU_NODEID_NUMERIC, {40}}, {0, MU_NODEID_NUMERIC, {2004}}, true}
 #endif
 };
 
@@ -716,7 +714,7 @@ static const mu_node_t s_base_nodes[] = {
      0,
      NULL,
      .type_definition = {0}},
-#if MUC_OPCUA_CU_BASE_INFO_LOCALTIME || defined(MUC_OPCUA_CU_BASE_INFO_ENGINEERING_UNITS) ||                             \
+#if MUC_OPCUA_CU_BASE_INFO_LOCALTIME || defined(MUC_OPCUA_CU_BASE_INFO_ENGINEERING_UNITS) ||                           \
     defined(MUC_OPCUA_CU_BASE_INFO_CURRENCY)
     {{0, MU_NODEID_NUMERIC, {22}},
      MU_NODECLASS_DATATYPE,
@@ -1483,8 +1481,8 @@ static const mu_node_t s_base_nodes[] = {
      {14, s_str_InterfaceTypes},
      s_interface_types_refs,
      sizeof(s_interface_types_refs) / sizeof(s_interface_types_refs[0]),
-      NULL,
-      .type_definition = {0, MU_NODEID_NUMERIC, {61}}},
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {61}}},
 #endif
 #ifdef MUC_OPCUA_CU_BASE_INFO_LOCATIONS_OBJECT
     /* OPC-10000-5 §8.2.12, OPC-10000-7 CU 4053: Locations Folder (i=31915),
@@ -1513,10 +1511,10 @@ static const mu_node_t s_base_nodes[] = {
      MU_NODECLASS_OBJECT,
      {14, s_str_Default_Binary},
      {14, s_str_Default_Binary},
-      NULL,
-      0,
-      NULL,
-      .type_definition = {0, MU_NODEID_NUMERIC, {76}}},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {76}}},
     /* OPC-10000-7 CU 5240: DataVariables representing currency may carry a
      * CurrencyUnit Property. OPC-10000-5 §12.2.12.2 defines it by BrowseName;
      * no single global numeric NodeId is assigned, so expose the declaration
@@ -1721,10 +1719,10 @@ static const mu_node_t s_base_nodes[] = {
      MU_NODECLASS_VARIABLE,
      {9, s_str_LocalTime},
      {9, s_str_LocalTime},
-      NULL,
-      0,
-      NULL,
-      .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
 #endif
 #ifdef MUC_OPCUA_CU_BASE_INFO_LOCATIONS_OBJECT
     /* OPC-10000-5 §8.2.12, OPC-10000-7 CU 4053: Locations Folder (i=31915),

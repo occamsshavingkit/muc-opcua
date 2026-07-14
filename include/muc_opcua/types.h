@@ -224,7 +224,7 @@ typedef struct {
    Set these bits in a Variable's AccessLevelEx Attribute when Read or Write
    operations on that Variable cannot be guaranteed atomic. When the bit is '1',
    atomicity is not assured. */
-#define MU_ACCESS_LEVEL_EX_NONATOMIC_READ  (1u << 1)
+#define MU_ACCESS_LEVEL_EX_NONATOMIC_READ (1u << 1)
 #define MU_ACCESS_LEVEL_EX_NONATOMIC_WRITE (1u << 0)
 #endif /* MUC_OPCUA_CU_ADDRESS_SPACE_ATOMICITY */
 
@@ -241,7 +241,7 @@ typedef struct {
    and Constant). Set these bits in a Variable's AccessLevelEx Attribute to
    indicate persisted values and configuration-version-relevant constants. */
 #define MU_ACCESS_LEVEL_EX_NON_VOLATILE (1u << 12)
-#define MU_ACCESS_LEVEL_EX_CONSTANT     (1u << 13)
+#define MU_ACCESS_LEVEL_EX_CONSTANT (1u << 13)
 #endif /* MUC_OPCUA_CU_ADDRESS_SPACE_NONVOLATILE_CONSTANT */
 
 #endif /* MUC_OPCUA_TYPES_H */

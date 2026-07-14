@@ -6,22 +6,21 @@ static mu_history_memstore_t *store(void *context) {
     return (mu_history_memstore_t *)context;
 }
 
-opcua_statuscode_t mu_memstore_read_raw_modified(
-    void *context, const mu_nodeid_t *node_id, opcua_boolean_t is_read_modified,
-    opcua_datetime_t start_time, opcua_datetime_t end_time,
-    opcua_uint32_t num_values_per_node, opcua_boolean_t return_bounds,
-    const opcua_byte_t *cp_in, size_t cp_in_length,
-    opcua_byte_t *cp_out, size_t *cp_out_length,
-    mu_historical_data_point_t *data_points, size_t max_data_points,
-    size_t *actual_data_points)
-{
+opcua_statuscode_t mu_memstore_read_raw_modified(void *context, const mu_nodeid_t *node_id,
+                                                 opcua_boolean_t is_read_modified, opcua_datetime_t start_time,
+                                                 opcua_datetime_t end_time, opcua_uint32_t num_values_per_node,
+                                                 opcua_boolean_t return_bounds, const opcua_byte_t *cp_in,
+                                                 size_t cp_in_length, opcua_byte_t *cp_out, size_t *cp_out_length,
+                                                 mu_historical_data_point_t *data_points, size_t max_data_points,
+                                                 size_t *actual_data_points) {
     (void)node_id;
     (void)is_read_modified;
     (void)return_bounds;
     mu_history_memstore_t *s = store(context);
     size_t written = 0;
 
-    if (cp_out_length) *cp_out_length = 0;
+    if (cp_out_length)
+        *cp_out_length = 0;
 
     /* Continuation point: skip past previously-returned points */
     size_t skip = 0;
@@ -29,13 +28,14 @@ opcua_statuscode_t mu_memstore_read_raw_modified(
         memcpy(&skip, cp_in, sizeof(size_t));
     }
 
-    size_t per_page = (num_values_per_node > 0 && num_values_per_node < max_data_points)
-                          ? num_values_per_node
-                          : max_data_points;
+    size_t per_page =
+        (num_values_per_node > 0 && num_values_per_node < max_data_points) ? num_values_per_node : max_data_points;
 
     for (size_t i = skip; i < s->count && written < per_page; i++) {
-        if (s->points[i].source_timestamp < start_time) continue;
-        if (s->points[i].source_timestamp > end_time) continue;
+        if (s->points[i].source_timestamp < start_time)
+            continue;
+        if (s->points[i].source_timestamp > end_time)
+            continue;
         memcpy(&data_points[written], &s->points[i], sizeof(mu_historical_data_point_t));
         written++;
     }
@@ -51,12 +51,10 @@ opcua_statuscode_t mu_memstore_read_raw_modified(
     return MU_STATUS_GOOD;
 }
 
-opcua_statuscode_t mu_memstore_update_data(
-    void *context, const mu_nodeid_t *node_id,
-    opcua_uint32_t perform_insert_replace,
-    const mu_historical_data_point_t *data_points, size_t data_points_count,
-    opcua_statuscode_t *results)
-{
+opcua_statuscode_t mu_memstore_update_data(void *context, const mu_nodeid_t *node_id,
+                                           opcua_uint32_t perform_insert_replace,
+                                           const mu_historical_data_point_t *data_points, size_t data_points_count,
+                                           opcua_statuscode_t *results) {
     (void)node_id;
     mu_history_memstore_t *s = store(context);
 
@@ -78,7 +76,7 @@ opcua_statuscode_t mu_memstore_update_data(
                 }
             }
             results[i] = MU_STATUS_BAD_ENTRYEXISTS;
-            replaced:;
+        replaced:;
         } else {
             results[i] = MU_STATUS_BAD_INVALIDARGUMENT;
         }
@@ -86,11 +84,9 @@ opcua_statuscode_t mu_memstore_update_data(
     return MU_STATUS_GOOD;
 }
 
-opcua_statuscode_t mu_memstore_delete_raw_modified(
-    void *context, const mu_nodeid_t *node_id,
-    opcua_boolean_t is_delete_modified,
-    opcua_datetime_t start_time, opcua_datetime_t end_time)
-{
+opcua_statuscode_t mu_memstore_delete_raw_modified(void *context, const mu_nodeid_t *node_id,
+                                                   opcua_boolean_t is_delete_modified, opcua_datetime_t start_time,
+                                                   opcua_datetime_t end_time) {
     (void)node_id;
     (void)is_delete_modified;
     mu_history_memstore_t *s = store(context);
@@ -98,8 +94,7 @@ opcua_statuscode_t mu_memstore_delete_raw_modified(
     size_t deleted = 0;
 
     for (size_t i = 0; i < s->count; i++) {
-        if (s->points[i].source_timestamp >= start_time &&
-            s->points[i].source_timestamp <= end_time) {
+        if (s->points[i].source_timestamp >= start_time && s->points[i].source_timestamp <= end_time) {
             deleted++;
         } else {
             if (write != i) {
