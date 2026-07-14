@@ -45,6 +45,7 @@ engines:
       # Callback-shaped history adapter matches the public HistoryRead function
       # signature; parameter-count warnings are not actionable here.
       - 'src/services/history_memstore.c'
+      - 'include/muc_opcua/services/history_memstore.h'
 
   # Markdown link-fragment checks.  Docs links may point to sections that
   # exist in the rendered output but are generated, not in raw Markdown.
@@ -54,6 +55,10 @@ engines:
       # Spec Kit artifacts are generated planning documents. Their table and
       # line-length style does not affect shipped documentation or code quality.
       - 'specs/**'
+      # Generated conformance matrices intentionally contain long table cells
+      # for OPC references and profile/test lists.
+      - 'docs/conformance/opc-profile-roadmap.md'
+      - 'tests/conformance/claim_test_map.md'
 
   # Shell scripts under scripts/ are CI infrastructure; pipeline warnings
   # are not deployment-relevant.

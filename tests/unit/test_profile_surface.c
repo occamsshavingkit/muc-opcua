@@ -17,8 +17,6 @@
 #include "muc_opcua/muc_opcua.h"
 #include "unity.h"
 
-#include <string.h>
-
 #include "../../src/core/server_internal.h"
 #include "../../src/core/service_dispatch.h"
 
@@ -39,9 +37,9 @@ static const mu_node_t *base_find(opcua_uint32_t numeric) {
     return mu_address_space_find_node(bs, (mu_address_space_index_t *)0, &id);
 }
 
-static const mu_node_t *base_find_string(const char *text) {
+static const mu_node_t *base_find_string(const char *text, opcua_int32_t text_length) {
     const mu_address_space_t *bs = mu_base_address_space();
-    mu_nodeid_t id = {0, MU_NODEID_STRING, {.string = {(opcua_int32_t)strlen(text), (const opcua_byte_t *)text}}};
+    mu_nodeid_t id = {0, MU_NODEID_STRING, {.string = {text_length, (const opcua_byte_t *)text}}};
     return mu_address_space_find_node(bs, (mu_address_space_index_t *)0, &id);
 }
 
@@ -79,9 +77,10 @@ void test_claimed_cu_nodes_present_when_enabled(void) {
     TEST_ASSERT_NOT_NULL(base_find(887)); /* EUInformation */
 #endif
 #if defined(MUC_OPCUA_CU_BASE_INFO_CURRENCY)
-    TEST_ASSERT_NOT_NULL(base_find(23498));                 /* CurrencyUnitType */
-    TEST_ASSERT_NOT_NULL(base_find(23507));                 /* Default Binary */
-    TEST_ASSERT_NOT_NULL(base_find_string("CurrencyUnit")); /* CurrencyUnit */
+    TEST_ASSERT_NOT_NULL(base_find(23498)); /* CurrencyUnitType */
+    TEST_ASSERT_NOT_NULL(base_find(23507)); /* Default Binary */
+    TEST_ASSERT_NOT_NULL(
+        base_find_string("CurrencyUnit", (opcua_int32_t)(sizeof("CurrencyUnit") - 1u))); /* CurrencyUnit */
 #endif
 }
 #else

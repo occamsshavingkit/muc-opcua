@@ -32,8 +32,9 @@ opcua_statuscode_t mu_memstore_read_raw_modified(void *context, const mu_nodeid_
     mu_history_memstore_t *s = store(context);
     size_t written = 0;
 
-    if (cp_out_length)
+    if (cp_out_length) {
         *cp_out_length = 0;
+    }
 
     /* Continuation point: skip past previously-returned points */
     size_t skip = 0;
@@ -46,8 +47,9 @@ opcua_statuscode_t mu_memstore_read_raw_modified(void *context, const mu_nodeid_
 
     size_t scan = skip;
     for (; scan < s->count && written < per_page; scan++) {
-        if (!point_in_range(&s->points[scan], start_time, end_time))
+        if (!point_in_range(&s->points[scan], start_time, end_time)) {
             continue;
+        }
         memcpy(&data_points[written], &s->points[scan], sizeof(mu_historical_data_point_t));
         written++;
     }
