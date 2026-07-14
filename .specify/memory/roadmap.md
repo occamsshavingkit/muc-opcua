@@ -1,28 +1,19 @@
 <!--
 SYNC IMPACT REPORT
 ==================
-Version change: 1.1.2 → 1.1.3
-Bump rationale: PATCH — added 4 missing CUs from OPC API to manifest and
-roadmap; resolved Q7; recount from 100→104 genuinely unimplemented CUs.
+Version change: 1.1.3 → 1.1.4
+Bump rationale: PATCH — reconciled spec 005 status/pointer after the Nano Core
+Type System & Base Info CU implementation merged as PR #305.
 
 Changes this revision:
-  - Resolved Q7: 4 genuinely new CUs added to manifest and scope-in lists
-    (3080 Security Default ApplicationInstance Certificate — mandatory;
-    3201 Base Info Custom Type System — optional; 5592 Base Info
-    Engineering Units — optional; 5814 Security – No Application
-    Authentication — optional). 3721 (ECC Policy) is DUP. 2371/2837/2853
-    are already claimed via Kconfig symbols.
-  - Updated CU counts: nano 34→38, micro 9→13, embedded 56→57, standard 1
-    — 104 total (was 100).
-  - Added 3080 to spec 007 scope-in; 3201 and 5592 to spec 005 scope-in;
-    5814 to spec 007 scope-in.
-  - nano mandatory count: 5→6 (adding 3080).
-  - Updated manifest with cu_optional flags from OPC API for all 110
-    previously-existing CUs + 4 new entries.
+  - Marked roadmap spec 005 as implemented.
+  - Updated spec 005's spec directory pointer from "not yet created" to
+    `specs/069-nano-type-system/`.
+  - Recorded PR #305 and merge commit a6fbaaf as the implementation evidence.
 
-Specs affected: 005, 007 (scope-in lists expanded)
+Specs affected: 005
 Open questions added: none
-Open questions resolved: Q7
+Open questions resolved: none
 -->
 
 # muc-opcua — Spec Roadmap
@@ -196,16 +187,18 @@ with `implementation_state: unimplemented` and `kconfig_symbol: null`. Grouped b
 lowest-profile-default (a CU that defaults on in nano and all higher profiles is
 listed under nano).
 
-CU counts (deduplicated, API-verified): nano 38, micro 13, embedded 57, standard 1 — 104 total.
+CU counts (deduplicated, API-verified): nano 38, micro 13, embedded 57,
+standard 1 — 104 total.
 
 > **Deduplication and API enrichment complete (2026-07-13):**
+>
 > - 10 CUs matched claimed entries with `MUC_OPCUA_CU_*` Kconfig symbols (Q4).
 > - `cu_optional` flags added to all 110 previously-existing unimplemented CUs
 >   from `profiles.opcfoundation.org/api/profile/includedconformanceunits/`.
 > - 4 genuinely new CUs added from OPC API that were missing from the manifest
 >   (Q7): 3080, 3201, 5592, 5814.
 
-### 005 — Server: Nano Core Type System & Base Info CUs  [status: planned]
+### 005 — Server: Nano Core Type System & Base Info CUs  [status: implemented]
 
 - **Description:** Implements the ~14 genuinely new Exposes Type System and
   Base Info CUs required by the Core 2022 Server Facet at the nano tier (8
@@ -241,12 +234,14 @@ CU counts (deduplicated, API-verified): nano 38, micro 13, embedded 57, standard
 - **Depends on:** none (existing address space infrastructure in
   `src/address_space/base_nodes.c`)
 - **Governed by:** C-05, C-06, C-07, C-08; ADR-0003
-- **Spec dir:** _not yet created_
+- **Spec dir:** `specs/069-nano-type-system/`
 - **Notes:** Most of these CUs are "expose type node in address space" tasks —
   adding static Node entries to `base_nodes.c` with correct NodeIds,
   BrowseNames, and type definitions per OPC-10000-3 §4 and OPC-10000-5.
   Existing `base_nodes.c` infrastructure already supports this pattern.
-  Estimated flash impact ~1-3 KB for static tables.
+  Estimated flash impact ~1-3 KB for static tables. Implemented by PR #305
+  (`069-nano-type-system`), merged 2026-07-14 at merge commit `a6fbaaf` after
+  CI, Codacy, and CodeRabbit passed.
 
 ### 006 — Server: Nano Core Service Behaviour CUs  [status: planned]
 
@@ -501,12 +496,12 @@ CU counts (deduplicated, API-verified): nano 38, micro 13, embedded 57, standard
   - `opc_cu_3175` Session Base ← `MUC_OPCUA_CU_SESSION_BASE`
   - `opc_cu_3985` Session General Service Behaviour ← `MUC_OPCUA_CU_SESSION_GENERAL_SERVICE`
   - `opc_cu_3727` Subscription Basic ← `MUC_OPCUA_CU_SUBSCRIPTION_BASIC`
-  
-  Real unimplemented count: **100 CUs** (nano 34, micro 9, embedded 56, standard 1).
+  Real unimplemented count: **100 CUs** (nano 34, micro 9, embedded 56,
+  standard 1).
 
 - **Q5 — Size envelope per tier** [resolved 2026-07-13, data from
   `profiles.opcfoundation.org/api/profile/includedconformanceunits/2266/`]:
-  
+
   Current nano baseline `elf_text` = 27,080 bytes (`scripts/measure_size.sh nano`).
   
   **Authoritative OPC data** (API query 2026-07-13 for nano profile ID 2266):
@@ -564,4 +559,4 @@ CU counts (deduplicated, API-verified): nano 38, micro 13, embedded 57, standard
 
 ---
 
-**Version**: 1.1.3 | **Ratified**: 2026-07-07 | **Last Amended**: 2026-07-13
+**Version**: 1.1.4 | **Ratified**: 2026-07-07 | **Last Amended**: 2026-07-14
