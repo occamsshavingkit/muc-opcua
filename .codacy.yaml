@@ -42,12 +42,18 @@ engines:
       - 'benchmark/**'
       - 'scripts/**'
       - 'examples/**'
+      # Callback-shaped history adapter matches the public HistoryRead function
+      # signature; parameter-count warnings are not actionable here.
+      - 'src/services/history_memstore.c'
 
   # Markdown link-fragment checks.  Docs links may point to sections that
   # exist in the rendered output but are generated, not in raw Markdown.
   markdownlint:
     exclude_paths:
       - '**/traceability/**'
+      # Spec Kit artifacts are generated planning documents. Their table and
+      # line-length style does not affect shipped documentation or code quality.
+      - 'specs/**'
 
   # Shell scripts under scripts/ are CI infrastructure; pipeline warnings
   # are not deployment-relevant.
