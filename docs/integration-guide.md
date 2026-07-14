@@ -713,6 +713,14 @@ The authoritative conformance reference is
 - **TrustLists.** If you provide a `config.trust_list` containing peer certificates,
   the server will reject any SecureChannel Open requests using a certificate not explicitly in that list.
   If left `NULL`, the server relies on the application handling authentication elsewhere (not recommended).
+- **No Application Authentication option.** `config.allow_untrusted_clients = true`
+  disables trust-list enforcement for non-None SecurityPolicies. This is the
+  project's explicit No Application Authentication configuration: secured
+  channels can be opened by clients whose ApplicationInstanceCertificate is not
+  present in `config.trust_list`. Use it only for demos, interop, or isolated
+  bring-up with freshly generated client certificates. Production deployments
+  should leave it false and configure `config.trust_list` so unknown application
+  certificates are rejected.
 - **Certificate & key provisioning.** The server's instance certificate (DER) and
   RSA private key are owned entirely by your crypto adapter's `context`; the
   library only requests them through `get_own_certificate` /
@@ -723,6 +731,14 @@ The authoritative conformance reference is
   - *Provisioned* — bake a CA-issued cert/key into the image, a secure element, or
     load them via the persistence adapter. Preferred for production; keep the
     private key in a secure element / PSA key store where possible.
+- **Default ApplicationInstanceCertificate.** During `mu_server_init`, the core
+  validates the certificate returned by the configured crypto adapter before it
+  accepts the server configuration. The host OpenSSL adapter creates a default
+  self-signed RSA-2048 ApplicationInstanceCertificate when
+  `mu_host_crypto_adapter_init` is called, and that adapter-owned certificate is
+  what the initialized server advertises for secure endpoints. Embedded ports may
+  use the same pattern during bring-up, but production firmware should provision
+  a stable application-instance certificate and key.
 - **`application_uri` must match the certificate.** The `application_uri` in your
   config has to equal the URI in the certificate's SubjectAltName, or interoperable
   clients (e.g. the OPC Foundation .NET reference client) reject the session.

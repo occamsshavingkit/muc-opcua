@@ -165,6 +165,123 @@ menuconfig MUC_OPCUA_FACET_CORE_2022_SERVER
 
 if MUC_OPCUA_FACET_CORE_2022_SERVER
 
+config MUC_OPCUA_CU_ADDRESS_SPACE_ADDIN_REFERENCE
+	bool "CU: Address Space AddIn Reference"
+	default y if MUC_OPCUA_INTERN_PROFILE_NANO_EMBEDDED_DEVICE_2025_SERVER
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2446:Address Space AddIn Reference.
+	  Backing tests: test_profile_surface.
+	  Notes: Support the HasAddIn Reference to bind an AddIn to an Object or ObjectType.
+
+config MUC_OPCUA_CU_ADDRESS_SPACE_ADDIN_DEFAULTINSTANCEBROWSENAME
+	bool "CU: Address Space AddIn DefaultInstanceBrowsename"
+	default y if MUC_OPCUA_INTERN_PROFILE_NANO_EMBEDDED_DEVICE_2025_SERVER
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2447:Address Space AddIn DefaultInstanceBrowsename.
+	  Backing tests: test_profile_surface.
+	  Notes: Support the DefaultInstanceBrowseName Property for ObjectTypes.
+
+config MUC_OPCUA_CU_BASE_INFO_LOCALTIME
+	bool "CU: Base Info LocalTime"
+	default y if MUC_OPCUA_INTERN_PROFILE_NANO_EMBEDDED_DEVICE_2025_SERVER
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2476:Base Info LocalTime.
+	  Backing tests: test_profile_surface.
+	  Notes: Exposes local time information by providing the LocalTime Variable on the Server Object. Exposes the TimeZoneDataType, its Encoding Object and all its supertypes in the AddressSpace.
+
+config MUC_OPCUA_CU_BASE_INFO_SELECTION_LIST
+	bool "CU: Base Info Selection List"
+	default y if MUC_OPCUA_INTERN_PROFILE_NANO_EMBEDDED_DEVICE_2025_SERVER
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2711:Base Info Selection List.
+	  Backing tests: test_profile_surface.
+	  Notes: The Server supports Variables of the SelectionListType VariableType.
+
+config MUC_OPCUA_CU_ADDRESS_SPACE_ATOMICITY
+	bool "CU: Address Space Atomicity"
+	default y if MUC_OPCUA_INTERN_PROFILE_NANO_EMBEDDED_DEVICE_2025_SERVER
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2809:Address Space Atomicity.
+	  Backing tests: test_profile_surface.
+	  Notes: Support setting the NonatomicRead and NonatomicWrite flags in the AccessLevelEx Attribute for Variable Nodes to indicate whether Read or Write operations can be performed in atomic manner. If the flags are set to '1', atomicity cannot be assured.
+
+config MUC_OPCUA_CU_ADDRESS_SPACE_FULL_ARRAY_ONLY
+	bool "CU: Address Space Full Array Only"
+	default y if MUC_OPCUA_INTERN_PROFILE_NANO_EMBEDDED_DEVICE_2025_SERVER
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2820:Address Space Full Array Only.
+	  Backing tests: test_profile_surface.
+	  Notes: Support setting the WriteFullArrayOnly flag in the AccessLevelEx Attribute for Variable Nodes of non-scalar data types to indicate whether write operations for an array can be performed with an IndexRange.
+
+config MUC_OPCUA_CU_BASE_INFO_VALUEASTEXT
+	bool "CU: Base Info ValueAsText"
+	default y if MUC_OPCUA_INTERN_PROFILE_NANO_EMBEDDED_DEVICE_2025_SERVER
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2969:Base Info ValueAsText.
+	  Backing tests: test_profile_surface.
+	  Notes: The Server supports the Property ValueAsText for enumerated DataTypes.
+
+config MUC_OPCUA_CU_BASE_INFO_OPTIONSET
+	bool "CU: Base Info OptionSet"
+	default y if MUC_OPCUA_INTERN_PROFILE_NANO_EMBEDDED_DEVICE_2025_SERVER
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3127:Base Info OptionSet.
+	  Backing tests: test_profile_surface.
+	  Notes: The Server supports the VariableType OptionSetType.
+
+config MUC_OPCUA_CU_BASE_INFO_ESTIMATED_RETURN_TIME
+	bool "CU: Base Info Estimated Return Time"
+	default y if MUC_OPCUA_INTERN_PROFILE_NANO_EMBEDDED_DEVICE_2025_SERVER
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3198:Base Info Estimated Return Time.
+	  Backing tests: test_profile_surface.
+	  Notes: Server supports the EstimatedReturnTime Property. It indicates the time at which the Server is expected to have a ServerStatus.State of RUNNING_0. Clients can use this information to govern the reconnect logic.
+
+config MUC_OPCUA_CU_ADDRESS_SPACE_INTERFACES
+	bool "CU: Address Space Interfaces"
+	default y if MUC_OPCUA_INTERN_PROFILE_NANO_EMBEDDED_DEVICE_2025_SERVER
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3560:Address Space Interfaces.
+	  Backing tests: test_profile_surface.
+	  Notes: Support Interfaces and associated rules. Includes exposing the entry point InterfaceTypes and the types BaseInterfaceType and HasInterface and all their supertypes in the AddressSpace.
+
+config MUC_OPCUA_CU_BASE_INFO_LOCATIONS_OBJECT
+	bool "CU: Base Info Locations Object"
+	default y if MUC_OPCUA_INTERN_PROFILE_NANO_EMBEDDED_DEVICE_2025_SERVER
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 4053:Base Info Locations Object.
+	  Backing tests: test_profile_surface.
+	  Notes: Exposes the entry point for different types of locations in the AddressSpace.
+
+config MUC_OPCUA_CU_ADDRESS_SPACE_NONVOLATILE_AND_CONSTANT
+	bool "CU: Address Space NonVolatile and Constant"
+	default y if MUC_OPCUA_INTERN_PROFILE_NANO_EMBEDDED_DEVICE_2025_SERVER
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 4237:Address Space NonVolatile and Constant.
+	  Backing tests: test_profile_surface.
+	  Notes: Support setting the NonVolatile and Constant flags in the AccessLevelEx Attribute for Variable Nodes to indicate whether persistent storage is supported.
+
+config MUC_OPCUA_CU_BASE_INFO_CURRENCY
+	bool "CU: Base Info Currency"
+	default y if MUC_OPCUA_INTERN_PROFILE_NANO_EMBEDDED_DEVICE_2025_SERVER
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5240:Base Info Currency.
+	  Backing tests: test_profile_surface.
+	  Notes: Support the CurrencyUnit Property on DataVariables that represent currency.
+
 config MUC_OPCUA_CU_ADDRESS_SPACE_BASE
 	bool "CU: Address Space Base"
 	default y if MUC_OPCUA_INTERN_PROFILE_NANO_EMBEDDED_DEVICE_2025_SERVER || MUC_OPCUA_PROFILE_CUSTOM
@@ -514,6 +631,15 @@ config MUC_OPCUA_CU_CORE_2017_ATTRIBUTE_WRITE
 	  Backing tests: test_write_service.
 	  Notes: Optional facet; only on full.
 
+config MUC_OPCUA_CU_BASE_INFO_ENGINEERING_UNITS
+	bool "CU: Base Info Engineering Units"
+	default y if MUC_OPCUA_INTERN_PROFILE_NANO_EMBEDDED_DEVICE_2025_SERVER
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5592:Base Info Engineering Units.
+	  Backing tests: test_profile_surface.
+	  Notes: The Server supports defining Variables that include the Engineering Units Property. This property makes use of the EUInformation data structure. This structure by default represents the UN/CEFACT "Codes for Units of Measurement" or the Common Data Dictionary (IEC CDD). If a different EU representation is required then the EUInformation.namespaceUri will indicate the alternate namespace.
+
 # View TranslateBrowsePath (opc_cu_2317)
 #   Implementation state: unimplemented -- visible but not selectable.
 #   Detail: CU 2317:View TranslateBrowsePath.
@@ -550,24 +676,6 @@ comment "Session Change User (NOT IMPLEMENTED)"
 #   Notes: Allow configuration of the following Security related items (when they apply). * select the allowed/used User identification policy or policies (e.g. User Name/Password or X509). * enable/disable or select the security policy "None" or other security policies. * enable/disable or select endpoints with MessageSecurityMode SIGN or SIGNANDENCRYPT. * set the permitted certification authorities. * define how to react to unknown Certificates. * allow accepting any valid Certificate
 comment "Security Administration (NOT IMPLEMENTED)"
 
-# Address Space AddIn Reference (opc_cu_2446)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 2446:Address Space AddIn Reference.
-#   Notes: Support the HasAddIn Reference to bind an AddIn to an Object or ObjectType.
-comment "Address Space AddIn Reference (NOT IMPLEMENTED)"
-
-# Address Space AddIn DefaultInstanceBrowsename (opc_cu_2447)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 2447:Address Space AddIn DefaultInstanceBrowsename.
-#   Notes: Support the DefaultInstanceBrowseName Property for ObjectTypes.
-comment "Address Space AddIn DefaultInstanceBrowsename (NOT IMPLEMENTED)"
-
-# Base Info LocalTime (opc_cu_2476)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 2476:Base Info LocalTime.
-#   Notes: Exposes local time information by providing the LocalTime Variable on the Server Object. Exposes the TimeZoneDataType, its Encoding Object and all its supertypes in the AddressSpace.
-comment "Base Info LocalTime (NOT IMPLEMENTED)"
-
 # Time Sync – OS based support (opc_cu_2478)
 #   Implementation state: unimplemented -- visible but not selectable.
 #   Detail: CU 2478:Time Sync – OS based support.
@@ -592,12 +700,6 @@ comment "Time Sync – IEEE 802.1AS (NOT IMPLEMENTED)"
 #   Notes: Support at least one Security Policy. Support of SecurityPolicy None is recommended for testing and compatibility reasons even if the UA Server supports a more secure policy.
 comment "SecurityPolicy Support (NOT IMPLEMENTED)"
 
-# Base Info Selection List (opc_cu_2711)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 2711:Base Info Selection List.
-#   Notes: The Server supports Variables of the SelectionListType VariableType.
-comment "Base Info Selection List (NOT IMPLEMENTED)"
-
 # Time Sync – NTP (opc_cu_2786)
 #   Implementation state: unimplemented -- visible but not selectable.
 #   Detail: CU 2786:Time Sync – NTP.
@@ -610,29 +712,11 @@ comment "Time Sync – NTP (NOT IMPLEMENTED)"
 #   Notes: Restrict access based on the configured Roles and permissions.
 comment "Security Role Server Authorization (NOT IMPLEMENTED)"
 
-# Address Space Atomicity (opc_cu_2809)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 2809:Address Space Atomicity.
-#   Notes: Support setting the NonatomicRead and NonatomicWrite flags in the AccessLevelEx Attribute for Variable Nodes to indicate whether Read or Write operations can be performed in atomic manner. If the flags are set to '1', atomicity cannot be assured.
-comment "Address Space Atomicity (NOT IMPLEMENTED)"
-
-# Address Space Full Array Only (opc_cu_2820)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 2820:Address Space Full Array Only.
-#   Notes: Support setting the WriteFullArrayOnly flag in the AccessLevelEx Attribute for Variable Nodes of non-scalar data types to indicate whether write operations for an array can be performed with an IndexRange.
-comment "Address Space Full Array Only (NOT IMPLEMENTED)"
-
 # Attribute Write StatusCode & Timestamp (opc_cu_2936)
 #   Implementation state: unimplemented -- visible but not selectable.
 #   Detail: CU 2936:Attribute Write StatusCode & Timestamp.
 #   Notes: Supports writing of StatusCode and Timestamps along with the Value.
 comment "Attribute Write StatusCode & Timestamp (NOT IMPLEMENTED)"
-
-# Base Info ValueAsText (opc_cu_2969)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 2969:Base Info ValueAsText.
-#   Notes: The Server supports the Property ValueAsText for enumerated DataTypes.
-comment "Base Info ValueAsText (NOT IMPLEMENTED)"
 
 # Attribute Read (opc_cu_3072)
 #   Implementation state: unimplemented -- visible but not selectable.
@@ -645,12 +729,6 @@ comment "Attribute Read (NOT IMPLEMENTED)"
 #   Detail: CU 3073:View RegisterNodes.
 #   Notes: Support the RegisterNodes and UnregisterNodes Services as a way to optimize access to repeatedly used Nodes in the Server's OPC UA AddressSpace.
 comment "View RegisterNodes (NOT IMPLEMENTED)"
-
-# Base Info OptionSet (opc_cu_3127)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 3127:Base Info OptionSet.
-#   Notes: The Server supports the VariableType OptionSetType.
-comment "Base Info OptionSet (NOT IMPLEMENTED)"
 
 # Attribute Write Index (opc_cu_3147)
 #   Implementation state: unimplemented -- visible but not selectable.
@@ -682,12 +760,6 @@ comment "Base Info Core Views Folder (NOT IMPLEMENTED)"
 #   Notes: The Server supports the collection of diagnostic information and exposes it in the AddressSpace. This includes always the ServerDiagnostics Object of the Server Object and its EnabledFlag Variable. The EnabledFlag in the ServerDiagnostics Object can be set TRUE and in that case the following Objects and Variables for diagnostic data as defined in the ServerDiagnosticsType are exposed: ServerDiagnosticsSummary with all its subcomponents, SubscriptionDiagnosticsArray, and SessionsDiagnosticsSummary with all its subcomponents.
 comment "Base Info Diagnostics (NOT IMPLEMENTED)"
 
-# Base Info Estimated Return Time (opc_cu_3198)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 3198:Base Info Estimated Return Time.
-#   Notes: Server supports the EstimatedReturnTime Property. It indicates the time at which the Server is expected to have a ServerStatus.State of RUNNING_0. Clients can use this information to govern the reconnect logic.
-comment "Base Info Estimated Return Time (NOT IMPLEMENTED)"
-
 # View Basic 2 (opc_cu_3530)
 #   Implementation state: unimplemented -- visible but not selectable.
 #   Detail: CU 3530:View Basic 2.
@@ -706,12 +778,6 @@ comment "Base Info Namespace Metadata (NOT IMPLEMENTED)"
 #   Notes: Support the NodeClasses with their Attributes and References. This includes for instance: Object, ObjectType, Variable, VariableType, References and DataType.
 comment "Address Space Base (NOT IMPLEMENTED)"
 
-# Address Space Interfaces (opc_cu_3560)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 3560:Address Space Interfaces.
-#   Notes: Support Interfaces and associated rules. Includes exposing the entry point InterfaceTypes and the types BaseInterfaceType and HasInterface and all their supertypes in the AddressSpace.
-comment "Address Space Interfaces (NOT IMPLEMENTED)"
-
 # Time Sync - Configure Clock Skew (opc_cu_3802)
 #   Implementation state: unimplemented -- visible but not selectable.
 #   Detail: CU 3802:Time Sync - Configure Clock Skew.
@@ -721,7 +787,7 @@ comment "Time Sync - Configure Clock Skew (NOT IMPLEMENTED)"
 # Documentation - Core Capacities (opc_cu_3808)
 #   Implementation state: unimplemented -- visible but not selectable.
 #   Detail: CU 3808:Documentation - Core Capacities.
-#   Notes: The application documentation shall specify the core OPC UA related capacities. This includes the number of supported SecureChannels, Sessions, and Continuation Points for the View Services. If Subscriptions are supported, it shall also include capacity information for Subscriptions and Publish requests, MonitoredItems, retransmission queue, and the queue for sampled MonitoredItems.
+#   Notes: The application documentation shall specify the core OPC UA related capacities. This includes the number of supported SecureChannels, Sessions, and Continuation Points for the View Services. If Subscriptions are supported, it shall also include capacity information for Subscriptions and Publish requests, MonitoredItems, retransmission queue, and the queue for sampled MonitoredItems. (Documentation complete; no code change needed.)
 comment "Documentation - Core Capacities (NOT IMPLEMENTED)"
 
 # Base Info Server Capabilities 2 (opc_cu_3912)
@@ -741,24 +807,6 @@ comment "Base Services Diagnostics (NOT IMPLEMENTED)"
 #   Detail: CU 3985:Session General Service Behaviour.
 #   Notes: Implement basic Service behaviour. This includes in particular: – checking the authentication token – returning the requestHandle in responses – respecting a timeoutHint
 comment "Session General Service Behaviour (NOT IMPLEMENTED)"
-
-# Base Info Locations Object (opc_cu_4053)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 4053:Base Info Locations Object.
-#   Notes: Exposes the entry point for different types of locations in the AddressSpace.
-comment "Base Info Locations Object (NOT IMPLEMENTED)"
-
-# Address Space NonVolatile and Constant (opc_cu_4237)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 4237:Address Space NonVolatile and Constant.
-#   Notes: Support setting the NonVolatile and Constant flags in the AccessLevelEx Attribute for Variable Nodes to indicate whether persistent storage is supported.
-comment "Address Space NonVolatile and Constant (NOT IMPLEMENTED)"
-
-# Base Info Currency (opc_cu_5240)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 5240:Base Info Currency.
-#   Notes: Support the CurrencyUnit Property on DataVariables that represent currency.
-comment "Base Info Currency (NOT IMPLEMENTED)"
 
 # Time Sync – UA based support (opc_cu_5505)
 #   Implementation state: unimplemented -- visible but not selectable.
@@ -787,6 +835,24 @@ comment "Monitor Items 500 (NOT IMPLEMENTED) [OPC-10000-4 §5.13.2]"
 #   Imported from: profiles/opcua-profile-snapshot.json.
 #   Notes: Imported from OPC snapshot. At least 5 queue entries per MonitoredItem. Mandatory CU of the Enhanced DataChange Subscription 2017 facet.
 comment "Monitor MinQueueSize_05 (NOT IMPLEMENTED) [OPC-10000-4 §5.13.2]"
+
+# Security Default ApplicationInstance Certificate (opc_cu_3080)
+#   Implementation state: unimplemented -- visible but not selectable.
+#   Detail: CU 3080:Security Default ApplicationInstance Certificate.
+#   Notes: An application, when installed, has a default ApplicationInstanceCertificate that is valid. The default ApplicationInstanceCertificate shall either be created as part of the installation or installation instructions explicitly describe the process to create and apply a default ApplicationInstanceCertificate to the application. (Documentation complete; no code change needed.)
+comment "Security Default ApplicationInstance Certificate (NOT IMPLEMENTED)"
+
+# Base Info Custom Type System (opc_cu_3201)
+#   Implementation state: unimplemented -- visible but not selectable.
+#   Detail: CU 3201:Base Info Custom Type System.
+#   Notes: The Server supports custom types (i.e. types that are derived from well-known ObjectTypes, VariableTypes, ReferenceTypes or DataTypes). Supporting this ConformanceUnit requires that the custom types with their full inheritance tree are exposed in the AddressSpace. For each DataType having encoding information (Structured DataTypes) the Encoding Objects shall be exposed as well. For all Events supported by the Server, the EventType shall be exposed. (Documentation complete; no code change needed.)
+comment "Base Info Custom Type System (NOT IMPLEMENTED)"
+
+# Security – No Application Authentication (opc_cu_5814)
+#   Implementation state: unimplemented -- visible but not selectable.
+#   Detail: CU 5814:Security – No Application Authentication.
+#   Notes: The Server supports being able to be configured for no application authentication, just User authentication and normal encryption/signing: – Configure Server to skip the trust check when validating certificates – Certificates are just used for message security (signing and encryption) – Users level is used for authentication (Documentation complete; no code change needed.)
+comment "Security – No Application Authentication (NOT IMPLEMENTED)"
 
 endif
 

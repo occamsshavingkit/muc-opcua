@@ -102,14 +102,30 @@ Profiles are additive through `standard`; `full` then enables the optional
 services/facets used for integration and development coverage. Any profile can
 be further adjusted by the override mechanism above.
 
-**Capacities are separate from feature gating** and are not covered by this
-doc: session/connection/subscription/array-length limits resolve through a
-default → profile → user cascade in `include/muc_opcua/capacities.h`, keyed
-off the `MUC_OPCUA_PROFILE_{MICRO,EMBEDDED,STANDARD,FULL}` choice symbols
-(the Kconfig profile tier, still emitted as compile defs).
-Override any capacity directly with `-DMU_MAX_*=<n>` regardless of profile.
-See [docs/conformance/documentation.md](conformance/documentation.md) for the
+**Capacities are separate from feature gating**: session/connection/subscription/
+array-length limits resolve through a default -> profile -> user cascade in
+`include/muc_opcua/capacities.h`, keyed off the Kconfig profile choice symbols
+(still emitted as compile defs). Override any capacity directly with
+`-DMU_MAX_*=<n>` regardless of profile. The generated
+[Capacity symbols](#capacity-symbols) table in this document is the CU 3808
+application-documentation surface for core capacities; it includes the Nano
+values for `max_sessions`, `max_connections`, `max_secure_channels`,
+`max_subscriptions`, monitored items, publish requests, sampled-item queues,
+View/Query continuation points, and address-space sizing. See also
+[docs/conformance/documentation.md](conformance/documentation.md) for the
 per-profile capacity table.
+
+### Custom type systems and the Exposes Type System facet
+
+If an application defines custom ObjectTypes, VariableTypes, DataTypes,
+ReferenceTypes, or structured values whose DataTypes must be discoverable by
+clients, the build must enable the OPC UA **Exposes Type System Server** facet
+(`MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER`). In current named profiles that
+facet is enabled from `embedded` through `full`; `nano` and `micro` stay smaller
+unless the application opts into the facet explicitly. Without the facet, a
+server may still expose simple instance nodes, but it must not claim support for
+custom type-system exposure because clients cannot reliably browse the type
+definitions and supertypes behind those custom instances.
 
 ### Where the flags live (Kconfig)
 

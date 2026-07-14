@@ -137,4 +137,44 @@
 #define MU_ID_RANGE_DATATYPE 884         /* Range DataType (low, high) */
 #define MU_ID_EUINFORMATION_DATATYPE 887 /* EUInformation DataType */
 
+/* Server Nano Core Type System & Base Info NodeIds (OPC-10000-5).
+ * Consumed by the optional CU implementations in base_nodes.c; each is
+ * gated by its corresponding MUC_OPCUA_CU_* Kconfig symbol. */
+#define MU_NODEID_TIMEZONEDATATYPE  8912  /* TimeZoneDataType DataType, OPC-10000-5 §12.2.12.11 */
+#define MU_NODEID_OPTIONSETTYPE     11487 /* OptionSetType VariableType, OPC-10000-5 §7.17 */
+#define MU_NODEID_SELECTIONLISTTYPE 16309 /* SelectionListType VariableType, OPC-10000-5 §7.18 */
+#define MU_NODEID_BASEINTERFACETYPE 17602 /* BaseInterfaceType ObjectType, OPC-10000-5 §6.9 */
+#define MU_NODEID_HASINTERFACE      17603 /* HasInterface ReferenceType, OPC-10000-5 §11.20 */
+#define MU_NODEID_HASADDIN          17604 /* HasAddIn ReferenceType, OPC-10000-5 §11.21 */
+#define MU_NODEID_CURRENCYUNITTYPE  23498 /* CurrencyUnitType DataType, OPC-10000-5 §12.2.12.2 */
+
+/* T002 lookup outcome (OPC-10000-5 via opc-ua-reference MCP, 2026-07).
+ * The following instance-declaration / folder NodeIds are NOT numerically
+ * assigned in the OPC-10000-5 spec text — that spec defines them by
+ * BrowseName only (ServerType table §6.3.1; AddressSpace folders §8.2).
+ * Their numeric NodeIds live in the OPC UA NodeSet (NodeIds.csv / Opc.Ua.Nodeset.xml),
+ * which is not currently vendored in this repo and is not exposed by the
+ * opc-ua-reference MCP search tools. Tasks T010-T015 should either:
+ *   (a) vendor a minimal NodeIds.csv snapshot and look them up there, or
+ *   (b) follow the research.md fallback (Decision 5 / "Note on Server Property
+ *       NodeIds") and define the nodes conceptually by BrowseName + type,
+ *       letting the integrator assign an instance NodeId.
+ *
+ *   Unresolved (no spec-grounded numeric NodeId found):
+ *     - Server.LocalTime Property            (OPC-10000-5 §6.3.1, ServerType)
+ *     - Server.EstimatedReturnTime Property   (OPC-10000-5 §6.3.1, ServerType)
+ *     - Locations Folder under Objects        (OPC-10000-5 §8.2.12)
+ *     - InterfaceTypes Folder under Types     (OPC-10000-5 §8.2.11)
+ *     - CurrencyUnit Property                 (OPC-10000-5 §12.2.12.2)
+ *     - ValueAsText Property                  (per-type instance declaration,
+ *                                              e.g. i=11461 on MultiStateValueDiscreteType
+ *                                              per docs/conformance/data-access.md —
+ *                                              no single global NodeId)
+ *     - DefaultInstanceBrowseName Property    (no numeric NodeId in spec text)
+ *     - EngineeringUnits Property             (per-type instance declaration,
+ *                                              e.g. i=2371 on AnalogItemType —
+ *                                              no single global NodeId; see comment
+ *                                              block above next to MU_ID_ANALOGITEMTYPE)
+ */
+
 #endif /* MUC_OPCUA_OPCUA_IDS_H */
