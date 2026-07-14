@@ -1018,15 +1018,18 @@ def _check_opc_references_in_help(manifest: dict) -> list[str]:
         if kind == "facet":
             symbol = _facet_toggle_symbol(item)
         else:
-            display = item.get("opc_display_name")
-            if not isinstance(display, str) or not display:
-                sym_raw = item.get("kconfig_symbol")
-                symbol = sym_raw if isinstance(sym_raw, str) else None
+            sym_raw = item.get("kconfig_symbol")
+            if isinstance(sym_raw, str) and sym_raw:
+                symbol = sym_raw
             else:
-                try:
-                    symbol = compute_kconfig_symbol(display, "conformance_unit")
-                except ValueError:
+                display = item.get("opc_display_name")
+                if not isinstance(display, str) or not display:
                     symbol = None
+                else:
+                    try:
+                        symbol = compute_kconfig_symbol(display, "conformance_unit")
+                    except ValueError:
+                        symbol = None
 
         if not symbol:
             continue
@@ -1042,24 +1045,15 @@ def _check_opc_references_in_help(manifest: dict) -> list[str]:
             errors.append(
                 "OPC reference in help: " + kind + " symbol '" + symbol
                 + "' (item '" + item_id + "') has no help entry "
-                "(expected OPC source '" + expected_ref
-                + "'; OPC-10000-7 §4.2)"
+                + "for expected reference '" + expected_ref + "'"
             )
             continue
-
-        if spec not in help_text:
+        expected_ref = spec + ((" §" + str(section)) if section else "")
+        if expected_ref not in help_text:
             errors.append(
                 "OPC reference in help: " + kind + " symbol '" + symbol
-                + "' (item '" + item_id + "') help is missing OPC "
-                "reference spec '" + spec + "' (OPC-10000-7 §4.2)"
-            )
-
-        if section and str(section) not in help_text:
-            errors.append(
-                "OPC reference in help: " + kind + " symbol '" + symbol
-                + "' (item '" + item_id + "') help is missing OPC "
-                "reference section '§" + str(section) + "' for spec '"
-                + spec + "' (OPC-10000-7 §4.2)"
+                + "' (item '" + item_id + "') help lacks expected reference '"
+                + expected_ref + "'"
             )
 
     return errors

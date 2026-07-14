@@ -113,6 +113,9 @@ foreach(TEST_SOURCE ${UNIT_TEST_SOURCES})
 
     if(RUN_TEST)
         add_unity_test(${TEST_NAME} ${TEST_SOURCE})
+        if(TEST_NAME STREQUAL "test_history_memstore")
+            target_sources(${TEST_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/src/services/history_memstore.c)
+        endif()
     endif()
 endforeach()
 

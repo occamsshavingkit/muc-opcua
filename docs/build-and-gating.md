@@ -457,6 +457,19 @@ to refresh.
 |---------|------|-------|------|-------|----------|----------|------|------------|
 | READ_CACHE | read_cache | implemented |  |  |  |  |  |  |
 | MUC_OPCUA_FACET_CORE_2022_SERVER | opc_facet_1322 | deferred | ✅ | ✅ | ✅ | ✅ | ✅ |  |
+| MUC_OPCUA_CU_ADDRESS_SPACE_ADDIN_REFERENCE | opc_cu_2446 | claimed |  | ✅ | ✅ | ✅ | ✅ |  |
+| MUC_OPCUA_CU_ADDRESS_SPACE_ADDIN_DEFAULTINSTANCEBROWSENAME | opc_cu_2447 | claimed |  | ✅ | ✅ | ✅ | ✅ |  |
+| MUC_OPCUA_CU_BASE_INFO_LOCALTIME | opc_cu_2476 | claimed |  | ✅ | ✅ | ✅ | ✅ |  |
+| MUC_OPCUA_CU_BASE_INFO_SELECTION_LIST | opc_cu_2711 | claimed |  | ✅ | ✅ | ✅ | ✅ |  |
+| MUC_OPCUA_CU_ADDRESS_SPACE_ATOMICITY | opc_cu_2809 | claimed | ✅ | ✅ | ✅ | ✅ | ✅ |  |
+| MUC_OPCUA_CU_ADDRESS_SPACE_FULL_ARRAY_ONLY | opc_cu_2820 | claimed | ✅ | ✅ | ✅ | ✅ | ✅ |  |
+| MUC_OPCUA_CU_BASE_INFO_VALUEASTEXT | opc_cu_2969 | claimed |  | ✅ | ✅ | ✅ | ✅ |  |
+| MUC_OPCUA_CU_BASE_INFO_OPTIONSET | opc_cu_3127 | claimed |  | ✅ | ✅ | ✅ | ✅ |  |
+| MUC_OPCUA_CU_BASE_INFO_ESTIMATED_RETURN_TIME | opc_cu_3198 | claimed |  | ✅ | ✅ | ✅ | ✅ |  |
+| MUC_OPCUA_CU_ADDRESS_SPACE_INTERFACES | opc_cu_3560 | claimed |  | ✅ | ✅ | ✅ | ✅ |  |
+| MUC_OPCUA_CU_BASE_INFO_LOCATIONS_OBJECT | opc_cu_4053 | claimed |  | ✅ | ✅ | ✅ | ✅ |  |
+| MUC_OPCUA_CU_ADDRESS_SPACE_NONVOLATILE_CONSTANT | opc_cu_4237 | claimed |  | ✅ | ✅ | ✅ | ✅ |  |
+| MUC_OPCUA_CU_BASE_INFO_CURRENCY | opc_cu_5240 | claimed |  | ✅ | ✅ | ✅ | ✅ |  |
 | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER | opc_facet_1219 | deferred |  |  | ✅ | ✅ | ✅ |  |
 | MUC_OPCUA_FACET_STANDARD_DATACHANGE_SUBSCRIPTION_2022_SERVER | opc_facet_1324 | deferred |  |  | ✅ | ✅ | ✅ |  |
 | MUC_OPCUA_FACET_GLOBAL_CERTIFICATE_MANAGEMENT_SERVER | opc_facet_1631 | deferred |  |  | ✅ | ✅ | ✅ |  |
@@ -506,6 +519,7 @@ to refresh.
 | MUC_OPCUA_CU_SERVER_CAPABILITIES_2 | opc_cu_server_capabilities_2 | claimed | ✅ | ✅ | ✅ | ✅ | ✅ |  |
 | MUC_OPCUA_CU_SESSION_GENERAL_SERVICE | opc_cu_session_general_service | claimed | ✅ | ✅ | ✅ | ✅ | ✅ |  |
 | MUC_OPCUA_CU_NAMESPACE_METADATA | opc_cu_namespace_metadata | claimed | ✅ | ✅ | ✅ | ✅ | ✅ |  |
+| MUC_OPCUA_CU_BASE_INFO_ENGINEERING_UNITS | opc_cu_5592 | claimed |  | ✅ | ✅ | ✅ | ✅ |  |
 
 ### Capacity symbols
 
@@ -549,26 +563,13 @@ The following OPC items are tracked in the manifest but are NOT implemented. The
 | opc_facet_1029 | OPC-10000-7 §4.2 | unimplemented | Defines the use of AliasNames in a GDS. |
 | opc_facet_1636 | OPC-10000-7 §4.2 | unimplemented | Defines the use of AliasNames in a Server. |
 | opc_facet_1637 | OPC-10000-7 §4.2 | unimplemented | Defines the use of AliasNames in an aggregating Server. |
-| opc_cu_2446 |  | unimplemented | Support the HasAddIn Reference to bind an AddIn to an Object or ObjectType. |
-| opc_cu_2447 |  | unimplemented | Support the DefaultInstanceBrowseName Property for ObjectTypes. |
-| opc_cu_2476 |  | unimplemented | Exposes local time information by providing the LocalTime Variable on the Server Object. Exposes the TimeZoneDataType, its Encoding Object and all its supertypes in the AddressSpace. |
 | opc_cu_2600 |  | unimplemented | Support at least one Security Policy. Support of SecurityPolicy None is recommended for testing and compatibility reasons even if the UA Server supports a more secure policy. |
-| opc_cu_2711 |  | unimplemented | The Server supports Variables of the SelectionListType VariableType. |
-| opc_cu_2809 |  | unimplemented | Support setting the NonatomicRead and NonatomicWrite flags in the AccessLevelEx Attribute for Variable Nodes to indicate whether Read or Write operations can be performed in atomic manner. If the flags are set to '1', atomicity cannot be assured. |
-| opc_cu_2820 |  | unimplemented | Support setting the WriteFullArrayOnly flag in the AccessLevelEx Attribute for Variable Nodes of non-scalar data types to indicate whether write operations for an array can be performed with an IndexRange. |
-| opc_cu_2969 |  | unimplemented | The Server supports the Property ValueAsText for enumerated DataTypes. |
-| opc_cu_3127 |  | unimplemented | The Server supports the VariableType OptionSetType. |
 | opc_cu_3184 |  | unimplemented | Exposes the base entry points Root and Objects and the Server Object with its base content ServerArray, NamespaceArray, ServerStatus, ServiceLevel, Auditing indication, entry point to VendorServerInfo and ServerRedundancy indication in the AddressSpace. |
 | opc_cu_3186 |  | unimplemented | Exposes the entry point into views in the AddressSpace. This is the Views Object. |
-| opc_cu_3198 |  | unimplemented | Server supports the EstimatedReturnTime Property. It indicates the time at which the Server is expected to have a ServerStatus.State of RUNNING_0. Clients can use this information to govern the reconnect logic. |
 | opc_cu_3545 |  | unimplemented | Supports the NamespaceMetaData Object for all Namespaces in the Server that have static NodeIds. |
 | opc_cu_3554 |  | unimplemented | Support the NodeClasses with their Attributes and References. This includes for instance: Object, ObjectType, Variable, VariableType, References and DataType. |
-| opc_cu_3560 |  | unimplemented | Support Interfaces and associated rules. Includes exposing the entry point InterfaceTypes and the types BaseInterfaceType and HasInterface and all their supertypes in the AddressSpace. |
-| opc_cu_3808 |  | unimplemented | The application documentation shall specify the core OPC UA related capacities. This includes the number of supported SecureChannels, Sessions, and Continuation Points for the View Services. If Subscriptions are supported, it shall also include capacity information for Subscriptions and Publish requests, MonitoredItems, retransmission queue, and the queue for sampled MonitoredItems. |
+| opc_cu_3808 |  | unimplemented | The application documentation shall specify the core OPC UA related capacities. This includes the number of supported SecureChannels, Sessions, and Continuation Points for the View Services. If Subscriptions are supported, it shall also include capacity information for Subscriptions and Publish requests, MonitoredItems, retransmission queue, and the queue for sampled MonitoredItems. (Documentation complete; no code change needed.) |
 | opc_cu_3912 |  | unimplemented | Exposes ServerProfileArray, LocaleIdArray, MinSupportedSampleRate, MaxBrowseContinuationPoints, ModellingRules, MaxArrayLength, MaxStringLength, MaxByteStringLength and MaxSessions of the ServerCapabilities Object, as well as MaxNodesPerRead, MaxNodesPerWrite, MaxNodesPerBrowse, MaxNodesPerRegisterNodes, MaxNodesPerTranslateBrowsePathsToNodesIds of the OperationLimits Object. |
-| opc_cu_4053 |  | unimplemented | Exposes the entry point for different types of locations in the AddressSpace. |
-| opc_cu_4237 |  | unimplemented | Support setting the NonVolatile and Constant flags in the AccessLevelEx Attribute for Variable Nodes to indicate whether persistent storage is supported. |
-| opc_cu_5240 |  | unimplemented | Support the CurrencyUnit Property on DataVariables that represent currency. |
 | opc_cu_2231 |  | unimplemented | Support the Certificate Management Services of UA Part 12 for the Push model to manage Application Instance Certificates and Trust Lists including Revocation Lists. |
 | opc_cu_2423 |  | unimplemented | Exposes the RationalNumberType and RationalNumber, all their supertypes and for the DataType the Encoding Objects in the AddressSpace. |
 | opc_cu_2481 |  | unimplemented | Exposes the NormalizedString DataType and all its supertypes in the AddressSpace |
@@ -662,7 +663,11 @@ The following OPC items are tracked in the manifest but are NOT implemented. The
 | opc_cu_3985 |  | unimplemented | Implement basic Service behaviour. This includes in particular: – checking the authentication token – returning the requestHandle in responses – respecting a timeoutHint |
 | opc_cu_5505 |  | unimplemented | Application supports time synchronization by use of the request or response header timestamps provided by a configured well known source, such as a Discovery Server to synchronize the time on the application and that this time synchronization occurs periodically. Use of this TimeSyncing can be configured. |
 | opc_cu_5793 |  | unimplemented | Support at least one of the optional ConformanceUnits for time synchronization mechanisms in the Security Time Synchronization Facet. The application documentation shall specify which synchronization mechanisms with which profiles are supported. |
+| opc_cu_3080 |  | unimplemented | An application, when installed, has a default ApplicationInstanceCertificate that is valid. The default ApplicationInstanceCertificate shall either be created as part of the installation or installation instructions explicitly describe the process to create and apply a default ApplicationInstanceCertificate to the application. (Documentation complete; no code change needed.) |
+| opc_cu_3201 |  | unimplemented | The Server supports custom types (i.e. types that are derived from well-known ObjectTypes, VariableTypes, ReferenceTypes or DataTypes). Supporting this ConformanceUnit requires that the custom types with their full inheritance tree are exposed in the AddressSpace. For each DataType having encoding information (Structured DataTypes) the Encoding Objects shall be exposed as well. For all Events supported by the Server, the EventType shall be exposed. (Documentation complete; no code change needed.) |
+| opc_cu_5814 |  | unimplemented | The Server supports being able to be configured for no application authentication, just User authentication and normal encryption/signing: – Configure Server to skip the trust check when validating certificates – Certificates are just used for message security (signing and encryption) – Users level is used for authentication (Documentation complete; no code change needed.) |
 <!-- END GENERATED MANIFEST TABLES -->
+
 
 
 

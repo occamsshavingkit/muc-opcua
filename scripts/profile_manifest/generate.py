@@ -14,11 +14,9 @@ generator twice produces byte-identical output, which ``validate.py
 from __future__ import annotations
 
 import argparse
-import json
 import os
 import re
 import sys
-from typing import Any
 
 _HERE = os.path.dirname(os.path.abspath(__file__))
 _PKG_PARENT = os.path.dirname(_HERE)
@@ -131,6 +129,17 @@ def _item_prompt(item: dict) -> str:
         return display_name
     item_id = item.get("id", "")
     return item_id.replace("_", " ").capitalize()
+
+
+def _cu_symbol(item: dict) -> str | None:
+    """Return the selectable Kconfig symbol for a Conformance Unit item."""
+    sym = item.get("kconfig_symbol")
+    if isinstance(sym, str) and sym:
+        return sym
+    opc_display_name = item.get("opc_display_name")
+    if isinstance(opc_display_name, str) and opc_display_name:
+        return compute_kconfig_symbol(opc_display_name, "conformance_unit")
+    return None
 
 
 def _facet_name(item: dict) -> str:
@@ -358,10 +367,7 @@ def _selectable_contained_cus(manifest: dict) -> list[tuple[str, dict]]:
                 continue
             if cu_item.get("implementation_state") not in _SELECTABLE_STATES:
                 continue
-            opc_display_name = cu_item.get("opc_display_name")
-            if not isinstance(opc_display_name, str) or not opc_display_name:
-                continue
-            symbol = compute_kconfig_symbol(opc_display_name, "conformance_unit")
+            symbol = _cu_symbol(cu_item)
             if not symbol or symbol in seen:
                 continue
             seen.add(symbol)
@@ -703,11 +709,7 @@ def _emit_selectable(
     a visual grouping and convenience group-toggle with tristate display
     (    all-on / all-off / partial).
     """
-    sym = item.get("kconfig_symbol")
-    if item.get("kind") == "conformance_unit":
-        opc_display_name = item.get("opc_display_name")
-        if isinstance(opc_display_name, str) and opc_display_name:
-            sym = compute_kconfig_symbol(opc_display_name, "conformance_unit")
+    sym = _cu_symbol(item) if item.get("kind") == "conformance_unit" else item.get("kconfig_symbol")
     if not sym:
         return
 
@@ -720,15 +722,9 @@ def _emit_selectable(
     lines.append("config " + sym)
     lines.append('\tbool "' + prompt + '"')
 
-    depends_on = item.get("depends_on") or []
-    op = item.get("depends_on_op")
-
     # When underneath a facet, CU selection is independent of the facet
     # toggle.  The facet shows a tristate indicator (all-on / all-off /
     # partial) based on which CUs are enabled.
-
-    if op != "or":
-        deps = list(depends_on)
 
     _emit_default(lines, item, profile_symbols)
 
@@ -976,6 +972,7 @@ def _emit_one_facet_menu(
         lines.append("if " + facet_symbol)
         lines.append("")
     elif use_plain_config:
+        assert facet_symbol is not None
         if facet_symbol not in emitted_facet_symbols:
             emitted_facet_symbols.add(facet_symbol)
             lines.append("config " + facet_symbol)
@@ -1375,7 +1372,6 @@ def _emit_capacity_derived(lines: list[str], cap: dict) -> None:
     """Emit a derived capacity (references its source capacity + override)."""
     internal = cap["internal_macro"]
     public = cap["public_override"]
-    derives_from = cap.get("derives_from", "")
 
     source_cap = cap.get("_source_cap")
     if isinstance(source_cap, dict):
@@ -1472,7 +1468,7 @@ def generate_capacities_h(manifest: dict) -> str:
         lines.append("")
 
     lines.append("#endif /* MUC_OPCUA_CAPACITIES_H */")
-    return "\n".join(lines)
+    return "\n".join(lines) + "\n"
 
 
 # ---------------------------------------------------------------------------
@@ -1954,7 +1950,6 @@ def main(argv: list[str] | None = None) -> int:
 
     outputs = [o.strip() for o in args.outputs.split(",") if o.strip()]
 
-    manifest_dir = os.path.dirname(os.path.abspath(args.manifest))
     repo_root = _REPO_ROOT
 
     for output in outputs:

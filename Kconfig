@@ -167,7 +167,7 @@ if MUC_OPCUA_FACET_CORE_2022_SERVER
 
 config MUC_OPCUA_CU_ADDRESS_SPACE_ADDIN_REFERENCE
 	bool "CU: Address Space AddIn Reference"
-	default y if MUC_OPCUA_INTERN_PROFILE_NANO_EMBEDDED_DEVICE_2025_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_MICRO_EMBEDDED_DEVICE_2025_SERVER
 	help
 	  Implementation state: claimed.
 	  OPC item: CU 2446:Address Space AddIn Reference.
@@ -176,7 +176,7 @@ config MUC_OPCUA_CU_ADDRESS_SPACE_ADDIN_REFERENCE
 
 config MUC_OPCUA_CU_ADDRESS_SPACE_ADDIN_DEFAULTINSTANCEBROWSENAME
 	bool "CU: Address Space AddIn DefaultInstanceBrowsename"
-	default y if MUC_OPCUA_INTERN_PROFILE_NANO_EMBEDDED_DEVICE_2025_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_MICRO_EMBEDDED_DEVICE_2025_SERVER
 	help
 	  Implementation state: claimed.
 	  OPC item: CU 2447:Address Space AddIn DefaultInstanceBrowsename.
@@ -185,7 +185,7 @@ config MUC_OPCUA_CU_ADDRESS_SPACE_ADDIN_DEFAULTINSTANCEBROWSENAME
 
 config MUC_OPCUA_CU_BASE_INFO_LOCALTIME
 	bool "CU: Base Info LocalTime"
-	default y if MUC_OPCUA_INTERN_PROFILE_NANO_EMBEDDED_DEVICE_2025_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_MICRO_EMBEDDED_DEVICE_2025_SERVER
 	help
 	  Implementation state: claimed.
 	  OPC item: CU 2476:Base Info LocalTime.
@@ -194,7 +194,7 @@ config MUC_OPCUA_CU_BASE_INFO_LOCALTIME
 
 config MUC_OPCUA_CU_BASE_INFO_SELECTION_LIST
 	bool "CU: Base Info Selection List"
-	default y if MUC_OPCUA_INTERN_PROFILE_NANO_EMBEDDED_DEVICE_2025_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_MICRO_EMBEDDED_DEVICE_2025_SERVER
 	help
 	  Implementation state: claimed.
 	  OPC item: CU 2711:Base Info Selection List.
@@ -221,7 +221,7 @@ config MUC_OPCUA_CU_ADDRESS_SPACE_FULL_ARRAY_ONLY
 
 config MUC_OPCUA_CU_BASE_INFO_VALUEASTEXT
 	bool "CU: Base Info ValueAsText"
-	default y if MUC_OPCUA_INTERN_PROFILE_NANO_EMBEDDED_DEVICE_2025_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_MICRO_EMBEDDED_DEVICE_2025_SERVER
 	help
 	  Implementation state: claimed.
 	  OPC item: CU 2969:Base Info ValueAsText.
@@ -230,7 +230,7 @@ config MUC_OPCUA_CU_BASE_INFO_VALUEASTEXT
 
 config MUC_OPCUA_CU_BASE_INFO_OPTIONSET
 	bool "CU: Base Info OptionSet"
-	default y if MUC_OPCUA_INTERN_PROFILE_NANO_EMBEDDED_DEVICE_2025_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_MICRO_EMBEDDED_DEVICE_2025_SERVER
 	help
 	  Implementation state: claimed.
 	  OPC item: CU 3127:Base Info OptionSet.
@@ -239,7 +239,7 @@ config MUC_OPCUA_CU_BASE_INFO_OPTIONSET
 
 config MUC_OPCUA_CU_BASE_INFO_ESTIMATED_RETURN_TIME
 	bool "CU: Base Info Estimated Return Time"
-	default y if MUC_OPCUA_INTERN_PROFILE_NANO_EMBEDDED_DEVICE_2025_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_MICRO_EMBEDDED_DEVICE_2025_SERVER
 	help
 	  Implementation state: claimed.
 	  OPC item: CU 3198:Base Info Estimated Return Time.
@@ -248,7 +248,7 @@ config MUC_OPCUA_CU_BASE_INFO_ESTIMATED_RETURN_TIME
 
 config MUC_OPCUA_CU_ADDRESS_SPACE_INTERFACES
 	bool "CU: Address Space Interfaces"
-	default y if MUC_OPCUA_INTERN_PROFILE_NANO_EMBEDDED_DEVICE_2025_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_MICRO_EMBEDDED_DEVICE_2025_SERVER
 	help
 	  Implementation state: claimed.
 	  OPC item: CU 3560:Address Space Interfaces.
@@ -257,16 +257,16 @@ config MUC_OPCUA_CU_ADDRESS_SPACE_INTERFACES
 
 config MUC_OPCUA_CU_BASE_INFO_LOCATIONS_OBJECT
 	bool "CU: Base Info Locations Object"
-	default y if MUC_OPCUA_INTERN_PROFILE_NANO_EMBEDDED_DEVICE_2025_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_MICRO_EMBEDDED_DEVICE_2025_SERVER
 	help
 	  Implementation state: claimed.
 	  OPC item: CU 4053:Base Info Locations Object.
 	  Backing tests: test_profile_surface.
 	  Notes: Exposes the entry point for different types of locations in the AddressSpace.
 
-config MUC_OPCUA_CU_ADDRESS_SPACE_NONVOLATILE_AND_CONSTANT
+config MUC_OPCUA_CU_ADDRESS_SPACE_NONVOLATILE_CONSTANT
 	bool "CU: Address Space NonVolatile and Constant"
-	default y if MUC_OPCUA_INTERN_PROFILE_NANO_EMBEDDED_DEVICE_2025_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_MICRO_EMBEDDED_DEVICE_2025_SERVER
 	help
 	  Implementation state: claimed.
 	  OPC item: CU 4237:Address Space NonVolatile and Constant.
@@ -275,7 +275,7 @@ config MUC_OPCUA_CU_ADDRESS_SPACE_NONVOLATILE_AND_CONSTANT
 
 config MUC_OPCUA_CU_BASE_INFO_CURRENCY
 	bool "CU: Base Info Currency"
-	default y if MUC_OPCUA_INTERN_PROFILE_NANO_EMBEDDED_DEVICE_2025_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_MICRO_EMBEDDED_DEVICE_2025_SERVER
 	help
 	  Implementation state: claimed.
 	  OPC item: CU 5240:Base Info Currency.
@@ -319,7 +319,7 @@ config MUC_OPCUA_CU_COMPLEX_TYPES
 	  Backing tests: test_complex_types.
 	  Notes: Project-level Conformance Unit mirroring the legacy 'complex_types' item; emits Kconfig symbol MUC_OPCUA_CU_COMPLEX_TYPES matching the #ifdef guard renamed in Task 3 of the CU-aligned code reorganisation plan.
 
-config MUC_OPCUA_CU_BASE_INFO_CORE_STRUCTURE_2
+config MUC_OPCUA_CU_CORE_STRUCTURE_2
 	bool "CU: Base Info Core Structure 2"
 	default y if MUC_OPCUA_INTERN_PROFILE_NANO_EMBEDDED_DEVICE_2025_SERVER || MUC_OPCUA_PROFILE_CUSTOM
 	help
@@ -329,7 +329,7 @@ config MUC_OPCUA_CU_BASE_INFO_CORE_STRUCTURE_2
 	  Imported from: comprehensive-fix (Fix 2).
 	  Notes: Already-implemented CU added to manifest as claimed so the feature is tracked, gated by its Kconfig symbol, and covered by the claim/test map.
 
-config MUC_OPCUA_CU_BASE_INFO_CORE_VIEWS_FOLDER
+config MUC_OPCUA_CU_CORE_VIEWS_FOLDER
 	bool "CU: Base Info Core Views Folder"
 	default y if MUC_OPCUA_INTERN_PROFILE_NANO_EMBEDDED_DEVICE_2025_SERVER || MUC_OPCUA_PROFILE_CUSTOM
 	help
@@ -429,7 +429,7 @@ config MUC_OPCUA_CU_MULTIPLE_CONNECTIONS
 	  Backing tests: test_connection_multiplex.
 	  Notes: Project-level Conformance Unit mirroring the legacy 'multiple_connections' item; emits Kconfig symbol MUC_OPCUA_CU_MULTIPLE_CONNECTIONS matching the #ifdef guard renamed in Task 3 of the CU-aligned code reorganisation plan.
 
-config MUC_OPCUA_CU_BASE_INFO_NAMESPACE_METADATA
+config MUC_OPCUA_CU_NAMESPACE_METADATA
 	bool "CU: Base Info Namespace Metadata"
 	default y if MUC_OPCUA_INTERN_PROFILE_NANO_EMBEDDED_DEVICE_2025_SERVER || MUC_OPCUA_PROFILE_CUSTOM
 	help
@@ -484,7 +484,7 @@ config MUC_OPCUA_CU_SECURITY_ECC
 	  Backing tests: test_ecc_crypto.
 	  Notes: Project-level Conformance Unit mirroring the legacy 'ecc' item; emits Kconfig symbol MUC_OPCUA_CU_SECURITY_ECC matching the #ifdef guard renamed in Task 3 of the CU-aligned code reorganisation plan.
 
-config MUC_OPCUA_CU_BASE_INFO_SERVER_CAPABILITIES_2
+config MUC_OPCUA_CU_SERVER_CAPABILITIES_2
 	bool "CU: Base Info Server Capabilities 2"
 	default y if MUC_OPCUA_INTERN_PROFILE_NANO_EMBEDDED_DEVICE_2025_SERVER || MUC_OPCUA_PROFILE_CUSTOM
 	help
@@ -504,7 +504,7 @@ config MUC_OPCUA_CU_SESSION_BASE
 	  Imported from: comprehensive-fix (Fix 2).
 	  Notes: Already-implemented CU added to manifest as claimed so the feature is tracked, gated by its Kconfig symbol, and covered by the claim/test map.
 
-config MUC_OPCUA_CU_SESSION_GENERAL_SERVICE_BEHAVIOUR
+config MUC_OPCUA_CU_SESSION_GENERAL_SERVICE
 	bool "CU: Session General Service Behaviour"
 	default y if MUC_OPCUA_INTERN_PROFILE_NANO_EMBEDDED_DEVICE_2025_SERVER || MUC_OPCUA_PROFILE_CUSTOM
 	help
@@ -633,7 +633,7 @@ config MUC_OPCUA_CU_CORE_2017_ATTRIBUTE_WRITE
 
 config MUC_OPCUA_CU_BASE_INFO_ENGINEERING_UNITS
 	bool "CU: Base Info Engineering Units"
-	default y if MUC_OPCUA_INTERN_PROFILE_NANO_EMBEDDED_DEVICE_2025_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_MICRO_EMBEDDED_DEVICE_2025_SERVER
 	help
 	  Implementation state: claimed.
 	  OPC item: CU 5592:Base Info Engineering Units.

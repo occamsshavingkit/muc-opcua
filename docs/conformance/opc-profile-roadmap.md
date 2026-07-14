@@ -15,10 +15,10 @@ remains future work.
 
 | State | Count |
 |-------|-------|
-| claimed | 41 |
+| claimed | 55 |
 | implemented | 1 |
 | deferred | 9 |
-| unimplemented | 123 |
+| unimplemented | 113 |
 
 ## Item matrix
 
@@ -36,26 +36,26 @@ remains future work.
 | opc_facet_1322 | facet | deferred | OPC-10000-7 §4.2 | MUC_OPCUA_FACET_CORE_2022_SERVER | all | — |
 | opc_facet_1636 | facet | unimplemented | OPC-10000-7 §4.2 | — | — | — |
 | opc_facet_1637 | facet | unimplemented | OPC-10000-7 §4.2 | — | — | — |
-| opc_cu_2446 | conformance_unit | unimplemented |  | — | all | — |
-| opc_cu_2447 | conformance_unit | unimplemented |  | — | all | — |
-| opc_cu_2476 | conformance_unit | unimplemented |  | — | all | — |
+| opc_cu_2446 | conformance_unit | claimed |  | MUC_OPCUA_CU_ADDRESS_SPACE_ADDIN_REFERENCE | micro, embedded, standard, full | test_profile_surface |
+| opc_cu_2447 | conformance_unit | claimed |  | MUC_OPCUA_CU_ADDRESS_SPACE_ADDIN_DEFAULTINSTANCEBROWSENAME | micro, embedded, standard, full | test_profile_surface |
+| opc_cu_2476 | conformance_unit | claimed |  | MUC_OPCUA_CU_BASE_INFO_LOCALTIME | micro, embedded, standard, full | test_profile_surface |
 | opc_cu_2600 | conformance_unit | unimplemented |  | — | all | — |
-| opc_cu_2711 | conformance_unit | unimplemented |  | — | all | — |
-| opc_cu_2809 | conformance_unit | unimplemented |  | — | all | — |
-| opc_cu_2820 | conformance_unit | unimplemented |  | — | all | — |
-| opc_cu_2969 | conformance_unit | unimplemented |  | — | all | — |
-| opc_cu_3127 | conformance_unit | unimplemented |  | — | all | — |
-| opc_cu_3184 | conformance_unit | unimplemented |  | — | all | — |
-| opc_cu_3186 | conformance_unit | unimplemented |  | — | all | — |
-| opc_cu_3198 | conformance_unit | unimplemented |  | — | all | — |
-| opc_cu_3545 | conformance_unit | unimplemented |  | — | all | — |
-| opc_cu_3554 | conformance_unit | unimplemented |  | — | all | — |
-| opc_cu_3560 | conformance_unit | unimplemented |  | — | all | — |
+| opc_cu_2711 | conformance_unit | claimed |  | MUC_OPCUA_CU_BASE_INFO_SELECTION_LIST | micro, embedded, standard, full | test_profile_surface |
+| opc_cu_2809 | conformance_unit | claimed |  | MUC_OPCUA_CU_ADDRESS_SPACE_ATOMICITY | all | test_profile_surface |
+| opc_cu_2820 | conformance_unit | claimed |  | MUC_OPCUA_CU_ADDRESS_SPACE_FULL_ARRAY_ONLY | all | test_profile_surface |
+| opc_cu_2969 | conformance_unit | claimed |  | MUC_OPCUA_CU_BASE_INFO_VALUEASTEXT | micro, embedded, standard, full | test_profile_surface |
+| opc_cu_3127 | conformance_unit | claimed |  | MUC_OPCUA_CU_BASE_INFO_OPTIONSET | micro, embedded, standard, full | test_profile_surface |
+| opc_cu_3184 | conformance_unit | unimplemented |  | — | micro, embedded, standard, full | — |
+| opc_cu_3186 | conformance_unit | unimplemented |  | — | micro, embedded, standard, full | — |
+| opc_cu_3198 | conformance_unit | claimed |  | MUC_OPCUA_CU_BASE_INFO_ESTIMATED_RETURN_TIME | micro, embedded, standard, full | test_profile_surface |
+| opc_cu_3545 | conformance_unit | unimplemented |  | — | micro, embedded, standard, full | — |
+| opc_cu_3554 | conformance_unit | unimplemented |  | — | micro, embedded, standard, full | — |
+| opc_cu_3560 | conformance_unit | claimed |  | MUC_OPCUA_CU_ADDRESS_SPACE_INTERFACES | micro, embedded, standard, full | test_profile_surface |
 | opc_cu_3808 | conformance_unit | unimplemented |  | — | all | — |
 | opc_cu_3912 | conformance_unit | unimplemented |  | — | all | — |
-| opc_cu_4053 | conformance_unit | unimplemented |  | — | all | — |
-| opc_cu_4237 | conformance_unit | unimplemented |  | — | all | — |
-| opc_cu_5240 | conformance_unit | unimplemented |  | — | all | — |
+| opc_cu_4053 | conformance_unit | claimed |  | MUC_OPCUA_CU_BASE_INFO_LOCATIONS_OBJECT | micro, embedded, standard, full | test_profile_surface |
+| opc_cu_4237 | conformance_unit | claimed |  | MUC_OPCUA_CU_ADDRESS_SPACE_NONVOLATILE_CONSTANT | micro, embedded, standard, full | test_profile_surface |
+| opc_cu_5240 | conformance_unit | claimed |  | MUC_OPCUA_CU_BASE_INFO_CURRENCY | micro, embedded, standard, full | test_profile_surface |
 | opc_facet_1219 | facet | deferred | OPC-10000-7 §4.2 | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER | embedded, standard, full | — |
 | opc_facet_1324 | facet | deferred | OPC-10000-7 §4.2 | MUC_OPCUA_FACET_STANDARD_DATACHANGE_SUBSCRIPTION_2022_SERVER | embedded, standard, full | — |
 | opc_facet_1631 | facet | deferred | OPC-10000-7 §4.2 | MUC_OPCUA_FACET_GLOBAL_CERTIFICATE_MANAGEMENT_SERVER | embedded, standard, full | — |
@@ -159,34 +159,34 @@ remains future work.
 | opc_cu_2317 | conformance_unit | unimplemented |  | — | all | — |
 | opc_cu_2328 | conformance_unit | unimplemented |  | — | all | — |
 | opc_cu_2352 | conformance_unit | unimplemented |  | — | all | — |
-| opc_cu_2389 | conformance_unit | unimplemented |  | — | all | — |
-| opc_cu_2400 | conformance_unit | unimplemented |  | — | all | — |
-| opc_cu_2407 | conformance_unit | unimplemented |  | — | all | — |
-| opc_cu_2478 | conformance_unit | unimplemented |  | — | all | — |
-| opc_cu_2479 | conformance_unit | unimplemented |  | — | all | — |
-| opc_cu_2480 | conformance_unit | unimplemented |  | — | all | — |
-| opc_cu_2786 | conformance_unit | unimplemented |  | — | all | — |
-| opc_cu_2808 | conformance_unit | unimplemented |  | — | all | — |
+| opc_cu_2389 | conformance_unit | unimplemented |  | — | micro, embedded, standard, full | — |
+| opc_cu_2400 | conformance_unit | unimplemented |  | — | micro, embedded, standard, full | — |
+| opc_cu_2407 | conformance_unit | unimplemented |  | — | micro, embedded, standard, full | — |
+| opc_cu_2478 | conformance_unit | unimplemented |  | — | micro, embedded, standard, full | — |
+| opc_cu_2479 | conformance_unit | unimplemented |  | — | micro, embedded, standard, full | — |
+| opc_cu_2480 | conformance_unit | unimplemented |  | — | micro, embedded, standard, full | — |
+| opc_cu_2786 | conformance_unit | unimplemented |  | — | micro, embedded, standard, full | — |
+| opc_cu_2808 | conformance_unit | unimplemented |  | — | micro, embedded, standard, full | — |
 | opc_cu_2823 | conformance_unit | unimplemented |  | — | embedded, standard, full | — |
-| opc_cu_2936 | conformance_unit | unimplemented |  | — | all | — |
+| opc_cu_2936 | conformance_unit | unimplemented |  | — | micro, embedded, standard, full | — |
 | opc_cu_3072 | conformance_unit | unimplemented |  | — | all | — |
 | opc_cu_3073 | conformance_unit | unimplemented |  | — | all | — |
 | opc_cu_3125 | conformance_unit | unimplemented |  | — | standard, full | — |
 | opc_cu_3143 | conformance_unit | unimplemented |  | — | micro, embedded, standard, full | — |
-| opc_cu_3147 | conformance_unit | unimplemented |  | — | all | — |
+| opc_cu_3147 | conformance_unit | unimplemented |  | — | micro, embedded, standard, full | — |
 | opc_cu_3175 | conformance_unit | unimplemented |  | — | all | — |
-| opc_cu_3192 | conformance_unit | unimplemented |  | — | all | — |
+| opc_cu_3192 | conformance_unit | unimplemented |  | — | micro, embedded, standard, full | — |
 | opc_cu_3530 | conformance_unit | unimplemented |  | — | all | — |
 | opc_cu_3534 | conformance_unit | unimplemented |  | — | embedded, standard, full | — |
 | opc_cu_3535 | conformance_unit | unimplemented |  | — | embedded, standard, full | — |
 | opc_cu_3536 | conformance_unit | unimplemented |  | — | embedded, standard, full | — |
 | opc_cu_3645 | conformance_unit | unimplemented |  | — | embedded, standard, full | — |
 | opc_cu_3727 | conformance_unit | unimplemented |  | — | micro, embedded, standard, full | — |
-| opc_cu_3802 | conformance_unit | unimplemented |  | — | all | — |
+| opc_cu_3802 | conformance_unit | unimplemented |  | — | micro, embedded, standard, full | — |
 | opc_cu_3913 | conformance_unit | unimplemented |  | — | micro, embedded, standard, full | — |
-| opc_cu_3983 | conformance_unit | unimplemented |  | — | all | — |
+| opc_cu_3983 | conformance_unit | unimplemented |  | — | micro, embedded, standard, full | — |
 | opc_cu_3985 | conformance_unit | unimplemented |  | — | all | — |
-| opc_cu_5505 | conformance_unit | unimplemented |  | — | all | — |
+| opc_cu_5505 | conformance_unit | unimplemented |  | — | micro, embedded, standard, full | — |
 | opc_cu_5793 | conformance_unit | unimplemented |  | — | all | — |
 | opc_cu_protocol_ua_tcp | conformance_unit | claimed | OPC-10000-6 §7.1 | MUC_OPCUA_CU_PROTOCOL_UA_TCP | all | test_tcp_connection |
 | opc_cu_ua_binary_encoding | conformance_unit | claimed | OPC-10000-6 §5 | MUC_OPCUA_CU_UA_BINARY_ENCODING | all | test_binary_primitives, test_binary_nodeid |
@@ -198,6 +198,10 @@ remains future work.
 | opc_cu_server_capabilities_2 | conformance_unit | claimed | OPC-10000-3 §4 | MUC_OPCUA_CU_SERVER_CAPABILITIES_2 | all | test_base_server_behaviour |
 | opc_cu_session_general_service | conformance_unit | claimed | OPC-10000-4 §5.6 | MUC_OPCUA_CU_SESSION_GENERAL_SERVICE | all | test_dispatch_session_order, test_base_server_behaviour |
 | opc_cu_namespace_metadata | conformance_unit | claimed | OPC-10000-3 §4 | MUC_OPCUA_CU_NAMESPACE_METADATA | all | test_base_server_behaviour, test_read_browsename_namespace |
+| opc_cu_3080 | conformance_unit | unimplemented |  | — | all | — |
+| opc_cu_3201 | conformance_unit | unimplemented |  | — | micro, embedded, standard, full | — |
+| opc_cu_5592 | conformance_unit | claimed |  | MUC_OPCUA_CU_BASE_INFO_ENGINEERING_UNITS | micro, embedded, standard, full | test_profile_surface |
+| opc_cu_5814 | conformance_unit | unimplemented |  | — | micro, embedded, standard, full | — |
 
 ## Capacities
 

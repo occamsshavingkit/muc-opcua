@@ -224,8 +224,8 @@ typedef struct {
    Set these bits in a Variable's AccessLevelEx Attribute when Read or Write
    operations on that Variable cannot be guaranteed atomic. When the bit is '1',
    atomicity is not assured. */
-#define MU_ACCESS_LEVEL_EX_NONATOMIC_READ (1u << 1)
-#define MU_ACCESS_LEVEL_EX_NONATOMIC_WRITE (1u << 0)
+#define MU_ACCESS_LEVEL_EX_NONATOMIC_READ (1u << 8)
+#define MU_ACCESS_LEVEL_EX_NONATOMIC_WRITE (1u << 9)
 #endif /* MUC_OPCUA_CU_ADDRESS_SPACE_ATOMICITY */
 
 #ifdef MUC_OPCUA_CU_ADDRESS_SPACE_FULL_ARRAY_ONLY
@@ -233,7 +233,7 @@ typedef struct {
    Only). Set this bit in a Variable's AccessLevelEx Attribute to indicate that
    write operations for an array can only be performed on the full array (i.e.
    IndexRange partial writes are not permitted). */
-#define MU_ACCESS_LEVEL_EX_WRITE_FULL_ARRAY_ONLY (1u << 2)
+#define MU_ACCESS_LEVEL_EX_WRITE_FULL_ARRAY_ONLY (1u << 10)
 #endif /* MUC_OPCUA_CU_ADDRESS_SPACE_FULL_ARRAY_ONLY */
 
 #ifdef MUC_OPCUA_CU_ADDRESS_SPACE_NONVOLATILE_CONSTANT
