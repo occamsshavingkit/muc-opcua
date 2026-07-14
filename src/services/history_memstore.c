@@ -8,8 +8,9 @@ static mu_history_memstore_t *store(void *context) {
 
 static size_t find_timestamp(const mu_history_memstore_t *s, opcua_datetime_t source_timestamp) {
     for (size_t i = 0; i < s->count; i++) {
-        if (s->points[i].source_timestamp == source_timestamp)
+        if (s->points[i].source_timestamp == source_timestamp) {
             return i;
+        }
     }
     return s->count;
 }

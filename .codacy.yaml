@@ -21,6 +21,10 @@ engines:
   # Configure Cppcheck for C language (not C++).
   cppcheck:
     language: c
+    exclude_paths:
+      # Cppcheck analyzes this public adapter header without source-file uses,
+      # which reports false unused-type/member MISRA findings.
+      - 'include/muc_opcua/services/history_memstore.h'
 
   # Flawfinder flags raw memcpy/strlen/read in protocol serialization code.
   # Production code uses mu_checked_memcpy wrappers or guard-before-copy;
