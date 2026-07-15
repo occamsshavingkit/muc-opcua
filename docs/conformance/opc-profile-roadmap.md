@@ -15,10 +15,10 @@ remains future work.
 
 | State | Count |
 |-------|-------|
-| claimed | 55 |
-| implemented | 1 |
+| claimed | 60 |
+| implemented | 6 |
 | deferred | 9 |
-| unimplemented | 113 |
+| unimplemented | 109 |
 
 ## Item matrix
 
@@ -156,11 +156,11 @@ remains future work.
 | opc_facet_2323 | facet | unimplemented | OPC-10000-7 §4.2 | — | — | — |
 | opc_facet_837 | facet | deferred | OPC-10000-7 §4.2 | MUC_OPCUA_FACET_UA_TCP_UA_SC_UA_BINARY | all | — |
 | opc_facet_1760 | facet | deferred | OPC-10000-7 §4.2 | MUC_OPCUA_FACET_SECURITY_TIME_SYNCHRONIZATION | all | — |
-| opc_cu_2317 | conformance_unit | unimplemented |  | — | all | — |
-| opc_cu_2328 | conformance_unit | unimplemented |  | — | all | — |
-| opc_cu_2352 | conformance_unit | unimplemented |  | — | all | — |
-| opc_cu_2389 | conformance_unit | unimplemented |  | — | micro, embedded, standard, full | — |
-| opc_cu_2400 | conformance_unit | unimplemented |  | — | micro, embedded, standard, full | — |
+| opc_cu_2317 | conformance_unit | implemented | OPC-10000-4 §5.9.4 | MUC_OPCUA_CU_VIEW_TRANSLATEBROWSEPATH | all | test_browse_service, test_view_services |
+| opc_cu_2328 | conformance_unit | implemented | OPC-10000-4 §5.5.1, 5.5.4 | MUC_OPCUA_CU_DISCOVERY_GET_ENDPOINTS | all | test_discovery_endpoint, test_discovery_services |
+| opc_cu_2352 | conformance_unit | implemented | OPC-10000-4 §5.5.2 | MUC_OPCUA_CU_DISCOVERY_FIND_SERVERS_SELF | all | test_discovery_services, test_discovery_endpoint |
+| opc_cu_2389 | conformance_unit | claimed | OPC-10000-4 §5.11.4 | MUC_OPCUA_CU_ATTRIBUTE_WRITE_VALUES | micro, embedded, standard, full | test_write_value_gate, test_write_service |
+| opc_cu_2400 | conformance_unit | implemented | OPC-10000-4 §5.7.3 | MUC_OPCUA_CU_SESSION_CHANGE_USER | micro, embedded, standard, full | test_session, test_session_auth |
 | opc_cu_2407 | conformance_unit | unimplemented |  | — | micro, embedded, standard, full | — |
 | opc_cu_2478 | conformance_unit | unimplemented |  | — | micro, embedded, standard, full | — |
 | opc_cu_2479 | conformance_unit | unimplemented |  | — | micro, embedded, standard, full | — |
@@ -168,15 +168,15 @@ remains future work.
 | opc_cu_2786 | conformance_unit | unimplemented |  | — | micro, embedded, standard, full | — |
 | opc_cu_2808 | conformance_unit | unimplemented |  | — | micro, embedded, standard, full | — |
 | opc_cu_2823 | conformance_unit | unimplemented |  | — | embedded, standard, full | — |
-| opc_cu_2936 | conformance_unit | unimplemented |  | — | micro, embedded, standard, full | — |
+| opc_cu_2936 | conformance_unit | claimed | OPC-10000-4 §5.11.4 | MUC_OPCUA_CU_ATTRIBUTE_WRITE_STATUSCODE_TIMESTAMP | micro, embedded, standard, full | test_write_service, test_write_response |
 | opc_cu_3072 | conformance_unit | unimplemented |  | — | all | — |
 | opc_cu_3073 | conformance_unit | unimplemented |  | — | all | — |
 | opc_cu_3125 | conformance_unit | unimplemented |  | — | standard, full | — |
 | opc_cu_3143 | conformance_unit | unimplemented |  | — | micro, embedded, standard, full | — |
-| opc_cu_3147 | conformance_unit | unimplemented |  | — | micro, embedded, standard, full | — |
+| opc_cu_3147 | conformance_unit | claimed | OPC-10000-4 §5.11.4 | MUC_OPCUA_CU_ATTRIBUTE_WRITE_INDEX_RANGE | micro, embedded, standard, full | test_write_service |
 | opc_cu_3175 | conformance_unit | unimplemented |  | — | all | — |
-| opc_cu_3192 | conformance_unit | unimplemented |  | — | micro, embedded, standard, full | — |
-| opc_cu_3530 | conformance_unit | unimplemented |  | — | all | — |
+| opc_cu_3192 | conformance_unit | claimed | OPC-10000-5 §6.3.1, 6.3.3, 8.3.2, 12.9 | MUC_OPCUA_CU_BASE_INFO_DIAGNOSTICS | micro, embedded, standard, full | test_diagnostics, test_profile_surface |
+| opc_cu_3530 | conformance_unit | implemented | OPC-10000-4 §5.9.2, 5.9.3 | MUC_OPCUA_CU_VIEW_BASIC_2 | all | test_browse_service, test_browse_limits, test_view_services |
 | opc_cu_3534 | conformance_unit | unimplemented |  | — | embedded, standard, full | — |
 | opc_cu_3535 | conformance_unit | unimplemented |  | — | embedded, standard, full | — |
 | opc_cu_3536 | conformance_unit | unimplemented |  | — | embedded, standard, full | — |
@@ -184,7 +184,7 @@ remains future work.
 | opc_cu_3727 | conformance_unit | unimplemented |  | — | micro, embedded, standard, full | — |
 | opc_cu_3802 | conformance_unit | unimplemented |  | — | micro, embedded, standard, full | — |
 | opc_cu_3913 | conformance_unit | unimplemented |  | — | micro, embedded, standard, full | — |
-| opc_cu_3983 | conformance_unit | unimplemented |  | — | micro, embedded, standard, full | — |
+| opc_cu_3983 | conformance_unit | claimed | OPC-10000-4 §7.32, 7.38 | MUC_OPCUA_CU_BASE_SERVICES_DIAGNOSTICS | micro, embedded, standard, full | test_service_header |
 | opc_cu_3985 | conformance_unit | unimplemented |  | — | all | — |
 | opc_cu_5505 | conformance_unit | unimplemented |  | — | micro, embedded, standard, full | — |
 | opc_cu_5793 | conformance_unit | unimplemented |  | — | all | — |
@@ -198,6 +198,12 @@ remains future work.
 | opc_cu_server_capabilities_2 | conformance_unit | claimed | OPC-10000-3 §4 | MUC_OPCUA_CU_SERVER_CAPABILITIES_2 | all | test_base_server_behaviour |
 | opc_cu_session_general_service | conformance_unit | claimed | OPC-10000-4 §5.6 | MUC_OPCUA_CU_SESSION_GENERAL_SERVICE | all | test_dispatch_session_order, test_base_server_behaviour |
 | opc_cu_namespace_metadata | conformance_unit | claimed | OPC-10000-3 §4 | MUC_OPCUA_CU_NAMESPACE_METADATA | all | test_base_server_behaviour, test_read_browsename_namespace |
+| opc_cu_2190 | conformance_unit | unimplemented | OPC-10000-4 §5.6.5 | — | standard, full | — |
+| opc_cu_2271 | conformance_unit | unimplemented | OPC-10000-4 §5.4.5 | — | standard, full | — |
+| opc_cu_2863 | conformance_unit | unimplemented | OPC-10000-7 §6.5 | — | embedded, standard, full | — |
+| opc_cu_3170 | conformance_unit | unimplemented | OPC-10000-4 §5.4.6 | — | standard, full | — |
+| opc_cu_3721 | conformance_unit | unimplemented | OPC-10000-7 §6.5 | — | full | — |
+| opc_cu_3923 | conformance_unit | unimplemented | OPC-10000-4 §5.6 | — | micro, embedded, standard, full | — |
 | opc_cu_3080 | conformance_unit | unimplemented |  | — | all | — |
 | opc_cu_3201 | conformance_unit | unimplemented |  | — | micro, embedded, standard, full | — |
 | opc_cu_5592 | conformance_unit | claimed |  | MUC_OPCUA_CU_BASE_INFO_ENGINEERING_UNITS | micro, embedded, standard, full | test_profile_surface |

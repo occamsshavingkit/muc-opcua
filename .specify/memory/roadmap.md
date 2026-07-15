@@ -135,7 +135,7 @@ Status legend (lifecycle): **undecided** · **needs-info** · **planned** ·
   - History
 - **Depends on:** 001 (Nano Client)
 - **Governed by:** C-01, C-03
-- **Spec dir:** _not yet created_
+- **Spec dir:** `specs/071-nano-service-behaviour`
 - **Notes:** Subscription client is more complex than the server side because
   the client drives the Publish request loop. Must handle keep-alive, timeout,
   and subscription transfer.
@@ -243,7 +243,7 @@ standard 1 — 104 total.
   (`069-nano-type-system`), merged 2026-07-14 at merge commit `a6fbaaf` after
   CI, Codacy, and CodeRabbit passed.
 
-### 006 — Server: Nano Core Service Behaviour CUs  [status: planned]
+### 006 — Server: Nano Core Service Behaviour CUs  [status: implemented]
 
 - **Description:** Implements the ~10 genuinely new service behaviour CUs
   required at nano (5 duplicates already claimed removed — Session Base,
@@ -276,7 +276,14 @@ standard 1 — 104 total.
 - **Governed by:** C-05, C-07, C-08; ADR-0003; Constitution Principle IV
   (protocol correctness gates)
 - **Spec dir:** _not yet created_
-- **Notes:** Several of these CUs may already be functionally implemented (e.g.
+- **Notes:** Implemented and validated in `specs/071-nano-service-behaviour`.
+  `opc_cu_3147` partial IndexRange writes are implemented (bounded partial
+  array updates in `write_value_index_range()`,
+  `src/core/service_dispatch/attribute_handler.c`) and the CU is claimed
+  with a dedicated `MUC_OPCUA_CU_ATTRIBUTE_WRITE_INDEX_RANGE` Kconfig symbol,
+  enabled/disabled gating tests, and regenerated profile artifacts. All ten
+  in-scope CUs have dedicated symbols, generated artifacts, backing tests,
+  and focused profile-gating evidence; no deferred CU remains.
   Read, Browse, Session, Discovery) but are marked unimplemented in the manifest
   because they lack dedicated Kconfig symbols or CU-level tests. The spec's
   planning phase must audit each CU against the existing implementation and

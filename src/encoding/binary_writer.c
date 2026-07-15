@@ -217,7 +217,7 @@ opcua_statuscode_t mu_binary_write_argument(mu_binary_writer_t *writer, const mu
 }
 #endif
 
-#if MUC_OPCUA_CU_DIAGNOSTICS
+#if MUC_OPCUA_CU_BASE_INFO_DIAGNOSTICS
 opcua_statuscode_t mu_binary_write_server_diagnostics_summary(mu_binary_writer_t *writer,
                                                               const mu_diagnostics_summary_t *diag) {
     if (!writer || !diag) {

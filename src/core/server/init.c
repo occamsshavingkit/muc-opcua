@@ -199,7 +199,7 @@ opcua_statuscode_t mu_server_init(void *storage, size_t storage_size, const mu_s
                                      ? server->config.time_adapter.get_time(server->config.time_adapter.context)
                                      : 0;
         mu_base_runtime_init(&server->runtime_base, &server->config.time_adapter, start
-#if MUC_OPCUA_CU_DIAGNOSTICS
+#if MUC_OPCUA_CU_BASE_INFO_DIAGNOSTICS
                              ,
                              &server->diag
 #endif

@@ -127,7 +127,7 @@ static opcua_statuscode_t test_write_handler(void *handle, const mu_nodeid_t *no
 }
 
 void test_write_service_integration(void) {
-#ifdef MUC_OPCUA_CU_CORE_2017_ATTRIBUTE_WRITE
+#ifdef MUC_OPCUA_SERVICE_WRITE
     mock_t mock;
     (void)memset(&mock, 0, sizeof(mock));
 

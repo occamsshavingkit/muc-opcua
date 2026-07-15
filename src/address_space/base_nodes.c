@@ -1917,7 +1917,7 @@ static opcua_statuscode_t base_status_time_read(void *ctx, const mu_nodeid_t *id
 }
 #endif /* MUC_OPCUA_FACET_CORE_2022_SERVER */
 
-#if defined(MUC_OPCUA_FACET_CORE_2022_SERVER) && MUC_OPCUA_CU_DIAGNOSTICS
+#if defined(MUC_OPCUA_FACET_CORE_2022_SERVER) && MUC_OPCUA_CU_BASE_INFO_DIAGNOSTICS
 /* Live ServerDiagnosticsSummary (2275): emit the caller-owned counter struct as a scalar
    ServerDiagnosticsSummaryDataType ExtensionObject. The encoder reads value.array as a
    const mu_diagnostics_summary_t* (12 x UInt32, OPC-10000-5 §12.9). */
@@ -1944,14 +1944,14 @@ static opcua_statuscode_t base_diagnostics_enabled_read(void *context, const mu_
 #endif
 
 void mu_base_runtime_init(mu_base_runtime_nodes_t *s, const mu_time_adapter_t *time, opcua_datetime_t start_time
-#if MUC_OPCUA_CU_DIAGNOSTICS
+#if MUC_OPCUA_CU_BASE_INFO_DIAGNOSTICS
                           ,
                           const mu_diagnostics_summary_t *diag
 #endif
 ) {
     s->rt.time = time;
     s->rt.start_time = start_time;
-#if MUC_OPCUA_CU_DIAGNOSTICS
+#if MUC_OPCUA_CU_BASE_INFO_DIAGNOSTICS
     s->rt.diag = diag;
 #endif
 
@@ -1992,7 +1992,7 @@ void mu_base_runtime_init(mu_base_runtime_nodes_t *s, const mu_time_adapter_t *t
         .value = &s->values[1],
         .type_definition = type_def};
 
-#if MUC_OPCUA_CU_DIAGNOSTICS
+#if MUC_OPCUA_CU_BASE_INFO_DIAGNOSTICS
     /* Base Server Behaviour facet (spec 064): the ServerDiagnostics object tree.
        ServerDiagnostics(2274) Object, ServerDiagnosticsSummary(2275) live Variable,
        EnabledFlag(2294) Variable. Read-addressable by NodeId (OPC-10000-5 §6.3.3). */

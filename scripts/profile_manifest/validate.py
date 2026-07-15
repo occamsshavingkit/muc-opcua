@@ -45,6 +45,20 @@ _DEFAULT_MANIFEST = os.path.join(
     _REPO_ROOT, "profiles", "opcua-profile-manifest.yaml"
 )
 _UNSELECTABLE_STATES = ("unimplemented",)
+_IN_SCOPE_071_CU_IDS = frozenset(
+    (
+        "opc_cu_2317",
+        "opc_cu_2328",
+        "opc_cu_2352",
+        "opc_cu_2389",
+        "opc_cu_2400",
+        "opc_cu_2936",
+        "opc_cu_3147",
+        "opc_cu_3192",
+        "opc_cu_3530",
+        "opc_cu_3983",
+    )
+)
 
 
 def _parse_args(argv: list[str]) -> argparse.Namespace:
@@ -282,6 +296,36 @@ def _check_generated(manifest: dict, manifest_path: str) -> list[str]:
             "docs/conformance/opc-profile-roadmap.md: drift detected -- "
             "committed file does not match generator output "
             "(run generate.py --outputs roadmap)"
+        )
+
+    # completion.md drift check (spec 073 CU-based conformance completion).
+    import json as _json
+
+    from profile_manifest import completion as _completion
+
+    completion_path = os.path.join(_REPO_ROOT, "docs", "conformance", "completion.md")
+    snap_path = os.path.join(_REPO_ROOT, "profiles", "opcua-profile-normalized-snapshot.json")
+    try:
+        with open(snap_path, encoding="utf-8") as fh:
+            _snapshot = _json.load(fh)
+        _cat_path = os.path.join(_REPO_ROOT, "profiles", "opcua-server-conformance.json")
+        _catalog = None
+        if os.path.exists(_cat_path):
+            with open(_cat_path, encoding="utf-8") as fh:
+                _catalog = _json.load(fh)
+        expected_completion = _completion.render_report(manifest, _snapshot, _catalog)
+        with open(completion_path, "r", encoding="utf-8") as fh:
+            actual_completion = fh.read()
+        if actual_completion != expected_completion:
+            errors.append(
+                "docs/conformance/completion.md: drift detected -- committed "
+                "file does not match generator output "
+                "(run generate.py --outputs completion)"
+            )
+    except FileNotFoundError:
+        errors.append(
+            "docs/conformance/completion.md: file is missing "
+            "(run generate.py --outputs completion to create it)"
         )
 
     # build-and-gating.md generated-section drift check.
@@ -781,6 +825,8 @@ def _check_claims(manifest: dict) -> list[str]:
         if not isinstance(item, dict):
             continue
 
+        errors.extend(_check_in_scope_071_implemented_cu_requirements(item))
+
         state = item.get("implementation_state")
         if state != "claimed":
             continue
@@ -813,6 +859,66 @@ def _check_claims(manifest: dict) -> list[str]:
                     + ", ".join(claimed_profiles)
                     + " but has no backing tests for those profiles"
                 )
+
+    return errors
+
+
+def _check_in_scope_071_manifest_requirements(manifest: dict) -> list[str]:
+    """Validate 071 in-scope implemented CU claim evidence in a manifest."""
+    errors: list[str] = []
+    items = manifest.get("items", [])
+    if not isinstance(items, list):
+        return errors
+    for item in items:
+        if isinstance(item, dict):
+            errors.extend(_check_in_scope_071_implemented_cu_requirements(item))
+    return errors
+
+
+def _check_in_scope_071_implemented_cu_requirements(item: dict) -> list[str]:
+    """Require claim evidence before a 071 CU is marked implemented.
+
+    OPC-10000-7 §4.2 exposes Conformance Units as selectable profile/facet
+    capabilities. For the 071 nano-service behaviour scope, an implemented CU
+    claim must therefore have a selectable Kconfig symbol plus concrete backing
+    tests before promotion (SCN-001, CASE-010, quickstart path 4).
+    """
+    item_id = item.get("id")
+    if item_id not in _IN_SCOPE_071_CU_IDS:
+        return []
+    if item.get("kind") != "conformance_unit":
+        return []
+    if item.get("implementation_state") != "implemented":
+        return []
+
+    errors: list[str] = []
+    symbol = item.get("kconfig_symbol")
+    if not isinstance(symbol, str) or not symbol:
+        errors.append(
+            "claim: in-scope 071 CU '" + str(item_id) + "' is implemented but "
+            "has no non-empty kconfig_symbol (required before promotion per "
+            "OPC-10000-7 §4.2; evidence binding: SCN-001, CASE-010, "
+            "quickstart path 4)"
+        )
+
+    backing = item.get("backing_tests") or []
+    if not isinstance(backing, list) or not backing:
+        errors.append(
+            "claim: in-scope 071 CU '" + str(item_id) + "' is implemented but "
+            "has no non-empty backing_tests (required before promotion per "
+            "OPC-10000-7 §4.2; evidence binding: SCN-001, CASE-010, "
+            "quickstart path 4)"
+        )
+    else:
+        for test_path in backing:
+            if not isinstance(test_path, str) or not test_path:
+                errors.append(
+                    "claim: in-scope 071 CU '" + str(item_id) + "' has an "
+                    "invalid backing_tests entry (must be a non-empty string; "
+                    "OPC-10000-7 §4.2; evidence binding: SCN-001, CASE-010, "
+                    "quickstart path 4)"
+                )
+                break
 
     return errors
 
@@ -1305,6 +1411,47 @@ def _check_unimplemented_availability(manifest: dict) -> list[str]:
     return errors
 
 
+def _check_reconciliation_links(manifest: dict) -> list[str]:
+    """Spec 073 FR-002: `satisfied_by` must point to an existing implemented CU,
+    and `not_applicable` must map known profile keys to non-empty reasons."""
+    errors: list[str] = []
+    items = manifest.get("items", [])
+    by_id = {it.get("id"): it for it in items if it.get("kind") == "conformance_unit"}
+    implemented = {"claimed", "implemented"}
+    profile_keys = set(manifest.get("profiles", {}).keys())
+    for it in items:
+        if it.get("kind") != "conformance_unit":
+            continue
+        iid = it.get("id", "<unknown>")
+        sat = it.get("satisfied_by")
+        if sat is not None:
+            target = by_id.get(sat)
+            if target is None:
+                errors.append("reconciliation: '" + str(iid) + "' satisfied_by unknown CU '" + str(sat) + "'")
+            elif target.get("implementation_state") not in implemented:
+                errors.append(
+                    "reconciliation: '" + str(iid) + "' satisfied_by '" + str(sat)
+                    + "' which is not implemented/claimed"
+                )
+        na = it.get("not_applicable")
+        if na is not None:
+            if not isinstance(na, dict) or not na:
+                errors.append("reconciliation: '" + str(iid) + "' not_applicable must be a non-empty mapping")
+            else:
+                for pkey, reason in na.items():
+                    if profile_keys and pkey not in profile_keys:
+                        errors.append(
+                            "reconciliation: '" + str(iid) + "' not_applicable references unknown profile '"
+                            + str(pkey) + "'"
+                        )
+                    if not isinstance(reason, str) or not reason.strip():
+                        errors.append(
+                            "reconciliation: '" + str(iid) + "' not_applicable['" + str(pkey)
+                            + "'] must have a grounded reason"
+                        )
+    return errors
+
+
 def main(argv: list[str] | None = None) -> int:
     args = _parse_args(sys.argv[1:] if argv is None else argv)
 
@@ -1316,6 +1463,8 @@ def main(argv: list[str] | None = None) -> int:
         return 1
 
     errors = validate_manifest(manifest)
+    errors.extend(_check_in_scope_071_manifest_requirements(manifest))
+    errors.extend(_check_reconciliation_links(manifest))
     if errors:
         print("manifest: FAIL")
         for err in errors:

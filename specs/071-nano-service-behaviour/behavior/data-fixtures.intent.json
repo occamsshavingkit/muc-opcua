@@ -1,0 +1,30 @@
+{
+  "feature": "server-nano-service-behaviour-cus",
+  "fixtures": [
+    {
+      "id": "FIX-001",
+      "purpose": "Nano profile with discovery and view CUs enabled by default",
+      "sources": ["profiles/opcua-profile-manifest.yaml", "generated defconfigs"]
+    },
+    {
+      "id": "FIX-002",
+      "purpose": "Micro-or-higher profile with write/session/diagnostics CUs enabled",
+      "sources": ["profiles/opcua-profile-manifest.yaml", "service request fixtures"]
+    },
+    {
+      "id": "FIX-003",
+      "purpose": "Malformed, boundary, and disabled-CU service request payloads",
+      "sources": ["tests/fixtures", "unit test request builders"]
+    },
+    {
+      "id": "FIX-004",
+      "purpose": "Live diagnostics counters and ServerDiagnostics address-space nodes",
+      "sources": ["tests/unit/test_diagnostics.c", "src/address_space/base_nodes.c"]
+    },
+    {
+      "id": "FIX-005",
+      "purpose": "Custom-profile matrix with one dedicated CU symbol disabled at a time",
+      "sources": ["profiles/opcua-profile-manifest.yaml", "scripts/test_profile_gating.sh", "unit service request builders"]
+    }
+  ]
+}

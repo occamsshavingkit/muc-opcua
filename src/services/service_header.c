@@ -57,8 +57,22 @@ opcua_statuscode_t mu_response_header_encode(mu_binary_writer_t *writer, const m
         return status;
     }
 
-    /* serviceDiagnostics: empty DiagnosticInfo (encoding mask byte 0x00) */
-    status = mu_binary_write_byte(writer, 0x00);
+#if defined(MUC_OPCUA_CU_BASE_SERVICES_DIAGNOSTICS) && MUC_OPCUA_CU_BASE_SERVICES_DIAGNOSTICS
+    /* OPC-10000-4 §7.32/§7.38: returnDiagnostics may request available
+       service-level diagnostic information. This server currently exposes the
+       service result as DiagnosticInfo.innerStatusCode and no string table. */
+    if ((header->return_diagnostics & 0x20u) != 0u) {
+        status = mu_binary_write_byte(writer, 0x20u);
+        if (status != MU_STATUS_GOOD) {
+            return status;
+        }
+        status = mu_binary_write_statuscode(writer, header->service_result);
+    } else
+#endif
+    {
+        /* serviceDiagnostics: empty DiagnosticInfo (encoding mask byte 0x00) */
+        status = mu_binary_write_byte(writer, 0x00);
+    }
     if (status != MU_STATUS_GOOD) {
         return status;
     }

@@ -1,0 +1,6 @@
+{
+  "feature": "server-nano-service-behaviour-cus",
+  "ui_required": false,
+  "reason": "The feature has no user interface or visual fidelity requirements.",
+  "interaction_intents": []
+}

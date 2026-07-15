@@ -1,0 +1,37 @@
+{
+  "feature": "server-nano-service-behaviour-cus",
+  "scenarios": [
+    {
+      "id": "SCN-001",
+      "source": "spec.md US1, CASE-001, CASE-002, CASE-010",
+      "given": ["nano profile selected", "discovery and view CUs enabled by nano defaults", "custom profile may disable one dedicated CU"],
+      "when": ["client invokes discovery and view service requests"],
+      "then": ["responses match cited OPC UA sections", "optional CUs remain unclaimed by nano defaults", "a disabled dedicated CU does not disable unrelated enabled behavior"],
+      "case_types": ["positive", "permission", "state_conflict"]
+    },
+    {
+      "id": "SCN-002",
+      "source": "spec.md US2, CASE-003, CASE-004, CASE-007, CASE-009",
+      "given": ["micro or higher profile enables write/session CUs"],
+      "when": ["client writes values or changes session user"],
+      "then": ["valid requests succeed", "invalid or disabled requests return explicit StatusCodes", "disabled behavior preserves prior value, identity, and nonce state", "IndexRange remains unsupported and unclaimed under S071-D1"],
+      "case_types": ["positive", "permission", "validation"]
+    },
+    {
+      "id": "SCN-003",
+      "source": "spec.md US3, CASE-005, CASE-007",
+      "given": ["diagnostics CUs enabled or disabled by profile gate"],
+      "when": ["client reads diagnostics nodes or requests returnDiagnostics"],
+      "then": ["enabled diagnostics are observable", "each disabled dedicated diagnostics behavior is unavailable and not claimed without disabling the other diagnostics CU"],
+      "case_types": ["positive", "permission"]
+    },
+    {
+      "id": "SCN-004",
+      "source": "spec.md Edge Cases, CASE-006, CASE-008",
+      "given": ["in-scope service receives malformed or boundary request"],
+      "when": ["service decodes and validates request"],
+      "then": ["cited OPC UA failure StatusCode is returned", "bounded state remains safe"],
+      "case_types": ["negative", "boundary"]
+    }
+  ]
+}

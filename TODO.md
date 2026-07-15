@@ -1,7 +1,9 @@
+<!-- markdownlint-disable MD013 MD022 MD032 MD056 MD060 -->
+
 # TODO — muc-opcua
 
-**Updated**: 2026-07-12 (Task 4 CU reorg — stub.c traceability gap from Task 1)
-**Source**: code review findings, complexity audit, binary size analysis
+**Updated**: 2026-07-15 (Spec 071 Write IndexRange `opc_cu_3147` fully claimed; `S071-D1` closed)
+**Source**: code review findings, complexity audit, binary size analysis, approved Spec Kit deferrals
 
 ## Task 1 Follow-up — Traceability Gap
 

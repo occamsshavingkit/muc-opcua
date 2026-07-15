@@ -165,6 +165,51 @@ menuconfig MUC_OPCUA_FACET_CORE_2022_SERVER
 
 if MUC_OPCUA_FACET_CORE_2022_SERVER
 
+config MUC_OPCUA_CU_VIEW_TRANSLATEBROWSEPATH
+	bool "CU: View TranslateBrowsePath"
+	default y if MUC_OPCUA_INTERN_PROFILE_NANO_EMBEDDED_DEVICE_2025_SERVER
+	help
+	  Implementation state: implemented.
+	  OPC source: OPC-10000-4 §5.9.4 -- CU 2317:View TranslateBrowsePath.
+	  Backing tests: test_browse_service, test_view_services.
+	  Notes: Support TranslateBrowsePathsToNodeIds Service.
+
+config MUC_OPCUA_CU_DISCOVERY_GET_ENDPOINTS
+	bool "CU: Discovery Get Endpoints"
+	default y if MUC_OPCUA_INTERN_PROFILE_NANO_EMBEDDED_DEVICE_2025_SERVER
+	help
+	  Implementation state: implemented.
+	  OPC source: OPC-10000-4 §5.5.1, 5.5.4 -- CU 2328:Discovery Get Endpoints.
+	  Backing tests: test_discovery_endpoint, test_discovery_services.
+	  Notes: Support the GetEndpoints Service to obtain all Endpoints of the Server. This includes filtering based on Profiles.
+
+config MUC_OPCUA_CU_DISCOVERY_FIND_SERVERS_SELF
+	bool "CU: Discovery Find Servers Self"
+	default y if MUC_OPCUA_INTERN_PROFILE_NANO_EMBEDDED_DEVICE_2025_SERVER
+	help
+	  Implementation state: implemented.
+	  OPC source: OPC-10000-4 §5.5.2 -- CU 2352:Discovery Find Servers Self.
+	  Backing tests: test_discovery_services, test_discovery_endpoint.
+	  Notes: Support the FindServers Service only for itself.
+
+config MUC_OPCUA_CU_ATTRIBUTE_WRITE_VALUES
+	bool "CU: Attribute Write Values"
+	default y if MUC_OPCUA_INTERN_PROFILE_MICRO_EMBEDDED_DEVICE_2025_SERVER
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-4 §5.11.4 -- CU 2389:Attribute Write Values.
+	  Backing tests: test_write_value_gate, test_write_service.
+	  Notes: Supports writing to values to one or more Attributes of one or more Nodes. Implemented as Value Attribute writes only; non-Value Attribute writes remain rejected.
+
+config MUC_OPCUA_CU_SESSION_CHANGE_USER
+	bool "CU: Session Change User"
+	default y if MUC_OPCUA_INTERN_PROFILE_MICRO_EMBEDDED_DEVICE_2025_SERVER
+	help
+	  Implementation state: implemented.
+	  OPC source: OPC-10000-4 §5.7.3 -- CU 2400:Session Change User.
+	  Backing tests: test_session, test_session_auth.
+	  Notes: Support the use of ActivateSession to change the Session user.
+
 config MUC_OPCUA_CU_ADDRESS_SPACE_ADDIN_REFERENCE
 	bool "CU: Address Space AddIn Reference"
 	default y if MUC_OPCUA_INTERN_PROFILE_MICRO_EMBEDDED_DEVICE_2025_SERVER
@@ -219,6 +264,16 @@ config MUC_OPCUA_CU_ADDRESS_SPACE_FULL_ARRAY_ONLY
 	  Backing tests: test_profile_surface.
 	  Notes: Support setting the WriteFullArrayOnly flag in the AccessLevelEx Attribute for Variable Nodes of non-scalar data types to indicate whether write operations for an array can be performed with an IndexRange.
 
+config MUC_OPCUA_CU_ATTRIBUTE_WRITE_STATUSCODE_TIMESTAMP
+	bool "CU: Attribute Write StatusCode & Timestamp"
+	depends on MUC_OPCUA_CU_ATTRIBUTE_WRITE_VALUES
+	default y if MUC_OPCUA_INTERN_PROFILE_MICRO_EMBEDDED_DEVICE_2025_SERVER
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-4 §5.11.4 -- CU 2936:Attribute Write StatusCode & Timestamp.
+	  Backing tests: test_write_service, test_write_response.
+	  Notes: Supports writing StatusCode and Timestamp DataValue fields along with the Value; depends on Attribute Write Values so it cannot enable Write by itself.
+
 config MUC_OPCUA_CU_BASE_INFO_VALUEASTEXT
 	bool "CU: Base Info ValueAsText"
 	default y if MUC_OPCUA_INTERN_PROFILE_MICRO_EMBEDDED_DEVICE_2025_SERVER
@@ -237,6 +292,25 @@ config MUC_OPCUA_CU_BASE_INFO_OPTIONSET
 	  Backing tests: test_profile_surface.
 	  Notes: The Server supports the VariableType OptionSetType.
 
+config MUC_OPCUA_CU_ATTRIBUTE_WRITE_INDEX_RANGE
+	bool "CU: Attribute Write Index"
+	depends on MUC_OPCUA_CU_ATTRIBUTE_WRITE_VALUES
+	default y if MUC_OPCUA_INTERN_PROFILE_MICRO_EMBEDDED_DEVICE_2025_SERVER
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-4 §5.11.4 -- CU 3147:Attribute Write Index.
+	  Backing tests: test_write_service.
+	  Notes: Supports the IndexRange to write a single element or a range of elements when the Attribute value is an array and partial updates is allowed for this array; depends on Attribute Write Values so it cannot enable Write by itself.
+
+config MUC_OPCUA_CU_BASE_INFO_DIAGNOSTICS
+	bool "CU: Base Info Diagnostics"
+	default y if MUC_OPCUA_INTERN_PROFILE_MICRO_EMBEDDED_DEVICE_2025_SERVER
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-5 §6.3.1, 6.3.3, 8.3.2, 12.9 -- CU 3192:Base Info Diagnostics.
+	  Backing tests: test_diagnostics, test_profile_surface.
+	  Notes: The Server supports the collection of diagnostic information and exposes it in the AddressSpace. This includes always the ServerDiagnostics Object of the Server Object and its EnabledFlag Variable. The EnabledFlag in the ServerDiagnostics Object can be set TRUE and in that case the following Objects and Variables for diagnostic data as defined in the ServerDiagnosticsType are exposed: ServerDiagnosticsSummary with all its subcomponents, SubscriptionDiagnosticsArray, and SessionsDiagnosticsSummary with all its subcomponents.
+
 config MUC_OPCUA_CU_BASE_INFO_ESTIMATED_RETURN_TIME
 	bool "CU: Base Info Estimated Return Time"
 	default y if MUC_OPCUA_INTERN_PROFILE_MICRO_EMBEDDED_DEVICE_2025_SERVER
@@ -246,6 +320,15 @@ config MUC_OPCUA_CU_BASE_INFO_ESTIMATED_RETURN_TIME
 	  Backing tests: test_profile_surface.
 	  Notes: Server supports the EstimatedReturnTime Property. It indicates the time at which the Server is expected to have a ServerStatus.State of RUNNING_0. Clients can use this information to govern the reconnect logic.
 
+config MUC_OPCUA_CU_VIEW_BASIC_2
+	bool "CU: View Basic 2"
+	default y if MUC_OPCUA_INTERN_PROFILE_NANO_EMBEDDED_DEVICE_2025_SERVER
+	help
+	  Implementation state: implemented.
+	  OPC source: OPC-10000-4 §5.9.2, 5.9.3 -- CU 3530:View Basic 2.
+	  Backing tests: test_browse_service, test_browse_limits, test_view_services.
+	  Notes: Support the View Service Set (Browse, BrowseNext). This includes the support of minimum 1 continuation point per Session.
+
 config MUC_OPCUA_CU_ADDRESS_SPACE_INTERFACES
 	bool "CU: Address Space Interfaces"
 	default y if MUC_OPCUA_INTERN_PROFILE_MICRO_EMBEDDED_DEVICE_2025_SERVER
@@ -254,6 +337,15 @@ config MUC_OPCUA_CU_ADDRESS_SPACE_INTERFACES
 	  OPC item: CU 3560:Address Space Interfaces.
 	  Backing tests: test_profile_surface.
 	  Notes: Support Interfaces and associated rules. Includes exposing the entry point InterfaceTypes and the types BaseInterfaceType and HasInterface and all their supertypes in the AddressSpace.
+
+config MUC_OPCUA_CU_BASE_SERVICES_DIAGNOSTICS
+	bool "CU: Base Services Diagnostics"
+	default y if MUC_OPCUA_INTERN_PROFILE_MICRO_EMBEDDED_DEVICE_2025_SERVER
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-4 §7.32, 7.38 -- CU 3983:Base Services Diagnostics.
+	  Backing tests: test_service_header.
+	  Notes: The Server returns available diagnostic information as requested with the 'returnDiagnostics' parameter.
 
 config MUC_OPCUA_CU_BASE_INFO_LOCATIONS_OBJECT
 	bool "CU: Base Info Locations Object"
@@ -294,6 +386,7 @@ config MUC_OPCUA_CU_ADDRESS_SPACE_BASE
 
 config MUC_OPCUA_CU_AGGREGATE_FULL
 	bool "CU: Aggregate Full"
+	depends on MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
 	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
 	help
 	  Implementation state: claimed.
@@ -303,6 +396,7 @@ config MUC_OPCUA_CU_AGGREGATE_FULL
 
 config MUC_OPCUA_CU_AUDITING
 	bool "CU: Auditing"
+	depends on MUC_OPCUA_CU_EVENTS
 	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
 	help
 	  Implementation state: claimed.
@@ -377,6 +471,7 @@ config MUC_OPCUA_CU_DYNAMIC_NODES
 
 config MUC_OPCUA_CU_EVENT_FILTER_WHERE
 	bool "CU: Event Filter Where"
+	depends on MUC_OPCUA_CU_EVENTS && MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
 	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
 	help
 	  Implementation state: claimed.
@@ -386,6 +481,7 @@ config MUC_OPCUA_CU_EVENT_FILTER_WHERE
 
 config MUC_OPCUA_CU_EVENTS
 	bool "CU: Events"
+	depends on MUC_OPCUA_CU_SUBSCRIPTION_BASIC
 	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
 	help
 	  Implementation state: claimed.
@@ -459,6 +555,7 @@ config MUC_OPCUA_CU_PUBSUB
 
 config MUC_OPCUA_CU_REDUNDANCY
 	bool "CU: Redundancy"
+	depends on MUC_OPCUA_CU_SUBSCRIPTION_BASIC
 	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
 	help
 	  Implementation state: claimed.
@@ -516,6 +613,7 @@ config MUC_OPCUA_CU_SESSION_GENERAL_SERVICE
 
 config MUC_OPCUA_CU_SESSION_TIMEOUT
 	bool "CU: Session Timeout"
+	depends on MUC_OPCUA_CU_MULTIPLE_CONNECTIONS || MUC_OPCUA_CU_MULTI_CHUNK
 	default y if MUC_OPCUA_CU_MULTIPLE_CONNECTIONS || MUC_OPCUA_CU_MULTI_CHUNK
 	help
 	  Implementation state: claimed.
@@ -534,6 +632,7 @@ config MUC_OPCUA_CU_SUBSCRIPTION_BASIC
 
 config MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
 	bool "CU: Subscription Standard"
+	depends on MUC_OPCUA_CU_SUBSCRIPTION_BASIC
 	default y if MUC_OPCUA_INTERN_PROFILE_EMBEDDED_2025_UA_SERVER
 	help
 	  Implementation state: claimed.
@@ -640,35 +739,47 @@ config MUC_OPCUA_CU_BASE_INFO_ENGINEERING_UNITS
 	  Backing tests: test_profile_surface.
 	  Notes: The Server supports defining Variables that include the Engineering Units Property. This property makes use of the EUInformation data structure. This structure by default represents the UN/CEFACT "Codes for Units of Measurement" or the Common Data Dictionary (IEC CDD). If a different EU representation is required then the EUInformation.namespaceUri will indicate the alternate namespace.
 
-# View TranslateBrowsePath (opc_cu_2317)
+# Session Cancel (opc_cu_2190)
 #   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 2317:View TranslateBrowsePath.
-#   Notes: Support TranslateBrowsePathsToNodeIds Service.
-comment "View TranslateBrowsePath (NOT IMPLEMENTED)"
+#   OPC source: OPC-10000-4 §5.6.5.
+#   Detail: CU 2190:Session Cancel.
+#   Notes: Imported from OPC profile REST API 2026-07-15. Not implemented: no Cancel service handler exists.
+comment "Session Cancel (NOT IMPLEMENTED) [OPC-10000-4 §5.6.5]"
 
-# Discovery Get Endpoints (opc_cu_2328)
+# Discovery Register (opc_cu_2271)
 #   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 2328:Discovery Get Endpoints.
-#   Notes: Support the GetEndpoints Service to obtain all Endpoints of the Server. This includes filtering based on Profiles.
-comment "Discovery Get Endpoints (NOT IMPLEMENTED)"
+#   OPC source: OPC-10000-4 §5.4.5.
+#   Detail: CU 2271:Discovery Register.
+#   Notes: Imported from OPC profile REST API 2026-07-15. Not implemented: register_server.c is a stub (outbound RegisterServer to a discovery server is not supported).
+comment "Discovery Register (NOT IMPLEMENTED) [OPC-10000-4 §5.4.5]"
 
-# Discovery Find Servers Self (opc_cu_2352)
+# Security Policy Required (opc_cu_2863)
 #   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 2352:Discovery Find Servers Self.
-#   Notes: Support the FindServers Service only for itself.
-comment "Discovery Find Servers Self (NOT IMPLEMENTED)"
+#   OPC source: OPC-10000-7 §6.5.
+#   Detail: CU 2863:Security Policy Required.
+#   Notes: Imported from OPC profile REST API 2026-07-15. Capability satisfied via the secure-conversation layer, which implements Basic256Sha256, Aes128_Sha256_RsaOaep, and Aes256_Sha256_RsaPss; Kconfig gates per-profile inclusion.
+comment "Security Policy Required (NOT IMPLEMENTED) [OPC-10000-7 §6.5]"
 
-# Attribute Write Values (opc_cu_2389)
+# Discovery Register2 (opc_cu_3170)
 #   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 2389:Attribute Write Values.
-#   Notes: Supports writing to values to one or more Attributes of one or more Nodes.
-comment "Attribute Write Values (NOT IMPLEMENTED)"
+#   OPC source: OPC-10000-4 §5.4.6.
+#   Detail: CU 3170:Discovery Register2.
+#   Notes: Imported from OPC profile REST API 2026-07-15. Not implemented: RegisterServer2 outbound registration is not supported.
+comment "Discovery Register2 (NOT IMPLEMENTED) [OPC-10000-4 §5.4.6]"
 
-# Session Change User (opc_cu_2400)
+# Security ECC Policy (opc_cu_3721)
 #   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 2400:Session Change User.
-#   Notes: Support the use of ActivateSession to change the Session user.
-comment "Session Change User (NOT IMPLEMENTED)"
+#   OPC source: OPC-10000-7 §6.5.
+#   Detail: CU 3721:Security ECC Policy.
+#   Notes: Imported from OPC profile REST API 2026-07-15. Optional. Capability satisfied by MUC_OPCUA_CU_SECURITY_ECC (spec 059); Kconfig gates per-profile inclusion (built in full).
+comment "Security ECC Policy (NOT IMPLEMENTED) [OPC-10000-7 §6.5]"
+
+# Session Multiple (opc_cu_3923)
+#   Implementation state: unimplemented -- visible but not selectable.
+#   OPC source: OPC-10000-4 §5.6.
+#   Detail: CU 3923:Session Multiple.
+#   Notes: Imported from OPC profile REST API 2026-07-15. Capability satisfied by MUC_OPCUA_CU_MULTIPLE_CONNECTIONS (multiple parallel sessions); Kconfig gates per-profile inclusion.
+comment "Session Multiple (NOT IMPLEMENTED) [OPC-10000-4 §5.6]"
 
 # Security Administration (opc_cu_2407)
 #   Implementation state: unimplemented -- visible but not selectable.
@@ -712,12 +823,6 @@ comment "Time Sync – NTP (NOT IMPLEMENTED)"
 #   Notes: Restrict access based on the configured Roles and permissions.
 comment "Security Role Server Authorization (NOT IMPLEMENTED)"
 
-# Attribute Write StatusCode & Timestamp (opc_cu_2936)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 2936:Attribute Write StatusCode & Timestamp.
-#   Notes: Supports writing of StatusCode and Timestamps along with the Value.
-comment "Attribute Write StatusCode & Timestamp (NOT IMPLEMENTED)"
-
 # Attribute Read (opc_cu_3072)
 #   Implementation state: unimplemented -- visible but not selectable.
 #   Detail: CU 3072:Attribute Read.
@@ -729,12 +834,6 @@ comment "Attribute Read (NOT IMPLEMENTED)"
 #   Detail: CU 3073:View RegisterNodes.
 #   Notes: Support the RegisterNodes and UnregisterNodes Services as a way to optimize access to repeatedly used Nodes in the Server's OPC UA AddressSpace.
 comment "View RegisterNodes (NOT IMPLEMENTED)"
-
-# Attribute Write Index (opc_cu_3147)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 3147:Attribute Write Index.
-#   Notes: Supports the IndexRange to write a single element or a range of elements when the Attribute value is an array and partial updates is allowed for this array.
-comment "Attribute Write Index (NOT IMPLEMENTED)"
 
 # Session Base (opc_cu_3175)
 #   Implementation state: unimplemented -- visible but not selectable.
@@ -753,18 +852,6 @@ comment "Base Info Core Structure 2 (NOT IMPLEMENTED)"
 #   Detail: CU 3186:Base Info Core Views Folder.
 #   Notes: Exposes the entry point into views in the AddressSpace. This is the Views Object.
 comment "Base Info Core Views Folder (NOT IMPLEMENTED)"
-
-# Base Info Diagnostics (opc_cu_3192)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 3192:Base Info Diagnostics.
-#   Notes: The Server supports the collection of diagnostic information and exposes it in the AddressSpace. This includes always the ServerDiagnostics Object of the Server Object and its EnabledFlag Variable. The EnabledFlag in the ServerDiagnostics Object can be set TRUE and in that case the following Objects and Variables for diagnostic data as defined in the ServerDiagnosticsType are exposed: ServerDiagnosticsSummary with all its subcomponents, SubscriptionDiagnosticsArray, and SessionsDiagnosticsSummary with all its subcomponents.
-comment "Base Info Diagnostics (NOT IMPLEMENTED)"
-
-# View Basic 2 (opc_cu_3530)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 3530:View Basic 2.
-#   Notes: Support the View Service Set (Browse, BrowseNext). This includes the support of minimum 1 continuation point per Session.
-comment "View Basic 2 (NOT IMPLEMENTED)"
 
 # Base Info Namespace Metadata (opc_cu_3545)
 #   Implementation state: unimplemented -- visible but not selectable.
@@ -795,12 +882,6 @@ comment "Documentation - Core Capacities (NOT IMPLEMENTED)"
 #   Detail: CU 3912:Base Info Server Capabilities 2.
 #   Notes: Exposes ServerProfileArray, LocaleIdArray, MinSupportedSampleRate, MaxBrowseContinuationPoints, ModellingRules, MaxArrayLength, MaxStringLength, MaxByteStringLength and MaxSessions of the ServerCapabilities Object, as well as MaxNodesPerRead, MaxNodesPerWrite, MaxNodesPerBrowse, MaxNodesPerRegisterNodes, MaxNodesPerTranslateBrowsePathsToNodesIds of the OperationLimits Object.
 comment "Base Info Server Capabilities 2 (NOT IMPLEMENTED)"
-
-# Base Services Diagnostics (opc_cu_3983)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 3983:Base Services Diagnostics.
-#   Notes: The Server returns available diagnostic information as requested with the 'returnDiagnostics' parameter.
-comment "Base Services Diagnostics (NOT IMPLEMENTED)"
 
 # Session General Service Behaviour (opc_cu_3985)
 #   Implementation state: unimplemented -- visible but not selectable.

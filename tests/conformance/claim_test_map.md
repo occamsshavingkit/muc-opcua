@@ -63,6 +63,16 @@ Backing test column: comma-separated ctest names (as registered).
 | Historical Access Server Facet | OPC-10000-11 | full | test_history |
 | Query | OPC-10000-4 §5.9 | full | test_query_service |
 | NodeManagement | OPC-10000-4 §5.7 | full | test_node_management, test_node_management_errors |
+| View TranslateBrowsePath | OPC-10000-4 §5.9.4 | all | test_browse_service, test_view_services |
+| Discovery Get Endpoints | OPC-10000-4 §5.5.1, 5.5.4 | all | test_discovery_endpoint, test_discovery_services |
+| Discovery Find Servers Self | OPC-10000-4 §5.5.2 | all | test_discovery_services, test_discovery_endpoint |
+| Attribute Write Values | OPC-10000-4 §5.11.4 | micro, embedded, standard, full | test_write_value_gate, test_write_service |
+| Session Change User | OPC-10000-4 §5.7.3 | micro, embedded, standard, full | test_session, test_session_auth |
+| Attribute Write StatusCode & Timestamp | OPC-10000-4 §5.11.4 | micro, embedded, standard, full | test_write_service, test_write_response |
+| Attribute Write Index | OPC-10000-4 §5.11.4 | micro, embedded, standard, full | test_write_service |
+| Base Info Diagnostics | OPC-10000-5 §6.3.1, 6.3.3, 8.3.2, 12.9 | micro, embedded, standard, full | test_diagnostics, test_profile_surface |
+| View Basic 2 | OPC-10000-4 §5.9.2, 5.9.3 | all | test_browse_service, test_browse_limits, test_view_services |
+| Base Services Diagnostics | OPC-10000-4 §7.32, 7.38 | micro, embedded, standard, full | test_service_header |
 | Protocol UA TCP | OPC-10000-6 §7.1 | all | test_tcp_connection |
 | UA Binary Encoding | OPC-10000-6 §5 | all | test_binary_primitives, test_binary_nodeid |
 | UA Secure Conversation | OPC-10000-6 §6 | all | test_secure_channel |

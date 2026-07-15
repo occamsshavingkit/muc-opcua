@@ -129,6 +129,12 @@
       "opc_cu_5868"
     ],
     "opc_facet_1322": [
+      "opc_cu_2190",
+      "opc_cu_2271",
+      "opc_cu_2863",
+      "opc_cu_3170",
+      "opc_cu_3721",
+      "opc_cu_3923",
       "opc_cu_2317",
       "opc_cu_2328",
       "opc_cu_2352",
@@ -715,6 +721,7 @@
     {
       "id": "opc_cu_2600",
       "kind": "conformance_unit",
+      "satisfied_by": "opc_cu_ua_secure_conversation",
       "opc_display_name": "SecurityPolicy Support",
       "kconfig_symbol": null,
       "implementation_state": "unimplemented",
@@ -1089,6 +1096,9 @@
     {
       "id": "opc_cu_3808",
       "kind": "conformance_unit",
+      "not_applicable": {
+        "nano": "Documentation CU; satisfied by documentation presence, not code."
+      },
       "opc_display_name": "Documentation - Core Capacities",
       "kconfig_symbol": null,
       "implementation_state": "unimplemented",
@@ -4131,8 +4141,8 @@
       "id": "opc_cu_2317",
       "kind": "conformance_unit",
       "opc_display_name": "View TranslateBrowsePath",
-      "kconfig_symbol": null,
-      "implementation_state": "unimplemented",
+      "kconfig_symbol": "MUC_OPCUA_CU_VIEW_TRANSLATEBROWSEPATH",
+      "implementation_state": "implemented",
       "depends_on": [],
       "profile_defaults": {
         "nano": true,
@@ -4142,10 +4152,13 @@
         "full": true,
         "custom": false
       },
-      "backing_tests": [],
+      "backing_tests": [
+        "test_browse_service",
+        "test_view_services"
+      ],
       "opc_reference": {
-        "spec": null,
-        "section": null,
+        "spec": "OPC-10000-4",
+        "section": "5.9.4",
         "cu_id": "2317",
         "cu_name": "View TranslateBrowsePath",
         "source_url": "https://profiles.opcfoundation.org"
@@ -4161,8 +4174,8 @@
       "id": "opc_cu_2328",
       "kind": "conformance_unit",
       "opc_display_name": "Discovery Get Endpoints",
-      "kconfig_symbol": null,
-      "implementation_state": "unimplemented",
+      "kconfig_symbol": "MUC_OPCUA_CU_DISCOVERY_GET_ENDPOINTS",
+      "implementation_state": "implemented",
       "depends_on": [],
       "profile_defaults": {
         "nano": true,
@@ -4172,10 +4185,13 @@
         "full": true,
         "custom": false
       },
-      "backing_tests": [],
+      "backing_tests": [
+        "test_discovery_endpoint",
+        "test_discovery_services"
+      ],
       "opc_reference": {
-        "spec": null,
-        "section": null,
+        "spec": "OPC-10000-4",
+        "section": "5.5.1, 5.5.4",
         "cu_id": "2328",
         "cu_name": "Discovery Get Endpoints",
         "source_url": "https://profiles.opcfoundation.org"
@@ -4191,8 +4207,8 @@
       "id": "opc_cu_2352",
       "kind": "conformance_unit",
       "opc_display_name": "Discovery Find Servers Self",
-      "kconfig_symbol": null,
-      "implementation_state": "unimplemented",
+      "kconfig_symbol": "MUC_OPCUA_CU_DISCOVERY_FIND_SERVERS_SELF",
+      "implementation_state": "implemented",
       "depends_on": [],
       "profile_defaults": {
         "nano": true,
@@ -4202,10 +4218,13 @@
         "full": true,
         "custom": false
       },
-      "backing_tests": [],
+      "backing_tests": [
+        "test_discovery_services",
+        "test_discovery_endpoint"
+      ],
       "opc_reference": {
-        "spec": null,
-        "section": null,
+        "spec": "OPC-10000-4",
+        "section": "5.5.2",
         "cu_id": "2352",
         "cu_name": "Discovery Find Servers Self",
         "source_url": "https://profiles.opcfoundation.org"
@@ -4221,8 +4240,8 @@
       "id": "opc_cu_2389",
       "kind": "conformance_unit",
       "opc_display_name": "Attribute Write Values",
-      "kconfig_symbol": null,
-      "implementation_state": "unimplemented",
+      "kconfig_symbol": "MUC_OPCUA_CU_ATTRIBUTE_WRITE_VALUES",
+      "implementation_state": "claimed",
       "depends_on": [],
       "profile_defaults": {
         "nano": false,
@@ -4232,10 +4251,13 @@
         "full": true,
         "custom": false
       },
-      "backing_tests": [],
+      "backing_tests": [
+        "test_write_value_gate",
+        "test_write_service"
+      ],
       "opc_reference": {
-        "spec": null,
-        "section": null,
+        "spec": "OPC-10000-4",
+        "section": "5.11.4",
         "cu_id": "2389",
         "cu_name": "Attribute Write Values",
         "source_url": "https://profiles.opcfoundation.org"
@@ -4244,15 +4266,15 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "Supports writing to values to one or more Attributes of one or more Nodes.",
+      "notes": "Supports writing to values to one or more Attributes of one or more Nodes. Implemented as Value Attribute writes only; non-Value Attribute writes remain rejected.",
       "cu_optional": true
     },
     {
       "id": "opc_cu_2400",
       "kind": "conformance_unit",
       "opc_display_name": "Session Change User",
-      "kconfig_symbol": null,
-      "implementation_state": "unimplemented",
+      "kconfig_symbol": "MUC_OPCUA_CU_SESSION_CHANGE_USER",
+      "implementation_state": "implemented",
       "depends_on": [],
       "profile_defaults": {
         "nano": false,
@@ -4262,10 +4284,13 @@
         "full": true,
         "custom": false
       },
-      "backing_tests": [],
+      "backing_tests": [
+        "test_session",
+        "test_session_auth"
+      ],
       "opc_reference": {
-        "spec": null,
-        "section": null,
+        "spec": "OPC-10000-4",
+        "section": "5.7.3",
         "cu_id": "2400",
         "cu_name": "Session Change User",
         "source_url": "https://profiles.opcfoundation.org"
@@ -4491,9 +4516,11 @@
       "id": "opc_cu_2936",
       "kind": "conformance_unit",
       "opc_display_name": "Attribute Write StatusCode & Timestamp",
-      "kconfig_symbol": null,
-      "implementation_state": "unimplemented",
-      "depends_on": [],
+      "kconfig_symbol": "MUC_OPCUA_CU_ATTRIBUTE_WRITE_STATUSCODE_TIMESTAMP",
+      "implementation_state": "claimed",
+      "depends_on": [
+        "MUC_OPCUA_CU_ATTRIBUTE_WRITE_VALUES"
+      ],
       "profile_defaults": {
         "nano": false,
         "micro": true,
@@ -4502,10 +4529,13 @@
         "full": true,
         "custom": false
       },
-      "backing_tests": [],
+      "backing_tests": [
+        "test_write_service",
+        "test_write_response"
+      ],
       "opc_reference": {
-        "spec": null,
-        "section": null,
+        "spec": "OPC-10000-4",
+        "section": "5.11.4",
         "cu_id": "2936",
         "cu_name": "Attribute Write StatusCode & Timestamp",
         "source_url": "https://profiles.opcfoundation.org"
@@ -4514,12 +4544,13 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "Supports writing of StatusCode and Timestamps along with the Value.",
+      "notes": "Supports writing StatusCode and Timestamp DataValue fields along with the Value; depends on Attribute Write Values so it cannot enable Write by itself.",
       "cu_optional": true
     },
     {
       "id": "opc_cu_3072",
       "kind": "conformance_unit",
+      "satisfied_by": "service_read",
       "opc_display_name": "Attribute Read",
       "kconfig_symbol": null,
       "implementation_state": "unimplemented",
@@ -4550,6 +4581,7 @@
     {
       "id": "opc_cu_3073",
       "kind": "conformance_unit",
+      "satisfied_by": "service_register_nodes",
       "opc_display_name": "View RegisterNodes",
       "kconfig_symbol": null,
       "implementation_state": "unimplemented",
@@ -4641,9 +4673,11 @@
       "id": "opc_cu_3147",
       "kind": "conformance_unit",
       "opc_display_name": "Attribute Write Index",
-      "kconfig_symbol": null,
-      "implementation_state": "unimplemented",
-      "depends_on": [],
+      "kconfig_symbol": "MUC_OPCUA_CU_ATTRIBUTE_WRITE_INDEX_RANGE",
+      "implementation_state": "claimed",
+      "depends_on": [
+        "MUC_OPCUA_CU_ATTRIBUTE_WRITE_VALUES"
+      ],
       "profile_defaults": {
         "nano": false,
         "micro": true,
@@ -4652,10 +4686,12 @@
         "full": true,
         "custom": false
       },
-      "backing_tests": [],
+      "backing_tests": [
+        "test_write_service"
+      ],
       "opc_reference": {
-        "spec": null,
-        "section": null,
+        "spec": "OPC-10000-4",
+        "section": "5.11.4",
         "cu_id": "3147",
         "cu_name": "Attribute Write Index",
         "source_url": "https://profiles.opcfoundation.org"
@@ -4664,7 +4700,7 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "Supports the IndexRange to write a single element or a range of elements when the Attribute value is an array and partial updates is allowed for this array.",
+      "notes": "Supports the IndexRange to write a single element or a range of elements when the Attribute value is an array and partial updates is allowed for this array; depends on Attribute Write Values so it cannot enable Write by itself.",
       "cu_optional": true
     },
     {
@@ -4701,8 +4737,8 @@
       "id": "opc_cu_3192",
       "kind": "conformance_unit",
       "opc_display_name": "Base Info Diagnostics",
-      "kconfig_symbol": null,
-      "implementation_state": "unimplemented",
+      "kconfig_symbol": "MUC_OPCUA_CU_BASE_INFO_DIAGNOSTICS",
+      "implementation_state": "claimed",
       "depends_on": [],
       "profile_defaults": {
         "nano": false,
@@ -4712,10 +4748,13 @@
         "full": true,
         "custom": false
       },
-      "backing_tests": [],
+      "backing_tests": [
+        "test_diagnostics",
+        "test_profile_surface"
+      ],
       "opc_reference": {
-        "spec": null,
-        "section": null,
+        "spec": "OPC-10000-5",
+        "section": "6.3.1, 6.3.3, 8.3.2, 12.9",
         "cu_id": "3192",
         "cu_name": "Base Info Diagnostics",
         "source_url": "https://profiles.opcfoundation.org"
@@ -4731,8 +4770,8 @@
       "id": "opc_cu_3530",
       "kind": "conformance_unit",
       "opc_display_name": "View Basic 2",
-      "kconfig_symbol": null,
-      "implementation_state": "unimplemented",
+      "kconfig_symbol": "MUC_OPCUA_CU_VIEW_BASIC_2",
+      "implementation_state": "implemented",
       "depends_on": [],
       "profile_defaults": {
         "nano": true,
@@ -4742,10 +4781,14 @@
         "full": true,
         "custom": false
       },
-      "backing_tests": [],
+      "backing_tests": [
+        "test_browse_service",
+        "test_browse_limits",
+        "test_view_services"
+      ],
       "opc_reference": {
-        "spec": null,
-        "section": null,
+        "spec": "OPC-10000-4",
+        "section": "5.9.2, 5.9.3",
         "cu_id": "3530",
         "cu_name": "View Basic 2",
         "source_url": "https://profiles.opcfoundation.org"
@@ -4880,6 +4923,7 @@
     {
       "id": "opc_cu_3727",
       "kind": "conformance_unit",
+      "satisfied_by": "opc_cu_subscription_basic",
       "opc_display_name": "Subscription Basic",
       "kconfig_symbol": null,
       "implementation_state": "unimplemented",
@@ -4971,8 +5015,8 @@
       "id": "opc_cu_3983",
       "kind": "conformance_unit",
       "opc_display_name": "Base Services Diagnostics",
-      "kconfig_symbol": null,
-      "implementation_state": "unimplemented",
+      "kconfig_symbol": "MUC_OPCUA_CU_BASE_SERVICES_DIAGNOSTICS",
+      "implementation_state": "claimed",
       "depends_on": [],
       "profile_defaults": {
         "nano": false,
@@ -4982,10 +5026,12 @@
         "full": true,
         "custom": false
       },
-      "backing_tests": [],
+      "backing_tests": [
+        "test_service_header"
+      ],
       "opc_reference": {
-        "spec": null,
-        "section": null,
+        "spec": "OPC-10000-4",
+        "section": "7.32, 7.38",
         "cu_id": "3983",
         "cu_name": "Base Services Diagnostics",
         "source_url": "https://profiles.opcfoundation.org"
@@ -5404,8 +5450,194 @@
       "notes": "Already-implemented CU added to manifest as claimed so the feature is tracked, gated by its Kconfig symbol, and covered by the claim/test map."
     },
     {
+      "id": "opc_cu_2190",
+      "kind": "conformance_unit",
+      "opc_display_name": "Session Cancel",
+      "kconfig_symbol": null,
+      "implementation_state": "unimplemented",
+      "depends_on": [],
+      "profile_defaults": {
+        "nano": false,
+        "micro": false,
+        "embedded": false,
+        "standard": true,
+        "full": true,
+        "custom": false
+      },
+      "backing_tests": [],
+      "opc_reference": {
+        "spec": "OPC-10000-4",
+        "section": "5.6.5",
+        "cu_id": "2190",
+        "cu_name": "Session Cancel",
+        "source_url": "https://profiles.opcfoundation.org"
+      },
+      "source_metadata": {
+        "profile_group_id": 171,
+        "source_endpoint": "conformanceunit/?pg=171&all=1"
+      },
+      "notes": "Imported from OPC profile REST API 2026-07-15. Not implemented: no Cancel service handler exists.",
+      "cu_optional": false
+    },
+    {
+      "id": "opc_cu_2271",
+      "kind": "conformance_unit",
+      "opc_display_name": "Discovery Register",
+      "kconfig_symbol": null,
+      "implementation_state": "unimplemented",
+      "depends_on": [],
+      "profile_defaults": {
+        "nano": false,
+        "micro": false,
+        "embedded": false,
+        "standard": true,
+        "full": true,
+        "custom": false
+      },
+      "backing_tests": [],
+      "opc_reference": {
+        "spec": "OPC-10000-4",
+        "section": "5.4.5",
+        "cu_id": "2271",
+        "cu_name": "Discovery Register",
+        "source_url": "https://profiles.opcfoundation.org"
+      },
+      "source_metadata": {
+        "profile_group_id": 171,
+        "source_endpoint": "conformanceunit/?pg=171&all=1"
+      },
+      "notes": "Imported from OPC profile REST API 2026-07-15. Not implemented: register_server.c is a stub (outbound RegisterServer to a discovery server is not supported).",
+      "cu_optional": false
+    },
+    {
+      "id": "opc_cu_2863",
+      "kind": "conformance_unit",
+      "satisfied_by": "opc_cu_ua_secure_conversation",
+      "opc_display_name": "Security Policy Required",
+      "kconfig_symbol": null,
+      "implementation_state": "unimplemented",
+      "depends_on": [],
+      "profile_defaults": {
+        "nano": false,
+        "micro": false,
+        "embedded": true,
+        "standard": true,
+        "full": true,
+        "custom": false
+      },
+      "backing_tests": [],
+      "opc_reference": {
+        "spec": "OPC-10000-7",
+        "section": "6.5",
+        "cu_id": "2863",
+        "cu_name": "Security Policy Required",
+        "source_url": "https://profiles.opcfoundation.org"
+      },
+      "source_metadata": {
+        "profile_group_id": 171,
+        "source_endpoint": "conformanceunit/?pg=171&all=1"
+      },
+      "notes": "Imported from OPC profile REST API 2026-07-15. Capability satisfied via the secure-conversation layer, which implements Basic256Sha256, Aes128_Sha256_RsaOaep, and Aes256_Sha256_RsaPss; Kconfig gates per-profile inclusion.",
+      "cu_optional": false
+    },
+    {
+      "id": "opc_cu_3170",
+      "kind": "conformance_unit",
+      "opc_display_name": "Discovery Register2",
+      "kconfig_symbol": null,
+      "implementation_state": "unimplemented",
+      "depends_on": [],
+      "profile_defaults": {
+        "nano": false,
+        "micro": false,
+        "embedded": false,
+        "standard": true,
+        "full": true,
+        "custom": false
+      },
+      "backing_tests": [],
+      "opc_reference": {
+        "spec": "OPC-10000-4",
+        "section": "5.4.6",
+        "cu_id": "3170",
+        "cu_name": "Discovery Register2",
+        "source_url": "https://profiles.opcfoundation.org"
+      },
+      "source_metadata": {
+        "profile_group_id": 171,
+        "source_endpoint": "conformanceunit/?pg=171&all=1"
+      },
+      "notes": "Imported from OPC profile REST API 2026-07-15. Not implemented: RegisterServer2 outbound registration is not supported.",
+      "cu_optional": false
+    },
+    {
+      "id": "opc_cu_3721",
+      "kind": "conformance_unit",
+      "satisfied_by": "opc_cu_security_ecc",
+      "opc_display_name": "Security ECC Policy",
+      "kconfig_symbol": null,
+      "implementation_state": "unimplemented",
+      "depends_on": [],
+      "profile_defaults": {
+        "nano": false,
+        "micro": false,
+        "embedded": false,
+        "standard": false,
+        "full": true,
+        "custom": false
+      },
+      "backing_tests": [],
+      "opc_reference": {
+        "spec": "OPC-10000-7",
+        "section": "6.5",
+        "cu_id": "3721",
+        "cu_name": "Security ECC Policy",
+        "source_url": "https://profiles.opcfoundation.org"
+      },
+      "source_metadata": {
+        "profile_group_id": 171,
+        "source_endpoint": "conformanceunit/?pg=171&all=1"
+      },
+      "notes": "Imported from OPC profile REST API 2026-07-15. Optional. Capability satisfied by MUC_OPCUA_CU_SECURITY_ECC (spec 059); Kconfig gates per-profile inclusion (built in full).",
+      "cu_optional": true
+    },
+    {
+      "id": "opc_cu_3923",
+      "kind": "conformance_unit",
+      "satisfied_by": "opc_cu_multiple_connections",
+      "opc_display_name": "Session Multiple",
+      "kconfig_symbol": null,
+      "implementation_state": "unimplemented",
+      "depends_on": [],
+      "profile_defaults": {
+        "nano": false,
+        "micro": true,
+        "embedded": true,
+        "standard": true,
+        "full": true,
+        "custom": false
+      },
+      "backing_tests": [],
+      "opc_reference": {
+        "spec": "OPC-10000-4",
+        "section": "5.6",
+        "cu_id": "3923",
+        "cu_name": "Session Multiple",
+        "source_url": "https://profiles.opcfoundation.org"
+      },
+      "source_metadata": {
+        "profile_group_id": 171,
+        "source_endpoint": "conformanceunit/?pg=171&all=1"
+      },
+      "notes": "Imported from OPC profile REST API 2026-07-15. Capability satisfied by MUC_OPCUA_CU_MULTIPLE_CONNECTIONS (multiple parallel sessions); Kconfig gates per-profile inclusion.",
+      "cu_optional": false
+    },
+    {
       "id": "opc_cu_3080",
       "kind": "conformance_unit",
+      "not_applicable": {
+        "nano": "Nano is SecurityPolicy None + Anonymous (spec 072); no ApplicationInstance certificate is required."
+      },
       "opc_display_name": "Security Default ApplicationInstance Certificate",
       "kconfig_symbol": null,
       "implementation_state": "unimplemented",

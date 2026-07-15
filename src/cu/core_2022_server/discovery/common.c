@@ -2,7 +2,7 @@
  * Shared helper implementations for discovery service handlers. */
 #include "core/dispatch_discovery/common.h"
 
-#ifdef MUC_OPCUA_CU_DISCOVERY_FIND_SERVERS_SELF_GET_ENDPOINTS
+#ifdef MUC_OPCUA_DISCOVERY_SHARED
 
 bool string_matches_cstr(const mu_string_t *left, const char *right) {
     if (left == NULL || right == NULL || left->length < 0 || left->data == NULL) {
@@ -124,4 +124,4 @@ opcua_statuscode_t findservers_application_description_encode(mu_binary_writer_t
     return MU_STATUS_GOOD;
 }
 
-#endif /* MUC_OPCUA_CU_DISCOVERY_FIND_SERVERS_SELF_GET_ENDPOINTS */
+#endif /* MUC_OPCUA_DISCOVERY_SHARED */

@@ -8,7 +8,7 @@
  */
 #include "muc_opcua/config.h"
 
-#if MUC_OPCUA_CU_DIAGNOSTICS
+#if MUC_OPCUA_CU_BASE_INFO_DIAGNOSTICS
 
 #include "core/server_internal.h"
 #include "muc_opcua/server.h"
@@ -62,4 +62,4 @@ void mu_diagnostics_subscription_closed(mu_server_t *server) {
         server->diag.current_subscription_count--;
 }
 
-#endif /* MUC_OPCUA_CU_DIAGNOSTICS */
+#endif /* MUC_OPCUA_CU_BASE_INFO_DIAGNOSTICS */

@@ -89,7 +89,7 @@ static opcua_statuscode_t read_bench_value(void *context, const mu_nodeid_t *nod
     return MU_STATUS_GOOD;
 }
 
-#ifdef MUC_OPCUA_CU_CORE_2017_ATTRIBUTE_WRITE
+#ifdef MUC_OPCUA_SERVICE_WRITE
 static opcua_statuscode_t write_bench_value(void *handle, const mu_nodeid_t *node_id, opcua_uint32_t attribute_id,
                                             const mu_datavalue_t *value) {
     (void)handle;
@@ -185,7 +185,7 @@ static bool scenario_supported(scenario_t scenario) {
         return true;
     case SCENARIO_WRITE_VALUE:
     case SCENARIO_WRITE_BAD_TYPE:
-#ifdef MUC_OPCUA_CU_CORE_2017_ATTRIBUTE_WRITE
+#ifdef MUC_OPCUA_SERVICE_WRITE
         return true;
 #else
         return false;
@@ -370,7 +370,7 @@ static opcua_statuscode_t build_read_request(const bench_options_t *options, opc
     return MU_STATUS_GOOD;
 }
 
-#ifdef MUC_OPCUA_CU_CORE_2017_ATTRIBUTE_WRITE
+#ifdef MUC_OPCUA_SERVICE_WRITE
 static opcua_statuscode_t build_write_request(const bench_options_t *options, opcua_byte_t *buffer, size_t capacity,
                                               size_t *request_len) {
     mu_binary_writer_t writer;
@@ -418,7 +418,7 @@ static opcua_statuscode_t build_request(const bench_options_t *options, size_t *
         return build_read_request(options, request_buffer, sizeof(request_buffer), request_len);
     case SCENARIO_WRITE_VALUE:
     case SCENARIO_WRITE_BAD_TYPE:
-#ifdef MUC_OPCUA_CU_CORE_2017_ATTRIBUTE_WRITE
+#ifdef MUC_OPCUA_SERVICE_WRITE
         *request_id = MU_ID_WRITEREQUEST;
         *response_id = MU_ID_WRITERESPONSE;
         return build_write_request(options, request_buffer, sizeof(request_buffer), request_len);
@@ -473,7 +473,7 @@ static opcua_statuscode_t init_server(size_t node_count, mu_server_t **server) {
     config.max_sessions = 1u;
     config.max_secure_channels = 1u;
     config.address_space = &bench_address_space;
-#ifdef MUC_OPCUA_CU_CORE_2017_ATTRIBUTE_WRITE
+#ifdef MUC_OPCUA_SERVICE_WRITE
     config.write_handler = write_bench_value;
 #endif
     fake_platform_init(&config.tcp_adapter, &config.time_adapter, &config.entropy_adapter);

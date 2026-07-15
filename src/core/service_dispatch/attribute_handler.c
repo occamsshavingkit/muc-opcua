@@ -86,7 +86,215 @@ opcua_statuscode_t handle_read(mu_server_t *server, mu_binary_reader_t *r, mu_bi
 }
 #endif /* MUC_OPCUA_CU_ATTRIBUTE_READ */
 
-#ifdef MUC_OPCUA_CU_CORE_2017_ATTRIBUTE_WRITE
+#ifdef MUC_OPCUA_SERVICE_WRITE
+#ifdef MUC_OPCUA_CU_ATTRIBUTE_WRITE_INDEX_RANGE
+/* Byte size of one array element for the partial-update merge below.
+ * OPC-10000-4 5.11.4: IndexRange applies to the built-in element type carried
+ * by the array Variant, so this mirrors the full set of MU_TYPE_* Variant
+ * members rather than only the numeric ones exercised by current tests. */
+static size_t write_index_range_elem_size(mu_builtin_type_t type) {
+    switch (type) {
+    case MU_TYPE_BOOLEAN:
+        return sizeof(opcua_boolean_t);
+    case MU_TYPE_SBYTE:
+        return sizeof(opcua_sbyte_t);
+    case MU_TYPE_BYTE:
+        return sizeof(opcua_byte_t);
+    case MU_TYPE_INT16:
+        return sizeof(opcua_int16_t);
+    case MU_TYPE_UINT16:
+        return sizeof(opcua_uint16_t);
+    case MU_TYPE_INT32:
+        return sizeof(opcua_int32_t);
+    case MU_TYPE_UINT32:
+        return sizeof(opcua_uint32_t);
+    case MU_TYPE_INT64:
+        return sizeof(opcua_int64_t);
+    case MU_TYPE_UINT64:
+        return sizeof(opcua_uint64_t);
+    case MU_TYPE_FLOAT:
+        return sizeof(opcua_float_t);
+    case MU_TYPE_DOUBLE:
+        return sizeof(opcua_double_t);
+    case MU_TYPE_STRING:
+        return sizeof(mu_string_t);
+    case MU_TYPE_DATETIME:
+        return sizeof(opcua_datetime_t);
+    case MU_TYPE_BYTESTRING:
+        return sizeof(mu_bytestring_t);
+    case MU_TYPE_NODEID:
+        return sizeof(mu_nodeid_t);
+    case MU_TYPE_EXPANDEDNODEID:
+        return sizeof(mu_expanded_nodeid_t);
+    case MU_TYPE_STATUSCODE:
+        return sizeof(opcua_statuscode_t);
+    case MU_TYPE_QUALIFIEDNAME:
+        return sizeof(mu_qualified_name_t);
+    case MU_TYPE_LOCALIZEDTEXT:
+        return sizeof(mu_localized_text_t);
+    default:
+        return 0;
+    }
+}
+
+/* Strict one-dimensional IndexRange parser for Write (OPC-10000-4 5.11.4).
+ * Unlike the Read-side range narrowing (read_attribute.c), an out-of-bounds
+ * end index is rejected rather than clamped: a partial-update target must be
+ * fully inside the current array. On success *start is the first affected
+ * element and *count is the number of elements the range selects. */
+static opcua_statuscode_t parse_write_index_range(const mu_string_t *range_str, opcua_int32_t array_length,
+                                                  opcua_int32_t *start, opcua_int32_t *count) {
+    const char *p = (const char *)range_str->data;
+    opcua_int32_t len = range_str->length;
+    opcua_int32_t pos = 0;
+    opcua_int32_t range_start = 0;
+    opcua_int32_t range_end = -1;
+
+    if (len <= 0 || !p || p[pos] < '0' || p[pos] > '9') {
+        return MU_STATUS_BAD_INDEXRANGEINVALID;
+    }
+
+    while (pos < len && p[pos] >= '0' && p[pos] <= '9') {
+        range_start = range_start * 10 + (p[pos] - '0');
+        pos++;
+    }
+
+    if (pos < len && p[pos] == ':') {
+        pos++;
+        if (pos >= len || p[pos] < '0' || p[pos] > '9') {
+            return MU_STATUS_BAD_INDEXRANGEINVALID;
+        }
+        range_end = 0;
+        while (pos < len && p[pos] >= '0' && p[pos] <= '9') {
+            range_end = range_end * 10 + (p[pos] - '0');
+            pos++;
+        }
+    }
+
+    if (pos != len || (range_end != -1 && range_start >= range_end) || range_start >= array_length) {
+        return MU_STATUS_BAD_INDEXRANGEINVALID;
+    }
+
+    if (range_end == -1) {
+        *start = range_start;
+        *count = 1;
+    } else {
+        if (range_end >= array_length) {
+            return MU_STATUS_BAD_INDEXRANGEINVALID;
+        }
+        *start = range_start;
+        *count = range_end - range_start + 1;
+    }
+
+    return MU_STATUS_GOOD;
+}
+
+/* Apply a Write IndexRange partial array update: read the node's current
+ * array, merge the WriteValue's array into the selected slice, and dispatch
+ * the merged full array to the configured write callback. OPC-10000-4
+ * 5.11.4.2: "A Server shall return a Bad_WriteNotSupported error if an
+ * indexRange is provided and writing of indexRange is not possible for the
+ * Node" (e.g. the Node's current value is not an array). */
+static opcua_statuscode_t write_value_index_range(mu_server_t *server, const mu_node_t *node,
+                                                  const mu_write_value_t *write_val) {
+    if (!node->value) {
+        return MU_STATUS_BAD_WRITENOTSUPPORTED;
+    }
+
+    mu_variant_t current;
+    opcua_statuscode_t s = mu_value_source_read(node->value, &node->node_id, &current);
+    if (s != MU_STATUS_GOOD) {
+        return s;
+    }
+    if (!current.is_array || current.array_length <= 0) {
+        return MU_STATUS_BAD_WRITENOTSUPPORTED;
+    }
+
+    /* OPC-10000-4 5.11.4.2: "If the indexRange parameter is specified then
+     * the Value shall be an array even if only one element is being
+     * written." */
+    if (!write_val->value.value.is_array) {
+        return MU_STATUS_BAD_TYPEMISMATCH;
+    }
+
+    opcua_int32_t start, count;
+    s = parse_write_index_range(&write_val->index_range, current.array_length, &start, &count);
+    if (s != MU_STATUS_GOOD) {
+        return s;
+    }
+
+    if (!mu_variant_type_is_assignable(current.type, write_val->value.value.type)) {
+        return MU_STATUS_BAD_TYPEMISMATCH;
+    }
+
+    const mu_variant_t *patch = &write_val->value.value;
+    if (patch->array_length != count) {
+        return MU_STATUS_BAD_INDEXRANGEDATAMISMATCH;
+    }
+
+    size_t esize = write_index_range_elem_size(current.type);
+    if (esize == 0) {
+        return MU_STATUS_BAD_WRITENOTSUPPORTED;
+    }
+
+    /* Bounded by the address space's own configured array length (fixed at
+     * integration time), not by attacker-controlled input. */
+    opcua_byte_t merged[(size_t)current.array_length * esize];
+    (void)memcpy(merged, current.value.array, (size_t)current.array_length * esize);
+    (void)memcpy(merged + (size_t)start * esize, patch->value.array, (size_t)count * esize);
+
+    mu_datavalue_t effective_value = write_val->value;
+    effective_value.value = current;
+    effective_value.value.value.array = merged;
+    effective_value.value.array_length = current.array_length;
+
+    mu_write_handler_t write_handler = server->config.write_handler;
+    if (!write_handler) {
+        return MU_STATUS_BAD_WRITENOTSUPPORTED;
+    }
+    return write_handler(server->config.write_handler_handle, &write_val->node_id,
+                         (opcua_uint32_t)write_val->attribute_id, &effective_value);
+}
+#endif /* MUC_OPCUA_CU_ATTRIBUTE_WRITE_INDEX_RANGE */
+
+static bool write_attribute_is_valid_for_node(const mu_node_t *node, opcua_uint32_t attribute_id) {
+    switch (attribute_id) {
+    case MU_ATTRIBUTEID_NODEID:
+    case MU_ATTRIBUTEID_NODECLASS:
+    case MU_ATTRIBUTEID_BROWSENAME:
+    case MU_ATTRIBUTEID_DISPLAYNAME:
+    case MU_ATTRIBUTEID_DESCRIPTION:
+    case MU_ATTRIBUTEID_WRITEMASK:
+    case MU_ATTRIBUTEID_USERWRITEMASK:
+        return true;
+    case MU_ATTRIBUTEID_VALUE:
+        return true;
+    case MU_ATTRIBUTEID_DATATYPE:
+    case MU_ATTRIBUTEID_VALUERANK:
+        return node->node_class == MU_NODECLASS_VARIABLE || node->node_class == MU_NODECLASS_VARIABLETYPE;
+    case MU_ATTRIBUTEID_ACCESSLEVEL:
+    case MU_ATTRIBUTEID_USERACCESSLEVEL:
+    case MU_ATTRIBUTEID_MINIMUMSAMPLINGINTERVAL:
+    case MU_ATTRIBUTEID_HISTORIZING:
+        return node->node_class == MU_NODECLASS_VARIABLE;
+    case MU_ATTRIBUTEID_EXECUTABLE:
+    case MU_ATTRIBUTEID_USEREXECUTABLE:
+        return node->node_class == MU_NODECLASS_METHOD;
+    case MU_ATTRIBUTEID_EVENTNOTIFIER:
+        return node->node_class == MU_NODECLASS_OBJECT || node->node_class == MU_NODECLASS_VIEW;
+    case MU_ATTRIBUTEID_ISABSTRACT:
+        return node->node_class == MU_NODECLASS_OBJECTTYPE || node->node_class == MU_NODECLASS_VARIABLETYPE ||
+               node->node_class == MU_NODECLASS_REFERENCETYPE || node->node_class == MU_NODECLASS_DATATYPE;
+    case MU_ATTRIBUTEID_SYMMETRIC:
+    case MU_ATTRIBUTEID_INVERSENAME:
+        return node->node_class == MU_NODECLASS_REFERENCETYPE;
+    case MU_ATTRIBUTEID_CONTAINSNOLOOPS:
+        return node->node_class == MU_NODECLASS_VIEW;
+    default:
+        return false;
+    }
+}
+
 opcua_statuscode_t handle_write(mu_server_t *server, mu_binary_reader_t *r, mu_binary_writer_t *w,
                                 size_t *response_length) {
     mu_request_header_t req;
@@ -114,20 +322,35 @@ opcua_statuscode_t handle_write(mu_server_t *server, mu_binary_reader_t *r, mu_b
     for (size_t i = 0; i < wreq.num_nodes_to_write; ++i) {
         const mu_write_value_t *write_val = &wreq.nodes_to_write[i];
         opcua_statuscode_t result = MU_STATUS_GOOD;
+        bool handled = false;
 
         const mu_node_t *node = mu_resolve_node(server->config.address_space, &server->user_address_space_index,
                                                 &server->runtime_base.space, &write_val->node_id);
         if (!node) {
             result = MU_STATUS_BAD_NODEIDUNKNOWN;
+        } else if (!write_attribute_is_valid_for_node(node, write_val->attribute_id)) {
+            result = MU_STATUS_BAD_ATTRIBUTEIDINVALID;
         } else if (write_val->attribute_id != MU_ATTRIBUTEID_VALUE) {
             result = MU_STATUS_BAD_NOTWRITABLE;
+#ifndef MUC_OPCUA_CU_ATTRIBUTE_WRITE_STATUSCODE_TIMESTAMP
+        } else if (write_val->value.has_status || write_val->value.has_source_timestamp ||
+                   write_val->value.has_source_picoseconds || write_val->value.has_server_timestamp ||
+                   write_val->value.has_server_picoseconds) {
+            result = MU_STATUS_BAD_WRITENOTSUPPORTED;
+#endif
         } else if (!write_val->value.has_value) {
             /* OPC-10000-4 section 5.11.4.2: Value Attribute writes require DataValue.value. */
             result = MU_STATUS_BAD_TYPEMISMATCH;
-        } else if (write_val->index_range.length > 0) {
-            result = MU_STATUS_BAD_WRITENOTSUPPORTED;
         } else if (node->node_class != MU_NODECLASS_VARIABLE) {
             result = MU_STATUS_BAD_NOTWRITABLE;
+        } else if (write_val->index_range.length > 0) {
+#ifdef MUC_OPCUA_CU_ATTRIBUTE_WRITE_INDEX_RANGE
+            /* opc_cu_3147: bounded partial array update, OPC-10000-4 5.11.4. */
+            result = write_value_index_range(server, node, write_val);
+#else
+            result = MU_STATUS_BAD_WRITENOTSUPPORTED;
+#endif
+            handled = true;
         } else if (node->value) {
             /* Check value type is assignable if the variable has a current value.
              * OPC-10000-4 5.11.4.2 Table 53: subtypes of the Attribute DataType
@@ -141,7 +364,7 @@ opcua_statuscode_t handle_write(mu_server_t *server, mu_binary_reader_t *r, mu_b
             }
         }
 
-        if (result == MU_STATUS_GOOD) {
+        if (!handled && result == MU_STATUS_GOOD) {
             /* Apply write callback if configured */
             mu_write_handler_t write_handler = server->config.write_handler;
             void *write_handler_handle = server->config.write_handler_handle;
@@ -184,4 +407,4 @@ opcua_statuscode_t handle_write(mu_server_t *server, mu_binary_reader_t *r, mu_b
     *response_length = w->position;
     return MU_STATUS_GOOD;
 }
-#endif /* MUC_OPCUA_CU_CORE_2017_ATTRIBUTE_WRITE */
+#endif /* MUC_OPCUA_SERVICE_WRITE */

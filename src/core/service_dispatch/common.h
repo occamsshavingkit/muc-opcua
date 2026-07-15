@@ -19,10 +19,10 @@
 #ifdef MUC_OPCUA_CU_ATTRIBUTE_READ
 #include "../../services/read.h"
 #endif
-#ifdef MUC_OPCUA_CU_CORE_2017_ATTRIBUTE_WRITE
+#ifdef MUC_OPCUA_SERVICE_WRITE
 #include "../../services/write.h"
 #endif
-#ifdef MUC_OPCUA_CU_VIEW_BASIC_TRANSLATEBROWSEPATH
+#if defined(MUC_OPCUA_CU_VIEW_BASIC_2) || defined(MUC_OPCUA_CU_VIEW_TRANSLATEBROWSEPATH)
 #include "../../services/browse.h"
 #endif
 #ifdef MUC_OPCUA_FACET_CORE_2022_SERVER
@@ -72,6 +72,11 @@ bool mu_opn_time_sync_allows(opcua_datetime_t server_time, opcua_datetime_t clie
 
 #define MU_DISPATCH_MAX_REGISTER_NODES 32
 #define MU_DISPATCH_MAX_SUBSCRIPTION_OPERATIONS 32
+
+#if defined(MUC_OPCUA_CU_BASE_SERVICES_DIAGNOSTICS) && MUC_OPCUA_CU_BASE_SERVICES_DIAGNOSTICS
+void mu_response_diagnostics_set_current(opcua_uint32_t return_diagnostics);
+opcua_uint32_t mu_response_diagnostics_current(void);
+#endif
 
 #if MUC_OPCUA_CU_SUBSCRIPTION_BASIC
 #define MU_DOUBLE_SIGN_BIT 0x8000000000000000ULL
@@ -184,9 +189,11 @@ opcua_statuscode_t handle_activate_session(mu_server_t *server, mu_binary_reader
 opcua_statuscode_t handle_close_session(mu_server_t *server, mu_binary_reader_t *r, mu_binary_writer_t *w,
                                         size_t *response_length);
 
-#ifdef MUC_OPCUA_CU_DISCOVERY_FIND_SERVERS_SELF_GET_ENDPOINTS
+#ifdef MUC_OPCUA_CU_DISCOVERY_GET_ENDPOINTS
 opcua_statuscode_t handle_get_endpoints(mu_server_t *server, mu_binary_reader_t *r, mu_binary_writer_t *w,
                                         size_t *response_length);
+#endif
+#ifdef MUC_OPCUA_DISCOVERY_FIND_SERVERS_ENABLED
 opcua_statuscode_t handle_find_servers(mu_server_t *server, mu_binary_reader_t *r, mu_binary_writer_t *w,
                                        size_t *response_length);
 #endif
@@ -195,16 +202,18 @@ opcua_statuscode_t handle_find_servers(mu_server_t *server, mu_binary_reader_t *
 opcua_statuscode_t handle_read(mu_server_t *server, mu_binary_reader_t *r, mu_binary_writer_t *w,
                                size_t *response_length);
 #endif
-#ifdef MUC_OPCUA_CU_CORE_2017_ATTRIBUTE_WRITE
+#ifdef MUC_OPCUA_SERVICE_WRITE
 opcua_statuscode_t handle_write(mu_server_t *server, mu_binary_reader_t *r, mu_binary_writer_t *w,
                                 size_t *response_length);
 #endif
 
-#ifdef MUC_OPCUA_CU_VIEW_BASIC_TRANSLATEBROWSEPATH
+#ifdef MUC_OPCUA_CU_VIEW_BASIC_2
 opcua_statuscode_t handle_browse(mu_server_t *server, mu_binary_reader_t *r, mu_binary_writer_t *w,
                                  size_t *response_length);
 opcua_statuscode_t handle_browse_next(mu_server_t *server, mu_binary_reader_t *r, mu_binary_writer_t *w,
                                       size_t *response_length);
+#endif
+#ifdef MUC_OPCUA_CU_VIEW_TRANSLATEBROWSEPATH
 opcua_statuscode_t handle_translate_browse_paths(mu_server_t *server, mu_binary_reader_t *r, mu_binary_writer_t *w,
                                                  size_t *response_length);
 #endif

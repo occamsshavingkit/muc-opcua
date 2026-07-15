@@ -5,7 +5,7 @@
 #include "muc_opcua/encoding.h"
 #include "muc_opcua/types.h"
 
-#ifdef MUC_OPCUA_CU_CORE_2017_ATTRIBUTE_WRITE
+#ifdef MUC_OPCUA_SERVICE_WRITE
 
 #ifndef MU_ATTRIBUTEID_VALUE
 #define MU_ATTRIBUTEID_VALUE 13
@@ -26,6 +26,6 @@ opcua_statuscode_t mu_write_request_decode(mu_binary_reader_t *reader, mu_write_
 
 opcua_statuscode_t mu_write_response_encode(mu_binary_writer_t *writer, const mu_write_response_t *resp);
 
-#endif /* MUC_OPCUA_CU_CORE_2017_ATTRIBUTE_WRITE */
+#endif /* MUC_OPCUA_SERVICE_WRITE */
 
 #endif /* MUC_OPCUA_SERVICES_WRITE_H */
