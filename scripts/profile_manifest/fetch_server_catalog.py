@@ -39,7 +39,8 @@ def _get(url: str, retries: int = 3) -> dict:
     last: Exception | None = None
     for _ in range(retries):
         try:
-            with urllib.request.urlopen(url, timeout=60) as resp:  # noqa: S310 - scheme checked above
+            # nosec B310 -- scheme restricted to https above; dev-only catalog fetch.
+            with urllib.request.urlopen(url, timeout=60) as resp:  # nosemgrep: dynamic-urllib-use-detected
                 return json.loads(resp.read().decode("utf-8"))
         except Exception as exc:  # noqa: BLE001 - network best-effort
             last = exc

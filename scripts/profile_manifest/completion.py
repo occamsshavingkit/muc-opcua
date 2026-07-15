@@ -201,14 +201,17 @@ def _render_server_surface(manifest: dict, catalog: dict) -> list[str]:
     # Overall: distinct CUs across all Server profiles.
     all_ids = sorted({c for p in profiles for c in p["conformance_units"]}, key=int)
     overall = compute_catalog_completion(manifest, all_ids, opt_map)
+    req_frac = f"{overall['required_implemented']}/{overall['required_total']}"
+    opt_frac = f"{overall['optional_implemented']}/{overall['optional_total']}"
+    totals = f"(required {overall['required_total']}, optional {overall['optional_total']})"
     rows = ["## Full Server Surface (all 90 OPC Server profiles/facets)", "",
             "Denominator is the full OPC Server conformance surface from the REST API",
             "catalog (`profiles/opcua-server-conformance.json`); status is codebase",
             "capability from the build manifest. Coarse feature-level CUs that are not",
             "yet reconciled to individual OPC CU ids count as not-implemented — see the",
             "reconciliation note below.", "",
-            f"- Distinct Server CUs: **{len(all_ids)}** (required {overall['required_total']}, optional {overall['optional_total']})",
-            f"- Reconciled as implemented: **required {overall['required_implemented']}/{overall['required_total']}**, **optional {overall['optional_implemented']}/{overall['optional_total']}**",
+            f"- Distinct Server CUs: **{len(all_ids)}** {totals}",
+            f"- Reconciled as implemented: **required {req_frac}**, **optional {opt_frac}**",
             "",
             "### Per Server profile / facet", "",
             "| OPC id | Profile / Facet | Required | Optional |",
