@@ -18,7 +18,7 @@ remains future work.
 | claimed | 60 |
 | implemented | 7 |
 | deferred | 9 |
-| unimplemented | 109 |
+| unimplemented | 117 |
 
 ## Item matrix
 
@@ -199,6 +199,14 @@ remains future work.
 | opc_cu_server_capabilities_2 | conformance_unit | claimed | OPC-10000-3 §4 | MUC_OPCUA_CU_SERVER_CAPABILITIES_2 | all | test_base_server_behaviour |
 | opc_cu_session_general_service | conformance_unit | claimed | OPC-10000-4 §5.6 | MUC_OPCUA_CU_SESSION_GENERAL_SERVICE | all | test_dispatch_session_order, test_base_server_behaviour |
 | opc_cu_namespace_metadata | conformance_unit | claimed | OPC-10000-3 §4 | MUC_OPCUA_CU_NAMESPACE_METADATA | all | test_base_server_behaviour, test_read_browsename_namespace |
+| opc_cu_2318 | conformance_unit | unimplemented |  | — | embedded, standard, full | — |
+| opc_cu_2515 | conformance_unit | unimplemented |  | — | full | — |
+| opc_cu_3150 | conformance_unit | unimplemented |  | — | full | — |
+| opc_cu_4030 | conformance_unit | unimplemented |  | — | full | — |
+| opc_cu_2380 | conformance_unit | unimplemented |  | — | full | — |
+| opc_cu_2394 | conformance_unit | unimplemented |  | — | full | — |
+| opc_cu_2939 | conformance_unit | unimplemented |  | — | full | — |
+| opc_cu_3153 | conformance_unit | unimplemented |  | — | full | — |
 | opc_cu_2190 | conformance_unit | unimplemented | OPC-10000-4 §5.6.5 | — | standard, full | — |
 | opc_cu_2271 | conformance_unit | unimplemented | OPC-10000-4 §5.4.5 | — | standard, full | — |
 | opc_cu_2863 | conformance_unit | unimplemented | OPC-10000-7 §6.5 | — | embedded, standard, full | — |

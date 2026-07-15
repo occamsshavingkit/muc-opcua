@@ -747,6 +747,30 @@ config MUC_OPCUA_CU_BASE_INFO_ENGINEERING_UNITS
 #   Notes: Imported from OPC profile REST API 2026-07-15. Not implemented: no Cancel service handler exists.
 comment "Session Cancel (NOT IMPLEMENTED) [OPC-10000-4 §5.6.5]"
 
+# Node Management Add Node (opc_cu_2380)
+#   Implementation state: unimplemented -- visible but not selectable.
+#   Detail: CU 2380:Node Management Add Node.
+#   Notes: Reconciled (spec 073): AddNodes service (nodemanagement/dispatch_node_mgmt.c handle_add_nodes -> mu_add_nodes_process); tested by test_node_management (AddNodes decode/encode, duplicate-NodeId). Satisfied by service_nodemanagement.
+comment "Node Management Add Node (NOT IMPLEMENTED)"
+
+# Node Management Delete Node (opc_cu_2394)
+#   Implementation state: unimplemented -- visible but not selectable.
+#   Detail: CU 2394:Node Management Delete Node.
+#   Notes: Reconciled (spec 073): DeleteNodes service (handle_delete_nodes -> mu_delete_nodes_process); tested by test_node_management. Satisfied by service_nodemanagement.
+comment "Node Management Delete Node (NOT IMPLEMENTED)"
+
+# Node Management Add Ref (opc_cu_2939)
+#   Implementation state: unimplemented -- visible but not selectable.
+#   Detail: CU 2939:Node Management Add Ref.
+#   Notes: Reconciled (spec 073): AddReferences service (handle_add_references -> mu_add_references_process); tested by test_node_management. Satisfied by service_nodemanagement.
+comment "Node Management Add Ref (NOT IMPLEMENTED)"
+
+# Node Management Delete Ref (opc_cu_3153)
+#   Implementation state: unimplemented -- visible but not selectable.
+#   Detail: CU 3153:Node Management Delete Ref.
+#   Notes: Reconciled (spec 073): DeleteReferences service (handle_delete_references -> mu_delete_references_process); tested by test_node_management (incl. Bad_NotFound). Satisfied by service_nodemanagement.
+comment "Node Management Delete Ref (NOT IMPLEMENTED)"
+
 # Discovery Register (opc_cu_2271)
 #   Implementation state: unimplemented -- visible but not selectable.
 #   OPC source: OPC-10000-4 §5.4.5.
@@ -781,6 +805,30 @@ comment "Security ECC Policy (NOT IMPLEMENTED) [OPC-10000-7 §6.5]"
 #   Detail: CU 3923:Session Multiple.
 #   Notes: Imported from OPC profile REST API 2026-07-15. Capability satisfied by MUC_OPCUA_CU_MULTIPLE_CONNECTIONS (multiple parallel sessions); Kconfig gates per-profile inclusion.
 comment "Session Multiple (NOT IMPLEMENTED) [OPC-10000-4 §5.6]"
+
+# Monitor QueueSize_ServerMax (opc_cu_2318)
+#   Implementation state: unimplemented -- visible but not selectable.
+#   Detail: CU 2318:Monitor QueueSize_ServerMax.
+#   Notes: Reconciled (spec 073): server clamps requested MonitoredItem QueueSize to the compiled max (subscription_monitor.c); tested by test_subscriptions_capacity. Satisfied by subscription_standard.
+comment "Monitor QueueSize_ServerMax (NOT IMPLEMENTED)"
+
+# Address Space Events 2 (opc_cu_2515)
+#   Implementation state: unimplemented -- visible but not selectable.
+#   Detail: CU 2515:Address Space Events 2.
+#   Notes: Reconciled (spec 073): address-space-triggered events are queued per subscription and delivered in Publish (notification.c mu_server_trigger_event); tested by test_event_notifications. Satisfied by opc_cu_events.
+comment "Address Space Events 2 (NOT IMPLEMENTED)"
+
+# Monitor Events (opc_cu_3150)
+#   Implementation state: unimplemented -- visible but not selectable.
+#   Detail: CU 3150:Monitor Events.
+#   Notes: Reconciled (spec 073): MonitoredItem on the EventNotifier attribute delivers EventFieldLists end-to-end (notification.c); tested by test_event_notifications. Satisfied by opc_cu_events.
+comment "Monitor Events (NOT IMPLEMENTED)"
+
+# Monitor Complex Event Filter (opc_cu_4030)
+#   Implementation state: unimplemented -- visible but not selectable.
+#   Detail: CU 4030:Monitor Complex Event Filter.
+#   Notes: Reconciled (spec 073): combined SELECT + WHERE event filter with operator support and unsupported-operator rejection (filter_reader.c + event_filter.c); tested E2E by test_event_notifications. Satisfied by opc_cu_event_filter_where.
+comment "Monitor Complex Event Filter (NOT IMPLEMENTED)"
 
 # Security Administration (opc_cu_2407)
 #   Implementation state: unimplemented -- visible but not selectable.
@@ -1351,7 +1399,7 @@ comment "Subscription Multiple (NOT IMPLEMENTED)"
 # Subscription Retransmission Queue (opc_cu_3535)
 #   Implementation state: unimplemented -- visible but not selectable.
 #   Detail: CU 3535:Subscription Retransmission Queue.
-#   Notes: Support a retransmission queue of sent NotificationMessages and the Republish Service. See UA Part 4 for the required size of the retransmission queue.
+#   Notes: Support a retransmission queue of sent NotificationMessages and the Republish Service. See UA Part 4 for the required size of the retransmission queue. muc-opcua: Republish is implemented and tested; the retransmission store holds the single most-recent NotificationMessage per subscription (profile-targeting minimal capacity), which may not meet CTT multi-message republish depth.
 comment "Subscription Retransmission Queue (NOT IMPLEMENTED)"
 
 # Base Info ResendData Method (opc_cu_3544)
