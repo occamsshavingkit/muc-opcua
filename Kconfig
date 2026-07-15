@@ -574,6 +574,7 @@ config MUC_OPCUA_CU_REVERSE_CONNECT
 
 config MUC_OPCUA_CU_SECURITY_ECC
 	bool "CU: Security ECC"
+	depends on SECURE_CHANNEL_CRYPTO
 	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
 	help
 	  Implementation state: claimed.
@@ -1526,6 +1527,15 @@ config READ_CACHE
 	help
 	  Implementation state: implemented.
 	  Notes: Opt-in Read value cache (maxAge optimization). Current build symbol but no dedicated conformance test; classified implemented, not claimed.
+
+config SECURE_CHANNEL_CRYPTO
+	bool "Secure channel message crypto"
+	default y if MUC_OPCUA_INTERN_PROFILE_MICRO_EMBEDDED_DEVICE_2025_SERVER
+	help
+	  Implementation state: implemented.
+	  OPC source: OPC-10000-7 §4.3.
+	  Backing tests: test_profile_gating.
+	  Notes: Build gate that decouples secure-channel message crypto (symmetric/asymmetric chunk crypto, certificate, trustlist, key derivation) from the MUC_OPCUA_FACET_CORE_2022_SERVER umbrella. Defaults off for nano (SecurityPolicy None only per OPC-10000-7 4.3) and on for the security-capable micro/embedded/standard/full profiles (profile intent, not backend presence -- spec 072 FR-005). When off the heavy crypto TUs are excluded and MUC_OPCUA_CU_SECURITY_ECC / crypto backends cannot be enabled; SecurityPolicy None behaviour and explicit non-None rejection are preserved.
 
 endmenu
 
