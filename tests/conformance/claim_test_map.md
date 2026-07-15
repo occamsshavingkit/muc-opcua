@@ -19,7 +19,7 @@ Backing test column: comma-separated ctest names (as registered).
 
 | Claim / conformance unit | OPC UA § | Profiles | Backing test |
 |--------------------------|----------|----------|--------------|
-| Secure channel message crypto | OPC-10000-7 §4.3 | micro, embedded, standard, full | test_profile_gating |
+| Secure channel message crypto | OPC-10000-7 §4.3 | micro, embedded, standard, full | test_secure_handshake_modern |
 | Address Space AddIn Reference |  | micro, embedded, standard, full | test_profile_surface |
 | Address Space AddIn DefaultInstanceBrowsename |  | micro, embedded, standard, full | test_profile_surface |
 | Base Info LocalTime |  | micro, embedded, standard, full | test_profile_surface |

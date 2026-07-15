@@ -1,6 +1,6 @@
 /* src/services/secure_channel.c */
 #include "secure_channel.h"
-#ifdef MUC_OPCUA_FACET_CORE_2022_SERVER
+#ifdef MUC_OPCUA_SECURE_CHANNEL_CRYPTO
 #include "../security/key_derivation.h"
 #endif
 #include <stddef.h>
@@ -54,7 +54,7 @@ void mu_secure_channel_init(mu_secure_channel_t *channel) {
         channel->out_sequence_number = 0;
         channel->policy = MU_SECURITY_POLICY_NONE_ID;
         channel->mode = MU_MESSAGE_SECURITY_MODE_NONE;
-#ifdef MUC_OPCUA_FACET_CORE_2022_SERVER
+#ifdef MUC_OPCUA_SECURE_CHANNEL_CRYPTO
         mu_secure_zero(&channel->client_keys, sizeof(channel->client_keys));
         mu_secure_zero(&channel->server_keys, sizeof(channel->server_keys));
         channel->keys_valid = false;
@@ -89,7 +89,7 @@ opcua_statuscode_t mu_secure_channel_open(mu_secure_channel_t *channel, const mu
             return MU_STATUS_BAD_SECURITYMODEREJECTED;
         }
     }
-#ifdef MUC_OPCUA_FACET_CORE_2022_SERVER
+#ifdef MUC_OPCUA_SECURE_CHANNEL_CRYPTO
     else if (channel->policy == MU_SECURITY_POLICY_BASIC256SHA256_ID ||
              channel->policy == MU_SECURITY_POLICY_AES128_SHA256_RSAOAEP_ID ||
              channel->policy == MU_SECURITY_POLICY_AES256_SHA256_RSAPSS_ID) {
@@ -160,7 +160,7 @@ opcua_statuscode_t mu_secure_channel_close(mu_secure_channel_t *channel) {
         return MU_STATUS_BAD_TCPSECURECHANNELUNKNOWN;
     }
 
-#ifdef MUC_OPCUA_FACET_CORE_2022_SERVER
+#ifdef MUC_OPCUA_SECURE_CHANNEL_CRYPTO
     mu_sym_keys_release_cipher(&channel->client_keys);
     mu_sym_keys_release_cipher(&channel->server_keys);
     mu_secure_zero(&channel->client_keys, sizeof(channel->client_keys));

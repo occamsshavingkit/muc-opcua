@@ -1534,7 +1534,7 @@ config SECURE_CHANNEL_CRYPTO
 	help
 	  Implementation state: implemented.
 	  OPC source: OPC-10000-7 §4.3.
-	  Backing tests: test_profile_gating.
+	  Backing tests: test_secure_handshake_modern.
 	  Notes: Build gate that decouples secure-channel message crypto (symmetric/asymmetric chunk crypto, certificate, trustlist, key derivation) from the MUC_OPCUA_FACET_CORE_2022_SERVER umbrella. Defaults off for nano (SecurityPolicy None only per OPC-10000-7 4.3) and on for the security-capable micro/embedded/standard/full profiles (profile intent, not backend presence -- spec 072 FR-005). When off the heavy crypto TUs are excluded and MUC_OPCUA_CU_SECURITY_ECC / crypto backends cannot be enabled; SecurityPolicy None behaviour and explicit non-None rejection are preserved.
 
 endmenu

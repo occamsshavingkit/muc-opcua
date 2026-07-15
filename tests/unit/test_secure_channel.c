@@ -556,7 +556,7 @@ void test_secure_channel_close(void) {
     TEST_ASSERT_FALSE(channel.is_open);
 }
 
-#ifdef MUC_OPCUA_SECURITY
+#ifdef MUC_OPCUA_SECURE_CHANNEL_CRYPTO
 static void populate_derived_session_keys(mu_secure_channel_t *channel) {
     (void)memset(&channel->client_keys, 0xA5, sizeof(channel->client_keys));
     (void)memset(&channel->server_keys, 0x5A, sizeof(channel->server_keys));
@@ -648,7 +648,7 @@ int main(void) {
     RUN_TEST(test_secure_channel_open_none);
     RUN_TEST(test_secure_channel_open_rejects_when_entropy_unavailable);
     RUN_TEST(test_secure_channel_close);
-#ifdef MUC_OPCUA_SECURITY
+#ifdef MUC_OPCUA_SECURE_CHANNEL_CRYPTO
     RUN_TEST(test_secure_channel_close_and_init_zeroize_derived_session_keys);
 #endif
     RUN_TEST(test_opn_rejects_unacceptable_security_policy_without_crypto_adapter);

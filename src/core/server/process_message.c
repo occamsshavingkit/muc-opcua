@@ -95,7 +95,7 @@ static void process_message_multi_chunk_final_dispatch(mu_server_t *server, cons
 /* Route an OPN or MSG chunk to the appropriate handler based on the
    configured security policy. */
 static void process_message_opn_or_msg(mu_server_t *server, opcua_byte_t *msg, size_t msg_len, bool is_opn) {
-#ifdef MUC_OPCUA_FACET_CORE_2022_SERVER
+#ifdef MUC_OPCUA_SECURE_CHANNEL_CRYPTO
     if (server->config.crypto_adapter != NULL) {
         handle_data_chunk_secure(server, msg, msg_len, is_opn);
         return;

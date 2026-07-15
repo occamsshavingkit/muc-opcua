@@ -61,18 +61,22 @@ if(MUC_OPCUA_CU_USER_AUTH)
     target_include_directories(test_user_auth_plaintext PRIVATE ${CMAKE_SOURCE_DIR}/src)
     add_test(NAME test_user_auth_plaintext COMMAND test_user_auth_plaintext)
 
-    add_executable(test_user_auth_encrypted test_user_auth_encrypted.c)
-    target_link_libraries(test_user_auth_encrypted PRIVATE muc_opcua muc_opcua_test_support unity)
-    target_include_directories(test_user_auth_encrypted PRIVATE ${CMAKE_SOURCE_DIR}/src)
-    add_test(NAME test_user_auth_encrypted COMMAND test_user_auth_encrypted)
+    # Encrypted UserName token decrypt needs the secure-channel crypto stack
+    # (spec 072): not built on the crypto-gated nano profile even though it has
+    # USER_AUTH enabled.
+    if(MUC_OPCUA_SECURE_CHANNEL_CRYPTO)
+        add_executable(test_user_auth_encrypted test_user_auth_encrypted.c)
+        target_link_libraries(test_user_auth_encrypted PRIVATE muc_opcua muc_opcua_test_support unity)
+        target_include_directories(test_user_auth_encrypted PRIVATE ${CMAKE_SOURCE_DIR}/src)
+        add_test(NAME test_user_auth_encrypted COMMAND test_user_auth_encrypted)
+    endif()
 endif()
 
-if(MUC_OPCUA_CU_USER_AUTH)
-    # Certificate user tokens need CU_USER_AUTH for ActivateSession's
-    # username/certificate token dispatch. The security code (certificate
-    # identity token decoder in encoding/binary_reader.c) is now always
-    # compiled as part of FACET_CORE_2022_SERVER, so this test applies to all
-    # profiles where user auth is enabled.
+# Certificate + secured-e2e user-token flows validate a certificate signature and
+# run over a real secured channel, so they need both CU_USER_AUTH and the
+# secure-channel crypto stack (spec 072). Excluded on the crypto-gated nano
+# profile even though it enables USER_AUTH.
+if(MUC_OPCUA_CU_USER_AUTH AND MUC_OPCUA_SECURE_CHANNEL_CRYPTO)
     add_executable(test_user_auth_certificate test_user_auth_certificate.c)
     target_link_libraries(test_user_auth_certificate PRIVATE muc_opcua muc_opcua_test_support unity)
     target_include_directories(test_user_auth_certificate PRIVATE ${CMAKE_SOURCE_DIR}/src)
@@ -91,10 +95,14 @@ if(MUC_OPCUA_WRITE_VALUE_ENABLED)
     add_test(NAME test_write_service_integration COMMAND test_write_service_integration)
 endif()
 
-add_executable(test_secure_handshake_modern test_secure_handshake_modern.c)
-target_link_libraries(test_secure_handshake_modern PRIVATE muc_opcua muc_opcua_test_support unity)
-target_include_directories(test_secure_handshake_modern PRIVATE ${CMAKE_SOURCE_DIR}/src)
-add_test(NAME test_secure_handshake_modern COMMAND test_secure_handshake_modern)
+# Secured (Basic256Sha256/AES) handshake: needs the secure-channel crypto stack
+# (spec 072), so it is not built on the SecurityPolicy-None-only nano profile.
+if(MUC_OPCUA_SECURE_CHANNEL_CRYPTO)
+    add_executable(test_secure_handshake_modern test_secure_handshake_modern.c)
+    target_link_libraries(test_secure_handshake_modern PRIVATE muc_opcua muc_opcua_test_support unity)
+    target_include_directories(test_secure_handshake_modern PRIVATE ${CMAKE_SOURCE_DIR}/src)
+    add_test(NAME test_secure_handshake_modern COMMAND test_secure_handshake_modern)
+endif()
 
 # ECC SecurityPolicies (spec 059): full client<->server ECC secure-channel handshake
 # (curve25519 + nistP256). Only meaningful when the ECC feature is compiled in.

@@ -37,6 +37,7 @@ add_library(muc_opcua STATIC
     encoding/binary_datavalue.c
     encoding/variant_type.c
     security/security_policy.c
+    security/secure_util.c
     generated/opcua_ids.c
 )
 
@@ -448,12 +449,22 @@ endforeach()
 # (security/ecc.c) is droppable and gated separately by CU_SECURITY_ECC below;
 # excluded from the FACET glob so non-ECC profiles pay no .text.
 if(MUC_OPCUA_FACET_CORE_2022_SERVER)
+    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_FACET_CORE_2022_SERVER=1)
+    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_SECURITY=1)
+endif()
+
+# -- Secure-channel message crypto (spec 072) --
+# Decoupled from the facet umbrella so the SecurityPolicy-None-only nano profile
+# does not compile the symmetric/asymmetric chunk crypto, certificate, trustlist,
+# or key-derivation translation units. security_policy.c (policy/mode enums used by
+# the None path AND the non-None rejection) stays in the always-compiled core list
+# above; ecc.c is gated separately below (and depends on this gate via Kconfig).
+if(MUC_OPCUA_SECURE_CHANNEL_CRYPTO)
     file(GLOB_RECURSE _sources cu/core_2022_server/security/*.c)
     list(REMOVE_ITEM _sources
         ${CMAKE_CURRENT_SOURCE_DIR}/cu/core_2022_server/security/ecc.c)
     target_sources(muc_opcua PRIVATE ${_sources})
-    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_FACET_CORE_2022_SERVER=1)
-    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_SECURITY=1)
+    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_SECURE_CHANNEL_CRYPTO=1)
 endif()
 
 # -- CU: Security ECC (spec 059) --
@@ -472,7 +483,7 @@ if(MUC_OPCUA_IS_HOST)
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_MDNS_DISCOVERY=1)
 
     # The host crypto adapter (SecurityPolicy Basic256Sha256) is backed by OpenSSL.
-    if(MUC_OPCUA_FACET_CORE_2022_SERVER)
+    if(MUC_OPCUA_SECURE_CHANNEL_CRYPTO)
         find_package(OpenSSL)
         if(OpenSSL_FOUND)
             target_sources(muc_opcua PRIVATE
@@ -491,13 +502,13 @@ if(MUC_OPCUA_IS_HOST)
     endif()
 endif()
 
-if(MUC_OPCUA_HAVE_MBEDTLS)
+if(MUC_OPCUA_HAVE_MBEDTLS AND MUC_OPCUA_SECURE_CHANNEL_CRYPTO)
     target_sources(muc_opcua PRIVATE platform/mbedtls_crypto_adapter.c)
     target_link_libraries(muc_opcua PUBLIC mbedcrypto mbedx509)
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_HAVE_MBEDTLS=1)
 endif()
 
-if(MUC_OPCUA_HAVE_WOLFSSL)
+if(MUC_OPCUA_HAVE_WOLFSSL AND MUC_OPCUA_SECURE_CHANNEL_CRYPTO)
     target_sources(muc_opcua PRIVATE
         platform/wolfssl_crypto/cipher.c
         platform/wolfssl_crypto/asymmetric.c

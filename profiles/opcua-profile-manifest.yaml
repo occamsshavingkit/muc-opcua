@@ -299,7 +299,7 @@
       },
       "default_unconditional": false,
       "backing_tests": [
-        "test_profile_gating"
+        "test_secure_handshake_modern"
       ],
       "opc_reference": {
         "spec": "OPC-10000-7",

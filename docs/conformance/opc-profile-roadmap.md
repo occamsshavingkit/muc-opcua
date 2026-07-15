@@ -25,7 +25,7 @@ remains future work.
 | Item | Kind | State | OPC reference | Kconfig | Profiles | Backing tests |
 |------|------|-------|---------------|---------|----------|---------------|
 | read_cache | optimization | implemented |  | READ_CACHE | — | — |
-| secure_channel_crypto | optimization | implemented | OPC-10000-7 §4.3 | SECURE_CHANNEL_CRYPTO | micro, embedded, standard, full | test_profile_gating |
+| secure_channel_crypto | optimization | implemented | OPC-10000-7 §4.3 | SECURE_CHANNEL_CRYPTO | micro, embedded, standard, full | test_secure_handshake_modern |
 | opc_file_server_facet | facet | unimplemented | OPC-10000-20 File Server Facet | — | — | — |
 | opc_json_encoding | facet | unimplemented | OPC-10000-6 §5.3 JSON Encoding | — | — | — |
 | opc_xml_encoding | facet | unimplemented | OPC-10000-6 §5.4 XML Encoding | — | — | — |

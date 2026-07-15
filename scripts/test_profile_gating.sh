@@ -64,6 +64,8 @@ assert_cfg "$D1" CU_QUERY OFF
 # CU: Subscription basic on (micro+); CU: Security ECC off (full only)
 assert_cfg "$D1" CU_SUBSCRIPTION_BASIC ON
 assert_cfg "$D1" CU_SECURITY_ECC OFF
+# Secure-channel crypto gate (spec 072): on for security-capable profiles (micro+)
+assert_cfg "$D1" SECURE_CHANNEL_CRYPTO ON
 
 echo "### 2. 'nano' baseline: profile symbol, cascade, minimal facets, CUs ###"
 D2="$WORKDIR/g2"
@@ -89,6 +91,8 @@ assert_cfg "$D2" CU_CORE_2017_ATTRIBUTE_WRITE OFF
 # CU: Subscription basic off (micro+); CU: Security ECC off (full only)
 assert_cfg "$D2" CU_SUBSCRIPTION_BASIC OFF
 assert_cfg "$D2" CU_SECURITY_ECC OFF
+# Secure-channel crypto gate (spec 072): OFF for the SecurityPolicy-None-only nano
+assert_cfg "$D2" SECURE_CHANNEL_CRYPTO OFF
 
 echo "### 3. 'embedded' baseline: profile symbol, cascade, facets, CUs ###"
 D3="$WORKDIR/g3"
@@ -115,6 +119,8 @@ assert_cfg "$D3" CU_NODEMANAGEMENT OFF
 # CU: Subscription basic on (micro+); CU: Security ECC off (full only)
 assert_cfg "$D3" CU_SUBSCRIPTION_BASIC ON
 assert_cfg "$D3" CU_SECURITY_ECC OFF
+# Secure-channel crypto gate (spec 072): on for embedded (security-capable)
+assert_cfg "$D3" SECURE_CHANNEL_CRYPTO ON
 
 echo "### 4. Subtraction: standard minus CU_SUBSCRIPTION_BASIC drops the code ###"
 D4="$WORKDIR/g4"

@@ -135,11 +135,18 @@ def find_gaps(rows, profile, registered):
         if not backing:
             gaps.append(f"  [{claim}] ({section}) — no backing test listed")
             continue
-        missing = [t for t in backing if t not in registered]
-        if missing:
+        # A claimed CU is backed in this profile when AT LEAST ONE of its backing
+        # tests is registered here (per this module's contract: "MUST have a
+        # backing test that is registered in that build"). Some backing tests are
+        # profile-conditional -- e.g. the certificate / secured-e2e user-auth
+        # tests need the secure-channel crypto stack and are not built on the
+        # crypto-gated nano profile (spec 072) -- so requiring every listed test
+        # in every claimed profile would spuriously fail a CU that is genuinely
+        # backed (e.g. opc_cu_user_auth via test_user_auth_plaintext on nano).
+        if not any(t in registered for t in backing):
             gaps.append(
-                f"  [{claim}] ({section}) — backing test(s) not registered in "
-                f"profile '{profile}': {', '.join(missing)}"
+                f"  [{claim}] ({section}) — no backing test registered in "
+                f"profile '{profile}' (listed: {', '.join(backing)})"
             )
     return gaps, applicable
 

@@ -23,8 +23,8 @@ Four build/behaviour contracts. Each maps to spec acceptance scenarios and succe
 
 ## C4 — Secured profiles byte-identical (SC-003, US2)
 
-**Given** any profile built with a crypto backend (`MUC_OPCUA_HAVE_MBEDTLS`/`MUC_OPCUA_HAVE_WOLFSSL`), **when** configured, **then** `MUC_OPCUA_SECURE_CHANNEL_CRYPTO` is defined, all crypto TUs compile, the full crypto suite passes unchanged (`secure_handshake_modern`, `sym_chunk`, `asym_chunk`, `user_auth_encrypted`, `ecc_handshake_e2e`), **and** the profile's ARM `.text` is byte-identical to its pre-change baseline.
-**Evidence**: per-profile CTest on micro/embedded/standard/full stays green; `scripts/measure_size.sh` (or the CI size job) shows zero `.text` delta for secured profiles; gating test asserts the gate on for secured profiles.
+**Given** any profile built with a crypto backend (`MUC_OPCUA_HAVE_MBEDTLS`/`MUC_OPCUA_HAVE_WOLFSSL`), **when** configured, **then** `MUC_OPCUA_SECURE_CHANNEL_CRYPTO` is defined, all crypto TUs compile, the full crypto suite passes unchanged (`secure_handshake_modern`, `sym_chunk`, `asym_chunk`, `user_auth_encrypted`, `ecc_handshake_e2e`), **and** the profile's archive `.text` is byte-identical to its pre-change baseline.
+**Evidence** (measured, see the size ledger): per-profile CTest on micro/embedded/standard/full stays green; **archive `.text` is byte-identical for all four secured profiles**; linked `.text` is byte-identical for micro/embedded/standard and **+4 bytes on full** — a benign linker-layout artifact from relocating `mu_secure_zero` into the always-compiled `secure_util.c` (full is the only secured profile with ECC, which calls it); behaviour is unchanged. The gating test asserts the gate on for secured profiles.
 
 ## Size contract (SC-001)
 

@@ -13,26 +13,9 @@
 #define MU_HKDF_MAX_INFO 256
 #endif
 
-void mu_secure_zero(void *v, size_t n) {
-    volatile unsigned char *p = (volatile unsigned char *)v;
-
-    /* Volatile byte stores keep the wipe observable so compilers cannot elide
-       clearing soon-dead key material. */
-    while (n != 0u) {
-        *p++ = 0u;
-        --n;
-    }
-}
-
-bool mu_secure_memeq(const void *a, const void *b, size_t n) {
-    const volatile unsigned char *pa = (const volatile unsigned char *)a;
-    const volatile unsigned char *pb = (const volatile unsigned char *)b;
-    unsigned char d = 0;
-    for (size_t i = 0; i < n; i++) {
-        d |= (pa[i] ^ pb[i]);
-    }
-    return d == 0;
-}
+/* mu_secure_zero / mu_secure_memeq now live in the always-compiled
+   src/security/secure_util.c (spec 072); this TU calls them via the
+   key_derivation.h -> secure_util.h include and links against that core object. */
 
 /* P_SHA256(secret, seed) per RFC 5246:
      A(0) = seed

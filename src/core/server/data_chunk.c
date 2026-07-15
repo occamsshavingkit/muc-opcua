@@ -3,7 +3,7 @@
 #include "../service_message.h"
 #include "../uasc.h"
 #include "common.h"
-#ifdef MUC_OPCUA_FACET_CORE_2022_SERVER
+#ifdef MUC_OPCUA_SECURE_CHANNEL_CRYPTO
 #include "../../security/asym_chunk.h"
 #include "../../security/sym_chunk.h"
 #endif
@@ -12,7 +12,7 @@
 void mu_service_dispatch_set_opn_security_policy(mu_server_t *server, const mu_string_t *security_policy);
 void mu_service_dispatch_set_opn_client_cert(mu_server_t *server, const mu_bytestring_t *client_cert);
 
-#ifdef MUC_OPCUA_FACET_CORE_2022_SERVER
+#ifdef MUC_OPCUA_SECURE_CHANNEL_CRYPTO
 _Static_assert(MU_SECURE_RESP_MAX + MU_SECURE_OPN_REQ_MAX + MU_SECURE_SESSION_MAX <= MU_SECURE_SCRATCH_SIZE,
                "secure scratch must hold response, OPN request, and session-handshake buffers");
 #endif
@@ -60,7 +60,7 @@ opcua_statuscode_t mu_server_emit_message(mu_server_t *server, opcua_uint32_t re
     }
 #endif
 
-#ifdef MUC_OPCUA_FACET_CORE_2022_SERVER
+#ifdef MUC_OPCUA_SECURE_CHANNEL_CRYPTO
     if (server_secure_channel.mode != MU_MESSAGE_SECURITY_MODE_NONE) {
         size_t total = 0;
         opcua_statuscode_t status;
@@ -259,7 +259,7 @@ void handle_data_chunk_plaintext(mu_server_t *server, const opcua_byte_t *msg, s
     }
 }
 
-#ifdef MUC_OPCUA_FACET_CORE_2022_SERVER
+#ifdef MUC_OPCUA_SECURE_CHANNEL_CRYPTO
 /* Unwrap an incoming asymmetric OPN chunk and extract its metadata. */
 static bool secure_unwrap_opn(mu_server_t *server, const mu_crypto_adapter_t *crypto, opcua_byte_t *msg, size_t msg_len,
                               opcua_byte_t *opn_buf, mu_string_t *out_security_policy,
@@ -463,4 +463,4 @@ void handle_data_chunk_secure(mu_server_t *server, opcua_byte_t *msg, size_t msg
         (void)mu_secure_channel_close(&server_secure_channel);
     }
 }
-#endif /* MUC_OPCUA_FACET_CORE_2022_SERVER */
+#endif /* MUC_OPCUA_SECURE_CHANNEL_CRYPTO */

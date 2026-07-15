@@ -1,5 +1,31 @@
 # Feature Size Ledger
 
+## 2026-07-15: Spec 072 — Nano SecurityPolicy-None Crypto Gating
+
+Introduced `MUC_OPCUA_SECURE_CHANNEL_CRYPTO`, decoupling secure-channel message
+crypto (sym/asym chunk, certificate, trustlist, key derivation) from the
+`MUC_OPCUA_FACET_CORE_2022_SERVER` umbrella. Off for nano only; on for
+micro/embedded/standard/full. `scripts/measure_size.sh all` (ARM Cortex-M0+,
+`-Os`), before at commit `e868159` (archive `.text` / elf_text):
+
+| Profile | before | after | Δ elf |
+|----------|------------------:|------------------:|------:|
+| nano | 29,442 / 27,220 | 23,568 / 21,320 | −5,900 |
+| micro | 41,420 / 39,952 | 41,420 / 39,952 | 0 |
+| embedded | 54,485 / 60,724 | 54,485 / 60,724 | 0 |
+| standard | 55,400 / 63,796 | 55,400 / 63,796 | 0 |
+| full | 82,689 / 87,852 | 82,689 / 87,856 | +4 |
+
+- **SC-001 met**: nano `.text` drops ~5.9 KB, BSS unchanged (512) — the crypto
+  TUs are excluded from the SecurityPolicy-None-only profile.
+- **Secured builds**: archive `.text` is byte-identical for all four secured
+  profiles (no code added/removed). Linked `.text` is byte-identical for
+  micro/embedded/standard; **full is +4 bytes** — a benign linker-layout
+  artifact from relocating `mu_secure_zero`/`mu_secure_memeq` into the
+  always-compiled `secure_util.c` (full is the only secured profile with ECC,
+  which calls them). Behaviour unchanged (full 136/136 pass); the identical
+  archive `.text` confirms no semantic size regression.
+
 ## 2026-07-14: Spec 071 - Nano Service Behaviour
 
 Measured with `scripts/measure_size.sh nano` after the Discovery, View, Write,
