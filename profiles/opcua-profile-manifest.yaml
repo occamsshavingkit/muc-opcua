@@ -1967,6 +1967,7 @@
     {
       "id": "opc_cu_2928",
       "kind": "conformance_unit",
+      "satisfied_by": "opc_cu_subscription_basic",
       "opc_display_name": "Monitored Items Deadband Filter",
       "kconfig_symbol": null,
       "implementation_state": "unimplemented",
@@ -1997,6 +1998,7 @@
     {
       "id": "opc_cu_2940",
       "kind": "conformance_unit",
+      "satisfied_by": "opc_cu_subscription_standard",
       "opc_display_name": "Base Info GetMonitoredItems Method",
       "kconfig_symbol": null,
       "implementation_state": "unimplemented",
@@ -2027,6 +2029,7 @@
     {
       "id": "opc_cu_2963",
       "kind": "conformance_unit",
+      "satisfied_by": "opc_cu_subscription_basic",
       "opc_display_name": "Monitor Basic",
       "kconfig_symbol": null,
       "implementation_state": "unimplemented",
@@ -2057,6 +2060,7 @@
     {
       "id": "opc_cu_3146",
       "kind": "conformance_unit",
+      "satisfied_by": "opc_cu_subscription_standard",
       "opc_display_name": "Monitor Triggering",
       "kconfig_symbol": null,
       "implementation_state": "unimplemented",
@@ -2267,6 +2271,7 @@
     {
       "id": "opc_cu_3532",
       "kind": "conformance_unit",
+      "satisfied_by": "opc_cu_subscription_standard",
       "opc_display_name": "Monitor Queueing",
       "kconfig_symbol": null,
       "implementation_state": "unimplemented",
@@ -2297,6 +2302,7 @@
     {
       "id": "opc_cu_3544",
       "kind": "conformance_unit",
+      "satisfied_by": "opc_cu_subscription_standard",
       "opc_display_name": "Base Info ResendData Method",
       "kconfig_symbol": null,
       "implementation_state": "unimplemented",
@@ -3077,6 +3083,7 @@
     {
       "id": "opc_cu_5207",
       "kind": "conformance_unit",
+      "satisfied_by": "opc_cu_subscription_basic",
       "opc_display_name": "Monitor Items 2",
       "kconfig_symbol": null,
       "implementation_state": "unimplemented",
@@ -4833,6 +4840,7 @@
     {
       "id": "opc_cu_3534",
       "kind": "conformance_unit",
+      "satisfied_by": "opc_cu_subscription_basic",
       "opc_display_name": "Subscription Multiple",
       "kconfig_symbol": null,
       "implementation_state": "unimplemented",
@@ -4863,6 +4871,7 @@
     {
       "id": "opc_cu_3535",
       "kind": "conformance_unit",
+      "satisfied_by": "opc_cu_subscription_basic",
       "opc_display_name": "Subscription Retransmission Queue",
       "kconfig_symbol": null,
       "implementation_state": "unimplemented",
@@ -4887,7 +4896,7 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "Support a retransmission queue of sent NotificationMessages and the Republish Service. See UA Part 4 for the required size of the retransmission queue.",
+      "notes": "Support a retransmission queue of sent NotificationMessages and the Republish Service. See UA Part 4 for the required size of the retransmission queue. muc-opcua: Republish is implemented and tested; the retransmission store holds the single most-recent NotificationMessage per subscription (profile-targeting minimal capacity), which may not meet CTT multi-message republish depth.",
       "cu_optional": false
     },
     {
@@ -5014,6 +5023,7 @@
     {
       "id": "opc_cu_3913",
       "kind": "conformance_unit",
+      "satisfied_by": "opc_cu_subscription_basic",
       "opc_display_name": "Subscription Publish Basic",
       "kconfig_symbol": null,
       "implementation_state": "unimplemented",
