@@ -135,6 +135,10 @@
       "opc_cu_3170",
       "opc_cu_3721",
       "opc_cu_3923",
+      "opc_cu_2318",
+      "opc_cu_2515",
+      "opc_cu_3150",
+      "opc_cu_4030",
       "opc_cu_2317",
       "opc_cu_2328",
       "opc_cu_2352",
@@ -1937,6 +1941,7 @@
     {
       "id": "opc_cu_2536",
       "kind": "conformance_unit",
+      "satisfied_by": "opc_cu_event_filter_where",
       "opc_display_name": "Base Info ContentFilter",
       "kconfig_symbol": null,
       "implementation_state": "unimplemented",
@@ -5488,6 +5493,130 @@
         "profile_group_id": 171
       },
       "notes": "Already-implemented CU added to manifest as claimed so the feature is tracked, gated by its Kconfig symbol, and covered by the claim/test map."
+    },
+    {
+      "id": "opc_cu_2318",
+      "kind": "conformance_unit",
+      "satisfied_by": "opc_cu_subscription_standard",
+      "opc_display_name": "Monitor QueueSize_ServerMax",
+      "kconfig_symbol": null,
+      "implementation_state": "unimplemented",
+      "depends_on": [],
+      "profile_defaults": {
+        "nano": false,
+        "micro": false,
+        "embedded": true,
+        "standard": true,
+        "full": true,
+        "custom": false
+      },
+      "backing_tests": [],
+      "opc_reference": {
+        "spec": null,
+        "section": null,
+        "cu_id": "2318",
+        "cu_name": "Monitor QueueSize_ServerMax",
+        "source_url": "https://profiles.opcfoundation.org"
+      },
+      "source_metadata": {
+        "profile_group_id": 171,
+        "source_endpoint": "conformanceunit/?pg=171&all=1"
+      },
+      "notes": "Reconciled (spec 073): server clamps requested MonitoredItem QueueSize to the compiled max (subscription_monitor.c); tested by test_subscriptions_capacity. Satisfied by subscription_standard.",
+      "cu_optional": false
+    },
+    {
+      "id": "opc_cu_2515",
+      "kind": "conformance_unit",
+      "satisfied_by": "opc_cu_events",
+      "opc_display_name": "Address Space Events 2",
+      "kconfig_symbol": null,
+      "implementation_state": "unimplemented",
+      "depends_on": [],
+      "profile_defaults": {
+        "nano": false,
+        "micro": false,
+        "embedded": false,
+        "standard": false,
+        "full": true,
+        "custom": false
+      },
+      "backing_tests": [],
+      "opc_reference": {
+        "spec": null,
+        "section": null,
+        "cu_id": "2515",
+        "cu_name": "Address Space Events 2",
+        "source_url": "https://profiles.opcfoundation.org"
+      },
+      "source_metadata": {
+        "profile_group_id": 171,
+        "source_endpoint": "conformanceunit/?pg=171&all=1"
+      },
+      "notes": "Reconciled (spec 073): address-space-triggered events are queued per subscription and delivered in Publish (notification.c mu_server_trigger_event); tested by test_event_notifications. Satisfied by opc_cu_events.",
+      "cu_optional": false
+    },
+    {
+      "id": "opc_cu_3150",
+      "kind": "conformance_unit",
+      "satisfied_by": "opc_cu_events",
+      "opc_display_name": "Monitor Events",
+      "kconfig_symbol": null,
+      "implementation_state": "unimplemented",
+      "depends_on": [],
+      "profile_defaults": {
+        "nano": false,
+        "micro": false,
+        "embedded": false,
+        "standard": false,
+        "full": true,
+        "custom": false
+      },
+      "backing_tests": [],
+      "opc_reference": {
+        "spec": null,
+        "section": null,
+        "cu_id": "3150",
+        "cu_name": "Monitor Events",
+        "source_url": "https://profiles.opcfoundation.org"
+      },
+      "source_metadata": {
+        "profile_group_id": 171,
+        "source_endpoint": "conformanceunit/?pg=171&all=1"
+      },
+      "notes": "Reconciled (spec 073): MonitoredItem on the EventNotifier attribute delivers EventFieldLists end-to-end (notification.c); tested by test_event_notifications. Satisfied by opc_cu_events.",
+      "cu_optional": false
+    },
+    {
+      "id": "opc_cu_4030",
+      "kind": "conformance_unit",
+      "satisfied_by": "opc_cu_event_filter_where",
+      "opc_display_name": "Monitor Complex Event Filter",
+      "kconfig_symbol": null,
+      "implementation_state": "unimplemented",
+      "depends_on": [],
+      "profile_defaults": {
+        "nano": false,
+        "micro": false,
+        "embedded": false,
+        "standard": false,
+        "full": true,
+        "custom": false
+      },
+      "backing_tests": [],
+      "opc_reference": {
+        "spec": null,
+        "section": null,
+        "cu_id": "4030",
+        "cu_name": "Monitor Complex Event Filter",
+        "source_url": "https://profiles.opcfoundation.org"
+      },
+      "source_metadata": {
+        "profile_group_id": 171,
+        "source_endpoint": "conformanceunit/?pg=171&all=1"
+      },
+      "notes": "Reconciled (spec 073): combined SELECT + WHERE event filter with operator support and unsupported-operator rejection (filter_reader.c + event_filter.c); tested E2E by test_event_notifications. Satisfied by opc_cu_event_filter_where.",
+      "cu_optional": false
     },
     {
       "id": "opc_cu_2190",

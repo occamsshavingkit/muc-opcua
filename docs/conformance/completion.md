@@ -16,7 +16,7 @@ yet reconciled to individual OPC CU ids count as not-implemented — see the
 reconciliation note below.
 
 - Distinct Server CUs: **525** (required 179, optional 346)
-- Reconciled as implemented: **required 31/179**, **optional 20/346**
+- Reconciled as implemented: **required 36/179**, **optional 20/346**
 
 ### Per Server profile / facet
 
@@ -29,34 +29,34 @@ reconciliation note below.
 | 1026 | Global Service Authorization Request Server Facet | 0/1 | 0/0 |
 | 1027 | Global Service KeyCredential Pull Facet | 0/1 | 0/0 |
 | 1029 | GDS AliasName Server Facet | 0/5 | 0/5 |
-| 1219 | Exposes Type System Server Facet | 0/8 | 1/38 |
+| 1219 | Exposes Type System Server Facet | 1/8 | 1/38 |
 | 1322 | Core 2022 Server Facet | 14/17 | 20/27 |
 | 1324 | Standard DataChange Subscription 2022 Server Facet | 11/16 | 0/1 |
-| 1328 | Auditing 2022 Server Facet | 6/18 | 0/12 |
-| 1329 | Node Management 2022 Server Facet | 0/15 | 1/39 |
+| 1328 | Auditing 2022 Server Facet | 11/18 | 0/12 |
+| 1329 | Node Management 2022 Server Facet | 1/15 | 1/39 |
 | 1330 | Nano Embedded Device 2022 Server Profile | 18/22 | 20/29 |
-| 1332 | Embedded 2022 UA Server Profile | 31/51 | 20/68 |
-| 1333 | Standard 2022 UA Server Profile | 31/55 | 20/68 |
+| 1332 | Embedded 2022 UA Server Profile | 32/51 | 20/68 |
+| 1333 | Standard 2022 UA Server Profile | 32/55 | 20/68 |
 | 1343 | Global Discovery Server 2022 Profile | 29/41 | 20/28 |
-| 1344 | Global Discovery and Certificate Mgmt 2022 Server | 29/52 | 20/42 |
-| 1346 | A & E Wrapper 2022 Facet | 5/18 | 0/0 |
+| 1344 | Global Discovery and Certificate Mgmt 2022 Server | 34/52 | 20/42 |
+| 1346 | A & E Wrapper 2022 Facet | 9/18 | 0/0 |
 | 1348 | File Access Server Facet | 0/1 | 0/2 |
 | 1351 | User Role Base 2022 Server Facet | 0/2 | 0/1 |
-| 1500 | A & C Exclusive Alarming 2022 Server Facet | 6/23 | 0/77 |
-| 1501 | A & C Non-Exclusive Alarming 2022 Server Facet | 6/23 | 0/80 |
-| 1502 | A & C Alarm 2022 Server Facet | 6/22 | 0/62 |
+| 1500 | A & C Exclusive Alarming 2022 Server Facet | 11/23 | 0/77 |
+| 1501 | A & C Non-Exclusive Alarming 2022 Server Facet | 11/23 | 0/80 |
+| 1502 | A & C Alarm 2022 Server Facet | 11/22 | 0/62 |
 | 1503 | A & C Alarm Auditing Server Facet | 0/1 | 0/7 |
-| 1504 | A & C Dialog 2022 Server Facet | 6/19 | 0/13 |
+| 1504 | A & C Dialog 2022 Server Facet | 11/19 | 0/13 |
 | 1505 | Data Access Server Facet | 0/1 | 0/21 |
 | 1524 | Dictionary Reference Server Facet | 0/1 | 0/2 |
 | 1525 | Temporary File Access Server Facet | 0/1 | 0/4 |
-| 1551 | A & C Base Condition 2022 Server Facet | 6/18 | 0/8 |
+| 1551 | A & C Base Condition 2022 Server Facet | 11/18 | 0/8 |
 | 1562 | A & C Address Space Instance 2022 Server Facet | 0/1 | 0/0 |
-| 1563 | A & C Enable 2022 Server Facet | 6/20 | 0/11 |
-| 1564 | A & C Previous Instances 2022 Server Facet | 6/19 | 0/8 |
-| 1565 | A & C Acknowledgeable Alarm 2022 Server Facet | 6/19 | 0/15 |
-| 1566 | A & C CertificateExpiration 2022 Server Facet | 6/22 | 0/10 |
-| 1568 | A & C Refresh2 2022 Server Facet | 6/19 | 0/8 |
+| 1563 | A & C Enable 2022 Server Facet | 11/20 | 0/11 |
+| 1564 | A & C Previous Instances 2022 Server Facet | 11/19 | 0/8 |
+| 1565 | A & C Acknowledgeable Alarm 2022 Server Facet | 11/19 | 0/15 |
+| 1566 | A & C CertificateExpiration 2022 Server Facet | 11/22 | 0/10 |
+| 1568 | A & C Refresh2 2022 Server Facet | 11/19 | 0/8 |
 | 1571 | Historical Raw Data 2022 Server Facet | 0/4 | 0/1 |
 | 1572 | Historical Annotation 2022 Server Facet | 0/6 | 0/0 |
 | 1573 | Historical Data Update 2022 Server Facet | 0/3 | 0/1 |
@@ -77,7 +77,7 @@ reconciliation note below.
 | 1633 | Request State Change Server Facet | 0/1 | 0/0 |
 | 1636 | AliasName Server Facet | 0/3 | 0/4 |
 | 1637 | AliasName Aggregating Server Facet | 0/4 | 0/5 |
-| 1638 | State Machine 2022 Server Facet | 6/16 | 0/14 |
+| 1638 | State Machine 2022 Server Facet | 11/16 | 0/14 |
 | 1639 | Method 2022 Server Facet | 0/4 | 0/2 |
 | 1691 | User Token – Anonymous Server Facet | 0/1 | 0/0 |
 | 1695 | User Token – User Name Password Server Facet | 0/2 | 0/1 |
@@ -98,7 +98,7 @@ reconciliation note below.
 | 1997 | Attribute WriteMask Server Facet | 0/6 | 0/1 |
 | 2069 | Subnet Discovery Server Facet | 0/1 | 0/0 |
 | 2080 | User Role Management 2022 Server Facet | 0/6 | 0/8 |
-| 2085 | Standard Event Subscription 2022 Server Facet | 6/15 | 0/7 |
+| 2085 | Standard Event Subscription 2022 Server Facet | 11/15 | 0/7 |
 | 2098 | Durable Subscription 2022 Server Facet | 0/3 | 0/0 |
 | 2113 | KeyCredential Service Server Facet | 0/2 | 0/3 |
 | 2242 | LogObject Facet | 0/1 | 0/13 |
@@ -108,8 +108,8 @@ reconciliation note below.
 | 2255 | Micro Embedded Device 2022 Server Profile | 23/32 | 20/30 |
 | 2266 | Nano Embedded Device 2025 Server Profile | 18/22 | 20/29 |
 | 2267 | Micro Embedded Device 2025 Server Profile | 23/32 | 20/30 |
-| 2268 | Embedded 2025 UA Server Profile | 31/51 | 20/68 |
-| 2269 | Standard 2025 UA Server Profile | 31/55 | 20/68 |
+| 2268 | Embedded 2025 UA Server Profile | 32/51 | 20/68 |
+| 2269 | Standard 2025 UA Server Profile | 32/55 | 20/68 |
 | 2322 | AliasName Configuration Facet | 0/4 | 0/5 |
 | 2323 | AliasName Server PubSub Publisher Facet | 0/4 | 0/4 |
 
@@ -263,7 +263,7 @@ Optional CUs:
 ## Profile Embedded 2025 UA Server Profile
 
 - Required CUs implemented: **30/48**
-- Optional CUs implemented: **21/71**
+- Optional CUs implemented: **22/71**
 
 Required CUs:
 
@@ -323,6 +323,7 @@ Optional CUs:
 - [x] `opc_cu_2446` Address Space AddIn Reference
 - [x] `opc_cu_2447` Address Space AddIn DefaultInstanceBrowsename
 - [x] `opc_cu_2476` Base Info LocalTime
+- [x] `opc_cu_2536` Base Info ContentFilter
 - [x] `opc_cu_2711` Base Info Selection List
 - [x] `opc_cu_2936` Attribute Write StatusCode & Timestamp
 - [x] `opc_cu_2969` Base Info ValueAsText
@@ -357,7 +358,6 @@ Optional CUs:
 - [ ] `opc_cu_2516` Base Info HasOrderedComponent
 - [ ] `opc_cu_2517` Base Info Deprecated Information
 - [ ] `opc_cu_2518` Base Info Image DataTypes
-- [ ] `opc_cu_2536` Base Info ContentFilter
 - [ ] `opc_cu_2786` Time Sync – NTP
 - [ ] `opc_cu_2808` Security Role Server Authorization
 - [ ] `opc_cu_3196` Base Info Fixed SamplingInterval
@@ -393,7 +393,7 @@ Optional CUs:
 ## Profile Standard 2025 UA Server Profile
 
 - Required CUs implemented: **30/52**
-- Optional CUs implemented: **21/71**
+- Optional CUs implemented: **22/71**
 
 Required CUs:
 
@@ -457,6 +457,7 @@ Optional CUs:
 - [x] `opc_cu_2446` Address Space AddIn Reference
 - [x] `opc_cu_2447` Address Space AddIn DefaultInstanceBrowsename
 - [x] `opc_cu_2476` Base Info LocalTime
+- [x] `opc_cu_2536` Base Info ContentFilter
 - [x] `opc_cu_2711` Base Info Selection List
 - [x] `opc_cu_2936` Attribute Write StatusCode & Timestamp
 - [x] `opc_cu_2969` Base Info ValueAsText
@@ -491,7 +492,6 @@ Optional CUs:
 - [ ] `opc_cu_2516` Base Info HasOrderedComponent
 - [ ] `opc_cu_2517` Base Info Deprecated Information
 - [ ] `opc_cu_2518` Base Info Image DataTypes
-- [ ] `opc_cu_2536` Base Info ContentFilter
 - [ ] `opc_cu_2786` Time Sync – NTP
 - [ ] `opc_cu_2808` Security Role Server Authorization
 - [ ] `opc_cu_3196` Base Info Fixed SamplingInterval
@@ -530,7 +530,7 @@ Facet CU membership uses direct `included_conformance_units`
 (sub-facet CUs are counted where the snapshot expands them).
 
 - **GDS AliasName Server Facet** (`opc_facet_1029`): required 0/0, optional 0/0 — 10 closure CU(s) not in manifest
-- **Exposes Type System Server Facet** (`opc_facet_1219`): required 0/7, optional 1/39
+- **Exposes Type System Server Facet** (`opc_facet_1219`): required 0/7, optional 2/39
 - **Core 2022 Server Facet** (`opc_facet_1322`): required 14/16, optional 20/28
 - **Standard DataChange Subscription 2022 Server Facet** (`opc_facet_1324`): required 11/16, optional 0/1
 - **Global Certificate Management Server Facet** (`opc_facet_1631`): required 0/1, optional 0/0

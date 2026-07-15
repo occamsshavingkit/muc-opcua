@@ -49,3 +49,47 @@ Overall reconciled required 21 → 31.
 - 3535: grow the retransmission store to a multi-message queue for CTT-level republish.
 - 3911/4055/3922/3196: add the missing ServerCapabilities / diagnostics / status-bit surface.
 - 5208: apply monitored-item IndexRange slicing + test.
+
+## 2026-07-15 — Auditing 2022 Server Facet (opc_id 1328)
+
+30 CUs (18 required + 12 optional). This facet reuses the subscription CUs
+already reconciled under 1324 (2963, 3534, 3535, 3727, 3913, 5207). New work:
+the auditing / event / base-info CUs. Reconciled **5 more** (facet 11/18
+required; overall reconciled required 31 → 36).
+
+### Claimed (satisfied_by) — added as granular manifest entries
+
+| CU | Name | Alias | Evidence |
+| --- | --- | --- | --- |
+| 2318 | Monitor QueueSize_ServerMax | subscription_standard | `subscription_monitor.c` clamps requested QueueSize to compiled max; `test_subscriptions_capacity` |
+| 2515 | Address Space Events 2 | events | `notification.c` `mu_server_trigger_event` queues + delivers events; `test_event_notifications::test_alarm_event_generation_and_publishing` |
+| 2536 | Base Info ContentFilter | event_filter_where | `event_filter.c` `mu_where_clause_eval` full operator set; `test_event_filter_where` |
+| 3150 | Monitor Events | events | `notification.c` MonitoredItem on EventNotifier attr delivers EventFieldLists E2E; `test_event_notifications` |
+| 4030 | Monitor Complex Event Filter | event_filter_where | `filter_reader.c` SELECT + `event_filter.c` WHERE, unsupported-operator rejection; `test_event_notifications` (E2E) |
+
+### NOT claimed — grounded reasons
+
+- **Auditing CUs (2422, 3968, 5213, 3228, 3224, 3226, 3230)**: the audit subsystem
+  (`auditing/audit_events.c` `mu_raise_audit_event`) is a **tested dispatch stub with
+  zero service integration** — no session/secure-channel/write/method/history/node-
+  management handler ever raises an audit event (only 4 audit types defined, none
+  emitted). Infra + isolated unit tests exist (PARTIAL), but the server does not
+  actually emit AuditEvents, so none of the granular auditing CUs are claimed.
+- **3194 Base Info Events Capabilities**: the EventNotifier attribute is never
+  exposed — `read_attribute.c` has no `MU_ATTRIBUTEID_EVENTNOTIFIER` case and no node
+  sets `.event_notifier`; a client cannot discover the Server as an event source.
+- **3206 EventQueueOverflow EventType**: overflow silently discards the oldest event;
+  no `EventQueueOverflowEventType` is inserted (behavioural mismatch).
+- **3546 LocalTime Events**: the LocalTime event field is name-resolvable but always
+  emitted Null (behavioural mismatch).
+- **3199 System Status**: ServerStatus/State nodes exist and are read, but no
+  system-status *event* generation; CU intent (node vs event) ambiguous — deferred.
+- **Absent**: 2747, 2822, 2978, 3224, 3226, 3230, 4427 (N/A client), 5578 — no code.
+
+### Surfaced concern (follow-up)
+
+`opc_cu_auditing` (`MUC_OPCUA_CU_AUDITING`) is currently **claimed**, but the audit
+subsystem has no service integration (no service call raises an audit event). Its
+claim appears **over-stated** and should be reviewed — either wire audit-event
+emission into the service handlers, or downgrade the alias. Out of scope for this
+reconciliation increment; flagged here so it is not lost.
