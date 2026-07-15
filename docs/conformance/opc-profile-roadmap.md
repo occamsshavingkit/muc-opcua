@@ -18,7 +18,7 @@ remains future work.
 | claimed | 60 |
 | implemented | 7 |
 | deferred | 9 |
-| unimplemented | 113 |
+| unimplemented | 117 |
 
 ## Item matrix
 
@@ -203,6 +203,10 @@ remains future work.
 | opc_cu_2515 | conformance_unit | unimplemented |  | — | full | — |
 | opc_cu_3150 | conformance_unit | unimplemented |  | — | full | — |
 | opc_cu_4030 | conformance_unit | unimplemented |  | — | full | — |
+| opc_cu_2380 | conformance_unit | unimplemented |  | — | full | — |
+| opc_cu_2394 | conformance_unit | unimplemented |  | — | full | — |
+| opc_cu_2939 | conformance_unit | unimplemented |  | — | full | — |
+| opc_cu_3153 | conformance_unit | unimplemented |  | — | full | — |
 | opc_cu_2190 | conformance_unit | unimplemented | OPC-10000-4 §5.6.5 | — | standard, full | — |
 | opc_cu_2271 | conformance_unit | unimplemented | OPC-10000-4 §5.4.5 | — | standard, full | — |
 | opc_cu_2863 | conformance_unit | unimplemented | OPC-10000-7 §6.5 | — | embedded, standard, full | — |

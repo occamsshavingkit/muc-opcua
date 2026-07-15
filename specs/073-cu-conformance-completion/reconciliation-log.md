@@ -93,3 +93,29 @@ subsystem has no service integration (no service call raises an audit event). It
 claim appears **over-stated** and should be reviewed — either wire audit-event
 emission into the service handlers, or downgrade the alias. Out of scope for this
 reconciliation increment; flagged here so it is not lost.
+
+## 2026-07-15 — Node Management 2022 Server Facet (opc_id 1329)
+
+54 CUs (15 required + 39 optional). Reconciled the 4 core NodeManagement
+**service** CUs (facet 0/15 → 5/15 required incl. 2536 from 1328; overall
+reconciled required 36 → 40). Added as granular manifest entries under
+`service_nodemanagement` (`MUC_OPCUA_CU_NODEMANAGEMENT`, full only):
+
+| CU | Name | Evidence |
+| --- | --- | --- |
+| 2380 | Node Management Add Node | `dispatch_node_mgmt.c` handle_add_nodes → mu_add_nodes_process; `test_node_management` (decode/encode, duplicate-NodeId) |
+| 2394 | Node Management Delete Node | handle_delete_nodes → mu_delete_nodes_process; `test_node_management` |
+| 2939 | Node Management Add Ref | handle_add_references → mu_add_references_process; `test_node_management` |
+| 3153 | Node Management Delete Ref | handle_delete_references → mu_delete_references_process; `test_node_management` (incl. Bad_NotFound) |
+
+### NOT claimed / deferred
+
+- **2489 Node Management Capabilities**: no NodeManagement ServerCapabilities node
+  in the address space.
+- **~44 "Base Info X DataType" companion CUs** (2423/2481/2482/2500/2513/2514/…):
+  these require exposing specific companion-spec DataType/ReferenceType nodes
+  (RationalNumber, EUInformation, Audio, Spatial, ISA-95 relations, etc.) in the
+  address space. As a minimal profile-targeting server we do not expose most of
+  these; deferred as a batch — each needs per-node address-space grounding and most
+  are genuinely absent. Core-type CUs (3185/3188/3189 base type folders/ServerType)
+  are also deferred pending per-node grounding.

@@ -130,6 +130,10 @@
     ],
     "opc_facet_1322": [
       "opc_cu_2190",
+      "opc_cu_2380",
+      "opc_cu_2394",
+      "opc_cu_2939",
+      "opc_cu_3153",
       "opc_cu_2271",
       "opc_cu_2863",
       "opc_cu_3170",
@@ -5616,6 +5620,130 @@
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
       "notes": "Reconciled (spec 073): combined SELECT + WHERE event filter with operator support and unsupported-operator rejection (filter_reader.c + event_filter.c); tested E2E by test_event_notifications. Satisfied by opc_cu_event_filter_where.",
+      "cu_optional": false
+    },
+    {
+      "id": "opc_cu_2380",
+      "kind": "conformance_unit",
+      "satisfied_by": "service_nodemanagement",
+      "opc_display_name": "Node Management Add Node",
+      "kconfig_symbol": null,
+      "implementation_state": "unimplemented",
+      "depends_on": [],
+      "profile_defaults": {
+        "nano": false,
+        "micro": false,
+        "embedded": false,
+        "standard": false,
+        "full": true,
+        "custom": false
+      },
+      "backing_tests": [],
+      "opc_reference": {
+        "spec": null,
+        "section": null,
+        "cu_id": "2380",
+        "cu_name": "Node Management Add Node",
+        "source_url": "https://profiles.opcfoundation.org"
+      },
+      "source_metadata": {
+        "profile_group_id": 171,
+        "source_endpoint": "conformanceunit/?pg=171&all=1"
+      },
+      "notes": "Reconciled (spec 073): AddNodes service (nodemanagement/dispatch_node_mgmt.c handle_add_nodes -> mu_add_nodes_process); tested by test_node_management (AddNodes decode/encode, duplicate-NodeId). Satisfied by service_nodemanagement.",
+      "cu_optional": false
+    },
+    {
+      "id": "opc_cu_2394",
+      "kind": "conformance_unit",
+      "satisfied_by": "service_nodemanagement",
+      "opc_display_name": "Node Management Delete Node",
+      "kconfig_symbol": null,
+      "implementation_state": "unimplemented",
+      "depends_on": [],
+      "profile_defaults": {
+        "nano": false,
+        "micro": false,
+        "embedded": false,
+        "standard": false,
+        "full": true,
+        "custom": false
+      },
+      "backing_tests": [],
+      "opc_reference": {
+        "spec": null,
+        "section": null,
+        "cu_id": "2394",
+        "cu_name": "Node Management Delete Node",
+        "source_url": "https://profiles.opcfoundation.org"
+      },
+      "source_metadata": {
+        "profile_group_id": 171,
+        "source_endpoint": "conformanceunit/?pg=171&all=1"
+      },
+      "notes": "Reconciled (spec 073): DeleteNodes service (handle_delete_nodes -> mu_delete_nodes_process); tested by test_node_management. Satisfied by service_nodemanagement.",
+      "cu_optional": false
+    },
+    {
+      "id": "opc_cu_2939",
+      "kind": "conformance_unit",
+      "satisfied_by": "service_nodemanagement",
+      "opc_display_name": "Node Management Add Ref",
+      "kconfig_symbol": null,
+      "implementation_state": "unimplemented",
+      "depends_on": [],
+      "profile_defaults": {
+        "nano": false,
+        "micro": false,
+        "embedded": false,
+        "standard": false,
+        "full": true,
+        "custom": false
+      },
+      "backing_tests": [],
+      "opc_reference": {
+        "spec": null,
+        "section": null,
+        "cu_id": "2939",
+        "cu_name": "Node Management Add Ref",
+        "source_url": "https://profiles.opcfoundation.org"
+      },
+      "source_metadata": {
+        "profile_group_id": 171,
+        "source_endpoint": "conformanceunit/?pg=171&all=1"
+      },
+      "notes": "Reconciled (spec 073): AddReferences service (handle_add_references -> mu_add_references_process); tested by test_node_management. Satisfied by service_nodemanagement.",
+      "cu_optional": false
+    },
+    {
+      "id": "opc_cu_3153",
+      "kind": "conformance_unit",
+      "satisfied_by": "service_nodemanagement",
+      "opc_display_name": "Node Management Delete Ref",
+      "kconfig_symbol": null,
+      "implementation_state": "unimplemented",
+      "depends_on": [],
+      "profile_defaults": {
+        "nano": false,
+        "micro": false,
+        "embedded": false,
+        "standard": false,
+        "full": true,
+        "custom": false
+      },
+      "backing_tests": [],
+      "opc_reference": {
+        "spec": null,
+        "section": null,
+        "cu_id": "3153",
+        "cu_name": "Node Management Delete Ref",
+        "source_url": "https://profiles.opcfoundation.org"
+      },
+      "source_metadata": {
+        "profile_group_id": 171,
+        "source_endpoint": "conformanceunit/?pg=171&all=1"
+      },
+      "notes": "Reconciled (spec 073): DeleteReferences service (handle_delete_references -> mu_delete_references_process); tested by test_node_management (incl. Bad_NotFound). Satisfied by service_nodemanagement.",
       "cu_optional": false
     },
     {

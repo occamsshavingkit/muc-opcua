@@ -747,6 +747,30 @@ config MUC_OPCUA_CU_BASE_INFO_ENGINEERING_UNITS
 #   Notes: Imported from OPC profile REST API 2026-07-15. Not implemented: no Cancel service handler exists.
 comment "Session Cancel (NOT IMPLEMENTED) [OPC-10000-4 §5.6.5]"
 
+# Node Management Add Node (opc_cu_2380)
+#   Implementation state: unimplemented -- visible but not selectable.
+#   Detail: CU 2380:Node Management Add Node.
+#   Notes: Reconciled (spec 073): AddNodes service (nodemanagement/dispatch_node_mgmt.c handle_add_nodes -> mu_add_nodes_process); tested by test_node_management (AddNodes decode/encode, duplicate-NodeId). Satisfied by service_nodemanagement.
+comment "Node Management Add Node (NOT IMPLEMENTED)"
+
+# Node Management Delete Node (opc_cu_2394)
+#   Implementation state: unimplemented -- visible but not selectable.
+#   Detail: CU 2394:Node Management Delete Node.
+#   Notes: Reconciled (spec 073): DeleteNodes service (handle_delete_nodes -> mu_delete_nodes_process); tested by test_node_management. Satisfied by service_nodemanagement.
+comment "Node Management Delete Node (NOT IMPLEMENTED)"
+
+# Node Management Add Ref (opc_cu_2939)
+#   Implementation state: unimplemented -- visible but not selectable.
+#   Detail: CU 2939:Node Management Add Ref.
+#   Notes: Reconciled (spec 073): AddReferences service (handle_add_references -> mu_add_references_process); tested by test_node_management. Satisfied by service_nodemanagement.
+comment "Node Management Add Ref (NOT IMPLEMENTED)"
+
+# Node Management Delete Ref (opc_cu_3153)
+#   Implementation state: unimplemented -- visible but not selectable.
+#   Detail: CU 3153:Node Management Delete Ref.
+#   Notes: Reconciled (spec 073): DeleteReferences service (handle_delete_references -> mu_delete_references_process); tested by test_node_management (incl. Bad_NotFound). Satisfied by service_nodemanagement.
+comment "Node Management Delete Ref (NOT IMPLEMENTED)"
+
 # Discovery Register (opc_cu_2271)
 #   Implementation state: unimplemented -- visible but not selectable.
 #   OPC source: OPC-10000-4 §5.4.5.

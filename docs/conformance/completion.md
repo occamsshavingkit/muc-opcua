@@ -16,7 +16,7 @@ yet reconciled to individual OPC CU ids count as not-implemented — see the
 reconciliation note below.
 
 - Distinct Server CUs: **525** (required 179, optional 346)
-- Reconciled as implemented: **required 36/179**, **optional 20/346**
+- Reconciled as implemented: **required 40/179**, **optional 20/346**
 
 ### Per Server profile / facet
 
@@ -33,7 +33,7 @@ reconciliation note below.
 | 1322 | Core 2022 Server Facet | 14/17 | 20/27 |
 | 1324 | Standard DataChange Subscription 2022 Server Facet | 11/16 | 0/1 |
 | 1328 | Auditing 2022 Server Facet | 11/18 | 0/12 |
-| 1329 | Node Management 2022 Server Facet | 1/15 | 1/39 |
+| 1329 | Node Management 2022 Server Facet | 5/15 | 1/39 |
 | 1330 | Nano Embedded Device 2022 Server Profile | 18/22 | 20/29 |
 | 1332 | Embedded 2022 UA Server Profile | 32/51 | 20/68 |
 | 1333 | Standard 2022 UA Server Profile | 32/55 | 20/68 |

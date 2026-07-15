@@ -668,6 +668,10 @@ The following OPC items are tracked in the manifest but are NOT implemented. The
 | opc_cu_2515 |  | unimplemented | Reconciled (spec 073): address-space-triggered events are queued per subscription and delivered in Publish (notification.c mu_server_trigger_event); tested by test_event_notifications. Satisfied by opc_cu_events. |
 | opc_cu_3150 |  | unimplemented | Reconciled (spec 073): MonitoredItem on the EventNotifier attribute delivers EventFieldLists end-to-end (notification.c); tested by test_event_notifications. Satisfied by opc_cu_events. |
 | opc_cu_4030 |  | unimplemented | Reconciled (spec 073): combined SELECT + WHERE event filter with operator support and unsupported-operator rejection (filter_reader.c + event_filter.c); tested E2E by test_event_notifications. Satisfied by opc_cu_event_filter_where. |
+| opc_cu_2380 |  | unimplemented | Reconciled (spec 073): AddNodes service (nodemanagement/dispatch_node_mgmt.c handle_add_nodes -> mu_add_nodes_process); tested by test_node_management (AddNodes decode/encode, duplicate-NodeId). Satisfied by service_nodemanagement. |
+| opc_cu_2394 |  | unimplemented | Reconciled (spec 073): DeleteNodes service (handle_delete_nodes -> mu_delete_nodes_process); tested by test_node_management. Satisfied by service_nodemanagement. |
+| opc_cu_2939 |  | unimplemented | Reconciled (spec 073): AddReferences service (handle_add_references -> mu_add_references_process); tested by test_node_management. Satisfied by service_nodemanagement. |
+| opc_cu_3153 |  | unimplemented | Reconciled (spec 073): DeleteReferences service (handle_delete_references -> mu_delete_references_process); tested by test_node_management (incl. Bad_NotFound). Satisfied by service_nodemanagement. |
 | opc_cu_2190 | OPC-10000-4 §5.6.5 | unimplemented | Imported from OPC profile REST API 2026-07-15. Not implemented: no Cancel service handler exists. |
 | opc_cu_2271 | OPC-10000-4 §5.4.5 | unimplemented | Imported from OPC profile REST API 2026-07-15. Not implemented: register_server.c is a stub (outbound RegisterServer to a discovery server is not supported). |
 | opc_cu_2863 | OPC-10000-7 §6.5 | unimplemented | Imported from OPC profile REST API 2026-07-15. Capability satisfied via the secure-conversation layer, which implements Basic256Sha256, Aes128_Sha256_RsaOaep, and Aes256_Sha256_RsaPss; Kconfig gates per-profile inclusion. |
@@ -678,6 +682,7 @@ The following OPC items are tracked in the manifest but are NOT implemented. The
 | opc_cu_3201 |  | unimplemented | The Server supports custom types (i.e. types that are derived from well-known ObjectTypes, VariableTypes, ReferenceTypes or DataTypes). Supporting this ConformanceUnit requires that the custom types with their full inheritance tree are exposed in the AddressSpace. For each DataType having encoding information (Structured DataTypes) the Encoding Objects shall be exposed as well. For all Events supported by the Server, the EventType shall be exposed. (Documentation complete; no code change needed.) |
 | opc_cu_5814 |  | unimplemented | The Server supports being able to be configured for no application authentication, just User authentication and normal encryption/signing: – Configure Server to skip the trust check when validating certificates – Certificates are just used for message security (signing and encryption) – Users level is used for authentication (Documentation complete; no code change needed.) |
 <!-- END GENERATED MANIFEST TABLES -->
+
 
 
 
