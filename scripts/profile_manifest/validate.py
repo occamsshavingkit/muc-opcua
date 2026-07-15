@@ -1412,8 +1412,11 @@ def _check_unimplemented_availability(manifest: dict) -> list[str]:
 
 
 def _check_reconciliation_links(manifest: dict) -> list[str]:
-    """Spec 073 FR-002: `satisfied_by` must point to an existing implemented CU,
-    and `not_applicable` must map known profile keys to non-empty reasons."""
+    """Validate spec 073 FR-002 reconciliation links.
+
+    `satisfied_by` must point to an existing implemented CU, and `not_applicable`
+    must map known profile keys to non-empty reasons.
+    """
     errors: list[str] = []
     items = manifest.get("items", [])
     by_id = {it.get("id"): it for it in items if it.get("kind") == "conformance_unit"}

@@ -65,8 +65,11 @@ def _index_by_id(items: list[dict]) -> dict[str, dict]:
 
 
 def _cu_id_implemented(cid: str, group: list[dict], by_id: dict[str, dict]) -> bool:
-    """A cu_id is implemented if any entry sharing it is implemented, or the
-    entry's grounded `satisfied_by` link resolves to an implemented entry."""
+    """Report whether a cu_id resolves to an implemented entry.
+
+    True if any entry sharing the cu_id is implemented, or the entry's grounded
+    `satisfied_by` link resolves to an implemented entry.
+    """
     for entry in group:
         if entry.get("implementation_state") in _IMPLEMENTED:
             return True
@@ -204,10 +207,9 @@ def _render_server_surface(manifest: dict, catalog: dict) -> list[str]:
             "capability from the build manifest. Coarse feature-level CUs that are not",
             "yet reconciled to individual OPC CU ids count as not-implemented — see the",
             "reconciliation note below.", "",
-            f"- Distinct Server CUs: **{len(all_ids)}** "
-            f"(required {overall['required_total']}, optional {overall['optional_total']})",
-            f"- Reconciled as implemented: **required {overall['required_implemented']}/{overall['required_total']}"
-            f"**, **optional {overall['optional_implemented']}/{overall['optional_total']}**", "",
+            f"- Distinct Server CUs: **{len(all_ids)}** (required {overall['required_total']}, optional {overall['optional_total']})",
+            f"- Reconciled as implemented: **required {overall['required_implemented']}/{overall['required_total']}**, **optional {overall['optional_implemented']}/{overall['optional_total']}**",
+            "",
             "### Per Server profile / facet", "",
             "| OPC id | Profile / Facet | Required | Optional |",
             "| --- | --- | --- | --- |"]

@@ -22,7 +22,6 @@ from __future__ import annotations
 import argparse
 import json
 import os
-import sys
 import time
 import urllib.request
 
@@ -33,10 +32,14 @@ _OUT = os.path.join(_REPO, "profiles", "opcua-server-conformance.json")
 
 
 def _get(url: str, retries: int = 3) -> dict:
+    # Only ever fetch the fixed https REST endpoint; reject any other scheme so a
+    # crafted value can never reach urllib's file:// handler (Bandit B310).
+    if not url.startswith("https://"):
+        raise ValueError(f"refusing non-https catalog URL: {url}")
     last: Exception | None = None
     for _ in range(retries):
         try:
-            with urllib.request.urlopen(url, timeout=60) as resp:
+            with urllib.request.urlopen(url, timeout=60) as resp:  # noqa: S310 - scheme checked above
                 return json.loads(resp.read().decode("utf-8"))
         except Exception as exc:  # noqa: BLE001 - network best-effort
             last = exc
