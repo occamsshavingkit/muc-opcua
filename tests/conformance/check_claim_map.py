@@ -53,7 +53,10 @@ IN_SCOPE_CU_PROFILE_DEFAULTS = {
     },
     "opc_cu_3147": {
         "claim": "Attribute Write Index",
-        "profiles": {"micro", "embedded", "standard", "full"},
+        # IndexRange writes carry an array Value, which only decodes with heap.
+        # The strictly no-heap MCU tiers (nano/micro/embedded) cannot support it,
+        # so it is claimed only on the heap-capable standard/full tiers.
+        "profiles": {"standard", "full"},
     },
     "opc_cu_3192": {
         "claim": "Base Info Diagnostics",

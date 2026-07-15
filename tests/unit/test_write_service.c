@@ -874,7 +874,11 @@ void test_write_index_range_rejects_invalid_ranges_without_callback(void) {
         TEST_ASSERT_EQUAL(0, g_last_array_length);
     }
 }
-#else
+/* The IndexRange-off rejection path drives an array-valued Write, which only
+ * decodes when heap is available; a strictly no-heap build (nano/micro/embedded)
+ * rejects any array Write at decode time (Bad_OutOfMemory) before per-operation
+ * logic runs, so this operation-level assertion is only meaningful with heap. */
+#elif MUC_OPCUA_ALLOW_HEAP
 void test_write_index_range_fields_off_rejects_without_mutation(void) {
     /* SCN-002 / CASE-007 / opc_cu_3147: OPC-10000-4 section 5.11.4.2:
        "A Server shall return a Bad_WriteNotSupported error if an indexRange
@@ -933,7 +937,7 @@ int main(void) {
 #ifdef MUC_OPCUA_CU_ATTRIBUTE_WRITE_INDEX_RANGE
     RUN_TEST(test_write_index_range_updates_array_slice);
     RUN_TEST(test_write_index_range_rejects_invalid_ranges_without_callback);
-#else
+#elif MUC_OPCUA_ALLOW_HEAP
     RUN_TEST(test_write_index_range_fields_off_rejects_without_mutation);
 #endif
 #endif

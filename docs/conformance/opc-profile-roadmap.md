@@ -173,7 +173,7 @@ remains future work.
 | opc_cu_3073 | conformance_unit | unimplemented |  | — | all | — |
 | opc_cu_3125 | conformance_unit | unimplemented |  | — | standard, full | — |
 | opc_cu_3143 | conformance_unit | unimplemented |  | — | micro, embedded, standard, full | — |
-| opc_cu_3147 | conformance_unit | claimed | OPC-10000-4 §5.11.4 | MUC_OPCUA_CU_ATTRIBUTE_WRITE_INDEX_RANGE | micro, embedded, standard, full | test_write_service |
+| opc_cu_3147 | conformance_unit | claimed | OPC-10000-4 §5.11.4 | MUC_OPCUA_CU_ATTRIBUTE_WRITE_INDEX_RANGE | standard, full | test_write_service |
 | opc_cu_3175 | conformance_unit | unimplemented |  | — | all | — |
 | opc_cu_3192 | conformance_unit | claimed | OPC-10000-5 §6.3.1, 6.3.3, 8.3.2, 12.9 | MUC_OPCUA_CU_BASE_INFO_DIAGNOSTICS | micro, embedded, standard, full | test_diagnostics, test_profile_surface |
 | opc_cu_3530 | conformance_unit | implemented | OPC-10000-4 §5.9.2, 5.9.3 | MUC_OPCUA_CU_VIEW_BASIC_2 | all | test_browse_service, test_browse_limits, test_view_services |

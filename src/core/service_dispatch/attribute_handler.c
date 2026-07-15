@@ -88,6 +88,16 @@ opcua_statuscode_t handle_read(mu_server_t *server, mu_binary_reader_t *r, mu_bi
 
 #ifdef MUC_OPCUA_SERVICE_WRITE
 #ifdef MUC_OPCUA_CU_ATTRIBUTE_WRITE_INDEX_RANGE
+/* OPC-10000-4 5.11.4.2 requires an IndexRange write to carry an array Value.
+ * Array Values are only decodable when heap is available (see binary_variant.c:
+ * a no-heap build returns Bad_OutOfMemory for any non-empty array). IndexRange
+ * therefore cannot function on the strictly no-heap MCU tiers (nano/micro/
+ * embedded), so it must never be enabled there. The manifest keeps its
+ * profile_defaults off for those tiers; this assert makes the invariant a
+ * build error for any other (e.g. custom) misconfiguration. */
+_Static_assert(MUC_OPCUA_ALLOW_HEAP, "MUC_OPCUA_CU_ATTRIBUTE_WRITE_INDEX_RANGE requires MUC_OPCUA_ALLOW_HEAP "
+                                     "(IndexRange writes carry an array Value, which needs heap to decode)");
+
 /* Byte size of one array element for the partial-update merge below.
  * OPC-10000-4 5.11.4: IndexRange applies to the built-in element type carried
  * by the array Variant, so this mirrors the full set of MU_TYPE_* Variant

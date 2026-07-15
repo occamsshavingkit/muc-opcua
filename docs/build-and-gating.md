@@ -515,7 +515,7 @@ to refresh.
 | MUC_OPCUA_CU_ATTRIBUTE_WRITE_VALUES | opc_cu_2389 | claimed |  | ✅ | ✅ | ✅ | ✅ |  |
 | MUC_OPCUA_CU_SESSION_CHANGE_USER | opc_cu_2400 | implemented |  | ✅ | ✅ | ✅ | ✅ |  |
 | MUC_OPCUA_CU_ATTRIBUTE_WRITE_STATUSCODE_TIMESTAMP | opc_cu_2936 | claimed |  | ✅ | ✅ | ✅ | ✅ | MUC_OPCUA_CU_ATTRIBUTE_WRITE_VALUES |
-| MUC_OPCUA_CU_ATTRIBUTE_WRITE_INDEX_RANGE | opc_cu_3147 | claimed |  | ✅ | ✅ | ✅ | ✅ | MUC_OPCUA_CU_ATTRIBUTE_WRITE_VALUES |
+| MUC_OPCUA_CU_ATTRIBUTE_WRITE_INDEX_RANGE | opc_cu_3147 | claimed |  |  |  | ✅ | ✅ | MUC_OPCUA_CU_ATTRIBUTE_WRITE_VALUES |
 | MUC_OPCUA_CU_BASE_INFO_DIAGNOSTICS | opc_cu_3192 | claimed |  | ✅ | ✅ | ✅ | ✅ |  |
 | MUC_OPCUA_CU_VIEW_BASIC_2 | opc_cu_3530 | implemented | ✅ | ✅ | ✅ | ✅ | ✅ |  |
 | MUC_OPCUA_CU_BASE_SERVICES_DIAGNOSTICS | opc_cu_3983 | claimed |  | ✅ | ✅ | ✅ | ✅ |  |
@@ -673,6 +673,7 @@ The following OPC items are tracked in the manifest but are NOT implemented. The
 | opc_cu_3201 |  | unimplemented | The Server supports custom types (i.e. types that are derived from well-known ObjectTypes, VariableTypes, ReferenceTypes or DataTypes). Supporting this ConformanceUnit requires that the custom types with their full inheritance tree are exposed in the AddressSpace. For each DataType having encoding information (Structured DataTypes) the Encoding Objects shall be exposed as well. For all Events supported by the Server, the EventType shall be exposed. (Documentation complete; no code change needed.) |
 | opc_cu_5814 |  | unimplemented | The Server supports being able to be configured for no application authentication, just User authentication and normal encryption/signing: – Configure Server to skip the trust check when validating certificates – Certificates are just used for message security (signing and encryption) – Users level is used for authentication (Documentation complete; no code change needed.) |
 <!-- END GENERATED MANIFEST TABLES -->
+
 
 
 

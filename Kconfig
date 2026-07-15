@@ -295,12 +295,12 @@ config MUC_OPCUA_CU_BASE_INFO_OPTIONSET
 config MUC_OPCUA_CU_ATTRIBUTE_WRITE_INDEX_RANGE
 	bool "CU: Attribute Write Index"
 	depends on MUC_OPCUA_CU_ATTRIBUTE_WRITE_VALUES
-	default y if MUC_OPCUA_INTERN_PROFILE_MICRO_EMBEDDED_DEVICE_2025_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_STANDARD_2025_UA_SERVER
 	help
 	  Implementation state: claimed.
 	  OPC source: OPC-10000-4 §5.11.4 -- CU 3147:Attribute Write Index.
 	  Backing tests: test_write_service.
-	  Notes: Supports the IndexRange to write a single element or a range of elements when the Attribute value is an array and partial updates is allowed for this array; depends on Attribute Write Values so it cannot enable Write by itself.
+	  Notes: Supports the IndexRange to write a single element or a range of elements when the Attribute value is an array and partial updates is allowed for this array; depends on Attribute Write Values so it cannot enable Write by itself. Requires heap (array-valued Write decode uses heap), so it is unavailable on the strictly no-heap MCU tiers (nano/micro/embedded) and defaults off there; a _Static_assert in attribute_handler.c enforces MUC_OPCUA_ALLOW_HEAP.
 
 config MUC_OPCUA_CU_BASE_INFO_DIAGNOSTICS
 	bool "CU: Base Info Diagnostics"

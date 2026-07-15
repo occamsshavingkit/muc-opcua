@@ -69,7 +69,7 @@ Backing test column: comma-separated ctest names (as registered).
 | Attribute Write Values | OPC-10000-4 §5.11.4 | micro, embedded, standard, full | test_write_value_gate, test_write_service |
 | Session Change User | OPC-10000-4 §5.7.3 | micro, embedded, standard, full | test_session, test_session_auth |
 | Attribute Write StatusCode & Timestamp | OPC-10000-4 §5.11.4 | micro, embedded, standard, full | test_write_service, test_write_response |
-| Attribute Write Index | OPC-10000-4 §5.11.4 | micro, embedded, standard, full | test_write_service |
+| Attribute Write Index | OPC-10000-4 §5.11.4 | standard, full | test_write_service |
 | Base Info Diagnostics | OPC-10000-5 §6.3.1, 6.3.3, 8.3.2, 12.9 | micro, embedded, standard, full | test_diagnostics, test_profile_surface |
 | View Basic 2 | OPC-10000-4 §5.9.2, 5.9.3 | all | test_browse_service, test_browse_limits, test_view_services |
 | Base Services Diagnostics | OPC-10000-4 §7.32, 7.38 | micro, embedded, standard, full | test_service_header |

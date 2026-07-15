@@ -4680,8 +4680,8 @@
       ],
       "profile_defaults": {
         "nano": false,
-        "micro": true,
-        "embedded": true,
+        "micro": false,
+        "embedded": false,
         "standard": true,
         "full": true,
         "custom": false
@@ -4700,7 +4700,7 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "Supports the IndexRange to write a single element or a range of elements when the Attribute value is an array and partial updates is allowed for this array; depends on Attribute Write Values so it cannot enable Write by itself.",
+      "notes": "Supports the IndexRange to write a single element or a range of elements when the Attribute value is an array and partial updates is allowed for this array; depends on Attribute Write Values so it cannot enable Write by itself. Requires heap (array-valued Write decode uses heap), so it is unavailable on the strictly no-heap MCU tiers (nano/micro/embedded) and defaults off there; a _Static_assert in attribute_handler.c enforces MUC_OPCUA_ALLOW_HEAP.",
       "cu_optional": true
     },
     {
