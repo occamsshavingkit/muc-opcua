@@ -361,6 +361,8 @@ This document maps implementation and test files back to OPC UA normative sectio
 | `register_server.c` | Traceability mapped | OPC UA Part 4 / 6 | — | Split file — see directory for service coverage |
 | `response_encode.c` | Traceability mapped | OPC UA Part 4 / 6 | — | Split file — see directory for service coverage |
 | `retransmit.c` | Traceability mapped | OPC UA Part 4 / 6 | — | Split file — see directory for service coverage |
+| `secure_util.h` | Defensive memory utils | OPC UA Part 6 | 6.7 | mu_secure_zero / mu_secure_memeq declarations; always-compiled, no-crypto-safe (spec 072) |
+| `secure_util.c` | Defensive memory utils | OPC UA Part 6 | 6.7 | mu_secure_zero / mu_secure_memeq; always-compiled, no-crypto-safe (spec 072) |
 | `security_policy.c` | Traceability mapped | OPC UA Part 4 / 6 | — | Split file — see directory for service coverage |
 | `sign.c` | Traceability mapped | OPC UA Part 4 / 6 | — | Split file — see directory for service coverage |
 | `status.c` | Traceability mapped | OPC UA Part 4 / 6 | — | Split file — see directory for service coverage |

@@ -72,12 +72,12 @@ foreach(TEST_SOURCE ${UNIT_TEST_SOURCES})
            TEST_NAME STREQUAL "test_security_rsa_pss_errors" OR TEST_NAME STREQUAL "test_security_trustlist" OR
            TEST_NAME STREQUAL "test_sym_chunk" OR TEST_NAME STREQUAL "test_wolfssl_adapter" OR
            TEST_NAME STREQUAL "test_security_policy_selection" OR TEST_NAME STREQUAL "test_certificate_validity")
-        # These exercise src/security/**, src/platform/host_crypto_adapter.c, and
-        # mu_binary_read_certificate_identity_token, all compiled as part of
-        # FACET_CORE_2022_SERVER (security code is always compiled for named
-        # profiles) -- see src/CMakeLists.txt's
-        # `if(MUC_OPCUA_FACET_CORE_2022_SERVER) target_sources(...)` block.
-        if(NOT MUC_OPCUA_FACET_CORE_2022_SERVER)
+        # These exercise the secure-channel crypto TUs (sym/asym chunk,
+        # certificate, trustlist) and the host crypto adapter, now compiled under
+        # MUC_OPCUA_SECURE_CHANNEL_CRYPTO (spec 072), not the facet umbrella -- see
+        # src/CMakeLists.txt's `if(MUC_OPCUA_SECURE_CHANNEL_CRYPTO)` block. Gated
+        # off (with the crypto) on the SecurityPolicy-None-only nano profile.
+        if(NOT MUC_OPCUA_SECURE_CHANNEL_CRYPTO)
             set(RUN_TEST OFF)
         endif()
     elseif(TEST_NAME STREQUAL "test_ecc_crypto")
@@ -95,8 +95,10 @@ foreach(TEST_SOURCE ${UNIT_TEST_SOURCES})
             set(RUN_TEST OFF)
         endif()
     elseif(TEST_NAME STREQUAL "test_password_decrypt_zeroize")
-        # Uses mu_secure_zero from security/key_derivation.c (security code).
-        if(NOT MUC_OPCUA_FACET_CORE_2022_SERVER)
+        # Decrypts an encrypted UserName token password -> needs the secure-channel
+        # crypto stack (spec 072). mu_secure_zero itself is now always compiled
+        # (secure_util.c), but the decrypt path is crypto-gated.
+        if(NOT MUC_OPCUA_SECURE_CHANNEL_CRYPTO)
             set(RUN_TEST OFF)
         endif()
     elseif(TEST_NAME STREQUAL "test_read_browsename_namespace" OR

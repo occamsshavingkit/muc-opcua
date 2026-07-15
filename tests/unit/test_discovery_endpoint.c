@@ -488,6 +488,41 @@ void test_getendpoints_locale_filter_returns_server_application_name_in_requeste
     assert_string_equal_cstr(&text, "Test Server");
 }
 
+#ifndef MUC_OPCUA_SECURE_CHANNEL_CRYPTO
+static opcua_statuscode_t crypto_gate_stub_own_certificate(void *context, const opcua_byte_t **certificate,
+                                                           size_t *length) {
+    static const opcua_byte_t cert[3] = {1u, 2u, 3u};
+    (void)context;
+    *certificate = cert;
+    *length = sizeof(cert);
+    return MU_STATUS_GOOD;
+}
+
+void test_getendpoints_crypto_gated_advertises_none_only_even_with_adapter(void) {
+    /* spec 072 / OPC-10000-7 section 4.3: with MUC_OPCUA_SECURE_CHANNEL_CRYPTO
+       compiled out, an application-supplied crypto_adapter must NOT cause secured
+       endpoints to be advertised -- the chunk-crypto path is absent, so a client
+       selecting Basic256Sha256/Aes128 would be rejected at OpenSecureChannel. A
+       SecurityPolicy-None-only build advertises exactly one endpoint (None). */
+    mu_server_t server;
+    discovery_server(&server);
+
+    mu_crypto_adapter_t adapter;
+    (void)memset(&adapter, 0, sizeof(adapter));
+    adapter.get_own_certificate = crypto_gate_stub_own_certificate;
+    server.config.crypto_adapter = &adapter;
+
+    opcua_byte_t req[256];
+    size_t req_len = build_getendpoints_request(req, sizeof(req), NULL);
+    opcua_byte_t resp[1024];
+    size_t resp_len = sizeof(resp);
+
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD,
+                      mu_service_dispatch(&server, MU_ID_GETENDPOINTSREQUEST, req, req_len, resp, &resp_len));
+    TEST_ASSERT_EQUAL_INT32(1, endpoint_count(resp, resp_len));
+}
+#endif /* !MUC_OPCUA_SECURE_CHANNEL_CRYPTO */
+
 int main(void) {
     UNITY_BEGIN();
     RUN_TEST(test_findservers_no_session);
@@ -499,5 +534,8 @@ int main(void) {
     RUN_TEST(
         test_getendpoints_scn001_case001_opc_cu_2328_endpoint_url_and_profile_uri_match_returns_one_local_endpoint);
     RUN_TEST(test_getendpoints_locale_filter_returns_server_application_name_in_requested_locale);
+#ifndef MUC_OPCUA_SECURE_CHANNEL_CRYPTO
+    RUN_TEST(test_getendpoints_crypto_gated_advertises_none_only_even_with_adapter);
+#endif
     return UNITY_END();
 }

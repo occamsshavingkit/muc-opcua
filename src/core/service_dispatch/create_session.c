@@ -128,7 +128,7 @@ static opcua_statuscode_t read_create_session_request(mu_binary_reader_t *r, mu_
     return MU_STATUS_GOOD;
 }
 
-#ifdef MUC_OPCUA_FACET_CORE_2022_SERVER
+#ifdef MUC_OPCUA_SECURE_CHANNEL_CRYPTO
 static opcua_statuscode_t validate_create_session_security(mu_server_t *server, const mu_bytestring_t *client_cert,
                                                            const mu_string_t *application_uri) {
     if (server_secure_channel.policy != MU_SECURITY_POLICY_NONE_ID &&
@@ -260,7 +260,7 @@ static opcua_statuscode_t encode_server_signature(mu_binary_writer_t *w, mu_serv
     (void)server;
     (void)client_cert;
     (void)client_nonce;
-#ifdef MUC_OPCUA_FACET_CORE_2022_SERVER
+#ifdef MUC_OPCUA_SECURE_CHANNEL_CRYPTO
     const char *sig_uri = mu_security_policy_asym_signature_uri(server_secure_channel.policy);
     if (server_secure_channel.policy != MU_SECURITY_POLICY_NONE_ID &&
         server_secure_channel.policy != MU_SECURITY_POLICY_INVALID_ID && server->config.crypto_adapter != NULL &&
@@ -325,7 +325,7 @@ opcua_statuscode_t handle_create_session(mu_server_t *server, mu_binary_reader_t
         return MU_STATUS_BAD_DECODINGERROR;
     }
 
-#ifdef MUC_OPCUA_FACET_CORE_2022_SERVER
+#ifdef MUC_OPCUA_SECURE_CHANNEL_CRYPTO
     s = validate_create_session_security(server, &client_cert, &application_uri);
     if (s != MU_STATUS_GOOD) {
         return s;
@@ -362,7 +362,7 @@ opcua_statuscode_t handle_create_session(mu_server_t *server, mu_binary_reader_t
     if (s != MU_STATUS_GOOD) {
         goto cleanup;
     }
-#ifdef MUC_OPCUA_FACET_CORE_2022_SERVER
+#ifdef MUC_OPCUA_SECURE_CHANNEL_CRYPTO
     mu_secure_zero(nonce_buf, sizeof(nonce_buf));
 #endif
 

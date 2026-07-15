@@ -133,7 +133,10 @@ set(MUC_OPCUA_KCONFIG_FEATURES
     MUC_OPCUA_CU_REVERSE_CONNECT
     MUC_OPCUA_CU_NAMESPACES
     # Project options (non-OPC implementation controls)
-    READ_CACHE)
+    READ_CACHE
+    # Secure-channel message-crypto gate (spec 072): decouples crypto from the
+    # Core 2022 Server facet umbrella; resolves to MUC_OPCUA_SECURE_CHANNEL_CRYPTO.
+    SECURE_CHANNEL_CRYPTO)
 
 # Legacy -D overrides are the ONLY cache entries for these symbols (option() is gone),
 # so DEFINED CACHE{} reliably detects a user-supplied -DMUC_OPCUA_<X>=ON/OFF.

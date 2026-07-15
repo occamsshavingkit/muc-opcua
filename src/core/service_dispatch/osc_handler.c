@@ -60,7 +60,7 @@ static opcua_statuscode_t ensure_unique_secure_channel_id(mu_server_t *server) {
 }
 #endif
 
-#ifdef MUC_OPCUA_FACET_CORE_2022_SERVER
+#ifdef MUC_OPCUA_SECURE_CHANNEL_CRYPTO
 static opcua_statuscode_t enforce_osc_application_auth(const mu_server_t *server) {
     if (server_secure_channel.policy != MU_SECURITY_POLICY_NONE_ID &&
         server_secure_channel.policy != MU_SECURITY_POLICY_INVALID_ID) {
@@ -180,7 +180,7 @@ opcua_statuscode_t handle_open_secure_channel(mu_server_t *server, mu_binary_rea
     (void)channel_was_open;
 #endif
 
-#ifdef MUC_OPCUA_FACET_CORE_2022_SERVER
+#ifdef MUC_OPCUA_SECURE_CHANNEL_CRYPTO
     s = enforce_osc_application_auth(server);
     if (s != MU_STATUS_GOOD) {
         return s;
@@ -235,7 +235,7 @@ opcua_statuscode_t handle_open_secure_channel(mu_server_t *server, mu_binary_rea
     }
 
     server_secure_channel.mode = (mu_message_security_mode_t)security_mode;
-#ifdef MUC_OPCUA_FACET_CORE_2022_SERVER
+#ifdef MUC_OPCUA_SECURE_CHANNEL_CRYPTO
     if (server_secure_channel.policy != MU_SECURITY_POLICY_NONE_ID &&
         server_secure_channel.policy != MU_SECURITY_POLICY_INVALID_ID && server->config.crypto_adapter != NULL) {
         const mu_crypto_adapter_t *cr = server->config.crypto_adapter;

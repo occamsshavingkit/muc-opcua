@@ -283,6 +283,34 @@
       "notes": "Opt-in Read value cache (maxAge optimization). Current build symbol but no dedicated conformance test; classified implemented, not claimed."
     },
     {
+      "id": "secure_channel_crypto",
+      "kind": "optimization",
+      "opc_display_name": "Secure channel message crypto",
+      "kconfig_symbol": "SECURE_CHANNEL_CRYPTO",
+      "implementation_state": "implemented",
+      "depends_on": [
+        "MUC_OPCUA_FACET_CORE_2022_SERVER"
+      ],
+      "profile_defaults": {
+        "nano": false,
+        "micro": true,
+        "embedded": true,
+        "standard": true,
+        "full": true,
+        "custom": false
+      },
+      "default_unconditional": false,
+      "backing_tests": [
+        "test_secure_handshake_modern"
+      ],
+      "opc_reference": {
+        "spec": "OPC-10000-7",
+        "section": "4.3",
+        "facet": null
+      },
+      "notes": "Build gate that decouples secure-channel message crypto (symmetric/asymmetric chunk crypto, certificate, trustlist, key derivation) from the MUC_OPCUA_FACET_CORE_2022_SERVER umbrella. Defaults off for nano (SecurityPolicy None only per OPC-10000-7 4.3) and on for the security-capable micro/embedded/standard/full profiles (profile intent, not backend presence -- spec 072 FR-005). When off the heavy crypto TUs are excluded and MUC_OPCUA_CU_SECURITY_ECC / crypto backends cannot be enabled; SecurityPolicy None behaviour and explicit non-None rejection are preserved."
+    },
+    {
       "id": "opc_file_server_facet",
       "kind": "facet",
       "opc_display_name": "File Server Facet",
@@ -3227,7 +3255,9 @@
       "opc_display_name": "Security ECC",
       "kconfig_symbol": "MUC_OPCUA_CU_SECURITY_ECC",
       "implementation_state": "claimed",
-      "depends_on": [],
+      "depends_on": [
+        "SECURE_CHANNEL_CRYPTO"
+      ],
       "profile_defaults": {
         "nano": false,
         "micro": false,

@@ -8,8 +8,10 @@
 #include "muc_opcua/status.h"
 #include <stddef.h>
 
-void mu_secure_zero(void *v, size_t n);
-bool mu_secure_memeq(const void *a, const void *b, size_t n);
+/* mu_secure_zero / mu_secure_memeq relocated to the always-compiled core
+   (secure_util.c) so no-crypto builds keep them (spec 072); re-exported here so
+   existing crypto callers that include this header are unaffected. */
+#include "security/secure_util.h"
 
 /* P_SHA256(secret, seed) expanded to `output_length` bytes, using the crypto
    adapter's HMAC-SHA256. Returns Bad_* on adapter failure or if seed is too long. */
