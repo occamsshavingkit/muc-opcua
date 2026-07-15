@@ -6,6 +6,8 @@
 #include "security/secure_util.h"
 
 void mu_secure_zero(void *v, size_t n) {
+    /* cppcheck-suppress misra-c2012-11.5 ; deliberate void*->byte* for a
+       byte-wise volatile wipe of caller-owned key material. */
     volatile unsigned char *p = (volatile unsigned char *)v;
 
     /* Volatile byte stores keep the wipe observable so compilers cannot elide
@@ -17,7 +19,10 @@ void mu_secure_zero(void *v, size_t n) {
 }
 
 bool mu_secure_memeq(const void *a, const void *b, size_t n) {
+    /* cppcheck-suppress misra-c2012-11.5 ; deliberate void*->byte* for a
+       constant-time byte comparison of secrets. */
     const volatile unsigned char *pa = (const volatile unsigned char *)a;
+    /* cppcheck-suppress misra-c2012-11.5 ; deliberate void*->byte* (see above). */
     const volatile unsigned char *pb = (const volatile unsigned char *)b;
     unsigned char d = 0;
     for (size_t i = 0; i < n; i++) {
