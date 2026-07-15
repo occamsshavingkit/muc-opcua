@@ -1,0 +1,6 @@
+{
+  "feature": "server-nano-service-behaviour-cus",
+  "uif_applicable": false,
+  "reason": "No UI feedback, view state, or visual interaction is in scope.",
+  "contracts": []
+}

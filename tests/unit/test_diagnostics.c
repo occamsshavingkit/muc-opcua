@@ -15,7 +15,19 @@
 void setUp(void) {}
 void tearDown(void) {}
 
-#if MUC_OPCUA_SERVER_DIAGNOSTICS
+#if defined(MUC_OPCUA_CU_BASE_INFO_DIAGNOSTICS) && MUC_OPCUA_CU_BASE_INFO_DIAGNOSTICS
+#define TEST_HAS_BASE_INFO_DIAGNOSTICS 1
+#else
+#define TEST_HAS_BASE_INFO_DIAGNOSTICS 0
+#endif
+
+#if defined(MUC_OPCUA_CU_DIAGNOSTICS) && MUC_OPCUA_CU_DIAGNOSTICS
+#define TEST_HAS_LEGACY_DIAGNOSTICS_AGGREGATE 1
+#else
+#define TEST_HAS_LEGACY_DIAGNOSTICS_AGGREGATE 0
+#endif
+
+#if TEST_HAS_BASE_INFO_DIAGNOSTICS
 
 static mu_server_t s_server;
 
@@ -152,15 +164,43 @@ void test_server_diagnostics_enabled_flag_is_true(void) {
 
 #else
 
+#if MUC_OPCUA_BASE_NODES
+static const mu_node_t *find_runtime_node(mu_base_runtime_nodes_t *rn, opcua_uint32_t numeric) {
+    for (size_t i = 0; i < rn->space.node_count; ++i) {
+        if (rn->space.nodes[i].node_id.identifier.numeric == numeric) {
+            return &rn->space.nodes[i];
+        }
+    }
+    return NULL;
+}
+
+void test_disabled_base_info_diagnostics_exposes_no_diagnostics_nodes(void) {
+    mu_base_runtime_nodes_t rn;
+    memset(&rn, 0, sizeof(rn));
+    mu_base_runtime_init(&rn, NULL, 0
+#if TEST_HAS_BASE_INFO_DIAGNOSTICS
+                         ,
+                         &diag
+#endif
+    );
+
+    TEST_ASSERT_NULL_MESSAGE(find_runtime_node(&rn, 2274u),
+                             "ServerDiagnostics (2274) must be absent when CU 3192 is off");
+    TEST_ASSERT_NULL_MESSAGE(find_runtime_node(&rn, 2275u),
+                             "ServerDiagnosticsSummary (2275) must be absent when CU 3192 is off");
+    TEST_ASSERT_NULL_MESSAGE(find_runtime_node(&rn, 2294u), "EnabledFlag (2294) must be absent when CU 3192 is off");
+}
+#endif
+
 void test_diagnostics_require_build_flag(void) {
-    TEST_PASS_MESSAGE("MUC_OPCUA_SERVER_DIAGNOSTICS is disabled in this build");
+    TEST_PASS_MESSAGE("MUC_OPCUA_CU_BASE_INFO_DIAGNOSTICS is disabled in this build");
 }
 
 #endif
 
 int main(void) {
     UNITY_BEGIN();
-#if MUC_OPCUA_SERVER_DIAGNOSTICS
+#if TEST_HAS_BASE_INFO_DIAGNOSTICS
     RUN_TEST(test_session_create_increments_counters);
     RUN_TEST(test_session_close_decrements_count);
     RUN_TEST(test_subscription_create_increments);
@@ -172,6 +212,9 @@ int main(void) {
     RUN_TEST(test_server_diagnostics_enabled_flag_is_true);
 #endif
 #else
+#if MUC_OPCUA_BASE_NODES
+    RUN_TEST(test_disabled_base_info_diagnostics_exposes_no_diagnostics_nodes);
+#endif
     RUN_TEST(test_diagnostics_require_build_flag);
 #endif
     return UNITY_END();

@@ -349,7 +349,7 @@ opcua_statuscode_t mu_binary_write_variant(mu_binary_writer_t *writer, const mu_
         return MU_STATUS_GOOD;
     }
 
-#if MUC_OPCUA_CU_DIAGNOSTICS
+#if MUC_OPCUA_CU_BASE_INFO_DIAGNOSTICS
     if (variant->type == MU_TYPE_EXTENSIONOBJECT) {
         /* The only scalar ExtensionObject Value this server encodes is the Base Server
            Behaviour facet's ServerDiagnosticsSummary (spec 064); value.array holds a

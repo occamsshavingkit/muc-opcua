@@ -150,9 +150,12 @@ opcua_statuscode_t mu_browse_request_decode(mu_binary_reader_t *reader, mu_brows
         return status;
     }
 
-    if (no_of_nodes < 0) {
+    if (no_of_nodes == -1) {
         req->num_nodes_to_browse = 0;
         return MU_STATUS_GOOD; /* null array */
+    }
+    if (no_of_nodes < -1) {
+        return MU_STATUS_BAD_DECODINGERROR;
     }
     if ((size_t)no_of_nodes > max_desc) {
         /* OPC-10000-4 §5.9.2 / §7.38.2: a Browse exceeding the server's operation

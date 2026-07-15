@@ -177,7 +177,7 @@ struct mu_server {
     size_t condition_count;
 #endif
 
-#if MUC_OPCUA_CU_DIAGNOSTICS
+#if MUC_OPCUA_CU_BASE_INFO_DIAGNOSTICS
     mu_diagnostics_summary_t diag;
 #endif
 
@@ -264,12 +264,13 @@ opcua_statuscode_t handle_activate_session(mu_server_t *server, mu_binary_reader
 opcua_statuscode_t handle_close_session(mu_server_t *server, mu_binary_reader_t *r, mu_binary_writer_t *w,
                                         size_t *response_length);
 
-/* Discovery service handlers — implemented in dispatch_discovery.c (T009).
- * Compiled under MUC_OPCUA_CU_DISCOVERY_FIND_SERVERS_SELF_GET_ENDPOINTS; the dispatch table in
- * service_dispatch.c references these by name. */
-#ifdef MUC_OPCUA_CU_DISCOVERY_FIND_SERVERS_SELF_GET_ENDPOINTS
+/* Discovery service handlers. Dispatch registers each Service only when its
+ * CU gate is enabled (OPC-10000-4 sections 5.5.1 and 5.5.4). */
+#ifdef MUC_OPCUA_CU_DISCOVERY_GET_ENDPOINTS
 opcua_statuscode_t handle_get_endpoints(mu_server_t *server, mu_binary_reader_t *r, mu_binary_writer_t *w,
                                         size_t *response_length);
+#endif
+#ifdef MUC_OPCUA_DISCOVERY_FIND_SERVERS_ENABLED
 opcua_statuscode_t handle_find_servers(mu_server_t *server, mu_binary_reader_t *r, mu_binary_writer_t *w,
                                        size_t *response_length);
 #endif
@@ -280,7 +281,7 @@ opcua_statuscode_t handle_find_servers(mu_server_t *server, mu_binary_reader_t *
 opcua_statuscode_t handle_read(mu_server_t *server, mu_binary_reader_t *r, mu_binary_writer_t *w,
                                size_t *response_length);
 #endif
-#ifdef MUC_OPCUA_CU_CORE_2017_ATTRIBUTE_WRITE
+#ifdef MUC_OPCUA_SERVICE_WRITE
 opcua_statuscode_t handle_write(mu_server_t *server, mu_binary_reader_t *r, mu_binary_writer_t *w,
                                 size_t *response_length);
 #endif

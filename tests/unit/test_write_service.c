@@ -11,6 +11,8 @@ void tearDown(void) {}
 static mu_nodeid_t g_last_write_node;
 static mu_datavalue_t g_last_write_val;
 static int g_write_count = 0;
+static opcua_int32_t g_last_array[8];
+static opcua_int32_t g_last_array_length = 0;
 
 typedef struct {
     int count;
@@ -68,6 +70,17 @@ static mu_datavalue_t int32_datavalue(opcua_int32_t value) {
     return dv;
 }
 
+static mu_datavalue_t int32_datavalue_with_status_and_timestamps(opcua_int32_t value) {
+    mu_datavalue_t dv = int32_datavalue(value);
+    dv.has_status = true;
+    dv.status = MU_STATUS_BAD_NOTWRITABLE;
+    dv.has_source_timestamp = true;
+    dv.source_timestamp = 1357924680;
+    dv.has_server_timestamp = true;
+    dv.server_timestamp = 2468135790;
+    return dv;
+}
+
 static mu_datavalue_t float_datavalue(float value) {
     mu_datavalue_t dv;
     (void)memset(&dv, 0, sizeof(dv));
@@ -76,6 +89,30 @@ static mu_datavalue_t float_datavalue(float value) {
     dv.value.is_array = false;
     dv.value.value.f = value;
     return dv;
+}
+
+static mu_datavalue_t int32_array_datavalue(const opcua_int32_t *values, opcua_int32_t length) {
+    mu_datavalue_t dv;
+    (void)memset(&dv, 0, sizeof(dv));
+    dv.has_value = true;
+    dv.value.type = MU_TYPE_INT32;
+    dv.value.is_array = true;
+    dv.value.array_length = length;
+    dv.value.value.array = values;
+    return dv;
+}
+
+static opcua_statuscode_t array_write_handler(void *handle, const mu_nodeid_t *node_id, opcua_uint32_t attribute_id,
+                                              const mu_datavalue_t *value) {
+    (void)handle;
+    (void)node_id;
+    (void)attribute_id;
+    g_last_array_length = value->value.array_length;
+    if (g_last_array_length > (opcua_int32_t)(sizeof(g_last_array) / sizeof(g_last_array[0]))) {
+        return MU_STATUS_BAD_TOOMANYOPERATIONS;
+    }
+    (void)memcpy(g_last_array, value->value.value.array, (size_t)g_last_array_length * sizeof(g_last_array[0]));
+    return MU_STATUS_GOOD;
 }
 
 static void encode_write_request(mu_binary_writer_t *writer, opcua_uint32_t request_handle,
@@ -161,7 +198,7 @@ static void run_write_items(mu_server_t *server, const write_request_item_t *ite
     decode_write_response_results(resp_buffer, resp_len, request_handle, results, item_count);
 }
 
-#ifdef MUC_OPCUA_CU_CORE_2017_ATTRIBUTE_WRITE
+#ifdef MUC_OPCUA_SERVICE_WRITE
 void test_write_service_basic(void) {
     /* Initialize mock server structure */
     mu_server_t server;
@@ -638,15 +675,271 @@ void test_write_service_batch_matches_individual_operation_results_and_callback_
     TEST_ASSERT_EQUAL_HEX32(MU_STATUS_BAD_NOTWRITABLE, batch_results[3]);
     TEST_ASSERT_EQUAL_HEX32(MU_STATUS_BAD_USERACCESSDENIED, batch_results[4]);
 }
+
+void test_write_value_opc_cu_2389_scn002_case003_reports_good_and_callback_details(void) {
+    /* SCN-002 / CASE-003 / opc_cu_2389: OPC-10000-4 section 5.11.4
+       Write Value reports operation-level Good and passes the accepted Value write to the server callback. */
+    mu_server_t server;
+    (void)memset(&server, 0, sizeof(server));
+
+    mu_node_t node;
+    (void)memset(&node, 0, sizeof(node));
+    node.node_id = (mu_nodeid_t){1, MU_NODEID_NUMERIC, {.numeric = 8301}};
+    node.node_class = MU_NODECLASS_VARIABLE;
+    node.browse_name = (mu_string_t){8, (const opcua_byte_t *)"Writable"};
+    node.display_name = (mu_string_t){8, (const opcua_byte_t *)"Writable"};
+
+    mu_value_source_t value;
+    value.type = MU_VALUESOURCE_STATIC;
+    value.data.static_value.type = MU_TYPE_INT32;
+    value.data.static_value.is_array = false;
+    value.data.static_value.value.i32 = 12;
+    node.value = &value;
+
+    mu_address_space_t address_space = {&node, 1};
+    write_callback_log_t log;
+    (void)memset(&log, 0, sizeof(log));
+    server.config.address_space = &address_space;
+    server.config.write_handler = logging_write_handler;
+    server.config.write_handler_handle = &log;
+    (void)memset(&server.user_address_space_index, 0, sizeof(server.user_address_space_index));
+
+    mu_string_t null_range = {-1, NULL};
+    write_request_item_t item = {node.node_id, 13, null_range, int32_datavalue(321)};
+    opcua_statuscode_t result;
+
+    run_write_items(&server, &item, 1, 2389, &result);
+
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, result);
+    TEST_ASSERT_EQUAL(1, log.count);
+    TEST_ASSERT_EQUAL(8301, log.nodes[0].identifier.numeric);
+    TEST_ASSERT_EQUAL(13, log.attributes[0]);
+    TEST_ASSERT_TRUE(log.values[0].has_value);
+    TEST_ASSERT_EQUAL(MU_TYPE_INT32, log.values[0].value.type);
+    TEST_ASSERT_EQUAL(321, log.values[0].value.value.i32);
+}
+
+void test_write_statuscode_timestamp_opc_cu_2936_scn002_case003_reaches_callback(void) {
+    /* SCN-002 / CASE-003 / opc_cu_2936: OPC-10000-4 section 5.11.4
+       StatusCode and timestamp fields in an accepted Write Value DataValue remain observable by the callback. */
+    mu_server_t server;
+    (void)memset(&server, 0, sizeof(server));
+
+    mu_node_t node;
+    (void)memset(&node, 0, sizeof(node));
+    node.node_id = (mu_nodeid_t){1, MU_NODEID_NUMERIC, {.numeric = 8401}};
+    node.node_class = MU_NODECLASS_VARIABLE;
+    node.browse_name = (mu_string_t){8, (const opcua_byte_t *)"Writable"};
+    node.display_name = (mu_string_t){8, (const opcua_byte_t *)"Writable"};
+
+    mu_value_source_t value;
+    value.type = MU_VALUESOURCE_STATIC;
+    value.data.static_value.type = MU_TYPE_INT32;
+    value.data.static_value.is_array = false;
+    value.data.static_value.value.i32 = 12;
+    node.value = &value;
+
+    mu_address_space_t address_space = {&node, 1};
+    write_callback_log_t log;
+    (void)memset(&log, 0, sizeof(log));
+    server.config.address_space = &address_space;
+    server.config.write_handler = logging_write_handler;
+    server.config.write_handler_handle = &log;
+    (void)memset(&server.user_address_space_index, 0, sizeof(server.user_address_space_index));
+
+    mu_string_t null_range = {-1, NULL};
+    write_request_item_t item = {node.node_id, 13, null_range, int32_datavalue_with_status_and_timestamps(654)};
+    opcua_statuscode_t result;
+
+    run_write_items(&server, &item, 1, 2936, &result);
+
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, result);
+    TEST_ASSERT_EQUAL(1, log.count);
+    TEST_ASSERT_TRUE(log.values[0].has_value);
+    TEST_ASSERT_EQUAL(MU_TYPE_INT32, log.values[0].value.type);
+    TEST_ASSERT_EQUAL(654, log.values[0].value.value.i32);
+    TEST_ASSERT_TRUE(log.values[0].has_status);
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_BAD_NOTWRITABLE, log.values[0].status);
+    TEST_ASSERT_TRUE(log.values[0].has_source_timestamp);
+    TEST_ASSERT_EQUAL_INT64(1357924680, log.values[0].source_timestamp);
+    TEST_ASSERT_TRUE(log.values[0].has_server_timestamp);
+    TEST_ASSERT_EQUAL_INT64(2468135790, log.values[0].server_timestamp);
+}
+
+void test_write_statuscode_timestamp_fields_off_rejects_without_mutation(void) {
+    /* SCN-002 / CASE-007 / opc_cu_2936: OPC-10000-4 section 5.11.4
+       A build with Write Values enabled but the StatusCode/Timestamp field CU
+       disabled rejects those fields at operation level without applying the write. */
+    mu_server_t server;
+    (void)memset(&server, 0, sizeof(server));
+
+    mu_node_t node;
+    (void)memset(&node, 0, sizeof(node));
+    node.node_id = (mu_nodeid_t){1, MU_NODEID_NUMERIC, {.numeric = 8402}};
+    node.node_class = MU_NODECLASS_VARIABLE;
+    node.browse_name = (mu_string_t){8, (const opcua_byte_t *)"Writable"};
+    node.display_name = (mu_string_t){8, (const opcua_byte_t *)"Writable"};
+
+    mu_value_source_t value;
+    value.type = MU_VALUESOURCE_STATIC;
+    value.data.static_value.type = MU_TYPE_INT32;
+    value.data.static_value.is_array = false;
+    value.data.static_value.value.i32 = 12;
+    node.value = &value;
+
+    mu_address_space_t address_space = {&node, 1};
+    write_callback_log_t log;
+    (void)memset(&log, 0, sizeof(log));
+    server.config.address_space = &address_space;
+    server.config.write_handler = logging_write_handler;
+    server.config.write_handler_handle = &log;
+    (void)memset(&server.user_address_space_index, 0, sizeof(server.user_address_space_index));
+
+    mu_string_t null_range = {-1, NULL};
+    write_request_item_t item = {node.node_id, 13, null_range, int32_datavalue_with_status_and_timestamps(654)};
+    opcua_statuscode_t result;
+
+    run_write_items(&server, &item, 1, 2936, &result);
+
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_BAD_WRITENOTSUPPORTED, result);
+    TEST_ASSERT_EQUAL(0, log.count);
+    TEST_ASSERT_EQUAL(MU_TYPE_INT32, node.value->data.static_value.type);
+    TEST_ASSERT_EQUAL(12, node.value->data.static_value.value.i32);
+}
+
+#ifdef MUC_OPCUA_CU_ATTRIBUTE_WRITE_INDEX_RANGE
+void test_write_index_range_updates_array_slice(void) {
+    mu_server_t server;
+    mu_node_t node;
+    mu_value_source_t value;
+    opcua_int32_t existing[] = {10, 20, 30, 40};
+    opcua_int32_t patch[] = {200, 300};
+    (void)memset(&server, 0, sizeof(server));
+    (void)memset(&node, 0, sizeof(node));
+    node.node_id = (mu_nodeid_t){1, MU_NODEID_NUMERIC, {.numeric = 8501}};
+    node.node_class = MU_NODECLASS_VARIABLE;
+    value.type = MU_VALUESOURCE_STATIC;
+    value.data.static_value.type = MU_TYPE_INT32;
+    value.data.static_value.is_array = true;
+    value.data.static_value.array_length = 4;
+    value.data.static_value.value.array = existing;
+    node.value = &value;
+    mu_address_space_t address_space = {&node, 1};
+    server.config.address_space = &address_space;
+    server.config.write_handler = array_write_handler;
+    mu_string_t range = {3, (const opcua_byte_t *)"1:2"};
+    write_request_item_t item = {node.node_id, 13, range, int32_array_datavalue(patch, 2)};
+    opcua_statuscode_t result;
+
+    g_last_array_length = 0;
+    run_write_items(&server, &item, 1, 3147, &result);
+
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, result);
+    TEST_ASSERT_EQUAL(4, g_last_array_length);
+    TEST_ASSERT_EQUAL(10, g_last_array[0]);
+    TEST_ASSERT_EQUAL(200, g_last_array[1]);
+    TEST_ASSERT_EQUAL(300, g_last_array[2]);
+    TEST_ASSERT_EQUAL(40, g_last_array[3]);
+}
+
+void test_write_index_range_rejects_invalid_ranges_without_callback(void) {
+    const char *ranges[] = {"2:1", "1:8", "x:y"};
+    for (size_t i = 0; i < sizeof(ranges) / sizeof(ranges[0]); ++i) {
+        mu_server_t server;
+        mu_node_t node;
+        mu_value_source_t value;
+        opcua_int32_t existing[] = {10, 20, 30, 40};
+        opcua_int32_t patch[] = {200, 300};
+        (void)memset(&server, 0, sizeof(server));
+        (void)memset(&node, 0, sizeof(node));
+        node.node_id = (mu_nodeid_t){1, MU_NODEID_NUMERIC, {.numeric = 8502}};
+        node.node_class = MU_NODECLASS_VARIABLE;
+        value.type = MU_VALUESOURCE_STATIC;
+        value.data.static_value.type = MU_TYPE_INT32;
+        value.data.static_value.is_array = true;
+        value.data.static_value.array_length = 4;
+        value.data.static_value.value.array = existing;
+        node.value = &value;
+        mu_address_space_t address_space = {&node, 1};
+        server.config.address_space = &address_space;
+        server.config.write_handler = array_write_handler;
+        mu_string_t range = {(opcua_int32_t)strlen(ranges[i]), (const opcua_byte_t *)ranges[i]};
+        write_request_item_t item = {node.node_id, 13, range, int32_array_datavalue(patch, 2)};
+        opcua_statuscode_t result;
+
+        g_last_array_length = 0;
+        run_write_items(&server, &item, 1, 3148, &result);
+
+        TEST_ASSERT_EQUAL_HEX32(MU_STATUS_BAD_INDEXRANGEINVALID, result);
+        TEST_ASSERT_EQUAL(0, g_last_array_length);
+    }
+}
+/* The IndexRange-off rejection path drives an array-valued Write, which only
+ * decodes when heap is available; a strictly no-heap build (nano/micro/embedded)
+ * rejects any array Write at decode time (Bad_OutOfMemory) before per-operation
+ * logic runs, so this operation-level assertion is only meaningful with heap. */
+#elif MUC_OPCUA_ALLOW_HEAP
+void test_write_index_range_fields_off_rejects_without_mutation(void) {
+    /* SCN-002 / CASE-007 / opc_cu_3147: OPC-10000-4 section 5.11.4.2:
+       "A Server shall return a Bad_WriteNotSupported error if an indexRange
+       is provided and writing of indexRange is not possible for the Node."
+       A build with Write Values enabled but the IndexRange CU disabled
+       rejects any non-empty indexRange at operation level without applying
+       the write. */
+    mu_server_t server;
+    mu_node_t node;
+    mu_value_source_t value;
+    opcua_int32_t existing[] = {10, 20, 30, 40};
+    opcua_int32_t patch[] = {200, 300};
+    (void)memset(&server, 0, sizeof(server));
+    (void)memset(&node, 0, sizeof(node));
+    node.node_id = (mu_nodeid_t){1, MU_NODEID_NUMERIC, {.numeric = 8503}};
+    node.node_class = MU_NODECLASS_VARIABLE;
+    value.type = MU_VALUESOURCE_STATIC;
+    value.data.static_value.type = MU_TYPE_INT32;
+    value.data.static_value.is_array = true;
+    value.data.static_value.array_length = 4;
+    value.data.static_value.value.array = existing;
+    node.value = &value;
+    mu_address_space_t address_space = {&node, 1};
+    server.config.address_space = &address_space;
+    server.config.write_handler = array_write_handler;
+    mu_string_t range = {3, (const opcua_byte_t *)"1:2"};
+    write_request_item_t item = {node.node_id, 13, range, int32_array_datavalue(patch, 2)};
+    opcua_statuscode_t result;
+
+    g_last_array_length = 0;
+    run_write_items(&server, &item, 1, 3149, &result);
+
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_BAD_WRITENOTSUPPORTED, result);
+    TEST_ASSERT_EQUAL(0, g_last_array_length);
+    TEST_ASSERT_EQUAL(10, existing[0]);
+    TEST_ASSERT_EQUAL(20, existing[1]);
+    TEST_ASSERT_EQUAL(30, existing[2]);
+    TEST_ASSERT_EQUAL(40, existing[3]);
+}
+#endif
 #endif
 
 int main(void) {
     UNITY_BEGIN();
-#ifdef MUC_OPCUA_CU_CORE_2017_ATTRIBUTE_WRITE
+#ifdef MUC_OPCUA_SERVICE_WRITE
     RUN_TEST(test_write_service_basic);
     RUN_TEST(test_write_service_type_mismatch);
     RUN_TEST(test_write_service_batch);
     RUN_TEST(test_write_service_batch_matches_individual_operation_results_and_callback_order);
+    RUN_TEST(test_write_value_opc_cu_2389_scn002_case003_reports_good_and_callback_details);
+#ifdef MUC_OPCUA_CU_ATTRIBUTE_WRITE_STATUSCODE_TIMESTAMP
+    RUN_TEST(test_write_statuscode_timestamp_opc_cu_2936_scn002_case003_reaches_callback);
+#else
+    RUN_TEST(test_write_statuscode_timestamp_fields_off_rejects_without_mutation);
+#endif
+#ifdef MUC_OPCUA_CU_ATTRIBUTE_WRITE_INDEX_RANGE
+    RUN_TEST(test_write_index_range_updates_array_slice);
+    RUN_TEST(test_write_index_range_rejects_invalid_ranges_without_callback);
+#elif MUC_OPCUA_ALLOW_HEAP
+    RUN_TEST(test_write_index_range_fields_off_rejects_without_mutation);
+#endif
 #endif
     return UNITY_END();
 }

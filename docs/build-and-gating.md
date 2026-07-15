@@ -509,6 +509,16 @@ to refresh.
 | MUC_OPCUA_CU_NODEMANAGEMENT | service_nodemanagement | claimed |  |  |  |  | ✅ |  |
 | MUC_OPCUA_FACET_UA_TCP_UA_SC_UA_BINARY | opc_facet_837 | deferred | ✅ | ✅ | ✅ | ✅ | ✅ |  |
 | MUC_OPCUA_FACET_SECURITY_TIME_SYNCHRONIZATION | opc_facet_1760 | deferred | ✅ | ✅ | ✅ | ✅ | ✅ |  |
+| MUC_OPCUA_CU_VIEW_TRANSLATEBROWSEPATH | opc_cu_2317 | implemented | ✅ | ✅ | ✅ | ✅ | ✅ |  |
+| MUC_OPCUA_CU_DISCOVERY_GET_ENDPOINTS | opc_cu_2328 | implemented | ✅ | ✅ | ✅ | ✅ | ✅ |  |
+| MUC_OPCUA_CU_DISCOVERY_FIND_SERVERS_SELF | opc_cu_2352 | implemented | ✅ | ✅ | ✅ | ✅ | ✅ |  |
+| MUC_OPCUA_CU_ATTRIBUTE_WRITE_VALUES | opc_cu_2389 | claimed |  | ✅ | ✅ | ✅ | ✅ |  |
+| MUC_OPCUA_CU_SESSION_CHANGE_USER | opc_cu_2400 | implemented |  | ✅ | ✅ | ✅ | ✅ |  |
+| MUC_OPCUA_CU_ATTRIBUTE_WRITE_STATUSCODE_TIMESTAMP | opc_cu_2936 | claimed |  | ✅ | ✅ | ✅ | ✅ | MUC_OPCUA_CU_ATTRIBUTE_WRITE_VALUES |
+| MUC_OPCUA_CU_ATTRIBUTE_WRITE_INDEX_RANGE | opc_cu_3147 | claimed |  |  |  | ✅ | ✅ | MUC_OPCUA_CU_ATTRIBUTE_WRITE_VALUES |
+| MUC_OPCUA_CU_BASE_INFO_DIAGNOSTICS | opc_cu_3192 | claimed |  | ✅ | ✅ | ✅ | ✅ |  |
+| MUC_OPCUA_CU_VIEW_BASIC_2 | opc_cu_3530 | implemented | ✅ | ✅ | ✅ | ✅ | ✅ |  |
+| MUC_OPCUA_CU_BASE_SERVICES_DIAGNOSTICS | opc_cu_3983 | claimed |  | ✅ | ✅ | ✅ | ✅ |  |
 | MUC_OPCUA_CU_PROTOCOL_UA_TCP | opc_cu_protocol_ua_tcp | claimed | ✅ | ✅ | ✅ | ✅ | ✅ |  |
 | MUC_OPCUA_CU_UA_BINARY_ENCODING | opc_cu_ua_binary_encoding | claimed | ✅ | ✅ | ✅ | ✅ | ✅ |  |
 | MUC_OPCUA_CU_UA_SECURE_CONVERSATION | opc_cu_ua_secure_conversation | claimed | ✅ | ✅ | ✅ | ✅ | ✅ |  |
@@ -631,11 +641,6 @@ The following OPC items are tracked in the manifest but are NOT implemented. The
 | opc_facet_2242 | OPC-10000-7 §4.2 | unimplemented | This Facet supports the LogObject functionality - used to collect information, like diagnostic information. It is defined in UA Part 26. |
 | opc_facet_2322 | OPC-10000-7 §4.2 | unimplemented | Defines the functionality related to configuration of AliasNames |
 | opc_facet_2323 | OPC-10000-7 §4.2 | unimplemented | Supports the publication of AliasName changes via the PubSub notifications |
-| opc_cu_2317 |  | unimplemented | Support TranslateBrowsePathsToNodeIds Service. |
-| opc_cu_2328 |  | unimplemented | Support the GetEndpoints Service to obtain all Endpoints of the Server. This includes filtering based on Profiles. |
-| opc_cu_2352 |  | unimplemented | Support the FindServers Service only for itself. |
-| opc_cu_2389 |  | unimplemented | Supports writing to values to one or more Attributes of one or more Nodes. |
-| opc_cu_2400 |  | unimplemented | Support the use of ActivateSession to change the Session user. |
 | opc_cu_2407 |  | unimplemented | Allow configuration of the following Security related items (when they apply). * select the allowed/used User identification policy or policies (e.g. User Name/Password or X509). * enable/disable or select the security policy "None" or other security policies. * enable/disable or select endpoints with MessageSecurityMode SIGN or SIGNANDENCRYPT. * set the permitted certification authorities. * define how to react to unknown Certificates. * allow accepting any valid Certificate |
 | opc_cu_2478 |  | unimplemented | Application supports time synchronization via features of a standard operating system. |
 | opc_cu_2479 |  | unimplemented | Application supports time synchronization via the Precision Time Protocol (PTP). |
@@ -643,15 +648,11 @@ The following OPC items are tracked in the manifest but are NOT implemented. The
 | opc_cu_2786 |  | unimplemented | Application supports time synchronization via the Network Time Protocol (NTP). |
 | opc_cu_2808 |  | unimplemented | Restrict access based on the configured Roles and permissions. |
 | opc_cu_2823 |  | unimplemented | Servers shall take proper measures to protect against attacks on user identity tokens. Such an attack is assumed if repeated connection attempts with invalid user identity tokens happen. See ActivateSession Service in UA Part 4. |
-| opc_cu_2936 |  | unimplemented | Supports writing of StatusCode and Timestamps along with the Value. |
 | opc_cu_3072 |  | unimplemented | Supports the Read Service to read one or more Attributes of one or more Nodes. This includes support of the IndexRange parameter to read a single element or a range of elements when the Attribute value is an array. |
 | opc_cu_3073 |  | unimplemented | Support the RegisterNodes and UnregisterNodes Services as a way to optimize access to repeatedly used Nodes in the Server's OPC UA AddressSpace. |
 | opc_cu_3125 |  | unimplemented | The Server supports a public/private key pair for user identity. The administrator shall be able to enable or disable the use of this feature including all validation steps which are defined for application instance certificates. |
 | opc_cu_3143 |  | unimplemented | If the maximum supported number of PublishRequests has been queued and a new PublishRequest arrives, the "oldest" PublishRequest has to be discarded by returning the proper error. |
-| opc_cu_3147 |  | unimplemented | Supports the IndexRange to write a single element or a range of elements when the Attribute value is an array and partial updates is allowed for this array. |
 | opc_cu_3175 |  | unimplemented | Support the Session Service Set (CreateSession, ActivateSession, CloseSession) except the use of ActivateSession to change the Session user. This includes correct handling of all parameters that are provided. Note that for the CreateSession and ActivateSession services, if the SecurityMode = None then: 1) The Application Certificate and Nonce are optional. 2) The signatures are null/empty. |
-| opc_cu_3192 |  | unimplemented | The Server supports the collection of diagnostic information and exposes it in the AddressSpace. This includes always the ServerDiagnostics Object of the Server Object and its EnabledFlag Variable. The EnabledFlag in the ServerDiagnostics Object can be set TRUE and in that case the following Objects and Variables for diagnostic data as defined in the ServerDiagnosticsType are exposed: ServerDiagnosticsSummary with all its subcomponents, SubscriptionDiagnosticsArray, and SessionsDiagnosticsSummary with all its subcomponents. |
-| opc_cu_3530 |  | unimplemented | Support the View Service Set (Browse, BrowseNext). This includes the support of minimum 1 continuation point per Session. |
 | opc_cu_3534 |  | unimplemented | Server supports at least 2 Subscriptions in a single Session. |
 | opc_cu_3535 |  | unimplemented | Support a retransmission queue of sent NotificationMessages and the Republish Service. See UA Part 4 for the required size of the retransmission queue. |
 | opc_cu_3536 |  | unimplemented | The Server supports User Name/Password combination(s). The token will be encrypted as required by the security policy of the User Token Policy or by the security policy of the endpoint. |
@@ -659,14 +660,29 @@ The following OPC items are tracked in the manifest but are NOT implemented. The
 | opc_cu_3727 |  | unimplemented | Support the following Subscription Services: CreateSubscription, ModifySubscription, DeleteSubscriptions, Publish, Republish and SetPublishingMode. |
 | opc_cu_3802 |  | unimplemented | Supports configuration of the acceptable clock skew. |
 | opc_cu_3913 |  | unimplemented | Support at least 2 Publish Service requests per Session. |
-| opc_cu_3983 |  | unimplemented | The Server returns available diagnostic information as requested with the 'returnDiagnostics' parameter. |
 | opc_cu_3985 |  | unimplemented | Implement basic Service behaviour. This includes in particular: – checking the authentication token – returning the requestHandle in responses – respecting a timeoutHint |
 | opc_cu_5505 |  | unimplemented | Application supports time synchronization by use of the request or response header timestamps provided by a configured well known source, such as a Discovery Server to synchronize the time on the application and that this time synchronization occurs periodically. Use of this TimeSyncing can be configured. |
 | opc_cu_5793 |  | unimplemented | Support at least one of the optional ConformanceUnits for time synchronization mechanisms in the Security Time Synchronization Facet. The application documentation shall specify which synchronization mechanisms with which profiles are supported. |
+| opc_cu_2190 | OPC-10000-4 §5.6.5 | unimplemented | Imported from OPC profile REST API 2026-07-15. Not implemented: no Cancel service handler exists. |
+| opc_cu_2271 | OPC-10000-4 §5.4.5 | unimplemented | Imported from OPC profile REST API 2026-07-15. Not implemented: register_server.c is a stub (outbound RegisterServer to a discovery server is not supported). |
+| opc_cu_2863 | OPC-10000-7 §6.5 | unimplemented | Imported from OPC profile REST API 2026-07-15. Capability satisfied via the secure-conversation layer, which implements Basic256Sha256, Aes128_Sha256_RsaOaep, and Aes256_Sha256_RsaPss; Kconfig gates per-profile inclusion. |
+| opc_cu_3170 | OPC-10000-4 §5.4.6 | unimplemented | Imported from OPC profile REST API 2026-07-15. Not implemented: RegisterServer2 outbound registration is not supported. |
+| opc_cu_3721 | OPC-10000-7 §6.5 | unimplemented | Imported from OPC profile REST API 2026-07-15. Optional. Capability satisfied by MUC_OPCUA_CU_SECURITY_ECC (spec 059); Kconfig gates per-profile inclusion (built in full). |
+| opc_cu_3923 | OPC-10000-4 §5.6 | unimplemented | Imported from OPC profile REST API 2026-07-15. Capability satisfied by MUC_OPCUA_CU_MULTIPLE_CONNECTIONS (multiple parallel sessions); Kconfig gates per-profile inclusion. |
 | opc_cu_3080 |  | unimplemented | An application, when installed, has a default ApplicationInstanceCertificate that is valid. The default ApplicationInstanceCertificate shall either be created as part of the installation or installation instructions explicitly describe the process to create and apply a default ApplicationInstanceCertificate to the application. (Documentation complete; no code change needed.) |
 | opc_cu_3201 |  | unimplemented | The Server supports custom types (i.e. types that are derived from well-known ObjectTypes, VariableTypes, ReferenceTypes or DataTypes). Supporting this ConformanceUnit requires that the custom types with their full inheritance tree are exposed in the AddressSpace. For each DataType having encoding information (Structured DataTypes) the Encoding Objects shall be exposed as well. For all Events supported by the Server, the EventType shall be exposed. (Documentation complete; no code change needed.) |
 | opc_cu_5814 |  | unimplemented | The Server supports being able to be configured for no application authentication, just User authentication and normal encryption/signing: – Configure Server to skip the trust check when validating certificates – Certificates are just used for message security (signing and encryption) – Users level is used for authentication (Documentation complete; no code change needed.) |
 <!-- END GENERATED MANIFEST TABLES -->
+
+
+
+
+
+
+
+
+
+
 
 
 

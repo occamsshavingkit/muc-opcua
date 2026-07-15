@@ -141,15 +141,15 @@ assert_cfg "$D5" CU_ATTRIBUTE_READ OFF
 assert_cfg "$D5" CU_VIEW_BASIC_TRANSLATEBROWSEPATH OFF
 assert_cfg "$D5" CU_DISCOVERY_FIND_SERVERS_SELF_GET_ENDPOINTS OFF
 
-echo "### 5b. CU_SUBSCRIPTION_STANDARD is independent of CU_SUBSCRIPTION_BASIC ###"
+echo "### 5b. CU_SUBSCRIPTION_STANDARD follows its CU_SUBSCRIPTION_BASIC dependency ###"
 D5B="$WORKDIR/g5b"
 cmake -S . -B "$D5B" -DMUC_OPCUA_PROFILE=full \
     -DMUC_OPCUA_CU_SUBSCRIPTION_BASIC=OFF \
     -DMUC_OPCUA_PLATFORM=host >/dev/null 2>&1
 assert_cfg "$D5B" CU_SUBSCRIPTION_BASIC OFF
-# CU_SUBSCRIPTION_STANDARD is independent (no depends on BASIC)
-if grep -q "^set(MUC_OPCUA_CU_SUBSCRIPTION_STANDARD ON)" "$D5B/muc_opcua_config.cmake" 2>/dev/null; then
-    echo "  PASS  CU_SUBSCRIPTION_STANDARD independent of CU_SUBSCRIPTION_BASIC"
+# Kconfig declares CU_SUBSCRIPTION_STANDARD depends on BASIC.
+if grep -q "^set(MUC_OPCUA_CU_SUBSCRIPTION_STANDARD OFF)" "$D5B/muc_opcua_config.cmake" 2>/dev/null; then
+    echo "  PASS  CU_SUBSCRIPTION_STANDARD follows its CU_SUBSCRIPTION_BASIC dependency"
     PASS=$((PASS + 1))
 else
     echo "  FAIL  CU_SUBSCRIPTION_STANDARD unexpectedly cascaded OFF"

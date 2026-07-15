@@ -1,5 +1,19 @@
 # Feature Size Ledger
 
+## 2026-07-14: Spec 071 - Nano Service Behaviour
+
+Measured with `scripts/measure_size.sh nano` after the Discovery, View, Write,
+Session, and Diagnostics changes:
+
+| Profile | text | data | bss | dec |
+|---------|-----:|-----:|----:|----:|
+| nano | 29,442 | 0 | 512 | 29,442 |
+
+The current measurement is recorded as the feature endpoint. A directly
+comparable pre-071 baseline was not available in the active worktree; the
+historical ledger baseline is not used as a release delta because it predates
+the current profile and CU set.
+
 ## 2026-07-11: Spec 066 — Client Redundancy Facet (Project B, B7)
 
 Made `MUC_OPCUA_REDUNDANCY` real: TransferSubscriptions was a no-op self-transfer (found the

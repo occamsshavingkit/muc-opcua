@@ -25,6 +25,7 @@ if _PKG_PARENT not in sys.path:
     sys.path.insert(0, _PKG_PARENT)
 
 from profile_manifest.model import load_manifest, validate_manifest  # noqa: E402
+from profile_manifest import completion as _completion  # noqa: E402
 
 _DEFAULT_PROFILES = ("nano", "micro", "embedded", "standard", "full", "custom")
 _SELECTABLE_STATES = ("claimed", "implemented", "deferred")
@@ -722,9 +723,10 @@ def _emit_selectable(
     lines.append("config " + sym)
     lines.append('\tbool "' + prompt + '"')
 
-    # When underneath a facet, CU selection is independent of the facet
-    # toggle.  The facet shows a tristate indicator (all-on / all-off /
-    # partial) based on which CUs are enabled.
+    depends_on = item.get("depends_on") or []
+    depends_expr = _depends_expr(depends_on, item.get("depends_on_op"))
+    if depends_expr:
+        lines.append("\tdepends on " + depends_expr)
 
     _emit_default(lines, item, profile_symbols)
 
@@ -1926,7 +1928,7 @@ def _parse_args(argv: list[str]) -> argparse.Namespace:
         "--outputs",
         default="kconfig,defconfigs",
         help="Comma-separated list of outputs to write "
-        "(kconfig, defconfigs, capacities_h, claim_map, roadmap, build_docs).",
+        "(kconfig, defconfigs, capacities_h, claim_map, roadmap, build_docs, completion).",
     )
     return parser.parse_args(argv)
 
@@ -1992,6 +1994,23 @@ def main(argv: list[str] | None = None) -> int:
             build_docs_path = os.path.join(repo_root, "docs", "build-and-gating.md")
             update_build_docs(manifest, build_docs_path)
             print("updated " + build_docs_path)
+        elif output == "completion":
+            import json as _json
+            docs_dir = os.path.join(repo_root, "docs", "conformance")
+            os.makedirs(docs_dir, exist_ok=True)
+            snap_path = os.path.join(repo_root, "profiles", "opcua-profile-normalized-snapshot.json")
+            with open(snap_path, encoding="utf-8") as fh:
+                snapshot = _json.load(fh)
+            cat_path = os.path.join(repo_root, "profiles", "opcua-server-conformance.json")
+            catalog = None
+            if os.path.exists(cat_path):
+                with open(cat_path, encoding="utf-8") as fh:
+                    catalog = _json.load(fh)
+            content = _completion.render_report(manifest, snapshot, catalog)
+            completion_path = os.path.join(docs_dir, "completion.md")
+            with open(completion_path, "w", encoding="utf-8") as fh:
+                fh.write(content)
+            print("wrote " + completion_path)
         else:
             print("generate: FAIL (unknown output '" + output + "')")
             return 1

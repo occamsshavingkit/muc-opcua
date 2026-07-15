@@ -72,6 +72,7 @@ opcua_statuscode_t write_publish_response_prefix(mu_binary_writer_t *w, opcua_ui
     rh.timestamp = 0;
     rh.request_handle = request_handle;
     rh.service_result = MU_STATUS_GOOD;
+    rh.return_diagnostics = 0u;
     return mu_response_header_encode(w, &rh);
 }
 

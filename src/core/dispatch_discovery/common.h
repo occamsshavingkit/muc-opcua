@@ -12,7 +12,7 @@
 #include <stddef.h>
 #include <string.h>
 
-#ifdef MUC_OPCUA_CU_DISCOVERY_FIND_SERVERS_SELF_GET_ENDPOINTS
+#ifdef MUC_OPCUA_DISCOVERY_SHARED
 
 bool string_matches_cstr(const mu_string_t *left, const char *right);
 bool locale_id_is_usable(const mu_string_t *locale_id);
@@ -24,5 +24,5 @@ opcua_statuscode_t findservers_application_description_encode(mu_binary_writer_t
                                                               const mu_application_description_t *desc,
                                                               const mu_string_t *requested_locale);
 
-#endif /* MUC_OPCUA_CU_DISCOVERY_FIND_SERVERS_SELF_GET_ENDPOINTS */
+#endif /* MUC_OPCUA_DISCOVERY_SHARED */
 #endif /* DISPATCH_DISCOVERY_COMMON_H */

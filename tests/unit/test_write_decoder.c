@@ -7,8 +7,86 @@
 void setUp(void) {}
 void tearDown(void) {}
 
+#ifdef MUC_OPCUA_SERVICE_WRITE
+static void init_sentinel_write_state(mu_write_request_t *req, mu_write_value_t *nodes, size_t node_count) {
+    req->num_nodes_to_write = 77;
+    req->nodes_to_write = &nodes[1];
+
+    for (size_t i = 0; i < node_count; ++i) {
+        nodes[i].node_id.namespace_index = (opcua_uint16_t)(40 + i);
+        nodes[i].node_id.identifier_type = MU_NODEID_NUMERIC;
+        nodes[i].node_id.identifier.numeric = (opcua_uint32_t)(9000 + i);
+        nodes[i].attribute_id = (opcua_uint32_t)(100 + i);
+        nodes[i].index_range.length = -1;
+        nodes[i].index_range.data = (const opcua_byte_t *)0x1;
+        nodes[i].value.has_value = true;
+        nodes[i].value.value.type = MU_TYPE_INT32;
+        nodes[i].value.value.value.i32 = (opcua_int32_t)(-100 - (int)i);
+    }
+}
+
+static void assert_sentinel_write_state_unchanged(const mu_write_request_t *req, const mu_write_value_t *nodes,
+                                                  size_t node_count) {
+    TEST_ASSERT_EQUAL_size_t(77, req->num_nodes_to_write);
+    TEST_ASSERT_EQUAL_PTR(&nodes[1], req->nodes_to_write);
+
+    for (size_t i = 0; i < node_count; ++i) {
+        TEST_ASSERT_EQUAL_UINT16((opcua_uint16_t)(40 + i), nodes[i].node_id.namespace_index);
+        TEST_ASSERT_EQUAL_INT(MU_NODEID_NUMERIC, nodes[i].node_id.identifier_type);
+        TEST_ASSERT_EQUAL_UINT32((opcua_uint32_t)(9000 + i), nodes[i].node_id.identifier.numeric);
+        TEST_ASSERT_EQUAL_UINT32((opcua_uint32_t)(100 + i), nodes[i].attribute_id);
+        TEST_ASSERT_EQUAL_INT32(-1, nodes[i].index_range.length);
+        TEST_ASSERT_EQUAL_PTR((const opcua_byte_t *)0x1, nodes[i].index_range.data);
+        TEST_ASSERT_TRUE(nodes[i].value.has_value);
+        TEST_ASSERT_EQUAL_INT(MU_TYPE_INT32, nodes[i].value.value.type);
+        TEST_ASSERT_EQUAL_INT32((opcua_int32_t)(-100 - (int)i), nodes[i].value.value.value.i32);
+    }
+}
+
+static opcua_statuscode_t decode_write_fixture(const opcua_byte_t *buf, size_t len, mu_write_request_t *req,
+                                               mu_write_value_t *nodes, size_t max_nodes) {
+    mu_binary_reader_t r;
+    mu_binary_reader_init(&r, buf, len);
+    return mu_write_request_decode(&r, req, nodes, max_nodes);
+}
+
+static size_t build_malformed_array_request(opcua_byte_t *buf, size_t len) {
+    mu_binary_writer_t w;
+    mu_binary_writer_init(&w, buf, len);
+    /* SCN-004 / OPC-10000-6 section 5.2.1: array counts below -1 are malformed. */
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_write_int32(&w, -2));
+    return w.position;
+}
+
+static size_t build_excessive_count_request(opcua_byte_t *buf, size_t len) {
+    mu_binary_writer_t w;
+    mu_binary_writer_init(&w, buf, len);
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_write_int32(&w, 3));
+    return w.position;
+}
+
+static size_t build_truncated_body_request(opcua_byte_t *buf, size_t len) {
+    mu_binary_writer_t w;
+    mu_binary_writer_init(&w, buf, len);
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_write_int32(&w, 1));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_write_byte(&w, 0x02));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_write_uint16(&w, 2));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_write_uint32(&w, 1001));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_write_uint32(&w, 13));
+    return w.position;
+}
+
+static size_t build_invalid_nodeid_request(opcua_byte_t *buf, size_t len) {
+    mu_binary_writer_t w;
+    mu_binary_writer_init(&w, buf, len);
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_write_int32(&w, 1));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_write_byte(&w, 0x0F));
+    return w.position;
+}
+#endif
+
 void test_write_request_decode_happy_path(void) {
-#ifdef MUC_OPCUA_CU_CORE_2017_ATTRIBUTE_WRITE
+#ifdef MUC_OPCUA_SERVICE_WRITE
     opcua_byte_t buf[256];
     mu_binary_writer_t w;
     mu_binary_writer_init(&w, buf, sizeof(buf));
@@ -69,7 +147,7 @@ void test_write_request_decode_happy_path(void) {
 }
 
 void test_write_request_decode_errors(void) {
-#ifdef MUC_OPCUA_CU_CORE_2017_ATTRIBUTE_WRITE
+#ifdef MUC_OPCUA_SERVICE_WRITE
     opcua_byte_t buf[256];
     mu_binary_writer_t w;
     mu_binary_writer_init(&w, buf, sizeof(buf));
@@ -87,8 +165,64 @@ void test_write_request_decode_errors(void) {
 #endif
 }
 
+void test_write_request_decode_rejects_malformed_array_without_state_mutation(void) {
+#ifdef MUC_OPCUA_SERVICE_WRITE
+    opcua_byte_t buf[16];
+    mu_write_request_t req;
+    mu_write_value_t nodes[2];
+    size_t len = build_malformed_array_request(buf, sizeof(buf));
+
+    init_sentinel_write_state(&req, nodes, 2);
+
+    TEST_ASSERT_EQUAL(MU_STATUS_BAD_DECODINGERROR, decode_write_fixture(buf, len, &req, nodes, 2));
+    assert_sentinel_write_state_unchanged(&req, nodes, 2);
+#endif
+}
+
+void test_write_request_decode_rejects_excessive_count_without_state_mutation(void) {
+#ifdef MUC_OPCUA_SERVICE_WRITE
+    opcua_byte_t buf[16];
+    mu_write_request_t req;
+    mu_write_value_t nodes[2];
+    size_t len = build_excessive_count_request(buf, sizeof(buf));
+
+    init_sentinel_write_state(&req, nodes, 2);
+
+    TEST_ASSERT_EQUAL(MU_STATUS_BAD_TOOMANYOPERATIONS, decode_write_fixture(buf, len, &req, nodes, 2));
+    assert_sentinel_write_state_unchanged(&req, nodes, 2);
+#endif
+}
+
+void test_write_request_decode_rejects_truncated_body_without_state_mutation(void) {
+#ifdef MUC_OPCUA_SERVICE_WRITE
+    opcua_byte_t buf[32];
+    mu_write_request_t req;
+    mu_write_value_t nodes[2];
+    size_t len = build_truncated_body_request(buf, sizeof(buf));
+
+    init_sentinel_write_state(&req, nodes, 2);
+
+    TEST_ASSERT_EQUAL(MU_STATUS_BAD_DECODINGERROR, decode_write_fixture(buf, len, &req, nodes, 2));
+    assert_sentinel_write_state_unchanged(&req, nodes, 2);
+#endif
+}
+
+void test_write_request_decode_rejects_invalid_nodeid_without_state_mutation(void) {
+#ifdef MUC_OPCUA_SERVICE_WRITE
+    opcua_byte_t buf[16];
+    mu_write_request_t req;
+    mu_write_value_t nodes[2];
+    size_t len = build_invalid_nodeid_request(buf, sizeof(buf));
+
+    init_sentinel_write_state(&req, nodes, 2);
+
+    TEST_ASSERT_EQUAL(MU_STATUS_BAD_DECODINGERROR, decode_write_fixture(buf, len, &req, nodes, 2));
+    assert_sentinel_write_state_unchanged(&req, nodes, 2);
+#endif
+}
+
 void test_write_response_encode(void) {
-#ifdef MUC_OPCUA_CU_CORE_2017_ATTRIBUTE_WRITE
+#ifdef MUC_OPCUA_SERVICE_WRITE
     opcua_byte_t buf[256];
     mu_binary_writer_t w;
     mu_binary_writer_init(&w, buf, sizeof(buf));
@@ -132,6 +266,10 @@ int main(void) {
     UNITY_BEGIN();
     RUN_TEST(test_write_request_decode_happy_path);
     RUN_TEST(test_write_request_decode_errors);
+    RUN_TEST(test_write_request_decode_rejects_malformed_array_without_state_mutation);
+    RUN_TEST(test_write_request_decode_rejects_excessive_count_without_state_mutation);
+    RUN_TEST(test_write_request_decode_rejects_truncated_body_without_state_mutation);
+    RUN_TEST(test_write_request_decode_rejects_invalid_nodeid_without_state_mutation);
     RUN_TEST(test_write_response_encode);
     return UNITY_END();
 }

@@ -2,7 +2,7 @@
  * FindServers service handler (OPC-10000-4 5.5.2.2). */
 #include "core/dispatch_discovery/common.h"
 
-#ifdef MUC_OPCUA_CU_DISCOVERY_FIND_SERVERS_SELF_GET_ENDPOINTS
+#ifdef MUC_OPCUA_DISCOVERY_FIND_SERVERS_ENABLED
 
 static bool findservers_endpoint_matches(const mu_string_t *endpoint_url, const char *discovery_url) {
     if (endpoint_url == NULL || endpoint_url->length <= 0) {
@@ -143,4 +143,4 @@ opcua_statuscode_t handle_find_servers(mu_server_t *server, mu_binary_reader_t *
     return MU_STATUS_GOOD;
 }
 
-#endif /* MUC_OPCUA_CU_DISCOVERY_FIND_SERVERS_SELF_GET_ENDPOINTS */
+#endif /* MUC_OPCUA_DISCOVERY_FIND_SERVERS_ENABLED */

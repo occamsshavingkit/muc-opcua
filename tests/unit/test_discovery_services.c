@@ -53,6 +53,21 @@ static size_t build_findservers_truncated_body_request(opcua_byte_t *buffer, siz
     return writer.position;
 }
 
+static size_t build_findservers_unfiltered_request(opcua_byte_t *buffer, size_t capacity,
+                                                   opcua_uint32_t request_handle) {
+    mu_binary_writer_t writer;
+    mu_binary_writer_init(&writer, buffer, capacity);
+
+    mu_string_t null_str = {-1, NULL};
+    write_request_header(&writer, request_handle);
+    mu_binary_write_string(&writer, &null_str); /* endpointUrl */
+    mu_binary_write_int32(&writer, 0);          /* localeIds[] */
+    mu_binary_write_int32(&writer, 0);          /* serverUris[] */
+    mu_binary_write_int32(&writer, 0);          /* serverTypes[] */
+
+    return writer.position;
+}
+
 static size_t build_findservers_endpoint_filter_request(opcua_byte_t *buffer, size_t capacity,
                                                         const char *endpoint_url) {
     mu_binary_writer_t writer;
@@ -195,6 +210,74 @@ static void assert_string_equal_cstr(const mu_string_t *actual, const char *expe
     }
 }
 
+typedef struct {
+    mu_string_t application_uri;
+    mu_string_t product_uri;
+    opcua_byte_t application_name_mask;
+    mu_string_t application_name_locale;
+    mu_string_t application_name_text;
+    opcua_uint32_t application_type;
+    mu_string_t gateway_server_uri;
+    mu_string_t discovery_profile_uri;
+    opcua_int32_t discovery_url_count;
+    mu_string_t discovery_url;
+} findservers_application_t;
+
+static void read_findservers_single_application(const opcua_byte_t *response, size_t response_len,
+                                                opcua_uint32_t expected_request_handle,
+                                                findservers_application_t *app) {
+    mu_binary_reader_t reader;
+    mu_nodeid_t response_type;
+    opcua_uint32_t request_handle;
+    opcua_statuscode_t service_result;
+    opcua_int32_t server_count;
+
+    *app = (findservers_application_t){0};
+    app->application_name_locale = (mu_string_t){-1, NULL};
+
+    mu_binary_reader_init(&reader, response, response_len);
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_binary_read_nodeid(&reader, &response_type));
+    TEST_ASSERT_EQUAL(MU_NODEID_NUMERIC, response_type.identifier_type);
+    TEST_ASSERT_EQUAL_UINT32(MU_ID_FINDSERVERSRESPONSE, response_type.identifier.numeric);
+    skip_response_header(&reader, &request_handle, &service_result);
+    TEST_ASSERT_EQUAL_UINT32(expected_request_handle, request_handle);
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, service_result);
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_binary_read_int32(&reader, &server_count));
+    TEST_ASSERT_EQUAL_INT32(1, server_count);
+
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_binary_read_string(&reader, &app->application_uri));
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_binary_read_string(&reader, &app->product_uri));
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_binary_read_byte(&reader, &app->application_name_mask));
+    if ((app->application_name_mask & 0x01u) != 0u) {
+        TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_binary_read_string(&reader, &app->application_name_locale));
+    }
+    if ((app->application_name_mask & 0x02u) != 0u) {
+        TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_binary_read_string(&reader, &app->application_name_text));
+    }
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_binary_read_uint32(&reader, &app->application_type));
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_binary_read_string(&reader, &app->gateway_server_uri));
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_binary_read_string(&reader, &app->discovery_profile_uri));
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_binary_read_int32(&reader, &app->discovery_url_count));
+    TEST_ASSERT_EQUAL_INT32(1, app->discovery_url_count);
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_binary_read_string(&reader, &app->discovery_url));
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, reader.status);
+    TEST_ASSERT_EQUAL_UINT(response_len, reader.position);
+}
+
+static void assert_findservers_self_application(const opcua_byte_t *response, size_t response_len,
+                                                opcua_uint32_t expected_request_handle,
+                                                const mu_server_config_t *config) {
+    findservers_application_t app;
+    read_findservers_single_application(response, response_len, expected_request_handle, &app);
+
+    assert_string_equal_cstr(&app.application_uri, config->application_uri);
+    assert_string_equal_cstr(&app.product_uri, config->product_uri);
+    TEST_ASSERT_EQUAL_UINT8(0x02u, app.application_name_mask);
+    assert_string_equal_cstr(&app.application_name_text, config->application_name);
+    TEST_ASSERT_EQUAL_UINT32((opcua_uint32_t)MU_APPLICATION_TYPE_SERVER, app.application_type);
+    assert_string_equal_cstr(&app.discovery_url, config->endpoint_url);
+}
+
 static void read_findservers_first_application_name(const opcua_byte_t *response, size_t response_len,
                                                     opcua_uint32_t expected_request_handle,
                                                     opcua_byte_t *localized_text_mask, mu_string_t *locale,
@@ -287,6 +370,23 @@ void test_findservers_malformed_array_count_returns_bad_decodingerror(void) {
        OPC-10000-6 section 5.2.5 reserves -1 for null arrays, so -2 is malformed. */
     TEST_ASSERT_EQUAL_HEX32(MU_STATUS_BAD_DECODINGERROR, mu_service_dispatch(&server, MU_ID_FINDSERVERSREQUEST, request,
                                                                              request_len, response, &response_len));
+}
+
+void test_findservers_scn001_case001_self_unfiltered_returns_exactly_own_server_opc_cu_2352(void) {
+    mu_server_t server;
+    discovery_server(&server);
+
+    opcua_byte_t request[128];
+    size_t request_len = build_findservers_unfiltered_request(request, sizeof(request), 32);
+    opcua_byte_t response[512];
+    size_t response_len = sizeof(response);
+
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_service_dispatch(&server, MU_ID_FINDSERVERSREQUEST, request, request_len,
+                                                                response, &response_len));
+
+    /* SCN-001 CASE-001 opc_cu_2352: OPC-10000-4 section 5.5.2 FindServers
+       Self returns exactly this server's ApplicationDescription when unfiltered. */
+    assert_findservers_self_application(response, response_len, 32, &server.config);
 }
 
 void test_getendpoints_malformed_array_count_returns_bad_decodingerror(void) {
@@ -388,6 +488,35 @@ void test_findservers_server_type_filter_excludes_server_application(void) {
     TEST_ASSERT_EQUAL_INT32(0, server_count);
 }
 
+void test_findservers_scn001_case001_self_matching_filters_expose_only_own_server_opc_cu_2352(void) {
+    mu_server_t server;
+    discovery_server(&server);
+    opcua_byte_t request[192];
+    opcua_byte_t response[512];
+    size_t request_len;
+    size_t response_len;
+
+    /* SCN-001 CASE-001 opc_cu_2352: OPC-10000-4 section 5.5.2 filters may
+       select the local server, but must not fabricate or expose any other server. */
+    request_len = build_findservers_endpoint_filter_request(request, sizeof(request), server.config.endpoint_url);
+    response_len = sizeof(response);
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_service_dispatch(&server, MU_ID_FINDSERVERSREQUEST, request, request_len,
+                                                                response, &response_len));
+    assert_findservers_self_application(response, response_len, 28, &server.config);
+
+    request_len = build_findservers_server_uri_filter_request(request, sizeof(request), server.config.application_uri);
+    response_len = sizeof(response);
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_service_dispatch(&server, MU_ID_FINDSERVERSREQUEST, request, request_len,
+                                                                response, &response_len));
+    assert_findservers_self_application(response, response_len, 30, &server.config);
+
+    request_len = build_findservers_server_type_filter_request(request, sizeof(request), MU_APPLICATION_TYPE_SERVER);
+    response_len = sizeof(response);
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_service_dispatch(&server, MU_ID_FINDSERVERSREQUEST, request, request_len,
+                                                                response, &response_len));
+    assert_findservers_self_application(response, response_len, 31, &server.config);
+}
+
 void test_findservers_truncated_body_returns_bad_decodingerror(void) {
     mu_server_t server;
     discovery_server(&server);
@@ -424,11 +553,13 @@ int main(void) {
     RUN_TEST(test_discovery_findservers_response);
     RUN_TEST(test_discovery_getendpoints_response);
     RUN_TEST(test_findservers_malformed_array_count_returns_bad_decodingerror);
+    RUN_TEST(test_findservers_scn001_case001_self_unfiltered_returns_exactly_own_server_opc_cu_2352);
     RUN_TEST(test_getendpoints_malformed_array_count_returns_bad_decodingerror);
     RUN_TEST(test_findservers_endpoint_url_filter_excludes_nonmatching_server);
     RUN_TEST(test_findservers_locale_filter_returns_application_name_in_requested_locale);
     RUN_TEST(test_findservers_server_uri_filter_excludes_nonmatching_server);
     RUN_TEST(test_findservers_server_type_filter_excludes_server_application);
+    RUN_TEST(test_findservers_scn001_case001_self_matching_filters_expose_only_own_server_opc_cu_2352);
     RUN_TEST(test_findservers_truncated_body_returns_bad_decodingerror);
     RUN_TEST(test_getendpoints_truncated_body_returns_bad_decodingerror);
     return UNITY_END();

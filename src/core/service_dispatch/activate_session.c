@@ -356,6 +356,13 @@ static opcua_statuscode_t verify_and_activate_session(mu_server_t *server, const
     if (activate_result != MU_STATUS_GOOD) {
         return activate_result;
     }
+#ifndef MUC_OPCUA_CU_SESSION_CHANGE_USER
+    if (slot->state == MU_SESSION_STATE_ACTIVATED) {
+        /* OPC-10000-4 sections 5.7.2 and 5.7.3: initial activation remains
+           available; replacing the user of an activated Session is opc_cu_2400. */
+        return MU_STATUS_BAD_SERVICEUNSUPPORTED;
+    }
+#endif
     if (token_type_numeric == 0u) {
         return MU_STATUS_BAD_IDENTITYTOKENINVALID;
     }
@@ -507,19 +514,33 @@ opcua_statuscode_t handle_activate_session(mu_server_t *server, mu_binary_reader
 #endif
     );
     if (s != MU_STATUS_GOOD)
-        return s;
+        goto cleanup_nonce;
 
     s = mu_binary_write_bytestring(w, &server_nonce);
     if (s != MU_STATUS_GOOD)
-        return s;
+        goto cleanup_nonce;
+    mu_binary_write_int32(w, 0);
+    mu_binary_write_int32(w, 0);
+    if (w->status != MU_STATUS_GOOD) {
+        s = w->status;
+        goto cleanup_nonce;
+    }
+
+    if (activate_result == MU_STATUS_GOOD && req.authentication_token.identifier_type == MU_NODEID_NUMERIC &&
+        req.authentication_token.namespace_index == 0u) {
+        mu_session_t *slot = mu_session_find_by_token(server->sessions, MU_INTERN_MAX_SESSIONS,
+                                                      req.authentication_token.identifier.numeric);
+        if (slot != NULL) {
+            (void)memcpy(slot->server_nonce, nonce_buf, sizeof(slot->server_nonce));
+        }
+    }
+
+    *response_length = w->position;
+    s = MU_STATUS_GOOD;
+
+cleanup_nonce:
 #ifdef MUC_OPCUA_FACET_CORE_2022_SERVER
     mu_secure_zero(nonce_buf, sizeof(nonce_buf));
 #endif
-    mu_binary_write_int32(w, 0);
-    mu_binary_write_int32(w, 0);
-    if (w->status != MU_STATUS_GOOD)
-        return w->status;
-
-    *response_length = w->position;
-    return MU_STATUS_GOOD;
+    return s;
 }

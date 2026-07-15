@@ -62,7 +62,7 @@ void test_service_dispatch_unsupported_services(void) {
     server.secure_channel.is_open = true;
 
     const opcua_uint32_t unsupported[] = {
-#ifndef MUC_OPCUA_CU_CORE_2017_ATTRIBUTE_WRITE
+#ifndef MUC_OPCUA_SERVICE_WRITE
         MU_ID_WRITEREQUEST,
 #endif
 #if !(MUC_OPCUA_SUBSCRIPTIONS && MUC_OPCUA_SUBSCRIPTIONS_STANDARD && MUC_OPCUA_BASE_TYPE_SYSTEM)

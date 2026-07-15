@@ -15,7 +15,7 @@
 void setUp(void) {}
 void tearDown(void) {}
 
-#ifdef MUC_OPCUA_CU_CORE_2017_ATTRIBUTE_WRITE
+#ifdef MUC_OPCUA_SERVICE_WRITE
 static opcua_statuscode_t dummy_write_handler(void *handle, const mu_nodeid_t *node_id, opcua_uint32_t attribute_id,
                                               const mu_datavalue_t *value) {
     (void)handle;
@@ -332,6 +332,56 @@ void test_write_service_non_value_attribute(void) {
     TEST_ASSERT_EQUAL(MU_STATUS_BAD_NOTWRITABLE, item_status);
 }
 
+void test_write_attribute_invalid_for_variable_is_operation_level_bad_attributeidinvalid(void) {
+    mu_server_t server;
+    (void)memset(&server, 0, sizeof(server));
+
+    mu_node_t node;
+    (void)memset(&node, 0, sizeof(node));
+    node.node_id = (mu_nodeid_t){1, MU_NODEID_NUMERIC, {.numeric = 5003}};
+    node.node_class = MU_NODECLASS_VARIABLE;
+    node.browse_name = (mu_string_t){4, (const opcua_byte_t *)"Test"};
+    node.display_name = (mu_string_t){4, (const opcua_byte_t *)"Test"};
+
+    mu_value_source_t val_src;
+    val_src.type = MU_VALUESOURCE_STATIC;
+    val_src.data.static_value.type = MU_TYPE_INT32;
+    val_src.data.static_value.is_array = false;
+    val_src.data.static_value.value.i32 = 10;
+    node.value = &val_src;
+
+    mu_address_space_t address_space = {&node, 1};
+    int callback_count = 0;
+    server.config.address_space = &address_space;
+    server.config.write_handler = counting_write_handler;
+    server.config.write_handler_handle = &callback_count;
+    (void)memset(&server.user_address_space_index, 0, sizeof(server.user_address_space_index));
+
+    opcua_byte_t req_buffer[128];
+    mu_binary_writer_t writer;
+    mu_binary_writer_init(&writer, req_buffer, sizeof(req_buffer));
+
+    write_request_header(&writer, 42);
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_write_int32(&writer, 1));
+
+    /* OPC-10000-4 section 5.11.4: Executable is not an Attribute of Variable nodes. */
+    write_int32_value_writevalue(&writer, &node.node_id, MU_ATTRIBUTEID_EXECUTABLE, 42);
+
+    mu_binary_reader_t reader;
+    mu_binary_reader_init(&reader, req_buffer, writer.position);
+
+    opcua_byte_t resp_buffer[128];
+    mu_binary_writer_t resp_writer;
+    mu_binary_writer_init(&resp_writer, resp_buffer, sizeof(resp_buffer));
+
+    size_t resp_len = 0;
+    opcua_statuscode_t status = handle_write(&server, &reader, &resp_writer, &resp_len);
+
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, status);
+    TEST_ASSERT_EQUAL(0, callback_count);
+    assert_single_write_result(resp_buffer, resp_len, MU_STATUS_GOOD, MU_STATUS_BAD_ATTRIBUTEIDINVALID);
+}
+
 void test_write_service_index_range(void) {
     mu_server_t server;
     memset(&server, 0, sizeof(server));
@@ -512,6 +562,73 @@ void test_write_value_on_object_is_operation_level_bad_notwritable(void) {
     assert_single_write_result(resp_buffer, resp_len, MU_STATUS_GOOD, MU_STATUS_BAD_NOTWRITABLE);
 }
 
+void test_write_invalid_value_type_opc_cu_2389_scn002_case009_preserves_readable_target_value(void) {
+    /* SCN-002 / CASE-009 / opc_cu_2389: OPC-10000-4 section 5.11.4
+       Invalid Write Value targets report operation-level failure and leave the readable target unchanged. */
+    mu_server_t server;
+    (void)memset(&server, 0, sizeof(server));
+
+    mu_node_t node;
+    (void)memset(&node, 0, sizeof(node));
+    node.node_id = (mu_nodeid_t){1, MU_NODEID_NUMERIC, {.numeric = 8302}};
+    node.node_class = MU_NODECLASS_VARIABLE;
+    node.browse_name = (mu_string_t){8, (const opcua_byte_t *)"Readable"};
+    node.display_name = (mu_string_t){8, (const opcua_byte_t *)"Readable"};
+
+    mu_value_source_t value;
+    value.type = MU_VALUESOURCE_STATIC;
+    value.data.static_value.type = MU_TYPE_INT32;
+    value.data.static_value.is_array = false;
+    value.data.static_value.value.i32 = 55;
+    node.value = &value;
+
+    mu_address_space_t address_space = {&node, 1};
+    int callback_count = 0;
+    server.config.address_space = &address_space;
+    server.config.write_handler = counting_write_handler;
+    server.config.write_handler_handle = &callback_count;
+    (void)memset(&server.user_address_space_index, 0, sizeof(server.user_address_space_index));
+
+    TEST_ASSERT_EQUAL(MU_TYPE_INT32, node.value->data.static_value.type);
+    TEST_ASSERT_EQUAL(55, node.value->data.static_value.value.i32);
+
+    opcua_byte_t req_buffer[128];
+    mu_binary_writer_t writer;
+    mu_binary_writer_init(&writer, req_buffer, sizeof(req_buffer));
+
+    write_request_header(&writer, 2389);
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_write_int32(&writer, 1));
+
+    mu_string_t null_string = {-1, NULL};
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_write_nodeid(&writer, &node.node_id));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_write_int32(&writer, 13));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_write_string(&writer, &null_string));
+
+    mu_datavalue_t dv;
+    (void)memset(&dv, 0, sizeof(dv));
+    dv.has_value = true;
+    dv.value.type = MU_TYPE_FLOAT;
+    dv.value.is_array = false;
+    dv.value.value.f = 9.25f;
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_write_datavalue(&writer, &dv));
+
+    mu_binary_reader_t reader;
+    mu_binary_reader_init(&reader, req_buffer, writer.position);
+
+    opcua_byte_t resp_buffer[128];
+    mu_binary_writer_t resp_writer;
+    mu_binary_writer_init(&resp_writer, resp_buffer, sizeof(resp_buffer));
+
+    size_t resp_len = 0;
+    opcua_statuscode_t status = handle_write(&server, &reader, &resp_writer, &resp_len);
+
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, status);
+    TEST_ASSERT_EQUAL(0, callback_count);
+    assert_single_write_result(resp_buffer, resp_len, MU_STATUS_GOOD, MU_STATUS_BAD_TYPEMISMATCH);
+    TEST_ASSERT_EQUAL(MU_TYPE_INT32, node.value->data.static_value.type);
+    TEST_ASSERT_EQUAL(55, node.value->data.static_value.value.i32);
+}
+
 void test_write_too_many_operations_is_service_level_bad_toomanyoperations(void) {
     mu_server_t server;
     memset(&server, 0, sizeof(server));
@@ -542,18 +659,94 @@ void test_write_too_many_operations_is_service_level_bad_toomanyoperations(void)
     TEST_ASSERT_EQUAL(0, callback_count);
     TEST_ASSERT_EQUAL(0, resp_len);
 }
+#else
+static void write_request_header(mu_binary_writer_t *writer, opcua_uint32_t request_handle) {
+    mu_nodeid_t auth_token = {0, MU_NODEID_NUMERIC, {0}};
+    mu_string_t audit_id = {-1, NULL};
+    mu_nodeid_t null_id = {0, MU_NODEID_NUMERIC, {0}};
+
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_write_nodeid(writer, &auth_token));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_write_int64(writer, 0));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_write_uint32(writer, request_handle));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_write_uint32(writer, 0));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_write_string(writer, &audit_id));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_write_uint32(writer, 10000));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_write_extension_object_header(writer, &null_id, 0));
+}
+
+void test_write_disabled_scn002_case007_opc_cu_2389_2936_3147_rejects_real_write_and_preserves_target(void) {
+    /* SCN-002 / CASE-007 / opc_cu_2389 / opc_cu_2936 / deferred opc_cu_3147:
+       OPC-10000-4 section 5.11.4 Write is not built in this profile, so the
+       service-dispatch boundary rejects WriteRequest as unsupported. This is
+       explicit unsupported evidence only; it does not claim IndexRange support. */
+    mu_server_t server;
+    (void)memset(&server, 0, sizeof(server));
+
+    mu_node_t node;
+    (void)memset(&node, 0, sizeof(node));
+    node.node_id = (mu_nodeid_t){1, MU_NODEID_NUMERIC, {.numeric = 8307}};
+    node.node_class = MU_NODECLASS_VARIABLE;
+    node.browse_name = (mu_string_t){8, (const opcua_byte_t *)"Disabled"};
+    node.display_name = (mu_string_t){8, (const opcua_byte_t *)"Disabled"};
+
+    mu_value_source_t value;
+    value.type = MU_VALUESOURCE_STATIC;
+    value.data.static_value.type = MU_TYPE_INT32;
+    value.data.static_value.is_array = false;
+    value.data.static_value.value.i32 = 77;
+    node.value = &value;
+
+    mu_address_space_t address_space = {&node, 1};
+    server.config.address_space = &address_space;
+
+    opcua_byte_t req_buffer[160];
+    mu_binary_writer_t writer;
+    mu_binary_writer_init(&writer, req_buffer, sizeof(req_buffer));
+
+    write_request_header(&writer, 2407);
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_write_int32(&writer, 1));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_write_nodeid(&writer, &node.node_id));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_write_int32(&writer, 13));
+
+    mu_string_t index_range = {3, (const opcua_byte_t *)"1:2"};
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_write_string(&writer, &index_range));
+
+    mu_datavalue_t dv;
+    (void)memset(&dv, 0, sizeof(dv));
+    dv.has_value = true;
+    dv.value.type = MU_TYPE_INT32;
+    dv.value.is_array = false;
+    dv.value.value.i32 = 99;
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_write_datavalue(&writer, &dv));
+
+    opcua_byte_t resp_buffer[64];
+    (void)memset(resp_buffer, 0xA5, sizeof(resp_buffer));
+    size_t resp_len = sizeof(resp_buffer);
+
+    TEST_ASSERT_EQUAL_HEX32(
+        MU_STATUS_BAD_SERVICEUNSUPPORTED,
+        mu_service_dispatch(&server, MU_ID_WRITEREQUEST, req_buffer, writer.position, resp_buffer, &resp_len));
+    TEST_ASSERT_EQUAL(MU_TYPE_INT32, node.value->data.static_value.type);
+    TEST_ASSERT_EQUAL(77, node.value->data.static_value.value.i32);
+    TEST_ASSERT_EQUAL(sizeof(resp_buffer), resp_len);
+    TEST_ASSERT_EQUAL_UINT8(0xA5, resp_buffer[0]);
+}
 #endif
 
 int main(void) {
     UNITY_BEGIN();
-#ifdef MUC_OPCUA_CU_CORE_2017_ATTRIBUTE_WRITE
+#ifdef MUC_OPCUA_SERVICE_WRITE
     RUN_TEST(test_write_service_empty_array);
     RUN_TEST(test_write_datavalue_without_value_returns_type_mismatch_without_callback);
     RUN_TEST(test_write_service_non_value_attribute);
+    RUN_TEST(test_write_attribute_invalid_for_variable_is_operation_level_bad_attributeidinvalid);
     RUN_TEST(test_write_service_index_range);
     RUN_TEST(test_write_unknown_node_is_operation_level_bad_nodeidunknown);
     RUN_TEST(test_write_value_on_object_is_operation_level_bad_notwritable);
+    RUN_TEST(test_write_invalid_value_type_opc_cu_2389_scn002_case009_preserves_readable_target_value);
     RUN_TEST(test_write_too_many_operations_is_service_level_bad_toomanyoperations);
+#else
+    RUN_TEST(test_write_disabled_scn002_case007_opc_cu_2389_2936_3147_rejects_real_write_and_preserves_target);
 #endif
     return UNITY_END();
 }

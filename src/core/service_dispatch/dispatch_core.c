@@ -24,6 +24,19 @@ static opcua_statuscode_t read_auth_token_from_request(const opcua_byte_t *reque
     return MU_STATUS_GOOD;
 }
 
+#if defined(MUC_OPCUA_CU_BASE_SERVICES_DIAGNOSTICS) && MUC_OPCUA_CU_BASE_SERVICES_DIAGNOSTICS
+static opcua_uint32_t read_return_diagnostics_from_request(const opcua_byte_t *request_body, size_t request_length) {
+    mu_binary_reader_t reader;
+    mu_request_header_t header;
+
+    mu_binary_reader_init(&reader, request_body, request_length);
+    if (mu_request_header_decode(&reader, &header) != MU_STATUS_GOOD) {
+        return 0u;
+    }
+    return header.return_diagnostics;
+}
+#endif
+
 /* Service dispatch table. Entries MUST appear in ascending order of
    service.request_id: find_service_descriptor() performs a binary search.
    Grounding: OPC-10000-4 §4.1 (Service Set model) and §7.1 — Services are
@@ -32,8 +45,10 @@ static opcua_statuscode_t read_auth_token_from_request(const opcua_byte_t *reque
    Each entry retains its own feature-guard so any subset produced by the
    preprocessor remains a sorted subsequence. */
 static const mu_service_descriptor_t g_supported_services[] = {
-#ifdef MUC_OPCUA_CU_DISCOVERY_FIND_SERVERS_SELF_GET_ENDPOINTS
+#ifdef MUC_OPCUA_DISCOVERY_FIND_SERVERS_ENABLED
     {{MU_ID_FINDSERVERSREQUEST, MU_ID_FINDSERVERSRESPONSE, false}, handle_find_servers},
+#endif
+#ifdef MUC_OPCUA_CU_DISCOVERY_GET_ENDPOINTS
     {{MU_ID_GETENDPOINTSREQUEST, MU_ID_GETENDPOINTSRESPONSE, false}, handle_get_endpoints},
 #endif
     {{MU_ID_OPENSECURECHANNELREQUEST, MU_ID_OPENSECURECHANNELRESPONSE, false}, handle_open_secure_channel},
@@ -47,9 +62,11 @@ static const mu_service_descriptor_t g_supported_services[] = {
     {{MU_ID_DELETENODESREQUEST, MU_ID_DELETENODESRESPONSE, true}, handle_delete_nodes},
     {{MU_ID_DELETEREFERENCESREQUEST, MU_ID_DELETEREFERENCESRESPONSE, true}, handle_delete_references},
 #endif
-#ifdef MUC_OPCUA_CU_VIEW_BASIC_TRANSLATEBROWSEPATH
+#ifdef MUC_OPCUA_CU_VIEW_BASIC_2
     {{MU_ID_BROWSEREQUEST, MU_ID_BROWSERESPONSE, true}, handle_browse},
     {{MU_ID_BROWSENEXTREQUEST, MU_ID_BROWSENEXTRESPONSE, true}, handle_browse_next},
+#endif
+#ifdef MUC_OPCUA_CU_VIEW_TRANSLATEBROWSEPATH
     {{MU_ID_TRANSLATEBROWSEPATHSTONODEIDSREQUEST, MU_ID_TRANSLATEBROWSEPATHSTONODEIDSRESPONSE, true},
      handle_translate_browse_paths},
 #endif
@@ -67,7 +84,7 @@ static const mu_service_descriptor_t g_supported_services[] = {
 #ifdef MUC_OPCUA_CU_HISTORICAL_ACCESS_SERVER_FACET
     {{MU_ID_HISTORYREADREQUEST, MU_ID_HISTORYREADRESPONSE, true}, handle_history_read},
 #endif
-#ifdef MUC_OPCUA_CU_CORE_2017_ATTRIBUTE_WRITE
+#ifdef MUC_OPCUA_SERVICE_WRITE
     {{MU_ID_WRITEREQUEST, MU_ID_WRITERESPONSE, true}, handle_write},
 #endif
 #ifdef MUC_OPCUA_CU_HISTORICAL_ACCESS_SERVER_FACET
@@ -132,6 +149,9 @@ opcua_statuscode_t mu_service_dispatch(mu_server_t *server, opcua_uint32_t reque
     }
 
     server->active_session = NULL;
+#if defined(MUC_OPCUA_CU_BASE_SERVICES_DIAGNOSTICS) && MUC_OPCUA_CU_BASE_SERVICES_DIAGNOSTICS
+    mu_response_diagnostics_set_current(0u);
+#endif
 
     const mu_service_descriptor_t *descriptor = find_service_descriptor(request_id);
     if (descriptor == NULL) {
@@ -184,6 +204,9 @@ opcua_statuscode_t mu_service_dispatch(mu_server_t *server, opcua_uint32_t reque
     mu_binary_writer_init(&writer, response_body, *response_length);
 
     if (descriptor->handler != NULL) {
+#if defined(MUC_OPCUA_CU_BASE_SERVICES_DIAGNOSTICS) && MUC_OPCUA_CU_BASE_SERVICES_DIAGNOSTICS
+        mu_response_diagnostics_set_current(read_return_diagnostics_from_request(request_body, request_length));
+#endif
         return descriptor->handler(server, &reader, &writer, response_length);
     }
 

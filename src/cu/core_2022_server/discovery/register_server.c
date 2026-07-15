@@ -1,6 +1,6 @@
 /* src/core/dispatch_discovery/register_server.c
  * RegisterServer service handler (OPC-10000-4 5.5.2.2).
  * TODO: Implement register_server handler. */
-#ifdef MUC_OPCUA_CU_DISCOVERY_FIND_SERVERS_SELF_GET_ENDPOINTS
+#ifdef MUC_OPCUA_DISCOVERY_FIND_SERVERS_ENABLED
 #include "services/discovery.h"
-#endif /* MUC_OPCUA_CU_DISCOVERY_FIND_SERVERS_SELF_GET_ENDPOINTS */
+#endif /* MUC_OPCUA_DISCOVERY_FIND_SERVERS_ENABLED */

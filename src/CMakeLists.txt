@@ -78,18 +78,61 @@ if(MUC_OPCUA_READ_CACHE)
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_READ_CACHE=1)
 endif()
 
-# -- CU: View Basic TranslateBrowsePath (facet: Core 2022 Server) --
+# -- CU: View Basic/BrowseNext and TranslateBrowsePath (facet: Core 2022 Server) --
+if(MUC_OPCUA_CU_VIEW_BASIC_2 OR MUC_OPCUA_CU_VIEW_TRANSLATEBROWSEPATH)
+    target_sources(muc_opcua PRIVATE
+        cu/core_2022_server/view_basic_translate/browse.c
+        cu/core_2022_server/view_basic_translate/view_handler.c)
+
+    if(MUC_OPCUA_CU_VIEW_BASIC_2)
+        target_sources(muc_opcua PRIVATE
+            cu/core_2022_server/view_basic_translate/browse_next.c)
+    endif()
+
+    if(MUC_OPCUA_CU_VIEW_TRANSLATEBROWSEPATH)
+        target_sources(muc_opcua PRIVATE
+            cu/core_2022_server/view_basic_translate/translate_paths.c)
+    endif()
+endif()
+
 if(MUC_OPCUA_CU_VIEW_BASIC_TRANSLATEBROWSEPATH)
-    file(GLOB _sources cu/core_2022_server/view_basic_translate/*.c)
-    target_sources(muc_opcua PRIVATE ${_sources})
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_CU_VIEW_BASIC_TRANSLATEBROWSEPATH=1)
 endif()
 
-# -- CU: Discovery FindServers-Self-GetEndpoints (facet: Core 2022 Server) --
+if(MUC_OPCUA_CU_VIEW_BASIC_2)
+    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_CU_VIEW_BASIC_2=1)
+endif()
+
+if(MUC_OPCUA_CU_VIEW_TRANSLATEBROWSEPATH)
+    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_CU_VIEW_TRANSLATEBROWSEPATH=1)
+endif()
+
+# -- CU: Discovery FindServers-Self-GetEndpoints compatibility gate / dedicated Discovery CUs --
+set(MUC_OPCUA_DISCOVERY_FIND_SERVERS_ENABLED OFF)
+if(MUC_OPCUA_CU_DISCOVERY_FIND_SERVERS_SELF)
+    set(MUC_OPCUA_DISCOVERY_FIND_SERVERS_ENABLED ON)
+endif()
+
 if(MUC_OPCUA_CU_DISCOVERY_FIND_SERVERS_SELF_GET_ENDPOINTS)
-    file(GLOB _sources cu/core_2022_server/discovery/*.c)
-    target_sources(muc_opcua PRIVATE ${_sources})
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_CU_DISCOVERY_FIND_SERVERS_SELF_GET_ENDPOINTS=1)
+endif()
+
+if(MUC_OPCUA_DISCOVERY_FIND_SERVERS_ENABLED OR MUC_OPCUA_CU_DISCOVERY_GET_ENDPOINTS)
+    target_sources(muc_opcua PRIVATE cu/core_2022_server/discovery/common.c)
+    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_DISCOVERY_SHARED=1)
+endif()
+
+if(MUC_OPCUA_DISCOVERY_FIND_SERVERS_ENABLED)
+    target_sources(muc_opcua PRIVATE
+        cu/core_2022_server/discovery/find_servers.c
+        cu/core_2022_server/discovery/register_server.c)
+    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_DISCOVERY_FIND_SERVERS_ENABLED=1)
+    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_CU_DISCOVERY_FIND_SERVERS_SELF=1)
+endif()
+
+if(MUC_OPCUA_CU_DISCOVERY_GET_ENDPOINTS)
+    target_sources(muc_opcua PRIVATE cu/core_2022_server/discovery/get_endpoints.c)
+    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_CU_DISCOVERY_GET_ENDPOINTS=1)
 endif()
 
 # -- CU: View RegisterNodes (define-only, no source files yet) --
@@ -97,19 +140,36 @@ if(MUC_OPCUA_CU_VIEW_REGISTERNODES)
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_CU_VIEW_REGISTERNODES=1)
 endif()
 
-# -- CU: Core 2017 Attribute Write --
-if(MUC_OPCUA_CU_CORE_2017_ATTRIBUTE_WRITE)
+# -- CU: Attribute Write Values (OPC-10000-4 5.11.4) --
+# MUC_OPCUA_CU_CORE_2017_ATTRIBUTE_WRITE remains a compatibility aggregate for
+# full-profile builds; custom builds can enable the dedicated Write Value CU
+# independently with MUC_OPCUA_CU_ATTRIBUTE_WRITE_VALUES.
+if(MUC_OPCUA_WRITE_VALUE_ENABLED)
     file(GLOB _sources cu/core_2022_server/attribute_write/*.c)
     target_sources(muc_opcua PRIVATE ${_sources})
-    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_CU_CORE_2017_ATTRIBUTE_WRITE=1)
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_SERVICE_WRITE=1)
+endif()
+if(MUC_OPCUA_CU_ATTRIBUTE_WRITE_VALUES)
+    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_CU_ATTRIBUTE_WRITE_VALUES=1)
+endif()
+if(MUC_OPCUA_CU_SESSION_CHANGE_USER)
+    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_CU_SESSION_CHANGE_USER=1)
+endif()
+if(MUC_OPCUA_CU_ATTRIBUTE_WRITE_STATUSCODE_TIMESTAMP)
+    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_CU_ATTRIBUTE_WRITE_STATUSCODE_TIMESTAMP=1)
+endif()
+if(MUC_OPCUA_CU_ATTRIBUTE_WRITE_INDEX_RANGE)
+    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_CU_ATTRIBUTE_WRITE_INDEX_RANGE=1)
+endif()
+if(MUC_OPCUA_CU_CORE_2017_ATTRIBUTE_WRITE)
+    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_CU_CORE_2017_ATTRIBUTE_WRITE=1)
 endif()
 
 # Read/Write attribute dispatch handler. attribute_handler.c carries both sets
-# internally (#ifdef MUC_OPCUA_CU_ATTRIBUTE_READ / MUC_OPCUA_CU_CORE_2017_ATTRIBUTE_WRITE),
+# internally (#ifdef MUC_OPCUA_CU_ATTRIBUTE_READ / MUC_OPCUA_SERVICE_WRITE),
 # so compile it whenever either CU is enabled. File is shared infrastructure
 # and remains at src/core/service_dispatch/.
-if(MUC_OPCUA_CU_ATTRIBUTE_READ OR MUC_OPCUA_CU_CORE_2017_ATTRIBUTE_WRITE)
+if(MUC_OPCUA_CU_ATTRIBUTE_READ OR MUC_OPCUA_WRITE_VALUE_ENABLED)
     target_sources(muc_opcua PRIVATE core/service_dispatch/attribute_handler.c)
 endif()
 
@@ -273,12 +333,17 @@ if(MUC_OPCUA_CU_REVERSE_CONNECT)
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_REVERSE_CONNECT=1)
 endif()
 
-# -- CU: Server Diagnostics --
-if(MUC_OPCUA_CU_DIAGNOSTICS)
+# -- CU 3192: Base Info Diagnostics --
+if(MUC_OPCUA_CU_BASE_INFO_DIAGNOSTICS)
     file(GLOB _sources cu/core_2022_server/diagnostics/*.c)
     target_sources(muc_opcua PRIVATE ${_sources})
-    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_CU_DIAGNOSTICS=1)
+    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_CU_BASE_INFO_DIAGNOSTICS=1)
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_SERVER_DIAGNOSTICS=1)
+endif()
+
+# -- CU 3983: Base Services Diagnostics --
+if(MUC_OPCUA_CU_BASE_SERVICES_DIAGNOSTICS)
+    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_CU_BASE_SERVICES_DIAGNOSTICS=1)
 endif()
 
 if(MUC_OPCUA_CU_DYNAMIC_NODES)

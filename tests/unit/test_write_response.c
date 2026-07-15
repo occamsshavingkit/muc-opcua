@@ -49,7 +49,7 @@ void setUp(void) {}
 void tearDown(void) {}
 
 void test_write_response_encode_matches_fixture(void) {
-#ifdef MUC_OPCUA_CU_CORE_2017_ATTRIBUTE_WRITE
+#ifdef MUC_OPCUA_SERVICE_WRITE
     opcua_byte_t buf[FIXTURE_SIZE];
     mu_binary_writer_t w;
     mu_binary_writer_init(&w, buf, sizeof(buf));
@@ -58,6 +58,7 @@ void test_write_response_encode_matches_fixture(void) {
     header.timestamp = 0;
     header.request_handle = 1;
     header.service_result = MU_STATUS_GOOD;
+    header.return_diagnostics = 0u;
 
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_response_header_encode(&w, &header));
     TEST_ASSERT_EQUAL(RESPONSE_HEADER_SIZE, w.position);
@@ -75,7 +76,7 @@ void test_write_response_encode_matches_fixture(void) {
 }
 
 void test_write_response_fixture_decode_verify_fields(void) {
-#ifdef MUC_OPCUA_CU_CORE_2017_ATTRIBUTE_WRITE
+#ifdef MUC_OPCUA_SERVICE_WRITE
     FILE *f = fopen(FIXTURE_PATH, "rb");
     TEST_ASSERT_NOT_NULL(f);
     opcua_byte_t file_buf[FIXTURE_SIZE];
@@ -139,7 +140,7 @@ void test_write_response_fixture_decode_verify_fields(void) {
 }
 
 void test_write_response_encode_with_two_results(void) {
-#ifdef MUC_OPCUA_CU_CORE_2017_ATTRIBUTE_WRITE
+#ifdef MUC_OPCUA_SERVICE_WRITE
     opcua_byte_t buf[128];
     mu_binary_writer_t w;
     mu_binary_writer_init(&w, buf, sizeof(buf));
@@ -170,8 +171,48 @@ void test_write_response_encode_with_two_results(void) {
 #endif
 }
 
+void test_write_response_opc_cu_2936_preserves_statuscode_timestamp_operation_results(void) {
+#ifdef MUC_OPCUA_SERVICE_WRITE
+    /* SCN-002 / CASE-003 / opc_cu_2936: OPC-10000-4 section 5.11.4
+       WriteResponse preserves concrete operation-level StatusCodes for accepted/rejected
+       StatusCode and Timestamp write attempts. */
+    opcua_byte_t buf[128];
+    mu_binary_writer_t w;
+    mu_binary_writer_init(&w, buf, sizeof(buf));
+
+    opcua_statuscode_t results[] = {MU_STATUS_GOOD, MU_STATUS_BAD_WRITENOTSUPPORTED, MU_STATUS_BAD_NOTWRITABLE};
+    mu_write_response_t resp;
+    resp.num_results = 3;
+    resp.results = results;
+
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_write_response_encode(&w, &resp));
+
+    mu_binary_reader_t r;
+    mu_binary_reader_init(&r, buf, w.position);
+
+    opcua_int32_t count;
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_int32(&r, &count));
+    TEST_ASSERT_EQUAL(3, count);
+
+    opcua_statuscode_t accepted_status_timestamp;
+    opcua_statuscode_t rejected_index_range_status_timestamp;
+    opcua_statuscode_t rejected_attribute_status_timestamp;
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_statuscode(&r, &accepted_status_timestamp));
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, accepted_status_timestamp);
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_statuscode(&r, &rejected_index_range_status_timestamp));
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_BAD_WRITENOTSUPPORTED, rejected_index_range_status_timestamp);
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_statuscode(&r, &rejected_attribute_status_timestamp));
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_BAD_NOTWRITABLE, rejected_attribute_status_timestamp);
+
+    opcua_int32_t diag_count;
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_int32(&r, &diag_count));
+    TEST_ASSERT_EQUAL(-1, diag_count);
+    TEST_ASSERT_EQUAL_size_t(w.position, r.position);
+#endif
+}
+
 void test_write_response_decode_null_results(void) {
-#ifdef MUC_OPCUA_CU_CORE_2017_ATTRIBUTE_WRITE
+#ifdef MUC_OPCUA_SERVICE_WRITE
     opcua_byte_t buf[32];
     mu_binary_writer_t w;
     mu_binary_writer_init(&w, buf, sizeof(buf));
@@ -200,6 +241,7 @@ int main(void) {
     RUN_TEST(test_write_response_encode_matches_fixture);
     RUN_TEST(test_write_response_fixture_decode_verify_fields);
     RUN_TEST(test_write_response_encode_with_two_results);
+    RUN_TEST(test_write_response_opc_cu_2936_preserves_statuscode_timestamp_operation_results);
     RUN_TEST(test_write_response_decode_null_results);
     return UNITY_END();
 }

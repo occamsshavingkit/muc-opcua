@@ -23,7 +23,9 @@ typedef struct {
     opcua_datetime_t timestamp;
     opcua_uint32_t request_handle;
     opcua_statuscode_t service_result;
-    /* serviceDiagnostics, stringTable, additionalHeader are emitted empty/null */
+    opcua_uint32_t return_diagnostics;
+    /* stringTable and additionalHeader are emitted null. serviceDiagnostics is
+       emitted only for the Base Services Diagnostics CU. */
 } mu_response_header_t;
 
 opcua_statuscode_t mu_request_header_decode(mu_binary_reader_t *reader, mu_request_header_t *header);

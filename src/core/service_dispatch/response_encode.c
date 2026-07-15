@@ -9,6 +9,18 @@ static opcua_datetime_t resolve_timestamp(const mu_server_t *server) {
 }
 #endif
 
+#if defined(MUC_OPCUA_CU_BASE_SERVICES_DIAGNOSTICS) && MUC_OPCUA_CU_BASE_SERVICES_DIAGNOSTICS
+static opcua_uint32_t g_return_diagnostics;
+
+void mu_response_diagnostics_set_current(opcua_uint32_t return_diagnostics) {
+    g_return_diagnostics = return_diagnostics;
+}
+
+opcua_uint32_t mu_response_diagnostics_current(void) {
+    return g_return_diagnostics;
+}
+#endif
+
 opcua_statuscode_t write_response_prefix(mu_binary_writer_t *w, opcua_uint32_t response_type_id,
                                          opcua_uint32_t request_handle, opcua_statuscode_t service_result
 #ifdef MUC_OPCUA_CU_TIME_SYNC
@@ -30,6 +42,11 @@ opcua_statuscode_t write_response_prefix(mu_binary_writer_t *w, opcua_uint32_t r
 #endif
     rh.request_handle = request_handle;
     rh.service_result = service_result;
+#if defined(MUC_OPCUA_CU_BASE_SERVICES_DIAGNOSTICS) && MUC_OPCUA_CU_BASE_SERVICES_DIAGNOSTICS
+    rh.return_diagnostics = mu_response_diagnostics_current();
+#else
+    rh.return_diagnostics = 0u;
+#endif
     return mu_response_header_encode(w, &rh);
 }
 
@@ -61,6 +78,11 @@ opcua_statuscode_t mu_write_service_fault(opcua_byte_t *buffer, size_t *length, 
 #endif
     rh.request_handle = request_handle;
     rh.service_result = service_result;
+#if defined(MUC_OPCUA_CU_BASE_SERVICES_DIAGNOSTICS) && MUC_OPCUA_CU_BASE_SERVICES_DIAGNOSTICS
+    rh.return_diagnostics = mu_response_diagnostics_current();
+#else
+    rh.return_diagnostics = 0u;
+#endif
     s = mu_response_header_encode(&w, &rh);
     if (s != MU_STATUS_GOOD) {
         return s;

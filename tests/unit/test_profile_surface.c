@@ -27,6 +27,118 @@
 void setUp(void) {}
 void tearDown(void) {}
 
+/* --- T009: Nano/default and optional service CU profile surface fixtures --- */
+
+#if defined(MUC_OPCUA_PROFILE_NANO_EMBEDDED_DEVICE_2025_SERVER) && MUC_OPCUA_PROFILE_NANO_EMBEDDED_DEVICE_2025_SERVER
+#define PROFILE_SURFACE_IS_NANO_DEFAULT 1
+#else
+#define PROFILE_SURFACE_IS_NANO_DEFAULT 0
+#endif
+
+#if defined(MUC_OPCUA_PROFILE_CUSTOM) && MUC_OPCUA_PROFILE_CUSTOM
+#define PROFILE_SURFACE_IS_CUSTOM 1
+#else
+#define PROFILE_SURFACE_IS_CUSTOM 0
+#endif
+
+#if defined(MUC_OPCUA_CU_DISCOVERY_FIND_SERVERS_SELF_GET_ENDPOINTS) &&                                                 \
+    MUC_OPCUA_CU_DISCOVERY_FIND_SERVERS_SELF_GET_ENDPOINTS
+#define PROFILE_SURFACE_HAS_DISCOVERY_AGGREGATE 1
+#else
+#define PROFILE_SURFACE_HAS_DISCOVERY_AGGREGATE 0
+#endif
+
+#if defined(MUC_OPCUA_CU_VIEW_BASIC_TRANSLATEBROWSEPATH) && MUC_OPCUA_CU_VIEW_BASIC_TRANSLATEBROWSEPATH
+#define PROFILE_SURFACE_HAS_VIEW_AGGREGATE 1
+#else
+#define PROFILE_SURFACE_HAS_VIEW_AGGREGATE 0
+#endif
+
+#if defined(MUC_OPCUA_CU_CORE_2017_ATTRIBUTE_WRITE) && MUC_OPCUA_CU_CORE_2017_ATTRIBUTE_WRITE
+#define PROFILE_SURFACE_HAS_WRITE_AGGREGATE 1
+#else
+#define PROFILE_SURFACE_HAS_WRITE_AGGREGATE 0
+#endif
+
+#if defined(MUC_OPCUA_CU_BASE_INFO_DIAGNOSTICS) && MUC_OPCUA_CU_BASE_INFO_DIAGNOSTICS
+#define PROFILE_SURFACE_HAS_BASE_INFO_DIAGNOSTICS_CU 1
+#else
+#define PROFILE_SURFACE_HAS_BASE_INFO_DIAGNOSTICS_CU 0
+#endif
+
+#if defined(MUC_OPCUA_CU_DIAGNOSTICS) && MUC_OPCUA_CU_DIAGNOSTICS
+#define PROFILE_SURFACE_HAS_DIAGNOSTICS_AGGREGATE 1
+#else
+#define PROFILE_SURFACE_HAS_DIAGNOSTICS_AGGREGATE 0
+#endif
+
+/* ActivateSession change-user has no current aggregate or dedicated CU symbol.
+   T030 adds the real in-scope symbol; until then, this local fixture documents
+   that the optional CU is not claimed by any profile-surface assertion here. */
+#define PROFILE_SURFACE_HAS_CHANGE_USER_OPTIONAL_CU 0
+
+static void assert_cu_surface_enabled(const char *symbol_name, int enabled) {
+    TEST_ASSERT_TRUE_MESSAGE(enabled, symbol_name);
+}
+
+static void assert_cu_surface_disabled(const char *symbol_name, int enabled) {
+    TEST_ASSERT_FALSE_MESSAGE(enabled, symbol_name);
+}
+
+void test_nano_default_service_surface_keeps_mandatory_discovery_and_view(void) {
+    /* SCN-001 / CASE-010 / quickstart path 4: current nano/default profile
+       evidence is intentionally bound to existing aggregate symbols. Dedicated
+       in-scope Discovery/View CU symbols are introduced later by T018. */
+    if (PROFILE_SURFACE_IS_CUSTOM) {
+        TEST_PASS_MESSAGE("custom profile may intentionally override the nano/default service surface");
+        return;
+    }
+
+    assert_cu_surface_enabled("MUC_OPCUA_CU_DISCOVERY_FIND_SERVERS_SELF_GET_ENDPOINTS",
+                              PROFILE_SURFACE_HAS_DISCOVERY_AGGREGATE);
+    assert_cu_surface_enabled("MUC_OPCUA_CU_VIEW_BASIC_TRANSLATEBROWSEPATH", PROFILE_SURFACE_HAS_VIEW_AGGREGATE);
+}
+
+void test_nano_default_service_surface_does_not_claim_optional_cus(void) {
+    /* SCN-001 / CASE-010 / quickstart path 4: nano must not grow optional
+       Write, change-user Session, or Diagnostics claims while T009 is only
+       adding profile-surface coverage. T030/T038 promote dedicated symbols. */
+    if (!PROFILE_SURFACE_IS_NANO_DEFAULT) {
+        TEST_PASS_MESSAGE("optional nano-default absence is asserted only in nano/default builds");
+        return;
+    }
+
+    assert_cu_surface_disabled("MUC_OPCUA_CU_CORE_2017_ATTRIBUTE_WRITE", PROFILE_SURFACE_HAS_WRITE_AGGREGATE);
+    assert_cu_surface_disabled("ActivateSession change-user optional CU", PROFILE_SURFACE_HAS_CHANGE_USER_OPTIONAL_CU);
+    assert_cu_surface_disabled("MUC_OPCUA_CU_BASE_INFO_DIAGNOSTICS", PROFILE_SURFACE_HAS_BASE_INFO_DIAGNOSTICS_CU);
+}
+
+void test_optional_service_surface_tracks_current_compile_time_gates(void) {
+    /* CASE-010 / quickstart path 4: optional Write and Diagnostics coverage is
+       tied to the current aggregate gates, not to future dedicated in-scope CU
+       symbols. This keeps T009 foundational and avoids promotion by test name. */
+#if PROFILE_SURFACE_HAS_WRITE_AGGREGATE
+    assert_cu_surface_enabled("MUC_OPCUA_CU_CORE_2017_ATTRIBUTE_WRITE", PROFILE_SURFACE_HAS_WRITE_AGGREGATE);
+#else
+    assert_cu_surface_disabled("MUC_OPCUA_CU_CORE_2017_ATTRIBUTE_WRITE", PROFILE_SURFACE_HAS_WRITE_AGGREGATE);
+#endif
+
+#if PROFILE_SURFACE_HAS_BASE_INFO_DIAGNOSTICS_CU
+    assert_cu_surface_enabled("MUC_OPCUA_CU_BASE_INFO_DIAGNOSTICS", PROFILE_SURFACE_HAS_BASE_INFO_DIAGNOSTICS_CU);
+#else
+    assert_cu_surface_disabled("MUC_OPCUA_CU_BASE_INFO_DIAGNOSTICS", PROFILE_SURFACE_HAS_BASE_INFO_DIAGNOSTICS_CU);
+#endif
+}
+
+void test_disabled_base_info_diagnostics_does_not_claim_legacy_aggregate(void) {
+    if (PROFILE_SURFACE_HAS_BASE_INFO_DIAGNOSTICS_CU) {
+        TEST_PASS_MESSAGE("CU 3192 diagnostics surface is enabled by the dedicated symbol");
+        return;
+    }
+
+    assert_cu_surface_disabled("legacy MUC_OPCUA_CU_DIAGNOSTICS aggregate", PROFILE_SURFACE_HAS_DIAGNOSTICS_AGGREGATE);
+}
+
 /* --- T015: Base Information node presence tracks the build ---------------- */
 
 #if defined(MUC_OPCUA_FACET_CORE_2022_SERVER) && MUC_OPCUA_FACET_CORE_2022_SERVER
@@ -115,6 +227,10 @@ void test_register_nodes_support_matches_build(void) {
 
 int main(void) {
     UNITY_BEGIN();
+    RUN_TEST(test_nano_default_service_surface_keeps_mandatory_discovery_and_view);
+    RUN_TEST(test_nano_default_service_surface_does_not_claim_optional_cus);
+    RUN_TEST(test_optional_service_surface_tracks_current_compile_time_gates);
+    RUN_TEST(test_disabled_base_info_diagnostics_does_not_claim_legacy_aggregate);
 #if defined(MUC_OPCUA_FACET_CORE_2022_SERVER) && MUC_OPCUA_FACET_CORE_2022_SERVER
     RUN_TEST(test_base_info_nodes_present_when_built);
     RUN_TEST(test_claimed_cu_nodes_present_when_enabled);

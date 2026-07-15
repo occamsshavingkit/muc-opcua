@@ -9,16 +9,49 @@ void tearDown(void) {}
 
 #include "../../src/core/server_internal.h"
 #include "../../src/core/service_dispatch.h"
+#include "../../src/services/discovery.h"
 #include "../../src/services/service_header.h"
 #include <string.h>
+
+#define TEST_ENDPOINT_URL "opc.tcp://localhost:4840"
+#define TEST_APPLICATION_URI "urn:test:app"
+#define TEST_PRODUCT_URI "urn:test:product"
+#define TEST_APPLICATION_NAME "Test Server"
+#define TEST_SECURITY_POLICY_NONE_URI "http://opcfoundation.org/UA/SecurityPolicy#None"
+#define TEST_UATCP_UASC_UABINARY_PROFILE_URI "http://opcfoundation.org/UA-Profile/Transport/uatcp-uasc-uabinary"
+
+typedef struct parsed_endpoint {
+    mu_string_t endpoint_url;
+    mu_string_t server_application_uri;
+    mu_string_t server_product_uri;
+    opcua_byte_t application_name_mask;
+    mu_string_t application_name_locale;
+    mu_string_t application_name_text;
+    opcua_uint32_t application_type;
+    mu_string_t gateway_server_uri;
+    mu_string_t discovery_profile_uri;
+    opcua_int32_t discovery_url_count;
+    mu_string_t discovery_url;
+    mu_string_t server_certificate;
+    opcua_uint32_t security_mode;
+    mu_string_t security_policy_uri;
+    opcua_int32_t user_identity_token_count;
+    mu_string_t token_policy_id;
+    opcua_uint32_t token_type;
+    mu_string_t token_issued_token_type;
+    mu_string_t token_issuer_endpoint_url;
+    mu_string_t token_security_policy_uri;
+    mu_string_t transport_profile_uri;
+    opcua_byte_t security_level;
+} parsed_endpoint_t;
 
 static void discovery_server(mu_server_t *server) {
     (void)memset(server, 0, sizeof(*server));
     server->secure_channel.is_open = true; /* channel open, no session */
-    server->config.endpoint_url = "opc.tcp://localhost:4840";
-    server->config.application_uri = "urn:test:app";
-    server->config.product_uri = "urn:test:product";
-    server->config.application_name = "Test Server";
+    server->config.endpoint_url = TEST_ENDPOINT_URL;
+    server->config.application_uri = TEST_APPLICATION_URI;
+    server->config.product_uri = TEST_PRODUCT_URI;
+    server->config.application_name = TEST_APPLICATION_NAME;
 }
 
 /* FindServers requires RequestHeader plus endpointUrl, localeIds[], serverUris[],
@@ -149,6 +182,109 @@ static void assert_string_equal_cstr(const mu_string_t *actual, const char *expe
     }
 }
 
+static void assert_null_string(const mu_string_t *actual) {
+    TEST_ASSERT_NOT_NULL(actual);
+    TEST_ASSERT_EQUAL_INT32(-1, actual->length);
+}
+
+static void read_getendpoints_response_header(mu_binary_reader_t *r, const opcua_byte_t *resp, size_t len,
+                                              opcua_int32_t *endpoint_array_count) {
+    mu_binary_reader_init(r, resp, len);
+    mu_nodeid_t type;
+    opcua_int64_t ts;
+    opcua_uint32_t handle;
+    opcua_statuscode_t result;
+    opcua_byte_t diag;
+    opcua_int32_t string_table_len;
+    mu_nodeid_t additional_header;
+    opcua_byte_t additional_encoding;
+
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_nodeid(r, &type));
+    TEST_ASSERT_EQUAL(MU_ID_GETENDPOINTSRESPONSE, type.identifier.numeric);
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_int64(r, &ts));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_uint32(r, &handle));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_statuscode(r, &result));
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, result);
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_byte(r, &diag));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_int32(r, &string_table_len));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_nodeid(r, &additional_header));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_byte(r, &additional_encoding));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_int32(r, endpoint_array_count));
+
+    (void)ts;
+    (void)handle;
+    (void)diag;
+    (void)string_table_len;
+    (void)additional_header;
+    (void)additional_encoding;
+}
+
+static void read_first_endpoint(const opcua_byte_t *resp, size_t len, opcua_int32_t expected_count,
+                                parsed_endpoint_t *endpoint) {
+    mu_binary_reader_t r;
+    opcua_int32_t count;
+
+    (void)memset(endpoint, 0, sizeof(*endpoint));
+    endpoint->application_name_locale = (mu_string_t){-1, NULL};
+
+    read_getendpoints_response_header(&r, resp, len, &count);
+    TEST_ASSERT_EQUAL_INT32(expected_count, count);
+    TEST_ASSERT_GREATER_THAN_INT32(0, count);
+
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_string(&r, &endpoint->endpoint_url));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_string(&r, &endpoint->server_application_uri));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_string(&r, &endpoint->server_product_uri));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_byte(&r, &endpoint->application_name_mask));
+    if ((endpoint->application_name_mask & 0x01u) != 0u) {
+        TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_string(&r, &endpoint->application_name_locale));
+    }
+    if ((endpoint->application_name_mask & 0x02u) != 0u) {
+        TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_string(&r, &endpoint->application_name_text));
+    }
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_uint32(&r, &endpoint->application_type));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_string(&r, &endpoint->gateway_server_uri));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_string(&r, &endpoint->discovery_profile_uri));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_int32(&r, &endpoint->discovery_url_count));
+    TEST_ASSERT_EQUAL_INT32(1, endpoint->discovery_url_count);
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_string(&r, &endpoint->discovery_url));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_string(&r, &endpoint->server_certificate));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_uint32(&r, &endpoint->security_mode));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_string(&r, &endpoint->security_policy_uri));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_int32(&r, &endpoint->user_identity_token_count));
+    TEST_ASSERT_EQUAL_INT32(1, endpoint->user_identity_token_count);
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_string(&r, &endpoint->token_policy_id));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_uint32(&r, &endpoint->token_type));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_string(&r, &endpoint->token_issued_token_type));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_string(&r, &endpoint->token_issuer_endpoint_url));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_string(&r, &endpoint->token_security_policy_uri));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_string(&r, &endpoint->transport_profile_uri));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_byte(&r, &endpoint->security_level));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, r.status);
+    TEST_ASSERT_EQUAL_size_t(len, r.position);
+}
+
+static void assert_local_none_endpoint(const parsed_endpoint_t *endpoint) {
+    assert_string_equal_cstr(&endpoint->endpoint_url, TEST_ENDPOINT_URL);
+    assert_string_equal_cstr(&endpoint->server_application_uri, TEST_APPLICATION_URI);
+    assert_string_equal_cstr(&endpoint->server_product_uri, TEST_PRODUCT_URI);
+    TEST_ASSERT_EQUAL_UINT8(0x02u, endpoint->application_name_mask);
+    assert_string_equal_cstr(&endpoint->application_name_text, TEST_APPLICATION_NAME);
+    TEST_ASSERT_EQUAL_UINT32(MU_APPLICATION_TYPE_SERVER, endpoint->application_type);
+    assert_null_string(&endpoint->gateway_server_uri);
+    assert_null_string(&endpoint->discovery_profile_uri);
+    assert_string_equal_cstr(&endpoint->discovery_url, TEST_ENDPOINT_URL);
+    assert_null_string(&endpoint->server_certificate);
+    TEST_ASSERT_EQUAL_UINT32(MU_MESSAGE_SECURITY_MODE_NONE, endpoint->security_mode);
+    assert_string_equal_cstr(&endpoint->security_policy_uri, TEST_SECURITY_POLICY_NONE_URI);
+    assert_string_equal_cstr(&endpoint->token_policy_id, "anonymous");
+    TEST_ASSERT_EQUAL_UINT32(MU_USER_TOKEN_TYPE_ANONYMOUS, endpoint->token_type);
+    assert_null_string(&endpoint->token_issued_token_type);
+    assert_null_string(&endpoint->token_issuer_endpoint_url);
+    assert_null_string(&endpoint->token_security_policy_uri);
+    assert_string_equal_cstr(&endpoint->transport_profile_uri, TEST_UATCP_UASC_UABINARY_PROFILE_URI);
+    TEST_ASSERT_EQUAL_UINT8(0u, endpoint->security_level);
+}
+
 static void read_getendpoints_first_application_name(const opcua_byte_t *resp, size_t len,
                                                      opcua_byte_t *localized_text_mask, mu_string_t *locale,
                                                      mu_string_t *text) {
@@ -232,26 +368,30 @@ void test_getendpoints_no_session(void) {
     TEST_ASSERT_EQUAL(MU_ID_GETENDPOINTSRESPONSE, response_type(resp, resp_len));
 }
 
-void test_getendpoints_profile_uri_match_returns_endpoint(void) {
-    /* OPC-10000-4 §5.5.4.2: profileUris[] lists transport profiles that the
-       returned endpoints shall support. */
+void test_getendpoints_scn001_case001_opc_cu_2328_profile_uri_match_returns_local_endpoint_details(void) {
+    /* SCN-001 / CASE-001 / opc_cu_2328: OPC-10000-4 sections 5.5.1 and
+       5.5.4.2 require GetEndpoints to return endpoints that support a matching
+       profileUris[] transport profile. */
     mu_server_t server;
     discovery_server(&server);
 
     opcua_byte_t req[256];
-    size_t req_len = build_getendpoints_request(req, sizeof(req),
-                                                "http://opcfoundation.org/UA-Profile/Transport/uatcp-uasc-uabinary");
+    size_t req_len = build_getendpoints_request(req, sizeof(req), TEST_UATCP_UASC_UABINARY_PROFILE_URI);
     opcua_byte_t resp[1024];
     size_t resp_len = sizeof(resp);
 
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD,
                       mu_service_dispatch(&server, MU_ID_GETENDPOINTSREQUEST, req, req_len, resp, &resp_len));
-    TEST_ASSERT_GREATER_THAN_INT32(0, endpoint_count(resp, resp_len));
+
+    parsed_endpoint_t endpoint;
+    read_first_endpoint(resp, resp_len, 1, &endpoint);
+    assert_local_none_endpoint(&endpoint);
 }
 
-void test_getendpoints_profile_uri_mismatch_returns_empty_array(void) {
-    /* OPC-10000-4 §5.5.4.2: a non-empty unmatched profileUris[] filter succeeds
-       with no returned endpoints. */
+void test_getendpoints_scn001_case001_opc_cu_2328_profile_uri_mismatch_returns_empty_array(void) {
+    /* SCN-001 / CASE-001 / opc_cu_2328: OPC-10000-4 section 5.5.4.2 filters
+       by profileUris[]; an unmatched filter returns an empty Endpoints[] with
+       a Good service result, not a service error. */
     mu_server_t server;
     discovery_server(&server);
 
@@ -266,7 +406,27 @@ void test_getendpoints_profile_uri_mismatch_returns_empty_array(void) {
     TEST_ASSERT_EQUAL_INT32(0, endpoint_count(resp, resp_len));
 }
 
-void test_getendpoints_endpoint_url_filter_excludes_nonmatching_endpoint(void) {
+void test_getendpoints_scn001_case001_opc_cu_2328_endpoint_url_match_returns_exactly_local_endpoint(void) {
+    /* SCN-001 / CASE-001 / opc_cu_2328: OPC-10000-4 sections 5.5.1 and
+       5.5.4.2 require a matching endpointUrl filter to return the local
+       EndpointDescription. */
+    mu_server_t server;
+    discovery_server(&server);
+
+    opcua_byte_t req[256];
+    size_t req_len = build_getendpoints_request_with_endpoint_url(req, sizeof(req), TEST_ENDPOINT_URL, NULL);
+    opcua_byte_t resp[1024];
+    size_t resp_len = sizeof(resp);
+
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD,
+                      mu_service_dispatch(&server, MU_ID_GETENDPOINTSREQUEST, req, req_len, resp, &resp_len));
+
+    parsed_endpoint_t endpoint;
+    read_first_endpoint(resp, resp_len, 1, &endpoint);
+    assert_local_none_endpoint(&endpoint);
+}
+
+void test_getendpoints_scn001_case001_opc_cu_2328_endpoint_url_filter_excludes_nonmatching_endpoint(void) {
     mu_server_t server;
     discovery_server(&server);
 
@@ -278,9 +438,30 @@ void test_getendpoints_endpoint_url_filter_excludes_nonmatching_endpoint(void) {
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD,
                       mu_service_dispatch(&server, MU_ID_GETENDPOINTSREQUEST, req, req_len, resp, &resp_len));
 
-    /* OPC-10000-4 section 5.5.4.2 defines endpointUrl as a GetEndpoints
-       request filter; a nonmatching URL excludes endpoints from Endpoints[]. */
+    /* SCN-001 / CASE-001 / opc_cu_2328: OPC-10000-4 section 5.5.4.2 defines
+       endpointUrl as a GetEndpoints request filter; a nonmatching URL excludes
+       endpoints from Endpoints[] without changing the Good service result. */
     TEST_ASSERT_EQUAL_INT32(0, endpoint_count(resp, resp_len));
+}
+
+void test_getendpoints_scn001_case001_opc_cu_2328_endpoint_url_and_profile_uri_match_returns_one_local_endpoint(void) {
+    /* SCN-001 / CASE-001 / opc_cu_2328: OPC-10000-4 section 5.5.4.2 filters
+       endpointUrl and profileUris[] together before returning Endpoints[]. */
+    mu_server_t server;
+    discovery_server(&server);
+
+    opcua_byte_t req[256];
+    size_t req_len = build_getendpoints_request_with_endpoint_url(req, sizeof(req), TEST_ENDPOINT_URL,
+                                                                  TEST_UATCP_UASC_UABINARY_PROFILE_URI);
+    opcua_byte_t resp[1024];
+    size_t resp_len = sizeof(resp);
+
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD,
+                      mu_service_dispatch(&server, MU_ID_GETENDPOINTSREQUEST, req, req_len, resp, &resp_len));
+
+    parsed_endpoint_t endpoint;
+    read_first_endpoint(resp, resp_len, 1, &endpoint);
+    assert_local_none_endpoint(&endpoint);
 }
 
 void test_getendpoints_locale_filter_returns_server_application_name_in_requested_locale(void) {
@@ -311,9 +492,12 @@ int main(void) {
     UNITY_BEGIN();
     RUN_TEST(test_findservers_no_session);
     RUN_TEST(test_getendpoints_no_session);
-    RUN_TEST(test_getendpoints_profile_uri_match_returns_endpoint);
-    RUN_TEST(test_getendpoints_profile_uri_mismatch_returns_empty_array);
-    RUN_TEST(test_getendpoints_endpoint_url_filter_excludes_nonmatching_endpoint);
+    RUN_TEST(test_getendpoints_scn001_case001_opc_cu_2328_profile_uri_match_returns_local_endpoint_details);
+    RUN_TEST(test_getendpoints_scn001_case001_opc_cu_2328_profile_uri_mismatch_returns_empty_array);
+    RUN_TEST(test_getendpoints_scn001_case001_opc_cu_2328_endpoint_url_match_returns_exactly_local_endpoint);
+    RUN_TEST(test_getendpoints_scn001_case001_opc_cu_2328_endpoint_url_filter_excludes_nonmatching_endpoint);
+    RUN_TEST(
+        test_getendpoints_scn001_case001_opc_cu_2328_endpoint_url_and_profile_uri_match_returns_one_local_endpoint);
     RUN_TEST(test_getendpoints_locale_filter_returns_server_application_name_in_requested_locale);
     return UNITY_END();
 }

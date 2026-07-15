@@ -2,7 +2,7 @@
  * GetEndpoints service handler (OPC-10000-4 5.5.4.2). */
 #include "core/dispatch_discovery/common.h"
 
-#ifdef MUC_OPCUA_CU_DISCOVERY_FIND_SERVERS_SELF_GET_ENDPOINTS
+#ifdef MUC_OPCUA_CU_DISCOVERY_GET_ENDPOINTS
 
 static bool getendpoints_endpoint_matches(const mu_string_t *endpoint_url, const mu_endpoint_description_t *endpoint) {
     if (endpoint_url == NULL || endpoint_url->length <= 0) {
@@ -226,4 +226,4 @@ opcua_statuscode_t handle_get_endpoints(mu_server_t *server, mu_binary_reader_t 
     return MU_STATUS_GOOD;
 }
 
-#endif /* MUC_OPCUA_CU_DISCOVERY_FIND_SERVERS_SELF_GET_ENDPOINTS */
+#endif /* MUC_OPCUA_CU_DISCOVERY_GET_ENDPOINTS */

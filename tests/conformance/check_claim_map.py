@@ -19,6 +19,54 @@ import sys
 
 VALID_PROFILES = {"nano", "micro", "embedded", "standard", "full", "default", "custom"}
 PROFILE_ALIASES = {"default": "full", "custom": "full"}
+CLAIM_MAP_NAMED_PROFILES = {"nano", "micro", "embedded", "standard", "full"}
+
+
+IN_SCOPE_CU_PROFILE_DEFAULTS = {
+    "opc_cu_2317": {
+        "claim": "View TranslateBrowsePath",
+        "profiles": {"nano", "micro", "embedded", "standard", "full"},
+    },
+    "opc_cu_2328": {
+        "claim": "Discovery Get Endpoints",
+        "profiles": {"nano", "micro", "embedded", "standard", "full"},
+    },
+    "opc_cu_2352": {
+        "claim": "Discovery Find Servers Self",
+        "profiles": {"nano", "micro", "embedded", "standard", "full"},
+    },
+    "opc_cu_3530": {
+        "claim": "View Basic 2",
+        "profiles": {"nano", "micro", "embedded", "standard", "full"},
+    },
+    "opc_cu_2389": {
+        "claim": "Attribute Write Values",
+        "profiles": {"micro", "embedded", "standard", "full"},
+    },
+    "opc_cu_2400": {
+        "claim": "Session Change User",
+        "profiles": {"micro", "embedded", "standard", "full"},
+    },
+    "opc_cu_2936": {
+        "claim": "Attribute Write StatusCode & Timestamp",
+        "profiles": {"micro", "embedded", "standard", "full"},
+    },
+    "opc_cu_3147": {
+        "claim": "Attribute Write Index",
+        # IndexRange writes carry an array Value, which only decodes with heap.
+        # The strictly no-heap MCU tiers (nano/micro/embedded) cannot support it,
+        # so it is claimed only on the heap-capable standard/full tiers.
+        "profiles": {"standard", "full"},
+    },
+    "opc_cu_3192": {
+        "claim": "Base Info Diagnostics",
+        "profiles": {"micro", "embedded", "standard", "full"},
+    },
+    "opc_cu_3983": {
+        "claim": "Base Services Diagnostics",
+        "profiles": {"micro", "embedded", "standard", "full"},
+    },
+}
 
 
 def _parse_profiles(cell):
@@ -96,6 +144,50 @@ def find_gaps(rows, profile, registered):
     return gaps, applicable
 
 
+def _matches_in_scope_cu(claim, cu_id, expected_claim):
+    claim_lower = claim.lower()
+    return cu_id in claim_lower or claim_lower == expected_claim.lower()
+
+
+def _profile_default_profiles(profiles):
+    return {p.lower() for p in profiles if p.lower() in CLAIM_MAP_NAMED_PROFILES}
+
+
+def find_profile_default_gaps(rows):
+    """Return SCN-001/CASE-010 quickstart path 4 profile-default gaps.
+
+    T006 guard for the ten 071 in-scope CUs: when a generated claim-map row
+    names one of these CU ids or exact claim names, its profile column must
+    match the manifest-default expectation. This prevents later generated
+    artifacts from silently claiming optional write/session/diagnostics CUs for
+    nano or dropping nano-default Discovery/View CUs before profile gating runs.
+    The claim-map docs define "all" as the named profiles only; default/custom
+    aliases remain valid for CLI backing-test enforcement but are ignored here
+    because parsed rows no longer distinguish alias expansion from explicit text.
+    """
+    gaps = []
+    for claim, section, profiles, _backing in rows:
+        for cu_id, expected in IN_SCOPE_CU_PROFILE_DEFAULTS.items():
+            if not _matches_in_scope_cu(claim, cu_id, expected["claim"]):
+                continue
+            expected_profiles = expected["profiles"]
+            actual_profiles = _profile_default_profiles(profiles)
+            missing = sorted(expected_profiles - actual_profiles)
+            unexpected = sorted(actual_profiles - expected_profiles)
+            if missing or unexpected:
+                details = []
+                if missing:
+                    details.append(f"missing profile default(s): {', '.join(missing)}")
+                if unexpected:
+                    details.append(f"unexpected profile claim(s): {', '.join(unexpected)}")
+                gaps.append(
+                    f"  [{cu_id}] {expected['claim']} ({section}) — "
+                    + "; ".join(details)
+                )
+            break
+    return gaps
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--manifest", required=True)
@@ -116,18 +208,29 @@ def main():
 
     registered = registered_tests(args.build_dir)
     gaps, applicable = find_gaps(rows, profile, registered)
+    profile_default_gaps = find_profile_default_gaps(rows)
 
-    if gaps:
+    if gaps or profile_default_gaps:
+        if profile_default_gaps:
+            print(
+                "claim-map FAIL: in-scope CU profile defaults do not match "
+                "SCN-001 / CASE-010 / quickstart path 4 expectations:",
+                file=sys.stderr,
+            )
+            for g in profile_default_gaps:
+                print(g, file=sys.stderr)
+        if gaps:
+            print(
+                f"claim-map FAIL: {len(gaps)} claimed conformance unit(s) lack a "
+                f"profile-runnable backing test in profile '{profile}':",
+                file=sys.stderr,
+            )
+            for g in gaps:
+                print(g, file=sys.stderr)
         print(
-            f"claim-map FAIL: {len(gaps)} claimed conformance unit(s) lack a "
-            f"profile-runnable backing test in profile '{profile}':",
-            file=sys.stderr,
-        )
-        for g in gaps:
-            print(g, file=sys.stderr)
-        print(
-            "\nEach claim must have a test registered in this profile, or the "
-            "claim must be corrected (OPC-10000-7 §4.2/§4.3).",
+            "\nEach claim must have a test registered in this profile, and "
+            "in-scope CU profile defaults must match the manifest expectation "
+            "(OPC-10000-7 §4.2/§4.3).",
             file=sys.stderr,
         )
         return 1
