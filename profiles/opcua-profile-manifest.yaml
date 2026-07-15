@@ -288,7 +288,9 @@
       "opc_display_name": "Secure channel message crypto",
       "kconfig_symbol": "SECURE_CHANNEL_CRYPTO",
       "implementation_state": "implemented",
-      "depends_on": [],
+      "depends_on": [
+        "MUC_OPCUA_FACET_CORE_2022_SERVER"
+      ],
       "profile_defaults": {
         "nano": false,
         "micro": true,

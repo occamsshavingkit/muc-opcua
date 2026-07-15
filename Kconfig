@@ -1530,6 +1530,7 @@ config READ_CACHE
 
 config SECURE_CHANNEL_CRYPTO
 	bool "Secure channel message crypto"
+	depends on MUC_OPCUA_FACET_CORE_2022_SERVER
 	default y if MUC_OPCUA_INTERN_PROFILE_MICRO_EMBEDDED_DEVICE_2025_SERVER
 	help
 	  Implementation state: implemented.

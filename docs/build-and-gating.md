@@ -456,7 +456,7 @@ to refresh.
 | Kconfig | Item | State | nano | micro | embedded | standard | full | Depends on |
 |---------|------|-------|------|-------|----------|----------|------|------------|
 | READ_CACHE | read_cache | implemented |  |  |  |  |  |  |
-| SECURE_CHANNEL_CRYPTO | secure_channel_crypto | implemented |  | ✅ | ✅ | ✅ | ✅ |  |
+| SECURE_CHANNEL_CRYPTO | secure_channel_crypto | implemented |  | ✅ | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
 | MUC_OPCUA_FACET_CORE_2022_SERVER | opc_facet_1322 | deferred | ✅ | ✅ | ✅ | ✅ | ✅ |  |
 | MUC_OPCUA_CU_ADDRESS_SPACE_ADDIN_REFERENCE | opc_cu_2446 | claimed |  | ✅ | ✅ | ✅ | ✅ |  |
 | MUC_OPCUA_CU_ADDRESS_SPACE_ADDIN_DEFAULTINSTANCEBROWSENAME | opc_cu_2447 | claimed |  | ✅ | ✅ | ✅ | ✅ |  |
@@ -674,6 +674,7 @@ The following OPC items are tracked in the manifest but are NOT implemented. The
 | opc_cu_3201 |  | unimplemented | The Server supports custom types (i.e. types that are derived from well-known ObjectTypes, VariableTypes, ReferenceTypes or DataTypes). Supporting this ConformanceUnit requires that the custom types with their full inheritance tree are exposed in the AddressSpace. For each DataType having encoding information (Structured DataTypes) the Encoding Objects shall be exposed as well. For all Events supported by the Server, the EventType shall be exposed. (Documentation complete; no code change needed.) |
 | opc_cu_5814 |  | unimplemented | The Server supports being able to be configured for no application authentication, just User authentication and normal encryption/signing: – Configure Server to skip the trust check when validating certificates – Certificates are just used for message security (signing and encryption) – Users level is used for authentication (Documentation complete; no code change needed.) |
 <!-- END GENERATED MANIFEST TABLES -->
+
 
 
 

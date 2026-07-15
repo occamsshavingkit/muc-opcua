@@ -226,7 +226,13 @@ opcua_statuscode_t mu_discovery_get_endpoints(const mu_server_config_t *config, 
                            MU_STATUS_GOOD;
 
     const char *none_uri = mu_security_policy_uri(MU_SECURITY_POLICY_NONE_ID);
-#ifdef MUC_OPCUA_FACET_CORE_2022_SERVER
+    /* Advertise secured endpoints only when the secure-channel crypto is actually
+       compiled in (spec 072). Gating on the crypto gate rather than the facet
+       umbrella keeps the advertised endpoints consistent with what the build can
+       service: a crypto-gated build (e.g. nano) that is handed an external
+       crypto_adapter must still advertise SecurityPolicy None only, because the
+       chunk-crypto path is absent and would reject a secured OpenSecureChannel. */
+#ifdef MUC_OPCUA_SECURE_CHANNEL_CRYPTO
     const char *b256_uri = mu_security_policy_uri(MU_SECURITY_POLICY_BASIC256SHA256_ID);
     const char *aes128_uri = mu_security_policy_uri(MU_SECURITY_POLICY_AES128_SHA256_RSAOAEP_ID);
 #endif
@@ -234,7 +240,7 @@ opcua_statuscode_t mu_discovery_get_endpoints(const mu_server_config_t *config, 
 
     fill_endpoint(config, &eps[n++], MU_MESSAGE_SECURITY_MODE_NONE, none_uri, have_crypto ? cert : NULL,
                   have_crypto ? cert_len : 0, 0);
-#ifdef MUC_OPCUA_FACET_CORE_2022_SERVER
+#ifdef MUC_OPCUA_SECURE_CHANNEL_CRYPTO
     if (have_crypto) {
         if (n < max) {
             fill_endpoint(config, &eps[n++], MU_MESSAGE_SECURITY_MODE_SIGN, b256_uri, cert, cert_len, 1);
