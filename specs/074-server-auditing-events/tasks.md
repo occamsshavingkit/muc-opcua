@@ -28,11 +28,14 @@ carries only 5 base fields; full-field AuditEvents require extending it.*
 - [ ] T005a [US1] Extend `MU_EVENT_FIELD_*` (event_filter.h) with STATUS,
   ACTIONTIMESTAMP, SERVERID, CLIENTAUDITENTRYID, CLIENTUSERID, ATTRIBUTEID,
   OLDVALUE, NEWVALUE, SECURECHANNELID, SESSIONID.
-- [ ] T005b [US1] Extend `mu_event_notification_t` (types.h) with an audit payload
-  under `#if MUC_OPCUA_CU_AUDITING`: source_node, status, action_timestamp,
-  bounded inline strings (`MU_AUDIT_STR_MAX`) for server_id/client_user_id/
-  client_audit_entry_id/secure_channel_id, session_id, attribute_id, and a scalar
-  old/new value pair. Add `MU_AUDIT_STR_MAX` capacity.
+- [ ] T005b [US1] Shared static audit-payload pool (research.md Decision 7):
+  define `mu_audit_payload_t` (source_node, session_id, status, action_timestamp,
+  attribute_id, secure_channel_id, bounded inline client_user_id/audit_entry_id
+  `MU_AUDIT_STR_MAX`, scalar old/new); add `audit_pool[MU_MAX_AUDIT_PAYLOADS]` +
+  write index + sequence to `struct mu_server` (`#if MUC_OPCUA_CU_AUDITING`); add
+  a tiny `audit_ref` (uint8 index + uint32 sequence) to `mu_event_notification_t`
+  (`#if MUC_OPCUA_CU_AUDITING`). Add `MU_MAX_AUDIT_PAYLOADS` + `MU_AUDIT_STR_MAX`
+  capacities. Bump `MU_SERVER_STORAGE_BYTES` to cover the pool.
 - [ ] T005c [US1] RED unit test: SELECT of the new audit fields resolves the
   carried value (not Null); non-audit events still resolve base fields only.
 - [ ] T005d [US1] Extend the notification.c SELECT resolver with the new enum

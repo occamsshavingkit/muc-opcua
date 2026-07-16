@@ -117,25 +117,37 @@ model so AuditEvents carry and can SELECT their fields:
 3. notification.c SELECT resolver: add cases for the new enums.
 4. filter_reader.c SELECT parsing: map AuditEvent BrowseName paths to the enums.
 
-## Decision 7 — bounded capture (no-heap lifetime + RAM)
+## Decision 7 — bounded capture: shared static audit-payload pool (no-heap)
 
-The notification is **queued** (`queue[MU_MAX_EVENT_QUEUE_SIZE=8]` per
-subscription × `MU_INTERN_MAX_SUBSCRIPTIONS`) and delivered later in Publish, so
-any pointed-to data (request strings, write value arrays) is gone by delivery.
+The notification is **queued** (`queue[MU_MAX_EVENT_QUEUE_SIZE=8]` per subscription
+× `MU_INTERN_MAX_SUBSCRIPTIONS`, up to 100 on `full`) and delivered later in Publish,
+so pointed-to data is gone by delivery. Auditing defaults **on only for `full`**
+(constrained profiles: off → 0 cost).
 
-**Decision**:
+**Design finding**: embedding the audit fields in every queued
+`mu_event_notification_t` would add ~100–150 KB static RAM on `full` (payload ×
+8 × 100). Instead use a **shared static audit-payload pool** — no heap:
 
-- **Strings** (server_id, client_user_id, client_audit_entry_id, secure_channel_id):
-  bounded inline char buffers `[MU_AUDIT_STR_MAX]` copied at emit time; over-long
-  values truncated (documented). Sized small (e.g. 32-64B).
-- **Write old/new values**: capture **scalar** built-in values inline (small
-  fixed union); array/structured values are emitted Null with a documented
-  limitation (a scalar-write audit is the common CTT case). Avoids unbounded copy.
-- **RAM cost**: the audit payload enlarges the queued notification. Cost =
-  `delta * 8 * MU_INTERN_MAX_SUBSCRIPTIONS`, paid **only** on auditing-enabled
-  profiles. Must be measured (SC-003) and may motivate a smaller audit-profile
-  `MU_MAX_EVENT_QUEUE_SIZE` or subscription cap. **This is the dominant cost of
-  the full-field path and the reason it is materially larger than base-only.**
+- `struct mu_server` gains (under `#if MUC_OPCUA_CU_AUDITING`) a fixed ring
+  `mu_audit_payload_t audit_pool[MU_MAX_AUDIT_PAYLOADS]` (compile-time constant,
+  e.g. 16) + a write index and a monotonically increasing sequence counter.
+  Total ~`sizeof(payload) * 16` (~2–4 KB), **not** multiplied by queue × subs.
+- Each queued `mu_event_notification_t` carries a tiny `audit_ref` (`uint8_t`
+  index + `uint32_t` sequence) under `#if MUC_OPCUA_CU_AUDITING` — a few bytes ×
+  800 slots (~few KB) rather than ~100 KB.
+- The audit→event adapter stores the payload in the next ring slot (stamping its
+  sequence) and sets the event's `audit_ref`.
+- The SELECT resolver (has `server`) looks up `server->audit_pool[ref.index]`; if
+  `slot.sequence != ref.sequence` (ring wrapped past it) the audit fields resolve
+  to **Null** — the same graceful degradation as event-queue overflow.
+- **Payload fields** (bounded): source_node, session_id (nodeids), status,
+  action_timestamp, attribute_id, secure_channel_id (uint32, formatted on
+  resolve), bounded inline strings (`MU_AUDIT_STR_MAX`, e.g. 32) for
+  client_user_id / client_audit_entry_id, and **scalar** old/new values
+  (arrays/structs → Null, documented). server_id resolves from a server-wide
+  static (not per-event).
+- **RAM cost**: ~2–4 KB pool + a few KB of refs, on `full`/auditing only;
+  measured (SC-003). ~30× smaller than enlarge-struct.
 
 ## Decision 8 — WHERE over audit fields
 

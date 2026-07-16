@@ -34,13 +34,12 @@ the event-field model — the RAM cost below is now the dominant cost.*
 `MU_EVENT_FIELD_*` SELECT-resolver cases + filter-parser mappings, 4 emission
 sites, EventNotifier read case, Server node bit. Estimated ~1–2 KB, **only** when
 `MUC_OPCUA_CU_AUDITING` on; **0** otherwise (compiles out).
-**RAM Impact**: **the material cost.** The audit payload enlarges the queued
-`mu_event_notification_t` (bounded inline strings `MU_AUDIT_STR_MAX` + scalar
-old/new), multiplied by `MU_MAX_EVENT_QUEUE_SIZE (8) * MU_INTERN_MAX_SUBSCRIPTIONS`
-(up to 50–100). The audit payload is under `#if MUC_OPCUA_CU_AUDITING` so
-non-auditing profiles pay **0**; auditing profiles pay `delta * 8 * subs`, to be
-**measured** (SC-003) — may motivate a smaller audit-profile event-queue size or
-subscription cap.
+**RAM Impact**: bounded via a **shared static audit-payload pool** (research.md
+Decision 7, revised): `struct mu_server` gains a fixed ring
+`audit_pool[MU_MAX_AUDIT_PAYLOADS≈16]` (~2–4 KB, no heap) referenced by a tiny
+per-event `audit_ref` (index+sequence). ~**30× smaller** than embedding the
+payload in every queued event (~4 KB vs ~100–150 KB on `full`). All under
+`#if MUC_OPCUA_CU_AUDITING`; non-auditing profiles pay **0**. Measured (SC-003).
 **Heap Use**: none (bounded inline capture; scalar write values only, arrays→Null).
 **Static Tables Added**: none.
 **Transport Buffers**: unchanged.
