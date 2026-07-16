@@ -396,6 +396,19 @@ opcua_statuscode_t handle_create_session(mu_server_t *server, mu_binary_reader_t
        ServerDiagnosticsSummary current/cumulatedSessionCount (OPC-10000-5 §12.9). */
     mu_diagnostics_session_created(server);
 
+#if MUC_OPCUA_CU_AUDITING
+    /* spec 074: emit an AuditCreateSessionEvent (i=2071) for the successful
+       CreateSession (OPC-10000-5 §6.4.8). No-op unless auditing is enabled. */
+    {
+        mu_audit_event_t audit_ev;
+        (void)memset(&audit_ev, 0, sizeof(audit_ev));
+        audit_ev.event_type = MU_AUDIT_EVENT_CREATE_SESSION;
+        audit_ev.status = true;
+        audit_ev.specific.create_session.session_id = sid;
+        mu_raise_audit_event(server, &audit_ev);
+    }
+#endif
+
     *response_length = w->position;
     return MU_STATUS_GOOD;
 

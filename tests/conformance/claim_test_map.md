@@ -46,7 +46,7 @@ Backing test column: comma-separated ctest names (as registered).
 | Core 2022 Server Facet | OPC-10000-4 §5.14.7 | full | test_transfer_subscriptions |
 | Core 2022 Server Facet | OPC-10000-5 §6.3 | full | test_diagnostics |
 | Core 2022 Server Facet | OPC-10000-6 | full | test_complex_types |
-| Core 2022 Server Facet | OPC-10000-4 §7.x | full | test_audit_events |
+| Core 2022 Server Facet | OPC-10000-4 §7.x | full | test_audit_events, test_event_notifications |
 | Core 2022 Server Facet | OPC-10000-3 | full | test_address_space_dynamic |
 | Core 2022 Server Facet | OPC-10000-6 | full | test_message_chunk_errors |
 | Core 2022 Server Facet | OPC-10000-4 | micro, embedded, standard, full | test_base_server_behaviour |

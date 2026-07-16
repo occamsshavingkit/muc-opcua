@@ -1,5 +1,5 @@
 <!-- SPECKIT START -->
 For additional context about technologies to be used, project structure,
 shell commands, and other important information, read the current plan:
-specs/072-nano-securitypolicy-none-gating/plan.md
+specs/074-server-auditing-events/plan.md
 <!-- SPECKIT END -->

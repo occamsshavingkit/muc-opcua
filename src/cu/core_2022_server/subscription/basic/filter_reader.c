@@ -281,6 +281,19 @@ mu_event_field_t mu_event_field_from_name(const mu_string_t *name) {
         {"LocalTime", 9, MU_EVENT_FIELD_LOCALTIME},
         {"Message", 7, MU_EVENT_FIELD_MESSAGE},
         {"Severity", 8, MU_EVENT_FIELD_SEVERITY},
+#if MUC_OPCUA_CU_AUDITING
+        /* AuditEventType + subtype fields (spec 074; OPC-10000-5 §6.4). */
+        {"Status", 6, MU_EVENT_FIELD_STATUS},
+        {"ActionTimeStamp", 15, MU_EVENT_FIELD_ACTIONTIMESTAMP},
+        {"ServerId", 8, MU_EVENT_FIELD_SERVERID},
+        {"ClientAuditEntryId", 18, MU_EVENT_FIELD_CLIENTAUDITENTRYID},
+        {"ClientUserId", 12, MU_EVENT_FIELD_CLIENTUSERID},
+        {"AttributeId", 11, MU_EVENT_FIELD_ATTRIBUTEID},
+        {"OldValue", 8, MU_EVENT_FIELD_OLDVALUE},
+        {"NewValue", 8, MU_EVENT_FIELD_NEWVALUE},
+        {"SecureChannelId", 15, MU_EVENT_FIELD_SECURECHANNELID},
+        {"SessionId", 9, MU_EVENT_FIELD_SESSIONID},
+#endif
     };
     if (name == NULL || name->data == NULL || name->length <= 0) {
         return MU_EVENT_FIELD_NONE;

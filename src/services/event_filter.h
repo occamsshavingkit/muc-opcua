@@ -35,6 +35,20 @@ typedef enum {
     MU_EVENT_FIELD_LOCALTIME = 6,
     MU_EVENT_FIELD_MESSAGE = 7,
     MU_EVENT_FIELD_SEVERITY = 8,
+#if MUC_OPCUA_CU_AUDITING
+    /* AuditEventType fields (spec 074; OPC-10000-5 §6.4.3 + subtypes). Resolved
+       from the shared audit-payload pool via the event's audit_ref. */
+    MU_EVENT_FIELD_STATUS = 9,
+    MU_EVENT_FIELD_ACTIONTIMESTAMP = 10,
+    MU_EVENT_FIELD_SERVERID = 11,
+    MU_EVENT_FIELD_CLIENTAUDITENTRYID = 12,
+    MU_EVENT_FIELD_CLIENTUSERID = 13,
+    MU_EVENT_FIELD_ATTRIBUTEID = 14,
+    MU_EVENT_FIELD_OLDVALUE = 15,
+    MU_EVENT_FIELD_NEWVALUE = 16,
+    MU_EVENT_FIELD_SECURECHANNELID = 17,
+    MU_EVENT_FIELD_SESSIONID = 18,
+#endif
     MU_EVENT_FIELD_NONE = 0xFFu
 } mu_event_field_t;
 

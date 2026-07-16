@@ -232,6 +232,19 @@ opcua_statuscode_t read_attribute(const mu_address_space_t *address_space, const
         }
         return MU_STATUS_BAD_NOTREADABLE;
 
+#if MUC_OPCUA_CU_EVENTS
+    case MU_ATTRIBUTEID_EVENTNOTIFIER:
+        /* OPC-10000-3 §5.4.6: EventNotifier is an attribute of Object and View
+           nodes only; other NodeClasses do not have it. Bit 0 = SubscribeToEvents.
+           Advertises a node (notably the Server Object i=2253) as an event source
+           so a client can create an event MonitoredItem on it (CU 3194). */
+        if (node->node_class != MU_NODECLASS_OBJECT && node->node_class != MU_NODECLASS_VIEW) {
+            return MU_STATUS_BAD_ATTRIBUTEIDINVALID;
+        }
+        value->type = MU_TYPE_BYTE;
+        value->value.by = node->event_notifier;
+        return MU_STATUS_GOOD;
+#endif
 #if MUC_OPCUA_CU_SUBSCRIPTION_STANDARD || MUC_OPCUA_CU_METHOD_SERVER
     case MU_ATTRIBUTEID_EXECUTABLE:
     case MU_ATTRIBUTEID_USEREXECUTABLE:

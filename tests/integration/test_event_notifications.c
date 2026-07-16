@@ -895,6 +895,193 @@ void test_publish_immediately_after_create_subscription(void) {
 #endif
 }
 
+#if MUC_OPCUA_SUBSCRIPTIONS && MUC_OPCUA_EVENTS && MUC_OPCUA_CU_AUDITING
+/* EventFilter selecting base + AuditEvent fields (spec 074): EventType, Status,
+   AttributeId. No WhereClause. */
+static void write_event_filter_audit(mu_binary_writer_t *w) {
+    mu_nodeid_t filter_type = {0, MU_NODEID_NUMERIC, {727}};
+    opcua_byte_t filter_buf[512];
+    mu_binary_writer_t f_w;
+    mu_binary_writer_init(&f_w, filter_buf, sizeof(filter_buf));
+    mu_binary_write_int32(&f_w, 3);
+    const char *names[] = {"EventType", "Status", "AttributeId"};
+    for (int i = 0; i < 3; ++i) {
+        mu_nodeid_t tid = {0, MU_NODEID_NUMERIC, {0}};
+        mu_binary_write_nodeid(&f_w, &tid);
+        mu_binary_write_int32(&f_w, 1);
+        mu_binary_write_uint16(&f_w, 0);
+        mu_string_t nm = {(opcua_int32_t)strlen(names[i]), (const opcua_byte_t *)names[i]};
+        mu_binary_write_string(&f_w, &nm);
+        mu_binary_write_uint32(&f_w, 13);
+        mu_string_t idx = {-1, NULL};
+        mu_binary_write_string(&f_w, &idx);
+    }
+    mu_binary_write_int32(&f_w, 0);
+    mu_binary_write_extension_object_header(w, &filter_type, f_w.position);
+    (void)memcpy(w->buffer + w->position, filter_buf, f_w.position);
+    w->position += f_w.position;
+}
+
+static void enqueue_create_monitored_item_audit(mock_t *mock, opcua_uint32_t seq, opcua_uint32_t sub_id,
+                                                opcua_uint32_t client_handle) {
+    opcua_byte_t tmp[1024], chunk[1024];
+    mu_binary_writer_t w;
+    size_t clen;
+    mu_binary_writer_init(&w, tmp, sizeof(tmp));
+    mu_nodeid_t t = {0, MU_NODEID_NUMERIC, {ID_CREATEMONITOREDITEMSREQUEST}};
+    mu_binary_write_nodeid(&w, &t);
+    write_request_header(&w, TEST_FAKE_FIRST_AUTH_TOKEN, seq);
+    mu_binary_write_uint32(&w, sub_id);
+    mu_binary_write_uint32(&w, 3);
+    mu_binary_write_int32(&w, 1);
+    /* MonitoredItem on Server EventNotifier (2253, attr 12) with the audit filter. */
+    mu_nodeid_t n = {0, MU_NODEID_NUMERIC, {2253}};
+    mu_binary_write_nodeid(&w, &n);
+    mu_binary_write_uint32(&w, 12);
+    mu_string_t nul = {-1, NULL};
+    mu_binary_write_string(&w, &nul);
+    mu_binary_write_uint16(&w, 0);
+    mu_binary_write_string(&w, &nul);
+    mu_binary_write_uint32(&w, 2);
+    mu_binary_write_uint32(&w, client_handle);
+    mu_binary_write_double(&w, 0.0);
+    write_event_filter_audit(&w);
+    mu_binary_write_uint32(&w, 8);
+    mu_binary_write_boolean(&w, true);
+    clen = build_msg(chunk, sizeof(chunk), seq, seq, tmp, w.position);
+    enqueue(mock, chunk, clen);
+}
+#endif
+
+/* spec 074 SC-001: a client subscribed to the Server EventNotifier receives an
+   AuditWriteUpdateEvent (i=2100) when the server raises a WRITE_UPDATE audit,
+   with the selected audit fields (Status, AttributeId) resolved from the pool. */
+void test_audit_write_event_e2e(void) {
+#if MUC_OPCUA_SUBSCRIPTIONS && MUC_OPCUA_EVENTS && MUC_OPCUA_CU_AUDITING
+    mock_t mock;
+    (void)memset(&mock, 0, sizeof(mock));
+    enqueue_connect(&mock);
+    enqueue_create_subscription(&mock, 4, 200.0);
+
+    _Alignas(8) opcua_byte_t storage[MU_SERVER_STORAGE_BYTES];
+    mu_server_config_t config;
+    (void)memset(&config, 0, sizeof(config));
+    config.endpoint_url = "opc.tcp://host:4840";
+    config.application_uri = "urn:t";
+    config.product_uri = "urn:t";
+    config.application_name = "t";
+    config.auditing_enabled = true;
+
+    static opcua_byte_t rx[8192], tx[8192];
+    config.receive_buffer = rx;
+    config.receive_buffer_size = sizeof(rx);
+    config.send_buffer = tx;
+    config.send_buffer_size = sizeof(tx);
+    config.max_chunk_count = 1;
+    config.max_message_size = 8192;
+    config.max_sessions = 1;
+    config.max_secure_channels = 1;
+
+    fake_platform_init(NULL, &config.time_adapter, &config.entropy_adapter);
+    s_tick = 0;
+    config.time_adapter.get_tick_ms = test_get_tick_ms;
+    config.tcp_adapter.context = &mock;
+    config.tcp_adapter.listen = mock_listen;
+    config.tcp_adapter.accept = mock_accept;
+    config.tcp_adapter.read = mock_read;
+    config.tcp_adapter.write = mock_write;
+    config.tcp_adapter.close_connection = mock_close;
+    config.tcp_adapter.shutdown = mock_shutdown;
+
+    mu_server_t *server = NULL;
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_server_init(storage, sizeof(storage), &config, &server));
+
+    mu_binary_reader_t body;
+    opcua_statuscode_t sr;
+
+    run_connect(server, &mock);
+    mu_server_poll(server);
+    TEST_ASSERT_EQUAL(ID_CREATESUBSCRIPTIONRESPONSE, parse_response(mock.last_write, mock.last_write_len, &body, &sr));
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, sr);
+    opcua_uint32_t sub_id;
+    mu_binary_read_uint32(&body, &sub_id);
+
+    enqueue_create_monitored_item_audit(&mock, 5, sub_id, 77);
+    mu_server_poll(server);
+    TEST_ASSERT_EQUAL(ID_CREATEMONITOREDITEMSRESPONSE,
+                      parse_response(mock.last_write, mock.last_write_len, &body, &sr));
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, sr);
+
+    /* Server raises a WRITE_UPDATE AuditEvent. */
+    mu_audit_event_t ae;
+    (void)memset(&ae, 0, sizeof(ae));
+    ae.event_type = MU_AUDIT_EVENT_WRITE_UPDATE;
+    ae.status = true;
+    ae.action_timestamp = 123456789;
+    ae.specific.write_update.node_id = (mu_nodeid_t){1, MU_NODEID_NUMERIC, {.numeric = 5001}};
+    ae.specific.write_update.old_value.type = MU_TYPE_INT32;
+    ae.specific.write_update.old_value.value.i32 = 10;
+    ae.specific.write_update.new_value.type = MU_TYPE_INT32;
+    ae.specific.write_update.new_value.value.i32 = 20;
+    mu_raise_audit_event(server, &ae);
+
+    enqueue_publish(&mock, 6);
+    s_tick = 250;
+    mu_server_poll(server);
+    mu_server_poll(server);
+
+    TEST_ASSERT_EQUAL(ID_PUBLISHRESPONSE, parse_response(mock.last_write, mock.last_write_len, &body, &sr));
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, sr);
+
+    opcua_uint32_t resp_sub_id;
+    mu_binary_read_uint32(&body, &resp_sub_id);
+    TEST_ASSERT_EQUAL(sub_id, resp_sub_id);
+    opcua_int32_t navail;
+    mu_binary_read_int32(&body, &navail);
+    opcua_byte_t more;
+    mu_binary_read_byte(&body, &more);
+    opcua_uint32_t seq_num;
+    mu_binary_read_uint32(&body, &seq_num);
+    opcua_int64_t pub_time;
+    mu_binary_read_int64(&body, &pub_time);
+    opcua_int32_t ndata;
+    mu_binary_read_int32(&body, &ndata);
+    TEST_ASSERT_EQUAL(1, ndata);
+
+    mu_nodeid_t ext_type;
+    size_t ext_len;
+    mu_binary_read_extension_object_header(&body, &ext_type, &ext_len);
+    TEST_ASSERT_EQUAL(ID_EVENTNOTIFICATIONLIST, ext_type.identifier.numeric);
+    opcua_int32_t total_events;
+    mu_binary_read_int32(&body, &total_events);
+    TEST_ASSERT_EQUAL(1, total_events);
+    opcua_uint32_t client_handle;
+    mu_binary_read_uint32(&body, &client_handle);
+    TEST_ASSERT_EQUAL(77, client_handle);
+    opcua_int32_t field_count;
+    mu_binary_read_int32(&body, &field_count);
+    TEST_ASSERT_EQUAL(3, field_count);
+
+    /* EventType -> AuditWriteUpdateEventType i=2100 */
+    mu_variant_t v_type;
+    mu_binary_read_variant(&body, &v_type);
+    TEST_ASSERT_EQUAL(MU_TYPE_NODEID, v_type.type);
+    TEST_ASSERT_EQUAL(2100, v_type.value.nodeid.identifier.numeric);
+    /* Status -> Boolean true */
+    mu_variant_t v_status;
+    mu_binary_read_variant(&body, &v_status);
+    TEST_ASSERT_EQUAL(MU_TYPE_BOOLEAN, v_status.type);
+    TEST_ASSERT_TRUE(v_status.value.b);
+    /* AttributeId -> UInt32 13 (Value) */
+    mu_variant_t v_attr;
+    mu_binary_read_variant(&body, &v_attr);
+    TEST_ASSERT_EQUAL(MU_TYPE_UINT32, v_attr.type);
+    TEST_ASSERT_EQUAL(13u, v_attr.value.ui32);
+
+    mu_server_close(server);
+#endif
+}
+
 int main(void) {
     UNITY_BEGIN();
     RUN_TEST(test_alarm_event_generation_and_publishing);
@@ -902,6 +1089,9 @@ int main(void) {
 #if MUC_OPCUA_EVENT_FILTER_WHERE
     RUN_TEST(test_event_where_clause_filters_and_counts);
     RUN_TEST(test_event_where_unsupported_operator_rejected);
+#endif
+#if MUC_OPCUA_SUBSCRIPTIONS && MUC_OPCUA_EVENTS && MUC_OPCUA_CU_AUDITING
+    RUN_TEST(test_audit_write_event_e2e);
 #endif
     return UNITY_END();
 }

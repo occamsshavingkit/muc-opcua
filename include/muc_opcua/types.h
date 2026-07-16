@@ -191,12 +191,27 @@ typedef struct {
 } mu_certificate_identity_token_t;
 
 #ifdef MUC_OPCUA_EVENTS
+#if MUC_OPCUA_CU_AUDITING
+/* Reference into the server's shared audit-payload pool (spec 074): the queued
+ * event carries only this (a few bytes), not the full audit fields. `valid` is
+ * false for non-audit events; the resolver checks the pool slot's sequence
+ * against `sequence` and resolves audit fields to Null on a ring-wrap miss. */
+typedef struct {
+    opcua_boolean_t valid;
+    opcua_byte_t index;
+    opcua_uint32_t sequence;
+} mu_audit_ref_t;
+#endif
+
 typedef struct {
     mu_nodeid_t event_type;
     mu_bytestring_t event_id;
     opcua_datetime_t time;
     mu_string_t message;
     opcua_uint16_t severity;
+#if MUC_OPCUA_CU_AUDITING
+    mu_audit_ref_t audit_ref;
+#endif
 } mu_event_notification_t;
 
 typedef struct {
