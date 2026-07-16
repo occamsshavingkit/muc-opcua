@@ -86,6 +86,26 @@ opcua_int32_t count_reportable_items(const struct mu_server *server, mu_subscrip
 }
 #endif
 
+/* CU 3922: the SemanticsChanged bit is one-shot. Every item of this Subscription that
+   was just reported (its bit is set in the reportable bitmap) has now carried the bit in
+   the emitted Notification, so clear the latch. */
+static void clear_semantics_changed_for_reported(struct mu_server *server, const mu_subscription_t *sub) {
+    for (size_t w = 0; w < MU_REPORTABLE_BITMAP_WORDS; ++w) {
+        opcua_uint32_t bits = server->subs.reportable_bitmap[w];
+        while (bits != 0u) {
+            size_t i = w * 32u + (size_t)mu_ctz_u32(bits);
+            bits &= (bits - 1u);
+            if (i >= MU_INTERN_MAX_MONITORED_ITEMS) {
+                break;
+            }
+            mu_monitored_item_t *item = &server->subs.monitored_items[i];
+            if (item->in_use && item->subscription_id == sub->subscription_id) {
+                item->semantics_changed = false;
+            }
+        }
+    }
+}
+
 #if MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
 void prepare_reportable_queues(struct mu_server *server, const mu_subscription_t *sub) {
     for (size_t i = 0; i < MU_INTERN_MAX_MONITORED_ITEMS; ++i) {
@@ -154,6 +174,7 @@ void clear_reported_items(struct mu_server *server, const mu_subscription_t *sub
     opcua_int32_t remaining = report_count;
     bool triggered_items[MU_INTERN_MAX_MONITORED_ITEMS];
 
+    clear_semantics_changed_for_reported(server, sub);
     (void)memset(triggered_items, 0, sizeof(triggered_items));
     for (size_t w = 0; w < MU_REPORTABLE_BITMAP_WORDS; ++w) {
         opcua_uint32_t bits = server->subs.reportable_bitmap[w];
@@ -206,6 +227,7 @@ void clear_reported_items(struct mu_server *server, const mu_subscription_t *sub
 }
 #else
 void clear_reported_items(struct mu_server *server, const mu_subscription_t *sub) {
+    clear_semantics_changed_for_reported(server, sub);
     for (size_t w = 0; w < MU_REPORTABLE_BITMAP_WORDS; ++w) {
         opcua_uint32_t bits = server->subs.reportable_bitmap[w];
         while (bits != 0u) {

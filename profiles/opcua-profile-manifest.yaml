@@ -2886,6 +2886,7 @@
     {
       "id": "opc_cu_3911",
       "kind": "conformance_unit",
+      "satisfied_by": "opc_cu_subscription_basic",
       "opc_display_name": "Base Info Server Capabilities Subscriptions",
       "kconfig_symbol": null,
       "implementation_state": "unimplemented",
@@ -2910,12 +2911,13 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "Exposes AggregateFunctions, MaxSubscriptions, MaxMonitoredItems, MaxSubscriptionsPerSession and MaxMonitoredItemsPerSubscription of the ServerCapabilities Object as well as MaxMonitoredItemsPerCall of the OperationLimits Object.",
+      "notes": "Reconciled (spec 073): ServerCapabilities exposes AggregateFunctions(2997), MaxSubscriptions(24096), MaxMonitoredItems(24097), MaxSubscriptionsPerSession(24098), MaxMonitoredItemsPerSubscription(24104) + existing MaxMonitoredItemsPerCall(11714) in base_nodes.c (both address-space tables), advertised values == enforced MU_INTERN_* caps; test_operation_limits::test_subscription_capability_nodes_resolve. Satisfied by opc_cu_subscription_basic.\nExposes AggregateFunctions, MaxSubscriptions, MaxMonitoredItems, MaxSubscriptionsPerSession and MaxMonitoredItemsPerSubscription of the ServerCapabilities Object as well as MaxMonitoredItemsPerCall of the OperationLimits Object.",
       "cu_optional": false
     },
     {
       "id": "opc_cu_3922",
       "kind": "conformance_unit",
+      "satisfied_by": "opc_cu_subscription_basic",
       "opc_display_name": "Base Info SemanticChange Bit",
       "kconfig_symbol": null,
       "implementation_state": "unimplemented",
@@ -2940,7 +2942,7 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "Supports setting the SemanticsChanged Bit in the statusCode when a semantic change occurs, such as a change in the engineering unit associated with the Value Attribute.",
+      "notes": "Reconciled (spec 073): mu_server_signal_semantic_change (public API) latches per-MonitoredItem; the next DataChange Notification sets StatusCode bit 14 (0x4000, SemanticsChanged) then the one-shot latch clears (notification.c + deadband.c, OPC-10000-4 §7.38.1); test_subscriptions::test_publish_semantics_changed_bit (E2E emit->decode). Satisfied by opc_cu_subscription_basic.\nSupports setting the SemanticsChanged Bit in the statusCode when a semantic change occurs, such as a change in the engineering unit associated with the Value Attribute.",
       "cu_optional": false
     },
     {
@@ -3036,6 +3038,7 @@
     {
       "id": "opc_cu_4055",
       "kind": "conformance_unit",
+      "satisfied_by": "opc_cu_subscription_basic",
       "opc_display_name": "Base Info Server Capabilities MaxMonitoredItemsQueueSize",
       "kconfig_symbol": null,
       "implementation_state": "unimplemented",
@@ -3060,7 +3063,7 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": " Exposes MaxMonitoredItemsQueueSize of the ServerCapabilities Object.",
+      "notes": "Reconciled (spec 073): MaxMonitoredItemsQueueSize(31916) exposed on ServerCapabilities in base_nodes.c, advertised value == MU_INTERN_MONITORED_QUEUE_DEPTH; test_operation_limits::test_subscription_capability_nodes_resolve. Satisfied by opc_cu_subscription_basic.\n Exposes MaxMonitoredItemsQueueSize of the ServerCapabilities Object.",
       "cu_optional": false
     },
     {
@@ -3127,6 +3130,7 @@
     {
       "id": "opc_cu_5208",
       "kind": "conformance_unit",
+      "satisfied_by": "opc_cu_subscription_basic",
       "opc_display_name": "Monitor Value Change V2",
       "kconfig_symbol": null,
       "implementation_state": "unimplemented",
@@ -3151,7 +3155,7 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "Support creation of MonitoredItems for Attribute value changes. This includes support of the IndexRange to select a single element or a range of elements when the Attribute value is an array.\nThis ConformanceUnit does not require queuing when multiple value changes occur during a \"publish period\".\nI.e. the latest change will be sent in the Notification.",
+      "notes": "Reconciled (spec 073): MonitoredItem IndexRange is parsed at create (subscription_helpers.c), rejected with Bad_IndexRangeInvalid when malformed, and applied to array samples via apply_numeric_index_range (read_attribute.c) in read_monitored_item_value; test_monitored_index_range (single element, slice, whole-array, out-of-bounds). Satisfied by opc_cu_subscription_basic.\nSupport creation of MonitoredItems for Attribute value changes. This includes support of the IndexRange to select a single element or a range of elements when the Attribute value is an array.\nThis ConformanceUnit does not require queuing when multiple value changes occur during a \"publish period\".\nI.e. the latest change will be sent in the Notification.",
       "cu_optional": false
     },
     {
@@ -4695,6 +4699,7 @@
     {
       "id": "opc_cu_3143",
       "kind": "conformance_unit",
+      "satisfied_by": "opc_cu_subscription_basic",
       "opc_display_name": "Subscription PublishRequest Queue Overflow",
       "kconfig_symbol": null,
       "implementation_state": "unimplemented",
@@ -4719,7 +4724,7 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "If the maximum supported number of PublishRequests has been queued and a new PublishRequest arrives, the \"oldest\" PublishRequest has to be discarded by returning the proper error.",
+      "notes": "Reconciled (spec 073): on Publish-queue overflow handle_publish evicts the OLDEST parked request and answers it with Bad_TooManyPublishRequests, then parks the incoming request (publish_request_evict_oldest, publish_due.c; OPC-10000-4 §5.14.5.1); test_subscriptions_capacity::test_publish_queue_overflow_evicts_oldest_and_parks_newest. Satisfied by opc_cu_subscription_basic.\nIf the maximum supported number of PublishRequests has been queued and a new PublishRequest arrives, the \"oldest\" PublishRequest has to be discarded by returning the proper error.",
       "cu_optional": false
     },
     {

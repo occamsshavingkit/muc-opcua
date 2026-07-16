@@ -236,6 +236,13 @@ opcua_statuscode_t handle_publish(mu_server_t *server, mu_binary_reader_t *r, mu
     mu_publish_request_t *parked = NULL;
     s = mu_publish_request_enqueue(&server->subs, server->active_session->session_id, server->current_request_id,
                                    req.request_handle, now_ms, &parked);
+    if (s == MU_STATUS_BAD_TOOMANYPUBLISHREQUESTS &&
+        publish_request_evict_oldest(server, server->active_session->session_id)) {
+        /* OPC-10000-4 §5.14.5.1: the oldest parked request was answered with
+           Bad_TooManyPublishRequests; park this incoming request in the freed slot. */
+        s = mu_publish_request_enqueue(&server->subs, server->active_session->session_id, server->current_request_id,
+                                       req.request_handle, now_ms, &parked);
+    }
     if (s != MU_STATUS_GOOD) {
         return s;
     }

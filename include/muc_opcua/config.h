@@ -197,7 +197,10 @@
  * parked-Publish arrays) and a non-subscription server (1024). Previously the two
  * arms duplicated every sub-total macro, which invited drift. */
 #ifdef MUC_OPCUA_SUBSCRIPTIONS
-#define MU_SERVER_STORAGE_BASE_BYTES 3200
+/* 3328 (was 3200): the extra 128 B covers the per-MonitoredItem IndexRange (two
+ * int32, CU 5208) and SemanticsChanged latch (CU 3922) for a BASIC-only server's
+ * fixed MonitoredItem array (Standard-tier arrays are sized separately below). */
+#define MU_SERVER_STORAGE_BASE_BYTES 3328
 #else
 #define MU_SERVER_STORAGE_BASE_BYTES 1152
 #endif
@@ -234,7 +237,7 @@
  * from capacities.h (MU_INTERN_*). */
 #define MU_SUBSCRIPTIONS_STANDARD_STORAGE_BYTES                                                                        \
     (MU_INTERN_MAX_MONITORED_ITEMS * (MU_INTERN_MONITORED_QUEUE_DEPTH * 96 + MU_INTERN_MAX_TRIGGER_LINKS * 8 +         \
-                                      MU_WHERE_CLAUSE_STORAGE_BYTES + 368) +                                           \
+                                      MU_WHERE_CLAUSE_STORAGE_BYTES + 384) +                                           \
      MU_INTERN_MAX_SUBSCRIPTIONS * 336 + MU_INTERN_MAX_PUBLISH_REQUESTS * 48)
 #else
 #define MU_SUBSCRIPTIONS_STANDARD_STORAGE_BYTES 0

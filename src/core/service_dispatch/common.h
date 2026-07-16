@@ -102,6 +102,10 @@ typedef struct {
     opcua_uint32_t monitoring_mode;
     opcua_uint32_t client_handle;
     opcua_uint64_t sampling_interval_bits;
+    /* Parsed IndexRange (OPC-10000-4 §7.22): index_range_start == -1 means no
+       IndexRange was requested; index_range_end == -1 means a single element. */
+    opcua_int32_t index_range_start;
+    opcua_int32_t index_range_end;
 #if MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
     mu_datachange_trigger_t trigger;
     mu_deadband_type_t deadband_type;

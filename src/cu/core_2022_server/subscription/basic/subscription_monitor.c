@@ -1,4 +1,5 @@
 /* src/services/subscription_monitor.c */
+#include "services/read/common.h" /* apply_numeric_index_range (CU 5208) */
 #include "services/subscription.h"
 #include <string.h>
 
@@ -217,6 +218,25 @@ void monitored_item_prepare_pending_queue(mu_monitored_item_t *item) {
 
 #endif
 
+size_t mu_server_signal_semantic_change(mu_server_t *server, const mu_nodeid_t *node_id) {
+    if (server == NULL || node_id == NULL) {
+        return 0u;
+    }
+    size_t flagged = 0u;
+    for (size_t i = 0; i < MU_INTERN_MAX_MONITORED_ITEMS; ++i) {
+        mu_monitored_item_t *item = &server->subs.monitored_items[i];
+        /* Value attribute (13) only: SemanticsChanged has meaning for data-change
+           Notifications (OPC-10000-4 §7.38.1). */
+        if (!item->in_use || item->attribute_id != 13u || !mu_nodeid_equal(&item->node_id, node_id)) {
+            continue;
+        }
+        item->semantics_changed = true;
+        item->pending = true; /* force one Notification carrying the bit */
+        ++flagged;
+    }
+    return flagged;
+}
+
 opcua_statuscode_t read_monitored_item_value(const mu_monitored_item_t *item, mu_variant_t *cur) {
     const mu_node_t *node = item->resolved_node;
 
@@ -224,7 +244,12 @@ opcua_statuscode_t read_monitored_item_value(const mu_monitored_item_t *item, mu
         return MU_STATUS_BAD_NODEIDUNKNOWN;
     }
 
-    return mu_value_source_read(node->value, &item->node_id, cur);
+    opcua_statuscode_t s = mu_value_source_read(node->value, &item->node_id, cur);
+    if (s == MU_STATUS_GOOD && item->index_range_start >= 0) {
+        /* CU 5208 / OPC-10000-4 §7.22: slice the array to the monitored IndexRange. */
+        s = apply_numeric_index_range(cur, item->index_range_start, item->index_range_end);
+    }
+    return s;
 }
 
 bool monitored_item_sample_changed(const mu_monitored_item_t *item, const mu_variant_t *cur,

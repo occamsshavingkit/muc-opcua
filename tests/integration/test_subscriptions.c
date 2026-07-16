@@ -1097,6 +1097,85 @@ void test_publish_delivers_data_change(void) {
     TEST_ASSERT_EQUAL(2, seqn);
 }
 
+/* CU 3922 (OPC-10000-4 §7.38.1): after mu_server_signal_semantic_change, the next
+   DataChange Notification for the monitored node carries the SemanticsChanged bit
+   (0x4000) in its StatusCode, even with an unchanged value; the bit is one-shot and
+   is absent on the following notification. */
+void test_publish_semantics_changed_bit(void) {
+    mock_t mock;
+    memset(&mock, 0, sizeof(mock));
+    enqueue_connect(&mock);
+
+    _Alignas(8) opcua_byte_t storage[MU_SERVER_STORAGE_BYTES];
+    mu_server_config_t config;
+    s_mon_val = 10;
+    mu_server_t *server = make_server(&mock, storage, sizeof(storage), &config, &samp_space);
+    mu_binary_reader_t body;
+    opcua_statuscode_t sr;
+
+    run_connect(server, &mock);
+    enqueue_create_subscription(&mock, 4, 200.0, 1000, 1000);
+    mu_server_poll(server);
+    TEST_ASSERT_EQUAL(ID_CREATESUBSCRIPTIONRESPONSE, parse_response(mock.last_write, mock.last_write_len, &body, &sr));
+    opcua_uint32_t sub_id;
+    mu_binary_read_uint32(&body, &sub_id);
+
+    opcua_byte_t tmp[1024], chunk[1024];
+    mu_binary_writer_t w;
+    size_t clen;
+    mu_binary_writer_init(&w, tmp, sizeof(tmp));
+    {
+        mu_nodeid_t t = {0, MU_NODEID_NUMERIC, {ID_CREATEMONITOREDITEMSREQUEST}};
+        mu_binary_write_nodeid(&w, &t);
+    }
+    write_request_header(&w, TEST_FIRST_AUTH_TOKEN, 5);
+    mu_binary_write_uint32(&w, sub_id);
+    mu_binary_write_uint32(&w, 3);
+    mu_binary_write_int32(&w, 1);
+    write_moncreate_item(&w, 1, 5000, 7, 100.0);
+    clen = build_msg(chunk, sizeof(chunk), 5, 5, tmp, w.position);
+    enqueue(&mock, chunk, clen);
+    mu_server_poll(server);
+
+    /* Publish #1: drain the baseline (10), no SemanticsChanged bit. */
+    opcua_uint32_t sid, seqn, ch;
+    mu_datavalue_t dv;
+    enqueue_publish(&mock, 6);
+    mu_server_poll(server);
+    tick_to(server, 300);
+    (void)memset(&dv, 0, sizeof(dv));
+    TEST_ASSERT_EQUAL(ID_PUBLISHRESPONSE, parse_response(mock.last_write, mock.last_write_len, &body, &sr));
+    TEST_ASSERT_EQUAL(1, parse_publish_response(&body, &sid, &seqn, &ch, &dv));
+    TEST_ASSERT_EQUAL_INT32(10, dv.value.value.i32);
+    TEST_ASSERT_EQUAL_HEX32(0u, dv.status & 0x4000u);
+
+    /* Signal a semantic change (value stays 10). One item is flagged. */
+    mu_nodeid_t node5000 = {1, MU_NODEID_NUMERIC, {.numeric = 5000u}};
+    TEST_ASSERT_EQUAL_UINT32(1u, (opcua_uint32_t)mu_server_signal_semantic_change(server, &node5000));
+
+    /* Publish #2: the item reports (forced) with the SemanticsChanged bit set. */
+    enqueue_publish(&mock, 7);
+    mu_server_poll(server);
+    tick_to(server, 700);
+    (void)memset(&dv, 0, sizeof(dv));
+    TEST_ASSERT_EQUAL(ID_PUBLISHRESPONSE, parse_response(mock.last_write, mock.last_write_len, &body, &sr));
+    TEST_ASSERT_EQUAL(1, parse_publish_response(&body, &sid, &seqn, &ch, &dv));
+    TEST_ASSERT_EQUAL(7, ch);
+    TEST_ASSERT_TRUE(dv.has_status);
+    TEST_ASSERT_EQUAL_HEX32(0x4000u, dv.status & 0x4000u);
+
+    /* Publish #3: a real value change (30); the one-shot bit is now clear. */
+    s_mon_val = 30;
+    enqueue_publish(&mock, 8);
+    mu_server_poll(server);
+    tick_to(server, 1100);
+    (void)memset(&dv, 0, sizeof(dv));
+    TEST_ASSERT_EQUAL(ID_PUBLISHRESPONSE, parse_response(mock.last_write, mock.last_write_len, &body, &sr));
+    TEST_ASSERT_EQUAL(1, parse_publish_response(&body, &sid, &seqn, &ch, &dv));
+    TEST_ASSERT_EQUAL_INT32(30, dv.value.value.i32);
+    TEST_ASSERT_EQUAL_HEX32(0u, dv.status & 0x4000u);
+}
+
 /* Regression for the malformed DataChangeNotification (#288 real cause): the
    ExtensionObject Length prefix must EXACTLY cover its body — the MonitoredItems
    array count, every MonitoredItemNotification, and the trailing DiagnosticInfos
@@ -2663,6 +2742,7 @@ int main(void) {
 #endif
     RUN_TEST(test_sampling_detects_change);
     RUN_TEST(test_publish_delivers_data_change);
+    RUN_TEST(test_publish_semantics_changed_bit);
     RUN_TEST(test_publish_datachange_extension_object_length_is_exact);
     RUN_TEST(test_publish_keep_alive);
     RUN_TEST(test_publish_acknowledgement_unknown_sequence_returns_result);

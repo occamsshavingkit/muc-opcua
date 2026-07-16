@@ -1,4 +1,5 @@
 #include "core/service_dispatch/common.h"
+#include "services/read/common.h" /* parse_numeric_range / apply_numeric_index_range (CU 5208) */
 
 /* Spec 057: advertised MaxMonitoredItemsPerCall (base_nodes.c) must match the
  * per-call subscription-operation bound enforced here. */
@@ -37,6 +38,21 @@ opcua_statuscode_t read_monitored_item_create_body(mu_binary_reader_t *r, mu_mon
     s = mu_binary_read_string(r, &index_range);
     if (s != MU_STATUS_GOOD) {
         return s;
+    }
+    /* OPC-10000-4 §7.22 / CU 5208: parse the IndexRange now so the sampler can slice
+       array values. start == -1 → no range; start == -2 → malformed (rejected per-item
+       with Bad_IndexRangeInvalid in resolve_and_validate_create_item). */
+    body->index_range_start = -1;
+    body->index_range_end = -1;
+    if (index_range.length > 0) {
+        opcua_int32_t range_start;
+        opcua_int32_t range_end;
+        if (parse_numeric_range(&index_range, &range_start, &range_end) == MU_STATUS_GOOD) {
+            body->index_range_start = range_start;
+            body->index_range_end = range_end;
+        } else {
+            body->index_range_start = -2;
+        }
     }
     mu_binary_read_uint16(r, &data_encoding_namespace_index);
     if (r->status != MU_STATUS_GOOD) {
@@ -313,6 +329,8 @@ opcua_statuscode_t configure_monitored_item(mu_monitored_item_t *item, const mu_
     copy_monitored_node_id(item, &body->node_id);
     item->resolved_node = node;
     item->attribute_id = body->attribute_id;
+    item->index_range_start = body->index_range_start >= 0 ? body->index_range_start : -1;
+    item->index_range_end = body->index_range_end;
     item->client_handle = body->client_handle;
     item->monitoring_mode = (opcua_byte_t)body->monitoring_mode;
     item->trigger = MU_DATACHANGE_TRIGGER_STATUS_VALUE;
@@ -372,6 +390,10 @@ opcua_statuscode_t configure_monitored_item(mu_monitored_item_t *item, const mu_
 #endif
     if (body->attribute_id != 12u && node != NULL && node->value != NULL) {
         item->last_status = mu_value_source_read(node->value, &body->node_id, &item->last_value);
+        if (item->last_status == MU_STATUS_GOOD && item->index_range_start >= 0) {
+            item->last_status =
+                apply_numeric_index_range(&item->last_value, item->index_range_start, item->index_range_end);
+        }
         if (item->last_status == MU_STATUS_GOOD) {
             item->has_value = true;
             item->pending = true;

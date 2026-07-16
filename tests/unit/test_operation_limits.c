@@ -122,6 +122,25 @@ static void test_advertised_limits_match_enforcement(void) {
     TEST_ASSERT_EQUAL_UINT32(MU_INTERN_MAX_ARRAY_LENGTH, read_base_uint32(11702));
     TEST_ASSERT_EQUAL_UINT32(MU_MAX_ENCODED_STRING_LENGTH, read_base_uint32(11703));
 }
+
+#if MUC_OPCUA_CU_SUBSCRIPTION_BASIC
+/* CU 3911/4055: the ServerCapabilities subscription-limit nodes resolve and their
+   advertised values equal the enforced capacity macros; AggregateFunctions(2997)
+   resolves as an Object. (nano, which lacks subscriptions, is covered by the
+   compile-out: these assertions are not built there.) */
+static void test_subscription_capability_nodes_resolve(void) {
+    TEST_ASSERT_EQUAL_UINT32(MU_INTERN_MAX_SUBSCRIPTIONS, read_base_uint32(24096));     /* MaxSubscriptions */
+    TEST_ASSERT_EQUAL_UINT32(MU_INTERN_MAX_MONITORED_ITEMS, read_base_uint32(24097));   /* MaxMonitoredItems */
+    TEST_ASSERT_EQUAL_UINT32(MU_INTERN_MAX_SUBSCRIPTIONS, read_base_uint32(24098));     /* PerSession */
+    TEST_ASSERT_EQUAL_UINT32(MU_INTERN_MAX_MONITORED_ITEMS, read_base_uint32(24104));   /* PerSubscription */
+    TEST_ASSERT_EQUAL_UINT32(MU_INTERN_MONITORED_QUEUE_DEPTH, read_base_uint32(31916)); /* QueueSize */
+
+    mu_nodeid_t aggr = {0, MU_NODEID_NUMERIC, {.numeric = 2997u}};
+    const mu_node_t *n = mu_resolve_node(NULL, NULL, NULL, &aggr);
+    TEST_ASSERT_NOT_NULL_MESSAGE(n, "AggregateFunctions(2997) must resolve");
+    TEST_ASSERT_EQUAL(MU_NODECLASS_OBJECT, n->node_class);
+}
+#endif
 #endif
 
 int main(void) {
@@ -131,6 +150,9 @@ int main(void) {
 #ifdef MUC_OPCUA_BASE_NODES
     RUN_TEST(test_base_address_space_is_sorted);
     RUN_TEST(test_advertised_limits_match_enforcement);
+#if MUC_OPCUA_CU_SUBSCRIPTION_BASIC
+    RUN_TEST(test_subscription_capability_nodes_resolve);
+#endif
 #endif
     return UNITY_END();
 }

@@ -28,6 +28,13 @@ bool resolve_and_validate_create_item(mu_server_t *server, mu_monitored_item_cre
         return false;
     }
 
+    if (body->index_range_start == -2) {
+        /* CU 5208 / OPC-10000-4 §7.22: a syntactically invalid IndexRange. */
+        opcua_statuscode_t s = write_monitored_item_create_result(w, MU_STATUS_BAD_INDEXRANGEINVALID, 0u, 0u, 0u);
+        (void)s;
+        return false;
+    }
+
 #if MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
     {
         opcua_statuscode_t filter_status = validate_create_item_filter(server, body, node);

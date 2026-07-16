@@ -1041,7 +1041,7 @@ comment "Monitor Basic (NOT IMPLEMENTED)"
 # Subscription PublishRequest Queue Overflow (opc_cu_3143)
 #   Implementation state: unimplemented -- visible but not selectable.
 #   Detail: CU 3143:Subscription PublishRequest Queue Overflow.
-#   Notes: If the maximum supported number of PublishRequests has been queued and a new PublishRequest arrives, the "oldest" PublishRequest has to be discarded by returning the proper error.
+#   Notes: Reconciled (spec 073): on Publish-queue overflow handle_publish evicts the OLDEST parked request and answers it with Bad_TooManyPublishRequests, then parks the incoming request (publish_request_evict_oldest, publish_due.c; OPC-10000-4 §5.14.5.1); test_subscriptions_capacity::test_publish_queue_overflow_evicts_oldest_and_parks_newest. Satisfied by opc_cu_subscription_basic. If the maximum supported number of PublishRequests has been queued and a new PublishRequest arrives, the "oldest" PublishRequest has to be discarded by returning the proper error.
 comment "Subscription PublishRequest Queue Overflow (NOT IMPLEMENTED)"
 
 # Base Info Fixed SamplingInterval (opc_cu_3196)
@@ -1059,7 +1059,7 @@ comment "Subscription Basic (NOT IMPLEMENTED)"
 # Base Info Server Capabilities Subscriptions (opc_cu_3911)
 #   Implementation state: unimplemented -- visible but not selectable.
 #   Detail: CU 3911:Base Info Server Capabilities Subscriptions.
-#   Notes: Exposes AggregateFunctions, MaxSubscriptions, MaxMonitoredItems, MaxSubscriptionsPerSession and MaxMonitoredItemsPerSubscription of the ServerCapabilities Object as well as MaxMonitoredItemsPerCall of the OperationLimits Object.
+#   Notes: Reconciled (spec 073): ServerCapabilities exposes AggregateFunctions(2997), MaxSubscriptions(24096), MaxMonitoredItems(24097), MaxSubscriptionsPerSession(24098), MaxMonitoredItemsPerSubscription(24104) + existing MaxMonitoredItemsPerCall(11714) in base_nodes.c (both address-space tables), advertised values == enforced MU_INTERN_* caps; test_operation_limits::test_subscription_capability_nodes_resolve. Satisfied by opc_cu_subscription_basic. Exposes AggregateFunctions, MaxSubscriptions, MaxMonitoredItems, MaxSubscriptionsPerSession and MaxMonitoredItemsPerSubscription of the ServerCapabilities Object as well as MaxMonitoredItemsPerCall of the OperationLimits Object.
 comment "Base Info Server Capabilities Subscriptions (NOT IMPLEMENTED)"
 
 # Subscription Publish Basic (opc_cu_3913)
@@ -1071,13 +1071,13 @@ comment "Subscription Publish Basic (NOT IMPLEMENTED)"
 # Base Info SemanticChange Bit (opc_cu_3922)
 #   Implementation state: unimplemented -- visible but not selectable.
 #   Detail: CU 3922:Base Info SemanticChange Bit.
-#   Notes: Supports setting the SemanticsChanged Bit in the statusCode when a semantic change occurs, such as a change in the engineering unit associated with the Value Attribute.
+#   Notes: Reconciled (spec 073): mu_server_signal_semantic_change (public API) latches per-MonitoredItem; the next DataChange Notification sets StatusCode bit 14 (0x4000, SemanticsChanged) then the one-shot latch clears (notification.c + deadband.c, OPC-10000-4 §7.38.1); test_subscriptions::test_publish_semantics_changed_bit (E2E emit->decode). Satisfied by opc_cu_subscription_basic. Supports setting the SemanticsChanged Bit in the statusCode when a semantic change occurs, such as a change in the engineering unit associated with the Value Attribute.
 comment "Base Info SemanticChange Bit (NOT IMPLEMENTED)"
 
 # Base Info Server Capabilities MaxMonitoredItemsQueueSize (opc_cu_4055)
 #   Implementation state: unimplemented -- visible but not selectable.
 #   Detail: CU 4055:Base Info Server Capabilities MaxMonitoredItemsQueueSize.
-#   Notes: Exposes MaxMonitoredItemsQueueSize of the ServerCapabilities Object.
+#   Notes: Reconciled (spec 073): MaxMonitoredItemsQueueSize(31916) exposed on ServerCapabilities in base_nodes.c, advertised value == MU_INTERN_MONITORED_QUEUE_DEPTH; test_operation_limits::test_subscription_capability_nodes_resolve. Satisfied by opc_cu_subscription_basic. Exposes MaxMonitoredItemsQueueSize of the ServerCapabilities Object.
 comment "Base Info Server Capabilities MaxMonitoredItemsQueueSize (NOT IMPLEMENTED)"
 
 # Monitor Items 2 (opc_cu_5207)
@@ -1089,7 +1089,7 @@ comment "Monitor Items 2 (NOT IMPLEMENTED)"
 # Monitor Value Change V2 (opc_cu_5208)
 #   Implementation state: unimplemented -- visible but not selectable.
 #   Detail: CU 5208:Monitor Value Change V2.
-#   Notes: Support creation of MonitoredItems for Attribute value changes. This includes support of the IndexRange to select a single element or a range of elements when the Attribute value is an array. This ConformanceUnit does not require queuing when multiple value changes occur during a "publish period". I.e. the latest change will be sent in the Notification.
+#   Notes: Reconciled (spec 073): MonitoredItem IndexRange is parsed at create (subscription_helpers.c), rejected with Bad_IndexRangeInvalid when malformed, and applied to array samples via apply_numeric_index_range (read_attribute.c) in read_monitored_item_value; test_monitored_index_range (single element, slice, whole-array, out-of-bounds). Satisfied by opc_cu_subscription_basic. Support creation of MonitoredItems for Attribute value changes. This includes support of the IndexRange to select a single element or a range of elements when the Attribute value is an array. This ConformanceUnit does not require queuing when multiple value changes occur during a "publish period". I.e. the latest change will be sent in the Notification.
 comment "Monitor Value Change V2 (NOT IMPLEMENTED)"
 
 endif

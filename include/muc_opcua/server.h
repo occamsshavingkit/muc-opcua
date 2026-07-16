@@ -175,6 +175,17 @@ opcua_statuscode_t mu_server_register_method_callback(mu_server_t *server, const
 opcua_statuscode_t mu_server_trigger_event(mu_server_t *server, const mu_event_notification_t *event);
 #endif
 
+#ifdef MUC_OPCUA_CU_SUBSCRIPTION_BASIC
+/*
+ * Signal that the semantics (metadata) of a Variable's Value have changed — for
+ * example a change to its EngineeringUnits or EURange. The next DataChange
+ * Notification for each MonitoredItem sampling this node's Value will carry the
+ * SemanticsChanged bit in its StatusCode, warning clients to re-read the metadata
+ * (OPC-10000-4 §7.38.1). Returns the number of MonitoredItems flagged.
+ */
+size_t mu_server_signal_semantic_change(mu_server_t *server, const mu_nodeid_t *node_id);
+#endif
+
 #ifdef MUC_OPCUA_AUDITING
 #include "muc_opcua/services/audit.h"
 void mu_raise_audit_event(mu_server_t *server, const mu_audit_event_t *event);
