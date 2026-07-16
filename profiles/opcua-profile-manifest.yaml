@@ -3677,10 +3677,10 @@
       "implementation_state": "claimed",
       "depends_on": [],
       "profile_defaults": {
-        "nano": false,
-        "micro": false,
-        "embedded": false,
-        "standard": false,
+        "nano": true,
+        "micro": true,
+        "embedded": true,
+        "standard": true,
         "full": true,
         "custom": false
       },
@@ -4386,12 +4386,13 @@
     {
       "id": "opc_cu_2478",
       "kind": "conformance_unit",
+      "satisfied_by": "opc_cu_time_sync",
       "opc_display_name": "Time Sync \u2013 OS based support",
       "kconfig_symbol": null,
       "implementation_state": "unimplemented",
       "depends_on": [],
       "profile_defaults": {
-        "nano": false,
+        "nano": true,
         "micro": true,
         "embedded": true,
         "standard": true,
@@ -4476,12 +4477,13 @@
     {
       "id": "opc_cu_2786",
       "kind": "conformance_unit",
+      "satisfied_by": "opc_cu_time_sync",
       "opc_display_name": "Time Sync \u2013 NTP",
       "kconfig_symbol": null,
       "implementation_state": "unimplemented",
       "depends_on": [],
       "profile_defaults": {
-        "nano": false,
+        "nano": true,
         "micro": true,
         "embedded": true,
         "standard": true,
@@ -5007,12 +5009,13 @@
     {
       "id": "opc_cu_3802",
       "kind": "conformance_unit",
+      "satisfied_by": "opc_cu_time_sync",
       "opc_display_name": "Time Sync - Configure Clock Skew",
       "kconfig_symbol": null,
       "implementation_state": "unimplemented",
       "depends_on": [],
       "profile_defaults": {
-        "nano": false,
+        "nano": true,
         "micro": true,
         "embedded": true,
         "standard": true,
@@ -5160,6 +5163,7 @@
     {
       "id": "opc_cu_5793",
       "kind": "conformance_unit",
+      "satisfied_by": "opc_cu_time_sync",
       "opc_display_name": "Time Sync - Support",
       "kconfig_symbol": null,
       "implementation_state": "unimplemented",

@@ -67,7 +67,7 @@ opcua_statuscode_t handle_query_next(mu_server_t *server, mu_binary_reader_t *r,
 /* Spec 055: returns true if an OpenSecureChannel carrying client_time should be
  * allowed under MU_TIME_SYNC_MAX_CLOCK_SKEW_MS: within tolerance, or either side
  * 0 (unknown time / clockless peer). Both times are opcua_datetime_t 100ns ticks. */
-bool mu_opn_time_sync_allows(opcua_datetime_t server_time, opcua_datetime_t client_time);
+bool mu_opn_time_sync_allows(opcua_datetime_t server_time, opcua_datetime_t client_time, opcua_uint64_t max_skew_ns);
 #endif
 
 #define MU_DISPATCH_MAX_REGISTER_NODES 32

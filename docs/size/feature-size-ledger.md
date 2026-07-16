@@ -1567,3 +1567,28 @@ audit payload in every queued event (~268 KB); the pool design (research.md
 Decision 7) is the reason the full-field path is affordable. Flash: audit→event
 adapter + SELECT resolver/parser + 4 emitters, ~1–2 KB, auditing-only. Non-auditing
 profiles (nano/micro/embedded/standard): **0** flash + RAM (compiled out).
+
+## 2026-07-16: Spec 075 — Nano Time-Sync (configurable clock skew)
+
+Turned nano's last unreconciled *required* CU (`opc_cu_5793` Time Sync – Support)
+into a claimable feature: retyped the OpenSecureChannel timestamp-freshness skew
+knob from a compile-time `MU_TIME_SYNC_MAX_CLOCK_SKEW_MS` constant to a runtime
+`mu_server_config_t.acceptable_clock_skew_ns` field (nanoseconds), compared in the
+native 100 ns DateTime domain so a host-class (x86_64/aarch64) deployment reaches
+sub-microsecond (IEEE-802.1AS / PTP) precision. No sync protocol is added — the
+disciplined clock is supplied by the integrator via `time_adapter.get_time`.
+
+Gated by `MUC_OPCUA_CU_TIME_SYNC` (now on for all profiles incl. nano). Cost is a
+single `opcua_uint64_t` config field + the ns-scaling arithmetic at the one OPN
+call site; no address-space nodes. `scripts/measure_size.sh` (ARM Cortex-M0+,
+`-Os`), nano archive `.text` / elf_text:
+
+| Profile | before | after | Δ elf |
+|----------|------------------:|------------------:|------:|
+| nano | 23,568 / 21,320 | 23,660 / 21,524 | +204 |
+
+**RAM**: +8 B (`.data`/`.bss` unchanged — the field lives in caller-owned config
+storage; no-heap invariant preserved). Reconciled `opc_cu_5793`/`2478` (OS-based)/
+`2786` (NTP)/`3802` (Configure Clock Skew) via `satisfied_by`; `2479` (PTP)/`2480`
+(802.1AS)/`5505` (UA-based) remain unclaimed (integrator's protocol, not ours).
+Nano reaches **18/18 required** CUs.

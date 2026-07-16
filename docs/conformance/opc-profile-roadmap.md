@@ -138,7 +138,7 @@ remains future work.
 | opc_cu_dynamic_nodes | conformance_unit | claimed | OPC-10000-3 Core 2022 Server Facet | MUC_OPCUA_CU_DYNAMIC_NODES | full | test_address_space_dynamic |
 | opc_cu_multi_chunk | conformance_unit | claimed | OPC-10000-6 Core 2022 Server Facet | MUC_OPCUA_CU_MULTI_CHUNK | full | test_message_chunk_errors |
 | opc_cu_session_timeout | conformance_unit | claimed | OPC-10000-4 Core 2022 Server Facet | MUC_OPCUA_CU_SESSION_TIMEOUT | micro, embedded, standard, full | test_base_server_behaviour |
-| opc_cu_time_sync | conformance_unit | claimed | OPC-10000-4 §7.28 Core 2022 Server Facet | MUC_OPCUA_CU_TIME_SYNC | full | test_time_sync, test_dispatch_services |
+| opc_cu_time_sync | conformance_unit | claimed | OPC-10000-4 §7.28 Core 2022 Server Facet | MUC_OPCUA_CU_TIME_SYNC | all | test_time_sync, test_dispatch_services |
 | opc_cu_extended_nodeids | conformance_unit | claimed | OPC-10000-3 Core 2022 Server Facet | MUC_OPCUA_CU_EXTENDED_NODEIDS | full | test_address_space_string_limits, test_binary_nodeid_errors |
 | opc_cu_aggregate_full | conformance_unit | claimed | OPC-10000-13 Core 2022 Server Facet | MUC_OPCUA_CU_AGGREGATE_FULL | full | test_aggregate, test_aggregate_full |
 | opc_cu_pubsub | conformance_unit | claimed | OPC-10000-14 Core 2022 Server Facet | MUC_OPCUA_CU_PUBSUB | full | test_uadp_encoding, test_pubsub |
@@ -163,10 +163,10 @@ remains future work.
 | opc_cu_2389 | conformance_unit | claimed | OPC-10000-4 §5.11.4 | MUC_OPCUA_CU_ATTRIBUTE_WRITE_VALUES | micro, embedded, standard, full | test_write_value_gate, test_write_service |
 | opc_cu_2400 | conformance_unit | implemented | OPC-10000-4 §5.7.3 | MUC_OPCUA_CU_SESSION_CHANGE_USER | micro, embedded, standard, full | test_session, test_session_auth |
 | opc_cu_2407 | conformance_unit | unimplemented |  | — | micro, embedded, standard, full | — |
-| opc_cu_2478 | conformance_unit | unimplemented |  | — | micro, embedded, standard, full | — |
+| opc_cu_2478 | conformance_unit | unimplemented |  | — | all | — |
 | opc_cu_2479 | conformance_unit | unimplemented |  | — | micro, embedded, standard, full | — |
 | opc_cu_2480 | conformance_unit | unimplemented |  | — | micro, embedded, standard, full | — |
-| opc_cu_2786 | conformance_unit | unimplemented |  | — | micro, embedded, standard, full | — |
+| opc_cu_2786 | conformance_unit | unimplemented |  | — | all | — |
 | opc_cu_2808 | conformance_unit | unimplemented |  | — | micro, embedded, standard, full | — |
 | opc_cu_2823 | conformance_unit | unimplemented |  | — | embedded, standard, full | — |
 | opc_cu_2936 | conformance_unit | claimed | OPC-10000-4 §5.11.4 | MUC_OPCUA_CU_ATTRIBUTE_WRITE_STATUSCODE_TIMESTAMP | micro, embedded, standard, full | test_write_service, test_write_response |
@@ -183,7 +183,7 @@ remains future work.
 | opc_cu_3536 | conformance_unit | unimplemented |  | — | embedded, standard, full | — |
 | opc_cu_3645 | conformance_unit | unimplemented |  | — | embedded, standard, full | — |
 | opc_cu_3727 | conformance_unit | unimplemented |  | — | micro, embedded, standard, full | — |
-| opc_cu_3802 | conformance_unit | unimplemented |  | — | micro, embedded, standard, full | — |
+| opc_cu_3802 | conformance_unit | unimplemented |  | — | all | — |
 | opc_cu_3913 | conformance_unit | unimplemented |  | — | micro, embedded, standard, full | — |
 | opc_cu_3983 | conformance_unit | claimed | OPC-10000-4 §7.32, 7.38 | MUC_OPCUA_CU_BASE_SERVICES_DIAGNOSTICS | micro, embedded, standard, full | test_service_header |
 | opc_cu_3985 | conformance_unit | unimplemented |  | — | all | — |

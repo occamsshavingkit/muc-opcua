@@ -50,7 +50,7 @@ Backing test column: comma-separated ctest names (as registered).
 | Core 2022 Server Facet | OPC-10000-3 | full | test_address_space_dynamic |
 | Core 2022 Server Facet | OPC-10000-6 | full | test_message_chunk_errors |
 | Core 2022 Server Facet | OPC-10000-4 | micro, embedded, standard, full | test_base_server_behaviour |
-| Core 2022 Server Facet | OPC-10000-4 §7.28 | full | test_time_sync, test_dispatch_services |
+| Core 2022 Server Facet | OPC-10000-4 §7.28 | all | test_time_sync, test_dispatch_services |
 | Core 2022 Server Facet | OPC-10000-3 | full | test_address_space_string_limits, test_binary_nodeid_errors |
 | Core 2022 Server Facet | OPC-10000-13 | full | test_aggregate, test_aggregate_full |
 | Core 2022 Server Facet | OPC-10000-14 | full | test_uadp_encoding, test_pubsub |
