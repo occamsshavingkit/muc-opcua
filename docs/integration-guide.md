@@ -149,6 +149,31 @@ and `src/core/server_internal.h`; do not copy it into application code.
 > static opcua_byte_t g_server_storage[MU_SERVER_STORAGE_BYTES];
 > ```
 
+### 2.2.1 Advertised capacities (Core Capacities)
+
+The server's core OPC UA capacities are fixed at build time per profile and are
+both **documented in-source** and **discoverable at runtime**. This satisfies the
+"application documentation shall specify the core capacities" requirement
+(OPC-10000-7 *Documentation - Core Capacities*, `opc_cu_3808`):
+
+| Capacity | Compile-time macro (`include/muc_opcua/capacities.h`) | Runtime node (`ServerCapabilities`/`OperationLimits`) |
+|---|---|---|
+| SecureChannels | `MU_INTERN_MAX_CONNECTIONS` | — |
+| Sessions | `MU_INTERN_MAX_SESSIONS` | — |
+| View Continuation Points | `MU_INTERN_MAX_CONTINUATION_POINTS` | — |
+| Subscriptions | `MU_INTERN_MAX_SUBSCRIPTIONS` | `MaxSubscriptions` (i=24096), `MaxSubscriptionsPerSession` (i=24098) |
+| Parallel Publish requests | `MU_INTERN_MAX_PUBLISH_REQUESTS` | — |
+| MonitoredItems | `MU_INTERN_MAX_MONITORED_ITEMS` | `MaxMonitoredItems` (i=24097), `MaxMonitoredItemsPerSubscription` (i=24104) |
+| Sampled/queued MonitoredItem depth | `MU_INTERN_MONITORED_QUEUE_DEPTH` | `MaxMonitoredItemsQueueSize` (i=31916) |
+| Retransmission queue | `MU_RETRANSMIT_BYTES` (single most-recent NotificationMessage) | — |
+| Per-call operation limits | `MU_MAX_NODES_PER_READ`/`_WRITE`/`_BROWSE`, `MU_MAX_MONITORED_ITEMS_PER_CALL` | `OperationLimits` (i=11704) children |
+
+The per-profile values are the resolved `MU_INTERN_*` macros (default → profile →
+`MU_MAX_*` override cascade); the advertised runtime node values are compile-time
+asserted equal to the enforced macros, so they can never drift. A client reads the
+live values from the `ServerCapabilities` Object (i=2268) and its `OperationLimits`
+child; capacities without a standard node are documented here and in `capacities.h`.
+
 ### 2.3 The `mu_server_init` contract
 
 ```c

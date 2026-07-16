@@ -12,7 +12,12 @@ import os
 from typing import Any
 
 
-_ALLOWED_IMPLEMENTATION_STATES = ("unimplemented", "deferred", "implemented", "claimed")
+# "documented" (spec 078): a Documentation/process CU that is satisfied by shipped
+# documentation rather than code — e.g. "Documentation - Core Capacities". It counts
+# as implemented in completion tallies but, having no code, is exempt from the
+# backing_tests / kconfig_symbol requirements the claimed/implemented states carry.
+# The CU's `notes` must cite the specific documentation that satisfies it.
+_ALLOWED_IMPLEMENTATION_STATES = ("unimplemented", "deferred", "implemented", "claimed", "documented")
 _ALLOWED_KINDS = ("profile", "facet", "conformance_unit", "optimization")
 _ALLOWED_INTERNAL_CLASSIFICATIONS = ("keep_internal", "retire_internal")
 _ALLOWED_CAPACITY_KINDS = ("profile_varying", "invariant", "derived")
