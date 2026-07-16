@@ -1622,3 +1622,18 @@ additions and the 3922 emit/clear path.
 The `MU_SERVER_STORAGE_BYTES` estimate was bumped to match: base `3200 → 3328`
 (BASIC-only servers' fixed array) and the Standard per-item term `368 → 384`. No-heap
 invariant preserved (all storage is caller-owned). nano RAM unchanged.
+
+## 2026-07-16: Spec 077 — Auditing 074 follow-ups (OldValue, failure-path, SessionId/SecureChannelId)
+
+Full-profile-only (auditing is full-only). Deepens the existing AuditEvents:
+pre-write OldValue capture on writes, failure-path emission (Status=false) on
+Write/ActivateSession/CreateSession, SecureChannelId on the channel event, and
+SessionId on the activate event. `scripts/measure_size.sh full` (ARM Cortex-M0+):
+
+| Profile | before | after | Δ elf |
+|----------|------------------:|------------------:|------:|
+| full  | 85,754 / 91,144 | 86,046 / 91,420 | +276 |
+
+nano/micro/embedded/standard: 0 (auditing compiled out). No RAM change (the audit
+payload pool and event struct are unchanged; the SecureChannelId string is formatted
+into a transient stack buffer copied into the existing pool slot).

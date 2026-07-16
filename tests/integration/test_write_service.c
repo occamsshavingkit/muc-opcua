@@ -126,6 +126,21 @@ static opcua_statuscode_t test_write_handler(void *handle, const mu_nodeid_t *no
     return MU_STATUS_BAD_NOTWRITABLE;
 }
 
+#if MUC_OPCUA_CU_AUDITING
+/* spec 077: capture every AuditEvent the server raises so the test can assert the
+   emit-site follow-ups (OldValue, failure-path Status, SessionId/SecureChannelId). */
+#define AUDIT_CAPTURE_MAX 16
+static mu_audit_event_t g_captured_audits[AUDIT_CAPTURE_MAX];
+static size_t g_captured_audit_count;
+static void capture_audit_event(struct mu_server *s, const mu_audit_event_t *event, void *ctx) {
+    (void)s;
+    (void)ctx;
+    if (g_captured_audit_count < AUDIT_CAPTURE_MAX) {
+        g_captured_audits[g_captured_audit_count++] = *event;
+    }
+}
+#endif
+
 void test_write_service_integration(void) {
 #ifdef MUC_OPCUA_SERVICE_WRITE
     mock_t mock;
@@ -250,10 +265,17 @@ void test_write_service_integration(void) {
 
     /* Write Handler registration */
     config.write_handler = test_write_handler;
+#if MUC_OPCUA_CU_AUDITING
+    config.auditing_enabled = true;
+#endif
 
     _Alignas(8) opcua_byte_t storage[MU_SERVER_STORAGE_BYTES];
     mu_server_t *server = NULL;
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_server_init(storage, sizeof(storage), &config, &server));
+#if MUC_OPCUA_CU_AUDITING
+    g_captured_audit_count = 0;
+    mu_server_set_audit_callback(server, capture_audit_event, NULL);
+#endif
 
     mu_server_poll(server); /* accept */
     mu_server_poll(server); /* HEL -> ACK */
@@ -418,6 +440,41 @@ void test_write_service_integration(void) {
 
     /* Invalid attribute range */
     TEST_ASSERT_EQUAL_HEX32(MU_STATUS_BAD_NOTWRITABLE, r3);
+
+#if MUC_OPCUA_CU_AUDITING
+    /* spec 077 audit follow-ups, observed on the raised events:
+       - a successful write carries OldValue (pre-write = 10) + NewValue (42);
+       - a rejected write is audited too, with Status=false;
+       - the OpenSecureChannel audit carries a non-empty SecureChannelId;
+       - the ActivateSession audit carries the SessionId. */
+    bool saw_write_success = false, saw_write_fail = false, saw_osc_channel_id = false, saw_activate_session_id = false;
+    for (size_t k = 0; k < g_captured_audit_count; ++k) {
+        const mu_audit_event_t *e = &g_captured_audits[k];
+        if (e->event_type == MU_AUDIT_EVENT_WRITE_UPDATE && e->status) {
+            saw_write_success = true;
+            TEST_ASSERT_EQUAL_MESSAGE(MU_TYPE_INT32, e->specific.write_update.old_value.type,
+                                      "successful write audit must capture the pre-write OldValue");
+            TEST_ASSERT_EQUAL_INT32(10, e->specific.write_update.old_value.value.i32);
+            TEST_ASSERT_EQUAL_INT32(42, e->specific.write_update.new_value.value.i32);
+        }
+        if (e->event_type == MU_AUDIT_EVENT_WRITE_UPDATE && !e->status) {
+            saw_write_fail = true;
+        }
+        if (e->event_type == MU_AUDIT_EVENT_OPEN_SECURE_CHANNEL &&
+            e->specific.open_channel.secure_channel_id.length > 0) {
+            saw_osc_channel_id = true;
+        }
+        if (e->event_type == MU_AUDIT_EVENT_ACTIVATE_SESSION &&
+            e->specific.activate_session.session_id.identifier.numeric != 0u) {
+            saw_activate_session_id = true;
+        }
+    }
+    TEST_ASSERT_TRUE_MESSAGE(saw_write_success,
+                             "successful write must emit AuditWriteUpdateEvent (OldValue=10, NewValue=42)");
+    TEST_ASSERT_TRUE_MESSAGE(saw_write_fail, "rejected write must emit AuditWriteUpdateEvent with Status=false");
+    TEST_ASSERT_TRUE_MESSAGE(saw_osc_channel_id, "OpenSecureChannel audit must carry a non-empty SecureChannelId");
+    TEST_ASSERT_TRUE_MESSAGE(saw_activate_session_id, "ActivateSession audit must carry the SessionId");
+#endif
 #endif
 }
 

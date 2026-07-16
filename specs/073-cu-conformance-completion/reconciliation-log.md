@@ -203,3 +203,30 @@ Implementation notes:
 Facet 1324 required 12/16 -> **16/16** (complete). Overall reconciled required
 45 -> 49 (four unique CUs). The shared subscription/base-info CUs also lift the
 Auditing (1328), A&C alarm, and Embedded/Standard 2022 facet tallies that list them.
+
+## 2026-07-16 — Auditing 074 follow-ups: OldValue, failure-path, SessionId/SecureChannelId
+
+Deepens the already-claimed AuditEvents (2422 SecureChannel, 3968 Services, 3228
+Write) so they are genuinely conformant, resolving the three follow-ups flagged when
+spec 074 first made auditing real. No new CU numbers — this raises the fidelity of
+existing claims. All full-profile-only (auditing is full-only).
+
+- **OldValue capture** (attribute_handler.c): the pre-write value is read BEFORE the
+  write and carried in AuditWriteUpdateEvent.OldValue (was always Null).
+- **Failure-path auditing** (Status=false): rejected writes now emit an
+  AuditWriteUpdateEvent with Status=false (was success-only); ActivateSession emits on
+  failed activation (bad user identity); CreateSession emits on rejection
+  (capacity/validation). An auditor now sees failed/rejected operations, not just
+  successes — the security-relevant half.
+- **SecureChannelId** (osc_handler.c): AuditOpenSecureChannelEvent carries the numeric
+  channel id formatted as a String (was Null).
+- **SessionId** (activate_session.c): AuditActivateSessionEvent carries the SessionId
+  NodeId (was unset; CreateSession already set it).
+
+Backing test: `tests/integration/test_write_service.c` gains an audit callback that
+captures every raised event while the harness drives OPN + CreateSession +
+ActivateSession + a successful write (1001, 10→42) + rejected writes; it asserts the
+successful write's OldValue=10/NewValue=42, a rejected write with Status=false, a
+non-empty SecureChannelId on the channel event, and a populated SessionId on the
+activate event. Still deferred (new emit sites, not this increment): 3224/3226/3230
+(NodeManagement/History/Method audits) and 5213 (connection-close).

@@ -539,15 +539,24 @@ opcua_statuscode_t handle_activate_session(mu_server_t *server, mu_binary_reader
     s = MU_STATUS_GOOD;
 
 #if MUC_OPCUA_CU_AUDITING
-    /* spec 074: emit an AuditActivateSessionEvent (i=2075) for the successful
-       ActivateSession (OPC-10000-5 §6.4.10). SessionId population + failure-path
-       auditing (Status=false) are documented follow-ups. No-op unless auditing
-       is enabled. */
+    /* spec 074/077: emit an AuditActivateSessionEvent (i=2075) for ActivateSession
+       (OPC-10000-5 §6.4.10) — on FAILURE too (Status=false), so an auditor sees
+       rejected activations (e.g. bad user identity), carrying the SessionId. No-op
+       unless auditing is enabled. */
     {
         mu_audit_event_t audit_ev;
         (void)memset(&audit_ev, 0, sizeof(audit_ev));
         audit_ev.event_type = MU_AUDIT_EVENT_ACTIVATE_SESSION;
-        audit_ev.status = true;
+        audit_ev.status = (activate_result == MU_STATUS_GOOD);
+        if (req.authentication_token.identifier_type == MU_NODEID_NUMERIC &&
+            req.authentication_token.namespace_index == 0u) {
+            const mu_session_t *audit_slot = mu_session_find_by_token(server->sessions, MU_INTERN_MAX_SESSIONS,
+                                                                      req.authentication_token.identifier.numeric);
+            if (audit_slot != NULL) {
+                audit_ev.specific.activate_session.session_id =
+                    (mu_nodeid_t){0, MU_NODEID_NUMERIC, {audit_slot->session_id}};
+            }
+        }
         mu_raise_audit_event(server, &audit_ev);
     }
 #endif
