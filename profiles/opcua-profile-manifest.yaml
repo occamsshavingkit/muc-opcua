@@ -1142,7 +1142,7 @@
       },
       "opc_display_name": "Documentation - Core Capacities",
       "kconfig_symbol": null,
-      "implementation_state": "unimplemented",
+      "implementation_state": "documented",
       "depends_on": [],
       "profile_defaults": {
         "nano": true,
@@ -1164,7 +1164,7 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "The application documentation shall specify the core OPC UA related capacities. This includes the number of supported SecureChannels, Sessions, and Continuation Points for the View Services.\nIf Subscriptions are supported, it shall also include capacity information for Subscriptions and Publish requests, MonitoredItems, retransmission queue, and the queue for sampled MonitoredItems. (Documentation complete; no code change needed.)",
+      "notes": "Documented (spec 078): the core capacities (SecureChannels/Sessions/ContinuationPoints/Subscriptions/PublishRequests/MonitoredItems/queue depth/retransmission) are specified in docs/integration-guide.md §2.2.1 and capacities.h, and discoverable at runtime via the ServerCapabilities/OperationLimits nodes. Documentation CU (no code). The application documentation shall specify the core OPC UA related capacities. This includes the number of supported SecureChannels, Sessions, and Continuation Points for the View Services.\nIf Subscriptions are supported, it shall also include capacity information for Subscriptions and Publish requests, MonitoredItems, retransmission queue, and the queue for sampled MonitoredItems. (Documentation complete; no code change needed.)",
       "cu_optional": false
     },
     {
@@ -4953,6 +4953,7 @@
     {
       "id": "opc_cu_3536",
       "kind": "conformance_unit",
+      "satisfied_by": "opc_cu_user_auth",
       "opc_display_name": "Security User Name Password 2",
       "kconfig_symbol": null,
       "implementation_state": "unimplemented",
@@ -4977,7 +4978,7 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "The Server supports User Name/Password combination(s). The token will be encrypted as required by the security policy of the User Token Policy or by the security policy of the endpoint.",
+      "notes": "Reconciled (spec 078): username/password identity tokens with per-policy (endpoint/UserTokenPolicy) password encryption are decrypted+verified in activate_session.c handle_activate_username; test_user_auth_encrypted, test_user_auth_plaintext, test_user_auth_secure_e2e. Satisfied by opc_cu_user_auth. The Server supports User Name/Password combination(s). The token will be encrypted as required by the security policy of the User Token Policy or by the security policy of the endpoint.",
       "cu_optional": false
     },
     {
@@ -6105,7 +6106,7 @@
       },
       "opc_display_name": "Security Default ApplicationInstance Certificate",
       "kconfig_symbol": null,
-      "implementation_state": "unimplemented",
+      "implementation_state": "documented",
       "depends_on": [],
       "profile_defaults": {
         "nano": true,

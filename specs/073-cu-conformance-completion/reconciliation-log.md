@@ -231,13 +231,51 @@ non-empty SecureChannelId on the channel event, and a populated SessionId on the
 activate event. Still deferred (new emit sites, not this increment): 3224/3226/3230
 (NodeManagement/History/Method audits) and 5213 (connection-close).
 
+## 2026-07-16 — Cheap-win reconciliation: Micro required-complete (30/30)
+
+Claimed the required CUs that are genuinely satisfied but were unclaimed, after
+rigorous per-CU verification against the honest-evidence bar. NET: overall required
+49 -> 52; **Micro 28/30 -> 30/30 (required-complete)**, Embedded 36 -> 39/48,
+Standard 36 -> 39/52, Nano 18/18.
+
+Claimed:
+- **3536** User Name/Password 2 -> `satisfied_by: opc_cu_user_auth` (claimed alias;
+  MUC_OPCUA_CU_USER_AUTH on for micro/embedded/standard/full). Encrypted
+  username/password decrypt+verify in activate_session.c; test_user_auth_encrypted/
+  plaintext/secure_e2e.
+- **3808** Documentation - Core Capacities, **3080** Default ApplicationInstance
+  Certificate -> new `implementation_state: "documented"`. These are Documentation
+  CUs satisfied by shipped docs, not code. Added the `documented` state to the
+  tooling (model.py allows it, completion.py counts it, generate.py renders it as
+  "(DOCUMENTED)"), exempt from the backing_tests/kconfig rules that code claims
+  carry — see the model.py comment. 3808 is backed by docs/integration-guide.md
+  §2.2.1 (new capacities table) + the runtime ServerCapabilities/OperationLimits
+  nodes; 3080 by §6 (self-signed-at-boot + get_own_certificate provisioning).
+
+Deliberately NOT claimed (verification caught over-claims flagged by an initial
+optimistic pass — honest under-claim per the 073 ethos):
+- **3188** Base Types, **3189** ServerType, **5801** Type Information — require the
+  COMPLETE type system (all Encoding Objects, ModellingRuleType, every
+  InstanceDeclaration, all EventTypes); we expose a subset. The type-system facet
+  opc_facet_1219 stays `deferred` for the same reason.
+- **3185** Core Types Folders — the folders ARE exposed+tested (test_type_system),
+  but claiming needs a Kconfig gate distinct from the (deferred) full-type-system
+  facet whose symbol it would otherwise duplicate. Left deferred pending that split.
+- **2823** Invalid user token — requires anti-brute-force mitigation (repeated-attempt
+  lockout) we don't implement; rejection alone is insufficient.
+- **3125** User X509 — token signature is verified (proof-of-possession) but not the
+  full user-certificate trust/chain validation the CU requires.
+
+Genuine remaining gaps (real feature work): 3641/2483/4426 (specialized DataType
+nodes), 2231 (Part-12 push cert mgmt), 2271/3170 (outbound RegisterServer/2), 2190
+(Session Cancel).
+
 ## 2026-07-16 — Roadmap A1: specialized DataType nodes (CU 4426, 2483)
 
 First step of the Embedded/Standard completion roadmap. Exposes specialized DataType
 nodes in the base address-space type-system table, gated by a new selectable CU
 symbol `MUC_OPCUA_CU_BASE_INFO_DATATYPES` (embedded/standard/full; implied by the
-type-system facet). Emb/Std required 36 -> 38 (independent of the still-open #314
-which adds 3536/3808/3080).
+type-system facet). Emb/Std required 39 -> 41 (on top of the merged cheap-win pass).
 
 | CU | Now backed by |
 | --- | --- |
