@@ -2,6 +2,8 @@
 #include "muc_opcua/muc_opcua.h"
 #include "unity.h"
 
+#include <string.h>
+
 void setUp(void) {}
 void tearDown(void) {}
 
