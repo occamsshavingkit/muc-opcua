@@ -287,6 +287,46 @@ void test_read_over_capacity_is_too_many_operations(void) {
     TEST_ASSERT_EQUAL_HEX32(MU_STATUS_BAD_TOOMANYOPERATIONS, mu_read_request_decode(&reader, &req, nodes, 2));
 }
 
+#if MUC_OPCUA_CU_EVENTS
+void test_read_service_eventnotifier(void) {
+    /* spec 074 / CU 3194 / OPC-10000-3 §5.4.6: EventNotifier is a readable
+       attribute of Object/View nodes (the Server Object advertises
+       SubscribeToEvents); other NodeClasses return Bad_AttributeIdInvalid. */
+    mu_node_t nodes[2];
+    (void)memset(nodes, 0, sizeof(nodes));
+    nodes[0].node_id =
+        (mu_nodeid_t){.identifier_type = MU_NODEID_NUMERIC, .namespace_index = 0, .identifier.numeric = 2253};
+    nodes[0].node_class = MU_NODECLASS_OBJECT;
+    nodes[0].browse_name = (mu_string_t){6, (const opcua_byte_t *)"Server"};
+    nodes[0].display_name = (mu_string_t){6, (const opcua_byte_t *)"Server"};
+    nodes[0].event_notifier = 0x01u;
+    nodes[1].node_id =
+        (mu_nodeid_t){.identifier_type = MU_NODEID_NUMERIC, .namespace_index = 1, .identifier.numeric = 1000};
+    nodes[1].node_class = MU_NODECLASS_VARIABLE;
+    nodes[1].browse_name = (mu_string_t){3, (const opcua_byte_t *)"Var"};
+    nodes[1].display_name = (mu_string_t){3, (const opcua_byte_t *)"Var"};
+
+    mu_address_space_t address_space = {.nodes = nodes, .node_count = 2};
+    mu_read_value_id_t reads[2] = {{.node_id = nodes[0].node_id, .attribute_id = MU_ATTRIBUTEID_EVENTNOTIFIER},
+                                   {.node_id = nodes[1].node_id, .attribute_id = MU_ATTRIBUTEID_EVENTNOTIFIER}};
+    mu_read_request_t req = {.max_age = 0,
+                             .timestamps_to_return = MU_TIMESTAMPS_TO_RETURN_NEITHER,
+                             .nodes_to_read = reads,
+                             .num_nodes_to_read = 2};
+    mu_read_response_t resp;
+    mu_datavalue_t results[2];
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_read_process(&address_space, NULL, &req, 0, &resp, results, 2, NULL));
+
+    /* Object -> Byte with SubscribeToEvents (bit 0) */
+    TEST_ASSERT_TRUE(resp.results[0].has_value);
+    TEST_ASSERT_EQUAL(MU_TYPE_BYTE, resp.results[0].value.type);
+    TEST_ASSERT_EQUAL_HEX8(0x01u, resp.results[0].value.value.by);
+    /* Variable has no EventNotifier attribute */
+    TEST_ASSERT_FALSE(resp.results[1].has_value);
+    TEST_ASSERT_EQUAL(MU_STATUS_BAD_ATTRIBUTEIDINVALID, resp.results[1].status);
+}
+#endif
+
 int main(void) {
     UNITY_BEGIN();
     RUN_TEST(test_read_service_request_decode);
@@ -294,6 +334,9 @@ int main(void) {
     RUN_TEST(test_read_service_scalar_values);
     RUN_TEST(test_read_service_rejects_invalid_timestamps_to_return);
     RUN_TEST(test_read_service_browsename_displayname);
+#if MUC_OPCUA_CU_EVENTS
+    RUN_TEST(test_read_service_eventnotifier);
+#endif
     RUN_TEST(test_read_service_batch_preserves_per_operation_results);
     return UNITY_END();
 }

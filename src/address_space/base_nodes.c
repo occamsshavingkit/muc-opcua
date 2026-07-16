@@ -5,6 +5,16 @@
 #include <stddef.h>
 #include <string.h>
 
+/* Server Object EventNotifier attribute (OPC-10000-3 §5.4.6): bit 0 =
+ * SubscribeToEvents. Advertised only when the event delivery surface is
+ * compiled in, so a no-events profile does not claim to be an event source
+ * (spec 074 / CU 3194). */
+#if MUC_OPCUA_CU_EVENTS
+#define MU_SERVER_EVENTNOTIFIER 0x01u
+#else
+#define MU_SERVER_EVENTNOTIFIER 0x00u
+#endif
+
 #ifdef MUC_OPCUA_FACET_CORE_2022_SERVER
 
 /* Pooled strings to save flash */
@@ -951,7 +961,8 @@ static const mu_node_t s_base_nodes[] = {
      s_server_refs,
      sizeof(s_server_refs) / sizeof(s_server_refs[0]),
      NULL,
-     .type_definition = {0, MU_NODEID_NUMERIC, {2004}}},
+     .type_definition = {0, MU_NODEID_NUMERIC, {2004}},
+     .event_notifier = MU_SERVER_EVENTNOTIFIER},
     {{0, MU_NODEID_NUMERIC, {2254}},
      MU_NODECLASS_VARIABLE,
      {11, s_str_ServerArray},
