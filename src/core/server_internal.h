@@ -200,6 +200,11 @@ struct mu_server {
         void *context;
     } audit_callbacks[MU_MAX_AUDIT_CALLBACKS];
     size_t audit_callback_count;
+    /* Shared audit-payload ring (spec 074): full AuditEvent field values live
+       here, referenced by index+sequence from queued events (audit.h). */
+    mu_audit_payload_t audit_pool[MU_MAX_AUDIT_PAYLOADS];
+    opcua_byte_t audit_pool_next;       /* ring write index */
+    opcua_uint32_t audit_pool_sequence; /* monotonic stamp; never 0 (0 = empty slot) */
 #endif
 };
 
