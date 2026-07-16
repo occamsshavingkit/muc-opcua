@@ -16,7 +16,7 @@ yet reconciled to individual OPC CU ids count as not-implemented — see the
 reconciliation note below.
 
 - Distinct Server CUs: **525** (required 179, optional 346)
-- Reconciled as implemented: **required 52/179**, **optional 24/346**
+- Reconciled as implemented: **required 54/179**, **optional 24/346**
 
 ### Per Server profile / facet
 
@@ -29,14 +29,14 @@ reconciliation note below.
 | 1026 | Global Service Authorization Request Server Facet | 0/1 | 0/0 |
 | 1027 | Global Service KeyCredential Pull Facet | 0/1 | 0/0 |
 | 1029 | GDS AliasName Server Facet | 0/5 | 0/5 |
-| 1219 | Exposes Type System Server Facet | 1/8 | 1/38 |
+| 1219 | Exposes Type System Server Facet | 3/8 | 1/38 |
 | 1322 | Core 2022 Server Facet | 16/17 | 23/27 |
 | 1324 | Standard DataChange Subscription 2022 Server Facet | 16/16 | 0/1 |
 | 1328 | Auditing 2022 Server Facet | 17/18 | 1/12 |
-| 1329 | Node Management 2022 Server Facet | 5/15 | 1/39 |
+| 1329 | Node Management 2022 Server Facet | 7/15 | 1/39 |
 | 1330 | Nano Embedded Device 2022 Server Profile | 21/22 | 23/29 |
-| 1332 | Embedded 2022 UA Server Profile | 41/51 | 23/68 |
-| 1333 | Standard 2022 UA Server Profile | 41/55 | 23/68 |
+| 1332 | Embedded 2022 UA Server Profile | 43/51 | 23/68 |
+| 1333 | Standard 2022 UA Server Profile | 43/55 | 23/68 |
 | 1343 | Global Discovery Server 2022 Profile | 37/41 | 23/28 |
 | 1344 | Global Discovery and Certificate Mgmt 2022 Server | 45/52 | 24/42 |
 | 1346 | A & E Wrapper 2022 Facet | 10/18 | 0/0 |
@@ -108,8 +108,8 @@ reconciliation note below.
 | 2255 | Micro Embedded Device 2022 Server Profile | 31/32 | 23/30 |
 | 2266 | Nano Embedded Device 2025 Server Profile | 21/22 | 23/29 |
 | 2267 | Micro Embedded Device 2025 Server Profile | 31/32 | 23/30 |
-| 2268 | Embedded 2025 UA Server Profile | 41/51 | 23/68 |
-| 2269 | Standard 2025 UA Server Profile | 41/55 | 23/68 |
+| 2268 | Embedded 2025 UA Server Profile | 43/51 | 23/68 |
+| 2269 | Standard 2025 UA Server Profile | 43/55 | 23/68 |
 | 2322 | AliasName Configuration Facet | 0/4 | 0/5 |
 | 2323 | AliasName Server PubSub Publisher Facet | 0/4 | 0/4 |
 
@@ -262,7 +262,7 @@ Optional CUs:
 
 ## Profile Embedded 2025 UA Server Profile
 
-- Required CUs implemented: **39/48**
+- Required CUs implemented: **41/48**
 - Optional CUs implemented: **25/71**
 
 Required CUs:
@@ -270,6 +270,7 @@ Required CUs:
 - [x] `opc_cu_2317` View TranslateBrowsePath
 - [x] `opc_cu_2328` Discovery Get Endpoints
 - [x] `opc_cu_2352` Discovery Find Servers Self
+- [x] `opc_cu_2483` Base Info Date DataTypes
 - [x] `opc_cu_2600` SecurityPolicy Support
 - [x] `opc_cu_2809` Address Space Atomicity
 - [x] `opc_cu_2820` Address Space Full Array Only
@@ -300,6 +301,7 @@ Required CUs:
 - [x] `opc_cu_3923` Session Multiple
 - [x] `opc_cu_3985` Session General Service Behaviour
 - [x] `opc_cu_4055` Base Info Server Capabilities MaxMonitoredItemsQueueSize
+- [x] `opc_cu_4426` Base Info Decimal DataType
 - [x] `opc_cu_5207` Monitor Items 2
 - [x] `opc_cu_5208` Monitor Value Change V2
 - [x] `opc_cu_5793` Time Sync - Support
@@ -307,13 +309,11 @@ Required CUs:
 - [x] `opc_cu_ua_binary_encoding` UA Binary Encoding
 - [x] `opc_cu_ua_secure_conversation` UA Secure Conversation
 - [ ] `opc_cu_2231` Push Model for Global Certificate and TrustList Management
-- [ ] `opc_cu_2483` Base Info Date DataTypes
 - [ ] `opc_cu_2823` Security Invalid user token
 - [ ] `opc_cu_3185` Base Info Core Types Folders
 - [ ] `opc_cu_3188` Base Info Base Types
 - [ ] `opc_cu_3189` Base Info ServerType
 - [ ] `opc_cu_3641` Base Info Method Argument DataType
-- [ ] `opc_cu_4426` Base Info Decimal DataType
 - [ ] `opc_cu_5801` Base Info Type Information
 
 Optional CUs:
@@ -392,7 +392,7 @@ Optional CUs:
 
 ## Profile Standard 2025 UA Server Profile
 
-- Required CUs implemented: **39/52**
+- Required CUs implemented: **41/52**
 - Optional CUs implemented: **25/71**
 
 Required CUs:
@@ -400,6 +400,7 @@ Required CUs:
 - [x] `opc_cu_2317` View TranslateBrowsePath
 - [x] `opc_cu_2328` Discovery Get Endpoints
 - [x] `opc_cu_2352` Discovery Find Servers Self
+- [x] `opc_cu_2483` Base Info Date DataTypes
 - [x] `opc_cu_2600` SecurityPolicy Support
 - [x] `opc_cu_2809` Address Space Atomicity
 - [x] `opc_cu_2820` Address Space Full Array Only
@@ -430,6 +431,7 @@ Required CUs:
 - [x] `opc_cu_3923` Session Multiple
 - [x] `opc_cu_3985` Session General Service Behaviour
 - [x] `opc_cu_4055` Base Info Server Capabilities MaxMonitoredItemsQueueSize
+- [x] `opc_cu_4426` Base Info Decimal DataType
 - [x] `opc_cu_5207` Monitor Items 2
 - [x] `opc_cu_5208` Monitor Value Change V2
 - [x] `opc_cu_5793` Time Sync - Support
@@ -439,7 +441,6 @@ Required CUs:
 - [ ] `opc_cu_2190` Session Cancel
 - [ ] `opc_cu_2231` Push Model for Global Certificate and TrustList Management
 - [ ] `opc_cu_2271` Discovery Register
-- [ ] `opc_cu_2483` Base Info Date DataTypes
 - [ ] `opc_cu_2823` Security Invalid user token
 - [ ] `opc_cu_3125` Security User X509
 - [ ] `opc_cu_3170` Discovery Register2
@@ -447,7 +448,6 @@ Required CUs:
 - [ ] `opc_cu_3188` Base Info Base Types
 - [ ] `opc_cu_3189` Base Info ServerType
 - [ ] `opc_cu_3641` Base Info Method Argument DataType
-- [ ] `opc_cu_4426` Base Info Decimal DataType
 - [ ] `opc_cu_5801` Base Info Type Information
 
 Optional CUs:
@@ -530,7 +530,7 @@ Facet CU membership uses direct `included_conformance_units`
 (sub-facet CUs are counted where the snapshot expands them).
 
 - **GDS AliasName Server Facet** (`opc_facet_1029`): required 0/0, optional 0/0 — 10 closure CU(s) not in manifest
-- **Exposes Type System Server Facet** (`opc_facet_1219`): required 0/7, optional 2/39
+- **Exposes Type System Server Facet** (`opc_facet_1219`): required 2/7, optional 2/39
 - **Core 2022 Server Facet** (`opc_facet_1322`): required 16/16, optional 23/28
 - **Standard DataChange Subscription 2022 Server Facet** (`opc_facet_1324`): required 16/16, optional 0/1
 - **Global Certificate Management Server Facet** (`opc_facet_1631`): required 0/1, optional 0/0

@@ -193,6 +193,7 @@
       "opc_cu_address_space_base",
       "opc_cu_aggregate_full",
       "opc_cu_auditing",
+      "opc_cu_base_info_datatypes",
       "opc_cu_complex_types",
       "opc_cu_core_structure_2",
       "opc_cu_core_views_folder",
@@ -1589,6 +1590,7 @@
     {
       "id": "opc_cu_2483",
       "kind": "conformance_unit",
+      "satisfied_by": "opc_cu_base_info_datatypes",
       "opc_display_name": "Base Info Date DataTypes",
       "kconfig_symbol": null,
       "implementation_state": "unimplemented",
@@ -1613,7 +1615,7 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "Exposes the DurationString, TimeString, and DateString DataTypes and all their supertypes in the AddressSpace",
+      "notes": "Reconciled (spec 079): DurationString(12879)/TimeString(12880)/DateString(12881) exposed as subtypes of String(12) in base_nodes.c; test_type_system. Satisfied by opc_cu_base_info_datatypes. Exposes the DurationString, TimeString, and DateString DataTypes and all their supertypes in the AddressSpace",
       "cu_optional": false
     },
     {
@@ -3069,6 +3071,7 @@
     {
       "id": "opc_cu_4426",
       "kind": "conformance_unit",
+      "satisfied_by": "opc_cu_base_info_datatypes",
       "opc_display_name": "Base Info Decimal DataType",
       "kconfig_symbol": null,
       "implementation_state": "unimplemented",
@@ -3093,7 +3096,7 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "Exposes the DataType Decimal and all its supertypes in the AddressSpace.",
+      "notes": "Reconciled (spec 079): Decimal(i=50) + its supertype Number(i=26) exposed in base_nodes.c type-system table with HasSubtype closure to BaseDataType; test_type_system. Satisfied by opc_cu_base_info_datatypes. Exposes the DataType Decimal and all its supertypes in the AddressSpace.",
       "cu_optional": false
     },
     {
@@ -3828,6 +3831,33 @@
         "facet": "Core 2022 Server Facet"
       },
       "notes": "Project-level Conformance Unit mirroring the legacy 'namespaces' item; emits Kconfig symbol MUC_OPCUA_CU_NAMESPACES matching the #ifdef guard renamed in Task 3 of the CU-aligned code reorganisation plan."
+    },
+    {
+      "id": "opc_cu_base_info_datatypes",
+      "kind": "conformance_unit",
+      "opc_display_name": "Base Info Specialized DataTypes",
+      "kconfig_symbol": "MUC_OPCUA_CU_BASE_INFO_DATATYPES",
+      "implementation_state": "claimed",
+      "depends_on": [
+        "MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER"
+      ],
+      "profile_defaults": {
+        "nano": false,
+        "micro": false,
+        "embedded": true,
+        "standard": true,
+        "full": true,
+        "custom": false
+      },
+      "backing_tests": [
+        "test_type_system"
+      ],
+      "opc_reference": {
+        "spec": "OPC-10000-5",
+        "section": null,
+        "facet": "Core 2022 Server Facet"
+      },
+      "notes": "spec 079: gates the specialized DataType nodes exposed in base_nodes.c (Number i=26 / Decimal i=50; DurationString/TimeString/DateString i=12879/12880/12881) and their supertype closure. Satisfies CU 2483/4426; implied on when the type-system facet is enabled."
     },
     {
       "id": "service_read",

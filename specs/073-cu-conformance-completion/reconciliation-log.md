@@ -269,3 +269,25 @@ optimistic pass — honest under-claim per the 073 ethos):
 Genuine remaining gaps (real feature work): 3641/2483/4426 (specialized DataType
 nodes), 2231 (Part-12 push cert mgmt), 2271/3170 (outbound RegisterServer/2), 2190
 (Session Cancel).
+
+## 2026-07-16 — Roadmap A1: specialized DataType nodes (CU 4426, 2483)
+
+First step of the Embedded/Standard completion roadmap. Exposes specialized DataType
+nodes in the base address-space type-system table, gated by a new selectable CU
+symbol `MUC_OPCUA_CU_BASE_INFO_DATATYPES` (embedded/standard/full; implied by the
+type-system facet). Emb/Std required 39 -> 41 (on top of the merged cheap-win pass).
+
+| CU | Now backed by |
+| --- | --- |
+| 4426 Base Info Decimal DataType | `Number`(i=26) + `Decimal`(i=50) nodes added to base_nodes.c with HasSubtype closure BaseDataType→Number→Decimal; test_type_system::test_specialized_datatype_nodes_and_supertypes |
+| 2483 Base Info Date DataTypes | `DurationString`(12879)/`TimeString`(12880)/`DateString`(12881) as subtypes of String(12); same test |
+
+Both `satisfied_by` the new claimed alias `opc_cu_base_info_datatypes`. Notes:
+- Sorted-table discipline (no linear fallback): Number(26) sorts after BaseDataType(24)
+  before References(31); Decimal(50) sorts between HasComponent(47) and BaseObjectType(58)
+  — a first pass wrongly put 50 before 31, caught by test_base_address_space_is_sorted.
+- The new CU symbol had to be propagated to test TUs via
+  `target_compile_definitions(... PUBLIC)` in src/CMakeLists.txt (autoconf force-include
+  reaches only the library, not tests).
+- **3641** (Argument DataType) was deferred to A2: its Encoding Objects require
+  DataTypeEncodingType(i=76), which is part of the full type-system work (3188).
