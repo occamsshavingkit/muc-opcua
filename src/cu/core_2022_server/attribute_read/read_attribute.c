@@ -55,6 +55,20 @@ static size_t variant_elem_size(mu_builtin_type_t type) {
 #endif
 
 #if defined(MUC_OPCUA_CU_MULTI_CHUNK) || defined(MUC_OPCUA_CU_SUBSCRIPTION_BASIC)
+/* Parse a run of ASCII decimal digits at *pos into *out; advances *pos past them.
+   Returns false when no digit is present at *pos. */
+static bool parse_decimal_run(const char *p, opcua_int32_t len, opcua_int32_t *pos, opcua_int32_t *out) {
+    if (*pos >= len || p[*pos] < '0' || p[*pos] > '9') {
+        return false;
+    }
+    *out = 0;
+    while (*pos < len && p[*pos] >= '0' && p[*pos] <= '9') {
+        *out = *out * 10 + (p[*pos] - '0');
+        ++(*pos);
+    }
+    return true;
+}
+
 opcua_statuscode_t parse_numeric_range(const mu_string_t *range_str, opcua_int32_t *start, opcua_int32_t *end) {
     const char *p = (const char *)range_str->data;
     opcua_int32_t len = range_str->length;
@@ -63,25 +77,14 @@ opcua_statuscode_t parse_numeric_range(const mu_string_t *range_str, opcua_int32
     *start = 0;
     *end = -1;
 
-    if (pos >= len || p[pos] < '0' || p[pos] > '9') {
+    if (!parse_decimal_run(p, len, &pos, start)) {
         return MU_STATUS_BAD_INDEXRANGEINVALID;
-    }
-
-    while (pos < len && p[pos] >= '0' && p[pos] <= '9') {
-        *start = *start * 10 + (p[pos] - '0');
-        pos++;
     }
 
     if (pos < len && p[pos] == ':') {
         pos++;
-        if (pos >= len || p[pos] < '0' || p[pos] > '9') {
+        if (!parse_decimal_run(p, len, &pos, end)) {
             return MU_STATUS_BAD_INDEXRANGEINVALID;
-        }
-
-        *end = 0;
-        while (pos < len && p[pos] >= '0' && p[pos] <= '9') {
-            *end = *end * 10 + (p[pos] - '0');
-            pos++;
         }
     }
 

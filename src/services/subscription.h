@@ -199,8 +199,9 @@ typedef struct {
     opcua_byte_t trigger;              /* mu_datachange_trigger_t */
     opcua_byte_t timestamps_to_return; /* mu_timestamps_to_return_t (OPC-10000-4 §5.13.2.2 Table 63) */
     bool in_use;
-    bool has_value;         /* a baseline sample has been taken */
-    bool pending;           /* a change is queued, awaiting the next Publish */
+    bool has_value; /* a baseline sample has been taken */
+    bool pending;   /* a change is queued, awaiting the next Publish */
+    /* cppcheck-suppress unusedStructMember ; set here, read cross-TU in notification.c */
     bool semantics_changed; /* CU 3922: set the SemanticsChanged bit (0x4000) on the
                                next data-change Notification, then clear (OPC-10000-4 §7.38.1) */
 #if MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
