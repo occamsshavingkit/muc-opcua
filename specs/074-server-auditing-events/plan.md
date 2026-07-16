@@ -26,10 +26,23 @@ Make OPC UA Auditing genuinely conformant by joining the two halves that already
 
 ## Embedded Size Budget
 
-**Flash Impact**: New: audit→event adapter (field construction), 4 emission call sites, EventNotifier read case (~1 switch case), Server node bit. Estimated small (~0.5–1.5 KB) and **only** when `MUC_OPCUA_CU_AUDITING` on. Nano/other non-auditing profiles: **0** (compiles out).
-**RAM Impact**: none mandatory; reuses existing event-field buffers.
-**Heap Use**: none.
-**Static Tables Added**: none (Server node `.event_notifier` byte set on an existing node).
+*Revised after the implementation probe (research.md Decision 6-7): the event
+pipeline carries only 5 base fields, so full-field AuditEvents require extending
+the event-field model — the RAM cost below is now the dominant cost.*
+
+**Flash Impact**: audit→event adapter + field construction, the new
+`MU_EVENT_FIELD_*` SELECT-resolver cases + filter-parser mappings, 4 emission
+sites, EventNotifier read case, Server node bit. Estimated ~1–2 KB, **only** when
+`MUC_OPCUA_CU_AUDITING` on; **0** otherwise (compiles out).
+**RAM Impact**: **the material cost.** The audit payload enlarges the queued
+`mu_event_notification_t` (bounded inline strings `MU_AUDIT_STR_MAX` + scalar
+old/new), multiplied by `MU_MAX_EVENT_QUEUE_SIZE (8) * MU_INTERN_MAX_SUBSCRIPTIONS`
+(up to 50–100). The audit payload is under `#if MUC_OPCUA_CU_AUDITING` so
+non-auditing profiles pay **0**; auditing profiles pay `delta * 8 * subs`, to be
+**measured** (SC-003) — may motivate a smaller audit-profile event-queue size or
+subscription cap.
+**Heap Use**: none (bounded inline capture; scalar write values only, arrays→Null).
+**Static Tables Added**: none.
 **Transport Buffers**: unchanged.
 **Crypto Dependency Impact**: none.
 

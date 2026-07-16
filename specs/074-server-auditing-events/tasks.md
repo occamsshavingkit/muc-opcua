@@ -20,6 +20,25 @@
 - [ ] T004 [US1] Add `MU_ATTRIBUTEID_EVENTNOTIFIER` case to `read_attribute.c` returning the node's `event_notifier` byte (default 0).
 - [ ] T005 [US1] Set `.event_notifier = 0x01` on the Server Object in `base_nodes.c` (gated with the events/auditing surface). GREEN T003.
 
+## Phase 2b: Event-field-model extension (full-field AuditEvents)
+
+*Added after the implementation probe (research.md Decision 6-7): the pipeline
+carries only 5 base fields; full-field AuditEvents require extending it.*
+
+- [ ] T005a [US1] Extend `MU_EVENT_FIELD_*` (event_filter.h) with STATUS,
+  ACTIONTIMESTAMP, SERVERID, CLIENTAUDITENTRYID, CLIENTUSERID, ATTRIBUTEID,
+  OLDVALUE, NEWVALUE, SECURECHANNELID, SESSIONID.
+- [ ] T005b [US1] Extend `mu_event_notification_t` (types.h) with an audit payload
+  under `#if MUC_OPCUA_CU_AUDITING`: source_node, status, action_timestamp,
+  bounded inline strings (`MU_AUDIT_STR_MAX`) for server_id/client_user_id/
+  client_audit_entry_id/secure_channel_id, session_id, attribute_id, and a scalar
+  old/new value pair. Add `MU_AUDIT_STR_MAX` capacity.
+- [ ] T005c [US1] RED unit test: SELECT of the new audit fields resolves the
+  carried value (not Null); non-audit events still resolve base fields only.
+- [ ] T005d [US1] Extend the notification.c SELECT resolver with the new enum
+  cases (from the audit payload) and `filter_reader.c` SELECT-path parsing to map
+  AuditEvent BrowseName paths to the new enums. GREEN T005c.
+
 ## Phase 3: US1 — audit→event routing + emission (the core)
 
 ### RED (tests first)

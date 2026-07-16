@@ -93,3 +93,53 @@ emit+observe of the 4 modelled actions (not the full audit surface).
 None blocking. Exact subtype-field completeness (e.g. whether to populate
 SecurityPolicyUri on the channel audit) is an implementation refinement, not a
 design unknown.
+
+## Decision 6 — event-field-model extension (revised scope, post-implementation-probe)
+
+**Finding (2026-07-16, during implementation)**: the event pipeline delivers only
+5 base fields. `mu_event_notification_t` (types.h) carries `event_type`,
+`event_id`, `time`, `message`, `severity`; the SELECT resolver
+(notification.c:277-310) emits exactly those and Null for everything else
+(SourceNode/SourceName/ReceiveTime/LocalTime and any AuditEvent field). The
+`MU_EVENT_FIELD_*` enum already *reserves* SourceNode/SourceName/ReceiveTime/
+LocalTime (parsed, resolved Null), so SELECT-path parsing extends cleanly, but
+**no audit-specific field can currently be carried or resolved.**
+
+**Decision (per user choice: full-field AuditEvents)**: extend the event field
+model so AuditEvents carry and can SELECT their fields:
+
+1. `mu_event_notification_t`: add an audit payload **only under
+   `#if MUC_OPCUA_CU_AUDITING`** (non-auditing builds pay 0): `source_node`
+   (nodeid), `status` (bool), `action_timestamp` (datetime), and a bounded
+   subtype union (secure_channel_id, session_id, attribute_id, old/new scalar).
+2. `MU_EVENT_FIELD_*`: add STATUS, ACTIONTIMESTAMP, SERVERID, CLIENTAUDITENTRYID,
+   CLIENTUSERID, ATTRIBUTEID, OLDVALUE, NEWVALUE, SECURECHANNELID, SESSIONID.
+3. notification.c SELECT resolver: add cases for the new enums.
+4. filter_reader.c SELECT parsing: map AuditEvent BrowseName paths to the enums.
+
+## Decision 7 — bounded capture (no-heap lifetime + RAM)
+
+The notification is **queued** (`queue[MU_MAX_EVENT_QUEUE_SIZE=8]` per
+subscription × `MU_INTERN_MAX_SUBSCRIPTIONS`) and delivered later in Publish, so
+any pointed-to data (request strings, write value arrays) is gone by delivery.
+
+**Decision**:
+
+- **Strings** (server_id, client_user_id, client_audit_entry_id, secure_channel_id):
+  bounded inline char buffers `[MU_AUDIT_STR_MAX]` copied at emit time; over-long
+  values truncated (documented). Sized small (e.g. 32-64B).
+- **Write old/new values**: capture **scalar** built-in values inline (small
+  fixed union); array/structured values are emitted Null with a documented
+  limitation (a scalar-write audit is the common CTT case). Avoids unbounded copy.
+- **RAM cost**: the audit payload enlarges the queued notification. Cost =
+  `delta * 8 * MU_INTERN_MAX_SUBSCRIPTIONS`, paid **only** on auditing-enabled
+  profiles. Must be measured (SC-003) and may motivate a smaller audit-profile
+  `MU_MAX_EVENT_QUEUE_SIZE` or subscription cap. **This is the dominant cost of
+  the full-field path and the reason it is materially larger than base-only.**
+
+## Decision 8 — WHERE over audit fields
+
+`mu_where_clause_eval` reads `mu_event_fields_t` (a separate carrier). WHERE over
+audit-specific fields is **out of scope** for the first cut (SELECT-only for
+audit fields); WHERE continues to operate on the base fields. Documented; a
+follow-up can extend `mu_event_fields_t` if CTT requires audit-field WHERE.
