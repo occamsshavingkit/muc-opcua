@@ -124,6 +124,11 @@ static const opcua_byte_t s_str_ServerType[] = "ServerType";
 static const opcua_byte_t s_str_State[] = "State";
 static const opcua_byte_t s_str_StatusCode[] = "StatusCode";
 static const opcua_byte_t s_str_String[] = "String";
+static const opcua_byte_t s_str_Number[] = "Number";
+static const opcua_byte_t s_str_Decimal[] = "Decimal";
+static const opcua_byte_t s_str_DurationString[] = "DurationString";
+static const opcua_byte_t s_str_TimeString[] = "TimeString";
+static const opcua_byte_t s_str_DateString[] = "DateString";
 #if MUC_OPCUA_CU_BASE_INFO_LOCALTIME || defined(MUC_OPCUA_CU_BASE_INFO_ENGINEERING_UNITS) ||                           \
     defined(MUC_OPCUA_CU_BASE_INFO_CURRENCY)
 static const opcua_byte_t s_str_Structure[] = "Structure";
@@ -284,11 +289,24 @@ static const mu_reference_t s_base_data_type_refs[] = {
     {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {19}}, true},
     {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {20}}, true},
     {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {21}}, true},
+#if MUC_OPCUA_CU_BASE_INFO_DATATYPES
+    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {26}}, true}, /* HasSubtype -> Number (CU 4426) */
+#endif
 #if MUC_OPCUA_CU_BASE_INFO_LOCALTIME || defined(MUC_OPCUA_CU_BASE_INFO_ENGINEERING_UNITS) ||                           \
     defined(MUC_OPCUA_CU_BASE_INFO_CURRENCY)
     {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {22}}, true}
 #endif
 };
+
+#if MUC_OPCUA_CU_BASE_INFO_DATATYPES
+/* CU 4426/2483: HasSubtype forward refs for the specialized DataType nodes. */
+static const mu_reference_t s_number_subtype_refs[] = {
+    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {50}}, true}}; /* Number -> Decimal */
+static const mu_reference_t s_string_subtype_refs[] = {
+    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {12879}}, true},  /* String -> DurationString */
+    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {12880}}, true},  /* String -> TimeString */
+    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {12881}}, true}}; /* String -> DateString */
+#endif
 
 #if MUC_OPCUA_CU_BASE_INFO_LOCALTIME || defined(MUC_OPCUA_CU_BASE_INFO_ENGINEERING_UNITS) ||                           \
     defined(MUC_OPCUA_CU_BASE_INFO_CURRENCY)
@@ -709,8 +727,13 @@ static const mu_node_t s_base_nodes[] = {
      MU_NODECLASS_DATATYPE,
      {6, s_str_String},
      {6, s_str_String},
+#if MUC_OPCUA_CU_BASE_INFO_DATATYPES
+     s_string_subtype_refs,
+     sizeof(s_string_subtype_refs) / sizeof(s_string_subtype_refs[0]),
+#else
      NULL,
      0,
+#endif
      NULL,
      .type_definition = {0}},
     {{0, MU_NODEID_NUMERIC, {13}},
@@ -772,6 +795,18 @@ static const mu_node_t s_base_nodes[] = {
      sizeof(s_base_data_type_refs) / sizeof(s_base_data_type_refs[0]),
      NULL,
      .type_definition = {0}},
+#if MUC_OPCUA_CU_BASE_INFO_DATATYPES
+    /* CU 4426: Number(i=26, subtype of BaseDataType). Sorted slot between
+       BaseDataType(24) and References(31). Decimal(50) sorts later (before 58). */
+    {{0, MU_NODEID_NUMERIC, {26}},
+     MU_NODECLASS_DATATYPE,
+     {6, s_str_Number},
+     {6, s_str_Number},
+     s_number_subtype_refs,
+     sizeof(s_number_subtype_refs) / sizeof(s_number_subtype_refs[0]),
+     NULL,
+     .type_definition = {0}},
+#endif
     {{0, MU_NODEID_NUMERIC, {31}},
      MU_NODECLASS_REFERENCETYPE,
      {10, s_str_References},
@@ -852,6 +887,18 @@ static const mu_node_t s_base_nodes[] = {
      0,
      NULL,
      .type_definition = {0}},
+#if MUC_OPCUA_CU_BASE_INFO_DATATYPES
+    /* CU 4426: Decimal(i=50, subtype of Number). Sorted slot between HasComponent(47)
+       and BaseObjectType(58). */
+    {{0, MU_NODEID_NUMERIC, {50}},
+     MU_NODECLASS_DATATYPE,
+     {7, s_str_Decimal},
+     {7, s_str_Decimal},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0}},
+#endif
     {{0, MU_NODEID_NUMERIC, {58}},
      MU_NODECLASS_OBJECTTYPE,
      {14, s_str_BaseObjectType},
@@ -1386,6 +1433,34 @@ static const mu_node_t s_base_nodes[] = {
      sizeof(s_property_type_ref) / sizeof(s_property_type_ref[0]),
      MU_RESEND_INPUT_VALUE,
      .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+#endif
+#if MUC_OPCUA_CU_BASE_INFO_DATATYPES
+    /* CU 2483: DurationString/TimeString/DateString (subtypes of String). Sorted
+       slot between InputArguments(12874) and EstimatedReturnTime(12885). */
+    {{0, MU_NODEID_NUMERIC, {12879}},
+     MU_NODECLASS_DATATYPE,
+     {14, s_str_DurationString},
+     {14, s_str_DurationString},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0}},
+    {{0, MU_NODEID_NUMERIC, {12880}},
+     MU_NODECLASS_DATATYPE,
+     {10, s_str_TimeString},
+     {10, s_str_TimeString},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0}},
+    {{0, MU_NODEID_NUMERIC, {12881}},
+     MU_NODECLASS_DATATYPE,
+     {10, s_str_DateString},
+     {10, s_str_DateString},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0}},
 #endif
 #ifdef MUC_OPCUA_CU_BASE_INFO_ESTIMATED_RETURN_TIME
     /* OPC-10000-5 §6.3.1, OPC-10000-7 CU 3198: Server.EstimatedReturnTime

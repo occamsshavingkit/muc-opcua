@@ -404,6 +404,16 @@ config MUC_OPCUA_CU_AUDITING
 	  Backing tests: test_audit_events, test_event_notifications.
 	  Notes: spec 074: the server now emits OPC UA AuditEvents (Open Secure Channel/Create Session/Activate Session/Write Update, subtypes i=2060/2071/2075/2100) that a client observes by subscribing to the Server Object EventNotifier -- not just the host-callback stub. Emit+observe proven E2E by test_event_notifications::test_audit_write_event_e2e. Project-level Conformance Unit mirroring the legacy 'auditing' item; emits Kconfig symbol MUC_OPCUA_CU_AUDITING matching the #ifdef guard renamed in Task 3 of the CU-aligned code reorganisation plan.
 
+config MUC_OPCUA_CU_BASE_INFO_DATATYPES
+	bool "CU: Base Info Specialized DataTypes"
+	depends on MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_EMBEDDED_2025_UA_SERVER
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-5 -- Core 2022 Server Facet.
+	  Backing tests: test_type_system.
+	  Notes: spec 079: gates the specialized DataType nodes exposed in base_nodes.c (Number i=26 / Decimal i=50; DurationString/TimeString/DateString i=12879/12880/12881) and their supertype closure. Satisfies CU 2483/4426; implied on when the type-system facet is enabled.
+
 config MUC_OPCUA_CU_COMPLEX_TYPES
 	bool "CU: Complex Types"
 	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
@@ -1129,7 +1139,7 @@ comment "Base Info DecimalString DataType (NOT IMPLEMENTED)"
 # Base Info Date DataTypes (opc_cu_2483)
 #   Implementation state: unimplemented -- visible but not selectable.
 #   Detail: CU 2483:Base Info Date DataTypes.
-#   Notes: Exposes the DurationString, TimeString, and DateString DataTypes and all their supertypes in the AddressSpace
+#   Notes: Reconciled (spec 079): DurationString(12879)/TimeString(12880)/DateString(12881) exposed as subtypes of String(12) in base_nodes.c; test_type_system. Satisfied by opc_cu_base_info_datatypes. Exposes the DurationString, TimeString, and DateString DataTypes and all their supertypes in the AddressSpace
 comment "Base Info Date DataTypes (NOT IMPLEMENTED)"
 
 # Base Info BitFieldMaskDataType (opc_cu_2484)
@@ -1363,7 +1373,7 @@ comment "Base Info Handle DataType (NOT IMPLEMENTED)"
 # Base Info Decimal DataType (opc_cu_4426)
 #   Implementation state: unimplemented -- visible but not selectable.
 #   Detail: CU 4426:Base Info Decimal DataType.
-#   Notes: Exposes the DataType Decimal and all its supertypes in the AddressSpace.
+#   Notes: Reconciled (spec 079): Decimal(i=50) + its supertype Number(i=26) exposed in base_nodes.c type-system table with HasSubtype closure to BaseDataType; test_type_system. Satisfied by opc_cu_base_info_datatypes. Exposes the DataType Decimal and all its supertypes in the AddressSpace.
 comment "Base Info Decimal DataType (NOT IMPLEMENTED)"
 
 # Base Info Type Information (opc_cu_5801)

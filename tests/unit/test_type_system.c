@@ -117,6 +117,24 @@ void test_instances_have_type_definition_references(void) {
     TEST_ASSERT_TRUE(has_forward_ref(11705u, 40u, 68u));
 }
 
+#if MUC_OPCUA_CU_BASE_INFO_DATATYPES
+/* spec 079: specialized DataType nodes and their supertype closure (CU 4426 Decimal,
+   CU 2483 Date DataTypes). */
+void test_specialized_datatype_nodes_and_supertypes(void) {
+    assert_node(26u, MU_NODECLASS_DATATYPE, "Number");
+    assert_node(50u, MU_NODECLASS_DATATYPE, "Decimal");
+    assert_node(12879u, MU_NODECLASS_DATATYPE, "DurationString");
+    assert_node(12880u, MU_NODECLASS_DATATYPE, "TimeString");
+    assert_node(12881u, MU_NODECLASS_DATATYPE, "DateString");
+
+    TEST_ASSERT_TRUE(has_forward_ref(24u, 45u, 26u));    /* BaseDataType -> Number */
+    TEST_ASSERT_TRUE(has_forward_ref(26u, 45u, 50u));    /* Number -> Decimal */
+    TEST_ASSERT_TRUE(has_forward_ref(12u, 45u, 12879u)); /* String -> DurationString */
+    TEST_ASSERT_TRUE(has_forward_ref(12u, 45u, 12880u)); /* String -> TimeString */
+    TEST_ASSERT_TRUE(has_forward_ref(12u, 45u, 12881u)); /* String -> DateString */
+}
+#endif
+
 void test_server_profile_array_advertises_embedded_profile(void) {
 #if MUC_OPCUA_MARKER_STANDARD_PROFILE
     static const char embedded_profile[] = "http://opcfoundation.org/UA-Profile/Server/StandardUA2017";
@@ -179,6 +197,9 @@ int main(void) {
     RUN_TEST(test_type_hierarchies_have_subtype_references);
     RUN_TEST(test_instances_have_type_definition_references);
     RUN_TEST(test_server_profile_array_advertises_embedded_profile);
+#if MUC_OPCUA_CU_BASE_INFO_DATATYPES
+    RUN_TEST(test_specialized_datatype_nodes_and_supertypes);
+#endif
 #elif MUC_OPCUA_BASE_NODES
     RUN_TEST(test_default_build_keeps_types_folder_unexpanded);
 #endif
