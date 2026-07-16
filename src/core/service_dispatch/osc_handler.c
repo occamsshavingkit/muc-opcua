@@ -307,16 +307,30 @@ opcua_statuscode_t handle_open_secure_channel(mu_server_t *server, mu_binary_rea
 #endif
 
 #if MUC_OPCUA_CU_AUDITING
-    /* spec 074: emit an AuditOpenSecureChannelEvent (i=2060) for the successful
+    /* spec 074/077: emit an AuditOpenSecureChannelEvent (i=2060) for the successful
        OpenSecureChannel (OPC-10000-5 §6.4.6), for both SecurityPolicy None and
-       secured channels. SecureChannelId string + failure-path auditing are
-       documented follow-ups. No-op unless auditing is enabled. */
+       secured channels, now carrying the SecureChannelId (the numeric channel id
+       formatted as a String, per AuditChannelEventType.SecureChannelId). No-op
+       unless auditing is enabled. */
     {
+        opcua_byte_t chid_buf[10]; /* UInt32 max = 4294967295 -> 10 digits */
+        opcua_uint32_t chid = server_secure_channel.channel_id;
+        opcua_int32_t chid_len = 0;
+        opcua_byte_t rev[10];
+        opcua_int32_t n = 0;
+        do {
+            rev[n++] = (opcua_byte_t)('0' + (chid % 10u));
+            chid /= 10u;
+        } while (chid != 0u);
+        while (n > 0) {
+            chid_buf[chid_len++] = rev[--n];
+        }
+
         mu_audit_event_t audit_ev;
         (void)memset(&audit_ev, 0, sizeof(audit_ev));
         audit_ev.event_type = MU_AUDIT_EVENT_OPEN_SECURE_CHANNEL;
         audit_ev.status = true;
-        audit_ev.specific.open_channel.secure_channel_id = (mu_string_t){-1, NULL};
+        audit_ev.specific.open_channel.secure_channel_id = (mu_string_t){chid_len, chid_buf};
         mu_raise_audit_event(server, &audit_ev);
     }
 #endif

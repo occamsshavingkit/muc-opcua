@@ -374,6 +374,19 @@ opcua_statuscode_t handle_write(mu_server_t *server, mu_binary_reader_t *r, mu_b
             }
         }
 
+#if MUC_OPCUA_CU_AUDITING
+        /* spec 077: capture the pre-write value for the AuditWriteUpdateEvent OldValue,
+           read BEFORE the write mutates it. Non-scalars are dropped to Null downstream. */
+        mu_variant_t audit_old_value;
+        audit_old_value.type = MU_TYPE_NULL;
+        if (node != NULL && node->value != NULL && write_val->attribute_id == MU_ATTRIBUTEID_VALUE) {
+            mu_variant_t pre_write;
+            if (mu_value_source_read(node->value, &node->node_id, &pre_write) == MU_STATUS_GOOD) {
+                audit_old_value = pre_write;
+            }
+        }
+#endif
+
         if (!handled && result == MU_STATUS_GOOD) {
             /* Apply write callback if configured */
             mu_write_handler_t write_handler = server->config.write_handler;
@@ -388,21 +401,18 @@ opcua_statuscode_t handle_write(mu_server_t *server, mu_binary_reader_t *r, mu_b
 
         results[i] = result;
 #if MUC_OPCUA_CU_AUDITING
-        if (result == MU_STATUS_GOOD) {
-            /* spec 074: emit an AuditWriteUpdateEvent (i=2100) per successful
-               attribute write (OPC-10000-5 §6.4.25). NewValue = the written
-               scalar (the adapter drops non-scalar values to Null); OldValue
-               capture (pre-write read) is a documented follow-up. No-op unless
-               auditing is enabled. */
-            mu_audit_event_t audit_ev;
-            (void)memset(&audit_ev, 0, sizeof(audit_ev));
-            audit_ev.event_type = MU_AUDIT_EVENT_WRITE_UPDATE;
-            audit_ev.status = true;
-            audit_ev.specific.write_update.node_id = write_val->node_id;
-            audit_ev.specific.write_update.new_value = write_val->value.value;
-            audit_ev.specific.write_update.old_value.type = MU_TYPE_NULL;
-            mu_raise_audit_event(server, &audit_ev);
-        }
+        /* spec 074/077: emit an AuditWriteUpdateEvent (i=2100) per attribute write
+           (OPC-10000-5 §6.4.25) — on FAILURE too, with Status=false, so an auditor
+           sees rejected writes. NewValue = the attempted scalar; OldValue = the
+           pre-write value captured above. No-op unless auditing is enabled. */
+        mu_audit_event_t audit_ev;
+        (void)memset(&audit_ev, 0, sizeof(audit_ev));
+        audit_ev.event_type = MU_AUDIT_EVENT_WRITE_UPDATE;
+        audit_ev.status = (result == MU_STATUS_GOOD);
+        audit_ev.specific.write_update.node_id = write_val->node_id;
+        audit_ev.specific.write_update.new_value = write_val->value.value;
+        audit_ev.specific.write_update.old_value = audit_old_value;
+        mu_raise_audit_event(server, &audit_ev);
 #endif
     }
 

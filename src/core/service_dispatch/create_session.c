@@ -347,6 +347,17 @@ opcua_statuscode_t handle_create_session(mu_server_t *server, mu_binary_reader_t
     if (s != MU_STATUS_GOOD) {
         /* Session could not be created (capacity/validation) -> rejectedSessionCount. */
         mu_diagnostics_session_rejected(server);
+#if MUC_OPCUA_CU_AUDITING
+        /* spec 077: audit the rejected CreateSession (Status=false) — a flood of
+           rejected sessions is a security-relevant signal. No SessionId exists. */
+        {
+            mu_audit_event_t audit_ev;
+            (void)memset(&audit_ev, 0, sizeof(audit_ev));
+            audit_ev.event_type = MU_AUDIT_EVENT_CREATE_SESSION;
+            audit_ev.status = false;
+            mu_raise_audit_event(server, &audit_ev);
+        }
+#endif
         return s;
     }
 
