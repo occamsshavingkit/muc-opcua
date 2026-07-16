@@ -61,6 +61,27 @@ bool publish_request_dequeue_valid(struct mu_server *server, opcua_uint32_t sess
     return false;
 }
 
+bool publish_request_evict_oldest(struct mu_server *server, opcua_uint32_t session_id) {
+    mu_publish_request_t evicted;
+    if (server == NULL || !publish_request_dequeue(&server->subs, session_id, &evicted)) {
+        return false;
+    }
+
+    opcua_byte_t fault_buf[MU_PUBLISH_BODY_BYTES];
+    size_t fault_length = sizeof(fault_buf);
+    opcua_statuscode_t s =
+        mu_write_service_fault(fault_buf, &fault_length, evicted.request_handle, MU_STATUS_BAD_TOOMANYPUBLISHREQUESTS
+#ifdef MUC_OPCUA_CU_TIME_SYNC
+                               ,
+                               server
+#endif
+        );
+    if (s == MU_STATUS_GOOD) {
+        (void)mu_server_emit_message(server, evicted.request_id, fault_buf, fault_length);
+    }
+    return true;
+}
+
 opcua_statuscode_t write_publish_response_prefix(mu_binary_writer_t *w, opcua_uint32_t request_handle) {
     mu_nodeid_t type = {0, MU_NODEID_NUMERIC, {MU_ID_PUBLISHRESPONSE}};
     opcua_statuscode_t s = mu_binary_write_nodeid(w, &type);

@@ -313,6 +313,7 @@ opcua_statuscode_t mu_monitored_item_alloc(mu_subscriptions_t *subs, opcua_uint3
     slot->in_use = true;
     slot->subscription_id = subscription_id;
     slot->monitored_item_id = monitored_item_id;
+    slot->index_range_start = -1; /* no IndexRange until configure_monitored_item sets one */
     subs->active_monitored_items_count++;
 
     *out_item = slot;

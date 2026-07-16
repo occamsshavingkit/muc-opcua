@@ -22,6 +22,7 @@
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-const-variable"
 #endif
+static const opcua_byte_t s_str_AggregateFunctions[] = "AggregateFunctions";
 static const opcua_byte_t s_str_Aggregates[] = "Aggregates";
 static const opcua_byte_t s_str_BaseDataType[] = "BaseDataType";
 static const opcua_byte_t s_str_BaseDataVariableType[] = "BaseDataVariableType";
@@ -83,7 +84,12 @@ static const opcua_byte_t s_str_LocalTime[] = "LocalTime";
 #endif
 static const opcua_byte_t s_str_LocalizedText[] = "LocalizedText";
 static const opcua_byte_t s_str_MaxArrayLength[] = "MaxArrayLength";
+static const opcua_byte_t s_str_MaxMonitoredItems[] = "MaxMonitoredItems";
 static const opcua_byte_t s_str_MaxMonitoredItemsPerCall[] = "MaxMonitoredItemsPerCall";
+static const opcua_byte_t s_str_MaxMonitoredItemsPerSubscription[] = "MaxMonitoredItemsPerSubscription";
+static const opcua_byte_t s_str_MaxMonitoredItemsQueueSize[] = "MaxMonitoredItemsQueueSize";
+static const opcua_byte_t s_str_MaxSubscriptions[] = "MaxSubscriptions";
+static const opcua_byte_t s_str_MaxSubscriptionsPerSession[] = "MaxSubscriptionsPerSession";
 static const opcua_byte_t s_str_MaxNodesPerBrowse[] = "MaxNodesPerBrowse";
 static const opcua_byte_t s_str_MaxNodesPerRead[] = "MaxNodesPerRead";
 static const opcua_byte_t s_str_MaxNodesPerWrite[] = "MaxNodesPerWrite";
@@ -513,6 +519,14 @@ static const mu_reference_t s_server_capabilities_refs[] = {
     {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {11702}}, true}, /* MaxArrayLength */
     {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {11703}}, true}, /* MaxStringLength */
     {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {11704}}, true},
+#if MUC_OPCUA_CU_SUBSCRIPTION_BASIC
+    {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {24096}}, true}, /* MaxSubscriptions */
+    {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {24097}}, true}, /* MaxMonitoredItems */
+    {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {24098}}, true}, /* MaxSubscriptionsPerSession */
+    {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {24104}}, true}, /* MaxMonitoredItemsPerSubscription */
+    {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {2997}}, true},  /* AggregateFunctions (HasComponent) */
+    {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {31916}}, true}, /* MaxMonitoredItemsQueueSize */
+#endif
 #if MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER
     {{0, MU_NODEID_NUMERIC, {40}}, {0, MU_NODEID_NUMERIC, {58}}, true}
 #endif
@@ -579,6 +593,21 @@ static const mu_value_source_t s_max_nodes_per_write_value = {
 
 static const mu_value_source_t s_max_monitored_items_per_call_value = {
     MU_VALUESOURCE_STATIC, {.static_value = {.type = MU_TYPE_UINT32, .value.ui32 = MU_MAX_MONITORED_ITEMS_PER_CALL}}};
+
+#if MUC_OPCUA_CU_SUBSCRIPTION_BASIC
+/* CU 3911/4055: ServerCapabilities subscription limits. Advertised values ARE the
+   enforced capacity macros, so they cannot drift. */
+static const mu_value_source_t s_max_subscriptions_value = {
+    MU_VALUESOURCE_STATIC, {.static_value = {.type = MU_TYPE_UINT32, .value.ui32 = MU_INTERN_MAX_SUBSCRIPTIONS}}};
+static const mu_value_source_t s_max_monitored_items_value = {
+    MU_VALUESOURCE_STATIC, {.static_value = {.type = MU_TYPE_UINT32, .value.ui32 = MU_INTERN_MAX_MONITORED_ITEMS}}};
+static const mu_value_source_t s_max_subscriptions_per_session_value = {
+    MU_VALUESOURCE_STATIC, {.static_value = {.type = MU_TYPE_UINT32, .value.ui32 = MU_INTERN_MAX_SUBSCRIPTIONS}}};
+static const mu_value_source_t s_max_monitored_items_per_subscription_value = {
+    MU_VALUESOURCE_STATIC, {.static_value = {.type = MU_TYPE_UINT32, .value.ui32 = MU_INTERN_MAX_MONITORED_ITEMS}}};
+static const mu_value_source_t s_max_monitored_items_queue_size_value = {
+    MU_VALUESOURCE_STATIC, {.static_value = {.type = MU_TYPE_UINT32, .value.ui32 = MU_INTERN_MONITORED_QUEUE_DEPTH}}};
+#endif
 
 static const mu_value_source_t s_max_array_length_value = {
     MU_VALUESOURCE_STATIC, {.static_value = {.type = MU_TYPE_UINT32, .value.ui32 = MU_INTERN_MAX_ARRAY_LENGTH}}};
@@ -1019,6 +1048,19 @@ static const mu_node_t s_base_nodes[] = {
      sizeof(s_property_type_ref) / sizeof(s_property_type_ref[0]),
      &s_locale_id_array_value,
      .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+#if MUC_OPCUA_CU_SUBSCRIPTION_BASIC && !MUC_OPCUA_CU_DATA_ACCESS
+    /* CU 3911: AggregateFunctions(2997). When DataAccess is enabled this node is
+       emitted inside the DataAccess block instead (after 2377), so that exactly one
+       copy exists and the numeric run stays ascending in both configurations. */
+    {{0, MU_NODEID_NUMERIC, {2997}},
+     MU_NODECLASS_OBJECT,
+     {18, s_str_AggregateFunctions},
+     {18, s_str_AggregateFunctions},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {61}}},
+#endif
 #if MUC_OPCUA_CU_DATA_ACCESS
     /* Spec 060: Data Access types + property instance-declarations (2365..11461). */
     {{0, MU_NODEID_NUMERIC, {2365}},
@@ -1125,6 +1167,19 @@ static const mu_node_t s_base_nodes[] = {
      sizeof(s_da_prop_mandatory_refs) / sizeof(s_da_prop_mandatory_refs[0]),
      NULL,
      .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+#if MUC_OPCUA_CU_SUBSCRIPTION_BASIC
+    /* CU 3911: AggregateFunctions Folder (i=2997), HasComponent child of
+       ServerCapabilities(2268), FolderType(61). Sorts after the DataAccess block
+       (2365..2377) and before LocalTime (8912). */
+    {{0, MU_NODEID_NUMERIC, {2997}},
+     MU_NODECLASS_OBJECT,
+     {18, s_str_AggregateFunctions},
+     {18, s_str_AggregateFunctions},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {61}}},
+#endif
 #if MUC_OPCUA_CU_BASE_INFO_LOCALTIME
     /* OPC-10000-5 §12.2.12.11, OPC-10000-7 CU 2476: TimeZoneDataType (8912),
      * subtype of Structure (22), with its Default Binary encoding Object (8917). */
@@ -1495,6 +1550,51 @@ static const mu_node_t s_base_nodes[] = {
      NULL,
      .type_definition = {0, MU_NODEID_NUMERIC, {61}}},
 #endif
+#if MUC_OPCUA_CU_SUBSCRIPTION_BASIC
+    /* CU 3911/4055: ServerCapabilities subscription limits. Placed after 17708 so
+       the numeric run stays ascending on every shipped profile (none of which
+       enable the Locations(31915)/Currency(23498) tail alongside these). */
+    {{0, MU_NODEID_NUMERIC, {24096}},
+     MU_NODECLASS_VARIABLE,
+     {16, s_str_MaxSubscriptions},
+     {16, s_str_MaxSubscriptions},
+     s_property_type_ref,
+     sizeof(s_property_type_ref) / sizeof(s_property_type_ref[0]),
+     &s_max_subscriptions_value,
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+    {{0, MU_NODEID_NUMERIC, {24097}},
+     MU_NODECLASS_VARIABLE,
+     {17, s_str_MaxMonitoredItems},
+     {17, s_str_MaxMonitoredItems},
+     s_property_type_ref,
+     sizeof(s_property_type_ref) / sizeof(s_property_type_ref[0]),
+     &s_max_monitored_items_value,
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+    {{0, MU_NODEID_NUMERIC, {24098}},
+     MU_NODECLASS_VARIABLE,
+     {26, s_str_MaxSubscriptionsPerSession},
+     {26, s_str_MaxSubscriptionsPerSession},
+     s_property_type_ref,
+     sizeof(s_property_type_ref) / sizeof(s_property_type_ref[0]),
+     &s_max_subscriptions_per_session_value,
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+    {{0, MU_NODEID_NUMERIC, {24104}},
+     MU_NODECLASS_VARIABLE,
+     {32, s_str_MaxMonitoredItemsPerSubscription},
+     {32, s_str_MaxMonitoredItemsPerSubscription},
+     s_property_type_ref,
+     sizeof(s_property_type_ref) / sizeof(s_property_type_ref[0]),
+     &s_max_monitored_items_per_subscription_value,
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+    {{0, MU_NODEID_NUMERIC, {31916}},
+     MU_NODECLASS_VARIABLE,
+     {26, s_str_MaxMonitoredItemsQueueSize},
+     {26, s_str_MaxMonitoredItemsQueueSize},
+     s_property_type_ref,
+     sizeof(s_property_type_ref) / sizeof(s_property_type_ref[0]),
+     &s_max_monitored_items_queue_size_value,
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+#endif
 #ifdef MUC_OPCUA_CU_BASE_INFO_LOCATIONS_OBJECT
     /* OPC-10000-5 §8.2.12, OPC-10000-7 CU 4053: Locations Folder (i=31915),
      * organized by Objects (85), with FolderType (61). */
@@ -1649,6 +1749,17 @@ static const mu_node_t s_base_nodes[] = {
      0,
      &s_locale_id_array_value,
      .type_definition = {0}},
+#if MUC_OPCUA_CU_SUBSCRIPTION_BASIC
+    /* CU 3911: AggregateFunctions Folder (i=2997), FolderType(61). */
+    {{0, MU_NODEID_NUMERIC, {2997}},
+     MU_NODECLASS_OBJECT,
+     {18, s_str_AggregateFunctions},
+     {18, s_str_AggregateFunctions},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {61}}},
+#endif
 #if MUC_OPCUA_CU_BASE_INFO_LOCALTIME
     /* OPC-10000-5 §12.2.12.11, OPC-10000-7 CU 2476: TimeZoneDataType (8912),
      * subtype of Structure (22), with its Default Binary encoding Object (8917). */
@@ -1846,6 +1957,49 @@ static const mu_node_t s_base_nodes[] = {
      0,
      NULL,
      .type_definition = {0, MU_NODEID_NUMERIC, {61}}},
+#endif
+#if MUC_OPCUA_CU_SUBSCRIPTION_BASIC
+    /* CU 3911/4055: ServerCapabilities subscription limits (minimal table). */
+    {{0, MU_NODEID_NUMERIC, {24096}},
+     MU_NODECLASS_VARIABLE,
+     {16, s_str_MaxSubscriptions},
+     {16, s_str_MaxSubscriptions},
+     NULL,
+     0,
+     &s_max_subscriptions_value,
+     .type_definition = {0}},
+    {{0, MU_NODEID_NUMERIC, {24097}},
+     MU_NODECLASS_VARIABLE,
+     {17, s_str_MaxMonitoredItems},
+     {17, s_str_MaxMonitoredItems},
+     NULL,
+     0,
+     &s_max_monitored_items_value,
+     .type_definition = {0}},
+    {{0, MU_NODEID_NUMERIC, {24098}},
+     MU_NODECLASS_VARIABLE,
+     {26, s_str_MaxSubscriptionsPerSession},
+     {26, s_str_MaxSubscriptionsPerSession},
+     NULL,
+     0,
+     &s_max_subscriptions_per_session_value,
+     .type_definition = {0}},
+    {{0, MU_NODEID_NUMERIC, {24104}},
+     MU_NODECLASS_VARIABLE,
+     {32, s_str_MaxMonitoredItemsPerSubscription},
+     {32, s_str_MaxMonitoredItemsPerSubscription},
+     NULL,
+     0,
+     &s_max_monitored_items_per_subscription_value,
+     .type_definition = {0}},
+    {{0, MU_NODEID_NUMERIC, {31916}},
+     MU_NODECLASS_VARIABLE,
+     {26, s_str_MaxMonitoredItemsQueueSize},
+     {26, s_str_MaxMonitoredItemsQueueSize},
+     NULL,
+     0,
+     &s_max_monitored_items_queue_size_value,
+     .type_definition = {0}},
 #endif
 #ifdef MUC_OPCUA_CU_BASE_INFO_CURRENCY
     /* OPC-10000-5 §12.2.12.2, OPC-10000-7 CU 5240: CurrencyUnitType (23498),

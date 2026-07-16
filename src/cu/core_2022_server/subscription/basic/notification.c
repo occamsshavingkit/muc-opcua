@@ -122,13 +122,20 @@ static opcua_statuscode_t write_dcn_item_value(mu_binary_writer_t *w, const mu_m
         return s;
     }
 
+    /* CU 3922 (OPC-10000-4 §7.38.1): bit 14 of the StatusCode, set on a data-change
+       Notification when the Variable's metadata changed so the client re-reads it. */
+    opcua_statuscode_t reported_status = status;
+    if (item->semantics_changed) {
+        reported_status |= 0x00004000u; /* SemanticsChanged */
+    }
+
     mu_datavalue_t dv;
     (void)memset(&dv, 0, sizeof(dv));
     dv.has_value = true;
     dv.value = *value;
-    if (status != MU_STATUS_GOOD) {
+    if (reported_status != MU_STATUS_GOOD) {
         dv.has_status = true;
-        dv.status = status;
+        dv.status = reported_status;
     }
     datavalue_apply_timestamps(&dv, item, now);
     return mu_binary_write_datavalue(w, &dv);

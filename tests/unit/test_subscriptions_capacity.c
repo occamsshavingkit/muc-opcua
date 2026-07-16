@@ -177,6 +177,52 @@ void test_rejects_publish_request_queue_capacity_exhaustion_without_storage_grow
     TEST_ASSERT_EQUAL_UINT32(MU_INTERN_MAX_PUBLISH_REQUESTS, count_queued_publish_requests(&subs));
 }
 
+static bool publish_queue_contains_handle(const mu_subscriptions_t *subs, opcua_uint32_t request_handle) {
+    for (opcua_uint32_t i = 0u; i < MU_INTERN_MAX_PUBLISH_REQUESTS; ++i) {
+        if (subs->publish_queue[i].in_use && subs->publish_queue[i].request_handle == request_handle) {
+            return true;
+        }
+    }
+    return false;
+}
+
+/* OPC-10000-4 §5.14.5.1: "When a Server receives a new Publish request that exceeds its
+   limit it shall de-queue the oldest Publish request and return a response with the result
+   set to Bad_TooManyPublishRequests." So on overflow the OLDEST parked request is evicted
+   (and answered with the error), and the incoming request is parked in its place — the
+   incoming request is NOT the one rejected. */
+void test_publish_queue_overflow_evicts_oldest_and_parks_newest(void) {
+    mu_server_t server;
+    (void)memset(&server, 0, sizeof(server));
+    mu_subscriptions_init(&server.subs);
+    assert_standard_capacity_configuration();
+
+    /* Fill the queue; request_handle 100 is the oldest (enqueued_ms 0), ascending. */
+    for (opcua_uint32_t i = 0u; i < MU_INTERN_MAX_PUBLISH_REQUESTS; ++i) {
+        mu_publish_request_t *request = NULL;
+        TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD,
+                                mu_publish_request_enqueue(&server.subs, 1u, 200u + i, 100u + i, i, &request));
+        TEST_ASSERT_NOT_NULL(request);
+    }
+    TEST_ASSERT_EQUAL_UINT32(MU_INTERN_MAX_PUBLISH_REQUESTS, count_queued_publish_requests(&server.subs));
+
+    /* Evict the oldest to make room (answers request_handle 100 with the error, async). */
+    TEST_ASSERT_TRUE(publish_request_evict_oldest(&server, 1u));
+    TEST_ASSERT_EQUAL_UINT32(MU_INTERN_MAX_PUBLISH_REQUESTS - 1u, count_queued_publish_requests(&server.subs));
+    TEST_ASSERT_FALSE(publish_queue_contains_handle(&server.subs, 100u)); /* oldest gone */
+    TEST_ASSERT_TRUE(publish_queue_contains_handle(&server.subs, 101u));  /* next-oldest retained */
+
+    /* The incoming request now parks in the freed slot; the queue is full again. */
+    mu_publish_request_t *incoming = NULL;
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_publish_request_enqueue(&server.subs, 1u, 999u, 999u, 999u, &incoming));
+    TEST_ASSERT_NOT_NULL(incoming);
+    TEST_ASSERT_EQUAL_UINT32(MU_INTERN_MAX_PUBLISH_REQUESTS, count_queued_publish_requests(&server.subs));
+    TEST_ASSERT_TRUE(publish_queue_contains_handle(&server.subs, 999u)); /* newest parked */
+
+    /* With no parked requests for an unknown session there is nothing to evict. */
+    TEST_ASSERT_FALSE(publish_request_evict_oldest(&server, 42u));
+}
+
 void test_monitored_item_queue_clamps_to_fixed_depth_and_marks_overflow(void) {
     mu_server_t server;
     (void)memset(&server, 0, sizeof(server));
@@ -324,6 +370,7 @@ int main(void) {
     RUN_TEST(test_accepts_required_monitored_items_and_rejects_capacity_exhaustion_without_storage_growth);
     RUN_TEST(test_set_triggering_rejects_link_capacity_exhaustion_without_corrupting_existing_links);
     RUN_TEST(test_rejects_publish_request_queue_capacity_exhaustion_without_storage_growth);
+    RUN_TEST(test_publish_queue_overflow_evicts_oldest_and_parks_newest);
     RUN_TEST(test_monitored_item_queue_clamps_to_fixed_depth_and_marks_overflow);
 #if MUC_OPCUA_ENHANCED_DATACHANGE
     RUN_TEST(test_enhanced_capacity_macros_meet_profile_minimums);

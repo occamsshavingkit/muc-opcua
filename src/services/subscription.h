@@ -176,6 +176,10 @@ typedef struct {
     opcua_uint32_t client_handle;        /* echoed in every notification */
     opcua_uint32_t attribute_id;         /* usually Value (13) */
     opcua_uint32_t sampling_interval_ms; /* revised */
+    /* Parsed IndexRange (OPC-10000-4 §7.22, CU 5208): index_range_start == -1 means no
+       IndexRange (whole value); index_range_end == -1 means a single element at start. */
+    opcua_int32_t index_range_start;
+    opcua_int32_t index_range_end;
     opcua_statuscode_t last_status;
 #if MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
     opcua_uint32_t queue_size;
@@ -195,8 +199,10 @@ typedef struct {
     opcua_byte_t trigger;              /* mu_datachange_trigger_t */
     opcua_byte_t timestamps_to_return; /* mu_timestamps_to_return_t (OPC-10000-4 §5.13.2.2 Table 63) */
     bool in_use;
-    bool has_value; /* a baseline sample has been taken */
-    bool pending;   /* a change is queued, awaiting the next Publish */
+    bool has_value;         /* a baseline sample has been taken */
+    bool pending;           /* a change is queued, awaiting the next Publish */
+    bool semantics_changed; /* CU 3922: set the SemanticsChanged bit (0x4000) on the
+                               next data-change Notification, then clear (OPC-10000-4 §7.38.1) */
 #if MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
     opcua_byte_t deadband_type; /* mu_deadband_type_t */
     bool has_reported;
@@ -386,6 +392,12 @@ opcua_statuscode_t mu_publish_request_enqueue(mu_subscriptions_t *subs, opcua_ui
    requests for the given session. Called when SetPublishingMode disables
    publishing or when the last Subscription for a session is deleted. */
 void mu_publish_request_queue_clear(mu_subscriptions_t *subs, opcua_uint32_t session_id);
+
+/* OPC-10000-4 §5.14.5.1 Publish-queue overflow: de-queue the oldest parked Publish
+   request for the session and answer it with a Bad_TooManyPublishRequests fault, freeing
+   a slot for the incoming request. Returns true if a request was evicted (a slot is now
+   free), false if the session had no parked request to evict. */
+bool publish_request_evict_oldest(struct mu_server *server, opcua_uint32_t session_id);
 
 /* Return the number of in-use subscriptions owned by a session. */
 size_t mu_subscriptions_count_for_session(const mu_subscriptions_t *subs, opcua_uint32_t session_id);

@@ -4,7 +4,10 @@
 #include <stddef.h>
 #include <string.h>
 
-#ifdef MUC_OPCUA_CU_MULTI_CHUNK
+/* IndexRange element selection is used by two callers: the Read service (multi-chunk
+   large-array slicing) and MonitoredItem sampling (spec 073 CU 5208, OPC-10000-4
+   §7.22). Compile the range helpers whenever either is enabled. */
+#if defined(MUC_OPCUA_CU_MULTI_CHUNK) || defined(MUC_OPCUA_CU_SUBSCRIPTION_BASIC)
 static size_t variant_elem_size(mu_builtin_type_t type) {
     switch (type) {
     case MU_TYPE_BOOLEAN:
@@ -51,8 +54,8 @@ static size_t variant_elem_size(mu_builtin_type_t type) {
 }
 #endif
 
-#ifdef MUC_OPCUA_CU_MULTI_CHUNK
-static opcua_statuscode_t parse_numeric_range(const mu_string_t *range_str, opcua_int32_t *start, opcua_int32_t *end) {
+#if defined(MUC_OPCUA_CU_MULTI_CHUNK) || defined(MUC_OPCUA_CU_SUBSCRIPTION_BASIC)
+opcua_statuscode_t parse_numeric_range(const mu_string_t *range_str, opcua_int32_t *start, opcua_int32_t *end) {
     const char *p = (const char *)range_str->data;
     opcua_int32_t len = range_str->length;
     opcua_int32_t pos = 0;
@@ -93,23 +96,12 @@ static opcua_statuscode_t parse_numeric_range(const mu_string_t *range_str, opcu
     return MU_STATUS_GOOD;
 }
 
-opcua_statuscode_t apply_index_range(const mu_string_t *index_range, mu_variant_t *value) {
-    if (!index_range || index_range->length <= 0 || !index_range->data) {
+/* Select element `start` (single, when end == -1) or the inclusive [start, end] slice
+   of an array variant in place. A scalar or empty array is left untouched (no-op).
+   Out-of-range start yields Bad_IndexRangeNoData; end is clamped to the last element. */
+opcua_statuscode_t apply_numeric_index_range(mu_variant_t *value, opcua_int32_t start, opcua_int32_t end) {
+    if (!value->is_array || value->array_length <= 0) {
         return MU_STATUS_GOOD;
-    }
-
-    if (!value->is_array) {
-        return MU_STATUS_GOOD;
-    }
-
-    if (value->array_length <= 0) {
-        return MU_STATUS_GOOD;
-    }
-
-    opcua_int32_t start, end;
-    opcua_statuscode_t s = parse_numeric_range(index_range, &start, &end);
-    if (s != MU_STATUS_GOOD) {
-        return s;
     }
 
     if (start < 0 || start >= value->array_length) {
@@ -136,6 +128,28 @@ opcua_statuscode_t apply_index_range(const mu_string_t *index_range, mu_variant_
     }
 
     return MU_STATUS_GOOD;
+}
+
+opcua_statuscode_t apply_index_range(const mu_string_t *index_range, mu_variant_t *value) {
+    if (!index_range || index_range->length <= 0 || !index_range->data) {
+        return MU_STATUS_GOOD;
+    }
+
+    if (!value->is_array) {
+        return MU_STATUS_GOOD;
+    }
+
+    if (value->array_length <= 0) {
+        return MU_STATUS_GOOD;
+    }
+
+    opcua_int32_t start, end;
+    opcua_statuscode_t s = parse_numeric_range(index_range, &start, &end);
+    if (s != MU_STATUS_GOOD) {
+        return s;
+    }
+
+    return apply_numeric_index_range(value, start, end);
 }
 #endif
 

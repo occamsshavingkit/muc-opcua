@@ -1592,3 +1592,33 @@ storage; no-heap invariant preserved). Reconciled `opc_cu_5793`/`2478` (OS-based
 `2786` (NTP)/`3802` (Configure Clock Skew) via `satisfied_by`; `2479` (PTP)/`2480`
 (802.1AS)/`5505` (UA-based) remain unclaimed (integrator's protocol, not ours).
 Nano reaches **18/18 required** CUs.
+
+## 2026-07-16: Spec 073 long tail — DataChange Subscription facet completion (CUs 5208/3911/4055/3922)
+
+Completed the Standard DataChange Subscription 2022 Server Facet (opc_id 1324) to
+**16/16 required** by implementing its last four required CUs, all gated on
+`MUC_OPCUA_CU_SUBSCRIPTION_BASIC` (off for nano):
+
+- **5208** Monitor Value Change V2 — MonitoredItem IndexRange parsed at create and
+  applied to array samples; the read-path range helpers were un-gated from
+  `MUC_OPCUA_CU_MULTI_CHUNK` to also compile under subscriptions, sharing one slicer.
+- **3911/4055** ServerCapabilities subscription-limit nodes (`24096`/`24097`/`24098`/
+  `24104`/`31916` + `AggregateFunctions` `2997`) added to both `base_nodes.c` tables.
+- **3922** SemanticsChanged StatusCode bit via `mu_server_signal_semantic_change`.
+
+`scripts/measure_size.sh` (ARM Cortex-M0+, `-Os`), archive `.text` / elf_text:
+
+| Profile | before | after | Δ elf |
+|----------|------------------:|------------------:|------:|
+| nano  | 23,660 / 21,524 | 23,660 / 21,524 | 0 (gated out) |
+| micro | 41,644 / 40,336 | 43,656 / 42,212 | +1,876 |
+
+The micro delta is dominated by the now-compiled IndexRange helpers (the
+`variant_elem_size` type switch + `parse_numeric_range`) plus the base-node table
+additions and the 3922 emit/clear path.
+
+**RAM**: per-MonitoredItem +8 B (two `opcua_int32_t` parsed IndexRange, `-1` = none)
++ 1 B (`semantics_changed` latch, absorbed into existing padding on most layouts).
+The `MU_SERVER_STORAGE_BYTES` estimate was bumped to match: base `3200 → 3328`
+(BASIC-only servers' fixed array) and the Standard per-item term `368 → 384`. No-heap
+invariant preserved (all storage is caller-owned). nano RAM unchanged.

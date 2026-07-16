@@ -40,8 +40,12 @@ opcua_boolean_t mu_read_cache_lookup(mu_read_cache_t *cache, const mu_nodeid_t *
 void mu_read_cache_store(mu_read_cache_t *cache, const mu_nodeid_t *node_id, const mu_variant_t *val,
                          opcua_datetime_t read_time);
 
-#ifdef MUC_OPCUA_CU_MULTI_CHUNK
+/* IndexRange element selection helpers, shared by the Read service (multi-chunk) and
+   MonitoredItem sampling (spec 073 CU 5208). Compiled when either caller is enabled. */
+#if defined(MUC_OPCUA_CU_MULTI_CHUNK) || defined(MUC_OPCUA_CU_SUBSCRIPTION_BASIC)
 opcua_statuscode_t apply_index_range(const mu_string_t *index_range, mu_variant_t *value);
+opcua_statuscode_t parse_numeric_range(const mu_string_t *range_str, opcua_int32_t *start, opcua_int32_t *end);
+opcua_statuscode_t apply_numeric_index_range(mu_variant_t *value, opcua_int32_t start, opcua_int32_t end);
 #endif
 
 #endif

@@ -139,3 +139,67 @@ Overall reconciled required 40 -> 43. Still deferred: 5213 (no connection-close
 audit type), 3224/3226/3230 (no NodeManagement/History/Method audit emit sites);
 documented 074 follow-ups: failure-path (Status=false) auditing, OldValue capture,
 SessionId/SecureChannelId string population.
+
+## 2026-07-16 — Publish-queue overflow discards the oldest request (CU 3143)
+
+Closes the behavioural mismatch flagged in the 1324 increment. OPC-10000-4
+**§5.14.5.1** (verified against the reference, not §5.13.5 as the earlier follow-up
+mis-cited): "When a Server receives a new Publish request that exceeds its limit it
+shall **de-queue the oldest** Publish request and return a response with the result
+set to Bad_TooManyPublishRequests." We previously rejected the **incoming** request
+(`Bad_TooManyPublishRequests` on the new one) — a different observable behaviour.
+
+Fix: on overflow, `handle_publish` (`subscription_crud.c`) now calls the new
+`publish_request_evict_oldest` (`publish_due.c`), which de-queues the session's
+oldest parked request (`publish_request_dequeue`, already FIFO-by-`enqueued_ms`) and
+answers **that** request with a `Bad_TooManyPublishRequests` ServiceFault via the same
+`mu_write_service_fault` + `mu_server_emit_message` path the timeout-eviction already
+uses; the incoming request then parks in the freed slot. If the session has no parked
+request to evict (queue full of another session), we fall back to returning the error
+on the incoming request. The low-level `mu_publish_request_enqueue` primitive is
+unchanged (still returns the error when full) — the discard policy lives at the
+service layer.
+
+| CU | Name | Alias | Now backed by |
+| --- | --- | --- | --- |
+| 3143 | Subscription PublishRequest Queue Overflow | opc_cu_subscription_basic | `publish_request_evict_oldest` (publish_due.c) + handle_publish wiring; test_subscriptions_capacity::test_publish_queue_overflow_evicts_oldest_and_parks_newest |
+
+Facet 1324 (Standard DataChange Subscription) required 11/16 -> 12/16. Overall
+reconciled required 44 -> 45 (one unique CU). The same shared CU also advances every
+facet that lists 3143 — 1328 Auditing 14/18 -> 15/18, the A&C alarm facets, and the
+Embedded/Standard 2022 profiles — but overall counts it once. Remaining 1324
+required: 3911/4055 (ServerCapabilities nodes), 3922 (SemanticChange status bit),
+5208 (monitored-item IndexRange slicing).
+
+## 2026-07-16 — DataChange Subscription facet completed: 16/16 required (CUs 5208, 3911, 4055, 3922)
+
+The remaining four required CUs of facet 1324, each with real code + a backing test.
+All are gated on `MUC_OPCUA_CU_SUBSCRIPTION_BASIC` and aliased to
+`opc_cu_subscription_basic` (off for nano, on for micro/embedded/standard/full).
+
+| CU | Name | Now backed by |
+| --- | --- | --- |
+| 5208 | Monitor Value Change V2 | IndexRange parsed at MonitoredItem create (`subscription_helpers.c`), malformed → Bad_IndexRangeInvalid, applied to array samples via `apply_numeric_index_range` in `read_monitored_item_value`; `test_monitored_index_range` |
+| 3911 | Base Info ServerCapabilities Subscriptions | `AggregateFunctions`(2997), `MaxSubscriptions`(24096), `MaxMonitoredItems`(24097), `MaxSubscriptionsPerSession`(24098), `MaxMonitoredItemsPerSubscription`(24104) added to both `base_nodes.c` tables; `test_operation_limits::test_subscription_capability_nodes_resolve` |
+| 4055 | Base Info MaxMonitoredItemsQueueSize | `MaxMonitoredItemsQueueSize`(31916) node; same resolve test |
+| 3922 | Base Info SemanticChange Bit | `mu_server_signal_semantic_change` latches the item; next DataChange Notification sets StatusCode bit 14 (0x4000) then the one-shot latch clears; `test_subscriptions::test_publish_semantics_changed_bit` |
+
+Implementation notes:
+- **5208**: the read-path `apply_index_range` helpers (`variant_elem_size`,
+  `parse_numeric_range`) were previously gated on `MUC_OPCUA_CU_MULTI_CHUNK` (off on
+  standard); the gate was widened to `|| MUC_OPCUA_CU_SUBSCRIPTION_BASIC` and a numeric
+  core `apply_numeric_index_range` was extracted so read and sampling share one slicer.
+  Per-item cost: two `opcua_int32_t` (parsed start/end, `-1` = no range).
+- **3911/4055**: the base address space is binary-searched with **no linear fallback**,
+  so it must stay strictly ascending by NodeId. The existing
+  `test_base_address_space_is_sorted` guard (runs on every profile) confirms the new
+  nodes preserve the ordering; `AggregateFunctions`(2997) needs two guarded copies in
+  the type-system table (DataAccess-on vs -off) so exactly one is emitted in sorted
+  position. nano excludes all of these via the compile gate.
+- **3922**: the SemanticsChanged trigger is integrator-driven (the library owns no
+  runtime EU/EURange changes in its static address space); providing the ABI +
+  emitting the bit + clearing it one-shot is the honest, spec-conformant mechanism.
+
+Facet 1324 required 12/16 -> **16/16** (complete). Overall reconciled required
+45 -> 49 (four unique CUs). The shared subscription/base-info CUs also lift the
+Auditing (1328), A&C alarm, and Embedded/Standard 2022 facet tallies that list them.
