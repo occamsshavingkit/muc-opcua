@@ -23,7 +23,7 @@ import json
 import pathlib
 from typing import Any
 
-_IMPLEMENTED = {"claimed", "implemented"}
+_IMPLEMENTED = {"claimed", "implemented", "documented"}
 
 
 def _index_by_cu_id(items: list[dict]) -> dict[str, dict]:

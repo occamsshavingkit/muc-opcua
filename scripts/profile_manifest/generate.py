@@ -768,10 +768,11 @@ def _emit_unselectable(lines: list[str], item: dict) -> None:
         lines.append("#   Notes: " + _sanitize_kconfig_text(notes))
 
     # Visible comment directive in menuconfig (always shown, never toggleable).
+    label = "DOCUMENTED" if state == "documented" else "NOT IMPLEMENTED"
     if source:
-        lines.append('comment "' + name + ' (NOT IMPLEMENTED) [' + source + ']"')
+        lines.append('comment "' + name + ' (' + label + ') [' + source + ']"')
     else:
-        lines.append('comment "' + name + ' (NOT IMPLEMENTED)"')
+        lines.append('comment "' + name + ' (' + label + ')"')
     lines.append("")
 
 
@@ -1693,7 +1694,7 @@ def generate_roadmap(manifest: dict) -> str:
     lines.append("")
     lines.append("| State | Count |")
     lines.append("|-------|-------|")
-    for state in ("claimed", "implemented", "deferred", "unimplemented"):
+    for state in ("claimed", "implemented", "documented", "deferred", "unimplemented"):
         count = state_counts.get(state, 0)
         if count:
             lines.append("| " + state + " | " + str(count) + " |")

@@ -944,12 +944,6 @@ comment "Address Space Base (NOT IMPLEMENTED)"
 #   Notes: Supports configuration of the acceptable clock skew.
 comment "Time Sync - Configure Clock Skew (NOT IMPLEMENTED)"
 
-# Documentation - Core Capacities (opc_cu_3808)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 3808:Documentation - Core Capacities.
-#   Notes: The application documentation shall specify the core OPC UA related capacities. This includes the number of supported SecureChannels, Sessions, and Continuation Points for the View Services. If Subscriptions are supported, it shall also include capacity information for Subscriptions and Publish requests, MonitoredItems, retransmission queue, and the queue for sampled MonitoredItems. (Documentation complete; no code change needed.)
-comment "Documentation - Core Capacities (NOT IMPLEMENTED)"
-
 # Base Info Server Capabilities 2 (opc_cu_3912)
 #   Implementation state: unimplemented -- visible but not selectable.
 #   Detail: CU 3912:Base Info Server Capabilities 2.
@@ -989,12 +983,6 @@ comment "Monitor Items 500 (NOT IMPLEMENTED) [OPC-10000-4 §5.13.2]"
 #   Imported from: profiles/opcua-profile-snapshot.json.
 #   Notes: Imported from OPC snapshot. At least 5 queue entries per MonitoredItem. Mandatory CU of the Enhanced DataChange Subscription 2017 facet.
 comment "Monitor MinQueueSize_05 (NOT IMPLEMENTED) [OPC-10000-4 §5.13.2]"
-
-# Security Default ApplicationInstance Certificate (opc_cu_3080)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 3080:Security Default ApplicationInstance Certificate.
-#   Notes: An application, when installed, has a default ApplicationInstanceCertificate that is valid. The default ApplicationInstanceCertificate shall either be created as part of the installation or installation instructions explicitly describe the process to create and apply a default ApplicationInstanceCertificate to the application. (Documentation complete; no code change needed.)
-comment "Security Default ApplicationInstance Certificate (NOT IMPLEMENTED)"
 
 # Base Info Custom Type System (opc_cu_3201)
 #   Implementation state: unimplemented -- visible but not selectable.
@@ -1471,7 +1459,7 @@ comment "Security Invalid user token (NOT IMPLEMENTED)"
 # Security User Name Password 2 (opc_cu_3536)
 #   Implementation state: unimplemented -- visible but not selectable.
 #   Detail: CU 3536:Security User Name Password 2.
-#   Notes: The Server supports User Name/Password combination(s). The token will be encrypted as required by the security policy of the User Token Policy or by the security policy of the endpoint.
+#   Notes: Reconciled (spec 078): username/password identity tokens with per-policy (endpoint/UserTokenPolicy) password encryption are decrypted+verified in activate_session.c handle_activate_username; test_user_auth_encrypted, test_user_auth_plaintext, test_user_auth_secure_e2e. Satisfied by opc_cu_user_auth. The Server supports User Name/Password combination(s). The token will be encrypted as required by the security policy of the User Token Policy or by the security policy of the endpoint.
 comment "Security User Name Password 2 (NOT IMPLEMENTED)"
 
 # Security User Token Unencrypted (opc_cu_3645)
