@@ -172,31 +172,46 @@ static void test_time_sync_null_server_produces_zero_timestamp(void) {
 #ifdef MUC_OPCUA_TIME_SYNC
 #define TS_BASE 132537600000000000LL
 #define TS_MS(ms) ((opcua_int64_t)(ms) * 10000LL)
+/* Default acceptable-skew window in 100ns ticks (the old compile-time behaviour). */
+#define TS_DEFAULT_SKEW ((opcua_uint64_t)MU_TIME_SYNC_MAX_CLOCK_SKEW_MS * 1000000ULL) /* ms -> ns */
 
 static void test_time_sync_within_skew_is_allowed(void) {
     /* client 1 minute ahead of server — inside the 5-minute window */
-    TEST_ASSERT_TRUE(mu_opn_time_sync_allows(TS_BASE, TS_BASE + TS_MS(60000)));
-    TEST_ASSERT_TRUE(mu_opn_time_sync_allows(TS_BASE, TS_BASE - TS_MS(60000)));
+    TEST_ASSERT_TRUE(mu_opn_time_sync_allows(TS_BASE, TS_BASE + TS_MS(60000), TS_DEFAULT_SKEW));
+    TEST_ASSERT_TRUE(mu_opn_time_sync_allows(TS_BASE, TS_BASE - TS_MS(60000), TS_DEFAULT_SKEW));
     /* exactly at the 5-minute boundary is allowed (<=) */
-    TEST_ASSERT_TRUE(mu_opn_time_sync_allows(TS_BASE, TS_BASE + TS_MS(300000)));
+    TEST_ASSERT_TRUE(mu_opn_time_sync_allows(TS_BASE, TS_BASE + TS_MS(300000), TS_DEFAULT_SKEW));
 }
 
 static void test_time_sync_far_future_is_rejected(void) {
     /* client 10 minutes ahead — beyond the window */
-    TEST_ASSERT_FALSE(mu_opn_time_sync_allows(TS_BASE, TS_BASE + TS_MS(600000)));
+    TEST_ASSERT_FALSE(mu_opn_time_sync_allows(TS_BASE, TS_BASE + TS_MS(600000), TS_DEFAULT_SKEW));
     /* one tick beyond the boundary */
-    TEST_ASSERT_FALSE(mu_opn_time_sync_allows(TS_BASE, TS_BASE + TS_MS(300000) + 1));
+    TEST_ASSERT_FALSE(mu_opn_time_sync_allows(TS_BASE, TS_BASE + TS_MS(300000) + 1, TS_DEFAULT_SKEW));
 }
 
 static void test_time_sync_far_past_is_rejected(void) {
-    TEST_ASSERT_FALSE(mu_opn_time_sync_allows(TS_BASE, TS_BASE - TS_MS(600000)));
+    TEST_ASSERT_FALSE(mu_opn_time_sync_allows(TS_BASE, TS_BASE - TS_MS(600000), TS_DEFAULT_SKEW));
 }
 
 static void test_time_sync_zero_timestamp_skips_check(void) {
     /* Either side 0 = unknown time (clockless peer): allow the channel. */
-    TEST_ASSERT_TRUE(mu_opn_time_sync_allows(TS_BASE, 0));
-    TEST_ASSERT_TRUE(mu_opn_time_sync_allows(0, TS_BASE + TS_MS(600000)));
-    TEST_ASSERT_TRUE(mu_opn_time_sync_allows(0, 0));
+    TEST_ASSERT_TRUE(mu_opn_time_sync_allows(TS_BASE, 0, TS_DEFAULT_SKEW));
+    TEST_ASSERT_TRUE(mu_opn_time_sync_allows(0, TS_BASE + TS_MS(600000), TS_DEFAULT_SKEW));
+    TEST_ASSERT_TRUE(mu_opn_time_sync_allows(0, 0, TS_DEFAULT_SKEW));
+}
+
+/* spec 075: sub-microsecond skew is representable in 100ns ticks (impossible with
+   the old millisecond knob) -- an IEEE-802.1AS-class window (~200ns = 2 ticks). */
+static void test_time_sync_subus_window_is_enforced(void) {
+    const opcua_uint64_t win = 200u;                                       /* 200ns window */
+    TEST_ASSERT_TRUE(mu_opn_time_sync_allows(TS_BASE, TS_BASE + 1, win));  /* 100ns diff: inside */
+    TEST_ASSERT_TRUE(mu_opn_time_sync_allows(TS_BASE, TS_BASE + 2, win));  /* 200ns: at boundary */
+    TEST_ASSERT_FALSE(mu_opn_time_sync_allows(TS_BASE, TS_BASE + 5, win)); /* 500ns: rejected */
+    /* a coarse 5s window on the same call path */
+    const opcua_uint64_t win5s = 5000000000ULL; /* 5s in ns */
+    TEST_ASSERT_TRUE(mu_opn_time_sync_allows(TS_BASE, TS_BASE + TS_MS(4000), win5s));
+    TEST_ASSERT_FALSE(mu_opn_time_sync_allows(TS_BASE, TS_BASE + TS_MS(6000), win5s));
 }
 #endif /* MUC_OPCUA_TIME_SYNC */
 
@@ -210,6 +225,7 @@ int main(void) {
     RUN_TEST(test_time_sync_far_future_is_rejected);
     RUN_TEST(test_time_sync_far_past_is_rejected);
     RUN_TEST(test_time_sync_zero_timestamp_skips_check);
+    RUN_TEST(test_time_sync_subus_window_is_enforced);
 #endif
     return UNITY_END();
 }

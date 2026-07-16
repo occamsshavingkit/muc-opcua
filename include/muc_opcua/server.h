@@ -95,6 +95,17 @@ typedef struct {
     opcua_boolean_t auditing_enabled;
 #endif
 
+#ifdef MUC_OPCUA_TIME_SYNC
+    /* Acceptable OpenSecureChannel RequestHeader.timestamp skew from server time
+       (anti-replay / freshness, OPC-10000-4 §7.28), in NANOSECONDS. 0 = use the
+       compile-time MU_TIME_SYNC_MAX_CLOCK_SKEW_MS default (backward compatible).
+       Compared in native 100ns DateTime ticks, so ~100ns is the finest meaningful
+       value (IEEE-802.1AS / PTP); ~5s suits loosely-synchronized deployments. The
+       synchronized clock itself is supplied by the integrator via
+       time_adapter.get_time -- muc-opcua implements no sync protocol (spec 075). */
+    opcua_uint64_t acceptable_clock_skew_ns;
+#endif
+
 #ifdef MUC_OPCUA_PUBSUB
     /* PubSub Configuration (optional) */
     mu_pubsub_connection_t pubsub;

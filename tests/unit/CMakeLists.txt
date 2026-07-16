@@ -111,6 +111,14 @@ foreach(TEST_SOURCE ${UNIT_TEST_SOURCES})
         if(NOT MUC_OPCUA_CLIENT_NANO)
             set(RUN_TEST OFF)
         endif()
+    elseif(TEST_NAME STREQUAL "test_time_sync")
+        # Exercises mu_opn_time_sync_allows (osc_handler.c), which is compiled
+        # only under MUC_OPCUA_CU_TIME_SYNC (spec 075). Enabled on every profile
+        # today, but gate defensively so a custom/flag-off build does not fail to
+        # link the test against the compiled-out helper.
+        if(NOT MUC_OPCUA_CU_TIME_SYNC)
+            set(RUN_TEST OFF)
+        endif()
     endif()
 
     if(RUN_TEST)

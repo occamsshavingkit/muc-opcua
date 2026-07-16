@@ -16,7 +16,7 @@ yet reconciled to individual OPC CU ids count as not-implemented — see the
 reconciliation note below.
 
 - Distinct Server CUs: **525** (required 179, optional 346)
-- Reconciled as implemented: **required 43/179**, **optional 21/346**
+- Reconciled as implemented: **required 44/179**, **optional 24/346**
 
 ### Per Server profile / facet
 
@@ -30,15 +30,15 @@ reconciliation note below.
 | 1027 | Global Service KeyCredential Pull Facet | 0/1 | 0/0 |
 | 1029 | GDS AliasName Server Facet | 0/5 | 0/5 |
 | 1219 | Exposes Type System Server Facet | 1/8 | 1/38 |
-| 1322 | Core 2022 Server Facet | 14/17 | 20/27 |
+| 1322 | Core 2022 Server Facet | 15/17 | 23/27 |
 | 1324 | Standard DataChange Subscription 2022 Server Facet | 11/16 | 0/1 |
 | 1328 | Auditing 2022 Server Facet | 14/18 | 1/12 |
 | 1329 | Node Management 2022 Server Facet | 5/15 | 1/39 |
-| 1330 | Nano Embedded Device 2022 Server Profile | 18/22 | 20/29 |
-| 1332 | Embedded 2022 UA Server Profile | 32/51 | 20/68 |
-| 1333 | Standard 2022 UA Server Profile | 32/55 | 20/68 |
-| 1343 | Global Discovery Server 2022 Profile | 29/41 | 20/28 |
-| 1344 | Global Discovery and Certificate Mgmt 2022 Server | 37/52 | 21/42 |
+| 1330 | Nano Embedded Device 2022 Server Profile | 19/22 | 23/29 |
+| 1332 | Embedded 2022 UA Server Profile | 33/51 | 23/68 |
+| 1333 | Standard 2022 UA Server Profile | 33/55 | 23/68 |
+| 1343 | Global Discovery Server 2022 Profile | 30/41 | 23/28 |
+| 1344 | Global Discovery and Certificate Mgmt 2022 Server | 38/52 | 24/42 |
 | 1346 | A & E Wrapper 2022 Facet | 9/18 | 0/0 |
 | 1348 | File Access Server Facet | 0/1 | 0/2 |
 | 1351 | User Role Base 2022 Server Facet | 0/2 | 0/1 |
@@ -105,11 +105,11 @@ reconciliation note below.
 | 2249 | Redundancy Transparent Server Facet | 0/1 | 0/0 |
 | 2250 | Embedded DataChange Subscription 2022 Server Facet | 4/9 | 0/1 |
 | 2252 | Redundancy Visible Server Facet | 0/1 | 0/0 |
-| 2255 | Micro Embedded Device 2022 Server Profile | 23/32 | 20/30 |
-| 2266 | Nano Embedded Device 2025 Server Profile | 18/22 | 20/29 |
-| 2267 | Micro Embedded Device 2025 Server Profile | 23/32 | 20/30 |
-| 2268 | Embedded 2025 UA Server Profile | 32/51 | 20/68 |
-| 2269 | Standard 2025 UA Server Profile | 32/55 | 20/68 |
+| 2255 | Micro Embedded Device 2022 Server Profile | 24/32 | 23/30 |
+| 2266 | Nano Embedded Device 2025 Server Profile | 19/22 | 23/29 |
+| 2267 | Micro Embedded Device 2025 Server Profile | 24/32 | 23/30 |
+| 2268 | Embedded 2025 UA Server Profile | 33/51 | 23/68 |
+| 2269 | Standard 2025 UA Server Profile | 33/55 | 23/68 |
 | 2322 | AliasName Configuration Facet | 0/4 | 0/5 |
 | 2323 | AliasName Server PubSub Publisher Facet | 0/4 | 0/4 |
 
@@ -123,8 +123,8 @@ reconciliation note below.
 
 ## Profile Nano Embedded Device 2025 Server Profile
 
-- Required CUs implemented: **17/18**
-- Optional CUs implemented: **21/31**
+- Required CUs implemented: **18/18**
+- Optional CUs implemented: **24/31**
 - Not applicable (grounded): 2
 
 Required CUs:
@@ -143,10 +143,10 @@ Required CUs:
 - [x] `opc_cu_3554` Address Space Base
 - [x] `opc_cu_3912` Base Info Server Capabilities 2
 - [x] `opc_cu_3985` Session General Service Behaviour
+- [x] `opc_cu_5793` Time Sync - Support
 - [x] `opc_cu_protocol_ua_tcp` Protocol UA TCP
 - [x] `opc_cu_ua_binary_encoding` UA Binary Encoding
 - [x] `opc_cu_ua_secure_conversation` UA Secure Conversation
-- [ ] `opc_cu_5793` Time Sync - Support
 
 Optional CUs:
 
@@ -155,7 +155,9 @@ Optional CUs:
 - [x] `opc_cu_2446` Address Space AddIn Reference
 - [x] `opc_cu_2447` Address Space AddIn DefaultInstanceBrowsename
 - [x] `opc_cu_2476` Base Info LocalTime
+- [x] `opc_cu_2478` Time Sync – OS based support
 - [x] `opc_cu_2711` Base Info Selection List
+- [x] `opc_cu_2786` Time Sync – NTP
 - [x] `opc_cu_2936` Attribute Write StatusCode & Timestamp
 - [x] `opc_cu_2969` Base Info ValueAsText
 - [x] `opc_cu_3127` Base Info OptionSet
@@ -166,19 +168,17 @@ Optional CUs:
 - [x] `opc_cu_3545` Base Info Namespace Metadata
 - [x] `opc_cu_3560` Address Space Interfaces
 - [x] `opc_cu_3721` Security ECC Policy
+- [x] `opc_cu_3802` Time Sync - Configure Clock Skew
 - [x] `opc_cu_3983` Base Services Diagnostics
 - [x] `opc_cu_4053` Base Info Locations Object
 - [x] `opc_cu_4237` Address Space NonVolatile and Constant
 - [x] `opc_cu_5240` Base Info Currency
 - [x] `opc_cu_5592` Base Info Engineering Units
 - [ ] `opc_cu_2407` Security Administration
-- [ ] `opc_cu_2478` Time Sync – OS based support
 - [ ] `opc_cu_2479` Time Sync – IEEE 1588 (PTP)
 - [ ] `opc_cu_2480` Time Sync – IEEE 802.1AS
-- [ ] `opc_cu_2786` Time Sync – NTP
 - [ ] `opc_cu_2808` Security Role Server Authorization
 - [ ] `opc_cu_3201` Base Info Custom Type System
-- [ ] `opc_cu_3802` Time Sync - Configure Clock Skew
 - [ ] `opc_cu_5505` Time Sync – UA based support
 - [ ] `opc_cu_5814` Security – No Application Authentication
 
@@ -189,8 +189,8 @@ Not applicable (grounded):
 
 ## Profile Micro Embedded Device 2025 Server Profile
 
-- Required CUs implemented: **22/30**
-- Optional CUs implemented: **21/32**
+- Required CUs implemented: **23/30**
+- Optional CUs implemented: **24/32**
 
 Required CUs:
 
@@ -213,6 +213,7 @@ Required CUs:
 - [x] `opc_cu_3923` Session Multiple
 - [x] `opc_cu_3985` Session General Service Behaviour
 - [x] `opc_cu_5207` Monitor Items 2
+- [x] `opc_cu_5793` Time Sync - Support
 - [x] `opc_cu_protocol_ua_tcp` Protocol UA TCP
 - [x] `opc_cu_ua_binary_encoding` UA Binary Encoding
 - [x] `opc_cu_ua_secure_conversation` UA Secure Conversation
@@ -223,7 +224,6 @@ Required CUs:
 - [ ] `opc_cu_3922` Base Info SemanticChange Bit
 - [ ] `opc_cu_4055` Base Info Server Capabilities MaxMonitoredItemsQueueSize
 - [ ] `opc_cu_5208` Monitor Value Change V2
-- [ ] `opc_cu_5793` Time Sync - Support
 
 Optional CUs:
 
@@ -232,7 +232,9 @@ Optional CUs:
 - [x] `opc_cu_2446` Address Space AddIn Reference
 - [x] `opc_cu_2447` Address Space AddIn DefaultInstanceBrowsename
 - [x] `opc_cu_2476` Base Info LocalTime
+- [x] `opc_cu_2478` Time Sync – OS based support
 - [x] `opc_cu_2711` Base Info Selection List
+- [x] `opc_cu_2786` Time Sync – NTP
 - [x] `opc_cu_2936` Attribute Write StatusCode & Timestamp
 - [x] `opc_cu_2969` Base Info ValueAsText
 - [x] `opc_cu_3127` Base Info OptionSet
@@ -243,27 +245,25 @@ Optional CUs:
 - [x] `opc_cu_3545` Base Info Namespace Metadata
 - [x] `opc_cu_3560` Address Space Interfaces
 - [x] `opc_cu_3721` Security ECC Policy
+- [x] `opc_cu_3802` Time Sync - Configure Clock Skew
 - [x] `opc_cu_3983` Base Services Diagnostics
 - [x] `opc_cu_4053` Base Info Locations Object
 - [x] `opc_cu_4237` Address Space NonVolatile and Constant
 - [x] `opc_cu_5240` Base Info Currency
 - [x] `opc_cu_5592` Base Info Engineering Units
 - [ ] `opc_cu_2407` Security Administration
-- [ ] `opc_cu_2478` Time Sync – OS based support
 - [ ] `opc_cu_2479` Time Sync – IEEE 1588 (PTP)
 - [ ] `opc_cu_2480` Time Sync – IEEE 802.1AS
-- [ ] `opc_cu_2786` Time Sync – NTP
 - [ ] `opc_cu_2808` Security Role Server Authorization
 - [ ] `opc_cu_3196` Base Info Fixed SamplingInterval
 - [ ] `opc_cu_3201` Base Info Custom Type System
-- [ ] `opc_cu_3802` Time Sync - Configure Clock Skew
 - [ ] `opc_cu_5505` Time Sync – UA based support
 - [ ] `opc_cu_5814` Security – No Application Authentication
 
 ## Profile Embedded 2025 UA Server Profile
 
-- Required CUs implemented: **30/48**
-- Optional CUs implemented: **22/71**
+- Required CUs implemented: **31/48**
+- Optional CUs implemented: **25/71**
 
 Required CUs:
 
@@ -294,6 +294,7 @@ Required CUs:
 - [x] `opc_cu_3923` Session Multiple
 - [x] `opc_cu_3985` Session General Service Behaviour
 - [x] `opc_cu_5207` Monitor Items 2
+- [x] `opc_cu_5793` Time Sync - Support
 - [x] `opc_cu_protocol_ua_tcp` Protocol UA TCP
 - [x] `opc_cu_ua_binary_encoding` UA Binary Encoding
 - [x] `opc_cu_ua_secure_conversation` UA Secure Conversation
@@ -313,7 +314,6 @@ Required CUs:
 - [ ] `opc_cu_4055` Base Info Server Capabilities MaxMonitoredItemsQueueSize
 - [ ] `opc_cu_4426` Base Info Decimal DataType
 - [ ] `opc_cu_5208` Monitor Value Change V2
-- [ ] `opc_cu_5793` Time Sync - Support
 - [ ] `opc_cu_5801` Base Info Type Information
 
 Optional CUs:
@@ -323,8 +323,10 @@ Optional CUs:
 - [x] `opc_cu_2446` Address Space AddIn Reference
 - [x] `opc_cu_2447` Address Space AddIn DefaultInstanceBrowsename
 - [x] `opc_cu_2476` Base Info LocalTime
+- [x] `opc_cu_2478` Time Sync – OS based support
 - [x] `opc_cu_2536` Base Info ContentFilter
 - [x] `opc_cu_2711` Base Info Selection List
+- [x] `opc_cu_2786` Time Sync – NTP
 - [x] `opc_cu_2936` Attribute Write StatusCode & Timestamp
 - [x] `opc_cu_2969` Base Info ValueAsText
 - [x] `opc_cu_3127` Base Info OptionSet
@@ -335,6 +337,7 @@ Optional CUs:
 - [x] `opc_cu_3545` Base Info Namespace Metadata
 - [x] `opc_cu_3560` Address Space Interfaces
 - [x] `opc_cu_3721` Security ECC Policy
+- [x] `opc_cu_3802` Time Sync - Configure Clock Skew
 - [x] `opc_cu_3983` Base Services Diagnostics
 - [x] `opc_cu_4053` Base Info Locations Object
 - [x] `opc_cu_4237` Address Space NonVolatile and Constant
@@ -342,7 +345,6 @@ Optional CUs:
 - [x] `opc_cu_5592` Base Info Engineering Units
 - [ ] `opc_cu_2407` Security Administration
 - [ ] `opc_cu_2423` Base Info Rational Number
-- [ ] `opc_cu_2478` Time Sync – OS based support
 - [ ] `opc_cu_2479` Time Sync – IEEE 1588 (PTP)
 - [ ] `opc_cu_2480` Time Sync – IEEE 802.1AS
 - [ ] `opc_cu_2481` Base Info NormalizedString DataType
@@ -358,7 +360,6 @@ Optional CUs:
 - [ ] `opc_cu_2516` Base Info HasOrderedComponent
 - [ ] `opc_cu_2517` Base Info Deprecated Information
 - [ ] `opc_cu_2518` Base Info Image DataTypes
-- [ ] `opc_cu_2786` Time Sync – NTP
 - [ ] `opc_cu_2808` Security Role Server Authorization
 - [ ] `opc_cu_3196` Base Info Fixed SamplingInterval
 - [ ] `opc_cu_3201` Base Info Custom Type System
@@ -382,7 +383,6 @@ Optional CUs:
 - [ ] `opc_cu_3757` Base Info HasPhysicalComponent
 - [ ] `opc_cu_3758` Base Info HasContainedComponent
 - [ ] `opc_cu_3759` Base Info HasAttachedComponent
-- [ ] `opc_cu_3802` Time Sync - Configure Clock Skew
 - [ ] `opc_cu_3996` Base Info ReferenceDescription
 - [ ] `opc_cu_4052` Base Info TrimmedString
 - [ ] `opc_cu_4054` Base Info Handle DataType
@@ -392,8 +392,8 @@ Optional CUs:
 
 ## Profile Standard 2025 UA Server Profile
 
-- Required CUs implemented: **30/52**
-- Optional CUs implemented: **22/71**
+- Required CUs implemented: **31/52**
+- Optional CUs implemented: **25/71**
 
 Required CUs:
 
@@ -424,6 +424,7 @@ Required CUs:
 - [x] `opc_cu_3923` Session Multiple
 - [x] `opc_cu_3985` Session General Service Behaviour
 - [x] `opc_cu_5207` Monitor Items 2
+- [x] `opc_cu_5793` Time Sync - Support
 - [x] `opc_cu_protocol_ua_tcp` Protocol UA TCP
 - [x] `opc_cu_ua_binary_encoding` UA Binary Encoding
 - [x] `opc_cu_ua_secure_conversation` UA Secure Conversation
@@ -447,7 +448,6 @@ Required CUs:
 - [ ] `opc_cu_4055` Base Info Server Capabilities MaxMonitoredItemsQueueSize
 - [ ] `opc_cu_4426` Base Info Decimal DataType
 - [ ] `opc_cu_5208` Monitor Value Change V2
-- [ ] `opc_cu_5793` Time Sync - Support
 - [ ] `opc_cu_5801` Base Info Type Information
 
 Optional CUs:
@@ -457,8 +457,10 @@ Optional CUs:
 - [x] `opc_cu_2446` Address Space AddIn Reference
 - [x] `opc_cu_2447` Address Space AddIn DefaultInstanceBrowsename
 - [x] `opc_cu_2476` Base Info LocalTime
+- [x] `opc_cu_2478` Time Sync – OS based support
 - [x] `opc_cu_2536` Base Info ContentFilter
 - [x] `opc_cu_2711` Base Info Selection List
+- [x] `opc_cu_2786` Time Sync – NTP
 - [x] `opc_cu_2936` Attribute Write StatusCode & Timestamp
 - [x] `opc_cu_2969` Base Info ValueAsText
 - [x] `opc_cu_3127` Base Info OptionSet
@@ -469,6 +471,7 @@ Optional CUs:
 - [x] `opc_cu_3545` Base Info Namespace Metadata
 - [x] `opc_cu_3560` Address Space Interfaces
 - [x] `opc_cu_3721` Security ECC Policy
+- [x] `opc_cu_3802` Time Sync - Configure Clock Skew
 - [x] `opc_cu_3983` Base Services Diagnostics
 - [x] `opc_cu_4053` Base Info Locations Object
 - [x] `opc_cu_4237` Address Space NonVolatile and Constant
@@ -476,7 +479,6 @@ Optional CUs:
 - [x] `opc_cu_5592` Base Info Engineering Units
 - [ ] `opc_cu_2407` Security Administration
 - [ ] `opc_cu_2423` Base Info Rational Number
-- [ ] `opc_cu_2478` Time Sync – OS based support
 - [ ] `opc_cu_2479` Time Sync – IEEE 1588 (PTP)
 - [ ] `opc_cu_2480` Time Sync – IEEE 802.1AS
 - [ ] `opc_cu_2481` Base Info NormalizedString DataType
@@ -492,7 +494,6 @@ Optional CUs:
 - [ ] `opc_cu_2516` Base Info HasOrderedComponent
 - [ ] `opc_cu_2517` Base Info Deprecated Information
 - [ ] `opc_cu_2518` Base Info Image DataTypes
-- [ ] `opc_cu_2786` Time Sync – NTP
 - [ ] `opc_cu_2808` Security Role Server Authorization
 - [ ] `opc_cu_3196` Base Info Fixed SamplingInterval
 - [ ] `opc_cu_3201` Base Info Custom Type System
@@ -516,7 +517,6 @@ Optional CUs:
 - [ ] `opc_cu_3757` Base Info HasPhysicalComponent
 - [ ] `opc_cu_3758` Base Info HasContainedComponent
 - [ ] `opc_cu_3759` Base Info HasAttachedComponent
-- [ ] `opc_cu_3802` Time Sync - Configure Clock Skew
 - [ ] `opc_cu_3996` Base Info ReferenceDescription
 - [ ] `opc_cu_4052` Base Info TrimmedString
 - [ ] `opc_cu_4054` Base Info Handle DataType
@@ -531,7 +531,7 @@ Facet CU membership uses direct `included_conformance_units`
 
 - **GDS AliasName Server Facet** (`opc_facet_1029`): required 0/0, optional 0/0 — 10 closure CU(s) not in manifest
 - **Exposes Type System Server Facet** (`opc_facet_1219`): required 0/7, optional 2/39
-- **Core 2022 Server Facet** (`opc_facet_1322`): required 14/16, optional 20/28
+- **Core 2022 Server Facet** (`opc_facet_1322`): required 15/16, optional 23/28
 - **Standard DataChange Subscription 2022 Server Facet** (`opc_facet_1324`): required 11/16, optional 0/1
 - **Global Certificate Management Server Facet** (`opc_facet_1631`): required 0/1, optional 0/0
 - **AliasName Server Facet** (`opc_facet_1636`): required 0/0, optional 0/0 — 7 closure CU(s) not in manifest

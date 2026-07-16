@@ -4,19 +4,26 @@
 #endif
 
 #ifdef MUC_OPCUA_CU_TIME_SYNC
-bool mu_opn_time_sync_allows(opcua_datetime_t server_time, opcua_datetime_t client_time) {
-    /* FR-003: skip when either peer reports no time (0 = unknown / clockless). */
+/* `max_skew_ns` is the acceptable window in NANOSECONDS (spec 075): the comparison
+ * is done in ns so a host-class (x86_64/aarch64) deployment is not floored at
+ * 100ns by our choice. The residual granularity is the OPC DateTime wire
+ * resolution of the timestamps being compared (100ns ticks), not this knob. */
+bool mu_opn_time_sync_allows(opcua_datetime_t server_time, opcua_datetime_t client_time, opcua_uint64_t max_skew_ns) {
+    /* FR-003/FR-004: skip when either peer reports no time (0 = unknown / clockless). */
     if (server_time == 0 || client_time == 0) {
         return true;
     }
-    /* opcua_datetime_t is 100ns ticks; convert the ms window to ticks (*10000).
-     * Realistic timestamps (~1.3e17 ticks) keep the difference well inside int64. */
-    const opcua_int64_t max_ticks = (opcua_int64_t)MU_TIME_SYNC_MAX_CLOCK_SKEW_MS * 10000LL;
     opcua_int64_t diff = server_time - client_time;
     if (diff < 0) {
         diff = -diff;
     }
-    return diff <= max_ticks;
+    /* diff is in 100ns ticks; convert to ns for the comparison. Guard the *100
+       against uint64 overflow -- any such diff is far beyond any real window. */
+    opcua_uint64_t diff_ticks = (opcua_uint64_t)diff;
+    if (diff_ticks > UINT64_MAX / 100u) {
+        return false;
+    }
+    return diff_ticks * 100u <= max_skew_ns;
 }
 #endif
 
@@ -128,7 +135,13 @@ opcua_statuscode_t handle_open_secure_channel(mu_server_t *server, mu_binary_rea
         opcua_datetime_t server_time = server->config.time_adapter.get_time
                                            ? server->config.time_adapter.get_time(server->config.time_adapter.context)
                                            : 0;
-        if (!mu_opn_time_sync_allows(server_time, req.timestamp)) {
+        /* Acceptable skew window in nanoseconds: the runtime config when set, else
+           the compile-time default (MU_TIME_SYNC_MAX_CLOCK_SKEW_MS, ms->ns) for
+           backward compatibility (spec 075 FR-002/FR-003). */
+        opcua_uint64_t max_skew_ns = server->config.acceptable_clock_skew_ns != 0u
+                                         ? server->config.acceptable_clock_skew_ns
+                                         : (opcua_uint64_t)MU_TIME_SYNC_MAX_CLOCK_SKEW_MS * 1000000u;
+        if (!mu_opn_time_sync_allows(server_time, req.timestamp, max_skew_ns)) {
             return MU_STATUS_BAD_SECURITYCHECKSFAILED;
         }
     }
