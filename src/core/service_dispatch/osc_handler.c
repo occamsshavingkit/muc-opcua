@@ -293,6 +293,21 @@ opcua_statuscode_t handle_open_secure_channel(mu_server_t *server, mu_binary_rea
     (void)client_nonce;
 #endif
 
+#if MUC_OPCUA_CU_AUDITING
+    /* spec 074: emit an AuditOpenSecureChannelEvent (i=2060) for the successful
+       OpenSecureChannel (OPC-10000-5 §6.4.6), for both SecurityPolicy None and
+       secured channels. SecureChannelId string + failure-path auditing are
+       documented follow-ups. No-op unless auditing is enabled. */
+    {
+        mu_audit_event_t audit_ev;
+        (void)memset(&audit_ev, 0, sizeof(audit_ev));
+        audit_ev.event_type = MU_AUDIT_EVENT_OPEN_SECURE_CHANNEL;
+        audit_ev.status = true;
+        audit_ev.specific.open_channel.secure_channel_id = (mu_string_t){-1, NULL};
+        mu_raise_audit_event(server, &audit_ev);
+    }
+#endif
+
     *response_length = w->position;
     return MU_STATUS_GOOD;
 }

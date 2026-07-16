@@ -538,6 +538,20 @@ opcua_statuscode_t handle_activate_session(mu_server_t *server, mu_binary_reader
     *response_length = w->position;
     s = MU_STATUS_GOOD;
 
+#if MUC_OPCUA_CU_AUDITING
+    /* spec 074: emit an AuditActivateSessionEvent (i=2075) for the successful
+       ActivateSession (OPC-10000-5 §6.4.10). SessionId population + failure-path
+       auditing (Status=false) are documented follow-ups. No-op unless auditing
+       is enabled. */
+    {
+        mu_audit_event_t audit_ev;
+        (void)memset(&audit_ev, 0, sizeof(audit_ev));
+        audit_ev.event_type = MU_AUDIT_EVENT_ACTIVATE_SESSION;
+        audit_ev.status = true;
+        mu_raise_audit_event(server, &audit_ev);
+    }
+#endif
+
 cleanup_nonce:
 #ifdef MUC_OPCUA_SECURE_CHANNEL_CRYPTO
     mu_secure_zero(nonce_buf, sizeof(nonce_buf));
