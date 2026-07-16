@@ -130,6 +130,10 @@
     ],
     "opc_facet_1322": [
       "opc_cu_2190",
+      "opc_cu_3194",
+      "opc_cu_2422",
+      "opc_cu_3968",
+      "opc_cu_3228",
       "opc_cu_2380",
       "opc_cu_2394",
       "opc_cu_2939",
@@ -3576,14 +3580,15 @@
         "custom": false
       },
       "backing_tests": [
-        "test_audit_events"
+        "test_audit_events",
+        "test_event_notifications"
       ],
       "opc_reference": {
         "spec": "OPC-10000-4",
         "section": "7.x",
         "facet": "Core 2022 Server Facet"
       },
-      "notes": "Project-level Conformance Unit mirroring the legacy 'auditing' item; emits Kconfig symbol MUC_OPCUA_CU_AUDITING matching the #ifdef guard renamed in Task 3 of the CU-aligned code reorganisation plan."
+      "notes": "spec 074: the server now emits OPC UA AuditEvents (Open Secure Channel/Create Session/Activate Session/Write Update, subtypes i=2060/2071/2075/2100) that a client observes by subscribing to the Server Object EventNotifier -- not just the host-callback stub. Emit+observe proven E2E by test_event_notifications::test_audit_write_event_e2e. Project-level Conformance Unit mirroring the legacy 'auditing' item; emits Kconfig symbol MUC_OPCUA_CU_AUDITING matching the #ifdef guard renamed in Task 3 of the CU-aligned code reorganisation plan."
     },
     {
       "id": "opc_cu_dynamic_nodes",
@@ -5744,6 +5749,130 @@
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
       "notes": "Reconciled (spec 073): DeleteReferences service (handle_delete_references -> mu_delete_references_process); tested by test_node_management (incl. Bad_NotFound). Satisfied by service_nodemanagement.",
+      "cu_optional": false
+    },
+    {
+      "id": "opc_cu_3194",
+      "kind": "conformance_unit",
+      "satisfied_by": "opc_cu_events",
+      "opc_display_name": "Base Info Events Capabilities",
+      "kconfig_symbol": null,
+      "implementation_state": "unimplemented",
+      "depends_on": [],
+      "profile_defaults": {
+        "nano": false,
+        "micro": false,
+        "embedded": false,
+        "standard": false,
+        "full": true,
+        "custom": false
+      },
+      "backing_tests": [],
+      "opc_reference": {
+        "spec": null,
+        "section": null,
+        "cu_id": "3194",
+        "cu_name": "Base Info Events Capabilities",
+        "source_url": "https://profiles.opcfoundation.org"
+      },
+      "source_metadata": {
+        "profile_group_id": 171,
+        "source_endpoint": "conformanceunit/?pg=171&all=1"
+      },
+      "notes": "Reconciled (spec 074): the Server Object (i=2253) exposes a readable EventNotifier attribute (SubscribeToEvents) so a client can discover it as an event source; read_attribute.c + base_nodes.c, tested by test_read_service::test_read_service_eventnotifier.",
+      "cu_optional": false
+    },
+    {
+      "id": "opc_cu_2422",
+      "kind": "conformance_unit",
+      "satisfied_by": "opc_cu_auditing",
+      "opc_display_name": "Auditing Secure Communication",
+      "kconfig_symbol": null,
+      "implementation_state": "unimplemented",
+      "depends_on": [],
+      "profile_defaults": {
+        "nano": false,
+        "micro": false,
+        "embedded": false,
+        "standard": false,
+        "full": true,
+        "custom": false
+      },
+      "backing_tests": [],
+      "opc_reference": {
+        "spec": null,
+        "section": null,
+        "cu_id": "2422",
+        "cu_name": "Auditing Secure Communication",
+        "source_url": "https://profiles.opcfoundation.org"
+      },
+      "source_metadata": {
+        "profile_group_id": 171,
+        "source_endpoint": "conformanceunit/?pg=171&all=1"
+      },
+      "notes": "Reconciled (spec 074): AuditOpenSecureChannelEvent (i=2060) emitted on OpenSecureChannel (osc_handler.c) and observable via the Server EventNotifier; test_event_notifications. Satisfied by opc_cu_auditing.",
+      "cu_optional": false
+    },
+    {
+      "id": "opc_cu_3968",
+      "kind": "conformance_unit",
+      "satisfied_by": "opc_cu_auditing",
+      "opc_display_name": "Auditing Services",
+      "kconfig_symbol": null,
+      "implementation_state": "unimplemented",
+      "depends_on": [],
+      "profile_defaults": {
+        "nano": false,
+        "micro": false,
+        "embedded": false,
+        "standard": false,
+        "full": true,
+        "custom": false
+      },
+      "backing_tests": [],
+      "opc_reference": {
+        "spec": null,
+        "section": null,
+        "cu_id": "3968",
+        "cu_name": "Auditing Services",
+        "source_url": "https://profiles.opcfoundation.org"
+      },
+      "source_metadata": {
+        "profile_group_id": 171,
+        "source_endpoint": "conformanceunit/?pg=171&all=1"
+      },
+      "notes": "Reconciled (spec 074): the server emits + delivers AuditEvents for CreateSession/ActivateSession/Write (audited service subset); test_event_notifications. Satisfied by opc_cu_auditing.",
+      "cu_optional": false
+    },
+    {
+      "id": "opc_cu_3228",
+      "kind": "conformance_unit",
+      "satisfied_by": "opc_cu_auditing",
+      "opc_display_name": "Auditing Write",
+      "kconfig_symbol": null,
+      "implementation_state": "unimplemented",
+      "depends_on": [],
+      "profile_defaults": {
+        "nano": false,
+        "micro": false,
+        "embedded": false,
+        "standard": false,
+        "full": true,
+        "custom": false
+      },
+      "backing_tests": [],
+      "opc_reference": {
+        "spec": null,
+        "section": null,
+        "cu_id": "3228",
+        "cu_name": "Auditing Write",
+        "source_url": "https://profiles.opcfoundation.org"
+      },
+      "source_metadata": {
+        "profile_group_id": 171,
+        "source_endpoint": "conformanceunit/?pg=171&all=1"
+      },
+      "notes": "Reconciled (spec 074): AuditWriteUpdateEvent (i=2100) emitted per successful attribute write (attribute_handler.c) and observable via the Server EventNotifier; test_event_notifications. Satisfied by opc_cu_auditing.",
       "cu_optional": false
     },
     {

@@ -672,6 +672,10 @@ The following OPC items are tracked in the manifest but are NOT implemented. The
 | opc_cu_2394 |  | unimplemented | Reconciled (spec 073): DeleteNodes service (handle_delete_nodes -> mu_delete_nodes_process); tested by test_node_management. Satisfied by service_nodemanagement. |
 | opc_cu_2939 |  | unimplemented | Reconciled (spec 073): AddReferences service (handle_add_references -> mu_add_references_process); tested by test_node_management. Satisfied by service_nodemanagement. |
 | opc_cu_3153 |  | unimplemented | Reconciled (spec 073): DeleteReferences service (handle_delete_references -> mu_delete_references_process); tested by test_node_management (incl. Bad_NotFound). Satisfied by service_nodemanagement. |
+| opc_cu_3194 |  | unimplemented | Reconciled (spec 074): the Server Object (i=2253) exposes a readable EventNotifier attribute (SubscribeToEvents) so a client can discover it as an event source; read_attribute.c + base_nodes.c, tested by test_read_service::test_read_service_eventnotifier. |
+| opc_cu_2422 |  | unimplemented | Reconciled (spec 074): AuditOpenSecureChannelEvent (i=2060) emitted on OpenSecureChannel (osc_handler.c) and observable via the Server EventNotifier; test_event_notifications. Satisfied by opc_cu_auditing. |
+| opc_cu_3968 |  | unimplemented | Reconciled (spec 074): the server emits + delivers AuditEvents for CreateSession/ActivateSession/Write (audited service subset); test_event_notifications. Satisfied by opc_cu_auditing. |
+| opc_cu_3228 |  | unimplemented | Reconciled (spec 074): AuditWriteUpdateEvent (i=2100) emitted per successful attribute write (attribute_handler.c) and observable via the Server EventNotifier; test_event_notifications. Satisfied by opc_cu_auditing. |
 | opc_cu_2190 | OPC-10000-4 §5.6.5 | unimplemented | Imported from OPC profile REST API 2026-07-15. Not implemented: no Cancel service handler exists. |
 | opc_cu_2271 | OPC-10000-4 §5.4.5 | unimplemented | Imported from OPC profile REST API 2026-07-15. Not implemented: register_server.c is a stub (outbound RegisterServer to a discovery server is not supported). |
 | opc_cu_2863 | OPC-10000-7 §6.5 | unimplemented | Imported from OPC profile REST API 2026-07-15. Capability satisfied via the secure-conversation layer, which implements Basic256Sha256, Aes128_Sha256_RsaOaep, and Aes256_Sha256_RsaPss; Kconfig gates per-profile inclusion. |
@@ -682,6 +686,7 @@ The following OPC items are tracked in the manifest but are NOT implemented. The
 | opc_cu_3201 |  | unimplemented | The Server supports custom types (i.e. types that are derived from well-known ObjectTypes, VariableTypes, ReferenceTypes or DataTypes). Supporting this ConformanceUnit requires that the custom types with their full inheritance tree are exposed in the AddressSpace. For each DataType having encoding information (Structured DataTypes) the Encoding Objects shall be exposed as well. For all Events supported by the Server, the EventType shall be exposed. (Documentation complete; no code change needed.) |
 | opc_cu_5814 |  | unimplemented | The Server supports being able to be configured for no application authentication, just User authentication and normal encryption/signing: – Configure Server to skip the trust check when validating certificates – Certificates are just used for message security (signing and encryption) – Users level is used for authentication (Documentation complete; no code change needed.) |
 <!-- END GENERATED MANIFEST TABLES -->
+
 
 
 

@@ -401,8 +401,8 @@ config MUC_OPCUA_CU_AUDITING
 	help
 	  Implementation state: claimed.
 	  OPC source: OPC-10000-4 §7.x -- Core 2022 Server Facet.
-	  Backing tests: test_audit_events.
-	  Notes: Project-level Conformance Unit mirroring the legacy 'auditing' item; emits Kconfig symbol MUC_OPCUA_CU_AUDITING matching the #ifdef guard renamed in Task 3 of the CU-aligned code reorganisation plan.
+	  Backing tests: test_audit_events, test_event_notifications.
+	  Notes: spec 074: the server now emits OPC UA AuditEvents (Open Secure Channel/Create Session/Activate Session/Write Update, subtypes i=2060/2071/2075/2100) that a client observes by subscribing to the Server Object EventNotifier -- not just the host-callback stub. Emit+observe proven E2E by test_event_notifications::test_audit_write_event_e2e. Project-level Conformance Unit mirroring the legacy 'auditing' item; emits Kconfig symbol MUC_OPCUA_CU_AUDITING matching the #ifdef guard renamed in Task 3 of the CU-aligned code reorganisation plan.
 
 config MUC_OPCUA_CU_COMPLEX_TYPES
 	bool "CU: Complex Types"
@@ -746,6 +746,30 @@ config MUC_OPCUA_CU_BASE_INFO_ENGINEERING_UNITS
 #   Detail: CU 2190:Session Cancel.
 #   Notes: Imported from OPC profile REST API 2026-07-15. Not implemented: no Cancel service handler exists.
 comment "Session Cancel (NOT IMPLEMENTED) [OPC-10000-4 §5.6.5]"
+
+# Base Info Events Capabilities (opc_cu_3194)
+#   Implementation state: unimplemented -- visible but not selectable.
+#   Detail: CU 3194:Base Info Events Capabilities.
+#   Notes: Reconciled (spec 074): the Server Object (i=2253) exposes a readable EventNotifier attribute (SubscribeToEvents) so a client can discover it as an event source; read_attribute.c + base_nodes.c, tested by test_read_service::test_read_service_eventnotifier.
+comment "Base Info Events Capabilities (NOT IMPLEMENTED)"
+
+# Auditing Secure Communication (opc_cu_2422)
+#   Implementation state: unimplemented -- visible but not selectable.
+#   Detail: CU 2422:Auditing Secure Communication.
+#   Notes: Reconciled (spec 074): AuditOpenSecureChannelEvent (i=2060) emitted on OpenSecureChannel (osc_handler.c) and observable via the Server EventNotifier; test_event_notifications. Satisfied by opc_cu_auditing.
+comment "Auditing Secure Communication (NOT IMPLEMENTED)"
+
+# Auditing Services (opc_cu_3968)
+#   Implementation state: unimplemented -- visible but not selectable.
+#   Detail: CU 3968:Auditing Services.
+#   Notes: Reconciled (spec 074): the server emits + delivers AuditEvents for CreateSession/ActivateSession/Write (audited service subset); test_event_notifications. Satisfied by opc_cu_auditing.
+comment "Auditing Services (NOT IMPLEMENTED)"
+
+# Auditing Write (opc_cu_3228)
+#   Implementation state: unimplemented -- visible but not selectable.
+#   Detail: CU 3228:Auditing Write.
+#   Notes: Reconciled (spec 074): AuditWriteUpdateEvent (i=2100) emitted per successful attribute write (attribute_handler.c) and observable via the Server EventNotifier; test_event_notifications. Satisfied by opc_cu_auditing.
+comment "Auditing Write (NOT IMPLEMENTED)"
 
 # Node Management Add Node (opc_cu_2380)
 #   Implementation state: unimplemented -- visible but not selectable.

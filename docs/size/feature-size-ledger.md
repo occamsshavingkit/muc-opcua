@@ -1553,3 +1553,17 @@ full-featured      53514        0        0      53514 build/size-031/full-featur
 - Service_dispatch.c shared growth: ~+145 B across all profiles (binary search + cleanup + ifdef)
 - **`<math.h>` removed from subscription.c** — double-precision software emulation library (~12 KB) no longer linked for profiles with subscriptions. The net effect is that the code-size additions above are partially offset for micro/embedded/full, keeping `.text` growth modest.
 - `.data = 0`, `.bss = 0`, heap = 0 across all profiles (no-heap invariant preserved).
+
+## 2026-07-16: Spec 074 — Server-Emitted, Client-Observable AuditEvents
+
+Made auditing conformant (emit + observe over OPC UA), gated by
+`MUC_OPCUA_CU_AUDITING` (defaults on for `full` only; 0 on all other profiles).
+
+**RAM** (auditing-enabled profiles only): shared static audit-payload pool
+`audit_pool[16]` = 16 × 336 B = **5.2 KB**, plus an 8-byte `audit_ref` per queued
+event (8 × MU_MAX_EVENT_QUEUE_SIZE 8 × MU_INTERN_MAX_SUBSCRIPTIONS 100 ≈ 6.4 KB on
+full) → **~11.6 KB on full**. This is **~23× smaller** than embedding the full
+audit payload in every queued event (~268 KB); the pool design (research.md
+Decision 7) is the reason the full-field path is affordable. Flash: audit→event
+adapter + SELECT resolver/parser + 4 emitters, ~1–2 KB, auditing-only. Non-auditing
+profiles (nano/micro/embedded/standard): **0** flash + RAM (compiled out).

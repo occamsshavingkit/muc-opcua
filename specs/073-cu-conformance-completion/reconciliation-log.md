@@ -119,3 +119,23 @@ reconciled required 36 → 40). Added as granular manifest entries under
   these; deferred as a batch — each needs per-node address-space grounding and most
   are genuinely absent. Core-type CUs (3185/3188/3189 base type folders/ServerType)
   are also deferred pending per-node grounding.
+
+## 2026-07-16 — Auditing made real (spec 074), reconciles 4 CUs
+
+Spec 074 (server-emitted, client-observable AuditEvents) turned the audit
+subsystem from a host-callback stub into genuine OPC UA auditing (emit + observe
+via the Server EventNotifier). That makes previously-unclaimable CUs honest:
+
+| CU | Name | Alias | Now backed by |
+| --- | --- | --- | --- |
+| 3194 | Base Info Events Capabilities | opc_cu_events | Server EventNotifier readable; test_read_service::test_read_service_eventnotifier |
+| 2422 | Auditing Secure Communication | opc_cu_auditing | AuditOpenSecureChannelEvent emitted+observable; test_event_notifications |
+| 3968 | Auditing Services | opc_cu_auditing | Create/Activate/Write AuditEvents emitted+observable; test_event_notifications |
+| 3228 | Auditing Write | opc_cu_auditing | AuditWriteUpdateEvent emitted+observable; test_event_notifications |
+
+`opc_cu_auditing` re-annotated + test_event_notifications added as backing (the
+emit->observe proof), resolving the over-claim flagged in the 1328 increment.
+Overall reconciled required 40 -> 43. Still deferred: 5213 (no connection-close
+audit type), 3224/3226/3230 (no NodeManagement/History/Method audit emit sites);
+documented 074 follow-ups: failure-path (Status=false) auditing, OldValue capture,
+SessionId/SecureChannelId string population.

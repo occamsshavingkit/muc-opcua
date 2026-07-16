@@ -18,7 +18,7 @@ remains future work.
 | claimed | 60 |
 | implemented | 7 |
 | deferred | 9 |
-| unimplemented | 117 |
+| unimplemented | 121 |
 
 ## Item matrix
 
@@ -134,7 +134,7 @@ remains future work.
 | opc_cu_redundancy | conformance_unit | claimed | OPC-10000-4 §5.14.7 Core 2022 Server Facet | MUC_OPCUA_CU_REDUNDANCY | full | test_transfer_subscriptions |
 | opc_cu_diagnostics | conformance_unit | claimed | OPC-10000-5 §6.3 Core 2022 Server Facet | MUC_OPCUA_CU_DIAGNOSTICS | full | test_diagnostics |
 | opc_cu_complex_types | conformance_unit | claimed | OPC-10000-6 Core 2022 Server Facet | MUC_OPCUA_CU_COMPLEX_TYPES | full | test_complex_types |
-| opc_cu_auditing | conformance_unit | claimed | OPC-10000-4 §7.x Core 2022 Server Facet | MUC_OPCUA_CU_AUDITING | full | test_audit_events |
+| opc_cu_auditing | conformance_unit | claimed | OPC-10000-4 §7.x Core 2022 Server Facet | MUC_OPCUA_CU_AUDITING | full | test_audit_events, test_event_notifications |
 | opc_cu_dynamic_nodes | conformance_unit | claimed | OPC-10000-3 Core 2022 Server Facet | MUC_OPCUA_CU_DYNAMIC_NODES | full | test_address_space_dynamic |
 | opc_cu_multi_chunk | conformance_unit | claimed | OPC-10000-6 Core 2022 Server Facet | MUC_OPCUA_CU_MULTI_CHUNK | full | test_message_chunk_errors |
 | opc_cu_session_timeout | conformance_unit | claimed | OPC-10000-4 Core 2022 Server Facet | MUC_OPCUA_CU_SESSION_TIMEOUT | micro, embedded, standard, full | test_base_server_behaviour |
@@ -207,6 +207,10 @@ remains future work.
 | opc_cu_2394 | conformance_unit | unimplemented |  | — | full | — |
 | opc_cu_2939 | conformance_unit | unimplemented |  | — | full | — |
 | opc_cu_3153 | conformance_unit | unimplemented |  | — | full | — |
+| opc_cu_3194 | conformance_unit | unimplemented |  | — | full | — |
+| opc_cu_2422 | conformance_unit | unimplemented |  | — | full | — |
+| opc_cu_3968 | conformance_unit | unimplemented |  | — | full | — |
+| opc_cu_3228 | conformance_unit | unimplemented |  | — | full | — |
 | opc_cu_2190 | conformance_unit | unimplemented | OPC-10000-4 §5.6.5 | — | standard, full | — |
 | opc_cu_2271 | conformance_unit | unimplemented | OPC-10000-4 §5.4.5 | — | standard, full | — |
 | opc_cu_2863 | conformance_unit | unimplemented | OPC-10000-7 §6.5 | — | embedded, standard, full | — |

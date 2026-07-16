@@ -16,7 +16,7 @@ yet reconciled to individual OPC CU ids count as not-implemented — see the
 reconciliation note below.
 
 - Distinct Server CUs: **525** (required 179, optional 346)
-- Reconciled as implemented: **required 40/179**, **optional 20/346**
+- Reconciled as implemented: **required 43/179**, **optional 21/346**
 
 ### Per Server profile / facet
 
@@ -32,31 +32,31 @@ reconciliation note below.
 | 1219 | Exposes Type System Server Facet | 1/8 | 1/38 |
 | 1322 | Core 2022 Server Facet | 14/17 | 20/27 |
 | 1324 | Standard DataChange Subscription 2022 Server Facet | 11/16 | 0/1 |
-| 1328 | Auditing 2022 Server Facet | 11/18 | 0/12 |
+| 1328 | Auditing 2022 Server Facet | 14/18 | 1/12 |
 | 1329 | Node Management 2022 Server Facet | 5/15 | 1/39 |
 | 1330 | Nano Embedded Device 2022 Server Profile | 18/22 | 20/29 |
 | 1332 | Embedded 2022 UA Server Profile | 32/51 | 20/68 |
 | 1333 | Standard 2022 UA Server Profile | 32/55 | 20/68 |
 | 1343 | Global Discovery Server 2022 Profile | 29/41 | 20/28 |
-| 1344 | Global Discovery and Certificate Mgmt 2022 Server | 34/52 | 20/42 |
+| 1344 | Global Discovery and Certificate Mgmt 2022 Server | 37/52 | 21/42 |
 | 1346 | A & E Wrapper 2022 Facet | 9/18 | 0/0 |
 | 1348 | File Access Server Facet | 0/1 | 0/2 |
 | 1351 | User Role Base 2022 Server Facet | 0/2 | 0/1 |
-| 1500 | A & C Exclusive Alarming 2022 Server Facet | 11/23 | 0/77 |
-| 1501 | A & C Non-Exclusive Alarming 2022 Server Facet | 11/23 | 0/80 |
-| 1502 | A & C Alarm 2022 Server Facet | 11/22 | 0/62 |
+| 1500 | A & C Exclusive Alarming 2022 Server Facet | 12/23 | 0/77 |
+| 1501 | A & C Non-Exclusive Alarming 2022 Server Facet | 12/23 | 0/80 |
+| 1502 | A & C Alarm 2022 Server Facet | 12/22 | 0/62 |
 | 1503 | A & C Alarm Auditing Server Facet | 0/1 | 0/7 |
-| 1504 | A & C Dialog 2022 Server Facet | 11/19 | 0/13 |
+| 1504 | A & C Dialog 2022 Server Facet | 12/19 | 0/13 |
 | 1505 | Data Access Server Facet | 0/1 | 0/21 |
 | 1524 | Dictionary Reference Server Facet | 0/1 | 0/2 |
 | 1525 | Temporary File Access Server Facet | 0/1 | 0/4 |
-| 1551 | A & C Base Condition 2022 Server Facet | 11/18 | 0/8 |
+| 1551 | A & C Base Condition 2022 Server Facet | 12/18 | 0/8 |
 | 1562 | A & C Address Space Instance 2022 Server Facet | 0/1 | 0/0 |
-| 1563 | A & C Enable 2022 Server Facet | 11/20 | 0/11 |
-| 1564 | A & C Previous Instances 2022 Server Facet | 11/19 | 0/8 |
-| 1565 | A & C Acknowledgeable Alarm 2022 Server Facet | 11/19 | 0/15 |
-| 1566 | A & C CertificateExpiration 2022 Server Facet | 11/22 | 0/10 |
-| 1568 | A & C Refresh2 2022 Server Facet | 11/19 | 0/8 |
+| 1563 | A & C Enable 2022 Server Facet | 12/20 | 0/11 |
+| 1564 | A & C Previous Instances 2022 Server Facet | 12/19 | 0/8 |
+| 1565 | A & C Acknowledgeable Alarm 2022 Server Facet | 12/19 | 0/15 |
+| 1566 | A & C CertificateExpiration 2022 Server Facet | 12/22 | 0/10 |
+| 1568 | A & C Refresh2 2022 Server Facet | 12/19 | 0/8 |
 | 1571 | Historical Raw Data 2022 Server Facet | 0/4 | 0/1 |
 | 1572 | Historical Annotation 2022 Server Facet | 0/6 | 0/0 |
 | 1573 | Historical Data Update 2022 Server Facet | 0/3 | 0/1 |
@@ -77,7 +77,7 @@ reconciliation note below.
 | 1633 | Request State Change Server Facet | 0/1 | 0/0 |
 | 1636 | AliasName Server Facet | 0/3 | 0/4 |
 | 1637 | AliasName Aggregating Server Facet | 0/4 | 0/5 |
-| 1638 | State Machine 2022 Server Facet | 11/16 | 0/14 |
+| 1638 | State Machine 2022 Server Facet | 12/16 | 0/14 |
 | 1639 | Method 2022 Server Facet | 0/4 | 0/2 |
 | 1691 | User Token – Anonymous Server Facet | 0/1 | 0/0 |
 | 1695 | User Token – User Name Password Server Facet | 0/2 | 0/1 |
@@ -98,7 +98,7 @@ reconciliation note below.
 | 1997 | Attribute WriteMask Server Facet | 0/6 | 0/1 |
 | 2069 | Subnet Discovery Server Facet | 0/1 | 0/0 |
 | 2080 | User Role Management 2022 Server Facet | 0/6 | 0/8 |
-| 2085 | Standard Event Subscription 2022 Server Facet | 11/15 | 0/7 |
+| 2085 | Standard Event Subscription 2022 Server Facet | 12/15 | 0/7 |
 | 2098 | Durable Subscription 2022 Server Facet | 0/3 | 0/0 |
 | 2113 | KeyCredential Service Server Facet | 0/2 | 0/3 |
 | 2242 | LogObject Facet | 0/1 | 0/13 |
