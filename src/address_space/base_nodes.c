@@ -219,6 +219,33 @@ static const opcua_byte_t s_str_SessionDiagnosticsVariableType[] = "SessionDiagn
 static const opcua_byte_t s_str_SessionSecurityDiagnosticsArrayType[] = "SessionSecurityDiagnosticsArrayType";
 static const opcua_byte_t s_str_SessionSecurityDiagnosticsType[] = "SessionSecurityDiagnosticsType";
 static const opcua_byte_t s_str_BuildInfoType[] = "BuildInfoType";
+#if MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+/* spec 085 (CU 5801): BrowseNames for the ServerStatusType/BuildInfoType/
+   ServerDiagnosticsSummaryType InstanceDeclarations (State and BuildInfo are
+   already declared above and reused). */
+static const opcua_byte_t s_str_StartTime[] = "StartTime";
+static const opcua_byte_t s_str_CurrentTime[] = "CurrentTime";
+static const opcua_byte_t s_str_SecondsTillShutdown[] = "SecondsTillShutdown";
+static const opcua_byte_t s_str_ShutdownReason[] = "ShutdownReason";
+static const opcua_byte_t s_str_ProductUri[] = "ProductUri";
+static const opcua_byte_t s_str_ManufacturerName[] = "ManufacturerName";
+static const opcua_byte_t s_str_ProductName[] = "ProductName";
+static const opcua_byte_t s_str_SoftwareVersion[] = "SoftwareVersion";
+static const opcua_byte_t s_str_BuildNumber[] = "BuildNumber";
+static const opcua_byte_t s_str_BuildDate[] = "BuildDate";
+static const opcua_byte_t s_str_ServerViewCount[] = "ServerViewCount";
+static const opcua_byte_t s_str_CurrentSessionCount[] = "CurrentSessionCount";
+static const opcua_byte_t s_str_CumulatedSessionCount[] = "CumulatedSessionCount";
+static const opcua_byte_t s_str_SecurityRejectedSessionCount[] = "SecurityRejectedSessionCount";
+static const opcua_byte_t s_str_RejectedSessionCount[] = "RejectedSessionCount";
+static const opcua_byte_t s_str_SessionTimeoutCount[] = "SessionTimeoutCount";
+static const opcua_byte_t s_str_SessionAbortCount[] = "SessionAbortCount";
+static const opcua_byte_t s_str_PublishingIntervalCount[] = "PublishingIntervalCount";
+static const opcua_byte_t s_str_CurrentSubscriptionCount[] = "CurrentSubscriptionCount";
+static const opcua_byte_t s_str_CumulatedSubscriptionCount[] = "CumulatedSubscriptionCount";
+static const opcua_byte_t s_str_SecurityRejectedRequestsCount[] = "SecurityRejectedRequestsCount";
+static const opcua_byte_t s_str_RejectedRequestsCount[] = "RejectedRequestsCount";
+#endif
 #endif
 #if MUC_OPCUA_CU_BASE_INFO_LOCALTIME
 static const opcua_byte_t s_str_TimeZoneDataType[] = "TimeZoneDataType";
@@ -609,6 +636,63 @@ static const mu_reference_t s_non_transparent_redundancy_type_refs[] = {
 /* spec 083 (CU 3189): FileType HasSubtype -> AddressSpaceFileType. */
 static const mu_reference_t s_file_type_refs[] = {
     {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {11595}}, true}};
+#endif
+
+#if MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+/* spec 085 (CU 5801): shared HasModellingRule(37)->Mandatory(78) plus
+   HasTypeDefinition(40) forward refs for the ServerStatusType/BuildInfoType/
+   ServerDiagnosticsSummaryType own InstanceDeclarations. Mirrors the Data
+   Access property-declaration convention (s_da_prop_mandatory_refs below),
+   which also carries an explicit HasTypeDefinition ref so Browse(HasTypeDefinition)
+   / Browse(all forward) on the declaration node itself returns it, in addition
+   to the node's cached `type_definition` field used to fill in ReferenceDescription. */
+static const mu_reference_t s_mandatory_bdv_refs[] = {
+    {{0, MU_NODEID_NUMERIC, {37}}, {0, MU_NODEID_NUMERIC, {78}}, true},
+    {{0, MU_NODEID_NUMERIC, {40}}, {0, MU_NODEID_NUMERIC, {63}}, true}};
+
+/* ServerStatusType.BuildInfo(2142): Mandatory, TypeDefinition BuildInfoType(3051)
+   rather than plain BaseDataVariableType(63). */
+static const mu_reference_t s_mandatory_buildinfotype_refs[] = {
+    {{0, MU_NODEID_NUMERIC, {37}}, {0, MU_NODEID_NUMERIC, {78}}, true},
+    {{0, MU_NODEID_NUMERIC, {40}}, {0, MU_NODEID_NUMERIC, {3051}}, true}};
+
+/* ServerStatusType(2138) HasComponent(47) -> its 6 own declarations
+   (OPC-10000-5 §7.6). */
+static const mu_reference_t s_server_status_type_refs[] = {
+    {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {2139}}, true},
+    {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {2140}}, true},
+    {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {2141}}, true},
+    {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {2142}}, true},
+    {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {2752}}, true},
+    {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {2753}}, true}};
+
+/* BuildInfoType(3051) HasComponent(47) -> its 6 own declarations
+   (OPC-10000-5 §7.7 Table 77). Shared by both the DataAccess-on and
+   DataAccess-off copies of the 3051 node entry. */
+static const mu_reference_t s_build_info_type_refs[] = {
+    {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {3052}}, true},
+    {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {3053}}, true},
+    {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {3054}}, true},
+    {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {3055}}, true},
+    {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {3056}}, true},
+    {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {3057}}, true}};
+
+/* ServerDiagnosticsSummaryType(2150) HasComponent(47) -> its 12 own
+   declarations (OPC-10000-5 §7.8). NodeId 2158 is skipped in the official
+   numbering -- not a gap here. */
+static const mu_reference_t s_server_diagnostics_summary_type_refs[] = {
+    {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {2151}}, true},
+    {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {2152}}, true},
+    {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {2153}}, true},
+    {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {2154}}, true},
+    {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {2155}}, true},
+    {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {2156}}, true},
+    {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {2157}}, true},
+    {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {2159}}, true},
+    {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {2160}}, true},
+    {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {2161}}, true},
+    {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {2162}}, true},
+    {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {2163}}, true}};
 #endif
 
 #if MUC_OPCUA_CU_BASE_INFO_ARGUMENT_TYPE
@@ -1876,18 +1960,167 @@ static const mu_node_t s_base_nodes[] = {
      MU_NODECLASS_VARIABLETYPE,
      {16, s_str_ServerStatusType},
      {16, s_str_ServerStatusType},
+#if MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+     s_server_status_type_refs,
+     sizeof(s_server_status_type_refs) / sizeof(s_server_status_type_refs[0]),
+#else
      NULL,
      0,
+#endif
      NULL,
      .type_definition = {0}},
+#if MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+    /* spec 085 (CU 5801): ServerStatusType(2138) own declarations
+       (OPC-10000-5 §7.6). Sorted between ServerStatusType(2138) and
+       ServerDiagnosticsSummaryType(2150). */
+    {{0, MU_NODEID_NUMERIC, {2139}},
+     MU_NODECLASS_VARIABLE,
+     {9, s_str_StartTime},
+     {9, s_str_StartTime},
+     s_mandatory_bdv_refs,
+     sizeof(s_mandatory_bdv_refs) / sizeof(s_mandatory_bdv_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {63}}},
+    {{0, MU_NODEID_NUMERIC, {2140}},
+     MU_NODECLASS_VARIABLE,
+     {11, s_str_CurrentTime},
+     {11, s_str_CurrentTime},
+     s_mandatory_bdv_refs,
+     sizeof(s_mandatory_bdv_refs) / sizeof(s_mandatory_bdv_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {63}}},
+    {{0, MU_NODEID_NUMERIC, {2141}},
+     MU_NODECLASS_VARIABLE,
+     {5, s_str_State},
+     {5, s_str_State},
+     s_mandatory_bdv_refs,
+     sizeof(s_mandatory_bdv_refs) / sizeof(s_mandatory_bdv_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {63}}},
+    {{0, MU_NODEID_NUMERIC, {2142}},
+     MU_NODECLASS_VARIABLE,
+     {9, s_str_BuildInfo},
+     {9, s_str_BuildInfo},
+     s_mandatory_buildinfotype_refs,
+     sizeof(s_mandatory_buildinfotype_refs) / sizeof(s_mandatory_buildinfotype_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {3051}}},
+#endif
     {{0, MU_NODEID_NUMERIC, {2150}},
      MU_NODECLASS_VARIABLETYPE,
      {28, s_str_ServerDiagnosticsSummaryType},
      {28, s_str_ServerDiagnosticsSummaryType},
+#if MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+     s_server_diagnostics_summary_type_refs,
+     sizeof(s_server_diagnostics_summary_type_refs) / sizeof(s_server_diagnostics_summary_type_refs[0]),
+#else
      NULL,
      0,
+#endif
      NULL,
      .type_definition = {0}},
+#if MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+    /* spec 085 (CU 5801): ServerDiagnosticsSummaryType(2150) own declarations
+       (OPC-10000-5 §7.8). Sorted between ServerDiagnosticsSummaryType(2150)
+       and SamplingIntervalDiagnosticsArrayType(2164). NodeId 2158 is skipped
+       in the official numbering -- not a gap here. */
+    {{0, MU_NODEID_NUMERIC, {2151}},
+     MU_NODECLASS_VARIABLE,
+     {15, s_str_ServerViewCount},
+     {15, s_str_ServerViewCount},
+     s_mandatory_bdv_refs,
+     sizeof(s_mandatory_bdv_refs) / sizeof(s_mandatory_bdv_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {63}}},
+    {{0, MU_NODEID_NUMERIC, {2152}},
+     MU_NODECLASS_VARIABLE,
+     {19, s_str_CurrentSessionCount},
+     {19, s_str_CurrentSessionCount},
+     s_mandatory_bdv_refs,
+     sizeof(s_mandatory_bdv_refs) / sizeof(s_mandatory_bdv_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {63}}},
+    {{0, MU_NODEID_NUMERIC, {2153}},
+     MU_NODECLASS_VARIABLE,
+     {21, s_str_CumulatedSessionCount},
+     {21, s_str_CumulatedSessionCount},
+     s_mandatory_bdv_refs,
+     sizeof(s_mandatory_bdv_refs) / sizeof(s_mandatory_bdv_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {63}}},
+    {{0, MU_NODEID_NUMERIC, {2154}},
+     MU_NODECLASS_VARIABLE,
+     {28, s_str_SecurityRejectedSessionCount},
+     {28, s_str_SecurityRejectedSessionCount},
+     s_mandatory_bdv_refs,
+     sizeof(s_mandatory_bdv_refs) / sizeof(s_mandatory_bdv_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {63}}},
+    {{0, MU_NODEID_NUMERIC, {2155}},
+     MU_NODECLASS_VARIABLE,
+     {20, s_str_RejectedSessionCount},
+     {20, s_str_RejectedSessionCount},
+     s_mandatory_bdv_refs,
+     sizeof(s_mandatory_bdv_refs) / sizeof(s_mandatory_bdv_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {63}}},
+    {{0, MU_NODEID_NUMERIC, {2156}},
+     MU_NODECLASS_VARIABLE,
+     {19, s_str_SessionTimeoutCount},
+     {19, s_str_SessionTimeoutCount},
+     s_mandatory_bdv_refs,
+     sizeof(s_mandatory_bdv_refs) / sizeof(s_mandatory_bdv_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {63}}},
+    {{0, MU_NODEID_NUMERIC, {2157}},
+     MU_NODECLASS_VARIABLE,
+     {17, s_str_SessionAbortCount},
+     {17, s_str_SessionAbortCount},
+     s_mandatory_bdv_refs,
+     sizeof(s_mandatory_bdv_refs) / sizeof(s_mandatory_bdv_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {63}}},
+    {{0, MU_NODEID_NUMERIC, {2159}},
+     MU_NODECLASS_VARIABLE,
+     {23, s_str_PublishingIntervalCount},
+     {23, s_str_PublishingIntervalCount},
+     s_mandatory_bdv_refs,
+     sizeof(s_mandatory_bdv_refs) / sizeof(s_mandatory_bdv_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {63}}},
+    {{0, MU_NODEID_NUMERIC, {2160}},
+     MU_NODECLASS_VARIABLE,
+     {24, s_str_CurrentSubscriptionCount},
+     {24, s_str_CurrentSubscriptionCount},
+     s_mandatory_bdv_refs,
+     sizeof(s_mandatory_bdv_refs) / sizeof(s_mandatory_bdv_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {63}}},
+    {{0, MU_NODEID_NUMERIC, {2161}},
+     MU_NODECLASS_VARIABLE,
+     {26, s_str_CumulatedSubscriptionCount},
+     {26, s_str_CumulatedSubscriptionCount},
+     s_mandatory_bdv_refs,
+     sizeof(s_mandatory_bdv_refs) / sizeof(s_mandatory_bdv_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {63}}},
+    {{0, MU_NODEID_NUMERIC, {2162}},
+     MU_NODECLASS_VARIABLE,
+     {29, s_str_SecurityRejectedRequestsCount},
+     {29, s_str_SecurityRejectedRequestsCount},
+     s_mandatory_bdv_refs,
+     sizeof(s_mandatory_bdv_refs) / sizeof(s_mandatory_bdv_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {63}}},
+    {{0, MU_NODEID_NUMERIC, {2163}},
+     MU_NODECLASS_VARIABLE,
+     {21, s_str_RejectedRequestsCount},
+     {21, s_str_RejectedRequestsCount},
+     s_mandatory_bdv_refs,
+     sizeof(s_mandatory_bdv_refs) / sizeof(s_mandatory_bdv_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {63}}},
+#endif
     {{0, MU_NODEID_NUMERIC, {2164}},
      MU_NODECLASS_VARIABLETYPE,
      {36, s_str_SamplingIntervalDiagnosticsArrayType},
@@ -2018,6 +2251,28 @@ static const mu_node_t s_base_nodes[] = {
      sizeof(s_property_type_ref) / sizeof(s_property_type_ref[0]),
      &s_locale_id_array_value,
      .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+#if MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION && !MUC_OPCUA_CU_DATA_ACCESS
+    /* spec 085 (CU 5801): ServerStatusType(2138) own declarations
+       SecondsTillShutdown/ShutdownReason (DataAccess-off copy), mirroring the
+       in-DataAccess copy above (after EnumStrings(2377) there). Sorts after
+       LocaleIdArray(2271) and before AggregateFunctions(2997). */
+    {{0, MU_NODEID_NUMERIC, {2752}},
+     MU_NODECLASS_VARIABLE,
+     {19, s_str_SecondsTillShutdown},
+     {19, s_str_SecondsTillShutdown},
+     s_mandatory_bdv_refs,
+     sizeof(s_mandatory_bdv_refs) / sizeof(s_mandatory_bdv_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {63}}},
+    {{0, MU_NODEID_NUMERIC, {2753}},
+     MU_NODECLASS_VARIABLE,
+     {14, s_str_ShutdownReason},
+     {14, s_str_ShutdownReason},
+     s_mandatory_bdv_refs,
+     sizeof(s_mandatory_bdv_refs) / sizeof(s_mandatory_bdv_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {63}}},
+#endif
 #if MUC_OPCUA_CU_SUBSCRIPTION_BASIC && !MUC_OPCUA_CU_DATA_ACCESS
     /* CU 3911: AggregateFunctions(2997). When DataAccess is enabled this node is
        emitted inside the DataAccess block instead (after 2377), so that exactly one
@@ -2137,6 +2392,29 @@ static const mu_node_t s_base_nodes[] = {
      sizeof(s_da_prop_mandatory_refs) / sizeof(s_da_prop_mandatory_refs[0]),
      NULL,
      .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+#if MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+    /* spec 085 (CU 5801): ServerStatusType(2138) own declarations
+       SecondsTillShutdown/ShutdownReason (DataAccess-on copy; fall inside the
+       2365..11461 DataAccess block, so they're dual-placed -- see the
+       DataAccess-off mirror after LocaleIdArray(2271) below). Sorts after
+       EnumStrings(2377) and before AggregateFunctions(2997). */
+    {{0, MU_NODEID_NUMERIC, {2752}},
+     MU_NODECLASS_VARIABLE,
+     {19, s_str_SecondsTillShutdown},
+     {19, s_str_SecondsTillShutdown},
+     s_mandatory_bdv_refs,
+     sizeof(s_mandatory_bdv_refs) / sizeof(s_mandatory_bdv_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {63}}},
+    {{0, MU_NODEID_NUMERIC, {2753}},
+     MU_NODECLASS_VARIABLE,
+     {14, s_str_ShutdownReason},
+     {14, s_str_ShutdownReason},
+     s_mandatory_bdv_refs,
+     sizeof(s_mandatory_bdv_refs) / sizeof(s_mandatory_bdv_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {63}}},
+#endif
 #if MUC_OPCUA_CU_SUBSCRIPTION_BASIC
     /* CU 3911: AggregateFunctions Folder (i=2997), HasComponent child of
        ServerCapabilities(2268), FolderType(61). Sorts after the DataAccess block
@@ -2157,10 +2435,70 @@ static const mu_node_t s_base_nodes[] = {
      MU_NODECLASS_VARIABLETYPE,
      {13, s_str_BuildInfoType},
      {13, s_str_BuildInfoType},
+#if MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+     s_build_info_type_refs,
+     sizeof(s_build_info_type_refs) / sizeof(s_build_info_type_refs[0]),
+#else
      NULL,
      0,
+#endif
      NULL,
      .type_definition = {0}},
+#endif
+#if MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+    /* spec 085 (CU 5801): BuildInfoType(3051) own declarations
+       (OPC-10000-5 §7.7 Table 77; DataAccess-on copy -- all 6 fall inside the
+       2365..11461 DataAccess block, so they're dual-placed -- see the
+       DataAccess-off mirror below). Sorts after BuildInfoType(3051) and
+       before EnumValueType(7594). */
+    {{0, MU_NODEID_NUMERIC, {3052}},
+     MU_NODECLASS_VARIABLE,
+     {10, s_str_ProductUri},
+     {10, s_str_ProductUri},
+     s_mandatory_bdv_refs,
+     sizeof(s_mandatory_bdv_refs) / sizeof(s_mandatory_bdv_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {63}}},
+    {{0, MU_NODEID_NUMERIC, {3053}},
+     MU_NODECLASS_VARIABLE,
+     {16, s_str_ManufacturerName},
+     {16, s_str_ManufacturerName},
+     s_mandatory_bdv_refs,
+     sizeof(s_mandatory_bdv_refs) / sizeof(s_mandatory_bdv_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {63}}},
+    {{0, MU_NODEID_NUMERIC, {3054}},
+     MU_NODECLASS_VARIABLE,
+     {11, s_str_ProductName},
+     {11, s_str_ProductName},
+     s_mandatory_bdv_refs,
+     sizeof(s_mandatory_bdv_refs) / sizeof(s_mandatory_bdv_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {63}}},
+    {{0, MU_NODEID_NUMERIC, {3055}},
+     MU_NODECLASS_VARIABLE,
+     {15, s_str_SoftwareVersion},
+     {15, s_str_SoftwareVersion},
+     s_mandatory_bdv_refs,
+     sizeof(s_mandatory_bdv_refs) / sizeof(s_mandatory_bdv_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {63}}},
+    {{0, MU_NODEID_NUMERIC, {3056}},
+     MU_NODECLASS_VARIABLE,
+     {11, s_str_BuildNumber},
+     {11, s_str_BuildNumber},
+     s_mandatory_bdv_refs,
+     sizeof(s_mandatory_bdv_refs) / sizeof(s_mandatory_bdv_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {63}}},
+    {{0, MU_NODEID_NUMERIC, {3057}},
+     MU_NODECLASS_VARIABLE,
+     {9, s_str_BuildDate},
+     {9, s_str_BuildDate},
+     s_mandatory_bdv_refs,
+     sizeof(s_mandatory_bdv_refs) / sizeof(s_mandatory_bdv_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {63}}},
 #endif
 #if MUC_OPCUA_CU_BASE_INFO_BASE_TYPES
     /* CU 3188: EnumValueType(7594, subtype of Structure) + its Default XML(7616)/
@@ -2244,10 +2582,68 @@ static const mu_node_t s_base_nodes[] = {
      MU_NODECLASS_VARIABLETYPE,
      {13, s_str_BuildInfoType},
      {13, s_str_BuildInfoType},
+#if MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+     s_build_info_type_refs,
+     sizeof(s_build_info_type_refs) / sizeof(s_build_info_type_refs[0]),
+#else
      NULL,
      0,
+#endif
      NULL,
      .type_definition = {0}},
+#endif
+#if MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION && !MUC_OPCUA_CU_DATA_ACCESS
+    /* spec 085 (CU 5801): BuildInfoType(3051) own declarations (DataAccess-off
+       copy), mirroring the in-DataAccess copy above. Sorts after
+       BuildInfoType(3051) and before EnumValueType(7594). */
+    {{0, MU_NODEID_NUMERIC, {3052}},
+     MU_NODECLASS_VARIABLE,
+     {10, s_str_ProductUri},
+     {10, s_str_ProductUri},
+     s_mandatory_bdv_refs,
+     sizeof(s_mandatory_bdv_refs) / sizeof(s_mandatory_bdv_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {63}}},
+    {{0, MU_NODEID_NUMERIC, {3053}},
+     MU_NODECLASS_VARIABLE,
+     {16, s_str_ManufacturerName},
+     {16, s_str_ManufacturerName},
+     s_mandatory_bdv_refs,
+     sizeof(s_mandatory_bdv_refs) / sizeof(s_mandatory_bdv_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {63}}},
+    {{0, MU_NODEID_NUMERIC, {3054}},
+     MU_NODECLASS_VARIABLE,
+     {11, s_str_ProductName},
+     {11, s_str_ProductName},
+     s_mandatory_bdv_refs,
+     sizeof(s_mandatory_bdv_refs) / sizeof(s_mandatory_bdv_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {63}}},
+    {{0, MU_NODEID_NUMERIC, {3055}},
+     MU_NODECLASS_VARIABLE,
+     {15, s_str_SoftwareVersion},
+     {15, s_str_SoftwareVersion},
+     s_mandatory_bdv_refs,
+     sizeof(s_mandatory_bdv_refs) / sizeof(s_mandatory_bdv_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {63}}},
+    {{0, MU_NODEID_NUMERIC, {3056}},
+     MU_NODECLASS_VARIABLE,
+     {11, s_str_BuildNumber},
+     {11, s_str_BuildNumber},
+     s_mandatory_bdv_refs,
+     sizeof(s_mandatory_bdv_refs) / sizeof(s_mandatory_bdv_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {63}}},
+    {{0, MU_NODEID_NUMERIC, {3057}},
+     MU_NODECLASS_VARIABLE,
+     {9, s_str_BuildDate},
+     {9, s_str_BuildDate},
+     s_mandatory_bdv_refs,
+     sizeof(s_mandatory_bdv_refs) / sizeof(s_mandatory_bdv_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {63}}},
 #endif
 #if MUC_OPCUA_CU_BASE_INFO_BASE_TYPES && !MUC_OPCUA_CU_DATA_ACCESS
     /* CU 3188 (Data-Access-off variant): EnumValueType(7594) + its Encoding Objects,
