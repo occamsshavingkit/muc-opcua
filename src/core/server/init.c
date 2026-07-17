@@ -159,6 +159,20 @@ opcua_statuscode_t mu_server_config_validate(const mu_server_config_t *config) {
     return MU_STATUS_GOOD;
 }
 
+/* Bounded C-string -> mu_string_t for ServerStatus.BuildInfo identity (spec 084).
+   Avoids an unbounded strlen over integrator-provided config (over-read risk on a
+   non-terminated input, CWE-126); caps at the server's bounded-String limit,
+   consistent with value_source's scalar-String handling. NULL -> empty string. */
+static mu_string_t mu_cstr_bounded_string(const char *s) {
+    size_t n = 0u;
+    if (s != NULL) {
+        while (n < (size_t)MU_MAX_STRING_VALUE_LENGTH && s[n] != '\0') {
+            n++;
+        }
+    }
+    return (mu_string_t){mu_safe_int32_from_size_t(n), (const opcua_byte_t *)s};
+}
+
 opcua_statuscode_t mu_server_init(void *storage, size_t storage_size, const mu_server_config_t *config,
                                   mu_server_t **out_server) {
     mu_server_t *server;
@@ -204,6 +218,12 @@ opcua_statuscode_t mu_server_init(void *storage, size_t storage_size, const mu_s
                              &server->diag
 #endif
         );
+        /* ServerStatus.BuildInfo identity (spec 084): populate from config where cheaply
+           available. Manufacturer/software-version/build-number stay empty strings
+           (valid per OPC-10000-5 §12.3.15) -- the goal is a decodable
+           ServerStatusDataType, identity is a bonus. */
+        server->runtime_base.server_status.product_uri = mu_cstr_bounded_string(server->config.product_uri);
+        server->runtime_base.server_status.product_name = mu_cstr_bounded_string(server->config.application_name);
     }
     server->is_running = true;
 

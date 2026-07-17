@@ -36,8 +36,13 @@
 #else
 #define MU_BASE_RUNTIME_REDUNDANCY_NODES 0
 #endif
+/* ServerStatus (i=2256), a live ServerStatusDataType ExtensionObject (spec 084):
+   always present, since the Core 2022 Server Facet always provides ServerStatus. */
+#define MU_BASE_RUNTIME_SERVER_STATUS_NODES 1
 #define MU_BASE_RUNTIME_REDUNDANCY_INDEX (2 + MU_BASE_RUNTIME_DIAG_NODES)
-#define MU_BASE_RUNTIME_NODE_COUNT (2 + MU_BASE_RUNTIME_DIAG_NODES + MU_BASE_RUNTIME_REDUNDANCY_NODES)
+#define MU_BASE_RUNTIME_SERVER_STATUS_INDEX (MU_BASE_RUNTIME_REDUNDANCY_INDEX + MU_BASE_RUNTIME_REDUNDANCY_NODES)
+#define MU_BASE_RUNTIME_NODE_COUNT                                                                                     \
+    (2 + MU_BASE_RUNTIME_DIAG_NODES + MU_BASE_RUNTIME_REDUNDANCY_NODES + MU_BASE_RUNTIME_SERVER_STATUS_NODES)
 
 /* The const, static Base Information address space described above. Never NULL. */
 const mu_address_space_t *mu_base_address_space(void);
@@ -61,9 +66,14 @@ typedef struct {
    `space` is the address-space view over the two dynamic nodes. */
 typedef struct {
     mu_base_runtime_t rt;
-    mu_node_t nodes[MU_BASE_RUNTIME_NODE_COUNT]; /* CurrentTime(2258), StartTime(2257)[, ServerDiagnostics facet] */
+    mu_node_t nodes[MU_BASE_RUNTIME_NODE_COUNT]; /* CurrentTime(2258), StartTime(2257)[, ServerDiagnostics facet],
+                                                    ServerStatus(2256) */
     mu_value_source_t values[MU_BASE_RUNTIME_NODE_COUNT];
     mu_address_space_t space;
+    /* Caller-owned, mutable scratch for the ServerStatus(2256) read callback (spec
+       084): identity fields are populated by the server-init caller, CurrentTime is
+       filled live on each read. Never a static/global -- keeps archive .bss at 0. */
+    mu_server_status_t server_status;
 } mu_base_runtime_nodes_t;
 
 /* Populate `storage` with the CurrentTime/StartTime nodes whose value sources are

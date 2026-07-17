@@ -772,11 +772,18 @@ static const mu_argument_t s_resend_input_args[] = {
     {{14, s_arg_subscription_id}, MU_ARG_UINT32_DT, -1, MU_ARG_NO_DESC}};
 
 static const mu_value_source_t s_gmi_input_value = {
-    MU_VALUESOURCE_STATIC, {.static_value = {MU_TYPE_EXTENSIONOBJECT, {.array = s_gmi_input_args}, true, 1}}};
+    MU_VALUESOURCE_STATIC,
+    {.static_value = {
+         .type = MU_TYPE_EXTENSIONOBJECT, .value = {.array = s_gmi_input_args}, .is_array = true, .array_length = 1}}};
 static const mu_value_source_t s_gmi_output_value = {
-    MU_VALUESOURCE_STATIC, {.static_value = {MU_TYPE_EXTENSIONOBJECT, {.array = s_gmi_output_args}, true, 2}}};
-static const mu_value_source_t s_resend_input_value = {
-    MU_VALUESOURCE_STATIC, {.static_value = {MU_TYPE_EXTENSIONOBJECT, {.array = s_resend_input_args}, true, 1}}};
+    MU_VALUESOURCE_STATIC,
+    {.static_value = {
+         .type = MU_TYPE_EXTENSIONOBJECT, .value = {.array = s_gmi_output_args}, .is_array = true, .array_length = 2}}};
+static const mu_value_source_t s_resend_input_value = {MU_VALUESOURCE_STATIC,
+                                                       {.static_value = {.type = MU_TYPE_EXTENSIONOBJECT,
+                                                                         .value = {.array = s_resend_input_args},
+                                                                         .is_array = true,
+                                                                         .array_length = 1}}};
 
 #define MU_GMI_INPUT_VALUE &s_gmi_input_value
 #define MU_GMI_OUTPUT_VALUE &s_gmi_output_value
@@ -3294,6 +3301,22 @@ static opcua_statuscode_t base_status_time_read(void *ctx, const mu_nodeid_t *id
     }
     return MU_STATUS_GOOD;
 }
+
+/* Live ServerStatus (2256): emit the caller-owned mu_server_status_t scratch as a
+   scalar ServerStatusDataType ExtensionObject (spec 084). CurrentTime is refreshed
+   from the time adapter on every read; identity/build fields were set once by the
+   server-init caller. The encoder reads value.array as a const mu_server_status_t*
+   (OPC-10000-5 §12.10). */
+static opcua_statuscode_t base_server_status_read(void *ctx, const mu_nodeid_t *id, mu_variant_t *v) {
+    mu_server_status_t *st = (mu_server_status_t *)ctx; /* mutable scratch, caller-owned */
+    (void)id;
+    st->current_time = (st->time && st->time->get_time) ? st->time->get_time(st->time->context) : 0;
+    *v = (mu_variant_t){0};
+    v->type = MU_TYPE_EXTENSIONOBJECT;
+    v->value.array = st;
+    v->ext_encoding_id = 864u; /* ServerStatusDataType_Encoding_DefaultBinary */
+    return MU_STATUS_GOOD;
+}
 #endif /* MUC_OPCUA_FACET_CORE_2022_SERVER */
 
 #if defined(MUC_OPCUA_FACET_CORE_2022_SERVER) && MUC_OPCUA_CU_BASE_INFO_DIAGNOSTICS
@@ -3308,6 +3331,7 @@ static opcua_statuscode_t base_diagnostics_summary_read(void *context, const mu_
     v->is_array = false;
     v->array_length = 0;
     v->value.array = rt->diag;
+    v->ext_encoding_id = 861u; /* ServerDiagnosticsSummaryDataType_Encoding_DefaultBinary */
     return (rt->diag != NULL) ? MU_STATUS_GOOD : MU_STATUS_BAD_NOTREADABLE;
 }
 
@@ -3333,6 +3357,12 @@ void mu_base_runtime_init(mu_base_runtime_nodes_t *s, const mu_time_adapter_t *t
 #if MUC_OPCUA_CU_BASE_INFO_DIAGNOSTICS
     s->rt.diag = diag;
 #endif
+    /* ServerStatus (2256) scratch (spec 084): caller-owned, mutable, never a static --
+       CurrentTime is refreshed on each read by base_server_status_read. */
+    s->server_status = (mu_server_status_t){0};
+    s->server_status.time = time;
+    s->server_status.start_time = start_time;
+    s->server_status.state = 0;
 
 #ifdef MUC_OPCUA_FACET_CORE_2022_SERVER
     s->values[0].type = MU_VALUESOURCE_CALLBACK;
@@ -3431,6 +3461,24 @@ void mu_base_runtime_init(mu_base_runtime_nodes_t *s, const mu_time_adapter_t *t
         .value = &s->values[MU_BASE_RUNTIME_REDUNDANCY_INDEX],
         .type_definition = {0, MU_NODEID_NUMERIC, {.numeric = 68u}}}; /* PropertyType */
 #endif
+
+    /* ServerStatus (2256, spec 084): a live ServerStatusDataType ExtensionObject.
+       This runtime node shadows the static NULL-valued 2256 node in the const base
+       address space via mu_resolve_node's user -> dynamic -> base lookup order.
+       Reuses s_server_status_refs so Browse of ServerStatus's children (State,
+       CurrentTime, StartTime) still works. */
+    s->values[MU_BASE_RUNTIME_SERVER_STATUS_INDEX].type = MU_VALUESOURCE_CALLBACK;
+    s->values[MU_BASE_RUNTIME_SERVER_STATUS_INDEX].data.callback.read = base_server_status_read;
+    s->values[MU_BASE_RUNTIME_SERVER_STATUS_INDEX].data.callback.context = &s->server_status;
+    s->nodes[MU_BASE_RUNTIME_SERVER_STATUS_INDEX] = (mu_node_t){
+        .node_id = {.namespace_index = 0, .identifier_type = MU_NODEID_NUMERIC, .identifier.numeric = 2256u},
+        .node_class = MU_NODECLASS_VARIABLE,
+        .browse_name = {.length = (opcua_int32_t)12, .data = (const opcua_byte_t *)s_str_ServerStatus},
+        .display_name = {.length = (opcua_int32_t)12, .data = (const opcua_byte_t *)s_str_ServerStatus},
+        .references = s_server_status_refs,
+        .reference_count = sizeof(s_server_status_refs) / sizeof(s_server_status_refs[0]),
+        .value = &s->values[MU_BASE_RUNTIME_SERVER_STATUS_INDEX],
+        .type_definition = {0, MU_NODEID_NUMERIC, {.numeric = 63u}}}; /* BaseDataVariableType */
 
     s->space.nodes = s->nodes;
     s->space.node_count = MU_BASE_RUNTIME_NODE_COUNT;

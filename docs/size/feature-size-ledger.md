@@ -1727,3 +1727,31 @@ mu_server` field changes, so RAM and `MU_SERVER_STORAGE_BYTES` are unaffected.
   the archive-vs-linked distinction.)
 - Verified via `make test-profiles`: nano 101 / micro 124 / embedded 125 / standard
   125 / full 137, all green; manifest validate OK.
+## 2026-07-17: Spec 084 — ServerStatus.Value readable (CU 3802/3808)
+
+External conformance-gauntlet finding: reading `ServerStatus`(i=2256) `.Value` returned
+`Bad_NotReadable` because the static node had a `NULL` value source (only its child
+Variables — State/CurrentTime/StartTime — were served). Attached a runtime callback node
+for 2256 (shadowing the static one via `mu_resolve_node`, reusing `s_server_status_refs`
+so Browse of the children still resolves) that emits a full `ServerStatusDataType`
+ExtensionObject (StartTime/CurrentTime/State/BuildInfo/SecondsTillShutdown/ShutdownReason,
+DefaultBinary Encoding ns0 i=864). Added a `mu_variant_t.ext_encoding_id` discriminator so
+the scalar-ExtensionObject encoder dispatches between the diagnostics-summary (861) and
+ServerStatus (864) struct writers.
+
+`scripts/measure_size.sh all` (Arm Cortex-M0+, `-Os`), delta vs `main` (`3d097b8`):
+
+| Profile | .text Δ | .bss |
+|----------|--------:|:----:|
+| nano | +604 | 0 |
+| micro | +664 | 0 |
+| embedded | +658 | 0 |
+| standard | +740 | 0 |
+| full | +672 | 0 |
+
+- Archive `.bss` stays **0 B on every profile** — the `mu_server_status_t` scratch lives
+  in caller-owned `mu_base_runtime_nodes_t`, not a static.
+- RAM: `struct mu_server` grows (the new runtime node/value-source slots + the widened
+  `mu_variant_t` rippling through the existing time slots); `MU_SERVER_STATUS_STORAGE_BYTES`
+  (336 B) was added to the storage sum and the 32-bit ARM `_Static_assert` passes with
+  comfortable headroom on nano.
