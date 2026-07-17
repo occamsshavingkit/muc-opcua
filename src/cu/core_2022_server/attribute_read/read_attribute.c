@@ -173,25 +173,6 @@ static opcua_statuscode_t read_multichunk_attribute(const mu_node_t *node, opcua
         value->type = MU_TYPE_UINT32;
         value->value.ui32 = 0;
         return MU_STATUS_GOOD;
-    case MU_ATTRIBUTEID_DATATYPE:
-        if (node->node_class != MU_NODECLASS_VARIABLE && node->node_class != MU_NODECLASS_VARIABLETYPE) {
-            return MU_STATUS_BAD_ATTRIBUTEIDINVALID;
-        }
-        value->type = MU_TYPE_NODEID;
-        if (node->type_definition.namespace_index != 0 || node->type_definition.identifier_type != 0 ||
-            node->type_definition.identifier.numeric != 0) {
-            value->value.nodeid = node->type_definition;
-        } else {
-            value->value.nodeid = (mu_nodeid_t){0, MU_NODEID_NUMERIC, {.numeric = 24}};
-        }
-        return MU_STATUS_GOOD;
-    case MU_ATTRIBUTEID_VALUERANK:
-        if (node->node_class != MU_NODECLASS_VARIABLE && node->node_class != MU_NODECLASS_VARIABLETYPE) {
-            return MU_STATUS_BAD_ATTRIBUTEIDINVALID;
-        }
-        value->type = MU_TYPE_INT32;
-        value->value.i32 = -1;
-        return MU_STATUS_GOOD;
     case MU_ATTRIBUTEID_ACCESSLEVEL:
         if (node->node_class != MU_NODECLASS_VARIABLE) {
             return MU_STATUS_BAD_ATTRIBUTEIDINVALID;
@@ -248,6 +229,40 @@ opcua_statuscode_t read_attribute(const mu_address_space_t *address_space, const
             return mu_value_source_read(node->value, &node->node_id, value);
         }
         return MU_STATUS_BAD_NOTREADABLE;
+
+    case MU_ATTRIBUTEID_DATATYPE:
+        /* DataType is a mandatory attribute of Variable and VariableType nodes
+           (OPC-10000-3 §5.6.2), independent of the MultiChunk CU -- handled here
+           unconditionally rather than only when MUC_OPCUA_CU_MULTI_CHUNK is on. */
+        if (node->node_class != MU_NODECLASS_VARIABLE && node->node_class != MU_NODECLASS_VARIABLETYPE) {
+            return MU_STATUS_BAD_ATTRIBUTEIDINVALID;
+        }
+        value->type = MU_TYPE_NODEID;
+        if (node->data_type != 0) {
+            /* Accurate DataType, populated per-node. */
+            value->value.nodeid = (mu_nodeid_t){0, MU_NODEID_NUMERIC, {.numeric = node->data_type}};
+        } else if (node->type_definition.namespace_index != 0 || node->type_definition.identifier_type != 0 ||
+                   node->type_definition.identifier.numeric != 0) {
+            value->value.nodeid = node->type_definition;
+        } else {
+            value->value.nodeid = (mu_nodeid_t){0, MU_NODEID_NUMERIC, {.numeric = 24}};
+        }
+        return MU_STATUS_GOOD;
+
+    case MU_ATTRIBUTEID_VALUERANK:
+        /* ValueRank: mandatory attribute of Variable/VariableType nodes, same
+           reasoning as DATATYPE above. */
+        if (node->node_class != MU_NODECLASS_VARIABLE && node->node_class != MU_NODECLASS_VARIABLETYPE) {
+            return MU_STATUS_BAD_ATTRIBUTEIDINVALID;
+        }
+        value->type = MU_TYPE_INT32;
+        if (node->data_type != 0) {
+            /* Accurate ValueRank, only meaningful once data_type is set. */
+            value->value.i32 = (opcua_int32_t)node->value_rank;
+        } else {
+            value->value.i32 = -1;
+        }
+        return MU_STATUS_GOOD;
 
 #if MUC_OPCUA_CU_EVENTS
     case MU_ATTRIBUTEID_EVENTNOTIFIER:

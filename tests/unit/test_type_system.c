@@ -11,6 +11,7 @@
 #include "unity.h"
 
 #include "../../src/address_space/base_nodes.h"
+#include "../../src/services/read/common.h"
 #include "muc_opcua/address_space.h"
 
 #include <string.h>
@@ -330,6 +331,23 @@ static void test_servertype_instance_declarations(void) {
     /* HasModellingRule(37): a Mandatory decl -> Mandatory(78) */
     TEST_ASSERT_TRUE(has_forward_ref(2139u, 37u, 78u)); /* StartTime is Mandatory */
 }
+
+/* spec 086 Task 1: Variable nodes must report their true DataType/ValueRank
+   attributes instead of the legacy type_definition fallback (which returns the
+   TypeDefinition NodeId, e.g. PropertyType/BaseDataVariableType -- never a real
+   DataType). ServerStatusType_StartTime(2139) is DateTime(13), Scalar(-1)
+   (OPC-10000-5 §6.3.2 ServerStatusDataType). This fails until the data_type/
+   value_rank fields are populated on this node (a later task). */
+static void test_variable_reports_true_datatype_and_valuerank(void) {
+    mu_variant_t v = {0};
+    const mu_node_t *n = base_node(2139u);
+    TEST_ASSERT_NOT_NULL(n);
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, read_attribute(NULL, n, MU_ATTRIBUTEID_DATATYPE, &v));
+    TEST_ASSERT_EQUAL_UINT32(13u,
+                             v.value.nodeid.identifier.numeric); /* DateTime, not PropertyType/BaseDataVariableType */
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, read_attribute(NULL, n, MU_ATTRIBUTEID_VALUERANK, &v));
+    TEST_ASSERT_EQUAL_INT32(-1, v.value.i32);
+}
 #endif
 
 void test_server_profile_array_advertises_embedded_profile(void) {
@@ -408,6 +426,7 @@ int main(void) {
 #endif
 #if MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
     RUN_TEST(test_servertype_instance_declarations);
+    RUN_TEST(test_variable_reports_true_datatype_and_valuerank);
 #endif
 #elif MUC_OPCUA_BASE_NODES
     RUN_TEST(test_default_build_keeps_types_folder_unexpanded);
