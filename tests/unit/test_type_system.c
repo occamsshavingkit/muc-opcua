@@ -263,8 +263,9 @@ void test_base_types_and_modelling_rules(void) {
 static void test_servertype_type_tree_and_encodings(void) {
     /* ObjectTypes under BaseObjectType(58) */
     const uint32_t obj_bo[] = {2013u, 2020u, 2026u, 2029u, 2033u, 2034u, 11575u, 11616u, 11645u};
-    for (size_t i = 0; i < sizeof(obj_bo) / sizeof(obj_bo[0]); ++i)
+    for (size_t i = 0; i < sizeof(obj_bo) / sizeof(obj_bo[0]); ++i) {
         TEST_ASSERT_TRUE(has_forward_ref(58u, 45u, obj_bo[i]));
+    }
     TEST_ASSERT_TRUE(has_forward_ref(2034u, 45u, 2036u));   /* Transparent */
     TEST_ASSERT_TRUE(has_forward_ref(2034u, 45u, 2039u));   /* NonTransparent */
     TEST_ASSERT_TRUE(has_forward_ref(2039u, 45u, 11945u));  /* NonTransparentNetwork */
@@ -273,13 +274,15 @@ static void test_servertype_type_tree_and_encodings(void) {
 
     /* VariableTypes under BaseDataVariableType(63) */
     const uint32_t vt[] = {2137u, 2138u, 2150u, 2164u, 2165u, 2171u, 2172u, 2196u, 2197u, 2243u, 2244u, 3051u};
-    for (size_t i = 0; i < sizeof(vt) / sizeof(vt[0]); ++i)
+    for (size_t i = 0; i < sizeof(vt) / sizeof(vt[0]); ++i) {
         TEST_ASSERT_TRUE(has_forward_ref(63u, 45u, vt[i]));
+    }
 
     /* DataTypes: Structure(22) + Enumeration(29) subtypes */
     const uint32_t dt_struct[] = {338u, 853u, 856u, 859u, 862u, 865u, 868u, 871u, 874u, 11943u, 11944u};
-    for (size_t i = 0; i < sizeof(dt_struct) / sizeof(dt_struct[0]); ++i)
+    for (size_t i = 0; i < sizeof(dt_struct) / sizeof(dt_struct[0]); ++i) {
         TEST_ASSERT_TRUE(has_forward_ref(22u, 45u, dt_struct[i]));
+    }
     TEST_ASSERT_TRUE(has_forward_ref(29u, 45u, 851u));
     TEST_ASSERT_TRUE(has_forward_ref(29u, 45u, 852u));
 
