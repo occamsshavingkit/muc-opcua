@@ -416,3 +416,105 @@ on). Archive `.data`/`.bss` remain 0 B on all 5 profiles (constitution rule inta
 | CU | Now backed by |
 | --- | --- |
 | 3189 Base Info ServerType | The `ServerType`(2004) type tree — 14 ObjectTypes, 12 VariableTypes, 13 DataTypes (11 structured + 2 enums), 22 Default XML/Binary Encoding Objects — with full HasSubtype/HasEncoding closure in `base_nodes.c`; type-nodes-only, InstanceDeclarations deferred to CU 5801; backed by `test_type_system::test_servertype_type_tree_and_encodings` |
+
+## 2026-07-17 — Roadmap A2 (fourth slice): ServerType InstanceDeclarations (CU 5801 core, first slice)
+
+Adds the core Mandatory InstanceDeclarations for the `ServerType`(2004) tree that the
+previous (third) slice's type-nodes-only scope deferred. Gated by a new selectable CU
+symbol `MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION` (OPC item `opc_cu_5801`, alias none;
+embedded/standard/full; `depends on` the type-system facet
+`MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER` **and** `MUC_OPCUA_CU_BASE_INFO_SERVERTYPE`,
+the 3189 gate this slice nests inside). `implementation_state` is `deferred` — the CU is
+selectable and buildable but **not counted** toward the profile's required/claimed CU
+tally, and `opc_cu_5801` is **not claimed** by this slice (see below for why).
+
+**65 new InstanceDeclaration nodes**, by owning type:
+- **`ServerStatusType`(2138) — 6**: own Mandatory children (State/CurrentTime/StartTime
+  already existed pre-slice from the ServerStatus runtime work; this slice adds the
+  remaining declared children — SecondsTillShutdown(2752)/ShutdownReason(2753) plus
+  BuildInfo(2141) and its HasComponent closure) modeled as HasComponent/HasProperty +
+  HasTypeDefinition + HasModellingRule, matching OPC-10000-5 §6.3.2's InstanceDeclaration
+  tables.
+- **`BuildInfoType`(3051) — 6**: ProductUri/ManufacturerName/ProductName/SoftwareVersion/
+  BuildNumber/BuildDate (3052-3057), each a Mandatory Property.
+- **`ServerDiagnosticsSummaryType`(2150) — 12**: the full Mandatory Variable set (Server-
+  ViewCount/CurrentSessionCount/CumulatedSessionCount/SecurityRejectedSessionCount/
+  RejectedSessionCount/SessionTimeoutCount/SessionAbortCount/PublishingIntervalCount/
+  CurrentSubscriptionCount/CumulatedSubscriptionCount/SecurityRejectedRequestsCount/
+  RejectedRequestsCount).
+- **`ServerCapabilitiesType`(2013) — 24**: the Mandatory capability Variables/Objects
+  (ServerProfileArray/LocaleIdArray/MinSupportedSampleRate/MaxBrowseContinuationPoints/
+  MaxQueryContinuationPoints/MaxHistoryContinuationPoints/SoftwareCertificates/
+  MaxArrayLength/MaxStringLength/MaxByteStringLength, ModellingRules Folder,
+  AggregateFunctions Folder, OperationLimits Object + its own Mandatory children, and
+  `<VendorCapability>`). `RoleSet`(16295) is **dropped**: its TypeDefinition
+  `RoleSetType`(15607) doesn't exist yet in this address space, so instantiating RoleSet
+  would dangle a HasTypeDefinition reference — deferred to whichever future slice adds
+  RoleSetType. `<VendorCapability>` uses `OptionalPlaceholder`(11508) (the existing CU
+  3188 ModellingRule Object) rather than a new node.
+- **`ServerType`(2004) direct children — 17** (incl. 4 Methods): ServerArray/
+  NamespaceArray/ServerStatus/ServiceLevel/Auditing/ServerCapabilities/
+  ServerDiagnostics/VendorServerInfo/ServerRedundancy/NamespaceMetadata/
+  Namespaces (deferred where their TypeDefinitions aren't yet exposed — see below) plus
+  the 4 Methods `GetMonitoredItems`/`ResendData`/`SetSubscriptionDurable`/
+  `RequestServerStateChange`, declared with HasComponent + HasModellingRule but their
+  In/OutputArguments Property nodes omitted (Argument-list fidelity is out of scope for
+  this core slice).
+
+All 65 nodes are modeled structurally: HasComponent/HasProperty (as appropriate) from
+their owning type, HasTypeDefinition to the correct VariableType/ObjectType, and
+HasModellingRule to Mandatory(78) (or OptionalPlaceholder(11508) for `<VendorCapability>`).
+
+**DATA_ACCESS dual-branch placement:** `BuildInfoType` children 3052-3057, `ServerStatusType`
+2752/2753, and 6 `ServerCapabilitiesType`/`ServerType` property nodes
+(MaxBrowseContinuationPoints(2732)/MaxQueryContinuationPoints(2733)/
+MaxHistoryContinuationPoints(2734)/Auditing(2742)/AggregateFunctions(2754)/
+SoftwareCertificates(3049)) fall inside the pre-existing `DATA_ACCESS` dual-copy region of
+`s_base_nodes[]` (see the
+3189-slice entry above for why that region is duplicated once under `#if DATA_ACCESS` and
+once under `#if !DATA_ACCESS`). Each of those NodeIds was added to **both** branches so the
+table stays globally sorted whether `DATA_ACCESS` is on or off; embedded builds with
+`DATA_ACCESS` off exercise the second copy, so a single-branch add would have broken
+`test_base_address_space_is_sorted` on embedded specifically.
+
+**Design note — ServerType.EstimatedReturnTime/LocalTime/the 4 Methods declared
+unconditionally:** these are emitted under `MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION`
+without also gating on the sibling instance-facet CUs that would normally govern whether
+the *instance* behavior (e.g. an actual LocalTime runtime value, or the Methods being
+callable) is present. Per CU 5801's own Kconfig help text, 5801 is about
+type-*completeness* in the AddressSpace — declaring that an InstanceDeclaration exists —
+not about whether the corresponding runtime feature is wired up. Gating the declaration
+nodes on those sibling CUs would make the InstanceDeclaration set vary with unrelated
+feature flags, which is exactly the kind of incompleteness 5801 exists to catch.
+
+**Why 5801 is NOT yet claimed (two named prerequisites):**
+1. **Scope**: this is the *core* slice only. The much larger set of
+   Session/Subscription/SamplingInterval diagnostics-type InstanceDeclarations (the
+   `SessionDiagnosticsObjectType`/`SessionsDiagnosticsSummaryType`/
+   `SubscriptionDiagnosticsType`/`SamplingIntervalDiagnosticsArrayType` families under
+   `ServerDiagnosticsType`(2020), roughly 350 nodes) are deferred to later slices.
+2. **Pre-existing server-wide gap**: DataType/ValueRank attribute fidelity is not
+   per-node accurate anywhere in the server today. `read_attribute.c` returns the node's
+   `type_definition` for the `DataType` Attribute and `-1` for `ValueRank` on **every**
+   Variable, regardless of what DataType/ValueRank that Variable's type actually
+   declares. CU 5801's own text requires "the DataType of the Variable shall be provided
+   in the AddressSpace" — which is a weaker requirement about node *presence*, but an
+   honest claim also implies a Server that reports its own DataTypes correctly when
+   queried; this pre-existing gap needs fixing before 5801 can be claimed even for the
+   subset of the tree this slice covers.
+
+**Verified:** all 5 profiles green (nano 101/102, micro 124/125, embedded 125/126,
+standard 125/126, full 137/138 — each with exactly one failure,
+`test_no_stale_project_name`, caused by untracked planning-doc files under
+`docs/superpowers/plans/` containing absolute `micro-opcua` paths, not a code
+regression), manifest validate OK, 32-bit ARM `-mcpu=cortex-m0plus -mthumb
+-ffreestanding -Werror` compile of `base_nodes.c` clean. `.text` cost (ARM Cortex-M0+
+`-Os`, `scripts/measure_size.sh all`, vs `main` @ 1ef418b): nano/micro unaffected (CU
+gated off, byte-identical); embedded/standard/full each **+11,111 B** archive `.text`
+(identical delta — the 65 nodes are profile-independent once the type-information CU is
+on). Archive `.data`/`.bss` remain 0 B on all 5 profiles (constitution rule intact; pure
+`const` flash addition, no mutable static state).
+
+| CU | Now backed by |
+| --- | --- |
+| 5801 Base Info Type Information (core, not yet claimed) | 65 core InstanceDeclarations under the `ServerType`(2004) tree — `ServerStatusType`(6), `BuildInfoType`(6), `ServerDiagnosticsSummaryType`(12), `ServerCapabilitiesType`(24, `RoleSet` dropped pending `RoleSetType`), `ServerType`-direct(17 incl. 4 Methods) — in `base_nodes.c`, gated `MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION` (state `deferred`); backed by `test_type_system::test_servertype_instance_declarations`; the ~350-node Session/Subscription diagnostics InstanceDeclarations and the server-wide DataType/ValueRank attribute-fidelity fix remain outstanding before an honest claim |
