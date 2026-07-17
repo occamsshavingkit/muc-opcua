@@ -295,6 +295,42 @@ static void test_servertype_type_tree_and_encodings(void) {
 }
 #endif
 
+#if MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+/* spec 085: core ServerType-tree InstanceDeclarations (first slice toward CU 5801).
+   Each type's own Mandatory/Optional child Variables/Objects, with HasComponent/
+   HasProperty from the type + a HasModellingRule edge. NodeIds grounded against
+   docs/superpowers/plans/2026-07-17-cu-5801-core-node-inventory.md (OPC-10000-5
+   §7.6/§7.7/§6.3.2/§7.8/§6.3.1). */
+static void test_servertype_instance_declarations(void) {
+    /* ServerStatusType(2138) components (HasComponent 47) */
+    TEST_ASSERT_TRUE(has_forward_ref(2138u, 47u, 2139u));  /* StartTime */
+    TEST_ASSERT_TRUE(has_forward_ref(2138u, 47u, 2140u));  /* CurrentTime */
+    TEST_ASSERT_TRUE(has_forward_ref(2138u, 47u, 2141u));  /* State */
+    TEST_ASSERT_TRUE(has_forward_ref(2138u, 47u, 2142u));  /* BuildInfo */
+    TEST_ASSERT_TRUE(has_forward_ref(2138u, 47u, 2752u));  /* SecondsTillShutdown */
+    TEST_ASSERT_TRUE(has_forward_ref(2138u, 47u, 2753u));  /* ShutdownReason */
+
+    /* BuildInfoType(3051) components */
+    TEST_ASSERT_TRUE(has_forward_ref(3051u, 47u, 3052u));  /* ProductUri */
+    TEST_ASSERT_TRUE(has_forward_ref(3051u, 47u, 3057u));  /* BuildDate */
+
+    /* ServerDiagnosticsSummaryType(2150) first component */
+    TEST_ASSERT_TRUE(has_forward_ref(2150u, 47u, 2151u));  /* ServerViewCount */
+
+    /* ServerCapabilitiesType(2013) first property (HasProperty 46) */
+    TEST_ASSERT_TRUE(has_forward_ref(2013u, 46u, 2014u));  /* ServerProfileArray */
+
+    /* ServerType(2004) direct children -- from the inventory doc's ServerType table:
+       ServerArray is a Property, ServerStatus/ServerCapabilities are Components. */
+    TEST_ASSERT_TRUE(has_forward_ref(2004u, 46u, 2005u));  /* ServerArray (HasProperty) */
+    TEST_ASSERT_TRUE(has_forward_ref(2004u, 47u, 2007u));  /* ServerStatus (HasComponent) */
+    TEST_ASSERT_TRUE(has_forward_ref(2004u, 47u, 2009u));  /* ServerCapabilities (HasComponent) */
+
+    /* HasModellingRule(37): a Mandatory decl -> Mandatory(78) */
+    TEST_ASSERT_TRUE(has_forward_ref(2139u, 37u, 78u));    /* StartTime is Mandatory */
+}
+#endif
+
 void test_server_profile_array_advertises_embedded_profile(void) {
 #if MUC_OPCUA_MARKER_STANDARD_PROFILE
     static const char embedded_profile[] = "http://opcfoundation.org/UA-Profile/Server/StandardUA2017";
@@ -368,6 +404,9 @@ int main(void) {
 #endif
 #if MUC_OPCUA_CU_BASE_INFO_SERVERTYPE
     RUN_TEST(test_servertype_type_tree_and_encodings);
+#endif
+#if MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+    RUN_TEST(test_servertype_instance_declarations);
 #endif
 #elif MUC_OPCUA_BASE_NODES
     RUN_TEST(test_default_build_keeps_types_folder_unexpanded);
