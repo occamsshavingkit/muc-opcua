@@ -306,6 +306,19 @@
 #define MU_SERVER_DIAGNOSTICS_STORAGE_BYTES 0
 #endif
 
+/* mu_server_status_t (spec 084, ServerStatus.Value): lives caller-owned inside
+ * mu_base_runtime_nodes_t.server_status (struct mu_server's runtime_base field),
+ * plus the extra mu_node_t/mu_value_source_t slot the ServerStatus runtime node
+ * adds to MU_BASE_RUNTIME_NODE_COUNT -- both grow struct mu_server, so both must
+ * be accounted for here. mu_variant_t's new trailing ext_encoding_id field also
+ * widens the two PRE-EXISTING CurrentTime/StartTime mu_value_source_t slots, not
+ * just the new one, so that ripple must be counted too. Unconditional: the Core
+ * 2022 Server Facet always provides ServerStatus. Measured on a 64-bit host:
+ * sizeof(mu_server_status_t) 120 B + sizeof(mu_node_t) 136 B (new node) +
+ * sizeof(mu_value_source_t) 64 B (new slot) + 16 B (8 B ripple x 2 pre-existing
+ * slots) = 336 B. */
+#define MU_SERVER_STATUS_STORAGE_BYTES 336
+
 #ifdef MUC_OPCUA_COMPLEX_TYPES
 /* 8 structures * (def_ptr + nodeid) + 8 enums * (def_ptr + nodeid) + 2 * uint16 */
 #define MU_COMPLEX_TYPES_STORAGE_BYTES (8 * (sizeof(void *) + 24) + 8 * (sizeof(void *) + 24) + 4)
@@ -318,6 +331,7 @@
      MU_ADDRESS_SPACE_INDEX_STORAGE_BYTES + MU_MULTIPLE_CONNECTIONS_STORAGE_BYTES + MU_EVENTS_STORAGE_BYTES +          \
      MU_PUBSUB_STORAGE_BYTES + MU_NODEMANAGEMENT_STORAGE_BYTES + MU_ALARMS_CONDITIONS_STORAGE_BYTES +                  \
      MU_CHUNK_ASSEMBLY_STORAGE_BYTES + MU_AUDITING_STORAGE_BYTES + MU_CUSTOM_METHODS_STORAGE_BYTES +                   \
-     MU_SERVER_DIAGNOSTICS_STORAGE_BYTES + MU_COMPLEX_TYPES_STORAGE_BYTES + MU_QUERY_STORAGE_BYTES)
+     MU_SERVER_DIAGNOSTICS_STORAGE_BYTES + MU_COMPLEX_TYPES_STORAGE_BYTES + MU_QUERY_STORAGE_BYTES +                   \
+     MU_SERVER_STATUS_STORAGE_BYTES)
 
 #endif /* MUC_OPCUA_CONFIG_H */

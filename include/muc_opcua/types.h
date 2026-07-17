@@ -127,6 +127,9 @@ typedef struct {
        ({ type, { .scalar } }) keep working (is_array defaults to false). */
     opcua_boolean_t is_array;
     opcua_int32_t array_length; /* element count when is_array (>= 0; -1 = null array) */
+    /* for scalar ExtensionObject Values: the DataType's DefaultBinary Encoding NodeId
+       (ns0), so the encoder can dispatch to the right struct writer. 0 = not set. */
+    opcua_uint32_t ext_encoding_id;
 } mu_variant_t;
 
 /* Variant DataType assignability check (OPC-10000-4 5.11.4.2 Table 53).
