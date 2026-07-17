@@ -255,6 +255,46 @@ void test_base_types_and_modelling_rules(void) {
 }
 #endif
 
+#if MUC_OPCUA_CU_BASE_INFO_SERVERTYPE
+/* spec 083: ServerType type tree (CU 3189) -- ObjectTypes/VariableTypes/DataTypes
+   and their Encoding Objects that make up the Server object's type system. Nodes
+   land in later tasks (3/4/5); this test only asserts the HasSubtype/HasEncoding
+   reference closure. */
+static void test_servertype_type_tree_and_encodings(void) {
+    /* ObjectTypes under BaseObjectType(58) */
+    const uint32_t obj_bo[] = {2013u, 2020u, 2026u, 2029u, 2033u, 2034u,
+                               11575u, 11616u, 11645u};
+    for (size_t i = 0; i < sizeof(obj_bo) / sizeof(obj_bo[0]); ++i)
+        TEST_ASSERT_TRUE(has_forward_ref(58u, 45u, obj_bo[i]));
+    TEST_ASSERT_TRUE(has_forward_ref(2034u, 45u, 2036u));   /* Transparent */
+    TEST_ASSERT_TRUE(has_forward_ref(2034u, 45u, 2039u));   /* NonTransparent */
+    TEST_ASSERT_TRUE(has_forward_ref(2039u, 45u, 11945u));  /* NonTransparentNetwork */
+    TEST_ASSERT_TRUE(has_forward_ref(61u, 45u, 11564u));    /* OperationLimits->Folder */
+    TEST_ASSERT_TRUE(has_forward_ref(11575u, 45u, 11595u)); /* AddressSpaceFile->File */
+
+    /* VariableTypes under BaseDataVariableType(63) */
+    const uint32_t vt[] = {2137u, 2138u, 2150u, 2164u, 2165u, 2171u, 2172u,
+                           2196u, 2197u, 2243u, 2244u, 3051u};
+    for (size_t i = 0; i < sizeof(vt) / sizeof(vt[0]); ++i)
+        TEST_ASSERT_TRUE(has_forward_ref(63u, 45u, vt[i]));
+
+    /* DataTypes: Structure(22) + Enumeration(29) subtypes */
+    const uint32_t dt_struct[] = {338u, 853u, 856u, 859u, 862u, 865u,
+                                  868u, 871u, 874u, 11943u, 11944u};
+    for (size_t i = 0; i < sizeof(dt_struct) / sizeof(dt_struct[0]); ++i)
+        TEST_ASSERT_TRUE(has_forward_ref(22u, 45u, dt_struct[i]));
+    TEST_ASSERT_TRUE(has_forward_ref(29u, 45u, 851u));
+    TEST_ASSERT_TRUE(has_forward_ref(29u, 45u, 852u));
+
+    /* Encoding Objects reachable via HasEncoding(38) from their DataType */
+    TEST_ASSERT_TRUE(has_forward_ref(862u, 38u, 863u));    /* ServerStatus XML */
+    TEST_ASSERT_TRUE(has_forward_ref(862u, 38u, 864u));    /* ServerStatus Binary */
+    TEST_ASSERT_TRUE(has_forward_ref(338u, 38u, 339u));    /* BuildInfo XML */
+    TEST_ASSERT_TRUE(has_forward_ref(338u, 38u, 340u));    /* BuildInfo Binary */
+    TEST_ASSERT_TRUE(has_forward_ref(11944u, 38u, 11958u));/* NetworkGroup Binary */
+}
+#endif
+
 void test_server_profile_array_advertises_embedded_profile(void) {
 #if MUC_OPCUA_MARKER_STANDARD_PROFILE
     static const char embedded_profile[] = "http://opcfoundation.org/UA-Profile/Server/StandardUA2017";
@@ -325,6 +365,9 @@ int main(void) {
 #endif
 #if MUC_OPCUA_CU_BASE_INFO_BASE_TYPES
     RUN_TEST(test_base_types_and_modelling_rules);
+#endif
+#if MUC_OPCUA_CU_BASE_INFO_SERVERTYPE
+    RUN_TEST(test_servertype_type_tree_and_encodings);
 #endif
 #elif MUC_OPCUA_BASE_NODES
     RUN_TEST(test_default_build_keeps_types_folder_unexpanded);
