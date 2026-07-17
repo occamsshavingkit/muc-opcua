@@ -24,7 +24,7 @@ opcua_statuscode_t handle_add_nodes(mu_server_t *server, mu_binary_reader_t *r, 
     }
 
     s = write_response_prefix(w, MU_ID_ADDNODESRESPONSE, req.request_handle, MU_STATUS_GOOD
-#ifdef MUC_OPCUA_CU_TIME_SYNC
+#ifdef MU_RESPONSE_PREFIX_WANTS_SERVER
                               ,
                               server
 #endif
@@ -52,7 +52,7 @@ opcua_statuscode_t handle_add_references(mu_server_t *server, mu_binary_reader_t
     }
 
     s = write_response_prefix(w, MU_ID_ADDREFERENCESRESPONSE, req.request_handle, MU_STATUS_GOOD
-#ifdef MUC_OPCUA_CU_TIME_SYNC
+#ifdef MU_RESPONSE_PREFIX_WANTS_SERVER
                               ,
                               server
 #endif
@@ -80,7 +80,7 @@ opcua_statuscode_t handle_delete_nodes(mu_server_t *server, mu_binary_reader_t *
     }
 
     s = write_response_prefix(w, MU_ID_DELETENODESRESPONSE, req.request_handle, MU_STATUS_GOOD
-#ifdef MUC_OPCUA_CU_TIME_SYNC
+#ifdef MU_RESPONSE_PREFIX_WANTS_SERVER
                               ,
                               server
 #endif
@@ -108,7 +108,7 @@ opcua_statuscode_t handle_delete_references(mu_server_t *server, mu_binary_reade
     }
 
     s = write_response_prefix(w, MU_ID_DELETEREFERENCESRESPONSE, req.request_handle, MU_STATUS_GOOD
-#ifdef MUC_OPCUA_CU_TIME_SYNC
+#ifdef MU_RESPONSE_PREFIX_WANTS_SERVER
                               ,
                               server
 #endif

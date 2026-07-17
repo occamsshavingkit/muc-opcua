@@ -73,11 +73,6 @@ bool mu_opn_time_sync_allows(opcua_datetime_t server_time, opcua_datetime_t clie
 #define MU_DISPATCH_MAX_REGISTER_NODES 32
 #define MU_DISPATCH_MAX_SUBSCRIPTION_OPERATIONS 32
 
-#if defined(MUC_OPCUA_CU_BASE_SERVICES_DIAGNOSTICS) && MUC_OPCUA_CU_BASE_SERVICES_DIAGNOSTICS
-void mu_response_diagnostics_set_current(opcua_uint32_t return_diagnostics);
-opcua_uint32_t mu_response_diagnostics_current(void);
-#endif
-
 #if MUC_OPCUA_CU_SUBSCRIPTION_BASIC
 #define MU_DOUBLE_SIGN_BIT 0x8000000000000000ULL
 #define MU_PUBLISHING_INTERVAL_MIN_BITS 0x4049000000000000ULL
@@ -139,7 +134,7 @@ typedef struct {
 
 opcua_statuscode_t write_response_prefix(mu_binary_writer_t *w, opcua_uint32_t response_type_id,
                                          opcua_uint32_t request_handle, opcua_statuscode_t service_result
-#ifdef MUC_OPCUA_CU_TIME_SYNC
+#ifdef MU_RESPONSE_PREFIX_WANTS_SERVER
                                          ,
                                          const mu_server_t *server
 #endif

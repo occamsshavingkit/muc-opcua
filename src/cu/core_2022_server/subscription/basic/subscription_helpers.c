@@ -222,7 +222,7 @@ opcua_statuscode_t drive_subscription_id_status_array(mu_server_t *server, mu_bi
     }
 
     s = write_response_prefix(w, response_type_id, request_handle, MU_STATUS_GOOD
-#ifdef MUC_OPCUA_CU_TIME_SYNC
+#ifdef MU_RESPONSE_PREFIX_WANTS_SERVER
                               ,
                               server
 #endif

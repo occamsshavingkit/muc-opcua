@@ -50,7 +50,7 @@ bool publish_request_dequeue_valid(struct mu_server *server, opcua_uint32_t sess
     size_t fault_length = sizeof(fault_buf);
     opcua_statuscode_t s =
         mu_write_service_fault(fault_buf, &fault_length, out_request->request_handle, MU_STATUS_BAD_TIMEOUT
-#ifdef MUC_OPCUA_CU_TIME_SYNC
+#ifdef MU_RESPONSE_PREFIX_WANTS_SERVER
                                ,
                                server
 #endif
@@ -71,7 +71,7 @@ bool publish_request_evict_oldest(struct mu_server *server, opcua_uint32_t sessi
     size_t fault_length = sizeof(fault_buf);
     opcua_statuscode_t s =
         mu_write_service_fault(fault_buf, &fault_length, evicted.request_handle, MU_STATUS_BAD_TOOMANYPUBLISHREQUESTS
-#ifdef MUC_OPCUA_CU_TIME_SYNC
+#ifdef MU_RESPONSE_PREFIX_WANTS_SERVER
                                ,
                                server
 #endif
@@ -272,7 +272,7 @@ static opcua_statuscode_t emit_publish_response_too_large_fault(struct mu_server
     size_t fault_length = buffer_size;
     opcua_statuscode_t s =
         mu_write_service_fault(buffer, &fault_length, request->request_handle, MU_STATUS_BAD_RESPONSETOOLARGE
-#ifdef MUC_OPCUA_CU_TIME_SYNC
+#ifdef MU_RESPONSE_PREFIX_WANTS_SERVER
                                ,
                                server
 #endif

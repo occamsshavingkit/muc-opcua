@@ -120,7 +120,7 @@ opcua_statuscode_t handle_find_servers(mu_server_t *server, mu_binary_reader_t *
         findservers_endpoint_matches(&endpoint_url, app.discovery_url) && server_uri_matches && server_type_matches;
 
     s = write_response_prefix(w, MU_ID_FINDSERVERSRESPONSE, req.request_handle, MU_STATUS_GOOD
-#ifdef MUC_OPCUA_CU_TIME_SYNC
+#ifdef MU_RESPONSE_PREFIX_WANTS_SERVER
                               ,
                               server
 #endif

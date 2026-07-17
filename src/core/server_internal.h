@@ -125,6 +125,12 @@ struct mu_server {
 #endif
     mu_session_t sessions[MU_INTERN_MAX_SESSIONS];
     mu_session_t *active_session;
+#if defined(MUC_OPCUA_CU_BASE_SERVICES_DIAGNOSTICS) && MUC_OPCUA_CU_BASE_SERVICES_DIAGNOSTICS
+    /* Current request's returnDiagnostics header, set per-request by
+       mu_service_dispatch and read by the response-header writers. Per-instance
+       state (the server is synchronous), replacing a former file-static. */
+    opcua_uint32_t return_diagnostics;
+#endif
 #if MUC_OPCUA_READ_CACHE
     mu_read_cache_t read_cache;
 #endif
@@ -245,7 +251,7 @@ bool monitored_item_reports_by_trigger(const struct mu_server *server, const mu_
  * boundaries (T008+). Definitions live in service_dispatch.c. */
 opcua_statuscode_t write_response_prefix(mu_binary_writer_t *w, opcua_uint32_t response_type_id,
                                          opcua_uint32_t request_handle, opcua_statuscode_t service_result
-#ifdef MUC_OPCUA_CU_TIME_SYNC
+#ifdef MU_RESPONSE_PREFIX_WANTS_SERVER
                                          ,
                                          const mu_server_t *server
 #endif

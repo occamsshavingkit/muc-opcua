@@ -18,7 +18,7 @@ opcua_statuscode_t handle_transfer_subscriptions(mu_server_t *server, mu_binary_
     if (subscription_count < 0) {
         s = write_response_prefix(w, MU_ID_TRANSFERSUBSCRIPTIONSRESPONSE, req.request_handle,
                                   MU_STATUS_BAD_DECODINGERROR
-#ifdef MUC_OPCUA_CU_TIME_SYNC
+#ifdef MU_RESPONSE_PREFIX_WANTS_SERVER
                                   ,
                                   server
 #endif
@@ -32,7 +32,7 @@ opcua_statuscode_t handle_transfer_subscriptions(mu_server_t *server, mu_binary_
         /* Empty subscriptionIds -> service-level Bad_NothingToDo (OPC-10000-4 §5.14.7.3);
            results[] and diagnosticInfos[] are empty. */
         s = write_response_prefix(w, MU_ID_TRANSFERSUBSCRIPTIONSRESPONSE, req.request_handle, MU_STATUS_BAD_NOTHINGTODO
-#ifdef MUC_OPCUA_CU_TIME_SYNC
+#ifdef MU_RESPONSE_PREFIX_WANTS_SERVER
                                   ,
                                   server
 #endif
@@ -65,7 +65,7 @@ opcua_statuscode_t handle_transfer_subscriptions(mu_server_t *server, mu_binary_
         return s;
 
     s = write_response_prefix(w, MU_ID_TRANSFERSUBSCRIPTIONSRESPONSE, req.request_handle, MU_STATUS_GOOD
-#ifdef MUC_OPCUA_CU_TIME_SYNC
+#ifdef MU_RESPONSE_PREFIX_WANTS_SERVER
                               ,
                               server
 #endif

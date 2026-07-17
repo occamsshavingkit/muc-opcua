@@ -150,7 +150,7 @@ opcua_statuscode_t mu_service_dispatch(mu_server_t *server, opcua_uint32_t reque
 
     server->active_session = NULL;
 #if defined(MUC_OPCUA_CU_BASE_SERVICES_DIAGNOSTICS) && MUC_OPCUA_CU_BASE_SERVICES_DIAGNOSTICS
-    mu_response_diagnostics_set_current(0u);
+    server->return_diagnostics = 0u;
 #endif
 
     const mu_service_descriptor_t *descriptor = find_service_descriptor(request_id);
@@ -205,7 +205,7 @@ opcua_statuscode_t mu_service_dispatch(mu_server_t *server, opcua_uint32_t reque
 
     if (descriptor->handler != NULL) {
 #if defined(MUC_OPCUA_CU_BASE_SERVICES_DIAGNOSTICS) && MUC_OPCUA_CU_BASE_SERVICES_DIAGNOSTICS
-        mu_response_diagnostics_set_current(read_return_diagnostics_from_request(request_body, request_length));
+        server->return_diagnostics = read_return_diagnostics_from_request(request_body, request_length);
 #endif
         return descriptor->handler(server, &reader, &writer, response_length);
     }

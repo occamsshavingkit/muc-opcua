@@ -6,6 +6,16 @@
 #include "muc_opcua/server.h"
 #include <stdbool.h>
 
+/* write_response_prefix()/mu_write_service_fault() take the server instance when
+ * either the response timestamp (TIME_SYNC) or the returnDiagnostics echo
+ * (BASE_SERVICES_DIAGNOSTICS) is compiled in. Both read per-request state that
+ * lives on the server object (server->return_diagnostics), never file-static, to
+ * satisfy the zero-mutable-static / 0-B-.bss constitution. */
+#if defined(MUC_OPCUA_CU_TIME_SYNC) ||                                                                                 \
+    (defined(MUC_OPCUA_CU_BASE_SERVICES_DIAGNOSTICS) && MUC_OPCUA_CU_BASE_SERVICES_DIAGNOSTICS)
+#define MU_RESPONSE_PREFIX_WANTS_SERVER 1
+#endif
+
 typedef struct {
     opcua_uint32_t request_id;
     opcua_uint32_t response_id;
@@ -19,7 +29,7 @@ const mu_service_handler_t *mu_get_service_handler(opcua_uint32_t request_id);
    instead of leaving the client to time out. *length is in/out. */
 opcua_statuscode_t mu_write_service_fault(opcua_byte_t *buffer, size_t *length, opcua_uint32_t request_handle,
                                           opcua_statuscode_t service_result
-#ifdef MUC_OPCUA_CU_TIME_SYNC
+#ifdef MU_RESPONSE_PREFIX_WANTS_SERVER
                                           ,
                                           const mu_server_t *server
 #endif

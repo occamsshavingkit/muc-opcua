@@ -227,7 +227,7 @@ void handle_data_chunk_plaintext(mu_server_t *server, const opcua_byte_t *msg, s
         /* Always answer: send a ServiceFault rather than letting the client time out. */
         payload_len = server->config.send_buffer_size - body_offset;
         if (mu_write_service_fault(resp_body, &payload_len, 0, status
-#ifdef MUC_OPCUA_CU_TIME_SYNC
+#ifdef MU_RESPONSE_PREFIX_WANTS_SERVER
                                    ,
                                    server
 #endif
@@ -408,7 +408,7 @@ void handle_data_chunk_secure(mu_server_t *server, opcua_byte_t *msg, size_t msg
     if (status != MU_STATUS_GOOD) {
         resp_len = MU_SECURE_RESP_MAX;
         if (mu_write_service_fault(respbody, &resp_len, 0, status
-#ifdef MUC_OPCUA_CU_TIME_SYNC
+#ifdef MU_RESPONSE_PREFIX_WANTS_SERVER
                                    ,
                                    server
 #endif

@@ -1664,3 +1664,30 @@ not at risk.
   new BrowseName strings/refs already exist there via other full-only features and LTO folds them.
 - The primitive re-parenting is net-neutral ref restructuring; `--gc-sections` drops the
   unreferenced pooled strings when a profile disables the CU.
+
+## 2026-07-17: Spec 082 — Response diagnostics: remove file-static (0-B-.bss fix)
+
+Moved the request `returnDiagnostics` echo from a file-static `g_return_diagnostics`
+in `response_encode.c` onto `struct mu_server` (`server->return_diagnostics`), threaded
+through the existing `server` parameter of `write_response_prefix`/`mu_write_service_fault`
+(guard widened from `MUC_OPCUA_CU_TIME_SYNC` to `MU_RESPONSE_PREFIX_WANTS_SERVER` =
+`TIME_SYNC || BASE_SERVICES_DIAGNOSTICS`). Restores the zero-mutable-static / 0-B-`.bss`
+constitution invariant that the base-types size audit surfaced.
+
+`scripts/measure_size.sh all` (Arm Cortex-M0+, `-Os`), before at `main` commit `4d1e6bd`
+(archive `.text` / `.bss`):
+
+| Profile | .text before/after | .bss before → after |
+|----------|------------------:|:------:|
+| nano | 23,660 / 23,660 | 0 → 0 |
+| micro | 43,682 / 43,678 | **4 → 0** |
+| embedded | 61,420 / 61,416 | **4 → 0** |
+| standard | 62,359 / 62,355 | **4 → 0** |
+| full | 90,450 / 90,446 | **4 → 0** |
+
+- `.bss` returns to **0 B on every profile**; the removed global + its two accessor
+  functions also trim 4 B of `.text` on the DIAGNOSTICS profiles.
+- RAM: `+4 B` in `struct mu_server` on the DIAGNOSTICS profiles (caller-owned storage,
+  not static); `MU_SERVER_STORAGE_BYTES` already had slack — the 32-bit ARM
+  `_Static_assert` passes with no bump. nano/micro unaffected in RAM terms beyond the
+  gated field (nano has no DIAGNOSTICS).

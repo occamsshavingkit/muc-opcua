@@ -39,7 +39,7 @@ opcua_statuscode_t handle_close_session(mu_server_t *server, mu_binary_reader_t 
     }
 
     s = write_response_prefix(w, MU_ID_CLOSESESSIONRESPONSE, req.request_handle, close_result
-#ifdef MUC_OPCUA_CU_TIME_SYNC
+#ifdef MU_RESPONSE_PREFIX_WANTS_SERVER
                               ,
                               server
 #endif

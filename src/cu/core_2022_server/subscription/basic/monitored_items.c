@@ -8,7 +8,7 @@ opcua_statuscode_t write_create_monitored_items_prefix(mu_binary_writer_t *w, op
     (void)server;
 #endif
     opcua_statuscode_t s = write_response_prefix(w, MU_ID_CREATEMONITOREDITEMSRESPONSE, request_handle, MU_STATUS_GOOD
-#ifdef MUC_OPCUA_CU_TIME_SYNC
+#ifdef MU_RESPONSE_PREFIX_WANTS_SERVER
                                                  ,
                                                  server
 #endif
@@ -345,7 +345,7 @@ opcua_statuscode_t handle_modify_monitored_items(mu_server_t *server, mu_binary_
     }
 
     s = write_response_prefix(w, MU_ID_MODIFYMONITOREDITEMSRESPONSE, req.request_handle, MU_STATUS_GOOD
-#ifdef MUC_OPCUA_CU_TIME_SYNC
+#ifdef MU_RESPONSE_PREFIX_WANTS_SERVER
                               ,
                               server
 #endif
