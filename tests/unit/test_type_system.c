@@ -135,6 +135,21 @@ void test_specialized_datatype_nodes_and_supertypes(void) {
 }
 #endif
 
+#if MUC_OPCUA_CU_BASE_INFO_ARGUMENT_TYPE
+/* spec 080a: Argument DataType + its Encoding Objects and the shared encoding infra
+   (CU 3641). */
+void test_argument_datatype_and_encodings(void) {
+    assert_node(296u, MU_NODECLASS_DATATYPE, "Argument");
+    assert_node(76u, MU_NODECLASS_OBJECTTYPE, "DataTypeEncodingType");
+    assert_node(38u, MU_NODECLASS_REFERENCETYPE, "HasEncoding");
+
+    TEST_ASSERT_TRUE(has_forward_ref(22u, 45u, 296u));  /* Structure -> Argument */
+    TEST_ASSERT_TRUE(has_forward_ref(58u, 45u, 76u));   /* BaseObjectType -> DataTypeEncodingType */
+    TEST_ASSERT_TRUE(has_forward_ref(296u, 38u, 297u)); /* Argument -HasEncoding-> Default XML */
+    TEST_ASSERT_TRUE(has_forward_ref(296u, 38u, 298u)); /* Argument -HasEncoding-> Default Binary */
+}
+#endif
+
 void test_server_profile_array_advertises_embedded_profile(void) {
 #if MUC_OPCUA_MARKER_STANDARD_PROFILE
     static const char embedded_profile[] = "http://opcfoundation.org/UA-Profile/Server/StandardUA2017";
@@ -199,6 +214,9 @@ int main(void) {
     RUN_TEST(test_server_profile_array_advertises_embedded_profile);
 #if MUC_OPCUA_CU_BASE_INFO_DATATYPES
     RUN_TEST(test_specialized_datatype_nodes_and_supertypes);
+#endif
+#if MUC_OPCUA_CU_BASE_INFO_ARGUMENT_TYPE
+    RUN_TEST(test_argument_datatype_and_encodings);
 #endif
 #elif MUC_OPCUA_BASE_NODES
     RUN_TEST(test_default_build_keeps_types_folder_unexpanded);

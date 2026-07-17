@@ -414,6 +414,16 @@ config MUC_OPCUA_CU_BASE_INFO_DATATYPES
 	  Backing tests: test_type_system.
 	  Notes: spec 079: gates the specialized DataType nodes exposed in base_nodes.c (Number i=26 / Decimal i=50; DurationString/TimeString/DateString i=12879/12880/12881) and their supertype closure. Satisfies CU 2483/4426; implied on when the type-system facet is enabled.
 
+config MUC_OPCUA_CU_BASE_INFO_ARGUMENT_TYPE
+	bool "CU: Base Info Argument DataType + encoding infra"
+	depends on MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_EMBEDDED_2025_UA_SERVER
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-5 -- Core 2022 Server Facet.
+	  Backing tests: test_type_system.
+	  Notes: spec 080a: exposes the Argument(i=296) DataType (subtype of Structure) + its DefaultBinary(298)/DefaultXml(297) Encoding Objects, plus the shared DataTypeEncodingType(76) ObjectType and HasEncoding(38) ReferenceType, in base_nodes.c. Satisfies CU 3641. First slice of the base type-system completion (A2); 3188 base DataTypes + 3185 folders follow.
+
 config MUC_OPCUA_CU_COMPLEX_TYPES
 	bool "CU: Complex Types"
 	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
@@ -1253,7 +1263,7 @@ comment "Base Info UriString (NOT IMPLEMENTED)"
 # Base Info Method Argument DataType (opc_cu_3641)
 #   Implementation state: unimplemented -- visible but not selectable.
 #   Detail: CU 3641:Base Info Method Argument DataType.
-#   Notes: Exposes the Argument DataType, its Encoding Objects and all its supertypes in the AddressSpace.
+#   Notes: Reconciled (spec 080a): Argument(i=296, subtype of Structure) + its DefaultBinary(298)/DefaultXml(297) Encoding Objects (DataTypeEncodingType 76) exposed in base_nodes.c; test_type_system. Satisfied by opc_cu_base_info_base_types. Exposes the Argument DataType, its Encoding Objects and all its supertypes in the AddressSpace.
 comment "Base Info Method Argument DataType (NOT IMPLEMENTED)"
 
 # Base Info SemanticVersionString (opc_cu_3644)

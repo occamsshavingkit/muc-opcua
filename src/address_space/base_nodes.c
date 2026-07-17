@@ -129,6 +129,10 @@ static const opcua_byte_t s_str_Decimal[] = "Decimal";
 static const opcua_byte_t s_str_DurationString[] = "DurationString";
 static const opcua_byte_t s_str_TimeString[] = "TimeString";
 static const opcua_byte_t s_str_DateString[] = "DateString";
+static const opcua_byte_t s_str_Argument[] = "Argument";
+static const opcua_byte_t s_str_HasEncoding[] = "HasEncoding";
+static const opcua_byte_t s_str_DataTypeEncodingType[] = "DataTypeEncodingType";
+static const opcua_byte_t s_str_Default_XML[] = "Default XML";
 #if MUC_OPCUA_CU_BASE_INFO_LOCALTIME || defined(MUC_OPCUA_CU_BASE_INFO_ENGINEERING_UNITS) ||                           \
     defined(MUC_OPCUA_CU_BASE_INFO_CURRENCY)
 static const opcua_byte_t s_str_Structure[] = "Structure";
@@ -252,6 +256,9 @@ static const mu_reference_t s_references_refs[] = {{{0, MU_NODEID_NUMERIC, {45}}
 
 static const mu_reference_t s_nonhierarchical_refs[] = {
     {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {40}}, true},
+#if MUC_OPCUA_CU_BASE_INFO_ARGUMENT_TYPE
+    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {38}}, true}, /* HasSubtype -> HasEncoding (CU 3641) */
+#endif
 #if MUC_OPCUA_CU_ADDRESS_SPACE_INTERFACES
     {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {17603}}, true},
 #endif
@@ -311,6 +318,9 @@ static const mu_reference_t s_string_subtype_refs[] = {
 #if MUC_OPCUA_CU_BASE_INFO_LOCALTIME || defined(MUC_OPCUA_CU_BASE_INFO_ENGINEERING_UNITS) ||                           \
     defined(MUC_OPCUA_CU_BASE_INFO_CURRENCY)
 static const mu_reference_t s_structure_refs[] = {
+#if MUC_OPCUA_CU_BASE_INFO_ARGUMENT_TYPE
+    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {296}}, true}, /* HasSubtype -> Argument (CU 3641) */
+#endif
 #ifdef MUC_OPCUA_CU_BASE_INFO_ENGINEERING_UNITS
     {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {MU_ID_EUINFORMATION_DATATYPE}}, true},
 #endif
@@ -335,6 +345,9 @@ static const mu_reference_t s_currency_unit_type_refs[] = {
 
 static const mu_reference_t s_base_object_type_refs[] = {
     {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {61}}, true},
+#if MUC_OPCUA_CU_BASE_INFO_ARGUMENT_TYPE
+    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {76}}, true}, /* HasSubtype -> DataTypeEncodingType */
+#endif
 #ifdef MUC_OPCUA_CU_ADDRESS_SPACE_ADDIN_DEFAULTINSTANCEBROWSENAME
     {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {17605}}, true},
 #endif
@@ -342,6 +355,12 @@ static const mu_reference_t s_base_object_type_refs[] = {
     {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {17602}}, true},
 #endif
     {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {2004}}, true}};
+
+#if MUC_OPCUA_CU_BASE_INFO_ARGUMENT_TYPE
+/* CU 3641: Argument DataType HasEncoding refs to its Default XML/Binary encodings. */
+static const mu_reference_t s_argument_refs[] = {{{0, MU_NODEID_NUMERIC, {38}}, {0, MU_NODEID_NUMERIC, {297}}, true},
+                                                 {{0, MU_NODEID_NUMERIC, {38}}, {0, MU_NODEID_NUMERIC, {298}}, true}};
+#endif
 
 #if MUC_OPCUA_CU_ADDRESS_SPACE_INTERFACES
 static const mu_reference_t s_base_interface_type_refs[] = {
@@ -847,6 +866,17 @@ static const mu_node_t s_base_nodes[] = {
      0,
      NULL,
      .type_definition = {0}},
+#if MUC_OPCUA_CU_BASE_INFO_ARGUMENT_TYPE
+    /* CU 3641: HasEncoding ReferenceType (i=38, subtype of NonHierarchicalReferences). */
+    {{0, MU_NODEID_NUMERIC, {38}},
+     MU_NODECLASS_REFERENCETYPE,
+     {11, s_str_HasEncoding},
+     {11, s_str_HasEncoding},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0}},
+#endif
     {{0, MU_NODEID_NUMERIC, {40}},
      MU_NODECLASS_REFERENCETYPE,
      {17, s_str_HasTypeDefinition},
@@ -939,6 +969,18 @@ static const mu_node_t s_base_nodes[] = {
      0,
      NULL,
      .type_definition = {0}},
+#if MUC_OPCUA_CU_BASE_INFO_ARGUMENT_TYPE
+    /* CU 3641: DataTypeEncodingType (i=76, subtype of BaseObjectType) — the type
+       definition of every Encoding Object. */
+    {{0, MU_NODEID_NUMERIC, {76}},
+     MU_NODECLASS_OBJECTTYPE,
+     {20, s_str_DataTypeEncodingType},
+     {20, s_str_DataTypeEncodingType},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0}},
+#endif
 #if MUC_OPCUA_CU_DATA_ACCESS
     /* Spec 060: ModellingRule targets so a property's HasModellingRule resolves. */
     {{0, MU_NODEID_NUMERIC, {78}},
@@ -1022,6 +1064,34 @@ static const mu_node_t s_base_nodes[] = {
      sizeof(s_type_folder_reference_refs) / sizeof(s_type_folder_reference_refs[0]),
      NULL,
      .type_definition = {0, MU_NODEID_NUMERIC, {61}}},
+#if MUC_OPCUA_CU_BASE_INFO_ARGUMENT_TYPE
+    /* CU 3641: Argument DataType (i=296, subtype of Structure) + its Default XML(297)
+       / Default Binary(298) Encoding Objects (DataTypeEncodingType 76). */
+    {{0, MU_NODEID_NUMERIC, {296}},
+     MU_NODECLASS_DATATYPE,
+     {8, s_str_Argument},
+     {8, s_str_Argument},
+     s_argument_refs,
+     sizeof(s_argument_refs) / sizeof(s_argument_refs[0]),
+     NULL,
+     .type_definition = {0}},
+    {{0, MU_NODEID_NUMERIC, {297}},
+     MU_NODECLASS_OBJECT,
+     {11, s_str_Default_XML},
+     {11, s_str_Default_XML},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {76}}},
+    {{0, MU_NODEID_NUMERIC, {298}},
+     MU_NODECLASS_OBJECT,
+     {14, s_str_Default_Binary},
+     {14, s_str_Default_Binary},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {76}}},
+#endif
     {{0, MU_NODEID_NUMERIC, {2004}},
      MU_NODECLASS_OBJECTTYPE,
      {10, s_str_ServerType},

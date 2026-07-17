@@ -194,6 +194,7 @@
       "opc_cu_aggregate_full",
       "opc_cu_auditing",
       "opc_cu_base_info_datatypes",
+      "opc_cu_base_info_argument_type",
       "opc_cu_complex_types",
       "opc_cu_core_structure_2",
       "opc_cu_core_views_folder",
@@ -2438,6 +2439,7 @@
     {
       "id": "opc_cu_3641",
       "kind": "conformance_unit",
+      "satisfied_by": "opc_cu_base_info_argument_type",
       "opc_display_name": "Base Info Method Argument DataType",
       "kconfig_symbol": null,
       "implementation_state": "unimplemented",
@@ -2462,7 +2464,7 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "Exposes the Argument DataType, its Encoding Objects and all its supertypes in the AddressSpace.",
+      "notes": "Reconciled (spec 080a): Argument(i=296, subtype of Structure) + its DefaultBinary(298)/DefaultXml(297) Encoding Objects (DataTypeEncodingType 76) exposed in base_nodes.c; test_type_system. Satisfied by opc_cu_base_info_base_types. Exposes the Argument DataType, its Encoding Objects and all its supertypes in the AddressSpace.",
       "cu_optional": false
     },
     {
@@ -3858,6 +3860,33 @@
         "facet": "Core 2022 Server Facet"
       },
       "notes": "spec 079: gates the specialized DataType nodes exposed in base_nodes.c (Number i=26 / Decimal i=50; DurationString/TimeString/DateString i=12879/12880/12881) and their supertype closure. Satisfies CU 2483/4426; implied on when the type-system facet is enabled."
+    },
+    {
+      "id": "opc_cu_base_info_argument_type",
+      "kind": "conformance_unit",
+      "opc_display_name": "Base Info Argument DataType + encoding infra",
+      "kconfig_symbol": "MUC_OPCUA_CU_BASE_INFO_ARGUMENT_TYPE",
+      "implementation_state": "claimed",
+      "depends_on": [
+        "MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER"
+      ],
+      "profile_defaults": {
+        "nano": false,
+        "micro": false,
+        "embedded": true,
+        "standard": true,
+        "full": true,
+        "custom": false
+      },
+      "backing_tests": [
+        "test_type_system"
+      ],
+      "opc_reference": {
+        "spec": "OPC-10000-5",
+        "section": null,
+        "facet": "Core 2022 Server Facet"
+      },
+      "notes": "spec 080a: exposes the Argument(i=296) DataType (subtype of Structure) + its DefaultBinary(298)/DefaultXml(297) Encoding Objects, plus the shared DataTypeEncodingType(76) ObjectType and HasEncoding(38) ReferenceType, in base_nodes.c. Satisfies CU 3641. First slice of the base type-system completion (A2); 3188 base DataTypes + 3185 folders follow."
     },
     {
       "id": "service_read",

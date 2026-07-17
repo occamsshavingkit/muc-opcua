@@ -291,3 +291,15 @@ Both `satisfied_by` the new claimed alias `opc_cu_base_info_datatypes`. Notes:
   reaches only the library, not tests).
 - **3641** (Argument DataType) was deferred to A2: its Encoding Objects require
   DataTypeEncodingType(i=76), which is part of the full type-system work (3188).
+
+## 2026-07-17 — Roadmap A2 (first slice): Argument DataType + encoding infra (CU 3641)
+
+First slice of the type-system completion. Exposes the Argument(i=296) DataType
+(subtype of Structure) + its Default XML(297)/Default Binary(298) Encoding Objects,
+plus the shared DataTypeEncodingType(76) ObjectType and HasEncoding(38) ReferenceType,
+in base_nodes.c — gated by a new symbol MUC_OPCUA_CU_BASE_INFO_ARGUMENT_TYPE (alias
+opc_cu_base_info_argument_type; embedded/standard/full). Emb/Std required 41 -> 42.
+Backed by test_type_system::test_argument_datatype_and_encodings; sorted-table
+invariant enforced. The larger 3188 base-DataType set + 3185 folders follow; 3189
+ServerType and 5801 completeness (the ~35 KB flash item — scoped vs full is a
+maintainer decision) come after.
