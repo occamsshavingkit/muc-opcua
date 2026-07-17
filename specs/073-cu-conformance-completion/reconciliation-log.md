@@ -357,3 +357,62 @@ This is a pre-existing latent issue in those optional CUs — no named profile e
 `test_base_address_space_is_sorted` never exercises it. Spec 080b does not introduce or worsen any
 NAMED-profile ordering (all 5 remain sorted); fixing the ENG/CURRENCY/LOCALTIME node placement is a
 separate concern tracked for a future slice.
+
+## 2026-07-17 — Roadmap A2 (third slice): ServerType type tree (CU 3189)
+
+Exposes the `ServerType`(2004) type tree in `base_nodes.c`, gated by a new selectable CU
+symbol `MUC_OPCUA_CU_BASE_INFO_SERVERTYPE` (alias none; embedded/standard/full;
+`depends on` the type-system facet `MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER` **and**
+`MUC_OPCUA_CU_BASE_INFO_BASE_TYPES`, spec 080b's second slice). Emb/Std required 46 -> 47.
+
+**61 new nodes**, by category:
+- **14 ObjectTypes**: `ServerCapabilitiesType`(2013), `ServerDiagnosticsType`(2020),
+  `SessionsDiagnosticsSummaryType`(2026), `SessionDiagnosticsObjectType`(2029),
+  `VendorServerInfoType`(2033), `ServerRedundancyType`(2034) +
+  `TransparentRedundancyType`(2036) / `NonTransparentRedundancyType`(2039) /
+  `NonTransparentNetworkRedundancyType`(11945), `OperationLimitsType`(11564),
+  `FileType`(11575), `AddressSpaceFileType`(11595), `NamespaceMetadataType`(11616),
+  `NamespacesType`(11645).
+- **12 VariableTypes**: `ServerVendorCapabilityType`(2137), `ServerStatusType`(2138),
+  `ServerDiagnosticsSummaryType`(2150), the Sampling/Subscription/Session/SessionSecurity
+  diagnostics (Array)Types (2164/2165/2171/2172/2196/2197/2243/2244), `BuildInfoType`(3051).
+- **13 DataTypes**: 11 structured `Structure`-subtypes — `BuildInfo`(338),
+  `RedundantServerDataType`(853), `SamplingIntervalDiagnosticsDataType`(856),
+  `ServerDiagnosticsSummaryDataType`(859), `ServerStatusDataType`(862),
+  `SessionDiagnosticsDataType`(865), `SessionSecurityDiagnosticsDataType`(868),
+  `ServiceCounterDataType`(871), `SubscriptionDiagnosticsDataType`(874),
+  `EndpointUrlListDataType`(11943), `NetworkGroupDataType`(11944) — plus 2 enums
+  `RedundancySupport`(851), `ServerState`(852).
+- **22 Default XML/Binary Encoding Objects** for the 11 structured DataTypes above.
+
+All 61 nodes carry a full `HasSubtype` supertype closure back to their abstract roots and
+`HasEncoding` references for the structured DataTypes, matching the existing 3188/3185
+sorted-table + closure conventions.
+
+**Scope: type-nodes-only.** This slice exposes the *type tree* — the ObjectType/
+VariableType/DataType nodes and their relationships — not the ~550 Mandatory child
+Variables (InstanceDeclarations) each type prescribes (e.g. `ServerType.ServerStatus`,
+`ServerType.ServerCapabilities.MaxBrowseContinuationPoints`, …). Per the roadmap's
+InstanceDeclaration-completeness policy, those are **deferred to CU 5801**, where they
+will nest inside this same `MUC_OPCUA_CU_BASE_INFO_SERVERTYPE` gate rather than a new one.
+Claiming 3189 now (type tree only) and 5801 later (instance completeness) mirrors how
+3188/3185 claimed the base type system before instance-level facets landed.
+
+**BuildInfoType(3051) dual-branch placement:** its NodeId falls inside the pre-existing
+`DATA_ACCESS` dual-copy region of `s_base_nodes[]` (the 2997..8912 tail that is emitted
+once under `#if DATA_ACCESS` and once under `#if !DATA_ACCESS` to preserve global sort
+order — see the 080b second-slice entry above for why that duplication exists). 3051
+therefore had to be added to **both** branches; embedded builds with `DATA_ACCESS` off
+exercise the second copy, so a single-branch add would have broken
+`test_base_address_space_is_sorted` on embedded specifically.
+
+**Verified:** all 5 profiles green (nano 101 / micro 124 / embedded 125 / standard 125 /
+full 137 — `make test-profiles`), manifest validate OK, 32-bit ARM `-ffreestanding -Werror` compile of
+`base_nodes.c` clean. `.text` cost (ARM Cortex-M0+ `-Os`, `scripts/measure_size.sh all`,
+vs `main` @ 3d097b8): nano/micro unaffected (no type system); embedded/standard/full each
++9,280 B (identical delta — the 61 nodes are profile-independent once the type system is
+on). Archive `.data`/`.bss` remain 0 B on all 5 profiles (constitution rule intact).
+
+| CU | Now backed by |
+| --- | --- |
+| 3189 Base Info ServerType | The `ServerType`(2004) type tree — 14 ObjectTypes, 12 VariableTypes, 13 DataTypes (11 structured + 2 enums), 22 Default XML/Binary Encoding Objects — with full HasSubtype/HasEncoding closure in `base_nodes.c`; type-nodes-only, InstanceDeclarations deferred to CU 5801; backed by `test_type_system::test_servertype_type_tree_and_encodings` |

@@ -1126,6 +1126,16 @@ menuconfig MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER
 
 if MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER
 
+config MUC_OPCUA_CU_BASE_INFO_SERVERTYPE
+	bool "CU: Base Info ServerType"
+	depends on MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER && MUC_OPCUA_CU_BASE_INFO_BASE_TYPES
+	default y if MUC_OPCUA_INTERN_PROFILE_EMBEDDED_2025_UA_SERVER
+	help
+	  Implementation state: implemented.
+	  OPC item: CU 3189:Base Info ServerType.
+	  Backing tests: test_type_system.
+	  Notes: Exposes the type information of the ServerType and its containing types in the AddressSpace, including all their supertypes. It includes the Encoding Objects for its DataTypes.
+
 # Base Info Rational Number (opc_cu_2423)
 #   Implementation state: unimplemented -- visible but not selectable.
 #   Detail: CU 2423:Base Info Rational Number.
@@ -1233,12 +1243,6 @@ comment "Base Info Core Types Folders (NOT IMPLEMENTED)"
 #   Detail: CU 3188:Base Info Base Types.
 #   Notes: Reconciled (spec 080b): the full base OPC UA type system is exposed in base_nodes.c and asserted by test_type_system -- all built-in/abstract DataTypes with supertype closure (primitives re-parented under Integer(27)/UInteger(28)/Number(26)), the base Object/Variable/ReferenceTypes, ModellingRuleType(77) + its ModellingRule Objects (78/80/83/11508/11510), and EnumValueType(7594)/Union(12756) with EnumValueType Encoding Objects (7616/8251). Satisfied by opc_cu_base_info_base_types. Supports type information of the base OPC UA concepts, like build-in DataTypes, base Object- and VariableTypes, and base ReferenceTypes. Includes the Encoding Objects for the DataTypes that are not Build-in or abstract DataTypes. Exposes the ObjectTypes BaseObjectType, FolderType, DataTypeEncodingType and ModellingRuleType in the AddressSpace. Exposes the VariableTypes BaseVariableType, PropertyType, and BaseDataVariableType in the AddressSpace. Exposes the DataTypes BaseDataType Boolean, ByteString, DateTime, DataValue, DiagnosticsInfo, Enumeration, ExpandedNodeId, Guid, LocalizedText, NodeId, Number, QualifiedName, String, Structure, XmlElement, Integer, UInteger, Double, Float, Sbyte, Int16, Int32, Int64, Byte, Uint16, Uint32, Uint64, StatusCode, UtcTime, Duration, NumericRange, EnumValueType, and Union and their Encoding Objects in the AddressSpace. Exposes the ReferenceTypes References, HierarchicalReferences, NonHierarchicalReferences, HasChild, Organizes, HasModellingRule, HasTypeDefinition, HasEncoding, Aggregates, HasSubtype, HasComponent, and HasProperty in the AddressSpace Exposes the Objects Optional, Mandatory, OptionalPlaceholder, MandatoryPlaceholder and ExposesItsArrayin the AddressSpace.
 comment "Base Info Base Types (NOT IMPLEMENTED)"
-
-# Base Info ServerType (opc_cu_3189)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 3189:Base Info ServerType.
-#   Notes: Exposes the type information of the ServerType and its containing types in the AddressSpace, including all their supertypes. It includes the Encoding Objects for its DataTypes.
-comment "Base Info ServerType (NOT IMPLEMENTED)"
 
 # Base Info OptionSet DataType (opc_cu_3207)
 #   Implementation state: unimplemented -- visible but not selectable.

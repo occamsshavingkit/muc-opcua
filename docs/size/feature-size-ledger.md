@@ -1692,6 +1692,41 @@ constitution invariant that the base-types size audit surfaced.
   `_Static_assert` passes with no bump. nano/micro unaffected in RAM terms beyond the
   gated field (nano has no DIAGNOSTICS).
 
+## 2026-07-17: Spec 083 — ServerType type tree (CU 3189)
+
+Flash-only, type-nodes-only change: exposes the `ServerType`(2004) type tree in
+`base_nodes.c` — 14 ObjectTypes, 12 VariableTypes (incl. `BuildInfoType` 3051), 13
+DataTypes (11 structured Structure-subtypes + 2 enums), and 22 Default XML/Binary
+Encoding Objects (61 nodes total), gated by `MUC_OPCUA_CU_BASE_INFO_SERVERTYPE`
+(`depends on` the type-system facet + `MUC_OPCUA_CU_BASE_INFO_BASE_TYPES`, spec 080b).
+The ~550 Mandatory InstanceDeclarations each type prescribes are **deferred to CU
+5801** — this slice is the type tree only. `BuildInfoType`(3051) falls inside the
+pre-existing `DATA_ACCESS` dual-copy region of `s_base_nodes[]` and had to be added to
+both branches to keep the table sorted on DA-off profiles (embedded). No `struct
+mu_server` field changes, so RAM and `MU_SERVER_STORAGE_BYTES` are unaffected.
+
+`scripts/measure_size.sh all` (Arm Cortex-M0+, `-Os`), before at `main` commit
+`3d097b8` (archive `.text` / `.data` / `.bss`):
+
+| Profile | before | after | Δ .text | `.data`/`.bss` |
+|----------|------------------:|------------------:|------:|:---:|
+| nano | 23,660 | 23,660 | 0 | 0 / 0 (unchanged) |
+| micro | 43,678 | 43,678 | 0 | 0 / 0 (unchanged) |
+| embedded | 61,416 | 70,696 | **+9,280** | 0 / 0 |
+| standard | 62,355 | 71,635 | **+9,280** | 0 / 0 |
+| full | 90,446 | 99,726 | **+9,280** | 0 / 0 |
+
+- `nano`/`micro` are byte-identical — no type system, so the CU never compiles in.
+- `embedded`/`standard`/`full` gain the identical **+9,280 B** — the 61-node set is
+  profile-independent once the type system + base-types CU are on (as with the 080b
+  base-types slice, all three secured/type-system profiles move in lockstep).
+- **`.bss`/`.data` stay 0 B on every profile** — hard-gate confirmed: this is a pure
+  `const` flash addition, no mutable static state introduced. (`standard`/`full`
+  linked-ELF `.data`/`.bss` remain their pre-existing 1,336 B / 884 B from the
+  heap-enabled array-Write/Call path, unrelated to this slice — see spec 082 above for
+  the archive-vs-linked distinction.)
+- Verified via `make test-profiles`: nano 101 / micro 124 / embedded 125 / standard
+  125 / full 137, all green; manifest validate OK.
 ## 2026-07-17: Spec 084 — ServerStatus.Value readable (CU 3802/3808)
 
 External conformance-gauntlet finding: reading `ServerStatus`(i=2256) `.Value` returned

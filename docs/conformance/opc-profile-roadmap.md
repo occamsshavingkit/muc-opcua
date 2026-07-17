@@ -15,10 +15,11 @@ remains future work.
 
 | State | Count |
 |-------|-------|
-| claimed | 60 |
-| implemented | 7 |
+| claimed | 63 |
+| implemented | 8 |
+| documented | 2 |
 | deferred | 9 |
-| unimplemented | 121 |
+| unimplemented | 118 |
 
 ## Item matrix
 
@@ -52,7 +53,7 @@ remains future work.
 | opc_cu_3545 | conformance_unit | unimplemented |  | — | micro, embedded, standard, full | — |
 | opc_cu_3554 | conformance_unit | unimplemented |  | — | micro, embedded, standard, full | — |
 | opc_cu_3560 | conformance_unit | claimed |  | MUC_OPCUA_CU_ADDRESS_SPACE_INTERFACES | micro, embedded, standard, full | test_profile_surface |
-| opc_cu_3808 | conformance_unit | unimplemented |  | — | all | — |
+| opc_cu_3808 | conformance_unit | documented |  | — | all | — |
 | opc_cu_3912 | conformance_unit | unimplemented |  | — | all | — |
 | opc_cu_4053 | conformance_unit | claimed |  | MUC_OPCUA_CU_BASE_INFO_LOCATIONS_OBJECT | micro, embedded, standard, full | test_profile_surface |
 | opc_cu_4237 | conformance_unit | claimed |  | MUC_OPCUA_CU_ADDRESS_SPACE_NONVOLATILE_CONSTANT | micro, embedded, standard, full | test_profile_surface |
@@ -86,7 +87,7 @@ remains future work.
 | opc_cu_3146 | conformance_unit | unimplemented |  | — | embedded, standard, full | — |
 | opc_cu_3185 | conformance_unit | unimplemented |  | — | embedded, standard, full | — |
 | opc_cu_3188 | conformance_unit | unimplemented |  | — | embedded, standard, full | — |
-| opc_cu_3189 | conformance_unit | unimplemented |  | — | embedded, standard, full | — |
+| opc_cu_3189 | conformance_unit | implemented |  | MUC_OPCUA_CU_BASE_INFO_SERVERTYPE | embedded, standard, full | test_type_system |
 | opc_cu_3196 | conformance_unit | unimplemented |  | — | micro, embedded, standard, full | — |
 | opc_cu_3207 | conformance_unit | unimplemented |  | — | embedded, standard, full | — |
 | opc_cu_3214 | conformance_unit | unimplemented |  | — | embedded, standard, full | — |
@@ -144,6 +145,9 @@ remains future work.
 | opc_cu_pubsub | conformance_unit | claimed | OPC-10000-14 Core 2022 Server Facet | MUC_OPCUA_CU_PUBSUB | full | test_uadp_encoding, test_pubsub |
 | opc_cu_reverse_connect | conformance_unit | claimed | OPC-10000-6 §7.1.3 Core 2022 Server Facet | MUC_OPCUA_CU_REVERSE_CONNECT | full | test_reverse_connect |
 | opc_cu_namespaces | conformance_unit | claimed | OPC-10000-4 Core 2022 Server Facet | MUC_OPCUA_CU_NAMESPACES | full | test_read_browsename_namespace |
+| opc_cu_base_info_datatypes | conformance_unit | claimed | OPC-10000-5 Core 2022 Server Facet | MUC_OPCUA_CU_BASE_INFO_DATATYPES | embedded, standard, full | test_type_system |
+| opc_cu_base_info_argument_type | conformance_unit | claimed | OPC-10000-5 Core 2022 Server Facet | MUC_OPCUA_CU_BASE_INFO_ARGUMENT_TYPE | embedded, standard, full | test_type_system |
+| opc_cu_base_info_base_types | conformance_unit | claimed | OPC-10000-5 Core 2022 Server Facet | MUC_OPCUA_CU_BASE_INFO_BASE_TYPES | embedded, standard, full | test_type_system |
 | service_read | conformance_unit | claimed | OPC-10000-4 §5.10.2 Core 2017 Server Facet | MUC_OPCUA_CU_ATTRIBUTE_READ | all | test_read_service |
 | service_browse | conformance_unit | claimed | OPC-10000-4 §5.8 Core 2017 | MUC_OPCUA_CU_VIEW_BASIC_TRANSLATEBROWSEPATH | all | test_browse_service, test_browse_limits, test_view_services |
 | service_discovery | conformance_unit | claimed | OPC-10000-4 §5.4 Core 2017 | MUC_OPCUA_CU_DISCOVERY_FIND_SERVERS_SELF_GET_ENDPOINTS | all | test_discovery_endpoint |
@@ -217,7 +221,7 @@ remains future work.
 | opc_cu_3170 | conformance_unit | unimplemented | OPC-10000-4 §5.4.6 | — | standard, full | — |
 | opc_cu_3721 | conformance_unit | unimplemented | OPC-10000-7 §6.5 | — | full | — |
 | opc_cu_3923 | conformance_unit | unimplemented | OPC-10000-4 §5.6 | — | micro, embedded, standard, full | — |
-| opc_cu_3080 | conformance_unit | unimplemented |  | — | all | — |
+| opc_cu_3080 | conformance_unit | documented |  | — | all | — |
 | opc_cu_3201 | conformance_unit | unimplemented |  | — | micro, embedded, standard, full | — |
 | opc_cu_5592 | conformance_unit | claimed |  | MUC_OPCUA_CU_BASE_INFO_ENGINEERING_UNITS | micro, embedded, standard, full | test_profile_surface |
 | opc_cu_5814 | conformance_unit | unimplemented |  | — | micro, embedded, standard, full | — |

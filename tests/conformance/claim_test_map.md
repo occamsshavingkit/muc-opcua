@@ -33,6 +33,7 @@ Backing test column: comma-separated ctest names (as registered).
 | Base Info Locations Object |  | micro, embedded, standard, full | test_profile_surface |
 | Address Space NonVolatile and Constant |  | micro, embedded, standard, full | test_profile_surface |
 | Base Info Currency |  | micro, embedded, standard, full | test_profile_surface |
+| Base Info ServerType |  | embedded, standard, full | test_type_system |
 | Core 2022 Server Facet | OPC-10000-4 §5.12/5.13 | micro, embedded, standard, full | test_subscriptions, test_subscriptions_errors |
 | Core 2022 Server Facet | OPC-10000-7 | embedded, standard, full | test_subscriptions_capacity, test_subscription_deadband, test_subscription_publish |
 | Core 2022 Server Facet | OPC-10000-7 | full | test_ecc_crypto |
@@ -56,6 +57,9 @@ Backing test column: comma-separated ctest names (as registered).
 | Core 2022 Server Facet | OPC-10000-14 | full | test_uadp_encoding, test_pubsub |
 | Core 2022 Server Facet | OPC-10000-6 §7.1.3 | full | test_reverse_connect |
 | Core 2022 Server Facet | OPC-10000-4 | full | test_read_browsename_namespace |
+| Core 2022 Server Facet | OPC-10000-5 | embedded, standard, full | test_type_system |
+| Core 2022 Server Facet | OPC-10000-5 | embedded, standard, full | test_type_system |
+| Core 2022 Server Facet | OPC-10000-5 | embedded, standard, full | test_type_system |
 | Core 2017 Server Facet: Attribute Read | OPC-10000-4 §5.10.2 | all | test_read_service |
 | Core 2017: View Basic / TranslateBrowsePath | OPC-10000-4 §5.8 | all | test_browse_service, test_browse_limits, test_view_services |
 | Core 2017: Discovery Find Servers Self / Get Endpoints | OPC-10000-4 §5.4 | all | test_discovery_endpoint |

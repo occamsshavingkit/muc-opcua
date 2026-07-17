@@ -24,7 +24,7 @@
  * (CU 3641) and base-types (CU 3188) claims from those unrelated CUs. */
 #if MUC_OPCUA_CU_BASE_INFO_LOCALTIME || defined(MUC_OPCUA_CU_BASE_INFO_ENGINEERING_UNITS) ||                           \
     defined(MUC_OPCUA_CU_BASE_INFO_CURRENCY) || MUC_OPCUA_CU_BASE_INFO_ARGUMENT_TYPE ||                                \
-    MUC_OPCUA_CU_BASE_INFO_BASE_TYPES
+    MUC_OPCUA_CU_BASE_INFO_BASE_TYPES || MUC_OPCUA_CU_BASE_INFO_SERVERTYPE
 #define MU_HAVE_STRUCTURE_TYPE 1
 #else
 #define MU_HAVE_STRUCTURE_TYPE 0
@@ -56,7 +56,7 @@ static const opcua_byte_t s_str_DateTime[] = "DateTime";
 static const opcua_byte_t s_str_DefaultInstanceBrowseName[] = "DefaultInstanceBrowseName";
 #endif
 #if MUC_OPCUA_CU_BASE_INFO_LOCALTIME || defined(MUC_OPCUA_CU_BASE_INFO_CURRENCY) ||                                    \
-    MUC_OPCUA_CU_BASE_INFO_ARGUMENT_TYPE || MUC_OPCUA_CU_BASE_INFO_BASE_TYPES
+    MUC_OPCUA_CU_BASE_INFO_ARGUMENT_TYPE || MUC_OPCUA_CU_BASE_INFO_BASE_TYPES || MUC_OPCUA_CU_BASE_INFO_SERVERTYPE
 static const opcua_byte_t s_str_Default_Binary[] = "Default Binary";
 #endif
 static const opcua_byte_t s_str_Double[] = "Double";
@@ -175,6 +175,50 @@ static const opcua_byte_t s_str_ModellingRuleType[] = "ModellingRuleType";
 static const opcua_byte_t s_str_ExposesItsArray[] = "ExposesItsArray";
 static const opcua_byte_t s_str_OptionalPlaceholder[] = "OptionalPlaceholder";
 static const opcua_byte_t s_str_MandatoryPlaceholder[] = "MandatoryPlaceholder";
+#endif
+#if MUC_OPCUA_CU_BASE_INFO_SERVERTYPE
+/* spec 083 (CU 3189): BrowseNames for the ServerType structured DataTypes + enums
+   (ObjectType/VariableType BrowseNames follow below). */
+static const opcua_byte_t s_str_BuildInfo[] = "BuildInfo";
+static const opcua_byte_t s_str_RedundantServerDataType[] = "RedundantServerDataType";
+static const opcua_byte_t s_str_SamplingIntervalDiagnosticsDataType[] = "SamplingIntervalDiagnosticsDataType";
+static const opcua_byte_t s_str_ServerDiagnosticsSummaryDataType[] = "ServerDiagnosticsSummaryDataType";
+static const opcua_byte_t s_str_ServerStatusDataType[] = "ServerStatusDataType";
+static const opcua_byte_t s_str_SessionDiagnosticsDataType[] = "SessionDiagnosticsDataType";
+static const opcua_byte_t s_str_SessionSecurityDiagnosticsDataType[] = "SessionSecurityDiagnosticsDataType";
+static const opcua_byte_t s_str_ServiceCounterDataType[] = "ServiceCounterDataType";
+static const opcua_byte_t s_str_SubscriptionDiagnosticsDataType[] = "SubscriptionDiagnosticsDataType";
+static const opcua_byte_t s_str_EndpointUrlListDataType[] = "EndpointUrlListDataType";
+static const opcua_byte_t s_str_NetworkGroupDataType[] = "NetworkGroupDataType";
+static const opcua_byte_t s_str_ServerState[] = "ServerState";
+/* spec 083 (CU 3189): BrowseNames for the ServerType-tree ObjectTypes. */
+static const opcua_byte_t s_str_ServerCapabilitiesType[] = "ServerCapabilitiesType";
+static const opcua_byte_t s_str_ServerDiagnosticsType[] = "ServerDiagnosticsType";
+static const opcua_byte_t s_str_SessionsDiagnosticsSummaryType[] = "SessionsDiagnosticsSummaryType";
+static const opcua_byte_t s_str_SessionDiagnosticsObjectType[] = "SessionDiagnosticsObjectType";
+static const opcua_byte_t s_str_VendorServerInfoType[] = "VendorServerInfoType";
+static const opcua_byte_t s_str_ServerRedundancyType[] = "ServerRedundancyType";
+static const opcua_byte_t s_str_TransparentRedundancyType[] = "TransparentRedundancyType";
+static const opcua_byte_t s_str_NonTransparentRedundancyType[] = "NonTransparentRedundancyType";
+static const opcua_byte_t s_str_OperationLimitsType[] = "OperationLimitsType";
+static const opcua_byte_t s_str_FileType[] = "FileType";
+static const opcua_byte_t s_str_AddressSpaceFileType[] = "AddressSpaceFileType";
+static const opcua_byte_t s_str_NamespaceMetadataType[] = "NamespaceMetadataType";
+static const opcua_byte_t s_str_NamespacesType[] = "NamespacesType";
+static const opcua_byte_t s_str_NonTransparentNetworkRedundancyType[] = "NonTransparentNetworkRedundancyType";
+/* spec 083 (CU 3189): BrowseNames for the ServerType-tree VariableTypes. */
+static const opcua_byte_t s_str_ServerVendorCapabilityType[] = "ServerVendorCapabilityType";
+static const opcua_byte_t s_str_ServerStatusType[] = "ServerStatusType";
+static const opcua_byte_t s_str_ServerDiagnosticsSummaryType[] = "ServerDiagnosticsSummaryType";
+static const opcua_byte_t s_str_SamplingIntervalDiagnosticsArrayType[] = "SamplingIntervalDiagnosticsArrayType";
+static const opcua_byte_t s_str_SamplingIntervalDiagnosticsType[] = "SamplingIntervalDiagnosticsType";
+static const opcua_byte_t s_str_SubscriptionDiagnosticsArrayType[] = "SubscriptionDiagnosticsArrayType";
+static const opcua_byte_t s_str_SubscriptionDiagnosticsType[] = "SubscriptionDiagnosticsType";
+static const opcua_byte_t s_str_SessionDiagnosticsArrayType[] = "SessionDiagnosticsArrayType";
+static const opcua_byte_t s_str_SessionDiagnosticsVariableType[] = "SessionDiagnosticsVariableType";
+static const opcua_byte_t s_str_SessionSecurityDiagnosticsArrayType[] = "SessionSecurityDiagnosticsArrayType";
+static const opcua_byte_t s_str_SessionSecurityDiagnosticsType[] = "SessionSecurityDiagnosticsType";
+static const opcua_byte_t s_str_BuildInfoType[] = "BuildInfoType";
 #endif
 #if MUC_OPCUA_CU_BASE_INFO_LOCALTIME
 static const opcua_byte_t s_str_TimeZoneDataType[] = "TimeZoneDataType";
@@ -405,6 +449,60 @@ static const mu_reference_t s_enum_value_type_refs[] = {
      true}}; /* EnumValueType -HasEncoding-> Default Binary */
 #endif
 
+#if MUC_OPCUA_CU_BASE_INFO_SERVERTYPE
+/* spec 083 (CU 3189): Enumeration(29) HasSubtype closure for the ServerType enums,
+   plus HasEncoding refs for each structured DataType's Default XML/Binary
+   Encoding Objects (DataTypeEncodingType 76). */
+static const mu_reference_t s_enumeration_refs[] = {
+    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {851}}, true}, /* Enumeration -> RedundancySupport */
+    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {852}}, true}, /* Enumeration -> ServerState */
+};
+static const mu_reference_t s_build_info_refs[] = {
+    {{0, MU_NODEID_NUMERIC, {38}}, {0, MU_NODEID_NUMERIC, {339}}, true}, /* BuildInfo -HasEncoding-> Default XML */
+    {{0, MU_NODEID_NUMERIC, {38}}, {0, MU_NODEID_NUMERIC, {340}}, true}, /* BuildInfo -HasEncoding-> Default Binary */
+};
+static const mu_reference_t s_redundant_server_data_type_refs[] = {
+    {{0, MU_NODEID_NUMERIC, {38}}, {0, MU_NODEID_NUMERIC, {854}}, true},
+    {{0, MU_NODEID_NUMERIC, {38}}, {0, MU_NODEID_NUMERIC, {855}}, true},
+};
+static const mu_reference_t s_sampling_interval_diagnostics_data_type_refs[] = {
+    {{0, MU_NODEID_NUMERIC, {38}}, {0, MU_NODEID_NUMERIC, {857}}, true},
+    {{0, MU_NODEID_NUMERIC, {38}}, {0, MU_NODEID_NUMERIC, {858}}, true},
+};
+static const mu_reference_t s_server_diagnostics_summary_data_type_refs[] = {
+    {{0, MU_NODEID_NUMERIC, {38}}, {0, MU_NODEID_NUMERIC, {860}}, true},
+    {{0, MU_NODEID_NUMERIC, {38}}, {0, MU_NODEID_NUMERIC, {861}}, true},
+};
+static const mu_reference_t s_server_status_data_type_refs[] = {
+    {{0, MU_NODEID_NUMERIC, {38}}, {0, MU_NODEID_NUMERIC, {863}}, true},
+    {{0, MU_NODEID_NUMERIC, {38}}, {0, MU_NODEID_NUMERIC, {864}}, true},
+};
+static const mu_reference_t s_session_diagnostics_data_type_refs[] = {
+    {{0, MU_NODEID_NUMERIC, {38}}, {0, MU_NODEID_NUMERIC, {866}}, true},
+    {{0, MU_NODEID_NUMERIC, {38}}, {0, MU_NODEID_NUMERIC, {867}}, true},
+};
+static const mu_reference_t s_session_security_diagnostics_data_type_refs[] = {
+    {{0, MU_NODEID_NUMERIC, {38}}, {0, MU_NODEID_NUMERIC, {869}}, true},
+    {{0, MU_NODEID_NUMERIC, {38}}, {0, MU_NODEID_NUMERIC, {870}}, true},
+};
+static const mu_reference_t s_service_counter_data_type_refs[] = {
+    {{0, MU_NODEID_NUMERIC, {38}}, {0, MU_NODEID_NUMERIC, {872}}, true},
+    {{0, MU_NODEID_NUMERIC, {38}}, {0, MU_NODEID_NUMERIC, {873}}, true},
+};
+static const mu_reference_t s_subscription_diagnostics_data_type_refs[] = {
+    {{0, MU_NODEID_NUMERIC, {38}}, {0, MU_NODEID_NUMERIC, {875}}, true},
+    {{0, MU_NODEID_NUMERIC, {38}}, {0, MU_NODEID_NUMERIC, {876}}, true},
+};
+static const mu_reference_t s_endpoint_url_list_data_type_refs[] = {
+    {{0, MU_NODEID_NUMERIC, {38}}, {0, MU_NODEID_NUMERIC, {11949}}, true},
+    {{0, MU_NODEID_NUMERIC, {38}}, {0, MU_NODEID_NUMERIC, {11957}}, true},
+};
+static const mu_reference_t s_network_group_data_type_refs[] = {
+    {{0, MU_NODEID_NUMERIC, {38}}, {0, MU_NODEID_NUMERIC, {11950}}, true},
+    {{0, MU_NODEID_NUMERIC, {38}}, {0, MU_NODEID_NUMERIC, {11958}}, true},
+};
+#endif
+
 #if MU_HAVE_STRUCTURE_TYPE
 static const mu_reference_t s_structure_refs[] = {
 #if MUC_OPCUA_CU_BASE_INFO_ARGUMENT_TYPE
@@ -422,6 +520,28 @@ static const mu_reference_t s_structure_refs[] = {
 #endif
 #ifdef MUC_OPCUA_CU_BASE_INFO_CURRENCY
     {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {MU_NODEID_CURRENCYUNITTYPE}}, true},
+#endif
+#if MUC_OPCUA_CU_BASE_INFO_SERVERTYPE
+    /* spec 083 (CU 3189): the ServerType structured DataTypes. */
+    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {338}}, true}, /* HasSubtype -> BuildInfo */
+    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {853}}, true}, /* HasSubtype -> RedundantServerDataType */
+    {{0, MU_NODEID_NUMERIC, {45}},
+     {0, MU_NODEID_NUMERIC, {856}},
+     true}, /* HasSubtype -> SamplingIntervalDiagnosticsDataType */
+    {{0, MU_NODEID_NUMERIC, {45}},
+     {0, MU_NODEID_NUMERIC, {859}},
+     true}, /* HasSubtype -> ServerDiagnosticsSummaryDataType */
+    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {862}}, true}, /* HasSubtype -> ServerStatusDataType */
+    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {865}}, true}, /* HasSubtype -> SessionDiagnosticsDataType */
+    {{0, MU_NODEID_NUMERIC, {45}},
+     {0, MU_NODEID_NUMERIC, {868}},
+     true}, /* HasSubtype -> SessionSecurityDiagnosticsDataType */
+    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {871}}, true}, /* HasSubtype -> ServiceCounterDataType */
+    {{0, MU_NODEID_NUMERIC, {45}},
+     {0, MU_NODEID_NUMERIC, {874}},
+     true}, /* HasSubtype -> SubscriptionDiagnosticsDataType */
+    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {11943}}, true}, /* HasSubtype -> EndpointUrlListDataType */
+    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {11944}}, true}, /* HasSubtype -> NetworkGroupDataType */
 #endif
 };
 #endif
@@ -450,7 +570,46 @@ static const mu_reference_t s_base_object_type_refs[] = {
 #if MUC_OPCUA_CU_ADDRESS_SPACE_INTERFACES
     {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {17602}}, true},
 #endif
-    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {2004}}, true}};
+    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {2004}}, true}
+#if MUC_OPCUA_CU_BASE_INFO_SERVERTYPE
+    ,
+    /* spec 083 (CU 3189): ServerType-tree ObjectType subtypes of BaseObjectType. */
+    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {2013}}, true}, /* HasSubtype -> ServerCapabilitiesType */
+    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {2020}}, true}, /* HasSubtype -> ServerDiagnosticsType */
+    {{0, MU_NODEID_NUMERIC, {45}},
+     {0, MU_NODEID_NUMERIC, {2026}},
+     true}, /* HasSubtype -> SessionsDiagnosticsSummaryType */
+    {{0, MU_NODEID_NUMERIC, {45}},
+     {0, MU_NODEID_NUMERIC, {2029}},
+     true}, /* HasSubtype -> SessionDiagnosticsObjectType */
+    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {2033}}, true},  /* HasSubtype -> VendorServerInfoType */
+    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {2034}}, true},  /* HasSubtype -> ServerRedundancyType */
+    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {11575}}, true}, /* HasSubtype -> FileType */
+    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {11616}}, true}, /* HasSubtype -> NamespaceMetadataType */
+    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {11645}}, true}  /* HasSubtype -> NamespacesType */
+#endif
+};
+
+#if MUC_OPCUA_CU_BASE_INFO_SERVERTYPE
+/* spec 083 (CU 3189): FolderType HasSubtype -> OperationLimitsType. */
+static const mu_reference_t s_folder_type_refs[] = {
+    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {11564}}, true}};
+
+/* spec 083 (CU 3189): ServerRedundancyType HasSubtype -> Transparent-/
+   NonTransparentRedundancyType. */
+static const mu_reference_t s_server_redundancy_type_refs[] = {
+    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {2036}}, true},
+    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {2039}}, true}};
+
+/* spec 083 (CU 3189): NonTransparentRedundancyType HasSubtype ->
+   NonTransparentNetworkRedundancyType. */
+static const mu_reference_t s_non_transparent_redundancy_type_refs[] = {
+    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {11945}}, true}};
+
+/* spec 083 (CU 3189): FileType HasSubtype -> AddressSpaceFileType. */
+static const mu_reference_t s_file_type_refs[] = {
+    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {11595}}, true}};
+#endif
 
 #if MUC_OPCUA_CU_BASE_INFO_ARGUMENT_TYPE
 /* CU 3641: Argument DataType HasEncoding refs to its Default XML/Binary encodings. */
@@ -484,7 +643,23 @@ static const mu_reference_t s_base_data_variable_type_refs[] = {
 #endif
 #if MUC_OPCUA_CU_DATA_ACCESS
     /* Spec 060: BaseDataVariableType HasSubtype-> DataItemType (2365). */
-    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {2365}}, true}
+    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {2365}}, true},
+#endif
+#if MUC_OPCUA_CU_BASE_INFO_SERVERTYPE
+    /* spec 083 (CU 3189): BaseDataVariableType HasSubtype -> ServerType-tree
+       VariableTypes. */
+    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {2137}}, true},
+    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {2138}}, true},
+    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {2150}}, true},
+    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {2164}}, true},
+    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {2165}}, true},
+    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {2171}}, true},
+    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {2172}}, true},
+    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {2196}}, true},
+    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {2197}}, true},
+    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {2243}}, true},
+    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {2244}}, true},
+    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {3051}}, true}
 #endif
 };
 
@@ -996,6 +1171,8 @@ static const mu_node_t s_base_nodes[] = {
      .type_definition = {0}},
 #endif
 #if MUC_OPCUA_CU_BASE_INFO_BASE_TYPES
+    /* not OR'd with SERVERTYPE: it depends on BASE_TYPES in Kconfig, so this
+       block already compiles whenever SERVERTYPE is on */
     /* CU 3188: Integer(27)/UInteger(28) subtypes of Number, Enumeration(29) of
        BaseDataType. Sorted between Number(26) and References(31). */
     {{0, MU_NODEID_NUMERIC, {27}},
@@ -1018,8 +1195,13 @@ static const mu_node_t s_base_nodes[] = {
      MU_NODECLASS_DATATYPE,
      {11, s_str_Enumeration},
      {11, s_str_Enumeration},
+#if MUC_OPCUA_CU_BASE_INFO_SERVERTYPE
+     s_enumeration_refs,
+     sizeof(s_enumeration_refs) / sizeof(s_enumeration_refs[0]),
+#else
      NULL,
      0,
+#endif
      NULL,
      .type_definition = {0}},
 #endif
@@ -1075,8 +1257,8 @@ static const mu_node_t s_base_nodes[] = {
      NULL,
      .type_definition = {0}},
 #endif
-#if MUC_OPCUA_CU_BASE_INFO_ARGUMENT_TYPE || MUC_OPCUA_CU_BASE_INFO_BASE_TYPES
-    /* CU 3641/3188: HasEncoding ReferenceType (i=38, subtype of NonHierarchicalReferences). */
+#if MUC_OPCUA_CU_BASE_INFO_ARGUMENT_TYPE || MUC_OPCUA_CU_BASE_INFO_BASE_TYPES || MUC_OPCUA_CU_BASE_INFO_SERVERTYPE
+    /* CU 3641/3188/3189: HasEncoding ReferenceType (i=38, subtype of NonHierarchicalReferences). */
     {{0, MU_NODEID_NUMERIC, {38}},
      MU_NODECLASS_REFERENCETYPE,
      {11, s_str_HasEncoding},
@@ -1150,8 +1332,13 @@ static const mu_node_t s_base_nodes[] = {
      MU_NODECLASS_OBJECTTYPE,
      {10, s_str_FolderType},
      {10, s_str_FolderType},
+#if MUC_OPCUA_CU_BASE_INFO_SERVERTYPE
+     s_folder_type_refs,
+     sizeof(s_folder_type_refs) / sizeof(s_folder_type_refs[0]),
+#else
      NULL,
      0,
+#endif
      NULL,
      .type_definition = {0}},
     {{0, MU_NODEID_NUMERIC, {62}},
@@ -1178,8 +1365,8 @@ static const mu_node_t s_base_nodes[] = {
      0,
      NULL,
      .type_definition = {0}},
-#if MUC_OPCUA_CU_BASE_INFO_ARGUMENT_TYPE || MUC_OPCUA_CU_BASE_INFO_BASE_TYPES
-    /* CU 3641/3188: DataTypeEncodingType (i=76, subtype of BaseObjectType) — the
+#if MUC_OPCUA_CU_BASE_INFO_ARGUMENT_TYPE || MUC_OPCUA_CU_BASE_INFO_BASE_TYPES || MUC_OPCUA_CU_BASE_INFO_SERVERTYPE
+    /* CU 3641/3188/3189: DataTypeEncodingType (i=76, subtype of BaseObjectType) — the
        type definition of every Encoding Object. */
     {{0, MU_NODEID_NUMERIC, {76}},
      MU_NODECLASS_OBJECTTYPE,
@@ -1362,6 +1549,244 @@ static const mu_node_t s_base_nodes[] = {
      NULL,
      .type_definition = {0, MU_NODEID_NUMERIC, {76}}},
 #endif
+#if MUC_OPCUA_CU_BASE_INFO_SERVERTYPE
+    /* spec 083 (CU 3189): ServerType structured DataTypes (subtypes of
+       Structure 22) + their Default XML/Binary Encoding Objects, and the two
+       ServerType enums (subtypes of Enumeration 29). Sorted between the
+       Argument encodings (298) and ServerType (2004). */
+    {{0, MU_NODEID_NUMERIC, {338}},
+     MU_NODECLASS_DATATYPE,
+     {9, s_str_BuildInfo},
+     {9, s_str_BuildInfo},
+     s_build_info_refs,
+     sizeof(s_build_info_refs) / sizeof(s_build_info_refs[0]),
+     NULL,
+     .type_definition = {0}},
+    {{0, MU_NODEID_NUMERIC, {339}},
+     MU_NODECLASS_OBJECT,
+     {11, s_str_Default_XML},
+     {11, s_str_Default_XML},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {76}}},
+    {{0, MU_NODEID_NUMERIC, {340}},
+     MU_NODECLASS_OBJECT,
+     {14, s_str_Default_Binary},
+     {14, s_str_Default_Binary},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {76}}},
+    {{0, MU_NODEID_NUMERIC, {851}},
+     MU_NODECLASS_DATATYPE,
+     {17, s_str_RedundancySupport},
+     {17, s_str_RedundancySupport},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0}},
+    {{0, MU_NODEID_NUMERIC, {852}},
+     MU_NODECLASS_DATATYPE,
+     {11, s_str_ServerState},
+     {11, s_str_ServerState},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0}},
+    {{0, MU_NODEID_NUMERIC, {853}},
+     MU_NODECLASS_DATATYPE,
+     {23, s_str_RedundantServerDataType},
+     {23, s_str_RedundantServerDataType},
+     s_redundant_server_data_type_refs,
+     sizeof(s_redundant_server_data_type_refs) / sizeof(s_redundant_server_data_type_refs[0]),
+     NULL,
+     .type_definition = {0}},
+    {{0, MU_NODEID_NUMERIC, {854}},
+     MU_NODECLASS_OBJECT,
+     {11, s_str_Default_XML},
+     {11, s_str_Default_XML},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {76}}},
+    {{0, MU_NODEID_NUMERIC, {855}},
+     MU_NODECLASS_OBJECT,
+     {14, s_str_Default_Binary},
+     {14, s_str_Default_Binary},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {76}}},
+    {{0, MU_NODEID_NUMERIC, {856}},
+     MU_NODECLASS_DATATYPE,
+     {35, s_str_SamplingIntervalDiagnosticsDataType},
+     {35, s_str_SamplingIntervalDiagnosticsDataType},
+     s_sampling_interval_diagnostics_data_type_refs,
+     sizeof(s_sampling_interval_diagnostics_data_type_refs) / sizeof(s_sampling_interval_diagnostics_data_type_refs[0]),
+     NULL,
+     .type_definition = {0}},
+    {{0, MU_NODEID_NUMERIC, {857}},
+     MU_NODECLASS_OBJECT,
+     {11, s_str_Default_XML},
+     {11, s_str_Default_XML},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {76}}},
+    {{0, MU_NODEID_NUMERIC, {858}},
+     MU_NODECLASS_OBJECT,
+     {14, s_str_Default_Binary},
+     {14, s_str_Default_Binary},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {76}}},
+    {{0, MU_NODEID_NUMERIC, {859}},
+     MU_NODECLASS_DATATYPE,
+     {32, s_str_ServerDiagnosticsSummaryDataType},
+     {32, s_str_ServerDiagnosticsSummaryDataType},
+     s_server_diagnostics_summary_data_type_refs,
+     sizeof(s_server_diagnostics_summary_data_type_refs) / sizeof(s_server_diagnostics_summary_data_type_refs[0]),
+     NULL,
+     .type_definition = {0}},
+    {{0, MU_NODEID_NUMERIC, {860}},
+     MU_NODECLASS_OBJECT,
+     {11, s_str_Default_XML},
+     {11, s_str_Default_XML},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {76}}},
+    {{0, MU_NODEID_NUMERIC, {861}},
+     MU_NODECLASS_OBJECT,
+     {14, s_str_Default_Binary},
+     {14, s_str_Default_Binary},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {76}}},
+    {{0, MU_NODEID_NUMERIC, {862}},
+     MU_NODECLASS_DATATYPE,
+     {20, s_str_ServerStatusDataType},
+     {20, s_str_ServerStatusDataType},
+     s_server_status_data_type_refs,
+     sizeof(s_server_status_data_type_refs) / sizeof(s_server_status_data_type_refs[0]),
+     NULL,
+     .type_definition = {0}},
+    {{0, MU_NODEID_NUMERIC, {863}},
+     MU_NODECLASS_OBJECT,
+     {11, s_str_Default_XML},
+     {11, s_str_Default_XML},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {76}}},
+    {{0, MU_NODEID_NUMERIC, {864}},
+     MU_NODECLASS_OBJECT,
+     {14, s_str_Default_Binary},
+     {14, s_str_Default_Binary},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {76}}},
+    {{0, MU_NODEID_NUMERIC, {865}},
+     MU_NODECLASS_DATATYPE,
+     {26, s_str_SessionDiagnosticsDataType},
+     {26, s_str_SessionDiagnosticsDataType},
+     s_session_diagnostics_data_type_refs,
+     sizeof(s_session_diagnostics_data_type_refs) / sizeof(s_session_diagnostics_data_type_refs[0]),
+     NULL,
+     .type_definition = {0}},
+    {{0, MU_NODEID_NUMERIC, {866}},
+     MU_NODECLASS_OBJECT,
+     {11, s_str_Default_XML},
+     {11, s_str_Default_XML},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {76}}},
+    {{0, MU_NODEID_NUMERIC, {867}},
+     MU_NODECLASS_OBJECT,
+     {14, s_str_Default_Binary},
+     {14, s_str_Default_Binary},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {76}}},
+    {{0, MU_NODEID_NUMERIC, {868}},
+     MU_NODECLASS_DATATYPE,
+     {34, s_str_SessionSecurityDiagnosticsDataType},
+     {34, s_str_SessionSecurityDiagnosticsDataType},
+     s_session_security_diagnostics_data_type_refs,
+     sizeof(s_session_security_diagnostics_data_type_refs) / sizeof(s_session_security_diagnostics_data_type_refs[0]),
+     NULL,
+     .type_definition = {0}},
+    {{0, MU_NODEID_NUMERIC, {869}},
+     MU_NODECLASS_OBJECT,
+     {11, s_str_Default_XML},
+     {11, s_str_Default_XML},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {76}}},
+    {{0, MU_NODEID_NUMERIC, {870}},
+     MU_NODECLASS_OBJECT,
+     {14, s_str_Default_Binary},
+     {14, s_str_Default_Binary},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {76}}},
+    {{0, MU_NODEID_NUMERIC, {871}},
+     MU_NODECLASS_DATATYPE,
+     {22, s_str_ServiceCounterDataType},
+     {22, s_str_ServiceCounterDataType},
+     s_service_counter_data_type_refs,
+     sizeof(s_service_counter_data_type_refs) / sizeof(s_service_counter_data_type_refs[0]),
+     NULL,
+     .type_definition = {0}},
+    {{0, MU_NODEID_NUMERIC, {872}},
+     MU_NODECLASS_OBJECT,
+     {11, s_str_Default_XML},
+     {11, s_str_Default_XML},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {76}}},
+    {{0, MU_NODEID_NUMERIC, {873}},
+     MU_NODECLASS_OBJECT,
+     {14, s_str_Default_Binary},
+     {14, s_str_Default_Binary},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {76}}},
+    {{0, MU_NODEID_NUMERIC, {874}},
+     MU_NODECLASS_DATATYPE,
+     {31, s_str_SubscriptionDiagnosticsDataType},
+     {31, s_str_SubscriptionDiagnosticsDataType},
+     s_subscription_diagnostics_data_type_refs,
+     sizeof(s_subscription_diagnostics_data_type_refs) / sizeof(s_subscription_diagnostics_data_type_refs[0]),
+     NULL,
+     .type_definition = {0}},
+    {{0, MU_NODEID_NUMERIC, {875}},
+     MU_NODECLASS_OBJECT,
+     {11, s_str_Default_XML},
+     {11, s_str_Default_XML},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {76}}},
+    {{0, MU_NODEID_NUMERIC, {876}},
+     MU_NODECLASS_OBJECT,
+     {14, s_str_Default_Binary},
+     {14, s_str_Default_Binary},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {76}}},
+#endif
     {{0, MU_NODEID_NUMERIC, {2004}},
      MU_NODECLASS_OBJECTTYPE,
      {10, s_str_ServerType},
@@ -1370,6 +1795,164 @@ static const mu_node_t s_base_nodes[] = {
      0,
      NULL,
      .type_definition = {0}},
+#if MUC_OPCUA_CU_BASE_INFO_SERVERTYPE
+    /* spec 083 (CU 3189): ServerType-tree ObjectTypes. Sorted between
+       ServerType(2004) and Server(2253). */
+    {{0, MU_NODEID_NUMERIC, {2013}},
+     MU_NODECLASS_OBJECTTYPE,
+     {22, s_str_ServerCapabilitiesType},
+     {22, s_str_ServerCapabilitiesType},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0}},
+    {{0, MU_NODEID_NUMERIC, {2020}},
+     MU_NODECLASS_OBJECTTYPE,
+     {21, s_str_ServerDiagnosticsType},
+     {21, s_str_ServerDiagnosticsType},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0}},
+    {{0, MU_NODEID_NUMERIC, {2026}},
+     MU_NODECLASS_OBJECTTYPE,
+     {30, s_str_SessionsDiagnosticsSummaryType},
+     {30, s_str_SessionsDiagnosticsSummaryType},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0}},
+    {{0, MU_NODEID_NUMERIC, {2029}},
+     MU_NODECLASS_OBJECTTYPE,
+     {28, s_str_SessionDiagnosticsObjectType},
+     {28, s_str_SessionDiagnosticsObjectType},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0}},
+    {{0, MU_NODEID_NUMERIC, {2033}},
+     MU_NODECLASS_OBJECTTYPE,
+     {20, s_str_VendorServerInfoType},
+     {20, s_str_VendorServerInfoType},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0}},
+    {{0, MU_NODEID_NUMERIC, {2034}},
+     MU_NODECLASS_OBJECTTYPE,
+     {20, s_str_ServerRedundancyType},
+     {20, s_str_ServerRedundancyType},
+     s_server_redundancy_type_refs,
+     sizeof(s_server_redundancy_type_refs) / sizeof(s_server_redundancy_type_refs[0]),
+     NULL,
+     .type_definition = {0}},
+    {{0, MU_NODEID_NUMERIC, {2036}},
+     MU_NODECLASS_OBJECTTYPE,
+     {25, s_str_TransparentRedundancyType},
+     {25, s_str_TransparentRedundancyType},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0}},
+    {{0, MU_NODEID_NUMERIC, {2039}},
+     MU_NODECLASS_OBJECTTYPE,
+     {28, s_str_NonTransparentRedundancyType},
+     {28, s_str_NonTransparentRedundancyType},
+     s_non_transparent_redundancy_type_refs,
+     sizeof(s_non_transparent_redundancy_type_refs) / sizeof(s_non_transparent_redundancy_type_refs[0]),
+     NULL,
+     .type_definition = {0}},
+    /* spec 083 (CU 3189): ServerType-tree VariableTypes. Sorted between
+       NonTransparentRedundancyType(2039) and Server(2253). */
+    {{0, MU_NODEID_NUMERIC, {2137}},
+     MU_NODECLASS_VARIABLETYPE,
+     {26, s_str_ServerVendorCapabilityType},
+     {26, s_str_ServerVendorCapabilityType},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0}},
+    {{0, MU_NODEID_NUMERIC, {2138}},
+     MU_NODECLASS_VARIABLETYPE,
+     {16, s_str_ServerStatusType},
+     {16, s_str_ServerStatusType},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0}},
+    {{0, MU_NODEID_NUMERIC, {2150}},
+     MU_NODECLASS_VARIABLETYPE,
+     {28, s_str_ServerDiagnosticsSummaryType},
+     {28, s_str_ServerDiagnosticsSummaryType},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0}},
+    {{0, MU_NODEID_NUMERIC, {2164}},
+     MU_NODECLASS_VARIABLETYPE,
+     {36, s_str_SamplingIntervalDiagnosticsArrayType},
+     {36, s_str_SamplingIntervalDiagnosticsArrayType},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0}},
+    {{0, MU_NODEID_NUMERIC, {2165}},
+     MU_NODECLASS_VARIABLETYPE,
+     {31, s_str_SamplingIntervalDiagnosticsType},
+     {31, s_str_SamplingIntervalDiagnosticsType},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0}},
+    {{0, MU_NODEID_NUMERIC, {2171}},
+     MU_NODECLASS_VARIABLETYPE,
+     {32, s_str_SubscriptionDiagnosticsArrayType},
+     {32, s_str_SubscriptionDiagnosticsArrayType},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0}},
+    {{0, MU_NODEID_NUMERIC, {2172}},
+     MU_NODECLASS_VARIABLETYPE,
+     {27, s_str_SubscriptionDiagnosticsType},
+     {27, s_str_SubscriptionDiagnosticsType},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0}},
+    {{0, MU_NODEID_NUMERIC, {2196}},
+     MU_NODECLASS_VARIABLETYPE,
+     {27, s_str_SessionDiagnosticsArrayType},
+     {27, s_str_SessionDiagnosticsArrayType},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0}},
+    {{0, MU_NODEID_NUMERIC, {2197}},
+     MU_NODECLASS_VARIABLETYPE,
+     {30, s_str_SessionDiagnosticsVariableType},
+     {30, s_str_SessionDiagnosticsVariableType},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0}},
+    {{0, MU_NODEID_NUMERIC, {2243}},
+     MU_NODECLASS_VARIABLETYPE,
+     {35, s_str_SessionSecurityDiagnosticsArrayType},
+     {35, s_str_SessionSecurityDiagnosticsArrayType},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0}},
+    {{0, MU_NODEID_NUMERIC, {2244}},
+     MU_NODECLASS_VARIABLETYPE,
+     {30, s_str_SessionSecurityDiagnosticsType},
+     {30, s_str_SessionSecurityDiagnosticsType},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0}},
+#endif
     {{0, MU_NODEID_NUMERIC, {2253}},
      MU_NODECLASS_OBJECT,
      {6, s_str_Server},
@@ -1567,6 +2150,18 @@ static const mu_node_t s_base_nodes[] = {
      NULL,
      .type_definition = {0, MU_NODEID_NUMERIC, {61}}},
 #endif
+#if MUC_OPCUA_CU_BASE_INFO_SERVERTYPE
+    /* spec 083 (CU 3189): BuildInfoType(3051, DataAccess-on copy). Sorts
+       after AggregateFunctions(2997) and before EnumValueType(7594). */
+    {{0, MU_NODEID_NUMERIC, {3051}},
+     MU_NODECLASS_VARIABLETYPE,
+     {13, s_str_BuildInfoType},
+     {13, s_str_BuildInfoType},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0}},
+#endif
 #if MUC_OPCUA_CU_BASE_INFO_BASE_TYPES
     /* CU 3188: EnumValueType(7594, subtype of Structure) + its Default XML(7616)/
        Default Binary(8251) Encoding Objects. Sorts after AggregateFunctions(2997)
@@ -1641,6 +2236,19 @@ static const mu_node_t s_base_nodes[] = {
      NULL,
      .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
 #endif /* MUC_OPCUA_CU_DATA_ACCESS */
+#if MUC_OPCUA_CU_BASE_INFO_SERVERTYPE && !MUC_OPCUA_CU_DATA_ACCESS
+    /* spec 083 (CU 3189): BuildInfoType(3051, DataAccess-off copy), mirroring
+       the in-DataAccess copy above. Sorts after AggregateFunctions(2997) and before
+       EnumValueType(7594). */
+    {{0, MU_NODEID_NUMERIC, {3051}},
+     MU_NODECLASS_VARIABLETYPE,
+     {13, s_str_BuildInfoType},
+     {13, s_str_BuildInfoType},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0}},
+#endif
 #if MUC_OPCUA_CU_BASE_INFO_BASE_TYPES && !MUC_OPCUA_CU_DATA_ACCESS
     /* CU 3188 (Data-Access-off variant): EnumValueType(7594) + its Encoding Objects,
        mirroring the in-DataAccess copy above. Sorted after AggregateFunctions(2997)
@@ -1775,6 +2383,51 @@ static const mu_node_t s_base_nodes[] = {
      NULL,
      .type_definition = {0, MU_NODEID_NUMERIC, {77}}},
 #endif
+#if MUC_OPCUA_CU_BASE_INFO_SERVERTYPE
+    /* spec 083 (CU 3189): OperationLimitsType/FileType/AddressSpaceFileType/
+       NamespaceMetadataType/NamespacesType. Sorted between MandatoryPlaceholder(11510)
+       and MaxArrayLength(11702). */
+    {{0, MU_NODEID_NUMERIC, {11564}},
+     MU_NODECLASS_OBJECTTYPE,
+     {19, s_str_OperationLimitsType},
+     {19, s_str_OperationLimitsType},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0}},
+    {{0, MU_NODEID_NUMERIC, {11575}},
+     MU_NODECLASS_OBJECTTYPE,
+     {8, s_str_FileType},
+     {8, s_str_FileType},
+     s_file_type_refs,
+     sizeof(s_file_type_refs) / sizeof(s_file_type_refs[0]),
+     NULL,
+     .type_definition = {0}},
+    {{0, MU_NODEID_NUMERIC, {11595}},
+     MU_NODECLASS_OBJECTTYPE,
+     {20, s_str_AddressSpaceFileType},
+     {20, s_str_AddressSpaceFileType},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0}},
+    {{0, MU_NODEID_NUMERIC, {11616}},
+     MU_NODECLASS_OBJECTTYPE,
+     {21, s_str_NamespaceMetadataType},
+     {21, s_str_NamespaceMetadataType},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0}},
+    {{0, MU_NODEID_NUMERIC, {11645}},
+     MU_NODECLASS_OBJECTTYPE,
+     {14, s_str_NamespacesType},
+     {14, s_str_NamespacesType},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0}},
+#endif
     /* Spec 057: MaxArrayLength/MaxStringLength — sorted slots before 11704. */
     {{0, MU_NODEID_NUMERIC, {11702}},
      MU_NODECLASS_VARIABLE,
@@ -1834,6 +2487,69 @@ static const mu_node_t s_base_nodes[] = {
      sizeof(s_property_type_ref) / sizeof(s_property_type_ref[0]),
      &s_max_monitored_items_per_call_value,
      .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+#if MUC_OPCUA_CU_BASE_INFO_SERVERTYPE
+    /* spec 083 (CU 3189): EndpointUrlListDataType/NetworkGroupDataType
+       (subtypes of Structure 22) + their Default XML/Binary Encoding Objects.
+       Sorted between MaxMonitoredItemsPerCall(11714) and Union(12756). */
+    {{0, MU_NODEID_NUMERIC, {11943}},
+     MU_NODECLASS_DATATYPE,
+     {23, s_str_EndpointUrlListDataType},
+     {23, s_str_EndpointUrlListDataType},
+     s_endpoint_url_list_data_type_refs,
+     sizeof(s_endpoint_url_list_data_type_refs) / sizeof(s_endpoint_url_list_data_type_refs[0]),
+     NULL,
+     .type_definition = {0}},
+    {{0, MU_NODEID_NUMERIC, {11944}},
+     MU_NODECLASS_DATATYPE,
+     {20, s_str_NetworkGroupDataType},
+     {20, s_str_NetworkGroupDataType},
+     s_network_group_data_type_refs,
+     sizeof(s_network_group_data_type_refs) / sizeof(s_network_group_data_type_refs[0]),
+     NULL,
+     .type_definition = {0}},
+    /* spec 083 (CU 3189): NonTransparentNetworkRedundancyType. Sorted between
+       NetworkGroupDataType(11944) and Default_XML(11949). */
+    {{0, MU_NODEID_NUMERIC, {11945}},
+     MU_NODECLASS_OBJECTTYPE,
+     {35, s_str_NonTransparentNetworkRedundancyType},
+     {35, s_str_NonTransparentNetworkRedundancyType},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0}},
+    {{0, MU_NODEID_NUMERIC, {11949}},
+     MU_NODECLASS_OBJECT,
+     {11, s_str_Default_XML},
+     {11, s_str_Default_XML},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {76}}},
+    {{0, MU_NODEID_NUMERIC, {11950}},
+     MU_NODECLASS_OBJECT,
+     {11, s_str_Default_XML},
+     {11, s_str_Default_XML},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {76}}},
+    {{0, MU_NODEID_NUMERIC, {11957}},
+     MU_NODECLASS_OBJECT,
+     {14, s_str_Default_Binary},
+     {14, s_str_Default_Binary},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {76}}},
+    {{0, MU_NODEID_NUMERIC, {11958}},
+     MU_NODECLASS_OBJECT,
+     {14, s_str_Default_Binary},
+     {14, s_str_Default_Binary},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {76}}},
+#endif
 #if MUC_OPCUA_CU_BASE_INFO_BASE_TYPES
     /* CU 3188: Union(12756) abstract DataType (subtype of Structure). Sorted between
        MaxMonitoredItemsPerCall(11714) and ResendData(12873). */
