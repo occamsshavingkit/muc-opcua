@@ -73,6 +73,15 @@ typedef struct {
     /* EventNotifier attribute (OPC-10000-3 §5.4.6). Bits: 0=SubscribeToEvents, 1=HistoryRead.
      * Zero means the node does not support event subscriptions. */
     opcua_byte_t event_notifier;
+    /* ValueRank attribute (OPC-10000-3 §5.6.2): -1 Scalar, 1 OneDimension, etc.
+       Only consulted when data_type != 0. Placed next to event_notifier so the
+       two single-byte fields pack together. */
+    opcua_sbyte_t value_rank;
+
+    /* True DataType attribute (OPC-10000-3 §5.6.2): ns0 numeric DataType NodeId,
+       e.g. 12=String, 13=DateTime, 862=ServerStatusDataType. 0 = unset -> the read
+       path falls back to legacy behavior. Populated per-node where accuracy matters. */
+    opcua_uint32_t data_type;
 } mu_node_t;
 
 typedef struct mu_address_space mu_address_space_t;
