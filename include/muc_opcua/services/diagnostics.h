@@ -14,6 +14,7 @@
 
 /* ServerStatusDataType source (OPC-10000-5 §12.10). CurrentTime is filled live
    by the read callback; identity/build fields are set by the caller at init. */
+/* cppcheck-suppress misra-c2012-2.4 ; typedef consumed cross-TU (encoder + base_nodes) */
 typedef struct {
     opcua_datetime_t start_time;
     opcua_datetime_t current_time; /* filled by the read callback via the time adapter */
@@ -24,6 +25,7 @@ typedef struct {
     mu_string_t software_version;
     mu_string_t build_number;
     opcua_datetime_t build_date;
+    /* cppcheck-suppress unusedStructMember ; read cross-TU in base_nodes.c status callback */
     const mu_time_adapter_t *time; /* CurrentTime source; used only by the read callback */
 } mu_server_status_t;
 

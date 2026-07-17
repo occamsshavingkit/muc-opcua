@@ -9,6 +9,7 @@
 
 #include "muc_opcua/config.h"
 #include "muc_opcua/opcua_types.h"
+#include "muc_opcua/services/diagnostics.h" /* mu_server_status_t (ServerStatus writer) */
 #include "muc_opcua/status.h"
 #include "muc_opcua/types.h"
 #include <stddef.h>
@@ -79,8 +80,6 @@ opcua_statuscode_t mu_binary_skip_extension_object(mu_binary_reader_t *reader);
 
 opcua_statuscode_t mu_binary_read_variant(mu_binary_reader_t *reader, mu_variant_t *value);
 opcua_statuscode_t mu_binary_write_variant(mu_binary_writer_t *writer, const mu_variant_t *value);
-
-#include "muc_opcua/services/diagnostics.h" /* mu_server_status_t (unconditional) */
 
 #if MUC_OPCUA_SERVER_DIAGNOSTICS
 /* Encode ServerDiagnosticsSummaryDataType (i=859) as an ExtensionObject
