@@ -1,3 +1,4 @@
+<!-- markdownlint-disable MD013 -->
 # muc-opcua
 
 **A freestanding C11, zero-heap OPC UA server for small microcontrollers.**
