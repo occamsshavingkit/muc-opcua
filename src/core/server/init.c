@@ -204,6 +204,20 @@ opcua_statuscode_t mu_server_init(void *storage, size_t storage_size, const mu_s
                              &server->diag
 #endif
         );
+        /* ServerStatus.BuildInfo identity (spec 084): populate from config where cheaply
+           available. Manufacturer/software-version/build-number stay empty strings
+           (valid per OPC-10000-5 §12.3.15) -- the goal is a decodable
+           ServerStatusDataType, identity is a bonus. */
+        if (server->config.product_uri != NULL) {
+            server->runtime_base.server_status.product_uri =
+                (mu_string_t){mu_safe_int32_from_size_t(strlen(server->config.product_uri)),
+                              (const opcua_byte_t *)server->config.product_uri};
+        }
+        if (server->config.application_name != NULL) {
+            server->runtime_base.server_status.product_name =
+                (mu_string_t){mu_safe_int32_from_size_t(strlen(server->config.application_name)),
+                              (const opcua_byte_t *)server->config.application_name};
+        }
     }
     server->is_running = true;
 

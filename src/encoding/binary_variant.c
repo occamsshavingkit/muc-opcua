@@ -349,14 +349,23 @@ opcua_statuscode_t mu_binary_write_variant(mu_binary_writer_t *writer, const mu_
         return MU_STATUS_GOOD;
     }
 
-#if MUC_OPCUA_CU_BASE_INFO_DIAGNOSTICS
     if (variant->type == MU_TYPE_EXTENSIONOBJECT) {
-        /* The only scalar ExtensionObject Value this server encodes is the Base Server
-           Behaviour facet's ServerDiagnosticsSummary (spec 064); value.array holds a
-           const mu_diagnostics_summary_t* (OPC-10000-5 §12.9). */
-        return mu_binary_write_server_diagnostics_summary(writer,
-                                                          (const mu_diagnostics_summary_t *)variant->value.array);
-    }
+        /* Scalar ExtensionObject Values are dispatched by ext_encoding_id (the
+           DataType's DefaultBinary Encoding NodeId, ns0) to the right struct
+           writer, since value.array's pointee type depends on which struct it is. */
+#if MUC_OPCUA_CU_BASE_INFO_DIAGNOSTICS
+        if (variant->ext_encoding_id == 861u) {
+            /* Base Server Behaviour facet's ServerDiagnosticsSummary (spec 064);
+               value.array holds a const mu_diagnostics_summary_t* (OPC-10000-5 §12.9). */
+            return mu_binary_write_server_diagnostics_summary(writer,
+                                                              (const mu_diagnostics_summary_t *)variant->value.array);
+        }
 #endif
+        if (variant->ext_encoding_id == 864u) {
+            /* Core 2022 Server Facet's ServerStatus (spec 084); value.array holds a
+               const mu_server_status_t* (OPC-10000-5 §12.10). */
+            return mu_binary_write_server_status(writer, (const mu_server_status_t *)variant->value.array);
+        }
+    }
     return write_scalar_value(writer, variant->type, &variant->value);
 }

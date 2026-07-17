@@ -258,3 +258,48 @@ opcua_statuscode_t mu_binary_write_server_diagnostics_summary(mu_binary_writer_t
     return MU_STATUS_GOOD;
 }
 #endif
+
+opcua_statuscode_t mu_binary_write_server_status(mu_binary_writer_t *writer, const mu_server_status_t *status) {
+    if (!writer || !status) {
+        return MU_STATUS_BAD_INTERNALERROR;
+    }
+    /* ServerStatusDataType (OPC-10000-5 §12.10) body, exact field order:
+       StartTime, CurrentTime, State, BuildInfo (nested inline, §12.3.15:
+       ProductUri, ManufacturerName, ProductName, SoftwareVersion, BuildNumber,
+       BuildDate), SecondsTillShutdown, ShutdownReason. Wrapped as an
+       ExtensionObject with Encoding DefaultBinary = ns0 i=864. Core 2022 Server
+       Facet always provides ServerStatus, so this writer is unconditional. */
+    opcua_byte_t body[256];
+    mu_binary_writer_t bw;
+    mu_binary_writer_init(&bw, body, sizeof(body));
+    (void)mu_binary_write_int64(&bw, status->start_time);
+    (void)mu_binary_write_int64(&bw, status->current_time);
+    (void)mu_binary_write_int32(&bw, status->state);
+    /* BuildInfo (nested structure, encoded inline -- not a nested ExtensionObject). */
+    (void)mu_binary_write_string(&bw, &status->product_uri);
+    (void)mu_binary_write_string(&bw, &status->manufacturer_name);
+    (void)mu_binary_write_string(&bw, &status->product_name);
+    (void)mu_binary_write_string(&bw, &status->software_version);
+    (void)mu_binary_write_string(&bw, &status->build_number);
+    (void)mu_binary_write_int64(&bw, status->build_date);
+    (void)mu_binary_write_uint32(&bw, 0u); /* SecondsTillShutdown */
+    /* ShutdownReason: empty LocalizedText. Written inline (mask byte 0, no fields
+       present) rather than via mu_binary_write_localized_text, which is gated
+       under MUC_OPCUA_CU_DATA_ACCESS and not available on every profile. */
+    (void)mu_binary_write_byte(&bw, 0u);
+    if (bw.status != MU_STATUS_GOOD) {
+        return bw.status;
+    }
+
+    mu_nodeid_t status_type_id = {0, MU_NODEID_NUMERIC, {864u}};
+    opcua_statuscode_t status_s = mu_binary_write_extension_object_header(writer, &status_type_id, bw.position);
+    if (status_s != MU_STATUS_GOOD) {
+        return status_s;
+    }
+    if (writer->position + bw.position > writer->length) {
+        return MU_STATUS_BAD_OUTOFMEMORY;
+    }
+    (void)memcpy(writer->buffer + writer->position, body, bw.position);
+    writer->position += bw.position;
+    return MU_STATUS_GOOD;
+}

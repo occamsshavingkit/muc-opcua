@@ -8,7 +8,24 @@
 
 #include "muc_opcua/config.h"
 #include "muc_opcua/opcua_types.h"
+#include "muc_opcua/platform.h"
+#include "muc_opcua/types.h"
 #include <stdbool.h>
+
+/* ServerStatusDataType source (OPC-10000-5 §12.10). CurrentTime is filled live
+   by the read callback; identity/build fields are set by the caller at init. */
+typedef struct {
+    opcua_datetime_t start_time;
+    opcua_datetime_t current_time; /* filled by the read callback via the time adapter */
+    opcua_int32_t state;           /* ServerState enum, 0 = Running */
+    mu_string_t product_uri;
+    mu_string_t manufacturer_name;
+    mu_string_t product_name;
+    mu_string_t software_version;
+    mu_string_t build_number;
+    opcua_datetime_t build_date;
+    const mu_time_adapter_t *time; /* CurrentTime source; used only by the read callback */
+} mu_server_status_t;
 
 #if MUC_OPCUA_SERVER_DIAGNOSTICS
 
