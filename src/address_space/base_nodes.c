@@ -63,7 +63,12 @@ static const opcua_byte_t s_str_Double[] = "Double";
 #ifdef MUC_OPCUA_CU_BASE_INFO_ENGINEERING_UNITS
 static const opcua_byte_t s_str_EUInformation[] = "EUInformation";
 #endif
-#ifdef MUC_OPCUA_CU_BASE_INFO_ESTIMATED_RETURN_TIME
+#if defined(MUC_OPCUA_CU_BASE_INFO_ESTIMATED_RETURN_TIME) || MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+/* spec 085 (CU 5801) Task 4: also needed for ServerType.EstimatedReturnTime
+   (12882), the ObjectType-level InstanceDeclaration, which per the CU 5801
+   Kconfig help text must exist "even if ... not used in any instance of the
+   Server" -- i.e. independent of whether ESTIMATED_RETURN_TIME's own
+   Server-instance Variable(12885) is compiled in. */
 static const opcua_byte_t s_str_EstimatedReturnTime[] = "EstimatedReturnTime";
 #endif
 static const opcua_byte_t s_str_Float[] = "Float";
@@ -93,7 +98,11 @@ static const opcua_byte_t s_str_LocaleIdArray[] = "LocaleIdArray";
 #ifdef MUC_OPCUA_CU_BASE_INFO_LOCATIONS_OBJECT
 static const opcua_byte_t s_str_Locations[] = "Locations";
 #endif
-#if MUC_OPCUA_CU_BASE_INFO_LOCALTIME
+#if MUC_OPCUA_CU_BASE_INFO_LOCALTIME || MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+/* spec 085 (CU 5801) Task 4: also needed for ServerType.LocalTime (17612),
+   the ObjectType-level InstanceDeclaration -- see the EstimatedReturnTime
+   comment above for the rationale (independent of the LOCALTIME facet's own
+   Server-instance Variable(17634)). */
 static const opcua_byte_t s_str_LocalTime[] = "LocalTime";
 #endif
 static const opcua_byte_t s_str_LocalizedText[] = "LocalizedText";
@@ -245,6 +254,27 @@ static const opcua_byte_t s_str_CurrentSubscriptionCount[] = "CurrentSubscriptio
 static const opcua_byte_t s_str_CumulatedSubscriptionCount[] = "CumulatedSubscriptionCount";
 static const opcua_byte_t s_str_SecurityRejectedRequestsCount[] = "SecurityRejectedRequestsCount";
 static const opcua_byte_t s_str_RejectedRequestsCount[] = "RejectedRequestsCount";
+/* spec 085 (CU 5801) Task 4: BrowseNames for the ServerCapabilitiesType/
+   ServerType own InstanceDeclarations not already declared above/elsewhere. */
+static const opcua_byte_t s_str_MinSupportedSampleRate[] = "MinSupportedSampleRate";
+static const opcua_byte_t s_str_MaxBrowseContinuationPoints[] = "MaxBrowseContinuationPoints";
+static const opcua_byte_t s_str_MaxQueryContinuationPoints[] = "MaxQueryContinuationPoints";
+static const opcua_byte_t s_str_MaxHistoryContinuationPoints[] = "MaxHistoryContinuationPoints";
+static const opcua_byte_t s_str_MaxLogObjectContinuationPoints[] = "MaxLogObjectContinuationPoints";
+static const opcua_byte_t s_str_SoftwareCertificates[] = "SoftwareCertificates";
+static const opcua_byte_t s_str_MaxByteStringLength[] = "MaxByteStringLength";
+static const opcua_byte_t s_str_ModellingRules[] = "ModellingRules";
+static const opcua_byte_t s_str_MaxSessions[] = "MaxSessions";
+static const opcua_byte_t s_str_MaxSelectClauseParameters[] = "MaxSelectClauseParameters";
+static const opcua_byte_t s_str_MaxWhereClauseParameters[] = "MaxWhereClauseParameters";
+static const opcua_byte_t s_str_VendorCapability_Placeholder[] = "<VendorCapability>";
+static const opcua_byte_t s_str_ConformanceUnits[] = "ConformanceUnits";
+static const opcua_byte_t s_str_UrisVersion[] = "UrisVersion";
+static const opcua_byte_t s_str_Auditing[] = "Auditing";
+static const opcua_byte_t s_str_ServerDiagnostics[] = "ServerDiagnostics";
+static const opcua_byte_t s_str_VendorServerInfo[] = "VendorServerInfo";
+static const opcua_byte_t s_str_SetSubscriptionDurable[] = "SetSubscriptionDurable";
+static const opcua_byte_t s_str_RequestServerStateChange[] = "RequestServerStateChange";
 #endif
 #endif
 #if MUC_OPCUA_CU_BASE_INFO_LOCALTIME
@@ -693,6 +723,141 @@ static const mu_reference_t s_server_diagnostics_summary_type_refs[] = {
     {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {2161}}, true},
     {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {2162}}, true},
     {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {2163}}, true}};
+
+/* spec 085 (CU 5801) Task 4: shared HasModellingRule(37)->Mandatory(78)/
+   Optional(80) plus HasTypeDefinition(40) forward refs for the
+   ServerCapabilitiesType(2013)/ServerType(2004) own Property/Object/Method
+   InstanceDeclarations (OPC-10000-5 §6.3.2, §6.3.1). One array per distinct
+   (ModellingRule, TypeDefinition) combination, reused across both owner types
+   where the combination matches. */
+static const mu_reference_t s_mandatory_property_refs[] = {
+    {{0, MU_NODEID_NUMERIC, {37}}, {0, MU_NODEID_NUMERIC, {78}}, true},
+    {{0, MU_NODEID_NUMERIC, {40}}, {0, MU_NODEID_NUMERIC, {68}}, true}};
+
+static const mu_reference_t s_optional_property_refs[] = {
+    {{0, MU_NODEID_NUMERIC, {37}}, {0, MU_NODEID_NUMERIC, {80}}, true},
+    {{0, MU_NODEID_NUMERIC, {40}}, {0, MU_NODEID_NUMERIC, {68}}, true}};
+
+/* ServerCapabilitiesType.OperationLimits(11551): Optional, TypeDefinition
+   OperationLimitsType(11564). */
+static const mu_reference_t s_optional_operationlimitstype_refs[] = {
+    {{0, MU_NODEID_NUMERIC, {37}}, {0, MU_NODEID_NUMERIC, {80}}, true},
+    {{0, MU_NODEID_NUMERIC, {40}}, {0, MU_NODEID_NUMERIC, {11564}}, true}};
+
+/* ServerCapabilitiesType.ModellingRules(2019)/AggregateFunctions(2754):
+   Mandatory, TypeDefinition FolderType(61). */
+static const mu_reference_t s_mandatory_foldertype_refs[] = {
+    {{0, MU_NODEID_NUMERIC, {37}}, {0, MU_NODEID_NUMERIC, {78}}, true},
+    {{0, MU_NODEID_NUMERIC, {40}}, {0, MU_NODEID_NUMERIC, {61}}, true}};
+
+/* ServerCapabilitiesType.<VendorCapability>(11562): OptionalPlaceholder(11508)
+   (not the plain Optional(80) rule -- this is a placeholder BrowseName slot,
+   OPC-10000-5 §6.3.2 Table 10), TypeDefinition ServerVendorCapabilityType(2137).
+   NodeClass is Variable per NodeIds.csv (one WebFetch pass of the spec table
+   mislabeled it Object; the CSV is authoritative). */
+static const mu_reference_t s_optionalplaceholder_vendorcapability_refs[] = {
+    {{0, MU_NODEID_NUMERIC, {37}}, {0, MU_NODEID_NUMERIC, {11508}}, true},
+    {{0, MU_NODEID_NUMERIC, {40}}, {0, MU_NODEID_NUMERIC, {2137}}, true}};
+
+/* ServerType.ServerStatus(2007): Mandatory, TypeDefinition ServerStatusType(2138). */
+static const mu_reference_t s_mandatory_serverstatustype_refs[] = {
+    {{0, MU_NODEID_NUMERIC, {37}}, {0, MU_NODEID_NUMERIC, {78}}, true},
+    {{0, MU_NODEID_NUMERIC, {40}}, {0, MU_NODEID_NUMERIC, {2138}}, true}};
+
+/* ServerType.ServerCapabilities(2009): Mandatory, TypeDefinition
+   ServerCapabilitiesType(2013). */
+static const mu_reference_t s_mandatory_servercapabilitiestype_refs[] = {
+    {{0, MU_NODEID_NUMERIC, {37}}, {0, MU_NODEID_NUMERIC, {78}}, true},
+    {{0, MU_NODEID_NUMERIC, {40}}, {0, MU_NODEID_NUMERIC, {2013}}, true}};
+
+/* ServerType.ServerDiagnostics(2010): Mandatory, TypeDefinition
+   ServerDiagnosticsType(2020). */
+static const mu_reference_t s_mandatory_serverdiagnosticstype_refs[] = {
+    {{0, MU_NODEID_NUMERIC, {37}}, {0, MU_NODEID_NUMERIC, {78}}, true},
+    {{0, MU_NODEID_NUMERIC, {40}}, {0, MU_NODEID_NUMERIC, {2020}}, true}};
+
+/* ServerType.VendorServerInfo(2011): Mandatory, TypeDefinition
+   VendorServerInfoType(2033). */
+static const mu_reference_t s_mandatory_vendorserverinfotype_refs[] = {
+    {{0, MU_NODEID_NUMERIC, {37}}, {0, MU_NODEID_NUMERIC, {78}}, true},
+    {{0, MU_NODEID_NUMERIC, {40}}, {0, MU_NODEID_NUMERIC, {2033}}, true}};
+
+/* ServerType.ServerRedundancy(2012): Mandatory, TypeDefinition
+   ServerRedundancyType(2034). */
+static const mu_reference_t s_mandatory_serverredundancytype_refs[] = {
+    {{0, MU_NODEID_NUMERIC, {37}}, {0, MU_NODEID_NUMERIC, {78}}, true},
+    {{0, MU_NODEID_NUMERIC, {40}}, {0, MU_NODEID_NUMERIC, {2034}}, true}};
+
+/* ServerType.Namespaces(11527): Optional, TypeDefinition NamespacesType(11645). */
+static const mu_reference_t s_optional_namespacestype_refs[] = {
+    {{0, MU_NODEID_NUMERIC, {37}}, {0, MU_NODEID_NUMERIC, {80}}, true},
+    {{0, MU_NODEID_NUMERIC, {40}}, {0, MU_NODEID_NUMERIC, {11645}}, true}};
+
+/* ServerType's 4 Optional built-in Methods (GetMonitoredItems(11489)/
+   ResendData(12871)/SetSubscriptionDurable(12746)/
+   RequestServerStateChange(12883)): Methods carry no HasTypeDefinition
+   (OPC-10000-3 -- Methods aren't typed), just the HasModellingRule(37)->
+   Optional(80) edge. Per the CU 5801 Kconfig help text, InstanceDeclarations
+   (including Optional ones) must be provided "even if ... not used in any
+   instance of the Server", so these are unconditional here -- not gated by
+   MUC_OPCUA_CU_SUBSCRIPTION_STANDARD (which only governs the separate
+   Server-instance Method nodes, e.g. 11492). InputArguments/OutputArguments
+   (one level below each Method) are out of this core slice's scope. */
+static const mu_reference_t s_optional_method_refs[] = {
+    {{0, MU_NODEID_NUMERIC, {37}}, {0, MU_NODEID_NUMERIC, {80}}, true}};
+
+/* ServerCapabilitiesType(2013) HasProperty(46)/HasComponent(47) -> its 24 own
+   declarations (OPC-10000-5 §6.3.2 Table 10). RoleSet(16295) is dropped: its
+   TypeDefinition RoleSetType(15607) doesn't exist yet in this address space
+   (deferred to the role-based security slice). */
+static const mu_reference_t s_server_capabilities_type_refs[] = {
+    {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {2014}}, true},  /* ServerProfileArray */
+    {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {2016}}, true},  /* LocaleIdArray */
+    {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {2017}}, true},  /* MinSupportedSampleRate */
+    {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {2732}}, true},  /* MaxBrowseContinuationPoints */
+    {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {2733}}, true},  /* MaxQueryContinuationPoints */
+    {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {2734}}, true},  /* MaxHistoryContinuationPoints */
+    {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {19809}}, true}, /* MaxLogObjectContinuationPoints */
+    {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {3049}}, true},  /* SoftwareCertificates */
+    {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {11549}}, true}, /* MaxArrayLength */
+    {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {11550}}, true}, /* MaxStringLength */
+    {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {12910}}, true}, /* MaxByteStringLength */
+    {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {11551}}, true}, /* OperationLimits */
+    {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {2019}}, true},  /* ModellingRules */
+    {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {2754}}, true},  /* AggregateFunctions */
+    {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {24088}}, true}, /* MaxSessions */
+    {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {24089}}, true}, /* MaxSubscriptions */
+    {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {24090}}, true}, /* MaxMonitoredItems */
+    {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {24091}}, true}, /* MaxSubscriptionsPerSession */
+    {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {24103}}, true}, /* MaxMonitoredItemsPerSubscription */
+    {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {24092}}, true}, /* MaxSelectClauseParameters */
+    {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {24093}}, true}, /* MaxWhereClauseParameters */
+    {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {31770}}, true}, /* MaxMonitoredItemsQueueSize */
+    {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {11562}}, true}, /* <VendorCapability> */
+    {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {24094}}, true}  /* ConformanceUnits */
+};
+
+/* ServerType(2004) HasProperty(46)/HasComponent(47) -> its 17 direct children
+   (OPC-10000-5 §6.3.1 table). */
+static const mu_reference_t s_server_type_refs[] = {
+    {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {2005}}, true},  /* ServerArray */
+    {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {2006}}, true},  /* NamespaceArray */
+    {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {15003}}, true}, /* UrisVersion */
+    {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {2007}}, true},  /* ServerStatus */
+    {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {2008}}, true},  /* ServiceLevel */
+    {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {2742}}, true},  /* Auditing */
+    {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {12882}}, true}, /* EstimatedReturnTime */
+    {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {17612}}, true}, /* LocalTime */
+    {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {2009}}, true},  /* ServerCapabilities */
+    {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {2010}}, true},  /* ServerDiagnostics */
+    {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {2011}}, true},  /* VendorServerInfo */
+    {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {2012}}, true},  /* ServerRedundancy */
+    {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {11527}}, true}, /* Namespaces */
+    {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {11489}}, true}, /* GetMonitoredItems */
+    {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {12871}}, true}, /* ResendData */
+    {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {12746}}, true}, /* SetSubscriptionDurable */
+    {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {12883}}, true}  /* RequestServerStateChange */
+};
 #endif
 
 #if MUC_OPCUA_CU_BASE_INFO_ARGUMENT_TYPE
@@ -1875,10 +2040,88 @@ static const mu_node_t s_base_nodes[] = {
      MU_NODECLASS_OBJECTTYPE,
      {10, s_str_ServerType},
      {10, s_str_ServerType},
+#if MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+     s_server_type_refs,
+     sizeof(s_server_type_refs) / sizeof(s_server_type_refs[0]),
+#else
      NULL,
      0,
+#endif
      NULL,
      .type_definition = {0}},
+#if MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+    /* spec 085 (CU 5801) Task 4: ServerType(2004) direct children
+       ServerArray/NamespaceArray/ServerStatus/ServiceLevel/ServerCapabilities/
+       ServerDiagnostics/VendorServerInfo/ServerRedundancy (OPC-10000-5 §6.3.1
+       table). Sorted between ServerType(2004) and ServerCapabilitiesType(2013);
+       the remaining ServerType children (UrisVersion, Auditing,
+       EstimatedReturnTime, LocalTime, Namespaces, and the 4 built-in Methods)
+       sort elsewhere -- see s_server_type_refs above for the full 17-node list. */
+    {{0, MU_NODEID_NUMERIC, {2005}},
+     MU_NODECLASS_VARIABLE,
+     {11, s_str_ServerArray},
+     {11, s_str_ServerArray},
+     s_mandatory_property_refs,
+     sizeof(s_mandatory_property_refs) / sizeof(s_mandatory_property_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+    {{0, MU_NODEID_NUMERIC, {2006}},
+     MU_NODECLASS_VARIABLE,
+     {14, s_str_NamespaceArray},
+     {14, s_str_NamespaceArray},
+     s_mandatory_property_refs,
+     sizeof(s_mandatory_property_refs) / sizeof(s_mandatory_property_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+    {{0, MU_NODEID_NUMERIC, {2007}},
+     MU_NODECLASS_VARIABLE,
+     {12, s_str_ServerStatus},
+     {12, s_str_ServerStatus},
+     s_mandatory_serverstatustype_refs,
+     sizeof(s_mandatory_serverstatustype_refs) / sizeof(s_mandatory_serverstatustype_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {2138}}},
+    {{0, MU_NODEID_NUMERIC, {2008}},
+     MU_NODECLASS_VARIABLE,
+     {12, s_str_ServiceLevel},
+     {12, s_str_ServiceLevel},
+     s_mandatory_property_refs,
+     sizeof(s_mandatory_property_refs) / sizeof(s_mandatory_property_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+    {{0, MU_NODEID_NUMERIC, {2009}},
+     MU_NODECLASS_OBJECT,
+     {18, s_str_ServerCapabilities},
+     {18, s_str_ServerCapabilities},
+     s_mandatory_servercapabilitiestype_refs,
+     sizeof(s_mandatory_servercapabilitiestype_refs) / sizeof(s_mandatory_servercapabilitiestype_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {2013}}},
+    {{0, MU_NODEID_NUMERIC, {2010}},
+     MU_NODECLASS_OBJECT,
+     {17, s_str_ServerDiagnostics},
+     {17, s_str_ServerDiagnostics},
+     s_mandatory_serverdiagnosticstype_refs,
+     sizeof(s_mandatory_serverdiagnosticstype_refs) / sizeof(s_mandatory_serverdiagnosticstype_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {2020}}},
+    {{0, MU_NODEID_NUMERIC, {2011}},
+     MU_NODECLASS_OBJECT,
+     {16, s_str_VendorServerInfo},
+     {16, s_str_VendorServerInfo},
+     s_mandatory_vendorserverinfotype_refs,
+     sizeof(s_mandatory_vendorserverinfotype_refs) / sizeof(s_mandatory_vendorserverinfotype_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {2033}}},
+    {{0, MU_NODEID_NUMERIC, {2012}},
+     MU_NODECLASS_OBJECT,
+     {16, s_str_ServerRedundancy},
+     {16, s_str_ServerRedundancy},
+     s_mandatory_serverredundancytype_refs,
+     sizeof(s_mandatory_serverredundancytype_refs) / sizeof(s_mandatory_serverredundancytype_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {2034}}},
+#endif
 #if MUC_OPCUA_CU_BASE_INFO_SERVERTYPE
     /* spec 083 (CU 3189): ServerType-tree ObjectTypes. Sorted between
        ServerType(2004) and Server(2253). */
@@ -1886,10 +2129,56 @@ static const mu_node_t s_base_nodes[] = {
      MU_NODECLASS_OBJECTTYPE,
      {22, s_str_ServerCapabilitiesType},
      {22, s_str_ServerCapabilitiesType},
+#if MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+     s_server_capabilities_type_refs,
+     sizeof(s_server_capabilities_type_refs) / sizeof(s_server_capabilities_type_refs[0]),
+#else
      NULL,
      0,
+#endif
      NULL,
      .type_definition = {0}},
+#if MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+    /* spec 085 (CU 5801) Task 4: ServerCapabilitiesType(2013) own declarations
+       ServerProfileArray/LocaleIdArray/MinSupportedSampleRate/ModellingRules
+       (OPC-10000-5 §6.3.2 Table 10). Sorted between ServerCapabilitiesType(2013)
+       and ServerDiagnosticsType(2020); the remaining ServerCapabilitiesType
+       declarations sort elsewhere (dual-placed around the DataAccess block, or
+       above NodeId 11461) -- see s_server_capabilities_type_refs above for the
+       full 24-node list. */
+    {{0, MU_NODEID_NUMERIC, {2014}},
+     MU_NODECLASS_VARIABLE,
+     {18, s_str_ServerProfileArray},
+     {18, s_str_ServerProfileArray},
+     s_mandatory_property_refs,
+     sizeof(s_mandatory_property_refs) / sizeof(s_mandatory_property_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+    {{0, MU_NODEID_NUMERIC, {2016}},
+     MU_NODECLASS_VARIABLE,
+     {13, s_str_LocaleIdArray},
+     {13, s_str_LocaleIdArray},
+     s_mandatory_property_refs,
+     sizeof(s_mandatory_property_refs) / sizeof(s_mandatory_property_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+    {{0, MU_NODEID_NUMERIC, {2017}},
+     MU_NODECLASS_VARIABLE,
+     {22, s_str_MinSupportedSampleRate},
+     {22, s_str_MinSupportedSampleRate},
+     s_mandatory_property_refs,
+     sizeof(s_mandatory_property_refs) / sizeof(s_mandatory_property_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+    {{0, MU_NODEID_NUMERIC, {2019}},
+     MU_NODECLASS_OBJECT,
+     {14, s_str_ModellingRules},
+     {14, s_str_ModellingRules},
+     s_mandatory_foldertype_refs,
+     sizeof(s_mandatory_foldertype_refs) / sizeof(s_mandatory_foldertype_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {61}}},
+#endif
     {{0, MU_NODEID_NUMERIC, {2020}},
      MU_NODECLASS_OBJECTTYPE,
      {21, s_str_ServerDiagnosticsType},
@@ -2255,7 +2544,44 @@ static const mu_node_t s_base_nodes[] = {
     /* spec 085 (CU 5801): ServerStatusType(2138) own declarations
        SecondsTillShutdown/ShutdownReason (DataAccess-off copy), mirroring the
        in-DataAccess copy above (after EnumStrings(2377) there). Sorts after
-       LocaleIdArray(2271) and before AggregateFunctions(2997). */
+       LocaleIdArray(2271) and before AggregateFunctions(2997). Task 4 adds
+       three ServerCapabilitiesType properties (MaxBrowseContinuationPoints/
+       MaxQueryContinuationPoints/MaxHistoryContinuationPoints) and one
+       ServerType property (Auditing) that also fall inside the 2365..11461
+       DataAccess block, so they're dual-placed here too -- see the
+       DataAccess-on copies below (after EnumStrings(2377) there). */
+    {{0, MU_NODEID_NUMERIC, {2732}},
+     MU_NODECLASS_VARIABLE,
+     {27, s_str_MaxBrowseContinuationPoints},
+     {27, s_str_MaxBrowseContinuationPoints},
+     s_mandatory_property_refs,
+     sizeof(s_mandatory_property_refs) / sizeof(s_mandatory_property_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+    {{0, MU_NODEID_NUMERIC, {2733}},
+     MU_NODECLASS_VARIABLE,
+     {26, s_str_MaxQueryContinuationPoints},
+     {26, s_str_MaxQueryContinuationPoints},
+     s_mandatory_property_refs,
+     sizeof(s_mandatory_property_refs) / sizeof(s_mandatory_property_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+    {{0, MU_NODEID_NUMERIC, {2734}},
+     MU_NODECLASS_VARIABLE,
+     {28, s_str_MaxHistoryContinuationPoints},
+     {28, s_str_MaxHistoryContinuationPoints},
+     s_mandatory_property_refs,
+     sizeof(s_mandatory_property_refs) / sizeof(s_mandatory_property_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+    {{0, MU_NODEID_NUMERIC, {2742}},
+     MU_NODECLASS_VARIABLE,
+     {8, s_str_Auditing},
+     {8, s_str_Auditing},
+     s_mandatory_property_refs,
+     sizeof(s_mandatory_property_refs) / sizeof(s_mandatory_property_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
     {{0, MU_NODEID_NUMERIC, {2752}},
      MU_NODECLASS_VARIABLE,
      {19, s_str_SecondsTillShutdown},
@@ -2272,6 +2598,16 @@ static const mu_node_t s_base_nodes[] = {
      sizeof(s_mandatory_bdv_refs) / sizeof(s_mandatory_bdv_refs[0]),
      NULL,
      .type_definition = {0, MU_NODEID_NUMERIC, {63}}},
+    /* ServerCapabilitiesType.AggregateFunctions(2754): distinct NodeId from
+       the Server-instance AggregateFunctions Folder(2997) just below. */
+    {{0, MU_NODEID_NUMERIC, {2754}},
+     MU_NODECLASS_OBJECT,
+     {18, s_str_AggregateFunctions},
+     {18, s_str_AggregateFunctions},
+     s_mandatory_foldertype_refs,
+     sizeof(s_mandatory_foldertype_refs) / sizeof(s_mandatory_foldertype_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {61}}},
 #endif
 #if MUC_OPCUA_CU_SUBSCRIPTION_BASIC && !MUC_OPCUA_CU_DATA_ACCESS
     /* CU 3911: AggregateFunctions(2997). When DataAccess is enabled this node is
@@ -2285,6 +2621,19 @@ static const mu_node_t s_base_nodes[] = {
      0,
      NULL,
      .type_definition = {0, MU_NODEID_NUMERIC, {61}}},
+#endif
+#if MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION && !MUC_OPCUA_CU_DATA_ACCESS
+    /* spec 085 (CU 5801) Task 4: ServerCapabilitiesType.SoftwareCertificates
+       (3049, DataAccess-off copy), mirroring the in-DataAccess copy below.
+       Sorts after AggregateFunctions(2997) and before BuildInfoType(3051). */
+    {{0, MU_NODEID_NUMERIC, {3049}},
+     MU_NODECLASS_VARIABLE,
+     {20, s_str_SoftwareCertificates},
+     {20, s_str_SoftwareCertificates},
+     s_mandatory_property_refs,
+     sizeof(s_mandatory_property_refs) / sizeof(s_mandatory_property_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
 #endif
 #if MUC_OPCUA_CU_DATA_ACCESS
     /* Spec 060: Data Access types + property instance-declarations (2365..11461). */
@@ -2397,7 +2746,42 @@ static const mu_node_t s_base_nodes[] = {
        SecondsTillShutdown/ShutdownReason (DataAccess-on copy; fall inside the
        2365..11461 DataAccess block, so they're dual-placed -- see the
        DataAccess-off mirror after LocaleIdArray(2271) below). Sorts after
-       EnumStrings(2377) and before AggregateFunctions(2997). */
+       EnumStrings(2377) and before AggregateFunctions(2997). Task 4 adds
+       three ServerCapabilitiesType properties and one ServerType property
+       (Auditing) that also fall in this range -- see the DataAccess-off
+       mirror above for the shared rationale. */
+    {{0, MU_NODEID_NUMERIC, {2732}},
+     MU_NODECLASS_VARIABLE,
+     {27, s_str_MaxBrowseContinuationPoints},
+     {27, s_str_MaxBrowseContinuationPoints},
+     s_mandatory_property_refs,
+     sizeof(s_mandatory_property_refs) / sizeof(s_mandatory_property_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+    {{0, MU_NODEID_NUMERIC, {2733}},
+     MU_NODECLASS_VARIABLE,
+     {26, s_str_MaxQueryContinuationPoints},
+     {26, s_str_MaxQueryContinuationPoints},
+     s_mandatory_property_refs,
+     sizeof(s_mandatory_property_refs) / sizeof(s_mandatory_property_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+    {{0, MU_NODEID_NUMERIC, {2734}},
+     MU_NODECLASS_VARIABLE,
+     {28, s_str_MaxHistoryContinuationPoints},
+     {28, s_str_MaxHistoryContinuationPoints},
+     s_mandatory_property_refs,
+     sizeof(s_mandatory_property_refs) / sizeof(s_mandatory_property_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+    {{0, MU_NODEID_NUMERIC, {2742}},
+     MU_NODECLASS_VARIABLE,
+     {8, s_str_Auditing},
+     {8, s_str_Auditing},
+     s_mandatory_property_refs,
+     sizeof(s_mandatory_property_refs) / sizeof(s_mandatory_property_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
     {{0, MU_NODEID_NUMERIC, {2752}},
      MU_NODECLASS_VARIABLE,
      {19, s_str_SecondsTillShutdown},
@@ -2414,6 +2798,14 @@ static const mu_node_t s_base_nodes[] = {
      sizeof(s_mandatory_bdv_refs) / sizeof(s_mandatory_bdv_refs[0]),
      NULL,
      .type_definition = {0, MU_NODEID_NUMERIC, {63}}},
+    {{0, MU_NODEID_NUMERIC, {2754}},
+     MU_NODECLASS_OBJECT,
+     {18, s_str_AggregateFunctions},
+     {18, s_str_AggregateFunctions},
+     s_mandatory_foldertype_refs,
+     sizeof(s_mandatory_foldertype_refs) / sizeof(s_mandatory_foldertype_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {61}}},
 #endif
 #if MUC_OPCUA_CU_SUBSCRIPTION_BASIC
     /* CU 3911: AggregateFunctions Folder (i=2997), HasComponent child of
@@ -2427,6 +2819,19 @@ static const mu_node_t s_base_nodes[] = {
      0,
      NULL,
      .type_definition = {0, MU_NODEID_NUMERIC, {61}}},
+#endif
+#if MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+    /* spec 085 (CU 5801) Task 4: ServerCapabilitiesType.SoftwareCertificates
+       (3049, DataAccess-on copy). Sorts after AggregateFunctions(2997) and
+       before BuildInfoType(3051). */
+    {{0, MU_NODEID_NUMERIC, {3049}},
+     MU_NODECLASS_VARIABLE,
+     {20, s_str_SoftwareCertificates},
+     {20, s_str_SoftwareCertificates},
+     s_mandatory_property_refs,
+     sizeof(s_mandatory_property_refs) / sizeof(s_mandatory_property_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
 #endif
 #if MUC_OPCUA_CU_BASE_INFO_SERVERTYPE
     /* spec 083 (CU 3189): BuildInfoType(3051, DataAccess-on copy). Sorts
@@ -2733,6 +3138,19 @@ static const mu_node_t s_base_nodes[] = {
      NULL,
      .type_definition = {0}},
 #endif
+#if MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+    /* spec 085 (CU 5801) Task 4: ServerType.GetMonitoredItems(11489), the
+       ObjectType-level Method InstanceDeclaration -- distinct NodeId from the
+       Server-instance Method Server_GetMonitoredItems(11492) just below. */
+    {{0, MU_NODEID_NUMERIC, {11489}},
+     MU_NODECLASS_METHOD,
+     {17, s_str_GetMonitoredItems},
+     {17, s_str_GetMonitoredItems},
+     s_optional_method_refs,
+     sizeof(s_optional_method_refs) / sizeof(s_optional_method_refs[0]),
+     NULL,
+     .type_definition = {0}},
+#endif
 #if MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
     {{0, MU_NODEID_NUMERIC, {11492}},
      MU_NODECLASS_METHOD,
@@ -2778,6 +3196,53 @@ static const mu_node_t s_base_nodes[] = {
      0,
      NULL,
      .type_definition = {0, MU_NODEID_NUMERIC, {77}}},
+#endif
+#if MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+    /* spec 085 (CU 5801) Task 4: ServerType.Namespaces(11527, Optional) plus
+       ServerCapabilitiesType.MaxArrayLength(11549)/MaxStringLength(11550)/
+       OperationLimits(11551, Optional)/<VendorCapability>(11562,
+       OptionalPlaceholder). Sorted between MandatoryPlaceholder(11510) and
+       OperationLimitsType(11564). */
+    {{0, MU_NODEID_NUMERIC, {11527}},
+     MU_NODECLASS_OBJECT,
+     {10, s_str_Namespaces},
+     {10, s_str_Namespaces},
+     s_optional_namespacestype_refs,
+     sizeof(s_optional_namespacestype_refs) / sizeof(s_optional_namespacestype_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {11645}}},
+    {{0, MU_NODEID_NUMERIC, {11549}},
+     MU_NODECLASS_VARIABLE,
+     {14, s_str_MaxArrayLength},
+     {14, s_str_MaxArrayLength},
+     s_optional_property_refs,
+     sizeof(s_optional_property_refs) / sizeof(s_optional_property_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+    {{0, MU_NODEID_NUMERIC, {11550}},
+     MU_NODECLASS_VARIABLE,
+     {15, s_str_MaxStringLength},
+     {15, s_str_MaxStringLength},
+     s_optional_property_refs,
+     sizeof(s_optional_property_refs) / sizeof(s_optional_property_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+    {{0, MU_NODEID_NUMERIC, {11551}},
+     MU_NODECLASS_OBJECT,
+     {15, s_str_OperationLimits},
+     {15, s_str_OperationLimits},
+     s_optional_operationlimitstype_refs,
+     sizeof(s_optional_operationlimitstype_refs) / sizeof(s_optional_operationlimitstype_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {11564}}},
+    {{0, MU_NODEID_NUMERIC, {11562}},
+     MU_NODECLASS_VARIABLE,
+     {18, s_str_VendorCapability_Placeholder},
+     {18, s_str_VendorCapability_Placeholder},
+     s_optionalplaceholder_vendorcapability_refs,
+     sizeof(s_optionalplaceholder_vendorcapability_refs) / sizeof(s_optionalplaceholder_vendorcapability_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {2137}}},
 #endif
 #if MUC_OPCUA_CU_BASE_INFO_SERVERTYPE
     /* spec 083 (CU 3189): OperationLimitsType/FileType/AddressSpaceFileType/
@@ -2946,6 +3411,20 @@ static const mu_node_t s_base_nodes[] = {
      NULL,
      .type_definition = {0, MU_NODEID_NUMERIC, {76}}},
 #endif
+#if MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+    /* spec 085 (CU 5801) Task 4: ServerType.SetSubscriptionDurable(12746), the
+       ObjectType-level Method InstanceDeclaration -- distinct NodeId from any
+       Server-instance Method. Sorted between NamespacesType's Default
+       Binary(11958) and Union(12756). */
+    {{0, MU_NODEID_NUMERIC, {12746}},
+     MU_NODECLASS_METHOD,
+     {22, s_str_SetSubscriptionDurable},
+     {22, s_str_SetSubscriptionDurable},
+     s_optional_method_refs,
+     sizeof(s_optional_method_refs) / sizeof(s_optional_method_refs[0]),
+     NULL,
+     .type_definition = {0}},
+#endif
 #if MUC_OPCUA_CU_BASE_INFO_BASE_TYPES
     /* CU 3188: Union(12756) abstract DataType (subtype of Structure). Sorted between
        MaxMonitoredItemsPerCall(11714) and ResendData(12873). */
@@ -2955,6 +3434,19 @@ static const mu_node_t s_base_nodes[] = {
      {5, s_str_Union},
      NULL,
      0,
+     NULL,
+     .type_definition = {0}},
+#endif
+#if MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+    /* spec 085 (CU 5801) Task 4: ServerType.ResendData(12871), the
+       ObjectType-level Method InstanceDeclaration -- distinct NodeId from the
+       Server-instance Method Server_ResendData(12873) just below. */
+    {{0, MU_NODEID_NUMERIC, {12871}},
+     MU_NODECLASS_METHOD,
+     {10, s_str_ResendData},
+     {10, s_str_ResendData},
+     s_optional_method_refs,
+     sizeof(s_optional_method_refs) / sizeof(s_optional_method_refs[0]),
      NULL,
      .type_definition = {0}},
 #endif
@@ -3004,6 +3496,29 @@ static const mu_node_t s_base_nodes[] = {
      NULL,
      .type_definition = {0}},
 #endif
+#if MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+    /* spec 085 (CU 5801) Task 4: ServerType.EstimatedReturnTime(12882, Optional
+       Property) and ServerType.RequestServerStateChange(12883, Optional
+       Method) -- distinct NodeIds from the Server-instance
+       EstimatedReturnTime(12885) below. Sorted between DateString(12881) and
+       EstimatedReturnTime(12885). */
+    {{0, MU_NODEID_NUMERIC, {12882}},
+     MU_NODECLASS_VARIABLE,
+     {19, s_str_EstimatedReturnTime},
+     {19, s_str_EstimatedReturnTime},
+     s_optional_property_refs,
+     sizeof(s_optional_property_refs) / sizeof(s_optional_property_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+    {{0, MU_NODEID_NUMERIC, {12883}},
+     MU_NODECLASS_METHOD,
+     {24, s_str_RequestServerStateChange},
+     {24, s_str_RequestServerStateChange},
+     s_optional_method_refs,
+     sizeof(s_optional_method_refs) / sizeof(s_optional_method_refs[0]),
+     NULL,
+     .type_definition = {0}},
+#endif
 #ifdef MUC_OPCUA_CU_BASE_INFO_ESTIMATED_RETURN_TIME
     /* OPC-10000-5 §6.3.1, OPC-10000-7 CU 3198: Server.EstimatedReturnTime
      * (i=12885) is a DateTime (i=13) Property using PropertyType (i=68). */
@@ -3013,6 +3528,30 @@ static const mu_node_t s_base_nodes[] = {
      {19, s_str_EstimatedReturnTime},
      s_property_type_ref,
      sizeof(s_property_type_ref) / sizeof(s_property_type_ref[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+#endif
+#if MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+    /* spec 085 (CU 5801) Task 4: ServerCapabilitiesType.MaxByteStringLength
+       (12910, Optional Property). Sorted between EstimatedReturnTime(12885)
+       and BaseAnalogType(15318). */
+    {{0, MU_NODEID_NUMERIC, {12910}},
+     MU_NODECLASS_VARIABLE,
+     {19, s_str_MaxByteStringLength},
+     {19, s_str_MaxByteStringLength},
+     s_optional_property_refs,
+     sizeof(s_optional_property_refs) / sizeof(s_optional_property_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+    /* spec 085 (CU 5801) Task 4: ServerType.UrisVersion(15003, Optional
+       Property). Sorted between MaxByteStringLength(12910) and
+       BaseAnalogType(15318). */
+    {{0, MU_NODEID_NUMERIC, {15003}},
+     MU_NODECLASS_VARIABLE,
+     {11, s_str_UrisVersion},
+     {11, s_str_UrisVersion},
+     s_optional_property_refs,
+     sizeof(s_optional_property_refs) / sizeof(s_optional_property_refs[0]),
      NULL,
      .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
 #endif
@@ -3144,6 +3683,20 @@ static const mu_node_t s_base_nodes[] = {
      NULL,
      .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
 #endif
+#if MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+    /* spec 085 (CU 5801) Task 4: ServerType.LocalTime(17612, Optional
+       Property) -- distinct NodeId from the Server-instance
+       Server.LocalTime(17634) below. Sorted between
+       DefaultInstanceBrowseName(17605) and LocalTime(17634). */
+    {{0, MU_NODEID_NUMERIC, {17612}},
+     MU_NODECLASS_VARIABLE,
+     {9, s_str_LocalTime},
+     {9, s_str_LocalTime},
+     s_optional_property_refs,
+     sizeof(s_optional_property_refs) / sizeof(s_optional_property_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+#endif
 #if MUC_OPCUA_CU_BASE_INFO_LOCALTIME
     /* OPC-10000-5 §6.3.1: Server.LocalTime (i=17634) is a Property using
      * TimeZoneDataType (i=8912); this node model records PropertyType (i=68). */
@@ -3166,6 +3719,84 @@ static const mu_node_t s_base_nodes[] = {
      sizeof(s_interface_types_refs) / sizeof(s_interface_types_refs[0]),
      NULL,
      .type_definition = {0, MU_NODEID_NUMERIC, {61}}},
+#endif
+#if MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+    /* spec 085 (CU 5801) Task 4: ServerCapabilitiesType.
+       MaxLogObjectContinuationPoints(19809, Optional Property). Sorted
+       between InterfaceTypes(17708) and MaxSessions(24088). */
+    {{0, MU_NODEID_NUMERIC, {19809}},
+     MU_NODECLASS_VARIABLE,
+     {30, s_str_MaxLogObjectContinuationPoints},
+     {30, s_str_MaxLogObjectContinuationPoints},
+     s_optional_property_refs,
+     sizeof(s_optional_property_refs) / sizeof(s_optional_property_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+    /* spec 085 (CU 5801) Task 4: ServerCapabilitiesType's remaining Optional
+       Property declarations (MaxSessions/MaxSubscriptions/MaxMonitoredItems/
+       MaxSubscriptionsPerSession/MaxSelectClauseParameters/
+       MaxWhereClauseParameters/ConformanceUnits) -- distinct NodeIds from the
+       Server-instance subscription-limit Variables in the
+       MUC_OPCUA_CU_SUBSCRIPTION_BASIC block below (interleaved further down
+       for MaxMonitoredItemsPerSubscription(24103) and
+       MaxMonitoredItemsQueueSize(31770), which numerically fall inside that
+       block's NodeId run). */
+    {{0, MU_NODEID_NUMERIC, {24088}},
+     MU_NODECLASS_VARIABLE,
+     {11, s_str_MaxSessions},
+     {11, s_str_MaxSessions},
+     s_optional_property_refs,
+     sizeof(s_optional_property_refs) / sizeof(s_optional_property_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+    {{0, MU_NODEID_NUMERIC, {24089}},
+     MU_NODECLASS_VARIABLE,
+     {16, s_str_MaxSubscriptions},
+     {16, s_str_MaxSubscriptions},
+     s_optional_property_refs,
+     sizeof(s_optional_property_refs) / sizeof(s_optional_property_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+    {{0, MU_NODEID_NUMERIC, {24090}},
+     MU_NODECLASS_VARIABLE,
+     {17, s_str_MaxMonitoredItems},
+     {17, s_str_MaxMonitoredItems},
+     s_optional_property_refs,
+     sizeof(s_optional_property_refs) / sizeof(s_optional_property_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+    {{0, MU_NODEID_NUMERIC, {24091}},
+     MU_NODECLASS_VARIABLE,
+     {26, s_str_MaxSubscriptionsPerSession},
+     {26, s_str_MaxSubscriptionsPerSession},
+     s_optional_property_refs,
+     sizeof(s_optional_property_refs) / sizeof(s_optional_property_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+    {{0, MU_NODEID_NUMERIC, {24092}},
+     MU_NODECLASS_VARIABLE,
+     {25, s_str_MaxSelectClauseParameters},
+     {25, s_str_MaxSelectClauseParameters},
+     s_optional_property_refs,
+     sizeof(s_optional_property_refs) / sizeof(s_optional_property_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+    {{0, MU_NODEID_NUMERIC, {24093}},
+     MU_NODECLASS_VARIABLE,
+     {24, s_str_MaxWhereClauseParameters},
+     {24, s_str_MaxWhereClauseParameters},
+     s_optional_property_refs,
+     sizeof(s_optional_property_refs) / sizeof(s_optional_property_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+    {{0, MU_NODEID_NUMERIC, {24094}},
+     MU_NODECLASS_VARIABLE,
+     {16, s_str_ConformanceUnits},
+     {16, s_str_ConformanceUnits},
+     s_optional_property_refs,
+     sizeof(s_optional_property_refs) / sizeof(s_optional_property_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
 #endif
 #if MUC_OPCUA_CU_SUBSCRIPTION_BASIC
     /* CU 3911/4055: ServerCapabilities subscription limits. Placed after 17708 so
@@ -3195,6 +3826,22 @@ static const mu_node_t s_base_nodes[] = {
      sizeof(s_property_type_ref) / sizeof(s_property_type_ref[0]),
      &s_max_subscriptions_per_session_value,
      .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+#endif
+#if MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+    /* spec 085 (CU 5801) Task 4: ServerCapabilitiesType.
+       MaxMonitoredItemsPerSubscription(24103, Optional Property) -- distinct
+       NodeId from the Server-instance MaxMonitoredItemsPerSubscription(24104)
+       just below. */
+    {{0, MU_NODEID_NUMERIC, {24103}},
+     MU_NODECLASS_VARIABLE,
+     {32, s_str_MaxMonitoredItemsPerSubscription},
+     {32, s_str_MaxMonitoredItemsPerSubscription},
+     s_optional_property_refs,
+     sizeof(s_optional_property_refs) / sizeof(s_optional_property_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+#endif
+#if MUC_OPCUA_CU_SUBSCRIPTION_BASIC
     {{0, MU_NODEID_NUMERIC, {24104}},
      MU_NODECLASS_VARIABLE,
      {32, s_str_MaxMonitoredItemsPerSubscription},
@@ -3203,6 +3850,21 @@ static const mu_node_t s_base_nodes[] = {
      sizeof(s_property_type_ref) / sizeof(s_property_type_ref[0]),
      &s_max_monitored_items_per_subscription_value,
      .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+#endif
+#if MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+    /* spec 085 (CU 5801) Task 4: ServerCapabilitiesType.
+       MaxMonitoredItemsQueueSize(31770, Optional Property) -- distinct NodeId
+       from the Server-instance MaxMonitoredItemsQueueSize(31916) just below. */
+    {{0, MU_NODEID_NUMERIC, {31770}},
+     MU_NODECLASS_VARIABLE,
+     {26, s_str_MaxMonitoredItemsQueueSize},
+     {26, s_str_MaxMonitoredItemsQueueSize},
+     s_optional_property_refs,
+     sizeof(s_optional_property_refs) / sizeof(s_optional_property_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+#endif
+#if MUC_OPCUA_CU_SUBSCRIPTION_BASIC
     {{0, MU_NODEID_NUMERIC, {31916}},
      MU_NODECLASS_VARIABLE,
      {26, s_str_MaxMonitoredItemsQueueSize},
