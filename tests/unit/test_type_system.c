@@ -332,21 +332,45 @@ static void test_servertype_instance_declarations(void) {
     TEST_ASSERT_TRUE(has_forward_ref(2139u, 37u, 78u)); /* StartTime is Mandatory */
 }
 
-/* spec 086 Task 1: Variable nodes must report their true DataType/ValueRank
-   attributes instead of the legacy type_definition fallback (which returns the
-   TypeDefinition NodeId, e.g. PropertyType/BaseDataVariableType -- never a real
-   DataType). ServerStatusType_StartTime(2139) is DateTime(13), Scalar(-1)
-   (OPC-10000-5 §6.3.2 ServerStatusDataType). This fails until the data_type/
-   value_rank fields are populated on this node (a later task). */
-static void test_variable_reports_true_datatype_and_valuerank(void) {
+/* Reads DATATYPE + VALUERANK off `node_id` and asserts they equal
+   (expected_data_type, expected_value_rank). Shared helper for the
+   representative spread of CU 5801 Variable declarations below. */
+static void assert_datatype_and_valuerank(opcua_uint32_t node_id, opcua_uint32_t expected_data_type,
+                                          opcua_int32_t expected_value_rank) {
     mu_variant_t v = {0};
-    const mu_node_t *n = base_node(2139u);
+    const mu_node_t *n = base_node(node_id);
     TEST_ASSERT_NOT_NULL(n);
     TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, read_attribute(NULL, n, MU_ATTRIBUTEID_DATATYPE, &v));
-    TEST_ASSERT_EQUAL_UINT32(13u,
-                             v.value.nodeid.identifier.numeric); /* DateTime, not PropertyType/BaseDataVariableType */
+    TEST_ASSERT_EQUAL_UINT32(expected_data_type, v.value.nodeid.identifier.numeric);
     TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, read_attribute(NULL, n, MU_ATTRIBUTEID_VALUERANK, &v));
-    TEST_ASSERT_EQUAL_INT32(-1, v.value.i32);
+    TEST_ASSERT_EQUAL_INT32(expected_value_rank, v.value.i32);
+}
+
+/* spec 086 Task 1/2: Variable nodes must report their true DataType/ValueRank
+   attributes instead of the legacy type_definition fallback (which returns the
+   TypeDefinition NodeId, e.g. PropertyType/BaseDataVariableType -- never a real
+   DataType).
+
+   ServerStatusType_StartTime(2139): OPC-10000-5 §7.6 Table 8 and the official
+   OPC Foundation NodeSet2.xml (UAVariable i=2139) both give DataType=UtcTime
+   (294) -- a DateTime subtype, not the erroneous DateTime(13) originally
+   assumed by Task 1's placeholder assertion (that section number, §6.3.2, was
+   also wrong: §6.3.2 is ServerCapabilitiesType, not ServerStatusType). Grounded
+   against opc-ua-reference (search_text) and cross-checked against the raw
+   NodeSet2.xml (grep 'NodeId="i=2139"'), per the "never trust an anchor list
+   blindly" rule -- ValueRank stays Scalar(-1) in both readings. */
+static void test_variable_reports_true_datatype_and_valuerank(void) {
+    /* ServerStatusType(2138) own declarations (OPC-10000-5 §7.6). */
+    assert_datatype_and_valuerank(2139u, 294u, -1); /* StartTime: UtcTime */
+    assert_datatype_and_valuerank(2141u, 852u, -1); /* State: ServerState */
+    assert_datatype_and_valuerank(2142u, 338u, -1); /* BuildInfo: BuildInfo */
+    /* BuildInfoType(3051) own declarations (OPC-10000-5 §7.7 Table 77). */
+    assert_datatype_and_valuerank(3052u, 12u, -1); /* ProductUri: String */
+    /* ServerDiagnosticsSummaryType(2150) own declarations (OPC-10000-5 §7.8). */
+    assert_datatype_and_valuerank(2151u, 7u, -1); /* ServerViewCount: UInt32 */
+    /* ServerType(2004) direct children (OPC-10000-5 §6.3.1). */
+    assert_datatype_and_valuerank(2005u, 12u, 1);   /* ServerArray: String[] */
+    assert_datatype_and_valuerank(2007u, 862u, -1); /* ServerStatus: ServerStatusDataType */
 }
 #endif
 

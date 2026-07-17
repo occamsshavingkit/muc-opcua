@@ -2064,7 +2064,9 @@ static const mu_node_t s_base_nodes[] = {
      s_mandatory_property_refs,
      sizeof(s_mandatory_property_refs) / sizeof(s_mandatory_property_refs[0]),
      NULL,
-     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}},
+     .value_rank = 1,
+     .data_type = 12}, /* String[] (OPC-10000-5 §6.3.1) */
     {{0, MU_NODEID_NUMERIC, {2006}},
      MU_NODECLASS_VARIABLE,
      {14, s_str_NamespaceArray},
@@ -2072,7 +2074,9 @@ static const mu_node_t s_base_nodes[] = {
      s_mandatory_property_refs,
      sizeof(s_mandatory_property_refs) / sizeof(s_mandatory_property_refs[0]),
      NULL,
-     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}},
+     .value_rank = 1,
+     .data_type = 12}, /* String[] (OPC-10000-5 §6.3.1) */
     {{0, MU_NODEID_NUMERIC, {2007}},
      MU_NODECLASS_VARIABLE,
      {12, s_str_ServerStatus},
@@ -2080,7 +2084,9 @@ static const mu_node_t s_base_nodes[] = {
      s_mandatory_serverstatustype_refs,
      sizeof(s_mandatory_serverstatustype_refs) / sizeof(s_mandatory_serverstatustype_refs[0]),
      NULL,
-     .type_definition = {0, MU_NODEID_NUMERIC, {2138}}},
+     .type_definition = {0, MU_NODEID_NUMERIC, {2138}},
+     .value_rank = -1,
+     .data_type = 862}, /* ServerStatusDataType (OPC-10000-5 §6.3.1) */
     {{0, MU_NODEID_NUMERIC, {2008}},
      MU_NODECLASS_VARIABLE,
      {12, s_str_ServiceLevel},
@@ -2088,7 +2094,9 @@ static const mu_node_t s_base_nodes[] = {
      s_mandatory_property_refs,
      sizeof(s_mandatory_property_refs) / sizeof(s_mandatory_property_refs[0]),
      NULL,
-     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}},
+     .value_rank = -1,
+     .data_type = 3}, /* Byte (OPC-10000-5 §6.3.1) */
     {{0, MU_NODEID_NUMERIC, {2009}},
      MU_NODECLASS_OBJECT,
      {18, s_str_ServerCapabilities},
@@ -2153,7 +2161,9 @@ static const mu_node_t s_base_nodes[] = {
      s_mandatory_property_refs,
      sizeof(s_mandatory_property_refs) / sizeof(s_mandatory_property_refs[0]),
      NULL,
-     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}},
+     .value_rank = 1,
+     .data_type = 12}, /* String[] (OPC-10000-5 §6.3.2 Table 10) */
     {{0, MU_NODEID_NUMERIC, {2016}},
      MU_NODECLASS_VARIABLE,
      {13, s_str_LocaleIdArray},
@@ -2161,7 +2171,9 @@ static const mu_node_t s_base_nodes[] = {
      s_mandatory_property_refs,
      sizeof(s_mandatory_property_refs) / sizeof(s_mandatory_property_refs[0]),
      NULL,
-     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}},
+     .value_rank = 1,
+     .data_type = 295}, /* LocaleId[] (OPC-10000-5 §6.3.2 Table 10) */
     {{0, MU_NODEID_NUMERIC, {2017}},
      MU_NODECLASS_VARIABLE,
      {22, s_str_MinSupportedSampleRate},
@@ -2169,7 +2181,9 @@ static const mu_node_t s_base_nodes[] = {
      s_mandatory_property_refs,
      sizeof(s_mandatory_property_refs) / sizeof(s_mandatory_property_refs[0]),
      NULL,
-     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}},
+     .value_rank = -1,
+     .data_type = 290}, /* Duration (OPC-10000-5 §6.3.2 Table 10) */
     {{0, MU_NODEID_NUMERIC, {2019}},
      MU_NODECLASS_OBJECT,
      {14, s_str_ModellingRules},
@@ -2269,7 +2283,11 @@ static const mu_node_t s_base_nodes[] = {
      s_mandatory_bdv_refs,
      sizeof(s_mandatory_bdv_refs) / sizeof(s_mandatory_bdv_refs[0]),
      NULL,
-     .type_definition = {0, MU_NODEID_NUMERIC, {63}}},
+     .type_definition = {0, MU_NODEID_NUMERIC, {63}},
+     .value_rank = -1,
+     .data_type = 294}, /* UtcTime, not DateTime -- OPC-10000-5 §7.6 Table 8 and the
+                            official NodeSet2.xml both give DataType=UtcTime(294)
+                            (a DateTime subtype) for StartTime/CurrentTime */
     {{0, MU_NODEID_NUMERIC, {2140}},
      MU_NODECLASS_VARIABLE,
      {11, s_str_CurrentTime},
@@ -2277,7 +2295,9 @@ static const mu_node_t s_base_nodes[] = {
      s_mandatory_bdv_refs,
      sizeof(s_mandatory_bdv_refs) / sizeof(s_mandatory_bdv_refs[0]),
      NULL,
-     .type_definition = {0, MU_NODEID_NUMERIC, {63}}},
+     .type_definition = {0, MU_NODEID_NUMERIC, {63}},
+     .value_rank = -1,
+     .data_type = 294}, /* UtcTime (OPC-10000-5 §7.6 Table 8) */
     {{0, MU_NODEID_NUMERIC, {2141}},
      MU_NODECLASS_VARIABLE,
      {5, s_str_State},
@@ -2285,7 +2305,9 @@ static const mu_node_t s_base_nodes[] = {
      s_mandatory_bdv_refs,
      sizeof(s_mandatory_bdv_refs) / sizeof(s_mandatory_bdv_refs[0]),
      NULL,
-     .type_definition = {0, MU_NODEID_NUMERIC, {63}}},
+     .type_definition = {0, MU_NODEID_NUMERIC, {63}},
+     .value_rank = -1,
+     .data_type = 852}, /* ServerState (OPC-10000-5 §7.6 Table 8) */
     {{0, MU_NODEID_NUMERIC, {2142}},
      MU_NODECLASS_VARIABLE,
      {9, s_str_BuildInfo},
@@ -2293,7 +2315,9 @@ static const mu_node_t s_base_nodes[] = {
      s_mandatory_buildinfotype_refs,
      sizeof(s_mandatory_buildinfotype_refs) / sizeof(s_mandatory_buildinfotype_refs[0]),
      NULL,
-     .type_definition = {0, MU_NODEID_NUMERIC, {3051}}},
+     .type_definition = {0, MU_NODEID_NUMERIC, {3051}},
+     .value_rank = -1,
+     .data_type = 338}, /* BuildInfo (OPC-10000-5 §7.6 Table 8) */
 #endif
     {{0, MU_NODEID_NUMERIC, {2150}},
      MU_NODECLASS_VARIABLETYPE,
@@ -2320,7 +2344,9 @@ static const mu_node_t s_base_nodes[] = {
      s_mandatory_bdv_refs,
      sizeof(s_mandatory_bdv_refs) / sizeof(s_mandatory_bdv_refs[0]),
      NULL,
-     .type_definition = {0, MU_NODEID_NUMERIC, {63}}},
+     .type_definition = {0, MU_NODEID_NUMERIC, {63}},
+     .value_rank = -1,
+     .data_type = 7}, /* UInt32 (OPC-10000-5 §7.8) */
     {{0, MU_NODEID_NUMERIC, {2152}},
      MU_NODECLASS_VARIABLE,
      {19, s_str_CurrentSessionCount},
@@ -2328,7 +2354,9 @@ static const mu_node_t s_base_nodes[] = {
      s_mandatory_bdv_refs,
      sizeof(s_mandatory_bdv_refs) / sizeof(s_mandatory_bdv_refs[0]),
      NULL,
-     .type_definition = {0, MU_NODEID_NUMERIC, {63}}},
+     .type_definition = {0, MU_NODEID_NUMERIC, {63}},
+     .value_rank = -1,
+     .data_type = 7}, /* UInt32 (OPC-10000-5 §7.8) */
     {{0, MU_NODEID_NUMERIC, {2153}},
      MU_NODECLASS_VARIABLE,
      {21, s_str_CumulatedSessionCount},
@@ -2336,7 +2364,9 @@ static const mu_node_t s_base_nodes[] = {
      s_mandatory_bdv_refs,
      sizeof(s_mandatory_bdv_refs) / sizeof(s_mandatory_bdv_refs[0]),
      NULL,
-     .type_definition = {0, MU_NODEID_NUMERIC, {63}}},
+     .type_definition = {0, MU_NODEID_NUMERIC, {63}},
+     .value_rank = -1,
+     .data_type = 7}, /* UInt32 (OPC-10000-5 §7.8) */
     {{0, MU_NODEID_NUMERIC, {2154}},
      MU_NODECLASS_VARIABLE,
      {28, s_str_SecurityRejectedSessionCount},
@@ -2344,7 +2374,9 @@ static const mu_node_t s_base_nodes[] = {
      s_mandatory_bdv_refs,
      sizeof(s_mandatory_bdv_refs) / sizeof(s_mandatory_bdv_refs[0]),
      NULL,
-     .type_definition = {0, MU_NODEID_NUMERIC, {63}}},
+     .type_definition = {0, MU_NODEID_NUMERIC, {63}},
+     .value_rank = -1,
+     .data_type = 7}, /* UInt32 (OPC-10000-5 §7.8) */
     {{0, MU_NODEID_NUMERIC, {2155}},
      MU_NODECLASS_VARIABLE,
      {20, s_str_RejectedSessionCount},
@@ -2352,7 +2384,9 @@ static const mu_node_t s_base_nodes[] = {
      s_mandatory_bdv_refs,
      sizeof(s_mandatory_bdv_refs) / sizeof(s_mandatory_bdv_refs[0]),
      NULL,
-     .type_definition = {0, MU_NODEID_NUMERIC, {63}}},
+     .type_definition = {0, MU_NODEID_NUMERIC, {63}},
+     .value_rank = -1,
+     .data_type = 7}, /* UInt32 (OPC-10000-5 §7.8) */
     {{0, MU_NODEID_NUMERIC, {2156}},
      MU_NODECLASS_VARIABLE,
      {19, s_str_SessionTimeoutCount},
@@ -2360,7 +2394,9 @@ static const mu_node_t s_base_nodes[] = {
      s_mandatory_bdv_refs,
      sizeof(s_mandatory_bdv_refs) / sizeof(s_mandatory_bdv_refs[0]),
      NULL,
-     .type_definition = {0, MU_NODEID_NUMERIC, {63}}},
+     .type_definition = {0, MU_NODEID_NUMERIC, {63}},
+     .value_rank = -1,
+     .data_type = 7}, /* UInt32 (OPC-10000-5 §7.8) */
     {{0, MU_NODEID_NUMERIC, {2157}},
      MU_NODECLASS_VARIABLE,
      {17, s_str_SessionAbortCount},
@@ -2368,7 +2404,9 @@ static const mu_node_t s_base_nodes[] = {
      s_mandatory_bdv_refs,
      sizeof(s_mandatory_bdv_refs) / sizeof(s_mandatory_bdv_refs[0]),
      NULL,
-     .type_definition = {0, MU_NODEID_NUMERIC, {63}}},
+     .type_definition = {0, MU_NODEID_NUMERIC, {63}},
+     .value_rank = -1,
+     .data_type = 7}, /* UInt32 (OPC-10000-5 §7.8) */
     {{0, MU_NODEID_NUMERIC, {2159}},
      MU_NODECLASS_VARIABLE,
      {23, s_str_PublishingIntervalCount},
@@ -2376,7 +2414,9 @@ static const mu_node_t s_base_nodes[] = {
      s_mandatory_bdv_refs,
      sizeof(s_mandatory_bdv_refs) / sizeof(s_mandatory_bdv_refs[0]),
      NULL,
-     .type_definition = {0, MU_NODEID_NUMERIC, {63}}},
+     .type_definition = {0, MU_NODEID_NUMERIC, {63}},
+     .value_rank = -1,
+     .data_type = 7}, /* UInt32 (OPC-10000-5 §7.8) */
     {{0, MU_NODEID_NUMERIC, {2160}},
      MU_NODECLASS_VARIABLE,
      {24, s_str_CurrentSubscriptionCount},
@@ -2384,7 +2424,9 @@ static const mu_node_t s_base_nodes[] = {
      s_mandatory_bdv_refs,
      sizeof(s_mandatory_bdv_refs) / sizeof(s_mandatory_bdv_refs[0]),
      NULL,
-     .type_definition = {0, MU_NODEID_NUMERIC, {63}}},
+     .type_definition = {0, MU_NODEID_NUMERIC, {63}},
+     .value_rank = -1,
+     .data_type = 7}, /* UInt32 (OPC-10000-5 §7.8) */
     {{0, MU_NODEID_NUMERIC, {2161}},
      MU_NODECLASS_VARIABLE,
      {26, s_str_CumulatedSubscriptionCount},
@@ -2392,7 +2434,9 @@ static const mu_node_t s_base_nodes[] = {
      s_mandatory_bdv_refs,
      sizeof(s_mandatory_bdv_refs) / sizeof(s_mandatory_bdv_refs[0]),
      NULL,
-     .type_definition = {0, MU_NODEID_NUMERIC, {63}}},
+     .type_definition = {0, MU_NODEID_NUMERIC, {63}},
+     .value_rank = -1,
+     .data_type = 7}, /* UInt32 (OPC-10000-5 §7.8) */
     {{0, MU_NODEID_NUMERIC, {2162}},
      MU_NODECLASS_VARIABLE,
      {29, s_str_SecurityRejectedRequestsCount},
@@ -2400,7 +2444,9 @@ static const mu_node_t s_base_nodes[] = {
      s_mandatory_bdv_refs,
      sizeof(s_mandatory_bdv_refs) / sizeof(s_mandatory_bdv_refs[0]),
      NULL,
-     .type_definition = {0, MU_NODEID_NUMERIC, {63}}},
+     .type_definition = {0, MU_NODEID_NUMERIC, {63}},
+     .value_rank = -1,
+     .data_type = 7}, /* UInt32 (OPC-10000-5 §7.8) */
     {{0, MU_NODEID_NUMERIC, {2163}},
      MU_NODECLASS_VARIABLE,
      {21, s_str_RejectedRequestsCount},
@@ -2408,7 +2454,9 @@ static const mu_node_t s_base_nodes[] = {
      s_mandatory_bdv_refs,
      sizeof(s_mandatory_bdv_refs) / sizeof(s_mandatory_bdv_refs[0]),
      NULL,
-     .type_definition = {0, MU_NODEID_NUMERIC, {63}}},
+     .type_definition = {0, MU_NODEID_NUMERIC, {63}},
+     .value_rank = -1,
+     .data_type = 7}, /* UInt32 (OPC-10000-5 §7.8) */
 #endif
     {{0, MU_NODEID_NUMERIC, {2164}},
      MU_NODECLASS_VARIABLETYPE,
@@ -2557,7 +2605,9 @@ static const mu_node_t s_base_nodes[] = {
      s_mandatory_property_refs,
      sizeof(s_mandatory_property_refs) / sizeof(s_mandatory_property_refs[0]),
      NULL,
-     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}},
+     .value_rank = -1,
+     .data_type = 5}, /* UInt16 (OPC-10000-5 §6.3.2 Table 10) */
     {{0, MU_NODEID_NUMERIC, {2733}},
      MU_NODECLASS_VARIABLE,
      {26, s_str_MaxQueryContinuationPoints},
@@ -2565,7 +2615,9 @@ static const mu_node_t s_base_nodes[] = {
      s_mandatory_property_refs,
      sizeof(s_mandatory_property_refs) / sizeof(s_mandatory_property_refs[0]),
      NULL,
-     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}},
+     .value_rank = -1,
+     .data_type = 5}, /* UInt16 (OPC-10000-5 §6.3.2 Table 10) */
     {{0, MU_NODEID_NUMERIC, {2734}},
      MU_NODECLASS_VARIABLE,
      {28, s_str_MaxHistoryContinuationPoints},
@@ -2573,7 +2625,9 @@ static const mu_node_t s_base_nodes[] = {
      s_mandatory_property_refs,
      sizeof(s_mandatory_property_refs) / sizeof(s_mandatory_property_refs[0]),
      NULL,
-     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}},
+     .value_rank = -1,
+     .data_type = 5}, /* UInt16 (OPC-10000-5 §6.3.2 Table 10) */
     {{0, MU_NODEID_NUMERIC, {2742}},
      MU_NODECLASS_VARIABLE,
      {8, s_str_Auditing},
@@ -2581,7 +2635,9 @@ static const mu_node_t s_base_nodes[] = {
      s_mandatory_property_refs,
      sizeof(s_mandatory_property_refs) / sizeof(s_mandatory_property_refs[0]),
      NULL,
-     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}},
+     .value_rank = -1,
+     .data_type = 1}, /* Boolean (OPC-10000-5 §6.3.1) */
     {{0, MU_NODEID_NUMERIC, {2752}},
      MU_NODECLASS_VARIABLE,
      {19, s_str_SecondsTillShutdown},
@@ -2589,7 +2645,9 @@ static const mu_node_t s_base_nodes[] = {
      s_mandatory_bdv_refs,
      sizeof(s_mandatory_bdv_refs) / sizeof(s_mandatory_bdv_refs[0]),
      NULL,
-     .type_definition = {0, MU_NODEID_NUMERIC, {63}}},
+     .type_definition = {0, MU_NODEID_NUMERIC, {63}},
+     .value_rank = -1,
+     .data_type = 7}, /* UInt32 (OPC-10000-5 §7.6 Table 8) */
     {{0, MU_NODEID_NUMERIC, {2753}},
      MU_NODECLASS_VARIABLE,
      {14, s_str_ShutdownReason},
@@ -2597,7 +2655,9 @@ static const mu_node_t s_base_nodes[] = {
      s_mandatory_bdv_refs,
      sizeof(s_mandatory_bdv_refs) / sizeof(s_mandatory_bdv_refs[0]),
      NULL,
-     .type_definition = {0, MU_NODEID_NUMERIC, {63}}},
+     .type_definition = {0, MU_NODEID_NUMERIC, {63}},
+     .value_rank = -1,
+     .data_type = 21}, /* LocalizedText (OPC-10000-5 §7.6 Table 8) */
     /* ServerCapabilitiesType.AggregateFunctions(2754): distinct NodeId from
        the Server-instance AggregateFunctions Folder(2997) just below. */
     {{0, MU_NODEID_NUMERIC, {2754}},
@@ -2633,7 +2693,9 @@ static const mu_node_t s_base_nodes[] = {
      s_mandatory_property_refs,
      sizeof(s_mandatory_property_refs) / sizeof(s_mandatory_property_refs[0]),
      NULL,
-     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}},
+     .value_rank = 1,
+     .data_type = 344}, /* SignedSoftwareCertificate[] (OPC-10000-5 §6.3.2 Table 10) */
 #endif
 #if MUC_OPCUA_CU_DATA_ACCESS
     /* Spec 060: Data Access types + property instance-declarations (2365..11461). */
@@ -2757,7 +2819,9 @@ static const mu_node_t s_base_nodes[] = {
      s_mandatory_property_refs,
      sizeof(s_mandatory_property_refs) / sizeof(s_mandatory_property_refs[0]),
      NULL,
-     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}},
+     .value_rank = -1,
+     .data_type = 5}, /* UInt16 (OPC-10000-5 §6.3.2 Table 10) */
     {{0, MU_NODEID_NUMERIC, {2733}},
      MU_NODECLASS_VARIABLE,
      {26, s_str_MaxQueryContinuationPoints},
@@ -2765,7 +2829,9 @@ static const mu_node_t s_base_nodes[] = {
      s_mandatory_property_refs,
      sizeof(s_mandatory_property_refs) / sizeof(s_mandatory_property_refs[0]),
      NULL,
-     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}},
+     .value_rank = -1,
+     .data_type = 5}, /* UInt16 (OPC-10000-5 §6.3.2 Table 10) */
     {{0, MU_NODEID_NUMERIC, {2734}},
      MU_NODECLASS_VARIABLE,
      {28, s_str_MaxHistoryContinuationPoints},
@@ -2773,7 +2839,9 @@ static const mu_node_t s_base_nodes[] = {
      s_mandatory_property_refs,
      sizeof(s_mandatory_property_refs) / sizeof(s_mandatory_property_refs[0]),
      NULL,
-     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}},
+     .value_rank = -1,
+     .data_type = 5}, /* UInt16 (OPC-10000-5 §6.3.2 Table 10) */
     {{0, MU_NODEID_NUMERIC, {2742}},
      MU_NODECLASS_VARIABLE,
      {8, s_str_Auditing},
@@ -2781,7 +2849,9 @@ static const mu_node_t s_base_nodes[] = {
      s_mandatory_property_refs,
      sizeof(s_mandatory_property_refs) / sizeof(s_mandatory_property_refs[0]),
      NULL,
-     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}},
+     .value_rank = -1,
+     .data_type = 1}, /* Boolean (OPC-10000-5 §6.3.1) */
     {{0, MU_NODEID_NUMERIC, {2752}},
      MU_NODECLASS_VARIABLE,
      {19, s_str_SecondsTillShutdown},
@@ -2789,7 +2859,9 @@ static const mu_node_t s_base_nodes[] = {
      s_mandatory_bdv_refs,
      sizeof(s_mandatory_bdv_refs) / sizeof(s_mandatory_bdv_refs[0]),
      NULL,
-     .type_definition = {0, MU_NODEID_NUMERIC, {63}}},
+     .type_definition = {0, MU_NODEID_NUMERIC, {63}},
+     .value_rank = -1,
+     .data_type = 7}, /* UInt32 (OPC-10000-5 §7.6 Table 8) */
     {{0, MU_NODEID_NUMERIC, {2753}},
      MU_NODECLASS_VARIABLE,
      {14, s_str_ShutdownReason},
@@ -2797,7 +2869,9 @@ static const mu_node_t s_base_nodes[] = {
      s_mandatory_bdv_refs,
      sizeof(s_mandatory_bdv_refs) / sizeof(s_mandatory_bdv_refs[0]),
      NULL,
-     .type_definition = {0, MU_NODEID_NUMERIC, {63}}},
+     .type_definition = {0, MU_NODEID_NUMERIC, {63}},
+     .value_rank = -1,
+     .data_type = 21}, /* LocalizedText (OPC-10000-5 §7.6 Table 8) */
     {{0, MU_NODEID_NUMERIC, {2754}},
      MU_NODECLASS_OBJECT,
      {18, s_str_AggregateFunctions},
@@ -2831,7 +2905,9 @@ static const mu_node_t s_base_nodes[] = {
      s_mandatory_property_refs,
      sizeof(s_mandatory_property_refs) / sizeof(s_mandatory_property_refs[0]),
      NULL,
-     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}},
+     .value_rank = 1,
+     .data_type = 344}, /* SignedSoftwareCertificate[] (OPC-10000-5 §6.3.2 Table 10) */
 #endif
 #if MUC_OPCUA_CU_BASE_INFO_SERVERTYPE
     /* spec 083 (CU 3189): BuildInfoType(3051, DataAccess-on copy). Sorts
@@ -2863,7 +2939,9 @@ static const mu_node_t s_base_nodes[] = {
      s_mandatory_bdv_refs,
      sizeof(s_mandatory_bdv_refs) / sizeof(s_mandatory_bdv_refs[0]),
      NULL,
-     .type_definition = {0, MU_NODEID_NUMERIC, {63}}},
+     .type_definition = {0, MU_NODEID_NUMERIC, {63}},
+     .value_rank = -1,
+     .data_type = 12}, /* String (OPC-10000-5 §7.7 Table 77) */
     {{0, MU_NODEID_NUMERIC, {3053}},
      MU_NODECLASS_VARIABLE,
      {16, s_str_ManufacturerName},
@@ -2871,7 +2949,9 @@ static const mu_node_t s_base_nodes[] = {
      s_mandatory_bdv_refs,
      sizeof(s_mandatory_bdv_refs) / sizeof(s_mandatory_bdv_refs[0]),
      NULL,
-     .type_definition = {0, MU_NODEID_NUMERIC, {63}}},
+     .type_definition = {0, MU_NODEID_NUMERIC, {63}},
+     .value_rank = -1,
+     .data_type = 12}, /* String (OPC-10000-5 §7.7 Table 77) */
     {{0, MU_NODEID_NUMERIC, {3054}},
      MU_NODECLASS_VARIABLE,
      {11, s_str_ProductName},
@@ -2879,7 +2959,9 @@ static const mu_node_t s_base_nodes[] = {
      s_mandatory_bdv_refs,
      sizeof(s_mandatory_bdv_refs) / sizeof(s_mandatory_bdv_refs[0]),
      NULL,
-     .type_definition = {0, MU_NODEID_NUMERIC, {63}}},
+     .type_definition = {0, MU_NODEID_NUMERIC, {63}},
+     .value_rank = -1,
+     .data_type = 12}, /* String (OPC-10000-5 §7.7 Table 77) */
     {{0, MU_NODEID_NUMERIC, {3055}},
      MU_NODECLASS_VARIABLE,
      {15, s_str_SoftwareVersion},
@@ -2887,7 +2969,9 @@ static const mu_node_t s_base_nodes[] = {
      s_mandatory_bdv_refs,
      sizeof(s_mandatory_bdv_refs) / sizeof(s_mandatory_bdv_refs[0]),
      NULL,
-     .type_definition = {0, MU_NODEID_NUMERIC, {63}}},
+     .type_definition = {0, MU_NODEID_NUMERIC, {63}},
+     .value_rank = -1,
+     .data_type = 12}, /* String (OPC-10000-5 §7.7 Table 77) */
     {{0, MU_NODEID_NUMERIC, {3056}},
      MU_NODECLASS_VARIABLE,
      {11, s_str_BuildNumber},
@@ -2895,7 +2979,9 @@ static const mu_node_t s_base_nodes[] = {
      s_mandatory_bdv_refs,
      sizeof(s_mandatory_bdv_refs) / sizeof(s_mandatory_bdv_refs[0]),
      NULL,
-     .type_definition = {0, MU_NODEID_NUMERIC, {63}}},
+     .type_definition = {0, MU_NODEID_NUMERIC, {63}},
+     .value_rank = -1,
+     .data_type = 12}, /* String (OPC-10000-5 §7.7 Table 77) */
     {{0, MU_NODEID_NUMERIC, {3057}},
      MU_NODECLASS_VARIABLE,
      {9, s_str_BuildDate},
@@ -2903,7 +2989,10 @@ static const mu_node_t s_base_nodes[] = {
      s_mandatory_bdv_refs,
      sizeof(s_mandatory_bdv_refs) / sizeof(s_mandatory_bdv_refs[0]),
      NULL,
-     .type_definition = {0, MU_NODEID_NUMERIC, {63}}},
+     .type_definition = {0, MU_NODEID_NUMERIC, {63}},
+     .value_rank = -1,
+     .data_type = 294}, /* UtcTime, not DateTime -- OPC-10000-5 §7.7 Table 77 and
+                            the official NodeSet2.xml both give DataType=UtcTime(294) */
 #endif
 #if MUC_OPCUA_CU_BASE_INFO_BASE_TYPES
     /* CU 3188: EnumValueType(7594, subtype of Structure) + its Default XML(7616)/
@@ -3008,7 +3097,9 @@ static const mu_node_t s_base_nodes[] = {
      s_mandatory_bdv_refs,
      sizeof(s_mandatory_bdv_refs) / sizeof(s_mandatory_bdv_refs[0]),
      NULL,
-     .type_definition = {0, MU_NODEID_NUMERIC, {63}}},
+     .type_definition = {0, MU_NODEID_NUMERIC, {63}},
+     .value_rank = -1,
+     .data_type = 12}, /* String (OPC-10000-5 §7.7 Table 77) */
     {{0, MU_NODEID_NUMERIC, {3053}},
      MU_NODECLASS_VARIABLE,
      {16, s_str_ManufacturerName},
@@ -3016,7 +3107,9 @@ static const mu_node_t s_base_nodes[] = {
      s_mandatory_bdv_refs,
      sizeof(s_mandatory_bdv_refs) / sizeof(s_mandatory_bdv_refs[0]),
      NULL,
-     .type_definition = {0, MU_NODEID_NUMERIC, {63}}},
+     .type_definition = {0, MU_NODEID_NUMERIC, {63}},
+     .value_rank = -1,
+     .data_type = 12}, /* String (OPC-10000-5 §7.7 Table 77) */
     {{0, MU_NODEID_NUMERIC, {3054}},
      MU_NODECLASS_VARIABLE,
      {11, s_str_ProductName},
@@ -3024,7 +3117,9 @@ static const mu_node_t s_base_nodes[] = {
      s_mandatory_bdv_refs,
      sizeof(s_mandatory_bdv_refs) / sizeof(s_mandatory_bdv_refs[0]),
      NULL,
-     .type_definition = {0, MU_NODEID_NUMERIC, {63}}},
+     .type_definition = {0, MU_NODEID_NUMERIC, {63}},
+     .value_rank = -1,
+     .data_type = 12}, /* String (OPC-10000-5 §7.7 Table 77) */
     {{0, MU_NODEID_NUMERIC, {3055}},
      MU_NODECLASS_VARIABLE,
      {15, s_str_SoftwareVersion},
@@ -3032,7 +3127,9 @@ static const mu_node_t s_base_nodes[] = {
      s_mandatory_bdv_refs,
      sizeof(s_mandatory_bdv_refs) / sizeof(s_mandatory_bdv_refs[0]),
      NULL,
-     .type_definition = {0, MU_NODEID_NUMERIC, {63}}},
+     .type_definition = {0, MU_NODEID_NUMERIC, {63}},
+     .value_rank = -1,
+     .data_type = 12}, /* String (OPC-10000-5 §7.7 Table 77) */
     {{0, MU_NODEID_NUMERIC, {3056}},
      MU_NODECLASS_VARIABLE,
      {11, s_str_BuildNumber},
@@ -3040,7 +3137,9 @@ static const mu_node_t s_base_nodes[] = {
      s_mandatory_bdv_refs,
      sizeof(s_mandatory_bdv_refs) / sizeof(s_mandatory_bdv_refs[0]),
      NULL,
-     .type_definition = {0, MU_NODEID_NUMERIC, {63}}},
+     .type_definition = {0, MU_NODEID_NUMERIC, {63}},
+     .value_rank = -1,
+     .data_type = 12}, /* String (OPC-10000-5 §7.7 Table 77) */
     {{0, MU_NODEID_NUMERIC, {3057}},
      MU_NODECLASS_VARIABLE,
      {9, s_str_BuildDate},
@@ -3048,7 +3147,10 @@ static const mu_node_t s_base_nodes[] = {
      s_mandatory_bdv_refs,
      sizeof(s_mandatory_bdv_refs) / sizeof(s_mandatory_bdv_refs[0]),
      NULL,
-     .type_definition = {0, MU_NODEID_NUMERIC, {63}}},
+     .type_definition = {0, MU_NODEID_NUMERIC, {63}},
+     .value_rank = -1,
+     .data_type = 294}, /* UtcTime, not DateTime -- OPC-10000-5 §7.7 Table 77 and
+                            the official NodeSet2.xml both give DataType=UtcTime(294) */
 #endif
 #if MUC_OPCUA_CU_BASE_INFO_BASE_TYPES && !MUC_OPCUA_CU_DATA_ACCESS
     /* CU 3188 (Data-Access-off variant): EnumValueType(7594) + its Encoding Objects,
@@ -3218,7 +3320,9 @@ static const mu_node_t s_base_nodes[] = {
      s_optional_property_refs,
      sizeof(s_optional_property_refs) / sizeof(s_optional_property_refs[0]),
      NULL,
-     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}},
+     .value_rank = -1,
+     .data_type = 7}, /* UInt32 (OPC-10000-5 §6.3.2 Table 10) */
     {{0, MU_NODEID_NUMERIC, {11550}},
      MU_NODECLASS_VARIABLE,
      {15, s_str_MaxStringLength},
@@ -3226,7 +3330,9 @@ static const mu_node_t s_base_nodes[] = {
      s_optional_property_refs,
      sizeof(s_optional_property_refs) / sizeof(s_optional_property_refs[0]),
      NULL,
-     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}},
+     .value_rank = -1,
+     .data_type = 7}, /* UInt32 (OPC-10000-5 §6.3.2 Table 10) */
     {{0, MU_NODEID_NUMERIC, {11551}},
      MU_NODECLASS_OBJECT,
      {15, s_str_OperationLimits},
@@ -3242,7 +3348,12 @@ static const mu_node_t s_base_nodes[] = {
      s_optionalplaceholder_vendorcapability_refs,
      sizeof(s_optionalplaceholder_vendorcapability_refs) / sizeof(s_optionalplaceholder_vendorcapability_refs[0]),
      NULL,
-     .type_definition = {0, MU_NODEID_NUMERIC, {2137}}},
+     .type_definition = {0, MU_NODEID_NUMERIC, {2137}},
+     .value_rank = -1,
+     .data_type = 24}, /* BaseDataType (OPC-10000-5 §6.3.2 Table 10; the official
+                           NodeSet2.xml UAVariable i=11562 carries no explicit
+                           DataType/ValueRank attrs, so both fall back to the
+                           UANodeSet.xsd defaults i=24/-1) */
 #endif
 #if MUC_OPCUA_CU_BASE_INFO_SERVERTYPE
     /* spec 083 (CU 3189): OperationLimitsType/FileType/AddressSpaceFileType/
@@ -3509,7 +3620,9 @@ static const mu_node_t s_base_nodes[] = {
      s_optional_property_refs,
      sizeof(s_optional_property_refs) / sizeof(s_optional_property_refs[0]),
      NULL,
-     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}},
+     .value_rank = -1,
+     .data_type = 13}, /* DateTime (OPC-10000-5 §6.3.1) */
     {{0, MU_NODEID_NUMERIC, {12883}},
      MU_NODECLASS_METHOD,
      {24, s_str_RequestServerStateChange},
@@ -3542,7 +3655,9 @@ static const mu_node_t s_base_nodes[] = {
      s_optional_property_refs,
      sizeof(s_optional_property_refs) / sizeof(s_optional_property_refs[0]),
      NULL,
-     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}},
+     .value_rank = -1,
+     .data_type = 7}, /* UInt32 (OPC-10000-5 §6.3.2 Table 10) */
     /* spec 085 (CU 5801) Task 4: ServerType.UrisVersion(15003, Optional
        Property). Sorted between MaxByteStringLength(12910) and
        BaseAnalogType(15318). */
@@ -3553,7 +3668,10 @@ static const mu_node_t s_base_nodes[] = {
      s_optional_property_refs,
      sizeof(s_optional_property_refs) / sizeof(s_optional_property_refs[0]),
      NULL,
-     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}},
+     .value_rank = -1,
+     .data_type = 20998}, /* VersionTime (OPC-10000-5 §6.3.1; ns0 DataType NodeId
+                              confirmed via NodeIds.csv) */
 #endif
 #if MUC_OPCUA_CU_DATA_ACCESS
     /* Spec 060: BaseAnalogType + AnalogUnitType and their property instances
@@ -3695,7 +3813,9 @@ static const mu_node_t s_base_nodes[] = {
      s_optional_property_refs,
      sizeof(s_optional_property_refs) / sizeof(s_optional_property_refs[0]),
      NULL,
-     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}},
+     .value_rank = -1,
+     .data_type = 8912}, /* TimeZoneDataType (OPC-10000-5 §6.3.1) */
 #endif
 #if MUC_OPCUA_CU_BASE_INFO_LOCALTIME
     /* OPC-10000-5 §6.3.1: Server.LocalTime (i=17634) is a Property using
@@ -3731,7 +3851,9 @@ static const mu_node_t s_base_nodes[] = {
      s_optional_property_refs,
      sizeof(s_optional_property_refs) / sizeof(s_optional_property_refs[0]),
      NULL,
-     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}},
+     .value_rank = -1,
+     .data_type = 5}, /* UInt16 (OPC-10000-5 §6.3.2 Table 10) */
     /* spec 085 (CU 5801) Task 4: ServerCapabilitiesType's remaining Optional
        Property declarations (MaxSessions/MaxSubscriptions/MaxMonitoredItems/
        MaxSubscriptionsPerSession/MaxSelectClauseParameters/
@@ -3748,7 +3870,9 @@ static const mu_node_t s_base_nodes[] = {
      s_optional_property_refs,
      sizeof(s_optional_property_refs) / sizeof(s_optional_property_refs[0]),
      NULL,
-     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}},
+     .value_rank = -1,
+     .data_type = 7}, /* UInt32 (OPC-10000-5 §6.3.2 Table 10) */
     {{0, MU_NODEID_NUMERIC, {24089}},
      MU_NODECLASS_VARIABLE,
      {16, s_str_MaxSubscriptions},
@@ -3756,7 +3880,9 @@ static const mu_node_t s_base_nodes[] = {
      s_optional_property_refs,
      sizeof(s_optional_property_refs) / sizeof(s_optional_property_refs[0]),
      NULL,
-     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}},
+     .value_rank = -1,
+     .data_type = 7}, /* UInt32 (OPC-10000-5 §6.3.2 Table 10) */
     {{0, MU_NODEID_NUMERIC, {24090}},
      MU_NODECLASS_VARIABLE,
      {17, s_str_MaxMonitoredItems},
@@ -3764,7 +3890,9 @@ static const mu_node_t s_base_nodes[] = {
      s_optional_property_refs,
      sizeof(s_optional_property_refs) / sizeof(s_optional_property_refs[0]),
      NULL,
-     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}},
+     .value_rank = -1,
+     .data_type = 7}, /* UInt32 (OPC-10000-5 §6.3.2 Table 10) */
     {{0, MU_NODEID_NUMERIC, {24091}},
      MU_NODECLASS_VARIABLE,
      {26, s_str_MaxSubscriptionsPerSession},
@@ -3772,7 +3900,9 @@ static const mu_node_t s_base_nodes[] = {
      s_optional_property_refs,
      sizeof(s_optional_property_refs) / sizeof(s_optional_property_refs[0]),
      NULL,
-     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}},
+     .value_rank = -1,
+     .data_type = 7}, /* UInt32 (OPC-10000-5 §6.3.2 Table 10) */
     {{0, MU_NODEID_NUMERIC, {24092}},
      MU_NODECLASS_VARIABLE,
      {25, s_str_MaxSelectClauseParameters},
@@ -3780,7 +3910,9 @@ static const mu_node_t s_base_nodes[] = {
      s_optional_property_refs,
      sizeof(s_optional_property_refs) / sizeof(s_optional_property_refs[0]),
      NULL,
-     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}},
+     .value_rank = -1,
+     .data_type = 7}, /* UInt32 (OPC-10000-5 §6.3.2 Table 10) */
     {{0, MU_NODEID_NUMERIC, {24093}},
      MU_NODECLASS_VARIABLE,
      {24, s_str_MaxWhereClauseParameters},
@@ -3788,7 +3920,9 @@ static const mu_node_t s_base_nodes[] = {
      s_optional_property_refs,
      sizeof(s_optional_property_refs) / sizeof(s_optional_property_refs[0]),
      NULL,
-     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}},
+     .value_rank = -1,
+     .data_type = 7}, /* UInt32 (OPC-10000-5 §6.3.2 Table 10) */
     {{0, MU_NODEID_NUMERIC, {24094}},
      MU_NODECLASS_VARIABLE,
      {16, s_str_ConformanceUnits},
@@ -3796,7 +3930,9 @@ static const mu_node_t s_base_nodes[] = {
      s_optional_property_refs,
      sizeof(s_optional_property_refs) / sizeof(s_optional_property_refs[0]),
      NULL,
-     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}},
+     .value_rank = 1,
+     .data_type = 20}, /* QualifiedName[] (OPC-10000-5 §6.3.2 Table 10) */
 #endif
 #if MUC_OPCUA_CU_SUBSCRIPTION_BASIC
     /* CU 3911/4055: ServerCapabilities subscription limits. Placed after 17708 so
@@ -3839,7 +3975,9 @@ static const mu_node_t s_base_nodes[] = {
      s_optional_property_refs,
      sizeof(s_optional_property_refs) / sizeof(s_optional_property_refs[0]),
      NULL,
-     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}},
+     .value_rank = -1,
+     .data_type = 7}, /* UInt32 (OPC-10000-5 §6.3.2 Table 10) */
 #endif
 #if MUC_OPCUA_CU_SUBSCRIPTION_BASIC
     {{0, MU_NODEID_NUMERIC, {24104}},
@@ -3862,7 +4000,9 @@ static const mu_node_t s_base_nodes[] = {
      s_optional_property_refs,
      sizeof(s_optional_property_refs) / sizeof(s_optional_property_refs[0]),
      NULL,
-     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}},
+     .value_rank = -1,
+     .data_type = 7}, /* UInt32 (OPC-10000-5 §6.3.2 Table 10) */
 #endif
 #if MUC_OPCUA_CU_SUBSCRIPTION_BASIC
     {{0, MU_NODEID_NUMERIC, {31916}},
