@@ -597,11 +597,18 @@ static const mu_argument_t s_resend_input_args[] = {
     {{14, s_arg_subscription_id}, MU_ARG_UINT32_DT, -1, MU_ARG_NO_DESC}};
 
 static const mu_value_source_t s_gmi_input_value = {
-    MU_VALUESOURCE_STATIC, {.static_value = {MU_TYPE_EXTENSIONOBJECT, {.array = s_gmi_input_args}, true, 1}}};
+    MU_VALUESOURCE_STATIC,
+    {.static_value = {
+         .type = MU_TYPE_EXTENSIONOBJECT, .value = {.array = s_gmi_input_args}, .is_array = true, .array_length = 1}}};
 static const mu_value_source_t s_gmi_output_value = {
-    MU_VALUESOURCE_STATIC, {.static_value = {MU_TYPE_EXTENSIONOBJECT, {.array = s_gmi_output_args}, true, 2}}};
-static const mu_value_source_t s_resend_input_value = {
-    MU_VALUESOURCE_STATIC, {.static_value = {MU_TYPE_EXTENSIONOBJECT, {.array = s_resend_input_args}, true, 1}}};
+    MU_VALUESOURCE_STATIC,
+    {.static_value = {
+         .type = MU_TYPE_EXTENSIONOBJECT, .value = {.array = s_gmi_output_args}, .is_array = true, .array_length = 2}}};
+static const mu_value_source_t s_resend_input_value = {MU_VALUESOURCE_STATIC,
+                                                       {.static_value = {.type = MU_TYPE_EXTENSIONOBJECT,
+                                                                         .value = {.array = s_resend_input_args},
+                                                                         .is_array = true,
+                                                                         .array_length = 1}}};
 
 #define MU_GMI_INPUT_VALUE &s_gmi_input_value
 #define MU_GMI_OUTPUT_VALUE &s_gmi_output_value
