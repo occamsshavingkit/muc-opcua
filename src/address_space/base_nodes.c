@@ -22,8 +22,8 @@
  * Structure subtype or an Encoding Object is enabled -- not just the historical
  * LocalTime / EngineeringUnits / Currency trio.  This decouples the Argument
  * (CU 3641) and base-types (CU 3188) claims from those unrelated CUs. */
-#if MUC_OPCUA_CU_BASE_INFO_LOCALTIME || defined(MUC_OPCUA_CU_BASE_INFO_ENGINEERING_UNITS) ||                            \
-    defined(MUC_OPCUA_CU_BASE_INFO_CURRENCY) || MUC_OPCUA_CU_BASE_INFO_ARGUMENT_TYPE ||                                 \
+#if MUC_OPCUA_CU_BASE_INFO_LOCALTIME || defined(MUC_OPCUA_CU_BASE_INFO_ENGINEERING_UNITS) ||                           \
+    defined(MUC_OPCUA_CU_BASE_INFO_CURRENCY) || MUC_OPCUA_CU_BASE_INFO_ARGUMENT_TYPE ||                                \
     MUC_OPCUA_CU_BASE_INFO_BASE_TYPES
 #define MU_HAVE_STRUCTURE_TYPE 1
 #else
@@ -55,7 +55,7 @@ static const opcua_byte_t s_str_DateTime[] = "DateTime";
 #ifdef MUC_OPCUA_CU_ADDRESS_SPACE_ADDIN_DEFAULTINSTANCEBROWSENAME
 static const opcua_byte_t s_str_DefaultInstanceBrowseName[] = "DefaultInstanceBrowseName";
 #endif
-#if MUC_OPCUA_CU_BASE_INFO_LOCALTIME || defined(MUC_OPCUA_CU_BASE_INFO_CURRENCY) ||                                     \
+#if MUC_OPCUA_CU_BASE_INFO_LOCALTIME || defined(MUC_OPCUA_CU_BASE_INFO_CURRENCY) ||                                    \
     MUC_OPCUA_CU_BASE_INFO_ARGUMENT_TYPE || MUC_OPCUA_CU_BASE_INFO_BASE_TYPES
 static const opcua_byte_t s_str_Default_Binary[] = "Default Binary";
 #endif
@@ -399,8 +399,10 @@ static const mu_reference_t s_double_subtype_refs[] = {
 static const mu_reference_t s_datetime_subtype_refs[] = {
     {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {294}}, true}}; /* DateTime -> UtcTime */
 static const mu_reference_t s_enum_value_type_refs[] = {
-    {{0, MU_NODEID_NUMERIC, {38}}, {0, MU_NODEID_NUMERIC, {7616}}, true},  /* EnumValueType -HasEncoding-> Default XML */
-    {{0, MU_NODEID_NUMERIC, {38}}, {0, MU_NODEID_NUMERIC, {8251}}, true}}; /* EnumValueType -HasEncoding-> Default Binary */
+    {{0, MU_NODEID_NUMERIC, {38}}, {0, MU_NODEID_NUMERIC, {7616}}, true}, /* EnumValueType -HasEncoding-> Default XML */
+    {{0, MU_NODEID_NUMERIC, {38}},
+     {0, MU_NODEID_NUMERIC, {8251}},
+     true}}; /* EnumValueType -HasEncoding-> Default Binary */
 #endif
 
 #if MU_HAVE_STRUCTURE_TYPE

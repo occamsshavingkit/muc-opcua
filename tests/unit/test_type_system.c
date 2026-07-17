@@ -234,13 +234,13 @@ void test_base_types_and_modelling_rules(void) {
     TEST_ASSERT_TRUE(has_forward_ref(28u, 45u, 9u)); /* UInt64 */
 
     /* Specialized leaf subtypes. */
-    TEST_ASSERT_TRUE(has_forward_ref(11u, 45u, 290u));    /* Double -> Duration */
-    TEST_ASSERT_TRUE(has_forward_ref(12u, 45u, 291u));    /* String -> NumericRange */
-    TEST_ASSERT_TRUE(has_forward_ref(13u, 45u, 294u));    /* DateTime -> UtcTime */
-    TEST_ASSERT_TRUE(has_forward_ref(22u, 45u, 7594u));   /* Structure -> EnumValueType */
-    TEST_ASSERT_TRUE(has_forward_ref(22u, 45u, 12756u));  /* Structure -> Union */
-    TEST_ASSERT_TRUE(has_forward_ref(32u, 45u, 37u));     /* NonHier -> HasModellingRule */
-    TEST_ASSERT_TRUE(has_forward_ref(58u, 45u, 77u));     /* BaseObjectType -> ModellingRuleType */
+    TEST_ASSERT_TRUE(has_forward_ref(11u, 45u, 290u));   /* Double -> Duration */
+    TEST_ASSERT_TRUE(has_forward_ref(12u, 45u, 291u));   /* String -> NumericRange */
+    TEST_ASSERT_TRUE(has_forward_ref(13u, 45u, 294u));   /* DateTime -> UtcTime */
+    TEST_ASSERT_TRUE(has_forward_ref(22u, 45u, 7594u));  /* Structure -> EnumValueType */
+    TEST_ASSERT_TRUE(has_forward_ref(22u, 45u, 12756u)); /* Structure -> Union */
+    TEST_ASSERT_TRUE(has_forward_ref(32u, 45u, 37u));    /* NonHier -> HasModellingRule */
+    TEST_ASSERT_TRUE(has_forward_ref(58u, 45u, 77u));    /* BaseObjectType -> ModellingRuleType */
 
     /* EnumValueType HasEncoding -> its Encoding Objects. */
     TEST_ASSERT_TRUE(has_forward_ref(7594u, 38u, 7616u));
