@@ -18,8 +18,8 @@ remains future work.
 | claimed | 63 |
 | implemented | 8 |
 | documented | 2 |
-| deferred | 9 |
-| unimplemented | 118 |
+| deferred | 10 |
+| unimplemented | 117 |
 
 ## Item matrix
 
@@ -120,7 +120,7 @@ remains future work.
 | opc_cu_4426 | conformance_unit | unimplemented |  | — | embedded, standard, full | — |
 | opc_cu_5207 | conformance_unit | unimplemented |  | — | micro, embedded, standard, full | — |
 | opc_cu_5208 | conformance_unit | unimplemented |  | — | micro, embedded, standard, full | — |
-| opc_cu_5801 | conformance_unit | unimplemented |  | — | embedded, standard, full | — |
+| opc_cu_5801 | conformance_unit | deferred |  | MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION | embedded, standard, full | — |
 | opc_cu_5868 | conformance_unit | unimplemented |  | — | embedded, standard, full | — |
 | opc_cu_subscription_basic | conformance_unit | claimed | OPC-10000-4 §5.12/5.13 Core 2022 Server Facet | MUC_OPCUA_CU_SUBSCRIPTION_BASIC | micro, embedded, standard, full | test_subscriptions, test_subscriptions_errors |
 | opc_cu_subscription_standard | conformance_unit | claimed | OPC-10000-7 Core 2022 Server Facet | MUC_OPCUA_CU_SUBSCRIPTION_STANDARD | embedded, standard, full | test_subscriptions_capacity, test_subscription_deadband, test_subscription_publish |

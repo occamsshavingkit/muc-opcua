@@ -1755,3 +1755,42 @@ ServerStatus (864) struct writers.
   `mu_variant_t` rippling through the existing time slots); `MU_SERVER_STATUS_STORAGE_BYTES`
   (336 B) was added to the storage sum and the 32-bit ARM `_Static_assert` passes with
   comfortable headroom on nano.
+
+## 2026-07-17: Spec 085 — ServerType InstanceDeclarations (CU 5801 core)
+
+Adds the 65 core Mandatory InstanceDeclarations under the `ServerType`(2004) tree that
+the CU 3189 slice's type-nodes-only scope deferred — `ServerStatusType`(6),
+`BuildInfoType`(6), `ServerDiagnosticsSummaryType`(12), `ServerCapabilitiesType`(24,
+`RoleSet` dropped pending `RoleSetType`), and `ServerType`-direct(17, incl. 4 Methods
+with In/OutputArguments omitted) — in `base_nodes.c`, gated by the new selectable CU
+symbol `MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION` (`opc_cu_5801`, state `deferred`,
+nested inside the `MUC_OPCUA_CU_BASE_INFO_SERVERTYPE` (3189) gate; embedded/standard/full
+default). 14 of the 65 NodeIds (`BuildInfoType` children 3052-3057, `ServerStatusType`
+2752/2753, and 6 `ServerCapabilitiesType`/`ServerType` properties) fall inside the
+pre-existing `DATA_ACCESS` dual-copy region of `s_base_nodes[]` and were added to both
+branches to keep the table sorted on DA-off (embedded) profiles. No `struct mu_server`
+field changes, so RAM and `MU_SERVER_STORAGE_BYTES` are unaffected.
+
+`scripts/measure_size.sh all` (Arm Cortex-M0+, `-Os`), before at `main` commit `1ef418b`
+(archive `.text` / `.data` / `.bss`):
+
+| Profile | before | after | Δ .text | `.data`/`.bss` |
+|----------|------------------:|------------------:|------:|:---:|
+| nano | 24,296 | 24,296 | 0 | 0 / 0 (unchanged) |
+| micro | 44,366 | 44,366 | 0 | 0 / 0 (unchanged) |
+| embedded | 71,378 | 82,489 | **+11,111** | 0 / 0 |
+| standard | 72,399 | 83,510 | **+11,111** | 0 / 0 |
+| full | 100,434 | 111,545 | **+11,111** | 0 / 0 |
+
+- `nano`/`micro` are byte-identical — the CU is gated off (no type-information facet),
+  so it never compiles in.
+- `embedded`/`standard`/`full` gain the identical **+11,111 B** — the 65-node set is
+  profile-independent once the type-information CU is on (as with the 080b/083 type-tree
+  slices, all three secured/type-system profiles move in lockstep).
+- **`.bss`/`.data` stay 0 B on every profile** — hard-gate confirmed: this is a pure
+  `const` flash addition, no mutable static state introduced.
+- Verified via `make test-profiles`: nano 101/102, micro 124/125, embedded 125/126,
+  standard 125/126, full 137/138, each with the single known
+  `test_no_stale_project_name` failure (untracked planning-doc absolute paths, not a
+  code regression) and otherwise all green; manifest validate OK. 32-bit ARM
+  `-mcpu=cortex-m0plus -mthumb -ffreestanding -Werror` compile of `base_nodes.c` clean.
