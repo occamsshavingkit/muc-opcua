@@ -66,7 +66,7 @@ static void process_message_multi_chunk_final_dispatch(mu_server_t *server, cons
     if (status != MU_STATUS_GOOD) {
         payload_len = server->config.send_buffer_size - body_offset;
         if (mu_write_service_fault(resp_body, &payload_len, 0, status
-#ifdef MUC_OPCUA_CU_TIME_SYNC
+#ifdef MU_RESPONSE_PREFIX_WANTS_SERVER
                                    ,
                                    server
 #endif

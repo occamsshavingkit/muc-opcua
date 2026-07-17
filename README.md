@@ -29,7 +29,7 @@ need and can inspect or trim the resolved feature set with `menuconfig`.
 - **Tiny flash.** Measured snapshot (2026-07-17, reproduce with
   `scripts/measure_size.sh all`): a complete Nano server is **23.1 KiB**
   (23,660 B) of Arm Cortex-M0+ `-Os` core `.text`; Micro is **42.7 KiB**
-  (43,682 B); Standard 2017 is **60.9 KiB** (62,359 B). Every profile has
+  (43,678 B); Standard 2017 is **60.9 KiB** (62,355 B). Every profile has
   0 B `.data` and 0 B `.bss` — the library holds no mutable static state and
   never calls `malloc`.
 - **Freestanding & portable.** Plain C11 core with no OS assumptions. Hardware and OS
@@ -67,10 +67,10 @@ Measured 2026-07-17 (`scripts/measure_size.sh all`, Arm Cortex-M0+ `-Os` archive
 | Profile | .text | OPC UA Profile (strict mandatory set) |
 |---------|-------|----------------|
 | nano | 23,660 B | Nano Embedded Device 2017 (Core: Read/Browse/Discovery/RegisterNodes + Base Info + UserName/Password) |
-| micro | 43,682 B | Micro Embedded Device 2017 (Nano + basic subscriptions + 2 parallel sessions) |
-| embedded | 61,420 B | Embedded 2017 UA Server (Micro + Standard DataChange + Security + Type System) |
-| standard | 62,359 B | Standard 2017 UA Server (Embedded + Enhanced DataChange capacity + X509) |
-| full | 90,450 B | — (everything on: Write, Events, Data Access, Method Server, History, Query, NodeManagement, PubSub, Aggregate, Diagnostics, Reverse Connect, Client Redundancy, ECC, …) |
+| micro | 43,678 B | Micro Embedded Device 2017 (Nano + basic subscriptions + 2 parallel sessions) |
+| embedded | 61,416 B | Embedded 2017 UA Server (Micro + Standard DataChange + Security + Type System) |
+| standard | 62,355 B | Standard 2017 UA Server (Embedded + Enhanced DataChange capacity + X509) |
+| full | 90,446 B | — (everything on: Write, Events, Data Access, Method Server, History, Query, NodeManagement, PubSub, Aggregate, Diagnostics, Reverse Connect, Client Redundancy, ECC, …) |
 
 The base type-system CUs (3188/3185, spec 080b) add ~3.1 KB `.text` to
 `embedded`/`standard` and ~2.9 KB to `full`; `nano`/`micro` are unaffected (their

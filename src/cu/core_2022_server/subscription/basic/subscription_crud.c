@@ -80,7 +80,7 @@ opcua_statuscode_t handle_create_subscription(mu_server_t *server, mu_binary_rea
     mu_diagnostics_subscription_created(server);
 
     s = write_response_prefix(w, MU_ID_CREATESUBSCRIPTIONRESPONSE, req.request_handle, MU_STATUS_GOOD
-#ifdef MUC_OPCUA_CU_TIME_SYNC
+#ifdef MU_RESPONSE_PREFIX_WANTS_SERVER
                               ,
                               server
 #endif
@@ -135,7 +135,7 @@ opcua_statuscode_t handle_modify_subscription(mu_server_t *server, mu_binary_rea
                                      max_notifications_per_publish, priority);
 
     s = write_response_prefix(w, MU_ID_MODIFYSUBSCRIPTIONRESPONSE, req.request_handle, MU_STATUS_GOOD
-#ifdef MUC_OPCUA_CU_TIME_SYNC
+#ifdef MU_RESPONSE_PREFIX_WANTS_SERVER
                               ,
                               server
 #endif
@@ -283,7 +283,7 @@ opcua_statuscode_t handle_republish(mu_server_t *server, mu_binary_reader_t *r, 
     }
 
     s = write_response_prefix(w, MU_ID_REPUBLISHRESPONSE, req.request_handle, MU_STATUS_GOOD
-#ifdef MUC_OPCUA_CU_TIME_SYNC
+#ifdef MU_RESPONSE_PREFIX_WANTS_SERVER
                               ,
                               server
 #endif

@@ -15,7 +15,7 @@ opcua_statuscode_t handle_history_read(mu_server_t *server, mu_binary_reader_t *
     s = mu_history_read_request_decode(r, &req, nodes_to_read, MU_MAX_HISTORY_NODES_PER_READ);
     if (s != MU_STATUS_GOOD) {
         s = write_response_prefix(w, MU_ID_HISTORYREADRESPONSE, req_header.request_handle, s
-#ifdef MUC_OPCUA_CU_TIME_SYNC
+#ifdef MU_RESPONSE_PREFIX_WANTS_SERVER
                                   ,
                                   server
 #endif
@@ -28,7 +28,7 @@ opcua_statuscode_t handle_history_read(mu_server_t *server, mu_binary_reader_t *
 
     if (!server->config.history_adapter.read_raw_modified) {
         s = write_response_prefix(w, MU_ID_HISTORYREADRESPONSE, req_header.request_handle, MU_STATUS_BAD_NOTSUPPORTED
-#ifdef MUC_OPCUA_CU_TIME_SYNC
+#ifdef MU_RESPONSE_PREFIX_WANTS_SERVER
                                   ,
                                   server
 #endif
@@ -89,7 +89,7 @@ opcua_statuscode_t handle_history_read(mu_server_t *server, mu_binary_reader_t *
     }
 
     s = write_response_prefix(w, MU_ID_HISTORYREADRESPONSE, req_header.request_handle, MU_STATUS_GOOD
-#ifdef MUC_OPCUA_CU_TIME_SYNC
+#ifdef MU_RESPONSE_PREFIX_WANTS_SERVER
                               ,
                               server
 #endif
@@ -121,7 +121,7 @@ opcua_statuscode_t handle_history_update(mu_server_t *server, mu_binary_reader_t
     s = mu_history_update_request_decode(r, &req, items, MU_MAX_HISTORY_UPDATE_ITEMS);
     if (s != MU_STATUS_GOOD) {
         s = write_response_prefix(w, MU_ID_HISTORYUPDATERESPONSE, req_header.request_handle, s
-#ifdef MUC_OPCUA_CU_TIME_SYNC
+#ifdef MU_RESPONSE_PREFIX_WANTS_SERVER
                                   ,
                                   server
 #endif
@@ -170,7 +170,7 @@ opcua_statuscode_t handle_history_update(mu_server_t *server, mu_binary_reader_t
     }
 
     s = write_response_prefix(w, MU_ID_HISTORYUPDATERESPONSE, req_header.request_handle, MU_STATUS_GOOD
-#ifdef MUC_OPCUA_CU_TIME_SYNC
+#ifdef MU_RESPONSE_PREFIX_WANTS_SERVER
                               ,
                               server
 #endif

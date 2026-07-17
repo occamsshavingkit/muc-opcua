@@ -132,7 +132,7 @@ opcua_statuscode_t handle_translate_browse_paths(mu_server_t *server, mu_binary_
     }
 
     s = write_response_prefix(w, MU_ID_TRANSLATEBROWSEPATHSTONODEIDSRESPONSE, req.request_handle, MU_STATUS_GOOD
-#ifdef MUC_OPCUA_CU_TIME_SYNC
+#ifdef MU_RESPONSE_PREFIX_WANTS_SERVER
                               ,
                               server
 #endif
@@ -284,7 +284,7 @@ opcua_statuscode_t handle_browse(mu_server_t *server, mu_binary_reader_t *r, mu_
     }
 
     s = write_response_prefix(w, MU_ID_BROWSERESPONSE, req.request_handle, MU_STATUS_GOOD
-#ifdef MUC_OPCUA_CU_TIME_SYNC
+#ifdef MU_RESPONSE_PREFIX_WANTS_SERVER
                               ,
                               server
 #endif
@@ -345,7 +345,7 @@ opcua_statuscode_t handle_browse_next(mu_server_t *server, mu_binary_reader_t *r
     }
 
     s = write_response_prefix(w, MU_ID_BROWSENEXTRESPONSE, req.request_handle, MU_STATUS_GOOD
-#ifdef MUC_OPCUA_CU_TIME_SYNC
+#ifdef MU_RESPONSE_PREFIX_WANTS_SERVER
                               ,
                               server
 #endif

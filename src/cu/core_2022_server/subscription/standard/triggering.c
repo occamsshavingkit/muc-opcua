@@ -92,7 +92,7 @@ opcua_statuscode_t handle_set_triggering(mu_server_t *server, mu_binary_reader_t
     }
 
     s = write_response_prefix(w, MU_ID_SETTRIGGERINGRESPONSE, req.request_handle, MU_STATUS_GOOD
-#ifdef MUC_OPCUA_CU_TIME_SYNC
+#ifdef MU_RESPONSE_PREFIX_WANTS_SERVER
                               ,
                               server
 #endif

@@ -25,7 +25,7 @@ opcua_statuscode_t handle_query_first(mu_server_t *server, mu_binary_reader_t *r
     status = mu_query_first_process(server, &req, &resp, data_sets, 16);
 
     opcua_statuscode_t wstatus = write_response_prefix(w, MU_ID_QUERYFIRSTRESPONSE, req_header.request_handle, status
-#ifdef MUC_OPCUA_CU_TIME_SYNC
+#ifdef MU_RESPONSE_PREFIX_WANTS_SERVER
                                                        ,
                                                        server
 #endif
@@ -62,7 +62,7 @@ opcua_statuscode_t handle_query_next(mu_server_t *server, mu_binary_reader_t *r,
     status = mu_query_next_process(server, &req, &resp, data_sets, 16);
 
     opcua_statuscode_t wstatus = write_response_prefix(w, MU_ID_QUERYNEXTRESPONSE, req_header.request_handle, status
-#ifdef MUC_OPCUA_CU_TIME_SYNC
+#ifdef MU_RESPONSE_PREFIX_WANTS_SERVER
                                                        ,
                                                        server
 #endif
@@ -113,7 +113,7 @@ opcua_statuscode_t handle_register_nodes(mu_server_t *server, mu_binary_reader_t
     }
 
     s = write_response_prefix(w, MU_ID_REGISTERNODESRESPONSE, req.request_handle, MU_STATUS_GOOD
-#ifdef MUC_OPCUA_CU_TIME_SYNC
+#ifdef MU_RESPONSE_PREFIX_WANTS_SERVER
                               ,
                               server
 #endif
@@ -168,7 +168,7 @@ opcua_statuscode_t handle_unregister_nodes(mu_server_t *server, mu_binary_reader
     }
 
     s = write_response_prefix(w, MU_ID_UNREGISTERNODESRESPONSE, req.request_handle, MU_STATUS_GOOD
-#ifdef MUC_OPCUA_CU_TIME_SYNC
+#ifdef MU_RESPONSE_PREFIX_WANTS_SERVER
                               ,
                               server
 #endif
