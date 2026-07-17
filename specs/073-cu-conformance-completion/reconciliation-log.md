@@ -303,3 +303,57 @@ Backed by test_type_system::test_argument_datatype_and_encodings; sorted-table
 invariant enforced. The larger 3188 base-DataType set + 3185 folders follow; 3189
 ServerType and 5801 completeness (the ~35 KB flash item — scoped vs full is a
 maintainer decision) come after.
+
+## 2026-07-17 — Roadmap A2 (second slice): Base Types + Core Types Folders (CU 3188, 3185)
+
+Completes the base OPC UA type system in `base_nodes.c`, gated by a new selectable CU
+symbol `MUC_OPCUA_CU_BASE_INFO_BASE_TYPES` (alias `opc_cu_base_info_base_types`;
+embedded/standard/full; `depends on` the type-system facet **and** the specialized-DataTypes
+CU). Emb/Std required 44 -> 46.
+
+| CU | Now backed by |
+| --- | --- |
+| 3188 Base Info Base Types | The remaining built-in/abstract DataTypes (Guid14, ByteString15, XmlElement16, ExpandedNodeId18, DataValue23, DiagnosticInfo25, Integer27, UInteger28, Enumeration29, Duration290, NumericRange291, UtcTime294, EnumValueType7594, Union12756), HasModellingRule(37), ModellingRuleType(77) + its ModellingRule Objects (Optional80/Mandatory78/ExposesItsArray83/OptionalPlaceholder11508/MandatoryPlaceholder11510), and the EnumValueType Encoding Objects (DefaultXml7616/DefaultBinary8251) exposed in base_nodes.c with full HasSubtype/HasEncoding closure; test_type_system::test_base_types_and_modelling_rules |
+| 3185 Base Info Core Types Folders | The core type folders Types(86)/ObjectTypes(88)/VariableTypes(89)/DataTypes(90)/ReferenceTypes(91) (already present) asserted as CU-3185 entry points; same test |
+
+Both `satisfied_by` the new claimed alias `opc_cu_base_info_base_types`. Notes:
+- **Honest hierarchy (GPT-5 pre-code review):** claiming 3188 while leaving Int32/Float/etc.
+  directly under BaseDataType would advertise a wrong type tree, so the numeric primitives are
+  **re-parented under Integer(27)/UInteger(28)/Number(26)** per OPC-10000-3 whenever BASE_TYPES
+  is on (`s_base_data_type_refs` drops 2..11 under `#if !BASE_TYPES`; new
+  `s_integer_subtype_refs`/`s_uinteger_subtype_refs` + Number->Integer/UInteger/Float/Double).
+  Existing `test_type_hierarchies_have_subtype_references` assertions were made conditional
+  (24->6/7 becomes 27->6 / 28->7 under BASE_TYPES, with negative checks locking the re-parenting).
+- **Structure(22) gate hardening (review DESIGN DECISION 1):** Structure(22), its browse string,
+  its subtype-ref array, and the BaseDataType->Structure edge were gated on the historical
+  LocalTime/EngineeringUnits/Currency trio only; slice-1's Argument(296) worked by profile
+  coincidence. Replaced with a single `MU_HAVE_STRUCTURE_TYPE` macro that also includes
+  ARGUMENT_TYPE and BASE_TYPES, decoupling those claims from unrelated CUs. Likewise
+  HasEncoding(38)/DataTypeEncodingType(76) and s_str_Default_Binary widened to
+  `ARGUMENT_TYPE || BASE_TYPES`.
+- **DataAccess-branch duplication:** the 2997..8912 tail is emitted twice (once inside
+  `#if DATA_ACCESS`, once in the `!DATA_ACCESS` branch) to preserve the binary-searched sort
+  order. EnumValueType(7594)/its encodings therefore appear in both branches (mirroring the
+  existing TimeZone(8912) handling); `test_base_address_space_is_sorted` caught the first,
+  DA-only, placement (embedded builds DATA_ACCESS off).
+- `s_str_Mandatory`/`s_str_Optional` were moved out of the `#if DATA_ACCESS` string block so the
+  78/80 ModellingRule Objects (now gated `DATA_ACCESS || BASE_TYPES`, typed by ModellingRuleType
+  77 when BASE_TYPES is on) resolve their BrowseNames.
+- New CU symbol propagated to test TUs via `target_compile_definitions(... PUBLIC)` in
+  src/CMakeLists.txt (mirrors DATATYPES/ARGUMENT_TYPE; the top-level KCONFIG_FEATURES list is
+  not required — only LOCALTIME appears there).
+- Deferred earlier, now DONE: the strict primitive re-parenting the A2 handoff had punted to the
+  5801 block was pulled forward here because it is a prerequisite for an honest 3188 claim.
+- Verified: all 5 profiles green (nano 101 / micro 124 / embedded 125 / standard 125 / full 137),
+  manifest validate OK, 32-bit ARM `-ffreestanding -Werror` compile of base_nodes.c clean.
+
+### Pre-existing observation (out of scope for 080b)
+GPT-5's diff review flagged that `MUC_OPCUA_CU_BASE_INFO_ENGINEERING_UNITS` (and, by the same
+pattern, CURRENCY/LOCALTIME) emit their structured-DataType nodes (EUInformation i=887,
+CurrencyUnitType, TimeZoneDataType) in dedicated blocks that are NOT in global sorted position:
+on `main`, the EUInformation(887) node already sits physically after ServerCapabilities(2268), so
+enabling ENGINEERING_UNITS with the type system yields an unsorted `s_base_nodes[]` (2268 -> 887).
+This is a pre-existing latent issue in those optional CUs — no named profile enables them, so
+`test_base_address_space_is_sorted` never exercises it. Spec 080b does not introduce or worsen any
+NAMED-profile ordering (all 5 remain sorted); fixing the ENG/CURRENCY/LOCALTIME node placement is a
+separate concern tracked for a future slice.

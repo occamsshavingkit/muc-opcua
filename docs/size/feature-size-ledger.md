@@ -1637,3 +1637,14 @@ SessionId on the activate event. `scripts/measure_size.sh full` (ARM Cortex-M0+)
 nano/micro/embedded/standard: 0 (auditing compiled out). No RAM change (the audit
 payload pool and event struct are unchanged; the SecureChannelId string is formatted
 into a transient stack buffer copied into the existing pool slot).
+
+## Spec 080b — Base Types + Core Types Folders (CU 3188/3185)
+
+Flash-only change: ~21 static `const mu_node_t` rows + ~19 pooled BrowseName strings + several
+`mu_reference_t` arrays added to the **type-system** address-space table (Table A, gated on
+`MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER`). Growth lands on embedded/standard/full only;
+**nano/micro unchanged** (their minimal Table B has no type system). No `struct mu_server` field
+changes, so RAM and `MU_SERVER_STORAGE_BYTES` are unaffected and the 32-bit ARM static assert is
+not at risk. The re-parenting of numeric primitives is pure ref-array restructuring (net a handful
+of `mu_reference_t` entries; `--gc-sections` drops the unreferenced pooled strings when a profile
+disables the CU).
