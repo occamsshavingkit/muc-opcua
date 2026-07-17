@@ -1637,3 +1637,30 @@ SessionId on the activate event. `scripts/measure_size.sh full` (ARM Cortex-M0+)
 nano/micro/embedded/standard: 0 (auditing compiled out). No RAM change (the audit
 payload pool and event struct are unchanged; the SecureChannelId string is formatted
 into a transient stack buffer copied into the existing pool slot).
+
+## 2026-07-17: Spec 080b — Base Types + Core Types Folders (CU 3188/3185)
+
+Flash-only change: ~21 static `const mu_node_t` rows + ~19 pooled BrowseName strings + several
+`mu_reference_t` arrays added to the **type-system** address-space table (Table A, gated on
+`MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER`). Growth lands on embedded/standard/full only;
+**nano/micro unchanged** (their minimal Table B has no type system). No `struct mu_server` field
+changes, so RAM and `MU_SERVER_STORAGE_BYTES` are unaffected and the 32-bit ARM static assert is
+not at risk.
+
+`scripts/measure_size.sh all` (Arm Cortex-M0+, `-Os`), before at `main` commit `153e88e`
+(archive `.text` / elf_text):
+
+| Profile | before | after | Δ .text |
+|----------|------------------:|------------------:|------:|
+| nano | 23,660 / 21,524 | 23,660 / 21,524 | 0 |
+| micro | 43,682 / 42,240 | 43,682 / 42,240 | 0 |
+| embedded | 58,295 / 64,488 | 61,420 / 67,616 | +3,125 |
+| standard | 59,234 / 67,572 | 62,359 / 70,700 | +3,125 |
+| full | 87,512 / 92,888 | 90,450 / 95,828 | +2,938 |
+
+- `.bss`/`.data` unchanged on every profile (0 on nano/micro/embedded; standard/full keep their
+  existing 4 B `.bss` / 1,336 B `.data`) — the addition is pure `const` flash.
+- embedded == standard delta (both +3,125); `full` is a touch smaller (+2,938) because some of the
+  new BrowseName strings/refs already exist there via other full-only features and LTO folds them.
+- The primitive re-parenting is net-neutral ref restructuring; `--gc-sections` drops the
+  unreferenced pooled strings when a profile disables the CU.

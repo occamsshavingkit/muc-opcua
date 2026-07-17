@@ -195,6 +195,7 @@
       "opc_cu_auditing",
       "opc_cu_base_info_datatypes",
       "opc_cu_base_info_argument_type",
+      "opc_cu_base_info_base_types",
       "opc_cu_complex_types",
       "opc_cu_core_structure_2",
       "opc_cu_core_views_folder",
@@ -2107,6 +2108,7 @@
     {
       "id": "opc_cu_3185",
       "kind": "conformance_unit",
+      "satisfied_by": "opc_cu_base_info_base_types",
       "opc_display_name": "Base Info Core Types Folders",
       "kconfig_symbol": null,
       "implementation_state": "unimplemented",
@@ -2131,12 +2133,13 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "Exposes entry points into the type system in the AddressSpace. Specifically, these are the Folder Nodes: Types, ObjectTypes, DataTypes, VariableTypes, and ReferenceTypes.",
+      "notes": "Reconciled (spec 080b): the core type-system Folder Nodes Types(86)/ObjectTypes(88)/DataTypes(90)/VariableTypes(89)/ReferenceTypes(91) are exposed in base_nodes.c and asserted by test_type_system. Satisfied by opc_cu_base_info_base_types. Exposes entry points into the type system in the AddressSpace. Specifically, these are the Folder Nodes: Types, ObjectTypes, DataTypes, VariableTypes, and ReferenceTypes.",
       "cu_optional": false
     },
     {
       "id": "opc_cu_3188",
       "kind": "conformance_unit",
+      "satisfied_by": "opc_cu_base_info_base_types",
       "opc_display_name": "Base Info Base Types",
       "kconfig_symbol": null,
       "implementation_state": "unimplemented",
@@ -2161,7 +2164,7 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "Supports type information of the base OPC UA concepts, like build-in DataTypes, base Object- and VariableTypes, and base ReferenceTypes. Includes the Encoding Objects for the DataTypes that are not Build-in or abstract DataTypes.\r\nExposes the ObjectTypes BaseObjectType, FolderType, DataTypeEncodingType and ModellingRuleType in the AddressSpace.\r\nExposes the VariableTypes BaseVariableType, PropertyType, and BaseDataVariableType in the AddressSpace.\r\nExposes the DataTypes BaseDataType Boolean, ByteString, DateTime, DataValue, DiagnosticsInfo, Enumeration, ExpandedNodeId, Guid, LocalizedText, NodeId, Number, QualifiedName, String, Structure, XmlElement, Integer, UInteger, Double, Float, Sbyte, Int16, Int32, Int64, Byte, Uint16, Uint32, Uint64, StatusCode, UtcTime, Duration, NumericRange, EnumValueType, and Union and their Encoding Objects in the AddressSpace.\r\nExposes the ReferenceTypes References, HierarchicalReferences, NonHierarchicalReferences, HasChild, Organizes, HasModellingRule, HasTypeDefinition, HasEncoding, Aggregates, HasSubtype, HasComponent, and HasProperty in the AddressSpace\r\nExposes the Objects Optional, Mandatory, OptionalPlaceholder, MandatoryPlaceholder and ExposesItsArrayin the AddressSpace.\r\n",
+      "notes": "Reconciled (spec 080b): the full base OPC UA type system is exposed in base_nodes.c and asserted by test_type_system -- all built-in/abstract DataTypes with supertype closure (primitives re-parented under Integer(27)/UInteger(28)/Number(26)), the base Object/Variable/ReferenceTypes, ModellingRuleType(77) + its ModellingRule Objects (78/80/83/11508/11510), and EnumValueType(7594)/Union(12756) with EnumValueType Encoding Objects (7616/8251). Satisfied by opc_cu_base_info_base_types. Supports type information of the base OPC UA concepts, like build-in DataTypes, base Object- and VariableTypes, and base ReferenceTypes. Includes the Encoding Objects for the DataTypes that are not Build-in or abstract DataTypes.\r\nExposes the ObjectTypes BaseObjectType, FolderType, DataTypeEncodingType and ModellingRuleType in the AddressSpace.\r\nExposes the VariableTypes BaseVariableType, PropertyType, and BaseDataVariableType in the AddressSpace.\r\nExposes the DataTypes BaseDataType Boolean, ByteString, DateTime, DataValue, DiagnosticsInfo, Enumeration, ExpandedNodeId, Guid, LocalizedText, NodeId, Number, QualifiedName, String, Structure, XmlElement, Integer, UInteger, Double, Float, Sbyte, Int16, Int32, Int64, Byte, Uint16, Uint32, Uint64, StatusCode, UtcTime, Duration, NumericRange, EnumValueType, and Union and their Encoding Objects in the AddressSpace.\r\nExposes the ReferenceTypes References, HierarchicalReferences, NonHierarchicalReferences, HasChild, Organizes, HasModellingRule, HasTypeDefinition, HasEncoding, Aggregates, HasSubtype, HasComponent, and HasProperty in the AddressSpace\r\nExposes the Objects Optional, Mandatory, OptionalPlaceholder, MandatoryPlaceholder and ExposesItsArrayin the AddressSpace.\r\n",
       "cu_optional": false
     },
     {
@@ -2464,7 +2467,7 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "Reconciled (spec 080a): Argument(i=296, subtype of Structure) + its DefaultBinary(298)/DefaultXml(297) Encoding Objects (DataTypeEncodingType 76) exposed in base_nodes.c; test_type_system. Satisfied by opc_cu_base_info_base_types. Exposes the Argument DataType, its Encoding Objects and all its supertypes in the AddressSpace.",
+      "notes": "Reconciled (spec 080a): Argument(i=296, subtype of Structure) + its DefaultBinary(298)/DefaultXml(297) Encoding Objects (DataTypeEncodingType 76) exposed in base_nodes.c; test_type_system. Satisfied by opc_cu_base_info_argument_type. Exposes the Argument DataType, its Encoding Objects and all its supertypes in the AddressSpace.",
       "cu_optional": false
     },
     {
@@ -3887,6 +3890,34 @@
         "facet": "Core 2022 Server Facet"
       },
       "notes": "spec 080a: exposes the Argument(i=296) DataType (subtype of Structure) + its DefaultBinary(298)/DefaultXml(297) Encoding Objects, plus the shared DataTypeEncodingType(76) ObjectType and HasEncoding(38) ReferenceType, in base_nodes.c. Satisfies CU 3641. First slice of the base type-system completion (A2); 3188 base DataTypes + 3185 folders follow."
+    },
+    {
+      "id": "opc_cu_base_info_base_types",
+      "kind": "conformance_unit",
+      "opc_display_name": "Base Info Base Types + Core Types Folders",
+      "kconfig_symbol": "MUC_OPCUA_CU_BASE_INFO_BASE_TYPES",
+      "implementation_state": "claimed",
+      "depends_on": [
+        "MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER",
+        "MUC_OPCUA_CU_BASE_INFO_DATATYPES"
+      ],
+      "profile_defaults": {
+        "nano": false,
+        "micro": false,
+        "embedded": true,
+        "standard": true,
+        "full": true,
+        "custom": false
+      },
+      "backing_tests": [
+        "test_type_system"
+      ],
+      "opc_reference": {
+        "spec": "OPC-10000-5",
+        "section": null,
+        "facet": "Core 2022 Server Facet"
+      },
+      "notes": "spec 080b: completes the base OPC UA type system in base_nodes.c -- the remaining built-in/abstract DataTypes (Guid14/ByteString15/XmlElement16/ExpandedNodeId18/DataValue23/DiagnosticInfo25/Integer27/UInteger28/Enumeration29/Duration290/NumericRange291/UtcTime294/EnumValueType7594/Union12756) with correct supertype closure (primitives re-parented under Integer/UInteger/Number), HasModellingRule(37) + ModellingRuleType(77) + the ModellingRule Objects (Optional80/Mandatory78/ExposesItsArray83/OptionalPlaceholder11508/MandatoryPlaceholder11510), and the EnumValueType Encoding Objects (DefaultXml7616/DefaultBinary8251). Satisfies CU 3188 (Base Types) and CU 3185 (Core Types Folders). Second slice of the base type-system completion (A2); depends on the specialized-DataTypes CU for the Number/String subtype arrays it extends."
     },
     {
       "id": "service_read",

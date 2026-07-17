@@ -98,10 +98,20 @@ void test_type_hierarchies_have_subtype_references(void) {
     TEST_ASSERT_TRUE(has_forward_ref(44u, 45u, 46u));
     TEST_ASSERT_TRUE(has_forward_ref(44u, 45u, 47u));
 
+#if MUC_OPCUA_CU_BASE_INFO_BASE_TYPES
+    /* spec 080b re-parents the numeric primitives under Integer/UInteger so the
+       advertised DataType tree matches OPC-10000-3: Int32/UInt32 are no longer
+       direct BaseDataType children. */
+    TEST_ASSERT_TRUE(has_forward_ref(27u, 45u, 6u));  /* Integer -> Int32 */
+    TEST_ASSERT_TRUE(has_forward_ref(28u, 45u, 7u));  /* UInteger -> UInt32 */
+    TEST_ASSERT_FALSE(has_forward_ref(24u, 45u, 6u)); /* no longer direct */
+    TEST_ASSERT_FALSE(has_forward_ref(24u, 45u, 7u));
+#else
     TEST_ASSERT_TRUE(has_forward_ref(24u, 45u, 6u));
     TEST_ASSERT_TRUE(has_forward_ref(24u, 45u, 7u));
-    TEST_ASSERT_TRUE(has_forward_ref(24u, 45u, 12u));
-    TEST_ASSERT_TRUE(has_forward_ref(24u, 45u, 13u));
+#endif
+    TEST_ASSERT_TRUE(has_forward_ref(24u, 45u, 12u)); /* String stays direct */
+    TEST_ASSERT_TRUE(has_forward_ref(24u, 45u, 13u)); /* DateTime stays direct */
 
     TEST_ASSERT_TRUE(has_forward_ref(58u, 45u, 61u));
     TEST_ASSERT_TRUE(has_forward_ref(58u, 45u, 2004u));
@@ -147,6 +157,101 @@ void test_argument_datatype_and_encodings(void) {
     TEST_ASSERT_TRUE(has_forward_ref(58u, 45u, 76u));   /* BaseObjectType -> DataTypeEncodingType */
     TEST_ASSERT_TRUE(has_forward_ref(296u, 38u, 297u)); /* Argument -HasEncoding-> Default XML */
     TEST_ASSERT_TRUE(has_forward_ref(296u, 38u, 298u)); /* Argument -HasEncoding-> Default Binary */
+}
+#endif
+
+#if MUC_OPCUA_CU_BASE_INFO_BASE_TYPES
+/* spec 080b: the remaining base type-system nodes (CU 3188 Base Types) and the
+   core type folders (CU 3185). */
+static void assert_type_definition(opcua_uint32_t id, opcua_uint32_t expected) {
+    const mu_node_t *node = base_node(id);
+    TEST_ASSERT_NOT_NULL(node);
+    TEST_ASSERT_EQUAL_INT(MU_NODEID_NUMERIC, node->type_definition.identifier_type);
+    TEST_ASSERT_EQUAL_UINT(0u, node->type_definition.namespace_index);
+    TEST_ASSERT_EQUAL_UINT32(expected, node->type_definition.identifier.numeric);
+}
+
+void test_base_types_and_modelling_rules(void) {
+    /* Built-in / abstract DataTypes still missing before this slice. */
+    assert_node(14u, MU_NODECLASS_DATATYPE, "Guid");
+    assert_node(15u, MU_NODECLASS_DATATYPE, "ByteString");
+    assert_node(16u, MU_NODECLASS_DATATYPE, "XmlElement");
+    assert_node(18u, MU_NODECLASS_DATATYPE, "ExpandedNodeId");
+    assert_node(23u, MU_NODECLASS_DATATYPE, "DataValue");
+    assert_node(25u, MU_NODECLASS_DATATYPE, "DiagnosticInfo");
+    assert_node(27u, MU_NODECLASS_DATATYPE, "Integer");
+    assert_node(28u, MU_NODECLASS_DATATYPE, "UInteger");
+    assert_node(29u, MU_NODECLASS_DATATYPE, "Enumeration");
+    assert_node(290u, MU_NODECLASS_DATATYPE, "Duration");
+    assert_node(291u, MU_NODECLASS_DATATYPE, "NumericRange");
+    assert_node(294u, MU_NODECLASS_DATATYPE, "UtcTime");
+    assert_node(7594u, MU_NODECLASS_DATATYPE, "EnumValueType");
+    assert_node(12756u, MU_NODECLASS_DATATYPE, "Union");
+
+    /* ReferenceType + ObjectType. */
+    assert_node(37u, MU_NODECLASS_REFERENCETYPE, "HasModellingRule");
+    assert_node(77u, MU_NODECLASS_OBJECTTYPE, "ModellingRuleType");
+
+    /* ModellingRule Objects (typed by ModellingRuleType 77). */
+    assert_node(78u, MU_NODECLASS_OBJECT, "Mandatory");
+    assert_node(80u, MU_NODECLASS_OBJECT, "Optional");
+    assert_node(83u, MU_NODECLASS_OBJECT, "ExposesItsArray");
+    assert_node(11508u, MU_NODECLASS_OBJECT, "OptionalPlaceholder");
+    assert_node(11510u, MU_NODECLASS_OBJECT, "MandatoryPlaceholder");
+    assert_type_definition(78u, 77u);
+    assert_type_definition(80u, 77u);
+    assert_type_definition(83u, 77u);
+    assert_type_definition(11508u, 77u);
+    assert_type_definition(11510u, 77u);
+
+    /* EnumValueType Encoding Objects (typed by DataTypeEncodingType 76). */
+    assert_node(7616u, MU_NODECLASS_OBJECT, "Default XML");
+    assert_node(8251u, MU_NODECLASS_OBJECT, "Default Binary");
+    assert_type_definition(7616u, 76u);
+    assert_type_definition(8251u, 76u);
+
+    /* HasSubtype closure: direct BaseDataType children. */
+    TEST_ASSERT_TRUE(has_forward_ref(24u, 45u, 14u));
+    TEST_ASSERT_TRUE(has_forward_ref(24u, 45u, 15u));
+    TEST_ASSERT_TRUE(has_forward_ref(24u, 45u, 16u));
+    TEST_ASSERT_TRUE(has_forward_ref(24u, 45u, 18u));
+    TEST_ASSERT_TRUE(has_forward_ref(24u, 45u, 23u));
+    TEST_ASSERT_TRUE(has_forward_ref(24u, 45u, 25u));
+    TEST_ASSERT_TRUE(has_forward_ref(24u, 45u, 29u));
+
+    /* Number(26) -> Integer/UInteger/Float/Double (Decimal covered by DATATYPES). */
+    TEST_ASSERT_TRUE(has_forward_ref(26u, 45u, 27u));
+    TEST_ASSERT_TRUE(has_forward_ref(26u, 45u, 28u));
+    TEST_ASSERT_TRUE(has_forward_ref(26u, 45u, 10u));
+    TEST_ASSERT_TRUE(has_forward_ref(26u, 45u, 11u));
+
+    /* Integer -> signed; UInteger -> unsigned. */
+    TEST_ASSERT_TRUE(has_forward_ref(27u, 45u, 2u)); /* SByte */
+    TEST_ASSERT_TRUE(has_forward_ref(27u, 45u, 4u)); /* Int16 */
+    TEST_ASSERT_TRUE(has_forward_ref(27u, 45u, 8u)); /* Int64 */
+    TEST_ASSERT_TRUE(has_forward_ref(28u, 45u, 3u)); /* Byte */
+    TEST_ASSERT_TRUE(has_forward_ref(28u, 45u, 5u)); /* UInt16 */
+    TEST_ASSERT_TRUE(has_forward_ref(28u, 45u, 9u)); /* UInt64 */
+
+    /* Specialized leaf subtypes. */
+    TEST_ASSERT_TRUE(has_forward_ref(11u, 45u, 290u));   /* Double -> Duration */
+    TEST_ASSERT_TRUE(has_forward_ref(12u, 45u, 291u));   /* String -> NumericRange */
+    TEST_ASSERT_TRUE(has_forward_ref(13u, 45u, 294u));   /* DateTime -> UtcTime */
+    TEST_ASSERT_TRUE(has_forward_ref(22u, 45u, 7594u));  /* Structure -> EnumValueType */
+    TEST_ASSERT_TRUE(has_forward_ref(22u, 45u, 12756u)); /* Structure -> Union */
+    TEST_ASSERT_TRUE(has_forward_ref(32u, 45u, 37u));    /* NonHier -> HasModellingRule */
+    TEST_ASSERT_TRUE(has_forward_ref(58u, 45u, 77u));    /* BaseObjectType -> ModellingRuleType */
+
+    /* EnumValueType HasEncoding -> its Encoding Objects. */
+    TEST_ASSERT_TRUE(has_forward_ref(7594u, 38u, 7616u));
+    TEST_ASSERT_TRUE(has_forward_ref(7594u, 38u, 8251u));
+
+    /* CU 3185: the core type folders remain present (entry points). */
+    assert_node(86u, MU_NODECLASS_OBJECT, "Types");
+    assert_node(88u, MU_NODECLASS_OBJECT, "ObjectTypes");
+    assert_node(89u, MU_NODECLASS_OBJECT, "VariableTypes");
+    assert_node(90u, MU_NODECLASS_OBJECT, "DataTypes");
+    assert_node(91u, MU_NODECLASS_OBJECT, "ReferenceTypes");
 }
 #endif
 
@@ -217,6 +322,9 @@ int main(void) {
 #endif
 #if MUC_OPCUA_CU_BASE_INFO_ARGUMENT_TYPE
     RUN_TEST(test_argument_datatype_and_encodings);
+#endif
+#if MUC_OPCUA_CU_BASE_INFO_BASE_TYPES
+    RUN_TEST(test_base_types_and_modelling_rules);
 #endif
 #elif MUC_OPCUA_BASE_NODES
     RUN_TEST(test_default_build_keeps_types_folder_unexpanded);
