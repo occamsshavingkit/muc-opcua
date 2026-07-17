@@ -518,3 +518,64 @@ on). Archive `.data`/`.bss` remain 0 B on all 5 profiles (constitution rule inta
 | CU | Now backed by |
 | --- | --- |
 | 5801 Base Info Type Information (core, not yet claimed) | 65 core InstanceDeclarations under the `ServerType`(2004) tree — `ServerStatusType`(6), `BuildInfoType`(6), `ServerDiagnosticsSummaryType`(12), `ServerCapabilitiesType`(24, `RoleSet` dropped pending `RoleSetType`), `ServerType`-direct(17 incl. 4 Methods) — in `base_nodes.c`, gated `MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION` (state `deferred`); backed by `test_type_system::test_servertype_instance_declarations`; the ~350-node Session/Subscription diagnostics InstanceDeclarations and the server-wide DataType/ValueRank attribute-fidelity fix remain outstanding before an honest claim |
+
+## 2026-07-17 — DataType/ValueRank attribute fidelity (CU 5801 prerequisite)
+
+Closes prerequisite #2 named in the slice above ("Pre-existing server-wide gap:
+DataType/ValueRank attribute fidelity is not per-node accurate anywhere in the
+server today").
+
+**Read path (`mu_node_t` + `read_attribute.c`):** added `mu_node_t.data_type`
+(`opcua_uint32_t`, ns0 numeric DataType NodeId, e.g. `12`=String, `294`=UtcTime,
+`862`=ServerStatusDataType; `0` = unset) and `mu_node_t.value_rank`
+(`opcua_sbyte_t`, only consulted once `data_type != 0`). `sizeof(mu_node_t)`
+is **unchanged (136 B)** — both fields land in existing struct padding, verified
+by compiling a `sizeof` probe against the pre- and post-change header. `DATATYPE`/
+`VALUERANK` reads now return the populated per-node value when `data_type != 0`,
+else fall back to the legacy behavior (`type_definition` NodeId / `-1`) exactly as
+before.
+
+**The MULTI_CHUNK bugfix:** `DATATYPE`/`VALUERANK` are mandatory attributes of
+every Variable and VariableType node (OPC-10000-3 §5.6.2) — but the handling for
+both lived inside `read_multichunk_attribute()`, a helper only compiled in under
+`MUC_OPCUA_CU_MULTI_CHUNK`. On nano/micro/embedded (where that CU is off), reading
+either attribute returned `Bad_AttributeIdInvalid` for every Variable in the
+address space, including base nodes like `ServerStatus`/`ServerArray`. Both cases
+were moved into the main `read_attribute()` switch, unconditional on any CU —
+these attributes are now answered correctly on all five profiles for the first
+time, with no other test regressing.
+
+**Populated 53 Variable-class CU-5801 InstanceDeclarations** under the
+`ServerType`(2004) tree in `base_nodes.c` with their true DataType/ValueRank,
+grounded against the official OPC Foundation `NodeSet2.xml` (not memory/assumed
+values, per project convention) — including correcting `StartTime`(2139),
+`CurrentTime`(2140), and `BuildDate`(3057) to **UtcTime(294)**, a `DateTime`
+subtype, rather than the previously-assumed plain `DateTime`(13) (`NodeSet2.xml`
+lists these as `UtcTime`; `test_type_system.c`'s original Task-1 placeholder
+assertion had the wrong DataType *and* cited the wrong spec section for it,
+corrected in the same slice). Structured/Object-class and diagnostics-type
+InstanceDeclarations are out of scope for this fix.
+
+**This closes ONE of the two named prerequisites for claiming CU 5801** — the
+DataType/ValueRank fidelity gap. The remaining prerequisite (the ~350-node
+Session/Subscription/SamplingInterval diagnostics-type InstanceDeclarations under
+`ServerDiagnosticsType`(2020)) is still outstanding. **5801 remains `deferred`** —
+the manifest state and completion counts (47/51 required, 47/55 overall) are
+unchanged by this slice; only the read-path accuracy underneath the already-added
+node set improved.
+
+**Verified:** all 5 profiles green — nano 102/102, micro 125/125, embedded
+126/126, standard 126/126, full 138/138 (no regressions; DATATYPE/VALUERANK now
+answered instead of `Bad_AttributeIdInvalid` on nano/micro/embedded, confirmed
+by the existing attribute-read tests still passing plus the new
+`assert_datatype_and_valuerank` cases, compiled out on nano/micro where CU 5801
+itself is off). 32-bit ARM Cortex-M0+ freestanding compile
+(`-mcpu=cortex-m0plus -mthumb -Wall -Wextra -Werror -Wpedantic -Wshadow
+-Wconversion -Wcast-align -Wunused -Wformat=2`, embedded profile's exact `-D`
+set) of both `base_nodes.c` and `read_attribute.c` clean — no `-Wconversion`
+fallout from the new `sbyte`/`uint32` fields. `clang-format --dry-run --Werror`
+clean on all 4 changed files. `scripts/measure_size.sh all` vs `main`
+(`d76119d`): archive `.bss` **0 B on all 5 profiles**, `.text` delta small and
+non-zero as expected from the read-path logic gaining unconditional
+DATATYPE/VALUERANK handling (see `docs/size/feature-size-ledger.md` for the exact
+per-profile numbers) — no struct growth, so the cost is code, not data.

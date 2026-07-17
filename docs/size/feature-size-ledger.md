@@ -1794,3 +1794,43 @@ field changes, so RAM and `MU_SERVER_STORAGE_BYTES` are unaffected.
   `test_no_stale_project_name` failure (untracked planning-doc absolute paths, not a
   code regression) and otherwise all green; manifest validate OK. 32-bit ARM
   `-mcpu=cortex-m0plus -mthumb -ffreestanding -Werror` compile of `base_nodes.c` clean.
+
+## 2026-07-17: DataType/ValueRank fidelity (5801 prereq)
+
+Adds `mu_node_t.data_type`/`.value_rank` and moves `DATATYPE`/`VALUERANK` attribute
+handling out of the `MUC_OPCUA_CU_MULTI_CHUNK`-gated helper into the main
+`read_attribute()` switch (both attributes are mandatory for Variable/VariableType
+nodes per OPC-10000-3 §5.6.2, independent of MultiChunk — previously
+`Bad_AttributeIdInvalid` on nano/micro/embedded), then populates true
+DataType/ValueRank for the 53 Variable-class CU-5801 InstanceDeclarations added in
+the previous slice.
+
+**Zero struct growth:** `sizeof(mu_node_t)` stays **136 B** before and after — the
+new `opcua_uint32_t data_type` + `opcua_sbyte_t value_rank` fields land entirely in
+pre-existing struct padding (verified by compiling a `sizeof` probe against both
+the pre- and post-change header). So the only cost here is code (the read-path
+logic gaining unconditional branches on profiles that didn't have them), not data.
+
+`scripts/measure_size.sh all` (Arm Cortex-M0+, `-Os`), delta vs `main` (`d76119d`):
+
+| Profile | archive `.text` Δ | ELF `.text` Δ | `.bss` |
+|----------|--------:|--------:|:----:|
+| nano | +176 | +192 | 0 |
+| micro | +228 | +240 | 0 |
+| embedded | +1,028 | +1,048 | 0 |
+| standard | +1,020 | +1,044 | 0 |
+| full | +1,096 | +1,048 | 0 |
+
+- Archive `.bss` stays **0 B on every profile**, both before and after — no mutable
+  static state introduced.
+- `nano`/`micro` pick up a small delta too (unlike the pure-CU-gated 085 slice
+  above): the MULTI_CHUNK bugfix means DATATYPE/VALUERANK handling now compiles in
+  unconditionally on every profile, including the two where CU 5801 itself stays
+  off — this is the source of their non-zero `.text` movement.
+- Verified: all 5 profiles green via `ctest` (nano 102/102, micro 125/125, embedded
+  126/126, standard 126/126, full 138/138, no regressions). 32-bit ARM
+  Cortex-M0+ freestanding compile (embedded profile's exact `-D` set, `-Wall
+  -Wextra -Werror -Wpedantic -Wshadow -Wconversion -Wcast-align -Wunused
+  -Wformat=2`) of both `base_nodes.c` and `read_attribute.c` clean — no
+  `-Wconversion` fallout from the new `sbyte`/`uint32` fields. `clang-format
+  --dry-run --Werror` clean on all 4 changed files.
