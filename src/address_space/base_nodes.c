@@ -178,7 +178,7 @@ static const opcua_byte_t s_str_MandatoryPlaceholder[] = "MandatoryPlaceholder";
 #endif
 #if MUC_OPCUA_CU_BASE_INFO_SERVERTYPE
 /* spec 083 (CU 3189): BrowseNames for the ServerType structured DataTypes + enums
-   (ObjectType/VariableType BrowseNames land in Tasks 4/5). */
+   (ObjectType/VariableType BrowseNames follow below). */
 static const opcua_byte_t s_str_BuildInfo[] = "BuildInfo";
 static const opcua_byte_t s_str_RedundantServerDataType[] = "RedundantServerDataType";
 static const opcua_byte_t s_str_SamplingIntervalDiagnosticsDataType[] = "SamplingIntervalDiagnosticsDataType";
@@ -191,7 +191,7 @@ static const opcua_byte_t s_str_SubscriptionDiagnosticsDataType[] = "Subscriptio
 static const opcua_byte_t s_str_EndpointUrlListDataType[] = "EndpointUrlListDataType";
 static const opcua_byte_t s_str_NetworkGroupDataType[] = "NetworkGroupDataType";
 static const opcua_byte_t s_str_ServerState[] = "ServerState";
-/* spec 083 (CU 3189), Task 4: BrowseNames for the ServerType-tree ObjectTypes. */
+/* spec 083 (CU 3189): BrowseNames for the ServerType-tree ObjectTypes. */
 static const opcua_byte_t s_str_ServerCapabilitiesType[] = "ServerCapabilitiesType";
 static const opcua_byte_t s_str_ServerDiagnosticsType[] = "ServerDiagnosticsType";
 static const opcua_byte_t s_str_SessionsDiagnosticsSummaryType[] = "SessionsDiagnosticsSummaryType";
@@ -206,7 +206,7 @@ static const opcua_byte_t s_str_AddressSpaceFileType[] = "AddressSpaceFileType";
 static const opcua_byte_t s_str_NamespaceMetadataType[] = "NamespaceMetadataType";
 static const opcua_byte_t s_str_NamespacesType[] = "NamespacesType";
 static const opcua_byte_t s_str_NonTransparentNetworkRedundancyType[] = "NonTransparentNetworkRedundancyType";
-/* spec 083 (CU 3189), Task 5: BrowseNames for the ServerType-tree VariableTypes. */
+/* spec 083 (CU 3189): BrowseNames for the ServerType-tree VariableTypes. */
 static const opcua_byte_t s_str_ServerVendorCapabilityType[] = "ServerVendorCapabilityType";
 static const opcua_byte_t s_str_ServerStatusType[] = "ServerStatusType";
 static const opcua_byte_t s_str_ServerDiagnosticsSummaryType[] = "ServerDiagnosticsSummaryType";
@@ -522,7 +522,7 @@ static const mu_reference_t s_structure_refs[] = {
     {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {MU_NODEID_CURRENCYUNITTYPE}}, true},
 #endif
 #if MUC_OPCUA_CU_BASE_INFO_SERVERTYPE
-    /* CU 3189: the ServerType structured DataTypes (spec 083 Task 3). */
+    /* spec 083 (CU 3189): the ServerType structured DataTypes. */
     {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {338}}, true}, /* HasSubtype -> BuildInfo */
     {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {853}}, true}, /* HasSubtype -> RedundantServerDataType */
     {{0, MU_NODEID_NUMERIC, {45}},
@@ -573,7 +573,7 @@ static const mu_reference_t s_base_object_type_refs[] = {
     {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {2004}}, true}
 #if MUC_OPCUA_CU_BASE_INFO_SERVERTYPE
     ,
-    /* spec 083 (CU 3189), Task 4: ServerType-tree ObjectType subtypes of BaseObjectType. */
+    /* spec 083 (CU 3189): ServerType-tree ObjectType subtypes of BaseObjectType. */
     {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {2013}}, true}, /* HasSubtype -> ServerCapabilitiesType */
     {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {2020}}, true}, /* HasSubtype -> ServerDiagnosticsType */
     {{0, MU_NODEID_NUMERIC, {45}},
@@ -591,22 +591,22 @@ static const mu_reference_t s_base_object_type_refs[] = {
 };
 
 #if MUC_OPCUA_CU_BASE_INFO_SERVERTYPE
-/* spec 083 (CU 3189), Task 4: FolderType HasSubtype -> OperationLimitsType. */
+/* spec 083 (CU 3189): FolderType HasSubtype -> OperationLimitsType. */
 static const mu_reference_t s_folder_type_refs[] = {
     {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {11564}}, true}};
 
-/* spec 083 (CU 3189), Task 4: ServerRedundancyType HasSubtype -> Transparent-/
+/* spec 083 (CU 3189): ServerRedundancyType HasSubtype -> Transparent-/
    NonTransparentRedundancyType. */
 static const mu_reference_t s_server_redundancy_type_refs[] = {
     {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {2036}}, true},
     {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {2039}}, true}};
 
-/* spec 083 (CU 3189), Task 4: NonTransparentRedundancyType HasSubtype ->
+/* spec 083 (CU 3189): NonTransparentRedundancyType HasSubtype ->
    NonTransparentNetworkRedundancyType. */
 static const mu_reference_t s_non_transparent_redundancy_type_refs[] = {
     {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {11945}}, true}};
 
-/* spec 083 (CU 3189), Task 4: FileType HasSubtype -> AddressSpaceFileType. */
+/* spec 083 (CU 3189): FileType HasSubtype -> AddressSpaceFileType. */
 static const mu_reference_t s_file_type_refs[] = {
     {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {11595}}, true}};
 #endif
@@ -1164,6 +1164,8 @@ static const mu_node_t s_base_nodes[] = {
      .type_definition = {0}},
 #endif
 #if MUC_OPCUA_CU_BASE_INFO_BASE_TYPES
+    /* not OR'd with SERVERTYPE: it depends on BASE_TYPES in Kconfig, so this
+       block already compiles whenever SERVERTYPE is on */
     /* CU 3188: Integer(27)/UInteger(28) subtypes of Number, Enumeration(29) of
        BaseDataType. Sorted between Number(26) and References(31). */
     {{0, MU_NODEID_NUMERIC, {27}},
@@ -1541,7 +1543,7 @@ static const mu_node_t s_base_nodes[] = {
      .type_definition = {0, MU_NODEID_NUMERIC, {76}}},
 #endif
 #if MUC_OPCUA_CU_BASE_INFO_SERVERTYPE
-    /* spec 083 (CU 3189), Task 3: ServerType structured DataTypes (subtypes of
+    /* spec 083 (CU 3189): ServerType structured DataTypes (subtypes of
        Structure 22) + their Default XML/Binary Encoding Objects, and the two
        ServerType enums (subtypes of Enumeration 29). Sorted between the
        Argument encodings (298) and ServerType (2004). */
@@ -1787,7 +1789,7 @@ static const mu_node_t s_base_nodes[] = {
      NULL,
      .type_definition = {0}},
 #if MUC_OPCUA_CU_BASE_INFO_SERVERTYPE
-    /* spec 083 (CU 3189), Task 4: ServerType-tree ObjectTypes. Sorted between
+    /* spec 083 (CU 3189): ServerType-tree ObjectTypes. Sorted between
        ServerType(2004) and Server(2253). */
     {{0, MU_NODEID_NUMERIC, {2013}},
      MU_NODECLASS_OBJECTTYPE,
@@ -1853,7 +1855,7 @@ static const mu_node_t s_base_nodes[] = {
      sizeof(s_non_transparent_redundancy_type_refs) / sizeof(s_non_transparent_redundancy_type_refs[0]),
      NULL,
      .type_definition = {0}},
-    /* spec 083 (CU 3189), Task 5: ServerType-tree VariableTypes. Sorted between
+    /* spec 083 (CU 3189): ServerType-tree VariableTypes. Sorted between
        NonTransparentRedundancyType(2039) and Server(2253). */
     {{0, MU_NODEID_NUMERIC, {2137}},
      MU_NODECLASS_VARIABLETYPE,
@@ -2142,7 +2144,7 @@ static const mu_node_t s_base_nodes[] = {
      .type_definition = {0, MU_NODEID_NUMERIC, {61}}},
 #endif
 #if MUC_OPCUA_CU_BASE_INFO_SERVERTYPE
-    /* spec 083 (CU 3189), Task 5: BuildInfoType(3051, DataAccess-on copy). Sorts
+    /* spec 083 (CU 3189): BuildInfoType(3051, DataAccess-on copy). Sorts
        after AggregateFunctions(2997) and before EnumValueType(7594). */
     {{0, MU_NODEID_NUMERIC, {3051}},
      MU_NODECLASS_VARIABLETYPE,
@@ -2228,7 +2230,7 @@ static const mu_node_t s_base_nodes[] = {
      .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
 #endif /* MUC_OPCUA_CU_DATA_ACCESS */
 #if MUC_OPCUA_CU_BASE_INFO_SERVERTYPE && !MUC_OPCUA_CU_DATA_ACCESS
-    /* spec 083 (CU 3189), Task 5: BuildInfoType(3051, DataAccess-off copy), mirroring
+    /* spec 083 (CU 3189): BuildInfoType(3051, DataAccess-off copy), mirroring
        the in-DataAccess copy above. Sorts after AggregateFunctions(2997) and before
        EnumValueType(7594). */
     {{0, MU_NODEID_NUMERIC, {3051}},
@@ -2375,7 +2377,7 @@ static const mu_node_t s_base_nodes[] = {
      .type_definition = {0, MU_NODEID_NUMERIC, {77}}},
 #endif
 #if MUC_OPCUA_CU_BASE_INFO_SERVERTYPE
-    /* spec 083 (CU 3189), Task 4: OperationLimitsType/FileType/AddressSpaceFileType/
+    /* spec 083 (CU 3189): OperationLimitsType/FileType/AddressSpaceFileType/
        NamespaceMetadataType/NamespacesType. Sorted between MandatoryPlaceholder(11510)
        and MaxArrayLength(11702). */
     {{0, MU_NODEID_NUMERIC, {11564}},
@@ -2479,7 +2481,7 @@ static const mu_node_t s_base_nodes[] = {
      &s_max_monitored_items_per_call_value,
      .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
 #if MUC_OPCUA_CU_BASE_INFO_SERVERTYPE
-    /* spec 083 (CU 3189), Task 3: EndpointUrlListDataType/NetworkGroupDataType
+    /* spec 083 (CU 3189): EndpointUrlListDataType/NetworkGroupDataType
        (subtypes of Structure 22) + their Default XML/Binary Encoding Objects.
        Sorted between MaxMonitoredItemsPerCall(11714) and Union(12756). */
     {{0, MU_NODEID_NUMERIC, {11943}},
@@ -2498,7 +2500,7 @@ static const mu_node_t s_base_nodes[] = {
      sizeof(s_network_group_data_type_refs) / sizeof(s_network_group_data_type_refs[0]),
      NULL,
      .type_definition = {0}},
-    /* spec 083 (CU 3189), Task 4: NonTransparentNetworkRedundancyType. Sorted between
+    /* spec 083 (CU 3189): NonTransparentNetworkRedundancyType. Sorted between
        NetworkGroupDataType(11944) and Default_XML(11949). */
     {{0, MU_NODEID_NUMERIC, {11945}},
      MU_NODECLASS_OBJECTTYPE,
