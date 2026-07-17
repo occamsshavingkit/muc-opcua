@@ -191,6 +191,21 @@ static const opcua_byte_t s_str_SubscriptionDiagnosticsDataType[] = "Subscriptio
 static const opcua_byte_t s_str_EndpointUrlListDataType[] = "EndpointUrlListDataType";
 static const opcua_byte_t s_str_NetworkGroupDataType[] = "NetworkGroupDataType";
 static const opcua_byte_t s_str_ServerState[] = "ServerState";
+/* spec 083 (CU 3189), Task 4: BrowseNames for the ServerType-tree ObjectTypes. */
+static const opcua_byte_t s_str_ServerCapabilitiesType[] = "ServerCapabilitiesType";
+static const opcua_byte_t s_str_ServerDiagnosticsType[] = "ServerDiagnosticsType";
+static const opcua_byte_t s_str_SessionsDiagnosticsSummaryType[] = "SessionsDiagnosticsSummaryType";
+static const opcua_byte_t s_str_SessionDiagnosticsObjectType[] = "SessionDiagnosticsObjectType";
+static const opcua_byte_t s_str_VendorServerInfoType[] = "VendorServerInfoType";
+static const opcua_byte_t s_str_ServerRedundancyType[] = "ServerRedundancyType";
+static const opcua_byte_t s_str_TransparentRedundancyType[] = "TransparentRedundancyType";
+static const opcua_byte_t s_str_NonTransparentRedundancyType[] = "NonTransparentRedundancyType";
+static const opcua_byte_t s_str_OperationLimitsType[] = "OperationLimitsType";
+static const opcua_byte_t s_str_FileType[] = "FileType";
+static const opcua_byte_t s_str_AddressSpaceFileType[] = "AddressSpaceFileType";
+static const opcua_byte_t s_str_NamespaceMetadataType[] = "NamespaceMetadataType";
+static const opcua_byte_t s_str_NamespacesType[] = "NamespacesType";
+static const opcua_byte_t s_str_NonTransparentNetworkRedundancyType[] = "NonTransparentNetworkRedundancyType";
 #endif
 #if MUC_OPCUA_CU_BASE_INFO_LOCALTIME
 static const opcua_byte_t s_str_TimeZoneDataType[] = "TimeZoneDataType";
@@ -542,7 +557,46 @@ static const mu_reference_t s_base_object_type_refs[] = {
 #if MUC_OPCUA_CU_ADDRESS_SPACE_INTERFACES
     {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {17602}}, true},
 #endif
-    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {2004}}, true}};
+    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {2004}}, true}
+#if MUC_OPCUA_CU_BASE_INFO_SERVERTYPE
+    ,
+    /* spec 083 (CU 3189), Task 4: ServerType-tree ObjectType subtypes of BaseObjectType. */
+    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {2013}}, true}, /* HasSubtype -> ServerCapabilitiesType */
+    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {2020}}, true}, /* HasSubtype -> ServerDiagnosticsType */
+    {{0, MU_NODEID_NUMERIC, {45}},
+     {0, MU_NODEID_NUMERIC, {2026}},
+     true}, /* HasSubtype -> SessionsDiagnosticsSummaryType */
+    {{0, MU_NODEID_NUMERIC, {45}},
+     {0, MU_NODEID_NUMERIC, {2029}},
+     true}, /* HasSubtype -> SessionDiagnosticsObjectType */
+    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {2033}}, true},  /* HasSubtype -> VendorServerInfoType */
+    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {2034}}, true},  /* HasSubtype -> ServerRedundancyType */
+    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {11575}}, true}, /* HasSubtype -> FileType */
+    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {11616}}, true}, /* HasSubtype -> NamespaceMetadataType */
+    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {11645}}, true}  /* HasSubtype -> NamespacesType */
+#endif
+};
+
+#if MUC_OPCUA_CU_BASE_INFO_SERVERTYPE
+/* spec 083 (CU 3189), Task 4: FolderType HasSubtype -> OperationLimitsType. */
+static const mu_reference_t s_folder_type_refs[] = {
+    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {11564}}, true}};
+
+/* spec 083 (CU 3189), Task 4: ServerRedundancyType HasSubtype -> Transparent-/
+   NonTransparentRedundancyType. */
+static const mu_reference_t s_server_redundancy_type_refs[] = {
+    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {2036}}, true},
+    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {2039}}, true}};
+
+/* spec 083 (CU 3189), Task 4: NonTransparentRedundancyType HasSubtype ->
+   NonTransparentNetworkRedundancyType. */
+static const mu_reference_t s_non_transparent_redundancy_type_refs[] = {
+    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {11945}}, true}};
+
+/* spec 083 (CU 3189), Task 4: FileType HasSubtype -> AddressSpaceFileType. */
+static const mu_reference_t s_file_type_refs[] = {
+    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {11595}}, true}};
+#endif
 
 #if MUC_OPCUA_CU_BASE_INFO_ARGUMENT_TYPE
 /* CU 3641: Argument DataType HasEncoding refs to its Default XML/Binary encodings. */
@@ -1240,8 +1294,13 @@ static const mu_node_t s_base_nodes[] = {
      MU_NODECLASS_OBJECTTYPE,
      {10, s_str_FolderType},
      {10, s_str_FolderType},
+#if MUC_OPCUA_CU_BASE_INFO_SERVERTYPE
+     s_folder_type_refs,
+     sizeof(s_folder_type_refs) / sizeof(s_folder_type_refs[0]),
+#else
      NULL,
      0,
+#endif
      NULL,
      .type_definition = {0}},
     {{0, MU_NODEID_NUMERIC, {62}},
@@ -1698,6 +1757,74 @@ static const mu_node_t s_base_nodes[] = {
      0,
      NULL,
      .type_definition = {0}},
+#if MUC_OPCUA_CU_BASE_INFO_SERVERTYPE
+    /* spec 083 (CU 3189), Task 4: ServerType-tree ObjectTypes. Sorted between
+       ServerType(2004) and Server(2253). */
+    {{0, MU_NODEID_NUMERIC, {2013}},
+     MU_NODECLASS_OBJECTTYPE,
+     {22, s_str_ServerCapabilitiesType},
+     {22, s_str_ServerCapabilitiesType},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0}},
+    {{0, MU_NODEID_NUMERIC, {2020}},
+     MU_NODECLASS_OBJECTTYPE,
+     {21, s_str_ServerDiagnosticsType},
+     {21, s_str_ServerDiagnosticsType},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0}},
+    {{0, MU_NODEID_NUMERIC, {2026}},
+     MU_NODECLASS_OBJECTTYPE,
+     {30, s_str_SessionsDiagnosticsSummaryType},
+     {30, s_str_SessionsDiagnosticsSummaryType},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0}},
+    {{0, MU_NODEID_NUMERIC, {2029}},
+     MU_NODECLASS_OBJECTTYPE,
+     {28, s_str_SessionDiagnosticsObjectType},
+     {28, s_str_SessionDiagnosticsObjectType},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0}},
+    {{0, MU_NODEID_NUMERIC, {2033}},
+     MU_NODECLASS_OBJECTTYPE,
+     {20, s_str_VendorServerInfoType},
+     {20, s_str_VendorServerInfoType},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0}},
+    {{0, MU_NODEID_NUMERIC, {2034}},
+     MU_NODECLASS_OBJECTTYPE,
+     {20, s_str_ServerRedundancyType},
+     {20, s_str_ServerRedundancyType},
+     s_server_redundancy_type_refs,
+     sizeof(s_server_redundancy_type_refs) / sizeof(s_server_redundancy_type_refs[0]),
+     NULL,
+     .type_definition = {0}},
+    {{0, MU_NODEID_NUMERIC, {2036}},
+     MU_NODECLASS_OBJECTTYPE,
+     {25, s_str_TransparentRedundancyType},
+     {25, s_str_TransparentRedundancyType},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0}},
+    {{0, MU_NODEID_NUMERIC, {2039}},
+     MU_NODECLASS_OBJECTTYPE,
+     {28, s_str_NonTransparentRedundancyType},
+     {28, s_str_NonTransparentRedundancyType},
+     s_non_transparent_redundancy_type_refs,
+     sizeof(s_non_transparent_redundancy_type_refs) / sizeof(s_non_transparent_redundancy_type_refs[0]),
+     NULL,
+     .type_definition = {0}},
+#endif
     {{0, MU_NODEID_NUMERIC, {2253}},
      MU_NODECLASS_OBJECT,
      {6, s_str_Server},
@@ -2103,6 +2230,51 @@ static const mu_node_t s_base_nodes[] = {
      NULL,
      .type_definition = {0, MU_NODEID_NUMERIC, {77}}},
 #endif
+#if MUC_OPCUA_CU_BASE_INFO_SERVERTYPE
+    /* spec 083 (CU 3189), Task 4: OperationLimitsType/FileType/AddressSpaceFileType/
+       NamespaceMetadataType/NamespacesType. Sorted between MandatoryPlaceholder(11510)
+       and MaxArrayLength(11702). */
+    {{0, MU_NODEID_NUMERIC, {11564}},
+     MU_NODECLASS_OBJECTTYPE,
+     {19, s_str_OperationLimitsType},
+     {19, s_str_OperationLimitsType},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0}},
+    {{0, MU_NODEID_NUMERIC, {11575}},
+     MU_NODECLASS_OBJECTTYPE,
+     {8, s_str_FileType},
+     {8, s_str_FileType},
+     s_file_type_refs,
+     sizeof(s_file_type_refs) / sizeof(s_file_type_refs[0]),
+     NULL,
+     .type_definition = {0}},
+    {{0, MU_NODEID_NUMERIC, {11595}},
+     MU_NODECLASS_OBJECTTYPE,
+     {20, s_str_AddressSpaceFileType},
+     {20, s_str_AddressSpaceFileType},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0}},
+    {{0, MU_NODEID_NUMERIC, {11616}},
+     MU_NODECLASS_OBJECTTYPE,
+     {21, s_str_NamespaceMetadataType},
+     {21, s_str_NamespaceMetadataType},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0}},
+    {{0, MU_NODEID_NUMERIC, {11645}},
+     MU_NODECLASS_OBJECTTYPE,
+     {14, s_str_NamespacesType},
+     {14, s_str_NamespacesType},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0}},
+#endif
     /* Spec 057: MaxArrayLength/MaxStringLength — sorted slots before 11704. */
     {{0, MU_NODEID_NUMERIC, {11702}},
      MU_NODECLASS_VARIABLE,
@@ -2180,6 +2352,16 @@ static const mu_node_t s_base_nodes[] = {
      {20, s_str_NetworkGroupDataType},
      s_network_group_data_type_refs,
      sizeof(s_network_group_data_type_refs) / sizeof(s_network_group_data_type_refs[0]),
+     NULL,
+     .type_definition = {0}},
+    /* spec 083 (CU 3189), Task 4: NonTransparentNetworkRedundancyType. Sorted between
+       NetworkGroupDataType(11944) and Default_XML(11949). */
+    {{0, MU_NODEID_NUMERIC, {11945}},
+     MU_NODECLASS_OBJECTTYPE,
+     {35, s_str_NonTransparentNetworkRedundancyType},
+     {35, s_str_NonTransparentNetworkRedundancyType},
+     NULL,
+     0,
      NULL,
      .type_definition = {0}},
     {{0, MU_NODEID_NUMERIC, {11949}},
