@@ -1,4 +1,4 @@
-import json, derive_deps as d
+import json, graph_deps as d
 
 
 def _fixtures():

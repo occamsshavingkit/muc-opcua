@@ -123,24 +123,3 @@ def apply(manifest, graph):
         pd.setdefault("full", False)
         pd.setdefault("custom", False)
     return manifest
-
-
-if __name__ == "__main__":
-    MAN = "profiles/opcua-profile-manifest.yaml"
-    manifest = json.load(open(MAN))
-    apply(manifest, load_graph())
-    # The manifest's existing convention is ensure_ascii=True (en-dashes,
-    # curly quotes, etc. are all \uXXXX-escaped) with exactly one outlier:
-    # three pre-existing literal section-sign (§, U+00A7) characters in
-    # unrelated notes fields. Using ensure_ascii=False globally would match
-    # those three but flip ~26 other already-escaped characters elsewhere
-    # in the file to literal unicode -- unrelated byte-churn outside our
-    # field scope. Instead, dump with the default (matching the dominant
-    # convention) and undo just the one escape that regresses a literal
-    # the file already had.
-    text = json.dumps(manifest, indent=2)
-    text = text.replace("\\u00a7", "§")
-    with open(MAN, "w") as fh:
-        fh.write(text)
-        fh.write("\n")
-    print("derive_deps: applied")
