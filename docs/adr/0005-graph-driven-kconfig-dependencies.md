@@ -11,8 +11,8 @@ Two properties of each conformance unit (CU) drove the generated dependency
 structure:
 
 - `depends_on` / `depends_on_op` — which facet symbol(s) a CU requires.
-- `profile_defaults` — whether the CU defaults *on* for nano / micro / embedded /
-  standard / full.
+- `profile_defaults` — whether the CU defaults *on* for nano / micro /
+  embedded / standard / full.
 
 These were **hand-authored**. Hand-authoring drifted from the specification in
 two ways: some CUs carried fabricated inter-CU dependency chains (e.g.
@@ -42,18 +42,20 @@ sync.
 
 ### 2. `resolve_into` joins the graph into the manifest in-memory, at load time
 
-`scripts/profile_manifest/graph_deps.py` is a pure resolver. `resolve_into(manifest, graph)`
-mutates each **graph-mapped** CU (kind `conformance_unit`, with an
-`opc_reference.cu_name` that appears as a child CU in the graph) in memory:
+`scripts/profile_manifest/graph_deps.py` is a pure resolver.
+`resolve_into(manifest, graph)` mutates each **graph-mapped** CU (kind
+`conformance_unit`, with an `opc_reference.cu_name` that appears as a child
+CU in the graph) in memory:
 
 - `depends_on` = the OR of the Kconfig symbols of the facets the CU is a member
   of; `depends_on_op` = `"or"` iff there is more than one. Membership, not
   fabricated inter-CU chains — implementation coupling is satisfied by facet
   co-membership (a facet enables all its mandatory CUs together).
 - `profile_defaults` nano/micro/embedded/standard = transitive **all-mandatory
-  reachability** from each profile root (nano 2266 ⊂ micro 2267 ⊂ embedded 2268 ⊂
-  standard 2269). A CU defaults on for a profile iff it is a mandatory member of a
-  facet the profile pulls in through an all-mandatory path.
+  reachability** from each profile root (nano 2266 ⊂ micro 2267 ⊂
+  embedded 2268 ⊂ standard 2269). A CU defaults on for a profile iff it is a
+  mandatory member of a facet the profile pulls in through an all-mandatory
+  path.
 - `full` = `implementation_state ∈ {implemented, claimed, documented}`. **`full`
   is ours, not an OPC profile** — it turns on every server CU we have actually
   implemented, regardless of optional status.
@@ -89,12 +91,12 @@ graph-resolved `profile_defaults`.
 ## Consequences
 
 - **Pure-graph profile model.** Optional CUs default **off** for
-  nano/micro/embedded/standard and **on** only for `full`. We build to spec; we do
-  not override the OPC profiles. 20 optional-in-facet CUs that had been defaulted
-  on for embedded/standard correctly dropped off: 2389, 2400, 2446, 2447, 2476,
-  2711, 2936, 2969, 3127, 3147, 3186, 3192, 3198, 3545, 3560, 3983, 4053, 4237,
-  5240, 5592 (each `isOptional=true` with no all-mandatory path from any named
-  profile root).
+  nano/micro/embedded/standard and **on** only for `full`. We build to spec;
+  we do not override the OPC profiles. 20 optional-in-facet CUs that had
+  been defaulted on for embedded/standard correctly dropped off: 2389, 2400,
+  2446, 2447, 2476, 2711, 2936, 2969, 3127, 3147, 3186, 3192, 3198, 3545,
+  3560, 3983, 4053, 4237, 5240, 5592 (each `isOptional=true` with no
+  all-mandatory path from any named profile root).
 - **Smaller conformant binaries.** Because those optionals no longer compile into
   the smaller profiles, `.text` shrank: micro −4597 B, embedded −3661 B, standard
   −4478 B (measured on `examples/minimal_server`); nano and full net-unchanged;
@@ -108,7 +110,8 @@ graph-resolved `profile_defaults`.
   hand-authored dependency layer. Edit or re-pull the graph, run `generate.py`,
   and Kconfig follows.
 - All five profiles build clean and pass their suites (nano 102, micro 122,
-  embedded 123, standard 123, full 138); `validate.py --all` reports `manifest: OK`.
+  embedded 123, standard 123, full 138); `validate.py --all` reports
+  `manifest: OK`.
 
 ## Known follow-ups (not addressed here)
 
