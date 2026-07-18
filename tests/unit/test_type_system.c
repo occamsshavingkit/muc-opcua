@@ -455,7 +455,7 @@ typedef struct {
    `modelling_rule` (Mandatory 78/Optional 80), and HasTypeDefinition(40) ->
    `type_definition`. */
 static void assert_type_decls(opcua_uint32_t type_id, opcua_uint32_t ref_kind, opcua_uint32_t modelling_rule,
-                               opcua_uint32_t type_definition, const mu_type_decl_t *decls, size_t count) {
+                              opcua_uint32_t type_definition, const mu_type_decl_t *decls, size_t count) {
     for (size_t i = 0; i < count; ++i) {
         TEST_ASSERT_TRUE_MESSAGE(has_forward_ref(type_id, ref_kind, decls[i].node_id), decls[i].browse_name);
         assert_node(decls[i].node_id, MU_NODECLASS_VARIABLE, decls[i].browse_name);
@@ -503,10 +503,10 @@ static void test_operation_limits_type_instance_declarations(void) {
    HasComponent/Variable/BaseDataVariableType/Mandatory, matching exactly). */
 static void test_sampling_interval_diagnostics_type_instance_declarations(void) {
     static const mu_type_decl_t decls[] = {
-        {2166u, "SamplingInterval", 290u, -1},                        /* Duration */
-        {11697u, "SampledMonitoredItemsCount", 7u, -1},                /* UInt32 */
-        {11698u, "MaxSampledMonitoredItemsCount", 7u, -1},             /* UInt32 */
-        {11699u, "DisabledMonitoredItemsSamplingCount", 7u, -1},       /* UInt32 */
+        {2166u, "SamplingInterval", 290u, -1},                   /* Duration */
+        {11697u, "SampledMonitoredItemsCount", 7u, -1},          /* UInt32 */
+        {11698u, "MaxSampledMonitoredItemsCount", 7u, -1},       /* UInt32 */
+        {11699u, "DisabledMonitoredItemsSamplingCount", 7u, -1}, /* UInt32 */
     };
 
     /* SamplingIntervalDiagnosticsType -HasComponent(47)-> decl, Mandatory(78), BaseDataVariableType(63) */
@@ -527,7 +527,7 @@ static void test_sampling_interval_diagnostics_type_instance_declarations(void) 
    resolve identically here regardless of which copy is compiled in. */
 static void test_session_security_diagnostics_type_instance_declarations(void) {
     static const mu_type_decl_t decls[] = {
-        {2245u, "SessionId", 17u, -1},              /* NodeId */
+        {2245u, "SessionId", 17u, -1},               /* NodeId */
         {2246u, "ClientUserIdOfSession", 12u, -1},   /* String */
         {2247u, "ClientUserIdHistory", 12u, 1},      /* String[] */
         {2248u, "AuthenticationMechanism", 12u, -1}, /* String */
@@ -571,19 +571,19 @@ static void test_session_security_diagnostics_type_instance_declarations(void) {
 static void test_server_diagnostics_type_instance_declarations(void) {
     TEST_ASSERT_TRUE(has_forward_ref(2020u, 47u, 2021u)); /* HasComponent -> ServerDiagnosticsSummary */
     assert_node(2021u, MU_NODECLASS_VARIABLE, "ServerDiagnosticsSummary");
-    assert_datatype_and_valuerank(2021u, 859u, -1); /* ServerDiagnosticsSummaryDataType */
+    assert_datatype_and_valuerank(2021u, 859u, -1);       /* ServerDiagnosticsSummaryDataType */
     TEST_ASSERT_TRUE(has_forward_ref(2021u, 37u, 78u));   /* Mandatory */
     TEST_ASSERT_TRUE(has_forward_ref(2021u, 40u, 2150u)); /* TypeDef ServerDiagnosticsSummaryType */
 
     TEST_ASSERT_TRUE(has_forward_ref(2020u, 47u, 2022u)); /* HasComponent -> SamplingIntervalDiagnosticsArray */
     assert_node(2022u, MU_NODECLASS_VARIABLE, "SamplingIntervalDiagnosticsArray");
-    assert_datatype_and_valuerank(2022u, 856u, 1); /* SamplingIntervalDiagnosticsDataType[] */
+    assert_datatype_and_valuerank(2022u, 856u, 1);        /* SamplingIntervalDiagnosticsDataType[] */
     TEST_ASSERT_TRUE(has_forward_ref(2022u, 37u, 80u));   /* Optional */
     TEST_ASSERT_TRUE(has_forward_ref(2022u, 40u, 2164u)); /* TypeDef SamplingIntervalDiagnosticsArrayType */
 
     TEST_ASSERT_TRUE(has_forward_ref(2020u, 47u, 2023u)); /* HasComponent -> SubscriptionDiagnosticsArray */
     assert_node(2023u, MU_NODECLASS_VARIABLE, "SubscriptionDiagnosticsArray");
-    assert_datatype_and_valuerank(2023u, 874u, 1); /* SubscriptionDiagnosticsDataType[] */
+    assert_datatype_and_valuerank(2023u, 874u, 1);        /* SubscriptionDiagnosticsDataType[] */
     TEST_ASSERT_TRUE(has_forward_ref(2023u, 37u, 78u));   /* Mandatory */
     TEST_ASSERT_TRUE(has_forward_ref(2023u, 40u, 2171u)); /* TypeDef SubscriptionDiagnosticsArrayType */
 
@@ -594,7 +594,7 @@ static void test_server_diagnostics_type_instance_declarations(void) {
 
     TEST_ASSERT_TRUE(has_forward_ref(2020u, 46u, 2025u)); /* HasProperty -> EnabledFlag */
     assert_node(2025u, MU_NODECLASS_VARIABLE, "EnabledFlag");
-    assert_datatype_and_valuerank(2025u, 1u, -1); /* Boolean */
+    assert_datatype_and_valuerank(2025u, 1u, -1);       /* Boolean */
     TEST_ASSERT_TRUE(has_forward_ref(2025u, 37u, 78u)); /* Mandatory */
     TEST_ASSERT_TRUE(has_forward_ref(2025u, 40u, 68u)); /* TypeDef PropertyType */
 
