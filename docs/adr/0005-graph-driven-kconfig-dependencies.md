@@ -110,14 +110,33 @@ graph-resolved `profile_defaults`.
 - All five profiles build clean and pass their suites (nano 102, micro 122,
   embedded 123, standard 123, full 138); `validate.py --all` reports `manifest: OK`.
 
-## Known follow-up (not addressed here)
+## Known follow-ups (not addressed here)
 
-`tests/unit/test_profile_surface.c` gates `test_nano_default_service_surface_does_not_claim_optional_cus`
-on `MUC_OPCUA_PROFILE_NANO_EMBEDDED_DEVICE_2025_SERVER`, a macro that is never
-emitted as a compiler define — only the short `MUC_OPCUA_PROFILE_<UPPER>` markers
-are. The test therefore always short-circuits to a pass and never asserts. This
-predates this feature; it should be fixed so the nano optional-surface assertion
-actually runs.
+- **Dead nano-surface assertion (pre-existing).**
+  `tests/unit/test_profile_surface.c` gates
+  `test_nano_default_service_surface_does_not_claim_optional_cus` on
+  `MUC_OPCUA_PROFILE_NANO_EMBEDDED_DEVICE_2025_SERVER`, a macro that is never
+  emitted as a compiler define — only the short `MUC_OPCUA_PROFILE_<UPPER>`
+  markers are. The test always short-circuits to a pass and never asserts. It
+  predates this feature; it should be fixed so the assertion actually runs.
+- **`MUC_OPCUA_CU_SESSION_TIMEOUT` custom-build default changed.** This item is
+  graph-absent but hand-authored with `depends_on_op: or`. Removing the global
+  `_emit_default` OR-shortcut changed its `custom`-build default: it no longer
+  auto-enables when a user manually turns on one of its enablers
+  (`MULTIPLE_CONNECTIONS` / `MULTI_CHUNK`). For all named profiles the output is
+  unchanged. If the old custom-build convenience is wanted, model it explicitly
+  in `profile_defaults` rather than via a facet shortcut.
+- **`isOptional: null` treated as mandatory** (`graph_deps.py`). The committed
+  graph contains no nulls, so this is defensive only; consider asserting no-nulls
+  at load, or treating null as optional (the safer direction — it turns CUs off,
+  not on).
+- **Silent empty `depends_on`.** A graph-mapped, symbol-carrying CU whose
+  containing facets have no modeled symbol resolves to an empty `depends_on`
+  (unconditionally selectable) rather than an error. Zero occurrences today; a
+  future CU under an unmodeled facet would slip through. Consider a warning.
+- **Redundant recomputation.** `derive_profile_defaults` recomputes the four
+  root mandatory-sets per CU per call; memoizing them once per `resolve_into`
+  would remove the 135×4 repeat traversal. Correctness is unaffected.
 
 See ADR 0003 (profile-tier system) and
 [[cmake-profile-gating-mechanism]] for the surrounding gating design.
