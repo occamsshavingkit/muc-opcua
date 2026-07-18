@@ -51,3 +51,19 @@ def facet_symbol_for_graph_id(idx, graph_id):
 
 def selectable_item_for_cu_name(idx, cu_name):
     return idx["by_cu_name"].get(cu_name)
+
+
+def derive_depends_on(graph, idx, cu_name):
+    """depends_on = OR of the kconfig_symbols of the MODELLED facets that contain cu_name.
+
+    Returns (sorted_symbols, op) where op is 'or' for >1, else None.
+    """
+    syms = set()
+    for gid, node in graph["profiles"].items():
+        for c in node.get("child_cus", []):
+            if c.get("name") == cu_name:
+                sym = facet_symbol_for_graph_id(idx, gid)
+                if sym:
+                    syms.add(sym)
+    ordered = sorted(syms)
+    return ordered, ("or" if len(ordered) > 1 else None)
