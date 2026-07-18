@@ -68,17 +68,6 @@ engines:
       - 'docs/conformance/opc-profile-roadmap.md'
       - 'tests/conformance/claim_test_map.md'
 
-  # Semgrep flags bare `assert` as "non-test code" when the statement sits
-  # inside a function but the surrounding file isn't recognized as a test
-  # module by its own heuristics. The pytest-style unit tests colocated with
-  # the profile-manifest tooling use bare assert idiomatically -- the correct
-  # pattern for this codebase's test files (see tests/** exemptions for other
-  # engines above: test code is not deployed and is exempted from the
-  # security/complexity engines throughout this file).
-  semgrep:
-    exclude_paths:
-      - 'scripts/profile_manifest/test_*.py'
-
   # Shell scripts under scripts/ are CI infrastructure; pipeline warnings
   # are not deployment-relevant.
   shellcheck:
