@@ -437,6 +437,34 @@ static void test_variable_reports_true_datatype_and_valuerank(void) {
     assert_datatype_and_valuerank(2007u, 862u, -1); /* ServerStatus: ServerStatusDataType */
 }
 
+/* spec 091 (CU 5801): one row of a VariableType's own InstanceDeclaration
+   table -- reusable across every "type X HasComponent/HasProperty -> its own
+   Mandatory/Optional child Variables" completeness test (OperationLimitsType,
+   SamplingIntervalDiagnosticsType, and later diagnostics-type slices all
+   share this exact shape). */
+typedef struct {
+    opcua_uint32_t node_id;
+    const char *browse_name;
+    opcua_uint32_t data_type;
+    opcua_int32_t value_rank;
+} mu_type_decl_t;
+
+/* Asserts that `type_id` carries a `ref_kind` (HasComponent 47/HasProperty 46)
+   forward ref to every decl in `decls`, and that each decl node is a Variable
+   with the given BrowseName/DataType/ValueRank, HasModellingRule(37) ->
+   `modelling_rule` (Mandatory 78/Optional 80), and HasTypeDefinition(40) ->
+   `type_definition`. */
+static void assert_type_decls(opcua_uint32_t type_id, opcua_uint32_t ref_kind, opcua_uint32_t modelling_rule,
+                               opcua_uint32_t type_definition, const mu_type_decl_t *decls, size_t count) {
+    for (size_t i = 0; i < count; ++i) {
+        TEST_ASSERT_TRUE_MESSAGE(has_forward_ref(type_id, ref_kind, decls[i].node_id), decls[i].browse_name);
+        assert_node(decls[i].node_id, MU_NODECLASS_VARIABLE, decls[i].browse_name);
+        assert_datatype_and_valuerank(decls[i].node_id, decls[i].data_type, decls[i].value_rank);
+        TEST_ASSERT_TRUE_MESSAGE(has_forward_ref(decls[i].node_id, 37u, modelling_rule), decls[i].browse_name);
+        TEST_ASSERT_TRUE_MESSAGE(has_forward_ref(decls[i].node_id, 40u, type_definition), decls[i].browse_name);
+    }
+}
+
 /* spec 090 (CU 5801 Part B): OperationLimitsType(11564)'s 12 own Optional
    Property InstanceDeclarations, formally defined in OPC-10000-5 §6.3.11
    Table 20. NodeIds grounded against the official OPC Foundation NodeIds.csv
@@ -447,34 +475,42 @@ static void test_variable_reports_true_datatype_and_valuerank(void) {
    row as HasProperty/UInt32/PropertyType/Optional; that matches this test's
    expectations exactly (no deviation from the spec found). */
 static void test_operation_limits_type_instance_declarations(void) {
-    static const struct {
-        opcua_uint32_t node_id;
-        const char *browse_name;
-    } decls[] = {
-        {11565u, "MaxNodesPerRead"},
-        {12161u, "MaxNodesPerHistoryReadData"},
-        {12162u, "MaxNodesPerHistoryReadEvents"},
-        {11567u, "MaxNodesPerWrite"},
-        {12163u, "MaxNodesPerHistoryUpdateData"},
-        {12164u, "MaxNodesPerHistoryUpdateEvents"},
-        {11569u, "MaxNodesPerMethodCall"},
-        {11570u, "MaxNodesPerBrowse"},
-        {11571u, "MaxNodesPerRegisterNodes"},
-        {11572u, "MaxNodesPerTranslateBrowsePathsToNodeIds"},
-        {11573u, "MaxNodesPerNodeManagement"},
-        {11574u, "MaxMonitoredItemsPerCall"},
+    static const mu_type_decl_t decls[] = {
+        {11565u, "MaxNodesPerRead", 7u, -1},
+        {12161u, "MaxNodesPerHistoryReadData", 7u, -1},
+        {12162u, "MaxNodesPerHistoryReadEvents", 7u, -1},
+        {11567u, "MaxNodesPerWrite", 7u, -1},
+        {12163u, "MaxNodesPerHistoryUpdateData", 7u, -1},
+        {12164u, "MaxNodesPerHistoryUpdateEvents", 7u, -1},
+        {11569u, "MaxNodesPerMethodCall", 7u, -1},
+        {11570u, "MaxNodesPerBrowse", 7u, -1},
+        {11571u, "MaxNodesPerRegisterNodes", 7u, -1},
+        {11572u, "MaxNodesPerTranslateBrowsePathsToNodeIds", 7u, -1},
+        {11573u, "MaxNodesPerNodeManagement", 7u, -1},
+        {11574u, "MaxMonitoredItemsPerCall", 7u, -1},
     };
 
-    for (size_t i = 0; i < sizeof(decls) / sizeof(decls[0]); ++i) {
-        TEST_ASSERT_TRUE_MESSAGE(has_forward_ref(11564u, 46u, decls[i].node_id),
-                                 decls[i].browse_name); /* OperationLimitsType -HasProperty-> decl */
-        assert_node(decls[i].node_id, MU_NODECLASS_VARIABLE, decls[i].browse_name);
-        assert_datatype_and_valuerank(decls[i].node_id, 7u, -1); /* UInt32, Scalar */
-        TEST_ASSERT_TRUE_MESSAGE(has_forward_ref(decls[i].node_id, 37u, 80u),
-                                 decls[i].browse_name); /* HasModellingRule -> Optional */
-        TEST_ASSERT_TRUE_MESSAGE(has_forward_ref(decls[i].node_id, 40u, 68u),
-                                 decls[i].browse_name); /* HasTypeDefinition -> PropertyType */
-    }
+    /* OperationLimitsType -HasProperty(46)-> decl, Optional(80), PropertyType(68) */
+    assert_type_decls(11564u, 46u, 80u, 68u, decls, sizeof(decls) / sizeof(decls[0]));
+}
+
+/* spec 091 (CU 5801): SamplingIntervalDiagnosticsType(2165)'s 4 own Mandatory
+   HasComponent InstanceDeclarations (OPC-10000-5 §7.10 Table 80), all
+   TypeDefinition BaseDataVariableType(63). Grounded against opc-ua-reference
+   (search_nodes confirms 2166/11697/11698/11699 all resolve to OPC-10000-5
+   §7.10; the Table 80 text itself -- fetched via WebFetch since search_text
+   doesn't return full table bodies -- gives every row as
+   HasComponent/Variable/BaseDataVariableType/Mandatory, matching exactly). */
+static void test_sampling_interval_diagnostics_type_instance_declarations(void) {
+    static const mu_type_decl_t decls[] = {
+        {2166u, "SamplingInterval", 290u, -1},                        /* Duration */
+        {11697u, "SampledMonitoredItemsCount", 7u, -1},                /* UInt32 */
+        {11698u, "MaxSampledMonitoredItemsCount", 7u, -1},             /* UInt32 */
+        {11699u, "DisabledMonitoredItemsSamplingCount", 7u, -1},       /* UInt32 */
+    };
+
+    /* SamplingIntervalDiagnosticsType -HasComponent(47)-> decl, Mandatory(78), BaseDataVariableType(63) */
+    assert_type_decls(2165u, 47u, 78u, 63u, decls, sizeof(decls) / sizeof(decls[0]));
 }
 
 /* spec 090 (CU 5801 fix): the 4 previously-dangling DataType references found
@@ -611,6 +647,7 @@ int main(void) {
     RUN_TEST(test_servertype_instance_declarations);
     RUN_TEST(test_variable_reports_true_datatype_and_valuerank);
     RUN_TEST(test_operation_limits_type_instance_declarations);
+    RUN_TEST(test_sampling_interval_diagnostics_type_instance_declarations);
     RUN_TEST(test_servertype_datatype_refs_not_dangling);
 #endif
 #elif MUC_OPCUA_BASE_NODES

@@ -313,6 +313,12 @@ static const opcua_byte_t s_str_MaxNodesPerMethodCall[] = "MaxNodesPerMethodCall
 static const opcua_byte_t s_str_MaxNodesPerRegisterNodes[] = "MaxNodesPerRegisterNodes";
 static const opcua_byte_t s_str_MaxNodesPerTranslateBrowsePathsToNodeIds[] = "MaxNodesPerTranslateBrowsePathsToNodeIds";
 static const opcua_byte_t s_str_MaxNodesPerNodeManagement[] = "MaxNodesPerNodeManagement";
+/* spec 091 (CU 5801): BrowseNames for SamplingIntervalDiagnosticsType's own
+   InstanceDeclarations (OPC-10000-5 §7.10 Table 80). */
+static const opcua_byte_t s_str_SamplingInterval[] = "SamplingInterval";
+static const opcua_byte_t s_str_SampledMonitoredItemsCount[] = "SampledMonitoredItemsCount";
+static const opcua_byte_t s_str_MaxSampledMonitoredItemsCount[] = "MaxSampledMonitoredItemsCount";
+static const opcua_byte_t s_str_DisabledMonitoredItemsSamplingCount[] = "DisabledMonitoredItemsSamplingCount";
 #endif
 #endif
 #if MUC_OPCUA_CU_BASE_INFO_LOCALTIME
@@ -806,6 +812,20 @@ static const mu_reference_t s_server_diagnostics_summary_type_refs[] = {
     {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {2161}}, true},
     {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {2162}}, true},
     {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {2163}}, true}};
+
+/* spec 091 (CU 5801): SamplingIntervalDiagnosticsType(2165) HasComponent(47)
+   -> its 4 own declarations (OPC-10000-5 §7.10 Table 80). Grounded via
+   opc-ua-reference: search_nodes confirms 2166/11697/11698/11699 all resolve
+   to OPC-10000-5 §7.10; Table 80 itself gives every row as
+   HasComponent/Mandatory/BaseDataVariableType (fetched via WebFetch since
+   search_text truncates before the reference table body). None of the four
+   fall in the DataAccess band (2365-11461): 2166 < 2365, 11697-11699 > 11461,
+   so this is a single (non-DataAccess-branched) declaration set. */
+static const mu_reference_t s_sampling_interval_diagnostics_type_refs[] = {
+    {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {2166}}, true},
+    {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {11697}}, true},
+    {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {11698}}, true},
+    {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {11699}}, true}};
 
 /* spec 085 (CU 5801) Task 4: shared HasModellingRule(37)->Mandatory(78)/
    Optional(80) plus HasTypeDefinition(40) forward refs for the
@@ -2638,10 +2658,34 @@ static const mu_node_t s_base_nodes[] = {
      MU_NODECLASS_VARIABLETYPE,
      {31, s_str_SamplingIntervalDiagnosticsType},
      {31, s_str_SamplingIntervalDiagnosticsType},
+#if MUC_OPCUA_CU_BASE_INFO_SERVERTYPE && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+     s_sampling_interval_diagnostics_type_refs,
+     sizeof(s_sampling_interval_diagnostics_type_refs) / sizeof(s_sampling_interval_diagnostics_type_refs[0]),
+#else
      NULL,
      0,
+#endif
      NULL,
      .type_definition = {0}},
+#if MUC_OPCUA_CU_BASE_INFO_SERVERTYPE && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+    /* spec 091 (CU 5801): SamplingIntervalDiagnosticsType(2165)'s
+       SamplingInterval own declaration (OPC-10000-5 §7.10 Table 80). Sorted
+       between SamplingIntervalDiagnosticsType(2165) and
+       SubscriptionDiagnosticsArrayType(2171). The remaining 3 own
+       declarations (SampledMonitoredItemsCount/MaxSampledMonitoredItemsCount/
+       DisabledMonitoredItemsSamplingCount, NodeIds 11697-11699) sort far away
+       in the 11xxx neighborhood -- see below, near NamespacesType(11645). */
+    {{0, MU_NODEID_NUMERIC, {2166}},
+     MU_NODECLASS_VARIABLE,
+     {16, s_str_SamplingInterval},
+     {16, s_str_SamplingInterval},
+     s_mandatory_bdv_refs,
+     sizeof(s_mandatory_bdv_refs) / sizeof(s_mandatory_bdv_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {63}},
+     .value_rank = -1,
+     .data_type = 290}, /* Duration (OPC-10000-5 §7.10 Table 80) */
+#endif
     {{0, MU_NODEID_NUMERIC, {2171}},
      MU_NODECLASS_VARIABLETYPE,
      {32, s_str_SubscriptionDiagnosticsArrayType},
@@ -3681,6 +3725,43 @@ static const mu_node_t s_base_nodes[] = {
      0,
      NULL,
      .type_definition = {0}},
+#endif
+#if MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+    /* spec 091 (CU 5801): SamplingIntervalDiagnosticsType(2165)'s remaining 3
+       own declarations (OPC-10000-5 §7.10 Table 80) -- SamplingInterval(2166)
+       itself sorts next to the type node further above; these 3 land in the
+       11xxx neighborhood per their official NodeIds. Sorted between
+       NamespacesType(11645, CU_NAMESPACES-gated) and MaxArrayLength(11702). */
+    {{0, MU_NODEID_NUMERIC, {11697}},
+     MU_NODECLASS_VARIABLE,
+     {26, s_str_SampledMonitoredItemsCount},
+     {26, s_str_SampledMonitoredItemsCount},
+     s_mandatory_bdv_refs,
+     sizeof(s_mandatory_bdv_refs) / sizeof(s_mandatory_bdv_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {63}},
+     .value_rank = -1,
+     .data_type = 7}, /* UInt32 (OPC-10000-5 §7.10 Table 80) */
+    {{0, MU_NODEID_NUMERIC, {11698}},
+     MU_NODECLASS_VARIABLE,
+     {29, s_str_MaxSampledMonitoredItemsCount},
+     {29, s_str_MaxSampledMonitoredItemsCount},
+     s_mandatory_bdv_refs,
+     sizeof(s_mandatory_bdv_refs) / sizeof(s_mandatory_bdv_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {63}},
+     .value_rank = -1,
+     .data_type = 7}, /* UInt32 (OPC-10000-5 §7.10 Table 80) */
+    {{0, MU_NODEID_NUMERIC, {11699}},
+     MU_NODECLASS_VARIABLE,
+     {35, s_str_DisabledMonitoredItemsSamplingCount},
+     {35, s_str_DisabledMonitoredItemsSamplingCount},
+     s_mandatory_bdv_refs,
+     sizeof(s_mandatory_bdv_refs) / sizeof(s_mandatory_bdv_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {63}},
+     .value_rank = -1,
+     .data_type = 7}, /* UInt32 (OPC-10000-5 §7.10 Table 80) */
 #endif
 #endif
     /* Spec 057: MaxArrayLength/MaxStringLength — sorted slots before 11704. */
