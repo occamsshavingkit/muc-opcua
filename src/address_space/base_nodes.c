@@ -103,6 +103,12 @@ static const opcua_byte_t s_str_LocaleIdArray[] = "LocaleIdArray";
    §12.2.11.1). Previously dangling: LocaleIdArray declared .data_type = 295
    but no such node existed in the address space. */
 static const opcua_byte_t s_str_LocaleId[] = "LocaleId";
+/* spec 091 (CU 5801): MessageSecurityMode(302) DataType BrowseName -- the
+   closure Enumeration DataType for SessionSecurityDiagnosticsType.SecurityMode
+   (2251), a subtype of Enumeration(29) with no EnumStrings child (mirrors the
+   ServerState(852)/RedundancySupport(851) precedent, OPC-10000-4 §7.20
+   Table 139). */
+static const opcua_byte_t s_str_MessageSecurityMode[] = "MessageSecurityMode";
 #endif
 #ifdef MUC_OPCUA_CU_BASE_INFO_LOCATIONS_OBJECT
 static const opcua_byte_t s_str_Locations[] = "Locations";
@@ -319,6 +325,17 @@ static const opcua_byte_t s_str_SamplingInterval[] = "SamplingInterval";
 static const opcua_byte_t s_str_SampledMonitoredItemsCount[] = "SampledMonitoredItemsCount";
 static const opcua_byte_t s_str_MaxSampledMonitoredItemsCount[] = "MaxSampledMonitoredItemsCount";
 static const opcua_byte_t s_str_DisabledMonitoredItemsSamplingCount[] = "DisabledMonitoredItemsSamplingCount";
+/* spec 091 (CU 5801): BrowseNames for SessionSecurityDiagnosticsType's own
+   InstanceDeclarations (OPC-10000-5 §7.16 Table 86). */
+static const opcua_byte_t s_str_SessionId[] = "SessionId";
+static const opcua_byte_t s_str_ClientUserIdOfSession[] = "ClientUserIdOfSession";
+static const opcua_byte_t s_str_ClientUserIdHistory[] = "ClientUserIdHistory";
+static const opcua_byte_t s_str_AuthenticationMechanism[] = "AuthenticationMechanism";
+static const opcua_byte_t s_str_Encoding[] = "Encoding";
+static const opcua_byte_t s_str_TransportProtocol[] = "TransportProtocol";
+static const opcua_byte_t s_str_SecurityMode[] = "SecurityMode";
+static const opcua_byte_t s_str_SecurityPolicyUri[] = "SecurityPolicyUri";
+static const opcua_byte_t s_str_ClientCertificate[] = "ClientCertificate";
 #endif
 #endif
 #if MUC_OPCUA_CU_BASE_INFO_LOCALTIME
@@ -565,11 +582,26 @@ static const mu_reference_t s_enum_value_type_refs[] = {
 #if MUC_OPCUA_CU_BASE_INFO_SERVERTYPE
 /* spec 083 (CU 3189): Enumeration(29) HasSubtype closure for the ServerType enums,
    plus HasEncoding refs for each structured DataType's Default XML/Binary
-   Encoding Objects (DataTypeEncodingType 76). */
+   Encoding Objects (DataTypeEncodingType 76).
+   spec 091 (CU 5801): when TYPE_INFORMATION is also on, Enumeration(29) gets a
+   third HasSubtype -> MessageSecurityMode(302), the closure DataType for
+   SessionSecurityDiagnosticsType.SecurityMode(2251). Kept as two mutually
+   exclusive arrays (rather than one array unconditionally including 302) so
+   the extra ref only compiles in when 302 itself exists -- otherwise a
+   SERVERTYPE-only build with TYPE_INFORMATION off would carry a dangling
+   forward reference. */
+#if MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+static const mu_reference_t s_enumeration_refs_with_message_security_mode[] = {
+    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {851}}, true}, /* Enumeration -> RedundancySupport */
+    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {852}}, true}, /* Enumeration -> ServerState */
+    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {302}}, true}, /* Enumeration -> MessageSecurityMode */
+};
+#else
 static const mu_reference_t s_enumeration_refs[] = {
     {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {851}}, true}, /* Enumeration -> RedundancySupport */
     {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {852}}, true}, /* Enumeration -> ServerState */
 };
+#endif
 static const mu_reference_t s_build_info_refs[] = {
     {{0, MU_NODEID_NUMERIC, {38}}, {0, MU_NODEID_NUMERIC, {339}}, true}, /* BuildInfo -HasEncoding-> Default XML */
     {{0, MU_NODEID_NUMERIC, {38}}, {0, MU_NODEID_NUMERIC, {340}}, true}, /* BuildInfo -HasEncoding-> Default Binary */
@@ -826,6 +858,27 @@ static const mu_reference_t s_sampling_interval_diagnostics_type_refs[] = {
     {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {11697}}, true},
     {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {11698}}, true},
     {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {11699}}, true}};
+
+/* spec 091 (CU 5801): SessionSecurityDiagnosticsType(2244) HasComponent(47)
+   -> its 9 own declarations (OPC-10000-5 §7.16 Table 86). Grounded via
+   opc-ua-reference (search_nodes confirms every child NodeId resolves to
+   §7.16; Table 86 itself -- fetched via WebFetch since search_text truncates
+   the reference table body -- gives every row as HasComponent/Variable/
+   BaseDataVariableType/Mandatory, matching exactly). ClientCertificate(3058)
+   falls inside the DataAccess band (2365..11461), so it is dual-placed in
+   base_nodes.c (see the DataAccess-on/-off copies near BuildInfoType's own
+   declarations) -- this ref list still names it once, since exactly one copy
+   of the 3058 node exists in any given build. */
+static const mu_reference_t s_session_security_diagnostics_type_refs[] = {
+    {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {2245}}, true},
+    {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {2246}}, true},
+    {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {2247}}, true},
+    {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {2248}}, true},
+    {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {2249}}, true},
+    {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {2250}}, true},
+    {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {2251}}, true},
+    {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {2252}}, true},
+    {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {3058}}, true}};
 
 /* spec 085 (CU 5801) Task 4: shared HasModellingRule(37)->Mandatory(78)/
    Optional(80) plus HasTypeDefinition(40) forward refs for the
@@ -1586,7 +1639,10 @@ static const mu_node_t s_base_nodes[] = {
      MU_NODECLASS_DATATYPE,
      {11, s_str_Enumeration},
      {11, s_str_Enumeration},
-#if MUC_OPCUA_CU_BASE_INFO_SERVERTYPE
+#if MUC_OPCUA_CU_BASE_INFO_SERVERTYPE && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+     s_enumeration_refs_with_message_security_mode,
+     sizeof(s_enumeration_refs_with_message_security_mode) / sizeof(s_enumeration_refs_with_message_security_mode[0]),
+#elif MUC_OPCUA_CU_BASE_INFO_SERVERTYPE
      s_enumeration_refs,
      sizeof(s_enumeration_refs) / sizeof(s_enumeration_refs[0]),
 #else
@@ -1953,6 +2009,22 @@ static const mu_node_t s_base_nodes[] = {
      0,
      NULL,
      .type_definition = {0, MU_NODEID_NUMERIC, {76}}},
+#endif
+#if MUC_OPCUA_CU_BASE_INFO_SERVERTYPE && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+    /* spec 091 (CU 5801): MessageSecurityMode(302, subtype of Enumeration(29),
+       OPC-10000-4 §7.20 Table 139) is the closure DataType for
+       SessionSecurityDiagnosticsType.SecurityMode(2251). No EnumStrings child
+       is added, matching the ServerState(852)/RedundancySupport(851)
+       precedent. Sorted between the Argument encodings (298) and
+       BuildInfo(338). */
+    {{0, MU_NODEID_NUMERIC, {302}},
+     MU_NODECLASS_DATATYPE,
+     {19, s_str_MessageSecurityMode},
+     {19, s_str_MessageSecurityMode},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0}},
 #endif
 #if MUC_OPCUA_CU_BASE_INFO_SERVERTYPE
     /* spec 083 (CU 3189): ServerType structured DataTypes (subtypes of
@@ -2730,10 +2802,105 @@ static const mu_node_t s_base_nodes[] = {
      MU_NODECLASS_VARIABLETYPE,
      {30, s_str_SessionSecurityDiagnosticsType},
      {30, s_str_SessionSecurityDiagnosticsType},
+#if MUC_OPCUA_CU_BASE_INFO_SERVERTYPE && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+     s_session_security_diagnostics_type_refs,
+     sizeof(s_session_security_diagnostics_type_refs) / sizeof(s_session_security_diagnostics_type_refs[0]),
+#else
      NULL,
      0,
+#endif
      NULL,
      .type_definition = {0}},
+#if MUC_OPCUA_CU_BASE_INFO_SERVERTYPE && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+    /* spec 091 (CU 5801): SessionSecurityDiagnosticsType(2244)'s 8 own
+       declarations that fall outside the DataAccess band (OPC-10000-5 §7.16
+       Table 86). ClientCertificate(3058, ByteString) falls inside the
+       2365..11461 DataAccess block, so it is dual-placed further below,
+       mirroring the BuildInfoType(3051) own-declarations dual-copy precedent
+       -- see the DataAccess-off/-on copies near BuildDate(3057). Sorted
+       between SessionSecurityDiagnosticsType(2244) and
+       SubscriptionDiagnosticsArrayType(2171). */
+    {{0, MU_NODEID_NUMERIC, {2245}},
+     MU_NODECLASS_VARIABLE,
+     {9, s_str_SessionId},
+     {9, s_str_SessionId},
+     s_mandatory_bdv_refs,
+     sizeof(s_mandatory_bdv_refs) / sizeof(s_mandatory_bdv_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {63}},
+     .value_rank = -1,
+     .data_type = 17}, /* NodeId (OPC-10000-5 §7.16 Table 86) */
+    {{0, MU_NODEID_NUMERIC, {2246}},
+     MU_NODECLASS_VARIABLE,
+     {21, s_str_ClientUserIdOfSession},
+     {21, s_str_ClientUserIdOfSession},
+     s_mandatory_bdv_refs,
+     sizeof(s_mandatory_bdv_refs) / sizeof(s_mandatory_bdv_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {63}},
+     .value_rank = -1,
+     .data_type = 12}, /* String (OPC-10000-5 §7.16 Table 86) */
+    {{0, MU_NODEID_NUMERIC, {2247}},
+     MU_NODECLASS_VARIABLE,
+     {19, s_str_ClientUserIdHistory},
+     {19, s_str_ClientUserIdHistory},
+     s_mandatory_bdv_refs,
+     sizeof(s_mandatory_bdv_refs) / sizeof(s_mandatory_bdv_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {63}},
+     .value_rank = 1,
+     .data_type = 12}, /* String[] (OPC-10000-5 §7.16 Table 86) */
+    {{0, MU_NODEID_NUMERIC, {2248}},
+     MU_NODECLASS_VARIABLE,
+     {23, s_str_AuthenticationMechanism},
+     {23, s_str_AuthenticationMechanism},
+     s_mandatory_bdv_refs,
+     sizeof(s_mandatory_bdv_refs) / sizeof(s_mandatory_bdv_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {63}},
+     .value_rank = -1,
+     .data_type = 12}, /* String (OPC-10000-5 §7.16 Table 86) */
+    {{0, MU_NODEID_NUMERIC, {2249}},
+     MU_NODECLASS_VARIABLE,
+     {8, s_str_Encoding},
+     {8, s_str_Encoding},
+     s_mandatory_bdv_refs,
+     sizeof(s_mandatory_bdv_refs) / sizeof(s_mandatory_bdv_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {63}},
+     .value_rank = -1,
+     .data_type = 12}, /* String (OPC-10000-5 §7.16 Table 86) */
+    {{0, MU_NODEID_NUMERIC, {2250}},
+     MU_NODECLASS_VARIABLE,
+     {17, s_str_TransportProtocol},
+     {17, s_str_TransportProtocol},
+     s_mandatory_bdv_refs,
+     sizeof(s_mandatory_bdv_refs) / sizeof(s_mandatory_bdv_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {63}},
+     .value_rank = -1,
+     .data_type = 12}, /* String (OPC-10000-5 §7.16 Table 86) */
+    {{0, MU_NODEID_NUMERIC, {2251}},
+     MU_NODECLASS_VARIABLE,
+     {12, s_str_SecurityMode},
+     {12, s_str_SecurityMode},
+     s_mandatory_bdv_refs,
+     sizeof(s_mandatory_bdv_refs) / sizeof(s_mandatory_bdv_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {63}},
+     .value_rank = -1,
+     .data_type = 302}, /* MessageSecurityMode (OPC-10000-5 §7.16 Table 86) */
+    {{0, MU_NODEID_NUMERIC, {2252}},
+     MU_NODECLASS_VARIABLE,
+     {17, s_str_SecurityPolicyUri},
+     {17, s_str_SecurityPolicyUri},
+     s_mandatory_bdv_refs,
+     sizeof(s_mandatory_bdv_refs) / sizeof(s_mandatory_bdv_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {63}},
+     .value_rank = -1,
+     .data_type = 12}, /* String (OPC-10000-5 §7.16 Table 86) */
+#endif
 #endif
     {{0, MU_NODEID_NUMERIC, {2253}},
      MU_NODECLASS_OBJECT,
@@ -3205,6 +3372,22 @@ static const mu_node_t s_base_nodes[] = {
      .value_rank = -1,
      .data_type = 294}, /* UtcTime, not DateTime -- OPC-10000-5 §7.7 Table 77 and
                             the official NodeSet2.xml both give DataType=UtcTime(294) */
+    /* spec 091 (CU 5801): SessionSecurityDiagnosticsType.ClientCertificate
+       (3058, ByteString, DataAccess-on copy) -- falls inside the
+       2365..11461 DataAccess block, so it is dual-placed, mirroring the
+       BuildInfoType own-declarations dual-copy just above (see the
+       DataAccess-off mirror below). Sorts after BuildDate(3057) and before
+       EnumValueType(7594). */
+    {{0, MU_NODEID_NUMERIC, {3058}},
+     MU_NODECLASS_VARIABLE,
+     {17, s_str_ClientCertificate},
+     {17, s_str_ClientCertificate},
+     s_mandatory_bdv_refs,
+     sizeof(s_mandatory_bdv_refs) / sizeof(s_mandatory_bdv_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {63}},
+     .value_rank = -1,
+     .data_type = 15}, /* ByteString (OPC-10000-5 §7.16 Table 86) */
 #endif
 #if MUC_OPCUA_CU_BASE_INFO_BASE_TYPES
     /* CU 3188: EnumValueType(7594, subtype of Structure) + its Default XML(7616)/
@@ -3363,6 +3546,19 @@ static const mu_node_t s_base_nodes[] = {
      .value_rank = -1,
      .data_type = 294}, /* UtcTime, not DateTime -- OPC-10000-5 §7.7 Table 77 and
                             the official NodeSet2.xml both give DataType=UtcTime(294) */
+    /* spec 091 (CU 5801): SessionSecurityDiagnosticsType.ClientCertificate
+       (3058, ByteString, DataAccess-off copy), mirroring the in-DataAccess
+       copy above. Sorts after BuildDate(3057) and before EnumValueType(7594). */
+    {{0, MU_NODEID_NUMERIC, {3058}},
+     MU_NODECLASS_VARIABLE,
+     {17, s_str_ClientCertificate},
+     {17, s_str_ClientCertificate},
+     s_mandatory_bdv_refs,
+     sizeof(s_mandatory_bdv_refs) / sizeof(s_mandatory_bdv_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {63}},
+     .value_rank = -1,
+     .data_type = 15}, /* ByteString (OPC-10000-5 §7.16 Table 86) */
 #endif
 #if MUC_OPCUA_CU_BASE_INFO_BASE_TYPES && !MUC_OPCUA_CU_DATA_ACCESS
     /* CU 3188 (Data-Access-off variant): EnumValueType(7594) + its Encoding Objects,

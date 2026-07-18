@@ -513,6 +513,41 @@ static void test_sampling_interval_diagnostics_type_instance_declarations(void) 
     assert_type_decls(2165u, 47u, 78u, 63u, decls, sizeof(decls) / sizeof(decls[0]));
 }
 
+/* spec 091 (CU 5801): SessionSecurityDiagnosticsType(2244)'s 9 own Mandatory
+   HasComponent InstanceDeclarations (OPC-10000-5 §7.16 Table 86), all
+   TypeDefinition BaseDataVariableType(63). Grounded via opc-ua-reference
+   (search_nodes confirms every child NodeId resolves to §7.16; Table 86
+   itself -- fetched via WebFetch since search_text truncates the reference
+   table body -- gives every row as HasComponent/Variable/
+   BaseDataVariableType/Mandatory, matching exactly; no HasProperty rows).
+   SecurityMode(2251)'s DataType is MessageSecurityMode(302), an Enumeration
+   closure DataType added below (OPC-10000-4 §7.20 Table 139). Client
+   Certificate(3058, ByteString) falls inside the 2365..11461 DataAccess band,
+   so base_nodes.c dual-places it (DataAccess-on and -off copies); it must
+   resolve identically here regardless of which copy is compiled in. */
+static void test_session_security_diagnostics_type_instance_declarations(void) {
+    static const mu_type_decl_t decls[] = {
+        {2245u, "SessionId", 17u, -1},              /* NodeId */
+        {2246u, "ClientUserIdOfSession", 12u, -1},   /* String */
+        {2247u, "ClientUserIdHistory", 12u, 1},      /* String[] */
+        {2248u, "AuthenticationMechanism", 12u, -1}, /* String */
+        {2249u, "Encoding", 12u, -1},                /* String */
+        {2250u, "TransportProtocol", 12u, -1},       /* String */
+        {2251u, "SecurityMode", 302u, -1},           /* MessageSecurityMode */
+        {2252u, "SecurityPolicyUri", 12u, -1},       /* String */
+        {3058u, "ClientCertificate", 15u, -1},       /* ByteString */
+    };
+
+    /* SessionSecurityDiagnosticsType -HasComponent(47)-> decl, Mandatory(78), BaseDataVariableType(63) */
+    assert_type_decls(2244u, 47u, 78u, 63u, decls, sizeof(decls) / sizeof(decls[0]));
+
+    /* MessageSecurityMode(302): Enumeration DataType, subtype of
+       Enumeration(29). Per the ServerState(852)/RedundancySupport(851)
+       precedent, no EnumStrings child is added. */
+    assert_node(302u, MU_NODECLASS_DATATYPE, "MessageSecurityMode");
+    TEST_ASSERT_TRUE(has_forward_ref(29u, 45u, 302u)); /* Enumeration -HasSubtype-> MessageSecurityMode */
+}
+
 /* spec 090 (CU 5801 fix): the 4 previously-dangling DataType references found
    by a completeness sweep. See docs/superpowers/plans (090) for the grounded
    ModellingRule/owning-CU facts behind each fix:
@@ -648,6 +683,7 @@ int main(void) {
     RUN_TEST(test_variable_reports_true_datatype_and_valuerank);
     RUN_TEST(test_operation_limits_type_instance_declarations);
     RUN_TEST(test_sampling_interval_diagnostics_type_instance_declarations);
+    RUN_TEST(test_session_security_diagnostics_type_instance_declarations);
     RUN_TEST(test_servertype_datatype_refs_not_dangling);
 #endif
 #elif MUC_OPCUA_BASE_NODES
