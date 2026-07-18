@@ -2222,9 +2222,9 @@ static const mu_node_t s_base_nodes[] = {
        ServerArray/NamespaceArray/ServerStatus/ServiceLevel/ServerCapabilities/
        ServerDiagnostics/VendorServerInfo/ServerRedundancy (OPC-10000-5 §6.3.1
        table). Sorted between ServerType(2004) and ServerCapabilitiesType(2013);
-       the remaining ServerType children (UrisVersion, Auditing,
-       EstimatedReturnTime, LocalTime, Namespaces, and the 4 built-in Methods)
-       sort elsewhere -- see s_server_type_refs above for the full 17-node list. */
+       the remaining ServerType children (Auditing, EstimatedReturnTime,
+       LocalTime, Namespaces, and the 4 built-in Methods) sort elsewhere --
+       see s_server_type_refs above for the full node list. */
     {{0, MU_NODEID_NUMERIC, {2005}},
      MU_NODECLASS_VARIABLE,
      {11, s_str_ServerArray},
