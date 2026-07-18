@@ -67,3 +67,31 @@ def derive_depends_on(graph, idx, cu_name):
                     syms.add(sym)
     ordered = sorted(syms)
     return ordered, ("or" if len(ordered) > 1 else None)
+
+
+_ROOTS = {"nano": "2266", "micro": "2267", "embedded": "2268", "standard": "2269"}
+
+
+def _mandatory_cu_names(graph, root_id):
+    """CU names reachable from root via all-mandatory profile edges AND a mandatory CU edge."""
+    seen_profiles, mandatory_cus = set(), set()
+    stack = [str(root_id)]
+    while stack:
+        pid = stack.pop()
+        if pid in seen_profiles:
+            continue
+        seen_profiles.add(pid)
+        node = graph["profiles"].get(pid)
+        if not node:
+            continue
+        for c in node.get("child_cus", []):
+            if not c.get("isOptional"):
+                mandatory_cus.add(c.get("name"))
+        for p in node.get("child_profiles", []):
+            if not p.get("isOptional"):
+                stack.append(str(p.get("id")))
+    return mandatory_cus
+
+
+def derive_profile_defaults(graph, cu_name):
+    return {prof: (cu_name in _mandatory_cu_names(graph, rid)) for prof, rid in _ROOTS.items()}

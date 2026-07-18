@@ -51,3 +51,22 @@ def test_depends_on_multi_facet_is_or():
     deps, op = d.derive_depends_on(graph, idx, "Base Info ServerType")
     assert set(deps) == {"MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER", "MUC_OPCUA_FACET_CORE_2022_SERVER"}
     assert op == "or"
+
+
+def test_profile_defaults_mandatory_via_chain():
+    # Embedded(2268) ⊃ facet 1219 (mandatory) ⊃ ServerType (mandatory) => embedded True; nano/micro False
+    graph = {"profiles": {
+        "2266": {"name": "Nano …Profile", "child_profiles": [], "child_cus": []},
+        "2267": {"name": "Micro …Profile", "child_profiles": [{"id": 2266, "name": "Nano …Profile", "isOptional": False}], "child_cus": []},
+        "2268": {"name": "Embedded …Profile", "child_profiles": [
+                   {"id": 2267, "name": "Micro …Profile", "isOptional": False},
+                   {"id": 1219, "name": "Exposes Type System Server Facet", "isOptional": False}], "child_cus": []},
+        "2269": {"name": "Standard …Profile", "child_profiles": [{"id": 2268, "name": "Embedded …Profile", "isOptional": False}], "child_cus": []},
+        "1219": {"name": "Exposes Type System Server Facet", "child_profiles": [],
+                "child_cus": [{"id": 9001, "name": "Base Info ServerType", "isOptional": False},
+                             {"id": 9003, "name": "Base Info EUInformation", "isOptional": True}]}},
+        "cu_master": {}}
+    pd = d.derive_profile_defaults(graph, "Base Info ServerType")
+    assert pd == {"nano": False, "micro": False, "embedded": True, "standard": True}
+    pd_opt = d.derive_profile_defaults(graph, "Base Info EUInformation")
+    assert pd_opt == {"nano": False, "micro": False, "embedded": False, "standard": False}  # optional => not default
