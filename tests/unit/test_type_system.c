@@ -262,16 +262,19 @@ void test_base_types_and_modelling_rules(void) {
    land in later tasks (3/4/5); this test only asserts the HasSubtype/HasEncoding
    reference closure. */
 static void test_servertype_type_tree_and_encodings(void) {
-    /* ObjectTypes under BaseObjectType(58) */
-    const uint32_t obj_bo[] = {2013u, 2020u, 2026u, 2029u, 2033u, 2034u, 11575u, 11616u, 11645u};
+    /* ObjectTypes under BaseObjectType(58). NOTE (spec 090, CU 5801 Part A):
+       FileType(11575)/NamespaceMetadataType(11616)/NamespacesType(11645) (and
+       AddressSpaceFileType(11595), a FileType subtype) moved off this bare
+       SERVERTYPE gate onto their true (full-only) owner CU_NAMESPACES -- see
+       test_namespace_file_types_gated_by_cu_namespaces below. */
+    const uint32_t obj_bo[] = {2013u, 2020u, 2026u, 2029u, 2033u, 2034u};
     for (size_t i = 0; i < sizeof(obj_bo) / sizeof(obj_bo[0]); ++i) {
         TEST_ASSERT_TRUE(has_forward_ref(58u, 45u, obj_bo[i]));
     }
-    TEST_ASSERT_TRUE(has_forward_ref(2034u, 45u, 2036u));   /* Transparent */
-    TEST_ASSERT_TRUE(has_forward_ref(2034u, 45u, 2039u));   /* NonTransparent */
-    TEST_ASSERT_TRUE(has_forward_ref(2039u, 45u, 11945u));  /* NonTransparentNetwork */
-    TEST_ASSERT_TRUE(has_forward_ref(61u, 45u, 11564u));    /* OperationLimits->Folder */
-    TEST_ASSERT_TRUE(has_forward_ref(11575u, 45u, 11595u)); /* AddressSpaceFile->File */
+    TEST_ASSERT_TRUE(has_forward_ref(2034u, 45u, 2036u));  /* Transparent */
+    TEST_ASSERT_TRUE(has_forward_ref(2034u, 45u, 2039u));  /* NonTransparent */
+    TEST_ASSERT_TRUE(has_forward_ref(2039u, 45u, 11945u)); /* NonTransparentNetwork */
+    TEST_ASSERT_TRUE(has_forward_ref(61u, 45u, 11564u));   /* OperationLimits->Folder */
 
     /* VariableTypes under BaseDataVariableType(63) */
     const uint32_t vt[] = {2137u, 2138u, 2150u, 2164u, 2165u, 2171u, 2172u, 2196u, 2197u, 2243u, 2244u, 3051u};
@@ -293,6 +296,47 @@ static void test_servertype_type_tree_and_encodings(void) {
     TEST_ASSERT_TRUE(has_forward_ref(338u, 38u, 339u));     /* BuildInfo XML */
     TEST_ASSERT_TRUE(has_forward_ref(338u, 38u, 340u));     /* BuildInfo Binary */
     TEST_ASSERT_TRUE(has_forward_ref(11944u, 38u, 11958u)); /* NetworkGroup Binary */
+}
+
+/* spec 090 (CU 5801 Part A): FileType(11575)/AddressSpaceFileType(11595)/
+   NamespaceMetadataType(11616)/NamespacesType(11645) are auto-scoped to their
+   true owner CU_NAMESPACES (full-only), not the bare SERVERTYPE gate -- so
+   embedded/standard (which enable SERVERTYPE but not CU_NAMESPACES) no longer
+   pay CU 5801 completeness for types they never expose, while full (which
+   enables both) still compiles them. NamespaceMetadataType(11616) is properly
+   owned by CU_NAMESPACE_METADATA(3545) (also full-only); it is grouped under
+   CU_NAMESPACES here as a follow-up refinement since both CUs are full-only
+   for now. ServerType.Namespaces(11527), the Optional InstanceDeclaration
+   whose TypeDefinition is NamespacesType, moves with it. */
+static void test_namespace_file_types_gated_by_cu_namespaces(void) {
+#if MUC_OPCUA_CU_NAMESPACES
+    assert_node(11575u, MU_NODECLASS_OBJECTTYPE, "FileType");
+    assert_node(11595u, MU_NODECLASS_OBJECTTYPE, "AddressSpaceFileType");
+    assert_node(11616u, MU_NODECLASS_OBJECTTYPE, "NamespaceMetadataType");
+    assert_node(11645u, MU_NODECLASS_OBJECTTYPE, "NamespacesType");
+    TEST_ASSERT_TRUE(has_forward_ref(58u, 45u, 11575u));    /* BaseObjectType->FileType */
+    TEST_ASSERT_TRUE(has_forward_ref(58u, 45u, 11616u));    /* BaseObjectType->NamespaceMetadataType */
+    TEST_ASSERT_TRUE(has_forward_ref(58u, 45u, 11645u));    /* BaseObjectType->NamespacesType */
+    TEST_ASSERT_TRUE(has_forward_ref(11575u, 45u, 11595u)); /* FileType->AddressSpaceFileType */
+#if MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+    assert_node(11527u, MU_NODECLASS_OBJECT, "Namespaces");
+    TEST_ASSERT_TRUE(has_forward_ref(2004u, 47u, 11527u)); /* ServerType->Namespaces */
+#endif
+#else
+    /* embedded/standard: not present, and no dangling HasSubtype ref left
+       pointing at a node that isn't compiled in. */
+    TEST_ASSERT_NULL(base_node(11575u));
+    TEST_ASSERT_NULL(base_node(11595u));
+    TEST_ASSERT_NULL(base_node(11616u));
+    TEST_ASSERT_NULL(base_node(11645u));
+    TEST_ASSERT_FALSE(has_forward_ref(58u, 45u, 11575u));
+    TEST_ASSERT_FALSE(has_forward_ref(58u, 45u, 11616u));
+    TEST_ASSERT_FALSE(has_forward_ref(58u, 45u, 11645u));
+#if MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+    TEST_ASSERT_NULL(base_node(11527u));
+    TEST_ASSERT_FALSE(has_forward_ref(2004u, 47u, 11527u));
+#endif
+#endif
 }
 #endif
 
@@ -372,6 +416,46 @@ static void test_variable_reports_true_datatype_and_valuerank(void) {
     assert_datatype_and_valuerank(2005u, 12u, 1);   /* ServerArray: String[] */
     assert_datatype_and_valuerank(2007u, 862u, -1); /* ServerStatus: ServerStatusDataType */
 }
+
+/* spec 090 (CU 5801 Part B): OperationLimitsType(11564)'s 12 own Optional
+   Property InstanceDeclarations, formally defined in OPC-10000-5 §6.3.11
+   Table 20. NodeIds grounded against the official OPC Foundation NodeIds.csv
+   (files.opcfoundation.org/schemas/1.05/NodeIds.csv) -- distinct from the
+   runtime OperationLimits(11704) object's own property NodeIds
+   (11705/11707/11710/11714/...) and from ServerCapabilitiesType's/ServerType's
+   own OperationLimits-property copies (e.g. 12157-12160). Table 20 gives every
+   row as HasProperty/UInt32/PropertyType/Optional; that matches this test's
+   expectations exactly (no deviation from the spec found). */
+static void test_operation_limits_type_instance_declarations(void) {
+    static const struct {
+        opcua_uint32_t node_id;
+        const char *browse_name;
+    } decls[] = {
+        {11565u, "MaxNodesPerRead"},
+        {12161u, "MaxNodesPerHistoryReadData"},
+        {12162u, "MaxNodesPerHistoryReadEvents"},
+        {11567u, "MaxNodesPerWrite"},
+        {12163u, "MaxNodesPerHistoryUpdateData"},
+        {12164u, "MaxNodesPerHistoryUpdateEvents"},
+        {11569u, "MaxNodesPerMethodCall"},
+        {11570u, "MaxNodesPerBrowse"},
+        {11571u, "MaxNodesPerRegisterNodes"},
+        {11572u, "MaxNodesPerTranslateBrowsePathsToNodeIds"},
+        {11573u, "MaxNodesPerNodeManagement"},
+        {11574u, "MaxMonitoredItemsPerCall"},
+    };
+
+    for (size_t i = 0; i < sizeof(decls) / sizeof(decls[0]); ++i) {
+        TEST_ASSERT_TRUE_MESSAGE(has_forward_ref(11564u, 46u, decls[i].node_id),
+                                 decls[i].browse_name); /* OperationLimitsType -HasProperty-> decl */
+        assert_node(decls[i].node_id, MU_NODECLASS_VARIABLE, decls[i].browse_name);
+        assert_datatype_and_valuerank(decls[i].node_id, 7u, -1); /* UInt32, Scalar */
+        TEST_ASSERT_TRUE_MESSAGE(has_forward_ref(decls[i].node_id, 37u, 80u),
+                                 decls[i].browse_name); /* HasModellingRule -> Optional */
+        TEST_ASSERT_TRUE_MESSAGE(has_forward_ref(decls[i].node_id, 40u, 68u),
+                                 decls[i].browse_name); /* HasTypeDefinition -> PropertyType */
+    }
+}
 #endif
 
 void test_server_profile_array_advertises_embedded_profile(void) {
@@ -447,10 +531,12 @@ int main(void) {
 #endif
 #if MUC_OPCUA_CU_BASE_INFO_SERVERTYPE
     RUN_TEST(test_servertype_type_tree_and_encodings);
+    RUN_TEST(test_namespace_file_types_gated_by_cu_namespaces);
 #endif
 #if MUC_OPCUA_CU_BASE_INFO_SERVERTYPE && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
     RUN_TEST(test_servertype_instance_declarations);
     RUN_TEST(test_variable_reports_true_datatype_and_valuerank);
+    RUN_TEST(test_operation_limits_type_instance_declarations);
 #endif
 #elif MUC_OPCUA_BASE_NODES
     RUN_TEST(test_default_build_keeps_types_folder_unexpanded);
