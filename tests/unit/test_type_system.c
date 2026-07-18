@@ -50,6 +50,26 @@ static bool has_forward_ref(opcua_uint32_t source_id, opcua_uint32_t ref_type_id
     return false;
 }
 
+/* CU 5801 general regression (spec 090): no exposed Variable node may declare
+   a DataType that is absent from the address space, or whose NodeId resolves
+   to something other than a DataType node. Runs unconditionally (any
+   profile/build) by walking the raw node table directly instead of relying
+   on the BASE_TYPE_SYSTEM-gated helpers below. */
+static void test_no_variable_has_dangling_datatype(void) {
+    const mu_address_space_t *address_space = mu_base_address_space();
+    for (size_t i = 0u; i < address_space->node_count; ++i) {
+        const mu_node_t *node = &address_space->nodes[i];
+        if (node->node_class != MU_NODECLASS_VARIABLE || node->data_type == 0u) {
+            continue;
+        }
+        const mu_node_t *data_type_node = base_node(node->data_type);
+        TEST_ASSERT_NOT_NULL_MESSAGE(data_type_node, "Variable references a DataType node absent from the "
+                                                     "address space (CU 5801 dangling reference)");
+        TEST_ASSERT_EQUAL_MESSAGE(MU_NODECLASS_DATATYPE, data_type_node->node_class,
+                                  "Variable's declared DataType id resolves to a non-DataType node");
+    }
+}
+
 #if MUC_OPCUA_BASE_TYPE_SYSTEM
 
 static void assert_node(opcua_uint32_t id, mu_node_class_t node_class, const char *browse_name) {
@@ -456,6 +476,59 @@ static void test_operation_limits_type_instance_declarations(void) {
                                  decls[i].browse_name); /* HasTypeDefinition -> PropertyType */
     }
 }
+
+/* spec 090 (CU 5801 fix): the 4 previously-dangling DataType references found
+   by a completeness sweep. See docs/superpowers/plans (090) for the grounded
+   ModellingRule/owning-CU facts behind each fix:
+   - LocaleIdArray(2016) Mandatory -> LocaleId(295) DataType ADDED (subtype of
+     String(12), no encodings).
+   - SoftwareCertificates(3049) Mandatory -> SignedSoftwareCertificate(344)
+     DataType ADDED (subtype of Structure(22), with Default XML(345)/Default
+     Binary(346) Encoding Objects).
+   - ServerType.UrisVersion(15003) Optional, owned by CU 3994 (Session
+     Sessionless Invocation / "Sessionless Server Facet", entirely
+     unimplemented in this codebase -- docs/conformance/completion.md shows
+     0/2). REMOVED: not exposed in any profile until that facet is
+     implemented, rather than fabricating a claim for an unimplemented CU.
+   - ServerType.LocalTime(17612) Optional, owned by CU 2476 (Base Info
+     LocalTime, full-only). RE-GATED from the bare SERVERTYPE &&
+     TYPE_INFORMATION condition onto MUC_OPCUA_CU_BASE_INFO_LOCALTIME, matching
+     its DataType TimeZoneDataType(8912)'s existing gate. */
+static void test_servertype_datatype_refs_not_dangling(void) {
+    /* LocaleIdArray(2016) -> LocaleId(295): Mandatory, always present here. */
+    assert_node(295u, MU_NODECLASS_DATATYPE, "LocaleId");
+    TEST_ASSERT_TRUE(has_forward_ref(12u, 45u, 295u)); /* String -HasSubtype-> LocaleId */
+    assert_datatype_and_valuerank(2016u, 295u, 1);     /* LocaleIdArray: LocaleId[] */
+
+    /* SoftwareCertificates(3049) -> SignedSoftwareCertificate(344): Mandatory,
+       always present here, with its Structure encodings. */
+    assert_node(344u, MU_NODECLASS_DATATYPE, "SignedSoftwareCertificate");
+    assert_node(345u, MU_NODECLASS_OBJECT, "Default XML");
+    assert_node(346u, MU_NODECLASS_OBJECT, "Default Binary");
+    TEST_ASSERT_TRUE(has_forward_ref(22u, 45u, 344u));  /* Structure -HasSubtype-> SignedSoftwareCertificate */
+    TEST_ASSERT_TRUE(has_forward_ref(344u, 38u, 345u)); /* -HasEncoding-> Default XML */
+    TEST_ASSERT_TRUE(has_forward_ref(344u, 38u, 346u)); /* -HasEncoding-> Default Binary */
+    assert_datatype_and_valuerank(3049u, 344u, 1);      /* SoftwareCertificates: SignedSoftwareCertificate[] */
+
+    /* UrisVersion(15003)/VersionTime(20998): removed everywhere (CU 3994
+       unimplemented). No dangling reference left behind. */
+    TEST_ASSERT_NULL(base_node(15003u));
+    TEST_ASSERT_NULL(base_node(20998u));
+    TEST_ASSERT_FALSE(has_forward_ref(2004u, 46u, 15003u)); /* ServerType no longer -HasProperty-> UrisVersion */
+
+    /* LocalTime(17612): present iff LOCALTIME (full-only); its DataType
+       TimeZoneDataType(8912) shares that exact gate, so never dangling. */
+#if MUC_OPCUA_CU_BASE_INFO_LOCALTIME
+    assert_node(17612u, MU_NODECLASS_VARIABLE, "LocalTime");
+    TEST_ASSERT_TRUE(has_forward_ref(2004u, 46u, 17612u)); /* ServerType -HasProperty-> LocalTime */
+    assert_datatype_and_valuerank(17612u, 8912u, -1);      /* LocalTime: TimeZoneDataType */
+    assert_node(8912u, MU_NODECLASS_DATATYPE, "TimeZoneDataType");
+#else
+    TEST_ASSERT_NULL(base_node(17612u));
+    TEST_ASSERT_FALSE(has_forward_ref(2004u, 46u, 17612u));
+    TEST_ASSERT_NULL(base_node(8912u));
+#endif
+}
 #endif
 
 void test_server_profile_array_advertises_embedded_profile(void) {
@@ -515,6 +588,7 @@ void test_default_build_keeps_types_folder_unexpanded(void) {
 
 int main(void) {
     UNITY_BEGIN();
+    RUN_TEST(test_no_variable_has_dangling_datatype);
 #if MUC_OPCUA_BASE_TYPE_SYSTEM
     RUN_TEST(test_namespace0_type_system_nodes_are_present);
     RUN_TEST(test_type_hierarchies_have_subtype_references);
@@ -537,6 +611,7 @@ int main(void) {
     RUN_TEST(test_servertype_instance_declarations);
     RUN_TEST(test_variable_reports_true_datatype_and_valuerank);
     RUN_TEST(test_operation_limits_type_instance_declarations);
+    RUN_TEST(test_servertype_datatype_refs_not_dangling);
 #endif
 #elif MUC_OPCUA_BASE_NODES
     RUN_TEST(test_default_build_keeps_types_folder_unexpanded);
