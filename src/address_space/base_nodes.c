@@ -63,7 +63,8 @@ static const opcua_byte_t s_str_Double[] = "Double";
 #ifdef MUC_OPCUA_CU_BASE_INFO_ENGINEERING_UNITS
 static const opcua_byte_t s_str_EUInformation[] = "EUInformation";
 #endif
-#if defined(MUC_OPCUA_CU_BASE_INFO_ESTIMATED_RETURN_TIME) || MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+#if defined(MUC_OPCUA_CU_BASE_INFO_ESTIMATED_RETURN_TIME) ||                                                           \
+    (MUC_OPCUA_CU_BASE_INFO_SERVERTYPE && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION)
 /* spec 085 (CU 5801) Task 4: also needed for ServerType.EstimatedReturnTime
    (12882), the ObjectType-level InstanceDeclaration, which per the CU 5801
    Kconfig help text must exist "even if ... not used in any instance of the
@@ -98,7 +99,7 @@ static const opcua_byte_t s_str_LocaleIdArray[] = "LocaleIdArray";
 #ifdef MUC_OPCUA_CU_BASE_INFO_LOCATIONS_OBJECT
 static const opcua_byte_t s_str_Locations[] = "Locations";
 #endif
-#if MUC_OPCUA_CU_BASE_INFO_LOCALTIME || MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+#if MUC_OPCUA_CU_BASE_INFO_LOCALTIME || (MUC_OPCUA_CU_BASE_INFO_SERVERTYPE && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION)
 /* spec 085 (CU 5801) Task 4: also needed for ServerType.LocalTime (17612),
    the ObjectType-level InstanceDeclaration -- see the EstimatedReturnTime
    comment above for the rationale (independent of the LOCALTIME facet's own
@@ -228,7 +229,7 @@ static const opcua_byte_t s_str_SessionDiagnosticsVariableType[] = "SessionDiagn
 static const opcua_byte_t s_str_SessionSecurityDiagnosticsArrayType[] = "SessionSecurityDiagnosticsArrayType";
 static const opcua_byte_t s_str_SessionSecurityDiagnosticsType[] = "SessionSecurityDiagnosticsType";
 static const opcua_byte_t s_str_BuildInfoType[] = "BuildInfoType";
-#if MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+#if MUC_OPCUA_CU_BASE_INFO_SERVERTYPE && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
 /* spec 085 (CU 5801): BrowseNames for the ServerStatusType/BuildInfoType/
    ServerDiagnosticsSummaryType InstanceDeclarations (State and BuildInfo are
    already declared above and reused). */
@@ -668,7 +669,7 @@ static const mu_reference_t s_file_type_refs[] = {
     {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {11595}}, true}};
 #endif
 
-#if MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+#if MUC_OPCUA_CU_BASE_INFO_SERVERTYPE && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
 /* spec 085 (CU 5801): shared HasModellingRule(37)->Mandatory(78) plus
    HasTypeDefinition(40) forward refs for the ServerStatusType/BuildInfoType/
    ServerDiagnosticsSummaryType own InstanceDeclarations. Mirrors the Data
@@ -2040,7 +2041,7 @@ static const mu_node_t s_base_nodes[] = {
      MU_NODECLASS_OBJECTTYPE,
      {10, s_str_ServerType},
      {10, s_str_ServerType},
-#if MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+#if MUC_OPCUA_CU_BASE_INFO_SERVERTYPE && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
      s_server_type_refs,
      sizeof(s_server_type_refs) / sizeof(s_server_type_refs[0]),
 #else
@@ -2049,7 +2050,7 @@ static const mu_node_t s_base_nodes[] = {
 #endif
      NULL,
      .type_definition = {0}},
-#if MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+#if MUC_OPCUA_CU_BASE_INFO_SERVERTYPE && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
     /* spec 085 (CU 5801) Task 4: ServerType(2004) direct children
        ServerArray/NamespaceArray/ServerStatus/ServiceLevel/ServerCapabilities/
        ServerDiagnostics/VendorServerInfo/ServerRedundancy (OPC-10000-5 §6.3.1
@@ -2137,7 +2138,7 @@ static const mu_node_t s_base_nodes[] = {
      MU_NODECLASS_OBJECTTYPE,
      {22, s_str_ServerCapabilitiesType},
      {22, s_str_ServerCapabilitiesType},
-#if MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+#if MUC_OPCUA_CU_BASE_INFO_SERVERTYPE && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
      s_server_capabilities_type_refs,
      sizeof(s_server_capabilities_type_refs) / sizeof(s_server_capabilities_type_refs[0]),
 #else
@@ -2146,7 +2147,7 @@ static const mu_node_t s_base_nodes[] = {
 #endif
      NULL,
      .type_definition = {0}},
-#if MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+#if MUC_OPCUA_CU_BASE_INFO_SERVERTYPE && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
     /* spec 085 (CU 5801) Task 4: ServerCapabilitiesType(2013) own declarations
        ServerProfileArray/LocaleIdArray/MinSupportedSampleRate/ModellingRules
        (OPC-10000-5 §6.3.2 Table 10). Sorted between ServerCapabilitiesType(2013)
@@ -2263,7 +2264,7 @@ static const mu_node_t s_base_nodes[] = {
      MU_NODECLASS_VARIABLETYPE,
      {16, s_str_ServerStatusType},
      {16, s_str_ServerStatusType},
-#if MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+#if MUC_OPCUA_CU_BASE_INFO_SERVERTYPE && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
      s_server_status_type_refs,
      sizeof(s_server_status_type_refs) / sizeof(s_server_status_type_refs[0]),
 #else
@@ -2272,7 +2273,7 @@ static const mu_node_t s_base_nodes[] = {
 #endif
      NULL,
      .type_definition = {0}},
-#if MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+#if MUC_OPCUA_CU_BASE_INFO_SERVERTYPE && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
     /* spec 085 (CU 5801): ServerStatusType(2138) own declarations
        (OPC-10000-5 §7.6). Sorted between ServerStatusType(2138) and
        ServerDiagnosticsSummaryType(2150). */
@@ -2323,7 +2324,7 @@ static const mu_node_t s_base_nodes[] = {
      MU_NODECLASS_VARIABLETYPE,
      {28, s_str_ServerDiagnosticsSummaryType},
      {28, s_str_ServerDiagnosticsSummaryType},
-#if MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+#if MUC_OPCUA_CU_BASE_INFO_SERVERTYPE && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
      s_server_diagnostics_summary_type_refs,
      sizeof(s_server_diagnostics_summary_type_refs) / sizeof(s_server_diagnostics_summary_type_refs[0]),
 #else
@@ -2332,7 +2333,7 @@ static const mu_node_t s_base_nodes[] = {
 #endif
      NULL,
      .type_definition = {0}},
-#if MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+#if MUC_OPCUA_CU_BASE_INFO_SERVERTYPE && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
     /* spec 085 (CU 5801): ServerDiagnosticsSummaryType(2150) own declarations
        (OPC-10000-5 §7.8). Sorted between ServerDiagnosticsSummaryType(2150)
        and SamplingIntervalDiagnosticsArrayType(2164). NodeId 2158 is skipped
@@ -2588,7 +2589,7 @@ static const mu_node_t s_base_nodes[] = {
      sizeof(s_property_type_ref) / sizeof(s_property_type_ref[0]),
      &s_locale_id_array_value,
      .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
-#if MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION && !MUC_OPCUA_CU_DATA_ACCESS
+#if MUC_OPCUA_CU_BASE_INFO_SERVERTYPE && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION && !MUC_OPCUA_CU_DATA_ACCESS
     /* spec 085 (CU 5801): ServerStatusType(2138) own declarations
        SecondsTillShutdown/ShutdownReason (DataAccess-off copy), mirroring the
        in-DataAccess copy above (after EnumStrings(2377) there). Sorts after
@@ -2682,7 +2683,7 @@ static const mu_node_t s_base_nodes[] = {
      NULL,
      .type_definition = {0, MU_NODEID_NUMERIC, {61}}},
 #endif
-#if MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION && !MUC_OPCUA_CU_DATA_ACCESS
+#if MUC_OPCUA_CU_BASE_INFO_SERVERTYPE && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION && !MUC_OPCUA_CU_DATA_ACCESS
     /* spec 085 (CU 5801) Task 4: ServerCapabilitiesType.SoftwareCertificates
        (3049, DataAccess-off copy), mirroring the in-DataAccess copy below.
        Sorts after AggregateFunctions(2997) and before BuildInfoType(3051). */
@@ -2803,7 +2804,7 @@ static const mu_node_t s_base_nodes[] = {
      sizeof(s_da_prop_mandatory_refs) / sizeof(s_da_prop_mandatory_refs[0]),
      NULL,
      .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
-#if MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+#if MUC_OPCUA_CU_BASE_INFO_SERVERTYPE && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
     /* spec 085 (CU 5801): ServerStatusType(2138) own declarations
        SecondsTillShutdown/ShutdownReason (DataAccess-on copy; fall inside the
        2365..11461 DataAccess block, so they're dual-placed -- see the
@@ -2894,7 +2895,7 @@ static const mu_node_t s_base_nodes[] = {
      NULL,
      .type_definition = {0, MU_NODEID_NUMERIC, {61}}},
 #endif
-#if MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+#if MUC_OPCUA_CU_BASE_INFO_SERVERTYPE && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
     /* spec 085 (CU 5801) Task 4: ServerCapabilitiesType.SoftwareCertificates
        (3049, DataAccess-on copy). Sorts after AggregateFunctions(2997) and
        before BuildInfoType(3051). */
@@ -2916,7 +2917,7 @@ static const mu_node_t s_base_nodes[] = {
      MU_NODECLASS_VARIABLETYPE,
      {13, s_str_BuildInfoType},
      {13, s_str_BuildInfoType},
-#if MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+#if MUC_OPCUA_CU_BASE_INFO_SERVERTYPE && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
      s_build_info_type_refs,
      sizeof(s_build_info_type_refs) / sizeof(s_build_info_type_refs[0]),
 #else
@@ -2926,7 +2927,7 @@ static const mu_node_t s_base_nodes[] = {
      NULL,
      .type_definition = {0}},
 #endif
-#if MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+#if MUC_OPCUA_CU_BASE_INFO_SERVERTYPE && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
     /* spec 085 (CU 5801): BuildInfoType(3051) own declarations
        (OPC-10000-5 §7.7 Table 77; DataAccess-on copy -- all 6 fall inside the
        2365..11461 DataAccess block, so they're dual-placed -- see the
@@ -3076,7 +3077,7 @@ static const mu_node_t s_base_nodes[] = {
      MU_NODECLASS_VARIABLETYPE,
      {13, s_str_BuildInfoType},
      {13, s_str_BuildInfoType},
-#if MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+#if MUC_OPCUA_CU_BASE_INFO_SERVERTYPE && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
      s_build_info_type_refs,
      sizeof(s_build_info_type_refs) / sizeof(s_build_info_type_refs[0]),
 #else
@@ -3086,7 +3087,7 @@ static const mu_node_t s_base_nodes[] = {
      NULL,
      .type_definition = {0}},
 #endif
-#if MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION && !MUC_OPCUA_CU_DATA_ACCESS
+#if MUC_OPCUA_CU_BASE_INFO_SERVERTYPE && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION && !MUC_OPCUA_CU_DATA_ACCESS
     /* spec 085 (CU 5801): BuildInfoType(3051) own declarations (DataAccess-off
        copy), mirroring the in-DataAccess copy above. Sorts after
        BuildInfoType(3051) and before EnumValueType(7594). */
@@ -3240,7 +3241,7 @@ static const mu_node_t s_base_nodes[] = {
      NULL,
      .type_definition = {0}},
 #endif
-#if MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+#if MUC_OPCUA_CU_BASE_INFO_SERVERTYPE && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
     /* spec 085 (CU 5801) Task 4: ServerType.GetMonitoredItems(11489), the
        ObjectType-level Method InstanceDeclaration -- distinct NodeId from the
        Server-instance Method Server_GetMonitoredItems(11492) just below. */
@@ -3299,7 +3300,7 @@ static const mu_node_t s_base_nodes[] = {
      NULL,
      .type_definition = {0, MU_NODEID_NUMERIC, {77}}},
 #endif
-#if MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+#if MUC_OPCUA_CU_BASE_INFO_SERVERTYPE && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
     /* spec 085 (CU 5801) Task 4: ServerType.Namespaces(11527, Optional) plus
        ServerCapabilitiesType.MaxArrayLength(11549)/MaxStringLength(11550)/
        OperationLimits(11551, Optional)/<VendorCapability>(11562,
@@ -3522,7 +3523,7 @@ static const mu_node_t s_base_nodes[] = {
      NULL,
      .type_definition = {0, MU_NODEID_NUMERIC, {76}}},
 #endif
-#if MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+#if MUC_OPCUA_CU_BASE_INFO_SERVERTYPE && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
     /* spec 085 (CU 5801) Task 4: ServerType.SetSubscriptionDurable(12746), the
        ObjectType-level Method InstanceDeclaration -- distinct NodeId from any
        Server-instance Method. Sorted between NamespacesType's Default
@@ -3548,7 +3549,7 @@ static const mu_node_t s_base_nodes[] = {
      NULL,
      .type_definition = {0}},
 #endif
-#if MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+#if MUC_OPCUA_CU_BASE_INFO_SERVERTYPE && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
     /* spec 085 (CU 5801) Task 4: ServerType.ResendData(12871), the
        ObjectType-level Method InstanceDeclaration -- distinct NodeId from the
        Server-instance Method Server_ResendData(12873) just below. */
@@ -3607,7 +3608,7 @@ static const mu_node_t s_base_nodes[] = {
      NULL,
      .type_definition = {0}},
 #endif
-#if MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+#if MUC_OPCUA_CU_BASE_INFO_SERVERTYPE && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
     /* spec 085 (CU 5801) Task 4: ServerType.EstimatedReturnTime(12882, Optional
        Property) and ServerType.RequestServerStateChange(12883, Optional
        Method) -- distinct NodeIds from the Server-instance
@@ -3644,7 +3645,7 @@ static const mu_node_t s_base_nodes[] = {
      NULL,
      .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
 #endif
-#if MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+#if MUC_OPCUA_CU_BASE_INFO_SERVERTYPE && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
     /* spec 085 (CU 5801) Task 4: ServerCapabilitiesType.MaxByteStringLength
        (12910, Optional Property). Sorted between EstimatedReturnTime(12885)
        and BaseAnalogType(15318). */
@@ -3801,7 +3802,7 @@ static const mu_node_t s_base_nodes[] = {
      NULL,
      .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
 #endif
-#if MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+#if MUC_OPCUA_CU_BASE_INFO_SERVERTYPE && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
     /* spec 085 (CU 5801) Task 4: ServerType.LocalTime(17612, Optional
        Property) -- distinct NodeId from the Server-instance
        Server.LocalTime(17634) below. Sorted between
@@ -3840,7 +3841,7 @@ static const mu_node_t s_base_nodes[] = {
      NULL,
      .type_definition = {0, MU_NODEID_NUMERIC, {61}}},
 #endif
-#if MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+#if MUC_OPCUA_CU_BASE_INFO_SERVERTYPE && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
     /* spec 085 (CU 5801) Task 4: ServerCapabilitiesType.
        MaxLogObjectContinuationPoints(19809, Optional Property). Sorted
        between InterfaceTypes(17708) and MaxSessions(24088). */
@@ -3963,7 +3964,7 @@ static const mu_node_t s_base_nodes[] = {
      &s_max_subscriptions_per_session_value,
      .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
 #endif
-#if MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+#if MUC_OPCUA_CU_BASE_INFO_SERVERTYPE && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
     /* spec 085 (CU 5801) Task 4: ServerCapabilitiesType.
        MaxMonitoredItemsPerSubscription(24103, Optional Property) -- distinct
        NodeId from the Server-instance MaxMonitoredItemsPerSubscription(24104)
@@ -3989,7 +3990,7 @@ static const mu_node_t s_base_nodes[] = {
      &s_max_monitored_items_per_subscription_value,
      .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
 #endif
-#if MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+#if MUC_OPCUA_CU_BASE_INFO_SERVERTYPE && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
     /* spec 085 (CU 5801) Task 4: ServerCapabilitiesType.
        MaxMonitoredItemsQueueSize(31770, Optional Property) -- distinct NodeId
        from the Server-instance MaxMonitoredItemsQueueSize(31916) just below. */

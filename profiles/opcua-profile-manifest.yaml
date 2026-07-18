@@ -3178,8 +3178,7 @@
       "kconfig_symbol": "MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION",
       "implementation_state": "deferred",
       "depends_on": [
-        "MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER",
-        "MUC_OPCUA_CU_BASE_INFO_SERVERTYPE"
+        "MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER"
       ],
       "profile_defaults": {
         "nano": false,

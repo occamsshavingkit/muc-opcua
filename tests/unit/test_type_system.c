@@ -296,7 +296,7 @@ static void test_servertype_type_tree_and_encodings(void) {
 }
 #endif
 
-#if MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+#if MUC_OPCUA_CU_BASE_INFO_SERVERTYPE && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
 /* spec 085: core ServerType-tree InstanceDeclarations (first slice toward CU 5801).
    Each type's own Mandatory/Optional child Variables/Objects, with HasComponent/
    HasProperty from the type + a HasModellingRule edge. NodeIds grounded against
@@ -448,7 +448,7 @@ int main(void) {
 #if MUC_OPCUA_CU_BASE_INFO_SERVERTYPE
     RUN_TEST(test_servertype_type_tree_and_encodings);
 #endif
-#if MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+#if MUC_OPCUA_CU_BASE_INFO_SERVERTYPE && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
     RUN_TEST(test_servertype_instance_declarations);
     RUN_TEST(test_variable_reports_true_datatype_and_valuerank);
 #endif
