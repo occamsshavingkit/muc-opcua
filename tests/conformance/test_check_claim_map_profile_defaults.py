@@ -16,9 +16,12 @@ class InScopeCuProfileDefaultsTest(unittest.TestCase):
                 ["test_discovery_endpoint"],
             ),
             (
+                # Optional CU (see graph_deps.derive_profile_defaults / the
+                # 2026-07-18 graph-driven Kconfig plan): default-off in
+                # nano/micro/embedded/standard, on only in full.
                 "opc_cu_2389 Attribute Write Values",
                 "OPC-10000-4 §5.11.4",
-                {"micro", "embedded", "standard", "full"},
+                {"full"},
                 ["test_write_service"],
             ),
         ]

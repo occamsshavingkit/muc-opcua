@@ -41,30 +41,41 @@ IN_SCOPE_CU_PROFILE_DEFAULTS = {
     },
     "opc_cu_2389": {
         "claim": "Attribute Write Values",
-        "profiles": {"micro", "embedded", "standard", "full"},
+        # CU 2389 is an OPTIONAL member of every graph facet it belongs to
+        # (profiles/opcua-profile-graph.json: isOptional=true everywhere,
+        # mandatory-reachable from none of the nano/micro/embedded/standard
+        # roots -- see graph_deps.derive_profile_defaults). Per the
+        # graph-driven Kconfig refactor (2026-07-18 plan), optional CUs
+        # default off in the four named profiles and on only in full.
+        "profiles": {"full"},
     },
     "opc_cu_2400": {
         "claim": "Session Change User",
-        "profiles": {"micro", "embedded", "standard", "full"},
+        # Optional everywhere in the graph (see 2389 note above).
+        "profiles": {"full"},
     },
     "opc_cu_2936": {
         "claim": "Attribute Write StatusCode & Timestamp",
-        "profiles": {"micro", "embedded", "standard", "full"},
+        # Optional everywhere in the graph (see 2389 note above).
+        "profiles": {"full"},
     },
     "opc_cu_3147": {
         "claim": "Attribute Write Index",
-        # IndexRange writes carry an array Value, which only decodes with heap.
-        # The strictly no-heap MCU tiers (nano/micro/embedded) cannot support it,
-        # so it is claimed only on the heap-capable standard/full tiers.
-        "profiles": {"standard", "full"},
+        # Optional everywhere in the graph (see 2389 note above). Also
+        # IndexRange writes carry an array Value, which only decodes with
+        # heap, so the strictly no-heap MCU tiers could not support it even
+        # if it were mandatory -- both reasons converge on full-only.
+        "profiles": {"full"},
     },
     "opc_cu_3192": {
         "claim": "Base Info Diagnostics",
-        "profiles": {"micro", "embedded", "standard", "full"},
+        # Optional everywhere in the graph (see 2389 note above).
+        "profiles": {"full"},
     },
     "opc_cu_3983": {
         "claim": "Base Services Diagnostics",
-        "profiles": {"micro", "embedded", "standard", "full"},
+        # Optional everywhere in the graph (see 2389 note above).
+        "profiles": {"full"},
     },
 }
 
