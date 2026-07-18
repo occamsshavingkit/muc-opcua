@@ -26,6 +26,7 @@ if _PKG_PARENT not in sys.path:
 
 from profile_manifest.model import load_manifest, validate_manifest  # noqa: E402
 from profile_manifest import completion as _completion  # noqa: E402
+from profile_manifest import graph_deps  # noqa: E402  # pylint: disable=wrong-import-position
 
 _DEFAULT_PROFILES = ("nano", "micro", "embedded", "standard", "full", "custom")
 _SELECTABLE_STATES = ("claimed", "implemented", "deferred")
@@ -1156,16 +1157,15 @@ def _emit_profile_sections(
 
 def _emit_default(lines: list[str], item: dict, profile_symbols: dict[str, str]) -> None:
     default_unconditional = item.get("default_unconditional")
-    depends_on = item.get("depends_on") or []
-    op = item.get("depends_on_op")
 
     if default_unconditional is True:
         lines.append("\tdefault y")
         return
 
-    if op == "or" and depends_on:
-        lines.append("\tdefault y if " + " || ".join(depends_on))
-        return
+    # Defaults always come from profile_defaults (the lowest reaching
+    # profile + custom), never from depends_on: depends_on only expresses
+    # "is this facet/CU selectable at all", not "is it on by default" --
+    # a multi-facet CU must not default on just because one facet is on.
 
     # Use the lowest internal profile that reaches this item so a single
     # cascade condition covers every profile at that tier and above.
@@ -1943,6 +1943,12 @@ def main(argv: list[str] | None = None) -> int:
         print("generate: FAIL")
         print("  load error: " + str(exc))
         return 1
+
+    # Live join: the composition graph is the authoritative source for
+    # depends_on/profile_defaults on every graph-mapped conformance_unit.
+    # In-memory only -- the manifest is never written back to disk.
+    graph_path = os.path.join(_REPO_ROOT, "profiles", "opcua-profile-graph.json")
+    graph_deps.resolve_into(manifest, graph_deps.load_graph(graph_path))
 
     errors = validate_manifest(manifest)
     if errors:

@@ -458,27 +458,27 @@ to refresh.
 | READ_CACHE | read_cache | implemented |  |  |  |  |  |  |
 | SECURE_CHANNEL_CRYPTO | secure_channel_crypto | implemented |  | ✅ | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
 | MUC_OPCUA_FACET_CORE_2022_SERVER | opc_facet_1322 | deferred | ✅ | ✅ | ✅ | ✅ | ✅ |  |
-| MUC_OPCUA_CU_ADDRESS_SPACE_ADDIN_REFERENCE | opc_cu_2446 | claimed |  | ✅ | ✅ | ✅ | ✅ |  |
-| MUC_OPCUA_CU_ADDRESS_SPACE_ADDIN_DEFAULTINSTANCEBROWSENAME | opc_cu_2447 | claimed |  | ✅ | ✅ | ✅ | ✅ |  |
-| MUC_OPCUA_CU_BASE_INFO_LOCALTIME | opc_cu_2476 | claimed |  | ✅ | ✅ | ✅ | ✅ |  |
-| MUC_OPCUA_CU_BASE_INFO_SELECTION_LIST | opc_cu_2711 | claimed |  | ✅ | ✅ | ✅ | ✅ |  |
-| MUC_OPCUA_CU_ADDRESS_SPACE_ATOMICITY | opc_cu_2809 | claimed | ✅ | ✅ | ✅ | ✅ | ✅ |  |
-| MUC_OPCUA_CU_ADDRESS_SPACE_FULL_ARRAY_ONLY | opc_cu_2820 | claimed | ✅ | ✅ | ✅ | ✅ | ✅ |  |
-| MUC_OPCUA_CU_BASE_INFO_VALUEASTEXT | opc_cu_2969 | claimed |  | ✅ | ✅ | ✅ | ✅ |  |
-| MUC_OPCUA_CU_BASE_INFO_OPTIONSET | opc_cu_3127 | claimed |  | ✅ | ✅ | ✅ | ✅ |  |
-| MUC_OPCUA_CU_BASE_INFO_ESTIMATED_RETURN_TIME | opc_cu_3198 | claimed |  | ✅ | ✅ | ✅ | ✅ |  |
-| MUC_OPCUA_CU_ADDRESS_SPACE_INTERFACES | opc_cu_3560 | claimed |  | ✅ | ✅ | ✅ | ✅ |  |
-| MUC_OPCUA_CU_BASE_INFO_LOCATIONS_OBJECT | opc_cu_4053 | claimed |  | ✅ | ✅ | ✅ | ✅ |  |
-| MUC_OPCUA_CU_ADDRESS_SPACE_NONVOLATILE_CONSTANT | opc_cu_4237 | claimed |  | ✅ | ✅ | ✅ | ✅ |  |
-| MUC_OPCUA_CU_BASE_INFO_CURRENCY | opc_cu_5240 | claimed |  | ✅ | ✅ | ✅ | ✅ |  |
+| MUC_OPCUA_CU_ADDRESS_SPACE_ADDIN_REFERENCE | opc_cu_2446 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
+| MUC_OPCUA_CU_ADDRESS_SPACE_ADDIN_DEFAULTINSTANCEBROWSENAME | opc_cu_2447 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
+| MUC_OPCUA_CU_BASE_INFO_LOCALTIME | opc_cu_2476 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
+| MUC_OPCUA_CU_BASE_INFO_SELECTION_LIST | opc_cu_2711 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
+| MUC_OPCUA_CU_ADDRESS_SPACE_ATOMICITY | opc_cu_2809 | claimed | ✅ | ✅ | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
+| MUC_OPCUA_CU_ADDRESS_SPACE_FULL_ARRAY_ONLY | opc_cu_2820 | claimed | ✅ | ✅ | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
+| MUC_OPCUA_CU_BASE_INFO_VALUEASTEXT | opc_cu_2969 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
+| MUC_OPCUA_CU_BASE_INFO_OPTIONSET | opc_cu_3127 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
+| MUC_OPCUA_CU_BASE_INFO_ESTIMATED_RETURN_TIME | opc_cu_3198 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
+| MUC_OPCUA_CU_ADDRESS_SPACE_INTERFACES | opc_cu_3560 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER, MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER |
+| MUC_OPCUA_CU_BASE_INFO_LOCATIONS_OBJECT | opc_cu_4053 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
+| MUC_OPCUA_CU_ADDRESS_SPACE_NONVOLATILE_CONSTANT | opc_cu_4237 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
+| MUC_OPCUA_CU_BASE_INFO_CURRENCY | opc_cu_5240 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
 | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER | opc_facet_1219 | deferred |  |  | ✅ | ✅ | ✅ |  |
 | MUC_OPCUA_FACET_STANDARD_DATACHANGE_SUBSCRIPTION_2022_SERVER | opc_facet_1324 | deferred |  |  | ✅ | ✅ | ✅ |  |
 | MUC_OPCUA_FACET_GLOBAL_CERTIFICATE_MANAGEMENT_SERVER | opc_facet_1631 | deferred |  |  | ✅ | ✅ | ✅ |  |
 | MUC_OPCUA_FACET_USER_TOKEN_USER_NAME_PASSWORD_SERVER | opc_facet_1695 | deferred |  |  | ✅ | ✅ | ✅ |  |
 | MUC_OPCUA_FACET_USER_TOKEN_X509_CERTIFICATE_SERVER | opc_facet_1696 | deferred |  |  |  | ✅ | ✅ |  |
 | MUC_OPCUA_FACET_EMBEDDED_DATACHANGE_SUBSCRIPTION_2022_SERVER | opc_facet_2250 | deferred |  | ✅ | ✅ | ✅ | ✅ |  |
-| MUC_OPCUA_CU_BASE_INFO_SERVERTYPE | opc_cu_3189 | implemented |  |  | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER, MUC_OPCUA_CU_BASE_INFO_BASE_TYPES |
-| MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION | opc_cu_5801 | deferred |  |  | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER |
+| MUC_OPCUA_CU_BASE_INFO_SERVERTYPE | opc_cu_3189 | implemented |  |  | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER |
+| MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION | opc_cu_5801 | deferred |  |  | ✅ | ✅ |  | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER |
 | MUC_OPCUA_CU_SUBSCRIPTION_BASIC | opc_cu_subscription_basic | claimed |  | ✅ | ✅ | ✅ | ✅ |  |
 | MUC_OPCUA_CU_SUBSCRIPTION_STANDARD | opc_cu_subscription_standard | claimed |  |  | ✅ | ✅ | ✅ | MUC_OPCUA_CU_SUBSCRIPTION_BASIC |
 | MUC_OPCUA_CU_SECURITY_ECC | opc_cu_security_ecc | claimed |  |  |  |  | ✅ | SECURE_CHANNEL_CRYPTO |
@@ -505,37 +505,37 @@ to refresh.
 | MUC_OPCUA_CU_BASE_INFO_DATATYPES | opc_cu_base_info_datatypes | claimed |  |  | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER |
 | MUC_OPCUA_CU_BASE_INFO_ARGUMENT_TYPE | opc_cu_base_info_argument_type | claimed |  |  | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER |
 | MUC_OPCUA_CU_BASE_INFO_BASE_TYPES | opc_cu_base_info_base_types | claimed |  |  | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER, MUC_OPCUA_CU_BASE_INFO_DATATYPES |
-| MUC_OPCUA_CU_ATTRIBUTE_READ | service_read | claimed | ✅ | ✅ | ✅ | ✅ | ✅ |  |
+| MUC_OPCUA_CU_ATTRIBUTE_READ | service_read | claimed | ✅ | ✅ | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
 | MUC_OPCUA_CU_VIEW_BASIC_TRANSLATEBROWSEPATH | service_browse | claimed | ✅ | ✅ | ✅ | ✅ | ✅ |  |
 | MUC_OPCUA_CU_DISCOVERY_FIND_SERVERS_SELF_GET_ENDPOINTS | service_discovery | claimed | ✅ | ✅ | ✅ | ✅ | ✅ |  |
-| MUC_OPCUA_CU_VIEW_REGISTERNODES | service_register_nodes | claimed | ✅ | ✅ | ✅ | ✅ | ✅ |  |
+| MUC_OPCUA_CU_VIEW_REGISTERNODES | service_register_nodes | claimed | ✅ | ✅ | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
 | MUC_OPCUA_CU_CORE_2017_ATTRIBUTE_WRITE | service_write | claimed |  |  |  |  | ✅ |  |
 | MUC_OPCUA_CU_HISTORICAL_ACCESS_SERVER_FACET | service_history | claimed |  |  |  |  | ✅ |  |
 | MUC_OPCUA_CU_QUERY | service_query | claimed |  |  |  |  | ✅ |  |
 | MUC_OPCUA_CU_NODEMANAGEMENT | service_nodemanagement | claimed |  |  |  |  | ✅ |  |
 | MUC_OPCUA_FACET_UA_TCP_UA_SC_UA_BINARY | opc_facet_837 | deferred | ✅ | ✅ | ✅ | ✅ | ✅ |  |
 | MUC_OPCUA_FACET_SECURITY_TIME_SYNCHRONIZATION | opc_facet_1760 | deferred | ✅ | ✅ | ✅ | ✅ | ✅ |  |
-| MUC_OPCUA_CU_VIEW_TRANSLATEBROWSEPATH | opc_cu_2317 | implemented | ✅ | ✅ | ✅ | ✅ | ✅ |  |
-| MUC_OPCUA_CU_DISCOVERY_GET_ENDPOINTS | opc_cu_2328 | implemented | ✅ | ✅ | ✅ | ✅ | ✅ |  |
-| MUC_OPCUA_CU_DISCOVERY_FIND_SERVERS_SELF | opc_cu_2352 | implemented | ✅ | ✅ | ✅ | ✅ | ✅ |  |
-| MUC_OPCUA_CU_ATTRIBUTE_WRITE_VALUES | opc_cu_2389 | claimed |  | ✅ | ✅ | ✅ | ✅ |  |
-| MUC_OPCUA_CU_SESSION_CHANGE_USER | opc_cu_2400 | implemented |  | ✅ | ✅ | ✅ | ✅ |  |
-| MUC_OPCUA_CU_ATTRIBUTE_WRITE_STATUSCODE_TIMESTAMP | opc_cu_2936 | claimed |  | ✅ | ✅ | ✅ | ✅ | MUC_OPCUA_CU_ATTRIBUTE_WRITE_VALUES |
-| MUC_OPCUA_CU_ATTRIBUTE_WRITE_INDEX_RANGE | opc_cu_3147 | claimed |  |  |  | ✅ | ✅ | MUC_OPCUA_CU_ATTRIBUTE_WRITE_VALUES |
-| MUC_OPCUA_CU_BASE_INFO_DIAGNOSTICS | opc_cu_3192 | claimed |  | ✅ | ✅ | ✅ | ✅ |  |
-| MUC_OPCUA_CU_VIEW_BASIC_2 | opc_cu_3530 | implemented | ✅ | ✅ | ✅ | ✅ | ✅ |  |
-| MUC_OPCUA_CU_BASE_SERVICES_DIAGNOSTICS | opc_cu_3983 | claimed |  | ✅ | ✅ | ✅ | ✅ |  |
-| MUC_OPCUA_CU_PROTOCOL_UA_TCP | opc_cu_protocol_ua_tcp | claimed | ✅ | ✅ | ✅ | ✅ | ✅ |  |
-| MUC_OPCUA_CU_UA_BINARY_ENCODING | opc_cu_ua_binary_encoding | claimed | ✅ | ✅ | ✅ | ✅ | ✅ |  |
-| MUC_OPCUA_CU_UA_SECURE_CONVERSATION | opc_cu_ua_secure_conversation | claimed | ✅ | ✅ | ✅ | ✅ | ✅ |  |
-| MUC_OPCUA_CU_ADDRESS_SPACE_BASE | opc_cu_address_space_base | claimed | ✅ | ✅ | ✅ | ✅ | ✅ |  |
-| MUC_OPCUA_CU_SESSION_BASE | opc_cu_session_base | claimed | ✅ | ✅ | ✅ | ✅ | ✅ |  |
-| MUC_OPCUA_CU_CORE_STRUCTURE_2 | opc_cu_core_structure_2 | claimed | ✅ | ✅ | ✅ | ✅ | ✅ |  |
-| MUC_OPCUA_CU_CORE_VIEWS_FOLDER | opc_cu_core_views_folder | claimed | ✅ | ✅ | ✅ | ✅ | ✅ |  |
-| MUC_OPCUA_CU_SERVER_CAPABILITIES_2 | opc_cu_server_capabilities_2 | claimed | ✅ | ✅ | ✅ | ✅ | ✅ |  |
-| MUC_OPCUA_CU_SESSION_GENERAL_SERVICE | opc_cu_session_general_service | claimed | ✅ | ✅ | ✅ | ✅ | ✅ |  |
-| MUC_OPCUA_CU_NAMESPACE_METADATA | opc_cu_namespace_metadata | claimed | ✅ | ✅ | ✅ | ✅ | ✅ |  |
-| MUC_OPCUA_CU_BASE_INFO_ENGINEERING_UNITS | opc_cu_5592 | claimed |  | ✅ | ✅ | ✅ | ✅ |  |
+| MUC_OPCUA_CU_VIEW_TRANSLATEBROWSEPATH | opc_cu_2317 | implemented | ✅ | ✅ | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
+| MUC_OPCUA_CU_DISCOVERY_GET_ENDPOINTS | opc_cu_2328 | implemented | ✅ | ✅ | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
+| MUC_OPCUA_CU_DISCOVERY_FIND_SERVERS_SELF | opc_cu_2352 | implemented | ✅ | ✅ | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
+| MUC_OPCUA_CU_ATTRIBUTE_WRITE_VALUES | opc_cu_2389 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
+| MUC_OPCUA_CU_SESSION_CHANGE_USER | opc_cu_2400 | implemented |  |  |  |  | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
+| MUC_OPCUA_CU_ATTRIBUTE_WRITE_STATUSCODE_TIMESTAMP | opc_cu_2936 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
+| MUC_OPCUA_CU_ATTRIBUTE_WRITE_INDEX_RANGE | opc_cu_3147 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
+| MUC_OPCUA_CU_BASE_INFO_DIAGNOSTICS | opc_cu_3192 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
+| MUC_OPCUA_CU_VIEW_BASIC_2 | opc_cu_3530 | implemented | ✅ | ✅ | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
+| MUC_OPCUA_CU_BASE_SERVICES_DIAGNOSTICS | opc_cu_3983 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
+| MUC_OPCUA_CU_PROTOCOL_UA_TCP | opc_cu_protocol_ua_tcp | claimed | ✅ | ✅ | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_UA_TCP_UA_SC_UA_BINARY |
+| MUC_OPCUA_CU_UA_BINARY_ENCODING | opc_cu_ua_binary_encoding | claimed | ✅ | ✅ | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_UA_TCP_UA_SC_UA_BINARY |
+| MUC_OPCUA_CU_UA_SECURE_CONVERSATION | opc_cu_ua_secure_conversation | claimed | ✅ | ✅ | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_UA_TCP_UA_SC_UA_BINARY |
+| MUC_OPCUA_CU_ADDRESS_SPACE_BASE | opc_cu_address_space_base | claimed | ✅ | ✅ | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
+| MUC_OPCUA_CU_SESSION_BASE | opc_cu_session_base | claimed | ✅ | ✅ | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
+| MUC_OPCUA_CU_CORE_STRUCTURE_2 | opc_cu_core_structure_2 | claimed | ✅ | ✅ | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
+| MUC_OPCUA_CU_CORE_VIEWS_FOLDER | opc_cu_core_views_folder | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
+| MUC_OPCUA_CU_SERVER_CAPABILITIES_2 | opc_cu_server_capabilities_2 | claimed | ✅ | ✅ | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
+| MUC_OPCUA_CU_SESSION_GENERAL_SERVICE | opc_cu_session_general_service | claimed | ✅ | ✅ | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
+| MUC_OPCUA_CU_NAMESPACE_METADATA | opc_cu_namespace_metadata | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
+| MUC_OPCUA_CU_BASE_INFO_ENGINEERING_UNITS | opc_cu_5592 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
 
 ### Capacity symbols
 
@@ -687,6 +687,7 @@ The following OPC items are tracked in the manifest but are NOT implemented. The
 | opc_cu_3201 |  | unimplemented | The Server supports custom types (i.e. types that are derived from well-known ObjectTypes, VariableTypes, ReferenceTypes or DataTypes). Supporting this ConformanceUnit requires that the custom types with their full inheritance tree are exposed in the AddressSpace. For each DataType having encoding information (Structured DataTypes) the Encoding Objects shall be exposed as well. For all Events supported by the Server, the EventType shall be exposed. (Documentation complete; no code change needed.) |
 | opc_cu_5814 |  | unimplemented | The Server supports being able to be configured for no application authentication, just User authentication and normal encryption/signing: – Configure Server to skip the trust check when validating certificates – Certificates are just used for message security (signing and encryption) – Users level is used for authentication (Documentation complete; no code change needed.) |
 <!-- END GENERATED MANIFEST TABLES -->
+
 
 
 

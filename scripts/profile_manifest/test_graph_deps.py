@@ -1,0 +1,172 @@
+import os
+import sys
+import unittest
+
+_HERE = os.path.dirname(os.path.abspath(__file__))
+if _HERE not in sys.path:
+    sys.path.insert(0, _HERE)
+
+import graph_deps as d  # noqa: E402  # pylint: disable=wrong-import-position
+
+
+def _fixtures():
+    graph = {"profiles": {
+        "1219": {"name": "Exposes Type System Server Facet",
+                 "profileUri": "…/ExposesTypeSystem",
+                 "child_profiles": [], "child_cus": [
+                     {"id": 9001, "name": "Base Info ServerType", "isOptional": False},
+                     {"id": 9002, "name": "Base Info Type Information", "isOptional": False}]}},
+        "cu_master": {}}
+    manifest = {"items": [
+        {"id": "opc_facet_1219", "kind": "facet",
+         "kconfig_symbol": "MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER",
+         "opc_reference": {"profile_id": "1219"}},
+        {"id": "opc_cu_3189", "kind": "conformance_unit",
+         "kconfig_symbol": "MUC_OPCUA_CU_BASE_INFO_SERVERTYPE",
+         "opc_reference": {"cu_id": "3189", "cu_name": "Base Info ServerType"}},
+    ]}
+    return graph, manifest
+
+
+def _full_graph():
+    """The Task-4 profile/facet-membership graph, keyed for reuse by apply() tests."""
+    return {"profiles": {
+        "2266": {"name": "Nano …Profile", "child_profiles": [], "child_cus": []},
+        "2267": {"name": "Micro …Profile", "child_profiles": [{"id": 2266, "name": "Nano …Profile", "isOptional": False}], "child_cus": []},
+        "2268": {"name": "Embedded …Profile", "child_profiles": [
+                   {"id": 2267, "name": "Micro …Profile", "isOptional": False},
+                   {"id": 1219, "name": "Exposes Type System Server Facet", "isOptional": False}], "child_cus": []},
+        "2269": {"name": "Standard …Profile", "child_profiles": [{"id": 2268, "name": "Embedded …Profile", "isOptional": False}], "child_cus": []},
+        "1219": {"name": "Exposes Type System Server Facet", "child_profiles": [],
+                "child_cus": [{"id": 9001, "name": "Base Info ServerType", "isOptional": False},
+                             {"id": 9003, "name": "Base Info EUInformation", "isOptional": True}]}},
+        "cu_master": {}}
+
+
+class GraphDepsTests(unittest.TestCase):
+
+    def test_facet_symbol_by_graph_id(self):
+        _, manifest = _fixtures()
+        idx = d.build_index(manifest)
+        self.assertEqual(
+            d.facet_symbol_for_graph_id(idx, "1219"),
+            "MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER",
+        )
+
+    def test_item_for_cu_name_prefers_symbol_carrier(self):
+        _, manifest = _fixtures()
+        idx = d.build_index(manifest)
+        it = d.selectable_item_for_cu_name(idx, "Base Info ServerType")
+        self.assertEqual(it["kconfig_symbol"], "MUC_OPCUA_CU_BASE_INFO_SERVERTYPE")
+
+    def test_depends_on_single_facet(self):
+        graph, manifest = _fixtures()
+        idx = d.build_index(manifest)
+        deps, op = d.derive_depends_on(graph, idx, "Base Info ServerType")
+        self.assertEqual(deps, ["MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER"])
+        self.assertIsNone(op)
+
+    def test_depends_on_multi_facet_is_or(self):
+        graph, manifest = _fixtures()
+        # add a second modeled facet that also contains ServerType
+        graph["profiles"]["1322"] = {"name": "Core 2022 Server Facet", "child_profiles": [],
+            "child_cus": [{"id": 9001, "name": "Base Info ServerType", "isOptional": False}]}
+        manifest["items"].append({"id": "opc_facet_1322", "kind": "facet",
+            "kconfig_symbol": "MUC_OPCUA_FACET_CORE_2022_SERVER", "opc_reference": {"profile_id": "1322"}})
+        idx = d.build_index(manifest)
+        deps, op = d.derive_depends_on(graph, idx, "Base Info ServerType")
+        self.assertEqual(
+            set(deps),
+            {"MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER", "MUC_OPCUA_FACET_CORE_2022_SERVER"},
+        )
+        self.assertEqual(op, "or")
+
+    def test_profile_defaults_mandatory_via_chain(self):
+        # Embedded(2268) ⊃ facet 1219 (mandatory) ⊃ ServerType (mandatory) => embedded True; nano/micro False
+        graph = {"profiles": {
+            "2266": {"name": "Nano …Profile", "child_profiles": [], "child_cus": []},
+            "2267": {"name": "Micro …Profile", "child_profiles": [{"id": 2266, "name": "Nano …Profile", "isOptional": False}], "child_cus": []},
+            "2268": {"name": "Embedded …Profile", "child_profiles": [
+                       {"id": 2267, "name": "Micro …Profile", "isOptional": False},
+                       {"id": 1219, "name": "Exposes Type System Server Facet", "isOptional": False}], "child_cus": []},
+            "2269": {"name": "Standard …Profile", "child_profiles": [{"id": 2268, "name": "Embedded …Profile", "isOptional": False}], "child_cus": []},
+            "1219": {"name": "Exposes Type System Server Facet", "child_profiles": [],
+                    "child_cus": [{"id": 9001, "name": "Base Info ServerType", "isOptional": False},
+                                 {"id": 9003, "name": "Base Info EUInformation", "isOptional": True}]}},
+            "cu_master": {}}
+        pd = d.derive_profile_defaults(graph, "Base Info ServerType")
+        self.assertEqual(
+            pd, {"nano": False, "micro": False, "embedded": True, "standard": True}
+        )
+        pd_opt = d.derive_profile_defaults(graph, "Base Info EUInformation")
+        self.assertEqual(
+            pd_opt, {"nano": False, "micro": False, "embedded": False, "standard": False}
+        )  # optional => not default
+
+    def test_resolve_into_maps_graph_cu_and_leaves_absent(self):
+        graph = _full_graph()
+        manifest = {"items": [
+            {"id": "opc_facet_1219", "kind": "facet",
+             "kconfig_symbol": "MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER",
+             "opc_reference": {"profile_id": "1219"}},
+            {"id": "opc_cu_3189", "kind": "conformance_unit",
+             "kconfig_symbol": "MUC_OPCUA_CU_BASE_INFO_SERVERTYPE",
+             "opc_reference": {"cu_id": "3189", "cu_name": "Base Info ServerType"},
+             "implementation_state": "claimed",
+             "depends_on": ["MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER", "MUC_OPCUA_CU_BASE_INFO_BASE_TYPES"],
+             "profile_defaults": {"nano": True, "micro": True, "embedded": True, "standard": True,
+                                   "full": True, "custom": False}},
+            # graph-absent cu_name: no authoritative data, hand-authored values must survive untouched
+            {"id": "service_x", "kind": "conformance_unit",
+             "kconfig_symbol": "MUC_OPCUA_CU_SERVICE_X",
+             "opc_reference": {"cu_name": "Service X (not modelled in graph)"},
+             "implementation_state": "implemented",
+             "depends_on": ["HAND_AUTHORED"],
+             "profile_defaults": {"nano": True, "micro": True, "embedded": True, "standard": True,
+                                   "full": True, "custom": True}},
+        ]}
+        d.resolve_into(manifest, graph)
+
+        st = next(i for i in manifest["items"] if i["id"] == "opc_cu_3189")
+        self.assertEqual(
+            st["depends_on"], ["MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER"]
+        )  # BASE_TYPES dropped
+        self.assertTrue("depends_on_op" not in st or st["depends_on_op"] is None)
+        self.assertTrue(st["profile_defaults"]["embedded"] is True and st["profile_defaults"]["nano"] is False)
+        self.assertTrue(st["profile_defaults"]["full"] is True)  # derived from implementation_state=claimed
+
+        sx = next(i for i in manifest["items"] if i["id"] == "service_x")
+        self.assertEqual(sx["depends_on"], ["HAND_AUTHORED"])
+        self.assertEqual(sx["profile_defaults"], {
+            "nano": True, "micro": True, "embedded": True, "standard": True,
+            "full": True, "custom": True,
+        })
+
+    def test_resolve_into_skips_non_conformance_unit_items(self):
+        graph = _full_graph()
+        untouched = {"id": "opc_facet_only", "kind": "facet",
+                     "kconfig_symbol": "MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER",
+                     "opc_reference": {"profile_id": "1219"}}
+        manifest = {"items": [untouched]}
+        d.resolve_into(manifest, graph)
+        self.assertEqual(manifest["items"][0], untouched)  # kind != conformance_unit: untouched
+
+    def test_resolve_into_full_false_when_not_implemented(self):
+        graph = _full_graph()
+        manifest = {"items": [
+            {"id": "opc_facet_1219", "kind": "facet",
+             "kconfig_symbol": "MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER",
+             "opc_reference": {"profile_id": "1219"}},
+            {"id": "opc_cu_3189", "kind": "conformance_unit",
+             "kconfig_symbol": "MUC_OPCUA_CU_BASE_INFO_SERVERTYPE",
+             "opc_reference": {"cu_id": "3189", "cu_name": "Base Info ServerType"},
+             "implementation_state": "planned"},
+        ]}
+        d.resolve_into(manifest, graph)
+        it = manifest["items"][1]
+        self.assertFalse(it["profile_defaults"]["full"])
+        self.assertFalse(it["profile_defaults"]["custom"])  # defaulted, not present before
+
+
+if __name__ == "__main__":
+    unittest.main()

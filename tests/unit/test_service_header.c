@@ -7,8 +7,14 @@
 void setUp(void) {}
 void tearDown(void) {}
 
-#if defined(MUC_OPCUA_PROFILE_MICRO) || defined(MUC_OPCUA_PROFILE_EMBEDDED) || defined(MUC_OPCUA_PROFILE_STANDARD) ||  \
-    defined(MUC_OPCUA_PROFILE_FULL)
+/* CU 3983 (Base Services Diagnostics) is an OPTIONAL member of every graph
+ * facet it belongs to (profiles/opcua-profile-graph.json: isOptional=true
+ * everywhere, mandatory-reachable from none of the nano/micro/embedded/
+ * standard profile roots -- see graph_deps.derive_profile_defaults). Per
+ * the graph-driven Kconfig refactor (2026-07-18 plan), optional CUs default
+ * off in the four named profiles and on only in full (or an explicit custom
+ * override), so this surface is now full-only. */
+#if defined(MUC_OPCUA_PROFILE_FULL)
 #define TEST_PROFILE_EXPECTS_BASE_SERVICES_DIAGNOSTICS 1
 #else
 #define TEST_PROFILE_EXPECTS_BASE_SERVICES_DIAGNOSTICS 0
@@ -81,8 +87,7 @@ void test_base_services_diagnostics_symbol_matches_profile_surface(void) {
         return;
     }
 
-    TEST_ASSERT_TRUE_MESSAGE(TEST_HAS_BASE_SERVICES_DIAGNOSTICS,
-                             "micro/embedded/standard/full builds must expose opc_cu_3983");
+    TEST_ASSERT_TRUE_MESSAGE(TEST_HAS_BASE_SERVICES_DIAGNOSTICS, "full builds must expose opc_cu_3983");
 }
 
 void test_response_header_service_diagnostics_follow_return_diagnostics_gate(void) {
