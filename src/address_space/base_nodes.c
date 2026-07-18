@@ -293,6 +293,9 @@ static const opcua_byte_t s_str_MaxSelectClauseParameters[] = "MaxSelectClausePa
 static const opcua_byte_t s_str_MaxWhereClauseParameters[] = "MaxWhereClauseParameters";
 static const opcua_byte_t s_str_VendorCapability_Placeholder[] = "<VendorCapability>";
 static const opcua_byte_t s_str_ConformanceUnits[] = "ConformanceUnits";
+/* spec 091 (CU 5801): SessionsDiagnosticsSummaryType.<ClientName>(12097)
+   OptionalPlaceholder BrowseName (OPC-10000-5 §6.3.4). */
+static const opcua_byte_t s_str_ClientName_Placeholder[] = "<ClientName>";
 /* spec 090 (CU 5801 fix): ServerType.UrisVersion(15003)/VersionTime(20998) --
    removed. UrisVersion is Optional and owned by CU 3994 (Session Sessionless
    Invocation, part of the "Sessionless Server Facet"), which is entirely
@@ -908,6 +911,28 @@ static const mu_reference_t s_server_diagnostics_type_refs[] = {
     {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {2023}}, true},
     {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {2744}}, true},
     {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {2025}}, true}};
+
+/* spec 093 (CU 5801): SessionsDiagnosticsSummaryType(2026) HasComponent(47)
+   -> its 3 own InstanceDeclarations (OPC-10000-5 §6.3.4). Grounded via
+   opc-ua-reference (search_nodes confirms 2027/2028/12097 all resolve to
+   §6.3.4; WebFetch of the section table confirms every row is HasComponent).
+   <ClientName>(12097) is an OptionalPlaceholder slot -- only the bare
+   placeholder node is emitted (see s_optionalplaceholder_clientname_refs
+   below); the full SessionDiagnosticsObjectType(2029) cascade under it is
+   deferred to a future slice. */
+static const mu_reference_t s_sessions_diagnostics_summary_type_refs[] = {
+    {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {2027}}, true},
+    {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {2028}}, true},
+    {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {12097}}, true}};
+
+/* SessionsDiagnosticsSummaryType.<ClientName>(12097): OptionalPlaceholder
+   (11508) (not the plain Optional(80) rule -- a placeholder BrowseName slot,
+   OPC-10000-5 §6.3.4), TypeDefinition SessionDiagnosticsObjectType(2029).
+   Same shape as ServerCapabilitiesType.<VendorCapability>(11562)
+   (s_optionalplaceholder_vendorcapability_refs above). */
+static const mu_reference_t s_optionalplaceholder_clientname_refs[] = {
+    {{0, MU_NODEID_NUMERIC, {37}}, {0, MU_NODEID_NUMERIC, {11508}}, true},
+    {{0, MU_NODEID_NUMERIC, {40}}, {0, MU_NODEID_NUMERIC, {2029}}, true}};
 
 /* ServerDiagnosticsSummary(2021): Mandatory, TypeDefinition
    ServerDiagnosticsSummaryType(2150), plus its own 12 materialized field
@@ -2612,10 +2637,46 @@ static const mu_node_t s_base_nodes[] = {
      MU_NODECLASS_OBJECTTYPE,
      {30, s_str_SessionsDiagnosticsSummaryType},
      {30, s_str_SessionsDiagnosticsSummaryType},
+#if MUC_OPCUA_CU_BASE_INFO_SERVERTYPE && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+     s_sessions_diagnostics_summary_type_refs,
+     sizeof(s_sessions_diagnostics_summary_type_refs) / sizeof(s_sessions_diagnostics_summary_type_refs[0]),
+#else
      NULL,
      0,
+#endif
      NULL,
      .type_definition = {0}},
+#if MUC_OPCUA_CU_BASE_INFO_SERVERTYPE && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+    /* spec 093 (CU 5801): SessionsDiagnosticsSummaryType(2026)'s own 2
+       Mandatory array InstanceDeclarations (OPC-10000-5 §6.3.4), sorted
+       between SessionsDiagnosticsSummaryType(2026) and
+       SessionDiagnosticsObjectType(2029). The 3rd declaration,
+       <ClientName>(12097), is an OptionalPlaceholder and lives in the 11xxx
+       cluster below (sorted near MandatoryPlaceholder(11510)/
+       OperationLimitsType(11564)), not here -- its NodeId puts it out of
+       band with 2027/2028. */
+    {{0, MU_NODEID_NUMERIC, {2027}},
+     MU_NODECLASS_VARIABLE,
+     {23, s_str_SessionDiagnosticsArray},
+     {23, s_str_SessionDiagnosticsArray},
+     s_mandatory_sessiondiagnosticsarraytype_refs,
+     sizeof(s_mandatory_sessiondiagnosticsarraytype_refs) / sizeof(s_mandatory_sessiondiagnosticsarraytype_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {2196}},
+     .value_rank = 1,
+     .data_type = 865}, /* SessionDiagnosticsDataType[] (OPC-10000-5 §6.3.4) */
+    {{0, MU_NODEID_NUMERIC, {2028}},
+     MU_NODECLASS_VARIABLE,
+     {31, s_str_SessionSecurityDiagnosticsArray},
+     {31, s_str_SessionSecurityDiagnosticsArray},
+     s_mandatory_sessionsecuritydiagnosticsarraytype_refs,
+     sizeof(s_mandatory_sessionsecuritydiagnosticsarraytype_refs) /
+         sizeof(s_mandatory_sessionsecuritydiagnosticsarraytype_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {2243}},
+     .value_rank = 1,
+     .data_type = 868}, /* SessionSecurityDiagnosticsDataType[] (OPC-10000-5 §6.3.4) */
+#endif
     {{0, MU_NODEID_NUMERIC, {2029}},
      MU_NODECLASS_OBJECTTYPE,
      {28, s_str_SessionDiagnosticsObjectType},
@@ -4556,6 +4617,21 @@ static const mu_node_t s_base_nodes[] = {
      .type_definition = {0, MU_NODEID_NUMERIC, {76}}},
 #endif
 #if MUC_OPCUA_CU_BASE_INFO_SERVERTYPE && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+    /* spec 093 (CU 5801): SessionsDiagnosticsSummaryType.<ClientName>(12097)
+       OptionalPlaceholder (OPC-10000-5 §6.3.4), TypeDefinition
+       SessionDiagnosticsObjectType(2029). Bare placeholder node only --
+       matching the ServerCapabilitiesType.<VendorCapability>(11562)
+       precedent -- the full 56-node SessionDiagnosticsObjectType cascade
+       under it is DEFERRED to a future slice, not built here. Sorted
+       between Default Binary(11958) and MaxNodesPerHistoryReadData(12161). */
+    {{0, MU_NODEID_NUMERIC, {12097}},
+     MU_NODECLASS_OBJECT,
+     {12, s_str_ClientName_Placeholder},
+     {12, s_str_ClientName_Placeholder},
+     s_optionalplaceholder_clientname_refs,
+     sizeof(s_optionalplaceholder_clientname_refs) / sizeof(s_optionalplaceholder_clientname_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {2029}}},
     /* spec 090 (CU 5801 Part B): OperationLimitsType(11564)'s remaining 4 own
        Property InstanceDeclarations -- the History Read/Update pair -- whose
        official NodeIds.csv (schemas 1.05) NodeIds fall in this non-contiguous

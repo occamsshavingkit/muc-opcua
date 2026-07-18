@@ -633,6 +633,37 @@ static void test_server_diagnostics_type_instance_declarations(void) {
     TEST_ASSERT_TRUE(has_forward_ref(3130u, 40u, 2243u));
 }
 
+/* spec 091 (CU 5801): SessionsDiagnosticsSummaryType(2026)'s 3 own
+   InstanceDeclarations (OPC-10000-5 §6.3.4), all HasComponent. Grounded via
+   opc-ua-reference (search_nodes: 2027/2028/12097 all resolve to §6.3.4;
+   WebFetch of the section table confirms every row is HasComponent, with
+   SessionDiagnosticsArray/SessionSecurityDiagnosticsArray Mandatory and
+   <ClientName> an Optional placeholder). 2027/2028 are homogeneous
+   (BaseDataVariableType, Mandatory) so share assert_type_decls; <ClientName>
+   (12097) is an Object OptionalPlaceholder(11508) slot with TypeDefinition
+   SessionDiagnosticsObjectType(2029) -- only the bare placeholder node itself
+   is emitted here (matching the ServerCapabilitiesType.<VendorCapability>
+   (11562) precedent). The full SessionDiagnosticsObjectType(2029) 56-node
+   cascade under this placeholder is explicitly DEFERRED to a future slice;
+   it is not built here. */
+static void test_sessions_diagnostics_summary_type_instance_declarations(void) {
+    static const mu_type_decl_t decls[] = {
+        {2027u, "SessionDiagnosticsArray", 865u, 1},         /* SessionDiagnosticsDataType[] */
+        {2028u, "SessionSecurityDiagnosticsArray", 868u, 1}, /* SessionSecurityDiagnosticsDataType[] */
+    };
+    /* SessionsDiagnosticsSummaryType -HasComponent(47)-> decl, Mandatory(78) */
+    assert_type_decls(2026u, 47u, 78u, 2196u, &decls[0], 1); /* TypeDef SessionDiagnosticsArrayType */
+    assert_type_decls(2026u, 47u, 78u, 2243u, &decls[1], 1); /* TypeDef SessionSecurityDiagnosticsArrayType */
+
+    /* <ClientName>(12097): OptionalPlaceholder(11508), TypeDef
+       SessionDiagnosticsObjectType(2029). Bare placeholder only -- no
+       children (deferred, see comment above). */
+    TEST_ASSERT_TRUE(has_forward_ref(2026u, 47u, 12097u));
+    assert_node(12097u, MU_NODECLASS_OBJECT, "<ClientName>");
+    TEST_ASSERT_TRUE(has_forward_ref(12097u, 37u, 11508u)); /* HasModellingRule -> OptionalPlaceholder */
+    TEST_ASSERT_TRUE(has_forward_ref(12097u, 40u, 2029u));  /* HasTypeDefinition -> SessionDiagnosticsObjectType */
+}
+
 /* spec 090 (CU 5801 fix): the 4 previously-dangling DataType references found
    by a completeness sweep. See docs/superpowers/plans (090) for the grounded
    ModellingRule/owning-CU facts behind each fix:
@@ -770,6 +801,7 @@ int main(void) {
     RUN_TEST(test_sampling_interval_diagnostics_type_instance_declarations);
     RUN_TEST(test_session_security_diagnostics_type_instance_declarations);
     RUN_TEST(test_server_diagnostics_type_instance_declarations);
+    RUN_TEST(test_sessions_diagnostics_summary_type_instance_declarations);
     RUN_TEST(test_servertype_datatype_refs_not_dangling);
 #endif
 #elif MUC_OPCUA_BASE_NODES
