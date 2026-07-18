@@ -26,7 +26,7 @@ if _PKG_PARENT not in sys.path:
 
 from profile_manifest.model import load_manifest, validate_manifest  # noqa: E402
 from profile_manifest import completion as _completion  # noqa: E402
-from profile_manifest import graph_deps  # noqa: E402
+from profile_manifest import graph_deps  # noqa: E402  # pylint: disable=wrong-import-position
 
 _DEFAULT_PROFILES = ("nano", "micro", "embedded", "standard", "full", "custom")
 _SELECTABLE_STATES = ("claimed", "implemented", "deferred")

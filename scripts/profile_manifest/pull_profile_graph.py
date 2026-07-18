@@ -7,7 +7,10 @@ profiles.opcfoundation.org: every profile/facet's child profiles/facets
 flagged isOptional. Authoritative source for building Kconfig dependency
 structure.
 """
-import json, time, urllib.request, sys
+import json
+import sys
+import time
+import urllib.request
 
 BASE = "https://profiles.opcfoundation.org/api"
 OUT = "profiles/opcua-profile-graph.json"
@@ -34,9 +37,29 @@ def result(d):
     return d.get("result", []) if isinstance(d, dict) else []
 
 
+def get_or_die(path):
+    """Fetch path via get(), aborting the whole pull rather than silently
+    writing an incomplete graph. The graph is now authoritative for Kconfig
+    deps, so a retry-exhausted/non-JSON response must not degrade into an
+    empty [] result -- that would look like a legitimate "no children" edge.
+    """
+    d = get(path)
+    if d is None:
+        sys.exit(
+            f"FATAL: request failed for {BASE}{path} (no JSON after retries) "
+            "-- refusing to write an incomplete profile graph"
+        )
+    return d
+
+
+def save(g):
+    with open(OUT, "w", encoding="utf-8") as fh:
+        json.dump(g, fh, indent=1)
+
+
 # 1. master lists
-profiles = result(get("/profile/?pg=171&all=1"))          # profiles + facets
-cus_master = result(get("/conformanceunit/?pg=171&all=1"))  # all CUs
+profiles = result(get_or_die("/profile/?pg=171&all=1"))          # profiles + facets
+cus_master = result(get_or_die("/conformanceunit/?pg=171&all=1"))  # all CUs
 print(f"profiles/facets: {len(profiles)}  cus: {len(cus_master)}")
 
 graph = {"profiles": {}, "cu_master": {}}
@@ -46,9 +69,9 @@ for cu in cus_master:
 # 2. per profile/facet: child profiles/facets + child CUs
 for i, p in enumerate(profiles):
     pid = p["id"]
-    inc_p = result(get(f"/profile/includedprofiles/{pid}"))
+    inc_p = result(get_or_die(f"/profile/includedprofiles/{pid}"))
     time.sleep(0.12)
-    inc_c = result(get(f"/profile/includedconformanceunits/{pid}"))
+    inc_c = result(get_or_die(f"/profile/includedconformanceunits/{pid}"))
     time.sleep(0.12)
     graph["profiles"][pid] = {
         "name": p.get("name"),
@@ -58,7 +81,7 @@ for i, p in enumerate(profiles):
     }
     if (i + 1) % 25 == 0:
         print(f"  {i+1}/{len(profiles)} ...")
-        json.dump(graph, open(OUT, "w"), indent=1)  # incremental save
+        save(graph)  # incremental save
 
-json.dump(graph, open(OUT, "w"), indent=1)
+save(graph)
 print(f"DONE -> {OUT}  ({len(graph['profiles'])} profiles/facets, {len(graph['cu_master'])} cus)")

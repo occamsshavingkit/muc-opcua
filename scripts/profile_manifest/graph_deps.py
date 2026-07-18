@@ -21,7 +21,8 @@ import json
 
 
 def load_graph(path="profiles/opcua-profile-graph.json"):
-    return json.load(open(path))
+    with open(path, encoding="utf-8") as fh:
+        return json.load(fh)
 
 
 def items(manifest):

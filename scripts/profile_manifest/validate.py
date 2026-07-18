@@ -37,7 +37,7 @@ if _PKG_PARENT not in sys.path:
     sys.path.insert(0, _PKG_PARENT)
 
 from profile_manifest.model import load_manifest, validate_manifest  # noqa: E402
-from profile_manifest import graph_deps  # noqa: E402
+from profile_manifest import graph_deps  # noqa: E402  # pylint: disable=wrong-import-position
 
 _DEFAULT_PROFILES = ("nano", "micro", "embedded", "standard", "full", "custom")
 _NAMED_PROFILES = ("nano", "micro", "embedded", "standard", "full")
