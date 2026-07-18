@@ -23,6 +23,7 @@ Standard-library only.
 from __future__ import annotations
 
 import argparse
+import copy
 import json
 import os
 import sys
@@ -35,8 +36,24 @@ if _PKG_PARENT not in sys.path:
     sys.path.insert(0, _PKG_PARENT)
 
 from profile_manifest.model import load_manifest, validate_manifest  # noqa: E402
+from profile_manifest import graph_deps  # noqa: E402
 
 _DEFAULT_PROFILES = ("nano", "micro", "embedded", "standard", "full", "custom")
+_GRAPH_PATH = os.path.join(
+    os.path.dirname(_PKG_PARENT), "profiles", "opcua-profile-graph.json"
+)
+
+
+def _validate_resolved(manifest: dict) -> list:
+    """Validate the graph-resolved view of a manifest without mutating the
+    on-disk object. Graph-mapped items no longer store derived
+    depends_on/profile_defaults (they are joined live from the composition
+    graph), so validation must run against the resolved copy — never against
+    the stripped manifest that gets written back to disk."""
+    resolved = graph_deps.resolve_into(
+        copy.deepcopy(manifest), graph_deps.load_graph(_GRAPH_PATH)
+    )
+    return validate_manifest(resolved)
 
 
 def _parse_args(argv: list[str]) -> argparse.Namespace:
@@ -760,7 +777,7 @@ def main(argv: list[str] | None = None) -> int:
     if args.dry_run:
         _print_summary(counts)
         # Validate the merged result in memory to prove it would be clean.
-        errors = validate_manifest(new_manifest)
+        errors = _validate_resolved(new_manifest)
         if errors:
             print(f"  WARNING: merged manifest would have {len(errors)} validation error(s):")
             for err in errors:
@@ -769,8 +786,9 @@ def main(argv: list[str] | None = None) -> int:
         print("  dry-run validation: OK")
         return 0
 
-    # --write mode
-    errors = validate_manifest(new_manifest)
+    # --write mode. Validate the resolved view, but write the unresolved
+    # (stripped) manifest so no graph-derived fields land back on disk.
+    errors = _validate_resolved(new_manifest)
     if errors:
         print(f"manifest: FAIL (merged result has validation errors)")
         for err in errors:
