@@ -7,10 +7,14 @@ kconfig_symbols of the modelled facets it is a member of, and the
 nano/micro/embedded/standard columns of ``profile_defaults`` should reflect
 transitive all-mandatory reachability from each build profile's graph root.
 
-This module computes those fields from the graph and rewrites them onto the
-manifest in place (see :func:`apply`); ``full``/``custom`` are left
-untouched -- they encode "implemented server CU" / "user override", not
-graph membership.
+This module is a pure resolver: :func:`resolve_into` joins the graph
+(spec structure) with a manifest (the "us" side -- kconfig_symbol,
+implementation_state, capacities, backing_tests) IN MEMORY, at generation
+time. It never writes to disk. ``depends_on``/``profile_defaults`` are
+overwritten for every graph-mapped conformance_unit; ``full`` is derived
+from ``implementation_state``; graph-absent items (no cu_name, or a
+cu_name the graph doesn't model) are left untouched -- their hand-authored
+values are the only authoritative data we have for them.
 """
 
 import json
@@ -97,7 +101,15 @@ def derive_profile_defaults(graph, cu_name):
     return {prof: (cu_name in _mandatory_cu_names(graph, rid)) for prof, rid in _ROOTS.items()}
 
 
-def apply(manifest, graph):
+_IMPLEMENTED = {"implemented", "claimed", "documented"}
+
+
+def resolve_into(manifest, graph):
+    """Join the graph into ``manifest`` in memory: overwrite depends_on/profile_defaults
+    on every graph-mapped conformance_unit; leave graph-absent items untouched.
+
+    Never writes to disk -- callers own the manifest's lifecycle.
+    """
     idx = build_index(manifest)
     graph_cu_names = {
         c["name"] for node in graph["profiles"].values() for c in node.get("child_cus", [])
@@ -120,6 +132,6 @@ def apply(manifest, graph):
             del it["depends_on_op"]
         pd = it.setdefault("profile_defaults", {})
         pd.update(derive_profile_defaults(graph, cu_name))  # nano/micro/embedded/standard
-        pd.setdefault("full", False)
+        pd["full"] = it.get("implementation_state") in _IMPLEMENTED  # us-side, derived
         pd.setdefault("custom", False)
     return manifest
