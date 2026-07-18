@@ -96,14 +96,25 @@ static const opcua_byte_t s_str_Int64[] = "Int64";
 static const opcua_byte_t s_str_InterfaceTypes[] = "InterfaceTypes";
 #endif
 static const opcua_byte_t s_str_LocaleIdArray[] = "LocaleIdArray";
+#if MUC_OPCUA_CU_BASE_INFO_SERVERTYPE && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+/* spec 090 (CU 5801 fix): LocaleId(295) DataType BrowseName -- the Mandatory
+   element DataType of ServerCapabilitiesType.LocaleIdArray(2016), a subtype
+   of String(12) with no encodings (OPC-10000-5 §6.3.2 Table 10 /
+   §12.2.11.1). Previously dangling: LocaleIdArray declared .data_type = 295
+   but no such node existed in the address space. */
+static const opcua_byte_t s_str_LocaleId[] = "LocaleId";
+#endif
 #ifdef MUC_OPCUA_CU_BASE_INFO_LOCATIONS_OBJECT
 static const opcua_byte_t s_str_Locations[] = "Locations";
 #endif
-#if MUC_OPCUA_CU_BASE_INFO_LOCALTIME || (MUC_OPCUA_CU_BASE_INFO_SERVERTYPE && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION)
-/* spec 085 (CU 5801) Task 4: also needed for ServerType.LocalTime (17612),
-   the ObjectType-level InstanceDeclaration -- see the EstimatedReturnTime
-   comment above for the rationale (independent of the LOCALTIME facet's own
-   Server-instance Variable(17634)). */
+#if MUC_OPCUA_CU_BASE_INFO_LOCALTIME
+/* spec 090 (CU 5801 fix): ServerType.LocalTime(17612), the ObjectType-level
+   InstanceDeclaration, is re-gated onto its true owner
+   CU_BASE_INFO_LOCALTIME (full-only) instead of the bare SERVERTYPE &&
+   TYPE_INFORMATION condition -- see the node definition near NodeId 17612
+   below. The old gate exposed the property at embedded/standard without its
+   TimeZoneDataType(8912) DataType (itself LOCALTIME-gated), a dangling
+   reference. */
 static const opcua_byte_t s_str_LocalTime[] = "LocalTime";
 #endif
 static const opcua_byte_t s_str_LocalizedText[] = "LocalizedText";
@@ -263,6 +274,12 @@ static const opcua_byte_t s_str_MaxQueryContinuationPoints[] = "MaxQueryContinua
 static const opcua_byte_t s_str_MaxHistoryContinuationPoints[] = "MaxHistoryContinuationPoints";
 static const opcua_byte_t s_str_MaxLogObjectContinuationPoints[] = "MaxLogObjectContinuationPoints";
 static const opcua_byte_t s_str_SoftwareCertificates[] = "SoftwareCertificates";
+/* spec 090 (CU 5801 fix): SignedSoftwareCertificate(344) DataType BrowseName --
+   the Mandatory element DataType of ServerCapabilitiesType.SoftwareCertificates
+   (3049), a subtype of Structure(22) (OPC-10000-4 §7.37, OPC-10000-5 §12.3.13).
+   Previously dangling: SoftwareCertificates declared .data_type = 344 but no
+   such node existed in the address space. */
+static const opcua_byte_t s_str_SignedSoftwareCertificate[] = "SignedSoftwareCertificate";
 static const opcua_byte_t s_str_MaxByteStringLength[] = "MaxByteStringLength";
 static const opcua_byte_t s_str_ModellingRules[] = "ModellingRules";
 static const opcua_byte_t s_str_MaxSessions[] = "MaxSessions";
@@ -270,7 +287,14 @@ static const opcua_byte_t s_str_MaxSelectClauseParameters[] = "MaxSelectClausePa
 static const opcua_byte_t s_str_MaxWhereClauseParameters[] = "MaxWhereClauseParameters";
 static const opcua_byte_t s_str_VendorCapability_Placeholder[] = "<VendorCapability>";
 static const opcua_byte_t s_str_ConformanceUnits[] = "ConformanceUnits";
-static const opcua_byte_t s_str_UrisVersion[] = "UrisVersion";
+/* spec 090 (CU 5801 fix): ServerType.UrisVersion(15003)/VersionTime(20998) --
+   removed. UrisVersion is Optional and owned by CU 3994 (Session Sessionless
+   Invocation, part of the "Sessionless Server Facet"), which is entirely
+   unimplemented in this codebase (docs/conformance/completion.md: 0/2). The
+   property was previously declared under the bare SERVERTYPE &&
+   TYPE_INFORMATION gate with .data_type = 20998, but no VersionTime DataType
+   node exists (nor should it be claimed without implementing CU 3994). Not
+   exposed in any profile until that facet is implemented. */
 static const opcua_byte_t s_str_Auditing[] = "Auditing";
 static const opcua_byte_t s_str_ServerDiagnostics[] = "ServerDiagnostics";
 static const opcua_byte_t s_str_VendorServerInfo[] = "VendorServerInfo";
@@ -474,7 +498,7 @@ static const mu_reference_t s_base_data_type_refs[] = {
 };
 
 #if MUC_OPCUA_CU_BASE_INFO_DATATYPES
-/* CU 4426/2483: HasSubtype forward refs for the specialized DataType nodes. */
+/* CU 4426: HasSubtype forward refs for the specialized Number DataType nodes. */
 static const mu_reference_t s_number_subtype_refs[] = {
     {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {50}}, true}, /* Number -> Decimal (CU 4426) */
 #if MUC_OPCUA_CU_BASE_INFO_BASE_TYPES
@@ -484,12 +508,24 @@ static const mu_reference_t s_number_subtype_refs[] = {
     {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {28}}, true}, /* Number -> UInteger */
 #endif
 };
+#endif
+#if MUC_OPCUA_CU_BASE_INFO_DATATYPES || (MUC_OPCUA_CU_BASE_INFO_SERVERTYPE && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION)
+/* CU 2483 / spec 090 (CU 5801 fix): HasSubtype forward refs for String(12)'s
+   specialized leaf DataTypes. LocaleId(295) is needed whenever
+   ServerCapabilitiesType.LocaleIdArray(2016) is exposed (Mandatory property,
+   gated by SERVERTYPE && TYPE_INFORMATION), independent of whether
+   CU_BASE_INFO_DATATYPES is also enabled. */
 static const mu_reference_t s_string_subtype_refs[] = {
+#if MUC_OPCUA_CU_BASE_INFO_DATATYPES
     {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {12879}}, true}, /* String -> DurationString */
     {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {12880}}, true}, /* String -> TimeString */
     {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {12881}}, true}, /* String -> DateString */
 #if MUC_OPCUA_CU_BASE_INFO_BASE_TYPES
     {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {291}}, true}, /* String -> NumericRange (CU 3188) */
+#endif
+#endif
+#if MUC_OPCUA_CU_BASE_INFO_SERVERTYPE && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {295}}, true}, /* String -> LocaleId */
 #endif
 };
 #endif
@@ -532,6 +568,19 @@ static const mu_reference_t s_build_info_refs[] = {
     {{0, MU_NODEID_NUMERIC, {38}}, {0, MU_NODEID_NUMERIC, {339}}, true}, /* BuildInfo -HasEncoding-> Default XML */
     {{0, MU_NODEID_NUMERIC, {38}}, {0, MU_NODEID_NUMERIC, {340}}, true}, /* BuildInfo -HasEncoding-> Default Binary */
 };
+#if MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+/* spec 090 (CU 5801 fix): SignedSoftwareCertificate(344) HasEncoding refs --
+   the Mandatory element DataType of ServerCapabilitiesType.SoftwareCertificates
+   (3049). */
+static const mu_reference_t s_signed_software_certificate_refs[] = {
+    {{0, MU_NODEID_NUMERIC, {38}},
+     {0, MU_NODEID_NUMERIC, {345}},
+     true}, /* SignedSoftwareCertificate -HasEncoding-> Default XML */
+    {{0, MU_NODEID_NUMERIC, {38}},
+     {0, MU_NODEID_NUMERIC, {346}},
+     true}, /* SignedSoftwareCertificate -HasEncoding-> Default Binary */
+};
+#endif
 static const mu_reference_t s_redundant_server_data_type_refs[] = {
     {{0, MU_NODEID_NUMERIC, {38}}, {0, MU_NODEID_NUMERIC, {854}}, true},
     {{0, MU_NODEID_NUMERIC, {38}}, {0, MU_NODEID_NUMERIC, {855}}, true},
@@ -595,6 +644,11 @@ static const mu_reference_t s_structure_refs[] = {
 #if MUC_OPCUA_CU_BASE_INFO_SERVERTYPE
     /* spec 083 (CU 3189): the ServerType structured DataTypes. */
     {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {338}}, true}, /* HasSubtype -> BuildInfo */
+#if MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+    /* spec 090 (CU 5801 fix): SignedSoftwareCertificate is only needed when
+       ServerCapabilitiesType.SoftwareCertificates(3049) is exposed. */
+    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {344}}, true}, /* HasSubtype -> SignedSoftwareCertificate */
+#endif
     {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {853}}, true}, /* HasSubtype -> RedundantServerDataType */
     {{0, MU_NODEID_NUMERIC, {45}},
      {0, MU_NODEID_NUMERIC, {856}},
@@ -896,18 +950,25 @@ static const mu_reference_t s_server_capabilities_type_refs[] = {
 /* ServerType(2004) HasProperty(46)/HasComponent(47) -> its 17 direct children
    (OPC-10000-5 §6.3.1 table). */
 static const mu_reference_t s_server_type_refs[] = {
-    {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {2005}}, true},  /* ServerArray */
-    {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {2006}}, true},  /* NamespaceArray */
-    {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {15003}}, true}, /* UrisVersion */
+    {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {2005}}, true}, /* ServerArray */
+    {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {2006}}, true}, /* NamespaceArray */
+    /* spec 090 (CU 5801 fix): UrisVersion(15003) removed -- Optional property
+       owned by CU 3994 (Session Sessionless Invocation), entirely
+       unimplemented in this codebase. See the s_str_ConformanceUnits comment
+       above for the full rationale. */
     {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {2007}}, true},  /* ServerStatus */
     {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {2008}}, true},  /* ServiceLevel */
     {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {2742}}, true},  /* Auditing */
     {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {12882}}, true}, /* EstimatedReturnTime */
+#if MUC_OPCUA_CU_BASE_INFO_LOCALTIME
+    /* spec 090 (CU 5801 fix): LocalTime(17612) re-gated onto its true owner
+       CU_BASE_INFO_LOCALTIME (full-only) -- see the node definition below. */
     {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {17612}}, true}, /* LocalTime */
-    {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {2009}}, true},  /* ServerCapabilities */
-    {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {2010}}, true},  /* ServerDiagnostics */
-    {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {2011}}, true},  /* VendorServerInfo */
-    {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {2012}}, true},  /* ServerRedundancy */
+#endif
+    {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {2009}}, true}, /* ServerCapabilities */
+    {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {2010}}, true}, /* ServerDiagnostics */
+    {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {2011}}, true}, /* VendorServerInfo */
+    {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {2012}}, true}, /* ServerRedundancy */
 #if MUC_OPCUA_CU_NAMESPACES
     /* spec 090 (CU 5801 Part A): Namespaces(11527) moved to the CU_NAMESPACES
        gate along with the node itself and NamespacesType -- see
@@ -1339,7 +1400,7 @@ static const mu_node_t s_base_nodes[] = {
      MU_NODECLASS_DATATYPE,
      {6, s_str_String},
      {6, s_str_String},
-#if MUC_OPCUA_CU_BASE_INFO_DATATYPES
+#if MUC_OPCUA_CU_BASE_INFO_DATATYPES || (MUC_OPCUA_CU_BASE_INFO_SERVERTYPE && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION)
      s_string_subtype_refs,
      sizeof(s_string_subtype_refs) / sizeof(s_string_subtype_refs[0]),
 #else
@@ -1831,6 +1892,20 @@ static const mu_node_t s_base_nodes[] = {
      NULL,
      .type_definition = {0}},
 #endif
+#if MUC_OPCUA_CU_BASE_INFO_SERVERTYPE && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+    /* spec 090 (CU 5801 fix): LocaleId(295, subtype of String(12), no
+       encodings -- OPC-10000-5 §12.2.11.1) is the Mandatory element DataType
+       of ServerCapabilitiesType.LocaleIdArray(2016). Sorted between
+       UtcTime(294) and Argument(296). */
+    {{0, MU_NODEID_NUMERIC, {295}},
+     MU_NODECLASS_DATATYPE,
+     {8, s_str_LocaleId},
+     {8, s_str_LocaleId},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0}},
+#endif
 #if MUC_OPCUA_CU_BASE_INFO_ARGUMENT_TYPE
     /* CU 3641: Argument DataType (i=296, subtype of Structure) + its Default XML(297)
        / Default Binary(298) Encoding Objects (DataTypeEncodingType 76). */
@@ -1888,6 +1963,38 @@ static const mu_node_t s_base_nodes[] = {
      0,
      NULL,
      .type_definition = {0, MU_NODEID_NUMERIC, {76}}},
+#if MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+    /* spec 090 (CU 5801 fix): SignedSoftwareCertificate(344, subtype of
+       Structure(22)) + its Default XML(345)/Default Binary(346) Encoding
+       Objects (DataTypeEncodingType 76) -- OPC-10000-4 §7.37, OPC-10000-5
+       §12.3.13. Mandatory element DataType of
+       ServerCapabilitiesType.SoftwareCertificates(3049). Sorted between
+       BuildInfo's Default_Binary(340) and RedundancySupport(851). */
+    {{0, MU_NODEID_NUMERIC, {344}},
+     MU_NODECLASS_DATATYPE,
+     {25, s_str_SignedSoftwareCertificate},
+     {25, s_str_SignedSoftwareCertificate},
+     s_signed_software_certificate_refs,
+     sizeof(s_signed_software_certificate_refs) / sizeof(s_signed_software_certificate_refs[0]),
+     NULL,
+     .type_definition = {0}},
+    {{0, MU_NODEID_NUMERIC, {345}},
+     MU_NODECLASS_OBJECT,
+     {11, s_str_Default_XML},
+     {11, s_str_Default_XML},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {76}}},
+    {{0, MU_NODEID_NUMERIC, {346}},
+     MU_NODECLASS_OBJECT,
+     {14, s_str_Default_Binary},
+     {14, s_str_Default_Binary},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {76}}},
+#endif
     {{0, MU_NODEID_NUMERIC, {851}},
      MU_NODECLASS_DATATYPE,
      {17, s_str_RedundancySupport},
@@ -3881,20 +3988,9 @@ static const mu_node_t s_base_nodes[] = {
      .type_definition = {0, MU_NODEID_NUMERIC, {68}},
      .value_rank = -1,
      .data_type = 7}, /* UInt32 (OPC-10000-5 §6.3.2 Table 10) */
-    /* spec 085 (CU 5801) Task 4: ServerType.UrisVersion(15003, Optional
-       Property). Sorted between MaxByteStringLength(12910) and
-       BaseAnalogType(15318). */
-    {{0, MU_NODEID_NUMERIC, {15003}},
-     MU_NODECLASS_VARIABLE,
-     {11, s_str_UrisVersion},
-     {11, s_str_UrisVersion},
-     s_optional_property_refs,
-     sizeof(s_optional_property_refs) / sizeof(s_optional_property_refs[0]),
-     NULL,
-     .type_definition = {0, MU_NODEID_NUMERIC, {68}},
-     .value_rank = -1,
-     .data_type = 20998}, /* VersionTime (OPC-10000-5 §6.3.1; ns0 DataType NodeId
-                              confirmed via NodeIds.csv) */
+/* spec 090 (CU 5801 fix): ServerType.UrisVersion(15003)/VersionTime(20998)
+   removed -- see the s_str_ConformanceUnits comment above for the
+   grounded rationale (Optional property owned by unimplemented CU 3994). */
 #endif
 #if MUC_OPCUA_CU_DATA_ACCESS
     /* Spec 060: BaseAnalogType + AnalogUnitType and their property instances
@@ -4024,10 +4120,14 @@ static const mu_node_t s_base_nodes[] = {
      NULL,
      .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
 #endif
-#if MUC_OPCUA_CU_BASE_INFO_SERVERTYPE && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
-    /* spec 085 (CU 5801) Task 4: ServerType.LocalTime(17612, Optional
-       Property) -- distinct NodeId from the Server-instance
-       Server.LocalTime(17634) below. Sorted between
+#if MUC_OPCUA_CU_BASE_INFO_LOCALTIME
+    /* spec 090 (CU 5801 fix): ServerType.LocalTime(17612, Optional Property)
+       -- distinct NodeId from the Server-instance Server.LocalTime(17634)
+       below. Re-gated from the bare SERVERTYPE && TYPE_INFORMATION condition
+       onto its true owner CU_BASE_INFO_LOCALTIME (full-only, CU 2476),
+       matching its TimeZoneDataType(8912) DataType's own gate -- the old gate
+       exposed this property at embedded/standard without TimeZoneDataType
+       compiled in, a dangling reference. Sorted between
        DefaultInstanceBrowseName(17605) and LocalTime(17634). */
     {{0, MU_NODEID_NUMERIC, {17612}},
      MU_NODECLASS_VARIABLE,
@@ -4039,8 +4139,6 @@ static const mu_node_t s_base_nodes[] = {
      .type_definition = {0, MU_NODEID_NUMERIC, {68}},
      .value_rank = -1,
      .data_type = 8912}, /* TimeZoneDataType (OPC-10000-5 §6.3.1) */
-#endif
-#if MUC_OPCUA_CU_BASE_INFO_LOCALTIME
     /* OPC-10000-5 §6.3.1: Server.LocalTime (i=17634) is a Property using
      * TimeZoneDataType (i=8912); this node model records PropertyType (i=68). */
     {{0, MU_NODEID_NUMERIC, {17634}},
