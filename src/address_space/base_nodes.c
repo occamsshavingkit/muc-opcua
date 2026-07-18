@@ -336,6 +336,22 @@ static const opcua_byte_t s_str_TransportProtocol[] = "TransportProtocol";
 static const opcua_byte_t s_str_SecurityMode[] = "SecurityMode";
 static const opcua_byte_t s_str_SecurityPolicyUri[] = "SecurityPolicyUri";
 static const opcua_byte_t s_str_ClientCertificate[] = "ClientCertificate";
+/* spec 092 (CU 5801): BrowseNames for ServerDiagnosticsType's own
+   InstanceDeclarations (OPC-10000-5 §6.3.3 Table 11) and the further own
+   instance cascades of ServerDiagnosticsSummary(2021) and
+   SessionsDiagnosticsSummary(2744). Grounded via opc-ua-reference
+   (search_nodes: every NodeId below resolves to §6.3.3) and the official
+   NodeIds.csv (schemas 1.05), which spells out the full hierarchical
+   BrowseNames (e.g. ServerDiagnosticsType_ServerDiagnosticsSummary_
+   ServerViewCount) confirming these are distinct instance NodeIds from
+   ServerDiagnosticsSummaryType's own 2151-2163 declarations. */
+static const opcua_byte_t s_str_ServerDiagnosticsSummary[] = "ServerDiagnosticsSummary";
+static const opcua_byte_t s_str_SamplingIntervalDiagnosticsArray[] = "SamplingIntervalDiagnosticsArray";
+static const opcua_byte_t s_str_SubscriptionDiagnosticsArray[] = "SubscriptionDiagnosticsArray";
+static const opcua_byte_t s_str_EnabledFlag[] = "EnabledFlag";
+static const opcua_byte_t s_str_SessionsDiagnosticsSummary[] = "SessionsDiagnosticsSummary";
+static const opcua_byte_t s_str_SessionDiagnosticsArray[] = "SessionDiagnosticsArray";
+static const opcua_byte_t s_str_SessionSecurityDiagnosticsArray[] = "SessionSecurityDiagnosticsArray";
 #endif
 #endif
 #if MUC_OPCUA_CU_BASE_INFO_LOCALTIME
@@ -879,6 +895,82 @@ static const mu_reference_t s_session_security_diagnostics_type_refs[] = {
     {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {2251}}, true},
     {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {2252}}, true},
     {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {3058}}, true}};
+
+/* spec 092 (CU 5801): ServerDiagnosticsType(2020) HasComponent(47)/
+   HasProperty(46) -> its 5 own InstanceDeclarations (OPC-10000-5 §6.3.3
+   Table 11). Grounded via opc-ua-reference (search_nodes confirms every
+   child NodeId resolves to §6.3.3) and the official NodeIds.csv (schemas
+   1.05), which gives every row's exact Reference kind: HasComponent for
+   the 4 Variable/Object children, HasProperty for EnabledFlag. */
+static const mu_reference_t s_server_diagnostics_type_refs[] = {
+    {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {2021}}, true},
+    {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {2022}}, true},
+    {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {2023}}, true},
+    {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {2744}}, true},
+    {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {2025}}, true}};
+
+/* ServerDiagnosticsSummary(2021): Mandatory, TypeDefinition
+   ServerDiagnosticsSummaryType(2150), plus its own 12 materialized field
+   children (3116-3128, distinct NodeIds from ServerDiagnosticsSummaryType's
+   own 2151-2163 declarations -- confirmed via the official NodeIds.csv).
+   NodeId 3123 is an official numbering gap, not invented here. All 12 fall
+   inside the 2365..11461 DataAccess band, so they are dual-placed (see the
+   DataAccess-on/-off copies near ClientCertificate(3058)); this ref list
+   still names them once, since exactly one copy of each exists in any
+   given build. */
+static const mu_reference_t s_server_diagnostics_summary_instance_refs[] = {
+    {{0, MU_NODEID_NUMERIC, {37}}, {0, MU_NODEID_NUMERIC, {78}}, true},
+    {{0, MU_NODEID_NUMERIC, {40}}, {0, MU_NODEID_NUMERIC, {2150}}, true},
+    {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {3116}}, true},
+    {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {3117}}, true},
+    {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {3118}}, true},
+    {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {3119}}, true},
+    {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {3120}}, true},
+    {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {3121}}, true},
+    {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {3122}}, true},
+    {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {3124}}, true},
+    {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {3125}}, true},
+    {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {3126}}, true},
+    {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {3127}}, true},
+    {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {3128}}, true}};
+
+/* SamplingIntervalDiagnosticsArray(2022): Optional, TypeDefinition
+   SamplingIntervalDiagnosticsArrayType(2164). */
+static const mu_reference_t s_optional_samplingintervaldiagnosticsarraytype_refs[] = {
+    {{0, MU_NODEID_NUMERIC, {37}}, {0, MU_NODEID_NUMERIC, {80}}, true},
+    {{0, MU_NODEID_NUMERIC, {40}}, {0, MU_NODEID_NUMERIC, {2164}}, true}};
+
+/* SubscriptionDiagnosticsArray(2023): Mandatory, TypeDefinition
+   SubscriptionDiagnosticsArrayType(2171). */
+static const mu_reference_t s_mandatory_subscriptiondiagnosticsarraytype_refs[] = {
+    {{0, MU_NODEID_NUMERIC, {37}}, {0, MU_NODEID_NUMERIC, {78}}, true},
+    {{0, MU_NODEID_NUMERIC, {40}}, {0, MU_NODEID_NUMERIC, {2171}}, true}};
+
+/* SessionsDiagnosticsSummary(2744): Mandatory, TypeDefinition
+   SessionsDiagnosticsSummaryType(2026), plus its own 2 materialized array
+   children (3129 SessionDiagnosticsArray, 3130
+   SessionSecurityDiagnosticsArray). 2744 itself and both children fall
+   inside the 2365..11461 DataAccess band, so all three are dual-placed
+   (2744 near Auditing(2742)/SecondsTillShutdown(2752); 3129/3130 near
+   ClientCertificate(3058)); this ref list still names them once, and is
+   shared by both dual copies of the 2744 node entry itself. */
+static const mu_reference_t s_sessions_diagnostics_summary_instance_refs[] = {
+    {{0, MU_NODEID_NUMERIC, {37}}, {0, MU_NODEID_NUMERIC, {78}}, true},
+    {{0, MU_NODEID_NUMERIC, {40}}, {0, MU_NODEID_NUMERIC, {2026}}, true},
+    {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {3129}}, true},
+    {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {3130}}, true}};
+
+/* SessionDiagnosticsArray(3129): Mandatory, TypeDefinition
+   SessionDiagnosticsArrayType(2196). */
+static const mu_reference_t s_mandatory_sessiondiagnosticsarraytype_refs[] = {
+    {{0, MU_NODEID_NUMERIC, {37}}, {0, MU_NODEID_NUMERIC, {78}}, true},
+    {{0, MU_NODEID_NUMERIC, {40}}, {0, MU_NODEID_NUMERIC, {2196}}, true}};
+
+/* SessionSecurityDiagnosticsArray(3130): Mandatory, TypeDefinition
+   SessionSecurityDiagnosticsArrayType(2243). */
+static const mu_reference_t s_mandatory_sessionsecuritydiagnosticsarraytype_refs[] = {
+    {{0, MU_NODEID_NUMERIC, {37}}, {0, MU_NODEID_NUMERIC, {78}}, true},
+    {{0, MU_NODEID_NUMERIC, {40}}, {0, MU_NODEID_NUMERIC, {2243}}, true}};
 
 /* spec 085 (CU 5801) Task 4: shared HasModellingRule(37)->Mandatory(78)/
    Optional(80) plus HasTypeDefinition(40) forward refs for the
@@ -2457,10 +2549,65 @@ static const mu_node_t s_base_nodes[] = {
      MU_NODECLASS_OBJECTTYPE,
      {21, s_str_ServerDiagnosticsType},
      {21, s_str_ServerDiagnosticsType},
+#if MUC_OPCUA_CU_BASE_INFO_SERVERTYPE && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+     s_server_diagnostics_type_refs,
+     sizeof(s_server_diagnostics_type_refs) / sizeof(s_server_diagnostics_type_refs[0]),
+#else
      NULL,
      0,
+#endif
      NULL,
      .type_definition = {0}},
+#if MUC_OPCUA_CU_BASE_INFO_SERVERTYPE && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+    /* spec 092 (CU 5801): ServerDiagnosticsType(2020)'s own
+       InstanceDeclarations (OPC-10000-5 §6.3.3 Table 11), sorted between
+       ServerDiagnosticsType(2020) and SessionsDiagnosticsSummaryType(2026).
+       SessionsDiagnosticsSummary(2744) falls inside the 2365..11461
+       DataAccess band, so it is dual-placed elsewhere (near
+       Auditing(2742)/SecondsTillShutdown(2752)); not declared here. */
+    {{0, MU_NODEID_NUMERIC, {2021}},
+     MU_NODECLASS_VARIABLE,
+     {24, s_str_ServerDiagnosticsSummary},
+     {24, s_str_ServerDiagnosticsSummary},
+     s_server_diagnostics_summary_instance_refs,
+     sizeof(s_server_diagnostics_summary_instance_refs) / sizeof(s_server_diagnostics_summary_instance_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {2150}},
+     .value_rank = -1,
+     .data_type = 859}, /* ServerDiagnosticsSummaryDataType (OPC-10000-5 §6.3.3 Table 11) */
+    {{0, MU_NODEID_NUMERIC, {2022}},
+     MU_NODECLASS_VARIABLE,
+     {32, s_str_SamplingIntervalDiagnosticsArray},
+     {32, s_str_SamplingIntervalDiagnosticsArray},
+     s_optional_samplingintervaldiagnosticsarraytype_refs,
+     sizeof(s_optional_samplingintervaldiagnosticsarraytype_refs) /
+         sizeof(s_optional_samplingintervaldiagnosticsarraytype_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {2164}},
+     .value_rank = 1,
+     .data_type = 856}, /* SamplingIntervalDiagnosticsDataType[] (OPC-10000-5 §6.3.3 Table 11) */
+    {{0, MU_NODEID_NUMERIC, {2023}},
+     MU_NODECLASS_VARIABLE,
+     {28, s_str_SubscriptionDiagnosticsArray},
+     {28, s_str_SubscriptionDiagnosticsArray},
+     s_mandatory_subscriptiondiagnosticsarraytype_refs,
+     sizeof(s_mandatory_subscriptiondiagnosticsarraytype_refs) /
+         sizeof(s_mandatory_subscriptiondiagnosticsarraytype_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {2171}},
+     .value_rank = 1,
+     .data_type = 874}, /* SubscriptionDiagnosticsDataType[] (OPC-10000-5 §6.3.3 Table 11) */
+    {{0, MU_NODEID_NUMERIC, {2025}},
+     MU_NODECLASS_VARIABLE,
+     {11, s_str_EnabledFlag},
+     {11, s_str_EnabledFlag},
+     s_mandatory_property_refs,
+     sizeof(s_mandatory_property_refs) / sizeof(s_mandatory_property_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}},
+     .value_rank = -1,
+     .data_type = 1}, /* Boolean (OPC-10000-5 §6.3.3 Table 11) */
+#endif
     {{0, MU_NODEID_NUMERIC, {2026}},
      MU_NODECLASS_OBJECTTYPE,
      {30, s_str_SessionsDiagnosticsSummaryType},
@@ -3017,6 +3164,20 @@ static const mu_node_t s_base_nodes[] = {
      .type_definition = {0, MU_NODEID_NUMERIC, {68}},
      .value_rank = -1,
      .data_type = 1}, /* Boolean (OPC-10000-5 §6.3.1) */
+    /* spec 092 (CU 5801): ServerDiagnosticsType.SessionsDiagnosticsSummary
+       (2744, Object) falls inside the 2365..11461 DataAccess band, so it is
+       dual-placed here (mirroring the Auditing(2742)/SoftwareCertificates
+       (3049) precedent), between Auditing(2742) and
+       SecondsTillShutdown(2752). Already inside the enclosing SERVERTYPE &&
+       TYPE_INFORMATION gate for this block, so no further guard is needed. */
+    {{0, MU_NODEID_NUMERIC, {2744}},
+     MU_NODECLASS_OBJECT,
+     {26, s_str_SessionsDiagnosticsSummary},
+     {26, s_str_SessionsDiagnosticsSummary},
+     s_sessions_diagnostics_summary_instance_refs,
+     sizeof(s_sessions_diagnostics_summary_instance_refs) / sizeof(s_sessions_diagnostics_summary_instance_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {2026}}},
     {{0, MU_NODEID_NUMERIC, {2752}},
      MU_NODECLASS_VARIABLE,
      {19, s_str_SecondsTillShutdown},
@@ -3231,6 +3392,20 @@ static const mu_node_t s_base_nodes[] = {
      .type_definition = {0, MU_NODEID_NUMERIC, {68}},
      .value_rank = -1,
      .data_type = 1}, /* Boolean (OPC-10000-5 §6.3.1) */
+    /* spec 092 (CU 5801): ServerDiagnosticsType.SessionsDiagnosticsSummary
+       (2744, Object) falls inside the 2365..11461 DataAccess band, so it is
+       dual-placed here (mirroring the Auditing(2742)/SoftwareCertificates
+       (3049) precedent), between Auditing(2742) and
+       SecondsTillShutdown(2752). Already inside the enclosing SERVERTYPE &&
+       TYPE_INFORMATION gate for this block, so no further guard is needed. */
+    {{0, MU_NODEID_NUMERIC, {2744}},
+     MU_NODECLASS_OBJECT,
+     {26, s_str_SessionsDiagnosticsSummary},
+     {26, s_str_SessionsDiagnosticsSummary},
+     s_sessions_diagnostics_summary_instance_refs,
+     sizeof(s_sessions_diagnostics_summary_instance_refs) / sizeof(s_sessions_diagnostics_summary_instance_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {2026}}},
     {{0, MU_NODEID_NUMERIC, {2752}},
      MU_NODECLASS_VARIABLE,
      {19, s_str_SecondsTillShutdown},
@@ -3388,6 +3563,155 @@ static const mu_node_t s_base_nodes[] = {
      .type_definition = {0, MU_NODEID_NUMERIC, {63}},
      .value_rank = -1,
      .data_type = 15}, /* ByteString (OPC-10000-5 §7.16 Table 86) */
+    /* spec 092 (CU 5801): ServerDiagnosticsSummary(2021)'s own 12
+       materialized field children (OPC-10000-5 §6.3.3 Table 11; NodeId 3123
+       is an official numbering gap, not invented here), followed by
+       SessionsDiagnosticsSummary(2744)'s own 2 array children. All 14 fall
+       inside the 2365..11461 DataAccess band, so this is the DataAccess-on/
+       -off dual copy (mirroring the ClientCertificate(3058) precedent just
+       above). Sorts after ClientCertificate(3058) and before
+       EnumValueType(7594). */
+    {{0, MU_NODEID_NUMERIC, {3116}},
+     MU_NODECLASS_VARIABLE,
+     {15, s_str_ServerViewCount},
+     {15, s_str_ServerViewCount},
+     s_mandatory_bdv_refs,
+     sizeof(s_mandatory_bdv_refs) / sizeof(s_mandatory_bdv_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {63}},
+     .value_rank = -1,
+     .data_type = 7}, /* UInt32 (OPC-10000-5 §6.3.3 Table 11) */
+    {{0, MU_NODEID_NUMERIC, {3117}},
+     MU_NODECLASS_VARIABLE,
+     {19, s_str_CurrentSessionCount},
+     {19, s_str_CurrentSessionCount},
+     s_mandatory_bdv_refs,
+     sizeof(s_mandatory_bdv_refs) / sizeof(s_mandatory_bdv_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {63}},
+     .value_rank = -1,
+     .data_type = 7}, /* UInt32 (OPC-10000-5 §6.3.3 Table 11) */
+    {{0, MU_NODEID_NUMERIC, {3118}},
+     MU_NODECLASS_VARIABLE,
+     {21, s_str_CumulatedSessionCount},
+     {21, s_str_CumulatedSessionCount},
+     s_mandatory_bdv_refs,
+     sizeof(s_mandatory_bdv_refs) / sizeof(s_mandatory_bdv_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {63}},
+     .value_rank = -1,
+     .data_type = 7}, /* UInt32 (OPC-10000-5 §6.3.3 Table 11) */
+    {{0, MU_NODEID_NUMERIC, {3119}},
+     MU_NODECLASS_VARIABLE,
+     {28, s_str_SecurityRejectedSessionCount},
+     {28, s_str_SecurityRejectedSessionCount},
+     s_mandatory_bdv_refs,
+     sizeof(s_mandatory_bdv_refs) / sizeof(s_mandatory_bdv_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {63}},
+     .value_rank = -1,
+     .data_type = 7}, /* UInt32 (OPC-10000-5 §6.3.3 Table 11) */
+    {{0, MU_NODEID_NUMERIC, {3120}},
+     MU_NODECLASS_VARIABLE,
+     {20, s_str_RejectedSessionCount},
+     {20, s_str_RejectedSessionCount},
+     s_mandatory_bdv_refs,
+     sizeof(s_mandatory_bdv_refs) / sizeof(s_mandatory_bdv_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {63}},
+     .value_rank = -1,
+     .data_type = 7}, /* UInt32 (OPC-10000-5 §6.3.3 Table 11) */
+    {{0, MU_NODEID_NUMERIC, {3121}},
+     MU_NODECLASS_VARIABLE,
+     {19, s_str_SessionTimeoutCount},
+     {19, s_str_SessionTimeoutCount},
+     s_mandatory_bdv_refs,
+     sizeof(s_mandatory_bdv_refs) / sizeof(s_mandatory_bdv_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {63}},
+     .value_rank = -1,
+     .data_type = 7}, /* UInt32 (OPC-10000-5 §6.3.3 Table 11) */
+    {{0, MU_NODEID_NUMERIC, {3122}},
+     MU_NODECLASS_VARIABLE,
+     {17, s_str_SessionAbortCount},
+     {17, s_str_SessionAbortCount},
+     s_mandatory_bdv_refs,
+     sizeof(s_mandatory_bdv_refs) / sizeof(s_mandatory_bdv_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {63}},
+     .value_rank = -1,
+     .data_type = 7}, /* UInt32 (OPC-10000-5 §6.3.3 Table 11) */
+    {{0, MU_NODEID_NUMERIC, {3124}},
+     MU_NODECLASS_VARIABLE,
+     {23, s_str_PublishingIntervalCount},
+     {23, s_str_PublishingIntervalCount},
+     s_mandatory_bdv_refs,
+     sizeof(s_mandatory_bdv_refs) / sizeof(s_mandatory_bdv_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {63}},
+     .value_rank = -1,
+     .data_type = 7}, /* UInt32 (OPC-10000-5 §6.3.3 Table 11) */
+    {{0, MU_NODEID_NUMERIC, {3125}},
+     MU_NODECLASS_VARIABLE,
+     {24, s_str_CurrentSubscriptionCount},
+     {24, s_str_CurrentSubscriptionCount},
+     s_mandatory_bdv_refs,
+     sizeof(s_mandatory_bdv_refs) / sizeof(s_mandatory_bdv_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {63}},
+     .value_rank = -1,
+     .data_type = 7}, /* UInt32 (OPC-10000-5 §6.3.3 Table 11) */
+    {{0, MU_NODEID_NUMERIC, {3126}},
+     MU_NODECLASS_VARIABLE,
+     {26, s_str_CumulatedSubscriptionCount},
+     {26, s_str_CumulatedSubscriptionCount},
+     s_mandatory_bdv_refs,
+     sizeof(s_mandatory_bdv_refs) / sizeof(s_mandatory_bdv_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {63}},
+     .value_rank = -1,
+     .data_type = 7}, /* UInt32 (OPC-10000-5 §6.3.3 Table 11) */
+    {{0, MU_NODEID_NUMERIC, {3127}},
+     MU_NODECLASS_VARIABLE,
+     {29, s_str_SecurityRejectedRequestsCount},
+     {29, s_str_SecurityRejectedRequestsCount},
+     s_mandatory_bdv_refs,
+     sizeof(s_mandatory_bdv_refs) / sizeof(s_mandatory_bdv_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {63}},
+     .value_rank = -1,
+     .data_type = 7}, /* UInt32 (OPC-10000-5 §6.3.3 Table 11) */
+    {{0, MU_NODEID_NUMERIC, {3128}},
+     MU_NODECLASS_VARIABLE,
+     {21, s_str_RejectedRequestsCount},
+     {21, s_str_RejectedRequestsCount},
+     s_mandatory_bdv_refs,
+     sizeof(s_mandatory_bdv_refs) / sizeof(s_mandatory_bdv_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {63}},
+     .value_rank = -1,
+     .data_type = 7}, /* UInt32 (OPC-10000-5 §6.3.3 Table 11) */
+    {{0, MU_NODEID_NUMERIC, {3129}},
+     MU_NODECLASS_VARIABLE,
+     {23, s_str_SessionDiagnosticsArray},
+     {23, s_str_SessionDiagnosticsArray},
+     s_mandatory_sessiondiagnosticsarraytype_refs,
+     sizeof(s_mandatory_sessiondiagnosticsarraytype_refs) / sizeof(s_mandatory_sessiondiagnosticsarraytype_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {2196}},
+     .value_rank = 1,
+     .data_type = 865}, /* SessionDiagnosticsDataType[] (OPC-10000-5 §6.3.3 Table 11) */
+    {{0, MU_NODEID_NUMERIC, {3130}},
+     MU_NODECLASS_VARIABLE,
+     {31, s_str_SessionSecurityDiagnosticsArray},
+     {31, s_str_SessionSecurityDiagnosticsArray},
+     s_mandatory_sessionsecuritydiagnosticsarraytype_refs,
+     sizeof(s_mandatory_sessionsecuritydiagnosticsarraytype_refs) /
+         sizeof(s_mandatory_sessionsecuritydiagnosticsarraytype_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {2243}},
+     .value_rank = 1,
+     .data_type = 868}, /* SessionSecurityDiagnosticsDataType[] (OPC-10000-5 §6.3.3 Table 11) */
 #endif
 #if MUC_OPCUA_CU_BASE_INFO_BASE_TYPES
     /* CU 3188: EnumValueType(7594, subtype of Structure) + its Default XML(7616)/
@@ -3559,6 +3883,155 @@ static const mu_node_t s_base_nodes[] = {
      .type_definition = {0, MU_NODEID_NUMERIC, {63}},
      .value_rank = -1,
      .data_type = 15}, /* ByteString (OPC-10000-5 §7.16 Table 86) */
+    /* spec 092 (CU 5801): ServerDiagnosticsSummary(2021)'s own 12
+       materialized field children (OPC-10000-5 §6.3.3 Table 11; NodeId 3123
+       is an official numbering gap, not invented here), followed by
+       SessionsDiagnosticsSummary(2744)'s own 2 array children. All 14 fall
+       inside the 2365..11461 DataAccess band, so this is the DataAccess-on/
+       -off dual copy (mirroring the ClientCertificate(3058) precedent just
+       above). Sorts after ClientCertificate(3058) and before
+       EnumValueType(7594). */
+    {{0, MU_NODEID_NUMERIC, {3116}},
+     MU_NODECLASS_VARIABLE,
+     {15, s_str_ServerViewCount},
+     {15, s_str_ServerViewCount},
+     s_mandatory_bdv_refs,
+     sizeof(s_mandatory_bdv_refs) / sizeof(s_mandatory_bdv_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {63}},
+     .value_rank = -1,
+     .data_type = 7}, /* UInt32 (OPC-10000-5 §6.3.3 Table 11) */
+    {{0, MU_NODEID_NUMERIC, {3117}},
+     MU_NODECLASS_VARIABLE,
+     {19, s_str_CurrentSessionCount},
+     {19, s_str_CurrentSessionCount},
+     s_mandatory_bdv_refs,
+     sizeof(s_mandatory_bdv_refs) / sizeof(s_mandatory_bdv_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {63}},
+     .value_rank = -1,
+     .data_type = 7}, /* UInt32 (OPC-10000-5 §6.3.3 Table 11) */
+    {{0, MU_NODEID_NUMERIC, {3118}},
+     MU_NODECLASS_VARIABLE,
+     {21, s_str_CumulatedSessionCount},
+     {21, s_str_CumulatedSessionCount},
+     s_mandatory_bdv_refs,
+     sizeof(s_mandatory_bdv_refs) / sizeof(s_mandatory_bdv_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {63}},
+     .value_rank = -1,
+     .data_type = 7}, /* UInt32 (OPC-10000-5 §6.3.3 Table 11) */
+    {{0, MU_NODEID_NUMERIC, {3119}},
+     MU_NODECLASS_VARIABLE,
+     {28, s_str_SecurityRejectedSessionCount},
+     {28, s_str_SecurityRejectedSessionCount},
+     s_mandatory_bdv_refs,
+     sizeof(s_mandatory_bdv_refs) / sizeof(s_mandatory_bdv_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {63}},
+     .value_rank = -1,
+     .data_type = 7}, /* UInt32 (OPC-10000-5 §6.3.3 Table 11) */
+    {{0, MU_NODEID_NUMERIC, {3120}},
+     MU_NODECLASS_VARIABLE,
+     {20, s_str_RejectedSessionCount},
+     {20, s_str_RejectedSessionCount},
+     s_mandatory_bdv_refs,
+     sizeof(s_mandatory_bdv_refs) / sizeof(s_mandatory_bdv_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {63}},
+     .value_rank = -1,
+     .data_type = 7}, /* UInt32 (OPC-10000-5 §6.3.3 Table 11) */
+    {{0, MU_NODEID_NUMERIC, {3121}},
+     MU_NODECLASS_VARIABLE,
+     {19, s_str_SessionTimeoutCount},
+     {19, s_str_SessionTimeoutCount},
+     s_mandatory_bdv_refs,
+     sizeof(s_mandatory_bdv_refs) / sizeof(s_mandatory_bdv_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {63}},
+     .value_rank = -1,
+     .data_type = 7}, /* UInt32 (OPC-10000-5 §6.3.3 Table 11) */
+    {{0, MU_NODEID_NUMERIC, {3122}},
+     MU_NODECLASS_VARIABLE,
+     {17, s_str_SessionAbortCount},
+     {17, s_str_SessionAbortCount},
+     s_mandatory_bdv_refs,
+     sizeof(s_mandatory_bdv_refs) / sizeof(s_mandatory_bdv_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {63}},
+     .value_rank = -1,
+     .data_type = 7}, /* UInt32 (OPC-10000-5 §6.3.3 Table 11) */
+    {{0, MU_NODEID_NUMERIC, {3124}},
+     MU_NODECLASS_VARIABLE,
+     {23, s_str_PublishingIntervalCount},
+     {23, s_str_PublishingIntervalCount},
+     s_mandatory_bdv_refs,
+     sizeof(s_mandatory_bdv_refs) / sizeof(s_mandatory_bdv_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {63}},
+     .value_rank = -1,
+     .data_type = 7}, /* UInt32 (OPC-10000-5 §6.3.3 Table 11) */
+    {{0, MU_NODEID_NUMERIC, {3125}},
+     MU_NODECLASS_VARIABLE,
+     {24, s_str_CurrentSubscriptionCount},
+     {24, s_str_CurrentSubscriptionCount},
+     s_mandatory_bdv_refs,
+     sizeof(s_mandatory_bdv_refs) / sizeof(s_mandatory_bdv_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {63}},
+     .value_rank = -1,
+     .data_type = 7}, /* UInt32 (OPC-10000-5 §6.3.3 Table 11) */
+    {{0, MU_NODEID_NUMERIC, {3126}},
+     MU_NODECLASS_VARIABLE,
+     {26, s_str_CumulatedSubscriptionCount},
+     {26, s_str_CumulatedSubscriptionCount},
+     s_mandatory_bdv_refs,
+     sizeof(s_mandatory_bdv_refs) / sizeof(s_mandatory_bdv_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {63}},
+     .value_rank = -1,
+     .data_type = 7}, /* UInt32 (OPC-10000-5 §6.3.3 Table 11) */
+    {{0, MU_NODEID_NUMERIC, {3127}},
+     MU_NODECLASS_VARIABLE,
+     {29, s_str_SecurityRejectedRequestsCount},
+     {29, s_str_SecurityRejectedRequestsCount},
+     s_mandatory_bdv_refs,
+     sizeof(s_mandatory_bdv_refs) / sizeof(s_mandatory_bdv_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {63}},
+     .value_rank = -1,
+     .data_type = 7}, /* UInt32 (OPC-10000-5 §6.3.3 Table 11) */
+    {{0, MU_NODEID_NUMERIC, {3128}},
+     MU_NODECLASS_VARIABLE,
+     {21, s_str_RejectedRequestsCount},
+     {21, s_str_RejectedRequestsCount},
+     s_mandatory_bdv_refs,
+     sizeof(s_mandatory_bdv_refs) / sizeof(s_mandatory_bdv_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {63}},
+     .value_rank = -1,
+     .data_type = 7}, /* UInt32 (OPC-10000-5 §6.3.3 Table 11) */
+    {{0, MU_NODEID_NUMERIC, {3129}},
+     MU_NODECLASS_VARIABLE,
+     {23, s_str_SessionDiagnosticsArray},
+     {23, s_str_SessionDiagnosticsArray},
+     s_mandatory_sessiondiagnosticsarraytype_refs,
+     sizeof(s_mandatory_sessiondiagnosticsarraytype_refs) / sizeof(s_mandatory_sessiondiagnosticsarraytype_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {2196}},
+     .value_rank = 1,
+     .data_type = 865}, /* SessionDiagnosticsDataType[] (OPC-10000-5 §6.3.3 Table 11) */
+    {{0, MU_NODEID_NUMERIC, {3130}},
+     MU_NODECLASS_VARIABLE,
+     {31, s_str_SessionSecurityDiagnosticsArray},
+     {31, s_str_SessionSecurityDiagnosticsArray},
+     s_mandatory_sessionsecuritydiagnosticsarraytype_refs,
+     sizeof(s_mandatory_sessionsecuritydiagnosticsarraytype_refs) /
+         sizeof(s_mandatory_sessionsecuritydiagnosticsarraytype_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {2243}},
+     .value_rank = 1,
+     .data_type = 868}, /* SessionSecurityDiagnosticsDataType[] (OPC-10000-5 §6.3.3 Table 11) */
 #endif
 #if MUC_OPCUA_CU_BASE_INFO_BASE_TYPES && !MUC_OPCUA_CU_DATA_ACCESS
     /* CU 3188 (Data-Access-off variant): EnumValueType(7594) + its Encoding Objects,
