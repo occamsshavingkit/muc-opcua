@@ -95,3 +95,52 @@ def _mandatory_cu_names(graph, root_id):
 
 def derive_profile_defaults(graph, cu_name):
     return {prof: (cu_name in _mandatory_cu_names(graph, rid)) for prof, rid in _ROOTS.items()}
+
+
+def apply(manifest, graph):
+    idx = build_index(manifest)
+    graph_cu_names = {
+        c["name"] for node in graph["profiles"].values() for c in node.get("child_cus", [])
+    }
+    for it in items(manifest):
+        if not isinstance(it, dict) or it.get("kind") != "conformance_unit":
+            continue
+        cu_name = (it.get("opc_reference") or {}).get("cu_name")
+        # graph-absent -> we have no authoritative data; preserve hand-authored values
+        if not cu_name or cu_name not in graph_cu_names:
+            continue
+        # only rewrite the symbol-carrying (selectable) item for this CU
+        if idx["by_cu_name"].get(cu_name) is not it:
+            continue
+        deps, op = derive_depends_on(graph, idx, cu_name)
+        it["depends_on"] = deps
+        if op:
+            it["depends_on_op"] = op
+        elif "depends_on_op" in it:
+            del it["depends_on_op"]
+        pd = it.setdefault("profile_defaults", {})
+        pd.update(derive_profile_defaults(graph, cu_name))  # nano/micro/embedded/standard
+        pd.setdefault("full", False)
+        pd.setdefault("custom", False)
+    return manifest
+
+
+if __name__ == "__main__":
+    MAN = "profiles/opcua-profile-manifest.yaml"
+    manifest = json.load(open(MAN))
+    apply(manifest, load_graph())
+    # The manifest's existing convention is ensure_ascii=True (en-dashes,
+    # curly quotes, etc. are all \uXXXX-escaped) with exactly one outlier:
+    # three pre-existing literal section-sign (§, U+00A7) characters in
+    # unrelated notes fields. Using ensure_ascii=False globally would match
+    # those three but flip ~26 other already-escaped characters elsewhere
+    # in the file to literal unicode -- unrelated byte-churn outside our
+    # field scope. Instead, dump with the default (matching the dominant
+    # convention) and undo just the one escape that regresses a literal
+    # the file already had.
+    text = json.dumps(manifest, indent=2)
+    text = text.replace("\\u00a7", "§")
+    with open(MAN, "w") as fh:
+        fh.write(text)
+        fh.write("\n")
+    print("derive_deps: applied")

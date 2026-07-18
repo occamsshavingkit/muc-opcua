@@ -671,12 +671,14 @@
       "opc_display_name": "Address Space AddIn Reference",
       "kconfig_symbol": "MUC_OPCUA_CU_ADDRESS_SPACE_ADDIN_REFERENCE",
       "implementation_state": "claimed",
-      "depends_on": [],
+      "depends_on": [
+        "MUC_OPCUA_FACET_CORE_2022_SERVER"
+      ],
       "profile_defaults": {
         "nano": false,
-        "micro": true,
-        "embedded": true,
-        "standard": true,
+        "micro": false,
+        "embedded": false,
+        "standard": false,
         "full": true,
         "custom": false
       },
@@ -703,12 +705,14 @@
       "opc_display_name": "Address Space AddIn DefaultInstanceBrowsename",
       "kconfig_symbol": "MUC_OPCUA_CU_ADDRESS_SPACE_ADDIN_DEFAULTINSTANCEBROWSENAME",
       "implementation_state": "claimed",
-      "depends_on": [],
+      "depends_on": [
+        "MUC_OPCUA_FACET_CORE_2022_SERVER"
+      ],
       "profile_defaults": {
         "nano": false,
-        "micro": true,
-        "embedded": true,
-        "standard": true,
+        "micro": false,
+        "embedded": false,
+        "standard": false,
         "full": true,
         "custom": false
       },
@@ -735,12 +739,14 @@
       "opc_display_name": "Base Info LocalTime",
       "kconfig_symbol": "MUC_OPCUA_CU_BASE_INFO_LOCALTIME",
       "implementation_state": "claimed",
-      "depends_on": [],
+      "depends_on": [
+        "MUC_OPCUA_FACET_CORE_2022_SERVER"
+      ],
       "profile_defaults": {
         "nano": false,
-        "micro": true,
-        "embedded": true,
-        "standard": true,
+        "micro": false,
+        "embedded": false,
+        "standard": false,
         "full": true,
         "custom": false
       },
@@ -768,7 +774,9 @@
       "opc_display_name": "SecurityPolicy Support",
       "kconfig_symbol": null,
       "implementation_state": "unimplemented",
-      "depends_on": [],
+      "depends_on": [
+        "MUC_OPCUA_FACET_CORE_2022_SERVER"
+      ],
       "profile_defaults": {
         "nano": true,
         "micro": true,
@@ -798,12 +806,14 @@
       "opc_display_name": "Base Info Selection List",
       "kconfig_symbol": "MUC_OPCUA_CU_BASE_INFO_SELECTION_LIST",
       "implementation_state": "claimed",
-      "depends_on": [],
+      "depends_on": [
+        "MUC_OPCUA_FACET_CORE_2022_SERVER"
+      ],
       "profile_defaults": {
         "nano": false,
-        "micro": true,
-        "embedded": true,
-        "standard": true,
+        "micro": false,
+        "embedded": false,
+        "standard": false,
         "full": true,
         "custom": false
       },
@@ -830,7 +840,9 @@
       "opc_display_name": "Address Space Atomicity",
       "kconfig_symbol": "MUC_OPCUA_CU_ADDRESS_SPACE_ATOMICITY",
       "implementation_state": "claimed",
-      "depends_on": [],
+      "depends_on": [
+        "MUC_OPCUA_FACET_CORE_2022_SERVER"
+      ],
       "profile_defaults": {
         "nano": true,
         "micro": true,
@@ -862,7 +874,9 @@
       "opc_display_name": "Address Space Full Array Only",
       "kconfig_symbol": "MUC_OPCUA_CU_ADDRESS_SPACE_FULL_ARRAY_ONLY",
       "implementation_state": "claimed",
-      "depends_on": [],
+      "depends_on": [
+        "MUC_OPCUA_FACET_CORE_2022_SERVER"
+      ],
       "profile_defaults": {
         "nano": true,
         "micro": true,
@@ -894,12 +908,14 @@
       "opc_display_name": "Base Info ValueAsText",
       "kconfig_symbol": "MUC_OPCUA_CU_BASE_INFO_VALUEASTEXT",
       "implementation_state": "claimed",
-      "depends_on": [],
+      "depends_on": [
+        "MUC_OPCUA_FACET_CORE_2022_SERVER"
+      ],
       "profile_defaults": {
         "nano": false,
-        "micro": true,
-        "embedded": true,
-        "standard": true,
+        "micro": false,
+        "embedded": false,
+        "standard": false,
         "full": true,
         "custom": false
       },
@@ -926,12 +942,14 @@
       "opc_display_name": "Base Info OptionSet",
       "kconfig_symbol": "MUC_OPCUA_CU_BASE_INFO_OPTIONSET",
       "implementation_state": "claimed",
-      "depends_on": [],
+      "depends_on": [
+        "MUC_OPCUA_FACET_CORE_2022_SERVER"
+      ],
       "profile_defaults": {
         "nano": false,
-        "micro": true,
-        "embedded": true,
-        "standard": true,
+        "micro": false,
+        "embedded": false,
+        "standard": false,
         "full": true,
         "custom": false
       },
@@ -1018,12 +1036,14 @@
       "opc_display_name": "Base Info Estimated Return Time",
       "kconfig_symbol": "MUC_OPCUA_CU_BASE_INFO_ESTIMATED_RETURN_TIME",
       "implementation_state": "claimed",
-      "depends_on": [],
+      "depends_on": [
+        "MUC_OPCUA_FACET_CORE_2022_SERVER"
+      ],
       "profile_defaults": {
         "nano": false,
-        "micro": true,
-        "embedded": true,
-        "standard": true,
+        "micro": false,
+        "embedded": false,
+        "standard": false,
         "full": true,
         "custom": false
       },
@@ -1110,12 +1130,15 @@
       "opc_display_name": "Address Space Interfaces",
       "kconfig_symbol": "MUC_OPCUA_CU_ADDRESS_SPACE_INTERFACES",
       "implementation_state": "claimed",
-      "depends_on": [],
+      "depends_on": [
+        "MUC_OPCUA_FACET_CORE_2022_SERVER",
+        "MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER"
+      ],
       "profile_defaults": {
         "nano": false,
-        "micro": true,
-        "embedded": true,
-        "standard": true,
+        "micro": false,
+        "embedded": false,
+        "standard": false,
         "full": true,
         "custom": false
       },
@@ -1134,7 +1157,8 @@
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
       "notes": "Support Interfaces and associated rules. Includes exposing the entry point InterfaceTypes and the types BaseInterfaceType and HasInterface and all their supertypes in the AddressSpace.",
-      "cu_optional": true
+      "cu_optional": true,
+      "depends_on_op": "or"
     },
     {
       "id": "opc_cu_3808",
@@ -1145,7 +1169,9 @@
       "opc_display_name": "Documentation - Core Capacities",
       "kconfig_symbol": null,
       "implementation_state": "documented",
-      "depends_on": [],
+      "depends_on": [
+        "MUC_OPCUA_FACET_CORE_2022_SERVER"
+      ],
       "profile_defaults": {
         "nano": true,
         "micro": true,
@@ -1205,12 +1231,14 @@
       "opc_display_name": "Base Info Locations Object",
       "kconfig_symbol": "MUC_OPCUA_CU_BASE_INFO_LOCATIONS_OBJECT",
       "implementation_state": "claimed",
-      "depends_on": [],
+      "depends_on": [
+        "MUC_OPCUA_FACET_CORE_2022_SERVER"
+      ],
       "profile_defaults": {
         "nano": false,
-        "micro": true,
-        "embedded": true,
-        "standard": true,
+        "micro": false,
+        "embedded": false,
+        "standard": false,
         "full": true,
         "custom": false
       },
@@ -1237,12 +1265,14 @@
       "opc_display_name": "Address Space NonVolatile and Constant",
       "kconfig_symbol": "MUC_OPCUA_CU_ADDRESS_SPACE_NONVOLATILE_CONSTANT",
       "implementation_state": "claimed",
-      "depends_on": [],
+      "depends_on": [
+        "MUC_OPCUA_FACET_CORE_2022_SERVER"
+      ],
       "profile_defaults": {
         "nano": false,
-        "micro": true,
-        "embedded": true,
-        "standard": true,
+        "micro": false,
+        "embedded": false,
+        "standard": false,
         "full": true,
         "custom": false
       },
@@ -1269,12 +1299,14 @@
       "opc_display_name": "Base Info Currency",
       "kconfig_symbol": "MUC_OPCUA_CU_BASE_INFO_CURRENCY",
       "implementation_state": "claimed",
-      "depends_on": [],
+      "depends_on": [
+        "MUC_OPCUA_FACET_CORE_2022_SERVER"
+      ],
       "profile_defaults": {
         "nano": false,
-        "micro": true,
-        "embedded": true,
-        "standard": true,
+        "micro": false,
+        "embedded": false,
+        "standard": false,
         "full": true,
         "custom": false
       },
@@ -1475,7 +1507,9 @@
       "opc_display_name": "Push Model for Global Certificate and TrustList Management",
       "kconfig_symbol": null,
       "implementation_state": "unimplemented",
-      "depends_on": [],
+      "depends_on": [
+        "MUC_OPCUA_FACET_GLOBAL_CERTIFICATE_MANAGEMENT_SERVER"
+      ],
       "profile_defaults": {
         "nano": false,
         "micro": false,
@@ -1505,12 +1539,14 @@
       "opc_display_name": "Base Info Rational Number",
       "kconfig_symbol": null,
       "implementation_state": "unimplemented",
-      "depends_on": [],
+      "depends_on": [
+        "MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER"
+      ],
       "profile_defaults": {
         "nano": false,
         "micro": false,
-        "embedded": true,
-        "standard": true,
+        "embedded": false,
+        "standard": false,
         "full": true,
         "custom": false
       },
@@ -1535,12 +1571,14 @@
       "opc_display_name": "Base Info NormalizedString DataType",
       "kconfig_symbol": null,
       "implementation_state": "unimplemented",
-      "depends_on": [],
+      "depends_on": [
+        "MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER"
+      ],
       "profile_defaults": {
         "nano": false,
         "micro": false,
-        "embedded": true,
-        "standard": true,
+        "embedded": false,
+        "standard": false,
         "full": true,
         "custom": false
       },
@@ -1565,12 +1603,14 @@
       "opc_display_name": "Base Info DecimalString DataType",
       "kconfig_symbol": null,
       "implementation_state": "unimplemented",
-      "depends_on": [],
+      "depends_on": [
+        "MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER"
+      ],
       "profile_defaults": {
         "nano": false,
         "micro": false,
-        "embedded": true,
-        "standard": true,
+        "embedded": false,
+        "standard": false,
         "full": true,
         "custom": false
       },
@@ -1596,7 +1636,9 @@
       "opc_display_name": "Base Info Date DataTypes",
       "kconfig_symbol": null,
       "implementation_state": "unimplemented",
-      "depends_on": [],
+      "depends_on": [
+        "MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER"
+      ],
       "profile_defaults": {
         "nano": false,
         "micro": false,
@@ -1626,12 +1668,14 @@
       "opc_display_name": "Base Info BitFieldMaskDataType",
       "kconfig_symbol": null,
       "implementation_state": "unimplemented",
-      "depends_on": [],
+      "depends_on": [
+        "MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER"
+      ],
       "profile_defaults": {
         "nano": false,
         "micro": false,
-        "embedded": true,
-        "standard": true,
+        "embedded": false,
+        "standard": false,
         "full": true,
         "custom": false
       },
@@ -1656,12 +1700,14 @@
       "opc_display_name": "Base Info KeyValuePair",
       "kconfig_symbol": null,
       "implementation_state": "unimplemented",
-      "depends_on": [],
+      "depends_on": [
+        "MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER"
+      ],
       "profile_defaults": {
         "nano": false,
         "micro": false,
-        "embedded": true,
-        "standard": true,
+        "embedded": false,
+        "standard": false,
         "full": true,
         "custom": false
       },
@@ -1686,12 +1732,14 @@
       "opc_display_name": "Base Info Subvariables of Structures",
       "kconfig_symbol": null,
       "implementation_state": "unimplemented",
-      "depends_on": [],
+      "depends_on": [
+        "MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER"
+      ],
       "profile_defaults": {
         "nano": false,
         "micro": false,
-        "embedded": true,
-        "standard": true,
+        "embedded": false,
+        "standard": false,
         "full": true,
         "custom": false
       },
@@ -1716,12 +1764,14 @@
       "opc_display_name": "Base Info AssociatedWith",
       "kconfig_symbol": null,
       "implementation_state": "unimplemented",
-      "depends_on": [],
+      "depends_on": [
+        "MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER"
+      ],
       "profile_defaults": {
         "nano": false,
         "micro": false,
-        "embedded": true,
-        "standard": true,
+        "embedded": false,
+        "standard": false,
         "full": true,
         "custom": false
       },
@@ -1746,12 +1796,14 @@
       "opc_display_name": "Base Info EUInformation",
       "kconfig_symbol": null,
       "implementation_state": "unimplemented",
-      "depends_on": [],
+      "depends_on": [
+        "MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER"
+      ],
       "profile_defaults": {
         "nano": false,
         "micro": false,
-        "embedded": true,
-        "standard": true,
+        "embedded": false,
+        "standard": false,
         "full": true,
         "custom": false
       },
@@ -1776,12 +1828,14 @@
       "opc_display_name": "Base Info OrderedList",
       "kconfig_symbol": null,
       "implementation_state": "unimplemented",
-      "depends_on": [],
+      "depends_on": [
+        "MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER"
+      ],
       "profile_defaults": {
         "nano": false,
         "micro": false,
-        "embedded": true,
-        "standard": true,
+        "embedded": false,
+        "standard": false,
         "full": true,
         "custom": false
       },
@@ -1806,12 +1860,14 @@
       "opc_display_name": "Base Info Audio Type",
       "kconfig_symbol": null,
       "implementation_state": "unimplemented",
-      "depends_on": [],
+      "depends_on": [
+        "MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER"
+      ],
       "profile_defaults": {
         "nano": false,
         "micro": false,
-        "embedded": true,
-        "standard": true,
+        "embedded": false,
+        "standard": false,
         "full": true,
         "custom": false
       },
@@ -1836,12 +1892,14 @@
       "opc_display_name": "Base Info Spatial Data",
       "kconfig_symbol": null,
       "implementation_state": "unimplemented",
-      "depends_on": [],
+      "depends_on": [
+        "MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER"
+      ],
       "profile_defaults": {
         "nano": false,
         "micro": false,
-        "embedded": true,
-        "standard": true,
+        "embedded": false,
+        "standard": false,
         "full": true,
         "custom": false
       },
@@ -1866,12 +1924,14 @@
       "opc_display_name": "Base Info HasOrderedComponent",
       "kconfig_symbol": null,
       "implementation_state": "unimplemented",
-      "depends_on": [],
+      "depends_on": [
+        "MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER"
+      ],
       "profile_defaults": {
         "nano": false,
         "micro": false,
-        "embedded": true,
-        "standard": true,
+        "embedded": false,
+        "standard": false,
         "full": true,
         "custom": false
       },
@@ -1896,12 +1956,14 @@
       "opc_display_name": "Base Info Deprecated Information",
       "kconfig_symbol": null,
       "implementation_state": "unimplemented",
-      "depends_on": [],
+      "depends_on": [
+        "MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER"
+      ],
       "profile_defaults": {
         "nano": false,
         "micro": false,
-        "embedded": true,
-        "standard": true,
+        "embedded": false,
+        "standard": false,
         "full": true,
         "custom": false
       },
@@ -1926,12 +1988,14 @@
       "opc_display_name": "Base Info Image DataTypes",
       "kconfig_symbol": null,
       "implementation_state": "unimplemented",
-      "depends_on": [],
+      "depends_on": [
+        "MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER"
+      ],
       "profile_defaults": {
         "nano": false,
         "micro": false,
-        "embedded": true,
-        "standard": true,
+        "embedded": false,
+        "standard": false,
         "full": true,
         "custom": false
       },
@@ -1957,12 +2021,14 @@
       "opc_display_name": "Base Info ContentFilter",
       "kconfig_symbol": null,
       "implementation_state": "unimplemented",
-      "depends_on": [],
+      "depends_on": [
+        "MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER"
+      ],
       "profile_defaults": {
         "nano": false,
         "micro": false,
-        "embedded": true,
-        "standard": true,
+        "embedded": false,
+        "standard": false,
         "full": true,
         "custom": false
       },
@@ -1988,7 +2054,9 @@
       "opc_display_name": "Monitored Items Deadband Filter",
       "kconfig_symbol": null,
       "implementation_state": "unimplemented",
-      "depends_on": [],
+      "depends_on": [
+        "MUC_OPCUA_FACET_STANDARD_DATACHANGE_SUBSCRIPTION_2022_SERVER"
+      ],
       "profile_defaults": {
         "nano": false,
         "micro": false,
@@ -2019,7 +2087,9 @@
       "opc_display_name": "Base Info GetMonitoredItems Method",
       "kconfig_symbol": null,
       "implementation_state": "unimplemented",
-      "depends_on": [],
+      "depends_on": [
+        "MUC_OPCUA_FACET_STANDARD_DATACHANGE_SUBSCRIPTION_2022_SERVER"
+      ],
       "profile_defaults": {
         "nano": false,
         "micro": false,
@@ -2050,7 +2120,9 @@
       "opc_display_name": "Monitor Basic",
       "kconfig_symbol": null,
       "implementation_state": "unimplemented",
-      "depends_on": [],
+      "depends_on": [
+        "MUC_OPCUA_FACET_EMBEDDED_DATACHANGE_SUBSCRIPTION_2022_SERVER"
+      ],
       "profile_defaults": {
         "nano": false,
         "micro": true,
@@ -2081,7 +2153,9 @@
       "opc_display_name": "Monitor Triggering",
       "kconfig_symbol": null,
       "implementation_state": "unimplemented",
-      "depends_on": [],
+      "depends_on": [
+        "MUC_OPCUA_FACET_STANDARD_DATACHANGE_SUBSCRIPTION_2022_SERVER"
+      ],
       "profile_defaults": {
         "nano": false,
         "micro": false,
@@ -2112,7 +2186,9 @@
       "opc_display_name": "Base Info Core Types Folders",
       "kconfig_symbol": null,
       "implementation_state": "unimplemented",
-      "depends_on": [],
+      "depends_on": [
+        "MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER"
+      ],
       "profile_defaults": {
         "nano": false,
         "micro": false,
@@ -2143,7 +2219,9 @@
       "opc_display_name": "Base Info Base Types",
       "kconfig_symbol": null,
       "implementation_state": "unimplemented",
-      "depends_on": [],
+      "depends_on": [
+        "MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER"
+      ],
       "profile_defaults": {
         "nano": false,
         "micro": false,
@@ -2174,8 +2252,7 @@
       "kconfig_symbol": "MUC_OPCUA_CU_BASE_INFO_SERVERTYPE",
       "implementation_state": "implemented",
       "depends_on": [
-        "MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER",
-        "MUC_OPCUA_CU_BASE_INFO_BASE_TYPES"
+        "MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER"
       ],
       "profile_defaults": {
         "nano": false,
@@ -2208,12 +2285,14 @@
       "opc_display_name": "Base Info Fixed SamplingInterval",
       "kconfig_symbol": null,
       "implementation_state": "unimplemented",
-      "depends_on": [],
+      "depends_on": [
+        "MUC_OPCUA_FACET_EMBEDDED_DATACHANGE_SUBSCRIPTION_2022_SERVER"
+      ],
       "profile_defaults": {
         "nano": false,
-        "micro": true,
-        "embedded": true,
-        "standard": true,
+        "micro": false,
+        "embedded": false,
+        "standard": false,
         "full": true,
         "custom": false
       },
@@ -2238,12 +2317,14 @@
       "opc_display_name": "Base Info OptionSet DataType",
       "kconfig_symbol": null,
       "implementation_state": "unimplemented",
-      "depends_on": [],
+      "depends_on": [
+        "MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER"
+      ],
       "profile_defaults": {
         "nano": false,
         "micro": false,
-        "embedded": true,
-        "standard": true,
+        "embedded": false,
+        "standard": false,
         "full": true,
         "custom": false
       },
@@ -2268,12 +2349,14 @@
       "opc_display_name": "Base Info Range DataType",
       "kconfig_symbol": null,
       "implementation_state": "unimplemented",
-      "depends_on": [],
+      "depends_on": [
+        "MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER"
+      ],
       "profile_defaults": {
         "nano": false,
         "micro": false,
-        "embedded": true,
-        "standard": true,
+        "embedded": false,
+        "standard": false,
         "full": true,
         "custom": false
       },
@@ -2299,7 +2382,9 @@
       "opc_display_name": "Monitor Queueing",
       "kconfig_symbol": null,
       "implementation_state": "unimplemented",
-      "depends_on": [],
+      "depends_on": [
+        "MUC_OPCUA_FACET_STANDARD_DATACHANGE_SUBSCRIPTION_2022_SERVER"
+      ],
       "profile_defaults": {
         "nano": false,
         "micro": false,
@@ -2330,7 +2415,9 @@
       "opc_display_name": "Base Info ResendData Method",
       "kconfig_symbol": null,
       "implementation_state": "unimplemented",
-      "depends_on": [],
+      "depends_on": [
+        "MUC_OPCUA_FACET_STANDARD_DATACHANGE_SUBSCRIPTION_2022_SERVER"
+      ],
       "profile_defaults": {
         "nano": false,
         "micro": false,
@@ -2360,12 +2447,14 @@
       "opc_display_name": "Base Info UaBinary File",
       "kconfig_symbol": null,
       "implementation_state": "unimplemented",
-      "depends_on": [],
+      "depends_on": [
+        "MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER"
+      ],
       "profile_defaults": {
         "nano": false,
         "micro": false,
-        "embedded": true,
-        "standard": true,
+        "embedded": false,
+        "standard": false,
         "full": true,
         "custom": false
       },
@@ -2390,12 +2479,14 @@
       "opc_display_name": "Base Info StatusResult DataType",
       "kconfig_symbol": null,
       "implementation_state": "unimplemented",
-      "depends_on": [],
+      "depends_on": [
+        "MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER"
+      ],
       "profile_defaults": {
         "nano": false,
         "micro": false,
-        "embedded": true,
-        "standard": true,
+        "embedded": false,
+        "standard": false,
         "full": true,
         "custom": false
       },
@@ -2420,12 +2511,14 @@
       "opc_display_name": "Base Info UriString",
       "kconfig_symbol": null,
       "implementation_state": "unimplemented",
-      "depends_on": [],
+      "depends_on": [
+        "MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER"
+      ],
       "profile_defaults": {
         "nano": false,
         "micro": false,
-        "embedded": true,
-        "standard": true,
+        "embedded": false,
+        "standard": false,
         "full": true,
         "custom": false
       },
@@ -2451,7 +2544,9 @@
       "opc_display_name": "Base Info Method Argument DataType",
       "kconfig_symbol": null,
       "implementation_state": "unimplemented",
-      "depends_on": [],
+      "depends_on": [
+        "MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER"
+      ],
       "profile_defaults": {
         "nano": false,
         "micro": false,
@@ -2481,12 +2576,14 @@
       "opc_display_name": "Base Info SemanticVersionString",
       "kconfig_symbol": null,
       "implementation_state": "unimplemented",
-      "depends_on": [],
+      "depends_on": [
+        "MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER"
+      ],
       "profile_defaults": {
         "nano": false,
         "micro": false,
-        "embedded": true,
-        "standard": true,
+        "embedded": false,
+        "standard": false,
         "full": true,
         "custom": false
       },
@@ -2511,12 +2608,14 @@
       "opc_display_name": "Base Info IsExecutableOn",
       "kconfig_symbol": null,
       "implementation_state": "unimplemented",
-      "depends_on": [],
+      "depends_on": [
+        "MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER"
+      ],
       "profile_defaults": {
         "nano": false,
         "micro": false,
-        "embedded": true,
-        "standard": true,
+        "embedded": false,
+        "standard": false,
         "full": true,
         "custom": false
       },
@@ -2541,12 +2640,14 @@
       "opc_display_name": "Base Info IsExecutingOn",
       "kconfig_symbol": null,
       "implementation_state": "unimplemented",
-      "depends_on": [],
+      "depends_on": [
+        "MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER"
+      ],
       "profile_defaults": {
         "nano": false,
         "micro": false,
-        "embedded": true,
-        "standard": true,
+        "embedded": false,
+        "standard": false,
         "full": true,
         "custom": false
       },
@@ -2571,12 +2672,14 @@
       "opc_display_name": "Base Info Controls",
       "kconfig_symbol": null,
       "implementation_state": "unimplemented",
-      "depends_on": [],
+      "depends_on": [
+        "MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER"
+      ],
       "profile_defaults": {
         "nano": false,
         "micro": false,
-        "embedded": true,
-        "standard": true,
+        "embedded": false,
+        "standard": false,
         "full": true,
         "custom": false
       },
@@ -2601,12 +2704,14 @@
       "opc_display_name": "Base Info Utilizes",
       "kconfig_symbol": null,
       "implementation_state": "unimplemented",
-      "depends_on": [],
+      "depends_on": [
+        "MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER"
+      ],
       "profile_defaults": {
         "nano": false,
         "micro": false,
-        "embedded": true,
-        "standard": true,
+        "embedded": false,
+        "standard": false,
         "full": true,
         "custom": false
       },
@@ -2631,12 +2736,14 @@
       "opc_display_name": "Base Info Requires",
       "kconfig_symbol": null,
       "implementation_state": "unimplemented",
-      "depends_on": [],
+      "depends_on": [
+        "MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER"
+      ],
       "profile_defaults": {
         "nano": false,
         "micro": false,
-        "embedded": true,
-        "standard": true,
+        "embedded": false,
+        "standard": false,
         "full": true,
         "custom": false
       },
@@ -2661,12 +2768,14 @@
       "opc_display_name": "Base Info IsPhysicallyConnectedTo",
       "kconfig_symbol": null,
       "implementation_state": "unimplemented",
-      "depends_on": [],
+      "depends_on": [
+        "MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER"
+      ],
       "profile_defaults": {
         "nano": false,
         "micro": false,
-        "embedded": true,
-        "standard": true,
+        "embedded": false,
+        "standard": false,
         "full": true,
         "custom": false
       },
@@ -2691,12 +2800,14 @@
       "opc_display_name": "Base Info RepresentsSameEntityAs",
       "kconfig_symbol": null,
       "implementation_state": "unimplemented",
-      "depends_on": [],
+      "depends_on": [
+        "MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER"
+      ],
       "profile_defaults": {
         "nano": false,
         "micro": false,
-        "embedded": true,
-        "standard": true,
+        "embedded": false,
+        "standard": false,
         "full": true,
         "custom": false
       },
@@ -2721,12 +2832,14 @@
       "opc_display_name": "Base Info RepresentsSameHardwareAs",
       "kconfig_symbol": null,
       "implementation_state": "unimplemented",
-      "depends_on": [],
+      "depends_on": [
+        "MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER"
+      ],
       "profile_defaults": {
         "nano": false,
         "micro": false,
-        "embedded": true,
-        "standard": true,
+        "embedded": false,
+        "standard": false,
         "full": true,
         "custom": false
       },
@@ -2751,12 +2864,14 @@
       "opc_display_name": "Base Info RepresentsSameFunctionalityAs",
       "kconfig_symbol": null,
       "implementation_state": "unimplemented",
-      "depends_on": [],
+      "depends_on": [
+        "MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER"
+      ],
       "profile_defaults": {
         "nano": false,
         "micro": false,
-        "embedded": true,
-        "standard": true,
+        "embedded": false,
+        "standard": false,
         "full": true,
         "custom": false
       },
@@ -2781,12 +2896,14 @@
       "opc_display_name": "Base Info IsHostedBy",
       "kconfig_symbol": null,
       "implementation_state": "unimplemented",
-      "depends_on": [],
+      "depends_on": [
+        "MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER"
+      ],
       "profile_defaults": {
         "nano": false,
         "micro": false,
-        "embedded": true,
-        "standard": true,
+        "embedded": false,
+        "standard": false,
         "full": true,
         "custom": false
       },
@@ -2811,12 +2928,14 @@
       "opc_display_name": "Base Info HasPhysicalComponent",
       "kconfig_symbol": null,
       "implementation_state": "unimplemented",
-      "depends_on": [],
+      "depends_on": [
+        "MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER"
+      ],
       "profile_defaults": {
         "nano": false,
         "micro": false,
-        "embedded": true,
-        "standard": true,
+        "embedded": false,
+        "standard": false,
         "full": true,
         "custom": false
       },
@@ -2841,12 +2960,14 @@
       "opc_display_name": "Base Info HasContainedComponent",
       "kconfig_symbol": null,
       "implementation_state": "unimplemented",
-      "depends_on": [],
+      "depends_on": [
+        "MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER"
+      ],
       "profile_defaults": {
         "nano": false,
         "micro": false,
-        "embedded": true,
-        "standard": true,
+        "embedded": false,
+        "standard": false,
         "full": true,
         "custom": false
       },
@@ -2871,12 +2992,14 @@
       "opc_display_name": "Base Info HasAttachedComponent",
       "kconfig_symbol": null,
       "implementation_state": "unimplemented",
-      "depends_on": [],
+      "depends_on": [
+        "MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER"
+      ],
       "profile_defaults": {
         "nano": false,
         "micro": false,
-        "embedded": true,
-        "standard": true,
+        "embedded": false,
+        "standard": false,
         "full": true,
         "custom": false
       },
@@ -2902,7 +3025,9 @@
       "opc_display_name": "Base Info Server Capabilities Subscriptions",
       "kconfig_symbol": null,
       "implementation_state": "unimplemented",
-      "depends_on": [],
+      "depends_on": [
+        "MUC_OPCUA_FACET_EMBEDDED_DATACHANGE_SUBSCRIPTION_2022_SERVER"
+      ],
       "profile_defaults": {
         "nano": false,
         "micro": true,
@@ -2933,7 +3058,9 @@
       "opc_display_name": "Base Info SemanticChange Bit",
       "kconfig_symbol": null,
       "implementation_state": "unimplemented",
-      "depends_on": [],
+      "depends_on": [
+        "MUC_OPCUA_FACET_EMBEDDED_DATACHANGE_SUBSCRIPTION_2022_SERVER"
+      ],
       "profile_defaults": {
         "nano": false,
         "micro": true,
@@ -2963,12 +3090,14 @@
       "opc_display_name": "Base Info ReferenceDescription",
       "kconfig_symbol": null,
       "implementation_state": "unimplemented",
-      "depends_on": [],
+      "depends_on": [
+        "MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER"
+      ],
       "profile_defaults": {
         "nano": false,
         "micro": false,
-        "embedded": true,
-        "standard": true,
+        "embedded": false,
+        "standard": false,
         "full": true,
         "custom": false
       },
@@ -2993,12 +3122,14 @@
       "opc_display_name": "Base Info TrimmedString",
       "kconfig_symbol": null,
       "implementation_state": "unimplemented",
-      "depends_on": [],
+      "depends_on": [
+        "MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER"
+      ],
       "profile_defaults": {
         "nano": false,
         "micro": false,
-        "embedded": true,
-        "standard": true,
+        "embedded": false,
+        "standard": false,
         "full": true,
         "custom": false
       },
@@ -3023,12 +3154,14 @@
       "opc_display_name": "Base Info Handle DataType",
       "kconfig_symbol": null,
       "implementation_state": "unimplemented",
-      "depends_on": [],
+      "depends_on": [
+        "MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER"
+      ],
       "profile_defaults": {
         "nano": false,
         "micro": false,
-        "embedded": true,
-        "standard": true,
+        "embedded": false,
+        "standard": false,
         "full": true,
         "custom": false
       },
@@ -3054,7 +3187,9 @@
       "opc_display_name": "Base Info Server Capabilities MaxMonitoredItemsQueueSize",
       "kconfig_symbol": null,
       "implementation_state": "unimplemented",
-      "depends_on": [],
+      "depends_on": [
+        "MUC_OPCUA_FACET_EMBEDDED_DATACHANGE_SUBSCRIPTION_2022_SERVER"
+      ],
       "profile_defaults": {
         "nano": false,
         "micro": true,
@@ -3085,7 +3220,9 @@
       "opc_display_name": "Base Info Decimal DataType",
       "kconfig_symbol": null,
       "implementation_state": "unimplemented",
-      "depends_on": [],
+      "depends_on": [
+        "MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER"
+      ],
       "profile_defaults": {
         "nano": false,
         "micro": false,
@@ -3116,7 +3253,9 @@
       "opc_display_name": "Monitor Items 2",
       "kconfig_symbol": null,
       "implementation_state": "unimplemented",
-      "depends_on": [],
+      "depends_on": [
+        "MUC_OPCUA_FACET_EMBEDDED_DATACHANGE_SUBSCRIPTION_2022_SERVER"
+      ],
       "profile_defaults": {
         "nano": false,
         "micro": true,
@@ -3147,7 +3286,9 @@
       "opc_display_name": "Monitor Value Change V2",
       "kconfig_symbol": null,
       "implementation_state": "unimplemented",
-      "depends_on": [],
+      "depends_on": [
+        "MUC_OPCUA_FACET_EMBEDDED_DATACHANGE_SUBSCRIPTION_2022_SERVER"
+      ],
       "profile_defaults": {
         "nano": false,
         "micro": true,
@@ -3209,12 +3350,14 @@
       "opc_display_name": "Base Info Portable IDs",
       "kconfig_symbol": null,
       "implementation_state": "unimplemented",
-      "depends_on": [],
+      "depends_on": [
+        "MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER"
+      ],
       "profile_defaults": {
         "nano": false,
         "micro": false,
-        "embedded": true,
-        "standard": true,
+        "embedded": false,
+        "standard": false,
         "full": true,
         "custom": false
       },
@@ -3932,7 +4075,9 @@
       "opc_display_name": "Attribute Read",
       "kconfig_symbol": "MUC_OPCUA_CU_ATTRIBUTE_READ",
       "implementation_state": "claimed",
-      "depends_on": [],
+      "depends_on": [
+        "MUC_OPCUA_FACET_CORE_2022_SERVER"
+      ],
       "profile_defaults": {
         "nano": true,
         "micro": true,
@@ -4016,7 +4161,9 @@
       "opc_display_name": "View RegisterNodes",
       "kconfig_symbol": "MUC_OPCUA_CU_VIEW_REGISTERNODES",
       "implementation_state": "claimed",
-      "depends_on": [],
+      "depends_on": [
+        "MUC_OPCUA_FACET_CORE_2022_SERVER"
+      ],
       "profile_defaults": {
         "nano": true,
         "micro": true,
@@ -4295,7 +4442,9 @@
       "opc_display_name": "View TranslateBrowsePath",
       "kconfig_symbol": "MUC_OPCUA_CU_VIEW_TRANSLATEBROWSEPATH",
       "implementation_state": "implemented",
-      "depends_on": [],
+      "depends_on": [
+        "MUC_OPCUA_FACET_CORE_2022_SERVER"
+      ],
       "profile_defaults": {
         "nano": true,
         "micro": true,
@@ -4328,7 +4477,9 @@
       "opc_display_name": "Discovery Get Endpoints",
       "kconfig_symbol": "MUC_OPCUA_CU_DISCOVERY_GET_ENDPOINTS",
       "implementation_state": "implemented",
-      "depends_on": [],
+      "depends_on": [
+        "MUC_OPCUA_FACET_CORE_2022_SERVER"
+      ],
       "profile_defaults": {
         "nano": true,
         "micro": true,
@@ -4361,7 +4512,9 @@
       "opc_display_name": "Discovery Find Servers Self",
       "kconfig_symbol": "MUC_OPCUA_CU_DISCOVERY_FIND_SERVERS_SELF",
       "implementation_state": "implemented",
-      "depends_on": [],
+      "depends_on": [
+        "MUC_OPCUA_FACET_CORE_2022_SERVER"
+      ],
       "profile_defaults": {
         "nano": true,
         "micro": true,
@@ -4394,12 +4547,14 @@
       "opc_display_name": "Attribute Write Values",
       "kconfig_symbol": "MUC_OPCUA_CU_ATTRIBUTE_WRITE_VALUES",
       "implementation_state": "claimed",
-      "depends_on": [],
+      "depends_on": [
+        "MUC_OPCUA_FACET_CORE_2022_SERVER"
+      ],
       "profile_defaults": {
         "nano": false,
-        "micro": true,
-        "embedded": true,
-        "standard": true,
+        "micro": false,
+        "embedded": false,
+        "standard": false,
         "full": true,
         "custom": false
       },
@@ -4427,12 +4582,14 @@
       "opc_display_name": "Session Change User",
       "kconfig_symbol": "MUC_OPCUA_CU_SESSION_CHANGE_USER",
       "implementation_state": "implemented",
-      "depends_on": [],
+      "depends_on": [
+        "MUC_OPCUA_FACET_CORE_2022_SERVER"
+      ],
       "profile_defaults": {
         "nano": false,
-        "micro": true,
-        "embedded": true,
-        "standard": true,
+        "micro": false,
+        "embedded": false,
+        "standard": false,
         "full": true,
         "custom": false
       },
@@ -4460,12 +4617,14 @@
       "opc_display_name": "Security Administration",
       "kconfig_symbol": null,
       "implementation_state": "unimplemented",
-      "depends_on": [],
+      "depends_on": [
+        "MUC_OPCUA_FACET_CORE_2022_SERVER"
+      ],
       "profile_defaults": {
         "nano": false,
-        "micro": true,
-        "embedded": true,
-        "standard": true,
+        "micro": false,
+        "embedded": false,
+        "standard": false,
         "full": true,
         "custom": false
       },
@@ -4491,12 +4650,14 @@
       "opc_display_name": "Time Sync \u2013 OS based support",
       "kconfig_symbol": null,
       "implementation_state": "unimplemented",
-      "depends_on": [],
+      "depends_on": [
+        "MUC_OPCUA_FACET_SECURITY_TIME_SYNCHRONIZATION"
+      ],
       "profile_defaults": {
-        "nano": true,
-        "micro": true,
-        "embedded": true,
-        "standard": true,
+        "nano": false,
+        "micro": false,
+        "embedded": false,
+        "standard": false,
         "full": true,
         "custom": false
       },
@@ -4521,12 +4682,14 @@
       "opc_display_name": "Time Sync \u2013 IEEE 1588 (PTP)",
       "kconfig_symbol": null,
       "implementation_state": "unimplemented",
-      "depends_on": [],
+      "depends_on": [
+        "MUC_OPCUA_FACET_SECURITY_TIME_SYNCHRONIZATION"
+      ],
       "profile_defaults": {
         "nano": false,
-        "micro": true,
-        "embedded": true,
-        "standard": true,
+        "micro": false,
+        "embedded": false,
+        "standard": false,
         "full": true,
         "custom": false
       },
@@ -4551,12 +4714,14 @@
       "opc_display_name": "Time Sync \u2013 IEEE 802.1AS",
       "kconfig_symbol": null,
       "implementation_state": "unimplemented",
-      "depends_on": [],
+      "depends_on": [
+        "MUC_OPCUA_FACET_SECURITY_TIME_SYNCHRONIZATION"
+      ],
       "profile_defaults": {
         "nano": false,
-        "micro": true,
-        "embedded": true,
-        "standard": true,
+        "micro": false,
+        "embedded": false,
+        "standard": false,
         "full": true,
         "custom": false
       },
@@ -4582,12 +4747,14 @@
       "opc_display_name": "Time Sync \u2013 NTP",
       "kconfig_symbol": null,
       "implementation_state": "unimplemented",
-      "depends_on": [],
+      "depends_on": [
+        "MUC_OPCUA_FACET_SECURITY_TIME_SYNCHRONIZATION"
+      ],
       "profile_defaults": {
-        "nano": true,
-        "micro": true,
-        "embedded": true,
-        "standard": true,
+        "nano": false,
+        "micro": false,
+        "embedded": false,
+        "standard": false,
         "full": true,
         "custom": false
       },
@@ -4612,12 +4779,14 @@
       "opc_display_name": "Security Role Server Authorization",
       "kconfig_symbol": null,
       "implementation_state": "unimplemented",
-      "depends_on": [],
+      "depends_on": [
+        "MUC_OPCUA_FACET_CORE_2022_SERVER"
+      ],
       "profile_defaults": {
         "nano": false,
-        "micro": true,
-        "embedded": true,
-        "standard": true,
+        "micro": false,
+        "embedded": false,
+        "standard": false,
         "full": true,
         "custom": false
       },
@@ -4642,7 +4811,10 @@
       "opc_display_name": "Security Invalid user token",
       "kconfig_symbol": null,
       "implementation_state": "unimplemented",
-      "depends_on": [],
+      "depends_on": [
+        "MUC_OPCUA_FACET_USER_TOKEN_USER_NAME_PASSWORD_SERVER",
+        "MUC_OPCUA_FACET_USER_TOKEN_X509_CERTIFICATE_SERVER"
+      ],
       "profile_defaults": {
         "nano": false,
         "micro": false,
@@ -4664,7 +4836,8 @@
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
       "notes": "Servers shall take proper measures to protect against attacks on user identity tokens. Such an attack is assumed if repeated connection attempts with invalid user identity tokens happen. See ActivateSession Service in UA Part 4.",
-      "cu_optional": false
+      "cu_optional": false,
+      "depends_on_op": "or"
     },
     {
       "id": "opc_cu_2936",
@@ -4673,13 +4846,13 @@
       "kconfig_symbol": "MUC_OPCUA_CU_ATTRIBUTE_WRITE_STATUSCODE_TIMESTAMP",
       "implementation_state": "claimed",
       "depends_on": [
-        "MUC_OPCUA_CU_ATTRIBUTE_WRITE_VALUES"
+        "MUC_OPCUA_FACET_CORE_2022_SERVER"
       ],
       "profile_defaults": {
         "nano": false,
-        "micro": true,
-        "embedded": true,
-        "standard": true,
+        "micro": false,
+        "embedded": false,
+        "standard": false,
         "full": true,
         "custom": false
       },
@@ -4769,7 +4942,9 @@
       "opc_display_name": "Security User X509",
       "kconfig_symbol": null,
       "implementation_state": "unimplemented",
-      "depends_on": [],
+      "depends_on": [
+        "MUC_OPCUA_FACET_USER_TOKEN_X509_CERTIFICATE_SERVER"
+      ],
       "profile_defaults": {
         "nano": false,
         "micro": false,
@@ -4800,7 +4975,9 @@
       "opc_display_name": "Subscription PublishRequest Queue Overflow",
       "kconfig_symbol": null,
       "implementation_state": "unimplemented",
-      "depends_on": [],
+      "depends_on": [
+        "MUC_OPCUA_FACET_EMBEDDED_DATACHANGE_SUBSCRIPTION_2022_SERVER"
+      ],
       "profile_defaults": {
         "nano": false,
         "micro": true,
@@ -4831,13 +5008,13 @@
       "kconfig_symbol": "MUC_OPCUA_CU_ATTRIBUTE_WRITE_INDEX_RANGE",
       "implementation_state": "claimed",
       "depends_on": [
-        "MUC_OPCUA_CU_ATTRIBUTE_WRITE_VALUES"
+        "MUC_OPCUA_FACET_CORE_2022_SERVER"
       ],
       "profile_defaults": {
         "nano": false,
         "micro": false,
         "embedded": false,
-        "standard": true,
+        "standard": false,
         "full": true,
         "custom": false
       },
@@ -4894,12 +5071,14 @@
       "opc_display_name": "Base Info Diagnostics",
       "kconfig_symbol": "MUC_OPCUA_CU_BASE_INFO_DIAGNOSTICS",
       "implementation_state": "claimed",
-      "depends_on": [],
+      "depends_on": [
+        "MUC_OPCUA_FACET_CORE_2022_SERVER"
+      ],
       "profile_defaults": {
         "nano": false,
-        "micro": true,
-        "embedded": true,
-        "standard": true,
+        "micro": false,
+        "embedded": false,
+        "standard": false,
         "full": true,
         "custom": false
       },
@@ -4927,7 +5106,9 @@
       "opc_display_name": "View Basic 2",
       "kconfig_symbol": "MUC_OPCUA_CU_VIEW_BASIC_2",
       "implementation_state": "implemented",
-      "depends_on": [],
+      "depends_on": [
+        "MUC_OPCUA_FACET_CORE_2022_SERVER"
+      ],
       "profile_defaults": {
         "nano": true,
         "micro": true,
@@ -4962,7 +5143,9 @@
       "opc_display_name": "Subscription Multiple",
       "kconfig_symbol": null,
       "implementation_state": "unimplemented",
-      "depends_on": [],
+      "depends_on": [
+        "MUC_OPCUA_FACET_STANDARD_DATACHANGE_SUBSCRIPTION_2022_SERVER"
+      ],
       "profile_defaults": {
         "nano": false,
         "micro": false,
@@ -4993,7 +5176,9 @@
       "opc_display_name": "Subscription Retransmission Queue",
       "kconfig_symbol": null,
       "implementation_state": "unimplemented",
-      "depends_on": [],
+      "depends_on": [
+        "MUC_OPCUA_FACET_STANDARD_DATACHANGE_SUBSCRIPTION_2022_SERVER"
+      ],
       "profile_defaults": {
         "nano": false,
         "micro": false,
@@ -5024,7 +5209,9 @@
       "opc_display_name": "Security User Name Password 2",
       "kconfig_symbol": null,
       "implementation_state": "unimplemented",
-      "depends_on": [],
+      "depends_on": [
+        "MUC_OPCUA_FACET_USER_TOKEN_USER_NAME_PASSWORD_SERVER"
+      ],
       "profile_defaults": {
         "nano": false,
         "micro": false,
@@ -5054,12 +5241,14 @@
       "opc_display_name": "Security User Token Unencrypted",
       "kconfig_symbol": null,
       "implementation_state": "unimplemented",
-      "depends_on": [],
+      "depends_on": [
+        "MUC_OPCUA_FACET_USER_TOKEN_USER_NAME_PASSWORD_SERVER"
+      ],
       "profile_defaults": {
         "nano": false,
         "micro": false,
-        "embedded": true,
-        "standard": true,
+        "embedded": false,
+        "standard": false,
         "full": true,
         "custom": false
       },
@@ -5085,7 +5274,9 @@
       "opc_display_name": "Subscription Basic",
       "kconfig_symbol": null,
       "implementation_state": "unimplemented",
-      "depends_on": [],
+      "depends_on": [
+        "MUC_OPCUA_FACET_EMBEDDED_DATACHANGE_SUBSCRIPTION_2022_SERVER"
+      ],
       "profile_defaults": {
         "nano": false,
         "micro": true,
@@ -5116,12 +5307,14 @@
       "opc_display_name": "Time Sync - Configure Clock Skew",
       "kconfig_symbol": null,
       "implementation_state": "unimplemented",
-      "depends_on": [],
+      "depends_on": [
+        "MUC_OPCUA_FACET_SECURITY_TIME_SYNCHRONIZATION"
+      ],
       "profile_defaults": {
-        "nano": true,
-        "micro": true,
-        "embedded": true,
-        "standard": true,
+        "nano": false,
+        "micro": false,
+        "embedded": false,
+        "standard": false,
         "full": true,
         "custom": false
       },
@@ -5147,7 +5340,9 @@
       "opc_display_name": "Subscription Publish Basic",
       "kconfig_symbol": null,
       "implementation_state": "unimplemented",
-      "depends_on": [],
+      "depends_on": [
+        "MUC_OPCUA_FACET_EMBEDDED_DATACHANGE_SUBSCRIPTION_2022_SERVER"
+      ],
       "profile_defaults": {
         "nano": false,
         "micro": true,
@@ -5177,12 +5372,14 @@
       "opc_display_name": "Base Services Diagnostics",
       "kconfig_symbol": "MUC_OPCUA_CU_BASE_SERVICES_DIAGNOSTICS",
       "implementation_state": "claimed",
-      "depends_on": [],
+      "depends_on": [
+        "MUC_OPCUA_FACET_CORE_2022_SERVER"
+      ],
       "profile_defaults": {
         "nano": false,
-        "micro": true,
-        "embedded": true,
-        "standard": true,
+        "micro": false,
+        "embedded": false,
+        "standard": false,
         "full": true,
         "custom": false
       },
@@ -5239,12 +5436,14 @@
       "opc_display_name": "Time Sync \u2013 UA based support",
       "kconfig_symbol": null,
       "implementation_state": "unimplemented",
-      "depends_on": [],
+      "depends_on": [
+        "MUC_OPCUA_FACET_SECURITY_TIME_SYNCHRONIZATION"
+      ],
       "profile_defaults": {
         "nano": false,
-        "micro": true,
-        "embedded": true,
-        "standard": true,
+        "micro": false,
+        "embedded": false,
+        "standard": false,
         "full": true,
         "custom": false
       },
@@ -5270,7 +5469,9 @@
       "opc_display_name": "Time Sync - Support",
       "kconfig_symbol": null,
       "implementation_state": "unimplemented",
-      "depends_on": [],
+      "depends_on": [
+        "MUC_OPCUA_FACET_SECURITY_TIME_SYNCHRONIZATION"
+      ],
       "profile_defaults": {
         "nano": true,
         "micro": true,
@@ -5300,7 +5501,9 @@
       "opc_display_name": "Protocol UA TCP",
       "kconfig_symbol": "MUC_OPCUA_CU_PROTOCOL_UA_TCP",
       "implementation_state": "claimed",
-      "depends_on": [],
+      "depends_on": [
+        "MUC_OPCUA_FACET_UA_TCP_UA_SC_UA_BINARY"
+      ],
       "profile_defaults": {
         "nano": true,
         "micro": true,
@@ -5331,7 +5534,9 @@
       "opc_display_name": "UA Binary Encoding",
       "kconfig_symbol": "MUC_OPCUA_CU_UA_BINARY_ENCODING",
       "implementation_state": "claimed",
-      "depends_on": [],
+      "depends_on": [
+        "MUC_OPCUA_FACET_UA_TCP_UA_SC_UA_BINARY"
+      ],
       "profile_defaults": {
         "nano": true,
         "micro": true,
@@ -5363,7 +5568,9 @@
       "opc_display_name": "UA Secure Conversation",
       "kconfig_symbol": "MUC_OPCUA_CU_UA_SECURE_CONVERSATION",
       "implementation_state": "claimed",
-      "depends_on": [],
+      "depends_on": [
+        "MUC_OPCUA_FACET_UA_TCP_UA_SC_UA_BINARY"
+      ],
       "profile_defaults": {
         "nano": true,
         "micro": true,
@@ -5394,7 +5601,9 @@
       "opc_display_name": "Address Space Base",
       "kconfig_symbol": "MUC_OPCUA_CU_ADDRESS_SPACE_BASE",
       "implementation_state": "claimed",
-      "depends_on": [],
+      "depends_on": [
+        "MUC_OPCUA_FACET_CORE_2022_SERVER"
+      ],
       "profile_defaults": {
         "nano": true,
         "micro": true,
@@ -5426,7 +5635,9 @@
       "opc_display_name": "Session Base",
       "kconfig_symbol": "MUC_OPCUA_CU_SESSION_BASE",
       "implementation_state": "claimed",
-      "depends_on": [],
+      "depends_on": [
+        "MUC_OPCUA_FACET_CORE_2022_SERVER"
+      ],
       "profile_defaults": {
         "nano": true,
         "micro": true,
@@ -5458,7 +5669,9 @@
       "opc_display_name": "Base Info Core Structure 2",
       "kconfig_symbol": "MUC_OPCUA_CU_CORE_STRUCTURE_2",
       "implementation_state": "claimed",
-      "depends_on": [],
+      "depends_on": [
+        "MUC_OPCUA_FACET_CORE_2022_SERVER"
+      ],
       "profile_defaults": {
         "nano": true,
         "micro": true,
@@ -5489,12 +5702,14 @@
       "opc_display_name": "Base Info Core Views Folder",
       "kconfig_symbol": "MUC_OPCUA_CU_CORE_VIEWS_FOLDER",
       "implementation_state": "claimed",
-      "depends_on": [],
+      "depends_on": [
+        "MUC_OPCUA_FACET_CORE_2022_SERVER"
+      ],
       "profile_defaults": {
-        "nano": true,
-        "micro": true,
-        "embedded": true,
-        "standard": true,
+        "nano": false,
+        "micro": false,
+        "embedded": false,
+        "standard": false,
         "full": true,
         "custom": true
       },
@@ -5521,7 +5736,9 @@
       "opc_display_name": "Base Info Server Capabilities 2",
       "kconfig_symbol": "MUC_OPCUA_CU_SERVER_CAPABILITIES_2",
       "implementation_state": "claimed",
-      "depends_on": [],
+      "depends_on": [
+        "MUC_OPCUA_FACET_CORE_2022_SERVER"
+      ],
       "profile_defaults": {
         "nano": true,
         "micro": true,
@@ -5552,7 +5769,9 @@
       "opc_display_name": "Session General Service Behaviour",
       "kconfig_symbol": "MUC_OPCUA_CU_SESSION_GENERAL_SERVICE",
       "implementation_state": "claimed",
-      "depends_on": [],
+      "depends_on": [
+        "MUC_OPCUA_FACET_CORE_2022_SERVER"
+      ],
       "profile_defaults": {
         "nano": true,
         "micro": true,
@@ -5584,12 +5803,14 @@
       "opc_display_name": "Base Info Namespace Metadata",
       "kconfig_symbol": "MUC_OPCUA_CU_NAMESPACE_METADATA",
       "implementation_state": "claimed",
-      "depends_on": [],
+      "depends_on": [
+        "MUC_OPCUA_FACET_CORE_2022_SERVER"
+      ],
       "profile_defaults": {
-        "nano": true,
-        "micro": true,
-        "embedded": true,
-        "standard": true,
+        "nano": false,
+        "micro": false,
+        "embedded": false,
+        "standard": false,
         "full": true,
         "custom": true
       },
@@ -5621,8 +5842,8 @@
       "profile_defaults": {
         "nano": false,
         "micro": false,
-        "embedded": true,
-        "standard": true,
+        "embedded": false,
+        "standard": false,
         "full": true,
         "custom": false
       },
@@ -6207,9 +6428,9 @@
       "depends_on": [],
       "profile_defaults": {
         "nano": false,
-        "micro": true,
-        "embedded": true,
-        "standard": true,
+        "micro": false,
+        "embedded": false,
+        "standard": false,
         "full": true,
         "custom": false
       },
@@ -6234,12 +6455,14 @@
       "opc_display_name": "Base Info Engineering Units",
       "kconfig_symbol": "MUC_OPCUA_CU_BASE_INFO_ENGINEERING_UNITS",
       "implementation_state": "claimed",
-      "depends_on": [],
+      "depends_on": [
+        "MUC_OPCUA_FACET_CORE_2022_SERVER"
+      ],
       "profile_defaults": {
         "nano": false,
-        "micro": true,
-        "embedded": true,
-        "standard": true,
+        "micro": false,
+        "embedded": false,
+        "standard": false,
         "full": true,
         "custom": false
       },
@@ -6269,9 +6492,9 @@
       "depends_on": [],
       "profile_defaults": {
         "nano": false,
-        "micro": true,
-        "embedded": true,
-        "standard": true,
+        "micro": false,
+        "embedded": false,
+        "standard": false,
         "full": true,
         "custom": false
       },
