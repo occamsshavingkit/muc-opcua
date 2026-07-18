@@ -129,6 +129,30 @@ graph-resolved `profile_defaults`.
   (`MULTIPLE_CONNECTIONS` / `MULTI_CHUNK`). For all named profiles the output is
   unchanged. If the old custom-build convenience is wanted, model it explicitly
   in `profile_defaults` rather than via a facet shortcut.
+- **Dropped implementation prerequisites in custom builds.** `resolve_into`
+  overwrites a graph-mapped CU's `depends_on` with facet membership, discarding
+  any hand-authored inter-CU dependency. Most of those were fabricated *spec*
+  chains (SERVERTYPE→BASE_TYPES→DATATYPES) that facet co-membership reconstructs
+  — the deliberate cleanup. But a few encoded genuine *code* prerequisites: on
+  `main`, `ATTRIBUTE_WRITE_STATUSCODE_TIMESTAMP` and
+  `ATTRIBUTE_WRITE_INDEX_RANGE`
+  declared `depends_on: [ATTRIBUTE_WRITE_VALUES]` (they build on the base
+  write-values implementation). After resolution that guard is gone, so a custom
+  config could select the sub-feature with `ATTRIBUTE_WRITE_VALUES=n`. Named
+  profiles are unaffected (the facet enables them together). If custom-build
+  build-safety matters, the fix is a dedicated implementation-prerequisite layer
+  (a manifest field generate.py ANDs into `depends on`) kept distinct from the
+  graph-derived spec `depends_on` — preserving "graph is the sole source of spec
+  structure" while restoring real code guards. Same class as the SESSION_TIMEOUT
+  item above, but potentially compile-time rather than default-convenience.
+- **Multi-facet CUs are emitted under a single facet's menu.** For a CU that
+  belongs to more than one facet, `resolve_into` yields `depends_on_op == "or"`,
+  but `generate.py` still nests the CU inside one canonical facet's `if <facet>`
+  block. So a custom config enabling only the *other* facet won't surface the CU
+  even though its `depends on` lists both. Named profiles bundle the facets, so
+  this only affects hand-rolled custom configs; it is pre-existing menu-nesting
+  behavior, not introduced by the graph join, but the OR now makes the mismatch
+  visible.
 - **`isOptional: null` treated as mandatory** (`graph_deps.py`). The committed
   graph contains no nulls, so this is defensive only; consider asserting no-nulls
   at load, or treating null as optional (the safer direction — it turns CUs off,

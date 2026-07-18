@@ -6,7 +6,7 @@ _HERE = os.path.dirname(os.path.abspath(__file__))
 if _HERE not in sys.path:
     sys.path.insert(0, _HERE)
 
-import graph_deps as d  # noqa: E402
+import graph_deps as d  # noqa: E402  # pylint: disable=wrong-import-position
 
 
 def _fixtures():
