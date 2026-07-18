@@ -29,7 +29,7 @@ need and can inspect or trim the resolved feature set with `menuconfig`.
 - **Tiny flash.** Measured snapshot (2026-07-18, reproduce with
   `scripts/measure_size.sh all`): a complete Nano server is **23.9 KiB**
   (24,472 B) of Arm Cortex-M0+ `-Os` core `.text`; Micro is **41.4 KiB**
-  (42,368 B); Standard 2017 is **80.9 KiB** (82,797 B). Every profile has
+  (42,368 B); Standard 2017 is **86.9 KiB** (89,042 B). Every profile has
   0 B `.data` and 0 B `.bss` — the library holds no mutable static state and
   never calls `malloc`.
 - **Freestanding & portable.** Plain C11 core with no OS assumptions. Hardware and OS
@@ -68,9 +68,9 @@ Measured 2026-07-18 (`scripts/measure_size.sh all`, Arm Cortex-M0+ `-Os` archive
 |---------|-------|----------------|
 | nano | 24,472 B | Nano Embedded Device 2017 (Core: Read/Browse/Discovery/RegisterNodes + Base Info + UserName/Password) |
 | micro | 42,368 B | Micro Embedded Device 2017 (Nano + basic subscriptions + 2 parallel sessions) |
-| embedded | 82,449 B | Embedded 2017 UA Server (Micro + Standard DataChange + Security + Type System) |
-| standard | 82,797 B | Standard 2017 UA Server (Embedded + Enhanced DataChange capacity + X509) |
-| full | 114,994 B | — (everything on: Write, Events, Data Access, Method Server, History, Query, NodeManagement, PubSub, Aggregate, Diagnostics, Reverse Connect, Client Redundancy, ECC, …) |
+| embedded | 88,694 B | Embedded 2017 UA Server (Micro + Standard DataChange + Security + Type System) |
+| standard | 89,042 B | Standard 2017 UA Server (Embedded + Enhanced DataChange capacity + X509) |
+| full | 121,239 B | — (everything on: Write, Events, Data Access, Method Server, History, Query, NodeManagement, PubSub, Aggregate, Diagnostics, Reverse Connect, Client Redundancy, ECC, …) |
 
 The base type-system CUs (3188/3185, spec 080b) add ~3.1 KB `.text` to
 `embedded`/`standard` and ~2.9 KB to `full`; `nano`/`micro` are unaffected (their
