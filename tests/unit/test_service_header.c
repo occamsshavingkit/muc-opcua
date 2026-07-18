@@ -87,8 +87,7 @@ void test_base_services_diagnostics_symbol_matches_profile_surface(void) {
         return;
     }
 
-    TEST_ASSERT_TRUE_MESSAGE(TEST_HAS_BASE_SERVICES_DIAGNOSTICS,
-                             "full builds must expose opc_cu_3983");
+    TEST_ASSERT_TRUE_MESSAGE(TEST_HAS_BASE_SERVICES_DIAGNOSTICS, "full builds must expose opc_cu_3983");
 }
 
 void test_response_header_service_diagnostics_follow_return_diagnostics_gate(void) {
