@@ -1,8 +1,12 @@
 #!/usr/bin/env python3
-"""Pull the complete OPC UA server-profile composition graph (pg=171) from the
-profiles.opcfoundation.org REST API: every profile/facet's child profiles/facets
-(includedprofiles) and child CUs (includedconformanceunits), each edge flagged
-isOptional. Authoritative source for building Kconfig dependency structure."""
+"""Pull the OPC UA server-profile composition graph from the profiles API.
+
+Fetches the complete composition graph (pg=171) from
+profiles.opcfoundation.org: every profile/facet's child profiles/facets
+(includedprofiles) and child CUs (includedconformanceunits), each edge
+flagged isOptional. Authoritative source for building Kconfig dependency
+structure.
+"""
 import json, time, urllib.request, sys
 
 BASE = "https://profiles.opcfoundation.org/api"
@@ -12,7 +16,10 @@ def get(path):
     for attempt in range(3):
         try:
             req = urllib.request.Request(BASE + path, headers={"Accept": "application/json"})
-            with urllib.request.urlopen(req, timeout=30) as r:
+            # path is always one of this module's own fixed literal endpoint
+            # strings below (never attacker-controlled); BASE is a hardcoded
+            # https constant. Maintainer-only fetch tool.
+            with urllib.request.urlopen(req, timeout=30) as r:  # nosec B310  # nosemgrep: dynamic-urllib-use-detected, python_urlopen_rule-urllib-urlopen
                 if "application/json" not in r.headers.get("Content-Type", ""):
                     return None
                 return json.load(r)
@@ -25,6 +32,7 @@ def get(path):
 
 def result(d):
     return d.get("result", []) if isinstance(d, dict) else []
+
 
 # 1. master lists
 profiles = result(get("/profile/?pg=171&all=1"))          # profiles + facets

@@ -105,10 +105,11 @@ _IMPLEMENTED = {"implemented", "claimed", "documented"}
 
 
 def resolve_into(manifest, graph):
-    """Join the graph into ``manifest`` in memory: overwrite depends_on/profile_defaults
-    on every graph-mapped conformance_unit; leave graph-absent items untouched.
+    """Join the graph into ``manifest`` in memory.
 
-    Never writes to disk -- callers own the manifest's lifecycle.
+    Overwrite depends_on/profile_defaults on every graph-mapped
+    conformance_unit; leave graph-absent items untouched. Never writes to
+    disk -- callers own the manifest's lifecycle.
     """
     idx = build_index(manifest)
     graph_cu_names = {

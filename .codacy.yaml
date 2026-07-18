@@ -59,10 +59,25 @@ engines:
       # Spec Kit artifacts are generated planning documents. Their table and
       # line-length style does not affect shipped documentation or code quality.
       - 'specs/**'
+      # Agent planning docs (superpowers skill), same rationale as specs/**
+      # above: generated working notes for a development session, not
+      # shipped documentation. Their table/line-length style is not ours.
+      - 'docs/superpowers/plans/**'
       # Generated conformance matrices intentionally contain long table cells
       # for OPC references and profile/test lists.
       - 'docs/conformance/opc-profile-roadmap.md'
       - 'tests/conformance/claim_test_map.md'
+
+  # Semgrep flags bare `assert` as "non-test code" when the statement sits
+  # inside a function but the surrounding file isn't recognized as a test
+  # module by its own heuristics. The pytest-style unit tests colocated with
+  # the profile-manifest tooling use bare assert idiomatically -- the correct
+  # pattern for this codebase's test files (see tests/** exemptions for other
+  # engines above: test code is not deployed and is exempted from the
+  # security/complexity engines throughout this file).
+  semgrep:
+    exclude_paths:
+      - 'scripts/profile_manifest/test_*.py'
 
   # Shell scripts under scripts/ are CI infrastructure; pipeline warnings
   # are not deployment-relevant.

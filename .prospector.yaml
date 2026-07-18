@@ -1,0 +1,11 @@
+# Prospector configuration for the OPC UA profile-manifest tooling
+# (scripts/profile_manifest/**). The codebase convention for module/function
+# docstrings is a first-line summary (PEP 257 / pydocstyle D212 style, e.g.
+# generate.py, validate.py); pydocstyle's default convention prefers a
+# second-line summary (D213), which conflicts with that convention. Disable
+# the second-line-summary rule (and its paired D203) so the codebase's
+# actual, consistent docstring style is accepted.
+pydocstyle:
+  disable:
+    - D203
+    - D213

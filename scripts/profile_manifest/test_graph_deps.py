@@ -1,4 +1,4 @@
-import json, graph_deps as d
+import graph_deps as d
 
 
 def _fixtures():
@@ -21,13 +21,13 @@ def _fixtures():
 
 
 def test_facet_symbol_by_graph_id():
-    graph, manifest = _fixtures()
+    _, manifest = _fixtures()
     idx = d.build_index(manifest)
     assert d.facet_symbol_for_graph_id(idx, "1219") == "MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER"
 
 
 def test_item_for_cu_name_prefers_symbol_carrier():
-    graph, manifest = _fixtures()
+    _, manifest = _fixtures()
     idx = d.build_index(manifest)
     it = d.selectable_item_for_cu_name(idx, "Base Info ServerType")
     assert it["kconfig_symbol"] == "MUC_OPCUA_CU_BASE_INFO_SERVERTYPE"

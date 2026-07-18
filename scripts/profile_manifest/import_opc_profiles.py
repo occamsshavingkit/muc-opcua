@@ -45,11 +45,13 @@ _GRAPH_PATH = os.path.join(
 
 
 def _validate_resolved(manifest: dict) -> list:
-    """Validate the graph-resolved view of a manifest without mutating the
-    on-disk object. Graph-mapped items no longer store derived
-    depends_on/profile_defaults (they are joined live from the composition
-    graph), so validation must run against the resolved copy — never against
-    the stripped manifest that gets written back to disk."""
+    """Validate the graph-resolved view of a manifest without mutating it.
+
+    Graph-mapped items no longer store derived depends_on/profile_defaults
+    (they are joined live from the composition graph), so validation must
+    run against the resolved copy — never against the stripped manifest
+    that gets written back to disk.
+    """
     resolved = graph_deps.resolve_into(
         copy.deepcopy(manifest), graph_deps.load_graph(_GRAPH_PATH)
     )
