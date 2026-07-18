@@ -20,19 +20,19 @@ Backing test column: comma-separated ctest names (as registered).
 | Claim / conformance unit | OPC UA § | Profiles | Backing test |
 |--------------------------|----------|----------|--------------|
 | Secure channel message crypto | OPC-10000-7 §4.3 | micro, embedded, standard, full | test_secure_handshake_modern |
-| Address Space AddIn Reference |  | micro, embedded, standard, full | test_profile_surface |
-| Address Space AddIn DefaultInstanceBrowsename |  | micro, embedded, standard, full | test_profile_surface |
-| Base Info LocalTime |  | micro, embedded, standard, full | test_profile_surface |
-| Base Info Selection List |  | micro, embedded, standard, full | test_profile_surface |
+| Address Space AddIn Reference |  | full | test_profile_surface |
+| Address Space AddIn DefaultInstanceBrowsename |  | full | test_profile_surface |
+| Base Info LocalTime |  | full | test_profile_surface |
+| Base Info Selection List |  | full | test_profile_surface |
 | Address Space Atomicity |  | all | test_profile_surface |
 | Address Space Full Array Only |  | all | test_profile_surface |
-| Base Info ValueAsText |  | micro, embedded, standard, full | test_profile_surface |
-| Base Info OptionSet |  | micro, embedded, standard, full | test_profile_surface |
-| Base Info Estimated Return Time |  | micro, embedded, standard, full | test_profile_surface |
-| Address Space Interfaces |  | micro, embedded, standard, full | test_profile_surface |
-| Base Info Locations Object |  | micro, embedded, standard, full | test_profile_surface |
-| Address Space NonVolatile and Constant |  | micro, embedded, standard, full | test_profile_surface |
-| Base Info Currency |  | micro, embedded, standard, full | test_profile_surface |
+| Base Info ValueAsText |  | full | test_profile_surface |
+| Base Info OptionSet |  | full | test_profile_surface |
+| Base Info Estimated Return Time |  | full | test_profile_surface |
+| Address Space Interfaces |  | full | test_profile_surface |
+| Base Info Locations Object |  | full | test_profile_surface |
+| Address Space NonVolatile and Constant |  | full | test_profile_surface |
+| Base Info Currency |  | full | test_profile_surface |
 | Base Info ServerType |  | embedded, standard, full | test_type_system |
 | Core 2022 Server Facet | OPC-10000-4 §5.12/5.13 | micro, embedded, standard, full | test_subscriptions, test_subscriptions_errors |
 | Core 2022 Server Facet | OPC-10000-7 | embedded, standard, full | test_subscriptions_capacity, test_subscription_deadband, test_subscription_publish |
@@ -71,21 +71,21 @@ Backing test column: comma-separated ctest names (as registered).
 | View TranslateBrowsePath | OPC-10000-4 §5.9.4 | all | test_browse_service, test_view_services |
 | Discovery Get Endpoints | OPC-10000-4 §5.5.1, 5.5.4 | all | test_discovery_endpoint, test_discovery_services |
 | Discovery Find Servers Self | OPC-10000-4 §5.5.2 | all | test_discovery_services, test_discovery_endpoint |
-| Attribute Write Values | OPC-10000-4 §5.11.4 | micro, embedded, standard, full | test_write_value_gate, test_write_service |
-| Session Change User | OPC-10000-4 §5.7.3 | micro, embedded, standard, full | test_session, test_session_auth |
-| Attribute Write StatusCode & Timestamp | OPC-10000-4 §5.11.4 | micro, embedded, standard, full | test_write_service, test_write_response |
-| Attribute Write Index | OPC-10000-4 §5.11.4 | standard, full | test_write_service |
-| Base Info Diagnostics | OPC-10000-5 §6.3.1, 6.3.3, 8.3.2, 12.9 | micro, embedded, standard, full | test_diagnostics, test_profile_surface |
+| Attribute Write Values | OPC-10000-4 §5.11.4 | full | test_write_value_gate, test_write_service |
+| Session Change User | OPC-10000-4 §5.7.3 | full | test_session, test_session_auth |
+| Attribute Write StatusCode & Timestamp | OPC-10000-4 §5.11.4 | full | test_write_service, test_write_response |
+| Attribute Write Index | OPC-10000-4 §5.11.4 | full | test_write_service |
+| Base Info Diagnostics | OPC-10000-5 §6.3.1, 6.3.3, 8.3.2, 12.9 | full | test_diagnostics, test_profile_surface |
 | View Basic 2 | OPC-10000-4 §5.9.2, 5.9.3 | all | test_browse_service, test_browse_limits, test_view_services |
-| Base Services Diagnostics | OPC-10000-4 §7.32, 7.38 | micro, embedded, standard, full | test_service_header |
+| Base Services Diagnostics | OPC-10000-4 §7.32, 7.38 | full | test_service_header |
 | Protocol UA TCP | OPC-10000-6 §7.1 | all | test_tcp_connection |
 | UA Binary Encoding | OPC-10000-6 §5 | all | test_binary_primitives, test_binary_nodeid |
 | UA Secure Conversation | OPC-10000-6 §6 | all | test_secure_channel |
 | Address Space Base | OPC-10000-3 §4 | all | test_address_space_validation, test_base_server_behaviour |
 | Session Base | OPC-10000-4 §5.6 | all | test_session, test_session_auth |
 | Base Info Core Structure 2 | OPC-10000-3 §4 | all | test_base_server_behaviour |
-| Base Info Core Views Folder | OPC-10000-3 §4 | all | test_browse_service, test_view_services |
+| Base Info Core Views Folder | OPC-10000-3 §4 | full | test_browse_service, test_view_services |
 | Base Info Server Capabilities 2 | OPC-10000-3 §4 | all | test_base_server_behaviour |
 | Session General Service Behaviour | OPC-10000-4 §5.6 | all | test_dispatch_session_order, test_base_server_behaviour |
-| Base Info Namespace Metadata | OPC-10000-3 §4 | all | test_base_server_behaviour, test_read_browsename_namespace |
-| Base Info Engineering Units |  | micro, embedded, standard, full | test_profile_surface |
+| Base Info Namespace Metadata | OPC-10000-3 §4 | full | test_base_server_behaviour, test_read_browsename_namespace |
+| Base Info Engineering Units |  | full | test_profile_surface |

@@ -37,6 +37,7 @@ if _PKG_PARENT not in sys.path:
     sys.path.insert(0, _PKG_PARENT)
 
 from profile_manifest.model import load_manifest, validate_manifest  # noqa: E402
+from profile_manifest import graph_deps  # noqa: E402
 
 _DEFAULT_PROFILES = ("nano", "micro", "embedded", "standard", "full", "custom")
 _NAMED_PROFILES = ("nano", "micro", "embedded", "standard", "full")
@@ -1464,6 +1465,12 @@ def main(argv: list[str] | None = None) -> int:
         print("manifest: FAIL")
         print("  load error: " + str(exc))
         return 1
+
+    # Live join: validate the graph-resolved depends_on/profile_defaults --
+    # the same values generate.py would emit -- not the manifest's raw
+    # (possibly stale/absent) stored fields. In-memory only.
+    graph_path = os.path.join(_REPO_ROOT, "profiles", "opcua-profile-graph.json")
+    graph_deps.resolve_into(manifest, graph_deps.load_graph(graph_path))
 
     errors = validate_manifest(manifest)
     errors.extend(_check_in_scope_071_manifest_requirements(manifest))
