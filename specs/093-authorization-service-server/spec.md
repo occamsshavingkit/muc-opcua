@@ -3,7 +3,7 @@
 **Feature Branch**: `093-authorization-service-server`  
 **Created**: 2026-07-19  
 **Status**: Draft  
-**Input**: Authorization Service Server Facet — OAuth2/JWT access token support for OPC UA ActivateSession. Required for v1.05.02 profile compliance (Standard/Full). Enables the server to act as an OAuth2 Resource Server, validating JWT bearer tokens presented by clients during session activation.
+**Input**: Authorization Service Server Facet — OAuth2/JWT access token support for OPC UA ActivateSession. Targets the v1.05.02 Standard and Full profile scopes (not yet profile-compliant: pending external CTT evidence). Enables the server to act as an OAuth2 Resource Server, validating JWT bearer tokens presented by clients during session activation.
 
 ## User Scenarios & Testing *(mandatory)*
 

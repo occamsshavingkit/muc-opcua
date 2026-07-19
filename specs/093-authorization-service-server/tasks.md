@@ -54,18 +54,18 @@
 
 > Write these tests first and confirm they fail before implementation.
 
-- [ ] T012 [P] [US1] Add JWT unit test: valid RS256 token → `MU_JWT_OK`, claims correctly extracted in `tests/unit/test_jwt.c` per spec.md SC-001, FR-003
-- [ ] T013 [P] [US1] Add JWT unit test: expired token → `MU_JWT_ERR_EXPIRED` in `tests/unit/test_jwt.c` per spec.md SC-002, FR-003
-- [ ] T014 [P] [US1] Add JWT unit test: wrong signing key → `MU_JWT_ERR_SIGNATURE` in `tests/unit/test_jwt.c` per spec.md SC-003, FR-003
-- [ ] T015 [P] [US1] Add JWT unit test: wrong issuer → `MU_JWT_ERR_ISSUER`, wrong audience → `MU_JWT_ERR_AUDIENCE`, missing `sub` → `MU_JWT_ERR_NO_SUB` in `tests/unit/test_jwt.c` per FR-003, FR-007
-- [ ] T016 [P] [US1] Add JWT unit test: malformed (not three segments) → `MU_JWT_ERR_MALFORMED`, bad Base64 → `MU_JWT_ERR_BASE64`, unsupported alg → `MU_JWT_ERR_UNSUPPORTED_ALG` in `tests/unit/test_jwt.c` per spec.md Edge Cases
-- [ ] T017 [P] [US1] Add JWT unit test: `nbf` in future → rejected, no `exp` → rejected, no configured issuers → `MU_JWT_ERR_NO_CONFIGURED_ISSUERS` in `tests/unit/test_jwt.c` per spec.md Edge Cases, FR-003
+- [x] T012 [P] [US1] Add JWT unit test: valid RS256 token → `MU_JWT_OK`, claims correctly extracted in `tests/unit/test_jwt.c` per spec.md SC-001, FR-003
+- [x] T013 [P] [US1] Add JWT unit test: expired token → `MU_JWT_ERR_EXPIRED` in `tests/unit/test_jwt.c` per spec.md SC-002, FR-003
+- [x] T014 [P] [US1] Add JWT unit test: wrong signing key → `MU_JWT_ERR_SIGNATURE` in `tests/unit/test_jwt.c` per spec.md SC-003, FR-003
+- [x] T015 [P] [US1] Add JWT unit test: wrong issuer → `MU_JWT_ERR_ISSUER`, wrong audience → `MU_JWT_ERR_AUDIENCE`, missing `sub` → `MU_JWT_ERR_NO_SUB` in `tests/unit/test_jwt.c` per FR-003, FR-007
+- [x] T016 [P] [US1] Add JWT unit test: malformed (not three segments) → `MU_JWT_ERR_MALFORMED`, bad Base64 → `MU_JWT_ERR_BASE64`, unsupported alg → `MU_JWT_ERR_UNSUPPORTED_ALG` in `tests/unit/test_jwt.c` per spec.md Edge Cases
+- [x] T017 [P] [US1] Add JWT unit test: `nbf` in future → rejected, no `exp` → rejected, no configured issuers → `MU_JWT_ERR_NO_CONFIGURED_ISSUERS` in `tests/unit/test_jwt.c` per spec.md Edge Cases, FR-003
 
 ### Implementation for User Story 1
 
-- [ ] T018 [US1] Hook JWT validation into `handle_activate_session` in `src/core/service_dispatch/activate_session.c`: detect `tokenType` URI `urn:ietf:params:oauth:token-type:jwt`, extract raw JWT from `tokenData` ByteString, call `mu_jwt_validate()`, map result to `Bad_IdentityTokenInvalid` vs `Bad_IdentityTokenRejected` per OPC-10000-4 §5.7.3 Table 41, FR-002, FR-007, FR-008
-- [ ] T019 [US1] Extract `sub` claim as session user identity in `src/core/service_dispatch/activate_session.c` per FR-006, OPC-10000-5 §6.4.7
-- [ ] T020 [US1] Add integration test: ActivateSession with valid JWT → session created, user identity correct in `tests/integration/test_jwt_activate_session.c` per spec.md US1 Acceptance Scenario 1, SC-001
+- [x] T018 [US1] Hook JWT validation into `handle_activate_session` in `src/core/service_dispatch/activate_session.c`: detect `tokenType` URI `urn:ietf:params:oauth:token-type:jwt`, extract raw JWT from `tokenData` ByteString, call `mu_jwt_validate()`, map result to `Bad_IdentityTokenInvalid` vs `Bad_IdentityTokenRejected` per OPC-10000-4 §5.7.3 Table 41, FR-002, FR-007, FR-008
+- [x] T019 [US1] Extract `sub` claim as session user identity in `src/core/service_dispatch/activate_session.c` per FR-006, OPC-10000-5 §6.4.7
+- [x] T020 [US1] Add integration test: ActivateSession with valid JWT → session created, user identity correct in `tests/integration/test_jwt_activate_session.c` per spec.md US1 Acceptance Scenario 1, SC-001
 
 **Checkpoint**: JWT session activation works end-to-end. All P1 tests pass.
 

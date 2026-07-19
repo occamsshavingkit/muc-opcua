@@ -202,7 +202,10 @@ void mu_claim_scan(const char *json, size_t json_len, mu_jwt_claims_t *out) {
             return;
         }
 
-        /* Match against the six registered claim names (RFC 7519 §4.1). */
+        /* Match against the six registered claim names (RFC 7519 §4.1).
+           copy_json_string returns the absolute index just past the closing
+           quote (it scans from `start` but returns the new `i`, not a length),
+           so we assign its result to `i` directly. */
         const char *key = json + key_start;
         if (key_len == 3 && memcmp(key, "iss", 3) == 0) {
             if (json[value_start] == '"') {
@@ -210,7 +213,7 @@ void mu_claim_scan(const char *json, size_t json_len, mu_jwt_claims_t *out) {
                 if (n < 0) {
                     return;
                 }
-                i = value_start + 1 + (size_t)n;
+                i = (size_t)n;
                 continue;
             }
         } else if (key_len == 3 && memcmp(key, "sub", 3) == 0) {
@@ -219,7 +222,7 @@ void mu_claim_scan(const char *json, size_t json_len, mu_jwt_claims_t *out) {
                 if (n < 0) {
                     return;
                 }
-                i = value_start + 1 + (size_t)n;
+                i = (size_t)n;
                 continue;
             }
         } else if (key_len == 3 && memcmp(key, "aud", 3) == 0) {
@@ -228,7 +231,7 @@ void mu_claim_scan(const char *json, size_t json_len, mu_jwt_claims_t *out) {
                 if (n < 0) {
                     return;
                 }
-                i = value_start + 1 + (size_t)n;
+                i = (size_t)n;
                 continue;
             }
             if (json[value_start] == '[') {
