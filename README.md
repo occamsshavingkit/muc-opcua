@@ -68,9 +68,9 @@ Measured 2026-07-18 (`scripts/measure_size.sh all`, Arm Cortex-M0+ `-Os` archive
 |---------|-------|----------------|
 | nano | 24,472 B | Nano Embedded Device 2017 (Core: Read/Browse/Discovery/RegisterNodes + Base Info + UserName/Password) |
 | micro | 42,368 B | Micro Embedded Device 2017 (Nano + basic subscriptions + 2 parallel sessions) |
-| embedded | 88,694 B | Embedded 2017 UA Server (Micro + Standard DataChange + Security + Type System) |
-| standard | 89,042 B | Standard 2017 UA Server (Embedded + Enhanced DataChange capacity + X509) |
-| full | 121,239 B | — (everything on: Write, Events, Data Access, Method Server, History, Query, NodeManagement, PubSub, Aggregate, Diagnostics, Reverse Connect, Client Redundancy, ECC, …) |
+| embedded | 101,902 B | Embedded 2017 UA Server (Micro + Standard DataChange + Security + Type System) |
+| standard | 102,260 B | Standard 2017 UA Server (Embedded + Enhanced DataChange capacity + X509) |
+| full | 134,447 B | — (everything on: Write, Events, Data Access, Method Server, History, Query, NodeManagement, PubSub, Aggregate, Diagnostics, Reverse Connect, Client Redundancy, ECC, …) |
 
 The base type-system CUs (3188/3185, spec 080b) add ~3.1 KB `.text` to
 `embedded`/`standard` and ~2.9 KB to `full`; `nano`/`micro` are unaffected (their
@@ -79,7 +79,11 @@ spec 083 — 61 nodes) adds a further **+9,280 B** to `embedded`/`standard`/`ful
 alike (identical delta once the type system is on); `nano`/`micro` are unaffected.
 Making `ServerStatus.Value` readable as a `ServerStatusDataType` (CU 3802/3808, spec
 084) adds ~0.6–0.7 KB to **every** profile (it lives in the core Server object, so
-`nano`/`micro` grow too).
+`nano`/`micro` grow too). The remaining diagnostics type-system InstanceDeclarations
+(CU 5801 part 2, spec 092) — `SubscriptionDiagnosticsType` (31 members),
+`SessionDiagnosticsVariableType` (43 members), `SessionDiagnosticsObjectType` (4),
+and `ServerRedundancyType` (2) — add ~13.2 KB to `embedded`/`standard`/`full`;
+`nano`/`micro` are unaffected.
 
 Built with LTO (`MUC_OPCUA_LTO=ON`, the default). The `nano`/`micro`/`embedded`
 profiles are strictly no-heap (`MUC_OPCUA_ALLOW_HEAP=OFF`): 0 B `.data`, 0 B `.bss`,

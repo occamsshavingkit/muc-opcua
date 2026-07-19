@@ -718,6 +718,176 @@ static void test_servertype_datatype_refs_not_dangling(void) {
 }
 #endif
 
+#if MUC_OPCUA_CU_BASE_INFO_SERVERTYPE && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+
+/* spec 092 (CU 5801): SubscriptionDiagnosticsType(2172)'s 31 own InstanceDeclarations. */
+static void test_subscription_diagnostics_type_instance_declarations(void) {
+    static const mu_type_decl_t uint32_decls[] = {
+        {2174u, "SubscriptionId", 7u, -1},
+        {2177u, "MaxKeepAliveCount", 7u, -1},
+        {8888u, "MaxLifetimeCount", 7u, -1},
+        {2179u, "MaxNotificationsPerPublish", 7u, -1},
+        {2181u, "ModifyCount", 7u, -1},
+        {2182u, "EnableCount", 7u, -1},
+        {2183u, "DisableCount", 7u, -1},
+        {2184u, "RepublishRequestCount", 7u, -1},
+        {2185u, "RepublishMessageRequestCount", 7u, -1},
+        {2186u, "RepublishMessageCount", 7u, -1},
+        {2187u, "TransferRequestCount", 7u, -1},
+        {2188u, "TransferredToAltClientCount", 7u, -1},
+        {2189u, "TransferredToSameClientCount", 7u, -1},
+        {2190u, "PublishRequestCount", 7u, -1},
+        {2191u, "DataChangeNotificationsCount", 7u, -1},
+        {2998u, "EventNotificationsCount", 7u, -1},
+        {2193u, "NotificationsCount", 7u, -1},
+        {8889u, "LatePublishRequestCount", 7u, -1},
+        {8890u, "CurrentKeepAliveCount", 7u, -1},
+        {8891u, "CurrentLifetimeCount", 7u, -1},
+        {8892u, "UnacknowledgedMessageCount", 7u, -1},
+        {8893u, "DiscardedMessageCount", 7u, -1},
+        {8894u, "MonitoredItemCount", 7u, -1},
+        {8895u, "DisabledMonitoredItemCount", 7u, -1},
+        {8896u, "MonitoringQueueOverflowCount", 7u, -1},
+        {8897u, "NextSequenceNumber", 7u, -1},
+        {8902u, "EventQueueOverflowCount", 7u, -1},
+    };
+    assert_type_decls(2172u, 47u, 78u, 63u, uint32_decls, sizeof(uint32_decls) / sizeof(uint32_decls[0]));
+
+    assert_node(2173u, MU_NODECLASS_VARIABLE, "SessionId");
+    assert_datatype_and_valuerank(2173u, 17u, -1);
+    TEST_ASSERT_TRUE(has_forward_ref(2172u, 47u, 2173u));
+    TEST_ASSERT_TRUE(has_forward_ref(2173u, 37u, 78u));
+    TEST_ASSERT_TRUE(has_forward_ref(2173u, 40u, 63u));
+
+    assert_node(2175u, MU_NODECLASS_VARIABLE, "Priority");
+    assert_datatype_and_valuerank(2175u, 3u, -1);
+    TEST_ASSERT_TRUE(has_forward_ref(2172u, 47u, 2175u));
+
+    assert_node(2176u, MU_NODECLASS_VARIABLE, "PublishingInterval");
+    assert_datatype_and_valuerank(2176u, 290u, -1);
+    TEST_ASSERT_TRUE(has_forward_ref(2172u, 47u, 2176u));
+
+    assert_node(2180u, MU_NODECLASS_VARIABLE, "PublishingEnabled");
+    assert_datatype_and_valuerank(2180u, 1u, -1);
+    TEST_ASSERT_TRUE(has_forward_ref(2172u, 47u, 2180u));
+}
+
+/* spec 092 (CU 5801): SessionDiagnosticsVariableType(2197)'s 43 own InstanceDeclarations. */
+static void test_session_diagnostics_variable_type_instance_declarations(void) {
+    static const mu_type_decl_t uint32_decls[] = {
+        {3050u, "MaxResponseMessageSize", 7u, -1},
+        {2207u, "CurrentSubscriptionsCount", 7u, -1},
+        {2208u, "CurrentMonitoredItemsCount", 7u, -1},
+        {2209u, "CurrentPublishRequestsInQueue", 7u, -1},
+        {11892u, "UnauthorizedRequestCount", 7u, -1},
+    };
+    assert_type_decls(2197u, 47u, 78u, 63u, uint32_decls, sizeof(uint32_decls) / sizeof(uint32_decls[0]));
+
+    static const mu_type_decl_t svc_decls[] = {
+        {8900u, "TotalRequestCount", 871u, -1},
+        {2217u, "ReadCount", 871u, -1},
+        {2218u, "HistoryReadCount", 871u, -1},
+        {2219u, "WriteCount", 871u, -1},
+        {2220u, "HistoryUpdateCount", 871u, -1},
+        {2221u, "CallCount", 871u, -1},
+        {2222u, "CreateMonitoredItemsCount", 871u, -1},
+        {2223u, "ModifyMonitoredItemsCount", 871u, -1},
+        {2224u, "SetMonitoringModeCount", 871u, -1},
+        {2225u, "SetTriggeringCount", 871u, -1},
+        {2226u, "DeleteMonitoredItemsCount", 871u, -1},
+        {2227u, "CreateSubscriptionCount", 871u, -1},
+        {2228u, "ModifySubscriptionCount", 871u, -1},
+        {2229u, "SetPublishingModeCount", 871u, -1},
+        {2230u, "PublishCount", 871u, -1},
+        {2231u, "RepublishCount", 871u, -1},
+        {2232u, "TransferSubscriptionsCount", 871u, -1},
+        {2233u, "DeleteSubscriptionsCount", 871u, -1},
+        {2234u, "AddNodesCount", 871u, -1},
+        {2235u, "AddReferencesCount", 871u, -1},
+        {2236u, "DeleteNodesCount", 871u, -1},
+        {2237u, "DeleteReferencesCount", 871u, -1},
+        {2238u, "BrowseCount", 871u, -1},
+        {2239u, "BrowseNextCount", 871u, -1},
+        {2240u, "TranslateBrowsePathsToNodeIdsCount", 871u, -1},
+        {2241u, "QueryFirstCount", 871u, -1},
+        {2242u, "QueryNextCount", 871u, -1},
+        {2730u, "RegisterNodesCount", 871u, -1},
+        {2731u, "UnregisterNodesCount", 871u, -1},
+    };
+    assert_type_decls(2197u, 47u, 78u, 63u, svc_decls, sizeof(svc_decls) / sizeof(svc_decls[0]));
+
+    assert_node(2198u, MU_NODECLASS_VARIABLE, "SessionId");
+    assert_datatype_and_valuerank(2198u, 17u, -1);
+
+    assert_node(2199u, MU_NODECLASS_VARIABLE, "SessionName");
+    assert_datatype_and_valuerank(2199u, 12u, -1);
+
+    assert_node(2200u, MU_NODECLASS_VARIABLE, "ClientDescription");
+    assert_datatype_and_valuerank(2200u, 308u, -1);
+
+    assert_node(2201u, MU_NODECLASS_VARIABLE, "ServerUri");
+    assert_datatype_and_valuerank(2201u, 12u, -1);
+
+    assert_node(2202u, MU_NODECLASS_VARIABLE, "EndpointUrl");
+    assert_datatype_and_valuerank(2202u, 12u, -1);
+
+    assert_node(2203u, MU_NODECLASS_VARIABLE, "LocaleIds");
+    assert_datatype_and_valuerank(2203u, 295u, 1);
+
+    assert_node(2204u, MU_NODECLASS_VARIABLE, "ActualSessionTimeout");
+    assert_datatype_and_valuerank(2204u, 290u, -1);
+
+    assert_node(2205u, MU_NODECLASS_VARIABLE, "ClientConnectionTime");
+    assert_datatype_and_valuerank(2205u, 294u, -1);
+
+    assert_node(2206u, MU_NODECLASS_VARIABLE, "ClientLastContactTime");
+    assert_datatype_and_valuerank(2206u, 294u, -1);
+}
+
+/* spec 092 (CU 5801): SessionDiagnosticsObjectType(2029)'s 4 own InstanceDeclarations. */
+static void test_session_diagnostics_object_type_instance_declarations(void) {
+    TEST_ASSERT_TRUE(has_forward_ref(2029u, 47u, 2030u));
+    assert_node(2030u, MU_NODECLASS_VARIABLE, "SessionDiagnostics");
+    assert_datatype_and_valuerank(2030u, 865u, -1);
+    TEST_ASSERT_TRUE(has_forward_ref(2030u, 37u, 78u));
+    TEST_ASSERT_TRUE(has_forward_ref(2030u, 40u, 2197u));
+
+    TEST_ASSERT_TRUE(has_forward_ref(2029u, 47u, 2031u));
+    assert_node(2031u, MU_NODECLASS_VARIABLE, "SessionSecurityDiagnostics");
+    assert_datatype_and_valuerank(2031u, 868u, -1);
+    TEST_ASSERT_TRUE(has_forward_ref(2031u, 37u, 78u));
+    TEST_ASSERT_TRUE(has_forward_ref(2031u, 40u, 2244u));
+
+    TEST_ASSERT_TRUE(has_forward_ref(2029u, 47u, 2032u));
+    assert_node(2032u, MU_NODECLASS_VARIABLE, "SubscriptionDiagnosticsArray");
+    assert_datatype_and_valuerank(2032u, 874u, 1);
+    TEST_ASSERT_TRUE(has_forward_ref(2032u, 37u, 78u));
+    TEST_ASSERT_TRUE(has_forward_ref(2032u, 40u, 2171u));
+
+    TEST_ASSERT_TRUE(has_forward_ref(2029u, 46u, 19303u));
+    assert_node(19303u, MU_NODECLASS_VARIABLE, "CurrentRoleIds");
+    assert_datatype_and_valuerank(19303u, 17u, 1);
+    TEST_ASSERT_TRUE(has_forward_ref(19303u, 37u, 80u));
+    TEST_ASSERT_TRUE(has_forward_ref(19303u, 40u, 68u));
+}
+
+/* spec 092 (CU 5801): ServerRedundancyType(2034)'s 2 own InstanceDeclarations. */
+static void test_server_redundancy_type_instance_declarations(void) {
+    TEST_ASSERT_TRUE(has_forward_ref(2034u, 46u, 2035u));
+    assert_node(2035u, MU_NODECLASS_VARIABLE, "RedundancySupport");
+    assert_datatype_and_valuerank(2035u, 851u, -1);
+    TEST_ASSERT_TRUE(has_forward_ref(2035u, 37u, 78u));
+    TEST_ASSERT_TRUE(has_forward_ref(2035u, 40u, 68u));
+
+    TEST_ASSERT_TRUE(has_forward_ref(2034u, 46u, 32410u));
+    assert_node(32410u, MU_NODECLASS_VARIABLE, "RedundantServerArray");
+    assert_datatype_and_valuerank(32410u, 853u, 1);
+    TEST_ASSERT_TRUE(has_forward_ref(32410u, 37u, 80u));
+    TEST_ASSERT_TRUE(has_forward_ref(32410u, 40u, 68u));
+}
+
+#endif
+
 void test_server_profile_array_advertises_embedded_profile(void) {
 #if MUC_OPCUA_MARKER_STANDARD_PROFILE
     static const char embedded_profile[] = "http://opcfoundation.org/UA-Profile/Server/StandardUA2017";
@@ -802,6 +972,10 @@ int main(void) {
     RUN_TEST(test_session_security_diagnostics_type_instance_declarations);
     RUN_TEST(test_server_diagnostics_type_instance_declarations);
     RUN_TEST(test_sessions_diagnostics_summary_type_instance_declarations);
+    RUN_TEST(test_subscription_diagnostics_type_instance_declarations);
+    RUN_TEST(test_session_diagnostics_variable_type_instance_declarations);
+    RUN_TEST(test_session_diagnostics_object_type_instance_declarations);
+    RUN_TEST(test_server_redundancy_type_instance_declarations);
     RUN_TEST(test_servertype_datatype_refs_not_dangling);
 #endif
 #elif MUC_OPCUA_BASE_NODES
