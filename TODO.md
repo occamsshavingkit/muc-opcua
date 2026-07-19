@@ -2,23 +2,31 @@
 
 # TODO — muc-opcua
 
-**Updated**: 2026-07-19 (post-audit cleanup — all PG1-PG16 were already implemented; TODO was ~10 days stale)
+**Updated**: 2026-07-19 (PR #328 Authorization Service / JWT merged)
 
 ## Pending
 
 | ID | Feature | OPC Ref | Notes |
 |----|---------|---------|-------|
-| PG17 | Authorization Service Server Facet | OPC-10000-7 v1.05.02 | OAuth2/JWT access token support |
 | PG18 | KeyCredential Service Server Facet | OPC-10000-7 v1.05.02 | KeyCredential management for broker auth |
 | PG19 | User Role Management Server Facet | OPC-10000-7 v1.05.02 | Server user CRUD management |
 | PG20 | Global Certificate Management Server Facet | OPC-10000-7 v1.05.02 | Certificate enrollment/renewal via GDS |
-| PG23 | User Token — JWT Server Facet | OPC-10000-7 v1.05.02 | OAuth2/JWT |
 | PG24 | User Token — Issued Token Server Facet | OPC-10000-7 v1.05.02 | Kerberos (deprecated in 1.05.02) |
 
-## Deferred Tests (PR #327)
+## Recently Completed
 
-| ID | Test | Issue |
-|----|------|-------|
-| T092-1 | `test_subscription_diagnostics_type_instance_declarations` | browse_name assertion mismatch; implementation verified correct independently |
-| T092-2 | `test_session_diagnostics_variable_type_instance_declarations` | ibid |
-| T092-3 | `test_session_diagnostics_object_type_instance_declarations` | ibid |
+| PR | Feature | Notes |
+|----|---------|-------|
+| #328 | Authorization Service / JWT (CU 1629/1697) | OAuth2 Resource Server — JWT validation at ActivateSession. CU 1629 type nodes deferred (GDS namespace). Non-OpenSSL backends not yet supported. |
+| #327 | CU 5801 Diagnostics Part 2 | SubscriptionDiagnosticsType, SessionDiagnosticsVariableType, SessionDiagnosticsObjectType, ServerRedundancyType |
+
+## Follow-ups from Code Review
+
+| Source | Item | Status |
+|--------|------|--------|
+| PR #327 | 3 deferred test functions (browse_name assertion mismatch) | Pending investigation |
+| PR #328 | JWT success-path E2E test needs non-None SecurityPolicy fixture | Pending |
+| PR #328 | CU 1629 AuthorizationServiceConfigurationType type nodes (GDS ns 2) | Deferred |
+| PR #328 | Non-OpenSSL JWT crypto backends (mbedTLS/wolfSSL) | Deferred |
+| PR #328 | Issuer key rotation (evaluate all matching issuers, not first) | Deferred |
+| PR #328 | Refactor high-CCN functions (mu_jwt_validate, mu_claim_scan) | Deferred |
