@@ -281,8 +281,13 @@ opcua_statuscode_t mu_session_activate(mu_session_t *session, opcua_uint32_t aut
         return MU_STATUS_BAD_SESSIONIDINVALID;
     }
 
-    /* We support anonymous (321), username (324), and certificate (327) identity tokens */
-    if (identity_token_encoding_id != 321 && identity_token_encoding_id != 324 && identity_token_encoding_id != 327) {
+    /* We support anonymous (321), username (324), certificate (327), and
+       issued / JWT (940, IssuedIdentityToken_Encoding_DefaultBinary per
+       OPC-10000-6 §5.2.3). JWT support is gated on MUC_OPCUA_CU_USER_TOKEN_JWT
+       at the dispatch layer; we accept the encoding ID unconditionally here so
+       the session transitions to ACTIVATED regardless of build flag. */
+    if (identity_token_encoding_id != 321 && identity_token_encoding_id != 324 && identity_token_encoding_id != 327 &&
+        identity_token_encoding_id != 940) {
         return MU_STATUS_BAD_IDENTITYTOKENINVALID;
     }
 

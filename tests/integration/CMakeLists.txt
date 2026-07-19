@@ -119,3 +119,14 @@ if(MUC_OPCUA_CU_EVENTS)
     target_include_directories(test_event_notifications PRIVATE ${CMAKE_SOURCE_DIR}/src)
     add_test(NAME test_event_notifications COMMAND test_event_notifications)
 endif()
+
+# JWT UserIdentityToken at ActivateSession (spec 093, CU 1697). Needs the
+# secure-channel crypto stack for RSA signature verification through the OpenSSL
+# backend, plus MUC_OPCUA_CU_USER_TOKEN_JWT for the JWT validator + dispatch
+# hook to be compiled in.
+if(MUC_OPCUA_CU_USER_TOKEN_JWT AND MUC_OPCUA_SECURE_CHANNEL_CRYPTO)
+    add_executable(test_jwt_activate_session test_jwt_activate_session.c)
+    target_link_libraries(test_jwt_activate_session PRIVATE muc_opcua muc_opcua_test_support unity)
+    target_include_directories(test_jwt_activate_session PRIVATE ${CMAKE_SOURCE_DIR}/src)
+    add_test(NAME test_jwt_activate_session COMMAND test_jwt_activate_session)
+endif()

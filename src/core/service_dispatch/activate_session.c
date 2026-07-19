@@ -1,6 +1,16 @@
 /* service_dispatch/activate_session.c - ActivateSession service handler */
 #include "common.h"
 
+#ifdef MUC_OPCUA_CU_USER_TOKEN_JWT
+#include "muc_opcua/authorization/jwt.h"
+#endif
+
+/* NodeId numeric for the IssuedIdentityToken_Encoding_DefaultBinary binary
+   encoding (OPC-10000-6 §5.2.3). Defined unconditionally so the dispatch
+   table can match the type even when JWT support is compiled out -- in that
+   case we return Bad_IdentityTokenRejected per spec 093 FR-008. */
+#define MU_ID_ISSUED_IDENTITY_TOKEN_ENCODING_DEFAULTBINARY 940u
+
 static opcua_statuscode_t fill_server_nonce(mu_server_t *server, opcua_byte_t *nonce, size_t len) {
     return mu_session_generate_server_nonce(&server->config.entropy_adapter, nonce, len);
 }
@@ -202,6 +212,108 @@ static opcua_statuscode_t handle_activate_certificate(mu_server_t *server, mu_se
 }
 #endif /* MUC_OPCUA_SECURE_CHANNEL_CRYPTO */
 
+#ifdef MUC_OPCUA_CU_USER_TOKEN_JWT
+/* IssuedIdentityToken (OPC-10000-4 §7.40.6 / OPC-10000-6 §6.5.2.1) -- the JWT
+   bearer token arrives as this structure. We only need the raw `tokenData`
+   ByteString; `policyId` and `encryptionAlgorithm` are validated by the JWT
+   validator and ignored per spec respectively. */
+typedef struct {
+    mu_string_t policy_id;
+    mu_bytestring_t token_data;
+    mu_string_t encryption_algorithm;
+} mu_issued_identity_token_t;
+
+static opcua_statuscode_t decode_issued_identity_body(mu_binary_reader_t *r, size_t token_body_len,
+                                                      mu_issued_identity_token_t *issued_token) {
+    opcua_statuscode_t s = ensure_reader_bytes_remaining(r, token_body_len);
+    if (s != MU_STATUS_GOOD) {
+        return s;
+    }
+    if (token_body_len > 0) {
+        mu_binary_reader_t sub;
+        mu_binary_reader_init(&sub, r->buffer + r->position, token_body_len);
+        s = mu_binary_read_string(&sub, &issued_token->policy_id);
+        if (s != MU_STATUS_GOOD) {
+            return s;
+        }
+        s = mu_binary_read_bytestring(&sub, &issued_token->token_data);
+        if (s != MU_STATUS_GOOD) {
+            return s;
+        }
+        s = mu_binary_read_string(&sub, &issued_token->encryption_algorithm);
+        if (s != MU_STATUS_GOOD) {
+            return s;
+        }
+    }
+    r->position += token_body_len;
+    return MU_STATUS_GOOD;
+}
+
+/* OPC-10000-4 §7.40.6 / OPC-10000-6 §6.5.2.1: handle an IssuedIdentityToken
+   carrying a JWT (token type URI urn:ietf:params:oauth:token-type:jwt). The
+   raw JWT is in `token_data` as UTF-8 bytes; we copy it to a NUL-terminated
+   stack buffer (the validator takes a pointer/length, but the parser also
+   accesses it as a C string internally), resolve the server's wall clock to a
+   Unix timestamp, dispatch to mu_jwt_validate, and copy the `sub` claim into
+   the session's user_identity. Any JWT error maps to Bad_IdentityTokenInvalid
+   per spec 093 FR-007. */
+static opcua_statuscode_t handle_activate_jwt(mu_server_t *server, mu_session_t *slot,
+                                              const mu_issued_identity_token_t *issued_token,
+                                              mu_jwt_claims_t *out_claims) {
+    if (issued_token == NULL || issued_token->token_data.data == NULL || issued_token->token_data.length <= 0) {
+        return MU_STATUS_BAD_IDENTITYTOKENINVALID;
+    }
+
+    /* JWT bearer tokens MUST NOT be accepted over SecurityPolicy#None
+       (unencrypted connections) -- spec 093 FR-008 / OPC-10000-4 §7.40.2.1. */
+    if (server_secure_channel.policy == MU_SECURITY_POLICY_NONE_ID ||
+        server_secure_channel.policy == MU_SECURITY_POLICY_INVALID_ID) {
+        return MU_STATUS_BAD_IDENTITYTOKENREJECTED;
+    }
+
+    /* JWT length is bounded by the chunk size (max_message_size). Cap
+       defensively: a sane JWT is well under 4 KiB. */
+    size_t jwt_len = (size_t)issued_token->token_data.length;
+    if (jwt_len > 4096u) {
+        return MU_STATUS_BAD_IDENTITYTOKENINVALID;
+    }
+
+    /* Copy to a stack buffer so the validator has a contiguous, NUL-terminated
+       C string (the bytestring need not be NUL-terminated on the wire). */
+    char jwt_buf[4097];
+    (void)memcpy(jwt_buf, issued_token->token_data.data, jwt_len);
+    jwt_buf[jwt_len] = '\0';
+
+    /* Server wall clock in DateTime ticks (100-ns intervals since 1601-01-01).
+       Convert to Unix seconds (1970-01-01): the offset is 11644473600 seconds. */
+    opcua_int64_t server_time_unix = 0;
+    if (server->config.time_adapter.get_time != NULL) {
+        opcua_datetime_t now_ticks = server->config.time_adapter.get_time(server->config.time_adapter.context);
+        server_time_unix = (opcua_int64_t)(now_ticks / 10000000LL) - 11644473600LL;
+    }
+
+    /* If no issuers are configured, mu_jwt_validate returns
+       MU_JWT_ERR_NO_CONFIGURED_ISSUERS, which we treat as rejection per
+       spec 093 FR-008. */
+    mu_jwt_result_t jr = mu_jwt_validate(jwt_buf, jwt_len, server->config.jwt_issuers, server->config.jwt_issuer_count,
+                                         server_time_unix, out_claims);
+    if (jr != MU_JWT_OK) {
+        /* Stash the JWT subject fingerprint for the TransferSubscriptions
+           same-user check below -- but only on success; on failure we drop it. */
+        (void)slot;
+        /* Spec 093 FR-008: NO_CONFIGURED_ISSUERS is a server-side configuration
+           fault, not a malformed token -> Bad_IdentityTokenRejected. Other JWT
+           failures remain Bad_IdentityTokenInvalid per spec 093 FR-007. */
+        if (jr == MU_JWT_ERR_NO_CONFIGURED_ISSUERS) {
+            return MU_STATUS_BAD_IDENTITYTOKENREJECTED;
+        }
+        return MU_STATUS_BAD_IDENTITYTOKENINVALID;
+    }
+
+    return MU_STATUS_GOOD;
+}
+#endif /* MUC_OPCUA_CU_USER_TOKEN_JWT */
+
 static opcua_statuscode_t decode_client_software_certs_and_locales(mu_binary_reader_t *r) {
     opcua_int32_t cert_count;
     opcua_statuscode_t s = mu_binary_read_int32(r, &cert_count);
@@ -297,6 +409,10 @@ static opcua_statuscode_t decode_user_identity_token(mu_binary_reader_t *r, opcu
                                                      ,
                                                      mu_certificate_identity_token_t *cert_token
 #endif
+#ifdef MUC_OPCUA_CU_USER_TOKEN_JWT
+                                                     ,
+                                                     mu_issued_identity_token_t *issued_token
+#endif
 ) {
     mu_nodeid_t token_type;
     size_t token_body_len;
@@ -322,6 +438,14 @@ static opcua_statuscode_t decode_user_identity_token(mu_binary_reader_t *r, opcu
 #else
         s = skip_extension_object_body(r, token_body_len);
 #endif
+    } else if (is_ns0_numeric && num == MU_ID_ISSUED_IDENTITY_TOKEN_ENCODING_DEFAULTBINARY) {
+#ifdef MUC_OPCUA_CU_USER_TOKEN_JWT
+        s = decode_issued_identity_body(r, token_body_len, issued_token);
+#else
+        /* JWT support compiled out -- reject IssuedIdentityToken per spec 093
+           FR-008. Body is still skipped so the stream stays aligned. */
+        s = skip_extension_object_body(r, token_body_len);
+#endif
     } else {
         s = skip_extension_object_body(r, token_body_len);
     }
@@ -339,6 +463,10 @@ static opcua_statuscode_t verify_and_activate_session(mu_server_t *server, const
 #ifdef MUC_OPCUA_SECURE_CHANNEL_CRYPTO
                                                       ,
                                                       const mu_certificate_identity_token_t *cert_token
+#endif
+#ifdef MUC_OPCUA_CU_USER_TOKEN_JWT
+                                                      ,
+                                                      const mu_issued_identity_token_t *issued_token
 #endif
                                                       ,
                                                       const mu_bytestring_t *user_token_signature) {
@@ -389,6 +517,37 @@ static opcua_statuscode_t verify_and_activate_session(mu_server_t *server, const
 #else
         activate_result = MU_STATUS_BAD_IDENTITYTOKENINVALID;
 #endif
+    } else if (token_type_numeric == MU_ID_ISSUED_IDENTITY_TOKEN_ENCODING_DEFAULTBINARY) {
+#ifdef MUC_OPCUA_CU_USER_TOKEN_JWT
+        /* T018 / T019: JWT validation hook. mu_jwt_validate extracts the sub
+           claim on success; we copy it into the session's user_identity below
+           for the same-user (TransferSubscriptions) check. */
+        mu_jwt_claims_t jwt_claims;
+        (void)memset(&jwt_claims, 0, sizeof(jwt_claims));
+        activate_result = handle_activate_jwt(server, slot, issued_token, &jwt_claims);
+        if (activate_result == MU_STATUS_GOOD) {
+            /* Stash the subject on the slot for diagnostics / redundancy. The
+               fingerprint array is 64 bytes; cap the subject to that. The
+               whole block is gated on REDUNDANCY because slot->user_identity
+               is only declared under that guard. */
+#if MUC_OPCUA_CU_REDUNDANCY
+            size_t sub_len = strlen(jwt_claims.sub);
+            if (sub_len > sizeof(slot->user_identity)) {
+                sub_len = sizeof(slot->user_identity);
+            }
+            slot->user_identity_kind = 4u; /* JWT-issued */
+            slot->user_identity_len = 0;
+            (void)memcpy(slot->user_identity, jwt_claims.sub, sub_len);
+            slot->user_identity_len = (opcua_byte_t)sub_len;
+#else
+            (void)jwt_claims;
+#endif
+        }
+#else
+        /* JWT support compiled out: per spec 093 FR-008 an IssuedIdentityToken
+           MUST return Bad_IdentityTokenRejected (not Invalid). */
+        activate_result = MU_STATUS_BAD_IDENTITYTOKENREJECTED;
+#endif
     } else {
         activate_result = MU_STATUS_BAD_IDENTITYTOKENINVALID;
     }
@@ -397,9 +556,11 @@ static opcua_statuscode_t verify_and_activate_session(mu_server_t *server, const
 #if MUC_OPCUA_CU_REDUNDANCY
         if (activate_result == MU_STATUS_GOOD) {
             /* Fingerprint the user for the TransferSubscriptions same-user check. Store a
-               compact identity kind (1 anonymous, 2 username, 3 x509) that fits a byte. */
-            slot->user_identity_kind = (token_type_numeric == 324u) ? 2u : (token_type_numeric == 327u) ? 3u : 1u;
-            slot->user_identity_len = 0;
+               compact identity kind (1 anonymous, 2 username, 3 x509, 4 jwt) that fits a byte. */
+            if (token_type_numeric != MU_ID_ISSUED_IDENTITY_TOKEN_ENCODING_DEFAULTBINARY) {
+                slot->user_identity_kind = (token_type_numeric == 324u) ? 2u : (token_type_numeric == 327u) ? 3u : 1u;
+                slot->user_identity_len = 0;
+            }
             const mu_bytestring_t *disc = NULL;
 #ifdef MUC_OPCUA_CU_USER_AUTH
             mu_bytestring_t uname;
@@ -461,6 +622,9 @@ opcua_statuscode_t handle_activate_session(mu_server_t *server, mu_binary_reader
 #ifdef MUC_OPCUA_SECURE_CHANNEL_CRYPTO
     mu_certificate_identity_token_t cert_token = {{-1, NULL}, {-1, NULL}};
 #endif
+#ifdef MUC_OPCUA_CU_USER_TOKEN_JWT
+    mu_issued_identity_token_t issued_token = {{-1, NULL}, {-1, NULL}, {-1, NULL}};
+#endif
     mu_string_t anon_policy_id = {-1, NULL};
     opcua_uint32_t token_type_numeric = 0u;
 
@@ -472,6 +636,10 @@ opcua_statuscode_t handle_activate_session(mu_server_t *server, mu_binary_reader
 #ifdef MUC_OPCUA_SECURE_CHANNEL_CRYPTO
                                    ,
                                    &cert_token
+#endif
+#ifdef MUC_OPCUA_CU_USER_TOKEN_JWT
+                                   ,
+                                   &issued_token
 #endif
     );
     if (s != MU_STATUS_GOOD)
@@ -497,6 +665,10 @@ opcua_statuscode_t handle_activate_session(mu_server_t *server, mu_binary_reader
 #ifdef MUC_OPCUA_SECURE_CHANNEL_CRYPTO
                                     ,
                                     &cert_token
+#endif
+#ifdef MUC_OPCUA_CU_USER_TOKEN_JWT
+                                    ,
+                                    &issued_token
 #endif
                                     ,
                                     &user_token_signature);

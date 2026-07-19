@@ -720,6 +720,23 @@ config MUC_OPCUA_CU_USER_AUTH
 	  Backing tests: test_user_auth_plaintext, test_user_auth_certificate, test_user_auth_secure_e2e.
 	  Notes: Project-level Conformance Unit mirroring the legacy 'user_auth' item; emits Kconfig symbol MUC_OPCUA_CU_USER_AUTH matching the #ifdef guard renamed in Task 3 of the CU-aligned code reorganisation plan.
 
+config MUC_OPCUA_CU_USER_TOKEN_JWT
+	bool "CU: User Token JWT"
+	depends on MUC_OPCUA_CU_USER_AUTH
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: in-progress.
+	  OPC source: OPC-10000-7 CU 1697 -- User Token JWT Server Facet.
+	  Notes: Enables JWT bearer token validation at ActivateSession. The server acts as an OAuth2 Resource Server.
+
+config MUC_OPCUA_CU_AUTHORIZATION_SERVICE_SERVER
+	bool "CU: Authorization Service Server"
+	depends on MUC_OPCUA_CU_USER_TOKEN_JWT && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+	help
+	  Implementation state: in-progress.
+	  OPC source: OPC-10000-7 CU 1629 -- Authorization Service Server Facet.
+	  Notes: Enables AuthorizationServiceConfigurationType address-space nodes.
+
 config MUC_OPCUA_CU_VIEW_BASIC_TRANSLATEBROWSEPATH
 	bool "CU: View Basic / TranslateBrowsePath"
 	default y

@@ -296,6 +296,22 @@ if(MUC_OPCUA_CU_USER_AUTH)
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_CU_USER_AUTH=1)
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_USER_AUTH=1)
 endif()
+
+# -- CU: User Token JWT (spec 093, OPC-10000-7 CU 1697) --
+# Freestanding JWT/JWS validator sources are gated on MUC_OPCUA_HAVE_OPENSSL
+# (set in the OpenSSL detection block further below) because the crypto
+# verification wrapper currently only ships an OpenSSL backend. The actual
+# target_sources/compile-definition block lives below the OpenSSL/mbedTLS/
+# wolfSSL detection so the CMake variable is defined by the time it runs.
+# Non-OpenSSL backends will be enabled by relaxing that condition once
+# crypto_jwt.c grows the corresponding dispatch.
+
+# -- CU: Authorization Service Server (spec 093, OPC-10000-7 CU 1629) --
+# Define-only for now: drives AuthorizationServiceConfigurationType
+# address-space nodes (added in a later task).
+if(MUC_OPCUA_CU_AUTHORIZATION_SERVICE_SERVER)
+    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_CU_AUTHORIZATION_SERVICE_SERVER=1)
+endif()
 if(MUC_OPCUA_CU_MULTIPLE_CONNECTIONS)
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_CU_MULTIPLE_CONNECTIONS=1)
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_MULTIPLE_CONNECTIONS=1)
@@ -501,6 +517,7 @@ if(MUC_OPCUA_IS_HOST)
     if(MUC_OPCUA_SECURE_CHANNEL_CRYPTO)
         find_package(OpenSSL)
         if(OpenSSL_FOUND)
+            set(MUC_OPCUA_HAVE_OPENSSL ON CACHE INTERNAL "OpenSSL backend available")
             target_sources(muc_opcua PRIVATE
                 platform/host_crypto/common.c
                 platform/host_crypto/hash.c
@@ -535,6 +552,27 @@ if(MUC_OPCUA_HAVE_WOLFSSL AND MUC_OPCUA_SECURE_CHANNEL_CRYPTO)
     endif()
     target_link_libraries(muc_opcua PUBLIC wolfssl)
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_HAVE_WOLFSSL=1)
+endif()
+
+# -- CU: User Token JWT (spec 093, OPC-10000-7 CU 1697) --
+# Freestanding JWT/JWS validator (Base64url decoder, JSON claim scanner,
+# RSA/ECDSA signature verification wrapper). Gated on USER_AUTH because the
+# JWT token type is dispatched from the existing user-token path.
+#
+# The signature verification wrapper (crypto_jwt.c) currently only has an
+# OpenSSL backend, so the whole CU is additionally gated on
+# MUC_OPCUA_HAVE_OPENSSL to avoid shipping an unusable validator on
+# mbedTLS/wolfSSL-only builds. The OpenSSL detection block above sets
+# MUC_OPCUA_HAVE_OPENSSL only when host + SECURE_CHANNEL_CRYPTO + find_package
+# succeed; relax this condition once crypto_jwt.c grows mbedTLS/wolfSSL
+# dispatch.
+if(MUC_OPCUA_CU_USER_TOKEN_JWT AND MUC_OPCUA_HAVE_OPENSSL)
+    target_sources(muc_opcua PRIVATE
+        cu/core_2022_server/authorization/base64url.c
+        cu/core_2022_server/authorization/claim_scanner.c
+        cu/core_2022_server/authorization/jwt.c
+        cu/core_2022_server/authorization/crypto_jwt.c)
+    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_CU_USER_TOKEN_JWT=1)
 endif()
 
 target_include_directories(muc_opcua PUBLIC
