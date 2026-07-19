@@ -5740,9 +5740,9 @@
       "defaults": {
         "nano": 64,
         "micro": 64,
-        "embedded": 64,
-        "standard": 64,
-        "full": 64,
+        "embedded": 512,
+        "standard": 512,
+        "full": 512,
         "custom": 64
       },
       "baseline_default": 64,
