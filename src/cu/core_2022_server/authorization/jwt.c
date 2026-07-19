@@ -258,9 +258,8 @@ mu_jwt_result_t mu_jwt_validate(const char *jwt, size_t jwt_len, const mu_jwt_is
         return MU_JWT_ERR_SIGNATURE;
     }
 
-    opcua_boolean_t sig_ok = mu_crypto_jwt_verify((const opcua_byte_t *)jwt, dot2,
-                                                  sig_buf, (size_t)sig_len, issuer->public_key,
-                                                  issuer->public_key_len, alg);
+    opcua_boolean_t sig_ok = mu_crypto_jwt_verify((const opcua_byte_t *)jwt, dot2, sig_buf, (size_t)sig_len,
+                                                  issuer->public_key, issuer->public_key_len, alg);
     if (!sig_ok) {
         return MU_JWT_ERR_SIGNATURE;
     }

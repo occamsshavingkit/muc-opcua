@@ -145,8 +145,8 @@ static int raw_ecdsa_to_der(const unsigned char *rs, size_t rs_len, unsigned cha
    either an RSA or an EC key. The algorithm selects the digest and signature
    form (PKCS#1 v1.5 for RSA, raw r||s for ECDSA). */
 static opcua_boolean_t verify_with_key(EVP_PKEY *pk, const EVP_MD *md, const unsigned char *signing_input,
-                                       size_t signing_input_len, const unsigned char *signature,
-                                       size_t signature_len, mu_jwt_alg_t alg) {
+                                       size_t signing_input_len, const unsigned char *signature, size_t signature_len,
+                                       mu_jwt_alg_t alg) {
     EVP_MD_CTX *mdctx = EVP_MD_CTX_new();
     if (mdctx == NULL) {
         return 0;
@@ -211,7 +211,7 @@ opcua_boolean_t mu_crypto_jwt_verify(const opcua_byte_t *signing_input, size_t s
     return ok;
 }
 
-#else  /* no OpenSSL backend */
+#else /* no OpenSSL backend */
 
 /* Stub backend: signature verification always fails. The JWT validator still
    compiles so the rest of the stack (Kconfig gating, address-space nodes,

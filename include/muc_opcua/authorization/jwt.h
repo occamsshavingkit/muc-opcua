@@ -42,9 +42,9 @@ typedef struct {
     const char *issuer_url;         /* `iss` claim value to match */
     const opcua_byte_t *public_key; /* DER-encoded public key (RSA or EC) */
     size_t public_key_len;
-    const char *expected_audience;  /* `aud` claim value to match */
+    const char *expected_audience;     /* `aud` claim value to match */
     opcua_uint32_t clock_skew_seconds; /* tolerance for exp/nbf checks */
-    mu_jwt_alg_t alg;               /* expected signing algorithm */
+    mu_jwt_alg_t alg;                  /* expected signing algorithm */
 } mu_jwt_issuer_t;
 
 /* Claims extracted from a validated JWT (data-model.md §mu_jwt_claims_t).
@@ -89,8 +89,7 @@ typedef enum {
  * *out_claims is not modified.
  */
 mu_jwt_result_t mu_jwt_validate(const char *jwt, size_t jwt_len, const mu_jwt_issuer_t *issuers,
-                                opcua_byte_t issuer_count, opcua_int64_t server_time_unix,
-                                mu_jwt_claims_t *out_claims);
+                                opcua_byte_t issuer_count, opcua_int64_t server_time_unix, mu_jwt_claims_t *out_claims);
 
 #ifdef __cplusplus
 }
