@@ -19,6 +19,9 @@
 #ifdef MUC_OPCUA_SERVICE_HISTORY
 #include "muc_opcua/services/history.h"
 #endif
+#ifdef MUC_OPCUA_CU_USER_TOKEN_JWT
+#include "muc_opcua/authorization/jwt.h"
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -124,6 +127,14 @@ typedef struct {
 
     /* mDNS Discovery Adapter (optional) — NULL = disabled, zero storage impact */
     mu_mdns_adapter_t *mdns_adapter;
+
+#ifdef MUC_OPCUA_CU_USER_TOKEN_JWT
+    /* JWT/OAuth2 Resource Server configuration (optional).
+       When jwt_issuer_count == 0, JWT authentication is disabled and any JWT
+       UserIdentityToken is rejected with Bad_IdentityTokenRejected. */
+    const mu_jwt_issuer_t *jwt_issuers;
+    opcua_byte_t jwt_issuer_count;
+#endif
 
 } mu_server_config_t;
 

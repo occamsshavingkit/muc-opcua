@@ -296,6 +296,26 @@ if(MUC_OPCUA_CU_USER_AUTH)
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_CU_USER_AUTH=1)
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_USER_AUTH=1)
 endif()
+
+# -- CU: User Token JWT (spec 093, OPC-10000-7 CU 1697) --
+# Freestanding JWT/JWS validator (Base64url decoder, JSON claim scanner,
+# RSA/ECDSA signature verification wrapper). Gated on USER_AUTH because the
+# JWT token type is dispatched from the existing user-token path.
+if(MUC_OPCUA_CU_USER_TOKEN_JWT)
+    target_sources(muc_opcua PRIVATE
+        cu/core_2022_server/authorization/base64url.c
+        cu/core_2022_server/authorization/claim_scanner.c
+        cu/core_2022_server/authorization/jwt.c
+        cu/core_2022_server/authorization/crypto_jwt.c)
+    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_CU_USER_TOKEN_JWT=1)
+endif()
+
+# -- CU: Authorization Service Server (spec 093, OPC-10000-7 CU 1629) --
+# Define-only for now: drives AuthorizationServiceConfigurationType
+# address-space nodes (added in a later task).
+if(MUC_OPCUA_CU_AUTHORIZATION_SERVICE_SERVER)
+    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_CU_AUTHORIZATION_SERVICE_SERVER=1)
+endif()
 if(MUC_OPCUA_CU_MULTIPLE_CONNECTIONS)
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_CU_MULTIPLE_CONNECTIONS=1)
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_MULTIPLE_CONNECTIONS=1)
