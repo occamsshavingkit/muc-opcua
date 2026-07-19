@@ -210,64 +210,69 @@ mu_jwt_result_t mu_jwt_validate(const char *jwt, size_t jwt_len, const mu_jwt_is
         return MU_JWT_ERR_EXPIRED;
     }
 
-    /* Match issuer. */
-    const mu_jwt_issuer_t *issuer = NULL;
+    /* Match issuer and verify signature. Try all issuers with matching URL
+       (key rotation: multiple issuers may share the same URL but have
+       different keys/audiences). Return on the first that fully validates. */
+    bool any_issuer_matched = false;
     for (opcua_byte_t k = 0; k < issuer_count; k++) {
-        if (issuer_url_match(issuers[k].issuer_url, claims.iss)) {
-            issuer = &issuers[k];
-            break;
+        if (!issuer_url_match(issuers[k].issuer_url, claims.iss)) {
+            continue;
         }
+        any_issuer_matched = true;
+        const mu_jwt_issuer_t *issuer = &issuers[k];
+
+        opcua_int64_t skew = (opcua_int64_t)issuer->clock_skew_seconds;
+
+        /* exp check (RFC 7519 §4.1.4). */
+        if (server_time_unix > claims.exp + skew) {
+            return MU_JWT_ERR_EXPIRED;
+        }
+
+        /* nbf check (RFC 7519 §4.1.5). 0 means not present. */
+        if (claims.nbf != 0 && (server_time_unix + skew) < claims.nbf) {
+            return MU_JWT_ERR_NOT_YET_VALID;
+        }
+
+        /* Audience must match the configured value. */
+        if (!audience_match(issuer->expected_audience, claims.aud)) {
+            return MU_JWT_ERR_AUDIENCE;
+        }
+
+        /* Subject must be present and non-empty. */
+        if (claims.sub[0] == '\0') {
+            return MU_JWT_ERR_NO_SUB;
+        }
+
+        /* Algorithm must match the configured expectation for this issuer. */
+        if (issuer->alg != alg) {
+            return MU_JWT_ERR_UNSUPPORTED_ALG;
+        }
+
+        /* Decode signature and verify. The signing input is the ASCII bytes of
+           header.payload (RFC 7515 §5.1) -- that is, the original base64url text
+           before decoding, including the '.'. */
+        unsigned char sig_buf[MU_JWT_SIGNATURE_MAX];
+        int sig_len = mu_base64url_decode(jwt + dot2 + 1, sig_b64_len, sig_buf, sizeof(sig_buf));
+        if (sig_len <= 0) {
+            return MU_JWT_ERR_SIGNATURE;
+        }
+
+        opcua_boolean_t sig_ok = mu_crypto_jwt_verify((const opcua_byte_t *)jwt, dot2, sig_buf, (size_t)sig_len,
+                                                      issuer->public_key, issuer->public_key_len, alg);
+        if (sig_ok) {
+            if (out_claims != NULL) {
+                *out_claims = claims;
+            }
+            return MU_JWT_OK;
+        }
+        /* Signature didn't match this issuer's key; try the next issuer
+           with the same URL (key rotation). */
     }
-    if (issuer == NULL) {
+
+    if (!any_issuer_matched) {
         return MU_JWT_ERR_ISSUER;
     }
-
-    opcua_int64_t skew = (opcua_int64_t)issuer->clock_skew_seconds;
-
-    /* exp check (RFC 7519 §4.1.4). */
-    if (server_time_unix > claims.exp + skew) {
-        return MU_JWT_ERR_EXPIRED;
-    }
-
-    /* nbf check (RFC 7519 §4.1.5). 0 means not present. */
-    if (claims.nbf != 0 && (server_time_unix + skew) < claims.nbf) {
-        return MU_JWT_ERR_NOT_YET_VALID;
-    }
-
-    /* Audience must match the configured value. */
-    if (!audience_match(issuer->expected_audience, claims.aud)) {
-        return MU_JWT_ERR_AUDIENCE;
-    }
-
-    /* Subject must be present and non-empty. */
-    if (claims.sub[0] == '\0') {
-        return MU_JWT_ERR_NO_SUB;
-    }
-
-    /* Algorithm must match the configured expectation for this issuer. */
-    if (issuer->alg != alg) {
-        return MU_JWT_ERR_UNSUPPORTED_ALG;
-    }
-
-    /* Decode signature and verify. The signing input is the ASCII bytes of
-       header.payload (RFC 7515 §5.1) -- that is, the original base64url text
-       before decoding, including the '.'. */
-    unsigned char sig_buf[MU_JWT_SIGNATURE_MAX];
-    int sig_len = mu_base64url_decode(jwt + dot2 + 1, sig_b64_len, sig_buf, sizeof(sig_buf));
-    if (sig_len <= 0) {
-        return MU_JWT_ERR_SIGNATURE;
-    }
-
-    opcua_boolean_t sig_ok = mu_crypto_jwt_verify((const opcua_byte_t *)jwt, dot2, sig_buf, (size_t)sig_len,
-                                                  issuer->public_key, issuer->public_key_len, alg);
-    if (!sig_ok) {
-        return MU_JWT_ERR_SIGNATURE;
-    }
-
-    if (out_claims != NULL) {
-        *out_claims = claims;
-    }
-    return MU_JWT_OK;
+    return MU_JWT_ERR_SIGNATURE;
 }
 
 #endif /* MUC_OPCUA_CU_USER_TOKEN_JWT */
