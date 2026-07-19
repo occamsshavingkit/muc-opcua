@@ -4337,7 +4337,17 @@ static const mu_node_t s_base_nodes[] = {
        EnumStrings(2377) and before AggregateFunctions(2997). Task 4 adds
        three ServerCapabilitiesType properties and one ServerType property
        (Auditing) that also fall in this range -- see the DataAccess-off
-       mirror above for the shared rationale. */
+        mirror above for the shared rationale. */
+#if MUC_OPCUA_CU_BASE_INFO_SERVERTYPE && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+    {{0, MU_NODEID_NUMERIC, {2730}},
+     MU_NODECLASS_VARIABLE, {18, s_str_RegisterNodesCount}, {18, s_str_RegisterNodesCount},
+     s_mandatory_bdv_refs, sizeof(s_mandatory_bdv_refs) / sizeof(s_mandatory_bdv_refs[0]), NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {63}}, .value_rank = -1, .data_type = 871},
+    {{0, MU_NODEID_NUMERIC, {2731}},
+     MU_NODECLASS_VARIABLE, {20, s_str_UnregisterNodesCount}, {20, s_str_UnregisterNodesCount},
+     s_mandatory_bdv_refs, sizeof(s_mandatory_bdv_refs) / sizeof(s_mandatory_bdv_refs[0]), NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {63}}, .value_rank = -1, .data_type = 871},
+#endif
     {{0, MU_NODEID_NUMERIC, {2732}},
      MU_NODECLASS_VARIABLE,
      {27, s_str_MaxBrowseContinuationPoints},
@@ -4458,6 +4468,12 @@ static const mu_node_t s_base_nodes[] = {
      .type_definition = {0, MU_NODEID_NUMERIC, {68}},
      .value_rank = 1,
      .data_type = 344}, /* SignedSoftwareCertificate[] (OPC-10000-5 §6.3.2 Table 10) */
+#if MUC_OPCUA_CU_BASE_INFO_SERVERTYPE && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+    {{0, MU_NODEID_NUMERIC, {3050}},
+     MU_NODECLASS_VARIABLE, {22, s_str_MaxResponseMessageSize}, {22, s_str_MaxResponseMessageSize},
+     s_mandatory_bdv_refs, sizeof(s_mandatory_bdv_refs) / sizeof(s_mandatory_bdv_refs[0]), NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {63}}, .value_rank = -1, .data_type = 7},
+#endif
 #endif
 #if MUC_OPCUA_CU_BASE_INFO_SERVERTYPE
     /* spec 083 (CU 3189): BuildInfoType(3051, DataAccess-on copy). Sorts
