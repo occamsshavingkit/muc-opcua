@@ -718,6 +718,25 @@ static void test_servertype_datatype_refs_not_dangling(void) {
 }
 #endif
 
+#if MUC_OPCUA_CU_BASE_INFO_SERVERTYPE && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+
+/* spec 092 (CU 5801): ServerRedundancyType(2034)'s 2 own InstanceDeclarations. */
+static void test_server_redundancy_type_instance_declarations(void) {
+    TEST_ASSERT_TRUE(has_forward_ref(2034u, 46u, 2035u));
+    assert_node(2035u, MU_NODECLASS_VARIABLE, "RedundancySupport");
+    assert_datatype_and_valuerank(2035u, 851u, -1);
+    TEST_ASSERT_TRUE(has_forward_ref(2035u, 37u, 78u));
+    TEST_ASSERT_TRUE(has_forward_ref(2035u, 40u, 68u));
+
+    TEST_ASSERT_TRUE(has_forward_ref(2034u, 46u, 32410u));
+    assert_node(32410u, MU_NODECLASS_VARIABLE, "RedundantServerArray");
+    assert_datatype_and_valuerank(32410u, 853u, 1);
+    TEST_ASSERT_TRUE(has_forward_ref(32410u, 37u, 80u));
+    TEST_ASSERT_TRUE(has_forward_ref(32410u, 40u, 68u));
+}
+
+#endif
+
 void test_server_profile_array_advertises_embedded_profile(void) {
 #if MUC_OPCUA_MARKER_STANDARD_PROFILE
     static const char embedded_profile[] = "http://opcfoundation.org/UA-Profile/Server/StandardUA2017";
@@ -802,6 +821,7 @@ int main(void) {
     RUN_TEST(test_session_security_diagnostics_type_instance_declarations);
     RUN_TEST(test_server_diagnostics_type_instance_declarations);
     RUN_TEST(test_sessions_diagnostics_summary_type_instance_declarations);
+    RUN_TEST(test_server_redundancy_type_instance_declarations);
     RUN_TEST(test_servertype_datatype_refs_not_dangling);
 #endif
 #elif MUC_OPCUA_BASE_NODES
