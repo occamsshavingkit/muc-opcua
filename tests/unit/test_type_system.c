@@ -437,6 +437,34 @@ static void test_variable_reports_true_datatype_and_valuerank(void) {
     assert_datatype_and_valuerank(2007u, 862u, -1); /* ServerStatus: ServerStatusDataType */
 }
 
+/* spec 091 (CU 5801): one row of a VariableType's own InstanceDeclaration
+   table -- reusable across every "type X HasComponent/HasProperty -> its own
+   Mandatory/Optional child Variables" completeness test (OperationLimitsType,
+   SamplingIntervalDiagnosticsType, and later diagnostics-type slices all
+   share this exact shape). */
+typedef struct {
+    opcua_uint32_t node_id;
+    const char *browse_name;
+    opcua_uint32_t data_type;
+    opcua_int32_t value_rank;
+} mu_type_decl_t;
+
+/* Asserts that `type_id` carries a `ref_kind` (HasComponent 47/HasProperty 46)
+   forward ref to every decl in `decls`, and that each decl node is a Variable
+   with the given BrowseName/DataType/ValueRank, HasModellingRule(37) ->
+   `modelling_rule` (Mandatory 78/Optional 80), and HasTypeDefinition(40) ->
+   `type_definition`. */
+static void assert_type_decls(opcua_uint32_t type_id, opcua_uint32_t ref_kind, opcua_uint32_t modelling_rule,
+                              opcua_uint32_t type_definition, const mu_type_decl_t *decls, size_t count) {
+    for (size_t i = 0; i < count; ++i) {
+        TEST_ASSERT_TRUE_MESSAGE(has_forward_ref(type_id, ref_kind, decls[i].node_id), decls[i].browse_name);
+        assert_node(decls[i].node_id, MU_NODECLASS_VARIABLE, decls[i].browse_name);
+        assert_datatype_and_valuerank(decls[i].node_id, decls[i].data_type, decls[i].value_rank);
+        TEST_ASSERT_TRUE_MESSAGE(has_forward_ref(decls[i].node_id, 37u, modelling_rule), decls[i].browse_name);
+        TEST_ASSERT_TRUE_MESSAGE(has_forward_ref(decls[i].node_id, 40u, type_definition), decls[i].browse_name);
+    }
+}
+
 /* spec 090 (CU 5801 Part B): OperationLimitsType(11564)'s 12 own Optional
    Property InstanceDeclarations, formally defined in OPC-10000-5 §6.3.11
    Table 20. NodeIds grounded against the official OPC Foundation NodeIds.csv
@@ -447,34 +475,193 @@ static void test_variable_reports_true_datatype_and_valuerank(void) {
    row as HasProperty/UInt32/PropertyType/Optional; that matches this test's
    expectations exactly (no deviation from the spec found). */
 static void test_operation_limits_type_instance_declarations(void) {
-    static const struct {
-        opcua_uint32_t node_id;
-        const char *browse_name;
-    } decls[] = {
-        {11565u, "MaxNodesPerRead"},
-        {12161u, "MaxNodesPerHistoryReadData"},
-        {12162u, "MaxNodesPerHistoryReadEvents"},
-        {11567u, "MaxNodesPerWrite"},
-        {12163u, "MaxNodesPerHistoryUpdateData"},
-        {12164u, "MaxNodesPerHistoryUpdateEvents"},
-        {11569u, "MaxNodesPerMethodCall"},
-        {11570u, "MaxNodesPerBrowse"},
-        {11571u, "MaxNodesPerRegisterNodes"},
-        {11572u, "MaxNodesPerTranslateBrowsePathsToNodeIds"},
-        {11573u, "MaxNodesPerNodeManagement"},
-        {11574u, "MaxMonitoredItemsPerCall"},
+    static const mu_type_decl_t decls[] = {
+        {11565u, "MaxNodesPerRead", 7u, -1},
+        {12161u, "MaxNodesPerHistoryReadData", 7u, -1},
+        {12162u, "MaxNodesPerHistoryReadEvents", 7u, -1},
+        {11567u, "MaxNodesPerWrite", 7u, -1},
+        {12163u, "MaxNodesPerHistoryUpdateData", 7u, -1},
+        {12164u, "MaxNodesPerHistoryUpdateEvents", 7u, -1},
+        {11569u, "MaxNodesPerMethodCall", 7u, -1},
+        {11570u, "MaxNodesPerBrowse", 7u, -1},
+        {11571u, "MaxNodesPerRegisterNodes", 7u, -1},
+        {11572u, "MaxNodesPerTranslateBrowsePathsToNodeIds", 7u, -1},
+        {11573u, "MaxNodesPerNodeManagement", 7u, -1},
+        {11574u, "MaxMonitoredItemsPerCall", 7u, -1},
     };
 
-    for (size_t i = 0; i < sizeof(decls) / sizeof(decls[0]); ++i) {
-        TEST_ASSERT_TRUE_MESSAGE(has_forward_ref(11564u, 46u, decls[i].node_id),
-                                 decls[i].browse_name); /* OperationLimitsType -HasProperty-> decl */
-        assert_node(decls[i].node_id, MU_NODECLASS_VARIABLE, decls[i].browse_name);
-        assert_datatype_and_valuerank(decls[i].node_id, 7u, -1); /* UInt32, Scalar */
-        TEST_ASSERT_TRUE_MESSAGE(has_forward_ref(decls[i].node_id, 37u, 80u),
-                                 decls[i].browse_name); /* HasModellingRule -> Optional */
-        TEST_ASSERT_TRUE_MESSAGE(has_forward_ref(decls[i].node_id, 40u, 68u),
-                                 decls[i].browse_name); /* HasTypeDefinition -> PropertyType */
-    }
+    /* OperationLimitsType -HasProperty(46)-> decl, Optional(80), PropertyType(68) */
+    assert_type_decls(11564u, 46u, 80u, 68u, decls, sizeof(decls) / sizeof(decls[0]));
+}
+
+/* spec 091 (CU 5801): SamplingIntervalDiagnosticsType(2165)'s 4 own Mandatory
+   HasComponent InstanceDeclarations (OPC-10000-5 §7.10 Table 80), all
+   TypeDefinition BaseDataVariableType(63). Grounded against opc-ua-reference
+   (search_nodes confirms 2166/11697/11698/11699 all resolve to OPC-10000-5
+   §7.10; the Table 80 text itself -- fetched via WebFetch since search_text
+   doesn't return full table bodies -- gives every row as
+   HasComponent/Variable/BaseDataVariableType/Mandatory, matching exactly). */
+static void test_sampling_interval_diagnostics_type_instance_declarations(void) {
+    static const mu_type_decl_t decls[] = {
+        {2166u, "SamplingInterval", 290u, -1},                   /* Duration */
+        {11697u, "SampledMonitoredItemsCount", 7u, -1},          /* UInt32 */
+        {11698u, "MaxSampledMonitoredItemsCount", 7u, -1},       /* UInt32 */
+        {11699u, "DisabledMonitoredItemsSamplingCount", 7u, -1}, /* UInt32 */
+    };
+
+    /* SamplingIntervalDiagnosticsType -HasComponent(47)-> decl, Mandatory(78), BaseDataVariableType(63) */
+    assert_type_decls(2165u, 47u, 78u, 63u, decls, sizeof(decls) / sizeof(decls[0]));
+}
+
+/* spec 091 (CU 5801): SessionSecurityDiagnosticsType(2244)'s 9 own Mandatory
+   HasComponent InstanceDeclarations (OPC-10000-5 §7.16 Table 86), all
+   TypeDefinition BaseDataVariableType(63). Grounded via opc-ua-reference
+   (search_nodes confirms every child NodeId resolves to §7.16; Table 86
+   itself -- fetched via WebFetch since search_text truncates the reference
+   table body -- gives every row as HasComponent/Variable/
+   BaseDataVariableType/Mandatory, matching exactly; no HasProperty rows).
+   SecurityMode(2251)'s DataType is MessageSecurityMode(302), an Enumeration
+   closure DataType added below (OPC-10000-4 §7.20 Table 139). Client
+   Certificate(3058, ByteString) falls inside the 2365..11461 DataAccess band,
+   so base_nodes.c dual-places it (DataAccess-on and -off copies); it must
+   resolve identically here regardless of which copy is compiled in. */
+static void test_session_security_diagnostics_type_instance_declarations(void) {
+    static const mu_type_decl_t decls[] = {
+        {2245u, "SessionId", 17u, -1},               /* NodeId */
+        {2246u, "ClientUserIdOfSession", 12u, -1},   /* String */
+        {2247u, "ClientUserIdHistory", 12u, 1},      /* String[] */
+        {2248u, "AuthenticationMechanism", 12u, -1}, /* String */
+        {2249u, "Encoding", 12u, -1},                /* String */
+        {2250u, "TransportProtocol", 12u, -1},       /* String */
+        {2251u, "SecurityMode", 302u, -1},           /* MessageSecurityMode */
+        {2252u, "SecurityPolicyUri", 12u, -1},       /* String */
+        {3058u, "ClientCertificate", 15u, -1},       /* ByteString */
+    };
+
+    /* SessionSecurityDiagnosticsType -HasComponent(47)-> decl, Mandatory(78), BaseDataVariableType(63) */
+    assert_type_decls(2244u, 47u, 78u, 63u, decls, sizeof(decls) / sizeof(decls[0]));
+
+    /* MessageSecurityMode(302): Enumeration DataType, subtype of
+       Enumeration(29). Per the ServerState(852)/RedundancySupport(851)
+       precedent, no EnumStrings child is added. */
+    assert_node(302u, MU_NODECLASS_DATATYPE, "MessageSecurityMode");
+    TEST_ASSERT_TRUE(has_forward_ref(29u, 45u, 302u)); /* Enumeration -HasSubtype-> MessageSecurityMode */
+}
+
+/* spec 092 (CU 5801): ServerDiagnosticsType(2020)'s 5 own InstanceDeclarations
+   (OPC-10000-5 §6.3.3 Table 11), plus the further own-instance cascades under
+   ServerDiagnosticsSummary(2021) and SessionsDiagnosticsSummary(2744).
+   Grounded via opc-ua-reference (search_nodes confirms every NodeId below
+   resolves to §6.3.3) and the official OPC Foundation NodeIds.csv (schemas
+   1.05), which gives every row's exact BrowseName/NodeClass and confirms
+   NodeId 3123 is an official numbering gap (not invented here). Table 11
+   (fetched via WebFetch, since search_text truncates before the table body)
+   gives every row's Reference kind/ModellingRule: HasComponent/Mandatory for
+   ServerDiagnosticsSummary/SubscriptionDiagnosticsArray/
+   SessionsDiagnosticsSummary, HasComponent/Optional for
+   SamplingIntervalDiagnosticsArray, HasProperty/Mandatory for EnabledFlag.
+   SessionsDiagnosticsSummary(2744) and the 3116-3130 cascade fall inside the
+   2365..11461 DataAccess band, so base_nodes.c dual-places them; this test
+   must resolve identically regardless of which copy (DataAccess-on/-off) is
+   compiled in. Heterogeneous TypeDefinitions across siblings (2150/2164/2171/
+   2026/68 for the top level; 2196/2243 for 2744's own children) mean those
+   groups can't share a single assert_type_decls call, so they're asserted
+   individually; only the 12 homogeneous ServerDiagnosticsSummary field
+   children (all BaseDataVariableType) reuse the helper. */
+static void test_server_diagnostics_type_instance_declarations(void) {
+    TEST_ASSERT_TRUE(has_forward_ref(2020u, 47u, 2021u)); /* HasComponent -> ServerDiagnosticsSummary */
+    assert_node(2021u, MU_NODECLASS_VARIABLE, "ServerDiagnosticsSummary");
+    assert_datatype_and_valuerank(2021u, 859u, -1);       /* ServerDiagnosticsSummaryDataType */
+    TEST_ASSERT_TRUE(has_forward_ref(2021u, 37u, 78u));   /* Mandatory */
+    TEST_ASSERT_TRUE(has_forward_ref(2021u, 40u, 2150u)); /* TypeDef ServerDiagnosticsSummaryType */
+
+    TEST_ASSERT_TRUE(has_forward_ref(2020u, 47u, 2022u)); /* HasComponent -> SamplingIntervalDiagnosticsArray */
+    assert_node(2022u, MU_NODECLASS_VARIABLE, "SamplingIntervalDiagnosticsArray");
+    assert_datatype_and_valuerank(2022u, 856u, 1);        /* SamplingIntervalDiagnosticsDataType[] */
+    TEST_ASSERT_TRUE(has_forward_ref(2022u, 37u, 80u));   /* Optional */
+    TEST_ASSERT_TRUE(has_forward_ref(2022u, 40u, 2164u)); /* TypeDef SamplingIntervalDiagnosticsArrayType */
+
+    TEST_ASSERT_TRUE(has_forward_ref(2020u, 47u, 2023u)); /* HasComponent -> SubscriptionDiagnosticsArray */
+    assert_node(2023u, MU_NODECLASS_VARIABLE, "SubscriptionDiagnosticsArray");
+    assert_datatype_and_valuerank(2023u, 874u, 1);        /* SubscriptionDiagnosticsDataType[] */
+    TEST_ASSERT_TRUE(has_forward_ref(2023u, 37u, 78u));   /* Mandatory */
+    TEST_ASSERT_TRUE(has_forward_ref(2023u, 40u, 2171u)); /* TypeDef SubscriptionDiagnosticsArrayType */
+
+    TEST_ASSERT_TRUE(has_forward_ref(2020u, 47u, 2744u)); /* HasComponent -> SessionsDiagnosticsSummary */
+    assert_node(2744u, MU_NODECLASS_OBJECT, "SessionsDiagnosticsSummary");
+    TEST_ASSERT_TRUE(has_forward_ref(2744u, 37u, 78u));   /* Mandatory */
+    TEST_ASSERT_TRUE(has_forward_ref(2744u, 40u, 2026u)); /* TypeDef SessionsDiagnosticsSummaryType */
+
+    TEST_ASSERT_TRUE(has_forward_ref(2020u, 46u, 2025u)); /* HasProperty -> EnabledFlag */
+    assert_node(2025u, MU_NODECLASS_VARIABLE, "EnabledFlag");
+    assert_datatype_and_valuerank(2025u, 1u, -1);       /* Boolean */
+    TEST_ASSERT_TRUE(has_forward_ref(2025u, 37u, 78u)); /* Mandatory */
+    TEST_ASSERT_TRUE(has_forward_ref(2025u, 40u, 68u)); /* TypeDef PropertyType */
+
+    /* Cascade under ServerDiagnosticsSummary(2021): its own 12 materialized
+       field children, all HasComponent/Mandatory/BaseDataVariableType. */
+    static const mu_type_decl_t summary_decls[] = {
+        {3116u, "ServerViewCount", 7u, -1},
+        {3117u, "CurrentSessionCount", 7u, -1},
+        {3118u, "CumulatedSessionCount", 7u, -1},
+        {3119u, "SecurityRejectedSessionCount", 7u, -1},
+        {3120u, "RejectedSessionCount", 7u, -1},
+        {3121u, "SessionTimeoutCount", 7u, -1},
+        {3122u, "SessionAbortCount", 7u, -1},
+        {3124u, "PublishingIntervalCount", 7u, -1},
+        {3125u, "CurrentSubscriptionCount", 7u, -1},
+        {3126u, "CumulatedSubscriptionCount", 7u, -1},
+        {3127u, "SecurityRejectedRequestsCount", 7u, -1},
+        {3128u, "RejectedRequestsCount", 7u, -1},
+    };
+    assert_type_decls(2021u, 47u, 78u, 63u, summary_decls, sizeof(summary_decls) / sizeof(summary_decls[0]));
+    TEST_ASSERT_NULL(base_node(3123u)); /* official numbering gap -- not invented */
+
+    /* Cascade under SessionsDiagnosticsSummary(2744): its own 2 array
+       children. Heterogeneous TypeDefinitions (2196/2243), so asserted
+       individually rather than via assert_type_decls. */
+    TEST_ASSERT_TRUE(has_forward_ref(2744u, 47u, 3129u));
+    assert_node(3129u, MU_NODECLASS_VARIABLE, "SessionDiagnosticsArray");
+    assert_datatype_and_valuerank(3129u, 865u, 1); /* SessionDiagnosticsDataType[] */
+    TEST_ASSERT_TRUE(has_forward_ref(3129u, 37u, 78u));
+    TEST_ASSERT_TRUE(has_forward_ref(3129u, 40u, 2196u));
+
+    TEST_ASSERT_TRUE(has_forward_ref(2744u, 47u, 3130u));
+    assert_node(3130u, MU_NODECLASS_VARIABLE, "SessionSecurityDiagnosticsArray");
+    assert_datatype_and_valuerank(3130u, 868u, 1); /* SessionSecurityDiagnosticsDataType[] */
+    TEST_ASSERT_TRUE(has_forward_ref(3130u, 37u, 78u));
+    TEST_ASSERT_TRUE(has_forward_ref(3130u, 40u, 2243u));
+}
+
+/* spec 091 (CU 5801): SessionsDiagnosticsSummaryType(2026)'s 3 own
+   InstanceDeclarations (OPC-10000-5 §6.3.4), all HasComponent. Grounded via
+   opc-ua-reference (search_nodes: 2027/2028/12097 all resolve to §6.3.4;
+   WebFetch of the section table confirms every row is HasComponent, with
+   SessionDiagnosticsArray/SessionSecurityDiagnosticsArray Mandatory and
+   <ClientName> an Optional placeholder). 2027/2028 are homogeneous
+   (BaseDataVariableType, Mandatory) so share assert_type_decls; <ClientName>
+   (12097) is an Object OptionalPlaceholder(11508) slot with TypeDefinition
+   SessionDiagnosticsObjectType(2029) -- only the bare placeholder node itself
+   is emitted here (matching the ServerCapabilitiesType.<VendorCapability>
+   (11562) precedent). The full SessionDiagnosticsObjectType(2029) 56-node
+   cascade under this placeholder is explicitly DEFERRED to a future slice;
+   it is not built here. */
+static void test_sessions_diagnostics_summary_type_instance_declarations(void) {
+    static const mu_type_decl_t decls[] = {
+        {2027u, "SessionDiagnosticsArray", 865u, 1},         /* SessionDiagnosticsDataType[] */
+        {2028u, "SessionSecurityDiagnosticsArray", 868u, 1}, /* SessionSecurityDiagnosticsDataType[] */
+    };
+    /* SessionsDiagnosticsSummaryType -HasComponent(47)-> decl, Mandatory(78) */
+    assert_type_decls(2026u, 47u, 78u, 2196u, &decls[0], 1); /* TypeDef SessionDiagnosticsArrayType */
+    assert_type_decls(2026u, 47u, 78u, 2243u, &decls[1], 1); /* TypeDef SessionSecurityDiagnosticsArrayType */
+
+    /* <ClientName>(12097): OptionalPlaceholder(11508), TypeDef
+       SessionDiagnosticsObjectType(2029). Bare placeholder only -- no
+       children (deferred, see comment above). */
+    TEST_ASSERT_TRUE(has_forward_ref(2026u, 47u, 12097u));
+    assert_node(12097u, MU_NODECLASS_OBJECT, "<ClientName>");
+    TEST_ASSERT_TRUE(has_forward_ref(12097u, 37u, 11508u)); /* HasModellingRule -> OptionalPlaceholder */
+    TEST_ASSERT_TRUE(has_forward_ref(12097u, 40u, 2029u));  /* HasTypeDefinition -> SessionDiagnosticsObjectType */
 }
 
 /* spec 090 (CU 5801 fix): the 4 previously-dangling DataType references found
@@ -611,6 +798,10 @@ int main(void) {
     RUN_TEST(test_servertype_instance_declarations);
     RUN_TEST(test_variable_reports_true_datatype_and_valuerank);
     RUN_TEST(test_operation_limits_type_instance_declarations);
+    RUN_TEST(test_sampling_interval_diagnostics_type_instance_declarations);
+    RUN_TEST(test_session_security_diagnostics_type_instance_declarations);
+    RUN_TEST(test_server_diagnostics_type_instance_declarations);
+    RUN_TEST(test_sessions_diagnostics_summary_type_instance_declarations);
     RUN_TEST(test_servertype_datatype_refs_not_dangling);
 #endif
 #elif MUC_OPCUA_BASE_NODES
