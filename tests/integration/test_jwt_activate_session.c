@@ -153,6 +153,10 @@ static opcua_statuscode_t mock_read(void *c, void *h, opcua_byte_t *buf, size_t 
 static opcua_statuscode_t mock_write(void *c, void *h, const opcua_byte_t *buf, size_t len, size_t *n) {
     mock_t *m = (mock_t *)c;
     (void)h;
+    /* Defensive bounds check: the mock's last_write buffer is fixed-size; a
+       negative test that somehow produced an oversized write would otherwise
+       corrupt heap/stack. */
+    TEST_ASSERT_TRUE(len <= sizeof(m->last_write));
     (void)memcpy(m->last_write, buf, len);
     m->last_write_len = len;
     *n = len;
@@ -271,7 +275,13 @@ void setUp(void) {
 
 void tearDown(void) {}
 
-void test_activate_session_with_valid_jwt_succeeds(void) {
+void test_activate_session_jwt_over_securitypolicy_none_is_rejected(void) {
+    /* Spec 093 FR-008 / OPC-10000-4 §7.40.2.1: JWT bearer tokens MUST NOT be
+       accepted over SecurityPolicy#None (unencrypted connections). This test
+       feeds an otherwise-valid JWT over a None secure channel and asserts the
+       server rejects it with Bad_IdentityTokenRejected before any JWT
+       validation runs. End-to-end JWT-success coverage requires a non-None
+       SecurityPolicy variant of this fixture (tracked separately). */
     mock_t mock;
     (void)memset(&mock, 0, sizeof(mock));
 
@@ -448,12 +458,13 @@ void test_activate_session_with_valid_jwt_succeeds(void) {
     enqueue(&mock, chunk, clen);
     mu_server_poll(server); /* ActivateSession -> Response */
 
-    /* Expect Good -- spec.md SC-001: valid JWT, session activated. */
+    /* Expect Bad_IdentityTokenRejected -- JWT bearer tokens must not be
+       accepted over SecurityPolicy#None (spec 093 FR-008). */
     assert_response_service_result(mock.last_write, mock.last_write_len, MU_ID_ACTIVATESESSIONRESPONSE, 3,
-                                   MU_STATUS_GOOD);
+                                   MU_STATUS_BAD_IDENTITYTOKENREJECTED);
 
-    /* And the session should be in the Activated state. */
-    TEST_ASSERT_EQUAL(MU_SESSION_STATE_ACTIVATED, server->sessions[0].state);
+    /* And the session must NOT have transitioned to Activated. */
+    TEST_ASSERT_NOT_EQUAL(MU_SESSION_STATE_ACTIVATED, server->sessions[0].state);
 }
 
 void test_activate_session_with_expired_jwt_is_rejected(void) {
@@ -626,9 +637,12 @@ void test_activate_session_with_expired_jwt_is_rejected(void) {
     enqueue(&mock, chunk, clen);
     mu_server_poll(server);
 
-    /* Expect Bad_IdentityTokenInvalid (spec.md SC-002). */
+    /* The expired JWT would fail JWT validation with Bad_IdentityTokenInvalid,
+       but the SecurityPolicy#None guard (spec 093 FR-008) rejects first with
+       Bad_IdentityTokenRejected. Verifies the policy check takes precedence
+       over JWT expiry validation. */
     assert_response_service_result(mock.last_write, mock.last_write_len, MU_ID_ACTIVATESESSIONRESPONSE, 3,
-                                   MU_STATUS_BAD_IDENTITYTOKENINVALID);
+                                   MU_STATUS_BAD_IDENTITYTOKENREJECTED);
 
     /* Session must NOT have transitioned to Activated. */
     TEST_ASSERT_NOT_EQUAL(MU_SESSION_STATE_ACTIVATED, server->sessions[0].state);
@@ -636,7 +650,7 @@ void test_activate_session_with_expired_jwt_is_rejected(void) {
 
 int main(void) {
     UNITY_BEGIN();
-    RUN_TEST(test_activate_session_with_valid_jwt_succeeds);
+    RUN_TEST(test_activate_session_jwt_over_securitypolicy_none_is_rejected);
     RUN_TEST(test_activate_session_with_expired_jwt_is_rejected);
     return UNITY_END();
 }

@@ -698,7 +698,7 @@
     },
     {
       "toolId": "Prospector",
-      "localConfigurationFile": "/home/quackdcs/micro-opcua/.prospector.yaml",
+      "localConfigurationFile": ".prospector.yaml",
       "patterns": [
         {
           "patternId": "Prospector_profile-validator"

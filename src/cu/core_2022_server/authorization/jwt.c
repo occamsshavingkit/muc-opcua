@@ -132,9 +132,9 @@ static int issuer_url_match(const char *expected, const char *actual) {
 
 /* Compare a NUL-terminated expected audience against the aud claim. */
 static int audience_match(const char *expected, const char *actual) {
-    if (expected == NULL) {
-        /* No audience configured means we don't enforce. */
-        return 1;
+    /* Fail closed: no configured audience means we never accept. */
+    if (expected == NULL || expected[0] == '\0') {
+        return 0;
     }
     if (actual == NULL || actual[0] == '\0') {
         return 0;

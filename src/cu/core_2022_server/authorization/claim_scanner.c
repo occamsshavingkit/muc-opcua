@@ -26,10 +26,15 @@
 /* Copy a quoted JSON string value (between the surrounding quotes) into dst,
    applying \" and \\ unescaping. Truncates to dst_size-1 with NUL terminator.
    Returns the number of input bytes consumed INCLUDING the closing quote, or
-   -1 on malformed input (unterminated string). */
-static int copy_json_string(const char *src, size_t src_len, size_t start, char *dst, size_t dst_size) {
+   -1 on malformed input (unterminated string). If `overflow` is non-NULL it is
+   set to 1 when the value would have exceeded dst_size-1 chars (so callers
+   that must reject overlong values instead of truncating can react). */
+static int copy_json_string(const char *src, size_t src_len, size_t start, char *dst, size_t dst_size, int *overflow) {
     size_t i = start;
     size_t out = 0;
+    if (overflow != NULL) {
+        *overflow = 0;
+    }
     while (i < src_len) {
         char c = src[i++];
         if (c == '"') {
@@ -60,6 +65,8 @@ static int copy_json_string(const char *src, size_t src_len, size_t start, char 
         }
         if (dst != 0 && out + 1 < dst_size) {
             dst[out] = c;
+        } else if (overflow != NULL) {
+            *overflow = 1;
         }
         out++;
     }
@@ -67,7 +74,8 @@ static int copy_json_string(const char *src, size_t src_len, size_t start, char 
 }
 
 /* Parse a signed decimal integer. Returns the number of bytes consumed (>= 1)
-   or -1 on missing digits. The result is written to *out. */
+   or -1 on missing digits. The result is written to *out. Values are capped
+   at 9999999999 (~year 2286 in Unix seconds) to prevent int64 overflow. */
 static int parse_json_int(const char *src, size_t src_len, size_t start, opcua_int64_t *out) {
     size_t i = start;
     int negative = 0;
@@ -78,6 +86,14 @@ static int parse_json_int(const char *src, size_t src_len, size_t start, opcua_i
     opcua_int64_t value = 0;
     size_t digits = 0;
     while (i < src_len && src[i] >= '0' && src[i] <= '9') {
+        if (value > 9999999999LL) {
+            /* cap at ~year 2286; prevent overflow. Consume remaining digits
+               so the caller advances past the whole numeric literal. */
+            while (i < src_len && src[i] >= '0' && src[i] <= '9') {
+                i++;
+            }
+            break;
+        }
         value = value * 10 + (opcua_int64_t)(src[i] - '0');
         i++;
         digits++;
@@ -170,8 +186,23 @@ void mu_claim_scan(const char *json, size_t json_len, mu_jwt_claims_t *out) {
     if (json == 0 || out == 0) {
         return;
     }
+    /* Depth tracking: only accept claims at depth 1 (the top-level object).
+       This prevents a payload like {"meta":{"sub":"alice"}} from extracting
+       "alice" as the subject -- the inner "sub" is at depth 2 and ignored. */
+    int depth = 0;
     size_t i = 0;
     while (i < json_len) {
+        /* Track JSON nesting as we walk so we know we're at the top object. */
+        if (json[i] == '{') {
+            depth++;
+            i++;
+            continue;
+        }
+        if (json[i] == '}') {
+            depth--;
+            i++;
+            continue;
+        }
         /* Find next '"' that opens a key. */
         if (json[i] != '"') {
             i++;
@@ -202,14 +233,21 @@ void mu_claim_scan(const char *json, size_t json_len, mu_jwt_claims_t *out) {
             return;
         }
 
+        /* Only accept claims at depth 1 (top-level object). Nested values are
+           skipped via skip_value so the stream position stays aligned. */
+        if (depth != 1) {
+            i = skip_value(json, json_len, value_start);
+            continue;
+        }
+
         /* Match against the six registered claim names (RFC 7519 §4.1).
-           copy_json_string returns the absolute index just past the closing
-           quote (it scans from `start` but returns the new `i`, not a length),
-           so we assign its result to `i` directly. */
+            copy_json_string returns the absolute index just past the closing
+            quote (it scans from `start` but returns the new `i`, not a length),
+            so we assign its result to `i` directly. */
         const char *key = json + key_start;
         if (key_len == 3 && memcmp(key, "iss", 3) == 0) {
             if (json[value_start] == '"') {
-                int n = copy_json_string(json, json_len, value_start + 1, out->iss, sizeof(out->iss));
+                int n = copy_json_string(json, json_len, value_start + 1, out->iss, sizeof(out->iss), NULL);
                 if (n < 0) {
                     return;
                 }
@@ -218,16 +256,22 @@ void mu_claim_scan(const char *json, size_t json_len, mu_jwt_claims_t *out) {
             }
         } else if (key_len == 3 && memcmp(key, "sub", 3) == 0) {
             if (json[value_start] == '"') {
-                int n = copy_json_string(json, json_len, value_start + 1, out->sub, sizeof(out->sub));
+                int overflow = 0;
+                int n = copy_json_string(json, json_len, value_start + 1, out->sub, sizeof(out->sub), &overflow);
                 if (n < 0) {
                     return;
+                }
+                /* Reject overlong subjects rather than silently truncating:
+                   leave sub empty so mu_jwt_validate returns MU_JWT_ERR_NO_SUB. */
+                if (overflow) {
+                    out->sub[0] = '\0';
                 }
                 i = (size_t)n;
                 continue;
             }
         } else if (key_len == 3 && memcmp(key, "aud", 3) == 0) {
             if (json[value_start] == '"') {
-                int n = copy_json_string(json, json_len, value_start + 1, out->aud, sizeof(out->aud));
+                int n = copy_json_string(json, json_len, value_start + 1, out->aud, sizeof(out->aud), NULL);
                 if (n < 0) {
                     return;
                 }
@@ -238,7 +282,7 @@ void mu_claim_scan(const char *json, size_t json_len, mu_jwt_claims_t *out) {
                 /* aud as array of strings: use first element if it is a string. */
                 size_t arr = skip_ws(json, json_len, value_start + 1);
                 if (arr < json_len && json[arr] == '"') {
-                    int n = copy_json_string(json, json_len, arr + 1, out->aud, sizeof(out->aud));
+                    int n = copy_json_string(json, json_len, arr + 1, out->aud, sizeof(out->aud), NULL);
                     if (n < 0) {
                         return;
                     }

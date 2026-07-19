@@ -75,7 +75,7 @@ Extracted claims from a validated JWT.
 
 | File | Purpose |
 |------|---------|
-| `src/cu/core_2022_server/authorization/jwt.h` | Public JWT API (validate, claim accessors) |
+| `include/muc_opcua/authorization/jwt.h` | Public JWT API (validate, claim accessors) |
 | `src/cu/core_2022_server/authorization/jwt.c` | JWT parser, scanner, validator |
 | `src/cu/core_2022_server/authorization/base64url.c` | Base64url decode (no padding variant) |
 | `src/core/service_dispatch/activate_session.c` | Hook JWT validation into user token dispatch |

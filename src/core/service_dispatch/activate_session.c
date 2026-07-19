@@ -264,8 +264,15 @@ static opcua_statuscode_t handle_activate_jwt(mu_server_t *server, mu_session_t 
         return MU_STATUS_BAD_IDENTITYTOKENINVALID;
     }
 
+    /* JWT bearer tokens MUST NOT be accepted over SecurityPolicy#None
+       (unencrypted connections) -- spec 093 FR-008 / OPC-10000-4 §7.40.2.1. */
+    if (server_secure_channel.policy == MU_SECURITY_POLICY_NONE_ID ||
+        server_secure_channel.policy == MU_SECURITY_POLICY_INVALID_ID) {
+        return MU_STATUS_BAD_IDENTITYTOKENREJECTED;
+    }
+
     /* JWT length is bounded by the chunk size (max_message_size). Cap
-       defensively: a sane JWT is well under 8 KiB. */
+       defensively: a sane JWT is well under 4 KiB. */
     size_t jwt_len = (size_t)issued_token->token_data.length;
     if (jwt_len > 4096u) {
         return MU_STATUS_BAD_IDENTITYTOKENINVALID;
@@ -294,6 +301,12 @@ static opcua_statuscode_t handle_activate_jwt(mu_server_t *server, mu_session_t 
         /* Stash the JWT subject fingerprint for the TransferSubscriptions
            same-user check below -- but only on success; on failure we drop it. */
         (void)slot;
+        /* Spec 093 FR-008: NO_CONFIGURED_ISSUERS is a server-side configuration
+           fault, not a malformed token -> Bad_IdentityTokenRejected. Other JWT
+           failures remain Bad_IdentityTokenInvalid per spec 093 FR-007. */
+        if (jr == MU_JWT_ERR_NO_CONFIGURED_ISSUERS) {
+            return MU_STATUS_BAD_IDENTITYTOKENREJECTED;
+        }
         return MU_STATUS_BAD_IDENTITYTOKENINVALID;
     }
 
@@ -514,18 +527,21 @@ static opcua_statuscode_t verify_and_activate_session(mu_server_t *server, const
         activate_result = handle_activate_jwt(server, slot, issued_token, &jwt_claims);
         if (activate_result == MU_STATUS_GOOD) {
             /* Stash the subject on the slot for diagnostics / redundancy. The
-               fingerprint array is 64 bytes; cap the subject to that. */
+               fingerprint array is 64 bytes; cap the subject to that. The
+               whole block is gated on REDUNDANCY because slot->user_identity
+               is only declared under that guard. */
+#if MUC_OPCUA_CU_REDUNDANCY
             size_t sub_len = strlen(jwt_claims.sub);
             if (sub_len > sizeof(slot->user_identity)) {
                 sub_len = sizeof(slot->user_identity);
             }
-#if MUC_OPCUA_CU_REDUNDANCY
             slot->user_identity_kind = 4u; /* JWT-issued */
             slot->user_identity_len = 0;
             (void)memcpy(slot->user_identity, jwt_claims.sub, sub_len);
             slot->user_identity_len = (opcua_byte_t)sub_len;
+#else
+            (void)jwt_claims;
 #endif
-            (void)sub_len;
         }
 #else
         /* JWT support compiled out: per spec 093 FR-008 an IssuedIdentityToken
