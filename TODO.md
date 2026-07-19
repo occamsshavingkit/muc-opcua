@@ -2,7 +2,7 @@
 
 # TODO — muc-opcua
 
-**Updated**: 2026-07-19 (PR #328 Authorization Service / JWT merged)
+**Updated**: 2026-07-19 (CU 5801 deferred tests resolved — 124/124 pass)
 
 ## Pending
 
@@ -24,7 +24,7 @@
 
 | Source | Item | Status |
 |--------|------|--------|
-| PR #327 | 3 deferred test functions (browse_name assertion mismatch) | Pending investigation |
+| PR #327 | 3 deferred test functions (browse_name assertion mismatch) | ✅ Fixed — root cause was 62 wrong length constants + shifted NodeId mapping + 3 missing DA-off nodes |
 | PR #328 | JWT success-path E2E test needs non-None SecurityPolicy fixture | Pending |
 | PR #328 | CU 1629 AuthorizationServiceConfigurationType type nodes (GDS ns 2) | Deferred |
 | PR #328 | Non-OpenSSL JWT crypto backends (mbedTLS/wolfSSL) | Deferred |
