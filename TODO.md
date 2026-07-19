@@ -28,5 +28,5 @@
 | PR #328 | JWT success-path E2E test needs non-None SecurityPolicy fixture | ✅ Fixed — Basic256Sha256 secure channel test added |
 | PR #328 | CU 1629 AuthorizationServiceConfigurationType type nodes (GDS ns 2) | Deferred |
 | PR #328 | Non-OpenSSL JWT crypto backends (mbedTLS/wolfSSL) | Deferred |
-| PR #328 | Issuer key rotation (evaluate all matching issuers, not first) | Deferred |
+| PR #328 | Issuer key rotation (evaluate all matching issuers, not first) | ✅ Fixed — iterates all URL-matching issuers |
 | PR #328 | Refactor high-CCN functions (mu_jwt_validate, mu_claim_scan) | Deferred |
