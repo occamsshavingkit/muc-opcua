@@ -1,11 +1,11 @@
-# Conformance: Nano Embedded Device 2017 Server Profile
+# Conformance: Nano Embedded Device 2022 Server Profile
 
-This server targets the **Nano Embedded Device 2017 Server Profile**
+This server targets the **Nano Embedded Device 2022 Server Profile**
 (`http://opcfoundation.org/UA-Profile/Server/NanoEmbeddedDevice2017`, OPC 10000-7).
 Per the OPC Foundation profile definition, Nano is *functionally equivalent to the
-Core 2017 Server Facet* and requires the OPC UA TCP binary transport.
+Core 2022 Server Facet* and requires the OPC UA TCP binary transport.
 
-> **Strict profile (spec 067).** The `nano` build now equals exactly the mandatory Core 2017
+> **Strict profile (spec 067).** The `nano` build now equals exactly the mandatory Core 2022
 > facet set: Read/Browse/Discovery/**RegisterNodes**, the **Base Info Server object**
 > (`BASE_NODES`), and **UserName/Password** user tokens (`USER_AUTH`) — the last two were
 > previously integrator-supplied and are now built in for standalone conformance. Everything
@@ -51,7 +51,7 @@ to OPC-10000-7 §4.2/§4.3 evidence.
   (caller-owned) server struct.
 
 ## Security Time Synchronization (spec 055)
-- `Security Time Synch - Configuration` (Mandatory in the v1.05.02 Core 2017
+- `Security Time Synch - Configuration` (Mandatory in the v1.05.02 Core 2022
   Server Facet) is **targeted**: when `MUC_OPCUA_TIME_SYNC` is enabled the server
   stamps `ServerTimestamp` in response headers and, at OpenSecureChannel,
   validates the client's `RequestHeader.timestamp` against server time within

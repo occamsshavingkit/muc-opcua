@@ -69,7 +69,7 @@ reconciliation note below.
 | 1580 | Historical Event Replace 2022 Server Facet | 0/3 | 0/0 |
 | 1581 | Historical Event Delete 2022 Server Facet | 0/3 | 0/0 |
 | 1582 | Aggregate Subscription 2022 Server Facet | 16/18 | 0/39 |
-| 1627 | Enhanced DataChange Subscription 2017 Server Facet | 16/20 | 0/1 |
+| 1627 | Enhanced DataChange Subscription 2022 Server Facet | 16/20 | 0/1 |
 | 1629 | Authorization Service Server Facet | 0/1 | 0/0 |
 | 1630 | Sessionless Server Facet | 0/2 | 0/0 |
 | 1631 | Global Certificate Management Server Facet | 0/1 | 0/0 |
@@ -90,7 +90,7 @@ reconciliation note below.
 | 1709 | Historical Access Modified Data 2022 Server Facet | 0/4 | 0/0 |
 | 1710 | Historical Access Structured Data 2022 Server Facet | 0/4 | 0/6 |
 | 1715 | Base Server Behaviour Facet | 0/4 | 0/0 |
-| 1725 | ComplexType 2017 Server Facet | 0/3 | 0/3 |
+| 1725 | ComplexType 2022 Server Facet | 0/3 | 0/3 |
 | 1733 | Model Change Event Server Facet | 0/2 | 0/1 |
 | 1875 | Scheduler Base Server Facet | 1/5 | 0/3 |
 | 1876 | Scheduler Configuration Server Facet | 1/6 | 0/4 |

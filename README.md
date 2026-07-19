@@ -15,7 +15,7 @@ It ships with Kconfig-backed server profiles — **nano**, **micro**, **embedded
 need and can inspect or trim the resolved feature set with `menuconfig`.
 
 > **Status:** profile-*targeting*. The Nano surface is complete; Micro adds data-change
-> subscriptions; Standard targets the OPC-10000-7 Standard 2017 UA Server surface.
+> subscriptions; Standard targets the OPC-10000-7 Standard 2022 UA Server surface.
 > SecurityPolicy Basic256Sha256 has been validated against the OPC Foundation .NET
 > reference client. No formal profile-compliance claim is made until the OPC UA CTT
 > passes — see [docs/conformance/](docs/conformance/).
@@ -29,7 +29,7 @@ need and can inspect or trim the resolved feature set with `menuconfig`.
 - **Tiny flash.** Measured snapshot (2026-07-18, reproduce with
   `scripts/measure_size.sh all`): a complete Nano server is **23.9 KiB**
   (24,472 B) of Arm Cortex-M0+ `-Os` core `.text`; Micro is **41.4 KiB**
-  (42,368 B); Standard 2017 is **86.9 KiB** (89,042 B). Every profile has
+  (42,368 B); Standard 2022 is **86.9 KiB** (89,042 B). Every profile has
   0 B `.data` and 0 B `.bss` — the library holds no mutable static state and
   never calls `malloc`.
 - **Freestanding & portable.** Plain C11 core with no OS assumptions. Hardware and OS
@@ -66,10 +66,10 @@ Measured 2026-07-18 (`scripts/measure_size.sh all`, Arm Cortex-M0+ `-Os` archive
 
 | Profile | .text | OPC UA Profile (strict mandatory set) |
 |---------|-------|----------------|
-| nano | 24,472 B | Nano Embedded Device 2017 (Core: Read/Browse/Discovery/RegisterNodes + Base Info + UserName/Password) |
-| micro | 42,368 B | Micro Embedded Device 2017 (Nano + basic subscriptions + 2 parallel sessions) |
-| embedded | 101,902 B | Embedded 2017 UA Server (Micro + Standard DataChange + Security + Type System) |
-| standard | 102,260 B | Standard 2017 UA Server (Embedded + Enhanced DataChange capacity + X509) |
+| nano | 24,472 B | Nano Embedded Device 2022 (Core: Read/Browse/Discovery/RegisterNodes + Base Info + UserName/Password) |
+| micro | 42,368 B | Micro Embedded Device 2022 (Nano + basic subscriptions + 2 parallel sessions) |
+| embedded | 101,902 B | Embedded 2022 UA Server (Micro + Standard DataChange + Security + Type System) |
+| standard | 102,260 B | Standard 2022 UA Server (Embedded + Enhanced DataChange capacity + X509) |
 | full | 134,447 B | — (everything on: Write, Events, Data Access, Method Server, History, Query, NodeManagement, PubSub, Aggregate, Diagnostics, Reverse Connect, Client Redundancy, ECC, …) |
 
 The base type-system CUs (3188/3185, spec 080b) add ~3.1 KB `.text` to
@@ -129,7 +129,7 @@ standard/full storage. Retune per build with `-DMU_MAX_CONNECTIONS=n`.
 | full | 4,380,844 B | 100 | 100 | 100 | 2,000 | 5 | 100 |
 
 The `standard`/`full` monitored-item queue depth is **5** (not 2): they advertise
-`StandardUA2017`, which mandates the **Enhanced DataChange Subscription 2017** facet
+`StandardUA2017`, which mandates the **Enhanced DataChange Subscription 2022** facet
 (`MinQueueSize_05`). The deeper fixed inline queue adds +144 KiB (standard) / +288 KiB
 (full) of static RAM vs a depth-2 build — see
 [docs/conformance/enhanced-datachange.md](docs/conformance/enhanced-datachange.md).
@@ -336,8 +336,8 @@ Set `-DMUC_OPCUA_PLATFORM=pico` with `PICO_SDK_PATH` pointing at a Pico SDK chec
 
 - **Profile-targeting, not yet CTT-certified.** Surfaces are implemented and tested, but
   no formal compliance claim is made until the OPC UA CTT passes.
-- **The `embedded` profile targets Embedded 2017.** It includes Basic256Sha256,
-  Standard DataChange 2017, Base Info Type System exposure, and the required
+- **The `embedded` profile targets Embedded 2022.** It includes Basic256Sha256,
+  Standard DataChange 2022, Base Info Type System exposure, and the required
   GetMonitoredItems/ResendData methods, but it is not CTT-verified.
 - **The `standard`/`full` profiles** add multiplexed client connections, the Write
   service, username/X509 user tokens, dynamic nodes, arbitrary user methods,

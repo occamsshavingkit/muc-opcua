@@ -1,6 +1,6 @@
-# Conformance: Embedded 2017 UA Server Profile
+# Conformance: Embedded 2022 UA Server Profile
 
-This server targets the **Embedded 2017 UA Server Profile**
+This server targets the **Embedded 2022 UA Server Profile**
 (`http://opcfoundation.org/UA-Profile/Server/EmbeddedUA2017`, OPC-10000-7 §6.6.69)
 when built with `make embedded` or `-DMUC_OPCUA_PROFILE=embedded`.
 
@@ -10,7 +10,7 @@ document is a traceability map for the selected embedded target; the repo is not
 profile-compliant and not CTT-verified without external CTT evidence.
 
 > **Strict profile (spec 067).** As of spec 067 the `embedded` build equals *exactly* the
-> mandatory facet set of EmbeddedUA2017 (Micro + Standard DataChange 2017 + Security + Base
+> mandatory facet set of the Embedded 2022 UA Server Profile (Micro + Standard DataChange 2022 + Security + Base
 > Info Type System). Features listed below that are **optional facets** — Attribute Write,
 > Events/Alarms, Historical Access, Query, Data Access, arbitrary Method Server, PubSub,
 > etc. — are **no longer enabled by default** in this profile; enable them per build with
@@ -32,9 +32,9 @@ claims are out of scope for this profile-targeting build.
 `make embedded` enables:
 
 - SecurityPolicy Basic256Sha256 and SecurityPolicy None.
-- Data-change subscriptions with Standard DataChange Subscription 2017 facet additions.
+- Data-change subscriptions with Standard DataChange Subscription 2022 facet additions.
   This is the **Standard** DataChange tier (queue depth 2, `MinQueueSize_02`) — embedded
-  advertises `EmbeddedUA2017`. The higher **Enhanced** DataChange 2017 tier (queue depth 5)
+  advertises `EmbeddedUA2017`. The higher **Enhanced** DataChange 2022 tier (queue depth 5)
   is claimed only by the `standard`/`full` builds that advertise `StandardUA2017`; see
   `enhanced-datachange.md`.
 - Raised Standard capacity minima:
@@ -52,12 +52,12 @@ OPC-10000-7 §4.2 conformance-unit or §4.3 profile verification.
 |---|---|---|---|
 | Profile claim basis | OPC-10000-7 §4.2, §4.3, §6.6.69 | Profile-targeting only | `MUC_OPCUA_PROFILE=embedded`, `make embedded`, `docs/traceability/005-embedded-profile-completion.md`; no external CTT evidence |
 | Transport / encoding | OPC-10000-6 §5.2, §7.1.2.2, §7.1.2.3, §7.1.2.4, §7.2 | Targeted surface | `src/core/tcp_connection.c`, `src/core/message_chunk.c`, `src/encoding/*`, `tests/unit/test_tcp_connection.c`, `tests/unit/test_message_chunk_errors.c` |
-| Micro 2017 base | OPC-10000-7 Micro profile definition | Targeted behavior | `profile-micro.md`, `test_subscriptions`, `test_session`, `test_single_client_limit` |
+| Micro 2022 base | OPC-10000-7 Micro profile definition | Targeted behavior | `profile-micro.md`, `test_subscriptions`, `test_session`, `test_single_client_limit` |
 | SecurityPolicy None | OPC-10000-7 Core/Nano security baseline | Targeted behavior | `profile-nano.md`, handshake/interoperability tests |
 | SecurityPolicy Basic256Sha256 | OPC-10000-7 Embedded security policy support | Targeted behavior | `src/security/*`, `test_asym_chunk`, `test_sym_chunk`, `test_server_handshake_secure` |
 | SecurityPolicy Aes256_Sha256_RsaPss signatures | OPC-10000-7 Aes256_Sha256_RsaPss (RSA-PSS-SHA256 + `rsa-pss-sha2-256` URI) | Targeted behavior (feature 026): asymmetric signature scheme/URI is policy-selected; PSS for this policy, PKCS#1.5 for Basic256Sha256/Aes128 | `src/security/certificate.c` (`mu_asym_signature_*`), `security_policy.c`, `test_secure_handshake_modern` (aes256_pss + wrong-algorithm reject) |
 | Security Default ApplicationInstance Certificate | OPC-10000-7 §6.6.69 security CU | Targeted behavior | `src/security/certificate.c`, `test_certificate`, secure handshake tests |
-| Standard DataChange Subscription 2017 facet | OPC-10000-7 §6.6.17 | Targeted behavior | `tests/unit/test_subscriptions_capacity.c`, `tests/integration/test_subscriptions.c` |
+| Standard DataChange Subscription 2022 facet | OPC-10000-7 §6.6.17 | Targeted behavior | `tests/unit/test_subscriptions_capacity.c`, `tests/integration/test_subscriptions.c` |
 | Monitored Items Deadband Filter | OPC-10000-4 §7.22.2 | Targeted behavior | absolute-deadband coverage in subscription tests |
 | Monitored Items Aggregate Filter | OPC-10000-4 §7.22.4; OPC-10000-13 §5.4.3.5; OPC-10000-13 §5.4.3.10; OPC-10000-13 §5.4.3.11 | Profile-targeting, scoped | Average/Min/Max filters in `src/services/subscription.c`, `tests/unit/test_aggregate.c` |
 | Monitor MinQueueSize_02 | OPC-10000-4 §5.13.2, §7.20.1 | Targeted behavior | queue/discard/overflow coverage in subscription tests |
@@ -78,7 +78,7 @@ OPC-10000-7 §4.2 conformance-unit or §4.3 profile verification.
 | Feature | Reason | Expected behavior |
 |---|---|---|
 | TransferSubscriptions | Client Redundancy Facet, not part of the selected Embedded profile slice | Service unsupported |
-| Percent deadband | Data Access Server Facet (`MUC_OPCUA_DATA_ACCESS`, spec 060); not required by the Standard DataChange Subscription 2017 facet | `Bad_MonitoredItemFilterUnsupported` on the embedded profile (DA off by default); supported when the DA facet is built — see [data-access.md](data-access.md) |
+| Percent deadband | Data Access Server Facet (`MUC_OPCUA_DATA_ACCESS`, spec 060); not required by the Standard DataChange Subscription 2022 facet | `Bad_MonitoredItemFilterUnsupported` on the embedded profile (DA off by default); supported when the DA facet is built — see [data-access.md](data-access.md) |
 | Arbitrary user methods | Only the two Base Info methods are required for this profile work | `Bad_MethodInvalid` for unknown methods |
 
 ## Validation Snapshot

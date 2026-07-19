@@ -1,13 +1,13 @@
-# Conformance: Micro Embedded Device 2017 Server Profile
+# Conformance: Micro Embedded Device 2022 Server Profile
 
-This server targets the **Micro Embedded Device 2017 Server Profile**
+This server targets the **Micro Embedded Device 2022 Server Profile**
 (`http://opcfoundation.org/UA-Profile/Server/MicroEmbeddedDevice2017`, OPC 10000-7,
 OPC Foundation profile id 1659).
 >
 > **Strict profile (spec 067).** The `micro` build now equals exactly Nano + the
 > EmbeddedDataChangeSubscription facet + Session-Minimum-2-Parallel (`MULTIPLE_CONNECTIONS`).
 > The previously-bundled Attribute Write, Multi-chunk, and Extended NodeIds are **not**
-> mandated by MicroEmbeddedDevice2017 and are now `-D` opt-ins.
+> mandated by the Micro Embedded Device 2022 Server Profile and are now `-D` opt-ins.
 
 Per the profile definition, Micro *builds upon the
 Nano Embedded Device Server Profile; the most important additions are support for
@@ -59,7 +59,7 @@ boundary; no FPU is required on the target).
 The following are not required by the Micro profile and remain disabled unless the
 Embedded profile gates are enabled:
 
-- Standard DataChange Subscription 2017 facet deltas: absolute-deadband filtering
+- Standard DataChange Subscription 2022 facet deltas: absolute-deadband filtering
   (OPC-10000-4 §7.22.2), queue size 2 with overflow handling (§5.13.2, §7.20.1),
   SetTriggering (§5.13.5), and raised capacities.
 - Method Call for `Server.GetMonitoredItems` and `Server.ResendData`

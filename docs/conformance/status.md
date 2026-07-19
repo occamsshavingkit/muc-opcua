@@ -6,7 +6,7 @@ conformance units are the v1.05.02 set. Per-profile limits/capacities are
 documented in [documentation.md](documentation.md) (the mandatory documentation
 CU for limits, Mantis 7003).
 
-**Target Profile:** Embedded 2017 UA Server Profile
+**Target Profile:** Embedded 2022 UA Server Profile
 (`http://opcfoundation.org/UA-Profile/Server/EmbeddedUA2017`) for the `embedded`
 build. `nano` and `micro` remain available as lower-tier profile builds.
 
@@ -75,7 +75,7 @@ grounded in OPC-10000-4 section 7.38.2 Common StatusCodes.
 | `Bad_TypeMismatch` | `0x80740000` | `MU_STATUS_BAD_TYPEMISMATCH` | OPC-10000-4 section 7.38.2 |
 | `Bad_ContinuationPointInvalid` | `0x804A0000` | `MU_STATUS_BAD_CONTINUATIONPOINTINVALID` | OPC-10000-4 section 7.38.2 |
 
-Conformance-unit status (Core 2017 Server Facet groups; see [services.md](services.md)):
+Conformance-unit status (Core 2022 Server Facet groups; see [services.md](services.md)):
 
 | Conformance group / unit | Status | Evidence |
 |---|---|---|
@@ -98,7 +98,7 @@ All in-scope Nano conformance units are implemented and covered by tests/CI.
 
 ## Micro profile progress (Embedded Data Change Subscription Server Facet + ≥2 sessions)
 
-The Micro Embedded Device 2017 Server Profile builds on Nano (see
+The Micro Embedded Device 2022 Server Profile builds on Nano (see
 [profile-micro.md](profile-micro.md)). The subscription facet is implemented; the
 ≥2-session requirement is implemented.
 
@@ -113,7 +113,7 @@ The Micro Embedded Device 2017 Server Profile builds on Nano (see
 
 ## Embedded profile progress
 
-The Embedded 2017 profile surface is selected with `MUC_OPCUA_PROFILE=embedded`
+The Embedded 2022 profile surface is selected with `MUC_OPCUA_PROFILE=embedded`
 or the `configs/embedded.defconfig` seed. See [profile-embedded.md](profile-embedded.md)
 for the conformance-unit map.
 
@@ -121,16 +121,22 @@ for the conformance-unit map.
 |---|---|---|
 | SecurityPolicy Basic256Sha256 | Implemented | `test_asym_chunk`, `test_sym_chunk`, `test_server_handshake_secure` |
 | Security Default ApplicationInstance Certificate | Satisfied | `test_certificate`, existing certificate handling |
-| Standard DataChange Subscription 2017 facet | Implemented | `test_subscriptions_capacity`, `test_subscriptions` |
-| Enhanced DataChange Subscription 2017 facet (standard/full; mandated by StandardUA2017) | Implemented | `test_subscriptions_capacity` (`test_enhanced_*`); see `enhanced-datachange.md` |
+| Security Time Sync (CU 151) | Implemented | `test_time_sync` |
+| ECC Security Policies (curve25519/nist256) | Implemented (full only) | `test_ecc_crypto`, `test_ecc_handshake_e2e` |
+| Authorization Service / JWT (CU 1629/1697) | Implemented (full only) | `test_jwt`, `test_jwt_activate_session` |
+| Standard DataChange Subscription 2022 facet | Implemented | `test_subscriptions_capacity`, `test_subscriptions` |
+| Enhanced DataChange Subscription 2022 facet (standard/full; mandated by StandardUA2017) | Implemented | `test_subscriptions_capacity` (`test_enhanced_*`); see `enhanced-datachange.md` |
 | Base Server Behaviour: Session General Service Behaviour (auth token · requestHandle · timeoutHint) | Implemented | `test_service_state_errors`, `test_write_response`, `test_base_server_behaviour`; see `base-server-behaviour.md` |
 | ServerDiagnostics object (optional; `ServerDiagnosticsSummary` i=2275, standard/full) | Implemented | `test_diagnostics`; see `base-server-behaviour.md` |
 | Reverse Connect (optional; server-initiated, ReverseHello first per §7.1.3, standard/full) | Implemented | `test_reverse_connect`; see `reverse-connect.md` |
 | Client Redundancy (optional; TransferSubscriptions cross-session + RedundancySupport, full) | Implemented | `test_transfer_subscriptions`; see `redundancy.md` |
 | Base Info Type System | Implemented | `test_type_system`, `test_view_services` |
+| Data Access Server Facet | Implemented (standard/full) | `test_da_type_nodes`, `test_percent_deadband` |
 | Method Call: GetMonitoredItems / ResendData | Implemented | `test_method_call`, `test_method_call_errors` |
+| Method Server Facet (arbitrary user methods) | Implemented (full) | `test_method_call_arbitrary` |
 | Write Service | Implemented | Optional feature via `MUC_OPCUA_SERVICE_WRITE` |
 | Alarms & Conditions (Events) | Implemented | Event notifications via `MUC_OPCUA_EVENTS` |
+| Event Filter Where-Clause | Implemented (full) | `src/services/event_filter.c` |
 | Dynamic Nodes | Implemented | Runtime node addition via `MUC_OPCUA_DYNAMIC_NODES` |
 | NodeManagement Services | Implemented | Dynamic NodeManagement via `MUC_OPCUA_SERVICE_NODEMANAGEMENT` |
 | Query Services | Implemented | Search address space via `MUC_OPCUA_SERVICE_QUERY` |

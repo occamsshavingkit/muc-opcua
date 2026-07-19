@@ -1,9 +1,9 @@
-# Conformance: Enhanced DataChange Subscription 2017 Server Facet (spec 063)
+# Conformance: Enhanced DataChange Subscription 2022 Server Facet (spec 063)
 
-This server implements the OPC UA **Enhanced DataChange Subscription 2017 Server Facet**
+This server implements the OPC UA **Enhanced DataChange Subscription 2022 Server Facet**
 (OPC profile-DB facet `EnhancedDataChangeSubscription2017`, **id 1678**). It is a
 **capacity tier** of the DataChange subscription engine, not a distinct code path — it
-raises the mandatory minima of the base **Standard DataChange Subscription 2017** facet
+raises the mandatory minima of the base **Standard DataChange Subscription 2022** facet
 (id 1675, which Enhanced *includes*).
 
 ## Why the server claims it (it is mandatory, not optional)
@@ -11,18 +11,18 @@ raises the mandatory minima of the base **Standard DataChange Subscription 2017*
 The `standard` and `full` Kconfig profiles advertise
 `http://opcfoundation.org/UA-Profile/Server/StandardUA2017` (see
 `src/address_space/base_nodes.c`, `s_server_profile_array`, gated by the generated
-`MUC_OPCUA_STANDARD_PROFILE` marker). The **Standard 2017 UA Server Profile (id 1663)** lists the
-Enhanced DataChange 2017 facet with `isOptional = false` — so any server advertising
+`MUC_OPCUA_STANDARD_PROFILE` marker). The **Standard 2022 UA Server Profile (id 1663)** lists the
+Enhanced DataChange 2022 facet with `isOptional = false` — so any server advertising
 StandardUA2017 **must** meet the Enhanced minima. `embedded` advertises `EmbeddedUA2017`,
-which mandates only the plain **Standard DataChange 2017** facet (a lower queue-depth
+which mandates only the plain **Standard DataChange 2022** facet (a lower queue-depth
 floor), so embedded is a Standard-tier — not Enhanced — DataChange server.
 
 | Profile | Advertised profile | DataChange facet claimed | Queue depth |
 |---|---|---|---|
 | nano / micro | Nano / (Micro via Nano) | none / base subscriptions | 1 |
-| embedded | EmbeddedUA2017 | Standard DataChange 2017 (`MinQueueSize_02`) | 2 |
-| standard | StandardUA2017 | **Enhanced DataChange 2017** (`MinQueueSize_05`) | **5** |
-| full | StandardUA2017 | **Enhanced DataChange 2017** (`MinQueueSize_05`) | **5** |
+| embedded | EmbeddedUA2017 | Standard DataChange 2022 (`MinQueueSize_02`) | 2 |
+| standard | StandardUA2017 | **Enhanced DataChange 2022** (`MinQueueSize_05`) | **5** |
+| full | StandardUA2017 | **Enhanced DataChange 2022** (`MinQueueSize_05`) | **5** |
 
 ## Grounded minima (all four CUs are mandatory)
 

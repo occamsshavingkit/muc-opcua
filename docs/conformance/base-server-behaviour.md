@@ -1,12 +1,12 @@
 # Conformance: Base Server Behaviour Facet (spec 064)
 
-There is no standalone "Base Server Behaviour Facet" in the 2017 profile line. Base server
-behaviour is defined by the **Core 2017 Server Facet** (OPC profile-DB id 1673) — the
+There is no standalone "Base Server Behaviour Facet" in the 2022 profile line. Base server
+behaviour is defined by the **Core 2022 Server Facet** (OPC profile-DB id 1673) — the
 mandatory base of every profile this server ships (Nano → Micro → Embedded → Standard). This
 document covers its base-behaviour conformance units and the (optional) ServerDiagnostics
 object this server also exposes.
 
-## Mandatory: Session General Service Behaviour (Core 2017, `isOptional=false`)
+## Mandatory: Session General Service Behaviour (Core 2022, `isOptional=false`)
 
 > "Implement basic Service behaviour. This includes in particular: checking the
 > authentication token; returning the requestHandle in responses; respecting a timeoutHint."
