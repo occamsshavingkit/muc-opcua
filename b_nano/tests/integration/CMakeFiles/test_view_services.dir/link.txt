@@ -1,0 +1,1 @@
+/usr/bin/cc -Wl,--gc-sections CMakeFiles/test_view_services.dir/test_view_services.c.o -o test_view_services  ../../src/libmuc_opcua.a ../support/libmuc_opcua_test_support.a ../../_deps/unity-build/libunity.a ../../src/libmuc_opcua.a 
