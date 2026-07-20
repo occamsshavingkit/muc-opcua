@@ -2,31 +2,27 @@
 
 # TODO — muc-opcua
 
-**Updated**: 2026-07-20 (PR #329 KeyCredential Service merged)
+**Updated**: 2026-07-20 — PG18/PG19/PG20 all complete. Backlog empty.
 
 ## Pending
 
 | ID | Feature | OPC Ref | Notes |
 |----|---------|---------|-------|
-| PG19 | User Role Management Server Facet | OPC-10000-7 v1.05.02 | Server user CRUD management |
-| PG20 | Global Certificate Management Server Facet | OPC-10000-7 v1.05.02 | Certificate enrollment/renewal via GDS |
-| PG24 | User Token — Issued Token Server Facet | OPC-10000-7 v1.05.02 | Kerberos (deprecated in 1.05.02) |
+| PG24 | User Token — Issued Token Server Facet | OPC-10000-7 v1.05.02 | Kerberos — **deprecated** in v1.05.02 per OPC Foundation. Skipped. |
 
 ## Recently Completed
 
 | PR | Feature | Notes |
 |----|---------|-------|
-| #329 | KeyCredential Service Server Facet (CU 2113) | GetEncryptingKey, Create/Update/DeleteCredential. Integrator-provided adapter. Type nodes + 11 tests. 1.6 KB .text. |
-| #328 | Authorization Service / JWT (CU 1629/1697) | OAuth2 Resource Server — JWT validation at ActivateSession. mbedTLS/wolfSSL backends added. |
-| #327 | CU 5801 Diagnostics Part 2 | SubscriptionDiagnosticsType, SessionDiagnosticsVariableType, SessionDiagnosticsObjectType, ServerRedundancyType |
+| #331 | PG20 — Certificate Management (CU 2105) | Type nodes + adapter. GDS deferred. |
+| #330 | PG19 — User Role Management (CU 2080) | AddRole/RemoveRole/AddIdentity/RemoveIdentity. 13 tests. |
+| #329 | PG18 — KeyCredential Service (CU 2113) | GetEncryptingKey + CRUD methods. 11 tests. |
+| #328 | Authorization Service / JWT (CU 1629/1697) | OAuth2 Resource Server. mbedTLS/wolfSSL backends. |
+| #327 | CU 5801 Diagnostics Part 2 | 4 type trees: SubDiag, SesDiagVar, SesDiagObj, ServerRedundancy |
 
-## Follow-ups from Code Review
+## Deferred (low priority)
 
-| Source | Item | Status |
-|--------|------|--------|
-| PR #327 | 3 deferred test functions (browse_name assertion mismatch) | ✅ Fixed — root cause was 62 wrong length constants + shifted NodeId mapping + 3 missing DA-off nodes |
-| PR #328 | JWT success-path E2E test needs non-None SecurityPolicy fixture | ✅ Fixed — Basic256Sha256 secure channel test added |
-| PR #328 | CU 1629 AuthorizationServiceConfigurationType type nodes (GDS ns 2) | Deferred |
-| PR #328 | Non-OpenSSL JWT crypto backends (mbedTLS/wolfSSL) | ✅ Fixed — mbedTLS (pk_parse_public_key + pk_verify) and wolfSSL (wc_SignatureVerify) backends added |
-| PR #328 | Issuer key rotation (evaluate all matching issuers, not first) | ✅ Fixed — iterates all URL-matching issuers |
-| PR #328 | Refactor high-CCN functions (mu_jwt_validate, mu_claim_scan) | ✅ Fixed — split into named stages, CCN reduced from 27/42 to ~10/12 |
+| ID | Item | Notes |
+|----|------|-------|
+| D-1629 | CU 1629 AuthorizationServiceConfigurationType nodes | GDS namespace 2 type system |
+| D-GDS | Full GDS Push/Pull model | Certificate enrollment workflow, CRL management |
