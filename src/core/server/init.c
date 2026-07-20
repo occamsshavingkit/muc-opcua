@@ -315,7 +315,7 @@ opcua_statuscode_t mu_server_init(void *storage, size_t storage_size, const mu_s
         }
     }
 
-#ifdef MUC_OPCUA_CU_KEY_CREDENTIAL_SERVICE
+#if MUC_OPCUA_CU_KEY_CREDENTIAL_SERVICE
     /* spec 094 (CU 2113): auto-register the four KeyCredential method
        callbacks so the facet is wired up the moment the server is. The
        handlers themselves return Bad_NotSupported when no adapter is set,

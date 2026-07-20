@@ -24,10 +24,29 @@
 
 #if MUC_OPCUA_CU_KEY_CREDENTIAL_SERVICE
 
-/* Pull the typedefs we need from server_internal.h without depending on the
- * whole internal surface in the test. The handler signature matches
- * mu_method_callback_t (address_space.h). */
-typedef struct mu_server mu_server_t;
+/* Validate that the Call method object is a KeyCredentialConfigurationType
+ * or KeyCredentialConfigurationFolderType instance. Returns Bad_MethodInvalid
+ * when the object is found in the address space but has a different
+ * TypeDefinition. If the object is not found (e.g. dynamically managed nodes
+ * or unit-test stubs), validation is skipped. */
+static opcua_statuscode_t validate_keycred_object(const mu_server_t *server, const mu_nodeid_t *object_id) {
+    if (server == NULL || object_id == NULL) {
+        return MU_STATUS_BAD_METHODINVALID;
+    }
+    const mu_node_t *node =
+        mu_address_space_find_node(server->config.address_space, (mu_address_space_index_t *)0, object_id);
+    if (node == NULL) {
+        return MU_STATUS_GOOD;
+    }
+    if (node->type_definition.namespace_index != 0 || node->type_definition.identifier_type != MU_NODEID_NUMERIC) {
+        return MU_STATUS_BAD_METHODINVALID;
+    }
+    opcua_uint32_t td = node->type_definition.identifier.numeric;
+    if (td != 17533 && td != 17496) {
+        return MU_STATUS_BAD_METHODINVALID;
+    }
+    return MU_STATUS_GOOD;
+}
 
 /* Resolve the adapter from the server's config. Returns NULL when no
  * adapter was supplied, in which case every method returns Bad_NotSupported. */
@@ -92,8 +111,12 @@ static opcua_statuscode_t handle_get_encrypting_key(mu_server_t *server, void *c
                                                     size_t input_args_count, mu_variant_t *output_args,
                                                     size_t *output_args_count) {
     (void)context;
-    (void)object_id;
     (void)method_id;
+
+    opcua_statuscode_t s = validate_keycred_object(server, object_id);
+    if (s != MU_STATUS_GOOD) {
+        return s;
+    }
 
     if (output_args_count == NULL) {
         return MU_STATUS_BAD_INVALIDARGUMENT;
@@ -108,7 +131,7 @@ static opcua_statuscode_t handle_get_encrypting_key(mu_server_t *server, void *c
     }
 
     mu_string_t resource_uri;
-    opcua_statuscode_t s = read_string_arg(input_args, input_args_count, 0u, &resource_uri);
+    s = read_string_arg(input_args, input_args_count, 0u, &resource_uri);
     if (s != MU_STATUS_GOOD) {
         return s;
     }
@@ -137,12 +160,16 @@ static opcua_statuscode_t handle_create_credential(mu_server_t *server, void *co
                                                    size_t input_args_count, mu_variant_t *output_args,
                                                    size_t *output_args_count) {
     (void)context;
-    (void)object_id;
     (void)method_id;
     (void)output_args;
 
     if (output_args_count != NULL) {
         *output_args_count = 0u;
+    }
+
+    opcua_statuscode_t s = validate_keycred_object(server, object_id);
+    if (s != MU_STATUS_GOOD) {
+        return s;
     }
 
     const mu_key_credential_adapter_t *adapter = adapter_of(server);
@@ -153,7 +180,7 @@ static opcua_statuscode_t handle_create_credential(mu_server_t *server, void *co
     mu_string_t resource_uri;
     mu_bytestring_t credential;
     mu_string_t key_id;
-    opcua_statuscode_t s = read_string_arg(input_args, input_args_count, 0u, &resource_uri);
+    s = read_string_arg(input_args, input_args_count, 0u, &resource_uri);
     if (s != MU_STATUS_GOOD) {
         return s;
     }
@@ -177,12 +204,16 @@ static opcua_statuscode_t handle_update_credential(mu_server_t *server, void *co
                                                    size_t input_args_count, mu_variant_t *output_args,
                                                    size_t *output_args_count) {
     (void)context;
-    (void)object_id;
     (void)method_id;
     (void)output_args;
 
     if (output_args_count != NULL) {
         *output_args_count = 0u;
+    }
+
+    opcua_statuscode_t s = validate_keycred_object(server, object_id);
+    if (s != MU_STATUS_GOOD) {
+        return s;
     }
 
     const mu_key_credential_adapter_t *adapter = adapter_of(server);
@@ -193,7 +224,7 @@ static opcua_statuscode_t handle_update_credential(mu_server_t *server, void *co
     mu_string_t resource_uri;
     mu_bytestring_t credential;
     mu_string_t key_id;
-    opcua_statuscode_t s = read_string_arg(input_args, input_args_count, 0u, &resource_uri);
+    s = read_string_arg(input_args, input_args_count, 0u, &resource_uri);
     if (s != MU_STATUS_GOOD) {
         return s;
     }
@@ -217,12 +248,16 @@ static opcua_statuscode_t handle_delete_credential(mu_server_t *server, void *co
                                                    size_t input_args_count, mu_variant_t *output_args,
                                                    size_t *output_args_count) {
     (void)context;
-    (void)object_id;
     (void)method_id;
     (void)output_args;
 
     if (output_args_count != NULL) {
         *output_args_count = 0u;
+    }
+
+    opcua_statuscode_t s = validate_keycred_object(server, object_id);
+    if (s != MU_STATUS_GOOD) {
+        return s;
     }
 
     const mu_key_credential_adapter_t *adapter = adapter_of(server);
@@ -232,7 +267,7 @@ static opcua_statuscode_t handle_delete_credential(mu_server_t *server, void *co
 
     mu_string_t resource_uri;
     mu_string_t key_id;
-    opcua_statuscode_t s = read_string_arg(input_args, input_args_count, 0u, &resource_uri);
+    s = read_string_arg(input_args, input_args_count, 0u, &resource_uri);
     if (s != MU_STATUS_GOOD) {
         return s;
     }
