@@ -40,6 +40,7 @@ Backing test column: comma-separated ctest names (as registered).
 | Core 2022 Server Facet | OPC-10000-9 | full | test_alarms_conditions, test_event_notifier, test_event_serializer |
 | Core 2022 Server Facet | OPC-10000-8 §5.3 | full | test_analog_item, test_da_type_nodes, test_eu_information |
 | Core 2022 Server Facet | OPC-10000-4 §5.11 | full | test_method_call_arbitrary, test_method_call_errors |
+| Core 2022 Server Facet | OPC-10000-7 CU 2113 / OPC-10000-12 §8.5-8.6 | full | test_key_credential |
 | Core 2022 Server Facet | OPC-10000-4 §5.11 | full | test_method_call |
 | Core 2022 Server Facet | OPC-10000-4 §7.36 | all | test_user_auth_plaintext, test_user_auth_certificate, test_user_auth_secure_e2e |
 | Core 2022 Server Facet | OPC-10000-7 | micro, embedded, standard, full | test_connection_multiplex |

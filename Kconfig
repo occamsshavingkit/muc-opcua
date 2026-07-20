@@ -555,6 +555,20 @@ config MUC_OPCUA_CU_EXTENDED_NODEIDS
 	  Backing tests: test_address_space_string_limits, test_binary_nodeid_errors.
 	  Notes: Project-level Conformance Unit mirroring the legacy 'extended_nodeids' item; emits Kconfig symbol MUC_OPCUA_CU_EXTENDED_NODEIDS matching the #ifdef guard renamed in Task 3 of the CU-aligned code reorganisation plan.
 
+config MUC_OPCUA_CU_KEY_CREDENTIAL_SERVICE
+	bool "CU: KeyCredential Service"
+	depends on MUC_OPCUA_CU_METHOD_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: in-progress.
+	  OPC source: OPC-10000-12 §8.5-8.6, OPC-10000-7 CU 2113.
+	  Backing tests: test_key_credential.
+	  Notes: KeyCredential Service Server Facet -- manages OAuth2/OIDC broker
+	  auth credentials (GetEncryptingKey, CreateCredential, UpdateCredential,
+	  DeleteCredential). Credential storage is integrator-provided via
+	  mu_key_credential_adapter_t; with no adapter the methods return
+	  Bad_NotSupported. Depends on METHOD_SERVER for method dispatch.
+
 config MUC_OPCUA_CU_METHOD_SERVER
 	bool "CU: Method Server"
 	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES

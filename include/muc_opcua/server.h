@@ -22,6 +22,9 @@
 #ifdef MUC_OPCUA_CU_USER_TOKEN_JWT
 #include "muc_opcua/authorization/jwt.h"
 #endif
+#ifdef MUC_OPCUA_CU_KEY_CREDENTIAL_SERVICE
+#include "muc_opcua/services/key_credential.h"
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -127,6 +130,13 @@ typedef struct {
 
     /* mDNS Discovery Adapter (optional) — NULL = disabled, zero storage impact */
     mu_mdns_adapter_t *mdns_adapter;
+
+#ifdef MUC_OPCUA_CU_KEY_CREDENTIAL_SERVICE
+    /* KeyCredential Service adapter (spec 094 / CU 2113). NULL = the four
+       KeyCredential methods are still exposed (Bad_NotSupported) so the
+       ObjectType InstanceDeclarations remain browsable. */
+    const mu_key_credential_adapter_t *key_credential_adapter;
+#endif
 
 #ifdef MUC_OPCUA_CU_USER_TOKEN_JWT
     /* JWT/OAuth2 Resource Server configuration (optional).

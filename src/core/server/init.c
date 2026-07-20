@@ -315,6 +315,21 @@ opcua_statuscode_t mu_server_init(void *storage, size_t storage_size, const mu_s
         }
     }
 
+#ifdef MUC_OPCUA_CU_KEY_CREDENTIAL_SERVICE
+    /* spec 094 (CU 2113): auto-register the four KeyCredential method
+       callbacks so the facet is wired up the moment the server is. The
+       handlers themselves return Bad_NotSupported when no adapter is set,
+       so a server with the CU enabled but no backing store still advertises
+       browsable method nodes with a defined failure mode. */
+    {
+        extern opcua_statuscode_t mu_key_credential_register(struct mu_server * srv);
+        opcua_statuscode_t kc_status = mu_key_credential_register(server);
+        if (kc_status != MU_STATUS_GOOD) {
+            return kc_status;
+        }
+    }
+#endif
+
     *out_server = server;
     return MU_STATUS_GOOD;
 }

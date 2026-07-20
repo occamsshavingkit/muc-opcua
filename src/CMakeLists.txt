@@ -329,6 +329,15 @@ if(MUC_OPCUA_CU_METHOD_SERVER)
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_METHOD_SERVER=1)
 endif()
 
+# -- CU: KeyCredential Service (spec 094, OPC-10000-7 CU 2113) --
+# Depends on METHOD_SERVER for method dispatch. The 4 Method handlers each
+# check server->config.key_credential_adapter and return Bad_NotSupported
+# when no adapter is configured.
+if(MUC_OPCUA_CU_KEY_CREDENTIAL_SERVICE)
+    target_sources(muc_opcua PRIVATE cu/core_2022_server/key_credential/key_credential.c)
+    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_CU_KEY_CREDENTIAL_SERVICE=1)
+endif()
+
 # -- CU: Event Filter Where --
 if(MUC_OPCUA_CU_EVENT_FILTER_WHERE)
     file(GLOB _sources cu/core_2022_server/event_filter_where/*.c)
