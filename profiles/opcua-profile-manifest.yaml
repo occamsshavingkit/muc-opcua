@@ -1295,7 +1295,7 @@
     {
       "id": "opc_facet_1695",
       "kind": "facet",
-      "opc_display_name": "User Token \u2013 User Name Password Server Facet",
+      "opc_display_name": "User Token – User Name Password Server Facet",
       "kconfig_symbol": "MUC_OPCUA_FACET_USER_TOKEN_USER_NAME_PASSWORD_SERVER",
       "implementation_state": "deferred",
       "depends_on": [],
@@ -1324,7 +1324,7 @@
     {
       "id": "opc_facet_1696",
       "kind": "facet",
-      "opc_display_name": "User Token \u2013 X509 Certificate Server Facet",
+      "opc_display_name": "User Token – X509 Certificate Server Facet",
       "kconfig_symbol": "MUC_OPCUA_FACET_USER_TOKEN_X509_CERTIFICATE_SERVER",
       "implementation_state": "deferred",
       "depends_on": [],
@@ -4615,7 +4615,7 @@
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       },
-      "notes": "Implement basic Service behaviour. This includes in particular:\n \u2013 checking the authentication token\n \u2013 returning the requestHandle in responses\n \u2013 respecting a timeoutHint",
+      "notes": "Implement basic Service behaviour. This includes in particular:\n – checking the authentication token\n – returning the requestHandle in responses\n – respecting a timeoutHint",
       "cu_optional": false
     },
     {
@@ -5470,6 +5470,36 @@
       },
       "cu_optional": true,
       "notes": "The Server supports being able to be configured for no application authentication, just User authentication and normal encryption/signing:\n– Configure Server to skip the trust check when validating certificates\n– Certificates are just used for message security (signing and encryption)\n– Users level is used for authentication  (Documentation complete; no code change needed.)"
+    },
+    {
+      "id": "opc_cu_key_credential_service",
+      "kind": "conformance_unit",
+      "opc_display_name": "KeyCredential Service",
+      "kconfig_symbol": "MUC_OPCUA_CU_KEY_CREDENTIAL_SERVICE",
+      "implementation_state": "in-progress",
+      "depends_on": [
+        "MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION",
+        "MUC_OPCUA_CU_METHOD_SERVER"
+      ],
+      "profile_defaults": {
+        "nano": false,
+        "micro": false,
+        "embedded": false,
+        "standard": false,
+        "full": true,
+        "custom": false
+      },
+      "backing_tests": [
+        "test_key_credential"
+      ],
+      "opc_reference": {
+        "spec": "OPC-10000-12",
+        "section": "8.5-8.6",
+        "cu_id": "2113",
+        "cu_name": "KeyCredential Service",
+        "source_url": "https://profiles.opcfoundation.org"
+      },
+      "notes": "KeyCredential Service Server Facet -- manages OAuth2/OIDC broker auth credentials (GetEncryptingKey, CreateCredential, UpdateCredential, DeleteCredential). Grounded per OPC-10000-12 8.5-8.6 and OPC-10000-7 CU 2113."
     }
   ],
   "capacities": [
@@ -5966,7 +5996,7 @@
   "metadata": {
     "superseded_profiles": [
       {
-        "description": "This Profile is a collection of Facets necessary to build a functional OPC UA Server Application specifically for chip level devices with limited resources. This Profile is functionally equivalent to the Core Server Facet and defines the \"UA-TCP UA-SC UA-Binary\" as the required transport profile including an ECC Security Policy. The support of Diagnostic Objects and Variables is optional for this Profile despite it being defined as \u201cmandatory\u201d in UA Part 5. Support of Diagnostic Objects and Variables is mandatory in some higher-level Profiles. Exposing types in the AddressSpace is optional for this Profile except if custom types (i.e., types that are derived from well-known ObjectTypes, VariableTypes, ReferenceType or DataTypes) are used. Exposing all supported types in the AddressSpace is mandatory in some higher-level Profiles.<br>\nThis Profile supersedes the <a href=\"http://opcfoundation.org/UA-Profile/Server/NanoEmbeddedDevice2017\">Nano Embedded Device 2017 Server Profile</a>.",
+        "description": "This Profile is a collection of Facets necessary to build a functional OPC UA Server Application specifically for chip level devices with limited resources. This Profile is functionally equivalent to the Core Server Facet and defines the \"UA-TCP UA-SC UA-Binary\" as the required transport profile including an ECC Security Policy. The support of Diagnostic Objects and Variables is optional for this Profile despite it being defined as “mandatory” in UA Part 5. Support of Diagnostic Objects and Variables is mandatory in some higher-level Profiles. Exposing types in the AddressSpace is optional for this Profile except if custom types (i.e., types that are derived from well-known ObjectTypes, VariableTypes, ReferenceType or DataTypes) are used. Exposing all supported types in the AddressSpace is mandatory in some higher-level Profiles.<br>\nThis Profile supersedes the <a href=\"http://opcfoundation.org/UA-Profile/Server/NanoEmbeddedDevice2017\">Nano Embedded Device 2017 Server Profile</a>.",
         "display_name": "Nano Embedded Device 2022 Server Profile",
         "last_update_time": "2025-11-12T15:47:17",
         "name": "Nano Embedded Device 2022 Server Profile",
@@ -6023,9 +6053,9 @@
       },
       {
         "description": "<b>This User Token has been deprecated with OPC UA Specification Version 1.05.</b><br>\nThis Facet indicates that a User Token that is comprised of an issued token is supported.",
-        "display_name": "User Token \u2013 Issued Token Server Facet",
+        "display_name": "User Token – Issued Token Server Facet",
         "last_update_time": "2022-03-10T16:02:39",
-        "name": "User Token \u2013 Issued Token Server Facet",
+        "name": "User Token – Issued Token Server Facet",
         "opc_id": 1698,
         "opc_profile_uri": "http://opcfoundation.org/UA-Profile/Security/UserToken/Server/IssuedToken",
         "release_status": 4,
@@ -6037,9 +6067,9 @@
       },
       {
         "description": "<b>This User Token has been deprecated with OPC UA Specification Version 1.05.</b><br>\nThis Facet further refines the User Token - Issued Token to indicate a windows implementation of Kerberos",
-        "display_name": "User Token \u2013 Issued Token Windows Server Facet",
+        "display_name": "User Token – Issued Token Windows Server Facet",
         "last_update_time": "2022-03-10T16:02:49",
-        "name": "User Token \u2013 Issued Token Windows Server Facet",
+        "name": "User Token – Issued Token Windows Server Facet",
         "opc_id": 1699,
         "opc_profile_uri": "http://opcfoundation.org/UA-Profile/Security/UserToken/Server/IssuedTokenWindows",
         "release_status": 4,

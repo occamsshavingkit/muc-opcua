@@ -13,7 +13,8 @@
 
 #include <string.h>
 
-/* ---- Shared helpers (all backends) ---- */
+#if defined(MUC_OPCUA_HAVE_OPENSSL) || defined(MUC_OPCUA_HAVE_MBEDTLS) || defined(MUC_OPCUA_HAVE_WOLFSSL)
+/* ---- Shared helpers (all active backends) ---- */
 
 static int alg_is_rsa(mu_jwt_alg_t alg) {
     return alg == MU_JWT_ALG_RS256 || alg == MU_JWT_ALG_RS384 || alg == MU_JWT_ALG_RS512;
@@ -85,6 +86,8 @@ static int raw_ecdsa_to_der(const unsigned char *rs, size_t rs_len, unsigned cha
     memcpy(out + hdr, int_buf, int_len);
     return (int)(hdr + int_len);
 }
+
+#endif /* defined(HAVE_OPENSSL) || defined(HAVE_MBEDTLS) || defined(HAVE_WOLFSSL) */
 
 /* ---- OpenSSL backend ---- */
 #if defined(MUC_OPCUA_HAVE_OPENSSL)

@@ -119,6 +119,13 @@ foreach(TEST_SOURCE ${UNIT_TEST_SOURCES})
         if(NOT MUC_OPCUA_CU_TIME_SYNC)
             set(RUN_TEST OFF)
         endif()
+    elseif(TEST_NAME STREQUAL "test_key_credential")
+        # spec 094 (CU 2113): the KeyCredential handlers are compiled only
+        # under MUC_OPCUA_CU_KEY_CREDENTIAL_SERVICE (which itself depends on
+        # MUC_OPCUA_CU_METHOD_SERVER). Skip on profiles without the facet.
+        if(NOT MUC_OPCUA_CU_KEY_CREDENTIAL_SERVICE)
+            set(RUN_TEST OFF)
+        endif()
     endif()
 
     if(RUN_TEST)

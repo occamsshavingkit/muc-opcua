@@ -95,6 +95,21 @@ static const opcua_byte_t s_str_Int64[] = "Int64";
 #if MUC_OPCUA_CU_ADDRESS_SPACE_INTERFACES
 static const opcua_byte_t s_str_InterfaceTypes[] = "InterfaceTypes";
 #endif
+#if MUC_OPCUA_CU_KEY_CREDENTIAL_SERVICE && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+/* spec 094 (CU 2113): KeyCredential Service Server Facet type-system
+   InstanceDeclaration BrowseNames (OPC-10000-12 §8.5-8.6). */
+static const opcua_byte_t s_str_KeyCredentialConfigurationType[] = "KeyCredentialConfigurationType";
+static const opcua_byte_t s_str_KeyCredentialConfigurationFolderType[] = "KeyCredentialConfigurationFolderType";
+static const opcua_byte_t s_str_ResourceUri[] = "ResourceUri";
+static const opcua_byte_t s_str_ProfileUri[] = "ProfileUri";
+static const opcua_byte_t s_str_EndpointUrls[] = "EndpointUrls";
+static const opcua_byte_t s_str_ServiceStatus[] = "ServiceStatus";
+static const opcua_byte_t s_str_GetEncryptingKey[] = "GetEncryptingKey";
+static const opcua_byte_t s_str_CreateCredential[] = "CreateCredential";
+static const opcua_byte_t s_str_UpdateCredential[] = "UpdateCredential";
+static const opcua_byte_t s_str_DeleteCredential[] = "DeleteCredential";
+static const opcua_byte_t s_str_ServiceName_Placeholder[] = "<ServiceName>";
+#endif
 static const opcua_byte_t s_str_LocaleIdArray[] = "LocaleIdArray";
 #if MUC_OPCUA_CU_BASE_INFO_SERVERTYPE && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
 /* spec 090 (CU 5801 fix): LocaleId(295) DataType BrowseName -- the Mandatory
@@ -873,6 +888,11 @@ static const mu_reference_t s_base_object_type_refs[] = {
     {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {11645}}, true}  /* HasSubtype -> NamespacesType */
 #endif
 #endif
+#if MUC_OPCUA_CU_KEY_CREDENTIAL_SERVICE && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+    ,
+    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {17496}}, true},
+    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {17533}}, true}
+#endif
 };
 
 #if MUC_OPCUA_CU_BASE_INFO_SERVERTYPE
@@ -1308,6 +1328,78 @@ static const mu_reference_t s_optional_namespacestype_refs[] = {
    (one level below each Method) are out of this core slice's scope. */
 static const mu_reference_t s_optional_method_refs[] = {
     {{0, MU_NODEID_NUMERIC, {37}}, {0, MU_NODEID_NUMERIC, {80}}, true}};
+
+#if MUC_OPCUA_CU_KEY_CREDENTIAL_SERVICE && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+/* spec 094 (CU 2113): KeyCredentialConfigurationType(17533) and
+   KeyCredentialConfigurationFolderType(17496) ObjectType reference arrays
+   (OPC-10000-12 §8.5-8.6). Both types are subtypes of BaseObjectType(58).
+   The configuration type carries 4 mandatory Properties + the
+   GetEncryptingKey Method; the folder type carries the
+   <ServiceName>(17511) KeyCredentialConfiguration placeholder plus the
+   three write-path Methods. Method nodes use Mandatory modelling (these
+   methods are required on every instance); property nodes use
+   s_mandatory_property_refs (already defined above). */
+static const mu_reference_t s_keycred_config_folder_type_refs[] = {
+    /* subtype of BaseObjectType */
+    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {58}}, false},
+    /* <ServiceName> placeholder */
+    {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {17511}}, true},
+    /* CreateCredential */
+    {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {17522}}, true},
+    /* UpdateCredential */
+    {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {17519}}, true},
+    /* DeleteCredential */
+    {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {17521}}, true}};
+
+static const mu_reference_t s_keycred_config_type_refs[] = {
+    /* subtype of BaseObjectType */
+    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {58}}, false},
+    /* ResourceUri */
+    {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {17512}}, true},
+    /* ProfileUri */
+    {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {17513}}, true},
+    /* EndpointUrls */
+    {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {17514}}, true},
+    /* ServiceStatus */
+    {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {17515}}, true},
+    /* GetEncryptingKey */
+    {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {17516}}, true}};
+
+/* <ServiceName>(17511) placeholder: HasModellingRule(37)->OptionalPlaceholder(11508)
+   plus HasTypeDefinition(40)->KeyCredentialConfigurationType(17533). Mirrors the
+   <VendorCapability>/<ClientName> placeholder convention. */
+static const mu_reference_t s_keycred_servicename_placeholder_refs[] = {
+    {{0, MU_NODEID_NUMERIC, {37}}, {0, MU_NODEID_NUMERIC, {11508}}, true},
+    {{0, MU_NODEID_NUMERIC, {40}}, {0, MU_NODEID_NUMERIC, {17533}}, true}};
+
+/* GetEncryptingKey(17516): Mandatory, HasProperty -> InputArguments(17517),
+   HasProperty -> OutputArguments(17518). */
+static const mu_reference_t s_keycred_get_encrypting_key_refs[] = {
+    {{0, MU_NODEID_NUMERIC, {37}}, {0, MU_NODEID_NUMERIC, {78}}, true},
+    {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {17517}}, true},
+    {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {17518}}, true}};
+
+/* UpdateCredential(17519): Mandatory, HasProperty -> InputArguments(17520). */
+static const mu_reference_t s_keycred_update_credential_refs[] = {
+    {{0, MU_NODEID_NUMERIC, {37}}, {0, MU_NODEID_NUMERIC, {78}}, true},
+    {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {17520}}, true}};
+
+/* DeleteCredential(17521): Mandatory, no InputArguments/OutputArguments. */
+static const mu_reference_t s_keycred_delete_credential_refs[] = {
+    {{0, MU_NODEID_NUMERIC, {37}}, {0, MU_NODEID_NUMERIC, {78}}, true}};
+
+/* CreateCredential(17522): Mandatory, HasProperty -> InputArguments(17523),
+   HasProperty -> OutputArguments(17524). */
+static const mu_reference_t s_keycred_create_credential_refs[] = {
+    {{0, MU_NODEID_NUMERIC, {37}}, {0, MU_NODEID_NUMERIC, {78}}, true},
+    {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {17523}}, true},
+    {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {17524}}, true}};
+
+/* Mandatory Property modelling rule + PropertyType(68) type definition. */
+static const mu_reference_t s_keycred_mandatory_property_refs[] = {
+    {{0, MU_NODEID_NUMERIC, {37}}, {0, MU_NODEID_NUMERIC, {78}}, true},
+    {{0, MU_NODEID_NUMERIC, {40}}, {0, MU_NODEID_NUMERIC, {68}}, true}};
+#endif
 
 /* ServerCapabilitiesType(2013) HasProperty(46)/HasComponent(47) -> its 24 own
    declarations (OPC-10000-5 §6.3.2 Table 10). RoleSet(16295) is dropped: its
@@ -4330,23 +4422,35 @@ static const mu_node_t s_base_nodes[] = {
      NULL,
      .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
 #if MUC_OPCUA_CU_BASE_INFO_SERVERTYPE && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
-    /* spec 085 (CU 5801): ServerStatusType(2138) own declarations
-       SecondsTillShutdown/ShutdownReason (DataAccess-on copy; fall inside the
-       2365..11461 DataAccess block, so they're dual-placed -- see the
-       DataAccess-off mirror after LocaleIdArray(2271) below). Sorts after
-       EnumStrings(2377) and before AggregateFunctions(2997). Task 4 adds
-       three ServerCapabilitiesType properties and one ServerType property
-       (Auditing) that also fall in this range -- see the DataAccess-off
-        mirror above for the shared rationale. */
+/* spec 085 (CU 5801): ServerStatusType(2138) own declarations
+   SecondsTillShutdown/ShutdownReason (DataAccess-on copy; fall inside the
+   2365..11461 DataAccess block, so they're dual-placed -- see the
+   DataAccess-off mirror after LocaleIdArray(2271) below). Sorts after
+   EnumStrings(2377) and before AggregateFunctions(2997). Task 4 adds
+   three ServerCapabilitiesType properties and one ServerType property
+   (Auditing) that also fall in this range -- see the DataAccess-off
+    mirror above for the shared rationale. */
 #if MUC_OPCUA_CU_BASE_INFO_SERVERTYPE && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
     {{0, MU_NODEID_NUMERIC, {2730}},
-     MU_NODECLASS_VARIABLE, {18, s_str_RegisterNodesCount}, {18, s_str_RegisterNodesCount},
-     s_mandatory_bdv_refs, sizeof(s_mandatory_bdv_refs) / sizeof(s_mandatory_bdv_refs[0]), NULL,
-     .type_definition = {0, MU_NODEID_NUMERIC, {63}}, .value_rank = -1, .data_type = 871},
+     MU_NODECLASS_VARIABLE,
+     {18, s_str_RegisterNodesCount},
+     {18, s_str_RegisterNodesCount},
+     s_mandatory_bdv_refs,
+     sizeof(s_mandatory_bdv_refs) / sizeof(s_mandatory_bdv_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {63}},
+     .value_rank = -1,
+     .data_type = 871},
     {{0, MU_NODEID_NUMERIC, {2731}},
-     MU_NODECLASS_VARIABLE, {20, s_str_UnregisterNodesCount}, {20, s_str_UnregisterNodesCount},
-     s_mandatory_bdv_refs, sizeof(s_mandatory_bdv_refs) / sizeof(s_mandatory_bdv_refs[0]), NULL,
-     .type_definition = {0, MU_NODEID_NUMERIC, {63}}, .value_rank = -1, .data_type = 871},
+     MU_NODECLASS_VARIABLE,
+     {20, s_str_UnregisterNodesCount},
+     {20, s_str_UnregisterNodesCount},
+     s_mandatory_bdv_refs,
+     sizeof(s_mandatory_bdv_refs) / sizeof(s_mandatory_bdv_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {63}},
+     .value_rank = -1,
+     .data_type = 871},
 #endif
     {{0, MU_NODEID_NUMERIC, {2732}},
      MU_NODECLASS_VARIABLE,
@@ -4470,9 +4574,15 @@ static const mu_node_t s_base_nodes[] = {
      .data_type = 344}, /* SignedSoftwareCertificate[] (OPC-10000-5 §6.3.2 Table 10) */
 #if MUC_OPCUA_CU_BASE_INFO_SERVERTYPE && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
     {{0, MU_NODEID_NUMERIC, {3050}},
-     MU_NODECLASS_VARIABLE, {22, s_str_MaxResponseMessageSize}, {22, s_str_MaxResponseMessageSize},
-     s_mandatory_bdv_refs, sizeof(s_mandatory_bdv_refs) / sizeof(s_mandatory_bdv_refs[0]), NULL,
-     .type_definition = {0, MU_NODEID_NUMERIC, {63}}, .value_rank = -1, .data_type = 7},
+     MU_NODECLASS_VARIABLE,
+     {22, s_str_MaxResponseMessageSize},
+     {22, s_str_MaxResponseMessageSize},
+     s_mandatory_bdv_refs,
+     sizeof(s_mandatory_bdv_refs) / sizeof(s_mandatory_bdv_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {63}},
+     .value_rank = -1,
+     .data_type = 7},
 #endif
 #endif
 #if MUC_OPCUA_CU_BASE_INFO_SERVERTYPE
@@ -6051,6 +6161,21 @@ static const mu_node_t s_base_nodes[] = {
      NULL,
      .type_definition = {0}},
 #endif
+#if MUC_OPCUA_CU_KEY_CREDENTIAL_SERVICE && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+    /* spec 094 (CU 2113): KeyCredentialConfigurationFolderType(17496,
+       OPC-10000-12 §8.6.2) -- the ObjectType that groups
+       KeyCredentialConfiguration instances and exposes the write-path
+       Methods (CreateCredential/UpdateCredential/DeleteCredential).
+       Subtype of BaseObjectType(58). Sorted before AnalogUnitType(17497). */
+    {{0, MU_NODEID_NUMERIC, {17496}},
+     MU_NODECLASS_OBJECTTYPE,
+     {36, s_str_KeyCredentialConfigurationFolderType},
+     {36, s_str_KeyCredentialConfigurationFolderType},
+     s_keycred_config_folder_type_refs,
+     sizeof(s_keycred_config_folder_type_refs) / sizeof(s_keycred_config_folder_type_refs[0]),
+     NULL,
+     .type_definition = {0}},
+#endif
 #if MUC_OPCUA_CU_DATA_ACCESS
     {{0, MU_NODEID_NUMERIC, {17497}},
      MU_NODECLASS_VARIABLETYPE,
@@ -6084,6 +6209,143 @@ static const mu_node_t s_base_nodes[] = {
      sizeof(s_da_prop_mandatory_refs) / sizeof(s_da_prop_mandatory_refs[0]),
      NULL,
      .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+#endif /* MUC_OPCUA_CU_DATA_ACCESS */
+#if MUC_OPCUA_CU_KEY_CREDENTIAL_SERVICE && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+    /* spec 094 (CU 2113): KeyCredentialConfigurationFolderType and
+       KeyCredentialConfigurationType InstanceDeclarations
+       (OPC-10000-12 §8.5-8.6). NodeIds grounded against NodeIds.csv (schemas
+       1.05). Sorted between EngineeringUnits(17502) and the second
+       InstrumentRange(17567) declaration below. */
+    {{0, MU_NODEID_NUMERIC, {17511}},
+     MU_NODECLASS_OBJECT,
+     {13, s_str_ServiceName_Placeholder},
+     {13, s_str_ServiceName_Placeholder},
+     s_keycred_servicename_placeholder_refs,
+     sizeof(s_keycred_servicename_placeholder_refs) / sizeof(s_keycred_servicename_placeholder_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {17533}}},
+    {{0, MU_NODEID_NUMERIC, {17512}},
+     MU_NODECLASS_VARIABLE,
+     {11, s_str_ResourceUri},
+     {11, s_str_ResourceUri},
+     s_keycred_mandatory_property_refs,
+     sizeof(s_keycred_mandatory_property_refs) / sizeof(s_keycred_mandatory_property_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}},
+     .value_rank = -1,
+     .data_type = 12}, /* String (OPC-10000-12 §8.5.4) */
+    {{0, MU_NODEID_NUMERIC, {17513}},
+     MU_NODECLASS_VARIABLE,
+     {10, s_str_ProfileUri},
+     {10, s_str_ProfileUri},
+     s_keycred_mandatory_property_refs,
+     sizeof(s_keycred_mandatory_property_refs) / sizeof(s_keycred_mandatory_property_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}},
+     .value_rank = -1,
+     .data_type = 12}, /* String */
+    {{0, MU_NODEID_NUMERIC, {17514}},
+     MU_NODECLASS_VARIABLE,
+     {12, s_str_EndpointUrls},
+     {12, s_str_EndpointUrls},
+     s_keycred_mandatory_property_refs,
+     sizeof(s_keycred_mandatory_property_refs) / sizeof(s_keycred_mandatory_property_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}},
+     .value_rank = 1,
+     .data_type = 12}, /* String[] */
+    {{0, MU_NODEID_NUMERIC, {17515}},
+     MU_NODECLASS_VARIABLE,
+     {13, s_str_ServiceStatus},
+     {13, s_str_ServiceStatus},
+     s_keycred_mandatory_property_refs,
+     sizeof(s_keycred_mandatory_property_refs) / sizeof(s_keycred_mandatory_property_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}},
+     .value_rank = -1,
+     .data_type = 19}, /* StatusCode */
+    {{0, MU_NODEID_NUMERIC, {17516}},
+     MU_NODECLASS_METHOD,
+     {16, s_str_GetEncryptingKey},
+     {16, s_str_GetEncryptingKey},
+     s_keycred_get_encrypting_key_refs,
+     sizeof(s_keycred_get_encrypting_key_refs) / sizeof(s_keycred_get_encrypting_key_refs[0]),
+     NULL,
+     .type_definition = {0}},
+    {{0, MU_NODEID_NUMERIC, {17517}},
+     MU_NODECLASS_VARIABLE,
+     {14, s_str_InputArguments},
+     {14, s_str_InputArguments},
+     s_property_type_ref,
+     sizeof(s_property_type_ref) / sizeof(s_property_type_ref[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+    {{0, MU_NODEID_NUMERIC, {17518}},
+     MU_NODECLASS_VARIABLE,
+     {15, s_str_OutputArguments},
+     {15, s_str_OutputArguments},
+     s_property_type_ref,
+     sizeof(s_property_type_ref) / sizeof(s_property_type_ref[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+    {{0, MU_NODEID_NUMERIC, {17519}},
+     MU_NODECLASS_METHOD,
+     {16, s_str_UpdateCredential},
+     {16, s_str_UpdateCredential},
+     s_keycred_update_credential_refs,
+     sizeof(s_keycred_update_credential_refs) / sizeof(s_keycred_update_credential_refs[0]),
+     NULL,
+     .type_definition = {0}},
+    {{0, MU_NODEID_NUMERIC, {17520}},
+     MU_NODECLASS_VARIABLE,
+     {14, s_str_InputArguments},
+     {14, s_str_InputArguments},
+     s_property_type_ref,
+     sizeof(s_property_type_ref) / sizeof(s_property_type_ref[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+    {{0, MU_NODEID_NUMERIC, {17521}},
+     MU_NODECLASS_METHOD,
+     {16, s_str_DeleteCredential},
+     {16, s_str_DeleteCredential},
+     s_keycred_delete_credential_refs,
+     sizeof(s_keycred_delete_credential_refs) / sizeof(s_keycred_delete_credential_refs[0]),
+     NULL,
+     .type_definition = {0}},
+    {{0, MU_NODEID_NUMERIC, {17522}},
+     MU_NODECLASS_METHOD,
+     {16, s_str_CreateCredential},
+     {16, s_str_CreateCredential},
+     s_keycred_create_credential_refs,
+     sizeof(s_keycred_create_credential_refs) / sizeof(s_keycred_create_credential_refs[0]),
+     NULL,
+     .type_definition = {0}},
+    {{0, MU_NODEID_NUMERIC, {17523}},
+     MU_NODECLASS_VARIABLE,
+     {14, s_str_InputArguments},
+     {14, s_str_InputArguments},
+     s_property_type_ref,
+     sizeof(s_property_type_ref) / sizeof(s_property_type_ref[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+    {{0, MU_NODEID_NUMERIC, {17524}},
+     MU_NODECLASS_VARIABLE,
+     {15, s_str_OutputArguments},
+     {15, s_str_OutputArguments},
+     s_property_type_ref,
+     sizeof(s_property_type_ref) / sizeof(s_property_type_ref[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+    {{0, MU_NODEID_NUMERIC, {17533}},
+     MU_NODECLASS_OBJECTTYPE,
+     {30, s_str_KeyCredentialConfigurationType},
+     {30, s_str_KeyCredentialConfigurationType},
+     s_keycred_config_type_refs,
+     sizeof(s_keycred_config_type_refs) / sizeof(s_keycred_config_type_refs[0]),
+     NULL,
+     .type_definition = {0}},
+#endif /* MUC_OPCUA_CU_KEY_CREDENTIAL_SERVICE && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION */
+#if MUC_OPCUA_CU_DATA_ACCESS
     {{0, MU_NODEID_NUMERIC, {17567}},
      MU_NODECLASS_VARIABLE,
      {15, s_str_InstrumentRange},
