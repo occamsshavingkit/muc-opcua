@@ -275,7 +275,7 @@ static mu_variant_t make_bytestring_variant(const opcua_byte_t *data, size_t len
 void test_key_credential_register_wires_four_methods(void) {
     mock_store_reset();
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, init_test_server(&s_mock_adapter));
-    TEST_ASSERT_EQUAL_size_t(4, s_server->registered_method_count);
+    TEST_ASSERT_GREATER_OR_EQUAL_size_t(4, s_server->registered_method_count);
     TEST_ASSERT_NOT_EQUAL((size_t)-1, find_registered(s_server, MU_ID_KEYCRED_GET_ENCRYPTING_KEY));
     TEST_ASSERT_NOT_EQUAL((size_t)-1, find_registered(s_server, MU_ID_KEYCRED_CREATE_CREDENTIAL));
     TEST_ASSERT_NOT_EQUAL((size_t)-1, find_registered(s_server, MU_ID_KEYCRED_UPDATE_CREDENTIAL));

@@ -25,6 +25,9 @@
 #ifdef MUC_OPCUA_CU_KEY_CREDENTIAL_SERVICE
 #include "muc_opcua/services/key_credential.h"
 #endif
+#ifdef MUC_OPCUA_CU_USER_ROLE_MANAGEMENT
+#include "muc_opcua/services/role_management.h"
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -136,6 +139,10 @@ typedef struct {
        KeyCredential methods are still exposed (Bad_NotSupported) so the
        ObjectType InstanceDeclarations remain browsable. */
     const mu_key_credential_adapter_t *key_credential_adapter;
+#endif
+
+#ifdef MUC_OPCUA_CU_USER_ROLE_MANAGEMENT
+    const mu_role_management_adapter_t *role_management_adapter;
 #endif
 
 #ifdef MUC_OPCUA_CU_USER_TOKEN_JWT

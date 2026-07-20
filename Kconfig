@@ -569,6 +569,20 @@ config MUC_OPCUA_CU_KEY_CREDENTIAL_SERVICE
 	  mu_key_credential_adapter_t; with no adapter the methods return
 	  Bad_NotSupported. Depends on METHOD_SERVER for method dispatch.
 
+config MUC_OPCUA_CU_USER_ROLE_MANAGEMENT
+	bool "CU: User Role Management"
+	depends on MUC_OPCUA_CU_METHOD_SERVER && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: in-progress.
+	  OPC source: OPC-10000-12 §9.5-9.6, OPC-10000-7 CU 2080.
+	  Backing tests: test_role_management.
+	  Notes: User Role Management Server Facet -- CRUD for OPC UA Roles
+	  and identity-to-role mappings (AddRole, RemoveRole, AddIdentity,
+	  RemoveIdentity). Role storage is integrator-provided via
+	  mu_role_management_adapter_t; with no adapter the methods return
+	  Bad_NotSupported. Depends on METHOD_SERVER for method dispatch.
+
 config MUC_OPCUA_CU_METHOD_SERVER
 	bool "CU: Method Server"
 	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
