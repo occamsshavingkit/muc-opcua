@@ -338,6 +338,13 @@ if(MUC_OPCUA_CU_KEY_CREDENTIAL_SERVICE)
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_CU_KEY_CREDENTIAL_SERVICE=1)
 endif()
 
+# -- CU: User Role Management (spec 095, OPC-10000-7 CU 2080) --
+# Depends on METHOD_SERVER for method dispatch.
+if(MUC_OPCUA_CU_USER_ROLE_MANAGEMENT)
+    target_sources(muc_opcua PRIVATE cu/core_2022_server/role_management/role_management.c)
+    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_CU_USER_ROLE_MANAGEMENT=1)
+endif()
+
 # -- CU: Event Filter Where --
 if(MUC_OPCUA_CU_EVENT_FILTER_WHERE)
     file(GLOB _sources cu/core_2022_server/event_filter_where/*.c)

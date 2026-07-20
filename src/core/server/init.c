@@ -330,6 +330,16 @@ opcua_statuscode_t mu_server_init(void *storage, size_t storage_size, const mu_s
     }
 #endif
 
+#if MUC_OPCUA_CU_USER_ROLE_MANAGEMENT
+    {
+        extern opcua_statuscode_t mu_role_management_register(struct mu_server * srv);
+        opcua_statuscode_t rm_status = mu_role_management_register(server);
+        if (rm_status != MU_STATUS_GOOD) {
+            return rm_status;
+        }
+    }
+#endif
+
     *out_server = server;
     return MU_STATUS_GOOD;
 }

@@ -135,6 +135,7 @@ for the conformance-unit map.
 | Method Call: GetMonitoredItems / ResendData | Implemented | `test_method_call`, `test_method_call_errors` |
 | Method Server Facet (arbitrary user methods) | Implemented (full) | `test_method_call_arbitrary` |
 | KeyCredential Service Server Facet (CU 2113) | Implemented (full) | `test_key_credential`; see `key-credential-service.md` |
+| User Role Management Server Facet (CU 2080) | Implemented (full) | `test_role_management` |
 | Write Service | Implemented | Optional feature via `MUC_OPCUA_SERVICE_WRITE` |
 | Alarms & Conditions (Events) | Implemented | Event notifications via `MUC_OPCUA_EVENTS` |
 | Event Filter Where-Clause | Implemented (full) | `src/services/event_filter.c` |

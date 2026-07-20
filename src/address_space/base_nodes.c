@@ -110,6 +110,16 @@ static const opcua_byte_t s_str_UpdateCredential[] = "UpdateCredential";
 static const opcua_byte_t s_str_DeleteCredential[] = "DeleteCredential";
 static const opcua_byte_t s_str_ServiceName_Placeholder[] = "<ServiceName>";
 #endif
+#if MUC_OPCUA_CU_USER_ROLE_MANAGEMENT && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+static const opcua_byte_t s_str_RoleSetType[] = "RoleSetType";
+static const opcua_byte_t s_str_AddRole[] = "AddRole";
+static const opcua_byte_t s_str_RemoveRole[] = "RemoveRole";
+static const opcua_byte_t s_str_RoleName_Placeholder[] = "<RoleName>";
+static const opcua_byte_t s_str_AddIdentity[] = "AddIdentity";
+static const opcua_byte_t s_str_RemoveIdentity[] = "RemoveIdentity";
+static const opcua_byte_t s_str_RoleType[] = "RoleType";
+static const opcua_byte_t s_str_RoleSet[] = "RoleSet";
+#endif
 static const opcua_byte_t s_str_LocaleIdArray[] = "LocaleIdArray";
 #if MUC_OPCUA_CU_BASE_INFO_SERVERTYPE && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
 /* spec 090 (CU 5801 fix): LocaleId(295) DataType BrowseName -- the Mandatory
@@ -893,6 +903,11 @@ static const mu_reference_t s_base_object_type_refs[] = {
     {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {17496}}, true},
     {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {17533}}, true}
 #endif
+#if MUC_OPCUA_CU_USER_ROLE_MANAGEMENT && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+    ,
+    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {15607}}, true},
+    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {15620}}, true}
+#endif
 };
 
 #if MUC_OPCUA_CU_BASE_INFO_SERVERTYPE
@@ -1401,10 +1416,53 @@ static const mu_reference_t s_keycred_mandatory_property_refs[] = {
     {{0, MU_NODEID_NUMERIC, {40}}, {0, MU_NODEID_NUMERIC, {68}}, true}};
 #endif
 
-/* ServerCapabilitiesType(2013) HasProperty(46)/HasComponent(47) -> its 24 own
-   declarations (OPC-10000-5 §6.3.2 Table 10). RoleSet(16295) is dropped: its
-   TypeDefinition RoleSetType(15607) doesn't exist yet in this address space
-   (deferred to the role-based security slice). */
+#if MUC_OPCUA_CU_USER_ROLE_MANAGEMENT && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+/* RoleSetType(15607) HasProperty -> AddRole(15997), HasProperty -> RemoveRole(16000),
+   HasComponent -> RoleName_Placeholder(15608). */
+static const mu_reference_t s_role_set_type_refs[] = {
+    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {58}}, false},
+    {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {15997}}, true},
+    {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {16000}}, true},
+    {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {15608}}, true}};
+
+/* AddRole(15997): Mandatory, HasProperty -> InputArguments(15998),
+   HasProperty -> OutputArguments(15999). */
+static const mu_reference_t s_role_add_role_refs[] = {
+    {{0, MU_NODEID_NUMERIC, {37}}, {0, MU_NODEID_NUMERIC, {78}}, true},
+    {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {15998}}, true},
+    {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {15999}}, true}};
+
+/* RemoveRole(16000): Mandatory, HasProperty -> InputArguments(16001). */
+static const mu_reference_t s_role_remove_role_refs[] = {
+    {{0, MU_NODEID_NUMERIC, {37}}, {0, MU_NODEID_NUMERIC, {78}}, true},
+    {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {16001}}, true}};
+
+/* RoleName_Placeholder(15608): HasModellingRule(37)->OptionalPlaceholder(11508),
+   HasTypeDefinition(40)->RoleType(15620), HasProperty->AddIdentity(15612),
+   HasProperty->RemoveIdentity(15614). */
+static const mu_reference_t s_role_name_placeholder_refs[] = {
+    {{0, MU_NODEID_NUMERIC, {37}}, {0, MU_NODEID_NUMERIC, {11508}}, true},
+    {{0, MU_NODEID_NUMERIC, {40}}, {0, MU_NODEID_NUMERIC, {15620}}, true},
+    {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {15612}}, true},
+    {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {15614}}, true}};
+
+/* AddIdentity(15612): Mandatory, HasProperty -> InputArguments(15613). */
+static const mu_reference_t s_role_add_identity_refs[] = {
+    {{0, MU_NODEID_NUMERIC, {37}}, {0, MU_NODEID_NUMERIC, {78}}, true},
+    {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {15613}}, true}};
+
+/* RemoveIdentity(15614): Mandatory, HasProperty -> InputArguments(15615). */
+static const mu_reference_t s_role_remove_identity_refs[] = {
+    {{0, MU_NODEID_NUMERIC, {37}}, {0, MU_NODEID_NUMERIC, {78}}, true},
+    {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {15615}}, true}};
+
+/* RoleType(15620): subtype of BaseObjectType(58). */
+static const mu_reference_t s_role_type_refs[] = {{{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {58}}, false}};
+#endif
+
+/* ServerCapabilitiesType(2013) HasProperty(46)/HasComponent(47) -> its
+   declarations (OPC-10000-5 §6.3.2 Table 10). RoleSet(16295) is gated
+   on MUC_OPCUA_CU_USER_ROLE_MANAGEMENT. */
 static const mu_reference_t s_server_capabilities_type_refs[] = {
     {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {2014}}, true},  /* ServerProfileArray */
     {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {2016}}, true},  /* LocaleIdArray */
@@ -1429,7 +1487,10 @@ static const mu_reference_t s_server_capabilities_type_refs[] = {
     {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {24093}}, true}, /* MaxWhereClauseParameters */
     {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {31770}}, true}, /* MaxMonitoredItemsQueueSize */
     {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {11562}}, true}, /* <VendorCapability> */
-    {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {24094}}, true}  /* ConformanceUnits */
+    {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {24094}}, true}, /* ConformanceUnits */
+#if MUC_OPCUA_CU_USER_ROLE_MANAGEMENT && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+    {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {16295}}, true} /* RoleSet */
+#endif
 };
 
 /* ServerType(2004) HasProperty(46)/HasComponent(47) -> its 17 direct children
@@ -6148,6 +6209,117 @@ static const mu_node_t s_base_nodes[] = {
      sizeof(s_da_base_analog_type_refs) / sizeof(s_da_base_analog_type_refs[0]),
      NULL,
      .type_definition = {0}},
+#endif
+#if MUC_OPCUA_CU_USER_ROLE_MANAGEMENT && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+    /* spec 095 (CU 2080): RoleSetType(15607), RoleName_Placeholder(15608),
+       AddIdentity(15612)/RemoveIdentity(15614) Methods, RoleType(15620),
+       AddRole(15997)/RemoveRole(16000) Methods, and RoleSet instance(16295).
+       OPC-10000-12 §9.5-9.6. Sorted after BaseAnalogType(15318) and before
+       SelectionListType(16309). */
+    {{0, MU_NODEID_NUMERIC, {15607}},
+     MU_NODECLASS_OBJECTTYPE,
+     {11, s_str_RoleSetType},
+     {11, s_str_RoleSetType},
+     s_role_set_type_refs,
+     sizeof(s_role_set_type_refs) / sizeof(s_role_set_type_refs[0]),
+     NULL,
+     .type_definition = {0}},
+    {{0, MU_NODEID_NUMERIC, {15608}},
+     MU_NODECLASS_OBJECT,
+     {10, s_str_RoleName_Placeholder},
+     {10, s_str_RoleName_Placeholder},
+     s_role_name_placeholder_refs,
+     sizeof(s_role_name_placeholder_refs) / sizeof(s_role_name_placeholder_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {15620}}},
+    {{0, MU_NODEID_NUMERIC, {15612}},
+     MU_NODECLASS_METHOD,
+     {11, s_str_AddIdentity},
+     {11, s_str_AddIdentity},
+     s_role_add_identity_refs,
+     sizeof(s_role_add_identity_refs) / sizeof(s_role_add_identity_refs[0]),
+     NULL,
+     .type_definition = {0}},
+    {{0, MU_NODEID_NUMERIC, {15613}},
+     MU_NODECLASS_VARIABLE,
+     {14, s_str_InputArguments},
+     {14, s_str_InputArguments},
+     s_property_type_ref,
+     sizeof(s_property_type_ref) / sizeof(s_property_type_ref[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+    {{0, MU_NODEID_NUMERIC, {15614}},
+     MU_NODECLASS_METHOD,
+     {14, s_str_RemoveIdentity},
+     {14, s_str_RemoveIdentity},
+     s_role_remove_identity_refs,
+     sizeof(s_role_remove_identity_refs) / sizeof(s_role_remove_identity_refs[0]),
+     NULL,
+     .type_definition = {0}},
+    {{0, MU_NODEID_NUMERIC, {15615}},
+     MU_NODECLASS_VARIABLE,
+     {14, s_str_InputArguments},
+     {14, s_str_InputArguments},
+     s_property_type_ref,
+     sizeof(s_property_type_ref) / sizeof(s_property_type_ref[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+    {{0, MU_NODEID_NUMERIC, {15620}},
+     MU_NODECLASS_OBJECTTYPE,
+     {8, s_str_RoleType},
+     {8, s_str_RoleType},
+     s_role_type_refs,
+     sizeof(s_role_type_refs) / sizeof(s_role_type_refs[0]),
+     NULL,
+     .type_definition = {0}},
+    {{0, MU_NODEID_NUMERIC, {15997}},
+     MU_NODECLASS_METHOD,
+     {7, s_str_AddRole},
+     {7, s_str_AddRole},
+     s_role_add_role_refs,
+     sizeof(s_role_add_role_refs) / sizeof(s_role_add_role_refs[0]),
+     NULL,
+     .type_definition = {0}},
+    {{0, MU_NODEID_NUMERIC, {15998}},
+     MU_NODECLASS_VARIABLE,
+     {14, s_str_InputArguments},
+     {14, s_str_InputArguments},
+     s_property_type_ref,
+     sizeof(s_property_type_ref) / sizeof(s_property_type_ref[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+    {{0, MU_NODEID_NUMERIC, {15999}},
+     MU_NODECLASS_VARIABLE,
+     {15, s_str_OutputArguments},
+     {15, s_str_OutputArguments},
+     s_property_type_ref,
+     sizeof(s_property_type_ref) / sizeof(s_property_type_ref[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+    {{0, MU_NODEID_NUMERIC, {16000}},
+     MU_NODECLASS_METHOD,
+     {10, s_str_RemoveRole},
+     {10, s_str_RemoveRole},
+     s_role_remove_role_refs,
+     sizeof(s_role_remove_role_refs) / sizeof(s_role_remove_role_refs[0]),
+     NULL,
+     .type_definition = {0}},
+    {{0, MU_NODEID_NUMERIC, {16001}},
+     MU_NODECLASS_VARIABLE,
+     {14, s_str_InputArguments},
+     {14, s_str_InputArguments},
+     s_property_type_ref,
+     sizeof(s_property_type_ref) / sizeof(s_property_type_ref[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+    {{0, MU_NODEID_NUMERIC, {16295}},
+     MU_NODECLASS_OBJECT,
+     {7, s_str_RoleSet},
+     {7, s_str_RoleSet},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {15607}}},
 #endif
 #ifdef MUC_OPCUA_CU_BASE_INFO_SELECTION_LIST
     /* OPC-10000-5 §7.18, OPC-10000-7 CU 2711: SelectionListType (16309),
