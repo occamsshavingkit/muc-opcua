@@ -2,13 +2,12 @@
 
 # TODO — muc-opcua
 
-**Updated**: 2026-07-19 (CU 5801 deferred tests resolved — 124/124 pass)
+**Updated**: 2026-07-20 (PR #329 KeyCredential Service merged)
 
 ## Pending
 
 | ID | Feature | OPC Ref | Notes |
 |----|---------|---------|-------|
-| PG18 | KeyCredential Service Server Facet | OPC-10000-7 v1.05.02 | KeyCredential management for broker auth |
 | PG19 | User Role Management Server Facet | OPC-10000-7 v1.05.02 | Server user CRUD management |
 | PG20 | Global Certificate Management Server Facet | OPC-10000-7 v1.05.02 | Certificate enrollment/renewal via GDS |
 | PG24 | User Token — Issued Token Server Facet | OPC-10000-7 v1.05.02 | Kerberos (deprecated in 1.05.02) |
@@ -17,7 +16,8 @@
 
 | PR | Feature | Notes |
 |----|---------|-------|
-| #328 | Authorization Service / JWT (CU 1629/1697) | OAuth2 Resource Server — JWT validation at ActivateSession. CU 1629 type nodes deferred (GDS namespace). Non-OpenSSL backends not yet supported. |
+| #329 | KeyCredential Service Server Facet (CU 2113) | GetEncryptingKey, Create/Update/DeleteCredential. Integrator-provided adapter. Type nodes + 11 tests. 1.6 KB .text. |
+| #328 | Authorization Service / JWT (CU 1629/1697) | OAuth2 Resource Server — JWT validation at ActivateSession. mbedTLS/wolfSSL backends added. |
 | #327 | CU 5801 Diagnostics Part 2 | SubscriptionDiagnosticsType, SessionDiagnosticsVariableType, SessionDiagnosticsObjectType, ServerRedundancyType |
 
 ## Follow-ups from Code Review
