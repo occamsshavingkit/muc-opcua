@@ -5530,6 +5530,36 @@
         "source_url": "https://profiles.opcfoundation.org"
       },
       "notes": "User Role Management Server Facet -- CRUD for OPC UA Roles and identity-to-role mappings (AddRole, RemoveRole, AddIdentity, RemoveIdentity). Grounded per OPC-10000-12 9.5-9.6 and OPC-10000-7 CU 2080."
+    },
+    {
+      "id": "opc_cu_certificate_management",
+      "kind": "conformance_unit",
+      "opc_display_name": "Certificate Management",
+      "kconfig_symbol": "MUC_OPCUA_CU_CERTIFICATE_MANAGEMENT",
+      "implementation_state": "in-progress",
+      "depends_on": [
+        "MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION",
+        "MUC_OPCUA_CU_METHOD_SERVER"
+      ],
+      "profile_defaults": {
+        "nano": false,
+        "micro": false,
+        "embedded": false,
+        "standard": false,
+        "full": true,
+        "custom": false
+      },
+      "backing_tests": [
+        "test_certificate_management"
+      ],
+      "opc_reference": {
+        "spec": "OPC-10000-12",
+        "section": "7.5-7.6",
+        "cu_id": "2105",
+        "cu_name": "Certificate Management",
+        "source_url": "https://profiles.opcfoundation.org"
+      },
+      "notes": "Global Certificate Management Server Facet (PG20) -- type-system InstanceDeclarations for CertificateGroupType and CertificateType. Certificate enrollment/renewal Methods (CreateSigningRequest, GetRejectedList, FinishRequest) deferred. Grounded per OPC-10000-12 7.5-7.6 and OPC-10000-7 CU 2105."
     }
   ],
   "capacities": [

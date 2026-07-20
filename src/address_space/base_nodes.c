@@ -120,6 +120,12 @@ static const opcua_byte_t s_str_RemoveIdentity[] = "RemoveIdentity";
 static const opcua_byte_t s_str_RoleType[] = "RoleType";
 static const opcua_byte_t s_str_RoleSet[] = "RoleSet";
 #endif
+#if MUC_OPCUA_CU_CERTIFICATE_MANAGEMENT && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+/* spec 096 (CU 2105): Certificate Management Server Facet type-system
+   InstanceDeclaration BrowseNames (OPC-10000-12 §7.5-7.6). */
+static const opcua_byte_t s_str_CertificateGroupType[] = "CertificateGroupType";
+static const opcua_byte_t s_str_CertificateType[] = "CertificateType";
+#endif
 static const opcua_byte_t s_str_LocaleIdArray[] = "LocaleIdArray";
 #if MUC_OPCUA_CU_BASE_INFO_SERVERTYPE && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
 /* spec 090 (CU 5801 fix): LocaleId(295) DataType BrowseName -- the Mandatory
@@ -908,6 +914,11 @@ static const mu_reference_t s_base_object_type_refs[] = {
     {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {15607}}, true},
     {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {15620}}, true}
 #endif
+#if MUC_OPCUA_CU_CERTIFICATE_MANAGEMENT && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+    ,
+    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {12555}}, true},
+    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {12556}}, true}
+#endif
 };
 
 #if MUC_OPCUA_CU_BASE_INFO_SERVERTYPE
@@ -1458,6 +1469,18 @@ static const mu_reference_t s_role_remove_identity_refs[] = {
 
 /* RoleType(15620): subtype of BaseObjectType(58). */
 static const mu_reference_t s_role_type_refs[] = {{{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {58}}, false}};
+#endif
+
+#if MUC_OPCUA_CU_CERTIFICATE_MANAGEMENT && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+/* CertificateGroupType(12555): subtype of BaseObjectType(58). IsAbstract False.
+   OPC-10000-12 §7.8.3.1. */
+static const mu_reference_t s_certificate_group_type_refs[] = {
+    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {58}}, false}};
+
+/* CertificateType(12556): subtype of BaseObjectType(58). IsAbstract True.
+   OPC-10000-12 §7.8.4.1. */
+static const mu_reference_t s_certificate_type_refs[] = {
+    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {58}}, false}};
 #endif
 
 /* ServerCapabilitiesType(2013) HasProperty(46)/HasComponent(47) -> its
@@ -6056,7 +6079,32 @@ static const mu_node_t s_base_nodes[] = {
      NULL,
      .type_definition = {0, MU_NODEID_NUMERIC, {68}},
      .value_rank = -1,
-     .data_type = 7},
+      .data_type = 7},
+#endif
+#if MUC_OPCUA_CU_CERTIFICATE_MANAGEMENT && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+    /* spec 096 (CU 2105): CertificateGroupType(12555) and
+       CertificateType(12556) ObjectType InstanceDeclarations
+       (OPC-10000-12 §7.5-7.6). Both types are subtypes of BaseObjectType(58).
+       CertificateType is abstract (True). Methods (CreateSigningRequest,
+       GetRejectedList, FinishRequest) are deferred to a later iteration.
+       Sorted between MaxNodesPerHistoryUpdateEvents(12164) and
+       SetSubscriptionDurable(12746). */
+    {{0, MU_NODEID_NUMERIC, {12555}},
+     MU_NODECLASS_OBJECTTYPE,
+     {20, s_str_CertificateGroupType},
+     {20, s_str_CertificateGroupType},
+     s_certificate_group_type_refs,
+     sizeof(s_certificate_group_type_refs) / sizeof(s_certificate_group_type_refs[0]),
+     NULL,
+     .type_definition = {0}},
+    {{0, MU_NODEID_NUMERIC, {12556}},
+     MU_NODECLASS_OBJECTTYPE,
+     {15, s_str_CertificateType},
+     {15, s_str_CertificateType},
+     s_certificate_type_refs,
+     sizeof(s_certificate_type_refs) / sizeof(s_certificate_type_refs[0]),
+     NULL,
+     .type_definition = {0}},
 #endif
 #if MUC_OPCUA_CU_BASE_INFO_SERVERTYPE && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
     /* spec 085 (CU 5801) Task 4: ServerType.SetSubscriptionDurable(12746), the

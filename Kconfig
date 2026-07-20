@@ -1554,6 +1554,19 @@ if MUC_OPCUA_FACET_GLOBAL_CERTIFICATE_MANAGEMENT_SERVER
 #   Notes: Support the Certificate Management Services of UA Part 12 for the Push model to manage Application Instance Certificates and Trust Lists including Revocation Lists.
 comment "Push Model for Global Certificate and TrustList Management (NOT IMPLEMENTED)"
 
+config MUC_OPCUA_CU_CERTIFICATE_MANAGEMENT
+	bool "CU: Certificate Management"
+	depends on MUC_OPCUA_CU_METHOD_SERVER && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: in-progress.
+	  OPC source: OPC-10000-12 §7.5-7.6, OPC-10000-7 CU 2105.
+	  Backing tests: test_certificate_management.
+	  Notes: Global Certificate Management Server Facet (PG20) -- type-system
+	  InstanceDeclarations only. Certificate enrollment/renewal Methods
+	  (CreateSigningRequest, GetRejectedList, FinishRequest) deferred.
+	  Grounded per OPC-10000-12 7.5-7.6 and OPC-10000-7 CU 2105.
+
 endif
 
 menuconfig MUC_OPCUA_FACET_USER_TOKEN_USER_NAME_PASSWORD_SERVER

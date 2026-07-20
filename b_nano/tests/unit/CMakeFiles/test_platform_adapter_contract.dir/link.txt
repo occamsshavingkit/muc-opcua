@@ -1,0 +1,1 @@
+/usr/bin/cc -Wl,--gc-sections CMakeFiles/test_platform_adapter_contract.dir/test_platform_adapter_contract.c.o -o test_platform_adapter_contract  ../../_deps/unity-build/libunity.a ../../src/libmuc_opcua.a ../support/libmuc_opcua_test_support.a ../../src/libmuc_opcua.a 

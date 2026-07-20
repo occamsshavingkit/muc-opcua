@@ -1,0 +1,1 @@
+/usr/bin/cc -Wl,--gc-sections CMakeFiles/test_response_regression.dir/test_response_regression.c.o -o test_response_regression  ../../src/libmuc_opcua.a ../support/libmuc_opcua_test_support.a ../../_deps/unity-build/libunity.a ../../src/libmuc_opcua.a 

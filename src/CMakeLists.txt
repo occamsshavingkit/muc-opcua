@@ -345,6 +345,13 @@ if(MUC_OPCUA_CU_USER_ROLE_MANAGEMENT)
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_CU_USER_ROLE_MANAGEMENT=1)
 endif()
 
+# -- CU: Certificate Management (spec 096, OPC-10000-7 CU 2105) --
+# Type-system only: no Methods in this iteration. The ObjectType nodes
+# live entirely in base_nodes.c behind #ifdef. No separate .c file.
+if(MUC_OPCUA_CU_CERTIFICATE_MANAGEMENT)
+    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_CU_CERTIFICATE_MANAGEMENT=1)
+endif()
+
 # -- CU: Event Filter Where --
 if(MUC_OPCUA_CU_EVENT_FILTER_WHERE)
     file(GLOB _sources cu/core_2022_server/event_filter_where/*.c)

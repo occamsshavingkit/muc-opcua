@@ -28,6 +28,9 @@
 #ifdef MUC_OPCUA_CU_USER_ROLE_MANAGEMENT
 #include "muc_opcua/services/role_management.h"
 #endif
+#ifdef MUC_OPCUA_CU_CERTIFICATE_MANAGEMENT
+#include "muc_opcua/services/certificate_management.h"
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -143,6 +146,10 @@ typedef struct {
 
 #ifdef MUC_OPCUA_CU_USER_ROLE_MANAGEMENT
     const mu_role_management_adapter_t *role_management_adapter;
+#endif
+
+#ifdef MUC_OPCUA_CU_CERTIFICATE_MANAGEMENT
+    const mu_certificate_management_adapter_t *certificate_management_adapter;
 #endif
 
 #ifdef MUC_OPCUA_CU_USER_TOKEN_JWT
