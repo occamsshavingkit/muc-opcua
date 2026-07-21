@@ -103,7 +103,10 @@ static opcua_statuscode_t mock_finish(void *ctx, uint32_t request_id, mu_bytestr
 
 static opcua_statuscode_t mock_rejected(void *ctx, uint8_t *out_buffer, size_t *out_len) {
     (void)ctx;
-    if (s_rejected_len > 0 && out_buffer != NULL && out_len != NULL && *out_len >= s_rejected_len)
+    if (out_len == NULL) {
+        return MU_STATUS_BAD_INVALIDARGUMENT;
+    }
+    if (s_rejected_len > 0 && out_buffer != NULL && *out_len >= s_rejected_len)
         memcpy(out_buffer, s_rejected_buf, s_rejected_len);
     *out_len = s_rejected_len;
     return MU_STATUS_GOOD;
