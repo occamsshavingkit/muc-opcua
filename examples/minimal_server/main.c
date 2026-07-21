@@ -175,7 +175,7 @@ int main(void) {
 #ifdef MUC_OPCUA_SERVICE_ALARMS_CONDITIONS
     {
         mu_condition_id_t cid;
-        cid.node_id = mu_nodeid_make_numeric(1, 12345);
+        cid.node_id = (mu_nodeid_t){.identifier_type = MU_NODEID_NUMERIC, .namespace_index = 1, .identifier.numeric = 12345};
         if (mu_alarms_trigger_dialog(server, &cid, 0x03) == MU_STATUS_GOOD) {
             (void)printf("Triggered test dialog condition (NodeId 1:12345)\n");
         }

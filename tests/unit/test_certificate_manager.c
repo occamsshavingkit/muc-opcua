@@ -21,11 +21,9 @@ static _Alignas(8) opcua_byte_t s_server_storage[MU_SERVER_STORAGE_BYTES];
 static mu_server_t *s_server;
 
 /* TCP adapter stubs (matching test_key_credential.c signatures) */
-static opcua_statuscode_t stub_listen(void *ctx, const char *endpoint_url, opcua_uint16_t port, opcua_int32_t backlog) {
+static opcua_statuscode_t stub_listen(void *ctx, const char *endpoint_url) {
     (void)ctx;
     (void)endpoint_url;
-    (void)port;
-    (void)backlog;
     return 0;
 }
 static opcua_statuscode_t stub_accept(void *ctx, void **out_handle) {
@@ -105,7 +103,10 @@ static opcua_statuscode_t mock_finish(void *ctx, uint32_t request_id, mu_bytestr
 
 static opcua_statuscode_t mock_rejected(void *ctx, uint8_t *out_buffer, size_t *out_len) {
     (void)ctx;
-    if (s_rejected_len > 0 && out_buffer != NULL && out_len != NULL && *out_len >= s_rejected_len)
+    if (out_len == NULL) {
+        return MU_STATUS_BAD_INVALIDARGUMENT;
+    }
+    if (s_rejected_len > 0 && out_buffer != NULL && *out_len >= s_rejected_len)
         memcpy(out_buffer, s_rejected_buf, s_rejected_len);
     *out_len = s_rejected_len;
     return MU_STATUS_GOOD;

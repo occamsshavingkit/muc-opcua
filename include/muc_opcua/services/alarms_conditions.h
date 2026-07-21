@@ -44,15 +44,15 @@ opcua_statuscode_t mu_alarms_set_active(struct mu_server *server, const mu_condi
  * @brief Triggers a DialogCondition.
  */
 opcua_statuscode_t mu_alarms_trigger_dialog(struct mu_server *server, const mu_condition_id_t *id,
-                                     uint32_t valid_responses_mask);
+                                            uint32_t valid_responses_mask);
 
 /**
  * @brief Method dispatch handler for Alarms & Conditions Methods.
  */
 opcua_statuscode_t mu_alarms_conditions_method_dispatch(struct mu_server *server, const mu_nodeid_t *method_id,
-                                                 const mu_nodeid_t *object_id, size_t input_args_count,
-                                                 const mu_variant_t *input_args, size_t *output_args_count,
-                                                 mu_variant_t *output_args);
+                                                        const mu_nodeid_t *object_id, size_t input_args_count,
+                                                        const mu_variant_t *input_args, size_t *output_args_count,
+                                                        mu_variant_t *output_args);
 
 #ifdef __cplusplus
 }
