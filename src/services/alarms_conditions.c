@@ -71,7 +71,7 @@ opcua_statuscode_t mu_alarms_set_active(struct mu_server *server, const mu_condi
 }
 
 opcua_statuscode_t mu_alarms_trigger_dialog(struct mu_server *server, const mu_condition_id_t *id,
-                                     uint32_t valid_responses_mask) {
+                                            uint32_t valid_responses_mask) {
     if (!server || !id) {
         return MU_STATUS_BAD_INVALIDARGUMENT;
     }
@@ -101,9 +101,9 @@ opcua_statuscode_t mu_alarms_trigger_dialog(struct mu_server *server, const mu_c
 }
 
 opcua_statuscode_t mu_alarms_conditions_method_dispatch(mu_server_t *server, const mu_nodeid_t *method_id,
-                                                 const mu_nodeid_t *object_id, size_t input_args_count,
-                                                 const mu_variant_t *input_args, size_t *output_args_count,
-                                                 mu_variant_t *output_args) {
+                                                        const mu_nodeid_t *object_id, size_t input_args_count,
+                                                        const mu_variant_t *input_args, size_t *output_args_count,
+                                                        mu_variant_t *output_args) {
     (void)output_args;
     if (method_id->identifier_type != MU_NODEID_NUMERIC || method_id->namespace_index != 0) {
         return MU_STATUS_BAD_METHODINVALID;
