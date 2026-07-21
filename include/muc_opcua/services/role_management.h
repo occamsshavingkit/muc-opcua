@@ -52,6 +52,14 @@ opcua_statuscode_t mu_role_management_register(struct mu_server *server);
 
 #endif /* MUC_OPCUA_CU_USER_ROLE_MANAGEMENT */
 
+#ifdef MUC_OPCUA_CU_SECURITY_ROLE_SERVER_AUTHORIZATION
+
+typedef opcua_statuscode_t (*mu_role_permission_check_t)(void *context, const mu_nodeid_t *session_id,
+                                                         opcua_uint32_t service_type,
+                                                         const mu_nodeid_t *target_node_id);
+
+#endif /* MUC_OPCUA_CU_SECURITY_ROLE_SERVER_AUTHORIZATION */
+
 #ifdef __cplusplus
 }
 #endif

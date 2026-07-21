@@ -149,6 +149,11 @@ typedef struct {
     const mu_role_management_adapter_t *role_management_adapter;
 #endif
 
+#ifdef MUC_OPCUA_CU_SECURITY_ROLE_SERVER_AUTHORIZATION
+    mu_role_permission_check_t role_permission_check;
+    void *role_permission_check_context;
+#endif
+
 #ifdef MUC_OPCUA_CU_CERTIFICATE_MANAGEMENT
     const mu_certificate_management_adapter_t *certificate_management_adapter;
 #endif
