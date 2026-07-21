@@ -7,6 +7,7 @@
 #include "core/server_internal.h"
 #include "core/service_dispatch.h"
 #include "muc_opcua/encoding.h"
+#include "muc_opcua/services/audit.h"
 #include "services/node_management.h"
 #include "services/service_header.h"
 #include <stddef.h>
@@ -38,11 +39,19 @@ opcua_statuscode_t handle_add_nodes(mu_server_t *server, mu_binary_reader_t *r, 
         return s;
     }
 
+#if MUC_OPCUA_CU_AUDITING
+    {
+        mu_audit_event_t audit_ev;
+        (void)memset(&audit_ev, 0, sizeof(audit_ev));
+        audit_ev.event_type = MU_AUDIT_EVENT_NODE_MANAGEMENT;
+        audit_ev.status = true;
+        mu_raise_audit_event(server, &audit_ev);
+    }
+#endif
+
     *response_length = w->position;
     return MU_STATUS_GOOD;
 }
-
-/* AddReferences (OPC 10000-4 5.8.3). */
 opcua_statuscode_t handle_add_references(mu_server_t *server, mu_binary_reader_t *r, mu_binary_writer_t *w,
                                          size_t *response_length) {
     mu_request_header_t req;
@@ -65,6 +74,16 @@ opcua_statuscode_t handle_add_references(mu_server_t *server, mu_binary_reader_t
     if (s != MU_STATUS_GOOD) {
         return s;
     }
+
+#if MUC_OPCUA_CU_AUDITING
+    {
+        mu_audit_event_t audit_ev;
+        (void)memset(&audit_ev, 0, sizeof(audit_ev));
+        audit_ev.event_type = MU_AUDIT_EVENT_NODE_MANAGEMENT;
+        audit_ev.status = true;
+        mu_raise_audit_event(server, &audit_ev);
+    }
+#endif
 
     *response_length = w->position;
     return MU_STATUS_GOOD;
@@ -94,6 +113,16 @@ opcua_statuscode_t handle_delete_nodes(mu_server_t *server, mu_binary_reader_t *
         return s;
     }
 
+#if MUC_OPCUA_CU_AUDITING
+    {
+        mu_audit_event_t audit_ev;
+        (void)memset(&audit_ev, 0, sizeof(audit_ev));
+        audit_ev.event_type = MU_AUDIT_EVENT_NODE_MANAGEMENT;
+        audit_ev.status = true;
+        mu_raise_audit_event(server, &audit_ev);
+    }
+#endif
+
     *response_length = w->position;
     return MU_STATUS_GOOD;
 }
@@ -121,6 +150,16 @@ opcua_statuscode_t handle_delete_references(mu_server_t *server, mu_binary_reade
     if (s != MU_STATUS_GOOD) {
         return s;
     }
+
+#if MUC_OPCUA_CU_AUDITING
+    {
+        mu_audit_event_t audit_ev;
+        (void)memset(&audit_ev, 0, sizeof(audit_ev));
+        audit_ev.event_type = MU_AUDIT_EVENT_NODE_MANAGEMENT;
+        audit_ev.status = true;
+        mu_raise_audit_event(server, &audit_ev);
+    }
+#endif
 
     *response_length = w->position;
     return MU_STATUS_GOOD;

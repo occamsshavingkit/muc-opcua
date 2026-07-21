@@ -552,7 +552,9 @@
       "opc_cu_3194",
       "opc_cu_2422",
       "opc_cu_3968",
+      "opc_cu_3224",
       "opc_cu_3228",
+      "opc_cu_3230",
       "opc_cu_2380",
       "opc_cu_2394",
       "opc_cu_2939",
@@ -655,7 +657,14 @@
       "opc_cu_3080",
       "opc_cu_3201",
       "opc_cu_5592",
-      "opc_cu_5814"
+      "opc_cu_5814",
+      "opc_cu_2189",
+      "opc_cu_2726",
+      "opc_cu_2852",
+      "opc_cu_2879",
+      "opc_cu_2921",
+      "opc_cu_2927",
+      "opc_cu_alarms_conditions"
     ],
     "opc_facet_1324": [
       "opc_cu_2928",
@@ -5658,7 +5667,7 @@
       "backing_tests": [],
       "cu_optional": false,
       "id": "opc_cu_2515",
-      "implementation_state": "declared",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Reconciled (spec 073): address-space-triggered events are queued per subscription and delivered in Publish (notification.c mu_server_trigger_event); tested by test_event_notifications. Satisfied by opc_cu_events.",
@@ -5868,7 +5877,7 @@
       "backing_tests": [],
       "cu_optional": false,
       "id": "opc_cu_3194",
-      "implementation_state": "declared",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Reconciled (spec 074): the Server Object (i=2253) exposes a readable EventNotifier attribute (SubscribeToEvents) so a client can discover it as an event source; read_attribute.c + base_nodes.c, tested by test_read_service::test_read_service_eventnotifier.",
@@ -5898,10 +5907,10 @@
       "backing_tests": [],
       "cu_optional": false,
       "id": "opc_cu_2422",
-      "implementation_state": "declared",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
-      "notes": "Reconciled (spec 074): AuditOpenSecureChannelEvent (i=2060) emitted on OpenSecureChannel (osc_handler.c) and observable via the Server EventNotifier; test_event_notifications. Satisfied by opc_cu_auditing.",
+      "notes": "AuditOpenSecureChannelEvent (i=2060) emitted on OpenSecureChannel (osc_handler.c) and observable via the Server EventNotifier. Satisfied by opc_cu_auditing.",
       "opc_display_name": "Auditing Secure Communication",
       "opc_reference": {
         "cu_id": "2422",
@@ -5958,10 +5967,10 @@
       "backing_tests": [],
       "cu_optional": false,
       "id": "opc_cu_3228",
-      "implementation_state": "declared",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
-      "notes": "Reconciled (spec 074): AuditWriteUpdateEvent (i=2100) emitted per successful attribute write (attribute_handler.c) and observable via the Server EventNotifier; test_event_notifications. Satisfied by opc_cu_auditing.",
+      "notes": "AuditWriteUpdateEvent (i=2100) emitted per attribute write (attribute_handler.c) and observable via the Server EventNotifier. Satisfied by opc_cu_auditing.",
       "opc_display_name": "Auditing Write",
       "opc_reference": {
         "cu_id": "3228",
@@ -5979,6 +5988,216 @@
         "standard": false
       },
       "satisfied_by": "opc_cu_auditing",
+      "source_metadata": {
+        "profile_group_id": 171,
+        "source_endpoint": "conformanceunit/?pg=171&all=1"
+      }
+    },
+    {
+      "backing_tests": [],
+      "cu_optional": false,
+      "id": "opc_cu_3224",
+      "implementation_state": "claimed",
+      "kconfig_symbol": null,
+      "kind": "conformance_unit",
+      "notes": "AuditNodeManagementEventType (i=2090) emitted for AddNodes, AddReferences, DeleteNodes, DeleteReferences. Satisfied by opc_cu_auditing.",
+      "opc_display_name": "Auditing NodeManagement",
+      "opc_reference": {
+        "cu_id": "3224",
+        "cu_name": "Auditing NodeManagement",
+        "section": null,
+        "source_url": "https://profiles.opcfoundation.org",
+        "spec": "OPC-10000-5"
+      },
+      "profile_defaults": {
+        "custom": false,
+        "embedded": false,
+        "full": true,
+        "micro": false,
+        "nano": false,
+        "standard": false
+      },
+      "satisfied_by": "opc_cu_auditing",
+      "source_metadata": {
+        "profile_group_id": 171,
+        "source_endpoint": "conformanceunit/?pg=171&all=1"
+      }
+    },
+    {
+      "backing_tests": [],
+      "cu_optional": false,
+      "id": "opc_cu_3230",
+      "implementation_state": "claimed",
+      "kconfig_symbol": null,
+      "kind": "conformance_unit",
+      "notes": "AuditUpdateMethodEventType (i=2127) emitted for Call service method invocations. Satisfied by opc_cu_auditing.",
+      "opc_display_name": "Auditing Method",
+      "opc_reference": {
+        "cu_id": "3230",
+        "cu_name": "Auditing Method",
+        "section": null,
+        "source_url": "https://profiles.opcfoundation.org",
+        "spec": "OPC-10000-5"
+      },
+      "profile_defaults": {
+        "custom": false,
+        "embedded": false,
+        "full": true,
+        "micro": false,
+        "nano": false,
+        "standard": false
+      },
+      "satisfied_by": "opc_cu_auditing",
+      "source_metadata": {
+        "profile_group_id": 171,
+        "source_endpoint": "conformanceunit/?pg=171&all=1"
+      }
+    },
+    {
+      "backing_tests": [],
+      "cu_optional": false,
+      "id": "opc_cu_3763",
+      "implementation_state": "claimed",
+      "kconfig_symbol": null,
+      "kind": "conformance_unit",
+      "notes": "AuditConditionEnableEventType (i=2803) emitted for condition state changes (set_active). AuditConditionAcknowledgeEventType (i=8944) emitted for Acknowledge method. Satisfied by opc_cu_auditing.",
+      "opc_display_name": "A & C Auditing",
+      "opc_reference": {
+        "cu_id": "3763",
+        "cu_name": "A & C Auditing",
+        "section": "5.10",
+        "source_url": "https://profiles.opcfoundation.org",
+        "spec": "OPC-10000-9"
+      },
+      "profile_defaults": {
+        "custom": false,
+        "embedded": false,
+        "full": true,
+        "micro": false,
+        "nano": false,
+        "standard": false
+      },
+      "satisfied_by": "opc_cu_auditing",
+      "source_metadata": {
+        "profile_group_id": 171,
+        "source_endpoint": "conformanceunit/?pg=171&all=1"
+      }
+    },
+    {
+      "backing_tests": [],
+      "cu_optional": false,
+      "id": "opc_cu_3764",
+      "implementation_state": "claimed",
+      "kconfig_symbol": null,
+      "kind": "conformance_unit",
+      "notes": "AuditConditionRespondEventType (i=8927) emitted for DialogCondition Respond method. Satisfied by opc_cu_auditing.",
+      "opc_display_name": "A & C Dialog Auditing",
+      "opc_reference": {
+        "cu_id": "3764",
+        "cu_name": "A & C Dialog Auditing",
+        "section": "5.10.5",
+        "source_url": "https://profiles.opcfoundation.org",
+        "spec": "OPC-10000-9"
+      },
+      "profile_defaults": {
+        "custom": false,
+        "embedded": false,
+        "full": true,
+        "micro": false,
+        "nano": false,
+        "standard": false
+      },
+      "satisfied_by": "opc_cu_auditing",
+      "source_metadata": {
+        "profile_group_id": 171,
+        "source_endpoint": "conformanceunit/?pg=171&all=1"
+      }
+    },
+    {
+      "backing_tests": [],
+      "cu_optional": false,
+      "id": "opc_cu_3766",
+      "implementation_state": "claimed",
+      "kconfig_symbol": null,
+      "kind": "conformance_unit",
+      "notes": "AuditConditionConfirmEventType (i=8961) emitted for Confirm method. Satisfied by opc_cu_auditing.",
+      "opc_display_name": "A & C Confirm Auditing",
+      "opc_reference": {
+        "cu_id": "3766",
+        "cu_name": "A & C Confirm Auditing",
+        "section": "5.10.7",
+        "source_url": "https://profiles.opcfoundation.org",
+        "spec": "OPC-10000-9"
+      },
+      "profile_defaults": {
+        "custom": false,
+        "embedded": false,
+        "full": true,
+        "micro": false,
+        "nano": false,
+        "standard": false
+      },
+      "satisfied_by": "opc_cu_auditing",
+      "source_metadata": {
+        "profile_group_id": 171,
+        "source_endpoint": "conformanceunit/?pg=171&all=1"
+      }
+    },
+    {
+      "backing_tests": [],
+      "cu_optional": false,
+      "id": "opc_cu_3767",
+      "implementation_state": "deferred",
+      "kconfig_symbol": null,
+      "kind": "conformance_unit",
+      "notes": "Requires A & C Shelving State feature (not yet implemented). Deferred until shelving support is added.",
+      "opc_display_name": "A & C Shelving Auditing",
+      "opc_reference": {
+        "cu_id": "3767",
+        "cu_name": "A & C Shelving Auditing",
+        "section": "5.10.8",
+        "source_url": "https://profiles.opcfoundation.org",
+        "spec": "OPC-10000-9"
+      },
+      "profile_defaults": {
+        "custom": false,
+        "embedded": false,
+        "full": true,
+        "micro": false,
+        "nano": false,
+        "standard": false
+      },
+      "satisfied_by": null,
+      "source_metadata": {
+        "profile_group_id": 171,
+        "source_endpoint": "conformanceunit/?pg=171&all=1"
+      }
+    },
+    {
+      "backing_tests": [],
+      "cu_optional": false,
+      "id": "opc_cu_3768",
+      "implementation_state": "deferred",
+      "kconfig_symbol": null,
+      "kind": "conformance_unit",
+      "notes": "Requires A & C Suppression State feature (not yet implemented). Deferred until suppression support is added.",
+      "opc_display_name": "A & C Suppression Auditing",
+      "opc_reference": {
+        "cu_id": "3768",
+        "cu_name": "A & C Suppression Auditing",
+        "section": "5.10.9",
+        "source_url": "https://profiles.opcfoundation.org",
+        "spec": "OPC-10000-9"
+      },
+      "profile_defaults": {
+        "custom": false,
+        "embedded": false,
+        "full": true,
+        "micro": false,
+        "nano": false,
+        "standard": false
+      },
+      "satisfied_by": null,
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -6354,6 +6573,213 @@
         "micro": false,
         "nano": false,
         "standard": false
+      }
+    },
+    {
+      "backing_tests": [
+        "test_alarms_conditions"
+      ],
+      "depends_on": [
+        "MUC_OPCUA_CU_EVENTS",
+        "MUC_OPCUA_FACET_CORE_2022_SERVER"
+      ],
+      "id": "opc_cu_alarms_conditions",
+      "implementation_state": "claimed",
+      "kconfig_symbol": "MUC_OPCUA_CU_ALARMS_CONDITIONS",
+      "kind": "conformance_unit",
+      "notes": "Project-level CU gating the Alarms & Conditions service (OPC-10000-9). Enables ConditionClasses type nodes, AcknowledgeableConditionType/AlarmConditionType hierarchy, Acknowledge/Confirm method dispatch, and condition state tracking in server_internal.h. Satisfies OPC CUs 2189, 2726, 2852, 2879, 2921, 2927.",
+      "opc_display_name": "Alarms & Conditions",
+      "opc_reference": {
+        "section": "5",
+        "spec": "OPC-10000-9"
+      },
+      "profile_defaults": {
+        "custom": false,
+        "embedded": false,
+        "full": true,
+        "micro": false,
+        "nano": false,
+        "standard": false
+      }
+    },
+    {
+      "backing_tests": [],
+      "cu_optional": false,
+      "id": "opc_cu_2189",
+      "implementation_state": "declared",
+      "kconfig_symbol": null,
+      "kind": "conformance_unit",
+      "notes": "A & C ConditionClasses (OPC-10000-9 5.9): BaseConditionClassType(11163) and subtype ObjectTypes (ProcessConditionClassType, MaintenanceConditionClassType, SystemConditionClassType) exposed in the AddressSpace type system. Satisfied by opc_cu_alarms_conditions.",
+      "opc_display_name": "A & C ConditionClasses",
+      "opc_reference": {
+        "cu_id": "2189",
+        "cu_name": "A & C ConditionClasses",
+        "section": "5.9",
+        "source_url": "https://profiles.opcfoundation.org",
+        "spec": "OPC-10000-9"
+      },
+      "profile_defaults": {
+        "custom": false,
+        "embedded": false,
+        "full": true,
+        "micro": false,
+        "nano": false,
+        "standard": false
+      },
+      "satisfied_by": "opc_cu_alarms_conditions",
+      "source_metadata": {
+        "profile_group_id": 171,
+        "source_endpoint": "conformanceunit/?pg=171&all=1"
+      }
+    },
+    {
+      "backing_tests": [],
+      "cu_optional": false,
+      "id": "opc_cu_2726",
+      "implementation_state": "declared",
+      "kconfig_symbol": null,
+      "kind": "conformance_unit",
+      "notes": "A & C First in Group Alarm (OPC-10000-9 5.10.3): FirstInGroupAlarmType ObjectType exposed in the AddressSpace type system. Satisfied by opc_cu_alarms_conditions.",
+      "opc_display_name": "A & C First in Group Alarm",
+      "opc_reference": {
+        "cu_id": "2726",
+        "cu_name": "A & C First in Group Alarm",
+        "section": "5.10.3",
+        "source_url": "https://profiles.opcfoundation.org",
+        "spec": "OPC-10000-9"
+      },
+      "profile_defaults": {
+        "custom": false,
+        "embedded": false,
+        "full": true,
+        "micro": false,
+        "nano": false,
+        "standard": false
+      },
+      "satisfied_by": "opc_cu_alarms_conditions",
+      "source_metadata": {
+        "profile_group_id": 171,
+        "source_endpoint": "conformanceunit/?pg=171&all=1"
+      }
+    },
+    {
+      "backing_tests": [],
+      "cu_optional": false,
+      "id": "opc_cu_2852",
+      "implementation_state": "declared",
+      "kconfig_symbol": null,
+      "kind": "conformance_unit",
+      "notes": "A & C Condition Sub-Classes (OPC-10000-9 5.9.11): ConditionSubClassType(17223) ObjectType exposed in the AddressSpace type system. Satisfied by opc_cu_alarms_conditions.",
+      "opc_display_name": "A & C Condition Sub-Classes",
+      "opc_reference": {
+        "cu_id": "2852",
+        "cu_name": "A & C Condition Sub-Classes",
+        "section": "5.9.11",
+        "source_url": "https://profiles.opcfoundation.org",
+        "spec": "OPC-10000-9"
+      },
+      "profile_defaults": {
+        "custom": false,
+        "embedded": false,
+        "full": true,
+        "micro": false,
+        "nano": false,
+        "standard": false
+      },
+      "satisfied_by": "opc_cu_alarms_conditions",
+      "source_metadata": {
+        "profile_group_id": 171,
+        "source_endpoint": "conformanceunit/?pg=171&all=1"
+      }
+    },
+    {
+      "backing_tests": [],
+      "cu_optional": false,
+      "id": "opc_cu_2879",
+      "implementation_state": "declared",
+      "kconfig_symbol": null,
+      "kind": "conformance_unit",
+      "notes": "A & C Re-Alarming (OPC-10000-9 5.10.4): ReAlarmType and OffNormalAlarmType ObjectTypes exposed in the AddressSpace type system. Satisfied by opc_cu_alarms_conditions.",
+      "opc_display_name": "A & C Re-Alarming",
+      "opc_reference": {
+        "cu_id": "2879",
+        "cu_name": "A & C Re-Alarming",
+        "section": "5.10.4",
+        "source_url": "https://profiles.opcfoundation.org",
+        "spec": "OPC-10000-9"
+      },
+      "profile_defaults": {
+        "custom": false,
+        "embedded": false,
+        "full": true,
+        "micro": false,
+        "nano": false,
+        "standard": false
+      },
+      "satisfied_by": "opc_cu_alarms_conditions",
+      "source_metadata": {
+        "profile_group_id": 171,
+        "source_endpoint": "conformanceunit/?pg=171&all=1"
+      }
+    },
+    {
+      "backing_tests": [],
+      "cu_optional": false,
+      "id": "opc_cu_2921",
+      "implementation_state": "declared",
+      "kconfig_symbol": null,
+      "kind": "conformance_unit",
+      "notes": "A & C Alarm (OPC-10000-9 5.10): AlarmConditionType(2915) ObjectType exposed in the AddressSpace type system with ActiveState/Id, AcknowledgedState/Id properties. Satisfied by opc_cu_alarms_conditions.",
+      "opc_display_name": "A & C Alarm",
+      "opc_reference": {
+        "cu_id": "2921",
+        "cu_name": "A & C Alarm",
+        "section": "5.10",
+        "source_url": "https://profiles.opcfoundation.org",
+        "spec": "OPC-10000-9"
+      },
+      "profile_defaults": {
+        "custom": false,
+        "embedded": false,
+        "full": true,
+        "micro": false,
+        "nano": false,
+        "standard": false
+      },
+      "satisfied_by": "opc_cu_alarms_conditions",
+      "source_metadata": {
+        "profile_group_id": 171,
+        "source_endpoint": "conformanceunit/?pg=171&all=1"
+      }
+    },
+    {
+      "backing_tests": [],
+      "cu_optional": false,
+      "id": "opc_cu_2927",
+      "implementation_state": "declared",
+      "kconfig_symbol": null,
+      "kind": "conformance_unit",
+      "notes": "A & C Acknowledge (OPC-10000-9 5.7): AcknowledgeableConditionType(2881) ObjectType with Acknowledge(9111) and Confirm(9113) Method dispatch; condition state tracking (acked_state, confirmed_state). Satisfied by opc_cu_alarms_conditions.",
+      "opc_display_name": "A & C Acknowledge",
+      "opc_reference": {
+        "cu_id": "2927",
+        "cu_name": "A & C Acknowledge",
+        "section": "5.7",
+        "source_url": "https://profiles.opcfoundation.org",
+        "spec": "OPC-10000-9"
+      },
+      "profile_defaults": {
+        "custom": false,
+        "embedded": false,
+        "full": true,
+        "micro": false,
+        "nano": false,
+        "standard": false
+      },
+      "satisfied_by": "opc_cu_alarms_conditions",
+      "source_metadata": {
+        "profile_group_id": 171,
+        "source_endpoint": "conformanceunit/?pg=171&all=1"
       }
     }
   ],

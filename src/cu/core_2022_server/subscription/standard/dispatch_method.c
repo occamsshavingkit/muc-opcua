@@ -15,6 +15,7 @@
 #include "core/service_dispatch.h"
 #include "muc_opcua/address_space.h"
 #include "muc_opcua/encoding.h"
+#include "muc_opcua/services/audit.h"
 #include "muc_opcua/services/method.h"
 #include "services/service_header.h"
 #include "services/subscription.h"
@@ -340,6 +341,17 @@ opcua_statuscode_t handle_call(mu_server_t *server, mu_binary_reader_t *r, mu_bi
         }
 
         s = write_single_call_method_result(server, w, &object_id, &method_id, args, arg_count);
+#if MUC_OPCUA_CU_AUDITING
+        {
+            mu_audit_event_t audit_ev;
+            (void)memset(&audit_ev, 0, sizeof(audit_ev));
+            audit_ev.event_type = MU_AUDIT_EVENT_METHOD;
+            audit_ev.status = (s == MU_STATUS_GOOD);
+            audit_ev.specific.method.object_id = object_id;
+            audit_ev.specific.method.method_id = method_id;
+            mu_raise_audit_event(server, &audit_ev);
+        }
+#endif
 #if MUC_OPCUA_ALLOW_HEAP
         /* Release heap-decoded array arguments (only allocated when heap is on). */
         for (opcua_int32_t ai = 0; ai < arg_count; ++ai) {

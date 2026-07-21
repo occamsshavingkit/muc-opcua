@@ -1,5 +1,6 @@
 #include "muc_opcua/services/alarms_conditions.h"
 #include "../core/server_internal.h"
+#include "muc_opcua/services/audit.h"
 #include <string.h>
 
 #ifdef MUC_OPCUA_SERVICE_ALARMS_CONDITIONS
@@ -51,10 +52,19 @@ mu_status_t mu_alarms_set_active(struct mu_server *server, const mu_condition_id
             cond->acked_state = false;
             cond->retain = true;
         } else if (cond->acked_state) {
-            cond->retain = false; // Inactive and acked -> no longer retain
+            cond->retain = false;
         }
 
-        // TODO: Fire Event notification via Subscriptions if Event feature is active
+#if MUC_OPCUA_CU_AUDITING
+        {
+            mu_audit_event_t audit_ev;
+            (void)memset(&audit_ev, 0, sizeof(audit_ev));
+            audit_ev.event_type = MU_AUDIT_EVENT_CONDITION_ENABLE;
+            audit_ev.status = true;
+            audit_ev.specific.condition.condition_id = id->node_id;
+            mu_raise_audit_event(server, &audit_ev);
+        }
+#endif
     }
 
     return MU_STATUS_GOOD;
@@ -76,7 +86,17 @@ mu_status_t mu_alarms_trigger_dialog(struct mu_server *server, const mu_conditio
     cond->active_state = true;
     cond->retain = true;
 
-    // TODO: Fire Dialog Condition Event
+#if MUC_OPCUA_CU_AUDITING
+    {
+        mu_audit_event_t audit_ev;
+        (void)memset(&audit_ev, 0, sizeof(audit_ev));
+        audit_ev.event_type = MU_AUDIT_EVENT_CONDITION_RESPOND;
+        audit_ev.status = true;
+        audit_ev.specific.condition.condition_id = id->node_id;
+        mu_raise_audit_event(server, &audit_ev);
+    }
+#endif
+
     return MU_STATUS_GOOD;
 }
 
@@ -106,7 +126,17 @@ mu_status_t mu_alarms_conditions_method_dispatch(mu_server_t *server, const mu_n
             cond->retain = false;
         }
 
-        // TODO: Fire Acknowledged event
+#if MUC_OPCUA_CU_AUDITING
+        {
+            mu_audit_event_t audit_ev;
+            (void)memset(&audit_ev, 0, sizeof(audit_ev));
+            audit_ev.event_type = MU_AUDIT_EVENT_CONDITION_ACKNOWLEDGE;
+            audit_ev.status = true;
+            audit_ev.specific.condition.condition_id = cid.node_id;
+            mu_raise_audit_event(server, &audit_ev);
+        }
+#endif
+
         *output_args_count = 0;
         return MU_STATUS_GOOD;
     }
@@ -117,7 +147,7 @@ mu_status_t mu_alarms_conditions_method_dispatch(mu_server_t *server, const mu_n
             return MU_STATUS_BAD_NODEIDUNKNOWN;
         }
         if (!cond->active_state) {
-            return MU_STATUS_BAD_DIALOGNOTACTIVE; // Map to correct status
+            return MU_STATUS_BAD_DIALOGNOTACTIVE;
         }
         if (input_args_count < 1 || input_args[0].type != MU_VARIANT_TYPE_INT32) {
             return MU_STATUS_BAD_INVALIDARGUMENT;
@@ -131,6 +161,43 @@ mu_status_t mu_alarms_conditions_method_dispatch(mu_server_t *server, const mu_n
         cond->expected_response = response;
         cond->active_state = false;
         cond->retain = false;
+
+#if MUC_OPCUA_CU_AUDITING
+        {
+            mu_audit_event_t audit_ev;
+            (void)memset(&audit_ev, 0, sizeof(audit_ev));
+            audit_ev.event_type = MU_AUDIT_EVENT_CONDITION_RESPOND;
+            audit_ev.status = true;
+            audit_ev.specific.condition.condition_id = cid.node_id;
+            mu_raise_audit_event(server, &audit_ev);
+        }
+#endif
+
+        *output_args_count = 0;
+        return MU_STATUS_GOOD;
+    }
+
+    if (method_id->identifier.numeric == MU_NODEID_ACKNOWLEDGEABLECONDITIONTYPE_CONFIRM) {
+        mu_condition_t *cond = find_condition(server, &cid);
+        if (!cond) {
+            return MU_STATUS_BAD_NODEIDUNKNOWN;
+        }
+        if (cond->confirmed_state) {
+            return MU_STATUS_BAD_CONDITIONBRANCHALREADYCONFIRMED;
+        }
+
+        cond->confirmed_state = true;
+
+#if MUC_OPCUA_CU_AUDITING
+        {
+            mu_audit_event_t audit_ev;
+            (void)memset(&audit_ev, 0, sizeof(audit_ev));
+            audit_ev.event_type = MU_AUDIT_EVENT_CONDITION_CONFIRM;
+            audit_ev.status = true;
+            audit_ev.specific.condition.condition_id = cid.node_id;
+            mu_raise_audit_event(server, &audit_ev);
+        }
+#endif
 
         *output_args_count = 0;
         return MU_STATUS_GOOD;
