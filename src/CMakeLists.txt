@@ -431,6 +431,18 @@ if(MUC_OPCUA_CU_TIME_SYNC)
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_CU_TIME_SYNC=1)
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_TIME_SYNC=1)
 endif()
+
+# -- CU: Time Sync IEEE 1588 PTP (CU 2479) --
+if(MUC_OPCUA_CU_TIME_SYNC_IEEE_1588_PTP)
+    target_sources(muc_opcua PRIVATE cu/core_2022_server/time_sync_ieee_1588_ptp/stub.c)
+    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_CU_TIME_SYNC_IEEE_1588_PTP=1)
+endif()
+
+# -- CU: Time Sync IEEE 802.1AS (CU 2480) --
+if(MUC_OPCUA_CU_TIME_SYNC_IEEE_802_1AS)
+    target_sources(muc_opcua PRIVATE cu/core_2022_server/time_sync_ieee_802_1as/stub.c)
+    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_CU_TIME_SYNC_IEEE_802_1AS=1)
+endif()
 if(MUC_OPCUA_CU_EXTENDED_NODEIDS)
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_CU_EXTENDED_NODEIDS=1)
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_EXTENDED_NODEIDS=1)
