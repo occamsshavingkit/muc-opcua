@@ -48,6 +48,9 @@ static const mu_service_descriptor_t g_supported_services[] = {
 #ifdef MUC_OPCUA_DISCOVERY_FIND_SERVERS_ENABLED
     {{MU_ID_FINDSERVERSREQUEST, MU_ID_FINDSERVERSRESPONSE, false}, handle_find_servers},
 #endif
+#ifdef MUC_OPCUA_CU_DISCOVERY_REGISTER
+    {{MU_ID_REGISTERSERVERREQUEST, MU_ID_REGISTERSERVERRESPONSE, false}, handle_register_server},
+#endif
 #ifdef MUC_OPCUA_CU_DISCOVERY_GET_ENDPOINTS
     {{MU_ID_GETENDPOINTSREQUEST, MU_ID_GETENDPOINTSRESPONSE, false}, handle_get_endpoints},
 #endif
@@ -56,6 +59,9 @@ static const mu_service_descriptor_t g_supported_services[] = {
     {{MU_ID_CREATESESSIONREQUEST, MU_ID_CREATESESSIONRESPONSE, false}, handle_create_session},
     {{MU_ID_ACTIVATESESSIONREQUEST, MU_ID_ACTIVATESESSIONRESPONSE, false}, handle_activate_session},
     {{MU_ID_CLOSESESSIONREQUEST, MU_ID_CLOSESESSIONRESPONSE, true}, handle_close_session},
+#ifdef MUC_OPCUA_CU_SESSION_GENERAL_SERVICE
+    {{MU_ID_CANCELREQUEST, MU_ID_CANCELRESPONSE, true}, handle_cancel},
+#endif
 #ifdef MUC_OPCUA_CU_NODEMANAGEMENT
     {{MU_ID_ADDNODESREQUEST, MU_ID_ADDNODESRESPONSE, true}, handle_add_nodes},
     {{MU_ID_ADDREFERENCESREQUEST, MU_ID_ADDREFERENCESRESPONSE, true}, handle_add_references},

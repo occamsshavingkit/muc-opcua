@@ -211,6 +211,16 @@ config MUC_OPCUA_CU_DISCOVERY_FIND_SERVERS_SELF
 	  Backing tests: test_discovery_services, test_discovery_endpoint.
 	  Notes: Support the FindServers Service only for itself.
 
+config MUC_OPCUA_CU_DISCOVERY_REGISTER
+	bool "CU: Discovery Register"
+	depends on MUC_OPCUA_FACET_CORE_2022_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES || MUC_OPCUA_INTERN_PROFILE_STANDARD_2025_UA_SERVER
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-4 §5.4.5 -- CU 2271:Discovery Register.
+	  Backing tests: none yet.
+	  Notes: No-op RegisterServer stub; server does not register with LDS/GDS for local operation.
+
 config MUC_OPCUA_CU_ATTRIBUTE_WRITE_VALUES
 	bool "CU: Attribute Write Values"
 	depends on MUC_OPCUA_FACET_CORE_2022_SERVER

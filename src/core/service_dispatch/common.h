@@ -196,6 +196,14 @@ opcua_statuscode_t handle_get_endpoints(mu_server_t *server, mu_binary_reader_t 
 opcua_statuscode_t handle_find_servers(mu_server_t *server, mu_binary_reader_t *r, mu_binary_writer_t *w,
                                        size_t *response_length);
 #endif
+#ifdef MUC_OPCUA_CU_DISCOVERY_REGISTER
+opcua_statuscode_t handle_register_server(mu_server_t *server, mu_binary_reader_t *r, mu_binary_writer_t *w,
+                                          size_t *response_length);
+#endif
+#ifdef MUC_OPCUA_CU_SESSION_GENERAL_SERVICE
+opcua_statuscode_t handle_cancel(mu_server_t *server, mu_binary_reader_t *r, mu_binary_writer_t *w,
+                                 size_t *response_length);
+#endif
 
 #ifdef MUC_OPCUA_CU_ATTRIBUTE_READ
 opcua_statuscode_t handle_read(mu_server_t *server, mu_binary_reader_t *r, mu_binary_writer_t *w,

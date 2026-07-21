@@ -125,8 +125,7 @@ endif()
 
 if(MUC_OPCUA_DISCOVERY_FIND_SERVERS_ENABLED)
     target_sources(muc_opcua PRIVATE
-        cu/core_2022_server/discovery/find_servers.c
-        cu/core_2022_server/discovery/register_server.c)
+        cu/core_2022_server/discovery/find_servers.c)
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_DISCOVERY_FIND_SERVERS_ENABLED=1)
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_CU_DISCOVERY_FIND_SERVERS_SELF=1)
 endif()
@@ -134,6 +133,11 @@ endif()
 if(MUC_OPCUA_CU_DISCOVERY_GET_ENDPOINTS)
     target_sources(muc_opcua PRIVATE cu/core_2022_server/discovery/get_endpoints.c)
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_CU_DISCOVERY_GET_ENDPOINTS=1)
+endif()
+
+if(MUC_OPCUA_CU_DISCOVERY_REGISTER)
+    target_sources(muc_opcua PRIVATE cu/core_2022_server/discovery/register_server.c)
+    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_CU_DISCOVERY_REGISTER=1)
 endif()
 
 # -- CU: View RegisterNodes (define-only, no source files yet) --
@@ -164,6 +168,10 @@ if(MUC_OPCUA_CU_ATTRIBUTE_WRITE_INDEX_RANGE)
 endif()
 if(MUC_OPCUA_CU_CORE_2017_ATTRIBUTE_WRITE)
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_CU_CORE_2017_ATTRIBUTE_WRITE=1)
+endif()
+
+if(MUC_OPCUA_CU_SESSION_GENERAL_SERVICE)
+    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_CU_SESSION_GENERAL_SERVICE=1)
 endif()
 
 # Read/Write attribute dispatch handler. attribute_handler.c carries both sets

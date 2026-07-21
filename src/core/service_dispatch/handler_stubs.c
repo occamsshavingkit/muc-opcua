@@ -1,5 +1,42 @@
 #include "common.h"
 
+#ifdef MUC_OPCUA_CU_SESSION_GENERAL_SERVICE
+opcua_statuscode_t handle_cancel(mu_server_t *server, mu_binary_reader_t *r, mu_binary_writer_t *w,
+                                 size_t *response_length) {
+    (void)server;
+
+    mu_request_header_t req;
+    opcua_statuscode_t s = mu_request_header_decode(r, &req);
+    if (s != MU_STATUS_GOOD) {
+        return s;
+    }
+
+    opcua_uint32_t request_handle;
+    s = mu_binary_read_uint32(r, &request_handle);
+    if (s != MU_STATUS_GOOD) {
+        return s;
+    }
+
+    s = write_response_prefix(w, MU_ID_CANCELRESPONSE, req.request_handle, MU_STATUS_GOOD
+#ifdef MU_RESPONSE_PREFIX_WANTS_SERVER
+                              ,
+                              server
+#endif
+    );
+    if (s != MU_STATUS_GOOD) {
+        return s;
+    }
+
+    s = mu_binary_write_uint32(w, 0u);
+    if (s != MU_STATUS_GOOD) {
+        return s;
+    }
+
+    *response_length = w->position;
+    return MU_STATUS_GOOD;
+}
+#endif
+
 #ifdef MUC_OPCUA_CU_QUERY
 opcua_statuscode_t handle_query_first(mu_server_t *server, mu_binary_reader_t *r, mu_binary_writer_t *w,
                                       size_t *response_length) {
