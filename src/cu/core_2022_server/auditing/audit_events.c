@@ -84,6 +84,24 @@ static mu_nodeid_t audit_event_type_nodeid(opcua_uint32_t event_type) {
     case MU_AUDIT_EVENT_WRITE_UPDATE:
         numeric = 2100u; /* AuditWriteUpdateEventType §6.4.25 */
         break;
+    case MU_AUDIT_EVENT_NODE_MANAGEMENT:
+        numeric = 2090u; /* AuditNodeManagementEventType §6.4.19 */
+        break;
+    case MU_AUDIT_EVENT_METHOD:
+        numeric = 2127u; /* AuditUpdateMethodEventType §6.4.27 */
+        break;
+    case MU_AUDIT_EVENT_CONDITION_ENABLE:
+        numeric = 2803u; /* AuditConditionEnableEventType (OPC-10000-9 §5.10.3) */
+        break;
+    case MU_AUDIT_EVENT_CONDITION_ACKNOWLEDGE:
+        numeric = 8944u; /* AuditConditionAcknowledgeEventType §5.10.6 */
+        break;
+    case MU_AUDIT_EVENT_CONDITION_CONFIRM:
+        numeric = 8961u; /* AuditConditionConfirmEventType §5.10.7 */
+        break;
+    case MU_AUDIT_EVENT_CONDITION_RESPOND:
+        numeric = 8927u; /* AuditConditionRespondEventType §5.10.5 */
+        break;
     default:
         numeric = 2052u; /* AuditEventType base §6.4.3 */
         break;
@@ -182,6 +200,18 @@ void mu_raise_audit_event(mu_server_t *server, const mu_audit_event_t *event) {
         payload.attribute_id = 13u; /* Value attribute (OPC-10000-6) */
         audit_capture_scalar(&payload.old_value, &mutable_event.specific.write_update.old_value);
         audit_capture_scalar(&payload.new_value, &mutable_event.specific.write_update.new_value);
+        break;
+    case MU_AUDIT_EVENT_NODE_MANAGEMENT:
+        payload.source_node = mutable_event.specific.method.object_id;
+        break;
+    case MU_AUDIT_EVENT_METHOD:
+        payload.source_node = mutable_event.specific.method.object_id;
+        break;
+    case MU_AUDIT_EVENT_CONDITION_ENABLE:
+    case MU_AUDIT_EVENT_CONDITION_ACKNOWLEDGE:
+    case MU_AUDIT_EVENT_CONDITION_CONFIRM:
+    case MU_AUDIT_EVENT_CONDITION_RESPOND:
+        payload.source_node = mutable_event.specific.condition.condition_id;
         break;
     default:
         break;

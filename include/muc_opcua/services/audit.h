@@ -21,6 +21,12 @@ struct mu_server;
 #define MU_AUDIT_EVENT_CREATE_SESSION 1
 #define MU_AUDIT_EVENT_ACTIVATE_SESSION 2
 #define MU_AUDIT_EVENT_WRITE_UPDATE 3
+#define MU_AUDIT_EVENT_NODE_MANAGEMENT 4
+#define MU_AUDIT_EVENT_METHOD 5
+#define MU_AUDIT_EVENT_CONDITION_ENABLE 6
+#define MU_AUDIT_EVENT_CONDITION_ACKNOWLEDGE 7
+#define MU_AUDIT_EVENT_CONDITION_CONFIRM 8
+#define MU_AUDIT_EVENT_CONDITION_RESPOND 9
 
 typedef struct {
     opcua_uint32_t event_type;
@@ -45,6 +51,14 @@ typedef struct {
             mu_variant_t old_value;
             mu_variant_t new_value;
         } write_update;
+        struct {
+            mu_nodeid_t object_id;
+            mu_nodeid_t method_id;
+        } method;
+        struct {
+            mu_nodeid_t condition_id;
+            mu_nodeid_t session_id;
+        } condition;
     } specific;
 } mu_audit_event_t;
 

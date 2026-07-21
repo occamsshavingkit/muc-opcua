@@ -105,6 +105,12 @@ void test_audit_event_type_constants_are_distinct(void) {
     TEST_ASSERT_NOT_EQUAL(MU_AUDIT_EVENT_OPEN_SECURE_CHANNEL, MU_AUDIT_EVENT_CREATE_SESSION);
     TEST_ASSERT_NOT_EQUAL(MU_AUDIT_EVENT_CREATE_SESSION, MU_AUDIT_EVENT_ACTIVATE_SESSION);
     TEST_ASSERT_NOT_EQUAL(MU_AUDIT_EVENT_ACTIVATE_SESSION, MU_AUDIT_EVENT_WRITE_UPDATE);
+    TEST_ASSERT_NOT_EQUAL(MU_AUDIT_EVENT_WRITE_UPDATE, MU_AUDIT_EVENT_NODE_MANAGEMENT);
+    TEST_ASSERT_NOT_EQUAL(MU_AUDIT_EVENT_NODE_MANAGEMENT, MU_AUDIT_EVENT_METHOD);
+    TEST_ASSERT_NOT_EQUAL(MU_AUDIT_EVENT_METHOD, MU_AUDIT_EVENT_CONDITION_ENABLE);
+    TEST_ASSERT_NOT_EQUAL(MU_AUDIT_EVENT_CONDITION_ENABLE, MU_AUDIT_EVENT_CONDITION_ACKNOWLEDGE);
+    TEST_ASSERT_NOT_EQUAL(MU_AUDIT_EVENT_CONDITION_ACKNOWLEDGE, MU_AUDIT_EVENT_CONDITION_CONFIRM);
+    TEST_ASSERT_NOT_EQUAL(MU_AUDIT_EVENT_CONDITION_CONFIRM, MU_AUDIT_EVENT_CONDITION_RESPOND);
 }
 
 void test_audit_event_struct_has_open_channel_fields(void) {
@@ -130,6 +136,33 @@ void test_audit_event_struct_has_write_update_fields(void) {
     e.event_type = MU_AUDIT_EVENT_WRITE_UPDATE;
     e.specific.write_update.node_id.identifier.numeric = 5000u;
     TEST_ASSERT_EQUAL_UINT32(MU_AUDIT_EVENT_WRITE_UPDATE, e.event_type);
+}
+
+void test_audit_event_struct_has_method_fields(void) {
+    mu_audit_event_t e;
+    memset(&e, 0, sizeof(e));
+    e.event_type = MU_AUDIT_EVENT_METHOD;
+    e.specific.method.object_id.identifier.numeric = 2253u;
+    e.specific.method.method_id.identifier.numeric = 11492u;
+    TEST_ASSERT_EQUAL_UINT32(MU_AUDIT_EVENT_METHOD, e.event_type);
+    TEST_ASSERT_EQUAL_UINT32(2253u, e.specific.method.object_id.identifier.numeric);
+    TEST_ASSERT_EQUAL_UINT32(11492u, e.specific.method.method_id.identifier.numeric);
+}
+
+void test_audit_event_struct_has_condition_fields(void) {
+    mu_audit_event_t e;
+    memset(&e, 0, sizeof(e));
+    e.event_type = MU_AUDIT_EVENT_CONDITION_ENABLE;
+    e.specific.condition.condition_id.identifier.numeric = 6000u;
+    TEST_ASSERT_EQUAL_UINT32(MU_AUDIT_EVENT_CONDITION_ENABLE, e.event_type);
+    TEST_ASSERT_EQUAL_UINT32(6000u, e.specific.condition.condition_id.identifier.numeric);
+}
+
+void test_audit_event_struct_has_node_mgmt_fields(void) {
+    mu_audit_event_t e;
+    memset(&e, 0, sizeof(e));
+    e.event_type = MU_AUDIT_EVENT_NODE_MANAGEMENT;
+    TEST_ASSERT_EQUAL_UINT32(MU_AUDIT_EVENT_NODE_MANAGEMENT, e.event_type);
 }
 
 void test_audit_disabled_flag(void) {
@@ -265,6 +298,9 @@ int main(void) {
     RUN_TEST(test_audit_event_struct_has_open_channel_fields);
     RUN_TEST(test_audit_event_struct_has_session_fields);
     RUN_TEST(test_audit_event_struct_has_write_update_fields);
+    RUN_TEST(test_audit_event_struct_has_method_fields);
+    RUN_TEST(test_audit_event_struct_has_condition_fields);
+    RUN_TEST(test_audit_event_struct_has_node_mgmt_fields);
     RUN_TEST(test_audit_disabled_flag);
     RUN_TEST(test_raise_audit_event_valid_input);
     RUN_TEST(test_raise_audit_event_null_safety);
