@@ -2,27 +2,26 @@
 
 # TODO — muc-opcua
 
-**Updated**: 2026-07-20 — PG18/PG19/PG20 all complete. Backlog empty.
+**Updated**: 2026-07-20 — Backlog empty. All features complete.
 
 ## Pending
-
-| ID | Feature | OPC Ref | Notes |
-|----|---------|---------|-------|
-| PG24 | User Token — Issued Token Server Facet | OPC-10000-7 v1.05.02 | Kerberos — **deprecated** in v1.05.02 per OPC Foundation. Skipped. |
+*(none)*
 
 ## Recently Completed
 
 | PR | Feature | Notes |
 |----|---------|-------|
-| #331 | PG20 — Certificate Management (CU 2105) | Type nodes + adapter. GDS deferred. |
-| #330 | PG19 — User Role Management (CU 2080) | AddRole/RemoveRole/AddIdentity/RemoveIdentity. 13 tests. |
-| #329 | PG18 — KeyCredential Service (CU 2113) | GetEncryptingKey + CRUD methods. 11 tests. |
+| #332 | D-GDS Certificate Pull Management (CU 1631) | 8 types + 3 instances + 4 Methods + adapter. 14 tests. |
+| #331 | PG20 Certificate Management (CU 2105) | Type nodes + adapter. GDS deferred (later completed in #332). |
+| #330 | PG19 User Role Management (CU 2080) | AddRole/RemoveRole/AddIdentity/RemoveIdentity. 13 tests. |
+| #329 | PG18 KeyCredential Service (CU 2113) | GetEncryptingKey + CRUD methods. 11 tests. |
 | #328 | Authorization Service / JWT (CU 1629/1697) | OAuth2 Resource Server. mbedTLS/wolfSSL backends. |
-| #327 | CU 5801 Diagnostics Part 2 | 4 type trees: SubDiag, SesDiagVar, SesDiagObj, ServerRedundancy |
 
-## Deferred (low priority)
+## Deferred
 
 | ID | Item | Notes |
 |----|------|-------|
-| D-1629 | CU 1629 AuthorizationServiceConfigurationType nodes | GDS namespace 2 type system |
-| D-GDS | Full GDS Push/Pull model | Certificate enrollment workflow, CRL management |
+| D-1629 | AuthorizationServiceConfigurationType nodes | GDS namespace 2 type system |
+| D-ECC | ECC cert subtypes | 6 ECC-specific CertificateType subtypes |
+| D-TRUST | TrustList integration | Full TrustList management + CRL parsing |
+| D-PUSH | Push certificate model | ServerConfigurationType reverse-direction management |
