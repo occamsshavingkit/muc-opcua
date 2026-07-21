@@ -194,9 +194,8 @@ static opcua_statuscode_t write_single_call_method_result(mu_server_t *server, m
         nodeid_is_ns0_numeric(method_id, 9069)) {
         mu_variant_t output_args[2];
         size_t output_args_count = 0;
-        opcua_statuscode_t alarms_status = mu_alarms_conditions_method_dispatch(server, method_id, object_id,
-                                                                                (size_t)arg_count,
-                                                                                args, &output_args_count, output_args);
+        opcua_statuscode_t alarms_status = mu_alarms_conditions_method_dispatch(
+            server, method_id, object_id, (size_t)arg_count, args, &output_args_count, output_args);
         return write_call_method_result(w, alarms_status, 0, NULL, (opcua_int32_t)output_args_count, output_args);
     }
 #endif
