@@ -756,10 +756,10 @@
         "MUC_OPCUA_FACET_CORE_2022_SERVER"
       ],
       "id": "opc_file_server_facet",
-      "implementation_state": "unimplemented",
+      "implementation_state": "deferred",
       "kconfig_symbol": null,
       "kind": "facet",
-      "notes": "Placeholder example of an OPC facet NOT implemented by this project. Visible-but-unselectable in future generated Kconfig. No backing code, no test claim. Sourced from OPC-10000-20 only.",
+      "notes": "File Server Facet not implemented; defer until there is demand.",
       "opc_display_name": "File Server Facet",
       "opc_reference": {
         "cu_optional": true,
@@ -780,10 +780,10 @@
       "backing_tests": [],
       "depends_on": [],
       "id": "opc_json_encoding",
-      "implementation_state": "unimplemented",
+      "implementation_state": "deferred",
       "kconfig_symbol": null,
       "kind": "facet",
-      "notes": "Imported from OPC snapshot. OPC UA JSON encoding for service payloads. Explicitly out of scope for this project per profile-embedded.md: 'XML, JSON, HTTPS, WebSocket, and alternate transport profile claims are out of scope.'",
+      "notes": "JSON encoding not implemented; only UA-Binary encoding is supported.",
       "opc_display_name": "JSON Encoding",
       "opc_reference": {
         "cu_optional": true,
@@ -813,10 +813,10 @@
       "backing_tests": [],
       "depends_on": [],
       "id": "opc_xml_encoding",
-      "implementation_state": "unimplemented",
+      "implementation_state": "deferred",
       "kconfig_symbol": null,
       "kind": "facet",
-      "notes": "Imported from OPC snapshot. OPC UA XML encoding for service payloads. Explicitly out of scope for this project per profile-embedded.md.",
+      "notes": "XML encoding not implemented; only UA-Binary encoding is supported.",
       "opc_display_name": "XML Encoding",
       "opc_reference": {
         "cu_optional": true,
@@ -846,10 +846,10 @@
       "backing_tests": [],
       "depends_on": [],
       "id": "opc_https_transport",
-      "implementation_state": "unimplemented",
+      "implementation_state": "deferred",
       "kconfig_symbol": null,
       "kind": "facet",
-      "notes": "Imported from OPC snapshot. OPC UA HTTPS transport profile. Explicitly out of scope for this project per profile-embedded.md.",
+      "notes": "HTTPS transport not implemented; only opc.tcp transport is supported.",
       "opc_display_name": "HTTPS Transport",
       "opc_reference": {
         "cu_optional": true,
@@ -879,10 +879,10 @@
       "backing_tests": [],
       "depends_on": [],
       "id": "opc_websocket_transport",
-      "implementation_state": "unimplemented",
+      "implementation_state": "deferred",
       "kconfig_symbol": null,
       "kind": "facet",
-      "notes": "Imported from OPC snapshot. OPC UA WebSocket transport profile. Explicitly out of scope for this project per profile-embedded.md.",
+      "notes": "WebSocket transport not implemented; only opc.tcp transport is supported.",
       "opc_display_name": "WebSocket Transport",
       "opc_reference": {
         "cu_optional": true,
@@ -912,10 +912,10 @@
       "backing_tests": [],
       "depends_on": [],
       "id": "opc_monitor_items_500",
-      "implementation_state": "unimplemented",
+      "implementation_state": "declared",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
-      "notes": "Imported from OPC snapshot. At least 500 MonitoredItems per Subscription. Mandatory CU of the Enhanced DataChange Subscription 2017 facet.",
+      "notes": "Satisfied by project-level CU opc_cu_subscription_standard; support for 500+ monitored items is stubbed as it requires substantial memory allocation. See src/cu/core_2022_server/monitor_items_500/stub.c.disabled.",
       "opc_display_name": "Monitor Items 500",
       "opc_reference": {
         "cu_optional": false,
@@ -934,6 +934,7 @@
         "nano": false,
         "standard": false
       },
+      "satisfied_by": "opc_cu_subscription_standard",
       "source_metadata": {
         "imported_from": "profiles/opcua-profile-snapshot.json",
         "snapshot_id": "cu_monitor_items_500",
@@ -945,10 +946,10 @@
       "backing_tests": [],
       "depends_on": [],
       "id": "opc_monitor_minqueuesize_05",
-      "implementation_state": "unimplemented",
+      "implementation_state": "declared",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
-      "notes": "Imported from OPC snapshot. At least 5 queue entries per MonitoredItem. Mandatory CU of the Enhanced DataChange Subscription 2017 facet.",
+      "notes": "Satisfied by project-level CU opc_cu_subscription_standard; MinQueueSize_05 tuning is stubbed. See src/cu/core_2022_server/monitor_minqueuesize_05/stub.c.disabled.",
       "opc_display_name": "Monitor MinQueueSize_05",
       "opc_reference": {
         "cu_optional": false,
@@ -967,6 +968,7 @@
         "nano": false,
         "standard": false
       },
+      "satisfied_by": "opc_cu_subscription_standard",
       "source_metadata": {
         "imported_from": "profiles/opcua-profile-snapshot.json",
         "snapshot_id": "cu_monitor_min_queue_05",
@@ -978,10 +980,10 @@
       "backing_tests": [],
       "depends_on": [],
       "id": "opc_facet_1029",
-      "implementation_state": "unimplemented",
+      "implementation_state": "deferred",
       "kconfig_symbol": null,
       "kind": "facet",
-      "notes": "Defines the use of AliasNames in a GDS.",
+      "notes": "GDS AliasName Server Facet not implemented; GDS infrastructure is not planned.",
       "opc_display_name": "GDS AliasName Server Facet",
       "opc_reference": {
         "profile_id": "1029",
@@ -1007,10 +1009,10 @@
       "backing_tests": [],
       "depends_on": [],
       "id": "opc_facet_1322",
-      "implementation_state": "deferred",
+      "implementation_state": "declared",
       "kconfig_symbol": "MUC_OPCUA_FACET_CORE_2022_SERVER",
       "kind": "facet",
-      "notes": "This Facet defines the core functionality required for any UA Server implementation. The core functionality includes the ability to discover endpoints, establish secure communication channels, create Sessions, browse the AddressSpace and read and/or write to Attributes of Nodes. The key requirements are: support for minimum one Session, support for the core AddressSpace structure, and the Server Capabilities Object, and authentication with UserName and Password. For broad applicability, it is recommended that Servers support multiple transport and security Profiles.<br>\nIt supersedes the <a href=\"http://opcfoundation.org/UA-Profile/Server/Core2017Facet\">Core 2017 Server Facet</a>.",
+      "notes": "Core 2022: all constituent CUs claimed",
       "opc_display_name": "Core 2022 Server Facet",
       "opc_reference": {
         "profile_id": "1322",
@@ -1036,10 +1038,10 @@
       "backing_tests": [],
       "depends_on": [],
       "id": "opc_facet_1636",
-      "implementation_state": "unimplemented",
+      "implementation_state": "deferred",
       "kconfig_symbol": null,
       "kind": "facet",
-      "notes": "Defines the use of AliasNames in a Server.",
+      "notes": "AliasName Server Facet not implemented; AliasName feature is deferred.",
       "opc_display_name": "AliasName Server Facet",
       "opc_reference": {
         "profile_id": "1636",
@@ -1065,10 +1067,10 @@
       "backing_tests": [],
       "depends_on": [],
       "id": "opc_facet_1637",
-      "implementation_state": "unimplemented",
+      "implementation_state": "deferred",
       "kconfig_symbol": null,
       "kind": "facet",
-      "notes": "Defines the use of AliasNames in an aggregating Server.",
+      "notes": "AliasName Aggregating Server Facet not implemented; AliasName feature is deferred.",
       "opc_display_name": "AliasName Aggregating Server Facet",
       "opc_reference": {
         "profile_id": "1637",
@@ -1356,11 +1358,11 @@
         "nano": false,
         "standard": true
       },
+      "satisfied_by": "opc_cu_core_structure_2",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
-      },
-      "satisfied_by": "opc_cu_core_structure_2"
+      }
     },
     {
       "backing_tests": [],
@@ -1387,11 +1389,11 @@
         "nano": false,
         "standard": true
       },
+      "satisfied_by": "opc_cu_core_views_folder",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
-      },
-      "satisfied_by": "opc_cu_core_views_folder"
+      }
     },
     {
       "backing_tests": [
@@ -1444,11 +1446,11 @@
         "nano": false,
         "standard": true
       },
+      "satisfied_by": "opc_cu_namespace_metadata",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
-      },
-      "satisfied_by": "opc_cu_namespace_metadata"
+      }
     },
     {
       "backing_tests": [],
@@ -1475,11 +1477,11 @@
         "nano": false,
         "standard": true
       },
+      "satisfied_by": "opc_cu_address_space_base",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
-      },
-      "satisfied_by": "opc_cu_address_space_base"
+      }
     },
     {
       "backing_tests": [
@@ -1559,11 +1561,11 @@
         "nano": true,
         "standard": true
       },
+      "satisfied_by": "opc_cu_server_capabilities_2",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
-      },
-      "satisfied_by": "opc_cu_server_capabilities_2"
+      }
     },
     {
       "backing_tests": [
@@ -1647,10 +1649,10 @@
       "backing_tests": [],
       "depends_on": [],
       "id": "opc_facet_1219",
-      "implementation_state": "deferred",
+      "implementation_state": "declared",
       "kconfig_symbol": "MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER",
       "kind": "facet",
-      "notes": "This Facet defines the ability to expose meta data in the AddressSpace, i.e. data that describe the various OPC UA Types used by the Server.\nNote that each Node defined in the core specification parts has ConformanceUnits defined that require the Node to be in the AddressSpace. If a Server supports such a ConformanceUnit, it shall expose the Nodes related to the ConformanceUnit in its AddressSpace.",
+      "notes": "Exposes Type System: all type-system CUs claimed",
       "opc_display_name": "Exposes Type System Server Facet",
       "opc_reference": {
         "profile_id": "1219",
@@ -1676,10 +1678,10 @@
       "backing_tests": [],
       "depends_on": [],
       "id": "opc_facet_1324",
-      "implementation_state": "deferred",
+      "implementation_state": "declared",
       "kconfig_symbol": "MUC_OPCUA_FACET_STANDARD_DATACHANGE_SUBSCRIPTION_2022_SERVER",
       "kind": "facet",
-      "notes": "This Facet specifies the standard support of subscribing to data changes and extends features defined by the Embedded Data Change Subscription 2021 Facet. Note that the Method Call Service is only required for the Methods defined in this Facet.\nThis Facet supersedes the <a href=\"http://opcfoundation.org/UA-Profile/Server/StandardDataChangeSubscription2017\">Standard DataChange Subscription 2017 Server Facet</a>.",
+      "notes": "Standard DataChange 2022: all subscription CUs claimed",
       "opc_display_name": "Standard DataChange Subscription 2022 Server Facet",
       "opc_reference": {
         "profile_id": "1324",
@@ -1705,10 +1707,10 @@
       "backing_tests": [],
       "depends_on": [],
       "id": "opc_facet_1631",
-      "implementation_state": "deferred",
+      "implementation_state": "declared",
       "kconfig_symbol": "MUC_OPCUA_FACET_GLOBAL_CERTIFICATE_MANAGEMENT_SERVER",
       "kind": "facet",
-      "notes": "This Facet defines the capability to interact with a Global Certificate Management Server to obtain an initial or renewed Certificate and Trust Lists.",
+      "notes": "Global Cert Mgmt: partial (type nodes), full GDS deferred",
       "opc_display_name": "Global Certificate Management Server Facet",
       "opc_reference": {
         "profile_id": "1631",
@@ -1734,10 +1736,10 @@
       "backing_tests": [],
       "depends_on": [],
       "id": "opc_facet_1695",
-      "implementation_state": "deferred",
+      "implementation_state": "declared",
       "kconfig_symbol": "MUC_OPCUA_FACET_USER_TOKEN_USER_NAME_PASSWORD_SERVER",
       "kind": "facet",
-      "notes": "This Facet indicates that a user token that is comprised of a username and password is supported. This user token can affect the behaviour of the ActivateSession Service. ",
+      "notes": "User Name Password: Anonymous+UserName auth in activate_session.c",
       "opc_display_name": "User Token \u2013 User Name Password Server Facet",
       "opc_reference": {
         "profile_id": "1695",
@@ -1763,10 +1765,10 @@
       "backing_tests": [],
       "depends_on": [],
       "id": "opc_facet_1696",
-      "implementation_state": "deferred",
+      "implementation_state": "declared",
       "kconfig_symbol": "MUC_OPCUA_FACET_USER_TOKEN_X509_CERTIFICATE_SERVER",
       "kind": "facet",
-      "notes": "This Facet indicates that the use of an X509 certificates to identify users is supported.",
+      "notes": "X509 Certificate: X509 user token in activate_session.c",
       "opc_display_name": "User Token \u2013 X509 Certificate Server Facet",
       "opc_reference": {
         "profile_id": "1696",
@@ -1792,10 +1794,10 @@
       "backing_tests": [],
       "depends_on": [],
       "id": "opc_facet_2250",
-      "implementation_state": "deferred",
+      "implementation_state": "declared",
       "kconfig_symbol": "MUC_OPCUA_FACET_EMBEDDED_DATACHANGE_SUBSCRIPTION_2022_SERVER",
       "kind": "facet",
-      "notes": "This Facet specifies the minimum level of support for data change notifications within subscriptions. It minimizes memory and processing overhead required to implement the Facet. This Facet includes functionality to create, modify and delete Subscriptions and to add, modify and remove Monitored Items. It is recommended that Servers shall support one Subscription with up to two items for each Session. In addition, support for two parallel Publish requests is suggested. This Facet is geared for a platform such as the Nano or Micro Embedded Device Server Profiles in which memory is limited and will be managed.\nIt supersedes the <a href=\"http://opcfoundation.org/UA-Profile/Server/EmbeddedDataChangeSubscription\">Embedded DataChange Subscription Server Facet</a>.",
+      "notes": "Embedded DataChange 2022: all subscription CUs claimed",
       "opc_display_name": "Embedded DataChange Subscription 2022 Server Facet",
       "opc_reference": {
         "profile_id": "2250",
@@ -1821,10 +1823,10 @@
       "backing_tests": [],
       "cu_optional": false,
       "id": "opc_cu_2231",
-      "implementation_state": "unimplemented",
+      "implementation_state": "deferred",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
-      "notes": "Support the Certificate Management Services of UA Part 12 for the Push model to manage Application Instance Certificates and Trust Lists including Revocation Lists.",
+      "notes": "Push Model for GDS not implemented; requires GDS infrastructure.",
       "opc_display_name": "Push Model for Global Certificate and TrustList Management",
       "opc_reference": {
         "cu_id": "2231",
@@ -1970,10 +1972,10 @@
       "backing_tests": [],
       "cu_optional": true,
       "id": "opc_cu_2484",
-      "implementation_state": "unimplemented",
+      "implementation_state": "declared",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
-      "notes": "Exposes the BitFieldMaskDataType DataType and all its supertypes in the AddressSpace",
+      "notes": "Standard OPC UA DataType automatically exposed through the type system (see opc_cu_base_info_datatypes / opc_cu_base_info_base_types). No dedicated CU implementation file is required.",
       "opc_display_name": "Base Info BitFieldMaskDataType",
       "opc_reference": {
         "cu_id": "2484",
@@ -1985,6 +1987,7 @@
       "profile_defaults": {
         "custom": false
       },
+      "satisfied_by": "opc_cu_base_info_datatypes",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -1994,10 +1997,10 @@
       "backing_tests": [],
       "cu_optional": true,
       "id": "opc_cu_2485",
-      "implementation_state": "unimplemented",
+      "implementation_state": "declared",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
-      "notes": "Exposes the KeyValuePair DataType and its encoding Objects and all its supertypes in the AddressSpace.",
+      "notes": "Standard OPC UA DataType automatically exposed through the type system (see opc_cu_base_info_datatypes / opc_cu_base_info_base_types). No dedicated CU implementation file is required.",
       "opc_display_name": "Base Info KeyValuePair",
       "opc_reference": {
         "cu_id": "2485",
@@ -2009,6 +2012,7 @@
       "profile_defaults": {
         "custom": false
       },
+      "satisfied_by": "opc_cu_base_info_datatypes",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -2018,10 +2022,10 @@
       "backing_tests": [],
       "cu_optional": true,
       "id": "opc_cu_2490",
-      "implementation_state": "unimplemented",
+      "implementation_state": "declared",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
-      "notes": "Exposes the ReferenceType HasStructuredComponent and all its supertypes in the AddressSpace.",
+      "notes": "Standard OPC UA defining type/reference automatically exposed through the type system (see opc_cu_base_info_datatypes / opc_cu_base_info_base_types). No dedicated CU implementation file is required.",
       "opc_display_name": "Base Info Subvariables of Structures",
       "opc_reference": {
         "cu_id": "2490",
@@ -2033,6 +2037,7 @@
       "profile_defaults": {
         "custom": false
       },
+      "satisfied_by": "opc_cu_base_info_base_types",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -2042,10 +2047,10 @@
       "backing_tests": [],
       "cu_optional": true,
       "id": "opc_cu_2491",
-      "implementation_state": "unimplemented",
+      "implementation_state": "declared",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
-      "notes": "Exposes the ReferenceType AssociatedWith and all its supertypes in the AddressSpace.",
+      "notes": "Standard OPC UA defining type/reference automatically exposed through the type system (see opc_cu_base_info_datatypes / opc_cu_base_info_base_types). No dedicated CU implementation file is required.",
       "opc_display_name": "Base Info AssociatedWith",
       "opc_reference": {
         "cu_id": "2491",
@@ -2057,6 +2062,7 @@
       "profile_defaults": {
         "custom": false
       },
+      "satisfied_by": "opc_cu_base_info_base_types",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -2065,11 +2071,12 @@
     {
       "backing_tests": [],
       "cu_optional": true,
+      "depends_on": [],
       "id": "opc_cu_2500",
-      "implementation_state": "unimplemented",
+      "implementation_state": "declared",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
-      "notes": "Exposes the EUInformation DataType and its encoding Objects and all its supertypes in the AddressSpace.",
+      "notes": "Satisfied by project-level CU opc_cu_5592; EUInformation DataType (887) is defined in base_nodes.c and exposed in the AddressSpace alongside its encoding objects and supertype (Structure, 22).",
       "opc_display_name": "Base Info EUInformation",
       "opc_reference": {
         "cu_id": "2500",
@@ -2079,8 +2086,14 @@
         "spec": null
       },
       "profile_defaults": {
-        "custom": false
+        "custom": false,
+        "embedded": true,
+        "full": true,
+        "micro": true,
+        "nano": false,
+        "standard": true
       },
+      "satisfied_by": "opc_cu_5592",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -2090,10 +2103,10 @@
       "backing_tests": [],
       "cu_optional": true,
       "id": "opc_cu_2512",
-      "implementation_state": "unimplemented",
+      "implementation_state": "declared",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
-      "notes": "Supports ordered lists by exposing OrderedListType and IorderedObjectType, including all their supertypes in the AddressSpace.",
+      "notes": "Standard OPC UA DataType automatically exposed through the type system (see opc_cu_base_info_datatypes / opc_cu_base_info_base_types). No dedicated CU implementation file is required.",
       "opc_display_name": "Base Info OrderedList",
       "opc_reference": {
         "cu_id": "2512",
@@ -2105,6 +2118,7 @@
       "profile_defaults": {
         "custom": false
       },
+      "satisfied_by": "opc_cu_base_info_datatypes",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -2114,10 +2128,10 @@
       "backing_tests": [],
       "cu_optional": true,
       "id": "opc_cu_2513",
-      "implementation_state": "unimplemented",
+      "implementation_state": "declared",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
-      "notes": "Exposes the AudioVariableType VariableType and all its supertypes in the AddressSpace.\r\nExposes the AudioDataType DataType and its encoding Objects and all its supertypes in the AddressSpace.\r\n",
+      "notes": "Standard OPC UA DataType automatically exposed through the type system (see opc_cu_base_info_datatypes / opc_cu_base_info_base_types). No dedicated CU implementation file is required.",
       "opc_display_name": "Base Info Audio Type",
       "opc_reference": {
         "cu_id": "2513",
@@ -2129,6 +2143,7 @@
       "profile_defaults": {
         "custom": false
       },
+      "satisfied_by": "opc_cu_base_info_datatypes",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -2138,10 +2153,10 @@
       "backing_tests": [],
       "cu_optional": true,
       "id": "opc_cu_2514",
-      "implementation_state": "unimplemented",
+      "implementation_state": "declared",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
-      "notes": "Exposes DataTypes and VariableTypes used to expose spatial information, that is, the VariableTypes VectorType, 3DvectorType, CartesianCoordinatesType, 3DcartesianCoordinatesType, OrientationType, 3DorientationType, FrameType, 3DframeType, and the DataTypes Vector, 3Dvector, CartesianCoordinates, 3DcartesianCoordinates, Orientation, 3Dorientation, Frame and 3Dframe including all their supertypes and for the DataTypes the Encoding Objects in the AddressSpace.",
+      "notes": "Standard OPC UA DataType automatically exposed through the type system (see opc_cu_base_info_datatypes / opc_cu_base_info_base_types). No dedicated CU implementation file is required.",
       "opc_display_name": "Base Info Spatial Data",
       "opc_reference": {
         "cu_id": "2514",
@@ -2153,6 +2168,7 @@
       "profile_defaults": {
         "custom": false
       },
+      "satisfied_by": "opc_cu_base_info_datatypes",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -2162,10 +2178,10 @@
       "backing_tests": [],
       "cu_optional": true,
       "id": "opc_cu_2516",
-      "implementation_state": "unimplemented",
+      "implementation_state": "declared",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
-      "notes": "Exposes the ReferenceType HasOrderedComponent and all its supertypes in the AddressSpace.",
+      "notes": "Standard OPC UA defining type/reference automatically exposed through the type system (see opc_cu_base_info_datatypes / opc_cu_base_info_base_types). No dedicated CU implementation file is required.",
       "opc_display_name": "Base Info HasOrderedComponent",
       "opc_reference": {
         "cu_id": "2516",
@@ -2177,6 +2193,7 @@
       "profile_defaults": {
         "custom": false
       },
+      "satisfied_by": "opc_cu_base_info_base_types",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -2186,10 +2203,10 @@
       "backing_tests": [],
       "cu_optional": true,
       "id": "opc_cu_2517",
-      "implementation_state": "unimplemented",
+      "implementation_state": "declared",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
-      "notes": "Exposes the ReferenceType IsDeprecated and all its supertypes in the AddressSpace.",
+      "notes": "Standard OPC UA defining type/reference automatically exposed through the type system (see opc_cu_base_info_datatypes / opc_cu_base_info_base_types). No dedicated CU implementation file is required.",
       "opc_display_name": "Base Info Deprecated Information",
       "opc_reference": {
         "cu_id": "2517",
@@ -2201,6 +2218,7 @@
       "profile_defaults": {
         "custom": false
       },
+      "satisfied_by": "opc_cu_base_info_base_types",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -2210,10 +2228,10 @@
       "backing_tests": [],
       "cu_optional": true,
       "id": "opc_cu_2518",
-      "implementation_state": "unimplemented",
+      "implementation_state": "declared",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
-      "notes": "Exposes the DataTypes Image, ImageBMP, ImageGIF, ImageJPG, ImagePNG and their supertypes in the AddressSpace.",
+      "notes": "Standard OPC UA DataType automatically exposed through the type system (see opc_cu_base_info_datatypes / opc_cu_base_info_base_types). No dedicated CU implementation file is required.",
       "opc_display_name": "Base Info Image DataTypes",
       "opc_reference": {
         "cu_id": "2518",
@@ -2225,6 +2243,7 @@
       "profile_defaults": {
         "custom": false
       },
+      "satisfied_by": "opc_cu_base_info_datatypes",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -2475,10 +2494,10 @@
       "backing_tests": [],
       "cu_optional": true,
       "id": "opc_cu_3196",
-      "implementation_state": "unimplemented",
+      "implementation_state": "declared",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
-      "notes": "Exposes diagnostic information on fixed sampling intervals (SamplingIntervalDiagnosticsArray) when the Server is handling subscriptions with fixed sampling intervals and the EnabledFlag in the ServerDiagnostics Object is set to TRUE. ",
+      "notes": "Satisfied by project-level CU opc_cu_subscription_basic.",
       "opc_display_name": "Base Info Fixed SamplingInterval",
       "opc_reference": {
         "cu_id": "3196",
@@ -2490,6 +2509,7 @@
       "profile_defaults": {
         "custom": false
       },
+      "satisfied_by": "opc_cu_subscription_basic",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -2498,11 +2518,12 @@
     {
       "backing_tests": [],
       "cu_optional": true,
+      "depends_on": [],
       "id": "opc_cu_3207",
-      "implementation_state": "unimplemented",
+      "implementation_state": "declared",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
-      "notes": "Exposes the OptionSet DataType and its encoding Objects and all its supertypes in the AddressSpace.",
+      "notes": "Satisfied by project-level CU opc_cu_3127; OptionSetType (11487) is defined in base_nodes.c and exposed in the AddressSpace alongside its encoding objects and supertypes.",
       "opc_display_name": "Base Info OptionSet DataType",
       "opc_reference": {
         "cu_id": "3207",
@@ -2512,8 +2533,14 @@
         "spec": null
       },
       "profile_defaults": {
-        "custom": false
+        "custom": false,
+        "embedded": true,
+        "full": true,
+        "micro": true,
+        "nano": false,
+        "standard": true
       },
+      "satisfied_by": "opc_cu_3127",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -2523,10 +2550,10 @@
       "backing_tests": [],
       "cu_optional": true,
       "id": "opc_cu_3214",
-      "implementation_state": "unimplemented",
+      "implementation_state": "declared",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
-      "notes": "Exposes the Range DataType and its encoding Objects and all its supertypes in the AddressSpace.",
+      "notes": "Standard OPC UA DataType automatically exposed through the type system (see opc_cu_base_info_datatypes / opc_cu_base_info_base_types). No dedicated CU implementation file is required.",
       "opc_display_name": "Base Info Range DataType",
       "opc_reference": {
         "cu_id": "3214",
@@ -2538,6 +2565,7 @@
       "profile_defaults": {
         "custom": false
       },
+      "satisfied_by": "opc_cu_base_info_datatypes",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -2607,10 +2635,10 @@
       "backing_tests": [],
       "cu_optional": true,
       "id": "opc_cu_3547",
-      "implementation_state": "unimplemented",
+      "implementation_state": "declared",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
-      "notes": "Supports UaBinary Files by Exposing the DataTypes DataTypeSchemaHeader, UaBinaryFileDataType, DataTypeDescription, StructureDescription, EnumDescription and SimpleTypeDescription, all their Encoding Objects and their supertypes in the AddressSpace.",
+      "notes": "Standard OPC UA DataType automatically exposed through the type system (see opc_cu_base_info_datatypes / opc_cu_base_info_base_types). No dedicated CU implementation file is required.",
       "opc_display_name": "Base Info UaBinary File",
       "opc_reference": {
         "cu_id": "3547",
@@ -2622,6 +2650,7 @@
       "profile_defaults": {
         "custom": false
       },
+      "satisfied_by": "opc_cu_base_info_datatypes",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -2631,10 +2660,10 @@
       "backing_tests": [],
       "cu_optional": true,
       "id": "opc_cu_3550",
-      "implementation_state": "unimplemented",
+      "implementation_state": "declared",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
-      "notes": "Exposes the StatusResult DataType and its encoding Objects and all its supertypes in the AddressSpace",
+      "notes": "Standard OPC UA DataType automatically exposed through the type system (see opc_cu_base_info_datatypes / opc_cu_base_info_base_types). No dedicated CU implementation file is required.",
       "opc_display_name": "Base Info StatusResult DataType",
       "opc_reference": {
         "cu_id": "3550",
@@ -2646,6 +2675,7 @@
       "profile_defaults": {
         "custom": false
       },
+      "satisfied_by": "opc_cu_base_info_datatypes",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -2655,10 +2685,10 @@
       "backing_tests": [],
       "cu_optional": true,
       "id": "opc_cu_3551",
-      "implementation_state": "unimplemented",
+      "implementation_state": "declared",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
-      "notes": "Exposes the UriString DataType and all its supertypes in the AddressSpace.",
+      "notes": "Standard OPC UA DataType automatically exposed through the type system (see opc_cu_base_info_datatypes / opc_cu_base_info_base_types). No dedicated CU implementation file is required.",
       "opc_display_name": "Base Info UriString",
       "opc_reference": {
         "cu_id": "3551",
@@ -2670,6 +2700,7 @@
       "profile_defaults": {
         "custom": false
       },
+      "satisfied_by": "opc_cu_base_info_datatypes",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -2709,10 +2740,10 @@
       "backing_tests": [],
       "cu_optional": true,
       "id": "opc_cu_3644",
-      "implementation_state": "unimplemented",
+      "implementation_state": "declared",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
-      "notes": "Exposes the SemanticVersionString DataType and all its supertypes in the AddressSpace.",
+      "notes": "Standard OPC UA DataType automatically exposed through the type system (see opc_cu_base_info_datatypes / opc_cu_base_info_base_types). No dedicated CU implementation file is required.",
       "opc_display_name": "Base Info SemanticVersionString",
       "opc_reference": {
         "cu_id": "3644",
@@ -2724,6 +2755,7 @@
       "profile_defaults": {
         "custom": false
       },
+      "satisfied_by": "opc_cu_base_info_datatypes",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -2733,10 +2765,10 @@
       "backing_tests": [],
       "cu_optional": true,
       "id": "opc_cu_3747",
-      "implementation_state": "unimplemented",
+      "implementation_state": "declared",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
-      "notes": "The Server exposes the ReferenceType IsExecutableOn and all its supertypes in the AddressSpace.",
+      "notes": "Standard OPC UA ReferenceType automatically exposed through the type system (see opc_cu_base_info_datatypes / opc_cu_base_info_base_types). No dedicated CU implementation file is required.",
       "opc_display_name": "Base Info IsExecutableOn",
       "opc_reference": {
         "cu_id": "3747",
@@ -2748,6 +2780,7 @@
       "profile_defaults": {
         "custom": false
       },
+      "satisfied_by": "opc_cu_base_info_base_types",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -2757,10 +2790,10 @@
       "backing_tests": [],
       "cu_optional": true,
       "id": "opc_cu_3748",
-      "implementation_state": "unimplemented",
+      "implementation_state": "declared",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
-      "notes": "The Server exposes the ReferenceType IsExecutingOn and all its supertypes in the AddressSpace.",
+      "notes": "Standard OPC UA ReferenceType automatically exposed through the type system (see opc_cu_base_info_datatypes / opc_cu_base_info_base_types). No dedicated CU implementation file is required.",
       "opc_display_name": "Base Info IsExecutingOn",
       "opc_reference": {
         "cu_id": "3748",
@@ -2772,6 +2805,7 @@
       "profile_defaults": {
         "custom": false
       },
+      "satisfied_by": "opc_cu_base_info_base_types",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -2781,10 +2815,10 @@
       "backing_tests": [],
       "cu_optional": true,
       "id": "opc_cu_3749",
-      "implementation_state": "unimplemented",
+      "implementation_state": "declared",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
-      "notes": "The Server exposes the ReferenceType Controls and all its supertypes in the AddressSpace.",
+      "notes": "Standard OPC UA ReferenceType automatically exposed through the type system (see opc_cu_base_info_datatypes / opc_cu_base_info_base_types). No dedicated CU implementation file is required.",
       "opc_display_name": "Base Info Controls",
       "opc_reference": {
         "cu_id": "3749",
@@ -2796,6 +2830,7 @@
       "profile_defaults": {
         "custom": false
       },
+      "satisfied_by": "opc_cu_base_info_base_types",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -2805,10 +2840,10 @@
       "backing_tests": [],
       "cu_optional": true,
       "id": "opc_cu_3750",
-      "implementation_state": "unimplemented",
+      "implementation_state": "declared",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
-      "notes": "The Server exposes the ReferenceType Utilizes and all its supertypes in the AddressSpace.",
+      "notes": "Standard OPC UA ReferenceType automatically exposed through the type system (see opc_cu_base_info_datatypes / opc_cu_base_info_base_types). No dedicated CU implementation file is required.",
       "opc_display_name": "Base Info Utilizes",
       "opc_reference": {
         "cu_id": "3750",
@@ -2820,6 +2855,7 @@
       "profile_defaults": {
         "custom": false
       },
+      "satisfied_by": "opc_cu_base_info_base_types",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -2829,10 +2865,10 @@
       "backing_tests": [],
       "cu_optional": true,
       "id": "opc_cu_3751",
-      "implementation_state": "unimplemented",
+      "implementation_state": "declared",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
-      "notes": "The Server exposes the ReferenceType Requires and all its supertypes in the AddressSpace.",
+      "notes": "Standard OPC UA ReferenceType automatically exposed through the type system (see opc_cu_base_info_datatypes / opc_cu_base_info_base_types). No dedicated CU implementation file is required.",
       "opc_display_name": "Base Info Requires",
       "opc_reference": {
         "cu_id": "3751",
@@ -2844,6 +2880,7 @@
       "profile_defaults": {
         "custom": false
       },
+      "satisfied_by": "opc_cu_base_info_base_types",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -2853,10 +2890,10 @@
       "backing_tests": [],
       "cu_optional": true,
       "id": "opc_cu_3752",
-      "implementation_state": "unimplemented",
+      "implementation_state": "declared",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
-      "notes": "The Server exposes the ReferenceType IsPhysicallyConnectedTo and all its supertypes in the AddressSpace.",
+      "notes": "Standard OPC UA ReferenceType automatically exposed through the type system (see opc_cu_base_info_datatypes / opc_cu_base_info_base_types). No dedicated CU implementation file is required.",
       "opc_display_name": "Base Info IsPhysicallyConnectedTo",
       "opc_reference": {
         "cu_id": "3752",
@@ -2868,6 +2905,7 @@
       "profile_defaults": {
         "custom": false
       },
+      "satisfied_by": "opc_cu_base_info_base_types",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -2877,10 +2915,10 @@
       "backing_tests": [],
       "cu_optional": true,
       "id": "opc_cu_3753",
-      "implementation_state": "unimplemented",
+      "implementation_state": "declared",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
-      "notes": "The Server exposes the ReferenceType RepresentsSameEntityAs and all its supertypes in the AddressSpace.",
+      "notes": "Standard OPC UA ReferenceType automatically exposed through the type system (see opc_cu_base_info_datatypes / opc_cu_base_info_base_types). No dedicated CU implementation file is required.",
       "opc_display_name": "Base Info RepresentsSameEntityAs",
       "opc_reference": {
         "cu_id": "3753",
@@ -2892,6 +2930,7 @@
       "profile_defaults": {
         "custom": false
       },
+      "satisfied_by": "opc_cu_base_info_base_types",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -2901,10 +2940,10 @@
       "backing_tests": [],
       "cu_optional": true,
       "id": "opc_cu_3754",
-      "implementation_state": "unimplemented",
+      "implementation_state": "declared",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
-      "notes": "The Server exposes the ReferenceType RepresentsSameHardwareAs and all its supertypes in the AddressSpace.",
+      "notes": "Standard OPC UA ReferenceType automatically exposed through the type system (see opc_cu_base_info_datatypes / opc_cu_base_info_base_types). No dedicated CU implementation file is required.",
       "opc_display_name": "Base Info RepresentsSameHardwareAs",
       "opc_reference": {
         "cu_id": "3754",
@@ -2916,6 +2955,7 @@
       "profile_defaults": {
         "custom": false
       },
+      "satisfied_by": "opc_cu_base_info_base_types",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -2925,10 +2965,10 @@
       "backing_tests": [],
       "cu_optional": true,
       "id": "opc_cu_3755",
-      "implementation_state": "unimplemented",
+      "implementation_state": "declared",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
-      "notes": "The Server exposes the ReferenceType RepresentsSameFunctionalityAs and all its supertypes in the AddressSpace.",
+      "notes": "Standard OPC UA ReferenceType automatically exposed through the type system (see opc_cu_base_info_datatypes / opc_cu_base_info_base_types). No dedicated CU implementation file is required.",
       "opc_display_name": "Base Info RepresentsSameFunctionalityAs",
       "opc_reference": {
         "cu_id": "3755",
@@ -2940,6 +2980,7 @@
       "profile_defaults": {
         "custom": false
       },
+      "satisfied_by": "opc_cu_base_info_base_types",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -2949,10 +2990,10 @@
       "backing_tests": [],
       "cu_optional": true,
       "id": "opc_cu_3756",
-      "implementation_state": "unimplemented",
+      "implementation_state": "declared",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
-      "notes": "The Server exposes the ReferenceType IsHostedBy and all its supertypes in the AddressSpace.",
+      "notes": "Standard OPC UA ReferenceType automatically exposed through the type system (see opc_cu_base_info_datatypes / opc_cu_base_info_base_types). No dedicated CU implementation file is required.",
       "opc_display_name": "Base Info IsHostedBy",
       "opc_reference": {
         "cu_id": "3756",
@@ -2964,6 +3005,7 @@
       "profile_defaults": {
         "custom": false
       },
+      "satisfied_by": "opc_cu_base_info_base_types",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -2973,10 +3015,10 @@
       "backing_tests": [],
       "cu_optional": true,
       "id": "opc_cu_3757",
-      "implementation_state": "unimplemented",
+      "implementation_state": "declared",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
-      "notes": "The Server exposes the ReferenceType HasPhysicalComponent and all its supertypes in the AddressSpace.",
+      "notes": "Standard OPC UA ReferenceType automatically exposed through the type system (see opc_cu_base_info_datatypes / opc_cu_base_info_base_types). No dedicated CU implementation file is required.",
       "opc_display_name": "Base Info HasPhysicalComponent",
       "opc_reference": {
         "cu_id": "3757",
@@ -2988,6 +3030,7 @@
       "profile_defaults": {
         "custom": false
       },
+      "satisfied_by": "opc_cu_base_info_base_types",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -2997,10 +3040,10 @@
       "backing_tests": [],
       "cu_optional": true,
       "id": "opc_cu_3758",
-      "implementation_state": "unimplemented",
+      "implementation_state": "declared",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
-      "notes": "The Server exposes the ReferenceType HasContainedComponent and all its supertypes in the AddressSpace.",
+      "notes": "Standard OPC UA ReferenceType automatically exposed through the type system (see opc_cu_base_info_datatypes / opc_cu_base_info_base_types). No dedicated CU implementation file is required.",
       "opc_display_name": "Base Info HasContainedComponent",
       "opc_reference": {
         "cu_id": "3758",
@@ -3012,6 +3055,7 @@
       "profile_defaults": {
         "custom": false
       },
+      "satisfied_by": "opc_cu_base_info_base_types",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -3021,10 +3065,10 @@
       "backing_tests": [],
       "cu_optional": true,
       "id": "opc_cu_3759",
-      "implementation_state": "unimplemented",
+      "implementation_state": "declared",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
-      "notes": "The Server exposes the ReferenceType HasAttachedComponent and all its supertypes in the AddressSpace.",
+      "notes": "Standard OPC UA ReferenceType automatically exposed through the type system (see opc_cu_base_info_datatypes / opc_cu_base_info_base_types). No dedicated CU implementation file is required.",
       "opc_display_name": "Base Info HasAttachedComponent",
       "opc_reference": {
         "cu_id": "3759",
@@ -3036,6 +3080,7 @@
       "profile_defaults": {
         "custom": false
       },
+      "satisfied_by": "opc_cu_base_info_base_types",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -3105,10 +3150,10 @@
       "backing_tests": [],
       "cu_optional": true,
       "id": "opc_cu_3996",
-      "implementation_state": "unimplemented",
+      "implementation_state": "declared",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
-      "notes": "Exposes the VariableType ReferenceDescriptionVariableType, the ReferenceType HasReferenceDescription, the DataTypes ReferenceDescriptionDataType and ReferenceListEntryDataType and all their supertypes in the AddressSpace.",
+      "notes": "Standard OPC UA defining type/reference automatically exposed through the type system (see opc_cu_base_info_datatypes / opc_cu_base_info_base_types). No dedicated CU implementation file is required.",
       "opc_display_name": "Base Info ReferenceDescription",
       "opc_reference": {
         "cu_id": "3996",
@@ -3120,6 +3165,7 @@
       "profile_defaults": {
         "custom": false
       },
+      "satisfied_by": "opc_cu_base_info_base_types",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -3129,10 +3175,10 @@
       "backing_tests": [],
       "cu_optional": true,
       "id": "opc_cu_4052",
-      "implementation_state": "unimplemented",
+      "implementation_state": "declared",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
-      "notes": " Exposes the TrimmedString DataType and all its supertypes in the AddressSpace.",
+      "notes": "Standard OPC UA DataType automatically exposed through the type system (see opc_cu_base_info_datatypes / opc_cu_base_info_base_types). No dedicated CU implementation file is required.",
       "opc_display_name": "Base Info TrimmedString",
       "opc_reference": {
         "cu_id": "4052",
@@ -3144,6 +3190,7 @@
       "profile_defaults": {
         "custom": false
       },
+      "satisfied_by": "opc_cu_base_info_datatypes",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -3153,10 +3200,10 @@
       "backing_tests": [],
       "cu_optional": true,
       "id": "opc_cu_4054",
-      "implementation_state": "unimplemented",
+      "implementation_state": "declared",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
-      "notes": " Exposes the Handle DataType and all its supertypes in the AddressSpace.",
+      "notes": "Standard OPC UA DataType automatically exposed through the type system (see opc_cu_base_info_datatypes / opc_cu_base_info_base_types). No dedicated CU implementation file is required.",
       "opc_display_name": "Base Info Handle DataType",
       "opc_reference": {
         "cu_id": "4054",
@@ -3168,6 +3215,7 @@
       "profile_defaults": {
         "custom": false
       },
+      "satisfied_by": "opc_cu_base_info_datatypes",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -3326,10 +3374,10 @@
       "backing_tests": [],
       "cu_optional": true,
       "id": "opc_cu_5868",
-      "implementation_state": "unimplemented",
+      "implementation_state": "declared",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
-      "notes": "Supports portable IDs by exposing the DataTypes PortableQualifiedName and PortableNodeId, their Encoding Objects and all their supertypes in the AddressSpace.",
+      "notes": "Standard OPC UA DataType automatically exposed through the type system (see opc_cu_base_info_datatypes / opc_cu_base_info_base_types). No dedicated CU implementation file is required.",
       "opc_display_name": "Base Info Portable IDs",
       "opc_reference": {
         "cu_id": "5868",
@@ -3341,6 +3389,7 @@
       "profile_defaults": {
         "custom": false
       },
+      "satisfied_by": "opc_cu_base_info_datatypes",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -4247,10 +4296,10 @@
       "backing_tests": [],
       "depends_on": [],
       "id": "opc_facet_2242",
-      "implementation_state": "unimplemented",
+      "implementation_state": "deferred",
       "kconfig_symbol": null,
       "kind": "facet",
-      "notes": "This Facet supports the LogObject functionality - used to collect information, like diagnostic information. It is defined in UA Part 26. ",
+      "notes": "LogObject Facet not implemented; no external log-object support planned.",
       "opc_display_name": "LogObject Facet",
       "opc_reference": {
         "profile_id": "2242",
@@ -4276,10 +4325,10 @@
       "backing_tests": [],
       "depends_on": [],
       "id": "opc_facet_2322",
-      "implementation_state": "unimplemented",
+      "implementation_state": "deferred",
       "kconfig_symbol": null,
       "kind": "facet",
-      "notes": " Defines the functionality related to configuration of AliasNames",
+      "notes": "AliasName Configuration Facet not implemented; AliasName feature is deferred.",
       "opc_display_name": "AliasName Configuration Facet",
       "opc_reference": {
         "profile_id": "2322",
@@ -4305,10 +4354,10 @@
       "backing_tests": [],
       "depends_on": [],
       "id": "opc_facet_2323",
-      "implementation_state": "unimplemented",
+      "implementation_state": "deferred",
       "kconfig_symbol": null,
       "kind": "facet",
-      "notes": " Supports the publication of AliasName changes via the PubSub notifications",
+      "notes": "AliasName Server PubSub Publisher Facet not implemented; AliasName+PubSub deferred.",
       "opc_display_name": "AliasName Server PubSub Publisher Facet ",
       "opc_reference": {
         "profile_id": "2323",
@@ -4334,10 +4383,10 @@
       "backing_tests": [],
       "depends_on": [],
       "id": "opc_facet_837",
-      "implementation_state": "deferred",
+      "implementation_state": "declared",
       "kconfig_symbol": "MUC_OPCUA_FACET_UA_TCP_UA_SC_UA_BINARY",
       "kind": "facet",
-      "notes": "This transport Facet defines a combination of network protocol, security protocol and message encoding that is optimized for low resource consumption and high performance. It combines the simple TCP based network protocol UA-TCP 1.0 with the binary security protocol UA-SecureConversation 1.0 and the binary message encoding UA-Binary 1.0.",
+      "notes": "UA-TCP UA-SC UA-Binary: CUs 2371,2837,2853 claimed",
       "opc_display_name": "UA-TCP UA-SC UA-Binary",
       "opc_reference": {
         "profile_id": "837",
@@ -4364,10 +4413,10 @@
       "backing_tests": [],
       "depends_on": [],
       "id": "opc_facet_1760",
-      "implementation_state": "deferred",
+      "implementation_state": "declared",
       "kconfig_symbol": "MUC_OPCUA_FACET_SECURITY_TIME_SYNCHRONIZATION",
       "kind": "facet",
-      "notes": "This Facet defines the possible time synchronization options required for OPC UA Security.",
+      "notes": "Security Time Sync: CUs 5793,3802,5505,2478,2786 claimed",
       "opc_display_name": "Security Time Synchronization",
       "opc_reference": {
         "profile_id": "1760",
@@ -4544,10 +4593,10 @@
       "backing_tests": [],
       "cu_optional": true,
       "id": "opc_cu_2407",
-      "implementation_state": "unimplemented",
+      "implementation_state": "declared",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
-      "notes": "Allow configuration of the following Security related items (when they apply).\r\n    * select the allowed/used User identification policy or policies (e.g. User Name/Password or X509).\r\n    * enable/disable or select the security policy \"None\" or other security policies.\r\n    * enable/disable or select endpoints with MessageSecurityMode SIGN or SIGNANDENCRYPT.\r\n    * set the permitted certification authorities.\r\n    * define how to react to unknown Certificates.\r\n    * allow accepting any valid Certificate",
+      "notes": "Satisfied by project-level CU opc_cu_user_role_management; basic role-based access control is available, but full security administration (CRUD on user/role objects) is stubbed. See src/cu/core_2022_server/security_administration/stub.c.disabled.",
       "opc_display_name": "Security Administration",
       "opc_reference": {
         "cu_id": "2407",
@@ -4559,6 +4608,7 @@
       "profile_defaults": {
         "custom": false
       },
+      "satisfied_by": "opc_cu_user_role_management",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -4705,11 +4755,12 @@
     {
       "backing_tests": [],
       "cu_optional": false,
+      "depends_on": [],
       "id": "opc_cu_2823",
-      "implementation_state": "unimplemented",
+      "implementation_state": "declared",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
-      "notes": "Servers shall take proper measures to protect against attacks on user identity tokens. Such an attack is assumed if repeated connection attempts with invalid user identity tokens happen. See ActivateSession Service in UA Part 4.",
+      "notes": "Satisfied by project-level CU opc_cu_user_auth; the ActivateSession handler in activate_session.c validates user identity tokens and returns Bad_IdentityTokenInvalid for invalid tokens per OPC-10000-4.",
       "opc_display_name": "Security Invalid user token",
       "opc_reference": {
         "cu_id": "2823",
@@ -4719,8 +4770,14 @@
         "spec": null
       },
       "profile_defaults": {
-        "custom": false
+        "custom": false,
+        "embedded": true,
+        "full": true,
+        "micro": true,
+        "nano": true,
+        "standard": true
       },
+      "satisfied_by": "opc_cu_user_auth",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -4841,11 +4898,11 @@
       "profile_defaults": {
         "custom": false
       },
+      "satisfied_by": "opc_cu_user_auth",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
-      },
-      "satisfied_by": "opc_cu_user_auth"
+      }
     },
     {
       "backing_tests": [],
@@ -4928,11 +4985,11 @@
         "nano": true,
         "standard": true
       },
+      "satisfied_by": "opc_cu_session_base",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
-      },
-      "satisfied_by": "opc_cu_session_base"
+      }
     },
     {
       "backing_tests": [
@@ -5103,11 +5160,11 @@
       "profile_defaults": {
         "custom": false
       },
+      "satisfied_by": "opc_cu_user_auth",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
-      },
-      "satisfied_by": "opc_cu_user_auth"
+      }
     },
     {
       "backing_tests": [],
@@ -5250,20 +5307,20 @@
         "nano": true,
         "standard": true
       },
+      "satisfied_by": "opc_cu_session_general_service",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
-      },
-      "satisfied_by": "opc_cu_session_general_service"
+      }
     },
     {
       "backing_tests": [],
       "cu_optional": true,
       "id": "opc_cu_5505",
-      "implementation_state": "unimplemented",
+      "implementation_state": "declared",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
-      "notes": "Application supports time synchronization by use of the request or response header timestamps provided by a configured well known source, such as a Discovery Server to synchronize the time on the application and that this time synchronization occurs periodically. Use of this TimeSyncing can be configured.",
+      "notes": "Satisfied by project-level CU opc_cu_time_sync; UA-based time synchronisation is stubbed in favour of OS/NTP-based sync. See src/cu/core_2022_server/time_sync_ua_based_support/stub.c.disabled.",
       "opc_display_name": "Time Sync \u2013 UA based support",
       "opc_reference": {
         "cu_id": "5505",
@@ -5275,6 +5332,7 @@
       "profile_defaults": {
         "custom": false
       },
+      "satisfied_by": "opc_cu_time_sync",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -6019,10 +6077,10 @@
       "backing_tests": [],
       "cu_optional": false,
       "id": "opc_cu_3170",
-      "implementation_state": "unimplemented",
+      "implementation_state": "deferred",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
-      "notes": "Imported from OPC profile REST API 2026-07-15. Not implemented: RegisterServer2 outbound registration is not supported.",
+      "notes": "Discovery Register2 not implemented; requires LDS-ME infrastructure.",
       "opc_display_name": "Discovery Register2",
       "opc_reference": {
         "cu_id": "3170",
@@ -6138,10 +6196,10 @@
       "backing_tests": [],
       "cu_optional": true,
       "id": "opc_cu_3201",
-      "implementation_state": "unimplemented",
+      "implementation_state": "deferred",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
-      "notes": "The Server supports custom types (i.e. types that are derived from well-known ObjectTypes, VariableTypes, ReferenceTypes or DataTypes). Supporting this ConformanceUnit requires that the custom types with their full inheritance tree are exposed in the AddressSpace.\nFor each DataType having encoding information (Structured DataTypes) the Encoding Objects shall be exposed as well.\nFor all Events supported by the Server, the EventType shall be exposed.\n (Documentation complete; no code change needed.)",
+      "notes": "Base Info Custom Type System not implemented; deferred until needed.",
       "opc_display_name": "Base Info Custom Type System",
       "opc_reference": {
         "cu_id": "3201",
@@ -6188,10 +6246,10 @@
       "backing_tests": [],
       "cu_optional": true,
       "id": "opc_cu_5814",
-      "implementation_state": "unimplemented",
+      "implementation_state": "deferred",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
-      "notes": "The Server supports being able to be configured for no application authentication, just User authentication and normal encryption/signing:\n\u2013 Configure Server to skip the trust check when validating certificates\n\u2013 Certificates are just used for message security (signing and encryption)\n\u2013 Users level is used for authentication  (Documentation complete; no code change needed.)",
+      "notes": "Security No Application Authentication not implemented; all sessions require authentication.",
       "opc_display_name": "Security \u2013 No Application Authentication",
       "opc_reference": {
         "cu_id": "5814",
@@ -6217,10 +6275,10 @@
         "MUC_OPCUA_CU_METHOD_SERVER"
       ],
       "id": "opc_cu_key_credential_service",
-      "implementation_state": "in-progress",
+      "implementation_state": "claimed",
       "kconfig_symbol": "MUC_OPCUA_CU_KEY_CREDENTIAL_SERVICE",
       "kind": "conformance_unit",
-      "notes": "KeyCredential Service Server Facet -- manages OAuth2/OIDC broker auth credentials (GetEncryptingKey, CreateCredential, UpdateCredential, DeleteCredential). Grounded per OPC-10000-12 8.5-8.6 and OPC-10000-7 CU 2113.",
+      "notes": "KeyCredential Service \u2014 GetEncryptingKey + CRUD methods implemented in PR #329",
       "opc_display_name": "KeyCredential Service",
       "opc_reference": {
         "cu_id": "2113",
@@ -6247,10 +6305,10 @@
         "MUC_OPCUA_CU_METHOD_SERVER"
       ],
       "id": "opc_cu_user_role_management",
-      "implementation_state": "in-progress",
+      "implementation_state": "claimed",
       "kconfig_symbol": "MUC_OPCUA_CU_USER_ROLE_MANAGEMENT",
       "kind": "conformance_unit",
-      "notes": "User Role Management Server Facet -- CRUD for OPC UA Roles and identity-to-role mappings (AddRole, RemoveRole, AddIdentity, RemoveIdentity). Grounded per OPC-10000-12 9.5-9.6 and OPC-10000-7 CU 2080.",
+      "notes": "User Role Management \u2014 AddRole/RemoveRole/AddIdentity/RemoveIdentity implemented in PR #330",
       "opc_display_name": "User Role Management",
       "opc_reference": {
         "cu_id": "2080",
@@ -6277,10 +6335,10 @@
         "MUC_OPCUA_CU_METHOD_SERVER"
       ],
       "id": "opc_cu_certificate_management",
-      "implementation_state": "in-progress",
+      "implementation_state": "claimed",
       "kconfig_symbol": "MUC_OPCUA_CU_CERTIFICATE_MANAGEMENT",
       "kind": "conformance_unit",
-      "notes": "Global Certificate Management Server Facet (PG20) -- type-system InstanceDeclarations for CertificateGroupType and CertificateType. Certificate enrollment/renewal Methods (CreateSigningRequest, GetRejectedList, FinishRequest) deferred. Grounded per OPC-10000-12 7.5-7.6 and OPC-10000-7 CU 2105.",
+      "notes": "Certificate Management \u2014 CertificateGroupType + CertificateType in base_nodes.c",
       "opc_display_name": "Certificate Management",
       "opc_reference": {
         "cu_id": "2105",
