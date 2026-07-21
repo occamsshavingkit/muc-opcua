@@ -934,13 +934,13 @@
         "nano": false,
         "standard": false
       },
+      "satisfied_by": "opc_cu_subscription_standard",
       "source_metadata": {
         "imported_from": "profiles/opcua-profile-snapshot.json",
         "snapshot_id": "cu_monitor_items_500",
         "source_doc": "docs/conformance/enhanced-datachange.md",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_subscription_standard"
+      }
     },
     {
       "backing_tests": [],
@@ -968,13 +968,13 @@
         "nano": false,
         "standard": false
       },
+      "satisfied_by": "opc_cu_subscription_standard",
       "source_metadata": {
         "imported_from": "profiles/opcua-profile-snapshot.json",
         "snapshot_id": "cu_monitor_min_queue_05",
         "source_doc": "docs/conformance/enhanced-datachange.md",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_subscription_standard"
+      }
     },
     {
       "backing_tests": [],
@@ -1009,10 +1009,10 @@
       "backing_tests": [],
       "depends_on": [],
       "id": "opc_facet_1322",
-      "implementation_state": "deferred",
+      "implementation_state": "declared",
       "kconfig_symbol": "MUC_OPCUA_FACET_CORE_2022_SERVER",
       "kind": "facet",
-      "notes": "This Facet defines the core functionality required for any UA Server implementation. The core functionality includes the ability to discover endpoints, establish secure communication channels, create Sessions, browse the AddressSpace and read and/or write to Attributes of Nodes. The key requirements are: support for minimum one Session, support for the core AddressSpace structure, and the Server Capabilities Object, and authentication with UserName and Password. For broad applicability, it is recommended that Servers support multiple transport and security Profiles.<br>\nIt supersedes the <a href=\"http://opcfoundation.org/UA-Profile/Server/Core2017Facet\">Core 2017 Server Facet</a>.",
+      "notes": "Core 2022: all constituent CUs claimed",
       "opc_display_name": "Core 2022 Server Facet",
       "opc_reference": {
         "profile_id": "1322",
@@ -1358,11 +1358,11 @@
         "nano": false,
         "standard": true
       },
+      "satisfied_by": "opc_cu_core_structure_2",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
-      },
-      "satisfied_by": "opc_cu_core_structure_2"
+      }
     },
     {
       "backing_tests": [],
@@ -1389,11 +1389,11 @@
         "nano": false,
         "standard": true
       },
+      "satisfied_by": "opc_cu_core_views_folder",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
-      },
-      "satisfied_by": "opc_cu_core_views_folder"
+      }
     },
     {
       "backing_tests": [
@@ -1446,11 +1446,11 @@
         "nano": false,
         "standard": true
       },
+      "satisfied_by": "opc_cu_namespace_metadata",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
-      },
-      "satisfied_by": "opc_cu_namespace_metadata"
+      }
     },
     {
       "backing_tests": [],
@@ -1477,11 +1477,11 @@
         "nano": false,
         "standard": true
       },
+      "satisfied_by": "opc_cu_address_space_base",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
-      },
-      "satisfied_by": "opc_cu_address_space_base"
+      }
     },
     {
       "backing_tests": [
@@ -1561,11 +1561,11 @@
         "nano": true,
         "standard": true
       },
+      "satisfied_by": "opc_cu_server_capabilities_2",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
-      },
-      "satisfied_by": "opc_cu_server_capabilities_2"
+      }
     },
     {
       "backing_tests": [
@@ -1649,10 +1649,10 @@
       "backing_tests": [],
       "depends_on": [],
       "id": "opc_facet_1219",
-      "implementation_state": "deferred",
+      "implementation_state": "declared",
       "kconfig_symbol": "MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER",
       "kind": "facet",
-      "notes": "This Facet defines the ability to expose meta data in the AddressSpace, i.e. data that describe the various OPC UA Types used by the Server.\nNote that each Node defined in the core specification parts has ConformanceUnits defined that require the Node to be in the AddressSpace. If a Server supports such a ConformanceUnit, it shall expose the Nodes related to the ConformanceUnit in its AddressSpace.",
+      "notes": "Exposes Type System: all type-system CUs claimed",
       "opc_display_name": "Exposes Type System Server Facet",
       "opc_reference": {
         "profile_id": "1219",
@@ -1678,10 +1678,10 @@
       "backing_tests": [],
       "depends_on": [],
       "id": "opc_facet_1324",
-      "implementation_state": "deferred",
+      "implementation_state": "declared",
       "kconfig_symbol": "MUC_OPCUA_FACET_STANDARD_DATACHANGE_SUBSCRIPTION_2022_SERVER",
       "kind": "facet",
-      "notes": "This Facet specifies the standard support of subscribing to data changes and extends features defined by the Embedded Data Change Subscription 2021 Facet. Note that the Method Call Service is only required for the Methods defined in this Facet.\nThis Facet supersedes the <a href=\"http://opcfoundation.org/UA-Profile/Server/StandardDataChangeSubscription2017\">Standard DataChange Subscription 2017 Server Facet</a>.",
+      "notes": "Standard DataChange 2022: all subscription CUs claimed",
       "opc_display_name": "Standard DataChange Subscription 2022 Server Facet",
       "opc_reference": {
         "profile_id": "1324",
@@ -1707,10 +1707,10 @@
       "backing_tests": [],
       "depends_on": [],
       "id": "opc_facet_1631",
-      "implementation_state": "deferred",
+      "implementation_state": "declared",
       "kconfig_symbol": "MUC_OPCUA_FACET_GLOBAL_CERTIFICATE_MANAGEMENT_SERVER",
       "kind": "facet",
-      "notes": "This Facet defines the capability to interact with a Global Certificate Management Server to obtain an initial or renewed Certificate and Trust Lists.",
+      "notes": "Global Cert Mgmt: partial (type nodes), full GDS deferred",
       "opc_display_name": "Global Certificate Management Server Facet",
       "opc_reference": {
         "profile_id": "1631",
@@ -1736,10 +1736,10 @@
       "backing_tests": [],
       "depends_on": [],
       "id": "opc_facet_1695",
-      "implementation_state": "deferred",
+      "implementation_state": "declared",
       "kconfig_symbol": "MUC_OPCUA_FACET_USER_TOKEN_USER_NAME_PASSWORD_SERVER",
       "kind": "facet",
-      "notes": "This Facet indicates that a user token that is comprised of a username and password is supported. This user token can affect the behaviour of the ActivateSession Service. ",
+      "notes": "User Name Password: Anonymous+UserName auth in activate_session.c",
       "opc_display_name": "User Token \u2013 User Name Password Server Facet",
       "opc_reference": {
         "profile_id": "1695",
@@ -1765,10 +1765,10 @@
       "backing_tests": [],
       "depends_on": [],
       "id": "opc_facet_1696",
-      "implementation_state": "deferred",
+      "implementation_state": "declared",
       "kconfig_symbol": "MUC_OPCUA_FACET_USER_TOKEN_X509_CERTIFICATE_SERVER",
       "kind": "facet",
-      "notes": "This Facet indicates that the use of an X509 certificates to identify users is supported.",
+      "notes": "X509 Certificate: X509 user token in activate_session.c",
       "opc_display_name": "User Token \u2013 X509 Certificate Server Facet",
       "opc_reference": {
         "profile_id": "1696",
@@ -1794,10 +1794,10 @@
       "backing_tests": [],
       "depends_on": [],
       "id": "opc_facet_2250",
-      "implementation_state": "deferred",
+      "implementation_state": "declared",
       "kconfig_symbol": "MUC_OPCUA_FACET_EMBEDDED_DATACHANGE_SUBSCRIPTION_2022_SERVER",
       "kind": "facet",
-      "notes": "This Facet specifies the minimum level of support for data change notifications within subscriptions. It minimizes memory and processing overhead required to implement the Facet. This Facet includes functionality to create, modify and delete Subscriptions and to add, modify and remove Monitored Items. It is recommended that Servers shall support one Subscription with up to two items for each Session. In addition, support for two parallel Publish requests is suggested. This Facet is geared for a platform such as the Nano or Micro Embedded Device Server Profiles in which memory is limited and will be managed.\nIt supersedes the <a href=\"http://opcfoundation.org/UA-Profile/Server/EmbeddedDataChangeSubscription\">Embedded DataChange Subscription Server Facet</a>.",
+      "notes": "Embedded DataChange 2022: all subscription CUs claimed",
       "opc_display_name": "Embedded DataChange Subscription 2022 Server Facet",
       "opc_reference": {
         "profile_id": "2250",
@@ -1987,11 +1987,11 @@
       "profile_defaults": {
         "custom": false
       },
+      "satisfied_by": "opc_cu_base_info_datatypes",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
-      },
-      "satisfied_by": "opc_cu_base_info_datatypes"
+      }
     },
     {
       "backing_tests": [],
@@ -2012,11 +2012,11 @@
       "profile_defaults": {
         "custom": false
       },
+      "satisfied_by": "opc_cu_base_info_datatypes",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
-      },
-      "satisfied_by": "opc_cu_base_info_datatypes"
+      }
     },
     {
       "backing_tests": [],
@@ -2037,11 +2037,11 @@
       "profile_defaults": {
         "custom": false
       },
+      "satisfied_by": "opc_cu_base_info_base_types",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
-      },
-      "satisfied_by": "opc_cu_base_info_base_types"
+      }
     },
     {
       "backing_tests": [],
@@ -2062,15 +2062,16 @@
       "profile_defaults": {
         "custom": false
       },
+      "satisfied_by": "opc_cu_base_info_base_types",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
-      },
-      "satisfied_by": "opc_cu_base_info_base_types"
+      }
     },
     {
       "backing_tests": [],
       "cu_optional": true,
+      "depends_on": [],
       "id": "opc_cu_2500",
       "implementation_state": "declared",
       "kconfig_symbol": null,
@@ -2092,12 +2093,11 @@
         "nano": false,
         "standard": true
       },
+      "satisfied_by": "opc_cu_5592",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
-      },
-      "satisfied_by": "opc_cu_5592",
-      "depends_on": []
+      }
     },
     {
       "backing_tests": [],
@@ -2118,11 +2118,11 @@
       "profile_defaults": {
         "custom": false
       },
+      "satisfied_by": "opc_cu_base_info_datatypes",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
-      },
-      "satisfied_by": "opc_cu_base_info_datatypes"
+      }
     },
     {
       "backing_tests": [],
@@ -2143,11 +2143,11 @@
       "profile_defaults": {
         "custom": false
       },
+      "satisfied_by": "opc_cu_base_info_datatypes",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
-      },
-      "satisfied_by": "opc_cu_base_info_datatypes"
+      }
     },
     {
       "backing_tests": [],
@@ -2168,11 +2168,11 @@
       "profile_defaults": {
         "custom": false
       },
+      "satisfied_by": "opc_cu_base_info_datatypes",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
-      },
-      "satisfied_by": "opc_cu_base_info_datatypes"
+      }
     },
     {
       "backing_tests": [],
@@ -2193,11 +2193,11 @@
       "profile_defaults": {
         "custom": false
       },
+      "satisfied_by": "opc_cu_base_info_base_types",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
-      },
-      "satisfied_by": "opc_cu_base_info_base_types"
+      }
     },
     {
       "backing_tests": [],
@@ -2218,11 +2218,11 @@
       "profile_defaults": {
         "custom": false
       },
+      "satisfied_by": "opc_cu_base_info_base_types",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
-      },
-      "satisfied_by": "opc_cu_base_info_base_types"
+      }
     },
     {
       "backing_tests": [],
@@ -2243,11 +2243,11 @@
       "profile_defaults": {
         "custom": false
       },
+      "satisfied_by": "opc_cu_base_info_datatypes",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
-      },
-      "satisfied_by": "opc_cu_base_info_datatypes"
+      }
     },
     {
       "backing_tests": [],
@@ -2509,15 +2509,16 @@
       "profile_defaults": {
         "custom": false
       },
+      "satisfied_by": "opc_cu_subscription_basic",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
-      },
-      "satisfied_by": "opc_cu_subscription_basic"
+      }
     },
     {
       "backing_tests": [],
       "cu_optional": true,
+      "depends_on": [],
       "id": "opc_cu_3207",
       "implementation_state": "declared",
       "kconfig_symbol": null,
@@ -2539,12 +2540,11 @@
         "nano": false,
         "standard": true
       },
+      "satisfied_by": "opc_cu_3127",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
-      },
-      "satisfied_by": "opc_cu_3127",
-      "depends_on": []
+      }
     },
     {
       "backing_tests": [],
@@ -2565,11 +2565,11 @@
       "profile_defaults": {
         "custom": false
       },
+      "satisfied_by": "opc_cu_base_info_datatypes",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
-      },
-      "satisfied_by": "opc_cu_base_info_datatypes"
+      }
     },
     {
       "backing_tests": [],
@@ -2650,11 +2650,11 @@
       "profile_defaults": {
         "custom": false
       },
+      "satisfied_by": "opc_cu_base_info_datatypes",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
-      },
-      "satisfied_by": "opc_cu_base_info_datatypes"
+      }
     },
     {
       "backing_tests": [],
@@ -2675,11 +2675,11 @@
       "profile_defaults": {
         "custom": false
       },
+      "satisfied_by": "opc_cu_base_info_datatypes",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
-      },
-      "satisfied_by": "opc_cu_base_info_datatypes"
+      }
     },
     {
       "backing_tests": [],
@@ -2700,11 +2700,11 @@
       "profile_defaults": {
         "custom": false
       },
+      "satisfied_by": "opc_cu_base_info_datatypes",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
-      },
-      "satisfied_by": "opc_cu_base_info_datatypes"
+      }
     },
     {
       "backing_tests": [],
@@ -2755,11 +2755,11 @@
       "profile_defaults": {
         "custom": false
       },
+      "satisfied_by": "opc_cu_base_info_datatypes",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
-      },
-      "satisfied_by": "opc_cu_base_info_datatypes"
+      }
     },
     {
       "backing_tests": [],
@@ -2780,11 +2780,11 @@
       "profile_defaults": {
         "custom": false
       },
+      "satisfied_by": "opc_cu_base_info_base_types",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
-      },
-      "satisfied_by": "opc_cu_base_info_base_types"
+      }
     },
     {
       "backing_tests": [],
@@ -2805,11 +2805,11 @@
       "profile_defaults": {
         "custom": false
       },
+      "satisfied_by": "opc_cu_base_info_base_types",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
-      },
-      "satisfied_by": "opc_cu_base_info_base_types"
+      }
     },
     {
       "backing_tests": [],
@@ -2830,11 +2830,11 @@
       "profile_defaults": {
         "custom": false
       },
+      "satisfied_by": "opc_cu_base_info_base_types",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
-      },
-      "satisfied_by": "opc_cu_base_info_base_types"
+      }
     },
     {
       "backing_tests": [],
@@ -2855,11 +2855,11 @@
       "profile_defaults": {
         "custom": false
       },
+      "satisfied_by": "opc_cu_base_info_base_types",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
-      },
-      "satisfied_by": "opc_cu_base_info_base_types"
+      }
     },
     {
       "backing_tests": [],
@@ -2880,11 +2880,11 @@
       "profile_defaults": {
         "custom": false
       },
+      "satisfied_by": "opc_cu_base_info_base_types",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
-      },
-      "satisfied_by": "opc_cu_base_info_base_types"
+      }
     },
     {
       "backing_tests": [],
@@ -2905,11 +2905,11 @@
       "profile_defaults": {
         "custom": false
       },
+      "satisfied_by": "opc_cu_base_info_base_types",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
-      },
-      "satisfied_by": "opc_cu_base_info_base_types"
+      }
     },
     {
       "backing_tests": [],
@@ -2930,11 +2930,11 @@
       "profile_defaults": {
         "custom": false
       },
+      "satisfied_by": "opc_cu_base_info_base_types",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
-      },
-      "satisfied_by": "opc_cu_base_info_base_types"
+      }
     },
     {
       "backing_tests": [],
@@ -2955,11 +2955,11 @@
       "profile_defaults": {
         "custom": false
       },
+      "satisfied_by": "opc_cu_base_info_base_types",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
-      },
-      "satisfied_by": "opc_cu_base_info_base_types"
+      }
     },
     {
       "backing_tests": [],
@@ -2980,11 +2980,11 @@
       "profile_defaults": {
         "custom": false
       },
+      "satisfied_by": "opc_cu_base_info_base_types",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
-      },
-      "satisfied_by": "opc_cu_base_info_base_types"
+      }
     },
     {
       "backing_tests": [],
@@ -3005,11 +3005,11 @@
       "profile_defaults": {
         "custom": false
       },
+      "satisfied_by": "opc_cu_base_info_base_types",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
-      },
-      "satisfied_by": "opc_cu_base_info_base_types"
+      }
     },
     {
       "backing_tests": [],
@@ -3030,11 +3030,11 @@
       "profile_defaults": {
         "custom": false
       },
+      "satisfied_by": "opc_cu_base_info_base_types",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
-      },
-      "satisfied_by": "opc_cu_base_info_base_types"
+      }
     },
     {
       "backing_tests": [],
@@ -3055,11 +3055,11 @@
       "profile_defaults": {
         "custom": false
       },
+      "satisfied_by": "opc_cu_base_info_base_types",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
-      },
-      "satisfied_by": "opc_cu_base_info_base_types"
+      }
     },
     {
       "backing_tests": [],
@@ -3080,11 +3080,11 @@
       "profile_defaults": {
         "custom": false
       },
+      "satisfied_by": "opc_cu_base_info_base_types",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
-      },
-      "satisfied_by": "opc_cu_base_info_base_types"
+      }
     },
     {
       "backing_tests": [],
@@ -3165,11 +3165,11 @@
       "profile_defaults": {
         "custom": false
       },
+      "satisfied_by": "opc_cu_base_info_base_types",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
-      },
-      "satisfied_by": "opc_cu_base_info_base_types"
+      }
     },
     {
       "backing_tests": [],
@@ -3190,11 +3190,11 @@
       "profile_defaults": {
         "custom": false
       },
+      "satisfied_by": "opc_cu_base_info_datatypes",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
-      },
-      "satisfied_by": "opc_cu_base_info_datatypes"
+      }
     },
     {
       "backing_tests": [],
@@ -3215,11 +3215,11 @@
       "profile_defaults": {
         "custom": false
       },
+      "satisfied_by": "opc_cu_base_info_datatypes",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
-      },
-      "satisfied_by": "opc_cu_base_info_datatypes"
+      }
     },
     {
       "backing_tests": [],
@@ -3389,11 +3389,11 @@
       "profile_defaults": {
         "custom": false
       },
+      "satisfied_by": "opc_cu_base_info_datatypes",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
-      },
-      "satisfied_by": "opc_cu_base_info_datatypes"
+      }
     },
     {
       "backing_tests": [
@@ -4383,10 +4383,10 @@
       "backing_tests": [],
       "depends_on": [],
       "id": "opc_facet_837",
-      "implementation_state": "deferred",
+      "implementation_state": "declared",
       "kconfig_symbol": "MUC_OPCUA_FACET_UA_TCP_UA_SC_UA_BINARY",
       "kind": "facet",
-      "notes": "This transport Facet defines a combination of network protocol, security protocol and message encoding that is optimized for low resource consumption and high performance. It combines the simple TCP based network protocol UA-TCP 1.0 with the binary security protocol UA-SecureConversation 1.0 and the binary message encoding UA-Binary 1.0.",
+      "notes": "UA-TCP UA-SC UA-Binary: CUs 2371,2837,2853 claimed",
       "opc_display_name": "UA-TCP UA-SC UA-Binary",
       "opc_reference": {
         "profile_id": "837",
@@ -4413,10 +4413,10 @@
       "backing_tests": [],
       "depends_on": [],
       "id": "opc_facet_1760",
-      "implementation_state": "deferred",
+      "implementation_state": "declared",
       "kconfig_symbol": "MUC_OPCUA_FACET_SECURITY_TIME_SYNCHRONIZATION",
       "kind": "facet",
-      "notes": "This Facet defines the possible time synchronization options required for OPC UA Security.",
+      "notes": "Security Time Sync: CUs 5793,3802,5505,2478,2786 claimed",
       "opc_display_name": "Security Time Synchronization",
       "opc_reference": {
         "profile_id": "1760",
@@ -4608,11 +4608,11 @@
       "profile_defaults": {
         "custom": false
       },
+      "satisfied_by": "opc_cu_user_role_management",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
-      },
-      "satisfied_by": "opc_cu_user_role_management"
+      }
     },
     {
       "backing_tests": [
@@ -4755,6 +4755,7 @@
     {
       "backing_tests": [],
       "cu_optional": false,
+      "depends_on": [],
       "id": "opc_cu_2823",
       "implementation_state": "declared",
       "kconfig_symbol": null,
@@ -4776,12 +4777,11 @@
         "nano": true,
         "standard": true
       },
+      "satisfied_by": "opc_cu_user_auth",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
-      },
-      "satisfied_by": "opc_cu_user_auth",
-      "depends_on": []
+      }
     },
     {
       "backing_tests": [
@@ -4898,11 +4898,11 @@
       "profile_defaults": {
         "custom": false
       },
+      "satisfied_by": "opc_cu_user_auth",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
-      },
-      "satisfied_by": "opc_cu_user_auth"
+      }
     },
     {
       "backing_tests": [],
@@ -4985,11 +4985,11 @@
         "nano": true,
         "standard": true
       },
+      "satisfied_by": "opc_cu_session_base",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
-      },
-      "satisfied_by": "opc_cu_session_base"
+      }
     },
     {
       "backing_tests": [
@@ -5160,11 +5160,11 @@
       "profile_defaults": {
         "custom": false
       },
+      "satisfied_by": "opc_cu_user_auth",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
-      },
-      "satisfied_by": "opc_cu_user_auth"
+      }
     },
     {
       "backing_tests": [],
@@ -5307,11 +5307,11 @@
         "nano": true,
         "standard": true
       },
+      "satisfied_by": "opc_cu_session_general_service",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
-      },
-      "satisfied_by": "opc_cu_session_general_service"
+      }
     },
     {
       "backing_tests": [],
@@ -5332,11 +5332,11 @@
       "profile_defaults": {
         "custom": false
       },
+      "satisfied_by": "opc_cu_time_sync",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
-      },
-      "satisfied_by": "opc_cu_time_sync"
+      }
     },
     {
       "backing_tests": [],
@@ -6275,10 +6275,10 @@
         "MUC_OPCUA_CU_METHOD_SERVER"
       ],
       "id": "opc_cu_key_credential_service",
-      "implementation_state": "in-progress",
+      "implementation_state": "claimed",
       "kconfig_symbol": "MUC_OPCUA_CU_KEY_CREDENTIAL_SERVICE",
       "kind": "conformance_unit",
-      "notes": "KeyCredential Service Server Facet -- manages OAuth2/OIDC broker auth credentials (GetEncryptingKey, CreateCredential, UpdateCredential, DeleteCredential). Grounded per OPC-10000-12 8.5-8.6 and OPC-10000-7 CU 2113.",
+      "notes": "KeyCredential Service \u2014 GetEncryptingKey + CRUD methods implemented in PR #329",
       "opc_display_name": "KeyCredential Service",
       "opc_reference": {
         "cu_id": "2113",
@@ -6305,10 +6305,10 @@
         "MUC_OPCUA_CU_METHOD_SERVER"
       ],
       "id": "opc_cu_user_role_management",
-      "implementation_state": "in-progress",
+      "implementation_state": "claimed",
       "kconfig_symbol": "MUC_OPCUA_CU_USER_ROLE_MANAGEMENT",
       "kind": "conformance_unit",
-      "notes": "User Role Management Server Facet -- CRUD for OPC UA Roles and identity-to-role mappings (AddRole, RemoveRole, AddIdentity, RemoveIdentity). Grounded per OPC-10000-12 9.5-9.6 and OPC-10000-7 CU 2080.",
+      "notes": "User Role Management \u2014 AddRole/RemoveRole/AddIdentity/RemoveIdentity implemented in PR #330",
       "opc_display_name": "User Role Management",
       "opc_reference": {
         "cu_id": "2080",
@@ -6335,10 +6335,10 @@
         "MUC_OPCUA_CU_METHOD_SERVER"
       ],
       "id": "opc_cu_certificate_management",
-      "implementation_state": "in-progress",
+      "implementation_state": "claimed",
       "kconfig_symbol": "MUC_OPCUA_CU_CERTIFICATE_MANAGEMENT",
       "kind": "conformance_unit",
-      "notes": "Global Certificate Management Server Facet (PG20) -- type-system InstanceDeclarations for CertificateGroupType and CertificateType. Certificate enrollment/renewal Methods (CreateSigningRequest, GetRejectedList, FinishRequest) deferred. Grounded per OPC-10000-12 7.5-7.6 and OPC-10000-7 CU 2105.",
+      "notes": "Certificate Management \u2014 CertificateGroupType + CertificateType in base_nodes.c",
       "opc_display_name": "Certificate Management",
       "opc_reference": {
         "cu_id": "2105",
