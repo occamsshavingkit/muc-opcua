@@ -612,6 +612,43 @@
       "opc_cu_5505",
       "opc_cu_5793",
       "opc_cu_address_space_base",
+      "opc_cu_aggregate_interpolative",
+      "opc_cu_aggregate_average",
+      "opc_cu_aggregate_time_average",
+      "opc_cu_aggregate_time_average_2",
+      "opc_cu_aggregate_total",
+      "opc_cu_aggregate_total_2",
+      "opc_cu_aggregate_minimum",
+      "opc_cu_aggregate_maximum",
+      "opc_cu_aggregate_range",
+      "opc_cu_aggregate_minimum_2",
+      "opc_cu_aggregate_maximum_2",
+      "opc_cu_aggregate_count",
+      "opc_cu_aggregate_duration_state_zero",
+      "opc_cu_aggregate_start",
+      "opc_cu_aggregate_end",
+      "opc_cu_aggregate_delta",
+      "opc_cu_aggregate_delta_bounds",
+      "opc_cu_aggregate_duration_good",
+      "opc_cu_aggregate_duration_bad",
+      "opc_cu_aggregate_percent_good",
+      "opc_cu_aggregate_percent_bad",
+      "opc_cu_aggregate_worst_quality",
+      "opc_cu_aggregate_worst_quality_2",
+      "opc_cu_aggregate_annotation_count",
+      "opc_cu_aggregate_min_actual_time",
+      "opc_cu_aggregate_max_actual_time",
+      "opc_cu_aggregate_min_actual_time_2",
+      "opc_cu_aggregate_max_actual_time_2",
+      "opc_cu_aggregate_range_2",
+      "opc_cu_aggregate_duration_state_nonzero",
+      "opc_cu_aggregate_number_transitions",
+      "opc_cu_aggregate_start_bound",
+      "opc_cu_aggregate_end_bound",
+      "opc_cu_aggregate_std_dev_sample",
+      "opc_cu_aggregate_variance_sample",
+      "opc_cu_aggregate_std_dev_population",
+      "opc_cu_aggregate_variance_population",
       "opc_cu_aggregate_full",
       "opc_cu_auditing",
       "opc_cu_base_info_datatypes",
@@ -3910,6 +3947,1042 @@
         "nano": false,
         "standard": false
       }
+    },
+    {
+      "backing_tests": [
+        "test_aggregate",
+        "test_aggregate_full"
+      ],
+      "depends_on": [
+        "MUC_OPCUA_CU_SUBSCRIPTION_STANDARD"
+      ],
+      "id": "opc_cu_aggregate_interpolative",
+      "implementation_state": "claimed",
+      "kconfig_symbol": null,
+      "kind": "conformance_unit",
+      "opc_display_name": "Aggregates - Interpolative",
+      "opc_reference": {
+        "facet": "Core 2022 Server Facet",
+        "section": "4.2.2.3",
+        "spec": "OPC-10000-13"
+      },
+      "profile_defaults": {
+        "custom": false,
+        "embedded": false,
+        "full": true,
+        "micro": false,
+        "nano": false,
+        "standard": false
+      },
+      "satisfied_by": "opc_cu_aggregate_full"
+    },
+    {
+      "backing_tests": [
+        "test_aggregate",
+        "test_aggregate_full"
+      ],
+      "depends_on": [
+        "MUC_OPCUA_CU_SUBSCRIPTION_STANDARD"
+      ],
+      "id": "opc_cu_aggregate_average",
+      "implementation_state": "claimed",
+      "kconfig_symbol": null,
+      "kind": "conformance_unit",
+      "opc_display_name": "Aggregates - Average",
+      "opc_reference": {
+        "facet": "Core 2022 Server Facet",
+        "section": "4.2.2.4",
+        "spec": "OPC-10000-13"
+      },
+      "profile_defaults": {
+        "custom": false,
+        "embedded": false,
+        "full": true,
+        "micro": false,
+        "nano": false,
+        "standard": false
+      },
+      "satisfied_by": "opc_cu_aggregate_full"
+    },
+    {
+      "backing_tests": [
+        "test_aggregate",
+        "test_aggregate_full"
+      ],
+      "depends_on": [
+        "MUC_OPCUA_CU_SUBSCRIPTION_STANDARD"
+      ],
+      "id": "opc_cu_aggregate_time_average",
+      "implementation_state": "claimed",
+      "kconfig_symbol": null,
+      "kind": "conformance_unit",
+      "opc_display_name": "Aggregates - TimeAverage",
+      "opc_reference": {
+        "facet": "Core 2022 Server Facet",
+        "section": "4.2.2.5",
+        "spec": "OPC-10000-13"
+      },
+      "profile_defaults": {
+        "custom": false,
+        "embedded": false,
+        "full": true,
+        "micro": false,
+        "nano": false,
+        "standard": false
+      },
+      "satisfied_by": "opc_cu_aggregate_full"
+    },
+    {
+      "backing_tests": [
+        "test_aggregate",
+        "test_aggregate_full"
+      ],
+      "depends_on": [
+        "MUC_OPCUA_CU_SUBSCRIPTION_STANDARD"
+      ],
+      "id": "opc_cu_aggregate_time_average_2",
+      "implementation_state": "claimed",
+      "kconfig_symbol": null,
+      "kind": "conformance_unit",
+      "opc_display_name": "Aggregates - TimeAverage2",
+      "opc_reference": {
+        "facet": "Core 2022 Server Facet",
+        "section": "4.2.2.6",
+        "spec": "OPC-10000-13"
+      },
+      "profile_defaults": {
+        "custom": false,
+        "embedded": false,
+        "full": true,
+        "micro": false,
+        "nano": false,
+        "standard": false
+      },
+      "satisfied_by": "opc_cu_aggregate_full"
+    },
+    {
+      "backing_tests": [
+        "test_aggregate",
+        "test_aggregate_full"
+      ],
+      "depends_on": [
+        "MUC_OPCUA_CU_SUBSCRIPTION_STANDARD"
+      ],
+      "id": "opc_cu_aggregate_total",
+      "implementation_state": "claimed",
+      "kconfig_symbol": null,
+      "kind": "conformance_unit",
+      "opc_display_name": "Aggregates - Total",
+      "opc_reference": {
+        "facet": "Core 2022 Server Facet",
+        "section": "4.2.2.7",
+        "spec": "OPC-10000-13"
+      },
+      "profile_defaults": {
+        "custom": false,
+        "embedded": false,
+        "full": true,
+        "micro": false,
+        "nano": false,
+        "standard": false
+      },
+      "satisfied_by": "opc_cu_aggregate_full"
+    },
+    {
+      "backing_tests": [
+        "test_aggregate",
+        "test_aggregate_full"
+      ],
+      "depends_on": [
+        "MUC_OPCUA_CU_SUBSCRIPTION_STANDARD"
+      ],
+      "id": "opc_cu_aggregate_total_2",
+      "implementation_state": "claimed",
+      "kconfig_symbol": null,
+      "kind": "conformance_unit",
+      "opc_display_name": "Aggregates - Total2",
+      "opc_reference": {
+        "facet": "Core 2022 Server Facet",
+        "section": "4.2.2.8",
+        "spec": "OPC-10000-13"
+      },
+      "profile_defaults": {
+        "custom": false,
+        "embedded": false,
+        "full": true,
+        "micro": false,
+        "nano": false,
+        "standard": false
+      },
+      "satisfied_by": "opc_cu_aggregate_full"
+    },
+    {
+      "backing_tests": [
+        "test_aggregate",
+        "test_aggregate_full"
+      ],
+      "depends_on": [
+        "MUC_OPCUA_CU_SUBSCRIPTION_STANDARD"
+      ],
+      "id": "opc_cu_aggregate_minimum",
+      "implementation_state": "claimed",
+      "kconfig_symbol": null,
+      "kind": "conformance_unit",
+      "opc_display_name": "Aggregates - Minimum",
+      "opc_reference": {
+        "facet": "Core 2022 Server Facet",
+        "section": "4.2.2.9",
+        "spec": "OPC-10000-13"
+      },
+      "profile_defaults": {
+        "custom": false,
+        "embedded": false,
+        "full": true,
+        "micro": false,
+        "nano": false,
+        "standard": false
+      },
+      "satisfied_by": "opc_cu_aggregate_full"
+    },
+    {
+      "backing_tests": [
+        "test_aggregate",
+        "test_aggregate_full"
+      ],
+      "depends_on": [
+        "MUC_OPCUA_CU_SUBSCRIPTION_STANDARD"
+      ],
+      "id": "opc_cu_aggregate_maximum",
+      "implementation_state": "claimed",
+      "kconfig_symbol": null,
+      "kind": "conformance_unit",
+      "opc_display_name": "Aggregates - Maximum",
+      "opc_reference": {
+        "facet": "Core 2022 Server Facet",
+        "section": "4.2.2.10",
+        "spec": "OPC-10000-13"
+      },
+      "profile_defaults": {
+        "custom": false,
+        "embedded": false,
+        "full": true,
+        "micro": false,
+        "nano": false,
+        "standard": false
+      },
+      "satisfied_by": "opc_cu_aggregate_full"
+    },
+    {
+      "backing_tests": [
+        "test_aggregate",
+        "test_aggregate_full"
+      ],
+      "depends_on": [
+        "MUC_OPCUA_CU_SUBSCRIPTION_STANDARD"
+      ],
+      "id": "opc_cu_aggregate_range",
+      "implementation_state": "claimed",
+      "kconfig_symbol": null,
+      "kind": "conformance_unit",
+      "opc_display_name": "Aggregates - Range",
+      "opc_reference": {
+        "facet": "Core 2022 Server Facet",
+        "section": "4.2.2.13",
+        "spec": "OPC-10000-13"
+      },
+      "profile_defaults": {
+        "custom": false,
+        "embedded": false,
+        "full": true,
+        "micro": false,
+        "nano": false,
+        "standard": false
+      },
+      "satisfied_by": "opc_cu_aggregate_full"
+    },
+    {
+      "backing_tests": [
+        "test_aggregate",
+        "test_aggregate_full"
+      ],
+      "depends_on": [
+        "MUC_OPCUA_CU_SUBSCRIPTION_STANDARD"
+      ],
+      "id": "opc_cu_aggregate_minimum_2",
+      "implementation_state": "claimed",
+      "kconfig_symbol": null,
+      "kind": "conformance_unit",
+      "opc_display_name": "Aggregates - Minimum2",
+      "opc_reference": {
+        "facet": "Core 2022 Server Facet",
+        "section": "4.2.2.14",
+        "spec": "OPC-10000-13"
+      },
+      "profile_defaults": {
+        "custom": false,
+        "embedded": false,
+        "full": true,
+        "micro": false,
+        "nano": false,
+        "standard": false
+      },
+      "satisfied_by": "opc_cu_aggregate_full"
+    },
+    {
+      "backing_tests": [
+        "test_aggregate",
+        "test_aggregate_full"
+      ],
+      "depends_on": [
+        "MUC_OPCUA_CU_SUBSCRIPTION_STANDARD"
+      ],
+      "id": "opc_cu_aggregate_maximum_2",
+      "implementation_state": "claimed",
+      "kconfig_symbol": null,
+      "kind": "conformance_unit",
+      "opc_display_name": "Aggregates - Maximum2",
+      "opc_reference": {
+        "facet": "Core 2022 Server Facet",
+        "section": "4.2.2.15",
+        "spec": "OPC-10000-13"
+      },
+      "profile_defaults": {
+        "custom": false,
+        "embedded": false,
+        "full": true,
+        "micro": false,
+        "nano": false,
+        "standard": false
+      },
+      "satisfied_by": "opc_cu_aggregate_full"
+    },
+    {
+      "backing_tests": [
+        "test_aggregate",
+        "test_aggregate_full"
+      ],
+      "depends_on": [
+        "MUC_OPCUA_CU_SUBSCRIPTION_STANDARD"
+      ],
+      "id": "opc_cu_aggregate_count",
+      "implementation_state": "claimed",
+      "kconfig_symbol": null,
+      "kind": "conformance_unit",
+      "opc_display_name": "Aggregates - Count",
+      "opc_reference": {
+        "facet": "Core 2022 Server Facet",
+        "section": "4.2.2.19",
+        "spec": "OPC-10000-13"
+      },
+      "profile_defaults": {
+        "custom": false,
+        "embedded": false,
+        "full": true,
+        "micro": false,
+        "nano": false,
+        "standard": false
+      },
+      "satisfied_by": "opc_cu_aggregate_full"
+    },
+    {
+      "backing_tests": [
+        "test_aggregate",
+        "test_aggregate_full"
+      ],
+      "depends_on": [
+        "MUC_OPCUA_CU_SUBSCRIPTION_STANDARD"
+      ],
+      "id": "opc_cu_aggregate_duration_state_zero",
+      "implementation_state": "claimed",
+      "kconfig_symbol": null,
+      "kind": "conformance_unit",
+      "opc_display_name": "Aggregates - DurationInStateZero",
+      "opc_reference": {
+        "facet": "Core 2022 Server Facet",
+        "section": "4.2.2.20",
+        "spec": "OPC-10000-13"
+      },
+      "profile_defaults": {
+        "custom": false,
+        "embedded": false,
+        "full": true,
+        "micro": false,
+        "nano": false,
+        "standard": false
+      },
+      "satisfied_by": "opc_cu_aggregate_full"
+    },
+    {
+      "backing_tests": [
+        "test_aggregate",
+        "test_aggregate_full"
+      ],
+      "depends_on": [
+        "MUC_OPCUA_CU_SUBSCRIPTION_STANDARD"
+      ],
+      "id": "opc_cu_aggregate_start",
+      "implementation_state": "claimed",
+      "kconfig_symbol": null,
+      "kind": "conformance_unit",
+      "opc_display_name": "Aggregates - Start",
+      "opc_reference": {
+        "facet": "Core 2022 Server Facet",
+        "section": "4.2.2.23",
+        "spec": "OPC-10000-13"
+      },
+      "profile_defaults": {
+        "custom": false,
+        "embedded": false,
+        "full": true,
+        "micro": false,
+        "nano": false,
+        "standard": false
+      },
+      "satisfied_by": "opc_cu_aggregate_full"
+    },
+    {
+      "backing_tests": [
+        "test_aggregate",
+        "test_aggregate_full"
+      ],
+      "depends_on": [
+        "MUC_OPCUA_CU_SUBSCRIPTION_STANDARD"
+      ],
+      "id": "opc_cu_aggregate_end",
+      "implementation_state": "claimed",
+      "kconfig_symbol": null,
+      "kind": "conformance_unit",
+      "opc_display_name": "Aggregates - End",
+      "opc_reference": {
+        "facet": "Core 2022 Server Facet",
+        "section": "4.2.2.24",
+        "spec": "OPC-10000-13"
+      },
+      "profile_defaults": {
+        "custom": false,
+        "embedded": false,
+        "full": true,
+        "micro": false,
+        "nano": false,
+        "standard": false
+      },
+      "satisfied_by": "opc_cu_aggregate_full"
+    },
+    {
+      "backing_tests": [
+        "test_aggregate",
+        "test_aggregate_full"
+      ],
+      "depends_on": [
+        "MUC_OPCUA_CU_SUBSCRIPTION_STANDARD"
+      ],
+      "id": "opc_cu_aggregate_delta",
+      "implementation_state": "claimed",
+      "kconfig_symbol": null,
+      "kind": "conformance_unit",
+      "opc_display_name": "Aggregates - Delta",
+      "opc_reference": {
+        "facet": "Core 2022 Server Facet",
+        "section": "4.2.2.25",
+        "spec": "OPC-10000-13"
+      },
+      "profile_defaults": {
+        "custom": false,
+        "embedded": false,
+        "full": true,
+        "micro": false,
+        "nano": false,
+        "standard": false
+      },
+      "satisfied_by": "opc_cu_aggregate_full"
+    },
+    {
+      "backing_tests": [
+        "test_aggregate",
+        "test_aggregate_full"
+      ],
+      "depends_on": [
+        "MUC_OPCUA_CU_SUBSCRIPTION_STANDARD"
+      ],
+      "id": "opc_cu_aggregate_delta_bounds",
+      "implementation_state": "claimed",
+      "kconfig_symbol": null,
+      "kind": "conformance_unit",
+      "opc_display_name": "Aggregates - DeltaBounds",
+      "opc_reference": {
+        "facet": "Core 2022 Server Facet",
+        "section": "4.2.2.28",
+        "spec": "OPC-10000-13"
+      },
+      "profile_defaults": {
+        "custom": false,
+        "embedded": false,
+        "full": true,
+        "micro": false,
+        "nano": false,
+        "standard": false
+      },
+      "satisfied_by": "opc_cu_aggregate_full"
+    },
+    {
+      "backing_tests": [
+        "test_aggregate",
+        "test_aggregate_full"
+      ],
+      "depends_on": [
+        "MUC_OPCUA_CU_SUBSCRIPTION_STANDARD"
+      ],
+      "id": "opc_cu_aggregate_duration_good",
+      "implementation_state": "claimed",
+      "kconfig_symbol": null,
+      "kind": "conformance_unit",
+      "opc_display_name": "Aggregates - DurationGood",
+      "opc_reference": {
+        "facet": "Core 2022 Server Facet",
+        "section": "4.2.2.29",
+        "spec": "OPC-10000-13"
+      },
+      "profile_defaults": {
+        "custom": false,
+        "embedded": false,
+        "full": true,
+        "micro": false,
+        "nano": false,
+        "standard": false
+      },
+      "satisfied_by": "opc_cu_aggregate_full"
+    },
+    {
+      "backing_tests": [
+        "test_aggregate",
+        "test_aggregate_full"
+      ],
+      "depends_on": [
+        "MUC_OPCUA_CU_SUBSCRIPTION_STANDARD"
+      ],
+      "id": "opc_cu_aggregate_duration_bad",
+      "implementation_state": "claimed",
+      "kconfig_symbol": null,
+      "kind": "conformance_unit",
+      "opc_display_name": "Aggregates - DurationBad",
+      "opc_reference": {
+        "facet": "Core 2022 Server Facet",
+        "section": "4.2.2.30",
+        "spec": "OPC-10000-13"
+      },
+      "profile_defaults": {
+        "custom": false,
+        "embedded": false,
+        "full": true,
+        "micro": false,
+        "nano": false,
+        "standard": false
+      },
+      "satisfied_by": "opc_cu_aggregate_full"
+    },
+    {
+      "backing_tests": [
+        "test_aggregate",
+        "test_aggregate_full"
+      ],
+      "depends_on": [
+        "MUC_OPCUA_CU_SUBSCRIPTION_STANDARD"
+      ],
+      "id": "opc_cu_aggregate_percent_good",
+      "implementation_state": "claimed",
+      "kconfig_symbol": null,
+      "kind": "conformance_unit",
+      "opc_display_name": "Aggregates - PercentGood",
+      "opc_reference": {
+        "facet": "Core 2022 Server Facet",
+        "section": "4.2.2.31",
+        "spec": "OPC-10000-13"
+      },
+      "profile_defaults": {
+        "custom": false,
+        "embedded": false,
+        "full": true,
+        "micro": false,
+        "nano": false,
+        "standard": false
+      },
+      "satisfied_by": "opc_cu_aggregate_full"
+    },
+    {
+      "backing_tests": [
+        "test_aggregate",
+        "test_aggregate_full"
+      ],
+      "depends_on": [
+        "MUC_OPCUA_CU_SUBSCRIPTION_STANDARD"
+      ],
+      "id": "opc_cu_aggregate_percent_bad",
+      "implementation_state": "claimed",
+      "kconfig_symbol": null,
+      "kind": "conformance_unit",
+      "opc_display_name": "Aggregates - PercentBad",
+      "opc_reference": {
+        "facet": "Core 2022 Server Facet",
+        "section": "4.2.2.32",
+        "spec": "OPC-10000-13"
+      },
+      "profile_defaults": {
+        "custom": false,
+        "embedded": false,
+        "full": true,
+        "micro": false,
+        "nano": false,
+        "standard": false
+      },
+      "satisfied_by": "opc_cu_aggregate_full"
+    },
+    {
+      "backing_tests": [
+        "test_aggregate",
+        "test_aggregate_full"
+      ],
+      "depends_on": [
+        "MUC_OPCUA_CU_SUBSCRIPTION_STANDARD"
+      ],
+      "id": "opc_cu_aggregate_worst_quality",
+      "implementation_state": "claimed",
+      "kconfig_symbol": null,
+      "kind": "conformance_unit",
+      "opc_display_name": "Aggregates - WorstQuality",
+      "opc_reference": {
+        "facet": "Core 2022 Server Facet",
+        "section": "4.2.2.33",
+        "spec": "OPC-10000-13"
+      },
+      "profile_defaults": {
+        "custom": false,
+        "embedded": false,
+        "full": true,
+        "micro": false,
+        "nano": false,
+        "standard": false
+      },
+      "satisfied_by": "opc_cu_aggregate_full"
+    },
+    {
+      "backing_tests": [
+        "test_aggregate",
+        "test_aggregate_full"
+      ],
+      "depends_on": [
+        "MUC_OPCUA_CU_SUBSCRIPTION_STANDARD"
+      ],
+      "id": "opc_cu_aggregate_worst_quality_2",
+      "implementation_state": "claimed",
+      "kconfig_symbol": null,
+      "kind": "conformance_unit",
+      "opc_display_name": "Aggregates - WorstQuality2",
+      "opc_reference": {
+        "facet": "Core 2022 Server Facet",
+        "section": "4.2.2.34",
+        "spec": "OPC-10000-13"
+      },
+      "profile_defaults": {
+        "custom": false,
+        "embedded": false,
+        "full": true,
+        "micro": false,
+        "nano": false,
+        "standard": false
+      },
+      "satisfied_by": "opc_cu_aggregate_full"
+    },
+    {
+      "backing_tests": [
+        "test_aggregate",
+        "test_aggregate_full"
+      ],
+      "depends_on": [
+        "MUC_OPCUA_CU_SUBSCRIPTION_STANDARD"
+      ],
+      "id": "opc_cu_aggregate_annotation_count",
+      "implementation_state": "claimed",
+      "kconfig_symbol": null,
+      "kind": "conformance_unit",
+      "opc_display_name": "Aggregates - AnnotationCount",
+      "opc_reference": {
+        "facet": "Core 2022 Server Facet",
+        "section": "4.2.2.35",
+        "spec": "OPC-10000-13"
+      },
+      "profile_defaults": {
+        "custom": false,
+        "embedded": false,
+        "full": true,
+        "micro": false,
+        "nano": false,
+        "standard": false
+      },
+      "satisfied_by": "opc_cu_aggregate_full"
+    },
+    {
+      "backing_tests": [
+        "test_aggregate",
+        "test_aggregate_full"
+      ],
+      "depends_on": [
+        "MUC_OPCUA_CU_SUBSCRIPTION_STANDARD"
+      ],
+      "id": "opc_cu_aggregate_min_actual_time",
+      "implementation_state": "documented",
+      "kconfig_symbol": null,
+      "kind": "conformance_unit",
+      "opc_display_name": "Aggregates - MinimumActualTime",
+      "opc_reference": {
+        "facet": "Core 2022 Server Facet",
+        "section": "4.2.2.11",
+        "spec": "OPC-10000-13"
+      },
+      "profile_defaults": {
+        "custom": false,
+        "embedded": false,
+        "full": true,
+        "micro": false,
+        "nano": false,
+        "standard": false
+      },
+      "satisfied_by": "opc_cu_aggregate_full"
+    },
+    {
+      "backing_tests": [
+        "test_aggregate",
+        "test_aggregate_full"
+      ],
+      "depends_on": [
+        "MUC_OPCUA_CU_SUBSCRIPTION_STANDARD"
+      ],
+      "id": "opc_cu_aggregate_max_actual_time",
+      "implementation_state": "documented",
+      "kconfig_symbol": null,
+      "kind": "conformance_unit",
+      "opc_display_name": "Aggregates - MaximumActualTime",
+      "opc_reference": {
+        "facet": "Core 2022 Server Facet",
+        "section": "4.2.2.12",
+        "spec": "OPC-10000-13"
+      },
+      "profile_defaults": {
+        "custom": false,
+        "embedded": false,
+        "full": true,
+        "micro": false,
+        "nano": false,
+        "standard": false
+      },
+      "satisfied_by": "opc_cu_aggregate_full"
+    },
+    {
+      "backing_tests": [
+        "test_aggregate",
+        "test_aggregate_full"
+      ],
+      "depends_on": [
+        "MUC_OPCUA_CU_SUBSCRIPTION_STANDARD"
+      ],
+      "id": "opc_cu_aggregate_min_actual_time_2",
+      "implementation_state": "documented",
+      "kconfig_symbol": null,
+      "kind": "conformance_unit",
+      "opc_display_name": "Aggregates - MinimumActualTime2",
+      "opc_reference": {
+        "facet": "Core 2022 Server Facet",
+        "section": "4.2.2.16",
+        "spec": "OPC-10000-13"
+      },
+      "profile_defaults": {
+        "custom": false,
+        "embedded": false,
+        "full": true,
+        "micro": false,
+        "nano": false,
+        "standard": false
+      },
+      "satisfied_by": "opc_cu_aggregate_full"
+    },
+    {
+      "backing_tests": [
+        "test_aggregate",
+        "test_aggregate_full"
+      ],
+      "depends_on": [
+        "MUC_OPCUA_CU_SUBSCRIPTION_STANDARD"
+      ],
+      "id": "opc_cu_aggregate_max_actual_time_2",
+      "implementation_state": "documented",
+      "kconfig_symbol": null,
+      "kind": "conformance_unit",
+      "opc_display_name": "Aggregates - MaximumActualTime2",
+      "opc_reference": {
+        "facet": "Core 2022 Server Facet",
+        "section": "4.2.2.17",
+        "spec": "OPC-10000-13"
+      },
+      "profile_defaults": {
+        "custom": false,
+        "embedded": false,
+        "full": true,
+        "micro": false,
+        "nano": false,
+        "standard": false
+      },
+      "satisfied_by": "opc_cu_aggregate_full"
+    },
+    {
+      "backing_tests": [
+        "test_aggregate",
+        "test_aggregate_full"
+      ],
+      "depends_on": [
+        "MUC_OPCUA_CU_SUBSCRIPTION_STANDARD"
+      ],
+      "id": "opc_cu_aggregate_range_2",
+      "implementation_state": "documented",
+      "kconfig_symbol": null,
+      "kind": "conformance_unit",
+      "opc_display_name": "Aggregates - Range2",
+      "opc_reference": {
+        "facet": "Core 2022 Server Facet",
+        "section": "4.2.2.18",
+        "spec": "OPC-10000-13"
+      },
+      "profile_defaults": {
+        "custom": false,
+        "embedded": false,
+        "full": true,
+        "micro": false,
+        "nano": false,
+        "standard": false
+      },
+      "satisfied_by": "opc_cu_aggregate_full"
+    },
+    {
+      "backing_tests": [
+        "test_aggregate",
+        "test_aggregate_full"
+      ],
+      "depends_on": [
+        "MUC_OPCUA_CU_SUBSCRIPTION_STANDARD"
+      ],
+      "id": "opc_cu_aggregate_duration_state_nonzero",
+      "implementation_state": "documented",
+      "kconfig_symbol": null,
+      "kind": "conformance_unit",
+      "opc_display_name": "Aggregates - DurationInStateNonZero",
+      "opc_reference": {
+        "facet": "Core 2022 Server Facet",
+        "section": "4.2.2.21",
+        "spec": "OPC-10000-13"
+      },
+      "profile_defaults": {
+        "custom": false,
+        "embedded": false,
+        "full": true,
+        "micro": false,
+        "nano": false,
+        "standard": false
+      },
+      "satisfied_by": "opc_cu_aggregate_full"
+    },
+    {
+      "backing_tests": [
+        "test_aggregate",
+        "test_aggregate_full"
+      ],
+      "depends_on": [
+        "MUC_OPCUA_CU_SUBSCRIPTION_STANDARD"
+      ],
+      "id": "opc_cu_aggregate_number_transitions",
+      "implementation_state": "documented",
+      "kconfig_symbol": null,
+      "kind": "conformance_unit",
+      "opc_display_name": "Aggregates - NumberOfTransitions",
+      "opc_reference": {
+        "facet": "Core 2022 Server Facet",
+        "section": "4.2.2.22",
+        "spec": "OPC-10000-13"
+      },
+      "profile_defaults": {
+        "custom": false,
+        "embedded": false,
+        "full": true,
+        "micro": false,
+        "nano": false,
+        "standard": false
+      },
+      "satisfied_by": "opc_cu_aggregate_full"
+    },
+    {
+      "backing_tests": [
+        "test_aggregate",
+        "test_aggregate_full"
+      ],
+      "depends_on": [
+        "MUC_OPCUA_CU_SUBSCRIPTION_STANDARD"
+      ],
+      "id": "opc_cu_aggregate_start_bound",
+      "implementation_state": "documented",
+      "kconfig_symbol": null,
+      "kind": "conformance_unit",
+      "opc_display_name": "Aggregates - StartBound",
+      "opc_reference": {
+        "facet": "Core 2022 Server Facet",
+        "section": "4.2.2.26",
+        "spec": "OPC-10000-13"
+      },
+      "profile_defaults": {
+        "custom": false,
+        "embedded": false,
+        "full": true,
+        "micro": false,
+        "nano": false,
+        "standard": false
+      },
+      "satisfied_by": "opc_cu_aggregate_full"
+    },
+    {
+      "backing_tests": [
+        "test_aggregate",
+        "test_aggregate_full"
+      ],
+      "depends_on": [
+        "MUC_OPCUA_CU_SUBSCRIPTION_STANDARD"
+      ],
+      "id": "opc_cu_aggregate_end_bound",
+      "implementation_state": "documented",
+      "kconfig_symbol": null,
+      "kind": "conformance_unit",
+      "opc_display_name": "Aggregates - EndBound",
+      "opc_reference": {
+        "facet": "Core 2022 Server Facet",
+        "section": "4.2.2.27",
+        "spec": "OPC-10000-13"
+      },
+      "profile_defaults": {
+        "custom": false,
+        "embedded": false,
+        "full": true,
+        "micro": false,
+        "nano": false,
+        "standard": false
+      },
+      "satisfied_by": "opc_cu_aggregate_full"
+    },
+    {
+      "backing_tests": [
+        "test_aggregate",
+        "test_aggregate_full"
+      ],
+      "depends_on": [
+        "MUC_OPCUA_CU_SUBSCRIPTION_STANDARD"
+      ],
+      "id": "opc_cu_aggregate_std_dev_sample",
+      "implementation_state": "documented",
+      "kconfig_symbol": null,
+      "kind": "conformance_unit",
+      "opc_display_name": "Aggregates - StandardDeviationSample",
+      "opc_reference": {
+        "facet": "Core 2022 Server Facet",
+        "section": "4.2.2.36",
+        "spec": "OPC-10000-13"
+      },
+      "profile_defaults": {
+        "custom": false,
+        "embedded": false,
+        "full": true,
+        "micro": false,
+        "nano": false,
+        "standard": false
+      },
+      "satisfied_by": "opc_cu_aggregate_full"
+    },
+    {
+      "backing_tests": [
+        "test_aggregate",
+        "test_aggregate_full"
+      ],
+      "depends_on": [
+        "MUC_OPCUA_CU_SUBSCRIPTION_STANDARD"
+      ],
+      "id": "opc_cu_aggregate_variance_sample",
+      "implementation_state": "documented",
+      "kconfig_symbol": null,
+      "kind": "conformance_unit",
+      "opc_display_name": "Aggregates - VarianceSample",
+      "opc_reference": {
+        "facet": "Core 2022 Server Facet",
+        "section": "4.2.2.37",
+        "spec": "OPC-10000-13"
+      },
+      "profile_defaults": {
+        "custom": false,
+        "embedded": false,
+        "full": true,
+        "micro": false,
+        "nano": false,
+        "standard": false
+      },
+      "satisfied_by": "opc_cu_aggregate_full"
+    },
+    {
+      "backing_tests": [
+        "test_aggregate",
+        "test_aggregate_full"
+      ],
+      "depends_on": [
+        "MUC_OPCUA_CU_SUBSCRIPTION_STANDARD"
+      ],
+      "id": "opc_cu_aggregate_std_dev_population",
+      "implementation_state": "documented",
+      "kconfig_symbol": null,
+      "kind": "conformance_unit",
+      "opc_display_name": "Aggregates - StandardDeviationPopulation",
+      "opc_reference": {
+        "facet": "Core 2022 Server Facet",
+        "section": "4.2.2.38",
+        "spec": "OPC-10000-13"
+      },
+      "profile_defaults": {
+        "custom": false,
+        "embedded": false,
+        "full": true,
+        "micro": false,
+        "nano": false,
+        "standard": false
+      },
+      "satisfied_by": "opc_cu_aggregate_full"
+    },
+    {
+      "backing_tests": [
+        "test_aggregate",
+        "test_aggregate_full"
+      ],
+      "depends_on": [
+        "MUC_OPCUA_CU_SUBSCRIPTION_STANDARD"
+      ],
+      "id": "opc_cu_aggregate_variance_population",
+      "implementation_state": "documented",
+      "kconfig_symbol": null,
+      "kind": "conformance_unit",
+      "opc_display_name": "Aggregates - VariancePopulation",
+      "opc_reference": {
+        "facet": "Core 2022 Server Facet",
+        "section": "4.2.2.39",
+        "spec": "OPC-10000-13"
+      },
+      "profile_defaults": {
+        "custom": false,
+        "embedded": false,
+        "full": true,
+        "micro": false,
+        "nano": false,
+        "standard": false
+      },
+      "satisfied_by": "opc_cu_aggregate_full"
     },
     {
       "backing_tests": [
