@@ -158,6 +158,19 @@ config MUC_OPCUA_CU_UA_SECURE_CONVERSATION
 
 endif
 
+config MUC_OPCUA_MDNS_DISCOVERY
+	bool "mDNS Discovery (LDS Multicast DNS)"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Host-platform mDNS (Multicast DNS) adapter for LDS-less
+	  discovery per OPC-10000-12 Annex A. Sends PTR/SRV/TXT/A records
+	  on 224.0.0.251:5353 so clients can find the server without
+	  a central discovery server. Adds ~2 KB of flash on host builds.
+	  Embedded platforms use their own mDNS provider.
+	  Not mandated by any OPC server profile — only required by the
+	  separate Subnet Discovery Server Facet (id 2069, CU 3171).
+	  OFF for nano/micro/embedded/standard per spec.
+
 menuconfig MUC_OPCUA_FACET_CORE_2022_SERVER
 	bool "Core 2022 Server Facet"
 	default y if MUC_OPCUA_INTERN_PROFILE_NANO_EMBEDDED_DEVICE_2025_SERVER

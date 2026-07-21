@@ -24,7 +24,8 @@
  * (CU 3641) and base-types (CU 3188) claims from those unrelated CUs. */
 #if MUC_OPCUA_CU_BASE_INFO_LOCALTIME || defined(MUC_OPCUA_CU_BASE_INFO_ENGINEERING_UNITS) ||                           \
     defined(MUC_OPCUA_CU_BASE_INFO_CURRENCY) || MUC_OPCUA_CU_BASE_INFO_ARGUMENT_TYPE ||                                \
-    MUC_OPCUA_CU_BASE_INFO_BASE_TYPES || MUC_OPCUA_CU_BASE_INFO_SERVERTYPE
+    MUC_OPCUA_CU_BASE_INFO_BASE_TYPES || MUC_OPCUA_CU_BASE_INFO_SERVERTYPE ||                                          \
+    (MUC_OPCUA_CU_USER_TOKEN_JWT && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION)
 #define MU_HAVE_STRUCTURE_TYPE 1
 #else
 #define MU_HAVE_STRUCTURE_TYPE 0
@@ -37,6 +38,11 @@
 #endif
 static const opcua_byte_t s_str_AggregateFunctions[] = "AggregateFunctions";
 static const opcua_byte_t s_str_Aggregates[] = "Aggregates";
+#if MUC_OPCUA_CU_USER_TOKEN_JWT && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+static const opcua_byte_t s_str_AuthorizationServiceConfigurationDataType[] =
+    "AuthorizationServiceConfigurationDataType";
+static const opcua_byte_t s_str_AuthorizationServiceConfigurationType[] = "AuthorizationServiceConfigurationType";
+#endif
 static const opcua_byte_t s_str_BaseDataType[] = "BaseDataType";
 static const opcua_byte_t s_str_BaseDataVariableType[] = "BaseDataVariableType";
 #if MUC_OPCUA_CU_ADDRESS_SPACE_INTERFACES
@@ -56,7 +62,8 @@ static const opcua_byte_t s_str_DateTime[] = "DateTime";
 static const opcua_byte_t s_str_DefaultInstanceBrowseName[] = "DefaultInstanceBrowseName";
 #endif
 #if MUC_OPCUA_CU_BASE_INFO_LOCALTIME || defined(MUC_OPCUA_CU_BASE_INFO_CURRENCY) ||                                    \
-    MUC_OPCUA_CU_BASE_INFO_ARGUMENT_TYPE || MUC_OPCUA_CU_BASE_INFO_BASE_TYPES || MUC_OPCUA_CU_BASE_INFO_SERVERTYPE
+    MUC_OPCUA_CU_BASE_INFO_ARGUMENT_TYPE || MUC_OPCUA_CU_BASE_INFO_BASE_TYPES || MUC_OPCUA_CU_BASE_INFO_SERVERTYPE ||  \
+    (MUC_OPCUA_CU_USER_TOKEN_JWT && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION)
 static const opcua_byte_t s_str_Default_Binary[] = "Default Binary";
 #endif
 static const opcua_byte_t s_str_Double[] = "Double";
@@ -861,6 +868,9 @@ static const mu_reference_t s_structure_refs[] = {
     {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {11943}}, true}, /* HasSubtype -> EndpointUrlListDataType */
     {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {11944}}, true}, /* HasSubtype -> NetworkGroupDataType */
 #endif
+#if MUC_OPCUA_CU_USER_TOKEN_JWT && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {23744}}, true},
+#endif
 };
 #endif
 
@@ -930,6 +940,10 @@ static const mu_reference_t s_base_object_type_refs[] = {
     ,
     {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {12555}}, true},
     {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {12556}}, true}
+#endif
+#if MUC_OPCUA_CU_USER_TOKEN_JWT && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+    ,
+    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {17852}}, true}
 #endif
 };
 
@@ -2235,7 +2249,8 @@ static const mu_node_t s_base_nodes[] = {
      NULL,
      .type_definition = {0}},
 #endif
-#if MUC_OPCUA_CU_BASE_INFO_ARGUMENT_TYPE || MUC_OPCUA_CU_BASE_INFO_BASE_TYPES || MUC_OPCUA_CU_BASE_INFO_SERVERTYPE
+#if MUC_OPCUA_CU_BASE_INFO_ARGUMENT_TYPE || MUC_OPCUA_CU_BASE_INFO_BASE_TYPES || MUC_OPCUA_CU_BASE_INFO_SERVERTYPE ||  \
+    (MUC_OPCUA_CU_USER_TOKEN_JWT && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION)
     /* CU 3641/3188/3189: HasEncoding ReferenceType (i=38, subtype of NonHierarchicalReferences). */
     {{0, MU_NODEID_NUMERIC, {38}},
      MU_NODECLASS_REFERENCETYPE,
@@ -2343,7 +2358,8 @@ static const mu_node_t s_base_nodes[] = {
      0,
      NULL,
      .type_definition = {0}},
-#if MUC_OPCUA_CU_BASE_INFO_ARGUMENT_TYPE || MUC_OPCUA_CU_BASE_INFO_BASE_TYPES || MUC_OPCUA_CU_BASE_INFO_SERVERTYPE
+#if MUC_OPCUA_CU_BASE_INFO_ARGUMENT_TYPE || MUC_OPCUA_CU_BASE_INFO_BASE_TYPES || MUC_OPCUA_CU_BASE_INFO_SERVERTYPE ||  \
+    (MUC_OPCUA_CU_USER_TOKEN_JWT && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION)
     /* CU 3641/3188/3189: DataTypeEncodingType (i=76, subtype of BaseObjectType) — the
        type definition of every Encoding Object. */
     {{0, MU_NODEID_NUMERIC, {76}},

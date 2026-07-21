@@ -539,8 +539,10 @@ endif()
 # The host TCP adapter uses POSIX sockets; only compile it for the host platform.
 if(MUC_OPCUA_IS_HOST)
     target_sources(muc_opcua PRIVATE platform/host_tcp_adapter.c)
-    target_sources(muc_opcua PRIVATE platform/posix_mdns.c)
-    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_MDNS_DISCOVERY=1)
+    if(MUC_OPCUA_MDNS_DISCOVERY)
+        target_sources(muc_opcua PRIVATE platform/posix_mdns.c)
+        target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_MDNS_DISCOVERY=1)
+    endif()
 
     # The host crypto adapter (SecurityPolicy Basic256Sha256) is backed by OpenSSL.
     if(MUC_OPCUA_SECURE_CHANNEL_CRYPTO)
