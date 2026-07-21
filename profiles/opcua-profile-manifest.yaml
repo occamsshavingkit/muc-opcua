@@ -2229,7 +2229,7 @@
       "backing_tests": [],
       "cu_optional": true,
       "id": "opc_cu_2536",
-      "implementation_state": "unimplemented",
+      "implementation_state": "declared",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Exposes the ContentFilter DataType and its encoding Objects and all its supertypes in the AddressSpace",
@@ -2242,7 +2242,12 @@
         "spec": null
       },
       "profile_defaults": {
-        "custom": false
+        "custom": false,
+        "embedded": false,
+        "full": true,
+        "micro": false,
+        "nano": false,
+        "standard": false
       },
       "satisfied_by": "opc_cu_event_filter_where",
       "source_metadata": {
@@ -2254,7 +2259,7 @@
       "backing_tests": [],
       "cu_optional": false,
       "id": "opc_cu_2928",
-      "implementation_state": "unimplemented",
+      "implementation_state": "declared",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Supports an absolute Deadband filter as a DataChangeFilter for numeric data types.  ",
@@ -2267,7 +2272,12 @@
         "spec": null
       },
       "profile_defaults": {
-        "custom": false
+        "custom": false,
+        "embedded": true,
+        "full": true,
+        "micro": true,
+        "nano": true,
+        "standard": true
       },
       "satisfied_by": "opc_cu_subscription_basic",
       "source_metadata": {
@@ -2279,7 +2289,7 @@
       "backing_tests": [],
       "cu_optional": false,
       "id": "opc_cu_2940",
-      "implementation_state": "unimplemented",
+      "implementation_state": "declared",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "The Server supports obtaining subscription information via GetMonitoredItems Method on the Server object.",
@@ -2292,7 +2302,12 @@
         "spec": null
       },
       "profile_defaults": {
-        "custom": false
+        "custom": false,
+        "embedded": true,
+        "full": true,
+        "micro": false,
+        "nano": false,
+        "standard": true
       },
       "satisfied_by": "opc_cu_subscription_standard",
       "source_metadata": {
@@ -2304,7 +2319,7 @@
       "backing_tests": [],
       "cu_optional": false,
       "id": "opc_cu_2963",
-      "implementation_state": "unimplemented",
+      "implementation_state": "declared",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Support the following MonitoredItem Services: CreateMonitoredItems, ModifyMonitoredItems, DeleteMonitoredItems and SetMonitoringMode.",
@@ -2317,7 +2332,12 @@
         "spec": null
       },
       "profile_defaults": {
-        "custom": false
+        "custom": false,
+        "embedded": true,
+        "full": true,
+        "micro": true,
+        "nano": true,
+        "standard": true
       },
       "satisfied_by": "opc_cu_subscription_basic",
       "source_metadata": {
@@ -2329,7 +2349,7 @@
       "backing_tests": [],
       "cu_optional": false,
       "id": "opc_cu_3146",
-      "implementation_state": "unimplemented",
+      "implementation_state": "declared",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Support the SetTriggering Service to create and/or delete triggering links for a triggering item.",
@@ -2342,7 +2362,12 @@
         "spec": null
       },
       "profile_defaults": {
-        "custom": false
+        "custom": false,
+        "embedded": true,
+        "full": true,
+        "micro": false,
+        "nano": false,
+        "standard": true
       },
       "satisfied_by": "opc_cu_subscription_standard",
       "source_metadata": {
@@ -2354,7 +2379,7 @@
       "backing_tests": [],
       "cu_optional": false,
       "id": "opc_cu_3185",
-      "implementation_state": "unimplemented",
+      "implementation_state": "declared",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Reconciled (spec 080b): the core type-system Folder Nodes Types(86)/ObjectTypes(88)/DataTypes(90)/VariableTypes(89)/ReferenceTypes(91) are exposed in base_nodes.c and asserted by test_type_system. Satisfied by opc_cu_base_info_base_types. Exposes entry points into the type system in the AddressSpace. Specifically, these are the Folder Nodes: Types, ObjectTypes, DataTypes, VariableTypes, and ReferenceTypes.",
@@ -2367,7 +2392,12 @@
         "spec": null
       },
       "profile_defaults": {
-        "custom": false
+        "custom": false,
+        "embedded": true,
+        "full": true,
+        "micro": false,
+        "nano": false,
+        "standard": true
       },
       "satisfied_by": "opc_cu_base_info_base_types",
       "source_metadata": {
@@ -2379,7 +2409,7 @@
       "backing_tests": [],
       "cu_optional": false,
       "id": "opc_cu_3188",
-      "implementation_state": "unimplemented",
+      "implementation_state": "declared",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Reconciled (spec 080b): the full base OPC UA type system is exposed in base_nodes.c and asserted by test_type_system -- all built-in/abstract DataTypes with supertype closure (primitives re-parented under Integer(27)/UInteger(28)/Number(26)), the base Object/Variable/ReferenceTypes, ModellingRuleType(77) + its ModellingRule Objects (78/80/83/11508/11510), and EnumValueType(7594)/Union(12756) with EnumValueType Encoding Objects (7616/8251). Satisfied by opc_cu_base_info_base_types. Supports type information of the base OPC UA concepts, like build-in DataTypes, base Object- and VariableTypes, and base ReferenceTypes. Includes the Encoding Objects for the DataTypes that are not Build-in or abstract DataTypes.\r\nExposes the ObjectTypes BaseObjectType, FolderType, DataTypeEncodingType and ModellingRuleType in the AddressSpace.\r\nExposes the VariableTypes BaseVariableType, PropertyType, and BaseDataVariableType in the AddressSpace.\r\nExposes the DataTypes BaseDataType Boolean, ByteString, DateTime, DataValue, DiagnosticsInfo, Enumeration, ExpandedNodeId, Guid, LocalizedText, NodeId, Number, QualifiedName, String, Structure, XmlElement, Integer, UInteger, Double, Float, Sbyte, Int16, Int32, Int64, Byte, Uint16, Uint32, Uint64, StatusCode, UtcTime, Duration, NumericRange, EnumValueType, and Union and their Encoding Objects in the AddressSpace.\r\nExposes the ReferenceTypes References, HierarchicalReferences, NonHierarchicalReferences, HasChild, Organizes, HasModellingRule, HasTypeDefinition, HasEncoding, Aggregates, HasSubtype, HasComponent, and HasProperty in the AddressSpace\r\nExposes the Objects Optional, Mandatory, OptionalPlaceholder, MandatoryPlaceholder and ExposesItsArrayin the AddressSpace.\r\n",
@@ -2392,7 +2422,12 @@
         "spec": null
       },
       "profile_defaults": {
-        "custom": false
+        "custom": false,
+        "embedded": true,
+        "full": true,
+        "micro": false,
+        "nano": false,
+        "standard": true
       },
       "satisfied_by": "opc_cu_base_info_base_types",
       "source_metadata": {
@@ -2406,7 +2441,7 @@
       ],
       "cu_optional": false,
       "id": "opc_cu_3189",
-      "implementation_state": "implemented",
+      "implementation_state": "claimed",
       "kconfig_symbol": "MUC_OPCUA_CU_BASE_INFO_SERVERTYPE",
       "kind": "conformance_unit",
       "notes": "Exposes the type information of the ServerType and its containing types in the AddressSpace, including all their supertypes. It includes the Encoding Objects for its DataTypes. ",
@@ -2419,7 +2454,12 @@
         "spec": null
       },
       "profile_defaults": {
-        "custom": false
+        "custom": false,
+        "embedded": true,
+        "full": true,
+        "micro": true,
+        "nano": true,
+        "standard": true
       },
       "source_metadata": {
         "profile_group_id": 171,
@@ -2502,7 +2542,7 @@
       "backing_tests": [],
       "cu_optional": false,
       "id": "opc_cu_3532",
-      "implementation_state": "unimplemented",
+      "implementation_state": "declared",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Support at least 2 queue entries for MonitoredItems.\nServers often will adapt the queue size to the number of currently monitored Items. It is expected that Servers support the documented queue capacity for at least one third of the supported MonitoredItems.\n",
@@ -2515,7 +2555,12 @@
         "spec": null
       },
       "profile_defaults": {
-        "custom": false
+        "custom": false,
+        "embedded": true,
+        "full": true,
+        "micro": false,
+        "nano": false,
+        "standard": true
       },
       "satisfied_by": "opc_cu_subscription_standard",
       "source_metadata": {
@@ -2527,7 +2572,7 @@
       "backing_tests": [],
       "cu_optional": false,
       "id": "opc_cu_3544",
-      "implementation_state": "unimplemented",
+      "implementation_state": "declared",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Support the standard Method ResendData to get the latest value of the monitored items of a Subscription.",
@@ -2540,7 +2585,12 @@
         "spec": null
       },
       "profile_defaults": {
-        "custom": false
+        "custom": false,
+        "embedded": true,
+        "full": true,
+        "micro": false,
+        "nano": false,
+        "standard": true
       },
       "satisfied_by": "opc_cu_subscription_standard",
       "source_metadata": {
@@ -2624,7 +2674,7 @@
       "backing_tests": [],
       "cu_optional": false,
       "id": "opc_cu_3641",
-      "implementation_state": "unimplemented",
+      "implementation_state": "declared",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Reconciled (spec 080a): Argument(i=296, subtype of Structure) + its DefaultBinary(298)/DefaultXml(297) Encoding Objects (DataTypeEncodingType 76) exposed in base_nodes.c; test_type_system. Satisfied by opc_cu_base_info_argument_type. Exposes the Argument DataType, its Encoding Objects and all its supertypes in the AddressSpace.",
@@ -2637,7 +2687,12 @@
         "spec": null
       },
       "profile_defaults": {
-        "custom": false
+        "custom": false,
+        "embedded": true,
+        "full": true,
+        "micro": false,
+        "nano": false,
+        "standard": true
       },
       "satisfied_by": "opc_cu_base_info_argument_type",
       "source_metadata": {
@@ -2985,7 +3040,7 @@
       "backing_tests": [],
       "cu_optional": false,
       "id": "opc_cu_3911",
-      "implementation_state": "unimplemented",
+      "implementation_state": "declared",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Reconciled (spec 073): ServerCapabilities exposes AggregateFunctions(2997), MaxSubscriptions(24096), MaxMonitoredItems(24097), MaxSubscriptionsPerSession(24098), MaxMonitoredItemsPerSubscription(24104) + existing MaxMonitoredItemsPerCall(11714) in base_nodes.c (both address-space tables), advertised values == enforced MU_INTERN_* caps; test_operation_limits::test_subscription_capability_nodes_resolve. Satisfied by opc_cu_subscription_basic.\nExposes AggregateFunctions, MaxSubscriptions, MaxMonitoredItems, MaxSubscriptionsPerSession and MaxMonitoredItemsPerSubscription of the ServerCapabilities Object as well as MaxMonitoredItemsPerCall of the OperationLimits Object.",
@@ -2998,7 +3053,12 @@
         "spec": null
       },
       "profile_defaults": {
-        "custom": false
+        "custom": false,
+        "embedded": true,
+        "full": true,
+        "micro": true,
+        "nano": true,
+        "standard": true
       },
       "satisfied_by": "opc_cu_subscription_basic",
       "source_metadata": {
@@ -3010,7 +3070,7 @@
       "backing_tests": [],
       "cu_optional": false,
       "id": "opc_cu_3922",
-      "implementation_state": "unimplemented",
+      "implementation_state": "declared",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Reconciled (spec 073): mu_server_signal_semantic_change (public API) latches per-MonitoredItem; the next DataChange Notification sets StatusCode bit 14 (0x4000, SemanticsChanged) then the one-shot latch clears (notification.c + deadband.c, OPC-10000-4 \u00a77.38.1); test_subscriptions::test_publish_semantics_changed_bit (E2E emit->decode). Satisfied by opc_cu_subscription_basic.\nSupports setting the SemanticsChanged Bit in the statusCode when a semantic change occurs, such as a change in the engineering unit associated with the Value Attribute.",
@@ -3023,7 +3083,12 @@
         "spec": null
       },
       "profile_defaults": {
-        "custom": false
+        "custom": false,
+        "embedded": true,
+        "full": true,
+        "micro": true,
+        "nano": true,
+        "standard": true
       },
       "satisfied_by": "opc_cu_subscription_basic",
       "source_metadata": {
@@ -3107,7 +3172,7 @@
       "backing_tests": [],
       "cu_optional": false,
       "id": "opc_cu_4055",
-      "implementation_state": "unimplemented",
+      "implementation_state": "declared",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Reconciled (spec 073): MaxMonitoredItemsQueueSize(31916) exposed on ServerCapabilities in base_nodes.c, advertised value == MU_INTERN_MONITORED_QUEUE_DEPTH; test_operation_limits::test_subscription_capability_nodes_resolve. Satisfied by opc_cu_subscription_basic.\n Exposes MaxMonitoredItemsQueueSize of the ServerCapabilities Object.",
@@ -3120,7 +3185,12 @@
         "spec": null
       },
       "profile_defaults": {
-        "custom": false
+        "custom": false,
+        "embedded": true,
+        "full": true,
+        "micro": true,
+        "nano": true,
+        "standard": true
       },
       "satisfied_by": "opc_cu_subscription_basic",
       "source_metadata": {
@@ -3132,7 +3202,7 @@
       "backing_tests": [],
       "cu_optional": false,
       "id": "opc_cu_4426",
-      "implementation_state": "unimplemented",
+      "implementation_state": "declared",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Reconciled (spec 079): Decimal(i=50) + its supertype Number(i=26) exposed in base_nodes.c type-system table with HasSubtype closure to BaseDataType; test_type_system. Satisfied by opc_cu_base_info_datatypes. Exposes the DataType Decimal and all its supertypes in the AddressSpace.",
@@ -3145,7 +3215,12 @@
         "spec": null
       },
       "profile_defaults": {
-        "custom": false
+        "custom": false,
+        "embedded": true,
+        "full": true,
+        "micro": false,
+        "nano": false,
+        "standard": true
       },
       "satisfied_by": "opc_cu_base_info_datatypes",
       "source_metadata": {
@@ -3157,7 +3232,7 @@
       "backing_tests": [],
       "cu_optional": false,
       "id": "opc_cu_5207",
-      "implementation_state": "unimplemented",
+      "implementation_state": "declared",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Support at least 2 MonitoredItems per Subscription where the size of each MonitoredItem is at least equal to size of Double.",
@@ -3170,7 +3245,12 @@
         "spec": null
       },
       "profile_defaults": {
-        "custom": false
+        "custom": false,
+        "embedded": true,
+        "full": true,
+        "micro": true,
+        "nano": true,
+        "standard": true
       },
       "satisfied_by": "opc_cu_subscription_basic",
       "source_metadata": {
@@ -3182,7 +3262,7 @@
       "backing_tests": [],
       "cu_optional": false,
       "id": "opc_cu_5208",
-      "implementation_state": "unimplemented",
+      "implementation_state": "declared",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Reconciled (spec 073): MonitoredItem IndexRange is parsed at create (subscription_helpers.c), rejected with Bad_IndexRangeInvalid when malformed, and applied to array samples via apply_numeric_index_range (read_attribute.c) in read_monitored_item_value; test_monitored_index_range (single element, slice, whole-array, out-of-bounds). Satisfied by opc_cu_subscription_basic.\nSupport creation of MonitoredItems for Attribute value changes. This includes support of the IndexRange to select a single element or a range of elements when the Attribute value is an array.\nThis ConformanceUnit does not require queuing when multiple value changes occur during a \"publish period\".\nI.e. the latest change will be sent in the Notification.",
@@ -3195,7 +3275,12 @@
         "spec": null
       },
       "profile_defaults": {
-        "custom": false
+        "custom": false,
+        "embedded": true,
+        "full": true,
+        "micro": true,
+        "nano": true,
+        "standard": true
       },
       "satisfied_by": "opc_cu_subscription_basic",
       "source_metadata": {
@@ -3207,7 +3292,7 @@
       "backing_tests": [],
       "cu_optional": false,
       "id": "opc_cu_5801",
-      "implementation_state": "deferred",
+      "implementation_state": "claimed",
       "kconfig_symbol": "MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION",
       "kind": "conformance_unit",
       "notes": "For each Object provided in the AddressSpace of the Server the ObjectType of the Object shall be provided in the AddressSpace of the Server.\nFor each Variable provided in the AddressSpace of the Server the VariableType and the DataType of the Variable shall be provided in the AddressSpace of the Server.\nFor each Value provided by the Server, which can be a subtype of the one defined in the Variable, the DataType of the Value shall be provided in the AddressSpace of the Server.\nFor each Method Argument provided by the Server the DataType of the Value shall be provided in the AddressSpace of the Server.\nFor each Structure DataType provided by the Server, each DataType used in the Structure shall be provided in the AddressSpace of the Server. \nFor each Reference provided in the AddressSpace of the Server the ReferenceType shall be provided in the AddressSpace of the Server.\nFor each ObjectType, VariableType, ReferenceType, and DataType provided in the AddressSpace of the Server the direct supertype shall be provided in the AddressSpace of the Server. This requires that all supertypes shall be provided in the AddressSpace.\nFor each DataType having encoding information (Structured DataTypes) the Encoding Objects shall be provided in the AddressSpace of the Server.\nFor each VariableType and ObjectType provided in the AddressSpace of the Server, all InstanceDeclarations shall be provided in the AddressSpace of the Server, even if they are optional and not used in any instance of the Server.\nFor each VariableType, ObjectType and DataType all Methods, Objects and Variables that are referenced with a hierarchical Reference either from the VariableType, ObjectType or DataType or an InstanceDeclaration of the ObjectType or VariableType, either directly or indirectly, shall be provided in the AddressSpace of the Server.\nFor all Events provided by the Server, the EventType shall be provided in the AddressSpace of the Server.\n",
@@ -3220,7 +3305,12 @@
         "spec": null
       },
       "profile_defaults": {
-        "custom": false
+        "custom": false,
+        "embedded": true,
+        "full": true,
+        "micro": false,
+        "nano": false,
+        "standard": true
       },
       "source_metadata": {
         "profile_group_id": 171,
@@ -4302,7 +4392,7 @@
       ],
       "cu_optional": false,
       "id": "opc_cu_2317",
-      "implementation_state": "implemented",
+      "implementation_state": "claimed",
       "kconfig_symbol": "MUC_OPCUA_CU_VIEW_TRANSLATEBROWSEPATH",
       "kind": "conformance_unit",
       "notes": "Support TranslateBrowsePathsToNodeIds Service.",
@@ -4315,7 +4405,12 @@
         "spec": "OPC-10000-4"
       },
       "profile_defaults": {
-        "custom": false
+        "custom": false,
+        "embedded": true,
+        "full": true,
+        "micro": true,
+        "nano": true,
+        "standard": true
       },
       "source_metadata": {
         "profile_group_id": 171,
@@ -4329,7 +4424,7 @@
       ],
       "cu_optional": false,
       "id": "opc_cu_2328",
-      "implementation_state": "implemented",
+      "implementation_state": "claimed",
       "kconfig_symbol": "MUC_OPCUA_CU_DISCOVERY_GET_ENDPOINTS",
       "kind": "conformance_unit",
       "notes": "Support the GetEndpoints Service to obtain all Endpoints of the Server.\r\nThis includes filtering based on Profiles.",
@@ -4342,7 +4437,12 @@
         "spec": "OPC-10000-4"
       },
       "profile_defaults": {
-        "custom": false
+        "custom": false,
+        "embedded": true,
+        "full": true,
+        "micro": true,
+        "nano": true,
+        "standard": true
       },
       "source_metadata": {
         "profile_group_id": 171,
@@ -4410,7 +4510,7 @@
       ],
       "cu_optional": true,
       "id": "opc_cu_2400",
-      "implementation_state": "implemented",
+      "implementation_state": "claimed",
       "kconfig_symbol": "MUC_OPCUA_CU_SESSION_CHANGE_USER",
       "kind": "conformance_unit",
       "notes": "Support the use of ActivateSession to change the Session user.",
@@ -4423,7 +4523,12 @@
         "spec": "OPC-10000-4"
       },
       "profile_defaults": {
-        "custom": false
+        "custom": false,
+        "embedded": true,
+        "full": true,
+        "micro": true,
+        "nano": true,
+        "standard": true
       },
       "source_metadata": {
         "profile_group_id": 171,
@@ -4567,7 +4672,9 @@
       }
     },
     {
-      "backing_tests": ["test_role_management"],
+      "backing_tests": [
+        "test_role_management"
+      ],
       "cu_optional": true,
       "id": "opc_cu_2808",
       "implementation_state": "claimed",
@@ -4738,7 +4845,7 @@
       "backing_tests": [],
       "cu_optional": false,
       "id": "opc_cu_3143",
-      "implementation_state": "unimplemented",
+      "implementation_state": "declared",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Reconciled (spec 073): on Publish-queue overflow handle_publish evicts the OLDEST parked request and answers it with Bad_TooManyPublishRequests, then parks the incoming request (publish_request_evict_oldest, publish_due.c; OPC-10000-4 \u00a75.14.5.1); test_subscriptions_capacity::test_publish_queue_overflow_evicts_oldest_and_parks_newest. Satisfied by opc_cu_subscription_basic.\nIf the maximum supported number of PublishRequests has been queued and a new PublishRequest arrives, the \"oldest\" PublishRequest has to be discarded by returning the proper error.",
@@ -4751,7 +4858,12 @@
         "spec": null
       },
       "profile_defaults": {
-        "custom": false
+        "custom": false,
+        "embedded": true,
+        "full": true,
+        "micro": true,
+        "nano": true,
+        "standard": true
       },
       "satisfied_by": "opc_cu_subscription_basic",
       "source_metadata": {
@@ -4850,7 +4962,7 @@
       ],
       "cu_optional": false,
       "id": "opc_cu_3530",
-      "implementation_state": "implemented",
+      "implementation_state": "claimed",
       "kconfig_symbol": "MUC_OPCUA_CU_VIEW_BASIC_2",
       "kind": "conformance_unit",
       "notes": "Support the View Service Set (Browse, BrowseNext). This includes the support of minimum 1 continuation point per Session.",
@@ -4863,7 +4975,12 @@
         "spec": "OPC-10000-4"
       },
       "profile_defaults": {
-        "custom": false
+        "custom": false,
+        "embedded": true,
+        "full": true,
+        "micro": true,
+        "nano": true,
+        "standard": true
       },
       "source_metadata": {
         "profile_group_id": 171,
@@ -4874,7 +4991,7 @@
       "backing_tests": [],
       "cu_optional": false,
       "id": "opc_cu_3534",
-      "implementation_state": "unimplemented",
+      "implementation_state": "declared",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Server supports at least 2 Subscriptions in a single Session.",
@@ -4887,7 +5004,12 @@
         "spec": null
       },
       "profile_defaults": {
-        "custom": false
+        "custom": false,
+        "embedded": true,
+        "full": true,
+        "micro": true,
+        "nano": true,
+        "standard": true
       },
       "satisfied_by": "opc_cu_subscription_basic",
       "source_metadata": {
@@ -4899,7 +5021,7 @@
       "backing_tests": [],
       "cu_optional": false,
       "id": "opc_cu_3535",
-      "implementation_state": "unimplemented",
+      "implementation_state": "declared",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Support a retransmission queue of sent NotificationMessages and the Republish Service. See UA Part 4 for the required size of the retransmission queue. muc-opcua: Republish is implemented and tested; the retransmission store holds the single most-recent NotificationMessage per subscription (profile-targeting minimal capacity), which may not meet CTT multi-message republish depth.",
@@ -4912,7 +5034,12 @@
         "spec": null
       },
       "profile_defaults": {
-        "custom": false
+        "custom": false,
+        "embedded": true,
+        "full": true,
+        "micro": true,
+        "nano": true,
+        "standard": true
       },
       "satisfied_by": "opc_cu_subscription_basic",
       "source_metadata": {
@@ -4924,7 +5051,7 @@
       "backing_tests": [],
       "cu_optional": false,
       "id": "opc_cu_3536",
-      "implementation_state": "unimplemented",
+      "implementation_state": "declared",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Reconciled (spec 078): username/password identity tokens with per-policy (endpoint/UserTokenPolicy) password encryption are decrypted+verified in activate_session.c handle_activate_username; test_user_auth_encrypted, test_user_auth_plaintext, test_user_auth_secure_e2e. Satisfied by opc_cu_user_auth. The Server supports User Name/Password combination(s). The token will be encrypted as required by the security policy of the User Token Policy or by the security policy of the endpoint.",
@@ -4937,7 +5064,12 @@
         "spec": null
       },
       "profile_defaults": {
-        "custom": false
+        "custom": false,
+        "embedded": true,
+        "full": true,
+        "micro": true,
+        "nano": true,
+        "standard": true
       },
       "satisfied_by": "opc_cu_user_auth",
       "source_metadata": {
@@ -4973,7 +5105,7 @@
       "backing_tests": [],
       "cu_optional": false,
       "id": "opc_cu_3727",
-      "implementation_state": "unimplemented",
+      "implementation_state": "declared",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Support the following Subscription Services: CreateSubscription, ModifySubscription, DeleteSubscriptions, Publish, Republish and SetPublishingMode.",
@@ -4986,7 +5118,12 @@
         "spec": null
       },
       "profile_defaults": {
-        "custom": false
+        "custom": false,
+        "embedded": true,
+        "full": true,
+        "micro": true,
+        "nano": true,
+        "standard": true
       },
       "satisfied_by": "opc_cu_subscription_basic",
       "source_metadata": {
@@ -4998,7 +5135,7 @@
       "backing_tests": [],
       "cu_optional": true,
       "id": "opc_cu_3802",
-      "implementation_state": "unimplemented",
+      "implementation_state": "declared",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Supports configuration of the acceptable clock skew.",
@@ -5011,7 +5148,12 @@
         "spec": null
       },
       "profile_defaults": {
-        "custom": false
+        "custom": false,
+        "embedded": true,
+        "full": true,
+        "micro": true,
+        "nano": true,
+        "standard": true
       },
       "satisfied_by": "opc_cu_time_sync",
       "source_metadata": {
@@ -5023,7 +5165,7 @@
       "backing_tests": [],
       "cu_optional": false,
       "id": "opc_cu_3913",
-      "implementation_state": "unimplemented",
+      "implementation_state": "declared",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Support at least 2 Publish Service requests per Session.",
@@ -5036,7 +5178,12 @@
         "spec": null
       },
       "profile_defaults": {
-        "custom": false
+        "custom": false,
+        "embedded": true,
+        "full": true,
+        "micro": true,
+        "nano": true,
+        "standard": true
       },
       "satisfied_by": "opc_cu_subscription_basic",
       "source_metadata": {
@@ -5128,7 +5275,7 @@
       "backing_tests": [],
       "cu_optional": false,
       "id": "opc_cu_5793",
-      "implementation_state": "unimplemented",
+      "implementation_state": "declared",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Support at least one of the optional ConformanceUnits for time synchronization mechanisms in the Security Time Synchronization Facet.\nThe application documentation shall specify which synchronization mechanisms with which profiles are supported.",
@@ -5141,7 +5288,12 @@
         "spec": null
       },
       "profile_defaults": {
-        "custom": false
+        "custom": false,
+        "embedded": true,
+        "full": true,
+        "micro": true,
+        "nano": true,
+        "standard": true
       },
       "satisfied_by": "opc_cu_time_sync",
       "source_metadata": {
@@ -5409,7 +5561,7 @@
       "backing_tests": [],
       "cu_optional": false,
       "id": "opc_cu_2318",
-      "implementation_state": "unimplemented",
+      "implementation_state": "declared",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Reconciled (spec 073): server clamps requested MonitoredItem QueueSize to the compiled max (subscription_monitor.c); tested by test_subscriptions_capacity. Satisfied by subscription_standard.",
@@ -5422,7 +5574,12 @@
         "spec": null
       },
       "profile_defaults": {
-        "custom": false
+        "custom": false,
+        "embedded": true,
+        "full": true,
+        "micro": false,
+        "nano": false,
+        "standard": true
       },
       "satisfied_by": "opc_cu_subscription_standard",
       "source_metadata": {
@@ -5434,7 +5591,7 @@
       "backing_tests": [],
       "cu_optional": false,
       "id": "opc_cu_2515",
-      "implementation_state": "unimplemented",
+      "implementation_state": "declared",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Reconciled (spec 073): address-space-triggered events are queued per subscription and delivered in Publish (notification.c mu_server_trigger_event); tested by test_event_notifications. Satisfied by opc_cu_events.",
@@ -5447,7 +5604,12 @@
         "spec": null
       },
       "profile_defaults": {
-        "custom": false
+        "custom": false,
+        "embedded": false,
+        "full": true,
+        "micro": false,
+        "nano": false,
+        "standard": false
       },
       "satisfied_by": "opc_cu_events",
       "source_metadata": {
@@ -5459,7 +5621,7 @@
       "backing_tests": [],
       "cu_optional": false,
       "id": "opc_cu_3150",
-      "implementation_state": "unimplemented",
+      "implementation_state": "declared",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Reconciled (spec 073): MonitoredItem on the EventNotifier attribute delivers EventFieldLists end-to-end (notification.c); tested by test_event_notifications. Satisfied by opc_cu_events.",
@@ -5472,7 +5634,12 @@
         "spec": null
       },
       "profile_defaults": {
-        "custom": false
+        "custom": false,
+        "embedded": false,
+        "full": true,
+        "micro": false,
+        "nano": false,
+        "standard": false
       },
       "satisfied_by": "opc_cu_events",
       "source_metadata": {
@@ -5484,7 +5651,7 @@
       "backing_tests": [],
       "cu_optional": false,
       "id": "opc_cu_4030",
-      "implementation_state": "unimplemented",
+      "implementation_state": "declared",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Reconciled (spec 073): combined SELECT + WHERE event filter with operator support and unsupported-operator rejection (filter_reader.c + event_filter.c); tested E2E by test_event_notifications. Satisfied by opc_cu_event_filter_where.",
@@ -5497,7 +5664,12 @@
         "spec": null
       },
       "profile_defaults": {
-        "custom": false
+        "custom": false,
+        "embedded": false,
+        "full": true,
+        "micro": false,
+        "nano": false,
+        "standard": false
       },
       "satisfied_by": "opc_cu_event_filter_where",
       "source_metadata": {
@@ -5509,7 +5681,7 @@
       "backing_tests": [],
       "cu_optional": false,
       "id": "opc_cu_2380",
-      "implementation_state": "unimplemented",
+      "implementation_state": "declared",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Reconciled (spec 073): AddNodes service (nodemanagement/dispatch_node_mgmt.c handle_add_nodes -> mu_add_nodes_process); tested by test_node_management (AddNodes decode/encode, duplicate-NodeId). Satisfied by service_nodemanagement.",
@@ -5522,7 +5694,12 @@
         "spec": null
       },
       "profile_defaults": {
-        "custom": false
+        "custom": false,
+        "embedded": false,
+        "full": true,
+        "micro": false,
+        "nano": false,
+        "standard": false
       },
       "satisfied_by": "service_nodemanagement",
       "source_metadata": {
@@ -5534,7 +5711,7 @@
       "backing_tests": [],
       "cu_optional": false,
       "id": "opc_cu_2394",
-      "implementation_state": "unimplemented",
+      "implementation_state": "declared",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Reconciled (spec 073): DeleteNodes service (handle_delete_nodes -> mu_delete_nodes_process); tested by test_node_management. Satisfied by service_nodemanagement.",
@@ -5547,7 +5724,12 @@
         "spec": null
       },
       "profile_defaults": {
-        "custom": false
+        "custom": false,
+        "embedded": false,
+        "full": true,
+        "micro": false,
+        "nano": false,
+        "standard": false
       },
       "satisfied_by": "service_nodemanagement",
       "source_metadata": {
@@ -5559,7 +5741,7 @@
       "backing_tests": [],
       "cu_optional": false,
       "id": "opc_cu_2939",
-      "implementation_state": "unimplemented",
+      "implementation_state": "declared",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Reconciled (spec 073): AddReferences service (handle_add_references -> mu_add_references_process); tested by test_node_management. Satisfied by service_nodemanagement.",
@@ -5572,7 +5754,12 @@
         "spec": null
       },
       "profile_defaults": {
-        "custom": false
+        "custom": false,
+        "embedded": false,
+        "full": true,
+        "micro": false,
+        "nano": false,
+        "standard": false
       },
       "satisfied_by": "service_nodemanagement",
       "source_metadata": {
@@ -5584,7 +5771,7 @@
       "backing_tests": [],
       "cu_optional": false,
       "id": "opc_cu_3153",
-      "implementation_state": "unimplemented",
+      "implementation_state": "declared",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Reconciled (spec 073): DeleteReferences service (handle_delete_references -> mu_delete_references_process); tested by test_node_management (incl. Bad_NotFound). Satisfied by service_nodemanagement.",
@@ -5597,7 +5784,12 @@
         "spec": null
       },
       "profile_defaults": {
-        "custom": false
+        "custom": false,
+        "embedded": false,
+        "full": true,
+        "micro": false,
+        "nano": false,
+        "standard": false
       },
       "satisfied_by": "service_nodemanagement",
       "source_metadata": {
@@ -5609,7 +5801,7 @@
       "backing_tests": [],
       "cu_optional": false,
       "id": "opc_cu_3194",
-      "implementation_state": "unimplemented",
+      "implementation_state": "declared",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Reconciled (spec 074): the Server Object (i=2253) exposes a readable EventNotifier attribute (SubscribeToEvents) so a client can discover it as an event source; read_attribute.c + base_nodes.c, tested by test_read_service::test_read_service_eventnotifier.",
@@ -5622,7 +5814,12 @@
         "spec": null
       },
       "profile_defaults": {
-        "custom": false
+        "custom": false,
+        "embedded": false,
+        "full": true,
+        "micro": false,
+        "nano": false,
+        "standard": false
       },
       "satisfied_by": "opc_cu_events",
       "source_metadata": {
@@ -5634,7 +5831,7 @@
       "backing_tests": [],
       "cu_optional": false,
       "id": "opc_cu_2422",
-      "implementation_state": "unimplemented",
+      "implementation_state": "declared",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Reconciled (spec 074): AuditOpenSecureChannelEvent (i=2060) emitted on OpenSecureChannel (osc_handler.c) and observable via the Server EventNotifier; test_event_notifications. Satisfied by opc_cu_auditing.",
@@ -5647,7 +5844,12 @@
         "spec": null
       },
       "profile_defaults": {
-        "custom": false
+        "custom": false,
+        "embedded": false,
+        "full": true,
+        "micro": false,
+        "nano": false,
+        "standard": false
       },
       "satisfied_by": "opc_cu_auditing",
       "source_metadata": {
@@ -5659,7 +5861,7 @@
       "backing_tests": [],
       "cu_optional": false,
       "id": "opc_cu_3968",
-      "implementation_state": "unimplemented",
+      "implementation_state": "declared",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Reconciled (spec 074): the server emits + delivers AuditEvents for CreateSession/ActivateSession/Write (audited service subset); test_event_notifications. Satisfied by opc_cu_auditing.",
@@ -5672,7 +5874,12 @@
         "spec": null
       },
       "profile_defaults": {
-        "custom": false
+        "custom": false,
+        "embedded": false,
+        "full": true,
+        "micro": false,
+        "nano": false,
+        "standard": false
       },
       "satisfied_by": "opc_cu_auditing",
       "source_metadata": {
@@ -5684,7 +5891,7 @@
       "backing_tests": [],
       "cu_optional": false,
       "id": "opc_cu_3228",
-      "implementation_state": "unimplemented",
+      "implementation_state": "declared",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Reconciled (spec 074): AuditWriteUpdateEvent (i=2100) emitted per successful attribute write (attribute_handler.c) and observable via the Server EventNotifier; test_event_notifications. Satisfied by opc_cu_auditing.",
@@ -5697,7 +5904,12 @@
         "spec": null
       },
       "profile_defaults": {
-        "custom": false
+        "custom": false,
+        "embedded": false,
+        "full": true,
+        "micro": false,
+        "nano": false,
+        "standard": false
       },
       "satisfied_by": "opc_cu_auditing",
       "source_metadata": {
@@ -5768,7 +5980,7 @@
       "backing_tests": [],
       "cu_optional": false,
       "id": "opc_cu_2863",
-      "implementation_state": "unimplemented",
+      "implementation_state": "declared",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Imported from OPC profile REST API 2026-07-15. Capability satisfied via the secure-conversation layer, which implements Basic256Sha256, Aes128_Sha256_RsaOaep, and Aes256_Sha256_RsaPss; Kconfig gates per-profile inclusion.",
@@ -5781,7 +5993,12 @@
         "spec": "OPC-10000-7"
       },
       "profile_defaults": {
-        "custom": false
+        "custom": false,
+        "embedded": true,
+        "full": true,
+        "micro": false,
+        "nano": false,
+        "standard": true
       },
       "satisfied_by": "opc_cu_ua_secure_conversation",
       "source_metadata": {
@@ -5817,7 +6034,7 @@
       "backing_tests": [],
       "cu_optional": true,
       "id": "opc_cu_3721",
-      "implementation_state": "unimplemented",
+      "implementation_state": "declared",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Imported from OPC profile REST API 2026-07-15. Optional. Capability satisfied by MUC_OPCUA_CU_SECURITY_ECC (spec 059); Kconfig gates per-profile inclusion (built in full).",
@@ -5830,7 +6047,12 @@
         "spec": "OPC-10000-7"
       },
       "profile_defaults": {
-        "custom": false
+        "custom": false,
+        "embedded": false,
+        "full": true,
+        "micro": false,
+        "nano": false,
+        "standard": false
       },
       "satisfied_by": "opc_cu_security_ecc",
       "source_metadata": {
@@ -5842,7 +6064,7 @@
       "backing_tests": [],
       "cu_optional": false,
       "id": "opc_cu_3923",
-      "implementation_state": "unimplemented",
+      "implementation_state": "declared",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Imported from OPC profile REST API 2026-07-15. Capability satisfied by MUC_OPCUA_CU_MULTIPLE_CONNECTIONS (multiple parallel sessions); Kconfig gates per-profile inclusion.",
@@ -5855,7 +6077,12 @@
         "spec": "OPC-10000-4"
       },
       "profile_defaults": {
-        "custom": false
+        "custom": false,
+        "embedded": true,
+        "full": true,
+        "micro": true,
+        "nano": true,
+        "standard": true
       },
       "satisfied_by": "opc_cu_multiple_connections",
       "source_metadata": {
