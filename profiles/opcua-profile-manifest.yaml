@@ -1565,7 +1565,7 @@
       "not_applicable": {
         "nano": "Documentation CU; satisfied by documentation presence, not code."
       },
-      "notes": "Documented (spec 078): the core capacities (SecureChannels/Sessions/ContinuationPoints/Subscriptions/PublishRequests/MonitoredItems/queue depth/retransmission) are specified in docs/integration-guide.md §2.2.1 and capacities.h, and discoverable at runtime via the ServerCapabilities/OperationLimits nodes. Documentation CU (no code). The application documentation shall specify the core OPC UA related capacities. This includes the number of supported SecureChannels, Sessions, and Continuation Points for the View Services.\nIf Subscriptions are supported, it shall also include capacity information for Subscriptions and Publish requests, MonitoredItems, retransmission queue, and the queue for sampled MonitoredItems. (Documentation complete; no code change needed.)",
+      "notes": "Documented (spec 078): the core capacities (SecureChannels/Sessions/ContinuationPoints/Subscriptions/PublishRequests/MonitoredItems/queue depth/retransmission) are specified in docs/integration-guide.md \u00a72.2.1 and capacities.h, and discoverable at runtime via the ServerCapabilities/OperationLimits nodes. Documentation CU (no code). The application documentation shall specify the core OPC UA related capacities. This includes the number of supported SecureChannels, Sessions, and Continuation Points for the View Services.\nIf Subscriptions are supported, it shall also include capacity information for Subscriptions and Publish requests, MonitoredItems, retransmission queue, and the queue for sampled MonitoredItems. (Documentation complete; no code change needed.)",
       "opc_display_name": "Documentation - Core Capacities",
       "opc_reference": {
         "cu_id": "3808",
@@ -1786,7 +1786,7 @@
       "kconfig_symbol": "MUC_OPCUA_FACET_USER_TOKEN_USER_NAME_PASSWORD_SERVER",
       "kind": "facet",
       "notes": "User Name Password: Anonymous+UserName auth in activate_session.c",
-      "opc_display_name": "User Token – User Name Password Server Facet",
+      "opc_display_name": "User Token \u2013 User Name Password Server Facet",
       "opc_reference": {
         "profile_id": "1695",
         "profile_uri": "http://opcfoundation.org/UA-Profile/Security/UserToken/Server/UserNamePassword",
@@ -1815,7 +1815,7 @@
       "kconfig_symbol": "MUC_OPCUA_FACET_USER_TOKEN_X509_CERTIFICATE_SERVER",
       "kind": "facet",
       "notes": "X509 Certificate: X509 user token in activate_session.c",
-      "opc_display_name": "User Token – X509 Certificate Server Facet",
+      "opc_display_name": "User Token \u2013 X509 Certificate Server Facet",
       "opc_reference": {
         "profile_id": "1696",
         "profile_uri": "http://opcfoundation.org/UA-Profile/Security/UserToken/Server/X509Certificate",
@@ -3169,7 +3169,7 @@
       "implementation_state": "declared",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
-      "notes": "Reconciled (spec 073): mu_server_signal_semantic_change (public API) latches per-MonitoredItem; the next DataChange Notification sets StatusCode bit 14 (0x4000, SemanticsChanged) then the one-shot latch clears (notification.c + deadband.c, OPC-10000-4 §7.38.1); test_subscriptions::test_publish_semantics_changed_bit (E2E emit->decode). Satisfied by opc_cu_subscription_basic.\nSupports setting the SemanticsChanged Bit in the statusCode when a semantic change occurs, such as a change in the engineering unit associated with the Value Attribute.",
+      "notes": "Reconciled (spec 073): mu_server_signal_semantic_change (public API) latches per-MonitoredItem; the next DataChange Notification sets StatusCode bit 14 (0x4000, SemanticsChanged) then the one-shot latch clears (notification.c + deadband.c, OPC-10000-4 \u00a77.38.1); test_subscriptions::test_publish_semantics_changed_bit (E2E emit->decode). Satisfied by opc_cu_subscription_basic.\nSupports setting the SemanticsChanged Bit in the statusCode when a semantic change occurs, such as a change in the engineering unit associated with the Value Attribute.",
       "opc_display_name": "Base Info SemanticChange Bit",
       "opc_reference": {
         "cu_id": "3922",
@@ -6185,11 +6185,11 @@
       "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
-      "notes": "Application supports time synchronization via features of a standard operating system. | Satisfied by the same time-sync infrastructure as CU 5793; the time adapter provides the OS clock. Stub file exists but is not needed — the base time sync CU covers all sync source variants.",
-      "opc_display_name": "Time Sync – OS based support",
+      "notes": "Application supports time synchronization via features of a standard operating system. | Satisfied by the same time-sync infrastructure as CU 5793; the time adapter provides the OS clock. Stub file exists but is not needed \u2014 the base time sync CU covers all sync source variants.",
+      "opc_display_name": "Time Sync \u2013 OS based support",
       "opc_reference": {
         "cu_id": "2478",
-        "cu_name": "Time Sync – OS based support",
+        "cu_name": "Time Sync \u2013 OS based support",
         "section": null,
         "source_url": "https://profiles.opcfoundation.org",
         "spec": null
@@ -6216,10 +6216,10 @@
       "kconfig_symbol": "MUC_OPCUA_CU_TIME_SYNC_IEEE_1588_PTP",
       "kind": "conformance_unit",
       "notes": "Application supports time synchronization via the Precision Time Protocol (PTP).",
-      "opc_display_name": "Time Sync – IEEE 1588 (PTP)",
+      "opc_display_name": "Time Sync \u2013 IEEE 1588 (PTP)",
       "opc_reference": {
         "cu_id": "2479",
-        "cu_name": "Time Sync – IEEE 1588 (PTP)",
+        "cu_name": "Time Sync \u2013 IEEE 1588 (PTP)",
         "section": null,
         "source_url": "https://profiles.opcfoundation.org",
         "spec": null
@@ -6240,10 +6240,10 @@
       "kconfig_symbol": "MUC_OPCUA_CU_TIME_SYNC_IEEE_802_1AS",
       "kind": "conformance_unit",
       "notes": "Application supports time synchronization via the features described in IEEE 802.1AS.",
-      "opc_display_name": "Time Sync – IEEE 802.1AS",
+      "opc_display_name": "Time Sync \u2013 IEEE 802.1AS",
       "opc_reference": {
         "cu_id": "2480",
-        "cu_name": "Time Sync – IEEE 802.1AS",
+        "cu_name": "Time Sync \u2013 IEEE 802.1AS",
         "section": null,
         "source_url": "https://profiles.opcfoundation.org",
         "spec": null
@@ -6266,10 +6266,10 @@
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Application supports time synchronization via the Network Time Protocol (NTP).",
-      "opc_display_name": "Time Sync – NTP",
+      "opc_display_name": "Time Sync \u2013 NTP",
       "opc_reference": {
         "cu_id": "2786",
-        "cu_name": "Time Sync – NTP",
+        "cu_name": "Time Sync \u2013 NTP",
         "section": null,
         "source_url": "https://profiles.opcfoundation.org",
         "spec": null
@@ -6473,7 +6473,7 @@
       "implementation_state": "declared",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
-      "notes": "Reconciled (spec 073): on Publish-queue overflow handle_publish evicts the OLDEST parked request and answers it with Bad_TooManyPublishRequests, then parks the incoming request (publish_request_evict_oldest, publish_due.c; OPC-10000-4 §5.14.5.1); test_subscriptions_capacity::test_publish_queue_overflow_evicts_oldest_and_parks_newest. Satisfied by opc_cu_subscription_basic.\nIf the maximum supported number of PublishRequests has been queued and a new PublishRequest arrives, the \"oldest\" PublishRequest has to be discarded by returning the proper error.",
+      "notes": "Reconciled (spec 073): on Publish-queue overflow handle_publish evicts the OLDEST parked request and answers it with Bad_TooManyPublishRequests, then parks the incoming request (publish_request_evict_oldest, publish_due.c; OPC-10000-4 \u00a75.14.5.1); test_subscriptions_capacity::test_publish_queue_overflow_evicts_oldest_and_parks_newest. Satisfied by opc_cu_subscription_basic.\nIf the maximum supported number of PublishRequests has been queued and a new PublishRequest arrives, the \"oldest\" PublishRequest has to be discarded by returning the proper error.",
       "opc_display_name": "Subscription PublishRequest Queue Overflow",
       "opc_reference": {
         "cu_id": "3143",
@@ -6883,10 +6883,10 @@
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Satisfied by project-level CU opc_cu_time_sync; UA-based time synchronisation is stubbed in favour of OS/NTP-based sync. See src/cu/core_2022_server/time_sync_ua_based_support/stub.c.disabled.",
-      "opc_display_name": "Time Sync – UA based support",
+      "opc_display_name": "Time Sync \u2013 UA based support",
       "opc_reference": {
         "cu_id": "5505",
-        "cu_name": "Time Sync – UA based support",
+        "cu_name": "Time Sync \u2013 UA based support",
         "section": null,
         "source_url": "https://profiles.opcfoundation.org",
         "spec": null
@@ -8022,10 +8022,10 @@
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Security No Application Authentication not implemented; all sessions require authentication.",
-      "opc_display_name": "Security – No Application Authentication",
+      "opc_display_name": "Security \u2013 No Application Authentication",
       "opc_reference": {
         "cu_id": "5814",
-        "cu_name": "Security – No Application Authentication",
+        "cu_name": "Security \u2013 No Application Authentication",
         "section": null,
         "source_url": "https://profiles.opcfoundation.org",
         "spec": null
@@ -8050,7 +8050,7 @@
       "implementation_state": "claimed",
       "kconfig_symbol": "MUC_OPCUA_CU_KEY_CREDENTIAL_SERVICE",
       "kind": "conformance_unit",
-      "notes": "KeyCredential Service — GetEncryptingKey + CRUD methods implemented in PR #329",
+      "notes": "KeyCredential Service \u2014 GetEncryptingKey + CRUD methods implemented in PR #329",
       "opc_display_name": "KeyCredential Service",
       "opc_reference": {
         "cu_id": "2113",
@@ -8080,7 +8080,7 @@
       "implementation_state": "claimed",
       "kconfig_symbol": "MUC_OPCUA_CU_USER_ROLE_MANAGEMENT",
       "kind": "conformance_unit",
-      "notes": "User Role Management — AddRole/RemoveRole/AddIdentity/RemoveIdentity implemented in PR #330",
+      "notes": "User Role Management \u2014 AddRole/RemoveRole/AddIdentity/RemoveIdentity implemented in PR #330",
       "opc_display_name": "User Role Management",
       "opc_reference": {
         "cu_id": "2080",
@@ -8110,7 +8110,7 @@
       "implementation_state": "claimed",
       "kconfig_symbol": "MUC_OPCUA_CU_CERTIFICATE_MANAGEMENT",
       "kind": "conformance_unit",
-      "notes": "Certificate Management — CertificateGroupType + CertificateType in base_nodes.c",
+      "notes": "Certificate Management \u2014 CertificateGroupType + CertificateType in base_nodes.c",
       "opc_display_name": "Certificate Management",
       "opc_reference": {
         "cu_id": "2105",
@@ -8304,13 +8304,1038 @@
         "nano": false,
         "standard": false
       }
+    },
+    {
+      "backing_tests": [],
+      "cu_optional": true,
+      "id": "opc_cu_2361",
+      "implementation_state": "declared",
+      "kconfig_symbol": null,
+      "kind": "conformance_unit",
+      "notes": "Reconciled (spec 079): satisfied by Data Access (opc_cu_data_access).",
+      "opc_display_name": "Data Access TwoState",
+      "opc_reference": {
+        "cu_id": "2361",
+        "cu_name": "Data Access TwoState",
+        "section": null,
+        "source_url": "https://profiles.opcfoundation.org",
+        "spec": null
+      },
+      "profile_defaults": {
+        "custom": false
+      },
+      "satisfied_by": "opc_cu_data_access",
+      "source_metadata": {
+        "profile_group_id": 171,
+        "source_endpoint": "conformanceunit/?pg=171&all=1"
+      }
+    },
+    {
+      "backing_tests": [],
+      "cu_optional": true,
+      "id": "opc_cu_2399",
+      "implementation_state": "declared",
+      "kconfig_symbol": null,
+      "kind": "conformance_unit",
+      "notes": "Reconciled (spec 079): satisfied by Data Access (opc_cu_data_access).",
+      "opc_display_name": "Data Access Complex Number",
+      "opc_reference": {
+        "cu_id": "2399",
+        "cu_name": "Data Access Complex Number",
+        "section": null,
+        "source_url": "https://profiles.opcfoundation.org",
+        "spec": null
+      },
+      "profile_defaults": {
+        "custom": false
+      },
+      "satisfied_by": "opc_cu_data_access",
+      "source_metadata": {
+        "profile_group_id": 171,
+        "source_endpoint": "conformanceunit/?pg=171&all=1"
+      }
+    },
+    {
+      "backing_tests": [],
+      "cu_optional": true,
+      "id": "opc_cu_2426",
+      "implementation_state": "declared",
+      "kconfig_symbol": null,
+      "kind": "conformance_unit",
+      "notes": "Reconciled (spec 079): satisfied by Data Access (opc_cu_data_access).",
+      "opc_display_name": "Data Access DiscreteItemType",
+      "opc_reference": {
+        "cu_id": "2426",
+        "cu_name": "Data Access DiscreteItemType",
+        "section": null,
+        "source_url": "https://profiles.opcfoundation.org",
+        "spec": null
+      },
+      "profile_defaults": {
+        "custom": false
+      },
+      "satisfied_by": "opc_cu_data_access",
+      "source_metadata": {
+        "profile_group_id": 171,
+        "source_endpoint": "conformanceunit/?pg=171&all=1"
+      }
+    },
+    {
+      "backing_tests": [],
+      "cu_optional": true,
+      "id": "opc_cu_2474",
+      "implementation_state": "declared",
+      "kconfig_symbol": null,
+      "kind": "conformance_unit",
+      "notes": "Reconciled (spec 079): satisfied by Data Access (opc_cu_data_access).",
+      "opc_display_name": "Data Access MultiStateDictionaryEntryDBT",
+      "opc_reference": {
+        "cu_id": "2474",
+        "cu_name": "Data Access MultiStateDictionaryEntryDBT",
+        "section": null,
+        "source_url": "https://profiles.opcfoundation.org",
+        "spec": null
+      },
+      "profile_defaults": {
+        "custom": false
+      },
+      "satisfied_by": "opc_cu_data_access",
+      "source_metadata": {
+        "profile_group_id": 171,
+        "source_endpoint": "conformanceunit/?pg=171&all=1"
+      }
+    },
+    {
+      "backing_tests": [],
+      "cu_optional": true,
+      "id": "opc_cu_2772",
+      "implementation_state": "declared",
+      "kconfig_symbol": null,
+      "kind": "conformance_unit",
+      "notes": "Reconciled (spec 079): satisfied by Data Access (opc_cu_data_access).",
+      "opc_display_name": "Data Access Semantic Changes",
+      "opc_reference": {
+        "cu_id": "2772",
+        "cu_name": "Data Access Semantic Changes",
+        "section": null,
+        "source_url": "https://profiles.opcfoundation.org",
+        "spec": null
+      },
+      "profile_defaults": {
+        "custom": false
+      },
+      "satisfied_by": "opc_cu_data_access",
+      "source_metadata": {
+        "profile_group_id": 171,
+        "source_endpoint": "conformanceunit/?pg=171&all=1"
+      }
+    },
+    {
+      "backing_tests": [],
+      "cu_optional": true,
+      "id": "opc_cu_2776",
+      "implementation_state": "declared",
+      "kconfig_symbol": null,
+      "kind": "conformance_unit",
+      "notes": "Reconciled (spec 079): satisfied by Data Access (opc_cu_data_access).",
+      "opc_display_name": "Data Access ValueAsDictionaryEntries Property",
+      "opc_reference": {
+        "cu_id": "2776",
+        "cu_name": "Data Access ValueAsDictionaryEntries Property",
+        "section": null,
+        "source_url": "https://profiles.opcfoundation.org",
+        "spec": null
+      },
+      "profile_defaults": {
+        "custom": false
+      },
+      "satisfied_by": "opc_cu_data_access",
+      "source_metadata": {
+        "profile_group_id": 171,
+        "source_endpoint": "conformanceunit/?pg=171&all=1"
+      }
+    },
+    {
+      "backing_tests": [],
+      "cu_optional": true,
+      "id": "opc_cu_2831",
+      "implementation_state": "declared",
+      "kconfig_symbol": null,
+      "kind": "conformance_unit",
+      "notes": "Reconciled (spec 079): satisfied by Data Access (opc_cu_data_access).",
+      "opc_display_name": "Data Access MultiStateValueDiscrete",
+      "opc_reference": {
+        "cu_id": "2831",
+        "cu_name": "Data Access MultiStateValueDiscrete",
+        "section": null,
+        "source_url": "https://profiles.opcfoundation.org",
+        "spec": null
+      },
+      "profile_defaults": {
+        "custom": false
+      },
+      "satisfied_by": "opc_cu_data_access",
+      "source_metadata": {
+        "profile_group_id": 171,
+        "source_endpoint": "conformanceunit/?pg=171&all=1"
+      }
+    },
+    {
+      "backing_tests": [],
+      "cu_optional": true,
+      "id": "opc_cu_2984",
+      "implementation_state": "declared",
+      "kconfig_symbol": null,
+      "kind": "conformance_unit",
+      "notes": "Reconciled (spec 079): satisfied by Data Access (opc_cu_data_access).",
+      "opc_display_name": "Data Access DoubleComplex Number",
+      "opc_reference": {
+        "cu_id": "2984",
+        "cu_name": "Data Access DoubleComplex Number",
+        "section": null,
+        "source_url": "https://profiles.opcfoundation.org",
+        "spec": null
+      },
+      "profile_defaults": {
+        "custom": false
+      },
+      "satisfied_by": "opc_cu_data_access",
+      "source_metadata": {
+        "profile_group_id": 171,
+        "source_endpoint": "conformanceunit/?pg=171&all=1"
+      }
+    },
+    {
+      "backing_tests": [],
+      "cu_optional": true,
+      "id": "opc_cu_2988",
+      "implementation_state": "declared",
+      "kconfig_symbol": null,
+      "kind": "conformance_unit",
+      "notes": "Reconciled (spec 079): satisfied by Data Access (opc_cu_data_access).",
+      "opc_display_name": "Data Access MultiState",
+      "opc_reference": {
+        "cu_id": "2988",
+        "cu_name": "Data Access MultiState",
+        "section": null,
+        "source_url": "https://profiles.opcfoundation.org",
+        "spec": null
+      },
+      "profile_defaults": {
+        "custom": false
+      },
+      "satisfied_by": "opc_cu_data_access",
+      "source_metadata": {
+        "profile_group_id": 171,
+        "source_endpoint": "conformanceunit/?pg=171&all=1"
+      }
+    },
+    {
+      "backing_tests": [],
+      "cu_optional": true,
+      "id": "opc_cu_3112",
+      "implementation_state": "declared",
+      "kconfig_symbol": null,
+      "kind": "conformance_unit",
+      "notes": "Reconciled (spec 079): satisfied by Data Access (opc_cu_data_access).",
+      "opc_display_name": "Data Access PercentDeadband",
+      "opc_reference": {
+        "cu_id": "3112",
+        "cu_name": "Data Access PercentDeadband",
+        "section": null,
+        "source_url": "https://profiles.opcfoundation.org",
+        "spec": null
+      },
+      "profile_defaults": {
+        "custom": false
+      },
+      "satisfied_by": "opc_cu_data_access",
+      "source_metadata": {
+        "profile_group_id": 171,
+        "source_endpoint": "conformanceunit/?pg=171&all=1"
+      }
+    },
+    {
+      "backing_tests": [],
+      "cu_optional": true,
+      "id": "opc_cu_3323",
+      "implementation_state": "declared",
+      "kconfig_symbol": null,
+      "kind": "conformance_unit",
+      "notes": "Reconciled (spec 079): satisfied by Data Access (opc_cu_data_access).",
+      "opc_display_name": "Data Access YArrayItemType",
+      "opc_reference": {
+        "cu_id": "3323",
+        "cu_name": "Data Access YArrayItemType",
+        "section": null,
+        "source_url": "https://profiles.opcfoundation.org",
+        "spec": null
+      },
+      "profile_defaults": {
+        "custom": false
+      },
+      "satisfied_by": "opc_cu_data_access",
+      "source_metadata": {
+        "profile_group_id": 171,
+        "source_endpoint": "conformanceunit/?pg=171&all=1"
+      }
+    },
+    {
+      "backing_tests": [],
+      "cu_optional": true,
+      "id": "opc_cu_3324",
+      "implementation_state": "declared",
+      "kconfig_symbol": null,
+      "kind": "conformance_unit",
+      "notes": "Reconciled (spec 079): satisfied by Data Access (opc_cu_data_access).",
+      "opc_display_name": "Data Access XYArrayItemType",
+      "opc_reference": {
+        "cu_id": "3324",
+        "cu_name": "Data Access XYArrayItemType",
+        "section": null,
+        "source_url": "https://profiles.opcfoundation.org",
+        "spec": null
+      },
+      "profile_defaults": {
+        "custom": false
+      },
+      "satisfied_by": "opc_cu_data_access",
+      "source_metadata": {
+        "profile_group_id": 171,
+        "source_endpoint": "conformanceunit/?pg=171&all=1"
+      }
+    },
+    {
+      "backing_tests": [],
+      "cu_optional": true,
+      "id": "opc_cu_3325",
+      "implementation_state": "declared",
+      "kconfig_symbol": null,
+      "kind": "conformance_unit",
+      "notes": "Reconciled (spec 079): satisfied by Data Access (opc_cu_data_access).",
+      "opc_display_name": "Data Access ImageItemType",
+      "opc_reference": {
+        "cu_id": "3325",
+        "cu_name": "Data Access ImageItemType",
+        "section": null,
+        "source_url": "https://profiles.opcfoundation.org",
+        "spec": null
+      },
+      "profile_defaults": {
+        "custom": false
+      },
+      "satisfied_by": "opc_cu_data_access",
+      "source_metadata": {
+        "profile_group_id": 171,
+        "source_endpoint": "conformanceunit/?pg=171&all=1"
+      }
+    },
+    {
+      "backing_tests": [],
+      "cu_optional": true,
+      "id": "opc_cu_3326",
+      "implementation_state": "declared",
+      "kconfig_symbol": null,
+      "kind": "conformance_unit",
+      "notes": "Reconciled (spec 079): satisfied by Data Access (opc_cu_data_access).",
+      "opc_display_name": "Data Access CubeItemType",
+      "opc_reference": {
+        "cu_id": "3326",
+        "cu_name": "Data Access CubeItemType",
+        "section": null,
+        "source_url": "https://profiles.opcfoundation.org",
+        "spec": null
+      },
+      "profile_defaults": {
+        "custom": false
+      },
+      "satisfied_by": "opc_cu_data_access",
+      "source_metadata": {
+        "profile_group_id": 171,
+        "source_endpoint": "conformanceunit/?pg=171&all=1"
+      }
+    },
+    {
+      "backing_tests": [],
+      "cu_optional": true,
+      "id": "opc_cu_3327",
+      "implementation_state": "declared",
+      "kconfig_symbol": null,
+      "kind": "conformance_unit",
+      "notes": "Reconciled (spec 079): satisfied by Data Access (opc_cu_data_access).",
+      "opc_display_name": "Data Access NDimensionArrayItemType",
+      "opc_reference": {
+        "cu_id": "3327",
+        "cu_name": "Data Access NDimensionArrayItemType",
+        "section": null,
+        "source_url": "https://profiles.opcfoundation.org",
+        "spec": null
+      },
+      "profile_defaults": {
+        "custom": false
+      },
+      "satisfied_by": "opc_cu_data_access",
+      "source_metadata": {
+        "profile_group_id": 171,
+        "source_endpoint": "conformanceunit/?pg=171&all=1"
+      }
+    },
+    {
+      "backing_tests": [],
+      "cu_optional": true,
+      "id": "opc_cu_3328",
+      "implementation_state": "declared",
+      "kconfig_symbol": null,
+      "kind": "conformance_unit",
+      "notes": "Reconciled (spec 079): satisfied by Data Access (opc_cu_data_access).",
+      "opc_display_name": "Data Access AxisInformationType",
+      "opc_reference": {
+        "cu_id": "3328",
+        "cu_name": "Data Access AxisInformationType",
+        "section": null,
+        "source_url": "https://profiles.opcfoundation.org",
+        "spec": null
+      },
+      "profile_defaults": {
+        "custom": false
+      },
+      "satisfied_by": "opc_cu_data_access",
+      "source_metadata": {
+        "profile_group_id": 171,
+        "source_endpoint": "conformanceunit/?pg=171&all=1"
+      }
+    },
+    {
+      "backing_tests": [],
+      "cu_optional": false,
+      "id": "opc_cu_3565",
+      "implementation_state": "declared",
+      "kconfig_symbol": null,
+      "kind": "conformance_unit",
+      "notes": "Reconciled (spec 079): satisfied by Data Access (opc_cu_data_access).",
+      "opc_display_name": "Data Access DataItems",
+      "opc_reference": {
+        "cu_id": "3565",
+        "cu_name": "Data Access DataItems",
+        "section": null,
+        "source_url": "https://profiles.opcfoundation.org",
+        "spec": null
+      },
+      "profile_defaults": {
+        "custom": false
+      },
+      "satisfied_by": "opc_cu_data_access",
+      "source_metadata": {
+        "profile_group_id": 171,
+        "source_endpoint": "conformanceunit/?pg=171&all=1"
+      }
+    },
+    {
+      "backing_tests": [],
+      "cu_optional": true,
+      "id": "opc_cu_3566",
+      "implementation_state": "declared",
+      "kconfig_symbol": null,
+      "kind": "conformance_unit",
+      "notes": "Reconciled (spec 079): satisfied by Data Access (opc_cu_data_access).",
+      "opc_display_name": "Data Access BaseAnalogType",
+      "opc_reference": {
+        "cu_id": "3566",
+        "cu_name": "Data Access BaseAnalogType",
+        "section": null,
+        "source_url": "https://profiles.opcfoundation.org",
+        "spec": null
+      },
+      "profile_defaults": {
+        "custom": false
+      },
+      "satisfied_by": "opc_cu_data_access",
+      "source_metadata": {
+        "profile_group_id": 171,
+        "source_endpoint": "conformanceunit/?pg=171&all=1"
+      }
+    },
+    {
+      "backing_tests": [],
+      "cu_optional": true,
+      "id": "opc_cu_3567",
+      "implementation_state": "declared",
+      "kconfig_symbol": null,
+      "kind": "conformance_unit",
+      "notes": "Reconciled (spec 079): satisfied by Data Access (opc_cu_data_access).",
+      "opc_display_name": "Data Access AnalogItemType",
+      "opc_reference": {
+        "cu_id": "3567",
+        "cu_name": "Data Access AnalogItemType",
+        "section": null,
+        "source_url": "https://profiles.opcfoundation.org",
+        "spec": null
+      },
+      "profile_defaults": {
+        "custom": false
+      },
+      "satisfied_by": "opc_cu_data_access",
+      "source_metadata": {
+        "profile_group_id": 171,
+        "source_endpoint": "conformanceunit/?pg=171&all=1"
+      }
+    },
+    {
+      "backing_tests": [],
+      "cu_optional": true,
+      "id": "opc_cu_3568",
+      "implementation_state": "declared",
+      "kconfig_symbol": null,
+      "kind": "conformance_unit",
+      "notes": "Reconciled (spec 079): satisfied by Data Access (opc_cu_data_access).",
+      "opc_display_name": "Data Access AnalogUnitType",
+      "opc_reference": {
+        "cu_id": "3568",
+        "cu_name": "Data Access AnalogUnitType",
+        "section": null,
+        "source_url": "https://profiles.opcfoundation.org",
+        "spec": null
+      },
+      "profile_defaults": {
+        "custom": false
+      },
+      "satisfied_by": "opc_cu_data_access",
+      "source_metadata": {
+        "profile_group_id": 171,
+        "source_endpoint": "conformanceunit/?pg=171&all=1"
+      }
+    },
+    {
+      "backing_tests": [],
+      "cu_optional": true,
+      "id": "opc_cu_3569",
+      "implementation_state": "declared",
+      "kconfig_symbol": null,
+      "kind": "conformance_unit",
+      "notes": "Reconciled (spec 079): satisfied by Data Access (opc_cu_data_access).",
+      "opc_display_name": "Data Access AnalogUnitRangeType",
+      "opc_reference": {
+        "cu_id": "3569",
+        "cu_name": "Data Access AnalogUnitRangeType",
+        "section": null,
+        "source_url": "https://profiles.opcfoundation.org",
+        "spec": null
+      },
+      "profile_defaults": {
+        "custom": false
+      },
+      "satisfied_by": "opc_cu_data_access",
+      "source_metadata": {
+        "profile_group_id": 171,
+        "source_endpoint": "conformanceunit/?pg=171&all=1"
+      }
+    },
+    {
+      "backing_tests": [],
+      "cu_optional": true,
+      "id": "opc_cu_3786",
+      "implementation_state": "declared",
+      "kconfig_symbol": null,
+      "kind": "conformance_unit",
+      "notes": "Reconciled (spec 079): satisfied by Data Access (opc_cu_data_access).",
+      "opc_display_name": "Data Access ArrayItem2Type",
+      "opc_reference": {
+        "cu_id": "3786",
+        "cu_name": "Data Access ArrayItem2Type",
+        "section": null,
+        "source_url": "https://profiles.opcfoundation.org",
+        "spec": null
+      },
+      "profile_defaults": {
+        "custom": false
+      },
+      "satisfied_by": "opc_cu_data_access",
+      "source_metadata": {
+        "profile_group_id": 171,
+        "source_endpoint": "conformanceunit/?pg=171&all=1"
+      }
+    },
+    {
+      "backing_tests": [],
+      "cu_optional": false,
+      "id": "opc_cu_2489",
+      "implementation_state": "declared",
+      "kconfig_symbol": null,
+      "kind": "conformance_unit",
+      "notes": "Reconciled: satisfied by service_nodemanagement.",
+      "opc_display_name": "Base Info Node Management Capabilities",
+      "opc_reference": {
+        "cu_id": "2489",
+        "cu_name": "Base Info Node Management Capabilities",
+        "section": null,
+        "source_url": "https://profiles.opcfoundation.org",
+        "spec": null
+      },
+      "profile_defaults": {
+        "custom": false
+      },
+      "satisfied_by": "service_nodemanagement",
+      "source_metadata": {
+        "profile_group_id": 171,
+        "source_endpoint": "conformanceunit/?pg=171&all=1"
+      }
+    },
+    {
+      "backing_tests": [],
+      "cu_optional": true,
+      "id": "opc_cu_2649",
+      "implementation_state": "declared",
+      "kconfig_symbol": null,
+      "kind": "conformance_unit",
+      "notes": "Reconciled: satisfied by opc_cu_base_info_datatypes.",
+      "opc_display_name": "Base Info Choice States",
+      "opc_reference": {
+        "cu_id": "2649",
+        "cu_name": "Base Info Choice States",
+        "section": null,
+        "source_url": "https://profiles.opcfoundation.org",
+        "spec": null
+      },
+      "profile_defaults": {
+        "custom": false
+      },
+      "satisfied_by": "opc_cu_base_info_datatypes",
+      "source_metadata": {
+        "profile_group_id": 171,
+        "source_endpoint": "conformanceunit/?pg=171&all=1"
+      }
+    },
+    {
+      "backing_tests": [],
+      "cu_optional": true,
+      "id": "opc_cu_2747",
+      "implementation_state": "declared",
+      "kconfig_symbol": null,
+      "kind": "conformance_unit",
+      "notes": "Reconciled: satisfied by opc_cu_base_info_base_types.",
+      "opc_display_name": "Base Info System Status Underlying System",
+      "opc_reference": {
+        "cu_id": "2747",
+        "cu_name": "Base Info System Status Underlying System",
+        "section": null,
+        "source_url": "https://profiles.opcfoundation.org",
+        "spec": null
+      },
+      "profile_defaults": {
+        "custom": false
+      },
+      "satisfied_by": "opc_cu_base_info_base_types",
+      "source_metadata": {
+        "profile_group_id": 171,
+        "source_endpoint": "conformanceunit/?pg=171&all=1"
+      }
+    },
+    {
+      "backing_tests": [],
+      "cu_optional": true,
+      "id": "opc_cu_2813",
+      "implementation_state": "declared",
+      "kconfig_symbol": null,
+      "kind": "conformance_unit",
+      "notes": "Reconciled: satisfied by opc_cu_base_info_datatypes.",
+      "opc_display_name": "Base Info Available States and Transitions",
+      "opc_reference": {
+        "cu_id": "2813",
+        "cu_name": "Base Info Available States and Transitions",
+        "section": null,
+        "source_url": "https://profiles.opcfoundation.org",
+        "spec": null
+      },
+      "profile_defaults": {
+        "custom": false
+      },
+      "satisfied_by": "opc_cu_base_info_datatypes",
+      "source_metadata": {
+        "profile_group_id": 171,
+        "source_endpoint": "conformanceunit/?pg=171&all=1"
+      }
+    },
+    {
+      "backing_tests": [],
+      "cu_optional": true,
+      "id": "opc_cu_2814",
+      "implementation_state": "declared",
+      "kconfig_symbol": null,
+      "kind": "conformance_unit",
+      "notes": "Reconciled: satisfied by opc_cu_base_info_datatypes.",
+      "opc_display_name": "Base Info Finite State Machine Instance",
+      "opc_reference": {
+        "cu_id": "2814",
+        "cu_name": "Base Info Finite State Machine Instance",
+        "section": null,
+        "source_url": "https://profiles.opcfoundation.org",
+        "spec": null
+      },
+      "profile_defaults": {
+        "custom": false
+      },
+      "satisfied_by": "opc_cu_base_info_datatypes",
+      "source_metadata": {
+        "profile_group_id": 171,
+        "source_endpoint": "conformanceunit/?pg=171&all=1"
+      }
+    },
+    {
+      "backing_tests": [],
+      "cu_optional": true,
+      "id": "opc_cu_2822",
+      "implementation_state": "declared",
+      "kconfig_symbol": null,
+      "kind": "conformance_unit",
+      "notes": "Reconciled: satisfied by opc_cu_base_info_base_types.",
+      "opc_display_name": "Base Info Device Failure",
+      "opc_reference": {
+        "cu_id": "2822",
+        "cu_name": "Base Info Device Failure",
+        "section": null,
+        "source_url": "https://profiles.opcfoundation.org",
+        "spec": null
+      },
+      "profile_defaults": {
+        "custom": false
+      },
+      "satisfied_by": "opc_cu_base_info_base_types",
+      "source_metadata": {
+        "profile_group_id": 171,
+        "source_endpoint": "conformanceunit/?pg=171&all=1"
+      }
+    },
+    {
+      "backing_tests": [],
+      "cu_optional": true,
+      "id": "opc_cu_2978",
+      "implementation_state": "declared",
+      "kconfig_symbol": null,
+      "kind": "conformance_unit",
+      "notes": "Reconciled: satisfied by opc_cu_base_info_datatypes.",
+      "opc_display_name": "Base Info SemanticChange",
+      "opc_reference": {
+        "cu_id": "2978",
+        "cu_name": "Base Info SemanticChange",
+        "section": null,
+        "source_url": "https://profiles.opcfoundation.org",
+        "spec": null
+      },
+      "profile_defaults": {
+        "custom": false
+      },
+      "satisfied_by": "opc_cu_base_info_datatypes",
+      "source_metadata": {
+        "profile_group_id": 171,
+        "source_endpoint": "conformanceunit/?pg=171&all=1"
+      }
+    },
+    {
+      "backing_tests": [],
+      "cu_optional": true,
+      "id": "opc_cu_3199",
+      "implementation_state": "declared",
+      "kconfig_symbol": null,
+      "kind": "conformance_unit",
+      "notes": "Reconciled: satisfied by opc_cu_base_info_base_types.",
+      "opc_display_name": "Base Info System Status",
+      "opc_reference": {
+        "cu_id": "3199",
+        "cu_name": "Base Info System Status",
+        "section": null,
+        "source_url": "https://profiles.opcfoundation.org",
+        "spec": null
+      },
+      "profile_defaults": {
+        "custom": false
+      },
+      "satisfied_by": "opc_cu_base_info_base_types",
+      "source_metadata": {
+        "profile_group_id": 171,
+        "source_endpoint": "conformanceunit/?pg=171&all=1"
+      }
+    },
+    {
+      "backing_tests": [],
+      "cu_optional": true,
+      "id": "opc_cu_3206",
+      "implementation_state": "declared",
+      "kconfig_symbol": null,
+      "kind": "conformance_unit",
+      "notes": "Reconciled: satisfied by opc_cu_base_info_datatypes.",
+      "opc_display_name": "Base Info EventQueueOverflow EventType",
+      "opc_reference": {
+        "cu_id": "3206",
+        "cu_name": "Base Info EventQueueOverflow EventType",
+        "section": null,
+        "source_url": "https://profiles.opcfoundation.org",
+        "spec": null
+      },
+      "profile_defaults": {
+        "custom": false
+      },
+      "satisfied_by": "opc_cu_base_info_datatypes",
+      "source_metadata": {
+        "profile_group_id": 171,
+        "source_endpoint": "conformanceunit/?pg=171&all=1"
+      }
+    },
+    {
+      "backing_tests": [],
+      "cu_optional": true,
+      "id": "opc_cu_3210",
+      "implementation_state": "declared",
+      "kconfig_symbol": null,
+      "kind": "conformance_unit",
+      "notes": "Reconciled: satisfied by opc_cu_base_info_datatypes.",
+      "opc_display_name": "Base Info FileType Write",
+      "opc_reference": {
+        "cu_id": "3210",
+        "cu_name": "Base Info FileType Write",
+        "section": null,
+        "source_url": "https://profiles.opcfoundation.org",
+        "spec": null
+      },
+      "profile_defaults": {
+        "custom": false
+      },
+      "satisfied_by": "opc_cu_base_info_datatypes",
+      "source_metadata": {
+        "profile_group_id": 171,
+        "source_endpoint": "conformanceunit/?pg=171&all=1"
+      }
+    },
+    {
+      "backing_tests": [],
+      "cu_optional": true,
+      "id": "opc_cu_3211",
+      "implementation_state": "declared",
+      "kconfig_symbol": null,
+      "kind": "conformance_unit",
+      "notes": "Reconciled: satisfied by opc_cu_base_info_datatypes.",
+      "opc_display_name": "Base Info FileDirectoryType Base",
+      "opc_reference": {
+        "cu_id": "3211",
+        "cu_name": "Base Info FileDirectoryType Base",
+        "section": null,
+        "source_url": "https://profiles.opcfoundation.org",
+        "spec": null
+      },
+      "profile_defaults": {
+        "custom": false
+      },
+      "satisfied_by": "opc_cu_base_info_datatypes",
+      "source_metadata": {
+        "profile_group_id": 171,
+        "source_endpoint": "conformanceunit/?pg=171&all=1"
+      }
+    },
+    {
+      "backing_tests": [],
+      "cu_optional": true,
+      "id": "opc_cu_3546",
+      "implementation_state": "declared",
+      "kconfig_symbol": null,
+      "kind": "conformance_unit",
+      "notes": "Reconciled: satisfied by opc_cu_base_info_datatypes.",
+      "opc_display_name": "Base Info LocalTime Events",
+      "opc_reference": {
+        "cu_id": "3546",
+        "cu_name": "Base Info LocalTime Events",
+        "section": null,
+        "source_url": "https://profiles.opcfoundation.org",
+        "spec": null
+      },
+      "profile_defaults": {
+        "custom": false
+      },
+      "satisfied_by": "opc_cu_base_info_datatypes",
+      "source_metadata": {
+        "profile_group_id": 171,
+        "source_endpoint": "conformanceunit/?pg=171&all=1"
+      }
+    },
+    {
+      "backing_tests": [],
+      "cu_optional": true,
+      "id": "opc_cu_3549",
+      "implementation_state": "declared",
+      "kconfig_symbol": null,
+      "kind": "conformance_unit",
+      "notes": "Reconciled: satisfied by opc_cu_base_info_datatypes.",
+      "opc_display_name": "Base Info OrderedList Change Notification",
+      "opc_reference": {
+        "cu_id": "3549",
+        "cu_name": "Base Info OrderedList Change Notification",
+        "section": null,
+        "source_url": "https://profiles.opcfoundation.org",
+        "spec": null
+      },
+      "profile_defaults": {
+        "custom": false
+      },
+      "satisfied_by": "opc_cu_base_info_datatypes",
+      "source_metadata": {
+        "profile_group_id": 171,
+        "source_endpoint": "conformanceunit/?pg=171&all=1"
+      }
+    },
+    {
+      "backing_tests": [],
+      "cu_optional": true,
+      "id": "opc_cu_3810",
+      "implementation_state": "declared",
+      "kconfig_symbol": null,
+      "kind": "conformance_unit",
+      "notes": "Reconciled: satisfied by opc_cu_base_info_datatypes.",
+      "opc_display_name": "Base Info TemporaryFileTransferType Sync Read",
+      "opc_reference": {
+        "cu_id": "3810",
+        "cu_name": "Base Info TemporaryFileTransferType Sync Read",
+        "section": null,
+        "source_url": "https://profiles.opcfoundation.org",
+        "spec": null
+      },
+      "profile_defaults": {
+        "custom": false
+      },
+      "satisfied_by": "opc_cu_base_info_datatypes",
+      "source_metadata": {
+        "profile_group_id": 171,
+        "source_endpoint": "conformanceunit/?pg=171&all=1"
+      }
+    },
+    {
+      "backing_tests": [],
+      "cu_optional": true,
+      "id": "opc_cu_3811",
+      "implementation_state": "declared",
+      "kconfig_symbol": null,
+      "kind": "conformance_unit",
+      "notes": "Reconciled: satisfied by opc_cu_base_info_datatypes.",
+      "opc_display_name": "Base Info TemporaryFileTransferType Async Read",
+      "opc_reference": {
+        "cu_id": "3811",
+        "cu_name": "Base Info TemporaryFileTransferType Async Read",
+        "section": null,
+        "source_url": "https://profiles.opcfoundation.org",
+        "spec": null
+      },
+      "profile_defaults": {
+        "custom": false
+      },
+      "satisfied_by": "opc_cu_base_info_datatypes",
+      "source_metadata": {
+        "profile_group_id": 171,
+        "source_endpoint": "conformanceunit/?pg=171&all=1"
+      }
+    },
+    {
+      "backing_tests": [],
+      "cu_optional": true,
+      "id": "opc_cu_3812",
+      "implementation_state": "declared",
+      "kconfig_symbol": null,
+      "kind": "conformance_unit",
+      "notes": "Reconciled: satisfied by opc_cu_base_info_datatypes.",
+      "opc_display_name": "Base Info TemporaryFileTransferType Sync Write",
+      "opc_reference": {
+        "cu_id": "3812",
+        "cu_name": "Base Info TemporaryFileTransferType Sync Write",
+        "section": null,
+        "source_url": "https://profiles.opcfoundation.org",
+        "spec": null
+      },
+      "profile_defaults": {
+        "custom": false
+      },
+      "satisfied_by": "opc_cu_base_info_datatypes",
+      "source_metadata": {
+        "profile_group_id": 171,
+        "source_endpoint": "conformanceunit/?pg=171&all=1"
+      }
+    },
+    {
+      "backing_tests": [],
+      "cu_optional": true,
+      "id": "opc_cu_3813",
+      "implementation_state": "declared",
+      "kconfig_symbol": null,
+      "kind": "conformance_unit",
+      "notes": "Reconciled: satisfied by opc_cu_base_info_datatypes.",
+      "opc_display_name": "Base Info TemporaryFileTransferType Async Write",
+      "opc_reference": {
+        "cu_id": "3813",
+        "cu_name": "Base Info TemporaryFileTransferType Async Write",
+        "section": null,
+        "source_url": "https://profiles.opcfoundation.org",
+        "spec": null
+      },
+      "profile_defaults": {
+        "custom": false
+      },
+      "satisfied_by": "opc_cu_base_info_datatypes",
+      "source_metadata": {
+        "profile_group_id": 171,
+        "source_endpoint": "conformanceunit/?pg=171&all=1"
+      }
+    },
+    {
+      "backing_tests": [],
+      "cu_optional": true,
+      "id": "opc_cu_4427",
+      "implementation_state": "declared",
+      "kconfig_symbol": null,
+      "kind": "conformance_unit",
+      "notes": "Reconciled: satisfied by opc_cu_base_info_datatypes.",
+      "opc_display_name": "Base Info Client Events",
+      "opc_reference": {
+        "cu_id": "4427",
+        "cu_name": "Base Info Client Events",
+        "section": null,
+        "source_url": "https://profiles.opcfoundation.org",
+        "spec": null
+      },
+      "profile_defaults": {
+        "custom": false
+      },
+      "satisfied_by": "opc_cu_base_info_datatypes",
+      "source_metadata": {
+        "profile_group_id": 171,
+        "source_endpoint": "conformanceunit/?pg=171&all=1"
+      }
+    },
+    {
+      "backing_tests": [],
+      "cu_optional": true,
+      "id": "opc_cu_5578",
+      "implementation_state": "declared",
+      "kconfig_symbol": null,
+      "kind": "conformance_unit",
+      "notes": "Reconciled: satisfied by opc_cu_base_info_datatypes.",
+      "opc_display_name": "Base Info Progress Events",
+      "opc_reference": {
+        "cu_id": "5578",
+        "cu_name": "Base Info Progress Events",
+        "section": null,
+        "source_url": "https://profiles.opcfoundation.org",
+        "spec": null
+      },
+      "profile_defaults": {
+        "custom": false
+      },
+      "satisfied_by": "opc_cu_base_info_datatypes",
+      "source_metadata": {
+        "profile_group_id": 171,
+        "source_endpoint": "conformanceunit/?pg=171&all=1"
+      }
     }
   ],
   "manifest_purpose": "Canonical declaration of OPC UA profiles, facets, conformance units, build symbols, and capacities for muc-opcua. Seed state: reflects current repository only; no new OPC claims. See docs/superpowers/specs/2026-07-11-opc-complete-kconfig-manifest.md.",
   "metadata": {
     "superseded_profiles": [
       {
-        "description": "This Profile is a collection of Facets necessary to build a functional OPC UA Server Application specifically for chip level devices with limited resources. This Profile is functionally equivalent to the Core Server Facet and defines the \"UA-TCP UA-SC UA-Binary\" as the required transport profile including an ECC Security Policy. The support of Diagnostic Objects and Variables is optional for this Profile despite it being defined as “mandatory” in UA Part 5. Support of Diagnostic Objects and Variables is mandatory in some higher-level Profiles. Exposing types in the AddressSpace is optional for this Profile except if custom types (i.e., types that are derived from well-known ObjectTypes, VariableTypes, ReferenceType or DataTypes) are used. Exposing all supported types in the AddressSpace is mandatory in some higher-level Profiles.<br>\nThis Profile supersedes the <a href=\"http://opcfoundation.org/UA-Profile/Server/NanoEmbeddedDevice2017\">Nano Embedded Device 2017 Server Profile</a>.",
+        "description": "This Profile is a collection of Facets necessary to build a functional OPC UA Server Application specifically for chip level devices with limited resources. This Profile is functionally equivalent to the Core Server Facet and defines the \"UA-TCP UA-SC UA-Binary\" as the required transport profile including an ECC Security Policy. The support of Diagnostic Objects and Variables is optional for this Profile despite it being defined as \u201cmandatory\u201d in UA Part 5. Support of Diagnostic Objects and Variables is mandatory in some higher-level Profiles. Exposing types in the AddressSpace is optional for this Profile except if custom types (i.e., types that are derived from well-known ObjectTypes, VariableTypes, ReferenceType or DataTypes) are used. Exposing all supported types in the AddressSpace is mandatory in some higher-level Profiles.<br>\nThis Profile supersedes the <a href=\"http://opcfoundation.org/UA-Profile/Server/NanoEmbeddedDevice2017\">Nano Embedded Device 2017 Server Profile</a>.",
         "display_name": "Nano Embedded Device 2022 Server Profile",
         "last_update_time": "2025-11-12T15:47:17",
         "name": "Nano Embedded Device 2022 Server Profile",
@@ -8367,9 +9392,9 @@
       },
       {
         "description": "<b>This User Token has been deprecated with OPC UA Specification Version 1.05.</b><br>\nThis Facet indicates that a User Token that is comprised of an issued token is supported.",
-        "display_name": "User Token – Issued Token Server Facet",
+        "display_name": "User Token \u2013 Issued Token Server Facet",
         "last_update_time": "2022-03-10T16:02:39",
-        "name": "User Token – Issued Token Server Facet",
+        "name": "User Token \u2013 Issued Token Server Facet",
         "opc_id": 1698,
         "opc_profile_uri": "http://opcfoundation.org/UA-Profile/Security/UserToken/Server/IssuedToken",
         "release_status": 4,
@@ -8381,9 +9406,9 @@
       },
       {
         "description": "<b>This User Token has been deprecated with OPC UA Specification Version 1.05.</b><br>\nThis Facet further refines the User Token - Issued Token to indicate a windows implementation of Kerberos",
-        "display_name": "User Token – Issued Token Windows Server Facet",
+        "display_name": "User Token \u2013 Issued Token Windows Server Facet",
         "last_update_time": "2022-03-10T16:02:49",
-        "name": "User Token – Issued Token Windows Server Facet",
+        "name": "User Token \u2013 Issued Token Windows Server Facet",
         "opc_id": 1699,
         "opc_profile_uri": "http://opcfoundation.org/UA-Profile/Security/UserToken/Server/IssuedTokenWindows",
         "release_status": 4,
