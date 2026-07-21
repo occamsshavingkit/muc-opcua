@@ -21,6 +21,7 @@ tests/unit/CMakeFiles/test_asym_chunk.dir/test_asym_chunk.c.o: /home/quackdcs/mi
   /home/quackdcs/micro-opcua/include/muc_opcua/server.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/audit.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_management.h \
+  /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/diagnostics.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/history.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h \
@@ -118,13 +119,13 @@ tests/unit/CMakeFiles/test_asym_chunk.dir/test_asym_chunk.c.o: /home/quackdcs/mi
 
 /usr/include/x86_64-linux-gnu/bits/timesize.h:
 
-/home/quackdcs/micro-opcua/src/core/safe_mem.h:
-
-/home/quackdcs/micro-opcua/src/security/key_derivation.h:
+/usr/include/x86_64-linux-gnu/bits/stdio_lim.h:
 
 /home/quackdcs/micro-opcua/src/platform/host_crypto_adapter.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/status.h:
+
+/home/quackdcs/micro-opcua/include/muc_opcua/services/role_management.h:
 
 /home/quackdcs/micro-opcua/src/security/asym_chunk.h:
 
@@ -147,8 +148,6 @@ tests/unit/CMakeFiles/test_asym_chunk.dir/test_asym_chunk.c.o: /home/quackdcs/mi
 /home/quackdcs/micro-opcua/include/muc_opcua/security.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/platform.h:
-
-/home/quackdcs/micro-opcua/include/muc_opcua/services/role_management.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/server.h:
 
@@ -192,6 +191,8 @@ tests/unit/CMakeFiles/test_asym_chunk.dir/test_asym_chunk.c.o: /home/quackdcs/mi
 
 /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h:
 
+/home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h:
+
 /usr/include/x86_64-linux-gnu/bits/stdint-uintn.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/capacities.h:
@@ -199,6 +200,10 @@ tests/unit/CMakeFiles/test_asym_chunk.dir/test_asym_chunk.c.o: /home/quackdcs/mi
 /home/quackdcs/micro-opcua/include/muc_opcua/services/history.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/features.h:
+
+/home/quackdcs/micro-opcua/src/core/safe_mem.h:
+
+/home/quackdcs/micro-opcua/src/security/key_derivation.h:
 
 /home/quackdcs/micro-opcua/src/security/certificate.h:
 
@@ -251,5 +256,3 @@ _deps/unity-src/src/unity.h:
 /usr/include/x86_64-linux-gnu/bits/stdint-intn.h:
 
 /usr/include/x86_64-linux-gnu/bits/stdint-least.h:
-
-/usr/include/x86_64-linux-gnu/bits/stdio_lim.h:

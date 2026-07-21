@@ -54,6 +54,7 @@ src/CMakeFiles/muc_opcua.dir/services/alarms_conditions.c.o: \
  /home/quackdcs/micro-opcua/src/../include/muc_opcua/services/key_credential.h \
  /home/quackdcs/micro-opcua/src/../include/muc_opcua/services/role_management.h \
  /home/quackdcs/micro-opcua/src/../include/muc_opcua/services/certificate_management.h \
+ /home/quackdcs/micro-opcua/src/../include/muc_opcua/services/certificate_manager.h \
  /home/quackdcs/micro-opcua/src/../include/muc_opcua/services/audit.h \
  /home/quackdcs/micro-opcua/src/services/../core/service_dispatch.h \
  /home/quackdcs/micro-opcua/src/../include/muc_opcua/opcua_ids.h \

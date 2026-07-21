@@ -126,6 +126,18 @@ static const opcua_byte_t s_str_RoleSet[] = "RoleSet";
 static const opcua_byte_t s_str_CertificateGroupType[] = "CertificateGroupType";
 static const opcua_byte_t s_str_CertificateType[] = "CertificateType";
 #endif
+#if MUC_OPCUA_CU_CERTIFICATE_MANAGER_PULL && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+static const opcua_byte_t s_str_ApplicationCertificateType[] = "ApplicationCertificateType";
+static const opcua_byte_t s_str_HttpsCertificateType[] = "HttpsCertificateType";
+static const opcua_byte_t s_str_UserCertificateType[] = "UserCertificateType";
+static const opcua_byte_t s_str_RsaSha256ApplicationCertificateType[] = "RsaSha256ApplicationCertificateType";
+static const opcua_byte_t s_str_RsaMinApplicationCertificateType[] = "RsaMinApplicationCertificateType";
+static const opcua_byte_t s_str_CertificateDirectoryType[] = "CertificateDirectoryType";
+static const opcua_byte_t s_str_CertificateGroups[] = "CertificateGroups";
+static const opcua_byte_t s_str_DefaultApplicationGroup[] = "DefaultApplicationGroup";
+static const opcua_byte_t s_str_DefaultHttpsGroup[] = "DefaultHttpsGroup";
+static const opcua_byte_t s_str_DefaultUserTokenGroup[] = "DefaultUserTokenGroup";
+#endif
 static const opcua_byte_t s_str_LocaleIdArray[] = "LocaleIdArray";
 #if MUC_OPCUA_CU_BASE_INFO_SERVERTYPE && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
 /* spec 090 (CU 5801 fix): LocaleId(295) DataType BrowseName -- the Mandatory
@@ -1481,6 +1493,29 @@ static const mu_reference_t s_certificate_group_type_refs[] = {
    OPC-10000-12 §7.8.4.1. */
 static const mu_reference_t s_certificate_type_refs[] = {
     {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {58}}, false}};
+#endif
+
+#if MUC_OPCUA_CU_CERTIFICATE_MANAGER_PULL && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+static const mu_reference_t s_app_cert_type_refs[] = {
+    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {12556}}, false}};
+static const mu_reference_t s_https_cert_type_refs[] = {
+    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {12556}}, false}};
+static const mu_reference_t s_user_cert_type_refs[] = {
+    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {12556}}, false}};
+static const mu_reference_t s_rsasha256_cert_type_refs[] = {
+    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {12557}}, false}};
+static const mu_reference_t s_rsamin_cert_type_refs[] = {
+    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {12557}}, false}};
+static const mu_reference_t s_cert_dir_type_refs[] = {
+    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {58}}, false}};
+static const mu_reference_t s_cert_groups_refs[] = {
+    {{0, MU_NODEID_NUMERIC, {35}}, {0, MU_NODEID_NUMERIC, {85}}, false}};
+static const mu_reference_t s_default_app_group_refs[] = {
+    {{0, MU_NODEID_NUMERIC, {35}}, {0, MU_NODEID_NUMERIC, {15624}}, false}};
+static const mu_reference_t s_default_https_group_refs[] = {
+    {{0, MU_NODEID_NUMERIC, {35}}, {0, MU_NODEID_NUMERIC, {15624}}, false}};
+static const mu_reference_t s_default_user_group_refs[] = {
+    {{0, MU_NODEID_NUMERIC, {35}}, {0, MU_NODEID_NUMERIC, {15624}}, false}};
 #endif
 
 /* ServerCapabilitiesType(2013) HasProperty(46)/HasComponent(47) -> its
@@ -6079,7 +6114,7 @@ static const mu_node_t s_base_nodes[] = {
      NULL,
      .type_definition = {0, MU_NODEID_NUMERIC, {68}},
      .value_rank = -1,
-      .data_type = 7},
+     .data_type = 7},
 #endif
 #if MUC_OPCUA_CU_CERTIFICATE_MANAGEMENT && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
     /* spec 096 (CU 2105): CertificateGroupType(12555) and
@@ -6105,6 +6140,88 @@ static const mu_node_t s_base_nodes[] = {
      sizeof(s_certificate_type_refs) / sizeof(s_certificate_type_refs[0]),
      NULL,
      .type_definition = {0}},
+#endif
+#if MUC_OPCUA_CU_CERTIFICATE_MANAGER_PULL && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+    {{0, MU_NODEID_NUMERIC, {12557}},
+     MU_NODECLASS_OBJECTTYPE,
+     {26, s_str_ApplicationCertificateType},
+     {26, s_str_ApplicationCertificateType},
+     s_app_cert_type_refs,
+     sizeof(s_app_cert_type_refs) / sizeof(s_app_cert_type_refs[0]),
+     NULL,
+     .type_definition = {0}},
+    {{0, MU_NODEID_NUMERIC, {12558}},
+     MU_NODECLASS_OBJECTTYPE,
+     {20, s_str_HttpsCertificateType},
+     {20, s_str_HttpsCertificateType},
+     s_https_cert_type_refs,
+     sizeof(s_https_cert_type_refs) / sizeof(s_https_cert_type_refs[0]),
+     NULL,
+     .type_definition = {0}},
+    {{0, MU_NODEID_NUMERIC, {12559}},
+     MU_NODECLASS_OBJECTTYPE,
+     {35, s_str_RsaSha256ApplicationCertificateType},
+     {35, s_str_RsaSha256ApplicationCertificateType},
+     s_rsasha256_cert_type_refs,
+     sizeof(s_rsasha256_cert_type_refs) / sizeof(s_rsasha256_cert_type_refs[0]),
+     NULL,
+     .type_definition = {0}},
+    {{0, MU_NODEID_NUMERIC, {15017}},
+     MU_NODECLASS_OBJECTTYPE,
+     {19, s_str_UserCertificateType},
+     {19, s_str_UserCertificateType},
+     s_user_cert_type_refs,
+     sizeof(s_user_cert_type_refs) / sizeof(s_user_cert_type_refs[0]),
+     NULL,
+     .type_definition = {0}},
+    {{0, MU_NODEID_NUMERIC, {15421}},
+     MU_NODECLASS_OBJECTTYPE,
+     {32, s_str_RsaMinApplicationCertificateType},
+     {32, s_str_RsaMinApplicationCertificateType},
+     s_rsamin_cert_type_refs,
+     sizeof(s_rsamin_cert_type_refs) / sizeof(s_rsamin_cert_type_refs[0]),
+     NULL,
+     .type_definition = {0}},
+    {{0, MU_NODEID_NUMERIC, {15594}},
+     MU_NODECLASS_OBJECTTYPE,
+     {24, s_str_CertificateDirectoryType},
+     {24, s_str_CertificateDirectoryType},
+     s_cert_dir_type_refs,
+     sizeof(s_cert_dir_type_refs) / sizeof(s_cert_dir_type_refs[0]),
+     NULL,
+     .type_definition = {0}},
+    {{0, MU_NODEID_NUMERIC, {15624}},
+     MU_NODECLASS_OBJECT,
+     {17, s_str_CertificateGroups},
+     {17, s_str_CertificateGroups},
+     s_cert_groups_refs,
+     sizeof(s_cert_groups_refs) / sizeof(s_cert_groups_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {61}}},
+    {{0, MU_NODEID_NUMERIC, {15625}},
+     MU_NODECLASS_OBJECT,
+     {23, s_str_DefaultApplicationGroup},
+     {23, s_str_DefaultApplicationGroup},
+     s_default_app_group_refs,
+     sizeof(s_default_app_group_refs) / sizeof(s_default_app_group_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {12555}}},
+    {{0, MU_NODEID_NUMERIC, {15626}},
+     MU_NODECLASS_OBJECT,
+     {17, s_str_DefaultHttpsGroup},
+     {17, s_str_DefaultHttpsGroup},
+     s_default_https_group_refs,
+     sizeof(s_default_https_group_refs) / sizeof(s_default_https_group_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {12555}}},
+    {{0, MU_NODEID_NUMERIC, {15627}},
+     MU_NODECLASS_OBJECT,
+     {21, s_str_DefaultUserTokenGroup},
+     {21, s_str_DefaultUserTokenGroup},
+     s_default_user_group_refs,
+     sizeof(s_default_user_group_refs) / sizeof(s_default_user_group_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {12555}}},
 #endif
 #if MUC_OPCUA_CU_BASE_INFO_SERVERTYPE && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
     /* spec 085 (CU 5801) Task 4: ServerType.SetSubscriptionDurable(12746), the

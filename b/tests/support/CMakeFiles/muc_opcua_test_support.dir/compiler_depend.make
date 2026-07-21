@@ -51,6 +51,7 @@ tests/support/CMakeFiles/muc_opcua_test_support.dir/service_builders.c.o: /home/
   /home/quackdcs/micro-opcua/include/muc_opcua/server.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/audit.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_management.h \
+  /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/diagnostics.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/history.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h \
@@ -82,13 +83,15 @@ tests/support/CMakeFiles/muc_opcua_test_support.dir/service_builders.c.o: /home/
   /usr/lib/gcc/x86_64-linux-gnu/13/include/stdint.h
 
 
-/home/quackdcs/micro-opcua/include/muc_opcua/services/role_management.h:
-
 /home/quackdcs/micro-opcua/include/muc_opcua/services/method.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/services/history.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/services/diagnostics.h:
+
+/home/quackdcs/micro-opcua/include/muc_opcua/services/role_management.h:
+
+/home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/server.h:
 

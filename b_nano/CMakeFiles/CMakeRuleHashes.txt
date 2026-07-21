@@ -32,4 +32,3 @@ d6a863f2d3e4c66bf5498aec739588ff CMakeFiles/cppcheck
 54a1d33beede483685f75d0436b99802 CMakeFiles/format-check
 542cf7ae05c960a71a9cb79ca8a6aa26 CMakeFiles/menuconfig
 c3c605d7f01c4f7dd4017854367d796c CMakeFiles/savedefconfig
-671395c3f847467c32ddd0895ed5ebf6 tests/conformance/CMakeFiles/test_claim_map

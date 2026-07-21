@@ -37,6 +37,7 @@ src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/auditing/audit_events.c.o: \
  /home/quackdcs/micro-opcua/src/../include/muc_opcua/services/key_credential.h \
  /home/quackdcs/micro-opcua/src/../include/muc_opcua/services/role_management.h \
  /home/quackdcs/micro-opcua/src/../include/muc_opcua/services/certificate_management.h \
+ /home/quackdcs/micro-opcua/src/../include/muc_opcua/services/certificate_manager.h \
  /home/quackdcs/micro-opcua/src/../include/muc_opcua/services/audit.h \
  /home/quackdcs/micro-opcua/src/core/server_internal.h \
  /home/quackdcs/micro-opcua/src/core/../address_space/base_nodes.h \

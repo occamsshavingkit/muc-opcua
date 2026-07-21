@@ -216,6 +216,7 @@ src/CMakeFiles/muc_opcua.dir/core/server/data_chunk.c.o: /home/quackdcs/micro-op
   /home/quackdcs/micro-opcua/include/muc_opcua/services/alarms_conditions.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/audit.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_management.h \
+  /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/diagnostics.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/history.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h \
@@ -292,6 +293,7 @@ src/CMakeFiles/muc_opcua.dir/core/server/dispatch.c.o: /home/quackdcs/micro-opcu
   /home/quackdcs/micro-opcua/include/muc_opcua/services/alarms_conditions.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/audit.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_management.h \
+  /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/diagnostics.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/history.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h \
@@ -354,6 +356,7 @@ src/CMakeFiles/muc_opcua.dir/core/server/init.c.o: /home/quackdcs/micro-opcua/sr
   /home/quackdcs/micro-opcua/include/muc_opcua/services/alarms_conditions.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/audit.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_management.h \
+  /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/diagnostics.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/history.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h \
@@ -424,6 +427,7 @@ src/CMakeFiles/muc_opcua.dir/core/server/poll.c.o: /home/quackdcs/micro-opcua/sr
   /home/quackdcs/micro-opcua/include/muc_opcua/services/alarms_conditions.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/audit.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_management.h \
+  /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/diagnostics.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/history.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h \
@@ -488,6 +492,7 @@ src/CMakeFiles/muc_opcua.dir/core/server/process_message.c.o: /home/quackdcs/mic
   /home/quackdcs/micro-opcua/include/muc_opcua/services/alarms_conditions.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/audit.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_management.h \
+  /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/diagnostics.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/history.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h \
@@ -553,6 +558,7 @@ src/CMakeFiles/muc_opcua.dir/core/service_dispatch/activate_session.c.o: /home/q
   /home/quackdcs/micro-opcua/include/muc_opcua/services/alarms_conditions.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/audit.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_management.h \
+  /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/diagnostics.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/history.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h \
@@ -632,6 +638,7 @@ src/CMakeFiles/muc_opcua.dir/core/service_dispatch/attribute_handler.c.o: /home/
   /home/quackdcs/micro-opcua/include/muc_opcua/services/alarms_conditions.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/audit.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_management.h \
+  /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/diagnostics.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/history.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h \
@@ -716,6 +723,7 @@ src/CMakeFiles/muc_opcua.dir/core/service_dispatch/close_session.c.o: /home/quac
   /home/quackdcs/micro-opcua/include/muc_opcua/services/alarms_conditions.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/audit.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_management.h \
+  /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/diagnostics.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/history.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h \
@@ -795,6 +803,7 @@ src/CMakeFiles/muc_opcua.dir/core/service_dispatch/create_session.c.o: /home/qua
   /home/quackdcs/micro-opcua/include/muc_opcua/services/alarms_conditions.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/audit.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_management.h \
+  /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/diagnostics.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/history.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h \
@@ -874,6 +883,7 @@ src/CMakeFiles/muc_opcua.dir/core/service_dispatch/dispatch_core.c.o: /home/quac
   /home/quackdcs/micro-opcua/include/muc_opcua/services/alarms_conditions.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/audit.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_management.h \
+  /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/diagnostics.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/history.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h \
@@ -953,6 +963,7 @@ src/CMakeFiles/muc_opcua.dir/core/service_dispatch/handler_stubs.c.o: /home/quac
   /home/quackdcs/micro-opcua/include/muc_opcua/services/alarms_conditions.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/audit.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_management.h \
+  /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/diagnostics.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/history.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h \
@@ -1032,6 +1043,7 @@ src/CMakeFiles/muc_opcua.dir/core/service_dispatch/osc_handler.c.o: /home/quackd
   /home/quackdcs/micro-opcua/include/muc_opcua/services/alarms_conditions.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/audit.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_management.h \
+  /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/diagnostics.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/history.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h \
@@ -1112,6 +1124,7 @@ src/CMakeFiles/muc_opcua.dir/core/service_dispatch/reader_helpers.c.o: /home/qua
   /home/quackdcs/micro-opcua/include/muc_opcua/services/alarms_conditions.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/audit.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_management.h \
+  /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/diagnostics.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/history.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h \
@@ -1191,6 +1204,7 @@ src/CMakeFiles/muc_opcua.dir/core/service_dispatch/response_encode.c.o: /home/qu
   /home/quackdcs/micro-opcua/include/muc_opcua/services/alarms_conditions.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/audit.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_management.h \
+  /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/diagnostics.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/history.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h \
@@ -1327,6 +1341,7 @@ src/CMakeFiles/muc_opcua.dir/core/tcp_connection.c.o: /home/quackdcs/micro-opcua
   /home/quackdcs/micro-opcua/include/muc_opcua/server.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/audit.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_management.h \
+  /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/diagnostics.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/history.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h \
@@ -1518,6 +1533,7 @@ src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/auditing/audit_events.c.o: /hom
   /home/quackdcs/micro-opcua/include/muc_opcua/services/alarms_conditions.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/audit.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_management.h \
+  /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/diagnostics.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/history.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h \
@@ -1751,6 +1767,70 @@ src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/authorization/jwt.c.o: /home/qu
   /usr/lib/gcc/x86_64-linux-gnu/13/include/stddef.h \
   /usr/lib/gcc/x86_64-linux-gnu/13/include/stdint.h
 
+src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/certificate_manager/cert_manager.c.o: /home/quackdcs/micro-opcua/src/cu/core_2022_server/certificate_manager/cert_manager.c \
+  /home/quackdcs/micro-opcua/include/muc_opcua/address_space.h \
+  /home/quackdcs/micro-opcua/include/muc_opcua/address_space/complex_types.h \
+  /home/quackdcs/micro-opcua/include/muc_opcua/opcua_types.h \
+  /home/quackdcs/micro-opcua/include/muc_opcua/authorization/jwt.h \
+  /home/quackdcs/micro-opcua/include/muc_opcua/capacities.h \
+  /home/quackdcs/micro-opcua/include/muc_opcua/config.h \
+  /home/quackdcs/micro-opcua/include/muc_opcua/encoding.h \
+  /home/quackdcs/micro-opcua/include/muc_opcua/features.h \
+  /home/quackdcs/micro-opcua/include/muc_opcua/opcua_ids.h \
+  /home/quackdcs/micro-opcua/include/muc_opcua/opcua_types.h \
+  /home/quackdcs/micro-opcua/include/muc_opcua/platform.h \
+  /home/quackdcs/micro-opcua/include/muc_opcua/pubsub.h \
+  /home/quackdcs/micro-opcua/include/muc_opcua/security.h \
+  /home/quackdcs/micro-opcua/include/muc_opcua/server.h \
+  /home/quackdcs/micro-opcua/include/muc_opcua/services/alarms_conditions.h \
+  /home/quackdcs/micro-opcua/include/muc_opcua/services/audit.h \
+  /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_management.h \
+  /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h \
+  /home/quackdcs/micro-opcua/include/muc_opcua/services/diagnostics.h \
+  /home/quackdcs/micro-opcua/include/muc_opcua/services/history.h \
+  /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h \
+  /home/quackdcs/micro-opcua/include/muc_opcua/services/method.h \
+  /home/quackdcs/micro-opcua/include/muc_opcua/services/role_management.h \
+  /home/quackdcs/micro-opcua/include/muc_opcua/status.h \
+  /home/quackdcs/micro-opcua/include/muc_opcua/types.h \
+  /home/quackdcs/micro-opcua/src/address_space/base_nodes.h \
+  /home/quackdcs/micro-opcua/src/core/sequence.h \
+  /home/quackdcs/micro-opcua/src/security/security_policy.h \
+  /home/quackdcs/micro-opcua/src/security/sym_chunk.h \
+  /home/quackdcs/micro-opcua/src/services/event_filter.h \
+  /home/quackdcs/micro-opcua/src/services/read.h \
+  /home/quackdcs/micro-opcua/src/services/read/common.h \
+  /home/quackdcs/micro-opcua/src/services/secure_channel.h \
+  /home/quackdcs/micro-opcua/src/services/session.h \
+  /home/quackdcs/micro-opcua/src/services/subscription.h \
+  /home/quackdcs/micro-opcua/src/core/message_chunk.h \
+  /home/quackdcs/micro-opcua/src/core/server_internal.h \
+  /home/quackdcs/micro-opcua/src/core/service_dispatch.h \
+  /home/quackdcs/micro-opcua/src/core/tcp_connection.h \
+  /usr/include/features-time64.h \
+  /usr/include/features.h \
+  /usr/include/stdc-predef.h \
+  /usr/include/stdint.h \
+  /usr/include/string.h \
+  /usr/include/x86_64-linux-gnu/bits/libc-header-start.h \
+  /usr/include/x86_64-linux-gnu/bits/long-double.h \
+  /usr/include/x86_64-linux-gnu/bits/stdint-intn.h \
+  /usr/include/x86_64-linux-gnu/bits/stdint-least.h \
+  /usr/include/x86_64-linux-gnu/bits/stdint-uintn.h \
+  /usr/include/x86_64-linux-gnu/bits/string_fortified.h \
+  /usr/include/x86_64-linux-gnu/bits/time64.h \
+  /usr/include/x86_64-linux-gnu/bits/timesize.h \
+  /usr/include/x86_64-linux-gnu/bits/types.h \
+  /usr/include/x86_64-linux-gnu/bits/typesizes.h \
+  /usr/include/x86_64-linux-gnu/bits/wchar.h \
+  /usr/include/x86_64-linux-gnu/bits/wordsize.h \
+  /usr/include/x86_64-linux-gnu/gnu/stubs-64.h \
+  /usr/include/x86_64-linux-gnu/gnu/stubs.h \
+  /usr/include/x86_64-linux-gnu/sys/cdefs.h \
+  /usr/lib/gcc/x86_64-linux-gnu/13/include/stdbool.h \
+  /usr/lib/gcc/x86_64-linux-gnu/13/include/stddef.h \
+  /usr/lib/gcc/x86_64-linux-gnu/13/include/stdint.h
+
 src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/complex_types/binary_complex.c.o: /home/quackdcs/micro-opcua/src/cu/core_2022_server/complex_types/binary_complex.c \
   /home/quackdcs/micro-opcua/include/muc_opcua/address_space.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/address_space/complex_types.h \
@@ -1805,6 +1885,7 @@ src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/complex_types/complex_types.c.o
   /home/quackdcs/micro-opcua/include/muc_opcua/services/alarms_conditions.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/audit.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_management.h \
+  /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/diagnostics.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/history.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h \
@@ -1866,6 +1947,7 @@ src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/diagnostics/diagnostics.c.o: /h
   /home/quackdcs/micro-opcua/include/muc_opcua/services/alarms_conditions.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/audit.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_management.h \
+  /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/diagnostics.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/history.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h \
@@ -1927,6 +2009,7 @@ src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/discovery/common.c.o: /home/qua
   /home/quackdcs/micro-opcua/include/muc_opcua/services/alarms_conditions.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/audit.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_management.h \
+  /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/diagnostics.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/history.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h \
@@ -1993,6 +2076,7 @@ src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/discovery/find_servers.c.o: /ho
   /home/quackdcs/micro-opcua/include/muc_opcua/services/alarms_conditions.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/audit.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_management.h \
+  /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/diagnostics.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/history.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h \
@@ -2059,6 +2143,7 @@ src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/discovery/get_endpoints.c.o: /h
   /home/quackdcs/micro-opcua/include/muc_opcua/services/alarms_conditions.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/audit.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_management.h \
+  /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/diagnostics.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/history.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h \
@@ -2123,6 +2208,7 @@ src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/discovery/register_server.c.o: 
   /home/quackdcs/micro-opcua/include/muc_opcua/server.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/audit.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_management.h \
+  /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/diagnostics.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/history.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h \
@@ -2205,6 +2291,7 @@ src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/historical_access/history.c.o: 
   /home/quackdcs/micro-opcua/include/muc_opcua/services/alarms_conditions.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/audit.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_management.h \
+  /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/diagnostics.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/history.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h \
@@ -2270,6 +2357,7 @@ src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/historical_access/history_handl
   /home/quackdcs/micro-opcua/include/muc_opcua/services/alarms_conditions.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/audit.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_management.h \
+  /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/diagnostics.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/history.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h \
@@ -2349,6 +2437,7 @@ src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/key_credential/key_credential.c
   /home/quackdcs/micro-opcua/include/muc_opcua/services/alarms_conditions.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/audit.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_management.h \
+  /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/diagnostics.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/history.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h \
@@ -2412,6 +2501,7 @@ src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/nodemanagement/add_nodes.c.o: /
   /home/quackdcs/micro-opcua/include/muc_opcua/services/alarms_conditions.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/audit.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_management.h \
+  /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/diagnostics.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/history.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h \
@@ -2477,6 +2567,7 @@ src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/nodemanagement/add_references.c
   /home/quackdcs/micro-opcua/include/muc_opcua/services/alarms_conditions.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/audit.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_management.h \
+  /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/diagnostics.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/history.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h \
@@ -2542,6 +2633,7 @@ src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/nodemanagement/delete.c.o: /hom
   /home/quackdcs/micro-opcua/include/muc_opcua/services/alarms_conditions.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/audit.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_management.h \
+  /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/diagnostics.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/history.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h \
@@ -2607,6 +2699,7 @@ src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/nodemanagement/dispatch_node_mg
   /home/quackdcs/micro-opcua/include/muc_opcua/services/alarms_conditions.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/audit.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_management.h \
+  /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/diagnostics.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/history.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h \
@@ -2709,6 +2802,7 @@ src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/query/query.c.o: /home/quackdcs
   /home/quackdcs/micro-opcua/include/muc_opcua/services/alarms_conditions.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/audit.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_management.h \
+  /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/diagnostics.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/history.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h \
@@ -2774,6 +2868,7 @@ src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/redundancy/transfer_handler.c.o
   /home/quackdcs/micro-opcua/include/muc_opcua/services/alarms_conditions.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/audit.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_management.h \
+  /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/diagnostics.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/history.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h \
@@ -2853,6 +2948,7 @@ src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/role_management/role_management
   /home/quackdcs/micro-opcua/include/muc_opcua/services/alarms_conditions.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/audit.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_management.h \
+  /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/diagnostics.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/history.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h \
@@ -3174,6 +3270,7 @@ src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/subscription/basic/deadband.c.o
   /home/quackdcs/micro-opcua/include/muc_opcua/services/alarms_conditions.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/audit.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_management.h \
+  /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/diagnostics.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/history.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h \
@@ -3242,6 +3339,7 @@ src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/subscription/basic/filter_reade
   /home/quackdcs/micro-opcua/include/muc_opcua/services/alarms_conditions.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/audit.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_management.h \
+  /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/diagnostics.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/history.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h \
@@ -3321,6 +3419,7 @@ src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/subscription/basic/monitored_it
   /home/quackdcs/micro-opcua/include/muc_opcua/services/alarms_conditions.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/audit.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_management.h \
+  /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/diagnostics.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/history.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h \
@@ -3400,6 +3499,7 @@ src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/subscription/basic/notification
   /home/quackdcs/micro-opcua/include/muc_opcua/services/alarms_conditions.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/audit.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_management.h \
+  /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/diagnostics.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/history.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h \
@@ -3468,6 +3568,7 @@ src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/subscription/basic/publish_due.
   /home/quackdcs/micro-opcua/include/muc_opcua/services/alarms_conditions.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/audit.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_management.h \
+  /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/diagnostics.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/history.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h \
@@ -3536,6 +3637,7 @@ src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/subscription/basic/pubsub.c.o: 
   /home/quackdcs/micro-opcua/include/muc_opcua/services/alarms_conditions.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/audit.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_management.h \
+  /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/diagnostics.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/history.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h \
@@ -3599,6 +3701,7 @@ src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/subscription/basic/retransmit.c
   /home/quackdcs/micro-opcua/include/muc_opcua/services/alarms_conditions.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/audit.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_management.h \
+  /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/diagnostics.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/history.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h \
@@ -3667,6 +3770,7 @@ src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/subscription/basic/subscription
   /home/quackdcs/micro-opcua/include/muc_opcua/services/alarms_conditions.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/audit.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_management.h \
+  /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/diagnostics.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/history.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h \
@@ -3746,6 +3850,7 @@ src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/subscription/basic/subscription
   /home/quackdcs/micro-opcua/include/muc_opcua/services/alarms_conditions.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/audit.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_management.h \
+  /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/diagnostics.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/history.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h \
@@ -3826,6 +3931,7 @@ src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/subscription/basic/subscription
   /home/quackdcs/micro-opcua/include/muc_opcua/services/alarms_conditions.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/audit.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_management.h \
+  /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/diagnostics.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/history.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h \
@@ -3892,6 +3998,7 @@ src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/subscription/basic/tick.c.o: /h
   /home/quackdcs/micro-opcua/include/muc_opcua/services/alarms_conditions.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/audit.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_management.h \
+  /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/diagnostics.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/history.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h \
@@ -3995,6 +4102,7 @@ src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/subscription/standard/dispatch_
   /home/quackdcs/micro-opcua/include/muc_opcua/services/alarms_conditions.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/audit.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_management.h \
+  /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/diagnostics.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/history.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h \
@@ -4065,6 +4173,7 @@ src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/subscription/standard/subscript
   /home/quackdcs/micro-opcua/include/muc_opcua/services/alarms_conditions.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/audit.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_management.h \
+  /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/diagnostics.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/history.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h \
@@ -4130,6 +4239,7 @@ src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/subscription/standard/triggerin
   /home/quackdcs/micro-opcua/include/muc_opcua/services/alarms_conditions.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/audit.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_management.h \
+  /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/diagnostics.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/history.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h \
@@ -4209,6 +4319,7 @@ src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/view_basic_translate/browse.c.o
   /home/quackdcs/micro-opcua/include/muc_opcua/services/alarms_conditions.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/audit.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_management.h \
+  /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/diagnostics.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/history.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h \
@@ -4275,6 +4386,7 @@ src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/view_basic_translate/browse_nex
   /home/quackdcs/micro-opcua/include/muc_opcua/services/alarms_conditions.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/audit.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_management.h \
+  /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/diagnostics.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/history.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h \
@@ -4341,6 +4453,7 @@ src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/view_basic_translate/translate_
   /home/quackdcs/micro-opcua/include/muc_opcua/services/alarms_conditions.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/audit.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_management.h \
+  /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/diagnostics.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/history.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h \
@@ -4407,6 +4520,7 @@ src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/view_basic_translate/view_handl
   /home/quackdcs/micro-opcua/include/muc_opcua/services/alarms_conditions.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/audit.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_management.h \
+  /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/diagnostics.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/history.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h \
@@ -5856,6 +5970,7 @@ src/CMakeFiles/muc_opcua.dir/services/alarms_conditions.c.o: /home/quackdcs/micr
   /home/quackdcs/micro-opcua/include/muc_opcua/services/alarms_conditions.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/audit.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_management.h \
+  /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/diagnostics.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/history.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h \
@@ -5917,6 +6032,7 @@ src/CMakeFiles/muc_opcua.dir/services/discovery.c.o: /home/quackdcs/micro-opcua/
   /home/quackdcs/micro-opcua/include/muc_opcua/server.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/audit.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_management.h \
+  /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/diagnostics.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/history.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h \
@@ -6039,6 +6155,7 @@ src/CMakeFiles/muc_opcua.dir/services/session.c.o: /home/quackdcs/micro-opcua/sr
   /home/quackdcs/micro-opcua/include/muc_opcua/services/alarms_conditions.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/audit.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_management.h \
+  /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/diagnostics.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/history.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h \
@@ -6132,10 +6249,6 @@ src/CMakeFiles/muc_opcua.dir/services/session.c.o: /home/quackdcs/micro-opcua/sr
 
 /usr/include/errno.h:
 
-/usr/include/x86_64-linux-gnu/bits/socket-constants.h:
-
-/home/quackdcs/micro-opcua/src/platform/host_tcp_adapter.h:
-
 /home/quackdcs/micro-opcua/src/platform/host_crypto/sign.c:
 
 /home/quackdcs/micro-opcua/src/platform/host_crypto/hash.c:
@@ -6160,7 +6273,9 @@ src/CMakeFiles/muc_opcua.dir/services/session.c.o: /home/quackdcs/micro-opcua/sr
 
 /home/quackdcs/micro-opcua/src/encoding/binary_datavalue.c:
 
-/usr/include/x86_64-linux-gnu/bits/types/time_t.h:
+/home/quackdcs/micro-opcua/src/cu/core_2022_server/view_basic_translate/view_handler.c:
+
+/home/quackdcs/micro-opcua/src/cu/core_2022_server/view_basic_translate/translate_paths.c:
 
 /home/quackdcs/micro-opcua/src/platform/host_crypto/ecc.c:
 
@@ -6225,10 +6340,6 @@ src/CMakeFiles/muc_opcua.dir/services/session.c.o: /home/quackdcs/micro-opcua/sr
 /home/quackdcs/micro-opcua/src/core/server/poll.c:
 
 /home/quackdcs/micro-opcua/src/cu/core_2022_server/authorization/jwt.c:
-
-/usr/include/openssl/bnerr.h:
-
-/home/quackdcs/micro-opcua/src/cu/core_2022_server/auditing/audit_events.c:
 
 /usr/include/x86_64-linux-gnu/bits/wordsize.h:
 
@@ -6360,8 +6471,6 @@ src/CMakeFiles/muc_opcua.dir/services/session.c.o: /home/quackdcs/micro-opcua/sr
 
 /usr/include/x86_64-linux-gnu/bits/time.h:
 
-/home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h:
-
 /usr/include/x86_64-linux-gnu/bits/string_fortified.h:
 
 /usr/include/stdlib.h:
@@ -6402,6 +6511,12 @@ src/CMakeFiles/muc_opcua.dir/services/session.c.o: /home/quackdcs/micro-opcua/sr
 
 /usr/include/openssl/objects.h:
 
+/usr/include/endian.h:
+
+/home/quackdcs/micro-opcua/src/address_space/address_space.c:
+
+/usr/include/stdint.h:
+
 /home/quackdcs/micro-opcua/src/cu/core_2022_server/security/asym_chunk/unwrap.c:
 
 /home/quackdcs/micro-opcua/src/platform/host_crypto_adapter.h:
@@ -6415,6 +6530,12 @@ src/CMakeFiles/muc_opcua.dir/services/session.c.o: /home/quackdcs/micro-opcua/sr
 /home/quackdcs/micro-opcua/src/cu/core_2022_server/event_filter_where/event_filter.c:
 
 /usr/include/features.h:
+
+/usr/include/x86_64-linux-gnu/bits/socket-constants.h:
+
+/home/quackdcs/micro-opcua/src/platform/host_tcp_adapter.h:
+
+/home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h:
 
 /home/quackdcs/micro-opcua/src/security/asym_chunk.h:
 
@@ -6510,11 +6631,15 @@ src/CMakeFiles/muc_opcua.dir/services/session.c.o: /home/quackdcs/micro-opcua/sr
 
 /home/quackdcs/micro-opcua/include/muc_opcua/security.h:
 
-/usr/include/endian.h:
+/home/quackdcs/micro-opcua/src/cu/core_2022_server/certificate_manager/cert_manager.c:
 
-/usr/include/stdint.h:
+/home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h:
 
-/home/quackdcs/micro-opcua/src/address_space/address_space.c:
+/home/quackdcs/micro-opcua/src/cu/core_2022_server/auditing/audit_events.c:
+
+/usr/include/openssl/bnerr.h:
+
+/usr/include/x86_64-linux-gnu/bits/types/time_t.h:
 
 /usr/include/openssl/buffer.h:
 
@@ -6721,7 +6846,3 @@ src/CMakeFiles/muc_opcua.dir/services/session.c.o: /home/quackdcs/micro-opcua/sr
 /home/quackdcs/micro-opcua/src/cu/core_2022_server/subscription/standard/dispatch_method.c:
 
 /home/quackdcs/micro-opcua/src/cu/core_2022_server/subscription/standard/subscription_aggregate.c:
-
-/home/quackdcs/micro-opcua/src/cu/core_2022_server/view_basic_translate/translate_paths.c:
-
-/home/quackdcs/micro-opcua/src/cu/core_2022_server/view_basic_translate/view_handler.c:

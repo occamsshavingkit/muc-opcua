@@ -21,6 +21,7 @@ tests/unit/CMakeFiles/test_write_decoder.dir/test_write_decoder.c.o: /home/quack
   /home/quackdcs/micro-opcua/include/muc_opcua/server.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/audit.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_management.h \
+  /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/diagnostics.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/history.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h \
@@ -106,6 +107,8 @@ tests/unit/CMakeFiles/test_write_decoder.dir/test_write_decoder.c.o: /home/quack
 
 /home/quackdcs/micro-opcua/include/muc_opcua/status.h:
 
+/home/quackdcs/micro-opcua/include/muc_opcua/services/role_management.h:
+
 /usr/include/x86_64-linux-gnu/bits/types/__sigset_t.h:
 
 /usr/include/x86_64-linux-gnu/bits/long-double.h:
@@ -152,11 +155,9 @@ tests/unit/CMakeFiles/test_write_decoder.dir/test_write_decoder.c.o: /home/quack
 
 /home/quackdcs/micro-opcua/include/muc_opcua/address_space.h:
 
-/usr/include/features.h:
+/usr/include/x86_64-linux-gnu/bits/types/__fpos_t.h:
 
-/usr/include/x86_64-linux-gnu/bits/types/FILE.h:
-
-/home/quackdcs/micro-opcua/include/muc_opcua/services/role_management.h:
+/home/quackdcs/micro-opcua/include/muc_opcua/address_space/complex_types.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/opcua_types.h:
 
@@ -170,6 +171,8 @@ tests/unit/CMakeFiles/test_write_decoder.dir/test_write_decoder.c.o: /home/quack
 
 /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h:
 
+/home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h:
+
 /usr/include/x86_64-linux-gnu/bits/stdint-uintn.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/services/history.h:
@@ -177,6 +180,10 @@ tests/unit/CMakeFiles/test_write_decoder.dir/test_write_decoder.c.o: /home/quack
 /home/quackdcs/micro-opcua/include/muc_opcua/capacities.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/features.h:
+
+/usr/include/features.h:
+
+/usr/include/x86_64-linux-gnu/bits/types/FILE.h:
 
 _deps/unity-src/src/unity_internals.h:
 
@@ -227,7 +234,3 @@ _deps/unity-src/src/unity.h:
 /home/quackdcs/micro-opcua/include/muc_opcua/services/diagnostics.h:
 
 /usr/include/x86_64-linux-gnu/bits/time64.h:
-
-/home/quackdcs/micro-opcua/include/muc_opcua/address_space/complex_types.h:
-
-/usr/include/x86_64-linux-gnu/bits/types/__fpos_t.h:

@@ -43,6 +43,7 @@ src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/discovery/get_endpoints.c.o: \
  /home/quackdcs/micro-opcua/src/../include/muc_opcua/services/key_credential.h \
  /home/quackdcs/micro-opcua/src/../include/muc_opcua/services/role_management.h \
  /home/quackdcs/micro-opcua/src/../include/muc_opcua/services/certificate_management.h \
+ /home/quackdcs/micro-opcua/src/../include/muc_opcua/services/certificate_manager.h \
  /home/quackdcs/micro-opcua/src/../include/muc_opcua/services/audit.h \
  /home/quackdcs/micro-opcua/src/core/dispatch_discovery/../../services/service_header.h \
  /home/quackdcs/micro-opcua/src/core/dispatch_discovery/../server_internal.h \

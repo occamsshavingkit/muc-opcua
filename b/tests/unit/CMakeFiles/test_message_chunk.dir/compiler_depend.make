@@ -21,6 +21,7 @@ tests/unit/CMakeFiles/test_message_chunk.dir/test_message_chunk.c.o: /home/quack
   /home/quackdcs/micro-opcua/include/muc_opcua/server.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/audit.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_management.h \
+  /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/diagnostics.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/history.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h \
@@ -112,19 +113,25 @@ tests/unit/CMakeFiles/test_message_chunk.dir/test_message_chunk.c.o: /home/quack
 
 /usr/include/x86_64-linux-gnu/bits/long-double.h:
 
+/home/quackdcs/micro-opcua/include/muc_opcua/services/role_management.h:
+
 /home/quackdcs/micro-opcua/include/muc_opcua/services/audit.h:
 
 /usr/include/x86_64-linux-gnu/bits/libc-header-start.h:
 
-/usr/include/features-time64.h:
-
-/home/quackdcs/micro-opcua/tests/unit/test_message_chunk.c:
-
-/usr/include/x86_64-linux-gnu/bits/setjmp.h:
-
 /home/quackdcs/micro-opcua/include/muc_opcua/security.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/platform.h:
+
+/home/quackdcs/micro-opcua/tests/unit/test_message_chunk.c:
+
+/usr/include/features-time64.h:
+
+/usr/include/x86_64-linux-gnu/bits/setjmp.h:
+
+/usr/include/x86_64-linux-gnu/bits/types/__fpos_t.h:
+
+/home/quackdcs/micro-opcua/include/muc_opcua/address_space/complex_types.h:
 
 /usr/include/x86_64-linux-gnu/bits/typesizes.h:
 
@@ -146,8 +153,6 @@ tests/unit/CMakeFiles/test_message_chunk.dir/test_message_chunk.c.o: /home/quack
 
 /home/quackdcs/micro-opcua/src/core/message_chunk.h:
 
-/home/quackdcs/micro-opcua/include/muc_opcua/services/role_management.h:
-
 /home/quackdcs/micro-opcua/include/muc_opcua/server.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/types.h:
@@ -165,6 +170,8 @@ tests/unit/CMakeFiles/test_message_chunk.dir/test_message_chunk.c.o: /home/quack
 /home/quackdcs/micro-opcua/include/muc_opcua/authorization/jwt.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h:
+
+/home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h:
 
 /usr/include/x86_64-linux-gnu/bits/stdint-uintn.h:
 
@@ -227,7 +234,3 @@ _deps/unity-src/src/unity.h:
 /home/quackdcs/micro-opcua/include/muc_opcua/services/diagnostics.h:
 
 /usr/include/x86_64-linux-gnu/bits/time64.h:
-
-/home/quackdcs/micro-opcua/include/muc_opcua/address_space/complex_types.h:
-
-/usr/include/x86_64-linux-gnu/bits/types/__fpos_t.h:

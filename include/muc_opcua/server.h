@@ -30,6 +30,7 @@
 #endif
 #ifdef MUC_OPCUA_CU_CERTIFICATE_MANAGEMENT
 #include "muc_opcua/services/certificate_management.h"
+#include "muc_opcua/services/certificate_manager.h"
 #endif
 
 #ifdef __cplusplus
@@ -150,6 +151,10 @@ typedef struct {
 
 #ifdef MUC_OPCUA_CU_CERTIFICATE_MANAGEMENT
     const mu_certificate_management_adapter_t *certificate_management_adapter;
+#endif
+
+#ifdef MUC_OPCUA_CU_CERTIFICATE_MANAGER_PULL
+    const mu_certificate_manager_adapter_t *certificate_manager_adapter;
 #endif
 
 #ifdef MUC_OPCUA_CU_USER_TOKEN_JWT

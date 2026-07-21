@@ -1560,12 +1560,26 @@ config MUC_OPCUA_CU_CERTIFICATE_MANAGEMENT
 	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
 	help
 	  Implementation state: in-progress.
-	  OPC source: OPC-10000-12 §7.5-7.6, OPC-10000-7 CU 2105.
+	  OPC source: OPC-10000-12 §7.8.3-7.8.4, OPC-10000-7 CU 2105.
 	  Backing tests: test_certificate_management.
-	  Notes: Global Certificate Management Server Facet (PG20) -- type-system
-	  InstanceDeclarations only. Certificate enrollment/renewal Methods
-	  (CreateSigningRequest, GetRejectedList, FinishRequest) deferred.
-	  Grounded per OPC-10000-12 7.5-7.6 and OPC-10000-7 CU 2105.
+	  Notes: Type-system InstanceDeclarations for CertificateGroupType
+	  and CertificateType. Full Pull model Methods gated by the
+	  MUC_OPCUA_CU_CERTIFICATE_MANAGER_PULL option below.
+	  Grounded per OPC-10000-12 7.8.3-7.8.4 and OPC-10000-7 CU 2105.
+
+config MUC_OPCUA_CU_CERTIFICATE_MANAGER_PULL
+	bool "CU: Certificate Manager Pull Model"
+	depends on MUC_OPCUA_CU_CERTIFICATE_MANAGEMENT && MUC_OPCUA_CU_METHOD_SERVER && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: in-progress.
+	  OPC source: OPC-10000-12 §7.6, §7.9 (Pull Certificate Management).
+	  Backing tests: test_certificate_manager.
+	  Notes: Pull model certificate enrollment Methods
+	  (StartSigningRequest, FinishRequest, GetRejectedList,
+	  StartNewKeyPairRequest) + adapter callbacks. Type-system
+	  nodes + instances + CertificateDirectoryType.
+	  Grounded per OPC-10000-12 7.6, 7.9 and OPC-10000-7 CU 1631.
 
 endif
 

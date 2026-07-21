@@ -43,6 +43,7 @@ src/CMakeFiles/muc_opcua.dir/core/service_dispatch/handler_stubs.c.o: \
  /home/quackdcs/micro-opcua/src/../include/muc_opcua/services/key_credential.h \
  /home/quackdcs/micro-opcua/src/../include/muc_opcua/services/role_management.h \
  /home/quackdcs/micro-opcua/src/../include/muc_opcua/services/certificate_management.h \
+ /home/quackdcs/micro-opcua/src/../include/muc_opcua/services/certificate_manager.h \
  /home/quackdcs/micro-opcua/src/../include/muc_opcua/services/audit.h \
  /home/quackdcs/micro-opcua/src/core/service_dispatch/../../services/secure_channel.h \
  /home/quackdcs/micro-opcua/src/core/service_dispatch/../../services/../core/sequence.h \

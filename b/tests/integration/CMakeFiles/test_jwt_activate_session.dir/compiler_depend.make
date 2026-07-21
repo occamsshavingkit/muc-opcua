@@ -22,6 +22,7 @@ tests/integration/CMakeFiles/test_jwt_activate_session.dir/test_jwt_activate_ses
   /home/quackdcs/micro-opcua/include/muc_opcua/services/alarms_conditions.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/audit.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_management.h \
+  /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/diagnostics.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/history.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h \
@@ -231,17 +232,13 @@ tests/integration/CMakeFiles/test_jwt_activate_session.dir/test_jwt_activate_ses
 
 /usr/include/x86_64-linux-gnu/bits/stdint-intn.h:
 
-/home/quackdcs/micro-opcua/include/muc_opcua/pubsub.h:
+/usr/include/x86_64-linux-gnu/bits/sched.h:
 
 /usr/include/limits.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/opcua_ids.h:
 
 _deps/unity-src/src/unity_internals.h:
-
-/home/quackdcs/micro-opcua/include/muc_opcua/opcua_types.h:
-
-/usr/include/openssl/cryptoerr.h:
 
 /usr/include/x86_64-linux-gnu/bits/pthreadtypes.h:
 
@@ -301,6 +298,12 @@ _deps/unity-src/src/unity_internals.h:
 
 /usr/include/openssl/params.h:
 
+/home/quackdcs/micro-opcua/src/core/tcp_connection.h:
+
+/usr/include/openssl/stack.h:
+
+/home/quackdcs/micro-opcua/src/services/read/common.h:
+
 /usr/include/x86_64-linux-gnu/bits/types/__mbstate_t.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/capacities.h:
@@ -309,13 +312,13 @@ _deps/unity-src/src/unity_internals.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/authorization/jwt.h:
 
+/home/quackdcs/micro-opcua/include/muc_opcua/pubsub.h:
+
+/usr/include/openssl/cryptoerr.h:
+
+/home/quackdcs/micro-opcua/include/muc_opcua/opcua_types.h:
+
 /home/quackdcs/micro-opcua/include/muc_opcua/server.h:
-
-/home/quackdcs/micro-opcua/include/muc_opcua/services/role_management.h:
-
-/home/quackdcs/micro-opcua/src/core/tcp_connection.h:
-
-/usr/include/openssl/stack.h:
 
 /usr/include/x86_64-linux-gnu/bits/mathcalls.h:
 
@@ -363,6 +366,10 @@ _deps/unity-src/src/unity.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h:
 
+/usr/include/features.h:
+
+/home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h:
+
 /usr/include/inttypes.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/config.h:
@@ -381,9 +388,7 @@ _deps/unity-src/src/unity.h:
 
 /usr/include/x86_64-linux-gnu/bits/long-double.h:
 
-/usr/include/features.h:
-
-/home/quackdcs/micro-opcua/src/services/read/common.h:
+/home/quackdcs/micro-opcua/include/muc_opcua/services/role_management.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/status.h:
 
@@ -472,8 +477,6 @@ _deps/unity-src/src/unity.h:
 /usr/include/x86_64-linux-gnu/bits/fp-fast.h:
 
 /usr/include/openssl/obj_mac.h:
-
-/usr/include/x86_64-linux-gnu/bits/sched.h:
 
 /usr/include/x86_64-linux-gnu/bits/timesize.h:
 

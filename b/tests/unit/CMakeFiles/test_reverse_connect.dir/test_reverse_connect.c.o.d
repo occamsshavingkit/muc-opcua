@@ -40,6 +40,7 @@ tests/unit/CMakeFiles/test_reverse_connect.dir/test_reverse_connect.c.o: \
  /home/quackdcs/micro-opcua/src/../include/muc_opcua/services/key_credential.h \
  /home/quackdcs/micro-opcua/src/../include/muc_opcua/services/role_management.h \
  /home/quackdcs/micro-opcua/src/../include/muc_opcua/services/certificate_management.h \
+ /home/quackdcs/micro-opcua/src/../include/muc_opcua/services/certificate_manager.h \
  /home/quackdcs/micro-opcua/src/../include/muc_opcua/services/audit.h \
  /usr/include/string.h \
  /home/quackdcs/micro-opcua/b/_deps/unity-src/src/unity.h \

@@ -21,6 +21,7 @@ tests/unit/CMakeFiles/test_tcp_connection.dir/test_tcp_connection.c.o: /home/qua
   /home/quackdcs/micro-opcua/include/muc_opcua/server.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/audit.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_management.h \
+  /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/diagnostics.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/history.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h \
@@ -104,6 +105,8 @@ tests/unit/CMakeFiles/test_tcp_connection.dir/test_tcp_connection.c.o: /home/qua
 
 /home/quackdcs/micro-opcua/include/muc_opcua/status.h:
 
+/home/quackdcs/micro-opcua/include/muc_opcua/services/role_management.h:
+
 /usr/include/x86_64-linux-gnu/bits/types/struct_FILE.h:
 
 /home/quackdcs/micro-opcua/src/core/tcp_connection.h:
@@ -148,7 +151,9 @@ tests/unit/CMakeFiles/test_tcp_connection.dir/test_tcp_connection.c.o: /home/qua
 
 /home/quackdcs/micro-opcua/include/muc_opcua/address_space.h:
 
-/home/quackdcs/micro-opcua/include/muc_opcua/services/role_management.h:
+/usr/include/x86_64-linux-gnu/bits/types/__fpos_t.h:
+
+/home/quackdcs/micro-opcua/include/muc_opcua/address_space/complex_types.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/server.h:
 
@@ -169,6 +174,8 @@ tests/unit/CMakeFiles/test_tcp_connection.dir/test_tcp_connection.c.o: /home/qua
 /usr/include/string.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h:
+
+/home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h:
 
 /usr/include/x86_64-linux-gnu/bits/stdint-uintn.h:
 
@@ -227,7 +234,3 @@ _deps/unity-src/src/unity.h:
 /home/quackdcs/micro-opcua/include/muc_opcua/services/diagnostics.h:
 
 /usr/include/x86_64-linux-gnu/bits/time64.h:
-
-/home/quackdcs/micro-opcua/include/muc_opcua/address_space/complex_types.h:
-
-/usr/include/x86_64-linux-gnu/bits/types/__fpos_t.h:

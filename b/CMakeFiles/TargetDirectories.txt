@@ -99,6 +99,7 @@
 /home/quackdcs/micro-opcua/b/tests/unit/CMakeFiles/test_cert_token_decoder.dir
 /home/quackdcs/micro-opcua/b/tests/unit/CMakeFiles/test_certificate.dir
 /home/quackdcs/micro-opcua/b/tests/unit/CMakeFiles/test_certificate_management.dir
+/home/quackdcs/micro-opcua/b/tests/unit/CMakeFiles/test_certificate_manager.dir
 /home/quackdcs/micro-opcua/b/tests/unit/CMakeFiles/test_certificate_validity.dir
 /home/quackdcs/micro-opcua/b/tests/unit/CMakeFiles/test_complex_types.dir
 /home/quackdcs/micro-opcua/b/tests/unit/CMakeFiles/test_conformance_docs.dir

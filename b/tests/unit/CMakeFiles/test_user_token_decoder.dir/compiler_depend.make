@@ -21,6 +21,7 @@ tests/unit/CMakeFiles/test_user_token_decoder.dir/test_user_token_decoder.c.o: /
   /home/quackdcs/micro-opcua/include/muc_opcua/server.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/audit.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_management.h \
+  /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/diagnostics.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/history.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h \
@@ -101,6 +102,10 @@ tests/unit/CMakeFiles/test_user_token_decoder.dir/test_user_token_decoder.c.o: /
 
 /usr/include/x86_64-linux-gnu/bits/types/struct_FILE.h:
 
+/usr/include/x86_64-linux-gnu/bits/types/__mbstate_t.h:
+
+/home/quackdcs/micro-opcua/include/muc_opcua/services/role_management.h:
+
 /home/quackdcs/micro-opcua/include/muc_opcua/services/audit.h:
 
 /usr/include/x86_64-linux-gnu/bits/libc-header-start.h:
@@ -117,13 +122,11 @@ tests/unit/CMakeFiles/test_user_token_decoder.dir/test_user_token_decoder.c.o: /
 
 /usr/include/x86_64-linux-gnu/bits/types/__sigset_t.h:
 
+/home/quackdcs/micro-opcua/tests/unit/test_user_token_decoder.c:
+
 /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_management.h:
 
 /usr/include/x86_64-linux-gnu/bits/long-double.h:
-
-/home/quackdcs/micro-opcua/tests/unit/test_user_token_decoder.c:
-
-/home/quackdcs/micro-opcua/include/muc_opcua/services/role_management.h:
 
 /usr/include/x86_64-linux-gnu/bits/typesizes.h:
 
@@ -145,12 +148,6 @@ tests/unit/CMakeFiles/test_user_token_decoder.dir/test_user_token_decoder.c.o: /
 
 /usr/include/x86_64-linux-gnu/bits/types/FILE.h:
 
-/usr/include/limits.h:
-
-_deps/unity-src/src/unity_internals.h:
-
-/home/quackdcs/micro-opcua/include/muc_opcua/opcua_ids.h:
-
 /home/quackdcs/micro-opcua/include/muc_opcua/server.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/types.h:
@@ -169,17 +166,23 @@ _deps/unity-src/src/unity_internals.h:
 
 /usr/include/string.h:
 
+/home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h:
+
 /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h:
 
 /usr/include/x86_64-linux-gnu/bits/stdint-uintn.h:
-
-/usr/include/x86_64-linux-gnu/bits/types/__mbstate_t.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/services/history.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/capacities.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/features.h:
+
+_deps/unity-src/src/unity_internals.h:
+
+/home/quackdcs/micro-opcua/include/muc_opcua/opcua_ids.h:
+
+/usr/include/limits.h:
 
 /usr/include/stdc-predef.h:
 

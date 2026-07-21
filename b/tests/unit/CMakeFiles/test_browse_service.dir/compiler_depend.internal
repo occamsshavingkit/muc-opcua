@@ -22,6 +22,7 @@ tests/unit/CMakeFiles/test_browse_service.dir/test_browse_service.c.o
  /home/quackdcs/micro-opcua/include/muc_opcua/server.h
  /home/quackdcs/micro-opcua/include/muc_opcua/services/audit.h
  /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_management.h
+ /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h
  /home/quackdcs/micro-opcua/include/muc_opcua/services/diagnostics.h
  /home/quackdcs/micro-opcua/include/muc_opcua/services/history.h
  /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h

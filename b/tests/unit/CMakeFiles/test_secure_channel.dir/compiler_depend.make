@@ -22,6 +22,7 @@ tests/unit/CMakeFiles/test_secure_channel.dir/test_secure_channel.c.o: /home/qua
   /home/quackdcs/micro-opcua/include/muc_opcua/services/alarms_conditions.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/audit.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_management.h \
+  /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/diagnostics.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/history.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h \
@@ -133,6 +134,12 @@ tests/unit/CMakeFiles/test_secure_channel.dir/test_secure_channel.c.o: /home/qua
 
 /usr/include/x86_64-linux-gnu/bits/math-vector.h:
 
+/usr/include/x86_64-linux-gnu/bits/types/struct___jmp_buf_tag.h:
+
+/usr/include/x86_64-linux-gnu/bits/libm-simd-decl-stubs.h:
+
+/home/quackdcs/micro-opcua/include/muc_opcua/services/role_management.h:
+
 /home/quackdcs/micro-opcua/tests/support/fake_platform.h:
 
 /usr/include/x86_64-linux-gnu/bits/time64.h:
@@ -146,6 +153,8 @@ tests/unit/CMakeFiles/test_secure_channel.dir/test_secure_channel.c.o: /home/qua
 /home/quackdcs/micro-opcua/include/muc_opcua/status.h:
 
 /usr/include/x86_64-linux-gnu/bits/stdint-uintn.h:
+
+/home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h:
 
@@ -199,8 +208,6 @@ tests/unit/CMakeFiles/test_secure_channel.dir/test_secure_channel.c.o: /home/qua
 
 /home/quackdcs/micro-opcua/include/muc_opcua/encoding.h:
 
-/home/quackdcs/micro-opcua/include/muc_opcua/services/role_management.h:
-
 /home/quackdcs/micro-opcua/include/muc_opcua/server.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/types.h:
@@ -213,8 +220,6 @@ tests/unit/CMakeFiles/test_secure_channel.dir/test_secure_channel.c.o: /home/qua
 
 /home/quackdcs/micro-opcua/include/muc_opcua/config.h:
 
-/home/quackdcs/micro-opcua/src/address_space/base_nodes.h:
-
 /home/quackdcs/micro-opcua/include/muc_opcua/authorization/jwt.h:
 
 /usr/include/string.h:
@@ -224,6 +229,8 @@ tests/unit/CMakeFiles/test_secure_channel.dir/test_secure_channel.c.o: /home/qua
 /home/quackdcs/micro-opcua/include/muc_opcua/capacities.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/features.h:
+
+/home/quackdcs/micro-opcua/src/address_space/base_nodes.h:
 
 /usr/include/stdc-predef.h:
 
@@ -250,10 +257,6 @@ tests/unit/CMakeFiles/test_secure_channel.dir/test_secure_channel.c.o: /home/qua
 /usr/lib/gcc/x86_64-linux-gnu/13/include/stdarg.h:
 
 /home/quackdcs/micro-opcua/src/core/service_dispatch.h:
-
-/usr/include/x86_64-linux-gnu/bits/types/struct___jmp_buf_tag.h:
-
-/usr/include/x86_64-linux-gnu/bits/libm-simd-decl-stubs.h:
 
 _deps/unity-src/src/unity_internals.h:
 

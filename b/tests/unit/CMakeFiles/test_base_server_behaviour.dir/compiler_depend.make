@@ -21,6 +21,7 @@ tests/unit/CMakeFiles/test_base_server_behaviour.dir/test_base_server_behaviour.
   /home/quackdcs/micro-opcua/include/muc_opcua/services/alarms_conditions.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/audit.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_management.h \
+  /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/diagnostics.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/history.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h \
@@ -139,6 +140,10 @@ tests/unit/CMakeFiles/test_base_server_behaviour.dir/test_base_server_behaviour.
 
 /usr/include/x86_64-linux-gnu/bits/math-vector.h:
 
+/usr/include/x86_64-linux-gnu/bits/types/struct___jmp_buf_tag.h:
+
+/usr/include/x86_64-linux-gnu/bits/libm-simd-decl-stubs.h:
+
 /usr/include/x86_64-linux-gnu/bits/types/__mbstate_t.h:
 
 /home/quackdcs/micro-opcua/src/core/sequence.h:
@@ -149,13 +154,17 @@ tests/unit/CMakeFiles/test_base_server_behaviour.dir/test_base_server_behaviour.
 
 /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_management.h:
 
+/home/quackdcs/micro-opcua/include/muc_opcua/status.h:
+
+/home/quackdcs/micro-opcua/src/services/session.h:
+
 /usr/include/x86_64-linux-gnu/bits/stdint-uintn.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h:
 
-/home/quackdcs/micro-opcua/include/muc_opcua/status.h:
+/home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h:
 
-/home/quackdcs/micro-opcua/src/services/session.h:
+/home/quackdcs/micro-opcua/include/muc_opcua/services/role_management.h:
 
 /usr/include/x86_64-linux-gnu/bits/time64.h:
 
@@ -183,8 +192,6 @@ tests/unit/CMakeFiles/test_base_server_behaviour.dir/test_base_server_behaviour.
 
 /home/quackdcs/micro-opcua/include/muc_opcua/platform.h:
 
-/usr/include/stdc-predef.h:
-
 /usr/include/x86_64-linux-gnu/bits/types/__fpos_t.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/address_space/complex_types.h:
@@ -192,8 +199,6 @@ tests/unit/CMakeFiles/test_base_server_behaviour.dir/test_base_server_behaviour.
 /usr/include/x86_64-linux-gnu/bits/mathcalls.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/encoding.h:
-
-/home/quackdcs/micro-opcua/include/muc_opcua/services/role_management.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/server.h:
 
@@ -223,6 +228,8 @@ tests/unit/CMakeFiles/test_base_server_behaviour.dir/test_base_server_behaviour.
 
 /home/quackdcs/micro-opcua/src/services/subscription_publish/common.h:
 
+/usr/include/stdc-predef.h:
+
 /home/quackdcs/micro-opcua/src/security/sym_chunk.h:
 
 /usr/include/x86_64-linux-gnu/bits/stdio_lim.h:
@@ -246,10 +253,6 @@ tests/unit/CMakeFiles/test_base_server_behaviour.dir/test_base_server_behaviour.
 /usr/lib/gcc/x86_64-linux-gnu/13/include/stdarg.h:
 
 /home/quackdcs/micro-opcua/src/core/service_dispatch.h:
-
-/usr/include/x86_64-linux-gnu/bits/types/struct___jmp_buf_tag.h:
-
-/usr/include/x86_64-linux-gnu/bits/libm-simd-decl-stubs.h:
 
 /home/quackdcs/micro-opcua/src/core/ctz.h:
 

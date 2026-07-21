@@ -21,6 +21,7 @@ tests/unit/CMakeFiles/test_server_status_value.dir/test_server_status_value.c.o:
   /home/quackdcs/micro-opcua/include/muc_opcua/services/alarms_conditions.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/audit.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_management.h \
+  /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/diagnostics.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/history.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h \
@@ -129,13 +130,11 @@ tests/unit/CMakeFiles/test_server_status_value.dir/test_server_status_value.c.o:
 
 /usr/include/x86_64-linux-gnu/bits/setjmp.h:
 
+/usr/include/x86_64-linux-gnu/bits/mathcalls-helper-functions.h:
+
 /usr/include/x86_64-linux-gnu/bits/types/__mbstate_t.h:
 
 /home/quackdcs/micro-opcua/src/core/sequence.h:
-
-/usr/include/x86_64-linux-gnu/bits/stdint-uintn.h:
-
-/home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/status.h:
 
@@ -146,6 +145,14 @@ tests/unit/CMakeFiles/test_server_status_value.dir/test_server_status_value.c.o:
 /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_management.h:
 
 /usr/include/x86_64-linux-gnu/bits/long-double.h:
+
+/usr/include/x86_64-linux-gnu/bits/stdint-uintn.h:
+
+/home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h:
+
+/home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h:
+
+/home/quackdcs/micro-opcua/include/muc_opcua/services/role_management.h:
 
 /usr/include/x86_64-linux-gnu/bits/time64.h:
 
@@ -185,8 +192,6 @@ tests/unit/CMakeFiles/test_server_status_value.dir/test_server_status_value.c.o:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/address_space.h:
 
-/usr/include/stdc-predef.h:
-
 /usr/include/x86_64-linux-gnu/bits/types/__fpos_t.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/address_space/complex_types.h:
@@ -199,8 +204,6 @@ tests/unit/CMakeFiles/test_server_status_value.dir/test_server_status_value.c.o:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/opcua_types.h:
 
-/home/quackdcs/micro-opcua/include/muc_opcua/services/role_management.h:
-
 /home/quackdcs/micro-opcua/include/muc_opcua/server.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/types.h:
@@ -212,6 +215,8 @@ tests/unit/CMakeFiles/test_server_status_value.dir/test_server_status_value.c.o:
 /home/quackdcs/micro-opcua/include/muc_opcua/capacities.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/features.h:
+
+/usr/include/stdc-predef.h:
 
 /home/quackdcs/micro-opcua/src/security/sym_chunk.h:
 
@@ -270,5 +275,3 @@ _deps/unity-src/src/unity.h:
 /usr/lib/gcc/x86_64-linux-gnu/13/include/stdnoreturn.h:
 
 /usr/include/x86_64-linux-gnu/bits/flt-eval-method.h:
-
-/usr/include/x86_64-linux-gnu/bits/mathcalls-helper-functions.h:

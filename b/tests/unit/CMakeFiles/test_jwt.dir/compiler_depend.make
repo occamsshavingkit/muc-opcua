@@ -21,6 +21,7 @@ tests/unit/CMakeFiles/test_jwt.dir/test_jwt.c.o: /home/quackdcs/micro-opcua/test
   /home/quackdcs/micro-opcua/include/muc_opcua/server.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/audit.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_management.h \
+  /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/diagnostics.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/history.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h \
@@ -194,11 +195,9 @@ tests/unit/CMakeFiles/test_jwt.dir/test_jwt.c.o: /home/quackdcs/micro-opcua/test
 
 /usr/include/x86_64-linux-gnu/bits/types/__fpos_t.h:
 
+/usr/include/x86_64-linux-gnu/bits/types/__FILE.h:
+
 /usr/include/openssl/dsa.h:
-
-/usr/include/openssl/err.h:
-
-/usr/include/x86_64-linux-gnu/bits/libm-simd-decl-stubs.h:
 
 /usr/include/openssl/e_os2.h:
 
@@ -258,8 +257,6 @@ _deps/unity-src/src/unity_internals.h:
 
 /usr/include/linux/errno.h:
 
-/usr/include/features.h:
-
 /usr/include/x86_64-linux-gnu/bits/time.h:
 
 /usr/include/openssl/asn1.h:
@@ -274,16 +271,6 @@ _deps/unity-src/src/unity_internals.h:
 
 /usr/include/openssl/pemerr.h:
 
-/home/quackdcs/micro-opcua/include/muc_opcua/authorization/jwt.h:
-
-/usr/include/x86_64-linux-gnu/bits/types/__mbstate_t.h:
-
-/home/quackdcs/micro-opcua/include/muc_opcua/capacities.h:
-
-/home/quackdcs/micro-opcua/include/muc_opcua/server.h:
-
-/home/quackdcs/micro-opcua/include/muc_opcua/services/role_management.h:
-
 /usr/include/openssl/buffererr.h:
 
 /usr/include/x86_64-linux-gnu/bits/stdlib-float.h:
@@ -293,6 +280,14 @@ _deps/unity-src/src/unity_internals.h:
 /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_management.h:
 
 /usr/include/errno.h:
+
+/home/quackdcs/micro-opcua/include/muc_opcua/authorization/jwt.h:
+
+/usr/include/x86_64-linux-gnu/bits/types/__mbstate_t.h:
+
+/home/quackdcs/micro-opcua/include/muc_opcua/capacities.h:
+
+/home/quackdcs/micro-opcua/include/muc_opcua/server.h:
 
 /usr/include/x86_64-linux-gnu/bits/types/clockid_t.h:
 
@@ -352,6 +347,12 @@ _deps/unity-src/src/unity.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/types.h:
 
+/home/quackdcs/micro-opcua/include/muc_opcua/services/role_management.h:
+
+/usr/include/features.h:
+
+/home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h:
+
 /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h:
 
 /usr/include/setjmp.h:
@@ -367,6 +368,10 @@ _deps/unity-src/src/unity.h:
 /usr/include/asm-generic/errno-base.h:
 
 /usr/include/asm-generic/errno.h:
+
+/usr/include/openssl/err.h:
+
+/usr/include/x86_64-linux-gnu/bits/libm-simd-decl-stubs.h:
 
 /usr/include/openssl/evp.h:
 
@@ -469,5 +474,3 @@ _deps/unity-src/src/unity.h:
 /usr/include/x86_64-linux-gnu/bits/stdio_lim.h:
 
 /usr/include/x86_64-linux-gnu/bits/types/FILE.h:
-
-/usr/include/x86_64-linux-gnu/bits/types/__FILE.h:

@@ -22,6 +22,7 @@ tests/unit/CMakeFiles/test_transfer_subscriptions.dir/test_transfer_subscription
   /home/quackdcs/micro-opcua/include/muc_opcua/services/alarms_conditions.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/audit.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_management.h \
+  /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/diagnostics.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/history.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h \
@@ -166,6 +167,10 @@ tests/unit/CMakeFiles/test_transfer_subscriptions.dir/test_transfer_subscription
 
 /usr/include/stdint.h:
 
+/usr/include/stdc-predef.h:
+
+/home/quackdcs/micro-opcua/include/muc_opcua/services/role_management.h:
+
 /usr/include/x86_64-linux-gnu/bits/types/__sigset_t.h:
 
 /usr/include/x86_64-linux-gnu/bits/long-double.h:
@@ -183,6 +188,8 @@ tests/unit/CMakeFiles/test_transfer_subscriptions.dir/test_transfer_subscription
 /home/quackdcs/micro-opcua/include/muc_opcua/services/audit.h:
 
 /usr/include/x86_64-linux-gnu/bits/stdint-uintn.h:
+
+/home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h:
 
@@ -208,8 +215,6 @@ tests/unit/CMakeFiles/test_transfer_subscriptions.dir/test_transfer_subscription
 
 /home/quackdcs/micro-opcua/tests/unit/test_transfer_subscriptions.c:
 
-/home/quackdcs/micro-opcua/include/muc_opcua/services/role_management.h:
-
 /home/quackdcs/micro-opcua/include/muc_opcua/server.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/types.h:
@@ -234,14 +239,6 @@ _deps/unity-src/src/unity.h:
 
 /usr/include/math.h:
 
-/usr/lib/gcc/x86_64-linux-gnu/13/include/stdbool.h:
-
-/home/quackdcs/micro-opcua/src/security/secure_util.h:
-
-/usr/include/x86_64-linux-gnu/bits/stdio_lim.h:
-
-/home/quackdcs/micro-opcua/src/services/event_filter.h:
-
 /home/quackdcs/micro-opcua/include/muc_opcua/address_space.h:
 
 /usr/include/x86_64-linux-gnu/bits/types/__fpos_t.h:
@@ -264,6 +261,14 @@ _deps/unity-src/src/unity.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/features.h:
 
+/usr/lib/gcc/x86_64-linux-gnu/13/include/stdbool.h:
+
+/home/quackdcs/micro-opcua/src/security/secure_util.h:
+
+/usr/include/x86_64-linux-gnu/bits/stdio_lim.h:
+
+/home/quackdcs/micro-opcua/src/services/event_filter.h:
+
 /home/quackdcs/micro-opcua/src/address_space/base_nodes.h:
 
 /usr/include/stdio.h:
@@ -273,8 +278,6 @@ _deps/unity-src/src/unity.h:
 /home/quackdcs/micro-opcua/src/services/session.h:
 
 /home/quackdcs/micro-opcua/src/services/query.h:
-
-/usr/include/stdc-predef.h:
 
 /home/quackdcs/micro-opcua/src/security/sym_chunk.h:
 

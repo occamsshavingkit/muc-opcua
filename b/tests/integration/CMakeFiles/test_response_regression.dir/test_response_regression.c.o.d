@@ -43,6 +43,7 @@ tests/integration/CMakeFiles/test_response_regression.dir/test_response_regressi
  /home/quackdcs/micro-opcua/src/../include/muc_opcua/services/key_credential.h \
  /home/quackdcs/micro-opcua/src/../include/muc_opcua/services/role_management.h \
  /home/quackdcs/micro-opcua/src/../include/muc_opcua/services/certificate_management.h \
+ /home/quackdcs/micro-opcua/src/../include/muc_opcua/services/certificate_manager.h \
  /home/quackdcs/micro-opcua/src/../include/muc_opcua/services/audit.h \
  /home/quackdcs/micro-opcua/tests/support/service_builders.h \
  /home/quackdcs/micro-opcua/b/_deps/unity-src/src/unity.h \

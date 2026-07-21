@@ -38,6 +38,7 @@ src/CMakeFiles/muc_opcua.dir/core/tcp_connection.c.o: \
  /home/quackdcs/micro-opcua/src/../include/muc_opcua/services/key_credential.h \
  /home/quackdcs/micro-opcua/src/../include/muc_opcua/services/role_management.h \
  /home/quackdcs/micro-opcua/src/../include/muc_opcua/services/certificate_management.h \
+ /home/quackdcs/micro-opcua/src/../include/muc_opcua/services/certificate_manager.h \
  /home/quackdcs/micro-opcua/src/../include/muc_opcua/services/audit.h \
  /home/quackdcs/micro-opcua/src/core/../encoding/binary_le.h \
  /home/quackdcs/micro-opcua/src/../include/muc_opcua/encoding.h \

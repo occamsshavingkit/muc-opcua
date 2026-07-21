@@ -20,6 +20,7 @@ tests/benchmark/CMakeFiles/hotpath_benchmark.dir/hotpath_benchmark.c.o: /home/qu
   /home/quackdcs/micro-opcua/include/muc_opcua/services/alarms_conditions.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/audit.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_management.h \
+  /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/diagnostics.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/history.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h \
@@ -162,6 +163,8 @@ tests/benchmark/CMakeFiles/hotpath_benchmark.dir/hotpath_benchmark.c.o: /home/qu
 
 /usr/include/x86_64-linux-gnu/bits/floatn-common.h:
 
+/usr/include/x86_64-linux-gnu/bits/endianness.h:
+
 /usr/include/x86_64-linux-gnu/bits/types/__mbstate_t.h:
 
 /home/quackdcs/micro-opcua/src/core/sequence.h:
@@ -175,6 +178,8 @@ tests/benchmark/CMakeFiles/hotpath_benchmark.dir/hotpath_benchmark.c.o: /home/qu
 /home/quackdcs/micro-opcua/include/muc_opcua/services/method.h:
 
 /home/quackdcs/micro-opcua/src/services/subscription.h:
+
+/home/quackdcs/micro-opcua/include/muc_opcua/services/role_management.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/types.h:
 
@@ -191,6 +196,8 @@ tests/benchmark/CMakeFiles/hotpath_benchmark.dir/hotpath_benchmark.c.o: /home/qu
 /home/quackdcs/micro-opcua/include/muc_opcua/status.h:
 
 /usr/include/x86_64-linux-gnu/bits/stdint-uintn.h:
+
+/home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h:
 
@@ -234,10 +241,6 @@ tests/benchmark/CMakeFiles/hotpath_benchmark.dir/hotpath_benchmark.c.o: /home/qu
 
 /home/quackdcs/micro-opcua/include/muc_opcua/muc_opcua.h:
 
-/usr/include/x86_64-linux-gnu/bits/endianness.h:
-
-/home/quackdcs/micro-opcua/include/muc_opcua/services/role_management.h:
-
 /home/quackdcs/micro-opcua/include/muc_opcua/server.h:
 
 /usr/include/x86_64-linux-gnu/bits/errno.h:
@@ -256,8 +259,6 @@ tests/benchmark/CMakeFiles/hotpath_benchmark.dir/hotpath_benchmark.c.o: /home/qu
 
 /usr/include/string.h:
 
-/home/quackdcs/micro-opcua/src/security/sym_chunk.h:
-
 /usr/include/x86_64-linux-gnu/bits/local_lim.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/services/history.h:
@@ -267,6 +268,8 @@ tests/benchmark/CMakeFiles/hotpath_benchmark.dir/hotpath_benchmark.c.o: /home/qu
 /home/quackdcs/micro-opcua/include/muc_opcua/features.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/platform.h:
+
+/home/quackdcs/micro-opcua/src/security/sym_chunk.h:
 
 /usr/include/x86_64-linux-gnu/bits/stdio_lim.h:
 

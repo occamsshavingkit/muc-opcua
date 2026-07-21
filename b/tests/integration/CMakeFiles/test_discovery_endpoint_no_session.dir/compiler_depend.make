@@ -22,6 +22,7 @@ tests/integration/CMakeFiles/test_discovery_endpoint_no_session.dir/test_discove
   /home/quackdcs/micro-opcua/include/muc_opcua/services/alarms_conditions.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/audit.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_management.h \
+  /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/diagnostics.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/history.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h \
@@ -141,21 +142,17 @@ tests/integration/CMakeFiles/test_discovery_endpoint_no_session.dir/test_discove
 
 /usr/include/x86_64-linux-gnu/bits/libc-header-start.h:
 
-/usr/include/x86_64-linux-gnu/bits/types/__mbstate_t.h:
+/usr/include/x86_64-linux-gnu/bits/fp-logb.h:
 
-/home/quackdcs/micro-opcua/src/core/sequence.h:
-
-/usr/include/x86_64-linux-gnu/bits/types/__sigset_t.h:
-
-/usr/include/x86_64-linux-gnu/bits/long-double.h:
-
-/home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_management.h:
+/home/quackdcs/micro-opcua/include/muc_opcua/services/role_management.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/services/audit.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/status.h:
 
 /usr/include/x86_64-linux-gnu/bits/stdint-uintn.h:
+
+/home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h:
 
@@ -173,13 +170,21 @@ tests/integration/CMakeFiles/test_discovery_endpoint_no_session.dir/test_discove
 
 /home/quackdcs/micro-opcua/include/muc_opcua/platform.h:
 
+/usr/include/x86_64-linux-gnu/bits/types/__sigset_t.h:
+
+/usr/include/x86_64-linux-gnu/bits/long-double.h:
+
+/home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_management.h:
+
+/usr/include/x86_64-linux-gnu/bits/types/__mbstate_t.h:
+
+/home/quackdcs/micro-opcua/src/core/sequence.h:
+
 /usr/include/x86_64-linux-gnu/bits/time64.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/services/diagnostics.h:
 
 /home/quackdcs/micro-opcua/tests/integration/test_discovery_endpoint_no_session.c:
-
-/home/quackdcs/micro-opcua/include/muc_opcua/services/role_management.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/server.h:
 
@@ -268,8 +273,6 @@ _deps/unity-src/src/unity_internals.h:
 /usr/include/x86_64-linux-gnu/bits/fp-fast.h:
 
 /usr/include/stdint.h:
-
-/usr/include/x86_64-linux-gnu/bits/fp-logb.h:
 
 /home/quackdcs/micro-opcua/src/security/security_policy.h:
 

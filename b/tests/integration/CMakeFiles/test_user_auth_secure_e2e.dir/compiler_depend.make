@@ -22,6 +22,7 @@ tests/integration/CMakeFiles/test_user_auth_secure_e2e.dir/test_user_auth_secure
   /home/quackdcs/micro-opcua/include/muc_opcua/services/alarms_conditions.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/audit.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_management.h \
+  /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/diagnostics.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/history.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h \
@@ -152,13 +153,13 @@ tests/integration/CMakeFiles/test_user_auth_secure_e2e.dir/test_user_auth_secure
 
 /usr/include/x86_64-linux-gnu/bits/floatn.h:
 
+/usr/include/string.h:
+
 /home/quackdcs/micro-opcua/src/platform/host_crypto_adapter.h:
 
 /home/quackdcs/micro-opcua/src/security/sym_chunk.h:
 
-/home/quackdcs/micro-opcua/src/services/read/common.h:
-
-/usr/include/features.h:
+/home/quackdcs/micro-opcua/include/muc_opcua/services/role_management.h:
 
 /usr/include/x86_64-linux-gnu/bits/types/__sigset_t.h:
 
@@ -180,6 +181,8 @@ tests/integration/CMakeFiles/test_user_auth_secure_e2e.dir/test_user_auth_secure
 
 /usr/include/x86_64-linux-gnu/bits/stdint-uintn.h:
 
+/home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h:
+
 /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h:
 
 /home/quackdcs/micro-opcua/src/services/session.h:
@@ -193,12 +196,6 @@ tests/integration/CMakeFiles/test_user_auth_secure_e2e.dir/test_user_auth_secure
 /home/quackdcs/micro-opcua/include/muc_opcua/security.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/platform.h:
-
-/usr/include/x86_64-linux-gnu/bits/types/struct_FILE.h:
-
-/home/quackdcs/micro-opcua/src/core/tcp_connection.h:
-
-/home/quackdcs/micro-opcua/src/core/message_chunk.h:
 
 /usr/include/x86_64-linux-gnu/bits/typesizes.h:
 
@@ -230,8 +227,6 @@ _deps/unity-src/src/unity.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/encoding.h:
 
-/home/quackdcs/micro-opcua/include/muc_opcua/services/role_management.h:
-
 /home/quackdcs/micro-opcua/include/muc_opcua/server.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/types.h:
@@ -242,13 +237,21 @@ _deps/unity-src/src/unity.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/authorization/jwt.h:
 
-/usr/include/string.h:
-
 /home/quackdcs/micro-opcua/include/muc_opcua/services/history.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/capacities.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/features.h:
+
+/home/quackdcs/micro-opcua/src/services/read/common.h:
+
+/usr/include/x86_64-linux-gnu/bits/types/struct_FILE.h:
+
+/home/quackdcs/micro-opcua/src/core/message_chunk.h:
+
+/home/quackdcs/micro-opcua/src/core/tcp_connection.h:
+
+/usr/include/features.h:
 
 /home/quackdcs/micro-opcua/src/core/safe_mem.h:
 

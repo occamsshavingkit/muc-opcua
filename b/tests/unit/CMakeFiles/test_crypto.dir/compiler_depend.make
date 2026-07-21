@@ -21,6 +21,7 @@ tests/unit/CMakeFiles/test_crypto.dir/test_crypto.c.o: /home/quackdcs/micro-opcu
   /home/quackdcs/micro-opcua/include/muc_opcua/server.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/audit.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_management.h \
+  /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/diagnostics.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/history.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h \
@@ -112,9 +113,13 @@ tests/unit/CMakeFiles/test_crypto.dir/test_crypto.c.o: /home/quackdcs/micro-opcu
 
 /usr/include/x86_64-linux-gnu/bits/types/FILE.h:
 
+/usr/include/x86_64-linux-gnu/bits/types.h:
+
 /home/quackdcs/micro-opcua/src/platform/host_crypto_adapter.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/status.h:
+
+/home/quackdcs/micro-opcua/include/muc_opcua/services/role_management.h:
 
 /usr/include/x86_64-linux-gnu/bits/types/__sigset_t.h:
 
@@ -148,17 +153,11 @@ tests/unit/CMakeFiles/test_crypto.dir/test_crypto.c.o: /home/quackdcs/micro-opcu
 
 /usr/include/math.h:
 
-/usr/lib/gcc/x86_64-linux-gnu/13/include/stdbool.h:
-
-/home/quackdcs/micro-opcua/src/security/secure_util.h:
-
 /home/quackdcs/micro-opcua/include/muc_opcua/address_space.h:
 
 /usr/include/x86_64-linux-gnu/bits/types/__fpos_t.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/address_space/complex_types.h:
-
-/home/quackdcs/micro-opcua/include/muc_opcua/services/role_management.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/server.h:
 
@@ -184,7 +183,13 @@ tests/unit/CMakeFiles/test_crypto.dir/test_crypto.c.o: /home/quackdcs/micro-opcu
 
 /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h:
 
+/home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h:
+
 /usr/include/x86_64-linux-gnu/bits/stdint-uintn.h:
+
+/usr/lib/gcc/x86_64-linux-gnu/13/include/stdbool.h:
+
+/home/quackdcs/micro-opcua/src/security/secure_util.h:
 
 /usr/include/features-time64.h:
 
@@ -237,8 +242,6 @@ _deps/unity-src/src/unity.h:
 /usr/include/x86_64-linux-gnu/bits/stdint-least.h:
 
 /usr/include/x86_64-linux-gnu/bits/stdio_lim.h:
-
-/usr/include/x86_64-linux-gnu/bits/types.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/services/diagnostics.h:
 

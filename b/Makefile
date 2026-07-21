@@ -1030,6 +1030,19 @@ test_certificate_management/fast:
 .PHONY : test_certificate_management/fast
 
 #=============================================================================
+# Target rules for targets named test_certificate_manager
+
+# Build rule for target.
+test_certificate_manager: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 test_certificate_manager
+.PHONY : test_certificate_manager
+
+# fast build rule for target.
+test_certificate_manager/fast:
+	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_certificate_manager.dir/build.make tests/unit/CMakeFiles/test_certificate_manager.dir/build
+.PHONY : test_certificate_manager/fast
+
+#=============================================================================
 # Target rules for targets named test_certificate_validity
 
 # Build rule for target.
@@ -2579,6 +2592,7 @@ help:
 	@echo "... test_cert_token_decoder"
 	@echo "... test_certificate"
 	@echo "... test_certificate_management"
+	@echo "... test_certificate_manager"
 	@echo "... test_certificate_validity"
 	@echo "... test_complex_types"
 	@echo "... test_conformance_docs"
