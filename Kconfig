@@ -569,6 +569,19 @@ config MUC_OPCUA_CU_EVENTS
 	  Backing tests: test_alarms_conditions, test_event_notifier, test_event_serializer.
 	  Notes: Project-level Conformance Unit mirroring the legacy 'events' item; emits Kconfig symbol MUC_OPCUA_CU_EVENTS matching the #ifdef guard renamed in Task 3 of the CU-aligned code reorganisation plan.
 
+config MUC_OPCUA_CU_ALARMS_CONDITIONS
+	bool "CU: Alarms & Conditions"
+	depends on MUC_OPCUA_CU_EVENTS && MUC_OPCUA_FACET_CORE_2022_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-9 §5.
+	  Backing tests: test_alarms_conditions.
+	  Notes: Project-level CU gating the Alarms & Conditions service. Enables
+	  Acknowledge/Confirm/Dialog method dispatch, condition state tracking,
+	  and A&C audit event integration. Satisfies OPC CUs 2189, 2726, 2852,
+	  2879, 2921, 2927.
+
 config MUC_OPCUA_CU_EXTENDED_NODEIDS
 	bool "CU: Extended Nodeids"
 	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES

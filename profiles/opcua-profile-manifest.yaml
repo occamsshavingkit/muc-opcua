@@ -6576,6 +6576,156 @@
       }
     },
     {
+      "backing_tests": [],
+      "cu_optional": false,
+      "id": "opc_cu_2921",
+      "implementation_state": "documented",
+      "kconfig_symbol": null,
+      "kind": "conformance_unit",
+      "notes": "AlarmConditionType and state tracking. Satisfied by opc_cu_alarms_conditions.",
+      "opc_display_name": "A & C Alarm",
+      "opc_reference": {
+        "cu_id": "2921",
+        "cu_name": "A & C Alarm",
+        "section": "5.10",
+        "source_url": "https://profiles.opcfoundation.org",
+        "spec": "OPC-10000-9"
+      },
+      "profile_defaults": {
+        "custom": false
+      },
+      "satisfied_by": "opc_cu_alarms_conditions",
+      "source_metadata": {
+        "profile_group_id": 171,
+        "source_endpoint": "conformanceunit/?pg=171&all=1"
+      }
+    },
+    {
+      "backing_tests": [],
+      "cu_optional": false,
+      "id": "opc_cu_2927",
+      "implementation_state": "documented",
+      "kconfig_symbol": null,
+      "kind": "conformance_unit",
+      "notes": "AcknowledgeableConditionType with Acknowledge/Confirm method dispatch. Satisfied by opc_cu_alarms_conditions.",
+      "opc_display_name": "A & C Acknowledge",
+      "opc_reference": {
+        "cu_id": "2927",
+        "cu_name": "A & C Acknowledge",
+        "section": "5.7",
+        "source_url": "https://profiles.opcfoundation.org",
+        "spec": "OPC-10000-9"
+      },
+      "profile_defaults": {
+        "custom": false
+      },
+      "satisfied_by": "opc_cu_alarms_conditions",
+      "source_metadata": {
+        "profile_group_id": 171,
+        "source_endpoint": "conformanceunit/?pg=171&all=1"
+      }
+    },
+    {
+      "backing_tests": [],
+      "cu_optional": false,
+      "id": "opc_cu_2189",
+      "implementation_state": "documented",
+      "kconfig_symbol": null,
+      "kind": "conformance_unit",
+      "notes": "ConditionClasses type nodes deferred. Satisfied by opc_cu_alarms_conditions.",
+      "opc_display_name": "A & C ConditionClasses",
+      "opc_reference": {
+        "cu_id": "2189",
+        "cu_name": "A & C ConditionClasses",
+        "section": "5.9",
+        "source_url": "https://profiles.opcfoundation.org",
+        "spec": "OPC-10000-9"
+      },
+      "profile_defaults": {
+        "custom": false
+      },
+      "satisfied_by": "opc_cu_alarms_conditions",
+      "source_metadata": {
+        "profile_group_id": 171,
+        "source_endpoint": "conformanceunit/?pg=171&all=1"
+      }
+    },
+    {
+      "backing_tests": [],
+      "cu_optional": false,
+      "id": "opc_cu_2726",
+      "implementation_state": "documented",
+      "kconfig_symbol": null,
+      "kind": "conformance_unit",
+      "notes": "FirstInGroupAlarmType deferred. Satisfied by opc_cu_alarms_conditions.",
+      "opc_display_name": "A & C First in Group Alarm",
+      "opc_reference": {
+        "cu_id": "2726",
+        "cu_name": "A & C First in Group Alarm",
+        "section": "5.10.3",
+        "source_url": "https://profiles.opcfoundation.org",
+        "spec": "OPC-10000-9"
+      },
+      "profile_defaults": {
+        "custom": false
+      },
+      "satisfied_by": "opc_cu_alarms_conditions",
+      "source_metadata": {
+        "profile_group_id": 171,
+        "source_endpoint": "conformanceunit/?pg=171&all=1"
+      }
+    },
+    {
+      "backing_tests": [],
+      "cu_optional": false,
+      "id": "opc_cu_2852",
+      "implementation_state": "documented",
+      "kconfig_symbol": null,
+      "kind": "conformance_unit",
+      "notes": "ConditionSubClassType deferred. Satisfied by opc_cu_alarms_conditions.",
+      "opc_display_name": "A & C Condition Sub-Classes",
+      "opc_reference": {
+        "cu_id": "2852",
+        "cu_name": "A & C Condition Sub-Classes",
+        "section": "5.9.11",
+        "source_url": "https://profiles.opcfoundation.org",
+        "spec": "OPC-10000-9"
+      },
+      "profile_defaults": {
+        "custom": false
+      },
+      "satisfied_by": "opc_cu_alarms_conditions",
+      "source_metadata": {
+        "profile_group_id": 171,
+        "source_endpoint": "conformanceunit/?pg=171&all=1"
+      }
+    },
+    {
+      "backing_tests": [],
+      "cu_optional": false,
+      "id": "opc_cu_2879",
+      "implementation_state": "documented",
+      "kconfig_symbol": null,
+      "kind": "conformance_unit",
+      "notes": "ReAlarmType/OffNormalAlarmType deferred. Satisfied by opc_cu_alarms_conditions.",
+      "opc_display_name": "A & C Re-Alarming",
+      "opc_reference": {
+        "cu_id": "2879",
+        "cu_name": "A & C Re-Alarming",
+        "section": "5.10.4",
+        "source_url": "https://profiles.opcfoundation.org",
+        "spec": "OPC-10000-9"
+      },
+      "profile_defaults": {
+        "custom": false
+      },
+      "satisfied_by": "opc_cu_alarms_conditions",
+      "source_metadata": {
+        "profile_group_id": 171,
+        "source_endpoint": "conformanceunit/?pg=171&all=1"
+      }
+    },
+    {
       "backing_tests": [
         "test_alarms_conditions"
       ],
@@ -6587,7 +6737,7 @@
       "implementation_state": "claimed",
       "kconfig_symbol": "MUC_OPCUA_CU_ALARMS_CONDITIONS",
       "kind": "conformance_unit",
-      "notes": "Project-level CU gating the Alarms & Conditions service (OPC-10000-9). Enables ConditionClasses type nodes, AcknowledgeableConditionType/AlarmConditionType hierarchy, Acknowledge/Confirm method dispatch, and condition state tracking in server_internal.h. Satisfies OPC CUs 2189, 2726, 2852, 2879, 2921, 2927.",
+      "notes": "Project-level CU gating the Alarms & Conditions service (OPC-10000-9). Enables Acknowledge/Confirm/Dialog method dispatch, condition state tracking, and audit event integration. Satisfies OPC CUs 2921, 2927.",
       "opc_display_name": "Alarms & Conditions",
       "opc_reference": {
         "section": "5",
@@ -6600,186 +6750,6 @@
         "micro": false,
         "nano": false,
         "standard": false
-      }
-    },
-    {
-      "backing_tests": [],
-      "cu_optional": false,
-      "id": "opc_cu_2189",
-      "implementation_state": "declared",
-      "kconfig_symbol": null,
-      "kind": "conformance_unit",
-      "notes": "A & C ConditionClasses (OPC-10000-9 5.9): BaseConditionClassType(11163) and subtype ObjectTypes (ProcessConditionClassType, MaintenanceConditionClassType, SystemConditionClassType) exposed in the AddressSpace type system. Satisfied by opc_cu_alarms_conditions.",
-      "opc_display_name": "A & C ConditionClasses",
-      "opc_reference": {
-        "cu_id": "2189",
-        "cu_name": "A & C ConditionClasses",
-        "section": "5.9",
-        "source_url": "https://profiles.opcfoundation.org",
-        "spec": "OPC-10000-9"
-      },
-      "profile_defaults": {
-        "custom": false,
-        "embedded": false,
-        "full": true,
-        "micro": false,
-        "nano": false,
-        "standard": false
-      },
-      "satisfied_by": "opc_cu_alarms_conditions",
-      "source_metadata": {
-        "profile_group_id": 171,
-        "source_endpoint": "conformanceunit/?pg=171&all=1"
-      }
-    },
-    {
-      "backing_tests": [],
-      "cu_optional": false,
-      "id": "opc_cu_2726",
-      "implementation_state": "declared",
-      "kconfig_symbol": null,
-      "kind": "conformance_unit",
-      "notes": "A & C First in Group Alarm (OPC-10000-9 5.10.3): FirstInGroupAlarmType ObjectType exposed in the AddressSpace type system. Satisfied by opc_cu_alarms_conditions.",
-      "opc_display_name": "A & C First in Group Alarm",
-      "opc_reference": {
-        "cu_id": "2726",
-        "cu_name": "A & C First in Group Alarm",
-        "section": "5.10.3",
-        "source_url": "https://profiles.opcfoundation.org",
-        "spec": "OPC-10000-9"
-      },
-      "profile_defaults": {
-        "custom": false,
-        "embedded": false,
-        "full": true,
-        "micro": false,
-        "nano": false,
-        "standard": false
-      },
-      "satisfied_by": "opc_cu_alarms_conditions",
-      "source_metadata": {
-        "profile_group_id": 171,
-        "source_endpoint": "conformanceunit/?pg=171&all=1"
-      }
-    },
-    {
-      "backing_tests": [],
-      "cu_optional": false,
-      "id": "opc_cu_2852",
-      "implementation_state": "declared",
-      "kconfig_symbol": null,
-      "kind": "conformance_unit",
-      "notes": "A & C Condition Sub-Classes (OPC-10000-9 5.9.11): ConditionSubClassType(17223) ObjectType exposed in the AddressSpace type system. Satisfied by opc_cu_alarms_conditions.",
-      "opc_display_name": "A & C Condition Sub-Classes",
-      "opc_reference": {
-        "cu_id": "2852",
-        "cu_name": "A & C Condition Sub-Classes",
-        "section": "5.9.11",
-        "source_url": "https://profiles.opcfoundation.org",
-        "spec": "OPC-10000-9"
-      },
-      "profile_defaults": {
-        "custom": false,
-        "embedded": false,
-        "full": true,
-        "micro": false,
-        "nano": false,
-        "standard": false
-      },
-      "satisfied_by": "opc_cu_alarms_conditions",
-      "source_metadata": {
-        "profile_group_id": 171,
-        "source_endpoint": "conformanceunit/?pg=171&all=1"
-      }
-    },
-    {
-      "backing_tests": [],
-      "cu_optional": false,
-      "id": "opc_cu_2879",
-      "implementation_state": "declared",
-      "kconfig_symbol": null,
-      "kind": "conformance_unit",
-      "notes": "A & C Re-Alarming (OPC-10000-9 5.10.4): ReAlarmType and OffNormalAlarmType ObjectTypes exposed in the AddressSpace type system. Satisfied by opc_cu_alarms_conditions.",
-      "opc_display_name": "A & C Re-Alarming",
-      "opc_reference": {
-        "cu_id": "2879",
-        "cu_name": "A & C Re-Alarming",
-        "section": "5.10.4",
-        "source_url": "https://profiles.opcfoundation.org",
-        "spec": "OPC-10000-9"
-      },
-      "profile_defaults": {
-        "custom": false,
-        "embedded": false,
-        "full": true,
-        "micro": false,
-        "nano": false,
-        "standard": false
-      },
-      "satisfied_by": "opc_cu_alarms_conditions",
-      "source_metadata": {
-        "profile_group_id": 171,
-        "source_endpoint": "conformanceunit/?pg=171&all=1"
-      }
-    },
-    {
-      "backing_tests": [],
-      "cu_optional": false,
-      "id": "opc_cu_2921",
-      "implementation_state": "declared",
-      "kconfig_symbol": null,
-      "kind": "conformance_unit",
-      "notes": "A & C Alarm (OPC-10000-9 5.10): AlarmConditionType(2915) ObjectType exposed in the AddressSpace type system with ActiveState/Id, AcknowledgedState/Id properties. Satisfied by opc_cu_alarms_conditions.",
-      "opc_display_name": "A & C Alarm",
-      "opc_reference": {
-        "cu_id": "2921",
-        "cu_name": "A & C Alarm",
-        "section": "5.10",
-        "source_url": "https://profiles.opcfoundation.org",
-        "spec": "OPC-10000-9"
-      },
-      "profile_defaults": {
-        "custom": false,
-        "embedded": false,
-        "full": true,
-        "micro": false,
-        "nano": false,
-        "standard": false
-      },
-      "satisfied_by": "opc_cu_alarms_conditions",
-      "source_metadata": {
-        "profile_group_id": 171,
-        "source_endpoint": "conformanceunit/?pg=171&all=1"
-      }
-    },
-    {
-      "backing_tests": [],
-      "cu_optional": false,
-      "id": "opc_cu_2927",
-      "implementation_state": "declared",
-      "kconfig_symbol": null,
-      "kind": "conformance_unit",
-      "notes": "A & C Acknowledge (OPC-10000-9 5.7): AcknowledgeableConditionType(2881) ObjectType with Acknowledge(9111) and Confirm(9113) Method dispatch; condition state tracking (acked_state, confirmed_state). Satisfied by opc_cu_alarms_conditions.",
-      "opc_display_name": "A & C Acknowledge",
-      "opc_reference": {
-        "cu_id": "2927",
-        "cu_name": "A & C Acknowledge",
-        "section": "5.7",
-        "source_url": "https://profiles.opcfoundation.org",
-        "spec": "OPC-10000-9"
-      },
-      "profile_defaults": {
-        "custom": false,
-        "embedded": false,
-        "full": true,
-        "micro": false,
-        "nano": false,
-        "standard": false
-      },
-      "satisfied_by": "opc_cu_alarms_conditions",
-      "source_metadata": {
-        "profile_group_id": 171,
-        "source_endpoint": "conformanceunit/?pg=171&all=1"
       }
     }
   ],
