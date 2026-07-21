@@ -998,17 +998,25 @@ comment "Security Administration (NOT IMPLEMENTED)"
 #   Notes: Application supports time synchronization via features of a standard operating system.
 comment "Time Sync – OS based support (NOT IMPLEMENTED)"
 
-# Time Sync – IEEE 1588 (PTP) (opc_cu_2479)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 2479:Time Sync – IEEE 1588 (PTP).
-#   Notes: Application supports time synchronization via the Precision Time Protocol (PTP).
-comment "Time Sync – IEEE 1588 (PTP) (NOT IMPLEMENTED)"
+config MUC_OPCUA_CU_TIME_SYNC_IEEE_1588_PTP
+	bool "CU: Time Sync – IEEE 1588 (PTP)"
+	depends on MUC_OPCUA_FACET_CORE_2022_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-7 §4.2 -- CU 2479:Time Sync – IEEE 1588 (PTP).
+	  Backing tests: none yet.
+	  Notes: Application supports time synchronization via the Precision Time Protocol (PTP).
 
-# Time Sync – IEEE 802.1AS (opc_cu_2480)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 2480:Time Sync – IEEE 802.1AS.
-#   Notes: Application supports time synchronization via the features described in IEEE 802.1AS.
-comment "Time Sync – IEEE 802.1AS (NOT IMPLEMENTED)"
+config MUC_OPCUA_CU_TIME_SYNC_IEEE_802_1AS
+	bool "CU: Time Sync – IEEE 802.1AS"
+	depends on MUC_OPCUA_FACET_CORE_2022_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-7 §4.2 -- CU 2480:Time Sync – IEEE 802.1AS.
+	  Backing tests: none yet.
+	  Notes: Application supports time synchronization via the features described in IEEE 802.1AS.
 
 # SecurityPolicy Support (opc_cu_2600)
 #   Implementation state: unimplemented -- visible but not selectable.
