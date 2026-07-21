@@ -21,11 +21,9 @@ static _Alignas(8) opcua_byte_t s_server_storage[MU_SERVER_STORAGE_BYTES];
 static mu_server_t *s_server;
 
 /* TCP adapter stubs (matching test_key_credential.c signatures) */
-static opcua_statuscode_t stub_listen(void *ctx, const char *endpoint_url, opcua_uint16_t port, opcua_int32_t backlog) {
+static opcua_statuscode_t stub_listen(void *ctx, const char *endpoint_url) {
     (void)ctx;
     (void)endpoint_url;
-    (void)port;
-    (void)backlog;
     return 0;
 }
 static opcua_statuscode_t stub_accept(void *ctx, void **out_handle) {
