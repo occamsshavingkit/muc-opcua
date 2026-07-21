@@ -649,7 +649,7 @@ The following OPC items are tracked in the manifest but are NOT implemented. The
 | opc_cu_2479 |  | unimplemented | Application supports time synchronization via the Precision Time Protocol (PTP). |
 | opc_cu_2480 |  | unimplemented | Application supports time synchronization via the features described in IEEE 802.1AS. |
 | opc_cu_2786 |  | unimplemented | Application supports time synchronization via the Network Time Protocol (NTP). |
-| opc_cu_2808 |  | unimplemented | Restrict access based on the configured Roles and permissions. |
+| opc_cu_2808 | test_role_management | claimed | Stub callback interface for role-based access control. |
 | opc_cu_2823 |  | unimplemented | Servers shall take proper measures to protect against attacks on user identity tokens. Such an attack is assumed if repeated connection attempts with invalid user identity tokens happen. See ActivateSession Service in UA Part 4. |
 | opc_cu_3072 |  | unimplemented | Supports the Read Service to read one or more Attributes of one or more Nodes. This includes support of the IndexRange parameter to read a single element or a range of elements when the Attribute value is an array. |
 | opc_cu_3073 |  | unimplemented | Support the RegisterNodes and UnregisterNodes Services as a way to optimize access to repeatedly used Nodes in the Server's OPC UA AddressSpace. |

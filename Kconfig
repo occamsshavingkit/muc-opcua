@@ -1030,11 +1030,18 @@ comment "SecurityPolicy Support (NOT IMPLEMENTED)"
 #   Notes: Application supports time synchronization via the Network Time Protocol (NTP).
 comment "Time Sync – NTP (NOT IMPLEMENTED)"
 
-# Security Role Server Authorization (opc_cu_2808)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 2808:Security Role Server Authorization.
-#   Notes: Restrict access based on the configured Roles and permissions.
-comment "Security Role Server Authorization (NOT IMPLEMENTED)"
+config MUC_OPCUA_CU_SECURITY_ROLE_SERVER_AUTHORIZATION
+	bool "CU: Security Role Server Authorization"
+	depends on MUC_OPCUA_CU_USER_ROLE_MANAGEMENT
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed — stub callback interface.
+	  OPC source: OPC-10000-7 CU 2808.
+	  Backing tests: test_role_management.
+	  Notes: Stub callback interface for role-based access control. The
+	  permission-check callback is invoked before each service handler;
+	  a NULL callback (default) allows all requests. Integrators
+	  supply their own authorization logic via the callback.
 
 # Attribute Read (opc_cu_3072)
 #   Implementation state: unimplemented -- visible but not selectable.

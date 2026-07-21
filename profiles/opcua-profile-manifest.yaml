@@ -4567,13 +4567,13 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": ["test_role_management"],
       "cu_optional": true,
       "id": "opc_cu_2808",
-      "implementation_state": "unimplemented",
-      "kconfig_symbol": null,
+      "implementation_state": "claimed",
+      "kconfig_symbol": "MUC_OPCUA_CU_SECURITY_ROLE_SERVER_AUTHORIZATION",
       "kind": "conformance_unit",
-      "notes": "Restrict access based on the configured Roles and permissions.",
+      "notes": "Stub callback interface for role-based access control. The callback is invoked before each service handler; NULL callback allows all.",
       "opc_display_name": "Security Role Server Authorization",
       "opc_reference": {
         "cu_id": "2808",

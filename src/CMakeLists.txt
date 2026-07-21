@@ -353,6 +353,12 @@ if(MUC_OPCUA_CU_USER_ROLE_MANAGEMENT)
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_CU_USER_ROLE_MANAGEMENT=1)
 endif()
 
+# -- CU: Security Role Server Authorization (opc_cu_2808) --
+# Stub callback interface; no source file. Depends on USER_ROLE_MANAGEMENT.
+if(MUC_OPCUA_CU_SECURITY_ROLE_SERVER_AUTHORIZATION)
+    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_CU_SECURITY_ROLE_SERVER_AUTHORIZATION=1)
+endif()
+
 # -- CU: Certificate Management (spec 096, OPC-10000-7 CU 2105) --
 # Type-system only: no Methods in this iteration. The ObjectType nodes
 # live entirely in base_nodes.c behind #ifdef. No separate .c file.

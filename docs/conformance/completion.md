@@ -177,7 +177,7 @@ Optional CUs:
 - [ ] `opc_cu_2407` Security Administration
 - [ ] `opc_cu_2479` Time Sync – IEEE 1588 (PTP)
 - [ ] `opc_cu_2480` Time Sync – IEEE 802.1AS
-- [ ] `opc_cu_2808` Security Role Server Authorization
+- [x] `opc_cu_2808` Security Role Server Authorization
 - [ ] `opc_cu_3201` Base Info Custom Type System
 - [ ] `opc_cu_5505` Time Sync – UA based support
 - [ ] `opc_cu_5814` Security – No Application Authentication
@@ -254,7 +254,7 @@ Optional CUs:
 - [ ] `opc_cu_2407` Security Administration
 - [ ] `opc_cu_2479` Time Sync – IEEE 1588 (PTP)
 - [ ] `opc_cu_2480` Time Sync – IEEE 802.1AS
-- [ ] `opc_cu_2808` Security Role Server Authorization
+- [x] `opc_cu_2808` Security Role Server Authorization
 - [ ] `opc_cu_3196` Base Info Fixed SamplingInterval
 - [ ] `opc_cu_3201` Base Info Custom Type System
 - [ ] `opc_cu_5505` Time Sync – UA based support
@@ -360,7 +360,7 @@ Optional CUs:
 - [ ] `opc_cu_2516` Base Info HasOrderedComponent
 - [ ] `opc_cu_2517` Base Info Deprecated Information
 - [ ] `opc_cu_2518` Base Info Image DataTypes
-- [ ] `opc_cu_2808` Security Role Server Authorization
+- [x] `opc_cu_2808` Security Role Server Authorization
 - [ ] `opc_cu_3196` Base Info Fixed SamplingInterval
 - [ ] `opc_cu_3201` Base Info Custom Type System
 - [ ] `opc_cu_3207` Base Info OptionSet DataType
@@ -494,7 +494,7 @@ Optional CUs:
 - [ ] `opc_cu_2516` Base Info HasOrderedComponent
 - [ ] `opc_cu_2517` Base Info Deprecated Information
 - [ ] `opc_cu_2518` Base Info Image DataTypes
-- [ ] `opc_cu_2808` Security Role Server Authorization
+- [x] `opc_cu_2808` Security Role Server Authorization
 - [ ] `opc_cu_3196` Base Info Fixed SamplingInterval
 - [ ] `opc_cu_3201` Base Info Custom Type System
 - [ ] `opc_cu_3207` Base Info OptionSet DataType
