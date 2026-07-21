@@ -1565,7 +1565,7 @@
       "not_applicable": {
         "nano": "Documentation CU; satisfied by documentation presence, not code."
       },
-      "notes": "Documented (spec 078): the core capacities (SecureChannels/Sessions/ContinuationPoints/Subscriptions/PublishRequests/MonitoredItems/queue depth/retransmission) are specified in docs/integration-guide.md \u00a72.2.1 and capacities.h, and discoverable at runtime via the ServerCapabilities/OperationLimits nodes. Documentation CU (no code). The application documentation shall specify the core OPC UA related capacities. This includes the number of supported SecureChannels, Sessions, and Continuation Points for the View Services.\nIf Subscriptions are supported, it shall also include capacity information for Subscriptions and Publish requests, MonitoredItems, retransmission queue, and the queue for sampled MonitoredItems. (Documentation complete; no code change needed.)",
+      "notes": "Documented (spec 078): the core capacities (SecureChannels/Sessions/ContinuationPoints/Subscriptions/PublishRequests/MonitoredItems/queue depth/retransmission) are specified in docs/integration-guide.md §2.2.1 and capacities.h, and discoverable at runtime via the ServerCapabilities/OperationLimits nodes. Documentation CU (no code). The application documentation shall specify the core OPC UA related capacities. This includes the number of supported SecureChannels, Sessions, and Continuation Points for the View Services.\nIf Subscriptions are supported, it shall also include capacity information for Subscriptions and Publish requests, MonitoredItems, retransmission queue, and the queue for sampled MonitoredItems. (Documentation complete; no code change needed.)",
       "opc_display_name": "Documentation - Core Capacities",
       "opc_reference": {
         "cu_id": "3808",
@@ -1786,7 +1786,7 @@
       "kconfig_symbol": "MUC_OPCUA_FACET_USER_TOKEN_USER_NAME_PASSWORD_SERVER",
       "kind": "facet",
       "notes": "User Name Password: Anonymous+UserName auth in activate_session.c",
-      "opc_display_name": "User Token \u2013 User Name Password Server Facet",
+      "opc_display_name": "User Token – User Name Password Server Facet",
       "opc_reference": {
         "profile_id": "1695",
         "profile_uri": "http://opcfoundation.org/UA-Profile/Security/UserToken/Server/UserNamePassword",
@@ -1815,7 +1815,7 @@
       "kconfig_symbol": "MUC_OPCUA_FACET_USER_TOKEN_X509_CERTIFICATE_SERVER",
       "kind": "facet",
       "notes": "X509 Certificate: X509 user token in activate_session.c",
-      "opc_display_name": "User Token \u2013 X509 Certificate Server Facet",
+      "opc_display_name": "User Token – X509 Certificate Server Facet",
       "opc_reference": {
         "profile_id": "1696",
         "profile_uri": "http://opcfoundation.org/UA-Profile/Security/UserToken/Server/X509Certificate",
@@ -3169,7 +3169,7 @@
       "implementation_state": "declared",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
-      "notes": "Reconciled (spec 073): mu_server_signal_semantic_change (public API) latches per-MonitoredItem; the next DataChange Notification sets StatusCode bit 14 (0x4000, SemanticsChanged) then the one-shot latch clears (notification.c + deadband.c, OPC-10000-4 \u00a77.38.1); test_subscriptions::test_publish_semantics_changed_bit (E2E emit->decode). Satisfied by opc_cu_subscription_basic.\nSupports setting the SemanticsChanged Bit in the statusCode when a semantic change occurs, such as a change in the engineering unit associated with the Value Attribute.",
+      "notes": "Reconciled (spec 073): mu_server_signal_semantic_change (public API) latches per-MonitoredItem; the next DataChange Notification sets StatusCode bit 14 (0x4000, SemanticsChanged) then the one-shot latch clears (notification.c + deadband.c, OPC-10000-4 §7.38.1); test_subscriptions::test_publish_semantics_changed_bit (E2E emit->decode). Satisfied by opc_cu_subscription_basic.\nSupports setting the SemanticsChanged Bit in the statusCode when a semantic change occurs, such as a change in the engineering unit associated with the Value Attribute.",
       "opc_display_name": "Base Info SemanticChange Bit",
       "opc_reference": {
         "cu_id": "3922",
@@ -5323,6 +5323,486 @@
     },
     {
       "backing_tests": [
+        "test_history"
+      ],
+      "cu_optional": true,
+      "depends_on": [],
+      "id": "opc_cu_1571",
+      "implementation_state": "declared",
+      "kconfig_symbol": null,
+      "kind": "conformance_unit",
+      "notes": "HistoryRead service with ReadRawModifiedDetails. Continuation points, pagination, timestamp filtering, and returnBounds implemented. Satisfied by service_history (MUC_OPCUA_CU_HISTORICAL_ACCESS_SERVER_FACET).",
+      "opc_display_name": "Historical Raw Data 2022 Server Facet",
+      "opc_reference": {
+        "cu_id": "1571",
+        "cu_name": "Historical Raw Data 2022 Server Facet",
+        "section": null,
+        "source_url": "https://profiles.opcfoundation.org",
+        "spec": "OPC-10000-11"
+      },
+      "profile_defaults": {
+        "custom": false,
+        "embedded": false,
+        "full": true,
+        "micro": false,
+        "nano": false,
+        "standard": false
+      },
+      "satisfied_by": "service_history",
+      "source_metadata": {
+        "profile_group_id": 171,
+        "source_endpoint": "profile/?pg=171&all=1"
+      }
+    },
+    {
+      "backing_tests": [],
+      "cu_optional": true,
+      "depends_on": [],
+      "id": "opc_cu_1572",
+      "implementation_state": "deferred",
+      "kconfig_symbol": null,
+      "kind": "conformance_unit",
+      "notes": "Historical Annotation not implemented; no annotation storage or retrieval support.",
+      "opc_display_name": "Historical Annotation 2022 Server Facet",
+      "opc_reference": {
+        "cu_id": "1572",
+        "cu_name": "Historical Annotation 2022 Server Facet",
+        "section": null,
+        "source_url": "https://profiles.opcfoundation.org",
+        "spec": "OPC-10000-11"
+      },
+      "profile_defaults": {
+        "custom": false,
+        "embedded": false,
+        "full": false,
+        "micro": false,
+        "nano": false,
+        "standard": false
+      },
+      "source_metadata": {
+        "profile_group_id": 171,
+        "source_endpoint": "profile/?pg=171&all=1"
+      }
+    },
+    {
+      "backing_tests": [
+        "test_history"
+      ],
+      "cu_optional": true,
+      "depends_on": [],
+      "id": "opc_cu_1573",
+      "implementation_state": "declared",
+      "kconfig_symbol": null,
+      "kind": "conformance_unit",
+      "notes": "HistoryUpdate service with UpdateDataDetails. performInsertReplace field decoded and dispatched via history_adapter.update_data callback. Satisfied by service_history (MUC_OPCUA_CU_HISTORICAL_ACCESS_SERVER_FACET).",
+      "opc_display_name": "Historical Data Update 2022 Server Facet",
+      "opc_reference": {
+        "cu_id": "1573",
+        "cu_name": "Historical Data Update 2022 Server Facet",
+        "section": null,
+        "source_url": "https://profiles.opcfoundation.org",
+        "spec": "OPC-10000-11"
+      },
+      "profile_defaults": {
+        "custom": false,
+        "embedded": false,
+        "full": true,
+        "micro": false,
+        "nano": false,
+        "standard": false
+      },
+      "satisfied_by": "service_history",
+      "source_metadata": {
+        "profile_group_id": 171,
+        "source_endpoint": "profile/?pg=171&all=1"
+      }
+    },
+    {
+      "backing_tests": [
+        "test_history_memstore"
+      ],
+      "cu_optional": true,
+      "depends_on": [],
+      "id": "opc_cu_1574",
+      "implementation_state": "declared",
+      "kconfig_symbol": null,
+      "kind": "conformance_unit",
+      "notes": "HistoryUpdate Insert (performInsertReplace=1). Insert rejects existing-timestamp collision; replace requires pre-existing timestamp. Satisfied by service_history (MUC_OPCUA_CU_HISTORICAL_ACCESS_SERVER_FACET).",
+      "opc_display_name": "Historical Data Insert 2022 Server Facet",
+      "opc_reference": {
+        "cu_id": "1574",
+        "cu_name": "Historical Data Insert 2022 Server Facet",
+        "section": null,
+        "source_url": "https://profiles.opcfoundation.org",
+        "spec": "OPC-10000-11"
+      },
+      "profile_defaults": {
+        "custom": false,
+        "embedded": false,
+        "full": true,
+        "micro": false,
+        "nano": false,
+        "standard": false
+      },
+      "satisfied_by": "service_history",
+      "source_metadata": {
+        "profile_group_id": 171,
+        "source_endpoint": "profile/?pg=171&all=1"
+      }
+    },
+    {
+      "backing_tests": [
+        "test_history_memstore"
+      ],
+      "cu_optional": true,
+      "depends_on": [],
+      "id": "opc_cu_1575",
+      "implementation_state": "declared",
+      "kconfig_symbol": null,
+      "kind": "conformance_unit",
+      "notes": "HistoryUpdate Replace (performInsertReplace=2). Replace updates existing-timestamp entry; insert new entries via replace. Satisfied by service_history (MUC_OPCUA_CU_HISTORICAL_ACCESS_SERVER_FACET).",
+      "opc_display_name": "Historical Data Replace 2022 Server Facet",
+      "opc_reference": {
+        "cu_id": "1575",
+        "cu_name": "Historical Data Replace 2022 Server Facet",
+        "section": null,
+        "source_url": "https://profiles.opcfoundation.org",
+        "spec": "OPC-10000-11"
+      },
+      "profile_defaults": {
+        "custom": false,
+        "embedded": false,
+        "full": true,
+        "micro": false,
+        "nano": false,
+        "standard": false
+      },
+      "satisfied_by": "service_history",
+      "source_metadata": {
+        "profile_group_id": 171,
+        "source_endpoint": "profile/?pg=171&all=1"
+      }
+    },
+    {
+      "backing_tests": [
+        "test_history"
+      ],
+      "cu_optional": true,
+      "depends_on": [],
+      "id": "opc_cu_1576",
+      "implementation_state": "declared",
+      "kconfig_symbol": null,
+      "kind": "conformance_unit",
+      "notes": "HistoryUpdate service with DeleteRawModifiedDetails. isDeleteModified, startTime, endTime decoded and dispatched via history_adapter.delete_raw_modified callback. Satisfied by service_history (MUC_OPCUA_CU_HISTORICAL_ACCESS_SERVER_FACET).",
+      "opc_display_name": "Historical Data Delete 2022 Server Facet",
+      "opc_reference": {
+        "cu_id": "1576",
+        "cu_name": "Historical Data Delete 2022 Server Facet",
+        "section": null,
+        "source_url": "https://profiles.opcfoundation.org",
+        "spec": "OPC-10000-11"
+      },
+      "profile_defaults": {
+        "custom": false,
+        "embedded": false,
+        "full": true,
+        "micro": false,
+        "nano": false,
+        "standard": false
+      },
+      "satisfied_by": "service_history",
+      "source_metadata": {
+        "profile_group_id": 171,
+        "source_endpoint": "profile/?pg=171&all=1"
+      }
+    },
+    {
+      "backing_tests": [],
+      "cu_optional": true,
+      "depends_on": [
+        "opc_cu_1575"
+      ],
+      "id": "opc_cu_2264",
+      "implementation_state": "declared",
+      "kconfig_symbol": null,
+      "kind": "conformance_unit",
+      "notes": "Replace single values in history. Satisfied by Historical Data Replace (opc_cu_1575) via service_history.",
+      "opc_display_name": "Historical Access Replace Value",
+      "opc_reference": {
+        "cu_id": "2264",
+        "cu_name": "Historical Access Replace Value",
+        "section": null,
+        "source_url": "https://profiles.opcfoundation.org",
+        "spec": "OPC-10000-11"
+      },
+      "profile_defaults": {
+        "custom": false,
+        "embedded": false,
+        "full": true,
+        "micro": false,
+        "nano": false,
+        "standard": false
+      },
+      "satisfied_by": "service_history",
+      "source_metadata": {
+        "profile_group_id": 171,
+        "source_endpoint": "conformanceunit/?pg=171&all=1"
+      }
+    },
+    {
+      "backing_tests": [],
+      "cu_optional": true,
+      "depends_on": [],
+      "id": "opc_cu_1577",
+      "implementation_state": "deferred",
+      "kconfig_symbol": null,
+      "kind": "conformance_unit",
+      "notes": "Base Historical Event not implemented; no event history support.",
+      "opc_display_name": "Base Historical Event 2022 Server Facet",
+      "opc_reference": {
+        "cu_id": "1577",
+        "cu_name": "Base Historical Event 2022 Server Facet",
+        "section": null,
+        "source_url": "https://profiles.opcfoundation.org",
+        "spec": "OPC-10000-11"
+      },
+      "profile_defaults": {
+        "custom": false,
+        "embedded": false,
+        "full": false,
+        "micro": false,
+        "nano": false,
+        "standard": false
+      },
+      "source_metadata": {
+        "profile_group_id": 171,
+        "source_endpoint": "profile/?pg=171&all=1"
+      }
+    },
+    {
+      "backing_tests": [],
+      "cu_optional": true,
+      "depends_on": [
+        "opc_cu_1577"
+      ],
+      "id": "opc_cu_1578",
+      "implementation_state": "deferred",
+      "kconfig_symbol": null,
+      "kind": "conformance_unit",
+      "notes": "Historical Event Update not implemented; no event history support.",
+      "opc_display_name": "Historical Event Update 2022 Server Facet",
+      "opc_reference": {
+        "cu_id": "1578",
+        "cu_name": "Historical Event Update 2022 Server Facet",
+        "section": null,
+        "source_url": "https://profiles.opcfoundation.org",
+        "spec": "OPC-10000-11"
+      },
+      "profile_defaults": {
+        "custom": false,
+        "embedded": false,
+        "full": false,
+        "micro": false,
+        "nano": false,
+        "standard": false
+      },
+      "source_metadata": {
+        "profile_group_id": 171,
+        "source_endpoint": "profile/?pg=171&all=1"
+      }
+    },
+    {
+      "backing_tests": [],
+      "cu_optional": true,
+      "depends_on": [
+        "opc_cu_1577"
+      ],
+      "id": "opc_cu_1579",
+      "implementation_state": "deferred",
+      "kconfig_symbol": null,
+      "kind": "conformance_unit",
+      "notes": "Historical Event Insert not implemented; no event history support.",
+      "opc_display_name": "Historical Event Insert 2022 Server Facet",
+      "opc_reference": {
+        "cu_id": "1579",
+        "cu_name": "Historical Event Insert 2022 Server Facet",
+        "section": null,
+        "source_url": "https://profiles.opcfoundation.org",
+        "spec": "OPC-10000-11"
+      },
+      "profile_defaults": {
+        "custom": false,
+        "embedded": false,
+        "full": false,
+        "micro": false,
+        "nano": false,
+        "standard": false
+      },
+      "source_metadata": {
+        "profile_group_id": 171,
+        "source_endpoint": "profile/?pg=171&all=1"
+      }
+    },
+    {
+      "backing_tests": [],
+      "cu_optional": true,
+      "depends_on": [
+        "opc_cu_1577"
+      ],
+      "id": "opc_cu_1580",
+      "implementation_state": "deferred",
+      "kconfig_symbol": null,
+      "kind": "conformance_unit",
+      "notes": "Historical Event Replace not implemented; no event history support.",
+      "opc_display_name": "Historical Event Replace 2022 Server Facet",
+      "opc_reference": {
+        "cu_id": "1580",
+        "cu_name": "Historical Event Replace 2022 Server Facet",
+        "section": null,
+        "source_url": "https://profiles.opcfoundation.org",
+        "spec": "OPC-10000-11"
+      },
+      "profile_defaults": {
+        "custom": false,
+        "embedded": false,
+        "full": false,
+        "micro": false,
+        "nano": false,
+        "standard": false
+      },
+      "source_metadata": {
+        "profile_group_id": 171,
+        "source_endpoint": "profile/?pg=171&all=1"
+      }
+    },
+    {
+      "backing_tests": [],
+      "cu_optional": true,
+      "depends_on": [
+        "opc_cu_1577"
+      ],
+      "id": "opc_cu_1581",
+      "implementation_state": "deferred",
+      "kconfig_symbol": null,
+      "kind": "conformance_unit",
+      "notes": "Historical Event Delete not implemented; no event history support.",
+      "opc_display_name": "Historical Event Delete 2022 Server Facet",
+      "opc_reference": {
+        "cu_id": "1581",
+        "cu_name": "Historical Event Delete 2022 Server Facet",
+        "section": null,
+        "source_url": "https://profiles.opcfoundation.org",
+        "spec": "OPC-10000-11"
+      },
+      "profile_defaults": {
+        "custom": false,
+        "embedded": false,
+        "full": false,
+        "micro": false,
+        "nano": false,
+        "standard": false
+      },
+      "source_metadata": {
+        "profile_group_id": 171,
+        "source_endpoint": "profile/?pg=171&all=1"
+      }
+    },
+    {
+      "backing_tests": [],
+      "cu_optional": true,
+      "depends_on": [],
+      "id": "opc_cu_1710",
+      "implementation_state": "deferred",
+      "kconfig_symbol": null,
+      "kind": "conformance_unit",
+      "notes": "Historical Access Structured Data not implemented; structured data storage/retrieval requires additional development.",
+      "opc_display_name": "Historical Access Structured Data 2022 Server Facet",
+      "opc_reference": {
+        "cu_id": "1710",
+        "cu_name": "Historical Access Structured Data 2022 Server Facet",
+        "section": null,
+        "source_url": "https://profiles.opcfoundation.org",
+        "spec": "OPC-10000-11"
+      },
+      "profile_defaults": {
+        "custom": false,
+        "embedded": false,
+        "full": false,
+        "micro": false,
+        "nano": false,
+        "standard": false
+      },
+      "source_metadata": {
+        "profile_group_id": 171,
+        "source_endpoint": "profile/?pg=171&all=1"
+      }
+    },
+    {
+      "backing_tests": [],
+      "cu_optional": true,
+      "depends_on": [
+        "opc_cu_1710"
+      ],
+      "id": "opc_cu_2185",
+      "implementation_state": "deferred",
+      "kconfig_symbol": null,
+      "kind": "conformance_unit",
+      "notes": "Historical Access Structured Data Insert deferred; depends on opc_cu_1710.",
+      "opc_display_name": "Historical Access Structured Data Insert",
+      "opc_reference": {
+        "cu_id": "2185",
+        "cu_name": "Historical Access Structured Data Insert",
+        "section": null,
+        "source_url": "https://profiles.opcfoundation.org",
+        "spec": "OPC-10000-11"
+      },
+      "profile_defaults": {
+        "custom": false,
+        "embedded": false,
+        "full": false,
+        "micro": false,
+        "nano": false,
+        "standard": false
+      },
+      "source_metadata": {
+        "profile_group_id": 171,
+        "source_endpoint": "conformanceunit/?pg=171&all=1"
+      }
+    },
+    {
+      "backing_tests": [],
+      "cu_optional": true,
+      "depends_on": [
+        "opc_cu_1710"
+      ],
+      "id": "opc_cu_2332",
+      "implementation_state": "deferred",
+      "kconfig_symbol": null,
+      "kind": "conformance_unit",
+      "notes": "Historical Access Structured Data Read Raw deferred; depends on opc_cu_1710.",
+      "opc_display_name": "Historical Access Structured Data Read Raw",
+      "opc_reference": {
+        "cu_id": "2332",
+        "cu_name": "Historical Access Structured Data Read Raw",
+        "section": null,
+        "source_url": "https://profiles.opcfoundation.org",
+        "spec": "OPC-10000-11"
+      },
+      "profile_defaults": {
+        "custom": false,
+        "embedded": false,
+        "full": false,
+        "micro": false,
+        "nano": false,
+        "standard": false
+      },
+      "source_metadata": {
+        "profile_group_id": 171,
+        "source_endpoint": "conformanceunit/?pg=171&all=1"
+      }
+    },
+    {
+      "backing_tests": [
         "test_query_service"
       ],
       "depends_on": [],
@@ -5705,11 +6185,11 @@
       "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
-      "notes": "Application supports time synchronization via features of a standard operating system. | Satisfied by the same time-sync infrastructure as CU 5793; the time adapter provides the OS clock. Stub file exists but is not needed \u2014 the base time sync CU covers all sync source variants.",
-      "opc_display_name": "Time Sync \u2013 OS based support",
+      "notes": "Application supports time synchronization via features of a standard operating system. | Satisfied by the same time-sync infrastructure as CU 5793; the time adapter provides the OS clock. Stub file exists but is not needed — the base time sync CU covers all sync source variants.",
+      "opc_display_name": "Time Sync – OS based support",
       "opc_reference": {
         "cu_id": "2478",
-        "cu_name": "Time Sync \u2013 OS based support",
+        "cu_name": "Time Sync – OS based support",
         "section": null,
         "source_url": "https://profiles.opcfoundation.org",
         "spec": null
@@ -5736,10 +6216,10 @@
       "kconfig_symbol": "MUC_OPCUA_CU_TIME_SYNC_IEEE_1588_PTP",
       "kind": "conformance_unit",
       "notes": "Application supports time synchronization via the Precision Time Protocol (PTP).",
-      "opc_display_name": "Time Sync \u2013 IEEE 1588 (PTP)",
+      "opc_display_name": "Time Sync – IEEE 1588 (PTP)",
       "opc_reference": {
         "cu_id": "2479",
-        "cu_name": "Time Sync \u2013 IEEE 1588 (PTP)",
+        "cu_name": "Time Sync – IEEE 1588 (PTP)",
         "section": null,
         "source_url": "https://profiles.opcfoundation.org",
         "spec": null
@@ -5760,10 +6240,10 @@
       "kconfig_symbol": "MUC_OPCUA_CU_TIME_SYNC_IEEE_802_1AS",
       "kind": "conformance_unit",
       "notes": "Application supports time synchronization via the features described in IEEE 802.1AS.",
-      "opc_display_name": "Time Sync \u2013 IEEE 802.1AS",
+      "opc_display_name": "Time Sync – IEEE 802.1AS",
       "opc_reference": {
         "cu_id": "2480",
-        "cu_name": "Time Sync \u2013 IEEE 802.1AS",
+        "cu_name": "Time Sync – IEEE 802.1AS",
         "section": null,
         "source_url": "https://profiles.opcfoundation.org",
         "spec": null
@@ -5786,10 +6266,10 @@
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Application supports time synchronization via the Network Time Protocol (NTP).",
-      "opc_display_name": "Time Sync \u2013 NTP",
+      "opc_display_name": "Time Sync – NTP",
       "opc_reference": {
         "cu_id": "2786",
-        "cu_name": "Time Sync \u2013 NTP",
+        "cu_name": "Time Sync – NTP",
         "section": null,
         "source_url": "https://profiles.opcfoundation.org",
         "spec": null
@@ -5993,7 +6473,7 @@
       "implementation_state": "declared",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
-      "notes": "Reconciled (spec 073): on Publish-queue overflow handle_publish evicts the OLDEST parked request and answers it with Bad_TooManyPublishRequests, then parks the incoming request (publish_request_evict_oldest, publish_due.c; OPC-10000-4 \u00a75.14.5.1); test_subscriptions_capacity::test_publish_queue_overflow_evicts_oldest_and_parks_newest. Satisfied by opc_cu_subscription_basic.\nIf the maximum supported number of PublishRequests has been queued and a new PublishRequest arrives, the \"oldest\" PublishRequest has to be discarded by returning the proper error.",
+      "notes": "Reconciled (spec 073): on Publish-queue overflow handle_publish evicts the OLDEST parked request and answers it with Bad_TooManyPublishRequests, then parks the incoming request (publish_request_evict_oldest, publish_due.c; OPC-10000-4 §5.14.5.1); test_subscriptions_capacity::test_publish_queue_overflow_evicts_oldest_and_parks_newest. Satisfied by opc_cu_subscription_basic.\nIf the maximum supported number of PublishRequests has been queued and a new PublishRequest arrives, the \"oldest\" PublishRequest has to be discarded by returning the proper error.",
       "opc_display_name": "Subscription PublishRequest Queue Overflow",
       "opc_reference": {
         "cu_id": "3143",
@@ -6403,10 +6883,10 @@
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Satisfied by project-level CU opc_cu_time_sync; UA-based time synchronisation is stubbed in favour of OS/NTP-based sync. See src/cu/core_2022_server/time_sync_ua_based_support/stub.c.disabled.",
-      "opc_display_name": "Time Sync \u2013 UA based support",
+      "opc_display_name": "Time Sync – UA based support",
       "opc_reference": {
         "cu_id": "5505",
-        "cu_name": "Time Sync \u2013 UA based support",
+        "cu_name": "Time Sync – UA based support",
         "section": null,
         "source_url": "https://profiles.opcfoundation.org",
         "spec": null
@@ -7542,10 +8022,10 @@
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Security No Application Authentication not implemented; all sessions require authentication.",
-      "opc_display_name": "Security \u2013 No Application Authentication",
+      "opc_display_name": "Security – No Application Authentication",
       "opc_reference": {
         "cu_id": "5814",
-        "cu_name": "Security \u2013 No Application Authentication",
+        "cu_name": "Security – No Application Authentication",
         "section": null,
         "source_url": "https://profiles.opcfoundation.org",
         "spec": null
@@ -7570,7 +8050,7 @@
       "implementation_state": "claimed",
       "kconfig_symbol": "MUC_OPCUA_CU_KEY_CREDENTIAL_SERVICE",
       "kind": "conformance_unit",
-      "notes": "KeyCredential Service \u2014 GetEncryptingKey + CRUD methods implemented in PR #329",
+      "notes": "KeyCredential Service — GetEncryptingKey + CRUD methods implemented in PR #329",
       "opc_display_name": "KeyCredential Service",
       "opc_reference": {
         "cu_id": "2113",
@@ -7600,7 +8080,7 @@
       "implementation_state": "claimed",
       "kconfig_symbol": "MUC_OPCUA_CU_USER_ROLE_MANAGEMENT",
       "kind": "conformance_unit",
-      "notes": "User Role Management \u2014 AddRole/RemoveRole/AddIdentity/RemoveIdentity implemented in PR #330",
+      "notes": "User Role Management — AddRole/RemoveRole/AddIdentity/RemoveIdentity implemented in PR #330",
       "opc_display_name": "User Role Management",
       "opc_reference": {
         "cu_id": "2080",
@@ -7630,7 +8110,7 @@
       "implementation_state": "claimed",
       "kconfig_symbol": "MUC_OPCUA_CU_CERTIFICATE_MANAGEMENT",
       "kind": "conformance_unit",
-      "notes": "Certificate Management \u2014 CertificateGroupType + CertificateType in base_nodes.c",
+      "notes": "Certificate Management — CertificateGroupType + CertificateType in base_nodes.c",
       "opc_display_name": "Certificate Management",
       "opc_reference": {
         "cu_id": "2105",
@@ -7830,7 +8310,7 @@
   "metadata": {
     "superseded_profiles": [
       {
-        "description": "This Profile is a collection of Facets necessary to build a functional OPC UA Server Application specifically for chip level devices with limited resources. This Profile is functionally equivalent to the Core Server Facet and defines the \"UA-TCP UA-SC UA-Binary\" as the required transport profile including an ECC Security Policy. The support of Diagnostic Objects and Variables is optional for this Profile despite it being defined as \u201cmandatory\u201d in UA Part 5. Support of Diagnostic Objects and Variables is mandatory in some higher-level Profiles. Exposing types in the AddressSpace is optional for this Profile except if custom types (i.e., types that are derived from well-known ObjectTypes, VariableTypes, ReferenceType or DataTypes) are used. Exposing all supported types in the AddressSpace is mandatory in some higher-level Profiles.<br>\nThis Profile supersedes the <a href=\"http://opcfoundation.org/UA-Profile/Server/NanoEmbeddedDevice2017\">Nano Embedded Device 2017 Server Profile</a>.",
+        "description": "This Profile is a collection of Facets necessary to build a functional OPC UA Server Application specifically for chip level devices with limited resources. This Profile is functionally equivalent to the Core Server Facet and defines the \"UA-TCP UA-SC UA-Binary\" as the required transport profile including an ECC Security Policy. The support of Diagnostic Objects and Variables is optional for this Profile despite it being defined as “mandatory” in UA Part 5. Support of Diagnostic Objects and Variables is mandatory in some higher-level Profiles. Exposing types in the AddressSpace is optional for this Profile except if custom types (i.e., types that are derived from well-known ObjectTypes, VariableTypes, ReferenceType or DataTypes) are used. Exposing all supported types in the AddressSpace is mandatory in some higher-level Profiles.<br>\nThis Profile supersedes the <a href=\"http://opcfoundation.org/UA-Profile/Server/NanoEmbeddedDevice2017\">Nano Embedded Device 2017 Server Profile</a>.",
         "display_name": "Nano Embedded Device 2022 Server Profile",
         "last_update_time": "2025-11-12T15:47:17",
         "name": "Nano Embedded Device 2022 Server Profile",
@@ -7887,9 +8367,9 @@
       },
       {
         "description": "<b>This User Token has been deprecated with OPC UA Specification Version 1.05.</b><br>\nThis Facet indicates that a User Token that is comprised of an issued token is supported.",
-        "display_name": "User Token \u2013 Issued Token Server Facet",
+        "display_name": "User Token – Issued Token Server Facet",
         "last_update_time": "2022-03-10T16:02:39",
-        "name": "User Token \u2013 Issued Token Server Facet",
+        "name": "User Token – Issued Token Server Facet",
         "opc_id": 1698,
         "opc_profile_uri": "http://opcfoundation.org/UA-Profile/Security/UserToken/Server/IssuedToken",
         "release_status": 4,
@@ -7901,9 +8381,9 @@
       },
       {
         "description": "<b>This User Token has been deprecated with OPC UA Specification Version 1.05.</b><br>\nThis Facet further refines the User Token - Issued Token to indicate a windows implementation of Kerberos",
-        "display_name": "User Token \u2013 Issued Token Windows Server Facet",
+        "display_name": "User Token – Issued Token Windows Server Facet",
         "last_update_time": "2022-03-10T16:02:49",
-        "name": "User Token \u2013 Issued Token Windows Server Facet",
+        "name": "User Token – Issued Token Windows Server Facet",
         "opc_id": 1699,
         "opc_profile_uri": "http://opcfoundation.org/UA-Profile/Security/UserToken/Server/IssuedTokenWindows",
         "release_status": 4,
