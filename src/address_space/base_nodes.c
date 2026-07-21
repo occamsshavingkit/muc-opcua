@@ -220,6 +220,11 @@ static const opcua_byte_t s_str_Decimal[] = "Decimal";
 static const opcua_byte_t s_str_DurationString[] = "DurationString";
 static const opcua_byte_t s_str_TimeString[] = "TimeString";
 static const opcua_byte_t s_str_DateString[] = "DateString";
+/* CU 2481-2482, 2484, 2423: additional Base Info DataTypes */
+static const opcua_byte_t s_str_NormalizedString[] = "NormalizedString";
+static const opcua_byte_t s_str_DecimalString[] = "DecimalString";
+static const opcua_byte_t s_str_BitFieldMaskDataType[] = "BitFieldMaskDataType";
+static const opcua_byte_t s_str_RationalNumber[] = "RationalNumber";
 static const opcua_byte_t s_str_Argument[] = "Argument";
 static const opcua_byte_t s_str_HasEncoding[] = "HasEncoding";
 static const opcua_byte_t s_str_DataTypeEncodingType[] = "DataTypeEncodingType";
@@ -695,6 +700,8 @@ static const mu_reference_t s_number_subtype_refs[] = {
    CU_BASE_INFO_DATATYPES is also enabled. */
 static const mu_reference_t s_string_subtype_refs[] = {
 #if MUC_OPCUA_CU_BASE_INFO_DATATYPES
+    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {12877}}, true}, /* String -> NormalizedString */
+    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {12878}}, true}, /* String -> DecimalString */
     {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {12879}}, true}, /* String -> DurationString */
     {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {12880}}, true}, /* String -> TimeString */
     {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {12881}}, true}, /* String -> DateString */
@@ -870,6 +877,9 @@ static const mu_reference_t s_structure_refs[] = {
 #endif
 #if MUC_OPCUA_CU_USER_TOKEN_JWT && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
     {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {23744}}, true},
+#endif
+#if MUC_OPCUA_CU_BASE_INFO_DATATYPES
+    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {18806}}, true}, /* Structure -> RationalNumber */
 #endif
 };
 #endif
