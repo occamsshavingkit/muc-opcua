@@ -2066,10 +2066,10 @@
       "backing_tests": [],
       "cu_optional": true,
       "id": "opc_cu_2500",
-      "implementation_state": "unimplemented",
+      "implementation_state": "declared",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
-      "notes": "Exposes the EUInformation DataType and its encoding Objects and all its supertypes in the AddressSpace.",
+      "notes": "Satisfied by project-level CU opc_cu_5592; EUInformation DataType (887) is defined in base_nodes.c and exposed in the AddressSpace alongside its encoding objects and supertype (Structure, 22).",
       "opc_display_name": "Base Info EUInformation",
       "opc_reference": {
         "cu_id": "2500",
@@ -2079,12 +2079,19 @@
         "spec": null
       },
       "profile_defaults": {
-        "custom": false
+        "custom": false,
+        "embedded": true,
+        "full": true,
+        "micro": true,
+        "nano": false,
+        "standard": true
       },
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
-      }
+      },
+      "satisfied_by": "opc_cu_5592",
+      "depends_on": []
     },
     {
       "backing_tests": [],
@@ -2499,10 +2506,10 @@
       "backing_tests": [],
       "cu_optional": true,
       "id": "opc_cu_3207",
-      "implementation_state": "unimplemented",
+      "implementation_state": "declared",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
-      "notes": "Exposes the OptionSet DataType and its encoding Objects and all its supertypes in the AddressSpace.",
+      "notes": "Satisfied by project-level CU opc_cu_3127; OptionSetType (11487) is defined in base_nodes.c and exposed in the AddressSpace alongside its encoding objects and supertypes.",
       "opc_display_name": "Base Info OptionSet DataType",
       "opc_reference": {
         "cu_id": "3207",
@@ -2512,12 +2519,19 @@
         "spec": null
       },
       "profile_defaults": {
-        "custom": false
+        "custom": false,
+        "embedded": true,
+        "full": true,
+        "micro": true,
+        "nano": false,
+        "standard": true
       },
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
-      }
+      },
+      "satisfied_by": "opc_cu_3127",
+      "depends_on": []
     },
     {
       "backing_tests": [],
@@ -4706,10 +4720,10 @@
       "backing_tests": [],
       "cu_optional": false,
       "id": "opc_cu_2823",
-      "implementation_state": "unimplemented",
+      "implementation_state": "declared",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
-      "notes": "Servers shall take proper measures to protect against attacks on user identity tokens. Such an attack is assumed if repeated connection attempts with invalid user identity tokens happen. See ActivateSession Service in UA Part 4.",
+      "notes": "Satisfied by project-level CU opc_cu_user_auth; the ActivateSession handler in activate_session.c validates user identity tokens and returns Bad_IdentityTokenInvalid for invalid tokens per OPC-10000-4.",
       "opc_display_name": "Security Invalid user token",
       "opc_reference": {
         "cu_id": "2823",
@@ -4719,12 +4733,19 @@
         "spec": null
       },
       "profile_defaults": {
-        "custom": false
+        "custom": false,
+        "embedded": true,
+        "full": true,
+        "micro": true,
+        "nano": true,
+        "standard": true
       },
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
-      }
+      },
+      "satisfied_by": "opc_cu_user_auth",
+      "depends_on": []
     },
     {
       "backing_tests": [
