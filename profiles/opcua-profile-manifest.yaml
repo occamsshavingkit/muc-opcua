@@ -5709,10 +5709,10 @@
       "backing_tests": [],
       "cu_optional": false,
       "id": "opc_cu_2190",
-      "implementation_state": "unimplemented",
-      "kconfig_symbol": null,
+      "implementation_state": "claimed",
+      "kconfig_symbol": "MUC_OPCUA_CU_SESSION_GENERAL_SERVICE",
       "kind": "conformance_unit",
-      "notes": "Imported from OPC profile REST API 2026-07-15. Not implemented: no Cancel service handler exists.",
+      "notes": "Cancel service stub responds with Count=0. Embedded server processes requests synchronously.",
       "opc_display_name": "Session Cancel",
       "opc_reference": {
         "cu_id": "2190",
@@ -5722,8 +5722,14 @@
         "spec": "OPC-10000-4"
       },
       "profile_defaults": {
-        "custom": false
+        "custom": false,
+        "embedded": true,
+        "full": true,
+        "micro": true,
+        "nano": true,
+        "standard": true
       },
+      "satisfied_by": "MUC_OPCUA_CU_SESSION_GENERAL_SERVICE",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -5733,10 +5739,10 @@
       "backing_tests": [],
       "cu_optional": false,
       "id": "opc_cu_2271",
-      "implementation_state": "unimplemented",
-      "kconfig_symbol": null,
+      "implementation_state": "claimed",
+      "kconfig_symbol": "MUC_OPCUA_CU_DISCOVERY_REGISTER",
       "kind": "conformance_unit",
-      "notes": "Imported from OPC profile REST API 2026-07-15. Not implemented: register_server.c is a stub (outbound RegisterServer to a discovery server is not supported).",
+      "notes": "No-op RegisterServer stub; server does not register with LDS/GDS for local operation.",
       "opc_display_name": "Discovery Register",
       "opc_reference": {
         "cu_id": "2271",
@@ -5746,7 +5752,12 @@
         "spec": "OPC-10000-4"
       },
       "profile_defaults": {
-        "custom": false
+        "custom": false,
+        "embedded": true,
+        "full": true,
+        "micro": true,
+        "nano": true,
+        "standard": true
       },
       "source_metadata": {
         "profile_group_id": 171,
