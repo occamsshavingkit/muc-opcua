@@ -21,6 +21,7 @@ tests/unit/CMakeFiles/test_certificate.dir/test_certificate.c.o: /home/quackdcs/
   /home/quackdcs/micro-opcua/include/muc_opcua/server.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/audit.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_management.h \
+  /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/diagnostics.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/history.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h \
@@ -210,9 +211,13 @@ tests/unit/CMakeFiles/test_certificate.dir/test_certificate.c.o: /home/quackdcs/
 
 /usr/include/sched.h:
 
+/usr/include/pthread.h:
+
 /home/quackdcs/micro-opcua/src/security/certificate.h:
 
 /usr/include/openssl/symhacks.h:
+
+/home/quackdcs/micro-opcua/include/muc_opcua/services/role_management.h:
 
 /usr/include/setjmp.h:
 
@@ -237,6 +242,8 @@ tests/unit/CMakeFiles/test_certificate.dir/test_certificate.c.o: /home/quackdcs/
 /usr/include/openssl/opensslv.h:
 
 /usr/include/x86_64-linux-gnu/bits/stdint-uintn.h:
+
+/home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h:
 
@@ -270,10 +277,6 @@ _deps/unity-src/src/unity.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/address_space.h:
 
-/usr/include/stdio.h:
-
-/home/quackdcs/micro-opcua/src/security/security_policy.h:
-
 /usr/include/x86_64-linux-gnu/bits/types/__fpos_t.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/address_space/complex_types.h:
@@ -288,8 +291,6 @@ _deps/unity-src/src/unity.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/encoding.h:
 
-/home/quackdcs/micro-opcua/include/muc_opcua/services/role_management.h:
-
 /home/quackdcs/micro-opcua/include/muc_opcua/server.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/config.h:
@@ -303,6 +304,10 @@ _deps/unity-src/src/unity.h:
 /home/quackdcs/micro-opcua/include/muc_opcua/features.h:
 
 /usr/include/openssl/params.h:
+
+/usr/include/stdio.h:
+
+/home/quackdcs/micro-opcua/src/security/security_policy.h:
 
 /usr/include/features-time64.h:
 
@@ -379,5 +384,3 @@ _deps/unity-src/src/unity_internals.h:
 /usr/include/openssl/safestack.h:
 
 /usr/include/openssl/types.h:
-
-/usr/include/pthread.h:

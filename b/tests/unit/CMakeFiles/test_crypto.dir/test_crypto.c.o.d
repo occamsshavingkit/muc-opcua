@@ -42,6 +42,7 @@ tests/unit/CMakeFiles/test_crypto.dir/test_crypto.c.o: \
  /home/quackdcs/micro-opcua/src/../include/muc_opcua/services/key_credential.h \
  /home/quackdcs/micro-opcua/src/../include/muc_opcua/services/role_management.h \
  /home/quackdcs/micro-opcua/src/../include/muc_opcua/services/certificate_management.h \
+ /home/quackdcs/micro-opcua/src/../include/muc_opcua/services/certificate_manager.h \
  /home/quackdcs/micro-opcua/src/../include/muc_opcua/services/audit.h \
  /home/quackdcs/micro-opcua/src/security/key_derivation.h \
  /home/quackdcs/micro-opcua/src/security/secure_util.h \

@@ -304,6 +304,7 @@ tests/unit/all: tests/unit/CMakeFiles/test_capacity_propagation.dir/all
 tests/unit/all: tests/unit/CMakeFiles/test_cert_token_decoder.dir/all
 tests/unit/all: tests/unit/CMakeFiles/test_certificate.dir/all
 tests/unit/all: tests/unit/CMakeFiles/test_certificate_management.dir/all
+tests/unit/all: tests/unit/CMakeFiles/test_certificate_manager.dir/all
 tests/unit/all: tests/unit/CMakeFiles/test_certificate_validity.dir/all
 tests/unit/all: tests/unit/CMakeFiles/test_complex_types.dir/all
 tests/unit/all: tests/unit/CMakeFiles/test_conformance_docs.dir/all
@@ -431,6 +432,7 @@ tests/unit/clean: tests/unit/CMakeFiles/test_capacity_propagation.dir/clean
 tests/unit/clean: tests/unit/CMakeFiles/test_cert_token_decoder.dir/clean
 tests/unit/clean: tests/unit/CMakeFiles/test_certificate.dir/clean
 tests/unit/clean: tests/unit/CMakeFiles/test_certificate_management.dir/clean
+tests/unit/clean: tests/unit/CMakeFiles/test_certificate_manager.dir/clean
 tests/unit/clean: tests/unit/CMakeFiles/test_certificate_validity.dir/clean
 tests/unit/clean: tests/unit/CMakeFiles/test_complex_types.dir/clean
 tests/unit/clean: tests/unit/CMakeFiles/test_conformance_docs.dir/clean
@@ -530,12 +532,12 @@ tests/unit/clean: tests/unit/CMakeFiles/test_write_value_gate.dir/clean
 CMakeFiles/menuconfig.dir/all:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/menuconfig.dir/build.make CMakeFiles/menuconfig.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/menuconfig.dir/build.make CMakeFiles/menuconfig.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=2 "Built target menuconfig"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num= "Built target menuconfig"
 .PHONY : CMakeFiles/menuconfig.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/menuconfig.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 1
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 0
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/menuconfig.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 0
 .PHONY : CMakeFiles/menuconfig.dir/rule
@@ -1310,12 +1312,12 @@ CMakeFiles/ContinuousSubmit.dir/clean:
 CMakeFiles/format-check.dir/all:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/format-check.dir/build.make CMakeFiles/format-check.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/format-check.dir/build.make CMakeFiles/format-check.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num= "Built target format-check"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=1 "Built target format-check"
 .PHONY : CMakeFiles/format-check.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/format-check.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 1
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/format-check.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 0
 .PHONY : CMakeFiles/format-check.dir/rule
@@ -1336,12 +1338,12 @@ CMakeFiles/format-check.dir/clean:
 CMakeFiles/cppcheck.dir/all:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/cppcheck.dir/build.make CMakeFiles/cppcheck.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/cppcheck.dir/build.make CMakeFiles/cppcheck.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=1 "Built target cppcheck"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num= "Built target cppcheck"
 .PHONY : CMakeFiles/cppcheck.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/cppcheck.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 1
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 0
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/cppcheck.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 0
 .PHONY : CMakeFiles/cppcheck.dir/rule
@@ -1388,12 +1390,12 @@ CMakeFiles/clang-tidy.dir/clean:
 src/CMakeFiles/muc_opcua.dir/all:
 	$(MAKE) $(MAKESILENT) -f src/CMakeFiles/muc_opcua.dir/build.make src/CMakeFiles/muc_opcua.dir/depend
 	$(MAKE) $(MAKESILENT) -f src/CMakeFiles/muc_opcua.dir/build.make src/CMakeFiles/muc_opcua.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27 "Built target muc_opcua"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27 "Built target muc_opcua"
 .PHONY : src/CMakeFiles/muc_opcua.dir/all
 
 # Build rule for subdir invocation for target.
 src/CMakeFiles/muc_opcua.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 25
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 26
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 src/CMakeFiles/muc_opcua.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 0
 .PHONY : src/CMakeFiles/muc_opcua.dir/rule
@@ -1419,7 +1421,7 @@ tests/support/CMakeFiles/muc_opcua_test_support.dir/all: src/CMakeFiles/muc_opcu
 
 # Build rule for subdir invocation for target.
 tests/support/CMakeFiles/muc_opcua_test_support.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 26
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 27
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/support/CMakeFiles/muc_opcua_test_support.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 0
 .PHONY : tests/support/CMakeFiles/muc_opcua_test_support.dir/rule
@@ -1473,7 +1475,7 @@ tests/unit/CMakeFiles/test_address_space_callbacks.dir/all: _deps/unity-build/CM
 
 # Build rule for subdir invocation for target.
 tests/unit/CMakeFiles/test_address_space_callbacks.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 28
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 29
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/unit/CMakeFiles/test_address_space_callbacks.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 0
 .PHONY : tests/unit/CMakeFiles/test_address_space_callbacks.dir/rule
@@ -1501,7 +1503,7 @@ tests/unit/CMakeFiles/test_address_space_dynamic.dir/all: _deps/unity-build/CMak
 
 # Build rule for subdir invocation for target.
 tests/unit/CMakeFiles/test_address_space_dynamic.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 27
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 28
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/unit/CMakeFiles/test_address_space_dynamic.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 0
 .PHONY : tests/unit/CMakeFiles/test_address_space_dynamic.dir/rule
@@ -1529,7 +1531,7 @@ tests/unit/CMakeFiles/test_address_space_string_limits.dir/all: _deps/unity-buil
 
 # Build rule for subdir invocation for target.
 tests/unit/CMakeFiles/test_address_space_string_limits.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 28
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 29
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/unit/CMakeFiles/test_address_space_string_limits.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 0
 .PHONY : tests/unit/CMakeFiles/test_address_space_string_limits.dir/rule
@@ -1557,7 +1559,7 @@ tests/unit/CMakeFiles/test_address_space_validation.dir/all: _deps/unity-build/C
 
 # Build rule for subdir invocation for target.
 tests/unit/CMakeFiles/test_address_space_validation.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 27
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 28
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/unit/CMakeFiles/test_address_space_validation.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 0
 .PHONY : tests/unit/CMakeFiles/test_address_space_validation.dir/rule
@@ -1585,7 +1587,7 @@ tests/unit/CMakeFiles/test_address_space_values.dir/all: _deps/unity-build/CMake
 
 # Build rule for subdir invocation for target.
 tests/unit/CMakeFiles/test_address_space_values.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 28
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 29
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/unit/CMakeFiles/test_address_space_values.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 0
 .PHONY : tests/unit/CMakeFiles/test_address_space_values.dir/rule
@@ -1613,7 +1615,7 @@ tests/unit/CMakeFiles/test_aggregate.dir/all: _deps/unity-build/CMakeFiles/unity
 
 # Build rule for subdir invocation for target.
 tests/unit/CMakeFiles/test_aggregate.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 27
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 28
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/unit/CMakeFiles/test_aggregate.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 0
 .PHONY : tests/unit/CMakeFiles/test_aggregate.dir/rule
@@ -1641,7 +1643,7 @@ tests/unit/CMakeFiles/test_aggregate_full.dir/all: _deps/unity-build/CMakeFiles/
 
 # Build rule for subdir invocation for target.
 tests/unit/CMakeFiles/test_aggregate_full.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 28
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 29
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/unit/CMakeFiles/test_aggregate_full.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 0
 .PHONY : tests/unit/CMakeFiles/test_aggregate_full.dir/rule
@@ -1669,7 +1671,7 @@ tests/unit/CMakeFiles/test_alarms_conditions.dir/all: _deps/unity-build/CMakeFil
 
 # Build rule for subdir invocation for target.
 tests/unit/CMakeFiles/test_alarms_conditions.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 27
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 28
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/unit/CMakeFiles/test_alarms_conditions.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 0
 .PHONY : tests/unit/CMakeFiles/test_alarms_conditions.dir/rule
@@ -1697,7 +1699,7 @@ tests/unit/CMakeFiles/test_analog_item.dir/all: _deps/unity-build/CMakeFiles/uni
 
 # Build rule for subdir invocation for target.
 tests/unit/CMakeFiles/test_analog_item.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 28
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 29
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/unit/CMakeFiles/test_analog_item.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 0
 .PHONY : tests/unit/CMakeFiles/test_analog_item.dir/rule
@@ -1725,7 +1727,7 @@ tests/unit/CMakeFiles/test_asym_chunk.dir/all: _deps/unity-build/CMakeFiles/unit
 
 # Build rule for subdir invocation for target.
 tests/unit/CMakeFiles/test_asym_chunk.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 27
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 28
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/unit/CMakeFiles/test_asym_chunk.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 0
 .PHONY : tests/unit/CMakeFiles/test_asym_chunk.dir/rule
@@ -1753,7 +1755,7 @@ tests/unit/CMakeFiles/test_async_opcua_inventory.dir/all: _deps/unity-build/CMak
 
 # Build rule for subdir invocation for target.
 tests/unit/CMakeFiles/test_async_opcua_inventory.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 28
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 29
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/unit/CMakeFiles/test_async_opcua_inventory.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 0
 .PHONY : tests/unit/CMakeFiles/test_async_opcua_inventory.dir/rule
@@ -1781,7 +1783,7 @@ tests/unit/CMakeFiles/test_audit_events.dir/all: _deps/unity-build/CMakeFiles/un
 
 # Build rule for subdir invocation for target.
 tests/unit/CMakeFiles/test_audit_events.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 27
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 28
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/unit/CMakeFiles/test_audit_events.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 0
 .PHONY : tests/unit/CMakeFiles/test_audit_events.dir/rule
@@ -1809,7 +1811,7 @@ tests/unit/CMakeFiles/test_base_server_behaviour.dir/all: _deps/unity-build/CMak
 
 # Build rule for subdir invocation for target.
 tests/unit/CMakeFiles/test_base_server_behaviour.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 28
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 29
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/unit/CMakeFiles/test_base_server_behaviour.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 0
 .PHONY : tests/unit/CMakeFiles/test_base_server_behaviour.dir/rule
@@ -1837,7 +1839,7 @@ tests/unit/CMakeFiles/test_binary_array_errors.dir/all: _deps/unity-build/CMakeF
 
 # Build rule for subdir invocation for target.
 tests/unit/CMakeFiles/test_binary_array_errors.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 27
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 28
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/unit/CMakeFiles/test_binary_array_errors.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 0
 .PHONY : tests/unit/CMakeFiles/test_binary_array_errors.dir/rule
@@ -1865,7 +1867,7 @@ tests/unit/CMakeFiles/test_binary_bytestring_errors.dir/all: _deps/unity-build/C
 
 # Build rule for subdir invocation for target.
 tests/unit/CMakeFiles/test_binary_bytestring_errors.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 28
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 29
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/unit/CMakeFiles/test_binary_bytestring_errors.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 0
 .PHONY : tests/unit/CMakeFiles/test_binary_bytestring_errors.dir/rule
@@ -1893,7 +1895,7 @@ tests/unit/CMakeFiles/test_binary_extension_object.dir/all: _deps/unity-build/CM
 
 # Build rule for subdir invocation for target.
 tests/unit/CMakeFiles/test_binary_extension_object.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 27
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 28
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/unit/CMakeFiles/test_binary_extension_object.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 0
 .PHONY : tests/unit/CMakeFiles/test_binary_extension_object.dir/rule
@@ -1921,7 +1923,7 @@ tests/unit/CMakeFiles/test_binary_extension_object_errors.dir/all: _deps/unity-b
 
 # Build rule for subdir invocation for target.
 tests/unit/CMakeFiles/test_binary_extension_object_errors.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 28
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 29
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/unit/CMakeFiles/test_binary_extension_object_errors.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 0
 .PHONY : tests/unit/CMakeFiles/test_binary_extension_object_errors.dir/rule
@@ -1949,7 +1951,7 @@ tests/unit/CMakeFiles/test_binary_nodeid.dir/all: _deps/unity-build/CMakeFiles/u
 
 # Build rule for subdir invocation for target.
 tests/unit/CMakeFiles/test_binary_nodeid.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 27
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 28
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/unit/CMakeFiles/test_binary_nodeid.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 0
 .PHONY : tests/unit/CMakeFiles/test_binary_nodeid.dir/rule
@@ -1977,7 +1979,7 @@ tests/unit/CMakeFiles/test_binary_nodeid_errors.dir/all: _deps/unity-build/CMake
 
 # Build rule for subdir invocation for target.
 tests/unit/CMakeFiles/test_binary_nodeid_errors.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 28
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 29
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/unit/CMakeFiles/test_binary_nodeid_errors.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 0
 .PHONY : tests/unit/CMakeFiles/test_binary_nodeid_errors.dir/rule
@@ -2005,7 +2007,7 @@ tests/unit/CMakeFiles/test_binary_primitives.dir/all: _deps/unity-build/CMakeFil
 
 # Build rule for subdir invocation for target.
 tests/unit/CMakeFiles/test_binary_primitives.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 27
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 28
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/unit/CMakeFiles/test_binary_primitives.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 0
 .PHONY : tests/unit/CMakeFiles/test_binary_primitives.dir/rule
@@ -2033,7 +2035,7 @@ tests/unit/CMakeFiles/test_binary_string.dir/all: _deps/unity-build/CMakeFiles/u
 
 # Build rule for subdir invocation for target.
 tests/unit/CMakeFiles/test_binary_string.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 28
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 29
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/unit/CMakeFiles/test_binary_string.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 0
 .PHONY : tests/unit/CMakeFiles/test_binary_string.dir/rule
@@ -2061,7 +2063,7 @@ tests/unit/CMakeFiles/test_binary_string_errors.dir/all: _deps/unity-build/CMake
 
 # Build rule for subdir invocation for target.
 tests/unit/CMakeFiles/test_binary_string_errors.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 27
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 28
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/unit/CMakeFiles/test_binary_string_errors.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 0
 .PHONY : tests/unit/CMakeFiles/test_binary_string_errors.dir/rule
@@ -2089,7 +2091,7 @@ tests/unit/CMakeFiles/test_binary_variant_datavalue.dir/all: _deps/unity-build/C
 
 # Build rule for subdir invocation for target.
 tests/unit/CMakeFiles/test_binary_variant_datavalue.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 28
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 29
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/unit/CMakeFiles/test_binary_variant_datavalue.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 0
 .PHONY : tests/unit/CMakeFiles/test_binary_variant_datavalue.dir/rule
@@ -2117,7 +2119,7 @@ tests/unit/CMakeFiles/test_browse_limits.dir/all: _deps/unity-build/CMakeFiles/u
 
 # Build rule for subdir invocation for target.
 tests/unit/CMakeFiles/test_browse_limits.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 27
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 28
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/unit/CMakeFiles/test_browse_limits.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 0
 .PHONY : tests/unit/CMakeFiles/test_browse_limits.dir/rule
@@ -2145,7 +2147,7 @@ tests/unit/CMakeFiles/test_browse_service.dir/all: _deps/unity-build/CMakeFiles/
 
 # Build rule for subdir invocation for target.
 tests/unit/CMakeFiles/test_browse_service.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 28
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 29
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/unit/CMakeFiles/test_browse_service.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 0
 .PHONY : tests/unit/CMakeFiles/test_browse_service.dir/rule
@@ -2173,7 +2175,7 @@ tests/unit/CMakeFiles/test_build_config.dir/all: _deps/unity-build/CMakeFiles/un
 
 # Build rule for subdir invocation for target.
 tests/unit/CMakeFiles/test_build_config.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 27
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 28
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/unit/CMakeFiles/test_build_config.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 0
 .PHONY : tests/unit/CMakeFiles/test_build_config.dir/rule
@@ -2201,7 +2203,7 @@ tests/unit/CMakeFiles/test_capacity_propagation.dir/all: _deps/unity-build/CMake
 
 # Build rule for subdir invocation for target.
 tests/unit/CMakeFiles/test_capacity_propagation.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 28
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 29
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/unit/CMakeFiles/test_capacity_propagation.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 0
 .PHONY : tests/unit/CMakeFiles/test_capacity_propagation.dir/rule
@@ -2229,7 +2231,7 @@ tests/unit/CMakeFiles/test_cert_token_decoder.dir/all: _deps/unity-build/CMakeFi
 
 # Build rule for subdir invocation for target.
 tests/unit/CMakeFiles/test_cert_token_decoder.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 27
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 28
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/unit/CMakeFiles/test_cert_token_decoder.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 0
 .PHONY : tests/unit/CMakeFiles/test_cert_token_decoder.dir/rule
@@ -2257,7 +2259,7 @@ tests/unit/CMakeFiles/test_certificate.dir/all: _deps/unity-build/CMakeFiles/uni
 
 # Build rule for subdir invocation for target.
 tests/unit/CMakeFiles/test_certificate.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 28
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 29
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/unit/CMakeFiles/test_certificate.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 0
 .PHONY : tests/unit/CMakeFiles/test_certificate.dir/rule
@@ -2285,7 +2287,7 @@ tests/unit/CMakeFiles/test_certificate_management.dir/all: _deps/unity-build/CMa
 
 # Build rule for subdir invocation for target.
 tests/unit/CMakeFiles/test_certificate_management.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 27
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 28
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/unit/CMakeFiles/test_certificate_management.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 0
 .PHONY : tests/unit/CMakeFiles/test_certificate_management.dir/rule
@@ -2300,6 +2302,34 @@ tests/unit/CMakeFiles/test_certificate_management.dir/clean:
 .PHONY : tests/unit/CMakeFiles/test_certificate_management.dir/clean
 
 #=============================================================================
+# Target rules for target tests/unit/CMakeFiles/test_certificate_manager.dir
+
+# All Build rule for target.
+tests/unit/CMakeFiles/test_certificate_manager.dir/all: src/CMakeFiles/muc_opcua.dir/all
+tests/unit/CMakeFiles/test_certificate_manager.dir/all: tests/support/CMakeFiles/muc_opcua_test_support.dir/all
+tests/unit/CMakeFiles/test_certificate_manager.dir/all: _deps/unity-build/CMakeFiles/unity.dir/all
+	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_certificate_manager.dir/build.make tests/unit/CMakeFiles/test_certificate_manager.dir/depend
+	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_certificate_manager.dir/build.make tests/unit/CMakeFiles/test_certificate_manager.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=44 "Built target test_certificate_manager"
+.PHONY : tests/unit/CMakeFiles/test_certificate_manager.dir/all
+
+# Build rule for subdir invocation for target.
+tests/unit/CMakeFiles/test_certificate_manager.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 29
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/unit/CMakeFiles/test_certificate_manager.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 0
+.PHONY : tests/unit/CMakeFiles/test_certificate_manager.dir/rule
+
+# Convenience name for target.
+test_certificate_manager: tests/unit/CMakeFiles/test_certificate_manager.dir/rule
+.PHONY : test_certificate_manager
+
+# clean rule for target.
+tests/unit/CMakeFiles/test_certificate_manager.dir/clean:
+	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_certificate_manager.dir/build.make tests/unit/CMakeFiles/test_certificate_manager.dir/clean
+.PHONY : tests/unit/CMakeFiles/test_certificate_manager.dir/clean
+
+#=============================================================================
 # Target rules for target tests/unit/CMakeFiles/test_certificate_validity.dir
 
 # All Build rule for target.
@@ -2308,7 +2338,7 @@ tests/unit/CMakeFiles/test_certificate_validity.dir/all: tests/support/CMakeFile
 tests/unit/CMakeFiles/test_certificate_validity.dir/all: _deps/unity-build/CMakeFiles/unity.dir/all
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_certificate_validity.dir/build.make tests/unit/CMakeFiles/test_certificate_validity.dir/depend
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_certificate_validity.dir/build.make tests/unit/CMakeFiles/test_certificate_validity.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=44 "Built target test_certificate_validity"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num= "Built target test_certificate_validity"
 .PHONY : tests/unit/CMakeFiles/test_certificate_validity.dir/all
 
 # Build rule for subdir invocation for target.
@@ -2336,7 +2366,7 @@ tests/unit/CMakeFiles/test_complex_types.dir/all: tests/support/CMakeFiles/muc_o
 tests/unit/CMakeFiles/test_complex_types.dir/all: _deps/unity-build/CMakeFiles/unity.dir/all
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_complex_types.dir/build.make tests/unit/CMakeFiles/test_complex_types.dir/depend
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_complex_types.dir/build.make tests/unit/CMakeFiles/test_complex_types.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=45 "Built target test_complex_types"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num= "Built target test_complex_types"
 .PHONY : tests/unit/CMakeFiles/test_complex_types.dir/all
 
 # Build rule for subdir invocation for target.
@@ -2364,12 +2394,12 @@ tests/unit/CMakeFiles/test_conformance_docs.dir/all: tests/support/CMakeFiles/mu
 tests/unit/CMakeFiles/test_conformance_docs.dir/all: _deps/unity-build/CMakeFiles/unity.dir/all
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_conformance_docs.dir/build.make tests/unit/CMakeFiles/test_conformance_docs.dir/depend
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_conformance_docs.dir/build.make tests/unit/CMakeFiles/test_conformance_docs.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num= "Built target test_conformance_docs"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=46 "Built target test_conformance_docs"
 .PHONY : tests/unit/CMakeFiles/test_conformance_docs.dir/all
 
 # Build rule for subdir invocation for target.
 tests/unit/CMakeFiles/test_conformance_docs.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 27
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 29
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/unit/CMakeFiles/test_conformance_docs.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 0
 .PHONY : tests/unit/CMakeFiles/test_conformance_docs.dir/rule
@@ -2392,7 +2422,7 @@ tests/unit/CMakeFiles/test_connection_multiplex.dir/all: tests/support/CMakeFile
 tests/unit/CMakeFiles/test_connection_multiplex.dir/all: _deps/unity-build/CMakeFiles/unity.dir/all
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_connection_multiplex.dir/build.make tests/unit/CMakeFiles/test_connection_multiplex.dir/depend
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_connection_multiplex.dir/build.make tests/unit/CMakeFiles/test_connection_multiplex.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=46 "Built target test_connection_multiplex"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num= "Built target test_connection_multiplex"
 .PHONY : tests/unit/CMakeFiles/test_connection_multiplex.dir/all
 
 # Build rule for subdir invocation for target.
@@ -2420,7 +2450,7 @@ tests/unit/CMakeFiles/test_crypto.dir/all: tests/support/CMakeFiles/muc_opcua_te
 tests/unit/CMakeFiles/test_crypto.dir/all: _deps/unity-build/CMakeFiles/unity.dir/all
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_crypto.dir/build.make tests/unit/CMakeFiles/test_crypto.dir/depend
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_crypto.dir/build.make tests/unit/CMakeFiles/test_crypto.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=47 "Built target test_crypto"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num= "Built target test_crypto"
 .PHONY : tests/unit/CMakeFiles/test_crypto.dir/all
 
 # Build rule for subdir invocation for target.
@@ -2448,12 +2478,12 @@ tests/unit/CMakeFiles/test_da_type_nodes.dir/all: tests/support/CMakeFiles/muc_o
 tests/unit/CMakeFiles/test_da_type_nodes.dir/all: _deps/unity-build/CMakeFiles/unity.dir/all
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_da_type_nodes.dir/build.make tests/unit/CMakeFiles/test_da_type_nodes.dir/depend
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_da_type_nodes.dir/build.make tests/unit/CMakeFiles/test_da_type_nodes.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num= "Built target test_da_type_nodes"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=48 "Built target test_da_type_nodes"
 .PHONY : tests/unit/CMakeFiles/test_da_type_nodes.dir/all
 
 # Build rule for subdir invocation for target.
 tests/unit/CMakeFiles/test_da_type_nodes.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 27
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 29
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/unit/CMakeFiles/test_da_type_nodes.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 0
 .PHONY : tests/unit/CMakeFiles/test_da_type_nodes.dir/rule
@@ -2476,7 +2506,7 @@ tests/unit/CMakeFiles/test_diagnostics.dir/all: tests/support/CMakeFiles/muc_opc
 tests/unit/CMakeFiles/test_diagnostics.dir/all: _deps/unity-build/CMakeFiles/unity.dir/all
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_diagnostics.dir/build.make tests/unit/CMakeFiles/test_diagnostics.dir/depend
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_diagnostics.dir/build.make tests/unit/CMakeFiles/test_diagnostics.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=48 "Built target test_diagnostics"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num= "Built target test_diagnostics"
 .PHONY : tests/unit/CMakeFiles/test_diagnostics.dir/all
 
 # Build rule for subdir invocation for target.
@@ -2504,12 +2534,12 @@ tests/unit/CMakeFiles/test_discovery_encode.dir/all: tests/support/CMakeFiles/mu
 tests/unit/CMakeFiles/test_discovery_encode.dir/all: _deps/unity-build/CMakeFiles/unity.dir/all
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_discovery_encode.dir/build.make tests/unit/CMakeFiles/test_discovery_encode.dir/depend
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_discovery_encode.dir/build.make tests/unit/CMakeFiles/test_discovery_encode.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num= "Built target test_discovery_encode"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=49 "Built target test_discovery_encode"
 .PHONY : tests/unit/CMakeFiles/test_discovery_encode.dir/all
 
 # Build rule for subdir invocation for target.
 tests/unit/CMakeFiles/test_discovery_encode.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 27
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 29
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/unit/CMakeFiles/test_discovery_encode.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 0
 .PHONY : tests/unit/CMakeFiles/test_discovery_encode.dir/rule
@@ -2532,7 +2562,7 @@ tests/unit/CMakeFiles/test_discovery_endpoint.dir/all: tests/support/CMakeFiles/
 tests/unit/CMakeFiles/test_discovery_endpoint.dir/all: _deps/unity-build/CMakeFiles/unity.dir/all
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_discovery_endpoint.dir/build.make tests/unit/CMakeFiles/test_discovery_endpoint.dir/depend
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_discovery_endpoint.dir/build.make tests/unit/CMakeFiles/test_discovery_endpoint.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=49 "Built target test_discovery_endpoint"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num= "Built target test_discovery_endpoint"
 .PHONY : tests/unit/CMakeFiles/test_discovery_endpoint.dir/all
 
 # Build rule for subdir invocation for target.
@@ -2560,7 +2590,7 @@ tests/unit/CMakeFiles/test_discovery_services.dir/all: tests/support/CMakeFiles/
 tests/unit/CMakeFiles/test_discovery_services.dir/all: _deps/unity-build/CMakeFiles/unity.dir/all
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_discovery_services.dir/build.make tests/unit/CMakeFiles/test_discovery_services.dir/depend
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_discovery_services.dir/build.make tests/unit/CMakeFiles/test_discovery_services.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=50 "Built target test_discovery_services"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num= "Built target test_discovery_services"
 .PHONY : tests/unit/CMakeFiles/test_discovery_services.dir/all
 
 # Build rule for subdir invocation for target.
@@ -2593,7 +2623,7 @@ tests/unit/CMakeFiles/test_dispatch_services.dir/all: _deps/unity-build/CMakeFil
 
 # Build rule for subdir invocation for target.
 tests/unit/CMakeFiles/test_dispatch_services.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 27
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 28
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/unit/CMakeFiles/test_dispatch_services.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 0
 .PHONY : tests/unit/CMakeFiles/test_dispatch_services.dir/rule
@@ -2621,7 +2651,7 @@ tests/unit/CMakeFiles/test_dispatch_session_order.dir/all: _deps/unity-build/CMa
 
 # Build rule for subdir invocation for target.
 tests/unit/CMakeFiles/test_dispatch_session_order.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 28
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 29
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/unit/CMakeFiles/test_dispatch_session_order.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 0
 .PHONY : tests/unit/CMakeFiles/test_dispatch_session_order.dir/rule
@@ -2649,7 +2679,7 @@ tests/unit/CMakeFiles/test_dispatch_subscription.dir/all: _deps/unity-build/CMak
 
 # Build rule for subdir invocation for target.
 tests/unit/CMakeFiles/test_dispatch_subscription.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 27
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 28
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/unit/CMakeFiles/test_dispatch_subscription.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 0
 .PHONY : tests/unit/CMakeFiles/test_dispatch_subscription.dir/rule
@@ -2677,7 +2707,7 @@ tests/unit/CMakeFiles/test_ecc_crypto.dir/all: _deps/unity-build/CMakeFiles/unit
 
 # Build rule for subdir invocation for target.
 tests/unit/CMakeFiles/test_ecc_crypto.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 28
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 29
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/unit/CMakeFiles/test_ecc_crypto.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 0
 .PHONY : tests/unit/CMakeFiles/test_ecc_crypto.dir/rule
@@ -2705,7 +2735,7 @@ tests/unit/CMakeFiles/test_eu_information.dir/all: _deps/unity-build/CMakeFiles/
 
 # Build rule for subdir invocation for target.
 tests/unit/CMakeFiles/test_eu_information.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 28
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 29
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/unit/CMakeFiles/test_eu_information.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 0
 .PHONY : tests/unit/CMakeFiles/test_eu_information.dir/rule
@@ -2733,7 +2763,7 @@ tests/unit/CMakeFiles/test_event_filter_select.dir/all: _deps/unity-build/CMakeF
 
 # Build rule for subdir invocation for target.
 tests/unit/CMakeFiles/test_event_filter_select.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 27
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 28
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/unit/CMakeFiles/test_event_filter_select.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 0
 .PHONY : tests/unit/CMakeFiles/test_event_filter_select.dir/rule
@@ -2761,7 +2791,7 @@ tests/unit/CMakeFiles/test_event_filter_where.dir/all: _deps/unity-build/CMakeFi
 
 # Build rule for subdir invocation for target.
 tests/unit/CMakeFiles/test_event_filter_where.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 28
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 29
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/unit/CMakeFiles/test_event_filter_where.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 0
 .PHONY : tests/unit/CMakeFiles/test_event_filter_where.dir/rule
@@ -2789,7 +2819,7 @@ tests/unit/CMakeFiles/test_event_notifier.dir/all: _deps/unity-build/CMakeFiles/
 
 # Build rule for subdir invocation for target.
 tests/unit/CMakeFiles/test_event_notifier.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 28
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 29
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/unit/CMakeFiles/test_event_notifier.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 0
 .PHONY : tests/unit/CMakeFiles/test_event_notifier.dir/rule
@@ -2817,7 +2847,7 @@ tests/unit/CMakeFiles/test_event_serializer.dir/all: _deps/unity-build/CMakeFile
 
 # Build rule for subdir invocation for target.
 tests/unit/CMakeFiles/test_event_serializer.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 27
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 28
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/unit/CMakeFiles/test_event_serializer.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 0
 .PHONY : tests/unit/CMakeFiles/test_event_serializer.dir/rule
@@ -2845,7 +2875,7 @@ tests/unit/CMakeFiles/test_get_endpoints_gate.dir/all: _deps/unity-build/CMakeFi
 
 # Build rule for subdir invocation for target.
 tests/unit/CMakeFiles/test_get_endpoints_gate.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 28
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 29
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/unit/CMakeFiles/test_get_endpoints_gate.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 0
 .PHONY : tests/unit/CMakeFiles/test_get_endpoints_gate.dir/rule
@@ -2873,7 +2903,7 @@ tests/unit/CMakeFiles/test_history.dir/all: _deps/unity-build/CMakeFiles/unity.d
 
 # Build rule for subdir invocation for target.
 tests/unit/CMakeFiles/test_history.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 27
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 28
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/unit/CMakeFiles/test_history.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 0
 .PHONY : tests/unit/CMakeFiles/test_history.dir/rule
@@ -2901,7 +2931,7 @@ tests/unit/CMakeFiles/test_history_memstore.dir/all: _deps/unity-build/CMakeFile
 
 # Build rule for subdir invocation for target.
 tests/unit/CMakeFiles/test_history_memstore.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 28
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 29
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/unit/CMakeFiles/test_history_memstore.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 0
 .PHONY : tests/unit/CMakeFiles/test_history_memstore.dir/rule
@@ -2924,12 +2954,12 @@ tests/unit/CMakeFiles/test_jwt.dir/all: tests/support/CMakeFiles/muc_opcua_test_
 tests/unit/CMakeFiles/test_jwt.dir/all: _deps/unity-build/CMakeFiles/unity.dir/all
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_jwt.dir/build.make tests/unit/CMakeFiles/test_jwt.dir/depend
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_jwt.dir/build.make tests/unit/CMakeFiles/test_jwt.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num= "Built target test_jwt"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=58 "Built target test_jwt"
 .PHONY : tests/unit/CMakeFiles/test_jwt.dir/all
 
 # Build rule for subdir invocation for target.
 tests/unit/CMakeFiles/test_jwt.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 27
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 29
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/unit/CMakeFiles/test_jwt.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 0
 .PHONY : tests/unit/CMakeFiles/test_jwt.dir/rule
@@ -2952,12 +2982,12 @@ tests/unit/CMakeFiles/test_key_credential.dir/all: tests/support/CMakeFiles/muc_
 tests/unit/CMakeFiles/test_key_credential.dir/all: _deps/unity-build/CMakeFiles/unity.dir/all
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_key_credential.dir/build.make tests/unit/CMakeFiles/test_key_credential.dir/depend
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_key_credential.dir/build.make tests/unit/CMakeFiles/test_key_credential.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num= "Built target test_key_credential"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=59 "Built target test_key_credential"
 .PHONY : tests/unit/CMakeFiles/test_key_credential.dir/all
 
 # Build rule for subdir invocation for target.
 tests/unit/CMakeFiles/test_key_credential.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 27
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 29
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/unit/CMakeFiles/test_key_credential.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 0
 .PHONY : tests/unit/CMakeFiles/test_key_credential.dir/rule
@@ -2980,7 +3010,7 @@ tests/unit/CMakeFiles/test_mbedtls_adapter.dir/all: tests/support/CMakeFiles/muc
 tests/unit/CMakeFiles/test_mbedtls_adapter.dir/all: _deps/unity-build/CMakeFiles/unity.dir/all
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_mbedtls_adapter.dir/build.make tests/unit/CMakeFiles/test_mbedtls_adapter.dir/depend
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_mbedtls_adapter.dir/build.make tests/unit/CMakeFiles/test_mbedtls_adapter.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=59 "Built target test_mbedtls_adapter"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num= "Built target test_mbedtls_adapter"
 .PHONY : tests/unit/CMakeFiles/test_mbedtls_adapter.dir/all
 
 # Build rule for subdir invocation for target.
@@ -3008,12 +3038,12 @@ tests/unit/CMakeFiles/test_message_chunk.dir/all: tests/support/CMakeFiles/muc_o
 tests/unit/CMakeFiles/test_message_chunk.dir/all: _deps/unity-build/CMakeFiles/unity.dir/all
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_message_chunk.dir/build.make tests/unit/CMakeFiles/test_message_chunk.dir/depend
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_message_chunk.dir/build.make tests/unit/CMakeFiles/test_message_chunk.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num= "Built target test_message_chunk"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=60 "Built target test_message_chunk"
 .PHONY : tests/unit/CMakeFiles/test_message_chunk.dir/all
 
 # Build rule for subdir invocation for target.
 tests/unit/CMakeFiles/test_message_chunk.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 27
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 29
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/unit/CMakeFiles/test_message_chunk.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 0
 .PHONY : tests/unit/CMakeFiles/test_message_chunk.dir/rule
@@ -3036,7 +3066,7 @@ tests/unit/CMakeFiles/test_message_chunk_errors.dir/all: tests/support/CMakeFile
 tests/unit/CMakeFiles/test_message_chunk_errors.dir/all: _deps/unity-build/CMakeFiles/unity.dir/all
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_message_chunk_errors.dir/build.make tests/unit/CMakeFiles/test_message_chunk_errors.dir/depend
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_message_chunk_errors.dir/build.make tests/unit/CMakeFiles/test_message_chunk_errors.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=60 "Built target test_message_chunk_errors"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num= "Built target test_message_chunk_errors"
 .PHONY : tests/unit/CMakeFiles/test_message_chunk_errors.dir/all
 
 # Build rule for subdir invocation for target.
@@ -3064,12 +3094,12 @@ tests/unit/CMakeFiles/test_method_call.dir/all: tests/support/CMakeFiles/muc_opc
 tests/unit/CMakeFiles/test_method_call.dir/all: _deps/unity-build/CMakeFiles/unity.dir/all
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_method_call.dir/build.make tests/unit/CMakeFiles/test_method_call.dir/depend
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_method_call.dir/build.make tests/unit/CMakeFiles/test_method_call.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num= "Built target test_method_call"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=61 "Built target test_method_call"
 .PHONY : tests/unit/CMakeFiles/test_method_call.dir/all
 
 # Build rule for subdir invocation for target.
 tests/unit/CMakeFiles/test_method_call.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 27
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 29
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/unit/CMakeFiles/test_method_call.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 0
 .PHONY : tests/unit/CMakeFiles/test_method_call.dir/rule
@@ -3092,7 +3122,7 @@ tests/unit/CMakeFiles/test_method_call_arbitrary.dir/all: tests/support/CMakeFil
 tests/unit/CMakeFiles/test_method_call_arbitrary.dir/all: _deps/unity-build/CMakeFiles/unity.dir/all
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_method_call_arbitrary.dir/build.make tests/unit/CMakeFiles/test_method_call_arbitrary.dir/depend
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_method_call_arbitrary.dir/build.make tests/unit/CMakeFiles/test_method_call_arbitrary.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=61 "Built target test_method_call_arbitrary"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num= "Built target test_method_call_arbitrary"
 .PHONY : tests/unit/CMakeFiles/test_method_call_arbitrary.dir/all
 
 # Build rule for subdir invocation for target.
@@ -3120,12 +3150,12 @@ tests/unit/CMakeFiles/test_method_call_errors.dir/all: tests/support/CMakeFiles/
 tests/unit/CMakeFiles/test_method_call_errors.dir/all: _deps/unity-build/CMakeFiles/unity.dir/all
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_method_call_errors.dir/build.make tests/unit/CMakeFiles/test_method_call_errors.dir/depend
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_method_call_errors.dir/build.make tests/unit/CMakeFiles/test_method_call_errors.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num= "Built target test_method_call_errors"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=62 "Built target test_method_call_errors"
 .PHONY : tests/unit/CMakeFiles/test_method_call_errors.dir/all
 
 # Build rule for subdir invocation for target.
 tests/unit/CMakeFiles/test_method_call_errors.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 27
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 29
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/unit/CMakeFiles/test_method_call_errors.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 0
 .PHONY : tests/unit/CMakeFiles/test_method_call_errors.dir/rule
@@ -3148,12 +3178,12 @@ tests/unit/CMakeFiles/test_monitored_index_range.dir/all: tests/support/CMakeFil
 tests/unit/CMakeFiles/test_monitored_index_range.dir/all: _deps/unity-build/CMakeFiles/unity.dir/all
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_monitored_index_range.dir/build.make tests/unit/CMakeFiles/test_monitored_index_range.dir/depend
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_monitored_index_range.dir/build.make tests/unit/CMakeFiles/test_monitored_index_range.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num= "Built target test_monitored_index_range"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=63 "Built target test_monitored_index_range"
 .PHONY : tests/unit/CMakeFiles/test_monitored_index_range.dir/all
 
 # Build rule for subdir invocation for target.
 tests/unit/CMakeFiles/test_monitored_index_range.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 27
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 29
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/unit/CMakeFiles/test_monitored_index_range.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 0
 .PHONY : tests/unit/CMakeFiles/test_monitored_index_range.dir/rule
@@ -3176,7 +3206,7 @@ tests/unit/CMakeFiles/test_no_heap_lifecycle.dir/all: tests/support/CMakeFiles/m
 tests/unit/CMakeFiles/test_no_heap_lifecycle.dir/all: _deps/unity-build/CMakeFiles/unity.dir/all
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_no_heap_lifecycle.dir/build.make tests/unit/CMakeFiles/test_no_heap_lifecycle.dir/depend
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_no_heap_lifecycle.dir/build.make tests/unit/CMakeFiles/test_no_heap_lifecycle.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=63 "Built target test_no_heap_lifecycle"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num= "Built target test_no_heap_lifecycle"
 .PHONY : tests/unit/CMakeFiles/test_no_heap_lifecycle.dir/all
 
 # Build rule for subdir invocation for target.
@@ -3204,12 +3234,12 @@ tests/unit/CMakeFiles/test_no_stale_project_name.dir/all: tests/support/CMakeFil
 tests/unit/CMakeFiles/test_no_stale_project_name.dir/all: _deps/unity-build/CMakeFiles/unity.dir/all
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_no_stale_project_name.dir/build.make tests/unit/CMakeFiles/test_no_stale_project_name.dir/depend
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_no_stale_project_name.dir/build.make tests/unit/CMakeFiles/test_no_stale_project_name.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num= "Built target test_no_stale_project_name"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=64 "Built target test_no_stale_project_name"
 .PHONY : tests/unit/CMakeFiles/test_no_stale_project_name.dir/all
 
 # Build rule for subdir invocation for target.
 tests/unit/CMakeFiles/test_no_stale_project_name.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 27
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 29
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/unit/CMakeFiles/test_no_stale_project_name.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 0
 .PHONY : tests/unit/CMakeFiles/test_no_stale_project_name.dir/rule
@@ -3232,7 +3262,7 @@ tests/unit/CMakeFiles/test_node_management.dir/all: tests/support/CMakeFiles/muc
 tests/unit/CMakeFiles/test_node_management.dir/all: _deps/unity-build/CMakeFiles/unity.dir/all
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_node_management.dir/build.make tests/unit/CMakeFiles/test_node_management.dir/depend
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_node_management.dir/build.make tests/unit/CMakeFiles/test_node_management.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=64 "Built target test_node_management"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num= "Built target test_node_management"
 .PHONY : tests/unit/CMakeFiles/test_node_management.dir/all
 
 # Build rule for subdir invocation for target.
@@ -3260,12 +3290,12 @@ tests/unit/CMakeFiles/test_node_management_errors.dir/all: tests/support/CMakeFi
 tests/unit/CMakeFiles/test_node_management_errors.dir/all: _deps/unity-build/CMakeFiles/unity.dir/all
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_node_management_errors.dir/build.make tests/unit/CMakeFiles/test_node_management_errors.dir/depend
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_node_management_errors.dir/build.make tests/unit/CMakeFiles/test_node_management_errors.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num= "Built target test_node_management_errors"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=65 "Built target test_node_management_errors"
 .PHONY : tests/unit/CMakeFiles/test_node_management_errors.dir/all
 
 # Build rule for subdir invocation for target.
 tests/unit/CMakeFiles/test_node_management_errors.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 27
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 29
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/unit/CMakeFiles/test_node_management_errors.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 0
 .PHONY : tests/unit/CMakeFiles/test_node_management_errors.dir/rule
@@ -3288,7 +3318,7 @@ tests/unit/CMakeFiles/test_notification_encoding.dir/all: tests/support/CMakeFil
 tests/unit/CMakeFiles/test_notification_encoding.dir/all: _deps/unity-build/CMakeFiles/unity.dir/all
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_notification_encoding.dir/build.make tests/unit/CMakeFiles/test_notification_encoding.dir/depend
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_notification_encoding.dir/build.make tests/unit/CMakeFiles/test_notification_encoding.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=65 "Built target test_notification_encoding"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num= "Built target test_notification_encoding"
 .PHONY : tests/unit/CMakeFiles/test_notification_encoding.dir/all
 
 # Build rule for subdir invocation for target.
@@ -3316,12 +3346,12 @@ tests/unit/CMakeFiles/test_operation_limits.dir/all: tests/support/CMakeFiles/mu
 tests/unit/CMakeFiles/test_operation_limits.dir/all: _deps/unity-build/CMakeFiles/unity.dir/all
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_operation_limits.dir/build.make tests/unit/CMakeFiles/test_operation_limits.dir/depend
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_operation_limits.dir/build.make tests/unit/CMakeFiles/test_operation_limits.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num= "Built target test_operation_limits"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=66 "Built target test_operation_limits"
 .PHONY : tests/unit/CMakeFiles/test_operation_limits.dir/all
 
 # Build rule for subdir invocation for target.
 tests/unit/CMakeFiles/test_operation_limits.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 27
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 29
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/unit/CMakeFiles/test_operation_limits.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 0
 .PHONY : tests/unit/CMakeFiles/test_operation_limits.dir/rule
@@ -3344,7 +3374,7 @@ tests/unit/CMakeFiles/test_password_decrypt_zeroize.dir/all: tests/support/CMake
 tests/unit/CMakeFiles/test_password_decrypt_zeroize.dir/all: _deps/unity-build/CMakeFiles/unity.dir/all
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_password_decrypt_zeroize.dir/build.make tests/unit/CMakeFiles/test_password_decrypt_zeroize.dir/depend
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_password_decrypt_zeroize.dir/build.make tests/unit/CMakeFiles/test_password_decrypt_zeroize.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=66 "Built target test_password_decrypt_zeroize"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num= "Built target test_password_decrypt_zeroize"
 .PHONY : tests/unit/CMakeFiles/test_password_decrypt_zeroize.dir/all
 
 # Build rule for subdir invocation for target.
@@ -3372,12 +3402,12 @@ tests/unit/CMakeFiles/test_percent_deadband.dir/all: tests/support/CMakeFiles/mu
 tests/unit/CMakeFiles/test_percent_deadband.dir/all: _deps/unity-build/CMakeFiles/unity.dir/all
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_percent_deadband.dir/build.make tests/unit/CMakeFiles/test_percent_deadband.dir/depend
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_percent_deadband.dir/build.make tests/unit/CMakeFiles/test_percent_deadband.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num= "Built target test_percent_deadband"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=67 "Built target test_percent_deadband"
 .PHONY : tests/unit/CMakeFiles/test_percent_deadband.dir/all
 
 # Build rule for subdir invocation for target.
 tests/unit/CMakeFiles/test_percent_deadband.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 27
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 29
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/unit/CMakeFiles/test_percent_deadband.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 0
 .PHONY : tests/unit/CMakeFiles/test_percent_deadband.dir/rule
@@ -3400,7 +3430,7 @@ tests/unit/CMakeFiles/test_platform_adapter_contract.dir/all: tests/support/CMak
 tests/unit/CMakeFiles/test_platform_adapter_contract.dir/all: _deps/unity-build/CMakeFiles/unity.dir/all
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_platform_adapter_contract.dir/build.make tests/unit/CMakeFiles/test_platform_adapter_contract.dir/depend
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_platform_adapter_contract.dir/build.make tests/unit/CMakeFiles/test_platform_adapter_contract.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=67 "Built target test_platform_adapter_contract"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num= "Built target test_platform_adapter_contract"
 .PHONY : tests/unit/CMakeFiles/test_platform_adapter_contract.dir/all
 
 # Build rule for subdir invocation for target.
@@ -3428,12 +3458,12 @@ tests/unit/CMakeFiles/test_profile_surface.dir/all: tests/support/CMakeFiles/muc
 tests/unit/CMakeFiles/test_profile_surface.dir/all: _deps/unity-build/CMakeFiles/unity.dir/all
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_profile_surface.dir/build.make tests/unit/CMakeFiles/test_profile_surface.dir/depend
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_profile_surface.dir/build.make tests/unit/CMakeFiles/test_profile_surface.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num= "Built target test_profile_surface"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=68 "Built target test_profile_surface"
 .PHONY : tests/unit/CMakeFiles/test_profile_surface.dir/all
 
 # Build rule for subdir invocation for target.
 tests/unit/CMakeFiles/test_profile_surface.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 27
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 29
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/unit/CMakeFiles/test_profile_surface.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 0
 .PHONY : tests/unit/CMakeFiles/test_profile_surface.dir/rule
@@ -3456,7 +3486,7 @@ tests/unit/CMakeFiles/test_public_headers.dir/all: tests/support/CMakeFiles/muc_
 tests/unit/CMakeFiles/test_public_headers.dir/all: _deps/unity-build/CMakeFiles/unity.dir/all
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_public_headers.dir/build.make tests/unit/CMakeFiles/test_public_headers.dir/depend
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_public_headers.dir/build.make tests/unit/CMakeFiles/test_public_headers.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=68 "Built target test_public_headers"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num= "Built target test_public_headers"
 .PHONY : tests/unit/CMakeFiles/test_public_headers.dir/all
 
 # Build rule for subdir invocation for target.
@@ -3484,12 +3514,12 @@ tests/unit/CMakeFiles/test_pubsub.dir/all: tests/support/CMakeFiles/muc_opcua_te
 tests/unit/CMakeFiles/test_pubsub.dir/all: _deps/unity-build/CMakeFiles/unity.dir/all
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_pubsub.dir/build.make tests/unit/CMakeFiles/test_pubsub.dir/depend
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_pubsub.dir/build.make tests/unit/CMakeFiles/test_pubsub.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num= "Built target test_pubsub"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=69 "Built target test_pubsub"
 .PHONY : tests/unit/CMakeFiles/test_pubsub.dir/all
 
 # Build rule for subdir invocation for target.
 tests/unit/CMakeFiles/test_pubsub.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 27
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 29
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/unit/CMakeFiles/test_pubsub.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 0
 .PHONY : tests/unit/CMakeFiles/test_pubsub.dir/rule
@@ -3512,7 +3542,7 @@ tests/unit/CMakeFiles/test_query_encoding.dir/all: tests/support/CMakeFiles/muc_
 tests/unit/CMakeFiles/test_query_encoding.dir/all: _deps/unity-build/CMakeFiles/unity.dir/all
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_query_encoding.dir/build.make tests/unit/CMakeFiles/test_query_encoding.dir/depend
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_query_encoding.dir/build.make tests/unit/CMakeFiles/test_query_encoding.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=69 "Built target test_query_encoding"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num= "Built target test_query_encoding"
 .PHONY : tests/unit/CMakeFiles/test_query_encoding.dir/all
 
 # Build rule for subdir invocation for target.
@@ -3540,12 +3570,12 @@ tests/unit/CMakeFiles/test_query_service.dir/all: tests/support/CMakeFiles/muc_o
 tests/unit/CMakeFiles/test_query_service.dir/all: _deps/unity-build/CMakeFiles/unity.dir/all
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_query_service.dir/build.make tests/unit/CMakeFiles/test_query_service.dir/depend
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_query_service.dir/build.make tests/unit/CMakeFiles/test_query_service.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num= "Built target test_query_service"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=70 "Built target test_query_service"
 .PHONY : tests/unit/CMakeFiles/test_query_service.dir/all
 
 # Build rule for subdir invocation for target.
 tests/unit/CMakeFiles/test_query_service.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 27
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 29
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/unit/CMakeFiles/test_query_service.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 0
 .PHONY : tests/unit/CMakeFiles/test_query_service.dir/rule
@@ -3568,7 +3598,7 @@ tests/unit/CMakeFiles/test_read_browsename_namespace.dir/all: tests/support/CMak
 tests/unit/CMakeFiles/test_read_browsename_namespace.dir/all: _deps/unity-build/CMakeFiles/unity.dir/all
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_read_browsename_namespace.dir/build.make tests/unit/CMakeFiles/test_read_browsename_namespace.dir/depend
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_read_browsename_namespace.dir/build.make tests/unit/CMakeFiles/test_read_browsename_namespace.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=70 "Built target test_read_browsename_namespace"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num= "Built target test_read_browsename_namespace"
 .PHONY : tests/unit/CMakeFiles/test_read_browsename_namespace.dir/all
 
 # Build rule for subdir invocation for target.
@@ -3596,12 +3626,12 @@ tests/unit/CMakeFiles/test_read_service.dir/all: tests/support/CMakeFiles/muc_op
 tests/unit/CMakeFiles/test_read_service.dir/all: _deps/unity-build/CMakeFiles/unity.dir/all
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_read_service.dir/build.make tests/unit/CMakeFiles/test_read_service.dir/depend
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_read_service.dir/build.make tests/unit/CMakeFiles/test_read_service.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num= "Built target test_read_service"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=71 "Built target test_read_service"
 .PHONY : tests/unit/CMakeFiles/test_read_service.dir/all
 
 # Build rule for subdir invocation for target.
 tests/unit/CMakeFiles/test_read_service.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 27
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 29
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/unit/CMakeFiles/test_read_service.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 0
 .PHONY : tests/unit/CMakeFiles/test_read_service.dir/rule
@@ -3624,7 +3654,7 @@ tests/unit/CMakeFiles/test_read_timestamps_to_return.dir/all: tests/support/CMak
 tests/unit/CMakeFiles/test_read_timestamps_to_return.dir/all: _deps/unity-build/CMakeFiles/unity.dir/all
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_read_timestamps_to_return.dir/build.make tests/unit/CMakeFiles/test_read_timestamps_to_return.dir/depend
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_read_timestamps_to_return.dir/build.make tests/unit/CMakeFiles/test_read_timestamps_to_return.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=71 "Built target test_read_timestamps_to_return"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num= "Built target test_read_timestamps_to_return"
 .PHONY : tests/unit/CMakeFiles/test_read_timestamps_to_return.dir/all
 
 # Build rule for subdir invocation for target.
@@ -3652,7 +3682,7 @@ tests/unit/CMakeFiles/test_reverse_connect.dir/all: tests/support/CMakeFiles/muc
 tests/unit/CMakeFiles/test_reverse_connect.dir/all: _deps/unity-build/CMakeFiles/unity.dir/all
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_reverse_connect.dir/build.make tests/unit/CMakeFiles/test_reverse_connect.dir/depend
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_reverse_connect.dir/build.make tests/unit/CMakeFiles/test_reverse_connect.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=72 "Built target test_reverse_connect"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num= "Built target test_reverse_connect"
 .PHONY : tests/unit/CMakeFiles/test_reverse_connect.dir/all
 
 # Build rule for subdir invocation for target.
@@ -3680,12 +3710,12 @@ tests/unit/CMakeFiles/test_role_management.dir/all: tests/support/CMakeFiles/muc
 tests/unit/CMakeFiles/test_role_management.dir/all: _deps/unity-build/CMakeFiles/unity.dir/all
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_role_management.dir/build.make tests/unit/CMakeFiles/test_role_management.dir/depend
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_role_management.dir/build.make tests/unit/CMakeFiles/test_role_management.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num= "Built target test_role_management"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=73 "Built target test_role_management"
 .PHONY : tests/unit/CMakeFiles/test_role_management.dir/all
 
 # Build rule for subdir invocation for target.
 tests/unit/CMakeFiles/test_role_management.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 27
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 29
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/unit/CMakeFiles/test_role_management.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 0
 .PHONY : tests/unit/CMakeFiles/test_role_management.dir/rule
@@ -3708,7 +3738,7 @@ tests/unit/CMakeFiles/test_secure_channel.dir/all: tests/support/CMakeFiles/muc_
 tests/unit/CMakeFiles/test_secure_channel.dir/all: _deps/unity-build/CMakeFiles/unity.dir/all
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_secure_channel.dir/build.make tests/unit/CMakeFiles/test_secure_channel.dir/depend
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_secure_channel.dir/build.make tests/unit/CMakeFiles/test_secure_channel.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=73 "Built target test_secure_channel"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num= "Built target test_secure_channel"
 .PHONY : tests/unit/CMakeFiles/test_secure_channel.dir/all
 
 # Build rule for subdir invocation for target.
@@ -3736,7 +3766,7 @@ tests/unit/CMakeFiles/test_security_identity_errors.dir/all: tests/support/CMake
 tests/unit/CMakeFiles/test_security_identity_errors.dir/all: _deps/unity-build/CMakeFiles/unity.dir/all
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_security_identity_errors.dir/build.make tests/unit/CMakeFiles/test_security_identity_errors.dir/depend
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_security_identity_errors.dir/build.make tests/unit/CMakeFiles/test_security_identity_errors.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=74 "Built target test_security_identity_errors"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num= "Built target test_security_identity_errors"
 .PHONY : tests/unit/CMakeFiles/test_security_identity_errors.dir/all
 
 # Build rule for subdir invocation for target.
@@ -3764,12 +3794,12 @@ tests/unit/CMakeFiles/test_security_policy.dir/all: tests/support/CMakeFiles/muc
 tests/unit/CMakeFiles/test_security_policy.dir/all: _deps/unity-build/CMakeFiles/unity.dir/all
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_security_policy.dir/build.make tests/unit/CMakeFiles/test_security_policy.dir/depend
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_security_policy.dir/build.make tests/unit/CMakeFiles/test_security_policy.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num= "Built target test_security_policy"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=75 "Built target test_security_policy"
 .PHONY : tests/unit/CMakeFiles/test_security_policy.dir/all
 
 # Build rule for subdir invocation for target.
 tests/unit/CMakeFiles/test_security_policy.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 27
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 29
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/unit/CMakeFiles/test_security_policy.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 0
 .PHONY : tests/unit/CMakeFiles/test_security_policy.dir/rule
@@ -3792,7 +3822,7 @@ tests/unit/CMakeFiles/test_security_policy_selection.dir/all: tests/support/CMak
 tests/unit/CMakeFiles/test_security_policy_selection.dir/all: _deps/unity-build/CMakeFiles/unity.dir/all
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_security_policy_selection.dir/build.make tests/unit/CMakeFiles/test_security_policy_selection.dir/depend
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_security_policy_selection.dir/build.make tests/unit/CMakeFiles/test_security_policy_selection.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=75 "Built target test_security_policy_selection"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num= "Built target test_security_policy_selection"
 .PHONY : tests/unit/CMakeFiles/test_security_policy_selection.dir/all
 
 # Build rule for subdir invocation for target.
@@ -3820,12 +3850,12 @@ tests/unit/CMakeFiles/test_security_rsa_oaep.dir/all: tests/support/CMakeFiles/m
 tests/unit/CMakeFiles/test_security_rsa_oaep.dir/all: _deps/unity-build/CMakeFiles/unity.dir/all
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_security_rsa_oaep.dir/build.make tests/unit/CMakeFiles/test_security_rsa_oaep.dir/depend
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_security_rsa_oaep.dir/build.make tests/unit/CMakeFiles/test_security_rsa_oaep.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num= "Built target test_security_rsa_oaep"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=76 "Built target test_security_rsa_oaep"
 .PHONY : tests/unit/CMakeFiles/test_security_rsa_oaep.dir/all
 
 # Build rule for subdir invocation for target.
 tests/unit/CMakeFiles/test_security_rsa_oaep.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 27
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 29
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/unit/CMakeFiles/test_security_rsa_oaep.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 0
 .PHONY : tests/unit/CMakeFiles/test_security_rsa_oaep.dir/rule
@@ -3848,7 +3878,7 @@ tests/unit/CMakeFiles/test_security_rsa_oaep_errors.dir/all: tests/support/CMake
 tests/unit/CMakeFiles/test_security_rsa_oaep_errors.dir/all: _deps/unity-build/CMakeFiles/unity.dir/all
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_security_rsa_oaep_errors.dir/build.make tests/unit/CMakeFiles/test_security_rsa_oaep_errors.dir/depend
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_security_rsa_oaep_errors.dir/build.make tests/unit/CMakeFiles/test_security_rsa_oaep_errors.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=76 "Built target test_security_rsa_oaep_errors"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num= "Built target test_security_rsa_oaep_errors"
 .PHONY : tests/unit/CMakeFiles/test_security_rsa_oaep_errors.dir/all
 
 # Build rule for subdir invocation for target.
@@ -3876,12 +3906,12 @@ tests/unit/CMakeFiles/test_security_rsa_pss.dir/all: tests/support/CMakeFiles/mu
 tests/unit/CMakeFiles/test_security_rsa_pss.dir/all: _deps/unity-build/CMakeFiles/unity.dir/all
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_security_rsa_pss.dir/build.make tests/unit/CMakeFiles/test_security_rsa_pss.dir/depend
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_security_rsa_pss.dir/build.make tests/unit/CMakeFiles/test_security_rsa_pss.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num= "Built target test_security_rsa_pss"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=77 "Built target test_security_rsa_pss"
 .PHONY : tests/unit/CMakeFiles/test_security_rsa_pss.dir/all
 
 # Build rule for subdir invocation for target.
 tests/unit/CMakeFiles/test_security_rsa_pss.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 27
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 29
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/unit/CMakeFiles/test_security_rsa_pss.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 0
 .PHONY : tests/unit/CMakeFiles/test_security_rsa_pss.dir/rule
@@ -3904,7 +3934,7 @@ tests/unit/CMakeFiles/test_security_rsa_pss_errors.dir/all: tests/support/CMakeF
 tests/unit/CMakeFiles/test_security_rsa_pss_errors.dir/all: _deps/unity-build/CMakeFiles/unity.dir/all
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_security_rsa_pss_errors.dir/build.make tests/unit/CMakeFiles/test_security_rsa_pss_errors.dir/depend
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_security_rsa_pss_errors.dir/build.make tests/unit/CMakeFiles/test_security_rsa_pss_errors.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=77 "Built target test_security_rsa_pss_errors"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num= "Built target test_security_rsa_pss_errors"
 .PHONY : tests/unit/CMakeFiles/test_security_rsa_pss_errors.dir/all
 
 # Build rule for subdir invocation for target.
@@ -3932,12 +3962,12 @@ tests/unit/CMakeFiles/test_security_trustlist.dir/all: tests/support/CMakeFiles/
 tests/unit/CMakeFiles/test_security_trustlist.dir/all: _deps/unity-build/CMakeFiles/unity.dir/all
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_security_trustlist.dir/build.make tests/unit/CMakeFiles/test_security_trustlist.dir/depend
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_security_trustlist.dir/build.make tests/unit/CMakeFiles/test_security_trustlist.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num= "Built target test_security_trustlist"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=78 "Built target test_security_trustlist"
 .PHONY : tests/unit/CMakeFiles/test_security_trustlist.dir/all
 
 # Build rule for subdir invocation for target.
 tests/unit/CMakeFiles/test_security_trustlist.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 27
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 29
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/unit/CMakeFiles/test_security_trustlist.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 0
 .PHONY : tests/unit/CMakeFiles/test_security_trustlist.dir/rule
@@ -3960,7 +3990,7 @@ tests/unit/CMakeFiles/test_server_address_space_config.dir/all: tests/support/CM
 tests/unit/CMakeFiles/test_server_address_space_config.dir/all: _deps/unity-build/CMakeFiles/unity.dir/all
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_server_address_space_config.dir/build.make tests/unit/CMakeFiles/test_server_address_space_config.dir/depend
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_server_address_space_config.dir/build.make tests/unit/CMakeFiles/test_server_address_space_config.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=78 "Built target test_server_address_space_config"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num= "Built target test_server_address_space_config"
 .PHONY : tests/unit/CMakeFiles/test_server_address_space_config.dir/all
 
 # Build rule for subdir invocation for target.
@@ -3988,12 +4018,12 @@ tests/unit/CMakeFiles/test_server_config.dir/all: tests/support/CMakeFiles/muc_o
 tests/unit/CMakeFiles/test_server_config.dir/all: _deps/unity-build/CMakeFiles/unity.dir/all
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_server_config.dir/build.make tests/unit/CMakeFiles/test_server_config.dir/depend
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_server_config.dir/build.make tests/unit/CMakeFiles/test_server_config.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num= "Built target test_server_config"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=79 "Built target test_server_config"
 .PHONY : tests/unit/CMakeFiles/test_server_config.dir/all
 
 # Build rule for subdir invocation for target.
 tests/unit/CMakeFiles/test_server_config.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 27
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 29
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/unit/CMakeFiles/test_server_config.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 0
 .PHONY : tests/unit/CMakeFiles/test_server_config.dir/rule
@@ -4016,12 +4046,12 @@ tests/unit/CMakeFiles/test_server_status_value.dir/all: tests/support/CMakeFiles
 tests/unit/CMakeFiles/test_server_status_value.dir/all: _deps/unity-build/CMakeFiles/unity.dir/all
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_server_status_value.dir/build.make tests/unit/CMakeFiles/test_server_status_value.dir/depend
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_server_status_value.dir/build.make tests/unit/CMakeFiles/test_server_status_value.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num= "Built target test_server_status_value"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=81 "Built target test_server_status_value"
 .PHONY : tests/unit/CMakeFiles/test_server_status_value.dir/all
 
 # Build rule for subdir invocation for target.
 tests/unit/CMakeFiles/test_server_status_value.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 27
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 29
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/unit/CMakeFiles/test_server_status_value.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 0
 .PHONY : tests/unit/CMakeFiles/test_server_status_value.dir/rule
@@ -4044,7 +4074,7 @@ tests/unit/CMakeFiles/test_service_dispatch.dir/all: tests/support/CMakeFiles/mu
 tests/unit/CMakeFiles/test_service_dispatch.dir/all: _deps/unity-build/CMakeFiles/unity.dir/all
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_service_dispatch.dir/build.make tests/unit/CMakeFiles/test_service_dispatch.dir/depend
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_service_dispatch.dir/build.make tests/unit/CMakeFiles/test_service_dispatch.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=81 "Built target test_service_dispatch"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num= "Built target test_service_dispatch"
 .PHONY : tests/unit/CMakeFiles/test_service_dispatch.dir/all
 
 # Build rule for subdir invocation for target.
@@ -4072,12 +4102,12 @@ tests/unit/CMakeFiles/test_service_header.dir/all: tests/support/CMakeFiles/muc_
 tests/unit/CMakeFiles/test_service_header.dir/all: _deps/unity-build/CMakeFiles/unity.dir/all
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_service_header.dir/build.make tests/unit/CMakeFiles/test_service_header.dir/depend
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_service_header.dir/build.make tests/unit/CMakeFiles/test_service_header.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num= "Built target test_service_header"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=82 "Built target test_service_header"
 .PHONY : tests/unit/CMakeFiles/test_service_header.dir/all
 
 # Build rule for subdir invocation for target.
 tests/unit/CMakeFiles/test_service_header.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 27
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 29
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/unit/CMakeFiles/test_service_header.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 0
 .PHONY : tests/unit/CMakeFiles/test_service_header.dir/rule
@@ -4100,7 +4130,7 @@ tests/unit/CMakeFiles/test_service_message.dir/all: tests/support/CMakeFiles/muc
 tests/unit/CMakeFiles/test_service_message.dir/all: _deps/unity-build/CMakeFiles/unity.dir/all
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_service_message.dir/build.make tests/unit/CMakeFiles/test_service_message.dir/depend
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_service_message.dir/build.make tests/unit/CMakeFiles/test_service_message.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=82 "Built target test_service_message"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num= "Built target test_service_message"
 .PHONY : tests/unit/CMakeFiles/test_service_message.dir/all
 
 # Build rule for subdir invocation for target.
@@ -4128,12 +4158,12 @@ tests/unit/CMakeFiles/test_service_state_errors.dir/all: tests/support/CMakeFile
 tests/unit/CMakeFiles/test_service_state_errors.dir/all: _deps/unity-build/CMakeFiles/unity.dir/all
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_service_state_errors.dir/build.make tests/unit/CMakeFiles/test_service_state_errors.dir/depend
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_service_state_errors.dir/build.make tests/unit/CMakeFiles/test_service_state_errors.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num= "Built target test_service_state_errors"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=83 "Built target test_service_state_errors"
 .PHONY : tests/unit/CMakeFiles/test_service_state_errors.dir/all
 
 # Build rule for subdir invocation for target.
 tests/unit/CMakeFiles/test_service_state_errors.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 27
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 29
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/unit/CMakeFiles/test_service_state_errors.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 0
 .PHONY : tests/unit/CMakeFiles/test_service_state_errors.dir/rule
@@ -4156,7 +4186,7 @@ tests/unit/CMakeFiles/test_session.dir/all: tests/support/CMakeFiles/muc_opcua_t
 tests/unit/CMakeFiles/test_session.dir/all: _deps/unity-build/CMakeFiles/unity.dir/all
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_session.dir/build.make tests/unit/CMakeFiles/test_session.dir/depend
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_session.dir/build.make tests/unit/CMakeFiles/test_session.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=83 "Built target test_session"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num= "Built target test_session"
 .PHONY : tests/unit/CMakeFiles/test_session.dir/all
 
 # Build rule for subdir invocation for target.
@@ -4184,12 +4214,12 @@ tests/unit/CMakeFiles/test_session_auth.dir/all: tests/support/CMakeFiles/muc_op
 tests/unit/CMakeFiles/test_session_auth.dir/all: _deps/unity-build/CMakeFiles/unity.dir/all
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_session_auth.dir/build.make tests/unit/CMakeFiles/test_session_auth.dir/depend
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_session_auth.dir/build.make tests/unit/CMakeFiles/test_session_auth.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num= "Built target test_session_auth"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=84 "Built target test_session_auth"
 .PHONY : tests/unit/CMakeFiles/test_session_auth.dir/all
 
 # Build rule for subdir invocation for target.
 tests/unit/CMakeFiles/test_session_auth.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 27
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 29
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/unit/CMakeFiles/test_session_auth.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 0
 .PHONY : tests/unit/CMakeFiles/test_session_auth.dir/rule
@@ -4212,12 +4242,12 @@ tests/unit/CMakeFiles/test_size_report.dir/all: tests/support/CMakeFiles/muc_opc
 tests/unit/CMakeFiles/test_size_report.dir/all: _deps/unity-build/CMakeFiles/unity.dir/all
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_size_report.dir/build.make tests/unit/CMakeFiles/test_size_report.dir/depend
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_size_report.dir/build.make tests/unit/CMakeFiles/test_size_report.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num= "Built target test_size_report"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=85 "Built target test_size_report"
 .PHONY : tests/unit/CMakeFiles/test_size_report.dir/all
 
 # Build rule for subdir invocation for target.
 tests/unit/CMakeFiles/test_size_report.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 27
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 29
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/unit/CMakeFiles/test_size_report.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 0
 .PHONY : tests/unit/CMakeFiles/test_size_report.dir/rule
@@ -4240,7 +4270,7 @@ tests/unit/CMakeFiles/test_status.dir/all: tests/support/CMakeFiles/muc_opcua_te
 tests/unit/CMakeFiles/test_status.dir/all: _deps/unity-build/CMakeFiles/unity.dir/all
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_status.dir/build.make tests/unit/CMakeFiles/test_status.dir/depend
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_status.dir/build.make tests/unit/CMakeFiles/test_status.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=85 "Built target test_status"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num= "Built target test_status"
 .PHONY : tests/unit/CMakeFiles/test_status.dir/all
 
 # Build rule for subdir invocation for target.
@@ -4268,12 +4298,12 @@ tests/unit/CMakeFiles/test_subscription_deadband.dir/all: tests/support/CMakeFil
 tests/unit/CMakeFiles/test_subscription_deadband.dir/all: _deps/unity-build/CMakeFiles/unity.dir/all
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_subscription_deadband.dir/build.make tests/unit/CMakeFiles/test_subscription_deadband.dir/depend
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_subscription_deadband.dir/build.make tests/unit/CMakeFiles/test_subscription_deadband.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num= "Built target test_subscription_deadband"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=86 "Built target test_subscription_deadband"
 .PHONY : tests/unit/CMakeFiles/test_subscription_deadband.dir/all
 
 # Build rule for subdir invocation for target.
 tests/unit/CMakeFiles/test_subscription_deadband.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 27
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 29
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/unit/CMakeFiles/test_subscription_deadband.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 0
 .PHONY : tests/unit/CMakeFiles/test_subscription_deadband.dir/rule
@@ -4296,7 +4326,7 @@ tests/unit/CMakeFiles/test_subscription_publish.dir/all: tests/support/CMakeFile
 tests/unit/CMakeFiles/test_subscription_publish.dir/all: _deps/unity-build/CMakeFiles/unity.dir/all
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_subscription_publish.dir/build.make tests/unit/CMakeFiles/test_subscription_publish.dir/depend
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_subscription_publish.dir/build.make tests/unit/CMakeFiles/test_subscription_publish.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=86 "Built target test_subscription_publish"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num= "Built target test_subscription_publish"
 .PHONY : tests/unit/CMakeFiles/test_subscription_publish.dir/all
 
 # Build rule for subdir invocation for target.
@@ -4324,7 +4354,7 @@ tests/unit/CMakeFiles/test_subscriptions_capacity.dir/all: tests/support/CMakeFi
 tests/unit/CMakeFiles/test_subscriptions_capacity.dir/all: _deps/unity-build/CMakeFiles/unity.dir/all
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_subscriptions_capacity.dir/build.make tests/unit/CMakeFiles/test_subscriptions_capacity.dir/depend
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_subscriptions_capacity.dir/build.make tests/unit/CMakeFiles/test_subscriptions_capacity.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=87 "Built target test_subscriptions_capacity"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num= "Built target test_subscriptions_capacity"
 .PHONY : tests/unit/CMakeFiles/test_subscriptions_capacity.dir/all
 
 # Build rule for subdir invocation for target.
@@ -4352,12 +4382,12 @@ tests/unit/CMakeFiles/test_subscriptions_errors.dir/all: tests/support/CMakeFile
 tests/unit/CMakeFiles/test_subscriptions_errors.dir/all: _deps/unity-build/CMakeFiles/unity.dir/all
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_subscriptions_errors.dir/build.make tests/unit/CMakeFiles/test_subscriptions_errors.dir/depend
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_subscriptions_errors.dir/build.make tests/unit/CMakeFiles/test_subscriptions_errors.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num= "Built target test_subscriptions_errors"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=88 "Built target test_subscriptions_errors"
 .PHONY : tests/unit/CMakeFiles/test_subscriptions_errors.dir/all
 
 # Build rule for subdir invocation for target.
 tests/unit/CMakeFiles/test_subscriptions_errors.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 27
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 29
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/unit/CMakeFiles/test_subscriptions_errors.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 0
 .PHONY : tests/unit/CMakeFiles/test_subscriptions_errors.dir/rule
@@ -4380,7 +4410,7 @@ tests/unit/CMakeFiles/test_sym_chunk.dir/all: tests/support/CMakeFiles/muc_opcua
 tests/unit/CMakeFiles/test_sym_chunk.dir/all: _deps/unity-build/CMakeFiles/unity.dir/all
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_sym_chunk.dir/build.make tests/unit/CMakeFiles/test_sym_chunk.dir/depend
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_sym_chunk.dir/build.make tests/unit/CMakeFiles/test_sym_chunk.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=88 "Built target test_sym_chunk"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num= "Built target test_sym_chunk"
 .PHONY : tests/unit/CMakeFiles/test_sym_chunk.dir/all
 
 # Build rule for subdir invocation for target.
@@ -4408,12 +4438,12 @@ tests/unit/CMakeFiles/test_tcp_connection.dir/all: tests/support/CMakeFiles/muc_
 tests/unit/CMakeFiles/test_tcp_connection.dir/all: _deps/unity-build/CMakeFiles/unity.dir/all
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_tcp_connection.dir/build.make tests/unit/CMakeFiles/test_tcp_connection.dir/depend
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_tcp_connection.dir/build.make tests/unit/CMakeFiles/test_tcp_connection.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num= "Built target test_tcp_connection"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=89 "Built target test_tcp_connection"
 .PHONY : tests/unit/CMakeFiles/test_tcp_connection.dir/all
 
 # Build rule for subdir invocation for target.
 tests/unit/CMakeFiles/test_tcp_connection.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 27
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 29
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/unit/CMakeFiles/test_tcp_connection.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 0
 .PHONY : tests/unit/CMakeFiles/test_tcp_connection.dir/rule
@@ -4436,7 +4466,7 @@ tests/unit/CMakeFiles/test_time_sync.dir/all: tests/support/CMakeFiles/muc_opcua
 tests/unit/CMakeFiles/test_time_sync.dir/all: _deps/unity-build/CMakeFiles/unity.dir/all
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_time_sync.dir/build.make tests/unit/CMakeFiles/test_time_sync.dir/depend
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_time_sync.dir/build.make tests/unit/CMakeFiles/test_time_sync.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=89 "Built target test_time_sync"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num= "Built target test_time_sync"
 .PHONY : tests/unit/CMakeFiles/test_time_sync.dir/all
 
 # Build rule for subdir invocation for target.
@@ -4464,12 +4494,12 @@ tests/unit/CMakeFiles/test_traceability_docs.dir/all: tests/support/CMakeFiles/m
 tests/unit/CMakeFiles/test_traceability_docs.dir/all: _deps/unity-build/CMakeFiles/unity.dir/all
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_traceability_docs.dir/build.make tests/unit/CMakeFiles/test_traceability_docs.dir/depend
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_traceability_docs.dir/build.make tests/unit/CMakeFiles/test_traceability_docs.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num= "Built target test_traceability_docs"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=90 "Built target test_traceability_docs"
 .PHONY : tests/unit/CMakeFiles/test_traceability_docs.dir/all
 
 # Build rule for subdir invocation for target.
 tests/unit/CMakeFiles/test_traceability_docs.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 27
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 29
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/unit/CMakeFiles/test_traceability_docs.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 0
 .PHONY : tests/unit/CMakeFiles/test_traceability_docs.dir/rule
@@ -4492,7 +4522,7 @@ tests/unit/CMakeFiles/test_transfer_subscriptions.dir/all: tests/support/CMakeFi
 tests/unit/CMakeFiles/test_transfer_subscriptions.dir/all: _deps/unity-build/CMakeFiles/unity.dir/all
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_transfer_subscriptions.dir/build.make tests/unit/CMakeFiles/test_transfer_subscriptions.dir/depend
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_transfer_subscriptions.dir/build.make tests/unit/CMakeFiles/test_transfer_subscriptions.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=90 "Built target test_transfer_subscriptions"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num= "Built target test_transfer_subscriptions"
 .PHONY : tests/unit/CMakeFiles/test_transfer_subscriptions.dir/all
 
 # Build rule for subdir invocation for target.
@@ -4520,7 +4550,7 @@ tests/unit/CMakeFiles/test_type_system.dir/all: tests/support/CMakeFiles/muc_opc
 tests/unit/CMakeFiles/test_type_system.dir/all: _deps/unity-build/CMakeFiles/unity.dir/all
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_type_system.dir/build.make tests/unit/CMakeFiles/test_type_system.dir/depend
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_type_system.dir/build.make tests/unit/CMakeFiles/test_type_system.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=91 "Built target test_type_system"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num= "Built target test_type_system"
 .PHONY : tests/unit/CMakeFiles/test_type_system.dir/all
 
 # Build rule for subdir invocation for target.
@@ -4548,12 +4578,12 @@ tests/unit/CMakeFiles/test_uadp_encoding.dir/all: tests/support/CMakeFiles/muc_o
 tests/unit/CMakeFiles/test_uadp_encoding.dir/all: _deps/unity-build/CMakeFiles/unity.dir/all
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_uadp_encoding.dir/build.make tests/unit/CMakeFiles/test_uadp_encoding.dir/depend
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_uadp_encoding.dir/build.make tests/unit/CMakeFiles/test_uadp_encoding.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num= "Built target test_uadp_encoding"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=92 "Built target test_uadp_encoding"
 .PHONY : tests/unit/CMakeFiles/test_uadp_encoding.dir/all
 
 # Build rule for subdir invocation for target.
 tests/unit/CMakeFiles/test_uadp_encoding.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 27
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 29
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/unit/CMakeFiles/test_uadp_encoding.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 0
 .PHONY : tests/unit/CMakeFiles/test_uadp_encoding.dir/rule
@@ -4576,7 +4606,7 @@ tests/unit/CMakeFiles/test_uasc_framing.dir/all: tests/support/CMakeFiles/muc_op
 tests/unit/CMakeFiles/test_uasc_framing.dir/all: _deps/unity-build/CMakeFiles/unity.dir/all
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_uasc_framing.dir/build.make tests/unit/CMakeFiles/test_uasc_framing.dir/depend
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_uasc_framing.dir/build.make tests/unit/CMakeFiles/test_uasc_framing.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=92 "Built target test_uasc_framing"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num= "Built target test_uasc_framing"
 .PHONY : tests/unit/CMakeFiles/test_uasc_framing.dir/all
 
 # Build rule for subdir invocation for target.
@@ -4604,12 +4634,12 @@ tests/unit/CMakeFiles/test_user_token_decoder.dir/all: tests/support/CMakeFiles/
 tests/unit/CMakeFiles/test_user_token_decoder.dir/all: _deps/unity-build/CMakeFiles/unity.dir/all
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_user_token_decoder.dir/build.make tests/unit/CMakeFiles/test_user_token_decoder.dir/depend
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_user_token_decoder.dir/build.make tests/unit/CMakeFiles/test_user_token_decoder.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num= "Built target test_user_token_decoder"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=95 "Built target test_user_token_decoder"
 .PHONY : tests/unit/CMakeFiles/test_user_token_decoder.dir/all
 
 # Build rule for subdir invocation for target.
 tests/unit/CMakeFiles/test_user_token_decoder.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 27
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 29
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/unit/CMakeFiles/test_user_token_decoder.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 0
 .PHONY : tests/unit/CMakeFiles/test_user_token_decoder.dir/rule
@@ -4632,7 +4662,7 @@ tests/unit/CMakeFiles/test_user_token_encrypted.dir/all: tests/support/CMakeFile
 tests/unit/CMakeFiles/test_user_token_encrypted.dir/all: _deps/unity-build/CMakeFiles/unity.dir/all
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_user_token_encrypted.dir/build.make tests/unit/CMakeFiles/test_user_token_encrypted.dir/depend
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_user_token_encrypted.dir/build.make tests/unit/CMakeFiles/test_user_token_encrypted.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=95 "Built target test_user_token_encrypted"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num= "Built target test_user_token_encrypted"
 .PHONY : tests/unit/CMakeFiles/test_user_token_encrypted.dir/all
 
 # Build rule for subdir invocation for target.
@@ -4660,7 +4690,7 @@ tests/unit/CMakeFiles/test_wolfssl_adapter.dir/all: tests/support/CMakeFiles/muc
 tests/unit/CMakeFiles/test_wolfssl_adapter.dir/all: _deps/unity-build/CMakeFiles/unity.dir/all
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_wolfssl_adapter.dir/build.make tests/unit/CMakeFiles/test_wolfssl_adapter.dir/depend
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_wolfssl_adapter.dir/build.make tests/unit/CMakeFiles/test_wolfssl_adapter.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=96 "Built target test_wolfssl_adapter"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num= "Built target test_wolfssl_adapter"
 .PHONY : tests/unit/CMakeFiles/test_wolfssl_adapter.dir/all
 
 # Build rule for subdir invocation for target.
@@ -4688,12 +4718,12 @@ tests/unit/CMakeFiles/test_write_decoder.dir/all: tests/support/CMakeFiles/muc_o
 tests/unit/CMakeFiles/test_write_decoder.dir/all: _deps/unity-build/CMakeFiles/unity.dir/all
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_write_decoder.dir/build.make tests/unit/CMakeFiles/test_write_decoder.dir/depend
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_write_decoder.dir/build.make tests/unit/CMakeFiles/test_write_decoder.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num= "Built target test_write_decoder"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=97 "Built target test_write_decoder"
 .PHONY : tests/unit/CMakeFiles/test_write_decoder.dir/all
 
 # Build rule for subdir invocation for target.
 tests/unit/CMakeFiles/test_write_decoder.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 27
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 29
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/unit/CMakeFiles/test_write_decoder.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 0
 .PHONY : tests/unit/CMakeFiles/test_write_decoder.dir/rule
@@ -4716,7 +4746,7 @@ tests/unit/CMakeFiles/test_write_errors.dir/all: tests/support/CMakeFiles/muc_op
 tests/unit/CMakeFiles/test_write_errors.dir/all: _deps/unity-build/CMakeFiles/unity.dir/all
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_write_errors.dir/build.make tests/unit/CMakeFiles/test_write_errors.dir/depend
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_write_errors.dir/build.make tests/unit/CMakeFiles/test_write_errors.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=97 "Built target test_write_errors"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num= "Built target test_write_errors"
 .PHONY : tests/unit/CMakeFiles/test_write_errors.dir/all
 
 # Build rule for subdir invocation for target.
@@ -4744,12 +4774,12 @@ tests/unit/CMakeFiles/test_write_response.dir/all: tests/support/CMakeFiles/muc_
 tests/unit/CMakeFiles/test_write_response.dir/all: _deps/unity-build/CMakeFiles/unity.dir/all
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_write_response.dir/build.make tests/unit/CMakeFiles/test_write_response.dir/depend
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_write_response.dir/build.make tests/unit/CMakeFiles/test_write_response.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num= "Built target test_write_response"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=98 "Built target test_write_response"
 .PHONY : tests/unit/CMakeFiles/test_write_response.dir/all
 
 # Build rule for subdir invocation for target.
 tests/unit/CMakeFiles/test_write_response.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 27
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 29
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/unit/CMakeFiles/test_write_response.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 0
 .PHONY : tests/unit/CMakeFiles/test_write_response.dir/rule
@@ -4772,7 +4802,7 @@ tests/unit/CMakeFiles/test_write_service.dir/all: tests/support/CMakeFiles/muc_o
 tests/unit/CMakeFiles/test_write_service.dir/all: _deps/unity-build/CMakeFiles/unity.dir/all
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_write_service.dir/build.make tests/unit/CMakeFiles/test_write_service.dir/depend
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_write_service.dir/build.make tests/unit/CMakeFiles/test_write_service.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=98 "Built target test_write_service"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num= "Built target test_write_service"
 .PHONY : tests/unit/CMakeFiles/test_write_service.dir/all
 
 # Build rule for subdir invocation for target.
@@ -4800,7 +4830,7 @@ tests/unit/CMakeFiles/test_write_value_gate.dir/all: tests/support/CMakeFiles/mu
 tests/unit/CMakeFiles/test_write_value_gate.dir/all: _deps/unity-build/CMakeFiles/unity.dir/all
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_write_value_gate.dir/build.make tests/unit/CMakeFiles/test_write_value_gate.dir/depend
 	$(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_write_value_gate.dir/build.make tests/unit/CMakeFiles/test_write_value_gate.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=99 "Built target test_write_value_gate"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num= "Built target test_write_value_gate"
 .PHONY : tests/unit/CMakeFiles/test_write_value_gate.dir/all
 
 # Build rule for subdir invocation for target.
@@ -4828,7 +4858,7 @@ tests/integration/CMakeFiles/test_minimal_server_flow.dir/all: tests/support/CMa
 tests/integration/CMakeFiles/test_minimal_server_flow.dir/all: _deps/unity-build/CMakeFiles/unity.dir/all
 	$(MAKE) $(MAKESILENT) -f tests/integration/CMakeFiles/test_minimal_server_flow.dir/build.make tests/integration/CMakeFiles/test_minimal_server_flow.dir/depend
 	$(MAKE) $(MAKESILENT) -f tests/integration/CMakeFiles/test_minimal_server_flow.dir/build.make tests/integration/CMakeFiles/test_minimal_server_flow.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=62 "Built target test_minimal_server_flow"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num= "Built target test_minimal_server_flow"
 .PHONY : tests/integration/CMakeFiles/test_minimal_server_flow.dir/all
 
 # Build rule for subdir invocation for target.
@@ -4856,12 +4886,12 @@ tests/integration/CMakeFiles/test_discovery_endpoint_no_session.dir/all: tests/s
 tests/integration/CMakeFiles/test_discovery_endpoint_no_session.dir/all: _deps/unity-build/CMakeFiles/unity.dir/all
 	$(MAKE) $(MAKESILENT) -f tests/integration/CMakeFiles/test_discovery_endpoint_no_session.dir/build.make tests/integration/CMakeFiles/test_discovery_endpoint_no_session.dir/depend
 	$(MAKE) $(MAKESILENT) -f tests/integration/CMakeFiles/test_discovery_endpoint_no_session.dir/build.make tests/integration/CMakeFiles/test_discovery_endpoint_no_session.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num= "Built target test_discovery_endpoint_no_session"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=50 "Built target test_discovery_endpoint_no_session"
 .PHONY : tests/integration/CMakeFiles/test_discovery_endpoint_no_session.dir/all
 
 # Build rule for subdir invocation for target.
 tests/integration/CMakeFiles/test_discovery_endpoint_no_session.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 27
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 29
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/integration/CMakeFiles/test_discovery_endpoint_no_session.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 0
 .PHONY : tests/integration/CMakeFiles/test_discovery_endpoint_no_session.dir/rule
@@ -4884,7 +4914,7 @@ tests/integration/CMakeFiles/test_single_client_limit.dir/all: tests/support/CMa
 tests/integration/CMakeFiles/test_single_client_limit.dir/all: _deps/unity-build/CMakeFiles/unity.dir/all
 	$(MAKE) $(MAKESILENT) -f tests/integration/CMakeFiles/test_single_client_limit.dir/build.make tests/integration/CMakeFiles/test_single_client_limit.dir/depend
 	$(MAKE) $(MAKESILENT) -f tests/integration/CMakeFiles/test_single_client_limit.dir/build.make tests/integration/CMakeFiles/test_single_client_limit.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=84 "Built target test_single_client_limit"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num= "Built target test_single_client_limit"
 .PHONY : tests/integration/CMakeFiles/test_single_client_limit.dir/all
 
 # Build rule for subdir invocation for target.
@@ -4912,12 +4942,12 @@ tests/integration/CMakeFiles/test_server_handshake.dir/all: tests/support/CMakeF
 tests/integration/CMakeFiles/test_server_handshake.dir/all: _deps/unity-build/CMakeFiles/unity.dir/all
 	$(MAKE) $(MAKESILENT) -f tests/integration/CMakeFiles/test_server_handshake.dir/build.make tests/integration/CMakeFiles/test_server_handshake.dir/depend
 	$(MAKE) $(MAKESILENT) -f tests/integration/CMakeFiles/test_server_handshake.dir/build.make tests/integration/CMakeFiles/test_server_handshake.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num= "Built target test_server_handshake"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=80 "Built target test_server_handshake"
 .PHONY : tests/integration/CMakeFiles/test_server_handshake.dir/all
 
 # Build rule for subdir invocation for target.
 tests/integration/CMakeFiles/test_server_handshake.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 27
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 29
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/integration/CMakeFiles/test_server_handshake.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 0
 .PHONY : tests/integration/CMakeFiles/test_server_handshake.dir/rule
@@ -4940,12 +4970,12 @@ tests/integration/CMakeFiles/test_response_regression.dir/all: tests/support/CMa
 tests/integration/CMakeFiles/test_response_regression.dir/all: _deps/unity-build/CMakeFiles/unity.dir/all
 	$(MAKE) $(MAKESILENT) -f tests/integration/CMakeFiles/test_response_regression.dir/build.make tests/integration/CMakeFiles/test_response_regression.dir/depend
 	$(MAKE) $(MAKESILENT) -f tests/integration/CMakeFiles/test_response_regression.dir/build.make tests/integration/CMakeFiles/test_response_regression.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num= "Built target test_response_regression"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=72 "Built target test_response_regression"
 .PHONY : tests/integration/CMakeFiles/test_response_regression.dir/all
 
 # Build rule for subdir invocation for target.
 tests/integration/CMakeFiles/test_response_regression.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 27
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 29
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/integration/CMakeFiles/test_response_regression.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 0
 .PHONY : tests/integration/CMakeFiles/test_response_regression.dir/rule
@@ -4968,7 +4998,7 @@ tests/integration/CMakeFiles/test_server_framing.dir/all: tests/support/CMakeFil
 tests/integration/CMakeFiles/test_server_framing.dir/all: _deps/unity-build/CMakeFiles/unity.dir/all
 	$(MAKE) $(MAKESILENT) -f tests/integration/CMakeFiles/test_server_framing.dir/build.make tests/integration/CMakeFiles/test_server_framing.dir/depend
 	$(MAKE) $(MAKESILENT) -f tests/integration/CMakeFiles/test_server_framing.dir/build.make tests/integration/CMakeFiles/test_server_framing.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=79 "Built target test_server_framing"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num= "Built target test_server_framing"
 .PHONY : tests/integration/CMakeFiles/test_server_framing.dir/all
 
 # Build rule for subdir invocation for target.
@@ -4996,7 +5026,7 @@ tests/integration/CMakeFiles/test_server_handshake_secure.dir/all: tests/support
 tests/integration/CMakeFiles/test_server_handshake_secure.dir/all: _deps/unity-build/CMakeFiles/unity.dir/all
 	$(MAKE) $(MAKESILENT) -f tests/integration/CMakeFiles/test_server_handshake_secure.dir/build.make tests/integration/CMakeFiles/test_server_handshake_secure.dir/depend
 	$(MAKE) $(MAKESILENT) -f tests/integration/CMakeFiles/test_server_handshake_secure.dir/build.make tests/integration/CMakeFiles/test_server_handshake_secure.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=80 "Built target test_server_handshake_secure"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num= "Built target test_server_handshake_secure"
 .PHONY : tests/integration/CMakeFiles/test_server_handshake_secure.dir/all
 
 # Build rule for subdir invocation for target.
@@ -5024,12 +5054,12 @@ tests/integration/CMakeFiles/test_connection_robustness.dir/all: tests/support/C
 tests/integration/CMakeFiles/test_connection_robustness.dir/all: _deps/unity-build/CMakeFiles/unity.dir/all
 	$(MAKE) $(MAKESILENT) -f tests/integration/CMakeFiles/test_connection_robustness.dir/build.make tests/integration/CMakeFiles/test_connection_robustness.dir/depend
 	$(MAKE) $(MAKESILENT) -f tests/integration/CMakeFiles/test_connection_robustness.dir/build.make tests/integration/CMakeFiles/test_connection_robustness.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num= "Built target test_connection_robustness"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=47 "Built target test_connection_robustness"
 .PHONY : tests/integration/CMakeFiles/test_connection_robustness.dir/all
 
 # Build rule for subdir invocation for target.
 tests/integration/CMakeFiles/test_connection_robustness.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 27
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 29
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/integration/CMakeFiles/test_connection_robustness.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 0
 .PHONY : tests/integration/CMakeFiles/test_connection_robustness.dir/rule
@@ -5052,12 +5082,12 @@ tests/integration/CMakeFiles/test_view_services.dir/all: tests/support/CMakeFile
 tests/integration/CMakeFiles/test_view_services.dir/all: _deps/unity-build/CMakeFiles/unity.dir/all
 	$(MAKE) $(MAKESILENT) -f tests/integration/CMakeFiles/test_view_services.dir/build.make tests/integration/CMakeFiles/test_view_services.dir/depend
 	$(MAKE) $(MAKESILENT) -f tests/integration/CMakeFiles/test_view_services.dir/build.make tests/integration/CMakeFiles/test_view_services.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num= "Built target test_view_services"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=96 "Built target test_view_services"
 .PHONY : tests/integration/CMakeFiles/test_view_services.dir/all
 
 # Build rule for subdir invocation for target.
 tests/integration/CMakeFiles/test_view_services.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 27
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 29
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/integration/CMakeFiles/test_view_services.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 0
 .PHONY : tests/integration/CMakeFiles/test_view_services.dir/rule
@@ -5080,12 +5110,12 @@ tests/integration/CMakeFiles/test_translate_browse_path_gate.dir/all: tests/supp
 tests/integration/CMakeFiles/test_translate_browse_path_gate.dir/all: _deps/unity-build/CMakeFiles/unity.dir/all
 	$(MAKE) $(MAKESILENT) -f tests/integration/CMakeFiles/test_translate_browse_path_gate.dir/build.make tests/integration/CMakeFiles/test_translate_browse_path_gate.dir/depend
 	$(MAKE) $(MAKESILENT) -f tests/integration/CMakeFiles/test_translate_browse_path_gate.dir/build.make tests/integration/CMakeFiles/test_translate_browse_path_gate.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num= "Built target test_translate_browse_path_gate"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=91 "Built target test_translate_browse_path_gate"
 .PHONY : tests/integration/CMakeFiles/test_translate_browse_path_gate.dir/all
 
 # Build rule for subdir invocation for target.
 tests/integration/CMakeFiles/test_translate_browse_path_gate.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 27
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 29
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/integration/CMakeFiles/test_translate_browse_path_gate.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 0
 .PHONY : tests/integration/CMakeFiles/test_translate_browse_path_gate.dir/rule
@@ -5108,12 +5138,12 @@ tests/integration/CMakeFiles/test_subscriptions.dir/all: tests/support/CMakeFile
 tests/integration/CMakeFiles/test_subscriptions.dir/all: _deps/unity-build/CMakeFiles/unity.dir/all
 	$(MAKE) $(MAKESILENT) -f tests/integration/CMakeFiles/test_subscriptions.dir/build.make tests/integration/CMakeFiles/test_subscriptions.dir/depend
 	$(MAKE) $(MAKESILENT) -f tests/integration/CMakeFiles/test_subscriptions.dir/build.make tests/integration/CMakeFiles/test_subscriptions.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num= "Built target test_subscriptions"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=87 "Built target test_subscriptions"
 .PHONY : tests/integration/CMakeFiles/test_subscriptions.dir/all
 
 # Build rule for subdir invocation for target.
 tests/integration/CMakeFiles/test_subscriptions.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 27
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 29
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/integration/CMakeFiles/test_subscriptions.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 0
 .PHONY : tests/integration/CMakeFiles/test_subscriptions.dir/rule
@@ -5136,12 +5166,12 @@ tests/integration/CMakeFiles/test_user_auth_plaintext.dir/all: tests/support/CMa
 tests/integration/CMakeFiles/test_user_auth_plaintext.dir/all: _deps/unity-build/CMakeFiles/unity.dir/all
 	$(MAKE) $(MAKESILENT) -f tests/integration/CMakeFiles/test_user_auth_plaintext.dir/build.make tests/integration/CMakeFiles/test_user_auth_plaintext.dir/depend
 	$(MAKE) $(MAKESILENT) -f tests/integration/CMakeFiles/test_user_auth_plaintext.dir/build.make tests/integration/CMakeFiles/test_user_auth_plaintext.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num= "Built target test_user_auth_plaintext"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=94 "Built target test_user_auth_plaintext"
 .PHONY : tests/integration/CMakeFiles/test_user_auth_plaintext.dir/all
 
 # Build rule for subdir invocation for target.
 tests/integration/CMakeFiles/test_user_auth_plaintext.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 27
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 29
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/integration/CMakeFiles/test_user_auth_plaintext.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 0
 .PHONY : tests/integration/CMakeFiles/test_user_auth_plaintext.dir/rule
@@ -5164,7 +5194,7 @@ tests/integration/CMakeFiles/test_user_auth_encrypted.dir/all: tests/support/CMa
 tests/integration/CMakeFiles/test_user_auth_encrypted.dir/all: _deps/unity-build/CMakeFiles/unity.dir/all
 	$(MAKE) $(MAKESILENT) -f tests/integration/CMakeFiles/test_user_auth_encrypted.dir/build.make tests/integration/CMakeFiles/test_user_auth_encrypted.dir/depend
 	$(MAKE) $(MAKESILENT) -f tests/integration/CMakeFiles/test_user_auth_encrypted.dir/build.make tests/integration/CMakeFiles/test_user_auth_encrypted.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=93 "Built target test_user_auth_encrypted"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num= "Built target test_user_auth_encrypted"
 .PHONY : tests/integration/CMakeFiles/test_user_auth_encrypted.dir/all
 
 # Build rule for subdir invocation for target.
@@ -5192,12 +5222,12 @@ tests/integration/CMakeFiles/test_user_auth_certificate.dir/all: tests/support/C
 tests/integration/CMakeFiles/test_user_auth_certificate.dir/all: _deps/unity-build/CMakeFiles/unity.dir/all
 	$(MAKE) $(MAKESILENT) -f tests/integration/CMakeFiles/test_user_auth_certificate.dir/build.make tests/integration/CMakeFiles/test_user_auth_certificate.dir/depend
 	$(MAKE) $(MAKESILENT) -f tests/integration/CMakeFiles/test_user_auth_certificate.dir/build.make tests/integration/CMakeFiles/test_user_auth_certificate.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num= "Built target test_user_auth_certificate"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=93 "Built target test_user_auth_certificate"
 .PHONY : tests/integration/CMakeFiles/test_user_auth_certificate.dir/all
 
 # Build rule for subdir invocation for target.
 tests/integration/CMakeFiles/test_user_auth_certificate.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 27
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 29
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/integration/CMakeFiles/test_user_auth_certificate.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 0
 .PHONY : tests/integration/CMakeFiles/test_user_auth_certificate.dir/rule
@@ -5220,7 +5250,7 @@ tests/integration/CMakeFiles/test_user_auth_secure_e2e.dir/all: tests/support/CM
 tests/integration/CMakeFiles/test_user_auth_secure_e2e.dir/all: _deps/unity-build/CMakeFiles/unity.dir/all
 	$(MAKE) $(MAKESILENT) -f tests/integration/CMakeFiles/test_user_auth_secure_e2e.dir/build.make tests/integration/CMakeFiles/test_user_auth_secure_e2e.dir/depend
 	$(MAKE) $(MAKESILENT) -f tests/integration/CMakeFiles/test_user_auth_secure_e2e.dir/build.make tests/integration/CMakeFiles/test_user_auth_secure_e2e.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=94 "Built target test_user_auth_secure_e2e"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num= "Built target test_user_auth_secure_e2e"
 .PHONY : tests/integration/CMakeFiles/test_user_auth_secure_e2e.dir/all
 
 # Build rule for subdir invocation for target.
@@ -5248,12 +5278,12 @@ tests/integration/CMakeFiles/test_write_service_integration.dir/all: tests/suppo
 tests/integration/CMakeFiles/test_write_service_integration.dir/all: _deps/unity-build/CMakeFiles/unity.dir/all
 	$(MAKE) $(MAKESILENT) -f tests/integration/CMakeFiles/test_write_service_integration.dir/build.make tests/integration/CMakeFiles/test_write_service_integration.dir/depend
 	$(MAKE) $(MAKESILENT) -f tests/integration/CMakeFiles/test_write_service_integration.dir/build.make tests/integration/CMakeFiles/test_write_service_integration.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num= "Built target test_write_service_integration"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=99 "Built target test_write_service_integration"
 .PHONY : tests/integration/CMakeFiles/test_write_service_integration.dir/all
 
 # Build rule for subdir invocation for target.
 tests/integration/CMakeFiles/test_write_service_integration.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 27
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 29
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/integration/CMakeFiles/test_write_service_integration.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 0
 .PHONY : tests/integration/CMakeFiles/test_write_service_integration.dir/rule
@@ -5276,12 +5306,12 @@ tests/integration/CMakeFiles/test_secure_handshake_modern.dir/all: tests/support
 tests/integration/CMakeFiles/test_secure_handshake_modern.dir/all: _deps/unity-build/CMakeFiles/unity.dir/all
 	$(MAKE) $(MAKESILENT) -f tests/integration/CMakeFiles/test_secure_handshake_modern.dir/build.make tests/integration/CMakeFiles/test_secure_handshake_modern.dir/depend
 	$(MAKE) $(MAKESILENT) -f tests/integration/CMakeFiles/test_secure_handshake_modern.dir/build.make tests/integration/CMakeFiles/test_secure_handshake_modern.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num= "Built target test_secure_handshake_modern"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=74 "Built target test_secure_handshake_modern"
 .PHONY : tests/integration/CMakeFiles/test_secure_handshake_modern.dir/all
 
 # Build rule for subdir invocation for target.
 tests/integration/CMakeFiles/test_secure_handshake_modern.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 27
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 29
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/integration/CMakeFiles/test_secure_handshake_modern.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 0
 .PHONY : tests/integration/CMakeFiles/test_secure_handshake_modern.dir/rule
@@ -5309,7 +5339,7 @@ tests/integration/CMakeFiles/test_ecc_handshake_e2e.dir/all: _deps/unity-build/C
 
 # Build rule for subdir invocation for target.
 tests/integration/CMakeFiles/test_ecc_handshake_e2e.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 27
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 28
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/integration/CMakeFiles/test_ecc_handshake_e2e.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 0
 .PHONY : tests/integration/CMakeFiles/test_ecc_handshake_e2e.dir/rule
@@ -5337,7 +5367,7 @@ tests/integration/CMakeFiles/test_event_notifications.dir/all: _deps/unity-build
 
 # Build rule for subdir invocation for target.
 tests/integration/CMakeFiles/test_event_notifications.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 27
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 28
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/integration/CMakeFiles/test_event_notifications.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 0
 .PHONY : tests/integration/CMakeFiles/test_event_notifications.dir/rule
@@ -5360,7 +5390,7 @@ tests/integration/CMakeFiles/test_jwt_activate_session.dir/all: tests/support/CM
 tests/integration/CMakeFiles/test_jwt_activate_session.dir/all: _deps/unity-build/CMakeFiles/unity.dir/all
 	$(MAKE) $(MAKESILENT) -f tests/integration/CMakeFiles/test_jwt_activate_session.dir/build.make tests/integration/CMakeFiles/test_jwt_activate_session.dir/depend
 	$(MAKE) $(MAKESILENT) -f tests/integration/CMakeFiles/test_jwt_activate_session.dir/build.make tests/integration/CMakeFiles/test_jwt_activate_session.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=58 "Built target test_jwt_activate_session"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num= "Built target test_jwt_activate_session"
 .PHONY : tests/integration/CMakeFiles/test_jwt_activate_session.dir/all
 
 # Build rule for subdir invocation for target.
@@ -5386,12 +5416,12 @@ tests/integration/CMakeFiles/test_jwt_activate_session.dir/clean:
 tests/conformance/CMakeFiles/test_claim_map.dir/all:
 	$(MAKE) $(MAKESILENT) -f tests/conformance/CMakeFiles/test_claim_map.dir/build.make tests/conformance/CMakeFiles/test_claim_map.dir/depend
 	$(MAKE) $(MAKESILENT) -f tests/conformance/CMakeFiles/test_claim_map.dir/build.make tests/conformance/CMakeFiles/test_claim_map.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num= "Built target test_claim_map"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=45 "Built target test_claim_map"
 .PHONY : tests/conformance/CMakeFiles/test_claim_map.dir/all
 
 # Build rule for subdir invocation for target.
 tests/conformance/CMakeFiles/test_claim_map.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 1
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/conformance/CMakeFiles/test_claim_map.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 0
 .PHONY : tests/conformance/CMakeFiles/test_claim_map.dir/rule
@@ -5418,7 +5448,7 @@ tests/benchmark/CMakeFiles/audit_latency_benchmark.dir/all: tests/support/CMakeF
 
 # Build rule for subdir invocation for target.
 tests/benchmark/CMakeFiles/audit_latency_benchmark.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 26
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 27
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/benchmark/CMakeFiles/audit_latency_benchmark.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 0
 .PHONY : tests/benchmark/CMakeFiles/audit_latency_benchmark.dir/rule
@@ -5445,7 +5475,7 @@ tests/benchmark/CMakeFiles/hotpath_benchmark.dir/all: tests/support/CMakeFiles/m
 
 # Build rule for subdir invocation for target.
 tests/benchmark/CMakeFiles/hotpath_benchmark.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 26
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 27
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/benchmark/CMakeFiles/hotpath_benchmark.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/quackdcs/micro-opcua/b/CMakeFiles 0
 .PHONY : tests/benchmark/CMakeFiles/hotpath_benchmark.dir/rule

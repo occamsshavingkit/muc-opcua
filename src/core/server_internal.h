@@ -142,7 +142,7 @@ struct mu_server {
     opcua_uint32_t current_request_id;
 #endif
 #if MUC_OPCUA_CU_METHOD_SERVER
-#define MU_MAX_REGISTERED_METHODS 8
+#define MU_MAX_REGISTERED_METHODS 16
     struct {
         mu_nodeid_t method_id;
         mu_method_callback_t callback;

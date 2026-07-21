@@ -39,6 +39,7 @@ tests/unit/CMakeFiles/test_connection_multiplex.dir/test_connection_multiplex.c.
  /home/quackdcs/micro-opcua/src/../include/muc_opcua/services/key_credential.h \
  /home/quackdcs/micro-opcua/src/../include/muc_opcua/services/role_management.h \
  /home/quackdcs/micro-opcua/src/../include/muc_opcua/services/certificate_management.h \
+ /home/quackdcs/micro-opcua/src/../include/muc_opcua/services/certificate_manager.h \
  /home/quackdcs/micro-opcua/src/../include/muc_opcua/services/audit.h \
  /home/quackdcs/micro-opcua/src/../include/muc_opcua/encoding.h \
  /home/quackdcs/micro-opcua/src/../include/muc_opcua/services/diagnostics.h \

@@ -6,5 +6,5 @@ C_DEFINES = -DMUC_OPCUA_ALLOW_HEAP=0 -DMUC_OPCUA_BASE_NODES=1 -DMUC_OPCUA_CU_ADD
 
 C_INCLUDES = -I/home/quackdcs/micro-opcua/src -I/home/quackdcs/micro-opcua/src/../include -I/home/quackdcs/micro-opcua/b_nano/include
 
-C_FLAGS = -std=c11 -Wall -Wextra -Werror -Wpedantic -Wshadow -Wconversion -Wcast-align -Wunused -Wformat=2 -ffunction-sections -fdata-sections -Os
+C_FLAGS = -std=c11 -flto=auto -fno-fat-lto-objects -Wall -Wextra -Werror -Wpedantic -Wshadow -Wconversion -Wcast-align -Wunused -Wformat=2 -ffunction-sections -fdata-sections -Os
 

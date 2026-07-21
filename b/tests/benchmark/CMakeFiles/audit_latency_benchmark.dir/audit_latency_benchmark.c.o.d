@@ -53,6 +53,7 @@ tests/benchmark/CMakeFiles/audit_latency_benchmark.dir/audit_latency_benchmark.c
  /home/quackdcs/micro-opcua/src/../include/muc_opcua/services/key_credential.h \
  /home/quackdcs/micro-opcua/src/../include/muc_opcua/services/role_management.h \
  /home/quackdcs/micro-opcua/src/../include/muc_opcua/services/certificate_management.h \
+ /home/quackdcs/micro-opcua/src/../include/muc_opcua/services/certificate_manager.h \
  /home/quackdcs/micro-opcua/src/../include/muc_opcua/services/audit.h \
  /home/quackdcs/micro-opcua/src/../include/muc_opcua/services/alarms_conditions.h \
  /home/quackdcs/micro-opcua/tests/benchmark/../../src/core/service_dispatch.h \

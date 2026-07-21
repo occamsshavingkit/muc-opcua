@@ -63,6 +63,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/muc_opcua.dir/cu/core_2022_server/authorization/crypto_jwt.c.o.d"
   "CMakeFiles/muc_opcua.dir/cu/core_2022_server/authorization/jwt.c.o"
   "CMakeFiles/muc_opcua.dir/cu/core_2022_server/authorization/jwt.c.o.d"
+  "CMakeFiles/muc_opcua.dir/cu/core_2022_server/certificate_manager/cert_manager.c.o"
+  "CMakeFiles/muc_opcua.dir/cu/core_2022_server/certificate_manager/cert_manager.c.o.d"
   "CMakeFiles/muc_opcua.dir/cu/core_2022_server/complex_types/binary_complex.c.o"
   "CMakeFiles/muc_opcua.dir/cu/core_2022_server/complex_types/binary_complex.c.o.d"
   "CMakeFiles/muc_opcua.dir/cu/core_2022_server/complex_types/complex_types.c.o"

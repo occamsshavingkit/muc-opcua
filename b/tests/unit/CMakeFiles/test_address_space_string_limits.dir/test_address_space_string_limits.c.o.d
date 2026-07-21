@@ -42,6 +42,7 @@ tests/unit/CMakeFiles/test_address_space_string_limits.dir/test_address_space_st
  /home/quackdcs/micro-opcua/src/../include/muc_opcua/services/key_credential.h \
  /home/quackdcs/micro-opcua/src/../include/muc_opcua/services/role_management.h \
  /home/quackdcs/micro-opcua/src/../include/muc_opcua/services/certificate_management.h \
+ /home/quackdcs/micro-opcua/src/../include/muc_opcua/services/certificate_manager.h \
  /home/quackdcs/micro-opcua/src/../include/muc_opcua/services/audit.h \
  /home/quackdcs/micro-opcua/b/_deps/unity-src/src/unity.h \
  /home/quackdcs/micro-opcua/b/_deps/unity-src/src/unity_internals.h \

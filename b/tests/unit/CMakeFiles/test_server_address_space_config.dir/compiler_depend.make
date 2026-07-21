@@ -21,6 +21,7 @@ tests/unit/CMakeFiles/test_server_address_space_config.dir/test_server_address_s
   /home/quackdcs/micro-opcua/include/muc_opcua/server.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/audit.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_management.h \
+  /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/diagnostics.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/history.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h \
@@ -101,7 +102,11 @@ tests/unit/CMakeFiles/test_server_address_space_config.dir/test_server_address_s
 
 /usr/include/x86_64-linux-gnu/bits/types/struct_FILE.h:
 
+/usr/include/x86_64-linux-gnu/bits/types/__mbstate_t.h:
+
 /home/quackdcs/micro-opcua/include/muc_opcua/status.h:
+
+/home/quackdcs/micro-opcua/include/muc_opcua/services/role_management.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/services/audit.h:
 
@@ -151,14 +156,6 @@ tests/unit/CMakeFiles/test_server_address_space_config.dir/test_server_address_s
 
 /usr/include/x86_64-linux-gnu/bits/types/FILE.h:
 
-/usr/include/limits.h:
-
-_deps/unity-src/src/unity_internals.h:
-
-/home/quackdcs/micro-opcua/include/muc_opcua/opcua_ids.h:
-
-/home/quackdcs/micro-opcua/include/muc_opcua/services/role_management.h:
-
 /home/quackdcs/micro-opcua/include/muc_opcua/opcua_types.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/pubsub.h:
@@ -171,15 +168,21 @@ _deps/unity-src/src/unity_internals.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h:
 
-/usr/include/x86_64-linux-gnu/bits/stdint-uintn.h:
+/home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h:
 
-/usr/include/x86_64-linux-gnu/bits/types/__mbstate_t.h:
+/usr/include/x86_64-linux-gnu/bits/stdint-uintn.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/services/history.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/capacities.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/features.h:
+
+_deps/unity-src/src/unity_internals.h:
+
+/home/quackdcs/micro-opcua/include/muc_opcua/opcua_ids.h:
+
+/usr/include/limits.h:
 
 /usr/include/stdc-predef.h:
 

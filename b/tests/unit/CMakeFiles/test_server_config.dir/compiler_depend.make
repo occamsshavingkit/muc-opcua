@@ -17,6 +17,7 @@ tests/unit/CMakeFiles/test_server_config.dir/test_server_config.c.o: /home/quack
   /home/quackdcs/micro-opcua/include/muc_opcua/server.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/audit.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_management.h \
+  /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/history.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/method.h \
@@ -107,6 +108,8 @@ tests/unit/CMakeFiles/test_server_config.dir/test_server_config.c.o: /home/quack
 
 /home/quackdcs/micro-opcua/include/muc_opcua/status.h:
 
+/home/quackdcs/micro-opcua/include/muc_opcua/services/role_management.h:
+
 /home/quackdcs/micro-opcua/tests/support/fake_platform.h:
 
 /usr/include/x86_64-linux-gnu/bits/stdio_lim.h:
@@ -143,8 +146,6 @@ _deps/unity-src/src/unity_internals.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/address_space.h:
 
-/home/quackdcs/micro-opcua/include/muc_opcua/services/role_management.h:
-
 /home/quackdcs/micro-opcua/include/muc_opcua/opcua_types.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/pubsub.h:
@@ -154,6 +155,8 @@ _deps/unity-src/src/unity_internals.h:
 /usr/include/string.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h:
+
+/home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h:
 
 /usr/include/x86_64-linux-gnu/bits/stdint-uintn.h:
 
@@ -173,19 +176,19 @@ _deps/unity-src/src/unity_internals.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/features.h:
 
-/usr/include/x86_64-linux-gnu/bits/fp-logb.h:
-
-/usr/include/x86_64-linux-gnu/bits/timesize.h:
-
 /usr/include/features-time64.h:
 
 /usr/include/x86_64-linux-gnu/bits/setjmp.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/security.h:
 
+/usr/include/x86_64-linux-gnu/bits/fp-fast.h:
+
 /usr/include/stdint.h:
 
-/usr/include/x86_64-linux-gnu/bits/fp-fast.h:
+/usr/include/x86_64-linux-gnu/bits/fp-logb.h:
+
+/usr/include/x86_64-linux-gnu/bits/timesize.h:
 
 /usr/include/stdio.h:
 

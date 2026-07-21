@@ -21,6 +21,7 @@ tests/unit/CMakeFiles/test_ecc_crypto.dir/test_ecc_crypto.c.o: /home/quackdcs/mi
   /home/quackdcs/micro-opcua/include/muc_opcua/server.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/audit.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_management.h \
+  /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/diagnostics.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/history.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h \
@@ -117,6 +118,12 @@ tests/unit/CMakeFiles/test_ecc_crypto.dir/test_ecc_crypto.c.o: /home/quackdcs/mi
 
 /usr/include/x86_64-linux-gnu/bits/timesize.h:
 
+/home/quackdcs/micro-opcua/src/platform/host_crypto_adapter.h:
+
+/home/quackdcs/micro-opcua/src/security/sym_chunk.h:
+
+/home/quackdcs/micro-opcua/include/muc_opcua/status.h:
+
 /usr/lib/gcc/x86_64-linux-gnu/13/include/stddef.h:
 
 /home/quackdcs/micro-opcua/src/security/asym_ecc.h:
@@ -127,11 +134,7 @@ tests/unit/CMakeFiles/test_ecc_crypto.dir/test_ecc_crypto.c.o: /home/quackdcs/mi
 
 /usr/include/math.h:
 
-/home/quackdcs/micro-opcua/src/platform/host_crypto_adapter.h:
-
-/home/quackdcs/micro-opcua/src/security/sym_chunk.h:
-
-/home/quackdcs/micro-opcua/include/muc_opcua/status.h:
+/home/quackdcs/micro-opcua/include/muc_opcua/services/role_management.h:
 
 /usr/include/x86_64-linux-gnu/bits/types/__sigset_t.h:
 
@@ -148,8 +151,6 @@ tests/unit/CMakeFiles/test_ecc_crypto.dir/test_ecc_crypto.c.o: /home/quackdcs/mi
 /usr/include/x86_64-linux-gnu/bits/libc-header-start.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/security.h:
-
-/home/quackdcs/micro-opcua/src/security/key_derivation.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/platform.h:
 
@@ -173,8 +174,6 @@ tests/unit/CMakeFiles/test_ecc_crypto.dir/test_ecc_crypto.c.o: /home/quackdcs/mi
 
 /home/quackdcs/micro-opcua/include/muc_opcua/address_space/complex_types.h:
 
-/home/quackdcs/micro-opcua/include/muc_opcua/services/role_management.h:
-
 /home/quackdcs/micro-opcua/include/muc_opcua/opcua_types.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/pubsub.h:
@@ -187,6 +186,8 @@ tests/unit/CMakeFiles/test_ecc_crypto.dir/test_ecc_crypto.c.o: /home/quackdcs/mi
 
 /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h:
 
+/home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h:
+
 /usr/include/x86_64-linux-gnu/bits/stdint-uintn.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/services/history.h:
@@ -194,6 +195,8 @@ tests/unit/CMakeFiles/test_ecc_crypto.dir/test_ecc_crypto.c.o: /home/quackdcs/mi
 /home/quackdcs/micro-opcua/include/muc_opcua/capacities.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/features.h:
+
+/home/quackdcs/micro-opcua/src/security/key_derivation.h:
 
 /usr/lib/gcc/x86_64-linux-gnu/13/include/stdbool.h:
 

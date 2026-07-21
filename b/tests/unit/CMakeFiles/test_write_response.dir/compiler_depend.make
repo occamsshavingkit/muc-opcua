@@ -21,6 +21,7 @@ tests/unit/CMakeFiles/test_write_response.dir/test_write_response.c.o: /home/qua
   /home/quackdcs/micro-opcua/include/muc_opcua/server.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/audit.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_management.h \
+  /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/diagnostics.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/history.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h \
@@ -105,7 +106,11 @@ tests/unit/CMakeFiles/test_write_response.dir/test_write_response.c.o: /home/qua
 
 /usr/include/x86_64-linux-gnu/bits/types/__mbstate_t.h:
 
+/usr/include/x86_64-linux-gnu/bits/types/__fpos64_t.h:
+
 /home/quackdcs/micro-opcua/include/muc_opcua/status.h:
+
+/home/quackdcs/micro-opcua/include/muc_opcua/services/role_management.h:
 
 /usr/include/x86_64-linux-gnu/bits/types/__sigset_t.h:
 
@@ -116,10 +121,6 @@ tests/unit/CMakeFiles/test_write_response.dir/test_write_response.c.o: /home/qua
 /home/quackdcs/micro-opcua/include/muc_opcua/services/audit.h:
 
 /usr/include/x86_64-linux-gnu/bits/libc-header-start.h:
-
-/usr/include/features-time64.h:
-
-/usr/include/x86_64-linux-gnu/bits/setjmp.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/security.h:
 
@@ -145,15 +146,11 @@ tests/unit/CMakeFiles/test_write_response.dir/test_write_response.c.o: /home/qua
 
 /home/quackdcs/micro-opcua/include/muc_opcua/address_space/complex_types.h:
 
-/home/quackdcs/micro-opcua/include/muc_opcua/services/role_management.h:
-
 /home/quackdcs/micro-opcua/include/muc_opcua/server.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/types.h:
 
 /usr/include/setjmp.h:
-
-/usr/include/x86_64-linux-gnu/bits/types/__fpos64_t.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/opcua_types.h:
 
@@ -171,6 +168,8 @@ tests/unit/CMakeFiles/test_write_response.dir/test_write_response.c.o: /home/qua
 
 /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h:
 
+/home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h:
+
 /usr/include/x86_64-linux-gnu/bits/stdint-uintn.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/services/history.h:
@@ -178,6 +177,10 @@ tests/unit/CMakeFiles/test_write_response.dir/test_write_response.c.o: /home/qua
 /home/quackdcs/micro-opcua/include/muc_opcua/capacities.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/features.h:
+
+/usr/include/features-time64.h:
+
+/usr/include/x86_64-linux-gnu/bits/setjmp.h:
 
 /usr/include/features.h:
 

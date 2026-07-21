@@ -20,6 +20,7 @@ tests/benchmark/CMakeFiles/audit_latency_benchmark.dir/audit_latency_benchmark.c
   /home/quackdcs/micro-opcua/include/muc_opcua/services/alarms_conditions.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/audit.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_management.h \
+  /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/diagnostics.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/history.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h \
@@ -174,6 +175,8 @@ tests/benchmark/CMakeFiles/audit_latency_benchmark.dir/audit_latency_benchmark.c
 
 /home/quackdcs/micro-opcua/src/services/subscription.h:
 
+/home/quackdcs/micro-opcua/include/muc_opcua/services/role_management.h:
+
 /home/quackdcs/micro-opcua/include/muc_opcua/types.h:
 
 /usr/include/x86_64-linux-gnu/bits/time64.h:
@@ -189,6 +192,8 @@ tests/benchmark/CMakeFiles/audit_latency_benchmark.dir/audit_latency_benchmark.c
 /home/quackdcs/micro-opcua/include/muc_opcua/status.h:
 
 /usr/include/x86_64-linux-gnu/bits/stdint-uintn.h:
+
+/home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h:
 
@@ -228,8 +233,6 @@ tests/benchmark/CMakeFiles/audit_latency_benchmark.dir/audit_latency_benchmark.c
 
 /usr/include/x86_64-linux-gnu/bits/endianness.h:
 
-/home/quackdcs/micro-opcua/include/muc_opcua/services/role_management.h:
-
 /home/quackdcs/micro-opcua/include/muc_opcua/server.h:
 
 /usr/include/x86_64-linux-gnu/bits/errno.h:
@@ -246,8 +249,6 @@ tests/benchmark/CMakeFiles/audit_latency_benchmark.dir/audit_latency_benchmark.c
 
 /usr/include/string.h:
 
-/home/quackdcs/micro-opcua/src/security/sym_chunk.h:
-
 /usr/include/x86_64-linux-gnu/bits/local_lim.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/services/history.h:
@@ -257,6 +258,8 @@ tests/benchmark/CMakeFiles/audit_latency_benchmark.dir/audit_latency_benchmark.c
 /home/quackdcs/micro-opcua/include/muc_opcua/features.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/platform.h:
+
+/home/quackdcs/micro-opcua/src/security/sym_chunk.h:
 
 /usr/include/x86_64-linux-gnu/bits/stdio_lim.h:
 

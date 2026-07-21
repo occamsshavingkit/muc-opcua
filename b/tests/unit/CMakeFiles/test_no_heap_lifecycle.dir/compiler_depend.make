@@ -17,6 +17,7 @@ tests/unit/CMakeFiles/test_no_heap_lifecycle.dir/test_no_heap_lifecycle.c.o: /ho
   /home/quackdcs/micro-opcua/include/muc_opcua/server.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/audit.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_management.h \
+  /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/history.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/method.h \
@@ -97,8 +98,6 @@ tests/unit/CMakeFiles/test_no_heap_lifecycle.dir/test_no_heap_lifecycle.c.o: /ho
 
 /usr/include/x86_64-linux-gnu/bits/wchar.h:
 
-/usr/include/stdio.h:
-
 /usr/include/features.h:
 
 /usr/include/x86_64-linux-gnu/bits/types/FILE.h:
@@ -108,6 +107,8 @@ tests/unit/CMakeFiles/test_no_heap_lifecycle.dir/test_no_heap_lifecycle.c.o: /ho
 /usr/include/x86_64-linux-gnu/bits/types/struct_FILE.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/status.h:
+
+/home/quackdcs/micro-opcua/include/muc_opcua/services/role_management.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/services/audit.h:
 
@@ -143,8 +144,6 @@ _deps/unity-src/src/unity_internals.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/address_space.h:
 
-/home/quackdcs/micro-opcua/include/muc_opcua/services/role_management.h:
-
 /home/quackdcs/micro-opcua/include/muc_opcua/opcua_types.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/pubsub.h:
@@ -154,6 +153,8 @@ _deps/unity-src/src/unity_internals.h:
 /home/quackdcs/micro-opcua/include/muc_opcua/authorization/jwt.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h:
+
+/home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h:
 
 /usr/include/x86_64-linux-gnu/bits/stdint-uintn.h:
 
@@ -178,6 +179,8 @@ _deps/unity-src/src/unity_internals.h:
 /usr/include/stdint.h:
 
 /usr/include/x86_64-linux-gnu/bits/fp-fast.h:
+
+/usr/include/stdio.h:
 
 /usr/include/stdlib.h:
 

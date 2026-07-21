@@ -22,6 +22,7 @@ tests/unit/CMakeFiles/test_time_sync.dir/test_time_sync.c.o: /home/quackdcs/micr
   /home/quackdcs/micro-opcua/include/muc_opcua/services/alarms_conditions.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/audit.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_management.h \
+  /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/diagnostics.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/history.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h \
@@ -163,9 +164,7 @@ tests/unit/CMakeFiles/test_time_sync.dir/test_time_sync.c.o: /home/quackdcs/micr
 
 /usr/include/stdc-predef.h:
 
-/usr/lib/gcc/x86_64-linux-gnu/13/include/stdarg.h:
-
-/home/quackdcs/micro-opcua/src/core/service_dispatch.h:
+/usr/include/math.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/transport.h:
 
@@ -176,6 +175,8 @@ tests/unit/CMakeFiles/test_time_sync.dir/test_time_sync.c.o: /home/quackdcs/micr
 /home/quackdcs/micro-opcua/src/services/history.h:
 
 /home/quackdcs/micro-opcua/src/services/secure_channel.h:
+
+/home/quackdcs/micro-opcua/include/muc_opcua/services/role_management.h:
 
 /usr/include/x86_64-linux-gnu/bits/types/__sigset_t.h:
 
@@ -200,6 +201,8 @@ tests/unit/CMakeFiles/test_time_sync.dir/test_time_sync.c.o: /home/quackdcs/micr
 /home/quackdcs/micro-opcua/tests/unit/test_time_sync.c:
 
 /usr/include/x86_64-linux-gnu/bits/stdint-uintn.h:
+
+/home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h:
 
@@ -231,8 +234,6 @@ _deps/unity-src/src/unity.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/muc_opcua.h:
 
-/usr/include/math.h:
-
 /home/quackdcs/micro-opcua/include/muc_opcua/address_space.h:
 
 /usr/include/x86_64-linux-gnu/bits/types/__fpos_t.h:
@@ -247,8 +248,6 @@ _deps/unity-src/src/unity.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/opcua_types.h:
 
-/home/quackdcs/micro-opcua/include/muc_opcua/services/role_management.h:
-
 /home/quackdcs/micro-opcua/include/muc_opcua/server.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/services/history.h:
@@ -256,6 +255,10 @@ _deps/unity-src/src/unity.h:
 /home/quackdcs/micro-opcua/include/muc_opcua/capacities.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/features.h:
+
+/usr/lib/gcc/x86_64-linux-gnu/13/include/stdarg.h:
+
+/home/quackdcs/micro-opcua/src/core/service_dispatch.h:
 
 /home/quackdcs/micro-opcua/src/address_space/base_nodes.h:
 

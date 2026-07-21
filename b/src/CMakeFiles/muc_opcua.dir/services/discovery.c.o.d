@@ -42,6 +42,7 @@ src/CMakeFiles/muc_opcua.dir/services/discovery.c.o: \
  /home/quackdcs/micro-opcua/src/../include/muc_opcua/services/key_credential.h \
  /home/quackdcs/micro-opcua/src/../include/muc_opcua/services/role_management.h \
  /home/quackdcs/micro-opcua/src/../include/muc_opcua/services/certificate_management.h \
+ /home/quackdcs/micro-opcua/src/../include/muc_opcua/services/certificate_manager.h \
  /home/quackdcs/micro-opcua/src/../include/muc_opcua/services/audit.h \
  /usr/include/string.h \
  /usr/include/x86_64-linux-gnu/bits/string_fortified.h

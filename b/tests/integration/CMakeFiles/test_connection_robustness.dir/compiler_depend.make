@@ -22,6 +22,7 @@ tests/integration/CMakeFiles/test_connection_robustness.dir/test_connection_robu
   /home/quackdcs/micro-opcua/include/muc_opcua/services/alarms_conditions.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/audit.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_management.h \
+  /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/diagnostics.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/history.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h \
@@ -131,6 +132,8 @@ tests/integration/CMakeFiles/test_connection_robustness.dir/test_connection_robu
 
 /usr/include/x86_64-linux-gnu/bits/math-vector.h:
 
+/home/quackdcs/micro-opcua/include/muc_opcua/services/role_management.h:
+
 /usr/include/x86_64-linux-gnu/bits/types/__mbstate_t.h:
 
 /home/quackdcs/micro-opcua/src/core/sequence.h:
@@ -146,6 +149,8 @@ tests/integration/CMakeFiles/test_connection_robustness.dir/test_connection_robu
 /home/quackdcs/micro-opcua/include/muc_opcua/status.h:
 
 /usr/include/x86_64-linux-gnu/bits/stdint-uintn.h:
+
+/home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h:
 
@@ -169,9 +174,9 @@ tests/integration/CMakeFiles/test_connection_robustness.dir/test_connection_robu
 
 /usr/include/x86_64-linux-gnu/bits/types/__sigset_t.h:
 
-/home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_management.h:
-
 /usr/include/x86_64-linux-gnu/bits/long-double.h:
+
+/home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_management.h:
 
 /home/quackdcs/micro-opcua/tests/integration/test_connection_robustness.c:
 
@@ -194,8 +199,6 @@ _deps/unity-src/src/unity.h:
 /usr/include/x86_64-linux-gnu/bits/mathcalls.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/encoding.h:
-
-/home/quackdcs/micro-opcua/include/muc_opcua/services/role_management.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/server.h:
 

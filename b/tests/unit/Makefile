@@ -592,6 +592,20 @@ test_certificate_management/fast:
 .PHONY : test_certificate_management/fast
 
 # Convenience name for target.
+tests/unit/CMakeFiles/test_certificate_manager.dir/rule:
+	cd /home/quackdcs/micro-opcua/b && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/unit/CMakeFiles/test_certificate_manager.dir/rule
+.PHONY : tests/unit/CMakeFiles/test_certificate_manager.dir/rule
+
+# Convenience name for target.
+test_certificate_manager: tests/unit/CMakeFiles/test_certificate_manager.dir/rule
+.PHONY : test_certificate_manager
+
+# fast build rule for target.
+test_certificate_manager/fast:
+	cd /home/quackdcs/micro-opcua/b && $(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_certificate_manager.dir/build.make tests/unit/CMakeFiles/test_certificate_manager.dir/build
+.PHONY : test_certificate_manager/fast
+
+# Convenience name for target.
 tests/unit/CMakeFiles/test_certificate_validity.dir/rule:
 	cd /home/quackdcs/micro-opcua/b && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/unit/CMakeFiles/test_certificate_validity.dir/rule
 .PHONY : tests/unit/CMakeFiles/test_certificate_validity.dir/rule
@@ -2594,6 +2608,30 @@ test_certificate_management.s: test_certificate_management.c.s
 test_certificate_management.c.s:
 	cd /home/quackdcs/micro-opcua/b && $(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_certificate_management.dir/build.make tests/unit/CMakeFiles/test_certificate_management.dir/test_certificate_management.c.s
 .PHONY : test_certificate_management.c.s
+
+test_certificate_manager.o: test_certificate_manager.c.o
+.PHONY : test_certificate_manager.o
+
+# target to build an object file
+test_certificate_manager.c.o:
+	cd /home/quackdcs/micro-opcua/b && $(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_certificate_manager.dir/build.make tests/unit/CMakeFiles/test_certificate_manager.dir/test_certificate_manager.c.o
+.PHONY : test_certificate_manager.c.o
+
+test_certificate_manager.i: test_certificate_manager.c.i
+.PHONY : test_certificate_manager.i
+
+# target to preprocess a source file
+test_certificate_manager.c.i:
+	cd /home/quackdcs/micro-opcua/b && $(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_certificate_manager.dir/build.make tests/unit/CMakeFiles/test_certificate_manager.dir/test_certificate_manager.c.i
+.PHONY : test_certificate_manager.c.i
+
+test_certificate_manager.s: test_certificate_manager.c.s
+.PHONY : test_certificate_manager.s
+
+# target to generate assembly for a file
+test_certificate_manager.c.s:
+	cd /home/quackdcs/micro-opcua/b && $(MAKE) $(MAKESILENT) -f tests/unit/CMakeFiles/test_certificate_manager.dir/build.make tests/unit/CMakeFiles/test_certificate_manager.dir/test_certificate_manager.c.s
+.PHONY : test_certificate_manager.c.s
 
 test_certificate_validity.o: test_certificate_validity.c.o
 .PHONY : test_certificate_validity.o
@@ -4798,6 +4836,7 @@ help:
 	@echo "... test_cert_token_decoder"
 	@echo "... test_certificate"
 	@echo "... test_certificate_management"
+	@echo "... test_certificate_manager"
 	@echo "... test_certificate_validity"
 	@echo "... test_complex_types"
 	@echo "... test_conformance_docs"
@@ -4981,6 +5020,9 @@ help:
 	@echo "... test_certificate_management.o"
 	@echo "... test_certificate_management.i"
 	@echo "... test_certificate_management.s"
+	@echo "... test_certificate_manager.o"
+	@echo "... test_certificate_manager.i"
+	@echo "... test_certificate_manager.s"
 	@echo "... test_certificate_validity.o"
 	@echo "... test_certificate_validity.i"
 	@echo "... test_certificate_validity.s"

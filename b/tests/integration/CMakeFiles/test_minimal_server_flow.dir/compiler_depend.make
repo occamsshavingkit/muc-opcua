@@ -21,6 +21,7 @@ tests/integration/CMakeFiles/test_minimal_server_flow.dir/test_minimal_server_fl
   /home/quackdcs/micro-opcua/include/muc_opcua/server.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/audit.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_management.h \
+  /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/diagnostics.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/history.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h \
@@ -108,9 +109,13 @@ tests/integration/CMakeFiles/test_minimal_server_flow.dir/test_minimal_server_fl
 
 /usr/include/x86_64-linux-gnu/bits/types/__fpos64_t.h:
 
+/usr/include/x86_64-linux-gnu/bits/types/__FILE.h:
+
 /usr/include/x86_64-linux-gnu/bits/math-vector.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/status.h:
+
+/home/quackdcs/micro-opcua/include/muc_opcua/services/role_management.h:
 
 /usr/include/x86_64-linux-gnu/bits/types/__sigset_t.h:
 
@@ -148,15 +153,11 @@ tests/integration/CMakeFiles/test_minimal_server_flow.dir/test_minimal_server_fl
 
 /home/quackdcs/micro-opcua/include/muc_opcua/services/method.h:
 
-/usr/include/x86_64-linux-gnu/bits/types/__FILE.h:
-
 /home/quackdcs/micro-opcua/include/muc_opcua/address_space.h:
 
 /usr/include/x86_64-linux-gnu/bits/types/__fpos_t.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/address_space/complex_types.h:
-
-/home/quackdcs/micro-opcua/include/muc_opcua/services/role_management.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/server.h:
 
@@ -175,6 +176,8 @@ tests/integration/CMakeFiles/test_minimal_server_flow.dir/test_minimal_server_fl
 /usr/include/string.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h:
+
+/home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h:
 
 /usr/include/x86_64-linux-gnu/bits/stdint-uintn.h:
 

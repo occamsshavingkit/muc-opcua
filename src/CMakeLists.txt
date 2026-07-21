@@ -352,6 +352,12 @@ if(MUC_OPCUA_CU_CERTIFICATE_MANAGEMENT)
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_CU_CERTIFICATE_MANAGEMENT=1)
 endif()
 
+if(MUC_OPCUA_CU_CERTIFICATE_MANAGER_PULL)
+    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_CU_CERTIFICATE_MANAGER_PULL=1)
+    file(GLOB _sources cu/core_2022_server/certificate_manager/*.c)
+    target_sources(muc_opcua PRIVATE ${_sources})
+endif()
+
 # -- CU: Event Filter Where --
 if(MUC_OPCUA_CU_EVENT_FILTER_WHERE)
     file(GLOB _sources cu/core_2022_server/event_filter_where/*.c)

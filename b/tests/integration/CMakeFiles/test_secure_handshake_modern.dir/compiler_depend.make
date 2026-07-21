@@ -22,6 +22,7 @@ tests/integration/CMakeFiles/test_secure_handshake_modern.dir/test_secure_handsh
   /home/quackdcs/micro-opcua/include/muc_opcua/services/alarms_conditions.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/audit.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_management.h \
+  /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/diagnostics.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/history.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h \
@@ -155,9 +156,7 @@ tests/integration/CMakeFiles/test_secure_handshake_modern.dir/test_secure_handsh
 
 /home/quackdcs/micro-opcua/src/security/sym_chunk.h:
 
-/home/quackdcs/micro-opcua/src/services/read/common.h:
-
-/usr/include/features.h:
+/home/quackdcs/micro-opcua/include/muc_opcua/services/role_management.h:
 
 /usr/include/x86_64-linux-gnu/bits/types/__sigset_t.h:
 
@@ -179,6 +178,8 @@ tests/integration/CMakeFiles/test_secure_handshake_modern.dir/test_secure_handsh
 
 /usr/include/x86_64-linux-gnu/bits/stdint-uintn.h:
 
+/home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h:
+
 /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h:
 
 /home/quackdcs/micro-opcua/src/services/session.h:
@@ -198,6 +199,10 @@ tests/integration/CMakeFiles/test_secure_handshake_modern.dir/test_secure_handsh
 /home/quackdcs/micro-opcua/include/muc_opcua/services/method.h:
 
 /home/quackdcs/micro-opcua/src/services/subscription.h:
+
+/usr/include/x86_64-linux-gnu/bits/floatn-common.h:
+
+_deps/unity-src/src/unity.h:
 
 /home/quackdcs/micro-opcua/tests/integration/test_secure_handshake_modern.c:
 
@@ -225,14 +230,6 @@ tests/integration/CMakeFiles/test_secure_handshake_modern.dir/test_secure_handsh
 
 /home/quackdcs/micro-opcua/include/muc_opcua/encoding.h:
 
-/usr/include/x86_64-linux-gnu/bits/types/struct_FILE.h:
-
-/home/quackdcs/micro-opcua/src/core/tcp_connection.h:
-
-/home/quackdcs/micro-opcua/src/core/message_chunk.h:
-
-/home/quackdcs/micro-opcua/include/muc_opcua/services/role_management.h:
-
 /home/quackdcs/micro-opcua/include/muc_opcua/server.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/types.h:
@@ -250,6 +247,16 @@ tests/integration/CMakeFiles/test_secure_handshake_modern.dir/test_secure_handsh
 /home/quackdcs/micro-opcua/include/muc_opcua/capacities.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/features.h:
+
+/home/quackdcs/micro-opcua/src/services/read/common.h:
+
+/usr/include/x86_64-linux-gnu/bits/types/struct_FILE.h:
+
+/home/quackdcs/micro-opcua/src/core/message_chunk.h:
+
+/home/quackdcs/micro-opcua/src/core/tcp_connection.h:
+
+/usr/include/features.h:
 
 /home/quackdcs/micro-opcua/src/core/safe_mem.h:
 
@@ -296,7 +303,3 @@ _deps/unity-src/src/unity_internals.h:
 /home/quackdcs/micro-opcua/src/security/security_policy.h:
 
 /usr/include/stdio.h:
-
-_deps/unity-src/src/unity.h:
-
-/usr/include/x86_64-linux-gnu/bits/floatn-common.h:

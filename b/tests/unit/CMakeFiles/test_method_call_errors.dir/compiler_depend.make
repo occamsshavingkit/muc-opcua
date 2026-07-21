@@ -22,6 +22,7 @@ tests/unit/CMakeFiles/test_method_call_errors.dir/test_method_call_errors.c.o: /
   /home/quackdcs/micro-opcua/include/muc_opcua/services/alarms_conditions.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/audit.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_management.h \
+  /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/diagnostics.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/history.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h \
@@ -130,6 +131,10 @@ tests/unit/CMakeFiles/test_method_call_errors.dir/test_method_call_errors.c.o: /
 
 /usr/include/x86_64-linux-gnu/bits/mathcalls-helper-functions.h:
 
+/usr/include/x86_64-linux-gnu/bits/math-vector.h:
+
+/home/quackdcs/micro-opcua/include/muc_opcua/services/role_management.h:
+
 /usr/include/x86_64-linux-gnu/bits/types/__mbstate_t.h:
 
 /home/quackdcs/micro-opcua/src/core/sequence.h:
@@ -145,6 +150,8 @@ tests/unit/CMakeFiles/test_method_call_errors.dir/test_method_call_errors.c.o: /
 /home/quackdcs/micro-opcua/include/muc_opcua/status.h:
 
 /usr/include/x86_64-linux-gnu/bits/stdint-uintn.h:
+
+/home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h:
 
@@ -171,8 +178,6 @@ tests/unit/CMakeFiles/test_method_call_errors.dir/test_method_call_errors.c.o: /
 /home/quackdcs/micro-opcua/include/muc_opcua/services/method.h:
 
 /home/quackdcs/micro-opcua/src/services/subscription.h:
-
-/usr/include/x86_64-linux-gnu/bits/math-vector.h:
 
 /home/quackdcs/micro-opcua/src/address_space/base_nodes.h:
 
@@ -201,8 +206,6 @@ tests/unit/CMakeFiles/test_method_call_errors.dir/test_method_call_errors.c.o: /
 /home/quackdcs/micro-opcua/include/muc_opcua/pubsub.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/opcua_types.h:
-
-/home/quackdcs/micro-opcua/include/muc_opcua/services/role_management.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/server.h:
 

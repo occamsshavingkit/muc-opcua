@@ -953,6 +953,30 @@ cu/core_2022_server/authorization/jwt.c.s:
 	cd /home/quackdcs/micro-opcua/b && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/muc_opcua.dir/build.make src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/authorization/jwt.c.s
 .PHONY : cu/core_2022_server/authorization/jwt.c.s
 
+cu/core_2022_server/certificate_manager/cert_manager.o: cu/core_2022_server/certificate_manager/cert_manager.c.o
+.PHONY : cu/core_2022_server/certificate_manager/cert_manager.o
+
+# target to build an object file
+cu/core_2022_server/certificate_manager/cert_manager.c.o:
+	cd /home/quackdcs/micro-opcua/b && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/muc_opcua.dir/build.make src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/certificate_manager/cert_manager.c.o
+.PHONY : cu/core_2022_server/certificate_manager/cert_manager.c.o
+
+cu/core_2022_server/certificate_manager/cert_manager.i: cu/core_2022_server/certificate_manager/cert_manager.c.i
+.PHONY : cu/core_2022_server/certificate_manager/cert_manager.i
+
+# target to preprocess a source file
+cu/core_2022_server/certificate_manager/cert_manager.c.i:
+	cd /home/quackdcs/micro-opcua/b && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/muc_opcua.dir/build.make src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/certificate_manager/cert_manager.c.i
+.PHONY : cu/core_2022_server/certificate_manager/cert_manager.c.i
+
+cu/core_2022_server/certificate_manager/cert_manager.s: cu/core_2022_server/certificate_manager/cert_manager.c.s
+.PHONY : cu/core_2022_server/certificate_manager/cert_manager.s
+
+# target to generate assembly for a file
+cu/core_2022_server/certificate_manager/cert_manager.c.s:
+	cd /home/quackdcs/micro-opcua/b && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/muc_opcua.dir/build.make src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/certificate_manager/cert_manager.c.s
+.PHONY : cu/core_2022_server/certificate_manager/cert_manager.c.s
+
 cu/core_2022_server/complex_types/binary_complex.o: cu/core_2022_server/complex_types/binary_complex.c.o
 .PHONY : cu/core_2022_server/complex_types/binary_complex.o
 
@@ -2743,6 +2767,9 @@ help:
 	@echo "... cu/core_2022_server/authorization/jwt.o"
 	@echo "... cu/core_2022_server/authorization/jwt.i"
 	@echo "... cu/core_2022_server/authorization/jwt.s"
+	@echo "... cu/core_2022_server/certificate_manager/cert_manager.o"
+	@echo "... cu/core_2022_server/certificate_manager/cert_manager.i"
+	@echo "... cu/core_2022_server/certificate_manager/cert_manager.s"
 	@echo "... cu/core_2022_server/complex_types/binary_complex.o"
 	@echo "... cu/core_2022_server/complex_types/binary_complex.i"
 	@echo "... cu/core_2022_server/complex_types/binary_complex.s"

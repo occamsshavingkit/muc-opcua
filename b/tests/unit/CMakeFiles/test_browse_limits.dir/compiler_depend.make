@@ -21,6 +21,7 @@ tests/unit/CMakeFiles/test_browse_limits.dir/test_browse_limits.c.o: /home/quack
   /home/quackdcs/micro-opcua/include/muc_opcua/server.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/audit.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_management.h \
+  /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/diagnostics.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/history.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h \
@@ -101,7 +102,11 @@ tests/unit/CMakeFiles/test_browse_limits.dir/test_browse_limits.c.o: /home/quack
 
 /usr/include/x86_64-linux-gnu/bits/types/struct_FILE.h:
 
+/usr/include/x86_64-linux-gnu/bits/types/__mbstate_t.h:
+
 /home/quackdcs/micro-opcua/include/muc_opcua/status.h:
+
+/home/quackdcs/micro-opcua/include/muc_opcua/services/role_management.h:
 
 /usr/include/x86_64-linux-gnu/bits/types/__sigset_t.h:
 
@@ -147,9 +152,9 @@ tests/unit/CMakeFiles/test_browse_limits.dir/test_browse_limits.c.o: /home/quack
 
 /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h:
 
-/usr/include/x86_64-linux-gnu/bits/stdint-uintn.h:
+/home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h:
 
-/usr/include/x86_64-linux-gnu/bits/types/__mbstate_t.h:
+/usr/include/x86_64-linux-gnu/bits/stdint-uintn.h:
 
 /usr/lib/gcc/x86_64-linux-gnu/13/include/syslimits.h:
 
@@ -159,15 +164,9 @@ tests/unit/CMakeFiles/test_browse_limits.dir/test_browse_limits.c.o: /home/quack
 
 /home/quackdcs/micro-opcua/include/muc_opcua/address_space.h:
 
-/usr/include/features.h:
-
-/usr/include/x86_64-linux-gnu/bits/types/FILE.h:
-
 /home/quackdcs/micro-opcua/include/muc_opcua/pubsub.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/opcua_types.h:
-
-/home/quackdcs/micro-opcua/include/muc_opcua/services/role_management.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/server.h:
 
@@ -182,6 +181,10 @@ tests/unit/CMakeFiles/test_browse_limits.dir/test_browse_limits.c.o: /home/quack
 /home/quackdcs/micro-opcua/include/muc_opcua/capacities.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/features.h:
+
+/usr/include/features.h:
+
+/usr/include/x86_64-linux-gnu/bits/types/FILE.h:
 
 _deps/unity-src/src/unity_internals.h:
 

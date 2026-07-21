@@ -340,6 +340,16 @@ opcua_statuscode_t mu_server_init(void *storage, size_t storage_size, const mu_s
     }
 #endif
 
+#if MUC_OPCUA_CU_CERTIFICATE_MANAGER_PULL
+    {
+        extern opcua_statuscode_t mu_certificate_manager_register(struct mu_server * srv);
+        opcua_statuscode_t cm_status = mu_certificate_manager_register(server);
+        if (cm_status != MU_STATUS_GOOD) {
+            return cm_status;
+        }
+    }
+#endif
+
     *out_server = server;
     return MU_STATUS_GOOD;
 }

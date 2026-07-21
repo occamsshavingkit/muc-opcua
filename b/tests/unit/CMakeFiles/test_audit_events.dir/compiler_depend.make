@@ -21,6 +21,7 @@ tests/unit/CMakeFiles/test_audit_events.dir/test_audit_events.c.o: /home/quackdc
   /home/quackdcs/micro-opcua/include/muc_opcua/services/alarms_conditions.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/audit.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_management.h \
+  /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/diagnostics.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/history.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h \
@@ -130,23 +131,29 @@ tests/unit/CMakeFiles/test_audit_events.dir/test_audit_events.c.o: /home/quackdc
 
 /usr/include/x86_64-linux-gnu/bits/mathcalls-helper-functions.h:
 
-/usr/include/x86_64-linux-gnu/bits/types/__mbstate_t.h:
-
-/home/quackdcs/micro-opcua/src/core/sequence.h:
-
-/usr/include/x86_64-linux-gnu/bits/stdint-uintn.h:
-
-/home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h:
+/usr/include/x86_64-linux-gnu/bits/math-vector.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/status.h:
 
 /home/quackdcs/micro-opcua/src/services/session.h:
 
+/usr/include/x86_64-linux-gnu/bits/stdint-uintn.h:
+
+/home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h:
+
+/home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h:
+
+/home/quackdcs/micro-opcua/include/muc_opcua/services/role_management.h:
+
 /usr/include/x86_64-linux-gnu/bits/types/__sigset_t.h:
+
+/usr/include/x86_64-linux-gnu/bits/long-double.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_management.h:
 
-/usr/include/x86_64-linux-gnu/bits/long-double.h:
+/usr/include/x86_64-linux-gnu/bits/types/__mbstate_t.h:
+
+/home/quackdcs/micro-opcua/src/core/sequence.h:
 
 /home/quackdcs/micro-opcua/tests/support/fake_platform.h:
 
@@ -168,8 +175,6 @@ tests/unit/CMakeFiles/test_audit_events.dir/test_audit_events.c.o: /home/quackdc
 
 /home/quackdcs/micro-opcua/include/muc_opcua/security.h:
 
-/home/quackdcs/micro-opcua/include/muc_opcua/services/role_management.h:
-
 /home/quackdcs/micro-opcua/include/muc_opcua/server.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/types.h:
@@ -185,8 +190,6 @@ tests/unit/CMakeFiles/test_audit_events.dir/test_audit_events.c.o: /home/quackdc
 /home/quackdcs/micro-opcua/src/services/subscription.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/platform.h:
-
-/usr/include/x86_64-linux-gnu/bits/math-vector.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/address_space.h:
 

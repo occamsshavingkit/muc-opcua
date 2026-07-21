@@ -21,6 +21,7 @@ tests/unit/CMakeFiles/test_sym_chunk.dir/test_sym_chunk.c.o: /home/quackdcs/micr
   /home/quackdcs/micro-opcua/include/muc_opcua/server.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/audit.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_management.h \
+  /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/diagnostics.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/history.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h \
@@ -108,11 +109,15 @@ tests/unit/CMakeFiles/test_sym_chunk.dir/test_sym_chunk.c.o: /home/quackdcs/micr
 
 /usr/include/x86_64-linux-gnu/bits/types/__fpos64_t.h:
 
+/usr/include/x86_64-linux-gnu/bits/types/__FILE.h:
+
 /home/quackdcs/micro-opcua/src/platform/host_crypto_adapter.h:
 
 /home/quackdcs/micro-opcua/src/security/sym_chunk.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/status.h:
+
+/home/quackdcs/micro-opcua/include/muc_opcua/services/role_management.h:
 
 /usr/include/x86_64-linux-gnu/bits/types/__sigset_t.h:
 
@@ -132,8 +137,6 @@ tests/unit/CMakeFiles/test_sym_chunk.dir/test_sym_chunk.c.o: /home/quackdcs/micr
 
 /home/quackdcs/micro-opcua/include/muc_opcua/services/method.h:
 
-/usr/include/x86_64-linux-gnu/bits/types/__FILE.h:
-
 /home/quackdcs/micro-opcua/tests/unit/test_sym_chunk.c:
 
 /usr/include/x86_64-linux-gnu/bits/math-vector.h:
@@ -151,8 +154,6 @@ tests/unit/CMakeFiles/test_sym_chunk.dir/test_sym_chunk.c.o: /home/quackdcs/micr
 /usr/include/x86_64-linux-gnu/bits/types/__fpos_t.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/address_space/complex_types.h:
-
-/home/quackdcs/micro-opcua/include/muc_opcua/services/role_management.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/server.h:
 
@@ -177,6 +178,8 @@ tests/unit/CMakeFiles/test_sym_chunk.dir/test_sym_chunk.c.o: /home/quackdcs/micr
 /usr/include/string.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h:
+
+/home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h:
 
 /usr/include/x86_64-linux-gnu/bits/stdint-uintn.h:
 

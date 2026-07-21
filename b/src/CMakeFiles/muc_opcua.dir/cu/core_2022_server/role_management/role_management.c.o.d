@@ -53,6 +53,7 @@ src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/role_management/role_management
  /home/quackdcs/micro-opcua/src/../include/muc_opcua/authorization/../opcua_types.h \
  /home/quackdcs/micro-opcua/src/../include/muc_opcua/services/key_credential.h \
  /home/quackdcs/micro-opcua/src/../include/muc_opcua/services/certificate_management.h \
+ /home/quackdcs/micro-opcua/src/../include/muc_opcua/services/certificate_manager.h \
  /home/quackdcs/micro-opcua/src/../include/muc_opcua/services/audit.h \
  /home/quackdcs/micro-opcua/src/../include/muc_opcua/services/alarms_conditions.h \
  /home/quackdcs/micro-opcua/src/core/service_dispatch.h \

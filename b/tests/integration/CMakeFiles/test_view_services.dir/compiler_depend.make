@@ -22,6 +22,7 @@ tests/integration/CMakeFiles/test_view_services.dir/test_view_services.c.o: /hom
   /home/quackdcs/micro-opcua/include/muc_opcua/services/alarms_conditions.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/audit.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_management.h \
+  /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/diagnostics.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/history.h \
   /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h \
@@ -132,15 +133,21 @@ tests/integration/CMakeFiles/test_view_services.dir/test_view_services.c.o: /hom
 
 /usr/include/x86_64-linux-gnu/bits/math-vector.h:
 
-/usr/include/x86_64-linux-gnu/bits/types/__mbstate_t.h:
+/usr/include/x86_64-linux-gnu/bits/types/struct___jmp_buf_tag.h:
 
-/home/quackdcs/micro-opcua/src/core/sequence.h:
+/usr/include/x86_64-linux-gnu/bits/libm-simd-decl-stubs.h:
+
+/home/quackdcs/micro-opcua/include/muc_opcua/services/role_management.h:
 
 /usr/include/x86_64-linux-gnu/bits/types/__sigset_t.h:
 
 /usr/include/x86_64-linux-gnu/bits/long-double.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_management.h:
+
+/usr/include/x86_64-linux-gnu/bits/types/__mbstate_t.h:
+
+/home/quackdcs/micro-opcua/src/core/sequence.h:
 
 /usr/include/x86_64-linux-gnu/bits/time64.h:
 
@@ -159,6 +166,8 @@ tests/integration/CMakeFiles/test_view_services.dir/test_view_services.c.o: /hom
 /home/quackdcs/micro-opcua/include/muc_opcua/status.h:
 
 /usr/include/x86_64-linux-gnu/bits/stdint-uintn.h:
+
+/home/quackdcs/micro-opcua/include/muc_opcua/services/certificate_manager.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/services/key_credential.h:
 
@@ -191,8 +200,6 @@ tests/integration/CMakeFiles/test_view_services.dir/test_view_services.c.o: /hom
 /usr/include/x86_64-linux-gnu/bits/mathcalls.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/encoding.h:
-
-/home/quackdcs/micro-opcua/include/muc_opcua/services/role_management.h:
 
 /home/quackdcs/micro-opcua/include/muc_opcua/server.h:
 
@@ -245,10 +252,6 @@ tests/integration/CMakeFiles/test_view_services.dir/test_view_services.c.o: /hom
 /usr/lib/gcc/x86_64-linux-gnu/13/include/stdarg.h:
 
 /home/quackdcs/micro-opcua/src/core/service_dispatch.h:
-
-/usr/include/x86_64-linux-gnu/bits/types/struct___jmp_buf_tag.h:
-
-/usr/include/x86_64-linux-gnu/bits/libm-simd-decl-stubs.h:
 
 /home/quackdcs/micro-opcua/tests/support/fake_platform.h:
 
