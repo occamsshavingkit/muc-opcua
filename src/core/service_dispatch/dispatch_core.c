@@ -50,6 +50,7 @@ static const mu_service_descriptor_t g_supported_services[] = {
 #endif
 #ifdef MUC_OPCUA_CU_DISCOVERY_REGISTER
     {{MU_ID_REGISTERSERVERREQUEST, MU_ID_REGISTERSERVERRESPONSE, false}, handle_register_server},
+    {{MU_ID_REGISTERSERVER2REQUEST, MU_ID_REGISTERSERVER2RESPONSE, false}, handle_register_server},
 #endif
 #ifdef MUC_OPCUA_CU_DISCOVERY_GET_ENDPOINTS
     {{MU_ID_GETENDPOINTSREQUEST, MU_ID_GETENDPOINTSRESPONSE, false}, handle_get_endpoints},

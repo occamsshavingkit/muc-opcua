@@ -1,0 +1,1 @@
+/usr/bin/cc -Wl,--gc-sections CMakeFiles/test_cert_token_decoder.dir/test_cert_token_decoder.c.o -o test_cert_token_decoder  ../../_deps/unity-build/libunity.a ../../src/libmuc_opcua.a ../support/libmuc_opcua_test_support.a ../../src/libmuc_opcua.a /usr/lib/x86_64-linux-gnu/libcrypto.so 

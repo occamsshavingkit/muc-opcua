@@ -1,0 +1,3 @@
+/home/quackdcs/micro-opcua/b_ci_test/_deps/unity-subbuild/CMakeFiles/unity-populate.dir
+/home/quackdcs/micro-opcua/b_ci_test/_deps/unity-subbuild/CMakeFiles/edit_cache.dir
+/home/quackdcs/micro-opcua/b_ci_test/_deps/unity-subbuild/CMakeFiles/rebuild_cache.dir

@@ -1,0 +1,2 @@
+# CMAKE generated file: DO NOT EDIT!
+# Timestamp file for compiler generated dependencies management for test_no_stale_project_name.
