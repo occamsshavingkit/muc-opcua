@@ -121,6 +121,11 @@ This document maps implementation and test files back to OPC UA normative sectio
 | `include/muc_opcua/services/key_credential.h` | KeyCredential Service | OPC-10000-4 / OPC-10000-7 / OPC-10000-12 | 5.11 / CU 2113 / 8.5-8.6 | Public adapter type (mu_key_credential_adapter_t) + Method/Type NodeId constants |
 | `tests/unit/test_key_credential.c` | Tests | OPC-10000-4 / OPC-10000-7 / OPC-10000-12 | 5.11 / CU 2113 / 8.5-8.6 | KeyCredential handler dispatch, Bad_NotSupported without adapter, Bad_NoEntryExists paths |
 | `src/cu/core_2022_server/authorization/crypto_jwt.h` | JWT Validator | OPC-10000-4 / OPC-10000-7 / RFC 7515 / RFC 7518 | 5.7.3 / CU 1697 / 5 / 3.1 | JWS verify wrapper interface |
+| `src/cu/core_2022_server/role_management/role_management.c` | Role Management | OPC-10000-4 / OPC-10000-5 | 5.8 / 6.3 | Role-based authorization service implementation |
+| `src/cu/core_2022_server/certificate_manager/cert_manager.c` | Certificate Manager | OPC-10000-4 / OPC-10000-12 | 5.11 / 7.5 | Certificate group manager implementation |
+| `include/muc_opcua/services/certificate_manager.h` | Certificate Manager | OPC-10000-4 / OPC-10000-12 | 5.11 / 7.5 | Certificate manager public interface |
+| `include/muc_opcua/services/certificate_management.h` | Certificate Management | OPC-10000-4 / OPC-10000-12 | 5.11 / 7.5 | Certificate management type definitions |
+| `include/muc_opcua/services/role_management.h` | Role Management | OPC-10000-4 / OPC-10000-5 | 5.8 / 6.3 | Role management public interface |
 | `tests/unit/test_jwt.c` | Tests | OPC-10000-4 / OPC-10000-7 / RFC 7519 / RFC 7515 | 5.7.3 / CU 1697 / 4 / 5 | mu_jwt_validate acceptance scenarios (valid token, expired, wrong key, wrong issuer/audience, missing sub, malformed, nbf, no exp, no configured issuers) |
 | `tests/integration/test_jwt_activate_session.c` | Integration Tests | OPC-10000-4 / OPC-10000-6 / OPC-10000-7 | 5.7.3 / 5.2.3, 6.5.2.1 / CU 1697 | ActivateSession with an IssuedIdentityToken carrying a JWT — end-to-end session activation with sub claim as user identity |
 | `tests/benchmark/audit_latency_benchmark.c` | Benchmark Tests | OPC-10000-4 / OPC-10000-6 | 5.5.2, 5.5.4, 5.6.2, 5.7.2, 5.7.3, 5.11.2 / 5.2 | Valid minimal discovery/session/read latency scenario |
@@ -147,6 +152,8 @@ This document maps implementation and test files back to OPC UA normative sectio
 | `specs/020-audit-hardening/tasks.md` | Task Plan | OPC-10000-4 / OPC-10000-6 / OPC-10000-7 / OPC-10000-13 | 5.5.2, 5.5.4, 5.6.2, 5.7.2, 5.7.3, 5.8, 5.10.2, 5.10.3, 5.10.4, 5.11.2, 5.13, 5.14, 7.22.1, 7.22.4, 7.38.2 / 5.2, 5.2.2.15, 5.2.5, 6.7.2, 7.1.2.2, 7.1.2.3, 7.1.2.4, 7.2 / 4.2, 4.3 / 4.2.2.4, 4.2.2.9, 4.2.2.10, 5.4.3.5, 5.4.3.10, 5.4.3.11 | Serialized audit-hardening task list with exact OPC UA citations for tests, implementation, documentation, evidence, and verification |
 | `src/address_space/base_nodes.h` | Base Information | Part 5 | 6.3, 7 | Standard Server node set interface + resolver |
 | `src/address_space/base_nodes.c` | Base Information | Part 5 | 6.3, 7 | Default Server/ServerStatus/ServerCapabilities nodes |
+| `src/address_space/ac_nodes.c` | Alarms & Conditions | OPC-10000-9 | 5 | A&C type node registration placeholder |
+| `src/address_space/ac_nodes.h` | Alarms & Conditions | OPC-10000-9 | 5 | A&C type node header |
 | `src/security/security_policy.h` | SecurityPolicy | Part 7 | 6.x | Policy id + Basic256Sha256 parameter table |
 | `src/security/security_policy.c` | SecurityPolicy | Part 7 | 6.x | SecurityPolicyUri parsing |
 | `src/security/certificate.h` | Certificates | Part 6 / 4 | 6.7.4 / 7.2 | Thumbprint + peer cert validation interface |

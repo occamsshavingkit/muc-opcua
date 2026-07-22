@@ -45,12 +45,13 @@ static const char *const excluded_dir_names[] = {
     ".git", "specs", /* every specs/NNN-feature directory is a spec-kit planning/history record */
     "obj",           /* .NET build intermediates (tests/interop/dotnet/obj), gitignored */
     "bin",           /* .NET build output (tests/interop/dotnet/bin), gitignored */
+    "b",             /* minimal build directory name used by CI */
 };
 
 /* "build" prefixed directories are matched by prefix, not exact name (build,
    build-san, build-fuzz, build/size-arm/... all live under a "build" prefix). */
 static int is_build_dir_name(const char *name) {
-    return strncmp(name, "build", 5) == 0;
+    return strncmp(name, "build", 5) == 0 || strncmp(name, "b_", 2) == 0;
 }
 
 /* docs/traceability/NNN-*.md files that are frozen history for an
