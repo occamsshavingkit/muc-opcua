@@ -1869,10 +1869,10 @@
       "backing_tests": [],
       "cu_optional": false,
       "id": "opc_cu_2231",
-      "implementation_state": "deferred",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
-      "notes": "Push Model for GDS not implemented; requires GDS infrastructure.",
+      "notes": "Push Model for Certificate and TrustList Management. ServerConfigurationType in base_nodes.c, UpdateCertificate+ApplyChanges Method stubs with adapter interface. The server accepts certificate pushes from an external GDS/agent; integrator provides storage adapter.",
       "opc_display_name": "Push Model for Global Certificate and TrustList Management",
       "opc_reference": {
         "cu_id": "2231",
@@ -1882,7 +1882,12 @@
         "spec": null
       },
       "profile_defaults": {
-        "custom": false
+        "custom": false,
+        "embedded": true,
+        "full": true,
+        "micro": false,
+        "nano": false,
+        "standard": true
       },
       "source_metadata": {
         "profile_group_id": 171,

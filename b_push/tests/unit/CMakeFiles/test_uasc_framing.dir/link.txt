@@ -1,0 +1,1 @@
+/usr/bin/cc -Wl,--gc-sections CMakeFiles/test_uasc_framing.dir/test_uasc_framing.c.o -o test_uasc_framing  ../../_deps/unity-build/libunity.a ../../src/libmuc_opcua.a ../support/libmuc_opcua_test_support.a ../../src/libmuc_opcua.a /usr/lib/x86_64-linux-gnu/libcrypto.so 

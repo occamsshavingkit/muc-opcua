@@ -1,0 +1,159 @@
+speed_benchmark_tool 1 0.0444296
+test_address_space_callbacks 1 0.00069493
+test_address_space_dynamic 1 0.00170913
+test_address_space_string_limits 1 0.00043056
+test_address_space_validation 1 0.000406139
+test_address_space_values 1 0.0004354
+test_aggregate 1 0.00183522
+test_aggregate_full 1 0.00058948
+test_alarms_conditions 1 0.00114877
+test_analog_item 1 0.00042953
+test_asym_chunk 1 0.969109
+test_async_opcua_inventory 1 0.00080918
+test_audit_events 1 0.00134208
+test_base_server_behaviour 1 0.00138352
+test_binary_array_errors 1 0.00041021
+test_binary_bytestring_errors 1 0.00041017
+test_binary_extension_object 1 0.00040904
+test_binary_extension_object_errors 1 0.00046817
+test_binary_nodeid 1 0.00041942
+test_binary_nodeid_errors 1 0.00047974
+test_binary_primitives 1 0.000392069
+test_binary_string 1 0.00042572
+test_binary_string_errors 1 0.00038847
+test_binary_variant_datavalue 1 0.00039244
+test_browse_limits 1 0.00043854
+test_browse_service 1 0.00171318
+test_build_config 1 0.00038519
+test_capacity_propagation 1 0.00040525
+test_cert_token_decoder 1 0.00046469
+test_certificate 1 2.01611
+test_certificate_management 1 0.00177786
+test_certificate_manager 1 0.00200815
+test_certificate_validity 1 0.62532
+test_complex_types 1 0.00156267
+test_conformance_docs 1 0.409538
+test_connection_multiplex 1 0.0017648
+test_crypto 1 0.857944
+test_da_type_nodes 1 0.00080397
+test_diagnostics 1 0.00119705
+test_discovery_encode 1 0.00055453
+test_discovery_endpoint 0 0
+test_discovery_services 0 0
+test_dispatch_services 0 0
+test_dispatch_session_order 1 0.00133647
+test_dispatch_subscription 1 0.00174107
+test_ecc_crypto 1 0.8475
+test_eu_information 1 0.0007688
+test_event_filter_select 1 0.00043329
+test_event_filter_where 1 0.00040648
+test_event_notifier 1 0.00045708
+test_event_serializer 1 0.00198702
+test_get_endpoints_gate 0 0
+test_history 1 0.00143731
+test_history_memstore 1 0.00057689
+test_jwt 1 0.101891
+test_key_credential 1 0.00210466
+test_mbedtls_adapter 1 0.00056986
+test_message_chunk 1 0.00047729
+test_message_chunk_errors 1 0.00152652
+test_method_call 1 0.00143694
+test_method_call_arbitrary 1 0.00087337
+test_method_call_errors 1 0.00123492
+test_monitored_index_range 1 0.00038584
+test_no_heap_lifecycle 1 0.000357959
+test_no_stale_project_name 1 0.0302784
+test_node_management 1 0.00317572
+test_node_management_errors 1 0.00251095
+test_notification_encoding 1 0.00070023
+test_operation_limits 1 0.00045327
+test_password_decrypt_zeroize 1 0.00043621
+test_percent_deadband 1 0.00045993
+test_platform_adapter_contract 1 0.00047963
+test_profile_surface 1 0.00065998
+test_public_headers 1 0.00047676
+test_pubsub 1 0.00197316
+test_query_encoding 1 0.00054424
+test_query_service 1 0.00168949
+test_read_browsename_namespace 1 0.00047542
+test_read_service 1 0.00047584
+test_read_timestamps_to_return 1 0.0004057
+test_reverse_connect 1 0.00162747
+test_role_management 1 0.00172539
+test_secure_channel 1 0.00160533
+test_security_identity_errors 0 0
+test_security_policy 1 0.00040441
+test_security_policy_selection 1 0.000403759
+test_security_rsa_oaep 1 0.192112
+test_security_rsa_oaep_errors 1 0.0519412
+test_security_rsa_pss 1 0.197762
+test_security_rsa_pss_errors 1 0.115031
+test_security_trustlist 1 0.00077036
+test_server_address_space_config 1 0.00174584
+test_server_config 1 0.00083469
+test_server_status_value 1 0.00044721
+test_service_dispatch 1 0.00131628
+test_service_header 1 0.00040632
+test_service_message 1 0.00040845
+test_service_state_errors 0 0
+test_session 1 0.00144436
+test_session_auth 1 0.00040517
+test_size_report 1 0.00051277
+test_status 1 0.00042039
+test_subscription_deadband 1 0.00048258
+test_subscription_publish 1 0.00060469
+test_subscriptions_capacity 1 0.00450205
+test_subscriptions_errors 1 0.002431
+test_sym_chunk 1 0.486611
+test_tcp_connection 1 0.00077119
+test_time_sync 1 0.00169624
+test_traceability_docs 0 0
+test_transfer_subscriptions 1 0.0016814
+test_type_system 1 0.00054505
+test_uadp_encoding 1 0.0004082
+test_uasc_framing 1 0.00039281
+test_user_token_decoder 1 0.00039708
+test_user_token_encrypted 1 0.00037046
+test_wolfssl_adapter 1 0.00038281
+test_write_decoder 1 0.00037966
+test_write_errors 1 0.00146164
+test_write_response 1 0.00044726
+test_write_service 1 0.00152592
+test_write_value_gate 1 0.00127076
+test_size_report_script 1 0.001209
+test_minimal_server_flow 0 0
+test_discovery_endpoint_no_session 0 0
+test_single_client_limit 1 0.0010542
+test_server_handshake 0 0
+test_response_regression 1 0.00135684
+test_server_framing 1 0.00136713
+test_server_handshake_secure 0 0
+test_connection_robustness 1 0.00187162
+test_view_services 1 0.00175231
+test_translate_browse_path_gate 1 0.00154136
+test_subscriptions 1 0.003156
+test_user_auth_plaintext 0 0
+test_user_auth_encrypted 1 0.00143734
+test_user_auth_certificate 1 0.00127117
+test_user_auth_secure_e2e 1 2.90218
+test_write_service_integration 1 0.00189615
+test_secure_handshake_modern 0 0
+test_ecc_handshake_e2e 0 0
+test_event_notifications 1 0.00246444
+test_jwt_activate_session 1 0.384489
+test_claim_map 1 0.0246999
+---
+test_discovery_endpoint
+test_discovery_services
+test_dispatch_services
+test_get_endpoints_gate
+test_security_identity_errors
+test_service_state_errors
+test_traceability_docs
+test_minimal_server_flow
+test_discovery_endpoint_no_session
+test_server_handshake
+test_server_handshake_secure
+test_user_auth_plaintext
+test_secure_handshake_modern
+test_ecc_handshake_e2e
