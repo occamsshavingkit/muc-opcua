@@ -185,6 +185,30 @@ muc_opcua/fast:
 	cd /home/quackdcs/micro-opcua/b && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/muc_opcua.dir/build.make src/CMakeFiles/muc_opcua.dir/build
 .PHONY : muc_opcua/fast
 
+address_space/ac_nodes.o: address_space/ac_nodes.c.o
+.PHONY : address_space/ac_nodes.o
+
+# target to build an object file
+address_space/ac_nodes.c.o:
+	cd /home/quackdcs/micro-opcua/b && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/muc_opcua.dir/build.make src/CMakeFiles/muc_opcua.dir/address_space/ac_nodes.c.o
+.PHONY : address_space/ac_nodes.c.o
+
+address_space/ac_nodes.i: address_space/ac_nodes.c.i
+.PHONY : address_space/ac_nodes.i
+
+# target to preprocess a source file
+address_space/ac_nodes.c.i:
+	cd /home/quackdcs/micro-opcua/b && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/muc_opcua.dir/build.make src/CMakeFiles/muc_opcua.dir/address_space/ac_nodes.c.i
+.PHONY : address_space/ac_nodes.c.i
+
+address_space/ac_nodes.s: address_space/ac_nodes.c.s
+.PHONY : address_space/ac_nodes.s
+
+# target to generate assembly for a file
+address_space/ac_nodes.c.s:
+	cd /home/quackdcs/micro-opcua/b && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/muc_opcua.dir/build.make src/CMakeFiles/muc_opcua.dir/address_space/ac_nodes.c.s
+.PHONY : address_space/ac_nodes.c.s
+
 address_space/address_space.o: address_space/address_space.c.o
 .PHONY : address_space/address_space.o
 
@@ -1961,6 +1985,54 @@ cu/core_2022_server/subscription/standard/triggering.c.s:
 	cd /home/quackdcs/micro-opcua/b && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/muc_opcua.dir/build.make src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/subscription/standard/triggering.c.s
 .PHONY : cu/core_2022_server/subscription/standard/triggering.c.s
 
+cu/core_2022_server/time_sync_ieee_1588_ptp/stub.o: cu/core_2022_server/time_sync_ieee_1588_ptp/stub.c.o
+.PHONY : cu/core_2022_server/time_sync_ieee_1588_ptp/stub.o
+
+# target to build an object file
+cu/core_2022_server/time_sync_ieee_1588_ptp/stub.c.o:
+	cd /home/quackdcs/micro-opcua/b && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/muc_opcua.dir/build.make src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/time_sync_ieee_1588_ptp/stub.c.o
+.PHONY : cu/core_2022_server/time_sync_ieee_1588_ptp/stub.c.o
+
+cu/core_2022_server/time_sync_ieee_1588_ptp/stub.i: cu/core_2022_server/time_sync_ieee_1588_ptp/stub.c.i
+.PHONY : cu/core_2022_server/time_sync_ieee_1588_ptp/stub.i
+
+# target to preprocess a source file
+cu/core_2022_server/time_sync_ieee_1588_ptp/stub.c.i:
+	cd /home/quackdcs/micro-opcua/b && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/muc_opcua.dir/build.make src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/time_sync_ieee_1588_ptp/stub.c.i
+.PHONY : cu/core_2022_server/time_sync_ieee_1588_ptp/stub.c.i
+
+cu/core_2022_server/time_sync_ieee_1588_ptp/stub.s: cu/core_2022_server/time_sync_ieee_1588_ptp/stub.c.s
+.PHONY : cu/core_2022_server/time_sync_ieee_1588_ptp/stub.s
+
+# target to generate assembly for a file
+cu/core_2022_server/time_sync_ieee_1588_ptp/stub.c.s:
+	cd /home/quackdcs/micro-opcua/b && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/muc_opcua.dir/build.make src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/time_sync_ieee_1588_ptp/stub.c.s
+.PHONY : cu/core_2022_server/time_sync_ieee_1588_ptp/stub.c.s
+
+cu/core_2022_server/time_sync_ieee_802_1as/stub.o: cu/core_2022_server/time_sync_ieee_802_1as/stub.c.o
+.PHONY : cu/core_2022_server/time_sync_ieee_802_1as/stub.o
+
+# target to build an object file
+cu/core_2022_server/time_sync_ieee_802_1as/stub.c.o:
+	cd /home/quackdcs/micro-opcua/b && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/muc_opcua.dir/build.make src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/time_sync_ieee_802_1as/stub.c.o
+.PHONY : cu/core_2022_server/time_sync_ieee_802_1as/stub.c.o
+
+cu/core_2022_server/time_sync_ieee_802_1as/stub.i: cu/core_2022_server/time_sync_ieee_802_1as/stub.c.i
+.PHONY : cu/core_2022_server/time_sync_ieee_802_1as/stub.i
+
+# target to preprocess a source file
+cu/core_2022_server/time_sync_ieee_802_1as/stub.c.i:
+	cd /home/quackdcs/micro-opcua/b && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/muc_opcua.dir/build.make src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/time_sync_ieee_802_1as/stub.c.i
+.PHONY : cu/core_2022_server/time_sync_ieee_802_1as/stub.c.i
+
+cu/core_2022_server/time_sync_ieee_802_1as/stub.s: cu/core_2022_server/time_sync_ieee_802_1as/stub.c.s
+.PHONY : cu/core_2022_server/time_sync_ieee_802_1as/stub.s
+
+# target to generate assembly for a file
+cu/core_2022_server/time_sync_ieee_802_1as/stub.c.s:
+	cd /home/quackdcs/micro-opcua/b && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/muc_opcua.dir/build.make src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/time_sync_ieee_802_1as/stub.c.s
+.PHONY : cu/core_2022_server/time_sync_ieee_802_1as/stub.c.s
+
 cu/core_2022_server/view_basic_translate/browse.o: cu/core_2022_server/view_basic_translate/browse.c.o
 .PHONY : cu/core_2022_server/view_basic_translate/browse.o
 
@@ -2671,6 +2743,9 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... test"
 	@echo "... muc_opcua"
+	@echo "... address_space/ac_nodes.o"
+	@echo "... address_space/ac_nodes.i"
+	@echo "... address_space/ac_nodes.s"
 	@echo "... address_space/address_space.o"
 	@echo "... address_space/address_space.i"
 	@echo "... address_space/address_space.s"
@@ -2893,6 +2968,12 @@ help:
 	@echo "... cu/core_2022_server/subscription/standard/triggering.o"
 	@echo "... cu/core_2022_server/subscription/standard/triggering.i"
 	@echo "... cu/core_2022_server/subscription/standard/triggering.s"
+	@echo "... cu/core_2022_server/time_sync_ieee_1588_ptp/stub.o"
+	@echo "... cu/core_2022_server/time_sync_ieee_1588_ptp/stub.i"
+	@echo "... cu/core_2022_server/time_sync_ieee_1588_ptp/stub.s"
+	@echo "... cu/core_2022_server/time_sync_ieee_802_1as/stub.o"
+	@echo "... cu/core_2022_server/time_sync_ieee_802_1as/stub.i"
+	@echo "... cu/core_2022_server/time_sync_ieee_802_1as/stub.s"
 	@echo "... cu/core_2022_server/view_basic_translate/browse.o"
 	@echo "... cu/core_2022_server/view_basic_translate/browse.i"
 	@echo "... cu/core_2022_server/view_basic_translate/browse.s"

@@ -727,24 +727,10 @@ src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/discovery/find_servers.c.s: cma
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/muc_opcua.dir/cu/core_2022_server/discovery/find_servers.c.s"
 	cd /home/quackdcs/micro-opcua/b/src && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/quackdcs/micro-opcua/src/cu/core_2022_server/discovery/find_servers.c -o CMakeFiles/muc_opcua.dir/cu/core_2022_server/discovery/find_servers.c.s
 
-src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/discovery/register_server.c.o: src/CMakeFiles/muc_opcua.dir/flags.make
-src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/discovery/register_server.c.o: /home/quackdcs/micro-opcua/src/cu/core_2022_server/discovery/register_server.c
-src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/discovery/register_server.c.o: src/CMakeFiles/muc_opcua.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=$(CMAKE_PROGRESS_48) "Building C object src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/discovery/register_server.c.o"
-	cd /home/quackdcs/micro-opcua/b/src && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/discovery/register_server.c.o -MF CMakeFiles/muc_opcua.dir/cu/core_2022_server/discovery/register_server.c.o.d -o CMakeFiles/muc_opcua.dir/cu/core_2022_server/discovery/register_server.c.o -c /home/quackdcs/micro-opcua/src/cu/core_2022_server/discovery/register_server.c
-
-src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/discovery/register_server.c.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/muc_opcua.dir/cu/core_2022_server/discovery/register_server.c.i"
-	cd /home/quackdcs/micro-opcua/b/src && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/quackdcs/micro-opcua/src/cu/core_2022_server/discovery/register_server.c > CMakeFiles/muc_opcua.dir/cu/core_2022_server/discovery/register_server.c.i
-
-src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/discovery/register_server.c.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/muc_opcua.dir/cu/core_2022_server/discovery/register_server.c.s"
-	cd /home/quackdcs/micro-opcua/b/src && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/quackdcs/micro-opcua/src/cu/core_2022_server/discovery/register_server.c -o CMakeFiles/muc_opcua.dir/cu/core_2022_server/discovery/register_server.c.s
-
 src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/discovery/get_endpoints.c.o: src/CMakeFiles/muc_opcua.dir/flags.make
 src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/discovery/get_endpoints.c.o: /home/quackdcs/micro-opcua/src/cu/core_2022_server/discovery/get_endpoints.c
 src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/discovery/get_endpoints.c.o: src/CMakeFiles/muc_opcua.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=$(CMAKE_PROGRESS_49) "Building C object src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/discovery/get_endpoints.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=$(CMAKE_PROGRESS_48) "Building C object src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/discovery/get_endpoints.c.o"
 	cd /home/quackdcs/micro-opcua/b/src && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/discovery/get_endpoints.c.o -MF CMakeFiles/muc_opcua.dir/cu/core_2022_server/discovery/get_endpoints.c.o.d -o CMakeFiles/muc_opcua.dir/cu/core_2022_server/discovery/get_endpoints.c.o -c /home/quackdcs/micro-opcua/src/cu/core_2022_server/discovery/get_endpoints.c
 
 src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/discovery/get_endpoints.c.i: cmake_force
@@ -754,6 +740,20 @@ src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/discovery/get_endpoints.c.i: cm
 src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/discovery/get_endpoints.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/muc_opcua.dir/cu/core_2022_server/discovery/get_endpoints.c.s"
 	cd /home/quackdcs/micro-opcua/b/src && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/quackdcs/micro-opcua/src/cu/core_2022_server/discovery/get_endpoints.c -o CMakeFiles/muc_opcua.dir/cu/core_2022_server/discovery/get_endpoints.c.s
+
+src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/discovery/register_server.c.o: src/CMakeFiles/muc_opcua.dir/flags.make
+src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/discovery/register_server.c.o: /home/quackdcs/micro-opcua/src/cu/core_2022_server/discovery/register_server.c
+src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/discovery/register_server.c.o: src/CMakeFiles/muc_opcua.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=$(CMAKE_PROGRESS_49) "Building C object src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/discovery/register_server.c.o"
+	cd /home/quackdcs/micro-opcua/b/src && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/discovery/register_server.c.o -MF CMakeFiles/muc_opcua.dir/cu/core_2022_server/discovery/register_server.c.o.d -o CMakeFiles/muc_opcua.dir/cu/core_2022_server/discovery/register_server.c.o -c /home/quackdcs/micro-opcua/src/cu/core_2022_server/discovery/register_server.c
+
+src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/discovery/register_server.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/muc_opcua.dir/cu/core_2022_server/discovery/register_server.c.i"
+	cd /home/quackdcs/micro-opcua/b/src && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/quackdcs/micro-opcua/src/cu/core_2022_server/discovery/register_server.c > CMakeFiles/muc_opcua.dir/cu/core_2022_server/discovery/register_server.c.i
+
+src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/discovery/register_server.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/muc_opcua.dir/cu/core_2022_server/discovery/register_server.c.s"
+	cd /home/quackdcs/micro-opcua/b/src && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/quackdcs/micro-opcua/src/cu/core_2022_server/discovery/register_server.c -o CMakeFiles/muc_opcua.dir/cu/core_2022_server/discovery/register_server.c.s
 
 src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/attribute_write/write.c.o: src/CMakeFiles/muc_opcua.dir/flags.make
 src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/attribute_write/write.c.o: /home/quackdcs/micro-opcua/src/cu/core_2022_server/attribute_write/write.c
@@ -1119,10 +1119,24 @@ src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/historical_access/history_handl
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/muc_opcua.dir/cu/core_2022_server/historical_access/history_handler.c.s"
 	cd /home/quackdcs/micro-opcua/b/src && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/quackdcs/micro-opcua/src/cu/core_2022_server/historical_access/history_handler.c -o CMakeFiles/muc_opcua.dir/cu/core_2022_server/historical_access/history_handler.c.s
 
+src/CMakeFiles/muc_opcua.dir/address_space/ac_nodes.c.o: src/CMakeFiles/muc_opcua.dir/flags.make
+src/CMakeFiles/muc_opcua.dir/address_space/ac_nodes.c.o: /home/quackdcs/micro-opcua/src/address_space/ac_nodes.c
+src/CMakeFiles/muc_opcua.dir/address_space/ac_nodes.c.o: src/CMakeFiles/muc_opcua.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=$(CMAKE_PROGRESS_76) "Building C object src/CMakeFiles/muc_opcua.dir/address_space/ac_nodes.c.o"
+	cd /home/quackdcs/micro-opcua/b/src && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT src/CMakeFiles/muc_opcua.dir/address_space/ac_nodes.c.o -MF CMakeFiles/muc_opcua.dir/address_space/ac_nodes.c.o.d -o CMakeFiles/muc_opcua.dir/address_space/ac_nodes.c.o -c /home/quackdcs/micro-opcua/src/address_space/ac_nodes.c
+
+src/CMakeFiles/muc_opcua.dir/address_space/ac_nodes.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/muc_opcua.dir/address_space/ac_nodes.c.i"
+	cd /home/quackdcs/micro-opcua/b/src && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/quackdcs/micro-opcua/src/address_space/ac_nodes.c > CMakeFiles/muc_opcua.dir/address_space/ac_nodes.c.i
+
+src/CMakeFiles/muc_opcua.dir/address_space/ac_nodes.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/muc_opcua.dir/address_space/ac_nodes.c.s"
+	cd /home/quackdcs/micro-opcua/b/src && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/quackdcs/micro-opcua/src/address_space/ac_nodes.c -o CMakeFiles/muc_opcua.dir/address_space/ac_nodes.c.s
+
 src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/key_credential/key_credential.c.o: src/CMakeFiles/muc_opcua.dir/flags.make
 src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/key_credential/key_credential.c.o: /home/quackdcs/micro-opcua/src/cu/core_2022_server/key_credential/key_credential.c
 src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/key_credential/key_credential.c.o: src/CMakeFiles/muc_opcua.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=$(CMAKE_PROGRESS_76) "Building C object src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/key_credential/key_credential.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=$(CMAKE_PROGRESS_77) "Building C object src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/key_credential/key_credential.c.o"
 	cd /home/quackdcs/micro-opcua/b/src && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/key_credential/key_credential.c.o -MF CMakeFiles/muc_opcua.dir/cu/core_2022_server/key_credential/key_credential.c.o.d -o CMakeFiles/muc_opcua.dir/cu/core_2022_server/key_credential/key_credential.c.o -c /home/quackdcs/micro-opcua/src/cu/core_2022_server/key_credential/key_credential.c
 
 src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/key_credential/key_credential.c.i: cmake_force
@@ -1136,7 +1150,7 @@ src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/key_credential/key_credential.c
 src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/role_management/role_management.c.o: src/CMakeFiles/muc_opcua.dir/flags.make
 src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/role_management/role_management.c.o: /home/quackdcs/micro-opcua/src/cu/core_2022_server/role_management/role_management.c
 src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/role_management/role_management.c.o: src/CMakeFiles/muc_opcua.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=$(CMAKE_PROGRESS_77) "Building C object src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/role_management/role_management.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=$(CMAKE_PROGRESS_78) "Building C object src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/role_management/role_management.c.o"
 	cd /home/quackdcs/micro-opcua/b/src && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/role_management/role_management.c.o -MF CMakeFiles/muc_opcua.dir/cu/core_2022_server/role_management/role_management.c.o.d -o CMakeFiles/muc_opcua.dir/cu/core_2022_server/role_management/role_management.c.o -c /home/quackdcs/micro-opcua/src/cu/core_2022_server/role_management/role_management.c
 
 src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/role_management/role_management.c.i: cmake_force
@@ -1150,7 +1164,7 @@ src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/role_management/role_management
 src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/certificate_manager/cert_manager.c.o: src/CMakeFiles/muc_opcua.dir/flags.make
 src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/certificate_manager/cert_manager.c.o: /home/quackdcs/micro-opcua/src/cu/core_2022_server/certificate_manager/cert_manager.c
 src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/certificate_manager/cert_manager.c.o: src/CMakeFiles/muc_opcua.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=$(CMAKE_PROGRESS_78) "Building C object src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/certificate_manager/cert_manager.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=$(CMAKE_PROGRESS_79) "Building C object src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/certificate_manager/cert_manager.c.o"
 	cd /home/quackdcs/micro-opcua/b/src && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/certificate_manager/cert_manager.c.o -MF CMakeFiles/muc_opcua.dir/cu/core_2022_server/certificate_manager/cert_manager.c.o.d -o CMakeFiles/muc_opcua.dir/cu/core_2022_server/certificate_manager/cert_manager.c.o -c /home/quackdcs/micro-opcua/src/cu/core_2022_server/certificate_manager/cert_manager.c
 
 src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/certificate_manager/cert_manager.c.i: cmake_force
@@ -1164,7 +1178,7 @@ src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/certificate_manager/cert_manage
 src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/event_filter_where/event_filter.c.o: src/CMakeFiles/muc_opcua.dir/flags.make
 src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/event_filter_where/event_filter.c.o: /home/quackdcs/micro-opcua/src/cu/core_2022_server/event_filter_where/event_filter.c
 src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/event_filter_where/event_filter.c.o: src/CMakeFiles/muc_opcua.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=$(CMAKE_PROGRESS_79) "Building C object src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/event_filter_where/event_filter.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=$(CMAKE_PROGRESS_80) "Building C object src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/event_filter_where/event_filter.c.o"
 	cd /home/quackdcs/micro-opcua/b/src && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/event_filter_where/event_filter.c.o -MF CMakeFiles/muc_opcua.dir/cu/core_2022_server/event_filter_where/event_filter.c.o.d -o CMakeFiles/muc_opcua.dir/cu/core_2022_server/event_filter_where/event_filter.c.o -c /home/quackdcs/micro-opcua/src/cu/core_2022_server/event_filter_where/event_filter.c
 
 src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/event_filter_where/event_filter.c.i: cmake_force
@@ -1178,7 +1192,7 @@ src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/event_filter_where/event_filter
 src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/redundancy/transfer_handler.c.o: src/CMakeFiles/muc_opcua.dir/flags.make
 src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/redundancy/transfer_handler.c.o: /home/quackdcs/micro-opcua/src/cu/core_2022_server/redundancy/transfer_handler.c
 src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/redundancy/transfer_handler.c.o: src/CMakeFiles/muc_opcua.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=$(CMAKE_PROGRESS_80) "Building C object src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/redundancy/transfer_handler.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=$(CMAKE_PROGRESS_81) "Building C object src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/redundancy/transfer_handler.c.o"
 	cd /home/quackdcs/micro-opcua/b/src && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/redundancy/transfer_handler.c.o -MF CMakeFiles/muc_opcua.dir/cu/core_2022_server/redundancy/transfer_handler.c.o.d -o CMakeFiles/muc_opcua.dir/cu/core_2022_server/redundancy/transfer_handler.c.o -c /home/quackdcs/micro-opcua/src/cu/core_2022_server/redundancy/transfer_handler.c
 
 src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/redundancy/transfer_handler.c.i: cmake_force
@@ -1192,7 +1206,7 @@ src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/redundancy/transfer_handler.c.s
 src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/diagnostics/diagnostics.c.o: src/CMakeFiles/muc_opcua.dir/flags.make
 src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/diagnostics/diagnostics.c.o: /home/quackdcs/micro-opcua/src/cu/core_2022_server/diagnostics/diagnostics.c
 src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/diagnostics/diagnostics.c.o: src/CMakeFiles/muc_opcua.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=$(CMAKE_PROGRESS_81) "Building C object src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/diagnostics/diagnostics.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=$(CMAKE_PROGRESS_82) "Building C object src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/diagnostics/diagnostics.c.o"
 	cd /home/quackdcs/micro-opcua/b/src && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/diagnostics/diagnostics.c.o -MF CMakeFiles/muc_opcua.dir/cu/core_2022_server/diagnostics/diagnostics.c.o.d -o CMakeFiles/muc_opcua.dir/cu/core_2022_server/diagnostics/diagnostics.c.o -c /home/quackdcs/micro-opcua/src/cu/core_2022_server/diagnostics/diagnostics.c
 
 src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/diagnostics/diagnostics.c.i: cmake_force
@@ -1203,10 +1217,38 @@ src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/diagnostics/diagnostics.c.s: cm
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/muc_opcua.dir/cu/core_2022_server/diagnostics/diagnostics.c.s"
 	cd /home/quackdcs/micro-opcua/b/src && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/quackdcs/micro-opcua/src/cu/core_2022_server/diagnostics/diagnostics.c -o CMakeFiles/muc_opcua.dir/cu/core_2022_server/diagnostics/diagnostics.c.s
 
+src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/time_sync_ieee_1588_ptp/stub.c.o: src/CMakeFiles/muc_opcua.dir/flags.make
+src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/time_sync_ieee_1588_ptp/stub.c.o: /home/quackdcs/micro-opcua/src/cu/core_2022_server/time_sync_ieee_1588_ptp/stub.c
+src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/time_sync_ieee_1588_ptp/stub.c.o: src/CMakeFiles/muc_opcua.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=$(CMAKE_PROGRESS_83) "Building C object src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/time_sync_ieee_1588_ptp/stub.c.o"
+	cd /home/quackdcs/micro-opcua/b/src && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/time_sync_ieee_1588_ptp/stub.c.o -MF CMakeFiles/muc_opcua.dir/cu/core_2022_server/time_sync_ieee_1588_ptp/stub.c.o.d -o CMakeFiles/muc_opcua.dir/cu/core_2022_server/time_sync_ieee_1588_ptp/stub.c.o -c /home/quackdcs/micro-opcua/src/cu/core_2022_server/time_sync_ieee_1588_ptp/stub.c
+
+src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/time_sync_ieee_1588_ptp/stub.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/muc_opcua.dir/cu/core_2022_server/time_sync_ieee_1588_ptp/stub.c.i"
+	cd /home/quackdcs/micro-opcua/b/src && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/quackdcs/micro-opcua/src/cu/core_2022_server/time_sync_ieee_1588_ptp/stub.c > CMakeFiles/muc_opcua.dir/cu/core_2022_server/time_sync_ieee_1588_ptp/stub.c.i
+
+src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/time_sync_ieee_1588_ptp/stub.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/muc_opcua.dir/cu/core_2022_server/time_sync_ieee_1588_ptp/stub.c.s"
+	cd /home/quackdcs/micro-opcua/b/src && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/quackdcs/micro-opcua/src/cu/core_2022_server/time_sync_ieee_1588_ptp/stub.c -o CMakeFiles/muc_opcua.dir/cu/core_2022_server/time_sync_ieee_1588_ptp/stub.c.s
+
+src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/time_sync_ieee_802_1as/stub.c.o: src/CMakeFiles/muc_opcua.dir/flags.make
+src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/time_sync_ieee_802_1as/stub.c.o: /home/quackdcs/micro-opcua/src/cu/core_2022_server/time_sync_ieee_802_1as/stub.c
+src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/time_sync_ieee_802_1as/stub.c.o: src/CMakeFiles/muc_opcua.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=$(CMAKE_PROGRESS_84) "Building C object src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/time_sync_ieee_802_1as/stub.c.o"
+	cd /home/quackdcs/micro-opcua/b/src && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/time_sync_ieee_802_1as/stub.c.o -MF CMakeFiles/muc_opcua.dir/cu/core_2022_server/time_sync_ieee_802_1as/stub.c.o.d -o CMakeFiles/muc_opcua.dir/cu/core_2022_server/time_sync_ieee_802_1as/stub.c.o -c /home/quackdcs/micro-opcua/src/cu/core_2022_server/time_sync_ieee_802_1as/stub.c
+
+src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/time_sync_ieee_802_1as/stub.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/muc_opcua.dir/cu/core_2022_server/time_sync_ieee_802_1as/stub.c.i"
+	cd /home/quackdcs/micro-opcua/b/src && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/quackdcs/micro-opcua/src/cu/core_2022_server/time_sync_ieee_802_1as/stub.c > CMakeFiles/muc_opcua.dir/cu/core_2022_server/time_sync_ieee_802_1as/stub.c.i
+
+src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/time_sync_ieee_802_1as/stub.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/muc_opcua.dir/cu/core_2022_server/time_sync_ieee_802_1as/stub.c.s"
+	cd /home/quackdcs/micro-opcua/b/src && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/quackdcs/micro-opcua/src/cu/core_2022_server/time_sync_ieee_802_1as/stub.c -o CMakeFiles/muc_opcua.dir/cu/core_2022_server/time_sync_ieee_802_1as/stub.c.s
+
 src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/complex_types/binary_complex.c.o: src/CMakeFiles/muc_opcua.dir/flags.make
 src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/complex_types/binary_complex.c.o: /home/quackdcs/micro-opcua/src/cu/core_2022_server/complex_types/binary_complex.c
 src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/complex_types/binary_complex.c.o: src/CMakeFiles/muc_opcua.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=$(CMAKE_PROGRESS_82) "Building C object src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/complex_types/binary_complex.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=$(CMAKE_PROGRESS_85) "Building C object src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/complex_types/binary_complex.c.o"
 	cd /home/quackdcs/micro-opcua/b/src && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/complex_types/binary_complex.c.o -MF CMakeFiles/muc_opcua.dir/cu/core_2022_server/complex_types/binary_complex.c.o.d -o CMakeFiles/muc_opcua.dir/cu/core_2022_server/complex_types/binary_complex.c.o -c /home/quackdcs/micro-opcua/src/cu/core_2022_server/complex_types/binary_complex.c
 
 src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/complex_types/binary_complex.c.i: cmake_force
@@ -1220,7 +1262,7 @@ src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/complex_types/binary_complex.c.
 src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/complex_types/complex_types.c.o: src/CMakeFiles/muc_opcua.dir/flags.make
 src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/complex_types/complex_types.c.o: /home/quackdcs/micro-opcua/src/cu/core_2022_server/complex_types/complex_types.c
 src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/complex_types/complex_types.c.o: src/CMakeFiles/muc_opcua.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=$(CMAKE_PROGRESS_83) "Building C object src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/complex_types/complex_types.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=$(CMAKE_PROGRESS_86) "Building C object src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/complex_types/complex_types.c.o"
 	cd /home/quackdcs/micro-opcua/b/src && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/complex_types/complex_types.c.o -MF CMakeFiles/muc_opcua.dir/cu/core_2022_server/complex_types/complex_types.c.o.d -o CMakeFiles/muc_opcua.dir/cu/core_2022_server/complex_types/complex_types.c.o -c /home/quackdcs/micro-opcua/src/cu/core_2022_server/complex_types/complex_types.c
 
 src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/complex_types/complex_types.c.i: cmake_force
@@ -1234,7 +1276,7 @@ src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/complex_types/complex_types.c.s
 src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/auditing/audit_events.c.o: src/CMakeFiles/muc_opcua.dir/flags.make
 src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/auditing/audit_events.c.o: /home/quackdcs/micro-opcua/src/cu/core_2022_server/auditing/audit_events.c
 src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/auditing/audit_events.c.o: src/CMakeFiles/muc_opcua.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=$(CMAKE_PROGRESS_84) "Building C object src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/auditing/audit_events.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=$(CMAKE_PROGRESS_87) "Building C object src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/auditing/audit_events.c.o"
 	cd /home/quackdcs/micro-opcua/b/src && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/auditing/audit_events.c.o -MF CMakeFiles/muc_opcua.dir/cu/core_2022_server/auditing/audit_events.c.o.d -o CMakeFiles/muc_opcua.dir/cu/core_2022_server/auditing/audit_events.c.o -c /home/quackdcs/micro-opcua/src/cu/core_2022_server/auditing/audit_events.c
 
 src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/auditing/audit_events.c.i: cmake_force
@@ -1248,7 +1290,7 @@ src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/auditing/audit_events.c.s: cmak
 src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/security/asym_chunk/unwrap.c.o: src/CMakeFiles/muc_opcua.dir/flags.make
 src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/security/asym_chunk/unwrap.c.o: /home/quackdcs/micro-opcua/src/cu/core_2022_server/security/asym_chunk/unwrap.c
 src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/security/asym_chunk/unwrap.c.o: src/CMakeFiles/muc_opcua.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=$(CMAKE_PROGRESS_85) "Building C object src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/security/asym_chunk/unwrap.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=$(CMAKE_PROGRESS_88) "Building C object src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/security/asym_chunk/unwrap.c.o"
 	cd /home/quackdcs/micro-opcua/b/src && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/security/asym_chunk/unwrap.c.o -MF CMakeFiles/muc_opcua.dir/cu/core_2022_server/security/asym_chunk/unwrap.c.o.d -o CMakeFiles/muc_opcua.dir/cu/core_2022_server/security/asym_chunk/unwrap.c.o -c /home/quackdcs/micro-opcua/src/cu/core_2022_server/security/asym_chunk/unwrap.c
 
 src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/security/asym_chunk/unwrap.c.i: cmake_force
@@ -1262,7 +1304,7 @@ src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/security/asym_chunk/unwrap.c.s:
 src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/security/asym_chunk/wrap.c.o: src/CMakeFiles/muc_opcua.dir/flags.make
 src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/security/asym_chunk/wrap.c.o: /home/quackdcs/micro-opcua/src/cu/core_2022_server/security/asym_chunk/wrap.c
 src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/security/asym_chunk/wrap.c.o: src/CMakeFiles/muc_opcua.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=$(CMAKE_PROGRESS_86) "Building C object src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/security/asym_chunk/wrap.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=$(CMAKE_PROGRESS_89) "Building C object src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/security/asym_chunk/wrap.c.o"
 	cd /home/quackdcs/micro-opcua/b/src && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/security/asym_chunk/wrap.c.o -MF CMakeFiles/muc_opcua.dir/cu/core_2022_server/security/asym_chunk/wrap.c.o.d -o CMakeFiles/muc_opcua.dir/cu/core_2022_server/security/asym_chunk/wrap.c.o -c /home/quackdcs/micro-opcua/src/cu/core_2022_server/security/asym_chunk/wrap.c
 
 src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/security/asym_chunk/wrap.c.i: cmake_force
@@ -1276,7 +1318,7 @@ src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/security/asym_chunk/wrap.c.s: c
 src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/security/certificate.c.o: src/CMakeFiles/muc_opcua.dir/flags.make
 src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/security/certificate.c.o: /home/quackdcs/micro-opcua/src/cu/core_2022_server/security/certificate.c
 src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/security/certificate.c.o: src/CMakeFiles/muc_opcua.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=$(CMAKE_PROGRESS_87) "Building C object src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/security/certificate.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=$(CMAKE_PROGRESS_90) "Building C object src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/security/certificate.c.o"
 	cd /home/quackdcs/micro-opcua/b/src && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/security/certificate.c.o -MF CMakeFiles/muc_opcua.dir/cu/core_2022_server/security/certificate.c.o.d -o CMakeFiles/muc_opcua.dir/cu/core_2022_server/security/certificate.c.o -c /home/quackdcs/micro-opcua/src/cu/core_2022_server/security/certificate.c
 
 src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/security/certificate.c.i: cmake_force
@@ -1290,7 +1332,7 @@ src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/security/certificate.c.s: cmake
 src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/security/key_derivation.c.o: src/CMakeFiles/muc_opcua.dir/flags.make
 src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/security/key_derivation.c.o: /home/quackdcs/micro-opcua/src/cu/core_2022_server/security/key_derivation.c
 src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/security/key_derivation.c.o: src/CMakeFiles/muc_opcua.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=$(CMAKE_PROGRESS_88) "Building C object src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/security/key_derivation.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=$(CMAKE_PROGRESS_91) "Building C object src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/security/key_derivation.c.o"
 	cd /home/quackdcs/micro-opcua/b/src && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/security/key_derivation.c.o -MF CMakeFiles/muc_opcua.dir/cu/core_2022_server/security/key_derivation.c.o.d -o CMakeFiles/muc_opcua.dir/cu/core_2022_server/security/key_derivation.c.o -c /home/quackdcs/micro-opcua/src/cu/core_2022_server/security/key_derivation.c
 
 src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/security/key_derivation.c.i: cmake_force
@@ -1304,7 +1346,7 @@ src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/security/key_derivation.c.s: cm
 src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/security/sym_chunk.c.o: src/CMakeFiles/muc_opcua.dir/flags.make
 src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/security/sym_chunk.c.o: /home/quackdcs/micro-opcua/src/cu/core_2022_server/security/sym_chunk.c
 src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/security/sym_chunk.c.o: src/CMakeFiles/muc_opcua.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=$(CMAKE_PROGRESS_89) "Building C object src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/security/sym_chunk.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=$(CMAKE_PROGRESS_92) "Building C object src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/security/sym_chunk.c.o"
 	cd /home/quackdcs/micro-opcua/b/src && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/security/sym_chunk.c.o -MF CMakeFiles/muc_opcua.dir/cu/core_2022_server/security/sym_chunk.c.o.d -o CMakeFiles/muc_opcua.dir/cu/core_2022_server/security/sym_chunk.c.o -c /home/quackdcs/micro-opcua/src/cu/core_2022_server/security/sym_chunk.c
 
 src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/security/sym_chunk.c.i: cmake_force
@@ -1318,7 +1360,7 @@ src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/security/sym_chunk.c.s: cmake_f
 src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/security/trustlist.c.o: src/CMakeFiles/muc_opcua.dir/flags.make
 src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/security/trustlist.c.o: /home/quackdcs/micro-opcua/src/cu/core_2022_server/security/trustlist.c
 src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/security/trustlist.c.o: src/CMakeFiles/muc_opcua.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=$(CMAKE_PROGRESS_90) "Building C object src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/security/trustlist.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=$(CMAKE_PROGRESS_93) "Building C object src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/security/trustlist.c.o"
 	cd /home/quackdcs/micro-opcua/b/src && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/security/trustlist.c.o -MF CMakeFiles/muc_opcua.dir/cu/core_2022_server/security/trustlist.c.o.d -o CMakeFiles/muc_opcua.dir/cu/core_2022_server/security/trustlist.c.o -c /home/quackdcs/micro-opcua/src/cu/core_2022_server/security/trustlist.c
 
 src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/security/trustlist.c.i: cmake_force
@@ -1332,7 +1374,7 @@ src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/security/trustlist.c.s: cmake_f
 src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/security/ecc.c.o: src/CMakeFiles/muc_opcua.dir/flags.make
 src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/security/ecc.c.o: /home/quackdcs/micro-opcua/src/cu/core_2022_server/security/ecc.c
 src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/security/ecc.c.o: src/CMakeFiles/muc_opcua.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=$(CMAKE_PROGRESS_91) "Building C object src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/security/ecc.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=$(CMAKE_PROGRESS_94) "Building C object src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/security/ecc.c.o"
 	cd /home/quackdcs/micro-opcua/b/src && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/security/ecc.c.o -MF CMakeFiles/muc_opcua.dir/cu/core_2022_server/security/ecc.c.o.d -o CMakeFiles/muc_opcua.dir/cu/core_2022_server/security/ecc.c.o -c /home/quackdcs/micro-opcua/src/cu/core_2022_server/security/ecc.c
 
 src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/security/ecc.c.i: cmake_force
@@ -1346,7 +1388,7 @@ src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/security/ecc.c.s: cmake_force
 src/CMakeFiles/muc_opcua.dir/platform/host_tcp_adapter.c.o: src/CMakeFiles/muc_opcua.dir/flags.make
 src/CMakeFiles/muc_opcua.dir/platform/host_tcp_adapter.c.o: /home/quackdcs/micro-opcua/src/platform/host_tcp_adapter.c
 src/CMakeFiles/muc_opcua.dir/platform/host_tcp_adapter.c.o: src/CMakeFiles/muc_opcua.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=$(CMAKE_PROGRESS_92) "Building C object src/CMakeFiles/muc_opcua.dir/platform/host_tcp_adapter.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=$(CMAKE_PROGRESS_95) "Building C object src/CMakeFiles/muc_opcua.dir/platform/host_tcp_adapter.c.o"
 	cd /home/quackdcs/micro-opcua/b/src && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT src/CMakeFiles/muc_opcua.dir/platform/host_tcp_adapter.c.o -MF CMakeFiles/muc_opcua.dir/platform/host_tcp_adapter.c.o.d -o CMakeFiles/muc_opcua.dir/platform/host_tcp_adapter.c.o -c /home/quackdcs/micro-opcua/src/platform/host_tcp_adapter.c
 
 src/CMakeFiles/muc_opcua.dir/platform/host_tcp_adapter.c.i: cmake_force
@@ -1360,7 +1402,7 @@ src/CMakeFiles/muc_opcua.dir/platform/host_tcp_adapter.c.s: cmake_force
 src/CMakeFiles/muc_opcua.dir/platform/posix_mdns.c.o: src/CMakeFiles/muc_opcua.dir/flags.make
 src/CMakeFiles/muc_opcua.dir/platform/posix_mdns.c.o: /home/quackdcs/micro-opcua/src/platform/posix_mdns.c
 src/CMakeFiles/muc_opcua.dir/platform/posix_mdns.c.o: src/CMakeFiles/muc_opcua.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=$(CMAKE_PROGRESS_93) "Building C object src/CMakeFiles/muc_opcua.dir/platform/posix_mdns.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=$(CMAKE_PROGRESS_96) "Building C object src/CMakeFiles/muc_opcua.dir/platform/posix_mdns.c.o"
 	cd /home/quackdcs/micro-opcua/b/src && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT src/CMakeFiles/muc_opcua.dir/platform/posix_mdns.c.o -MF CMakeFiles/muc_opcua.dir/platform/posix_mdns.c.o.d -o CMakeFiles/muc_opcua.dir/platform/posix_mdns.c.o -c /home/quackdcs/micro-opcua/src/platform/posix_mdns.c
 
 src/CMakeFiles/muc_opcua.dir/platform/posix_mdns.c.i: cmake_force
@@ -1374,7 +1416,7 @@ src/CMakeFiles/muc_opcua.dir/platform/posix_mdns.c.s: cmake_force
 src/CMakeFiles/muc_opcua.dir/platform/host_crypto/common.c.o: src/CMakeFiles/muc_opcua.dir/flags.make
 src/CMakeFiles/muc_opcua.dir/platform/host_crypto/common.c.o: /home/quackdcs/micro-opcua/src/platform/host_crypto/common.c
 src/CMakeFiles/muc_opcua.dir/platform/host_crypto/common.c.o: src/CMakeFiles/muc_opcua.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=$(CMAKE_PROGRESS_94) "Building C object src/CMakeFiles/muc_opcua.dir/platform/host_crypto/common.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=$(CMAKE_PROGRESS_97) "Building C object src/CMakeFiles/muc_opcua.dir/platform/host_crypto/common.c.o"
 	cd /home/quackdcs/micro-opcua/b/src && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT src/CMakeFiles/muc_opcua.dir/platform/host_crypto/common.c.o -MF CMakeFiles/muc_opcua.dir/platform/host_crypto/common.c.o.d -o CMakeFiles/muc_opcua.dir/platform/host_crypto/common.c.o -c /home/quackdcs/micro-opcua/src/platform/host_crypto/common.c
 
 src/CMakeFiles/muc_opcua.dir/platform/host_crypto/common.c.i: cmake_force
@@ -1388,7 +1430,7 @@ src/CMakeFiles/muc_opcua.dir/platform/host_crypto/common.c.s: cmake_force
 src/CMakeFiles/muc_opcua.dir/platform/host_crypto/hash.c.o: src/CMakeFiles/muc_opcua.dir/flags.make
 src/CMakeFiles/muc_opcua.dir/platform/host_crypto/hash.c.o: /home/quackdcs/micro-opcua/src/platform/host_crypto/hash.c
 src/CMakeFiles/muc_opcua.dir/platform/host_crypto/hash.c.o: src/CMakeFiles/muc_opcua.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=$(CMAKE_PROGRESS_95) "Building C object src/CMakeFiles/muc_opcua.dir/platform/host_crypto/hash.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=$(CMAKE_PROGRESS_98) "Building C object src/CMakeFiles/muc_opcua.dir/platform/host_crypto/hash.c.o"
 	cd /home/quackdcs/micro-opcua/b/src && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT src/CMakeFiles/muc_opcua.dir/platform/host_crypto/hash.c.o -MF CMakeFiles/muc_opcua.dir/platform/host_crypto/hash.c.o.d -o CMakeFiles/muc_opcua.dir/platform/host_crypto/hash.c.o -c /home/quackdcs/micro-opcua/src/platform/host_crypto/hash.c
 
 src/CMakeFiles/muc_opcua.dir/platform/host_crypto/hash.c.i: cmake_force
@@ -1402,7 +1444,7 @@ src/CMakeFiles/muc_opcua.dir/platform/host_crypto/hash.c.s: cmake_force
 src/CMakeFiles/muc_opcua.dir/platform/host_crypto/cipher.c.o: src/CMakeFiles/muc_opcua.dir/flags.make
 src/CMakeFiles/muc_opcua.dir/platform/host_crypto/cipher.c.o: /home/quackdcs/micro-opcua/src/platform/host_crypto/cipher.c
 src/CMakeFiles/muc_opcua.dir/platform/host_crypto/cipher.c.o: src/CMakeFiles/muc_opcua.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=$(CMAKE_PROGRESS_96) "Building C object src/CMakeFiles/muc_opcua.dir/platform/host_crypto/cipher.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=$(CMAKE_PROGRESS_99) "Building C object src/CMakeFiles/muc_opcua.dir/platform/host_crypto/cipher.c.o"
 	cd /home/quackdcs/micro-opcua/b/src && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT src/CMakeFiles/muc_opcua.dir/platform/host_crypto/cipher.c.o -MF CMakeFiles/muc_opcua.dir/platform/host_crypto/cipher.c.o.d -o CMakeFiles/muc_opcua.dir/platform/host_crypto/cipher.c.o -c /home/quackdcs/micro-opcua/src/platform/host_crypto/cipher.c
 
 src/CMakeFiles/muc_opcua.dir/platform/host_crypto/cipher.c.i: cmake_force
@@ -1416,7 +1458,7 @@ src/CMakeFiles/muc_opcua.dir/platform/host_crypto/cipher.c.s: cmake_force
 src/CMakeFiles/muc_opcua.dir/platform/host_crypto/asymmetric.c.o: src/CMakeFiles/muc_opcua.dir/flags.make
 src/CMakeFiles/muc_opcua.dir/platform/host_crypto/asymmetric.c.o: /home/quackdcs/micro-opcua/src/platform/host_crypto/asymmetric.c
 src/CMakeFiles/muc_opcua.dir/platform/host_crypto/asymmetric.c.o: src/CMakeFiles/muc_opcua.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=$(CMAKE_PROGRESS_97) "Building C object src/CMakeFiles/muc_opcua.dir/platform/host_crypto/asymmetric.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=$(CMAKE_PROGRESS_100) "Building C object src/CMakeFiles/muc_opcua.dir/platform/host_crypto/asymmetric.c.o"
 	cd /home/quackdcs/micro-opcua/b/src && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT src/CMakeFiles/muc_opcua.dir/platform/host_crypto/asymmetric.c.o -MF CMakeFiles/muc_opcua.dir/platform/host_crypto/asymmetric.c.o.d -o CMakeFiles/muc_opcua.dir/platform/host_crypto/asymmetric.c.o -c /home/quackdcs/micro-opcua/src/platform/host_crypto/asymmetric.c
 
 src/CMakeFiles/muc_opcua.dir/platform/host_crypto/asymmetric.c.i: cmake_force
@@ -1430,7 +1472,7 @@ src/CMakeFiles/muc_opcua.dir/platform/host_crypto/asymmetric.c.s: cmake_force
 src/CMakeFiles/muc_opcua.dir/platform/host_crypto/sign.c.o: src/CMakeFiles/muc_opcua.dir/flags.make
 src/CMakeFiles/muc_opcua.dir/platform/host_crypto/sign.c.o: /home/quackdcs/micro-opcua/src/platform/host_crypto/sign.c
 src/CMakeFiles/muc_opcua.dir/platform/host_crypto/sign.c.o: src/CMakeFiles/muc_opcua.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=$(CMAKE_PROGRESS_98) "Building C object src/CMakeFiles/muc_opcua.dir/platform/host_crypto/sign.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=$(CMAKE_PROGRESS_101) "Building C object src/CMakeFiles/muc_opcua.dir/platform/host_crypto/sign.c.o"
 	cd /home/quackdcs/micro-opcua/b/src && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT src/CMakeFiles/muc_opcua.dir/platform/host_crypto/sign.c.o -MF CMakeFiles/muc_opcua.dir/platform/host_crypto/sign.c.o.d -o CMakeFiles/muc_opcua.dir/platform/host_crypto/sign.c.o -c /home/quackdcs/micro-opcua/src/platform/host_crypto/sign.c
 
 src/CMakeFiles/muc_opcua.dir/platform/host_crypto/sign.c.i: cmake_force
@@ -1444,7 +1486,7 @@ src/CMakeFiles/muc_opcua.dir/platform/host_crypto/sign.c.s: cmake_force
 src/CMakeFiles/muc_opcua.dir/platform/host_crypto/ecc.c.o: src/CMakeFiles/muc_opcua.dir/flags.make
 src/CMakeFiles/muc_opcua.dir/platform/host_crypto/ecc.c.o: /home/quackdcs/micro-opcua/src/platform/host_crypto/ecc.c
 src/CMakeFiles/muc_opcua.dir/platform/host_crypto/ecc.c.o: src/CMakeFiles/muc_opcua.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=$(CMAKE_PROGRESS_99) "Building C object src/CMakeFiles/muc_opcua.dir/platform/host_crypto/ecc.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=$(CMAKE_PROGRESS_102) "Building C object src/CMakeFiles/muc_opcua.dir/platform/host_crypto/ecc.c.o"
 	cd /home/quackdcs/micro-opcua/b/src && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT src/CMakeFiles/muc_opcua.dir/platform/host_crypto/ecc.c.o -MF CMakeFiles/muc_opcua.dir/platform/host_crypto/ecc.c.o.d -o CMakeFiles/muc_opcua.dir/platform/host_crypto/ecc.c.o -c /home/quackdcs/micro-opcua/src/platform/host_crypto/ecc.c
 
 src/CMakeFiles/muc_opcua.dir/platform/host_crypto/ecc.c.i: cmake_force
@@ -1458,7 +1500,7 @@ src/CMakeFiles/muc_opcua.dir/platform/host_crypto/ecc.c.s: cmake_force
 src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/authorization/base64url.c.o: src/CMakeFiles/muc_opcua.dir/flags.make
 src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/authorization/base64url.c.o: /home/quackdcs/micro-opcua/src/cu/core_2022_server/authorization/base64url.c
 src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/authorization/base64url.c.o: src/CMakeFiles/muc_opcua.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=$(CMAKE_PROGRESS_100) "Building C object src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/authorization/base64url.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=$(CMAKE_PROGRESS_103) "Building C object src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/authorization/base64url.c.o"
 	cd /home/quackdcs/micro-opcua/b/src && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/authorization/base64url.c.o -MF CMakeFiles/muc_opcua.dir/cu/core_2022_server/authorization/base64url.c.o.d -o CMakeFiles/muc_opcua.dir/cu/core_2022_server/authorization/base64url.c.o -c /home/quackdcs/micro-opcua/src/cu/core_2022_server/authorization/base64url.c
 
 src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/authorization/base64url.c.i: cmake_force
@@ -1472,7 +1514,7 @@ src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/authorization/base64url.c.s: cm
 src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/authorization/claim_scanner.c.o: src/CMakeFiles/muc_opcua.dir/flags.make
 src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/authorization/claim_scanner.c.o: /home/quackdcs/micro-opcua/src/cu/core_2022_server/authorization/claim_scanner.c
 src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/authorization/claim_scanner.c.o: src/CMakeFiles/muc_opcua.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=$(CMAKE_PROGRESS_101) "Building C object src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/authorization/claim_scanner.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=$(CMAKE_PROGRESS_104) "Building C object src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/authorization/claim_scanner.c.o"
 	cd /home/quackdcs/micro-opcua/b/src && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/authorization/claim_scanner.c.o -MF CMakeFiles/muc_opcua.dir/cu/core_2022_server/authorization/claim_scanner.c.o.d -o CMakeFiles/muc_opcua.dir/cu/core_2022_server/authorization/claim_scanner.c.o -c /home/quackdcs/micro-opcua/src/cu/core_2022_server/authorization/claim_scanner.c
 
 src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/authorization/claim_scanner.c.i: cmake_force
@@ -1486,7 +1528,7 @@ src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/authorization/claim_scanner.c.s
 src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/authorization/jwt.c.o: src/CMakeFiles/muc_opcua.dir/flags.make
 src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/authorization/jwt.c.o: /home/quackdcs/micro-opcua/src/cu/core_2022_server/authorization/jwt.c
 src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/authorization/jwt.c.o: src/CMakeFiles/muc_opcua.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=$(CMAKE_PROGRESS_102) "Building C object src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/authorization/jwt.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=$(CMAKE_PROGRESS_105) "Building C object src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/authorization/jwt.c.o"
 	cd /home/quackdcs/micro-opcua/b/src && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/authorization/jwt.c.o -MF CMakeFiles/muc_opcua.dir/cu/core_2022_server/authorization/jwt.c.o.d -o CMakeFiles/muc_opcua.dir/cu/core_2022_server/authorization/jwt.c.o -c /home/quackdcs/micro-opcua/src/cu/core_2022_server/authorization/jwt.c
 
 src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/authorization/jwt.c.i: cmake_force
@@ -1500,7 +1542,7 @@ src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/authorization/jwt.c.s: cmake_fo
 src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/authorization/crypto_jwt.c.o: src/CMakeFiles/muc_opcua.dir/flags.make
 src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/authorization/crypto_jwt.c.o: /home/quackdcs/micro-opcua/src/cu/core_2022_server/authorization/crypto_jwt.c
 src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/authorization/crypto_jwt.c.o: src/CMakeFiles/muc_opcua.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=$(CMAKE_PROGRESS_103) "Building C object src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/authorization/crypto_jwt.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=$(CMAKE_PROGRESS_106) "Building C object src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/authorization/crypto_jwt.c.o"
 	cd /home/quackdcs/micro-opcua/b/src && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/authorization/crypto_jwt.c.o -MF CMakeFiles/muc_opcua.dir/cu/core_2022_server/authorization/crypto_jwt.c.o.d -o CMakeFiles/muc_opcua.dir/cu/core_2022_server/authorization/crypto_jwt.c.o -c /home/quackdcs/micro-opcua/src/cu/core_2022_server/authorization/crypto_jwt.c
 
 src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/authorization/crypto_jwt.c.i: cmake_force
@@ -1560,8 +1602,8 @@ muc_opcua_OBJECTS = \
 "CMakeFiles/muc_opcua.dir/cu/core_2022_server/view_basic_translate/translate_paths.c.o" \
 "CMakeFiles/muc_opcua.dir/cu/core_2022_server/discovery/common.c.o" \
 "CMakeFiles/muc_opcua.dir/cu/core_2022_server/discovery/find_servers.c.o" \
-"CMakeFiles/muc_opcua.dir/cu/core_2022_server/discovery/register_server.c.o" \
 "CMakeFiles/muc_opcua.dir/cu/core_2022_server/discovery/get_endpoints.c.o" \
+"CMakeFiles/muc_opcua.dir/cu/core_2022_server/discovery/register_server.c.o" \
 "CMakeFiles/muc_opcua.dir/cu/core_2022_server/attribute_write/write.c.o" \
 "CMakeFiles/muc_opcua.dir/core/service_dispatch/attribute_handler.c.o" \
 "CMakeFiles/muc_opcua.dir/cu/core_2022_server/nodemanagement/add_nodes.c.o" \
@@ -1588,12 +1630,15 @@ muc_opcua_OBJECTS = \
 "CMakeFiles/muc_opcua.dir/platform/host_udp_adapter.c.o" \
 "CMakeFiles/muc_opcua.dir/cu/core_2022_server/historical_access/history.c.o" \
 "CMakeFiles/muc_opcua.dir/cu/core_2022_server/historical_access/history_handler.c.o" \
+"CMakeFiles/muc_opcua.dir/address_space/ac_nodes.c.o" \
 "CMakeFiles/muc_opcua.dir/cu/core_2022_server/key_credential/key_credential.c.o" \
 "CMakeFiles/muc_opcua.dir/cu/core_2022_server/role_management/role_management.c.o" \
 "CMakeFiles/muc_opcua.dir/cu/core_2022_server/certificate_manager/cert_manager.c.o" \
 "CMakeFiles/muc_opcua.dir/cu/core_2022_server/event_filter_where/event_filter.c.o" \
 "CMakeFiles/muc_opcua.dir/cu/core_2022_server/redundancy/transfer_handler.c.o" \
 "CMakeFiles/muc_opcua.dir/cu/core_2022_server/diagnostics/diagnostics.c.o" \
+"CMakeFiles/muc_opcua.dir/cu/core_2022_server/time_sync_ieee_1588_ptp/stub.c.o" \
+"CMakeFiles/muc_opcua.dir/cu/core_2022_server/time_sync_ieee_802_1as/stub.c.o" \
 "CMakeFiles/muc_opcua.dir/cu/core_2022_server/complex_types/binary_complex.c.o" \
 "CMakeFiles/muc_opcua.dir/cu/core_2022_server/complex_types/complex_types.c.o" \
 "CMakeFiles/muc_opcua.dir/cu/core_2022_server/auditing/audit_events.c.o" \
@@ -1667,8 +1712,8 @@ src/libmuc_opcua.a: src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/view_basic_
 src/libmuc_opcua.a: src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/view_basic_translate/translate_paths.c.o
 src/libmuc_opcua.a: src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/discovery/common.c.o
 src/libmuc_opcua.a: src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/discovery/find_servers.c.o
-src/libmuc_opcua.a: src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/discovery/register_server.c.o
 src/libmuc_opcua.a: src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/discovery/get_endpoints.c.o
+src/libmuc_opcua.a: src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/discovery/register_server.c.o
 src/libmuc_opcua.a: src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/attribute_write/write.c.o
 src/libmuc_opcua.a: src/CMakeFiles/muc_opcua.dir/core/service_dispatch/attribute_handler.c.o
 src/libmuc_opcua.a: src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/nodemanagement/add_nodes.c.o
@@ -1695,12 +1740,15 @@ src/libmuc_opcua.a: src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/subscriptio
 src/libmuc_opcua.a: src/CMakeFiles/muc_opcua.dir/platform/host_udp_adapter.c.o
 src/libmuc_opcua.a: src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/historical_access/history.c.o
 src/libmuc_opcua.a: src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/historical_access/history_handler.c.o
+src/libmuc_opcua.a: src/CMakeFiles/muc_opcua.dir/address_space/ac_nodes.c.o
 src/libmuc_opcua.a: src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/key_credential/key_credential.c.o
 src/libmuc_opcua.a: src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/role_management/role_management.c.o
 src/libmuc_opcua.a: src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/certificate_manager/cert_manager.c.o
 src/libmuc_opcua.a: src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/event_filter_where/event_filter.c.o
 src/libmuc_opcua.a: src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/redundancy/transfer_handler.c.o
 src/libmuc_opcua.a: src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/diagnostics/diagnostics.c.o
+src/libmuc_opcua.a: src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/time_sync_ieee_1588_ptp/stub.c.o
+src/libmuc_opcua.a: src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/time_sync_ieee_802_1as/stub.c.o
 src/libmuc_opcua.a: src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/complex_types/binary_complex.c.o
 src/libmuc_opcua.a: src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/complex_types/complex_types.c.o
 src/libmuc_opcua.a: src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/auditing/audit_events.c.o
@@ -1725,7 +1773,7 @@ src/libmuc_opcua.a: src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/authorizati
 src/libmuc_opcua.a: src/CMakeFiles/muc_opcua.dir/cu/core_2022_server/authorization/crypto_jwt.c.o
 src/libmuc_opcua.a: src/CMakeFiles/muc_opcua.dir/build.make
 src/libmuc_opcua.a: src/CMakeFiles/muc_opcua.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=$(CMAKE_PROGRESS_104) "Linking C static library libmuc_opcua.a"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/quackdcs/micro-opcua/b/CMakeFiles --progress-num=$(CMAKE_PROGRESS_107) "Linking C static library libmuc_opcua.a"
 	cd /home/quackdcs/micro-opcua/b/src && $(CMAKE_COMMAND) -P CMakeFiles/muc_opcua.dir/cmake_clean_target.cmake
 	cd /home/quackdcs/micro-opcua/b/src && $(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/muc_opcua.dir/link.txt --verbose=$(VERBOSE)
 

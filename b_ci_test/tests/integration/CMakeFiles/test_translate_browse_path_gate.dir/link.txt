@@ -1,0 +1,1 @@
+/usr/bin/cc -Wl,--gc-sections CMakeFiles/test_translate_browse_path_gate.dir/test_translate_browse_path_gate.c.o -o test_translate_browse_path_gate  ../../src/libmuc_opcua.a ../support/libmuc_opcua_test_support.a ../../_deps/unity-build/libunity.a ../../src/libmuc_opcua.a /usr/lib/x86_64-linux-gnu/libcrypto.so 
