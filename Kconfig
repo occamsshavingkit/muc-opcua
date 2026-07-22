@@ -1628,9 +1628,11 @@ config MUC_OPCUA_CU_CERTIFICATE_MANAGER_PULL
 	  Backing tests: test_certificate_manager.
 	  Notes: Pull model certificate enrollment Methods
 	  (StartSigningRequest, FinishRequest, GetRejectedList,
-	  StartNewKeyPairRequest) + adapter callbacks. Type-system
-	  nodes + instances + CertificateDirectoryType.
-	  Grounded per OPC-10000-12 7.6, 7.9 and OPC-10000-7 CU 1631.
+	  StartNewKeyPairRequest) + Push model (UpdateCertificate,
+	  ApplyChanges) + adapter callbacks. Type-system nodes
+	  + instances + CertificateDirectoryType + ServerConfigurationType.
+	  Grounded per OPC-10000-12 7.6, 7.9, 7.10 and OPC-10000-7
+	  CUs 1631, 2231.
 
 endif
 

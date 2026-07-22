@@ -145,6 +145,12 @@ static const opcua_byte_t s_str_DefaultApplicationGroup[] = "DefaultApplicationG
 static const opcua_byte_t s_str_DefaultHttpsGroup[] = "DefaultHttpsGroup";
 static const opcua_byte_t s_str_DefaultUserTokenGroup[] = "DefaultUserTokenGroup";
 #endif
+#if MUC_OPCUA_CU_CERTIFICATE_MANAGER_PULL && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+/* spec 112 (CU 2231): Push Model — ServerConfiguration type strings */
+static const opcua_byte_t s_str_ServerConfigurationType[] = "ServerConfigurationType";
+static const opcua_byte_t s_str_UpdateCertificate[] = "UpdateCertificate";
+static const opcua_byte_t s_str_ApplyChanges[] = "ApplyChanges";
+#endif
 static const opcua_byte_t s_str_LocaleIdArray[] = "LocaleIdArray";
 #if MUC_OPCUA_CU_BASE_INFO_SERVERTYPE && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
 /* spec 090 (CU 5801 fix): LocaleId(295) DataType BrowseName -- the Mandatory
@@ -1540,6 +1546,12 @@ static const mu_reference_t s_default_https_group_refs[] = {
     {{0, MU_NODEID_NUMERIC, {35}}, {0, MU_NODEID_NUMERIC, {15624}}, false}};
 static const mu_reference_t s_default_user_group_refs[] = {
     {{0, MU_NODEID_NUMERIC, {35}}, {0, MU_NODEID_NUMERIC, {15624}}, false}};
+#endif
+
+#if MUC_OPCUA_CU_CERTIFICATE_MANAGER_PULL && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+/* ServerConfigurationType(12581): subtype of BaseObjectType(58). OPC-10000-12 §7.10.3. */
+static const mu_reference_t s_server_config_type_refs[] = {
+    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {58}}, false}};
 #endif
 
 /* ServerCapabilitiesType(2013) HasProperty(46)/HasComponent(47) -> its
@@ -6191,7 +6203,18 @@ static const mu_node_t s_base_nodes[] = {
      s_rsasha256_cert_type_refs,
      sizeof(s_rsasha256_cert_type_refs) / sizeof(s_rsasha256_cert_type_refs[0]),
      NULL,
+      .type_definition = {0}},
+#if MUC_OPCUA_CU_CERTIFICATE_MANAGER_PULL && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+    /* spec 112 (CU 2231): ServerConfigurationType(12581). OPC-10000-12 §7.10.3. */
+    {{0, MU_NODEID_NUMERIC, {12581}},
+     MU_NODECLASS_OBJECTTYPE,
+     {23, s_str_ServerConfigurationType},
+     {23, s_str_ServerConfigurationType},
+     s_server_config_type_refs,
+     sizeof(s_server_config_type_refs) / sizeof(s_server_config_type_refs[0]),
+     NULL,
      .type_definition = {0}},
+#endif
     {{0, MU_NODEID_NUMERIC, {15017}},
      MU_NODECLASS_OBJECTTYPE,
      {19, s_str_UserCertificateType},
