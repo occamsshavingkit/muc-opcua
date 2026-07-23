@@ -7877,7 +7877,7 @@
         "nano": true,
         "standard": true
       },
-      "satisfied_by": "MUC_OPCUA_CU_SESSION_GENERAL_SERVICE",
+      "satisfied_by": "opc_cu_session_general_service",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"

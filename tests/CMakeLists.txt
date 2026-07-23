@@ -33,6 +33,17 @@ if(MUC_OPCUA_BUILD_TESTS)
         add_test(NAME speed_benchmark_tool
             COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tests/tools/test_speed_benchmark.py
         )
+        # The scripts/profile_manifest unittest suite guards the conformance
+        # manifest itself (CU reconciliation links, completion arithmetic).
+        # It previously ran only when a developer invoked it by hand, so a
+        # malformed satisfied_by link reached main unnoticed; register it with
+        # ctest so CI executes it like any other test.
+        add_test(NAME profile_manifest_tests
+            COMMAND ${Python3_EXECUTABLE} -m unittest discover
+                    -s ${CMAKE_SOURCE_DIR}/scripts/profile_manifest
+                    -t ${CMAKE_SOURCE_DIR}
+                    -p "test_*.py"
+        )
     endif()
 endif()
 
