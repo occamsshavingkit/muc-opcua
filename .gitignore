@@ -1,4 +1,8 @@
 build*/
+# Ad-hoc developer build directories (b/, b_<tag>/). The generic build*/
+# rule below does not catch these short names; they were committed by accident.
+/b/
+/b_*/
 bin/
 obj/
 out/
