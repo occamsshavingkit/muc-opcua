@@ -21,8 +21,12 @@ jobs:
   # see docs/conformance/generator-drift.md.
   manifest-validation:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
