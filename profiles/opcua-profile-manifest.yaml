@@ -583,38 +583,24 @@
       "opc_cu_2166",
       "opc_cu_2184",
       "opc_cu_2185",
-      "opc_cu_2188",
       "opc_cu_2189",
       "opc_cu_2190",
       "opc_cu_2194",
       "opc_cu_2201",
-      "opc_cu_2210",
-      "opc_cu_2220",
       "opc_cu_2256",
-      "opc_cu_2263",
       "opc_cu_2264",
       "opc_cu_2271",
-      "opc_cu_2273",
       "opc_cu_2302",
-      "opc_cu_2303",
-      "opc_cu_2305",
-      "opc_cu_2314",
       "opc_cu_2317",
       "opc_cu_2318",
       "opc_cu_2328",
       "opc_cu_2332",
-      "opc_cu_2335",
-      "opc_cu_2339",
-      "opc_cu_2346",
-      "opc_cu_2350",
       "opc_cu_2352",
       "opc_cu_2375",
       "opc_cu_2376",
       "opc_cu_2377",
       "opc_cu_2380",
       "opc_cu_2381",
-      "opc_cu_2382",
-      "opc_cu_2384",
       "opc_cu_2389",
       "opc_cu_2394",
       "opc_cu_2400",
@@ -646,27 +632,18 @@
       "opc_cu_2939",
       "opc_cu_2954",
       "opc_cu_2958",
-      "opc_cu_2962",
       "opc_cu_2969",
-      "opc_cu_2975",
       "opc_cu_2978",
       "opc_cu_2984",
       "opc_cu_2988",
-      "opc_cu_2993",
-      "opc_cu_2996",
       "opc_cu_2998",
       "opc_cu_3010",
-      "opc_cu_3011",
-      "opc_cu_3032",
       "opc_cu_3048",
-      "opc_cu_3055",
-      "opc_cu_3061",
       "opc_cu_3062",
       "opc_cu_3072",
       "opc_cu_3073",
       "opc_cu_3075",
       "opc_cu_3080",
-      "opc_cu_3085",
       "opc_cu_3105",
       "opc_cu_3108",
       "opc_cu_3112",
@@ -675,7 +652,6 @@
       "opc_cu_3147",
       "opc_cu_3150",
       "opc_cu_3153",
-      "opc_cu_3159",
       "opc_cu_3170",
       "opc_cu_3175",
       "opc_cu_3184",
@@ -9511,36 +9487,6 @@
       "backing_tests": [],
       "cu_optional": true,
       "depends_on": [],
-      "id": "opc_cu_2993",
-      "implementation_state": "documented",
-      "kconfig_symbol": null,
-      "kind": "conformance_unit",
-      "notes": "Satisfied by project-level CU opc_cu_aggregate_annotation_count; the AnnotationCount aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_ANNOTATION_COUNT.",
-      "opc_display_name": "Aggregate \u2013 AnnotationCount",
-      "opc_reference": {
-        "cu_id": "2993",
-        "cu_name": "Aggregate \u2013 AnnotationCount",
-        "section": null,
-        "source_url": "https://profiles.opcfoundation.org",
-        "spec": null
-      },
-      "profile_defaults": {
-        "custom": false,
-        "embedded": false,
-        "full": true,
-        "micro": false,
-        "nano": false,
-        "standard": false
-      },
-      "satisfied_by": "opc_cu_aggregate_annotation_count",
-      "source_metadata": {
-        "source_endpoint": "profiles/opcua-server-conformance.json"
-      }
-    },
-    {
-      "backing_tests": [],
-      "cu_optional": true,
-      "depends_on": [],
       "id": "opc_cu_2375",
       "implementation_state": "documented",
       "kconfig_symbol": null,
@@ -9563,66 +9509,6 @@
         "standard": false
       },
       "satisfied_by": "opc_cu_aggregate_average",
-      "source_metadata": {
-        "source_endpoint": "profiles/opcua-server-conformance.json"
-      }
-    },
-    {
-      "backing_tests": [],
-      "cu_optional": true,
-      "depends_on": [],
-      "id": "opc_cu_2996",
-      "implementation_state": "documented",
-      "kconfig_symbol": null,
-      "kind": "conformance_unit",
-      "notes": "Satisfied by project-level CU opc_cu_aggregate_average; the Average aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_AVERAGE.",
-      "opc_display_name": "Aggregate \u2013 Average",
-      "opc_reference": {
-        "cu_id": "2996",
-        "cu_name": "Aggregate \u2013 Average",
-        "section": null,
-        "source_url": "https://profiles.opcfoundation.org",
-        "spec": null
-      },
-      "profile_defaults": {
-        "custom": false,
-        "embedded": false,
-        "full": true,
-        "micro": false,
-        "nano": false,
-        "standard": false
-      },
-      "satisfied_by": "opc_cu_aggregate_average",
-      "source_metadata": {
-        "source_endpoint": "profiles/opcua-server-conformance.json"
-      }
-    },
-    {
-      "backing_tests": [],
-      "cu_optional": true,
-      "depends_on": [],
-      "id": "opc_cu_2263",
-      "implementation_state": "documented",
-      "kconfig_symbol": null,
-      "kind": "conformance_unit",
-      "notes": "Satisfied by project-level CU opc_cu_aggregate_count; the Count aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_COUNT.",
-      "opc_display_name": "Aggregate \u2013 Count",
-      "opc_reference": {
-        "cu_id": "2263",
-        "cu_name": "Aggregate \u2013 Count",
-        "section": null,
-        "source_url": "https://profiles.opcfoundation.org",
-        "spec": null
-      },
-      "profile_defaults": {
-        "custom": false,
-        "embedded": false,
-        "full": true,
-        "micro": false,
-        "nano": false,
-        "standard": false
-      },
-      "satisfied_by": "opc_cu_aggregate_count",
       "source_metadata": {
         "source_endpoint": "profiles/opcua-server-conformance.json"
       }
@@ -9691,36 +9577,6 @@
       "backing_tests": [],
       "cu_optional": true,
       "depends_on": [],
-      "id": "opc_cu_2335",
-      "implementation_state": "documented",
-      "kconfig_symbol": null,
-      "kind": "conformance_unit",
-      "notes": "Satisfied by project-level CU opc_cu_aggregate_delta; the Delta aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_DELTA.",
-      "opc_display_name": "Aggregate \u2013 Delta",
-      "opc_reference": {
-        "cu_id": "2335",
-        "cu_name": "Aggregate \u2013 Delta",
-        "section": null,
-        "source_url": "https://profiles.opcfoundation.org",
-        "spec": null
-      },
-      "profile_defaults": {
-        "custom": false,
-        "embedded": false,
-        "full": true,
-        "micro": false,
-        "nano": false,
-        "standard": false
-      },
-      "satisfied_by": "opc_cu_aggregate_delta",
-      "source_metadata": {
-        "source_endpoint": "profiles/opcua-server-conformance.json"
-      }
-    },
-    {
-      "backing_tests": [],
-      "cu_optional": true,
-      "depends_on": [],
       "id": "opc_cu_2194",
       "implementation_state": "documented",
       "kconfig_symbol": null,
@@ -9743,66 +9599,6 @@
         "standard": false
       },
       "satisfied_by": "opc_cu_aggregate_delta_bounds",
-      "source_metadata": {
-        "source_endpoint": "profiles/opcua-server-conformance.json"
-      }
-    },
-    {
-      "backing_tests": [],
-      "cu_optional": true,
-      "depends_on": [],
-      "id": "opc_cu_2350",
-      "implementation_state": "documented",
-      "kconfig_symbol": null,
-      "kind": "conformance_unit",
-      "notes": "Satisfied by project-level CU opc_cu_aggregate_delta_bounds; the DeltaBounds aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_DELTA_BOUNDS.",
-      "opc_display_name": "Aggregate \u2013 DeltaBounds",
-      "opc_reference": {
-        "cu_id": "2350",
-        "cu_name": "Aggregate \u2013 DeltaBounds",
-        "section": null,
-        "source_url": "https://profiles.opcfoundation.org",
-        "spec": null
-      },
-      "profile_defaults": {
-        "custom": false,
-        "embedded": false,
-        "full": true,
-        "micro": false,
-        "nano": false,
-        "standard": false
-      },
-      "satisfied_by": "opc_cu_aggregate_delta_bounds",
-      "source_metadata": {
-        "source_endpoint": "profiles/opcua-server-conformance.json"
-      }
-    },
-    {
-      "backing_tests": [],
-      "cu_optional": true,
-      "depends_on": [],
-      "id": "opc_cu_2314",
-      "implementation_state": "documented",
-      "kconfig_symbol": null,
-      "kind": "conformance_unit",
-      "notes": "Satisfied by project-level CU opc_cu_aggregate_duration_bad; the DurationBad aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_DURATION_BAD.",
-      "opc_display_name": "Aggregate \u2013 DurationBad",
-      "opc_reference": {
-        "cu_id": "2314",
-        "cu_name": "Aggregate \u2013 DurationBad",
-        "section": null,
-        "source_url": "https://profiles.opcfoundation.org",
-        "spec": null
-      },
-      "profile_defaults": {
-        "custom": false,
-        "embedded": false,
-        "full": true,
-        "micro": false,
-        "nano": false,
-        "standard": false
-      },
-      "satisfied_by": "opc_cu_aggregate_duration_bad",
       "source_metadata": {
         "source_endpoint": "profiles/opcua-server-conformance.json"
       }
@@ -9841,36 +9637,6 @@
       "backing_tests": [],
       "cu_optional": true,
       "depends_on": [],
-      "id": "opc_cu_3085",
-      "implementation_state": "documented",
-      "kconfig_symbol": null,
-      "kind": "conformance_unit",
-      "notes": "Satisfied by project-level CU opc_cu_aggregate_duration_good; the DurationGood aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_DURATION_GOOD.",
-      "opc_display_name": "Aggregate \u2013 DurationGood",
-      "opc_reference": {
-        "cu_id": "3085",
-        "cu_name": "Aggregate \u2013 DurationGood",
-        "section": null,
-        "source_url": "https://profiles.opcfoundation.org",
-        "spec": null
-      },
-      "profile_defaults": {
-        "custom": false,
-        "embedded": false,
-        "full": true,
-        "micro": false,
-        "nano": false,
-        "standard": false
-      },
-      "satisfied_by": "opc_cu_aggregate_duration_good",
-      "source_metadata": {
-        "source_endpoint": "profiles/opcua-server-conformance.json"
-      }
-    },
-    {
-      "backing_tests": [],
-      "cu_optional": true,
-      "depends_on": [],
       "id": "opc_cu_3105",
       "implementation_state": "documented",
       "kconfig_symbol": null,
@@ -9893,36 +9659,6 @@
         "standard": false
       },
       "satisfied_by": "opc_cu_aggregate_duration_good",
-      "source_metadata": {
-        "source_endpoint": "profiles/opcua-server-conformance.json"
-      }
-    },
-    {
-      "backing_tests": [],
-      "cu_optional": true,
-      "depends_on": [],
-      "id": "opc_cu_2220",
-      "implementation_state": "documented",
-      "kconfig_symbol": null,
-      "kind": "conformance_unit",
-      "notes": "Satisfied by project-level CU opc_cu_aggregate_duration_state_zero; the DurationInStateZero aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_DURATION_IN_STATE_ZERO.",
-      "opc_display_name": "Aggregate \u2013 DurationInStateZero",
-      "opc_reference": {
-        "cu_id": "2220",
-        "cu_name": "Aggregate \u2013 DurationInStateZero",
-        "section": null,
-        "source_url": "https://profiles.opcfoundation.org",
-        "spec": null
-      },
-      "profile_defaults": {
-        "custom": false,
-        "embedded": false,
-        "full": true,
-        "micro": false,
-        "nano": false,
-        "standard": false
-      },
-      "satisfied_by": "opc_cu_aggregate_duration_state_zero",
       "source_metadata": {
         "source_endpoint": "profiles/opcua-server-conformance.json"
       }
@@ -9991,36 +9727,6 @@
       "backing_tests": [],
       "cu_optional": true,
       "depends_on": [],
-      "id": "opc_cu_3061",
-      "implementation_state": "documented",
-      "kconfig_symbol": null,
-      "kind": "conformance_unit",
-      "notes": "Satisfied by project-level CU opc_cu_aggregate_end; the End aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_END.",
-      "opc_display_name": "Aggregate \u2013 End",
-      "opc_reference": {
-        "cu_id": "3061",
-        "cu_name": "Aggregate \u2013 End",
-        "section": null,
-        "source_url": "https://profiles.opcfoundation.org",
-        "spec": null
-      },
-      "profile_defaults": {
-        "custom": false,
-        "embedded": false,
-        "full": true,
-        "micro": false,
-        "nano": false,
-        "standard": false
-      },
-      "satisfied_by": "opc_cu_aggregate_end",
-      "source_metadata": {
-        "source_endpoint": "profiles/opcua-server-conformance.json"
-      }
-    },
-    {
-      "backing_tests": [],
-      "cu_optional": true,
-      "depends_on": [],
       "id": "opc_cu_2754",
       "implementation_state": "documented",
       "kconfig_symbol": null,
@@ -10030,36 +9736,6 @@
       "opc_reference": {
         "cu_id": "2754",
         "cu_name": "Aggregate Subscription \u2013 Interpolative",
-        "section": null,
-        "source_url": "https://profiles.opcfoundation.org",
-        "spec": null
-      },
-      "profile_defaults": {
-        "custom": false,
-        "embedded": false,
-        "full": true,
-        "micro": false,
-        "nano": false,
-        "standard": false
-      },
-      "satisfied_by": "opc_cu_aggregate_interpolative",
-      "source_metadata": {
-        "source_endpoint": "profiles/opcua-server-conformance.json"
-      }
-    },
-    {
-      "backing_tests": [],
-      "cu_optional": true,
-      "depends_on": [],
-      "id": "opc_cu_3159",
-      "implementation_state": "documented",
-      "kconfig_symbol": null,
-      "kind": "conformance_unit",
-      "notes": "Satisfied by project-level CU opc_cu_aggregate_interpolative; the Interpolative aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_INTERPOLATIVE.",
-      "opc_display_name": "Aggregate \u2013 Interpolative",
-      "opc_reference": {
-        "cu_id": "3159",
-        "cu_name": "Aggregate \u2013 Interpolative",
         "section": null,
         "source_url": "https://profiles.opcfoundation.org",
         "spec": null
@@ -10111,36 +9787,6 @@
       "backing_tests": [],
       "cu_optional": true,
       "depends_on": [],
-      "id": "opc_cu_2962",
-      "implementation_state": "documented",
-      "kconfig_symbol": null,
-      "kind": "conformance_unit",
-      "notes": "Satisfied by project-level CU opc_cu_aggregate_maximum; the Maximum aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_MAXIMUM.",
-      "opc_display_name": "Aggregate \u2013 Maximum",
-      "opc_reference": {
-        "cu_id": "2962",
-        "cu_name": "Aggregate \u2013 Maximum",
-        "section": null,
-        "source_url": "https://profiles.opcfoundation.org",
-        "spec": null
-      },
-      "profile_defaults": {
-        "custom": false,
-        "embedded": false,
-        "full": true,
-        "micro": false,
-        "nano": false,
-        "standard": false
-      },
-      "satisfied_by": "opc_cu_aggregate_maximum",
-      "source_metadata": {
-        "source_endpoint": "profiles/opcua-server-conformance.json"
-      }
-    },
-    {
-      "backing_tests": [],
-      "cu_optional": true,
-      "depends_on": [],
       "id": "opc_cu_2166",
       "implementation_state": "documented",
       "kconfig_symbol": null,
@@ -10163,66 +9809,6 @@
         "standard": false
       },
       "satisfied_by": "opc_cu_aggregate_maximum_2",
-      "source_metadata": {
-        "source_endpoint": "profiles/opcua-server-conformance.json"
-      }
-    },
-    {
-      "backing_tests": [],
-      "cu_optional": true,
-      "depends_on": [],
-      "id": "opc_cu_2188",
-      "implementation_state": "documented",
-      "kconfig_symbol": null,
-      "kind": "conformance_unit",
-      "notes": "Satisfied by project-level CU opc_cu_aggregate_maximum_2; the Maximum2 aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_MAXIMUM_2.",
-      "opc_display_name": "Aggregate \u2013 Maximum2",
-      "opc_reference": {
-        "cu_id": "2188",
-        "cu_name": "Aggregate \u2013 Maximum2",
-        "section": null,
-        "source_url": "https://profiles.opcfoundation.org",
-        "spec": null
-      },
-      "profile_defaults": {
-        "custom": false,
-        "embedded": false,
-        "full": true,
-        "micro": false,
-        "nano": false,
-        "standard": false
-      },
-      "satisfied_by": "opc_cu_aggregate_maximum_2",
-      "source_metadata": {
-        "source_endpoint": "profiles/opcua-server-conformance.json"
-      }
-    },
-    {
-      "backing_tests": [],
-      "cu_optional": true,
-      "depends_on": [],
-      "id": "opc_cu_2346",
-      "implementation_state": "documented",
-      "kconfig_symbol": null,
-      "kind": "conformance_unit",
-      "notes": "Satisfied by project-level CU opc_cu_aggregate_minimum; the Minimum aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_MINIMUM.",
-      "opc_display_name": "Aggregate \u2013 Minimum",
-      "opc_reference": {
-        "cu_id": "2346",
-        "cu_name": "Aggregate \u2013 Minimum",
-        "section": null,
-        "source_url": "https://profiles.opcfoundation.org",
-        "spec": null
-      },
-      "profile_defaults": {
-        "custom": false,
-        "embedded": false,
-        "full": true,
-        "micro": false,
-        "nano": false,
-        "standard": false
-      },
-      "satisfied_by": "opc_cu_aggregate_minimum",
       "source_metadata": {
         "source_endpoint": "profiles/opcua-server-conformance.json"
       }
@@ -10291,66 +9877,6 @@
       "backing_tests": [],
       "cu_optional": true,
       "depends_on": [],
-      "id": "opc_cu_2382",
-      "implementation_state": "documented",
-      "kconfig_symbol": null,
-      "kind": "conformance_unit",
-      "notes": "Satisfied by project-level CU opc_cu_aggregate_minimum_2; the Minimum2 aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_MINIMUM_2.",
-      "opc_display_name": "Aggregate \u2013 Minimum2",
-      "opc_reference": {
-        "cu_id": "2382",
-        "cu_name": "Aggregate \u2013 Minimum2",
-        "section": null,
-        "source_url": "https://profiles.opcfoundation.org",
-        "spec": null
-      },
-      "profile_defaults": {
-        "custom": false,
-        "embedded": false,
-        "full": true,
-        "micro": false,
-        "nano": false,
-        "standard": false
-      },
-      "satisfied_by": "opc_cu_aggregate_minimum_2",
-      "source_metadata": {
-        "source_endpoint": "profiles/opcua-server-conformance.json"
-      }
-    },
-    {
-      "backing_tests": [],
-      "cu_optional": true,
-      "depends_on": [],
-      "id": "opc_cu_2975",
-      "implementation_state": "documented",
-      "kconfig_symbol": null,
-      "kind": "conformance_unit",
-      "notes": "Satisfied by project-level CU opc_cu_aggregate_percent_bad; the PercentBad aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_PERCENT_BAD.",
-      "opc_display_name": "Aggregate \u2013 PercentBad",
-      "opc_reference": {
-        "cu_id": "2975",
-        "cu_name": "Aggregate \u2013 PercentBad",
-        "section": null,
-        "source_url": "https://profiles.opcfoundation.org",
-        "spec": null
-      },
-      "profile_defaults": {
-        "custom": false,
-        "embedded": false,
-        "full": true,
-        "micro": false,
-        "nano": false,
-        "standard": false
-      },
-      "satisfied_by": "opc_cu_aggregate_percent_bad",
-      "source_metadata": {
-        "source_endpoint": "profiles/opcua-server-conformance.json"
-      }
-    },
-    {
-      "backing_tests": [],
-      "cu_optional": true,
-      "depends_on": [],
       "id": "opc_cu_3010",
       "implementation_state": "documented",
       "kconfig_symbol": null,
@@ -10373,36 +9899,6 @@
         "standard": false
       },
       "satisfied_by": "opc_cu_aggregate_percent_bad",
-      "source_metadata": {
-        "source_endpoint": "profiles/opcua-server-conformance.json"
-      }
-    },
-    {
-      "backing_tests": [],
-      "cu_optional": true,
-      "depends_on": [],
-      "id": "opc_cu_2303",
-      "implementation_state": "documented",
-      "kconfig_symbol": null,
-      "kind": "conformance_unit",
-      "notes": "Satisfied by project-level CU opc_cu_aggregate_percent_good; the PercentGood aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_PERCENT_GOOD.",
-      "opc_display_name": "Aggregate \u2013 PercentGood",
-      "opc_reference": {
-        "cu_id": "2303",
-        "cu_name": "Aggregate \u2013 PercentGood",
-        "section": null,
-        "source_url": "https://profiles.opcfoundation.org",
-        "spec": null
-      },
-      "profile_defaults": {
-        "custom": false,
-        "embedded": false,
-        "full": true,
-        "micro": false,
-        "nano": false,
-        "standard": false
-      },
-      "satisfied_by": "opc_cu_aggregate_percent_good",
       "source_metadata": {
         "source_endpoint": "profiles/opcua-server-conformance.json"
       }
@@ -10471,66 +9967,6 @@
       "backing_tests": [],
       "cu_optional": true,
       "depends_on": [],
-      "id": "opc_cu_3011",
-      "implementation_state": "documented",
-      "kconfig_symbol": null,
-      "kind": "conformance_unit",
-      "notes": "Satisfied by project-level CU opc_cu_aggregate_range; the Range aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_RANGE.",
-      "opc_display_name": "Aggregate \u2013 Range",
-      "opc_reference": {
-        "cu_id": "3011",
-        "cu_name": "Aggregate \u2013 Range",
-        "section": null,
-        "source_url": "https://profiles.opcfoundation.org",
-        "spec": null
-      },
-      "profile_defaults": {
-        "custom": false,
-        "embedded": false,
-        "full": true,
-        "micro": false,
-        "nano": false,
-        "standard": false
-      },
-      "satisfied_by": "opc_cu_aggregate_range",
-      "source_metadata": {
-        "source_endpoint": "profiles/opcua-server-conformance.json"
-      }
-    },
-    {
-      "backing_tests": [],
-      "cu_optional": true,
-      "depends_on": [],
-      "id": "opc_cu_2339",
-      "implementation_state": "documented",
-      "kconfig_symbol": null,
-      "kind": "conformance_unit",
-      "notes": "Satisfied by project-level CU opc_cu_aggregate_start; the Start aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_START.",
-      "opc_display_name": "Aggregate \u2013 Start",
-      "opc_reference": {
-        "cu_id": "2339",
-        "cu_name": "Aggregate \u2013 Start",
-        "section": null,
-        "source_url": "https://profiles.opcfoundation.org",
-        "spec": null
-      },
-      "profile_defaults": {
-        "custom": false,
-        "embedded": false,
-        "full": true,
-        "micro": false,
-        "nano": false,
-        "standard": false
-      },
-      "satisfied_by": "opc_cu_aggregate_start",
-      "source_metadata": {
-        "source_endpoint": "profiles/opcua-server-conformance.json"
-      }
-    },
-    {
-      "backing_tests": [],
-      "cu_optional": true,
-      "depends_on": [],
       "id": "opc_cu_3108",
       "implementation_state": "documented",
       "kconfig_symbol": null,
@@ -10553,36 +9989,6 @@
         "standard": false
       },
       "satisfied_by": "opc_cu_aggregate_start",
-      "source_metadata": {
-        "source_endpoint": "profiles/opcua-server-conformance.json"
-      }
-    },
-    {
-      "backing_tests": [],
-      "cu_optional": true,
-      "depends_on": [],
-      "id": "opc_cu_2305",
-      "implementation_state": "documented",
-      "kconfig_symbol": null,
-      "kind": "conformance_unit",
-      "notes": "Satisfied by project-level CU opc_cu_aggregate_time_average; the TimeAverage aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_TIME_AVERAGE.",
-      "opc_display_name": "Aggregate \u2013 TimeAverage",
-      "opc_reference": {
-        "cu_id": "2305",
-        "cu_name": "Aggregate \u2013 TimeAverage",
-        "section": null,
-        "source_url": "https://profiles.opcfoundation.org",
-        "spec": null
-      },
-      "profile_defaults": {
-        "custom": false,
-        "embedded": false,
-        "full": true,
-        "micro": false,
-        "nano": false,
-        "standard": false
-      },
-      "satisfied_by": "opc_cu_aggregate_time_average",
       "source_metadata": {
         "source_endpoint": "profiles/opcua-server-conformance.json"
       }
@@ -10621,36 +10027,6 @@
       "backing_tests": [],
       "cu_optional": true,
       "depends_on": [],
-      "id": "opc_cu_2273",
-      "implementation_state": "documented",
-      "kconfig_symbol": null,
-      "kind": "conformance_unit",
-      "notes": "Satisfied by project-level CU opc_cu_aggregate_time_average_2; the TimeAverage2 aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_TIME_AVERAGE_2.",
-      "opc_display_name": "Aggregate \u2013 TimeAverage2",
-      "opc_reference": {
-        "cu_id": "2273",
-        "cu_name": "Aggregate \u2013 TimeAverage2",
-        "section": null,
-        "source_url": "https://profiles.opcfoundation.org",
-        "spec": null
-      },
-      "profile_defaults": {
-        "custom": false,
-        "embedded": false,
-        "full": true,
-        "micro": false,
-        "nano": false,
-        "standard": false
-      },
-      "satisfied_by": "opc_cu_aggregate_time_average_2",
-      "source_metadata": {
-        "source_endpoint": "profiles/opcua-server-conformance.json"
-      }
-    },
-    {
-      "backing_tests": [],
-      "cu_optional": true,
-      "depends_on": [],
       "id": "opc_cu_3126",
       "implementation_state": "documented",
       "kconfig_symbol": null,
@@ -10673,36 +10049,6 @@
         "standard": false
       },
       "satisfied_by": "opc_cu_aggregate_time_average_2",
-      "source_metadata": {
-        "source_endpoint": "profiles/opcua-server-conformance.json"
-      }
-    },
-    {
-      "backing_tests": [],
-      "cu_optional": true,
-      "depends_on": [],
-      "id": "opc_cu_3032",
-      "implementation_state": "documented",
-      "kconfig_symbol": null,
-      "kind": "conformance_unit",
-      "notes": "Satisfied by project-level CU opc_cu_aggregate_total; the Total aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_TOTAL.",
-      "opc_display_name": "Aggregate \u2013 Total",
-      "opc_reference": {
-        "cu_id": "3032",
-        "cu_name": "Aggregate \u2013 Total",
-        "section": null,
-        "source_url": "https://profiles.opcfoundation.org",
-        "spec": null
-      },
-      "profile_defaults": {
-        "custom": false,
-        "embedded": false,
-        "full": true,
-        "micro": false,
-        "nano": false,
-        "standard": false
-      },
-      "satisfied_by": "opc_cu_aggregate_total",
       "source_metadata": {
         "source_endpoint": "profiles/opcua-server-conformance.json"
       }
@@ -10771,36 +10117,6 @@
       "backing_tests": [],
       "cu_optional": true,
       "depends_on": [],
-      "id": "opc_cu_2210",
-      "implementation_state": "documented",
-      "kconfig_symbol": null,
-      "kind": "conformance_unit",
-      "notes": "Satisfied by project-level CU opc_cu_aggregate_total_2; the Total2 aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_TOTAL_2.",
-      "opc_display_name": "Aggregate \u2013 Total2",
-      "opc_reference": {
-        "cu_id": "2210",
-        "cu_name": "Aggregate \u2013 Total2",
-        "section": null,
-        "source_url": "https://profiles.opcfoundation.org",
-        "spec": null
-      },
-      "profile_defaults": {
-        "custom": false,
-        "embedded": false,
-        "full": true,
-        "micro": false,
-        "nano": false,
-        "standard": false
-      },
-      "satisfied_by": "opc_cu_aggregate_total_2",
-      "source_metadata": {
-        "source_endpoint": "profiles/opcua-server-conformance.json"
-      }
-    },
-    {
-      "backing_tests": [],
-      "cu_optional": true,
-      "depends_on": [],
       "id": "opc_cu_2201",
       "implementation_state": "documented",
       "kconfig_symbol": null,
@@ -10823,66 +10139,6 @@
         "standard": false
       },
       "satisfied_by": "opc_cu_aggregate_worst_quality",
-      "source_metadata": {
-        "source_endpoint": "profiles/opcua-server-conformance.json"
-      }
-    },
-    {
-      "backing_tests": [],
-      "cu_optional": true,
-      "depends_on": [],
-      "id": "opc_cu_3055",
-      "implementation_state": "documented",
-      "kconfig_symbol": null,
-      "kind": "conformance_unit",
-      "notes": "Satisfied by project-level CU opc_cu_aggregate_worst_quality; the WorstQuality aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_WORST_QUALITY.",
-      "opc_display_name": "Aggregate \u2013 WorstQuality",
-      "opc_reference": {
-        "cu_id": "3055",
-        "cu_name": "Aggregate \u2013 WorstQuality",
-        "section": null,
-        "source_url": "https://profiles.opcfoundation.org",
-        "spec": null
-      },
-      "profile_defaults": {
-        "custom": false,
-        "embedded": false,
-        "full": true,
-        "micro": false,
-        "nano": false,
-        "standard": false
-      },
-      "satisfied_by": "opc_cu_aggregate_worst_quality",
-      "source_metadata": {
-        "source_endpoint": "profiles/opcua-server-conformance.json"
-      }
-    },
-    {
-      "backing_tests": [],
-      "cu_optional": true,
-      "depends_on": [],
-      "id": "opc_cu_2384",
-      "implementation_state": "documented",
-      "kconfig_symbol": null,
-      "kind": "conformance_unit",
-      "notes": "Satisfied by project-level CU opc_cu_aggregate_worst_quality_2; the WorstQuality2 aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_WORST_QUALITY_2.",
-      "opc_display_name": "Aggregate \u2013 WorstQuality2",
-      "opc_reference": {
-        "cu_id": "2384",
-        "cu_name": "Aggregate \u2013 WorstQuality2",
-        "section": null,
-        "source_url": "https://profiles.opcfoundation.org",
-        "spec": null
-      },
-      "profile_defaults": {
-        "custom": false,
-        "embedded": false,
-        "full": true,
-        "micro": false,
-        "nano": false,
-        "standard": false
-      },
-      "satisfied_by": "opc_cu_aggregate_worst_quality_2",
       "source_metadata": {
         "source_endpoint": "profiles/opcua-server-conformance.json"
       }
