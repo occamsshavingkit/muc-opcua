@@ -90,11 +90,26 @@ def _opc_function_name(const_suffix: str) -> str:
     return "".join(part.capitalize() for part in const_suffix.split("_"))
 
 
+# Functions that ARE dispatched but not faithfully: being handled by an
+# MU_ID_AGGREGATETYPE_* branch is necessary evidence, not sufficient. Anything
+# here computes the wrong quantity and must not be claimed.
+#
+#   AnnotationCount shares the Count branch in subscription_aggregate.c
+#   (accumulator.count.value++ per sample) and the server stores no annotations,
+#   so a client requesting it receives the sample count, not the annotation
+#   count. Until an annotation path exists it is not implemented.
+_DISPATCHED_BUT_NOT_FAITHFUL = frozenset({"AnnotationCount"})
+
+
 def _implemented_functions() -> set[str]:
-    """Aggregate functions the server actually computes (declared AND dispatched)."""
+    """Aggregate functions the server faithfully computes.
+
+    Declared AND dispatched, minus the ones dispatched to a branch that computes
+    the wrong quantity (``_DISPATCHED_BUT_NOT_FAITHFUL``).
+    """
     declared = set(_CONST_RE.findall(_IDS_H.read_text(encoding="utf-8")))
     dispatched = set(_CONST_RE.findall(_DISPATCH_C.read_text(encoding="utf-8")))
-    return {_opc_function_name(c) for c in declared & dispatched}
+    return {_opc_function_name(c) for c in declared & dispatched} - _DISPATCHED_BUT_NOT_FAITHFUL
 
 
 def _catalog_aggregate_cus() -> dict[str, dict[str, list[str]]]:
@@ -147,12 +162,13 @@ class AggregateCuReconciliationTest(unittest.TestCase):
         """
         self.assertEqual(
             len(self.implemented),
-            24,
-            "expected 24 declared-and-dispatched aggregate functions, got "
-            + repr(sorted(self.implemented)),
+            23,
+            "expected 23 faithfully-implemented aggregate functions (24 dispatched "
+            "minus AnnotationCount), got " + repr(sorted(self.implemented)),
         )
         self.assertIn("TimeAverage2", self.implemented)
         self.assertIn("DurationInStateZero", self.implemented)
+        self.assertNotIn("AnnotationCount", self.implemented)
         self.assertGreater(len(self.catalog[_SUBSCRIPTION_KIND]), 30)
         self.assertGreater(len(self.catalog[_HISTORICAL_KIND]), 30)
 

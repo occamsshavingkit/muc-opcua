@@ -579,7 +579,6 @@
       "opc_cu_1580",
       "opc_cu_1581",
       "opc_cu_1710",
-      "opc_cu_2165",
       "opc_cu_2166",
       "opc_cu_2184",
       "opc_cu_2185",
@@ -9457,36 +9456,6 @@
       "backing_tests": [],
       "cu_optional": true,
       "depends_on": [],
-      "id": "opc_cu_2165",
-      "implementation_state": "documented",
-      "kconfig_symbol": null,
-      "kind": "conformance_unit",
-      "notes": "Satisfied by project-level CU opc_cu_aggregate_annotation_count; the AnnotationCount aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_ANNOTATION_COUNT.",
-      "opc_display_name": "Aggregate Subscription \u2013 AnnotationCount",
-      "opc_reference": {
-        "cu_id": "2165",
-        "cu_name": "Aggregate Subscription \u2013 AnnotationCount",
-        "section": null,
-        "source_url": "https://profiles.opcfoundation.org",
-        "spec": null
-      },
-      "profile_defaults": {
-        "custom": false,
-        "embedded": false,
-        "full": true,
-        "micro": false,
-        "nano": false,
-        "standard": false
-      },
-      "satisfied_by": "opc_cu_aggregate_annotation_count",
-      "source_metadata": {
-        "source_endpoint": "profiles/opcua-server-conformance.json"
-      }
-    },
-    {
-      "backing_tests": [],
-      "cu_optional": true,
-      "depends_on": [],
       "id": "opc_cu_2375",
       "implementation_state": "documented",
       "kconfig_symbol": null,
@@ -9496,9 +9465,9 @@
       "opc_reference": {
         "cu_id": "2375",
         "cu_name": "Aggregate Subscription \u2013 Average",
-        "section": null,
+        "section": "5.4.3.5",
         "source_url": "https://profiles.opcfoundation.org",
-        "spec": null
+        "spec": "OPC-10000-13"
       },
       "profile_defaults": {
         "custom": false,
@@ -9526,9 +9495,9 @@
       "opc_reference": {
         "cu_id": "2958",
         "cu_name": "Aggregate Subscription \u2013 Count",
-        "section": null,
+        "section": "5.4.3.21",
         "source_url": "https://profiles.opcfoundation.org",
-        "spec": null
+        "spec": "OPC-10000-13"
       },
       "profile_defaults": {
         "custom": false,
@@ -9556,9 +9525,9 @@
       "opc_reference": {
         "cu_id": "2256",
         "cu_name": "Aggregate Subscription \u2013 Delta",
-        "section": null,
+        "section": "5.4.3.27",
         "source_url": "https://profiles.opcfoundation.org",
-        "spec": null
+        "spec": "OPC-10000-13"
       },
       "profile_defaults": {
         "custom": false,
@@ -9586,9 +9555,9 @@
       "opc_reference": {
         "cu_id": "2194",
         "cu_name": "Aggregate Subscription \u2013 DeltaBounds",
-        "section": null,
+        "section": "5.4.3.30",
         "source_url": "https://profiles.opcfoundation.org",
-        "spec": null
+        "spec": "OPC-10000-13"
       },
       "profile_defaults": {
         "custom": false,
@@ -9616,9 +9585,9 @@
       "opc_reference": {
         "cu_id": "2954",
         "cu_name": "Aggregate Subscription \u2013 DurationBad",
-        "section": null,
+        "section": "5.4.3.32",
         "source_url": "https://profiles.opcfoundation.org",
-        "spec": null
+        "spec": "OPC-10000-13"
       },
       "profile_defaults": {
         "custom": false,
@@ -9646,9 +9615,9 @@
       "opc_reference": {
         "cu_id": "3105",
         "cu_name": "Aggregate Subscription \u2013 DurationGood",
-        "section": null,
+        "section": "5.4.3.31",
         "source_url": "https://profiles.opcfoundation.org",
-        "spec": null
+        "spec": "OPC-10000-13"
       },
       "profile_defaults": {
         "custom": false,
@@ -9676,9 +9645,9 @@
       "opc_reference": {
         "cu_id": "2998",
         "cu_name": "Aggregate Subscription \u2013 DurationInStateZero",
-        "section": null,
+        "section": "5.4.3.22",
         "source_url": "https://profiles.opcfoundation.org",
-        "spec": null
+        "spec": "OPC-10000-13"
       },
       "profile_defaults": {
         "custom": false,
@@ -9706,9 +9675,9 @@
       "opc_reference": {
         "cu_id": "2743",
         "cu_name": "Aggregate Subscription \u2013 End",
-        "section": null,
+        "section": "5.4.3.26",
         "source_url": "https://profiles.opcfoundation.org",
-        "spec": null
+        "spec": "OPC-10000-13"
       },
       "profile_defaults": {
         "custom": false,
@@ -9736,9 +9705,9 @@
       "opc_reference": {
         "cu_id": "2754",
         "cu_name": "Aggregate Subscription \u2013 Interpolative",
-        "section": null,
+        "section": "5.4.3.4",
         "source_url": "https://profiles.opcfoundation.org",
-        "spec": null
+        "spec": "OPC-10000-13"
       },
       "profile_defaults": {
         "custom": false,
@@ -9766,9 +9735,9 @@
       "opc_reference": {
         "cu_id": "2381",
         "cu_name": "Aggregate Subscription \u2013 Maximum",
-        "section": null,
+        "section": "5.4.3.11",
         "source_url": "https://profiles.opcfoundation.org",
-        "spec": null
+        "spec": "OPC-10000-13"
       },
       "profile_defaults": {
         "custom": false,
@@ -9796,9 +9765,9 @@
       "opc_reference": {
         "cu_id": "2166",
         "cu_name": "Aggregate Subscription \u2013 Maximum2",
-        "section": null,
+        "section": "5.4.3.16",
         "source_url": "https://profiles.opcfoundation.org",
-        "spec": null
+        "spec": "OPC-10000-13"
       },
       "profile_defaults": {
         "custom": false,
@@ -9826,9 +9795,9 @@
       "opc_reference": {
         "cu_id": "2376",
         "cu_name": "Aggregate Subscription \u2013 Minimum",
-        "section": null,
+        "section": "5.4.3.10",
         "source_url": "https://profiles.opcfoundation.org",
-        "spec": null
+        "spec": "OPC-10000-13"
       },
       "profile_defaults": {
         "custom": false,
@@ -9856,9 +9825,9 @@
       "opc_reference": {
         "cu_id": "2302",
         "cu_name": "Aggregate Subscription \u2013 Minimum2",
-        "section": null,
+        "section": "5.4.3.15",
         "source_url": "https://profiles.opcfoundation.org",
-        "spec": null
+        "spec": "OPC-10000-13"
       },
       "profile_defaults": {
         "custom": false,
@@ -9886,9 +9855,9 @@
       "opc_reference": {
         "cu_id": "3010",
         "cu_name": "Aggregate Subscription \u2013 PercentBad",
-        "section": null,
+        "section": "5.4.3.34",
         "source_url": "https://profiles.opcfoundation.org",
-        "spec": null
+        "spec": "OPC-10000-13"
       },
       "profile_defaults": {
         "custom": false,
@@ -9916,9 +9885,9 @@
       "opc_reference": {
         "cu_id": "3048",
         "cu_name": "Aggregate Subscription \u2013 PercentGood",
-        "section": null,
+        "section": "5.4.3.33",
         "source_url": "https://profiles.opcfoundation.org",
-        "spec": null
+        "spec": "OPC-10000-13"
       },
       "profile_defaults": {
         "custom": false,
@@ -9946,9 +9915,9 @@
       "opc_reference": {
         "cu_id": "2377",
         "cu_name": "Aggregate Subscription \u2013 Range",
-        "section": null,
+        "section": "5.4.3.14",
         "source_url": "https://profiles.opcfoundation.org",
-        "spec": null
+        "spec": "OPC-10000-13"
       },
       "profile_defaults": {
         "custom": false,
@@ -9976,9 +9945,9 @@
       "opc_reference": {
         "cu_id": "3108",
         "cu_name": "Aggregate Subscription \u2013 Start",
-        "section": null,
+        "section": "5.4.3.25",
         "source_url": "https://profiles.opcfoundation.org",
-        "spec": null
+        "spec": "OPC-10000-13"
       },
       "profile_defaults": {
         "custom": false,
@@ -10006,9 +9975,9 @@
       "opc_reference": {
         "cu_id": "3075",
         "cu_name": "Aggregate Subscription \u2013 TimeAverage",
-        "section": null,
+        "section": "5.4.3.6",
         "source_url": "https://profiles.opcfoundation.org",
-        "spec": null
+        "spec": "OPC-10000-13"
       },
       "profile_defaults": {
         "custom": false,
@@ -10036,9 +10005,9 @@
       "opc_reference": {
         "cu_id": "3126",
         "cu_name": "Aggregate Subscription \u2013 TimeAverage2",
-        "section": null,
+        "section": "5.4.3.7",
         "source_url": "https://profiles.opcfoundation.org",
-        "spec": null
+        "spec": "OPC-10000-13"
       },
       "profile_defaults": {
         "custom": false,
@@ -10066,9 +10035,9 @@
       "opc_reference": {
         "cu_id": "3062",
         "cu_name": "Aggregate Subscription \u2013 Total",
-        "section": null,
+        "section": "5.4.3.8",
         "source_url": "https://profiles.opcfoundation.org",
-        "spec": null
+        "spec": "OPC-10000-13"
       },
       "profile_defaults": {
         "custom": false,
@@ -10096,9 +10065,9 @@
       "opc_reference": {
         "cu_id": "2184",
         "cu_name": "Aggregate Subscription \u2013 Total2",
-        "section": null,
+        "section": "5.4.3.9",
         "source_url": "https://profiles.opcfoundation.org",
-        "spec": null
+        "spec": "OPC-10000-13"
       },
       "profile_defaults": {
         "custom": false,
@@ -10126,9 +10095,9 @@
       "opc_reference": {
         "cu_id": "2201",
         "cu_name": "Aggregate Subscription \u2013 WorstQuality",
-        "section": null,
+        "section": "5.4.3.35",
         "source_url": "https://profiles.opcfoundation.org",
-        "spec": null
+        "spec": "OPC-10000-13"
       },
       "profile_defaults": {
         "custom": false,
@@ -10156,9 +10125,9 @@
       "opc_reference": {
         "cu_id": "2408",
         "cu_name": "Aggregate Subscription \u2013 WorstQuality2",
-        "section": null,
+        "section": "5.4.3.36",
         "source_url": "https://profiles.opcfoundation.org",
-        "spec": null
+        "spec": "OPC-10000-13"
       },
       "profile_defaults": {
         "custom": false,
