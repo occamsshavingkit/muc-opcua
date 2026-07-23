@@ -16,7 +16,7 @@ yet reconciled to individual OPC CU ids count as not-implemented — see the
 reconciliation note below.
 
 - Distinct Server CUs: **525** (required 179, optional 346)
-- Reconciled as implemented: **required 73/179**, **optional 115/346**
+- Reconciled as implemented: **required 73/179**, **optional 138/346**
 
 ### Per Server profile / facet
 
@@ -68,7 +68,7 @@ reconciliation note below.
 | 1579 | Historical Event Insert 2022 Server Facet | 0/3 | 0/0 |
 | 1580 | Historical Event Replace 2022 Server Facet | 0/3 | 0/0 |
 | 1581 | Historical Event Delete 2022 Server Facet | 0/3 | 0/0 |
-| 1582 | Aggregate Subscription 2022 Server Facet | 16/18 | 1/39 |
+| 1582 | Aggregate Subscription 2022 Server Facet | 16/18 | 24/39 |
 | 1627 | Enhanced DataChange Subscription 2017 Server Facet | 16/20 | 1/1 |
 | 1629 | Authorization Service Server Facet | 0/1 | 0/0 |
 | 1630 | Sessionless Server Facet | 0/2 | 0/0 |

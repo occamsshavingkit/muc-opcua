@@ -7,6 +7,45 @@ on:
     branches: [ main, "001-minimal-embedded-server" ]
 
 jobs:
+  # The conformance manifest is the source of truth for every profile/facet/CU
+  # claim, but nothing in CI used to look at it: a satisfied_by link pointing at
+  # a Kconfig symbol instead of an item id reached main unnoticed. This job is
+  # build-free so it gives fast feedback on manifest edits.
+  #
+  # --check-generated and --check-profiles are deliberately NOT run yet. Both
+  # fail on main today for one root cause: every facet item sits in a
+  # non-selectable implementation_state, so _selectable_facet_toggles() returns
+  # 0 and generate_kconfig() emits ~419 lines against the 2063 committed.
+  # Kconfig generation last matched at 4122c923 (2026-07-18). Turning these on
+  # before that is repaired would pin CI red, so they are staged behind it --
+  # see docs/conformance/generator-drift.md.
+  manifest-validation:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      # NOTE: persist-credentials: false was tried here (CI-hardening review)
+      # but breaks checkout on this repo: stray build directories (b/, b_*/)
+      # are committed with orphaned Unity gitlinks (mode 160000) and no
+      # .gitmodules, and checkout's persist-credentials=false cleanup runs
+      # `git submodule foreach`, which fails on them with exit 128. Left at the
+      # default until those build dirs are removed from git (tracked separately).
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - name: Install dependencies
+        run: pip install --quiet pyyaml
+      - name: Validate manifest structure and reconciliation links
+        run: python3 scripts/profile_manifest/validate.py --manifest profiles/opcua-profile-manifest.yaml --manifest-only
+      - name: Validate claim/test coverage
+        run: python3 scripts/profile_manifest/validate.py --manifest profiles/opcua-profile-manifest.yaml --check-claims
+      - name: Validate capacity defaults resolve per profile
+        run: python3 scripts/profile_manifest/validate.py --manifest profiles/opcua-profile-manifest.yaml --check-capacities
+      - name: Manifest unit tests
+        run: python3 -m unittest discover -s scripts/profile_manifest -t . -p "test_*.py" -v
+
   host-build:
     runs-on: ubuntu-latest
     steps:
