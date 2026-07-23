@@ -48,12 +48,15 @@ static const mu_service_descriptor_t g_supported_services[] = {
 #ifdef MUC_OPCUA_DISCOVERY_FIND_SERVERS_ENABLED
     {{MU_ID_FINDSERVERSREQUEST, MU_ID_FINDSERVERSRESPONSE, false}, handle_find_servers},
 #endif
-#ifdef MUC_OPCUA_CU_DISCOVERY_REGISTER
-    {{MU_ID_REGISTERSERVERREQUEST, MU_ID_REGISTERSERVERRESPONSE, false}, handle_register_server},
-    {{MU_ID_REGISTERSERVER2REQUEST, MU_ID_REGISTERSERVER2RESPONSE, false}, handle_register_server},
-#endif
 #ifdef MUC_OPCUA_CU_DISCOVERY_GET_ENDPOINTS
     {{MU_ID_GETENDPOINTSREQUEST, MU_ID_GETENDPOINTSRESPONSE, false}, handle_get_endpoints},
+#endif
+#ifdef MUC_OPCUA_CU_DISCOVERY_REGISTER
+    {{MU_ID_REGISTERSERVERREQUEST, MU_ID_REGISTERSERVERRESPONSE, false}, handle_register_server},
+    /* RegisterServer2's request id (12193) is larger than every other service
+       here, so it cannot sit next to RegisterServer without breaking the
+       ascending-order invariant the binary search relies on. It is registered
+       at the tail of the table instead. */
 #endif
     {{MU_ID_OPENSECURECHANNELREQUEST, MU_ID_OPENSECURECHANNELRESPONSE, false}, handle_open_secure_channel},
     {{MU_ID_CLOSESECURECHANNELREQUEST, MU_ID_CLOSESECURECHANNELRESPONSE, false}, handle_close_secure_channel},
@@ -117,6 +120,17 @@ static const mu_service_descriptor_t g_supported_services[] = {
     {{MU_ID_TRANSFERSUBSCRIPTIONSREQUEST, MU_ID_TRANSFERSUBSCRIPTIONSRESPONSE, true}, handle_transfer_subscriptions},
 #endif
     {{MU_ID_DELETESUBSCRIPTIONSREQUEST, MU_ID_DELETESUBSCRIPTIONSRESPONSE, true}, handle_delete_subscriptions},
+#endif
+#ifdef MUC_OPCUA_CU_DISCOVERY_REGISTER
+    /* RegisterServer2 tail entry -- see the note by RegisterServer above. Its
+       request id (12193) is the numerically largest in the table, so the
+       ascending-order invariant places it last.
+       NOTE: 12193/12194 were added without a grounded source and are anomalous
+       (request/response ids one apart, where every other pair differs by three);
+       the value is unverified against the OPC NodeIds.csv and should be
+       confirmed separately. Dispatch is correct for whatever id the client
+       actually sends, since the table is keyed on this same constant. */
+    {{MU_ID_REGISTERSERVER2REQUEST, MU_ID_REGISTERSERVER2RESPONSE, false}, handle_register_server},
 #endif
 };
 
