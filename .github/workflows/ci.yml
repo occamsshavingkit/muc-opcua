@@ -24,13 +24,15 @@ jobs:
     permissions:
       contents: read
     steps:
-      # NOTE: persist-credentials: false was tried here (CI-hardening review)
-      # but breaks checkout on this repo: stray build directories (b/, b_*/)
-      # are committed with orphaned Unity gitlinks (mode 160000) and no
-      # .gitmodules, and checkout's persist-credentials=false cleanup runs
-      # `git submodule foreach`, which fails on them with exit 128. Left at the
-      # default until those build dirs are removed from git (tracked separately).
+      # This job only reads the tree, so it runs with least privilege:
+      # persist-credentials: false (drops the checkout token afterwards). This
+      # was blocked earlier by committed build dirs (b/, b_*/) carrying orphaned
+      # Unity gitlinks with no .gitmodules -- checkout's credential cleanup runs
+      # `git submodule foreach` and died on them. Those dirs are now removed from
+      # git (this PR), so it is safe.
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
