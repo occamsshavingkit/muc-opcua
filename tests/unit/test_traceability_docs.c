@@ -407,9 +407,13 @@ static void check_file_traceability(const char *dir_path) {
             } else if (S_ISREG(st.st_mode)) {
                 const char *ext = strrchr(entry->d_name, '.');
                 if (ext && (strcmp(ext, ".c") == 0 || strcmp(ext, ".h") == 0)) {
-                    /* Skip stub files -- intentional placeholders for unimplemented CUs */
+                    /* Skip stub files -- intentional placeholders for unimplemented CUs.
+                       This must `continue` to the next entry, not `return`: a bare
+                       return abandoned the rest of the directory (so files after a
+                       stub in readdir order went unchecked) and leaked this DIR
+                       handle by skipping the closedir below. */
                     if (strstr(path, "stub.c") != NULL) {
-                        return;
+                        continue;
                     }
                     /* Check if path is in files_to_sections.md */
                     /* Note: The paths in files-to-sections.md might be like `src/core/server.c`
