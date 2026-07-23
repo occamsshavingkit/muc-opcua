@@ -1,1 +1,0 @@
-/usr/bin/cc -Wl,--gc-sections CMakeFiles/test_message_chunk_errors.dir/test_message_chunk_errors.c.o -o test_message_chunk_errors  ../../_deps/unity-build/libunity.a ../../src/libmuc_opcua.a ../support/libmuc_opcua_test_support.a ../../src/libmuc_opcua.a /usr/lib/x86_64-linux-gnu/libcrypto.so 

@@ -1,1 +1,0 @@
-/usr/bin/cc -Wl,--gc-sections CMakeFiles/audit_latency_benchmark.dir/audit_latency_benchmark.c.o -o audit_latency_benchmark  ../../src/libmuc_opcua.a ../support/libmuc_opcua_test_support.a ../../src/libmuc_opcua.a 

@@ -1,1 +1,0 @@
-/usr/bin/cc -Wl,--gc-sections CMakeFiles/test_event_notifications.dir/test_event_notifications.c.o -o test_event_notifications  ../../src/libmuc_opcua.a ../support/libmuc_opcua_test_support.a ../../_deps/unity-build/libunity.a ../../src/libmuc_opcua.a /usr/lib/x86_64-linux-gnu/libcrypto.so 
