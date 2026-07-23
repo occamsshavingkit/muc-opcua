@@ -6203,7 +6203,7 @@ static const mu_node_t s_base_nodes[] = {
      s_rsasha256_cert_type_refs,
      sizeof(s_rsasha256_cert_type_refs) / sizeof(s_rsasha256_cert_type_refs[0]),
      NULL,
-      .type_definition = {0}},
+     .type_definition = {0}},
 #if MUC_OPCUA_CU_CERTIFICATE_MANAGER_PULL && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
     /* spec 112 (CU 2231): ServerConfigurationType(12581). OPC-10000-12 §7.10.3. */
     {{0, MU_NODEID_NUMERIC, {12581}},

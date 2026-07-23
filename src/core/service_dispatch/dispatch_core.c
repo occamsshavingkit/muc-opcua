@@ -53,10 +53,10 @@ static const mu_service_descriptor_t g_supported_services[] = {
 #endif
 #ifdef MUC_OPCUA_CU_DISCOVERY_REGISTER
     {{MU_ID_REGISTERSERVERREQUEST, MU_ID_REGISTERSERVERRESPONSE, false}, handle_register_server},
-    /* RegisterServer2's request id (12193) is larger than every other service
-       here, so it cannot sit next to RegisterServer without breaking the
-       ascending-order invariant the binary search relies on. It is registered
-       at the tail of the table instead. */
+/* RegisterServer2's request id (12193) is larger than every other service
+   here, so it cannot sit next to RegisterServer without breaking the
+   ascending-order invariant the binary search relies on. It is registered
+   at the tail of the table instead. */
 #endif
     {{MU_ID_OPENSECURECHANNELREQUEST, MU_ID_OPENSECURECHANNELRESPONSE, false}, handle_open_secure_channel},
     {{MU_ID_CLOSESECURECHANNELREQUEST, MU_ID_CLOSESECURECHANNELRESPONSE, false}, handle_close_secure_channel},

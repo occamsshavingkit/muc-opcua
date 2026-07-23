@@ -113,7 +113,8 @@ static int is_known_cross_block_transition(opcua_uint32_t prev, opcua_uint32_t n
     (void)prev;
     (void)next;
     /* CERTIFICATE_MANAGER_PULL(15627) -> BASE_INFO_SERVERTYPE(12746) */
-    if (prev == 15627u && next == 12746u) return 1;
+    if (prev == 15627u && next == 12746u)
+        return 1;
     return 0;
 }
 
@@ -130,8 +131,8 @@ static void test_base_address_space_is_sorted(void) {
                 ++known;
             } else {
                 char msg[96];
-                (void)snprintf(msg, sizeof(msg),
-                               "base nodes not strictly ascending at index %zu (numeric %u then %u)", i, prev, next);
+                (void)snprintf(msg, sizeof(msg), "base nodes not strictly ascending at index %zu (numeric %u then %u)",
+                               i, prev, next);
                 TEST_FAIL_MESSAGE(msg);
             }
         }
