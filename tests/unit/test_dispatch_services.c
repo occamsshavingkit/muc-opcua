@@ -9,6 +9,7 @@
 #include "../../src/services/subscription.h"
 #include "muc_opcua/muc_opcua.h"
 #include "unity.h"
+#include <stdio.h>
 #include <string.h>
 
 void setUp(void) {}
@@ -1002,7 +1003,13 @@ void test_dispatch_unsupported_service_returns_bad_serviceunsupported(void) {
     opcua_byte_t req[1] = {0};
     opcua_byte_t resp[64];
     size_t resp_len = sizeof(resp);
-    enum { unsupported_request_id = 437u }; /* RegisterServerRequest_Encoding_DefaultBinary */
+    /* A Response type NodeId is never registered as a service-request key, so it
+       reliably exercises the "descriptor not found" path. This previously used
+       RegisterServerRequest (437), but that became a genuinely dispatched (stub)
+       service once Discovery Register landed, so the request decoded and failed
+       with Bad_DecodingError instead -- the test was asserting on a service that
+       is no longer unsupported. */
+    const opcua_uint32_t unsupported_request_id = MU_ID_GETENDPOINTSRESPONSE;
 
     /* OPC-10000-4 sections 6.3.1 and 7.38.2: a Server that does not support
        the requested Service returns Bad_ServiceUnsupported. */
@@ -1033,8 +1040,110 @@ void test_dispatch_transfer_subscriptions_returns_bad_serviceunsupported(void) {
 #endif
 }
 
+/* Regression guard for the service-dispatch table sort invariant.
+ *
+ * find_service_descriptor() binary-searches g_supported_services[], which only
+ * works when the table is strictly ascending by request_id. RegisterServer2
+ * (id 12193) and GetEndpoints (id 428) were once ordered so that GetEndpoints
+ * followed the far-larger RegisterServer2, and the binary search then silently
+ * failed to find both of them -- every GetEndpoints request came back
+ * Bad_ServiceUnsupported and the whole discovery/session/handshake path
+ * cascaded. No test exercised the ordering, so it reached main.
+ *
+ * This asserts every service the current build enables is reachable through the
+ * public accessor. A NULL result means the binary search cannot see a service
+ * that IS in the table, i.e. the table is no longer sorted. The id list mirrors
+ * g_supported_services[] entry-for-entry, under the same feature guards, so it
+ * stays correct in every profile. */
+static void test_every_enabled_service_is_reachable(void) {
+    static const opcua_uint32_t enabled_service_request_ids[] = {
+#ifdef MUC_OPCUA_DISCOVERY_FIND_SERVERS_ENABLED
+        MU_ID_FINDSERVERSREQUEST,
+#endif
+#ifdef MUC_OPCUA_CU_DISCOVERY_REGISTER
+        MU_ID_REGISTERSERVERREQUEST,
+        MU_ID_REGISTERSERVER2REQUEST,
+#endif
+#ifdef MUC_OPCUA_CU_DISCOVERY_GET_ENDPOINTS
+        MU_ID_GETENDPOINTSREQUEST,
+#endif
+        MU_ID_OPENSECURECHANNELREQUEST,
+        MU_ID_CLOSESECURECHANNELREQUEST,
+        MU_ID_CREATESESSIONREQUEST,
+        MU_ID_ACTIVATESESSIONREQUEST,
+        MU_ID_CLOSESESSIONREQUEST,
+#ifdef MUC_OPCUA_CU_SESSION_GENERAL_SERVICE
+        MU_ID_CANCELREQUEST,
+#endif
+#ifdef MUC_OPCUA_CU_NODEMANAGEMENT
+        MU_ID_ADDNODESREQUEST,
+        MU_ID_ADDREFERENCESREQUEST,
+        MU_ID_DELETENODESREQUEST,
+        MU_ID_DELETEREFERENCESREQUEST,
+#endif
+#ifdef MUC_OPCUA_CU_VIEW_BASIC_2
+        MU_ID_BROWSEREQUEST,
+        MU_ID_BROWSENEXTREQUEST,
+#endif
+#ifdef MUC_OPCUA_CU_VIEW_TRANSLATEBROWSEPATH
+        MU_ID_TRANSLATEBROWSEPATHSTONODEIDSREQUEST,
+#endif
+#ifdef MUC_OPCUA_CU_VIEW_REGISTERNODES
+        MU_ID_REGISTERNODESREQUEST,
+        MU_ID_UNREGISTERNODESREQUEST,
+#endif
+#ifdef MUC_OPCUA_CU_QUERY
+        MU_ID_QUERYFIRSTREQUEST,
+        MU_ID_QUERYNEXTREQUEST,
+#endif
+#ifdef MUC_OPCUA_CU_ATTRIBUTE_READ
+        MU_ID_READREQUEST,
+#endif
+#ifdef MUC_OPCUA_CU_HISTORICAL_ACCESS_SERVER_FACET
+        MU_ID_HISTORYREADREQUEST,
+#endif
+#ifdef MUC_OPCUA_SERVICE_WRITE
+        MU_ID_WRITEREQUEST,
+#endif
+#ifdef MUC_OPCUA_CU_HISTORICAL_ACCESS_SERVER_FACET
+        MU_ID_HISTORYUPDATEREQUEST,
+#endif
+#if MU_DISPATCH_CALL_ENABLED
+        MU_ID_CALLREQUEST,
+#endif
+#if MUC_OPCUA_CU_SUBSCRIPTION_BASIC
+        MU_ID_CREATEMONITOREDITEMSREQUEST,
+        MU_ID_MODIFYMONITOREDITEMSREQUEST,
+        MU_ID_SETMONITORINGMODEREQUEST,
+#if MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
+        MU_ID_SETTRIGGERINGREQUEST,
+#endif
+        MU_ID_DELETEMONITOREDITEMSREQUEST,
+        MU_ID_CREATESUBSCRIPTIONREQUEST,
+        MU_ID_MODIFYSUBSCRIPTIONREQUEST,
+        MU_ID_SETPUBLISHINGMODEREQUEST,
+        MU_ID_PUBLISHREQUEST,
+        MU_ID_REPUBLISHREQUEST,
+#if MUC_OPCUA_CU_REDUNDANCY
+        MU_ID_TRANSFERSUBSCRIPTIONSREQUEST,
+#endif
+        MU_ID_DELETESUBSCRIPTIONSREQUEST,
+#endif
+    };
+
+    const size_t count = sizeof(enabled_service_request_ids) / sizeof(enabled_service_request_ids[0]);
+    for (size_t i = 0; i < count; ++i) {
+        const opcua_uint32_t id = enabled_service_request_ids[i];
+        char msg[96];
+        (void)snprintf(msg, sizeof(msg), "service request 0x%X unreachable -- dispatch table not sorted?",
+                       (unsigned)id);
+        TEST_ASSERT_NOT_NULL_MESSAGE(mu_get_service_handler(id), msg);
+    }
+}
+
 int main(void) {
     UNITY_BEGIN();
+    RUN_TEST(test_every_enabled_service_is_reachable);
     RUN_TEST(test_service_fault_encode);
     RUN_TEST(test_dispatch_unsupported_service_returns_bad_serviceunsupported);
     RUN_TEST(test_dispatch_transfer_subscriptions_returns_bad_serviceunsupported);
