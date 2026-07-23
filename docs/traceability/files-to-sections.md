@@ -123,6 +123,7 @@ This document maps implementation and test files back to OPC UA normative sectio
 | `src/cu/core_2022_server/authorization/crypto_jwt.h` | JWT Validator | OPC-10000-4 / OPC-10000-7 / RFC 7515 / RFC 7518 | 5.7.3 / CU 1697 / 5 / 3.1 | JWS verify wrapper interface |
 | `src/cu/core_2022_server/role_management/role_management.c` | Role Management | OPC-10000-4 / OPC-10000-5 | 5.8 / 6.3 | Role-based authorization service implementation |
 | `src/cu/core_2022_server/certificate_manager/cert_manager.c` | Certificate Manager | OPC-10000-4 / OPC-10000-12 | 5.11 / 7.5 | Certificate group manager implementation |
+| `src/cu/core_2022_server/certificate_manager/push_model.c` | Certificate Manager | OPC-10000-7 / OPC-10000-12 | CU 2231 / 7.10 | Push Model UpdateCertificate/ApplyChanges handlers (server accepts cert/trust-list pushes from a GDS/agent) |
 | `include/muc_opcua/services/certificate_manager.h` | Certificate Manager | OPC-10000-4 / OPC-10000-12 | 5.11 / 7.5 | Certificate manager public interface |
 | `include/muc_opcua/services/certificate_management.h` | Certificate Management | OPC-10000-4 / OPC-10000-12 | 5.11 / 7.5 | Certificate management type definitions |
 | `include/muc_opcua/services/role_management.h` | Role Management | OPC-10000-4 / OPC-10000-5 | 5.8 / 6.3 | Role management public interface |
