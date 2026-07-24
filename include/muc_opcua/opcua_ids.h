@@ -8,8 +8,12 @@
 #define MU_ID_FINDSERVERSRESPONSE 425
 #define MU_ID_REGISTERSERVERREQUEST 437
 #define MU_ID_REGISTERSERVERRESPONSE 440
-#define MU_ID_REGISTERSERVER2REQUEST 12193
-#define MU_ID_REGISTERSERVER2RESPONSE 12194
+/* RegisterServer2Request/Response _Encoding_DefaultBinary Object NodeIds (the
+   wire TypeId), grounded against the OPC UA NodeSet NodeIds.csv. These are NOT
+   the RegisterServer2Request/Response DataType ids (12193/12194) -- the dispatch
+   table keys on the binary encoding id, as it does for every other service. */
+#define MU_ID_REGISTERSERVER2REQUEST 12211
+#define MU_ID_REGISTERSERVER2RESPONSE 12212
 #define MU_ID_GETENDPOINTSREQUEST 428
 #define MU_ID_GETENDPOINTSRESPONSE 431
 

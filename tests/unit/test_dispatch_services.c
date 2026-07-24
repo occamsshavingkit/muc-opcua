@@ -1141,9 +1141,34 @@ static void test_every_enabled_service_is_reachable(void) {
     }
 }
 
+/* The dispatch table keys on each service's _Encoding_DefaultBinary NodeId --
+ * the TypeId a client puts on the wire -- not the request structure's DataType
+ * NodeId. Reachability tests can't catch a wrong value here because the table
+ * and the client-facing constant are the same macro, so this pins the encoding
+ * ids for the discovery services against the OPC UA NodeSet (NodeIds.csv):
+ *
+ *   FindServersRequest_Encoding_DefaultBinary     422
+ *   GetEndpointsRequest_Encoding_DefaultBinary    428
+ *   RegisterServerRequest_Encoding_DefaultBinary  437
+ *   RegisterServer2Request_Encoding_DefaultBinary  12211
+ *   RegisterServer2Response_Encoding_DefaultBinary 12212
+ *
+ * RegisterServer2 previously used its DataType ids (12193/12194) here, so a
+ * spec-compliant RegisterServer2 request arrived with TypeId 12211 and the
+ * binary search returned Bad_ServiceUnsupported -- the service was unreachable
+ * to real clients. */
+static void test_discovery_service_ids_are_binary_encoding_nodeids(void) {
+    TEST_ASSERT_EQUAL_UINT32(422u, MU_ID_FINDSERVERSREQUEST);
+    TEST_ASSERT_EQUAL_UINT32(428u, MU_ID_GETENDPOINTSREQUEST);
+    TEST_ASSERT_EQUAL_UINT32(437u, MU_ID_REGISTERSERVERREQUEST);
+    TEST_ASSERT_EQUAL_UINT32(12211u, MU_ID_REGISTERSERVER2REQUEST);
+    TEST_ASSERT_EQUAL_UINT32(12212u, MU_ID_REGISTERSERVER2RESPONSE);
+}
+
 int main(void) {
     UNITY_BEGIN();
     RUN_TEST(test_every_enabled_service_is_reachable);
+    RUN_TEST(test_discovery_service_ids_are_binary_encoding_nodeids);
     RUN_TEST(test_service_fault_encode);
     RUN_TEST(test_dispatch_unsupported_service_returns_bad_serviceunsupported);
     RUN_TEST(test_dispatch_transfer_subscriptions_returns_bad_serviceunsupported);
