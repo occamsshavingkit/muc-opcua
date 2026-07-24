@@ -8,17 +8,13 @@ on:
 
 jobs:
   # The conformance manifest is the source of truth for every profile/facet/CU
-  # claim, but nothing in CI used to look at it: a satisfied_by link pointing at
-  # a Kconfig symbol instead of an item id reached main unnoticed. This job is
-  # build-free so it gives fast feedback on manifest edits.
-  #
-  # --check-generated and --check-profiles are deliberately NOT run yet. Both
-  # fail on main today for one root cause: every facet item sits in a
-  # non-selectable implementation_state, so _selectable_facet_toggles() returns
-  # 0 and generate_kconfig() emits ~419 lines against the 2063 committed.
-  # Kconfig generation last matched at 4122c923 (2026-07-18). Turning these on
-  # before that is repaired would pin CI red, so they are staged behind it --
-  # see docs/conformance/generator-drift.md.
+  # claim, and this build-free job enforces it: structure, reconciliation links,
+  # claim/test coverage, capacity resolution, and -- now that the generator
+  # drift is repaired (see docs/conformance/generator-drift.md) -- that every
+  # committed generated artifact (Kconfig, defconfigs, capacities.h, claim map,
+  # roadmap, completion.md, build docs) matches generator output, and that each
+  # named profile resolves correctly. Regenerate with
+  # `scripts/profile_manifest/generate.py` after any manifest change.
   manifest-validation:
     runs-on: ubuntu-latest
     permissions:
@@ -43,6 +39,10 @@ jobs:
         run: python3 scripts/profile_manifest/validate.py --manifest profiles/opcua-profile-manifest.yaml --check-claims
       - name: Validate capacity defaults resolve per profile
         run: python3 scripts/profile_manifest/validate.py --manifest profiles/opcua-profile-manifest.yaml --check-capacities
+      - name: Check generated artifacts match the manifest (no drift)
+        run: python3 scripts/profile_manifest/validate.py --manifest profiles/opcua-profile-manifest.yaml --check-generated
+      - name: Check named profiles resolve
+        run: python3 scripts/profile_manifest/validate.py --manifest profiles/opcua-profile-manifest.yaml --check-profiles
       - name: Manifest unit tests
         run: python3 -m unittest discover -s scripts/profile_manifest -t . -p "test_*.py" -v
 

@@ -23,6 +23,7 @@ Backing test column: comma-separated ctest names (as registered).
 | Address Space AddIn Reference |  | full | test_profile_surface |
 | Address Space AddIn DefaultInstanceBrowsename |  | full | test_profile_surface |
 | Base Info LocalTime |  | full | test_profile_surface |
+| SecurityPolicy Support |  | all | test_security_policy, test_secure_channel |
 | Base Info Selection List |  | full | test_profile_surface |
 | Address Space Atomicity |  | all | test_profile_surface |
 | Address Space Full Array Only |  | all | test_profile_surface |
@@ -33,14 +34,19 @@ Backing test column: comma-separated ctest names (as registered).
 | Base Info Locations Object |  | full | test_profile_surface |
 | Address Space NonVolatile and Constant |  | full | test_profile_surface |
 | Base Info Currency |  | full | test_profile_surface |
+| Push Model for Global Certificate and TrustList Management |  | embedded, standard, full | test_claim_map |
+| Base Info Rational Number |  | full | test_type_system |
+| Base Info NormalizedString DataType |  | full | test_type_system |
+| Base Info DecimalString DataType |  | full | test_type_system |
+| Base Info Date DataTypes |  | embedded, standard, full | test_type_system |
 | Base Info ServerType |  | embedded, standard, full | test_type_system |
+| Base Info Type Information |  | embedded, standard, full | test_claim_map |
 | Core 2022 Server Facet | OPC-10000-4 §5.12/5.13 | micro, embedded, standard, full | test_subscriptions, test_subscriptions_errors |
 | Core 2022 Server Facet | OPC-10000-7 | embedded, standard, full | test_subscriptions_capacity, test_subscription_deadband, test_subscription_publish |
 | Core 2022 Server Facet | OPC-10000-7 | full | test_ecc_crypto |
 | Core 2022 Server Facet | OPC-10000-9 | full | test_alarms_conditions, test_event_notifier, test_event_serializer |
 | Core 2022 Server Facet | OPC-10000-8 §5.3 | full | test_analog_item, test_da_type_nodes, test_eu_information |
 | Core 2022 Server Facet | OPC-10000-4 §5.11 | full | test_method_call_arbitrary, test_method_call_errors |
-| Core 2022 Server Facet | OPC-10000-7 CU 2113 / OPC-10000-12 §8.5-8.6 | full | test_key_credential |
 | Core 2022 Server Facet | OPC-10000-4 §5.11 | full | test_method_call |
 | Core 2022 Server Facet | OPC-10000-4 §7.36 | all | test_user_auth_plaintext, test_user_auth_certificate, test_user_auth_secure_e2e |
 | Core 2022 Server Facet | OPC-10000-7 | micro, embedded, standard, full | test_connection_multiplex |
@@ -54,6 +60,30 @@ Backing test column: comma-separated ctest names (as registered).
 | Core 2022 Server Facet | OPC-10000-4 | micro, embedded, standard, full | test_base_server_behaviour |
 | Core 2022 Server Facet | OPC-10000-4 §7.28 | all | test_time_sync, test_dispatch_services |
 | Core 2022 Server Facet | OPC-10000-3 | full | test_address_space_string_limits, test_binary_nodeid_errors |
+| Core 2022 Server Facet | OPC-10000-13 §4.2.2.3 | full | test_aggregate, test_aggregate_full |
+| Core 2022 Server Facet | OPC-10000-13 §4.2.2.4 | full | test_aggregate, test_aggregate_full |
+| Core 2022 Server Facet | OPC-10000-13 §4.2.2.5 | full | test_aggregate, test_aggregate_full |
+| Core 2022 Server Facet | OPC-10000-13 §4.2.2.6 | full | test_aggregate, test_aggregate_full |
+| Core 2022 Server Facet | OPC-10000-13 §4.2.2.7 | full | test_aggregate, test_aggregate_full |
+| Core 2022 Server Facet | OPC-10000-13 §4.2.2.8 | full | test_aggregate, test_aggregate_full |
+| Core 2022 Server Facet | OPC-10000-13 §4.2.2.9 | full | test_aggregate, test_aggregate_full |
+| Core 2022 Server Facet | OPC-10000-13 §4.2.2.10 | full | test_aggregate, test_aggregate_full |
+| Core 2022 Server Facet | OPC-10000-13 §4.2.2.13 | full | test_aggregate, test_aggregate_full |
+| Core 2022 Server Facet | OPC-10000-13 §4.2.2.14 | full | test_aggregate, test_aggregate_full |
+| Core 2022 Server Facet | OPC-10000-13 §4.2.2.15 | full | test_aggregate, test_aggregate_full |
+| Core 2022 Server Facet | OPC-10000-13 §4.2.2.19 | full | test_aggregate, test_aggregate_full |
+| Core 2022 Server Facet | OPC-10000-13 §4.2.2.20 | full | test_aggregate, test_aggregate_full |
+| Core 2022 Server Facet | OPC-10000-13 §4.2.2.23 | full | test_aggregate, test_aggregate_full |
+| Core 2022 Server Facet | OPC-10000-13 §4.2.2.24 | full | test_aggregate, test_aggregate_full |
+| Core 2022 Server Facet | OPC-10000-13 §4.2.2.25 | full | test_aggregate, test_aggregate_full |
+| Core 2022 Server Facet | OPC-10000-13 §4.2.2.28 | full | test_aggregate, test_aggregate_full |
+| Core 2022 Server Facet | OPC-10000-13 §4.2.2.29 | full | test_aggregate, test_aggregate_full |
+| Core 2022 Server Facet | OPC-10000-13 §4.2.2.30 | full | test_aggregate, test_aggregate_full |
+| Core 2022 Server Facet | OPC-10000-13 §4.2.2.31 | full | test_aggregate, test_aggregate_full |
+| Core 2022 Server Facet | OPC-10000-13 §4.2.2.32 | full | test_aggregate, test_aggregate_full |
+| Core 2022 Server Facet | OPC-10000-13 §4.2.2.33 | full | test_aggregate, test_aggregate_full |
+| Core 2022 Server Facet | OPC-10000-13 §4.2.2.34 | full | test_aggregate, test_aggregate_full |
+| Core 2022 Server Facet | OPC-10000-13 §4.2.2.35 | full | test_aggregate, test_aggregate_full |
 | Core 2022 Server Facet | OPC-10000-13 | full | test_aggregate, test_aggregate_full |
 | Core 2022 Server Facet | OPC-10000-14 | full | test_uadp_encoding, test_pubsub |
 | Core 2022 Server Facet | OPC-10000-6 §7.1.3 | full | test_reverse_connect |
@@ -74,6 +104,11 @@ Backing test column: comma-separated ctest names (as registered).
 | Discovery Find Servers Self | OPC-10000-4 §5.5.2 | all | test_discovery_services, test_discovery_endpoint |
 | Attribute Write Values | OPC-10000-4 §5.11.4 | full | test_write_value_gate, test_write_service |
 | Session Change User | OPC-10000-4 §5.7.3 | full | test_session, test_session_auth |
+| Time Sync – OS based support |  | full | test_time_sync |
+| Time Sync – IEEE 1588 (PTP) |  | full | test_claim_map |
+| Time Sync – IEEE 802.1AS |  | full | test_claim_map |
+| Time Sync – NTP |  | full | test_time_sync |
+| Security Role Server Authorization |  | full | test_role_management |
 | Attribute Write StatusCode & Timestamp | OPC-10000-4 §5.11.4 | full | test_write_service, test_write_response |
 | Attribute Write Index | OPC-10000-4 §5.11.4 | full | test_write_service |
 | Base Info Diagnostics | OPC-10000-5 §6.3.1, 6.3.3, 8.3.2, 12.9 | full | test_diagnostics, test_profile_surface |
@@ -89,4 +124,22 @@ Backing test column: comma-separated ctest names (as registered).
 | Base Info Server Capabilities 2 | OPC-10000-3 §4 | all | test_base_server_behaviour |
 | Session General Service Behaviour | OPC-10000-4 §5.6 | all | test_dispatch_session_order, test_base_server_behaviour |
 | Base Info Namespace Metadata | OPC-10000-3 §4 | full | test_base_server_behaviour, test_read_browsename_namespace |
+| Address Space Events 2 |  | full | test_claim_map |
+| Base Info Events Capabilities |  | full | test_claim_map |
+| Auditing Secure Communication |  | full | test_claim_map |
+| Auditing Write |  | full | test_claim_map |
+| Auditing NodeManagement | OPC-10000-5 | full | test_claim_map |
+| Auditing Method | OPC-10000-5 | full | test_claim_map |
+| A & C Auditing | OPC-10000-9 §5.10 | full | test_claim_map |
+| A & C Dialog Auditing | OPC-10000-9 §5.10.5 | full | test_claim_map |
+| A & C Confirm Auditing | OPC-10000-9 §5.10.7 | full | test_claim_map |
+| Session Cancel | OPC-10000-4 §5.6.5 | standard, full | test_claim_map |
+| Discovery Register | OPC-10000-4 §5.4.5 | standard, full | test_claim_map |
+| Security Default ApplicationInstance Certificate |  | all | test_certificate_validity, test_server_config |
 | Base Info Engineering Units |  | full | test_profile_surface |
+| KeyCredential Service | OPC-10000-12 §8.5-8.6 | full | test_key_credential |
+| User Role Management | OPC-10000-12 §9.5-9.6 | full | test_role_management |
+| Certificate Management | OPC-10000-12 §7.5-7.6 | full | test_certificate_management |
+| Alarms & Conditions | OPC-10000-9 §5 | full | test_alarms_conditions |
+| User Token JWT Server Facet | OPC-10000-7 §CU 1697 | full | test_jwt_activate_session |
+| Certificate Manager Pull | OPC-10000-12 §7.6, 7.9 | full | test_certificate_manager |

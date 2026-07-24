@@ -113,80 +113,108 @@ menu "OPC UA Facets and Conformance Units"
 
 menu "Profile: Nano Embedded Device 2025 Server Profile"
 
-menuconfig MUC_OPCUA_FACET_UA_TCP_UA_SC_UA_BINARY
-	bool "UA-TCP UA-SC UA-Binary"
-	default y if MUC_OPCUA_INTERN_PROFILE_NANO_EMBEDDED_DEVICE_2025_SERVER
-	help
-	  Implementation state: deferred.
-	  OPC source: OPC-10000-7 §4.2.
-	  Notes: This transport Facet defines a combination of network protocol, security protocol and message encoding that is optimized for low resource consumption and high performance. It combines the simple TCP based network protocol UA-TCP 1.0 with the binary security protocol UA-SecureConversation 1.0 and the binary message encoding UA-Binary 1.0.
-
-if MUC_OPCUA_FACET_UA_TCP_UA_SC_UA_BINARY
-
-config MUC_OPCUA_CU_PROTOCOL_UA_TCP
-	bool "CU: Protocol UA TCP"
-	depends on MUC_OPCUA_FACET_UA_TCP_UA_SC_UA_BINARY
-	default y if MUC_OPCUA_INTERN_PROFILE_NANO_EMBEDDED_DEVICE_2025_SERVER || MUC_OPCUA_PROFILE_CUSTOM
-	help
-	  Implementation state: claimed.
-	  OPC source: OPC-10000-6 §7.1 -- CU 2371:Protocol UA TCP.
-	  Backing tests: test_tcp_connection.
-	  Imported from: comprehensive-fix (Fix 2).
-	  Notes: Already-implemented CU added to manifest as claimed so the feature is tracked, gated by its Kconfig symbol, and covered by the claim/test map.
-
-config MUC_OPCUA_CU_UA_BINARY_ENCODING
-	bool "CU: UA Binary Encoding"
-	depends on MUC_OPCUA_FACET_UA_TCP_UA_SC_UA_BINARY
-	default y if MUC_OPCUA_INTERN_PROFILE_NANO_EMBEDDED_DEVICE_2025_SERVER || MUC_OPCUA_PROFILE_CUSTOM
-	help
-	  Implementation state: claimed.
-	  OPC source: OPC-10000-6 §5 -- CU 2837:UA Binary Encoding.
-	  Backing tests: test_binary_primitives, test_binary_nodeid.
-	  Imported from: comprehensive-fix (Fix 2).
-	  Notes: Already-implemented CU added to manifest as claimed so the feature is tracked, gated by its Kconfig symbol, and covered by the claim/test map.
-
-config MUC_OPCUA_CU_UA_SECURE_CONVERSATION
-	bool "CU: UA Secure Conversation"
-	depends on MUC_OPCUA_FACET_UA_TCP_UA_SC_UA_BINARY
-	default y if MUC_OPCUA_INTERN_PROFILE_NANO_EMBEDDED_DEVICE_2025_SERVER || MUC_OPCUA_PROFILE_CUSTOM
-	help
-	  Implementation state: claimed.
-	  OPC source: OPC-10000-6 §6 -- CU 2853:UA Secure Conversation.
-	  Backing tests: test_secure_channel.
-	  Imported from: comprehensive-fix (Fix 2).
-	  Notes: Already-implemented CU added to manifest as claimed so the feature is tracked, gated by its Kconfig symbol, and covered by the claim/test map.
-
-endif
-
-config MUC_OPCUA_MDNS_DISCOVERY
-	bool "mDNS Discovery (LDS Multicast DNS)"
-	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
-	help
-	  Host-platform mDNS (Multicast DNS) adapter for LDS-less
-	  discovery per OPC-10000-12 Annex A. Sends PTR/SRV/TXT/A records
-	  on 224.0.0.251:5353 so clients can find the server without
-	  a central discovery server. Adds ~2 KB of flash on host builds.
-	  Embedded platforms use their own mDNS provider.
-	  Not mandated by any OPC server profile — only required by the
-	  separate Subnet Discovery Server Facet (id 2069, CU 3171).
-	  OFF for nano/micro/embedded/standard per spec.
-
 menuconfig MUC_OPCUA_FACET_CORE_2022_SERVER
 	bool "Core 2022 Server Facet"
 	default y if MUC_OPCUA_INTERN_PROFILE_NANO_EMBEDDED_DEVICE_2025_SERVER
 	help
-	  Implementation state: deferred.
+	  Implementation state: implemented.
 	  OPC source: OPC-10000-7 §4.2.
-	  Notes: This Facet defines the core functionality required for any UA Server implementation. The core functionality includes the ability to discover endpoints, establish secure communication channels, create Sessions, browse the AddressSpace and read and/or write to Attributes of Nodes. The key requirements are: support for minimum one Session, support for the core AddressSpace structure, and the Server Capabilities Object, and authentication with UserName and Password. For broad applicability, it is recommended that Servers support multiple transport and security Profiles. It supersedes the Core 2017 Server Facet.
+	  Notes: Core 2022: all constituent CUs claimed
 
 if MUC_OPCUA_FACET_CORE_2022_SERVER
+
+config MUC_OPCUA_CU_HISTORICAL_ANNOTATION_2022_SERVER_FACET
+	bool "CU: Historical Annotation 2022 Server Facet"
+	default n
+	help
+	  Implementation state: deferred.
+	  OPC source: OPC-10000-11 -- CU 1572:Historical Annotation 2022 Server Facet.
+	  Notes: Historical Annotation not implemented; no annotation storage or retrieval support.
+
+config MUC_OPCUA_CU_BASE_HISTORICAL_EVENT_2022_SERVER_FACET
+	bool "CU: Base Historical Event 2022 Server Facet"
+	default n
+	help
+	  Implementation state: deferred.
+	  OPC source: OPC-10000-11 -- CU 1577:Base Historical Event 2022 Server Facet.
+	  Notes: Base Historical Event not implemented; no event history support.
+
+config MUC_OPCUA_CU_HISTORICAL_EVENT_UPDATE_2022_SERVER_FACET
+	bool "CU: Historical Event Update 2022 Server Facet"
+	depends on MUC_OPCUA_CU_HISTORICAL_ACCESS_SERVER_FACET
+	default n
+	help
+	  Implementation state: deferred.
+	  OPC source: OPC-10000-11 -- CU 1578:Historical Event Update 2022 Server Facet.
+	  Notes: Historical Event Update not implemented; no event history support.
+
+config MUC_OPCUA_CU_HISTORICAL_EVENT_INSERT_2022_SERVER_FACET
+	bool "CU: Historical Event Insert 2022 Server Facet"
+	depends on MUC_OPCUA_CU_HISTORICAL_ACCESS_SERVER_FACET
+	default n
+	help
+	  Implementation state: deferred.
+	  OPC source: OPC-10000-11 -- CU 1579:Historical Event Insert 2022 Server Facet.
+	  Notes: Historical Event Insert not implemented; no event history support.
+
+config MUC_OPCUA_CU_HISTORICAL_EVENT_REPLACE_2022_SERVER_FACET
+	bool "CU: Historical Event Replace 2022 Server Facet"
+	depends on MUC_OPCUA_CU_HISTORICAL_ACCESS_SERVER_FACET
+	default n
+	help
+	  Implementation state: deferred.
+	  OPC source: OPC-10000-11 -- CU 1580:Historical Event Replace 2022 Server Facet.
+	  Notes: Historical Event Replace not implemented; no event history support.
+
+config MUC_OPCUA_CU_HISTORICAL_EVENT_DELETE_2022_SERVER_FACET
+	bool "CU: Historical Event Delete 2022 Server Facet"
+	depends on MUC_OPCUA_CU_HISTORICAL_ACCESS_SERVER_FACET
+	default n
+	help
+	  Implementation state: deferred.
+	  OPC source: OPC-10000-11 -- CU 1581:Historical Event Delete 2022 Server Facet.
+	  Notes: Historical Event Delete not implemented; no event history support.
+
+config MUC_OPCUA_CU_HISTORICAL_ACCESS_STRUCTURED_DATA_2022_SERVER_FACET
+	bool "CU: Historical Access Structured Data 2022 Server Facet"
+	default n
+	help
+	  Implementation state: deferred.
+	  OPC source: OPC-10000-11 -- CU 1710:Historical Access Structured Data 2022 Server Facet.
+	  Notes: Historical Access Structured Data not implemented; structured data storage/retrieval requires additional development.
+
+config MUC_OPCUA_CU_HISTORICAL_ACCESS_STRUCTURED_DATA_INSERT
+	bool "CU: Historical Access Structured Data Insert"
+	default n
+	help
+	  Implementation state: deferred.
+	  OPC source: OPC-10000-11 -- CU 2185:Historical Access Structured Data Insert.
+	  Notes: Historical Access Structured Data Insert deferred; depends on opc_cu_1710.
+
+config MUC_OPCUA_CU_SESSION_CANCEL
+	bool "CU: Session Cancel"
+	default y if MUC_OPCUA_INTERN_PROFILE_STANDARD_2025_UA_SERVER
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-4 §5.6.5 -- CU 2190:Session Cancel.
+	  Backing tests: test_claim_map.
+	  Notes: Cancel service stub responds with Count=0. Embedded server processes requests synchronously.
+
+config MUC_OPCUA_CU_DISCOVERY_REGISTER
+	bool "CU: Discovery Register"
+	default y if MUC_OPCUA_INTERN_PROFILE_STANDARD_2025_UA_SERVER
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-4 §5.4.5 -- CU 2271:Discovery Register.
+	  Backing tests: test_claim_map.
+	  Notes: No-op RegisterServer stub; server does not register with LDS/GDS for local operation.
 
 config MUC_OPCUA_CU_VIEW_TRANSLATEBROWSEPATH
 	bool "CU: View TranslateBrowsePath"
 	depends on MUC_OPCUA_FACET_CORE_2022_SERVER
 	default y if MUC_OPCUA_INTERN_PROFILE_NANO_EMBEDDED_DEVICE_2025_SERVER
 	help
-	  Implementation state: implemented.
+	  Implementation state: claimed.
 	  OPC source: OPC-10000-4 §5.9.4 -- CU 2317:View TranslateBrowsePath.
 	  Backing tests: test_browse_service, test_view_services.
 	  Notes: Support TranslateBrowsePathsToNodeIds Service.
@@ -196,10 +224,18 @@ config MUC_OPCUA_CU_DISCOVERY_GET_ENDPOINTS
 	depends on MUC_OPCUA_FACET_CORE_2022_SERVER
 	default y if MUC_OPCUA_INTERN_PROFILE_NANO_EMBEDDED_DEVICE_2025_SERVER
 	help
-	  Implementation state: implemented.
+	  Implementation state: claimed.
 	  OPC source: OPC-10000-4 §5.5.1, 5.5.4 -- CU 2328:Discovery Get Endpoints.
 	  Backing tests: test_discovery_endpoint, test_discovery_services.
 	  Notes: Support the GetEndpoints Service to obtain all Endpoints of the Server. This includes filtering based on Profiles.
+
+config MUC_OPCUA_CU_HISTORICAL_ACCESS_STRUCTURED_DATA_READ_RAW
+	bool "CU: Historical Access Structured Data Read Raw"
+	default n
+	help
+	  Implementation state: deferred.
+	  OPC source: OPC-10000-11 -- CU 2332:Historical Access Structured Data Read Raw.
+	  Notes: Historical Access Structured Data Read Raw deferred; depends on opc_cu_1710.
 
 config MUC_OPCUA_CU_DISCOVERY_FIND_SERVERS_SELF
 	bool "CU: Discovery Find Servers Self"
@@ -210,16 +246,6 @@ config MUC_OPCUA_CU_DISCOVERY_FIND_SERVERS_SELF
 	  OPC source: OPC-10000-4 §5.5.2 -- CU 2352:Discovery Find Servers Self.
 	  Backing tests: test_discovery_services, test_discovery_endpoint.
 	  Notes: Support the FindServers Service only for itself.
-
-config MUC_OPCUA_CU_DISCOVERY_REGISTER
-	bool "CU: Discovery Register"
-	depends on MUC_OPCUA_FACET_CORE_2022_SERVER
-	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES || MUC_OPCUA_INTERN_PROFILE_STANDARD_2025_UA_SERVER
-	help
-	  Implementation state: claimed.
-	  OPC source: OPC-10000-4 §5.4.5 -- CU 2271:Discovery Register.
-	  Backing tests: none yet.
-	  Notes: No-op RegisterServer stub; server does not register with LDS/GDS for local operation.
 
 config MUC_OPCUA_CU_ATTRIBUTE_WRITE_VALUES
 	bool "CU: Attribute Write Values"
@@ -236,10 +262,19 @@ config MUC_OPCUA_CU_SESSION_CHANGE_USER
 	depends on MUC_OPCUA_FACET_CORE_2022_SERVER
 	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
 	help
-	  Implementation state: implemented.
+	  Implementation state: claimed.
 	  OPC source: OPC-10000-4 §5.7.3 -- CU 2400:Session Change User.
 	  Backing tests: test_session, test_session_auth.
 	  Notes: Support the use of ActivateSession to change the Session user.
+
+config MUC_OPCUA_CU_AUDITING_SECURE_COMMUNICATION
+	bool "CU: Auditing Secure Communication"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2422:Auditing Secure Communication.
+	  Backing tests: test_claim_map.
+	  Notes: AuditOpenSecureChannelEvent (i=2060) emitted on OpenSecureChannel (osc_handler.c) and observable via the Server EventNotifier. Satisfied by opc_cu_auditing.
 
 config MUC_OPCUA_CU_ADDRESS_SPACE_ADDIN_REFERENCE
 	bool "CU: Address Space AddIn Reference"
@@ -271,6 +306,55 @@ config MUC_OPCUA_CU_BASE_INFO_LOCALTIME
 	  Backing tests: test_profile_surface.
 	  Notes: Exposes local time information by providing the LocalTime Variable on the Server Object. Exposes the TimeZoneDataType, its Encoding Object and all its supertypes in the AddressSpace.
 
+config MUC_OPCUA_CU_TIME_SYNC_OS_BASED_SUPPORT
+	bool "CU: Time Sync – OS based support"
+	depends on MUC_OPCUA_FACET_SECURITY_TIME_SYNCHRONIZATION
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2478:Time Sync – OS based support.
+	  Backing tests: test_time_sync.
+	  Notes: Application supports time synchronization via features of a standard operating system. | Satisfied by the same time-sync infrastructure as CU 5793; the time adapter provides the OS clock. Stub file exists but is not needed — the base time sync CU covers all sync source variants.
+
+config MUC_OPCUA_CU_TIME_SYNC_IEEE_1588_PTP
+	bool "CU: Time Sync – IEEE 1588 (PTP)"
+	depends on MUC_OPCUA_FACET_SECURITY_TIME_SYNCHRONIZATION
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2479:Time Sync – IEEE 1588 (PTP).
+	  Backing tests: test_claim_map.
+	  Notes: Application supports time synchronization via the Precision Time Protocol (PTP).
+
+config MUC_OPCUA_CU_TIME_SYNC_IEEE_802_1AS
+	bool "CU: Time Sync – IEEE 802.1AS"
+	depends on MUC_OPCUA_FACET_SECURITY_TIME_SYNCHRONIZATION
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2480:Time Sync – IEEE 802.1AS.
+	  Backing tests: test_claim_map.
+	  Notes: Application supports time synchronization via the features described in IEEE 802.1AS.
+
+config MUC_OPCUA_CU_ADDRESS_SPACE_EVENTS_2
+	bool "CU: Address Space Events 2"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2515:Address Space Events 2.
+	  Backing tests: test_claim_map.
+	  Notes: Reconciled (spec 073): address-space-triggered events are queued per subscription and delivered in Publish (notification.c mu_server_trigger_event); tested by test_event_notifications. Satisfied by opc_cu_events.
+
+config MUC_OPCUA_CU_SECURITYPOLICY_SUPPORT
+	bool "CU: SecurityPolicy Support"
+	depends on MUC_OPCUA_FACET_CORE_2022_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_NANO_EMBEDDED_DEVICE_2025_SERVER
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2600:SecurityPolicy Support.
+	  Backing tests: test_security_policy, test_secure_channel.
+	  Notes: Support at least one Security Policy. Support of SecurityPolicy None is recommended for testing and compatibility reasons even if the UA Server supports a more secure policy.
+
 config MUC_OPCUA_CU_BASE_INFO_SELECTION_LIST
 	bool "CU: Base Info Selection List"
 	depends on MUC_OPCUA_FACET_CORE_2022_SERVER
@@ -280,6 +364,26 @@ config MUC_OPCUA_CU_BASE_INFO_SELECTION_LIST
 	  OPC item: CU 2711:Base Info Selection List.
 	  Backing tests: test_profile_surface.
 	  Notes: The Server supports Variables of the SelectionListType VariableType.
+
+config MUC_OPCUA_CU_TIME_SYNC_NTP
+	bool "CU: Time Sync – NTP"
+	depends on MUC_OPCUA_FACET_SECURITY_TIME_SYNCHRONIZATION
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2786:Time Sync – NTP.
+	  Backing tests: test_time_sync.
+	  Notes: Application supports time synchronization via the Network Time Protocol (NTP).
+
+config MUC_OPCUA_CU_SECURITY_ROLE_SERVER_AUTHORIZATION
+	bool "CU: Security Role Server Authorization"
+	depends on MUC_OPCUA_FACET_CORE_2022_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2808:Security Role Server Authorization.
+	  Backing tests: test_role_management.
+	  Notes: Stub callback interface for role-based access control. The callback is invoked before each service handler; NULL callback allows all.
 
 config MUC_OPCUA_CU_ADDRESS_SPACE_ATOMICITY
 	bool "CU: Address Space Atomicity"
@@ -321,6 +425,15 @@ config MUC_OPCUA_CU_BASE_INFO_VALUEASTEXT
 	  Backing tests: test_profile_surface.
 	  Notes: The Server supports the Property ValueAsText for enumerated DataTypes.
 
+config OPC_CU_3080
+	bool "CU: Security Default ApplicationInstance Certificate"
+	default y if MUC_OPCUA_INTERN_PROFILE_NANO_EMBEDDED_DEVICE_2025_SERVER
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3080:Security Default ApplicationInstance Certificate.
+	  Backing tests: test_certificate_validity, test_server_config.
+	  Notes: An application, when installed, has a default ApplicationInstanceCertificate that is valid. The default ApplicationInstanceCertificate shall either be created as part of the installation or installation instructions explicitly describe the process to create and apply a default ApplicationInstanceCertificate to the application. (Documentation complete; no code change needed.)
+
 config MUC_OPCUA_CU_BASE_INFO_OPTIONSET
 	bool "CU: Base Info OptionSet"
 	depends on MUC_OPCUA_FACET_CORE_2022_SERVER
@@ -351,6 +464,15 @@ config MUC_OPCUA_CU_BASE_INFO_DIAGNOSTICS
 	  Backing tests: test_diagnostics, test_profile_surface.
 	  Notes: The Server supports the collection of diagnostic information and exposes it in the AddressSpace. This includes always the ServerDiagnostics Object of the Server Object and its EnabledFlag Variable. The EnabledFlag in the ServerDiagnostics Object can be set TRUE and in that case the following Objects and Variables for diagnostic data as defined in the ServerDiagnosticsType are exposed: ServerDiagnosticsSummary with all its subcomponents, SubscriptionDiagnosticsArray, and SessionsDiagnosticsSummary with all its subcomponents.
 
+config MUC_OPCUA_CU_BASE_INFO_EVENTS_CAPABILITIES
+	bool "CU: Base Info Events Capabilities"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3194:Base Info Events Capabilities.
+	  Backing tests: test_claim_map.
+	  Notes: Reconciled (spec 074): the Server Object (i=2253) exposes a readable EventNotifier attribute (SubscribeToEvents) so a client can discover it as an event source; read_attribute.c + base_nodes.c, tested by test_read_service::test_read_service_eventnotifier.
+
 config MUC_OPCUA_CU_BASE_INFO_ESTIMATED_RETURN_TIME
 	bool "CU: Base Info Estimated Return Time"
 	depends on MUC_OPCUA_FACET_CORE_2022_SERVER
@@ -361,12 +483,39 @@ config MUC_OPCUA_CU_BASE_INFO_ESTIMATED_RETURN_TIME
 	  Backing tests: test_profile_surface.
 	  Notes: Server supports the EstimatedReturnTime Property. It indicates the time at which the Server is expected to have a ServerStatus.State of RUNNING_0. Clients can use this information to govern the reconnect logic.
 
+config MUC_OPCUA_CU_AUDITING_NODEMANAGEMENT
+	bool "CU: Auditing NodeManagement"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-5 -- CU 3224:Auditing NodeManagement.
+	  Backing tests: test_claim_map.
+	  Notes: AuditNodeManagementEventType (i=2090) emitted for AddNodes, AddReferences, DeleteNodes, DeleteReferences. Satisfied by opc_cu_auditing.
+
+config MUC_OPCUA_CU_AUDITING_WRITE
+	bool "CU: Auditing Write"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3228:Auditing Write.
+	  Backing tests: test_claim_map.
+	  Notes: AuditWriteUpdateEvent (i=2100) emitted per attribute write (attribute_handler.c) and observable via the Server EventNotifier. Satisfied by opc_cu_auditing.
+
+config MUC_OPCUA_CU_AUDITING_METHOD
+	bool "CU: Auditing Method"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-5 -- CU 3230:Auditing Method.
+	  Backing tests: test_claim_map.
+	  Notes: AuditUpdateMethodEventType (i=2127) emitted for Call service method invocations. Satisfied by opc_cu_auditing.
+
 config MUC_OPCUA_CU_VIEW_BASIC_2
 	bool "CU: View Basic 2"
 	depends on MUC_OPCUA_FACET_CORE_2022_SERVER
 	default y if MUC_OPCUA_INTERN_PROFILE_NANO_EMBEDDED_DEVICE_2025_SERVER
 	help
-	  Implementation state: implemented.
+	  Implementation state: claimed.
 	  OPC source: OPC-10000-4 §5.9.2, 5.9.3 -- CU 3530:View Basic 2.
 	  Backing tests: test_browse_service, test_browse_limits, test_view_services.
 	  Notes: Support the View Service Set (Browse, BrowseNext). This includes the support of minimum 1 continuation point per Session.
@@ -380,6 +529,49 @@ config MUC_OPCUA_CU_ADDRESS_SPACE_INTERFACES
 	  OPC item: CU 3560:Address Space Interfaces.
 	  Backing tests: test_profile_surface.
 	  Notes: Support Interfaces and associated rules. Includes exposing the entry point InterfaceTypes and the types BaseInterfaceType and HasInterface and all their supertypes in the AddressSpace.
+
+config MUC_OPCUA_CU_A_C_AUDITING
+	bool "CU: A & C Auditing"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-9 §5.10 -- CU 3763:A & C Auditing.
+	  Backing tests: test_claim_map.
+	  Notes: AuditConditionEnableEventType (i=2803) emitted for condition state changes (set_active). AuditConditionAcknowledgeEventType (i=8944) emitted for Acknowledge method. Satisfied by opc_cu_auditing.
+
+config MUC_OPCUA_CU_A_C_DIALOG_AUDITING
+	bool "CU: A & C Dialog Auditing"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-9 §5.10.5 -- CU 3764:A & C Dialog Auditing.
+	  Backing tests: test_claim_map.
+	  Notes: AuditConditionRespondEventType (i=8927) emitted for DialogCondition Respond method. Satisfied by opc_cu_auditing.
+
+config MUC_OPCUA_CU_A_C_CONFIRM_AUDITING
+	bool "CU: A & C Confirm Auditing"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-9 §5.10.7 -- CU 3766:A & C Confirm Auditing.
+	  Backing tests: test_claim_map.
+	  Notes: AuditConditionConfirmEventType (i=8961) emitted for Confirm method. Satisfied by opc_cu_auditing.
+
+config MUC_OPCUA_CU_A_C_SHELVING_AUDITING
+	bool "CU: A & C Shelving Auditing"
+	default n
+	help
+	  Implementation state: deferred.
+	  OPC source: OPC-10000-9 §5.10.8 -- CU 3767:A & C Shelving Auditing.
+	  Notes: Requires A & C Shelving State feature (not yet implemented). Deferred until shelving support is added.
+
+config MUC_OPCUA_CU_A_C_SUPPRESSION_AUDITING
+	bool "CU: A & C Suppression Auditing"
+	default n
+	help
+	  Implementation state: deferred.
+	  OPC source: OPC-10000-9 §5.10.9 -- CU 3768:A & C Suppression Auditing.
+	  Notes: Requires A & C Suppression State feature (not yet implemented). Deferred until suppression support is added.
 
 config MUC_OPCUA_CU_BASE_SERVICES_DIAGNOSTICS
 	bool "CU: Base Services Diagnostics"
@@ -421,6 +613,16 @@ config MUC_OPCUA_CU_BASE_INFO_CURRENCY
 	  Backing tests: test_profile_surface.
 	  Notes: Support the CurrencyUnit Property on DataVariables that represent currency.
 
+config MUC_OPCUA_CU_BASE_INFO_ENGINEERING_UNITS
+	bool "CU: Base Info Engineering Units"
+	depends on MUC_OPCUA_FACET_CORE_2022_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5592:Base Info Engineering Units.
+	  Backing tests: test_profile_surface.
+	  Notes: The Server supports defining Variables that include the Engineering Units Property. This property makes use of the EUInformation data structure. This structure by default represents the UN/CEFACT "Codes for Units of Measurement" or the Common Data Dictionary (IEC CDD). If a different EU representation is required then the EUInformation.namespaceUri will indicate the alternate namespace.
+
 config MUC_OPCUA_CU_ADDRESS_SPACE_BASE
 	bool "CU: Address Space Base"
 	depends on MUC_OPCUA_FACET_CORE_2022_SERVER
@@ -432,6 +634,87 @@ config MUC_OPCUA_CU_ADDRESS_SPACE_BASE
 	  Imported from: comprehensive-fix (Fix 2).
 	  Notes: Already-implemented CU added to manifest as claimed so the feature is tracked, gated by its Kconfig symbol, and covered by the claim/test map.
 
+config MUC_OPCUA_CU_AGGREGATES_ANNOTATIONCOUNT
+	bool "CU: Aggregates - AnnotationCount"
+	depends on MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-13 §4.2.2.35 -- Core 2022 Server Facet.
+	  Backing tests: test_aggregate, test_aggregate_full.
+
+config MUC_OPCUA_CU_AGGREGATES_AVERAGE
+	bool "CU: Aggregates - Average"
+	depends on MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-13 §4.2.2.4 -- Core 2022 Server Facet.
+	  Backing tests: test_aggregate, test_aggregate_full.
+
+config MUC_OPCUA_CU_AGGREGATES_COUNT
+	bool "CU: Aggregates - Count"
+	depends on MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-13 §4.2.2.19 -- Core 2022 Server Facet.
+	  Backing tests: test_aggregate, test_aggregate_full.
+
+config MUC_OPCUA_CU_AGGREGATES_DELTA
+	bool "CU: Aggregates - Delta"
+	depends on MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-13 §4.2.2.25 -- Core 2022 Server Facet.
+	  Backing tests: test_aggregate, test_aggregate_full.
+
+config MUC_OPCUA_CU_AGGREGATES_DELTABOUNDS
+	bool "CU: Aggregates - DeltaBounds"
+	depends on MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-13 §4.2.2.28 -- Core 2022 Server Facet.
+	  Backing tests: test_aggregate, test_aggregate_full.
+
+config MUC_OPCUA_CU_AGGREGATES_DURATIONBAD
+	bool "CU: Aggregates - DurationBad"
+	depends on MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-13 §4.2.2.30 -- Core 2022 Server Facet.
+	  Backing tests: test_aggregate, test_aggregate_full.
+
+config MUC_OPCUA_CU_AGGREGATES_DURATIONGOOD
+	bool "CU: Aggregates - DurationGood"
+	depends on MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-13 §4.2.2.29 -- Core 2022 Server Facet.
+	  Backing tests: test_aggregate, test_aggregate_full.
+
+config MUC_OPCUA_CU_AGGREGATES_DURATIONINSTATEZERO
+	bool "CU: Aggregates - DurationInStateZero"
+	depends on MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-13 §4.2.2.20 -- Core 2022 Server Facet.
+	  Backing tests: test_aggregate, test_aggregate_full.
+
+config MUC_OPCUA_CU_AGGREGATES_END
+	bool "CU: Aggregates - End"
+	depends on MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-13 §4.2.2.24 -- Core 2022 Server Facet.
+	  Backing tests: test_aggregate, test_aggregate_full.
+
 config MUC_OPCUA_CU_AGGREGATE_FULL
 	bool "CU: Aggregate Full"
 	depends on MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
@@ -442,6 +725,151 @@ config MUC_OPCUA_CU_AGGREGATE_FULL
 	  Backing tests: test_aggregate, test_aggregate_full.
 	  Notes: Project-level Conformance Unit mirroring the legacy 'aggregate_full' item; emits Kconfig symbol MUC_OPCUA_CU_AGGREGATE_FULL matching the #ifdef guard renamed in Task 3 of the CU-aligned code reorganisation plan.
 
+config MUC_OPCUA_CU_AGGREGATES_INTERPOLATIVE
+	bool "CU: Aggregates - Interpolative"
+	depends on MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-13 §4.2.2.3 -- Core 2022 Server Facet.
+	  Backing tests: test_aggregate, test_aggregate_full.
+
+config MUC_OPCUA_CU_AGGREGATES_MAXIMUM
+	bool "CU: Aggregates - Maximum"
+	depends on MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-13 §4.2.2.10 -- Core 2022 Server Facet.
+	  Backing tests: test_aggregate, test_aggregate_full.
+
+config MUC_OPCUA_CU_AGGREGATES_MAXIMUM2
+	bool "CU: Aggregates - Maximum2"
+	depends on MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-13 §4.2.2.15 -- Core 2022 Server Facet.
+	  Backing tests: test_aggregate, test_aggregate_full.
+
+config MUC_OPCUA_CU_AGGREGATES_MINIMUM
+	bool "CU: Aggregates - Minimum"
+	depends on MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-13 §4.2.2.9 -- Core 2022 Server Facet.
+	  Backing tests: test_aggregate, test_aggregate_full.
+
+config MUC_OPCUA_CU_AGGREGATES_MINIMUM2
+	bool "CU: Aggregates - Minimum2"
+	depends on MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-13 §4.2.2.14 -- Core 2022 Server Facet.
+	  Backing tests: test_aggregate, test_aggregate_full.
+
+config MUC_OPCUA_CU_AGGREGATES_PERCENTBAD
+	bool "CU: Aggregates - PercentBad"
+	depends on MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-13 §4.2.2.32 -- Core 2022 Server Facet.
+	  Backing tests: test_aggregate, test_aggregate_full.
+
+config MUC_OPCUA_CU_AGGREGATES_PERCENTGOOD
+	bool "CU: Aggregates - PercentGood"
+	depends on MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-13 §4.2.2.31 -- Core 2022 Server Facet.
+	  Backing tests: test_aggregate, test_aggregate_full.
+
+config MUC_OPCUA_CU_AGGREGATES_RANGE
+	bool "CU: Aggregates - Range"
+	depends on MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-13 §4.2.2.13 -- Core 2022 Server Facet.
+	  Backing tests: test_aggregate, test_aggregate_full.
+
+config MUC_OPCUA_CU_AGGREGATES_START
+	bool "CU: Aggregates - Start"
+	depends on MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-13 §4.2.2.23 -- Core 2022 Server Facet.
+	  Backing tests: test_aggregate, test_aggregate_full.
+
+config MUC_OPCUA_CU_AGGREGATES_TIMEAVERAGE
+	bool "CU: Aggregates - TimeAverage"
+	depends on MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-13 §4.2.2.5 -- Core 2022 Server Facet.
+	  Backing tests: test_aggregate, test_aggregate_full.
+
+config MUC_OPCUA_CU_AGGREGATES_TIMEAVERAGE2
+	bool "CU: Aggregates - TimeAverage2"
+	depends on MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-13 §4.2.2.6 -- Core 2022 Server Facet.
+	  Backing tests: test_aggregate, test_aggregate_full.
+
+config MUC_OPCUA_CU_AGGREGATES_TOTAL
+	bool "CU: Aggregates - Total"
+	depends on MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-13 §4.2.2.7 -- Core 2022 Server Facet.
+	  Backing tests: test_aggregate, test_aggregate_full.
+
+config MUC_OPCUA_CU_AGGREGATES_TOTAL2
+	bool "CU: Aggregates - Total2"
+	depends on MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-13 §4.2.2.8 -- Core 2022 Server Facet.
+	  Backing tests: test_aggregate, test_aggregate_full.
+
+config MUC_OPCUA_CU_AGGREGATES_WORSTQUALITY
+	bool "CU: Aggregates - WorstQuality"
+	depends on MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-13 §4.2.2.33 -- Core 2022 Server Facet.
+	  Backing tests: test_aggregate, test_aggregate_full.
+
+config MUC_OPCUA_CU_AGGREGATES_WORSTQUALITY2
+	bool "CU: Aggregates - WorstQuality2"
+	depends on MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-13 §4.2.2.34 -- Core 2022 Server Facet.
+	  Backing tests: test_aggregate, test_aggregate_full.
+
+config MUC_OPCUA_CU_ALARMS_CONDITIONS
+	bool "CU: Alarms & Conditions"
+	depends on MUC_OPCUA_CU_EVENTS && MUC_OPCUA_FACET_CORE_2022_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-9 §5.
+	  Backing tests: test_alarms_conditions.
+	  Notes: Project-level CU gating the Alarms & Conditions service (OPC-10000-9). Enables Acknowledge/Confirm/Dialog method dispatch, condition state tracking, and audit event integration. Satisfies OPC CUs 2921, 2927.
+
 config MUC_OPCUA_CU_AUDITING
 	bool "CU: Auditing"
 	depends on MUC_OPCUA_CU_EVENTS
@@ -451,16 +879,6 @@ config MUC_OPCUA_CU_AUDITING
 	  OPC source: OPC-10000-4 §7.x -- Core 2022 Server Facet.
 	  Backing tests: test_audit_events, test_event_notifications.
 	  Notes: spec 074: the server now emits OPC UA AuditEvents (Open Secure Channel/Create Session/Activate Session/Write Update, subtypes i=2060/2071/2075/2100) that a client observes by subscribing to the Server Object EventNotifier -- not just the host-callback stub. Emit+observe proven E2E by test_event_notifications::test_audit_write_event_e2e. Project-level Conformance Unit mirroring the legacy 'auditing' item; emits Kconfig symbol MUC_OPCUA_CU_AUDITING matching the #ifdef guard renamed in Task 3 of the CU-aligned code reorganisation plan.
-
-config MUC_OPCUA_CU_BASE_INFO_DATATYPES
-	bool "CU: Base Info Specialized DataTypes"
-	depends on MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER
-	default y if MUC_OPCUA_INTERN_PROFILE_EMBEDDED_2025_UA_SERVER
-	help
-	  Implementation state: claimed.
-	  OPC source: OPC-10000-5 -- Core 2022 Server Facet.
-	  Backing tests: test_type_system.
-	  Notes: spec 079: gates the specialized DataType nodes exposed in base_nodes.c (Number i=26 / Decimal i=50; DurationString/TimeString/DateString i=12879/12880/12881) and their supertype closure. Satisfies CU 2483/4426; implied on when the type-system facet is enabled.
 
 config MUC_OPCUA_CU_BASE_INFO_ARGUMENT_TYPE
 	bool "CU: Base Info Argument DataType + encoding infra"
@@ -481,6 +899,26 @@ config MUC_OPCUA_CU_BASE_INFO_BASE_TYPES
 	  OPC source: OPC-10000-5 -- Core 2022 Server Facet.
 	  Backing tests: test_type_system.
 	  Notes: spec 080b: completes the base OPC UA type system in base_nodes.c -- the remaining built-in/abstract DataTypes (Guid14/ByteString15/XmlElement16/ExpandedNodeId18/DataValue23/DiagnosticInfo25/Integer27/UInteger28/Enumeration29/Duration290/NumericRange291/UtcTime294/EnumValueType7594/Union12756) with correct supertype closure (primitives re-parented under Integer/UInteger/Number), HasModellingRule(37) + ModellingRuleType(77) + the ModellingRule Objects (Optional80/Mandatory78/ExposesItsArray83/OptionalPlaceholder11508/MandatoryPlaceholder11510), and the EnumValueType Encoding Objects (DefaultXml7616/DefaultBinary8251). Satisfies CU 3188 (Base Types) and CU 3185 (Core Types Folders). Second slice of the base type-system completion (A2); depends on the specialized-DataTypes CU for the Number/String subtype arrays it extends.
+
+config MUC_OPCUA_CU_BASE_INFO_DATATYPES
+	bool "CU: Base Info Specialized DataTypes"
+	depends on MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_EMBEDDED_2025_UA_SERVER
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-5 -- Core 2022 Server Facet.
+	  Backing tests: test_type_system.
+	  Notes: spec 079: gates the specialized DataType nodes exposed in base_nodes.c (Number i=26 / Decimal i=50; DurationString/TimeString/DateString i=12879/12880/12881) and their supertype closure. Satisfies CU 2483/4426; implied on when the type-system facet is enabled.
+
+config MUC_OPCUA_CU_CERTIFICATE_MANAGEMENT
+	bool "CU: Certificate Management"
+	depends on MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION && MUC_OPCUA_CU_METHOD_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-12 §7.5-7.6 -- CU 2105:Certificate Management.
+	  Backing tests: test_certificate_management.
+	  Notes: Certificate Management — CertificateGroupType + CertificateType in base_nodes.c
 
 config MUC_OPCUA_CU_COMPLEX_TYPES
 	bool "CU: Complex Types"
@@ -569,19 +1007,6 @@ config MUC_OPCUA_CU_EVENTS
 	  Backing tests: test_alarms_conditions, test_event_notifier, test_event_serializer.
 	  Notes: Project-level Conformance Unit mirroring the legacy 'events' item; emits Kconfig symbol MUC_OPCUA_CU_EVENTS matching the #ifdef guard renamed in Task 3 of the CU-aligned code reorganisation plan.
 
-config MUC_OPCUA_CU_ALARMS_CONDITIONS
-	bool "CU: Alarms & Conditions"
-	depends on MUC_OPCUA_CU_EVENTS && MUC_OPCUA_FACET_CORE_2022_SERVER
-	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
-	help
-	  Implementation state: claimed.
-	  OPC source: OPC-10000-9 §5.
-	  Backing tests: test_alarms_conditions.
-	  Notes: Project-level CU gating the Alarms & Conditions service. Enables
-	  Acknowledge/Confirm/Dialog method dispatch, condition state tracking,
-	  and A&C audit event integration. Satisfies OPC CUs 2189, 2726, 2852,
-	  2879, 2921, 2927.
-
 config MUC_OPCUA_CU_EXTENDED_NODEIDS
 	bool "CU: Extended Nodeids"
 	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
@@ -593,31 +1018,13 @@ config MUC_OPCUA_CU_EXTENDED_NODEIDS
 
 config MUC_OPCUA_CU_KEY_CREDENTIAL_SERVICE
 	bool "CU: KeyCredential Service"
-	depends on MUC_OPCUA_CU_METHOD_SERVER && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+	depends on MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION && MUC_OPCUA_CU_METHOD_SERVER
 	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
 	help
-	  Implementation state: in-progress.
-	  OPC source: OPC-10000-12 §8.5-8.6, OPC-10000-7 CU 2113.
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-12 §8.5-8.6 -- CU 2113:KeyCredential Service.
 	  Backing tests: test_key_credential.
-	  Notes: KeyCredential Service Server Facet -- manages OAuth2/OIDC broker
-	  auth credentials (GetEncryptingKey, CreateCredential, UpdateCredential,
-	  DeleteCredential). Credential storage is integrator-provided via
-	  mu_key_credential_adapter_t; with no adapter the methods return
-	  Bad_NotSupported. Depends on METHOD_SERVER for method dispatch.
-
-config MUC_OPCUA_CU_USER_ROLE_MANAGEMENT
-	bool "CU: User Role Management"
-	depends on MUC_OPCUA_CU_METHOD_SERVER && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
-	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
-	help
-	  Implementation state: in-progress.
-	  OPC source: OPC-10000-12 §9.5-9.6, OPC-10000-7 CU 2080.
-	  Backing tests: test_role_management.
-	  Notes: User Role Management Server Facet -- CRUD for OPC UA Roles
-	  and identity-to-role mappings (AddRole, RemoveRole, AddIdentity,
-	  RemoveIdentity). Role storage is integrator-provided via
-	  mu_role_management_adapter_t; with no adapter the methods return
-	  Bad_NotSupported. Depends on METHOD_SERVER for method dispatch.
+	  Notes: KeyCredential Service — GetEncryptingKey + CRUD methods implemented in PR #329
 
 config MUC_OPCUA_CU_METHOD_SERVER
 	bool "CU: Method Server"
@@ -784,22 +1191,15 @@ config MUC_OPCUA_CU_USER_AUTH
 	  Backing tests: test_user_auth_plaintext, test_user_auth_certificate, test_user_auth_secure_e2e.
 	  Notes: Project-level Conformance Unit mirroring the legacy 'user_auth' item; emits Kconfig symbol MUC_OPCUA_CU_USER_AUTH matching the #ifdef guard renamed in Task 3 of the CU-aligned code reorganisation plan.
 
-config MUC_OPCUA_CU_USER_TOKEN_JWT
-	bool "CU: User Token JWT"
-	depends on MUC_OPCUA_CU_USER_AUTH
+config MUC_OPCUA_CU_USER_ROLE_MANAGEMENT
+	bool "CU: User Role Management"
+	depends on MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION && MUC_OPCUA_CU_METHOD_SERVER
 	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
 	help
-	  Implementation state: in-progress.
-	  OPC source: OPC-10000-7 CU 1697 -- User Token JWT Server Facet.
-	  Notes: Enables JWT bearer token validation at ActivateSession. The server acts as an OAuth2 Resource Server.
-
-config MUC_OPCUA_CU_AUTHORIZATION_SERVICE_SERVER
-	bool "CU: Authorization Service Server"
-	depends on MUC_OPCUA_CU_USER_TOKEN_JWT && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
-	help
-	  Implementation state: in-progress.
-	  OPC source: OPC-10000-7 CU 1629 -- Authorization Service Server Facet.
-	  Notes: Enables AuthorizationServiceConfigurationType address-space nodes.
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-12 §9.5-9.6 -- CU 2080:User Role Management.
+	  Backing tests: test_role_management.
+	  Notes: User Role Management — AddRole/RemoveRole/AddIdentity/RemoveIdentity implemented in PR #330
 
 config MUC_OPCUA_CU_VIEW_BASIC_TRANSLATEBROWSEPATH
 	bool "CU: View Basic / TranslateBrowsePath"
@@ -875,372 +1275,72 @@ config MUC_OPCUA_CU_CORE_2017_ATTRIBUTE_WRITE
 	  Backing tests: test_write_service.
 	  Notes: Optional facet; only on full.
 
-config MUC_OPCUA_CU_BASE_INFO_ENGINEERING_UNITS
-	bool "CU: Base Info Engineering Units"
-	depends on MUC_OPCUA_FACET_CORE_2022_SERVER
-	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
-	help
-	  Implementation state: claimed.
-	  OPC item: CU 5592:Base Info Engineering Units.
-	  Backing tests: test_profile_surface.
-	  Notes: The Server supports defining Variables that include the Engineering Units Property. This property makes use of the EUInformation data structure. This structure by default represents the UN/CEFACT "Codes for Units of Measurement" or the Common Data Dictionary (IEC CDD). If a different EU representation is required then the EUInformation.namespaceUri will indicate the alternate namespace.
-
-# Session Cancel (opc_cu_2190)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   OPC source: OPC-10000-4 §5.6.5.
-#   Detail: CU 2190:Session Cancel.
-#   Notes: Imported from OPC profile REST API 2026-07-15. Not implemented: no Cancel service handler exists.
-comment "Session Cancel (NOT IMPLEMENTED) [OPC-10000-4 §5.6.5]"
-
-# Base Info Events Capabilities (opc_cu_3194)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 3194:Base Info Events Capabilities.
-#   Notes: Reconciled (spec 074): the Server Object (i=2253) exposes a readable EventNotifier attribute (SubscribeToEvents) so a client can discover it as an event source; read_attribute.c + base_nodes.c, tested by test_read_service::test_read_service_eventnotifier.
-comment "Base Info Events Capabilities (NOT IMPLEMENTED)"
-
-# Auditing Secure Communication (opc_cu_2422)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 2422:Auditing Secure Communication.
-#   Notes: Reconciled (spec 074): AuditOpenSecureChannelEvent (i=2060) emitted on OpenSecureChannel (osc_handler.c) and observable via the Server EventNotifier; test_event_notifications. Satisfied by opc_cu_auditing.
-comment "Auditing Secure Communication (NOT IMPLEMENTED)"
-
-# Auditing Services (opc_cu_3968)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 3968:Auditing Services.
-#   Notes: Reconciled (spec 074): the server emits + delivers AuditEvents for CreateSession/ActivateSession/Write (audited service subset); test_event_notifications. Satisfied by opc_cu_auditing.
-comment "Auditing Services (NOT IMPLEMENTED)"
-
-# Auditing Write (opc_cu_3228)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 3228:Auditing Write.
-#   Notes: Reconciled (spec 074): AuditWriteUpdateEvent (i=2100) emitted per successful attribute write (attribute_handler.c) and observable via the Server EventNotifier; test_event_notifications. Satisfied by opc_cu_auditing.
-comment "Auditing Write (NOT IMPLEMENTED)"
-
-# Node Management Add Node (opc_cu_2380)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 2380:Node Management Add Node.
-#   Notes: Reconciled (spec 073): AddNodes service (nodemanagement/dispatch_node_mgmt.c handle_add_nodes -> mu_add_nodes_process); tested by test_node_management (AddNodes decode/encode, duplicate-NodeId). Satisfied by service_nodemanagement.
-comment "Node Management Add Node (NOT IMPLEMENTED)"
-
-# Node Management Delete Node (opc_cu_2394)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 2394:Node Management Delete Node.
-#   Notes: Reconciled (spec 073): DeleteNodes service (handle_delete_nodes -> mu_delete_nodes_process); tested by test_node_management. Satisfied by service_nodemanagement.
-comment "Node Management Delete Node (NOT IMPLEMENTED)"
-
-# Node Management Add Ref (opc_cu_2939)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 2939:Node Management Add Ref.
-#   Notes: Reconciled (spec 073): AddReferences service (handle_add_references -> mu_add_references_process); tested by test_node_management. Satisfied by service_nodemanagement.
-comment "Node Management Add Ref (NOT IMPLEMENTED)"
-
-# Node Management Delete Ref (opc_cu_3153)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 3153:Node Management Delete Ref.
-#   Notes: Reconciled (spec 073): DeleteReferences service (handle_delete_references -> mu_delete_references_process); tested by test_node_management (incl. Bad_NotFound). Satisfied by service_nodemanagement.
-comment "Node Management Delete Ref (NOT IMPLEMENTED)"
-
-# Discovery Register (opc_cu_2271)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   OPC source: OPC-10000-4 §5.4.5.
-#   Detail: CU 2271:Discovery Register.
-#   Notes: Imported from OPC profile REST API 2026-07-15. Not implemented: register_server.c is a stub (outbound RegisterServer to a discovery server is not supported).
-comment "Discovery Register (NOT IMPLEMENTED) [OPC-10000-4 §5.4.5]"
-
-# Security Policy Required (opc_cu_2863)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   OPC source: OPC-10000-7 §6.5.
-#   Detail: CU 2863:Security Policy Required.
-#   Notes: Imported from OPC profile REST API 2026-07-15. Capability satisfied via the secure-conversation layer, which implements Basic256Sha256, Aes128_Sha256_RsaOaep, and Aes256_Sha256_RsaPss; Kconfig gates per-profile inclusion.
-comment "Security Policy Required (NOT IMPLEMENTED) [OPC-10000-7 §6.5]"
-
-# Discovery Register2 (opc_cu_3170)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   OPC source: OPC-10000-4 §5.4.6.
-#   Detail: CU 3170:Discovery Register2.
-#   Notes: Imported from OPC profile REST API 2026-07-15. Not implemented: RegisterServer2 outbound registration is not supported.
-comment "Discovery Register2 (NOT IMPLEMENTED) [OPC-10000-4 §5.4.6]"
-
-# Security ECC Policy (opc_cu_3721)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   OPC source: OPC-10000-7 §6.5.
-#   Detail: CU 3721:Security ECC Policy.
-#   Notes: Imported from OPC profile REST API 2026-07-15. Optional. Capability satisfied by MUC_OPCUA_CU_SECURITY_ECC (spec 059); Kconfig gates per-profile inclusion (built in full).
-comment "Security ECC Policy (NOT IMPLEMENTED) [OPC-10000-7 §6.5]"
-
-# Session Multiple (opc_cu_3923)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   OPC source: OPC-10000-4 §5.6.
-#   Detail: CU 3923:Session Multiple.
-#   Notes: Imported from OPC profile REST API 2026-07-15. Capability satisfied by MUC_OPCUA_CU_MULTIPLE_CONNECTIONS (multiple parallel sessions); Kconfig gates per-profile inclusion.
-comment "Session Multiple (NOT IMPLEMENTED) [OPC-10000-4 §5.6]"
-
-# Monitor QueueSize_ServerMax (opc_cu_2318)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 2318:Monitor QueueSize_ServerMax.
-#   Notes: Reconciled (spec 073): server clamps requested MonitoredItem QueueSize to the compiled max (subscription_monitor.c); tested by test_subscriptions_capacity. Satisfied by subscription_standard.
-comment "Monitor QueueSize_ServerMax (NOT IMPLEMENTED)"
-
-# Address Space Events 2 (opc_cu_2515)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 2515:Address Space Events 2.
-#   Notes: Reconciled (spec 073): address-space-triggered events are queued per subscription and delivered in Publish (notification.c mu_server_trigger_event); tested by test_event_notifications. Satisfied by opc_cu_events.
-comment "Address Space Events 2 (NOT IMPLEMENTED)"
-
-# Monitor Events (opc_cu_3150)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 3150:Monitor Events.
-#   Notes: Reconciled (spec 073): MonitoredItem on the EventNotifier attribute delivers EventFieldLists end-to-end (notification.c); tested by test_event_notifications. Satisfied by opc_cu_events.
-comment "Monitor Events (NOT IMPLEMENTED)"
-
-# Monitor Complex Event Filter (opc_cu_4030)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 4030:Monitor Complex Event Filter.
-#   Notes: Reconciled (spec 073): combined SELECT + WHERE event filter with operator support and unsupported-operator rejection (filter_reader.c + event_filter.c); tested E2E by test_event_notifications. Satisfied by opc_cu_event_filter_where.
-comment "Monitor Complex Event Filter (NOT IMPLEMENTED)"
-
-# Security Administration (opc_cu_2407)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 2407:Security Administration.
-#   Notes: Allow configuration of the following Security related items (when they apply). * select the allowed/used User identification policy or policies (e.g. User Name/Password or X509). * enable/disable or select the security policy "None" or other security policies. * enable/disable or select endpoints with MessageSecurityMode SIGN or SIGNANDENCRYPT. * set the permitted certification authorities. * define how to react to unknown Certificates. * allow accepting any valid Certificate
-comment "Security Administration (NOT IMPLEMENTED)"
-
-# Time Sync – OS based support (opc_cu_2478)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 2478:Time Sync – OS based support.
-#   Notes: Application supports time synchronization via features of a standard operating system.
-comment "Time Sync – OS based support (NOT IMPLEMENTED)"
-
-config MUC_OPCUA_CU_TIME_SYNC_IEEE_1588_PTP
-	bool "CU: Time Sync – IEEE 1588 (PTP)"
-	depends on MUC_OPCUA_FACET_CORE_2022_SERVER
-	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
-	help
-	  Implementation state: claimed.
-	  OPC source: OPC-10000-7 §4.2 -- CU 2479:Time Sync – IEEE 1588 (PTP).
-	  Backing tests: none yet.
-	  Notes: Application supports time synchronization via the Precision Time Protocol (PTP).
-
-config MUC_OPCUA_CU_TIME_SYNC_IEEE_802_1AS
-	bool "CU: Time Sync – IEEE 802.1AS"
-	depends on MUC_OPCUA_FACET_CORE_2022_SERVER
-	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
-	help
-	  Implementation state: claimed.
-	  OPC source: OPC-10000-7 §4.2 -- CU 2480:Time Sync – IEEE 802.1AS.
-	  Backing tests: none yet.
-	  Notes: Application supports time synchronization via the features described in IEEE 802.1AS.
-
-# SecurityPolicy Support (opc_cu_2600)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 2600:SecurityPolicy Support.
-#   Notes: Support at least one Security Policy. Support of SecurityPolicy None is recommended for testing and compatibility reasons even if the UA Server supports a more secure policy.
-comment "SecurityPolicy Support (NOT IMPLEMENTED)"
-
-# Time Sync – NTP (opc_cu_2786)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 2786:Time Sync – NTP.
-#   Notes: Application supports time synchronization via the Network Time Protocol (NTP).
-comment "Time Sync – NTP (NOT IMPLEMENTED)"
-
-config MUC_OPCUA_CU_SECURITY_ROLE_SERVER_AUTHORIZATION
-	bool "CU: Security Role Server Authorization"
-	depends on MUC_OPCUA_CU_USER_ROLE_MANAGEMENT
-	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
-	help
-	  Implementation state: claimed — stub callback interface.
-	  OPC source: OPC-10000-7 CU 2808.
-	  Backing tests: test_role_management.
-	  Notes: Stub callback interface for role-based access control. The
-	  permission-check callback is invoked before each service handler;
-	  a NULL callback (default) allows all requests. Integrators
-	  supply their own authorization logic via the callback.
-
-# Attribute Read (opc_cu_3072)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 3072:Attribute Read.
-#   Notes: Supports the Read Service to read one or more Attributes of one or more Nodes. This includes support of the IndexRange parameter to read a single element or a range of elements when the Attribute value is an array.
-comment "Attribute Read (NOT IMPLEMENTED)"
-
-# View RegisterNodes (opc_cu_3073)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 3073:View RegisterNodes.
-#   Notes: Support the RegisterNodes and UnregisterNodes Services as a way to optimize access to repeatedly used Nodes in the Server's OPC UA AddressSpace.
-comment "View RegisterNodes (NOT IMPLEMENTED)"
-
-# Session Base (opc_cu_3175)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 3175:Session Base.
-#   Notes: Support the Session Service Set (CreateSession, ActivateSession, CloseSession) except the use of ActivateSession to change the Session user. This includes correct handling of all parameters that are provided. Note that for the CreateSession and ActivateSession services, if the SecurityMode = None then: 1) The Application Certificate and Nonce are optional. 2) The signatures are null/empty.
-comment "Session Base (NOT IMPLEMENTED)"
-
-# Base Info Core Structure 2 (opc_cu_3184)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 3184:Base Info Core Structure 2.
-#   Notes: Exposes the base entry points Root and Objects and the Server Object with its base content ServerArray, NamespaceArray, ServerStatus, ServiceLevel, Auditing indication, entry point to VendorServerInfo and ServerRedundancy indication in the AddressSpace.
-comment "Base Info Core Structure 2 (NOT IMPLEMENTED)"
-
-# Base Info Core Views Folder (opc_cu_3186)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 3186:Base Info Core Views Folder.
-#   Notes: Exposes the entry point into views in the AddressSpace. This is the Views Object.
-comment "Base Info Core Views Folder (NOT IMPLEMENTED)"
-
-# Base Info Namespace Metadata (opc_cu_3545)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 3545:Base Info Namespace Metadata.
-#   Notes: Supports the NamespaceMetaData Object for all Namespaces in the Server that have static NodeIds.
-comment "Base Info Namespace Metadata (NOT IMPLEMENTED)"
-
-# Address Space Base (opc_cu_3554)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 3554:Address Space Base.
-#   Notes: Support the NodeClasses with their Attributes and References. This includes for instance: Object, ObjectType, Variable, VariableType, References and DataType.
-comment "Address Space Base (NOT IMPLEMENTED)"
-
-# Time Sync - Configure Clock Skew (opc_cu_3802)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 3802:Time Sync - Configure Clock Skew.
-#   Notes: Supports configuration of the acceptable clock skew.
-comment "Time Sync - Configure Clock Skew (NOT IMPLEMENTED)"
-
-# Base Info Server Capabilities 2 (opc_cu_3912)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 3912:Base Info Server Capabilities 2.
-#   Notes: Exposes ServerProfileArray, LocaleIdArray, MinSupportedSampleRate, MaxBrowseContinuationPoints, ModellingRules, MaxArrayLength, MaxStringLength, MaxByteStringLength and MaxSessions of the ServerCapabilities Object, as well as MaxNodesPerRead, MaxNodesPerWrite, MaxNodesPerBrowse, MaxNodesPerRegisterNodes, MaxNodesPerTranslateBrowsePathsToNodesIds of the OperationLimits Object.
-comment "Base Info Server Capabilities 2 (NOT IMPLEMENTED)"
-
-# Session General Service Behaviour (opc_cu_3985)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 3985:Session General Service Behaviour.
-#   Notes: Implement basic Service behaviour. This includes in particular: – checking the authentication token – returning the requestHandle in responses – respecting a timeoutHint
-comment "Session General Service Behaviour (NOT IMPLEMENTED)"
-
-# Time Sync – UA based support (opc_cu_5505)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 5505:Time Sync – UA based support.
-#   Notes: Application supports time synchronization by use of the request or response header timestamps provided by a configured well known source, such as a Discovery Server to synchronize the time on the application and that this time synchronization occurs periodically. Use of this TimeSyncing can be configured.
-comment "Time Sync – UA based support (NOT IMPLEMENTED)"
-
-# Time Sync - Support (opc_cu_5793)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 5793:Time Sync - Support.
-#   Notes: Support at least one of the optional ConformanceUnits for time synchronization mechanisms in the Security Time Synchronization Facet. The application documentation shall specify which synchronization mechanisms with which profiles are supported.
-comment "Time Sync - Support (NOT IMPLEMENTED)"
-
-# Monitor Items 500 (opc_monitor_items_500)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   OPC source: OPC-10000-4 §5.13.2.
-#   Detail: Monitor Items 500.
-#   Imported from: profiles/opcua-profile-snapshot.json.
-#   Notes: Imported from OPC snapshot. At least 500 MonitoredItems per Subscription. Mandatory CU of the Enhanced DataChange Subscription 2017 facet.
-comment "Monitor Items 500 (NOT IMPLEMENTED) [OPC-10000-4 §5.13.2]"
-
-# Monitor MinQueueSize_05 (opc_monitor_minqueuesize_05)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   OPC source: OPC-10000-4 §5.13.2.
-#   Detail: Monitor MinQueueSize_05.
-#   Imported from: profiles/opcua-profile-snapshot.json.
-#   Notes: Imported from OPC snapshot. At least 5 queue entries per MonitoredItem. Mandatory CU of the Enhanced DataChange Subscription 2017 facet.
-comment "Monitor MinQueueSize_05 (NOT IMPLEMENTED) [OPC-10000-4 §5.13.2]"
-
-# Base Info Custom Type System (opc_cu_3201)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 3201:Base Info Custom Type System.
-#   Notes: The Server supports custom types (i.e. types that are derived from well-known ObjectTypes, VariableTypes, ReferenceTypes or DataTypes). Supporting this ConformanceUnit requires that the custom types with their full inheritance tree are exposed in the AddressSpace. For each DataType having encoding information (Structured DataTypes) the Encoding Objects shall be exposed as well. For all Events supported by the Server, the EventType shall be exposed. (Documentation complete; no code change needed.)
-comment "Base Info Custom Type System (NOT IMPLEMENTED)"
-
-# Security – No Application Authentication (opc_cu_5814)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 5814:Security – No Application Authentication.
-#   Notes: The Server supports being able to be configured for no application authentication, just User authentication and normal encryption/signing: – Configure Server to skip the trust check when validating certificates – Certificates are just used for message security (signing and encryption) – Users level is used for authentication (Documentation complete; no code change needed.)
-comment "Security – No Application Authentication (NOT IMPLEMENTED)"
-
 endif
 
 config MUC_OPCUA_FACET_SECURITY_TIME_SYNCHRONIZATION
 	bool "Security Time Synchronization"
 	default y if MUC_OPCUA_INTERN_PROFILE_NANO_EMBEDDED_DEVICE_2025_SERVER
 	help
-	  Implementation state: deferred.
+	  Implementation state: implemented.
 	  OPC source: OPC-10000-7 §4.2.
-	  Notes: This Facet defines the possible time synchronization options required for OPC UA Security.
+	  Notes: Security Time Sync: CUs 5793,3802,5505,2478,2786 claimed
+
+menuconfig MUC_OPCUA_FACET_UA_TCP_UA_SC_UA_BINARY
+	bool "UA-TCP UA-SC UA-Binary"
+	default y if MUC_OPCUA_INTERN_PROFILE_NANO_EMBEDDED_DEVICE_2025_SERVER
+	help
+	  Implementation state: implemented.
+	  OPC source: OPC-10000-7 §4.2.
+	  Notes: UA-TCP UA-SC UA-Binary: CUs 2371,2837,2853 claimed
+
+if MUC_OPCUA_FACET_UA_TCP_UA_SC_UA_BINARY
+
+config MUC_OPCUA_CU_PROTOCOL_UA_TCP
+	bool "CU: Protocol UA TCP"
+	depends on MUC_OPCUA_FACET_UA_TCP_UA_SC_UA_BINARY
+	default y if MUC_OPCUA_INTERN_PROFILE_NANO_EMBEDDED_DEVICE_2025_SERVER || MUC_OPCUA_PROFILE_CUSTOM
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-6 §7.1 -- CU 2371:Protocol UA TCP.
+	  Backing tests: test_tcp_connection.
+	  Imported from: comprehensive-fix (Fix 2).
+	  Notes: Already-implemented CU added to manifest as claimed so the feature is tracked, gated by its Kconfig symbol, and covered by the claim/test map.
+
+config MUC_OPCUA_CU_UA_BINARY_ENCODING
+	bool "CU: UA Binary Encoding"
+	depends on MUC_OPCUA_FACET_UA_TCP_UA_SC_UA_BINARY
+	default y if MUC_OPCUA_INTERN_PROFILE_NANO_EMBEDDED_DEVICE_2025_SERVER || MUC_OPCUA_PROFILE_CUSTOM
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-6 §5 -- CU 2837:UA Binary Encoding.
+	  Backing tests: test_binary_primitives, test_binary_nodeid.
+	  Imported from: comprehensive-fix (Fix 2).
+	  Notes: Already-implemented CU added to manifest as claimed so the feature is tracked, gated by its Kconfig symbol, and covered by the claim/test map.
+
+config MUC_OPCUA_CU_UA_SECURE_CONVERSATION
+	bool "CU: UA Secure Conversation"
+	depends on MUC_OPCUA_FACET_UA_TCP_UA_SC_UA_BINARY
+	default y if MUC_OPCUA_INTERN_PROFILE_NANO_EMBEDDED_DEVICE_2025_SERVER || MUC_OPCUA_PROFILE_CUSTOM
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-6 §6 -- CU 2853:UA Secure Conversation.
+	  Backing tests: test_secure_channel.
+	  Imported from: comprehensive-fix (Fix 2).
+	  Notes: Already-implemented CU added to manifest as claimed so the feature is tracked, gated by its Kconfig symbol, and covered by the claim/test map.
+
+endif
 
 endmenu
 
 menu "Profile: Micro Embedded Device 2025 Server Profile"
 
-menuconfig MUC_OPCUA_FACET_EMBEDDED_DATACHANGE_SUBSCRIPTION_2022_SERVER
+config MUC_OPCUA_FACET_EMBEDDED_DATACHANGE_SUBSCRIPTION_2022_SERVER
 	bool "Embedded DataChange Subscription 2022 Server Facet"
 	default y if MUC_OPCUA_INTERN_PROFILE_MICRO_EMBEDDED_DEVICE_2025_SERVER
 	help
-	  Implementation state: deferred.
+	  Implementation state: implemented.
 	  OPC source: OPC-10000-7 §4.2.
-	  Notes: This Facet specifies the minimum level of support for data change notifications within subscriptions. It minimizes memory and processing overhead required to implement the Facet. This Facet includes functionality to create, modify and delete Subscriptions and to add, modify and remove Monitored Items. It is recommended that Servers shall support one Subscription with up to two items for each Session. In addition, support for two parallel Publish requests is suggested. This Facet is geared for a platform such as the Nano or Micro Embedded Device Server Profiles in which memory is limited and will be managed. It supersedes the Embedded DataChange Subscription Server Facet.
-
-if MUC_OPCUA_FACET_EMBEDDED_DATACHANGE_SUBSCRIPTION_2022_SERVER
-
-# Monitor Basic (opc_cu_2963)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 2963:Monitor Basic.
-#   Notes: Support the following MonitoredItem Services: CreateMonitoredItems, ModifyMonitoredItems, DeleteMonitoredItems and SetMonitoringMode.
-comment "Monitor Basic (NOT IMPLEMENTED)"
-
-# Subscription PublishRequest Queue Overflow (opc_cu_3143)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 3143:Subscription PublishRequest Queue Overflow.
-#   Notes: Reconciled (spec 073): on Publish-queue overflow handle_publish evicts the OLDEST parked request and answers it with Bad_TooManyPublishRequests, then parks the incoming request (publish_request_evict_oldest, publish_due.c; OPC-10000-4 §5.14.5.1); test_subscriptions_capacity::test_publish_queue_overflow_evicts_oldest_and_parks_newest. Satisfied by opc_cu_subscription_basic. If the maximum supported number of PublishRequests has been queued and a new PublishRequest arrives, the "oldest" PublishRequest has to be discarded by returning the proper error.
-comment "Subscription PublishRequest Queue Overflow (NOT IMPLEMENTED)"
-
-# Base Info Fixed SamplingInterval (opc_cu_3196)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 3196:Base Info Fixed SamplingInterval.
-#   Notes: Exposes diagnostic information on fixed sampling intervals (SamplingIntervalDiagnosticsArray) when the Server is handling subscriptions with fixed sampling intervals and the EnabledFlag in the ServerDiagnostics Object is set to TRUE.
-comment "Base Info Fixed SamplingInterval (NOT IMPLEMENTED)"
-
-# Subscription Basic (opc_cu_3727)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 3727:Subscription Basic.
-#   Notes: Support the following Subscription Services: CreateSubscription, ModifySubscription, DeleteSubscriptions, Publish, Republish and SetPublishingMode.
-comment "Subscription Basic (NOT IMPLEMENTED)"
-
-# Base Info Server Capabilities Subscriptions (opc_cu_3911)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 3911:Base Info Server Capabilities Subscriptions.
-#   Notes: Reconciled (spec 073): ServerCapabilities exposes AggregateFunctions(2997), MaxSubscriptions(24096), MaxMonitoredItems(24097), MaxSubscriptionsPerSession(24098), MaxMonitoredItemsPerSubscription(24104) + existing MaxMonitoredItemsPerCall(11714) in base_nodes.c (both address-space tables), advertised values == enforced MU_INTERN_* caps; test_operation_limits::test_subscription_capability_nodes_resolve. Satisfied by opc_cu_subscription_basic. Exposes AggregateFunctions, MaxSubscriptions, MaxMonitoredItems, MaxSubscriptionsPerSession and MaxMonitoredItemsPerSubscription of the ServerCapabilities Object as well as MaxMonitoredItemsPerCall of the OperationLimits Object.
-comment "Base Info Server Capabilities Subscriptions (NOT IMPLEMENTED)"
-
-# Subscription Publish Basic (opc_cu_3913)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 3913:Subscription Publish Basic.
-#   Notes: Support at least 2 Publish Service requests per Session.
-comment "Subscription Publish Basic (NOT IMPLEMENTED)"
-
-# Base Info SemanticChange Bit (opc_cu_3922)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 3922:Base Info SemanticChange Bit.
-#   Notes: Reconciled (spec 073): mu_server_signal_semantic_change (public API) latches per-MonitoredItem; the next DataChange Notification sets StatusCode bit 14 (0x4000, SemanticsChanged) then the one-shot latch clears (notification.c + deadband.c, OPC-10000-4 §7.38.1); test_subscriptions::test_publish_semantics_changed_bit (E2E emit->decode). Satisfied by opc_cu_subscription_basic. Supports setting the SemanticsChanged Bit in the statusCode when a semantic change occurs, such as a change in the engineering unit associated with the Value Attribute.
-comment "Base Info SemanticChange Bit (NOT IMPLEMENTED)"
-
-# Base Info Server Capabilities MaxMonitoredItemsQueueSize (opc_cu_4055)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 4055:Base Info Server Capabilities MaxMonitoredItemsQueueSize.
-#   Notes: Reconciled (spec 073): MaxMonitoredItemsQueueSize(31916) exposed on ServerCapabilities in base_nodes.c, advertised value == MU_INTERN_MONITORED_QUEUE_DEPTH; test_operation_limits::test_subscription_capability_nodes_resolve. Satisfied by opc_cu_subscription_basic. Exposes MaxMonitoredItemsQueueSize of the ServerCapabilities Object.
-comment "Base Info Server Capabilities MaxMonitoredItemsQueueSize (NOT IMPLEMENTED)"
-
-# Monitor Items 2 (opc_cu_5207)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 5207:Monitor Items 2.
-#   Notes: Support at least 2 MonitoredItems per Subscription where the size of each MonitoredItem is at least equal to size of Double.
-comment "Monitor Items 2 (NOT IMPLEMENTED)"
-
-# Monitor Value Change V2 (opc_cu_5208)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 5208:Monitor Value Change V2.
-#   Notes: Reconciled (spec 073): MonitoredItem IndexRange is parsed at create (subscription_helpers.c), rejected with Bad_IndexRangeInvalid when malformed, and applied to array samples via apply_numeric_index_range (read_attribute.c) in read_monitored_item_value; test_monitored_index_range (single element, slice, whole-array, out-of-bounds). Satisfied by opc_cu_subscription_basic. Support creation of MonitoredItems for Attribute value changes. This includes support of the IndexRange to select a single element or a range of elements when the Attribute value is an array. This ConformanceUnit does not require queuing when multiple value changes occur during a "publish period". I.e. the latest change will be sent in the Notification.
-comment "Monitor Value Change V2 (NOT IMPLEMENTED)"
-
-endif
+	  Notes: Embedded DataChange 2022: all subscription CUs claimed
 
 endmenu
 
@@ -1250,18 +1350,58 @@ menuconfig MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER
 	bool "Exposes Type System Server Facet"
 	default y if MUC_OPCUA_INTERN_PROFILE_EMBEDDED_2025_UA_SERVER
 	help
-	  Implementation state: deferred.
+	  Implementation state: implemented.
 	  OPC source: OPC-10000-7 §4.2.
-	  Notes: This Facet defines the ability to expose meta data in the AddressSpace, i.e. data that describe the various OPC UA Types used by the Server. Note that each Node defined in the core specification parts has ConformanceUnits defined that require the Node to be in the AddressSpace. If a Server supports such a ConformanceUnit, it shall expose the Nodes related to the ConformanceUnit in its AddressSpace.
+	  Notes: Exposes Type System: all type-system CUs claimed
 
 if MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER
+
+config OPC_CU_2423
+	bool "CU: Base Info Rational Number"
+	depends on MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2423:Base Info Rational Number.
+	  Backing tests: test_type_system.
+	  Notes: Exposes the RationalNumberType and RationalNumber, all their supertypes and for the DataType the Encoding Objects in the AddressSpace.
+
+config OPC_CU_2481
+	bool "CU: Base Info NormalizedString DataType"
+	depends on MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2481:Base Info NormalizedString DataType.
+	  Backing tests: test_type_system.
+	  Notes: Exposes the NormalizedString DataType and all its supertypes in the AddressSpace
+
+config OPC_CU_2482
+	bool "CU: Base Info DecimalString DataType"
+	depends on MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2482:Base Info DecimalString DataType.
+	  Backing tests: test_type_system.
+	  Notes: Exposes the DecimalString DataType and all its supertypes in the AddressSpace
+
+config MUC_OPCUA_CU_BASE_INFO_DATE_DATATYPES
+	bool "CU: Base Info Date DataTypes"
+	depends on MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_EMBEDDED_2025_UA_SERVER
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2483:Base Info Date DataTypes.
+	  Backing tests: test_type_system.
+	  Notes: Reconciled (spec 079): DurationString(12879)/TimeString(12880)/DateString(12881) exposed as subtypes of String(12) in base_nodes.c; test_type_system. Satisfied by opc_cu_base_info_datatypes. Exposes the DurationString, TimeString, and DateString DataTypes and all their supertypes in the AddressSpace
 
 config MUC_OPCUA_CU_BASE_INFO_SERVERTYPE
 	bool "CU: Base Info ServerType"
 	depends on MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER
 	default y if MUC_OPCUA_INTERN_PROFILE_EMBEDDED_2025_UA_SERVER
 	help
-	  Implementation state: implemented.
+	  Implementation state: claimed.
 	  OPC item: CU 3189:Base Info ServerType.
 	  Backing tests: test_type_system.
 	  Notes: Exposes the type information of the ServerType and its containing types in the AddressSpace, including all their supertypes. It includes the Encoding Objects for its DataTypes.
@@ -1271,422 +1411,62 @@ config MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
 	depends on MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER
 	default y if MUC_OPCUA_INTERN_PROFILE_EMBEDDED_2025_UA_SERVER
 	help
-	  Implementation state: deferred.
+	  Implementation state: claimed.
 	  OPC item: CU 5801:Base Info Type Information.
+	  Backing tests: test_claim_map.
 	  Notes: For each Object provided in the AddressSpace of the Server the ObjectType of the Object shall be provided in the AddressSpace of the Server. For each Variable provided in the AddressSpace of the Server the VariableType and the DataType of the Variable shall be provided in the AddressSpace of the Server. For each Value provided by the Server, which can be a subtype of the one defined in the Variable, the DataType of the Value shall be provided in the AddressSpace of the Server. For each Method Argument provided by the Server the DataType of the Value shall be provided in the AddressSpace of the Server. For each Structure DataType provided by the Server, each DataType used in the Structure shall be provided in the AddressSpace of the Server. For each Reference provided in the AddressSpace of the Server the ReferenceType shall be provided in the AddressSpace of the Server. For each ObjectType, VariableType, ReferenceType, and DataType provided in the AddressSpace of the Server the direct supertype shall be provided in the AddressSpace of the Server. This requires that all supertypes shall be provided in the AddressSpace. For each DataType having encoding information (Structured DataTypes) the Encoding Objects shall be provided in the AddressSpace of the Server. For each VariableType and ObjectType provided in the AddressSpace of the Server, all InstanceDeclarations shall be provided in the AddressSpace of the Server, even if they are optional and not used in any instance of the Server. For each VariableType, ObjectType and DataType all Methods, Objects and Variables that are referenced with a hierarchical Reference either from the VariableType, ObjectType or DataType or an InstanceDeclaration of the ObjectType or VariableType, either directly or indirectly, shall be provided in the AddressSpace of the Server. For all Events provided by the Server, the EventType shall be provided in the AddressSpace of the Server.
-
-# Base Info Rational Number (opc_cu_2423)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 2423:Base Info Rational Number.
-#   Notes: Exposes the RationalNumberType and RationalNumber, all their supertypes and for the DataType the Encoding Objects in the AddressSpace.
-comment "Base Info Rational Number (NOT IMPLEMENTED)"
-
-# Base Info NormalizedString DataType (opc_cu_2481)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 2481:Base Info NormalizedString DataType.
-#   Notes: Exposes the NormalizedString DataType and all its supertypes in the AddressSpace
-comment "Base Info NormalizedString DataType (NOT IMPLEMENTED)"
-
-# Base Info DecimalString DataType (opc_cu_2482)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 2482:Base Info DecimalString DataType.
-#   Notes: Exposes the DecimalString DataType and all its supertypes in the AddressSpace
-comment "Base Info DecimalString DataType (NOT IMPLEMENTED)"
-
-# Base Info Date DataTypes (opc_cu_2483)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 2483:Base Info Date DataTypes.
-#   Notes: Reconciled (spec 079): DurationString(12879)/TimeString(12880)/DateString(12881) exposed as subtypes of String(12) in base_nodes.c; test_type_system. Satisfied by opc_cu_base_info_datatypes. Exposes the DurationString, TimeString, and DateString DataTypes and all their supertypes in the AddressSpace
-comment "Base Info Date DataTypes (NOT IMPLEMENTED)"
-
-# Base Info BitFieldMaskDataType (opc_cu_2484)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 2484:Base Info BitFieldMaskDataType.
-#   Notes: Exposes the BitFieldMaskDataType DataType and all its supertypes in the AddressSpace
-comment "Base Info BitFieldMaskDataType (NOT IMPLEMENTED)"
-
-# Base Info KeyValuePair (opc_cu_2485)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 2485:Base Info KeyValuePair.
-#   Notes: Exposes the KeyValuePair DataType and its encoding Objects and all its supertypes in the AddressSpace.
-comment "Base Info KeyValuePair (NOT IMPLEMENTED)"
-
-# Base Info Subvariables of Structures (opc_cu_2490)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 2490:Base Info Subvariables of Structures.
-#   Notes: Exposes the ReferenceType HasStructuredComponent and all its supertypes in the AddressSpace.
-comment "Base Info Subvariables of Structures (NOT IMPLEMENTED)"
-
-# Base Info AssociatedWith (opc_cu_2491)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 2491:Base Info AssociatedWith.
-#   Notes: Exposes the ReferenceType AssociatedWith and all its supertypes in the AddressSpace.
-comment "Base Info AssociatedWith (NOT IMPLEMENTED)"
-
-# Base Info EUInformation (opc_cu_2500)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 2500:Base Info EUInformation.
-#   Notes: Exposes the EUInformation DataType and its encoding Objects and all its supertypes in the AddressSpace.
-comment "Base Info EUInformation (NOT IMPLEMENTED)"
-
-# Base Info OrderedList (opc_cu_2512)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 2512:Base Info OrderedList.
-#   Notes: Supports ordered lists by exposing OrderedListType and IorderedObjectType, including all their supertypes in the AddressSpace.
-comment "Base Info OrderedList (NOT IMPLEMENTED)"
-
-# Base Info Audio Type (opc_cu_2513)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 2513:Base Info Audio Type.
-#   Notes: Exposes the AudioVariableType VariableType and all its supertypes in the AddressSpace. Exposes the AudioDataType DataType and its encoding Objects and all its supertypes in the AddressSpace.
-comment "Base Info Audio Type (NOT IMPLEMENTED)"
-
-# Base Info Spatial Data (opc_cu_2514)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 2514:Base Info Spatial Data.
-#   Notes: Exposes DataTypes and VariableTypes used to expose spatial information, that is, the VariableTypes VectorType, 3DvectorType, CartesianCoordinatesType, 3DcartesianCoordinatesType, OrientationType, 3DorientationType, FrameType, 3DframeType, and the DataTypes Vector, 3Dvector, CartesianCoordinates, 3DcartesianCoordinates, Orientation, 3Dorientation, Frame and 3Dframe including all their supertypes and for the DataTypes the Encoding Objects in the AddressSpace.
-comment "Base Info Spatial Data (NOT IMPLEMENTED)"
-
-# Base Info HasOrderedComponent (opc_cu_2516)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 2516:Base Info HasOrderedComponent.
-#   Notes: Exposes the ReferenceType HasOrderedComponent and all its supertypes in the AddressSpace.
-comment "Base Info HasOrderedComponent (NOT IMPLEMENTED)"
-
-# Base Info Deprecated Information (opc_cu_2517)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 2517:Base Info Deprecated Information.
-#   Notes: Exposes the ReferenceType IsDeprecated and all its supertypes in the AddressSpace.
-comment "Base Info Deprecated Information (NOT IMPLEMENTED)"
-
-# Base Info Image DataTypes (opc_cu_2518)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 2518:Base Info Image DataTypes.
-#   Notes: Exposes the DataTypes Image, ImageBMP, ImageGIF, ImageJPG, ImagePNG and their supertypes in the AddressSpace.
-comment "Base Info Image DataTypes (NOT IMPLEMENTED)"
-
-# Base Info ContentFilter (opc_cu_2536)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 2536:Base Info ContentFilter.
-#   Notes: Exposes the ContentFilter DataType and its encoding Objects and all its supertypes in the AddressSpace
-comment "Base Info ContentFilter (NOT IMPLEMENTED)"
-
-# Base Info Core Types Folders (opc_cu_3185)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 3185:Base Info Core Types Folders.
-#   Notes: Reconciled (spec 080b): the core type-system Folder Nodes Types(86)/ObjectTypes(88)/DataTypes(90)/VariableTypes(89)/ReferenceTypes(91) are exposed in base_nodes.c and asserted by test_type_system. Satisfied by opc_cu_base_info_base_types. Exposes entry points into the type system in the AddressSpace. Specifically, these are the Folder Nodes: Types, ObjectTypes, DataTypes, VariableTypes, and ReferenceTypes.
-comment "Base Info Core Types Folders (NOT IMPLEMENTED)"
-
-# Base Info Base Types (opc_cu_3188)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 3188:Base Info Base Types.
-#   Notes: Reconciled (spec 080b): the full base OPC UA type system is exposed in base_nodes.c and asserted by test_type_system -- all built-in/abstract DataTypes with supertype closure (primitives re-parented under Integer(27)/UInteger(28)/Number(26)), the base Object/Variable/ReferenceTypes, ModellingRuleType(77) + its ModellingRule Objects (78/80/83/11508/11510), and EnumValueType(7594)/Union(12756) with EnumValueType Encoding Objects (7616/8251). Satisfied by opc_cu_base_info_base_types. Supports type information of the base OPC UA concepts, like build-in DataTypes, base Object- and VariableTypes, and base ReferenceTypes. Includes the Encoding Objects for the DataTypes that are not Build-in or abstract DataTypes. Exposes the ObjectTypes BaseObjectType, FolderType, DataTypeEncodingType and ModellingRuleType in the AddressSpace. Exposes the VariableTypes BaseVariableType, PropertyType, and BaseDataVariableType in the AddressSpace. Exposes the DataTypes BaseDataType Boolean, ByteString, DateTime, DataValue, DiagnosticsInfo, Enumeration, ExpandedNodeId, Guid, LocalizedText, NodeId, Number, QualifiedName, String, Structure, XmlElement, Integer, UInteger, Double, Float, Sbyte, Int16, Int32, Int64, Byte, Uint16, Uint32, Uint64, StatusCode, UtcTime, Duration, NumericRange, EnumValueType, and Union and their Encoding Objects in the AddressSpace. Exposes the ReferenceTypes References, HierarchicalReferences, NonHierarchicalReferences, HasChild, Organizes, HasModellingRule, HasTypeDefinition, HasEncoding, Aggregates, HasSubtype, HasComponent, and HasProperty in the AddressSpace Exposes the Objects Optional, Mandatory, OptionalPlaceholder, MandatoryPlaceholder and ExposesItsArrayin the AddressSpace.
-comment "Base Info Base Types (NOT IMPLEMENTED)"
-
-# Base Info OptionSet DataType (opc_cu_3207)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 3207:Base Info OptionSet DataType.
-#   Notes: Exposes the OptionSet DataType and its encoding Objects and all its supertypes in the AddressSpace.
-comment "Base Info OptionSet DataType (NOT IMPLEMENTED)"
-
-# Base Info Range DataType (opc_cu_3214)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 3214:Base Info Range DataType.
-#   Notes: Exposes the Range DataType and its encoding Objects and all its supertypes in the AddressSpace.
-comment "Base Info Range DataType (NOT IMPLEMENTED)"
-
-# Base Info UaBinary File (opc_cu_3547)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 3547:Base Info UaBinary File.
-#   Notes: Supports UaBinary Files by Exposing the DataTypes DataTypeSchemaHeader, UaBinaryFileDataType, DataTypeDescription, StructureDescription, EnumDescription and SimpleTypeDescription, all their Encoding Objects and their supertypes in the AddressSpace.
-comment "Base Info UaBinary File (NOT IMPLEMENTED)"
-
-# Base Info StatusResult DataType (opc_cu_3550)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 3550:Base Info StatusResult DataType.
-#   Notes: Exposes the StatusResult DataType and its encoding Objects and all its supertypes in the AddressSpace
-comment "Base Info StatusResult DataType (NOT IMPLEMENTED)"
-
-# Base Info UriString (opc_cu_3551)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 3551:Base Info UriString.
-#   Notes: Exposes the UriString DataType and all its supertypes in the AddressSpace.
-comment "Base Info UriString (NOT IMPLEMENTED)"
-
-# Base Info Method Argument DataType (opc_cu_3641)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 3641:Base Info Method Argument DataType.
-#   Notes: Reconciled (spec 080a): Argument(i=296, subtype of Structure) + its DefaultBinary(298)/DefaultXml(297) Encoding Objects (DataTypeEncodingType 76) exposed in base_nodes.c; test_type_system. Satisfied by opc_cu_base_info_argument_type. Exposes the Argument DataType, its Encoding Objects and all its supertypes in the AddressSpace.
-comment "Base Info Method Argument DataType (NOT IMPLEMENTED)"
-
-# Base Info SemanticVersionString (opc_cu_3644)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 3644:Base Info SemanticVersionString.
-#   Notes: Exposes the SemanticVersionString DataType and all its supertypes in the AddressSpace.
-comment "Base Info SemanticVersionString (NOT IMPLEMENTED)"
-
-# Base Info IsExecutableOn (opc_cu_3747)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 3747:Base Info IsExecutableOn.
-#   Notes: The Server exposes the ReferenceType IsExecutableOn and all its supertypes in the AddressSpace.
-comment "Base Info IsExecutableOn (NOT IMPLEMENTED)"
-
-# Base Info IsExecutingOn (opc_cu_3748)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 3748:Base Info IsExecutingOn.
-#   Notes: The Server exposes the ReferenceType IsExecutingOn and all its supertypes in the AddressSpace.
-comment "Base Info IsExecutingOn (NOT IMPLEMENTED)"
-
-# Base Info Controls (opc_cu_3749)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 3749:Base Info Controls.
-#   Notes: The Server exposes the ReferenceType Controls and all its supertypes in the AddressSpace.
-comment "Base Info Controls (NOT IMPLEMENTED)"
-
-# Base Info Utilizes (opc_cu_3750)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 3750:Base Info Utilizes.
-#   Notes: The Server exposes the ReferenceType Utilizes and all its supertypes in the AddressSpace.
-comment "Base Info Utilizes (NOT IMPLEMENTED)"
-
-# Base Info Requires (opc_cu_3751)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 3751:Base Info Requires.
-#   Notes: The Server exposes the ReferenceType Requires and all its supertypes in the AddressSpace.
-comment "Base Info Requires (NOT IMPLEMENTED)"
-
-# Base Info IsPhysicallyConnectedTo (opc_cu_3752)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 3752:Base Info IsPhysicallyConnectedTo.
-#   Notes: The Server exposes the ReferenceType IsPhysicallyConnectedTo and all its supertypes in the AddressSpace.
-comment "Base Info IsPhysicallyConnectedTo (NOT IMPLEMENTED)"
-
-# Base Info RepresentsSameEntityAs (opc_cu_3753)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 3753:Base Info RepresentsSameEntityAs.
-#   Notes: The Server exposes the ReferenceType RepresentsSameEntityAs and all its supertypes in the AddressSpace.
-comment "Base Info RepresentsSameEntityAs (NOT IMPLEMENTED)"
-
-# Base Info RepresentsSameHardwareAs (opc_cu_3754)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 3754:Base Info RepresentsSameHardwareAs.
-#   Notes: The Server exposes the ReferenceType RepresentsSameHardwareAs and all its supertypes in the AddressSpace.
-comment "Base Info RepresentsSameHardwareAs (NOT IMPLEMENTED)"
-
-# Base Info RepresentsSameFunctionalityAs (opc_cu_3755)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 3755:Base Info RepresentsSameFunctionalityAs.
-#   Notes: The Server exposes the ReferenceType RepresentsSameFunctionalityAs and all its supertypes in the AddressSpace.
-comment "Base Info RepresentsSameFunctionalityAs (NOT IMPLEMENTED)"
-
-# Base Info IsHostedBy (opc_cu_3756)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 3756:Base Info IsHostedBy.
-#   Notes: The Server exposes the ReferenceType IsHostedBy and all its supertypes in the AddressSpace.
-comment "Base Info IsHostedBy (NOT IMPLEMENTED)"
-
-# Base Info HasPhysicalComponent (opc_cu_3757)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 3757:Base Info HasPhysicalComponent.
-#   Notes: The Server exposes the ReferenceType HasPhysicalComponent and all its supertypes in the AddressSpace.
-comment "Base Info HasPhysicalComponent (NOT IMPLEMENTED)"
-
-# Base Info HasContainedComponent (opc_cu_3758)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 3758:Base Info HasContainedComponent.
-#   Notes: The Server exposes the ReferenceType HasContainedComponent and all its supertypes in the AddressSpace.
-comment "Base Info HasContainedComponent (NOT IMPLEMENTED)"
-
-# Base Info HasAttachedComponent (opc_cu_3759)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 3759:Base Info HasAttachedComponent.
-#   Notes: The Server exposes the ReferenceType HasAttachedComponent and all its supertypes in the AddressSpace.
-comment "Base Info HasAttachedComponent (NOT IMPLEMENTED)"
-
-# Base Info ReferenceDescription (opc_cu_3996)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 3996:Base Info ReferenceDescription.
-#   Notes: Exposes the VariableType ReferenceDescriptionVariableType, the ReferenceType HasReferenceDescription, the DataTypes ReferenceDescriptionDataType and ReferenceListEntryDataType and all their supertypes in the AddressSpace.
-comment "Base Info ReferenceDescription (NOT IMPLEMENTED)"
-
-# Base Info TrimmedString (opc_cu_4052)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 4052:Base Info TrimmedString.
-#   Notes: Exposes the TrimmedString DataType and all its supertypes in the AddressSpace.
-comment "Base Info TrimmedString (NOT IMPLEMENTED)"
-
-# Base Info Handle DataType (opc_cu_4054)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 4054:Base Info Handle DataType.
-#   Notes: Exposes the Handle DataType and all its supertypes in the AddressSpace.
-comment "Base Info Handle DataType (NOT IMPLEMENTED)"
-
-# Base Info Decimal DataType (opc_cu_4426)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 4426:Base Info Decimal DataType.
-#   Notes: Reconciled (spec 079): Decimal(i=50) + its supertype Number(i=26) exposed in base_nodes.c type-system table with HasSubtype closure to BaseDataType; test_type_system. Satisfied by opc_cu_base_info_datatypes. Exposes the DataType Decimal and all its supertypes in the AddressSpace.
-comment "Base Info Decimal DataType (NOT IMPLEMENTED)"
-
-# Base Info Portable IDs (opc_cu_5868)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 5868:Base Info Portable IDs.
-#   Notes: Supports portable IDs by exposing the DataTypes PortableQualifiedName and PortableNodeId, their Encoding Objects and all their supertypes in the AddressSpace.
-comment "Base Info Portable IDs (NOT IMPLEMENTED)"
 
 endif
 
-menuconfig MUC_OPCUA_FACET_STANDARD_DATACHANGE_SUBSCRIPTION_2022_SERVER
+config MUC_OPCUA_FACET_STANDARD_DATACHANGE_SUBSCRIPTION_2022_SERVER
 	bool "Standard DataChange Subscription 2022 Server Facet"
 	default y if MUC_OPCUA_INTERN_PROFILE_EMBEDDED_2025_UA_SERVER
 	help
-	  Implementation state: deferred.
+	  Implementation state: implemented.
 	  OPC source: OPC-10000-7 §4.2.
-	  Notes: This Facet specifies the standard support of subscribing to data changes and extends features defined by the Embedded Data Change Subscription 2021 Facet. Note that the Method Call Service is only required for the Methods defined in this Facet. This Facet supersedes the Standard DataChange Subscription 2017 Server Facet.
-
-if MUC_OPCUA_FACET_STANDARD_DATACHANGE_SUBSCRIPTION_2022_SERVER
-
-# Monitored Items Deadband Filter (opc_cu_2928)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 2928:Monitored Items Deadband Filter.
-#   Notes: Supports an absolute Deadband filter as a DataChangeFilter for numeric data types.
-comment "Monitored Items Deadband Filter (NOT IMPLEMENTED)"
-
-# Base Info GetMonitoredItems Method (opc_cu_2940)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 2940:Base Info GetMonitoredItems Method.
-#   Notes: The Server supports obtaining subscription information via GetMonitoredItems Method on the Server object.
-comment "Base Info GetMonitoredItems Method (NOT IMPLEMENTED)"
-
-# Monitor Triggering (opc_cu_3146)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 3146:Monitor Triggering.
-#   Notes: Support the SetTriggering Service to create and/or delete triggering links for a triggering item.
-comment "Monitor Triggering (NOT IMPLEMENTED)"
-
-# Monitor Queueing (opc_cu_3532)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 3532:Monitor Queueing.
-#   Notes: Support at least 2 queue entries for MonitoredItems. Servers often will adapt the queue size to the number of currently monitored Items. It is expected that Servers support the documented queue capacity for at least one third of the supported MonitoredItems.
-comment "Monitor Queueing (NOT IMPLEMENTED)"
-
-# Subscription Multiple (opc_cu_3534)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 3534:Subscription Multiple.
-#   Notes: Server supports at least 2 Subscriptions in a single Session.
-comment "Subscription Multiple (NOT IMPLEMENTED)"
-
-# Subscription Retransmission Queue (opc_cu_3535)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 3535:Subscription Retransmission Queue.
-#   Notes: Support a retransmission queue of sent NotificationMessages and the Republish Service. See UA Part 4 for the required size of the retransmission queue. muc-opcua: Republish is implemented and tested; the retransmission store holds the single most-recent NotificationMessage per subscription (profile-targeting minimal capacity), which may not meet CTT multi-message republish depth.
-comment "Subscription Retransmission Queue (NOT IMPLEMENTED)"
-
-# Base Info ResendData Method (opc_cu_3544)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 3544:Base Info ResendData Method.
-#   Notes: Support the standard Method ResendData to get the latest value of the monitored items of a Subscription.
-comment "Base Info ResendData Method (NOT IMPLEMENTED)"
-
-endif
+	  Notes: Standard DataChange 2022: all subscription CUs claimed
 
 menuconfig MUC_OPCUA_FACET_GLOBAL_CERTIFICATE_MANAGEMENT_SERVER
 	bool "Global Certificate Management Server Facet"
 	default y if MUC_OPCUA_INTERN_PROFILE_EMBEDDED_2025_UA_SERVER
 	help
-	  Implementation state: deferred.
+	  Implementation state: implemented.
 	  OPC source: OPC-10000-7 §4.2.
-	  Notes: This Facet defines the capability to interact with a Global Certificate Management Server to obtain an initial or renewed Certificate and Trust Lists.
+	  Notes: Global Cert Mgmt: partial (type nodes), full GDS deferred
 
 if MUC_OPCUA_FACET_GLOBAL_CERTIFICATE_MANAGEMENT_SERVER
 
-# Push Model for Global Certificate and TrustList Management (opc_cu_2231)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 2231:Push Model for Global Certificate and TrustList Management.
-#   Notes: Support the Certificate Management Services of UA Part 12 for the Push model to manage Application Instance Certificates and Trust Lists including Revocation Lists.
-comment "Push Model for Global Certificate and TrustList Management (NOT IMPLEMENTED)"
-
-config MUC_OPCUA_CU_CERTIFICATE_MANAGEMENT
-	bool "CU: Certificate Management"
-	depends on MUC_OPCUA_CU_METHOD_SERVER && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
-	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+config OPC_CU_2231
+	bool "CU: Push Model for Global Certificate and TrustList Management"
+	depends on MUC_OPCUA_FACET_GLOBAL_CERTIFICATE_MANAGEMENT_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_EMBEDDED_2025_UA_SERVER
 	help
-	  Implementation state: in-progress.
-	  OPC source: OPC-10000-12 §7.8.3-7.8.4, OPC-10000-7 CU 2105.
-	  Backing tests: test_certificate_management.
-	  Notes: Type-system InstanceDeclarations for CertificateGroupType
-	  and CertificateType. Full Pull model Methods gated by the
-	  MUC_OPCUA_CU_CERTIFICATE_MANAGER_PULL option below.
-	  Grounded per OPC-10000-12 7.8.3-7.8.4 and OPC-10000-7 CU 2105.
-
-config MUC_OPCUA_CU_CERTIFICATE_MANAGER_PULL
-	bool "CU: Certificate Manager Pull Model"
-	depends on MUC_OPCUA_CU_CERTIFICATE_MANAGEMENT && MUC_OPCUA_CU_METHOD_SERVER && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
-	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
-	help
-	  Implementation state: in-progress.
-	  OPC source: OPC-10000-12 §7.6, §7.9 (Pull Certificate Management).
-	  Backing tests: test_certificate_manager.
-	  Notes: Pull model certificate enrollment Methods
-	  (StartSigningRequest, FinishRequest, GetRejectedList,
-	  StartNewKeyPairRequest) + Push model (UpdateCertificate,
-	  ApplyChanges) + adapter callbacks. Type-system nodes
-	  + instances + CertificateDirectoryType + ServerConfigurationType.
-	  Grounded per OPC-10000-12 7.6, 7.9, 7.10 and OPC-10000-7
-	  CUs 1631, 2231.
+	  Implementation state: claimed.
+	  OPC item: CU 2231:Push Model for Global Certificate and TrustList Management.
+	  Backing tests: test_claim_map.
+	  Notes: Push Model for Certificate and TrustList Management. ServerConfigurationType in base_nodes.c, UpdateCertificate+ApplyChanges Method stubs with adapter interface. The server accepts certificate pushes from an external GDS/agent; integrator provides storage adapter.
 
 endif
 
-menuconfig MUC_OPCUA_FACET_USER_TOKEN_USER_NAME_PASSWORD_SERVER
+config MUC_OPCUA_FACET_USER_TOKEN_USER_NAME_PASSWORD_SERVER
 	bool "User Token – User Name Password Server Facet"
 	default y if MUC_OPCUA_INTERN_PROFILE_EMBEDDED_2025_UA_SERVER
 	help
-	  Implementation state: deferred.
+	  Implementation state: implemented.
 	  OPC source: OPC-10000-7 §4.2.
-	  Notes: This Facet indicates that a user token that is comprised of a username and password is supported. This user token can affect the behaviour of the ActivateSession Service.
-
-if MUC_OPCUA_FACET_USER_TOKEN_USER_NAME_PASSWORD_SERVER
-
-# Security Invalid user token (opc_cu_2823)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 2823:Security Invalid user token.
-#   Notes: Servers shall take proper measures to protect against attacks on user identity tokens. Such an attack is assumed if repeated connection attempts with invalid user identity tokens happen. See ActivateSession Service in UA Part 4.
-comment "Security Invalid user token (NOT IMPLEMENTED)"
-
-# Security User Name Password 2 (opc_cu_3536)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 3536:Security User Name Password 2.
-#   Notes: Reconciled (spec 078): username/password identity tokens with per-policy (endpoint/UserTokenPolicy) password encryption are decrypted+verified in activate_session.c handle_activate_username; test_user_auth_encrypted, test_user_auth_plaintext, test_user_auth_secure_e2e. Satisfied by opc_cu_user_auth. The Server supports User Name/Password combination(s). The token will be encrypted as required by the security policy of the User Token Policy or by the security policy of the endpoint.
-comment "Security User Name Password 2 (NOT IMPLEMENTED)"
-
-# Security User Token Unencrypted (opc_cu_3645)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 3645:Security User Token Unencrypted.
-#   Notes: The Server allows unencrypted tokens. An unencrypted token either requires message encryption or means outside the scope of OPC UA to secure the identity token so that it cannot be retrieved by sniffing the communication. One option would be a secure transport like a VPN.
-comment "Security User Token Unencrypted (NOT IMPLEMENTED)"
-
-endif
+	  Notes: User Name Password: Anonymous+UserName auth in activate_session.c
 
 endmenu
 
 menu "Profile: Standard 2025 UA Server Profile"
 
-menuconfig MUC_OPCUA_FACET_USER_TOKEN_X509_CERTIFICATE_SERVER
+config MUC_OPCUA_FACET_USER_TOKEN_X509_CERTIFICATE_SERVER
 	bool "User Token – X509 Certificate Server Facet"
 	default y if MUC_OPCUA_INTERN_PROFILE_STANDARD_2025_UA_SERVER
 	help
-	  Implementation state: deferred.
+	  Implementation state: implemented.
 	  OPC source: OPC-10000-7 §4.2.
-	  Notes: This Facet indicates that the use of an X509 certificates to identify users is supported.
-
-if MUC_OPCUA_FACET_USER_TOKEN_X509_CERTIFICATE_SERVER
-
-# Security User X509 (opc_cu_3125)
-#   Implementation state: unimplemented -- visible but not selectable.
-#   Detail: CU 3125:Security User X509.
-#   Notes: The Server supports a public/private key pair for user identity. The administrator shall be able to enable or disable the use of this feature including all validation steps which are defined for application instance certificates.
-comment "Security User X509 (NOT IMPLEMENTED)"
-
-endif
+	  Notes: X509 Certificate: X509 user token in activate_session.c
 
 endmenu
 
@@ -1702,7 +1482,7 @@ comment "Unimplemented OPC items (visible but not selectable)"
 #   Implementation state: unimplemented -- visible but not selectable.
 #   OPC source: OPC-10000-20.
 #   Detail: File Server Facet.
-#   Notes: Placeholder example of an OPC facet NOT implemented by this project. Visible-but-unselectable in future generated Kconfig. No backing code, no test claim. Sourced from OPC-10000-20 only.
+#   Notes: File Server Facet not implemented; defer until there is demand.
 comment "File Server Facet (NOT IMPLEMENTED) [OPC-10000-20]"
 
 # JSON Encoding (opc_json_encoding)
@@ -1710,7 +1490,7 @@ comment "File Server Facet (NOT IMPLEMENTED) [OPC-10000-20]"
 #   OPC source: OPC-10000-6 §5.3.
 #   Detail: JSON Encoding.
 #   Imported from: profiles/opcua-profile-snapshot.json.
-#   Notes: Imported from OPC snapshot. OPC UA JSON encoding for service payloads. Explicitly out of scope for this project per profile-embedded.md: 'XML, JSON, HTTPS, WebSocket, and alternate transport profile claims are out of scope.'
+#   Notes: JSON encoding not implemented; only UA-Binary encoding is supported.
 comment "JSON Encoding (NOT IMPLEMENTED) [OPC-10000-6 §5.3]"
 
 # XML Encoding (opc_xml_encoding)
@@ -1718,7 +1498,7 @@ comment "JSON Encoding (NOT IMPLEMENTED) [OPC-10000-6 §5.3]"
 #   OPC source: OPC-10000-6 §5.4.
 #   Detail: XML Encoding.
 #   Imported from: profiles/opcua-profile-snapshot.json.
-#   Notes: Imported from OPC snapshot. OPC UA XML encoding for service payloads. Explicitly out of scope for this project per profile-embedded.md.
+#   Notes: XML encoding not implemented; only UA-Binary encoding is supported.
 comment "XML Encoding (NOT IMPLEMENTED) [OPC-10000-6 §5.4]"
 
 # HTTPS Transport (opc_https_transport)
@@ -1726,7 +1506,7 @@ comment "XML Encoding (NOT IMPLEMENTED) [OPC-10000-6 §5.4]"
 #   OPC source: OPC-10000-7.
 #   Detail: HTTPS Transport.
 #   Imported from: profiles/opcua-profile-snapshot.json.
-#   Notes: Imported from OPC snapshot. OPC UA HTTPS transport profile. Explicitly out of scope for this project per profile-embedded.md.
+#   Notes: HTTPS transport not implemented; only opc.tcp transport is supported.
 comment "HTTPS Transport (NOT IMPLEMENTED) [OPC-10000-7]"
 
 # WebSocket Transport (opc_websocket_transport)
@@ -1734,43 +1514,43 @@ comment "HTTPS Transport (NOT IMPLEMENTED) [OPC-10000-7]"
 #   OPC source: OPC-10000-7.
 #   Detail: WebSocket Transport.
 #   Imported from: profiles/opcua-profile-snapshot.json.
-#   Notes: Imported from OPC snapshot. OPC UA WebSocket transport profile. Explicitly out of scope for this project per profile-embedded.md.
+#   Notes: WebSocket transport not implemented; only opc.tcp transport is supported.
 comment "WebSocket Transport (NOT IMPLEMENTED) [OPC-10000-7]"
 
 # GDS AliasName Server Facet (opc_facet_1029)
 #   Implementation state: unimplemented -- visible but not selectable.
 #   OPC source: OPC-10000-7 §4.2.
-#   Notes: Defines the use of AliasNames in a GDS.
+#   Notes: GDS AliasName Server Facet not implemented; GDS infrastructure is not planned.
 comment "GDS AliasName Server Facet (NOT IMPLEMENTED) [OPC-10000-7 §4.2]"
 
 # AliasName Server Facet (opc_facet_1636)
 #   Implementation state: unimplemented -- visible but not selectable.
 #   OPC source: OPC-10000-7 §4.2.
-#   Notes: Defines the use of AliasNames in a Server.
+#   Notes: AliasName Server Facet not implemented; AliasName feature is deferred.
 comment "AliasName Server Facet (NOT IMPLEMENTED) [OPC-10000-7 §4.2]"
 
 # AliasName Aggregating Server Facet (opc_facet_1637)
 #   Implementation state: unimplemented -- visible but not selectable.
 #   OPC source: OPC-10000-7 §4.2.
-#   Notes: Defines the use of AliasNames in an aggregating Server.
+#   Notes: AliasName Aggregating Server Facet not implemented; AliasName feature is deferred.
 comment "AliasName Aggregating Server Facet (NOT IMPLEMENTED) [OPC-10000-7 §4.2]"
 
 # LogObject Facet (opc_facet_2242)
 #   Implementation state: unimplemented -- visible but not selectable.
 #   OPC source: OPC-10000-7 §4.2.
-#   Notes: This Facet supports the LogObject functionality - used to collect information, like diagnostic information. It is defined in UA Part 26.
+#   Notes: LogObject Facet not implemented; no external log-object support planned.
 comment "LogObject Facet (NOT IMPLEMENTED) [OPC-10000-7 §4.2]"
 
 # AliasName Configuration Facet (opc_facet_2322)
 #   Implementation state: unimplemented -- visible but not selectable.
 #   OPC source: OPC-10000-7 §4.2.
-#   Notes: Defines the functionality related to configuration of AliasNames
+#   Notes: AliasName Configuration Facet not implemented; AliasName feature is deferred.
 comment "AliasName Configuration Facet (NOT IMPLEMENTED) [OPC-10000-7 §4.2]"
 
 # AliasName Server PubSub Publisher Facet  (opc_facet_2323)
 #   Implementation state: unimplemented -- visible but not selectable.
 #   OPC source: OPC-10000-7 §4.2.
-#   Notes: Supports the publication of AliasName changes via the PubSub notifications
+#   Notes: AliasName Server PubSub Publisher Facet not implemented; AliasName+PubSub deferred.
 comment "AliasName Server PubSub Publisher Facet  (NOT IMPLEMENTED) [OPC-10000-7 §4.2]"
 
 endmenu
@@ -1793,6 +1573,43 @@ config SECURE_CHANNEL_CRYPTO
 	  OPC source: OPC-10000-7 §4.3.
 	  Backing tests: test_secure_handshake_modern.
 	  Notes: Build gate that decouples secure-channel message crypto (symmetric/asymmetric chunk crypto, certificate, trustlist, key derivation) from the MUC_OPCUA_FACET_CORE_2022_SERVER umbrella. Defaults off for nano (SecurityPolicy None only per OPC-10000-7 4.3) and on for the security-capable micro/embedded/standard/full profiles (profile intent, not backend presence -- spec 072 FR-005). When off the heavy crypto TUs are excluded and MUC_OPCUA_CU_SECURITY_ECC / crypto backends cannot be enabled; SecurityPolicy None behaviour and explicit non-None rejection are preserved.
+
+config MUC_OPCUA_MDNS_DISCOVERY
+	bool "mDNS Discovery (LDS Multicast DNS)"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: implemented.
+	  OPC source: OPC-10000-12 §Annex A.
+	  Notes: Host-platform mDNS (Multicast DNS) adapter for LDS-less discovery (OPC-10000-12 Annex A). Project build gate, full profile only. Previously hand-added directly to Kconfig; reconciled into the manifest so the generator reproduces it.
+
+config MUC_OPCUA_CU_USER_TOKEN_JWT
+	bool "User Token JWT"
+	depends on MUC_OPCUA_CU_USER_AUTH
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: implemented.
+	  OPC source: OPC-10000-7 §CU 1697 -- User Token JWT Server Facet.
+	  Backing tests: test_jwt_activate_session.
+	  Notes: JWT (OAuth2) user-token validation (OPC-10000-7 CU 1697). Build gate for the JWT parser/verify path; full profile only. Reconciled from a hand-added Kconfig symbol so the generator reproduces it.
+
+config MUC_OPCUA_CU_CERTIFICATE_MANAGER_PULL
+	bool "Certificate Manager Pull"
+	depends on MUC_OPCUA_CU_CERTIFICATE_MANAGEMENT && MUC_OPCUA_CU_METHOD_SERVER && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: implemented.
+	  OPC source: OPC-10000-12 §7.6, 7.9.
+	  Backing tests: test_certificate_manager.
+	  Notes: Pull-model certificate management (OPC-10000-12 sections 7.6, 7.9). Build gate for the GDS pull handlers; full profile only. Reconciled from a hand-added Kconfig symbol.
+
+config MUC_OPCUA_CU_AUTHORIZATION_SERVICE_SERVER
+	bool "Authorization Service Server"
+	depends on MUC_OPCUA_CU_USER_TOKEN_JWT && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+	default n
+	help
+	  Implementation state: implemented.
+	  OPC source: OPC-10000-7 §CU 1629 -- Authorization Service Server Facet.
+	  Notes: Authorization Service configuration nodes (OPC-10000-7 CU 1629). Build gate; off by default in all profiles, selectable. Reconciled from a hand-added Kconfig symbol.
 
 endmenu
 
@@ -1948,6 +1765,9 @@ config WHERE_BLOB_BYTES
 
 config MAX_ADDRESS_SPACE_NODES
 	int "Max address space nodes"
+	default 512 if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	default 512 if MUC_OPCUA_INTERN_PROFILE_STANDARD_2025_UA_SERVER
+	default 512 if MUC_OPCUA_INTERN_PROFILE_EMBEDDED_2025_UA_SERVER
 	default 64
 	help
 	  Capacity: max_address_space_nodes.

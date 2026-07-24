@@ -457,10 +457,11 @@ to refresh.
 |---------|------|-------|------|-------|----------|----------|------|------------|
 | READ_CACHE | read_cache | implemented |  |  |  |  |  |  |
 | SECURE_CHANNEL_CRYPTO | secure_channel_crypto | implemented |  | ✅ | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
-| MUC_OPCUA_FACET_CORE_2022_SERVER | opc_facet_1322 | deferred | ✅ | ✅ | ✅ | ✅ | ✅ |  |
+| MUC_OPCUA_FACET_CORE_2022_SERVER | opc_facet_1322 | implemented | ✅ | ✅ | ✅ | ✅ | ✅ |  |
 | MUC_OPCUA_CU_ADDRESS_SPACE_ADDIN_REFERENCE | opc_cu_2446 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
 | MUC_OPCUA_CU_ADDRESS_SPACE_ADDIN_DEFAULTINSTANCEBROWSENAME | opc_cu_2447 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
 | MUC_OPCUA_CU_BASE_INFO_LOCALTIME | opc_cu_2476 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
+| — | opc_cu_2600 | claimed | ✅ | ✅ | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
 | MUC_OPCUA_CU_BASE_INFO_SELECTION_LIST | opc_cu_2711 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
 | MUC_OPCUA_CU_ADDRESS_SPACE_ATOMICITY | opc_cu_2809 | claimed | ✅ | ✅ | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
 | MUC_OPCUA_CU_ADDRESS_SPACE_FULL_ARRAY_ONLY | opc_cu_2820 | claimed | ✅ | ✅ | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
@@ -471,14 +472,19 @@ to refresh.
 | MUC_OPCUA_CU_BASE_INFO_LOCATIONS_OBJECT | opc_cu_4053 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
 | MUC_OPCUA_CU_ADDRESS_SPACE_NONVOLATILE_CONSTANT | opc_cu_4237 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
 | MUC_OPCUA_CU_BASE_INFO_CURRENCY | opc_cu_5240 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
-| MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER | opc_facet_1219 | deferred |  |  | ✅ | ✅ | ✅ |  |
-| MUC_OPCUA_FACET_STANDARD_DATACHANGE_SUBSCRIPTION_2022_SERVER | opc_facet_1324 | deferred |  |  | ✅ | ✅ | ✅ |  |
-| MUC_OPCUA_FACET_GLOBAL_CERTIFICATE_MANAGEMENT_SERVER | opc_facet_1631 | deferred |  |  | ✅ | ✅ | ✅ |  |
-| MUC_OPCUA_FACET_USER_TOKEN_USER_NAME_PASSWORD_SERVER | opc_facet_1695 | deferred |  |  | ✅ | ✅ | ✅ |  |
-| MUC_OPCUA_FACET_USER_TOKEN_X509_CERTIFICATE_SERVER | opc_facet_1696 | deferred |  |  |  | ✅ | ✅ |  |
-| MUC_OPCUA_FACET_EMBEDDED_DATACHANGE_SUBSCRIPTION_2022_SERVER | opc_facet_2250 | deferred |  | ✅ | ✅ | ✅ | ✅ |  |
-| MUC_OPCUA_CU_BASE_INFO_SERVERTYPE | opc_cu_3189 | implemented |  |  | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER |
-| MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION | opc_cu_5801 | deferred |  |  | ✅ | ✅ |  | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER |
+| MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER | opc_facet_1219 | implemented |  |  | ✅ | ✅ | ✅ |  |
+| MUC_OPCUA_FACET_STANDARD_DATACHANGE_SUBSCRIPTION_2022_SERVER | opc_facet_1324 | implemented |  |  | ✅ | ✅ | ✅ |  |
+| MUC_OPCUA_FACET_GLOBAL_CERTIFICATE_MANAGEMENT_SERVER | opc_facet_1631 | implemented |  |  | ✅ | ✅ | ✅ |  |
+| MUC_OPCUA_FACET_USER_TOKEN_USER_NAME_PASSWORD_SERVER | opc_facet_1695 | implemented |  |  | ✅ | ✅ | ✅ |  |
+| MUC_OPCUA_FACET_USER_TOKEN_X509_CERTIFICATE_SERVER | opc_facet_1696 | implemented |  |  |  | ✅ | ✅ |  |
+| MUC_OPCUA_FACET_EMBEDDED_DATACHANGE_SUBSCRIPTION_2022_SERVER | opc_facet_2250 | implemented |  | ✅ | ✅ | ✅ | ✅ |  |
+| OPC_CU_2231 | opc_cu_2231 | claimed |  |  | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_GLOBAL_CERTIFICATE_MANAGEMENT_SERVER |
+| OPC_CU_2423 | opc_cu_2423 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER |
+| OPC_CU_2481 | opc_cu_2481 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER |
+| OPC_CU_2482 | opc_cu_2482 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER |
+| — | opc_cu_2483 | claimed |  |  | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER |
+| MUC_OPCUA_CU_BASE_INFO_SERVERTYPE | opc_cu_3189 | claimed |  |  | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER |
+| MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION | opc_cu_5801 | claimed |  |  | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER |
 | MUC_OPCUA_CU_SUBSCRIPTION_BASIC | opc_cu_subscription_basic | claimed |  | ✅ | ✅ | ✅ | ✅ |  |
 | MUC_OPCUA_CU_SUBSCRIPTION_STANDARD | opc_cu_subscription_standard | claimed |  |  | ✅ | ✅ | ✅ | MUC_OPCUA_CU_SUBSCRIPTION_BASIC |
 | MUC_OPCUA_CU_SECURITY_ECC | opc_cu_security_ecc | claimed |  |  |  |  | ✅ | SECURE_CHANNEL_CRYPTO |
@@ -498,6 +504,30 @@ to refresh.
 | MUC_OPCUA_CU_SESSION_TIMEOUT | opc_cu_session_timeout | claimed |  | ✅ | ✅ | ✅ | ✅ | MUC_OPCUA_CU_MULTIPLE_CONNECTIONS, MUC_OPCUA_CU_MULTI_CHUNK |
 | MUC_OPCUA_CU_TIME_SYNC | opc_cu_time_sync | claimed | ✅ | ✅ | ✅ | ✅ | ✅ |  |
 | MUC_OPCUA_CU_EXTENDED_NODEIDS | opc_cu_extended_nodeids | claimed |  |  |  |  | ✅ |  |
+| — | opc_cu_aggregate_interpolative | claimed |  |  |  |  | ✅ | MUC_OPCUA_CU_SUBSCRIPTION_STANDARD |
+| — | opc_cu_aggregate_average | claimed |  |  |  |  | ✅ | MUC_OPCUA_CU_SUBSCRIPTION_STANDARD |
+| — | opc_cu_aggregate_time_average | claimed |  |  |  |  | ✅ | MUC_OPCUA_CU_SUBSCRIPTION_STANDARD |
+| — | opc_cu_aggregate_time_average_2 | claimed |  |  |  |  | ✅ | MUC_OPCUA_CU_SUBSCRIPTION_STANDARD |
+| — | opc_cu_aggregate_total | claimed |  |  |  |  | ✅ | MUC_OPCUA_CU_SUBSCRIPTION_STANDARD |
+| — | opc_cu_aggregate_total_2 | claimed |  |  |  |  | ✅ | MUC_OPCUA_CU_SUBSCRIPTION_STANDARD |
+| — | opc_cu_aggregate_minimum | claimed |  |  |  |  | ✅ | MUC_OPCUA_CU_SUBSCRIPTION_STANDARD |
+| — | opc_cu_aggregate_maximum | claimed |  |  |  |  | ✅ | MUC_OPCUA_CU_SUBSCRIPTION_STANDARD |
+| — | opc_cu_aggregate_range | claimed |  |  |  |  | ✅ | MUC_OPCUA_CU_SUBSCRIPTION_STANDARD |
+| — | opc_cu_aggregate_minimum_2 | claimed |  |  |  |  | ✅ | MUC_OPCUA_CU_SUBSCRIPTION_STANDARD |
+| — | opc_cu_aggregate_maximum_2 | claimed |  |  |  |  | ✅ | MUC_OPCUA_CU_SUBSCRIPTION_STANDARD |
+| — | opc_cu_aggregate_count | claimed |  |  |  |  | ✅ | MUC_OPCUA_CU_SUBSCRIPTION_STANDARD |
+| — | opc_cu_aggregate_duration_state_zero | claimed |  |  |  |  | ✅ | MUC_OPCUA_CU_SUBSCRIPTION_STANDARD |
+| — | opc_cu_aggregate_start | claimed |  |  |  |  | ✅ | MUC_OPCUA_CU_SUBSCRIPTION_STANDARD |
+| — | opc_cu_aggregate_end | claimed |  |  |  |  | ✅ | MUC_OPCUA_CU_SUBSCRIPTION_STANDARD |
+| — | opc_cu_aggregate_delta | claimed |  |  |  |  | ✅ | MUC_OPCUA_CU_SUBSCRIPTION_STANDARD |
+| — | opc_cu_aggregate_delta_bounds | claimed |  |  |  |  | ✅ | MUC_OPCUA_CU_SUBSCRIPTION_STANDARD |
+| — | opc_cu_aggregate_duration_good | claimed |  |  |  |  | ✅ | MUC_OPCUA_CU_SUBSCRIPTION_STANDARD |
+| — | opc_cu_aggregate_duration_bad | claimed |  |  |  |  | ✅ | MUC_OPCUA_CU_SUBSCRIPTION_STANDARD |
+| — | opc_cu_aggregate_percent_good | claimed |  |  |  |  | ✅ | MUC_OPCUA_CU_SUBSCRIPTION_STANDARD |
+| — | opc_cu_aggregate_percent_bad | claimed |  |  |  |  | ✅ | MUC_OPCUA_CU_SUBSCRIPTION_STANDARD |
+| — | opc_cu_aggregate_worst_quality | claimed |  |  |  |  | ✅ | MUC_OPCUA_CU_SUBSCRIPTION_STANDARD |
+| — | opc_cu_aggregate_worst_quality_2 | claimed |  |  |  |  | ✅ | MUC_OPCUA_CU_SUBSCRIPTION_STANDARD |
+| — | opc_cu_aggregate_annotation_count | claimed |  |  |  |  | ✅ | MUC_OPCUA_CU_SUBSCRIPTION_STANDARD |
 | MUC_OPCUA_CU_AGGREGATE_FULL | opc_cu_aggregate_full | claimed |  |  |  |  | ✅ | MUC_OPCUA_CU_SUBSCRIPTION_STANDARD |
 | MUC_OPCUA_CU_PUBSUB | opc_cu_pubsub | claimed |  |  |  |  | ✅ |  |
 | MUC_OPCUA_CU_REVERSE_CONNECT | opc_cu_reverse_connect | claimed |  |  |  |  | ✅ |  |
@@ -511,19 +541,33 @@ to refresh.
 | MUC_OPCUA_CU_VIEW_REGISTERNODES | service_register_nodes | claimed | ✅ | ✅ | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
 | MUC_OPCUA_CU_CORE_2017_ATTRIBUTE_WRITE | service_write | claimed |  |  |  |  | ✅ |  |
 | MUC_OPCUA_CU_HISTORICAL_ACCESS_SERVER_FACET | service_history | claimed |  |  |  |  | ✅ |  |
+| — | opc_cu_1572 | deferred |  |  |  |  |  |  |
+| — | opc_cu_1577 | deferred |  |  |  |  |  |  |
+| — | opc_cu_1578 | deferred |  |  |  |  |  | MUC_OPCUA_CU_HISTORICAL_ACCESS_SERVER_FACET |
+| — | opc_cu_1579 | deferred |  |  |  |  |  | MUC_OPCUA_CU_HISTORICAL_ACCESS_SERVER_FACET |
+| — | opc_cu_1580 | deferred |  |  |  |  |  | MUC_OPCUA_CU_HISTORICAL_ACCESS_SERVER_FACET |
+| — | opc_cu_1581 | deferred |  |  |  |  |  | MUC_OPCUA_CU_HISTORICAL_ACCESS_SERVER_FACET |
+| — | opc_cu_1710 | deferred |  |  |  |  |  |  |
+| — | opc_cu_2185 | deferred |  |  |  |  |  |  |
+| — | opc_cu_2332 | deferred |  |  |  |  |  |  |
 | MUC_OPCUA_CU_QUERY | service_query | claimed |  |  |  |  | ✅ |  |
 | MUC_OPCUA_CU_NODEMANAGEMENT | service_nodemanagement | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_FACET_UA_TCP_UA_SC_UA_BINARY | opc_facet_837 | deferred | ✅ | ✅ | ✅ | ✅ | ✅ |  |
-| MUC_OPCUA_FACET_SECURITY_TIME_SYNCHRONIZATION | opc_facet_1760 | deferred | ✅ | ✅ | ✅ | ✅ | ✅ |  |
-| MUC_OPCUA_CU_VIEW_TRANSLATEBROWSEPATH | opc_cu_2317 | implemented | ✅ | ✅ | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
-| MUC_OPCUA_CU_DISCOVERY_GET_ENDPOINTS | opc_cu_2328 | implemented | ✅ | ✅ | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
+| MUC_OPCUA_FACET_UA_TCP_UA_SC_UA_BINARY | opc_facet_837 | implemented | ✅ | ✅ | ✅ | ✅ | ✅ |  |
+| MUC_OPCUA_FACET_SECURITY_TIME_SYNCHRONIZATION | opc_facet_1760 | implemented | ✅ | ✅ | ✅ | ✅ | ✅ |  |
+| MUC_OPCUA_CU_VIEW_TRANSLATEBROWSEPATH | opc_cu_2317 | claimed | ✅ | ✅ | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
+| MUC_OPCUA_CU_DISCOVERY_GET_ENDPOINTS | opc_cu_2328 | claimed | ✅ | ✅ | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
 | MUC_OPCUA_CU_DISCOVERY_FIND_SERVERS_SELF | opc_cu_2352 | implemented | ✅ | ✅ | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
 | MUC_OPCUA_CU_ATTRIBUTE_WRITE_VALUES | opc_cu_2389 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
-| MUC_OPCUA_CU_SESSION_CHANGE_USER | opc_cu_2400 | implemented |  |  |  |  | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
+| MUC_OPCUA_CU_SESSION_CHANGE_USER | opc_cu_2400 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
+| — | opc_cu_2478 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_SECURITY_TIME_SYNCHRONIZATION |
+| MUC_OPCUA_CU_TIME_SYNC_IEEE_1588_PTP | opc_cu_2479 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_SECURITY_TIME_SYNCHRONIZATION |
+| MUC_OPCUA_CU_TIME_SYNC_IEEE_802_1AS | opc_cu_2480 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_SECURITY_TIME_SYNCHRONIZATION |
+| — | opc_cu_2786 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_SECURITY_TIME_SYNCHRONIZATION |
+| MUC_OPCUA_CU_SECURITY_ROLE_SERVER_AUTHORIZATION | opc_cu_2808 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
 | MUC_OPCUA_CU_ATTRIBUTE_WRITE_STATUSCODE_TIMESTAMP | opc_cu_2936 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
 | MUC_OPCUA_CU_ATTRIBUTE_WRITE_INDEX_RANGE | opc_cu_3147 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
 | MUC_OPCUA_CU_BASE_INFO_DIAGNOSTICS | opc_cu_3192 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
-| MUC_OPCUA_CU_VIEW_BASIC_2 | opc_cu_3530 | implemented | ✅ | ✅ | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
+| MUC_OPCUA_CU_VIEW_BASIC_2 | opc_cu_3530 | claimed | ✅ | ✅ | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
 | MUC_OPCUA_CU_BASE_SERVICES_DIAGNOSTICS | opc_cu_3983 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
 | MUC_OPCUA_CU_PROTOCOL_UA_TCP | opc_cu_protocol_ua_tcp | claimed | ✅ | ✅ | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_UA_TCP_UA_SC_UA_BINARY |
 | MUC_OPCUA_CU_UA_BINARY_ENCODING | opc_cu_ua_binary_encoding | claimed | ✅ | ✅ | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_UA_TCP_UA_SC_UA_BINARY |
@@ -535,7 +579,29 @@ to refresh.
 | MUC_OPCUA_CU_SERVER_CAPABILITIES_2 | opc_cu_server_capabilities_2 | claimed | ✅ | ✅ | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
 | MUC_OPCUA_CU_SESSION_GENERAL_SERVICE | opc_cu_session_general_service | claimed | ✅ | ✅ | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
 | MUC_OPCUA_CU_NAMESPACE_METADATA | opc_cu_namespace_metadata | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
+| — | opc_cu_2515 | claimed |  |  |  |  | ✅ |  |
+| — | opc_cu_3194 | claimed |  |  |  |  | ✅ |  |
+| — | opc_cu_2422 | claimed |  |  |  |  | ✅ |  |
+| — | opc_cu_3228 | claimed |  |  |  |  | ✅ |  |
+| — | opc_cu_3224 | claimed |  |  |  |  | ✅ |  |
+| — | opc_cu_3230 | claimed |  |  |  |  | ✅ |  |
+| — | opc_cu_3763 | claimed |  |  |  |  | ✅ |  |
+| — | opc_cu_3764 | claimed |  |  |  |  | ✅ |  |
+| — | opc_cu_3766 | claimed |  |  |  |  | ✅ |  |
+| — | opc_cu_3767 | deferred |  |  |  |  |  |  |
+| — | opc_cu_3768 | deferred |  |  |  |  |  |  |
+| MUC_OPCUA_CU_SESSION_CANCEL | opc_cu_2190 | claimed |  |  |  | ✅ | ✅ |  |
+| MUC_OPCUA_CU_DISCOVERY_REGISTER | opc_cu_2271 | claimed |  |  |  | ✅ | ✅ |  |
+| OPC_CU_3080 | opc_cu_3080 | claimed | ✅ | ✅ | ✅ | ✅ | ✅ |  |
 | MUC_OPCUA_CU_BASE_INFO_ENGINEERING_UNITS | opc_cu_5592 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
+| MUC_OPCUA_CU_KEY_CREDENTIAL_SERVICE | opc_cu_key_credential_service | claimed |  |  |  |  | ✅ | MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION, MUC_OPCUA_CU_METHOD_SERVER |
+| MUC_OPCUA_CU_USER_ROLE_MANAGEMENT | opc_cu_user_role_management | claimed |  |  |  |  | ✅ | MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION, MUC_OPCUA_CU_METHOD_SERVER |
+| MUC_OPCUA_CU_CERTIFICATE_MANAGEMENT | opc_cu_certificate_management | claimed |  |  |  |  | ✅ | MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION, MUC_OPCUA_CU_METHOD_SERVER |
+| MUC_OPCUA_CU_ALARMS_CONDITIONS | opc_cu_alarms_conditions | claimed |  |  |  |  | ✅ | MUC_OPCUA_CU_EVENTS, MUC_OPCUA_FACET_CORE_2022_SERVER |
+| MUC_OPCUA_MDNS_DISCOVERY | mdns_discovery | implemented |  |  |  |  | ✅ |  |
+| MUC_OPCUA_CU_USER_TOKEN_JWT | cu_user_token_jwt | implemented |  |  |  |  | ✅ | MUC_OPCUA_CU_USER_AUTH |
+| MUC_OPCUA_CU_CERTIFICATE_MANAGER_PULL | cu_certificate_manager_pull | implemented |  |  |  |  | ✅ | MUC_OPCUA_CU_CERTIFICATE_MANAGEMENT, MUC_OPCUA_CU_METHOD_SERVER, MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION |
+| MUC_OPCUA_CU_AUTHORIZATION_SERVICE_SERVER | cu_authorization_service_server | implemented |  |  |  |  |  | MUC_OPCUA_CU_USER_TOKEN_JWT, MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION |
 
 ### Capacity symbols
 
@@ -552,7 +618,7 @@ to refresh.
 | MAX_WHERE_ELEMENTS | max_where_elements | 8 | 8 | 8 | 8 | 8 | MU_MAX_WHERE_ELEMENTS |
 | MAX_WHERE_OPERANDS | max_where_operands | 16 | 16 | 16 | 16 | 16 | MU_MAX_WHERE_OPERANDS |
 | WHERE_BLOB_BYTES | where_blob_bytes | 64 | 64 | 64 | 64 | 64 | MU_WHERE_BLOB_BYTES |
-| MAX_ADDRESS_SPACE_NODES | max_address_space_nodes | 64 | 64 | 64 | 64 | 64 | MU_MAX_ADDRESS_SPACE_NODES |
+| MAX_ADDRESS_SPACE_NODES | max_address_space_nodes | 64 | 64 | 512 | 512 | 512 | MU_MAX_ADDRESS_SPACE_NODES |
 | MAX_DYNAMIC_NODES | max_dynamic_nodes | 32 | 32 | 32 | 32 | 32 | MU_MAX_DYNAMIC_NODES |
 | MAX_DYNAMIC_REFERENCES | max_dynamic_references | 64 | 64 | 64 | 64 | 64 | MU_MAX_DYNAMIC_REFERENCES |
 | MAX_DYNAMIC_BROWSE_NAME_LENGTH | max_dynamic_browse_name_length | 64 | 64 | 64 | 64 | 64 | MU_MAX_DYNAMIC_BROWSE_NAME_LENGTH |
@@ -569,124 +635,21 @@ The following OPC items are tracked in the manifest but are NOT implemented. The
 
 | Item | OPC reference | State | Notes |
 |------|---------------|-------|-------|
-| opc_file_server_facet | OPC-10000-20 File Server Facet | unimplemented | Placeholder example of an OPC facet NOT implemented by this project. Visible-but-unselectable in future generated Kconfig. No backing code, no test claim. Sourced from OPC-10000-20 only. |
-| opc_json_encoding | OPC-10000-6 §5.3 JSON Encoding | unimplemented | Imported from OPC snapshot. OPC UA JSON encoding for service payloads. Explicitly out of scope for this project per profile-embedded.md: 'XML, JSON, HTTPS, WebSocket, and alternate transport profile claims are out of scope.' |
-| opc_xml_encoding | OPC-10000-6 §5.4 XML Encoding | unimplemented | Imported from OPC snapshot. OPC UA XML encoding for service payloads. Explicitly out of scope for this project per profile-embedded.md. |
-| opc_https_transport | OPC-10000-7 HTTPS Transport | unimplemented | Imported from OPC snapshot. OPC UA HTTPS transport profile. Explicitly out of scope for this project per profile-embedded.md. |
-| opc_websocket_transport | OPC-10000-7 WebSocket Transport | unimplemented | Imported from OPC snapshot. OPC UA WebSocket transport profile. Explicitly out of scope for this project per profile-embedded.md. |
-| opc_monitor_items_500 | OPC-10000-4 §5.13.2 Monitor Items 500 | unimplemented | Imported from OPC snapshot. At least 500 MonitoredItems per Subscription. Mandatory CU of the Enhanced DataChange Subscription 2017 facet. |
-| opc_monitor_minqueuesize_05 | OPC-10000-4 §5.13.2 Monitor MinQueueSize_05 | unimplemented | Imported from OPC snapshot. At least 5 queue entries per MonitoredItem. Mandatory CU of the Enhanced DataChange Subscription 2017 facet. |
-| opc_facet_1029 | OPC-10000-7 §4.2 | unimplemented | Defines the use of AliasNames in a GDS. |
-| opc_facet_1636 | OPC-10000-7 §4.2 | unimplemented | Defines the use of AliasNames in a Server. |
-| opc_facet_1637 | OPC-10000-7 §4.2 | unimplemented | Defines the use of AliasNames in an aggregating Server. |
-| opc_cu_2600 |  | unimplemented | Support at least one Security Policy. Support of SecurityPolicy None is recommended for testing and compatibility reasons even if the UA Server supports a more secure policy. |
-| opc_cu_3184 |  | unimplemented | Exposes the base entry points Root and Objects and the Server Object with its base content ServerArray, NamespaceArray, ServerStatus, ServiceLevel, Auditing indication, entry point to VendorServerInfo and ServerRedundancy indication in the AddressSpace. |
-| opc_cu_3186 |  | unimplemented | Exposes the entry point into views in the AddressSpace. This is the Views Object. |
-| opc_cu_3545 |  | unimplemented | Supports the NamespaceMetaData Object for all Namespaces in the Server that have static NodeIds. |
-| opc_cu_3554 |  | unimplemented | Support the NodeClasses with their Attributes and References. This includes for instance: Object, ObjectType, Variable, VariableType, References and DataType. |
-| opc_cu_3912 |  | unimplemented | Exposes ServerProfileArray, LocaleIdArray, MinSupportedSampleRate, MaxBrowseContinuationPoints, ModellingRules, MaxArrayLength, MaxStringLength, MaxByteStringLength and MaxSessions of the ServerCapabilities Object, as well as MaxNodesPerRead, MaxNodesPerWrite, MaxNodesPerBrowse, MaxNodesPerRegisterNodes, MaxNodesPerTranslateBrowsePathsToNodesIds of the OperationLimits Object. |
-| opc_cu_2231 |  | unimplemented | Support the Certificate Management Services of UA Part 12 for the Push model to manage Application Instance Certificates and Trust Lists including Revocation Lists. |
-| opc_cu_2423 |  | unimplemented | Exposes the RationalNumberType and RationalNumber, all their supertypes and for the DataType the Encoding Objects in the AddressSpace. |
-| opc_cu_2481 |  | unimplemented | Exposes the NormalizedString DataType and all its supertypes in the AddressSpace |
-| opc_cu_2482 |  | unimplemented | Exposes the DecimalString DataType and all its supertypes in the AddressSpace |
-| opc_cu_2483 |  | unimplemented | Reconciled (spec 079): DurationString(12879)/TimeString(12880)/DateString(12881) exposed as subtypes of String(12) in base_nodes.c; test_type_system. Satisfied by opc_cu_base_info_datatypes. Exposes the DurationString, TimeString, and DateString DataTypes and all their supertypes in the AddressSpace |
-| opc_cu_2484 |  | unimplemented | Exposes the BitFieldMaskDataType DataType and all its supertypes in the AddressSpace |
-| opc_cu_2485 |  | unimplemented | Exposes the KeyValuePair DataType and its encoding Objects and all its supertypes in the AddressSpace. |
-| opc_cu_2490 |  | unimplemented | Exposes the ReferenceType HasStructuredComponent and all its supertypes in the AddressSpace. |
-| opc_cu_2491 |  | unimplemented | Exposes the ReferenceType AssociatedWith and all its supertypes in the AddressSpace. |
-| opc_cu_2500 |  | unimplemented | Exposes the EUInformation DataType and its encoding Objects and all its supertypes in the AddressSpace. |
-| opc_cu_2512 |  | unimplemented | Supports ordered lists by exposing OrderedListType and IorderedObjectType, including all their supertypes in the AddressSpace. |
-| opc_cu_2513 |  | unimplemented | Exposes the AudioVariableType VariableType and all its supertypes in the AddressSpace. Exposes the AudioDataType DataType and its encoding Objects and all its supertypes in the AddressSpace. |
-| opc_cu_2514 |  | unimplemented | Exposes DataTypes and VariableTypes used to expose spatial information, that is, the VariableTypes VectorType, 3DvectorType, CartesianCoordinatesType, 3DcartesianCoordinatesType, OrientationType, 3DorientationType, FrameType, 3DframeType, and the DataTypes Vector, 3Dvector, CartesianCoordinates, 3DcartesianCoordinates, Orientation, 3Dorientation, Frame and 3Dframe including all their supertypes and for the DataTypes the Encoding Objects in the AddressSpace. |
-| opc_cu_2516 |  | unimplemented | Exposes the ReferenceType HasOrderedComponent and all its supertypes in the AddressSpace. |
-| opc_cu_2517 |  | unimplemented | Exposes the ReferenceType IsDeprecated and all its supertypes in the AddressSpace. |
-| opc_cu_2518 |  | unimplemented | Exposes the DataTypes Image, ImageBMP, ImageGIF, ImageJPG, ImagePNG and their supertypes in the AddressSpace. |
-| opc_cu_2536 |  | unimplemented | Exposes the ContentFilter DataType and its encoding Objects and all its supertypes in the AddressSpace |
-| opc_cu_2928 |  | unimplemented | Supports an absolute Deadband filter as a DataChangeFilter for numeric data types. |
-| opc_cu_2940 |  | unimplemented | The Server supports obtaining subscription information via GetMonitoredItems Method on the Server object. |
-| opc_cu_2963 |  | unimplemented | Support the following MonitoredItem Services: CreateMonitoredItems, ModifyMonitoredItems, DeleteMonitoredItems and SetMonitoringMode. |
-| opc_cu_3146 |  | unimplemented | Support the SetTriggering Service to create and/or delete triggering links for a triggering item. |
-| opc_cu_3185 |  | unimplemented | Reconciled (spec 080b): the core type-system Folder Nodes Types(86)/ObjectTypes(88)/DataTypes(90)/VariableTypes(89)/ReferenceTypes(91) are exposed in base_nodes.c and asserted by test_type_system. Satisfied by opc_cu_base_info_base_types. Exposes entry points into the type system in the AddressSpace. Specifically, these are the Folder Nodes: Types, ObjectTypes, DataTypes, VariableTypes, and ReferenceTypes. |
-| opc_cu_3188 |  | unimplemented | Reconciled (spec 080b): the full base OPC UA type system is exposed in base_nodes.c and asserted by test_type_system -- all built-in/abstract DataTypes with supertype closure (primitives re-parented under Integer(27)/UInteger(28)/Number(26)), the base Object/Variable/ReferenceTypes, ModellingRuleType(77) + its ModellingRule Objects (78/80/83/11508/11510), and EnumValueType(7594)/Union(12756) with EnumValueType Encoding Objects (7616/8251). Satisfied by opc_cu_base_info_base_types. Supports type information of the base OPC UA concepts, like build-in DataTypes, base Object- and VariableTypes, and base ReferenceTypes. Includes the Encoding Objects for the DataTypes that are not Build-in or abstract DataTypes. Exposes the ObjectTypes BaseObjectType, FolderType, DataTypeEncodingType and ModellingRuleType in the AddressSpace. Exposes the VariableTypes BaseVariableType, PropertyType, and BaseDataVariableType in the AddressSpace. Exposes the DataTypes BaseDataType Boolean, ByteString, DateTime, DataValue, DiagnosticsInfo, Enumeration, ExpandedNodeId, Guid, LocalizedText, NodeId, Number, QualifiedName, String, Structure, XmlElement, Integer, UInteger, Double, Float, Sbyte, Int16, Int32, Int64, Byte, Uint16, Uint32, Uint64, StatusCode, UtcTime, Duration, NumericRange, EnumValueType, and Union and their Encoding Objects in the AddressSpace. Exposes the ReferenceTypes References, HierarchicalReferences, NonHierarchicalReferences, HasChild, Organizes, HasModellingRule, HasTypeDefinition, HasEncoding, Aggregates, HasSubtype, HasComponent, and HasProperty in the AddressSpace Exposes the Objects Optional, Mandatory, OptionalPlaceholder, MandatoryPlaceholder and ExposesItsArrayin the AddressSpace. |
-| opc_cu_3196 |  | unimplemented | Exposes diagnostic information on fixed sampling intervals (SamplingIntervalDiagnosticsArray) when the Server is handling subscriptions with fixed sampling intervals and the EnabledFlag in the ServerDiagnostics Object is set to TRUE. |
-| opc_cu_3207 |  | unimplemented | Exposes the OptionSet DataType and its encoding Objects and all its supertypes in the AddressSpace. |
-| opc_cu_3214 |  | unimplemented | Exposes the Range DataType and its encoding Objects and all its supertypes in the AddressSpace. |
-| opc_cu_3532 |  | unimplemented | Support at least 2 queue entries for MonitoredItems. Servers often will adapt the queue size to the number of currently monitored Items. It is expected that Servers support the documented queue capacity for at least one third of the supported MonitoredItems. |
-| opc_cu_3544 |  | unimplemented | Support the standard Method ResendData to get the latest value of the monitored items of a Subscription. |
-| opc_cu_3547 |  | unimplemented | Supports UaBinary Files by Exposing the DataTypes DataTypeSchemaHeader, UaBinaryFileDataType, DataTypeDescription, StructureDescription, EnumDescription and SimpleTypeDescription, all their Encoding Objects and their supertypes in the AddressSpace. |
-| opc_cu_3550 |  | unimplemented | Exposes the StatusResult DataType and its encoding Objects and all its supertypes in the AddressSpace |
-| opc_cu_3551 |  | unimplemented | Exposes the UriString DataType and all its supertypes in the AddressSpace. |
-| opc_cu_3641 |  | unimplemented | Reconciled (spec 080a): Argument(i=296, subtype of Structure) + its DefaultBinary(298)/DefaultXml(297) Encoding Objects (DataTypeEncodingType 76) exposed in base_nodes.c; test_type_system. Satisfied by opc_cu_base_info_argument_type. Exposes the Argument DataType, its Encoding Objects and all its supertypes in the AddressSpace. |
-| opc_cu_3644 |  | unimplemented | Exposes the SemanticVersionString DataType and all its supertypes in the AddressSpace. |
-| opc_cu_3747 |  | unimplemented | The Server exposes the ReferenceType IsExecutableOn and all its supertypes in the AddressSpace. |
-| opc_cu_3748 |  | unimplemented | The Server exposes the ReferenceType IsExecutingOn and all its supertypes in the AddressSpace. |
-| opc_cu_3749 |  | unimplemented | The Server exposes the ReferenceType Controls and all its supertypes in the AddressSpace. |
-| opc_cu_3750 |  | unimplemented | The Server exposes the ReferenceType Utilizes and all its supertypes in the AddressSpace. |
-| opc_cu_3751 |  | unimplemented | The Server exposes the ReferenceType Requires and all its supertypes in the AddressSpace. |
-| opc_cu_3752 |  | unimplemented | The Server exposes the ReferenceType IsPhysicallyConnectedTo and all its supertypes in the AddressSpace. |
-| opc_cu_3753 |  | unimplemented | The Server exposes the ReferenceType RepresentsSameEntityAs and all its supertypes in the AddressSpace. |
-| opc_cu_3754 |  | unimplemented | The Server exposes the ReferenceType RepresentsSameHardwareAs and all its supertypes in the AddressSpace. |
-| opc_cu_3755 |  | unimplemented | The Server exposes the ReferenceType RepresentsSameFunctionalityAs and all its supertypes in the AddressSpace. |
-| opc_cu_3756 |  | unimplemented | The Server exposes the ReferenceType IsHostedBy and all its supertypes in the AddressSpace. |
-| opc_cu_3757 |  | unimplemented | The Server exposes the ReferenceType HasPhysicalComponent and all its supertypes in the AddressSpace. |
-| opc_cu_3758 |  | unimplemented | The Server exposes the ReferenceType HasContainedComponent and all its supertypes in the AddressSpace. |
-| opc_cu_3759 |  | unimplemented | The Server exposes the ReferenceType HasAttachedComponent and all its supertypes in the AddressSpace. |
-| opc_cu_3911 |  | unimplemented | Reconciled (spec 073): ServerCapabilities exposes AggregateFunctions(2997), MaxSubscriptions(24096), MaxMonitoredItems(24097), MaxSubscriptionsPerSession(24098), MaxMonitoredItemsPerSubscription(24104) + existing MaxMonitoredItemsPerCall(11714) in base_nodes.c (both address-space tables), advertised values == enforced MU_INTERN_* caps; test_operation_limits::test_subscription_capability_nodes_resolve. Satisfied by opc_cu_subscription_basic. Exposes AggregateFunctions, MaxSubscriptions, MaxMonitoredItems, MaxSubscriptionsPerSession and MaxMonitoredItemsPerSubscription of the ServerCapabilities Object as well as MaxMonitoredItemsPerCall of the OperationLimits Object. |
-| opc_cu_3922 |  | unimplemented | Reconciled (spec 073): mu_server_signal_semantic_change (public API) latches per-MonitoredItem; the next DataChange Notification sets StatusCode bit 14 (0x4000, SemanticsChanged) then the one-shot latch clears (notification.c + deadband.c, OPC-10000-4 §7.38.1); test_subscriptions::test_publish_semantics_changed_bit (E2E emit->decode). Satisfied by opc_cu_subscription_basic. Supports setting the SemanticsChanged Bit in the statusCode when a semantic change occurs, such as a change in the engineering unit associated with the Value Attribute. |
-| opc_cu_3996 |  | unimplemented | Exposes the VariableType ReferenceDescriptionVariableType, the ReferenceType HasReferenceDescription, the DataTypes ReferenceDescriptionDataType and ReferenceListEntryDataType and all their supertypes in the AddressSpace. |
-| opc_cu_4052 |  | unimplemented | Exposes the TrimmedString DataType and all its supertypes in the AddressSpace. |
-| opc_cu_4054 |  | unimplemented | Exposes the Handle DataType and all its supertypes in the AddressSpace. |
-| opc_cu_4055 |  | unimplemented | Reconciled (spec 073): MaxMonitoredItemsQueueSize(31916) exposed on ServerCapabilities in base_nodes.c, advertised value == MU_INTERN_MONITORED_QUEUE_DEPTH; test_operation_limits::test_subscription_capability_nodes_resolve. Satisfied by opc_cu_subscription_basic. Exposes MaxMonitoredItemsQueueSize of the ServerCapabilities Object. |
-| opc_cu_4426 |  | unimplemented | Reconciled (spec 079): Decimal(i=50) + its supertype Number(i=26) exposed in base_nodes.c type-system table with HasSubtype closure to BaseDataType; test_type_system. Satisfied by opc_cu_base_info_datatypes. Exposes the DataType Decimal and all its supertypes in the AddressSpace. |
-| opc_cu_5207 |  | unimplemented | Support at least 2 MonitoredItems per Subscription where the size of each MonitoredItem is at least equal to size of Double. |
-| opc_cu_5208 |  | unimplemented | Reconciled (spec 073): MonitoredItem IndexRange is parsed at create (subscription_helpers.c), rejected with Bad_IndexRangeInvalid when malformed, and applied to array samples via apply_numeric_index_range (read_attribute.c) in read_monitored_item_value; test_monitored_index_range (single element, slice, whole-array, out-of-bounds). Satisfied by opc_cu_subscription_basic. Support creation of MonitoredItems for Attribute value changes. This includes support of the IndexRange to select a single element or a range of elements when the Attribute value is an array. This ConformanceUnit does not require queuing when multiple value changes occur during a "publish period". I.e. the latest change will be sent in the Notification. |
-| opc_cu_5868 |  | unimplemented | Supports portable IDs by exposing the DataTypes PortableQualifiedName and PortableNodeId, their Encoding Objects and all their supertypes in the AddressSpace. |
-| opc_facet_2242 | OPC-10000-7 §4.2 | unimplemented | This Facet supports the LogObject functionality - used to collect information, like diagnostic information. It is defined in UA Part 26. |
-| opc_facet_2322 | OPC-10000-7 §4.2 | unimplemented | Defines the functionality related to configuration of AliasNames |
-| opc_facet_2323 | OPC-10000-7 §4.2 | unimplemented | Supports the publication of AliasName changes via the PubSub notifications |
-| opc_cu_2407 |  | unimplemented | Allow configuration of the following Security related items (when they apply). * select the allowed/used User identification policy or policies (e.g. User Name/Password or X509). * enable/disable or select the security policy "None" or other security policies. * enable/disable or select endpoints with MessageSecurityMode SIGN or SIGNANDENCRYPT. * set the permitted certification authorities. * define how to react to unknown Certificates. * allow accepting any valid Certificate |
-| opc_cu_2478 |  | unimplemented | Application supports time synchronization via features of a standard operating system. |
-| opc_cu_2479 |  | unimplemented | Application supports time synchronization via the Precision Time Protocol (PTP). |
-| opc_cu_2480 |  | unimplemented | Application supports time synchronization via the features described in IEEE 802.1AS. |
-| opc_cu_2786 |  | unimplemented | Application supports time synchronization via the Network Time Protocol (NTP). |
-| opc_cu_2808 | test_role_management | claimed | Stub callback interface for role-based access control. |
-| opc_cu_2823 |  | unimplemented | Servers shall take proper measures to protect against attacks on user identity tokens. Such an attack is assumed if repeated connection attempts with invalid user identity tokens happen. See ActivateSession Service in UA Part 4. |
-| opc_cu_3072 |  | unimplemented | Supports the Read Service to read one or more Attributes of one or more Nodes. This includes support of the IndexRange parameter to read a single element or a range of elements when the Attribute value is an array. |
-| opc_cu_3073 |  | unimplemented | Support the RegisterNodes and UnregisterNodes Services as a way to optimize access to repeatedly used Nodes in the Server's OPC UA AddressSpace. |
-| opc_cu_3125 |  | unimplemented | The Server supports a public/private key pair for user identity. The administrator shall be able to enable or disable the use of this feature including all validation steps which are defined for application instance certificates. |
-| opc_cu_3143 |  | unimplemented | Reconciled (spec 073): on Publish-queue overflow handle_publish evicts the OLDEST parked request and answers it with Bad_TooManyPublishRequests, then parks the incoming request (publish_request_evict_oldest, publish_due.c; OPC-10000-4 §5.14.5.1); test_subscriptions_capacity::test_publish_queue_overflow_evicts_oldest_and_parks_newest. Satisfied by opc_cu_subscription_basic. If the maximum supported number of PublishRequests has been queued and a new PublishRequest arrives, the "oldest" PublishRequest has to be discarded by returning the proper error. |
-| opc_cu_3175 |  | unimplemented | Support the Session Service Set (CreateSession, ActivateSession, CloseSession) except the use of ActivateSession to change the Session user. This includes correct handling of all parameters that are provided. Note that for the CreateSession and ActivateSession services, if the SecurityMode = None then: 1) The Application Certificate and Nonce are optional. 2) The signatures are null/empty. |
-| opc_cu_3534 |  | unimplemented | Server supports at least 2 Subscriptions in a single Session. |
-| opc_cu_3535 |  | unimplemented | Support a retransmission queue of sent NotificationMessages and the Republish Service. See UA Part 4 for the required size of the retransmission queue. muc-opcua: Republish is implemented and tested; the retransmission store holds the single most-recent NotificationMessage per subscription (profile-targeting minimal capacity), which may not meet CTT multi-message republish depth. |
-| opc_cu_3536 |  | unimplemented | Reconciled (spec 078): username/password identity tokens with per-policy (endpoint/UserTokenPolicy) password encryption are decrypted+verified in activate_session.c handle_activate_username; test_user_auth_encrypted, test_user_auth_plaintext, test_user_auth_secure_e2e. Satisfied by opc_cu_user_auth. The Server supports User Name/Password combination(s). The token will be encrypted as required by the security policy of the User Token Policy or by the security policy of the endpoint. |
-| opc_cu_3645 |  | unimplemented | The Server allows unencrypted tokens. An unencrypted token either requires message encryption or means outside the scope of OPC UA to secure the identity token so that it cannot be retrieved by sniffing the communication. One option would be a secure transport like a VPN. |
-| opc_cu_3727 |  | unimplemented | Support the following Subscription Services: CreateSubscription, ModifySubscription, DeleteSubscriptions, Publish, Republish and SetPublishingMode. |
-| opc_cu_3802 |  | unimplemented | Supports configuration of the acceptable clock skew. |
-| opc_cu_3913 |  | unimplemented | Support at least 2 Publish Service requests per Session. |
-| opc_cu_3985 |  | unimplemented | Implement basic Service behaviour. This includes in particular: – checking the authentication token – returning the requestHandle in responses – respecting a timeoutHint |
-| opc_cu_5505 |  | unimplemented | Application supports time synchronization by use of the request or response header timestamps provided by a configured well known source, such as a Discovery Server to synchronize the time on the application and that this time synchronization occurs periodically. Use of this TimeSyncing can be configured. |
-| opc_cu_5793 |  | unimplemented | Support at least one of the optional ConformanceUnits for time synchronization mechanisms in the Security Time Synchronization Facet. The application documentation shall specify which synchronization mechanisms with which profiles are supported. |
-| opc_cu_2318 |  | unimplemented | Reconciled (spec 073): server clamps requested MonitoredItem QueueSize to the compiled max (subscription_monitor.c); tested by test_subscriptions_capacity. Satisfied by subscription_standard. |
-| opc_cu_2515 |  | unimplemented | Reconciled (spec 073): address-space-triggered events are queued per subscription and delivered in Publish (notification.c mu_server_trigger_event); tested by test_event_notifications. Satisfied by opc_cu_events. |
-| opc_cu_3150 |  | unimplemented | Reconciled (spec 073): MonitoredItem on the EventNotifier attribute delivers EventFieldLists end-to-end (notification.c); tested by test_event_notifications. Satisfied by opc_cu_events. |
-| opc_cu_4030 |  | unimplemented | Reconciled (spec 073): combined SELECT + WHERE event filter with operator support and unsupported-operator rejection (filter_reader.c + event_filter.c); tested E2E by test_event_notifications. Satisfied by opc_cu_event_filter_where. |
-| opc_cu_2380 |  | unimplemented | Reconciled (spec 073): AddNodes service (nodemanagement/dispatch_node_mgmt.c handle_add_nodes -> mu_add_nodes_process); tested by test_node_management (AddNodes decode/encode, duplicate-NodeId). Satisfied by service_nodemanagement. |
-| opc_cu_2394 |  | unimplemented | Reconciled (spec 073): DeleteNodes service (handle_delete_nodes -> mu_delete_nodes_process); tested by test_node_management. Satisfied by service_nodemanagement. |
-| opc_cu_2939 |  | unimplemented | Reconciled (spec 073): AddReferences service (handle_add_references -> mu_add_references_process); tested by test_node_management. Satisfied by service_nodemanagement. |
-| opc_cu_3153 |  | unimplemented | Reconciled (spec 073): DeleteReferences service (handle_delete_references -> mu_delete_references_process); tested by test_node_management (incl. Bad_NotFound). Satisfied by service_nodemanagement. |
-| opc_cu_3194 |  | unimplemented | Reconciled (spec 074): the Server Object (i=2253) exposes a readable EventNotifier attribute (SubscribeToEvents) so a client can discover it as an event source; read_attribute.c + base_nodes.c, tested by test_read_service::test_read_service_eventnotifier. |
-| opc_cu_2422 |  | unimplemented | Reconciled (spec 074): AuditOpenSecureChannelEvent (i=2060) emitted on OpenSecureChannel (osc_handler.c) and observable via the Server EventNotifier; test_event_notifications. Satisfied by opc_cu_auditing. |
-| opc_cu_3968 |  | unimplemented | Reconciled (spec 074): the server emits + delivers AuditEvents for CreateSession/ActivateSession/Write (audited service subset); test_event_notifications. Satisfied by opc_cu_auditing. |
-| opc_cu_3228 |  | unimplemented | Reconciled (spec 074): AuditWriteUpdateEvent (i=2100) emitted per successful attribute write (attribute_handler.c) and observable via the Server EventNotifier; test_event_notifications. Satisfied by opc_cu_auditing. |
-| opc_cu_2190 | OPC-10000-4 §5.6.5 | unimplemented | Imported from OPC profile REST API 2026-07-15. Not implemented: no Cancel service handler exists. |
-| opc_cu_2271 | OPC-10000-4 §5.4.5 | unimplemented | Imported from OPC profile REST API 2026-07-15. Not implemented: register_server.c is a stub (outbound RegisterServer to a discovery server is not supported). |
-| opc_cu_2863 | OPC-10000-7 §6.5 | unimplemented | Imported from OPC profile REST API 2026-07-15. Capability satisfied via the secure-conversation layer, which implements Basic256Sha256, Aes128_Sha256_RsaOaep, and Aes256_Sha256_RsaPss; Kconfig gates per-profile inclusion. |
-| opc_cu_3170 | OPC-10000-4 §5.4.6 | unimplemented | Imported from OPC profile REST API 2026-07-15. Not implemented: RegisterServer2 outbound registration is not supported. |
-| opc_cu_3721 | OPC-10000-7 §6.5 | unimplemented | Imported from OPC profile REST API 2026-07-15. Optional. Capability satisfied by MUC_OPCUA_CU_SECURITY_ECC (spec 059); Kconfig gates per-profile inclusion (built in full). |
-| opc_cu_3923 | OPC-10000-4 §5.6 | unimplemented | Imported from OPC profile REST API 2026-07-15. Capability satisfied by MUC_OPCUA_CU_MULTIPLE_CONNECTIONS (multiple parallel sessions); Kconfig gates per-profile inclusion. |
-| opc_cu_3201 |  | unimplemented | The Server supports custom types (i.e. types that are derived from well-known ObjectTypes, VariableTypes, ReferenceTypes or DataTypes). Supporting this ConformanceUnit requires that the custom types with their full inheritance tree are exposed in the AddressSpace. For each DataType having encoding information (Structured DataTypes) the Encoding Objects shall be exposed as well. For all Events supported by the Server, the EventType shall be exposed. (Documentation complete; no code change needed.) |
-| opc_cu_5814 |  | unimplemented | The Server supports being able to be configured for no application authentication, just User authentication and normal encryption/signing: – Configure Server to skip the trust check when validating certificates – Certificates are just used for message security (signing and encryption) – Users level is used for authentication (Documentation complete; no code change needed.) |
+| opc_file_server_facet | OPC-10000-20 File Server Facet | unimplemented | File Server Facet not implemented; defer until there is demand. |
+| opc_json_encoding | OPC-10000-6 §5.3 JSON Encoding | unimplemented | JSON encoding not implemented; only UA-Binary encoding is supported. |
+| opc_xml_encoding | OPC-10000-6 §5.4 XML Encoding | unimplemented | XML encoding not implemented; only UA-Binary encoding is supported. |
+| opc_https_transport | OPC-10000-7 HTTPS Transport | unimplemented | HTTPS transport not implemented; only opc.tcp transport is supported. |
+| opc_websocket_transport | OPC-10000-7 WebSocket Transport | unimplemented | WebSocket transport not implemented; only opc.tcp transport is supported. |
+| opc_facet_1029 | OPC-10000-7 §4.2 | unimplemented | GDS AliasName Server Facet not implemented; GDS infrastructure is not planned. |
+| opc_facet_1636 | OPC-10000-7 §4.2 | unimplemented | AliasName Server Facet not implemented; AliasName feature is deferred. |
+| opc_facet_1637 | OPC-10000-7 §4.2 | unimplemented | AliasName Aggregating Server Facet not implemented; AliasName feature is deferred. |
+| opc_facet_2242 | OPC-10000-7 §4.2 | unimplemented | LogObject Facet not implemented; no external log-object support planned. |
+| opc_facet_2322 | OPC-10000-7 §4.2 | unimplemented | AliasName Configuration Facet not implemented; AliasName feature is deferred. |
+| opc_facet_2323 | OPC-10000-7 §4.2 | unimplemented | AliasName Server PubSub Publisher Facet not implemented; AliasName+PubSub deferred. |
 <!-- END GENERATED MANIFEST TABLES -->
+
+
+
 
 
 
