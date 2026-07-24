@@ -1,1 +1,0 @@
-/usr/bin/cc -Wl,--gc-sections CMakeFiles/test_server_framing.dir/test_server_framing.c.o -o test_server_framing  ../../src/libmuc_opcua.a ../support/libmuc_opcua_test_support.a ../../_deps/unity-build/libunity.a ../../src/libmuc_opcua.a /usr/lib/x86_64-linux-gnu/libcrypto.so 

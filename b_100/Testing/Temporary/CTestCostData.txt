@@ -1,3 +1,0 @@
-test_aggregate 1 0.00198379
-test_aggregate_full 1 0.000649079
----
