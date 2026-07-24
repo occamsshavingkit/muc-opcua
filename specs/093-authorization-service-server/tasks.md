@@ -19,11 +19,11 @@
 
 **Purpose**: Kconfig symbols, CMake gating, build integration
 
-- [ ] T001 Add `MUC_OPCUA_CU_USER_TOKEN_JWT` Kconfig symbol with depends on `MUC_OPCUA_CU_USER_AUTH`, default `y` for full profile, `n` otherwise in `Kconfig`
-- [ ] T002 [P] Add `MUC_OPCUA_CU_AUTHORIZATION_SERVICE_SERVER` Kconfig symbol with depends on `MUC_OPCUA_CU_USER_TOKEN_JWT && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION`, default `y` for full profile, `n` otherwise in `Kconfig`
-- [ ] T003 [P] Add `mu_jwt_config_t` and `mu_jwt_issuer_t` structs to `include/muc_opcua/server.h` (gated on `MUC_OPCUA_CU_USER_TOKEN_JWT`) per data-model.md
-- [ ] T004 [P] Add `mu_jwt_result_t` enum and `mu_jwt_alg_t` enum to new `include/muc_opcua/authorization/jwt.h`
-- [ ] T005 Add CMake gating for `src/cu/core_2022_server/authorization/` source files in `src/CMakeLists.txt`
+- [x] T001 Add `MUC_OPCUA_CU_USER_TOKEN_JWT` Kconfig symbol with depends on `MUC_OPCUA_CU_USER_AUTH`, default `y` for full profile, `n` otherwise in `Kconfig`
+- [x] T002 [P] Add `MUC_OPCUA_CU_AUTHORIZATION_SERVICE_SERVER` Kconfig symbol with depends on `MUC_OPCUA_CU_USER_TOKEN_JWT && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION`, default `y` for full profile, `n` otherwise in `Kconfig`
+- [x] T003 [P] Add `mu_jwt_config_t` and `mu_jwt_issuer_t` structs to `include/muc_opcua/server.h` (gated on `MUC_OPCUA_CU_USER_TOKEN_JWT`) per data-model.md
+- [x] T004 [P] Add `mu_jwt_result_t` enum and `mu_jwt_alg_t` enum to new `include/muc_opcua/authorization/jwt.h`
+- [x] T005 Add CMake gating for `src/cu/core_2022_server/authorization/` source files in `src/CMakeLists.txt`
 
 ---
 
@@ -33,12 +33,12 @@
 
 **CRITICAL**: No user story can begin until the parser, Base64url decoder, and signature verification wrappers are complete.
 
-- [ ] T006 Implement Base64url decoder (no padding, URL-safe alphabet) in `src/cu/core_2022_server/authorization/base64url.c` and `base64url.h` per RFC 7515 §2, RFC 4648 §5. No heap — output buffer caller-provided.
-- [ ] T007 Implement JWT parser: three-segment split, Base64url decode header + payload in `src/cu/core_2022_server/authorization/jwt.c` and `include/muc_opcua/authorization/jwt.h` per OPC-10000-7 CU 1697, RFC 7519 §4-5
-- [ ] T008 [P] Implement claim scanner (minimal streaming JSON key-value extractor for `iss`, `sub`, `aud`, `exp`, `nbf`, `iat`) in `src/cu/core_2022_server/authorization/claim_scanner.c` and `claim_scanner.h`. Unknown keys skipped. Fixed-size output buffers. No heap.
-- [ ] T009 Implement `mu_jwt_validate()` public API: header check (`alg` → algorithm dispatch), signature reconstruct + verify via platform crypto adapter, claim scanner → `mu_jwt_claims_t`, expiry/not-before/issuer/audience checks in `src/cu/core_2022_server/authorization/jwt.c` per RFC 7519 §4.1, RFC 8725 §3
-- [ ] T010 [P] Add RSA signature verification wrapper calling platform crypto adapter (`mu_crypto_rsa_verify()`) in `src/cu/core_2022_server/authorization/crypto_jwt.c` and `crypto_jwt.h` per research.md R2
-- [ ] T011 [P] Add ECDSA signature verification wrapper (`mu_crypto_ecdsa_verify()`) gated on `MUC_OPCUA_CU_SECURITY_ECC` in `src/cu/core_2022_server/authorization/crypto_jwt.c` per research.md R6
+- [x] T006 Implement Base64url decoder (no padding, URL-safe alphabet) in `src/cu/core_2022_server/authorization/base64url.c` and `base64url.h` per RFC 7515 §2, RFC 4648 §5. No heap — output buffer caller-provided.
+- [x] T007 Implement JWT parser: three-segment split, Base64url decode header + payload in `src/cu/core_2022_server/authorization/jwt.c` and `include/muc_opcua/authorization/jwt.h` per OPC-10000-7 CU 1697, RFC 7519 §4-5
+- [x] T008 [P] Implement claim scanner (minimal streaming JSON key-value extractor for `iss`, `sub`, `aud`, `exp`, `nbf`, `iat`) in `src/cu/core_2022_server/authorization/claim_scanner.c` and `claim_scanner.h`. Unknown keys skipped. Fixed-size output buffers. No heap.
+- [x] T009 Implement `mu_jwt_validate()` public API: header check (`alg` → algorithm dispatch), signature reconstruct + verify via platform crypto adapter, claim scanner → `mu_jwt_claims_t`, expiry/not-before/issuer/audience checks in `src/cu/core_2022_server/authorization/jwt.c` per RFC 7519 §4.1, RFC 8725 §3
+- [x] T010 [P] Add RSA signature verification wrapper calling platform crypto adapter (`mu_crypto_rsa_verify()`) in `src/cu/core_2022_server/authorization/crypto_jwt.c` and `crypto_jwt.h` per research.md R2
+- [x] T011 [P] Add ECDSA signature verification wrapper (`mu_crypto_ecdsa_verify()`) gated on `MUC_OPCUA_CU_SECURITY_ECC` in `src/cu/core_2022_server/authorization/crypto_jwt.c` per research.md R6
 
 **Checkpoint**: JWT parser, scanner, and validator pass unit tests. No ActivateSession integration yet.
 
@@ -79,13 +79,13 @@
 
 ### Tests for User Story 2
 
-- [ ] T021 [P] [US2] Add unit test: two-issuer config, JWT from issuer A accepted, JWT from issuer B accepted, cross-issuer audience mismatch rejected in `tests/unit/test_jwt_multi_issuer.c` per spec.md US2 Acceptance Scenarios
-- [ ] T022 [P] [US2] Add unit test: clock skew tolerance (token at boundary + skew accepted, beyond skew rejected) in `tests/unit/test_jwt_clock_skew.c` per FR-005
+- [x] T021 [P] [US2] Add unit test: two-issuer config, JWT from issuer A accepted, JWT from issuer B accepted, cross-issuer audience mismatch rejected in `tests/unit/test_jwt_multi_issuer.c` per spec.md US2 Acceptance Scenarios
+- [x] T022 [P] [US2] Add unit test: clock skew tolerance (token at boundary + skew accepted, beyond skew rejected) in `tests/unit/test_jwt_clock_skew.c` per FR-005
 
 ### Implementation for User Story 2
 
-- [ ] T023 [P] [US2] Implement issuer table lookup in `mu_jwt_validate()`: iterate `issuer_count` issuers, match `iss` claim, dispatch to that issuer's key and audience in `src/cu/core_2022_server/authorization/jwt.c` per FR-005
-- [ ] T024 [US2] Implement per-issuer clock skew tolerance in expiry/nbf checks in `src/cu/core_2022_server/authorization/jwt.c` per FR-005, Assumptions (last bullet)
+- [x] T023 [P] [US2] Implement issuer table lookup in `mu_jwt_validate()`: iterate `issuer_count` issuers, match `iss` claim, dispatch to that issuer's key and audience in `src/cu/core_2022_server/authorization/jwt.c` per FR-005
+- [x] T024 [US2] Implement per-issuer clock skew tolerance in expiry/nbf checks in `src/cu/core_2022_server/authorization/jwt.c` per FR-005, Assumptions (last bullet)
 
 **Checkpoint**: Multi-issuer support works. Both P2 tests pass. P1 tests still pass.
 
@@ -99,12 +99,12 @@
 
 ### Tests for User Story 3
 
-- [ ] T025 [P] [US3] Add unit test: `sub` claim handling — valid sub, empty sub (rejected), 128-byte sub, sub with special characters in `tests/unit/test_jwt_claims.c` per spec.md SC-005, FR-006
+- [x] T025 [P] [US3] Add unit test: `sub` claim handling — valid sub, empty sub (rejected), 128-byte sub, sub with special characters in `tests/unit/test_jwt_claims.c` per spec.md SC-005, FR-006
 
 ### Implementation for User Story 3
 
-- [ ] T026 [US3] Wire `sub` claim → session user identity in `src/core/service_dispatch/activate_session.c` per FR-006, OPC-10000-4 §5.7.3
-- [ ] T027 [US3] Update session diagnostics: include user identity from JWT claims in `src/cu/core_2022_server/diagnostics/diagnostics.c` per OPC-10000-5 §6.3.5
+- [x] T026 [US3] Wire `sub` claim → session user identity in `src/core/service_dispatch/activate_session.c` per FR-006, OPC-10000-4 §5.7.3
+- [x] T027 [US3] Update session diagnostics: include user identity from JWT claims in `src/cu/core_2022_server/diagnostics/diagnostics.c` per OPC-10000-5 §6.3.5
 
 **Checkpoint**: Identity mapping works. P3 tests pass. P1/P2 tests still pass.
 
@@ -114,10 +114,10 @@
 
 **Purpose**: AuthorizationServiceConfigurationType InstanceDeclarations for CU 1629 compliance. Gated on `MUC_OPCUA_CU_AUTHORIZATION_SERVICE_SERVER`.
 
-- [ ] T028 Add `AuthorizationServiceConfigurationType` type-system InstanceDeclarations in `src/address_space/base_nodes.c` (gated on `MUC_OPCUA_CU_BASE_INFO_SERVERTYPE && MUC_OPCUA_CU_AUTHORIZATION_SERVICE_SERVER && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION`) per OPC-10000-12 §9.7.4, data-model.md
-- [ ] T029 [P] Add conformance doc for CU 1629 in `docs/conformance/authorization-service.md` per OPC-10000-7 §6.6
-- [ ] T030 [P] Add conformance doc for CU 1697 in `docs/conformance/jwt-user-token.md` per OPC-10000-7 §6.6
-- [ ] T031 Update `docs/conformance/opc-profile-roadmap.md` to claim CU 1629 and CU 1697 for full profile
+- [x] T028 Add `AuthorizationServiceConfigurationType` type-system InstanceDeclarations in `src/address_space/base_nodes.c` (gated on `MUC_OPCUA_CU_BASE_INFO_SERVERTYPE && MUC_OPCUA_CU_AUTHORIZATION_SERVICE_SERVER && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION`) per OPC-10000-12 §9.7.4, data-model.md
+- [x] T029 [P] Add conformance doc for CU 1629 in `docs/conformance/authorization-service.md` per OPC-10000-7 §6.6
+- [x] T030 [P] Add conformance doc for CU 1697 in `docs/conformance/jwt-user-token.md` per OPC-10000-7 §6.6
+- [x] T031 Update `docs/conformance/opc-profile-roadmap.md` to claim CU 1629 and CU 1697 for full profile
 
 ---
 
@@ -125,12 +125,12 @@
 
 **Purpose**: Size measurement, profile builds, traceability, final validation
 
-- [ ] T032 Run all profile builds (nano, micro, embedded, standard, full) and verify compile-out of JWT code when symbols undefined per spec.md SC-006
-- [ ] T033 Measure `.text` growth in standard profile and verify ≤5 KB per plan.md size budget, spec.md SC-007
-- [ ] T034 Run full test suite (`ctest --test-dir build/full --output-on-failure`) and verify zero regressions per spec.md SC-008
-- [ ] T035 Run clang-format, cppcheck, and clang-tidy; fix any violations
-- [ ] T036 Update `README.md` size table if ≥100 B delta
-- [ ] T037 Update `docs/traceability/files-to-sections.md` with new source and test files
+- [x] T032 Run all profile builds (nano, micro, embedded, standard, full) and verify compile-out of JWT code when symbols undefined per spec.md SC-006
+- [x] T033 Measure `.text` growth in standard profile and verify ≤5 KB per plan.md size budget, spec.md SC-007
+- [x] T034 Run full test suite (`ctest --test-dir build/full --output-on-failure`) and verify zero regressions per spec.md SC-008
+- [x] T035 Run clang-format, cppcheck, and clang-tidy; fix any violations
+- [x] T036 Update `README.md` size table if ≥100 B delta
+- [x] T037 Update `docs/traceability/files-to-sections.md` with new source and test files
 
 ---
 
