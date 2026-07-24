@@ -91,8 +91,18 @@ assert_cfg "$D2" CU_CORE_2017_ATTRIBUTE_WRITE OFF
 # CU: Subscription basic off (micro+); CU: Security ECC off (full only)
 assert_cfg "$D2" CU_SUBSCRIPTION_BASIC OFF
 assert_cfg "$D2" CU_SECURITY_ECC OFF
+assert_cfg "$D2" CU_AUDITING OFF
 # Secure-channel crypto gate (spec 072): OFF for the SecurityPolicy-None-only nano
 assert_cfg "$D2" SECURE_CHANNEL_CRYPTO OFF
+cmake --build "$D2" -j4 >/dev/null 2>&1
+if nm "$D2/src/libmuc_opcua.a" 2>/dev/null | grep -qE \
+    'mu_raise_audit_event|mu_audit_pool_store|mu_server_set_audit_callback'; then
+    echo "  FAIL  audit emission/routing symbols present with CU_AUDITING=OFF"
+    FAIL=$((FAIL + 1))
+else
+    echo "  PASS  audit emission/routing symbols absent with CU_AUDITING=OFF"
+    PASS=$((PASS + 1))
+fi
 
 echo "### 3. 'embedded' baseline: profile symbol, cascade, facets, CUs ###"
 D3="$WORKDIR/g3"

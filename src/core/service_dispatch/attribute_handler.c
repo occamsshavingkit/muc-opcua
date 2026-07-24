@@ -410,6 +410,7 @@ opcua_statuscode_t handle_write(mu_server_t *server, mu_binary_reader_t *r, mu_b
         audit_ev.event_type = MU_AUDIT_EVENT_WRITE_UPDATE;
         audit_ev.status = (result == MU_STATUS_GOOD);
         audit_ev.specific.write_update.node_id = write_val->node_id;
+        audit_ev.specific.write_update.attribute_id = write_val->attribute_id;
         audit_ev.specific.write_update.new_value = write_val->value.value;
         audit_ev.specific.write_update.old_value = audit_old_value;
         mu_raise_audit_event(server, &audit_ev);

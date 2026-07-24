@@ -10,6 +10,7 @@
 #include <string.h>
 
 #include "../../src/core/server_internal.h"
+#include "../../src/services/subscription_publish/common.h"
 #include "fake_platform.h"
 
 void setUp(void) {}
@@ -174,6 +175,176 @@ void test_audit_disabled_flag(void) {
     TEST_ASSERT_TRUE(config.auditing_enabled);
 }
 
+#if MUC_OPCUA_CU_EVENTS
+void test_audit_event_select_fields_resolve_from_payload(void) {
+    setup_audit_server(true);
+
+    mu_audit_payload_t payload;
+    memset(&payload, 0, sizeof(payload));
+    memcpy(payload.event_id, "AUD1", 4u);
+    payload.event_id_length = 4u;
+    payload.source_node = (mu_nodeid_t){0, MU_NODEID_NUMERIC, {.numeric = 2253u}};
+    payload.status = false;
+    payload.action_timestamp = 123456789;
+    payload.session_id = (mu_nodeid_t){0, MU_NODEID_NUMERIC, {.numeric = 42u}};
+    payload.attribute_id = MU_ATTRIBUTEID_VALUE;
+    payload.old_value.type = MU_TYPE_INT32;
+    payload.old_value.value.i32 = 10;
+    payload.new_value.type = MU_TYPE_INT32;
+    payload.new_value.value.i32 = 20;
+    memcpy(payload.server_id.data, "server", 6u);
+    payload.server_id.len = 6;
+    memcpy(payload.client_audit_entry_id.data, "entry", 5u);
+    payload.client_audit_entry_id.len = 5;
+    memcpy(payload.client_user_id.data, "user", 4u);
+    payload.client_user_id.len = 4;
+    memcpy(payload.secure_channel_id.data, "7", 1u);
+    payload.secure_channel_id.len = 1;
+
+    mu_event_notification_t event;
+    memset(&event, 0, sizeof(event));
+    event.audit_ref = mu_audit_pool_store(&s_audit_server, &payload);
+    event.event_type = (mu_nodeid_t){0, MU_NODEID_NUMERIC, {.numeric = 2100u}};
+    event.time = payload.action_timestamp;
+    event.message = (mu_string_t){16, (const opcua_byte_t *)"Attribute Write"};
+    event.severity = 1u;
+
+    mu_variant_t value = mu_event_notification_resolve_field(&s_audit_server, &event, MU_EVENT_FIELD_EVENTID);
+    TEST_ASSERT_EQUAL(MU_TYPE_BYTESTRING, value.type);
+    TEST_ASSERT_EQUAL_INT32(4, value.value.bytestr.length);
+    TEST_ASSERT_EQUAL_MEMORY("AUD1", value.value.bytestr.data, 4u);
+
+    value = mu_event_notification_resolve_field(&s_audit_server, &event, MU_EVENT_FIELD_SOURCENODE);
+    TEST_ASSERT_EQUAL(MU_TYPE_NODEID, value.type);
+    TEST_ASSERT_EQUAL_UINT32(2253u, value.value.nodeid.identifier.numeric);
+    value = mu_event_notification_resolve_field(&s_audit_server, &event, MU_EVENT_FIELD_SOURCENAME);
+    TEST_ASSERT_EQUAL(MU_TYPE_STRING, value.type);
+    TEST_ASSERT_EQUAL_STRING_LEN("Server", value.value.str.data, 6u);
+    value = mu_event_notification_resolve_field(&s_audit_server, &event, MU_EVENT_FIELD_RECEIVETIME);
+    TEST_ASSERT_EQUAL(MU_TYPE_DATETIME, value.type);
+    TEST_ASSERT_EQUAL_INT64(123456789, value.value.dt);
+    value = mu_event_notification_resolve_field(&s_audit_server, &event, MU_EVENT_FIELD_STATUS);
+    TEST_ASSERT_EQUAL(MU_TYPE_BOOLEAN, value.type);
+    TEST_ASSERT_FALSE(value.value.b);
+    value = mu_event_notification_resolve_field(&s_audit_server, &event, MU_EVENT_FIELD_ATTRIBUTEID);
+    TEST_ASSERT_EQUAL(MU_TYPE_UINT32, value.type);
+    TEST_ASSERT_EQUAL_UINT32(MU_ATTRIBUTEID_VALUE, value.value.ui32);
+    value = mu_event_notification_resolve_field(&s_audit_server, &event, MU_EVENT_FIELD_OLDVALUE);
+    TEST_ASSERT_EQUAL(MU_TYPE_INT32, value.type);
+    TEST_ASSERT_EQUAL_INT32(10, value.value.i32);
+    value = mu_event_notification_resolve_field(&s_audit_server, &event, MU_EVENT_FIELD_NEWVALUE);
+    TEST_ASSERT_EQUAL(MU_TYPE_INT32, value.type);
+    TEST_ASSERT_EQUAL_INT32(20, value.value.i32);
+    value = mu_event_notification_resolve_field(&s_audit_server, &event, MU_EVENT_FIELD_SESSIONID);
+    TEST_ASSERT_EQUAL(MU_TYPE_NODEID, value.type);
+    TEST_ASSERT_EQUAL_UINT32(42u, value.value.nodeid.identifier.numeric);
+
+    s_audit_server.audit_pool[event.audit_ref.index].sequence++;
+    value = mu_event_notification_resolve_field(&s_audit_server, &event, MU_EVENT_FIELD_STATUS);
+    TEST_ASSERT_EQUAL(MU_TYPE_NULL, value.type);
+}
+
+void test_non_audit_event_resolves_audit_fields_to_null(void) {
+    setup_audit_server(true);
+    mu_event_notification_t event;
+    memset(&event, 0, sizeof(event));
+    mu_variant_t value = mu_event_notification_resolve_field(&s_audit_server, &event, MU_EVENT_FIELD_STATUS);
+    TEST_ASSERT_EQUAL(MU_TYPE_NULL, value.type);
+}
+
+static mu_event_notification_t raise_and_capture_notification(const mu_audit_event_t *audit_event) {
+    setup_audit_server(true);
+    s_audit_server.config.time_adapter.get_time = audit_test_time;
+    s_audit_server.subs.subscriptions[0].in_use = true;
+    mu_raise_audit_event(&s_audit_server, audit_event);
+    TEST_ASSERT_EQUAL_UINT32(1u, s_audit_server.subs.subscriptions[0].event_queue.count);
+    return s_audit_server.subs.subscriptions[0].event_queue.queue[0];
+}
+
+static void assert_audit_base_fields(const mu_event_notification_t *notification, opcua_uint32_t event_type,
+                                     bool status) {
+    TEST_ASSERT_EQUAL_UINT32(event_type, notification->event_type.identifier.numeric);
+    TEST_ASSERT_EQUAL_INT64(123456789, notification->time);
+    mu_variant_t value = mu_event_notification_resolve_field(&s_audit_server, notification, MU_EVENT_FIELD_EVENTID);
+    TEST_ASSERT_EQUAL(MU_TYPE_BYTESTRING, value.type);
+    TEST_ASSERT_TRUE(value.value.bytestr.length > 0);
+    value = mu_event_notification_resolve_field(&s_audit_server, notification, MU_EVENT_FIELD_SOURCENODE);
+    TEST_ASSERT_EQUAL(MU_TYPE_NODEID, value.type);
+    TEST_ASSERT_EQUAL_UINT32(2253u, value.value.nodeid.identifier.numeric);
+    value = mu_event_notification_resolve_field(&s_audit_server, notification, MU_EVENT_FIELD_STATUS);
+    TEST_ASSERT_EQUAL(MU_TYPE_BOOLEAN, value.type);
+    TEST_ASSERT_EQUAL(status, value.value.b);
+}
+
+void test_open_secure_channel_audit_maps_to_event(void) {
+    mu_audit_event_t audit_event;
+    memset(&audit_event, 0, sizeof(audit_event));
+    audit_event.event_type = MU_AUDIT_EVENT_OPEN_SECURE_CHANNEL;
+    audit_event.status = false;
+    audit_event.specific.open_channel.secure_channel_id = (mu_string_t){2, (const opcua_byte_t *)"17"};
+    mu_event_notification_t notification = raise_and_capture_notification(&audit_event);
+    assert_audit_base_fields(&notification, 2060u, false);
+    mu_variant_t value =
+        mu_event_notification_resolve_field(&s_audit_server, &notification, MU_EVENT_FIELD_SECURECHANNELID);
+    TEST_ASSERT_EQUAL(MU_TYPE_STRING, value.type);
+    TEST_ASSERT_EQUAL_STRING_LEN("17", value.value.str.data, 2u);
+}
+
+void test_create_session_audit_maps_to_event(void) {
+    mu_audit_event_t audit_event;
+    memset(&audit_event, 0, sizeof(audit_event));
+    audit_event.event_type = MU_AUDIT_EVENT_CREATE_SESSION;
+    audit_event.status = true;
+    audit_event.specific.create_session.session_id = (mu_nodeid_t){0, MU_NODEID_NUMERIC, {.numeric = 42u}};
+    mu_event_notification_t notification = raise_and_capture_notification(&audit_event);
+    assert_audit_base_fields(&notification, 2071u, true);
+    mu_variant_t value = mu_event_notification_resolve_field(&s_audit_server, &notification, MU_EVENT_FIELD_SESSIONID);
+    TEST_ASSERT_EQUAL(MU_TYPE_NODEID, value.type);
+    TEST_ASSERT_EQUAL_UINT32(42u, value.value.nodeid.identifier.numeric);
+}
+
+void test_activate_session_audit_maps_to_event(void) {
+    mu_audit_event_t audit_event;
+    memset(&audit_event, 0, sizeof(audit_event));
+    audit_event.event_type = MU_AUDIT_EVENT_ACTIVATE_SESSION;
+    audit_event.status = false;
+    audit_event.specific.activate_session.session_id = (mu_nodeid_t){0, MU_NODEID_NUMERIC, {.numeric = 43u}};
+    audit_event.specific.activate_session.user_name = (mu_string_t){5, (const opcua_byte_t *)"alice"};
+    mu_event_notification_t notification = raise_and_capture_notification(&audit_event);
+    assert_audit_base_fields(&notification, 2075u, false);
+    mu_variant_t value = mu_event_notification_resolve_field(&s_audit_server, &notification, MU_EVENT_FIELD_SESSIONID);
+    TEST_ASSERT_EQUAL(MU_TYPE_NODEID, value.type);
+    TEST_ASSERT_EQUAL_UINT32(43u, value.value.nodeid.identifier.numeric);
+    value = mu_event_notification_resolve_field(&s_audit_server, &notification, MU_EVENT_FIELD_CLIENTUSERID);
+    TEST_ASSERT_EQUAL(MU_TYPE_STRING, value.type);
+    TEST_ASSERT_EQUAL_STRING_LEN("alice", value.value.str.data, 5u);
+}
+
+void test_write_update_audit_maps_to_event(void) {
+    mu_audit_event_t audit_event;
+    memset(&audit_event, 0, sizeof(audit_event));
+    audit_event.event_type = MU_AUDIT_EVENT_WRITE_UPDATE;
+    audit_event.status = true;
+    audit_event.specific.write_update.attribute_id = MU_ATTRIBUTEID_VALUE;
+    audit_event.specific.write_update.old_value.type = MU_TYPE_INT32;
+    audit_event.specific.write_update.old_value.value.i32 = 10;
+    audit_event.specific.write_update.new_value.type = MU_TYPE_INT32;
+    audit_event.specific.write_update.new_value.value.i32 = 20;
+    mu_event_notification_t notification = raise_and_capture_notification(&audit_event);
+    assert_audit_base_fields(&notification, 2100u, true);
+    mu_variant_t value =
+        mu_event_notification_resolve_field(&s_audit_server, &notification, MU_EVENT_FIELD_ATTRIBUTEID);
+    TEST_ASSERT_EQUAL(MU_TYPE_UINT32, value.type);
+    TEST_ASSERT_EQUAL_UINT32(MU_ATTRIBUTEID_VALUE, value.value.ui32);
+    value = mu_event_notification_resolve_field(&s_audit_server, &notification, MU_EVENT_FIELD_OLDVALUE);
+    TEST_ASSERT_EQUAL(MU_TYPE_INT32, value.type);
+    TEST_ASSERT_EQUAL_INT32(10, value.value.i32);
+    value = mu_event_notification_resolve_field(&s_audit_server, &notification, MU_EVENT_FIELD_NEWVALUE);
+    TEST_ASSERT_EQUAL(MU_TYPE_INT32, value.type);
+    TEST_ASSERT_EQUAL_INT32(20, value.value.i32);
+}
+#endif
+
 /* T031: OPC-10000-5 §6.5 — valid audit event dispatch does not crash */
 void test_raise_audit_event_valid_input(void) {
     setup_audit_server(false);
@@ -302,6 +473,14 @@ int main(void) {
     RUN_TEST(test_audit_event_struct_has_condition_fields);
     RUN_TEST(test_audit_event_struct_has_node_mgmt_fields);
     RUN_TEST(test_audit_disabled_flag);
+#if MUC_OPCUA_CU_EVENTS
+    RUN_TEST(test_audit_event_select_fields_resolve_from_payload);
+    RUN_TEST(test_non_audit_event_resolves_audit_fields_to_null);
+    RUN_TEST(test_open_secure_channel_audit_maps_to_event);
+    RUN_TEST(test_create_session_audit_maps_to_event);
+    RUN_TEST(test_activate_session_audit_maps_to_event);
+    RUN_TEST(test_write_update_audit_maps_to_event);
+#endif
     RUN_TEST(test_raise_audit_event_valid_input);
     RUN_TEST(test_raise_audit_event_null_safety);
     RUN_TEST(test_callback_receives_event_fields);

@@ -88,6 +88,20 @@ static opcua_statuscode_t failing_entropy(void *context, opcua_byte_t *buffer, s
     return MU_STATUS_BAD_SECURITYCHECKSFAILED;
 }
 
+#if MUC_OPCUA_CU_AUDITING
+static size_t s_opn_audit_count;
+static mu_audit_event_t s_last_opn_audit;
+
+static void capture_opn_audit(struct mu_server *server, const mu_audit_event_t *event, void *context) {
+    (void)server;
+    (void)context;
+    if (event->event_type == MU_AUDIT_EVENT_OPEN_SECURE_CHANNEL) {
+        s_last_opn_audit = *event;
+        s_opn_audit_count++;
+    }
+}
+#endif
+
 static opcua_statuscode_t test_entropy(void *context, opcua_byte_t *buffer, size_t len) {
     (void)context;
     if (buffer != NULL) {
@@ -273,7 +287,19 @@ static void assert_opn_rejected(const opcua_byte_t *policy_uri, opcua_int32_t po
     enqueue_request(&transport, chunk, len);
 
     configure_transport_server(&config, &transport, rx, tx);
+#if MUC_OPCUA_CU_AUDITING
+    if (expected_status == MU_STATUS_BAD_REQUESTTYPEINVALID) {
+        config.auditing_enabled = true;
+    }
+#endif
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_server_init(storage.bytes, sizeof(storage.bytes), &config, &server));
+#if MUC_OPCUA_CU_AUDITING
+    if (expected_status == MU_STATUS_BAD_REQUESTTYPEINVALID) {
+        s_opn_audit_count = 0u;
+        (void)memset(&s_last_opn_audit, 0, sizeof(s_last_opn_audit));
+        mu_server_set_audit_callback(server, capture_opn_audit, NULL);
+    }
+#endif
 
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_server_poll(server));
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_server_poll(server));
@@ -287,6 +313,13 @@ static void assert_opn_rejected(const opcua_byte_t *policy_uri, opcua_int32_t po
     TEST_ASSERT_TRUE(response_type == MU_ID_SERVICEFAULT || response_type == MU_ID_OPENSECURECHANNELRESPONSE);
     TEST_ASSERT_EQUAL_HEX32(expected_status, service_result);
     TEST_ASSERT_FALSE(server->secure_channel.is_open);
+#if MUC_OPCUA_CU_AUDITING
+    if (expected_status == MU_STATUS_BAD_REQUESTTYPEINVALID) {
+        TEST_ASSERT_EQUAL_UINT32(1u, s_opn_audit_count);
+        TEST_ASSERT_EQUAL_UINT32(MU_AUDIT_EVENT_OPEN_SECURE_CHANNEL, s_last_opn_audit.event_type);
+        TEST_ASSERT_FALSE(s_last_opn_audit.status);
+    }
+#endif
 }
 
 static void assert_opn_entropy_failure_returns_security_checks_failed(void) {

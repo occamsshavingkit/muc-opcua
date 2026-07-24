@@ -18,7 +18,7 @@ void tearDown(void) {}
 #define ID_PUBLISHRESPONSE 829
 #define ID_EVENTNOTIFICATIONLIST 914
 
-#define MAX_INBOUND 8
+#define MAX_INBOUND 16
 typedef struct {
     int accept_count;
     opcua_byte_t inbound[MAX_INBOUND][1024];
@@ -30,6 +30,7 @@ typedef struct {
 } mock_t;
 
 static opcua_uint32_t s_channel_id = 1u;
+static opcua_uint32_t s_token_id = 1u;
 
 static opcua_uint32_t read_opn_channel_id(const opcua_byte_t *buf, size_t len) {
     if (len < 12) {
@@ -114,7 +115,7 @@ static size_t build_msg(opcua_byte_t *out, size_t cap, opcua_uint32_t seq, opcua
     w.position = 4;
     mu_binary_write_uint32(&w, (opcua_uint32_t)(24 + body_len));
     mu_binary_write_uint32(&w, s_channel_id);
-    mu_binary_write_uint32(&w, 1);
+    mu_binary_write_uint32(&w, s_token_id);
     mu_binary_write_uint32(&w, seq);
     mu_binary_write_uint32(&w, reqid);
     (void)memcpy(out + 24, body, body_len);
@@ -138,6 +139,8 @@ static void enqueue_connect(mock_t *mock) {
     opcua_byte_t tmp[512], chunk[512];
     mu_binary_writer_t w;
     size_t clen;
+
+    s_token_id = 1u;
 
     /* HEL */
     mu_binary_writer_init(&w, tmp, sizeof(tmp));
@@ -373,6 +376,11 @@ static opcua_uint64_t test_get_tick_ms(void *c) {
     return s_tick;
 }
 
+static opcua_datetime_t test_get_time(void *c) {
+    (void)c;
+    return 123456789;
+}
+
 void test_alarm_event_generation_and_publishing(void) {
 #if MUC_OPCUA_SUBSCRIPTIONS && MUC_OPCUA_EVENTS
     mock_t mock;
@@ -400,6 +408,7 @@ void test_alarm_event_generation_and_publishing(void) {
 
     fake_platform_init(NULL, &config.time_adapter, &config.entropy_adapter);
     s_tick = 0;
+    config.time_adapter.get_time = test_get_time;
     config.time_adapter.get_tick_ms = test_get_tick_ms;
     config.tcp_adapter.context = &mock;
     config.tcp_adapter.listen = mock_listen;
@@ -896,16 +905,28 @@ void test_publish_immediately_after_create_subscription(void) {
 }
 
 #if MUC_OPCUA_SUBSCRIPTIONS && MUC_OPCUA_EVENTS && MUC_OPCUA_CU_AUDITING
-/* EventFilter selecting base + AuditEvent fields (spec 074): EventType, Status,
-   AttributeId. No WhereClause. */
+static opcua_int32_t s_audit_write_value;
+
+static opcua_statuscode_t audit_write_handler(void *handle, const mu_nodeid_t *node_id, opcua_uint32_t attribute_id,
+                                              const mu_datavalue_t *value) {
+    (void)handle;
+    if (node_id->namespace_index != 1u || node_id->identifier_type != MU_NODEID_NUMERIC ||
+        node_id->identifier.numeric != 5001u || attribute_id != MU_ATTRIBUTEID_VALUE || !value->has_value ||
+        value->value.type != MU_TYPE_INT32) {
+        return MU_STATUS_BAD_NOTWRITABLE;
+    }
+    s_audit_write_value = value->value.value.i32;
+    return MU_STATUS_GOOD;
+}
+
 static void write_event_filter_audit(mu_binary_writer_t *w) {
     mu_nodeid_t filter_type = {0, MU_NODEID_NUMERIC, {727}};
     opcua_byte_t filter_buf[512];
     mu_binary_writer_t f_w;
     mu_binary_writer_init(&f_w, filter_buf, sizeof(filter_buf));
-    mu_binary_write_int32(&f_w, 3);
-    const char *names[] = {"EventType", "Status", "AttributeId"};
-    for (int i = 0; i < 3; ++i) {
+    mu_binary_write_int32(&f_w, 7);
+    const char *names[] = {"EventType", "SourceNode", "Time", "Status", "AttributeId", "OldValue", "NewValue"};
+    for (int i = 0; i < 7; ++i) {
         mu_nodeid_t tid = {0, MU_NODEID_NUMERIC, {0}};
         mu_binary_write_nodeid(&f_w, &tid);
         mu_binary_write_int32(&f_w, 1);
@@ -951,6 +972,129 @@ static void enqueue_create_monitored_item_audit(mock_t *mock, opcua_uint32_t seq
     clen = build_msg(chunk, sizeof(chunk), seq, seq, tmp, w.position);
     enqueue(mock, chunk, clen);
 }
+
+static void enqueue_audit_write(mock_t *mock, opcua_uint32_t seq, opcua_int32_t value) {
+    opcua_byte_t tmp[512], chunk[512];
+    mu_binary_writer_t w;
+    mu_binary_writer_init(&w, tmp, sizeof(tmp));
+    mu_nodeid_t request_type = {0, MU_NODEID_NUMERIC, {MU_ID_WRITEREQUEST}};
+    mu_binary_write_nodeid(&w, &request_type);
+    write_request_header(&w, TEST_FAKE_FIRST_AUTH_TOKEN, seq);
+    mu_binary_write_int32(&w, 1);
+
+    mu_nodeid_t node_id = {1, MU_NODEID_NUMERIC, {5001}};
+    mu_binary_write_nodeid(&w, &node_id);
+    mu_binary_write_uint32(&w, MU_ATTRIBUTEID_VALUE);
+    mu_string_t index_range = {-1, NULL};
+    mu_binary_write_string(&w, &index_range);
+    mu_datavalue_t data_value;
+    (void)memset(&data_value, 0, sizeof(data_value));
+    data_value.has_value = true;
+    data_value.value.type = MU_TYPE_INT32;
+    data_value.value.value.i32 = value;
+    mu_binary_write_datavalue(&w, &data_value);
+
+    size_t message_length = build_msg(chunk, sizeof(chunk), seq, seq, tmp, w.position);
+    enqueue(mock, chunk, message_length);
+}
+
+static void enqueue_open_secure_channel_renew(mock_t *mock, opcua_uint32_t seq) {
+    opcua_byte_t chunk[512];
+    mu_binary_writer_t w;
+    mu_binary_writer_init(&w, chunk, sizeof(chunk));
+    chunk[0] = 'O';
+    chunk[1] = 'P';
+    chunk[2] = 'N';
+    chunk[3] = 'F';
+    w.position = 4;
+    mu_binary_write_uint32(&w, 0);
+    mu_binary_write_uint32(&w, s_channel_id);
+    mu_string_t policy = {47, (const opcua_byte_t *)"http://opcfoundation.org/UA/SecurityPolicy#None"};
+    mu_binary_write_string(&w, &policy);
+    mu_binary_write_int32(&w, -1);
+    mu_binary_write_int32(&w, -1);
+    mu_binary_write_uint32(&w, seq);
+    mu_binary_write_uint32(&w, seq);
+    mu_nodeid_t request_type = {0, MU_NODEID_NUMERIC, {MU_ID_OPENSECURECHANNELREQUEST}};
+    mu_binary_write_nodeid(&w, &request_type);
+    write_request_header(&w, 0, seq);
+    mu_binary_write_uint32(&w, 0);
+    mu_binary_write_uint32(&w, 1);
+    mu_binary_write_uint32(&w, 1);
+    mu_binary_write_int32(&w, -1);
+    mu_binary_write_uint32(&w, 3600000);
+    mu_binary_writer_t size_writer;
+    mu_binary_writer_init(&size_writer, chunk, sizeof(chunk));
+    size_writer.position = 4;
+    mu_binary_write_uint32(&size_writer, (opcua_uint32_t)w.position);
+    enqueue(mock, chunk, w.position);
+}
+
+static void enqueue_rejected_activate_session(mock_t *mock, opcua_uint32_t seq) {
+    opcua_byte_t tmp[512], chunk[512];
+    mu_binary_writer_t w;
+    mu_binary_writer_init(&w, tmp, sizeof(tmp));
+    mu_nodeid_t request_type = {0, MU_NODEID_NUMERIC, {MU_ID_ACTIVATESESSIONREQUEST}};
+    mu_binary_write_nodeid(&w, &request_type);
+    write_request_header(&w, TEST_FAKE_FIRST_AUTH_TOKEN, seq);
+    mu_string_t null_string = {-1, NULL};
+    mu_bytestring_t null_bytes = {-1, NULL};
+    mu_binary_write_string(&w, &null_string);
+    mu_binary_write_bytestring(&w, &null_bytes);
+    mu_binary_write_int32(&w, 0);
+    mu_binary_write_int32(&w, 0);
+    mu_nodeid_t username_token_type = {0, MU_NODEID_NUMERIC, {324}};
+    mu_string_t policy = {15, (const opcua_byte_t *)"username_policy"};
+    mu_string_t username = {5, (const opcua_byte_t *)"alice"};
+    mu_bytestring_t password = {5, (const opcua_byte_t *)"wrong"};
+    mu_binary_write_extension_object_header(&w, &username_token_type, 41);
+    mu_binary_write_string(&w, &policy);
+    mu_binary_write_string(&w, &username);
+    mu_binary_write_bytestring(&w, &password);
+    mu_binary_write_string(&w, &null_string);
+    size_t message_length = build_msg(chunk, sizeof(chunk), seq, seq, tmp, w.position);
+    enqueue(mock, chunk, message_length);
+}
+
+static void parse_single_audit_notification(mock_t *mock, opcua_uint32_t subscription_id,
+                                            opcua_uint32_t expected_client_handle, mu_variant_t *fields,
+                                            size_t field_capacity) {
+    mu_binary_reader_t body;
+    opcua_statuscode_t service_result;
+    TEST_ASSERT_EQUAL(ID_PUBLISHRESPONSE,
+                      parse_response(mock->last_write, mock->last_write_len, &body, &service_result));
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, service_result);
+    opcua_uint32_t response_subscription_id;
+    mu_binary_read_uint32(&body, &response_subscription_id);
+    TEST_ASSERT_EQUAL(subscription_id, response_subscription_id);
+    opcua_int32_t available_sequence_count;
+    mu_binary_read_int32(&body, &available_sequence_count);
+    opcua_byte_t more_notifications;
+    mu_binary_read_byte(&body, &more_notifications);
+    opcua_uint32_t sequence_number;
+    mu_binary_read_uint32(&body, &sequence_number);
+    opcua_int64_t publish_time;
+    mu_binary_read_int64(&body, &publish_time);
+    opcua_int32_t notification_data_count;
+    mu_binary_read_int32(&body, &notification_data_count);
+    TEST_ASSERT_EQUAL(1, notification_data_count);
+    mu_nodeid_t extension_type;
+    size_t extension_length;
+    mu_binary_read_extension_object_header(&body, &extension_type, &extension_length);
+    TEST_ASSERT_EQUAL(ID_EVENTNOTIFICATIONLIST, extension_type.identifier.numeric);
+    opcua_int32_t event_count;
+    mu_binary_read_int32(&body, &event_count);
+    TEST_ASSERT_EQUAL(1, event_count);
+    opcua_uint32_t client_handle;
+    mu_binary_read_uint32(&body, &client_handle);
+    TEST_ASSERT_EQUAL(expected_client_handle, client_handle);
+    opcua_int32_t field_count;
+    mu_binary_read_int32(&body, &field_count);
+    TEST_ASSERT_EQUAL_INT((int)field_capacity, field_count);
+    for (size_t i = 0; i < field_capacity; ++i) {
+        mu_binary_read_variant(&body, &fields[i]);
+    }
+}
 #endif
 
 /* spec 074 SC-001: a client subscribed to the Server EventNotifier receives an
@@ -982,8 +1126,31 @@ void test_audit_write_event_e2e(void) {
     config.max_sessions = 1;
     config.max_secure_channels = 1;
 
+    static const mu_reference_t object_refs[] = {{{0, MU_NODEID_NUMERIC, {35}}, {1, MU_NODEID_NUMERIC, {5001}}, true}};
+    static const mu_reference_t variable_refs[] = {{{0, MU_NODEID_NUMERIC, {35}}, {0, MU_NODEID_NUMERIC, {85}}, false}};
+    static const mu_value_source_t initial_value = {MU_VALUESOURCE_STATIC,
+                                                    {.static_value = {MU_TYPE_INT32, {.i32 = 10}}}};
+    static const mu_node_t nodes[] = {{{0, MU_NODEID_NUMERIC, {85}},
+                                       MU_NODECLASS_OBJECT,
+                                       {7, (const opcua_byte_t *)"Objects"},
+                                       {7, (const opcua_byte_t *)"Objects"},
+                                       object_refs,
+                                       1,
+                                       NULL},
+                                      {{1, MU_NODEID_NUMERIC, {5001}},
+                                       MU_NODECLASS_VARIABLE,
+                                       {8, (const opcua_byte_t *)"AuditVar"},
+                                       {8, (const opcua_byte_t *)"AuditVar"},
+                                       variable_refs,
+                                       1,
+                                       &initial_value}};
+    static const mu_address_space_t address_space = {nodes, 2};
+    config.address_space = &address_space;
+    config.write_handler = audit_write_handler;
+
     fake_platform_init(NULL, &config.time_adapter, &config.entropy_adapter);
     s_tick = 0;
+    config.time_adapter.get_time = test_get_time;
     config.time_adapter.get_tick_ms = test_get_tick_ms;
     config.tcp_adapter.context = &mock;
     config.tcp_adapter.listen = mock_listen;
@@ -1012,71 +1179,91 @@ void test_audit_write_event_e2e(void) {
                       parse_response(mock.last_write, mock.last_write_len, &body, &sr));
     TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, sr);
 
-    /* Server raises a WRITE_UPDATE AuditEvent. */
-    mu_audit_event_t ae;
-    (void)memset(&ae, 0, sizeof(ae));
-    ae.event_type = MU_AUDIT_EVENT_WRITE_UPDATE;
-    ae.status = true;
-    ae.action_timestamp = 123456789;
-    ae.specific.write_update.node_id = (mu_nodeid_t){1, MU_NODEID_NUMERIC, {.numeric = 5001}};
-    ae.specific.write_update.old_value.type = MU_TYPE_INT32;
-    ae.specific.write_update.old_value.value.i32 = 10;
-    ae.specific.write_update.new_value.type = MU_TYPE_INT32;
-    ae.specific.write_update.new_value.value.i32 = 20;
-    mu_raise_audit_event(server, &ae);
+    s_audit_write_value = 10;
+    enqueue_audit_write(&mock, 6, 20);
+    mu_server_poll(server);
+    TEST_ASSERT_EQUAL(MU_ID_WRITERESPONSE, parse_response(mock.last_write, mock.last_write_len, &body, &sr));
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, sr);
+    opcua_int32_t write_result_count;
+    mu_binary_read_int32(&body, &write_result_count);
+    TEST_ASSERT_EQUAL(1, write_result_count);
+    opcua_statuscode_t write_result;
+    mu_binary_read_statuscode(&body, &write_result);
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, write_result);
+    TEST_ASSERT_EQUAL_INT32(20, s_audit_write_value);
 
-    enqueue_publish(&mock, 6);
+    enqueue_publish(&mock, 7);
     s_tick = 250;
     mu_server_poll(server);
     mu_server_poll(server);
 
-    TEST_ASSERT_EQUAL(ID_PUBLISHRESPONSE, parse_response(mock.last_write, mock.last_write_len, &body, &sr));
-    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, sr);
+    mu_variant_t fields[7];
+    parse_single_audit_notification(&mock, sub_id, 77, fields, 7u);
+    TEST_ASSERT_EQUAL(MU_TYPE_NODEID, fields[0].type);
+    TEST_ASSERT_EQUAL(2100, fields[0].value.nodeid.identifier.numeric);
+    TEST_ASSERT_EQUAL(MU_TYPE_NODEID, fields[1].type);
+    TEST_ASSERT_EQUAL(2253, fields[1].value.nodeid.identifier.numeric);
+    TEST_ASSERT_EQUAL(MU_TYPE_DATETIME, fields[2].type);
+    TEST_ASSERT_NOT_EQUAL(0, fields[2].value.dt);
+    TEST_ASSERT_EQUAL(MU_TYPE_BOOLEAN, fields[3].type);
+    TEST_ASSERT_TRUE(fields[3].value.b);
+    TEST_ASSERT_EQUAL(MU_TYPE_UINT32, fields[4].type);
+    TEST_ASSERT_EQUAL(13u, fields[4].value.ui32);
+    TEST_ASSERT_EQUAL(MU_TYPE_INT32, fields[5].type);
+    TEST_ASSERT_EQUAL_INT32(10, fields[5].value.i32);
+    TEST_ASSERT_EQUAL(MU_TYPE_INT32, fields[6].type);
+    TEST_ASSERT_EQUAL_INT32(20, fields[6].value.i32);
 
-    opcua_uint32_t resp_sub_id;
-    mu_binary_read_uint32(&body, &resp_sub_id);
-    TEST_ASSERT_EQUAL(sub_id, resp_sub_id);
-    opcua_int32_t navail;
-    mu_binary_read_int32(&body, &navail);
-    opcua_byte_t more;
-    mu_binary_read_byte(&body, &more);
-    opcua_uint32_t seq_num;
-    mu_binary_read_uint32(&body, &seq_num);
-    opcua_int64_t pub_time;
-    mu_binary_read_int64(&body, &pub_time);
-    opcua_int32_t ndata;
-    mu_binary_read_int32(&body, &ndata);
-    TEST_ASSERT_EQUAL(1, ndata);
+    bool audit_item_found = false;
+    for (size_t i = 0; i < MU_INTERN_MAX_MONITORED_ITEMS; ++i) {
+        mu_monitored_item_t *item = &server->subs.monitored_items[i];
+        if (item->in_use && item->client_handle == 77u) {
+            item->select_clauses_count = 5u;
+            item->select_clauses[0] = MU_EVENT_FIELD_EVENTTYPE;
+            item->select_clauses[1] = MU_EVENT_FIELD_STATUS;
+            item->select_clauses[2] = MU_EVENT_FIELD_SESSIONID;
+            item->select_clauses[3] = MU_EVENT_FIELD_CLIENTUSERID;
+            item->select_clauses[4] = MU_EVENT_FIELD_SECURECHANNELID;
+            audit_item_found = true;
+            break;
+        }
+    }
+    TEST_ASSERT_TRUE(audit_item_found);
 
-    mu_nodeid_t ext_type;
-    size_t ext_len;
-    mu_binary_read_extension_object_header(&body, &ext_type, &ext_len);
-    TEST_ASSERT_EQUAL(ID_EVENTNOTIFICATIONLIST, ext_type.identifier.numeric);
-    opcua_int32_t total_events;
-    mu_binary_read_int32(&body, &total_events);
-    TEST_ASSERT_EQUAL(1, total_events);
-    opcua_uint32_t client_handle;
-    mu_binary_read_uint32(&body, &client_handle);
-    TEST_ASSERT_EQUAL(77, client_handle);
-    opcua_int32_t field_count;
-    mu_binary_read_int32(&body, &field_count);
-    TEST_ASSERT_EQUAL(3, field_count);
+    mu_variant_t session_fields[5];
 
-    /* EventType -> AuditWriteUpdateEventType i=2100 */
-    mu_variant_t v_type;
-    mu_binary_read_variant(&body, &v_type);
-    TEST_ASSERT_EQUAL(MU_TYPE_NODEID, v_type.type);
-    TEST_ASSERT_EQUAL(2100, v_type.value.nodeid.identifier.numeric);
-    /* Status -> Boolean true */
-    mu_variant_t v_status;
-    mu_binary_read_variant(&body, &v_status);
-    TEST_ASSERT_EQUAL(MU_TYPE_BOOLEAN, v_status.type);
-    TEST_ASSERT_TRUE(v_status.value.b);
-    /* AttributeId -> UInt32 13 (Value) */
-    mu_variant_t v_attr;
-    mu_binary_read_variant(&body, &v_attr);
-    TEST_ASSERT_EQUAL(MU_TYPE_UINT32, v_attr.type);
-    TEST_ASSERT_EQUAL(13u, v_attr.value.ui32);
+    enqueue_open_secure_channel_renew(&mock, 8);
+    mu_server_poll(server);
+    s_token_id++;
+    enqueue_publish(&mock, 9);
+    s_tick = 500;
+    mu_server_poll(server);
+    mu_server_poll(server);
+    parse_single_audit_notification(&mock, sub_id, 77, session_fields, 5u);
+    TEST_ASSERT_EQUAL(MU_TYPE_NODEID, session_fields[0].type);
+    TEST_ASSERT_EQUAL(2060, session_fields[0].value.nodeid.identifier.numeric);
+    TEST_ASSERT_EQUAL(MU_TYPE_BOOLEAN, session_fields[1].type);
+    TEST_ASSERT_TRUE(session_fields[1].value.b);
+    TEST_ASSERT_EQUAL(MU_TYPE_STRING, session_fields[4].type);
+    TEST_ASSERT_TRUE(session_fields[4].value.str.length > 0);
+
+    enqueue_rejected_activate_session(&mock, 10);
+    mu_server_poll(server);
+    TEST_ASSERT_EQUAL(MU_ID_ACTIVATESESSIONRESPONSE, parse_response(mock.last_write, mock.last_write_len, &body, &sr));
+    TEST_ASSERT_NOT_EQUAL_HEX32(MU_STATUS_GOOD, sr);
+    enqueue_publish(&mock, 11);
+    s_tick = 750;
+    mu_server_poll(server);
+    mu_server_poll(server);
+    parse_single_audit_notification(&mock, sub_id, 77, session_fields, 5u);
+    TEST_ASSERT_EQUAL(MU_TYPE_NODEID, session_fields[0].type);
+    TEST_ASSERT_EQUAL(2075, session_fields[0].value.nodeid.identifier.numeric);
+    TEST_ASSERT_EQUAL(MU_TYPE_BOOLEAN, session_fields[1].type);
+    TEST_ASSERT_FALSE(session_fields[1].value.b);
+    TEST_ASSERT_EQUAL(MU_TYPE_NODEID, session_fields[2].type);
+    TEST_ASSERT_NOT_EQUAL(0u, session_fields[2].value.nodeid.identifier.numeric);
+    TEST_ASSERT_EQUAL(MU_TYPE_STRING, session_fields[3].type);
+    TEST_ASSERT_EQUAL_STRING_LEN("alice", session_fields[3].value.str.data, 5u);
 
     mu_server_close(server);
 #endif

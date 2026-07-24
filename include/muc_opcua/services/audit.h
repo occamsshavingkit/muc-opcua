@@ -48,6 +48,7 @@ typedef struct {
         } activate_session;
         struct {
             mu_nodeid_t node_id;
+            opcua_uint32_t attribute_id;
             mu_variant_t old_value;
             mu_variant_t new_value;
         } write_update;
@@ -83,6 +84,8 @@ typedef struct {
 
 typedef struct {
     opcua_uint32_t sequence; /* ring generation stamp; 0 = empty slot */
+    opcua_byte_t event_id[16];
+    opcua_byte_t event_id_length;
     mu_nodeid_t source_node; /* the notifier (Server Object i=2253) */
     opcua_boolean_t status;
     opcua_datetime_t action_timestamp;

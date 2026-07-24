@@ -181,7 +181,7 @@ void test_read_service_batch_preserves_per_operation_results(void) {
     variable_value.data.static_value.is_array = false;
     variable_value.data.static_value.value.i32 = 77;
 
-    mu_node_t nodes[2];
+    mu_node_t nodes[3];
     nodes[0].node_id =
         (mu_nodeid_t){.identifier_type = MU_NODEID_NUMERIC, .namespace_index = 1, .identifier.numeric = 1001};
     nodes[0].node_class = MU_NODECLASS_VARIABLE;
@@ -294,7 +294,7 @@ void test_read_service_eventnotifier(void) {
     /* spec 074 / CU 3194 / OPC-10000-3 §5.4.6: EventNotifier is a readable
        attribute of Object/View nodes (the Server Object advertises
        SubscribeToEvents); other NodeClasses return Bad_AttributeIdInvalid. */
-    mu_node_t nodes[2];
+    mu_node_t nodes[3];
     (void)memset(nodes, 0, sizeof(nodes));
     nodes[0].node_id =
         (mu_nodeid_t){.identifier_type = MU_NODEID_NUMERIC, .namespace_index = 0, .identifier.numeric = 2253};
@@ -303,29 +303,37 @@ void test_read_service_eventnotifier(void) {
     nodes[0].display_name = (mu_string_t){6, (const opcua_byte_t *)"Server"};
     nodes[0].event_notifier = 0x01u;
     nodes[1].node_id =
-        (mu_nodeid_t){.identifier_type = MU_NODEID_NUMERIC, .namespace_index = 1, .identifier.numeric = 1000};
-    nodes[1].node_class = MU_NODECLASS_VARIABLE;
-    nodes[1].browse_name = (mu_string_t){3, (const opcua_byte_t *)"Var"};
-    nodes[1].display_name = (mu_string_t){3, (const opcua_byte_t *)"Var"};
+        (mu_nodeid_t){.identifier_type = MU_NODEID_NUMERIC, .namespace_index = 1, .identifier.numeric = 2254};
+    nodes[1].node_class = MU_NODECLASS_OBJECT;
+    nodes[1].browse_name = (mu_string_t){5, (const opcua_byte_t *)"Other"};
+    nodes[1].display_name = (mu_string_t){5, (const opcua_byte_t *)"Other"};
+    nodes[2].node_id =
+        (mu_nodeid_t){.identifier_type = MU_NODEID_NUMERIC, .namespace_index = 1, .identifier.numeric = 2255};
+    nodes[2].node_class = MU_NODECLASS_VARIABLE;
+    nodes[2].browse_name = (mu_string_t){3, (const opcua_byte_t *)"Var"};
+    nodes[2].display_name = (mu_string_t){3, (const opcua_byte_t *)"Var"};
 
-    mu_address_space_t address_space = {.nodes = nodes, .node_count = 2};
-    mu_read_value_id_t reads[2] = {{.node_id = nodes[0].node_id, .attribute_id = MU_ATTRIBUTEID_EVENTNOTIFIER},
-                                   {.node_id = nodes[1].node_id, .attribute_id = MU_ATTRIBUTEID_EVENTNOTIFIER}};
+    mu_address_space_t address_space = {.nodes = nodes, .node_count = 3};
+    mu_read_value_id_t reads[3] = {{.node_id = nodes[0].node_id, .attribute_id = MU_ATTRIBUTEID_EVENTNOTIFIER},
+                                   {.node_id = nodes[1].node_id, .attribute_id = MU_ATTRIBUTEID_EVENTNOTIFIER},
+                                   {.node_id = nodes[2].node_id, .attribute_id = MU_ATTRIBUTEID_EVENTNOTIFIER}};
     mu_read_request_t req = {.max_age = 0,
                              .timestamps_to_return = MU_TIMESTAMPS_TO_RETURN_NEITHER,
                              .nodes_to_read = reads,
-                             .num_nodes_to_read = 2};
+                             .num_nodes_to_read = 3};
     mu_read_response_t resp;
-    mu_datavalue_t results[2];
-    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_read_process(&address_space, NULL, &req, 0, &resp, results, 2, NULL));
+    mu_datavalue_t results[3];
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_read_process(&address_space, NULL, &req, 0, &resp, results, 3, NULL));
 
     /* Object -> Byte with SubscribeToEvents (bit 0) */
     TEST_ASSERT_TRUE(resp.results[0].has_value);
     TEST_ASSERT_EQUAL(MU_TYPE_BYTE, resp.results[0].value.type);
     TEST_ASSERT_EQUAL_HEX8(0x01u, resp.results[0].value.value.by);
-    /* Variable has no EventNotifier attribute */
-    TEST_ASSERT_FALSE(resp.results[1].has_value);
-    TEST_ASSERT_EQUAL(MU_STATUS_BAD_ATTRIBUTEIDINVALID, resp.results[1].status);
+    TEST_ASSERT_TRUE(resp.results[1].has_value);
+    TEST_ASSERT_EQUAL(MU_TYPE_BYTE, resp.results[1].value.type);
+    TEST_ASSERT_EQUAL_HEX8(0x00u, resp.results[1].value.value.by);
+    TEST_ASSERT_FALSE(resp.results[2].has_value);
+    TEST_ASSERT_EQUAL(MU_STATUS_BAD_ATTRIBUTEIDINVALID, resp.results[2].status);
 }
 #endif
 

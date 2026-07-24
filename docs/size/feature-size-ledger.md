@@ -1564,9 +1564,22 @@ Made auditing conformant (emit + observe over OPC UA), gated by
 event (8 × MU_MAX_EVENT_QUEUE_SIZE 8 × MU_INTERN_MAX_SUBSCRIPTIONS 100 ≈ 6.4 KB on
 full) → **~11.6 KB on full**. This is **~23× smaller** than embedding the full
 audit payload in every queued event (~268 KB); the pool design (research.md
-Decision 7) is the reason the full-field path is affordable. Flash: audit→event
-adapter + SELECT resolver/parser + 4 emitters, ~1–2 KB, auditing-only. Non-auditing
-profiles (nano/micro/embedded/standard): **0** flash + RAM (compiled out).
+Decision 7) is the reason the full-field path is affordable.
+
+Final ARM Cortex-M0+ archive `.text`, measured with
+`scripts/measure_size.sh all --json` after the complete profile matrix:
+
+| Profile | pre-074 | post-074 | Δ archive `.text` |
+|---------|--------:|---------:|-----------------:|
+| nano | 24,596 B | 24,596 B | **0 B** |
+| standard | 103,101 B | 103,101 B | **0 B** |
+| full | 146,835 B | 147,229 B | **+394 B** |
+
+Auditing defaults on only for `full`, so the measured +394 B is the enabled
+feature cost. Nano and standard are byte-identical to their pre-074 baselines;
+the nano build also contains no audit emission/routing symbols, as enforced by
+`scripts/test_profile_gating.sh`. Archive `.data` and `.bss` remain 0 B for all
+measured profiles; caller-owned server storage carries the bounded audit pool.
 
 ## 2026-07-16: Spec 075 — Nano Time-Sync (configurable clock skew)
 
