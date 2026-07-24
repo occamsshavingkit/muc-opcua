@@ -121,7 +121,13 @@ This document maps implementation and test files back to OPC UA normative sectio
 | `include/muc_opcua/services/key_credential.h` | KeyCredential Service | OPC-10000-4 / OPC-10000-7 / OPC-10000-12 | 5.11 / CU 2113 / 8.5-8.6 | Public adapter type (mu_key_credential_adapter_t) + Method/Type NodeId constants |
 | `tests/unit/test_key_credential.c` | Tests | OPC-10000-4 / OPC-10000-7 / OPC-10000-12 | 5.11 / CU 2113 / 8.5-8.6 | KeyCredential handler dispatch, Bad_NotSupported without adapter, Bad_NoEntryExists paths |
 | `src/cu/core_2022_server/authorization/crypto_jwt.h` | JWT Validator | OPC-10000-4 / OPC-10000-7 / RFC 7515 / RFC 7518 | 5.7.3 / CU 1697 / 5 / 3.1 | JWS verify wrapper interface |
+| `tests/unit/test_jwt_claims.c` | Tests | OPC-10000-4 / OPC-10000-7 | 5.7.3 / CU 1697 | JWT `sub` claim handling: valid, empty, truncation, escape sequences |
+| `tests/unit/test_jwt_clock_skew.c` | Tests | OPC-10000-4 / OPC-10000-7 | 5.7.3 / CU 1697 | Per-issuer clock skew tolerance (boundary accepted, beyond boundary rejected) |
+| `tests/unit/test_jwt_multi_issuer.c` | Tests | OPC-10000-4 / OPC-10000-7 | 5.7.3 / CU 1697 | Multi-issuer lookup: correct issuer dispatched, cross-issuer audience mismatch rejected |
+| `docs/conformance/authorization-service.md` | Docs | OPC-10000-7 | 6.6 / CU 1629 | Authorization Service Server Facet conformance evidence |
+| `docs/conformance/jwt-user-token.md` | Docs | OPC-10000-7 | 6.6 / CU 1697 | JWT User Token conformance evidence |
 | `src/cu/core_2022_server/role_management/role_management.c` | Role Management | OPC-10000-4 / OPC-10000-5 | 5.8 / 6.3 | Role-based authorization service implementation |
+| `src/cu/core_2022_server/certificate_manager/cert_manager.h` | Certificate Manager | OPC-10000-4 / OPC-10000-12 | 5.11 / 7.5 | Certificate group manager internal header |
 | `src/cu/core_2022_server/certificate_manager/cert_manager.c` | Certificate Manager | OPC-10000-4 / OPC-10000-12 | 5.11 / 7.5 | Certificate group manager implementation |
 | `src/cu/core_2022_server/certificate_manager/push_model.c` | Certificate Manager | OPC-10000-7 / OPC-10000-12 | CU 2231 / 7.10 | Push Model UpdateCertificate/ApplyChanges handlers (server accepts cert/trust-list pushes from a GDS/agent) |
 | `include/muc_opcua/services/certificate_manager.h` | Certificate Manager | OPC-10000-4 / OPC-10000-12 | 5.11 / 7.5 | Certificate manager public interface |
