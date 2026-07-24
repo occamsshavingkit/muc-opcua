@@ -1,2 +1,0 @@
-/usr/bin/ar qc libmuc_opcua_test_support.a CMakeFiles/muc_opcua_test_support.dir/fake_platform.c.o CMakeFiles/muc_opcua_test_support.dir/service_builders.c.o
-/usr/bin/ranlib libmuc_opcua_test_support.a

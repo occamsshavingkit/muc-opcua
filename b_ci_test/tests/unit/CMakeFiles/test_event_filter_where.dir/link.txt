@@ -1,1 +1,0 @@
-/usr/bin/cc -Wl,--gc-sections CMakeFiles/test_event_filter_where.dir/test_event_filter_where.c.o -o test_event_filter_where  ../../_deps/unity-build/libunity.a ../../src/libmuc_opcua.a ../support/libmuc_opcua_test_support.a ../../src/libmuc_opcua.a /usr/lib/x86_64-linux-gnu/libcrypto.so 
