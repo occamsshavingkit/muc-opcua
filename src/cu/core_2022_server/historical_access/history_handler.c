@@ -53,8 +53,8 @@ opcua_statuscode_t handle_history_read(mu_server_t *server, mu_binary_reader_t *
         } else {
             res->status_code = server->config.history_adapter.read_raw_modified(
                 server->config.history_adapter.context, &node->node_id, req.details.is_read_modified,
-                req.details.start_time, req.details.end_time, req.details.num_values_per_node, req.details.return_bounds,
-                node->continuation_point.data,
+                req.details.start_time, req.details.end_time, req.details.num_values_per_node,
+                req.details.return_bounds, node->continuation_point.data,
                 node->continuation_point.length > 0 ? (size_t)node->continuation_point.length : 0,
                 continuation_points[i], &cp_out_length, data_points, 10, &actual_data_points);
         }
