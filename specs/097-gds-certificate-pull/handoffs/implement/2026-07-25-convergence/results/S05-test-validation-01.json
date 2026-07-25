@@ -1,0 +1,21 @@
+{
+  "contract_type": "speckit.implement.receipt.v1",
+  "shard_id": "S05-test-validation-01",
+  "task_type": "test",
+  "task_ids": ["T042"],
+  "completed_task_ids": ["T042"],
+  "changed_paths": [
+    "tests/unit/test_certificate_manager.c",
+    "src/address_space/node_id.c"
+  ],
+  "validation_evidence": [
+    "TDD red: contract-accurate Browse calls through mu_browse_process(NULL, NULL, ...) omitted forward targets 15594 and 15624",
+    "handoff reconciliation: S05 was narrowed to permit only src/address_space/node_id.c after RED proved the public Browse path required that corrective fix",
+    "root cause: base-space pointer identity selected binary lookup despite the documented 15627-to-12746 cross-block ordering violation; missing targets were discarded by Browse resolution",
+    "corrective fix: retain binary base-space lookup and use linear lookup only after a binary miss",
+    "cmake --build build/t042 --target test_certificate_manager: exit 0",
+    "ctest --test-dir build/t042 -R '^test_certificate_manager$' --output-on-failure: exit 0; 1/1 tests passed",
+    "lsp_diagnostics tests/unit/test_certificate_manager.c: no diagnostics",
+    "lsp_diagnostics src/address_space/node_id.c: no diagnostics"
+  ]
+}

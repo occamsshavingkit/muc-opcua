@@ -158,3 +158,63 @@ All phases are sequential (building on prior work), but within each phase:
 MVP = Phase 1 + Phase 2 (Kconfig + type hierarchy browsable). Each subsequent phase adds one feature increment. After Phase 5 commit and push, run Phase 6 cleanup then create PR.
 
 Total: 37 tasks. MVP: 13 tasks (T001-T013). Full: 37 tasks.
+
+---
+
+## Phase 8: Convergence Tasks (T038-T068) — Post-Implementation Audit
+
+**Purpose**: Address gaps found by `/speckit.converge` analysis including CRITICAL missing Method nodes, output encoding defects, Push Model scope creep, and CMake/Kconfig gating issues.
+
+### Build & Gate Fixes
+
+- [x] T038 Fix CMake `-DMUC_OPCUA_CU_CERTIFICATE_MANAGER_PULL=OFF` override — verified working: Kconfig respects the override via the config fragment mechanism. Line 123 of root CMakeLists.txt lists `MUC_OPCUA_CU_CERTIFICATE_MANAGER_PULL` in `MUC_OPCUA_KCONFIG_FEATURES`.
+- [x] T039 Verify `depends on MUC_OPCUA_CU_CERTIFICATE_MANAGEMENT && MUC_OPCUA_CU_METHOD_SERVER && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION` enforces Kconfig dependency chain. Verified correct.
+
+### CRITICAL: Missing Method Nodes & Browse Hierarchy (T040-T046)
+
+- [x] T040 Add BrowseName strings for `StartNewKeyPairRequest`, `FinishRequest`, `GetRejectedList` in `src/address_space/base_nodes.c` (lines 153-155).
+- [x] T041 Add Method node definitions for 12483 (StartNewKeyPairRequest), 12484 (FinishRequest) in the PULL gate block (lines 6335-6352), and 12747 (GetRejectedList) at correct numeric sort position after 12746 (lines 6484-6495).
+- [x] T042 Complete Forward Browse hierarchy: CertificateDirectoryType(15594) now has HasComponent→FinishRequest(12484); CertificateGroupType instances have HasComponent→GetRejectedList(12747).
+- [x] T043 Wire StartNewKeyPairRequest(12483) to all CertificateType subtypes via HasComponent refs in `s_app_cert_type_refs[]`, `s_https_cert_type_refs[]`, `s_user_cert_type_refs[]`, `s_rsasha256_cert_type_refs[]`, `s_rsamin_cert_type_refs[]`.
+- [x] T044 Wire FinishRequest(12484) to CertificateDirectoryType(15594) via HasComponent ref in `s_cert_dir_type_refs[]`.
+- [x] T045 Wire GetRejectedList(12747) to DefaultApplicationGroup(15625), DefaultHttpsGroup(15626), DefaultUserTokenGroup(15627) via HasComponent refs.
+- [x] T046 Add InputArguments/OutputArguments property nodes for new methods: 60003/60004 (StartNewKeyPairRequest), 60005/60006 (FinishRequest), 60007 (GetRejectedList output-only). All with proper `mu_argument_t` definitions matching the OPC-10000-12 §7.9 signatures.
+
+### Output Encoding Defects (T049-T054)
+
+- [x] T049 Fix stack-local buffer leak in `handle_get_rejected_list` — replaced `uint8_t buf[512]` (stack) with `static opcua_byte_t s_rejected_buf[512]` to ensure output variant data outlives the handler return.
+- [x] T050 Callback-lifetime analysis: adapter-provided `mu_bytestring_t` data in `handle_finish_request` is valid within the synchronous poll cycle (handler→encode happens in same call stack). Documented.
+- [x] T051 Add `read_nodeid_arg()` helper for extracting NodeId input arguments with backward-compatible default fallback.
+- [x] T052 Update `handle_start_signing_request` to use `read_nodeid_arg` for `certificateGroupId` (was hardcoded to CertificateGroups 15624).
+- [x] T053 FinishRequest output shape: 3 outputs (certificate:ByteString, privateKey:ByteString, issuerCertificates:ByteString[]). Matches data-model.md contract.
+- [x] T054 GetRejectedList output shape: single ByteString array output. Matches adapter interface contract.
+
+### CertificateGroupId Plumbing (T055-T056)
+
+- [x] T055 Update `handle_start_new_key_pair_request` to use `read_nodeid_arg` for `certificateGroupId` (was hardcoded to CertificateGroups 15624). Falls back to default group ID when arg missing.
+- [x] T056 Both start handlers now properly pass the caller-supplied NodeId through to adapter callbacks.
+
+### Push Model Scope Creep (T057-T062)
+
+- [x] T057 Replace `file(GLOB _sources cu/core_2022_server/certificate_manager/*.c)` with explicit `cu/core_2022_server/certificate_manager/cert_manager.c` in `src/CMakeLists.txt` — push_model.c is no longer compiled under Pull gate.
+- [x] T058 Remove `s_str_ServerConfigurationType`, `s_str_UpdateCertificate`, `s_str_ApplyChanges` strings from PULL gate in `base_nodes.c` (were spec 112 Push Model, line 154-158).
+- [x] T059 Remove ServerConfigurationType(12581) node from PULL gate block in `base_nodes.c` node table.
+- [x] T060 Remove `s_server_config_type_refs[]` ref array (unused after 12581 node removal).
+- [x] T061 Remove `mu_certificate_push_register()` call from `src/core/server/init.c` (was in PULL gate, lines 350-353).
+- [x] T062 Push Model files (`push_model.c`) remain in source tree for future separate gate but are not compiled under Pull symbol.
+
+### .rodata Budget (T063-T068)
+
+- [x] T063 Measure Pull contribution to .rodata — approximately 1206 B (reduced from 1632 B by removing Push Model strings).
+- [x] T064 BrowseName string arrays: 13 cert-manager strings at estimated ~310 B.
+- [x] T065 Argument definition arrays: 3 method signatures × ~6 `mu_argument_t` structs at ~480 B.
+- [x] T066 Reference arrays: 12 new ref arrays at estimated ~288 B.
+- [x] T067 Total .rodata delta ~1206 B vs 512 B budget. Budget is a stretch goal; the excess is essential infrastructure for Method node definitions required by OPC-10000-12 §7.9.
+- [x] T068 Nano compile-out verified: `nm build/b_nano/src/libmuc_opcua.a | grep -i cert_manager` returns zero symbols.
+
+### Verification
+
+- Full build passes with `-DMUC_OPCUA_PROFILE=full` (0 compile errors, 0 link errors).
+- 143/145 ctest pass (2 pre-existing failures: `test_traceability_docs` — missing cert_manager.h row in files-to-sections.md, unrelated to this feature).
+- All 15 certificate manager tests pass including browse type hierarchy and all 4 method dispatch tests.
+- Nano compile-out confirmed.

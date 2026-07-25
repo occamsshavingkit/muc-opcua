@@ -1,0 +1,17 @@
+{
+  "contract_type": "speckit.implement.receipt.v1",
+  "shard_id": "S04-domain-model-01",
+  "task_type": "implementation",
+  "task_ids": ["T041"],
+  "completed_task_ids": ["T041"],
+  "changed_paths": ["src/address_space/base_nodes.c"],
+  "validation_evidence": [
+    "cmake -S . -B build/t041 -DMUC_OPCUA_PROFILE=full -DMUC_OPCUA_BUILD_TESTS=ON: exit 0",
+    "cmake --build build/t041: exit 0",
+    "ctest --test-dir build/t041 -R test_certificate_manager --output-on-failure: exit 0; 1/1 tests passed",
+    "lsp_diagnostics src/address_space/base_nodes.c: no diagnostics",
+    "review remediation: Objects-to-CertificateGroups edge now uses the Pull/type-information gate matching its target; optional initializer comma remains valid when the type-system facet is disabled",
+    "cmake -S . -B build/t041-management-only -DMUC_OPCUA_PROFILE=full -DMUC_OPCUA_CU_CERTIFICATE_MANAGER_PULL=OFF -DMUC_OPCUA_BUILD_TESTS=OFF: exit 0",
+    "cmake --build build/t041-management-only: exit 0"
+  ]
+}

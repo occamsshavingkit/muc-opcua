@@ -4,10 +4,11 @@
  * Validates the four Pull Model method handlers dispatch correctly.
  */
 #include "../../src/core/server_internal.h"
+#include "../../src/services/browse.h"
 #include "muc_opcua/server.h"
 #include "muc_opcua/services/certificate_manager.h"
-#include "muc_opcua/services/method.h"
 #include "unity.h"
+#include <stdio.h>
 #include <string.h>
 
 void setUp(void) {}
@@ -363,6 +364,134 @@ void test_register_null_server(void) {
     TEST_ASSERT_EQUAL(MU_STATUS_BAD_INTERNALERROR, st);
 }
 
+static mu_browse_result_t test_browse_forward_with_pool(mu_nodeid_t source_id, mu_nodeid_t reference_type_id,
+                                                        opcua_boolean_t include_subtypes,
+                                                        mu_reference_description_t *ref_pool, size_t pool_size) {
+    mu_browse_description_t desc;
+    memset(&desc, 0, sizeof(desc));
+    desc.node_id = source_id;
+    desc.browse_direction = MU_BROWSE_DIRECTION_FORWARD;
+    desc.reference_type_id = reference_type_id;
+    desc.include_subtypes = include_subtypes;
+    desc.node_class_mask = 0;
+    desc.result_mask = 0x3F;
+
+    mu_browse_request_t req;
+    memset(&req, 0, sizeof(req));
+    req.requested_max_references_per_node = 0;
+    req.nodes_to_browse = &desc;
+    req.num_nodes_to_browse = 1;
+
+    mu_browse_result_t result;
+    memset(&result, 0, sizeof(result));
+
+    opcua_statuscode_t status = mu_browse_process(NULL, NULL, &req, &result, 1, ref_pool, pool_size);
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, status);
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, result.status_code);
+
+    return result;
+}
+
+static void assert_has_reference(const mu_browse_result_t *result, uint32_t expected_ref_type,
+                                 opcua_boolean_t expected_is_forward, uint32_t expected_target_numeric) {
+    opcua_boolean_t found = false;
+    for (size_t i = 0; i < result->num_references; ++i) {
+        const mu_reference_description_t *ref = &result->references[i];
+        if (ref->reference_type_id.namespace_index == 0 &&
+            ref->reference_type_id.identifier_type == MU_NODEID_NUMERIC &&
+            ref->reference_type_id.identifier.numeric == expected_ref_type &&
+            ref->is_forward == expected_is_forward &&
+            ref->node_id.namespace_index == 0 &&
+            ref->node_id.identifier_type == MU_NODEID_NUMERIC &&
+            ref->node_id.identifier.numeric == expected_target_numeric) {
+            found = true;
+            break;
+        }
+    }
+    if (!found) {
+        char msg[128];
+        snprintf(msg, sizeof(msg), "Ref type %u (forward: %d) to target %u not found",
+                 expected_ref_type, expected_is_forward, expected_target_numeric);
+        TEST_FAIL_MESSAGE(msg);
+    }
+}
+
+void test_certificate_manager_browse_types(void) {
+    /* Grounding assertions in OPC-10000-12 §7.8.4.1-§7.8.4.9 and §7.9.2 */
+    mu_nodeid_t id_58 = {0, MU_NODEID_NUMERIC, {58}};
+    mu_nodeid_t id_12556 = {0, MU_NODEID_NUMERIC, {12556}};
+    mu_nodeid_t id_12557 = {0, MU_NODEID_NUMERIC, {12557}};
+    mu_nodeid_t ref_subtype = {0, MU_NODEID_NUMERIC, {45}};
+    mu_reference_description_t ref_pool[100];
+
+    /* HasSubtype(45): 58->12555 (CertificateGroupType), 58->12556 (CertificateType),
+     * 58->15594 (CertificateDirectoryType). */
+    mu_browse_result_t res_58 = test_browse_forward_with_pool(id_58, ref_subtype, true, ref_pool, 100);
+    assert_has_reference(&res_58, 45, true, 12555);
+    assert_has_reference(&res_58, 45, true, 12556);
+    assert_has_reference(&res_58, 45, true, 15594);
+
+    /* HasSubtype(45): 12556->12557 (ApplicationCertificateType), 12556->12558
+     * (HttpsCertificateType), 12556->15017 (UserCertificateType). */
+    mu_browse_result_t res_12556 = test_browse_forward_with_pool(id_12556, ref_subtype, true, ref_pool, 100);
+    assert_has_reference(&res_12556, 45, true, 12557);
+    assert_has_reference(&res_12556, 45, true, 12558);
+    assert_has_reference(&res_12556, 45, true, 15017);
+
+    /* HasSubtype(45): 12557->12559 (RsaSha256ApplicationCertificateType),
+     * 12557->15421 (RsaMinApplicationCertificateType). */
+    mu_browse_result_t res_12557 = test_browse_forward_with_pool(id_12557, ref_subtype, true, ref_pool, 100);
+    assert_has_reference(&res_12557, 45, true, 12559);
+    assert_has_reference(&res_12557, 45, true, 15421);
+}
+
+
+void test_certificate_manager_browse_instances(void) {
+    /* Grounding assertions in OPC-10000-12 §7.8.3.1 and §7.9.2 */
+    mu_nodeid_t id_85 = {0, MU_NODEID_NUMERIC, {85}};
+    mu_nodeid_t id_15624 = {0, MU_NODEID_NUMERIC, {15624}};
+    mu_nodeid_t id_15625 = {0, MU_NODEID_NUMERIC, {15625}};
+    mu_nodeid_t id_15626 = {0, MU_NODEID_NUMERIC, {15626}};
+    mu_nodeid_t id_15627 = {0, MU_NODEID_NUMERIC, {15627}};
+
+    mu_nodeid_t ref_organizes = {0, MU_NODEID_NUMERIC, {35}};
+    mu_nodeid_t ref_hascomponent = {0, MU_NODEID_NUMERIC, {47}};
+    mu_nodeid_t ref_hasorderedcomponent = {0, MU_NODEID_NUMERIC, {49}};
+    mu_reference_description_t ref_pool[100];
+
+    /* Organizes(35): 85->15624 */
+    mu_browse_result_t res_85 = test_browse_forward_with_pool(id_85, ref_organizes, true, ref_pool, 100);
+    assert_has_reference(&res_85, 35, true, 15624);
+
+    /* Organizes(35) and HasComponent(47): 15624->15625, 15626, 15627 */
+    mu_browse_result_t res_15624_org =
+        test_browse_forward_with_pool(id_15624, ref_organizes, true, ref_pool, 100);
+    assert_has_reference(&res_15624_org, 35, true, 15625);
+    assert_has_reference(&res_15624_org, 35, true, 15626);
+    assert_has_reference(&res_15624_org, 35, true, 15627);
+
+    mu_browse_result_t res_15624_comp =
+        test_browse_forward_with_pool(id_15624, ref_hascomponent, true, ref_pool, 100);
+    assert_has_reference(&res_15624_comp, 47, true, 15625);
+    assert_has_reference(&res_15624_comp, 47, true, 15626);
+    assert_has_reference(&res_15624_comp, 47, true, 15627);
+
+    /* HasOrderedComponent(49): 15625->12557, 12559, 15421; 15626->12558; 15627->15017 */
+    mu_browse_result_t res_15625 =
+        test_browse_forward_with_pool(id_15625, ref_hasorderedcomponent, true, ref_pool, 100);
+    assert_has_reference(&res_15625, 49, true, 12557);
+    assert_has_reference(&res_15625, 49, true, 12559);
+    assert_has_reference(&res_15625, 49, true, 15421);
+
+    mu_browse_result_t res_15626 =
+        test_browse_forward_with_pool(id_15626, ref_hasorderedcomponent, true, ref_pool, 100);
+    assert_has_reference(&res_15626, 49, true, 12558);
+
+    mu_browse_result_t res_15627 =
+        test_browse_forward_with_pool(id_15627, ref_hasorderedcomponent, true, ref_pool, 100);
+    assert_has_reference(&res_15627, 49, true, 15017);
+}
+
 #else
 
 void test_certificate_manager_skipped(void) {
@@ -388,6 +517,8 @@ int main(void) {
     RUN_TEST(test_start_new_key_pair_invalid);
     RUN_TEST(test_start_new_key_pair_no_adapter);
     RUN_TEST(test_register_null_server);
+    RUN_TEST(test_certificate_manager_browse_types);
+    RUN_TEST(test_certificate_manager_browse_instances);
 #else
     RUN_TEST(test_certificate_manager_skipped);
 #endif

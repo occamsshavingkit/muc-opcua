@@ -1,0 +1,75 @@
+{
+  "contract_type": "speckit.implement.context-index.v1",
+  "run_id": "2026-07-25-convergence",
+  "feature_path": "specs/097-gds-certificate-pull",
+  "documents": [
+    {
+      "path": "specs/097-gds-certificate-pull/spec.md",
+      "headings": [
+        "Functional Requirements",
+        "Edge Cases",
+        "Success Criteria"
+      ]
+    },
+    {
+      "path": "specs/097-gds-certificate-pull/plan.md",
+      "headings": [
+        "Technical Context",
+        "Constitution Check",
+        "Project Structure"
+      ]
+    },
+    {
+      "path": "specs/097-gds-certificate-pull/data-model.md",
+      "headings": [
+        "Address Space Nodes",
+        "Method Signatures",
+        "Adapter Contracts"
+      ]
+    },
+    {
+      "path": "specs/097-gds-certificate-pull/contracts/sequences.md",
+      "headings": [
+        "Certificate Pull Method Sequences",
+        "Failure Paths",
+        "Compile-Out"
+      ]
+    },
+    {
+      "path": "specs/097-gds-certificate-pull/research.md",
+      "headings": [
+        "OPC UA Grounding",
+        "Validation Decisions",
+        "Size Measurement"
+      ]
+    },
+    {
+      "path": "specs/097-gds-certificate-pull/quickstart.md",
+      "headings": [
+        "Build",
+        "Feature Validation",
+        "Compile-Out Validation",
+        "Size Validation"
+      ]
+    },
+    {
+      "path": "specs/097-gds-certificate-pull/tasks.md",
+      "headings": [
+        "Phase 7: Convergence Remediation"
+      ]
+    }
+  ],
+  "implementation_roots": [
+    "CMakeLists.txt",
+    "src/CMakeLists.txt",
+    "include/muc_opcua",
+    "src/address_space",
+    "src/core/server",
+    "src/cu/core_2022_server/certificate_manager",
+    "src/encoding",
+    "tests",
+    "scripts",
+    "docs",
+    "profiles"
+  ]
+}

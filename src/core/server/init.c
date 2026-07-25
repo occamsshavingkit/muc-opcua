@@ -1,6 +1,7 @@
 /* src/core/server/init.c */
 #include "../safe_mem.h"
 #include "common.h"
+#include "cu/core_2022_server/certificate_manager/cert_manager.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -342,13 +343,7 @@ opcua_statuscode_t mu_server_init(void *storage, size_t storage_size, const mu_s
 
 #if MUC_OPCUA_CU_CERTIFICATE_MANAGER_PULL
     {
-        extern opcua_statuscode_t mu_certificate_manager_register(struct mu_server * srv);
         opcua_statuscode_t cm_status = mu_certificate_manager_register(server);
-        if (cm_status != MU_STATUS_GOOD)
-            return cm_status;
-
-        extern opcua_statuscode_t mu_certificate_push_register(struct mu_server * srv);
-        cm_status = mu_certificate_push_register(server);
         if (cm_status != MU_STATUS_GOOD)
             return cm_status;
     }

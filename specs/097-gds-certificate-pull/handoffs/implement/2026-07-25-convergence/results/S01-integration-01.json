@@ -1,0 +1,25 @@
+{
+  "contract_type": "speckit.implement.receipt.v1",
+  "shard_id": "S01-integration-01",
+  "task_type": "implementation",
+  "task_ids": [
+    "T038"
+  ],
+  "completed_task_ids": [
+    "T038"
+  ],
+  "changed_paths": [
+    "CMakeLists.txt",
+    "tests/unit/test_build_config.c"
+  ],
+  "validation_evidence": [
+    "Ran validation command 1: 'cmake -S . -B build/t038-off -DMUC_OPCUA_PROFILE=full -DMUC_OPCUA_CU_CERTIFICATE_MANAGER_PULL=OFF -DMUC_OPCUA_BUILD_TESTS=ON' which configured successfully with output showing 'Configuring done' and 'Generating done'. This covers FR-007 and FR-009 by disabling the Pull-model certificate manager.",
+    "Ran validation command 2: 'cmake --build build/t038-off' which successfully built the library and unit test executables with the MUC_OPCUA_CU_CERTIFICATE_MANAGER_PULL option set to OFF.",
+    "Ran validation command 3: 'ctest --test-dir build/t038-off -R test_build_config --output-on-failure' which ran 1 test (test_build_config) and passed successfully. Verified that when undefined, the test executes the explicit TEST_PASS_MESSAGE('MUC_OPCUA_CU_CERTIFICATE_MANAGER_PULL compile-out is verified') rather than a tautological assert true.",
+    "Ran validation command 4: 'test ! -e build/t038-off/muc_opcua_autoconf.h || ! grep -q \"#define MUC_OPCUA_CU_CERTIFICATE_MANAGER_PULL 1\" build/t038-off/muc_opcua_autoconf.h' which exited with status 0, confirming that the preprocessor macro MUC_OPCUA_CU_CERTIFICATE_MANAGER_PULL is omitted (not defined) in the generated autoconf header when disabled, mapping to T038 requirements.",
+    "Ran validation command 5: '! ar t build/t038-off/src/libmuc_opcua.a | grep -E 'cert_manager\\.c\\.o|push_model\\.c\\.o'' which exited with status 0, confirming that the archive members cert_manager.c.o and push_model.c.o are not present in libmuc_opcua.a when MUC_OPCUA_CU_CERTIFICATE_MANAGER_PULL is OFF.",
+    "Ran validation command 6: '! nm build/t038-off/src/libmuc_opcua.a | grep -E 'mu_certificate_manager_register|mu_certificate_push_register'' which exited with status 0, confirming that the symbols mu_certificate_manager_register and mu_certificate_push_register are not present in libmuc_opcua.a when MUC_OPCUA_CU_CERTIFICATE_MANAGER_PULL is OFF.",
+    "Additionally verified regression/compilation with the pull model option ON by configuring and building under 'build/t038-on' ('cmake -S . -B build/t038-on -DMUC_OPCUA_PROFILE=full -DMUC_OPCUA_CU_CERTIFICATE_MANAGER_PULL=ON -DMUC_OPCUA_BUILD_TESTS=ON' and 'cmake --build build/t038-on').",
+    "Ran test_build_config directly under 'build/t038-on' to confirm that when defined, the test asserts MUC_OPCUA_CU_CERTIFICATE_MANAGER_PULL == 1 successfully."
+  ]
+}

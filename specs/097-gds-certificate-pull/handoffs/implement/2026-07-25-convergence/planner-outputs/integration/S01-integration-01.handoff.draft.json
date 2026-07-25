@@ -1,0 +1,55 @@
+{
+  "contract_type": "speckit.implement.handoff.v2",
+  "shard_id": "S01-integration-01",
+  "agent_topology": {
+    "core_agent": {"role": "orchestrator"},
+    "vertical_planner_agent": {
+      "role": "planner",
+      "vertical_planner_only": true,
+      "may_execute_implementation": false,
+      "may_write_manifest": false,
+      "may_update_tasks_md": false
+    },
+    "worker_agent": {
+      "role": "executor",
+      "single_handoff_only": true,
+      "may_dispatch_workers": false,
+      "may_update_tasks_md": false
+    }
+  },
+  "lifecycle_stage": "worker_execution",
+  "vertical_capability": "integration",
+  "capability_boundary": {
+    "owns": ["legacy Pull-CU override translation", "configuration regression test"],
+    "depends_on": ["existing Kconfig symbol", "existing src/CMakeLists.txt source gate"],
+    "must_not_touch": ["Kconfig", "src/CMakeLists.txt", "specs/097-gds-certificate-pull/tasks.md"]
+  },
+  "planner_outputs": {
+    "shard_plan_path": "specs/097-gds-certificate-pull/handoffs/implement/2026-07-25-convergence/planner-outputs/integration/shard-plan.md",
+    "handoff_draft_path": "specs/097-gds-certificate-pull/handoffs/implement/2026-07-25-convergence/planner-outputs/integration/S01-integration-01.handoff.draft.json",
+    "context_digest_draft_path": "specs/097-gds-certificate-pull/handoffs/implement/2026-07-25-convergence/planner-outputs/integration/S01-integration-01.context.draft.md",
+    "vertical_capability": "integration"
+  },
+  "draft_source": {
+    "vertical_planner_id": "planner-integration-t038",
+    "handoff_draft_path": "specs/097-gds-certificate-pull/handoffs/implement/2026-07-25-convergence/planner-outputs/integration/S01-integration-01.handoff.draft.json",
+    "context_digest_draft_path": "specs/097-gds-certificate-pull/handoffs/implement/2026-07-25-convergence/planner-outputs/integration/S01-integration-01.context.draft.md"
+  },
+  "task_ids": ["T038"],
+  "task_type": "implementation",
+  "task_text": ["Add MUC_OPCUA_CU_CERTIFICATE_MANAGER_PULL to the legacy CMake/Kconfig override translation in CMakeLists.txt and extend the existing configuration test so -DMUC_OPCUA_CU_CERTIFICATE_MANAGER_PULL=OFF leaves the generated symbol undefined and excludes both certificate-manager source objects (FR-007, FR-009)."],
+  "context_digest_path": "specs/097-gds-certificate-pull/handoffs/implement/2026-07-25-convergence/S01-integration-01.context.md",
+  "context_index_path": "specs/097-gds-certificate-pull/handoffs/implement/2026-07-25-convergence/context-index.json",
+  "allowed_read_paths": ["CMakeLists.txt", "src/CMakeLists.txt", "Kconfig", "tests/unit/CMakeLists.txt", "tests/unit/test_build_config.c", "tests/unit/test_certificate_manager.c", "specs/097-gds-certificate-pull/handoffs/implement/2026-07-25-convergence/context-index.json", "specs/097-gds-certificate-pull/handoffs/implement/2026-07-25-convergence/S01-integration-01.context.md"],
+  "allowed_write_paths": ["CMakeLists.txt", "tests/unit/test_build_config.c", "specs/097-gds-certificate-pull/handoffs/implement/2026-07-25-convergence/results/S01-integration-01.json"],
+  "context_gaps": [],
+  "validation_commands": ["cmake -S . -B build/t038-off -DMUC_OPCUA_PROFILE=full -DMUC_OPCUA_CU_CERTIFICATE_MANAGER_PULL=OFF -DMUC_OPCUA_BUILD_TESTS=ON", "cmake --build build/t038-off", "ctest --test-dir build/t038-off -R test_build_config --output-on-failure", "test ! -e build/t038-off/muc_opcua_autoconf.h || ! grep -q '#define MUC_OPCUA_CU_CERTIFICATE_MANAGER_PULL 1' build/t038-off/muc_opcua_autoconf.h", "! ar t build/t038-off/src/libmuc_opcua.a | grep -E 'cert_manager\\.c\\.o|push_model\\.c\\.o'", "! nm build/t038-off/src/libmuc_opcua.a | grep -E 'mu_certificate_manager_register|mu_certificate_push_register'"],
+  "task_status_update": {
+    "mode": "receipt",
+    "receipt_path": "specs/097-gds-certificate-pull/handoffs/implement/2026-07-25-convergence/results/S01-integration-01.json",
+    "committer": "core_agent",
+    "contract_type": "speckit.implement.receipt.v1",
+    "required_fields": ["contract_type", "shard_id", "task_type", "task_ids", "completed_task_ids", "changed_paths", "validation_evidence"]
+  },
+  "forbidden_actions": ["edit tasks.md", "edit Kconfig", "edit src/CMakeLists.txt", "commit", "dispatch workers", "implement any task other than T038"]
+}

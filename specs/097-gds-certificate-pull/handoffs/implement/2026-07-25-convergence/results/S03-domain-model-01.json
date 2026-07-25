@@ -1,0 +1,23 @@
+{
+  "contract_type": "speckit.implement.receipt.v1",
+  "shard_id": "S03-domain-model-01",
+  "task_type": "implementation",
+  "task_ids": [
+    "T040"
+  ],
+  "completed_task_ids": [
+    "T040"
+  ],
+  "changed_paths": [
+    "src/address_space/base_nodes.c"
+  ],
+  "validation_evidence": [
+    "Verification and validation successfully executed:",
+    "1. Configured build with MUC_OPCUA_PROFILE=full and MUC_OPCUA_BUILD_TESTS=ON:\nCommand: `cmake -S . -B build/t040 -DMUC_OPCUA_PROFILE=full -DMUC_OPCUA_BUILD_TESTS=ON` -> Clean exit code 0.",
+    "2. Compiled the codebase:\nCommand: `cmake --build build/t040` -> Clean exit code 0, target test_certificate_manager compiled successfully.",
+    "3. Ran the unit tests:\nCommand: `ctest --test-dir build/t040 -R test_certificate_manager --output-on-failure` -> Clean exit code 0, 100% tests passed (1/1 passed: test_certificate_manager).",
+    "4. Verified compile-out compatibility using embedded profile:\nCommand: `cmake -S . -B build/t040_embedded -DMUC_OPCUA_PROFILE=embedded -DMUC_OPCUA_BUILD_TESTS=ON` and `cmake --build build/t040_embedded` -> Clean exit code 0, confirming that pull-only nodes compile out cleanly without compilation or linking errors.",
+    "5. Verified that git diff contains only the requested six forward HasSubtype edges under the correct Pull-CU gates.",
+    "6. Validated Clang syntax and LSP diagnostics using clangd check:\nCommand: `clangd --check=src/address_space/base_nodes.c` -> Clean exit code 0, reporting all checks completed with 0 errors (resolving the preamble boundary crossing push/pop mismatch warning)."
+  ]
+}
