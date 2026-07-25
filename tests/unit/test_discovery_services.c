@@ -455,14 +455,12 @@ void test_findservers_endpoint_url_variations_return_self(void) {
 
     for (size_t i = 0; i < sizeof(endpoint_urls) / sizeof(endpoint_urls[0]); ++i) {
         opcua_byte_t request[192];
-        size_t request_len =
-            build_findservers_endpoint_filter_request(request, sizeof(request), endpoint_urls[i]);
+        size_t request_len = build_findservers_endpoint_filter_request(request, sizeof(request), endpoint_urls[i]);
         opcua_byte_t response[512];
         size_t response_len = sizeof(response);
 
-        TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD,
-                                mu_service_dispatch(&server, MU_ID_FINDSERVERSREQUEST, request, request_len, response,
-                                                    &response_len));
+        TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_service_dispatch(&server, MU_ID_FINDSERVERSREQUEST, request,
+                                                                    request_len, response, &response_len));
 
         /* OPC-10000-4 section 5.5.2.2 uses endpointUrl to determine which
            URL to return. An unrecognized HostName falls back to a suitable
