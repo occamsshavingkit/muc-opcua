@@ -243,9 +243,9 @@ void test_get_certificate_groups_returns_default_group_ids(void) {
     memset(outputs, 0, sizeof(outputs));
     size_t output_count = 1u;
 
-    opcua_statuscode_t status = s_server->registered_methods[idx].callback(
-        s_server, s_server->registered_methods[idx].context, &object_id, &method_id, &input, 1u, outputs,
-        &output_count);
+    opcua_statuscode_t status =
+        s_server->registered_methods[idx].callback(s_server, s_server->registered_methods[idx].context, &object_id,
+                                                   &method_id, &input, 1u, outputs, &output_count);
 
     TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, status);
     TEST_ASSERT_EQUAL_size_t(1u, output_count);
@@ -269,8 +269,7 @@ void test_register_application_deferred_returns_service_unsupported(void) {
     mu_nodeid_t method_id = {MU_GDS_NAMESPACE_INDEX, MU_NODEID_NUMERIC, {MU_ID_GDS_REGISTER_APPLICATION}};
     size_t output_count = 0u;
     opcua_statuscode_t status = s_server->registered_methods[idx].callback(
-        s_server, s_server->registered_methods[idx].context, &object_id, &method_id, NULL, 0u, NULL,
-        &output_count);
+        s_server, s_server->registered_methods[idx].context, &object_id, &method_id, NULL, 0u, NULL, &output_count);
 
     TEST_ASSERT_EQUAL_HEX32(MU_STATUS_BAD_SERVICEUNSUPPORTED, status);
 }
@@ -451,7 +450,7 @@ static mu_browse_result_t test_browse_forward_with_pool(mu_nodeid_t source_id, m
 }
 
 static void assert_has_reference(const mu_browse_result_t *result, uint32_t expected_ref_type,
-                                  opcua_boolean_t expected_is_forward, uint32_t expected_target_numeric) {
+                                 opcua_boolean_t expected_is_forward, uint32_t expected_target_numeric) {
     opcua_boolean_t found = false;
     for (size_t i = 0; i < result->num_references; ++i) {
         const mu_reference_description_t *ref = &result->references[i];
@@ -577,8 +576,8 @@ void test_certificate_manager_gds_argument_metadata(void) {
                              "CertificateGroupIds", 17u, 1);
 
     /* OPC-10000-12 §6.5.6: RegisterApplication returns ApplicationId:NodeId. */
-    assert_argument_metadata(MU_GDS_NAMESPACE_INDEX, MU_ID_GDS_REGISTER_APPLICATION_OUTPUT_ARGUMENTS,
-                             "ApplicationId", 17u, -1);
+    assert_argument_metadata(MU_GDS_NAMESPACE_INDEX, MU_ID_GDS_REGISTER_APPLICATION_OUTPUT_ARGUMENTS, "ApplicationId",
+                             17u, -1);
 }
 
 #else
