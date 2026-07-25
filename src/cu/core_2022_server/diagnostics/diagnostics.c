@@ -75,8 +75,8 @@ void mu_diagnostics_session_identity(const mu_session_t *session, opcua_byte_t *
     if (out_kind != NULL)
         *out_kind = session->user_identity_kind;
     if (out_identity != NULL)
-        *out_identity = session->user_identity_kind == 4u && session->user_identity_len > 0 ? session->user_identity
-                                                                                             : NULL;
+        *out_identity =
+            session->user_identity_kind == 4u && session->user_identity_len > 0 ? session->user_identity : NULL;
     if (out_identity_len != NULL)
         *out_identity_len = session->user_identity_kind == 4u ? session->user_identity_len : 0u;
 }
@@ -91,8 +91,7 @@ opcua_byte_t mu_diagnostics_session_role_count(const mu_session_t *session) {
 #endif
 }
 
-bool mu_diagnostics_session_role_id(const mu_session_t *session, opcua_byte_t index,
-                                    opcua_uint32_t *out_role_id) {
+bool mu_diagnostics_session_role_id(const mu_session_t *session, opcua_byte_t index, opcua_uint32_t *out_role_id) {
     if (session == NULL || out_role_id == NULL || index >= session->session_role_count)
         return false;
     *out_role_id = session->session_roles[index];

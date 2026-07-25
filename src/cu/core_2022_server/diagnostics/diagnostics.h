@@ -10,8 +10,7 @@
 void mu_diagnostics_session_identity(const mu_session_t *session, opcua_byte_t *out_kind,
                                      const opcua_byte_t **out_identity, opcua_byte_t *out_identity_len);
 opcua_byte_t mu_diagnostics_session_role_count(const mu_session_t *session);
-bool mu_diagnostics_session_role_id(const mu_session_t *session, opcua_byte_t index,
-                                    opcua_uint32_t *out_role_id);
+bool mu_diagnostics_session_role_id(const mu_session_t *session, opcua_byte_t index, opcua_uint32_t *out_role_id);
 #endif
 
 #endif

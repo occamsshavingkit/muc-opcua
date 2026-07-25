@@ -1028,8 +1028,7 @@ void test_activate_session_with_valid_jwt_succeeds_over_secure_channel(void) {
        as the session user identity. */
     TEST_ASSERT_EQUAL(4u, server->sessions[0].user_identity_kind);
     TEST_ASSERT_EQUAL(strlen(TEST_SUBJECT), server->sessions[0].user_identity_len);
-    TEST_ASSERT_EQUAL_MEMORY(TEST_SUBJECT, server->sessions[0].user_identity,
-                             server->sessions[0].user_identity_len);
+    TEST_ASSERT_EQUAL_MEMORY(TEST_SUBJECT, server->sessions[0].user_identity, server->sessions[0].user_identity_len);
 
     TEST_ASSERT_EQUAL(2, server->sessions[0].session_role_count);
     TEST_ASSERT_EQUAL_UINT32(15620u, server->sessions[0].session_roles[0]);

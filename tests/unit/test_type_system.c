@@ -479,8 +479,7 @@ static void test_authorization_service_configuration_type_is_cu_gated(void) {
 
     assert_node(17852u, MU_NODECLASS_OBJECTTYPE, "AuthorizationServiceConfigurationType");
     TEST_ASSERT_TRUE(has_forward_ref(58u, 45u, 17852u));
-    assert_type_decls(17852u, 46u, 78u, 68u, declarations,
-                      sizeof(declarations) / sizeof(declarations[0]));
+    assert_type_decls(17852u, 46u, 78u, 68u, declarations, sizeof(declarations) / sizeof(declarations[0]));
 #else
     TEST_ASSERT_NULL(base_node(17852u));
     TEST_ASSERT_NULL(base_node(17853u));
