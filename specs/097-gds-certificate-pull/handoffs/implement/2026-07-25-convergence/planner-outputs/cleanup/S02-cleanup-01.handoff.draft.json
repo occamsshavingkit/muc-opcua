@@ -1,0 +1,38 @@
+{
+  "contract_type": "speckit.implement.handoff.v2",
+  "shard_id": "S02-cleanup-01",
+  "agent_topology": {
+    "core_agent": {"role": "orchestrator"},
+    "vertical_planner_agent": {"role": "planner", "vertical_planner_only": true, "may_execute_implementation": false, "may_write_manifest": false, "may_update_tasks_md": false},
+    "worker_agent": {"role": "executor", "single_handoff_only": true, "may_dispatch_workers": false, "may_update_tasks_md": false}
+  },
+  "lifecycle_stage": "worker_execution",
+  "vertical_capability": "cleanup",
+  "capability_boundary": {
+    "owns": ["internal mu_certificate_manager_register declaration"],
+    "depends_on": ["T038", "existing certificate-manager implementation"],
+    "must_not_touch": ["include/muc_opcua/services/certificate_manager.h", "src/cu/core_2022_server/certificate_manager/push_model.c", "Kconfig", "src/CMakeLists.txt", "specs/097-gds-certificate-pull/tasks.md"]
+  },
+  "planner_outputs": {
+    "shard_plan_path": "specs/097-gds-certificate-pull/handoffs/implement/2026-07-25-convergence/planner-outputs/cleanup/shard-plan.md",
+    "handoff_draft_path": "specs/097-gds-certificate-pull/handoffs/implement/2026-07-25-convergence/planner-outputs/cleanup/S02-cleanup-01.handoff.draft.json",
+    "context_digest_draft_path": "specs/097-gds-certificate-pull/handoffs/implement/2026-07-25-convergence/planner-outputs/cleanup/S02-cleanup-01.context.draft.md",
+    "vertical_capability": "cleanup"
+  },
+  "draft_source": {
+    "vertical_planner_id": "planner-cleanup-t039",
+    "handoff_draft_path": "specs/097-gds-certificate-pull/handoffs/implement/2026-07-25-convergence/planner-outputs/cleanup/S02-cleanup-01.handoff.draft.json",
+    "context_digest_draft_path": "specs/097-gds-certificate-pull/handoffs/implement/2026-07-25-convergence/planner-outputs/cleanup/S02-cleanup-01.context.draft.md"
+  },
+  "task_ids": ["T039"],
+  "task_type": "implementation",
+  "task_text": ["Create src/cu/core_2022_server/certificate_manager/cert_manager.h with the registration declaration, include it from src/core/server/init.c and src/cu/core_2022_server/certificate_manager/cert_manager.c, and remove the ad-hoc external declaration (checked task T014)."],
+  "context_digest_path": "specs/097-gds-certificate-pull/handoffs/implement/2026-07-25-convergence/S02-cleanup-01.context.md",
+  "context_index_path": "specs/097-gds-certificate-pull/handoffs/implement/2026-07-25-convergence/context-index.json",
+  "allowed_read_paths": ["src/cu/core_2022_server/certificate_manager/cert_manager.c", "src/core/server/init.c", "include/muc_opcua/services/certificate_manager.h", "tests/unit/test_certificate_manager.c", "specs/097-gds-certificate-pull/handoffs/implement/2026-07-25-convergence/context-index.json", "specs/097-gds-certificate-pull/handoffs/implement/2026-07-25-convergence/S02-cleanup-01.context.md"],
+  "allowed_write_paths": ["src/cu/core_2022_server/certificate_manager/cert_manager.h", "src/core/server/init.c", "src/cu/core_2022_server/certificate_manager/cert_manager.c", "specs/097-gds-certificate-pull/handoffs/implement/2026-07-25-convergence/results/S02-cleanup-01.json"],
+  "context_gaps": [],
+  "validation_commands": ["test -f src/cu/core_2022_server/certificate_manager/cert_manager.h", "grep -q 'mu_certificate_manager_register' src/cu/core_2022_server/certificate_manager/cert_manager.h", "grep -q '#include.*cert_manager.h' src/core/server/init.c", "! grep -q 'extern.*mu_certificate_manager_register' src/core/server/init.c", "grep -q '#include.*cert_manager.h' src/cu/core_2022_server/certificate_manager/cert_manager.c", "cmake -S . -B build/t039 -DMUC_OPCUA_PROFILE=full -DMUC_OPCUA_BUILD_TESTS=ON", "cmake --build build/t039", "ctest --test-dir build/t039 -R test_certificate_manager --output-on-failure"],
+  "task_status_update": {"mode": "receipt", "receipt_path": "specs/097-gds-certificate-pull/handoffs/implement/2026-07-25-convergence/results/S02-cleanup-01.json", "committer": "core_agent", "contract_type": "speckit.implement.receipt.v1", "required_fields": ["contract_type", "shard_id", "task_type", "task_ids", "completed_task_ids", "changed_paths", "validation_evidence"]},
+  "forbidden_actions": ["edit tasks.md", "edit public API", "edit Push Model", "edit build gates", "commit", "dispatch workers", "implement any task other than T039"]
+}

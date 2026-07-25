@@ -230,7 +230,8 @@ const mu_node_t *mu_address_space_find_node(const mu_address_space_t *address_sp
 
     if (index == NULL) {
         if (address_space == mu_base_address_space()) {
-            return mu_address_space_find_node_binary_direct(address_space, node_id);
+            const mu_node_t *node = mu_address_space_find_node_binary_direct(address_space, node_id);
+            return node != NULL ? node : mu_address_space_find_node_linear(address_space, node_id);
         }
         return mu_address_space_find_node_linear(address_space, node_id);
     }

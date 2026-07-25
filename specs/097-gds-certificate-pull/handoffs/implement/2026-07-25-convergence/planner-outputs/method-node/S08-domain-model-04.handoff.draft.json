@@ -1,0 +1,9 @@
+{
+  "contract_type": "speckit.implement.handoff.v2",
+  "shard_id": "S08-domain-model-04",
+  "vertical_capability": "domain-model",
+  "task_ids": ["T045"],
+  "task_type": "implementation",
+  "allowed_read_paths": ["src/address_space/base_nodes.c", "specs/097-gds-certificate-pull/data-model.md", "specs/097-gds-certificate-pull/spec.md"],
+  "allowed_write_paths": ["src/address_space/base_nodes.c", "specs/097-gds-certificate-pull/handoffs/implement/2026-07-25-convergence/results/S08-domain-model-04.json"]
+}

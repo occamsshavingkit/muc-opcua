@@ -29,6 +29,14 @@ void test_build_config_wolfssl(void) {
 #endif
 }
 
+void test_build_config_certificate_manager_pull(void) {
+#ifdef MUC_OPCUA_CU_CERTIFICATE_MANAGER_PULL
+    TEST_ASSERT_EQUAL(1, MUC_OPCUA_CU_CERTIFICATE_MANAGER_PULL);
+#else
+    TEST_PASS_MESSAGE("MUC_OPCUA_CU_CERTIFICATE_MANAGER_PULL compile-out is verified");
+#endif
+}
+
 void test_build_config_connection_rx_buffer_size_default(void) {
     /* OPC-10000-6 §7.1.2.3 sets an 8192-byte receive-buffer negotiation floor,
        so the per-connection backing store cannot be smaller. */
@@ -40,6 +48,7 @@ int main(void) {
     RUN_TEST(test_build_config_user_auth);
     RUN_TEST(test_build_config_mbedtls);
     RUN_TEST(test_build_config_wolfssl);
+    RUN_TEST(test_build_config_certificate_manager_pull);
     RUN_TEST(test_build_config_connection_rx_buffer_size_default);
     return UNITY_END();
 }

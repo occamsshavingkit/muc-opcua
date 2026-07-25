@@ -14,6 +14,7 @@
  * Type-system InstanceDeclarations for the ObjectTypes live in
  * src/address_space/base_nodes.c.
  */
+#include "cert_manager.h"
 #include "core/server_internal.h"
 #include "muc_opcua/address_space.h"
 #include "muc_opcua/services/certificate_manager.h"
@@ -75,6 +76,21 @@ static opcua_statuscode_t read_uint32_arg(const mu_variant_t *args, size_t count
     return MU_STATUS_GOOD;
 }
 
+/* Extract a NodeId input argument by index. Returns a default NodeId
+ * when the argument is missing (optional backward-compatible behavior). */
+static opcua_statuscode_t read_nodeid_arg(const mu_variant_t *args, size_t count, size_t index, mu_nodeid_t default_id,
+                                          mu_nodeid_t *out) {
+    if (index >= count) {
+        *out = default_id;
+        return MU_STATUS_GOOD;
+    }
+    if (args[index].is_array || args[index].type != MU_TYPE_NODEID) {
+        return MU_STATUS_BAD_INVALIDARGUMENT;
+    }
+    *out = args[index].value.nodeid;
+    return MU_STATUS_GOOD;
+}
+
 /* StartSigningRequest (OPC-10000-12 §7.9.6).
  * Input:  CSR:ByteString, certificateGroupId:NodeId
  * Output: requestId:UInt32 */
@@ -104,8 +120,13 @@ static opcua_statuscode_t handle_start_signing_request(mu_server_t *server, void
         return MU_STATUS_BAD_INVALIDARGUMENT;
     }
 
-    /* certificateGroupId is always CertificateGroups(15624) for now. */
-    mu_nodeid_t group_id = {0u, MU_NODEID_NUMERIC, {MU_ID_CERTIFICATE_GROUPS_DIR}};
+    /* certificateGroupId (optional arg[1]): read if present, else default. */
+    mu_nodeid_t default_group = {0u, MU_NODEID_NUMERIC, {MU_ID_CERTIFICATE_GROUPS_DIR}};
+    mu_nodeid_t group_id;
+    s = read_nodeid_arg(input_args, input_args_count, 1u, default_group, &group_id);
+    if (s != MU_STATUS_GOOD) {
+        return s;
+    }
     uint32_t request_id = 0;
     s = adapter->start_signing_request(adapter->context, &csr, group_id, &request_id);
     if (s != MU_STATUS_GOOD) {
@@ -184,16 +205,20 @@ static opcua_statuscode_t handle_get_rejected_list(mu_server_t *server, void *co
         return MU_STATUS_BAD_NOTSUPPORTED;
     }
 
-    /* Single output: the rejected list encoded as ByteString. */
-    uint8_t buf[512];
-    size_t buf_len = sizeof(buf);
-    opcua_statuscode_t s = adapter->get_rejected_list(adapter->context, buf, &buf_len);
+    /* Single output: the rejected list encoded as ByteString.
+     * Uses a static buffer to avoid stack-lifetime issues --
+     * the variant's bytestr.data must remain valid until the
+     * Call service finishes encoding the output. muc-opcua is
+     * single-threaded cooperative, so a static is safe. */
+    static opcua_byte_t s_rejected_buf[512];
+    size_t buf_len = sizeof(s_rejected_buf);
+    opcua_statuscode_t s = adapter->get_rejected_list(adapter->context, s_rejected_buf, &buf_len);
     if (s != MU_STATUS_GOOD) {
         return s;
     }
 
     if (output_args != NULL && output_args_count != NULL && *output_args_count == 0u && buf_len > 0) {
-        mu_bytestring_t b = {(int)buf_len, buf};
+        mu_bytestring_t b = {(int)buf_len, s_rejected_buf};
         output_args[0] = bytestring_variant(b);
         *output_args_count = 1u;
     }
@@ -229,7 +254,12 @@ static opcua_statuscode_t handle_start_new_key_pair_request(mu_server_t *server,
         return MU_STATUS_BAD_INVALIDARGUMENT;
     }
 
-    mu_nodeid_t group_id = {0u, MU_NODEID_NUMERIC, {MU_ID_CERTIFICATE_GROUPS_DIR}};
+    mu_nodeid_t default_group = {0u, MU_NODEID_NUMERIC, {MU_ID_CERTIFICATE_GROUPS_DIR}};
+    mu_nodeid_t group_id;
+    s = read_nodeid_arg(input_args, input_args_count, 1u, default_group, &group_id);
+    if (s != MU_STATUS_GOOD) {
+        return s;
+    }
     uint32_t request_id = 0;
     s = adapter->start_new_key_pair(adapter->context, &key_spec, group_id, &request_id);
     if (s != MU_STATUS_GOOD) {

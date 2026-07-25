@@ -1,0 +1,56 @@
+{
+  "contract_type": "speckit.implement.receipt.v1",
+  "shard_id": "S02-cleanup-01",
+  "task_type": "implementation",
+  "task_ids": ["T039"],
+  "completed_task_ids": ["T039"],
+  "changed_paths": [
+    "src/cu/core_2022_server/certificate_manager/cert_manager.h",
+    "src/core/server/init.c",
+    "src/cu/core_2022_server/certificate_manager/cert_manager.c"
+  ],
+  "validation_evidence": {
+    "validation_commands": [
+      {
+        "command": "test -f src/cu/core_2022_server/certificate_manager/cert_manager.h",
+        "exit_code": 0,
+        "output": ""
+      },
+      {
+        "command": "grep -q 'mu_certificate_manager_register' src/cu/core_2022_server/certificate_manager/cert_manager.h",
+        "exit_code": 0,
+        "output": ""
+      },
+      {
+        "command": "grep -q '#include.*cert_manager.h' src/core/server/init.c",
+        "exit_code": 0,
+        "output": ""
+      },
+      {
+        "command": "! grep -q 'extern.*mu_certificate_manager_register' src/core/server/init.c",
+        "exit_code": 0,
+        "output": ""
+      },
+      {
+        "command": "grep -q '#include.*cert_manager.h' src/cu/core_2022_server/certificate_manager/cert_manager.c",
+        "exit_code": 0,
+        "output": ""
+      },
+      {
+        "command": "cmake -S . -B build/t039 -DMUC_OPCUA_PROFILE=full -DMUC_OPCUA_BUILD_TESTS=ON",
+        "exit_code": 0,
+        "output": ""
+      },
+      {
+        "command": "cmake --build build/t039",
+        "exit_code": 0,
+        "output": ""
+      },
+      {
+        "command": "ctest --test-dir build/t039 -R test_certificate_manager --output-on-failure",
+        "exit_code": 0,
+        "output": "1/1 Test #33: test_certificate_manager .........   Passed    0.00 sec\n100% tests passed, 0 tests failed out of 1"
+      }
+    ]
+  }
+}

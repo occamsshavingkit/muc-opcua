@@ -1,0 +1,142 @@
+{
+  "contract_type": "speckit.implement.manifest.v1",
+  "run_id": "2026-07-25-convergence",
+  "feature_path": "specs/097-gds-certificate-pull",
+  "context_index_path": "specs/097-gds-certificate-pull/handoffs/implement/2026-07-25-convergence/context-index.json",
+  "execution_mode": "isolated_subagent",
+  "planner_outputs": [
+    {
+      "vertical_capability": "integration",
+      "planner_id": "planner-integration-t038",
+      "shard_plan_path": "specs/097-gds-certificate-pull/handoffs/implement/2026-07-25-convergence/planner-outputs/integration/shard-plan.md",
+      "handoff_draft_paths": ["specs/097-gds-certificate-pull/handoffs/implement/2026-07-25-convergence/planner-outputs/integration/S01-integration-01.handoff.draft.json"],
+      "context_digest_draft_paths": ["specs/097-gds-certificate-pull/handoffs/implement/2026-07-25-convergence/planner-outputs/integration/S01-integration-01.context.draft.md"]
+    },
+    {
+      "vertical_capability": "cleanup",
+      "planner_id": "planner-cleanup-t039",
+      "shard_plan_path": "specs/097-gds-certificate-pull/handoffs/implement/2026-07-25-convergence/planner-outputs/cleanup/shard-plan.md",
+      "handoff_draft_paths": ["specs/097-gds-certificate-pull/handoffs/implement/2026-07-25-convergence/planner-outputs/cleanup/S02-cleanup-01.handoff.draft.json"],
+      "context_digest_draft_paths": ["specs/097-gds-certificate-pull/handoffs/implement/2026-07-25-convergence/planner-outputs/cleanup/S02-cleanup-01.context.draft.md"]
+    },
+    {
+      "vertical_capability": "domain-model",
+      "planner_id": "planner-domain-model-t040",
+      "shard_plan_path": "specs/097-gds-certificate-pull/handoffs/implement/2026-07-25-convergence/planner-outputs/domain-model/shard-plan.md",
+      "handoff_draft_paths": ["specs/097-gds-certificate-pull/handoffs/implement/2026-07-25-convergence/planner-outputs/domain-model/S03-domain-model-01.handoff.draft.json"],
+      "context_digest_draft_paths": ["specs/097-gds-certificate-pull/handoffs/implement/2026-07-25-convergence/planner-outputs/domain-model/S03-domain-model-01.context.draft.md"]
+    },
+    {
+      "vertical_capability": "domain-model",
+      "planner_id": "planner-domain-model-t041",
+      "shard_plan_path": "specs/097-gds-certificate-pull/handoffs/implement/2026-07-25-convergence/planner-outputs/domain-model/shard-plan.md",
+      "handoff_draft_paths": ["specs/097-gds-certificate-pull/handoffs/implement/2026-07-25-convergence/planner-outputs/domain-model/S04-domain-model-01.handoff.draft.json"],
+      "context_digest_draft_paths": ["specs/097-gds-certificate-pull/handoffs/implement/2026-07-25-convergence/planner-outputs/domain-model/S04-domain-model-01.context.draft.md"]
+    },
+    {
+      "vertical_capability": "test-validation",
+      "planner_id": "planner-tests-t042",
+      "shard_plan_path": "specs/097-gds-certificate-pull/handoffs/implement/2026-07-25-convergence/planner-outputs/tests/shard-plan.md",
+      "handoff_draft_paths": ["specs/097-gds-certificate-pull/handoffs/implement/2026-07-25-convergence/planner-outputs/tests/S05-test-validation-01.handoff.draft.json"],
+      "context_digest_draft_paths": ["specs/097-gds-certificate-pull/handoffs/implement/2026-07-25-convergence/planner-outputs/tests/S05-test-validation-01.context.draft.md"]
+    },
+    {
+      "vertical_capability": "domain-model",
+      "planner_id": "planner-method-node-t043",
+      "shard_plan_path": "specs/097-gds-certificate-pull/handoffs/implement/2026-07-25-convergence/planner-outputs/method-node/shard-plan.md",
+      "handoff_draft_paths": ["specs/097-gds-certificate-pull/handoffs/implement/2026-07-25-convergence/planner-outputs/method-node/S06-domain-model-02.handoff.draft.json"],
+      "context_digest_draft_paths": ["specs/097-gds-certificate-pull/handoffs/implement/2026-07-25-convergence/planner-outputs/method-node/S06-domain-model-02.context.draft.md"]
+    },
+    {
+      "vertical_capability": "domain-model",
+      "planner_id": "planner-method-node-t044",
+      "shard_plan_path": "specs/097-gds-certificate-pull/handoffs/implement/2026-07-25-convergence/planner-outputs/method-node/shard-plan.md",
+      "handoff_draft_paths": ["specs/097-gds-certificate-pull/handoffs/implement/2026-07-25-convergence/planner-outputs/method-node/S07-domain-model-03.handoff.draft.json"],
+      "context_digest_draft_paths": ["specs/097-gds-certificate-pull/handoffs/implement/2026-07-25-convergence/planner-outputs/method-node/S07-domain-model-03.context.draft.md"]
+    },
+    {
+      "vertical_capability": "domain-model",
+      "planner_id": "planner-method-node-t045",
+      "shard_plan_path": "specs/097-gds-certificate-pull/handoffs/implement/2026-07-25-convergence/planner-outputs/method-node/shard-plan.md",
+      "handoff_draft_paths": ["specs/097-gds-certificate-pull/handoffs/implement/2026-07-25-convergence/planner-outputs/method-node/S08-domain-model-04.handoff.draft.json"],
+      "context_digest_draft_paths": ["specs/097-gds-certificate-pull/handoffs/implement/2026-07-25-convergence/planner-outputs/method-node/S08-domain-model-04.context.draft.md"]
+    }
+  ],
+  "shards": [
+    {
+      "shard_id": "S01-integration-01",
+      "handoff_path": "specs/097-gds-certificate-pull/handoffs/implement/2026-07-25-convergence/S01-integration-01.json",
+      "context_digest_path": "specs/097-gds-certificate-pull/handoffs/implement/2026-07-25-convergence/S01-integration-01.context.md",
+      "receipt_path": "specs/097-gds-certificate-pull/handoffs/implement/2026-07-25-convergence/results/S01-integration-01.json",
+      "task_ids": ["T038"],
+      "vertical_capability": "integration"
+    },
+    {
+      "shard_id": "S02-cleanup-01",
+      "handoff_path": "specs/097-gds-certificate-pull/handoffs/implement/2026-07-25-convergence/S02-cleanup-01.json",
+      "context_digest_path": "specs/097-gds-certificate-pull/handoffs/implement/2026-07-25-convergence/S02-cleanup-01.context.md",
+      "receipt_path": "specs/097-gds-certificate-pull/handoffs/implement/2026-07-25-convergence/results/S02-cleanup-01.json",
+      "task_ids": ["T039"],
+      "vertical_capability": "cleanup"
+    },
+    {
+      "shard_id": "S03-domain-model-01",
+      "handoff_path": "specs/097-gds-certificate-pull/handoffs/implement/2026-07-25-convergence/S03-domain-model-01.json",
+      "context_digest_path": "specs/097-gds-certificate-pull/handoffs/implement/2026-07-25-convergence/S03-domain-model-01.context.md",
+      "receipt_path": "specs/097-gds-certificate-pull/handoffs/implement/2026-07-25-convergence/results/S03-domain-model-01.json",
+      "task_ids": ["T040"],
+      "vertical_capability": "domain-model"
+    },
+    {
+      "shard_id": "S04-domain-model-01",
+      "handoff_path": "specs/097-gds-certificate-pull/handoffs/implement/2026-07-25-convergence/S04-domain-model-01.json",
+      "context_digest_path": "specs/097-gds-certificate-pull/handoffs/implement/2026-07-25-convergence/S04-domain-model-01.context.md",
+      "receipt_path": "specs/097-gds-certificate-pull/handoffs/implement/2026-07-25-convergence/results/S04-domain-model-01.json",
+      "task_ids": ["T041"],
+      "vertical_capability": "domain-model"
+    },
+    {
+      "shard_id": "S05-test-validation-01",
+      "handoff_path": "specs/097-gds-certificate-pull/handoffs/implement/2026-07-25-convergence/S05-test-validation-01.json",
+      "context_digest_path": "specs/097-gds-certificate-pull/handoffs/implement/2026-07-25-convergence/S05-test-validation-01.context.md",
+      "receipt_path": "specs/097-gds-certificate-pull/handoffs/implement/2026-07-25-convergence/results/S05-test-validation-01.json",
+      "task_ids": ["T042"],
+      "vertical_capability": "test-validation"
+    },
+    {
+      "shard_id": "S06-domain-model-02",
+      "handoff_path": "specs/097-gds-certificate-pull/handoffs/implement/2026-07-25-convergence/S06-domain-model-02.json",
+      "context_digest_path": "specs/097-gds-certificate-pull/handoffs/implement/2026-07-25-convergence/S06-domain-model-02.context.md",
+      "receipt_path": "specs/097-gds-certificate-pull/handoffs/implement/2026-07-25-convergence/results/S06-domain-model-02.json",
+      "task_ids": ["T043"],
+      "vertical_capability": "domain-model"
+    },
+    {
+      "shard_id": "S07-domain-model-03",
+      "handoff_path": "specs/097-gds-certificate-pull/handoffs/implement/2026-07-25-convergence/S07-domain-model-03.json",
+      "context_digest_path": "specs/097-gds-certificate-pull/handoffs/implement/2026-07-25-convergence/S07-domain-model-03.context.md",
+      "receipt_path": "specs/097-gds-certificate-pull/handoffs/implement/2026-07-25-convergence/results/S07-domain-model-03.json",
+      "task_ids": ["T044"],
+      "vertical_capability": "domain-model"
+    },
+    {
+      "shard_id": "S08-domain-model-04",
+      "handoff_path": "specs/097-gds-certificate-pull/handoffs/implement/2026-07-25-convergence/S08-domain-model-04.json",
+      "context_digest_path": "specs/097-gds-certificate-pull/handoffs/implement/2026-07-25-convergence/S08-domain-model-04.context.md",
+      "receipt_path": "specs/097-gds-certificate-pull/handoffs/implement/2026-07-25-convergence/results/S08-domain-model-04.json",
+      "task_ids": ["T045"],
+      "vertical_capability": "domain-model"
+    }
+  ],
+  "dependencies": [
+    {"shard_id": "S01-integration-01", "depends_on": []},
+    {"shard_id": "S02-cleanup-01", "depends_on": ["S01-integration-01"]},
+    {"shard_id": "S03-domain-model-01", "depends_on": ["S02-cleanup-01"]},
+    {"shard_id": "S04-domain-model-01", "depends_on": ["S03-domain-model-01"]},
+    {"shard_id": "S05-test-validation-01", "depends_on": ["S04-domain-model-01"]},
+    {"shard_id": "S06-domain-model-02", "depends_on": ["S05-test-validation-01"]},
+    {"shard_id": "S07-domain-model-03", "depends_on": ["S06-domain-model-02"]},
+    {"shard_id": "S08-domain-model-04", "depends_on": ["S07-domain-model-03"]}
+  ],
+  "dispatch_order": [["S01-integration-01"], ["S02-cleanup-01"], ["S03-domain-model-01"], ["S04-domain-model-01"], ["S05-test-validation-01"], ["S06-domain-model-02"], ["S07-domain-model-03"], ["S08-domain-model-04"]]
+}

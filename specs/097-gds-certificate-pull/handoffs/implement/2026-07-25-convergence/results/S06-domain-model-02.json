@@ -1,0 +1,21 @@
+{
+  "contract_type": "speckit.implement.receipt.v1",
+  "shard_id": "S06-domain-model-02",
+  "task_type": "implementation",
+  "task_ids": [
+    "T043"
+  ],
+  "completed_task_ids": [
+    "T043"
+  ],
+  "changed_paths": [
+    "src/address_space/base_nodes.c"
+  ],
+  "validation_evidence": [
+    "corrective fix: changed NodeIds of StartSigningRequest InputArguments and OutputArguments from 12483/12484 (which are reserved for other methods) to project-reserved NodeIds 60001/60002",
+    "corrective fix: moved variable node declarations of 60001 and 60002 to preserve numeric sort order (sorted ascendingly after RedundantServerArray (32410)) inside base_nodes.c Form 1",
+    "cmake -S . -B build/t043 -DMUC_OPCUA_PROFILE=full -DMUC_OPCUA_BUILD_TESTS=ON: exit 0",
+    "cmake --build build/t043 --target test_certificate_manager: exit 0",
+    "ctest --test-dir build/t043 -R '^test_certificate_manager$' --output-on-failure: exit 0; 16/16 tests passed"
+  ]
+}
