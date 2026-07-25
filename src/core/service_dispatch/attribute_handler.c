@@ -339,8 +339,7 @@ opcua_statuscode_t handle_write(mu_server_t *server, mu_binary_reader_t *r, mu_b
         audit_old_value.type = MU_TYPE_NULL;
 #endif
 
-        if (write_val->node_id.namespace_index == 0 &&
-            write_val->node_id.identifier_type == MU_NODEID_NUMERIC &&
+        if (write_val->node_id.namespace_index == 0 && write_val->node_id.identifier_type == MU_NODEID_NUMERIC &&
             write_val->node_id.identifier.numeric == 0) {
             result = MU_STATUS_BAD_NODEIDINVALID;
         } else {
@@ -379,7 +378,8 @@ opcua_statuscode_t handle_write(mu_server_t *server, mu_binary_reader_t *r, mu_b
                  * with infrastructure for TypeDef-based subtypes). */
                 mu_variant_t current_val;
                 s = mu_value_source_read(node->value, &node->node_id, &current_val);
-                if (s == MU_STATUS_GOOD && !mu_variant_type_is_assignable(current_val.type, write_val->value.value.type)) {
+                if (s == MU_STATUS_GOOD &&
+                    !mu_variant_type_is_assignable(current_val.type, write_val->value.value.type)) {
                     result = MU_STATUS_BAD_TYPEMISMATCH;
                 }
             }

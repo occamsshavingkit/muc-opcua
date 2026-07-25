@@ -134,8 +134,7 @@ opcua_statuscode_t mu_read_process_with_user_index(const mu_address_space_t *add
         dv->has_server_timestamp = false;
         dv->has_server_picoseconds = false;
 
-        if (read_val->node_id.namespace_index == 0 &&
-            read_val->node_id.identifier_type == MU_NODEID_NUMERIC &&
+        if (read_val->node_id.namespace_index == 0 && read_val->node_id.identifier_type == MU_NODEID_NUMERIC &&
             read_val->node_id.identifier.numeric == 0) {
             dv->has_status = true;
             dv->status = MU_STATUS_BAD_NODEIDINVALID;
