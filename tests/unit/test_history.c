@@ -12,7 +12,6 @@ void tearDown(void) {}
 
 #include "../../src/core/server_internal.h"
 #include "../../src/services/history.h"
-#include "../../src/services/service_header.h"
 #include "muc_opcua/opcua_ids.h"
 
 opcua_statuscode_t handle_history_read(mu_server_t *server, mu_binary_reader_t *r, mu_binary_writer_t *w,
@@ -55,8 +54,51 @@ static void write_history_read_request_with_continuation_point(mu_binary_writer_
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_write_uint16(w, 0));
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_write_string(w, &(mu_string_t){-1, NULL}));
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD,
-                      mu_binary_write_bytestring(w, &(mu_bytestring_t){.length = (opcua_int32_t)continuation_point_len,
-                                                                       .data = continuation_point}));
+                       mu_binary_write_bytestring(w, &(mu_bytestring_t){.length = (opcua_int32_t)continuation_point_len,
+                                                                        .data = continuation_point}));
+}
+
+static void write_test_request_header(mu_binary_writer_t *w) {
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD,
+                      mu_binary_write_nodeid(w, &(mu_nodeid_t){.namespace_index = 0,
+                                                               .identifier_type = MU_NODEID_NUMERIC,
+                                                               .identifier.numeric = 0}));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_write_int64(w, 100));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_write_uint32(w, 1));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_write_uint32(w, 0));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_write_string(w, &(mu_string_t){-1, NULL}));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_write_uint32(w, 0));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD,
+                      mu_binary_write_nodeid(w, &(mu_nodeid_t){.namespace_index = 0,
+                                                               .identifier_type = MU_NODEID_NUMERIC,
+                                                               .identifier.numeric = 0}));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_write_byte(w, 0));
+}
+
+static opcua_statuscode_t read_test_response_header(mu_binary_reader_t *r, opcua_uint32_t expected_response_id) {
+    mu_nodeid_t response_id;
+    opcua_int64_t timestamp;
+    opcua_uint32_t request_handle;
+    opcua_statuscode_t service_result;
+    opcua_byte_t diagnostics_mask;
+    opcua_int32_t string_table_length;
+    mu_nodeid_t additional_header_id;
+    opcua_byte_t additional_header_mask;
+
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_nodeid(r, &response_id));
+    TEST_ASSERT_EQUAL(expected_response_id, response_id.identifier.numeric);
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_int64(r, &timestamp));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_uint32(r, &request_handle));
+    TEST_ASSERT_EQUAL(1, request_handle);
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_statuscode(r, &service_result));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_byte(r, &diagnostics_mask));
+    TEST_ASSERT_EQUAL(0, diagnostics_mask);
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_int32(r, &string_table_length));
+    TEST_ASSERT_EQUAL(-1, string_table_length);
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_nodeid(r, &additional_header_id));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_byte(r, &additional_header_mask));
+    TEST_ASSERT_EQUAL(0, additional_header_mask);
+    return service_result;
 }
 
 void test_history_read_decode(void) {
@@ -1050,6 +1092,121 @@ void test_history_update_dispatch(void) {
 #endif
 }
 
+void test_history_read_without_adapter_returns_operation_unsupported_per_node(void) {
+    struct mu_server server;
+    opcua_byte_t request_buffer[256];
+    opcua_byte_t response_buffer[256];
+    mu_binary_writer_t request_writer;
+    mu_binary_writer_t response_writer;
+    mu_binary_reader_t request_reader;
+    mu_binary_reader_t response_reader;
+    size_t response_length = 0;
+    opcua_int32_t result_count;
+    opcua_statuscode_t result_status;
+
+    (void)memset(&server, 0, sizeof(server));
+    mu_binary_writer_init(&request_writer, request_buffer, sizeof(request_buffer));
+    write_test_request_header(&request_writer);
+
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD,
+                      mu_binary_write_nodeid(&request_writer,
+                                             &(mu_nodeid_t){.namespace_index = 0,
+                                                            .identifier_type = MU_NODEID_NUMERIC,
+                                                            .identifier.numeric =
+                                                                MU_ID_READRAWMODIFIEDDETAILS_ENCODING_DEFAULTBINARY}));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_write_byte(&request_writer, 0x01));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_write_int32(&request_writer, 22));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_write_boolean(&request_writer, false));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_write_int64(&request_writer, 1000));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_write_int64(&request_writer, 2000));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_write_uint32(&request_writer, 10));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_write_boolean(&request_writer, false));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_write_uint32(&request_writer, 2));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_write_boolean(&request_writer, false));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_write_int32(&request_writer, 1));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD,
+                      mu_binary_write_nodeid(&request_writer, &(mu_nodeid_t){.namespace_index = 2,
+                                                                            .identifier_type = MU_NODEID_NUMERIC,
+                                                                            .identifier.numeric = 1001}));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_write_string(&request_writer, &(mu_string_t){-1, NULL}));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_write_uint16(&request_writer, 0));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_write_string(&request_writer, &(mu_string_t){-1, NULL}));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD,
+                      mu_binary_write_bytestring(&request_writer, &(mu_bytestring_t){.length = -1, .data = NULL}));
+
+    mu_binary_reader_init(&request_reader, request_buffer, request_writer.position);
+    mu_binary_writer_init(&response_writer, response_buffer, sizeof(response_buffer));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD,
+                      handle_history_read(&server, &request_reader, &response_writer, &response_length));
+
+    mu_binary_reader_init(&response_reader, response_buffer, response_length);
+    /* OPC-10000-4 §5.11.3: operation failures belong in each HistoryReadResult,
+       while a syntactically valid request retains a Good ServiceResult. */
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD,
+                            read_test_response_header(&response_reader, MU_ID_HISTORYREADRESPONSE));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_int32(&response_reader, &result_count));
+    TEST_ASSERT_EQUAL(1, result_count);
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_statuscode(&response_reader, &result_status));
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_BAD_HISTORYOPERATIONUNSUPPORTED, result_status);
+}
+
+void test_history_update_without_adapter_returns_operation_unsupported_per_item(void) {
+    struct mu_server server;
+    opcua_byte_t request_buffer[256];
+    opcua_byte_t response_buffer[256];
+    mu_binary_writer_t request_writer;
+    mu_binary_writer_t response_writer;
+    mu_binary_reader_t request_reader;
+    mu_binary_reader_t response_reader;
+    size_t response_length = 0;
+    opcua_int32_t result_count;
+    opcua_statuscode_t result_status;
+    opcua_int32_t operation_result_count;
+
+    (void)memset(&server, 0, sizeof(server));
+    mu_binary_writer_init(&request_writer, request_buffer, sizeof(request_buffer));
+    write_test_request_header(&request_writer);
+
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_write_int32(&request_writer, 1));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD,
+                      mu_binary_write_nodeid(&request_writer,
+                                             &(mu_nodeid_t){.namespace_index = 0,
+                                                            .identifier_type = MU_NODEID_NUMERIC,
+                                                            .identifier.numeric =
+                                                                MU_ID_UPDATEDATADETAILS_ENCODING_DEFAULTBINARY}));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_write_byte(&request_writer, 0x01));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_write_int32(&request_writer, 38));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD,
+                      mu_binary_write_nodeid(&request_writer, &(mu_nodeid_t){.namespace_index = 2,
+                                                                            .identifier_type = MU_NODEID_NUMERIC,
+                                                                            .identifier.numeric = 1001}));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_write_uint32(&request_writer, 2));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_write_int32(&request_writer, 1));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_write_byte(&request_writer, 0x0F));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_write_byte(&request_writer, MU_TYPE_INT32));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_write_int32(&request_writer, 99));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_write_statuscode(&request_writer, MU_STATUS_GOOD));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_write_int64(&request_writer, 1000));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_write_int64(&request_writer, 2000));
+
+    mu_binary_reader_init(&request_reader, request_buffer, request_writer.position);
+    mu_binary_writer_init(&response_writer, response_buffer, sizeof(response_buffer));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD,
+                      handle_history_update(&server, &request_reader, &response_writer, &response_length));
+
+    mu_binary_reader_init(&response_reader, response_buffer, response_length);
+    /* OPC-10000-4 §5.11.4: unsupported update operations are reported in the
+       corresponding HistoryUpdateResult and do not fabricate operation results. */
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD,
+                            read_test_response_header(&response_reader, MU_ID_HISTORYUPDATERESPONSE));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_int32(&response_reader, &result_count));
+    TEST_ASSERT_EQUAL(1, result_count);
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_statuscode(&response_reader, &result_status));
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_BAD_HISTORYOPERATIONUNSUPPORTED, result_status);
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_int32(&response_reader, &operation_result_count));
+    TEST_ASSERT_EQUAL(-1, operation_result_count);
+}
+
 #endif // MUC_OPCUA_CU_HISTORICAL_ACCESS_SERVER_FACET
 
 /* Feature 028 (T037): only ReadRawModifiedDetails is supported; a HistoryRead whose
@@ -1087,6 +1244,8 @@ int main(void) {
     RUN_TEST(test_history_update_decode);
     RUN_TEST(test_history_update_decode_rejects_negative_length);
     RUN_TEST(test_history_update_dispatch);
+    RUN_TEST(test_history_read_without_adapter_returns_operation_unsupported_per_node);
+    RUN_TEST(test_history_update_without_adapter_returns_operation_unsupported_per_item);
 #endif
     return UNITY_END();
 }
