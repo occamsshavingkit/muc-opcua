@@ -6376,6 +6376,15 @@ static const mu_node_t s_base_nodes[] = {
      sizeof(s_rsasha256_cert_type_refs) / sizeof(s_rsasha256_cert_type_refs[0]),
      NULL,
      .type_definition = {0}},
+    /* spec 112 (CU 2231): ServerConfigurationType(12581). OPC-10000-12 §7.10.3. */
+    {{0, MU_NODEID_NUMERIC, {12581}},
+     MU_NODECLASS_OBJECTTYPE,
+     {23, s_str_ServerConfigurationType},
+     {23, s_str_ServerConfigurationType},
+     s_server_config_type_refs,
+     sizeof(s_server_config_type_refs) / sizeof(s_server_config_type_refs[0]),
+     NULL,
+     .type_definition = {0}},
     {{0, MU_NODEID_NUMERIC, {15017}},
      MU_NODECLASS_OBJECTTYPE,
      {19, s_str_UserCertificateType},
@@ -6432,15 +6441,6 @@ static const mu_node_t s_base_nodes[] = {
      sizeof(s_default_user_group_refs) / sizeof(s_default_user_group_refs[0]),
      NULL,
      .type_definition = {0, MU_NODEID_NUMERIC, {12555}}},
-    /* spec 112 (CU 2231): ServerConfigurationType(12581). OPC-10000-12 §7.10.3. */
-    {{0, MU_NODEID_NUMERIC, {12581}},
-     MU_NODECLASS_OBJECTTYPE,
-     {23, s_str_ServerConfigurationType},
-     {23, s_str_ServerConfigurationType},
-     s_server_config_type_refs,
-     sizeof(s_server_config_type_refs) / sizeof(s_server_config_type_refs[0]),
-     NULL,
-     .type_definition = {0}},
 #endif
 #if MUC_OPCUA_CU_BASE_INFO_SERVERTYPE && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
     /* spec 085 (CU 5801) Task 4: ServerType.SetSubscriptionDurable(12746), the
