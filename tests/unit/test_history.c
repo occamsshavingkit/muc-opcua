@@ -54,24 +54,22 @@ static void write_history_read_request_with_continuation_point(mu_binary_writer_
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_write_uint16(w, 0));
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_write_string(w, &(mu_string_t){-1, NULL}));
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD,
-                       mu_binary_write_bytestring(w, &(mu_bytestring_t){.length = (opcua_int32_t)continuation_point_len,
-                                                                        .data = continuation_point}));
+                      mu_binary_write_bytestring(w, &(mu_bytestring_t){.length = (opcua_int32_t)continuation_point_len,
+                                                                       .data = continuation_point}));
 }
 
 static void write_test_request_header(mu_binary_writer_t *w) {
-    TEST_ASSERT_EQUAL(MU_STATUS_GOOD,
-                      mu_binary_write_nodeid(w, &(mu_nodeid_t){.namespace_index = 0,
-                                                               .identifier_type = MU_NODEID_NUMERIC,
-                                                               .identifier.numeric = 0}));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_write_nodeid(w, &(mu_nodeid_t){.namespace_index = 0,
+                                                                               .identifier_type = MU_NODEID_NUMERIC,
+                                                                               .identifier.numeric = 0}));
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_write_int64(w, 100));
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_write_uint32(w, 1));
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_write_uint32(w, 0));
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_write_string(w, &(mu_string_t){-1, NULL}));
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_write_uint32(w, 0));
-    TEST_ASSERT_EQUAL(MU_STATUS_GOOD,
-                      mu_binary_write_nodeid(w, &(mu_nodeid_t){.namespace_index = 0,
-                                                               .identifier_type = MU_NODEID_NUMERIC,
-                                                               .identifier.numeric = 0}));
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_write_nodeid(w, &(mu_nodeid_t){.namespace_index = 0,
+                                                                               .identifier_type = MU_NODEID_NUMERIC,
+                                                                               .identifier.numeric = 0}));
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_write_byte(w, 0));
 }
 
@@ -1109,11 +1107,11 @@ void test_history_read_without_adapter_returns_operation_unsupported_per_node(vo
     write_test_request_header(&request_writer);
 
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD,
-                      mu_binary_write_nodeid(&request_writer,
-                                             &(mu_nodeid_t){.namespace_index = 0,
-                                                            .identifier_type = MU_NODEID_NUMERIC,
-                                                            .identifier.numeric =
-                                                                MU_ID_READRAWMODIFIEDDETAILS_ENCODING_DEFAULTBINARY}));
+                      mu_binary_write_nodeid(
+                          &request_writer,
+                          &(mu_nodeid_t){.namespace_index = 0,
+                                         .identifier_type = MU_NODEID_NUMERIC,
+                                         .identifier.numeric = MU_ID_READRAWMODIFIEDDETAILS_ENCODING_DEFAULTBINARY}));
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_write_byte(&request_writer, 0x01));
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_write_int32(&request_writer, 22));
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_write_boolean(&request_writer, false));
@@ -1126,8 +1124,8 @@ void test_history_read_without_adapter_returns_operation_unsupported_per_node(vo
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_write_int32(&request_writer, 1));
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD,
                       mu_binary_write_nodeid(&request_writer, &(mu_nodeid_t){.namespace_index = 2,
-                                                                            .identifier_type = MU_NODEID_NUMERIC,
-                                                                            .identifier.numeric = 1001}));
+                                                                             .identifier_type = MU_NODEID_NUMERIC,
+                                                                             .identifier.numeric = 1001}));
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_write_string(&request_writer, &(mu_string_t){-1, NULL}));
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_write_uint16(&request_writer, 0));
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_write_string(&request_writer, &(mu_string_t){-1, NULL}));
@@ -1142,8 +1140,7 @@ void test_history_read_without_adapter_returns_operation_unsupported_per_node(vo
     mu_binary_reader_init(&response_reader, response_buffer, response_length);
     /* OPC-10000-4 §5.11.3: operation failures belong in each HistoryReadResult,
        while a syntactically valid request retains a Good ServiceResult. */
-    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD,
-                            read_test_response_header(&response_reader, MU_ID_HISTORYREADRESPONSE));
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, read_test_response_header(&response_reader, MU_ID_HISTORYREADRESPONSE));
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_int32(&response_reader, &result_count));
     TEST_ASSERT_EQUAL(1, result_count);
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_statuscode(&response_reader, &result_status));
@@ -1168,18 +1165,18 @@ void test_history_update_without_adapter_returns_operation_unsupported_per_item(
     write_test_request_header(&request_writer);
 
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_write_int32(&request_writer, 1));
-    TEST_ASSERT_EQUAL(MU_STATUS_GOOD,
-                      mu_binary_write_nodeid(&request_writer,
-                                             &(mu_nodeid_t){.namespace_index = 0,
-                                                            .identifier_type = MU_NODEID_NUMERIC,
-                                                            .identifier.numeric =
-                                                                MU_ID_UPDATEDATADETAILS_ENCODING_DEFAULTBINARY}));
+    TEST_ASSERT_EQUAL(
+        MU_STATUS_GOOD,
+        mu_binary_write_nodeid(&request_writer,
+                               &(mu_nodeid_t){.namespace_index = 0,
+                                              .identifier_type = MU_NODEID_NUMERIC,
+                                              .identifier.numeric = MU_ID_UPDATEDATADETAILS_ENCODING_DEFAULTBINARY}));
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_write_byte(&request_writer, 0x01));
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_write_int32(&request_writer, 38));
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD,
                       mu_binary_write_nodeid(&request_writer, &(mu_nodeid_t){.namespace_index = 2,
-                                                                            .identifier_type = MU_NODEID_NUMERIC,
-                                                                            .identifier.numeric = 1001}));
+                                                                             .identifier_type = MU_NODEID_NUMERIC,
+                                                                             .identifier.numeric = 1001}));
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_write_uint32(&request_writer, 2));
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_write_int32(&request_writer, 1));
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_write_byte(&request_writer, 0x0F));
@@ -1197,8 +1194,7 @@ void test_history_update_without_adapter_returns_operation_unsupported_per_item(
     mu_binary_reader_init(&response_reader, response_buffer, response_length);
     /* OPC-10000-4 §5.11.4: unsupported update operations are reported in the
        corresponding HistoryUpdateResult and do not fabricate operation results. */
-    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD,
-                            read_test_response_header(&response_reader, MU_ID_HISTORYUPDATERESPONSE));
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, read_test_response_header(&response_reader, MU_ID_HISTORYUPDATERESPONSE));
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_int32(&response_reader, &result_count));
     TEST_ASSERT_EQUAL(1, result_count);
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_statuscode(&response_reader, &result_status));
