@@ -7530,7 +7530,8 @@
     },
     {
       "backing_tests": [
-        "test_claim_map"
+        "test_claim_map",
+        "test_read_service"
       ],
       "cu_optional": false,
       "id": "opc_cu_3194",
@@ -7562,7 +7563,8 @@
     },
     {
       "backing_tests": [
-        "test_claim_map"
+        "test_claim_map",
+        "test_event_notifications"
       ],
       "cu_optional": false,
       "id": "opc_cu_2422",
@@ -7593,10 +7595,12 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_event_notifications"
+      ],
       "cu_optional": false,
       "id": "opc_cu_3968",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Reconciled (spec 074): the server emits + delivers AuditEvents for CreateSession/ActivateSession/Write (audited service subset); test_event_notifications. Satisfied by opc_cu_auditing.",
@@ -7624,7 +7628,8 @@
     },
     {
       "backing_tests": [
-        "test_claim_map"
+        "test_claim_map",
+        "test_event_notifications"
       ],
       "cu_optional": false,
       "id": "opc_cu_3228",
@@ -7655,15 +7660,13 @@
       }
     },
     {
-      "backing_tests": [
-        "test_claim_map"
-      ],
+      "backing_tests": [],
       "cu_optional": false,
       "id": "opc_cu_3224",
-      "implementation_state": "claimed",
+      "implementation_state": "documented",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
-      "notes": "AuditNodeManagementEventType (i=2090) emitted for AddNodes, AddReferences, DeleteNodes, DeleteReferences. Satisfied by opc_cu_auditing.",
+      "notes": "Unclaimed (spec 074): no emit-to-observe test proves AuditNodeManagementEvent delivery for AddNodes, AddReferences, DeleteNodes, or DeleteReferences.",
       "opc_display_name": "Auditing NodeManagement",
       "opc_reference": {
         "cu_id": "3224",
@@ -7680,22 +7683,19 @@
         "nano": false,
         "standard": false
       },
-      "satisfied_by": "opc_cu_auditing",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       }
     },
     {
-      "backing_tests": [
-        "test_claim_map"
-      ],
+      "backing_tests": [],
       "cu_optional": false,
       "id": "opc_cu_3230",
-      "implementation_state": "claimed",
+      "implementation_state": "documented",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
-      "notes": "AuditUpdateMethodEventType (i=2127) emitted for Call service method invocations. Satisfied by opc_cu_auditing.",
+      "notes": "Unclaimed (spec 074): no emit-to-observe test proves AuditUpdateMethodEvent delivery for Call service method invocations.",
       "opc_display_name": "Auditing Method",
       "opc_reference": {
         "cu_id": "3230",
@@ -7712,7 +7712,6 @@
         "nano": false,
         "standard": false
       },
-      "satisfied_by": "opc_cu_auditing",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"

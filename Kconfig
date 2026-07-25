@@ -273,7 +273,7 @@ config MUC_OPCUA_CU_AUDITING_SECURE_COMMUNICATION
 	help
 	  Implementation state: claimed.
 	  OPC item: CU 2422:Auditing Secure Communication.
-	  Backing tests: test_claim_map.
+	  Backing tests: test_claim_map, test_event_notifications.
 	  Notes: AuditOpenSecureChannelEvent (i=2060) emitted on OpenSecureChannel (osc_handler.c) and observable via the Server EventNotifier. Satisfied by opc_cu_auditing.
 
 config MUC_OPCUA_CU_ADDRESS_SPACE_ADDIN_REFERENCE
@@ -470,7 +470,7 @@ config MUC_OPCUA_CU_BASE_INFO_EVENTS_CAPABILITIES
 	help
 	  Implementation state: claimed.
 	  OPC item: CU 3194:Base Info Events Capabilities.
-	  Backing tests: test_claim_map.
+	  Backing tests: test_claim_map, test_read_service.
 	  Notes: Reconciled (spec 074): the Server Object (i=2253) exposes a readable EventNotifier attribute (SubscribeToEvents) so a client can discover it as an event source; read_attribute.c + base_nodes.c, tested by test_read_service::test_read_service_eventnotifier.
 
 config MUC_OPCUA_CU_BASE_INFO_ESTIMATED_RETURN_TIME
@@ -483,32 +483,14 @@ config MUC_OPCUA_CU_BASE_INFO_ESTIMATED_RETURN_TIME
 	  Backing tests: test_profile_surface.
 	  Notes: Server supports the EstimatedReturnTime Property. It indicates the time at which the Server is expected to have a ServerStatus.State of RUNNING_0. Clients can use this information to govern the reconnect logic.
 
-config MUC_OPCUA_CU_AUDITING_NODEMANAGEMENT
-	bool "CU: Auditing NodeManagement"
-	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
-	help
-	  Implementation state: claimed.
-	  OPC source: OPC-10000-5 -- CU 3224:Auditing NodeManagement.
-	  Backing tests: test_claim_map.
-	  Notes: AuditNodeManagementEventType (i=2090) emitted for AddNodes, AddReferences, DeleteNodes, DeleteReferences. Satisfied by opc_cu_auditing.
-
 config MUC_OPCUA_CU_AUDITING_WRITE
 	bool "CU: Auditing Write"
 	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
 	help
 	  Implementation state: claimed.
 	  OPC item: CU 3228:Auditing Write.
-	  Backing tests: test_claim_map.
+	  Backing tests: test_claim_map, test_event_notifications.
 	  Notes: AuditWriteUpdateEvent (i=2100) emitted per attribute write (attribute_handler.c) and observable via the Server EventNotifier. Satisfied by opc_cu_auditing.
-
-config MUC_OPCUA_CU_AUDITING_METHOD
-	bool "CU: Auditing Method"
-	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
-	help
-	  Implementation state: claimed.
-	  OPC source: OPC-10000-5 -- CU 3230:Auditing Method.
-	  Backing tests: test_claim_map.
-	  Notes: AuditUpdateMethodEventType (i=2127) emitted for Call service method invocations. Satisfied by opc_cu_auditing.
 
 config MUC_OPCUA_CU_VIEW_BASIC_2
 	bool "CU: View Basic 2"
@@ -572,6 +554,15 @@ config MUC_OPCUA_CU_A_C_SUPPRESSION_AUDITING
 	  Implementation state: deferred.
 	  OPC source: OPC-10000-9 §5.10.9 -- CU 3768:A & C Suppression Auditing.
 	  Notes: Requires A & C Suppression State feature (not yet implemented). Deferred until suppression support is added.
+
+config MUC_OPCUA_CU_AUDITING_SERVICES
+	bool "CU: Auditing Services"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3968:Auditing Services.
+	  Backing tests: test_event_notifications.
+	  Notes: Reconciled (spec 074): the server emits + delivers AuditEvents for CreateSession/ActivateSession/Write (audited service subset); test_event_notifications. Satisfied by opc_cu_auditing.
 
 config MUC_OPCUA_CU_BASE_SERVICES_DIAGNOSTICS
 	bool "CU: Base Services Diagnostics"

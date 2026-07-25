@@ -51,6 +51,9 @@ opcua_statuscode_t write_data_change_notification(mu_binary_writer_t *w, const s
                                                   const mu_subscription_t *sub, opcua_int32_t report_count);
 opcua_statuscode_t write_status_change_notification(mu_binary_writer_t *w, opcua_statuscode_t status);
 #ifdef MUC_OPCUA_CU_EVENTS
+#include "../event_filter.h"
+mu_variant_t mu_event_notification_resolve_field(const struct mu_server *server, const mu_event_notification_t *event,
+                                                 mu_event_field_t field);
 opcua_statuscode_t write_event_notification_list(mu_binary_writer_t *w, struct mu_server *server,
                                                  const mu_subscription_t *sub);
 #endif

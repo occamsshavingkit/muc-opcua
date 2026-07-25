@@ -34,6 +34,30 @@ static opcua_statuscode_t validate_client_nonce(const mu_bytestring_t *client_no
     return MU_STATUS_GOOD;
 }
 
+#if MUC_OPCUA_CU_AUDITING
+static void raise_open_secure_channel_audit(mu_server_t *server, opcua_statuscode_t status) {
+    opcua_byte_t channel_id_buffer[10];
+    opcua_byte_t reversed_digits[10];
+    opcua_uint32_t channel_id = server_secure_channel.channel_id;
+    opcua_int32_t channel_id_length = 0;
+    opcua_int32_t digit_count = 0;
+    do {
+        reversed_digits[digit_count++] = (opcua_byte_t)('0' + (channel_id % 10u));
+        channel_id /= 10u;
+    } while (channel_id != 0u);
+    while (digit_count > 0) {
+        channel_id_buffer[channel_id_length++] = reversed_digits[--digit_count];
+    }
+
+    mu_audit_event_t audit_event;
+    (void)memset(&audit_event, 0, sizeof(audit_event));
+    audit_event.event_type = MU_AUDIT_EVENT_OPEN_SECURE_CHANNEL;
+    audit_event.status = status == MU_STATUS_GOOD;
+    audit_event.specific.open_channel.secure_channel_id = (mu_string_t){channel_id_length, channel_id_buffer};
+    mu_raise_audit_event(server, &audit_event);
+}
+#endif
+
 #ifdef MUC_OPCUA_CU_MULTIPLE_CONNECTIONS
 static bool secure_channel_id_used_by_other_connection(const mu_server_t *server, opcua_uint32_t channel_id) {
     if (server == NULL || channel_id == 0u) {
@@ -119,8 +143,8 @@ static opcua_statuscode_t encode_osc_security_token(mu_binary_writer_t *w, opcua
     return mu_binary_write_bytestring(w, &server_nonce);
 }
 
-opcua_statuscode_t handle_open_secure_channel(mu_server_t *server, mu_binary_reader_t *r, mu_binary_writer_t *w,
-                                              size_t *response_length) {
+static opcua_statuscode_t handle_open_secure_channel_impl(mu_server_t *server, mu_binary_reader_t *r,
+                                                          mu_binary_writer_t *w, size_t *response_length) {
     mu_request_header_t req;
     opcua_statuscode_t s = mu_request_header_decode(r, &req);
     if (s != MU_STATUS_GOOD) {
@@ -306,37 +330,17 @@ opcua_statuscode_t handle_open_secure_channel(mu_server_t *server, mu_binary_rea
     (void)client_nonce;
 #endif
 
-#if MUC_OPCUA_CU_AUDITING
-    /* spec 074/077: emit an AuditOpenSecureChannelEvent (i=2060) for the successful
-       OpenSecureChannel (OPC-10000-5 §6.4.6), for both SecurityPolicy None and
-       secured channels, now carrying the SecureChannelId (the numeric channel id
-       formatted as a String, per AuditChannelEventType.SecureChannelId). No-op
-       unless auditing is enabled. */
-    {
-        opcua_byte_t chid_buf[10]; /* UInt32 max = 4294967295 -> 10 digits */
-        opcua_uint32_t chid = server_secure_channel.channel_id;
-        opcua_int32_t chid_len = 0;
-        opcua_byte_t rev[10];
-        opcua_int32_t n = 0;
-        do {
-            rev[n++] = (opcua_byte_t)('0' + (chid % 10u));
-            chid /= 10u;
-        } while (chid != 0u);
-        while (n > 0) {
-            chid_buf[chid_len++] = rev[--n];
-        }
-
-        mu_audit_event_t audit_ev;
-        (void)memset(&audit_ev, 0, sizeof(audit_ev));
-        audit_ev.event_type = MU_AUDIT_EVENT_OPEN_SECURE_CHANNEL;
-        audit_ev.status = true;
-        audit_ev.specific.open_channel.secure_channel_id = (mu_string_t){chid_len, chid_buf};
-        mu_raise_audit_event(server, &audit_ev);
-    }
-#endif
-
     *response_length = w->position;
     return MU_STATUS_GOOD;
+}
+
+opcua_statuscode_t handle_open_secure_channel(mu_server_t *server, mu_binary_reader_t *r, mu_binary_writer_t *w,
+                                              size_t *response_length) {
+    opcua_statuscode_t status = handle_open_secure_channel_impl(server, r, w, response_length);
+#if MUC_OPCUA_CU_AUDITING
+    raise_open_secure_channel_audit(server, status);
+#endif
+    return status;
 }
 
 opcua_statuscode_t handle_close_secure_channel(mu_server_t *server, mu_binary_reader_t *r, mu_binary_writer_t *w,

@@ -582,9 +582,8 @@ to refresh.
 | — | opc_cu_2515 | claimed |  |  |  |  | ✅ |  |
 | — | opc_cu_3194 | claimed |  |  |  |  | ✅ |  |
 | — | opc_cu_2422 | claimed |  |  |  |  | ✅ |  |
+| — | opc_cu_3968 | claimed |  |  |  |  | ✅ |  |
 | — | opc_cu_3228 | claimed |  |  |  |  | ✅ |  |
-| — | opc_cu_3224 | claimed |  |  |  |  | ✅ |  |
-| — | opc_cu_3230 | claimed |  |  |  |  | ✅ |  |
 | — | opc_cu_3763 | claimed |  |  |  |  | ✅ |  |
 | — | opc_cu_3764 | claimed |  |  |  |  | ✅ |  |
 | — | opc_cu_3766 | claimed |  |  |  |  | ✅ |  |
@@ -647,6 +646,7 @@ The following OPC items are tracked in the manifest but are NOT implemented. The
 | opc_facet_2322 | OPC-10000-7 §4.2 | unimplemented | AliasName Configuration Facet not implemented; AliasName feature is deferred. |
 | opc_facet_2323 | OPC-10000-7 §4.2 | unimplemented | AliasName Server PubSub Publisher Facet not implemented; AliasName+PubSub deferred. |
 <!-- END GENERATED MANIFEST TABLES -->
+
 
 
 

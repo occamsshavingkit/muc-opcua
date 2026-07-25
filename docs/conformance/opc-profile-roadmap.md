@@ -15,9 +15,9 @@ remains future work.
 
 | State | Count |
 |-------|-------|
-| claimed | 120 |
+| claimed | 119 |
 | implemented | 16 |
-| documented | 179 |
+| documented | 180 |
 | deferred | 11 |
 | unimplemented | 11 |
 
@@ -263,12 +263,12 @@ remains future work.
 | opc_cu_2394 | conformance_unit | documented |  | — | full | — |
 | opc_cu_2939 | conformance_unit | documented |  | — | full | — |
 | opc_cu_3153 | conformance_unit | documented |  | — | full | — |
-| opc_cu_3194 | conformance_unit | claimed |  | — | full | test_claim_map |
-| opc_cu_2422 | conformance_unit | claimed |  | — | full | test_claim_map |
-| opc_cu_3968 | conformance_unit | documented |  | — | full | — |
-| opc_cu_3228 | conformance_unit | claimed |  | — | full | test_claim_map |
-| opc_cu_3224 | conformance_unit | claimed | OPC-10000-5 | — | full | test_claim_map |
-| opc_cu_3230 | conformance_unit | claimed | OPC-10000-5 | — | full | test_claim_map |
+| opc_cu_3194 | conformance_unit | claimed |  | — | full | test_claim_map, test_read_service |
+| opc_cu_2422 | conformance_unit | claimed |  | — | full | test_claim_map, test_event_notifications |
+| opc_cu_3968 | conformance_unit | claimed |  | — | full | test_event_notifications |
+| opc_cu_3228 | conformance_unit | claimed |  | — | full | test_claim_map, test_event_notifications |
+| opc_cu_3224 | conformance_unit | documented | OPC-10000-5 | — | full | — |
+| opc_cu_3230 | conformance_unit | documented | OPC-10000-5 | — | full | — |
 | opc_cu_3763 | conformance_unit | claimed | OPC-10000-9 §5.10 | — | full | test_claim_map |
 | opc_cu_3764 | conformance_unit | claimed | OPC-10000-9 §5.10.5 | — | full | test_claim_map |
 | opc_cu_3766 | conformance_unit | claimed | OPC-10000-9 §5.10.7 | — | full | test_claim_map |

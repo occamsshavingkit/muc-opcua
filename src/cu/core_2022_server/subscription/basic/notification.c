@@ -7,6 +7,7 @@
 
 #if MUC_OPCUA_CU_SUBSCRIPTION_BASIC
 
+#ifdef MUC_OPCUA_CU_EVENTS
 #if MUC_OPCUA_CU_AUDITING
 /* Resolve an AuditEvent SELECT field from the shared audit-payload pool (spec
    074). A stale ref (ring wrapped past the slot) resolves to Null. */
@@ -22,46 +23,50 @@ static mu_variant_t audit_str_variant(const mu_audit_str_t *s) {
     return v;
 }
 
-static mu_variant_t resolve_audit_field(const struct mu_server *server, const mu_event_notification_t *ev,
-                                        opcua_byte_t field) {
+static const mu_audit_payload_t *resolve_audit_payload(const struct mu_server *server,
+                                                       const mu_event_notification_t *event) {
+    if (server == NULL || event == NULL || !event->audit_ref.valid || event->audit_ref.index >= MU_MAX_AUDIT_PAYLOADS) {
+        return NULL;
+    }
+    const mu_audit_payload_t *payload = &server->audit_pool[event->audit_ref.index];
+    return payload->sequence == event->audit_ref.sequence ? payload : NULL;
+}
+
+static mu_variant_t resolve_audit_field(const mu_audit_payload_t *payload, opcua_byte_t field) {
     mu_variant_t v;
     (void)memset(&v, 0, sizeof(v));
     v.type = MU_TYPE_NULL;
-    if (!ev->audit_ref.valid) {
+    if (payload == NULL) {
         return v;
-    }
-    const mu_audit_payload_t *ap = &server->audit_pool[ev->audit_ref.index];
-    if (ap->sequence != ev->audit_ref.sequence) {
-        return v; /* ring wrapped past this reference */
     }
     switch (field) {
     case MU_EVENT_FIELD_STATUS:
         v.type = MU_TYPE_BOOLEAN;
-        v.value.b = ap->status;
+        v.value.b = payload->status;
         break;
     case MU_EVENT_FIELD_ACTIONTIMESTAMP:
         v.type = MU_TYPE_DATETIME;
-        v.value.dt = ap->action_timestamp;
+        v.value.dt = payload->action_timestamp;
         break;
     case MU_EVENT_FIELD_SERVERID:
-        return audit_str_variant(&ap->server_id);
+        return audit_str_variant(&payload->server_id);
     case MU_EVENT_FIELD_CLIENTAUDITENTRYID:
-        return audit_str_variant(&ap->client_audit_entry_id);
+        return audit_str_variant(&payload->client_audit_entry_id);
     case MU_EVENT_FIELD_CLIENTUSERID:
-        return audit_str_variant(&ap->client_user_id);
+        return audit_str_variant(&payload->client_user_id);
     case MU_EVENT_FIELD_SECURECHANNELID:
-        return audit_str_variant(&ap->secure_channel_id);
+        return audit_str_variant(&payload->secure_channel_id);
     case MU_EVENT_FIELD_ATTRIBUTEID:
         v.type = MU_TYPE_UINT32;
-        v.value.ui32 = ap->attribute_id;
+        v.value.ui32 = payload->attribute_id;
         break;
     case MU_EVENT_FIELD_OLDVALUE:
-        return ap->old_value;
+        return payload->old_value;
     case MU_EVENT_FIELD_NEWVALUE:
-        return ap->new_value;
+        return payload->new_value;
     case MU_EVENT_FIELD_SESSIONID:
         v.type = MU_TYPE_NODEID;
-        v.value.nodeid = ap->session_id;
+        v.value.nodeid = payload->session_id;
         break;
     default:
         break;
@@ -69,6 +74,89 @@ static mu_variant_t resolve_audit_field(const struct mu_server *server, const mu
     return v;
 }
 #endif /* MUC_OPCUA_CU_AUDITING */
+
+mu_variant_t mu_event_notification_resolve_field(const struct mu_server *server, const mu_event_notification_t *event,
+                                                 mu_event_field_t field) {
+    mu_variant_t value;
+    (void)memset(&value, 0, sizeof(value));
+    value.type = MU_TYPE_NULL;
+    if (server == NULL || event == NULL) {
+        return value;
+    }
+
+#if MUC_OPCUA_CU_AUDITING
+    const mu_audit_payload_t *audit_payload = resolve_audit_payload(server, event);
+#endif
+
+    switch (field) {
+    case MU_EVENT_FIELD_EVENTID:
+        value.type = MU_TYPE_BYTESTRING;
+#if MUC_OPCUA_CU_AUDITING
+        if (audit_payload != NULL) {
+            value.value.bytestr = (mu_bytestring_t){audit_payload->event_id_length, audit_payload->event_id};
+            return value;
+        }
+#endif
+        value.value.bytestr = event->event_id;
+        return value;
+    case MU_EVENT_FIELD_EVENTTYPE:
+        value.type = MU_TYPE_NODEID;
+        value.value.nodeid = event->event_type;
+        return value;
+    case MU_EVENT_FIELD_SOURCENODE:
+#if MUC_OPCUA_CU_AUDITING
+        if (audit_payload != NULL) {
+            value.type = MU_TYPE_NODEID;
+            value.value.nodeid = audit_payload->source_node;
+        }
+#endif
+        return value;
+    case MU_EVENT_FIELD_SOURCENAME:
+#if MUC_OPCUA_CU_AUDITING
+        if (audit_payload != NULL) {
+            value.type = MU_TYPE_STRING;
+            value.value.str = (mu_string_t){6, (const opcua_byte_t *)"Server"};
+        }
+#endif
+        return value;
+    case MU_EVENT_FIELD_TIME:
+        value.type = MU_TYPE_DATETIME;
+        value.value.dt = event->time;
+        return value;
+    case MU_EVENT_FIELD_RECEIVETIME:
+#if MUC_OPCUA_CU_AUDITING
+        if (audit_payload != NULL) {
+            value.type = MU_TYPE_DATETIME;
+            value.value.dt = audit_payload->action_timestamp;
+        }
+#endif
+        return value;
+    case MU_EVENT_FIELD_MESSAGE:
+        value.type = MU_TYPE_LOCALIZEDTEXT;
+        value.value.localized_text = (mu_localized_text_t){{-1, NULL}, event->message};
+        return value;
+    case MU_EVENT_FIELD_SEVERITY:
+        value.type = MU_TYPE_UINT16;
+        value.value.ui16 = event->severity;
+        return value;
+#if MUC_OPCUA_CU_AUDITING
+    case MU_EVENT_FIELD_STATUS:
+    case MU_EVENT_FIELD_ACTIONTIMESTAMP:
+    case MU_EVENT_FIELD_SERVERID:
+    case MU_EVENT_FIELD_CLIENTAUDITENTRYID:
+    case MU_EVENT_FIELD_CLIENTUSERID:
+    case MU_EVENT_FIELD_ATTRIBUTEID:
+    case MU_EVENT_FIELD_OLDVALUE:
+    case MU_EVENT_FIELD_NEWVALUE:
+    case MU_EVENT_FIELD_SECURECHANNELID:
+    case MU_EVENT_FIELD_SESSIONID:
+        return resolve_audit_field(audit_payload, (opcua_byte_t)field);
+#endif
+    default:
+        return value;
+    }
+}
+#endif
 
 static void datavalue_apply_timestamps(mu_datavalue_t *dv, const mu_monitored_item_t *item, opcua_datetime_t now) {
     opcua_byte_t mode = item->timestamps_to_return;
@@ -347,51 +435,7 @@ opcua_statuscode_t write_event_notification_list(mu_binary_writer_t *w, struct m
 
                 for (opcua_byte_t j = 0; j < item->select_clauses_count; ++j) {
                     opcua_byte_t field = item->select_clauses[j];
-                    mu_variant_t var;
-                    (void)memset(&var, 0, sizeof(var));
-
-                    switch (field) {
-                    case MU_EVENT_FIELD_EVENTID:
-                        var.type = MU_TYPE_BYTESTRING;
-                        var.value.bytestr = ev->event_id;
-                        break;
-                    case MU_EVENT_FIELD_EVENTTYPE:
-                        var.type = MU_TYPE_NODEID;
-                        var.value.nodeid = ev->event_type;
-                        break;
-                    case MU_EVENT_FIELD_TIME:
-                        var.type = MU_TYPE_DATETIME;
-                        var.value.dt = ev->time;
-                        break;
-                    case MU_EVENT_FIELD_MESSAGE: {
-                        var.type = MU_TYPE_LOCALIZEDTEXT;
-                        mu_localized_text_t lt = {{-1, NULL}, ev->message};
-                        var.value.localized_text = lt;
-                    } break;
-                    case MU_EVENT_FIELD_SEVERITY:
-                        var.type = MU_TYPE_UINT16;
-                        var.value.ui16 = ev->severity;
-                        break;
-#if MUC_OPCUA_CU_AUDITING
-                    case MU_EVENT_FIELD_STATUS:
-                    case MU_EVENT_FIELD_ACTIONTIMESTAMP:
-                    case MU_EVENT_FIELD_SERVERID:
-                    case MU_EVENT_FIELD_CLIENTAUDITENTRYID:
-                    case MU_EVENT_FIELD_CLIENTUSERID:
-                    case MU_EVENT_FIELD_ATTRIBUTEID:
-                    case MU_EVENT_FIELD_OLDVALUE:
-                    case MU_EVENT_FIELD_NEWVALUE:
-                    case MU_EVENT_FIELD_SECURECHANNELID:
-                    case MU_EVENT_FIELD_SESSIONID:
-                        var = resolve_audit_field(server, ev, field);
-                        break;
-#endif
-                    default:
-                        /* SourceNode/SourceName/ReceiveTime/LocalTime and any
-                           unresolved field: this server emits no value → Null. */
-                        var.type = MU_TYPE_NULL;
-                        break;
-                    }
+                    mu_variant_t var = mu_event_notification_resolve_field(server, ev, (mu_event_field_t)field);
                     s = mu_binary_write_variant(&sub_w, &var);
                     if (s != MU_STATUS_GOOD) {
                         return s;

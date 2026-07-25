@@ -125,11 +125,10 @@ Backing test column: comma-separated ctest names (as registered).
 | Session General Service Behaviour | OPC-10000-4 §5.6 | all | test_dispatch_session_order, test_base_server_behaviour |
 | Base Info Namespace Metadata | OPC-10000-3 §4 | full | test_base_server_behaviour, test_read_browsename_namespace |
 | Address Space Events 2 |  | full | test_claim_map |
-| Base Info Events Capabilities |  | full | test_claim_map |
-| Auditing Secure Communication |  | full | test_claim_map |
-| Auditing Write |  | full | test_claim_map |
-| Auditing NodeManagement | OPC-10000-5 | full | test_claim_map |
-| Auditing Method | OPC-10000-5 | full | test_claim_map |
+| Base Info Events Capabilities |  | full | test_claim_map, test_read_service |
+| Auditing Secure Communication |  | full | test_claim_map, test_event_notifications |
+| Auditing Services |  | full | test_event_notifications |
+| Auditing Write |  | full | test_claim_map, test_event_notifications |
 | A & C Auditing | OPC-10000-9 §5.10 | full | test_claim_map |
 | A & C Dialog Auditing | OPC-10000-9 §5.10.5 | full | test_claim_map |
 | A & C Confirm Auditing | OPC-10000-9 §5.10.7 | full | test_claim_map |

@@ -720,6 +720,15 @@ opcua_statuscode_t handle_activate_session(mu_server_t *server, mu_binary_reader
         (void)memset(&audit_ev, 0, sizeof(audit_ev));
         audit_ev.event_type = MU_AUDIT_EVENT_ACTIVATE_SESSION;
         audit_ev.status = (activate_result == MU_STATUS_GOOD);
+        if (token_type_numeric == 321u) {
+            audit_ev.specific.activate_session.user_name = anon_policy_id;
+        }
+#ifdef MUC_OPCUA_CU_USER_AUTH
+        else if (token_type_numeric == 324u) {
+            audit_ev.specific.activate_session.user_name = user_token.username;
+        }
+#endif
+        audit_ev.client_user_id = audit_ev.specific.activate_session.user_name;
         if (req.authentication_token.identifier_type == MU_NODEID_NUMERIC &&
             req.authentication_token.namespace_index == 0u) {
             const mu_session_t *audit_slot = mu_session_find_by_token(server->sessions, MU_INTERN_MAX_SESSIONS,

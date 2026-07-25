@@ -110,6 +110,21 @@ static mu_nodeid_t audit_event_type_nodeid(opcua_uint32_t event_type) {
     return id;
 }
 
+static mu_string_t audit_event_message(opcua_uint32_t event_type) {
+    switch (event_type) {
+    case MU_AUDIT_EVENT_OPEN_SECURE_CHANNEL:
+        return (mu_string_t){17, (const opcua_byte_t *)"OpenSecureChannel"};
+    case MU_AUDIT_EVENT_CREATE_SESSION:
+        return (mu_string_t){13, (const opcua_byte_t *)"CreateSession"};
+    case MU_AUDIT_EVENT_ACTIVATE_SESSION:
+        return (mu_string_t){15, (const opcua_byte_t *)"ActivateSession"};
+    case MU_AUDIT_EVENT_WRITE_UPDATE:
+        return (mu_string_t){15, (const opcua_byte_t *)"Attribute Write"};
+    default:
+        return (mu_string_t){10, (const opcua_byte_t *)"AuditEvent"};
+    }
+}
+
 mu_audit_ref_t mu_audit_pool_store(mu_server_t *server, const mu_audit_payload_t *payload) {
     mu_audit_ref_t ref = {false, 0u, 0u};
     if (server == NULL || payload == NULL) {
@@ -123,6 +138,16 @@ mu_audit_ref_t mu_audit_pool_store(mu_server_t *server, const mu_audit_payload_t
     server->audit_pool_sequence = seq;
     server->audit_pool[idx] = *payload;
     server->audit_pool[idx].sequence = seq;
+    if (server->audit_pool[idx].event_id_length == 0u) {
+        opcua_uint64_t timestamp = (opcua_uint64_t)server->audit_pool[idx].action_timestamp;
+        for (size_t i = 0; i < 4u; ++i) {
+            server->audit_pool[idx].event_id[i] = (opcua_byte_t)(seq >> (i * 8u));
+        }
+        for (size_t i = 0; i < 8u; ++i) {
+            server->audit_pool[idx].event_id[4u + i] = (opcua_byte_t)(timestamp >> (i * 8u));
+        }
+        server->audit_pool[idx].event_id_length = 12u;
+    }
     server->audit_pool_next = (opcua_byte_t)((idx + 1u) % MU_MAX_AUDIT_PAYLOADS);
     ref.valid = true;
     ref.index = idx;
@@ -197,7 +222,7 @@ void mu_raise_audit_event(mu_server_t *server, const mu_audit_event_t *event) {
         audit_str_copy(&payload.client_user_id, &mutable_event.specific.activate_session.user_name);
         break;
     case MU_AUDIT_EVENT_WRITE_UPDATE:
-        payload.attribute_id = 13u; /* Value attribute (OPC-10000-6) */
+        payload.attribute_id = mutable_event.specific.write_update.attribute_id;
         audit_capture_scalar(&payload.old_value, &mutable_event.specific.write_update.old_value);
         audit_capture_scalar(&payload.new_value, &mutable_event.specific.write_update.new_value);
         break;
@@ -222,7 +247,7 @@ void mu_raise_audit_event(mu_server_t *server, const mu_audit_event_t *event) {
     notif.event_type = audit_event_type_nodeid(mutable_event.event_type);
     notif.time = mutable_event.action_timestamp;
     notif.severity = 1u;
-    notif.message = (mu_string_t){-1, NULL};
+    notif.message = audit_event_message(mutable_event.event_type);
     notif.audit_ref = mu_audit_pool_store(server, &payload);
     (void)mu_server_trigger_event(server, &notif);
 #endif /* MUC_OPCUA_EVENTS */

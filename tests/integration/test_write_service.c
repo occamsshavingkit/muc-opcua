@@ -447,7 +447,8 @@ void test_write_service_integration(void) {
        - a rejected write is audited too, with Status=false;
        - the OpenSecureChannel audit carries a non-empty SecureChannelId;
        - the ActivateSession audit carries the SessionId. */
-    bool saw_write_success = false, saw_write_fail = false, saw_osc_channel_id = false, saw_activate_session_id = false;
+    bool saw_write_success = false, saw_write_fail = false, saw_osc_channel_id = false;
+    bool saw_create_session_id = false, saw_activate_session_id = false;
     for (size_t k = 0; k < g_captured_audit_count; ++k) {
         const mu_audit_event_t *e = &g_captured_audits[k];
         if (e->event_type == MU_AUDIT_EVENT_WRITE_UPDATE && e->status) {
@@ -464,8 +465,13 @@ void test_write_service_integration(void) {
             e->specific.open_channel.secure_channel_id.length > 0) {
             saw_osc_channel_id = true;
         }
+        if (e->event_type == MU_AUDIT_EVENT_CREATE_SESSION &&
+            e->specific.create_session.session_id.identifier.numeric != 0u) {
+            saw_create_session_id = true;
+        }
         if (e->event_type == MU_AUDIT_EVENT_ACTIVATE_SESSION &&
-            e->specific.activate_session.session_id.identifier.numeric != 0u) {
+            e->specific.activate_session.session_id.identifier.numeric != 0u &&
+            e->specific.activate_session.user_name.length > 0) {
             saw_activate_session_id = true;
         }
     }
@@ -473,7 +479,9 @@ void test_write_service_integration(void) {
                              "successful write must emit AuditWriteUpdateEvent (OldValue=10, NewValue=42)");
     TEST_ASSERT_TRUE_MESSAGE(saw_write_fail, "rejected write must emit AuditWriteUpdateEvent with Status=false");
     TEST_ASSERT_TRUE_MESSAGE(saw_osc_channel_id, "OpenSecureChannel audit must carry a non-empty SecureChannelId");
-    TEST_ASSERT_TRUE_MESSAGE(saw_activate_session_id, "ActivateSession audit must carry the SessionId");
+    TEST_ASSERT_TRUE_MESSAGE(saw_create_session_id, "CreateSession audit must carry the SessionId");
+    TEST_ASSERT_TRUE_MESSAGE(saw_activate_session_id,
+                             "ActivateSession audit must carry the SessionId and user identity");
 #endif
 #endif
 }
