@@ -15,7 +15,6 @@
 #define MUC_OPCUA_SERVICES_CERTIFICATE_MANAGER_H
 
 #include "muc_opcua/config.h"
-#include "muc_opcua/status.h"
 #include "muc_opcua/types.h"
 
 #ifdef __cplusplus
@@ -39,6 +38,18 @@ extern "C" {
 #define MU_ID_CM_START_NEW_KEY_PAIR_REQUEST 12483u
 #define MU_ID_CM_FINISH_REQUEST 12484u
 #define MU_ID_CM_GET_REJECTED_LIST 12747u
+
+/* Minimal OPC UA GDS namespace surface used by the certificate pull workflow.
+ * OPC-10000-12 §§6.5.6 and 7.9.7; Opc.Ua.Gds namespace URI occupies index 1
+ * in the built-in address space when this CU is enabled. */
+#define MU_GDS_NAMESPACE_INDEX 1u
+#define MU_ID_GDS_DIRECTORY 141u
+#define MU_ID_GDS_REGISTER_APPLICATION 146u
+#define MU_ID_GDS_REGISTER_APPLICATION_INPUT_ARGUMENTS 147u
+#define MU_ID_GDS_REGISTER_APPLICATION_OUTPUT_ARGUMENTS 148u
+#define MU_ID_GDS_GET_CERTIFICATE_GROUPS 508u
+#define MU_ID_GDS_GET_CERTIFICATE_GROUPS_INPUT_ARGUMENTS 509u
+#define MU_ID_GDS_GET_CERTIFICATE_GROUPS_OUTPUT_ARGUMENTS 510u
 
 #ifdef MUC_OPCUA_CU_CERTIFICATE_MANAGER_PULL
 

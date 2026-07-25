@@ -15,14 +15,14 @@
  * src/address_space/base_nodes.c.
  */
 #include "cert_manager.h"
+
+#if MUC_OPCUA_CU_CERTIFICATE_MANAGER_PULL
+
 #include "core/server_internal.h"
-#include "muc_opcua/address_space.h"
-#include "muc_opcua/services/certificate_manager.h"
-#include "muc_opcua/services/method.h"
 #include <stddef.h>
 #include <string.h>
 
-#if MUC_OPCUA_CU_CERTIFICATE_MANAGER_PULL
+_Static_assert(MU_MAX_REGISTERED_METHODS >= 6u, "certificate manager requires six method slots");
 
 /* Resolve the adapter from the server's config. Returns NULL when no
  * adapter was supplied, in which case every method returns Bad_NotSupported. */
@@ -273,9 +273,62 @@ static opcua_statuscode_t handle_start_new_key_pair_request(mu_server_t *server,
     return MU_STATUS_GOOD;
 }
 
-/* Register all four Pull Model certificate management Method callbacks.
+static const mu_nodeid_t s_default_certificate_group_ids[] = {
+    {0u, MU_NODEID_NUMERIC, {MU_ID_DEFAULT_APPLICATION_GROUP}},
+    {0u, MU_NODEID_NUMERIC, {MU_ID_DEFAULT_HTTPS_GROUP}},
+    {0u, MU_NODEID_NUMERIC, {MU_ID_DEFAULT_USER_TOKEN_GROUP}}};
+
+static opcua_statuscode_t handle_get_certificate_groups(mu_server_t *server, void *context,
+                                                        const mu_nodeid_t *object_id, const mu_nodeid_t *method_id,
+                                                        const mu_variant_t *input_args, size_t input_args_count,
+                                                        mu_variant_t *output_args, size_t *output_args_count) {
+    (void)server;
+    (void)context;
+    (void)object_id;
+    (void)method_id;
+
+    if (input_args_count == 0u) {
+        return MU_STATUS_BAD_ARGUMENTSMISSING;
+    }
+    if (input_args_count > 1u) {
+        return MU_STATUS_BAD_TOOMANYARGUMENTS;
+    }
+    if (input_args == NULL || input_args[0].is_array || input_args[0].type != MU_TYPE_NODEID) {
+        return MU_STATUS_BAD_INVALIDARGUMENT;
+    }
+    if (output_args == NULL || output_args_count == NULL || *output_args_count < 1u) {
+        return MU_STATUS_BAD_INTERNALERROR;
+    }
+
+    (void)memset(&output_args[0], 0, sizeof(output_args[0]));
+    output_args[0].type = MU_TYPE_NODEID;
+    output_args[0].is_array = true;
+    output_args[0].array_length = (opcua_int32_t)(sizeof(s_default_certificate_group_ids) /
+                                                  sizeof(s_default_certificate_group_ids[0]));
+    output_args[0].value.array = s_default_certificate_group_ids;
+    *output_args_count = 1u;
+    return MU_STATUS_GOOD;
+}
+
+static opcua_statuscode_t handle_register_application_deferred(
+    mu_server_t *server, void *context, const mu_nodeid_t *object_id, const mu_nodeid_t *method_id,
+    const mu_variant_t *input_args, size_t input_args_count, mu_variant_t *output_args, size_t *output_args_count) {
+    (void)server;
+    (void)context;
+    (void)object_id;
+    (void)method_id;
+    (void)input_args;
+    (void)input_args_count;
+    (void)output_args;
+    if (output_args_count != NULL) {
+        *output_args_count = 0u;
+    }
+    return MU_STATUS_BAD_SERVICEUNSUPPORTED;
+}
+
+/* Register the Pull Model and minimal GDS Method callbacks.
  * Called automatically from mu_server_init() when the CU is enabled.
- * Consumes 4 of the MU_MAX_REGISTERED_METHODS slots. */
+ * Consumes 6 of the MU_MAX_REGISTERED_METHODS slots. */
 opcua_statuscode_t mu_certificate_manager_register(mu_server_t *server) {
     if (server == NULL) {
         return MU_STATUS_BAD_INTERNALERROR;
@@ -285,6 +338,10 @@ opcua_statuscode_t mu_certificate_manager_register(mu_server_t *server) {
     static const mu_nodeid_t start_new_key_id = {0u, MU_NODEID_NUMERIC, {MU_ID_CM_START_NEW_KEY_PAIR_REQUEST}};
     static const mu_nodeid_t finish_id = {0u, MU_NODEID_NUMERIC, {MU_ID_CM_FINISH_REQUEST}};
     static const mu_nodeid_t get_rejected_id = {0u, MU_NODEID_NUMERIC, {MU_ID_CM_GET_REJECTED_LIST}};
+    static const mu_nodeid_t register_application_id = {
+        MU_GDS_NAMESPACE_INDEX, MU_NODEID_NUMERIC, {MU_ID_GDS_REGISTER_APPLICATION}};
+    static const mu_nodeid_t get_certificate_groups_id = {
+        MU_GDS_NAMESPACE_INDEX, MU_NODEID_NUMERIC, {MU_ID_GDS_GET_CERTIFICATE_GROUPS}};
 
     opcua_statuscode_t s;
     s = mu_server_register_method_callback(server, &start_signing_id, handle_start_signing_request, NULL, NULL, 0, NULL,
@@ -303,7 +360,16 @@ opcua_statuscode_t mu_certificate_manager_register(mu_server_t *server) {
     }
     s = mu_server_register_method_callback(server, &get_rejected_id, handle_get_rejected_list, NULL, NULL, 0, NULL, 0,
                                            true);
-    return s;
+    if (s != MU_STATUS_GOOD) {
+        return s;
+    }
+    s = mu_server_register_method_callback(server, &register_application_id, handle_register_application_deferred,
+                                           NULL, NULL, 0, NULL, 0, true);
+    if (s != MU_STATUS_GOOD) {
+        return s;
+    }
+    return mu_server_register_method_callback(server, &get_certificate_groups_id, handle_get_certificate_groups,
+                                              NULL, NULL, 0, NULL, 0, true);
 }
 
 #endif /* MUC_OPCUA_CU_CERTIFICATE_MANAGER_PULL */
