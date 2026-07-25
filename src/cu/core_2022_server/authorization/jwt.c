@@ -33,6 +33,7 @@
 #define MU_JWT_HEADER_MAX 128
 #define MU_JWT_PAYLOAD_MAX 2048
 #define MU_JWT_SIGNATURE_MAX 2048
+#define MU_JWT_KID_MAX 128
 
 /* Locate the next '.' in jwt starting at offset `start`. */
 static size_t find_dot(const char *jwt, size_t jwt_len, size_t start) {
@@ -104,7 +105,8 @@ static mu_jwt_alg_t alg_from_str(const char *s, size_t len) {
     return MU_JWT_ALG_NONE;
 }
 
-static mu_jwt_result_t decode_and_check_alg(const char *jwt, size_t header_b64_len, mu_jwt_alg_t *out_alg) {
+static mu_jwt_result_t decode_and_check_alg(const char *jwt, size_t header_b64_len, mu_jwt_alg_t *out_alg,
+                                            char *out_kid, size_t kid_max) {
     unsigned char header_buf[MU_JWT_HEADER_MAX];
     int header_len = mu_base64url_decode(jwt, header_b64_len, header_buf, sizeof(header_buf) - 1);
     if (header_len < 0) {
@@ -148,6 +150,51 @@ static mu_jwt_result_t decode_and_check_alg(const char *jwt, size_t header_b64_l
     if (*out_alg == MU_JWT_ALG_NONE) {
         return MU_JWT_ERR_UNSUPPORTED_ALG;
     }
+
+    /* Optional protected-header `kid` (RFC 7515 §4.1.4). When absent the
+       out_kid buffer is left as an empty C string. The value is unescaped
+       defensively: only \" and \\ are honoured, matching the claim scanner. */
+    if (out_kid != NULL && kid_max > 0) {
+        out_kid[0] = '\0';
+        for (size_t i = 0; i + 5 < (size_t)header_len; i++) {
+            if (hdr[i] == '"' && hdr[i + 1] == 'k' && hdr[i + 2] == 'i' && hdr[i + 3] == 'd' && hdr[i + 4] == '"') {
+                size_t j = i + 5;
+                while (j < (size_t)header_len && (hdr[j] == ' ' || hdr[j] == '\t')) {
+                    j++;
+                }
+                if (j >= (size_t)header_len || hdr[j] != ':') {
+                    break;
+                }
+                j++;
+                while (j < (size_t)header_len && (hdr[j] == ' ' || hdr[j] == '\t')) {
+                    j++;
+                }
+                if (j >= (size_t)header_len || hdr[j] != '"') {
+                    break;
+                }
+                j++;
+                size_t out = 0;
+                while (j < (size_t)header_len && hdr[j] != '"') {
+                    char c = hdr[j++];
+                    if (c == '\\' && j < (size_t)header_len) {
+                        char esc = hdr[j++];
+                        if (esc == '"') {
+                            c = '"';
+                        } else if (esc == '\\') {
+                            c = '\\';
+                        } else {
+                            c = esc;
+                        }
+                    }
+                    if (out + 1 < kid_max) {
+                        out_kid[out++] = c;
+                    }
+                }
+                out_kid[out] = '\0';
+                break;
+            }
+        }
+    }
     return MU_JWT_OK;
 }
 
@@ -168,6 +215,30 @@ static int audience_match(const char *expected, const char *actual) {
         return 0;
     }
     return strcmp(expected, actual) == 0;
+}
+
+/* RFC 7515 §4.1.4: when the issuer pins a bounded set of trusted `kid`
+   values, the protected-header `kid` must match one of them or the token is
+   rejected as a signature failure (no crypto backend invocation). An empty
+   `kid` in the token matches only when the issuer table omits kids entirely
+   (key selection falls back to the single pinned public_key). */
+static int kid_matches_issuer(const mu_jwt_issuer_t *issuer, const char *token_kid) {
+    if (issuer == NULL) {
+        return 1;
+    }
+    if (issuer->key_id_count == 0 || issuer->key_ids == NULL) {
+        return 1;
+    }
+    if (token_kid == NULL || token_kid[0] == '\0') {
+        return 0;
+    }
+    for (opcua_byte_t i = 0; i < issuer->key_id_count; i++) {
+        const char *trusted = issuer->key_ids[i];
+        if (trusted != NULL && strcmp(trusted, token_kid) == 0) {
+            return 1;
+        }
+    }
+    return 0;
 }
 
 /* Validate claims + signature against one issuer. Returns MU_JWT_OK on
@@ -229,7 +300,8 @@ mu_jwt_result_t mu_jwt_validate(const char *jwt, size_t jwt_len, const mu_jwt_is
     }
 
     mu_jwt_alg_t alg;
-    r = decode_and_check_alg(jwt, seg.header_b64_len, &alg);
+    char token_kid[MU_JWT_KID_MAX];
+    r = decode_and_check_alg(jwt, seg.header_b64_len, &alg, token_kid, sizeof(token_kid));
     if (r != MU_JWT_OK) {
         return r;
     }
@@ -246,6 +318,14 @@ mu_jwt_result_t mu_jwt_validate(const char *jwt, size_t jwt_len, const mu_jwt_is
     memset(&claims, 0, sizeof(claims));
     mu_claim_scan((const char *)payload_buf, (size_t)payload_len, &claims);
 
+    /* A malformed or over-capacity role claim rejects the token outright
+       (spec 093 Edge Cases / US3). role_overflow is set by the scanner when
+       the bound is exceeded; role_count is forced to 0 in that case so no
+       partial role state reaches the caller. */
+    if (claims.role_overflow) {
+        return MU_JWT_ERR_MALFORMED;
+    }
+
     if (claims.exp == 0) {
         return MU_JWT_ERR_EXPIRED;
     }
@@ -256,6 +336,9 @@ mu_jwt_result_t mu_jwt_validate(const char *jwt, size_t jwt_len, const mu_jwt_is
             continue;
         }
         any_issuer_matched = true;
+        if (!kid_matches_issuer(&issuers[k], token_kid)) {
+            continue;
+        }
         r = validate_against_issuer(&issuers[k], &claims, alg, server_time_unix, jwt, &seg, out_claims);
         if (r == MU_JWT_OK) {
             return MU_JWT_OK;

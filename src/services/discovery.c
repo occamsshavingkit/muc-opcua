@@ -199,6 +199,16 @@ static void fill_endpoint(const mu_server_config_t *config, mu_endpoint_descript
     }
 #endif
 
+#if defined(MUC_OPCUA_CU_USER_TOKEN_JWT) && MUC_OPCUA_CU_USER_TOKEN_JWT
+    desc->user_identity_tokens[desc->num_user_identity_tokens].policy_id = "jwt";
+    desc->user_identity_tokens[desc->num_user_identity_tokens].token_type = MU_USER_TOKEN_TYPE_ISSUEDTOKEN;
+    desc->user_identity_tokens[desc->num_user_identity_tokens].issued_token_type =
+        "urn:ietf:params:oauth:token-type:jwt";
+    desc->user_identity_tokens[desc->num_user_identity_tokens].issuer_endpoint_url = NULL;
+    desc->user_identity_tokens[desc->num_user_identity_tokens].security_policy_uri = NULL;
+    desc->num_user_identity_tokens++;
+#endif
+
     desc->transport_profile_uri = "http://opcfoundation.org/UA-Profile/Transport/uatcp-uasc-uabinary";
     desc->security_level = level;
 }

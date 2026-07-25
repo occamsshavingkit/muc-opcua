@@ -1,8 +1,8 @@
 /* tests/unit/test_discovery_services.c */
-#include "../../src/core/server_internal.h"
+#include "../../src/core/server_internal.h" // IWYU pragma: keep
 #include "../../src/core/service_dispatch.h"
 #include "../../src/services/discovery.h"
-#include "muc_opcua/muc_opcua.h"
+#include "muc_opcua/muc_opcua.h" // IWYU pragma: keep
 #include "unity.h"
 #include <string.h>
 
@@ -348,13 +348,51 @@ void test_discovery_getendpoints_response(void) {
     TEST_ASSERT_EQUAL(MU_MESSAGE_SECURITY_MODE_NONE, desc.security_mode);
     TEST_ASSERT_EQUAL_STRING("http://opcfoundation.org/UA/SecurityPolicy#None", desc.security_policy_uri);
 
+#if defined(MUC_OPCUA_CU_USER_TOKEN_JWT) && MUC_OPCUA_CU_USER_TOKEN_JWT
+    TEST_ASSERT_EQUAL(2, desc.num_user_identity_tokens);
+#else
     TEST_ASSERT_EQUAL(1, desc.num_user_identity_tokens);
+#endif
     TEST_ASSERT_EQUAL_STRING("anonymous", desc.user_identity_tokens[0].policy_id);
     TEST_ASSERT_EQUAL(MU_USER_TOKEN_TYPE_ANONYMOUS, desc.user_identity_tokens[0].token_type);
 
     TEST_ASSERT_EQUAL_STRING("http://opcfoundation.org/UA-Profile/Transport/uatcp-uasc-uabinary",
                              desc.transport_profile_uri);
     TEST_ASSERT_EQUAL(0, desc.security_level);
+}
+
+void test_discovery_endpoint_advertises_jwt_issued_token_only_when_enabled(void) {
+    mu_server_config_t config = {0};
+    config.application_uri = "urn:test:app";
+    config.product_uri = "urn:test:product";
+    config.application_name = "Test App";
+    config.endpoint_url = "opc.tcp://localhost:4840";
+
+    mu_endpoint_description_t desc;
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_discovery_get_endpoint_description(&config, &desc));
+
+    bool found_anonymous = false;
+    bool found_jwt = false;
+    for (size_t i = 0u; i < desc.num_user_identity_tokens; ++i) {
+        const mu_user_token_policy_t *policy = &desc.user_identity_tokens[i];
+        if (policy->token_type == MU_USER_TOKEN_TYPE_ANONYMOUS) {
+            found_anonymous = true;
+        }
+        if (policy->token_type == MU_USER_TOKEN_TYPE_ISSUEDTOKEN) {
+            found_jwt = true;
+            TEST_ASSERT_EQUAL_STRING("jwt", policy->policy_id);
+            TEST_ASSERT_EQUAL_STRING("urn:ietf:params:oauth:token-type:jwt", policy->issued_token_type);
+            TEST_ASSERT_NULL(policy->issuer_endpoint_url);
+            TEST_ASSERT_NULL(policy->security_policy_uri);
+        }
+    }
+
+    TEST_ASSERT_TRUE(found_anonymous);
+#if defined(MUC_OPCUA_CU_USER_TOKEN_JWT) && MUC_OPCUA_CU_USER_TOKEN_JWT
+    TEST_ASSERT_TRUE(found_jwt);
+#else
+    TEST_ASSERT_FALSE(found_jwt);
+#endif
 }
 
 void test_findservers_malformed_array_count_returns_bad_decodingerror(void) {
@@ -552,6 +590,7 @@ int main(void) {
     UNITY_BEGIN();
     RUN_TEST(test_discovery_findservers_response);
     RUN_TEST(test_discovery_getendpoints_response);
+    RUN_TEST(test_discovery_endpoint_advertises_jwt_issued_token_only_when_enabled);
     RUN_TEST(test_findservers_malformed_array_count_returns_bad_decodingerror);
     RUN_TEST(test_findservers_scn001_case001_self_unfiltered_returns_exactly_own_server_opc_cu_2352);
     RUN_TEST(test_getendpoints_malformed_array_count_returns_bad_decodingerror);

@@ -17,7 +17,7 @@
  *     multiple discoveryUrls[], multiple UserTokenPolicies, securityLevel > 0.
  *   - No encode buffer-overflow test (writing to a too-small buffer). */
 #include "../../src/services/discovery.h"
-#include "muc_opcua/muc_opcua.h"
+#include "muc_opcua/muc_opcua.h" // IWYU pragma: keep
 #include "unity.h"
 #include <string.h>
 
@@ -86,7 +86,11 @@ void test_endpoint_description_encode(void) {
     /* userIdentityTokens[] : UserTokenPolicies */
     opcua_int32_t n_tok;
     mu_binary_read_int32(&r, &n_tok);
+#if defined(MUC_OPCUA_CU_USER_TOKEN_JWT) && MUC_OPCUA_CU_USER_TOKEN_JWT
+    TEST_ASSERT_EQUAL(2, n_tok);
+#else
     TEST_ASSERT_EQUAL(1, n_tok);
+#endif
     mu_binary_read_string(&r, &s);
     TEST_ASSERT_EQUAL_MEMORY("anonymous", s.data, 9); /* policyId */
     opcua_uint32_t tok_type;
@@ -98,6 +102,21 @@ void test_endpoint_description_encode(void) {
     TEST_ASSERT_EQUAL(-1, s.length); /* issuerEndpointUrl */
     mu_binary_read_string(&r, &s);
     TEST_ASSERT_EQUAL(-1, s.length); /* securityPolicyUri */
+#if defined(MUC_OPCUA_CU_USER_TOKEN_JWT) && MUC_OPCUA_CU_USER_TOKEN_JWT
+    /* Second token: JWT IssuedToken */
+    mu_binary_read_string(&r, &s);
+    TEST_ASSERT_EQUAL(3, s.length);
+    TEST_ASSERT_EQUAL_MEMORY("jwt", s.data, 3); /* policyId */
+    mu_binary_read_uint32(&r, &tok_type);
+    TEST_ASSERT_EQUAL(MU_USER_TOKEN_TYPE_ISSUEDTOKEN, tok_type);
+    mu_binary_read_string(&r, &s);
+    TEST_ASSERT_EQUAL(36, s.length);
+    TEST_ASSERT_EQUAL_MEMORY("urn:ietf:params:oauth:token-type:jwt", s.data, 36); /* issuedTokenType */
+    mu_binary_read_string(&r, &s);
+    TEST_ASSERT_EQUAL(-1, s.length); /* issuerEndpointUrl */
+    mu_binary_read_string(&r, &s);
+    TEST_ASSERT_EQUAL(-1, s.length); /* securityPolicyUri */
+#endif
     /* transportProfileUri */
     mu_binary_read_string(&r, &s);
     TEST_ASSERT_EQUAL(65, s.length);

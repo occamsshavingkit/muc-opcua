@@ -5,9 +5,13 @@
 #include "muc_opcua/config.h"
 #include "muc_opcua/opcua_types.h"
 #include "muc_opcua/platform.h"
-#include "muc_opcua/status.h"
 #include <stdbool.h>
 #include <stddef.h>
+
+/* Bounded cap for OPC UA role NodeIds per session (matches MU_JWT_MAX_ROLES
+   from include/muc_opcua/authorization/jwt.h; duplicated here to avoid pulling
+   the authorization header into the session layer). */
+#define MU_SESSION_MAX_ROLES 8
 
 typedef enum { MU_SESSION_STATE_CLOSED = 0, MU_SESSION_STATE_CREATED, MU_SESSION_STATE_ACTIVATED } mu_session_state_t;
 
@@ -24,14 +28,21 @@ typedef struct {
 #ifdef MUC_OPCUA_CU_MULTIPLE_CONNECTIONS
     opcua_uint32_t secure_channel_id;
 #endif
-#if MUC_OPCUA_CU_REDUNDANCY
-    /* User-identity fingerprint captured at ActivateSession, for the same-user
-       (ClientValidated) check in TransferSubscriptions (OPC-10000-4 §5.14.1.4 /
-       §6.6.3). kind = the identity-token type (321 anonymous, 324 username, 327
-       x509); the bounded discriminator is the username bytes / cert prefix. */
+#if MUC_OPCUA_CU_REDUNDANCY || MUC_OPCUA_CU_USER_TOKEN_JWT
+    /* User-identity fingerprint captured at ActivateSession (spec 093 FR-006 /
+       OPC-10000-5 §6.4.7). Also used for the same-user (ClientValidated)
+       check in TransferSubscriptions (OPC-10000-4 §5.14.1.4 / §6.6.3).
+       kind = the identity-token type (1 anonymous, 2 username, 3 x509, 4 JWT).
+       For JWT-issued (kind=4), user_identity holds the `sub` claim. */
     opcua_byte_t user_identity_kind;
     opcua_byte_t user_identity_len;
     opcua_byte_t user_identity[64];
+#endif
+#if MUC_OPCUA_CU_REDUNDANCY || MUC_OPCUA_CU_USER_TOKEN_JWT
+    /* Role NodeIds carried by the JWT (spec 093 US3). Stored so the session
+       diagnostics and authorization layer can act on them without re-parsing. */
+    opcua_uint32_t session_roles[MU_SESSION_MAX_ROLES];
+    opcua_byte_t session_role_count;
 #endif
 } mu_session_t;
 

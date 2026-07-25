@@ -158,3 +158,53 @@
 ### Suggested MVP Scope
 
 Phase 1 + 2 + 3 = working JWT session activation with single issuer. This is independently shippable and testable.
+
+---
+
+## Phase 8: Convergence Remediation
+
+**Purpose**: Close the implementation and verification gaps found by the post-implementation convergence assessment. Tests precede each behavior change.
+
+### Authorization Service address-space gating
+
+- [x] T038 [P] Add type-system tests in `tests/unit/test_type_system.c` proving NodeIds 17852-17855, their NodeClasses, DataTypes, PropertyType references, and Mandatory modelling rules are present only when `MUC_OPCUA_CU_AUTHORIZATION_SERVICE_SERVER` is enabled per OPC-10000-12 §9.7.4 Table 158 and spec.md FR-009/OPC-005
+- [x] T039 Implement NodeIds 17853 `ServiceUri`, 17854 `ServiceCertificate`, and 17855 `IssuerEndpointUrl`, and gate NodeIds 17852-17855 on `MUC_OPCUA_CU_AUTHORIZATION_SERVICE_SERVER` in `src/address_space/base_nodes.c` per OPC-10000-12 §9.7.4 Table 158 and spec.md FR-009/OPC-005
+
+### JWT endpoint advertisement
+
+- [x] T040 [P] Add discovery tests in `tests/unit/test_discovery_services.c` proving JWT-enabled endpoints advertise an IssuedToken policy with token type URI `urn:ietf:params:oauth:token-type:jwt`, while JWT-disabled endpoints do not, per OPC-10000-4 §7.40.2.1, OPC-10000-6 §5.2.3, and spec.md FR-002/OPC-003
+- [x] T041 Advertise the JWT IssuedToken policy without displacing existing Anonymous/UserName policies by updating policy storage and population in `src/services/discovery.h` and `src/services/discovery.c` per OPC-10000-4 §7.40.2.1, OPC-10000-6 §5.2.3, and spec.md FR-002/OPC-003
+
+### JWT identity, roles, and key selection
+
+- [x] T042 [P] Extend `tests/integration/test_jwt_activate_session.c` to assert that successful activation persists the JWT `sub` identity when redundancy is disabled and exposes that identity through session diagnostics per OPC-10000-5 §6.3.5/§6.4.7 and spec.md FR-006/SC-005
+- [x] T043 Persist the validated JWT `sub` into session identity independently of `MUC_OPCUA_CU_REDUNDANCY` in `src/core/service_dispatch/activate_session.c` per OPC-10000-5 §6.4.7 and spec.md FR-006/SC-005
+- [x] T044 [P] Add JWT claim-scanner tests for a bounded array of OPC UA role NodeIds and malformed/over-capacity role claims in `tests/unit/test_jwt_claims.c` per RFC 7519 §4 and spec.md US3 Acceptance Scenario 1
+- [x] T045 [P] Extend `tests/integration/test_jwt_activate_session.c` to prove validated role NodeIds reach the active session and its diagnostics per OPC-10000-5 §6.3.5 and spec.md US1/US3 Acceptance Scenario 1
+- [x] T046 Parse the optional OPC UA role-claim array into bounded `mu_jwt_claims_t` storage in `include/muc_opcua/authorization/jwt.h`, `src/cu/core_2022_server/authorization/claim_scanner.h`, and `src/cu/core_2022_server/authorization/claim_scanner.c` per RFC 7519 §4 and spec.md US3 Acceptance Scenario 1
+- [x] T047 Map validated JWT role NodeIds into the session's RoleSet authorization state in `src/core/service_dispatch/activate_session.c` per spec.md US1 Acceptance Scenario 1 and US3 Acceptance Scenario 1
+- [x] T048 Expose JWT user identity and mapped roles from active sessions in `src/cu/core_2022_server/diagnostics/diagnostics.c` per OPC-10000-5 §6.3.5 and spec.md SC-005/US3 Acceptance Scenario 1
+- [x] T049 [P] Add JWT unit tests in `tests/unit/test_jwt.c` proving a known `kid` selects the matching trusted key and an unknown `kid` returns `MU_JWT_ERR_SIGNATURE` per RFC 7515 §4.1.4 and spec.md Edge Cases
+- [x] T050 Add bounded trusted-key identifiers to `mu_jwt_issuer_t`, parse the protected-header `kid`, and reject unmatched key identifiers in `include/muc_opcua/server.h`, `include/muc_opcua/authorization/jwt.h`, and `src/cu/core_2022_server/authorization/jwt.c` per RFC 7515 §4.1.4 and spec.md Edge Cases
+
+### Backend-neutral build gating and size proof
+
+- [x] T051 [P] Add CMake/Kconfig build-matrix coverage proving JWT translation units compile for OpenSSL, mbedTLS, and wolfSSL backends and compile out when `MUC_OPCUA_CU_USER_TOKEN_JWT` is disabled per spec.md FR-008/FR-010/SC-006
+- [x] T052 Gate JWT translation units on `MUC_OPCUA_CU_USER_TOKEN_JWT` rather than `MUC_OPCUA_HAVE_OPENSSL` alone in `src/CMakeLists.txt`, preserving the backend dispatch already implemented in `src/cu/core_2022_server/authorization/crypto_jwt.c`, per spec.md FR-008/FR-010
+- [x] T053 Measure equivalent Standard-profile JWT-on and JWT-off Arm Cortex-M0+ builds with `scripts/measure_size.sh` or an equivalent reproducible target, record the `.text`/`.data` delta, and enforce zero growth when both symbols are off and ≤5 KB `.text` growth when JWT is on per spec.md SC-006/SC-007
+- [x] T054 Rebuild the nano profile and run its complete CTest suite after T038-T053 per spec.md SC-008
+- [x] T055 Rebuild the micro profile and run its complete CTest suite after T038-T053 per spec.md SC-008
+- [x] T056 Rebuild the embedded profile and run its complete CTest suite after T038-T053 per spec.md SC-008
+- [x] T057 Rebuild the standard profile with JWT and Authorization Service enabled and run its complete CTest suite after T038-T053 per spec.md SC-008
+- [x] T058 Rebuild the full profile and run its complete CTest suite after T038-T053 per spec.md SC-008
+
+**T053 footprint evidence (2026-07-25)**: Equivalent Cortex-M0+ Standard-profile
+archive builds used `arm-none-eabi-gcc` with
+`-mcpu=cortex-m0plus -mthumb -flto -ffat-lto-objects`,
+`MUC_OPCUA_PLATFORM=arduino-skeleton`, and `MUC_OPCUA_OPTIMIZE_SIZE=ON`.
+The default Standard baseline and the explicit
+`MUC_OPCUA_CU_USER_TOKEN_JWT=OFF` /
+`MUC_OPCUA_CU_AUTHORIZATION_SERVICE_SERVER=OFF` build both measured
+103,101 B `.text`, 0 B `.data`, and 0 B `.bss` (zero disabled-feature
+growth). Enabling both symbols measured 107,256 B `.text`, 0 B `.data`, and
+0 B `.bss`: a 4,155 B `.text` increase, below the 5 KiB limit.

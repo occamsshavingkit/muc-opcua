@@ -34,6 +34,16 @@ typedef enum {
     MU_JWT_ALG_ES512,    /* ECDSA P-521 SHA-512 */
 } mu_jwt_alg_t;
 
+/* Bounded cap for the OPC UA role NodeIds a single JWT may carry (spec 093
+   US3 / RFC 7519 §4). The role-claim array is parsed into `role_node_ids`;
+   a token that lists more roles than this bound is rejected by the scanner
+   to keep the validator freestanding and the storage fixed-size. */
+#define MU_JWT_MAX_ROLES 8
+
+/* Bounded cap for the trusted key identifiers (`kid` values, RFC 7515
+   §4.1.4) the integrator may pin per issuer for key rotation. */
+#define MU_JWT_MAX_KEY_IDS 4
+
 /* A single trusted OAuth2 issuer configuration (data-model.md §mu_jwt_issuer_t).
    The server stores an array of these in the server config; the validator
    matches the JWT `iss` claim against `issuer_url` and uses the rest of the
@@ -45,11 +55,25 @@ typedef struct {
     const char *expected_audience;     /* `aud` claim value to match */
     opcua_uint32_t clock_skew_seconds; /* tolerance for exp/nbf checks */
     mu_jwt_alg_t alg;                  /* expected signing algorithm */
+    /* Optional bounded list of trusted key identifiers (RFC 7515 §4.1.4
+       `kid` protected-header parameter). When `key_id_count` > 0, a JWT
+       whose decoded header carries a `kid` that does not match any entry
+       is rejected with MU_JWT_ERR_SIGNATURE without invoking the crypto
+       backend. When 0, the `kid` is not enforced (key selection falls back
+       to `public_key`). Each entry is a NUL-terminated C string; the
+       scanner compares it byte-for-byte against the decoded `kid`. */
+    const char *const *key_ids;
+    opcua_byte_t key_id_count;
 } mu_jwt_issuer_t;
 
 /* Claims extracted from a validated JWT (data-model.md §mu_jwt_claims_t).
    String fields are fixed-size; values longer than the buffer are truncated.
-   `sub` MUST be non-empty for the token to be considered valid. */
+   `sub` MUST be non-empty for the token to be considered valid.
+
+   `role_node_ids` / `role_count` carry the optional OPC UA role claim
+   (spec 093 US3). The scanner parses numeric namespace-0 role NodeIds from
+   a JSON array; the array is rejected (role_count left at 0) if it is
+   malformed or lists more than MU_JWT_MAX_ROLES entries. */
 typedef struct {
     char sub[128];
     char iss[128];
@@ -57,6 +81,9 @@ typedef struct {
     opcua_int64_t exp; /* 0 if absent -> caller treats as error */
     opcua_int64_t nbf; /* 0 if absent -> no not-before check */
     opcua_int64_t iat; /* 0 if absent */
+    opcua_uint32_t role_node_ids[MU_JWT_MAX_ROLES];
+    opcua_byte_t role_count;
+    opcua_byte_t role_overflow;
 } mu_jwt_claims_t;
 
 /* Validation result codes (data-model.md §mu_jwt_result_t). */

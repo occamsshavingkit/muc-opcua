@@ -465,6 +465,31 @@ static void assert_type_decls(opcua_uint32_t type_id, opcua_uint32_t ref_kind, o
     }
 }
 
+/* spec 093 convergence T038: OPC-10000-12 section 9.7.4 Table 158.
+   AuthorizationServiceConfigurationType and its three Mandatory PropertyType
+   declarations are owned by CU Authorization Service Configuration Server and
+   must disappear together when that CU is disabled. */
+static void test_authorization_service_configuration_type_is_cu_gated(void) {
+#if MUC_OPCUA_CU_AUTHORIZATION_SERVICE_SERVER
+    static const mu_type_decl_t declarations[] = {
+        {17853u, "ServiceUri", 12u, -1},
+        {17854u, "ServiceCertificate", 15u, -1},
+        {17855u, "IssuerEndpointUrl", 12u, -1},
+    };
+
+    assert_node(17852u, MU_NODECLASS_OBJECTTYPE, "AuthorizationServiceConfigurationType");
+    TEST_ASSERT_TRUE(has_forward_ref(58u, 45u, 17852u));
+    assert_type_decls(17852u, 46u, 78u, 68u, declarations,
+                      sizeof(declarations) / sizeof(declarations[0]));
+#else
+    TEST_ASSERT_NULL(base_node(17852u));
+    TEST_ASSERT_NULL(base_node(17853u));
+    TEST_ASSERT_NULL(base_node(17854u));
+    TEST_ASSERT_NULL(base_node(17855u));
+    TEST_ASSERT_FALSE(has_forward_ref(58u, 45u, 17852u));
+#endif
+}
+
 /* spec 090 (CU 5801 Part B): OperationLimitsType(11564)'s 12 own Optional
    Property InstanceDeclarations, formally defined in OPC-10000-5 §6.3.11
    Table 20. NodeIds grounded against the official OPC Foundation NodeIds.csv
@@ -959,6 +984,7 @@ int main(void) {
     RUN_TEST(test_server_redundancy_type_instance_declarations);
     RUN_TEST(test_servertype_datatype_refs_not_dangling);
 #endif
+    RUN_TEST(test_authorization_service_configuration_type_is_cu_gated);
 #elif MUC_OPCUA_BASE_NODES
     RUN_TEST(test_default_build_keeps_types_folder_unexpanded);
 #endif

@@ -127,6 +127,19 @@ static void make_payload_with_raw_sub(char *buf, size_t buf_max, const char *sub
     (void)n;
 }
 
+/* Build a payload that additionally carries a raw JSON value for the OPC UA
+ * `roles` claim (already serialised by the caller, including any surrounding
+ * array brackets). spec 093 US3 / spec.md Edge Cases. */
+static void make_payload_with_roles(char *buf, size_t buf_max, const char *sub_value_quoted,
+                                    const char *roles_raw_json) {
+    int n = snprintf(buf, buf_max,
+                     "{\"iss\":\"https://auth.example.com\",\"sub\":%s,\"aud\":\"opcua-server\","
+                     "\"exp\":%lld,\"iat\":%lld,\"roles\":%s}",
+                     sub_value_quoted, (long long)TEST_EXP, (long long)TEST_NOW, roles_raw_json);
+    TEST_ASSERT_TRUE((size_t)n < buf_max);
+    (void)n;
+}
+
 void setUp(void) {
     if (s_key == NULL) {
         EVP_PKEY_CTX *pctx = EVP_PKEY_CTX_new_id(EVP_PKEY_RSA, NULL);
@@ -255,7 +268,7 @@ void test_sub_with_json_escapes_is_unescaped(void) {
 }
 
 /* Subject absent entirely from the payload (different from empty) -- the
- * scanner leaves claims.sub[0]=='\0', validator rejects with NO_SUB. */
+   scanner leaves claims.sub[0]=='\0', validator rejects with NO_SUB. */
 void test_sub_absent_is_rejected(void) {
     char payload[512];
     int n = snprintf(payload, sizeof(payload),
@@ -275,6 +288,94 @@ void test_sub_absent_is_rejected(void) {
     TEST_ASSERT_EQUAL(MU_JWT_ERR_NO_SUB, mu_jwt_validate(jwt, jwt_len, &issuer, 1, TEST_NOW, &claims));
 }
 
+/* A bounded numeric role-claim array populates claims.role_node_ids in order
+ * and sets role_count to the number of entries. spec 093 US3 / RFC 7519 §4. */
+void test_roles_bounded_array_is_parsed(void) {
+    char payload[640];
+    make_payload_with_roles(payload, sizeof(payload), "\"operator1\"", "[15620,15621,15807]");
+
+    char jwt[2048];
+    size_t jwt_len = build_jwt_rs256(s_header, payload, s_key, jwt, sizeof(jwt));
+
+    mu_jwt_issuer_t issuer;
+    make_issuer(&issuer);
+
+    mu_jwt_claims_t claims;
+    TEST_ASSERT_EQUAL(MU_JWT_OK, mu_jwt_validate(jwt, jwt_len, &issuer, 1, TEST_NOW, &claims));
+    TEST_ASSERT_EQUAL(3, (int)claims.role_count);
+    TEST_ASSERT_EQUAL_UINT32(15620u, claims.role_node_ids[0]);
+    TEST_ASSERT_EQUAL_UINT32(15621u, claims.role_node_ids[1]);
+    TEST_ASSERT_EQUAL_UINT32(15807u, claims.role_node_ids[2]);
+    TEST_ASSERT_EQUAL(0, (int)claims.role_overflow);
+}
+
+/* An empty roles array is valid -- role_count stays at zero, no overflow. */
+void test_roles_empty_array_yields_zero(void) {
+    char payload[640];
+    make_payload_with_roles(payload, sizeof(payload), "\"operator1\"", "[]");
+
+    char jwt[2048];
+    size_t jwt_len = build_jwt_rs256(s_header, payload, s_key, jwt, sizeof(jwt));
+
+    mu_jwt_issuer_t issuer;
+    make_issuer(&issuer);
+
+    mu_jwt_claims_t claims;
+    TEST_ASSERT_EQUAL(MU_JWT_OK, mu_jwt_validate(jwt, jwt_len, &issuer, 1, TEST_NOW, &claims));
+    TEST_ASSERT_EQUAL(0, (int)claims.role_count);
+    TEST_ASSERT_EQUAL(0, (int)claims.role_overflow);
+}
+
+/* A non-numeric element in the roles array is malformed -- the validator
+ * rejects the whole token with MU_JWT_ERR_MALFORMED (spec 093 Edge Cases). */
+void test_roles_non_numeric_element_is_rejected(void) {
+    char payload[640];
+    make_payload_with_roles(payload, sizeof(payload), "\"operator1\"", "[15620,\"not-a-number\"]");
+
+    char jwt[2048];
+    size_t jwt_len = build_jwt_rs256(s_header, payload, s_key, jwt, sizeof(jwt));
+
+    mu_jwt_issuer_t issuer;
+    make_issuer(&issuer);
+
+    mu_jwt_claims_t claims;
+    TEST_ASSERT_EQUAL(MU_JWT_ERR_MALFORMED, mu_jwt_validate(jwt, jwt_len, &issuer, 1, TEST_NOW, &claims));
+}
+
+/* Listing more roles than MU_JWT_MAX_ROLES overflows the bounded store -- the
+ * scanner sets role_overflow and the validator rejects with MALFORMED. */
+void test_roles_over_capacity_is_rejected(void) {
+    char payload[768];
+    make_payload_with_roles(payload, sizeof(payload), "\"operator1\"",
+                            "[1,2,3,4,5,6,7,8,9]");
+
+    char jwt[2048];
+    size_t jwt_len = build_jwt_rs256(s_header, payload, s_key, jwt, sizeof(jwt));
+
+    mu_jwt_issuer_t issuer;
+    make_issuer(&issuer);
+
+    mu_jwt_claims_t claims;
+    TEST_ASSERT_EQUAL(MU_JWT_ERR_MALFORMED, mu_jwt_validate(jwt, jwt_len, &issuer, 1, TEST_NOW, &claims));
+}
+
+/* A token without a roles claim parses normally; role_count/overflow stay 0. */
+void test_roles_absent_leaves_zero(void) {
+    char payload[512];
+    make_payload_with_raw_sub(payload, sizeof(payload), "\"operator1\"");
+
+    char jwt[1600];
+    size_t jwt_len = build_jwt_rs256(s_header, payload, s_key, jwt, sizeof(jwt));
+
+    mu_jwt_issuer_t issuer;
+    make_issuer(&issuer);
+
+    mu_jwt_claims_t claims;
+    TEST_ASSERT_EQUAL(MU_JWT_OK, mu_jwt_validate(jwt, jwt_len, &issuer, 1, TEST_NOW, &claims));
+    TEST_ASSERT_EQUAL(0, (int)claims.role_count);
+    TEST_ASSERT_EQUAL(0, (int)claims.role_overflow);
+}
+
 int main(void) {
     UNITY_BEGIN();
     RUN_TEST(test_sub_short_ascii_is_extracted);
@@ -283,6 +384,11 @@ int main(void) {
     RUN_TEST(test_sub_exactly_127_chars_is_accepted);
     RUN_TEST(test_sub_with_json_escapes_is_unescaped);
     RUN_TEST(test_sub_absent_is_rejected);
+    RUN_TEST(test_roles_bounded_array_is_parsed);
+    RUN_TEST(test_roles_empty_array_yields_zero);
+    RUN_TEST(test_roles_non_numeric_element_is_rejected);
+    RUN_TEST(test_roles_over_capacity_is_rejected);
+    RUN_TEST(test_roles_absent_leaves_zero);
     return UNITY_END();
 }
 

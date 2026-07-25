@@ -28,6 +28,13 @@ extern "C" {
  * The scanner handles a flat JSON object only. Nested objects/arrays (e.g.
  * `aud` as an array) are handled defensively: a JSON array of strings sets the
  * output to the first element.
+ *
+ * The optional OPC UA role claim (spec 093 US3) is parsed from a JSON array
+ * of numeric namespace-0 NodeIds. Up to MU_JWT_MAX_ROLES entries land in
+ * `out->role_node_ids`; `out->role_count` records how many were stored.
+ * A malformed array, a non-numeric element, or an array with more entries
+ * than the bound sets `out->role_overflow = 1` and `out->role_count = 0`
+ * so the caller can reject the token (per spec.md Edge Cases).
  */
 void mu_claim_scan(const char *json, size_t json_len, mu_jwt_claims_t *out);
 
