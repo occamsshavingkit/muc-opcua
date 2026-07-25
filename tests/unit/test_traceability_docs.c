@@ -9,7 +9,7 @@
 void setUp(void) {}
 void tearDown(void) {}
 
-static char files_to_sections_content[65536];
+static char files_to_sections_content[131072];
 static char sections_to_files_content[65536];
 static char optimize_hot_paths_content[131072];
 static char feature_023_content[65536];
