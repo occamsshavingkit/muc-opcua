@@ -4,14 +4,6 @@
 
 #ifdef MUC_OPCUA_CU_DISCOVERY_GET_ENDPOINTS
 
-static bool getendpoints_endpoint_matches(const mu_string_t *endpoint_url, const mu_endpoint_description_t *endpoint) {
-    if (endpoint_url == NULL || endpoint_url->length <= 0) {
-        return true;
-    }
-
-    return endpoint != NULL && string_matches_cstr(endpoint_url, endpoint->endpoint_url);
-}
-
 static opcua_statuscode_t endpoint_matches_profile_filter(mu_binary_reader_t *r,
                                                           const mu_endpoint_description_t *endpoint, bool *matches) {
     opcua_int32_t profile_count;
@@ -120,6 +112,7 @@ opcua_statuscode_t handle_get_endpoints(mu_server_t *server, mu_binary_reader_t 
     if (s != MU_STATUS_GOOD) {
         return s;
     }
+    (void)endpoint_url;
 
     mu_string_t requested_locale;
     s = read_requested_locale_ids(r, &requested_locale);
@@ -193,7 +186,7 @@ opcua_statuscode_t handle_get_endpoints(mu_server_t *server, mu_binary_reader_t 
                 }
             }
         }
-        if (matches && getendpoints_endpoint_matches(&endpoint_url, &eps[i])) {
+        if (matches) {
             include[i] = true;
             ++filtered_count;
         }

@@ -442,27 +442,37 @@ void test_getendpoints_scn001_case001_opc_cu_2328_endpoint_url_match_returns_exa
     assert_local_none_endpoint(&endpoint);
 }
 
-void test_getendpoints_scn001_case001_opc_cu_2328_endpoint_url_filter_excludes_nonmatching_endpoint(void) {
+void test_getendpoints_scn001_case001_opc_cu_2328_endpoint_url_variations_return_local_endpoint(void) {
     mu_server_t server;
     discovery_server(&server);
 
-    opcua_byte_t req[256];
-    size_t req_len = build_getendpoints_request_with_endpoint_url(req, sizeof(req), "opc.tcp://otherhost:4840", NULL);
-    opcua_byte_t resp[1024];
-    size_t resp_len = sizeof(resp);
+    static const char *const endpoint_urls[] = {
+        "opc.tcp://gateway.example:51210",
+        "OPC.TCP://LOCALHOST:4840",
+        "opc.tcp://127.0.0.1:4841",
+    };
 
-    TEST_ASSERT_EQUAL(MU_STATUS_GOOD,
-                      mu_service_dispatch(&server, MU_ID_GETENDPOINTSREQUEST, req, req_len, resp, &resp_len));
+    for (size_t i = 0; i < sizeof(endpoint_urls) / sizeof(endpoint_urls[0]); ++i) {
+        opcua_byte_t req[256];
+        size_t req_len = build_getendpoints_request_with_endpoint_url(req, sizeof(req), endpoint_urls[i], NULL);
+        opcua_byte_t resp[1024];
+        size_t resp_len = sizeof(resp);
 
-    /* SCN-001 / CASE-001 / opc_cu_2328: OPC-10000-4 section 5.5.4.2 defines
-       endpointUrl as a GetEndpoints request filter; a nonmatching URL excludes
-       endpoints from Endpoints[] without changing the Good service result. */
-    TEST_ASSERT_EQUAL_INT32(0, endpoint_count(resp, resp_len));
+        TEST_ASSERT_EQUAL(MU_STATUS_GOOD,
+                          mu_service_dispatch(&server, MU_ID_GETENDPOINTSREQUEST, req, req_len, resp, &resp_len));
+
+        /* SCN-001 / CASE-001 / opc_cu_2328: OPC-10000-4 section 5.5.4.2
+           uses endpointUrl to determine returned URLs. An unrecognized
+           HostName falls back to a suitable default rather than filtering. */
+        parsed_endpoint_t endpoint;
+        read_first_endpoint(resp, resp_len, 1, &endpoint);
+        assert_local_none_endpoint(&endpoint);
+    }
 }
 
 void test_getendpoints_scn001_case001_opc_cu_2328_endpoint_url_and_profile_uri_match_returns_one_local_endpoint(void) {
-    /* SCN-001 / CASE-001 / opc_cu_2328: OPC-10000-4 section 5.5.4.2 filters
-       endpointUrl and profileUris[] together before returning Endpoints[]. */
+    /* SCN-001 / CASE-001 / opc_cu_2328: OPC-10000-4 section 5.5.4.2 uses
+       endpointUrl for returned URLs and profileUris[] as the endpoint filter. */
     mu_server_t server;
     discovery_server(&server);
 
@@ -546,7 +556,7 @@ int main(void) {
     RUN_TEST(test_getendpoints_scn001_case001_opc_cu_2328_profile_uri_match_returns_local_endpoint_details);
     RUN_TEST(test_getendpoints_scn001_case001_opc_cu_2328_profile_uri_mismatch_returns_empty_array);
     RUN_TEST(test_getendpoints_scn001_case001_opc_cu_2328_endpoint_url_match_returns_exactly_local_endpoint);
-    RUN_TEST(test_getendpoints_scn001_case001_opc_cu_2328_endpoint_url_filter_excludes_nonmatching_endpoint);
+    RUN_TEST(test_getendpoints_scn001_case001_opc_cu_2328_endpoint_url_variations_return_local_endpoint);
     RUN_TEST(
         test_getendpoints_scn001_case001_opc_cu_2328_endpoint_url_and_profile_uri_match_returns_one_local_endpoint);
     RUN_TEST(test_getendpoints_locale_filter_returns_server_application_name_in_requested_locale);
