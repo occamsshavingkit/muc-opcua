@@ -148,8 +148,7 @@ static void test_arrayitemtype(void) {
     const mu_node_t *array_item = find(12021);
     TEST_ASSERT_NOT_NULL(array_item);
     TEST_ASSERT_EQUAL(MU_NODECLASS_VARIABLETYPE, array_item->node_class);
-    TEST_ASSERT_TRUE_MESSAGE(has_ref(find(2365), ND_HASSUBTYPE, 12021),
-                             "DataItemType HasSubtype-> ArrayItemType");
+    TEST_ASSERT_TRUE_MESSAGE(has_ref(find(2365), ND_HASSUBTYPE, 12021), "DataItemType HasSubtype-> ArrayItemType");
 }
 #endif /* MUC_OPCUA_DATA_ACCESS */
 

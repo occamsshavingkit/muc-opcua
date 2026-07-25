@@ -303,16 +303,18 @@ static opcua_statuscode_t handle_get_certificate_groups(mu_server_t *server, voi
     (void)memset(&output_args[0], 0, sizeof(output_args[0]));
     output_args[0].type = MU_TYPE_NODEID;
     output_args[0].is_array = true;
-    output_args[0].array_length = (opcua_int32_t)(sizeof(s_default_certificate_group_ids) /
-                                                  sizeof(s_default_certificate_group_ids[0]));
+    output_args[0].array_length =
+        (opcua_int32_t)(sizeof(s_default_certificate_group_ids) / sizeof(s_default_certificate_group_ids[0]));
     output_args[0].value.array = s_default_certificate_group_ids;
     *output_args_count = 1u;
     return MU_STATUS_GOOD;
 }
 
-static opcua_statuscode_t handle_register_application_deferred(
-    mu_server_t *server, void *context, const mu_nodeid_t *object_id, const mu_nodeid_t *method_id,
-    const mu_variant_t *input_args, size_t input_args_count, mu_variant_t *output_args, size_t *output_args_count) {
+static opcua_statuscode_t handle_register_application_deferred(mu_server_t *server, void *context,
+                                                               const mu_nodeid_t *object_id,
+                                                               const mu_nodeid_t *method_id,
+                                                               const mu_variant_t *input_args, size_t input_args_count,
+                                                               mu_variant_t *output_args, size_t *output_args_count) {
     (void)server;
     (void)context;
     (void)object_id;
@@ -363,13 +365,13 @@ opcua_statuscode_t mu_certificate_manager_register(mu_server_t *server) {
     if (s != MU_STATUS_GOOD) {
         return s;
     }
-    s = mu_server_register_method_callback(server, &register_application_id, handle_register_application_deferred,
-                                           NULL, NULL, 0, NULL, 0, true);
+    s = mu_server_register_method_callback(server, &register_application_id, handle_register_application_deferred, NULL,
+                                           NULL, 0, NULL, 0, true);
     if (s != MU_STATUS_GOOD) {
         return s;
     }
-    return mu_server_register_method_callback(server, &get_certificate_groups_id, handle_get_certificate_groups,
-                                              NULL, NULL, 0, NULL, 0, true);
+    return mu_server_register_method_callback(server, &get_certificate_groups_id, handle_get_certificate_groups, NULL,
+                                              NULL, 0, NULL, 0, true);
 }
 
 #endif /* MUC_OPCUA_CU_CERTIFICATE_MANAGER_PULL */

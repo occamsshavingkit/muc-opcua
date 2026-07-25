@@ -1596,7 +1596,7 @@ config MUC_OPCUA_CU_CERTIFICATE_MANAGER_PULL
 config MUC_OPCUA_CU_AUTHORIZATION_SERVICE_SERVER
 	bool "Authorization Service Server"
 	depends on MUC_OPCUA_CU_USER_TOKEN_JWT && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
-	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	default n
 	help
 	  Implementation state: implemented.
 	  OPC source: OPC-10000-7 §CU 1629 -- Authorization Service Server Facet.
