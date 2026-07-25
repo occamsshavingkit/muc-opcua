@@ -2,7 +2,7 @@
 #ifndef MUC_OPCUA_OPCUA_IDS_H
 #define MUC_OPCUA_OPCUA_IDS_H
 
-#include "muc_opcua/opcua_types.h"
+#include "muc_opcua/opcua_types.h" // IWYU pragma: keep
 
 #define MU_ID_FINDSERVERSREQUEST 422
 #define MU_ID_FINDSERVERSRESPONSE 425
@@ -79,10 +79,20 @@
 #define MU_ID_CREATEMONITOREDITEMSRESPONSE 754
 #define MU_ID_MODIFYMONITOREDITEMSREQUEST 763
 #define MU_ID_MODIFYMONITOREDITEMSRESPONSE 766
-#define MU_ID_SETMONITORINGMODEREQUEST 767
-#define MU_ID_SETMONITORINGMODERESPONSE 770
-#define MU_ID_SETTRIGGERINGREQUEST 773
-#define MU_ID_SETTRIGGERINGRESPONSE 776
+/* SetMonitoringMode and SetTriggering use the _Encoding_DefaultBinary Object
+ * NodeIds (the TypeId on the wire), NOT the service-structure DataType NodeIds.
+ * Confirmed against OPC UA NodeSet NodeIds.csv via python-opcua/node-opcua:
+ *   SetMonitoringModeRequest_Encoding_DefaultBinary   = 769  (DataType = 767)
+ *   SetMonitoringModeResponse_Encoding_DefaultBinary  = 772  (DataType = 770)
+ *   SetTriggeringRequest_Encoding_DefaultBinary       = 775  (DataType = 773)
+ *   SetTriggeringResponse_Encoding_DefaultBinary      = 778  (DataType = 776)
+ * Using the DataType NodeIds here made the services unreachable to spec-compliant
+ * clients (CTT saw Bad_ServiceUnsupported). Same bug class as RegisterServer2
+ * (commit 3751c875). */
+#define MU_ID_SETMONITORINGMODEREQUEST 769
+#define MU_ID_SETMONITORINGMODERESPONSE 772
+#define MU_ID_SETTRIGGERINGREQUEST 775
+#define MU_ID_SETTRIGGERINGRESPONSE 778
 #define MU_ID_DELETEMONITOREDITEMSREQUEST 781
 #define MU_ID_DELETEMONITOREDITEMSRESPONSE 784
 #define MU_ID_CREATESUBSCRIPTIONREQUEST 787

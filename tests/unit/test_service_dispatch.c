@@ -1,12 +1,11 @@
 /* tests/unit/test_service_dispatch.c */
-#include "muc_opcua/muc_opcua.h"
 #include "unity.h"
 #include <string.h>
 
 void setUp(void) {}
 void tearDown(void) {}
 
-#include "../../src/core/server_internal.h"
+#include "../../src/core/server_internal.h" // IWYU pragma: keep
 #include "../../src/core/service_dispatch.h"
 #include "../../src/services/session.h"
 
@@ -47,6 +46,49 @@ void test_service_dispatch_known_requests(void) {
     TEST_ASSERT_NOT_NULL(handler);
     TEST_ASSERT_EQUAL(MU_ID_READRESPONSE, handler->response_id);
     TEST_ASSERT_TRUE(handler->requires_session);
+}
+
+void test_set_monitoring_mode_uses_binary_encoding_node_ids(void) {
+    /* OPC-10000-6 defines service dispatch by the DefaultBinary encoding NodeId,
+       not the service structure DataType NodeId. */
+    TEST_ASSERT_EQUAL_UINT32(769u, MU_ID_SETMONITORINGMODEREQUEST);
+    TEST_ASSERT_EQUAL_UINT32(772u, MU_ID_SETMONITORINGMODERESPONSE);
+}
+
+/* The dispatch table keys on each service's _Encoding_DefaultBinary NodeId --
+ * the TypeId a client puts on the wire -- not the request structure's DataType
+ * NodeId. Reachability tests cannot catch a wrong value here because the table
+ * and the client-facing constant are the same macro, so this pins every
+ * subscription/MonitoredItem service encoding id against the OPC UA NodeSet
+ * (NodeIds.csv). Grounded via python-opcua / node-opcua / UnifiedAutomation .NET
+ * SDK references. Regression for issue #302: SetMonitoringMode and
+ * SetTriggering previously used their DataType NodeIds (767/770 and 773/776),
+ * which made both services unreachable to spec-compliant clients. */
+void test_subscription_service_ids_are_binary_encoding_node_ids(void) {
+    TEST_ASSERT_EQUAL_UINT32(751u, MU_ID_CREATEMONITOREDITEMSREQUEST);
+    TEST_ASSERT_EQUAL_UINT32(754u, MU_ID_CREATEMONITOREDITEMSRESPONSE);
+    TEST_ASSERT_EQUAL_UINT32(763u, MU_ID_MODIFYMONITOREDITEMSREQUEST);
+    TEST_ASSERT_EQUAL_UINT32(766u, MU_ID_MODIFYMONITOREDITEMSRESPONSE);
+    TEST_ASSERT_EQUAL_UINT32(769u, MU_ID_SETMONITORINGMODEREQUEST);
+    TEST_ASSERT_EQUAL_UINT32(772u, MU_ID_SETMONITORINGMODERESPONSE);
+    TEST_ASSERT_EQUAL_UINT32(775u, MU_ID_SETTRIGGERINGREQUEST);
+    TEST_ASSERT_EQUAL_UINT32(778u, MU_ID_SETTRIGGERINGRESPONSE);
+    TEST_ASSERT_EQUAL_UINT32(781u, MU_ID_DELETEMONITOREDITEMSREQUEST);
+    TEST_ASSERT_EQUAL_UINT32(784u, MU_ID_DELETEMONITOREDITEMSRESPONSE);
+    TEST_ASSERT_EQUAL_UINT32(787u, MU_ID_CREATESUBSCRIPTIONREQUEST);
+    TEST_ASSERT_EQUAL_UINT32(790u, MU_ID_CREATESUBSCRIPTIONRESPONSE);
+    TEST_ASSERT_EQUAL_UINT32(793u, MU_ID_MODIFYSUBSCRIPTIONREQUEST);
+    TEST_ASSERT_EQUAL_UINT32(796u, MU_ID_MODIFYSUBSCRIPTIONRESPONSE);
+    TEST_ASSERT_EQUAL_UINT32(799u, MU_ID_SETPUBLISHINGMODEREQUEST);
+    TEST_ASSERT_EQUAL_UINT32(802u, MU_ID_SETPUBLISHINGMODERESPONSE);
+    TEST_ASSERT_EQUAL_UINT32(826u, MU_ID_PUBLISHREQUEST);
+    TEST_ASSERT_EQUAL_UINT32(829u, MU_ID_PUBLISHRESPONSE);
+    TEST_ASSERT_EQUAL_UINT32(832u, MU_ID_REPUBLISHREQUEST);
+    TEST_ASSERT_EQUAL_UINT32(835u, MU_ID_REPUBLISHRESPONSE);
+    TEST_ASSERT_EQUAL_UINT32(841u, MU_ID_TRANSFERSUBSCRIPTIONSREQUEST);
+    TEST_ASSERT_EQUAL_UINT32(844u, MU_ID_TRANSFERSUBSCRIPTIONSRESPONSE);
+    TEST_ASSERT_EQUAL_UINT32(847u, MU_ID_DELETESUBSCRIPTIONSREQUEST);
+    TEST_ASSERT_EQUAL_UINT32(850u, MU_ID_DELETESUBSCRIPTIONSRESPONSE);
 }
 
 void test_service_dispatch_unknown_request(void) {
@@ -157,6 +199,8 @@ void test_activate_session_consumes_nonempty_certificates_and_identity_body(void
 int main(void) {
     UNITY_BEGIN();
     RUN_TEST(test_service_dispatch_known_requests);
+    RUN_TEST(test_set_monitoring_mode_uses_binary_encoding_node_ids);
+    RUN_TEST(test_subscription_service_ids_are_binary_encoding_node_ids);
     RUN_TEST(test_service_dispatch_unknown_request);
     RUN_TEST(test_service_dispatch_unsupported_services);
     RUN_TEST(test_activate_session_consumes_nonempty_certificates_and_identity_body);
