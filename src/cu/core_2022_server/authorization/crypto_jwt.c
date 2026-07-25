@@ -308,8 +308,8 @@ opcua_boolean_t mu_crypto_jwt_verify(const opcua_byte_t *signing_input, size_t s
         unsigned char der_buf[280];
         int der_len = raw_ecdsa_to_der(signature, signature_len, der_buf, sizeof(der_buf));
         if (der_len > 0) {
-            return (wc_SignatureVerifyHash(ht, WC_SIGNATURE_TYPE_ECC, hash, (word32)hash_len, der_buf,
-                                           (word32)der_len, public_key_der, (word32)public_key_len) == 0);
+            return (wc_SignatureVerifyHash(ht, WC_SIGNATURE_TYPE_ECC, hash, (word32)hash_len, der_buf, (word32)der_len,
+                                           public_key_der, (word32)public_key_len) == 0);
         }
     }
 #endif

@@ -346,8 +346,7 @@ void test_roles_non_numeric_element_is_rejected(void) {
  * scanner sets role_overflow and the validator rejects with MALFORMED. */
 void test_roles_over_capacity_is_rejected(void) {
     char payload[768];
-    make_payload_with_roles(payload, sizeof(payload), "\"operator1\"",
-                            "[1,2,3,4,5,6,7,8,9]");
+    make_payload_with_roles(payload, sizeof(payload), "\"operator1\"", "[1,2,3,4,5,6,7,8,9]");
 
     char jwt[2048];
     size_t jwt_len = build_jwt_rs256(s_header, payload, s_key, jwt, sizeof(jwt));
