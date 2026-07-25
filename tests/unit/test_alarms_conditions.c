@@ -1,8 +1,11 @@
+#ifdef MUC_OPCUA_SERVICE_ALARMS_CONDITIONS
 #include "core/server_internal.h"
+#endif
 #include "fake_platform.h"
 #include "muc_opcua/server.h"
 #include "muc_opcua/services/alarms_conditions.h"
 #include "unity.h"
+#include <string.h>
 
 static _Alignas(8) opcua_byte_t server_storage[MU_SERVER_STORAGE_BYTES];
 static mu_server_t *server;
@@ -31,6 +34,48 @@ void setUp(void) {
 void tearDown(void) {}
 
 #ifdef MUC_OPCUA_SERVICE_ALARMS_CONDITIONS
+
+static const mu_node_t *find_base_node(opcua_uint32_t id) {
+    mu_nodeid_t node_id = {0, MU_NODEID_NUMERIC, {.numeric = id}};
+    return mu_resolve_node(NULL, NULL, NULL, &node_id);
+}
+
+static void assert_type_node(opcua_uint32_t id, mu_node_class_t node_class, const char *browse_name) {
+    const mu_node_t *node = find_base_node(id);
+    TEST_ASSERT_NOT_NULL(node);
+    TEST_ASSERT_EQUAL(node_class, node->node_class);
+    TEST_ASSERT_EQUAL_INT((int)strlen(browse_name), node->browse_name.length);
+    TEST_ASSERT_EQUAL_MEMORY(browse_name, node->browse_name.data, strlen(browse_name));
+}
+
+/* T221-T224: OPC-10000-9 §§5.5, 5.7, 5.8 and 5.8.17. */
+void test_gauntlet_alarm_type_nodes_resolve(void) {
+    assert_type_node(2782, MU_NODECLASS_OBJECTTYPE, "ConditionType");
+    assert_type_node(2881, MU_NODECLASS_OBJECTTYPE, "AcknowledgeableConditionType");
+    assert_type_node(2915, MU_NODECLASS_OBJECTTYPE, "AlarmConditionType");
+    assert_type_node(2929, MU_NODECLASS_OBJECTTYPE, "ShelvedStateMachineType");
+}
+
+/* T226: the OPC-10000-9 lifecycle model uses the Part 16 state-machine
+ * ObjectTypes and the Part 9 two-state/condition VariableTypes. */
+void test_gauntlet_alarm_lifecycle_type_nodes_resolve(void) {
+    assert_type_node(2307, MU_NODECLASS_OBJECTTYPE, "StateType");
+    assert_type_node(2310, MU_NODECLASS_OBJECTTYPE, "TransitionType");
+    assert_type_node(2771, MU_NODECLASS_OBJECTTYPE, "FiniteStateMachineType");
+    assert_type_node(8995, MU_NODECLASS_VARIABLETYPE, "TwoStateVariableType");
+    assert_type_node(9002, MU_NODECLASS_VARIABLETYPE, "ConditionVariableType");
+}
+
+/* T228/T230/T231: OPC-10000-10 §5.2. ProgramDiagnosticDataType(894)
+ * is retained for compatibility; ProgramDiagnostic2DataType(24033) is its
+ * corrected replacement. NodeId 2378 is ProgramTransitionEventType, not a
+ * distinct "ProgramType". */
+void test_gauntlet_program_type_nodes_resolve(void) {
+    assert_type_node(894, MU_NODECLASS_DATATYPE, "ProgramDiagnosticDataType");
+    assert_type_node(2378, MU_NODECLASS_OBJECTTYPE, "ProgramTransitionEventType");
+    assert_type_node(2391, MU_NODECLASS_OBJECTTYPE, "ProgramStateMachineType");
+    assert_type_node(24033, MU_NODECLASS_DATATYPE, "ProgramDiagnostic2DataType");
+}
 
 void test_mu_alarms_set_active_triggers_event(void) {
     mu_condition_id_t alarm_id;
@@ -112,6 +157,9 @@ void test_mu_alarms_dialog_respond_method(void) {
 int main(void) {
     UNITY_BEGIN();
 #ifdef MUC_OPCUA_SERVICE_ALARMS_CONDITIONS
+    RUN_TEST(test_gauntlet_alarm_type_nodes_resolve);
+    RUN_TEST(test_gauntlet_alarm_lifecycle_type_nodes_resolve);
+    RUN_TEST(test_gauntlet_program_type_nodes_resolve);
     RUN_TEST(test_mu_alarms_set_active_triggers_event);
     RUN_TEST(test_mu_alarms_acknowledge_method_call);
     RUN_TEST(test_mu_alarms_trigger_dialog);

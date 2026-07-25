@@ -543,6 +543,24 @@ static const opcua_byte_t s_str_TrueState[] = "TrueState";
 static const opcua_byte_t s_str_TwoStateDiscreteType[] = "TwoStateDiscreteType";
 static const opcua_byte_t s_str_ValuePrecision[] = "ValuePrecision";
 #endif
+#if MUC_OPCUA_CU_ALARMS_CONDITIONS
+/* Issue #302 type-exploration closure. These standard type nodes provide
+ * metadata only and do not claim the OPC-10000-10 Programs Conformance Unit. */
+static const opcua_byte_t s_str_AcknowledgeableConditionType[] = "AcknowledgeableConditionType";
+static const opcua_byte_t s_str_AlarmConditionType[] = "AlarmConditionType";
+static const opcua_byte_t s_str_BaseEventType[] = "BaseEventType";
+static const opcua_byte_t s_str_ConditionType[] = "ConditionType";
+static const opcua_byte_t s_str_ConditionVariableType[] = "ConditionVariableType";
+static const opcua_byte_t s_str_FiniteStateMachineType[] = "FiniteStateMachineType";
+static const opcua_byte_t s_str_ProgramDiagnosticDataType[] = "ProgramDiagnosticDataType";
+static const opcua_byte_t s_str_ProgramDiagnostic2DataType[] = "ProgramDiagnostic2DataType";
+static const opcua_byte_t s_str_ProgramStateMachineType[] = "ProgramStateMachineType";
+static const opcua_byte_t s_str_ProgramTransitionEventType[] = "ProgramTransitionEventType";
+static const opcua_byte_t s_str_ShelvedStateMachineType[] = "ShelvedStateMachineType";
+static const opcua_byte_t s_str_StateType[] = "StateType";
+static const opcua_byte_t s_str_TransitionType[] = "TransitionType";
+static const opcua_byte_t s_str_TwoStateVariableType[] = "TwoStateVariableType";
+#endif
 #if MUC_OPCUA_CU_DATA_ACCESS || defined(MUC_OPCUA_CU_BASE_INFO_VALUEASTEXT)
 static const opcua_byte_t s_str_ValueAsText[] = "ValueAsText";
 #endif
@@ -3053,6 +3071,16 @@ static const mu_node_t s_base_nodes[] = {
      NULL,
      .type_definition = {0, MU_NODEID_NUMERIC, {76}}},
 #endif
+#if MUC_OPCUA_CU_ALARMS_CONDITIONS
+    {{0, MU_NODEID_NUMERIC, {894}},
+     MU_NODECLASS_DATATYPE,
+     {sizeof(s_str_ProgramDiagnosticDataType) - 1u, s_str_ProgramDiagnosticDataType},
+     {sizeof(s_str_ProgramDiagnosticDataType) - 1u, s_str_ProgramDiagnosticDataType},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0}},
+#endif
     {{0, MU_NODEID_NUMERIC, {2004}},
      MU_NODECLASS_OBJECTTYPE,
      {10, s_str_ServerType},
@@ -3408,6 +3436,16 @@ static const mu_node_t s_base_nodes[] = {
      sizeof(s_non_transparent_redundancy_type_refs) / sizeof(s_non_transparent_redundancy_type_refs[0]),
      NULL,
      .type_definition = {0}},
+#if MUC_OPCUA_CU_ALARMS_CONDITIONS
+    {{0, MU_NODEID_NUMERIC, {2041}},
+     MU_NODECLASS_OBJECTTYPE,
+     {sizeof(s_str_BaseEventType) - 1u, s_str_BaseEventType},
+     {sizeof(s_str_BaseEventType) - 1u, s_str_BaseEventType},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0}},
+#endif
     /* spec 083 (CU 3189): ServerType-tree VariableTypes. Sorted between
        NonTransparentRedundancyType(2039) and Server(2253). */
     {{0, MU_NODEID_NUMERIC, {2137}},
@@ -4453,6 +4491,24 @@ static const mu_node_t s_base_nodes[] = {
      sizeof(s_property_type_ref) / sizeof(s_property_type_ref[0]),
      &s_locale_id_array_value,
      .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+#if MUC_OPCUA_CU_ALARMS_CONDITIONS
+    {{0, MU_NODEID_NUMERIC, {2307}},
+     MU_NODECLASS_OBJECTTYPE,
+     {sizeof(s_str_StateType) - 1u, s_str_StateType},
+     {sizeof(s_str_StateType) - 1u, s_str_StateType},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0}},
+    {{0, MU_NODEID_NUMERIC, {2310}},
+     MU_NODECLASS_OBJECTTYPE,
+     {sizeof(s_str_TransitionType) - 1u, s_str_TransitionType},
+     {sizeof(s_str_TransitionType) - 1u, s_str_TransitionType},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0}},
+#endif
 #if MUC_OPCUA_CU_BASE_INFO_SERVERTYPE && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION && !MUC_OPCUA_CU_DATA_ACCESS
 /* spec 085 (CU 5801): ServerStatusType(2138) own declarations
    SecondsTillShutdown/ShutdownReason (DataAccess-off copy), mirroring the
@@ -4730,6 +4786,24 @@ static const mu_node_t s_base_nodes[] = {
      sizeof(s_da_prop_mandatory_refs) / sizeof(s_da_prop_mandatory_refs[0]),
      NULL,
      .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+#if MUC_OPCUA_CU_ALARMS_CONDITIONS
+    {{0, MU_NODEID_NUMERIC, {2378}},
+     MU_NODECLASS_OBJECTTYPE,
+     {sizeof(s_str_ProgramTransitionEventType) - 1u, s_str_ProgramTransitionEventType},
+     {sizeof(s_str_ProgramTransitionEventType) - 1u, s_str_ProgramTransitionEventType},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0}},
+    {{0, MU_NODEID_NUMERIC, {2391}},
+     MU_NODECLASS_OBJECTTYPE,
+     {sizeof(s_str_ProgramStateMachineType) - 1u, s_str_ProgramStateMachineType},
+     {sizeof(s_str_ProgramStateMachineType) - 1u, s_str_ProgramStateMachineType},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0}},
+#endif
 #if MUC_OPCUA_CU_BASE_INFO_SERVERTYPE && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
 /* spec 085 (CU 5801): ServerStatusType(2138) own declarations
    SecondsTillShutdown/ShutdownReason (DataAccess-on copy; fall inside the
@@ -4843,6 +4917,48 @@ static const mu_node_t s_base_nodes[] = {
      sizeof(s_mandatory_foldertype_refs) / sizeof(s_mandatory_foldertype_refs[0]),
      NULL,
      .type_definition = {0, MU_NODEID_NUMERIC, {61}}},
+#endif
+#if MUC_OPCUA_CU_ALARMS_CONDITIONS
+    {{0, MU_NODEID_NUMERIC, {2771}},
+     MU_NODECLASS_OBJECTTYPE,
+     {sizeof(s_str_FiniteStateMachineType) - 1u, s_str_FiniteStateMachineType},
+     {sizeof(s_str_FiniteStateMachineType) - 1u, s_str_FiniteStateMachineType},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0}},
+    {{0, MU_NODEID_NUMERIC, {2782}},
+     MU_NODECLASS_OBJECTTYPE,
+     {sizeof(s_str_ConditionType) - 1u, s_str_ConditionType},
+     {sizeof(s_str_ConditionType) - 1u, s_str_ConditionType},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0}},
+    {{0, MU_NODEID_NUMERIC, {2881}},
+     MU_NODECLASS_OBJECTTYPE,
+     {sizeof(s_str_AcknowledgeableConditionType) - 1u, s_str_AcknowledgeableConditionType},
+     {sizeof(s_str_AcknowledgeableConditionType) - 1u, s_str_AcknowledgeableConditionType},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0}},
+    {{0, MU_NODEID_NUMERIC, {2915}},
+     MU_NODECLASS_OBJECTTYPE,
+     {sizeof(s_str_AlarmConditionType) - 1u, s_str_AlarmConditionType},
+     {sizeof(s_str_AlarmConditionType) - 1u, s_str_AlarmConditionType},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0}},
+    {{0, MU_NODEID_NUMERIC, {2929}},
+     MU_NODECLASS_OBJECTTYPE,
+     {sizeof(s_str_ShelvedStateMachineType) - 1u, s_str_ShelvedStateMachineType},
+     {sizeof(s_str_ShelvedStateMachineType) - 1u, s_str_ShelvedStateMachineType},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0}},
 #endif
 #if MUC_OPCUA_CU_SUBSCRIPTION_BASIC
     /* CU 3911: AggregateFunctions Folder (i=2997), HasComponent child of
@@ -5315,6 +5431,24 @@ static const mu_node_t s_base_nodes[] = {
      0,
      NULL,
      .type_definition = {0, MU_NODEID_NUMERIC, {76}}},
+#endif
+#if MUC_OPCUA_CU_ALARMS_CONDITIONS
+    {{0, MU_NODEID_NUMERIC, {8995}},
+     MU_NODECLASS_VARIABLETYPE,
+     {sizeof(s_str_TwoStateVariableType) - 1u, s_str_TwoStateVariableType},
+     {sizeof(s_str_TwoStateVariableType) - 1u, s_str_TwoStateVariableType},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0}},
+    {{0, MU_NODEID_NUMERIC, {9002}},
+     MU_NODECLASS_VARIABLETYPE,
+     {sizeof(s_str_ConditionVariableType) - 1u, s_str_ConditionVariableType},
+     {sizeof(s_str_ConditionVariableType) - 1u, s_str_ConditionVariableType},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0}},
 #endif
     {{0, MU_NODEID_NUMERIC, {11238}},
      MU_NODECLASS_VARIABLETYPE,
@@ -7143,6 +7277,16 @@ static const mu_node_t s_base_nodes[] = {
      .type_definition = {0, MU_NODEID_NUMERIC, {68}},
      .value_rank = -1,
      .data_type = 5}, /* UInt16 (OPC-10000-5 §6.3.2 Table 10) */
+#if MUC_OPCUA_CU_ALARMS_CONDITIONS
+    {{0, MU_NODEID_NUMERIC, {24033}},
+     MU_NODECLASS_DATATYPE,
+     {sizeof(s_str_ProgramDiagnostic2DataType) - 1u, s_str_ProgramDiagnostic2DataType},
+     {sizeof(s_str_ProgramDiagnostic2DataType) - 1u, s_str_ProgramDiagnostic2DataType},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0}},
+#endif
     /* spec 085 (CU 5801) Task 4: ServerCapabilitiesType's remaining Optional
        Property declarations (MaxSessions/MaxSubscriptions/MaxMonitoredItems/
        MaxSubscriptionsPerSession/MaxSelectClauseParameters/
