@@ -14,11 +14,11 @@
  * Type-system InstanceDeclarations for the ObjectTypes live in
  * src/address_space/base_nodes.c.
  */
+#include "cert_manager.h"
 #include "core/server_internal.h"
 #include "muc_opcua/address_space.h"
 #include "muc_opcua/services/certificate_manager.h"
 #include "muc_opcua/services/method.h"
-#include "cert_manager.h"
 #include <stddef.h>
 #include <string.h>
 
@@ -78,8 +78,8 @@ static opcua_statuscode_t read_uint32_arg(const mu_variant_t *args, size_t count
 
 /* Extract a NodeId input argument by index. Returns a default NodeId
  * when the argument is missing (optional backward-compatible behavior). */
-static opcua_statuscode_t read_nodeid_arg(const mu_variant_t *args, size_t count, size_t index,
-                                          mu_nodeid_t default_id, mu_nodeid_t *out) {
+static opcua_statuscode_t read_nodeid_arg(const mu_variant_t *args, size_t count, size_t index, mu_nodeid_t default_id,
+                                          mu_nodeid_t *out) {
     if (index >= count) {
         *out = default_id;
         return MU_STATUS_GOOD;

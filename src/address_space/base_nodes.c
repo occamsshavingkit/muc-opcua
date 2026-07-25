@@ -564,15 +564,18 @@ static const mu_reference_t s_root_refs[] = {{{0, MU_NODEID_NUMERIC, {35}}, {0, 
 #endif
 };
 
-static const mu_reference_t s_objects_refs[] = {{{0, MU_NODEID_NUMERIC, {35}}, {0, MU_NODEID_NUMERIC, {2253}}, true},
+static const mu_reference_t s_objects_refs[] = {
+    {{0, MU_NODEID_NUMERIC, {35}}, {0, MU_NODEID_NUMERIC, {2253}}, true},
 #ifdef MUC_OPCUA_CU_BASE_INFO_LOCATIONS_OBJECT
-                                                {{0, MU_NODEID_NUMERIC, {35}}, {0, MU_NODEID_NUMERIC, {31915}}, true},
+    {{0, MU_NODEID_NUMERIC, {35}}, {0, MU_NODEID_NUMERIC, {31915}}, true},
 #endif
 #if MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER
-                                                {{0, MU_NODEID_NUMERIC, {40}}, {0, MU_NODEID_NUMERIC, {61}}, true},
+    {{0, MU_NODEID_NUMERIC, {40}}, {0, MU_NODEID_NUMERIC, {61}}, true},
 #endif
 #if MUC_OPCUA_CU_CERTIFICATE_MANAGER_PULL && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
-                                                {{0, MU_NODEID_NUMERIC, {35}}, {0, MU_NODEID_NUMERIC, {15624}}, true} /* Organizes -> CertificateGroups, OPC-10000-12 §7.8.3.1 and §7.9.2 (FR-002) */
+    {{0, MU_NODEID_NUMERIC, {35}},
+     {0, MU_NODEID_NUMERIC, {15624}},
+     true} /* Organizes -> CertificateGroups, OPC-10000-12 §7.8.3.1 and §7.9.2 (FR-002) */
 #endif
 };
 
@@ -965,7 +968,9 @@ static const mu_reference_t s_base_object_type_refs[] = {
 #endif
 #if MUC_OPCUA_CU_CERTIFICATE_MANAGER_PULL && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
     ,
-    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {15594}}, true} /* HasSubtype -> CertificateDirectoryType, OPC-10000-12 §7.9.2 */
+    {{0, MU_NODEID_NUMERIC, {45}},
+     {0, MU_NODEID_NUMERIC, {15594}},
+     true} /* HasSubtype -> CertificateDirectoryType, OPC-10000-12 §7.9.2 */
 #endif
 #if MUC_OPCUA_CU_USER_TOKEN_JWT && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
     ,
@@ -1535,24 +1540,34 @@ static const mu_reference_t s_certificate_type_refs[] = {
     {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {58}}, false}
 #if MUC_OPCUA_CU_CERTIFICATE_MANAGER_PULL && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
     ,
-    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {12557}}, true}, /* HasSubtype -> ApplicationCertificateType, OPC-10000-12 §7.8.4.2 */
-    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {12558}}, true}, /* HasSubtype -> HttpsCertificateType, OPC-10000-12 §7.8.4.3 */
-    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {15017}}, true}, /* HasSubtype -> UserCertificateType, OPC-10000-12 §7.8.4.4 */
-    {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {12482}}, true},  /* HasComponent -> StartSigningRequest Method (i=12482) */
-    {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {12483}}, true}  /* HasComponent -> StartNewKeyPairRequest Method (i=12483) */
+    {{0, MU_NODEID_NUMERIC, {45}},
+     {0, MU_NODEID_NUMERIC, {12557}},
+     true}, /* HasSubtype -> ApplicationCertificateType, OPC-10000-12 §7.8.4.2 */
+    {{0, MU_NODEID_NUMERIC, {45}},
+     {0, MU_NODEID_NUMERIC, {12558}},
+     true}, /* HasSubtype -> HttpsCertificateType, OPC-10000-12 §7.8.4.3 */
+    {{0, MU_NODEID_NUMERIC, {45}},
+     {0, MU_NODEID_NUMERIC, {15017}},
+     true}, /* HasSubtype -> UserCertificateType, OPC-10000-12 §7.8.4.4 */
+    {{0, MU_NODEID_NUMERIC, {47}},
+     {0, MU_NODEID_NUMERIC, {12482}},
+     true}, /* HasComponent -> StartSigningRequest Method (i=12482) */
+    {{0, MU_NODEID_NUMERIC, {47}},
+     {0, MU_NODEID_NUMERIC, {12483}},
+     true} /* HasComponent -> StartNewKeyPairRequest Method (i=12483) */
 #endif
 };
 #endif
 
 #if MUC_OPCUA_CU_CERTIFICATE_MANAGER_PULL && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
 static const mu_reference_t s_start_signing_request_refs[] = {
-    {{0, MU_NODEID_NUMERIC, {37}}, {0, MU_NODEID_NUMERIC, {80}}, true}, /* HasModellingRule -> Optional */
+    {{0, MU_NODEID_NUMERIC, {37}}, {0, MU_NODEID_NUMERIC, {80}}, true},    /* HasModellingRule -> Optional */
     {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {60001}}, true}, /* HasProperty -> InputArguments */
     {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {60002}}, true}  /* HasProperty -> OutputArguments */
 };
 
 static const mu_reference_t s_start_new_key_pair_request_refs[] = {
-    {{0, MU_NODEID_NUMERIC, {37}}, {0, MU_NODEID_NUMERIC, {80}}, true}, /* HasModellingRule -> Optional */
+    {{0, MU_NODEID_NUMERIC, {37}}, {0, MU_NODEID_NUMERIC, {80}}, true},    /* HasModellingRule -> Optional */
     {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {60003}}, true}, /* HasProperty -> InputArguments */
     {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {60004}}, true}  /* HasProperty -> OutputArguments */
 };
@@ -1561,54 +1576,57 @@ static const mu_reference_t s_app_cert_type_refs[] = {
     {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {12559}}, true},
     {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {15421}}, true},
     {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {12482}}, true},
-    {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {12483}}, true}
-};
+    {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {12483}}, true}};
 static const mu_reference_t s_https_cert_type_refs[] = {
     {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {12556}}, false},
     {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {12482}}, true},
-    {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {12483}}, true}
-};
+    {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {12483}}, true}};
 static const mu_reference_t s_user_cert_type_refs[] = {
     {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {12556}}, false},
     {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {12482}}, true},
-    {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {12483}}, true}
-};
+    {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {12483}}, true}};
 static const mu_reference_t s_rsasha256_cert_type_refs[] = {
     {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {12557}}, false},
     {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {12482}}, true},
-    {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {12483}}, true}
-};
+    {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {12483}}, true}};
 static const mu_reference_t s_rsamin_cert_type_refs[] = {
     {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {12557}}, false},
     {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {12482}}, true},
-    {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {12483}}, true}
-};
+    {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {12483}}, true}};
 static const mu_reference_t s_cert_dir_type_refs[] = {
-    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {58}}, false}
-};
+    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {58}}, false}};
 static const mu_reference_t s_cert_groups_refs[] = {
     {{0, MU_NODEID_NUMERIC, {35}}, {0, MU_NODEID_NUMERIC, {85}}, false}, /* Organizes <- Objects (85), inverse */
-    {{0, MU_NODEID_NUMERIC, {35}}, {0, MU_NODEID_NUMERIC, {15625}}, true}, /* Organizes -> DefaultApplicationGroup (15625), OPC-10000-12 §7.9.2 (FR-002) */
-    {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {15625}}, true}, /* HasComponent -> DefaultApplicationGroup (15625), OPC-10000-12 §7.9.2 (FR-002) */
-    {{0, MU_NODEID_NUMERIC, {35}}, {0, MU_NODEID_NUMERIC, {15626}}, true}, /* Organizes -> DefaultHttpsGroup (15626), OPC-10000-12 §7.9.2 (FR-002) */
-    {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {15626}}, true}, /* HasComponent -> DefaultHttpsGroup (15626), OPC-10000-12 §7.9.2 (FR-002) */
-    {{0, MU_NODEID_NUMERIC, {35}}, {0, MU_NODEID_NUMERIC, {15627}}, true}, /* Organizes -> DefaultUserTokenGroup (15627), OPC-10000-12 §7.9.2 (FR-002) */
-    {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {15627}}, true}  /* HasComponent -> DefaultUserTokenGroup (15627), OPC-10000-12 §7.9.2 (FR-002) */
+    {{0, MU_NODEID_NUMERIC, {35}},
+     {0, MU_NODEID_NUMERIC, {15625}},
+     true}, /* Organizes -> DefaultApplicationGroup (15625), OPC-10000-12 §7.9.2 (FR-002) */
+    {{0, MU_NODEID_NUMERIC, {47}},
+     {0, MU_NODEID_NUMERIC, {15625}},
+     true}, /* HasComponent -> DefaultApplicationGroup (15625), OPC-10000-12 §7.9.2 (FR-002) */
+    {{0, MU_NODEID_NUMERIC, {35}},
+     {0, MU_NODEID_NUMERIC, {15626}},
+     true}, /* Organizes -> DefaultHttpsGroup (15626), OPC-10000-12 §7.9.2 (FR-002) */
+    {{0, MU_NODEID_NUMERIC, {47}},
+     {0, MU_NODEID_NUMERIC, {15626}},
+     true}, /* HasComponent -> DefaultHttpsGroup (15626), OPC-10000-12 §7.9.2 (FR-002) */
+    {{0, MU_NODEID_NUMERIC, {35}},
+     {0, MU_NODEID_NUMERIC, {15627}},
+     true}, /* Organizes -> DefaultUserTokenGroup (15627), OPC-10000-12 §7.9.2 (FR-002) */
+    {{0, MU_NODEID_NUMERIC, {47}},
+     {0, MU_NODEID_NUMERIC, {15627}},
+     true} /* HasComponent -> DefaultUserTokenGroup (15627), OPC-10000-12 §7.9.2 (FR-002) */
 };
 static const mu_reference_t s_default_app_group_refs[] = {
     {{0, MU_NODEID_NUMERIC, {35}}, {0, MU_NODEID_NUMERIC, {15624}}, false},
     {{0, MU_NODEID_NUMERIC, {49}}, {0, MU_NODEID_NUMERIC, {12557}}, true},
     {{0, MU_NODEID_NUMERIC, {49}}, {0, MU_NODEID_NUMERIC, {12559}}, true},
-    {{0, MU_NODEID_NUMERIC, {49}}, {0, MU_NODEID_NUMERIC, {15421}}, true}
-};
+    {{0, MU_NODEID_NUMERIC, {49}}, {0, MU_NODEID_NUMERIC, {15421}}, true}};
 static const mu_reference_t s_default_https_group_refs[] = {
     {{0, MU_NODEID_NUMERIC, {35}}, {0, MU_NODEID_NUMERIC, {15624}}, false},
-    {{0, MU_NODEID_NUMERIC, {49}}, {0, MU_NODEID_NUMERIC, {12558}}, true}
-};
+    {{0, MU_NODEID_NUMERIC, {49}}, {0, MU_NODEID_NUMERIC, {12558}}, true}};
 static const mu_reference_t s_default_user_group_refs[] = {
     {{0, MU_NODEID_NUMERIC, {35}}, {0, MU_NODEID_NUMERIC, {15624}}, false},
-    {{0, MU_NODEID_NUMERIC, {49}}, {0, MU_NODEID_NUMERIC, {15017}}, true}
-};
+    {{0, MU_NODEID_NUMERIC, {49}}, {0, MU_NODEID_NUMERIC, {15017}}, true}};
 #endif
 
 /* ServerCapabilitiesType(2013) HasProperty(46)/HasComponent(47) -> its
@@ -1883,11 +1901,9 @@ static const opcua_byte_t s_arg_key_spec[] = "keySpec";
 
 static const mu_argument_t s_ssr_input_args[] = {
     {{3, s_arg_csr}, {0, MU_NODEID_NUMERIC, {15}}, -1, MU_ARG_NO_DESC},
-    {{18, s_arg_certificate_group_id}, {0, MU_NODEID_NUMERIC, {17}}, -1, MU_ARG_NO_DESC}
-};
+    {{18, s_arg_certificate_group_id}, {0, MU_NODEID_NUMERIC, {17}}, -1, MU_ARG_NO_DESC}};
 static const mu_argument_t s_ssr_output_args[] = {
-    {{9, s_arg_request_id}, {0, MU_NODEID_NUMERIC, {7}}, -1, MU_ARG_NO_DESC}
-};
+    {{9, s_arg_request_id}, {0, MU_NODEID_NUMERIC, {7}}, -1, MU_ARG_NO_DESC}};
 
 static const mu_value_source_t s_ssr_input_value = {
     MU_VALUESOURCE_STATIC,
@@ -1911,23 +1927,21 @@ static const mu_value_source_t s_ssr_output_value = {
  * Output: requestId (UInt32) */
 static const mu_argument_t s_snkp_input_args[] = {
     {{7, s_arg_key_spec}, {0, MU_NODEID_NUMERIC, {15}}, -1, MU_ARG_NO_DESC},
-    {{18, s_arg_certificate_group_id}, {0, MU_NODEID_NUMERIC, {17}}, -1, MU_ARG_NO_DESC}
-};
+    {{18, s_arg_certificate_group_id}, {0, MU_NODEID_NUMERIC, {17}}, -1, MU_ARG_NO_DESC}};
 static const mu_argument_t s_snkp_output_args[] = {
-    {{9, s_arg_request_id}, {0, MU_NODEID_NUMERIC, {7}}, -1, MU_ARG_NO_DESC}
-};
+    {{9, s_arg_request_id}, {0, MU_NODEID_NUMERIC, {7}}, -1, MU_ARG_NO_DESC}};
 static const mu_value_source_t s_snkp_input_value = {
     MU_VALUESOURCE_STATIC,
     {.static_value = {
          .type = MU_TYPE_EXTENSIONOBJECT, .value = {.array = s_snkp_input_args}, .is_array = true, .array_length = 2}}};
-static const mu_value_source_t s_snkp_output_value = {
-    MU_VALUESOURCE_STATIC,
-    {.static_value = {
-         .type = MU_TYPE_EXTENSIONOBJECT, .value = {.array = s_snkp_output_args}, .is_array = true, .array_length = 1}}};
+static const mu_value_source_t s_snkp_output_value = {MU_VALUESOURCE_STATIC,
+                                                      {.static_value = {.type = MU_TYPE_EXTENSIONOBJECT,
+                                                                        .value = {.array = s_snkp_output_args},
+                                                                        .is_array = true,
+                                                                        .array_length = 1}}};
 #define MU_SNKP_INPUT_VALUE &s_snkp_input_value
 #define MU_SNKP_OUTPUT_VALUE &s_snkp_output_value
 #endif
-
 
 static const mu_reference_t s_server_refs[] = {
     {{0, MU_NODEID_NUMERIC, {47}}, {0, MU_NODEID_NUMERIC, {2254}}, true},
@@ -6344,7 +6358,7 @@ static const mu_node_t s_base_nodes[] = {
      s_rsasha256_cert_type_refs,
      sizeof(s_rsasha256_cert_type_refs) / sizeof(s_rsasha256_cert_type_refs[0]),
      NULL,
-      .type_definition = {0}},
+     .type_definition = {0}},
     {{0, MU_NODEID_NUMERIC, {15017}},
      MU_NODECLASS_OBJECTTYPE,
      {19, s_str_UserCertificateType},
@@ -6412,13 +6426,13 @@ static const mu_node_t s_base_nodes[] = {
      {22, s_str_SetSubscriptionDurable},
      {22, s_str_SetSubscriptionDurable},
      s_optional_method_refs,
-      sizeof(s_optional_method_refs) / sizeof(s_optional_method_refs[0]),
-      NULL,
-      .type_definition = {0}},
+     sizeof(s_optional_method_refs) / sizeof(s_optional_method_refs[0]),
+     NULL,
+     .type_definition = {0}},
 #endif
 #if MUC_OPCUA_CU_BASE_INFO_BASE_TYPES
-     /* CU 3188: Union(12756) abstract DataType (subtype of Structure). Sorted between
-        MaxMonitoredItemsPerCall(11714) and ResendData(12873). */
+    /* CU 3188: Union(12756) abstract DataType (subtype of Structure). Sorted between
+       MaxMonitoredItemsPerCall(11714) and ResendData(12873). */
     {{0, MU_NODEID_NUMERIC, {12756}},
      MU_NODECLASS_DATATYPE,
      {5, s_str_Union},

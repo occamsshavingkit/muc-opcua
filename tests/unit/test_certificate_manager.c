@@ -399,10 +399,8 @@ static void assert_has_reference(const mu_browse_result_t *result, uint32_t expe
         const mu_reference_description_t *ref = &result->references[i];
         if (ref->reference_type_id.namespace_index == 0 &&
             ref->reference_type_id.identifier_type == MU_NODEID_NUMERIC &&
-            ref->reference_type_id.identifier.numeric == expected_ref_type &&
-            ref->is_forward == expected_is_forward &&
-            ref->node_id.namespace_index == 0 &&
-            ref->node_id.identifier_type == MU_NODEID_NUMERIC &&
+            ref->reference_type_id.identifier.numeric == expected_ref_type && ref->is_forward == expected_is_forward &&
+            ref->node_id.namespace_index == 0 && ref->node_id.identifier_type == MU_NODEID_NUMERIC &&
             ref->node_id.identifier.numeric == expected_target_numeric) {
             found = true;
             break;
@@ -410,8 +408,8 @@ static void assert_has_reference(const mu_browse_result_t *result, uint32_t expe
     }
     if (!found) {
         char msg[128];
-        snprintf(msg, sizeof(msg), "Ref type %u (forward: %d) to target %u not found",
-                 expected_ref_type, expected_is_forward, expected_target_numeric);
+        snprintf(msg, sizeof(msg), "Ref type %u (forward: %d) to target %u not found", expected_ref_type,
+                 expected_is_forward, expected_target_numeric);
         TEST_FAIL_MESSAGE(msg);
     }
 }
@@ -445,7 +443,6 @@ void test_certificate_manager_browse_types(void) {
     assert_has_reference(&res_12557, 45, true, 15421);
 }
 
-
 void test_certificate_manager_browse_instances(void) {
     /* Grounding assertions in OPC-10000-12 §7.8.3.1 and §7.9.2 */
     mu_nodeid_t id_85 = {0, MU_NODEID_NUMERIC, {85}};
@@ -464,14 +461,12 @@ void test_certificate_manager_browse_instances(void) {
     assert_has_reference(&res_85, 35, true, 15624);
 
     /* Organizes(35) and HasComponent(47): 15624->15625, 15626, 15627 */
-    mu_browse_result_t res_15624_org =
-        test_browse_forward_with_pool(id_15624, ref_organizes, true, ref_pool, 100);
+    mu_browse_result_t res_15624_org = test_browse_forward_with_pool(id_15624, ref_organizes, true, ref_pool, 100);
     assert_has_reference(&res_15624_org, 35, true, 15625);
     assert_has_reference(&res_15624_org, 35, true, 15626);
     assert_has_reference(&res_15624_org, 35, true, 15627);
 
-    mu_browse_result_t res_15624_comp =
-        test_browse_forward_with_pool(id_15624, ref_hascomponent, true, ref_pool, 100);
+    mu_browse_result_t res_15624_comp = test_browse_forward_with_pool(id_15624, ref_hascomponent, true, ref_pool, 100);
     assert_has_reference(&res_15624_comp, 47, true, 15625);
     assert_has_reference(&res_15624_comp, 47, true, 15626);
     assert_has_reference(&res_15624_comp, 47, true, 15627);
