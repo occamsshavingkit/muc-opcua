@@ -1,5 +1,5 @@
 #ifdef MUC_OPCUA_SERVICE_ALARMS_CONDITIONS
-#include "core/server_internal.h"
+#include "../../src/core/server_internal.h" // IWYU pragma: keep
 #endif
 #include "fake_platform.h"
 #include "muc_opcua/server.h"
