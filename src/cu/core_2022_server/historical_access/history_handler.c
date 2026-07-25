@@ -26,19 +26,6 @@ opcua_statuscode_t handle_history_read(mu_server_t *server, mu_binary_reader_t *
         return s;
     }
 
-    if (!server->config.history_adapter.read_raw_modified) {
-        s = write_response_prefix(w, MU_ID_HISTORYREADRESPONSE, req_header.request_handle, MU_STATUS_BAD_NOTSUPPORTED
-#ifdef MU_RESPONSE_PREFIX_WANTS_SERVER
-                                  ,
-                                  server
-#endif
-        );
-        if (s == MU_STATUS_GOOD) {
-            *response_length = w->position;
-        }
-        return s;
-    }
-
     mu_history_read_result_t results[MU_MAX_HISTORY_NODES_PER_READ];
     mu_datavalue_t dvals[MU_MAX_HISTORY_NODES_PER_READ][10];
     opcua_byte_t continuation_points[MU_MAX_HISTORY_NODES_PER_READ][MU_MAX_HISTORY_READ_CONTINUATION_POINT_LENGTH];
@@ -61,12 +48,16 @@ opcua_statuscode_t handle_history_read(mu_server_t *server, mu_binary_reader_t *
         memset(data_points, 0, sizeof(data_points));
         size_t actual_data_points = 0;
 
-        res->status_code = server->config.history_adapter.read_raw_modified(
-            server->config.history_adapter.context, &node->node_id, req.details.is_read_modified,
-            req.details.start_time, req.details.end_time, req.details.num_values_per_node, req.details.return_bounds,
-            node->continuation_point.data,
-            node->continuation_point.length > 0 ? (size_t)node->continuation_point.length : 0, continuation_points[i],
-            &cp_out_length, data_points, 10, &actual_data_points);
+        if (!server->config.history_adapter.read_raw_modified) {
+            res->status_code = MU_STATUS_BAD_HISTORYOPERATIONUNSUPPORTED;
+        } else {
+            res->status_code = server->config.history_adapter.read_raw_modified(
+                server->config.history_adapter.context, &node->node_id, req.details.is_read_modified,
+                req.details.start_time, req.details.end_time, req.details.num_values_per_node, req.details.return_bounds,
+                node->continuation_point.data,
+                node->continuation_point.length > 0 ? (size_t)node->continuation_point.length : 0,
+                continuation_points[i], &cp_out_length, data_points, 10, &actual_data_points);
+        }
 
         if (res->status_code == MU_STATUS_GOOD) {
             if (cp_out_length > 0 && cp_out_length <= sizeof(continuation_points[i])) {
@@ -145,18 +136,20 @@ opcua_statuscode_t handle_history_update(mu_server_t *server, mu_binary_reader_t
 
         if (item->type == MU_HISTORY_UPDATE_TYPE_DATA) {
             if (!server->config.history_adapter.update_data) {
-                res->status_code = MU_STATUS_BAD_NOTSUPPORTED;
+                res->status_code = MU_STATUS_BAD_HISTORYOPERATIONUNSUPPORTED;
                 continue;
             }
 
-            res->num_operation_results = item->body.data.num_values;
             res->status_code = server->config.history_adapter.update_data(
                 server->config.history_adapter.context, &item->body.data.node_id,
                 item->body.data.perform_insert_replace, item->body.data.values, item->body.data.num_values,
                 res->operation_results);
+            if (res->status_code == MU_STATUS_GOOD) {
+                res->num_operation_results = item->body.data.num_values;
+            }
         } else if (item->type == MU_HISTORY_UPDATE_TYPE_DELETE) {
             if (!server->config.history_adapter.delete_raw_modified) {
-                res->status_code = MU_STATUS_BAD_NOTSUPPORTED;
+                res->status_code = MU_STATUS_BAD_HISTORYOPERATIONUNSUPPORTED;
                 continue;
             }
 
