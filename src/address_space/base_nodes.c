@@ -607,9 +607,7 @@ static const mu_reference_t s_objects_refs[] = {
     {{0, MU_NODEID_NUMERIC, {35}},
      {0, MU_NODEID_NUMERIC, {15624}},
      true}, /* Organizes -> CertificateGroups, OPC-10000-12 §7.8.3.1 and §7.9.2 (FR-002) */
-    {{0, MU_NODEID_NUMERIC, {35}},
-     {MU_GDS_NAMESPACE_INDEX, MU_NODEID_NUMERIC, {MU_ID_GDS_DIRECTORY}},
-     true}
+    {{0, MU_NODEID_NUMERIC, {35}}, {MU_GDS_NAMESPACE_INDEX, MU_NODEID_NUMERIC, {MU_ID_GDS_DIRECTORY}}, true}
 #endif
 };
 
@@ -1615,9 +1613,7 @@ static const mu_reference_t s_start_new_key_pair_request_refs[] = {
 };
 static const mu_reference_t s_gds_directory_refs[] = {
     {{0, MU_NODEID_NUMERIC, {35}}, {0, MU_NODEID_NUMERIC, {85}}, false},
-    {{0, MU_NODEID_NUMERIC, {47}},
-     {MU_GDS_NAMESPACE_INDEX, MU_NODEID_NUMERIC, {MU_ID_GDS_REGISTER_APPLICATION}},
-     true},
+    {{0, MU_NODEID_NUMERIC, {47}}, {MU_GDS_NAMESPACE_INDEX, MU_NODEID_NUMERIC, {MU_ID_GDS_REGISTER_APPLICATION}}, true},
     {{0, MU_NODEID_NUMERIC, {47}},
      {MU_GDS_NAMESPACE_INDEX, MU_NODEID_NUMERIC, {MU_ID_GDS_GET_CERTIFICATE_GROUPS}},
      true}};
