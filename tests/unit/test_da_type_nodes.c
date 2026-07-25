@@ -141,6 +141,16 @@ static void test_modellingrule_objects_present(void) {
     TEST_ASSERT_EQUAL(MU_NODECLASS_OBJECT, m->node_class);
     TEST_ASSERT_EQUAL(MU_NODECLASS_OBJECT, o->node_class);
 }
+
+/* T218: OPC-10000-8 §5.3.4 ArrayItemType (12021) is a VariableType
+ * reachable as a DataItemType subtype. */
+static void test_arrayitemtype(void) {
+    const mu_node_t *array_item = find(12021);
+    TEST_ASSERT_NOT_NULL(array_item);
+    TEST_ASSERT_EQUAL(MU_NODECLASS_VARIABLETYPE, array_item->node_class);
+    TEST_ASSERT_TRUE_MESSAGE(has_ref(find(2365), ND_HASSUBTYPE, 12021),
+                             "DataItemType HasSubtype-> ArrayItemType");
+}
 #endif /* MUC_OPCUA_DATA_ACCESS */
 
 int main(void) {
@@ -152,6 +162,7 @@ int main(void) {
     RUN_TEST(test_multistatevaluediscrete);
     RUN_TEST(test_analogunittype);
     RUN_TEST(test_modellingrule_objects_present);
+    RUN_TEST(test_arrayitemtype);
 #endif
     return UNITY_END();
 }

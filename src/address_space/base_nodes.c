@@ -527,6 +527,7 @@ static const opcua_byte_t s_str_ServiceLevel[] = "ServiceLevel";
 /* Spec 060: Data Access type-system BrowseNames (OPC-10000-8 §5.3). */
 static const opcua_byte_t s_str_AnalogItemType[] = "AnalogItemType";
 static const opcua_byte_t s_str_AnalogUnitType[] = "AnalogUnitType";
+static const opcua_byte_t s_str_ArrayItemType[] = "ArrayItemType";
 static const opcua_byte_t s_str_BaseAnalogType[] = "BaseAnalogType";
 static const opcua_byte_t s_str_DataItemType[] = "DataItemType";
 static const opcua_byte_t s_str_Definition[] = "Definition";
@@ -1808,6 +1809,7 @@ static const mu_reference_t s_da_prop_optional_refs[] = {
 static const mu_reference_t s_da_data_item_type_refs[] = {
     {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {2372}}, true},
     {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {15318}}, true},
+    {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {12021}}, true},
     {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {2366}}, true},
     {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {2367}}, true}};
 
@@ -6377,6 +6379,16 @@ static const mu_node_t s_base_nodes[] = {
      0,
      NULL,
      .type_definition = {0, MU_NODEID_NUMERIC, {76}}},
+#endif
+#if MUC_OPCUA_CU_DATA_ACCESS
+    {{0, MU_NODEID_NUMERIC, {12021}},
+     MU_NODECLASS_VARIABLETYPE,
+     {sizeof(s_str_ArrayItemType) - 1u, s_str_ArrayItemType},
+     {sizeof(s_str_ArrayItemType) - 1u, s_str_ArrayItemType},
+     NULL,
+     0,
+     NULL,
+     .type_definition = {0}},
 #endif
 #if MUC_OPCUA_CU_BASE_INFO_SERVERTYPE && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
     /* spec 093 (CU 5801): SessionsDiagnosticsSummaryType.<ClientName>(12097)
