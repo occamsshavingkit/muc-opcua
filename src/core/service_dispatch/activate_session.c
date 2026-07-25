@@ -526,11 +526,9 @@ static opcua_statuscode_t verify_and_activate_session(mu_server_t *server, const
         (void)memset(&jwt_claims, 0, sizeof(jwt_claims));
         activate_result = handle_activate_jwt(server, slot, issued_token, &jwt_claims);
         if (activate_result == MU_STATUS_GOOD) {
-            /* Stash the subject on the slot for diagnostics / redundancy. The
-               fingerprint array is 64 bytes; cap the subject to that. The
-               whole block is gated on REDUNDANCY because slot->user_identity
-               is only declared under that guard. */
-#if MUC_OPCUA_CU_REDUNDANCY
+            /* T043: Persist the JWT `sub` claim as session user identity
+               (spec 093 FR-006, OPC-10000-5 §6.4.7). The fingerprint array
+               is 64 bytes; cap the subject to that. */
             size_t sub_len = strlen(jwt_claims.sub);
             if (sub_len > sizeof(slot->user_identity)) {
                 sub_len = sizeof(slot->user_identity);
@@ -539,8 +537,18 @@ static opcua_statuscode_t verify_and_activate_session(mu_server_t *server, const
             slot->user_identity_len = 0;
             (void)memcpy(slot->user_identity, jwt_claims.sub, sub_len);
             slot->user_identity_len = (opcua_byte_t)sub_len;
-#else
-            (void)jwt_claims;
+
+#if MUC_OPCUA_CU_REDUNDANCY || MUC_OPCUA_CU_USER_TOKEN_JWT
+            /* T047: Map validated JWT role NodeIds into the session's
+               role set (spec 093 US3). */
+            opcua_byte_t n = jwt_claims.role_count;
+            if (n > MU_SESSION_MAX_ROLES) {
+                n = MU_SESSION_MAX_ROLES;
+            }
+            slot->session_role_count = n;
+            for (opcua_byte_t ri = 0; ri < n; ri++) {
+                slot->session_roles[ri] = jwt_claims.role_node_ids[ri];
+            }
 #endif
         }
 #else

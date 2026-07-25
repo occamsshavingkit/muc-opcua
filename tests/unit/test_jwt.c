@@ -18,7 +18,7 @@
 #if MUC_OPCUA_CU_USER_TOKEN_JWT
 
 #include "muc_opcua/authorization/jwt.h"
-#include "muc_opcua/muc_opcua.h"
+#include "muc_opcua/muc_opcua.h" // IWYU pragma: keep
 #include "unity.h"
 
 #if defined(MUC_OPCUA_HAVE_OPENSSL)
@@ -397,6 +397,75 @@ void test_jwt_no_configured_issuers_is_rejected(void) {
     TEST_ASSERT_EQUAL(MU_JWT_ERR_NO_CONFIGURED_ISSUERS, r);
 }
 
+/* T049: a JWT whose protected header carries a known `kid` is accepted when
+ * the trusted issuer pins that key id (RFC 7515 §4.1.4 / spec.md Edge Cases). */
+void test_jwt_known_kid_is_accepted(void) {
+    static const char *known_kids[] = {"key-2025-01", "key-2025-02"};
+    char header[160];
+    int hn = snprintf(header, sizeof(header), "{\"alg\":\"RS256\",\"typ\":\"JWT\",\"kid\":\"key-2025-01\"}");
+    TEST_ASSERT_TRUE((size_t)hn < sizeof(header));
+    (void)hn;
+
+    char payload[512];
+    make_payload_exp_aud_sub(payload, sizeof(payload), TEST_EXP, 0, TEST_ISSUER, TEST_AUDIENCE, TEST_SUBJECT);
+
+    char jwt[1600];
+    size_t jwt_len = build_jwt(header, payload, s_signing_key, jwt, sizeof(jwt));
+
+    mu_jwt_issuer_t issuer;
+    make_trusted_issuer(&issuer);
+    issuer.key_ids = known_kids;
+    issuer.key_id_count = 2;
+
+    mu_jwt_claims_t claims;
+    TEST_ASSERT_EQUAL(MU_JWT_OK, mu_jwt_validate(jwt, jwt_len, &issuer, 1, TEST_NOW, &claims));
+}
+
+/* T049: a JWT whose header `kid` is not in the issuer's trusted set is
+ * rejected with MU_JWT_ERR_SIGNATURE without invoking the crypto backend. */
+void test_jwt_unknown_kid_is_rejected_with_signature(void) {
+    static const char *known_kids[] = {"key-2025-01"};
+    char header[160];
+    int hn = snprintf(header, sizeof(header), "{\"alg\":\"RS256\",\"typ\":\"JWT\",\"kid\":\"rotated-away\"}");
+    TEST_ASSERT_TRUE((size_t)hn < sizeof(header));
+    (void)hn;
+
+    char payload[512];
+    make_payload_exp_aud_sub(payload, sizeof(payload), TEST_EXP, 0, TEST_ISSUER, TEST_AUDIENCE, TEST_SUBJECT);
+
+    char jwt[1600];
+    size_t jwt_len = build_jwt(header, payload, s_signing_key, jwt, sizeof(jwt));
+
+    mu_jwt_issuer_t issuer;
+    make_trusted_issuer(&issuer);
+    issuer.key_ids = known_kids;
+    issuer.key_id_count = 1;
+
+    mu_jwt_claims_t claims;
+    TEST_ASSERT_EQUAL(MU_JWT_ERR_SIGNATURE, mu_jwt_validate(jwt, jwt_len, &issuer, 1, TEST_NOW, &claims));
+}
+
+/* T049: when the issuer table pins no kids, the header `kid` is ignored
+ * (key selection falls back to the single pinned public_key). */
+void test_jwt_kid_ignored_when_issuer_table_empty(void) {
+    char header[160];
+    int hn = snprintf(header, sizeof(header), "{\"alg\":\"RS256\",\"typ\":\"JWT\",\"kid\":\"anything\"}");
+    TEST_ASSERT_TRUE((size_t)hn < sizeof(header));
+    (void)hn;
+
+    char payload[512];
+    make_payload_exp_aud_sub(payload, sizeof(payload), TEST_EXP, 0, TEST_ISSUER, TEST_AUDIENCE, TEST_SUBJECT);
+
+    char jwt[1600];
+    size_t jwt_len = build_jwt(header, payload, s_signing_key, jwt, sizeof(jwt));
+
+    mu_jwt_issuer_t issuer;
+    make_trusted_issuer(&issuer);
+
+    mu_jwt_claims_t claims;
+    TEST_ASSERT_EQUAL(MU_JWT_OK, mu_jwt_validate(jwt, jwt_len, &issuer, 1, TEST_NOW, &claims));
+}
+
 int main(void) {
     UNITY_BEGIN();
     RUN_TEST(test_jwt_valid_rs256_token_is_accepted_and_claims_extracted);
@@ -411,6 +480,9 @@ int main(void) {
     RUN_TEST(test_jwt_nbf_in_future_is_rejected);
     RUN_TEST(test_jwt_no_exp_is_rejected);
     RUN_TEST(test_jwt_no_configured_issuers_is_rejected);
+    RUN_TEST(test_jwt_known_kid_is_accepted);
+    RUN_TEST(test_jwt_unknown_kid_is_rejected_with_signature);
+    RUN_TEST(test_jwt_kid_ignored_when_issuer_table_empty);
     return UNITY_END();
 }
 

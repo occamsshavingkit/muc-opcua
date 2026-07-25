@@ -50,7 +50,7 @@ typedef struct {
     mu_message_security_mode_t security_mode;
     const char *security_policy_uri;
 
-    mu_user_token_policy_t user_identity_tokens[2]; /* Anonymous and UserName */
+    mu_user_token_policy_t user_identity_tokens[3]; /* Anonymous, UserName, and JWT */
     size_t num_user_identity_tokens;
 
     const char *transport_profile_uri;

@@ -1,16 +1,16 @@
 /* tests/unit/test_discovery_endpoint.c
  * Discovery services (FindServers, GetEndpoints) are usable on an open
  * SecureChannel without an activated Session (OPC 10000-4 5.5). */
-#include "muc_opcua/muc_opcua.h"
+#include "muc_opcua/muc_opcua.h" // IWYU pragma: keep
 #include "unity.h"
 
 void setUp(void) {}
 void tearDown(void) {}
 
-#include "../../src/core/server_internal.h"
+#include "../../src/core/server_internal.h" // IWYU pragma: keep
 #include "../../src/core/service_dispatch.h"
 #include "../../src/services/discovery.h"
-#include "../../src/services/service_header.h"
+#include "../../src/services/service_header.h" // IWYU pragma: keep
 #include <string.h>
 
 #define TEST_ENDPOINT_URL "opc.tcp://localhost:4840"
@@ -251,12 +251,28 @@ static void read_first_endpoint(const opcua_byte_t *resp, size_t len, opcua_int3
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_uint32(&r, &endpoint->security_mode));
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_string(&r, &endpoint->security_policy_uri));
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_int32(&r, &endpoint->user_identity_token_count));
+#if defined(MUC_OPCUA_CU_USER_TOKEN_JWT) && MUC_OPCUA_CU_USER_TOKEN_JWT
+    TEST_ASSERT_EQUAL_INT32(2, endpoint->user_identity_token_count);
+#else
     TEST_ASSERT_EQUAL_INT32(1, endpoint->user_identity_token_count);
+#endif
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_string(&r, &endpoint->token_policy_id));
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_uint32(&r, &endpoint->token_type));
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_string(&r, &endpoint->token_issued_token_type));
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_string(&r, &endpoint->token_issuer_endpoint_url));
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_string(&r, &endpoint->token_security_policy_uri));
+#if defined(MUC_OPCUA_CU_USER_TOKEN_JWT) && MUC_OPCUA_CU_USER_TOKEN_JWT
+    /* Skip second token (JWT IssuedToken) so stream position matches. */
+    {
+        mu_string_t ign;
+        opcua_uint32_t ign_u32;
+        TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_string(&r, &ign));
+        TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_uint32(&r, &ign_u32));
+        TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_string(&r, &ign));
+        TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_string(&r, &ign));
+        TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_string(&r, &ign));
+    }
+#endif
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_string(&r, &endpoint->transport_profile_uri));
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_binary_read_byte(&r, &endpoint->security_level));
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, r.status);

@@ -13,11 +13,14 @@
  *   OPC-10000-7 CU 1697 -- User Token JWT Server Facet
  *   RFC 7515 §5 / RFC 7519 §4 -- JWS compact serialization, registered claims
  */
-#include "../../src/core/server_internal.h"
-#include "../../src/services/discovery.h"
+#include "../../src/core/server_internal.h" // IWYU pragma: keep
+#if defined(MUC_OPCUA_CU_DIAGNOSTICS)
+#include "../../src/cu/core_2022_server/diagnostics/diagnostics.h"
+#endif
+#include "../../src/services/discovery.h" // IWYU pragma: keep
 #include "fake_platform.h"
 #include "muc_opcua/config.h"
-#include "muc_opcua/muc_opcua.h"
+#include "muc_opcua/muc_opcua.h" // IWYU pragma: keep
 #include "unity.h"
 
 #if MUC_OPCUA_CU_USER_TOKEN_JWT
@@ -246,7 +249,7 @@ static void assert_response_service_result(const opcua_byte_t *buf, size_t len, 
     r.position = 24;
 
     mu_nodeid_t resp_type;
-    opcua_uint64_t ts;
+    opcua_int64_t ts;
     opcua_uint32_t request_handle;
     opcua_statuscode_t service_result;
 
@@ -950,7 +953,9 @@ void test_activate_session_with_valid_jwt_succeeds_over_secure_channel(void) {
     char jwt_buf[1600];
     const char *header = "{\"alg\":\"RS256\",\"typ\":\"JWT\"}";
     char payload[512];
-    int pn = snprintf(payload, sizeof(payload), "{\"iss\":\"%s\",\"sub\":\"%s\",\"aud\":\"%s\",\"exp\":%lld,\"iat\":1}",
+    int pn = snprintf(payload, sizeof(payload),
+                      "{\"iss\":\"%s\",\"sub\":\"%s\",\"aud\":\"%s\",\"exp\":%lld,\"iat\":1,"
+                      "\"roles\":[15620,15807]}",
                       TEST_ISSUER_URL, TEST_SUBJECT, TEST_AUDIENCE, (long long)TEST_EXP_OFFSET_SECONDS);
     TEST_ASSERT_TRUE((size_t)pn < sizeof(payload));
     (void)pn;
@@ -1018,6 +1023,35 @@ void test_activate_session_with_valid_jwt_succeeds_over_secure_channel(void) {
 
     /* Spec 093 SC-001: session MUST have transitioned to Activated. */
     TEST_ASSERT_EQUAL(MU_SESSION_STATE_ACTIVATED, server->sessions[0].state);
+
+    /* T042 (spec 093 FR-006 / SC-005): JWT `sub` claim MUST be persisted
+       as the session user identity. */
+    TEST_ASSERT_EQUAL(4u, server->sessions[0].user_identity_kind);
+    TEST_ASSERT_EQUAL(strlen(TEST_SUBJECT), server->sessions[0].user_identity_len);
+    TEST_ASSERT_EQUAL_MEMORY(TEST_SUBJECT, server->sessions[0].user_identity,
+                             server->sessions[0].user_identity_len);
+
+    TEST_ASSERT_EQUAL(2, server->sessions[0].session_role_count);
+    TEST_ASSERT_EQUAL_UINT32(15620u, server->sessions[0].session_roles[0]);
+    TEST_ASSERT_EQUAL_UINT32(15807u, server->sessions[0].session_roles[1]);
+
+#if defined(MUC_OPCUA_CU_DIAGNOSTICS)
+    opcua_byte_t diagnostics_kind = 0u;
+    opcua_byte_t diagnostics_identity_len = 0u;
+    const opcua_byte_t *diagnostics_identity = NULL;
+    mu_diagnostics_session_identity(&server->sessions[0], &diagnostics_kind, &diagnostics_identity,
+                                    &diagnostics_identity_len);
+    TEST_ASSERT_EQUAL(4u, diagnostics_kind);
+    TEST_ASSERT_EQUAL(strlen(TEST_SUBJECT), diagnostics_identity_len);
+    TEST_ASSERT_EQUAL_MEMORY(TEST_SUBJECT, diagnostics_identity, diagnostics_identity_len);
+    TEST_ASSERT_EQUAL(2, mu_diagnostics_session_role_count(&server->sessions[0]));
+    opcua_uint32_t diagnostics_role = 0u;
+    TEST_ASSERT_TRUE(mu_diagnostics_session_role_id(&server->sessions[0], 0u, &diagnostics_role));
+    TEST_ASSERT_EQUAL_UINT32(15620u, diagnostics_role);
+    TEST_ASSERT_TRUE(mu_diagnostics_session_role_id(&server->sessions[0], 1u, &diagnostics_role));
+    TEST_ASSERT_EQUAL_UINT32(15807u, diagnostics_role);
+    TEST_ASSERT_FALSE(mu_diagnostics_session_role_id(&server->sessions[0], 2u, &diagnostics_role));
+#endif
 
     mu_sym_keys_release_cipher(&c2s);
     mu_sym_keys_release_cipher(&s2c);

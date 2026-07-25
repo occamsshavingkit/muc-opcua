@@ -300,18 +300,17 @@ opcua_boolean_t mu_crypto_jwt_verify(const opcua_byte_t *signing_input, size_t s
     }
 
     if (alg_is_rsa(alg)) {
-        /* Parse DER-encoded RSA public key (SubjectPublicKeyInfo). wolfSSL's
-           wc_RsaPublicKeyDecode expects raw PKCS#1 RSA key, not SPKI. We try
-           wc_SignatureVerify first which handles SPKI directly. */
-        return (wc_SignatureVerify(ht, WC_SIGNATURE_TYPE_RSA_PKCS1, hash, (word32)hash_len, (byte *)signature,
-                                   (word32)signature_len, (byte *)public_key_der, (word32)public_key_len,
-                                   (enum wc_SignatureType)0) == 0);
+        return (wc_SignatureVerifyHash(ht, WC_SIGNATURE_TYPE_RSA_W_ENC, hash, (word32)hash_len, signature,
+                                       (word32)signature_len, public_key_der, (word32)public_key_len) == 0);
     }
 #if defined(MUC_OPCUA_CU_SECURITY_ECC)
     else if (alg_is_ecdsa(alg)) {
-        return (wc_SignatureVerify(ht, WC_SIGNATURE_TYPE_ECC, hash, (word32)hash_len, (byte *)signature,
-                                   (word32)signature_len, (byte *)public_key_der, (word32)public_key_len,
-                                   (enum wc_SignatureType)0) == 0);
+        unsigned char der_buf[280];
+        int der_len = raw_ecdsa_to_der(signature, signature_len, der_buf, sizeof(der_buf));
+        if (der_len > 0) {
+            return (wc_SignatureVerifyHash(ht, WC_SIGNATURE_TYPE_ECC, hash, (word32)hash_len, der_buf,
+                                           (word32)der_len, public_key_der, (word32)public_key_len) == 0);
+        }
     }
 #endif
 

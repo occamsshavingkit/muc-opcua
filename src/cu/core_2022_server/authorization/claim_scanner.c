@@ -197,6 +197,69 @@ static int dispatch_claim(const char *key, const char *json, size_t json_len, si
     return 0;
 }
 
+/* Parse the optional OPC UA role claim (spec 093 US3). Expected shape is a JSON
+   array of numeric namespace-0 NodeIds: `"roles":[15620,15621]`. The parser
+   stores up to MU_JWT_MAX_ROLES entries; on overflow, malformed array syntax,
+   or a non-numeric element, it clears the output and sets role_overflow so the
+   validator can reject the token (spec.md Edge Cases). Returns the new stream
+   position (just past the closing `]`). */
+static size_t handle_roles_claim(const char *json, size_t json_len, size_t value_start, mu_jwt_claims_t *out) {
+    out->role_count = 0;
+    out->role_overflow = 0;
+
+    if (value_start >= json_len || json[value_start] != '[') {
+        return skip_value(json, json_len, value_start);
+    }
+
+    size_t i = value_start + 1;
+    opcua_byte_t stored = 0;
+    int malformed = 0;
+    for (;;) {
+        i = skip_ws(json, json_len, i);
+        if (i >= json_len) {
+            malformed = 1;
+            break;
+        }
+        if (json[i] == ']') {
+            i++;
+            break;
+        }
+        opcua_int64_t v = 0;
+        int n = parse_json_int(json, json_len, i, &v);
+        if (n <= 0 || v < 0 || v > 0xFFFFFFFFLL) {
+            malformed = 1;
+            i = skip_value(json, json_len, value_start);
+            break;
+        }
+        if (stored < MU_JWT_MAX_ROLES) {
+            out->role_node_ids[stored] = (opcua_uint32_t)v;
+            stored++;
+        } else {
+            out->role_overflow = 1;
+        }
+        i = skip_ws(json, json_len, i + (size_t)n);
+        if (i < json_len && json[i] == ',') {
+            i++;
+            continue;
+        }
+        if (i < json_len && json[i] == ']') {
+            i++;
+            break;
+        }
+        malformed = 1;
+        i = skip_value(json, json_len, value_start);
+        break;
+    }
+
+    if (malformed || out->role_overflow) {
+        out->role_count = 0;
+        out->role_overflow = 1;
+        return i;
+    }
+    out->role_count = stored;
+    return i;
+}
+
 void mu_claim_scan(const char *json, size_t json_len, mu_jwt_claims_t *out) {
     if (json == NULL || out == NULL) {
         return;
@@ -248,6 +311,12 @@ void mu_claim_scan(const char *json, size_t json_len, mu_jwt_claims_t *out) {
                 i = new_pos;
                 continue;
             }
+        }
+
+        if (key_len == 5 && json[key_start] == 'r' && json[key_start + 1] == 'o' && json[key_start + 2] == 'l' &&
+            json[key_start + 3] == 'e' && json[key_start + 4] == 's') {
+            i = handle_roles_claim(json, json_len, value_start, out);
+            continue;
         }
 
         i = skip_value(json, json_len, value_start);
