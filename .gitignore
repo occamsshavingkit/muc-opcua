@@ -33,3 +33,4 @@ docs/benchmarks/speed-current.json
 scripts/kconfig/__pycache__/
 profiles/opcua-1.05-api/
 specs/068-opc-named-kconfig-redesign/playbook-opc-api.md
+.omo/

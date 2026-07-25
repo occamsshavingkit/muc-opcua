@@ -334,68 +334,77 @@ opcua_statuscode_t handle_write(mu_server_t *server, mu_binary_reader_t *r, mu_b
         opcua_statuscode_t result = MU_STATUS_GOOD;
         bool handled = false;
 
-        const mu_node_t *node = mu_resolve_node(server->config.address_space, &server->user_address_space_index,
-                                                &server->runtime_base.space, &write_val->node_id);
-        if (!node) {
-            result = MU_STATUS_BAD_NODEIDUNKNOWN;
-        } else if (!write_attribute_is_valid_for_node(node, write_val->attribute_id)) {
-            result = MU_STATUS_BAD_ATTRIBUTEIDINVALID;
-        } else if (write_val->attribute_id != MU_ATTRIBUTEID_VALUE) {
-            result = MU_STATUS_BAD_NOTWRITABLE;
-#ifndef MUC_OPCUA_CU_ATTRIBUTE_WRITE_STATUSCODE_TIMESTAMP
-        } else if (write_val->value.has_status || write_val->value.has_source_timestamp ||
-                   write_val->value.has_source_picoseconds || write_val->value.has_server_timestamp ||
-                   write_val->value.has_server_picoseconds) {
-            result = MU_STATUS_BAD_WRITENOTSUPPORTED;
-#endif
-        } else if (!write_val->value.has_value) {
-            /* OPC-10000-4 section 5.11.4.2: Value Attribute writes require DataValue.value. */
-            result = MU_STATUS_BAD_TYPEMISMATCH;
-        } else if (node->node_class != MU_NODECLASS_VARIABLE) {
-            result = MU_STATUS_BAD_NOTWRITABLE;
-        } else if (write_val->index_range.length > 0) {
-#ifdef MUC_OPCUA_CU_ATTRIBUTE_WRITE_INDEX_RANGE
-            /* opc_cu_3147: bounded partial array update, OPC-10000-4 5.11.4. */
-            result = write_value_index_range(server, node, write_val);
-#else
-            result = MU_STATUS_BAD_WRITENOTSUPPORTED;
-#endif
-            handled = true;
-        } else if (node->value) {
-            /* Check value type is assignable if the variable has a current value.
-             * OPC-10000-4 5.11.4.2 Table 53: subtypes of the Attribute DataType
-             * shall be accepted by the Server. mu_variant_type_is_assignable
-             * encodes that rule (currently exact-match for built-in types,
-             * with infrastructure for TypeDef-based subtypes). */
-            mu_variant_t current_val;
-            s = mu_value_source_read(node->value, &node->node_id, &current_val);
-            if (s == MU_STATUS_GOOD && !mu_variant_type_is_assignable(current_val.type, write_val->value.value.type)) {
-                result = MU_STATUS_BAD_TYPEMISMATCH;
-            }
-        }
-
 #if MUC_OPCUA_CU_AUDITING
-        /* spec 077: capture the pre-write value for the AuditWriteUpdateEvent OldValue,
-           read BEFORE the write mutates it. Non-scalars are dropped to Null downstream. */
         mu_variant_t audit_old_value;
         audit_old_value.type = MU_TYPE_NULL;
-        if (node != NULL && node->value != NULL && write_val->attribute_id == MU_ATTRIBUTEID_VALUE) {
-            mu_variant_t pre_write;
-            if (mu_value_source_read(node->value, &node->node_id, &pre_write) == MU_STATUS_GOOD) {
-                audit_old_value = pre_write;
-            }
-        }
 #endif
 
-        if (!handled && result == MU_STATUS_GOOD) {
-            /* Apply write callback if configured */
-            mu_write_handler_t write_handler = server->config.write_handler;
-            void *write_handler_handle = server->config.write_handler_handle;
-            if (write_handler) {
-                result = write_handler(write_handler_handle, &write_val->node_id,
-                                       (opcua_uint32_t)write_val->attribute_id, &write_val->value);
-            } else {
+        if (write_val->node_id.namespace_index == 0 &&
+            write_val->node_id.identifier_type == MU_NODEID_NUMERIC &&
+            write_val->node_id.identifier.numeric == 0) {
+            result = MU_STATUS_BAD_NODEIDINVALID;
+        } else {
+            const mu_node_t *node = mu_resolve_node(server->config.address_space, &server->user_address_space_index,
+                                                    &server->runtime_base.space, &write_val->node_id);
+            if (!node) {
+                result = MU_STATUS_BAD_NODEIDUNKNOWN;
+            } else if (!write_attribute_is_valid_for_node(node, write_val->attribute_id)) {
+                result = MU_STATUS_BAD_ATTRIBUTEIDINVALID;
+            } else if (write_val->attribute_id != MU_ATTRIBUTEID_VALUE) {
+                result = MU_STATUS_BAD_NOTWRITABLE;
+#ifndef MUC_OPCUA_CU_ATTRIBUTE_WRITE_STATUSCODE_TIMESTAMP
+            } else if (write_val->value.has_status || write_val->value.has_source_timestamp ||
+                       write_val->value.has_source_picoseconds || write_val->value.has_server_timestamp ||
+                       write_val->value.has_server_picoseconds) {
                 result = MU_STATUS_BAD_WRITENOTSUPPORTED;
+#endif
+            } else if (!write_val->value.has_value) {
+                /* OPC-10000-4 section 5.11.4.2: Value Attribute writes require DataValue.value. */
+                result = MU_STATUS_BAD_TYPEMISMATCH;
+            } else if (node->node_class != MU_NODECLASS_VARIABLE) {
+                result = MU_STATUS_BAD_NOTWRITABLE;
+            } else if (write_val->index_range.length > 0) {
+#ifdef MUC_OPCUA_CU_ATTRIBUTE_WRITE_INDEX_RANGE
+                /* opc_cu_3147: bounded partial array update, OPC-10000-4 5.11.4. */
+                result = write_value_index_range(server, node, write_val);
+#else
+                result = MU_STATUS_BAD_WRITENOTSUPPORTED;
+#endif
+                handled = true;
+            } else if (node->value) {
+                /* Check value type is assignable if the variable has a current value.
+                 * OPC-10000-4 5.11.4.2 Table 53: subtypes of the Attribute DataType
+                 * shall be accepted by the Server. mu_variant_type_is_assignable
+                 * encodes that rule (currently exact-match for built-in types,
+                 * with infrastructure for TypeDef-based subtypes). */
+                mu_variant_t current_val;
+                s = mu_value_source_read(node->value, &node->node_id, &current_val);
+                if (s == MU_STATUS_GOOD && !mu_variant_type_is_assignable(current_val.type, write_val->value.value.type)) {
+                    result = MU_STATUS_BAD_TYPEMISMATCH;
+                }
+            }
+
+#if MUC_OPCUA_CU_AUDITING
+            /* spec 077: capture the pre-write value for the AuditWriteUpdateEvent OldValue,
+               read BEFORE the write mutates it. Non-scalars are dropped to Null downstream. */
+            if (node != NULL && node->value != NULL && write_val->attribute_id == MU_ATTRIBUTEID_VALUE) {
+                mu_variant_t pre_write;
+                if (mu_value_source_read(node->value, &node->node_id, &pre_write) == MU_STATUS_GOOD) {
+                    audit_old_value = pre_write;
+                }
+            }
+#endif
+
+            if (!handled && result == MU_STATUS_GOOD) {
+                /* Apply write callback if configured */
+                mu_write_handler_t write_handler = server->config.write_handler;
+                void *write_handler_handle = server->config.write_handler_handle;
+                if (write_handler) {
+                    result = write_handler(write_handler_handle, &write_val->node_id,
+                                           (opcua_uint32_t)write_val->attribute_id, &write_val->value);
+                } else {
+                    result = MU_STATUS_BAD_WRITENOTSUPPORTED;
+                }
             }
         }
 
