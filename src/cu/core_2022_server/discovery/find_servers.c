@@ -4,14 +4,6 @@
 
 #ifdef MUC_OPCUA_DISCOVERY_FIND_SERVERS_ENABLED
 
-static bool findservers_endpoint_matches(const mu_string_t *endpoint_url, const char *discovery_url) {
-    if (endpoint_url == NULL || endpoint_url->length <= 0) {
-        return true;
-    }
-
-    return string_matches_cstr(endpoint_url, discovery_url);
-}
-
 static opcua_statuscode_t findservers_server_uri_filter_matches(mu_binary_reader_t *r, const char *application_uri,
                                                                 bool *matches) {
     opcua_int32_t count;
@@ -91,6 +83,7 @@ opcua_statuscode_t handle_find_servers(mu_server_t *server, mu_binary_reader_t *
     if (s != MU_STATUS_GOOD) {
         return s;
     }
+    (void)endpoint_url;
 
     mu_string_t requested_locale;
     s = read_requested_locale_ids(r, &requested_locale);
@@ -116,8 +109,7 @@ opcua_statuscode_t handle_find_servers(mu_server_t *server, mu_binary_reader_t *
         return s;
     }
 
-    bool include_app =
-        findservers_endpoint_matches(&endpoint_url, app.discovery_url) && server_uri_matches && server_type_matches;
+    bool include_app = server_uri_matches && server_type_matches;
 
     s = write_response_prefix(w, MU_ID_FINDSERVERSRESPONSE, req.request_handle, MU_STATUS_GOOD
 #ifdef MU_RESPONSE_PREFIX_WANTS_SERVER

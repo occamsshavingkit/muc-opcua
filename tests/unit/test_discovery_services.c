@@ -443,24 +443,32 @@ void test_getendpoints_malformed_array_count_returns_bad_decodingerror(void) {
         mu_service_dispatch(&server, MU_ID_GETENDPOINTSREQUEST, request, request_len, response, &response_len));
 }
 
-void test_findservers_endpoint_url_filter_excludes_nonmatching_server(void) {
+void test_findservers_endpoint_url_variations_return_self(void) {
     mu_server_t server;
     discovery_server(&server);
 
-    opcua_byte_t request[192];
-    size_t request_len =
-        build_findservers_endpoint_filter_request(request, sizeof(request), "opc.tcp://otherhost:4840");
-    opcua_byte_t response[512];
-    size_t response_len = sizeof(response);
+    static const char *const endpoint_urls[] = {
+        "opc.tcp://gateway.example:51210",
+        "OPC.TCP://LOCALHOST:4840",
+        "opc.tcp://127.0.0.1:4841",
+    };
 
-    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, mu_service_dispatch(&server, MU_ID_FINDSERVERSREQUEST, request, request_len,
-                                                                response, &response_len));
+    for (size_t i = 0; i < sizeof(endpoint_urls) / sizeof(endpoint_urls[0]); ++i) {
+        opcua_byte_t request[192];
+        size_t request_len =
+            build_findservers_endpoint_filter_request(request, sizeof(request), endpoint_urls[i]);
+        opcua_byte_t response[512];
+        size_t response_len = sizeof(response);
 
-    opcua_int32_t server_count = read_findservers_server_count(response, response_len, 28);
+        TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD,
+                                mu_service_dispatch(&server, MU_ID_FINDSERVERSREQUEST, request, request_len, response,
+                                                    &response_len));
 
-    /* OPC-10000-4 section 5.5.2.2 defines endpointUrl as a FindServers
-       request filter; a nonmatching URL excludes this server from Servers[]. */
-    TEST_ASSERT_EQUAL_INT32(0, server_count);
+        /* OPC-10000-4 section 5.5.2.2 uses endpointUrl to determine which
+           URL to return. An unrecognized HostName falls back to a suitable
+           default; endpointUrl is not a criterion for excluding this server. */
+        assert_findservers_self_application(response, response_len, 28, &server.config);
+    }
 }
 
 void test_findservers_locale_filter_returns_application_name_in_requested_locale(void) {
@@ -594,7 +602,7 @@ int main(void) {
     RUN_TEST(test_findservers_malformed_array_count_returns_bad_decodingerror);
     RUN_TEST(test_findservers_scn001_case001_self_unfiltered_returns_exactly_own_server_opc_cu_2352);
     RUN_TEST(test_getendpoints_malformed_array_count_returns_bad_decodingerror);
-    RUN_TEST(test_findservers_endpoint_url_filter_excludes_nonmatching_server);
+    RUN_TEST(test_findservers_endpoint_url_variations_return_self);
     RUN_TEST(test_findservers_locale_filter_returns_application_name_in_requested_locale);
     RUN_TEST(test_findservers_server_uri_filter_excludes_nonmatching_server);
     RUN_TEST(test_findservers_server_type_filter_excludes_server_application);
