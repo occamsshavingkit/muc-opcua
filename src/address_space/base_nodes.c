@@ -1,6 +1,7 @@
 /* src/address_space/base_nodes.c */
 #include "base_nodes.h"
 #include "muc_opcua/opcua_ids.h"
+#include "muc_opcua/services/certificate_manager.h"
 #include "muc_opcua/services/method.h"
 #include <stddef.h>
 #include <string.h>
@@ -156,6 +157,9 @@ static const opcua_byte_t s_str_DefaultUserTokenGroup[] = "DefaultUserTokenGroup
 static const opcua_byte_t s_str_ServerConfigurationType[] = "ServerConfigurationType";
 static const opcua_byte_t s_str_StartSigningRequest[] = "StartSigningRequest";
 static const opcua_byte_t s_str_StartNewKeyPairRequest[] = "StartNewKeyPairRequest";
+static const opcua_byte_t s_str_Directory[] = "Directory";
+static const opcua_byte_t s_str_RegisterApplication[] = "RegisterApplication";
+static const opcua_byte_t s_str_GetCertificateGroups[] = "GetCertificateGroups";
 #endif
 static const opcua_byte_t s_str_LocaleIdArray[] = "LocaleIdArray";
 #if MUC_OPCUA_CU_BASE_INFO_SERVERTYPE && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
@@ -573,6 +577,9 @@ static const opcua_byte_t s_str_http___opcfoundation_org_UA_Profile_Server_NanoE
 static const opcua_byte_t s_str_http___opcfoundation_org_UA_Profile_Server_StandardUA2017[] =
     "http://opcfoundation.org/UA-Profile/Server/StandardUA2017";
 static const opcua_byte_t s_str_http___opcfoundation_org_UA_[] = "http://opcfoundation.org/UA/";
+#if MUC_OPCUA_CU_CERTIFICATE_MANAGER_PULL
+static const opcua_byte_t s_str_http___opcfoundation_org_UA_GDS_[] = "http://opcfoundation.org/UA/GDS/";
+#endif
 static const opcua_byte_t s_str_urn_muc_opcua_server[] = "urn:muc-opcua:server";
 #if defined(__clang__)
 #pragma clang diagnostic pop
@@ -599,7 +606,10 @@ static const mu_reference_t s_objects_refs[] = {
 #if MUC_OPCUA_CU_CERTIFICATE_MANAGER_PULL && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
     {{0, MU_NODEID_NUMERIC, {35}},
      {0, MU_NODEID_NUMERIC, {15624}},
-     true} /* Organizes -> CertificateGroups, OPC-10000-12 §7.8.3.1 and §7.9.2 (FR-002) */
+     true}, /* Organizes -> CertificateGroups, OPC-10000-12 §7.8.3.1 and §7.9.2 (FR-002) */
+    {{0, MU_NODEID_NUMERIC, {35}},
+     {MU_GDS_NAMESPACE_INDEX, MU_NODEID_NUMERIC, {MU_ID_GDS_DIRECTORY}},
+     true}
 #endif
 };
 
@@ -1603,6 +1613,28 @@ static const mu_reference_t s_start_new_key_pair_request_refs[] = {
     {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {60003}}, true}, /* HasProperty -> InputArguments */
     {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {60004}}, true}  /* HasProperty -> OutputArguments */
 };
+static const mu_reference_t s_gds_directory_refs[] = {
+    {{0, MU_NODEID_NUMERIC, {35}}, {0, MU_NODEID_NUMERIC, {85}}, false},
+    {{0, MU_NODEID_NUMERIC, {47}},
+     {MU_GDS_NAMESPACE_INDEX, MU_NODEID_NUMERIC, {MU_ID_GDS_REGISTER_APPLICATION}},
+     true},
+    {{0, MU_NODEID_NUMERIC, {47}},
+     {MU_GDS_NAMESPACE_INDEX, MU_NODEID_NUMERIC, {MU_ID_GDS_GET_CERTIFICATE_GROUPS}},
+     true}};
+static const mu_reference_t s_gds_register_application_refs[] = {
+    {{0, MU_NODEID_NUMERIC, {46}},
+     {MU_GDS_NAMESPACE_INDEX, MU_NODEID_NUMERIC, {MU_ID_GDS_REGISTER_APPLICATION_INPUT_ARGUMENTS}},
+     true},
+    {{0, MU_NODEID_NUMERIC, {46}},
+     {MU_GDS_NAMESPACE_INDEX, MU_NODEID_NUMERIC, {MU_ID_GDS_REGISTER_APPLICATION_OUTPUT_ARGUMENTS}},
+     true}};
+static const mu_reference_t s_gds_get_certificate_groups_refs[] = {
+    {{0, MU_NODEID_NUMERIC, {46}},
+     {MU_GDS_NAMESPACE_INDEX, MU_NODEID_NUMERIC, {MU_ID_GDS_GET_CERTIFICATE_GROUPS_INPUT_ARGUMENTS}},
+     true},
+    {{0, MU_NODEID_NUMERIC, {46}},
+     {MU_GDS_NAMESPACE_INDEX, MU_NODEID_NUMERIC, {MU_ID_GDS_GET_CERTIFICATE_GROUPS_OUTPUT_ARGUMENTS}},
+     true}};
 static const mu_reference_t s_app_cert_type_refs[] = {
     {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {12556}}, false},
     {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {12559}}, true},
@@ -1926,6 +1958,9 @@ static const opcua_byte_t s_arg_csr[] = "CSR";
 static const opcua_byte_t s_arg_certificate_group_id[] = "certificateGroupId";
 static const opcua_byte_t s_arg_request_id[] = "requestId";
 static const opcua_byte_t s_arg_key_spec[] = "keySpec";
+static const opcua_byte_t s_arg_application_record[] = "ApplicationRecord";
+static const opcua_byte_t s_arg_application_id[] = "ApplicationId";
+static const opcua_byte_t s_arg_certificate_group_ids[] = "CertificateGroupIds";
 
 #ifndef MU_ARG_NO_DESC
 #define MU_ARG_NO_DESC                                                                                                 \
@@ -1954,9 +1989,52 @@ static const mu_value_source_t s_ssr_output_value = {
 
 #define MU_SSR_INPUT_VALUE &s_ssr_input_value
 #define MU_SSR_OUTPUT_VALUE &s_ssr_output_value
+
+static const mu_argument_t s_gds_register_input_args[] = {
+    {{17, s_arg_application_record}, {MU_GDS_NAMESPACE_INDEX, MU_NODEID_NUMERIC, {1}}, -1, MU_ARG_NO_DESC}};
+static const mu_argument_t s_gds_register_output_args[] = {
+    {{13, s_arg_application_id}, {0, MU_NODEID_NUMERIC, {17}}, -1, MU_ARG_NO_DESC}};
+static const mu_argument_t s_gds_get_groups_input_args[] = {
+    {{13, s_arg_application_id}, {0, MU_NODEID_NUMERIC, {17}}, -1, MU_ARG_NO_DESC}};
+static const mu_argument_t s_gds_get_groups_output_args[] = {
+    {{19, s_arg_certificate_group_ids}, {0, MU_NODEID_NUMERIC, {17}}, 1, MU_ARG_NO_DESC}};
+
+static const mu_value_source_t s_gds_register_input_value = {
+    MU_VALUESOURCE_STATIC,
+    {.static_value = {.type = MU_TYPE_EXTENSIONOBJECT,
+                      .value = {.array = s_gds_register_input_args},
+                      .is_array = true,
+                      .array_length = 1}}};
+static const mu_value_source_t s_gds_register_output_value = {
+    MU_VALUESOURCE_STATIC,
+    {.static_value = {.type = MU_TYPE_EXTENSIONOBJECT,
+                      .value = {.array = s_gds_register_output_args},
+                      .is_array = true,
+                      .array_length = 1}}};
+static const mu_value_source_t s_gds_get_groups_input_value = {
+    MU_VALUESOURCE_STATIC,
+    {.static_value = {.type = MU_TYPE_EXTENSIONOBJECT,
+                      .value = {.array = s_gds_get_groups_input_args},
+                      .is_array = true,
+                      .array_length = 1}}};
+static const mu_value_source_t s_gds_get_groups_output_value = {
+    MU_VALUESOURCE_STATIC,
+    {.static_value = {.type = MU_TYPE_EXTENSIONOBJECT,
+                      .value = {.array = s_gds_get_groups_output_args},
+                      .is_array = true,
+                      .array_length = 1}}};
+
+#define MU_GDS_REGISTER_INPUT_VALUE &s_gds_register_input_value
+#define MU_GDS_REGISTER_OUTPUT_VALUE &s_gds_register_output_value
+#define MU_GDS_GET_GROUPS_INPUT_VALUE &s_gds_get_groups_input_value
+#define MU_GDS_GET_GROUPS_OUTPUT_VALUE &s_gds_get_groups_output_value
 #else
 #define MU_SSR_INPUT_VALUE NULL
 #define MU_SSR_OUTPUT_VALUE NULL
+#define MU_GDS_REGISTER_INPUT_VALUE NULL
+#define MU_GDS_REGISTER_OUTPUT_VALUE NULL
+#define MU_GDS_GET_GROUPS_INPUT_VALUE NULL
+#define MU_GDS_GET_GROUPS_OUTPUT_VALUE NULL
 #endif
 
 /* StartNewKeyPairRequest (12483) input/output args.
@@ -2046,11 +2124,19 @@ static const mu_value_source_t s_server_array_value = {
     MU_VALUESOURCE_STATIC,
     {.static_value = {.type = MU_TYPE_STRING, .value.array = s_server_array, .is_array = true, .array_length = 1}}};
 
-static const mu_string_t s_namespace_array[] = {{28, s_str_http___opcfoundation_org_UA_}};
+static const mu_string_t s_namespace_array[] = {
+    {28, s_str_http___opcfoundation_org_UA_},
+#if MUC_OPCUA_CU_CERTIFICATE_MANAGER_PULL
+    {sizeof(s_str_http___opcfoundation_org_UA_GDS_) - 1u, s_str_http___opcfoundation_org_UA_GDS_}
+#endif
+};
 
 static const mu_value_source_t s_namespace_array_value = {
     MU_VALUESOURCE_STATIC,
-    {.static_value = {.type = MU_TYPE_STRING, .value.array = s_namespace_array, .is_array = true, .array_length = 1}}};
+    {.static_value = {.type = MU_TYPE_STRING,
+                      .value.array = s_namespace_array,
+                      .is_array = true,
+                      .array_length = (opcua_int32_t)(sizeof(s_namespace_array) / sizeof(s_namespace_array[0]))}}};
 
 static const mu_value_source_t s_server_status_state_value = {
     MU_VALUESOURCE_STATIC, {.static_value = {.type = MU_TYPE_INT32, .value.i32 = 0}}};
@@ -7548,6 +7634,62 @@ static const mu_node_t s_base_nodes[] = {
      s_property_type_ref,
      sizeof(s_property_type_ref) / sizeof(s_property_type_ref[0]),
      MU_SNKP_OUTPUT_VALUE,
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+    {{MU_GDS_NAMESPACE_INDEX, MU_NODEID_NUMERIC, {MU_ID_GDS_DIRECTORY}},
+     MU_NODECLASS_OBJECT,
+     {sizeof(s_str_Directory) - 1u, s_str_Directory},
+     {sizeof(s_str_Directory) - 1u, s_str_Directory},
+     s_gds_directory_refs,
+     sizeof(s_gds_directory_refs) / sizeof(s_gds_directory_refs[0]),
+     NULL,
+     .type_definition = {0}},
+    {{MU_GDS_NAMESPACE_INDEX, MU_NODEID_NUMERIC, {MU_ID_GDS_REGISTER_APPLICATION}},
+     MU_NODECLASS_METHOD,
+     {sizeof(s_str_RegisterApplication) - 1u, s_str_RegisterApplication},
+     {sizeof(s_str_RegisterApplication) - 1u, s_str_RegisterApplication},
+     s_gds_register_application_refs,
+     sizeof(s_gds_register_application_refs) / sizeof(s_gds_register_application_refs[0]),
+     NULL,
+     .type_definition = {0}},
+    {{MU_GDS_NAMESPACE_INDEX, MU_NODEID_NUMERIC, {MU_ID_GDS_REGISTER_APPLICATION_INPUT_ARGUMENTS}},
+     MU_NODECLASS_VARIABLE,
+     {14, s_str_InputArguments},
+     {14, s_str_InputArguments},
+     s_property_type_ref,
+     sizeof(s_property_type_ref) / sizeof(s_property_type_ref[0]),
+     MU_GDS_REGISTER_INPUT_VALUE,
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+    {{MU_GDS_NAMESPACE_INDEX, MU_NODEID_NUMERIC, {MU_ID_GDS_REGISTER_APPLICATION_OUTPUT_ARGUMENTS}},
+     MU_NODECLASS_VARIABLE,
+     {15, s_str_OutputArguments},
+     {15, s_str_OutputArguments},
+     s_property_type_ref,
+     sizeof(s_property_type_ref) / sizeof(s_property_type_ref[0]),
+     MU_GDS_REGISTER_OUTPUT_VALUE,
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+    {{MU_GDS_NAMESPACE_INDEX, MU_NODEID_NUMERIC, {MU_ID_GDS_GET_CERTIFICATE_GROUPS}},
+     MU_NODECLASS_METHOD,
+     {sizeof(s_str_GetCertificateGroups) - 1u, s_str_GetCertificateGroups},
+     {sizeof(s_str_GetCertificateGroups) - 1u, s_str_GetCertificateGroups},
+     s_gds_get_certificate_groups_refs,
+     sizeof(s_gds_get_certificate_groups_refs) / sizeof(s_gds_get_certificate_groups_refs[0]),
+     NULL,
+     .type_definition = {0}},
+    {{MU_GDS_NAMESPACE_INDEX, MU_NODEID_NUMERIC, {MU_ID_GDS_GET_CERTIFICATE_GROUPS_INPUT_ARGUMENTS}},
+     MU_NODECLASS_VARIABLE,
+     {14, s_str_InputArguments},
+     {14, s_str_InputArguments},
+     s_property_type_ref,
+     sizeof(s_property_type_ref) / sizeof(s_property_type_ref[0]),
+     MU_GDS_GET_GROUPS_INPUT_VALUE,
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
+    {{MU_GDS_NAMESPACE_INDEX, MU_NODEID_NUMERIC, {MU_ID_GDS_GET_CERTIFICATE_GROUPS_OUTPUT_ARGUMENTS}},
+     MU_NODECLASS_VARIABLE,
+     {15, s_str_OutputArguments},
+     {15, s_str_OutputArguments},
+     s_property_type_ref,
+     sizeof(s_property_type_ref) / sizeof(s_property_type_ref[0]),
+     MU_GDS_GET_GROUPS_OUTPUT_VALUE,
      .type_definition = {0, MU_NODEID_NUMERIC, {68}}},
 #endif
 };

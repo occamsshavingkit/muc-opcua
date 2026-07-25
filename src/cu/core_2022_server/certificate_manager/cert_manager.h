@@ -9,16 +9,15 @@
 #ifndef MUC_OPCUA_INTERNAL_CERT_MANAGER_H
 #define MUC_OPCUA_INTERNAL_CERT_MANAGER_H
 
-#include "muc_opcua/config.h"
 #include "muc_opcua/services/certificate_manager.h"
 
 #ifdef MUC_OPCUA_CU_CERTIFICATE_MANAGER_PULL
 
 struct mu_server;
 
-/* Register all four Pull Model certificate management Method callbacks on the
- * server. Called automatically from mu_server_init() when the CU is enabled.
- * Consumes 4 of the MU_MAX_REGISTERED_METHODS slots. Declared here for
+/* Register the Pull Model and minimal GDS Method callbacks on the server.
+ * Called automatically from mu_server_init() when the CU is enabled.
+ * Consumes 6 of the MU_MAX_REGISTERED_METHODS slots. Declared here for
  * internal callers; the canonical declaration is in the public header. */
 opcua_statuscode_t mu_certificate_manager_register(struct mu_server *server);
 

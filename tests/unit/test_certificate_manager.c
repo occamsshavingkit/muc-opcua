@@ -166,14 +166,18 @@ static opcua_statuscode_t init_test_server(const mu_certificate_manager_adapter_
     return mu_server_init(s_server_storage, sizeof(s_server_storage), &cfg, &s_server);
 }
 
-static size_t find_registered(mu_server_t *server, opcua_uint32_t numeric_id) {
+static size_t find_registered_ns(mu_server_t *server, opcua_uint16_t namespace_index, opcua_uint32_t numeric_id) {
     for (size_t i = 0; i < server->registered_method_count; ++i) {
-        if (server->registered_methods[i].method_id.namespace_index == 0u &&
+        if (server->registered_methods[i].method_id.namespace_index == namespace_index &&
             server->registered_methods[i].method_id.identifier_type == MU_NODEID_NUMERIC &&
             server->registered_methods[i].method_id.identifier.numeric == numeric_id)
             return i;
     }
     return (size_t)-1;
+}
+
+static size_t find_registered(mu_server_t *server, opcua_uint32_t numeric_id) {
+    return find_registered_ns(server, 0u, numeric_id);
 }
 
 static opcua_statuscode_t invoke_registered(mu_server_t *server, opcua_uint32_t method_numeric,
@@ -207,14 +211,68 @@ static mu_variant_t make_uint32_variant(uint32_t n) {
 
 /* --- US1: registration wiring --- */
 
-void test_certificate_manager_register_wires_four_methods(void) {
+void test_certificate_manager_register_wires_methods(void) {
     reset_mock_rejected();
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, init_test_server(&s_mock_adapter));
-    TEST_ASSERT_GREATER_OR_EQUAL_size_t(4, s_server->registered_method_count);
+    TEST_ASSERT_GREATER_OR_EQUAL_size_t(6, s_server->registered_method_count);
     TEST_ASSERT_NOT_EQUAL((size_t)-1, find_registered(s_server, MU_ID_CM_START_SIGNING_REQUEST));
     TEST_ASSERT_NOT_EQUAL((size_t)-1, find_registered(s_server, MU_ID_CM_FINISH_REQUEST));
     TEST_ASSERT_NOT_EQUAL((size_t)-1, find_registered(s_server, MU_ID_CM_GET_REJECTED_LIST));
     TEST_ASSERT_NOT_EQUAL((size_t)-1, find_registered(s_server, MU_ID_CM_START_NEW_KEY_PAIR_REQUEST));
+    TEST_ASSERT_NOT_EQUAL((size_t)-1,
+                          find_registered_ns(s_server, MU_GDS_NAMESPACE_INDEX, MU_ID_GDS_REGISTER_APPLICATION));
+    TEST_ASSERT_NOT_EQUAL((size_t)-1,
+                          find_registered_ns(s_server, MU_GDS_NAMESPACE_INDEX, MU_ID_GDS_GET_CERTIFICATE_GROUPS));
+}
+
+void test_get_certificate_groups_returns_default_group_ids(void) {
+    reset_mock_rejected();
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, init_test_server(&s_mock_adapter));
+
+    size_t idx = find_registered_ns(s_server, MU_GDS_NAMESPACE_INDEX, MU_ID_GDS_GET_CERTIFICATE_GROUPS);
+    TEST_ASSERT_NOT_EQUAL((size_t)-1, idx);
+
+    mu_nodeid_t object_id = {MU_GDS_NAMESPACE_INDEX, MU_NODEID_NUMERIC, {MU_ID_GDS_DIRECTORY}};
+    mu_nodeid_t method_id = {MU_GDS_NAMESPACE_INDEX, MU_NODEID_NUMERIC, {MU_ID_GDS_GET_CERTIFICATE_GROUPS}};
+    mu_nodeid_t application_id = {1u, MU_NODEID_NUMERIC, {1000u}};
+    mu_variant_t input;
+    memset(&input, 0, sizeof(input));
+    input.type = MU_TYPE_NODEID;
+    input.value.nodeid = application_id;
+    mu_variant_t outputs[1];
+    memset(outputs, 0, sizeof(outputs));
+    size_t output_count = 1u;
+
+    opcua_statuscode_t status = s_server->registered_methods[idx].callback(
+        s_server, s_server->registered_methods[idx].context, &object_id, &method_id, &input, 1u, outputs,
+        &output_count);
+
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, status);
+    TEST_ASSERT_EQUAL_size_t(1u, output_count);
+    TEST_ASSERT_EQUAL(MU_TYPE_NODEID, outputs[0].type);
+    TEST_ASSERT_TRUE(outputs[0].is_array);
+    TEST_ASSERT_EQUAL_INT32(3, outputs[0].array_length);
+    const mu_nodeid_t *group_ids = (const mu_nodeid_t *)outputs[0].value.array;
+    TEST_ASSERT_EQUAL_UINT32(MU_ID_DEFAULT_APPLICATION_GROUP, group_ids[0].identifier.numeric);
+    TEST_ASSERT_EQUAL_UINT32(MU_ID_DEFAULT_HTTPS_GROUP, group_ids[1].identifier.numeric);
+    TEST_ASSERT_EQUAL_UINT32(MU_ID_DEFAULT_USER_TOKEN_GROUP, group_ids[2].identifier.numeric);
+}
+
+void test_register_application_deferred_returns_service_unsupported(void) {
+    reset_mock_rejected();
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, init_test_server(&s_mock_adapter));
+
+    size_t idx = find_registered_ns(s_server, MU_GDS_NAMESPACE_INDEX, MU_ID_GDS_REGISTER_APPLICATION);
+    TEST_ASSERT_NOT_EQUAL((size_t)-1, idx);
+
+    mu_nodeid_t object_id = {MU_GDS_NAMESPACE_INDEX, MU_NODEID_NUMERIC, {MU_ID_GDS_DIRECTORY}};
+    mu_nodeid_t method_id = {MU_GDS_NAMESPACE_INDEX, MU_NODEID_NUMERIC, {MU_ID_GDS_REGISTER_APPLICATION}};
+    size_t output_count = 0u;
+    opcua_statuscode_t status = s_server->registered_methods[idx].callback(
+        s_server, s_server->registered_methods[idx].context, &object_id, &method_id, NULL, 0u, NULL,
+        &output_count);
+
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_BAD_SERVICEUNSUPPORTED, status);
 }
 
 /* --- US2: StartSigningRequest --- */
@@ -393,7 +451,7 @@ static mu_browse_result_t test_browse_forward_with_pool(mu_nodeid_t source_id, m
 }
 
 static void assert_has_reference(const mu_browse_result_t *result, uint32_t expected_ref_type,
-                                 opcua_boolean_t expected_is_forward, uint32_t expected_target_numeric) {
+                                  opcua_boolean_t expected_is_forward, uint32_t expected_target_numeric) {
     opcua_boolean_t found = false;
     for (size_t i = 0; i < result->num_references; ++i) {
         const mu_reference_description_t *ref = &result->references[i];
@@ -412,6 +470,32 @@ static void assert_has_reference(const mu_browse_result_t *result, uint32_t expe
                  expected_is_forward, expected_target_numeric);
         TEST_FAIL_MESSAGE(msg);
     }
+}
+
+static const mu_node_t *find_base_node_ns(opcua_uint16_t namespace_index, opcua_uint32_t numeric_id) {
+    mu_nodeid_t node_id = {namespace_index, MU_NODEID_NUMERIC, {numeric_id}};
+    return mu_resolve_node(NULL, NULL, NULL, &node_id);
+}
+
+static void assert_argument_metadata(opcua_uint16_t namespace_index, opcua_uint32_t variable_id,
+                                     const char *expected_name, opcua_uint32_t expected_data_type,
+                                     opcua_int32_t expected_value_rank) {
+    const mu_node_t *node = find_base_node_ns(namespace_index, variable_id);
+    TEST_ASSERT_NOT_NULL(node);
+    TEST_ASSERT_EQUAL(MU_NODECLASS_VARIABLE, node->node_class);
+    TEST_ASSERT_NOT_NULL(node->value);
+    TEST_ASSERT_EQUAL(MU_VALUESOURCE_STATIC, node->value->type);
+    const mu_variant_t *value = &node->value->data.static_value;
+    TEST_ASSERT_EQUAL(MU_TYPE_EXTENSIONOBJECT, value->type);
+    TEST_ASSERT_TRUE(value->is_array);
+    TEST_ASSERT_EQUAL_INT32(1, value->array_length);
+    const mu_argument_t *argument = (const mu_argument_t *)value->value.array;
+    TEST_ASSERT_NOT_NULL(argument);
+    TEST_ASSERT_EQUAL_INT((int)strlen(expected_name), argument[0].name.length);
+    TEST_ASSERT_EQUAL_MEMORY(expected_name, argument[0].name.data, strlen(expected_name));
+    TEST_ASSERT_EQUAL_UINT16(0u, argument[0].data_type.namespace_index);
+    TEST_ASSERT_EQUAL_UINT32(expected_data_type, argument[0].data_type.identifier.numeric);
+    TEST_ASSERT_EQUAL_INT32(expected_value_rank, argument[0].value_rank);
 }
 
 void test_certificate_manager_browse_types(void) {
@@ -487,6 +571,16 @@ void test_certificate_manager_browse_instances(void) {
     assert_has_reference(&res_15627, 49, true, 15017);
 }
 
+void test_certificate_manager_gds_argument_metadata(void) {
+    /* OPC-10000-12 §7.9.7: GetCertificateGroups returns CertificateGroupIds:NodeId[]. */
+    assert_argument_metadata(MU_GDS_NAMESPACE_INDEX, MU_ID_GDS_GET_CERTIFICATE_GROUPS_OUTPUT_ARGUMENTS,
+                             "CertificateGroupIds", 17u, 1);
+
+    /* OPC-10000-12 §6.5.6: RegisterApplication returns ApplicationId:NodeId. */
+    assert_argument_metadata(MU_GDS_NAMESPACE_INDEX, MU_ID_GDS_REGISTER_APPLICATION_OUTPUT_ARGUMENTS,
+                             "ApplicationId", 17u, -1);
+}
+
 #else
 
 void test_certificate_manager_skipped(void) {
@@ -498,7 +592,9 @@ void test_certificate_manager_skipped(void) {
 int main(void) {
     UNITY_BEGIN();
 #if MUC_OPCUA_CU_CERTIFICATE_MANAGER_PULL
-    RUN_TEST(test_certificate_manager_register_wires_four_methods);
+    RUN_TEST(test_certificate_manager_register_wires_methods);
+    RUN_TEST(test_get_certificate_groups_returns_default_group_ids);
+    RUN_TEST(test_register_application_deferred_returns_service_unsupported);
     RUN_TEST(test_start_signing_request_valid);
     RUN_TEST(test_start_signing_request_invalid);
     RUN_TEST(test_start_signing_request_no_adapter);
@@ -514,6 +610,7 @@ int main(void) {
     RUN_TEST(test_register_null_server);
     RUN_TEST(test_certificate_manager_browse_types);
     RUN_TEST(test_certificate_manager_browse_instances);
+    RUN_TEST(test_certificate_manager_gds_argument_metadata);
 #else
     RUN_TEST(test_certificate_manager_skipped);
 #endif
