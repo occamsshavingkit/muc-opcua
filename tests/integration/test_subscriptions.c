@@ -1479,8 +1479,8 @@ void test_republish_and_acknowledge(void) {
 #define ID_SETPUBLISHINGMODERESPONSE 802
 #define ID_MODIFYMONITOREDITEMSREQUEST 763
 #define ID_MODIFYMONITOREDITEMSRESPONSE 766
-#define ID_SETMONITORINGMODEREQUEST 767
-#define ID_SETMONITORINGMODERESPONSE 770
+#define ID_SETMONITORINGMODEREQUEST 769
+#define ID_SETMONITORINGMODERESPONSE 772
 
 /* Create a subscription + one monitored item on samp_space ns=1;i=5000, returning ids. */
 static mu_server_t *setup_sub_with_item(mock_t *mock, opcua_byte_t *storage, size_t ssize, mu_server_config_t *config,
@@ -2495,8 +2495,8 @@ void test_monitored_item_queue_overflow(void) {
 }
 #endif /* MU_INTERN_MONITORED_QUEUE_DEPTH >= 2 */
 
-#define ID_SETTRIGGERINGREQUEST 773  /* SetTriggeringRequest (i=773), OPC 10000-4 §5.13.5 */
-#define ID_SETTRIGGERINGRESPONSE 776 /* SetTriggeringResponse (i=776) */
+#define ID_SETTRIGGERINGREQUEST 775  /* SetTriggeringRequest_Encoding_DefaultBinary (i=775), OPC 10000-4 §5.13.5 */
+#define ID_SETTRIGGERINGRESPONSE 778 /* SetTriggeringResponse_Encoding_DefaultBinary (i=778) */
 
 /* Write one MonitoredItemCreateRequest with an explicit monitoringMode and null filter. */
 static void write_moncreate_item_mode(mu_binary_writer_t *w, opcua_uint16_t ns, opcua_uint32_t ident,

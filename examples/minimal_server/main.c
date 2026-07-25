@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 #include <unistd.h>
 
 #include "../../src/platform/host_tcp_adapter.h"
@@ -37,7 +38,11 @@ static opcua_datetime_t stub_get_time(void *context) {
 }
 static opcua_uint64_t stub_get_tick_ms(void *context) {
     (void)context;
-    return 0;
+    struct timespec timestamp;
+    if (clock_gettime(CLOCK_MONOTONIC, &timestamp) != 0) {
+        return 0u;
+    }
+    return (opcua_uint64_t)timestamp.tv_sec * 1000u + (opcua_uint64_t)timestamp.tv_nsec / 1000000u;
 }
 static opcua_statuscode_t stub_generate_random(void *context, opcua_byte_t *buffer, size_t length) {
     (void)context;
