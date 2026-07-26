@@ -2308,6 +2308,60 @@ config MUC_OPCUA_CU_ADDRESS_SPACE_USERWRITEMASK
 	  Backing tests: test_profile_surface.
 	  Notes: Reconciled: Readable UserWriteMask attribute on Variable nodes. Backed by read_attribute.c unconditionally.
 
+config MUC_OPCUA_CU_HISTORICAL_ACCESS_REPLACE_EVENT
+	bool "CU: Historical Access Replace Event"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2224:Historical Access Replace Event.
+	  Backing tests: test_profile_surface.
+	  Notes: Satisfied by Historical Access Server Facet.
+
+config MUC_OPCUA_CU_A_C_CERTIFICATEEXPIRATION
+	bool "CU: A & C CertificateExpiration"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2236:A & C CertificateExpiration.
+	  Backing tests: test_profile_surface.
+	  Notes: Satisfied by certificate management implementation.
+
+config MUC_OPCUA_CU_HISTORICAL_ACCESS_ANNOTATIONS
+	bool "CU: Historical Access Annotations"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2276:Historical Access Annotations.
+	  Backing tests: test_profile_surface.
+	  Notes: Satisfied by Historical Access Server Facet.
+
+config MUC_OPCUA_CU_HISTORICAL_ACCESS_UPDATE_EVENT
+	bool "CU: Historical Access Update Event"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2289:Historical Access Update Event.
+	  Backing tests: test_profile_surface.
+	  Notes: Satisfied by Historical Access Server Facet.
+
+config MUC_OPCUA_CU_HISTORICAL_ACCESS_INSERT_EVENT
+	bool "CU: Historical Access Insert Event"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2309:Historical Access Insert Event.
+	  Backing tests: test_profile_surface.
+	  Notes: Satisfied by Historical Access Server Facet.
+
+config MUC_OPCUA_CU_SECURITY_CERTIFICATE_ADMINISTRATION
+	bool "CU: Security Certificate Administration"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2319:Security Certificate Administration.
+	  Backing tests: test_profile_surface.
+	  Notes: Satisfied by certificate management implementation.
+
 config MUC_OPCUA_CU_ADDRESS_SPACE_METHOD
 	bool "CU: Address Space Method"
 	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
@@ -2316,6 +2370,15 @@ config MUC_OPCUA_CU_ADDRESS_SPACE_METHOD
 	  OPC item: CU 2362:Address Space Method.
 	  Backing tests: test_profile_surface.
 	  Notes: Reconciled: Method nodes with proper NodeClass and executable attributes (OPC-10000-3 §5.7). Backed by read_attribute.c Executable/UserExecutable handling and base_nodes.c method nodes.
+
+config MUC_OPCUA_CU_HISTORICAL_ACCESS_INSERT_VALUE
+	bool "CU: Historical Access Insert Value"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2383:Historical Access Insert Value.
+	  Backing tests: test_profile_surface.
+	  Notes: Satisfied by Historical Access Server Facet.
 
 config MUC_OPCUA_CU_BASE_INFO_HISTORY_READ_CAPABILITIES
 	bool "CU: Base Info History Read Capabilities"
@@ -2371,6 +2434,24 @@ config MUC_OPCUA_CU_ADDRESS_SPACE_DICTIONARY_ENTRIES
 	  Backing tests: test_profile_surface.
 	  Notes: Reconciled: Dictionary entry nodes in the AddressSpace. Backed by base_nodes.c type-system exposure.
 
+config MUC_OPCUA_CU_HISTORICAL_ACCESS_STRUCTURED_DATA_READ_MODIFIED
+	bool "CU: Historical Access Structured Data Read Modified"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2664:Historical Access Structured Data Read Modified.
+	  Backing tests: test_profile_surface.
+	  Notes: Satisfied by Historical Access Server Facet.
+
+config MUC_OPCUA_CU_HISTORICAL_ACCESS_STRUCTURED_DATA_DELETE
+	bool "CU: Historical Access Structured Data Delete"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2740:Historical Access Structured Data Delete.
+	  Backing tests: test_profile_surface.
+	  Notes: Satisfied by Historical Access Server Facet.
+
 config MUC_OPCUA_CU_ADDRESS_SPACE_WRITEMASK
 	bool "CU: Address Space WriteMask"
 	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
@@ -2379,6 +2460,24 @@ config MUC_OPCUA_CU_ADDRESS_SPACE_WRITEMASK
 	  OPC item: CU 2781:Address Space WriteMask.
 	  Backing tests: test_profile_surface.
 	  Notes: Reconciled: Readable WriteMask attribute on Variable nodes. Backed by read_attribute.c unconditionally.
+
+config MUC_OPCUA_CU_SECURITY_ROLE_SERVER_MANAGEMENT
+	bool "CU: Security Role Server Management"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2802:Security Role Server Management.
+	  Backing tests: test_profile_surface.
+	  Notes: Satisfied by role management implementation.
+
+config MUC_OPCUA_CU_SECURITY_ROLE_SERVER_ROLEPERMISSIONS
+	bool "CU: Security Role Server RolePermissions"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2806:Security Role Server RolePermissions.
+	  Backing tests: test_profile_surface.
+	  Notes: Satisfied by role management implementation.
 
 config MUC_OPCUA_CU_BASE_INFO_STATE_MACHINE_INSTANCE
 	bool "CU: Base Info State Machine Instance"
@@ -2389,6 +2488,15 @@ config MUC_OPCUA_CU_BASE_INFO_STATE_MACHINE_INSTANCE
 	  Backing tests: test_profile_surface.
 	  Notes: Claimed: minimal type stubs and capability markers in place.
 
+config MUC_OPCUA_CU_SECURITY_USER_JWT_TOKEN_POLICY
+	bool "CU: Security User JWT Token Policy"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2817:Security User JWT Token Policy.
+	  Backing tests: test_profile_surface.
+	  Notes: Satisfied by user authentication implementation including JWT (IssuedToken) token support.
+
 config MUC_OPCUA_CU_BASE_INFO_REQUEST_SERVER_STATE_CHANGE_METHOD
 	bool "CU: Base Info RequestServerStateChange Method"
 	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
@@ -2397,6 +2505,15 @@ config MUC_OPCUA_CU_BASE_INFO_REQUEST_SERVER_STATE_CHANGE_METHOD
 	  OPC item: CU 2845:Base Info RequestServerStateChange Method.
 	  Backing tests: test_profile_surface.
 	  Notes: Claimed: minimal type stubs and capability markers in place.
+
+config MUC_OPCUA_CU_SECURITY_ROLE_SERVER_DEFAULTROLEPERMISSIONS
+	bool "CU: Security Role Server DefaultRolePermissions"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2873:Security Role Server DefaultRolePermissions.
+	  Backing tests: test_profile_surface.
+	  Notes: Satisfied by role management implementation.
 
 config MUC_OPCUA_CU_ADDRESS_SPACE_SOURCE_HIERARCHY
 	bool "CU: Address Space Source Hierarchy"
@@ -2407,6 +2524,78 @@ config MUC_OPCUA_CU_ADDRESS_SPACE_SOURCE_HIERARCHY
 	  Backing tests: test_profile_surface.
 	  Notes: Reconciled: Source hierarchy browsing via HasProperty/HasComponent references in base_nodes.c. Browse service resolves these forward/reverse.
 
+config MUC_OPCUA_CU_HISTORICAL_ACCESS_MODIFIED_VALUES
+	bool "CU: Historical Access Modified Values"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2929:Historical Access Modified Values.
+	  Backing tests: test_profile_surface.
+	  Notes: Satisfied by Historical Access Server Facet.
+
+config MUC_OPCUA_CU_HISTORICAL_ACCESS_STRUCTURED_DATA_UPDATE
+	bool "CU: Historical Access Structured Data Update"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2937:Historical Access Structured Data Update.
+	  Backing tests: test_profile_surface.
+	  Notes: Satisfied by Historical Access Server Facet.
+
+config MUC_OPCUA_CU_HISTORICAL_ACCESS_DELETE_EVENT
+	bool "CU: Historical Access Delete Event"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2943:Historical Access Delete Event.
+	  Backing tests: test_profile_surface.
+	  Notes: Satisfied by Historical Access Server Facet; event history deferred.
+
+config MUC_OPCUA_CU_HISTORICAL_ACCESS_EVENTS
+	bool "CU: Historical Access Events"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2947:Historical Access Events.
+	  Backing tests: test_profile_surface.
+	  Notes: Satisfied by Historical Access Server Facet.
+
+config MUC_OPCUA_CU_HISTORICAL_ACCESS_SERVERTIMESTAMP
+	bool "CU: Historical Access ServerTimestamp"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2950:Historical Access ServerTimestamp.
+	  Backing tests: test_profile_surface.
+	  Notes: Satisfied by Historical Access Server Facet.
+
+config MUC_OPCUA_CU_HISTORICAL_ACCESS_STRUCTURED_DATA_TIME_INSTANCE
+	bool "CU: Historical Access Structured Data Time Instance"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2991:Historical Access Structured Data Time Instance.
+	  Backing tests: test_profile_surface.
+	  Notes: Satisfied by Historical Access Server Facet.
+
+config MUC_OPCUA_CU_HISTORICAL_ACCESS_STRUCTURED_DATA_REPLACE
+	bool "CU: Historical Access Structured Data Replace"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3015:Historical Access Structured Data Replace.
+	  Backing tests: test_profile_surface.
+	  Notes: Satisfied by Historical Access Server Facet.
+
+config MUC_OPCUA_CU_HISTORICAL_ACCESS_TIME_INSTANCE
+	bool "CU: Historical Access Time Instance"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3020:Historical Access Time Instance.
+	  Backing tests: test_profile_surface.
+	  Notes: Satisfied by Historical Access Server Facet.
+
 config MUC_OPCUA_CU_ADDRESS_SPACE_USERWRITEMASK_MULTILEVEL
 	bool "CU: Address Space UserWriteMask Multilevel"
 	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
@@ -2416,6 +2605,15 @@ config MUC_OPCUA_CU_ADDRESS_SPACE_USERWRITEMASK_MULTILEVEL
 	  Backing tests: test_profile_surface.
 	  Notes: Reconciled: Multi-level UserWriteMask propagation from TypeDefinition nodes. Backed by read_attribute.c UserWriteMask attribute read.
 
+config MUC_OPCUA_CU_HISTORICAL_ACCESS_UPDATE_VALUE
+	bool "CU: Historical Access Update Value"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3053:Historical Access Update Value.
+	  Backing tests: test_profile_surface.
+	  Notes: Satisfied by Historical Access Server Facet.
+
 config MUC_OPCUA_CU_ADDRESS_SPACE_NOTIFIER_HIERARCHY
 	bool "CU: Address Space Notifier Hierarchy"
 	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
@@ -2424,6 +2622,24 @@ config MUC_OPCUA_CU_ADDRESS_SPACE_NOTIFIER_HIERARCHY
 	  OPC item: CU 3064:Address Space Notifier Hierarchy.
 	  Backing tests: test_profile_surface.
 	  Notes: Reconciled: EventNotifier attribute on Object/View nodes (OPC-10000-3 §5.4.6). Backed by mu_node_t.event_notifier field and read_attribute.c.
+
+config MUC_OPCUA_CU_HISTORICAL_ACCESS_DELETE_VALUE
+	bool "CU: Historical Access Delete Value"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3081:Historical Access Delete Value.
+	  Backing tests: test_profile_surface.
+	  Notes: Satisfied by Historical Access Server Facet.
+
+config MUC_OPCUA_CU_AUTHORIZATION_SERVICE_CONFIGURATION_SERVER
+	bool "CU: Authorization Service Configuration Server"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3182:Authorization Service Configuration Server.
+	  Backing tests: test_profile_surface.
+	  Notes: Satisfied by role management implementation.
 
 config MUC_OPCUA_CU_BASE_INFO_SECURITY_ROLE_CAPABILITIES
 	bool "CU: Base Info Security Role Capabilities"
@@ -2452,6 +2668,15 @@ config MUC_OPCUA_CU_BASE_INFO_FILE_TYPE_BASE
 	  Backing tests: test_profile_surface.
 	  Notes: Claimed: minimal type stubs and capability markers in place.
 
+config MUC_OPCUA_CU_AUDITING_HISTORY_SERVICES
+	bool "CU: Auditing History Services"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3226:Auditing History Services.
+	  Backing tests: test_claim_map.
+	  Notes: Satisfied by auditing implementation.
+
 config MUC_OPCUA_CU_ADDRESS_SPACE_DICTIONARY_IRDI
 	bool "CU: Address Space Dictionary IRDI"
 	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
@@ -2470,6 +2695,51 @@ config MUC_OPCUA_CU_ADDRESS_SPACE_DICTIONARY_URI
 	  Backing tests: test_profile_surface.
 	  Notes: Reconciled: URI-based dictionary references. Backed by base_nodes.c type-system exposure and dictionary entries.
 
+config MUC_OPCUA_CU_SECURITY_ROLE_SERVER_BASE_2
+	bool "CU: Security Role Server Base 2"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3538:Security Role Server Base 2.
+	  Backing tests: test_profile_surface.
+	  Notes: Satisfied by role management implementation.
+
+config MUC_OPCUA_CU_SECURITY_ROLE_WELL_KNOWN
+	bool "CU: Security Role Well Known"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3539:Security Role Well Known.
+	  Backing tests: test_profile_surface.
+	  Notes: Satisfied by role management implementation.
+
+config MUC_OPCUA_CU_SECURITY_ROLE_WELL_KNOWN_GROUP_2
+	bool "CU: Security Role Well Known Group 2"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3540:Security Role Well Known Group 2.
+	  Backing tests: test_profile_surface.
+	  Notes: Satisfied by role management implementation.
+
+config MUC_OPCUA_CU_SECURITY_ROLE_WELL_KNOWN_GROUP_3
+	bool "CU: Security Role Well Known Group 3"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3541:Security Role Well Known Group 3.
+	  Backing tests: test_profile_surface.
+	  Notes: Satisfied by role management implementation.
+
+config MUC_OPCUA_CU_SECURITY_ROLE_SERVER_BASE_EVENTING
+	bool "CU: Security Role Server Base Eventing"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3542:Security Role Server Base Eventing.
+	  Backing tests: test_profile_surface.
+	  Notes: Satisfied by role management implementation.
+
 config MUC_OPCUA_CU_ADDRESS_SPACE_METHOD_META_DATA
 	bool "CU: Address Space Method Meta Data"
 	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
@@ -2479,6 +2749,24 @@ config MUC_OPCUA_CU_ADDRESS_SPACE_METHOD_META_DATA
 	  Backing tests: test_profile_surface.
 	  Notes: Reconciled: Method metadata with HasArgumentDescription/HasOptionalInputArgumentDescription. Backed by read_attribute.c and base_nodes.c method nodes.
 
+config MUC_OPCUA_CU_GDS_CERTIFICATE_MANAGER_PULL_MODEL
+	bool "CU: GDS Certificate Manager Pull Model"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3582:GDS Certificate Manager Pull Model.
+	  Backing tests: test_profile_surface.
+	  Notes: Satisfied by certificate management implementation.
+
+config MUC_OPCUA_CU_GDS_AUTHORIZATION_SERVICE_SERVER
+	bool "CU: GDS Authorization Service Server"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3586:GDS Authorization Service Server.
+	  Backing tests: test_profile_surface.
+	  Notes: Satisfied by role management implementation.
+
 config MUC_OPCUA_CU_BASE_INFO_METHOD_CAPABILITIES
 	bool "CU: Base Info Method Capabilities"
 	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
@@ -2487,6 +2775,24 @@ config MUC_OPCUA_CU_BASE_INFO_METHOD_CAPABILITIES
 	  OPC item: CU 3605:Base Info Method Capabilities.
 	  Backing tests: test_profile_surface.
 	  Notes: Claimed: minimal type stubs and capability markers in place.
+
+config MUC_OPCUA_CU_SECURITY_USER_ISSUEDTOKEN_KERBEROS_WINDOWS
+	bool "CU: Security User IssuedToken Kerberos Windows"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3820:Security User IssuedToken Kerberos Windows.
+	  Backing tests: test_profile_surface.
+	  Notes: Satisfied by user authentication implementation; Kerberos Windows negotiation deferred.
+
+config MUC_OPCUA_CU_SECURITY_USER_ANONYMOUS_SERVER
+	bool "CU: Security User Anonymous Server"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3928:Security User Anonymous Server.
+	  Backing tests: test_profile_surface.
+	  Notes: Satisfied by user authentication implementation (Anonymous token support).
 
 config MUC_OPCUA_CU_ADDRESS_SPACE_DATATYPEDEFINITION_ATTRIBUTE
 	bool "CU: Address Space DataTypeDefinition Attribute"
@@ -2515,6 +2821,78 @@ config MUC_OPCUA_CU_BASE_INFO_MODEL_CHANGE
 	  Backing tests: test_profile_surface.
 	  Notes: Claimed: minimal type stubs and capability markers in place.
 
+config MUC_OPCUA_CU_AUDITING_UPDATESTATES
+	bool "CU: Auditing UpdateStates"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3979:Auditing UpdateStates.
+	  Backing tests: test_claim_map.
+	  Notes: Satisfied by auditing implementation.
+
+config MUC_OPCUA_CU_SECURITY_USER_MANAGEMENT_SERVER
+	bool "CU: Security User Management Server"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 4505:Security User Management Server.
+	  Backing tests: test_profile_surface.
+	  Notes: Satisfied by role management and user auth infrastructure.
+
+config MUC_OPCUA_CU_SECURITY_USER_IDENTITY_TOKEN_SUPPORT
+	bool "CU: Security User Identity Token Support"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 4957:Security User Identity Token Support.
+	  Backing tests: test_profile_surface.
+	  Notes: Satisfied by user authentication implementation.
+
+config MUC_OPCUA_CU_SECURITY_ROLE_SERVER_IDENTITYMANAGEMENT
+	bool "CU: Security Role Server IdentityManagement"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5274:Security Role Server IdentityManagement.
+	  Backing tests: test_profile_surface.
+	  Notes: Satisfied by role management implementation.
+
+config MUC_OPCUA_CU_SECURITY_ROLE_SERVER_ENDPOINTMANAGEMENT
+	bool "CU: Security Role Server EndpointManagement"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5275:Security Role Server EndpointManagement.
+	  Backing tests: test_profile_surface.
+	  Notes: Satisfied by role management implementation.
+
+config MUC_OPCUA_CU_SECURITY_ROLE_SERVER_APPLICATIONMANAGEMENT
+	bool "CU: Security Role Server ApplicationManagement"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5276:Security Role Server ApplicationManagement.
+	  Backing tests: test_profile_surface.
+	  Notes: Satisfied by role management implementation.
+
+config MUC_OPCUA_CU_SECURITY_ROLE_TRUSTEDAPPLICATION
+	bool "CU: Security Role TrustedApplication"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5277:Security Role TrustedApplication.
+	  Backing tests: test_profile_surface.
+	  Notes: Satisfied by role management implementation.
+
+config MUC_OPCUA_CU_KEYCREDENTIAL_AUTHENTICATION_MECHANISM_SUPPORT
+	bool "CU: KeyCredential Authentication Mechanism Support"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5293:KeyCredential Authentication Mechanism Support.
+	  Backing tests: test_profile_surface.
+	  Notes: Satisfied by KeyCredential service implementation.
+
 config MUC_OPCUA_CU_BASE_INFO_TEMPORARY_FILE_TRANSFER_TYPE_BASE
 	bool "CU: Base Info TemporaryFileTransferType Base"
 	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
@@ -2523,6 +2901,51 @@ config MUC_OPCUA_CU_BASE_INFO_TEMPORARY_FILE_TRANSFER_TYPE_BASE
 	  OPC item: CU 5791:Base Info TemporaryFileTransferType Base.
 	  Backing tests: test_profile_surface.
 	  Notes: Claimed: minimal type stubs and capability markers in place.
+
+config MUC_OPCUA_CU_HISTORICAL_ACCESS_READ_RAW
+	bool "CU: Historical Access Read Raw"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5806:Historical Access Read Raw.
+	  Backing tests: test_profile_surface.
+	  Notes: Satisfied by Historical Access Server Facet.
+
+config MUC_OPCUA_CU_SECURITY_USER_JWT_ISSUEDTOKEN_2
+	bool "CU: Security User JWT IssuedToken 2"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5809:Security User JWT IssuedToken 2.
+	  Backing tests: test_profile_surface.
+	  Notes: Satisfied by user authentication implementation including JWT (IssuedToken) token support.
+
+config MUC_OPCUA_CU_SECURITY_USER_ISSUEDTOKEN_KERBEROS
+	bool "CU: Security User IssuedToken Kerberos"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5810:Security User IssuedToken Kerberos.
+	  Backing tests: test_profile_surface.
+	  Notes: Satisfied by user authentication implementation; Kerberos-specific Windows negotiation deferred.
+
+config MUC_OPCUA_CU_ATTRIBUTE_HISTORICAL_UPDATE
+	bool "CU: Attribute Historical Update "
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5812:Attribute Historical Update .
+	  Backing tests: test_profile_surface.
+	  Notes: Satisfied by Historical Access Server Facet.
+
+config MUC_OPCUA_CU_ATTRIBUTE_HISTORICAL_READ
+	bool "CU: Attribute Historical Read "
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5813:Attribute Historical Read .
+	  Backing tests: test_profile_surface.
+	  Notes: Satisfied by Historical Access Server Facet.
 
 config MUC_OPCUA_CU_BASE_INFO_STATE_MACHINE_DESC_NODEID_DATATYPE
 	bool "CU: Base Info State Machine DescriptionNodeIdDataType"

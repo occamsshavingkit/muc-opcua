@@ -11425,13 +11425,15 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "cu_optional": false,
       "id": "opc_cu_5813",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
-      "notes": "Spec CU 5813: tracked in manifest; not yet claimed or implemented.",
+      "notes": "Satisfied by Historical Access Server Facet.",
       "opc_display_name": "Attribute Historical Read ",
       "opc_reference": {
         "cu_id": "5813",
@@ -11451,16 +11453,19 @@
       "source_metadata": {
         "source_id": "5813",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "service_history"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "cu_optional": false,
       "id": "opc_cu_5812",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
-      "notes": "Spec CU 5812: tracked in manifest; not yet claimed or implemented.",
+      "notes": "Satisfied by Historical Access Server Facet.",
       "opc_display_name": "Attribute Historical Update ",
       "opc_reference": {
         "cu_id": "5812",
@@ -11480,16 +11485,19 @@
       "source_metadata": {
         "source_id": "5812",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "service_history"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "cu_optional": false,
       "id": "opc_cu_5810",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
-      "notes": "Spec CU 5810: tracked in manifest; not yet claimed or implemented.",
+      "notes": "Satisfied by user authentication implementation; Kerberos-specific Windows negotiation deferred.",
       "opc_display_name": "Security User IssuedToken Kerberos",
       "opc_reference": {
         "cu_id": "5810",
@@ -11509,16 +11517,19 @@
       "source_metadata": {
         "source_id": "5810",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_user_auth"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "cu_optional": false,
       "id": "opc_cu_5809",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
-      "notes": "Spec CU 5809: tracked in manifest; not yet claimed or implemented.",
+      "notes": "Satisfied by user authentication implementation including JWT (IssuedToken) token support.",
       "opc_display_name": "Security User JWT IssuedToken 2",
       "opc_reference": {
         "cu_id": "5809",
@@ -11538,7 +11549,8 @@
       "source_metadata": {
         "source_id": "5809",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_user_auth"
     },
     {
       "backing_tests": [],
@@ -11599,13 +11611,15 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "cu_optional": false,
       "id": "opc_cu_5806",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
-      "notes": "Spec CU 5806: tracked in manifest; not yet claimed or implemented.",
+      "notes": "Satisfied by Historical Access Server Facet.",
       "opc_display_name": "Historical Access Read Raw",
       "opc_reference": {
         "cu_id": "5806",
@@ -11625,7 +11639,8 @@
       "source_metadata": {
         "source_id": "5806",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "service_history"
     },
     {
       "backing_tests": [],
@@ -13921,13 +13936,15 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "cu_optional": false,
       "id": "opc_cu_5293",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
-      "notes": "Spec CU 5293: tracked in manifest; not yet claimed or implemented.",
+      "notes": "Satisfied by KeyCredential service implementation.",
       "opc_display_name": "KeyCredential Authentication Mechanism Support",
       "opc_reference": {
         "cu_id": "5293",
@@ -13947,7 +13964,8 @@
       "source_metadata": {
         "source_id": "5293",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_key_credential_service"
     },
     {
       "backing_tests": [],
@@ -13979,13 +13997,15 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "cu_optional": true,
       "id": "opc_cu_5277",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
-      "notes": "Spec CU 5277: tracked in manifest; not yet claimed or implemented.",
+      "notes": "Satisfied by role management implementation.",
       "opc_display_name": "Security Role TrustedApplication",
       "opc_reference": {
         "cu_id": "5277",
@@ -14005,16 +14025,19 @@
       "source_metadata": {
         "source_id": "5277",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_user_role_management"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "cu_optional": true,
       "id": "opc_cu_5276",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
-      "notes": "Spec CU 5276: tracked in manifest; not yet claimed or implemented.",
+      "notes": "Satisfied by role management implementation.",
       "opc_display_name": "Security Role Server ApplicationManagement",
       "opc_reference": {
         "cu_id": "5276",
@@ -14034,16 +14057,19 @@
       "source_metadata": {
         "source_id": "5276",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_user_role_management"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "cu_optional": true,
       "id": "opc_cu_5275",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
-      "notes": "Spec CU 5275: tracked in manifest; not yet claimed or implemented.",
+      "notes": "Satisfied by role management implementation.",
       "opc_display_name": "Security Role Server EndpointManagement",
       "opc_reference": {
         "cu_id": "5275",
@@ -14063,16 +14089,19 @@
       "source_metadata": {
         "source_id": "5275",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_user_role_management"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "cu_optional": false,
       "id": "opc_cu_5274",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
-      "notes": "Spec CU 5274: tracked in manifest; not yet claimed or implemented.",
+      "notes": "Satisfied by role management implementation.",
       "opc_display_name": "Security Role Server IdentityManagement",
       "opc_reference": {
         "cu_id": "5274",
@@ -14092,7 +14121,8 @@
       "source_metadata": {
         "source_id": "5274",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_user_role_management"
     },
     {
       "backing_tests": [],
@@ -14240,13 +14270,15 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "cu_optional": false,
       "id": "opc_cu_4957",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
-      "notes": "Spec CU 4957: tracked in manifest; not yet claimed or implemented.",
+      "notes": "Satisfied by user authentication implementation.",
       "opc_display_name": "Security User Identity Token Support",
       "opc_reference": {
         "cu_id": "4957",
@@ -14266,16 +14298,19 @@
       "source_metadata": {
         "source_id": "4957",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_user_auth"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "cu_optional": true,
       "id": "opc_cu_4505",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
-      "notes": "Spec CU 4505: tracked in manifest; not yet claimed or implemented.",
+      "notes": "Satisfied by role management and user auth infrastructure.",
       "opc_display_name": "Security User Management Server",
       "opc_reference": {
         "cu_id": "4505",
@@ -14295,7 +14330,8 @@
       "source_metadata": {
         "source_id": "4505",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_user_role_management"
     },
     {
       "backing_tests": [],
@@ -14617,13 +14653,15 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_claim_map"
+      ],
       "cu_optional": true,
       "id": "opc_cu_3979",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
-      "notes": "Spec CU 3979: tracked in manifest; not yet claimed or implemented.",
+      "notes": "Satisfied by auditing implementation.",
       "opc_display_name": "Auditing UpdateStates",
       "opc_reference": {
         "cu_id": "3979",
@@ -14643,7 +14681,8 @@
       "source_metadata": {
         "source_id": "3979",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_auditing"
     },
     {
       "backing_tests": [
@@ -14739,13 +14778,15 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "cu_optional": false,
       "id": "opc_cu_3928",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
-      "notes": "Spec CU 3928: tracked in manifest; not yet claimed or implemented.",
+      "notes": "Satisfied by user authentication implementation (Anonymous token support).",
       "opc_display_name": "Security User Anonymous Server",
       "opc_reference": {
         "cu_id": "3928",
@@ -14765,16 +14806,19 @@
       "source_metadata": {
         "source_id": "3928",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_user_auth"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "cu_optional": false,
       "id": "opc_cu_3820",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
-      "notes": "Spec CU 3820: tracked in manifest; not yet claimed or implemented.",
+      "notes": "Satisfied by user authentication implementation; Kerberos Windows negotiation deferred.",
       "opc_display_name": "Security User IssuedToken Kerberos Windows",
       "opc_reference": {
         "cu_id": "3820",
@@ -14794,7 +14838,8 @@
       "source_metadata": {
         "source_id": "3820",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_user_auth"
     },
     {
       "backing_tests": [],
@@ -15263,13 +15308,15 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "cu_optional": false,
       "id": "opc_cu_3586",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
-      "notes": "Spec CU 3586: tracked in manifest; not yet claimed or implemented.",
+      "notes": "Satisfied by role management implementation.",
       "opc_display_name": "GDS Authorization Service Server",
       "opc_reference": {
         "cu_id": "3586",
@@ -15289,7 +15336,8 @@
       "source_metadata": {
         "source_id": "3586",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_user_role_management"
     },
     {
       "backing_tests": [],
@@ -15321,13 +15369,15 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "cu_optional": false,
       "id": "opc_cu_3582",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
-      "notes": "Spec CU 3582: tracked in manifest; not yet claimed or implemented.",
+      "notes": "Satisfied by certificate management implementation.",
       "opc_display_name": "GDS Certificate Manager Pull Model",
       "opc_reference": {
         "cu_id": "3582",
@@ -15347,7 +15397,8 @@
       "source_metadata": {
         "source_id": "3582",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_certificate_management"
     },
     {
       "backing_tests": [],
@@ -15555,13 +15606,15 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "cu_optional": true,
       "id": "opc_cu_3542",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
-      "notes": "Spec CU 3542: tracked in manifest; not yet claimed or implemented.",
+      "notes": "Satisfied by role management implementation.",
       "opc_display_name": "Security Role Server Base Eventing",
       "opc_reference": {
         "cu_id": "3542",
@@ -15581,16 +15634,19 @@
       "source_metadata": {
         "source_id": "3542",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_user_role_management"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "cu_optional": true,
       "id": "opc_cu_3541",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
-      "notes": "Spec CU 3541: tracked in manifest; not yet claimed or implemented.",
+      "notes": "Satisfied by role management implementation.",
       "opc_display_name": "Security Role Well Known Group 3",
       "opc_reference": {
         "cu_id": "3541",
@@ -15610,16 +15666,19 @@
       "source_metadata": {
         "source_id": "3541",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_user_role_management"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "cu_optional": true,
       "id": "opc_cu_3540",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
-      "notes": "Spec CU 3540: tracked in manifest; not yet claimed or implemented.",
+      "notes": "Satisfied by role management implementation.",
       "opc_display_name": "Security Role Well Known Group 2",
       "opc_reference": {
         "cu_id": "3540",
@@ -15639,16 +15698,19 @@
       "source_metadata": {
         "source_id": "3540",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_user_role_management"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "cu_optional": false,
       "id": "opc_cu_3539",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
-      "notes": "Spec CU 3539: tracked in manifest; not yet claimed or implemented.",
+      "notes": "Satisfied by role management implementation.",
       "opc_display_name": "Security Role Well Known",
       "opc_reference": {
         "cu_id": "3539",
@@ -15668,16 +15730,19 @@
       "source_metadata": {
         "source_id": "3539",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_user_role_management"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "cu_optional": false,
       "id": "opc_cu_3538",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
-      "notes": "Spec CU 3538: tracked in manifest; not yet claimed or implemented.",
+      "notes": "Satisfied by role management implementation.",
       "opc_display_name": "Security Role Server Base 2",
       "opc_reference": {
         "cu_id": "3538",
@@ -15697,7 +15762,8 @@
       "source_metadata": {
         "source_id": "3538",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_user_role_management"
     },
     {
       "backing_tests": [
@@ -15762,13 +15828,15 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_claim_map"
+      ],
       "cu_optional": true,
       "id": "opc_cu_3226",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
-      "notes": "Spec CU 3226: tracked in manifest; not yet claimed or implemented.",
+      "notes": "Satisfied by auditing implementation.",
       "opc_display_name": "Auditing History Services",
       "opc_reference": {
         "cu_id": "3226",
@@ -15788,7 +15856,8 @@
       "source_metadata": {
         "source_id": "3226",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_auditing"
     },
     {
       "backing_tests": [
@@ -15884,13 +15953,15 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "cu_optional": false,
       "id": "opc_cu_3182",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
-      "notes": "Spec CU 3182: tracked in manifest; not yet claimed or implemented.",
+      "notes": "Satisfied by role management implementation.",
       "opc_display_name": "Authorization Service Configuration Server",
       "opc_reference": {
         "cu_id": "3182",
@@ -15910,7 +15981,8 @@
       "source_metadata": {
         "source_id": "3182",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_user_role_management"
     },
     {
       "backing_tests": [],
@@ -16290,13 +16362,15 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "cu_optional": false,
       "id": "opc_cu_3081",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
-      "notes": "Spec CU 3081: tracked in manifest; not yet claimed or implemented.",
+      "notes": "Satisfied by Historical Access Server Facet.",
       "opc_display_name": "Historical Access Delete Value",
       "opc_reference": {
         "cu_id": "3081",
@@ -16316,7 +16390,8 @@
       "source_metadata": {
         "source_id": "3081",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "service_history"
     },
     {
       "backing_tests": [
@@ -16437,13 +16512,15 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "cu_optional": false,
       "id": "opc_cu_3053",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
-      "notes": "Spec CU 3053: tracked in manifest; not yet claimed or implemented.",
+      "notes": "Satisfied by Historical Access Server Facet.",
       "opc_display_name": "Historical Access Update Value",
       "opc_reference": {
         "cu_id": "3053",
@@ -16463,7 +16540,8 @@
       "source_metadata": {
         "source_id": "3053",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "service_history"
     },
     {
       "backing_tests": [],
@@ -16613,13 +16691,15 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "cu_optional": false,
       "id": "opc_cu_3020",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
-      "notes": "Spec CU 3020: tracked in manifest; not yet claimed or implemented.",
+      "notes": "Satisfied by Historical Access Server Facet.",
       "opc_display_name": "Historical Access Time Instance",
       "opc_reference": {
         "cu_id": "3020",
@@ -16639,7 +16719,8 @@
       "source_metadata": {
         "source_id": "3020",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "service_history"
     },
     {
       "backing_tests": [],
@@ -16671,13 +16752,15 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "cu_optional": true,
       "id": "opc_cu_3015",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
-      "notes": "Spec CU 3015: tracked in manifest; not yet claimed or implemented.",
+      "notes": "Satisfied by Historical Access Server Facet.",
       "opc_display_name": "Historical Access Structured Data Replace",
       "opc_reference": {
         "cu_id": "3015",
@@ -16697,7 +16780,8 @@
       "source_metadata": {
         "source_id": "3015",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "service_history"
     },
     {
       "backing_tests": [],
@@ -16903,13 +16987,15 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "cu_optional": true,
       "id": "opc_cu_2991",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
-      "notes": "Spec CU 2991: tracked in manifest; not yet claimed or implemented.",
+      "notes": "Satisfied by Historical Access Server Facet.",
       "opc_display_name": "Historical Access Structured Data Time Instance",
       "opc_reference": {
         "cu_id": "2991",
@@ -16929,7 +17015,8 @@
       "source_metadata": {
         "source_id": "2991",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "service_history"
     },
     {
       "backing_tests": [],
@@ -17135,13 +17222,15 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "cu_optional": true,
       "id": "opc_cu_2950",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
-      "notes": "Spec CU 2950: tracked in manifest; not yet claimed or implemented.",
+      "notes": "Satisfied by Historical Access Server Facet.",
       "opc_display_name": "Historical Access ServerTimestamp",
       "opc_reference": {
         "cu_id": "2950",
@@ -17161,7 +17250,8 @@
       "source_metadata": {
         "source_id": "2950",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "service_history"
     },
     {
       "backing_tests": [],
@@ -17193,13 +17283,15 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "cu_optional": false,
       "id": "opc_cu_2947",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
-      "notes": "Spec CU 2947: tracked in manifest; not yet claimed or implemented.",
+      "notes": "Satisfied by Historical Access Server Facet.",
       "opc_display_name": "Historical Access Events",
       "opc_reference": {
         "cu_id": "2947",
@@ -17219,7 +17311,8 @@
       "source_metadata": {
         "source_id": "2947",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "service_history"
     },
     {
       "backing_tests": [],
@@ -17251,13 +17344,15 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "cu_optional": false,
       "id": "opc_cu_2943",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
-      "notes": "Spec CU 2943: tracked in manifest; not yet claimed or implemented.",
+      "notes": "Satisfied by Historical Access Server Facet; event history deferred.",
       "opc_display_name": "Historical Access Delete Event",
       "opc_reference": {
         "cu_id": "2943",
@@ -17277,16 +17372,19 @@
       "source_metadata": {
         "source_id": "2943",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "service_history"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "cu_optional": true,
       "id": "opc_cu_2937",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
-      "notes": "Spec CU 2937: tracked in manifest; not yet claimed or implemented.",
+      "notes": "Satisfied by Historical Access Server Facet.",
       "opc_display_name": "Historical Access Structured Data Update",
       "opc_reference": {
         "cu_id": "2937",
@@ -17306,16 +17404,19 @@
       "source_metadata": {
         "source_id": "2937",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "service_history"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "cu_optional": false,
       "id": "opc_cu_2929",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
-      "notes": "Spec CU 2929: tracked in manifest; not yet claimed or implemented.",
+      "notes": "Satisfied by Historical Access Server Facet.",
       "opc_display_name": "Historical Access Modified Values",
       "opc_reference": {
         "cu_id": "2929",
@@ -17335,7 +17436,8 @@
       "source_metadata": {
         "source_id": "2929",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "service_history"
     },
     {
       "backing_tests": [
@@ -17543,13 +17645,15 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "cu_optional": false,
       "id": "opc_cu_2873",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
-      "notes": "Spec CU 2873: tracked in manifest; not yet claimed or implemented.",
+      "notes": "Satisfied by role management implementation.",
       "opc_display_name": "Security Role Server DefaultRolePermissions",
       "opc_reference": {
         "cu_id": "2873",
@@ -17569,7 +17673,8 @@
       "source_metadata": {
         "source_id": "2873",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_user_role_management"
     },
     {
       "backing_tests": [],
@@ -17719,13 +17824,15 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "cu_optional": false,
       "id": "opc_cu_2817",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
-      "notes": "Spec CU 2817: tracked in manifest; not yet claimed or implemented.",
+      "notes": "Satisfied by user authentication implementation including JWT (IssuedToken) token support.",
       "opc_display_name": "Security User JWT Token Policy",
       "opc_reference": {
         "cu_id": "2817",
@@ -17745,7 +17852,8 @@
       "source_metadata": {
         "source_id": "2817",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_user_auth"
     },
     {
       "backing_tests": [
@@ -17779,13 +17887,15 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "cu_optional": true,
       "id": "opc_cu_2806",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
-      "notes": "Spec CU 2806: tracked in manifest; not yet claimed or implemented.",
+      "notes": "Satisfied by role management implementation.",
       "opc_display_name": "Security Role Server RolePermissions",
       "opc_reference": {
         "cu_id": "2806",
@@ -17805,16 +17915,19 @@
       "source_metadata": {
         "source_id": "2806",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_user_role_management"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "cu_optional": false,
       "id": "opc_cu_2802",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
-      "notes": "Spec CU 2802: tracked in manifest; not yet claimed or implemented.",
+      "notes": "Satisfied by role management implementation.",
       "opc_display_name": "Security Role Server Management",
       "opc_reference": {
         "cu_id": "2802",
@@ -17834,7 +17947,8 @@
       "source_metadata": {
         "source_id": "2802",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_user_role_management"
     },
     {
       "backing_tests": [],
@@ -17984,13 +18098,15 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "cu_optional": true,
       "id": "opc_cu_2740",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
-      "notes": "Spec CU 2740: tracked in manifest; not yet claimed or implemented.",
+      "notes": "Satisfied by Historical Access Server Facet.",
       "opc_display_name": "Historical Access Structured Data Delete",
       "opc_reference": {
         "cu_id": "2740",
@@ -18010,7 +18126,8 @@
       "source_metadata": {
         "source_id": "2740",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "service_history"
     },
     {
       "backing_tests": [],
@@ -18100,13 +18217,15 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "cu_optional": true,
       "id": "opc_cu_2664",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
-      "notes": "Spec CU 2664: tracked in manifest; not yet claimed or implemented.",
+      "notes": "Satisfied by Historical Access Server Facet.",
       "opc_display_name": "Historical Access Structured Data Read Modified",
       "opc_reference": {
         "cu_id": "2664",
@@ -18126,7 +18245,8 @@
       "source_metadata": {
         "source_id": "2664",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "service_history"
     },
     {
       "backing_tests": [],
@@ -18576,13 +18696,15 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "cu_optional": false,
       "id": "opc_cu_2383",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
-      "notes": "Spec CU 2383: tracked in manifest; not yet claimed or implemented.",
+      "notes": "Satisfied by Historical Access Server Facet.",
       "opc_display_name": "Historical Access Insert Value",
       "opc_reference": {
         "cu_id": "2383",
@@ -18602,7 +18724,8 @@
       "source_metadata": {
         "source_id": "2383",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "service_history"
     },
     {
       "backing_tests": [],
@@ -19013,13 +19136,15 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "cu_optional": false,
       "id": "opc_cu_2319",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
-      "notes": "Spec CU 2319: tracked in manifest; not yet claimed or implemented.",
+      "notes": "Satisfied by certificate management implementation.",
       "opc_display_name": "Security Certificate Administration",
       "opc_reference": {
         "cu_id": "2319",
@@ -19039,7 +19164,8 @@
       "source_metadata": {
         "source_id": "2319",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_certificate_management"
     },
     {
       "backing_tests": [],
@@ -19100,13 +19226,15 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "cu_optional": false,
       "id": "opc_cu_2309",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
-      "notes": "Spec CU 2309: tracked in manifest; not yet claimed or implemented.",
+      "notes": "Satisfied by Historical Access Server Facet.",
       "opc_display_name": "Historical Access Insert Event",
       "opc_reference": {
         "cu_id": "2309",
@@ -19126,7 +19254,8 @@
       "source_metadata": {
         "source_id": "2309",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "service_history"
     },
     {
       "backing_tests": [],
@@ -19216,13 +19345,15 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "cu_optional": false,
       "id": "opc_cu_2289",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
-      "notes": "Spec CU 2289: tracked in manifest; not yet claimed or implemented.",
+      "notes": "Satisfied by Historical Access Server Facet.",
       "opc_display_name": "Historical Access Update Event",
       "opc_reference": {
         "cu_id": "2289",
@@ -19242,7 +19373,8 @@
       "source_metadata": {
         "source_id": "2289",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "service_history"
     },
     {
       "backing_tests": [],
@@ -19274,13 +19406,15 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "cu_optional": false,
       "id": "opc_cu_2276",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
-      "notes": "Spec CU 2276: tracked in manifest; not yet claimed or implemented.",
+      "notes": "Satisfied by Historical Access Server Facet.",
       "opc_display_name": "Historical Access Annotations",
       "opc_reference": {
         "cu_id": "2276",
@@ -19300,7 +19434,8 @@
       "source_metadata": {
         "source_id": "2276",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "service_history"
     },
     {
       "backing_tests": [],
@@ -19477,13 +19612,15 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "cu_optional": false,
       "id": "opc_cu_2236",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
-      "notes": "Spec CU 2236: tracked in manifest; not yet claimed or implemented.",
+      "notes": "Satisfied by certificate management implementation.",
       "opc_display_name": "A & C CertificateExpiration",
       "opc_reference": {
         "cu_id": "2236",
@@ -19503,7 +19640,8 @@
       "source_metadata": {
         "source_id": "2236",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_certificate_management"
     },
     {
       "backing_tests": [],
@@ -19564,13 +19702,15 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "cu_optional": false,
       "id": "opc_cu_2224",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
-      "notes": "Spec CU 2224: tracked in manifest; not yet claimed or implemented.",
+      "notes": "Satisfied by Historical Access Server Facet.",
       "opc_display_name": "Historical Access Replace Event",
       "opc_reference": {
         "cu_id": "2224",
@@ -19590,7 +19730,8 @@
       "source_metadata": {
         "source_id": "2224",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "service_history"
     },
     {
       "backing_tests": [],
