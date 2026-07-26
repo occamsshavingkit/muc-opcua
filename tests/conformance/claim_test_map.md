@@ -175,11 +175,13 @@ Backing test column: comma-separated ctest names (as registered).
 | Historical Data Replace 2022 Server Facet | OPC-10000-11 | full | test_profile_surface |
 | Historical Data Delete 2022 Server Facet | OPC-10000-11 | full | test_profile_surface |
 | Historical Access Replace Value | OPC-10000-11 | full | test_profile_surface |
+| Historical Access Structured Data Insert | OPC-10000-11 | full | test_history |
+| Historical Access Structured Data Read Raw | OPC-10000-11 | full | test_history |
 | Query | OPC-10000-4 §5.9 | full | test_query_service |
 | NodeManagement | OPC-10000-4 §5.7 | full | test_node_management, test_node_management_errors |
 | View TranslateBrowsePath | OPC-10000-4 §5.9.4 | all | test_browse_service, test_view_services |
 | Discovery Get Endpoints | OPC-10000-4 §5.5.1, 5.5.4 | all | test_discovery_endpoint, test_discovery_services |
-| Discovery Find Servers Self | OPC-10000-4 §5.5.2 | all | test_discovery_services, test_discovery_endpoint |
+| Discovery Find Servers Self | OPC-10000-4 §5.5.2 | all | test_history |
 | Attribute Write Values | OPC-10000-4 §5.11.4 | full | test_write_value_gate, test_write_service |
 | Session Change User | OPC-10000-4 §5.7.3 | full | test_session, test_session_auth |
 | Security Administration |  | full | test_profile_surface |
@@ -236,6 +238,8 @@ Backing test column: comma-separated ctest names (as registered).
 | A & C Auditing | OPC-10000-9 §5.10 | full | test_claim_map |
 | A & C Dialog Auditing | OPC-10000-9 §5.10.5 | full | test_claim_map |
 | A & C Confirm Auditing | OPC-10000-9 §5.10.7 | full | test_claim_map |
+| A & C Shelving Auditing | OPC-10000-9 §5.10.8 | full | test_history |
+| A & C Suppression Auditing | OPC-10000-9 §5.10.9 | full | test_history |
 | Session Cancel | OPC-10000-4 §5.6.5 | standard, full | test_claim_map |
 | Discovery Register | OPC-10000-4 §5.4.5 | standard, full | test_claim_map |
 | Security Policy Required | OPC-10000-7 §6.5 | embedded, standard, full | test_profile_surface |
@@ -476,6 +480,7 @@ Backing test column: comma-separated ctest names (as registered).
 | GDS Key Credential Service Pull Model |  | full | test_certificate_management |
 | GDS Certificate Manager Pull Model |  | full | test_profile_surface |
 | GDS Query Applications |  | full | test_certificate_management |
+| Aggregate Master Configuration |  | full | test_history |
 | Historical Access Aggregates |  | full | test_history |
 | A & E Wrapper Mapping |  | full | test_alarms_conditions |
 | A & C Alarm Metrics |  | full | test_alarms_conditions |
@@ -511,6 +516,7 @@ Backing test column: comma-separated ctest names (as registered).
 | Aggregate - WorstQuality |  |  | test_history |
 | Historical Access Update Value |  | full | test_profile_surface |
 | A & C Confirm |  | full | test_alarms_conditions |
+| Aggregate Historical Configuration |  | full | test_history |
 | Aggregate - Total |  |  | test_history |
 | Redundancy Server Transparent |  | full | test_transfer_subscriptions |
 | Address Space UserWriteMask Multilevel |  | full | test_profile_surface |

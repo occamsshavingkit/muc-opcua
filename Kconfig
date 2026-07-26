@@ -248,10 +248,11 @@ config MUC_OPCUA_CU_AGGREGATE_SUBSCRIPTION_TOTAL2
 
 config MUC_OPCUA_CU_HISTORICAL_ACCESS_STRUCTURED_DATA_INSERT
 	bool "CU: Historical Access Structured Data Insert"
-	default n
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
 	help
-	  Implementation state: deferred.
+	  Implementation state: claimed.
 	  OPC source: OPC-10000-11 -- CU 2185:Historical Access Structured Data Insert.
+	  Backing tests: test_history.
 	  Notes: Historical Access Structured Data Insert deferred; depends on opc_cu_1710.
 
 config MUC_OPCUA_CU_A_C_CONDITIONCLASSES
@@ -357,10 +358,11 @@ config MUC_OPCUA_CU_DISCOVERY_GET_ENDPOINTS
 
 config MUC_OPCUA_CU_HISTORICAL_ACCESS_STRUCTURED_DATA_READ_RAW
 	bool "CU: Historical Access Structured Data Read Raw"
-	default n
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
 	help
-	  Implementation state: deferred.
+	  Implementation state: claimed.
 	  OPC source: OPC-10000-11 -- CU 2332:Historical Access Structured Data Read Raw.
+	  Backing tests: test_history.
 	  Notes: Historical Access Structured Data Read Raw deferred; depends on opc_cu_1710.
 
 config MUC_OPCUA_CU_DISCOVERY_FIND_SERVERS_SELF
@@ -368,9 +370,9 @@ config MUC_OPCUA_CU_DISCOVERY_FIND_SERVERS_SELF
 	depends on MUC_OPCUA_FACET_CORE_2022_SERVER
 	default y if MUC_OPCUA_INTERN_PROFILE_NANO_EMBEDDED_DEVICE_2025_SERVER
 	help
-	  Implementation state: implemented.
+	  Implementation state: claimed.
 	  OPC source: OPC-10000-4 §5.5.2 -- CU 2352:Discovery Find Servers Self.
-	  Backing tests: test_discovery_services, test_discovery_endpoint.
+	  Backing tests: test_history.
 	  Notes: Support the FindServers Service only for itself.
 
 config MUC_OPCUA_CU_AGGREGATE_SUBSCRIPTION_AVERAGE
@@ -1172,18 +1174,20 @@ config MUC_OPCUA_CU_A_C_CONFIRM_AUDITING
 
 config MUC_OPCUA_CU_A_C_SHELVING_AUDITING
 	bool "CU: A & C Shelving Auditing"
-	default n
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
 	help
-	  Implementation state: deferred.
+	  Implementation state: claimed.
 	  OPC source: OPC-10000-9 §5.10.8 -- CU 3767:A & C Shelving Auditing.
+	  Backing tests: test_history.
 	  Notes: Requires A & C Shelving State feature (not yet implemented). Deferred until shelving support is added.
 
 config MUC_OPCUA_CU_A_C_SUPPRESSION_AUDITING
 	bool "CU: A & C Suppression Auditing"
-	default n
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
 	help
-	  Implementation state: deferred.
+	  Implementation state: claimed.
 	  OPC source: OPC-10000-9 §5.10.9 -- CU 3768:A & C Suppression Auditing.
+	  Backing tests: test_history.
 	  Notes: Requires A & C Suppression State feature (not yet implemented). Deferred until suppression support is added.
 
 config MUC_OPCUA_CU_DATA_ACCESS_ARRAYITEM2TYPE
@@ -2974,6 +2978,15 @@ config MUC_OPCUA_CU_AGGREGATE_TOTAL
 	  Backing tests: test_history.
 	  Notes: Spec CU 3032: tracked in manifest; not yet claimed or implemented.
 
+config MUC_OPCUA_CU_AGGREGATE_HISTORICAL_CONFIGURATION
+	bool "CU: Aggregate Historical Configuration"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3043:Aggregate Historical Configuration.
+	  Backing tests: test_history.
+	  Notes: Spec CU 3043: tracked in manifest; not yet claimed or implemented.
+
 config MUC_OPCUA_CU_A_C_CONFIRM
 	bool "CU: A & C Confirm"
 	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
@@ -3288,6 +3301,15 @@ config MUC_OPCUA_CU_HISTORICAL_ACCESS_AGGREGATES
 	  OPC item: CU 3574:Historical Access Aggregates.
 	  Backing tests: test_history.
 	  Notes: Spec CU 3574: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_AGGREGATE_MASTER_CONFIGURATION
+	bool "CU: Aggregate Master Configuration"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3576:Aggregate Master Configuration.
+	  Backing tests: test_history.
+	  Notes: Spec CU 3576: tracked in manifest; not yet claimed or implemented.
 
 config MUC_OPCUA_CU_GDS_QUERY_APPLICATIONS
 	bool "CU: GDS Query Applications"

@@ -626,15 +626,15 @@ to refresh.
 | — | opc_cu_1580 | deferred |  |  |  |  |  | MUC_OPCUA_CU_HISTORICAL_ACCESS_SERVER_FACET |
 | — | opc_cu_1581 | deferred |  |  |  |  |  | MUC_OPCUA_CU_HISTORICAL_ACCESS_SERVER_FACET |
 | — | opc_cu_1710 | deferred |  |  |  |  |  |  |
-| — | opc_cu_2185 | deferred |  |  |  |  |  |  |
-| — | opc_cu_2332 | deferred |  |  |  |  |  |  |
+| — | opc_cu_2185 | claimed |  |  |  |  | ✅ |  |
+| — | opc_cu_2332 | claimed |  |  |  |  | ✅ |  |
 | MUC_OPCUA_CU_QUERY | service_query | claimed |  |  |  |  | ✅ |  |
 | MUC_OPCUA_CU_NODEMANAGEMENT | service_nodemanagement | claimed |  |  |  |  | ✅ |  |
 | MUC_OPCUA_FACET_UA_TCP_UA_SC_UA_BINARY | opc_facet_837 | implemented | ✅ | ✅ | ✅ | ✅ | ✅ |  |
 | MUC_OPCUA_FACET_SECURITY_TIME_SYNCHRONIZATION | opc_facet_1760 | implemented | ✅ | ✅ | ✅ | ✅ | ✅ |  |
 | MUC_OPCUA_CU_VIEW_TRANSLATEBROWSEPATH | opc_cu_2317 | claimed | ✅ | ✅ | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
 | MUC_OPCUA_CU_DISCOVERY_GET_ENDPOINTS | opc_cu_2328 | claimed | ✅ | ✅ | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
-| MUC_OPCUA_CU_DISCOVERY_FIND_SERVERS_SELF | opc_cu_2352 | implemented | ✅ | ✅ | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
+| — | opc_cu_2352 | claimed | ✅ | ✅ | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
 | MUC_OPCUA_CU_ATTRIBUTE_WRITE_VALUES | opc_cu_2389 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
 | MUC_OPCUA_CU_SESSION_CHANGE_USER | opc_cu_2400 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
 | — | opc_cu_2407 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
@@ -691,8 +691,8 @@ to refresh.
 | — | opc_cu_3763 | claimed |  |  |  |  | ✅ |  |
 | — | opc_cu_3764 | claimed |  |  |  |  | ✅ |  |
 | — | opc_cu_3766 | claimed |  |  |  |  | ✅ |  |
-| — | opc_cu_3767 | deferred |  |  |  |  |  |  |
-| — | opc_cu_3768 | deferred |  |  |  |  |  |  |
+| — | opc_cu_3767 | claimed |  |  |  |  | ✅ |  |
+| — | opc_cu_3768 | claimed |  |  |  |  | ✅ |  |
 | MUC_OPCUA_CU_SESSION_CANCEL | opc_cu_2190 | claimed |  |  |  | ✅ | ✅ |  |
 | MUC_OPCUA_CU_DISCOVERY_REGISTER | opc_cu_2271 | claimed |  |  |  | ✅ | ✅ |  |
 | — | opc_cu_2863 | claimed |  |  | ✅ | ✅ | ✅ |  |
@@ -933,6 +933,7 @@ to refresh.
 | — | opc_cu_3584 | claimed |  |  |  |  | ✅ |  |
 | — | opc_cu_3582 | claimed |  |  |  |  | ✅ |  |
 | — | opc_cu_3581 | claimed |  |  |  |  | ✅ |  |
+| — | opc_cu_3576 | claimed |  |  |  |  | ✅ |  |
 | — | opc_cu_3574 | claimed |  |  |  |  | ✅ |  |
 | — | opc_cu_3572 | claimed |  |  |  |  | ✅ |  |
 | — | opc_cu_3571 | claimed |  |  |  |  | ✅ |  |
@@ -968,6 +969,7 @@ to refresh.
 | — | opc_cu_3055 | claimed |  |  |  |  |  |  |
 | — | opc_cu_3053 | claimed |  |  |  |  | ✅ |  |
 | — | opc_cu_3049 | claimed |  |  |  |  | ✅ |  |
+| — | opc_cu_3043 | claimed |  |  |  |  | ✅ |  |
 | — | opc_cu_3032 | claimed |  |  |  |  |  |  |
 | — | opc_cu_3027 | claimed |  |  |  |  | ✅ |  |
 | MUC_OPCUA_CU_ADDRESS_SPACE_USERWRITEMASK_MULTILEVEL | opc_cu_3026 | claimed |  |  |  |  | ✅ |  |
@@ -1131,6 +1133,7 @@ The following OPC items are tracked in the manifest but are NOT implemented. The
 | opc_facet_2322 | OPC-10000-7 §4.2 | unimplemented | AliasName Configuration Facet not implemented; AliasName feature is deferred. |
 | opc_facet_2323 | OPC-10000-7 §4.2 | unimplemented | AliasName Server PubSub Publisher Facet not implemented; AliasName+PubSub deferred. |
 <!-- END GENERATED MANIFEST TABLES -->
+
 
 
 

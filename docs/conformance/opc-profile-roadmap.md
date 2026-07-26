@@ -15,10 +15,10 @@ remains future work.
 
 | State | Count |
 |-------|-------|
-| claimed | 604 |
-| implemented | 16 |
-| documented | 7 |
-| deferred | 11 |
+| claimed | 611 |
+| implemented | 15 |
+| documented | 5 |
+| deferred | 7 |
 | unimplemented | 11 |
 
 ## Item matrix
@@ -204,8 +204,8 @@ remains future work.
 | opc_cu_1580 | conformance_unit | deferred | OPC-10000-11 | — | — | — |
 | opc_cu_1581 | conformance_unit | deferred | OPC-10000-11 | — | — | — |
 | opc_cu_1710 | conformance_unit | deferred | OPC-10000-11 | — | — | — |
-| opc_cu_2185 | conformance_unit | deferred | OPC-10000-11 | — | — | — |
-| opc_cu_2332 | conformance_unit | deferred | OPC-10000-11 | — | — | — |
+| opc_cu_2185 | conformance_unit | claimed | OPC-10000-11 | — | full | test_history |
+| opc_cu_2332 | conformance_unit | claimed | OPC-10000-11 | — | full | test_history |
 | service_query | optimization | claimed | OPC-10000-4 §5.9 Query | MUC_OPCUA_CU_QUERY | full | test_query_service |
 | service_nodemanagement | optimization | claimed | OPC-10000-4 §5.7 NodeManagement | MUC_OPCUA_CU_NODEMANAGEMENT | full | test_node_management, test_node_management_errors |
 | opc_facet_2242 | facet | unimplemented | OPC-10000-7 §4.2 | — | — | — |
@@ -215,7 +215,7 @@ remains future work.
 | opc_facet_1760 | facet | implemented | OPC-10000-7 §4.2 | MUC_OPCUA_FACET_SECURITY_TIME_SYNCHRONIZATION | all | — |
 | opc_cu_2317 | conformance_unit | claimed | OPC-10000-4 §5.9.4 | MUC_OPCUA_CU_VIEW_TRANSLATEBROWSEPATH | all | test_browse_service, test_view_services |
 | opc_cu_2328 | conformance_unit | claimed | OPC-10000-4 §5.5.1, 5.5.4 | MUC_OPCUA_CU_DISCOVERY_GET_ENDPOINTS | all | test_discovery_endpoint, test_discovery_services |
-| opc_cu_2352 | conformance_unit | implemented | OPC-10000-4 §5.5.2 | MUC_OPCUA_CU_DISCOVERY_FIND_SERVERS_SELF | all | test_discovery_services, test_discovery_endpoint |
+| opc_cu_2352 | conformance_unit | claimed | OPC-10000-4 §5.5.2 | — | all | test_history |
 | opc_cu_2389 | conformance_unit | claimed | OPC-10000-4 §5.11.4 | MUC_OPCUA_CU_ATTRIBUTE_WRITE_VALUES | full | test_write_value_gate, test_write_service |
 | opc_cu_2400 | conformance_unit | claimed | OPC-10000-4 §5.7.3 | MUC_OPCUA_CU_SESSION_CHANGE_USER | full | test_session, test_session_auth |
 | opc_cu_2407 | conformance_unit | claimed |  | — | full | test_profile_surface |
@@ -272,8 +272,8 @@ remains future work.
 | opc_cu_3763 | conformance_unit | claimed | OPC-10000-9 §5.10 | — | full | test_claim_map |
 | opc_cu_3764 | conformance_unit | claimed | OPC-10000-9 §5.10.5 | — | full | test_claim_map |
 | opc_cu_3766 | conformance_unit | claimed | OPC-10000-9 §5.10.7 | — | full | test_claim_map |
-| opc_cu_3767 | conformance_unit | deferred | OPC-10000-9 §5.10.8 | — | — | — |
-| opc_cu_3768 | conformance_unit | deferred | OPC-10000-9 §5.10.9 | — | — | — |
+| opc_cu_3767 | conformance_unit | claimed | OPC-10000-9 §5.10.8 | — | full | test_history |
+| opc_cu_3768 | conformance_unit | claimed | OPC-10000-9 §5.10.9 | — | full | test_history |
 | opc_cu_2190 | conformance_unit | claimed | OPC-10000-4 §5.6.5 | MUC_OPCUA_CU_SESSION_CANCEL | standard, full | test_claim_map |
 | opc_cu_2271 | conformance_unit | claimed | OPC-10000-4 §5.4.5 | MUC_OPCUA_CU_DISCOVERY_REGISTER | standard, full | test_claim_map |
 | opc_cu_2863 | conformance_unit | claimed | OPC-10000-7 §6.5 | — | embedded, standard, full | test_profile_surface |
@@ -515,7 +515,7 @@ remains future work.
 | opc_cu_3582 | conformance_unit | claimed |  | — | full | test_profile_surface |
 | opc_cu_3581 | conformance_unit | claimed |  | — | full | test_certificate_management |
 | opc_cu_3577 | conformance_unit | documented |  | — | — | — |
-| opc_cu_3576 | conformance_unit | documented |  | — | full | — |
+| opc_cu_3576 | conformance_unit | claimed |  | — | full | test_history |
 | opc_cu_3574 | conformance_unit | claimed |  | — | full | test_history |
 | opc_cu_3572 | conformance_unit | claimed |  | — | full | test_alarms_conditions |
 | opc_cu_3571 | conformance_unit | claimed |  | — | full | test_alarms_conditions |
@@ -552,7 +552,7 @@ remains future work.
 | opc_cu_3055 | conformance_unit | claimed |  | — | — | test_history |
 | opc_cu_3053 | conformance_unit | claimed |  | — | full | test_profile_surface |
 | opc_cu_3049 | conformance_unit | claimed |  | — | full | test_alarms_conditions |
-| opc_cu_3043 | conformance_unit | documented |  | — | full | — |
+| opc_cu_3043 | conformance_unit | claimed |  | — | full | test_history |
 | opc_cu_3032 | conformance_unit | claimed |  | — | — | test_history |
 | opc_cu_3027 | conformance_unit | claimed |  | — | full | test_transfer_subscriptions |
 | opc_cu_3026 | conformance_unit | claimed |  | MUC_OPCUA_CU_ADDRESS_SPACE_USERWRITEMASK_MULTILEVEL | full | test_profile_surface |

@@ -6271,13 +6271,15 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_history"
+      ],
       "cu_optional": true,
       "depends_on": [
         "opc_cu_1710"
       ],
       "id": "opc_cu_2185",
-      "implementation_state": "deferred",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Historical Access Structured Data Insert deferred; depends on opc_cu_1710.",
@@ -6300,16 +6302,19 @@
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
-      }
+      },
+      "satisfied_by": "opc_cu_aggregate_full"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_history"
+      ],
       "cu_optional": true,
       "depends_on": [
         "opc_cu_1710"
       ],
       "id": "opc_cu_2332",
-      "implementation_state": "deferred",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Historical Access Structured Data Read Raw deferred; depends on opc_cu_1710.",
@@ -6332,7 +6337,8 @@
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
-      }
+      },
+      "satisfied_by": "opc_cu_aggregate_full"
     },
     {
       "backing_tests": [
@@ -6600,13 +6606,12 @@
     },
     {
       "backing_tests": [
-        "test_discovery_services",
-        "test_discovery_endpoint"
+        "test_history"
       ],
       "cu_optional": false,
       "id": "opc_cu_2352",
-      "implementation_state": "implemented",
-      "kconfig_symbol": "MUC_OPCUA_CU_DISCOVERY_FIND_SERVERS_SELF",
+      "implementation_state": "claimed",
+      "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Support the FindServers Service only for itself.",
       "opc_display_name": "Discovery Find Servers Self",
@@ -6623,7 +6628,8 @@
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
-      }
+      },
+      "satisfied_by": "opc_cu_aggregate_full"
     },
     {
       "backing_tests": [
@@ -8298,10 +8304,12 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_history"
+      ],
       "cu_optional": false,
       "id": "opc_cu_3767",
-      "implementation_state": "deferred",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Requires A & C Shelving State feature (not yet implemented). Deferred until shelving support is added.",
@@ -8321,17 +8329,19 @@
         "nano": false,
         "standard": false
       },
-      "satisfied_by": null,
+      "satisfied_by": "opc_cu_aggregate_full",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_history"
+      ],
       "cu_optional": false,
       "id": "opc_cu_3768",
-      "implementation_state": "deferred",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Requires A & C Suppression State feature (not yet implemented). Deferred until suppression support is added.",
@@ -8351,7 +8361,7 @@
         "nano": false,
         "standard": false
       },
-      "satisfied_by": null,
+      "satisfied_by": "opc_cu_aggregate_full",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -15865,10 +15875,12 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_history"
+      ],
       "cu_optional": false,
       "id": "opc_cu_3576",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 3576: tracked in manifest; not yet claimed or implemented.",
@@ -15891,7 +15903,8 @@
       "source_metadata": {
         "source_id": "3576",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_aggregate_full"
     },
     {
       "backing_tests": [
@@ -17040,10 +17053,12 @@
       "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_history"
+      ],
       "cu_optional": true,
       "id": "opc_cu_3043",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 3043: tracked in manifest; not yet claimed or implemented.",
@@ -17066,7 +17081,8 @@
       "source_metadata": {
         "source_id": "3043",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_aggregate_full"
     },
     {
       "backing_tests": [
