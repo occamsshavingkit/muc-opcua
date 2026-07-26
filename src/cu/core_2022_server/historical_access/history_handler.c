@@ -12,8 +12,8 @@ static bool aggregate_status_is_bad_cu(opcua_statuscode_t status) {
 }
 static bool variant_numeric_to_double_hist(const mu_variant_t *value, opcua_double_t *out);
 static opcua_statuscode_t compute_history_aggregate(const mu_historical_data_point_t *points, size_t num_points,
-                                                     opcua_uint32_t aggregate_type, mu_variant_t *result,
-                                                     opcua_statuscode_t *result_status);
+                                                    opcua_uint32_t aggregate_type, mu_variant_t *result,
+                                                    opcua_statuscode_t *result_status);
 
 opcua_statuscode_t handle_history_read(mu_server_t *server, mu_binary_reader_t *r, mu_binary_writer_t *w,
                                        size_t *response_length) {
@@ -66,10 +66,10 @@ opcua_statuscode_t handle_history_read(mu_server_t *server, mu_binary_reader_t *
                 res->status_code = MU_STATUS_BAD_HISTORYOPERATIONUNSUPPORTED;
             } else {
                 res->status_code = server->config.history_adapter.read_raw_modified(
-                    server->config.history_adapter.context, &node->node_id,
-                    req.details.raw_modified.is_read_modified, req.details.raw_modified.start_time,
-                    req.details.raw_modified.end_time, req.details.raw_modified.num_values_per_node,
-                    req.details.raw_modified.return_bounds, node->continuation_point.data,
+                    server->config.history_adapter.context, &node->node_id, req.details.raw_modified.is_read_modified,
+                    req.details.raw_modified.start_time, req.details.raw_modified.end_time,
+                    req.details.raw_modified.num_values_per_node, req.details.raw_modified.return_bounds,
+                    node->continuation_point.data,
                     node->continuation_point.length > 0 ? (size_t)node->continuation_point.length : 0,
                     continuation_points[i], &cp_out_length, data_points, MU_MAX_HISTORY_DATA_POINTS,
                     &actual_data_points);
@@ -100,10 +100,9 @@ opcua_statuscode_t handle_history_read(mu_server_t *server, mu_binary_reader_t *
             } else {
                 opcua_boolean_t is_raw = false;
                 res->status_code = server->config.history_adapter.read_raw_modified(
-                    server->config.history_adapter.context, &node->node_id, is_raw,
-                    req.details.processed.start_time, req.details.processed.end_time, 0,
-                    false, NULL, 0, NULL, NULL, data_points, MU_MAX_HISTORY_DATA_POINTS,
-                    &actual_data_points);
+                    server->config.history_adapter.context, &node->node_id, is_raw, req.details.processed.start_time,
+                    req.details.processed.end_time, 0, false, NULL, 0, NULL, NULL, data_points,
+                    MU_MAX_HISTORY_DATA_POINTS, &actual_data_points);
             }
 
             if (res->status_code == MU_STATUS_GOOD) {
@@ -269,8 +268,8 @@ static bool variant_numeric_to_double_hist(const mu_variant_t *value, opcua_doub
 }
 
 static opcua_statuscode_t compute_history_aggregate(const mu_historical_data_point_t *points, size_t num_points,
-                                                     opcua_uint32_t aggregate_type, mu_variant_t *result,
-                                                     opcua_statuscode_t *result_status) {
+                                                    opcua_uint32_t aggregate_type, mu_variant_t *result,
+                                                    opcua_statuscode_t *result_status) {
     if (num_points == 0) {
         *result_status = MU_STATUS_BAD_NODATA;
         memset(result, 0, sizeof(*result));
@@ -434,8 +433,10 @@ static opcua_statuscode_t compute_history_aggregate(const mu_historical_data_poi
                         min_r = max_r = val;
                         have = true;
                     } else {
-                        if (val < min_r) min_r = val;
-                        if (val > max_r) max_r = val;
+                        if (val < min_r)
+                            min_r = val;
+                        if (val > max_r)
+                            max_r = val;
                     }
                 }
             }
