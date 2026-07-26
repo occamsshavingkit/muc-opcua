@@ -146,6 +146,24 @@ typedef struct {
             mu_variant_t prev_val;
             opcua_uint64_t prev_time_ms;
         } interp;
+        struct {
+            mu_variant_t actual_val;
+            opcua_uint64_t actual_time_ms;
+        } min_actual_time;
+        struct {
+            mu_variant_t actual_val;
+            opcua_uint64_t actual_time_ms;
+        } max_actual_time;
+        struct {
+            opcua_uint32_t transitions;
+            bool last_was_zero;
+            bool has_last;
+        } num_trans;
+        struct {
+            opcua_double_t m2;
+            opcua_double_t mean;
+            opcua_uint32_t count;
+        } welford;
 #endif
     } accumulator;
     opcua_uint32_t aggregate_type; /* MU_ID_AGGREGATETYPE_AVERAGE, MINIMUM, MAXIMUM */

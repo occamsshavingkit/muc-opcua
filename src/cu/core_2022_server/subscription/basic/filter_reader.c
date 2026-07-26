@@ -246,7 +246,20 @@ opcua_statuscode_t read_aggregate_filter_body(mu_binary_reader_t *r, size_t filt
         body->aggregate_type != MU_ID_AGGREGATETYPE_TOTAL && body->aggregate_type != MU_ID_AGGREGATETYPE_TOTAL_2 &&
         body->aggregate_type != MU_ID_AGGREGATETYPE_WORST_QUALITY &&
         body->aggregate_type != MU_ID_AGGREGATETYPE_WORST_QUALITY_2 &&
-        body->aggregate_type != MU_ID_AGGREGATETYPE_ANNOTATION_COUNT
+        body->aggregate_type != MU_ID_AGGREGATETYPE_ANNOTATION_COUNT &&
+        body->aggregate_type != MU_ID_AGGREGATETYPE_MINIMUM_ACTUAL_TIME &&
+        body->aggregate_type != MU_ID_AGGREGATETYPE_MAXIMUM_ACTUAL_TIME &&
+        body->aggregate_type != MU_ID_AGGREGATETYPE_RANGE_2 &&
+        body->aggregate_type != MU_ID_AGGREGATETYPE_MINIMUM_ACTUAL_TIME_2 &&
+        body->aggregate_type != MU_ID_AGGREGATETYPE_MAXIMUM_ACTUAL_TIME_2 &&
+        body->aggregate_type != MU_ID_AGGREGATETYPE_DURATION_IN_STATE_NON_ZERO &&
+        body->aggregate_type != MU_ID_AGGREGATETYPE_NUMBER_OF_TRANSITIONS &&
+        body->aggregate_type != MU_ID_AGGREGATETYPE_START_BOUND &&
+        body->aggregate_type != MU_ID_AGGREGATETYPE_END_BOUND &&
+        body->aggregate_type != MU_ID_AGGREGATETYPE_STANDARD_DEVIATION_SAMPLE &&
+        body->aggregate_type != MU_ID_AGGREGATETYPE_VARIANCE_SAMPLE &&
+        body->aggregate_type != MU_ID_AGGREGATETYPE_STANDARD_DEVIATION_POPULATION &&
+        body->aggregate_type != MU_ID_AGGREGATETYPE_VARIANCE_POPULATION
 #endif
     ) {
         body->filter_result = MU_STATUS_BAD_MONITOREDITEMFILTERUNSUPPORTED;

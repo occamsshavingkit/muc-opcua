@@ -642,5 +642,9 @@ target_include_directories(muc_opcua PUBLIC
     $<INSTALL_INTERFACE:include>
 )
 
+if(MUC_OPCUA_CU_AGGREGATE_FULL)
+    target_link_libraries(muc_opcua PUBLIC m)
+endif()
+
 muc_opcua_apply_warnings(muc_opcua)
 muc_opcua_apply_codegen(muc_opcua)

@@ -1,6 +1,7 @@
 /* src/services/subscription_aggregate.c */
 #include "services/subscription.h"
 #include <string.h>
+#include <math.h>
 
 #if MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
 
@@ -167,6 +168,82 @@ void monitored_item_accumulate_aggregate(mu_monitored_item_t *item, const mu_var
     } else if (item->aggregate_state.aggregate_type == MU_ID_AGGREGATETYPE_INTERPOLATIVE) {
         item->aggregate_state.accumulator.interp.prev_val = *cur;
         item->aggregate_state.accumulator.interp.prev_time_ms = item->aggregate_state.accumulator.timeavg.duration_ms;
+    } else if (item->aggregate_state.aggregate_type == MU_ID_AGGREGATETYPE_MINIMUM_ACTUAL_TIME ||
+               item->aggregate_state.aggregate_type == MU_ID_AGGREGATETYPE_MINIMUM_ACTUAL_TIME_2) {
+        if (item->aggregate_state.sample_count == 0u) {
+            item->aggregate_state.accumulator.min_actual_time.actual_val = *cur;
+            item->aggregate_state.accumulator.min_actual_time.actual_time_ms = (opcua_uint64_t)item->aggregate_state.last_calculation;
+        } else {
+            opcua_double_t existing;
+            if (variant_numeric_to_double(&item->aggregate_state.accumulator.min_actual_time.actual_val, &existing) &&
+                val_double < existing) {
+                item->aggregate_state.accumulator.min_actual_time.actual_val = *cur;
+                item->aggregate_state.accumulator.min_actual_time.actual_time_ms = (opcua_uint64_t)item->aggregate_state.last_calculation;
+            }
+        }
+    } else if (item->aggregate_state.aggregate_type == MU_ID_AGGREGATETYPE_MAXIMUM_ACTUAL_TIME ||
+               item->aggregate_state.aggregate_type == MU_ID_AGGREGATETYPE_MAXIMUM_ACTUAL_TIME_2) {
+        if (item->aggregate_state.sample_count == 0u) {
+            item->aggregate_state.accumulator.max_actual_time.actual_val = *cur;
+            item->aggregate_state.accumulator.max_actual_time.actual_time_ms = (opcua_uint64_t)item->aggregate_state.last_calculation;
+        } else {
+            opcua_double_t existing;
+            if (variant_numeric_to_double(&item->aggregate_state.accumulator.max_actual_time.actual_val, &existing) &&
+                val_double > existing) {
+                item->aggregate_state.accumulator.max_actual_time.actual_val = *cur;
+                item->aggregate_state.accumulator.max_actual_time.actual_time_ms = (opcua_uint64_t)item->aggregate_state.last_calculation;
+            }
+        }
+    } else if (item->aggregate_state.aggregate_type == MU_ID_AGGREGATETYPE_RANGE_2) {
+        if (item->aggregate_state.sample_count == 0u) {
+            item->aggregate_state.accumulator.range.min_val = *cur;
+            item->aggregate_state.accumulator.range.max_val = *cur;
+        } else {
+            opcua_double_t existing;
+            if (variant_numeric_to_double(&item->aggregate_state.accumulator.range.min_val, &existing) &&
+                val_double < existing)
+                item->aggregate_state.accumulator.range.min_val = *cur;
+            if (variant_numeric_to_double(&item->aggregate_state.accumulator.range.max_val, &existing) &&
+                val_double > existing)
+                item->aggregate_state.accumulator.range.max_val = *cur;
+        }
+    } else if (item->aggregate_state.aggregate_type == MU_ID_AGGREGATETYPE_NUMBER_OF_TRANSITIONS) {
+        bool is_zero = (val_double == 0.0);
+        if (!item->aggregate_state.accumulator.num_trans.has_last) {
+            item->aggregate_state.accumulator.num_trans.last_was_zero = is_zero;
+            item->aggregate_state.accumulator.num_trans.has_last = true;
+        } else if (is_zero != item->aggregate_state.accumulator.num_trans.last_was_zero) {
+            item->aggregate_state.accumulator.num_trans.transitions++;
+            item->aggregate_state.accumulator.num_trans.last_was_zero = is_zero;
+        }
+    } else if (item->aggregate_state.aggregate_type == MU_ID_AGGREGATETYPE_START_BOUND) {
+        if (item->aggregate_state.sample_count == 0u)
+            item->aggregate_state.accumulator.endpoint.first_val = *cur;
+    } else if (item->aggregate_state.aggregate_type == MU_ID_AGGREGATETYPE_END_BOUND) {
+        item->aggregate_state.accumulator.endpoint.last_val = *cur;
+    } else if (item->aggregate_state.aggregate_type == MU_ID_AGGREGATETYPE_DURATION_IN_STATE_NON_ZERO) {
+        opcua_uint64_t sample_time_ms = item->aggregate_state.accumulator.duration.start_ms;
+        if (item->aggregate_state.sample_count > 0u) {
+            opcua_uint64_t previous_time_ms = item->aggregate_state.accumulator.duration.previous_ms;
+            if (sample_time_ms > previous_time_ms && item->aggregate_state.accumulator.duration.matches) {
+                item->aggregate_state.accumulator.duration.running_total_ms += sample_time_ms - previous_time_ms;
+            }
+        }
+        item->aggregate_state.accumulator.duration.start_ms = sample_time_ms;
+        item->aggregate_state.accumulator.duration.previous_ms = sample_time_ms;
+        item->aggregate_state.accumulator.duration.status = item->last_status;
+        item->aggregate_state.accumulator.duration.matches = (val_double != 0.0) && !aggregate_status_is_bad(item->last_status);
+    } else if (item->aggregate_state.aggregate_type == MU_ID_AGGREGATETYPE_STANDARD_DEVIATION_SAMPLE ||
+               item->aggregate_state.aggregate_type == MU_ID_AGGREGATETYPE_VARIANCE_SAMPLE ||
+               item->aggregate_state.aggregate_type == MU_ID_AGGREGATETYPE_STANDARD_DEVIATION_POPULATION ||
+               item->aggregate_state.aggregate_type == MU_ID_AGGREGATETYPE_VARIANCE_POPULATION) {
+        opcua_uint32_t wc = item->aggregate_state.accumulator.welford.count;
+        wc++;
+        opcua_double_t delta = val_double - item->aggregate_state.accumulator.welford.mean;
+        item->aggregate_state.accumulator.welford.mean += delta / (opcua_double_t)wc;
+        opcua_double_t delta2 = val_double - item->aggregate_state.accumulator.welford.mean;
+        item->aggregate_state.accumulator.welford.m2 += delta * delta2;
+        item->aggregate_state.accumulator.welford.count = wc;
     }
 #else
     }
@@ -295,6 +372,58 @@ void monitored_item_publish_aggregate(mu_monitored_item_t *item, opcua_uint64_t 
             calc_val.is_array = false;
         } else if (item->aggregate_state.aggregate_type == MU_ID_AGGREGATETYPE_INTERPOLATIVE) {
             calc_val = item->aggregate_state.accumulator.interp.prev_val;
+        } else if (item->aggregate_state.aggregate_type == MU_ID_AGGREGATETYPE_MINIMUM_ACTUAL_TIME ||
+                   item->aggregate_state.aggregate_type == MU_ID_AGGREGATETYPE_MINIMUM_ACTUAL_TIME_2) {
+            calc_val = item->aggregate_state.accumulator.min_actual_time.actual_val;
+        } else if (item->aggregate_state.aggregate_type == MU_ID_AGGREGATETYPE_MAXIMUM_ACTUAL_TIME ||
+                   item->aggregate_state.aggregate_type == MU_ID_AGGREGATETYPE_MAXIMUM_ACTUAL_TIME_2) {
+            calc_val = item->aggregate_state.accumulator.max_actual_time.actual_val;
+        } else if (item->aggregate_state.aggregate_type == MU_ID_AGGREGATETYPE_RANGE_2) {
+            calc_val.type = MU_TYPE_DOUBLE;
+            opcua_double_t rmn, rmx;
+            if (variant_numeric_to_double(&item->aggregate_state.accumulator.range.min_val, &rmn) &&
+                variant_numeric_to_double(&item->aggregate_state.accumulator.range.max_val, &rmx))
+                calc_val.value.d = rmx - rmn;
+            else
+                calc_val.value.d = 0.0;
+            calc_val.is_array = false;
+        } else if (item->aggregate_state.aggregate_type == MU_ID_AGGREGATETYPE_NUMBER_OF_TRANSITIONS) {
+            calc_val.type = MU_TYPE_INT64;
+            calc_val.value.i64 = (opcua_int64_t)item->aggregate_state.accumulator.num_trans.transitions;
+            calc_val.is_array = false;
+        } else if (item->aggregate_state.aggregate_type == MU_ID_AGGREGATETYPE_START_BOUND) {
+            calc_val = item->aggregate_state.accumulator.endpoint.first_val;
+        } else if (item->aggregate_state.aggregate_type == MU_ID_AGGREGATETYPE_END_BOUND) {
+            calc_val = item->aggregate_state.accumulator.endpoint.last_val;
+        } else if (item->aggregate_state.aggregate_type == MU_ID_AGGREGATETYPE_DURATION_IN_STATE_NON_ZERO) {
+            calc_val.type = MU_TYPE_DOUBLE;
+            if (now_ms > item->aggregate_state.accumulator.duration.previous_ms &&
+                item->aggregate_state.accumulator.duration.matches) {
+                item->aggregate_state.accumulator.duration.running_total_ms +=
+                    now_ms - item->aggregate_state.accumulator.duration.previous_ms;
+            }
+            calc_val.value.d = (opcua_double_t)item->aggregate_state.accumulator.duration.running_total_ms;
+            calc_val.is_array = false;
+        } else if (item->aggregate_state.aggregate_type == MU_ID_AGGREGATETYPE_STANDARD_DEVIATION_SAMPLE) {
+            calc_val.type = MU_TYPE_DOUBLE;
+            opcua_uint32_t wc = item->aggregate_state.accumulator.welford.count;
+            calc_val.value.d = (wc > 1u) ? sqrt(item->aggregate_state.accumulator.welford.m2 / (opcua_double_t)(wc - 1u)) : 0.0;
+            calc_val.is_array = false;
+        } else if (item->aggregate_state.aggregate_type == MU_ID_AGGREGATETYPE_VARIANCE_SAMPLE) {
+            calc_val.type = MU_TYPE_DOUBLE;
+            opcua_uint32_t wc = item->aggregate_state.accumulator.welford.count;
+            calc_val.value.d = (wc > 1u) ? item->aggregate_state.accumulator.welford.m2 / (opcua_double_t)(wc - 1u) : 0.0;
+            calc_val.is_array = false;
+        } else if (item->aggregate_state.aggregate_type == MU_ID_AGGREGATETYPE_STANDARD_DEVIATION_POPULATION) {
+            calc_val.type = MU_TYPE_DOUBLE;
+            opcua_uint32_t wc = item->aggregate_state.accumulator.welford.count;
+            calc_val.value.d = (wc > 0u) ? sqrt(item->aggregate_state.accumulator.welford.m2 / (opcua_double_t)wc) : 0.0;
+            calc_val.is_array = false;
+        } else if (item->aggregate_state.aggregate_type == MU_ID_AGGREGATETYPE_VARIANCE_POPULATION) {
+            calc_val.type = MU_TYPE_DOUBLE;
+            opcua_uint32_t wc = item->aggregate_state.accumulator.welford.count;
+            calc_val.value.d = (wc > 0u) ? item->aggregate_state.accumulator.welford.m2 / (opcua_double_t)wc : 0.0;
+            calc_val.is_array = false;
 #endif
         } else {
             calc_status = MU_STATUS_BAD_INTERNALERROR;

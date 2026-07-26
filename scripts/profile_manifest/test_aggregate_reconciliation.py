@@ -162,8 +162,8 @@ class AggregateCuReconciliationTest(unittest.TestCase):
         """
         self.assertEqual(
             len(self.implemented),
-            23,
-            "expected 23 faithfully-implemented aggregate functions (24 dispatched "
+            36,
+            "expected 36 faithfully-implemented aggregate functions (37 dispatched "
             "minus AnnotationCount), got " + repr(sorted(self.implemented)),
         )
         self.assertIn("TimeAverage2", self.implemented)
@@ -200,11 +200,6 @@ class AggregateCuReconciliationTest(unittest.TestCase):
 
     def test_uncomputed_aggregates_are_not_claimed(self) -> None:
         """The honesty direction: never claim an aggregate the code lacks.
-
-        13 aggregate functions (the ActualTime/Bound/StandardDeviation/Variance
-        family, NumberOfTransitions, Range2, DurationInStateNonZero) have no
-        MU_ID_AGGREGATETYPE_* constant and no dispatch branch at all, so their
-        CUs must stay uncounted in either facet.
         """
         overclaimed = sorted(
             (kind, fn, cid)
