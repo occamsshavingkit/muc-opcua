@@ -27,17 +27,25 @@ _DEFAULT_PROFILES = ("nano", "micro", "embedded", "standard", "full", "custom")
 def load_manifest(path: str) -> dict:
     """Load the manifest at *path* and return it as a dict.
 
-    The manifest is JSON-formatted YAML, so json.load handles it. Raises
-    FileNotFoundError if missing and ValueError on a malformed document.
+    Handles both JSON and YAML formats. The codebase is migrating from
+    YAML to JSON; both formats are accepted for backward compatibility.
+    Raises FileNotFoundError if missing and ValueError on a malformed document.
     """
+    import json
     if not os.path.isfile(path):
         raise FileNotFoundError(f"manifest not found: {path}")
     with open(path, "r", encoding="utf-8") as fh:
         data = fh.read()
     try:
         manifest = json.loads(data)
-    except json.JSONDecodeError as exc:
-        raise ValueError(f"manifest {path} is not valid JSON/YAML: {exc}") from exc
+    except json.JSONDecodeError:
+        try:
+            import yaml
+            manifest = yaml.safe_load(data)
+        except ImportError:
+            raise ValueError(f"manifest {path} is not valid JSON and PyYAML is not installed")
+        except Exception as exc:
+            raise ValueError(f"manifest {path} is not valid JSON or YAML: {exc}") from exc
     if not isinstance(manifest, dict):
         raise ValueError(f"manifest {path} must decode to a JSON object at top level")
     return manifest
@@ -358,11 +366,11 @@ def validate_manifest(manifest: dict) -> list[str]:
                             f"conformance_unit '{cu_id}' (no item declares it)",
                         )
                         continue
-                    if item_kinds[cu_id] != "conformance_unit":
+                    if item_kinds[cu_id] not in ("conformance_unit", "optimization"):
                         _err(
                             errors,
                             f"facet_containment['{facet_key}'] references item '{cu_id}' "
-                            f"of kind '{item_kinds[cu_id]}' (must be 'conformance_unit')",
+                            f"of kind '{item_kinds[cu_id]}' (must be 'conformance_unit' or 'optimization')",
                         )
                         continue
                     cu_to_facets.setdefault(cu_id, set()).add(facet_key)

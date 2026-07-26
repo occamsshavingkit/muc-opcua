@@ -951,29 +951,45 @@ to refresh.
 | — | opc_cu_3182 | claimed |  |  |  |  | ✅ |  |
 | — | opc_cu_3171 | claimed |  |  |  |  | ✅ |  |
 | — | opc_cu_3165 | claimed |  |  |  |  | ✅ |  |
+| — | opc_cu_3162 | claimed |  |  |  |  |  |  |
+| — | opc_cu_3159 | claimed |  |  |  |  |  |  |
 | — | opc_cu_3142 | claimed |  |  |  |  | ✅ |  |
 | — | opc_cu_3121 | claimed |  |  |  |  | ✅ |  |
 | — | opc_cu_3107 | claimed |  |  |  |  |  |  |
+| — | opc_cu_3101 | claimed |  |  |  |  |  |  |
 | — | opc_cu_3098 | claimed |  |  |  |  | ✅ |  |
+| — | opc_cu_3085 | claimed |  |  |  |  |  |  |
 | — | opc_cu_3084 | claimed |  |  |  |  |  |  |
 | — | opc_cu_3083 | claimed |  |  |  |  | ✅ |  |
 | — | opc_cu_3081 | claimed |  |  |  |  | ✅ |  |
 | MUC_OPCUA_CU_ADDRESS_SPACE_NOTIFIER_HIERARCHY | opc_cu_3064 | claimed |  |  |  |  | ✅ |  |
+| — | opc_cu_3061 | claimed |  |  |  |  |  |  |
 | — | opc_cu_3060 | claimed |  |  |  |  |  |  |
+| — | opc_cu_3055 | claimed |  |  |  |  |  |  |
 | — | opc_cu_3053 | claimed |  |  |  |  | ✅ |  |
 | — | opc_cu_3049 | claimed |  |  |  |  | ✅ |  |
+| — | opc_cu_3032 | claimed |  |  |  |  |  |  |
 | — | opc_cu_3027 | claimed |  |  |  |  | ✅ |  |
 | MUC_OPCUA_CU_ADDRESS_SPACE_USERWRITEMASK_MULTILEVEL | opc_cu_3026 | claimed |  |  |  |  | ✅ |  |
 | — | opc_cu_3020 | claimed |  |  |  |  | ✅ |  |
+| — | opc_cu_3018 | claimed |  |  |  |  |  |  |
 | — | opc_cu_3015 | claimed |  |  |  |  | ✅ |  |
+| — | opc_cu_3011 | claimed |  |  |  |  |  |  |
+| — | opc_cu_3006 | claimed |  |  |  |  |  |  |
 | — | opc_cu_3004 | claimed |  |  |  |  | ✅ |  |
 | — | opc_cu_3001 | claimed |  |  |  |  | ✅ |  |
 | — | opc_cu_3000 | claimed |  |  |  |  |  |  |
+| — | opc_cu_2996 | claimed |  |  |  |  |  |  |
 | — | opc_cu_2991 | claimed |  |  |  |  | ✅ |  |
+| — | opc_cu_2985 | claimed |  |  |  |  |  |  |
+| — | opc_cu_2975 | claimed |  |  |  |  |  |  |
 | — | opc_cu_2965 | claimed |  |  |  |  | ✅ |  |
+| — | opc_cu_2962 | claimed |  |  |  |  |  |  |
+| — | opc_cu_2960 | claimed |  |  |  |  |  |  |
 | — | opc_cu_2957 | claimed |  |  |  |  | ✅ |  |
 | — | opc_cu_2951 | claimed |  |  |  |  | ✅ |  |
 | — | opc_cu_2950 | claimed |  |  |  |  | ✅ |  |
+| — | opc_cu_2948 | claimed |  |  |  |  |  |  |
 | — | opc_cu_2947 | claimed |  |  |  |  | ✅ |  |
 | — | opc_cu_2946 | claimed |  |  |  |  | ✅ |  |
 | — | opc_cu_2943 | claimed |  |  |  |  | ✅ |  |
@@ -999,8 +1015,10 @@ to refresh.
 | — | opc_cu_2785 | claimed |  |  |  |  | ✅ |  |
 | MUC_OPCUA_CU_ADDRESS_SPACE_WRITEMASK | opc_cu_2781 | claimed |  |  |  |  | ✅ |  |
 | — | opc_cu_2777 | claimed |  |  |  |  | ✅ |  |
+| — | opc_cu_2759 | claimed |  |  |  |  |  |  |
 | — | opc_cu_2746 | claimed |  |  |  |  | ✅ |  |
 | — | opc_cu_2740 | claimed |  |  |  |  | ✅ |  |
+| — | opc_cu_2730 | claimed |  |  |  |  |  |  |
 | — | opc_cu_2709 | claimed |  |  |  |  | ✅ |  |
 | — | opc_cu_2705 | claimed |  |  |  |  | ✅ |  |
 | — | opc_cu_2664 | claimed |  |  |  |  | ✅ |  |
@@ -1018,31 +1036,49 @@ to refresh.
 | — | opc_cu_2448 | claimed |  |  |  |  | ✅ |  |
 | — | opc_cu_2391 | claimed |  |  |  |  | ✅ |  |
 | — | opc_cu_2390 | claimed |  |  |  |  | ✅ |  |
+| — | opc_cu_2384 | claimed |  |  |  |  |  |  |
 | — | opc_cu_2383 | claimed |  |  |  |  | ✅ |  |
+| — | opc_cu_2382 | claimed |  |  |  |  |  |  |
 | — | opc_cu_2379 | claimed |  |  |  |  | ✅ |  |
 | MUC_OPCUA_CU_ADDRESS_SPACE_METHOD | opc_cu_2362 | claimed |  |  |  |  | ✅ |  |
 | — | opc_cu_2354 | claimed |  |  |  |  | ✅ |  |
 | — | opc_cu_2353 | claimed |  |  |  |  | ✅ |  |
+| — | opc_cu_2350 | claimed |  |  |  |  |  |  |
+| — | opc_cu_2346 | claimed |  |  |  |  |  |  |
 | — | opc_cu_2345 | claimed |  |  |  |  | ✅ |  |
 | — | opc_cu_2343 | claimed |  |  |  |  | ✅ |  |
+| — | opc_cu_2339 | claimed |  |  |  |  |  |  |
+| — | opc_cu_2335 | claimed |  |  |  |  |  |  |
 | — | opc_cu_2333 | claimed |  |  |  |  | ✅ |  |
 | — | opc_cu_2323 | claimed |  |  |  |  | ✅ |  |
 | — | opc_cu_2319 | claimed |  |  |  |  | ✅ |  |
 | — | opc_cu_2315 | claimed |  |  |  |  | ✅ |  |
+| — | opc_cu_2314 | claimed |  |  |  |  |  |  |
 | — | opc_cu_2309 | claimed |  |  |  |  | ✅ |  |
+| — | opc_cu_2305 | claimed |  |  |  |  |  |  |
+| — | opc_cu_2303 | claimed |  |  |  |  |  |  |
 | — | opc_cu_2291 | claimed |  |  |  |  | ✅ |  |
 | — | opc_cu_2289 | claimed |  |  |  |  | ✅ |  |
+| — | opc_cu_2282 | claimed |  |  |  |  |  |  |
 | — | opc_cu_2276 | claimed |  |  |  |  | ✅ |  |
 | — | opc_cu_2275 | claimed |  |  |  |  | ✅ |  |
+| — | opc_cu_2273 | claimed |  |  |  |  |  |  |
+| — | opc_cu_2267 | claimed |  |  |  |  |  |  |
+| — | opc_cu_2263 | claimed |  |  |  |  |  |  |
 | — | opc_cu_2258 | claimed |  |  |  |  | ✅ |  |
 | — | opc_cu_2239 | claimed |  |  |  |  | ✅ |  |
 | — | opc_cu_2236 | claimed |  |  |  |  | ✅ |  |
 | — | opc_cu_2233 | claimed |  |  |  |  | ✅ |  |
 | — | opc_cu_2232 | claimed |  |  |  |  | ✅ |  |
 | — | opc_cu_2224 | claimed |  |  |  |  | ✅ |  |
+| — | opc_cu_2223 | claimed |  |  |  |  |  |  |
+| — | opc_cu_2220 | claimed |  |  |  |  |  |  |
+| — | opc_cu_2210 | claimed |  |  |  |  |  |  |
 | — | opc_cu_2203 | claimed |  |  |  |  | ✅ |  |
 | — | opc_cu_2202 | claimed |  |  |  |  | ✅ |  |
+| — | opc_cu_2188 | claimed |  |  |  |  |  |  |
 | — | opc_cu_2180 | claimed |  |  |  |  | ✅ |  |
+| — | opc_cu_2175 | claimed |  |  |  |  |  |  |
 | MUC_OPCUA_CU_ADDRESS_SPACE_USERWRITEMASK | opc_cu_2163 | claimed |  |  |  |  | ✅ |  |
 | MUC_OPCUA_MDNS_DISCOVERY | mdns_discovery | implemented |  |  |  |  | ✅ |  |
 | MUC_OPCUA_CU_USER_TOKEN_JWT | cu_user_token_jwt | implemented |  |  |  |  | ✅ | MUC_OPCUA_CU_USER_AUTH |
@@ -1095,6 +1131,10 @@ The following OPC items are tracked in the manifest but are NOT implemented. The
 | opc_facet_2322 | OPC-10000-7 §4.2 | unimplemented | AliasName Configuration Facet not implemented; AliasName feature is deferred. |
 | opc_facet_2323 | OPC-10000-7 §4.2 | unimplemented | AliasName Server PubSub Publisher Facet not implemented; AliasName+PubSub deferred. |
 <!-- END GENERATED MANIFEST TABLES -->
+
+
+
+
 
 
 

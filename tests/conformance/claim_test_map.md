@@ -494,29 +494,45 @@ Backing test column: comma-separated ctest names (as registered).
 | Authorization Service Configuration Server |  | full | test_profile_surface |
 | Discovery Server Announcement using mDNS  |  | full | test_claim_map |
 | A & C Shelving |  | full | test_alarms_conditions |
+| Aggregate - StandardDeviationPopulation |  |  | <placeholder-backfill> |
+| Aggregate - Interpolative |  |  | <placeholder-backfill> |
 | Monitor Alternate Encoding |  | full | test_subscriptions_capacity, test_subscription_deadband, test_subscription_publish |
 | Monitor Aggregate Filter |  | full | test_subscriptions_capacity, test_subscription_deadband, test_subscription_publish |
 | Documentation - Supported Profiles |  |  | test_base_server_behaviour |
+| Aggregate - MaximumActualTime2 |  |  | <placeholder-backfill> |
 | A & C OffNormal |  | full | test_alarms_conditions |
+| Aggregate - DurationGood |  |  | <placeholder-backfill> |
 | Documentation - Users Guide |  |  | test_base_server_behaviour |
 | A & C Comment |  | full | test_alarms_conditions |
 | Historical Access Delete Value |  | full | test_profile_surface |
 | Address Space Notifier Hierarchy |  | full | test_profile_surface |
+| Aggregate - End |  |  | <placeholder-backfill> |
 | Documentation - Multiple Languages |  |  | test_base_server_behaviour |
+| Aggregate - WorstQuality |  |  | <placeholder-backfill> |
 | Historical Access Update Value |  | full | test_profile_surface |
 | A & C Confirm |  | full | test_alarms_conditions |
+| Aggregate - Total |  |  | <placeholder-backfill> |
 | Redundancy Server Transparent |  | full | test_transfer_subscriptions |
 | Address Space UserWriteMask Multilevel |  | full | test_profile_surface |
 | Historical Access Time Instance |  | full | test_profile_surface |
+| Aggregate - MaximumActualTime |  |  | <placeholder-backfill> |
 | Historical Access Structured Data Replace |  | full | test_profile_surface |
+| Aggregate - Range |  |  | <placeholder-backfill> |
+| Aggregate - StandardDeviationSample |  |  | <placeholder-backfill> |
 | A & C Discrete |  | full | test_alarms_conditions |
 | A & C Non-Exclusive Level |  | full | test_alarms_conditions |
 | Documentation - Installation |  |  | test_base_server_behaviour |
+| Aggregate - Average |  |  | <placeholder-backfill> |
 | Historical Access Structured Data Time Instance |  | full | test_profile_surface |
+| Aggregate - NumberOfTransitions |  |  | <placeholder-backfill> |
+| Aggregate - PercentBad |  |  | <placeholder-backfill> |
 | A & C Basic |  | full | test_alarms_conditions |
+| Aggregate - Maximum |  |  | <placeholder-backfill> |
+| Aggregate - VarianceSample |  |  | <placeholder-backfill> |
 | A & C Refresh |  | full | test_alarms_conditions |
 | A & C Exclusive Deviation |  | full | test_alarms_conditions |
 | Historical Access ServerTimestamp |  | full | test_profile_surface |
+| Aggregate - VariancePopulation |  |  | <placeholder-backfill> |
 | Historical Access Events |  | full | test_profile_surface |
 | A & C Non-Exclusive RateOfChange |  | full | test_alarms_conditions |
 | Historical Access Delete Event |  | full | test_profile_surface |
@@ -542,8 +558,10 @@ Backing test column: comma-separated ctest names (as registered).
 | Protocol Configuration |  | full | test_secure_channel |
 | Address Space WriteMask |  | full | test_profile_surface |
 | AliasName Hierarchy |  | full | test_aliasname_stub |
+| Aggregate - MinimumActualTime |  |  | <placeholder-backfill> |
 | A & C Exclusive Level |  | full | test_alarms_conditions |
 | Historical Access Structured Data Delete |  | full | test_profile_surface |
+| Aggregate - Range2 |  |  | <placeholder-backfill> |
 | OPC UA Authority Profile |  | full | test_secure_channel |
 | Azure Identity Provider Authority Profile |  | full | test_certificate_management |
 | Historical Access Structured Data Read Modified |  | full | test_profile_surface |
@@ -561,31 +579,49 @@ Backing test column: comma-separated ctest names (as registered).
 | AliasName Base |  | full | test_aliasname_stub |
 | Method Call |  | full | test_method_call_arbitrary, test_method_call_errors |
 | A & C Non-Exclusive Deviation |  | full | test_alarms_conditions |
+| Aggregate - WorstQuality2 |  |  | <placeholder-backfill> |
 | Historical Access Insert Value |  | full | test_profile_surface |
+| Aggregate - Minimum2 |  |  | <placeholder-backfill> |
 | AliasName Category Tags |  | full | test_aliasname_stub |
 | Address Space Method |  | full | test_profile_surface |
 | Discovery Configuration |  | full | test_claim_map |
 | Subscription Transfer |  | full | test_subscriptions_capacity, test_subscription_deadband, test_subscription_publish |
+| Aggregate - DeltaBounds |  |  | <placeholder-backfill> |
+| Aggregate - Minimum |  |  | <placeholder-backfill> |
 | Attribute Alternate Encoding |  | full | test_read_service |
 | A & C Branch |  | full | test_alarms_conditions |
+| Aggregate - Start |  |  | <placeholder-backfill> |
+| Aggregate - Delta |  |  | <placeholder-backfill> |
 | A & C Instances |  | full | test_alarms_conditions |
 | A & C Exclusive RateOfChange |  | full | test_alarms_conditions |
 | Security Certificate Administration |  | full | test_profile_surface |
 | A & C Refresh2 |  | full | test_alarms_conditions |
+| Aggregate - DurationBad |  |  | <placeholder-backfill> |
 | Historical Access Insert Event |  | full | test_profile_surface |
+| Aggregate - TimeAverage |  |  | <placeholder-backfill> |
+| Aggregate - PercentGood |  |  | <placeholder-backfill> |
 | Attribute Read Complex |  | full | test_read_service |
 | Historical Access Update Event |  | full | test_profile_surface |
+| Aggregate - EndBound |  |  | <placeholder-backfill> |
 | Historical Access Annotations |  | full | test_profile_surface |
 | A & C Trip |  | full | test_alarms_conditions |
+| Aggregate - TimeAverage2 |  |  | <placeholder-backfill> |
+| Aggregate - StartBound |  |  | <placeholder-backfill> |
+| Aggregate - Count |  |  | <placeholder-backfill> |
 | Redundancy Server |  | full | test_transfer_subscriptions |
 | A & C SystemOffNormal |  | full | test_alarms_conditions |
 | A & C CertificateExpiration |  | full | test_profile_surface |
 | GDS LDS-ME Connectivity |  | full | test_certificate_management |
 | GDS Application Directory |  | full | test_certificate_management |
 | Historical Access Replace Event |  | full | test_profile_surface |
+| Aggregate - DurationInStateNonZero |  |  | <placeholder-backfill> |
+| Aggregate - DurationInStateZero |  |  | <placeholder-backfill> |
+| Aggregate - Total2 |  |  | <placeholder-backfill> |
 | Attribute Write Complex |  | full | test_read_service |
 | A & C Enable |  | full | test_alarms_conditions |
+| Aggregate - Maximum2 |  |  | <placeholder-backfill> |
 | A & C Dialog |  | full | test_alarms_conditions |
+| Aggregate - MinimumActualTime2 |  |  | <placeholder-backfill> |
 | Address Space UserWriteMask |  | full | test_profile_surface |
 | User Token JWT Server Facet | OPC-10000-7 §CU 1697 | full | test_jwt_activate_session |
 | Certificate Manager Pull | OPC-10000-12 §7.6, 7.9 | full | test_certificate_manager |
