@@ -1371,7 +1371,8 @@
         "snapshot_id": "cu_monitor_items_500",
         "source_doc": "docs/conformance/enhanced-datachange.md",
         "source_url": "https://profiles.opcfoundation.org",
-        "spec": "OPC-10000-4"
+        "spec": "OPC-10000-4",
+        "cu_id": 5242
       },
       "profile_defaults": {
         "custom": false,
@@ -1407,7 +1408,8 @@
         "snapshot_id": "cu_monitor_min_queue_05",
         "source_doc": "docs/conformance/enhanced-datachange.md",
         "source_url": "https://profiles.opcfoundation.org",
-        "spec": "OPC-10000-4"
+        "spec": "OPC-10000-4",
+        "cu_id": 5250
       },
       "profile_defaults": {
         "custom": false,
@@ -1978,7 +1980,7 @@
       "not_applicable": {
         "nano": "Documentation CU; satisfied by documentation presence, not code."
       },
-      "notes": "Documented (spec 078): the core capacities (SecureChannels/Sessions/ContinuationPoints/Subscriptions/PublishRequests/MonitoredItems/queue depth/retransmission) are specified in docs/integration-guide.md \u00a72.2.1 and capacities.h, and discoverable at runtime via the ServerCapabilities/OperationLimits nodes. Documentation CU (no code). The application documentation shall specify the core OPC UA related capacities. This includes the number of supported SecureChannels, Sessions, and Continuation Points for the View Services.\nIf Subscriptions are supported, it shall also include capacity information for Subscriptions and Publish requests, MonitoredItems, retransmission queue, and the queue for sampled MonitoredItems. (Documentation complete; no code change needed.)",
+      "notes": "Documented (spec 078): the core capacities (SecureChannels/Sessions/ContinuationPoints/Subscriptions/PublishRequests/MonitoredItems/queue depth/retransmission) are specified in docs/integration-guide.md §2.2.1 and capacities.h, and discoverable at runtime via the ServerCapabilities/OperationLimits nodes. Documentation CU (no code). The application documentation shall specify the core OPC UA related capacities. This includes the number of supported SecureChannels, Sessions, and Continuation Points for the View Services.\nIf Subscriptions are supported, it shall also include capacity information for Subscriptions and Publish requests, MonitoredItems, retransmission queue, and the queue for sampled MonitoredItems. (Documentation complete; no code change needed.)",
       "opc_display_name": "Documentation - Core Capacities",
       "opc_reference": {
         "cu_id": "3808",
@@ -2202,7 +2204,7 @@
       "kconfig_symbol": "MUC_OPCUA_FACET_USER_TOKEN_USER_NAME_PASSWORD_SERVER",
       "kind": "facet",
       "notes": "User Name Password: Anonymous+UserName auth in activate_session.c",
-      "opc_display_name": "User Token \u2013 User Name Password Server Facet",
+      "opc_display_name": "User Token – User Name Password Server Facet",
       "opc_reference": {
         "profile_id": "1695",
         "profile_uri": "http://opcfoundation.org/UA-Profile/Security/UserToken/Server/UserNamePassword",
@@ -2231,7 +2233,7 @@
       "kconfig_symbol": "MUC_OPCUA_FACET_USER_TOKEN_X509_CERTIFICATE_SERVER",
       "kind": "facet",
       "notes": "X509 Certificate: X509 user token in activate_session.c",
-      "opc_display_name": "User Token \u2013 X509 Certificate Server Facet",
+      "opc_display_name": "User Token – X509 Certificate Server Facet",
       "opc_reference": {
         "profile_id": "1696",
         "profile_uri": "http://opcfoundation.org/UA-Profile/Security/UserToken/Server/X509Certificate",
@@ -3678,7 +3680,7 @@
       "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
-      "notes": "Reconciled (spec 073): mu_server_signal_semantic_change (public API) latches per-MonitoredItem; the next DataChange Notification sets StatusCode bit 14 (0x4000, SemanticsChanged) then the one-shot latch clears (notification.c + deadband.c, OPC-10000-4 \u00a77.38.1); test_subscriptions::test_publish_semantics_changed_bit (E2E emit->decode). Satisfied by opc_cu_subscription_basic.\nSupports setting the SemanticsChanged Bit in the statusCode when a semantic change occurs, such as a change in the engineering unit associated with the Value Attribute.",
+      "notes": "Reconciled (spec 073): mu_server_signal_semantic_change (public API) latches per-MonitoredItem; the next DataChange Notification sets StatusCode bit 14 (0x4000, SemanticsChanged) then the one-shot latch clears (notification.c + deadband.c, OPC-10000-4 §7.38.1); test_subscriptions::test_publish_semantics_changed_bit (E2E emit->decode). Satisfied by opc_cu_subscription_basic.\nSupports setting the SemanticsChanged Bit in the statusCode when a semantic change occurs, such as a change in the engineering unit associated with the Value Attribute.",
       "opc_display_name": "Base Info SemanticChange Bit",
       "opc_reference": {
         "cu_id": "3922",
@@ -3983,7 +3985,8 @@
       "opc_reference": {
         "facet": "Core 2022 Server Facet",
         "section": "5.12/5.13",
-        "spec": "OPC-10000-4"
+        "spec": "OPC-10000-4",
+        "cu_id": 3727
       },
       "profile_defaults": {
         "custom": false,
@@ -4006,7 +4009,7 @@
       "id": "opc_cu_subscription_standard",
       "implementation_state": "claimed",
       "kconfig_symbol": "MUC_OPCUA_CU_SUBSCRIPTION_STANDARD",
-      "kind": "conformance_unit",
+      "kind": "optimization",
       "notes": "Project-level Conformance Unit mirroring the legacy 'subscriptions_standard' item; emits Kconfig symbol MUC_OPCUA_CU_SUBSCRIPTION_STANDARD matching the #ifdef guard renamed in Task 3 of the CU-aligned code reorganisation plan.",
       "opc_display_name": "Subscription Standard",
       "opc_reference": {
@@ -4033,7 +4036,7 @@
       "id": "opc_cu_security_ecc",
       "implementation_state": "claimed",
       "kconfig_symbol": "MUC_OPCUA_CU_SECURITY_ECC",
-      "kind": "conformance_unit",
+      "kind": "optimization",
       "notes": "Project-level Conformance Unit mirroring the legacy 'ecc' item; emits Kconfig symbol MUC_OPCUA_CU_SECURITY_ECC matching the #ifdef guard renamed in Task 3 of the CU-aligned code reorganisation plan.",
       "opc_display_name": "Security ECC",
       "opc_reference": {
@@ -4062,7 +4065,7 @@
       "id": "opc_cu_events",
       "implementation_state": "claimed",
       "kconfig_symbol": "MUC_OPCUA_CU_EVENTS",
-      "kind": "conformance_unit",
+      "kind": "optimization",
       "notes": "Project-level Conformance Unit mirroring the legacy 'events' item; emits Kconfig symbol MUC_OPCUA_CU_EVENTS matching the #ifdef guard renamed in Task 3 of the CU-aligned code reorganisation plan.",
       "opc_display_name": "Events",
       "opc_reference": {
@@ -4089,7 +4092,7 @@
       "id": "opc_cu_data_access",
       "implementation_state": "claimed",
       "kconfig_symbol": "MUC_OPCUA_CU_DATA_ACCESS",
-      "kind": "conformance_unit",
+      "kind": "optimization",
       "notes": "Project-level Conformance Unit mirroring the legacy 'data_access' item; emits Kconfig symbol MUC_OPCUA_CU_DATA_ACCESS matching the #ifdef guard renamed in Task 3 of the CU-aligned code reorganisation plan.",
       "opc_display_name": "Data Access",
       "opc_reference": {
@@ -4115,7 +4118,7 @@
       "id": "opc_cu_method_server",
       "implementation_state": "claimed",
       "kconfig_symbol": "MUC_OPCUA_CU_METHOD_SERVER",
-      "kind": "conformance_unit",
+      "kind": "optimization",
       "notes": "Project-level Conformance Unit mirroring the legacy 'method_server' item; emits Kconfig symbol MUC_OPCUA_CU_METHOD_SERVER matching the #ifdef guard renamed in Task 3 of the CU-aligned code reorganisation plan.",
       "opc_display_name": "Method Server",
       "opc_reference": {
@@ -4140,7 +4143,7 @@
       "id": "opc_cu_custom_methods",
       "implementation_state": "claimed",
       "kconfig_symbol": "MUC_OPCUA_CU_CUSTOM_METHODS",
-      "kind": "conformance_unit",
+      "kind": "optimization",
       "notes": "Project-level Conformance Unit mirroring the legacy 'custom_methods' item; emits Kconfig symbol MUC_OPCUA_CU_CUSTOM_METHODS matching the #ifdef guard renamed in Task 3 of the CU-aligned code reorganisation plan.",
       "opc_display_name": "Custom Methods",
       "opc_reference": {
@@ -4167,7 +4170,7 @@
       "id": "opc_cu_user_auth",
       "implementation_state": "claimed",
       "kconfig_symbol": "MUC_OPCUA_CU_USER_AUTH",
-      "kind": "conformance_unit",
+      "kind": "optimization",
       "notes": "Project-level Conformance Unit mirroring the legacy 'user_auth' item; emits Kconfig symbol MUC_OPCUA_CU_USER_AUTH matching the #ifdef guard renamed in Task 3 of the CU-aligned code reorganisation plan.",
       "opc_display_name": "User Auth",
       "opc_reference": {
@@ -4192,7 +4195,7 @@
       "id": "opc_cu_multiple_connections",
       "implementation_state": "claimed",
       "kconfig_symbol": "MUC_OPCUA_CU_MULTIPLE_CONNECTIONS",
-      "kind": "conformance_unit",
+      "kind": "optimization",
       "notes": "Project-level Conformance Unit mirroring the legacy 'multiple_connections' item; emits Kconfig symbol MUC_OPCUA_CU_MULTIPLE_CONNECTIONS matching the #ifdef guard renamed in Task 3 of the CU-aligned code reorganisation plan.",
       "opc_display_name": "Multiple Connections",
       "opc_reference": {
@@ -4222,7 +4225,7 @@
       "id": "opc_cu_event_filter_where",
       "implementation_state": "claimed",
       "kconfig_symbol": "MUC_OPCUA_CU_EVENT_FILTER_WHERE",
-      "kind": "conformance_unit",
+      "kind": "optimization",
       "notes": "Project-level Conformance Unit mirroring the legacy 'event_filter_where' item; emits Kconfig symbol MUC_OPCUA_CU_EVENT_FILTER_WHERE matching the #ifdef guard renamed in Task 3 of the CU-aligned code reorganisation plan.",
       "opc_display_name": "Event Filter Where",
       "opc_reference": {
@@ -4249,7 +4252,7 @@
       "id": "opc_cu_redundancy",
       "implementation_state": "claimed",
       "kconfig_symbol": "MUC_OPCUA_CU_REDUNDANCY",
-      "kind": "conformance_unit",
+      "kind": "optimization",
       "notes": "Project-level Conformance Unit mirroring the legacy 'redundancy' item; emits Kconfig symbol MUC_OPCUA_CU_REDUNDANCY matching the #ifdef guard renamed in Task 3 of the CU-aligned code reorganisation plan.",
       "opc_display_name": "Redundancy",
       "opc_reference": {
@@ -4274,7 +4277,7 @@
       "id": "opc_cu_diagnostics",
       "implementation_state": "claimed",
       "kconfig_symbol": "MUC_OPCUA_CU_DIAGNOSTICS",
-      "kind": "conformance_unit",
+      "kind": "optimization",
       "notes": "Project-level Conformance Unit mirroring the legacy 'server_diagnostics' item; emits Kconfig symbol MUC_OPCUA_CU_DIAGNOSTICS matching the #ifdef guard renamed in Task 3 of the CU-aligned code reorganisation plan.",
       "opc_display_name": "Diagnostics",
       "opc_reference": {
@@ -4299,7 +4302,7 @@
       "id": "opc_cu_complex_types",
       "implementation_state": "claimed",
       "kconfig_symbol": "MUC_OPCUA_CU_COMPLEX_TYPES",
-      "kind": "conformance_unit",
+      "kind": "optimization",
       "notes": "Project-level Conformance Unit mirroring the legacy 'complex_types' item; emits Kconfig symbol MUC_OPCUA_CU_COMPLEX_TYPES matching the #ifdef guard renamed in Task 3 of the CU-aligned code reorganisation plan.",
       "opc_display_name": "Complex Types",
       "opc_reference": {
@@ -4327,7 +4330,7 @@
       "id": "opc_cu_auditing",
       "implementation_state": "claimed",
       "kconfig_symbol": "MUC_OPCUA_CU_AUDITING",
-      "kind": "conformance_unit",
+      "kind": "optimization",
       "notes": "spec 074: the server now emits OPC UA AuditEvents (Open Secure Channel/Create Session/Activate Session/Write Update, subtypes i=2060/2071/2075/2100) that a client observes by subscribing to the Server Object EventNotifier -- not just the host-callback stub. Emit+observe proven E2E by test_event_notifications::test_audit_write_event_e2e. Project-level Conformance Unit mirroring the legacy 'auditing' item; emits Kconfig symbol MUC_OPCUA_CU_AUDITING matching the #ifdef guard renamed in Task 3 of the CU-aligned code reorganisation plan.",
       "opc_display_name": "Auditing",
       "opc_reference": {
@@ -4352,7 +4355,7 @@
       "id": "opc_cu_dynamic_nodes",
       "implementation_state": "claimed",
       "kconfig_symbol": "MUC_OPCUA_CU_DYNAMIC_NODES",
-      "kind": "conformance_unit",
+      "kind": "optimization",
       "notes": "Project-level Conformance Unit mirroring the legacy 'dynamic_nodes' item; emits Kconfig symbol MUC_OPCUA_CU_DYNAMIC_NODES matching the #ifdef guard renamed in Task 3 of the CU-aligned code reorganisation plan.",
       "opc_display_name": "Dynamic Nodes",
       "opc_reference": {
@@ -4377,7 +4380,7 @@
       "id": "opc_cu_multi_chunk",
       "implementation_state": "claimed",
       "kconfig_symbol": "MUC_OPCUA_CU_MULTI_CHUNK",
-      "kind": "conformance_unit",
+      "kind": "optimization",
       "notes": "Project-level Conformance Unit mirroring the legacy 'multi_chunk' item; emits Kconfig symbol MUC_OPCUA_CU_MULTI_CHUNK matching the #ifdef guard renamed in Task 3 of the CU-aligned code reorganisation plan.",
       "opc_display_name": "Multi Chunk",
       "opc_reference": {
@@ -4406,7 +4409,7 @@
       "id": "opc_cu_session_timeout",
       "implementation_state": "claimed",
       "kconfig_symbol": "MUC_OPCUA_CU_SESSION_TIMEOUT",
-      "kind": "conformance_unit",
+      "kind": "optimization",
       "notes": "Project-level Conformance Unit mirroring the legacy 'session_timeout' item; emits Kconfig symbol MUC_OPCUA_CU_SESSION_TIMEOUT matching the #ifdef guard renamed in Task 3 of the CU-aligned code reorganisation plan.",
       "opc_display_name": "Session Timeout",
       "opc_reference": {
@@ -4432,7 +4435,7 @@
       "id": "opc_cu_time_sync",
       "implementation_state": "claimed",
       "kconfig_symbol": "MUC_OPCUA_CU_TIME_SYNC",
-      "kind": "conformance_unit",
+      "kind": "optimization",
       "notes": "Project-level Conformance Unit mirroring the legacy 'time_sync' item; emits Kconfig symbol MUC_OPCUA_CU_TIME_SYNC matching the #ifdef guard renamed in Task 3 of the CU-aligned code reorganisation plan.",
       "opc_display_name": "Time Sync",
       "opc_reference": {
@@ -4458,7 +4461,7 @@
       "id": "opc_cu_extended_nodeids",
       "implementation_state": "claimed",
       "kconfig_symbol": "MUC_OPCUA_CU_EXTENDED_NODEIDS",
-      "kind": "conformance_unit",
+      "kind": "optimization",
       "notes": "Project-level Conformance Unit mirroring the legacy 'extended_nodeids' item; emits Kconfig symbol MUC_OPCUA_CU_EXTENDED_NODEIDS matching the #ifdef guard renamed in Task 3 of the CU-aligned code reorganisation plan.",
       "opc_display_name": "Extended Nodeids",
       "opc_reference": {
@@ -4486,7 +4489,7 @@
       "id": "opc_cu_aggregate_interpolative",
       "implementation_state": "claimed",
       "kconfig_symbol": null,
-      "kind": "conformance_unit",
+      "kind": "optimization",
       "opc_display_name": "Aggregates - Interpolative",
       "opc_reference": {
         "facet": "Core 2022 Server Facet",
@@ -4514,7 +4517,7 @@
       "id": "opc_cu_aggregate_average",
       "implementation_state": "claimed",
       "kconfig_symbol": null,
-      "kind": "conformance_unit",
+      "kind": "optimization",
       "opc_display_name": "Aggregates - Average",
       "opc_reference": {
         "facet": "Core 2022 Server Facet",
@@ -4542,7 +4545,7 @@
       "id": "opc_cu_aggregate_time_average",
       "implementation_state": "claimed",
       "kconfig_symbol": null,
-      "kind": "conformance_unit",
+      "kind": "optimization",
       "opc_display_name": "Aggregates - TimeAverage",
       "opc_reference": {
         "facet": "Core 2022 Server Facet",
@@ -4570,7 +4573,7 @@
       "id": "opc_cu_aggregate_time_average_2",
       "implementation_state": "claimed",
       "kconfig_symbol": null,
-      "kind": "conformance_unit",
+      "kind": "optimization",
       "opc_display_name": "Aggregates - TimeAverage2",
       "opc_reference": {
         "facet": "Core 2022 Server Facet",
@@ -4598,7 +4601,7 @@
       "id": "opc_cu_aggregate_total",
       "implementation_state": "claimed",
       "kconfig_symbol": null,
-      "kind": "conformance_unit",
+      "kind": "optimization",
       "opc_display_name": "Aggregates - Total",
       "opc_reference": {
         "facet": "Core 2022 Server Facet",
@@ -4626,7 +4629,7 @@
       "id": "opc_cu_aggregate_total_2",
       "implementation_state": "claimed",
       "kconfig_symbol": null,
-      "kind": "conformance_unit",
+      "kind": "optimization",
       "opc_display_name": "Aggregates - Total2",
       "opc_reference": {
         "facet": "Core 2022 Server Facet",
@@ -4654,7 +4657,7 @@
       "id": "opc_cu_aggregate_minimum",
       "implementation_state": "claimed",
       "kconfig_symbol": null,
-      "kind": "conformance_unit",
+      "kind": "optimization",
       "opc_display_name": "Aggregates - Minimum",
       "opc_reference": {
         "facet": "Core 2022 Server Facet",
@@ -4682,7 +4685,7 @@
       "id": "opc_cu_aggregate_maximum",
       "implementation_state": "claimed",
       "kconfig_symbol": null,
-      "kind": "conformance_unit",
+      "kind": "optimization",
       "opc_display_name": "Aggregates - Maximum",
       "opc_reference": {
         "facet": "Core 2022 Server Facet",
@@ -4710,7 +4713,7 @@
       "id": "opc_cu_aggregate_range",
       "implementation_state": "claimed",
       "kconfig_symbol": null,
-      "kind": "conformance_unit",
+      "kind": "optimization",
       "opc_display_name": "Aggregates - Range",
       "opc_reference": {
         "facet": "Core 2022 Server Facet",
@@ -4738,7 +4741,7 @@
       "id": "opc_cu_aggregate_minimum_2",
       "implementation_state": "claimed",
       "kconfig_symbol": null,
-      "kind": "conformance_unit",
+      "kind": "optimization",
       "opc_display_name": "Aggregates - Minimum2",
       "opc_reference": {
         "facet": "Core 2022 Server Facet",
@@ -4766,7 +4769,7 @@
       "id": "opc_cu_aggregate_maximum_2",
       "implementation_state": "claimed",
       "kconfig_symbol": null,
-      "kind": "conformance_unit",
+      "kind": "optimization",
       "opc_display_name": "Aggregates - Maximum2",
       "opc_reference": {
         "facet": "Core 2022 Server Facet",
@@ -4794,7 +4797,7 @@
       "id": "opc_cu_aggregate_count",
       "implementation_state": "claimed",
       "kconfig_symbol": null,
-      "kind": "conformance_unit",
+      "kind": "optimization",
       "opc_display_name": "Aggregates - Count",
       "opc_reference": {
         "facet": "Core 2022 Server Facet",
@@ -4822,7 +4825,7 @@
       "id": "opc_cu_aggregate_duration_state_zero",
       "implementation_state": "claimed",
       "kconfig_symbol": null,
-      "kind": "conformance_unit",
+      "kind": "optimization",
       "opc_display_name": "Aggregates - DurationInStateZero",
       "opc_reference": {
         "facet": "Core 2022 Server Facet",
@@ -4850,7 +4853,7 @@
       "id": "opc_cu_aggregate_start",
       "implementation_state": "claimed",
       "kconfig_symbol": null,
-      "kind": "conformance_unit",
+      "kind": "optimization",
       "opc_display_name": "Aggregates - Start",
       "opc_reference": {
         "facet": "Core 2022 Server Facet",
@@ -4878,7 +4881,7 @@
       "id": "opc_cu_aggregate_end",
       "implementation_state": "claimed",
       "kconfig_symbol": null,
-      "kind": "conformance_unit",
+      "kind": "optimization",
       "opc_display_name": "Aggregates - End",
       "opc_reference": {
         "facet": "Core 2022 Server Facet",
@@ -4906,7 +4909,7 @@
       "id": "opc_cu_aggregate_delta",
       "implementation_state": "claimed",
       "kconfig_symbol": null,
-      "kind": "conformance_unit",
+      "kind": "optimization",
       "opc_display_name": "Aggregates - Delta",
       "opc_reference": {
         "facet": "Core 2022 Server Facet",
@@ -4934,7 +4937,7 @@
       "id": "opc_cu_aggregate_delta_bounds",
       "implementation_state": "claimed",
       "kconfig_symbol": null,
-      "kind": "conformance_unit",
+      "kind": "optimization",
       "opc_display_name": "Aggregates - DeltaBounds",
       "opc_reference": {
         "facet": "Core 2022 Server Facet",
@@ -4962,7 +4965,7 @@
       "id": "opc_cu_aggregate_duration_good",
       "implementation_state": "claimed",
       "kconfig_symbol": null,
-      "kind": "conformance_unit",
+      "kind": "optimization",
       "opc_display_name": "Aggregates - DurationGood",
       "opc_reference": {
         "facet": "Core 2022 Server Facet",
@@ -4990,7 +4993,7 @@
       "id": "opc_cu_aggregate_duration_bad",
       "implementation_state": "claimed",
       "kconfig_symbol": null,
-      "kind": "conformance_unit",
+      "kind": "optimization",
       "opc_display_name": "Aggregates - DurationBad",
       "opc_reference": {
         "facet": "Core 2022 Server Facet",
@@ -5018,7 +5021,7 @@
       "id": "opc_cu_aggregate_percent_good",
       "implementation_state": "claimed",
       "kconfig_symbol": null,
-      "kind": "conformance_unit",
+      "kind": "optimization",
       "opc_display_name": "Aggregates - PercentGood",
       "opc_reference": {
         "facet": "Core 2022 Server Facet",
@@ -5046,7 +5049,7 @@
       "id": "opc_cu_aggregate_percent_bad",
       "implementation_state": "claimed",
       "kconfig_symbol": null,
-      "kind": "conformance_unit",
+      "kind": "optimization",
       "opc_display_name": "Aggregates - PercentBad",
       "opc_reference": {
         "facet": "Core 2022 Server Facet",
@@ -5074,7 +5077,7 @@
       "id": "opc_cu_aggregate_worst_quality",
       "implementation_state": "claimed",
       "kconfig_symbol": null,
-      "kind": "conformance_unit",
+      "kind": "optimization",
       "opc_display_name": "Aggregates - WorstQuality",
       "opc_reference": {
         "facet": "Core 2022 Server Facet",
@@ -5102,7 +5105,7 @@
       "id": "opc_cu_aggregate_worst_quality_2",
       "implementation_state": "claimed",
       "kconfig_symbol": null,
-      "kind": "conformance_unit",
+      "kind": "optimization",
       "opc_display_name": "Aggregates - WorstQuality2",
       "opc_reference": {
         "facet": "Core 2022 Server Facet",
@@ -5130,7 +5133,7 @@
       "id": "opc_cu_aggregate_annotation_count",
       "implementation_state": "claimed",
       "kconfig_symbol": null,
-      "kind": "conformance_unit",
+      "kind": "optimization",
       "opc_display_name": "Aggregates - AnnotationCount",
       "opc_reference": {
         "facet": "Core 2022 Server Facet",
@@ -5158,7 +5161,7 @@
       "id": "opc_cu_aggregate_min_actual_time",
       "implementation_state": "claimed",
       "kconfig_symbol": null,
-      "kind": "conformance_unit",
+      "kind": "optimization",
       "opc_display_name": "Aggregates - MinimumActualTime",
       "opc_reference": {
         "facet": "Core 2022 Server Facet",
@@ -5186,7 +5189,7 @@
       "id": "opc_cu_aggregate_max_actual_time",
       "implementation_state": "claimed",
       "kconfig_symbol": null,
-      "kind": "conformance_unit",
+      "kind": "optimization",
       "opc_display_name": "Aggregates - MaximumActualTime",
       "opc_reference": {
         "facet": "Core 2022 Server Facet",
@@ -5214,7 +5217,7 @@
       "id": "opc_cu_aggregate_min_actual_time_2",
       "implementation_state": "claimed",
       "kconfig_symbol": null,
-      "kind": "conformance_unit",
+      "kind": "optimization",
       "opc_display_name": "Aggregates - MinimumActualTime2",
       "opc_reference": {
         "facet": "Core 2022 Server Facet",
@@ -5242,7 +5245,7 @@
       "id": "opc_cu_aggregate_max_actual_time_2",
       "implementation_state": "claimed",
       "kconfig_symbol": null,
-      "kind": "conformance_unit",
+      "kind": "optimization",
       "opc_display_name": "Aggregates - MaximumActualTime2",
       "opc_reference": {
         "facet": "Core 2022 Server Facet",
@@ -5270,7 +5273,7 @@
       "id": "opc_cu_aggregate_range_2",
       "implementation_state": "claimed",
       "kconfig_symbol": null,
-      "kind": "conformance_unit",
+      "kind": "optimization",
       "opc_display_name": "Aggregates - Range2",
       "opc_reference": {
         "facet": "Core 2022 Server Facet",
@@ -5298,7 +5301,7 @@
       "id": "opc_cu_aggregate_duration_state_nonzero",
       "implementation_state": "claimed",
       "kconfig_symbol": null,
-      "kind": "conformance_unit",
+      "kind": "optimization",
       "opc_display_name": "Aggregates - DurationInStateNonZero",
       "opc_reference": {
         "facet": "Core 2022 Server Facet",
@@ -5326,7 +5329,7 @@
       "id": "opc_cu_aggregate_number_transitions",
       "implementation_state": "claimed",
       "kconfig_symbol": null,
-      "kind": "conformance_unit",
+      "kind": "optimization",
       "opc_display_name": "Aggregates - NumberOfTransitions",
       "opc_reference": {
         "facet": "Core 2022 Server Facet",
@@ -5354,7 +5357,7 @@
       "id": "opc_cu_aggregate_start_bound",
       "implementation_state": "claimed",
       "kconfig_symbol": null,
-      "kind": "conformance_unit",
+      "kind": "optimization",
       "opc_display_name": "Aggregates - StartBound",
       "opc_reference": {
         "facet": "Core 2022 Server Facet",
@@ -5382,7 +5385,7 @@
       "id": "opc_cu_aggregate_end_bound",
       "implementation_state": "claimed",
       "kconfig_symbol": null,
-      "kind": "conformance_unit",
+      "kind": "optimization",
       "opc_display_name": "Aggregates - EndBound",
       "opc_reference": {
         "facet": "Core 2022 Server Facet",
@@ -5410,7 +5413,7 @@
       "id": "opc_cu_aggregate_std_dev_sample",
       "implementation_state": "claimed",
       "kconfig_symbol": null,
-      "kind": "conformance_unit",
+      "kind": "optimization",
       "opc_display_name": "Aggregates - StandardDeviationSample",
       "opc_reference": {
         "facet": "Core 2022 Server Facet",
@@ -5438,7 +5441,7 @@
       "id": "opc_cu_aggregate_variance_sample",
       "implementation_state": "claimed",
       "kconfig_symbol": null,
-      "kind": "conformance_unit",
+      "kind": "optimization",
       "opc_display_name": "Aggregates - VarianceSample",
       "opc_reference": {
         "facet": "Core 2022 Server Facet",
@@ -5466,7 +5469,7 @@
       "id": "opc_cu_aggregate_std_dev_population",
       "implementation_state": "claimed",
       "kconfig_symbol": null,
-      "kind": "conformance_unit",
+      "kind": "optimization",
       "opc_display_name": "Aggregates - StandardDeviationPopulation",
       "opc_reference": {
         "facet": "Core 2022 Server Facet",
@@ -5494,7 +5497,7 @@
       "id": "opc_cu_aggregate_variance_population",
       "implementation_state": "claimed",
       "kconfig_symbol": null,
-      "kind": "conformance_unit",
+      "kind": "optimization",
       "opc_display_name": "Aggregates - VariancePopulation",
       "opc_reference": {
         "facet": "Core 2022 Server Facet",
@@ -5522,7 +5525,7 @@
       "id": "opc_cu_aggregate_full",
       "implementation_state": "claimed",
       "kconfig_symbol": "MUC_OPCUA_CU_AGGREGATE_FULL",
-      "kind": "conformance_unit",
+      "kind": "optimization",
       "notes": "Project-level Conformance Unit mirroring the legacy 'aggregate_full' item; emits Kconfig symbol MUC_OPCUA_CU_AGGREGATE_FULL matching the #ifdef guard renamed in Task 3 of the CU-aligned code reorganisation plan.",
       "opc_display_name": "Aggregate Full",
       "opc_reference": {
@@ -5548,7 +5551,7 @@
       "id": "opc_cu_pubsub",
       "implementation_state": "claimed",
       "kconfig_symbol": "MUC_OPCUA_CU_PUBSUB",
-      "kind": "conformance_unit",
+      "kind": "optimization",
       "notes": "Project-level Conformance Unit mirroring the legacy 'pubsub' item; emits Kconfig symbol MUC_OPCUA_CU_PUBSUB matching the #ifdef guard renamed in Task 3 of the CU-aligned code reorganisation plan.",
       "opc_display_name": "PubSub",
       "opc_reference": {
@@ -5573,7 +5576,7 @@
       "id": "opc_cu_reverse_connect",
       "implementation_state": "claimed",
       "kconfig_symbol": "MUC_OPCUA_CU_REVERSE_CONNECT",
-      "kind": "conformance_unit",
+      "kind": "optimization",
       "notes": "Project-level Conformance Unit mirroring the legacy 'reverse_connect' item; emits Kconfig symbol MUC_OPCUA_CU_REVERSE_CONNECT matching the #ifdef guard renamed in Task 3 of the CU-aligned code reorganisation plan.",
       "opc_display_name": "Reverse Connect",
       "opc_reference": {
@@ -5598,7 +5601,7 @@
       "id": "opc_cu_namespaces",
       "implementation_state": "claimed",
       "kconfig_symbol": "MUC_OPCUA_CU_NAMESPACES",
-      "kind": "conformance_unit",
+      "kind": "optimization",
       "notes": "Project-level Conformance Unit mirroring the legacy 'namespaces' item; emits Kconfig symbol MUC_OPCUA_CU_NAMESPACES matching the #ifdef guard renamed in Task 3 of the CU-aligned code reorganisation plan.",
       "opc_display_name": "Namespaces",
       "opc_reference": {
@@ -5625,7 +5628,7 @@
       "id": "opc_cu_base_info_datatypes",
       "implementation_state": "claimed",
       "kconfig_symbol": "MUC_OPCUA_CU_BASE_INFO_DATATYPES",
-      "kind": "conformance_unit",
+      "kind": "optimization",
       "notes": "spec 079: gates the specialized DataType nodes exposed in base_nodes.c (Number i=26 / Decimal i=50; DurationString/TimeString/DateString i=12879/12880/12881) and their supertype closure. Satisfies CU 2483/4426; implied on when the type-system facet is enabled.",
       "opc_display_name": "Base Info Specialized DataTypes",
       "opc_reference": {
@@ -5652,7 +5655,7 @@
       "id": "opc_cu_base_info_argument_type",
       "implementation_state": "claimed",
       "kconfig_symbol": "MUC_OPCUA_CU_BASE_INFO_ARGUMENT_TYPE",
-      "kind": "conformance_unit",
+      "kind": "optimization",
       "notes": "spec 080a: exposes the Argument(i=296) DataType (subtype of Structure) + its DefaultBinary(298)/DefaultXml(297) Encoding Objects, plus the shared DataTypeEncodingType(76) ObjectType and HasEncoding(38) ReferenceType, in base_nodes.c. Satisfies CU 3641. First slice of the base type-system completion (A2); 3188 base DataTypes + 3185 folders follow.",
       "opc_display_name": "Base Info Argument DataType + encoding infra",
       "opc_reference": {
@@ -5680,7 +5683,7 @@
       "id": "opc_cu_base_info_base_types",
       "implementation_state": "claimed",
       "kconfig_symbol": "MUC_OPCUA_CU_BASE_INFO_BASE_TYPES",
-      "kind": "conformance_unit",
+      "kind": "optimization",
       "notes": "spec 080b: completes the base OPC UA type system in base_nodes.c -- the remaining built-in/abstract DataTypes (Guid14/ByteString15/XmlElement16/ExpandedNodeId18/DataValue23/DiagnosticInfo25/Integer27/UInteger28/Enumeration29/Duration290/NumericRange291/UtcTime294/EnumValueType7594/Union12756) with correct supertype closure (primitives re-parented under Integer/UInteger/Number), HasModellingRule(37) + ModellingRuleType(77) + the ModellingRule Objects (Optional80/Mandatory78/ExposesItsArray83/OptionalPlaceholder11508/MandatoryPlaceholder11510), and the EnumValueType Encoding Objects (DefaultXml7616/DefaultBinary8251). Satisfies CU 3188 (Base Types) and CU 3185 (Core Types Folders). Second slice of the base type-system completion (A2); depends on the specialized-DataTypes CU for the Number/String subtype arrays it extends.",
       "opc_display_name": "Base Info Base Types + Core Types Folders",
       "opc_reference": {
@@ -5730,7 +5733,7 @@
       "id": "service_browse",
       "implementation_state": "claimed",
       "kconfig_symbol": "MUC_OPCUA_CU_VIEW_BASIC_TRANSLATEBROWSEPATH",
-      "kind": "conformance_unit",
+      "kind": "optimization",
       "notes": "Browse + BrowseNext + TranslateBrowsePaths.",
       "opc_display_name": "View Basic / TranslateBrowsePath",
       "opc_reference": {
@@ -5757,7 +5760,7 @@
       "id": "service_discovery",
       "implementation_state": "claimed",
       "kconfig_symbol": "MUC_OPCUA_CU_DISCOVERY_FIND_SERVERS_SELF_GET_ENDPOINTS",
-      "kind": "conformance_unit",
+      "kind": "optimization",
       "notes": "FindServers / GetEndpoints.",
       "opc_display_name": "Discovery Find Servers Self / Get Endpoints",
       "opc_reference": {
@@ -5790,7 +5793,8 @@
         "cu_name": "View RegisterNodes",
         "facet": "Core 2017",
         "section": "5.9",
-        "spec": "OPC-10000-4"
+        "spec": "OPC-10000-4",
+        "cu_id": 3073
       },
       "profile_defaults": {
         "custom": false
@@ -5804,7 +5808,7 @@
       "id": "service_write",
       "implementation_state": "claimed",
       "kconfig_symbol": "MUC_OPCUA_CU_CORE_2017_ATTRIBUTE_WRITE",
-      "kind": "conformance_unit",
+      "kind": "optimization",
       "notes": "Optional facet; only on full.",
       "opc_display_name": "Core 2017 Attribute Write",
       "opc_reference": {
@@ -5830,7 +5834,7 @@
       "id": "service_history",
       "implementation_state": "claimed",
       "kconfig_symbol": "MUC_OPCUA_CU_HISTORICAL_ACCESS_SERVER_FACET",
-      "kind": "conformance_unit",
+      "kind": "optimization",
       "notes": "HistoryRead/HistoryUpdate.",
       "opc_display_name": "Historical Access Server Facet",
       "opc_reference": {
@@ -6338,7 +6342,7 @@
       "id": "service_query",
       "implementation_state": "claimed",
       "kconfig_symbol": "MUC_OPCUA_CU_QUERY",
-      "kind": "conformance_unit",
+      "kind": "optimization",
       "notes": "QueryFirst/QueryNext.",
       "opc_display_name": "Query",
       "opc_reference": {
@@ -6365,7 +6369,7 @@
       "id": "service_nodemanagement",
       "implementation_state": "claimed",
       "kconfig_symbol": "MUC_OPCUA_CU_NODEMANAGEMENT",
-      "kind": "conformance_unit",
+      "kind": "optimization",
       "notes": "AddNodes/DeleteNodes/...",
       "opc_display_name": "NodeManagement",
       "opc_reference": {
@@ -6716,11 +6720,11 @@
       "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
-      "notes": "Application supports time synchronization via features of a standard operating system. | Satisfied by the same time-sync infrastructure as CU 5793; the time adapter provides the OS clock. Stub file exists but is not needed \u2014 the base time sync CU covers all sync source variants.",
-      "opc_display_name": "Time Sync \u2013 OS based support",
+      "notes": "Application supports time synchronization via features of a standard operating system. | Satisfied by the same time-sync infrastructure as CU 5793; the time adapter provides the OS clock. Stub file exists but is not needed — the base time sync CU covers all sync source variants.",
+      "opc_display_name": "Time Sync – OS based support",
       "opc_reference": {
         "cu_id": "2478",
-        "cu_name": "Time Sync \u2013 OS based support",
+        "cu_name": "Time Sync – OS based support",
         "section": null,
         "source_url": "https://profiles.opcfoundation.org",
         "spec": null
@@ -6749,10 +6753,10 @@
       "kconfig_symbol": "MUC_OPCUA_CU_TIME_SYNC_IEEE_1588_PTP",
       "kind": "conformance_unit",
       "notes": "Application supports time synchronization via the Precision Time Protocol (PTP).",
-      "opc_display_name": "Time Sync \u2013 IEEE 1588 (PTP)",
+      "opc_display_name": "Time Sync – IEEE 1588 (PTP)",
       "opc_reference": {
         "cu_id": "2479",
-        "cu_name": "Time Sync \u2013 IEEE 1588 (PTP)",
+        "cu_name": "Time Sync – IEEE 1588 (PTP)",
         "section": null,
         "source_url": "https://profiles.opcfoundation.org",
         "spec": null
@@ -6775,10 +6779,10 @@
       "kconfig_symbol": "MUC_OPCUA_CU_TIME_SYNC_IEEE_802_1AS",
       "kind": "conformance_unit",
       "notes": "Application supports time synchronization via the features described in IEEE 802.1AS.",
-      "opc_display_name": "Time Sync \u2013 IEEE 802.1AS",
+      "opc_display_name": "Time Sync – IEEE 802.1AS",
       "opc_reference": {
         "cu_id": "2480",
-        "cu_name": "Time Sync \u2013 IEEE 802.1AS",
+        "cu_name": "Time Sync – IEEE 802.1AS",
         "section": null,
         "source_url": "https://profiles.opcfoundation.org",
         "spec": null
@@ -6801,10 +6805,10 @@
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Application supports time synchronization via the Network Time Protocol (NTP).",
-      "opc_display_name": "Time Sync \u2013 NTP",
+      "opc_display_name": "Time Sync – NTP",
       "opc_reference": {
         "cu_id": "2786",
-        "cu_name": "Time Sync \u2013 NTP",
+        "cu_name": "Time Sync – NTP",
         "section": null,
         "source_url": "https://profiles.opcfoundation.org",
         "spec": null
@@ -7011,7 +7015,7 @@
       "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
-      "notes": "Reconciled (spec 073): on Publish-queue overflow handle_publish evicts the OLDEST parked request and answers it with Bad_TooManyPublishRequests, then parks the incoming request (publish_request_evict_oldest, publish_due.c; OPC-10000-4 \u00a75.14.5.1); test_subscriptions_capacity::test_publish_queue_overflow_evicts_oldest_and_parks_newest. Satisfied by opc_cu_subscription_basic.\nIf the maximum supported number of PublishRequests has been queued and a new PublishRequest arrives, the \"oldest\" PublishRequest has to be discarded by returning the proper error.",
+      "notes": "Reconciled (spec 073): on Publish-queue overflow handle_publish evicts the OLDEST parked request and answers it with Bad_TooManyPublishRequests, then parks the incoming request (publish_request_evict_oldest, publish_due.c; OPC-10000-4 §5.14.5.1); test_subscriptions_capacity::test_publish_queue_overflow_evicts_oldest_and_parks_newest. Satisfied by opc_cu_subscription_basic.\nIf the maximum supported number of PublishRequests has been queued and a new PublishRequest arrives, the \"oldest\" PublishRequest has to be discarded by returning the proper error.",
       "opc_display_name": "Subscription PublishRequest Queue Overflow",
       "opc_reference": {
         "cu_id": "3143",
@@ -7441,10 +7445,10 @@
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Satisfied by project-level CU opc_cu_time_sync; UA-based time synchronisation is stubbed in favour of OS/NTP-based sync. See src/cu/core_2022_server/time_sync_ua_based_support/stub.c.disabled.",
-      "opc_display_name": "Time Sync \u2013 UA based support",
+      "opc_display_name": "Time Sync – UA based support",
       "opc_reference": {
         "cu_id": "5505",
-        "cu_name": "Time Sync \u2013 UA based support",
+        "cu_name": "Time Sync – UA based support",
         "section": null,
         "source_url": "https://profiles.opcfoundation.org",
         "spec": null
@@ -8640,10 +8644,10 @@
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "The server supports anonymous authentication and SecurityPolicy None (spec 072); anonymous identity is accepted during ActivateSession. No application instance certificate is required in the SecurityPolicy None path.",
-      "opc_display_name": "Security \u2013 No Application Authentication",
+      "opc_display_name": "Security – No Application Authentication",
       "opc_reference": {
         "cu_id": "5814",
-        "cu_name": "Security \u2013 No Application Authentication",
+        "cu_name": "Security – No Application Authentication",
         "section": null,
         "source_url": "https://profiles.opcfoundation.org",
         "spec": null
@@ -8669,7 +8673,7 @@
       "implementation_state": "claimed",
       "kconfig_symbol": "MUC_OPCUA_CU_KEY_CREDENTIAL_SERVICE",
       "kind": "conformance_unit",
-      "notes": "KeyCredential Service \u2014 GetEncryptingKey + CRUD methods implemented in PR #329",
+      "notes": "KeyCredential Service — GetEncryptingKey + CRUD methods implemented in PR #329",
       "opc_display_name": "KeyCredential Service",
       "opc_reference": {
         "cu_id": "2113",
@@ -8699,7 +8703,7 @@
       "implementation_state": "claimed",
       "kconfig_symbol": "MUC_OPCUA_CU_USER_ROLE_MANAGEMENT",
       "kind": "conformance_unit",
-      "notes": "User Role Management \u2014 AddRole/RemoveRole/AddIdentity/RemoveIdentity implemented in PR #330",
+      "notes": "User Role Management — AddRole/RemoveRole/AddIdentity/RemoveIdentity implemented in PR #330",
       "opc_display_name": "User Role Management",
       "opc_reference": {
         "cu_id": "2080",
@@ -8729,7 +8733,7 @@
       "implementation_state": "claimed",
       "kconfig_symbol": "MUC_OPCUA_CU_CERTIFICATE_MANAGEMENT",
       "kind": "conformance_unit",
-      "notes": "Certificate Management \u2014 CertificateGroupType + CertificateType in base_nodes.c",
+      "notes": "Certificate Management — CertificateGroupType + CertificateType in base_nodes.c",
       "opc_display_name": "Certificate Management",
       "opc_reference": {
         "cu_id": "2105",
@@ -8920,7 +8924,7 @@
       "id": "opc_cu_alarms_conditions",
       "implementation_state": "claimed",
       "kconfig_symbol": "MUC_OPCUA_CU_ALARMS_CONDITIONS",
-      "kind": "conformance_unit",
+      "kind": "optimization",
       "notes": "Project-level CU gating the Alarms & Conditions service (OPC-10000-9). Enables Acknowledge/Confirm/Dialog method dispatch, condition state tracking, and audit event integration. Satisfies OPC CUs 2921, 2927.",
       "opc_display_name": "Alarms & Conditions",
       "opc_reference": {
@@ -10054,10 +10058,10 @@
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Satisfied by project-level CU opc_cu_aggregate_average; the Average aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_AVERAGE.",
-      "opc_display_name": "Aggregate Subscription \u2013 Average",
+      "opc_display_name": "Aggregate Subscription – Average",
       "opc_reference": {
         "cu_id": "2375",
-        "cu_name": "Aggregate Subscription \u2013 Average",
+        "cu_name": "Aggregate Subscription – Average",
         "section": "5.4.3.5",
         "source_url": "https://profiles.opcfoundation.org",
         "spec": "OPC-10000-13"
@@ -10086,10 +10090,10 @@
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Satisfied by project-level CU opc_cu_aggregate_count; the Count aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_COUNT.",
-      "opc_display_name": "Aggregate Subscription \u2013 Count",
+      "opc_display_name": "Aggregate Subscription – Count",
       "opc_reference": {
         "cu_id": "2958",
-        "cu_name": "Aggregate Subscription \u2013 Count",
+        "cu_name": "Aggregate Subscription – Count",
         "section": "5.4.3.21",
         "source_url": "https://profiles.opcfoundation.org",
         "spec": "OPC-10000-13"
@@ -10118,10 +10122,10 @@
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Satisfied by project-level CU opc_cu_aggregate_delta; the Delta aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_DELTA.",
-      "opc_display_name": "Aggregate Subscription \u2013 Delta",
+      "opc_display_name": "Aggregate Subscription – Delta",
       "opc_reference": {
         "cu_id": "2256",
-        "cu_name": "Aggregate Subscription \u2013 Delta",
+        "cu_name": "Aggregate Subscription – Delta",
         "section": "5.4.3.27",
         "source_url": "https://profiles.opcfoundation.org",
         "spec": "OPC-10000-13"
@@ -10150,10 +10154,10 @@
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Satisfied by project-level CU opc_cu_aggregate_delta_bounds; the DeltaBounds aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_DELTA_BOUNDS.",
-      "opc_display_name": "Aggregate Subscription \u2013 DeltaBounds",
+      "opc_display_name": "Aggregate Subscription – DeltaBounds",
       "opc_reference": {
         "cu_id": "2194",
-        "cu_name": "Aggregate Subscription \u2013 DeltaBounds",
+        "cu_name": "Aggregate Subscription – DeltaBounds",
         "section": "5.4.3.30",
         "source_url": "https://profiles.opcfoundation.org",
         "spec": "OPC-10000-13"
@@ -10182,10 +10186,10 @@
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Satisfied by project-level CU opc_cu_aggregate_duration_bad; the DurationBad aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_DURATION_BAD.",
-      "opc_display_name": "Aggregate Subscription \u2013 DurationBad",
+      "opc_display_name": "Aggregate Subscription – DurationBad",
       "opc_reference": {
         "cu_id": "2954",
-        "cu_name": "Aggregate Subscription \u2013 DurationBad",
+        "cu_name": "Aggregate Subscription – DurationBad",
         "section": "5.4.3.32",
         "source_url": "https://profiles.opcfoundation.org",
         "spec": "OPC-10000-13"
@@ -10214,10 +10218,10 @@
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Satisfied by project-level CU opc_cu_aggregate_duration_good; the DurationGood aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_DURATION_GOOD.",
-      "opc_display_name": "Aggregate Subscription \u2013 DurationGood",
+      "opc_display_name": "Aggregate Subscription – DurationGood",
       "opc_reference": {
         "cu_id": "3105",
-        "cu_name": "Aggregate Subscription \u2013 DurationGood",
+        "cu_name": "Aggregate Subscription – DurationGood",
         "section": "5.4.3.31",
         "source_url": "https://profiles.opcfoundation.org",
         "spec": "OPC-10000-13"
@@ -10246,10 +10250,10 @@
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Satisfied by project-level CU opc_cu_aggregate_duration_state_zero; the DurationInStateZero aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_DURATION_IN_STATE_ZERO.",
-      "opc_display_name": "Aggregate Subscription \u2013 DurationInStateZero",
+      "opc_display_name": "Aggregate Subscription – DurationInStateZero",
       "opc_reference": {
         "cu_id": "2998",
-        "cu_name": "Aggregate Subscription \u2013 DurationInStateZero",
+        "cu_name": "Aggregate Subscription – DurationInStateZero",
         "section": "5.4.3.22",
         "source_url": "https://profiles.opcfoundation.org",
         "spec": "OPC-10000-13"
@@ -10278,10 +10282,10 @@
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Satisfied by project-level CU opc_cu_aggregate_end; the End aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_END.",
-      "opc_display_name": "Aggregate Subscription \u2013 End",
+      "opc_display_name": "Aggregate Subscription – End",
       "opc_reference": {
         "cu_id": "2743",
-        "cu_name": "Aggregate Subscription \u2013 End",
+        "cu_name": "Aggregate Subscription – End",
         "section": "5.4.3.26",
         "source_url": "https://profiles.opcfoundation.org",
         "spec": "OPC-10000-13"
@@ -10310,10 +10314,10 @@
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Satisfied by project-level CU opc_cu_aggregate_interpolative; the Interpolative aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_INTERPOLATIVE.",
-      "opc_display_name": "Aggregate Subscription \u2013 Interpolative",
+      "opc_display_name": "Aggregate Subscription – Interpolative",
       "opc_reference": {
         "cu_id": "2754",
-        "cu_name": "Aggregate Subscription \u2013 Interpolative",
+        "cu_name": "Aggregate Subscription – Interpolative",
         "section": "5.4.3.4",
         "source_url": "https://profiles.opcfoundation.org",
         "spec": "OPC-10000-13"
@@ -10342,10 +10346,10 @@
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Satisfied by project-level CU opc_cu_aggregate_maximum; the Maximum aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_MAXIMUM.",
-      "opc_display_name": "Aggregate Subscription \u2013 Maximum",
+      "opc_display_name": "Aggregate Subscription – Maximum",
       "opc_reference": {
         "cu_id": "2381",
-        "cu_name": "Aggregate Subscription \u2013 Maximum",
+        "cu_name": "Aggregate Subscription – Maximum",
         "section": "5.4.3.11",
         "source_url": "https://profiles.opcfoundation.org",
         "spec": "OPC-10000-13"
@@ -10374,10 +10378,10 @@
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Satisfied by project-level CU opc_cu_aggregate_maximum_2; the Maximum2 aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_MAXIMUM_2.",
-      "opc_display_name": "Aggregate Subscription \u2013 Maximum2",
+      "opc_display_name": "Aggregate Subscription – Maximum2",
       "opc_reference": {
         "cu_id": "2166",
-        "cu_name": "Aggregate Subscription \u2013 Maximum2",
+        "cu_name": "Aggregate Subscription – Maximum2",
         "section": "5.4.3.16",
         "source_url": "https://profiles.opcfoundation.org",
         "spec": "OPC-10000-13"
@@ -10406,10 +10410,10 @@
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Satisfied by project-level CU opc_cu_aggregate_minimum; the Minimum aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_MINIMUM.",
-      "opc_display_name": "Aggregate Subscription \u2013 Minimum",
+      "opc_display_name": "Aggregate Subscription – Minimum",
       "opc_reference": {
         "cu_id": "2376",
-        "cu_name": "Aggregate Subscription \u2013 Minimum",
+        "cu_name": "Aggregate Subscription – Minimum",
         "section": "5.4.3.10",
         "source_url": "https://profiles.opcfoundation.org",
         "spec": "OPC-10000-13"
@@ -10438,10 +10442,10 @@
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Satisfied by project-level CU opc_cu_aggregate_minimum_2; the Minimum2 aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_MINIMUM_2.",
-      "opc_display_name": "Aggregate Subscription \u2013 Minimum2",
+      "opc_display_name": "Aggregate Subscription – Minimum2",
       "opc_reference": {
         "cu_id": "2302",
-        "cu_name": "Aggregate Subscription \u2013 Minimum2",
+        "cu_name": "Aggregate Subscription – Minimum2",
         "section": "5.4.3.15",
         "source_url": "https://profiles.opcfoundation.org",
         "spec": "OPC-10000-13"
@@ -10470,10 +10474,10 @@
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Satisfied by project-level CU opc_cu_aggregate_percent_bad; the PercentBad aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_PERCENT_BAD.",
-      "opc_display_name": "Aggregate Subscription \u2013 PercentBad",
+      "opc_display_name": "Aggregate Subscription – PercentBad",
       "opc_reference": {
         "cu_id": "3010",
-        "cu_name": "Aggregate Subscription \u2013 PercentBad",
+        "cu_name": "Aggregate Subscription – PercentBad",
         "section": "5.4.3.34",
         "source_url": "https://profiles.opcfoundation.org",
         "spec": "OPC-10000-13"
@@ -10502,10 +10506,10 @@
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Satisfied by project-level CU opc_cu_aggregate_percent_good; the PercentGood aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_PERCENT_GOOD.",
-      "opc_display_name": "Aggregate Subscription \u2013 PercentGood",
+      "opc_display_name": "Aggregate Subscription – PercentGood",
       "opc_reference": {
         "cu_id": "3048",
-        "cu_name": "Aggregate Subscription \u2013 PercentGood",
+        "cu_name": "Aggregate Subscription – PercentGood",
         "section": "5.4.3.33",
         "source_url": "https://profiles.opcfoundation.org",
         "spec": "OPC-10000-13"
@@ -10534,10 +10538,10 @@
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Satisfied by project-level CU opc_cu_aggregate_range; the Range aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_RANGE.",
-      "opc_display_name": "Aggregate Subscription \u2013 Range",
+      "opc_display_name": "Aggregate Subscription – Range",
       "opc_reference": {
         "cu_id": "2377",
-        "cu_name": "Aggregate Subscription \u2013 Range",
+        "cu_name": "Aggregate Subscription – Range",
         "section": "5.4.3.14",
         "source_url": "https://profiles.opcfoundation.org",
         "spec": "OPC-10000-13"
@@ -10566,10 +10570,10 @@
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Satisfied by project-level CU opc_cu_aggregate_start; the Start aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_START.",
-      "opc_display_name": "Aggregate Subscription \u2013 Start",
+      "opc_display_name": "Aggregate Subscription – Start",
       "opc_reference": {
         "cu_id": "3108",
-        "cu_name": "Aggregate Subscription \u2013 Start",
+        "cu_name": "Aggregate Subscription – Start",
         "section": "5.4.3.25",
         "source_url": "https://profiles.opcfoundation.org",
         "spec": "OPC-10000-13"
@@ -10598,10 +10602,10 @@
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Satisfied by project-level CU opc_cu_aggregate_time_average; the TimeAverage aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_TIME_AVERAGE.",
-      "opc_display_name": "Aggregate Subscription \u2013 TimeAverage",
+      "opc_display_name": "Aggregate Subscription – TimeAverage",
       "opc_reference": {
         "cu_id": "3075",
-        "cu_name": "Aggregate Subscription \u2013 TimeAverage",
+        "cu_name": "Aggregate Subscription – TimeAverage",
         "section": "5.4.3.6",
         "source_url": "https://profiles.opcfoundation.org",
         "spec": "OPC-10000-13"
@@ -10630,10 +10634,10 @@
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Satisfied by project-level CU opc_cu_aggregate_time_average_2; the TimeAverage2 aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_TIME_AVERAGE_2.",
-      "opc_display_name": "Aggregate Subscription \u2013 TimeAverage2",
+      "opc_display_name": "Aggregate Subscription – TimeAverage2",
       "opc_reference": {
         "cu_id": "3126",
-        "cu_name": "Aggregate Subscription \u2013 TimeAverage2",
+        "cu_name": "Aggregate Subscription – TimeAverage2",
         "section": "5.4.3.7",
         "source_url": "https://profiles.opcfoundation.org",
         "spec": "OPC-10000-13"
@@ -10662,10 +10666,10 @@
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Satisfied by project-level CU opc_cu_aggregate_total; the Total aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_TOTAL.",
-      "opc_display_name": "Aggregate Subscription \u2013 Total",
+      "opc_display_name": "Aggregate Subscription – Total",
       "opc_reference": {
         "cu_id": "3062",
-        "cu_name": "Aggregate Subscription \u2013 Total",
+        "cu_name": "Aggregate Subscription – Total",
         "section": "5.4.3.8",
         "source_url": "https://profiles.opcfoundation.org",
         "spec": "OPC-10000-13"
@@ -10694,10 +10698,10 @@
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Satisfied by project-level CU opc_cu_aggregate_total_2; the Total2 aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_TOTAL_2.",
-      "opc_display_name": "Aggregate Subscription \u2013 Total2",
+      "opc_display_name": "Aggregate Subscription – Total2",
       "opc_reference": {
         "cu_id": "2184",
-        "cu_name": "Aggregate Subscription \u2013 Total2",
+        "cu_name": "Aggregate Subscription – Total2",
         "section": "5.4.3.9",
         "source_url": "https://profiles.opcfoundation.org",
         "spec": "OPC-10000-13"
@@ -10726,10 +10730,10 @@
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Satisfied by project-level CU opc_cu_aggregate_worst_quality; the WorstQuality aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_WORST_QUALITY.",
-      "opc_display_name": "Aggregate Subscription \u2013 WorstQuality",
+      "opc_display_name": "Aggregate Subscription – WorstQuality",
       "opc_reference": {
         "cu_id": "2201",
-        "cu_name": "Aggregate Subscription \u2013 WorstQuality",
+        "cu_name": "Aggregate Subscription – WorstQuality",
         "section": "5.4.3.35",
         "source_url": "https://profiles.opcfoundation.org",
         "spec": "OPC-10000-13"
@@ -10758,10 +10762,10 @@
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Satisfied by project-level CU opc_cu_aggregate_worst_quality_2; the WorstQuality2 aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_WORST_QUALITY_2.",
-      "opc_display_name": "Aggregate Subscription \u2013 WorstQuality2",
+      "opc_display_name": "Aggregate Subscription – WorstQuality2",
       "opc_reference": {
         "cu_id": "2408",
-        "cu_name": "Aggregate Subscription \u2013 WorstQuality2",
+        "cu_name": "Aggregate Subscription – WorstQuality2",
         "section": "5.4.3.36",
         "source_url": "https://profiles.opcfoundation.org",
         "spec": "OPC-10000-13"
@@ -10792,10 +10796,10 @@
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Satisfied by project-level CU opc_cu_aggregate_min_actual_time; the MinimumActualTime aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_MINIMUM_ACTUAL_TIME.",
-      "opc_display_name": "Aggregate Subscription \u2013 MinimumActualTime",
+      "opc_display_name": "Aggregate Subscription – MinimumActualTime",
       "opc_reference": {
         "cu_id": "2974",
-        "cu_name": "Aggregate Subscription \u2013 MinimumActualTime",
+        "cu_name": "Aggregate Subscription – MinimumActualTime",
         "section": "5.4.3.12",
         "source_url": "https://profiles.opcfoundation.org",
         "spec": "OPC-10000-13"
@@ -10826,10 +10830,10 @@
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Satisfied by project-level CU opc_cu_aggregate_max_actual_time; the MaximumActualTime aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_MAXIMUM_ACTUAL_TIME.",
-      "opc_display_name": "Aggregate Subscription \u2013 MaximumActualTime",
+      "opc_display_name": "Aggregate Subscription – MaximumActualTime",
       "opc_reference": {
         "cu_id": "3130",
-        "cu_name": "Aggregate Subscription \u2013 MaximumActualTime",
+        "cu_name": "Aggregate Subscription – MaximumActualTime",
         "section": "5.4.3.13",
         "source_url": "https://profiles.opcfoundation.org",
         "spec": "OPC-10000-13"
@@ -10860,10 +10864,10 @@
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Satisfied by project-level CU opc_cu_aggregate_min_actual_time_2; the MinimumActualTime2 aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_MINIMUM_ACTUAL_TIME_2.",
-      "opc_display_name": "Aggregate Subscription \u2013 MinimumActualTime2",
+      "opc_display_name": "Aggregate Subscription – MinimumActualTime2",
       "opc_reference": {
         "cu_id": "2952",
-        "cu_name": "Aggregate Subscription \u2013 MinimumActualTime2",
+        "cu_name": "Aggregate Subscription – MinimumActualTime2",
         "section": "5.4.3.17",
         "source_url": "https://profiles.opcfoundation.org",
         "spec": "OPC-10000-13"
@@ -10894,10 +10898,10 @@
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Satisfied by project-level CU opc_cu_aggregate_max_actual_time_2; the MaximumActualTime2 aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_MAXIMUM_ACTUAL_TIME_2.",
-      "opc_display_name": "Aggregate Subscription \u2013 MaximumActualTime2",
+      "opc_display_name": "Aggregate Subscription – MaximumActualTime2",
       "opc_reference": {
         "cu_id": "2941",
-        "cu_name": "Aggregate Subscription \u2013 MaximumActualTime2",
+        "cu_name": "Aggregate Subscription – MaximumActualTime2",
         "section": "5.4.3.18",
         "source_url": "https://profiles.opcfoundation.org",
         "spec": "OPC-10000-13"
@@ -10928,10 +10932,10 @@
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Satisfied by project-level CU opc_cu_aggregate_range_2; the Range2 aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_RANGE_2.",
-      "opc_display_name": "Aggregate Subscription \u2013 Range2",
+      "opc_display_name": "Aggregate Subscription – Range2",
       "opc_reference": {
         "cu_id": "3047",
-        "cu_name": "Aggregate Subscription \u2013 Range2",
+        "cu_name": "Aggregate Subscription – Range2",
         "section": "5.4.3.19",
         "source_url": "https://profiles.opcfoundation.org",
         "spec": "OPC-10000-13"
@@ -10962,10 +10966,10 @@
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Satisfied by project-level CU opc_cu_aggregate_duration_state_nonzero; the DurationInStateNonZero aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_DURATION_IN_STATE_NON_ZERO.",
-      "opc_display_name": "Aggregate Subscription \u2013 DurationInStateNonZero",
+      "opc_display_name": "Aggregate Subscription – DurationInStateNonZero",
       "opc_reference": {
         "cu_id": "3144",
-        "cu_name": "Aggregate Subscription \u2013 DurationInStateNonZero",
+        "cu_name": "Aggregate Subscription – DurationInStateNonZero",
         "section": "5.4.3.23",
         "source_url": "https://profiles.opcfoundation.org",
         "spec": "OPC-10000-13"
@@ -10996,10 +11000,10 @@
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Satisfied by project-level CU opc_cu_aggregate_number_transitions; the NumberOfTransitions aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_NUMBER_OF_TRANSITIONS.",
-      "opc_display_name": "Aggregate Subscription \u2013 NumberOfTransitions",
+      "opc_display_name": "Aggregate Subscription – NumberOfTransitions",
       "opc_reference": {
         "cu_id": "3099",
-        "cu_name": "Aggregate Subscription \u2013 NumberOfTransitions",
+        "cu_name": "Aggregate Subscription – NumberOfTransitions",
         "section": "5.4.3.24",
         "source_url": "https://profiles.opcfoundation.org",
         "spec": "OPC-10000-13"
@@ -11030,10 +11034,10 @@
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Satisfied by project-level CU opc_cu_aggregate_start_bound; the StartBound aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_START_BOUND.",
-      "opc_display_name": "Aggregate Subscription \u2013 StartBound",
+      "opc_display_name": "Aggregate Subscription – StartBound",
       "opc_reference": {
         "cu_id": "2330",
-        "cu_name": "Aggregate Subscription \u2013 StartBound",
+        "cu_name": "Aggregate Subscription – StartBound",
         "section": "5.4.3.28",
         "source_url": "https://profiles.opcfoundation.org",
         "spec": "OPC-10000-13"
@@ -11064,10 +11068,10 @@
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Satisfied by project-level CU opc_cu_aggregate_end_bound; the EndBound aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_END_BOUND.",
-      "opc_display_name": "Aggregate Subscription \u2013 EndBound",
+      "opc_display_name": "Aggregate Subscription – EndBound",
       "opc_reference": {
         "cu_id": "2207",
-        "cu_name": "Aggregate Subscription \u2013 EndBound",
+        "cu_name": "Aggregate Subscription – EndBound",
         "section": "5.4.3.29",
         "source_url": "https://profiles.opcfoundation.org",
         "spec": "OPC-10000-13"
@@ -11098,10 +11102,10 @@
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Satisfied by project-level CU opc_cu_aggregate_std_dev_sample; the StandardDeviationSample aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_STANDARD_DEVIATION_SAMPLE.",
-      "opc_display_name": "Aggregate Subscription \u2013 StandardDeviationSample",
+      "opc_display_name": "Aggregate Subscription – StandardDeviationSample",
       "opc_reference": {
         "cu_id": "2358",
-        "cu_name": "Aggregate Subscription \u2013 StandardDeviationSample",
+        "cu_name": "Aggregate Subscription – StandardDeviationSample",
         "section": "5.4.3.37",
         "source_url": "https://profiles.opcfoundation.org",
         "spec": "OPC-10000-13"
@@ -11132,10 +11136,10 @@
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Satisfied by project-level CU opc_cu_aggregate_variance_sample; the VarianceSample aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_VARIANCE_SAMPLE.",
-      "opc_display_name": "Aggregate Subscription \u2013 VarianceSample",
+      "opc_display_name": "Aggregate Subscription – VarianceSample",
       "opc_reference": {
         "cu_id": "2281",
-        "cu_name": "Aggregate Subscription \u2013 VarianceSample",
+        "cu_name": "Aggregate Subscription – VarianceSample",
         "section": "5.4.3.38",
         "source_url": "https://profiles.opcfoundation.org",
         "spec": "OPC-10000-13"
@@ -11166,10 +11170,10 @@
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Satisfied by project-level CU opc_cu_aggregate_std_dev_population; the StandardDeviationPopulation aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_STANDARD_DEVIATION_POPULATION.",
-      "opc_display_name": "Aggregate Subscription \u2013 StandardDeviationPopulation",
+      "opc_display_name": "Aggregate Subscription – StandardDeviationPopulation",
       "opc_reference": {
         "cu_id": "2955",
-        "cu_name": "Aggregate Subscription \u2013 StandardDeviationPopulation",
+        "cu_name": "Aggregate Subscription – StandardDeviationPopulation",
         "section": "5.4.3.39",
         "source_url": "https://profiles.opcfoundation.org",
         "spec": "OPC-10000-13"
@@ -11200,10 +11204,10 @@
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Satisfied by project-level CU opc_cu_aggregate_variance_population; the VariancePopulation aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_VARIANCE_POPULATION.",
-      "opc_display_name": "Aggregate Subscription \u2013 VariancePopulation",
+      "opc_display_name": "Aggregate Subscription – VariancePopulation",
       "opc_reference": {
         "cu_id": "2178",
-        "cu_name": "Aggregate Subscription \u2013 VariancePopulation",
+        "cu_name": "Aggregate Subscription – VariancePopulation",
         "section": "5.4.3.40",
         "source_url": "https://profiles.opcfoundation.org",
         "spec": "OPC-10000-13"
@@ -15073,7 +15077,7 @@
       "implementation_state": "claimed",
       "kconfig_symbol": "MUC_OPCUA_CU_ADDRESS_SPACE_USER_ACCESS_LEVEL_BASE",
       "kind": "conformance_unit",
-      "notes": "Reconciled: Readable UserAccessLevel attribute on Variable nodes (OPC-10000-3 \u00a75.5.9). Backed by read_attribute.c unconditionally.",
+      "notes": "Reconciled: Readable UserAccessLevel attribute on Variable nodes (OPC-10000-3 §5.5.9). Backed by read_attribute.c unconditionally.",
       "opc_display_name": "Address Space User Access Level Base",
       "opc_reference": {
         "cu_id": "3965",
@@ -15104,7 +15108,7 @@
       "implementation_state": "claimed",
       "kconfig_symbol": "MUC_OPCUA_CU_ADDRESS_SPACE_DATATYPEDEFINITION_ATTRIBUTE",
       "kind": "conformance_unit",
-      "notes": "Reconciled: DataTypeDefinition attribute on DataType nodes (OPC-10000-5 \u00a712.2.12.3). Backed by base_nodes.c DataType nodes and read_attribute.c attribute handling.",
+      "notes": "Reconciled: DataTypeDefinition attribute on DataType nodes (OPC-10000-5 §12.2.12.3). Backed by base_nodes.c DataType nodes and read_attribute.c attribute handling.",
       "opc_display_name": "Address Space DataTypeDefinition Attribute",
       "opc_reference": {
         "cu_id": "3941",
@@ -16460,10 +16464,12 @@
       "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_history"
+      ],
       "cu_optional": true,
       "id": "opc_cu_3162",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 3162: tracked in manifest; not yet claimed or implemented.",
@@ -16486,13 +16492,16 @@
       "source_metadata": {
         "source_id": "3162",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_aggregate_full"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_history"
+      ],
       "cu_optional": true,
       "id": "opc_cu_3159",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 3159: tracked in manifest; not yet claimed or implemented.",
@@ -16515,7 +16524,8 @@
       "source_metadata": {
         "source_id": "3159",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_aggregate_full"
     },
     {
       "backing_tests": [
@@ -16647,10 +16657,12 @@
       "satisfied_by": "opc_cu_core_structure_2"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_history"
+      ],
       "cu_optional": true,
       "id": "opc_cu_3101",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 3101: tracked in manifest; not yet claimed or implemented.",
@@ -16673,7 +16685,8 @@
       "source_metadata": {
         "source_id": "3101",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_aggregate_full"
     },
     {
       "backing_tests": [
@@ -16708,10 +16721,12 @@
       "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_history"
+      ],
       "cu_optional": true,
       "id": "opc_cu_3085",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 3085: tracked in manifest; not yet claimed or implemented.",
@@ -16734,7 +16749,8 @@
       "source_metadata": {
         "source_id": "3085",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_aggregate_full"
     },
     {
       "backing_tests": [
@@ -16841,7 +16857,7 @@
       "implementation_state": "claimed",
       "kconfig_symbol": "MUC_OPCUA_CU_ADDRESS_SPACE_NOTIFIER_HIERARCHY",
       "kind": "conformance_unit",
-      "notes": "Reconciled: EventNotifier attribute on Object/View nodes (OPC-10000-3 \u00a75.4.6). Backed by mu_node_t.event_notifier field and read_attribute.c.",
+      "notes": "Reconciled: EventNotifier attribute on Object/View nodes (OPC-10000-3 §5.4.6). Backed by mu_node_t.event_notifier field and read_attribute.c.",
       "opc_display_name": "Address Space Notifier Hierarchy",
       "opc_reference": {
         "cu_id": "3064",
@@ -16864,10 +16880,12 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_history"
+      ],
       "cu_optional": true,
       "id": "opc_cu_3061",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 3061: tracked in manifest; not yet claimed or implemented.",
@@ -16890,7 +16908,8 @@
       "source_metadata": {
         "source_id": "3061",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_aggregate_full"
     },
     {
       "backing_tests": [
@@ -16925,10 +16944,12 @@
       "satisfied_by": "opc_cu_core_structure_2"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_history"
+      ],
       "cu_optional": true,
       "id": "opc_cu_3055",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 3055: tracked in manifest; not yet claimed or implemented.",
@@ -16951,7 +16972,8 @@
       "source_metadata": {
         "source_id": "3055",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_aggregate_full"
     },
     {
       "backing_tests": [
@@ -17047,10 +17069,12 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_history"
+      ],
       "cu_optional": true,
       "id": "opc_cu_3032",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 3032: tracked in manifest; not yet claimed or implemented.",
@@ -17073,7 +17097,8 @@
       "source_metadata": {
         "source_id": "3032",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_aggregate_full"
     },
     {
       "backing_tests": [
@@ -17171,10 +17196,12 @@
       "satisfied_by": "service_history"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_history"
+      ],
       "cu_optional": true,
       "id": "opc_cu_3018",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 3018: tracked in manifest; not yet claimed or implemented.",
@@ -17197,7 +17224,8 @@
       "source_metadata": {
         "source_id": "3018",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_aggregate_full"
     },
     {
       "backing_tests": [
@@ -17232,10 +17260,12 @@
       "satisfied_by": "service_history"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_history"
+      ],
       "cu_optional": true,
       "id": "opc_cu_3011",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 3011: tracked in manifest; not yet claimed or implemented.",
@@ -17258,13 +17288,16 @@
       "source_metadata": {
         "source_id": "3011",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_aggregate_full"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_history"
+      ],
       "cu_optional": true,
       "id": "opc_cu_3006",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 3006: tracked in manifest; not yet claimed or implemented.",
@@ -17287,7 +17320,8 @@
       "source_metadata": {
         "source_id": "3006",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_aggregate_full"
     },
     {
       "backing_tests": [
@@ -17386,10 +17420,12 @@
       "satisfied_by": "opc_cu_core_structure_2"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_history"
+      ],
       "cu_optional": true,
       "id": "opc_cu_2996",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 2996: tracked in manifest; not yet claimed or implemented.",
@@ -17412,7 +17448,8 @@
       "source_metadata": {
         "source_id": "2996",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_aggregate_full"
     },
     {
       "backing_tests": [],
@@ -17476,10 +17513,12 @@
       "satisfied_by": "service_history"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_history"
+      ],
       "cu_optional": true,
       "id": "opc_cu_2985",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 2985: tracked in manifest; not yet claimed or implemented.",
@@ -17502,13 +17541,16 @@
       "source_metadata": {
         "source_id": "2985",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_aggregate_full"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_history"
+      ],
       "cu_optional": true,
       "id": "opc_cu_2975",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 2975: tracked in manifest; not yet claimed or implemented.",
@@ -17531,7 +17573,8 @@
       "source_metadata": {
         "source_id": "2975",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_aggregate_full"
     },
     {
       "backing_tests": [
@@ -17566,10 +17609,12 @@
       "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_history"
+      ],
       "cu_optional": true,
       "id": "opc_cu_2962",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 2962: tracked in manifest; not yet claimed or implemented.",
@@ -17592,13 +17637,16 @@
       "source_metadata": {
         "source_id": "2962",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_aggregate_full"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_history"
+      ],
       "cu_optional": true,
       "id": "opc_cu_2960",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 2960: tracked in manifest; not yet claimed or implemented.",
@@ -17621,7 +17669,8 @@
       "source_metadata": {
         "source_id": "2960",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_aggregate_full"
     },
     {
       "backing_tests": [
@@ -17720,10 +17769,12 @@
       "satisfied_by": "service_history"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_history"
+      ],
       "cu_optional": true,
       "id": "opc_cu_2948",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 2948: tracked in manifest; not yet claimed or implemented.",
@@ -17746,7 +17797,8 @@
       "source_metadata": {
         "source_id": "2948",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_aggregate_full"
     },
     {
       "backing_tests": [
@@ -18549,10 +18601,12 @@
       "satisfied_by": "opc_cu_aliasname"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_history"
+      ],
       "cu_optional": true,
       "id": "opc_cu_2759",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 2759: tracked in manifest; not yet claimed or implemented.",
@@ -18575,7 +18629,8 @@
       "source_metadata": {
         "source_id": "2759",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_aggregate_full"
     },
     {
       "backing_tests": [
@@ -18642,10 +18697,12 @@
       "satisfied_by": "service_history"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_history"
+      ],
       "cu_optional": true,
       "id": "opc_cu_2730",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 2730: tracked in manifest; not yet claimed or implemented.",
@@ -18668,7 +18725,8 @@
       "source_metadata": {
         "source_id": "2730",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_aggregate_full"
     },
     {
       "backing_tests": [
@@ -19211,10 +19269,12 @@
       "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_history"
+      ],
       "cu_optional": true,
       "id": "opc_cu_2384",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 2384: tracked in manifest; not yet claimed or implemented.",
@@ -19237,7 +19297,8 @@
       "source_metadata": {
         "source_id": "2384",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_aggregate_full"
     },
     {
       "backing_tests": [
@@ -19272,10 +19333,12 @@
       "satisfied_by": "service_history"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_history"
+      ],
       "cu_optional": true,
       "id": "opc_cu_2382",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 2382: tracked in manifest; not yet claimed or implemented.",
@@ -19298,7 +19361,8 @@
       "source_metadata": {
         "source_id": "2382",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_aggregate_full"
     },
     {
       "backing_tests": [
@@ -19341,7 +19405,7 @@
       "implementation_state": "claimed",
       "kconfig_symbol": "MUC_OPCUA_CU_ADDRESS_SPACE_METHOD",
       "kind": "conformance_unit",
-      "notes": "Reconciled: Method nodes with proper NodeClass and executable attributes (OPC-10000-3 \u00a75.7). Backed by read_attribute.c Executable/UserExecutable handling and base_nodes.c method nodes.",
+      "notes": "Reconciled: Method nodes with proper NodeClass and executable attributes (OPC-10000-3 §5.7). Backed by read_attribute.c Executable/UserExecutable handling and base_nodes.c method nodes.",
       "opc_display_name": "Address Space Method",
       "opc_reference": {
         "cu_id": "2362",
@@ -19430,10 +19494,12 @@
       "satisfied_by": "opc_cu_subscription_standard"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_history"
+      ],
       "cu_optional": true,
       "id": "opc_cu_2350",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 2350: tracked in manifest; not yet claimed or implemented.",
@@ -19456,13 +19522,16 @@
       "source_metadata": {
         "source_id": "2350",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_aggregate_full"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_history"
+      ],
       "cu_optional": true,
       "id": "opc_cu_2346",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 2346: tracked in manifest; not yet claimed or implemented.",
@@ -19485,7 +19554,8 @@
       "source_metadata": {
         "source_id": "2346",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_aggregate_full"
     },
     {
       "backing_tests": [
@@ -19552,10 +19622,12 @@
       "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_history"
+      ],
       "cu_optional": true,
       "id": "opc_cu_2339",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 2339: tracked in manifest; not yet claimed or implemented.",
@@ -19578,7 +19650,8 @@
       "source_metadata": {
         "source_id": "2339",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_aggregate_full"
     },
     {
       "backing_tests": [],
@@ -19610,10 +19683,12 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_history"
+      ],
       "cu_optional": true,
       "id": "opc_cu_2335",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 2335: tracked in manifest; not yet claimed or implemented.",
@@ -19636,7 +19711,8 @@
       "source_metadata": {
         "source_id": "2335",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_aggregate_full"
     },
     {
       "backing_tests": [
@@ -19767,10 +19843,12 @@
       "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_history"
+      ],
       "cu_optional": true,
       "id": "opc_cu_2314",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 2314: tracked in manifest; not yet claimed or implemented.",
@@ -19793,7 +19871,8 @@
       "source_metadata": {
         "source_id": "2314",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_aggregate_full"
     },
     {
       "backing_tests": [
@@ -19828,10 +19907,12 @@
       "satisfied_by": "service_history"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_history"
+      ],
       "cu_optional": true,
       "id": "opc_cu_2305",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 2305: tracked in manifest; not yet claimed or implemented.",
@@ -19854,13 +19935,16 @@
       "source_metadata": {
         "source_id": "2305",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_aggregate_full"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_history"
+      ],
       "cu_optional": true,
       "id": "opc_cu_2303",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 2303: tracked in manifest; not yet claimed or implemented.",
@@ -19883,7 +19967,8 @@
       "source_metadata": {
         "source_id": "2303",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_aggregate_full"
     },
     {
       "backing_tests": [
@@ -19950,10 +20035,12 @@
       "satisfied_by": "service_history"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_history"
+      ],
       "cu_optional": true,
       "id": "opc_cu_2282",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 2282: tracked in manifest; not yet claimed or implemented.",
@@ -19976,7 +20063,8 @@
       "source_metadata": {
         "source_id": "2282",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_aggregate_full"
     },
     {
       "backing_tests": [
@@ -20043,10 +20131,12 @@
       "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_history"
+      ],
       "cu_optional": true,
       "id": "opc_cu_2273",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 2273: tracked in manifest; not yet claimed or implemented.",
@@ -20069,13 +20159,16 @@
       "source_metadata": {
         "source_id": "2273",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_aggregate_full"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_history"
+      ],
       "cu_optional": true,
       "id": "opc_cu_2267",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 2267: tracked in manifest; not yet claimed or implemented.",
@@ -20098,13 +20191,16 @@
       "source_metadata": {
         "source_id": "2267",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_aggregate_full"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_history"
+      ],
       "cu_optional": true,
       "id": "opc_cu_2263",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 2263: tracked in manifest; not yet claimed or implemented.",
@@ -20127,7 +20223,8 @@
       "source_metadata": {
         "source_id": "2263",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_aggregate_full"
     },
     {
       "backing_tests": [
@@ -20322,10 +20419,12 @@
       "satisfied_by": "service_history"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_history"
+      ],
       "cu_optional": true,
       "id": "opc_cu_2223",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 2223: tracked in manifest; not yet claimed or implemented.",
@@ -20348,13 +20447,16 @@
       "source_metadata": {
         "source_id": "2223",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_aggregate_full"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_history"
+      ],
       "cu_optional": true,
       "id": "opc_cu_2220",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 2220: tracked in manifest; not yet claimed or implemented.",
@@ -20377,13 +20479,16 @@
       "source_metadata": {
         "source_id": "2220",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_aggregate_full"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_history"
+      ],
       "cu_optional": true,
       "id": "opc_cu_2210",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 2210: tracked in manifest; not yet claimed or implemented.",
@@ -20406,7 +20511,8 @@
       "source_metadata": {
         "source_id": "2210",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_aggregate_full"
     },
     {
       "backing_tests": [
@@ -20473,10 +20579,12 @@
       "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_history"
+      ],
       "cu_optional": true,
       "id": "opc_cu_2188",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 2188: tracked in manifest; not yet claimed or implemented.",
@@ -20499,7 +20607,8 @@
       "source_metadata": {
         "source_id": "2188",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_aggregate_full"
     },
     {
       "backing_tests": [
@@ -20534,10 +20643,12 @@
       "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_history"
+      ],
       "cu_optional": true,
       "id": "opc_cu_2175",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 2175: tracked in manifest; not yet claimed or implemented.",
@@ -20560,7 +20671,8 @@
       "source_metadata": {
         "source_id": "2175",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_aggregate_full"
     },
     {
       "backing_tests": [],
@@ -20735,7 +20847,7 @@
     },
     {
       "id": "opc_cu_aliasname",
-      "kind": "conformance_unit",
+      "kind": "optimization",
       "implementation_state": "claimed",
       "opc_display_name": "AliasName Server",
       "kconfig_symbol": "MUC_OPCUA_CU_ALIASNAME",
@@ -20762,7 +20874,7 @@
     },
     {
       "id": "opc_cu_scheduler",
-      "kind": "conformance_unit",
+      "kind": "optimization",
       "implementation_state": "claimed",
       "opc_display_name": "Scheduler Base",
       "kconfig_symbol": "MUC_OPCUA_CU_SCHEDULER",
@@ -20792,7 +20904,7 @@
   "metadata": {
     "superseded_profiles": [
       {
-        "description": "This Profile is a collection of Facets necessary to build a functional OPC UA Server Application specifically for chip level devices with limited resources. This Profile is functionally equivalent to the Core Server Facet and defines the \"UA-TCP UA-SC UA-Binary\" as the required transport profile including an ECC Security Policy. The support of Diagnostic Objects and Variables is optional for this Profile despite it being defined as \u201cmandatory\u201d in UA Part 5. Support of Diagnostic Objects and Variables is mandatory in some higher-level Profiles. Exposing types in the AddressSpace is optional for this Profile except if custom types (i.e., types that are derived from well-known ObjectTypes, VariableTypes, ReferenceType or DataTypes) are used. Exposing all supported types in the AddressSpace is mandatory in some higher-level Profiles.<br>\nThis Profile supersedes the <a href=\"http://opcfoundation.org/UA-Profile/Server/NanoEmbeddedDevice2017\">Nano Embedded Device 2017 Server Profile</a>.",
+        "description": "This Profile is a collection of Facets necessary to build a functional OPC UA Server Application specifically for chip level devices with limited resources. This Profile is functionally equivalent to the Core Server Facet and defines the \"UA-TCP UA-SC UA-Binary\" as the required transport profile including an ECC Security Policy. The support of Diagnostic Objects and Variables is optional for this Profile despite it being defined as “mandatory” in UA Part 5. Support of Diagnostic Objects and Variables is mandatory in some higher-level Profiles. Exposing types in the AddressSpace is optional for this Profile except if custom types (i.e., types that are derived from well-known ObjectTypes, VariableTypes, ReferenceType or DataTypes) are used. Exposing all supported types in the AddressSpace is mandatory in some higher-level Profiles.<br>\nThis Profile supersedes the <a href=\"http://opcfoundation.org/UA-Profile/Server/NanoEmbeddedDevice2017\">Nano Embedded Device 2017 Server Profile</a>.",
         "display_name": "Nano Embedded Device 2022 Server Profile",
         "last_update_time": "2025-11-12T15:47:17",
         "name": "Nano Embedded Device 2022 Server Profile",
@@ -20849,9 +20961,9 @@
       },
       {
         "description": "<b>This User Token has been deprecated with OPC UA Specification Version 1.05.</b><br>\nThis Facet indicates that a User Token that is comprised of an issued token is supported.",
-        "display_name": "User Token \u2013 Issued Token Server Facet",
+        "display_name": "User Token – Issued Token Server Facet",
         "last_update_time": "2022-03-10T16:02:39",
-        "name": "User Token \u2013 Issued Token Server Facet",
+        "name": "User Token – Issued Token Server Facet",
         "opc_id": 1698,
         "opc_profile_uri": "http://opcfoundation.org/UA-Profile/Security/UserToken/Server/IssuedToken",
         "release_status": 4,
@@ -20863,9 +20975,9 @@
       },
       {
         "description": "<b>This User Token has been deprecated with OPC UA Specification Version 1.05.</b><br>\nThis Facet further refines the User Token - Issued Token to indicate a windows implementation of Kerberos",
-        "display_name": "User Token \u2013 Issued Token Windows Server Facet",
+        "display_name": "User Token – Issued Token Windows Server Facet",
         "last_update_time": "2022-03-10T16:02:49",
-        "name": "User Token \u2013 Issued Token Windows Server Facet",
+        "name": "User Token – Issued Token Windows Server Facet",
         "opc_id": 1699,
         "opc_profile_uri": "http://opcfoundation.org/UA-Profile/Security/UserToken/Server/IssuedTokenWindows",
         "release_status": 4,

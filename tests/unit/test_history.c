@@ -161,11 +161,12 @@ void test_history_read_decode(void) {
     opcua_statuscode_t status = mu_history_read_request_decode(&r, &req, nodes, 2);
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD, status);
 
-    TEST_ASSERT_EQUAL(false, req.details.is_read_modified);
-    TEST_ASSERT_EQUAL(10000, req.details.start_time);
-    TEST_ASSERT_EQUAL(20000, req.details.end_time);
-    TEST_ASSERT_EQUAL(100, req.details.num_values_per_node);
-    TEST_ASSERT_EQUAL(true, req.details.return_bounds);
+    TEST_ASSERT_EQUAL(MU_HISTORY_READ_TYPE_RAW_MODIFIED, req.details_type);
+    TEST_ASSERT_EQUAL(false, req.details.raw_modified.is_read_modified);
+    TEST_ASSERT_EQUAL(10000, req.details.raw_modified.start_time);
+    TEST_ASSERT_EQUAL(20000, req.details.raw_modified.end_time);
+    TEST_ASSERT_EQUAL(100, req.details.raw_modified.num_values_per_node);
+    TEST_ASSERT_EQUAL(true, req.details.raw_modified.return_bounds);
     TEST_ASSERT_EQUAL(2, req.timestamps_to_return);
     TEST_ASSERT_EQUAL(false, req.release_continuation_points);
     TEST_ASSERT_EQUAL(1, req.num_nodes_to_read);

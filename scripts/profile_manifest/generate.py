@@ -659,10 +659,13 @@ def generate_kconfig(manifest: dict) -> str:
     # Optimization items are project implementation controls, not OPC UA
     # Facets or Conformance Units.  They are emitted under a separate menu
     # to keep the OPC tree (OPC-10000-7 §4.2) structurally clean.
+    # Exclude items already emitted inside a facet menu (facet_containment)
+    # to avoid duplicate Kconfig ``config`` entries.
     optimization_items = [
         i for i in items
         if i.get("kind") == "optimization"
         and i.get("implementation_state") in _SELECTABLE_STATES
+        and i.get("id") not in contained_cus
     ]
     if optimization_items:
         lines.append('menu "Project options"')

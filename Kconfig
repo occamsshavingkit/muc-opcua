@@ -1404,107 +1404,8 @@ config MUC_OPCUA_CU_ADDRESS_SPACE_BASE
 	  Imported from: comprehensive-fix (Fix 2).
 	  Notes: Already-implemented CU added to manifest as claimed so the feature is tracked, gated by its Kconfig symbol, and covered by the claim/test map.
 
-config MUC_OPCUA_CU_AGGREGATES_ANNOTATIONCOUNT
-	bool "CU: Aggregates - AnnotationCount"
-	depends on MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
-	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
-	help
-	  Implementation state: claimed.
-	  OPC source: OPC-10000-13 §4.2.2.35 -- Core 2022 Server Facet.
-	  Backing tests: test_aggregate, test_aggregate_full.
-
-config MUC_OPCUA_CU_AGGREGATES_AVERAGE
-	bool "CU: Aggregates - Average"
-	depends on MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
-	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
-	help
-	  Implementation state: claimed.
-	  OPC source: OPC-10000-13 §4.2.2.4 -- Core 2022 Server Facet.
-	  Backing tests: test_aggregate, test_aggregate_full.
-
-config MUC_OPCUA_CU_AGGREGATES_COUNT
-	bool "CU: Aggregates - Count"
-	depends on MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
-	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
-	help
-	  Implementation state: claimed.
-	  OPC source: OPC-10000-13 §4.2.2.19 -- Core 2022 Server Facet.
-	  Backing tests: test_aggregate, test_aggregate_full.
-
-config MUC_OPCUA_CU_AGGREGATES_DELTA
-	bool "CU: Aggregates - Delta"
-	depends on MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
-	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
-	help
-	  Implementation state: claimed.
-	  OPC source: OPC-10000-13 §4.2.2.25 -- Core 2022 Server Facet.
-	  Backing tests: test_aggregate, test_aggregate_full.
-
-config MUC_OPCUA_CU_AGGREGATES_DELTABOUNDS
-	bool "CU: Aggregates - DeltaBounds"
-	depends on MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
-	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
-	help
-	  Implementation state: claimed.
-	  OPC source: OPC-10000-13 §4.2.2.28 -- Core 2022 Server Facet.
-	  Backing tests: test_aggregate, test_aggregate_full.
-
-config MUC_OPCUA_CU_AGGREGATES_DURATIONBAD
-	bool "CU: Aggregates - DurationBad"
-	depends on MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
-	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
-	help
-	  Implementation state: claimed.
-	  OPC source: OPC-10000-13 §4.2.2.30 -- Core 2022 Server Facet.
-	  Backing tests: test_aggregate, test_aggregate_full.
-
-config MUC_OPCUA_CU_AGGREGATES_DURATIONGOOD
-	bool "CU: Aggregates - DurationGood"
-	depends on MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
-	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
-	help
-	  Implementation state: claimed.
-	  OPC source: OPC-10000-13 §4.2.2.29 -- Core 2022 Server Facet.
-	  Backing tests: test_aggregate, test_aggregate_full.
-
-config MUC_OPCUA_CU_AGGREGATES_DURATIONINSTATENONZERO
-	bool "CU: Aggregates - DurationInStateNonZero"
-	depends on MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
-	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
-	help
-	  Implementation state: claimed.
-	  OPC source: OPC-10000-13 §4.2.2.21 -- Core 2022 Server Facet.
-	  Backing tests: test_aggregate, test_aggregate_full.
-
-config MUC_OPCUA_CU_AGGREGATES_DURATIONINSTATEZERO
-	bool "CU: Aggregates - DurationInStateZero"
-	depends on MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
-	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
-	help
-	  Implementation state: claimed.
-	  OPC source: OPC-10000-13 §4.2.2.20 -- Core 2022 Server Facet.
-	  Backing tests: test_aggregate, test_aggregate_full.
-
-config MUC_OPCUA_CU_AGGREGATES_END
-	bool "CU: Aggregates - End"
-	depends on MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
-	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
-	help
-	  Implementation state: claimed.
-	  OPC source: OPC-10000-13 §4.2.2.24 -- Core 2022 Server Facet.
-	  Backing tests: test_aggregate, test_aggregate_full.
-
-config MUC_OPCUA_CU_AGGREGATES_ENDBOUND
-	bool "CU: Aggregates - EndBound"
-	depends on MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
-	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
-	help
-	  Implementation state: claimed.
-	  OPC source: OPC-10000-13 §4.2.2.27 -- Core 2022 Server Facet.
-	  Backing tests: test_aggregate, test_aggregate_full.
-
 config MUC_OPCUA_CU_AGGREGATE_FULL
-	bool "CU: Aggregate Full"
+	bool "Aggregate Full"
 	depends on MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
 	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
 	help
@@ -1513,242 +1414,8 @@ config MUC_OPCUA_CU_AGGREGATE_FULL
 	  Backing tests: test_aggregate, test_aggregate_full.
 	  Notes: Project-level Conformance Unit mirroring the legacy 'aggregate_full' item; emits Kconfig symbol MUC_OPCUA_CU_AGGREGATE_FULL matching the #ifdef guard renamed in Task 3 of the CU-aligned code reorganisation plan.
 
-config MUC_OPCUA_CU_AGGREGATES_INTERPOLATIVE
-	bool "CU: Aggregates - Interpolative"
-	depends on MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
-	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
-	help
-	  Implementation state: claimed.
-	  OPC source: OPC-10000-13 §4.2.2.3 -- Core 2022 Server Facet.
-	  Backing tests: test_aggregate, test_aggregate_full.
-
-config MUC_OPCUA_CU_AGGREGATES_MAXIMUMACTUALTIME
-	bool "CU: Aggregates - MaximumActualTime"
-	depends on MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
-	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
-	help
-	  Implementation state: claimed.
-	  OPC source: OPC-10000-13 §4.2.2.12 -- Core 2022 Server Facet.
-	  Backing tests: test_aggregate, test_aggregate_full.
-
-config MUC_OPCUA_CU_AGGREGATES_MAXIMUMACTUALTIME2
-	bool "CU: Aggregates - MaximumActualTime2"
-	depends on MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
-	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
-	help
-	  Implementation state: claimed.
-	  OPC source: OPC-10000-13 §4.2.2.17 -- Core 2022 Server Facet.
-	  Backing tests: test_aggregate, test_aggregate_full.
-
-config MUC_OPCUA_CU_AGGREGATES_MAXIMUM
-	bool "CU: Aggregates - Maximum"
-	depends on MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
-	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
-	help
-	  Implementation state: claimed.
-	  OPC source: OPC-10000-13 §4.2.2.10 -- Core 2022 Server Facet.
-	  Backing tests: test_aggregate, test_aggregate_full.
-
-config MUC_OPCUA_CU_AGGREGATES_MAXIMUM2
-	bool "CU: Aggregates - Maximum2"
-	depends on MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
-	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
-	help
-	  Implementation state: claimed.
-	  OPC source: OPC-10000-13 §4.2.2.15 -- Core 2022 Server Facet.
-	  Backing tests: test_aggregate, test_aggregate_full.
-
-config MUC_OPCUA_CU_AGGREGATES_MINIMUMACTUALTIME
-	bool "CU: Aggregates - MinimumActualTime"
-	depends on MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
-	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
-	help
-	  Implementation state: claimed.
-	  OPC source: OPC-10000-13 §4.2.2.11 -- Core 2022 Server Facet.
-	  Backing tests: test_aggregate, test_aggregate_full.
-
-config MUC_OPCUA_CU_AGGREGATES_MINIMUMACTUALTIME2
-	bool "CU: Aggregates - MinimumActualTime2"
-	depends on MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
-	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
-	help
-	  Implementation state: claimed.
-	  OPC source: OPC-10000-13 §4.2.2.16 -- Core 2022 Server Facet.
-	  Backing tests: test_aggregate, test_aggregate_full.
-
-config MUC_OPCUA_CU_AGGREGATES_MINIMUM
-	bool "CU: Aggregates - Minimum"
-	depends on MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
-	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
-	help
-	  Implementation state: claimed.
-	  OPC source: OPC-10000-13 §4.2.2.9 -- Core 2022 Server Facet.
-	  Backing tests: test_aggregate, test_aggregate_full.
-
-config MUC_OPCUA_CU_AGGREGATES_MINIMUM2
-	bool "CU: Aggregates - Minimum2"
-	depends on MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
-	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
-	help
-	  Implementation state: claimed.
-	  OPC source: OPC-10000-13 §4.2.2.14 -- Core 2022 Server Facet.
-	  Backing tests: test_aggregate, test_aggregate_full.
-
-config MUC_OPCUA_CU_AGGREGATES_NUMBEROFTRANSITIONS
-	bool "CU: Aggregates - NumberOfTransitions"
-	depends on MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
-	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
-	help
-	  Implementation state: claimed.
-	  OPC source: OPC-10000-13 §4.2.2.22 -- Core 2022 Server Facet.
-	  Backing tests: test_aggregate, test_aggregate_full.
-
-config MUC_OPCUA_CU_AGGREGATES_PERCENTBAD
-	bool "CU: Aggregates - PercentBad"
-	depends on MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
-	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
-	help
-	  Implementation state: claimed.
-	  OPC source: OPC-10000-13 §4.2.2.32 -- Core 2022 Server Facet.
-	  Backing tests: test_aggregate, test_aggregate_full.
-
-config MUC_OPCUA_CU_AGGREGATES_PERCENTGOOD
-	bool "CU: Aggregates - PercentGood"
-	depends on MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
-	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
-	help
-	  Implementation state: claimed.
-	  OPC source: OPC-10000-13 §4.2.2.31 -- Core 2022 Server Facet.
-	  Backing tests: test_aggregate, test_aggregate_full.
-
-config MUC_OPCUA_CU_AGGREGATES_RANGE
-	bool "CU: Aggregates - Range"
-	depends on MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
-	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
-	help
-	  Implementation state: claimed.
-	  OPC source: OPC-10000-13 §4.2.2.13 -- Core 2022 Server Facet.
-	  Backing tests: test_aggregate, test_aggregate_full.
-
-config MUC_OPCUA_CU_AGGREGATES_RANGE2
-	bool "CU: Aggregates - Range2"
-	depends on MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
-	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
-	help
-	  Implementation state: claimed.
-	  OPC source: OPC-10000-13 §4.2.2.18 -- Core 2022 Server Facet.
-	  Backing tests: test_aggregate, test_aggregate_full.
-
-config MUC_OPCUA_CU_AGGREGATES_START
-	bool "CU: Aggregates - Start"
-	depends on MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
-	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
-	help
-	  Implementation state: claimed.
-	  OPC source: OPC-10000-13 §4.2.2.23 -- Core 2022 Server Facet.
-	  Backing tests: test_aggregate, test_aggregate_full.
-
-config MUC_OPCUA_CU_AGGREGATES_STARTBOUND
-	bool "CU: Aggregates - StartBound"
-	depends on MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
-	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
-	help
-	  Implementation state: claimed.
-	  OPC source: OPC-10000-13 §4.2.2.26 -- Core 2022 Server Facet.
-	  Backing tests: test_aggregate, test_aggregate_full.
-
-config MUC_OPCUA_CU_AGGREGATES_STANDARDDEVIATIONPOPULATION
-	bool "CU: Aggregates - StandardDeviationPopulation"
-	depends on MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
-	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
-	help
-	  Implementation state: claimed.
-	  OPC source: OPC-10000-13 §4.2.2.38 -- Core 2022 Server Facet.
-	  Backing tests: test_aggregate, test_aggregate_full.
-
-config MUC_OPCUA_CU_AGGREGATES_STANDARDDEVIATIONSAMPLE
-	bool "CU: Aggregates - StandardDeviationSample"
-	depends on MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
-	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
-	help
-	  Implementation state: claimed.
-	  OPC source: OPC-10000-13 §4.2.2.36 -- Core 2022 Server Facet.
-	  Backing tests: test_aggregate, test_aggregate_full.
-
-config MUC_OPCUA_CU_AGGREGATES_TIMEAVERAGE
-	bool "CU: Aggregates - TimeAverage"
-	depends on MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
-	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
-	help
-	  Implementation state: claimed.
-	  OPC source: OPC-10000-13 §4.2.2.5 -- Core 2022 Server Facet.
-	  Backing tests: test_aggregate, test_aggregate_full.
-
-config MUC_OPCUA_CU_AGGREGATES_TIMEAVERAGE2
-	bool "CU: Aggregates - TimeAverage2"
-	depends on MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
-	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
-	help
-	  Implementation state: claimed.
-	  OPC source: OPC-10000-13 §4.2.2.6 -- Core 2022 Server Facet.
-	  Backing tests: test_aggregate, test_aggregate_full.
-
-config MUC_OPCUA_CU_AGGREGATES_TOTAL
-	bool "CU: Aggregates - Total"
-	depends on MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
-	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
-	help
-	  Implementation state: claimed.
-	  OPC source: OPC-10000-13 §4.2.2.7 -- Core 2022 Server Facet.
-	  Backing tests: test_aggregate, test_aggregate_full.
-
-config MUC_OPCUA_CU_AGGREGATES_TOTAL2
-	bool "CU: Aggregates - Total2"
-	depends on MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
-	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
-	help
-	  Implementation state: claimed.
-	  OPC source: OPC-10000-13 §4.2.2.8 -- Core 2022 Server Facet.
-	  Backing tests: test_aggregate, test_aggregate_full.
-
-config MUC_OPCUA_CU_AGGREGATES_VARIANCEPOPULATION
-	bool "CU: Aggregates - VariancePopulation"
-	depends on MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
-	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
-	help
-	  Implementation state: claimed.
-	  OPC source: OPC-10000-13 §4.2.2.39 -- Core 2022 Server Facet.
-	  Backing tests: test_aggregate, test_aggregate_full.
-
-config MUC_OPCUA_CU_AGGREGATES_VARIANCESAMPLE
-	bool "CU: Aggregates - VarianceSample"
-	depends on MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
-	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
-	help
-	  Implementation state: claimed.
-	  OPC source: OPC-10000-13 §4.2.2.37 -- Core 2022 Server Facet.
-	  Backing tests: test_aggregate, test_aggregate_full.
-
-config MUC_OPCUA_CU_AGGREGATES_WORSTQUALITY
-	bool "CU: Aggregates - WorstQuality"
-	depends on MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
-	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
-	help
-	  Implementation state: claimed.
-	  OPC source: OPC-10000-13 §4.2.2.33 -- Core 2022 Server Facet.
-	  Backing tests: test_aggregate, test_aggregate_full.
-
-config MUC_OPCUA_CU_AGGREGATES_WORSTQUALITY2
-	bool "CU: Aggregates - WorstQuality2"
-	depends on MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
-	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
-	help
-	  Implementation state: claimed.
-	  OPC source: OPC-10000-13 §4.2.2.34 -- Core 2022 Server Facet.
-	  Backing tests: test_aggregate, test_aggregate_full.
-
 config MUC_OPCUA_CU_ALARMS_CONDITIONS
-	bool "CU: Alarms & Conditions"
+	bool "Alarms & Conditions"
 	depends on MUC_OPCUA_CU_EVENTS && MUC_OPCUA_FACET_CORE_2022_SERVER
 	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
 	help
@@ -1758,7 +1425,7 @@ config MUC_OPCUA_CU_ALARMS_CONDITIONS
 	  Notes: Project-level CU gating the Alarms & Conditions service (OPC-10000-9). Enables Acknowledge/Confirm/Dialog method dispatch, condition state tracking, and audit event integration. Satisfies OPC CUs 2921, 2927.
 
 config MUC_OPCUA_CU_AUDITING
-	bool "CU: Auditing"
+	bool "Auditing"
 	depends on MUC_OPCUA_CU_EVENTS
 	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
 	help
@@ -1768,7 +1435,7 @@ config MUC_OPCUA_CU_AUDITING
 	  Notes: spec 074: the server now emits OPC UA AuditEvents (Open Secure Channel/Create Session/Activate Session/Write Update, subtypes i=2060/2071/2075/2100) that a client observes by subscribing to the Server Object EventNotifier -- not just the host-callback stub. Emit+observe proven E2E by test_event_notifications::test_audit_write_event_e2e. Project-level Conformance Unit mirroring the legacy 'auditing' item; emits Kconfig symbol MUC_OPCUA_CU_AUDITING matching the #ifdef guard renamed in Task 3 of the CU-aligned code reorganisation plan.
 
 config MUC_OPCUA_CU_BASE_INFO_ARGUMENT_TYPE
-	bool "CU: Base Info Argument DataType + encoding infra"
+	bool "Base Info Argument DataType + encoding infra"
 	depends on MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER
 	default y if MUC_OPCUA_INTERN_PROFILE_EMBEDDED_2025_UA_SERVER
 	help
@@ -1778,7 +1445,7 @@ config MUC_OPCUA_CU_BASE_INFO_ARGUMENT_TYPE
 	  Notes: spec 080a: exposes the Argument(i=296) DataType (subtype of Structure) + its DefaultBinary(298)/DefaultXml(297) Encoding Objects, plus the shared DataTypeEncodingType(76) ObjectType and HasEncoding(38) ReferenceType, in base_nodes.c. Satisfies CU 3641. First slice of the base type-system completion (A2); 3188 base DataTypes + 3185 folders follow.
 
 config MUC_OPCUA_CU_BASE_INFO_BASE_TYPES
-	bool "CU: Base Info Base Types + Core Types Folders"
+	bool "Base Info Base Types + Core Types Folders"
 	depends on MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER && MUC_OPCUA_CU_BASE_INFO_DATATYPES
 	default y if MUC_OPCUA_INTERN_PROFILE_EMBEDDED_2025_UA_SERVER
 	help
@@ -1788,7 +1455,7 @@ config MUC_OPCUA_CU_BASE_INFO_BASE_TYPES
 	  Notes: spec 080b: completes the base OPC UA type system in base_nodes.c -- the remaining built-in/abstract DataTypes (Guid14/ByteString15/XmlElement16/ExpandedNodeId18/DataValue23/DiagnosticInfo25/Integer27/UInteger28/Enumeration29/Duration290/NumericRange291/UtcTime294/EnumValueType7594/Union12756) with correct supertype closure (primitives re-parented under Integer/UInteger/Number), HasModellingRule(37) + ModellingRuleType(77) + the ModellingRule Objects (Optional80/Mandatory78/ExposesItsArray83/OptionalPlaceholder11508/MandatoryPlaceholder11510), and the EnumValueType Encoding Objects (DefaultXml7616/DefaultBinary8251). Satisfies CU 3188 (Base Types) and CU 3185 (Core Types Folders). Second slice of the base type-system completion (A2); depends on the specialized-DataTypes CU for the Number/String subtype arrays it extends.
 
 config MUC_OPCUA_CU_BASE_INFO_DATATYPES
-	bool "CU: Base Info Specialized DataTypes"
+	bool "Base Info Specialized DataTypes"
 	depends on MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER
 	default y if MUC_OPCUA_INTERN_PROFILE_EMBEDDED_2025_UA_SERVER
 	help
@@ -1808,7 +1475,7 @@ config MUC_OPCUA_CU_CERTIFICATE_MANAGEMENT
 	  Notes: Certificate Management — CertificateGroupType + CertificateType in base_nodes.c
 
 config MUC_OPCUA_CU_COMPLEX_TYPES
-	bool "CU: Complex Types"
+	bool "Complex Types"
 	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
 	help
 	  Implementation state: claimed.
@@ -1839,7 +1506,7 @@ config MUC_OPCUA_CU_CORE_VIEWS_FOLDER
 	  Notes: Already-implemented CU added to manifest as claimed so the feature is tracked, gated by its Kconfig symbol, and covered by the claim/test map.
 
 config MUC_OPCUA_CU_CUSTOM_METHODS
-	bool "CU: Custom Methods"
+	bool "Custom Methods"
 	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
 	help
 	  Implementation state: claimed.
@@ -1848,7 +1515,7 @@ config MUC_OPCUA_CU_CUSTOM_METHODS
 	  Notes: Project-level Conformance Unit mirroring the legacy 'custom_methods' item; emits Kconfig symbol MUC_OPCUA_CU_CUSTOM_METHODS matching the #ifdef guard renamed in Task 3 of the CU-aligned code reorganisation plan.
 
 config MUC_OPCUA_CU_DATA_ACCESS
-	bool "CU: Data Access"
+	bool "Data Access"
 	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
 	help
 	  Implementation state: claimed.
@@ -1857,7 +1524,7 @@ config MUC_OPCUA_CU_DATA_ACCESS
 	  Notes: Project-level Conformance Unit mirroring the legacy 'data_access' item; emits Kconfig symbol MUC_OPCUA_CU_DATA_ACCESS matching the #ifdef guard renamed in Task 3 of the CU-aligned code reorganisation plan.
 
 config MUC_OPCUA_CU_DIAGNOSTICS
-	bool "CU: Diagnostics"
+	bool "Diagnostics"
 	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
 	help
 	  Implementation state: claimed.
@@ -1866,7 +1533,7 @@ config MUC_OPCUA_CU_DIAGNOSTICS
 	  Notes: Project-level Conformance Unit mirroring the legacy 'server_diagnostics' item; emits Kconfig symbol MUC_OPCUA_CU_DIAGNOSTICS matching the #ifdef guard renamed in Task 3 of the CU-aligned code reorganisation plan.
 
 config MUC_OPCUA_CU_DYNAMIC_NODES
-	bool "CU: Dynamic Nodes"
+	bool "Dynamic Nodes"
 	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
 	help
 	  Implementation state: claimed.
@@ -1875,7 +1542,7 @@ config MUC_OPCUA_CU_DYNAMIC_NODES
 	  Notes: Project-level Conformance Unit mirroring the legacy 'dynamic_nodes' item; emits Kconfig symbol MUC_OPCUA_CU_DYNAMIC_NODES matching the #ifdef guard renamed in Task 3 of the CU-aligned code reorganisation plan.
 
 config MUC_OPCUA_CU_EVENT_FILTER_WHERE
-	bool "CU: Event Filter Where"
+	bool "Event Filter Where"
 	depends on MUC_OPCUA_CU_EVENTS && MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
 	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
 	help
@@ -1885,7 +1552,7 @@ config MUC_OPCUA_CU_EVENT_FILTER_WHERE
 	  Notes: Project-level Conformance Unit mirroring the legacy 'event_filter_where' item; emits Kconfig symbol MUC_OPCUA_CU_EVENT_FILTER_WHERE matching the #ifdef guard renamed in Task 3 of the CU-aligned code reorganisation plan.
 
 config MUC_OPCUA_CU_EVENTS
-	bool "CU: Events"
+	bool "Events"
 	depends on MUC_OPCUA_CU_SUBSCRIPTION_BASIC
 	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
 	help
@@ -1895,7 +1562,7 @@ config MUC_OPCUA_CU_EVENTS
 	  Notes: Project-level Conformance Unit mirroring the legacy 'events' item; emits Kconfig symbol MUC_OPCUA_CU_EVENTS matching the #ifdef guard renamed in Task 3 of the CU-aligned code reorganisation plan.
 
 config MUC_OPCUA_CU_EXTENDED_NODEIDS
-	bool "CU: Extended Nodeids"
+	bool "Extended Nodeids"
 	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
 	help
 	  Implementation state: claimed.
@@ -1914,7 +1581,7 @@ config MUC_OPCUA_CU_KEY_CREDENTIAL_SERVICE
 	  Notes: KeyCredential Service — GetEncryptingKey + CRUD methods implemented in PR #329
 
 config MUC_OPCUA_CU_METHOD_SERVER
-	bool "CU: Method Server"
+	bool "Method Server"
 	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
 	help
 	  Implementation state: claimed.
@@ -1923,7 +1590,7 @@ config MUC_OPCUA_CU_METHOD_SERVER
 	  Notes: Project-level Conformance Unit mirroring the legacy 'method_server' item; emits Kconfig symbol MUC_OPCUA_CU_METHOD_SERVER matching the #ifdef guard renamed in Task 3 of the CU-aligned code reorganisation plan.
 
 config MUC_OPCUA_CU_MULTI_CHUNK
-	bool "CU: Multi Chunk"
+	bool "Multi Chunk"
 	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
 	help
 	  Implementation state: claimed.
@@ -1932,7 +1599,7 @@ config MUC_OPCUA_CU_MULTI_CHUNK
 	  Notes: Project-level Conformance Unit mirroring the legacy 'multi_chunk' item; emits Kconfig symbol MUC_OPCUA_CU_MULTI_CHUNK matching the #ifdef guard renamed in Task 3 of the CU-aligned code reorganisation plan.
 
 config MUC_OPCUA_CU_MULTIPLE_CONNECTIONS
-	bool "CU: Multiple Connections"
+	bool "Multiple Connections"
 	default y if MUC_OPCUA_INTERN_PROFILE_MICRO_EMBEDDED_DEVICE_2025_SERVER
 	help
 	  Implementation state: claimed.
@@ -1952,7 +1619,7 @@ config MUC_OPCUA_CU_NAMESPACE_METADATA
 	  Notes: Already-implemented CU added to manifest as claimed so the feature is tracked, gated by its Kconfig symbol, and covered by the claim/test map.
 
 config MUC_OPCUA_CU_NAMESPACES
-	bool "CU: Namespaces"
+	bool "Namespaces"
 	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
 	help
 	  Implementation state: claimed.
@@ -1961,7 +1628,7 @@ config MUC_OPCUA_CU_NAMESPACES
 	  Notes: Project-level Conformance Unit mirroring the legacy 'namespaces' item; emits Kconfig symbol MUC_OPCUA_CU_NAMESPACES matching the #ifdef guard renamed in Task 3 of the CU-aligned code reorganisation plan.
 
 config MUC_OPCUA_CU_PUBSUB
-	bool "CU: PubSub"
+	bool "PubSub"
 	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
 	help
 	  Implementation state: claimed.
@@ -1970,7 +1637,7 @@ config MUC_OPCUA_CU_PUBSUB
 	  Notes: Project-level Conformance Unit mirroring the legacy 'pubsub' item; emits Kconfig symbol MUC_OPCUA_CU_PUBSUB matching the #ifdef guard renamed in Task 3 of the CU-aligned code reorganisation plan.
 
 config MUC_OPCUA_CU_REDUNDANCY
-	bool "CU: Redundancy"
+	bool "Redundancy"
 	depends on MUC_OPCUA_CU_SUBSCRIPTION_BASIC
 	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
 	help
@@ -1980,7 +1647,7 @@ config MUC_OPCUA_CU_REDUNDANCY
 	  Notes: Project-level Conformance Unit mirroring the legacy 'redundancy' item; emits Kconfig symbol MUC_OPCUA_CU_REDUNDANCY matching the #ifdef guard renamed in Task 3 of the CU-aligned code reorganisation plan.
 
 config MUC_OPCUA_CU_REVERSE_CONNECT
-	bool "CU: Reverse Connect"
+	bool "Reverse Connect"
 	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
 	help
 	  Implementation state: claimed.
@@ -1989,7 +1656,7 @@ config MUC_OPCUA_CU_REVERSE_CONNECT
 	  Notes: Project-level Conformance Unit mirroring the legacy 'reverse_connect' item; emits Kconfig symbol MUC_OPCUA_CU_REVERSE_CONNECT matching the #ifdef guard renamed in Task 3 of the CU-aligned code reorganisation plan.
 
 config MUC_OPCUA_CU_SECURITY_ECC
-	bool "CU: Security ECC"
+	bool "Security ECC"
 	depends on SECURE_CHANNEL_CRYPTO
 	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
 	help
@@ -2032,7 +1699,7 @@ config MUC_OPCUA_CU_SESSION_GENERAL_SERVICE
 	  Notes: Already-implemented CU added to manifest as claimed so the feature is tracked, gated by its Kconfig symbol, and covered by the claim/test map.
 
 config MUC_OPCUA_CU_SESSION_TIMEOUT
-	bool "CU: Session Timeout"
+	bool "Session Timeout"
 	depends on MUC_OPCUA_CU_MULTIPLE_CONNECTIONS || MUC_OPCUA_CU_MULTI_CHUNK
 	default y if MUC_OPCUA_INTERN_PROFILE_MICRO_EMBEDDED_DEVICE_2025_SERVER
 	help
@@ -2046,12 +1713,12 @@ config MUC_OPCUA_CU_SUBSCRIPTION_BASIC
 	default y if MUC_OPCUA_INTERN_PROFILE_MICRO_EMBEDDED_DEVICE_2025_SERVER
 	help
 	  Implementation state: claimed.
-	  OPC source: OPC-10000-4 §5.12/5.13 -- Core 2022 Server Facet.
+	  OPC source: OPC-10000-4 §5.12/5.13 -- Core 2022 Server Facet -- CU 3727.
 	  Backing tests: test_subscriptions, test_subscriptions_errors.
 	  Notes: Project-level Conformance Unit mirroring the legacy 'subscriptions' item; emits Kconfig symbol MUC_OPCUA_CU_SUBSCRIPTION_BASIC matching the #ifdef guard renamed in Task 3 of the CU-aligned code reorganisation plan.
 
 config MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
-	bool "CU: Subscription Standard"
+	bool "Subscription Standard"
 	depends on MUC_OPCUA_CU_SUBSCRIPTION_BASIC
 	default y if MUC_OPCUA_INTERN_PROFILE_EMBEDDED_2025_UA_SERVER
 	help
@@ -2061,7 +1728,7 @@ config MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
 	  Notes: Project-level Conformance Unit mirroring the legacy 'subscriptions_standard' item; emits Kconfig symbol MUC_OPCUA_CU_SUBSCRIPTION_STANDARD matching the #ifdef guard renamed in Task 3 of the CU-aligned code reorganisation plan.
 
 config MUC_OPCUA_CU_TIME_SYNC
-	bool "CU: Time Sync"
+	bool "Time Sync"
 	default y if MUC_OPCUA_INTERN_PROFILE_NANO_EMBEDDED_DEVICE_2025_SERVER
 	help
 	  Implementation state: claimed.
@@ -2070,7 +1737,7 @@ config MUC_OPCUA_CU_TIME_SYNC
 	  Notes: Project-level Conformance Unit mirroring the legacy 'time_sync' item; emits Kconfig symbol MUC_OPCUA_CU_TIME_SYNC matching the #ifdef guard renamed in Task 3 of the CU-aligned code reorganisation plan.
 
 config MUC_OPCUA_CU_USER_AUTH
-	bool "CU: User Auth"
+	bool "User Auth"
 	default y if MUC_OPCUA_INTERN_PROFILE_NANO_EMBEDDED_DEVICE_2025_SERVER
 	help
 	  Implementation state: claimed.
@@ -2093,7 +1760,7 @@ config MUC_OPCUA_CU_MONITOR_ITEMS_500
 	default n
 	help
 	  Implementation state: claimed.
-	  OPC source: OPC-10000-4 §5.13.2 -- Monitor Items 500.
+	  OPC source: OPC-10000-4 §5.13.2 -- Monitor Items 500 -- CU 5242.
 	  Backing tests: test_profile_surface.
 	  Imported from: profiles/opcua-profile-snapshot.json.
 	  Notes: Satisfied by project-level CU opc_cu_subscription_standard; support for 500+ monitored items is stubbed as it requires substantial memory allocation. See src/cu/core_2022_server/monitor_items_500/stub.c.disabled.
@@ -2103,13 +1770,13 @@ config MUC_OPCUA_CU_MONITOR_MINQUEUESIZE_05
 	default n
 	help
 	  Implementation state: claimed.
-	  OPC source: OPC-10000-4 §5.13.2 -- Monitor MinQueueSize_05.
+	  OPC source: OPC-10000-4 §5.13.2 -- Monitor MinQueueSize_05 -- CU 5250.
 	  Backing tests: test_profile_surface.
 	  Imported from: profiles/opcua-profile-snapshot.json.
 	  Notes: Satisfied by project-level CU opc_cu_subscription_standard; MinQueueSize_05 tuning is stubbed. See src/cu/core_2022_server/monitor_minqueuesize_05/stub.c.disabled.
 
 config MUC_OPCUA_CU_VIEW_BASIC_TRANSLATEBROWSEPATH
-	bool "CU: View Basic / TranslateBrowsePath"
+	bool "View Basic / TranslateBrowsePath"
 	default y
 	help
 	  Implementation state: claimed.
@@ -2118,7 +1785,7 @@ config MUC_OPCUA_CU_VIEW_BASIC_TRANSLATEBROWSEPATH
 	  Notes: Browse + BrowseNext + TranslateBrowsePaths.
 
 config MUC_OPCUA_CU_DISCOVERY_FIND_SERVERS_SELF_GET_ENDPOINTS
-	bool "CU: Discovery Find Servers Self / Get Endpoints"
+	bool "Discovery Find Servers Self / Get Endpoints"
 	default y
 	help
 	  Implementation state: claimed.
@@ -2127,7 +1794,7 @@ config MUC_OPCUA_CU_DISCOVERY_FIND_SERVERS_SELF_GET_ENDPOINTS
 	  Notes: FindServers / GetEndpoints.
 
 config MUC_OPCUA_CU_HISTORICAL_ACCESS_SERVER_FACET
-	bool "CU: Historical Access Server Facet"
+	bool "Historical Access Server Facet"
 	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
 	help
 	  Implementation state: claimed.
@@ -2136,7 +1803,7 @@ config MUC_OPCUA_CU_HISTORICAL_ACCESS_SERVER_FACET
 	  Notes: HistoryRead/HistoryUpdate.
 
 config MUC_OPCUA_CU_NODEMANAGEMENT
-	bool "CU: NodeManagement"
+	bool "NodeManagement"
 	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
 	help
 	  Implementation state: claimed.
@@ -2145,7 +1812,7 @@ config MUC_OPCUA_CU_NODEMANAGEMENT
 	  Notes: AddNodes/DeleteNodes/...
 
 config MUC_OPCUA_CU_QUERY
-	bool "CU: Query"
+	bool "Query"
 	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
 	help
 	  Implementation state: claimed.
@@ -2169,12 +1836,12 @@ config MUC_OPCUA_CU_VIEW_REGISTERNODES
 	default y if MUC_OPCUA_INTERN_PROFILE_NANO_EMBEDDED_DEVICE_2025_SERVER
 	help
 	  Implementation state: claimed.
-	  OPC source: OPC-10000-4 §5.9 -- Core 2017 -- View RegisterNodes.
+	  OPC source: OPC-10000-4 §5.9 -- Core 2017 -- CU 3073:View RegisterNodes.
 	  Backing tests: test_view_services, test_profile_surface.
 	  Notes: RegisterNodes / UnregisterNodes.
 
 config MUC_OPCUA_CU_CORE_2017_ATTRIBUTE_WRITE
-	bool "CU: Core 2017 Attribute Write"
+	bool "Core 2017 Attribute Write"
 	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
 	help
 	  Implementation state: claimed.
@@ -2308,6 +1975,15 @@ config MUC_OPCUA_CU_ADDRESS_SPACE_USERWRITEMASK
 	  Backing tests: test_profile_surface.
 	  Notes: Reconciled: Readable UserWriteMask attribute on Variable nodes. Backed by read_attribute.c unconditionally.
 
+config MUC_OPCUA_CU_AGGREGATE_MINIMUMACTUALTIME2
+	bool "CU: Aggregate - MinimumActualTime2"
+	default n
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2175:Aggregate - MinimumActualTime2.
+	  Backing tests: test_history.
+	  Notes: Spec CU 2175: tracked in manifest; not yet claimed or implemented.
+
 config MUC_OPCUA_CU_A_C_DIALOG
 	bool "CU: A & C Dialog"
 	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
@@ -2316,6 +1992,15 @@ config MUC_OPCUA_CU_A_C_DIALOG
 	  OPC item: CU 2180:A & C Dialog.
 	  Backing tests: test_alarms_conditions.
 	  Notes: Spec CU 2180: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_AGGREGATE_MAXIMUM2
+	bool "CU: Aggregate - Maximum2"
+	default n
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2188:Aggregate - Maximum2.
+	  Backing tests: test_history.
+	  Notes: Spec CU 2188: tracked in manifest; not yet claimed or implemented.
 
 config MUC_OPCUA_CU_A_C_ENABLE
 	bool "CU: A & C Enable"
@@ -2334,6 +2019,33 @@ config MUC_OPCUA_CU_ATTRIBUTE_WRITE_COMPLEX
 	  OPC item: CU 2203:Attribute Write Complex.
 	  Backing tests: test_read_service.
 	  Notes: Spec CU 2203: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_AGGREGATE_TOTAL2
+	bool "CU: Aggregate - Total2"
+	default n
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2210:Aggregate - Total2.
+	  Backing tests: test_history.
+	  Notes: Spec CU 2210: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_AGGREGATE_DURATIONINSTATEZERO
+	bool "CU: Aggregate - DurationInStateZero"
+	default n
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2220:Aggregate - DurationInStateZero.
+	  Backing tests: test_history.
+	  Notes: Spec CU 2220: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_AGGREGATE_DURATIONINSTATENONZERO
+	bool "CU: Aggregate - DurationInStateNonZero"
+	default n
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2223:Aggregate - DurationInStateNonZero.
+	  Backing tests: test_history.
+	  Notes: Spec CU 2223: tracked in manifest; not yet claimed or implemented.
 
 config MUC_OPCUA_CU_HISTORICAL_ACCESS_REPLACE_EVENT
 	bool "CU: Historical Access Replace Event"
@@ -2389,6 +2101,33 @@ config MUC_OPCUA_CU_REDUNDANCY_SERVER
 	  Backing tests: test_transfer_subscriptions.
 	  Notes: Spec CU 2258: tracked in manifest; not yet claimed or implemented.
 
+config MUC_OPCUA_CU_AGGREGATE_COUNT
+	bool "CU: Aggregate - Count"
+	default n
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2263:Aggregate - Count.
+	  Backing tests: test_history.
+	  Notes: Spec CU 2263: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_AGGREGATE_STARTBOUND
+	bool "CU: Aggregate - StartBound"
+	default n
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2267:Aggregate - StartBound.
+	  Backing tests: test_history.
+	  Notes: Spec CU 2267: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_AGGREGATE_TIMEAVERAGE2
+	bool "CU: Aggregate - TimeAverage2"
+	default n
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2273:Aggregate - TimeAverage2.
+	  Backing tests: test_history.
+	  Notes: Spec CU 2273: tracked in manifest; not yet claimed or implemented.
+
 config MUC_OPCUA_CU_A_C_TRIP
 	bool "CU: A & C Trip"
 	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
@@ -2406,6 +2145,15 @@ config MUC_OPCUA_CU_HISTORICAL_ACCESS_ANNOTATIONS
 	  OPC item: CU 2276:Historical Access Annotations.
 	  Backing tests: test_profile_surface.
 	  Notes: Satisfied by Historical Access Server Facet.
+
+config MUC_OPCUA_CU_AGGREGATE_ENDBOUND
+	bool "CU: Aggregate - EndBound"
+	default n
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2282:Aggregate - EndBound.
+	  Backing tests: test_history.
+	  Notes: Spec CU 2282: tracked in manifest; not yet claimed or implemented.
 
 config MUC_OPCUA_CU_HISTORICAL_ACCESS_UPDATE_EVENT
 	bool "CU: Historical Access Update Event"
@@ -2425,6 +2173,24 @@ config MUC_OPCUA_CU_ATTRIBUTE_READ_COMPLEX
 	  Backing tests: test_read_service.
 	  Notes: Spec CU 2291: tracked in manifest; not yet claimed or implemented.
 
+config MUC_OPCUA_CU_AGGREGATE_PERCENTGOOD
+	bool "CU: Aggregate - PercentGood"
+	default n
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2303:Aggregate - PercentGood.
+	  Backing tests: test_history.
+	  Notes: Spec CU 2303: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_AGGREGATE_TIMEAVERAGE
+	bool "CU: Aggregate - TimeAverage"
+	default n
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2305:Aggregate - TimeAverage.
+	  Backing tests: test_history.
+	  Notes: Spec CU 2305: tracked in manifest; not yet claimed or implemented.
+
 config MUC_OPCUA_CU_HISTORICAL_ACCESS_INSERT_EVENT
 	bool "CU: Historical Access Insert Event"
 	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
@@ -2433,6 +2199,15 @@ config MUC_OPCUA_CU_HISTORICAL_ACCESS_INSERT_EVENT
 	  OPC item: CU 2309:Historical Access Insert Event.
 	  Backing tests: test_profile_surface.
 	  Notes: Satisfied by Historical Access Server Facet.
+
+config MUC_OPCUA_CU_AGGREGATE_DURATIONBAD
+	bool "CU: Aggregate - DurationBad"
+	default n
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2314:Aggregate - DurationBad.
+	  Backing tests: test_history.
+	  Notes: Spec CU 2314: tracked in manifest; not yet claimed or implemented.
 
 config MUC_OPCUA_CU_A_C_REFRESH2
 	bool "CU: A & C Refresh2"
@@ -2470,6 +2245,24 @@ config MUC_OPCUA_CU_A_C_INSTANCES
 	  Backing tests: test_alarms_conditions.
 	  Notes: Spec CU 2333: tracked in manifest; not yet claimed or implemented.
 
+config MUC_OPCUA_CU_AGGREGATE_DELTA
+	bool "CU: Aggregate - Delta"
+	default n
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2335:Aggregate - Delta.
+	  Backing tests: test_history.
+	  Notes: Spec CU 2335: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_AGGREGATE_START
+	bool "CU: Aggregate - Start"
+	default n
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2339:Aggregate - Start.
+	  Backing tests: test_history.
+	  Notes: Spec CU 2339: tracked in manifest; not yet claimed or implemented.
+
 config MUC_OPCUA_CU_A_C_BRANCH
 	bool "CU: A & C Branch"
 	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
@@ -2487,6 +2280,24 @@ config MUC_OPCUA_CU_ATTRIBUTE_ALTERNATE_ENCODING
 	  OPC item: CU 2345:Attribute Alternate Encoding.
 	  Backing tests: test_read_service.
 	  Notes: Spec CU 2345: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_AGGREGATE_MINIMUM
+	bool "CU: Aggregate - Minimum"
+	default n
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2346:Aggregate - Minimum.
+	  Backing tests: test_history.
+	  Notes: Spec CU 2346: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_AGGREGATE_DELTABOUNDS
+	bool "CU: Aggregate - DeltaBounds"
+	default n
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2350:Aggregate - DeltaBounds.
+	  Backing tests: test_history.
+	  Notes: Spec CU 2350: tracked in manifest; not yet claimed or implemented.
 
 config MUC_OPCUA_CU_SUBSCRIPTION_TRANSFER
 	bool "CU: Subscription Transfer"
@@ -2524,6 +2335,15 @@ config MUC_OPCUA_CU_ALIASNAME_CATEGORY_TAGS
 	  Backing tests: test_aliasname_stub.
 	  Notes: Spec CU 2379: tracked in manifest; not yet claimed or implemented.
 
+config MUC_OPCUA_CU_AGGREGATE_MINIMUM2
+	bool "CU: Aggregate - Minimum2"
+	default n
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2382:Aggregate - Minimum2.
+	  Backing tests: test_history.
+	  Notes: Spec CU 2382: tracked in manifest; not yet claimed or implemented.
+
 config MUC_OPCUA_CU_HISTORICAL_ACCESS_INSERT_VALUE
 	bool "CU: Historical Access Insert Value"
 	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
@@ -2532,6 +2352,15 @@ config MUC_OPCUA_CU_HISTORICAL_ACCESS_INSERT_VALUE
 	  OPC item: CU 2383:Historical Access Insert Value.
 	  Backing tests: test_profile_surface.
 	  Notes: Satisfied by Historical Access Server Facet.
+
+config MUC_OPCUA_CU_AGGREGATE_WORSTQUALITY2
+	bool "CU: Aggregate - WorstQuality2"
+	default n
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2384:Aggregate - WorstQuality2.
+	  Backing tests: test_history.
+	  Notes: Spec CU 2384: tracked in manifest; not yet claimed or implemented.
 
 config MUC_OPCUA_CU_A_C_NON_EXCLUSIVE_DEVIATION
 	bool "CU: A & C Non-Exclusive Deviation"
@@ -2686,6 +2515,15 @@ config MUC_OPCUA_CU_OPC_UA_AUTHORITY_PROFILE
 	  Backing tests: test_secure_channel.
 	  Notes: Spec CU 2709: tracked in manifest; not yet claimed or implemented.
 
+config MUC_OPCUA_CU_AGGREGATE_RANGE2
+	bool "CU: Aggregate - Range2"
+	default n
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2730:Aggregate - Range2.
+	  Backing tests: test_history.
+	  Notes: Spec CU 2730: tracked in manifest; not yet claimed or implemented.
+
 config MUC_OPCUA_CU_HISTORICAL_ACCESS_STRUCTURED_DATA_DELETE
 	bool "CU: Historical Access Structured Data Delete"
 	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
@@ -2703,6 +2541,15 @@ config MUC_OPCUA_CU_A_C_EXCLUSIVE_LEVEL
 	  OPC item: CU 2746:A & C Exclusive Level.
 	  Backing tests: test_alarms_conditions.
 	  Notes: Spec CU 2746: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_AGGREGATE_MINIMUMACTUALTIME
+	bool "CU: Aggregate - MinimumActualTime"
+	default n
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2759:Aggregate - MinimumActualTime.
+	  Backing tests: test_history.
+	  Notes: Spec CU 2759: tracked in manifest; not yet claimed or implemented.
 
 config MUC_OPCUA_CU_ALIASNAME_HIERARCHY
 	bool "CU: AliasName Hierarchy"
@@ -2929,6 +2776,15 @@ config MUC_OPCUA_CU_HISTORICAL_ACCESS_EVENTS
 	  Backing tests: test_profile_surface.
 	  Notes: Satisfied by Historical Access Server Facet.
 
+config MUC_OPCUA_CU_AGGREGATE_VARIANCEPOPULATION
+	bool "CU: Aggregate - VariancePopulation"
+	default n
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2948:Aggregate - VariancePopulation.
+	  Backing tests: test_history.
+	  Notes: Spec CU 2948: tracked in manifest; not yet claimed or implemented.
+
 config MUC_OPCUA_CU_HISTORICAL_ACCESS_SERVERTIMESTAMP
 	bool "CU: Historical Access ServerTimestamp"
 	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
@@ -2956,6 +2812,24 @@ config MUC_OPCUA_CU_A_C_REFRESH
 	  Backing tests: test_alarms_conditions.
 	  Notes: Spec CU 2957: tracked in manifest; not yet claimed or implemented.
 
+config MUC_OPCUA_CU_AGGREGATE_VARIANCESAMPLE
+	bool "CU: Aggregate - VarianceSample"
+	default n
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2960:Aggregate - VarianceSample.
+	  Backing tests: test_history.
+	  Notes: Spec CU 2960: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_AGGREGATE_MAXIMUM
+	bool "CU: Aggregate - Maximum"
+	default n
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2962:Aggregate - Maximum.
+	  Backing tests: test_history.
+	  Notes: Spec CU 2962: tracked in manifest; not yet claimed or implemented.
+
 config MUC_OPCUA_CU_A_C_BASIC
 	bool "CU: A & C Basic"
 	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
@@ -2965,6 +2839,24 @@ config MUC_OPCUA_CU_A_C_BASIC
 	  Backing tests: test_alarms_conditions.
 	  Notes: Spec CU 2965: tracked in manifest; not yet claimed or implemented.
 
+config MUC_OPCUA_CU_AGGREGATE_PERCENTBAD
+	bool "CU: Aggregate - PercentBad"
+	default n
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2975:Aggregate - PercentBad.
+	  Backing tests: test_history.
+	  Notes: Spec CU 2975: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_AGGREGATE_NUMBEROFTRANSITIONS
+	bool "CU: Aggregate - NumberOfTransitions"
+	default n
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2985:Aggregate - NumberOfTransitions.
+	  Backing tests: test_history.
+	  Notes: Spec CU 2985: tracked in manifest; not yet claimed or implemented.
+
 config MUC_OPCUA_CU_HISTORICAL_ACCESS_STRUCTURED_DATA_TIME_INSTANCE
 	bool "CU: Historical Access Structured Data Time Instance"
 	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
@@ -2973,6 +2865,15 @@ config MUC_OPCUA_CU_HISTORICAL_ACCESS_STRUCTURED_DATA_TIME_INSTANCE
 	  OPC item: CU 2991:Historical Access Structured Data Time Instance.
 	  Backing tests: test_profile_surface.
 	  Notes: Satisfied by Historical Access Server Facet.
+
+config MUC_OPCUA_CU_AGGREGATE_AVERAGE
+	bool "CU: Aggregate - Average"
+	default n
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2996:Aggregate - Average.
+	  Backing tests: test_history.
+	  Notes: Spec CU 2996: tracked in manifest; not yet claimed or implemented.
 
 config MUC_OPCUA_CU_DOCUMENTATION_INSTALLATION
 	bool "CU: Documentation - Installation"
@@ -3001,6 +2902,24 @@ config MUC_OPCUA_CU_A_C_DISCRETE
 	  Backing tests: test_alarms_conditions.
 	  Notes: Spec CU 3004: tracked in manifest; not yet claimed or implemented.
 
+config MUC_OPCUA_CU_AGGREGATE_STANDARDDEVIATIONSAMPLE
+	bool "CU: Aggregate - StandardDeviationSample"
+	default n
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3006:Aggregate - StandardDeviationSample.
+	  Backing tests: test_history.
+	  Notes: Spec CU 3006: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_AGGREGATE_RANGE
+	bool "CU: Aggregate - Range"
+	default n
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3011:Aggregate - Range.
+	  Backing tests: test_history.
+	  Notes: Spec CU 3011: tracked in manifest; not yet claimed or implemented.
+
 config MUC_OPCUA_CU_HISTORICAL_ACCESS_STRUCTURED_DATA_REPLACE
 	bool "CU: Historical Access Structured Data Replace"
 	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
@@ -3009,6 +2928,15 @@ config MUC_OPCUA_CU_HISTORICAL_ACCESS_STRUCTURED_DATA_REPLACE
 	  OPC item: CU 3015:Historical Access Structured Data Replace.
 	  Backing tests: test_profile_surface.
 	  Notes: Satisfied by Historical Access Server Facet.
+
+config MUC_OPCUA_CU_AGGREGATE_MAXIMUMACTUALTIME
+	bool "CU: Aggregate - MaximumActualTime"
+	default n
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3018:Aggregate - MaximumActualTime.
+	  Backing tests: test_history.
+	  Notes: Spec CU 3018: tracked in manifest; not yet claimed or implemented.
 
 config MUC_OPCUA_CU_HISTORICAL_ACCESS_TIME_INSTANCE
 	bool "CU: Historical Access Time Instance"
@@ -3037,6 +2965,15 @@ config MUC_OPCUA_CU_REDUNDANCY_SERVER_TRANSPARENT
 	  Backing tests: test_transfer_subscriptions.
 	  Notes: Spec CU 3027: tracked in manifest; not yet claimed or implemented.
 
+config MUC_OPCUA_CU_AGGREGATE_TOTAL
+	bool "CU: Aggregate - Total"
+	default n
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3032:Aggregate - Total.
+	  Backing tests: test_history.
+	  Notes: Spec CU 3032: tracked in manifest; not yet claimed or implemented.
+
 config MUC_OPCUA_CU_A_C_CONFIRM
 	bool "CU: A & C Confirm"
 	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
@@ -3055,6 +2992,15 @@ config MUC_OPCUA_CU_HISTORICAL_ACCESS_UPDATE_VALUE
 	  Backing tests: test_profile_surface.
 	  Notes: Satisfied by Historical Access Server Facet.
 
+config MUC_OPCUA_CU_AGGREGATE_WORSTQUALITY
+	bool "CU: Aggregate - WorstQuality"
+	default n
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3055:Aggregate - WorstQuality.
+	  Backing tests: test_history.
+	  Notes: Spec CU 3055: tracked in manifest; not yet claimed or implemented.
+
 config MUC_OPCUA_CU_DOCUMENTATION_MULTIPLE_LANGUAGES
 	bool "CU: Documentation - Multiple Languages"
 	default n
@@ -3063,6 +3009,15 @@ config MUC_OPCUA_CU_DOCUMENTATION_MULTIPLE_LANGUAGES
 	  OPC item: CU 3060:Documentation - Multiple Languages.
 	  Backing tests: test_base_server_behaviour.
 	  Notes: Spec CU 3060: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_AGGREGATE_END
+	bool "CU: Aggregate - End"
+	default n
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3061:Aggregate - End.
+	  Backing tests: test_history.
+	  Notes: Spec CU 3061: tracked in manifest; not yet claimed or implemented.
 
 config MUC_OPCUA_CU_ADDRESS_SPACE_NOTIFIER_HIERARCHY
 	bool "CU: Address Space Notifier Hierarchy"
@@ -3100,6 +3055,15 @@ config MUC_OPCUA_CU_DOCUMENTATION_USERS_GUIDE
 	  Backing tests: test_base_server_behaviour.
 	  Notes: Spec CU 3084: tracked in manifest; not yet claimed or implemented.
 
+config MUC_OPCUA_CU_AGGREGATE_DURATIONGOOD
+	bool "CU: Aggregate - DurationGood"
+	default n
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3085:Aggregate - DurationGood.
+	  Backing tests: test_history.
+	  Notes: Spec CU 3085: tracked in manifest; not yet claimed or implemented.
+
 config MUC_OPCUA_CU_A_C_OFFNORMAL
 	bool "CU: A & C OffNormal"
 	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
@@ -3108,6 +3072,15 @@ config MUC_OPCUA_CU_A_C_OFFNORMAL
 	  OPC item: CU 3098:A & C OffNormal.
 	  Backing tests: test_alarms_conditions.
 	  Notes: Spec CU 3098: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_AGGREGATE_MAXIMUMACTUALTIME2
+	bool "CU: Aggregate - MaximumActualTime2"
+	default n
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3101:Aggregate - MaximumActualTime2.
+	  Backing tests: test_history.
+	  Notes: Spec CU 3101: tracked in manifest; not yet claimed or implemented.
 
 config MUC_OPCUA_CU_DOCUMENTATION_SUPPORTED_PROFILES
 	bool "CU: Documentation - Supported Profiles"
@@ -3135,6 +3108,24 @@ config MUC_OPCUA_CU_MONITOR_ALTERNATE_ENCODING
 	  OPC item: CU 3142:Monitor Alternate Encoding.
 	  Backing tests: test_subscriptions_capacity, test_subscription_deadband, test_subscription_publish.
 	  Notes: Spec CU 3142: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_AGGREGATE_INTERPOLATIVE
+	bool "CU: Aggregate - Interpolative"
+	default n
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3159:Aggregate - Interpolative.
+	  Backing tests: test_history.
+	  Notes: Spec CU 3159: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_AGGREGATE_STANDARDDEVIATIONPOPULATION
+	bool "CU: Aggregate - StandardDeviationPopulation"
+	default n
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3162:Aggregate - StandardDeviationPopulation.
+	  Backing tests: test_history.
+	  Notes: Spec CU 3162: tracked in manifest; not yet claimed or implemented.
 
 config MUC_OPCUA_CU_A_C_SHELVING
 	bool "CU: A & C Shelving"
@@ -4586,7 +4577,7 @@ config MUC_OPCUA_CU_ALIASNAME_PUBSUB_NOTIFICATION
 	  Notes: Spec CU 5941: tracked in manifest; not yet claimed or implemented.
 
 config MUC_OPCUA_CU_SCHEDULER
-	bool "CU: Scheduler Base"
+	bool "Scheduler Base"
 	depends on MUC_OPCUA_CU_METHOD_SERVER
 	default n
 	help
@@ -4595,7 +4586,7 @@ config MUC_OPCUA_CU_SCHEDULER
 	  Backing tests: test_scheduler_stub.
 
 config MUC_OPCUA_CU_ALIASNAME
-	bool "CU: AliasName Server"
+	bool "AliasName Server"
 	depends on MUC_OPCUA_FACET_CORE_2022_SERVER
 	default n
 	help

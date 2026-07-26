@@ -20,6 +20,23 @@ typedef struct {
     opcua_boolean_t return_bounds;
 } mu_read_raw_modified_details_t;
 
+#ifndef MU_MAX_HISTORY_AGGREGATE_TYPES
+#define MU_MAX_HISTORY_AGGREGATE_TYPES 4
+#endif
+
+typedef struct {
+    opcua_datetime_t start_time;
+    opcua_datetime_t end_time;
+    opcua_double_t processing_interval;
+    opcua_uint32_t aggregate_types[MU_MAX_HISTORY_AGGREGATE_TYPES];
+    size_t num_aggregate_types;
+} mu_read_processed_details_t;
+
+typedef enum {
+    MU_HISTORY_READ_TYPE_RAW_MODIFIED = 0,
+    MU_HISTORY_READ_TYPE_PROCESSED = 1
+} mu_history_read_details_type_t;
+
 typedef struct {
     mu_nodeid_t node_id;
     mu_string_t index_range;
@@ -29,7 +46,11 @@ typedef struct {
 } mu_history_read_value_id_t;
 
 typedef struct {
-    mu_read_raw_modified_details_t details;
+    mu_history_read_details_type_t details_type;
+    union {
+        mu_read_raw_modified_details_t raw_modified;
+        mu_read_processed_details_t processed;
+    } details;
     opcua_uint32_t timestamps_to_return;
     opcua_boolean_t release_continuation_points;
     size_t num_nodes_to_read;

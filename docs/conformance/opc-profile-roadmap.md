@@ -15,9 +15,9 @@ remains future work.
 
 | State | Count |
 |-------|-------|
-| claimed | 568 |
+| claimed | 604 |
 | implemented | 16 |
-| documented | 43 |
+| documented | 7 |
 | deferred | 11 |
 | unimplemented | 11 |
 
@@ -123,74 +123,74 @@ remains future work.
 | opc_cu_5801 | conformance_unit | claimed |  | MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION | embedded, standard, full | test_claim_map |
 | opc_cu_5868 | conformance_unit | claimed |  | — | full | test_profile_surface |
 | opc_cu_subscription_basic | conformance_unit | claimed | OPC-10000-4 §5.12/5.13 Core 2022 Server Facet | MUC_OPCUA_CU_SUBSCRIPTION_BASIC | micro, embedded, standard, full | test_subscriptions, test_subscriptions_errors |
-| opc_cu_subscription_standard | conformance_unit | claimed | OPC-10000-7 Core 2022 Server Facet | MUC_OPCUA_CU_SUBSCRIPTION_STANDARD | embedded, standard, full | test_subscriptions_capacity, test_subscription_deadband, test_subscription_publish |
-| opc_cu_security_ecc | conformance_unit | claimed | OPC-10000-7 Core 2022 Server Facet | MUC_OPCUA_CU_SECURITY_ECC | full | test_ecc_crypto |
-| opc_cu_events | conformance_unit | claimed | OPC-10000-9 Core 2022 Server Facet | MUC_OPCUA_CU_EVENTS | full | test_alarms_conditions, test_event_notifier, test_event_serializer |
-| opc_cu_data_access | conformance_unit | claimed | OPC-10000-8 §5.3 Core 2022 Server Facet | MUC_OPCUA_CU_DATA_ACCESS | full | test_analog_item, test_da_type_nodes, test_eu_information |
-| opc_cu_method_server | conformance_unit | claimed | OPC-10000-4 §5.11 Core 2022 Server Facet | MUC_OPCUA_CU_METHOD_SERVER | full | test_method_call_arbitrary, test_method_call_errors |
-| opc_cu_custom_methods | conformance_unit | claimed | OPC-10000-4 §5.11 Core 2022 Server Facet | MUC_OPCUA_CU_CUSTOM_METHODS | full | test_method_call |
-| opc_cu_user_auth | conformance_unit | claimed | OPC-10000-4 §7.36 Core 2022 Server Facet | MUC_OPCUA_CU_USER_AUTH | all | test_user_auth_plaintext, test_user_auth_certificate, test_user_auth_secure_e2e |
-| opc_cu_multiple_connections | conformance_unit | claimed | OPC-10000-7 Core 2022 Server Facet | MUC_OPCUA_CU_MULTIPLE_CONNECTIONS | micro, embedded, standard, full | test_connection_multiplex |
-| opc_cu_event_filter_where | conformance_unit | claimed | OPC-10000-4 §7.4 Core 2022 Server Facet | MUC_OPCUA_CU_EVENT_FILTER_WHERE | full | test_event_filter_where, test_event_filter_select |
-| opc_cu_redundancy | conformance_unit | claimed | OPC-10000-4 §5.14.7 Core 2022 Server Facet | MUC_OPCUA_CU_REDUNDANCY | full | test_transfer_subscriptions |
-| opc_cu_diagnostics | conformance_unit | claimed | OPC-10000-5 §6.3 Core 2022 Server Facet | MUC_OPCUA_CU_DIAGNOSTICS | full | test_diagnostics |
-| opc_cu_complex_types | conformance_unit | claimed | OPC-10000-6 Core 2022 Server Facet | MUC_OPCUA_CU_COMPLEX_TYPES | full | test_complex_types |
-| opc_cu_auditing | conformance_unit | claimed | OPC-10000-4 §7.x Core 2022 Server Facet | MUC_OPCUA_CU_AUDITING | full | test_audit_events, test_event_notifications |
-| opc_cu_dynamic_nodes | conformance_unit | claimed | OPC-10000-3 Core 2022 Server Facet | MUC_OPCUA_CU_DYNAMIC_NODES | full | test_address_space_dynamic |
-| opc_cu_multi_chunk | conformance_unit | claimed | OPC-10000-6 Core 2022 Server Facet | MUC_OPCUA_CU_MULTI_CHUNK | full | test_message_chunk_errors |
-| opc_cu_session_timeout | conformance_unit | claimed | OPC-10000-4 Core 2022 Server Facet | MUC_OPCUA_CU_SESSION_TIMEOUT | micro, embedded, standard, full | test_base_server_behaviour |
-| opc_cu_time_sync | conformance_unit | claimed | OPC-10000-4 §7.28 Core 2022 Server Facet | MUC_OPCUA_CU_TIME_SYNC | all | test_time_sync, test_dispatch_services |
-| opc_cu_extended_nodeids | conformance_unit | claimed | OPC-10000-3 Core 2022 Server Facet | MUC_OPCUA_CU_EXTENDED_NODEIDS | full | test_address_space_string_limits, test_binary_nodeid_errors |
-| opc_cu_aggregate_interpolative | conformance_unit | claimed | OPC-10000-13 §4.2.2.3 Core 2022 Server Facet | — | full | test_aggregate, test_aggregate_full |
-| opc_cu_aggregate_average | conformance_unit | claimed | OPC-10000-13 §4.2.2.4 Core 2022 Server Facet | — | full | test_aggregate, test_aggregate_full |
-| opc_cu_aggregate_time_average | conformance_unit | claimed | OPC-10000-13 §4.2.2.5 Core 2022 Server Facet | — | full | test_aggregate, test_aggregate_full |
-| opc_cu_aggregate_time_average_2 | conformance_unit | claimed | OPC-10000-13 §4.2.2.6 Core 2022 Server Facet | — | full | test_aggregate, test_aggregate_full |
-| opc_cu_aggregate_total | conformance_unit | claimed | OPC-10000-13 §4.2.2.7 Core 2022 Server Facet | — | full | test_aggregate, test_aggregate_full |
-| opc_cu_aggregate_total_2 | conformance_unit | claimed | OPC-10000-13 §4.2.2.8 Core 2022 Server Facet | — | full | test_aggregate, test_aggregate_full |
-| opc_cu_aggregate_minimum | conformance_unit | claimed | OPC-10000-13 §4.2.2.9 Core 2022 Server Facet | — | full | test_aggregate, test_aggregate_full |
-| opc_cu_aggregate_maximum | conformance_unit | claimed | OPC-10000-13 §4.2.2.10 Core 2022 Server Facet | — | full | test_aggregate, test_aggregate_full |
-| opc_cu_aggregate_range | conformance_unit | claimed | OPC-10000-13 §4.2.2.13 Core 2022 Server Facet | — | full | test_aggregate, test_aggregate_full |
-| opc_cu_aggregate_minimum_2 | conformance_unit | claimed | OPC-10000-13 §4.2.2.14 Core 2022 Server Facet | — | full | test_aggregate, test_aggregate_full |
-| opc_cu_aggregate_maximum_2 | conformance_unit | claimed | OPC-10000-13 §4.2.2.15 Core 2022 Server Facet | — | full | test_aggregate, test_aggregate_full |
-| opc_cu_aggregate_count | conformance_unit | claimed | OPC-10000-13 §4.2.2.19 Core 2022 Server Facet | — | full | test_aggregate, test_aggregate_full |
-| opc_cu_aggregate_duration_state_zero | conformance_unit | claimed | OPC-10000-13 §4.2.2.20 Core 2022 Server Facet | — | full | test_aggregate, test_aggregate_full |
-| opc_cu_aggregate_start | conformance_unit | claimed | OPC-10000-13 §4.2.2.23 Core 2022 Server Facet | — | full | test_aggregate, test_aggregate_full |
-| opc_cu_aggregate_end | conformance_unit | claimed | OPC-10000-13 §4.2.2.24 Core 2022 Server Facet | — | full | test_aggregate, test_aggregate_full |
-| opc_cu_aggregate_delta | conformance_unit | claimed | OPC-10000-13 §4.2.2.25 Core 2022 Server Facet | — | full | test_aggregate, test_aggregate_full |
-| opc_cu_aggregate_delta_bounds | conformance_unit | claimed | OPC-10000-13 §4.2.2.28 Core 2022 Server Facet | — | full | test_aggregate, test_aggregate_full |
-| opc_cu_aggregate_duration_good | conformance_unit | claimed | OPC-10000-13 §4.2.2.29 Core 2022 Server Facet | — | full | test_aggregate, test_aggregate_full |
-| opc_cu_aggregate_duration_bad | conformance_unit | claimed | OPC-10000-13 §4.2.2.30 Core 2022 Server Facet | — | full | test_aggregate, test_aggregate_full |
-| opc_cu_aggregate_percent_good | conformance_unit | claimed | OPC-10000-13 §4.2.2.31 Core 2022 Server Facet | — | full | test_aggregate, test_aggregate_full |
-| opc_cu_aggregate_percent_bad | conformance_unit | claimed | OPC-10000-13 §4.2.2.32 Core 2022 Server Facet | — | full | test_aggregate, test_aggregate_full |
-| opc_cu_aggregate_worst_quality | conformance_unit | claimed | OPC-10000-13 §4.2.2.33 Core 2022 Server Facet | — | full | test_aggregate, test_aggregate_full |
-| opc_cu_aggregate_worst_quality_2 | conformance_unit | claimed | OPC-10000-13 §4.2.2.34 Core 2022 Server Facet | — | full | test_aggregate, test_aggregate_full |
-| opc_cu_aggregate_annotation_count | conformance_unit | claimed | OPC-10000-13 §4.2.2.35 Core 2022 Server Facet | — | full | test_aggregate, test_aggregate_full |
-| opc_cu_aggregate_min_actual_time | conformance_unit | claimed | OPC-10000-13 §4.2.2.11 Core 2022 Server Facet | — | full | test_aggregate, test_aggregate_full |
-| opc_cu_aggregate_max_actual_time | conformance_unit | claimed | OPC-10000-13 §4.2.2.12 Core 2022 Server Facet | — | full | test_aggregate, test_aggregate_full |
-| opc_cu_aggregate_min_actual_time_2 | conformance_unit | claimed | OPC-10000-13 §4.2.2.16 Core 2022 Server Facet | — | full | test_aggregate, test_aggregate_full |
-| opc_cu_aggregate_max_actual_time_2 | conformance_unit | claimed | OPC-10000-13 §4.2.2.17 Core 2022 Server Facet | — | full | test_aggregate, test_aggregate_full |
-| opc_cu_aggregate_range_2 | conformance_unit | claimed | OPC-10000-13 §4.2.2.18 Core 2022 Server Facet | — | full | test_aggregate, test_aggregate_full |
-| opc_cu_aggregate_duration_state_nonzero | conformance_unit | claimed | OPC-10000-13 §4.2.2.21 Core 2022 Server Facet | — | full | test_aggregate, test_aggregate_full |
-| opc_cu_aggregate_number_transitions | conformance_unit | claimed | OPC-10000-13 §4.2.2.22 Core 2022 Server Facet | — | full | test_aggregate, test_aggregate_full |
-| opc_cu_aggregate_start_bound | conformance_unit | claimed | OPC-10000-13 §4.2.2.26 Core 2022 Server Facet | — | full | test_aggregate, test_aggregate_full |
-| opc_cu_aggregate_end_bound | conformance_unit | claimed | OPC-10000-13 §4.2.2.27 Core 2022 Server Facet | — | full | test_aggregate, test_aggregate_full |
-| opc_cu_aggregate_std_dev_sample | conformance_unit | claimed | OPC-10000-13 §4.2.2.36 Core 2022 Server Facet | — | full | test_aggregate, test_aggregate_full |
-| opc_cu_aggregate_variance_sample | conformance_unit | claimed | OPC-10000-13 §4.2.2.37 Core 2022 Server Facet | — | full | test_aggregate, test_aggregate_full |
-| opc_cu_aggregate_std_dev_population | conformance_unit | claimed | OPC-10000-13 §4.2.2.38 Core 2022 Server Facet | — | full | test_aggregate, test_aggregate_full |
-| opc_cu_aggregate_variance_population | conformance_unit | claimed | OPC-10000-13 §4.2.2.39 Core 2022 Server Facet | — | full | test_aggregate, test_aggregate_full |
-| opc_cu_aggregate_full | conformance_unit | claimed | OPC-10000-13 Core 2022 Server Facet | MUC_OPCUA_CU_AGGREGATE_FULL | full | test_aggregate, test_aggregate_full |
-| opc_cu_pubsub | conformance_unit | claimed | OPC-10000-14 Core 2022 Server Facet | MUC_OPCUA_CU_PUBSUB | full | test_uadp_encoding, test_pubsub |
-| opc_cu_reverse_connect | conformance_unit | claimed | OPC-10000-6 §7.1.3 Core 2022 Server Facet | MUC_OPCUA_CU_REVERSE_CONNECT | full | test_reverse_connect |
-| opc_cu_namespaces | conformance_unit | claimed | OPC-10000-4 Core 2022 Server Facet | MUC_OPCUA_CU_NAMESPACES | full | test_read_browsename_namespace |
-| opc_cu_base_info_datatypes | conformance_unit | claimed | OPC-10000-5 Core 2022 Server Facet | MUC_OPCUA_CU_BASE_INFO_DATATYPES | embedded, standard, full | test_type_system |
-| opc_cu_base_info_argument_type | conformance_unit | claimed | OPC-10000-5 Core 2022 Server Facet | MUC_OPCUA_CU_BASE_INFO_ARGUMENT_TYPE | embedded, standard, full | test_type_system |
-| opc_cu_base_info_base_types | conformance_unit | claimed | OPC-10000-5 Core 2022 Server Facet | MUC_OPCUA_CU_BASE_INFO_BASE_TYPES | embedded, standard, full | test_type_system |
+| opc_cu_subscription_standard | optimization | claimed | OPC-10000-7 Core 2022 Server Facet | MUC_OPCUA_CU_SUBSCRIPTION_STANDARD | embedded, standard, full | test_subscriptions_capacity, test_subscription_deadband, test_subscription_publish |
+| opc_cu_security_ecc | optimization | claimed | OPC-10000-7 Core 2022 Server Facet | MUC_OPCUA_CU_SECURITY_ECC | full | test_ecc_crypto |
+| opc_cu_events | optimization | claimed | OPC-10000-9 Core 2022 Server Facet | MUC_OPCUA_CU_EVENTS | full | test_alarms_conditions, test_event_notifier, test_event_serializer |
+| opc_cu_data_access | optimization | claimed | OPC-10000-8 §5.3 Core 2022 Server Facet | MUC_OPCUA_CU_DATA_ACCESS | full | test_analog_item, test_da_type_nodes, test_eu_information |
+| opc_cu_method_server | optimization | claimed | OPC-10000-4 §5.11 Core 2022 Server Facet | MUC_OPCUA_CU_METHOD_SERVER | full | test_method_call_arbitrary, test_method_call_errors |
+| opc_cu_custom_methods | optimization | claimed | OPC-10000-4 §5.11 Core 2022 Server Facet | MUC_OPCUA_CU_CUSTOM_METHODS | full | test_method_call |
+| opc_cu_user_auth | optimization | claimed | OPC-10000-4 §7.36 Core 2022 Server Facet | MUC_OPCUA_CU_USER_AUTH | all | test_user_auth_plaintext, test_user_auth_certificate, test_user_auth_secure_e2e |
+| opc_cu_multiple_connections | optimization | claimed | OPC-10000-7 Core 2022 Server Facet | MUC_OPCUA_CU_MULTIPLE_CONNECTIONS | micro, embedded, standard, full | test_connection_multiplex |
+| opc_cu_event_filter_where | optimization | claimed | OPC-10000-4 §7.4 Core 2022 Server Facet | MUC_OPCUA_CU_EVENT_FILTER_WHERE | full | test_event_filter_where, test_event_filter_select |
+| opc_cu_redundancy | optimization | claimed | OPC-10000-4 §5.14.7 Core 2022 Server Facet | MUC_OPCUA_CU_REDUNDANCY | full | test_transfer_subscriptions |
+| opc_cu_diagnostics | optimization | claimed | OPC-10000-5 §6.3 Core 2022 Server Facet | MUC_OPCUA_CU_DIAGNOSTICS | full | test_diagnostics |
+| opc_cu_complex_types | optimization | claimed | OPC-10000-6 Core 2022 Server Facet | MUC_OPCUA_CU_COMPLEX_TYPES | full | test_complex_types |
+| opc_cu_auditing | optimization | claimed | OPC-10000-4 §7.x Core 2022 Server Facet | MUC_OPCUA_CU_AUDITING | full | test_audit_events, test_event_notifications |
+| opc_cu_dynamic_nodes | optimization | claimed | OPC-10000-3 Core 2022 Server Facet | MUC_OPCUA_CU_DYNAMIC_NODES | full | test_address_space_dynamic |
+| opc_cu_multi_chunk | optimization | claimed | OPC-10000-6 Core 2022 Server Facet | MUC_OPCUA_CU_MULTI_CHUNK | full | test_message_chunk_errors |
+| opc_cu_session_timeout | optimization | claimed | OPC-10000-4 Core 2022 Server Facet | MUC_OPCUA_CU_SESSION_TIMEOUT | micro, embedded, standard, full | test_base_server_behaviour |
+| opc_cu_time_sync | optimization | claimed | OPC-10000-4 §7.28 Core 2022 Server Facet | MUC_OPCUA_CU_TIME_SYNC | all | test_time_sync, test_dispatch_services |
+| opc_cu_extended_nodeids | optimization | claimed | OPC-10000-3 Core 2022 Server Facet | MUC_OPCUA_CU_EXTENDED_NODEIDS | full | test_address_space_string_limits, test_binary_nodeid_errors |
+| opc_cu_aggregate_interpolative | optimization | claimed | OPC-10000-13 §4.2.2.3 Core 2022 Server Facet | — | full | test_aggregate, test_aggregate_full |
+| opc_cu_aggregate_average | optimization | claimed | OPC-10000-13 §4.2.2.4 Core 2022 Server Facet | — | full | test_aggregate, test_aggregate_full |
+| opc_cu_aggregate_time_average | optimization | claimed | OPC-10000-13 §4.2.2.5 Core 2022 Server Facet | — | full | test_aggregate, test_aggregate_full |
+| opc_cu_aggregate_time_average_2 | optimization | claimed | OPC-10000-13 §4.2.2.6 Core 2022 Server Facet | — | full | test_aggregate, test_aggregate_full |
+| opc_cu_aggregate_total | optimization | claimed | OPC-10000-13 §4.2.2.7 Core 2022 Server Facet | — | full | test_aggregate, test_aggregate_full |
+| opc_cu_aggregate_total_2 | optimization | claimed | OPC-10000-13 §4.2.2.8 Core 2022 Server Facet | — | full | test_aggregate, test_aggregate_full |
+| opc_cu_aggregate_minimum | optimization | claimed | OPC-10000-13 §4.2.2.9 Core 2022 Server Facet | — | full | test_aggregate, test_aggregate_full |
+| opc_cu_aggregate_maximum | optimization | claimed | OPC-10000-13 §4.2.2.10 Core 2022 Server Facet | — | full | test_aggregate, test_aggregate_full |
+| opc_cu_aggregate_range | optimization | claimed | OPC-10000-13 §4.2.2.13 Core 2022 Server Facet | — | full | test_aggregate, test_aggregate_full |
+| opc_cu_aggregate_minimum_2 | optimization | claimed | OPC-10000-13 §4.2.2.14 Core 2022 Server Facet | — | full | test_aggregate, test_aggregate_full |
+| opc_cu_aggregate_maximum_2 | optimization | claimed | OPC-10000-13 §4.2.2.15 Core 2022 Server Facet | — | full | test_aggregate, test_aggregate_full |
+| opc_cu_aggregate_count | optimization | claimed | OPC-10000-13 §4.2.2.19 Core 2022 Server Facet | — | full | test_aggregate, test_aggregate_full |
+| opc_cu_aggregate_duration_state_zero | optimization | claimed | OPC-10000-13 §4.2.2.20 Core 2022 Server Facet | — | full | test_aggregate, test_aggregate_full |
+| opc_cu_aggregate_start | optimization | claimed | OPC-10000-13 §4.2.2.23 Core 2022 Server Facet | — | full | test_aggregate, test_aggregate_full |
+| opc_cu_aggregate_end | optimization | claimed | OPC-10000-13 §4.2.2.24 Core 2022 Server Facet | — | full | test_aggregate, test_aggregate_full |
+| opc_cu_aggregate_delta | optimization | claimed | OPC-10000-13 §4.2.2.25 Core 2022 Server Facet | — | full | test_aggregate, test_aggregate_full |
+| opc_cu_aggregate_delta_bounds | optimization | claimed | OPC-10000-13 §4.2.2.28 Core 2022 Server Facet | — | full | test_aggregate, test_aggregate_full |
+| opc_cu_aggregate_duration_good | optimization | claimed | OPC-10000-13 §4.2.2.29 Core 2022 Server Facet | — | full | test_aggregate, test_aggregate_full |
+| opc_cu_aggregate_duration_bad | optimization | claimed | OPC-10000-13 §4.2.2.30 Core 2022 Server Facet | — | full | test_aggregate, test_aggregate_full |
+| opc_cu_aggregate_percent_good | optimization | claimed | OPC-10000-13 §4.2.2.31 Core 2022 Server Facet | — | full | test_aggregate, test_aggregate_full |
+| opc_cu_aggregate_percent_bad | optimization | claimed | OPC-10000-13 §4.2.2.32 Core 2022 Server Facet | — | full | test_aggregate, test_aggregate_full |
+| opc_cu_aggregate_worst_quality | optimization | claimed | OPC-10000-13 §4.2.2.33 Core 2022 Server Facet | — | full | test_aggregate, test_aggregate_full |
+| opc_cu_aggregate_worst_quality_2 | optimization | claimed | OPC-10000-13 §4.2.2.34 Core 2022 Server Facet | — | full | test_aggregate, test_aggregate_full |
+| opc_cu_aggregate_annotation_count | optimization | claimed | OPC-10000-13 §4.2.2.35 Core 2022 Server Facet | — | full | test_aggregate, test_aggregate_full |
+| opc_cu_aggregate_min_actual_time | optimization | claimed | OPC-10000-13 §4.2.2.11 Core 2022 Server Facet | — | full | test_aggregate, test_aggregate_full |
+| opc_cu_aggregate_max_actual_time | optimization | claimed | OPC-10000-13 §4.2.2.12 Core 2022 Server Facet | — | full | test_aggregate, test_aggregate_full |
+| opc_cu_aggregate_min_actual_time_2 | optimization | claimed | OPC-10000-13 §4.2.2.16 Core 2022 Server Facet | — | full | test_aggregate, test_aggregate_full |
+| opc_cu_aggregate_max_actual_time_2 | optimization | claimed | OPC-10000-13 §4.2.2.17 Core 2022 Server Facet | — | full | test_aggregate, test_aggregate_full |
+| opc_cu_aggregate_range_2 | optimization | claimed | OPC-10000-13 §4.2.2.18 Core 2022 Server Facet | — | full | test_aggregate, test_aggregate_full |
+| opc_cu_aggregate_duration_state_nonzero | optimization | claimed | OPC-10000-13 §4.2.2.21 Core 2022 Server Facet | — | full | test_aggregate, test_aggregate_full |
+| opc_cu_aggregate_number_transitions | optimization | claimed | OPC-10000-13 §4.2.2.22 Core 2022 Server Facet | — | full | test_aggregate, test_aggregate_full |
+| opc_cu_aggregate_start_bound | optimization | claimed | OPC-10000-13 §4.2.2.26 Core 2022 Server Facet | — | full | test_aggregate, test_aggregate_full |
+| opc_cu_aggregate_end_bound | optimization | claimed | OPC-10000-13 §4.2.2.27 Core 2022 Server Facet | — | full | test_aggregate, test_aggregate_full |
+| opc_cu_aggregate_std_dev_sample | optimization | claimed | OPC-10000-13 §4.2.2.36 Core 2022 Server Facet | — | full | test_aggregate, test_aggregate_full |
+| opc_cu_aggregate_variance_sample | optimization | claimed | OPC-10000-13 §4.2.2.37 Core 2022 Server Facet | — | full | test_aggregate, test_aggregate_full |
+| opc_cu_aggregate_std_dev_population | optimization | claimed | OPC-10000-13 §4.2.2.38 Core 2022 Server Facet | — | full | test_aggregate, test_aggregate_full |
+| opc_cu_aggregate_variance_population | optimization | claimed | OPC-10000-13 §4.2.2.39 Core 2022 Server Facet | — | full | test_aggregate, test_aggregate_full |
+| opc_cu_aggregate_full | optimization | claimed | OPC-10000-13 Core 2022 Server Facet | MUC_OPCUA_CU_AGGREGATE_FULL | full | test_aggregate, test_aggregate_full |
+| opc_cu_pubsub | optimization | claimed | OPC-10000-14 Core 2022 Server Facet | MUC_OPCUA_CU_PUBSUB | full | test_uadp_encoding, test_pubsub |
+| opc_cu_reverse_connect | optimization | claimed | OPC-10000-6 §7.1.3 Core 2022 Server Facet | MUC_OPCUA_CU_REVERSE_CONNECT | full | test_reverse_connect |
+| opc_cu_namespaces | optimization | claimed | OPC-10000-4 Core 2022 Server Facet | MUC_OPCUA_CU_NAMESPACES | full | test_read_browsename_namespace |
+| opc_cu_base_info_datatypes | optimization | claimed | OPC-10000-5 Core 2022 Server Facet | MUC_OPCUA_CU_BASE_INFO_DATATYPES | embedded, standard, full | test_type_system |
+| opc_cu_base_info_argument_type | optimization | claimed | OPC-10000-5 Core 2022 Server Facet | MUC_OPCUA_CU_BASE_INFO_ARGUMENT_TYPE | embedded, standard, full | test_type_system |
+| opc_cu_base_info_base_types | optimization | claimed | OPC-10000-5 Core 2022 Server Facet | MUC_OPCUA_CU_BASE_INFO_BASE_TYPES | embedded, standard, full | test_type_system |
 | service_read | conformance_unit | claimed | OPC-10000-4 §5.10.2 Core 2017 Server Facet | MUC_OPCUA_CU_ATTRIBUTE_READ | all | test_read_service |
-| service_browse | conformance_unit | claimed | OPC-10000-4 §5.8 Core 2017 | MUC_OPCUA_CU_VIEW_BASIC_TRANSLATEBROWSEPATH | all | test_browse_service, test_browse_limits, test_view_services |
-| service_discovery | conformance_unit | claimed | OPC-10000-4 §5.4 Core 2017 | MUC_OPCUA_CU_DISCOVERY_FIND_SERVERS_SELF_GET_ENDPOINTS | all | test_discovery_endpoint |
+| service_browse | optimization | claimed | OPC-10000-4 §5.8 Core 2017 | MUC_OPCUA_CU_VIEW_BASIC_TRANSLATEBROWSEPATH | all | test_browse_service, test_browse_limits, test_view_services |
+| service_discovery | optimization | claimed | OPC-10000-4 §5.4 Core 2017 | MUC_OPCUA_CU_DISCOVERY_FIND_SERVERS_SELF_GET_ENDPOINTS | all | test_discovery_endpoint |
 | service_register_nodes | conformance_unit | claimed | OPC-10000-4 §5.9 Core 2017 | MUC_OPCUA_CU_VIEW_REGISTERNODES | all | test_view_services, test_profile_surface |
-| service_write | conformance_unit | claimed | OPC-10000-4 §5.10.4 Core 2017 Attribute Write | MUC_OPCUA_CU_CORE_2017_ATTRIBUTE_WRITE | full | test_write_service |
-| service_history | conformance_unit | claimed | OPC-10000-11 Historical Access Server Facet | MUC_OPCUA_CU_HISTORICAL_ACCESS_SERVER_FACET | full | test_history |
+| service_write | optimization | claimed | OPC-10000-4 §5.10.4 Core 2017 Attribute Write | MUC_OPCUA_CU_CORE_2017_ATTRIBUTE_WRITE | full | test_write_service |
+| service_history | optimization | claimed | OPC-10000-11 Historical Access Server Facet | MUC_OPCUA_CU_HISTORICAL_ACCESS_SERVER_FACET | full | test_history |
 | opc_cu_1571 | conformance_unit | claimed | OPC-10000-11 | — | full | test_profile_surface |
 | opc_cu_1572 | conformance_unit | deferred | OPC-10000-11 | — | — | — |
 | opc_cu_1573 | conformance_unit | claimed | OPC-10000-11 | — | full | test_profile_surface |
@@ -206,8 +206,8 @@ remains future work.
 | opc_cu_1710 | conformance_unit | deferred | OPC-10000-11 | — | — | — |
 | opc_cu_2185 | conformance_unit | deferred | OPC-10000-11 | — | — | — |
 | opc_cu_2332 | conformance_unit | deferred | OPC-10000-11 | — | — | — |
-| service_query | conformance_unit | claimed | OPC-10000-4 §5.9 Query | MUC_OPCUA_CU_QUERY | full | test_query_service |
-| service_nodemanagement | conformance_unit | claimed | OPC-10000-4 §5.7 NodeManagement | MUC_OPCUA_CU_NODEMANAGEMENT | full | test_node_management, test_node_management_errors |
+| service_query | optimization | claimed | OPC-10000-4 §5.9 Query | MUC_OPCUA_CU_QUERY | full | test_query_service |
+| service_nodemanagement | optimization | claimed | OPC-10000-4 §5.7 NodeManagement | MUC_OPCUA_CU_NODEMANAGEMENT | full | test_node_management, test_node_management_errors |
 | opc_facet_2242 | facet | unimplemented | OPC-10000-7 §4.2 | — | — | — |
 | opc_facet_2322 | facet | unimplemented | OPC-10000-7 §4.2 | — | — | — |
 | opc_facet_2323 | facet | unimplemented | OPC-10000-7 §4.2 | — | — | — |
@@ -293,7 +293,7 @@ remains future work.
 | opc_cu_2726 | conformance_unit | claimed | OPC-10000-9 §5.10.3 | — | full | test_profile_surface |
 | opc_cu_2852 | conformance_unit | claimed | OPC-10000-9 §5.9.11 | — | full | test_profile_surface |
 | opc_cu_2879 | conformance_unit | claimed | OPC-10000-9 §5.10.4 | — | full | test_profile_surface |
-| opc_cu_alarms_conditions | conformance_unit | claimed | OPC-10000-9 §5 | MUC_OPCUA_CU_ALARMS_CONDITIONS | full | test_alarms_conditions |
+| opc_cu_alarms_conditions | optimization | claimed | OPC-10000-9 §5 | MUC_OPCUA_CU_ALARMS_CONDITIONS | full | test_alarms_conditions |
 | opc_cu_2361 | conformance_unit | claimed |  | — | full | test_profile_surface |
 | opc_cu_2399 | conformance_unit | claimed |  | — | full | test_profile_surface |
 | opc_cu_2426 | conformance_unit | claimed |  | — | full | test_profile_surface |
@@ -534,48 +534,48 @@ remains future work.
 | opc_cu_3182 | conformance_unit | claimed |  | — | full | test_profile_surface |
 | opc_cu_3171 | conformance_unit | claimed |  | — | full | test_claim_map |
 | opc_cu_3165 | conformance_unit | claimed |  | — | full | test_alarms_conditions |
-| opc_cu_3162 | conformance_unit | documented |  | — | — | — |
-| opc_cu_3159 | conformance_unit | documented |  | — | — | — |
+| opc_cu_3162 | conformance_unit | claimed |  | — | — | test_history |
+| opc_cu_3159 | conformance_unit | claimed |  | — | — | test_history |
 | opc_cu_3142 | conformance_unit | claimed |  | — | full | test_subscriptions_capacity, test_subscription_deadband, test_subscription_publish |
 | opc_cu_3137 | conformance_unit | documented |  | — | — | — |
 | opc_cu_3121 | conformance_unit | claimed |  | — | full | test_subscriptions_capacity, test_subscription_deadband, test_subscription_publish |
 | opc_cu_3107 | conformance_unit | claimed |  | — | — | test_base_server_behaviour |
-| opc_cu_3101 | conformance_unit | documented |  | — | — | — |
+| opc_cu_3101 | conformance_unit | claimed |  | — | — | test_history |
 | opc_cu_3098 | conformance_unit | claimed |  | — | full | test_alarms_conditions |
-| opc_cu_3085 | conformance_unit | documented |  | — | — | — |
+| opc_cu_3085 | conformance_unit | claimed |  | — | — | test_history |
 | opc_cu_3084 | conformance_unit | claimed |  | — | — | test_base_server_behaviour |
 | opc_cu_3083 | conformance_unit | claimed |  | — | full | test_alarms_conditions |
 | opc_cu_3081 | conformance_unit | claimed |  | — | full | test_profile_surface |
 | opc_cu_3064 | conformance_unit | claimed |  | MUC_OPCUA_CU_ADDRESS_SPACE_NOTIFIER_HIERARCHY | full | test_profile_surface |
-| opc_cu_3061 | conformance_unit | documented |  | — | — | — |
+| opc_cu_3061 | conformance_unit | claimed |  | — | — | test_history |
 | opc_cu_3060 | conformance_unit | claimed |  | — | — | test_base_server_behaviour |
-| opc_cu_3055 | conformance_unit | documented |  | — | — | — |
+| opc_cu_3055 | conformance_unit | claimed |  | — | — | test_history |
 | opc_cu_3053 | conformance_unit | claimed |  | — | full | test_profile_surface |
 | opc_cu_3049 | conformance_unit | claimed |  | — | full | test_alarms_conditions |
 | opc_cu_3043 | conformance_unit | documented |  | — | full | — |
-| opc_cu_3032 | conformance_unit | documented |  | — | — | — |
+| opc_cu_3032 | conformance_unit | claimed |  | — | — | test_history |
 | opc_cu_3027 | conformance_unit | claimed |  | — | full | test_transfer_subscriptions |
 | opc_cu_3026 | conformance_unit | claimed |  | MUC_OPCUA_CU_ADDRESS_SPACE_USERWRITEMASK_MULTILEVEL | full | test_profile_surface |
 | opc_cu_3020 | conformance_unit | claimed |  | — | full | test_profile_surface |
-| opc_cu_3018 | conformance_unit | documented |  | — | — | — |
+| opc_cu_3018 | conformance_unit | claimed |  | — | — | test_history |
 | opc_cu_3015 | conformance_unit | claimed |  | — | full | test_profile_surface |
-| opc_cu_3011 | conformance_unit | documented |  | — | — | — |
-| opc_cu_3006 | conformance_unit | documented |  | — | — | — |
+| opc_cu_3011 | conformance_unit | claimed |  | — | — | test_history |
+| opc_cu_3006 | conformance_unit | claimed |  | — | — | test_history |
 | opc_cu_3004 | conformance_unit | claimed |  | — | full | test_alarms_conditions |
 | opc_cu_3001 | conformance_unit | claimed |  | — | full | test_alarms_conditions |
 | opc_cu_3000 | conformance_unit | claimed |  | — | — | test_base_server_behaviour |
-| opc_cu_2996 | conformance_unit | documented |  | — | — | — |
+| opc_cu_2996 | conformance_unit | claimed |  | — | — | test_history |
 | opc_cu_2993 | conformance_unit | documented |  | — | — | — |
 | opc_cu_2991 | conformance_unit | claimed |  | — | full | test_profile_surface |
-| opc_cu_2985 | conformance_unit | documented |  | — | — | — |
-| opc_cu_2975 | conformance_unit | documented |  | — | — | — |
+| opc_cu_2985 | conformance_unit | claimed |  | — | — | test_history |
+| opc_cu_2975 | conformance_unit | claimed |  | — | — | test_history |
 | opc_cu_2965 | conformance_unit | claimed |  | — | full | test_alarms_conditions |
-| opc_cu_2962 | conformance_unit | documented |  | — | — | — |
-| opc_cu_2960 | conformance_unit | documented |  | — | — | — |
+| opc_cu_2962 | conformance_unit | claimed |  | — | — | test_history |
+| opc_cu_2960 | conformance_unit | claimed |  | — | — | test_history |
 | opc_cu_2957 | conformance_unit | claimed |  | — | full | test_alarms_conditions |
 | opc_cu_2951 | conformance_unit | claimed |  | — | full | test_alarms_conditions |
 | opc_cu_2950 | conformance_unit | claimed |  | — | full | test_profile_surface |
-| opc_cu_2948 | conformance_unit | documented |  | — | — | — |
+| opc_cu_2948 | conformance_unit | claimed |  | — | — | test_history |
 | opc_cu_2947 | conformance_unit | claimed |  | — | full | test_profile_surface |
 | opc_cu_2946 | conformance_unit | claimed |  | — | full | test_alarms_conditions |
 | opc_cu_2943 | conformance_unit | claimed |  | — | full | test_profile_surface |
@@ -601,10 +601,10 @@ remains future work.
 | opc_cu_2785 | conformance_unit | claimed |  | — | full | test_secure_channel |
 | opc_cu_2781 | conformance_unit | claimed |  | MUC_OPCUA_CU_ADDRESS_SPACE_WRITEMASK | full | test_profile_surface |
 | opc_cu_2777 | conformance_unit | claimed |  | — | full | test_aliasname_stub |
-| opc_cu_2759 | conformance_unit | documented |  | — | — | — |
+| opc_cu_2759 | conformance_unit | claimed |  | — | — | test_history |
 | opc_cu_2746 | conformance_unit | claimed |  | — | full | test_alarms_conditions |
 | opc_cu_2740 | conformance_unit | claimed |  | — | full | test_profile_surface |
-| opc_cu_2730 | conformance_unit | documented |  | — | — | — |
+| opc_cu_2730 | conformance_unit | claimed |  | — | — | test_history |
 | opc_cu_2709 | conformance_unit | claimed |  | — | full | test_secure_channel |
 | opc_cu_2705 | conformance_unit | claimed |  | — | full | test_certificate_management |
 | opc_cu_2664 | conformance_unit | claimed |  | — | full | test_profile_surface |
@@ -622,58 +622,58 @@ remains future work.
 | opc_cu_2448 | conformance_unit | claimed |  | — | full | test_aliasname_stub |
 | opc_cu_2391 | conformance_unit | claimed |  | — | full | test_method_call_arbitrary, test_method_call_errors |
 | opc_cu_2390 | conformance_unit | claimed |  | — | full | test_alarms_conditions |
-| opc_cu_2384 | conformance_unit | documented |  | — | — | — |
+| opc_cu_2384 | conformance_unit | claimed |  | — | — | test_history |
 | opc_cu_2383 | conformance_unit | claimed |  | — | full | test_profile_surface |
-| opc_cu_2382 | conformance_unit | documented |  | — | — | — |
+| opc_cu_2382 | conformance_unit | claimed |  | — | — | test_history |
 | opc_cu_2379 | conformance_unit | claimed |  | — | full | test_aliasname_stub |
 | opc_cu_2362 | conformance_unit | claimed |  | MUC_OPCUA_CU_ADDRESS_SPACE_METHOD | full | test_profile_surface |
 | opc_cu_2354 | conformance_unit | claimed |  | — | full | test_claim_map |
 | opc_cu_2353 | conformance_unit | claimed |  | — | full | test_subscriptions_capacity, test_subscription_deadband, test_subscription_publish |
-| opc_cu_2350 | conformance_unit | documented |  | — | — | — |
-| opc_cu_2346 | conformance_unit | documented |  | — | — | — |
+| opc_cu_2350 | conformance_unit | claimed |  | — | — | test_history |
+| opc_cu_2346 | conformance_unit | claimed |  | — | — | test_history |
 | opc_cu_2345 | conformance_unit | claimed |  | — | full | test_read_service |
 | opc_cu_2343 | conformance_unit | claimed |  | — | full | test_alarms_conditions |
-| opc_cu_2339 | conformance_unit | documented |  | — | — | — |
+| opc_cu_2339 | conformance_unit | claimed |  | — | — | test_history |
 | opc_cu_2338 | conformance_unit | documented |  | — | — | — |
-| opc_cu_2335 | conformance_unit | documented |  | — | — | — |
+| opc_cu_2335 | conformance_unit | claimed |  | — | — | test_history |
 | opc_cu_2333 | conformance_unit | claimed |  | — | full | test_alarms_conditions |
 | opc_cu_2323 | conformance_unit | claimed |  | — | full | test_alarms_conditions |
 | opc_cu_2319 | conformance_unit | claimed |  | — | full | test_profile_surface |
 | opc_cu_2315 | conformance_unit | claimed |  | — | full | test_alarms_conditions |
-| opc_cu_2314 | conformance_unit | documented |  | — | — | — |
+| opc_cu_2314 | conformance_unit | claimed |  | — | — | test_history |
 | opc_cu_2309 | conformance_unit | claimed |  | — | full | test_profile_surface |
-| opc_cu_2305 | conformance_unit | documented |  | — | — | — |
-| opc_cu_2303 | conformance_unit | documented |  | — | — | — |
+| opc_cu_2305 | conformance_unit | claimed |  | — | — | test_history |
+| opc_cu_2303 | conformance_unit | claimed |  | — | — | test_history |
 | opc_cu_2291 | conformance_unit | claimed |  | — | full | test_read_service |
 | opc_cu_2289 | conformance_unit | claimed |  | — | full | test_profile_surface |
-| opc_cu_2282 | conformance_unit | documented |  | — | — | — |
+| opc_cu_2282 | conformance_unit | claimed |  | — | — | test_history |
 | opc_cu_2276 | conformance_unit | claimed |  | — | full | test_profile_surface |
 | opc_cu_2275 | conformance_unit | claimed |  | — | full | test_alarms_conditions |
-| opc_cu_2273 | conformance_unit | documented |  | — | — | — |
-| opc_cu_2267 | conformance_unit | documented |  | — | — | — |
-| opc_cu_2263 | conformance_unit | documented |  | — | — | — |
+| opc_cu_2273 | conformance_unit | claimed |  | — | — | test_history |
+| opc_cu_2267 | conformance_unit | claimed |  | — | — | test_history |
+| opc_cu_2263 | conformance_unit | claimed |  | — | — | test_history |
 | opc_cu_2258 | conformance_unit | claimed |  | — | full | test_transfer_subscriptions |
 | opc_cu_2239 | conformance_unit | claimed |  | — | full | test_alarms_conditions |
 | opc_cu_2236 | conformance_unit | claimed |  | — | full | test_profile_surface |
 | opc_cu_2233 | conformance_unit | claimed |  | — | full | test_certificate_management |
 | opc_cu_2232 | conformance_unit | claimed |  | — | full | test_certificate_management |
 | opc_cu_2224 | conformance_unit | claimed |  | — | full | test_profile_surface |
-| opc_cu_2223 | conformance_unit | documented |  | — | — | — |
-| opc_cu_2220 | conformance_unit | documented |  | — | — | — |
-| opc_cu_2210 | conformance_unit | documented |  | — | — | — |
+| opc_cu_2223 | conformance_unit | claimed |  | — | — | test_history |
+| opc_cu_2220 | conformance_unit | claimed |  | — | — | test_history |
+| opc_cu_2210 | conformance_unit | claimed |  | — | — | test_history |
 | opc_cu_2203 | conformance_unit | claimed |  | — | full | test_read_service |
 | opc_cu_2202 | conformance_unit | claimed |  | — | full | test_alarms_conditions |
-| opc_cu_2188 | conformance_unit | documented |  | — | — | — |
+| opc_cu_2188 | conformance_unit | claimed |  | — | — | test_history |
 | opc_cu_2180 | conformance_unit | claimed |  | — | full | test_alarms_conditions |
-| opc_cu_2175 | conformance_unit | documented |  | — | — | — |
+| opc_cu_2175 | conformance_unit | claimed |  | — | — | test_history |
 | opc_cu_2165 | conformance_unit | documented |  | — | — | — |
 | opc_cu_2163 | conformance_unit | claimed |  | MUC_OPCUA_CU_ADDRESS_SPACE_USERWRITEMASK | full | test_profile_surface |
 | mdns_discovery | optimization | implemented | OPC-10000-12 §Annex A | MUC_OPCUA_MDNS_DISCOVERY | full | — |
 | cu_user_token_jwt | optimization | implemented | OPC-10000-7 §CU 1697 User Token JWT Server Facet | MUC_OPCUA_CU_USER_TOKEN_JWT | full | test_jwt_activate_session |
 | cu_certificate_manager_pull | optimization | implemented | OPC-10000-12 §7.6, 7.9 | MUC_OPCUA_CU_CERTIFICATE_MANAGER_PULL | full | test_certificate_manager |
 | cu_authorization_service_server | optimization | implemented | OPC-10000-7 §CU 1629 Authorization Service Server Facet | MUC_OPCUA_CU_AUTHORIZATION_SERVICE_SERVER | — | — |
-| opc_cu_aliasname | conformance_unit | claimed | OPC-10000-7 | MUC_OPCUA_CU_ALIASNAME | — | test_aliasname_stub |
-| opc_cu_scheduler | conformance_unit | claimed | OPC-10000-7 | MUC_OPCUA_CU_SCHEDULER | — | test_scheduler_stub |
+| opc_cu_aliasname | optimization | claimed | OPC-10000-7 | MUC_OPCUA_CU_ALIASNAME | — | test_aliasname_stub |
+| opc_cu_scheduler | optimization | claimed | OPC-10000-7 | MUC_OPCUA_CU_SCHEDULER | — | test_scheduler_stub |
 
 ## Capacities
 
