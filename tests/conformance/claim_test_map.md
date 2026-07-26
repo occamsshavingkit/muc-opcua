@@ -336,16 +336,28 @@ Backing test column: comma-separated ctest names (as registered).
 | Base Info State Machine DescriptionNodeIdDataType |  | full | test_profile_surface |
 | Base Info TemporaryFileTransferType Base |  | full | test_profile_surface |
 | Base Info Model Change |  | full | test_profile_surface |
+| Address Space User Access Level Base |  | full | test_profile_surface |
+| Address Space DataTypeDefinition Attribute |  | full | test_profile_surface |
 | Base Info Method Capabilities |  | full | test_profile_surface |
+| Address Space Method Meta Data |  | full | test_profile_surface |
+| Address Space Dictionary URI |  | full | test_profile_surface |
+| Address Space Dictionary IRDI |  | full | test_profile_surface |
 | Base Info FileType Base |  | full | test_profile_surface |
 | Base Info Model Change General |  | full | test_profile_surface |
 | Base Info Security Role Capabilities |  | full | test_profile_surface |
+| Address Space Notifier Hierarchy |  | full | test_profile_surface |
+| Address Space UserWriteMask Multilevel |  | full | test_profile_surface |
+| Address Space Source Hierarchy |  | full | test_profile_surface |
 | Base Info RequestServerStateChange Method |  | full | test_profile_surface |
 | Base Info State Machine Instance |  | full | test_profile_surface |
+| Address Space WriteMask |  | full | test_profile_surface |
+| Address Space Dictionary Entries |  | full | test_profile_surface |
 | Base Info History ReadEvents Capabilities |  | full | test_profile_surface |
 | Base Info History ReadData Capabilities |  | full | test_profile_surface |
 | Base Info History UpdateData Capabilities |  | full | test_profile_surface |
 | Base Info History UpdateEvents Capabilities |  | full | test_profile_surface |
 | Base Info History Read Capabilities |  | full | test_profile_surface |
+| Address Space Method |  | full | test_profile_surface |
+| Address Space UserWriteMask |  | full | test_profile_surface |
 | User Token JWT Server Facet | OPC-10000-7 §CU 1697 | full | test_jwt_activate_session |
 | Certificate Manager Pull | OPC-10000-12 §7.6, 7.9 | full | test_certificate_manager |

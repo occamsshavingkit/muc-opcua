@@ -16,14 +16,14 @@ yet reconciled to individual OPC CU ids count as not-implemented — see the
 reconciliation note below.
 
 - Distinct Server CUs: **525** (required 179, optional 346)
-- Reconciled as implemented: **required 86/179**, **optional 152/346**
+- Reconciled as implemented: **required 94/179**, **optional 156/346**
 
 ### Per Server profile / facet
 
 | OPC id | Profile / Facet | Required | Optional |
 | --- | --- | --- | --- |
 | 661 | Client Redundancy Server Facet | 0/1 | 0/0 |
-| 744 | Address Space Notifier Server Facet | 0/2 | 0/0 |
+| 744 | Address Space Notifier Server Facet | 2/2 | 0/0 |
 | 768 | Documentation Server Facet | 0/2 | 0/4 |
 | 887 | A & C AlarmMetrics Server Facet | 0/1 | 0/0 |
 | 1026 | Global Service Authorization Request Server Facet | 0/1 | 0/0 |
@@ -39,7 +39,7 @@ reconciliation note below.
 | 1333 | Standard 2022 UA Server Profile | 55/55 | 68/68 |
 | 1343 | Global Discovery Server 2022 Profile | 38/41 | 28/28 |
 | 1344 | Global Discovery and Certificate Mgmt 2022 Server | 47/52 | 41/42 |
-| 1346 | A & E Wrapper 2022 Facet | 13/18 | 0/0 |
+| 1346 | A & E Wrapper 2022 Facet | 15/18 | 0/0 |
 | 1348 | File Access Server Facet | 1/1 | 2/2 |
 | 1351 | User Role Base 2022 Server Facet | 1/2 | 0/1 |
 | 1500 | A & C Exclusive Alarming 2022 Server Facet | 18/23 | 10/77 |
@@ -48,7 +48,7 @@ reconciliation note below.
 | 1503 | A & C Alarm Auditing Server Facet | 1/1 | 1/7 |
 | 1504 | A & C Dialog 2022 Server Facet | 16/19 | 9/13 |
 | 1505 | Data Access Server Facet | 1/1 | 21/21 |
-| 1524 | Dictionary Reference Server Facet | 0/1 | 0/2 |
+| 1524 | Dictionary Reference Server Facet | 1/1 | 2/2 |
 | 1525 | Temporary File Access Server Facet | 1/1 | 4/4 |
 | 1551 | A & C Base Condition 2022 Server Facet | 16/18 | 8/8 |
 | 1562 | A & C Address Space Instance 2022 Server Facet | 0/1 | 0/0 |
@@ -78,7 +78,7 @@ reconciliation note below.
 | 1636 | AliasName Server Facet | 0/3 | 0/4 |
 | 1637 | AliasName Aggregating Server Facet | 0/4 | 0/5 |
 | 1638 | State Machine 2022 Server Facet | 16/16 | 11/14 |
-| 1639 | Method 2022 Server Facet | 2/4 | 0/2 |
+| 1639 | Method 2022 Server Facet | 3/4 | 1/2 |
 | 1691 | User Token – Anonymous Server Facet | 0/1 | 0/0 |
 | 1695 | User Token – User Name Password Server Facet | 2/2 | 1/1 |
 | 1696 | User Token – X509 Certificate Server Facet | 2/2 | 0/0 |
@@ -90,12 +90,12 @@ reconciliation note below.
 | 1709 | Historical Access Modified Data 2022 Server Facet | 2/4 | 0/0 |
 | 1710 | Historical Access Structured Data 2022 Server Facet | 3/4 | 0/6 |
 | 1715 | Base Server Behaviour Facet | 1/4 | 0/0 |
-| 1725 | ComplexType 2017 Server Facet | 0/3 | 0/3 |
+| 1725 | ComplexType 2017 Server Facet | 1/3 | 0/3 |
 | 1733 | Model Change Event Server Facet | 2/2 | 1/1 |
-| 1875 | Scheduler Base Server Facet | 2/5 | 0/3 |
-| 1876 | Scheduler Configuration Server Facet | 2/6 | 0/4 |
-| 1996 | Attribute WriteMask Server 2023 Facet | 2/7 | 0/1 |
-| 1997 | Attribute WriteMask Server Facet | 2/6 | 0/1 |
+| 1875 | Scheduler Base Server Facet | 3/5 | 1/3 |
+| 1876 | Scheduler Configuration Server Facet | 3/6 | 1/4 |
+| 1996 | Attribute WriteMask Server 2023 Facet | 5/7 | 1/1 |
+| 1997 | Attribute WriteMask Server Facet | 5/6 | 1/1 |
 | 2069 | Subnet Discovery Server Facet | 0/1 | 0/0 |
 | 2080 | User Role Management 2022 Server Facet | 1/6 | 0/8 |
 | 2085 | Standard Event Subscription 2022 Server Facet | 15/15 | 7/7 |

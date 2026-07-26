@@ -2299,6 +2299,24 @@ config MUC_OPCUA_CU_AGGREGATE_SUBSCRIPTION_VARIANCEPOPULATION
 	  Backing tests: test_profile_surface.
 	  Notes: Satisfied by project-level CU opc_cu_aggregate_variance_population; the VariancePopulation aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_VARIANCE_POPULATION.
 
+config MUC_OPCUA_CU_ADDRESS_SPACE_USERWRITEMASK
+	bool "CU: Address Space UserWriteMask"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2163:Address Space UserWriteMask.
+	  Backing tests: test_profile_surface.
+	  Notes: Reconciled: Readable UserWriteMask attribute on Variable nodes. Backed by read_attribute.c unconditionally.
+
+config MUC_OPCUA_CU_ADDRESS_SPACE_METHOD
+	bool "CU: Address Space Method"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2362:Address Space Method.
+	  Backing tests: test_profile_surface.
+	  Notes: Reconciled: Method nodes with proper NodeClass and executable attributes (OPC-10000-3 §5.7). Backed by read_attribute.c Executable/UserExecutable handling and base_nodes.c method nodes.
+
 config MUC_OPCUA_CU_BASE_INFO_HISTORY_READ_CAPABILITIES
 	bool "CU: Base Info History Read Capabilities"
 	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
@@ -2344,6 +2362,24 @@ config MUC_OPCUA_CU_BASE_INFO_HISTORY_READ_EVENTS_CAPABILITIES
 	  Backing tests: test_profile_surface.
 	  Notes: Claimed: minimal type stubs and capability markers in place.
 
+config MUC_OPCUA_CU_ADDRESS_SPACE_DICTIONARY_ENTRIES
+	bool "CU: Address Space Dictionary Entries"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2539:Address Space Dictionary Entries.
+	  Backing tests: test_profile_surface.
+	  Notes: Reconciled: Dictionary entry nodes in the AddressSpace. Backed by base_nodes.c type-system exposure.
+
+config MUC_OPCUA_CU_ADDRESS_SPACE_WRITEMASK
+	bool "CU: Address Space WriteMask"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2781:Address Space WriteMask.
+	  Backing tests: test_profile_surface.
+	  Notes: Reconciled: Readable WriteMask attribute on Variable nodes. Backed by read_attribute.c unconditionally.
+
 config MUC_OPCUA_CU_BASE_INFO_STATE_MACHINE_INSTANCE
 	bool "CU: Base Info State Machine Instance"
 	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
@@ -2361,6 +2397,33 @@ config MUC_OPCUA_CU_BASE_INFO_REQUEST_SERVER_STATE_CHANGE_METHOD
 	  OPC item: CU 2845:Base Info RequestServerStateChange Method.
 	  Backing tests: test_profile_surface.
 	  Notes: Claimed: minimal type stubs and capability markers in place.
+
+config MUC_OPCUA_CU_ADDRESS_SPACE_SOURCE_HIERARCHY
+	bool "CU: Address Space Source Hierarchy"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2918:Address Space Source Hierarchy.
+	  Backing tests: test_profile_surface.
+	  Notes: Reconciled: Source hierarchy browsing via HasProperty/HasComponent references in base_nodes.c. Browse service resolves these forward/reverse.
+
+config MUC_OPCUA_CU_ADDRESS_SPACE_USERWRITEMASK_MULTILEVEL
+	bool "CU: Address Space UserWriteMask Multilevel"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3026:Address Space UserWriteMask Multilevel.
+	  Backing tests: test_profile_surface.
+	  Notes: Reconciled: Multi-level UserWriteMask propagation from TypeDefinition nodes. Backed by read_attribute.c UserWriteMask attribute read.
+
+config MUC_OPCUA_CU_ADDRESS_SPACE_NOTIFIER_HIERARCHY
+	bool "CU: Address Space Notifier Hierarchy"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3064:Address Space Notifier Hierarchy.
+	  Backing tests: test_profile_surface.
+	  Notes: Reconciled: EventNotifier attribute on Object/View nodes (OPC-10000-3 §5.4.6). Backed by mu_node_t.event_notifier field and read_attribute.c.
 
 config MUC_OPCUA_CU_BASE_INFO_SECURITY_ROLE_CAPABILITIES
 	bool "CU: Base Info Security Role Capabilities"
@@ -2389,6 +2452,33 @@ config MUC_OPCUA_CU_BASE_INFO_FILE_TYPE_BASE
 	  Backing tests: test_profile_surface.
 	  Notes: Claimed: minimal type stubs and capability markers in place.
 
+config MUC_OPCUA_CU_ADDRESS_SPACE_DICTIONARY_IRDI
+	bool "CU: Address Space Dictionary IRDI"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3524:Address Space Dictionary IRDI.
+	  Backing tests: test_profile_surface.
+	  Notes: Reconciled: IRDI-based dictionary references. Backed by base_nodes.c type-system exposure and dictionary entries.
+
+config MUC_OPCUA_CU_ADDRESS_SPACE_DICTIONARY_URI
+	bool "CU: Address Space Dictionary URI"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3525:Address Space Dictionary URI.
+	  Backing tests: test_profile_surface.
+	  Notes: Reconciled: URI-based dictionary references. Backed by base_nodes.c type-system exposure and dictionary entries.
+
+config MUC_OPCUA_CU_ADDRESS_SPACE_METHOD_META_DATA
+	bool "CU: Address Space Method Meta Data"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3562:Address Space Method Meta Data.
+	  Backing tests: test_profile_surface.
+	  Notes: Reconciled: Method metadata with HasArgumentDescription/HasOptionalInputArgumentDescription. Backed by read_attribute.c and base_nodes.c method nodes.
+
 config MUC_OPCUA_CU_BASE_INFO_METHOD_CAPABILITIES
 	bool "CU: Base Info Method Capabilities"
 	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
@@ -2397,6 +2487,24 @@ config MUC_OPCUA_CU_BASE_INFO_METHOD_CAPABILITIES
 	  OPC item: CU 3605:Base Info Method Capabilities.
 	  Backing tests: test_profile_surface.
 	  Notes: Claimed: minimal type stubs and capability markers in place.
+
+config MUC_OPCUA_CU_ADDRESS_SPACE_DATATYPEDEFINITION_ATTRIBUTE
+	bool "CU: Address Space DataTypeDefinition Attribute"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3941:Address Space DataTypeDefinition Attribute.
+	  Backing tests: test_profile_surface.
+	  Notes: Reconciled: DataTypeDefinition attribute on DataType nodes (OPC-10000-5 §12.2.12.3). Backed by base_nodes.c DataType nodes and read_attribute.c attribute handling.
+
+config MUC_OPCUA_CU_ADDRESS_SPACE_USER_ACCESS_LEVEL_BASE
+	bool "CU: Address Space User Access Level Base"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3965:Address Space User Access Level Base.
+	  Backing tests: test_profile_surface.
+	  Notes: Reconciled: Readable UserAccessLevel attribute on Variable nodes (OPC-10000-3 §5.5.9). Backed by read_attribute.c unconditionally.
 
 config MUC_OPCUA_CU_BASE_INFO_MODEL_CHANGE
 	bool "CU: Base Info Model Change"

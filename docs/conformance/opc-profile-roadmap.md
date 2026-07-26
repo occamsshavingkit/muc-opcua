@@ -15,9 +15,9 @@ remains future work.
 
 | State | Count |
 |-------|-------|
-| claimed | 326 |
+| claimed | 338 |
 | implemented | 16 |
-| documented | 283 |
+| documented | 271 |
 | deferred | 11 |
 | unimplemented | 11 |
 
@@ -490,8 +490,8 @@ remains future work.
 | opc_cu_3994 | conformance_unit | documented |  | — | full | — |
 | opc_cu_3979 | conformance_unit | documented |  | — | full | — |
 | opc_cu_3969 | conformance_unit | claimed |  | MUC_OPCUA_CU_BASE_INFO_MODEL_CHANGE | full | test_profile_surface |
-| opc_cu_3965 | conformance_unit | documented |  | — | full | — |
-| opc_cu_3941 | conformance_unit | documented |  | — | full | — |
+| opc_cu_3965 | conformance_unit | claimed |  | MUC_OPCUA_CU_ADDRESS_SPACE_USER_ACCESS_LEVEL_BASE | full | test_profile_surface |
+| opc_cu_3941 | conformance_unit | claimed |  | MUC_OPCUA_CU_ADDRESS_SPACE_DATATYPEDEFINITION_ATTRIBUTE | full | test_profile_surface |
 | opc_cu_3928 | conformance_unit | documented |  | — | full | — |
 | opc_cu_3820 | conformance_unit | documented |  | — | full | — |
 | opc_cu_3779 | conformance_unit | documented |  | — | full | — |
@@ -519,14 +519,14 @@ remains future work.
 | opc_cu_3574 | conformance_unit | documented |  | — | full | — |
 | opc_cu_3572 | conformance_unit | documented |  | — | full | — |
 | opc_cu_3571 | conformance_unit | documented |  | — | full | — |
-| opc_cu_3562 | conformance_unit | documented |  | — | full | — |
+| opc_cu_3562 | conformance_unit | claimed |  | MUC_OPCUA_CU_ADDRESS_SPACE_METHOD_META_DATA | full | test_profile_surface |
 | opc_cu_3542 | conformance_unit | documented |  | — | full | — |
 | opc_cu_3541 | conformance_unit | documented |  | — | full | — |
 | opc_cu_3540 | conformance_unit | documented |  | — | full | — |
 | opc_cu_3539 | conformance_unit | documented |  | — | full | — |
 | opc_cu_3538 | conformance_unit | documented |  | — | full | — |
-| opc_cu_3525 | conformance_unit | documented |  | — | full | — |
-| opc_cu_3524 | conformance_unit | documented |  | — | full | — |
+| opc_cu_3525 | conformance_unit | claimed |  | MUC_OPCUA_CU_ADDRESS_SPACE_DICTIONARY_URI | full | test_profile_surface |
+| opc_cu_3524 | conformance_unit | claimed |  | MUC_OPCUA_CU_ADDRESS_SPACE_DICTIONARY_IRDI | full | test_profile_surface |
 | opc_cu_3226 | conformance_unit | documented |  | — | full | — |
 | opc_cu_3213 | conformance_unit | claimed |  | MUC_OPCUA_CU_BASE_INFO_FILE_TYPE_BASE | full | test_profile_surface |
 | opc_cu_3203 | conformance_unit | claimed |  | MUC_OPCUA_CU_BASE_INFO_MODEL_CHANGE_GENERAL | full | test_profile_surface |
@@ -546,7 +546,7 @@ remains future work.
 | opc_cu_3084 | conformance_unit | documented |  | — | — | — |
 | opc_cu_3083 | conformance_unit | documented |  | — | full | — |
 | opc_cu_3081 | conformance_unit | documented |  | — | full | — |
-| opc_cu_3064 | conformance_unit | documented |  | — | full | — |
+| opc_cu_3064 | conformance_unit | claimed |  | MUC_OPCUA_CU_ADDRESS_SPACE_NOTIFIER_HIERARCHY | full | test_profile_surface |
 | opc_cu_3061 | conformance_unit | documented |  | — | — | — |
 | opc_cu_3060 | conformance_unit | documented |  | — | — | — |
 | opc_cu_3055 | conformance_unit | documented |  | — | — | — |
@@ -555,7 +555,7 @@ remains future work.
 | opc_cu_3043 | conformance_unit | documented |  | — | full | — |
 | opc_cu_3032 | conformance_unit | documented |  | — | — | — |
 | opc_cu_3027 | conformance_unit | documented |  | — | full | — |
-| opc_cu_3026 | conformance_unit | documented |  | — | full | — |
+| opc_cu_3026 | conformance_unit | claimed |  | MUC_OPCUA_CU_ADDRESS_SPACE_USERWRITEMASK_MULTILEVEL | full | test_profile_surface |
 | opc_cu_3020 | conformance_unit | documented |  | — | full | — |
 | opc_cu_3018 | conformance_unit | documented |  | — | — | — |
 | opc_cu_3015 | conformance_unit | documented |  | — | full | — |
@@ -581,7 +581,7 @@ remains future work.
 | opc_cu_2943 | conformance_unit | documented |  | — | full | — |
 | opc_cu_2937 | conformance_unit | documented |  | — | full | — |
 | opc_cu_2929 | conformance_unit | documented |  | — | full | — |
-| opc_cu_2918 | conformance_unit | documented |  | — | full | — |
+| opc_cu_2918 | conformance_unit | claimed |  | MUC_OPCUA_CU_ADDRESS_SPACE_SOURCE_HIERARCHY | full | test_profile_surface |
 | opc_cu_2902 | conformance_unit | documented |  | — | full | — |
 | opc_cu_2897 | conformance_unit | documented |  | — | full | — |
 | opc_cu_2896 | conformance_unit | documented |  | — | full | — |
@@ -599,7 +599,7 @@ remains future work.
 | opc_cu_2806 | conformance_unit | documented |  | — | full | — |
 | opc_cu_2802 | conformance_unit | documented |  | — | full | — |
 | opc_cu_2785 | conformance_unit | documented |  | — | full | — |
-| opc_cu_2781 | conformance_unit | documented |  | — | full | — |
+| opc_cu_2781 | conformance_unit | claimed |  | MUC_OPCUA_CU_ADDRESS_SPACE_WRITEMASK | full | test_profile_surface |
 | opc_cu_2777 | conformance_unit | documented |  | — | full | — |
 | opc_cu_2759 | conformance_unit | documented |  | — | — | — |
 | opc_cu_2746 | conformance_unit | documented |  | — | full | — |
@@ -609,7 +609,7 @@ remains future work.
 | opc_cu_2705 | conformance_unit | documented |  | — | full | — |
 | opc_cu_2664 | conformance_unit | documented |  | — | full | — |
 | opc_cu_2629 | conformance_unit | documented |  | — | full | — |
-| opc_cu_2539 | conformance_unit | documented |  | — | full | — |
+| opc_cu_2539 | conformance_unit | claimed |  | MUC_OPCUA_CU_ADDRESS_SPACE_DICTIONARY_ENTRIES | full | test_profile_surface |
 | opc_cu_2527 | conformance_unit | claimed |  | MUC_OPCUA_CU_BASE_INFO_HISTORY_READ_EVENTS_CAPABILITIES | full | test_profile_surface |
 | opc_cu_2526 | conformance_unit | claimed |  | MUC_OPCUA_CU_BASE_INFO_HISTORY_READ_DATA_CAPABILITIES | full | test_profile_surface |
 | opc_cu_2488 | conformance_unit | claimed |  | MUC_OPCUA_CU_BASE_INFO_HISTORY_UPDATE_DATA_CAPABILITIES | full | test_profile_surface |
@@ -626,7 +626,7 @@ remains future work.
 | opc_cu_2383 | conformance_unit | documented |  | — | full | — |
 | opc_cu_2382 | conformance_unit | documented |  | — | — | — |
 | opc_cu_2379 | conformance_unit | documented |  | — | full | — |
-| opc_cu_2362 | conformance_unit | documented |  | — | full | — |
+| opc_cu_2362 | conformance_unit | claimed |  | MUC_OPCUA_CU_ADDRESS_SPACE_METHOD | full | test_profile_surface |
 | opc_cu_2354 | conformance_unit | documented |  | — | full | — |
 | opc_cu_2353 | conformance_unit | documented |  | — | full | — |
 | opc_cu_2350 | conformance_unit | documented |  | — | — | — |
@@ -667,7 +667,7 @@ remains future work.
 | opc_cu_2180 | conformance_unit | documented |  | — | full | — |
 | opc_cu_2175 | conformance_unit | documented |  | — | — | — |
 | opc_cu_2165 | conformance_unit | documented |  | — | — | — |
-| opc_cu_2163 | conformance_unit | documented |  | — | full | — |
+| opc_cu_2163 | conformance_unit | claimed |  | MUC_OPCUA_CU_ADDRESS_SPACE_USERWRITEMASK | full | test_profile_surface |
 | mdns_discovery | optimization | implemented | OPC-10000-12 §Annex A | MUC_OPCUA_MDNS_DISCOVERY | full | — |
 | cu_user_token_jwt | optimization | implemented | OPC-10000-7 §CU 1697 User Token JWT Server Facet | MUC_OPCUA_CU_USER_TOKEN_JWT | full | test_jwt_activate_session |
 | cu_certificate_manager_pull | optimization | implemented | OPC-10000-12 §7.6, 7.9 | MUC_OPCUA_CU_CERTIFICATE_MANAGER_PULL | full | test_certificate_manager |

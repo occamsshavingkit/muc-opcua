@@ -14677,13 +14677,15 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "cu_optional": false,
       "id": "opc_cu_3965",
-      "implementation_state": "documented",
-      "kconfig_symbol": null,
+      "implementation_state": "claimed",
+      "kconfig_symbol": "MUC_OPCUA_CU_ADDRESS_SPACE_USER_ACCESS_LEVEL_BASE",
       "kind": "conformance_unit",
-      "notes": "Spec CU 3965: tracked in manifest; not yet claimed or implemented.",
+      "notes": "Reconciled: Readable UserAccessLevel attribute on Variable nodes (OPC-10000-3 \u00a75.5.9). Backed by read_attribute.c unconditionally.",
       "opc_display_name": "Address Space User Access Level Base",
       "opc_reference": {
         "cu_id": "3965",
@@ -14706,13 +14708,15 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "cu_optional": false,
       "id": "opc_cu_3941",
-      "implementation_state": "documented",
-      "kconfig_symbol": null,
+      "implementation_state": "claimed",
+      "kconfig_symbol": "MUC_OPCUA_CU_ADDRESS_SPACE_DATATYPEDEFINITION_ATTRIBUTE",
       "kind": "conformance_unit",
-      "notes": "Spec CU 3941: tracked in manifest; not yet claimed or implemented.",
+      "notes": "Reconciled: DataTypeDefinition attribute on DataType nodes (OPC-10000-5 \u00a712.2.12.3). Backed by base_nodes.c DataType nodes and read_attribute.c attribute handling.",
       "opc_display_name": "Address Space DataTypeDefinition Attribute",
       "opc_reference": {
         "cu_id": "3941",
@@ -15520,13 +15524,15 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "cu_optional": true,
       "id": "opc_cu_3562",
-      "implementation_state": "documented",
-      "kconfig_symbol": null,
+      "implementation_state": "claimed",
+      "kconfig_symbol": "MUC_OPCUA_CU_ADDRESS_SPACE_METHOD_META_DATA",
       "kind": "conformance_unit",
-      "notes": "Spec CU 3562: tracked in manifest; not yet claimed or implemented.",
+      "notes": "Reconciled: Method metadata with HasArgumentDescription/HasOptionalInputArgumentDescription. Backed by read_attribute.c and base_nodes.c method nodes.",
       "opc_display_name": "Address Space Method Meta Data",
       "opc_reference": {
         "cu_id": "3562",
@@ -15694,13 +15700,15 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "cu_optional": true,
       "id": "opc_cu_3525",
-      "implementation_state": "documented",
-      "kconfig_symbol": null,
+      "implementation_state": "claimed",
+      "kconfig_symbol": "MUC_OPCUA_CU_ADDRESS_SPACE_DICTIONARY_URI",
       "kind": "conformance_unit",
-      "notes": "Spec CU 3525: tracked in manifest; not yet claimed or implemented.",
+      "notes": "Reconciled: URI-based dictionary references. Backed by base_nodes.c type-system exposure and dictionary entries.",
       "opc_display_name": "Address Space Dictionary URI",
       "opc_reference": {
         "cu_id": "3525",
@@ -15723,13 +15731,15 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "cu_optional": true,
       "id": "opc_cu_3524",
-      "implementation_state": "documented",
-      "kconfig_symbol": null,
+      "implementation_state": "claimed",
+      "kconfig_symbol": "MUC_OPCUA_CU_ADDRESS_SPACE_DICTIONARY_IRDI",
       "kind": "conformance_unit",
-      "notes": "Spec CU 3524: tracked in manifest; not yet claimed or implemented.",
+      "notes": "Reconciled: IRDI-based dictionary references. Backed by base_nodes.c type-system exposure and dictionary entries.",
       "opc_display_name": "Address Space Dictionary IRDI",
       "opc_reference": {
         "cu_id": "3524",
@@ -16309,13 +16319,15 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "cu_optional": false,
       "id": "opc_cu_3064",
-      "implementation_state": "documented",
-      "kconfig_symbol": null,
+      "implementation_state": "claimed",
+      "kconfig_symbol": "MUC_OPCUA_CU_ADDRESS_SPACE_NOTIFIER_HIERARCHY",
       "kind": "conformance_unit",
-      "notes": "Spec CU 3064: tracked in manifest; not yet claimed or implemented.",
+      "notes": "Reconciled: EventNotifier attribute on Object/View nodes (OPC-10000-3 \u00a75.4.6). Backed by mu_node_t.event_notifier field and read_attribute.c.",
       "opc_display_name": "Address Space Notifier Hierarchy",
       "opc_reference": {
         "cu_id": "3064",
@@ -16570,13 +16582,15 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "cu_optional": true,
       "id": "opc_cu_3026",
-      "implementation_state": "documented",
-      "kconfig_symbol": null,
+      "implementation_state": "claimed",
+      "kconfig_symbol": "MUC_OPCUA_CU_ADDRESS_SPACE_USERWRITEMASK_MULTILEVEL",
       "kind": "conformance_unit",
-      "notes": "Spec CU 3026: tracked in manifest; not yet claimed or implemented.",
+      "notes": "Reconciled: Multi-level UserWriteMask propagation from TypeDefinition nodes. Backed by read_attribute.c UserWriteMask attribute read.",
       "opc_display_name": "Address Space UserWriteMask Multilevel",
       "opc_reference": {
         "cu_id": "3026",
@@ -17324,13 +17338,15 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "cu_optional": false,
       "id": "opc_cu_2918",
-      "implementation_state": "documented",
-      "kconfig_symbol": null,
+      "implementation_state": "claimed",
+      "kconfig_symbol": "MUC_OPCUA_CU_ADDRESS_SPACE_SOURCE_HIERARCHY",
       "kind": "conformance_unit",
-      "notes": "Spec CU 2918: tracked in manifest; not yet claimed or implemented.",
+      "notes": "Reconciled: Source hierarchy browsing via HasProperty/HasComponent references in base_nodes.c. Browse service resolves these forward/reverse.",
       "opc_display_name": "Address Space Source Hierarchy",
       "opc_reference": {
         "cu_id": "2918",
@@ -17850,13 +17866,15 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "cu_optional": false,
       "id": "opc_cu_2781",
-      "implementation_state": "documented",
-      "kconfig_symbol": null,
+      "implementation_state": "claimed",
+      "kconfig_symbol": "MUC_OPCUA_CU_ADDRESS_SPACE_WRITEMASK",
       "kind": "conformance_unit",
-      "notes": "Spec CU 2781: tracked in manifest; not yet claimed or implemented.",
+      "notes": "Reconciled: Readable WriteMask attribute on Variable nodes. Backed by read_attribute.c unconditionally.",
       "opc_display_name": "Address Space WriteMask",
       "opc_reference": {
         "cu_id": "2781",
@@ -18140,13 +18158,15 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "cu_optional": false,
       "id": "opc_cu_2539",
-      "implementation_state": "documented",
-      "kconfig_symbol": null,
+      "implementation_state": "claimed",
+      "kconfig_symbol": "MUC_OPCUA_CU_ADDRESS_SPACE_DICTIONARY_ENTRIES",
       "kind": "conformance_unit",
-      "notes": "Spec CU 2539: tracked in manifest; not yet claimed or implemented.",
+      "notes": "Reconciled: Dictionary entry nodes in the AddressSpace. Backed by base_nodes.c type-system exposure.",
       "opc_display_name": "Address Space Dictionary Entries",
       "opc_reference": {
         "cu_id": "2539",
@@ -18643,13 +18663,15 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "cu_optional": false,
       "id": "opc_cu_2362",
-      "implementation_state": "documented",
-      "kconfig_symbol": null,
+      "implementation_state": "claimed",
+      "kconfig_symbol": "MUC_OPCUA_CU_ADDRESS_SPACE_METHOD",
       "kind": "conformance_unit",
-      "notes": "Spec CU 2362: tracked in manifest; not yet claimed or implemented.",
+      "notes": "Reconciled: Method nodes with proper NodeClass and executable attributes (OPC-10000-3 \u00a75.7). Backed by read_attribute.c Executable/UserExecutable handling and base_nodes.c method nodes.",
       "opc_display_name": "Address Space Method",
       "opc_reference": {
         "cu_id": "2362",
@@ -19832,13 +19854,15 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "cu_optional": false,
       "id": "opc_cu_2163",
-      "implementation_state": "documented",
-      "kconfig_symbol": null,
+      "implementation_state": "claimed",
+      "kconfig_symbol": "MUC_OPCUA_CU_ADDRESS_SPACE_USERWRITEMASK",
       "kind": "conformance_unit",
-      "notes": "Spec CU 2163: tracked in manifest; not yet claimed or implemented.",
+      "notes": "Reconciled: Readable UserWriteMask attribute on Variable nodes. Backed by read_attribute.c unconditionally.",
       "opc_display_name": "Address Space UserWriteMask",
       "opc_reference": {
         "cu_id": "2163",

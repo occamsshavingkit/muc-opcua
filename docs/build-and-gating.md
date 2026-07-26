@@ -793,17 +793,29 @@ to refresh.
 | MUC_OPCUA_CU_BASE_INFO_STATE_MACHINE_DESC_NODEID_DATATYPE | opc_cu_5875 | claimed |  |  |  |  | ✅ |  |
 | MUC_OPCUA_CU_BASE_INFO_TEMPORARY_FILE_TRANSFER_TYPE_BASE | opc_cu_5791 | claimed |  |  |  |  | ✅ |  |
 | MUC_OPCUA_CU_BASE_INFO_MODEL_CHANGE | opc_cu_3969 | claimed |  |  |  |  | ✅ |  |
+| MUC_OPCUA_CU_ADDRESS_SPACE_USER_ACCESS_LEVEL_BASE | opc_cu_3965 | claimed |  |  |  |  | ✅ |  |
+| MUC_OPCUA_CU_ADDRESS_SPACE_DATATYPEDEFINITION_ATTRIBUTE | opc_cu_3941 | claimed |  |  |  |  | ✅ |  |
 | MUC_OPCUA_CU_BASE_INFO_METHOD_CAPABILITIES | opc_cu_3605 | claimed |  |  |  |  | ✅ |  |
+| MUC_OPCUA_CU_ADDRESS_SPACE_METHOD_META_DATA | opc_cu_3562 | claimed |  |  |  |  | ✅ |  |
+| MUC_OPCUA_CU_ADDRESS_SPACE_DICTIONARY_URI | opc_cu_3525 | claimed |  |  |  |  | ✅ |  |
+| MUC_OPCUA_CU_ADDRESS_SPACE_DICTIONARY_IRDI | opc_cu_3524 | claimed |  |  |  |  | ✅ |  |
 | MUC_OPCUA_CU_BASE_INFO_FILE_TYPE_BASE | opc_cu_3213 | claimed |  |  |  |  | ✅ |  |
 | MUC_OPCUA_CU_BASE_INFO_MODEL_CHANGE_GENERAL | opc_cu_3203 | claimed |  |  |  |  | ✅ |  |
 | MUC_OPCUA_CU_BASE_INFO_SECURITY_ROLE_CAPABILITIES | opc_cu_3197 | claimed |  |  |  |  | ✅ |  |
+| MUC_OPCUA_CU_ADDRESS_SPACE_NOTIFIER_HIERARCHY | opc_cu_3064 | claimed |  |  |  |  | ✅ |  |
+| MUC_OPCUA_CU_ADDRESS_SPACE_USERWRITEMASK_MULTILEVEL | opc_cu_3026 | claimed |  |  |  |  | ✅ |  |
+| MUC_OPCUA_CU_ADDRESS_SPACE_SOURCE_HIERARCHY | opc_cu_2918 | claimed |  |  |  |  | ✅ |  |
 | MUC_OPCUA_CU_BASE_INFO_REQUEST_SERVER_STATE_CHANGE_METHOD | opc_cu_2845 | claimed |  |  |  |  | ✅ |  |
 | MUC_OPCUA_CU_BASE_INFO_STATE_MACHINE_INSTANCE | opc_cu_2811 | claimed |  |  |  |  | ✅ |  |
+| MUC_OPCUA_CU_ADDRESS_SPACE_WRITEMASK | opc_cu_2781 | claimed |  |  |  |  | ✅ |  |
+| MUC_OPCUA_CU_ADDRESS_SPACE_DICTIONARY_ENTRIES | opc_cu_2539 | claimed |  |  |  |  | ✅ |  |
 | MUC_OPCUA_CU_BASE_INFO_HISTORY_READ_EVENTS_CAPABILITIES | opc_cu_2527 | claimed |  |  |  |  | ✅ |  |
 | MUC_OPCUA_CU_BASE_INFO_HISTORY_READ_DATA_CAPABILITIES | opc_cu_2526 | claimed |  |  |  |  | ✅ |  |
 | MUC_OPCUA_CU_BASE_INFO_HISTORY_UPDATE_DATA_CAPABILITIES | opc_cu_2488 | claimed |  |  |  |  | ✅ |  |
 | MUC_OPCUA_CU_BASE_INFO_HISTORY_UPDATE_EVENTS_CAPABILITIES | opc_cu_2487 | claimed |  |  |  |  | ✅ |  |
 | MUC_OPCUA_CU_BASE_INFO_HISTORY_READ_CAPABILITIES | opc_cu_2486 | claimed |  |  |  |  | ✅ |  |
+| MUC_OPCUA_CU_ADDRESS_SPACE_METHOD | opc_cu_2362 | claimed |  |  |  |  | ✅ |  |
+| MUC_OPCUA_CU_ADDRESS_SPACE_USERWRITEMASK | opc_cu_2163 | claimed |  |  |  |  | ✅ |  |
 | MUC_OPCUA_MDNS_DISCOVERY | mdns_discovery | implemented |  |  |  |  | ✅ |  |
 | MUC_OPCUA_CU_USER_TOKEN_JWT | cu_user_token_jwt | implemented |  |  |  |  | ✅ | MUC_OPCUA_CU_USER_AUTH |
 | MUC_OPCUA_CU_CERTIFICATE_MANAGER_PULL | cu_certificate_manager_pull | implemented |  |  |  |  | ✅ | MUC_OPCUA_CU_CERTIFICATE_MANAGEMENT, MUC_OPCUA_CU_METHOD_SERVER, MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION |
@@ -853,6 +865,7 @@ The following OPC items are tracked in the manifest but are NOT implemented. The
 | opc_facet_2322 | OPC-10000-7 §4.2 | unimplemented | AliasName Configuration Facet not implemented; AliasName feature is deferred. |
 | opc_facet_2323 | OPC-10000-7 §4.2 | unimplemented | AliasName Server PubSub Publisher Facet not implemented; AliasName+PubSub deferred. |
 <!-- END GENERATED MANIFEST TABLES -->
+
 
 
 
