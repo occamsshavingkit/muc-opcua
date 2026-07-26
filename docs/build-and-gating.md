@@ -467,8 +467,13 @@ to refresh.
 | MUC_OPCUA_CU_ADDRESS_SPACE_FULL_ARRAY_ONLY | opc_cu_2820 | claimed | ✅ | ✅ | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
 | MUC_OPCUA_CU_BASE_INFO_VALUEASTEXT | opc_cu_2969 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
 | MUC_OPCUA_CU_BASE_INFO_OPTIONSET | opc_cu_3127 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
+| — | opc_cu_3184 | claimed |  | ✅ | ✅ | ✅ | ✅ |  |
+| — | opc_cu_3186 | claimed |  | ✅ | ✅ | ✅ | ✅ |  |
 | MUC_OPCUA_CU_BASE_INFO_ESTIMATED_RETURN_TIME | opc_cu_3198 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
+| — | opc_cu_3545 | claimed |  | ✅ | ✅ | ✅ | ✅ |  |
 | MUC_OPCUA_CU_ADDRESS_SPACE_INTERFACES | opc_cu_3560 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER, MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER |
+| — | opc_cu_3808 | claimed | ✅ | ✅ | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
+| — | opc_cu_3912 | claimed | ✅ | ✅ | ✅ | ✅ | ✅ |  |
 | MUC_OPCUA_CU_BASE_INFO_LOCATIONS_OBJECT | opc_cu_4053 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
 | MUC_OPCUA_CU_ADDRESS_SPACE_NONVOLATILE_CONSTANT | opc_cu_4237 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
 | MUC_OPCUA_CU_BASE_INFO_CURRENCY | opc_cu_5240 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
@@ -483,8 +488,53 @@ to refresh.
 | OPC_CU_2481 | opc_cu_2481 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER |
 | OPC_CU_2482 | opc_cu_2482 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER |
 | — | opc_cu_2483 | claimed |  |  | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER |
+| — | opc_cu_2484 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER |
+| — | opc_cu_2485 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER |
+| — | opc_cu_2490 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER |
+| — | opc_cu_2491 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER |
+| — | opc_cu_2500 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER |
+| — | opc_cu_2512 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER |
+| — | opc_cu_2513 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER |
+| — | opc_cu_2514 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER |
+| — | opc_cu_2516 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER |
+| — | opc_cu_2517 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER |
+| — | opc_cu_2518 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER |
+| — | opc_cu_2536 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER |
+| — | opc_cu_2940 | claimed |  |  | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_STANDARD_DATACHANGE_SUBSCRIPTION_2022_SERVER |
+| — | opc_cu_3185 | claimed |  |  | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER |
+| — | opc_cu_3188 | claimed |  |  | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER |
 | MUC_OPCUA_CU_BASE_INFO_SERVERTYPE | opc_cu_3189 | claimed |  |  | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER |
+| — | opc_cu_3196 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_EMBEDDED_DATACHANGE_SUBSCRIPTION_2022_SERVER |
+| — | opc_cu_3207 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER |
+| — | opc_cu_3214 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER |
+| — | opc_cu_3544 | claimed |  |  | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_STANDARD_DATACHANGE_SUBSCRIPTION_2022_SERVER |
+| — | opc_cu_3547 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER |
+| — | opc_cu_3550 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER |
+| — | opc_cu_3551 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER |
+| — | opc_cu_3641 | claimed |  |  | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER |
+| — | opc_cu_3644 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER |
+| — | opc_cu_3747 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER |
+| — | opc_cu_3748 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER |
+| — | opc_cu_3749 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER |
+| — | opc_cu_3750 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER |
+| — | opc_cu_3751 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER |
+| — | opc_cu_3752 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER |
+| — | opc_cu_3753 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER |
+| — | opc_cu_3754 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER |
+| — | opc_cu_3755 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER |
+| — | opc_cu_3756 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER |
+| — | opc_cu_3757 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER |
+| — | opc_cu_3758 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER |
+| — | opc_cu_3759 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER |
+| — | opc_cu_3911 | claimed |  | ✅ | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_EMBEDDED_DATACHANGE_SUBSCRIPTION_2022_SERVER |
+| — | opc_cu_3922 | claimed |  | ✅ | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_EMBEDDED_DATACHANGE_SUBSCRIPTION_2022_SERVER |
+| — | opc_cu_3996 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER |
+| — | opc_cu_4052 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER |
+| — | opc_cu_4054 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER |
+| — | opc_cu_4055 | claimed |  | ✅ | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_EMBEDDED_DATACHANGE_SUBSCRIPTION_2022_SERVER |
+| — | opc_cu_4426 | claimed |  |  | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER |
 | MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION | opc_cu_5801 | claimed |  |  | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER |
+| — | opc_cu_5868 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER |
 | MUC_OPCUA_CU_SUBSCRIPTION_BASIC | opc_cu_subscription_basic | claimed |  | ✅ | ✅ | ✅ | ✅ |  |
 | MUC_OPCUA_CU_SUBSCRIPTION_STANDARD | opc_cu_subscription_standard | claimed |  |  | ✅ | ✅ | ✅ | MUC_OPCUA_CU_SUBSCRIPTION_BASIC |
 | MUC_OPCUA_CU_SECURITY_ECC | opc_cu_security_ecc | claimed |  |  |  |  | ✅ | SECURE_CHANNEL_CRYPTO |
@@ -593,10 +643,30 @@ to refresh.
 | MUC_OPCUA_CU_DISCOVERY_REGISTER | opc_cu_2271 | claimed |  |  |  | ✅ | ✅ |  |
 | OPC_CU_3080 | opc_cu_3080 | claimed | ✅ | ✅ | ✅ | ✅ | ✅ |  |
 | MUC_OPCUA_CU_BASE_INFO_ENGINEERING_UNITS | opc_cu_5592 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
+| — | opc_cu_5814 | claimed |  |  |  |  | ✅ |  |
 | MUC_OPCUA_CU_KEY_CREDENTIAL_SERVICE | opc_cu_key_credential_service | claimed |  |  |  |  | ✅ | MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION, MUC_OPCUA_CU_METHOD_SERVER |
 | MUC_OPCUA_CU_USER_ROLE_MANAGEMENT | opc_cu_user_role_management | claimed |  |  |  |  | ✅ | MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION, MUC_OPCUA_CU_METHOD_SERVER |
 | MUC_OPCUA_CU_CERTIFICATE_MANAGEMENT | opc_cu_certificate_management | claimed |  |  |  |  | ✅ | MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION, MUC_OPCUA_CU_METHOD_SERVER |
 | MUC_OPCUA_CU_ALARMS_CONDITIONS | opc_cu_alarms_conditions | claimed |  |  |  |  | ✅ | MUC_OPCUA_CU_EVENTS, MUC_OPCUA_FACET_CORE_2022_SERVER |
+| — | opc_cu_2489 | claimed |  |  |  |  | ✅ |  |
+| — | opc_cu_2649 | claimed |  |  |  |  | ✅ |  |
+| — | opc_cu_2747 | claimed |  |  |  |  | ✅ |  |
+| — | opc_cu_2813 | claimed |  |  |  |  | ✅ |  |
+| — | opc_cu_2814 | claimed |  |  |  |  | ✅ |  |
+| — | opc_cu_2822 | claimed |  |  |  |  | ✅ |  |
+| — | opc_cu_2978 | claimed |  |  |  |  | ✅ |  |
+| — | opc_cu_3199 | claimed |  |  |  |  | ✅ |  |
+| — | opc_cu_3206 | claimed |  |  |  |  | ✅ |  |
+| — | opc_cu_3210 | claimed |  |  |  |  | ✅ |  |
+| — | opc_cu_3211 | claimed |  |  |  |  | ✅ |  |
+| — | opc_cu_3546 | claimed |  |  |  |  | ✅ |  |
+| — | opc_cu_3549 | claimed |  |  |  |  | ✅ |  |
+| — | opc_cu_3810 | claimed |  |  |  |  | ✅ |  |
+| — | opc_cu_3811 | claimed |  |  |  |  | ✅ |  |
+| — | opc_cu_3812 | claimed |  |  |  |  | ✅ |  |
+| — | opc_cu_3813 | claimed |  |  |  |  | ✅ |  |
+| — | opc_cu_4427 | claimed |  |  |  |  | ✅ |  |
+| — | opc_cu_5578 | claimed |  |  |  |  | ✅ |  |
 | MUC_OPCUA_MDNS_DISCOVERY | mdns_discovery | implemented |  |  |  |  | ✅ |  |
 | MUC_OPCUA_CU_USER_TOKEN_JWT | cu_user_token_jwt | implemented |  |  |  |  | ✅ | MUC_OPCUA_CU_USER_AUTH |
 | MUC_OPCUA_CU_CERTIFICATE_MANAGER_PULL | cu_certificate_manager_pull | implemented |  |  |  |  | ✅ | MUC_OPCUA_CU_CERTIFICATE_MANAGEMENT, MUC_OPCUA_CU_METHOD_SERVER, MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION |
@@ -646,6 +716,7 @@ The following OPC items are tracked in the manifest but are NOT implemented. The
 | opc_facet_2322 | OPC-10000-7 §4.2 | unimplemented | AliasName Configuration Facet not implemented; AliasName feature is deferred. |
 | opc_facet_2323 | OPC-10000-7 §4.2 | unimplemented | AliasName Server PubSub Publisher Facet not implemented; AliasName+PubSub deferred. |
 <!-- END GENERATED MANIFEST TABLES -->
+
 
 
 

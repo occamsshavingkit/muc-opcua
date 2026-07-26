@@ -15,9 +15,9 @@ remains future work.
 
 | State | Count |
 |-------|-------|
-| claimed | 119 |
+| claimed | 189 |
 | implemented | 16 |
-| documented | 180 |
+| documented | 110 |
 | deferred | 11 |
 | unimplemented | 11 |
 
@@ -47,14 +47,14 @@ remains future work.
 | opc_cu_2820 | conformance_unit | claimed |  | MUC_OPCUA_CU_ADDRESS_SPACE_FULL_ARRAY_ONLY | all | test_profile_surface |
 | opc_cu_2969 | conformance_unit | claimed |  | MUC_OPCUA_CU_BASE_INFO_VALUEASTEXT | full | test_profile_surface |
 | opc_cu_3127 | conformance_unit | claimed |  | MUC_OPCUA_CU_BASE_INFO_OPTIONSET | full | test_profile_surface |
-| opc_cu_3184 | conformance_unit | documented |  | — | micro, embedded, standard, full | — |
-| opc_cu_3186 | conformance_unit | documented |  | — | micro, embedded, standard, full | — |
+| opc_cu_3184 | conformance_unit | claimed |  | — | micro, embedded, standard, full | test_profile_surface |
+| opc_cu_3186 | conformance_unit | claimed |  | — | micro, embedded, standard, full | test_profile_surface |
 | opc_cu_3198 | conformance_unit | claimed |  | MUC_OPCUA_CU_BASE_INFO_ESTIMATED_RETURN_TIME | full | test_profile_surface |
-| opc_cu_3545 | conformance_unit | documented |  | — | micro, embedded, standard, full | — |
+| opc_cu_3545 | conformance_unit | claimed |  | — | micro, embedded, standard, full | test_profile_surface |
 | opc_cu_3554 | conformance_unit | documented |  | — | micro, embedded, standard, full | — |
 | opc_cu_3560 | conformance_unit | claimed |  | MUC_OPCUA_CU_ADDRESS_SPACE_INTERFACES | full | test_profile_surface |
-| opc_cu_3808 | conformance_unit | documented |  | — | all | — |
-| opc_cu_3912 | conformance_unit | documented |  | — | all | — |
+| opc_cu_3808 | conformance_unit | claimed |  | — | all | test_profile_surface |
+| opc_cu_3912 | conformance_unit | claimed |  | — | all | test_profile_surface |
 | opc_cu_4053 | conformance_unit | claimed |  | MUC_OPCUA_CU_BASE_INFO_LOCATIONS_OBJECT | full | test_profile_surface |
 | opc_cu_4237 | conformance_unit | claimed |  | MUC_OPCUA_CU_ADDRESS_SPACE_NONVOLATILE_CONSTANT | full | test_profile_surface |
 | opc_cu_5240 | conformance_unit | claimed |  | MUC_OPCUA_CU_BASE_INFO_CURRENCY | full | test_profile_surface |
@@ -69,59 +69,59 @@ remains future work.
 | opc_cu_2481 | conformance_unit | claimed |  | OPC_CU_2481 | full | test_type_system |
 | opc_cu_2482 | conformance_unit | claimed |  | OPC_CU_2482 | full | test_type_system |
 | opc_cu_2483 | conformance_unit | claimed |  | — | embedded, standard, full | test_type_system |
-| opc_cu_2484 | conformance_unit | documented |  | — | full | — |
-| opc_cu_2485 | conformance_unit | documented |  | — | full | — |
-| opc_cu_2490 | conformance_unit | documented |  | — | full | — |
-| opc_cu_2491 | conformance_unit | documented |  | — | full | — |
-| opc_cu_2500 | conformance_unit | documented |  | — | full | — |
-| opc_cu_2512 | conformance_unit | documented |  | — | full | — |
-| opc_cu_2513 | conformance_unit | documented |  | — | full | — |
-| opc_cu_2514 | conformance_unit | documented |  | — | full | — |
-| opc_cu_2516 | conformance_unit | documented |  | — | full | — |
-| opc_cu_2517 | conformance_unit | documented |  | — | full | — |
-| opc_cu_2518 | conformance_unit | documented |  | — | full | — |
-| opc_cu_2536 | conformance_unit | documented |  | — | full | — |
+| opc_cu_2484 | conformance_unit | claimed |  | — | full | test_profile_surface |
+| opc_cu_2485 | conformance_unit | claimed |  | — | full | test_profile_surface |
+| opc_cu_2490 | conformance_unit | claimed |  | — | full | test_profile_surface |
+| opc_cu_2491 | conformance_unit | claimed |  | — | full | test_profile_surface |
+| opc_cu_2500 | conformance_unit | claimed |  | — | full | test_profile_surface |
+| opc_cu_2512 | conformance_unit | claimed |  | — | full | test_profile_surface |
+| opc_cu_2513 | conformance_unit | claimed |  | — | full | test_profile_surface |
+| opc_cu_2514 | conformance_unit | claimed |  | — | full | test_profile_surface |
+| opc_cu_2516 | conformance_unit | claimed |  | — | full | test_profile_surface |
+| opc_cu_2517 | conformance_unit | claimed |  | — | full | test_profile_surface |
+| opc_cu_2518 | conformance_unit | claimed |  | — | full | test_profile_surface |
+| opc_cu_2536 | conformance_unit | claimed |  | — | full | test_profile_surface |
 | opc_cu_2928 | conformance_unit | documented |  | — | embedded, standard, full | — |
-| opc_cu_2940 | conformance_unit | documented |  | — | embedded, standard, full | — |
+| opc_cu_2940 | conformance_unit | claimed |  | — | embedded, standard, full | test_profile_surface |
 | opc_cu_2963 | conformance_unit | documented |  | — | micro, embedded, standard, full | — |
 | opc_cu_3146 | conformance_unit | documented |  | — | embedded, standard, full | — |
-| opc_cu_3185 | conformance_unit | documented |  | — | embedded, standard, full | — |
-| opc_cu_3188 | conformance_unit | documented |  | — | embedded, standard, full | — |
+| opc_cu_3185 | conformance_unit | claimed |  | — | embedded, standard, full | test_profile_surface |
+| opc_cu_3188 | conformance_unit | claimed |  | — | embedded, standard, full | test_profile_surface |
 | opc_cu_3189 | conformance_unit | claimed |  | MUC_OPCUA_CU_BASE_INFO_SERVERTYPE | embedded, standard, full | test_type_system |
-| opc_cu_3196 | conformance_unit | documented |  | — | full | — |
-| opc_cu_3207 | conformance_unit | documented |  | — | full | — |
-| opc_cu_3214 | conformance_unit | documented |  | — | full | — |
+| opc_cu_3196 | conformance_unit | claimed |  | — | full | test_profile_surface |
+| opc_cu_3207 | conformance_unit | claimed |  | — | full | test_profile_surface |
+| opc_cu_3214 | conformance_unit | claimed |  | — | full | test_profile_surface |
 | opc_cu_3532 | conformance_unit | documented |  | — | embedded, standard, full | — |
-| opc_cu_3544 | conformance_unit | documented |  | — | embedded, standard, full | — |
-| opc_cu_3547 | conformance_unit | documented |  | — | full | — |
-| opc_cu_3550 | conformance_unit | documented |  | — | full | — |
-| opc_cu_3551 | conformance_unit | documented |  | — | full | — |
-| opc_cu_3641 | conformance_unit | documented |  | — | embedded, standard, full | — |
-| opc_cu_3644 | conformance_unit | documented |  | — | full | — |
-| opc_cu_3747 | conformance_unit | documented |  | — | full | — |
-| opc_cu_3748 | conformance_unit | documented |  | — | full | — |
-| opc_cu_3749 | conformance_unit | documented |  | — | full | — |
-| opc_cu_3750 | conformance_unit | documented |  | — | full | — |
-| opc_cu_3751 | conformance_unit | documented |  | — | full | — |
-| opc_cu_3752 | conformance_unit | documented |  | — | full | — |
-| opc_cu_3753 | conformance_unit | documented |  | — | full | — |
-| opc_cu_3754 | conformance_unit | documented |  | — | full | — |
-| opc_cu_3755 | conformance_unit | documented |  | — | full | — |
-| opc_cu_3756 | conformance_unit | documented |  | — | full | — |
-| opc_cu_3757 | conformance_unit | documented |  | — | full | — |
-| opc_cu_3758 | conformance_unit | documented |  | — | full | — |
-| opc_cu_3759 | conformance_unit | documented |  | — | full | — |
-| opc_cu_3911 | conformance_unit | documented |  | — | micro, embedded, standard, full | — |
-| opc_cu_3922 | conformance_unit | documented |  | — | micro, embedded, standard, full | — |
-| opc_cu_3996 | conformance_unit | documented |  | — | full | — |
-| opc_cu_4052 | conformance_unit | documented |  | — | full | — |
-| opc_cu_4054 | conformance_unit | documented |  | — | full | — |
-| opc_cu_4055 | conformance_unit | documented |  | — | micro, embedded, standard, full | — |
-| opc_cu_4426 | conformance_unit | documented |  | — | embedded, standard, full | — |
+| opc_cu_3544 | conformance_unit | claimed |  | — | embedded, standard, full | test_profile_surface |
+| opc_cu_3547 | conformance_unit | claimed |  | — | full | test_profile_surface |
+| opc_cu_3550 | conformance_unit | claimed |  | — | full | test_profile_surface |
+| opc_cu_3551 | conformance_unit | claimed |  | — | full | test_profile_surface |
+| opc_cu_3641 | conformance_unit | claimed |  | — | embedded, standard, full | test_profile_surface |
+| opc_cu_3644 | conformance_unit | claimed |  | — | full | test_profile_surface |
+| opc_cu_3747 | conformance_unit | claimed |  | — | full | test_profile_surface |
+| opc_cu_3748 | conformance_unit | claimed |  | — | full | test_profile_surface |
+| opc_cu_3749 | conformance_unit | claimed |  | — | full | test_profile_surface |
+| opc_cu_3750 | conformance_unit | claimed |  | — | full | test_profile_surface |
+| opc_cu_3751 | conformance_unit | claimed |  | — | full | test_profile_surface |
+| opc_cu_3752 | conformance_unit | claimed |  | — | full | test_profile_surface |
+| opc_cu_3753 | conformance_unit | claimed |  | — | full | test_profile_surface |
+| opc_cu_3754 | conformance_unit | claimed |  | — | full | test_profile_surface |
+| opc_cu_3755 | conformance_unit | claimed |  | — | full | test_profile_surface |
+| opc_cu_3756 | conformance_unit | claimed |  | — | full | test_profile_surface |
+| opc_cu_3757 | conformance_unit | claimed |  | — | full | test_profile_surface |
+| opc_cu_3758 | conformance_unit | claimed |  | — | full | test_profile_surface |
+| opc_cu_3759 | conformance_unit | claimed |  | — | full | test_profile_surface |
+| opc_cu_3911 | conformance_unit | claimed |  | — | micro, embedded, standard, full | test_profile_surface |
+| opc_cu_3922 | conformance_unit | claimed |  | — | micro, embedded, standard, full | test_profile_surface |
+| opc_cu_3996 | conformance_unit | claimed |  | — | full | test_profile_surface |
+| opc_cu_4052 | conformance_unit | claimed |  | — | full | test_profile_surface |
+| opc_cu_4054 | conformance_unit | claimed |  | — | full | test_profile_surface |
+| opc_cu_4055 | conformance_unit | claimed |  | — | micro, embedded, standard, full | test_profile_surface |
+| opc_cu_4426 | conformance_unit | claimed |  | — | embedded, standard, full | test_profile_surface |
 | opc_cu_5207 | conformance_unit | documented |  | — | micro, embedded, standard, full | — |
 | opc_cu_5208 | conformance_unit | documented |  | — | micro, embedded, standard, full | — |
 | opc_cu_5801 | conformance_unit | claimed |  | MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION | embedded, standard, full | test_claim_map |
-| opc_cu_5868 | conformance_unit | documented |  | — | full | — |
+| opc_cu_5868 | conformance_unit | claimed |  | — | full | test_profile_surface |
 | opc_cu_subscription_basic | conformance_unit | claimed | OPC-10000-4 §5.12/5.13 Core 2022 Server Facet | MUC_OPCUA_CU_SUBSCRIPTION_BASIC | micro, embedded, standard, full | test_subscriptions, test_subscriptions_errors |
 | opc_cu_subscription_standard | conformance_unit | claimed | OPC-10000-7 Core 2022 Server Facet | MUC_OPCUA_CU_SUBSCRIPTION_STANDARD | embedded, standard, full | test_subscriptions_capacity, test_subscription_deadband, test_subscription_publish |
 | opc_cu_security_ecc | conformance_unit | claimed | OPC-10000-7 Core 2022 Server Facet | MUC_OPCUA_CU_SECURITY_ECC | full | test_ecc_crypto |
@@ -283,7 +283,7 @@ remains future work.
 | opc_cu_3080 | conformance_unit | claimed |  | OPC_CU_3080 | all | test_certificate_validity, test_server_config |
 | opc_cu_3201 | conformance_unit | documented |  | — | full | — |
 | opc_cu_5592 | conformance_unit | claimed |  | MUC_OPCUA_CU_BASE_INFO_ENGINEERING_UNITS | full | test_profile_surface |
-| opc_cu_5814 | conformance_unit | documented |  | — | full | — |
+| opc_cu_5814 | conformance_unit | claimed |  | — | full | test_profile_surface |
 | opc_cu_key_credential_service | conformance_unit | claimed | OPC-10000-12 §8.5-8.6 | MUC_OPCUA_CU_KEY_CREDENTIAL_SERVICE | full | test_key_credential |
 | opc_cu_user_role_management | conformance_unit | claimed | OPC-10000-12 §9.5-9.6 | MUC_OPCUA_CU_USER_ROLE_MANAGEMENT | full | test_role_management |
 | opc_cu_certificate_management | conformance_unit | claimed | OPC-10000-12 §7.5-7.6 | MUC_OPCUA_CU_CERTIFICATE_MANAGEMENT | full | test_certificate_management |
@@ -316,25 +316,25 @@ remains future work.
 | opc_cu_3568 | conformance_unit | documented |  | — | full | — |
 | opc_cu_3569 | conformance_unit | documented |  | — | full | — |
 | opc_cu_3786 | conformance_unit | documented |  | — | full | — |
-| opc_cu_2489 | conformance_unit | documented |  | — | full | — |
-| opc_cu_2649 | conformance_unit | documented |  | — | full | — |
-| opc_cu_2747 | conformance_unit | documented |  | — | full | — |
-| opc_cu_2813 | conformance_unit | documented |  | — | full | — |
-| opc_cu_2814 | conformance_unit | documented |  | — | full | — |
-| opc_cu_2822 | conformance_unit | documented |  | — | full | — |
-| opc_cu_2978 | conformance_unit | documented |  | — | full | — |
-| opc_cu_3199 | conformance_unit | documented |  | — | full | — |
-| opc_cu_3206 | conformance_unit | documented |  | — | full | — |
-| opc_cu_3210 | conformance_unit | documented |  | — | full | — |
-| opc_cu_3211 | conformance_unit | documented |  | — | full | — |
-| opc_cu_3546 | conformance_unit | documented |  | — | full | — |
-| opc_cu_3549 | conformance_unit | documented |  | — | full | — |
-| opc_cu_3810 | conformance_unit | documented |  | — | full | — |
-| opc_cu_3811 | conformance_unit | documented |  | — | full | — |
-| opc_cu_3812 | conformance_unit | documented |  | — | full | — |
-| opc_cu_3813 | conformance_unit | documented |  | — | full | — |
-| opc_cu_4427 | conformance_unit | documented |  | — | full | — |
-| opc_cu_5578 | conformance_unit | documented |  | — | full | — |
+| opc_cu_2489 | conformance_unit | claimed |  | — | full | test_profile_surface |
+| opc_cu_2649 | conformance_unit | claimed |  | — | full | test_profile_surface |
+| opc_cu_2747 | conformance_unit | claimed |  | — | full | test_profile_surface |
+| opc_cu_2813 | conformance_unit | claimed |  | — | full | test_profile_surface |
+| opc_cu_2814 | conformance_unit | claimed |  | — | full | test_profile_surface |
+| opc_cu_2822 | conformance_unit | claimed |  | — | full | test_profile_surface |
+| opc_cu_2978 | conformance_unit | claimed |  | — | full | test_profile_surface |
+| opc_cu_3199 | conformance_unit | claimed |  | — | full | test_profile_surface |
+| opc_cu_3206 | conformance_unit | claimed |  | — | full | test_profile_surface |
+| opc_cu_3210 | conformance_unit | claimed |  | — | full | test_profile_surface |
+| opc_cu_3211 | conformance_unit | claimed |  | — | full | test_profile_surface |
+| opc_cu_3546 | conformance_unit | claimed |  | — | full | test_profile_surface |
+| opc_cu_3549 | conformance_unit | claimed |  | — | full | test_profile_surface |
+| opc_cu_3810 | conformance_unit | claimed |  | — | full | test_profile_surface |
+| opc_cu_3811 | conformance_unit | claimed |  | — | full | test_profile_surface |
+| opc_cu_3812 | conformance_unit | claimed |  | — | full | test_profile_surface |
+| opc_cu_3813 | conformance_unit | claimed |  | — | full | test_profile_surface |
+| opc_cu_4427 | conformance_unit | claimed |  | — | full | test_profile_surface |
+| opc_cu_5578 | conformance_unit | claimed |  | — | full | test_profile_surface |
 | opc_cu_2375 | conformance_unit | documented | OPC-10000-13 §5.4.3.5 | — | full | — |
 | opc_cu_2958 | conformance_unit | documented | OPC-10000-13 §5.4.3.21 | — | full | — |
 | opc_cu_2256 | conformance_unit | documented | OPC-10000-13 §5.4.3.27 | — | full | — |

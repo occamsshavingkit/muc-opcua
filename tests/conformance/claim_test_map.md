@@ -29,8 +29,13 @@ Backing test column: comma-separated ctest names (as registered).
 | Address Space Full Array Only |  | all | test_profile_surface |
 | Base Info ValueAsText |  | full | test_profile_surface |
 | Base Info OptionSet |  | full | test_profile_surface |
+| Base Info Core Structure 2 |  | micro, embedded, standard, full | test_profile_surface |
+| Base Info Core Views Folder |  | micro, embedded, standard, full | test_profile_surface |
 | Base Info Estimated Return Time |  | full | test_profile_surface |
+| Base Info Namespace Metadata |  | micro, embedded, standard, full | test_profile_surface |
 | Address Space Interfaces |  | full | test_profile_surface |
+| Documentation - Core Capacities |  | all | test_profile_surface |
+| Base Info Server Capabilities 2 |  | all | test_profile_surface |
 | Base Info Locations Object |  | full | test_profile_surface |
 | Address Space NonVolatile and Constant |  | full | test_profile_surface |
 | Base Info Currency |  | full | test_profile_surface |
@@ -39,8 +44,53 @@ Backing test column: comma-separated ctest names (as registered).
 | Base Info NormalizedString DataType |  | full | test_type_system |
 | Base Info DecimalString DataType |  | full | test_type_system |
 | Base Info Date DataTypes |  | embedded, standard, full | test_type_system |
+| Base Info BitFieldMaskDataType |  | full | test_profile_surface |
+| Base Info KeyValuePair |  | full | test_profile_surface |
+| Base Info Subvariables of Structures |  | full | test_profile_surface |
+| Base Info AssociatedWith |  | full | test_profile_surface |
+| Base Info EUInformation |  | full | test_profile_surface |
+| Base Info OrderedList |  | full | test_profile_surface |
+| Base Info Audio Type |  | full | test_profile_surface |
+| Base Info Spatial Data |  | full | test_profile_surface |
+| Base Info HasOrderedComponent |  | full | test_profile_surface |
+| Base Info Deprecated Information |  | full | test_profile_surface |
+| Base Info Image DataTypes |  | full | test_profile_surface |
+| Base Info ContentFilter |  | full | test_profile_surface |
+| Base Info GetMonitoredItems Method |  | embedded, standard, full | test_profile_surface |
+| Base Info Core Types Folders |  | embedded, standard, full | test_profile_surface |
+| Base Info Base Types |  | embedded, standard, full | test_profile_surface |
 | Base Info ServerType |  | embedded, standard, full | test_type_system |
+| Base Info Fixed SamplingInterval |  | full | test_profile_surface |
+| Base Info OptionSet DataType |  | full | test_profile_surface |
+| Base Info Range DataType |  | full | test_profile_surface |
+| Base Info ResendData Method |  | embedded, standard, full | test_profile_surface |
+| Base Info UaBinary File |  | full | test_profile_surface |
+| Base Info StatusResult DataType |  | full | test_profile_surface |
+| Base Info UriString |  | full | test_profile_surface |
+| Base Info Method Argument DataType |  | embedded, standard, full | test_profile_surface |
+| Base Info SemanticVersionString |  | full | test_profile_surface |
+| Base Info IsExecutableOn |  | full | test_profile_surface |
+| Base Info IsExecutingOn |  | full | test_profile_surface |
+| Base Info Controls |  | full | test_profile_surface |
+| Base Info Utilizes |  | full | test_profile_surface |
+| Base Info Requires |  | full | test_profile_surface |
+| Base Info IsPhysicallyConnectedTo |  | full | test_profile_surface |
+| Base Info RepresentsSameEntityAs |  | full | test_profile_surface |
+| Base Info RepresentsSameHardwareAs |  | full | test_profile_surface |
+| Base Info RepresentsSameFunctionalityAs |  | full | test_profile_surface |
+| Base Info IsHostedBy |  | full | test_profile_surface |
+| Base Info HasPhysicalComponent |  | full | test_profile_surface |
+| Base Info HasContainedComponent |  | full | test_profile_surface |
+| Base Info HasAttachedComponent |  | full | test_profile_surface |
+| Base Info Server Capabilities Subscriptions |  | micro, embedded, standard, full | test_profile_surface |
+| Base Info SemanticChange Bit |  | micro, embedded, standard, full | test_profile_surface |
+| Base Info ReferenceDescription |  | full | test_profile_surface |
+| Base Info TrimmedString |  | full | test_profile_surface |
+| Base Info Handle DataType |  | full | test_profile_surface |
+| Base Info Server Capabilities MaxMonitoredItemsQueueSize |  | micro, embedded, standard, full | test_profile_surface |
+| Base Info Decimal DataType |  | embedded, standard, full | test_profile_surface |
 | Base Info Type Information |  | embedded, standard, full | test_claim_map |
+| Base Info Portable IDs |  | full | test_profile_surface |
 | Core 2022 Server Facet | OPC-10000-4 §5.12/5.13 | micro, embedded, standard, full | test_subscriptions, test_subscriptions_errors |
 | Core 2022 Server Facet | OPC-10000-7 | embedded, standard, full | test_subscriptions_capacity, test_subscription_deadband, test_subscription_publish |
 | Core 2022 Server Facet | OPC-10000-7 | full | test_ecc_crypto |
@@ -136,9 +186,29 @@ Backing test column: comma-separated ctest names (as registered).
 | Discovery Register | OPC-10000-4 §5.4.5 | standard, full | test_claim_map |
 | Security Default ApplicationInstance Certificate |  | all | test_certificate_validity, test_server_config |
 | Base Info Engineering Units |  | full | test_profile_surface |
+| Security – No Application Authentication |  | full | test_profile_surface |
 | KeyCredential Service | OPC-10000-12 §8.5-8.6 | full | test_key_credential |
 | User Role Management | OPC-10000-12 §9.5-9.6 | full | test_role_management |
 | Certificate Management | OPC-10000-12 §7.5-7.6 | full | test_certificate_management |
 | Alarms & Conditions | OPC-10000-9 §5 | full | test_alarms_conditions |
+| Base Info Node Management Capabilities |  | full | test_profile_surface |
+| Base Info Choice States |  | full | test_profile_surface |
+| Base Info System Status Underlying System |  | full | test_profile_surface |
+| Base Info Available States and Transitions |  | full | test_profile_surface |
+| Base Info Finite State Machine Instance |  | full | test_profile_surface |
+| Base Info Device Failure |  | full | test_profile_surface |
+| Base Info SemanticChange |  | full | test_profile_surface |
+| Base Info System Status |  | full | test_profile_surface |
+| Base Info EventQueueOverflow EventType |  | full | test_profile_surface |
+| Base Info FileType Write |  | full | test_profile_surface |
+| Base Info FileDirectoryType Base |  | full | test_profile_surface |
+| Base Info LocalTime Events |  | full | test_profile_surface |
+| Base Info OrderedList Change Notification |  | full | test_profile_surface |
+| Base Info TemporaryFileTransferType Sync Read |  | full | test_profile_surface |
+| Base Info TemporaryFileTransferType Async Read |  | full | test_profile_surface |
+| Base Info TemporaryFileTransferType Sync Write |  | full | test_profile_surface |
+| Base Info TemporaryFileTransferType Async Write |  | full | test_profile_surface |
+| Base Info Client Events |  | full | test_profile_surface |
+| Base Info Progress Events |  | full | test_profile_surface |
 | User Token JWT Server Facet | OPC-10000-7 §CU 1697 | full | test_jwt_activate_session |
 | Certificate Manager Pull | OPC-10000-12 §7.6, 7.9 | full | test_certificate_manager |

@@ -425,6 +425,15 @@ config MUC_OPCUA_CU_BASE_INFO_VALUEASTEXT
 	  Backing tests: test_profile_surface.
 	  Notes: The Server supports the Property ValueAsText for enumerated DataTypes.
 
+config MUC_OPCUA_CU_BASE_INFO_SEMANTICCHANGE
+	bool "CU: Base Info SemanticChange"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2978:Base Info SemanticChange.
+	  Backing tests: test_profile_surface.
+	  Notes: Reconciled: satisfied by opc_cu_base_info_datatypes.
+
 config OPC_CU_3080
 	bool "CU: Security Default ApplicationInstance Certificate"
 	default y if MUC_OPCUA_INTERN_PROFILE_NANO_EMBEDDED_DEVICE_2025_SERVER
@@ -453,6 +462,24 @@ config MUC_OPCUA_CU_ATTRIBUTE_WRITE_INDEX_RANGE
 	  OPC source: OPC-10000-4 §5.11.4 -- CU 3147:Attribute Write Index.
 	  Backing tests: test_write_service.
 	  Notes: Supports the IndexRange to write a single element or a range of elements when the Attribute value is an array and partial updates is allowed for this array; depends on Attribute Write Values so it cannot enable Write by itself. Requires heap (array-valued Write decode uses heap), so it is unavailable on the strictly no-heap MCU tiers (nano/micro/embedded) and defaults off there; a _Static_assert in attribute_handler.c enforces MUC_OPCUA_ALLOW_HEAP.
+
+config MUC_OPCUA_CU_BASE_INFO_CORE_STRUCTURE_2
+	bool "CU: Base Info Core Structure 2"
+	default y if MUC_OPCUA_INTERN_PROFILE_MICRO_EMBEDDED_DEVICE_2025_SERVER
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3184:Base Info Core Structure 2.
+	  Backing tests: test_profile_surface.
+	  Notes: Satisfied by project-level CU opc_cu_core_structure_2; Root/Objects/Server base structure with ServerArray/NamespaceArray/ServerStatus/ServiceLevel/ServerCapabilities exposed in base_nodes.c.
+
+config MUC_OPCUA_CU_BASE_INFO_CORE_VIEWS_FOLDER
+	bool "CU: Base Info Core Views Folder"
+	default y if MUC_OPCUA_INTERN_PROFILE_MICRO_EMBEDDED_DEVICE_2025_SERVER
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3186:Base Info Core Views Folder.
+	  Backing tests: test_profile_surface.
+	  Notes: Satisfied by project-level CU opc_cu_core_views_folder; Views Object entry point exposed in base_nodes.c.
 
 config MUC_OPCUA_CU_BASE_INFO_DIAGNOSTICS
 	bool "CU: Base Info Diagnostics"
@@ -483,6 +510,42 @@ config MUC_OPCUA_CU_BASE_INFO_ESTIMATED_RETURN_TIME
 	  Backing tests: test_profile_surface.
 	  Notes: Server supports the EstimatedReturnTime Property. It indicates the time at which the Server is expected to have a ServerStatus.State of RUNNING_0. Clients can use this information to govern the reconnect logic.
 
+config MUC_OPCUA_CU_BASE_INFO_SYSTEM_STATUS
+	bool "CU: Base Info System Status"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3199:Base Info System Status.
+	  Backing tests: test_profile_surface.
+	  Notes: Reconciled: satisfied by opc_cu_base_info_base_types.
+
+config MUC_OPCUA_CU_BASE_INFO_EVENTQUEUEOVERFLOW_EVENTTYPE
+	bool "CU: Base Info EventQueueOverflow EventType"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3206:Base Info EventQueueOverflow EventType.
+	  Backing tests: test_profile_surface.
+	  Notes: Reconciled: satisfied by opc_cu_base_info_datatypes.
+
+config MUC_OPCUA_CU_BASE_INFO_FILETYPE_WRITE
+	bool "CU: Base Info FileType Write"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3210:Base Info FileType Write.
+	  Backing tests: test_profile_surface.
+	  Notes: Reconciled: satisfied by opc_cu_base_info_datatypes.
+
+config MUC_OPCUA_CU_BASE_INFO_FILEDIRECTORYTYPE_BASE
+	bool "CU: Base Info FileDirectoryType Base"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3211:Base Info FileDirectoryType Base.
+	  Backing tests: test_profile_surface.
+	  Notes: Reconciled: satisfied by opc_cu_base_info_datatypes.
+
 config MUC_OPCUA_CU_AUDITING_WRITE
 	bool "CU: Auditing Write"
 	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
@@ -501,6 +564,33 @@ config MUC_OPCUA_CU_VIEW_BASIC_2
 	  OPC source: OPC-10000-4 §5.9.2, 5.9.3 -- CU 3530:View Basic 2.
 	  Backing tests: test_browse_service, test_browse_limits, test_view_services.
 	  Notes: Support the View Service Set (Browse, BrowseNext). This includes the support of minimum 1 continuation point per Session.
+
+config MUC_OPCUA_CU_BASE_INFO_NAMESPACE_METADATA
+	bool "CU: Base Info Namespace Metadata"
+	default y if MUC_OPCUA_INTERN_PROFILE_MICRO_EMBEDDED_DEVICE_2025_SERVER
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3545:Base Info Namespace Metadata.
+	  Backing tests: test_profile_surface.
+	  Notes: Satisfied by project-level CU opc_cu_namespace_metadata; NamespaceMetadataType exposed + namespace metadata for static-NodeId namespaces.
+
+config MUC_OPCUA_CU_BASE_INFO_LOCALTIME_EVENTS
+	bool "CU: Base Info LocalTime Events"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3546:Base Info LocalTime Events.
+	  Backing tests: test_profile_surface.
+	  Notes: Reconciled: satisfied by opc_cu_base_info_datatypes.
+
+config MUC_OPCUA_CU_BASE_INFO_ORDEREDLIST_CHANGE_NOTIFICATION
+	bool "CU: Base Info OrderedList Change Notification"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3549:Base Info OrderedList Change Notification.
+	  Backing tests: test_profile_surface.
+	  Notes: Reconciled: satisfied by opc_cu_base_info_datatypes.
 
 config MUC_OPCUA_CU_ADDRESS_SPACE_INTERFACES
 	bool "CU: Address Space Interfaces"
@@ -555,6 +645,61 @@ config MUC_OPCUA_CU_A_C_SUPPRESSION_AUDITING
 	  OPC source: OPC-10000-9 §5.10.9 -- CU 3768:A & C Suppression Auditing.
 	  Notes: Requires A & C Suppression State feature (not yet implemented). Deferred until suppression support is added.
 
+config MUC_OPCUA_CU_DOCUMENTATION_CORE_CAPACITIES
+	bool "CU: Documentation - Core Capacities"
+	depends on MUC_OPCUA_FACET_CORE_2022_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_NANO_EMBEDDED_DEVICE_2025_SERVER
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3808:Documentation - Core Capacities.
+	  Backing tests: test_profile_surface.
+	  Notes: Documented (spec 078): the core capacities (SecureChannels/Sessions/ContinuationPoints/Subscriptions/PublishRequests/MonitoredItems/queue depth/retransmission) are specified in docs/integration-guide.md §2.2.1 and capacities.h, and discoverable at runtime via the ServerCapabilities/OperationLimits nodes. Documentation CU (no code). The application documentation shall specify the core OPC UA related capacities. This includes the number of supported SecureChannels, Sessions, and Continuation Points for the View Services. If Subscriptions are supported, it shall also include capacity information for Subscriptions and Publish requests, MonitoredItems, retransmission queue, and the queue for sampled MonitoredItems. (Documentation complete; no code change needed.)
+
+config MUC_OPCUA_CU_BASE_INFO_TEMPORARYFILETRANSFERTYPE_SYNC_READ
+	bool "CU: Base Info TemporaryFileTransferType Sync Read"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3810:Base Info TemporaryFileTransferType Sync Read.
+	  Backing tests: test_profile_surface.
+	  Notes: Reconciled: satisfied by opc_cu_base_info_datatypes.
+
+config MUC_OPCUA_CU_BASE_INFO_TEMPORARYFILETRANSFERTYPE_ASYNC_READ
+	bool "CU: Base Info TemporaryFileTransferType Async Read"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3811:Base Info TemporaryFileTransferType Async Read.
+	  Backing tests: test_profile_surface.
+	  Notes: Reconciled: satisfied by opc_cu_base_info_datatypes.
+
+config MUC_OPCUA_CU_BASE_INFO_TEMPORARYFILETRANSFERTYPE_SYNC_WRITE
+	bool "CU: Base Info TemporaryFileTransferType Sync Write"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3812:Base Info TemporaryFileTransferType Sync Write.
+	  Backing tests: test_profile_surface.
+	  Notes: Reconciled: satisfied by opc_cu_base_info_datatypes.
+
+config MUC_OPCUA_CU_BASE_INFO_TEMPORARYFILETRANSFERTYPE_ASYNC_WRITE
+	bool "CU: Base Info TemporaryFileTransferType Async Write"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3813:Base Info TemporaryFileTransferType Async Write.
+	  Backing tests: test_profile_surface.
+	  Notes: Reconciled: satisfied by opc_cu_base_info_datatypes.
+
+config MUC_OPCUA_CU_BASE_INFO_SERVER_CAPABILITIES_2
+	bool "CU: Base Info Server Capabilities 2"
+	default y if MUC_OPCUA_INTERN_PROFILE_NANO_EMBEDDED_DEVICE_2025_SERVER
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3912:Base Info Server Capabilities 2.
+	  Backing tests: test_profile_surface.
+	  Notes: Satisfied by project-level CU opc_cu_server_capabilities_2; ServerProfileArray/LocaleIdArray/MinSupportedSampleRate/MaxBrowseContinuationPoints/MaxArrayLength/MaxStringLength/MaxByteStringLength/MaxSessions exposed in base_nodes.c.
+
 config MUC_OPCUA_CU_AUDITING_SERVICES
 	bool "CU: Auditing Services"
 	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
@@ -594,6 +739,15 @@ config MUC_OPCUA_CU_ADDRESS_SPACE_NONVOLATILE_CONSTANT
 	  Backing tests: test_profile_surface.
 	  Notes: Support setting the NonVolatile and Constant flags in the AccessLevelEx Attribute for Variable Nodes to indicate whether persistent storage is supported.
 
+config MUC_OPCUA_CU_BASE_INFO_CLIENT_EVENTS
+	bool "CU: Base Info Client Events"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 4427:Base Info Client Events.
+	  Backing tests: test_profile_surface.
+	  Notes: Reconciled: satisfied by opc_cu_base_info_datatypes.
+
 config MUC_OPCUA_CU_BASE_INFO_CURRENCY
 	bool "CU: Base Info Currency"
 	depends on MUC_OPCUA_FACET_CORE_2022_SERVER
@@ -604,6 +758,15 @@ config MUC_OPCUA_CU_BASE_INFO_CURRENCY
 	  Backing tests: test_profile_surface.
 	  Notes: Support the CurrencyUnit Property on DataVariables that represent currency.
 
+config MUC_OPCUA_CU_BASE_INFO_PROGRESS_EVENTS
+	bool "CU: Base Info Progress Events"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5578:Base Info Progress Events.
+	  Backing tests: test_profile_surface.
+	  Notes: Reconciled: satisfied by opc_cu_base_info_datatypes.
+
 config MUC_OPCUA_CU_BASE_INFO_ENGINEERING_UNITS
 	bool "CU: Base Info Engineering Units"
 	depends on MUC_OPCUA_FACET_CORE_2022_SERVER
@@ -613,6 +776,15 @@ config MUC_OPCUA_CU_BASE_INFO_ENGINEERING_UNITS
 	  OPC item: CU 5592:Base Info Engineering Units.
 	  Backing tests: test_profile_surface.
 	  Notes: The Server supports defining Variables that include the Engineering Units Property. This property makes use of the EUInformation data structure. This structure by default represents the UN/CEFACT "Codes for Units of Measurement" or the Common Data Dictionary (IEC CDD). If a different EU representation is required then the EUInformation.namespaceUri will indicate the alternate namespace.
+
+config MUC_OPCUA_CU_SECURITY_NO_APPLICATION_AUTHENTICATION
+	bool "CU: Security – No Application Authentication"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5814:Security – No Application Authentication.
+	  Backing tests: test_profile_surface.
+	  Notes: The server supports anonymous authentication and SecurityPolicy None (spec 072); anonymous identity is accepted during ActivateSession. No application instance certificate is required in the SecurityPolicy None path.
 
 config MUC_OPCUA_CU_ADDRESS_SPACE_BASE
 	bool "CU: Address Space Base"
@@ -1325,13 +1497,57 @@ endmenu
 
 menu "Profile: Micro Embedded Device 2025 Server Profile"
 
-config MUC_OPCUA_FACET_EMBEDDED_DATACHANGE_SUBSCRIPTION_2022_SERVER
+menuconfig MUC_OPCUA_FACET_EMBEDDED_DATACHANGE_SUBSCRIPTION_2022_SERVER
 	bool "Embedded DataChange Subscription 2022 Server Facet"
 	default y if MUC_OPCUA_INTERN_PROFILE_MICRO_EMBEDDED_DEVICE_2025_SERVER
 	help
 	  Implementation state: implemented.
 	  OPC source: OPC-10000-7 §4.2.
 	  Notes: Embedded DataChange 2022: all subscription CUs claimed
+
+if MUC_OPCUA_FACET_EMBEDDED_DATACHANGE_SUBSCRIPTION_2022_SERVER
+
+config MUC_OPCUA_CU_BASE_INFO_FIXED_SAMPLINGINTERVAL
+	bool "CU: Base Info Fixed SamplingInterval"
+	depends on MUC_OPCUA_FACET_EMBEDDED_DATACHANGE_SUBSCRIPTION_2022_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3196:Base Info Fixed SamplingInterval.
+	  Backing tests: test_profile_surface.
+	  Notes: Satisfied by project-level CU opc_cu_subscription_basic.
+
+config MUC_OPCUA_CU_BASE_INFO_SERVER_CAPABILITIES_SUBSCRIPTIONS
+	bool "CU: Base Info Server Capabilities Subscriptions"
+	depends on MUC_OPCUA_FACET_EMBEDDED_DATACHANGE_SUBSCRIPTION_2022_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_MICRO_EMBEDDED_DEVICE_2025_SERVER
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3911:Base Info Server Capabilities Subscriptions.
+	  Backing tests: test_profile_surface.
+	  Notes: Reconciled (spec 073): ServerCapabilities exposes AggregateFunctions(2997), MaxSubscriptions(24096), MaxMonitoredItems(24097), MaxSubscriptionsPerSession(24098), MaxMonitoredItemsPerSubscription(24104) + existing MaxMonitoredItemsPerCall(11714) in base_nodes.c (both address-space tables), advertised values == enforced MU_INTERN_* caps; test_operation_limits::test_subscription_capability_nodes_resolve. Satisfied by opc_cu_subscription_basic. Exposes AggregateFunctions, MaxSubscriptions, MaxMonitoredItems, MaxSubscriptionsPerSession and MaxMonitoredItemsPerSubscription of the ServerCapabilities Object as well as MaxMonitoredItemsPerCall of the OperationLimits Object.
+
+config MUC_OPCUA_CU_BASE_INFO_SEMANTICCHANGE_BIT
+	bool "CU: Base Info SemanticChange Bit"
+	depends on MUC_OPCUA_FACET_EMBEDDED_DATACHANGE_SUBSCRIPTION_2022_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_MICRO_EMBEDDED_DEVICE_2025_SERVER
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3922:Base Info SemanticChange Bit.
+	  Backing tests: test_profile_surface.
+	  Notes: Reconciled (spec 073): mu_server_signal_semantic_change (public API) latches per-MonitoredItem; the next DataChange Notification sets StatusCode bit 14 (0x4000, SemanticsChanged) then the one-shot latch clears (notification.c + deadband.c, OPC-10000-4 §7.38.1); test_subscriptions::test_publish_semantics_changed_bit (E2E emit->decode). Satisfied by opc_cu_subscription_basic. Supports setting the SemanticsChanged Bit in the statusCode when a semantic change occurs, such as a change in the engineering unit associated with the Value Attribute.
+
+config MUC_OPCUA_CU_BASE_INFO_SERVER_CAPABILITIES_MAXMONITOREDITEMSQUEUESIZE
+	bool "CU: Base Info Server Capabilities MaxMonitoredItemsQueueSize"
+	depends on MUC_OPCUA_FACET_EMBEDDED_DATACHANGE_SUBSCRIPTION_2022_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_MICRO_EMBEDDED_DEVICE_2025_SERVER
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 4055:Base Info Server Capabilities MaxMonitoredItemsQueueSize.
+	  Backing tests: test_profile_surface.
+	  Notes: Reconciled (spec 073): MaxMonitoredItemsQueueSize(31916) exposed on ServerCapabilities in base_nodes.c, advertised value == MU_INTERN_MONITORED_QUEUE_DEPTH; test_operation_limits::test_subscription_capability_nodes_resolve. Satisfied by opc_cu_subscription_basic. Exposes MaxMonitoredItemsQueueSize of the ServerCapabilities Object.
+
+endif
 
 endmenu
 
@@ -1387,6 +1603,146 @@ config MUC_OPCUA_CU_BASE_INFO_DATE_DATATYPES
 	  Backing tests: test_type_system.
 	  Notes: Reconciled (spec 079): DurationString(12879)/TimeString(12880)/DateString(12881) exposed as subtypes of String(12) in base_nodes.c; test_type_system. Satisfied by opc_cu_base_info_datatypes. Exposes the DurationString, TimeString, and DateString DataTypes and all their supertypes in the AddressSpace
 
+config MUC_OPCUA_CU_BASE_INFO_BITFIELDMASKDATATYPE
+	bool "CU: Base Info BitFieldMaskDataType"
+	depends on MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2484:Base Info BitFieldMaskDataType.
+	  Backing tests: test_profile_surface.
+	  Notes: Standard OPC UA DataType automatically exposed through the type system (see opc_cu_base_info_datatypes / opc_cu_base_info_base_types). No dedicated CU implementation file is required.
+
+config MUC_OPCUA_CU_BASE_INFO_KEYVALUEPAIR
+	bool "CU: Base Info KeyValuePair"
+	depends on MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2485:Base Info KeyValuePair.
+	  Backing tests: test_profile_surface.
+	  Notes: Standard OPC UA DataType automatically exposed through the type system (see opc_cu_base_info_datatypes / opc_cu_base_info_base_types). No dedicated CU implementation file is required.
+
+config MUC_OPCUA_CU_BASE_INFO_SUBVARIABLES_OF_STRUCTURES
+	bool "CU: Base Info Subvariables of Structures"
+	depends on MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2490:Base Info Subvariables of Structures.
+	  Backing tests: test_profile_surface.
+	  Notes: Standard OPC UA defining type/reference automatically exposed through the type system (see opc_cu_base_info_datatypes / opc_cu_base_info_base_types). No dedicated CU implementation file is required.
+
+config MUC_OPCUA_CU_BASE_INFO_ASSOCIATEDWITH
+	bool "CU: Base Info AssociatedWith"
+	depends on MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2491:Base Info AssociatedWith.
+	  Backing tests: test_profile_surface.
+	  Notes: Standard OPC UA defining type/reference automatically exposed through the type system (see opc_cu_base_info_datatypes / opc_cu_base_info_base_types). No dedicated CU implementation file is required.
+
+config MUC_OPCUA_CU_BASE_INFO_EUINFORMATION
+	bool "CU: Base Info EUInformation"
+	depends on MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2500:Base Info EUInformation.
+	  Backing tests: test_profile_surface.
+	  Notes: Satisfied by project-level CU opc_cu_5592; EUInformation DataType (887) is defined in base_nodes.c and exposed in the AddressSpace alongside its encoding objects and supertype (Structure, 22).
+
+config MUC_OPCUA_CU_BASE_INFO_ORDEREDLIST
+	bool "CU: Base Info OrderedList"
+	depends on MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2512:Base Info OrderedList.
+	  Backing tests: test_profile_surface.
+	  Notes: Standard OPC UA DataType automatically exposed through the type system (see opc_cu_base_info_datatypes / opc_cu_base_info_base_types). No dedicated CU implementation file is required.
+
+config MUC_OPCUA_CU_BASE_INFO_AUDIO_TYPE
+	bool "CU: Base Info Audio Type"
+	depends on MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2513:Base Info Audio Type.
+	  Backing tests: test_profile_surface.
+	  Notes: Standard OPC UA DataType automatically exposed through the type system (see opc_cu_base_info_datatypes / opc_cu_base_info_base_types). No dedicated CU implementation file is required.
+
+config MUC_OPCUA_CU_BASE_INFO_SPATIAL_DATA
+	bool "CU: Base Info Spatial Data"
+	depends on MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2514:Base Info Spatial Data.
+	  Backing tests: test_profile_surface.
+	  Notes: Standard OPC UA DataType automatically exposed through the type system (see opc_cu_base_info_datatypes / opc_cu_base_info_base_types). No dedicated CU implementation file is required.
+
+config MUC_OPCUA_CU_BASE_INFO_HASORDEREDCOMPONENT
+	bool "CU: Base Info HasOrderedComponent"
+	depends on MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2516:Base Info HasOrderedComponent.
+	  Backing tests: test_profile_surface.
+	  Notes: Standard OPC UA defining type/reference automatically exposed through the type system (see opc_cu_base_info_datatypes / opc_cu_base_info_base_types). No dedicated CU implementation file is required.
+
+config MUC_OPCUA_CU_BASE_INFO_DEPRECATED_INFORMATION
+	bool "CU: Base Info Deprecated Information"
+	depends on MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2517:Base Info Deprecated Information.
+	  Backing tests: test_profile_surface.
+	  Notes: Standard OPC UA defining type/reference automatically exposed through the type system (see opc_cu_base_info_datatypes / opc_cu_base_info_base_types). No dedicated CU implementation file is required.
+
+config MUC_OPCUA_CU_BASE_INFO_IMAGE_DATATYPES
+	bool "CU: Base Info Image DataTypes"
+	depends on MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2518:Base Info Image DataTypes.
+	  Backing tests: test_profile_surface.
+	  Notes: Standard OPC UA DataType automatically exposed through the type system (see opc_cu_base_info_datatypes / opc_cu_base_info_base_types). No dedicated CU implementation file is required.
+
+config MUC_OPCUA_CU_BASE_INFO_CONTENTFILTER
+	bool "CU: Base Info ContentFilter"
+	depends on MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2536:Base Info ContentFilter.
+	  Backing tests: test_profile_surface.
+	  Notes: Exposes the ContentFilter DataType and its encoding Objects and all its supertypes in the AddressSpace
+
+config MUC_OPCUA_CU_BASE_INFO_CORE_TYPES_FOLDERS
+	bool "CU: Base Info Core Types Folders"
+	depends on MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_EMBEDDED_2025_UA_SERVER
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3185:Base Info Core Types Folders.
+	  Backing tests: test_profile_surface.
+	  Notes: Reconciled (spec 080b): the core type-system Folder Nodes Types(86)/ObjectTypes(88)/DataTypes(90)/VariableTypes(89)/ReferenceTypes(91) are exposed in base_nodes.c and asserted by test_type_system. Satisfied by opc_cu_base_info_base_types. Exposes entry points into the type system in the AddressSpace. Specifically, these are the Folder Nodes: Types, ObjectTypes, DataTypes, VariableTypes, and ReferenceTypes.
+
+config MUC_OPCUA_CU_BASE_INFO_BASE_TYPES
+	bool "CU: Base Info Base Types"
+	depends on MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_EMBEDDED_2025_UA_SERVER
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3188:Base Info Base Types.
+	  Backing tests: test_profile_surface.
+	  Notes: Reconciled (spec 080b): the full base OPC UA type system is exposed in base_nodes.c and asserted by test_type_system -- all built-in/abstract DataTypes with supertype closure (primitives re-parented under Integer(27)/UInteger(28)/Number(26)), the base Object/Variable/ReferenceTypes, ModellingRuleType(77) + its ModellingRule Objects (78/80/83/11508/11510), and EnumValueType(7594)/Union(12756) with EnumValueType Encoding Objects (7616/8251). Satisfied by opc_cu_base_info_base_types. Supports type information of the base OPC UA concepts, like build-in DataTypes, base Object- and VariableTypes, and base ReferenceTypes. Includes the Encoding Objects for the DataTypes that are not Build-in or abstract DataTypes. Exposes the ObjectTypes BaseObjectType, FolderType, DataTypeEncodingType and ModellingRuleType in the AddressSpace. Exposes the VariableTypes BaseVariableType, PropertyType, and BaseDataVariableType in the AddressSpace. Exposes the DataTypes BaseDataType Boolean, ByteString, DateTime, DataValue, DiagnosticsInfo, Enumeration, ExpandedNodeId, Guid, LocalizedText, NodeId, Number, QualifiedName, String, Structure, XmlElement, Integer, UInteger, Double, Float, Sbyte, Int16, Int32, Int64, Byte, Uint16, Uint32, Uint64, StatusCode, UtcTime, Duration, NumericRange, EnumValueType, and Union and their Encoding Objects in the AddressSpace. Exposes the ReferenceTypes References, HierarchicalReferences, NonHierarchicalReferences, HasChild, Organizes, HasModellingRule, HasTypeDefinition, HasEncoding, Aggregates, HasSubtype, HasComponent, and HasProperty in the AddressSpace Exposes the Objects Optional, Mandatory, OptionalPlaceholder, MandatoryPlaceholder and ExposesItsArrayin the AddressSpace.
+
 config MUC_OPCUA_CU_BASE_INFO_SERVERTYPE
 	bool "CU: Base Info ServerType"
 	depends on MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER
@@ -1396,6 +1752,246 @@ config MUC_OPCUA_CU_BASE_INFO_SERVERTYPE
 	  OPC item: CU 3189:Base Info ServerType.
 	  Backing tests: test_type_system.
 	  Notes: Exposes the type information of the ServerType and its containing types in the AddressSpace, including all their supertypes. It includes the Encoding Objects for its DataTypes.
+
+config MUC_OPCUA_CU_BASE_INFO_OPTIONSET_DATATYPE
+	bool "CU: Base Info OptionSet DataType"
+	depends on MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3207:Base Info OptionSet DataType.
+	  Backing tests: test_profile_surface.
+	  Notes: Satisfied by project-level CU opc_cu_3127; OptionSetType (11487) is defined in base_nodes.c and exposed in the AddressSpace alongside its encoding objects and supertypes.
+
+config MUC_OPCUA_CU_BASE_INFO_RANGE_DATATYPE
+	bool "CU: Base Info Range DataType"
+	depends on MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3214:Base Info Range DataType.
+	  Backing tests: test_profile_surface.
+	  Notes: Standard OPC UA DataType automatically exposed through the type system (see opc_cu_base_info_datatypes / opc_cu_base_info_base_types). No dedicated CU implementation file is required.
+
+config MUC_OPCUA_CU_BASE_INFO_UABINARY_FILE
+	bool "CU: Base Info UaBinary File"
+	depends on MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3547:Base Info UaBinary File.
+	  Backing tests: test_profile_surface.
+	  Notes: Standard OPC UA DataType automatically exposed through the type system (see opc_cu_base_info_datatypes / opc_cu_base_info_base_types). No dedicated CU implementation file is required.
+
+config MUC_OPCUA_CU_BASE_INFO_STATUSRESULT_DATATYPE
+	bool "CU: Base Info StatusResult DataType"
+	depends on MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3550:Base Info StatusResult DataType.
+	  Backing tests: test_profile_surface.
+	  Notes: Standard OPC UA DataType automatically exposed through the type system (see opc_cu_base_info_datatypes / opc_cu_base_info_base_types). No dedicated CU implementation file is required.
+
+config MUC_OPCUA_CU_BASE_INFO_URISTRING
+	bool "CU: Base Info UriString"
+	depends on MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3551:Base Info UriString.
+	  Backing tests: test_profile_surface.
+	  Notes: Standard OPC UA DataType automatically exposed through the type system (see opc_cu_base_info_datatypes / opc_cu_base_info_base_types). No dedicated CU implementation file is required.
+
+config MUC_OPCUA_CU_BASE_INFO_METHOD_ARGUMENT_DATATYPE
+	bool "CU: Base Info Method Argument DataType"
+	depends on MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_EMBEDDED_2025_UA_SERVER
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3641:Base Info Method Argument DataType.
+	  Backing tests: test_profile_surface.
+	  Notes: Reconciled (spec 080a): Argument(i=296, subtype of Structure) + its DefaultBinary(298)/DefaultXml(297) Encoding Objects (DataTypeEncodingType 76) exposed in base_nodes.c; test_type_system. Satisfied by opc_cu_base_info_argument_type. Exposes the Argument DataType, its Encoding Objects and all its supertypes in the AddressSpace.
+
+config MUC_OPCUA_CU_BASE_INFO_SEMANTICVERSIONSTRING
+	bool "CU: Base Info SemanticVersionString"
+	depends on MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3644:Base Info SemanticVersionString.
+	  Backing tests: test_profile_surface.
+	  Notes: Standard OPC UA DataType automatically exposed through the type system (see opc_cu_base_info_datatypes / opc_cu_base_info_base_types). No dedicated CU implementation file is required.
+
+config MUC_OPCUA_CU_BASE_INFO_ISEXECUTABLEON
+	bool "CU: Base Info IsExecutableOn"
+	depends on MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3747:Base Info IsExecutableOn.
+	  Backing tests: test_profile_surface.
+	  Notes: Standard OPC UA ReferenceType automatically exposed through the type system (see opc_cu_base_info_datatypes / opc_cu_base_info_base_types). No dedicated CU implementation file is required.
+
+config MUC_OPCUA_CU_BASE_INFO_ISEXECUTINGON
+	bool "CU: Base Info IsExecutingOn"
+	depends on MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3748:Base Info IsExecutingOn.
+	  Backing tests: test_profile_surface.
+	  Notes: Standard OPC UA ReferenceType automatically exposed through the type system (see opc_cu_base_info_datatypes / opc_cu_base_info_base_types). No dedicated CU implementation file is required.
+
+config MUC_OPCUA_CU_BASE_INFO_CONTROLS
+	bool "CU: Base Info Controls"
+	depends on MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3749:Base Info Controls.
+	  Backing tests: test_profile_surface.
+	  Notes: Standard OPC UA ReferenceType automatically exposed through the type system (see opc_cu_base_info_datatypes / opc_cu_base_info_base_types). No dedicated CU implementation file is required.
+
+config MUC_OPCUA_CU_BASE_INFO_UTILIZES
+	bool "CU: Base Info Utilizes"
+	depends on MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3750:Base Info Utilizes.
+	  Backing tests: test_profile_surface.
+	  Notes: Standard OPC UA ReferenceType automatically exposed through the type system (see opc_cu_base_info_datatypes / opc_cu_base_info_base_types). No dedicated CU implementation file is required.
+
+config MUC_OPCUA_CU_BASE_INFO_REQUIRES
+	bool "CU: Base Info Requires"
+	depends on MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3751:Base Info Requires.
+	  Backing tests: test_profile_surface.
+	  Notes: Standard OPC UA ReferenceType automatically exposed through the type system (see opc_cu_base_info_datatypes / opc_cu_base_info_base_types). No dedicated CU implementation file is required.
+
+config MUC_OPCUA_CU_BASE_INFO_ISPHYSICALLYCONNECTEDTO
+	bool "CU: Base Info IsPhysicallyConnectedTo"
+	depends on MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3752:Base Info IsPhysicallyConnectedTo.
+	  Backing tests: test_profile_surface.
+	  Notes: Standard OPC UA ReferenceType automatically exposed through the type system (see opc_cu_base_info_datatypes / opc_cu_base_info_base_types). No dedicated CU implementation file is required.
+
+config MUC_OPCUA_CU_BASE_INFO_REPRESENTSSAMEENTITYAS
+	bool "CU: Base Info RepresentsSameEntityAs"
+	depends on MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3753:Base Info RepresentsSameEntityAs.
+	  Backing tests: test_profile_surface.
+	  Notes: Standard OPC UA ReferenceType automatically exposed through the type system (see opc_cu_base_info_datatypes / opc_cu_base_info_base_types). No dedicated CU implementation file is required.
+
+config MUC_OPCUA_CU_BASE_INFO_REPRESENTSSAMEHARDWAREAS
+	bool "CU: Base Info RepresentsSameHardwareAs"
+	depends on MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3754:Base Info RepresentsSameHardwareAs.
+	  Backing tests: test_profile_surface.
+	  Notes: Standard OPC UA ReferenceType automatically exposed through the type system (see opc_cu_base_info_datatypes / opc_cu_base_info_base_types). No dedicated CU implementation file is required.
+
+config MUC_OPCUA_CU_BASE_INFO_REPRESENTSSAMEFUNCTIONALITYAS
+	bool "CU: Base Info RepresentsSameFunctionalityAs"
+	depends on MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3755:Base Info RepresentsSameFunctionalityAs.
+	  Backing tests: test_profile_surface.
+	  Notes: Standard OPC UA ReferenceType automatically exposed through the type system (see opc_cu_base_info_datatypes / opc_cu_base_info_base_types). No dedicated CU implementation file is required.
+
+config MUC_OPCUA_CU_BASE_INFO_ISHOSTEDBY
+	bool "CU: Base Info IsHostedBy"
+	depends on MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3756:Base Info IsHostedBy.
+	  Backing tests: test_profile_surface.
+	  Notes: Standard OPC UA ReferenceType automatically exposed through the type system (see opc_cu_base_info_datatypes / opc_cu_base_info_base_types). No dedicated CU implementation file is required.
+
+config MUC_OPCUA_CU_BASE_INFO_HASPHYSICALCOMPONENT
+	bool "CU: Base Info HasPhysicalComponent"
+	depends on MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3757:Base Info HasPhysicalComponent.
+	  Backing tests: test_profile_surface.
+	  Notes: Standard OPC UA ReferenceType automatically exposed through the type system (see opc_cu_base_info_datatypes / opc_cu_base_info_base_types). No dedicated CU implementation file is required.
+
+config MUC_OPCUA_CU_BASE_INFO_HASCONTAINEDCOMPONENT
+	bool "CU: Base Info HasContainedComponent"
+	depends on MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3758:Base Info HasContainedComponent.
+	  Backing tests: test_profile_surface.
+	  Notes: Standard OPC UA ReferenceType automatically exposed through the type system (see opc_cu_base_info_datatypes / opc_cu_base_info_base_types). No dedicated CU implementation file is required.
+
+config MUC_OPCUA_CU_BASE_INFO_HASATTACHEDCOMPONENT
+	bool "CU: Base Info HasAttachedComponent"
+	depends on MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3759:Base Info HasAttachedComponent.
+	  Backing tests: test_profile_surface.
+	  Notes: Standard OPC UA ReferenceType automatically exposed through the type system (see opc_cu_base_info_datatypes / opc_cu_base_info_base_types). No dedicated CU implementation file is required.
+
+config MUC_OPCUA_CU_BASE_INFO_REFERENCEDESCRIPTION
+	bool "CU: Base Info ReferenceDescription"
+	depends on MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3996:Base Info ReferenceDescription.
+	  Backing tests: test_profile_surface.
+	  Notes: Standard OPC UA defining type/reference automatically exposed through the type system (see opc_cu_base_info_datatypes / opc_cu_base_info_base_types). No dedicated CU implementation file is required.
+
+config MUC_OPCUA_CU_BASE_INFO_TRIMMEDSTRING
+	bool "CU: Base Info TrimmedString"
+	depends on MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 4052:Base Info TrimmedString.
+	  Backing tests: test_profile_surface.
+	  Notes: Standard OPC UA DataType automatically exposed through the type system (see opc_cu_base_info_datatypes / opc_cu_base_info_base_types). No dedicated CU implementation file is required.
+
+config MUC_OPCUA_CU_BASE_INFO_HANDLE_DATATYPE
+	bool "CU: Base Info Handle DataType"
+	depends on MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 4054:Base Info Handle DataType.
+	  Backing tests: test_profile_surface.
+	  Notes: Standard OPC UA DataType automatically exposed through the type system (see opc_cu_base_info_datatypes / opc_cu_base_info_base_types). No dedicated CU implementation file is required.
+
+config MUC_OPCUA_CU_BASE_INFO_DECIMAL_DATATYPE
+	bool "CU: Base Info Decimal DataType"
+	depends on MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_EMBEDDED_2025_UA_SERVER
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 4426:Base Info Decimal DataType.
+	  Backing tests: test_profile_surface.
+	  Notes: Reconciled (spec 079): Decimal(i=50) + its supertype Number(i=26) exposed in base_nodes.c type-system table with HasSubtype closure to BaseDataType; test_type_system. Satisfied by opc_cu_base_info_datatypes. Exposes the DataType Decimal and all its supertypes in the AddressSpace.
 
 config MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
 	bool "CU: Base Info Type Information"
@@ -1407,15 +2003,103 @@ config MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
 	  Backing tests: test_claim_map.
 	  Notes: For each Object provided in the AddressSpace of the Server the ObjectType of the Object shall be provided in the AddressSpace of the Server. For each Variable provided in the AddressSpace of the Server the VariableType and the DataType of the Variable shall be provided in the AddressSpace of the Server. For each Value provided by the Server, which can be a subtype of the one defined in the Variable, the DataType of the Value shall be provided in the AddressSpace of the Server. For each Method Argument provided by the Server the DataType of the Value shall be provided in the AddressSpace of the Server. For each Structure DataType provided by the Server, each DataType used in the Structure shall be provided in the AddressSpace of the Server. For each Reference provided in the AddressSpace of the Server the ReferenceType shall be provided in the AddressSpace of the Server. For each ObjectType, VariableType, ReferenceType, and DataType provided in the AddressSpace of the Server the direct supertype shall be provided in the AddressSpace of the Server. This requires that all supertypes shall be provided in the AddressSpace. For each DataType having encoding information (Structured DataTypes) the Encoding Objects shall be provided in the AddressSpace of the Server. For each VariableType and ObjectType provided in the AddressSpace of the Server, all InstanceDeclarations shall be provided in the AddressSpace of the Server, even if they are optional and not used in any instance of the Server. For each VariableType, ObjectType and DataType all Methods, Objects and Variables that are referenced with a hierarchical Reference either from the VariableType, ObjectType or DataType or an InstanceDeclaration of the ObjectType or VariableType, either directly or indirectly, shall be provided in the AddressSpace of the Server. For all Events provided by the Server, the EventType shall be provided in the AddressSpace of the Server.
 
+config MUC_OPCUA_CU_BASE_INFO_PORTABLE_IDS
+	bool "CU: Base Info Portable IDs"
+	depends on MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5868:Base Info Portable IDs.
+	  Backing tests: test_profile_surface.
+	  Notes: Standard OPC UA DataType automatically exposed through the type system (see opc_cu_base_info_datatypes / opc_cu_base_info_base_types). No dedicated CU implementation file is required.
+
+config MUC_OPCUA_CU_BASE_INFO_NODE_MANAGEMENT_CAPABILITIES
+	bool "CU: Base Info Node Management Capabilities"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2489:Base Info Node Management Capabilities.
+	  Backing tests: test_profile_surface.
+	  Notes: Reconciled: satisfied by service_nodemanagement.
+
+config MUC_OPCUA_CU_BASE_INFO_CHOICE_STATES
+	bool "CU: Base Info Choice States"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2649:Base Info Choice States.
+	  Backing tests: test_profile_surface.
+	  Notes: Reconciled: satisfied by opc_cu_base_info_datatypes.
+
+config MUC_OPCUA_CU_BASE_INFO_SYSTEM_STATUS_UNDERLYING_SYSTEM
+	bool "CU: Base Info System Status Underlying System"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2747:Base Info System Status Underlying System.
+	  Backing tests: test_profile_surface.
+	  Notes: Reconciled: satisfied by opc_cu_base_info_base_types.
+
+config MUC_OPCUA_CU_BASE_INFO_AVAILABLE_STATES_AND_TRANSITIONS
+	bool "CU: Base Info Available States and Transitions"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2813:Base Info Available States and Transitions.
+	  Backing tests: test_profile_surface.
+	  Notes: Reconciled: satisfied by opc_cu_base_info_datatypes.
+
+config MUC_OPCUA_CU_BASE_INFO_FINITE_STATE_MACHINE_INSTANCE
+	bool "CU: Base Info Finite State Machine Instance"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2814:Base Info Finite State Machine Instance.
+	  Backing tests: test_profile_surface.
+	  Notes: Reconciled: satisfied by opc_cu_base_info_datatypes.
+
+config MUC_OPCUA_CU_BASE_INFO_DEVICE_FAILURE
+	bool "CU: Base Info Device Failure"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2822:Base Info Device Failure.
+	  Backing tests: test_profile_surface.
+	  Notes: Reconciled: satisfied by opc_cu_base_info_base_types.
+
 endif
 
-config MUC_OPCUA_FACET_STANDARD_DATACHANGE_SUBSCRIPTION_2022_SERVER
+menuconfig MUC_OPCUA_FACET_STANDARD_DATACHANGE_SUBSCRIPTION_2022_SERVER
 	bool "Standard DataChange Subscription 2022 Server Facet"
 	default y if MUC_OPCUA_INTERN_PROFILE_EMBEDDED_2025_UA_SERVER
 	help
 	  Implementation state: implemented.
 	  OPC source: OPC-10000-7 §4.2.
 	  Notes: Standard DataChange 2022: all subscription CUs claimed
+
+if MUC_OPCUA_FACET_STANDARD_DATACHANGE_SUBSCRIPTION_2022_SERVER
+
+config MUC_OPCUA_CU_BASE_INFO_GETMONITOREDITEMS_METHOD
+	bool "CU: Base Info GetMonitoredItems Method"
+	depends on MUC_OPCUA_FACET_STANDARD_DATACHANGE_SUBSCRIPTION_2022_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_EMBEDDED_2025_UA_SERVER
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2940:Base Info GetMonitoredItems Method.
+	  Backing tests: test_profile_surface.
+	  Notes: The Server supports obtaining subscription information via GetMonitoredItems Method on the Server object.
+
+config MUC_OPCUA_CU_BASE_INFO_RESENDDATA_METHOD
+	bool "CU: Base Info ResendData Method"
+	depends on MUC_OPCUA_FACET_STANDARD_DATACHANGE_SUBSCRIPTION_2022_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_EMBEDDED_2025_UA_SERVER
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3544:Base Info ResendData Method.
+	  Backing tests: test_profile_surface.
+	  Notes: Support the standard Method ResendData to get the latest value of the monitored items of a Subscription.
+
+endif
 
 menuconfig MUC_OPCUA_FACET_GLOBAL_CERTIFICATE_MANAGEMENT_SERVER
 	bool "Global Certificate Management Server Facet"
