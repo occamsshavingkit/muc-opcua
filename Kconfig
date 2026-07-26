@@ -1922,26 +1922,6 @@ config MUC_OPCUA_CU_METHOD_SERVER
 	  Backing tests: test_method_call_arbitrary, test_method_call_errors.
 	  Notes: Project-level Conformance Unit mirroring the legacy 'method_server' item; emits Kconfig symbol MUC_OPCUA_CU_METHOD_SERVER matching the #ifdef guard renamed in Task 3 of the CU-aligned code reorganisation plan.
 
-config MUC_OPCUA_CU_SCHEDULER
-	bool "CU: Scheduler"
-	depends on MUC_OPCUA_FACET_CORE_2022_SERVER
-	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
-	help
-	  Implementation state: claimed (stub).
-	  OPC source: OPC-10000-7 -- Scheduler Server Facet.
-	  Backing tests: test_scheduler_stub.
-	  Notes: Scheduler Server Facet placeholder; no concrete implementation yet.
-
-config MUC_OPCUA_CU_ALIASNAME
-	bool "CU: AliasName Server"
-	depends on MUC_OPCUA_FACET_CORE_2022_SERVER
-	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
-	help
-	  Implementation state: claimed (stub).
-	  OPC source: OPC-10000-7 -- AliasName Server Facet.
-	  Backing tests: test_aliasname_stub.
-	  Notes: AliasName Server Facet placeholder; no concrete implementation yet.
-
 config MUC_OPCUA_CU_MULTI_CHUNK
 	bool "CU: Multi Chunk"
 	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
@@ -2328,6 +2308,33 @@ config MUC_OPCUA_CU_ADDRESS_SPACE_USERWRITEMASK
 	  Backing tests: test_profile_surface.
 	  Notes: Reconciled: Readable UserWriteMask attribute on Variable nodes. Backed by read_attribute.c unconditionally.
 
+config MUC_OPCUA_CU_A_C_DIALOG
+	bool "CU: A & C Dialog"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2180:A & C Dialog.
+	  Backing tests: test_alarms_conditions.
+	  Notes: Spec CU 2180: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_A_C_ENABLE
+	bool "CU: A & C Enable"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2202:A & C Enable.
+	  Backing tests: test_alarms_conditions.
+	  Notes: Spec CU 2202: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_ATTRIBUTE_WRITE_COMPLEX
+	bool "CU: Attribute Write Complex"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2203:Attribute Write Complex.
+	  Backing tests: test_read_service.
+	  Notes: Spec CU 2203: tracked in manifest; not yet claimed or implemented.
+
 config MUC_OPCUA_CU_HISTORICAL_ACCESS_REPLACE_EVENT
 	bool "CU: Historical Access Replace Event"
 	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
@@ -2337,6 +2344,24 @@ config MUC_OPCUA_CU_HISTORICAL_ACCESS_REPLACE_EVENT
 	  Backing tests: test_profile_surface.
 	  Notes: Satisfied by Historical Access Server Facet.
 
+config MUC_OPCUA_CU_GDS_APPLICATION_DIRECTORY
+	bool "CU: GDS Application Directory"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2232:GDS Application Directory.
+	  Backing tests: test_certificate_management.
+	  Notes: Spec CU 2232: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_GDS_LDS_ME_CONNECTIVITY
+	bool "CU: GDS LDS-ME Connectivity"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2233:GDS LDS-ME Connectivity.
+	  Backing tests: test_certificate_management.
+	  Notes: Spec CU 2233: tracked in manifest; not yet claimed or implemented.
+
 config MUC_OPCUA_CU_A_C_CERTIFICATEEXPIRATION
 	bool "CU: A & C CertificateExpiration"
 	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
@@ -2345,6 +2370,33 @@ config MUC_OPCUA_CU_A_C_CERTIFICATEEXPIRATION
 	  OPC item: CU 2236:A & C CertificateExpiration.
 	  Backing tests: test_profile_surface.
 	  Notes: Satisfied by certificate management implementation.
+
+config MUC_OPCUA_CU_A_C_SYSTEMOFFNORMAL
+	bool "CU: A & C SystemOffNormal"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2239:A & C SystemOffNormal.
+	  Backing tests: test_alarms_conditions.
+	  Notes: Spec CU 2239: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_REDUNDANCY_SERVER
+	bool "CU: Redundancy Server"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2258:Redundancy Server.
+	  Backing tests: test_transfer_subscriptions.
+	  Notes: Spec CU 2258: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_A_C_TRIP
+	bool "CU: A & C Trip"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2275:A & C Trip.
+	  Backing tests: test_alarms_conditions.
+	  Notes: Spec CU 2275: tracked in manifest; not yet claimed or implemented.
 
 config MUC_OPCUA_CU_HISTORICAL_ACCESS_ANNOTATIONS
 	bool "CU: Historical Access Annotations"
@@ -2364,6 +2416,15 @@ config MUC_OPCUA_CU_HISTORICAL_ACCESS_UPDATE_EVENT
 	  Backing tests: test_profile_surface.
 	  Notes: Satisfied by Historical Access Server Facet.
 
+config MUC_OPCUA_CU_ATTRIBUTE_READ_COMPLEX
+	bool "CU: Attribute Read Complex"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2291:Attribute Read Complex.
+	  Backing tests: test_read_service.
+	  Notes: Spec CU 2291: tracked in manifest; not yet claimed or implemented.
+
 config MUC_OPCUA_CU_HISTORICAL_ACCESS_INSERT_EVENT
 	bool "CU: Historical Access Insert Event"
 	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
@@ -2372,6 +2433,15 @@ config MUC_OPCUA_CU_HISTORICAL_ACCESS_INSERT_EVENT
 	  OPC item: CU 2309:Historical Access Insert Event.
 	  Backing tests: test_profile_surface.
 	  Notes: Satisfied by Historical Access Server Facet.
+
+config MUC_OPCUA_CU_A_C_REFRESH2
+	bool "CU: A & C Refresh2"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2315:A & C Refresh2.
+	  Backing tests: test_alarms_conditions.
+	  Notes: Spec CU 2315: tracked in manifest; not yet claimed or implemented.
 
 config MUC_OPCUA_CU_SECURITY_CERTIFICATE_ADMINISTRATION
 	bool "CU: Security Certificate Administration"
@@ -2382,6 +2452,60 @@ config MUC_OPCUA_CU_SECURITY_CERTIFICATE_ADMINISTRATION
 	  Backing tests: test_profile_surface.
 	  Notes: Satisfied by certificate management implementation.
 
+config MUC_OPCUA_CU_A_C_EXCLUSIVE_RATEOFCHANGE
+	bool "CU: A & C Exclusive RateOfChange"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2323:A & C Exclusive RateOfChange.
+	  Backing tests: test_alarms_conditions.
+	  Notes: Spec CU 2323: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_A_C_INSTANCES
+	bool "CU: A & C Instances"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2333:A & C Instances.
+	  Backing tests: test_alarms_conditions.
+	  Notes: Spec CU 2333: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_A_C_BRANCH
+	bool "CU: A & C Branch"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2343:A & C Branch.
+	  Backing tests: test_alarms_conditions.
+	  Notes: Spec CU 2343: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_ATTRIBUTE_ALTERNATE_ENCODING
+	bool "CU: Attribute Alternate Encoding"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2345:Attribute Alternate Encoding.
+	  Backing tests: test_read_service.
+	  Notes: Spec CU 2345: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_SUBSCRIPTION_TRANSFER
+	bool "CU: Subscription Transfer"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2353:Subscription Transfer.
+	  Backing tests: test_subscriptions_capacity, test_subscription_deadband, test_subscription_publish.
+	  Notes: Spec CU 2353: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_DISCOVERY_CONFIGURATION
+	bool "CU: Discovery Configuration"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2354:Discovery Configuration.
+	  Backing tests: test_claim_map.
+	  Notes: Spec CU 2354: tracked in manifest; not yet claimed or implemented.
+
 config MUC_OPCUA_CU_ADDRESS_SPACE_METHOD
 	bool "CU: Address Space Method"
 	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
@@ -2391,6 +2515,15 @@ config MUC_OPCUA_CU_ADDRESS_SPACE_METHOD
 	  Backing tests: test_profile_surface.
 	  Notes: Reconciled: Method nodes with proper NodeClass and executable attributes (OPC-10000-3 §5.7). Backed by read_attribute.c Executable/UserExecutable handling and base_nodes.c method nodes.
 
+config MUC_OPCUA_CU_ALIASNAME_CATEGORY_TAGS
+	bool "CU: AliasName Category Tags"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2379:AliasName Category Tags.
+	  Backing tests: test_aliasname_stub.
+	  Notes: Spec CU 2379: tracked in manifest; not yet claimed or implemented.
+
 config MUC_OPCUA_CU_HISTORICAL_ACCESS_INSERT_VALUE
 	bool "CU: Historical Access Insert Value"
 	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
@@ -2399,6 +2532,69 @@ config MUC_OPCUA_CU_HISTORICAL_ACCESS_INSERT_VALUE
 	  OPC item: CU 2383:Historical Access Insert Value.
 	  Backing tests: test_profile_surface.
 	  Notes: Satisfied by Historical Access Server Facet.
+
+config MUC_OPCUA_CU_A_C_NON_EXCLUSIVE_DEVIATION
+	bool "CU: A & C Non-Exclusive Deviation"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2390:A & C Non-Exclusive Deviation.
+	  Backing tests: test_alarms_conditions.
+	  Notes: Spec CU 2390: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_METHOD_CALL
+	bool "CU: Method Call"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2391:Method Call.
+	  Backing tests: test_method_call_arbitrary, test_method_call_errors.
+	  Notes: Spec CU 2391: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_ALIASNAME_BASE
+	bool "CU: AliasName Base"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2448:AliasName Base.
+	  Backing tests: test_aliasname_stub.
+	  Notes: Spec CU 2448: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_ALIASNAME_AGGREGATION
+	bool "CU: AliasName Aggregation"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2449:AliasName Aggregation.
+	  Backing tests: test_aliasname_stub.
+	  Notes: Spec CU 2449: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_ALIASNAME_MODELCHANGE
+	bool "CU: AliasName ModelChange"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2450:AliasName ModelChange.
+	  Backing tests: test_aliasname_stub.
+	  Notes: Spec CU 2450: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_GDS_ALIASNAME_DISCOVERY
+	bool "CU: GDS AliasName Discovery"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2453:GDS AliasName Discovery.
+	  Backing tests: test_certificate_management.
+	  Notes: Spec CU 2453: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_METHOD_CALL_COMPLEX
+	bool "CU: Method Call Complex"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2454:Method Call Complex.
+	  Backing tests: test_method_call_arbitrary, test_method_call_errors.
+	  Notes: Spec CU 2454: tracked in manifest; not yet claimed or implemented.
 
 config MUC_OPCUA_CU_BASE_INFO_HISTORY_READ_CAPABILITIES
 	bool "CU: Base Info History Read Capabilities"
@@ -2454,6 +2650,15 @@ config MUC_OPCUA_CU_ADDRESS_SPACE_DICTIONARY_ENTRIES
 	  Backing tests: test_profile_surface.
 	  Notes: Reconciled: Dictionary entry nodes in the AddressSpace. Backed by base_nodes.c type-system exposure.
 
+config MUC_OPCUA_CU_ALIASNAME_CATEGORY_TOPICS
+	bool "CU: AliasName Category Topics"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2629:AliasName Category Topics.
+	  Backing tests: test_aliasname_stub.
+	  Notes: Spec CU 2629: tracked in manifest; not yet claimed or implemented.
+
 config MUC_OPCUA_CU_HISTORICAL_ACCESS_STRUCTURED_DATA_READ_MODIFIED
 	bool "CU: Historical Access Structured Data Read Modified"
 	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
@@ -2462,6 +2667,24 @@ config MUC_OPCUA_CU_HISTORICAL_ACCESS_STRUCTURED_DATA_READ_MODIFIED
 	  OPC item: CU 2664:Historical Access Structured Data Read Modified.
 	  Backing tests: test_profile_surface.
 	  Notes: Satisfied by Historical Access Server Facet.
+
+config MUC_OPCUA_CU_AZURE_IDENTITY_PROVIDER_AUTHORITY_PROFILE
+	bool "CU: Azure Identity Provider Authority Profile"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2705:Azure Identity Provider Authority Profile.
+	  Backing tests: test_certificate_management.
+	  Notes: Spec CU 2705: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_OPC_UA_AUTHORITY_PROFILE
+	bool "CU: OPC UA Authority Profile"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2709:OPC UA Authority Profile.
+	  Backing tests: test_secure_channel.
+	  Notes: Spec CU 2709: tracked in manifest; not yet claimed or implemented.
 
 config MUC_OPCUA_CU_HISTORICAL_ACCESS_STRUCTURED_DATA_DELETE
 	bool "CU: Historical Access Structured Data Delete"
@@ -2472,6 +2695,24 @@ config MUC_OPCUA_CU_HISTORICAL_ACCESS_STRUCTURED_DATA_DELETE
 	  Backing tests: test_profile_surface.
 	  Notes: Satisfied by Historical Access Server Facet.
 
+config MUC_OPCUA_CU_A_C_EXCLUSIVE_LEVEL
+	bool "CU: A & C Exclusive Level"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2746:A & C Exclusive Level.
+	  Backing tests: test_alarms_conditions.
+	  Notes: Spec CU 2746: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_ALIASNAME_HIERARCHY
+	bool "CU: AliasName Hierarchy"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2777:AliasName Hierarchy.
+	  Backing tests: test_aliasname_stub.
+	  Notes: Spec CU 2777: tracked in manifest; not yet claimed or implemented.
+
 config MUC_OPCUA_CU_ADDRESS_SPACE_WRITEMASK
 	bool "CU: Address Space WriteMask"
 	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
@@ -2480,6 +2721,15 @@ config MUC_OPCUA_CU_ADDRESS_SPACE_WRITEMASK
 	  OPC item: CU 2781:Address Space WriteMask.
 	  Backing tests: test_profile_surface.
 	  Notes: Reconciled: Readable WriteMask attribute on Variable nodes. Backed by read_attribute.c unconditionally.
+
+config MUC_OPCUA_CU_PROTOCOL_CONFIGURATION
+	bool "CU: Protocol Configuration"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2785:Protocol Configuration.
+	  Backing tests: test_secure_channel.
+	  Notes: Spec CU 2785: tracked in manifest; not yet claimed or implemented.
 
 config MUC_OPCUA_CU_SECURITY_ROLE_SERVER_MANAGEMENT
 	bool "CU: Security Role Server Management"
@@ -2517,6 +2767,15 @@ config MUC_OPCUA_CU_SECURITY_USER_JWT_TOKEN_POLICY
 	  Backing tests: test_profile_surface.
 	  Notes: Satisfied by user authentication implementation including JWT (IssuedToken) token support.
 
+config MUC_OPCUA_CU_MONITOR_COMPLEX_VALUE
+	bool "CU: Monitor Complex Value"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2818:Monitor Complex Value.
+	  Backing tests: test_subscriptions_capacity, test_subscription_deadband, test_subscription_publish.
+	  Notes: Spec CU 2818: tracked in manifest; not yet claimed or implemented.
+
 config MUC_OPCUA_CU_BASE_INFO_REQUEST_SERVER_STATE_CHANGE_METHOD
 	bool "CU: Base Info RequestServerStateChange Method"
 	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
@@ -2526,6 +2785,33 @@ config MUC_OPCUA_CU_BASE_INFO_REQUEST_SERVER_STATE_CHANGE_METHOD
 	  Backing tests: test_profile_surface.
 	  Notes: Claimed: minimal type stubs and capability markers in place.
 
+config MUC_OPCUA_CU_A_C_DISCREPANCY
+	bool "CU: A & C Discrepancy"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2861:A & C Discrepancy.
+	  Backing tests: test_alarms_conditions.
+	  Notes: Spec CU 2861: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_PROTOCOL_REVERSE_CONNECT_SERVER
+	bool "CU: Protocol Reverse Connect Server"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2867:Protocol Reverse Connect Server.
+	  Backing tests: test_secure_channel.
+	  Notes: Spec CU 2867: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_DISCOVERY_GET_ENDPOINTS_SESSIONLESS
+	bool "CU: Discovery Get Endpoints SessionLess"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2871:Discovery Get Endpoints SessionLess.
+	  Backing tests: test_claim_map.
+	  Notes: Spec CU 2871: tracked in manifest; not yet claimed or implemented.
+
 config MUC_OPCUA_CU_SECURITY_ROLE_SERVER_DEFAULTROLEPERMISSIONS
 	bool "CU: Security Role Server DefaultRolePermissions"
 	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
@@ -2534,6 +2820,60 @@ config MUC_OPCUA_CU_SECURITY_ROLE_SERVER_DEFAULTROLEPERMISSIONS
 	  OPC item: CU 2873:Security Role Server DefaultRolePermissions.
 	  Backing tests: test_profile_surface.
 	  Notes: Satisfied by role management implementation.
+
+config MUC_OPCUA_CU_A_C_ON_OFF_DELAY
+	bool "CU: A & C On-Off Delay"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2877:A & C On-Off Delay.
+	  Backing tests: test_alarms_conditions.
+	  Notes: Spec CU 2877: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_A_C_AUDIBLE_SOUND
+	bool "CU: A & C Audible Sound"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2881:A & C Audible Sound.
+	  Backing tests: test_alarms_conditions.
+	  Notes: Spec CU 2881: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_A_C_SUPPRESSION_BY_OPERATOR
+	bool "CU: A & C Suppression by Operator"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2893:A & C Suppression by Operator.
+	  Backing tests: test_alarms_conditions.
+	  Notes: Spec CU 2893: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_A_C_SILENCING
+	bool "CU: A & C Silencing"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2896:A & C Silencing.
+	  Backing tests: test_alarms_conditions.
+	  Notes: Spec CU 2896: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_A_C_SUPPRESSION
+	bool "CU: A & C Suppression"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2897:A & C Suppression.
+	  Backing tests: test_alarms_conditions.
+	  Notes: Spec CU 2897: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_OAUTH2_AUTHORITY_PROFILE
+	bool "CU: OAuth2 Authority Profile"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2902:OAuth2 Authority Profile.
+	  Backing tests: test_user_auth_plaintext, test_user_auth_certificate, test_user_auth_secure_e2e.
+	  Notes: Spec CU 2902: tracked in manifest; not yet claimed or implemented.
 
 config MUC_OPCUA_CU_ADDRESS_SPACE_SOURCE_HIERARCHY
 	bool "CU: Address Space Source Hierarchy"
@@ -2571,6 +2911,15 @@ config MUC_OPCUA_CU_HISTORICAL_ACCESS_DELETE_EVENT
 	  Backing tests: test_profile_surface.
 	  Notes: Satisfied by Historical Access Server Facet; event history deferred.
 
+config MUC_OPCUA_CU_A_C_NON_EXCLUSIVE_RATEOFCHANGE
+	bool "CU: A & C Non-Exclusive RateOfChange"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2946:A & C Non-Exclusive RateOfChange.
+	  Backing tests: test_alarms_conditions.
+	  Notes: Spec CU 2946: tracked in manifest; not yet claimed or implemented.
+
 config MUC_OPCUA_CU_HISTORICAL_ACCESS_EVENTS
 	bool "CU: Historical Access Events"
 	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
@@ -2589,6 +2938,33 @@ config MUC_OPCUA_CU_HISTORICAL_ACCESS_SERVERTIMESTAMP
 	  Backing tests: test_profile_surface.
 	  Notes: Satisfied by Historical Access Server Facet.
 
+config MUC_OPCUA_CU_A_C_EXCLUSIVE_DEVIATION
+	bool "CU: A & C Exclusive Deviation"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2951:A & C Exclusive Deviation.
+	  Backing tests: test_alarms_conditions.
+	  Notes: Spec CU 2951: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_A_C_REFRESH
+	bool "CU: A & C Refresh"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2957:A & C Refresh.
+	  Backing tests: test_alarms_conditions.
+	  Notes: Spec CU 2957: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_A_C_BASIC
+	bool "CU: A & C Basic"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2965:A & C Basic.
+	  Backing tests: test_alarms_conditions.
+	  Notes: Spec CU 2965: tracked in manifest; not yet claimed or implemented.
+
 config MUC_OPCUA_CU_HISTORICAL_ACCESS_STRUCTURED_DATA_TIME_INSTANCE
 	bool "CU: Historical Access Structured Data Time Instance"
 	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
@@ -2597,6 +2973,33 @@ config MUC_OPCUA_CU_HISTORICAL_ACCESS_STRUCTURED_DATA_TIME_INSTANCE
 	  OPC item: CU 2991:Historical Access Structured Data Time Instance.
 	  Backing tests: test_profile_surface.
 	  Notes: Satisfied by Historical Access Server Facet.
+
+config MUC_OPCUA_CU_DOCUMENTATION_INSTALLATION
+	bool "CU: Documentation - Installation"
+	default n
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3000:Documentation - Installation.
+	  Backing tests: test_base_server_behaviour.
+	  Notes: Spec CU 3000: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_A_C_NON_EXCLUSIVE_LEVEL
+	bool "CU: A & C Non-Exclusive Level"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3001:A & C Non-Exclusive Level.
+	  Backing tests: test_alarms_conditions.
+	  Notes: Spec CU 3001: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_A_C_DISCRETE
+	bool "CU: A & C Discrete"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3004:A & C Discrete.
+	  Backing tests: test_alarms_conditions.
+	  Notes: Spec CU 3004: tracked in manifest; not yet claimed or implemented.
 
 config MUC_OPCUA_CU_HISTORICAL_ACCESS_STRUCTURED_DATA_REPLACE
 	bool "CU: Historical Access Structured Data Replace"
@@ -2625,6 +3028,24 @@ config MUC_OPCUA_CU_ADDRESS_SPACE_USERWRITEMASK_MULTILEVEL
 	  Backing tests: test_profile_surface.
 	  Notes: Reconciled: Multi-level UserWriteMask propagation from TypeDefinition nodes. Backed by read_attribute.c UserWriteMask attribute read.
 
+config MUC_OPCUA_CU_REDUNDANCY_SERVER_TRANSPARENT
+	bool "CU: Redundancy Server Transparent"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3027:Redundancy Server Transparent.
+	  Backing tests: test_transfer_subscriptions.
+	  Notes: Spec CU 3027: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_A_C_CONFIRM
+	bool "CU: A & C Confirm"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3049:A & C Confirm.
+	  Backing tests: test_alarms_conditions.
+	  Notes: Spec CU 3049: tracked in manifest; not yet claimed or implemented.
+
 config MUC_OPCUA_CU_HISTORICAL_ACCESS_UPDATE_VALUE
 	bool "CU: Historical Access Update Value"
 	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
@@ -2633,6 +3054,15 @@ config MUC_OPCUA_CU_HISTORICAL_ACCESS_UPDATE_VALUE
 	  OPC item: CU 3053:Historical Access Update Value.
 	  Backing tests: test_profile_surface.
 	  Notes: Satisfied by Historical Access Server Facet.
+
+config MUC_OPCUA_CU_DOCUMENTATION_MULTIPLE_LANGUAGES
+	bool "CU: Documentation - Multiple Languages"
+	default n
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3060:Documentation - Multiple Languages.
+	  Backing tests: test_base_server_behaviour.
+	  Notes: Spec CU 3060: tracked in manifest; not yet claimed or implemented.
 
 config MUC_OPCUA_CU_ADDRESS_SPACE_NOTIFIER_HIERARCHY
 	bool "CU: Address Space Notifier Hierarchy"
@@ -2651,6 +3081,78 @@ config MUC_OPCUA_CU_HISTORICAL_ACCESS_DELETE_VALUE
 	  OPC item: CU 3081:Historical Access Delete Value.
 	  Backing tests: test_profile_surface.
 	  Notes: Satisfied by Historical Access Server Facet.
+
+config MUC_OPCUA_CU_A_C_COMMENT
+	bool "CU: A & C Comment"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3083:A & C Comment.
+	  Backing tests: test_alarms_conditions.
+	  Notes: Spec CU 3083: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_DOCUMENTATION_USERS_GUIDE
+	bool "CU: Documentation - Users Guide"
+	default n
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3084:Documentation - Users Guide.
+	  Backing tests: test_base_server_behaviour.
+	  Notes: Spec CU 3084: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_A_C_OFFNORMAL
+	bool "CU: A & C OffNormal"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3098:A & C OffNormal.
+	  Backing tests: test_alarms_conditions.
+	  Notes: Spec CU 3098: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_DOCUMENTATION_SUPPORTED_PROFILES
+	bool "CU: Documentation - Supported Profiles"
+	default n
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3107:Documentation - Supported Profiles.
+	  Backing tests: test_base_server_behaviour.
+	  Notes: Spec CU 3107: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_MONITOR_AGGREGATE_FILTER
+	bool "CU: Monitor Aggregate Filter"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3121:Monitor Aggregate Filter.
+	  Backing tests: test_subscriptions_capacity, test_subscription_deadband, test_subscription_publish.
+	  Notes: Spec CU 3121: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_MONITOR_ALTERNATE_ENCODING
+	bool "CU: Monitor Alternate Encoding"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3142:Monitor Alternate Encoding.
+	  Backing tests: test_subscriptions_capacity, test_subscription_deadband, test_subscription_publish.
+	  Notes: Spec CU 3142: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_A_C_SHELVING
+	bool "CU: A & C Shelving"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3165:A & C Shelving.
+	  Backing tests: test_alarms_conditions.
+	  Notes: Spec CU 3165: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_DISCOVERY_SERVER_ANNOUNCEMENT_USING_MDNS
+	bool "CU: Discovery Server Announcement using mDNS "
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3171:Discovery Server Announcement using mDNS .
+	  Backing tests: test_claim_map.
+	  Notes: Spec CU 3171: tracked in manifest; not yet claimed or implemented.
 
 config MUC_OPCUA_CU_AUTHORIZATION_SERVICE_CONFIGURATION_SERVER
 	bool "CU: Authorization Service Configuration Server"
@@ -2769,6 +3271,42 @@ config MUC_OPCUA_CU_ADDRESS_SPACE_METHOD_META_DATA
 	  Backing tests: test_profile_surface.
 	  Notes: Reconciled: Method metadata with HasArgumentDescription/HasOptionalInputArgumentDescription. Backed by read_attribute.c and base_nodes.c method nodes.
 
+config MUC_OPCUA_CU_A_C_ALARM_METRICS
+	bool "CU: A & C Alarm Metrics"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3571:A & C Alarm Metrics.
+	  Backing tests: test_alarms_conditions.
+	  Notes: Spec CU 3571: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_A_E_WRAPPER_MAPPING
+	bool "CU: A & E Wrapper Mapping"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3572:A & E Wrapper Mapping.
+	  Backing tests: test_alarms_conditions.
+	  Notes: Spec CU 3572: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_HISTORICAL_ACCESS_AGGREGATES
+	bool "CU: Historical Access Aggregates"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3574:Historical Access Aggregates.
+	  Backing tests: test_history.
+	  Notes: Spec CU 3574: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_GDS_QUERY_APPLICATIONS
+	bool "CU: GDS Query Applications"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3581:GDS Query Applications.
+	  Backing tests: test_certificate_management.
+	  Notes: Spec CU 3581: tracked in manifest; not yet claimed or implemented.
+
 config MUC_OPCUA_CU_GDS_CERTIFICATE_MANAGER_PULL_MODEL
 	bool "CU: GDS Certificate Manager Pull Model"
 	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
@@ -2777,6 +3315,15 @@ config MUC_OPCUA_CU_GDS_CERTIFICATE_MANAGER_PULL_MODEL
 	  OPC item: CU 3582:GDS Certificate Manager Pull Model.
 	  Backing tests: test_profile_surface.
 	  Notes: Satisfied by certificate management implementation.
+
+config MUC_OPCUA_CU_GDS_KEY_CREDENTIAL_SERVICE_PULL_MODEL
+	bool "CU: GDS Key Credential Service Pull Model"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3584:GDS Key Credential Service Pull Model.
+	  Backing tests: test_certificate_management.
+	  Notes: Spec CU 3584: tracked in manifest; not yet claimed or implemented.
 
 config MUC_OPCUA_CU_GDS_AUTHORIZATION_SERVICE_SERVER
 	bool "CU: GDS Authorization Service Server"
@@ -2795,6 +3342,141 @@ config MUC_OPCUA_CU_BASE_INFO_METHOD_CAPABILITIES
 	  OPC item: CU 3605:Base Info Method Capabilities.
 	  Backing tests: test_profile_surface.
 	  Notes: Claimed: minimal type stubs and capability markers in place.
+
+config MUC_OPCUA_CU_SUBSCRIPTION_DURABLE
+	bool "CU: Subscription Durable"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3642:Subscription Durable.
+	  Backing tests: test_subscriptions_capacity, test_subscription_deadband, test_subscription_publish.
+	  Notes: Spec CU 3642: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_A_C_SUPPRESSION_GROUP
+	bool "CU: A & C Suppression Group"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3760:A & C Suppression Group.
+	  Backing tests: test_alarms_conditions.
+	  Notes: Spec CU 3760: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_A_C_INSTRUMENTDIAGNOSTIC
+	bool "CU: A & C InstrumentDiagnostic"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3761:A & C InstrumentDiagnostic.
+	  Backing tests: test_alarms_conditions.
+	  Notes: Spec CU 3761: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_A_C_SYSTEMDIAGNOSTIC
+	bool "CU: A & C SystemDiagnostic"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3762:A & C SystemDiagnostic.
+	  Backing tests: test_alarms_conditions.
+	  Notes: Spec CU 3762: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_A_C_ACKNOWLEDGE_AUDITING
+	bool "CU: A & C Acknowledge Auditing"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3765:A & C Acknowledge Auditing.
+	  Backing tests: test_alarms_conditions.
+	  Notes: Spec CU 3765: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_A_C_LATCHING_AUDITING
+	bool "CU: A & C Latching Auditing"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3770:A & C Latching Auditing.
+	  Backing tests: test_alarms_conditions.
+	  Notes: Spec CU 3770: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_A_C_OUTOFSERVICE_AUDITING
+	bool "CU: A & C OutOfService Auditing"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3771:A & C OutOfService Auditing.
+	  Backing tests: test_alarms_conditions.
+	  Notes: Spec CU 3771: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_A_C_STATEMACHINE_TRIGGER
+	bool "CU: A & C Statemachine Trigger"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3772:A & C Statemachine Trigger.
+	  Backing tests: test_alarms_conditions.
+	  Notes: Spec CU 3772: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_A_C_STATEMACHINE_SUPPRESSION_TRIGGER
+	bool "CU: A & C Statemachine Suppression Trigger"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3773:A & C Statemachine Suppression Trigger.
+	  Backing tests: test_alarms_conditions.
+	  Notes: Spec CU 3773: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_A_C_LATCHED_STATE
+	bool "CU: A & C Latched State"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3774:A & C Latched State.
+	  Backing tests: test_alarms_conditions.
+	  Notes: Spec CU 3774: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_A_C_ALARM_GROUP
+	bool "CU: A & C Alarm Group"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3775:A & C Alarm Group.
+	  Backing tests: test_alarms_conditions.
+	  Notes: Spec CU 3775: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_A_C_GETGROUPMEMBERSHIPS
+	bool "CU: A & C GetGroupMemberships"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3776:A & C GetGroupMemberships.
+	  Backing tests: test_alarms_conditions.
+	  Notes: Spec CU 3776: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_A_C_LIMIT_BASELIMIT
+	bool "CU: A & C Limit BaseLimit"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3777:A & C Limit BaseLimit.
+	  Backing tests: test_alarms_conditions.
+	  Notes: Spec CU 3777: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_A_C_LIMIT_SEVERITY
+	bool "CU: A & C Limit Severity"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3778:A & C Limit Severity.
+	  Backing tests: test_alarms_conditions.
+	  Notes: Spec CU 3778: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_A_C_LIMIT_DEADBAND
+	bool "CU: A & C Limit Deadband"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3779:A & C Limit Deadband.
+	  Backing tests: test_alarms_conditions.
+	  Notes: Spec CU 3779: tracked in manifest; not yet claimed or implemented.
 
 config MUC_OPCUA_CU_SECURITY_USER_ISSUEDTOKEN_KERBEROS_WINDOWS
 	bool "CU: Security User IssuedToken Kerberos Windows"
@@ -2850,6 +3532,105 @@ config MUC_OPCUA_CU_AUDITING_UPDATESTATES
 	  Backing tests: test_claim_map.
 	  Notes: Satisfied by auditing implementation.
 
+config MUC_OPCUA_CU_SESSION_SESSIONLESS_INVOCATION
+	bool "CU: Session Sessionless Invocation"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3994:Session Sessionless Invocation.
+	  Backing tests: test_dispatch_session_order, test_base_server_behaviour.
+	  Notes: Spec CU 3994: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_A_C_SILENCING_AUDITING
+	bool "CU: A & C Silencing Auditing"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 4428:A & C Silencing Auditing.
+	  Backing tests: test_alarms_conditions.
+	  Notes: Spec CU 4428: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_A_C_SUPPRESSION2_BY_OPERATOR
+	bool "CU: A & C Suppression2 by Operator"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 4463:A & C Suppression2 by Operator.
+	  Backing tests: test_alarms_conditions.
+	  Notes: Spec CU 4463: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_A_C_OUTOFSERVICE2
+	bool "CU: A & C OutOfService2"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 4464:A & C OutOfService2.
+	  Backing tests: test_alarms_conditions.
+	  Notes: Spec CU 4464: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_A_C_SHELVING2
+	bool "CU: A & C Shelving2"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 4465:A & C Shelving2.
+	  Backing tests: test_alarms_conditions.
+	  Notes: Spec CU 4465: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_A_C_DIALOG2
+	bool "CU: A & C Dialog2"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 4466:A & C Dialog2.
+	  Backing tests: test_alarms_conditions.
+	  Notes: Spec CU 4466: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_A_C_OUTOFSERVICE
+	bool "CU: A & C OutOfService"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 4467:A & C OutOfService.
+	  Backing tests: test_alarms_conditions.
+	  Notes: Spec CU 4467: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_SCHEDULER_SCHEDULING_BASE
+	bool "CU: Scheduler Scheduling Base"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 4500:Scheduler Scheduling Base.
+	  Backing tests: test_scheduler_stub.
+	  Notes: Spec CU 4500: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_SCHEDULER_CALENDAR_BASE
+	bool "CU: Scheduler Calendar Base"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 4501:Scheduler Calendar Base.
+	  Backing tests: test_scheduler_stub.
+	  Notes: Spec CU 4501: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_SCHEDULER_SCHEDULING_CONFIGURATION
+	bool "CU: Scheduler Scheduling Configuration"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 4502:Scheduler Scheduling Configuration.
+	  Backing tests: test_scheduler_stub.
+	  Notes: Spec CU 4502: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_SCHEDULER_CALENDAR_CONFIGURATION
+	bool "CU: Scheduler Calendar Configuration"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 4503:Scheduler Calendar Configuration.
+	  Backing tests: test_scheduler_stub.
+	  Notes: Spec CU 4503: tracked in manifest; not yet claimed or implemented.
+
 config MUC_OPCUA_CU_SECURITY_USER_MANAGEMENT_SERVER
 	bool "CU: Security User Management Server"
 	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
@@ -2867,6 +3648,51 @@ config MUC_OPCUA_CU_SECURITY_USER_IDENTITY_TOKEN_SUPPORT
 	  OPC item: CU 4957:Security User Identity Token Support.
 	  Backing tests: test_profile_surface.
 	  Notes: Satisfied by user authentication implementation.
+
+config MUC_OPCUA_CU_AUDITING_CONNECTIONS
+	bool "CU: Auditing Connections"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5213:Auditing Connections.
+	  Backing tests: test_audit_events, test_event_notifications.
+	  Notes: Spec CU 5213: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_MONITOR_ITEMS_500
+	bool "CU: Monitor Items 500"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5242:Monitor Items 500.
+	  Backing tests: test_subscriptions_capacity, test_subscription_deadband, test_subscription_publish.
+	  Notes: Spec CU 5242: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_SUBSCRIPTION_MINIMUM_05
+	bool "CU: Subscription Minimum 05"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5248:Subscription Minimum 05.
+	  Backing tests: test_subscriptions_capacity, test_subscription_deadband, test_subscription_publish.
+	  Notes: Spec CU 5248: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_SUBSCRIPTION_PUBLISH_MIN_10
+	bool "CU: Subscription Publish Min 10"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5249:Subscription Publish Min 10.
+	  Backing tests: test_subscriptions_capacity, test_subscription_deadband, test_subscription_publish.
+	  Notes: Spec CU 5249: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_MONITOR_MINQUEUESIZE_05
+	bool "CU: Monitor MinQueueSize_05"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5250:Monitor MinQueueSize_05.
+	  Backing tests: test_subscriptions_capacity, test_subscription_deadband, test_subscription_publish.
+	  Notes: Spec CU 5250: tracked in manifest; not yet claimed or implemented.
 
 config MUC_OPCUA_CU_SECURITY_ROLE_SERVER_IDENTITYMANAGEMENT
 	bool "CU: Security Role Server IdentityManagement"
@@ -2904,6 +3730,15 @@ config MUC_OPCUA_CU_SECURITY_ROLE_TRUSTEDAPPLICATION
 	  Backing tests: test_profile_surface.
 	  Notes: Satisfied by role management implementation.
 
+config MUC_OPCUA_CU_KEYCREDENTIAL_PROFILEURI_UA_TRANSPORT_WITH_USERNAME
+	bool "CU: KeyCredential ProfileURI - UA transport with UserName"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5292:KeyCredential ProfileURI - UA transport with UserName.
+	  Backing tests: test_key_credential.
+	  Notes: Spec CU 5292: tracked in manifest; not yet claimed or implemented.
+
 config MUC_OPCUA_CU_KEYCREDENTIAL_AUTHENTICATION_MECHANISM_SUPPORT
 	bool "CU: KeyCredential Authentication Mechanism Support"
 	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
@@ -2912,6 +3747,681 @@ config MUC_OPCUA_CU_KEYCREDENTIAL_AUTHENTICATION_MECHANISM_SUPPORT
 	  OPC item: CU 5293:KeyCredential Authentication Mechanism Support.
 	  Backing tests: test_profile_surface.
 	  Notes: Satisfied by KeyCredential service implementation.
+
+config MUC_OPCUA_CU_KEYCREDENTIAL_PROFILEURI_AMQP_SASL_PLAIN
+	bool "CU: KeyCredential ProfileURI - AMQP SASL Plain"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5301:KeyCredential ProfileURI - AMQP SASL Plain.
+	  Backing tests: test_key_credential.
+	  Notes: Spec CU 5301: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_KEYCREDENTIAL_PROFILEURI_MQTT_USERNAME
+	bool "CU: KeyCredential ProfileURI - MQTT UserName"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5302:KeyCredential ProfileURI - MQTT UserName.
+	  Backing tests: test_key_credential.
+	  Notes: Spec CU 5302: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_PUSH_MODEL_FOR_KEYCREDENTIAL_SERVICE
+	bool "CU: Push Model for KeyCredential Service"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5303:Push Model for KeyCredential Service.
+	  Backing tests: test_certificate_management.
+	  Notes: Spec CU 5303: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_A_C_ENABLED_TRANSITIONTIME
+	bool "CU: A & C Enabled TransitionTime"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5510:A & C Enabled TransitionTime.
+	  Backing tests: test_alarms_conditions.
+	  Notes: Spec CU 5510: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_A_C_ENABLED_EFFECTIVETRANSITIONTIME
+	bool "CU: A & C Enabled EffectiveTransitionTime "
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5511:A & C Enabled EffectiveTransitionTime .
+	  Backing tests: test_alarms_conditions.
+	  Notes: Spec CU 5511: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_A_C_ENABLED_EFFECTIVEDISPLAYNAME
+	bool "CU: A & C Enabled EffectiveDisplayName "
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5512:A & C Enabled EffectiveDisplayName .
+	  Backing tests: test_alarms_conditions.
+	  Notes: Spec CU 5512: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_A_C_ACTIVE_TRANSITIONTIME
+	bool "CU: A & C Active TransitionTime "
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5513:A & C Active TransitionTime .
+	  Backing tests: test_alarms_conditions.
+	  Notes: Spec CU 5513: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_A_C_ACTIVE_EFFECTIVETRANSITIONTIME
+	bool "CU: A & C Active EffectiveTransitionTime "
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5514:A & C Active EffectiveTransitionTime .
+	  Backing tests: test_alarms_conditions.
+	  Notes: Spec CU 5514: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_A_C_ACTIVE_EFFECTIVEDISPLAYNAME
+	bool "CU: A & C Active EffectiveDisplayName "
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5515:A & C Active EffectiveDisplayName .
+	  Backing tests: test_alarms_conditions.
+	  Notes: Spec CU 5515: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_A_C_ACKNOWLEDGE_TRANSITIONTIME
+	bool "CU: A & C Acknowledge TransitionTime"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5516:A & C Acknowledge TransitionTime.
+	  Backing tests: test_alarms_conditions.
+	  Notes: Spec CU 5516: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_A_C_ACKNOWLEDGE_EFFECTIVETRANSITIONTIME
+	bool "CU: A & C Acknowledge EffectiveTransitionTime "
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5517:A & C Acknowledge EffectiveTransitionTime .
+	  Backing tests: test_alarms_conditions.
+	  Notes: Spec CU 5517: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_A_C_ACKNOWLEDGE_EFFECTIVEDISPLAYNAME
+	bool "CU: A & C Acknowledge EffectiveDisplayName "
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5518:A & C Acknowledge EffectiveDisplayName .
+	  Backing tests: test_alarms_conditions.
+	  Notes: Spec CU 5518: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_A_C_CONFIRM_TRANSITIONTIME
+	bool "CU: A & C Confirm TransitionTime "
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5519:A & C Confirm TransitionTime .
+	  Backing tests: test_alarms_conditions.
+	  Notes: Spec CU 5519: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_A_C_CONFIRM_EFFECTIVETRANSITIONTIME
+	bool "CU: A & C Confirm EffectiveTransitionTime"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5520:A & C Confirm EffectiveTransitionTime.
+	  Backing tests: test_alarms_conditions.
+	  Notes: Spec CU 5520: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_A_C_CONFIRM_EFFECTIVEDISPLAYNAME
+	bool "CU: A & C Confirm EffectiveDisplayName"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5521:A & C Confirm EffectiveDisplayName.
+	  Backing tests: test_alarms_conditions.
+	  Notes: Spec CU 5521: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_A_C_SUPPRESSION_TRANSITIONTIME
+	bool "CU: A & C Suppression TransitionTime"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5522:A & C Suppression TransitionTime.
+	  Backing tests: test_alarms_conditions.
+	  Notes: Spec CU 5522: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_A_C_SUPPRESSION_EFFECTIVETRANSITIONTIME
+	bool "CU: A & C Suppression EffectiveTransitionTime"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5523:A & C Suppression EffectiveTransitionTime.
+	  Backing tests: test_alarms_conditions.
+	  Notes: Spec CU 5523: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_A_C_SUPPRESSION_EFFECTIVEDISPLAYNAME
+	bool "CU: A & C Suppression EffectiveDisplayName"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5524:A & C Suppression EffectiveDisplayName.
+	  Backing tests: test_alarms_conditions.
+	  Notes: Spec CU 5524: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_A_C_OUTOFSERVICE_TRANSITIONTIME
+	bool "CU: A & C OutOfService TransitionTime"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5525:A & C OutOfService TransitionTime.
+	  Backing tests: test_alarms_conditions.
+	  Notes: Spec CU 5525: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_A_C_OUTOFSERVICE_EFFECTIVETRANSITIONTIME
+	bool "CU: A & C OutOfService EffectiveTransitionTime"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5526:A & C OutOfService EffectiveTransitionTime.
+	  Backing tests: test_alarms_conditions.
+	  Notes: Spec CU 5526: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_A_C_OUTOFSERVICE_EFFECTIVEDISPLAYNAME
+	bool "CU: A & C OutOfService EffectiveDisplayName"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5527:A & C OutOfService EffectiveDisplayName.
+	  Backing tests: test_alarms_conditions.
+	  Notes: Spec CU 5527: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_A_C_SILENCE_TRANSITIONTIME
+	bool "CU: A & C Silence TransitionTime"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5528:A & C Silence TransitionTime.
+	  Backing tests: test_alarms_conditions.
+	  Notes: Spec CU 5528: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_A_C_SILENCE_EFFECTIVETRANSITIONTIME
+	bool "CU: A & C Silence EffectiveTransitionTime"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5529:A & C Silence EffectiveTransitionTime.
+	  Backing tests: test_alarms_conditions.
+	  Notes: Spec CU 5529: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_A_C_SILENCE_EFFECTIVEDISPLAYNAME
+	bool "CU: A & C Silence EffectiveDisplayName"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5530:A & C Silence EffectiveDisplayName.
+	  Backing tests: test_alarms_conditions.
+	  Notes: Spec CU 5530: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_A_C_LATCHED_TRANSITIONTIME
+	bool "CU: A & C Latched TransitionTime"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5531:A & C Latched TransitionTime.
+	  Backing tests: test_alarms_conditions.
+	  Notes: Spec CU 5531: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_A_C_LATCHED_EFFECTIVETRANSITIONTIME
+	bool "CU: A & C Latched EffectiveTransitionTime"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5532:A & C Latched EffectiveTransitionTime.
+	  Backing tests: test_alarms_conditions.
+	  Notes: Spec CU 5532: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_A_C_LATCHED_EFFECTIVEDISPLAYNAME
+	bool "CU: A & C Latched EffectiveDisplayName"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5533:A & C Latched EffectiveDisplayName.
+	  Backing tests: test_alarms_conditions.
+	  Notes: Spec CU 5533: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_A_C_NON_EXCLUSIVE_HIGHHIGH_TRANSITIONTIME
+	bool "CU: A & C Non-Exclusive HighHigh TransitionTime"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5534:A & C Non-Exclusive HighHigh TransitionTime.
+	  Backing tests: test_alarms_conditions.
+	  Notes: Spec CU 5534: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_A_C_NON_EXCLUSIVE_HIGH_TRANSITIONTIME
+	bool "CU: A & C Non-Exclusive High TransitionTime"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5535:A & C Non-Exclusive High TransitionTime.
+	  Backing tests: test_alarms_conditions.
+	  Notes: Spec CU 5535: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_A_C_NON_EXCLUSIVE_LOW_TRANSITIONTIME
+	bool "CU: A & C Non-Exclusive Low TransitionTime"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5536:A & C Non-Exclusive Low TransitionTime.
+	  Backing tests: test_alarms_conditions.
+	  Notes: Spec CU 5536: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_A_C_NON_EXCLUSIVE_LOWLOW_TRANSITIONTIME
+	bool "CU: A & C Non-Exclusive LowLow TransitionTime"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5537:A & C Non-Exclusive LowLow TransitionTime.
+	  Backing tests: test_alarms_conditions.
+	  Notes: Spec CU 5537: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_A_C_NON_EXCLUSIVE_HIGHHIGH_EFFECTIVETRANSITIONTIME
+	bool "CU: A & C Non-Exclusive HighHigh EffectiveTransitionTime"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5538:A & C Non-Exclusive HighHigh EffectiveTransitionTime.
+	  Backing tests: test_alarms_conditions.
+	  Notes: Spec CU 5538: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_A_C_NON_EXCLUSIVE_HIGH_EFFECTIVETRANSITIONTIME
+	bool "CU: A & C Non-Exclusive High EffectiveTransitionTime"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5539:A & C Non-Exclusive High EffectiveTransitionTime.
+	  Backing tests: test_alarms_conditions.
+	  Notes: Spec CU 5539: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_A_C_NON_EXCLUSIVE_LOW_EFFECTIVETRANSITIONTIME
+	bool "CU: A & C Non-Exclusive Low EffectiveTransitionTime"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5540:A & C Non-Exclusive Low EffectiveTransitionTime.
+	  Backing tests: test_alarms_conditions.
+	  Notes: Spec CU 5540: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_A_C_NON_EXCLUSIVE_LOWLOW_EFFECTIVETRANSITIONTIME
+	bool "CU: A & C Non-Exclusive LowLow EffectiveTransitionTime"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5541:A & C Non-Exclusive LowLow EffectiveTransitionTime.
+	  Backing tests: test_alarms_conditions.
+	  Notes: Spec CU 5541: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_A_C_NON_EXCLUSIVE_HIGHHIGH_EFFECTIVEDISPLAYNAME
+	bool "CU: A & C Non-Exclusive HighHigh EffectiveDisplayName"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5542:A & C Non-Exclusive HighHigh EffectiveDisplayName.
+	  Backing tests: test_alarms_conditions.
+	  Notes: Spec CU 5542: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_A_C_NON_EXCLUSIVE_HIGH_EFFECTIVEDISPLAYNAME
+	bool "CU: A & C Non-Exclusive High EffectiveDisplayName"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5543:A & C Non-Exclusive High EffectiveDisplayName.
+	  Backing tests: test_alarms_conditions.
+	  Notes: Spec CU 5543: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_A_C_NON_EXCLUSIVE_LOW_EFFECTIVEDISPLAYNAME
+	bool "CU: A & C Non-Exclusive Low EffectiveDisplayName"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5544:A & C Non-Exclusive Low EffectiveDisplayName.
+	  Backing tests: test_alarms_conditions.
+	  Notes: Spec CU 5544: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_A_C_NON_EXCLUSIVE_LOWLOW_EFFECTIVEDISPLAYNAME
+	bool "CU: A & C Non-Exclusive LowLow EffectiveDisplayName"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5545:A & C Non-Exclusive LowLow EffectiveDisplayName.
+	  Backing tests: test_alarms_conditions.
+	  Notes: Spec CU 5545: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_A_C_DIALOG_TRANSITIONTIME
+	bool "CU: A & C Dialog TransitionTime"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5546:A & C Dialog TransitionTime.
+	  Backing tests: test_alarms_conditions.
+	  Notes: Spec CU 5546: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_A_C_DIALOG_EFFECTIVETRANSITIONTIME
+	bool "CU: A & C Dialog EffectiveTransitionTime"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5547:A & C Dialog EffectiveTransitionTime.
+	  Backing tests: test_alarms_conditions.
+	  Notes: Spec CU 5547: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_A_C_DIALOG_EFFECTIVEDISPLAYNAME
+	bool "CU: A & C Dialog EffectiveDisplayName"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5548:A & C Dialog EffectiveDisplayName.
+	  Backing tests: test_alarms_conditions.
+	  Notes: Spec CU 5548: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_A_C_SHELVING_LASTTRANSITION
+	bool "CU: A & C Shelving LastTransition"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5549:A & C Shelving LastTransition.
+	  Backing tests: test_alarms_conditions.
+	  Notes: Spec CU 5549: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_A_C_SHELVING_UNSHELVEDTOTIMEDSHELVED_TRANSITIONTIME
+	bool "CU: A & C Shelving UnshelvedToTimedShelved TransitionTime"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5550:A & C Shelving UnshelvedToTimedShelved TransitionTime.
+	  Backing tests: test_alarms_conditions.
+	  Notes: Spec CU 5550: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_A_C_SHELVING_TIMEDSHELVEDTOUNSHELVED_TRANSITIONTIME
+	bool "CU: A & C Shelving TimedShelvedToUnshelved TransitionTime"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5551:A & C Shelving TimedShelvedToUnshelved TransitionTime.
+	  Backing tests: test_alarms_conditions.
+	  Notes: Spec CU 5551: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_A_C_SHELVING_TIMEDSHELVEDTOONESHOTSHELVED_TRANSITIONTIME
+	bool "CU: A & C Shelving TimedShelvedToOneShotShelved TransitionTime"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5552:A & C Shelving TimedShelvedToOneShotShelved TransitionTime.
+	  Backing tests: test_alarms_conditions.
+	  Notes: Spec CU 5552: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_A_C_SHELVING_UNSHELVEDTOONESHOTSHELVED_TRANSITIONTIME
+	bool "CU: A & C Shelving UnshelvedToOneShotShelved TransitionTime"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5553:A & C Shelving UnshelvedToOneShotShelved TransitionTime.
+	  Backing tests: test_alarms_conditions.
+	  Notes: Spec CU 5553: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_A_C_SHELVING_ONESHOTSHELVEDTOUNSHELVED_TRANSITIONTIME
+	bool "CU: A & C Shelving OneShotShelvedToUnshelved TransitionTime"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5554:A & C Shelving OneShotShelvedToUnshelved TransitionTime.
+	  Backing tests: test_alarms_conditions.
+	  Notes: Spec CU 5554: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_A_C_SHELVING_ONESHOTSHELVEDTOTIMEDSHELVED_TRANSITIONTIME
+	bool "CU: A & C Shelving OneShotShelvedToTimedShelved TransitionTime"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5555:A & C Shelving OneShotShelvedToTimedShelved TransitionTime.
+	  Backing tests: test_alarms_conditions.
+	  Notes: Spec CU 5555: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_A_C_SHELVING_UNSHELVED_EFFECTIVEDISPLAYNAME
+	bool "CU: A & C Shelving Unshelved EffectiveDisplayName"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5556:A & C Shelving Unshelved EffectiveDisplayName.
+	  Backing tests: test_alarms_conditions.
+	  Notes: Spec CU 5556: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_A_C_SHELVING_TIMEDSHELVED_EFFECTIVEDISPLAYNAME
+	bool "CU: A & C Shelving TimedShelved EffectiveDisplayName"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5557:A & C Shelving TimedShelved EffectiveDisplayName.
+	  Backing tests: test_alarms_conditions.
+	  Notes: Spec CU 5557: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_A_C_SHELVING_ONESHOTSHELVED_EFFECTIVEDISPLAYNAME
+	bool "CU: A & C Shelving OneShotShelved EffectiveDisplayName"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5558:A & C Shelving OneShotShelved EffectiveDisplayName.
+	  Backing tests: test_alarms_conditions.
+	  Notes: Spec CU 5558: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_A_C_EXCLUSIVE_LIMIT_LASTTRANSITION
+	bool "CU: A & C Exclusive Limit LastTransition"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5559:A & C Exclusive Limit LastTransition.
+	  Backing tests: test_alarms_conditions.
+	  Notes: Spec CU 5559: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_A_C_EXCLUSIVE_LIMIT_LOWTOLOWLOW_TRANSITIONTIME
+	bool "CU: A & C Exclusive Limit LowToLowLow TransitionTime"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5560:A & C Exclusive Limit LowToLowLow TransitionTime.
+	  Backing tests: test_alarms_conditions.
+	  Notes: Spec CU 5560: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_A_C_EXCLUSIVE_LIMIT_LOWLOWTOLOW_TRANSITIONTIME
+	bool "CU: A & C Exclusive Limit LowLowToLow TransitionTime"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5561:A & C Exclusive Limit LowLowToLow TransitionTime.
+	  Backing tests: test_alarms_conditions.
+	  Notes: Spec CU 5561: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_A_C_EXCLUSIVE_LIMIT_HIGHTOHIGHHIGH_TRANSITIONTIME
+	bool "CU: A & C Exclusive Limit HighToHighHigh TransitionTime"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5562:A & C Exclusive Limit HighToHighHigh TransitionTime.
+	  Backing tests: test_alarms_conditions.
+	  Notes: Spec CU 5562: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_A_C_EXCLUSIVE_LIMIT_HIGHHIGHTOHIGH_TRANSITIONTIME
+	bool "CU: A & C Exclusive Limit HighHighToHigh TransitionTime"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5563:A & C Exclusive Limit HighHighToHigh TransitionTime.
+	  Backing tests: test_alarms_conditions.
+	  Notes: Spec CU 5563: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_A_C_EXCLUSIVE_LIMIT_LOWLOW_EFFECTIVEDISPLAYNAME
+	bool "CU: A & C Exclusive Limit LowLow EffectiveDisplayName"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5564:A & C Exclusive Limit LowLow EffectiveDisplayName.
+	  Backing tests: test_alarms_conditions.
+	  Notes: Spec CU 5564: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_A_C_EXCLUSIVE_LIMIT_LOW_EFFECTIVEDISPLAYNAME
+	bool "CU: A & C Exclusive Limit Low EffectiveDisplayName"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5565:A & C Exclusive Limit Low EffectiveDisplayName.
+	  Backing tests: test_alarms_conditions.
+	  Notes: Spec CU 5565: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_A_C_EXCLUSIVE_LIMIT_HIGH_EFFECTIVEDISPLAYNAME
+	bool "CU: A & C Exclusive Limit High EffectiveDisplayName"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5566:A & C Exclusive Limit High EffectiveDisplayName.
+	  Backing tests: test_alarms_conditions.
+	  Notes: Spec CU 5566: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_A_C_EXCLUSIVE_LIMIT_HIGHHIGH_EFFECTIVEDISPLAYNAME
+	bool "CU: A & C Exclusive Limit HighHigh EffectiveDisplayName"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5567:A & C Exclusive Limit HighHigh EffectiveDisplayName.
+	  Backing tests: test_alarms_conditions.
+	  Notes: Spec CU 5567: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_LOGOBJECT_BASE
+	bool "CU: LogObject Base "
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5652:LogObject Base .
+	  Backing tests: test_alarms_conditions, test_event_notifier, test_event_serializer.
+	  Notes: Spec CU 5652: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_LOGOBJECT_PERSISTENT_STORAGE
+	bool "CU: LogObject Persistent Storage "
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5653:LogObject Persistent Storage .
+	  Backing tests: test_alarms_conditions, test_event_notifier, test_event_serializer.
+	  Notes: Spec CU 5653: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_LOGOBJECT_TRACECONTEXT
+	bool "CU: LogObject TraceContext "
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5654:LogObject TraceContext .
+	  Backing tests: test_alarms_conditions, test_event_notifier, test_event_serializer.
+	  Notes: Spec CU 5654: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_LOGOBJECT_ADDITIONALDATA
+	bool "CU: LogObject AdditionalData"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5655:LogObject AdditionalData.
+	  Backing tests: test_alarms_conditions, test_event_notifier, test_event_serializer.
+	  Notes: Spec CU 5655: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_LOGOBJECT_BASE_EVENT_COLLECTION
+	bool "CU: LogObject Base Event Collection"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5656:LogObject Base Event Collection.
+	  Backing tests: test_alarms_conditions, test_event_notifier, test_event_serializer.
+	  Notes: Spec CU 5656: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_LOGOBJECT_STORAGE_OVERFLOW
+	bool "CU: LogObject Storage Overflow"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5658:LogObject Storage Overflow.
+	  Backing tests: test_alarms_conditions, test_event_notifier, test_event_serializer.
+	  Notes: Spec CU 5658: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_LOGOBJECT_EVENT_GENERATION
+	bool "CU: LogObject Event Generation"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5659:LogObject Event Generation.
+	  Backing tests: test_alarms_conditions, test_event_notifier, test_event_serializer.
+	  Notes: Spec CU 5659: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_LOGOBJECT_MAXRECORDS
+	bool "CU: LogObject MaxRecords"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5660:LogObject MaxRecords.
+	  Backing tests: test_alarms_conditions, test_event_notifier, test_event_serializer.
+	  Notes: Spec CU 5660: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_LOGOBJECT_MAXSTORAGEDURATION
+	bool "CU: LogObject MaxStorageDuration"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5661:LogObject MaxStorageDuration.
+	  Backing tests: test_alarms_conditions, test_event_notifier, test_event_serializer.
+	  Notes: Spec CU 5661: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_LOGOBJECT_MINIMUMSEVERITY
+	bool "CU: LogObject MinimumSeverity"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5662:LogObject MinimumSeverity.
+	  Backing tests: test_alarms_conditions, test_event_notifier, test_event_serializer.
+	  Notes: Spec CU 5662: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_LOGOBJECT_LOGS_FOLDER
+	bool "CU: LogObject Logs Folder"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5663:LogObject Logs Folder.
+	  Backing tests: test_alarms_conditions, test_event_notifier, test_event_serializer.
+	  Notes: Spec CU 5663: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_LOGOBJECT_SERVERLOG
+	bool "CU: LogObject ServerLog "
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5664:LogObject ServerLog .
+	  Backing tests: test_alarms_conditions, test_event_notifier, test_event_serializer.
+	  Notes: Spec CU 5664: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_LOGOBJECT_EVENTTYPE
+	bool "CU: LogObject EventType"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5775:LogObject EventType.
+	  Backing tests: test_alarms_conditions, test_event_notifier, test_event_serializer.
+	  Notes: Spec CU 5775: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_LOGOBJECT_SOURCENODE
+	bool "CU: LogObject SourceNode"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5776:LogObject SourceNode.
+	  Backing tests: test_alarms_conditions, test_event_notifier, test_event_serializer.
+	  Notes: Spec CU 5776: tracked in manifest; not yet claimed or implemented.
 
 config MUC_OPCUA_CU_BASE_INFO_TEMPORARY_FILE_TRANSFER_TYPE_BASE
 	bool "CU: Base Info TemporaryFileTransferType Base"
@@ -2922,6 +4432,33 @@ config MUC_OPCUA_CU_BASE_INFO_TEMPORARY_FILE_TRANSFER_TYPE_BASE
 	  Backing tests: test_profile_surface.
 	  Notes: Claimed: minimal type stubs and capability markers in place.
 
+config MUC_OPCUA_CU_DOCUMENTATION_DURABLE_SUBSCRIPTION_CAPACITY
+	bool "CU: Documentation - Durable Subscription Capacity"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5795:Documentation - Durable Subscription Capacity.
+	  Backing tests: test_base_server_behaviour.
+	  Notes: Spec CU 5795: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_DOCUMENTATION_ON_LINE
+	bool "CU: Documentation - On-line"
+	default n
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5796:Documentation - On-line.
+	  Backing tests: test_base_server_behaviour.
+	  Notes: Spec CU 5796: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_DOCUMENTATION_TROUBLE_SHOOTING_GUIDE
+	bool "CU: Documentation - Trouble Shooting Guide"
+	default n
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5797:Documentation - Trouble Shooting Guide.
+	  Backing tests: test_base_server_behaviour.
+	  Notes: Spec CU 5797: tracked in manifest; not yet claimed or implemented.
+
 config MUC_OPCUA_CU_HISTORICAL_ACCESS_READ_RAW
 	bool "CU: Historical Access Read Raw"
 	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
@@ -2930,6 +4467,24 @@ config MUC_OPCUA_CU_HISTORICAL_ACCESS_READ_RAW
 	  OPC item: CU 5806:Historical Access Read Raw.
 	  Backing tests: test_profile_surface.
 	  Notes: Satisfied by Historical Access Server Facet.
+
+config MUC_OPCUA_CU_A_C_NON_EXCLUSIVE_LIMIT
+	bool "CU: A & C Non-Exclusive Limit"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5807:A & C Non-Exclusive Limit.
+	  Backing tests: test_alarms_conditions.
+	  Notes: Spec CU 5807: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_A_C_EXCLUSIVE_LIMIT
+	bool "CU: A & C Exclusive Limit"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5808:A & C Exclusive Limit.
+	  Backing tests: test_alarms_conditions.
+	  Notes: Spec CU 5808: tracked in manifest; not yet claimed or implemented.
 
 config MUC_OPCUA_CU_SECURITY_USER_JWT_ISSUEDTOKEN_2
 	bool "CU: Security User JWT IssuedToken 2"
@@ -2967,6 +4522,33 @@ config MUC_OPCUA_CU_ATTRIBUTE_HISTORICAL_READ
 	  Backing tests: test_profile_surface.
 	  Notes: Satisfied by Historical Access Server Facet.
 
+config MUC_OPCUA_CU_ALIASNAME_FINDALIASVERBOSE
+	bool "CU: AliasName FindAliasVerbose"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5869:AliasName FindAliasVerbose.
+	  Backing tests: test_aliasname_stub.
+	  Notes: Spec CU 5869: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_ALIASNAME_CATEGORY_LASTCHANGE
+	bool "CU: AliasName Category LastChange"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5873:AliasName Category LastChange.
+	  Backing tests: test_aliasname_stub.
+	  Notes: Spec CU 5873: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_ALIASNAME_CONFIGURATION_SUPPORT
+	bool "CU: AliasName Configuration Support"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5874:AliasName Configuration Support.
+	  Backing tests: test_aliasname_stub.
+	  Notes: Spec CU 5874: tracked in manifest; not yet claimed or implemented.
+
 config MUC_OPCUA_CU_BASE_INFO_STATE_MACHINE_DESC_NODEID_DATATYPE
 	bool "CU: Base Info State Machine DescriptionNodeIdDataType"
 	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
@@ -2975,6 +4557,51 @@ config MUC_OPCUA_CU_BASE_INFO_STATE_MACHINE_DESC_NODEID_DATATYPE
 	  OPC item: CU 5875:Base Info State Machine DescriptionNodeIdDataType.
 	  Backing tests: test_profile_surface.
 	  Notes: Claimed: minimal type stubs and capability markers in place.
+
+config MUC_OPCUA_CU_ALIASNAME_CONFIGURATION_SUPPORT_EXTERNAL
+	bool "CU: AliasName Configuration Support external"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5937:AliasName Configuration Support external.
+	  Backing tests: test_aliasname_stub.
+	  Notes: Spec CU 5937: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_ALIASNAME_PUBSUB_SUBSCRIBER
+	bool "CU: AliasName PubSub Subscriber  "
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5940:AliasName PubSub Subscriber  .
+	  Backing tests: test_aliasname_stub.
+	  Notes: Spec CU 5940: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_ALIASNAME_PUBSUB_NOTIFICATION
+	bool "CU: AliasName PubSub Notification"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5941:AliasName PubSub Notification.
+	  Backing tests: test_aliasname_stub.
+	  Notes: Spec CU 5941: tracked in manifest; not yet claimed or implemented.
+
+config MUC_OPCUA_CU_SCHEDULER
+	bool "CU: Scheduler Base"
+	depends on MUC_OPCUA_CU_METHOD_SERVER
+	default n
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-7.
+	  Backing tests: test_scheduler_stub.
+
+config MUC_OPCUA_CU_ALIASNAME
+	bool "CU: AliasName Server"
+	depends on MUC_OPCUA_FACET_CORE_2022_SERVER
+	default n
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-7.
+	  Backing tests: test_aliasname_stub.
 
 endif
 
