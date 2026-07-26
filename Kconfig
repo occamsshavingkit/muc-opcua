@@ -219,6 +219,15 @@ config MUC_OPCUA_CU_VIEW_TRANSLATEBROWSEPATH
 	  Backing tests: test_browse_service, test_view_services.
 	  Notes: Support TranslateBrowsePathsToNodeIds Service.
 
+config MUC_OPCUA_CU_MONITOR_QUEUESIZE_SERVERMAX
+	bool "CU: Monitor QueueSize_ServerMax"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2318:Monitor QueueSize_ServerMax.
+	  Backing tests: test_profile_surface.
+	  Notes: Reconciled (spec 073): server clamps requested MonitoredItem QueueSize to the compiled max (subscription_monitor.c); tested by test_subscriptions_capacity. Satisfied by subscription_standard.
+
 config MUC_OPCUA_CU_DISCOVERY_GET_ENDPOINTS
 	bool "CU: Discovery Get Endpoints"
 	depends on MUC_OPCUA_FACET_CORE_2022_SERVER
@@ -266,6 +275,16 @@ config MUC_OPCUA_CU_SESSION_CHANGE_USER
 	  OPC source: OPC-10000-4 §5.7.3 -- CU 2400:Session Change User.
 	  Backing tests: test_session, test_session_auth.
 	  Notes: Support the use of ActivateSession to change the Session user.
+
+config MUC_OPCUA_CU_SECURITY_ADMINISTRATION
+	bool "CU: Security Administration"
+	depends on MUC_OPCUA_FACET_CORE_2022_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2407:Security Administration.
+	  Backing tests: test_profile_surface.
+	  Notes: Satisfied by project-level CU opc_cu_user_role_management; basic role-based access control is available, but full security administration (CRUD on user/role objects) is stubbed. See src/cu/core_2022_server/security_administration/stub.c.disabled.
 
 config MUC_OPCUA_CU_AUDITING_SECURE_COMMUNICATION
 	bool "CU: Auditing Secure Communication"
@@ -405,6 +424,15 @@ config MUC_OPCUA_CU_ADDRESS_SPACE_FULL_ARRAY_ONLY
 	  Backing tests: test_profile_surface.
 	  Notes: Support setting the WriteFullArrayOnly flag in the AccessLevelEx Attribute for Variable Nodes of non-scalar data types to indicate whether write operations for an array can be performed with an IndexRange.
 
+config MUC_OPCUA_CU_SECURITY_POLICY_REQUIRED
+	bool "CU: Security Policy Required"
+	default y if MUC_OPCUA_INTERN_PROFILE_EMBEDDED_2025_UA_SERVER
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-7 §6.5 -- CU 2863:Security Policy Required.
+	  Backing tests: test_profile_surface.
+	  Notes: Imported from OPC profile REST API 2026-07-15. Capability satisfied via the secure-conversation layer, which implements Basic256Sha256, Aes128_Sha256_RsaOaep, and Aes256_Sha256_RsaPss; Kconfig gates per-profile inclusion.
+
 config MUC_OPCUA_CU_ATTRIBUTE_WRITE_STATUSCODE_TIMESTAMP
 	bool "CU: Attribute Write StatusCode & Timestamp"
 	depends on MUC_OPCUA_FACET_CORE_2022_SERVER
@@ -434,6 +462,24 @@ config MUC_OPCUA_CU_BASE_INFO_SEMANTICCHANGE
 	  Backing tests: test_profile_surface.
 	  Notes: Reconciled: satisfied by opc_cu_base_info_datatypes.
 
+config MUC_OPCUA_CU_DATA_ACCESS_DOUBLECOMPLEX_NUMBER
+	bool "CU: Data Access DoubleComplex Number"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2984:Data Access DoubleComplex Number.
+	  Backing tests: test_profile_surface.
+	  Notes: Reconciled (spec 079): satisfied by Data Access (opc_cu_data_access).
+
+config MUC_OPCUA_CU_DATA_ACCESS_MULTISTATE
+	bool "CU: Data Access MultiState"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2988:Data Access MultiState.
+	  Backing tests: test_profile_surface.
+	  Notes: Reconciled (spec 079): satisfied by Data Access (opc_cu_data_access).
+
 config OPC_CU_3080
 	bool "CU: Security Default ApplicationInstance Certificate"
 	default y if MUC_OPCUA_INTERN_PROFILE_NANO_EMBEDDED_DEVICE_2025_SERVER
@@ -442,6 +488,15 @@ config OPC_CU_3080
 	  OPC item: CU 3080:Security Default ApplicationInstance Certificate.
 	  Backing tests: test_certificate_validity, test_server_config.
 	  Notes: An application, when installed, has a default ApplicationInstanceCertificate that is valid. The default ApplicationInstanceCertificate shall either be created as part of the installation or installation instructions explicitly describe the process to create and apply a default ApplicationInstanceCertificate to the application. (Documentation complete; no code change needed.)
+
+config MUC_OPCUA_CU_DATA_ACCESS_PERCENTDEADBAND
+	bool "CU: Data Access PercentDeadband"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3112:Data Access PercentDeadband.
+	  Backing tests: test_profile_surface.
+	  Notes: Reconciled (spec 079): satisfied by Data Access (opc_cu_data_access).
 
 config MUC_OPCUA_CU_BASE_INFO_OPTIONSET
 	bool "CU: Base Info OptionSet"
@@ -462,6 +517,15 @@ config MUC_OPCUA_CU_ATTRIBUTE_WRITE_INDEX_RANGE
 	  OPC source: OPC-10000-4 §5.11.4 -- CU 3147:Attribute Write Index.
 	  Backing tests: test_write_service.
 	  Notes: Supports the IndexRange to write a single element or a range of elements when the Attribute value is an array and partial updates is allowed for this array; depends on Attribute Write Values so it cannot enable Write by itself. Requires heap (array-valued Write decode uses heap), so it is unavailable on the strictly no-heap MCU tiers (nano/micro/embedded) and defaults off there; a _Static_assert in attribute_handler.c enforces MUC_OPCUA_ALLOW_HEAP.
+
+config MUC_OPCUA_CU_MONITOR_EVENTS
+	bool "CU: Monitor Events"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3150:Monitor Events.
+	  Backing tests: test_profile_surface.
+	  Notes: Reconciled (spec 073): MonitoredItem on the EventNotifier attribute delivers EventFieldLists end-to-end (notification.c); tested by test_event_notifications. Satisfied by opc_cu_events.
 
 config MUC_OPCUA_CU_BASE_INFO_CORE_STRUCTURE_2
 	bool "CU: Base Info Core Structure 2"
@@ -602,6 +666,60 @@ config MUC_OPCUA_CU_ADDRESS_SPACE_INTERFACES
 	  Backing tests: test_profile_surface.
 	  Notes: Support Interfaces and associated rules. Includes exposing the entry point InterfaceTypes and the types BaseInterfaceType and HasInterface and all their supertypes in the AddressSpace.
 
+config MUC_OPCUA_CU_DATA_ACCESS_DATAITEMS
+	bool "CU: Data Access DataItems"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3565:Data Access DataItems.
+	  Backing tests: test_profile_surface.
+	  Notes: Reconciled (spec 079): satisfied by Data Access (opc_cu_data_access).
+
+config MUC_OPCUA_CU_DATA_ACCESS_BASEANALOGTYPE
+	bool "CU: Data Access BaseAnalogType"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3566:Data Access BaseAnalogType.
+	  Backing tests: test_profile_surface.
+	  Notes: Reconciled (spec 079): satisfied by Data Access (opc_cu_data_access).
+
+config MUC_OPCUA_CU_DATA_ACCESS_ANALOGITEMTYPE
+	bool "CU: Data Access AnalogItemType"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3567:Data Access AnalogItemType.
+	  Backing tests: test_profile_surface.
+	  Notes: Reconciled (spec 079): satisfied by Data Access (opc_cu_data_access).
+
+config MUC_OPCUA_CU_DATA_ACCESS_ANALOGUNITTYPE
+	bool "CU: Data Access AnalogUnitType"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3568:Data Access AnalogUnitType.
+	  Backing tests: test_profile_surface.
+	  Notes: Reconciled (spec 079): satisfied by Data Access (opc_cu_data_access).
+
+config MUC_OPCUA_CU_DATA_ACCESS_ANALOGUNITRANGETYPE
+	bool "CU: Data Access AnalogUnitRangeType"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3569:Data Access AnalogUnitRangeType.
+	  Backing tests: test_profile_surface.
+	  Notes: Reconciled (spec 079): satisfied by Data Access (opc_cu_data_access).
+
+config MUC_OPCUA_CU_SECURITY_ECC_POLICY
+	bool "CU: Security ECC Policy"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-7 §6.5 -- CU 3721:Security ECC Policy.
+	  Backing tests: test_profile_surface.
+	  Notes: Imported from OPC profile REST API 2026-07-15. Optional. Capability satisfied by MUC_OPCUA_CU_SECURITY_ECC (spec 059); Kconfig gates per-profile inclusion (built in full).
+
 config MUC_OPCUA_CU_A_C_AUDITING
 	bool "CU: A & C Auditing"
 	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
@@ -644,6 +762,15 @@ config MUC_OPCUA_CU_A_C_SUPPRESSION_AUDITING
 	  Implementation state: deferred.
 	  OPC source: OPC-10000-9 §5.10.9 -- CU 3768:A & C Suppression Auditing.
 	  Notes: Requires A & C Suppression State feature (not yet implemented). Deferred until suppression support is added.
+
+config MUC_OPCUA_CU_DATA_ACCESS_ARRAYITEM2TYPE
+	bool "CU: Data Access ArrayItem2Type"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3786:Data Access ArrayItem2Type.
+	  Backing tests: test_profile_surface.
+	  Notes: Reconciled (spec 079): satisfied by Data Access (opc_cu_data_access).
 
 config MUC_OPCUA_CU_DOCUMENTATION_CORE_CAPACITIES
 	bool "CU: Documentation - Core Capacities"
@@ -718,6 +845,15 @@ config MUC_OPCUA_CU_BASE_SERVICES_DIAGNOSTICS
 	  OPC source: OPC-10000-4 §7.32, 7.38 -- CU 3983:Base Services Diagnostics.
 	  Backing tests: test_service_header.
 	  Notes: The Server returns available diagnostic information as requested with the 'returnDiagnostics' parameter.
+
+config MUC_OPCUA_CU_MONITOR_COMPLEX_EVENT_FILTER
+	bool "CU: Monitor Complex Event Filter"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 4030:Monitor Complex Event Filter.
+	  Backing tests: test_profile_surface.
+	  Notes: Reconciled (spec 073): combined SELECT + WHERE event filter with operator support and unsupported-operator rejection (filter_reader.c + event_filter.c); tested E2E by test_event_notifications. Satisfied by opc_cu_event_filter_where.
 
 config MUC_OPCUA_CU_BASE_INFO_LOCATIONS_OBJECT
 	bool "CU: Base Info Locations Object"
@@ -860,6 +996,15 @@ config MUC_OPCUA_CU_AGGREGATES_DURATIONGOOD
 	  OPC source: OPC-10000-13 §4.2.2.29 -- Core 2022 Server Facet.
 	  Backing tests: test_aggregate, test_aggregate_full.
 
+config MUC_OPCUA_CU_AGGREGATES_DURATIONINSTATENONZERO
+	bool "CU: Aggregates - DurationInStateNonZero"
+	depends on MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-13 §4.2.2.21 -- Core 2022 Server Facet.
+	  Backing tests: test_aggregate, test_aggregate_full.
+
 config MUC_OPCUA_CU_AGGREGATES_DURATIONINSTATEZERO
 	bool "CU: Aggregates - DurationInStateZero"
 	depends on MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
@@ -876,6 +1021,15 @@ config MUC_OPCUA_CU_AGGREGATES_END
 	help
 	  Implementation state: claimed.
 	  OPC source: OPC-10000-13 §4.2.2.24 -- Core 2022 Server Facet.
+	  Backing tests: test_aggregate, test_aggregate_full.
+
+config MUC_OPCUA_CU_AGGREGATES_ENDBOUND
+	bool "CU: Aggregates - EndBound"
+	depends on MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-13 §4.2.2.27 -- Core 2022 Server Facet.
 	  Backing tests: test_aggregate, test_aggregate_full.
 
 config MUC_OPCUA_CU_AGGREGATE_FULL
@@ -897,6 +1051,24 @@ config MUC_OPCUA_CU_AGGREGATES_INTERPOLATIVE
 	  OPC source: OPC-10000-13 §4.2.2.3 -- Core 2022 Server Facet.
 	  Backing tests: test_aggregate, test_aggregate_full.
 
+config MUC_OPCUA_CU_AGGREGATES_MAXIMUMACTUALTIME
+	bool "CU: Aggregates - MaximumActualTime"
+	depends on MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-13 §4.2.2.12 -- Core 2022 Server Facet.
+	  Backing tests: test_aggregate, test_aggregate_full.
+
+config MUC_OPCUA_CU_AGGREGATES_MAXIMUMACTUALTIME2
+	bool "CU: Aggregates - MaximumActualTime2"
+	depends on MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-13 §4.2.2.17 -- Core 2022 Server Facet.
+	  Backing tests: test_aggregate, test_aggregate_full.
+
 config MUC_OPCUA_CU_AGGREGATES_MAXIMUM
 	bool "CU: Aggregates - Maximum"
 	depends on MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
@@ -915,6 +1087,24 @@ config MUC_OPCUA_CU_AGGREGATES_MAXIMUM2
 	  OPC source: OPC-10000-13 §4.2.2.15 -- Core 2022 Server Facet.
 	  Backing tests: test_aggregate, test_aggregate_full.
 
+config MUC_OPCUA_CU_AGGREGATES_MINIMUMACTUALTIME
+	bool "CU: Aggregates - MinimumActualTime"
+	depends on MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-13 §4.2.2.11 -- Core 2022 Server Facet.
+	  Backing tests: test_aggregate, test_aggregate_full.
+
+config MUC_OPCUA_CU_AGGREGATES_MINIMUMACTUALTIME2
+	bool "CU: Aggregates - MinimumActualTime2"
+	depends on MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-13 §4.2.2.16 -- Core 2022 Server Facet.
+	  Backing tests: test_aggregate, test_aggregate_full.
+
 config MUC_OPCUA_CU_AGGREGATES_MINIMUM
 	bool "CU: Aggregates - Minimum"
 	depends on MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
@@ -931,6 +1121,15 @@ config MUC_OPCUA_CU_AGGREGATES_MINIMUM2
 	help
 	  Implementation state: claimed.
 	  OPC source: OPC-10000-13 §4.2.2.14 -- Core 2022 Server Facet.
+	  Backing tests: test_aggregate, test_aggregate_full.
+
+config MUC_OPCUA_CU_AGGREGATES_NUMBEROFTRANSITIONS
+	bool "CU: Aggregates - NumberOfTransitions"
+	depends on MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-13 §4.2.2.22 -- Core 2022 Server Facet.
 	  Backing tests: test_aggregate, test_aggregate_full.
 
 config MUC_OPCUA_CU_AGGREGATES_PERCENTBAD
@@ -960,6 +1159,15 @@ config MUC_OPCUA_CU_AGGREGATES_RANGE
 	  OPC source: OPC-10000-13 §4.2.2.13 -- Core 2022 Server Facet.
 	  Backing tests: test_aggregate, test_aggregate_full.
 
+config MUC_OPCUA_CU_AGGREGATES_RANGE2
+	bool "CU: Aggregates - Range2"
+	depends on MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-13 §4.2.2.18 -- Core 2022 Server Facet.
+	  Backing tests: test_aggregate, test_aggregate_full.
+
 config MUC_OPCUA_CU_AGGREGATES_START
 	bool "CU: Aggregates - Start"
 	depends on MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
@@ -967,6 +1175,33 @@ config MUC_OPCUA_CU_AGGREGATES_START
 	help
 	  Implementation state: claimed.
 	  OPC source: OPC-10000-13 §4.2.2.23 -- Core 2022 Server Facet.
+	  Backing tests: test_aggregate, test_aggregate_full.
+
+config MUC_OPCUA_CU_AGGREGATES_STARTBOUND
+	bool "CU: Aggregates - StartBound"
+	depends on MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-13 §4.2.2.26 -- Core 2022 Server Facet.
+	  Backing tests: test_aggregate, test_aggregate_full.
+
+config MUC_OPCUA_CU_AGGREGATES_STANDARDDEVIATIONPOPULATION
+	bool "CU: Aggregates - StandardDeviationPopulation"
+	depends on MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-13 §4.2.2.38 -- Core 2022 Server Facet.
+	  Backing tests: test_aggregate, test_aggregate_full.
+
+config MUC_OPCUA_CU_AGGREGATES_STANDARDDEVIATIONSAMPLE
+	bool "CU: Aggregates - StandardDeviationSample"
+	depends on MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-13 §4.2.2.36 -- Core 2022 Server Facet.
 	  Backing tests: test_aggregate, test_aggregate_full.
 
 config MUC_OPCUA_CU_AGGREGATES_TIMEAVERAGE
@@ -1003,6 +1238,24 @@ config MUC_OPCUA_CU_AGGREGATES_TOTAL2
 	help
 	  Implementation state: claimed.
 	  OPC source: OPC-10000-13 §4.2.2.8 -- Core 2022 Server Facet.
+	  Backing tests: test_aggregate, test_aggregate_full.
+
+config MUC_OPCUA_CU_AGGREGATES_VARIANCEPOPULATION
+	bool "CU: Aggregates - VariancePopulation"
+	depends on MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-13 §4.2.2.39 -- Core 2022 Server Facet.
+	  Backing tests: test_aggregate, test_aggregate_full.
+
+config MUC_OPCUA_CU_AGGREGATES_VARIANCESAMPLE
+	bool "CU: Aggregates - VarianceSample"
+	depends on MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-13 §4.2.2.37 -- Core 2022 Server Facet.
 	  Backing tests: test_aggregate, test_aggregate_full.
 
 config MUC_OPCUA_CU_AGGREGATES_WORSTQUALITY
@@ -1364,6 +1617,26 @@ config MUC_OPCUA_CU_USER_ROLE_MANAGEMENT
 	  Backing tests: test_role_management.
 	  Notes: User Role Management — AddRole/RemoveRole/AddIdentity/RemoveIdentity implemented in PR #330
 
+config MUC_OPCUA_CU_MONITOR_ITEMS_500
+	bool "CU: Monitor Items 500"
+	default n
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-4 §5.13.2 -- Monitor Items 500.
+	  Backing tests: test_profile_surface.
+	  Imported from: profiles/opcua-profile-snapshot.json.
+	  Notes: Satisfied by project-level CU opc_cu_subscription_standard; support for 500+ monitored items is stubbed as it requires substantial memory allocation. See src/cu/core_2022_server/monitor_items_500/stub.c.disabled.
+
+config MUC_OPCUA_CU_MONITOR_MINQUEUESIZE_05
+	bool "CU: Monitor MinQueueSize_05"
+	default n
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-4 §5.13.2 -- Monitor MinQueueSize_05.
+	  Backing tests: test_profile_surface.
+	  Imported from: profiles/opcua-profile-snapshot.json.
+	  Notes: Satisfied by project-level CU opc_cu_subscription_standard; MinQueueSize_05 tuning is stubbed. See src/cu/core_2022_server/monitor_minqueuesize_05/stub.c.disabled.
+
 config MUC_OPCUA_CU_VIEW_BASIC_TRANSLATEBROWSEPATH
 	bool "CU: View Basic / TranslateBrowsePath"
 	default y
@@ -1507,6 +1780,16 @@ menuconfig MUC_OPCUA_FACET_EMBEDDED_DATACHANGE_SUBSCRIPTION_2022_SERVER
 
 if MUC_OPCUA_FACET_EMBEDDED_DATACHANGE_SUBSCRIPTION_2022_SERVER
 
+config MUC_OPCUA_CU_MONITOR_BASIC
+	bool "CU: Monitor Basic"
+	depends on MUC_OPCUA_FACET_EMBEDDED_DATACHANGE_SUBSCRIPTION_2022_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_MICRO_EMBEDDED_DEVICE_2025_SERVER
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2963:Monitor Basic.
+	  Backing tests: test_profile_surface.
+	  Notes: Support the following MonitoredItem Services: CreateMonitoredItems, ModifyMonitoredItems, DeleteMonitoredItems and SetMonitoringMode.
+
 config MUC_OPCUA_CU_BASE_INFO_FIXED_SAMPLINGINTERVAL
 	bool "CU: Base Info Fixed SamplingInterval"
 	depends on MUC_OPCUA_FACET_EMBEDDED_DATACHANGE_SUBSCRIPTION_2022_SERVER
@@ -1546,6 +1829,26 @@ config MUC_OPCUA_CU_BASE_INFO_SERVER_CAPABILITIES_MAXMONITOREDITEMSQUEUESIZE
 	  OPC item: CU 4055:Base Info Server Capabilities MaxMonitoredItemsQueueSize.
 	  Backing tests: test_profile_surface.
 	  Notes: Reconciled (spec 073): MaxMonitoredItemsQueueSize(31916) exposed on ServerCapabilities in base_nodes.c, advertised value == MU_INTERN_MONITORED_QUEUE_DEPTH; test_operation_limits::test_subscription_capability_nodes_resolve. Satisfied by opc_cu_subscription_basic. Exposes MaxMonitoredItemsQueueSize of the ServerCapabilities Object.
+
+config MUC_OPCUA_CU_MONITOR_ITEMS_2
+	bool "CU: Monitor Items 2"
+	depends on MUC_OPCUA_FACET_EMBEDDED_DATACHANGE_SUBSCRIPTION_2022_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_MICRO_EMBEDDED_DEVICE_2025_SERVER
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5207:Monitor Items 2.
+	  Backing tests: test_profile_surface.
+	  Notes: Support at least 2 MonitoredItems per Subscription where the size of each MonitoredItem is at least equal to size of Double.
+
+config MUC_OPCUA_CU_MONITOR_VALUE_CHANGE_V2
+	bool "CU: Monitor Value Change V2"
+	depends on MUC_OPCUA_FACET_EMBEDDED_DATACHANGE_SUBSCRIPTION_2022_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_MICRO_EMBEDDED_DEVICE_2025_SERVER
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5208:Monitor Value Change V2.
+	  Backing tests: test_profile_surface.
+	  Notes: Reconciled (spec 073): MonitoredItem IndexRange is parsed at create (subscription_helpers.c), rejected with Bad_IndexRangeInvalid when malformed, and applied to array samples via apply_numeric_index_range (read_attribute.c) in read_monitored_item_value; test_monitored_index_range (single element, slice, whole-array, out-of-bounds). Satisfied by opc_cu_subscription_basic. Support creation of MonitoredItems for Attribute value changes. This includes support of the IndexRange to select a single element or a range of elements when the Attribute value is an array. This ConformanceUnit does not require queuing when multiple value changes occur during a "publish period". I.e. the latest change will be sent in the Notification.
 
 endif
 
@@ -2013,6 +2316,42 @@ config MUC_OPCUA_CU_BASE_INFO_PORTABLE_IDS
 	  Backing tests: test_profile_surface.
 	  Notes: Standard OPC UA DataType automatically exposed through the type system (see opc_cu_base_info_datatypes / opc_cu_base_info_base_types). No dedicated CU implementation file is required.
 
+config MUC_OPCUA_CU_DATA_ACCESS_TWOSTATE
+	bool "CU: Data Access TwoState"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2361:Data Access TwoState.
+	  Backing tests: test_profile_surface.
+	  Notes: Reconciled (spec 079): satisfied by Data Access (opc_cu_data_access).
+
+config MUC_OPCUA_CU_DATA_ACCESS_COMPLEX_NUMBER
+	bool "CU: Data Access Complex Number"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2399:Data Access Complex Number.
+	  Backing tests: test_profile_surface.
+	  Notes: Reconciled (spec 079): satisfied by Data Access (opc_cu_data_access).
+
+config MUC_OPCUA_CU_DATA_ACCESS_DISCRETEITEMTYPE
+	bool "CU: Data Access DiscreteItemType"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2426:Data Access DiscreteItemType.
+	  Backing tests: test_profile_surface.
+	  Notes: Reconciled (spec 079): satisfied by Data Access (opc_cu_data_access).
+
+config MUC_OPCUA_CU_DATA_ACCESS_MULTISTATEDICTIONARYENTRYDBT
+	bool "CU: Data Access MultiStateDictionaryEntryDBT"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2474:Data Access MultiStateDictionaryEntryDBT.
+	  Backing tests: test_profile_surface.
+	  Notes: Reconciled (spec 079): satisfied by Data Access (opc_cu_data_access).
+
 config MUC_OPCUA_CU_BASE_INFO_NODE_MANAGEMENT_CAPABILITIES
 	bool "CU: Base Info Node Management Capabilities"
 	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
@@ -2039,6 +2378,24 @@ config MUC_OPCUA_CU_BASE_INFO_SYSTEM_STATUS_UNDERLYING_SYSTEM
 	  OPC item: CU 2747:Base Info System Status Underlying System.
 	  Backing tests: test_profile_surface.
 	  Notes: Reconciled: satisfied by opc_cu_base_info_base_types.
+
+config MUC_OPCUA_CU_DATA_ACCESS_SEMANTIC_CHANGES
+	bool "CU: Data Access Semantic Changes"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2772:Data Access Semantic Changes.
+	  Backing tests: test_profile_surface.
+	  Notes: Reconciled (spec 079): satisfied by Data Access (opc_cu_data_access).
+
+config MUC_OPCUA_CU_DATA_ACCESS_VALUEASDICTIONARYENTRIES_PROPERTY
+	bool "CU: Data Access ValueAsDictionaryEntries Property"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2776:Data Access ValueAsDictionaryEntries Property.
+	  Backing tests: test_profile_surface.
+	  Notes: Reconciled (spec 079): satisfied by Data Access (opc_cu_data_access).
 
 config MUC_OPCUA_CU_BASE_INFO_AVAILABLE_STATES_AND_TRANSITIONS
 	bool "CU: Base Info Available States and Transitions"
@@ -2067,6 +2424,69 @@ config MUC_OPCUA_CU_BASE_INFO_DEVICE_FAILURE
 	  Backing tests: test_profile_surface.
 	  Notes: Reconciled: satisfied by opc_cu_base_info_base_types.
 
+config MUC_OPCUA_CU_DATA_ACCESS_MULTISTATEVALUEDISCRETE
+	bool "CU: Data Access MultiStateValueDiscrete"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2831:Data Access MultiStateValueDiscrete.
+	  Backing tests: test_profile_surface.
+	  Notes: Reconciled (spec 079): satisfied by Data Access (opc_cu_data_access).
+
+config MUC_OPCUA_CU_DATA_ACCESS_YARRAYITEMTYPE
+	bool "CU: Data Access YArrayItemType"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3323:Data Access YArrayItemType.
+	  Backing tests: test_profile_surface.
+	  Notes: Reconciled (spec 079): satisfied by Data Access (opc_cu_data_access).
+
+config MUC_OPCUA_CU_DATA_ACCESS_XYARRAYITEMTYPE
+	bool "CU: Data Access XYArrayItemType"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3324:Data Access XYArrayItemType.
+	  Backing tests: test_profile_surface.
+	  Notes: Reconciled (spec 079): satisfied by Data Access (opc_cu_data_access).
+
+config MUC_OPCUA_CU_DATA_ACCESS_IMAGEITEMTYPE
+	bool "CU: Data Access ImageItemType"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3325:Data Access ImageItemType.
+	  Backing tests: test_profile_surface.
+	  Notes: Reconciled (spec 079): satisfied by Data Access (opc_cu_data_access).
+
+config MUC_OPCUA_CU_DATA_ACCESS_CUBEITEMTYPE
+	bool "CU: Data Access CubeItemType"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3326:Data Access CubeItemType.
+	  Backing tests: test_profile_surface.
+	  Notes: Reconciled (spec 079): satisfied by Data Access (opc_cu_data_access).
+
+config MUC_OPCUA_CU_DATA_ACCESS_NDIMENSIONARRAYITEMTYPE
+	bool "CU: Data Access NDimensionArrayItemType"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3327:Data Access NDimensionArrayItemType.
+	  Backing tests: test_profile_surface.
+	  Notes: Reconciled (spec 079): satisfied by Data Access (opc_cu_data_access).
+
+config MUC_OPCUA_CU_DATA_ACCESS_AXISINFORMATIONTYPE
+	bool "CU: Data Access AxisInformationType"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3328:Data Access AxisInformationType.
+	  Backing tests: test_profile_surface.
+	  Notes: Reconciled (spec 079): satisfied by Data Access (opc_cu_data_access).
+
 endif
 
 menuconfig MUC_OPCUA_FACET_STANDARD_DATACHANGE_SUBSCRIPTION_2022_SERVER
@@ -2079,6 +2499,16 @@ menuconfig MUC_OPCUA_FACET_STANDARD_DATACHANGE_SUBSCRIPTION_2022_SERVER
 
 if MUC_OPCUA_FACET_STANDARD_DATACHANGE_SUBSCRIPTION_2022_SERVER
 
+config MUC_OPCUA_CU_MONITORED_ITEMS_DEADBAND_FILTER
+	bool "CU: Monitored Items Deadband Filter"
+	depends on MUC_OPCUA_FACET_STANDARD_DATACHANGE_SUBSCRIPTION_2022_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_EMBEDDED_2025_UA_SERVER
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2928:Monitored Items Deadband Filter.
+	  Backing tests: test_profile_surface.
+	  Notes: Supports an absolute Deadband filter as a DataChangeFilter for numeric data types.
+
 config MUC_OPCUA_CU_BASE_INFO_GETMONITOREDITEMS_METHOD
 	bool "CU: Base Info GetMonitoredItems Method"
 	depends on MUC_OPCUA_FACET_STANDARD_DATACHANGE_SUBSCRIPTION_2022_SERVER
@@ -2088,6 +2518,26 @@ config MUC_OPCUA_CU_BASE_INFO_GETMONITOREDITEMS_METHOD
 	  OPC item: CU 2940:Base Info GetMonitoredItems Method.
 	  Backing tests: test_profile_surface.
 	  Notes: The Server supports obtaining subscription information via GetMonitoredItems Method on the Server object.
+
+config MUC_OPCUA_CU_MONITOR_TRIGGERING
+	bool "CU: Monitor Triggering"
+	depends on MUC_OPCUA_FACET_STANDARD_DATACHANGE_SUBSCRIPTION_2022_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_EMBEDDED_2025_UA_SERVER
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3146:Monitor Triggering.
+	  Backing tests: test_profile_surface.
+	  Notes: Support the SetTriggering Service to create and/or delete triggering links for a triggering item.
+
+config MUC_OPCUA_CU_MONITOR_QUEUEING
+	bool "CU: Monitor Queueing"
+	depends on MUC_OPCUA_FACET_STANDARD_DATACHANGE_SUBSCRIPTION_2022_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_EMBEDDED_2025_UA_SERVER
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3532:Monitor Queueing.
+	  Backing tests: test_profile_surface.
+	  Notes: Support at least 2 queue entries for MonitoredItems. Servers often will adapt the queue size to the number of currently monitored Items. It is expected that Servers support the documented queue capacity for at least one third of the supported MonitoredItems.
 
 config MUC_OPCUA_CU_BASE_INFO_RESENDDATA_METHOD
 	bool "CU: Base Info ResendData Method"
@@ -2123,7 +2573,7 @@ config OPC_CU_2231
 
 endif
 
-config MUC_OPCUA_FACET_USER_TOKEN_USER_NAME_PASSWORD_SERVER
+menuconfig MUC_OPCUA_FACET_USER_TOKEN_USER_NAME_PASSWORD_SERVER
 	bool "User Token – User Name Password Server Facet"
 	default y if MUC_OPCUA_INTERN_PROFILE_EMBEDDED_2025_UA_SERVER
 	help
@@ -2131,17 +2581,65 @@ config MUC_OPCUA_FACET_USER_TOKEN_USER_NAME_PASSWORD_SERVER
 	  OPC source: OPC-10000-7 §4.2.
 	  Notes: User Name Password: Anonymous+UserName auth in activate_session.c
 
+if MUC_OPCUA_FACET_USER_TOKEN_USER_NAME_PASSWORD_SERVER
+
+config MUC_OPCUA_CU_SECURITY_INVALID_USER_TOKEN
+	bool "CU: Security Invalid user token"
+	depends on MUC_OPCUA_FACET_USER_TOKEN_USER_NAME_PASSWORD_SERVER || MUC_OPCUA_FACET_USER_TOKEN_X509_CERTIFICATE_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_EMBEDDED_2025_UA_SERVER
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2823:Security Invalid user token.
+	  Backing tests: test_profile_surface.
+	  Notes: Satisfied by project-level CU opc_cu_user_auth; the ActivateSession handler in activate_session.c validates user identity tokens and returns Bad_IdentityTokenInvalid for invalid tokens per OPC-10000-4.
+
+config MUC_OPCUA_CU_SECURITY_USER_NAME_PASSWORD_2
+	bool "CU: Security User Name Password 2"
+	depends on MUC_OPCUA_FACET_USER_TOKEN_USER_NAME_PASSWORD_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_EMBEDDED_2025_UA_SERVER
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3536:Security User Name Password 2.
+	  Backing tests: test_profile_surface.
+	  Notes: Reconciled (spec 078): username/password identity tokens with per-policy (endpoint/UserTokenPolicy) password encryption are decrypted+verified in activate_session.c handle_activate_username; test_user_auth_encrypted, test_user_auth_plaintext, test_user_auth_secure_e2e. Satisfied by opc_cu_user_auth. The Server supports User Name/Password combination(s). The token will be encrypted as required by the security policy of the User Token Policy or by the security policy of the endpoint.
+
+config MUC_OPCUA_CU_SECURITY_USER_TOKEN_UNENCRYPTED
+	bool "CU: Security User Token Unencrypted"
+	depends on MUC_OPCUA_FACET_USER_TOKEN_USER_NAME_PASSWORD_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3645:Security User Token Unencrypted.
+	  Backing tests: test_profile_surface.
+	  Notes: Satisfied by opc_cu_user_auth; server accepts unencrypted username/password tokens (test_user_auth_plaintext).
+
+endif
+
 endmenu
 
 menu "Profile: Standard 2025 UA Server Profile"
 
-config MUC_OPCUA_FACET_USER_TOKEN_X509_CERTIFICATE_SERVER
+menuconfig MUC_OPCUA_FACET_USER_TOKEN_X509_CERTIFICATE_SERVER
 	bool "User Token – X509 Certificate Server Facet"
 	default y if MUC_OPCUA_INTERN_PROFILE_STANDARD_2025_UA_SERVER
 	help
 	  Implementation state: implemented.
 	  OPC source: OPC-10000-7 §4.2.
 	  Notes: X509 Certificate: X509 user token in activate_session.c
+
+if MUC_OPCUA_FACET_USER_TOKEN_X509_CERTIFICATE_SERVER
+
+config MUC_OPCUA_CU_SECURITY_USER_X509
+	bool "CU: Security User X509"
+	depends on MUC_OPCUA_FACET_USER_TOKEN_X509_CERTIFICATE_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_STANDARD_2025_UA_SERVER
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3125:Security User X509.
+	  Backing tests: test_profile_surface.
+	  Notes: Satisfied by opc_cu_user_auth; server supports X.509 certificate-based user authentication (test_user_auth_certificate).
+
+endif
 
 endmenu
 

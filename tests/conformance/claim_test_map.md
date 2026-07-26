@@ -20,6 +20,8 @@ Backing test column: comma-separated ctest names (as registered).
 | Claim / conformance unit | OPC UA § | Profiles | Backing test |
 |--------------------------|----------|----------|--------------|
 | Secure channel message crypto | OPC-10000-7 §4.3 | micro, embedded, standard, full | test_secure_handshake_modern |
+| Monitor Items 500 | OPC-10000-4 §5.13.2 |  | test_profile_surface |
+| Monitor MinQueueSize_05 | OPC-10000-4 §5.13.2 |  | test_profile_surface |
 | Address Space AddIn Reference |  | full | test_profile_surface |
 | Address Space AddIn DefaultInstanceBrowsename |  | full | test_profile_surface |
 | Base Info LocalTime |  | full | test_profile_surface |
@@ -56,13 +58,17 @@ Backing test column: comma-separated ctest names (as registered).
 | Base Info Deprecated Information |  | full | test_profile_surface |
 | Base Info Image DataTypes |  | full | test_profile_surface |
 | Base Info ContentFilter |  | full | test_profile_surface |
+| Monitored Items Deadband Filter |  | embedded, standard, full | test_profile_surface |
 | Base Info GetMonitoredItems Method |  | embedded, standard, full | test_profile_surface |
+| Monitor Basic |  | micro, embedded, standard, full | test_profile_surface |
+| Monitor Triggering |  | embedded, standard, full | test_profile_surface |
 | Base Info Core Types Folders |  | embedded, standard, full | test_profile_surface |
 | Base Info Base Types |  | embedded, standard, full | test_profile_surface |
 | Base Info ServerType |  | embedded, standard, full | test_type_system |
 | Base Info Fixed SamplingInterval |  | full | test_profile_surface |
 | Base Info OptionSet DataType |  | full | test_profile_surface |
 | Base Info Range DataType |  | full | test_profile_surface |
+| Monitor Queueing |  | embedded, standard, full | test_profile_surface |
 | Base Info ResendData Method |  | embedded, standard, full | test_profile_surface |
 | Base Info UaBinary File |  | full | test_profile_surface |
 | Base Info StatusResult DataType |  | full | test_profile_surface |
@@ -89,6 +95,8 @@ Backing test column: comma-separated ctest names (as registered).
 | Base Info Handle DataType |  | full | test_profile_surface |
 | Base Info Server Capabilities MaxMonitoredItemsQueueSize |  | micro, embedded, standard, full | test_profile_surface |
 | Base Info Decimal DataType |  | embedded, standard, full | test_profile_surface |
+| Monitor Items 2 |  | micro, embedded, standard, full | test_profile_surface |
+| Monitor Value Change V2 |  | micro, embedded, standard, full | test_profile_surface |
 | Base Info Type Information |  | embedded, standard, full | test_claim_map |
 | Base Info Portable IDs |  | full | test_profile_surface |
 | Core 2022 Server Facet | OPC-10000-4 §5.12/5.13 | micro, embedded, standard, full | test_subscriptions, test_subscriptions_errors |
@@ -134,6 +142,19 @@ Backing test column: comma-separated ctest names (as registered).
 | Core 2022 Server Facet | OPC-10000-13 §4.2.2.33 | full | test_aggregate, test_aggregate_full |
 | Core 2022 Server Facet | OPC-10000-13 §4.2.2.34 | full | test_aggregate, test_aggregate_full |
 | Core 2022 Server Facet | OPC-10000-13 §4.2.2.35 | full | test_aggregate, test_aggregate_full |
+| Core 2022 Server Facet | OPC-10000-13 §4.2.2.11 | full | test_aggregate, test_aggregate_full |
+| Core 2022 Server Facet | OPC-10000-13 §4.2.2.12 | full | test_aggregate, test_aggregate_full |
+| Core 2022 Server Facet | OPC-10000-13 §4.2.2.16 | full | test_aggregate, test_aggregate_full |
+| Core 2022 Server Facet | OPC-10000-13 §4.2.2.17 | full | test_aggregate, test_aggregate_full |
+| Core 2022 Server Facet | OPC-10000-13 §4.2.2.18 | full | test_aggregate, test_aggregate_full |
+| Core 2022 Server Facet | OPC-10000-13 §4.2.2.21 | full | test_aggregate, test_aggregate_full |
+| Core 2022 Server Facet | OPC-10000-13 §4.2.2.22 | full | test_aggregate, test_aggregate_full |
+| Core 2022 Server Facet | OPC-10000-13 §4.2.2.26 | full | test_aggregate, test_aggregate_full |
+| Core 2022 Server Facet | OPC-10000-13 §4.2.2.27 | full | test_aggregate, test_aggregate_full |
+| Core 2022 Server Facet | OPC-10000-13 §4.2.2.36 | full | test_aggregate, test_aggregate_full |
+| Core 2022 Server Facet | OPC-10000-13 §4.2.2.37 | full | test_aggregate, test_aggregate_full |
+| Core 2022 Server Facet | OPC-10000-13 §4.2.2.38 | full | test_aggregate, test_aggregate_full |
+| Core 2022 Server Facet | OPC-10000-13 §4.2.2.39 | full | test_aggregate, test_aggregate_full |
 | Core 2022 Server Facet | OPC-10000-13 | full | test_aggregate, test_aggregate_full |
 | Core 2022 Server Facet | OPC-10000-14 | full | test_uadp_encoding, test_pubsub |
 | Core 2022 Server Facet | OPC-10000-6 §7.1.3 | full | test_reverse_connect |
@@ -154,15 +175,20 @@ Backing test column: comma-separated ctest names (as registered).
 | Discovery Find Servers Self | OPC-10000-4 §5.5.2 | all | test_discovery_services, test_discovery_endpoint |
 | Attribute Write Values | OPC-10000-4 §5.11.4 | full | test_write_value_gate, test_write_service |
 | Session Change User | OPC-10000-4 §5.7.3 | full | test_session, test_session_auth |
+| Security Administration |  | full | test_profile_surface |
 | Time Sync – OS based support |  | full | test_time_sync |
 | Time Sync – IEEE 1588 (PTP) |  | full | test_claim_map |
 | Time Sync – IEEE 802.1AS |  | full | test_claim_map |
 | Time Sync – NTP |  | full | test_time_sync |
 | Security Role Server Authorization |  | full | test_role_management |
+| Security Invalid user token |  | embedded, standard, full | test_profile_surface |
 | Attribute Write StatusCode & Timestamp | OPC-10000-4 §5.11.4 | full | test_write_service, test_write_response |
+| Security User X509 |  | standard, full | test_profile_surface |
 | Attribute Write Index | OPC-10000-4 §5.11.4 | full | test_write_service |
 | Base Info Diagnostics | OPC-10000-5 §6.3.1, 6.3.3, 8.3.2, 12.9 | full | test_diagnostics, test_profile_surface |
 | View Basic 2 | OPC-10000-4 §5.9.2, 5.9.3 | all | test_browse_service, test_browse_limits, test_view_services |
+| Security User Name Password 2 |  | embedded, standard, full | test_profile_surface |
+| Security User Token Unencrypted |  | full | test_profile_surface |
 | Base Services Diagnostics | OPC-10000-4 §7.32, 7.38 | full | test_service_header |
 | Protocol UA TCP | OPC-10000-6 §7.1 | all | test_tcp_connection |
 | UA Binary Encoding | OPC-10000-6 §5 | all | test_binary_primitives, test_binary_nodeid |
@@ -174,7 +200,10 @@ Backing test column: comma-separated ctest names (as registered).
 | Base Info Server Capabilities 2 | OPC-10000-3 §4 | all | test_base_server_behaviour |
 | Session General Service Behaviour | OPC-10000-4 §5.6 | all | test_dispatch_session_order, test_base_server_behaviour |
 | Base Info Namespace Metadata | OPC-10000-3 §4 | full | test_base_server_behaviour, test_read_browsename_namespace |
+| Monitor QueueSize_ServerMax |  | full | test_profile_surface |
 | Address Space Events 2 |  | full | test_claim_map |
+| Monitor Events |  | full | test_profile_surface |
+| Monitor Complex Event Filter |  | full | test_profile_surface |
 | Base Info Events Capabilities |  | full | test_claim_map, test_read_service |
 | Auditing Secure Communication |  | full | test_claim_map, test_event_notifications |
 | Auditing Services |  | full | test_event_notifications |
@@ -184,6 +213,8 @@ Backing test column: comma-separated ctest names (as registered).
 | A & C Confirm Auditing | OPC-10000-9 §5.10.7 | full | test_claim_map |
 | Session Cancel | OPC-10000-4 §5.6.5 | standard, full | test_claim_map |
 | Discovery Register | OPC-10000-4 §5.4.5 | standard, full | test_claim_map |
+| Security Policy Required | OPC-10000-7 §6.5 | embedded, standard, full | test_profile_surface |
+| Security ECC Policy | OPC-10000-7 §6.5 | full | test_profile_surface |
 | Security Default ApplicationInstance Certificate |  | all | test_certificate_validity, test_server_config |
 | Base Info Engineering Units |  | full | test_profile_surface |
 | Security – No Application Authentication |  | full | test_profile_surface |
@@ -191,6 +222,28 @@ Backing test column: comma-separated ctest names (as registered).
 | User Role Management | OPC-10000-12 §9.5-9.6 | full | test_role_management |
 | Certificate Management | OPC-10000-12 §7.5-7.6 | full | test_certificate_management |
 | Alarms & Conditions | OPC-10000-9 §5 | full | test_alarms_conditions |
+| Data Access TwoState |  | full | test_profile_surface |
+| Data Access Complex Number |  | full | test_profile_surface |
+| Data Access DiscreteItemType |  | full | test_profile_surface |
+| Data Access MultiStateDictionaryEntryDBT |  | full | test_profile_surface |
+| Data Access Semantic Changes |  | full | test_profile_surface |
+| Data Access ValueAsDictionaryEntries Property |  | full | test_profile_surface |
+| Data Access MultiStateValueDiscrete |  | full | test_profile_surface |
+| Data Access DoubleComplex Number |  | full | test_profile_surface |
+| Data Access MultiState |  | full | test_profile_surface |
+| Data Access PercentDeadband |  | full | test_profile_surface |
+| Data Access YArrayItemType |  | full | test_profile_surface |
+| Data Access XYArrayItemType |  | full | test_profile_surface |
+| Data Access ImageItemType |  | full | test_profile_surface |
+| Data Access CubeItemType |  | full | test_profile_surface |
+| Data Access NDimensionArrayItemType |  | full | test_profile_surface |
+| Data Access AxisInformationType |  | full | test_profile_surface |
+| Data Access DataItems |  | full | test_profile_surface |
+| Data Access BaseAnalogType |  | full | test_profile_surface |
+| Data Access AnalogItemType |  | full | test_profile_surface |
+| Data Access AnalogUnitType |  | full | test_profile_surface |
+| Data Access AnalogUnitRangeType |  | full | test_profile_surface |
+| Data Access ArrayItem2Type |  | full | test_profile_surface |
 | Base Info Node Management Capabilities |  | full | test_profile_surface |
 | Base Info Choice States |  | full | test_profile_surface |
 | Base Info System Status Underlying System |  | full | test_profile_surface |
