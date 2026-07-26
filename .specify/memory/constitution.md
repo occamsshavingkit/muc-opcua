@@ -1,7 +1,16 @@
 <!--
 Sync Impact Report
-Version change: 1.0.1 -> 1.0.2 (MINOR: added client scope to Principle III and
-  Technology/Scope Constraints section — material expansion of project scope)
+Version change: 1.0.2 -> 1.0.3 (MINOR: added Principle VIII — CU-Level Kconfig Gating)
+Modified principles: none
+Added principles:
+- VIII. CU-Level Kconfig Gating — every CU gets its own Kconfig symbol; no
+  invented aggregators; C code gated per-CU with #ifdef
+Added sections: none
+Modified sections: none
+Removed sections: none
+Templates requiring updates: none
+Runtime guidance requiring updates: none
+Follow-up TODOs: none
 Modified principles:
 - III. Minimal OPC UA Surface — broadened from "smallest conformant server" to
   "smallest conformant server or client" client included alongside server
@@ -161,6 +170,28 @@ conformance traceability, or tests. Rationale: small firmware that fails
 ambiguously is more expensive than a slightly larger implementation with explicit
 limits and predictable failures.
 
+### VIII. CU-Level Kconfig Gating
+
+Every OPC UA Conformance Unit MUST have its own individually-selectable Kconfig
+symbol (`MUC_OPCUA_CU_<NAME>`), organized under its OPC Facet in the Kconfig menu
+tree. The OPC Foundation profile/facet/CU hierarchy is the single source of truth
+for the Kconfig structure. No invented aggregator symbols or `satisfied_by`
+middlemen are permitted — every CU gates itself directly.
+
+Each CU's C implementation MUST be gated on its own Kconfig symbol with
+`#ifdef MUC_OPCUA_CU_<NAME>`. The CU source files under
+`src/cu/<facet>/<cu_name>/` exist specifically so each CU can be compiled in or
+out independently with a single-file guard.
+
+Profiles and Facets set `default y if <PROFILE_CASCADE>` on their constituent CUs
+so selecting a profile enables the correct tree of CUs. Individual CUs remain
+toggleable within their facet menu so integrators can trim surface beyond what
+the profile requires.
+
+Rationale: CU-level gating is the mechanism that makes "pay for what you use"
+actually true. Without it, the Kconfig tree is decorative and the binary includes
+code the integrator cannot remove.
+
 ## Technology and Scope Constraints
 
 The core project type is a portable C library with thin platform adapters and
@@ -225,4 +256,4 @@ profile requirements, reproducible tooling, size discipline, or test-first proto
 work MUST be documented in the plan's Complexity Tracking section with a simpler
 alternative and the reason it was rejected.
 
-**Version**: 1.0.2 | **Ratified**: 2026-06-25 | **Last Amended**: 2026-07-07
+**Version**: 1.0.3 | **Ratified**: 2026-06-25 | **Last Amended**: 2026-07-27
