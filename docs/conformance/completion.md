@@ -16,7 +16,7 @@ yet reconciled to individual OPC CU ids count as not-implemented — see the
 reconciliation note below.
 
 - Distinct Server CUs: **525** (required 179, optional 346)
-- Reconciled as implemented: **required 176/179**, **optional 302/346**
+- Reconciled as implemented: **required 176/179**, **optional 338/346**
 
 ### Per Server profile / facet
 
@@ -86,7 +86,7 @@ reconciliation note below.
 | 1698 | User Token – Issued Token Server Facet | 2/2 | 0/0 |
 | 1699 | User Token – Issued Token Windows Server Facet | 3/3 | 0/0 |
 | 1707 | Historical Data AtTime 2022 Server Facet | 4/4 | 0/0 |
-| 1708 | Historical Aggregate 2022 Server Facet | 4/5 | 0/39 |
+| 1708 | Historical Aggregate 2022 Server Facet | 4/5 | 36/39 |
 | 1709 | Historical Access Modified Data 2022 Server Facet | 4/4 | 0/0 |
 | 1710 | Historical Access Structured Data 2022 Server Facet | 3/4 | 5/6 |
 | 1715 | Base Server Behaviour Facet | 4/4 | 0/0 |

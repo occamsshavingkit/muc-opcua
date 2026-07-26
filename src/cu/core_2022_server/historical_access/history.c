@@ -51,8 +51,9 @@ opcua_statuscode_t mu_history_read_request_decode(mu_binary_reader_t *reader, mu
         return s;
     }
 
-    // We only support ReadRawModifiedDetails for now
-    if (ext_type.identifier.numeric != MU_ID_READRAWMODIFIEDDETAILS_ENCODING_DEFAULTBINARY) {
+    opcua_uint32_t type_id = ext_type.identifier.numeric;
+    if (type_id != MU_ID_READRAWMODIFIEDDETAILS_ENCODING_DEFAULTBINARY &&
+        type_id != MU_ID_READPROCESSEDDETAILS_ENCODING_DEFAULTBINARY) {
         return MU_STATUS_BAD_HISTORYOPERATIONUNSUPPORTED;
     }
 
@@ -62,7 +63,6 @@ opcua_statuscode_t mu_history_read_request_decode(mu_binary_reader_t *reader, mu
         return s;
     }
 
-    // Only ByteString encoding is supported
     if (encoding_mask != 0x01) {
         return MU_STATUS_BAD_NOTSUPPORTED;
     }
@@ -87,30 +87,64 @@ opcua_statuscode_t mu_history_read_request_decode(mu_binary_reader_t *reader, mu
     mu_binary_reader_t body_reader;
     mu_binary_reader_init(&body_reader, reader->buffer + body_start, (size_t)length);
 
-    // Decode ReadRawModifiedDetails
-    s = mu_binary_read_boolean(&body_reader, &req->details.is_read_modified);
-    if (s != MU_STATUS_GOOD) {
-        return s;
-    }
+    if (type_id == MU_ID_READRAWMODIFIEDDETAILS_ENCODING_DEFAULTBINARY) {
+        req->details_type = MU_HISTORY_READ_TYPE_RAW_MODIFIED;
 
-    s = mu_binary_read_int64(&body_reader, &req->details.start_time);
-    if (s != MU_STATUS_GOOD) {
-        return s;
-    }
+        s = mu_binary_read_boolean(&body_reader, &req->details.raw_modified.is_read_modified);
+        if (s != MU_STATUS_GOOD) {
+            return s;
+        }
 
-    s = mu_binary_read_int64(&body_reader, &req->details.end_time);
-    if (s != MU_STATUS_GOOD) {
-        return s;
-    }
+        s = mu_binary_read_int64(&body_reader, &req->details.raw_modified.start_time);
+        if (s != MU_STATUS_GOOD) {
+            return s;
+        }
 
-    s = mu_binary_read_uint32(&body_reader, &req->details.num_values_per_node);
-    if (s != MU_STATUS_GOOD) {
-        return s;
-    }
+        s = mu_binary_read_int64(&body_reader, &req->details.raw_modified.end_time);
+        if (s != MU_STATUS_GOOD) {
+            return s;
+        }
 
-    s = mu_binary_read_boolean(&body_reader, &req->details.return_bounds);
-    if (s != MU_STATUS_GOOD) {
-        return s;
+        s = mu_binary_read_uint32(&body_reader, &req->details.raw_modified.num_values_per_node);
+        if (s != MU_STATUS_GOOD) {
+            return s;
+        }
+
+        s = mu_binary_read_boolean(&body_reader, &req->details.raw_modified.return_bounds);
+        if (s != MU_STATUS_GOOD) {
+            return s;
+        }
+    } else {
+        req->details_type = MU_HISTORY_READ_TYPE_PROCESSED;
+
+        s = mu_binary_read_int64(&body_reader, &req->details.processed.start_time);
+        if (s != MU_STATUS_GOOD) {
+            return s;
+        }
+
+        s = mu_binary_read_int64(&body_reader, &req->details.processed.end_time);
+        if (s != MU_STATUS_GOOD) {
+            return s;
+        }
+
+        s = mu_binary_read_double(&body_reader, &req->details.processed.processing_interval);
+        if (s != MU_STATUS_GOOD) {
+            return s;
+        }
+
+        /* Decode aggregateType as a single NodeId */
+        mu_nodeid_t agg_type_node;
+        s = mu_binary_read_nodeid(&body_reader, &agg_type_node);
+        if (s != MU_STATUS_GOOD) {
+            return s;
+        }
+        req->details.processed.aggregate_types[0] = agg_type_node.identifier.numeric;
+        req->details.processed.num_aggregate_types = 1;
+
+        /* Skip AggregateConfiguration (optional struct, treat as null/absent) */
+        /* Read-only: we skip the AggregateConfiguration struct */
+        /* It's a struct with 2 booleans (2 bytes) */
+        /* Just let the body_reader handle remaining bytes as the struct is optional */
     }
     if (body_reader.position != (size_t)length) {
         reader->status = MU_STATUS_BAD_DECODINGERROR;
