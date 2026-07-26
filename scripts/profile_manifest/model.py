@@ -206,13 +206,12 @@ def validate_manifest(manifest: dict) -> list[str]:
             )
 
         kconfig_symbol = item.get("kconfig_symbol")
-        satisfied_by = item.get("satisfied_by")
         if state in ("claimed", "implemented"):
-            if not satisfied_by and (kconfig_symbol is None or not isinstance(kconfig_symbol, str) or not kconfig_symbol):
+            if kconfig_symbol is None or not isinstance(kconfig_symbol, str) or not kconfig_symbol:
                 _err(
                     errors,
                     f"item '{item_id}': build-gated {state} item must declare a "
-                    f"non-empty kconfig_symbol (or set satisfied_by)",
+                    f"non-empty kconfig_symbol",
                 )
 
         if kconfig_symbol is not None:

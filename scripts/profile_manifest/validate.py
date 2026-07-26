@@ -1412,48 +1412,7 @@ def _check_unimplemented_availability(manifest: dict) -> list[str]:
     return errors
 
 
-def _check_reconciliation_links(manifest: dict) -> list[str]:
-    """Validate spec 073 FR-002 reconciliation links.
 
-    `satisfied_by` must point to an existing implemented CU or optimization
-    item, and `not_applicable` must map known profile keys to non-empty reasons.
-    """
-    errors: list[str] = []
-    items = manifest.get("items", [])
-    by_id = {it.get("id"): it for it in items if it.get("kind") in ("conformance_unit", "optimization")}
-    implemented = {"claimed", "implemented"}
-    profile_keys = set(manifest.get("profiles", {}).keys())
-    for it in items:
-        if it.get("kind") != "conformance_unit":
-            continue
-        iid = it.get("id", "<unknown>")
-        sat = it.get("satisfied_by")
-        if sat is not None:
-            target = by_id.get(sat)
-            if target is None:
-                errors.append("reconciliation: '" + str(iid) + "' satisfied_by unknown CU '" + str(sat) + "'")
-            elif target.get("implementation_state") not in implemented:
-                errors.append(
-                    "reconciliation: '" + str(iid) + "' satisfied_by '" + str(sat)
-                    + "' which is not implemented/claimed"
-                )
-        na = it.get("not_applicable")
-        if na is not None:
-            if not isinstance(na, dict) or not na:
-                errors.append("reconciliation: '" + str(iid) + "' not_applicable must be a non-empty mapping")
-            else:
-                for pkey, reason in na.items():
-                    if profile_keys and pkey not in profile_keys:
-                        errors.append(
-                            "reconciliation: '" + str(iid) + "' not_applicable references unknown profile '"
-                            + str(pkey) + "'"
-                        )
-                    if not isinstance(reason, str) or not reason.strip():
-                        errors.append(
-                            "reconciliation: '" + str(iid) + "' not_applicable['" + str(pkey)
-                            + "'] must have a grounded reason"
-                        )
-    return errors
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -1474,7 +1433,6 @@ def main(argv: list[str] | None = None) -> int:
 
     errors = validate_manifest(manifest)
     errors.extend(_check_in_scope_071_manifest_requirements(manifest))
-    errors.extend(_check_reconciliation_links(manifest))
     if errors:
         print("manifest: FAIL")
         for err in errors:

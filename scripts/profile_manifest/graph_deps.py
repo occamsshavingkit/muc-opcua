@@ -42,7 +42,7 @@ def build_index(manifest):
             by_profile_id[str(pid)] = it
         cu_name = ref.get("cu_name")
         if cu_name:
-            # prefer the symbol-carrying item; a satisfied_by alias carries the symbol
+            # prefer the symbol-carrying item
             cur = by_cu_name.get(cu_name)
             if cur is None or (sym and not cur.get("kconfig_symbol")):
                 by_cu_name[cu_name] = it
