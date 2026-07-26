@@ -221,6 +221,12 @@ opcua_statuscode_t read_attribute(const mu_address_space_t *address_space, const
         value->value.localized_text.text = node->display_name;
         return MU_STATUS_GOOD;
 
+    case MU_ATTRIBUTEID_DESCRIPTION:
+        value->type = MU_TYPE_LOCALIZEDTEXT;
+        value->value.localized_text.locale = (mu_string_t){-1, NULL};
+        value->value.localized_text.text = (mu_string_t){-1, NULL};
+        return MU_STATUS_GOOD;
+
     case MU_ATTRIBUTEID_VALUE:
         if (node->node_class != MU_NODECLASS_VARIABLE) {
             return MU_STATUS_BAD_ATTRIBUTEIDINVALID;
@@ -231,15 +237,11 @@ opcua_statuscode_t read_attribute(const mu_address_space_t *address_space, const
         return MU_STATUS_BAD_NOTREADABLE;
 
     case MU_ATTRIBUTEID_DATATYPE:
-        /* DataType is a mandatory attribute of Variable and VariableType nodes
-           (OPC-10000-3 §5.6.2), independent of the MultiChunk CU -- handled here
-           unconditionally rather than only when MUC_OPCUA_CU_MULTI_CHUNK is on. */
         if (node->node_class != MU_NODECLASS_VARIABLE && node->node_class != MU_NODECLASS_VARIABLETYPE) {
             return MU_STATUS_BAD_ATTRIBUTEIDINVALID;
         }
         value->type = MU_TYPE_NODEID;
         if (node->data_type != 0) {
-            /* Accurate DataType, populated per-node. */
             value->value.nodeid = (mu_nodeid_t){0, MU_NODEID_NUMERIC, {.numeric = node->data_type}};
         } else if (node->type_definition.namespace_index != 0 || node->type_definition.identifier_type != 0 ||
                    node->type_definition.identifier.numeric != 0) {
@@ -250,26 +252,70 @@ opcua_statuscode_t read_attribute(const mu_address_space_t *address_space, const
         return MU_STATUS_GOOD;
 
     case MU_ATTRIBUTEID_VALUERANK:
-        /* ValueRank: mandatory attribute of Variable/VariableType nodes, same
-           reasoning as DATATYPE above. */
         if (node->node_class != MU_NODECLASS_VARIABLE && node->node_class != MU_NODECLASS_VARIABLETYPE) {
             return MU_STATUS_BAD_ATTRIBUTEIDINVALID;
         }
         value->type = MU_TYPE_INT32;
         if (node->data_type != 0) {
-            /* Accurate ValueRank, only meaningful once data_type is set. */
             value->value.i32 = (opcua_int32_t)node->value_rank;
         } else {
             value->value.i32 = -1;
         }
         return MU_STATUS_GOOD;
 
+    case MU_ATTRIBUTEID_ARRAYDIMENSIONS:
+        if (node->node_class != MU_NODECLASS_VARIABLE && node->node_class != MU_NODECLASS_VARIABLETYPE) {
+            return MU_STATUS_BAD_ATTRIBUTEIDINVALID;
+        }
+        value->type = MU_TYPE_UINT32;
+        value->is_array = true;
+        value->array_length = 0;
+        return MU_STATUS_GOOD;
+
+    case MU_ATTRIBUTEID_ACCESSLEVEL:
+        if (node->node_class != MU_NODECLASS_VARIABLE) {
+            return MU_STATUS_BAD_ATTRIBUTEIDINVALID;
+        }
+        value->type = MU_TYPE_BYTE;
+        value->value.by = (node->value != NULL) ? 0x01 : 0;
+        return MU_STATUS_GOOD;
+
+    case MU_ATTRIBUTEID_USERACCESSLEVEL:
+        if (node->node_class != MU_NODECLASS_VARIABLE) {
+            return MU_STATUS_BAD_ATTRIBUTEIDINVALID;
+        }
+        value->type = MU_TYPE_BYTE;
+        value->value.by = (node->value != NULL) ? 0x01 : 0;
+        return MU_STATUS_GOOD;
+
+    case MU_ATTRIBUTEID_MINIMUMSAMPLINGINTERVAL:
+        if (node->node_class != MU_NODECLASS_VARIABLE) {
+            return MU_STATUS_BAD_ATTRIBUTEIDINVALID;
+        }
+        value->type = MU_TYPE_DOUBLE;
+        value->value.d = -1.0;
+        return MU_STATUS_GOOD;
+
+    case MU_ATTRIBUTEID_HISTORIZING:
+        if (node->node_class != MU_NODECLASS_VARIABLE) {
+            return MU_STATUS_BAD_ATTRIBUTEIDINVALID;
+        }
+        value->type = MU_TYPE_BOOLEAN;
+        value->value.b = false;
+        return MU_STATUS_GOOD;
+
+    case MU_ATTRIBUTEID_WRITEMASK:
+        value->type = MU_TYPE_UINT32;
+        value->value.ui32 = 0;
+        return MU_STATUS_GOOD;
+
+    case MU_ATTRIBUTEID_USERWRITEMASK:
+        value->type = MU_TYPE_UINT32;
+        value->value.ui32 = 0;
+        return MU_STATUS_GOOD;
+
 #if MUC_OPCUA_CU_EVENTS
     case MU_ATTRIBUTEID_EVENTNOTIFIER:
-        /* OPC-10000-3 §5.4.6: EventNotifier is an attribute of Object and View
-           nodes only; other NodeClasses do not have it. Bit 0 = SubscribeToEvents.
-           Advertises a node (notably the Server Object i=2253) as an event source
-           so a client can create an event MonitoredItem on it (CU 3194). */
         if (node->node_class != MU_NODECLASS_OBJECT && node->node_class != MU_NODECLASS_VIEW) {
             return MU_STATUS_BAD_ATTRIBUTEIDINVALID;
         }
@@ -277,14 +323,15 @@ opcua_statuscode_t read_attribute(const mu_address_space_t *address_space, const
         value->value.by = node->event_notifier;
         return MU_STATUS_GOOD;
 #endif
+
+    case MU_ATTRIBUTEID_ACCESSLEVELEX:
+        value->type = MU_TYPE_UINT32;
+        value->value.ui32 = 0;
+        return MU_STATUS_GOOD;
+
 #if MUC_OPCUA_CU_SUBSCRIPTION_STANDARD || MUC_OPCUA_CU_METHOD_SERVER
     case MU_ATTRIBUTEID_EXECUTABLE:
     case MU_ATTRIBUTEID_USEREXECUTABLE:
-        /* Executable/UserExecutable are mandatory attributes of Method nodes
-           (OPC-10000-3 §5.7). Present wherever Method nodes exist: the built-in
-           GetMonitoredItems/ResendData (SUBSCRIPTIONS_STANDARD) and any integrator
-           methods (METHOD_SERVER). Per-registration non-executability is enforced at
-           Call time (Bad_NotExecutable). */
         if (node->node_class != MU_NODECLASS_METHOD) {
             return MU_STATUS_BAD_ATTRIBUTEIDINVALID;
         }
@@ -292,6 +339,28 @@ opcua_statuscode_t read_attribute(const mu_address_space_t *address_space, const
         value->value.b = true;
         return MU_STATUS_GOOD;
 #endif
+
+    case MU_ATTRIBUTEID_ISABSTRACT:
+        value->type = MU_TYPE_BOOLEAN;
+        value->value.b = false;
+        return MU_STATUS_GOOD;
+
+    case MU_ATTRIBUTEID_SYMMETRIC:
+        value->type = MU_TYPE_BOOLEAN;
+        value->value.b = false;
+        return MU_STATUS_GOOD;
+
+    case MU_ATTRIBUTEID_INVERSENAME:
+        value->type = MU_TYPE_LOCALIZEDTEXT;
+        value->value.localized_text.locale = (mu_string_t){-1, NULL};
+        value->value.localized_text.text = (mu_string_t){-1, NULL};
+        return MU_STATUS_GOOD;
+
+    case MU_ATTRIBUTEID_CONTAINSNOLOOPS:
+        value->type = MU_TYPE_BOOLEAN;
+        value->value.b = true;
+        return MU_STATUS_GOOD;
+
 #ifdef MUC_OPCUA_CU_MULTI_CHUNK
     default:
         return read_multichunk_attribute(node, attribute_id, value);

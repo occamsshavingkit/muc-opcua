@@ -1,7 +1,7 @@
 /* src/services/subscription_aggregate.c */
 #include "services/subscription.h"
-#include <string.h>
 #include <math.h>
+#include <string.h>
 
 #if MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
 
@@ -172,26 +172,30 @@ void monitored_item_accumulate_aggregate(mu_monitored_item_t *item, const mu_var
                item->aggregate_state.aggregate_type == MU_ID_AGGREGATETYPE_MINIMUM_ACTUAL_TIME_2) {
         if (item->aggregate_state.sample_count == 0u) {
             item->aggregate_state.accumulator.min_actual_time.actual_val = *cur;
-            item->aggregate_state.accumulator.min_actual_time.actual_time_ms = (opcua_uint64_t)item->aggregate_state.last_calculation;
+            item->aggregate_state.accumulator.min_actual_time.actual_time_ms =
+                (opcua_uint64_t)item->aggregate_state.last_calculation;
         } else {
             opcua_double_t existing;
             if (variant_numeric_to_double(&item->aggregate_state.accumulator.min_actual_time.actual_val, &existing) &&
                 val_double < existing) {
                 item->aggregate_state.accumulator.min_actual_time.actual_val = *cur;
-                item->aggregate_state.accumulator.min_actual_time.actual_time_ms = (opcua_uint64_t)item->aggregate_state.last_calculation;
+                item->aggregate_state.accumulator.min_actual_time.actual_time_ms =
+                    (opcua_uint64_t)item->aggregate_state.last_calculation;
             }
         }
     } else if (item->aggregate_state.aggregate_type == MU_ID_AGGREGATETYPE_MAXIMUM_ACTUAL_TIME ||
                item->aggregate_state.aggregate_type == MU_ID_AGGREGATETYPE_MAXIMUM_ACTUAL_TIME_2) {
         if (item->aggregate_state.sample_count == 0u) {
             item->aggregate_state.accumulator.max_actual_time.actual_val = *cur;
-            item->aggregate_state.accumulator.max_actual_time.actual_time_ms = (opcua_uint64_t)item->aggregate_state.last_calculation;
+            item->aggregate_state.accumulator.max_actual_time.actual_time_ms =
+                (opcua_uint64_t)item->aggregate_state.last_calculation;
         } else {
             opcua_double_t existing;
             if (variant_numeric_to_double(&item->aggregate_state.accumulator.max_actual_time.actual_val, &existing) &&
                 val_double > existing) {
                 item->aggregate_state.accumulator.max_actual_time.actual_val = *cur;
-                item->aggregate_state.accumulator.max_actual_time.actual_time_ms = (opcua_uint64_t)item->aggregate_state.last_calculation;
+                item->aggregate_state.accumulator.max_actual_time.actual_time_ms =
+                    (opcua_uint64_t)item->aggregate_state.last_calculation;
             }
         }
     } else if (item->aggregate_state.aggregate_type == MU_ID_AGGREGATETYPE_RANGE_2) {
@@ -232,7 +236,8 @@ void monitored_item_accumulate_aggregate(mu_monitored_item_t *item, const mu_var
         item->aggregate_state.accumulator.duration.start_ms = sample_time_ms;
         item->aggregate_state.accumulator.duration.previous_ms = sample_time_ms;
         item->aggregate_state.accumulator.duration.status = item->last_status;
-        item->aggregate_state.accumulator.duration.matches = (val_double != 0.0) && !aggregate_status_is_bad(item->last_status);
+        item->aggregate_state.accumulator.duration.matches =
+            (val_double != 0.0) && !aggregate_status_is_bad(item->last_status);
     } else if (item->aggregate_state.aggregate_type == MU_ID_AGGREGATETYPE_STANDARD_DEVIATION_SAMPLE ||
                item->aggregate_state.aggregate_type == MU_ID_AGGREGATETYPE_VARIANCE_SAMPLE ||
                item->aggregate_state.aggregate_type == MU_ID_AGGREGATETYPE_STANDARD_DEVIATION_POPULATION ||
@@ -407,17 +412,20 @@ void monitored_item_publish_aggregate(mu_monitored_item_t *item, opcua_uint64_t 
         } else if (item->aggregate_state.aggregate_type == MU_ID_AGGREGATETYPE_STANDARD_DEVIATION_SAMPLE) {
             calc_val.type = MU_TYPE_DOUBLE;
             opcua_uint32_t wc = item->aggregate_state.accumulator.welford.count;
-            calc_val.value.d = (wc > 1u) ? sqrt(item->aggregate_state.accumulator.welford.m2 / (opcua_double_t)(wc - 1u)) : 0.0;
+            calc_val.value.d =
+                (wc > 1u) ? sqrt(item->aggregate_state.accumulator.welford.m2 / (opcua_double_t)(wc - 1u)) : 0.0;
             calc_val.is_array = false;
         } else if (item->aggregate_state.aggregate_type == MU_ID_AGGREGATETYPE_VARIANCE_SAMPLE) {
             calc_val.type = MU_TYPE_DOUBLE;
             opcua_uint32_t wc = item->aggregate_state.accumulator.welford.count;
-            calc_val.value.d = (wc > 1u) ? item->aggregate_state.accumulator.welford.m2 / (opcua_double_t)(wc - 1u) : 0.0;
+            calc_val.value.d =
+                (wc > 1u) ? item->aggregate_state.accumulator.welford.m2 / (opcua_double_t)(wc - 1u) : 0.0;
             calc_val.is_array = false;
         } else if (item->aggregate_state.aggregate_type == MU_ID_AGGREGATETYPE_STANDARD_DEVIATION_POPULATION) {
             calc_val.type = MU_TYPE_DOUBLE;
             opcua_uint32_t wc = item->aggregate_state.accumulator.welford.count;
-            calc_val.value.d = (wc > 0u) ? sqrt(item->aggregate_state.accumulator.welford.m2 / (opcua_double_t)wc) : 0.0;
+            calc_val.value.d =
+                (wc > 0u) ? sqrt(item->aggregate_state.accumulator.welford.m2 / (opcua_double_t)wc) : 0.0;
             calc_val.is_array = false;
         } else if (item->aggregate_state.aggregate_type == MU_ID_AGGREGATETYPE_VARIANCE_POPULATION) {
             calc_val.type = MU_TYPE_DOUBLE;
