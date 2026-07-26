@@ -1098,7 +1098,9 @@
       "opc_cu_5875",
       "opc_cu_5937",
       "opc_cu_5940",
-      "opc_cu_5941"
+      "opc_cu_5941",
+      "opc_cu_scheduler",
+      "opc_cu_aliasname"
     ],
     "opc_facet_1324": [
       "opc_cu_2928",
@@ -11220,10 +11222,12 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_aliasname_stub"
+      ],
       "cu_optional": false,
       "id": "opc_cu_5941",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 5941: tracked in manifest; not yet claimed or implemented.",
@@ -11246,13 +11250,16 @@
       "source_metadata": {
         "source_id": "5941",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_aliasname"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_aliasname_stub"
+      ],
       "cu_optional": true,
       "id": "opc_cu_5940",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 5940: tracked in manifest; not yet claimed or implemented.",
@@ -11275,13 +11282,16 @@
       "source_metadata": {
         "source_id": "5940",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_aliasname"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_aliasname_stub"
+      ],
       "cu_optional": true,
       "id": "opc_cu_5937",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 5937: tracked in manifest; not yet claimed or implemented.",
@@ -11304,7 +11314,8 @@
       "source_metadata": {
         "source_id": "5937",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_aliasname"
     },
     {
       "backing_tests": [
@@ -11338,10 +11349,12 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_aliasname_stub"
+      ],
       "cu_optional": false,
       "id": "opc_cu_5874",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 5874: tracked in manifest; not yet claimed or implemented.",
@@ -11364,13 +11377,16 @@
       "source_metadata": {
         "source_id": "5874",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_aliasname"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_aliasname_stub"
+      ],
       "cu_optional": false,
       "id": "opc_cu_5873",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 5873: tracked in manifest; not yet claimed or implemented.",
@@ -11393,13 +11409,16 @@
       "source_metadata": {
         "source_id": "5873",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_aliasname"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_aliasname_stub"
+      ],
       "cu_optional": true,
       "id": "opc_cu_5869",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 5869: tracked in manifest; not yet claimed or implemented.",
@@ -11422,7 +11441,8 @@
       "source_metadata": {
         "source_id": "5869",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_aliasname"
     },
     {
       "backing_tests": [
@@ -11553,10 +11573,12 @@
       "satisfied_by": "opc_cu_user_auth"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions"
+      ],
       "cu_optional": false,
       "id": "opc_cu_5808",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 5808: tracked in manifest; not yet claimed or implemented.",
@@ -11579,13 +11601,16 @@
       "source_metadata": {
         "source_id": "5808",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions"
+      ],
       "cu_optional": false,
       "id": "opc_cu_5807",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 5807: tracked in manifest; not yet claimed or implemented.",
@@ -11608,7 +11633,8 @@
       "source_metadata": {
         "source_id": "5807",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
       "backing_tests": [
@@ -11643,10 +11669,12 @@
       "satisfied_by": "service_history"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_base_server_behaviour"
+      ],
       "cu_optional": true,
       "id": "opc_cu_5797",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 5797: tracked in manifest; not yet claimed or implemented.",
@@ -11669,13 +11697,16 @@
       "source_metadata": {
         "source_id": "5797",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_core_structure_2"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_base_server_behaviour"
+      ],
       "cu_optional": true,
       "id": "opc_cu_5796",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 5796: tracked in manifest; not yet claimed or implemented.",
@@ -11698,13 +11729,16 @@
       "source_metadata": {
         "source_id": "5796",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_core_structure_2"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_base_server_behaviour"
+      ],
       "cu_optional": false,
       "id": "opc_cu_5795",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 5795: tracked in manifest; not yet claimed or implemented.",
@@ -11727,7 +11761,8 @@
       "source_metadata": {
         "source_id": "5795",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_core_structure_2"
     },
     {
       "backing_tests": [
@@ -11761,10 +11796,14 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions",
+        "test_event_notifier",
+        "test_event_serializer"
+      ],
       "cu_optional": true,
       "id": "opc_cu_5776",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 5776: tracked in manifest; not yet claimed or implemented.",
@@ -11787,13 +11826,18 @@
       "source_metadata": {
         "source_id": "5776",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_events"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions",
+        "test_event_notifier",
+        "test_event_serializer"
+      ],
       "cu_optional": true,
       "id": "opc_cu_5775",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 5775: tracked in manifest; not yet claimed or implemented.",
@@ -11816,13 +11860,18 @@
       "source_metadata": {
         "source_id": "5775",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_events"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions",
+        "test_event_notifier",
+        "test_event_serializer"
+      ],
       "cu_optional": true,
       "id": "opc_cu_5664",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 5664: tracked in manifest; not yet claimed or implemented.",
@@ -11845,13 +11894,18 @@
       "source_metadata": {
         "source_id": "5664",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_events"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions",
+        "test_event_notifier",
+        "test_event_serializer"
+      ],
       "cu_optional": true,
       "id": "opc_cu_5663",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 5663: tracked in manifest; not yet claimed or implemented.",
@@ -11874,13 +11928,18 @@
       "source_metadata": {
         "source_id": "5663",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_events"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions",
+        "test_event_notifier",
+        "test_event_serializer"
+      ],
       "cu_optional": true,
       "id": "opc_cu_5662",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 5662: tracked in manifest; not yet claimed or implemented.",
@@ -11903,13 +11962,18 @@
       "source_metadata": {
         "source_id": "5662",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_events"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions",
+        "test_event_notifier",
+        "test_event_serializer"
+      ],
       "cu_optional": true,
       "id": "opc_cu_5661",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 5661: tracked in manifest; not yet claimed or implemented.",
@@ -11932,13 +11996,18 @@
       "source_metadata": {
         "source_id": "5661",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_events"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions",
+        "test_event_notifier",
+        "test_event_serializer"
+      ],
       "cu_optional": true,
       "id": "opc_cu_5660",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 5660: tracked in manifest; not yet claimed or implemented.",
@@ -11961,13 +12030,18 @@
       "source_metadata": {
         "source_id": "5660",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_events"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions",
+        "test_event_notifier",
+        "test_event_serializer"
+      ],
       "cu_optional": true,
       "id": "opc_cu_5659",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 5659: tracked in manifest; not yet claimed or implemented.",
@@ -11990,13 +12064,18 @@
       "source_metadata": {
         "source_id": "5659",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_events"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions",
+        "test_event_notifier",
+        "test_event_serializer"
+      ],
       "cu_optional": true,
       "id": "opc_cu_5658",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 5658: tracked in manifest; not yet claimed or implemented.",
@@ -12019,13 +12098,18 @@
       "source_metadata": {
         "source_id": "5658",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_events"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions",
+        "test_event_notifier",
+        "test_event_serializer"
+      ],
       "cu_optional": true,
       "id": "opc_cu_5656",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 5656: tracked in manifest; not yet claimed or implemented.",
@@ -12048,13 +12132,18 @@
       "source_metadata": {
         "source_id": "5656",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_events"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions",
+        "test_event_notifier",
+        "test_event_serializer"
+      ],
       "cu_optional": true,
       "id": "opc_cu_5655",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 5655: tracked in manifest; not yet claimed or implemented.",
@@ -12077,13 +12166,18 @@
       "source_metadata": {
         "source_id": "5655",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_events"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions",
+        "test_event_notifier",
+        "test_event_serializer"
+      ],
       "cu_optional": true,
       "id": "opc_cu_5654",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 5654: tracked in manifest; not yet claimed or implemented.",
@@ -12106,13 +12200,18 @@
       "source_metadata": {
         "source_id": "5654",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_events"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions",
+        "test_event_notifier",
+        "test_event_serializer"
+      ],
       "cu_optional": true,
       "id": "opc_cu_5653",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 5653: tracked in manifest; not yet claimed or implemented.",
@@ -12135,13 +12234,18 @@
       "source_metadata": {
         "source_id": "5653",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_events"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions",
+        "test_event_notifier",
+        "test_event_serializer"
+      ],
       "cu_optional": false,
       "id": "opc_cu_5652",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 5652: tracked in manifest; not yet claimed or implemented.",
@@ -12164,13 +12268,16 @@
       "source_metadata": {
         "source_id": "5652",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_events"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions"
+      ],
       "cu_optional": true,
       "id": "opc_cu_5567",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 5567: tracked in manifest; not yet claimed or implemented.",
@@ -12193,13 +12300,16 @@
       "source_metadata": {
         "source_id": "5567",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions"
+      ],
       "cu_optional": true,
       "id": "opc_cu_5566",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 5566: tracked in manifest; not yet claimed or implemented.",
@@ -12222,13 +12332,16 @@
       "source_metadata": {
         "source_id": "5566",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions"
+      ],
       "cu_optional": true,
       "id": "opc_cu_5565",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 5565: tracked in manifest; not yet claimed or implemented.",
@@ -12251,13 +12364,16 @@
       "source_metadata": {
         "source_id": "5565",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions"
+      ],
       "cu_optional": true,
       "id": "opc_cu_5564",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 5564: tracked in manifest; not yet claimed or implemented.",
@@ -12280,13 +12396,16 @@
       "source_metadata": {
         "source_id": "5564",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions"
+      ],
       "cu_optional": true,
       "id": "opc_cu_5563",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 5563: tracked in manifest; not yet claimed or implemented.",
@@ -12309,13 +12428,16 @@
       "source_metadata": {
         "source_id": "5563",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions"
+      ],
       "cu_optional": true,
       "id": "opc_cu_5562",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 5562: tracked in manifest; not yet claimed or implemented.",
@@ -12338,13 +12460,16 @@
       "source_metadata": {
         "source_id": "5562",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions"
+      ],
       "cu_optional": true,
       "id": "opc_cu_5561",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 5561: tracked in manifest; not yet claimed or implemented.",
@@ -12367,13 +12492,16 @@
       "source_metadata": {
         "source_id": "5561",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions"
+      ],
       "cu_optional": true,
       "id": "opc_cu_5560",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 5560: tracked in manifest; not yet claimed or implemented.",
@@ -12396,13 +12524,16 @@
       "source_metadata": {
         "source_id": "5560",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions"
+      ],
       "cu_optional": true,
       "id": "opc_cu_5559",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 5559: tracked in manifest; not yet claimed or implemented.",
@@ -12425,13 +12556,16 @@
       "source_metadata": {
         "source_id": "5559",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions"
+      ],
       "cu_optional": true,
       "id": "opc_cu_5558",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 5558: tracked in manifest; not yet claimed or implemented.",
@@ -12454,13 +12588,16 @@
       "source_metadata": {
         "source_id": "5558",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions"
+      ],
       "cu_optional": true,
       "id": "opc_cu_5557",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 5557: tracked in manifest; not yet claimed or implemented.",
@@ -12483,13 +12620,16 @@
       "source_metadata": {
         "source_id": "5557",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions"
+      ],
       "cu_optional": true,
       "id": "opc_cu_5556",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 5556: tracked in manifest; not yet claimed or implemented.",
@@ -12512,13 +12652,16 @@
       "source_metadata": {
         "source_id": "5556",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions"
+      ],
       "cu_optional": true,
       "id": "opc_cu_5555",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 5555: tracked in manifest; not yet claimed or implemented.",
@@ -12541,13 +12684,16 @@
       "source_metadata": {
         "source_id": "5555",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions"
+      ],
       "cu_optional": true,
       "id": "opc_cu_5554",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 5554: tracked in manifest; not yet claimed or implemented.",
@@ -12570,13 +12716,16 @@
       "source_metadata": {
         "source_id": "5554",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions"
+      ],
       "cu_optional": true,
       "id": "opc_cu_5553",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 5553: tracked in manifest; not yet claimed or implemented.",
@@ -12599,13 +12748,16 @@
       "source_metadata": {
         "source_id": "5553",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions"
+      ],
       "cu_optional": true,
       "id": "opc_cu_5552",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 5552: tracked in manifest; not yet claimed or implemented.",
@@ -12628,13 +12780,16 @@
       "source_metadata": {
         "source_id": "5552",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions"
+      ],
       "cu_optional": true,
       "id": "opc_cu_5551",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 5551: tracked in manifest; not yet claimed or implemented.",
@@ -12657,13 +12812,16 @@
       "source_metadata": {
         "source_id": "5551",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions"
+      ],
       "cu_optional": true,
       "id": "opc_cu_5550",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 5550: tracked in manifest; not yet claimed or implemented.",
@@ -12686,13 +12844,16 @@
       "source_metadata": {
         "source_id": "5550",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions"
+      ],
       "cu_optional": true,
       "id": "opc_cu_5549",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 5549: tracked in manifest; not yet claimed or implemented.",
@@ -12715,13 +12876,16 @@
       "source_metadata": {
         "source_id": "5549",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions"
+      ],
       "cu_optional": true,
       "id": "opc_cu_5548",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 5548: tracked in manifest; not yet claimed or implemented.",
@@ -12744,13 +12908,16 @@
       "source_metadata": {
         "source_id": "5548",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions"
+      ],
       "cu_optional": true,
       "id": "opc_cu_5547",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 5547: tracked in manifest; not yet claimed or implemented.",
@@ -12773,13 +12940,16 @@
       "source_metadata": {
         "source_id": "5547",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions"
+      ],
       "cu_optional": true,
       "id": "opc_cu_5546",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 5546: tracked in manifest; not yet claimed or implemented.",
@@ -12802,13 +12972,16 @@
       "source_metadata": {
         "source_id": "5546",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions"
+      ],
       "cu_optional": true,
       "id": "opc_cu_5545",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 5545: tracked in manifest; not yet claimed or implemented.",
@@ -12831,13 +13004,16 @@
       "source_metadata": {
         "source_id": "5545",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions"
+      ],
       "cu_optional": true,
       "id": "opc_cu_5544",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 5544: tracked in manifest; not yet claimed or implemented.",
@@ -12860,13 +13036,16 @@
       "source_metadata": {
         "source_id": "5544",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions"
+      ],
       "cu_optional": true,
       "id": "opc_cu_5543",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 5543: tracked in manifest; not yet claimed or implemented.",
@@ -12889,13 +13068,16 @@
       "source_metadata": {
         "source_id": "5543",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions"
+      ],
       "cu_optional": true,
       "id": "opc_cu_5542",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 5542: tracked in manifest; not yet claimed or implemented.",
@@ -12918,13 +13100,16 @@
       "source_metadata": {
         "source_id": "5542",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions"
+      ],
       "cu_optional": true,
       "id": "opc_cu_5541",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 5541: tracked in manifest; not yet claimed or implemented.",
@@ -12947,13 +13132,16 @@
       "source_metadata": {
         "source_id": "5541",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions"
+      ],
       "cu_optional": true,
       "id": "opc_cu_5540",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 5540: tracked in manifest; not yet claimed or implemented.",
@@ -12976,13 +13164,16 @@
       "source_metadata": {
         "source_id": "5540",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions"
+      ],
       "cu_optional": true,
       "id": "opc_cu_5539",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 5539: tracked in manifest; not yet claimed or implemented.",
@@ -13005,13 +13196,16 @@
       "source_metadata": {
         "source_id": "5539",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions"
+      ],
       "cu_optional": true,
       "id": "opc_cu_5538",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 5538: tracked in manifest; not yet claimed or implemented.",
@@ -13034,13 +13228,16 @@
       "source_metadata": {
         "source_id": "5538",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions"
+      ],
       "cu_optional": true,
       "id": "opc_cu_5537",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 5537: tracked in manifest; not yet claimed or implemented.",
@@ -13063,13 +13260,16 @@
       "source_metadata": {
         "source_id": "5537",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions"
+      ],
       "cu_optional": true,
       "id": "opc_cu_5536",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 5536: tracked in manifest; not yet claimed or implemented.",
@@ -13092,13 +13292,16 @@
       "source_metadata": {
         "source_id": "5536",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions"
+      ],
       "cu_optional": true,
       "id": "opc_cu_5535",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 5535: tracked in manifest; not yet claimed or implemented.",
@@ -13121,13 +13324,16 @@
       "source_metadata": {
         "source_id": "5535",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions"
+      ],
       "cu_optional": true,
       "id": "opc_cu_5534",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 5534: tracked in manifest; not yet claimed or implemented.",
@@ -13150,13 +13356,16 @@
       "source_metadata": {
         "source_id": "5534",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions"
+      ],
       "cu_optional": true,
       "id": "opc_cu_5533",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 5533: tracked in manifest; not yet claimed or implemented.",
@@ -13179,13 +13388,16 @@
       "source_metadata": {
         "source_id": "5533",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions"
+      ],
       "cu_optional": true,
       "id": "opc_cu_5532",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 5532: tracked in manifest; not yet claimed or implemented.",
@@ -13208,13 +13420,16 @@
       "source_metadata": {
         "source_id": "5532",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions"
+      ],
       "cu_optional": true,
       "id": "opc_cu_5531",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 5531: tracked in manifest; not yet claimed or implemented.",
@@ -13237,13 +13452,16 @@
       "source_metadata": {
         "source_id": "5531",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions"
+      ],
       "cu_optional": true,
       "id": "opc_cu_5530",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 5530: tracked in manifest; not yet claimed or implemented.",
@@ -13266,13 +13484,16 @@
       "source_metadata": {
         "source_id": "5530",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions"
+      ],
       "cu_optional": true,
       "id": "opc_cu_5529",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 5529: tracked in manifest; not yet claimed or implemented.",
@@ -13295,13 +13516,16 @@
       "source_metadata": {
         "source_id": "5529",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions"
+      ],
       "cu_optional": true,
       "id": "opc_cu_5528",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 5528: tracked in manifest; not yet claimed or implemented.",
@@ -13324,13 +13548,16 @@
       "source_metadata": {
         "source_id": "5528",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions"
+      ],
       "cu_optional": true,
       "id": "opc_cu_5527",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 5527: tracked in manifest; not yet claimed or implemented.",
@@ -13353,13 +13580,16 @@
       "source_metadata": {
         "source_id": "5527",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions"
+      ],
       "cu_optional": true,
       "id": "opc_cu_5526",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 5526: tracked in manifest; not yet claimed or implemented.",
@@ -13382,13 +13612,16 @@
       "source_metadata": {
         "source_id": "5526",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions"
+      ],
       "cu_optional": true,
       "id": "opc_cu_5525",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 5525: tracked in manifest; not yet claimed or implemented.",
@@ -13411,13 +13644,16 @@
       "source_metadata": {
         "source_id": "5525",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions"
+      ],
       "cu_optional": true,
       "id": "opc_cu_5524",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 5524: tracked in manifest; not yet claimed or implemented.",
@@ -13440,13 +13676,16 @@
       "source_metadata": {
         "source_id": "5524",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions"
+      ],
       "cu_optional": true,
       "id": "opc_cu_5523",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 5523: tracked in manifest; not yet claimed or implemented.",
@@ -13469,13 +13708,16 @@
       "source_metadata": {
         "source_id": "5523",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions"
+      ],
       "cu_optional": true,
       "id": "opc_cu_5522",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 5522: tracked in manifest; not yet claimed or implemented.",
@@ -13498,13 +13740,16 @@
       "source_metadata": {
         "source_id": "5522",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions"
+      ],
       "cu_optional": true,
       "id": "opc_cu_5521",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 5521: tracked in manifest; not yet claimed or implemented.",
@@ -13527,13 +13772,16 @@
       "source_metadata": {
         "source_id": "5521",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions"
+      ],
       "cu_optional": true,
       "id": "opc_cu_5520",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 5520: tracked in manifest; not yet claimed or implemented.",
@@ -13556,13 +13804,16 @@
       "source_metadata": {
         "source_id": "5520",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions"
+      ],
       "cu_optional": true,
       "id": "opc_cu_5519",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 5519: tracked in manifest; not yet claimed or implemented.",
@@ -13585,13 +13836,16 @@
       "source_metadata": {
         "source_id": "5519",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions"
+      ],
       "cu_optional": true,
       "id": "opc_cu_5518",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 5518: tracked in manifest; not yet claimed or implemented.",
@@ -13614,13 +13868,16 @@
       "source_metadata": {
         "source_id": "5518",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions"
+      ],
       "cu_optional": true,
       "id": "opc_cu_5517",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 5517: tracked in manifest; not yet claimed or implemented.",
@@ -13643,13 +13900,16 @@
       "source_metadata": {
         "source_id": "5517",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions"
+      ],
       "cu_optional": true,
       "id": "opc_cu_5516",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 5516: tracked in manifest; not yet claimed or implemented.",
@@ -13672,13 +13932,16 @@
       "source_metadata": {
         "source_id": "5516",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions"
+      ],
       "cu_optional": true,
       "id": "opc_cu_5515",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 5515: tracked in manifest; not yet claimed or implemented.",
@@ -13701,13 +13964,16 @@
       "source_metadata": {
         "source_id": "5515",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions"
+      ],
       "cu_optional": true,
       "id": "opc_cu_5514",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 5514: tracked in manifest; not yet claimed or implemented.",
@@ -13730,13 +13996,16 @@
       "source_metadata": {
         "source_id": "5514",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions"
+      ],
       "cu_optional": true,
       "id": "opc_cu_5513",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 5513: tracked in manifest; not yet claimed or implemented.",
@@ -13759,13 +14028,16 @@
       "source_metadata": {
         "source_id": "5513",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions"
+      ],
       "cu_optional": true,
       "id": "opc_cu_5512",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 5512: tracked in manifest; not yet claimed or implemented.",
@@ -13788,13 +14060,16 @@
       "source_metadata": {
         "source_id": "5512",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions"
+      ],
       "cu_optional": true,
       "id": "opc_cu_5511",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 5511: tracked in manifest; not yet claimed or implemented.",
@@ -13817,13 +14092,16 @@
       "source_metadata": {
         "source_id": "5511",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions"
+      ],
       "cu_optional": true,
       "id": "opc_cu_5510",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 5510: tracked in manifest; not yet claimed or implemented.",
@@ -13846,13 +14124,16 @@
       "source_metadata": {
         "source_id": "5510",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_certificate_management"
+      ],
       "cu_optional": false,
       "id": "opc_cu_5303",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 5303: tracked in manifest; not yet claimed or implemented.",
@@ -13875,13 +14156,16 @@
       "source_metadata": {
         "source_id": "5303",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_certificate_management"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_key_credential"
+      ],
       "cu_optional": true,
       "id": "opc_cu_5302",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 5302: tracked in manifest; not yet claimed or implemented.",
@@ -13904,13 +14188,16 @@
       "source_metadata": {
         "source_id": "5302",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_key_credential_service"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_key_credential"
+      ],
       "cu_optional": true,
       "id": "opc_cu_5301",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 5301: tracked in manifest; not yet claimed or implemented.",
@@ -13933,7 +14220,8 @@
       "source_metadata": {
         "source_id": "5301",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_key_credential_service"
     },
     {
       "backing_tests": [
@@ -13968,10 +14256,12 @@
       "satisfied_by": "opc_cu_key_credential_service"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_key_credential"
+      ],
       "cu_optional": true,
       "id": "opc_cu_5292",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 5292: tracked in manifest; not yet claimed or implemented.",
@@ -13994,7 +14284,8 @@
       "source_metadata": {
         "source_id": "5292",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_key_credential_service"
     },
     {
       "backing_tests": [
@@ -14125,10 +14416,14 @@
       "satisfied_by": "opc_cu_user_role_management"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_subscriptions_capacity",
+        "test_subscription_deadband",
+        "test_subscription_publish"
+      ],
       "cu_optional": false,
       "id": "opc_cu_5250",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 5250: tracked in manifest; not yet claimed or implemented.",
@@ -14151,13 +14446,18 @@
       "source_metadata": {
         "source_id": "5250",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_subscription_standard"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_subscriptions_capacity",
+        "test_subscription_deadband",
+        "test_subscription_publish"
+      ],
       "cu_optional": false,
       "id": "opc_cu_5249",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 5249: tracked in manifest; not yet claimed or implemented.",
@@ -14180,13 +14480,18 @@
       "source_metadata": {
         "source_id": "5249",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_subscription_standard"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_subscriptions_capacity",
+        "test_subscription_deadband",
+        "test_subscription_publish"
+      ],
       "cu_optional": false,
       "id": "opc_cu_5248",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 5248: tracked in manifest; not yet claimed or implemented.",
@@ -14209,13 +14514,18 @@
       "source_metadata": {
         "source_id": "5248",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_subscription_standard"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_subscriptions_capacity",
+        "test_subscription_deadband",
+        "test_subscription_publish"
+      ],
       "cu_optional": false,
       "id": "opc_cu_5242",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 5242: tracked in manifest; not yet claimed or implemented.",
@@ -14238,13 +14548,17 @@
       "source_metadata": {
         "source_id": "5242",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_subscription_standard"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_audit_events",
+        "test_event_notifications"
+      ],
       "cu_optional": false,
       "id": "opc_cu_5213",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 5213: tracked in manifest; not yet claimed or implemented.",
@@ -14267,7 +14581,8 @@
       "source_metadata": {
         "source_id": "5213",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_auditing"
     },
     {
       "backing_tests": [
@@ -14334,10 +14649,12 @@
       "satisfied_by": "opc_cu_user_role_management"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_scheduler_stub"
+      ],
       "cu_optional": true,
       "id": "opc_cu_4503",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 4503: tracked in manifest; not yet claimed or implemented.",
@@ -14360,13 +14677,16 @@
       "source_metadata": {
         "source_id": "4503",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_scheduler"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_scheduler_stub"
+      ],
       "cu_optional": false,
       "id": "opc_cu_4502",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 4502: tracked in manifest; not yet claimed or implemented.",
@@ -14389,13 +14709,16 @@
       "source_metadata": {
         "source_id": "4502",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_scheduler"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_scheduler_stub"
+      ],
       "cu_optional": true,
       "id": "opc_cu_4501",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 4501: tracked in manifest; not yet claimed or implemented.",
@@ -14418,13 +14741,16 @@
       "source_metadata": {
         "source_id": "4501",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_scheduler"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_scheduler_stub"
+      ],
       "cu_optional": false,
       "id": "opc_cu_4500",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 4500: tracked in manifest; not yet claimed or implemented.",
@@ -14447,13 +14773,16 @@
       "source_metadata": {
         "source_id": "4500",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_scheduler"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions"
+      ],
       "cu_optional": true,
       "id": "opc_cu_4467",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 4467: tracked in manifest; not yet claimed or implemented.",
@@ -14476,13 +14805,16 @@
       "source_metadata": {
         "source_id": "4467",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions"
+      ],
       "cu_optional": true,
       "id": "opc_cu_4466",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 4466: tracked in manifest; not yet claimed or implemented.",
@@ -14505,13 +14837,16 @@
       "source_metadata": {
         "source_id": "4466",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions"
+      ],
       "cu_optional": true,
       "id": "opc_cu_4465",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 4465: tracked in manifest; not yet claimed or implemented.",
@@ -14534,13 +14869,16 @@
       "source_metadata": {
         "source_id": "4465",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions"
+      ],
       "cu_optional": true,
       "id": "opc_cu_4464",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 4464: tracked in manifest; not yet claimed or implemented.",
@@ -14563,13 +14901,16 @@
       "source_metadata": {
         "source_id": "4464",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions"
+      ],
       "cu_optional": true,
       "id": "opc_cu_4463",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 4463: tracked in manifest; not yet claimed or implemented.",
@@ -14592,13 +14933,16 @@
       "source_metadata": {
         "source_id": "4463",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions"
+      ],
       "cu_optional": true,
       "id": "opc_cu_4428",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 4428: tracked in manifest; not yet claimed or implemented.",
@@ -14621,13 +14965,17 @@
       "source_metadata": {
         "source_id": "4428",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_dispatch_session_order",
+        "test_base_server_behaviour"
+      ],
       "cu_optional": false,
       "id": "opc_cu_3994",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 3994: tracked in manifest; not yet claimed or implemented.",
@@ -14650,7 +14998,8 @@
       "source_metadata": {
         "source_id": "3994",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_session_general_service"
     },
     {
       "backing_tests": [
@@ -14842,10 +15191,12 @@
       "satisfied_by": "opc_cu_user_auth"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions"
+      ],
       "cu_optional": true,
       "id": "opc_cu_3779",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 3779: tracked in manifest; not yet claimed or implemented.",
@@ -14868,13 +15219,16 @@
       "source_metadata": {
         "source_id": "3779",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions"
+      ],
       "cu_optional": true,
       "id": "opc_cu_3778",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 3778: tracked in manifest; not yet claimed or implemented.",
@@ -14897,13 +15251,16 @@
       "source_metadata": {
         "source_id": "3778",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions"
+      ],
       "cu_optional": true,
       "id": "opc_cu_3777",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 3777: tracked in manifest; not yet claimed or implemented.",
@@ -14926,13 +15283,16 @@
       "source_metadata": {
         "source_id": "3777",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions"
+      ],
       "cu_optional": true,
       "id": "opc_cu_3776",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 3776: tracked in manifest; not yet claimed or implemented.",
@@ -14955,13 +15315,16 @@
       "source_metadata": {
         "source_id": "3776",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions"
+      ],
       "cu_optional": true,
       "id": "opc_cu_3775",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 3775: tracked in manifest; not yet claimed or implemented.",
@@ -14984,13 +15347,16 @@
       "source_metadata": {
         "source_id": "3775",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions"
+      ],
       "cu_optional": true,
       "id": "opc_cu_3774",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 3774: tracked in manifest; not yet claimed or implemented.",
@@ -15013,13 +15379,16 @@
       "source_metadata": {
         "source_id": "3774",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions"
+      ],
       "cu_optional": true,
       "id": "opc_cu_3773",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 3773: tracked in manifest; not yet claimed or implemented.",
@@ -15042,13 +15411,16 @@
       "source_metadata": {
         "source_id": "3773",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions"
+      ],
       "cu_optional": true,
       "id": "opc_cu_3772",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 3772: tracked in manifest; not yet claimed or implemented.",
@@ -15071,13 +15443,16 @@
       "source_metadata": {
         "source_id": "3772",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions"
+      ],
       "cu_optional": true,
       "id": "opc_cu_3771",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 3771: tracked in manifest; not yet claimed or implemented.",
@@ -15100,13 +15475,16 @@
       "source_metadata": {
         "source_id": "3771",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions"
+      ],
       "cu_optional": true,
       "id": "opc_cu_3770",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 3770: tracked in manifest; not yet claimed or implemented.",
@@ -15129,13 +15507,16 @@
       "source_metadata": {
         "source_id": "3770",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions"
+      ],
       "cu_optional": true,
       "id": "opc_cu_3765",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 3765: tracked in manifest; not yet claimed or implemented.",
@@ -15158,13 +15539,16 @@
       "source_metadata": {
         "source_id": "3765",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions"
+      ],
       "cu_optional": true,
       "id": "opc_cu_3762",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 3762: tracked in manifest; not yet claimed or implemented.",
@@ -15187,13 +15571,16 @@
       "source_metadata": {
         "source_id": "3762",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions"
+      ],
       "cu_optional": true,
       "id": "opc_cu_3761",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 3761: tracked in manifest; not yet claimed or implemented.",
@@ -15216,13 +15603,16 @@
       "source_metadata": {
         "source_id": "3761",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions"
+      ],
       "cu_optional": true,
       "id": "opc_cu_3760",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 3760: tracked in manifest; not yet claimed or implemented.",
@@ -15245,13 +15635,18 @@
       "source_metadata": {
         "source_id": "3760",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_subscriptions_capacity",
+        "test_subscription_deadband",
+        "test_subscription_publish"
+      ],
       "cu_optional": false,
       "id": "opc_cu_3642",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 3642: tracked in manifest; not yet claimed or implemented.",
@@ -15274,7 +15669,8 @@
       "source_metadata": {
         "source_id": "3642",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_subscription_standard"
     },
     {
       "backing_tests": [
@@ -15340,10 +15736,12 @@
       "satisfied_by": "opc_cu_user_role_management"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_certificate_management"
+      ],
       "cu_optional": false,
       "id": "opc_cu_3584",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 3584: tracked in manifest; not yet claimed or implemented.",
@@ -15366,7 +15764,8 @@
       "source_metadata": {
         "source_id": "3584",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_certificate_management"
     },
     {
       "backing_tests": [
@@ -15401,10 +15800,12 @@
       "satisfied_by": "opc_cu_certificate_management"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_certificate_management"
+      ],
       "cu_optional": false,
       "id": "opc_cu_3581",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 3581: tracked in manifest; not yet claimed or implemented.",
@@ -15427,7 +15828,8 @@
       "source_metadata": {
         "source_id": "3581",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_certificate_management"
     },
     {
       "backing_tests": [],
@@ -15488,10 +15890,12 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_history"
+      ],
       "cu_optional": false,
       "id": "opc_cu_3574",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 3574: tracked in manifest; not yet claimed or implemented.",
@@ -15514,13 +15918,16 @@
       "source_metadata": {
         "source_id": "3574",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "service_history"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions"
+      ],
       "cu_optional": false,
       "id": "opc_cu_3572",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 3572: tracked in manifest; not yet claimed or implemented.",
@@ -15543,13 +15950,16 @@
       "source_metadata": {
         "source_id": "3572",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions"
+      ],
       "cu_optional": false,
       "id": "opc_cu_3571",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 3571: tracked in manifest; not yet claimed or implemented.",
@@ -15572,7 +15982,8 @@
       "source_metadata": {
         "source_id": "3571",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
       "backing_tests": [
@@ -15985,10 +16396,12 @@
       "satisfied_by": "opc_cu_user_role_management"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_claim_map"
+      ],
       "cu_optional": false,
       "id": "opc_cu_3171",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 3171: tracked in manifest; not yet claimed or implemented.",
@@ -16011,13 +16424,16 @@
       "source_metadata": {
         "source_id": "3171",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_2271"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions"
+      ],
       "cu_optional": true,
       "id": "opc_cu_3165",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 3165: tracked in manifest; not yet claimed or implemented.",
@@ -16040,7 +16456,8 @@
       "source_metadata": {
         "source_id": "3165",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
       "backing_tests": [],
@@ -16101,10 +16518,14 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_subscriptions_capacity",
+        "test_subscription_deadband",
+        "test_subscription_publish"
+      ],
       "cu_optional": true,
       "id": "opc_cu_3142",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 3142: tracked in manifest; not yet claimed or implemented.",
@@ -16127,7 +16548,8 @@
       "source_metadata": {
         "source_id": "3142",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_subscription_standard"
     },
     {
       "backing_tests": [],
@@ -16159,10 +16581,14 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_subscriptions_capacity",
+        "test_subscription_deadband",
+        "test_subscription_publish"
+      ],
       "cu_optional": false,
       "id": "opc_cu_3121",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 3121: tracked in manifest; not yet claimed or implemented.",
@@ -16185,13 +16611,16 @@
       "source_metadata": {
         "source_id": "3121",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_subscription_standard"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_base_server_behaviour"
+      ],
       "cu_optional": true,
       "id": "opc_cu_3107",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 3107: tracked in manifest; not yet claimed or implemented.",
@@ -16214,7 +16643,8 @@
       "source_metadata": {
         "source_id": "3107",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_core_structure_2"
     },
     {
       "backing_tests": [],
@@ -16246,10 +16676,12 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions"
+      ],
       "cu_optional": true,
       "id": "opc_cu_3098",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 3098: tracked in manifest; not yet claimed or implemented.",
@@ -16272,7 +16704,8 @@
       "source_metadata": {
         "source_id": "3098",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
       "backing_tests": [],
@@ -16304,10 +16737,12 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_base_server_behaviour"
+      ],
       "cu_optional": false,
       "id": "opc_cu_3084",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 3084: tracked in manifest; not yet claimed or implemented.",
@@ -16330,13 +16765,16 @@
       "source_metadata": {
         "source_id": "3084",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_core_structure_2"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions"
+      ],
       "cu_optional": false,
       "id": "opc_cu_3083",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 3083: tracked in manifest; not yet claimed or implemented.",
@@ -16359,7 +16797,8 @@
       "source_metadata": {
         "source_id": "3083",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
       "backing_tests": [
@@ -16454,10 +16893,12 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_base_server_behaviour"
+      ],
       "cu_optional": true,
       "id": "opc_cu_3060",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 3060: tracked in manifest; not yet claimed or implemented.",
@@ -16480,7 +16921,8 @@
       "source_metadata": {
         "source_id": "3060",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_core_structure_2"
     },
     {
       "backing_tests": [],
@@ -16544,10 +16986,12 @@
       "satisfied_by": "service_history"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions"
+      ],
       "cu_optional": true,
       "id": "opc_cu_3049",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 3049: tracked in manifest; not yet claimed or implemented.",
@@ -16570,7 +17014,8 @@
       "source_metadata": {
         "source_id": "3049",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
       "backing_tests": [],
@@ -16631,10 +17076,12 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_transfer_subscriptions"
+      ],
       "cu_optional": false,
       "id": "opc_cu_3027",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 3027: tracked in manifest; not yet claimed or implemented.",
@@ -16657,7 +17104,8 @@
       "source_metadata": {
         "source_id": "3027",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_redundancy"
     },
     {
       "backing_tests": [
@@ -16842,10 +17290,12 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions"
+      ],
       "cu_optional": false,
       "id": "opc_cu_3004",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 3004: tracked in manifest; not yet claimed or implemented.",
@@ -16868,13 +17318,16 @@
       "source_metadata": {
         "source_id": "3004",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions"
+      ],
       "cu_optional": true,
       "id": "opc_cu_3001",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 3001: tracked in manifest; not yet claimed or implemented.",
@@ -16897,13 +17350,16 @@
       "source_metadata": {
         "source_id": "3001",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_base_server_behaviour"
+      ],
       "cu_optional": false,
       "id": "opc_cu_3000",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 3000: tracked in manifest; not yet claimed or implemented.",
@@ -16926,7 +17382,8 @@
       "source_metadata": {
         "source_id": "3000",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_core_structure_2"
     },
     {
       "backing_tests": [],
@@ -17077,10 +17534,12 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions"
+      ],
       "cu_optional": false,
       "id": "opc_cu_2965",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 2965: tracked in manifest; not yet claimed or implemented.",
@@ -17103,7 +17562,8 @@
       "source_metadata": {
         "source_id": "2965",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
       "backing_tests": [],
@@ -17164,10 +17624,12 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions"
+      ],
       "cu_optional": false,
       "id": "opc_cu_2957",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 2957: tracked in manifest; not yet claimed or implemented.",
@@ -17190,13 +17652,16 @@
       "source_metadata": {
         "source_id": "2957",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions"
+      ],
       "cu_optional": true,
       "id": "opc_cu_2951",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 2951: tracked in manifest; not yet claimed or implemented.",
@@ -17219,7 +17684,8 @@
       "source_metadata": {
         "source_id": "2951",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
       "backing_tests": [
@@ -17315,10 +17781,12 @@
       "satisfied_by": "service_history"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions"
+      ],
       "cu_optional": true,
       "id": "opc_cu_2946",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 2946: tracked in manifest; not yet claimed or implemented.",
@@ -17341,7 +17809,8 @@
       "source_metadata": {
         "source_id": "2946",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
       "backing_tests": [
@@ -17471,10 +17940,14 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_user_auth_plaintext",
+        "test_user_auth_certificate",
+        "test_user_auth_secure_e2e"
+      ],
       "cu_optional": true,
       "id": "opc_cu_2902",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 2902: tracked in manifest; not yet claimed or implemented.",
@@ -17497,13 +17970,16 @@
       "source_metadata": {
         "source_id": "2902",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_user_auth"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions"
+      ],
       "cu_optional": true,
       "id": "opc_cu_2897",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 2897: tracked in manifest; not yet claimed or implemented.",
@@ -17526,13 +18002,16 @@
       "source_metadata": {
         "source_id": "2897",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions"
+      ],
       "cu_optional": true,
       "id": "opc_cu_2896",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 2896: tracked in manifest; not yet claimed or implemented.",
@@ -17555,13 +18034,16 @@
       "source_metadata": {
         "source_id": "2896",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions"
+      ],
       "cu_optional": true,
       "id": "opc_cu_2893",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 2893: tracked in manifest; not yet claimed or implemented.",
@@ -17584,13 +18066,16 @@
       "source_metadata": {
         "source_id": "2893",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions"
+      ],
       "cu_optional": true,
       "id": "opc_cu_2881",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 2881: tracked in manifest; not yet claimed or implemented.",
@@ -17613,13 +18098,16 @@
       "source_metadata": {
         "source_id": "2881",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions"
+      ],
       "cu_optional": true,
       "id": "opc_cu_2877",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 2877: tracked in manifest; not yet claimed or implemented.",
@@ -17642,7 +18130,8 @@
       "source_metadata": {
         "source_id": "2877",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
       "backing_tests": [
@@ -17677,10 +18166,12 @@
       "satisfied_by": "opc_cu_user_role_management"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_claim_map"
+      ],
       "cu_optional": false,
       "id": "opc_cu_2871",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 2871: tracked in manifest; not yet claimed or implemented.",
@@ -17703,13 +18194,16 @@
       "source_metadata": {
         "source_id": "2871",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_2271"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_secure_channel"
+      ],
       "cu_optional": false,
       "id": "opc_cu_2867",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 2867: tracked in manifest; not yet claimed or implemented.",
@@ -17732,13 +18226,16 @@
       "source_metadata": {
         "source_id": "2867",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_ua_secure_conversation"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions"
+      ],
       "cu_optional": true,
       "id": "opc_cu_2861",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 2861: tracked in manifest; not yet claimed or implemented.",
@@ -17761,7 +18258,8 @@
       "source_metadata": {
         "source_id": "2861",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
       "backing_tests": [
@@ -17795,10 +18293,14 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_subscriptions_capacity",
+        "test_subscription_deadband",
+        "test_subscription_publish"
+      ],
       "cu_optional": true,
       "id": "opc_cu_2818",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 2818: tracked in manifest; not yet claimed or implemented.",
@@ -17821,7 +18323,8 @@
       "source_metadata": {
         "source_id": "2818",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_subscription_standard"
     },
     {
       "backing_tests": [
@@ -17951,10 +18454,12 @@
       "satisfied_by": "opc_cu_user_role_management"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_secure_channel"
+      ],
       "cu_optional": false,
       "id": "opc_cu_2785",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 2785: tracked in manifest; not yet claimed or implemented.",
@@ -17977,7 +18482,8 @@
       "source_metadata": {
         "source_id": "2785",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_ua_secure_conversation"
     },
     {
       "backing_tests": [
@@ -18011,10 +18517,12 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_aliasname_stub"
+      ],
       "cu_optional": true,
       "id": "opc_cu_2777",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 2777: tracked in manifest; not yet claimed or implemented.",
@@ -18037,7 +18545,8 @@
       "source_metadata": {
         "source_id": "2777",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_aliasname"
     },
     {
       "backing_tests": [],
@@ -18069,10 +18578,12 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions"
+      ],
       "cu_optional": true,
       "id": "opc_cu_2746",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 2746: tracked in manifest; not yet claimed or implemented.",
@@ -18095,7 +18606,8 @@
       "source_metadata": {
         "source_id": "2746",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
       "backing_tests": [
@@ -18159,10 +18671,12 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_secure_channel"
+      ],
       "cu_optional": true,
       "id": "opc_cu_2709",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 2709: tracked in manifest; not yet claimed or implemented.",
@@ -18185,13 +18699,16 @@
       "source_metadata": {
         "source_id": "2709",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_ua_secure_conversation"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_certificate_management"
+      ],
       "cu_optional": true,
       "id": "opc_cu_2705",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 2705: tracked in manifest; not yet claimed or implemented.",
@@ -18214,7 +18731,8 @@
       "source_metadata": {
         "source_id": "2705",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_certificate_management"
     },
     {
       "backing_tests": [
@@ -18249,10 +18767,12 @@
       "satisfied_by": "service_history"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_aliasname_stub"
+      ],
       "cu_optional": true,
       "id": "opc_cu_2629",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 2629: tracked in manifest; not yet claimed or implemented.",
@@ -18275,7 +18795,8 @@
       "source_metadata": {
         "source_id": "2629",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_aliasname"
     },
     {
       "backing_tests": [
@@ -18464,10 +18985,13 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_method_call_arbitrary",
+        "test_method_call_errors"
+      ],
       "cu_optional": true,
       "id": "opc_cu_2454",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 2454: tracked in manifest; not yet claimed or implemented.",
@@ -18490,13 +19014,16 @@
       "source_metadata": {
         "source_id": "2454",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_method_server"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_certificate_management"
+      ],
       "cu_optional": false,
       "id": "opc_cu_2453",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 2453: tracked in manifest; not yet claimed or implemented.",
@@ -18519,13 +19046,16 @@
       "source_metadata": {
         "source_id": "2453",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_certificate_management"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_aliasname_stub"
+      ],
       "cu_optional": false,
       "id": "opc_cu_2450",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 2450: tracked in manifest; not yet claimed or implemented.",
@@ -18548,13 +19078,16 @@
       "source_metadata": {
         "source_id": "2450",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_aliasname"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_aliasname_stub"
+      ],
       "cu_optional": false,
       "id": "opc_cu_2449",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 2449: tracked in manifest; not yet claimed or implemented.",
@@ -18577,13 +19110,16 @@
       "source_metadata": {
         "source_id": "2449",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_aliasname"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_aliasname_stub"
+      ],
       "cu_optional": false,
       "id": "opc_cu_2448",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 2448: tracked in manifest; not yet claimed or implemented.",
@@ -18606,13 +19142,17 @@
       "source_metadata": {
         "source_id": "2448",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_aliasname"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_method_call_arbitrary",
+        "test_method_call_errors"
+      ],
       "cu_optional": false,
       "id": "opc_cu_2391",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 2391: tracked in manifest; not yet claimed or implemented.",
@@ -18635,13 +19175,16 @@
       "source_metadata": {
         "source_id": "2391",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_method_server"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions"
+      ],
       "cu_optional": true,
       "id": "opc_cu_2390",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 2390: tracked in manifest; not yet claimed or implemented.",
@@ -18664,7 +19207,8 @@
       "source_metadata": {
         "source_id": "2390",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
       "backing_tests": [],
@@ -18757,10 +19301,12 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_aliasname_stub"
+      ],
       "cu_optional": true,
       "id": "opc_cu_2379",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 2379: tracked in manifest; not yet claimed or implemented.",
@@ -18783,7 +19329,8 @@
       "source_metadata": {
         "source_id": "2379",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_aliasname"
     },
     {
       "backing_tests": [
@@ -18817,10 +19364,12 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_claim_map"
+      ],
       "cu_optional": false,
       "id": "opc_cu_2354",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 2354: tracked in manifest; not yet claimed or implemented.",
@@ -18843,13 +19392,18 @@
       "source_metadata": {
         "source_id": "2354",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_2271"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_subscriptions_capacity",
+        "test_subscription_deadband",
+        "test_subscription_publish"
+      ],
       "cu_optional": false,
       "id": "opc_cu_2353",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 2353: tracked in manifest; not yet claimed or implemented.",
@@ -18872,7 +19426,8 @@
       "source_metadata": {
         "source_id": "2353",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_subscription_standard"
     },
     {
       "backing_tests": [],
@@ -18933,10 +19488,12 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_read_service"
+      ],
       "cu_optional": true,
       "id": "opc_cu_2345",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 2345: tracked in manifest; not yet claimed or implemented.",
@@ -18959,13 +19516,16 @@
       "source_metadata": {
         "source_id": "2345",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "service_read"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions"
+      ],
       "cu_optional": false,
       "id": "opc_cu_2343",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 2343: tracked in manifest; not yet claimed or implemented.",
@@ -18988,7 +19548,8 @@
       "source_metadata": {
         "source_id": "2343",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
       "backing_tests": [],
@@ -19078,10 +19639,12 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions"
+      ],
       "cu_optional": false,
       "id": "opc_cu_2333",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 2333: tracked in manifest; not yet claimed or implemented.",
@@ -19104,13 +19667,16 @@
       "source_metadata": {
         "source_id": "2333",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions"
+      ],
       "cu_optional": true,
       "id": "opc_cu_2323",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 2323: tracked in manifest; not yet claimed or implemented.",
@@ -19133,7 +19699,8 @@
       "source_metadata": {
         "source_id": "2323",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
       "backing_tests": [
@@ -19168,10 +19735,12 @@
       "satisfied_by": "opc_cu_certificate_management"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions"
+      ],
       "cu_optional": false,
       "id": "opc_cu_2315",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 2315: tracked in manifest; not yet claimed or implemented.",
@@ -19194,7 +19763,8 @@
       "source_metadata": {
         "source_id": "2315",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
       "backing_tests": [],
@@ -19316,10 +19886,12 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_read_service"
+      ],
       "cu_optional": false,
       "id": "opc_cu_2291",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 2291: tracked in manifest; not yet claimed or implemented.",
@@ -19342,7 +19914,8 @@
       "source_metadata": {
         "source_id": "2291",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "service_read"
     },
     {
       "backing_tests": [
@@ -19438,10 +20011,12 @@
       "satisfied_by": "service_history"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions"
+      ],
       "cu_optional": true,
       "id": "opc_cu_2275",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 2275: tracked in manifest; not yet claimed or implemented.",
@@ -19464,7 +20039,8 @@
       "source_metadata": {
         "source_id": "2275",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
       "backing_tests": [],
@@ -19554,10 +20130,12 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_transfer_subscriptions"
+      ],
       "cu_optional": false,
       "id": "opc_cu_2258",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 2258: tracked in manifest; not yet claimed or implemented.",
@@ -19580,13 +20158,16 @@
       "source_metadata": {
         "source_id": "2258",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_redundancy"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions"
+      ],
       "cu_optional": true,
       "id": "opc_cu_2239",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 2239: tracked in manifest; not yet claimed or implemented.",
@@ -19609,7 +20190,8 @@
       "source_metadata": {
         "source_id": "2239",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
       "backing_tests": [
@@ -19644,10 +20226,12 @@
       "satisfied_by": "opc_cu_certificate_management"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_certificate_management"
+      ],
       "cu_optional": false,
       "id": "opc_cu_2233",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 2233: tracked in manifest; not yet claimed or implemented.",
@@ -19670,13 +20254,16 @@
       "source_metadata": {
         "source_id": "2233",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_certificate_management"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_certificate_management"
+      ],
       "cu_optional": false,
       "id": "opc_cu_2232",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 2232: tracked in manifest; not yet claimed or implemented.",
@@ -19699,7 +20286,8 @@
       "source_metadata": {
         "source_id": "2232",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_certificate_management"
     },
     {
       "backing_tests": [
@@ -19821,10 +20409,12 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_read_service"
+      ],
       "cu_optional": false,
       "id": "opc_cu_2203",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 2203: tracked in manifest; not yet claimed or implemented.",
@@ -19847,13 +20437,16 @@
       "source_metadata": {
         "source_id": "2203",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "service_read"
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions"
+      ],
       "cu_optional": false,
       "id": "opc_cu_2202",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 2202: tracked in manifest; not yet claimed or implemented.",
@@ -19876,7 +20469,8 @@
       "source_metadata": {
         "source_id": "2202",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
       "backing_tests": [],
@@ -19908,10 +20502,12 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_alarms_conditions"
+      ],
       "cu_optional": false,
       "id": "opc_cu_2180",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Spec CU 2180: tracked in manifest; not yet claimed or implemented.",
@@ -19934,7 +20530,8 @@
       "source_metadata": {
         "source_id": "2180",
         "source_url": "https://profiles.opcfoundation.org"
-      }
+      },
+      "satisfied_by": "opc_cu_alarms_conditions"
     },
     {
       "backing_tests": [],
@@ -20134,6 +20731,60 @@
         "micro": false,
         "nano": false,
         "standard": false
+      }
+    },
+    {
+      "id": "opc_cu_aliasname",
+      "kind": "conformance_unit",
+      "implementation_state": "claimed",
+      "opc_display_name": "AliasName Server",
+      "kconfig_symbol": "MUC_OPCUA_CU_ALIASNAME",
+      "profile_defaults": {
+        "nano": false,
+        "micro": false,
+        "embedded": false,
+        "standard": false,
+        "full": false,
+        "custom": false
+      },
+      "backing_tests": [
+        "test_aliasname_stub"
+      ],
+      "depends_on": [
+        "MUC_OPCUA_FACET_CORE_2022_SERVER"
+      ],
+      "depends_on_op": "and",
+      "opc_reference": {
+        "spec": "OPC-10000-7",
+        "section": null,
+        "note": "AliasName Server Facet stub"
+      }
+    },
+    {
+      "id": "opc_cu_scheduler",
+      "kind": "conformance_unit",
+      "implementation_state": "claimed",
+      "opc_display_name": "Scheduler Base",
+      "kconfig_symbol": "MUC_OPCUA_CU_SCHEDULER",
+      "profile_defaults": {
+        "nano": false,
+        "micro": false,
+        "embedded": false,
+        "standard": false,
+        "full": false,
+        "custom": false
+      },
+      "backing_tests": [
+        "test_scheduler_stub"
+      ],
+      "depends_on": [
+        "MUC_OPCUA_CU_METHOD_SERVER"
+      ],
+      "depends_on_op": "and",
+      "opc_reference": {
+        "spec": "OPC-10000-7",
+        "section": null,
+        "note": "Scheduler Server Facet stub"
       }
     }
   ],

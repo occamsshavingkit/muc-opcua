@@ -1922,6 +1922,26 @@ config MUC_OPCUA_CU_METHOD_SERVER
 	  Backing tests: test_method_call_arbitrary, test_method_call_errors.
 	  Notes: Project-level Conformance Unit mirroring the legacy 'method_server' item; emits Kconfig symbol MUC_OPCUA_CU_METHOD_SERVER matching the #ifdef guard renamed in Task 3 of the CU-aligned code reorganisation plan.
 
+config MUC_OPCUA_CU_SCHEDULER
+	bool "CU: Scheduler"
+	depends on MUC_OPCUA_FACET_CORE_2022_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed (stub).
+	  OPC source: OPC-10000-7 -- Scheduler Server Facet.
+	  Backing tests: test_scheduler_stub.
+	  Notes: Scheduler Server Facet placeholder; no concrete implementation yet.
+
+config MUC_OPCUA_CU_ALIASNAME
+	bool "CU: AliasName Server"
+	depends on MUC_OPCUA_FACET_CORE_2022_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed (stub).
+	  OPC source: OPC-10000-7 -- AliasName Server Facet.
+	  Backing tests: test_aliasname_stub.
+	  Notes: AliasName Server Facet placeholder; no concrete implementation yet.
+
 config MUC_OPCUA_CU_MULTI_CHUNK
 	bool "CU: Multi Chunk"
 	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
