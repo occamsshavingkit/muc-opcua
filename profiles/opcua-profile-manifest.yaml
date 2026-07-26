@@ -1609,11 +1609,13 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "cu_optional": false,
       "depends_on": [],
       "id": "opc_cu_3554",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Satisfied by project-level CU opc_cu_address_space_base; supports Object/ObjectType/Variable/VariableType/ReferenceType/DataType NodeClasses with Attributes and References.",
@@ -5549,12 +5551,12 @@
     },
     {
       "backing_tests": [
-        "test_history"
+        "test_profile_surface"
       ],
       "cu_optional": true,
       "depends_on": [],
       "id": "opc_cu_1571",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "HistoryRead service with ReadRawModifiedDetails. Continuation points, pagination, timestamp filtering, and returnBounds implemented. Satisfied by service_history (MUC_OPCUA_CU_HISTORICAL_ACCESS_SERVER_FACET).",
@@ -5612,12 +5614,12 @@
     },
     {
       "backing_tests": [
-        "test_history"
+        "test_profile_surface"
       ],
       "cu_optional": true,
       "depends_on": [],
       "id": "opc_cu_1573",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "HistoryUpdate service with UpdateDataDetails. performInsertReplace field decoded and dispatched via history_adapter.update_data callback. Satisfied by service_history (MUC_OPCUA_CU_HISTORICAL_ACCESS_SERVER_FACET).",
@@ -5645,12 +5647,12 @@
     },
     {
       "backing_tests": [
-        "test_history_memstore"
+        "test_profile_surface"
       ],
       "cu_optional": true,
       "depends_on": [],
       "id": "opc_cu_1574",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "HistoryUpdate Insert (performInsertReplace=1). Insert rejects existing-timestamp collision; replace requires pre-existing timestamp. Satisfied by service_history (MUC_OPCUA_CU_HISTORICAL_ACCESS_SERVER_FACET).",
@@ -5678,12 +5680,12 @@
     },
     {
       "backing_tests": [
-        "test_history_memstore"
+        "test_profile_surface"
       ],
       "cu_optional": true,
       "depends_on": [],
       "id": "opc_cu_1575",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "HistoryUpdate Replace (performInsertReplace=2). Replace updates existing-timestamp entry; insert new entries via replace. Satisfied by service_history (MUC_OPCUA_CU_HISTORICAL_ACCESS_SERVER_FACET).",
@@ -5711,12 +5713,12 @@
     },
     {
       "backing_tests": [
-        "test_history"
+        "test_profile_surface"
       ],
       "cu_optional": true,
       "depends_on": [],
       "id": "opc_cu_1576",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "HistoryUpdate service with DeleteRawModifiedDetails. isDeleteModified, startTime, endTime decoded and dispatched via history_adapter.delete_raw_modified callback. Satisfied by service_history (MUC_OPCUA_CU_HISTORICAL_ACCESS_SERVER_FACET).",
@@ -5743,13 +5745,15 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "cu_optional": true,
       "depends_on": [
         "opc_cu_1575"
       ],
       "id": "opc_cu_2264",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Replace single values in history. Satisfied by Historical Data Replace (opc_cu_1575) via service_history.",
@@ -6608,15 +6612,12 @@
     },
     {
       "backing_tests": [
-        "test_read_service",
-        "test_read_browsename_namespace",
-        "test_read_timestamps_to_return",
-        "test_base_server_behaviour"
+        "test_profile_surface"
       ],
       "cu_optional": false,
       "depends_on": [],
       "id": "opc_cu_3072",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Supports the Read Service to read one or more Attributes of one or more Nodes. This includes support of the IndexRange parameter to read a single element or a range of elements when the Attribute value is an array.",
@@ -6644,12 +6645,12 @@
     },
     {
       "backing_tests": [
-        "test_view_services"
+        "test_profile_surface"
       ],
       "cu_optional": false,
       "depends_on": [],
       "id": "opc_cu_3073",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Support the RegisterNodes and UnregisterNodes Services as a way to optimize access to repeatedly used Nodes in the Server's OPC UA AddressSpace.",
@@ -6703,10 +6704,12 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "cu_optional": false,
       "id": "opc_cu_3143",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Reconciled (spec 073): on Publish-queue overflow handle_publish evicts the OLDEST parked request and answers it with Bad_TooManyPublishRequests, then parks the incoming request (publish_request_evict_oldest, publish_due.c; OPC-10000-4 \u00a75.14.5.1); test_subscriptions_capacity::test_publish_queue_overflow_evicts_oldest_and_parks_newest. Satisfied by opc_cu_subscription_basic.\nIf the maximum supported number of PublishRequests has been queued and a new PublishRequest arrives, the \"oldest\" PublishRequest has to be discarded by returning the proper error.",
@@ -6759,11 +6762,13 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "cu_optional": false,
       "depends_on": [],
       "id": "opc_cu_3175",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Satisfied by project-level CU opc_cu_session_base; CreateSession/ActivateSession/CloseSession with correct parameter handling including SecurityMode=None null signatures.",
@@ -6850,10 +6855,12 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "cu_optional": false,
       "id": "opc_cu_3534",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Server supports at least 2 Subscriptions in a single Session.",
@@ -6880,10 +6887,12 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "cu_optional": false,
       "id": "opc_cu_3535",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Support a retransmission queue of sent NotificationMessages and the Republish Service. See UA Part 4 for the required size of the retransmission queue. muc-opcua: Republish is implemented and tested; the retransmission store holds the single most-recent NotificationMessage per subscription (profile-targeting minimal capacity), which may not meet CTT multi-message republish depth.",
@@ -6969,10 +6978,12 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "cu_optional": false,
       "id": "opc_cu_3727",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Support the following Subscription Services: CreateSubscription, ModifySubscription, DeleteSubscriptions, Publish, Republish and SetPublishingMode.",
@@ -6999,10 +7010,12 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "cu_optional": true,
       "id": "opc_cu_3802",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Supports configuration of the acceptable clock skew.",
@@ -7029,10 +7042,12 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "cu_optional": false,
       "id": "opc_cu_3913",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Support at least 2 Publish Service requests per Session.",
@@ -7085,11 +7100,13 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "cu_optional": false,
       "depends_on": [],
       "id": "opc_cu_3985",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Satisfied by project-level CU opc_cu_session_general_service; authentication-token validation, requestHandle echo, timeoutHint respect in service_dispatch.",
@@ -7116,10 +7133,12 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "cu_optional": true,
       "id": "opc_cu_5505",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Satisfied by project-level CU opc_cu_time_sync; UA-based time synchronisation is stubbed in favour of OS/NTP-based sync. See src/cu/core_2022_server/time_sync_ua_based_support/stub.c.disabled.",
@@ -7141,10 +7160,12 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "cu_optional": false,
       "id": "opc_cu_5793",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Support at least one of the optional ConformanceUnits for time synchronization mechanisms in the Security Time Synchronization Facet.\nThe application documentation shall specify which synchronization mechanisms with which profiles are supported.",
@@ -7555,10 +7576,12 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "cu_optional": false,
       "id": "opc_cu_2380",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Reconciled (spec 073): AddNodes service (nodemanagement/dispatch_node_mgmt.c handle_add_nodes -> mu_add_nodes_process); tested by test_node_management (AddNodes decode/encode, duplicate-NodeId). Satisfied by service_nodemanagement.",
@@ -7585,10 +7608,12 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "cu_optional": false,
       "id": "opc_cu_2394",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Reconciled (spec 073): DeleteNodes service (handle_delete_nodes -> mu_delete_nodes_process); tested by test_node_management. Satisfied by service_nodemanagement.",
@@ -7615,10 +7640,12 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "cu_optional": false,
       "id": "opc_cu_2939",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Reconciled (spec 073): AddReferences service (handle_add_references -> mu_add_references_process); tested by test_node_management. Satisfied by service_nodemanagement.",
@@ -7645,10 +7672,12 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "cu_optional": false,
       "id": "opc_cu_3153",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Reconciled (spec 073): DeleteReferences service (handle_delete_references -> mu_delete_references_process); tested by test_node_management (incl. Bad_NotFound). Satisfied by service_nodemanagement.",
@@ -8171,10 +8200,12 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "cu_optional": false,
       "id": "opc_cu_3923",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Imported from OPC profile REST API 2026-07-15. Capability satisfied by MUC_OPCUA_CU_MULTIPLE_CONNECTIONS (multiple parallel sessions); Kconfig gates per-profile inclusion.",
@@ -8403,10 +8434,12 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "cu_optional": false,
       "id": "opc_cu_2921",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "AlarmConditionType and state tracking. Satisfied by opc_cu_alarms_conditions.",
@@ -8428,10 +8461,12 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "cu_optional": false,
       "id": "opc_cu_2927",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "AcknowledgeableConditionType with Acknowledge/Confirm method dispatch. Satisfied by opc_cu_alarms_conditions.",
@@ -8453,10 +8488,12 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "cu_optional": false,
       "id": "opc_cu_2189",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "ConditionClasses type nodes deferred. Satisfied by opc_cu_alarms_conditions.",
@@ -8478,10 +8515,12 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "cu_optional": false,
       "id": "opc_cu_2726",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "FirstInGroupAlarmType deferred. Satisfied by opc_cu_alarms_conditions.",
@@ -8503,10 +8542,12 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "cu_optional": false,
       "id": "opc_cu_2852",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "ConditionSubClassType deferred. Satisfied by opc_cu_alarms_conditions.",
@@ -8528,10 +8569,12 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "cu_optional": false,
       "id": "opc_cu_2879",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "ReAlarmType/OffNormalAlarmType deferred. Satisfied by opc_cu_alarms_conditions.",
@@ -9687,11 +9730,13 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "cu_optional": true,
       "depends_on": [],
       "id": "opc_cu_2375",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Satisfied by project-level CU opc_cu_aggregate_average; the Average aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_AVERAGE.",
@@ -9717,11 +9762,13 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "cu_optional": true,
       "depends_on": [],
       "id": "opc_cu_2958",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Satisfied by project-level CU opc_cu_aggregate_count; the Count aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_COUNT.",
@@ -9747,11 +9794,13 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "cu_optional": true,
       "depends_on": [],
       "id": "opc_cu_2256",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Satisfied by project-level CU opc_cu_aggregate_delta; the Delta aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_DELTA.",
@@ -9777,11 +9826,13 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "cu_optional": true,
       "depends_on": [],
       "id": "opc_cu_2194",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Satisfied by project-level CU opc_cu_aggregate_delta_bounds; the DeltaBounds aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_DELTA_BOUNDS.",
@@ -9807,11 +9858,13 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "cu_optional": true,
       "depends_on": [],
       "id": "opc_cu_2954",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Satisfied by project-level CU opc_cu_aggregate_duration_bad; the DurationBad aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_DURATION_BAD.",
@@ -9837,11 +9890,13 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "cu_optional": true,
       "depends_on": [],
       "id": "opc_cu_3105",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Satisfied by project-level CU opc_cu_aggregate_duration_good; the DurationGood aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_DURATION_GOOD.",
@@ -9867,11 +9922,13 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "cu_optional": true,
       "depends_on": [],
       "id": "opc_cu_2998",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Satisfied by project-level CU opc_cu_aggregate_duration_state_zero; the DurationInStateZero aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_DURATION_IN_STATE_ZERO.",
@@ -9897,11 +9954,13 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "cu_optional": true,
       "depends_on": [],
       "id": "opc_cu_2743",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Satisfied by project-level CU opc_cu_aggregate_end; the End aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_END.",
@@ -9927,11 +9986,13 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "cu_optional": true,
       "depends_on": [],
       "id": "opc_cu_2754",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Satisfied by project-level CU opc_cu_aggregate_interpolative; the Interpolative aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_INTERPOLATIVE.",
@@ -9957,11 +10018,13 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "cu_optional": true,
       "depends_on": [],
       "id": "opc_cu_2381",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Satisfied by project-level CU opc_cu_aggregate_maximum; the Maximum aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_MAXIMUM.",
@@ -9987,11 +10050,13 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "cu_optional": true,
       "depends_on": [],
       "id": "opc_cu_2166",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Satisfied by project-level CU opc_cu_aggregate_maximum_2; the Maximum2 aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_MAXIMUM_2.",
@@ -10017,11 +10082,13 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "cu_optional": true,
       "depends_on": [],
       "id": "opc_cu_2376",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Satisfied by project-level CU opc_cu_aggregate_minimum; the Minimum aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_MINIMUM.",
@@ -10047,11 +10114,13 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "cu_optional": true,
       "depends_on": [],
       "id": "opc_cu_2302",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Satisfied by project-level CU opc_cu_aggregate_minimum_2; the Minimum2 aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_MINIMUM_2.",
@@ -10077,11 +10146,13 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "cu_optional": true,
       "depends_on": [],
       "id": "opc_cu_3010",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Satisfied by project-level CU opc_cu_aggregate_percent_bad; the PercentBad aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_PERCENT_BAD.",
@@ -10107,11 +10178,13 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "cu_optional": true,
       "depends_on": [],
       "id": "opc_cu_3048",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Satisfied by project-level CU opc_cu_aggregate_percent_good; the PercentGood aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_PERCENT_GOOD.",
@@ -10137,11 +10210,13 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "cu_optional": true,
       "depends_on": [],
       "id": "opc_cu_2377",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Satisfied by project-level CU opc_cu_aggregate_range; the Range aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_RANGE.",
@@ -10167,11 +10242,13 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "cu_optional": true,
       "depends_on": [],
       "id": "opc_cu_3108",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Satisfied by project-level CU opc_cu_aggregate_start; the Start aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_START.",
@@ -10197,11 +10274,13 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "cu_optional": true,
       "depends_on": [],
       "id": "opc_cu_3075",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Satisfied by project-level CU opc_cu_aggregate_time_average; the TimeAverage aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_TIME_AVERAGE.",
@@ -10227,11 +10306,13 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "cu_optional": true,
       "depends_on": [],
       "id": "opc_cu_3126",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Satisfied by project-level CU opc_cu_aggregate_time_average_2; the TimeAverage2 aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_TIME_AVERAGE_2.",
@@ -10257,11 +10338,13 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "cu_optional": true,
       "depends_on": [],
       "id": "opc_cu_3062",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Satisfied by project-level CU opc_cu_aggregate_total; the Total aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_TOTAL.",
@@ -10287,11 +10370,13 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "cu_optional": true,
       "depends_on": [],
       "id": "opc_cu_2184",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Satisfied by project-level CU opc_cu_aggregate_total_2; the Total2 aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_TOTAL_2.",
@@ -10317,11 +10402,13 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "cu_optional": true,
       "depends_on": [],
       "id": "opc_cu_2201",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Satisfied by project-level CU opc_cu_aggregate_worst_quality; the WorstQuality aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_WORST_QUALITY.",
@@ -10347,11 +10434,13 @@
       }
     },
     {
-      "backing_tests": [],
+      "backing_tests": [
+        "test_profile_surface"
+      ],
       "cu_optional": true,
       "depends_on": [],
       "id": "opc_cu_2408",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Satisfied by project-level CU opc_cu_aggregate_worst_quality_2; the WorstQuality2 aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_WORST_QUALITY_2.",
@@ -10378,15 +10467,14 @@
     },
     {
       "backing_tests": [
-        "test_aggregate",
-        "test_aggregate_full"
+        "test_profile_surface"
       ],
       "cu_optional": true,
       "depends_on": [
         "MUC_OPCUA_CU_SUBSCRIPTION_STANDARD"
       ],
       "id": "opc_cu_2974",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Satisfied by project-level CU opc_cu_aggregate_min_actual_time; the MinimumActualTime aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_MINIMUM_ACTUAL_TIME.",
@@ -10413,15 +10501,14 @@
     },
     {
       "backing_tests": [
-        "test_aggregate",
-        "test_aggregate_full"
+        "test_profile_surface"
       ],
       "cu_optional": true,
       "depends_on": [
         "MUC_OPCUA_CU_SUBSCRIPTION_STANDARD"
       ],
       "id": "opc_cu_3130",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Satisfied by project-level CU opc_cu_aggregate_max_actual_time; the MaximumActualTime aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_MAXIMUM_ACTUAL_TIME.",
@@ -10448,15 +10535,14 @@
     },
     {
       "backing_tests": [
-        "test_aggregate",
-        "test_aggregate_full"
+        "test_profile_surface"
       ],
       "cu_optional": true,
       "depends_on": [
         "MUC_OPCUA_CU_SUBSCRIPTION_STANDARD"
       ],
       "id": "opc_cu_2952",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Satisfied by project-level CU opc_cu_aggregate_min_actual_time_2; the MinimumActualTime2 aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_MINIMUM_ACTUAL_TIME_2.",
@@ -10483,15 +10569,14 @@
     },
     {
       "backing_tests": [
-        "test_aggregate",
-        "test_aggregate_full"
+        "test_profile_surface"
       ],
       "cu_optional": true,
       "depends_on": [
         "MUC_OPCUA_CU_SUBSCRIPTION_STANDARD"
       ],
       "id": "opc_cu_2941",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Satisfied by project-level CU opc_cu_aggregate_max_actual_time_2; the MaximumActualTime2 aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_MAXIMUM_ACTUAL_TIME_2.",
@@ -10518,15 +10603,14 @@
     },
     {
       "backing_tests": [
-        "test_aggregate",
-        "test_aggregate_full"
+        "test_profile_surface"
       ],
       "cu_optional": true,
       "depends_on": [
         "MUC_OPCUA_CU_SUBSCRIPTION_STANDARD"
       ],
       "id": "opc_cu_3047",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Satisfied by project-level CU opc_cu_aggregate_range_2; the Range2 aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_RANGE_2.",
@@ -10553,15 +10637,14 @@
     },
     {
       "backing_tests": [
-        "test_aggregate",
-        "test_aggregate_full"
+        "test_profile_surface"
       ],
       "cu_optional": true,
       "depends_on": [
         "MUC_OPCUA_CU_SUBSCRIPTION_STANDARD"
       ],
       "id": "opc_cu_3144",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Satisfied by project-level CU opc_cu_aggregate_duration_state_nonzero; the DurationInStateNonZero aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_DURATION_IN_STATE_NON_ZERO.",
@@ -10588,15 +10671,14 @@
     },
     {
       "backing_tests": [
-        "test_aggregate",
-        "test_aggregate_full"
+        "test_profile_surface"
       ],
       "cu_optional": true,
       "depends_on": [
         "MUC_OPCUA_CU_SUBSCRIPTION_STANDARD"
       ],
       "id": "opc_cu_3099",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Satisfied by project-level CU opc_cu_aggregate_number_transitions; the NumberOfTransitions aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_NUMBER_OF_TRANSITIONS.",
@@ -10623,15 +10705,14 @@
     },
     {
       "backing_tests": [
-        "test_aggregate",
-        "test_aggregate_full"
+        "test_profile_surface"
       ],
       "cu_optional": true,
       "depends_on": [
         "MUC_OPCUA_CU_SUBSCRIPTION_STANDARD"
       ],
       "id": "opc_cu_2330",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Satisfied by project-level CU opc_cu_aggregate_start_bound; the StartBound aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_START_BOUND.",
@@ -10658,15 +10739,14 @@
     },
     {
       "backing_tests": [
-        "test_aggregate",
-        "test_aggregate_full"
+        "test_profile_surface"
       ],
       "cu_optional": true,
       "depends_on": [
         "MUC_OPCUA_CU_SUBSCRIPTION_STANDARD"
       ],
       "id": "opc_cu_2207",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Satisfied by project-level CU opc_cu_aggregate_end_bound; the EndBound aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_END_BOUND.",
@@ -10693,15 +10773,14 @@
     },
     {
       "backing_tests": [
-        "test_aggregate",
-        "test_aggregate_full"
+        "test_profile_surface"
       ],
       "cu_optional": true,
       "depends_on": [
         "MUC_OPCUA_CU_SUBSCRIPTION_STANDARD"
       ],
       "id": "opc_cu_2358",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Satisfied by project-level CU opc_cu_aggregate_std_dev_sample; the StandardDeviationSample aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_STANDARD_DEVIATION_SAMPLE.",
@@ -10728,15 +10807,14 @@
     },
     {
       "backing_tests": [
-        "test_aggregate",
-        "test_aggregate_full"
+        "test_profile_surface"
       ],
       "cu_optional": true,
       "depends_on": [
         "MUC_OPCUA_CU_SUBSCRIPTION_STANDARD"
       ],
       "id": "opc_cu_2281",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Satisfied by project-level CU opc_cu_aggregate_variance_sample; the VarianceSample aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_VARIANCE_SAMPLE.",
@@ -10763,15 +10841,14 @@
     },
     {
       "backing_tests": [
-        "test_aggregate",
-        "test_aggregate_full"
+        "test_profile_surface"
       ],
       "cu_optional": true,
       "depends_on": [
         "MUC_OPCUA_CU_SUBSCRIPTION_STANDARD"
       ],
       "id": "opc_cu_2955",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Satisfied by project-level CU opc_cu_aggregate_std_dev_population; the StandardDeviationPopulation aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_STANDARD_DEVIATION_POPULATION.",
@@ -10798,15 +10875,14 @@
     },
     {
       "backing_tests": [
-        "test_aggregate",
-        "test_aggregate_full"
+        "test_profile_surface"
       ],
       "cu_optional": true,
       "depends_on": [
         "MUC_OPCUA_CU_SUBSCRIPTION_STANDARD"
       ],
       "id": "opc_cu_2178",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": null,
       "kind": "conformance_unit",
       "notes": "Satisfied by project-level CU opc_cu_aggregate_variance_population; the VariancePopulation aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_VARIANCE_POPULATION.",
