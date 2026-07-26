@@ -35,6 +35,7 @@ Backing test column: comma-separated ctest names (as registered).
 | Base Info Core Views Folder |  | micro, embedded, standard, full | test_profile_surface |
 | Base Info Estimated Return Time |  | full | test_profile_surface |
 | Base Info Namespace Metadata |  | micro, embedded, standard, full | test_profile_surface |
+| Address Space Base |  | micro, embedded, standard, full | test_profile_surface |
 | Address Space Interfaces |  | full | test_profile_surface |
 | Documentation - Core Capacities |  | all | test_profile_surface |
 | Base Info Server Capabilities 2 |  | all | test_profile_surface |
@@ -168,6 +169,12 @@ Backing test column: comma-separated ctest names (as registered).
 | Core 2017: View RegisterNodes | OPC-10000-4 §5.9 | all | test_view_services, test_profile_surface |
 | Core 2017 Attribute Write | OPC-10000-4 §5.10.4 | full | test_write_service |
 | Historical Access Server Facet | OPC-10000-11 | full | test_history |
+| Historical Raw Data 2022 Server Facet | OPC-10000-11 | full | test_profile_surface |
+| Historical Data Update 2022 Server Facet | OPC-10000-11 | full | test_profile_surface |
+| Historical Data Insert 2022 Server Facet | OPC-10000-11 | full | test_profile_surface |
+| Historical Data Replace 2022 Server Facet | OPC-10000-11 | full | test_profile_surface |
+| Historical Data Delete 2022 Server Facet | OPC-10000-11 | full | test_profile_surface |
+| Historical Access Replace Value | OPC-10000-11 | full | test_profile_surface |
 | Query | OPC-10000-4 §5.9 | full | test_query_service |
 | NodeManagement | OPC-10000-4 §5.7 | full | test_node_management, test_node_management_errors |
 | View TranslateBrowsePath | OPC-10000-4 §5.9.4 | all | test_browse_service, test_view_services |
@@ -183,13 +190,25 @@ Backing test column: comma-separated ctest names (as registered).
 | Security Role Server Authorization |  | full | test_role_management |
 | Security Invalid user token |  | embedded, standard, full | test_profile_surface |
 | Attribute Write StatusCode & Timestamp | OPC-10000-4 §5.11.4 | full | test_write_service, test_write_response |
+| Attribute Read |  | all | test_profile_surface |
+| View RegisterNodes |  | all | test_profile_surface |
 | Security User X509 |  | standard, full | test_profile_surface |
+| Subscription PublishRequest Queue Overflow |  | micro, embedded, standard, full | test_profile_surface |
 | Attribute Write Index | OPC-10000-4 §5.11.4 | full | test_write_service |
+| Session Base |  | all | test_profile_surface |
 | Base Info Diagnostics | OPC-10000-5 §6.3.1, 6.3.3, 8.3.2, 12.9 | full | test_diagnostics, test_profile_surface |
 | View Basic 2 | OPC-10000-4 §5.9.2, 5.9.3 | all | test_browse_service, test_browse_limits, test_view_services |
+| Subscription Multiple |  | embedded, standard, full | test_profile_surface |
+| Subscription Retransmission Queue |  | embedded, standard, full | test_profile_surface |
 | Security User Name Password 2 |  | embedded, standard, full | test_profile_surface |
 | Security User Token Unencrypted |  | full | test_profile_surface |
+| Subscription Basic |  | micro, embedded, standard, full | test_profile_surface |
+| Time Sync - Configure Clock Skew |  | full | test_profile_surface |
+| Subscription Publish Basic |  | micro, embedded, standard, full | test_profile_surface |
 | Base Services Diagnostics | OPC-10000-4 §7.32, 7.38 | full | test_service_header |
+| Session General Service Behaviour |  | all | test_profile_surface |
+| Time Sync – UA based support |  | full | test_profile_surface |
+| Time Sync - Support |  | all | test_profile_surface |
 | Protocol UA TCP | OPC-10000-6 §7.1 | all | test_tcp_connection |
 | UA Binary Encoding | OPC-10000-6 §5 | all | test_binary_primitives, test_binary_nodeid |
 | UA Secure Conversation | OPC-10000-6 §6 | all | test_secure_channel |
@@ -204,23 +223,38 @@ Backing test column: comma-separated ctest names (as registered).
 | Address Space Events 2 |  | full | test_claim_map |
 | Monitor Events |  | full | test_profile_surface |
 | Monitor Complex Event Filter |  | full | test_profile_surface |
+| Node Management Add Node |  | full | test_profile_surface |
+| Node Management Delete Node |  | full | test_profile_surface |
+| Node Management Add Ref |  | full | test_profile_surface |
+| Node Management Delete Ref |  | full | test_profile_surface |
 | Base Info Events Capabilities |  | full | test_claim_map, test_read_service |
 | Auditing Secure Communication |  | full | test_claim_map, test_event_notifications |
 | Auditing Services |  | full | test_event_notifications |
 | Auditing Write |  | full | test_claim_map, test_event_notifications |
+| Auditing NodeManagement | OPC-10000-5 | full | test_claim_map |
+| Auditing Method | OPC-10000-5 | full | test_claim_map |
 | A & C Auditing | OPC-10000-9 §5.10 | full | test_claim_map |
 | A & C Dialog Auditing | OPC-10000-9 §5.10.5 | full | test_claim_map |
 | A & C Confirm Auditing | OPC-10000-9 §5.10.7 | full | test_claim_map |
 | Session Cancel | OPC-10000-4 §5.6.5 | standard, full | test_claim_map |
 | Discovery Register | OPC-10000-4 §5.4.5 | standard, full | test_claim_map |
 | Security Policy Required | OPC-10000-7 §6.5 | embedded, standard, full | test_profile_surface |
+| Discovery Register2 | OPC-10000-4 §5.4.6 | standard, full | test_profile_surface |
 | Security ECC Policy | OPC-10000-7 §6.5 | full | test_profile_surface |
+| Session Multiple | OPC-10000-4 §5.6 | micro, embedded, standard, full | test_profile_surface |
 | Security Default ApplicationInstance Certificate |  | all | test_certificate_validity, test_server_config |
+| Base Info Custom Type System |  | full | test_profile_surface |
 | Base Info Engineering Units |  | full | test_profile_surface |
 | Security – No Application Authentication |  | full | test_profile_surface |
 | KeyCredential Service | OPC-10000-12 §8.5-8.6 | full | test_key_credential |
 | User Role Management | OPC-10000-12 §9.5-9.6 | full | test_role_management |
 | Certificate Management | OPC-10000-12 §7.5-7.6 | full | test_certificate_management |
+| A & C Alarm | OPC-10000-9 §5.10 | full | test_profile_surface |
+| A & C Acknowledge | OPC-10000-9 §5.7 | full | test_profile_surface |
+| A & C ConditionClasses | OPC-10000-9 §5.9 | full | test_profile_surface |
+| A & C First in Group Alarm | OPC-10000-9 §5.10.3 | full | test_profile_surface |
+| A & C Condition Sub-Classes | OPC-10000-9 §5.9.11 | full | test_profile_surface |
+| A & C Re-Alarming | OPC-10000-9 §5.10.4 | full | test_profile_surface |
 | Alarms & Conditions | OPC-10000-9 §5 | full | test_alarms_conditions |
 | Data Access TwoState |  | full | test_profile_surface |
 | Data Access Complex Number |  | full | test_profile_surface |
@@ -263,5 +297,55 @@ Backing test column: comma-separated ctest names (as registered).
 | Base Info TemporaryFileTransferType Async Write |  | full | test_profile_surface |
 | Base Info Client Events |  | full | test_profile_surface |
 | Base Info Progress Events |  | full | test_profile_surface |
+| Aggregate Subscription – Average | OPC-10000-13 §5.4.3.5 | full | test_profile_surface |
+| Aggregate Subscription – Count | OPC-10000-13 §5.4.3.21 | full | test_profile_surface |
+| Aggregate Subscription – Delta | OPC-10000-13 §5.4.3.27 | full | test_profile_surface |
+| Aggregate Subscription – DeltaBounds | OPC-10000-13 §5.4.3.30 | full | test_profile_surface |
+| Aggregate Subscription – DurationBad | OPC-10000-13 §5.4.3.32 | full | test_profile_surface |
+| Aggregate Subscription – DurationGood | OPC-10000-13 §5.4.3.31 | full | test_profile_surface |
+| Aggregate Subscription – DurationInStateZero | OPC-10000-13 §5.4.3.22 | full | test_profile_surface |
+| Aggregate Subscription – End | OPC-10000-13 §5.4.3.26 | full | test_profile_surface |
+| Aggregate Subscription – Interpolative | OPC-10000-13 §5.4.3.4 | full | test_profile_surface |
+| Aggregate Subscription – Maximum | OPC-10000-13 §5.4.3.11 | full | test_profile_surface |
+| Aggregate Subscription – Maximum2 | OPC-10000-13 §5.4.3.16 | full | test_profile_surface |
+| Aggregate Subscription – Minimum | OPC-10000-13 §5.4.3.10 | full | test_profile_surface |
+| Aggregate Subscription – Minimum2 | OPC-10000-13 §5.4.3.15 | full | test_profile_surface |
+| Aggregate Subscription – PercentBad | OPC-10000-13 §5.4.3.34 | full | test_profile_surface |
+| Aggregate Subscription – PercentGood | OPC-10000-13 §5.4.3.33 | full | test_profile_surface |
+| Aggregate Subscription – Range | OPC-10000-13 §5.4.3.14 | full | test_profile_surface |
+| Aggregate Subscription – Start | OPC-10000-13 §5.4.3.25 | full | test_profile_surface |
+| Aggregate Subscription – TimeAverage | OPC-10000-13 §5.4.3.6 | full | test_profile_surface |
+| Aggregate Subscription – TimeAverage2 | OPC-10000-13 §5.4.3.7 | full | test_profile_surface |
+| Aggregate Subscription – Total | OPC-10000-13 §5.4.3.8 | full | test_profile_surface |
+| Aggregate Subscription – Total2 | OPC-10000-13 §5.4.3.9 | full | test_profile_surface |
+| Aggregate Subscription – WorstQuality | OPC-10000-13 §5.4.3.35 | full | test_profile_surface |
+| Aggregate Subscription – WorstQuality2 | OPC-10000-13 §5.4.3.36 | full | test_profile_surface |
+| Aggregate Subscription – MinimumActualTime | OPC-10000-13 §5.4.3.12 | full | test_profile_surface |
+| Aggregate Subscription – MaximumActualTime | OPC-10000-13 §5.4.3.13 | full | test_profile_surface |
+| Aggregate Subscription – MinimumActualTime2 | OPC-10000-13 §5.4.3.17 | full | test_profile_surface |
+| Aggregate Subscription – MaximumActualTime2 | OPC-10000-13 §5.4.3.18 | full | test_profile_surface |
+| Aggregate Subscription – Range2 | OPC-10000-13 §5.4.3.19 | full | test_profile_surface |
+| Aggregate Subscription – DurationInStateNonZero | OPC-10000-13 §5.4.3.23 | full | test_profile_surface |
+| Aggregate Subscription – NumberOfTransitions | OPC-10000-13 §5.4.3.24 | full | test_profile_surface |
+| Aggregate Subscription – StartBound | OPC-10000-13 §5.4.3.28 | full | test_profile_surface |
+| Aggregate Subscription – EndBound | OPC-10000-13 §5.4.3.29 | full | test_profile_surface |
+| Aggregate Subscription – StandardDeviationSample | OPC-10000-13 §5.4.3.37 | full | test_profile_surface |
+| Aggregate Subscription – VarianceSample | OPC-10000-13 §5.4.3.38 | full | test_profile_surface |
+| Aggregate Subscription – StandardDeviationPopulation | OPC-10000-13 §5.4.3.39 | full | test_profile_surface |
+| Aggregate Subscription – VariancePopulation | OPC-10000-13 §5.4.3.40 | full | test_profile_surface |
+| Base Info State Machine DescriptionNodeIdDataType |  | full | test_profile_surface |
+| Base Info TemporaryFileTransferType Base |  | full | test_profile_surface |
+| Base Info Model Change |  | full | test_profile_surface |
+| Base Info Method Capabilities |  | full | test_profile_surface |
+| Base Info FileType Base |  | full | test_profile_surface |
+| Base Info Model Change General |  | full | test_profile_surface |
+| Base Info Security Role Capabilities |  | full | test_profile_surface |
+| Base Info RequestServerStateChange Method |  | full | test_profile_surface |
+| Base Info State Machine Instance |  | full | test_profile_surface |
+| Base Info History ReadEvents Capabilities |  | full | test_profile_surface |
+| Base Info History ReadData Capabilities |  | full | test_profile_surface |
+| Base Info History UpdateData Capabilities |  | full | test_profile_surface |
+| Base Info History UpdateEvents Capabilities |  | full | test_profile_surface |
+| Base Info History Read Capabilities |  | full | test_profile_surface |
 | User Token JWT Server Facet | OPC-10000-7 §CU 1697 | full | test_jwt_activate_session |
 | Certificate Manager Pull | OPC-10000-12 §7.6, 7.9 | full | test_certificate_manager |

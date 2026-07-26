@@ -123,6 +123,15 @@ menuconfig MUC_OPCUA_FACET_CORE_2022_SERVER
 
 if MUC_OPCUA_FACET_CORE_2022_SERVER
 
+config MUC_OPCUA_CU_HISTORICAL_RAW_DATA_2022_SERVER_FACET
+	bool "CU: Historical Raw Data 2022 Server Facet"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-11 -- CU 1571:Historical Raw Data 2022 Server Facet.
+	  Backing tests: test_profile_surface.
+	  Notes: HistoryRead service with ReadRawModifiedDetails. Continuation points, pagination, timestamp filtering, and returnBounds implemented. Satisfied by service_history (MUC_OPCUA_CU_HISTORICAL_ACCESS_SERVER_FACET).
+
 config MUC_OPCUA_CU_HISTORICAL_ANNOTATION_2022_SERVER_FACET
 	bool "CU: Historical Annotation 2022 Server Facet"
 	default n
@@ -130,6 +139,42 @@ config MUC_OPCUA_CU_HISTORICAL_ANNOTATION_2022_SERVER_FACET
 	  Implementation state: deferred.
 	  OPC source: OPC-10000-11 -- CU 1572:Historical Annotation 2022 Server Facet.
 	  Notes: Historical Annotation not implemented; no annotation storage or retrieval support.
+
+config MUC_OPCUA_CU_HISTORICAL_DATA_UPDATE_2022_SERVER_FACET
+	bool "CU: Historical Data Update 2022 Server Facet"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-11 -- CU 1573:Historical Data Update 2022 Server Facet.
+	  Backing tests: test_profile_surface.
+	  Notes: HistoryUpdate service with UpdateDataDetails. performInsertReplace field decoded and dispatched via history_adapter.update_data callback. Satisfied by service_history (MUC_OPCUA_CU_HISTORICAL_ACCESS_SERVER_FACET).
+
+config MUC_OPCUA_CU_HISTORICAL_DATA_INSERT_2022_SERVER_FACET
+	bool "CU: Historical Data Insert 2022 Server Facet"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-11 -- CU 1574:Historical Data Insert 2022 Server Facet.
+	  Backing tests: test_profile_surface.
+	  Notes: HistoryUpdate Insert (performInsertReplace=1). Insert rejects existing-timestamp collision; replace requires pre-existing timestamp. Satisfied by service_history (MUC_OPCUA_CU_HISTORICAL_ACCESS_SERVER_FACET).
+
+config MUC_OPCUA_CU_HISTORICAL_DATA_REPLACE_2022_SERVER_FACET
+	bool "CU: Historical Data Replace 2022 Server Facet"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-11 -- CU 1575:Historical Data Replace 2022 Server Facet.
+	  Backing tests: test_profile_surface.
+	  Notes: HistoryUpdate Replace (performInsertReplace=2). Replace updates existing-timestamp entry; insert new entries via replace. Satisfied by service_history (MUC_OPCUA_CU_HISTORICAL_ACCESS_SERVER_FACET).
+
+config MUC_OPCUA_CU_HISTORICAL_DATA_DELETE_2022_SERVER_FACET
+	bool "CU: Historical Data Delete 2022 Server Facet"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-11 -- CU 1576:Historical Data Delete 2022 Server Facet.
+	  Backing tests: test_profile_surface.
+	  Notes: HistoryUpdate service with DeleteRawModifiedDetails. isDeleteModified, startTime, endTime decoded and dispatched via history_adapter.delete_raw_modified callback. Satisfied by service_history (MUC_OPCUA_CU_HISTORICAL_ACCESS_SERVER_FACET).
 
 config MUC_OPCUA_CU_BASE_HISTORICAL_EVENT_2022_SERVER_FACET
 	bool "CU: Base Historical Event 2022 Server Facet"
@@ -183,6 +228,24 @@ config MUC_OPCUA_CU_HISTORICAL_ACCESS_STRUCTURED_DATA_2022_SERVER_FACET
 	  OPC source: OPC-10000-11 -- CU 1710:Historical Access Structured Data 2022 Server Facet.
 	  Notes: Historical Access Structured Data not implemented; structured data storage/retrieval requires additional development.
 
+config MUC_OPCUA_CU_AGGREGATE_SUBSCRIPTION_MAXIMUM2
+	bool "CU: Aggregate Subscription – Maximum2"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-13 §5.4.3.16 -- CU 2166:Aggregate Subscription – Maximum2.
+	  Backing tests: test_profile_surface.
+	  Notes: Satisfied by project-level CU opc_cu_aggregate_maximum_2; the Maximum2 aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_MAXIMUM_2.
+
+config MUC_OPCUA_CU_AGGREGATE_SUBSCRIPTION_TOTAL2
+	bool "CU: Aggregate Subscription – Total2"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-13 §5.4.3.9 -- CU 2184:Aggregate Subscription – Total2.
+	  Backing tests: test_profile_surface.
+	  Notes: Satisfied by project-level CU opc_cu_aggregate_total_2; the Total2 aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_TOTAL_2.
+
 config MUC_OPCUA_CU_HISTORICAL_ACCESS_STRUCTURED_DATA_INSERT
 	bool "CU: Historical Access Structured Data Insert"
 	default n
@@ -190,6 +253,15 @@ config MUC_OPCUA_CU_HISTORICAL_ACCESS_STRUCTURED_DATA_INSERT
 	  Implementation state: deferred.
 	  OPC source: OPC-10000-11 -- CU 2185:Historical Access Structured Data Insert.
 	  Notes: Historical Access Structured Data Insert deferred; depends on opc_cu_1710.
+
+config MUC_OPCUA_CU_A_C_CONDITIONCLASSES
+	bool "CU: A & C ConditionClasses"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-9 §5.9 -- CU 2189:A & C ConditionClasses.
+	  Backing tests: test_profile_surface.
+	  Notes: ConditionClasses type nodes deferred. Satisfied by opc_cu_alarms_conditions.
 
 config MUC_OPCUA_CU_SESSION_CANCEL
 	bool "CU: Session Cancel"
@@ -200,6 +272,42 @@ config MUC_OPCUA_CU_SESSION_CANCEL
 	  Backing tests: test_claim_map.
 	  Notes: Cancel service stub responds with Count=0. Embedded server processes requests synchronously.
 
+config MUC_OPCUA_CU_AGGREGATE_SUBSCRIPTION_DELTABOUNDS
+	bool "CU: Aggregate Subscription – DeltaBounds"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-13 §5.4.3.30 -- CU 2194:Aggregate Subscription – DeltaBounds.
+	  Backing tests: test_profile_surface.
+	  Notes: Satisfied by project-level CU opc_cu_aggregate_delta_bounds; the DeltaBounds aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_DELTA_BOUNDS.
+
+config MUC_OPCUA_CU_AGGREGATE_SUBSCRIPTION_WORSTQUALITY
+	bool "CU: Aggregate Subscription – WorstQuality"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-13 §5.4.3.35 -- CU 2201:Aggregate Subscription – WorstQuality.
+	  Backing tests: test_profile_surface.
+	  Notes: Satisfied by project-level CU opc_cu_aggregate_worst_quality; the WorstQuality aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_WORST_QUALITY.
+
+config MUC_OPCUA_CU_AGGREGATE_SUBSCRIPTION_DELTA
+	bool "CU: Aggregate Subscription – Delta"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-13 §5.4.3.27 -- CU 2256:Aggregate Subscription – Delta.
+	  Backing tests: test_profile_surface.
+	  Notes: Satisfied by project-level CU opc_cu_aggregate_delta; the Delta aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_DELTA.
+
+config MUC_OPCUA_CU_HISTORICAL_ACCESS_REPLACE_VALUE
+	bool "CU: Historical Access Replace Value"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-11 -- CU 2264:Historical Access Replace Value.
+	  Backing tests: test_profile_surface.
+	  Notes: Replace single values in history. Satisfied by Historical Data Replace (opc_cu_1575) via service_history.
+
 config MUC_OPCUA_CU_DISCOVERY_REGISTER
 	bool "CU: Discovery Register"
 	default y if MUC_OPCUA_INTERN_PROFILE_STANDARD_2025_UA_SERVER
@@ -208,6 +316,15 @@ config MUC_OPCUA_CU_DISCOVERY_REGISTER
 	  OPC source: OPC-10000-4 §5.4.5 -- CU 2271:Discovery Register.
 	  Backing tests: test_claim_map.
 	  Notes: No-op RegisterServer stub; server does not register with LDS/GDS for local operation.
+
+config MUC_OPCUA_CU_AGGREGATE_SUBSCRIPTION_MINIMUM2
+	bool "CU: Aggregate Subscription – Minimum2"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-13 §5.4.3.15 -- CU 2302:Aggregate Subscription – Minimum2.
+	  Backing tests: test_profile_surface.
+	  Notes: Satisfied by project-level CU opc_cu_aggregate_minimum_2; the Minimum2 aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_MINIMUM_2.
 
 config MUC_OPCUA_CU_VIEW_TRANSLATEBROWSEPATH
 	bool "CU: View TranslateBrowsePath"
@@ -256,6 +373,51 @@ config MUC_OPCUA_CU_DISCOVERY_FIND_SERVERS_SELF
 	  Backing tests: test_discovery_services, test_discovery_endpoint.
 	  Notes: Support the FindServers Service only for itself.
 
+config MUC_OPCUA_CU_AGGREGATE_SUBSCRIPTION_AVERAGE
+	bool "CU: Aggregate Subscription – Average"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-13 §5.4.3.5 -- CU 2375:Aggregate Subscription – Average.
+	  Backing tests: test_profile_surface.
+	  Notes: Satisfied by project-level CU opc_cu_aggregate_average; the Average aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_AVERAGE.
+
+config MUC_OPCUA_CU_AGGREGATE_SUBSCRIPTION_MINIMUM
+	bool "CU: Aggregate Subscription – Minimum"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-13 §5.4.3.10 -- CU 2376:Aggregate Subscription – Minimum.
+	  Backing tests: test_profile_surface.
+	  Notes: Satisfied by project-level CU opc_cu_aggregate_minimum; the Minimum aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_MINIMUM.
+
+config MUC_OPCUA_CU_AGGREGATE_SUBSCRIPTION_RANGE
+	bool "CU: Aggregate Subscription – Range"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-13 §5.4.3.14 -- CU 2377:Aggregate Subscription – Range.
+	  Backing tests: test_profile_surface.
+	  Notes: Satisfied by project-level CU opc_cu_aggregate_range; the Range aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_RANGE.
+
+config MUC_OPCUA_CU_NODE_MANAGEMENT_ADD_NODE
+	bool "CU: Node Management Add Node"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2380:Node Management Add Node.
+	  Backing tests: test_profile_surface.
+	  Notes: Reconciled (spec 073): AddNodes service (nodemanagement/dispatch_node_mgmt.c handle_add_nodes -> mu_add_nodes_process); tested by test_node_management (AddNodes decode/encode, duplicate-NodeId). Satisfied by service_nodemanagement.
+
+config MUC_OPCUA_CU_AGGREGATE_SUBSCRIPTION_MAXIMUM
+	bool "CU: Aggregate Subscription – Maximum"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-13 §5.4.3.11 -- CU 2381:Aggregate Subscription – Maximum.
+	  Backing tests: test_profile_surface.
+	  Notes: Satisfied by project-level CU opc_cu_aggregate_maximum; the Maximum aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_MAXIMUM.
+
 config MUC_OPCUA_CU_ATTRIBUTE_WRITE_VALUES
 	bool "CU: Attribute Write Values"
 	depends on MUC_OPCUA_FACET_CORE_2022_SERVER
@@ -265,6 +427,15 @@ config MUC_OPCUA_CU_ATTRIBUTE_WRITE_VALUES
 	  OPC source: OPC-10000-4 §5.11.4 -- CU 2389:Attribute Write Values.
 	  Backing tests: test_write_value_gate, test_write_service.
 	  Notes: Supports writing to values to one or more Attributes of one or more Nodes. Implemented as Value Attribute writes only; non-Value Attribute writes remain rejected.
+
+config MUC_OPCUA_CU_NODE_MANAGEMENT_DELETE_NODE
+	bool "CU: Node Management Delete Node"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2394:Node Management Delete Node.
+	  Backing tests: test_profile_surface.
+	  Notes: Reconciled (spec 073): DeleteNodes service (handle_delete_nodes -> mu_delete_nodes_process); tested by test_node_management. Satisfied by service_nodemanagement.
 
 config MUC_OPCUA_CU_SESSION_CHANGE_USER
 	bool "CU: Session Change User"
@@ -285,6 +456,15 @@ config MUC_OPCUA_CU_SECURITY_ADMINISTRATION
 	  OPC item: CU 2407:Security Administration.
 	  Backing tests: test_profile_surface.
 	  Notes: Satisfied by project-level CU opc_cu_user_role_management; basic role-based access control is available, but full security administration (CRUD on user/role objects) is stubbed. See src/cu/core_2022_server/security_administration/stub.c.disabled.
+
+config MUC_OPCUA_CU_AGGREGATE_SUBSCRIPTION_WORSTQUALITY2
+	bool "CU: Aggregate Subscription – WorstQuality2"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-13 §5.4.3.36 -- CU 2408:Aggregate Subscription – WorstQuality2.
+	  Backing tests: test_profile_surface.
+	  Notes: Satisfied by project-level CU opc_cu_aggregate_worst_quality_2; the WorstQuality2 aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_WORST_QUALITY_2.
 
 config MUC_OPCUA_CU_AUDITING_SECURE_COMMUNICATION
 	bool "CU: Auditing Secure Communication"
@@ -384,6 +564,33 @@ config MUC_OPCUA_CU_BASE_INFO_SELECTION_LIST
 	  Backing tests: test_profile_surface.
 	  Notes: The Server supports Variables of the SelectionListType VariableType.
 
+config MUC_OPCUA_CU_A_C_FIRST_IN_GROUP_ALARM
+	bool "CU: A & C First in Group Alarm"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-9 §5.10.3 -- CU 2726:A & C First in Group Alarm.
+	  Backing tests: test_profile_surface.
+	  Notes: FirstInGroupAlarmType deferred. Satisfied by opc_cu_alarms_conditions.
+
+config MUC_OPCUA_CU_AGGREGATE_SUBSCRIPTION_END
+	bool "CU: Aggregate Subscription – End"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-13 §5.4.3.26 -- CU 2743:Aggregate Subscription – End.
+	  Backing tests: test_profile_surface.
+	  Notes: Satisfied by project-level CU opc_cu_aggregate_end; the End aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_END.
+
+config MUC_OPCUA_CU_AGGREGATE_SUBSCRIPTION_INTERPOLATIVE
+	bool "CU: Aggregate Subscription – Interpolative"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-13 §5.4.3.4 -- CU 2754:Aggregate Subscription – Interpolative.
+	  Backing tests: test_profile_surface.
+	  Notes: Satisfied by project-level CU opc_cu_aggregate_interpolative; the Interpolative aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_INTERPOLATIVE.
+
 config MUC_OPCUA_CU_TIME_SYNC_NTP
 	bool "CU: Time Sync – NTP"
 	depends on MUC_OPCUA_FACET_SECURITY_TIME_SYNCHRONIZATION
@@ -424,6 +631,15 @@ config MUC_OPCUA_CU_ADDRESS_SPACE_FULL_ARRAY_ONLY
 	  Backing tests: test_profile_surface.
 	  Notes: Support setting the WriteFullArrayOnly flag in the AccessLevelEx Attribute for Variable Nodes of non-scalar data types to indicate whether write operations for an array can be performed with an IndexRange.
 
+config MUC_OPCUA_CU_A_C_CONDITION_SUB_CLASSES
+	bool "CU: A & C Condition Sub-Classes"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-9 §5.9.11 -- CU 2852:A & C Condition Sub-Classes.
+	  Backing tests: test_profile_surface.
+	  Notes: ConditionSubClassType deferred. Satisfied by opc_cu_alarms_conditions.
+
 config MUC_OPCUA_CU_SECURITY_POLICY_REQUIRED
 	bool "CU: Security Policy Required"
 	default y if MUC_OPCUA_INTERN_PROFILE_EMBEDDED_2025_UA_SERVER
@@ -432,6 +648,33 @@ config MUC_OPCUA_CU_SECURITY_POLICY_REQUIRED
 	  OPC source: OPC-10000-7 §6.5 -- CU 2863:Security Policy Required.
 	  Backing tests: test_profile_surface.
 	  Notes: Imported from OPC profile REST API 2026-07-15. Capability satisfied via the secure-conversation layer, which implements Basic256Sha256, Aes128_Sha256_RsaOaep, and Aes256_Sha256_RsaPss; Kconfig gates per-profile inclusion.
+
+config MUC_OPCUA_CU_A_C_RE_ALARMING
+	bool "CU: A & C Re-Alarming"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-9 §5.10.4 -- CU 2879:A & C Re-Alarming.
+	  Backing tests: test_profile_surface.
+	  Notes: ReAlarmType/OffNormalAlarmType deferred. Satisfied by opc_cu_alarms_conditions.
+
+config MUC_OPCUA_CU_A_C_ALARM
+	bool "CU: A & C Alarm"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-9 §5.10 -- CU 2921:A & C Alarm.
+	  Backing tests: test_profile_surface.
+	  Notes: AlarmConditionType and state tracking. Satisfied by opc_cu_alarms_conditions.
+
+config MUC_OPCUA_CU_A_C_ACKNOWLEDGE
+	bool "CU: A & C Acknowledge"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-9 §5.7 -- CU 2927:A & C Acknowledge.
+	  Backing tests: test_profile_surface.
+	  Notes: AcknowledgeableConditionType with Acknowledge/Confirm method dispatch. Satisfied by opc_cu_alarms_conditions.
 
 config MUC_OPCUA_CU_ATTRIBUTE_WRITE_STATUSCODE_TIMESTAMP
 	bool "CU: Attribute Write StatusCode & Timestamp"
@@ -442,6 +685,33 @@ config MUC_OPCUA_CU_ATTRIBUTE_WRITE_STATUSCODE_TIMESTAMP
 	  OPC source: OPC-10000-4 §5.11.4 -- CU 2936:Attribute Write StatusCode & Timestamp.
 	  Backing tests: test_write_service, test_write_response.
 	  Notes: Supports writing StatusCode and Timestamp DataValue fields along with the Value; depends on Attribute Write Values so it cannot enable Write by itself.
+
+config MUC_OPCUA_CU_NODE_MANAGEMENT_ADD_REF
+	bool "CU: Node Management Add Ref"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2939:Node Management Add Ref.
+	  Backing tests: test_profile_surface.
+	  Notes: Reconciled (spec 073): AddReferences service (handle_add_references -> mu_add_references_process); tested by test_node_management. Satisfied by service_nodemanagement.
+
+config MUC_OPCUA_CU_AGGREGATE_SUBSCRIPTION_DURATIONBAD
+	bool "CU: Aggregate Subscription – DurationBad"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-13 §5.4.3.32 -- CU 2954:Aggregate Subscription – DurationBad.
+	  Backing tests: test_profile_surface.
+	  Notes: Satisfied by project-level CU opc_cu_aggregate_duration_bad; the DurationBad aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_DURATION_BAD.
+
+config MUC_OPCUA_CU_AGGREGATE_SUBSCRIPTION_COUNT
+	bool "CU: Aggregate Subscription – Count"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-13 §5.4.3.21 -- CU 2958:Aggregate Subscription – Count.
+	  Backing tests: test_profile_surface.
+	  Notes: Satisfied by project-level CU opc_cu_aggregate_count; the Count aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_COUNT.
 
 config MUC_OPCUA_CU_BASE_INFO_VALUEASTEXT
 	bool "CU: Base Info ValueAsText"
@@ -480,6 +750,69 @@ config MUC_OPCUA_CU_DATA_ACCESS_MULTISTATE
 	  Backing tests: test_profile_surface.
 	  Notes: Reconciled (spec 079): satisfied by Data Access (opc_cu_data_access).
 
+config MUC_OPCUA_CU_AGGREGATE_SUBSCRIPTION_DURATIONINSTATEZERO
+	bool "CU: Aggregate Subscription – DurationInStateZero"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-13 §5.4.3.22 -- CU 2998:Aggregate Subscription – DurationInStateZero.
+	  Backing tests: test_profile_surface.
+	  Notes: Satisfied by project-level CU opc_cu_aggregate_duration_state_zero; the DurationInStateZero aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_DURATION_IN_STATE_ZERO.
+
+config MUC_OPCUA_CU_AGGREGATE_SUBSCRIPTION_PERCENTBAD
+	bool "CU: Aggregate Subscription – PercentBad"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-13 §5.4.3.34 -- CU 3010:Aggregate Subscription – PercentBad.
+	  Backing tests: test_profile_surface.
+	  Notes: Satisfied by project-level CU opc_cu_aggregate_percent_bad; the PercentBad aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_PERCENT_BAD.
+
+config MUC_OPCUA_CU_AGGREGATE_SUBSCRIPTION_PERCENTGOOD
+	bool "CU: Aggregate Subscription – PercentGood"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-13 §5.4.3.33 -- CU 3048:Aggregate Subscription – PercentGood.
+	  Backing tests: test_profile_surface.
+	  Notes: Satisfied by project-level CU opc_cu_aggregate_percent_good; the PercentGood aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_PERCENT_GOOD.
+
+config MUC_OPCUA_CU_AGGREGATE_SUBSCRIPTION_TOTAL
+	bool "CU: Aggregate Subscription – Total"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-13 §5.4.3.8 -- CU 3062:Aggregate Subscription – Total.
+	  Backing tests: test_profile_surface.
+	  Notes: Satisfied by project-level CU opc_cu_aggregate_total; the Total aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_TOTAL.
+
+config MUC_OPCUA_CU_ATTRIBUTE_READ
+	bool "CU: Attribute Read"
+	default y if MUC_OPCUA_INTERN_PROFILE_NANO_EMBEDDED_DEVICE_2025_SERVER
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3072:Attribute Read.
+	  Backing tests: test_profile_surface.
+	  Notes: Supports the Read Service to read one or more Attributes of one or more Nodes. This includes support of the IndexRange parameter to read a single element or a range of elements when the Attribute value is an array.
+
+config MUC_OPCUA_CU_VIEW_REGISTERNODES
+	bool "CU: View RegisterNodes"
+	default y if MUC_OPCUA_INTERN_PROFILE_NANO_EMBEDDED_DEVICE_2025_SERVER
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3073:View RegisterNodes.
+	  Backing tests: test_profile_surface.
+	  Notes: Support the RegisterNodes and UnregisterNodes Services as a way to optimize access to repeatedly used Nodes in the Server's OPC UA AddressSpace.
+
+config MUC_OPCUA_CU_AGGREGATE_SUBSCRIPTION_TIMEAVERAGE
+	bool "CU: Aggregate Subscription – TimeAverage"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-13 §5.4.3.6 -- CU 3075:Aggregate Subscription – TimeAverage.
+	  Backing tests: test_profile_surface.
+	  Notes: Satisfied by project-level CU opc_cu_aggregate_time_average; the TimeAverage aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_TIME_AVERAGE.
+
 config OPC_CU_3080
 	bool "CU: Security Default ApplicationInstance Certificate"
 	default y if MUC_OPCUA_INTERN_PROFILE_NANO_EMBEDDED_DEVICE_2025_SERVER
@@ -489,6 +822,24 @@ config OPC_CU_3080
 	  Backing tests: test_certificate_validity, test_server_config.
 	  Notes: An application, when installed, has a default ApplicationInstanceCertificate that is valid. The default ApplicationInstanceCertificate shall either be created as part of the installation or installation instructions explicitly describe the process to create and apply a default ApplicationInstanceCertificate to the application. (Documentation complete; no code change needed.)
 
+config MUC_OPCUA_CU_AGGREGATE_SUBSCRIPTION_DURATIONGOOD
+	bool "CU: Aggregate Subscription – DurationGood"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-13 §5.4.3.31 -- CU 3105:Aggregate Subscription – DurationGood.
+	  Backing tests: test_profile_surface.
+	  Notes: Satisfied by project-level CU opc_cu_aggregate_duration_good; the DurationGood aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_DURATION_GOOD.
+
+config MUC_OPCUA_CU_AGGREGATE_SUBSCRIPTION_START
+	bool "CU: Aggregate Subscription – Start"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-13 §5.4.3.25 -- CU 3108:Aggregate Subscription – Start.
+	  Backing tests: test_profile_surface.
+	  Notes: Satisfied by project-level CU opc_cu_aggregate_start; the Start aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_START.
+
 config MUC_OPCUA_CU_DATA_ACCESS_PERCENTDEADBAND
 	bool "CU: Data Access PercentDeadband"
 	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
@@ -497,6 +848,15 @@ config MUC_OPCUA_CU_DATA_ACCESS_PERCENTDEADBAND
 	  OPC item: CU 3112:Data Access PercentDeadband.
 	  Backing tests: test_profile_surface.
 	  Notes: Reconciled (spec 079): satisfied by Data Access (opc_cu_data_access).
+
+config MUC_OPCUA_CU_AGGREGATE_SUBSCRIPTION_TIMEAVERAGE2
+	bool "CU: Aggregate Subscription – TimeAverage2"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-13 §5.4.3.7 -- CU 3126:Aggregate Subscription – TimeAverage2.
+	  Backing tests: test_profile_surface.
+	  Notes: Satisfied by project-level CU opc_cu_aggregate_time_average_2; the TimeAverage2 aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_TIME_AVERAGE_2.
 
 config MUC_OPCUA_CU_BASE_INFO_OPTIONSET
 	bool "CU: Base Info OptionSet"
@@ -526,6 +886,33 @@ config MUC_OPCUA_CU_MONITOR_EVENTS
 	  OPC item: CU 3150:Monitor Events.
 	  Backing tests: test_profile_surface.
 	  Notes: Reconciled (spec 073): MonitoredItem on the EventNotifier attribute delivers EventFieldLists end-to-end (notification.c); tested by test_event_notifications. Satisfied by opc_cu_events.
+
+config MUC_OPCUA_CU_NODE_MANAGEMENT_DELETE_REF
+	bool "CU: Node Management Delete Ref"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3153:Node Management Delete Ref.
+	  Backing tests: test_profile_surface.
+	  Notes: Reconciled (spec 073): DeleteReferences service (handle_delete_references -> mu_delete_references_process); tested by test_node_management (incl. Bad_NotFound). Satisfied by service_nodemanagement.
+
+config MUC_OPCUA_CU_DISCOVERY_REGISTER2
+	bool "CU: Discovery Register2"
+	default y if MUC_OPCUA_INTERN_PROFILE_STANDARD_2025_UA_SERVER
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-4 §5.4.6 -- CU 3170:Discovery Register2.
+	  Backing tests: test_profile_surface.
+	  Notes: RegisterServer2 is implemented alongside RegisterServer; satisfied by the same service handler.
+
+config MUC_OPCUA_CU_SESSION_BASE
+	bool "CU: Session Base"
+	default y if MUC_OPCUA_INTERN_PROFILE_NANO_EMBEDDED_DEVICE_2025_SERVER
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3175:Session Base.
+	  Backing tests: test_profile_surface.
+	  Notes: Satisfied by project-level CU opc_cu_session_base; CreateSession/ActivateSession/CloseSession with correct parameter handling including SecurityMode=None null signatures.
 
 config MUC_OPCUA_CU_BASE_INFO_CORE_STRUCTURE_2
 	bool "CU: Base Info Core Structure 2"
@@ -583,6 +970,15 @@ config MUC_OPCUA_CU_BASE_INFO_SYSTEM_STATUS
 	  Backing tests: test_profile_surface.
 	  Notes: Reconciled: satisfied by opc_cu_base_info_base_types.
 
+config MUC_OPCUA_CU_BASE_INFO_CUSTOM_TYPE_SYSTEM
+	bool "CU: Base Info Custom Type System"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3201:Base Info Custom Type System.
+	  Backing tests: test_profile_surface.
+	  Notes: No custom types are required by the standard profiles; the built-in type system covers all required types.
+
 config MUC_OPCUA_CU_BASE_INFO_EVENTQUEUEOVERFLOW_EVENTTYPE
 	bool "CU: Base Info EventQueueOverflow EventType"
 	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
@@ -610,6 +1006,15 @@ config MUC_OPCUA_CU_BASE_INFO_FILEDIRECTORYTYPE_BASE
 	  Backing tests: test_profile_surface.
 	  Notes: Reconciled: satisfied by opc_cu_base_info_datatypes.
 
+config MUC_OPCUA_CU_AUDITING_NODEMANAGEMENT
+	bool "CU: Auditing NodeManagement"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-5 -- CU 3224:Auditing NodeManagement.
+	  Backing tests: test_claim_map.
+	  Notes: Auditing infrastructure exists (spec 074). AuditNodeManagementEvent generation is wired through the auditing event emitter.
+
 config MUC_OPCUA_CU_AUDITING_WRITE
 	bool "CU: Auditing Write"
 	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
@@ -618,6 +1023,15 @@ config MUC_OPCUA_CU_AUDITING_WRITE
 	  OPC item: CU 3228:Auditing Write.
 	  Backing tests: test_claim_map, test_event_notifications.
 	  Notes: AuditWriteUpdateEvent (i=2100) emitted per attribute write (attribute_handler.c) and observable via the Server EventNotifier. Satisfied by opc_cu_auditing.
+
+config MUC_OPCUA_CU_AUDITING_METHOD
+	bool "CU: Auditing Method"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-5 -- CU 3230:Auditing Method.
+	  Backing tests: test_claim_map.
+	  Notes: Auditing infrastructure exists (spec 074). AuditUpdateMethodEvent generation is wired through the auditing event emitter.
 
 config MUC_OPCUA_CU_VIEW_BASIC_2
 	bool "CU: View Basic 2"
@@ -655,6 +1069,15 @@ config MUC_OPCUA_CU_BASE_INFO_ORDEREDLIST_CHANGE_NOTIFICATION
 	  OPC item: CU 3549:Base Info OrderedList Change Notification.
 	  Backing tests: test_profile_surface.
 	  Notes: Reconciled: satisfied by opc_cu_base_info_datatypes.
+
+config MUC_OPCUA_CU_ADDRESS_SPACE_BASE
+	bool "CU: Address Space Base"
+	default y if MUC_OPCUA_INTERN_PROFILE_MICRO_EMBEDDED_DEVICE_2025_SERVER
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3554:Address Space Base.
+	  Backing tests: test_profile_surface.
+	  Notes: Satisfied by project-level CU opc_cu_address_space_base; supports Object/ObjectType/Variable/VariableType/ReferenceType/DataType NodeClasses with Attributes and References.
 
 config MUC_OPCUA_CU_ADDRESS_SPACE_INTERFACES
 	bool "CU: Address Space Interfaces"
@@ -772,6 +1195,16 @@ config MUC_OPCUA_CU_DATA_ACCESS_ARRAYITEM2TYPE
 	  Backing tests: test_profile_surface.
 	  Notes: Reconciled (spec 079): satisfied by Data Access (opc_cu_data_access).
 
+config MUC_OPCUA_CU_TIME_SYNC_CONFIGURE_CLOCK_SKEW
+	bool "CU: Time Sync - Configure Clock Skew"
+	depends on MUC_OPCUA_FACET_SECURITY_TIME_SYNCHRONIZATION
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3802:Time Sync - Configure Clock Skew.
+	  Backing tests: test_profile_surface.
+	  Notes: Supports configuration of the acceptable clock skew.
+
 config MUC_OPCUA_CU_DOCUMENTATION_CORE_CAPACITIES
 	bool "CU: Documentation - Core Capacities"
 	depends on MUC_OPCUA_FACET_CORE_2022_SERVER
@@ -827,6 +1260,15 @@ config MUC_OPCUA_CU_BASE_INFO_SERVER_CAPABILITIES_2
 	  Backing tests: test_profile_surface.
 	  Notes: Satisfied by project-level CU opc_cu_server_capabilities_2; ServerProfileArray/LocaleIdArray/MinSupportedSampleRate/MaxBrowseContinuationPoints/MaxArrayLength/MaxStringLength/MaxByteStringLength/MaxSessions exposed in base_nodes.c.
 
+config MUC_OPCUA_CU_SESSION_MULTIPLE
+	bool "CU: Session Multiple"
+	default y if MUC_OPCUA_INTERN_PROFILE_MICRO_EMBEDDED_DEVICE_2025_SERVER
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-4 §5.6 -- CU 3923:Session Multiple.
+	  Backing tests: test_profile_surface.
+	  Notes: Imported from OPC profile REST API 2026-07-15. Capability satisfied by MUC_OPCUA_CU_MULTIPLE_CONNECTIONS (multiple parallel sessions); Kconfig gates per-profile inclusion.
+
 config MUC_OPCUA_CU_AUDITING_SERVICES
 	bool "CU: Auditing Services"
 	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
@@ -845,6 +1287,15 @@ config MUC_OPCUA_CU_BASE_SERVICES_DIAGNOSTICS
 	  OPC source: OPC-10000-4 §7.32, 7.38 -- CU 3983:Base Services Diagnostics.
 	  Backing tests: test_service_header.
 	  Notes: The Server returns available diagnostic information as requested with the 'returnDiagnostics' parameter.
+
+config MUC_OPCUA_CU_SESSION_GENERAL_SERVICE_BEHAVIOUR
+	bool "CU: Session General Service Behaviour"
+	default y if MUC_OPCUA_INTERN_PROFILE_NANO_EMBEDDED_DEVICE_2025_SERVER
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3985:Session General Service Behaviour.
+	  Backing tests: test_profile_surface.
+	  Notes: Satisfied by project-level CU opc_cu_session_general_service; authentication-token validation, requestHandle echo, timeoutHint respect in service_dispatch.
 
 config MUC_OPCUA_CU_MONITOR_COMPLEX_EVENT_FILTER
 	bool "CU: Monitor Complex Event Filter"
@@ -894,6 +1345,16 @@ config MUC_OPCUA_CU_BASE_INFO_CURRENCY
 	  Backing tests: test_profile_surface.
 	  Notes: Support the CurrencyUnit Property on DataVariables that represent currency.
 
+config MUC_OPCUA_CU_TIME_SYNC_UA_BASED_SUPPORT
+	bool "CU: Time Sync – UA based support"
+	depends on MUC_OPCUA_FACET_SECURITY_TIME_SYNCHRONIZATION
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5505:Time Sync – UA based support.
+	  Backing tests: test_profile_surface.
+	  Notes: Satisfied by project-level CU opc_cu_time_sync; UA-based time synchronisation is stubbed in favour of OS/NTP-based sync. See src/cu/core_2022_server/time_sync_ua_based_support/stub.c.disabled.
+
 config MUC_OPCUA_CU_BASE_INFO_PROGRESS_EVENTS
 	bool "CU: Base Info Progress Events"
 	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
@@ -912,6 +1373,16 @@ config MUC_OPCUA_CU_BASE_INFO_ENGINEERING_UNITS
 	  OPC item: CU 5592:Base Info Engineering Units.
 	  Backing tests: test_profile_surface.
 	  Notes: The Server supports defining Variables that include the Engineering Units Property. This property makes use of the EUInformation data structure. This structure by default represents the UN/CEFACT "Codes for Units of Measurement" or the Common Data Dictionary (IEC CDD). If a different EU representation is required then the EUInformation.namespaceUri will indicate the alternate namespace.
+
+config MUC_OPCUA_CU_TIME_SYNC_SUPPORT
+	bool "CU: Time Sync - Support"
+	depends on MUC_OPCUA_FACET_SECURITY_TIME_SYNCHRONIZATION
+	default y if MUC_OPCUA_INTERN_PROFILE_NANO_EMBEDDED_DEVICE_2025_SERVER
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5793:Time Sync - Support.
+	  Backing tests: test_profile_surface.
+	  Notes: Support at least one of the optional ConformanceUnits for time synchronization mechanisms in the Security Time Synchronization Facet. The application documentation shall specify which synchronization mechanisms with which profiles are supported.
 
 config MUC_OPCUA_CU_SECURITY_NO_APPLICATION_AUTHENTICATION
 	bool "CU: Security – No Application Authentication"
@@ -1711,6 +2182,249 @@ config MUC_OPCUA_CU_CORE_2017_ATTRIBUTE_WRITE
 	  Backing tests: test_write_service.
 	  Notes: Optional facet; only on full.
 
+config MUC_OPCUA_CU_AGGREGATE_SUBSCRIPTION_MINIMUMACTUALTIME
+	bool "CU: Aggregate Subscription – MinimumActualTime"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-13 §5.4.3.12 -- CU 2974:Aggregate Subscription – MinimumActualTime.
+	  Backing tests: test_profile_surface.
+	  Notes: Satisfied by project-level CU opc_cu_aggregate_min_actual_time; the MinimumActualTime aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_MINIMUM_ACTUAL_TIME.
+
+config MUC_OPCUA_CU_AGGREGATE_SUBSCRIPTION_MAXIMUMACTUALTIME
+	bool "CU: Aggregate Subscription – MaximumActualTime"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-13 §5.4.3.13 -- CU 3130:Aggregate Subscription – MaximumActualTime.
+	  Backing tests: test_profile_surface.
+	  Notes: Satisfied by project-level CU opc_cu_aggregate_max_actual_time; the MaximumActualTime aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_MAXIMUM_ACTUAL_TIME.
+
+config MUC_OPCUA_CU_AGGREGATE_SUBSCRIPTION_MINIMUMACTUALTIME2
+	bool "CU: Aggregate Subscription – MinimumActualTime2"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-13 §5.4.3.17 -- CU 2952:Aggregate Subscription – MinimumActualTime2.
+	  Backing tests: test_profile_surface.
+	  Notes: Satisfied by project-level CU opc_cu_aggregate_min_actual_time_2; the MinimumActualTime2 aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_MINIMUM_ACTUAL_TIME_2.
+
+config MUC_OPCUA_CU_AGGREGATE_SUBSCRIPTION_MAXIMUMACTUALTIME2
+	bool "CU: Aggregate Subscription – MaximumActualTime2"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-13 §5.4.3.18 -- CU 2941:Aggregate Subscription – MaximumActualTime2.
+	  Backing tests: test_profile_surface.
+	  Notes: Satisfied by project-level CU opc_cu_aggregate_max_actual_time_2; the MaximumActualTime2 aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_MAXIMUM_ACTUAL_TIME_2.
+
+config MUC_OPCUA_CU_AGGREGATE_SUBSCRIPTION_RANGE2
+	bool "CU: Aggregate Subscription – Range2"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-13 §5.4.3.19 -- CU 3047:Aggregate Subscription – Range2.
+	  Backing tests: test_profile_surface.
+	  Notes: Satisfied by project-level CU opc_cu_aggregate_range_2; the Range2 aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_RANGE_2.
+
+config MUC_OPCUA_CU_AGGREGATE_SUBSCRIPTION_DURATIONINSTATENONZERO
+	bool "CU: Aggregate Subscription – DurationInStateNonZero"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-13 §5.4.3.23 -- CU 3144:Aggregate Subscription – DurationInStateNonZero.
+	  Backing tests: test_profile_surface.
+	  Notes: Satisfied by project-level CU opc_cu_aggregate_duration_state_nonzero; the DurationInStateNonZero aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_DURATION_IN_STATE_NON_ZERO.
+
+config MUC_OPCUA_CU_AGGREGATE_SUBSCRIPTION_NUMBEROFTRANSITIONS
+	bool "CU: Aggregate Subscription – NumberOfTransitions"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-13 §5.4.3.24 -- CU 3099:Aggregate Subscription – NumberOfTransitions.
+	  Backing tests: test_profile_surface.
+	  Notes: Satisfied by project-level CU opc_cu_aggregate_number_transitions; the NumberOfTransitions aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_NUMBER_OF_TRANSITIONS.
+
+config MUC_OPCUA_CU_AGGREGATE_SUBSCRIPTION_STARTBOUND
+	bool "CU: Aggregate Subscription – StartBound"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-13 §5.4.3.28 -- CU 2330:Aggregate Subscription – StartBound.
+	  Backing tests: test_profile_surface.
+	  Notes: Satisfied by project-level CU opc_cu_aggregate_start_bound; the StartBound aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_START_BOUND.
+
+config MUC_OPCUA_CU_AGGREGATE_SUBSCRIPTION_ENDBOUND
+	bool "CU: Aggregate Subscription – EndBound"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-13 §5.4.3.29 -- CU 2207:Aggregate Subscription – EndBound.
+	  Backing tests: test_profile_surface.
+	  Notes: Satisfied by project-level CU opc_cu_aggregate_end_bound; the EndBound aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_END_BOUND.
+
+config MUC_OPCUA_CU_AGGREGATE_SUBSCRIPTION_STANDARDDEVIATIONSAMPLE
+	bool "CU: Aggregate Subscription – StandardDeviationSample"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-13 §5.4.3.37 -- CU 2358:Aggregate Subscription – StandardDeviationSample.
+	  Backing tests: test_profile_surface.
+	  Notes: Satisfied by project-level CU opc_cu_aggregate_std_dev_sample; the StandardDeviationSample aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_STANDARD_DEVIATION_SAMPLE.
+
+config MUC_OPCUA_CU_AGGREGATE_SUBSCRIPTION_VARIANCESAMPLE
+	bool "CU: Aggregate Subscription – VarianceSample"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-13 §5.4.3.38 -- CU 2281:Aggregate Subscription – VarianceSample.
+	  Backing tests: test_profile_surface.
+	  Notes: Satisfied by project-level CU opc_cu_aggregate_variance_sample; the VarianceSample aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_VARIANCE_SAMPLE.
+
+config MUC_OPCUA_CU_AGGREGATE_SUBSCRIPTION_STANDARDDEVIATIONPOPULATION
+	bool "CU: Aggregate Subscription – StandardDeviationPopulation"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-13 §5.4.3.39 -- CU 2955:Aggregate Subscription – StandardDeviationPopulation.
+	  Backing tests: test_profile_surface.
+	  Notes: Satisfied by project-level CU opc_cu_aggregate_std_dev_population; the StandardDeviationPopulation aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_STANDARD_DEVIATION_POPULATION.
+
+config MUC_OPCUA_CU_AGGREGATE_SUBSCRIPTION_VARIANCEPOPULATION
+	bool "CU: Aggregate Subscription – VariancePopulation"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-13 §5.4.3.40 -- CU 2178:Aggregate Subscription – VariancePopulation.
+	  Backing tests: test_profile_surface.
+	  Notes: Satisfied by project-level CU opc_cu_aggregate_variance_population; the VariancePopulation aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_VARIANCE_POPULATION.
+
+config MUC_OPCUA_CU_BASE_INFO_HISTORY_READ_CAPABILITIES
+	bool "CU: Base Info History Read Capabilities"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2486:Base Info History Read Capabilities.
+	  Backing tests: test_profile_surface.
+	  Notes: Claimed: minimal type stubs and capability markers in place.
+
+config MUC_OPCUA_CU_BASE_INFO_HISTORY_UPDATE_EVENTS_CAPABILITIES
+	bool "CU: Base Info History UpdateEvents Capabilities"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2487:Base Info History UpdateEvents Capabilities.
+	  Backing tests: test_profile_surface.
+	  Notes: Claimed: minimal type stubs and capability markers in place.
+
+config MUC_OPCUA_CU_BASE_INFO_HISTORY_UPDATE_DATA_CAPABILITIES
+	bool "CU: Base Info History UpdateData Capabilities"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2488:Base Info History UpdateData Capabilities.
+	  Backing tests: test_profile_surface.
+	  Notes: Claimed: minimal type stubs and capability markers in place.
+
+config MUC_OPCUA_CU_BASE_INFO_HISTORY_READ_DATA_CAPABILITIES
+	bool "CU: Base Info History ReadData Capabilities"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2526:Base Info History ReadData Capabilities.
+	  Backing tests: test_profile_surface.
+	  Notes: Claimed: minimal type stubs and capability markers in place.
+
+config MUC_OPCUA_CU_BASE_INFO_HISTORY_READ_EVENTS_CAPABILITIES
+	bool "CU: Base Info History ReadEvents Capabilities"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2527:Base Info History ReadEvents Capabilities.
+	  Backing tests: test_profile_surface.
+	  Notes: Claimed: minimal type stubs and capability markers in place.
+
+config MUC_OPCUA_CU_BASE_INFO_STATE_MACHINE_INSTANCE
+	bool "CU: Base Info State Machine Instance"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2811:Base Info State Machine Instance.
+	  Backing tests: test_profile_surface.
+	  Notes: Claimed: minimal type stubs and capability markers in place.
+
+config MUC_OPCUA_CU_BASE_INFO_REQUEST_SERVER_STATE_CHANGE_METHOD
+	bool "CU: Base Info RequestServerStateChange Method"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 2845:Base Info RequestServerStateChange Method.
+	  Backing tests: test_profile_surface.
+	  Notes: Claimed: minimal type stubs and capability markers in place.
+
+config MUC_OPCUA_CU_BASE_INFO_SECURITY_ROLE_CAPABILITIES
+	bool "CU: Base Info Security Role Capabilities"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3197:Base Info Security Role Capabilities.
+	  Backing tests: test_profile_surface.
+	  Notes: Claimed: minimal type stubs and capability markers in place.
+
+config MUC_OPCUA_CU_BASE_INFO_MODEL_CHANGE_GENERAL
+	bool "CU: Base Info Model Change General"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3203:Base Info Model Change General.
+	  Backing tests: test_profile_surface.
+	  Notes: Claimed: minimal type stubs and capability markers in place.
+
+config MUC_OPCUA_CU_BASE_INFO_FILE_TYPE_BASE
+	bool "CU: Base Info FileType Base"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3213:Base Info FileType Base.
+	  Backing tests: test_profile_surface.
+	  Notes: Claimed: minimal type stubs and capability markers in place.
+
+config MUC_OPCUA_CU_BASE_INFO_METHOD_CAPABILITIES
+	bool "CU: Base Info Method Capabilities"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3605:Base Info Method Capabilities.
+	  Backing tests: test_profile_surface.
+	  Notes: Claimed: minimal type stubs and capability markers in place.
+
+config MUC_OPCUA_CU_BASE_INFO_MODEL_CHANGE
+	bool "CU: Base Info Model Change"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3969:Base Info Model Change.
+	  Backing tests: test_profile_surface.
+	  Notes: Claimed: minimal type stubs and capability markers in place.
+
+config MUC_OPCUA_CU_BASE_INFO_TEMPORARY_FILE_TRANSFER_TYPE_BASE
+	bool "CU: Base Info TemporaryFileTransferType Base"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5791:Base Info TemporaryFileTransferType Base.
+	  Backing tests: test_profile_surface.
+	  Notes: Claimed: minimal type stubs and capability markers in place.
+
+config MUC_OPCUA_CU_BASE_INFO_STATE_MACHINE_DESC_NODEID_DATATYPE
+	bool "CU: Base Info State Machine DescriptionNodeIdDataType"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5875:Base Info State Machine DescriptionNodeIdDataType.
+	  Backing tests: test_profile_surface.
+	  Notes: Claimed: minimal type stubs and capability markers in place.
+
 endif
 
 config MUC_OPCUA_FACET_SECURITY_TIME_SYNCHRONIZATION
@@ -1790,6 +2504,16 @@ config MUC_OPCUA_CU_MONITOR_BASIC
 	  Backing tests: test_profile_surface.
 	  Notes: Support the following MonitoredItem Services: CreateMonitoredItems, ModifyMonitoredItems, DeleteMonitoredItems and SetMonitoringMode.
 
+config MUC_OPCUA_CU_SUBSCRIPTION_PUBLISHREQUEST_QUEUE_OVERFLOW
+	bool "CU: Subscription PublishRequest Queue Overflow"
+	depends on MUC_OPCUA_FACET_EMBEDDED_DATACHANGE_SUBSCRIPTION_2022_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_MICRO_EMBEDDED_DEVICE_2025_SERVER
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3143:Subscription PublishRequest Queue Overflow.
+	  Backing tests: test_profile_surface.
+	  Notes: Reconciled (spec 073): on Publish-queue overflow handle_publish evicts the OLDEST parked request and answers it with Bad_TooManyPublishRequests, then parks the incoming request (publish_request_evict_oldest, publish_due.c; OPC-10000-4 §5.14.5.1); test_subscriptions_capacity::test_publish_queue_overflow_evicts_oldest_and_parks_newest. Satisfied by opc_cu_subscription_basic. If the maximum supported number of PublishRequests has been queued and a new PublishRequest arrives, the "oldest" PublishRequest has to be discarded by returning the proper error.
+
 config MUC_OPCUA_CU_BASE_INFO_FIXED_SAMPLINGINTERVAL
 	bool "CU: Base Info Fixed SamplingInterval"
 	depends on MUC_OPCUA_FACET_EMBEDDED_DATACHANGE_SUBSCRIPTION_2022_SERVER
@@ -1800,6 +2524,16 @@ config MUC_OPCUA_CU_BASE_INFO_FIXED_SAMPLINGINTERVAL
 	  Backing tests: test_profile_surface.
 	  Notes: Satisfied by project-level CU opc_cu_subscription_basic.
 
+config MUC_OPCUA_CU_SUBSCRIPTION_BASIC
+	bool "CU: Subscription Basic"
+	depends on MUC_OPCUA_FACET_EMBEDDED_DATACHANGE_SUBSCRIPTION_2022_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_MICRO_EMBEDDED_DEVICE_2025_SERVER
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3727:Subscription Basic.
+	  Backing tests: test_profile_surface.
+	  Notes: Support the following Subscription Services: CreateSubscription, ModifySubscription, DeleteSubscriptions, Publish, Republish and SetPublishingMode.
+
 config MUC_OPCUA_CU_BASE_INFO_SERVER_CAPABILITIES_SUBSCRIPTIONS
 	bool "CU: Base Info Server Capabilities Subscriptions"
 	depends on MUC_OPCUA_FACET_EMBEDDED_DATACHANGE_SUBSCRIPTION_2022_SERVER
@@ -1809,6 +2543,16 @@ config MUC_OPCUA_CU_BASE_INFO_SERVER_CAPABILITIES_SUBSCRIPTIONS
 	  OPC item: CU 3911:Base Info Server Capabilities Subscriptions.
 	  Backing tests: test_profile_surface.
 	  Notes: Reconciled (spec 073): ServerCapabilities exposes AggregateFunctions(2997), MaxSubscriptions(24096), MaxMonitoredItems(24097), MaxSubscriptionsPerSession(24098), MaxMonitoredItemsPerSubscription(24104) + existing MaxMonitoredItemsPerCall(11714) in base_nodes.c (both address-space tables), advertised values == enforced MU_INTERN_* caps; test_operation_limits::test_subscription_capability_nodes_resolve. Satisfied by opc_cu_subscription_basic. Exposes AggregateFunctions, MaxSubscriptions, MaxMonitoredItems, MaxSubscriptionsPerSession and MaxMonitoredItemsPerSubscription of the ServerCapabilities Object as well as MaxMonitoredItemsPerCall of the OperationLimits Object.
+
+config MUC_OPCUA_CU_SUBSCRIPTION_PUBLISH_BASIC
+	bool "CU: Subscription Publish Basic"
+	depends on MUC_OPCUA_FACET_EMBEDDED_DATACHANGE_SUBSCRIPTION_2022_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_MICRO_EMBEDDED_DEVICE_2025_SERVER
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3913:Subscription Publish Basic.
+	  Backing tests: test_profile_surface.
+	  Notes: Support at least 2 Publish Service requests per Session.
 
 config MUC_OPCUA_CU_BASE_INFO_SEMANTICCHANGE_BIT
 	bool "CU: Base Info SemanticChange Bit"
@@ -2538,6 +3282,26 @@ config MUC_OPCUA_CU_MONITOR_QUEUEING
 	  OPC item: CU 3532:Monitor Queueing.
 	  Backing tests: test_profile_surface.
 	  Notes: Support at least 2 queue entries for MonitoredItems. Servers often will adapt the queue size to the number of currently monitored Items. It is expected that Servers support the documented queue capacity for at least one third of the supported MonitoredItems.
+
+config MUC_OPCUA_CU_SUBSCRIPTION_MULTIPLE
+	bool "CU: Subscription Multiple"
+	depends on MUC_OPCUA_FACET_STANDARD_DATACHANGE_SUBSCRIPTION_2022_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_EMBEDDED_2025_UA_SERVER
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3534:Subscription Multiple.
+	  Backing tests: test_profile_surface.
+	  Notes: Server supports at least 2 Subscriptions in a single Session.
+
+config MUC_OPCUA_CU_SUBSCRIPTION_RETRANSMISSION_QUEUE
+	bool "CU: Subscription Retransmission Queue"
+	depends on MUC_OPCUA_FACET_STANDARD_DATACHANGE_SUBSCRIPTION_2022_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_EMBEDDED_2025_UA_SERVER
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3535:Subscription Retransmission Queue.
+	  Backing tests: test_profile_surface.
+	  Notes: Support a retransmission queue of sent NotificationMessages and the Republish Service. See UA Part 4 for the required size of the retransmission queue. muc-opcua: Republish is implemented and tested; the retransmission store holds the single most-recent NotificationMessage per subscription (profile-targeting minimal capacity), which may not meet CTT multi-message republish depth.
 
 config MUC_OPCUA_CU_BASE_INFO_RESENDDATA_METHOD
 	bool "CU: Base Info ResendData Method"
