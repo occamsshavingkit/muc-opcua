@@ -37,6 +37,19 @@ assert_cfg() {
     fi
 }
 
+# assert_cache_cfg <build-dir> <SYM> <ON|OFF> -- checks an explicit CMake-only gate
+assert_cache_cfg() {
+    local dir="$1" sym="$2" expected="$3" actual
+    actual=$(grep -E "^MUC_OPCUA_${sym}:[^=]+=(ON|OFF)\$" "$dir/CMakeCache.txt" 2>/dev/null | cut -d= -f2)
+    if [ "$actual" = "$expected" ]; then
+        echo "  PASS  MUC_OPCUA_$sym=$actual (expected $expected)"
+        PASS=$((PASS + 1))
+    else
+        echo "  FAIL  MUC_OPCUA_$sym=$actual (expected $expected) [$dir]"
+        FAIL=$((FAIL + 1))
+    fi
+}
+
 echo "### 1. 'standard' baseline: profile symbol, cascade, facets, CUs ###"
 D1="$WORKDIR/g1"
 cmake -S . -B "$D1" -DMUC_OPCUA_PROFILE=standard -DMUC_OPCUA_PLATFORM=host >/dev/null 2>&1
@@ -310,6 +323,73 @@ if grep -q "config MUC_OPCUA_PROFILE_STANDARD_2022_UA_SERVER" Kconfig; then
 else
     echo "  PASS  superseded Standard 2022 profile is not selectable"
     PASS=$((PASS + 1))
+fi
+
+echo "### 17. Aggregate-only Discovery gate builds and runs GetEndpoints coverage ###"
+D17="$WORKDIR/g17"
+D17_CONFIGURE_LOG="$WORKDIR/g17-configure.log"
+D17_BUILD_LOG="$WORKDIR/g17-build.log"
+if cmake -S . -B "$D17" -DMUC_OPCUA_PROFILE=custom \
+    -DMUC_OPCUA_FACET_CORE_2022_SERVER=ON \
+    -DMUC_OPCUA_CU_DISCOVERY_FIND_SERVERS_SELF_GET_ENDPOINTS=ON \
+    -DMUC_OPCUA_CU_DISCOVERY_FIND_SERVERS_SELF=OFF \
+    -DMUC_OPCUA_CU_DISCOVERY_GET_ENDPOINTS=OFF \
+    -DMUC_OPCUA_BUILD_TESTS=ON \
+    -DMUC_OPCUA_PLATFORM=host >"$D17_CONFIGURE_LOG" 2>&1; then
+    assert_cfg "$D17" CU_DISCOVERY_FIND_SERVERS_SELF_GET_ENDPOINTS ON
+    assert_cache_cfg "$D17" CU_DISCOVERY_FIND_SERVERS_SELF OFF
+    assert_cfg "$D17" CU_DISCOVERY_GET_ENDPOINTS OFF
+
+    if cmake --build "$D17" --target test_get_endpoints_gate -j4 >"$D17_BUILD_LOG" 2>&1; then
+        if "$D17/tests/unit/test_get_endpoints_gate"; then
+            echo "  PASS  test_get_endpoints_gate passes with only the aggregate Discovery gate enabled"
+            PASS=$((PASS + 1))
+        else
+            echo "  FAIL  test_get_endpoints_gate failed with only the aggregate Discovery gate enabled"
+            FAIL=$((FAIL + 1))
+        fi
+    else
+        echo "  FAIL  could not build test_get_endpoints_gate for the aggregate-only Discovery configuration"
+        cat "$D17_BUILD_LOG"
+        FAIL=$((FAIL + 1))
+    fi
+else
+    echo "  FAIL  could not configure the aggregate-only Discovery scenario"
+    cat "$D17_CONFIGURE_LOG"
+    FAIL=$((FAIL + 1))
+fi
+
+echo "### 18. Reverse Connect closes its handle without Multiple Connections ###"
+D18="$WORKDIR/g18"
+D18_CONFIGURE_LOG="$WORKDIR/g18-configure.log"
+D18_BUILD_LOG="$WORKDIR/g18-build.log"
+if cmake -S . -B "$D18" -DMUC_OPCUA_PROFILE=custom \
+    -DMUC_OPCUA_FACET_CORE_2022_SERVER=ON \
+    -DMUC_OPCUA_CU_PROTOCOL_REVERSE_CONNECT_SERVER=ON \
+    -DMUC_OPCUA_CU_MULTIPLE_CONNECTIONS=OFF \
+    -DMUC_OPCUA_BUILD_TESTS=ON \
+    -DMUC_OPCUA_PLATFORM=host >"$D18_CONFIGURE_LOG" 2>&1; then
+    assert_cfg "$D18" FACET_CORE_2022_SERVER ON
+    assert_cfg "$D18" CU_PROTOCOL_REVERSE_CONNECT_SERVER ON
+    assert_cfg "$D18" CU_MULTIPLE_CONNECTIONS OFF
+
+    if cmake --build "$D18" --target test_reverse_connect -j4 >"$D18_BUILD_LOG" 2>&1; then
+        if "$D18/tests/unit/test_reverse_connect"; then
+            echo "  PASS  test_reverse_connect passes without Multiple Connections"
+            PASS=$((PASS + 1))
+        else
+            echo "  FAIL  test_reverse_connect failed without Multiple Connections"
+            FAIL=$((FAIL + 1))
+        fi
+    else
+        echo "  FAIL  could not build test_reverse_connect without Multiple Connections"
+        cat "$D18_BUILD_LOG"
+        FAIL=$((FAIL + 1))
+    fi
+else
+    echo "  FAIL  could not configure Reverse Connect without Multiple Connections"
+    cat "$D18_CONFIGURE_LOG"
+    FAIL=$((FAIL + 1))
 fi
 
 echo
