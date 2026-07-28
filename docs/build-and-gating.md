@@ -287,7 +287,7 @@ Full, but without the optional Redundancy and Reverse Connect facets
 cmake -S . -B build/full-lean \
     -DMUC_OPCUA_PROFILE=full \
     -DMUC_OPCUA_REDUNDANCY=OFF \
-    -DMUC_OPCUA_REVERSE_CONNECT=OFF
+    -DMUC_OPCUA_CU_PROTOCOL_REVERSE_CONNECT_SERVER=OFF
 ```
 
 Embedded, but with PubSub added on top (embedded doesn't default to it):
@@ -368,7 +368,7 @@ optional facets live only in `full`.
 | `MUC_OPCUA_COMPLEX_TYPES` | ComplexType Server Facet (custom structs/enums) | | | | | ✅ | `BASE_NODES` |
 | `MUC_OPCUA_REDUNDANCY` | Client Redundancy Facet (TransferSubscriptions) | | | | | ✅ | `SUBSCRIPTIONS` |
 | `MUC_OPCUA_AGGREGATE_FULL` | Full 42-aggregate set (OPC-10000-13) | | | | | ✅ | `SUBSCRIPTIONS_STANDARD` |
-| `MUC_OPCUA_REVERSE_CONNECT` | Reverse Connect Facet (server-initiated connections) | | | | | ✅ | |
+| `MUC_OPCUA_CU_PROTOCOL_REVERSE_CONNECT_SERVER` | Protocol Reverse Connect Server CU 2867 (server-initiated connections) | | | | | ✅ | |
 | `MUC_OPCUA_TIME_SYNC` | Security Time Synchronization (timestamp population) | | | | | ✅ | |
 | `MUC_OPCUA_NAMESPACES` | Namespaces metadata node (OPC-10000-5 §6.2.10) | | | | | ✅ | `BASE_NODES` |
 
@@ -457,28 +457,16 @@ to refresh.
 |---------|------|-------|------|-------|----------|----------|------|------------|
 | READ_CACHE | read_cache | implemented |  |  |  |  |  |  |
 | SECURE_CHANNEL_CRYPTO | secure_channel_crypto | implemented |  | ✅ | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
-| MUC_OPCUA_CU_MONITOR_ITEMS_500 | opc_monitor_items_500 | claimed |  |  |  |  |  |  |
-| MUC_OPCUA_CU_MONITOR_MINQUEUESIZE_05 | opc_monitor_minqueuesize_05 | claimed |  |  |  |  |  |  |
 | MUC_OPCUA_FACET_CORE_2022_SERVER | opc_facet_1322 | implemented | ✅ | ✅ | ✅ | ✅ | ✅ |  |
 | MUC_OPCUA_CU_ADDRESS_SPACE_ADDIN_REFERENCE | opc_cu_2446 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
 | MUC_OPCUA_CU_ADDRESS_SPACE_ADDIN_DEFAULTINSTANCEBROWSENAME | opc_cu_2447 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
 | MUC_OPCUA_CU_BASE_INFO_LOCALTIME | opc_cu_2476 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
-| MUC_OPCUA_CU_SECURITYPOLICY_SUPPORT | opc_cu_2600 | claimed | ✅ | ✅ | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
 | MUC_OPCUA_CU_BASE_INFO_SELECTION_LIST | opc_cu_2711 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
-| MUC_OPCUA_CU_ADDRESS_SPACE_ATOMICITY | opc_cu_2809 | claimed | ✅ | ✅ | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
-| MUC_OPCUA_CU_ADDRESS_SPACE_FULL_ARRAY_ONLY | opc_cu_2820 | claimed | ✅ | ✅ | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
 | MUC_OPCUA_CU_BASE_INFO_VALUEASTEXT | opc_cu_2969 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
 | MUC_OPCUA_CU_BASE_INFO_OPTIONSET | opc_cu_3127 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
-| — | opc_cu_3184 | claimed |  | ✅ | ✅ | ✅ | ✅ |  |
-| — | opc_cu_3186 | claimed |  | ✅ | ✅ | ✅ | ✅ |  |
 | MUC_OPCUA_CU_BASE_INFO_ESTIMATED_RETURN_TIME | opc_cu_3198 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
-| — | opc_cu_3545 | claimed |  | ✅ | ✅ | ✅ | ✅ |  |
-| — | opc_cu_3554 | claimed |  | ✅ | ✅ | ✅ | ✅ |  |
 | MUC_OPCUA_CU_ADDRESS_SPACE_INTERFACES | opc_cu_3560 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER, MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER |
-| MUC_OPCUA_CU_DOCUMENTATION_CORE_CAPACITIES | opc_cu_3808 | claimed | ✅ | ✅ | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
-| — | opc_cu_3912 | claimed | ✅ | ✅ | ✅ | ✅ | ✅ |  |
 | MUC_OPCUA_CU_BASE_INFO_LOCATIONS_OBJECT | opc_cu_4053 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
-| MUC_OPCUA_CU_ADDRESS_SPACE_NONVOLATILE_CONSTANT | opc_cu_4237 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
 | MUC_OPCUA_CU_BASE_INFO_CURRENCY | opc_cu_5240 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
 | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER | opc_facet_1219 | implemented |  |  | ✅ | ✅ | ✅ |  |
 | MUC_OPCUA_FACET_STANDARD_DATACHANGE_SUBSCRIPTION_2022_SERVER | opc_facet_1324 | implemented |  |  | ✅ | ✅ | ✅ |  |
@@ -486,123 +474,26 @@ to refresh.
 | MUC_OPCUA_FACET_USER_TOKEN_USER_NAME_PASSWORD_SERVER | opc_facet_1695 | implemented |  |  | ✅ | ✅ | ✅ |  |
 | MUC_OPCUA_FACET_USER_TOKEN_X509_CERTIFICATE_SERVER | opc_facet_1696 | implemented |  |  |  | ✅ | ✅ |  |
 | MUC_OPCUA_FACET_EMBEDDED_DATACHANGE_SUBSCRIPTION_2022_SERVER | opc_facet_2250 | implemented |  | ✅ | ✅ | ✅ | ✅ |  |
-| OPC_CU_2231 | opc_cu_2231 | claimed |  |  | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_GLOBAL_CERTIFICATE_MANAGEMENT_SERVER |
-| OPC_CU_2423 | opc_cu_2423 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER |
-| OPC_CU_2481 | opc_cu_2481 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER |
-| OPC_CU_2482 | opc_cu_2482 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER |
-| MUC_OPCUA_CU_BASE_INFO_DATE_DATATYPES | opc_cu_2483 | claimed |  |  | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER |
-| MUC_OPCUA_CU_BASE_INFO_BITFIELDMASKDATATYPE | opc_cu_2484 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER |
-| MUC_OPCUA_CU_BASE_INFO_KEYVALUEPAIR | opc_cu_2485 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER |
-| MUC_OPCUA_CU_BASE_INFO_SUBVARIABLES_OF_STRUCTURES | opc_cu_2490 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER |
-| MUC_OPCUA_CU_BASE_INFO_ASSOCIATEDWITH | opc_cu_2491 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER |
-| MUC_OPCUA_CU_BASE_INFO_EUINFORMATION | opc_cu_2500 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER |
-| MUC_OPCUA_CU_BASE_INFO_ORDEREDLIST | opc_cu_2512 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER |
-| MUC_OPCUA_CU_BASE_INFO_AUDIO_TYPE | opc_cu_2513 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER |
-| MUC_OPCUA_CU_BASE_INFO_SPATIAL_DATA | opc_cu_2514 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER |
-| MUC_OPCUA_CU_BASE_INFO_HASORDEREDCOMPONENT | opc_cu_2516 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER |
-| MUC_OPCUA_CU_BASE_INFO_DEPRECATED_INFORMATION | opc_cu_2517 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER |
-| MUC_OPCUA_CU_BASE_INFO_IMAGE_DATATYPES | opc_cu_2518 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER |
-| MUC_OPCUA_CU_BASE_INFO_CONTENTFILTER | opc_cu_2536 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER |
-| MUC_OPCUA_CU_MONITORED_ITEMS_DEADBAND_FILTER | opc_cu_2928 | claimed |  |  | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_STANDARD_DATACHANGE_SUBSCRIPTION_2022_SERVER |
-| MUC_OPCUA_CU_BASE_INFO_GETMONITOREDITEMS_METHOD | opc_cu_2940 | claimed |  |  | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_STANDARD_DATACHANGE_SUBSCRIPTION_2022_SERVER |
-| MUC_OPCUA_CU_MONITOR_BASIC | opc_cu_2963 | claimed |  | ✅ | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_EMBEDDED_DATACHANGE_SUBSCRIPTION_2022_SERVER |
-| MUC_OPCUA_CU_MONITOR_TRIGGERING | opc_cu_3146 | claimed |  |  | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_STANDARD_DATACHANGE_SUBSCRIPTION_2022_SERVER |
-| MUC_OPCUA_CU_BASE_INFO_CORE_TYPES_FOLDERS | opc_cu_3185 | claimed |  |  | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER |
-| — | opc_cu_3188 | claimed |  |  | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER |
 | MUC_OPCUA_CU_BASE_INFO_SERVERTYPE | opc_cu_3189 | claimed |  |  | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER |
-| MUC_OPCUA_CU_BASE_INFO_FIXED_SAMPLINGINTERVAL | opc_cu_3196 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_EMBEDDED_DATACHANGE_SUBSCRIPTION_2022_SERVER |
-| MUC_OPCUA_CU_BASE_INFO_OPTIONSET_DATATYPE | opc_cu_3207 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER |
-| MUC_OPCUA_CU_BASE_INFO_RANGE_DATATYPE | opc_cu_3214 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER |
-| MUC_OPCUA_CU_MONITOR_QUEUEING | opc_cu_3532 | claimed |  |  | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_STANDARD_DATACHANGE_SUBSCRIPTION_2022_SERVER |
-| MUC_OPCUA_CU_BASE_INFO_RESENDDATA_METHOD | opc_cu_3544 | claimed |  |  | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_STANDARD_DATACHANGE_SUBSCRIPTION_2022_SERVER |
-| MUC_OPCUA_CU_BASE_INFO_UABINARY_FILE | opc_cu_3547 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER |
-| MUC_OPCUA_CU_BASE_INFO_STATUSRESULT_DATATYPE | opc_cu_3550 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER |
-| MUC_OPCUA_CU_BASE_INFO_URISTRING | opc_cu_3551 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER |
-| MUC_OPCUA_CU_BASE_INFO_METHOD_ARGUMENT_DATATYPE | opc_cu_3641 | claimed |  |  | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER |
-| MUC_OPCUA_CU_BASE_INFO_SEMANTICVERSIONSTRING | opc_cu_3644 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER |
-| MUC_OPCUA_CU_BASE_INFO_ISEXECUTABLEON | opc_cu_3747 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER |
-| MUC_OPCUA_CU_BASE_INFO_ISEXECUTINGON | opc_cu_3748 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER |
-| MUC_OPCUA_CU_BASE_INFO_CONTROLS | opc_cu_3749 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER |
-| MUC_OPCUA_CU_BASE_INFO_UTILIZES | opc_cu_3750 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER |
-| MUC_OPCUA_CU_BASE_INFO_REQUIRES | opc_cu_3751 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER |
-| MUC_OPCUA_CU_BASE_INFO_ISPHYSICALLYCONNECTEDTO | opc_cu_3752 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER |
-| MUC_OPCUA_CU_BASE_INFO_REPRESENTSSAMEENTITYAS | opc_cu_3753 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER |
-| MUC_OPCUA_CU_BASE_INFO_REPRESENTSSAMEHARDWAREAS | opc_cu_3754 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER |
-| MUC_OPCUA_CU_BASE_INFO_REPRESENTSSAMEFUNCTIONALITYAS | opc_cu_3755 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER |
-| MUC_OPCUA_CU_BASE_INFO_ISHOSTEDBY | opc_cu_3756 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER |
-| MUC_OPCUA_CU_BASE_INFO_HASPHYSICALCOMPONENT | opc_cu_3757 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER |
-| MUC_OPCUA_CU_BASE_INFO_HASCONTAINEDCOMPONENT | opc_cu_3758 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER |
-| MUC_OPCUA_CU_BASE_INFO_HASATTACHEDCOMPONENT | opc_cu_3759 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER |
-| MUC_OPCUA_CU_BASE_INFO_SERVER_CAPABILITIES_SUBSCRIPTIONS | opc_cu_3911 | claimed |  | ✅ | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_EMBEDDED_DATACHANGE_SUBSCRIPTION_2022_SERVER |
-| MUC_OPCUA_CU_BASE_INFO_SEMANTICCHANGE_BIT | opc_cu_3922 | claimed |  | ✅ | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_EMBEDDED_DATACHANGE_SUBSCRIPTION_2022_SERVER |
-| MUC_OPCUA_CU_BASE_INFO_REFERENCEDESCRIPTION | opc_cu_3996 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER |
-| MUC_OPCUA_CU_BASE_INFO_TRIMMEDSTRING | opc_cu_4052 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER |
-| MUC_OPCUA_CU_BASE_INFO_HANDLE_DATATYPE | opc_cu_4054 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER |
-| MUC_OPCUA_CU_BASE_INFO_SERVER_CAPABILITIES_MAXMONITOREDITEMSQUEUESIZE | opc_cu_4055 | claimed |  | ✅ | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_EMBEDDED_DATACHANGE_SUBSCRIPTION_2022_SERVER |
-| MUC_OPCUA_CU_BASE_INFO_DECIMAL_DATATYPE | opc_cu_4426 | claimed |  |  | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER |
-| MUC_OPCUA_CU_MONITOR_ITEMS_2 | opc_cu_5207 | claimed |  | ✅ | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_EMBEDDED_DATACHANGE_SUBSCRIPTION_2022_SERVER |
-| MUC_OPCUA_CU_MONITOR_VALUE_CHANGE_V2 | opc_cu_5208 | claimed |  | ✅ | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_EMBEDDED_DATACHANGE_SUBSCRIPTION_2022_SERVER |
 | MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION | opc_cu_5801 | claimed |  |  | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER |
-| MUC_OPCUA_CU_BASE_INFO_PORTABLE_IDS | opc_cu_5868 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER |
 | MUC_OPCUA_CU_SUBSCRIPTION_BASIC | opc_cu_subscription_basic | claimed |  | ✅ | ✅ | ✅ | ✅ |  |
 | MUC_OPCUA_CU_SUBSCRIPTION_STANDARD | opc_cu_subscription_standard | claimed |  |  | ✅ | ✅ | ✅ | MUC_OPCUA_CU_SUBSCRIPTION_BASIC |
 | MUC_OPCUA_CU_SECURITY_ECC | opc_cu_security_ecc | claimed |  |  |  |  | ✅ | SECURE_CHANNEL_CRYPTO |
 | MUC_OPCUA_CU_EVENTS | opc_cu_events | claimed |  |  |  |  | ✅ | MUC_OPCUA_CU_SUBSCRIPTION_BASIC |
 | MUC_OPCUA_CU_DATA_ACCESS | opc_cu_data_access | claimed |  |  |  |  | ✅ |  |
 | MUC_OPCUA_CU_METHOD_SERVER | opc_cu_method_server | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_CUSTOM_METHODS | opc_cu_custom_methods | claimed |  |  |  |  | ✅ |  |
 | MUC_OPCUA_CU_USER_AUTH | opc_cu_user_auth | claimed | ✅ | ✅ | ✅ | ✅ | ✅ |  |
 | MUC_OPCUA_CU_MULTIPLE_CONNECTIONS | opc_cu_multiple_connections | claimed |  | ✅ | ✅ | ✅ | ✅ |  |
 | MUC_OPCUA_CU_EVENT_FILTER_WHERE | opc_cu_event_filter_where | claimed |  |  |  |  | ✅ | MUC_OPCUA_CU_EVENTS, MUC_OPCUA_CU_SUBSCRIPTION_STANDARD |
 | MUC_OPCUA_CU_REDUNDANCY | opc_cu_redundancy | claimed |  |  |  |  | ✅ | MUC_OPCUA_CU_SUBSCRIPTION_BASIC |
-| MUC_OPCUA_CU_DIAGNOSTICS | opc_cu_diagnostics | claimed |  |  |  |  | ✅ |  |
 | MUC_OPCUA_CU_COMPLEX_TYPES | opc_cu_complex_types | claimed |  |  |  |  | ✅ |  |
 | MUC_OPCUA_CU_AUDITING | opc_cu_auditing | claimed |  |  |  |  | ✅ | MUC_OPCUA_CU_EVENTS |
-| MUC_OPCUA_CU_DYNAMIC_NODES | opc_cu_dynamic_nodes | claimed |  |  |  |  | ✅ |  |
 | MUC_OPCUA_CU_MULTI_CHUNK | opc_cu_multi_chunk | claimed |  |  |  |  | ✅ |  |
 | MUC_OPCUA_CU_SESSION_TIMEOUT | opc_cu_session_timeout | claimed |  | ✅ | ✅ | ✅ | ✅ | MUC_OPCUA_CU_MULTIPLE_CONNECTIONS, MUC_OPCUA_CU_MULTI_CHUNK |
 | MUC_OPCUA_CU_TIME_SYNC | opc_cu_time_sync | claimed | ✅ | ✅ | ✅ | ✅ | ✅ |  |
 | MUC_OPCUA_CU_EXTENDED_NODEIDS | opc_cu_extended_nodeids | claimed |  |  |  |  | ✅ |  |
-| — | opc_cu_aggregate_interpolative | claimed |  |  |  |  | ✅ | MUC_OPCUA_CU_SUBSCRIPTION_STANDARD |
-| — | opc_cu_aggregate_average | claimed |  |  |  |  | ✅ | MUC_OPCUA_CU_SUBSCRIPTION_STANDARD |
-| — | opc_cu_aggregate_time_average | claimed |  |  |  |  | ✅ | MUC_OPCUA_CU_SUBSCRIPTION_STANDARD |
-| — | opc_cu_aggregate_time_average_2 | claimed |  |  |  |  | ✅ | MUC_OPCUA_CU_SUBSCRIPTION_STANDARD |
-| — | opc_cu_aggregate_total | claimed |  |  |  |  | ✅ | MUC_OPCUA_CU_SUBSCRIPTION_STANDARD |
-| — | opc_cu_aggregate_total_2 | claimed |  |  |  |  | ✅ | MUC_OPCUA_CU_SUBSCRIPTION_STANDARD |
-| — | opc_cu_aggregate_minimum | claimed |  |  |  |  | ✅ | MUC_OPCUA_CU_SUBSCRIPTION_STANDARD |
-| — | opc_cu_aggregate_maximum | claimed |  |  |  |  | ✅ | MUC_OPCUA_CU_SUBSCRIPTION_STANDARD |
-| — | opc_cu_aggregate_range | claimed |  |  |  |  | ✅ | MUC_OPCUA_CU_SUBSCRIPTION_STANDARD |
-| — | opc_cu_aggregate_minimum_2 | claimed |  |  |  |  | ✅ | MUC_OPCUA_CU_SUBSCRIPTION_STANDARD |
-| — | opc_cu_aggregate_maximum_2 | claimed |  |  |  |  | ✅ | MUC_OPCUA_CU_SUBSCRIPTION_STANDARD |
-| — | opc_cu_aggregate_count | claimed |  |  |  |  | ✅ | MUC_OPCUA_CU_SUBSCRIPTION_STANDARD |
-| — | opc_cu_aggregate_duration_state_zero | claimed |  |  |  |  | ✅ | MUC_OPCUA_CU_SUBSCRIPTION_STANDARD |
-| — | opc_cu_aggregate_start | claimed |  |  |  |  | ✅ | MUC_OPCUA_CU_SUBSCRIPTION_STANDARD |
-| — | opc_cu_aggregate_end | claimed |  |  |  |  | ✅ | MUC_OPCUA_CU_SUBSCRIPTION_STANDARD |
-| — | opc_cu_aggregate_delta | claimed |  |  |  |  | ✅ | MUC_OPCUA_CU_SUBSCRIPTION_STANDARD |
-| — | opc_cu_aggregate_delta_bounds | claimed |  |  |  |  | ✅ | MUC_OPCUA_CU_SUBSCRIPTION_STANDARD |
-| — | opc_cu_aggregate_duration_good | claimed |  |  |  |  | ✅ | MUC_OPCUA_CU_SUBSCRIPTION_STANDARD |
-| — | opc_cu_aggregate_duration_bad | claimed |  |  |  |  | ✅ | MUC_OPCUA_CU_SUBSCRIPTION_STANDARD |
-| — | opc_cu_aggregate_percent_good | claimed |  |  |  |  | ✅ | MUC_OPCUA_CU_SUBSCRIPTION_STANDARD |
-| — | opc_cu_aggregate_percent_bad | claimed |  |  |  |  | ✅ | MUC_OPCUA_CU_SUBSCRIPTION_STANDARD |
-| — | opc_cu_aggregate_worst_quality | claimed |  |  |  |  | ✅ | MUC_OPCUA_CU_SUBSCRIPTION_STANDARD |
-| — | opc_cu_aggregate_worst_quality_2 | claimed |  |  |  |  | ✅ | MUC_OPCUA_CU_SUBSCRIPTION_STANDARD |
-| — | opc_cu_aggregate_annotation_count | claimed |  |  |  |  | ✅ | MUC_OPCUA_CU_SUBSCRIPTION_STANDARD |
-| — | opc_cu_aggregate_min_actual_time | claimed |  |  |  |  | ✅ | MUC_OPCUA_CU_SUBSCRIPTION_STANDARD |
-| — | opc_cu_aggregate_max_actual_time | claimed |  |  |  |  | ✅ | MUC_OPCUA_CU_SUBSCRIPTION_STANDARD |
-| — | opc_cu_aggregate_min_actual_time_2 | claimed |  |  |  |  | ✅ | MUC_OPCUA_CU_SUBSCRIPTION_STANDARD |
-| — | opc_cu_aggregate_max_actual_time_2 | claimed |  |  |  |  | ✅ | MUC_OPCUA_CU_SUBSCRIPTION_STANDARD |
-| — | opc_cu_aggregate_range_2 | claimed |  |  |  |  | ✅ | MUC_OPCUA_CU_SUBSCRIPTION_STANDARD |
-| — | opc_cu_aggregate_duration_state_nonzero | claimed |  |  |  |  | ✅ | MUC_OPCUA_CU_SUBSCRIPTION_STANDARD |
-| — | opc_cu_aggregate_number_transitions | claimed |  |  |  |  | ✅ | MUC_OPCUA_CU_SUBSCRIPTION_STANDARD |
-| — | opc_cu_aggregate_start_bound | claimed |  |  |  |  | ✅ | MUC_OPCUA_CU_SUBSCRIPTION_STANDARD |
-| — | opc_cu_aggregate_end_bound | claimed |  |  |  |  | ✅ | MUC_OPCUA_CU_SUBSCRIPTION_STANDARD |
-| — | opc_cu_aggregate_std_dev_sample | claimed |  |  |  |  | ✅ | MUC_OPCUA_CU_SUBSCRIPTION_STANDARD |
-| — | opc_cu_aggregate_variance_sample | claimed |  |  |  |  | ✅ | MUC_OPCUA_CU_SUBSCRIPTION_STANDARD |
-| — | opc_cu_aggregate_std_dev_population | claimed |  |  |  |  | ✅ | MUC_OPCUA_CU_SUBSCRIPTION_STANDARD |
-| — | opc_cu_aggregate_variance_population | claimed |  |  |  |  | ✅ | MUC_OPCUA_CU_SUBSCRIPTION_STANDARD |
 | MUC_OPCUA_CU_AGGREGATE_FULL | opc_cu_aggregate_full | claimed |  |  |  |  | ✅ | MUC_OPCUA_CU_SUBSCRIPTION_STANDARD |
 | MUC_OPCUA_CU_PUBSUB | opc_cu_pubsub | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_REVERSE_CONNECT | opc_cu_reverse_connect | claimed |  |  |  |  | ✅ |  |
 | MUC_OPCUA_CU_NAMESPACES | opc_cu_namespaces | claimed |  |  |  |  | ✅ |  |
 | MUC_OPCUA_CU_BASE_INFO_DATATYPES | opc_cu_base_info_datatypes | claimed |  |  | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER |
 | MUC_OPCUA_CU_BASE_INFO_ARGUMENT_TYPE | opc_cu_base_info_argument_type | claimed |  |  | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER |
@@ -613,147 +504,32 @@ to refresh.
 | MUC_OPCUA_CU_VIEW_REGISTERNODES | service_register_nodes | claimed | ✅ | ✅ | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
 | MUC_OPCUA_CU_CORE_2017_ATTRIBUTE_WRITE | service_write | claimed |  |  |  |  | ✅ |  |
 | MUC_OPCUA_CU_HISTORICAL_ACCESS_SERVER_FACET | service_history | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_HISTORICAL_RAW_DATA_2022_SERVER_FACET | opc_cu_1571 | claimed |  |  |  |  | ✅ |  |
 | — | opc_cu_1572 | deferred |  |  |  |  |  |  |
-| MUC_OPCUA_CU_HISTORICAL_DATA_UPDATE_2022_SERVER_FACET | opc_cu_1573 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_HISTORICAL_DATA_INSERT_2022_SERVER_FACET | opc_cu_1574 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_HISTORICAL_DATA_REPLACE_2022_SERVER_FACET | opc_cu_1575 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_HISTORICAL_DATA_DELETE_2022_SERVER_FACET | opc_cu_1576 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_HISTORICAL_ACCESS_REPLACE_VALUE | opc_cu_2264 | claimed |  |  |  |  | ✅ |  |
 | — | opc_cu_1577 | deferred |  |  |  |  |  |  |
 | — | opc_cu_1578 | deferred |  |  |  |  |  | MUC_OPCUA_CU_HISTORICAL_ACCESS_SERVER_FACET |
 | — | opc_cu_1579 | deferred |  |  |  |  |  | MUC_OPCUA_CU_HISTORICAL_ACCESS_SERVER_FACET |
 | — | opc_cu_1580 | deferred |  |  |  |  |  | MUC_OPCUA_CU_HISTORICAL_ACCESS_SERVER_FACET |
 | — | opc_cu_1581 | deferred |  |  |  |  |  | MUC_OPCUA_CU_HISTORICAL_ACCESS_SERVER_FACET |
 | — | opc_cu_1710 | deferred |  |  |  |  |  |  |
-| MUC_OPCUA_CU_HISTORICAL_ACCESS_STRUCTURED_DATA_INSERT | opc_cu_2185 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_HISTORICAL_ACCESS_STRUCTURED_DATA_READ_RAW | opc_cu_2332 | claimed |  |  |  |  | ✅ |  |
 | MUC_OPCUA_CU_QUERY | service_query | claimed |  |  |  |  | ✅ |  |
 | MUC_OPCUA_CU_NODEMANAGEMENT | service_nodemanagement | claimed |  |  |  |  | ✅ |  |
 | MUC_OPCUA_FACET_UA_TCP_UA_SC_UA_BINARY | opc_facet_837 | implemented | ✅ | ✅ | ✅ | ✅ | ✅ |  |
 | MUC_OPCUA_FACET_SECURITY_TIME_SYNCHRONIZATION | opc_facet_1760 | implemented | ✅ | ✅ | ✅ | ✅ | ✅ |  |
 | MUC_OPCUA_CU_VIEW_TRANSLATEBROWSEPATH | opc_cu_2317 | claimed | ✅ | ✅ | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
 | MUC_OPCUA_CU_DISCOVERY_GET_ENDPOINTS | opc_cu_2328 | claimed | ✅ | ✅ | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
-| MUC_OPCUA_CU_DISCOVERY_FIND_SERVERS_SELF | opc_cu_2352 | claimed | ✅ | ✅ | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
-| MUC_OPCUA_CU_ATTRIBUTE_WRITE_VALUES | opc_cu_2389 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
 | MUC_OPCUA_CU_SESSION_CHANGE_USER | opc_cu_2400 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
-| MUC_OPCUA_CU_SECURITY_ADMINISTRATION | opc_cu_2407 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
-| MUC_OPCUA_CU_TIME_SYNC_OS_BASED_SUPPORT | opc_cu_2478 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_SECURITY_TIME_SYNCHRONIZATION |
-| MUC_OPCUA_CU_TIME_SYNC_IEEE_1588_PTP | opc_cu_2479 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_SECURITY_TIME_SYNCHRONIZATION |
-| MUC_OPCUA_CU_TIME_SYNC_IEEE_802_1AS | opc_cu_2480 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_SECURITY_TIME_SYNCHRONIZATION |
-| MUC_OPCUA_CU_TIME_SYNC_NTP | opc_cu_2786 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_SECURITY_TIME_SYNCHRONIZATION |
-| MUC_OPCUA_CU_SECURITY_ROLE_SERVER_AUTHORIZATION | opc_cu_2808 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
-| MUC_OPCUA_CU_SECURITY_INVALID_USER_TOKEN | opc_cu_2823 | claimed |  |  | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_USER_TOKEN_USER_NAME_PASSWORD_SERVER, MUC_OPCUA_FACET_USER_TOKEN_X509_CERTIFICATE_SERVER |
 | MUC_OPCUA_CU_ATTRIBUTE_WRITE_STATUSCODE_TIMESTAMP | opc_cu_2936 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
-| — | opc_cu_3072 | claimed | ✅ | ✅ | ✅ | ✅ | ✅ |  |
-| — | opc_cu_3073 | claimed | ✅ | ✅ | ✅ | ✅ | ✅ |  |
-| MUC_OPCUA_CU_SECURITY_USER_X509 | opc_cu_3125 | claimed |  |  |  | ✅ | ✅ | MUC_OPCUA_FACET_USER_TOKEN_X509_CERTIFICATE_SERVER |
-| MUC_OPCUA_CU_SUBSCRIPTION_PUBLISHREQUEST_QUEUE_OVERFLOW | opc_cu_3143 | claimed |  | ✅ | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_EMBEDDED_DATACHANGE_SUBSCRIPTION_2022_SERVER |
 | MUC_OPCUA_CU_ATTRIBUTE_WRITE_INDEX_RANGE | opc_cu_3147 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
-| — | opc_cu_3175 | claimed | ✅ | ✅ | ✅ | ✅ | ✅ |  |
 | MUC_OPCUA_CU_BASE_INFO_DIAGNOSTICS | opc_cu_3192 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
 | MUC_OPCUA_CU_VIEW_BASIC_2 | opc_cu_3530 | claimed | ✅ | ✅ | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
-| MUC_OPCUA_CU_SUBSCRIPTION_MULTIPLE | opc_cu_3534 | claimed |  |  | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_STANDARD_DATACHANGE_SUBSCRIPTION_2022_SERVER |
-| MUC_OPCUA_CU_SUBSCRIPTION_RETRANSMISSION_QUEUE | opc_cu_3535 | claimed |  |  | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_STANDARD_DATACHANGE_SUBSCRIPTION_2022_SERVER |
-| MUC_OPCUA_CU_SECURITY_USER_NAME_PASSWORD_2 | opc_cu_3536 | claimed |  |  | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_USER_TOKEN_USER_NAME_PASSWORD_SERVER |
-| MUC_OPCUA_CU_SECURITY_USER_TOKEN_UNENCRYPTED | opc_cu_3645 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_USER_TOKEN_USER_NAME_PASSWORD_SERVER |
-| — | opc_cu_3727 | claimed |  | ✅ | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_EMBEDDED_DATACHANGE_SUBSCRIPTION_2022_SERVER |
-| MUC_OPCUA_CU_TIME_SYNC_CONFIGURE_CLOCK_SKEW | opc_cu_3802 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_SECURITY_TIME_SYNCHRONIZATION |
-| MUC_OPCUA_CU_SUBSCRIPTION_PUBLISH_BASIC | opc_cu_3913 | claimed |  | ✅ | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_EMBEDDED_DATACHANGE_SUBSCRIPTION_2022_SERVER |
 | MUC_OPCUA_CU_BASE_SERVICES_DIAGNOSTICS | opc_cu_3983 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
-| — | opc_cu_3985 | claimed | ✅ | ✅ | ✅ | ✅ | ✅ |  |
-| MUC_OPCUA_CU_TIME_SYNC_UA_BASED_SUPPORT | opc_cu_5505 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_SECURITY_TIME_SYNCHRONIZATION |
-| MUC_OPCUA_CU_TIME_SYNC_SUPPORT | opc_cu_5793 | claimed | ✅ | ✅ | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_SECURITY_TIME_SYNCHRONIZATION |
-| MUC_OPCUA_CU_PROTOCOL_UA_TCP | opc_cu_protocol_ua_tcp | claimed | ✅ | ✅ | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_UA_TCP_UA_SC_UA_BINARY |
-| MUC_OPCUA_CU_UA_BINARY_ENCODING | opc_cu_ua_binary_encoding | claimed | ✅ | ✅ | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_UA_TCP_UA_SC_UA_BINARY |
-| MUC_OPCUA_CU_UA_SECURE_CONVERSATION | opc_cu_ua_secure_conversation | claimed | ✅ | ✅ | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_UA_TCP_UA_SC_UA_BINARY |
-| MUC_OPCUA_CU_ADDRESS_SPACE_BASE | opc_cu_address_space_base | claimed | ✅ | ✅ | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
-| MUC_OPCUA_CU_SESSION_BASE | opc_cu_session_base | claimed | ✅ | ✅ | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
-| MUC_OPCUA_CU_CORE_STRUCTURE_2 | opc_cu_core_structure_2 | claimed | ✅ | ✅ | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
-| MUC_OPCUA_CU_CORE_VIEWS_FOLDER | opc_cu_core_views_folder | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
-| MUC_OPCUA_CU_SERVER_CAPABILITIES_2 | opc_cu_server_capabilities_2 | claimed | ✅ | ✅ | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
 | MUC_OPCUA_CU_SESSION_GENERAL_SERVICE | opc_cu_session_general_service | claimed | ✅ | ✅ | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
-| MUC_OPCUA_CU_NAMESPACE_METADATA | opc_cu_namespace_metadata | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
-| MUC_OPCUA_CU_MONITOR_QUEUESIZE_SERVERMAX | opc_cu_2318 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_ADDRESS_SPACE_EVENTS_2 | opc_cu_2515 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_MONITOR_EVENTS | opc_cu_3150 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_MONITOR_COMPLEX_EVENT_FILTER | opc_cu_4030 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_NODE_MANAGEMENT_ADD_NODE | opc_cu_2380 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_NODE_MANAGEMENT_DELETE_NODE | opc_cu_2394 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_NODE_MANAGEMENT_ADD_REF | opc_cu_2939 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_NODE_MANAGEMENT_DELETE_REF | opc_cu_3153 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_BASE_INFO_EVENTS_CAPABILITIES | opc_cu_3194 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_AUDITING_SECURE_COMMUNICATION | opc_cu_2422 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_AUDITING_SERVICES | opc_cu_3968 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_AUDITING_WRITE | opc_cu_3228 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_AUDITING_NODEMANAGEMENT | opc_cu_3224 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_AUDITING_METHOD | opc_cu_3230 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_A_C_AUDITING | opc_cu_3763 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_A_C_DIALOG_AUDITING | opc_cu_3764 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_A_C_CONFIRM_AUDITING | opc_cu_3766 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_A_C_SHELVING_AUDITING | opc_cu_3767 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_A_C_SUPPRESSION_AUDITING | opc_cu_3768 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_SESSION_CANCEL | opc_cu_2190 | claimed |  |  |  | ✅ | ✅ |  |
 | MUC_OPCUA_CU_DISCOVERY_REGISTER | opc_cu_2271 | claimed |  |  |  | ✅ | ✅ |  |
-| MUC_OPCUA_CU_SECURITY_POLICY_REQUIRED | opc_cu_2863 | claimed |  |  | ✅ | ✅ | ✅ |  |
-| MUC_OPCUA_CU_DISCOVERY_REGISTER2 | opc_cu_3170 | claimed |  |  |  | ✅ | ✅ |  |
-| MUC_OPCUA_CU_SECURITY_ECC_POLICY | opc_cu_3721 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_SESSION_MULTIPLE | opc_cu_3923 | claimed |  | ✅ | ✅ | ✅ | ✅ |  |
-| OPC_CU_3080 | opc_cu_3080 | claimed | ✅ | ✅ | ✅ | ✅ | ✅ |  |
-| MUC_OPCUA_CU_BASE_INFO_CUSTOM_TYPE_SYSTEM | opc_cu_3201 | claimed |  |  |  |  | ✅ |  |
 | MUC_OPCUA_CU_BASE_INFO_ENGINEERING_UNITS | opc_cu_5592 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
-| MUC_OPCUA_CU_SECURITY_NO_APPLICATION_AUTHENTICATION | opc_cu_5814 | claimed |  |  |  |  | ✅ |  |
 | MUC_OPCUA_CU_KEY_CREDENTIAL_SERVICE | opc_cu_key_credential_service | claimed |  |  |  |  | ✅ | MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION, MUC_OPCUA_CU_METHOD_SERVER |
 | MUC_OPCUA_CU_USER_ROLE_MANAGEMENT | opc_cu_user_role_management | claimed |  |  |  |  | ✅ | MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION, MUC_OPCUA_CU_METHOD_SERVER |
 | MUC_OPCUA_CU_CERTIFICATE_MANAGEMENT | opc_cu_certificate_management | claimed |  |  |  |  | ✅ | MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION, MUC_OPCUA_CU_METHOD_SERVER |
-| MUC_OPCUA_CU_A_C_ALARM | opc_cu_2921 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_A_C_ACKNOWLEDGE | opc_cu_2927 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_A_C_CONDITIONCLASSES | opc_cu_2189 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_A_C_FIRST_IN_GROUP_ALARM | opc_cu_2726 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_A_C_CONDITION_SUB_CLASSES | opc_cu_2852 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_A_C_RE_ALARMING | opc_cu_2879 | claimed |  |  |  |  | ✅ |  |
 | MUC_OPCUA_CU_ALARMS_CONDITIONS | opc_cu_alarms_conditions | claimed |  |  |  |  | ✅ | MUC_OPCUA_CU_EVENTS, MUC_OPCUA_FACET_CORE_2022_SERVER |
-| MUC_OPCUA_CU_DATA_ACCESS_TWOSTATE | opc_cu_2361 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_DATA_ACCESS_COMPLEX_NUMBER | opc_cu_2399 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_DATA_ACCESS_DISCRETEITEMTYPE | opc_cu_2426 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_DATA_ACCESS_MULTISTATEDICTIONARYENTRYDBT | opc_cu_2474 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_DATA_ACCESS_SEMANTIC_CHANGES | opc_cu_2772 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_DATA_ACCESS_VALUEASDICTIONARYENTRIES_PROPERTY | opc_cu_2776 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_DATA_ACCESS_MULTISTATEVALUEDISCRETE | opc_cu_2831 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_DATA_ACCESS_DOUBLECOMPLEX_NUMBER | opc_cu_2984 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_DATA_ACCESS_MULTISTATE | opc_cu_2988 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_DATA_ACCESS_PERCENTDEADBAND | opc_cu_3112 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_DATA_ACCESS_YARRAYITEMTYPE | opc_cu_3323 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_DATA_ACCESS_XYARRAYITEMTYPE | opc_cu_3324 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_DATA_ACCESS_IMAGEITEMTYPE | opc_cu_3325 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_DATA_ACCESS_CUBEITEMTYPE | opc_cu_3326 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_DATA_ACCESS_NDIMENSIONARRAYITEMTYPE | opc_cu_3327 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_DATA_ACCESS_AXISINFORMATIONTYPE | opc_cu_3328 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_DATA_ACCESS_DATAITEMS | opc_cu_3565 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_DATA_ACCESS_BASEANALOGTYPE | opc_cu_3566 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_DATA_ACCESS_ANALOGITEMTYPE | opc_cu_3567 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_DATA_ACCESS_ANALOGUNITTYPE | opc_cu_3568 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_DATA_ACCESS_ANALOGUNITRANGETYPE | opc_cu_3569 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_DATA_ACCESS_ARRAYITEM2TYPE | opc_cu_3786 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_BASE_INFO_NODE_MANAGEMENT_CAPABILITIES | opc_cu_2489 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_BASE_INFO_CHOICE_STATES | opc_cu_2649 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_BASE_INFO_SYSTEM_STATUS_UNDERLYING_SYSTEM | opc_cu_2747 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_BASE_INFO_AVAILABLE_STATES_AND_TRANSITIONS | opc_cu_2813 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_BASE_INFO_FINITE_STATE_MACHINE_INSTANCE | opc_cu_2814 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_BASE_INFO_DEVICE_FAILURE | opc_cu_2822 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_BASE_INFO_SEMANTICCHANGE | opc_cu_2978 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_BASE_INFO_SYSTEM_STATUS | opc_cu_3199 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_BASE_INFO_EVENTQUEUEOVERFLOW_EVENTTYPE | opc_cu_3206 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_BASE_INFO_FILETYPE_WRITE | opc_cu_3210 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_BASE_INFO_FILEDIRECTORYTYPE_BASE | opc_cu_3211 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_BASE_INFO_LOCALTIME_EVENTS | opc_cu_3546 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_BASE_INFO_ORDEREDLIST_CHANGE_NOTIFICATION | opc_cu_3549 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_BASE_INFO_TEMPORARYFILETRANSFERTYPE_SYNC_READ | opc_cu_3810 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_BASE_INFO_TEMPORARYFILETRANSFERTYPE_ASYNC_READ | opc_cu_3811 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_BASE_INFO_TEMPORARYFILETRANSFERTYPE_SYNC_WRITE | opc_cu_3812 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_BASE_INFO_TEMPORARYFILETRANSFERTYPE_ASYNC_WRITE | opc_cu_3813 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_BASE_INFO_CLIENT_EVENTS | opc_cu_4427 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_BASE_INFO_PROGRESS_EVENTS | opc_cu_5578 | claimed |  |  |  |  | ✅ |  |
 | MUC_OPCUA_CU_AGGREGATE_SUBSCRIPTION_AVERAGE | opc_cu_2375 | claimed |  |  |  |  | ✅ |  |
 | MUC_OPCUA_CU_AGGREGATE_SUBSCRIPTION_COUNT | opc_cu_2958 | claimed |  |  |  |  | ✅ |  |
 | MUC_OPCUA_CU_AGGREGATE_SUBSCRIPTION_DELTA | opc_cu_2256 | claimed |  |  |  |  | ✅ |  |
@@ -790,304 +566,47 @@ to refresh.
 | MUC_OPCUA_CU_AGGREGATE_SUBSCRIPTION_VARIANCESAMPLE | opc_cu_2281 | claimed |  |  |  |  | ✅ |  |
 | MUC_OPCUA_CU_AGGREGATE_SUBSCRIPTION_STANDARDDEVIATIONPOPULATION | opc_cu_2955 | claimed |  |  |  |  | ✅ |  |
 | MUC_OPCUA_CU_AGGREGATE_SUBSCRIPTION_VARIANCEPOPULATION | opc_cu_2178 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_ALIASNAME_PUBSUB_NOTIFICATION | opc_cu_5941 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_ALIASNAME_PUBSUB_SUBSCRIBER | opc_cu_5940 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_ALIASNAME_CONFIGURATION_SUPPORT_EXTERNAL | opc_cu_5937 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_BASE_INFO_STATE_MACHINE_DESC_NODEID_DATATYPE | opc_cu_5875 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_ALIASNAME_CONFIGURATION_SUPPORT | opc_cu_5874 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_ALIASNAME_CATEGORY_LASTCHANGE | opc_cu_5873 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_ALIASNAME_FINDALIASVERBOSE | opc_cu_5869 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_ATTRIBUTE_HISTORICAL_READ | opc_cu_5813 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_ATTRIBUTE_HISTORICAL_UPDATE | opc_cu_5812 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_SECURITY_USER_ISSUEDTOKEN_KERBEROS | opc_cu_5810 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_SECURITY_USER_JWT_ISSUEDTOKEN_2 | opc_cu_5809 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_A_C_EXCLUSIVE_LIMIT | opc_cu_5808 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_A_C_NON_EXCLUSIVE_LIMIT | opc_cu_5807 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_HISTORICAL_ACCESS_READ_RAW | opc_cu_5806 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_DOCUMENTATION_TROUBLE_SHOOTING_GUIDE | opc_cu_5797 | claimed |  |  |  |  |  |  |
-| MUC_OPCUA_CU_DOCUMENTATION_ON_LINE | opc_cu_5796 | claimed |  |  |  |  |  |  |
-| MUC_OPCUA_CU_DOCUMENTATION_DURABLE_SUBSCRIPTION_CAPACITY | opc_cu_5795 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_BASE_INFO_TEMPORARY_FILE_TRANSFER_TYPE_BASE | opc_cu_5791 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_LOGOBJECT_SOURCENODE | opc_cu_5776 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_LOGOBJECT_EVENTTYPE | opc_cu_5775 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_LOGOBJECT_SERVERLOG | opc_cu_5664 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_LOGOBJECT_LOGS_FOLDER | opc_cu_5663 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_LOGOBJECT_MINIMUMSEVERITY | opc_cu_5662 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_LOGOBJECT_MAXSTORAGEDURATION | opc_cu_5661 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_LOGOBJECT_MAXRECORDS | opc_cu_5660 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_LOGOBJECT_EVENT_GENERATION | opc_cu_5659 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_LOGOBJECT_STORAGE_OVERFLOW | opc_cu_5658 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_LOGOBJECT_BASE_EVENT_COLLECTION | opc_cu_5656 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_LOGOBJECT_ADDITIONALDATA | opc_cu_5655 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_LOGOBJECT_TRACECONTEXT | opc_cu_5654 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_LOGOBJECT_PERSISTENT_STORAGE | opc_cu_5653 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_LOGOBJECT_BASE | opc_cu_5652 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_A_C_EXCLUSIVE_LIMIT_HIGHHIGH_EFFECTIVEDISPLAYNAME | opc_cu_5567 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_A_C_EXCLUSIVE_LIMIT_HIGH_EFFECTIVEDISPLAYNAME | opc_cu_5566 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_A_C_EXCLUSIVE_LIMIT_LOW_EFFECTIVEDISPLAYNAME | opc_cu_5565 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_A_C_EXCLUSIVE_LIMIT_LOWLOW_EFFECTIVEDISPLAYNAME | opc_cu_5564 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_A_C_EXCLUSIVE_LIMIT_HIGHHIGHTOHIGH_TRANSITIONTIME | opc_cu_5563 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_A_C_EXCLUSIVE_LIMIT_HIGHTOHIGHHIGH_TRANSITIONTIME | opc_cu_5562 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_A_C_EXCLUSIVE_LIMIT_LOWLOWTOLOW_TRANSITIONTIME | opc_cu_5561 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_A_C_EXCLUSIVE_LIMIT_LOWTOLOWLOW_TRANSITIONTIME | opc_cu_5560 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_A_C_EXCLUSIVE_LIMIT_LASTTRANSITION | opc_cu_5559 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_A_C_SHELVING_ONESHOTSHELVED_EFFECTIVEDISPLAYNAME | opc_cu_5558 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_A_C_SHELVING_TIMEDSHELVED_EFFECTIVEDISPLAYNAME | opc_cu_5557 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_A_C_SHELVING_UNSHELVED_EFFECTIVEDISPLAYNAME | opc_cu_5556 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_A_C_SHELVING_ONESHOTSHELVEDTOTIMEDSHELVED_TRANSITIONTIME | opc_cu_5555 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_A_C_SHELVING_ONESHOTSHELVEDTOUNSHELVED_TRANSITIONTIME | opc_cu_5554 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_A_C_SHELVING_UNSHELVEDTOONESHOTSHELVED_TRANSITIONTIME | opc_cu_5553 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_A_C_SHELVING_TIMEDSHELVEDTOONESHOTSHELVED_TRANSITIONTIME | opc_cu_5552 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_A_C_SHELVING_TIMEDSHELVEDTOUNSHELVED_TRANSITIONTIME | opc_cu_5551 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_A_C_SHELVING_UNSHELVEDTOTIMEDSHELVED_TRANSITIONTIME | opc_cu_5550 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_A_C_SHELVING_LASTTRANSITION | opc_cu_5549 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_A_C_DIALOG_EFFECTIVEDISPLAYNAME | opc_cu_5548 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_A_C_DIALOG_EFFECTIVETRANSITIONTIME | opc_cu_5547 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_A_C_DIALOG_TRANSITIONTIME | opc_cu_5546 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_A_C_NON_EXCLUSIVE_LOWLOW_EFFECTIVEDISPLAYNAME | opc_cu_5545 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_A_C_NON_EXCLUSIVE_LOW_EFFECTIVEDISPLAYNAME | opc_cu_5544 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_A_C_NON_EXCLUSIVE_HIGH_EFFECTIVEDISPLAYNAME | opc_cu_5543 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_A_C_NON_EXCLUSIVE_HIGHHIGH_EFFECTIVEDISPLAYNAME | opc_cu_5542 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_A_C_NON_EXCLUSIVE_LOWLOW_EFFECTIVETRANSITIONTIME | opc_cu_5541 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_A_C_NON_EXCLUSIVE_LOW_EFFECTIVETRANSITIONTIME | opc_cu_5540 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_A_C_NON_EXCLUSIVE_HIGH_EFFECTIVETRANSITIONTIME | opc_cu_5539 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_A_C_NON_EXCLUSIVE_HIGHHIGH_EFFECTIVETRANSITIONTIME | opc_cu_5538 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_A_C_NON_EXCLUSIVE_LOWLOW_TRANSITIONTIME | opc_cu_5537 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_A_C_NON_EXCLUSIVE_LOW_TRANSITIONTIME | opc_cu_5536 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_A_C_NON_EXCLUSIVE_HIGH_TRANSITIONTIME | opc_cu_5535 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_A_C_NON_EXCLUSIVE_HIGHHIGH_TRANSITIONTIME | opc_cu_5534 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_A_C_LATCHED_EFFECTIVEDISPLAYNAME | opc_cu_5533 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_A_C_LATCHED_EFFECTIVETRANSITIONTIME | opc_cu_5532 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_A_C_LATCHED_TRANSITIONTIME | opc_cu_5531 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_A_C_SILENCE_EFFECTIVEDISPLAYNAME | opc_cu_5530 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_A_C_SILENCE_EFFECTIVETRANSITIONTIME | opc_cu_5529 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_A_C_SILENCE_TRANSITIONTIME | opc_cu_5528 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_A_C_OUTOFSERVICE_EFFECTIVEDISPLAYNAME | opc_cu_5527 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_A_C_OUTOFSERVICE_EFFECTIVETRANSITIONTIME | opc_cu_5526 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_A_C_OUTOFSERVICE_TRANSITIONTIME | opc_cu_5525 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_A_C_SUPPRESSION_EFFECTIVEDISPLAYNAME | opc_cu_5524 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_A_C_SUPPRESSION_EFFECTIVETRANSITIONTIME | opc_cu_5523 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_A_C_SUPPRESSION_TRANSITIONTIME | opc_cu_5522 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_A_C_CONFIRM_EFFECTIVEDISPLAYNAME | opc_cu_5521 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_A_C_CONFIRM_EFFECTIVETRANSITIONTIME | opc_cu_5520 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_A_C_CONFIRM_TRANSITIONTIME | opc_cu_5519 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_A_C_ACKNOWLEDGE_EFFECTIVEDISPLAYNAME | opc_cu_5518 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_A_C_ACKNOWLEDGE_EFFECTIVETRANSITIONTIME | opc_cu_5517 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_A_C_ACKNOWLEDGE_TRANSITIONTIME | opc_cu_5516 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_A_C_ACTIVE_EFFECTIVEDISPLAYNAME | opc_cu_5515 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_A_C_ACTIVE_EFFECTIVETRANSITIONTIME | opc_cu_5514 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_A_C_ACTIVE_TRANSITIONTIME | opc_cu_5513 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_A_C_ENABLED_EFFECTIVEDISPLAYNAME | opc_cu_5512 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_A_C_ENABLED_EFFECTIVETRANSITIONTIME | opc_cu_5511 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_A_C_ENABLED_TRANSITIONTIME | opc_cu_5510 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_PUSH_MODEL_FOR_KEYCREDENTIAL_SERVICE | opc_cu_5303 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_KEYCREDENTIAL_PROFILEURI_MQTT_USERNAME | opc_cu_5302 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_KEYCREDENTIAL_PROFILEURI_AMQP_SASL_PLAIN | opc_cu_5301 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_KEYCREDENTIAL_AUTHENTICATION_MECHANISM_SUPPORT | opc_cu_5293 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_KEYCREDENTIAL_PROFILEURI_UA_TRANSPORT_WITH_USERNAME | opc_cu_5292 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_SECURITY_ROLE_TRUSTEDAPPLICATION | opc_cu_5277 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_SECURITY_ROLE_SERVER_APPLICATIONMANAGEMENT | opc_cu_5276 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_SECURITY_ROLE_SERVER_ENDPOINTMANAGEMENT | opc_cu_5275 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_SECURITY_ROLE_SERVER_IDENTITYMANAGEMENT | opc_cu_5274 | claimed |  |  |  |  | ✅ |  |
-| — | opc_cu_5250 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_SUBSCRIPTION_PUBLISH_MIN_10 | opc_cu_5249 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_SUBSCRIPTION_MINIMUM_05 | opc_cu_5248 | claimed |  |  |  |  | ✅ |  |
-| — | opc_cu_5242 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_AUDITING_CONNECTIONS | opc_cu_5213 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_SECURITY_USER_IDENTITY_TOKEN_SUPPORT | opc_cu_4957 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_SECURITY_USER_MANAGEMENT_SERVER | opc_cu_4505 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_SCHEDULER_CALENDAR_CONFIGURATION | opc_cu_4503 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_SCHEDULER_SCHEDULING_CONFIGURATION | opc_cu_4502 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_SCHEDULER_CALENDAR_BASE | opc_cu_4501 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_SCHEDULER_SCHEDULING_BASE | opc_cu_4500 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_A_C_OUTOFSERVICE | opc_cu_4467 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_A_C_DIALOG2 | opc_cu_4466 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_A_C_SHELVING2 | opc_cu_4465 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_A_C_OUTOFSERVICE2 | opc_cu_4464 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_A_C_SUPPRESSION2_BY_OPERATOR | opc_cu_4463 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_A_C_SILENCING_AUDITING | opc_cu_4428 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_SESSION_SESSIONLESS_INVOCATION | opc_cu_3994 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_AUDITING_UPDATESTATES | opc_cu_3979 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_BASE_INFO_MODEL_CHANGE | opc_cu_3969 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_ADDRESS_SPACE_USER_ACCESS_LEVEL_BASE | opc_cu_3965 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_ADDRESS_SPACE_DATATYPEDEFINITION_ATTRIBUTE | opc_cu_3941 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_SECURITY_USER_ANONYMOUS_SERVER | opc_cu_3928 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_SECURITY_USER_ISSUEDTOKEN_KERBEROS_WINDOWS | opc_cu_3820 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_A_C_LIMIT_DEADBAND | opc_cu_3779 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_A_C_LIMIT_SEVERITY | opc_cu_3778 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_A_C_LIMIT_BASELIMIT | opc_cu_3777 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_A_C_GETGROUPMEMBERSHIPS | opc_cu_3776 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_A_C_ALARM_GROUP | opc_cu_3775 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_A_C_LATCHED_STATE | opc_cu_3774 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_A_C_STATEMACHINE_SUPPRESSION_TRIGGER | opc_cu_3773 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_A_C_STATEMACHINE_TRIGGER | opc_cu_3772 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_A_C_OUTOFSERVICE_AUDITING | opc_cu_3771 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_A_C_LATCHING_AUDITING | opc_cu_3770 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_A_C_ACKNOWLEDGE_AUDITING | opc_cu_3765 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_A_C_SYSTEMDIAGNOSTIC | opc_cu_3762 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_A_C_INSTRUMENTDIAGNOSTIC | opc_cu_3761 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_A_C_SUPPRESSION_GROUP | opc_cu_3760 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_SUBSCRIPTION_DURABLE | opc_cu_3642 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_BASE_INFO_METHOD_CAPABILITIES | opc_cu_3605 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_GDS_AUTHORIZATION_SERVICE_SERVER | opc_cu_3586 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_GDS_KEY_CREDENTIAL_SERVICE_PULL_MODEL | opc_cu_3584 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_GDS_CERTIFICATE_MANAGER_PULL_MODEL | opc_cu_3582 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_GDS_QUERY_APPLICATIONS | opc_cu_3581 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_AGGREGATE_MASTER_CONFIGURATION | opc_cu_3576 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_HISTORICAL_ACCESS_AGGREGATES | opc_cu_3574 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_A_E_WRAPPER_MAPPING | opc_cu_3572 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_A_C_ALARM_METRICS | opc_cu_3571 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_ADDRESS_SPACE_METHOD_META_DATA | opc_cu_3562 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_SECURITY_ROLE_SERVER_BASE_EVENTING | opc_cu_3542 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_SECURITY_ROLE_WELL_KNOWN_GROUP_3 | opc_cu_3541 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_SECURITY_ROLE_WELL_KNOWN_GROUP_2 | opc_cu_3540 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_SECURITY_ROLE_WELL_KNOWN | opc_cu_3539 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_SECURITY_ROLE_SERVER_BASE_2 | opc_cu_3538 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_ADDRESS_SPACE_DICTIONARY_URI | opc_cu_3525 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_ADDRESS_SPACE_DICTIONARY_IRDI | opc_cu_3524 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_AUDITING_HISTORY_SERVICES | opc_cu_3226 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_BASE_INFO_FILE_TYPE_BASE | opc_cu_3213 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_BASE_INFO_MODEL_CHANGE_GENERAL | opc_cu_3203 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_BASE_INFO_SECURITY_ROLE_CAPABILITIES | opc_cu_3197 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_AUTHORIZATION_SERVICE_CONFIGURATION_SERVER | opc_cu_3182 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_DISCOVERY_SERVER_ANNOUNCEMENT_USING_MDNS | opc_cu_3171 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_A_C_SHELVING | opc_cu_3165 | claimed |  |  |  |  | ✅ |  |
 | MUC_OPCUA_CU_AGGREGATE_STANDARDDEVIATIONPOPULATION | opc_cu_3162 | claimed |  |  |  |  |  |  |
 | MUC_OPCUA_CU_AGGREGATE_INTERPOLATIVE | opc_cu_3159 | claimed |  |  |  |  |  |  |
-| MUC_OPCUA_CU_MONITOR_ALTERNATE_ENCODING | opc_cu_3142 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_MONITOR_AGGREGATE_FILTER | opc_cu_3121 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_DOCUMENTATION_SUPPORTED_PROFILES | opc_cu_3107 | claimed |  |  |  |  |  |  |
 | MUC_OPCUA_CU_AGGREGATE_MAXIMUMACTUALTIME2 | opc_cu_3101 | claimed |  |  |  |  |  |  |
-| MUC_OPCUA_CU_A_C_OFFNORMAL | opc_cu_3098 | claimed |  |  |  |  | ✅ |  |
 | MUC_OPCUA_CU_AGGREGATE_DURATIONGOOD | opc_cu_3085 | claimed |  |  |  |  |  |  |
-| MUC_OPCUA_CU_DOCUMENTATION_USERS_GUIDE | opc_cu_3084 | claimed |  |  |  |  |  |  |
-| MUC_OPCUA_CU_A_C_COMMENT | opc_cu_3083 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_HISTORICAL_ACCESS_DELETE_VALUE | opc_cu_3081 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_ADDRESS_SPACE_NOTIFIER_HIERARCHY | opc_cu_3064 | claimed |  |  |  |  | ✅ |  |
 | MUC_OPCUA_CU_AGGREGATE_END | opc_cu_3061 | claimed |  |  |  |  |  |  |
-| MUC_OPCUA_CU_DOCUMENTATION_MULTIPLE_LANGUAGES | opc_cu_3060 | claimed |  |  |  |  |  |  |
 | MUC_OPCUA_CU_AGGREGATE_WORSTQUALITY | opc_cu_3055 | claimed |  |  |  |  |  |  |
-| MUC_OPCUA_CU_HISTORICAL_ACCESS_UPDATE_VALUE | opc_cu_3053 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_A_C_CONFIRM | opc_cu_3049 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_AGGREGATE_HISTORICAL_CONFIGURATION | opc_cu_3043 | claimed |  |  |  |  | ✅ |  |
 | MUC_OPCUA_CU_AGGREGATE_TOTAL | opc_cu_3032 | claimed |  |  |  |  |  |  |
-| MUC_OPCUA_CU_REDUNDANCY_SERVER_TRANSPARENT | opc_cu_3027 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_ADDRESS_SPACE_USERWRITEMASK_MULTILEVEL | opc_cu_3026 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_HISTORICAL_ACCESS_TIME_INSTANCE | opc_cu_3020 | claimed |  |  |  |  | ✅ |  |
 | MUC_OPCUA_CU_AGGREGATE_MAXIMUMACTUALTIME | opc_cu_3018 | claimed |  |  |  |  |  |  |
-| MUC_OPCUA_CU_HISTORICAL_ACCESS_STRUCTURED_DATA_REPLACE | opc_cu_3015 | claimed |  |  |  |  | ✅ |  |
 | MUC_OPCUA_CU_AGGREGATE_RANGE | opc_cu_3011 | claimed |  |  |  |  |  |  |
 | MUC_OPCUA_CU_AGGREGATE_STANDARDDEVIATIONSAMPLE | opc_cu_3006 | claimed |  |  |  |  |  |  |
-| MUC_OPCUA_CU_A_C_DISCRETE | opc_cu_3004 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_A_C_NON_EXCLUSIVE_LEVEL | opc_cu_3001 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_DOCUMENTATION_INSTALLATION | opc_cu_3000 | claimed |  |  |  |  |  |  |
 | MUC_OPCUA_CU_AGGREGATE_AVERAGE | opc_cu_2996 | claimed |  |  |  |  |  |  |
-| MUC_OPCUA_CU_HISTORICAL_ACCESS_STRUCTURED_DATA_TIME_INSTANCE | opc_cu_2991 | claimed |  |  |  |  | ✅ |  |
 | MUC_OPCUA_CU_AGGREGATE_NUMBEROFTRANSITIONS | opc_cu_2985 | claimed |  |  |  |  |  |  |
 | MUC_OPCUA_CU_AGGREGATE_PERCENTBAD | opc_cu_2975 | claimed |  |  |  |  |  |  |
-| MUC_OPCUA_CU_A_C_BASIC | opc_cu_2965 | claimed |  |  |  |  | ✅ |  |
 | MUC_OPCUA_CU_AGGREGATE_MAXIMUM | opc_cu_2962 | claimed |  |  |  |  |  |  |
 | MUC_OPCUA_CU_AGGREGATE_VARIANCESAMPLE | opc_cu_2960 | claimed |  |  |  |  |  |  |
-| MUC_OPCUA_CU_A_C_REFRESH | opc_cu_2957 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_A_C_EXCLUSIVE_DEVIATION | opc_cu_2951 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_HISTORICAL_ACCESS_SERVERTIMESTAMP | opc_cu_2950 | claimed |  |  |  |  | ✅ |  |
 | MUC_OPCUA_CU_AGGREGATE_VARIANCEPOPULATION | opc_cu_2948 | claimed |  |  |  |  |  |  |
-| MUC_OPCUA_CU_HISTORICAL_ACCESS_EVENTS | opc_cu_2947 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_A_C_NON_EXCLUSIVE_RATEOFCHANGE | opc_cu_2946 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_HISTORICAL_ACCESS_DELETE_EVENT | opc_cu_2943 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_HISTORICAL_ACCESS_STRUCTURED_DATA_UPDATE | opc_cu_2937 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_HISTORICAL_ACCESS_MODIFIED_VALUES | opc_cu_2929 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_ADDRESS_SPACE_SOURCE_HIERARCHY | opc_cu_2918 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_OAUTH2_AUTHORITY_PROFILE | opc_cu_2902 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_A_C_SUPPRESSION | opc_cu_2897 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_A_C_SILENCING | opc_cu_2896 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_A_C_SUPPRESSION_BY_OPERATOR | opc_cu_2893 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_A_C_AUDIBLE_SOUND | opc_cu_2881 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_A_C_ON_OFF_DELAY | opc_cu_2877 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_SECURITY_ROLE_SERVER_DEFAULTROLEPERMISSIONS | opc_cu_2873 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_DISCOVERY_GET_ENDPOINTS_SESSIONLESS | opc_cu_2871 | claimed |  |  |  |  | ✅ |  |
 | MUC_OPCUA_CU_PROTOCOL_REVERSE_CONNECT_SERVER | opc_cu_2867 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_A_C_DISCREPANCY | opc_cu_2861 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_BASE_INFO_REQUEST_SERVER_STATE_CHANGE_METHOD | opc_cu_2845 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_MONITOR_COMPLEX_VALUE | opc_cu_2818 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_SECURITY_USER_JWT_TOKEN_POLICY | opc_cu_2817 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_BASE_INFO_STATE_MACHINE_INSTANCE | opc_cu_2811 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_SECURITY_ROLE_SERVER_ROLEPERMISSIONS | opc_cu_2806 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_SECURITY_ROLE_SERVER_MANAGEMENT | opc_cu_2802 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_PROTOCOL_CONFIGURATION | opc_cu_2785 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_ADDRESS_SPACE_WRITEMASK | opc_cu_2781 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_ALIASNAME_HIERARCHY | opc_cu_2777 | claimed |  |  |  |  | ✅ |  |
 | MUC_OPCUA_CU_AGGREGATE_MINIMUMACTUALTIME | opc_cu_2759 | claimed |  |  |  |  |  |  |
-| MUC_OPCUA_CU_A_C_EXCLUSIVE_LEVEL | opc_cu_2746 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_HISTORICAL_ACCESS_STRUCTURED_DATA_DELETE | opc_cu_2740 | claimed |  |  |  |  | ✅ |  |
 | MUC_OPCUA_CU_AGGREGATE_RANGE2 | opc_cu_2730 | claimed |  |  |  |  |  |  |
-| MUC_OPCUA_CU_OPC_UA_AUTHORITY_PROFILE | opc_cu_2709 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_AZURE_IDENTITY_PROVIDER_AUTHORITY_PROFILE | opc_cu_2705 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_HISTORICAL_ACCESS_STRUCTURED_DATA_READ_MODIFIED | opc_cu_2664 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_ALIASNAME_CATEGORY_TOPICS | opc_cu_2629 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_ADDRESS_SPACE_DICTIONARY_ENTRIES | opc_cu_2539 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_BASE_INFO_HISTORY_READ_EVENTS_CAPABILITIES | opc_cu_2527 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_BASE_INFO_HISTORY_READ_DATA_CAPABILITIES | opc_cu_2526 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_BASE_INFO_HISTORY_UPDATE_DATA_CAPABILITIES | opc_cu_2488 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_BASE_INFO_HISTORY_UPDATE_EVENTS_CAPABILITIES | opc_cu_2487 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_BASE_INFO_HISTORY_READ_CAPABILITIES | opc_cu_2486 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_METHOD_CALL_COMPLEX | opc_cu_2454 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_GDS_ALIASNAME_DISCOVERY | opc_cu_2453 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_ALIASNAME_MODELCHANGE | opc_cu_2450 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_ALIASNAME_AGGREGATION | opc_cu_2449 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_ALIASNAME_BASE | opc_cu_2448 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_METHOD_CALL | opc_cu_2391 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_A_C_NON_EXCLUSIVE_DEVIATION | opc_cu_2390 | claimed |  |  |  |  | ✅ |  |
 | MUC_OPCUA_CU_AGGREGATE_WORSTQUALITY2 | opc_cu_2384 | claimed |  |  |  |  |  |  |
-| MUC_OPCUA_CU_HISTORICAL_ACCESS_INSERT_VALUE | opc_cu_2383 | claimed |  |  |  |  | ✅ |  |
 | MUC_OPCUA_CU_AGGREGATE_MINIMUM2 | opc_cu_2382 | claimed |  |  |  |  |  |  |
-| MUC_OPCUA_CU_ALIASNAME_CATEGORY_TAGS | opc_cu_2379 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_ADDRESS_SPACE_METHOD | opc_cu_2362 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_DISCOVERY_CONFIGURATION | opc_cu_2354 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_SUBSCRIPTION_TRANSFER | opc_cu_2353 | claimed |  |  |  |  | ✅ |  |
 | MUC_OPCUA_CU_AGGREGATE_DELTABOUNDS | opc_cu_2350 | claimed |  |  |  |  |  |  |
 | MUC_OPCUA_CU_AGGREGATE_MINIMUM | opc_cu_2346 | claimed |  |  |  |  |  |  |
-| MUC_OPCUA_CU_ATTRIBUTE_ALTERNATE_ENCODING | opc_cu_2345 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_A_C_BRANCH | opc_cu_2343 | claimed |  |  |  |  | ✅ |  |
 | MUC_OPCUA_CU_AGGREGATE_START | opc_cu_2339 | claimed |  |  |  |  |  |  |
 | MUC_OPCUA_CU_AGGREGATE_DELTA | opc_cu_2335 | claimed |  |  |  |  |  |  |
-| MUC_OPCUA_CU_A_C_INSTANCES | opc_cu_2333 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_A_C_EXCLUSIVE_RATEOFCHANGE | opc_cu_2323 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_SECURITY_CERTIFICATE_ADMINISTRATION | opc_cu_2319 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_A_C_REFRESH2 | opc_cu_2315 | claimed |  |  |  |  | ✅ |  |
 | MUC_OPCUA_CU_AGGREGATE_DURATIONBAD | opc_cu_2314 | claimed |  |  |  |  |  |  |
-| MUC_OPCUA_CU_HISTORICAL_ACCESS_INSERT_EVENT | opc_cu_2309 | claimed |  |  |  |  | ✅ |  |
 | MUC_OPCUA_CU_AGGREGATE_TIMEAVERAGE | opc_cu_2305 | claimed |  |  |  |  |  |  |
 | MUC_OPCUA_CU_AGGREGATE_PERCENTGOOD | opc_cu_2303 | claimed |  |  |  |  |  |  |
-| MUC_OPCUA_CU_ATTRIBUTE_READ_COMPLEX | opc_cu_2291 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_HISTORICAL_ACCESS_UPDATE_EVENT | opc_cu_2289 | claimed |  |  |  |  | ✅ |  |
 | MUC_OPCUA_CU_AGGREGATE_ENDBOUND | opc_cu_2282 | claimed |  |  |  |  |  |  |
-| MUC_OPCUA_CU_HISTORICAL_ACCESS_ANNOTATIONS | opc_cu_2276 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_A_C_TRIP | opc_cu_2275 | claimed |  |  |  |  | ✅ |  |
 | MUC_OPCUA_CU_AGGREGATE_TIMEAVERAGE2 | opc_cu_2273 | claimed |  |  |  |  |  |  |
 | MUC_OPCUA_CU_AGGREGATE_STARTBOUND | opc_cu_2267 | claimed |  |  |  |  |  |  |
 | MUC_OPCUA_CU_AGGREGATE_COUNT | opc_cu_2263 | claimed |  |  |  |  |  |  |
-| MUC_OPCUA_CU_REDUNDANCY_SERVER | opc_cu_2258 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_A_C_SYSTEMOFFNORMAL | opc_cu_2239 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_A_C_CERTIFICATEEXPIRATION | opc_cu_2236 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_GDS_LDS_ME_CONNECTIVITY | opc_cu_2233 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_GDS_APPLICATION_DIRECTORY | opc_cu_2232 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_HISTORICAL_ACCESS_REPLACE_EVENT | opc_cu_2224 | claimed |  |  |  |  | ✅ |  |
 | MUC_OPCUA_CU_AGGREGATE_DURATIONINSTATENONZERO | opc_cu_2223 | claimed |  |  |  |  |  |  |
 | MUC_OPCUA_CU_AGGREGATE_DURATIONINSTATEZERO | opc_cu_2220 | claimed |  |  |  |  |  |  |
 | MUC_OPCUA_CU_AGGREGATE_TOTAL2 | opc_cu_2210 | claimed |  |  |  |  |  |  |
-| MUC_OPCUA_CU_ATTRIBUTE_WRITE_COMPLEX | opc_cu_2203 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_A_C_ENABLE | opc_cu_2202 | claimed |  |  |  |  | ✅ |  |
 | MUC_OPCUA_CU_AGGREGATE_MAXIMUM2 | opc_cu_2188 | claimed |  |  |  |  |  |  |
-| MUC_OPCUA_CU_A_C_DIALOG | opc_cu_2180 | claimed |  |  |  |  | ✅ |  |
 | MUC_OPCUA_CU_AGGREGATE_MINIMUMACTUALTIME2 | opc_cu_2175 | claimed |  |  |  |  |  |  |
-| MUC_OPCUA_CU_ADDRESS_SPACE_USERWRITEMASK | opc_cu_2163 | claimed |  |  |  |  | ✅ |  |
 | MUC_OPCUA_MDNS_DISCOVERY | mdns_discovery | implemented |  |  |  |  | ✅ |  |
 | MUC_OPCUA_CU_USER_TOKEN_JWT | cu_user_token_jwt | implemented |  |  |  |  | ✅ | MUC_OPCUA_CU_USER_AUTH |
 | MUC_OPCUA_CU_CERTIFICATE_MANAGER_PULL | cu_certificate_manager_pull | implemented |  |  |  |  | ✅ | MUC_OPCUA_CU_CERTIFICATE_MANAGEMENT, MUC_OPCUA_CU_METHOD_SERVER, MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION |
 | MUC_OPCUA_CU_AUTHORIZATION_SERVICE_SERVER | cu_authorization_service_server | implemented |  |  |  |  |  | MUC_OPCUA_CU_USER_TOKEN_JWT, MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION |
-| MUC_OPCUA_CU_ALIASNAME | opc_cu_aliasname | claimed |  |  |  |  |  | MUC_OPCUA_FACET_CORE_2022_SERVER |
-| MUC_OPCUA_CU_SCHEDULER | opc_cu_scheduler | claimed |  |  |  |  |  | MUC_OPCUA_CU_METHOD_SERVER |
 
 ### Capacity symbols
 
@@ -1133,6 +652,10 @@ The following OPC items are tracked in the manifest but are NOT implemented. The
 | opc_facet_2322 | OPC-10000-7 §4.2 | unimplemented | AliasName Configuration Facet not implemented; AliasName feature is deferred. |
 | opc_facet_2323 | OPC-10000-7 §4.2 | unimplemented | AliasName Server PubSub Publisher Facet not implemented; AliasName+PubSub deferred. |
 <!-- END GENERATED MANIFEST TABLES -->
+
+
+
+
 
 
 
