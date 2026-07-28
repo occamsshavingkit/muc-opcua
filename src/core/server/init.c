@@ -56,16 +56,14 @@ opcua_statuscode_t mu_server_config_validate(const mu_server_config_t *config) {
     }
 
     /* Validate Endpoints */
-#if MUC_OPCUA_CU_PROTOCOL_REVERSE_CONNECT_SERVER
-    if (config->reverse_connect_url != NULL) {
-        if (strncmp(config->reverse_connect_url, "opc.tcp://", 10) != 0) {
-            return MU_STATUS_BAD_TCPENDPOINTURLINVALID;
-        }
-    } else
-#endif
-        if (config->endpoint_url == NULL || strncmp(config->endpoint_url, "opc.tcp://", 10) != 0) {
+    if (config->endpoint_url == NULL || strncmp(config->endpoint_url, "opc.tcp://", 10) != 0) {
         return MU_STATUS_BAD_TCPENDPOINTURLINVALID;
     }
+#if MUC_OPCUA_CU_PROTOCOL_REVERSE_CONNECT_SERVER
+    if (config->reverse_connect_url != NULL && strncmp(config->reverse_connect_url, "opc.tcp://", 10) != 0) {
+        return MU_STATUS_BAD_TCPENDPOINTURLINVALID;
+    }
+#endif
 
     /* Validate caller-owned buffers */
     if (config->receive_buffer == NULL || config->receive_buffer_size < MU_MIN_CHUNK_SIZE) {
@@ -173,6 +171,26 @@ static mu_string_t mu_cstr_bounded_string(const char *s) {
     }
     return (mu_string_t){mu_safe_int32_from_size_t(n), (const opcua_byte_t *)s};
 }
+
+#if MUC_OPCUA_CU_PROTOCOL_REVERSE_CONNECT_SERVER
+static void reverse_connect_cleanup(mu_server_t *server, void *handle) {
+    if (handle != NULL) {
+        server->config.tcp_adapter.close_connection(server->config.tcp_adapter.context, handle);
+    }
+#ifdef MUC_OPCUA_CU_MULTIPLE_CONNECTIONS
+    server->conns[0].client_handle = NULL;
+    server->conns[0].rx_len = 0;
+    server->conns[0].rx_read_pos = 0;
+    server->conns[0].last_activity_ms = 0;
+    server->active_conn = NULL;
+#else
+    server->client_handle = NULL;
+    server->rx_len = 0;
+    server->rx_read_pos = 0;
+    server->last_activity_ms = 0;
+#endif
+}
+#endif
 
 opcua_statuscode_t mu_server_init(void *storage, size_t storage_size, const mu_server_config_t *config,
                                   mu_server_t **out_server) {
@@ -286,11 +304,17 @@ opcua_statuscode_t mu_server_init(void *storage, size_t storage_size, const mu_s
         if (status != MU_STATUS_GOOD) {
             return status;
         }
+        if (handle == NULL) {
+            return MU_STATUS_BAD_COMMUNICATIONERROR;
+        }
 #ifdef MUC_OPCUA_CU_MULTIPLE_CONNECTIONS
         server->conns[0].client_handle = handle;
+        server->conns[0].last_activity_ms =
+            server->config.time_adapter.get_tick_ms(server->config.time_adapter.context);
         server->active_conn = &server->conns[0];
 #else
         server->client_handle = handle;
+        server->last_activity_ms = server->config.time_adapter.get_tick_ms(server->config.time_adapter.context);
 #endif
         /* OPC-10000-6 §7.1.3: the Server created the TransportConnection, so the first
            Message it sends shall be a ReverseHello; the Client replies with a Hello. */
@@ -298,13 +322,17 @@ opcua_statuscode_t mu_server_init(void *storage, size_t storage_size, const mu_s
             size_t rhe_len = server->config.send_buffer_size;
             status = mu_tcp_create_reverse_hello(&server->config, server->config.send_buffer, &rhe_len);
             if (status != MU_STATUS_GOOD) {
+                reverse_connect_cleanup(server, handle);
                 return status;
             }
             size_t written = 0;
             status = server->config.tcp_adapter.write(server->config.tcp_adapter.context, handle,
-                                                      server->config.send_buffer, rhe_len, &written);
-            if (status != MU_STATUS_GOOD) {
-                return status;
+                                                       server->config.send_buffer, rhe_len, &written);
+            if (status != MU_STATUS_GOOD || written != rhe_len) {
+                opcua_statuscode_t write_status =
+                    status != MU_STATUS_GOOD ? status : MU_STATUS_BAD_COMMUNICATIONERROR;
+                reverse_connect_cleanup(server, handle);
+                return write_status;
             }
         }
     } else
@@ -374,6 +402,10 @@ void mu_server_close(mu_server_t *server) {
             }
         }
 #else
+        if (server->client_handle != NULL) {
+            server->config.tcp_adapter.close_connection(server->config.tcp_adapter.context, server->client_handle);
+            server->client_handle = NULL;
+        }
         mu_secure_channel_close(&server_secure_channel);
 #endif
         if (server->config.tcp_adapter.shutdown != NULL) {

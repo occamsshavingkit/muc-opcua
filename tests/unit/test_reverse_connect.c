@@ -12,10 +12,44 @@
 #include <unity.h>
 
 #ifdef MUC_OPCUA_CU_PROTOCOL_REVERSE_CONNECT_SERVER
+#include "../../src/core/server/common.h"
 #include "../../src/core/tcp_connection.h"
 #endif
 
-void setUp(void) {}
+static opcua_uint64_t g_tick_ms;
+
+#ifdef MUC_OPCUA_CU_PROTOCOL_REVERSE_CONNECT_SERVER
+/* ---- mock tracking ---- */
+static int g_connect_called;
+static int g_listen_called;
+static const char *g_connect_url;
+static int g_sentinel;
+static void *g_connect_result_handle;
+static opcua_byte_t g_write_capture[512];
+static size_t g_write_capture_len;
+static int g_write_called;
+static opcua_statuscode_t g_write_status;
+static size_t g_write_result;
+static int g_close_called;
+static void *g_closed_handle;
+#endif
+
+void setUp(void) {
+    g_tick_ms = 1000;
+#ifdef MUC_OPCUA_CU_PROTOCOL_REVERSE_CONNECT_SERVER
+    g_connect_called = 0;
+    g_listen_called = 0;
+    g_connect_url = NULL;
+    g_connect_result_handle = &g_sentinel;
+    (void)memset(g_write_capture, 0, sizeof(g_write_capture));
+    g_write_capture_len = 0;
+    g_write_called = 0;
+    g_write_status = MU_STATUS_GOOD;
+    g_write_result = (size_t)-1;
+    g_close_called = 0;
+    g_closed_handle = NULL;
+#endif
+}
 void tearDown(void) {}
 
 static opcua_datetime_t test_get_time(void *ctx) {
@@ -25,7 +59,7 @@ static opcua_datetime_t test_get_time(void *ctx) {
 
 static opcua_uint64_t test_get_tick(void *ctx) {
     (void)ctx;
-    return 1000;
+    return g_tick_ms;
 }
 
 static opcua_statuscode_t test_random(void *ctx, opcua_byte_t *buf, size_t len) {
@@ -35,12 +69,6 @@ static opcua_statuscode_t test_random(void *ctx, opcua_byte_t *buf, size_t len) 
 }
 
 #ifdef MUC_OPCUA_CU_PROTOCOL_REVERSE_CONNECT_SERVER
-
-/* ---- mock tracking ---- */
-static int g_connect_called;
-static int g_listen_called;
-static const char *g_connect_url;
-static int g_sentinel;
 
 static opcua_statuscode_t mock_listen_track(void *ctx, const char *url) {
     (void)ctx;
@@ -54,7 +82,7 @@ static opcua_statuscode_t mock_connect_track(void *ctx, const char *url, void **
     (void)url;
     g_connect_called++;
     g_connect_url = url;
-    *handle = &g_sentinel;
+    *handle = g_connect_result_handle;
     return MU_STATUS_GOOD;
 }
 
@@ -73,11 +101,6 @@ static opcua_statuscode_t mock_read(void *ctx, void *h, opcua_byte_t *buf, size_
     return MU_STATUS_GOOD;
 }
 
-/* Capture the first message written to the outbound connection (the ReverseHello). */
-static opcua_byte_t g_write_capture[512];
-static size_t g_write_capture_len;
-static int g_write_called;
-
 static opcua_statuscode_t mock_write(void *ctx, void *h, const opcua_byte_t *buf, size_t len, size_t *n) {
     (void)ctx;
     (void)h;
@@ -86,13 +109,14 @@ static opcua_statuscode_t mock_write(void *ctx, void *h, const opcua_byte_t *buf
         g_write_capture_len = len;
     }
     g_write_called++;
-    *n = len;
-    return MU_STATUS_GOOD;
+    *n = g_write_result == (size_t)-1 ? len : g_write_result;
+    return g_write_status;
 }
 
 static void mock_close(void *ctx, void *h) {
     (void)ctx;
-    (void)h;
+    g_close_called++;
+    g_closed_handle = h;
 }
 
 static void mock_shutdown(void *ctx) {
@@ -205,6 +229,30 @@ void test_reverse_connect_requires_application_uri(void) {
     TEST_ASSERT_NOT_EQUAL(MU_STATUS_GOOD, mu_server_config_validate(&cfg));
 }
 
+void test_reverse_connect_requires_endpoint_url(void) {
+    opcua_byte_t rx[MU_MIN_CHUNK_SIZE];
+    opcua_byte_t tx[MU_MIN_CHUNK_SIZE];
+    mu_server_config_t cfg;
+    build_valid_config(&cfg, rx, sizeof(rx), tx, sizeof(tx));
+    build_tcp_adapter(&cfg.tcp_adapter);
+    cfg.reverse_connect_url = "opc.tcp://192.168.1.100:4840";
+    cfg.endpoint_url = NULL;
+
+    TEST_ASSERT_NOT_EQUAL(MU_STATUS_GOOD, mu_server_config_validate(&cfg));
+}
+
+void test_reverse_connect_rejects_malformed_endpoint_url(void) {
+    opcua_byte_t rx[MU_MIN_CHUNK_SIZE];
+    opcua_byte_t tx[MU_MIN_CHUNK_SIZE];
+    mu_server_config_t cfg;
+    build_valid_config(&cfg, rx, sizeof(rx), tx, sizeof(tx));
+    build_tcp_adapter(&cfg.tcp_adapter);
+    cfg.reverse_connect_url = "opc.tcp://192.168.1.100:4840";
+    cfg.endpoint_url = "http://localhost:4840";
+
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_BAD_TCPENDPOINTURLINVALID, mu_server_config_validate(&cfg));
+}
+
 /* FR-1: the ReverseHello encoder produces a spec RHEF message (OPC-10000-6 §7.1.2.6):
    'R','H','E','F', declared MessageSize == actual length, then ServerUri + EndpointUrl. */
 void test_reverse_hello_encoder_produces_valid_rhe(void) {
@@ -266,6 +314,115 @@ void test_reverse_connect_emits_reverse_hello_first(void) {
     mu_server_close(server);
 }
 
+void test_reverse_connect_successful_shutdown_closes_outbound_handle(void) {
+    opcua_byte_t rx[MU_MIN_CHUNK_SIZE];
+    opcua_byte_t tx[MU_MIN_CHUNK_SIZE];
+    mu_server_config_t cfg;
+    build_valid_config(&cfg, rx, sizeof(rx), tx, sizeof(tx));
+    build_tcp_adapter(&cfg.tcp_adapter);
+    cfg.reverse_connect_url = "opc.tcp://192.168.1.100:4840";
+
+    _Alignas(8) opcua_byte_t storage[MU_SERVER_STORAGE_BYTES];
+    mu_server_t *server = NULL;
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_server_init(storage, sizeof(storage), &cfg, &server));
+
+    mu_server_close(server);
+
+    TEST_ASSERT_EQUAL_INT(1, g_close_called);
+    TEST_ASSERT_EQUAL_PTR(&g_sentinel, g_closed_handle);
+}
+
+void test_reverse_connect_rejects_success_without_connection_handle(void) {
+    opcua_byte_t rx[MU_MIN_CHUNK_SIZE];
+    opcua_byte_t tx[MU_MIN_CHUNK_SIZE];
+    mu_server_config_t cfg;
+    build_valid_config(&cfg, rx, sizeof(rx), tx, sizeof(tx));
+    build_tcp_adapter(&cfg.tcp_adapter);
+    cfg.reverse_connect_url = "opc.tcp://192.168.1.100:4840";
+    g_connect_result_handle = NULL;
+
+    _Alignas(8) opcua_byte_t storage[MU_SERVER_STORAGE_BYTES];
+    mu_server_t *server = NULL;
+    opcua_statuscode_t status = mu_server_init(storage, sizeof(storage), &cfg, &server);
+
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_BAD_COMMUNICATIONERROR, status);
+    TEST_ASSERT_EQUAL_INT(0, g_write_called);
+    TEST_ASSERT_EQUAL_INT(0, g_close_called);
+}
+
+void test_reverse_connect_rejects_partial_reverse_hello_write_without_leaking_handle(void) {
+    opcua_byte_t rx[MU_MIN_CHUNK_SIZE];
+    opcua_byte_t tx[MU_MIN_CHUNK_SIZE];
+    mu_server_config_t cfg;
+    build_valid_config(&cfg, rx, sizeof(rx), tx, sizeof(tx));
+    build_tcp_adapter(&cfg.tcp_adapter);
+    cfg.reverse_connect_url = "opc.tcp://192.168.1.100:4840";
+    g_write_result = 1;
+
+    _Alignas(8) opcua_byte_t storage[MU_SERVER_STORAGE_BYTES];
+    mu_server_t *server = NULL;
+    opcua_statuscode_t status = mu_server_init(storage, sizeof(storage), &cfg, &server);
+
+    TEST_ASSERT_NOT_EQUAL(MU_STATUS_GOOD, status);
+    TEST_ASSERT_EQUAL_INT(1, g_close_called);
+    TEST_ASSERT_EQUAL_PTR(&g_sentinel, g_closed_handle);
+}
+
+void test_reverse_connect_rejects_zero_byte_reverse_hello_write_without_leaking_handle(void) {
+    opcua_byte_t rx[MU_MIN_CHUNK_SIZE];
+    opcua_byte_t tx[MU_MIN_CHUNK_SIZE];
+    mu_server_config_t cfg;
+    build_valid_config(&cfg, rx, sizeof(rx), tx, sizeof(tx));
+    build_tcp_adapter(&cfg.tcp_adapter);
+    cfg.reverse_connect_url = "opc.tcp://192.168.1.100:4840";
+    g_write_result = 0;
+
+    _Alignas(8) opcua_byte_t storage[MU_SERVER_STORAGE_BYTES];
+    mu_server_t *server = NULL;
+    opcua_statuscode_t status = mu_server_init(storage, sizeof(storage), &cfg, &server);
+
+    TEST_ASSERT_NOT_EQUAL(MU_STATUS_GOOD, status);
+    TEST_ASSERT_EQUAL_INT(1, g_close_called);
+    TEST_ASSERT_EQUAL_PTR(&g_sentinel, g_closed_handle);
+}
+
+void test_reverse_connect_write_error_does_not_leak_outbound_handle(void) {
+    opcua_byte_t rx[MU_MIN_CHUNK_SIZE];
+    opcua_byte_t tx[MU_MIN_CHUNK_SIZE];
+    mu_server_config_t cfg;
+    build_valid_config(&cfg, rx, sizeof(rx), tx, sizeof(tx));
+    build_tcp_adapter(&cfg.tcp_adapter);
+    cfg.reverse_connect_url = "opc.tcp://192.168.1.100:4840";
+    g_write_status = MU_STATUS_BAD_COMMUNICATIONERROR;
+
+    _Alignas(8) opcua_byte_t storage[MU_SERVER_STORAGE_BYTES];
+    mu_server_t *server = NULL;
+    opcua_statuscode_t status = mu_server_init(storage, sizeof(storage), &cfg, &server);
+
+    TEST_ASSERT_EQUAL_HEX32(MU_STATUS_BAD_COMMUNICATIONERROR, status);
+    TEST_ASSERT_EQUAL_INT(1, g_close_called);
+    TEST_ASSERT_EQUAL_PTR(&g_sentinel, g_closed_handle);
+}
+
+void test_reverse_connect_at_high_uptime_survives_first_poll(void) {
+    opcua_byte_t rx[MU_MIN_CHUNK_SIZE];
+    opcua_byte_t tx[MU_MIN_CHUNK_SIZE];
+    mu_server_config_t cfg;
+    build_valid_config(&cfg, rx, sizeof(rx), tx, sizeof(tx));
+    build_tcp_adapter(&cfg.tcp_adapter);
+    cfg.reverse_connect_url = "opc.tcp://192.168.1.100:4840";
+    g_tick_ms = (opcua_uint64_t)MU_CONNECT_TIMEOUT_MS + 1u;
+
+    _Alignas(8) opcua_byte_t storage[MU_SERVER_STORAGE_BYTES];
+    mu_server_t *server = NULL;
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_server_init(storage, sizeof(storage), &cfg, &server));
+
+    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_server_poll(server));
+    TEST_ASSERT_EQUAL_INT(0, g_close_called);
+
+    mu_server_close(server);
+}
+
 #else /* !MUC_OPCUA_CU_PROTOCOL_REVERSE_CONNECT_SERVER */
 
 void test_reverse_connect_requires_build_flag(void) {
@@ -281,8 +438,16 @@ int main(void) {
     RUN_TEST(test_null_reverse_connect_url_calls_listen);
     RUN_TEST(test_reverse_connect_url_requires_connect_callback);
     RUN_TEST(test_reverse_connect_requires_application_uri);
+    RUN_TEST(test_reverse_connect_requires_endpoint_url);
+    RUN_TEST(test_reverse_connect_rejects_malformed_endpoint_url);
     RUN_TEST(test_reverse_hello_encoder_produces_valid_rhe);
     RUN_TEST(test_reverse_connect_emits_reverse_hello_first);
+    RUN_TEST(test_reverse_connect_successful_shutdown_closes_outbound_handle);
+    RUN_TEST(test_reverse_connect_rejects_success_without_connection_handle);
+    RUN_TEST(test_reverse_connect_rejects_partial_reverse_hello_write_without_leaking_handle);
+    RUN_TEST(test_reverse_connect_rejects_zero_byte_reverse_hello_write_without_leaking_handle);
+    RUN_TEST(test_reverse_connect_write_error_does_not_leak_outbound_handle);
+    RUN_TEST(test_reverse_connect_at_high_uptime_survives_first_poll);
 #else
     RUN_TEST(test_reverse_connect_requires_build_flag);
 #endif
