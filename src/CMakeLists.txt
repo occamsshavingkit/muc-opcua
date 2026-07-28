@@ -408,9 +408,9 @@ if(MUC_OPCUA_MARKER_STANDARD_PROFILE)
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_STANDARD_PROFILE=1)
 endif()
 
-if(MUC_OPCUA_CU_REVERSE_CONNECT)
-    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_CU_REVERSE_CONNECT=1)
-    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_REVERSE_CONNECT=1)
+# -- CU 2867: Protocol Reverse Connect Server --
+if(MUC_OPCUA_CU_PROTOCOL_REVERSE_CONNECT_SERVER)
+    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_CU_PROTOCOL_REVERSE_CONNECT_SERVER=1)
 endif()
 
 # -- CU 3192: Base Info Diagnostics --

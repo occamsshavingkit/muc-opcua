@@ -11,7 +11,7 @@
 #include <string.h>
 #include <unity.h>
 
-#ifdef MUC_OPCUA_REVERSE_CONNECT
+#ifdef MUC_OPCUA_CU_PROTOCOL_REVERSE_CONNECT_SERVER
 #include "../../src/core/tcp_connection.h"
 #endif
 
@@ -34,7 +34,7 @@ static opcua_statuscode_t test_random(void *ctx, opcua_byte_t *buf, size_t len) 
     return MU_STATUS_GOOD;
 }
 
-#ifdef MUC_OPCUA_REVERSE_CONNECT
+#ifdef MUC_OPCUA_CU_PROTOCOL_REVERSE_CONNECT_SERVER
 
 /* ---- mock tracking ---- */
 static int g_connect_called;
@@ -266,17 +266,17 @@ void test_reverse_connect_emits_reverse_hello_first(void) {
     mu_server_close(server);
 }
 
-#else /* !MUC_OPCUA_REVERSE_CONNECT */
+#else /* !MUC_OPCUA_CU_PROTOCOL_REVERSE_CONNECT_SERVER */
 
 void test_reverse_connect_requires_build_flag(void) {
-    TEST_PASS_MESSAGE("Reverse Connect gated behind MUC_OPCUA_REVERSE_CONNECT");
+    TEST_PASS_MESSAGE("Reverse Connect gated behind MUC_OPCUA_CU_PROTOCOL_REVERSE_CONNECT_SERVER");
 }
 
-#endif /* MUC_OPCUA_REVERSE_CONNECT */
+#endif /* MUC_OPCUA_CU_PROTOCOL_REVERSE_CONNECT_SERVER */
 
 int main(void) {
     UNITY_BEGIN();
-#ifdef MUC_OPCUA_REVERSE_CONNECT
+#ifdef MUC_OPCUA_CU_PROTOCOL_REVERSE_CONNECT_SERVER
     RUN_TEST(test_reverse_connect_url_calls_connect_not_listen);
     RUN_TEST(test_null_reverse_connect_url_calls_listen);
     RUN_TEST(test_reverse_connect_url_requires_connect_callback);
