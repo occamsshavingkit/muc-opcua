@@ -327,10 +327,9 @@ opcua_statuscode_t mu_server_init(void *storage, size_t storage_size, const mu_s
             }
             size_t written = 0;
             status = server->config.tcp_adapter.write(server->config.tcp_adapter.context, handle,
-                                                       server->config.send_buffer, rhe_len, &written);
+                                                      server->config.send_buffer, rhe_len, &written);
             if (status != MU_STATUS_GOOD || written != rhe_len) {
-                opcua_statuscode_t write_status =
-                    status != MU_STATUS_GOOD ? status : MU_STATUS_BAD_COMMUNICATIONERROR;
+                opcua_statuscode_t write_status = status != MU_STATUS_GOOD ? status : MU_STATUS_BAD_COMMUNICATIONERROR;
                 reverse_connect_cleanup(server, handle);
                 return write_status;
             }
