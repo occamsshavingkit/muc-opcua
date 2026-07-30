@@ -10,12 +10,12 @@ _HERE = os.path.dirname(os.path.abspath(__file__))
 if _HERE not in sys.path:
     sys.path.insert(0, _HERE)
 
-from generate import (  # noqa: E402
+from generate import (  # noqa: E402  # pylint: disable=wrong-import-position
     generate_build_docs_section,
     generate_kconfig,
     update_build_docs,
 )
-from model import validate_manifest  # noqa: E402
+from model import validate_manifest  # noqa: E402  # pylint: disable=wrong-import-position
 
 
 _PROFILE_DEFAULTS = {
