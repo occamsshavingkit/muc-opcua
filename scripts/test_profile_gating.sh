@@ -24,9 +24,19 @@ trap 'rm -rf "$WORKDIR"' EXIT
 PASS=0
 FAIL=0
 
-# assert_cfg <build-dir> <SYM> <ON|OFF>   -- checks muc_opcua_config.cmake
+# assert_cfg <build-dir> <SYM> <ON|OFF|UNDEFINED> -- checks muc_opcua_config.cmake
 assert_cfg() {
     local dir="$1" sym="$2" expected="$3" actual
+    if [ "$expected" = "UNDEFINED" ]; then
+        if grep -qE "^set\(MUC_OPCUA_${sym} " "$dir/muc_opcua_config.cmake" 2>/dev/null; then
+            echo "  FAIL  MUC_OPCUA_$sym is defined (expected Kconfig-undefined) [$dir]"
+            FAIL=$((FAIL + 1))
+        else
+            echo "  PASS  MUC_OPCUA_$sym is absent from Kconfig-resolved output"
+            PASS=$((PASS + 1))
+        fi
+        return
+    fi
     actual=$(grep -E "^set\(MUC_OPCUA_${sym} (ON|OFF)\)\$" "$dir/muc_opcua_config.cmake" 2>/dev/null | sed -E 's/.* (ON|OFF)\)/\1/')
     if [ "$actual" = "$expected" ]; then
         echo "  PASS  MUC_OPCUA_$sym=$actual (expected $expected)"
@@ -337,7 +347,7 @@ if cmake -S . -B "$D17" -DMUC_OPCUA_PROFILE=custom \
     -DMUC_OPCUA_BUILD_TESTS=ON \
     -DMUC_OPCUA_PLATFORM=host >"$D17_CONFIGURE_LOG" 2>&1; then
     assert_cfg "$D17" CU_DISCOVERY_FIND_SERVERS_SELF_GET_ENDPOINTS ON
-    assert_cache_cfg "$D17" CU_DISCOVERY_FIND_SERVERS_SELF OFF
+    assert_cfg "$D17" CU_DISCOVERY_FIND_SERVERS_SELF UNDEFINED
     assert_cfg "$D17" CU_DISCOVERY_GET_ENDPOINTS OFF
 
     if cmake --build "$D17" --target test_get_endpoints_gate -j4 >"$D17_BUILD_LOG" 2>&1; then
@@ -389,6 +399,54 @@ if cmake -S . -B "$D18" -DMUC_OPCUA_PROFILE=custom \
 else
     echo "  FAIL  could not configure Reverse Connect without Multiple Connections"
     cat "$D18_CONFIGURE_LOG"
+    FAIL=$((FAIL + 1))
+fi
+
+echo "### 19. Stale documented Write Value override cannot bypass canonical Kconfig gate ###"
+D19="$WORKDIR/g19"
+D19_CONFIGURE_LOG="$WORKDIR/g19-configure.log"
+D19_BUILD_LOG="$WORKDIR/g19-build.log"
+if cmake -S . -B "$D19" -DMUC_OPCUA_PROFILE=custom \
+    -DMUC_OPCUA_FACET_CORE_2022_SERVER=ON \
+    -DMUC_OPCUA_CU_CORE_2017_ATTRIBUTE_WRITE=OFF \
+    -DMUC_OPCUA_CU_ATTRIBUTE_WRITE_VALUES=ON \
+    -DMUC_OPCUA_PLATFORM=host \
+    -DCMAKE_EXPORT_COMPILE_COMMANDS=ON >"$D19_CONFIGURE_LOG" 2>&1; then
+    assert_cfg "$D19" CU_CORE_2017_ATTRIBUTE_WRITE OFF
+
+    if grep -q -- "-DMUC_OPCUA_SERVICE_WRITE=1" "$D19/compile_commands.json"; then
+        echo "  FAIL  stale Write Value override emitted MUC_OPCUA_SERVICE_WRITE=1"
+        FAIL=$((FAIL + 1))
+    else
+        echo "  PASS  stale Write Value override did not emit MUC_OPCUA_SERVICE_WRITE=1"
+        PASS=$((PASS + 1))
+    fi
+
+    if grep -q -- "-DMUC_OPCUA_CU_ATTRIBUTE_WRITE_VALUES=1" "$D19/compile_commands.json"; then
+        echo "  FAIL  stale Write Value override emitted MUC_OPCUA_CU_ATTRIBUTE_WRITE_VALUES=1"
+        FAIL=$((FAIL + 1))
+    else
+        echo "  PASS  stale Write Value override did not emit MUC_OPCUA_CU_ATTRIBUTE_WRITE_VALUES=1"
+        PASS=$((PASS + 1))
+    fi
+
+    if cmake --build "$D19" --target muc_opcua -j4 >"$D19_BUILD_LOG" 2>&1; then
+        if nm --defined-only "$D19/src/libmuc_opcua.a" 2>/dev/null | \
+            grep -qE '(^|[[:space:]])(handle_write|mu_write_request_decode|mu_write_response_encode)$'; then
+            echo "  FAIL  stale Write Value override compiled Write sources or handler"
+            FAIL=$((FAIL + 1))
+        else
+            echo "  PASS  stale Write Value override did not compile Write sources or handler"
+            PASS=$((PASS + 1))
+        fi
+    else
+        echo "  FAIL  could not build stale Write Value override scenario"
+        cat "$D19_BUILD_LOG"
+        FAIL=$((FAIL + 1))
+    fi
+else
+    echo "  FAIL  could not configure stale Write Value override scenario"
+    cat "$D19_CONFIGURE_LOG"
     FAIL=$((FAIL + 1))
 fi
 

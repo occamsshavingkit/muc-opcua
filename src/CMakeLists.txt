@@ -151,17 +151,13 @@ if(MUC_OPCUA_CU_VIEW_REGISTERNODES)
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_CU_VIEW_REGISTERNODES=1)
 endif()
 
-# -- CU: Attribute Write Values (OPC-10000-4 5.11.4) --
-# MUC_OPCUA_CU_CORE_2017_ATTRIBUTE_WRITE remains a compatibility aggregate for
-# full-profile builds; custom builds can enable the dedicated Write Value CU
-# independently with MUC_OPCUA_CU_ATTRIBUTE_WRITE_VALUES.
+# -- CU: Core 2017 Attribute Write (OPC-10000-4 5.10.4) --
+# MUC_OPCUA_WRITE_VALUE_ENABLED is derived from the canonical Kconfig CU after
+# dependency resolution and is the only build-system gate for Write support.
 if(MUC_OPCUA_WRITE_VALUE_ENABLED)
     file(GLOB _sources cu/core_2022_server/attribute_write/*.c)
     target_sources(muc_opcua PRIVATE ${_sources})
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_SERVICE_WRITE=1)
-endif()
-if(MUC_OPCUA_CU_ATTRIBUTE_WRITE_VALUES)
-    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_CU_ATTRIBUTE_WRITE_VALUES=1)
 endif()
 if(MUC_OPCUA_CU_SESSION_CHANGE_USER)
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_CU_SESSION_CHANGE_USER=1)
