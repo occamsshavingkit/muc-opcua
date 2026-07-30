@@ -47,19 +47,6 @@ assert_cfg() {
     fi
 }
 
-# assert_cache_cfg <build-dir> <SYM> <ON|OFF> -- checks an explicit CMake-only gate
-assert_cache_cfg() {
-    local dir="$1" sym="$2" expected="$3" actual
-    actual=$(grep -E "^MUC_OPCUA_${sym}:[^=]+=(ON|OFF)\$" "$dir/CMakeCache.txt" 2>/dev/null | cut -d= -f2)
-    if [ "$actual" = "$expected" ]; then
-        echo "  PASS  MUC_OPCUA_$sym=$actual (expected $expected)"
-        PASS=$((PASS + 1))
-    else
-        echo "  FAIL  MUC_OPCUA_$sym=$actual (expected $expected) [$dir]"
-        FAIL=$((FAIL + 1))
-    fi
-}
-
 echo "### 1. 'standard' baseline: profile symbol, cascade, facets, CUs ###"
 D1="$WORKDIR/g1"
 cmake -S . -B "$D1" -DMUC_OPCUA_PROFILE=standard -DMUC_OPCUA_PLATFORM=host >/dev/null 2>&1
@@ -414,29 +401,40 @@ if cmake -S . -B "$D19" -DMUC_OPCUA_PROFILE=custom \
     -DCMAKE_EXPORT_COMPILE_COMMANDS=ON >"$D19_CONFIGURE_LOG" 2>&1; then
     assert_cfg "$D19" CU_CORE_2017_ATTRIBUTE_WRITE OFF
 
-    if grep -q -- "-DMUC_OPCUA_SERVICE_WRITE=1" "$D19/compile_commands.json"; then
-        echo "  FAIL  stale Write Value override emitted MUC_OPCUA_SERVICE_WRITE=1"
+    if [ ! -f "$D19/compile_commands.json" ]; then
+        echo "  FAIL  stale Write Value override scenario did not produce compile_commands.json"
         FAIL=$((FAIL + 1))
     else
-        echo "  PASS  stale Write Value override did not emit MUC_OPCUA_SERVICE_WRITE=1"
-        PASS=$((PASS + 1))
-    fi
+        if grep -q -- "-DMUC_OPCUA_SERVICE_WRITE=1" "$D19/compile_commands.json"; then
+            echo "  FAIL  stale Write Value override emitted MUC_OPCUA_SERVICE_WRITE=1"
+            FAIL=$((FAIL + 1))
+        else
+            echo "  PASS  stale Write Value override did not emit MUC_OPCUA_SERVICE_WRITE=1"
+            PASS=$((PASS + 1))
+        fi
 
-    if grep -q -- "-DMUC_OPCUA_CU_ATTRIBUTE_WRITE_VALUES=1" "$D19/compile_commands.json"; then
-        echo "  FAIL  stale Write Value override emitted MUC_OPCUA_CU_ATTRIBUTE_WRITE_VALUES=1"
-        FAIL=$((FAIL + 1))
-    else
-        echo "  PASS  stale Write Value override did not emit MUC_OPCUA_CU_ATTRIBUTE_WRITE_VALUES=1"
-        PASS=$((PASS + 1))
+        if grep -q -- "-DMUC_OPCUA_CU_ATTRIBUTE_WRITE_VALUES=1" "$D19/compile_commands.json"; then
+            echo "  FAIL  stale Write Value override emitted MUC_OPCUA_CU_ATTRIBUTE_WRITE_VALUES=1"
+            FAIL=$((FAIL + 1))
+        else
+            echo "  PASS  stale Write Value override did not emit MUC_OPCUA_CU_ATTRIBUTE_WRITE_VALUES=1"
+            PASS=$((PASS + 1))
+        fi
     fi
 
     if cmake --build "$D19" --target muc_opcua -j4 >"$D19_BUILD_LOG" 2>&1; then
-        if nm --defined-only "$D19/src/libmuc_opcua.a" 2>/dev/null | \
+        if [ ! -f "$D19/src/libmuc_opcua.a" ]; then
+            echo "  FAIL  stale Write Value override scenario did not produce src/libmuc_opcua.a"
+            FAIL=$((FAIL + 1))
+        elif ! D19_NM_OUTPUT=$(nm "$D19/src/libmuc_opcua.a" 2>/dev/null); then
+            echo "  FAIL  could not inspect compiled Write symbols in src/libmuc_opcua.a"
+            FAIL=$((FAIL + 1))
+        elif printf '%s\n' "$D19_NM_OUTPUT" | \
             grep -qE '(^|[[:space:]])(handle_write|mu_write_request_decode|mu_write_response_encode)$'; then
-            echo "  FAIL  stale Write Value override compiled Write sources or handler"
+            echo "  FAIL  stale Write Value override compiled Write symbols"
             FAIL=$((FAIL + 1))
         else
-            echo "  PASS  stale Write Value override did not compile Write sources or handler"
+            echo "  PASS  stale Write Value override did not compile Write symbols"
             PASS=$((PASS + 1))
         fi
     else
