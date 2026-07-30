@@ -9,7 +9,8 @@ _HERE = os.path.dirname(os.path.abspath(__file__))
 if _HERE not in sys.path:
     sys.path.insert(0, _HERE)
 
-from generate import generate_kconfig, validate_manifest  # noqa: E402
+from generate import generate_kconfig  # noqa: E402
+from model import validate_manifest  # noqa: E402
 
 
 _PROFILE_DEFAULTS = {
@@ -111,6 +112,51 @@ class GenerateKconfigTest(unittest.TestCase):
         self.assertNotRegex(
             kconfig,
             r"(?m)^config MUC_OPCUA_CU_DOCUMENTED_CAPABILITY$",
+        )
+
+    def test_documented_cu_without_facet_is_visible_flat_without_symbol(self) -> None:
+        manifest = {
+            "schema_version": 1,
+            "profiles": _profiles(),
+            "items": [
+                {
+                    "id": "flat_documented_cu",
+                    "kind": "conformance_unit",
+                    "implementation_state": "documented",
+                    "kconfig_symbol": "MUC_OPCUA_CU_FLAT_DOCUMENTED_CAPABILITY",
+                    "opc_display_name": "Flat Documented Capability",
+                    "opc_reference": {
+                        "spec": "OPC-10000-7",
+                        "section": "6.5",
+                        "cu_id": "9998",
+                        "cu_name": "Flat Documented Capability",
+                    },
+                    "notes": "Satisfied by shipped documentation.",
+                    "profile_defaults": dict(_PROFILE_DEFAULTS),
+                },
+            ],
+            "capacities": [],
+        }
+
+        self.assertEqual(validate_manifest(manifest), [])
+        kconfig = generate_kconfig(manifest)
+        flat_section = (
+            'comment "Documented/unimplemented OPC items '
+            '(visible but not selectable)"'
+        )
+        documented_comment = (
+            'comment "Flat Documented Capability (DOCUMENTED) '
+            '[OPC-10000-7 §6.5]"'
+        )
+
+        section_start = kconfig.index(flat_section)
+        section_end = kconfig.index("\nendmenu\n", section_start)
+        documented_position = kconfig.index(documented_comment)
+        self.assertLess(section_start, documented_position)
+        self.assertLess(documented_position, section_end)
+        self.assertNotRegex(
+            kconfig,
+            r"(?m)^config MUC_OPCUA_CU_FLAT_DOCUMENTED_CAPABILITY$",
         )
 
 
