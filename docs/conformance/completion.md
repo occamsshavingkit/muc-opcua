@@ -106,10 +106,10 @@ reconciliation note below.
 | 2250 | Embedded DataChange Subscription 2022 Server Facet | 9/9 | 1/1 |
 | 2252 | Redundancy Visible Server Facet | 0/1 | 0/0 |
 | 2255 | Micro Embedded Device 2022 Server Profile | 16/32 | 17/30 |
-| 2266 | Nano Embedded Device 2025 Server Profile | 7/22 | 16/29 |
-| 2267 | Micro Embedded Device 2025 Server Profile | 16/32 | 17/30 |
-| 2268 | Embedded 2025 UA Server Profile | 21/51 | 19/68 |
-| 2269 | Standard 2025 UA Server Profile | 24/55 | 19/68 |
+| 2266 | Nano Embedded Device 2025 Server Profile | 6/18 | 17/30 |
+| 2267 | Micro Embedded Device 2025 Server Profile | 15/30 | 18/32 |
+| 2268 | Embedded 2025 UA Server Profile | 20/48 | 20/71 |
+| 2269 | Standard 2025 UA Server Profile | 23/52 | 20/71 |
 | 2322 | AliasName Configuration Facet | 0/4 | 0/5 |
 | 2323 | AliasName Server PubSub Publisher Facet | 0/4 | 0/4 |
 
@@ -534,6 +534,7 @@ Facet CU membership uses direct `included_conformance_units`
 - **Core 2022 Server Facet** (`opc_facet_1322`): required 6/16, optional 17/28
 - **Standard DataChange Subscription 2022 Server Facet** (`opc_facet_1324`): required 12/16, optional 1/1
 - **Global Certificate Management Server Facet** (`opc_facet_1631`): required 0/1, optional 0/0
+- **Reverse Connect Server Facet** (`opc_facet_1632`): required 1/1, optional 0/0
 - **AliasName Server Facet** (`opc_facet_1636`): required 0/3, optional 0/4
 - **AliasName Aggregating Server Facet** (`opc_facet_1637`): required 0/4, optional 0/5
 - **User Token – User Name Password Server Facet** (`opc_facet_1695`): required 0/2, optional 0/1

@@ -9,10 +9,12 @@ exclusion — on a small known manifest, independent of the real data.
 from __future__ import annotations
 
 import importlib.util
+import json
 import pathlib
 import unittest
 
 _PATH = pathlib.Path(__file__).with_name("completion.py")
+_REPO = pathlib.Path(__file__).resolve().parents[2]
 _SPEC = importlib.util.spec_from_file_location("profile_manifest_completion", _PATH)
 assert _SPEC is not None and _SPEC.loader is not None
 completion = importlib.util.module_from_spec(_SPEC)
@@ -118,6 +120,79 @@ class TestCompletion(unittest.TestCase):
             manifest, snapshot, {"key": None, "opc_id": "1322", "rel": "included_conformance_units"})
         self.assertEqual((r["required_implemented"], r["required_total"]), (1, 1))
         self.assertEqual((r["optional_implemented"], r["optional_total"]), (0, 1))
+
+    def test_manifest_profile_summary_matches_detailed_completion(self):
+        # Given the committed manifest, normalized snapshot, and Server catalog.
+        manifest = json.loads((_REPO / "profiles/opcua-profile-manifest.yaml").read_text())
+        snapshot = json.loads(
+            (_REPO / "profiles/opcua-profile-normalized-snapshot.json").read_text()
+        )
+        catalog = json.loads((_REPO / "profiles/opcua-server-conformance.json").read_text())
+        catalog_profiles = {str(profile["opc_id"]): profile for profile in catalog["profiles"]}
+        manifest_profiles = {
+            key: profile
+            for key, profile in manifest["profiles"].items()
+            if profile.get("opc_id") is not None
+        }
+        manifest_opc_ids = {
+            str(profile["opc_id"])
+            for profile in manifest_profiles.values()
+        }
+        catalog_only_profile = min(
+            (
+                profile
+                for profile in catalog["profiles"]
+                if str(profile["opc_id"]) not in manifest_opc_ids
+            ),
+            key=lambda profile: int(profile["opc_id"]),
+        )
+        by_cu_id = completion._index_by_cu_id(manifest["items"])
+        optionality_differences = 0
+        not_applicable_cus = 0
+        for key, profile in manifest_profiles.items():
+            opc_id = str(profile["opc_id"])
+            for cu_id in snapshot["relationships"]["transitive_cu_closure"][opc_id]:
+                entry = by_cu_id.get(str(cu_id))
+                if entry is None:
+                    continue
+                if key in (entry.get("not_applicable") or {}):
+                    not_applicable_cus += 1
+                if (entry.get("cu_optional") is True) != (
+                    catalog["conformance_unit_optional"].get(str(cu_id)) is True
+                ):
+                    optionality_differences += 1
+        self.assertGreater(not_applicable_cus, 0)
+        self.assertGreater(optionality_differences, 0)
+
+        # When the report renders the repeated Server summary rows.
+        report_lines = set(completion.render_report(manifest, snapshot, catalog).splitlines())
+
+        # Then every manifest-backed summary uses its detailed checklist arithmetic.
+        for key, profile in manifest_profiles.items():
+            opc_id = str(profile["opc_id"])
+            detail = completion.compute_profile_completion(
+                manifest, snapshot, {"key": key, "opc_id": opc_id}
+            )
+            catalog_profile = catalog_profiles[opc_id]
+            expected = (
+                f"| {opc_id} | {catalog_profile['name']} | "
+                f"{detail['required_implemented']}/{detail['required_total']} | "
+                f"{detail['optional_implemented']}/{detail['optional_total']} |"
+            )
+            self.assertIn(expected, report_lines)
+
+        catalog_detail = completion.compute_catalog_completion(
+            manifest,
+            catalog_only_profile["conformance_units"],
+            catalog["conformance_unit_optional"],
+        )
+        catalog_opc_id = str(catalog_only_profile["opc_id"])
+        catalog_expected = (
+            f"| {catalog_opc_id} | {catalog_only_profile['name']} | "
+            f"{catalog_detail['required_implemented']}/{catalog_detail['required_total']} | "
+            f"{catalog_detail['optional_implemented']}/{catalog_detail['optional_total']} |"
+        )
+        self.assertIn(catalog_expected, report_lines)
 
 
 if __name__ == "__main__":
