@@ -1865,7 +1865,7 @@ def generate_build_docs_section(manifest: dict) -> str:
             item_id = item.get("id", "")
             opc_ref = _roadmap_opc_ref(item)
             state = item.get("implementation_state", "")
-            notes = _sanitize_kconfig_text(item.get("notes"))
+            notes = _sanitize_kconfig_text(item.get("notes")).replace("|", r"\|")
             lines.append(
                 "| " + item_id + " | " + opc_ref + " | " + state + " | " + notes + " |"
             )
@@ -1886,7 +1886,13 @@ def update_build_docs(manifest: dict, path: str) -> None:
     appends at end of file if that heading is absent).
     """
     section = generate_build_docs_section(manifest)
-    blocked = _BUILD_DOCS_BEGIN + "\n" + section + _BUILD_DOCS_END + "\n"
+    blocked = (
+        _BUILD_DOCS_BEGIN
+        + "\n"
+        + section.rstrip("\n")
+        + "\n"
+        + _BUILD_DOCS_END
+    )
 
     try:
         with open(path, "r", encoding="utf-8") as fh:
@@ -1900,17 +1906,18 @@ def update_build_docs(manifest: dict, path: str) -> None:
     if begin_idx != -1 and end_idx != -1 and end_idx > begin_idx:
         before = content[:begin_idx]
         after = content[end_idx + len(_BUILD_DOCS_END):]
-        new_content = before + blocked + after
     else:
         anchor = "\n## Verifying gating behavior\n"
-        insertion = "\n" + blocked + "\n"
         anchor_idx = content.find(anchor)
         if anchor_idx != -1:
-            new_content = content[:anchor_idx] + insertion + content[anchor_idx:]
-        elif content.endswith("\n"):
-            new_content = content + "\n" + blocked
+            before = content[:anchor_idx]
+            after = content[anchor_idx:]
         else:
-            new_content = content + "\n\n" + blocked
+            before = content
+            after = ""
+
+    parts = [part for part in (before.rstrip("\n"), blocked, after.lstrip("\n")) if part]
+    new_content = "\n\n".join(parts).rstrip("\n") + "\n"
 
     with open(path, "w", encoding="utf-8") as fh:
         fh.write(new_content)

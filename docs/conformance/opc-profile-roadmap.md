@@ -16,7 +16,7 @@ remains future work.
 | State | Count |
 |-------|-------|
 | claimed | 130 |
-| implemented | 15 |
+| implemented | 16 |
 | documented | 485 |
 | deferred | 7 |
 | unimplemented | 11 |
@@ -61,6 +61,7 @@ remains future work.
 | opc_facet_1219 | facet | implemented | OPC-10000-7 §4.2 | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER | embedded, standard, full | — |
 | opc_facet_1324 | facet | implemented | OPC-10000-7 §4.2 | MUC_OPCUA_FACET_STANDARD_DATACHANGE_SUBSCRIPTION_2022_SERVER | embedded, standard, full | — |
 | opc_facet_1631 | facet | implemented | OPC-10000-7 §4.2 | MUC_OPCUA_FACET_GLOBAL_CERTIFICATE_MANAGEMENT_SERVER | embedded, standard, full | — |
+| opc_facet_1632 | facet | implemented | OPC-10000-7 §4.2 | MUC_OPCUA_FACET_REVERSE_CONNECT_SERVER | full | — |
 | opc_facet_1695 | facet | implemented | OPC-10000-7 §4.2 | MUC_OPCUA_FACET_USER_TOKEN_USER_NAME_PASSWORD_SERVER | embedded, standard, full | — |
 | opc_facet_1696 | facet | implemented | OPC-10000-7 §4.2 | MUC_OPCUA_FACET_USER_TOKEN_X509_CERTIFICATE_SERVER | standard, full | — |
 | opc_facet_2250 | facet | implemented | OPC-10000-7 §4.2 | MUC_OPCUA_FACET_EMBEDDED_DATACHANGE_SUBSCRIPTION_2022_SERVER | micro, embedded, standard, full | — |
@@ -214,7 +215,7 @@ remains future work.
 | opc_facet_1760 | facet | implemented | OPC-10000-7 §4.2 | MUC_OPCUA_FACET_SECURITY_TIME_SYNCHRONIZATION | all | — |
 | opc_cu_2317 | conformance_unit | claimed | OPC-10000-4 §5.9.4 | MUC_OPCUA_CU_VIEW_TRANSLATEBROWSEPATH | all | test_browse_service, test_view_services |
 | opc_cu_2328 | conformance_unit | claimed | OPC-10000-4 §5.5.1, 5.5.4 | MUC_OPCUA_CU_DISCOVERY_GET_ENDPOINTS | all | test_discovery_endpoint, test_discovery_services |
-| opc_cu_2352 | conformance_unit | documented | OPC-10000-4 §5.5.2 | MUC_OPCUA_CU_DISCOVERY_FIND_SERVERS_SELF | all | test_history |
+| opc_cu_2352 | conformance_unit | documented | OPC-10000-4 §5.5.2 | MUC_OPCUA_CU_DISCOVERY_FIND_SERVERS_SELF | all | test_discovery_services |
 | opc_cu_2389 | conformance_unit | documented | OPC-10000-4 §5.11.4 | MUC_OPCUA_CU_ATTRIBUTE_WRITE_VALUES | full | test_write_value_gate, test_write_service |
 | opc_cu_2400 | conformance_unit | claimed | OPC-10000-4 §5.7.3 | MUC_OPCUA_CU_SESSION_CHANGE_USER | full | test_session, test_session_auth |
 | opc_cu_2407 | conformance_unit | documented |  | MUC_OPCUA_CU_SECURITY_ADMINISTRATION | full | test_profile_surface |

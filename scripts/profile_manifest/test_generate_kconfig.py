@@ -3,13 +3,18 @@ from __future__ import annotations
 
 import os
 import sys
+import tempfile
 import unittest
 
 _HERE = os.path.dirname(os.path.abspath(__file__))
 if _HERE not in sys.path:
     sys.path.insert(0, _HERE)
 
-from generate import generate_kconfig  # noqa: E402
+from generate import (  # noqa: E402
+    generate_build_docs_section,
+    generate_kconfig,
+    update_build_docs,
+)
 from model import validate_manifest  # noqa: E402
 
 
@@ -157,6 +162,55 @@ class GenerateKconfigTest(unittest.TestCase):
         self.assertNotRegex(
             kconfig,
             r"(?m)^config MUC_OPCUA_CU_FLAT_DOCUMENTED_CAPABILITY$",
+        )
+
+
+class GenerateBuildDocsTest(unittest.TestCase):
+    def test_unavailable_item_notes_escape_markdown_table_pipe(self) -> None:
+        manifest = {
+            "items": [
+                {
+                    "id": "documented_cu",
+                    "implementation_state": "documented",
+                    "opc_reference": {
+                        "spec": "OPC-10000-7",
+                        "section": "6.4",
+                    },
+                    "notes": "Documented capability | satisfied elsewhere.",
+                },
+            ],
+            "capacities": [],
+        }
+
+        section = generate_build_docs_section(manifest)
+
+        self.assertIn(
+            "| documented_cu | OPC-10000-7 §6.4 | documented | "
+            r"Documented capability \| satisfied elsewhere. |",
+            section,
+        )
+
+    def test_update_build_docs_is_byte_idempotent(self) -> None:
+        manifest = {"items": [], "capacities": []}
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            path = os.path.join(tmpdir, "build.md")
+            with open(path, "w", encoding="utf-8") as fh:
+                fh.write("# Build\n\n## Verifying gating behavior\n\nBody\n")
+
+            update_build_docs(manifest, path)
+            with open(path, "rb") as fh:
+                first = fh.read()
+
+            update_build_docs(manifest, path)
+            with open(path, "rb") as fh:
+                second = fh.read()
+
+        self.assertEqual(first, second)
+        self.assertIn(
+            b"<!-- END GENERATED MANIFEST TABLES -->\n\n"
+            b"## Verifying gating behavior",
+            second,
         )
 
 

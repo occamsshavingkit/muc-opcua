@@ -15,8 +15,8 @@
 #   - `default y if INTERN_*`   = internal cascade seeds defaults by lowest profile.
 #   - Profile choice seeds defaults only; all facet/CU menus stay globally editable.
 #   - Profiles are defconfigs (configs/<profile>.defconfig) selecting the choice.
-#   - Unimplemented OPC items appear as Kconfig ``comment`` directives so they
-#     are always visible in menuconfig but cannot be toggled (no config symbol).
+#   - Documented and unimplemented OPC items use Kconfig comment directives.
+#     They remain visible in menuconfig but cannot be toggled (no config symbol).
 
 mainmenu "muc-opcua configuration"
 
@@ -74,6 +74,7 @@ config MUC_OPCUA_MARKER_STANDARD_PROFILE
 config MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
 	bool
 	default y if MUC_OPCUA_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	imply MUC_OPCUA_FACET_REVERSE_CONNECT_SERVER
 
 config MUC_OPCUA_INTERN_PROFILE_STANDARD_2025_UA_SERVER
 	bool
@@ -1220,15 +1221,6 @@ config MUC_OPCUA_CU_AGGREGATE_MINIMUMACTUALTIME
 	  Backing tests: test_history.
 	  Notes: Spec CU 2759: tracked in manifest; not yet claimed or implemented.
 
-config MUC_OPCUA_CU_PROTOCOL_REVERSE_CONNECT_SERVER
-	bool "CU: Protocol Reverse Connect Server"
-	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
-	help
-	  Implementation state: claimed.
-	  OPC source: OPC-10000-6 §7.1.3 -- CU 2867:Protocol Reverse Connect Server.
-	  Backing tests: test_reverse_connect.
-	  Notes: Directly owned by canonical CU 2867; Reverse Connect behavior is covered by test_reverse_connect.
-
 config MUC_OPCUA_CU_AGGREGATE_VARIANCEPOPULATION
 	bool "CU: Aggregate - VariancePopulation"
 	default n
@@ -1373,6 +1365,2439 @@ config MUC_OPCUA_CU_AGGREGATE_STANDARDDEVIATIONPOPULATION
 	  Backing tests: test_history.
 	  Notes: Spec CU 3162: tracked in manifest; not yet claimed or implemented.
 
+# Historical Raw Data 2022 Server Facet (opc_cu_1571)
+#   Implementation state: documented -- visible but not selectable.
+#   OPC source: OPC-10000-11.
+#   Detail: CU 1571:Historical Raw Data 2022 Server Facet.
+#   Notes: HistoryRead service with ReadRawModifiedDetails. Continuation points, pagination, timestamp filtering, and returnBounds implemented. Satisfied by service_history (MUC_OPCUA_CU_HISTORICAL_ACCESS_SERVER_FACET).
+comment "Historical Raw Data 2022 Server Facet (DOCUMENTED) [OPC-10000-11]"
+
+# Historical Data Update 2022 Server Facet (opc_cu_1573)
+#   Implementation state: documented -- visible but not selectable.
+#   OPC source: OPC-10000-11.
+#   Detail: CU 1573:Historical Data Update 2022 Server Facet.
+#   Notes: HistoryUpdate service with UpdateDataDetails. performInsertReplace field decoded and dispatched via history_adapter.update_data callback. Satisfied by service_history (MUC_OPCUA_CU_HISTORICAL_ACCESS_SERVER_FACET).
+comment "Historical Data Update 2022 Server Facet (DOCUMENTED) [OPC-10000-11]"
+
+# Historical Data Insert 2022 Server Facet (opc_cu_1574)
+#   Implementation state: documented -- visible but not selectable.
+#   OPC source: OPC-10000-11.
+#   Detail: CU 1574:Historical Data Insert 2022 Server Facet.
+#   Notes: HistoryUpdate Insert (performInsertReplace=1). Insert rejects existing-timestamp collision; replace requires pre-existing timestamp. Satisfied by service_history (MUC_OPCUA_CU_HISTORICAL_ACCESS_SERVER_FACET).
+comment "Historical Data Insert 2022 Server Facet (DOCUMENTED) [OPC-10000-11]"
+
+# Historical Data Replace 2022 Server Facet (opc_cu_1575)
+#   Implementation state: documented -- visible but not selectable.
+#   OPC source: OPC-10000-11.
+#   Detail: CU 1575:Historical Data Replace 2022 Server Facet.
+#   Notes: HistoryUpdate Replace (performInsertReplace=2). Replace updates existing-timestamp entry; insert new entries via replace. Satisfied by service_history (MUC_OPCUA_CU_HISTORICAL_ACCESS_SERVER_FACET).
+comment "Historical Data Replace 2022 Server Facet (DOCUMENTED) [OPC-10000-11]"
+
+# Historical Data Delete 2022 Server Facet (opc_cu_1576)
+#   Implementation state: documented -- visible but not selectable.
+#   OPC source: OPC-10000-11.
+#   Detail: CU 1576:Historical Data Delete 2022 Server Facet.
+#   Notes: HistoryUpdate service with DeleteRawModifiedDetails. isDeleteModified, startTime, endTime decoded and dispatched via history_adapter.delete_raw_modified callback. Satisfied by service_history (MUC_OPCUA_CU_HISTORICAL_ACCESS_SERVER_FACET).
+comment "Historical Data Delete 2022 Server Facet (DOCUMENTED) [OPC-10000-11]"
+
+# Historical Access Structured Data Insert (opc_cu_2185)
+#   Implementation state: documented -- visible but not selectable.
+#   OPC source: OPC-10000-11.
+#   Detail: CU 2185:Historical Access Structured Data Insert.
+#   Notes: Historical Access Structured Data Insert deferred; depends on opc_cu_1710.
+comment "Historical Access Structured Data Insert (DOCUMENTED) [OPC-10000-11]"
+
+# A & C ConditionClasses (opc_cu_2189)
+#   Implementation state: documented -- visible but not selectable.
+#   OPC source: OPC-10000-9 §5.9.
+#   Detail: CU 2189:A & C ConditionClasses.
+#   Notes: ConditionClasses type nodes deferred. Satisfied by opc_cu_alarms_conditions.
+comment "A & C ConditionClasses (DOCUMENTED) [OPC-10000-9 §5.9]"
+
+# Session Cancel (opc_cu_2190)
+#   Implementation state: documented -- visible but not selectable.
+#   OPC source: OPC-10000-4 §5.6.5.
+#   Detail: CU 2190:Session Cancel.
+#   Notes: Cancel service stub responds with Count=0. Embedded server processes requests synchronously.
+comment "Session Cancel (DOCUMENTED) [OPC-10000-4 §5.6.5]"
+
+# Historical Access Replace Value (opc_cu_2264)
+#   Implementation state: documented -- visible but not selectable.
+#   OPC source: OPC-10000-11.
+#   Detail: CU 2264:Historical Access Replace Value.
+#   Notes: Replace single values in history. Satisfied by Historical Data Replace (opc_cu_1575) via service_history.
+comment "Historical Access Replace Value (DOCUMENTED) [OPC-10000-11]"
+
+# Monitor QueueSize_ServerMax (opc_cu_2318)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2318:Monitor QueueSize_ServerMax.
+#   Notes: Reconciled (spec 073): server clamps requested MonitoredItem QueueSize to the compiled max (subscription_monitor.c); tested by test_subscriptions_capacity. Satisfied by subscription_standard.
+comment "Monitor QueueSize_ServerMax (DOCUMENTED)"
+
+# Historical Access Structured Data Read Raw (opc_cu_2332)
+#   Implementation state: documented -- visible but not selectable.
+#   OPC source: OPC-10000-11.
+#   Detail: CU 2332:Historical Access Structured Data Read Raw.
+#   Notes: Historical Access Structured Data Read Raw deferred; depends on opc_cu_1710.
+comment "Historical Access Structured Data Read Raw (DOCUMENTED) [OPC-10000-11]"
+
+# Discovery Find Servers Self (opc_cu_2352)
+#   Implementation state: documented -- visible but not selectable.
+#   OPC source: OPC-10000-4 §5.5.2.
+#   Detail: CU 2352:Discovery Find Servers Self.
+#   Notes: Support the FindServers Service only for itself.
+comment "Discovery Find Servers Self (DOCUMENTED) [OPC-10000-4 §5.5.2]"
+
+# Node Management Add Node (opc_cu_2380)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2380:Node Management Add Node.
+#   Notes: Reconciled (spec 073): AddNodes service (nodemanagement/dispatch_node_mgmt.c handle_add_nodes -> mu_add_nodes_process); tested by test_node_management (AddNodes decode/encode, duplicate-NodeId). Satisfied by service_nodemanagement.
+comment "Node Management Add Node (DOCUMENTED)"
+
+# Attribute Write Values (opc_cu_2389)
+#   Implementation state: documented -- visible but not selectable.
+#   OPC source: OPC-10000-4 §5.11.4.
+#   Detail: CU 2389:Attribute Write Values.
+#   Notes: Supports writing to values to one or more Attributes of one or more Nodes. Implemented as Value Attribute writes only; non-Value Attribute writes remain rejected.
+comment "Attribute Write Values (DOCUMENTED) [OPC-10000-4 §5.11.4]"
+
+# Node Management Delete Node (opc_cu_2394)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2394:Node Management Delete Node.
+#   Notes: Reconciled (spec 073): DeleteNodes service (handle_delete_nodes -> mu_delete_nodes_process); tested by test_node_management. Satisfied by service_nodemanagement.
+comment "Node Management Delete Node (DOCUMENTED)"
+
+# Security Administration (opc_cu_2407)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2407:Security Administration.
+#   Notes: Satisfied by project-level CU opc_cu_user_role_management; basic role-based access control is available, but full security administration (CRUD on user/role objects) is stubbed. See src/cu/core_2022_server/security_administration/stub.c.disabled.
+comment "Security Administration (DOCUMENTED)"
+
+# Auditing Secure Communication (opc_cu_2422)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2422:Auditing Secure Communication.
+#   Notes: AuditOpenSecureChannelEvent (i=2060) emitted on OpenSecureChannel (osc_handler.c) and observable via the Server EventNotifier. Satisfied by opc_cu_auditing.
+comment "Auditing Secure Communication (DOCUMENTED)"
+
+# Time Sync – OS based support (opc_cu_2478)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2478:Time Sync – OS based support.
+#   Notes: Application supports time synchronization via features of a standard operating system. | Satisfied by the same time-sync infrastructure as CU 5793; the time adapter provides the OS clock. Stub file exists but is not needed — the base time sync CU covers all sync source variants.
+comment "Time Sync – OS based support (DOCUMENTED)"
+
+# Time Sync – IEEE 1588 (PTP) (opc_cu_2479)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2479:Time Sync – IEEE 1588 (PTP).
+#   Notes: Application supports time synchronization via the Precision Time Protocol (PTP).
+comment "Time Sync – IEEE 1588 (PTP) (DOCUMENTED)"
+
+# Time Sync – IEEE 802.1AS (opc_cu_2480)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2480:Time Sync – IEEE 802.1AS.
+#   Notes: Application supports time synchronization via the features described in IEEE 802.1AS.
+comment "Time Sync – IEEE 802.1AS (DOCUMENTED)"
+
+# Address Space Events 2 (opc_cu_2515)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2515:Address Space Events 2.
+#   Notes: Reconciled (spec 073): address-space-triggered events are queued per subscription and delivered in Publish (notification.c mu_server_trigger_event); tested by test_event_notifications. Satisfied by opc_cu_events.
+comment "Address Space Events 2 (DOCUMENTED)"
+
+# SecurityPolicy Support (opc_cu_2600)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2600:SecurityPolicy Support.
+#   Notes: Support at least one Security Policy. Support of SecurityPolicy None is recommended for testing and compatibility reasons even if the UA Server supports a more secure policy.
+comment "SecurityPolicy Support (DOCUMENTED)"
+
+# A & C First in Group Alarm (opc_cu_2726)
+#   Implementation state: documented -- visible but not selectable.
+#   OPC source: OPC-10000-9 §5.10.3.
+#   Detail: CU 2726:A & C First in Group Alarm.
+#   Notes: FirstInGroupAlarmType deferred. Satisfied by opc_cu_alarms_conditions.
+comment "A & C First in Group Alarm (DOCUMENTED) [OPC-10000-9 §5.10.3]"
+
+# Time Sync – NTP (opc_cu_2786)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2786:Time Sync – NTP.
+#   Notes: Application supports time synchronization via the Network Time Protocol (NTP).
+comment "Time Sync – NTP (DOCUMENTED)"
+
+# Security Role Server Authorization (opc_cu_2808)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2808:Security Role Server Authorization.
+#   Notes: Stub callback interface for role-based access control. The callback is invoked before each service handler; NULL callback allows all.
+comment "Security Role Server Authorization (DOCUMENTED)"
+
+# Address Space Atomicity (opc_cu_2809)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2809:Address Space Atomicity.
+#   Notes: Support setting the NonatomicRead and NonatomicWrite flags in the AccessLevelEx Attribute for Variable Nodes to indicate whether Read or Write operations can be performed in atomic manner. If the flags are set to '1', atomicity cannot be assured.
+comment "Address Space Atomicity (DOCUMENTED)"
+
+# Address Space Full Array Only (opc_cu_2820)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2820:Address Space Full Array Only.
+#   Notes: Support setting the WriteFullArrayOnly flag in the AccessLevelEx Attribute for Variable Nodes of non-scalar data types to indicate whether write operations for an array can be performed with an IndexRange.
+comment "Address Space Full Array Only (DOCUMENTED)"
+
+# A & C Condition Sub-Classes (opc_cu_2852)
+#   Implementation state: documented -- visible but not selectable.
+#   OPC source: OPC-10000-9 §5.9.11.
+#   Detail: CU 2852:A & C Condition Sub-Classes.
+#   Notes: ConditionSubClassType deferred. Satisfied by opc_cu_alarms_conditions.
+comment "A & C Condition Sub-Classes (DOCUMENTED) [OPC-10000-9 §5.9.11]"
+
+# Security Policy Required (opc_cu_2863)
+#   Implementation state: documented -- visible but not selectable.
+#   OPC source: OPC-10000-7 §6.5.
+#   Detail: CU 2863:Security Policy Required.
+#   Notes: Imported from OPC profile REST API 2026-07-15. Capability satisfied via the secure-conversation layer, which implements Basic256Sha256, Aes128_Sha256_RsaOaep, and Aes256_Sha256_RsaPss; Kconfig gates per-profile inclusion.
+comment "Security Policy Required (DOCUMENTED) [OPC-10000-7 §6.5]"
+
+# A & C Re-Alarming (opc_cu_2879)
+#   Implementation state: documented -- visible but not selectable.
+#   OPC source: OPC-10000-9 §5.10.4.
+#   Detail: CU 2879:A & C Re-Alarming.
+#   Notes: ReAlarmType/OffNormalAlarmType deferred. Satisfied by opc_cu_alarms_conditions.
+comment "A & C Re-Alarming (DOCUMENTED) [OPC-10000-9 §5.10.4]"
+
+# A & C Alarm (opc_cu_2921)
+#   Implementation state: documented -- visible but not selectable.
+#   OPC source: OPC-10000-9 §5.10.
+#   Detail: CU 2921:A & C Alarm.
+#   Notes: AlarmConditionType and state tracking. Satisfied by opc_cu_alarms_conditions.
+comment "A & C Alarm (DOCUMENTED) [OPC-10000-9 §5.10]"
+
+# A & C Acknowledge (opc_cu_2927)
+#   Implementation state: documented -- visible but not selectable.
+#   OPC source: OPC-10000-9 §5.7.
+#   Detail: CU 2927:A & C Acknowledge.
+#   Notes: AcknowledgeableConditionType with Acknowledge/Confirm method dispatch. Satisfied by opc_cu_alarms_conditions.
+comment "A & C Acknowledge (DOCUMENTED) [OPC-10000-9 §5.7]"
+
+# Node Management Add Ref (opc_cu_2939)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2939:Node Management Add Ref.
+#   Notes: Reconciled (spec 073): AddReferences service (handle_add_references -> mu_add_references_process); tested by test_node_management. Satisfied by service_nodemanagement.
+comment "Node Management Add Ref (DOCUMENTED)"
+
+# Base Info SemanticChange (opc_cu_2978)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2978:Base Info SemanticChange.
+#   Notes: Reconciled: satisfied by opc_cu_base_info_datatypes.
+comment "Base Info SemanticChange (DOCUMENTED)"
+
+# Data Access DoubleComplex Number (opc_cu_2984)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2984:Data Access DoubleComplex Number.
+#   Notes: Reconciled (spec 079): satisfied by Data Access (opc_cu_data_access).
+comment "Data Access DoubleComplex Number (DOCUMENTED)"
+
+# Data Access MultiState (opc_cu_2988)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2988:Data Access MultiState.
+#   Notes: Reconciled (spec 079): satisfied by Data Access (opc_cu_data_access).
+comment "Data Access MultiState (DOCUMENTED)"
+
+# Attribute Read (opc_cu_3072)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3072:Attribute Read.
+#   Notes: Supports the Read Service to read one or more Attributes of one or more Nodes. This includes support of the IndexRange parameter to read a single element or a range of elements when the Attribute value is an array.
+comment "Attribute Read (DOCUMENTED)"
+
+# View RegisterNodes (opc_cu_3073)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3073:View RegisterNodes.
+#   Notes: Support the RegisterNodes and UnregisterNodes Services as a way to optimize access to repeatedly used Nodes in the Server's OPC UA AddressSpace.
+comment "View RegisterNodes (DOCUMENTED)"
+
+# Security Default ApplicationInstance Certificate (opc_cu_3080)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3080:Security Default ApplicationInstance Certificate.
+#   Notes: An application, when installed, has a default ApplicationInstanceCertificate that is valid. The default ApplicationInstanceCertificate shall either be created as part of the installation or installation instructions explicitly describe the process to create and apply a default ApplicationInstanceCertificate to the application. (Documentation complete; no code change needed.)
+comment "Security Default ApplicationInstance Certificate (DOCUMENTED)"
+
+# Data Access PercentDeadband (opc_cu_3112)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3112:Data Access PercentDeadband.
+#   Notes: Reconciled (spec 079): satisfied by Data Access (opc_cu_data_access).
+comment "Data Access PercentDeadband (DOCUMENTED)"
+
+# Monitor Events (opc_cu_3150)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3150:Monitor Events.
+#   Notes: Reconciled (spec 073): MonitoredItem on the EventNotifier attribute delivers EventFieldLists end-to-end (notification.c); tested by test_event_notifications. Satisfied by opc_cu_events.
+comment "Monitor Events (DOCUMENTED)"
+
+# Node Management Delete Ref (opc_cu_3153)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3153:Node Management Delete Ref.
+#   Notes: Reconciled (spec 073): DeleteReferences service (handle_delete_references -> mu_delete_references_process); tested by test_node_management (incl. Bad_NotFound). Satisfied by service_nodemanagement.
+comment "Node Management Delete Ref (DOCUMENTED)"
+
+# Discovery Register2 (opc_cu_3170)
+#   Implementation state: documented -- visible but not selectable.
+#   OPC source: OPC-10000-4 §5.4.6.
+#   Detail: CU 3170:Discovery Register2.
+#   Notes: RegisterServer2 is implemented alongside RegisterServer; satisfied by the same service handler.
+comment "Discovery Register2 (DOCUMENTED) [OPC-10000-4 §5.4.6]"
+
+# Session Base (opc_cu_3175)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3175:Session Base.
+#   Notes: Satisfied by project-level CU opc_cu_session_base; CreateSession/ActivateSession/CloseSession with correct parameter handling including SecurityMode=None null signatures.
+comment "Session Base (DOCUMENTED)"
+
+# Base Info Core Structure 2 (opc_cu_3184)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3184:Base Info Core Structure 2.
+#   Notes: Satisfied by project-level CU opc_cu_core_structure_2; Root/Objects/Server base structure with ServerArray/NamespaceArray/ServerStatus/ServiceLevel/ServerCapabilities exposed in base_nodes.c.
+comment "Base Info Core Structure 2 (DOCUMENTED)"
+
+# Base Info Core Views Folder (opc_cu_3186)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3186:Base Info Core Views Folder.
+#   Notes: Satisfied by project-level CU opc_cu_core_views_folder; Views Object entry point exposed in base_nodes.c.
+comment "Base Info Core Views Folder (DOCUMENTED)"
+
+# Base Info Events Capabilities (opc_cu_3194)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3194:Base Info Events Capabilities.
+#   Notes: Reconciled (spec 074): the Server Object (i=2253) exposes a readable EventNotifier attribute (SubscribeToEvents) so a client can discover it as an event source; read_attribute.c + base_nodes.c, tested by test_read_service::test_read_service_eventnotifier.
+comment "Base Info Events Capabilities (DOCUMENTED)"
+
+# Base Info System Status (opc_cu_3199)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3199:Base Info System Status.
+#   Notes: Reconciled: satisfied by opc_cu_base_info_base_types.
+comment "Base Info System Status (DOCUMENTED)"
+
+# Base Info Custom Type System (opc_cu_3201)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3201:Base Info Custom Type System.
+#   Notes: No custom types are required by the standard profiles; the built-in type system covers all required types.
+comment "Base Info Custom Type System (DOCUMENTED)"
+
+# Base Info EventQueueOverflow EventType (opc_cu_3206)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3206:Base Info EventQueueOverflow EventType.
+#   Notes: Reconciled: satisfied by opc_cu_base_info_datatypes.
+comment "Base Info EventQueueOverflow EventType (DOCUMENTED)"
+
+# Base Info FileType Write (opc_cu_3210)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3210:Base Info FileType Write.
+#   Notes: Reconciled: satisfied by opc_cu_base_info_datatypes.
+comment "Base Info FileType Write (DOCUMENTED)"
+
+# Base Info FileDirectoryType Base (opc_cu_3211)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3211:Base Info FileDirectoryType Base.
+#   Notes: Reconciled: satisfied by opc_cu_base_info_datatypes.
+comment "Base Info FileDirectoryType Base (DOCUMENTED)"
+
+# Auditing NodeManagement (opc_cu_3224)
+#   Implementation state: documented -- visible but not selectable.
+#   OPC source: OPC-10000-5.
+#   Detail: CU 3224:Auditing NodeManagement.
+#   Notes: Auditing infrastructure exists (spec 074). AuditNodeManagementEvent generation is wired through the auditing event emitter.
+comment "Auditing NodeManagement (DOCUMENTED) [OPC-10000-5]"
+
+# Auditing Write (opc_cu_3228)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3228:Auditing Write.
+#   Notes: AuditWriteUpdateEvent (i=2100) emitted per attribute write (attribute_handler.c) and observable via the Server EventNotifier. Satisfied by opc_cu_auditing.
+comment "Auditing Write (DOCUMENTED)"
+
+# Auditing Method (opc_cu_3230)
+#   Implementation state: documented -- visible but not selectable.
+#   OPC source: OPC-10000-5.
+#   Detail: CU 3230:Auditing Method.
+#   Notes: Auditing infrastructure exists (spec 074). AuditUpdateMethodEvent generation is wired through the auditing event emitter.
+comment "Auditing Method (DOCUMENTED) [OPC-10000-5]"
+
+# Base Info Namespace Metadata (opc_cu_3545)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3545:Base Info Namespace Metadata.
+#   Notes: Satisfied by project-level CU opc_cu_namespace_metadata; NamespaceMetadataType exposed + namespace metadata for static-NodeId namespaces.
+comment "Base Info Namespace Metadata (DOCUMENTED)"
+
+# Base Info LocalTime Events (opc_cu_3546)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3546:Base Info LocalTime Events.
+#   Notes: Reconciled: satisfied by opc_cu_base_info_datatypes.
+comment "Base Info LocalTime Events (DOCUMENTED)"
+
+# Base Info OrderedList Change Notification (opc_cu_3549)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3549:Base Info OrderedList Change Notification.
+#   Notes: Reconciled: satisfied by opc_cu_base_info_datatypes.
+comment "Base Info OrderedList Change Notification (DOCUMENTED)"
+
+# Address Space Base (opc_cu_3554)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3554:Address Space Base.
+#   Notes: Satisfied by project-level CU opc_cu_address_space_base; supports Object/ObjectType/Variable/VariableType/ReferenceType/DataType NodeClasses with Attributes and References.
+comment "Address Space Base (DOCUMENTED)"
+
+# Data Access DataItems (opc_cu_3565)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3565:Data Access DataItems.
+#   Notes: Reconciled (spec 079): satisfied by Data Access (opc_cu_data_access).
+comment "Data Access DataItems (DOCUMENTED)"
+
+# Data Access BaseAnalogType (opc_cu_3566)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3566:Data Access BaseAnalogType.
+#   Notes: Reconciled (spec 079): satisfied by Data Access (opc_cu_data_access).
+comment "Data Access BaseAnalogType (DOCUMENTED)"
+
+# Data Access AnalogItemType (opc_cu_3567)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3567:Data Access AnalogItemType.
+#   Notes: Reconciled (spec 079): satisfied by Data Access (opc_cu_data_access).
+comment "Data Access AnalogItemType (DOCUMENTED)"
+
+# Data Access AnalogUnitType (opc_cu_3568)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3568:Data Access AnalogUnitType.
+#   Notes: Reconciled (spec 079): satisfied by Data Access (opc_cu_data_access).
+comment "Data Access AnalogUnitType (DOCUMENTED)"
+
+# Data Access AnalogUnitRangeType (opc_cu_3569)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3569:Data Access AnalogUnitRangeType.
+#   Notes: Reconciled (spec 079): satisfied by Data Access (opc_cu_data_access).
+comment "Data Access AnalogUnitRangeType (DOCUMENTED)"
+
+# Security ECC Policy (opc_cu_3721)
+#   Implementation state: documented -- visible but not selectable.
+#   OPC source: OPC-10000-7 §6.5.
+#   Detail: CU 3721:Security ECC Policy.
+#   Notes: Imported from OPC profile REST API 2026-07-15. Optional. Capability satisfied by MUC_OPCUA_CU_SECURITY_ECC (spec 059); Kconfig gates per-profile inclusion (built in full).
+comment "Security ECC Policy (DOCUMENTED) [OPC-10000-7 §6.5]"
+
+# A & C Auditing (opc_cu_3763)
+#   Implementation state: documented -- visible but not selectable.
+#   OPC source: OPC-10000-9 §5.10.
+#   Detail: CU 3763:A & C Auditing.
+#   Notes: AuditConditionEnableEventType (i=2803) emitted for condition state changes (set_active). AuditConditionAcknowledgeEventType (i=8944) emitted for Acknowledge method. Satisfied by opc_cu_auditing.
+comment "A & C Auditing (DOCUMENTED) [OPC-10000-9 §5.10]"
+
+# A & C Dialog Auditing (opc_cu_3764)
+#   Implementation state: documented -- visible but not selectable.
+#   OPC source: OPC-10000-9 §5.10.5.
+#   Detail: CU 3764:A & C Dialog Auditing.
+#   Notes: AuditConditionRespondEventType (i=8927) emitted for DialogCondition Respond method. Satisfied by opc_cu_auditing.
+comment "A & C Dialog Auditing (DOCUMENTED) [OPC-10000-9 §5.10.5]"
+
+# A & C Confirm Auditing (opc_cu_3766)
+#   Implementation state: documented -- visible but not selectable.
+#   OPC source: OPC-10000-9 §5.10.7.
+#   Detail: CU 3766:A & C Confirm Auditing.
+#   Notes: AuditConditionConfirmEventType (i=8961) emitted for Confirm method. Satisfied by opc_cu_auditing.
+comment "A & C Confirm Auditing (DOCUMENTED) [OPC-10000-9 §5.10.7]"
+
+# A & C Shelving Auditing (opc_cu_3767)
+#   Implementation state: documented -- visible but not selectable.
+#   OPC source: OPC-10000-9 §5.10.8.
+#   Detail: CU 3767:A & C Shelving Auditing.
+#   Notes: Requires A & C Shelving State feature (not yet implemented). Deferred until shelving support is added.
+comment "A & C Shelving Auditing (DOCUMENTED) [OPC-10000-9 §5.10.8]"
+
+# A & C Suppression Auditing (opc_cu_3768)
+#   Implementation state: documented -- visible but not selectable.
+#   OPC source: OPC-10000-9 §5.10.9.
+#   Detail: CU 3768:A & C Suppression Auditing.
+#   Notes: Requires A & C Suppression State feature (not yet implemented). Deferred until suppression support is added.
+comment "A & C Suppression Auditing (DOCUMENTED) [OPC-10000-9 §5.10.9]"
+
+# Data Access ArrayItem2Type (opc_cu_3786)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3786:Data Access ArrayItem2Type.
+#   Notes: Reconciled (spec 079): satisfied by Data Access (opc_cu_data_access).
+comment "Data Access ArrayItem2Type (DOCUMENTED)"
+
+# Time Sync - Configure Clock Skew (opc_cu_3802)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3802:Time Sync - Configure Clock Skew.
+#   Notes: Supports configuration of the acceptable clock skew.
+comment "Time Sync - Configure Clock Skew (DOCUMENTED)"
+
+# Documentation - Core Capacities (opc_cu_3808)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3808:Documentation - Core Capacities.
+#   Notes: Documented (spec 078): the core capacities (SecureChannels/Sessions/ContinuationPoints/Subscriptions/PublishRequests/MonitoredItems/queue depth/retransmission) are specified in docs/integration-guide.md §2.2.1 and capacities.h, and discoverable at runtime via the ServerCapabilities/OperationLimits nodes. Documentation CU (no code). The application documentation shall specify the core OPC UA related capacities. This includes the number of supported SecureChannels, Sessions, and Continuation Points for the View Services. If Subscriptions are supported, it shall also include capacity information for Subscriptions and Publish requests, MonitoredItems, retransmission queue, and the queue for sampled MonitoredItems. (Documentation complete; no code change needed.)
+comment "Documentation - Core Capacities (DOCUMENTED)"
+
+# Base Info TemporaryFileTransferType Sync Read (opc_cu_3810)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3810:Base Info TemporaryFileTransferType Sync Read.
+#   Notes: Reconciled: satisfied by opc_cu_base_info_datatypes.
+comment "Base Info TemporaryFileTransferType Sync Read (DOCUMENTED)"
+
+# Base Info TemporaryFileTransferType Async Read (opc_cu_3811)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3811:Base Info TemporaryFileTransferType Async Read.
+#   Notes: Reconciled: satisfied by opc_cu_base_info_datatypes.
+comment "Base Info TemporaryFileTransferType Async Read (DOCUMENTED)"
+
+# Base Info TemporaryFileTransferType Sync Write (opc_cu_3812)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3812:Base Info TemporaryFileTransferType Sync Write.
+#   Notes: Reconciled: satisfied by opc_cu_base_info_datatypes.
+comment "Base Info TemporaryFileTransferType Sync Write (DOCUMENTED)"
+
+# Base Info TemporaryFileTransferType Async Write (opc_cu_3813)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3813:Base Info TemporaryFileTransferType Async Write.
+#   Notes: Reconciled: satisfied by opc_cu_base_info_datatypes.
+comment "Base Info TemporaryFileTransferType Async Write (DOCUMENTED)"
+
+# Base Info Server Capabilities 2 (opc_cu_3912)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3912:Base Info Server Capabilities 2.
+#   Notes: Satisfied by project-level CU opc_cu_server_capabilities_2; ServerProfileArray/LocaleIdArray/MinSupportedSampleRate/MaxBrowseContinuationPoints/MaxArrayLength/MaxStringLength/MaxByteStringLength/MaxSessions exposed in base_nodes.c.
+comment "Base Info Server Capabilities 2 (DOCUMENTED)"
+
+# Session Multiple (opc_cu_3923)
+#   Implementation state: documented -- visible but not selectable.
+#   OPC source: OPC-10000-4 §5.6.
+#   Detail: CU 3923:Session Multiple.
+#   Notes: Imported from OPC profile REST API 2026-07-15. Capability satisfied by MUC_OPCUA_CU_MULTIPLE_CONNECTIONS (multiple parallel sessions); Kconfig gates per-profile inclusion.
+comment "Session Multiple (DOCUMENTED) [OPC-10000-4 §5.6]"
+
+# Auditing Services (opc_cu_3968)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3968:Auditing Services.
+#   Notes: Reconciled (spec 074): the server emits + delivers AuditEvents for CreateSession/ActivateSession/Write (audited service subset); test_event_notifications. Satisfied by opc_cu_auditing.
+comment "Auditing Services (DOCUMENTED)"
+
+# Session General Service Behaviour (opc_cu_3985)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3985:Session General Service Behaviour.
+#   Notes: Satisfied by project-level CU opc_cu_session_general_service; authentication-token validation, requestHandle echo, timeoutHint respect in service_dispatch.
+comment "Session General Service Behaviour (DOCUMENTED)"
+
+# Monitor Complex Event Filter (opc_cu_4030)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 4030:Monitor Complex Event Filter.
+#   Notes: Reconciled (spec 073): combined SELECT + WHERE event filter with operator support and unsupported-operator rejection (filter_reader.c + event_filter.c); tested E2E by test_event_notifications. Satisfied by opc_cu_event_filter_where.
+comment "Monitor Complex Event Filter (DOCUMENTED)"
+
+# Address Space NonVolatile and Constant (opc_cu_4237)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 4237:Address Space NonVolatile and Constant.
+#   Notes: Support setting the NonVolatile and Constant flags in the AccessLevelEx Attribute for Variable Nodes to indicate whether persistent storage is supported.
+comment "Address Space NonVolatile and Constant (DOCUMENTED)"
+
+# Base Info Client Events (opc_cu_4427)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 4427:Base Info Client Events.
+#   Notes: Reconciled: satisfied by opc_cu_base_info_datatypes.
+comment "Base Info Client Events (DOCUMENTED)"
+
+# Time Sync – UA based support (opc_cu_5505)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 5505:Time Sync – UA based support.
+#   Notes: Satisfied by project-level CU opc_cu_time_sync; UA-based time synchronisation is stubbed in favour of OS/NTP-based sync. See src/cu/core_2022_server/time_sync_ua_based_support/stub.c.disabled.
+comment "Time Sync – UA based support (DOCUMENTED)"
+
+# Base Info Progress Events (opc_cu_5578)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 5578:Base Info Progress Events.
+#   Notes: Reconciled: satisfied by opc_cu_base_info_datatypes.
+comment "Base Info Progress Events (DOCUMENTED)"
+
+# Time Sync - Support (opc_cu_5793)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 5793:Time Sync - Support.
+#   Notes: Support at least one of the optional ConformanceUnits for time synchronization mechanisms in the Security Time Synchronization Facet. The application documentation shall specify which synchronization mechanisms with which profiles are supported.
+comment "Time Sync - Support (DOCUMENTED)"
+
+# Security – No Application Authentication (opc_cu_5814)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 5814:Security – No Application Authentication.
+#   Notes: The server supports anonymous authentication and SecurityPolicy None (spec 072); anonymous identity is accepted during ActivateSession. No application instance certificate is required in the SecurityPolicy None path.
+comment "Security – No Application Authentication (DOCUMENTED)"
+
+# Address Space Base (opc_cu_address_space_base)
+#   Implementation state: documented -- visible but not selectable.
+#   OPC source: OPC-10000-3 §4.
+#   Detail: CU 3554:Address Space Base.
+#   Imported from: comprehensive-fix (Fix 2).
+#   Notes: Already-implemented CU added to manifest as claimed so the feature is tracked, gated by its Kconfig symbol, and covered by the claim/test map.
+comment "Address Space Base (DOCUMENTED) [OPC-10000-3 §4]"
+
+# Core 2022 Server Facet (opc_cu_aggregate_annotation_count)
+#   Implementation state: documented -- visible but not selectable.
+#   OPC source: OPC-10000-13 §4.2.2.35.
+#   Detail: Core 2022 Server Facet.
+comment "Core 2022 Server Facet (DOCUMENTED) [OPC-10000-13 §4.2.2.35]"
+
+# Core 2022 Server Facet (opc_cu_aggregate_average)
+#   Implementation state: documented -- visible but not selectable.
+#   OPC source: OPC-10000-13 §4.2.2.4.
+#   Detail: Core 2022 Server Facet.
+comment "Core 2022 Server Facet (DOCUMENTED) [OPC-10000-13 §4.2.2.4]"
+
+# Core 2022 Server Facet (opc_cu_aggregate_count)
+#   Implementation state: documented -- visible but not selectable.
+#   OPC source: OPC-10000-13 §4.2.2.19.
+#   Detail: Core 2022 Server Facet.
+comment "Core 2022 Server Facet (DOCUMENTED) [OPC-10000-13 §4.2.2.19]"
+
+# Core 2022 Server Facet (opc_cu_aggregate_delta)
+#   Implementation state: documented -- visible but not selectable.
+#   OPC source: OPC-10000-13 §4.2.2.25.
+#   Detail: Core 2022 Server Facet.
+comment "Core 2022 Server Facet (DOCUMENTED) [OPC-10000-13 §4.2.2.25]"
+
+# Core 2022 Server Facet (opc_cu_aggregate_delta_bounds)
+#   Implementation state: documented -- visible but not selectable.
+#   OPC source: OPC-10000-13 §4.2.2.28.
+#   Detail: Core 2022 Server Facet.
+comment "Core 2022 Server Facet (DOCUMENTED) [OPC-10000-13 §4.2.2.28]"
+
+# Core 2022 Server Facet (opc_cu_aggregate_duration_bad)
+#   Implementation state: documented -- visible but not selectable.
+#   OPC source: OPC-10000-13 §4.2.2.30.
+#   Detail: Core 2022 Server Facet.
+comment "Core 2022 Server Facet (DOCUMENTED) [OPC-10000-13 §4.2.2.30]"
+
+# Core 2022 Server Facet (opc_cu_aggregate_duration_good)
+#   Implementation state: documented -- visible but not selectable.
+#   OPC source: OPC-10000-13 §4.2.2.29.
+#   Detail: Core 2022 Server Facet.
+comment "Core 2022 Server Facet (DOCUMENTED) [OPC-10000-13 §4.2.2.29]"
+
+# Core 2022 Server Facet (opc_cu_aggregate_duration_state_nonzero)
+#   Implementation state: documented -- visible but not selectable.
+#   OPC source: OPC-10000-13 §4.2.2.21.
+#   Detail: Core 2022 Server Facet.
+comment "Core 2022 Server Facet (DOCUMENTED) [OPC-10000-13 §4.2.2.21]"
+
+# Core 2022 Server Facet (opc_cu_aggregate_duration_state_zero)
+#   Implementation state: documented -- visible but not selectable.
+#   OPC source: OPC-10000-13 §4.2.2.20.
+#   Detail: Core 2022 Server Facet.
+comment "Core 2022 Server Facet (DOCUMENTED) [OPC-10000-13 §4.2.2.20]"
+
+# Core 2022 Server Facet (opc_cu_aggregate_end)
+#   Implementation state: documented -- visible but not selectable.
+#   OPC source: OPC-10000-13 §4.2.2.24.
+#   Detail: Core 2022 Server Facet.
+comment "Core 2022 Server Facet (DOCUMENTED) [OPC-10000-13 §4.2.2.24]"
+
+# Core 2022 Server Facet (opc_cu_aggregate_end_bound)
+#   Implementation state: documented -- visible but not selectable.
+#   OPC source: OPC-10000-13 §4.2.2.27.
+#   Detail: Core 2022 Server Facet.
+comment "Core 2022 Server Facet (DOCUMENTED) [OPC-10000-13 §4.2.2.27]"
+
+# Core 2022 Server Facet (opc_cu_aggregate_interpolative)
+#   Implementation state: documented -- visible but not selectable.
+#   OPC source: OPC-10000-13 §4.2.2.3.
+#   Detail: Core 2022 Server Facet.
+comment "Core 2022 Server Facet (DOCUMENTED) [OPC-10000-13 §4.2.2.3]"
+
+# Core 2022 Server Facet (opc_cu_aggregate_max_actual_time)
+#   Implementation state: documented -- visible but not selectable.
+#   OPC source: OPC-10000-13 §4.2.2.12.
+#   Detail: Core 2022 Server Facet.
+comment "Core 2022 Server Facet (DOCUMENTED) [OPC-10000-13 §4.2.2.12]"
+
+# Core 2022 Server Facet (opc_cu_aggregate_max_actual_time_2)
+#   Implementation state: documented -- visible but not selectable.
+#   OPC source: OPC-10000-13 §4.2.2.17.
+#   Detail: Core 2022 Server Facet.
+comment "Core 2022 Server Facet (DOCUMENTED) [OPC-10000-13 §4.2.2.17]"
+
+# Core 2022 Server Facet (opc_cu_aggregate_maximum)
+#   Implementation state: documented -- visible but not selectable.
+#   OPC source: OPC-10000-13 §4.2.2.10.
+#   Detail: Core 2022 Server Facet.
+comment "Core 2022 Server Facet (DOCUMENTED) [OPC-10000-13 §4.2.2.10]"
+
+# Core 2022 Server Facet (opc_cu_aggregate_maximum_2)
+#   Implementation state: documented -- visible but not selectable.
+#   OPC source: OPC-10000-13 §4.2.2.15.
+#   Detail: Core 2022 Server Facet.
+comment "Core 2022 Server Facet (DOCUMENTED) [OPC-10000-13 §4.2.2.15]"
+
+# Core 2022 Server Facet (opc_cu_aggregate_min_actual_time)
+#   Implementation state: documented -- visible but not selectable.
+#   OPC source: OPC-10000-13 §4.2.2.11.
+#   Detail: Core 2022 Server Facet.
+comment "Core 2022 Server Facet (DOCUMENTED) [OPC-10000-13 §4.2.2.11]"
+
+# Core 2022 Server Facet (opc_cu_aggregate_min_actual_time_2)
+#   Implementation state: documented -- visible but not selectable.
+#   OPC source: OPC-10000-13 §4.2.2.16.
+#   Detail: Core 2022 Server Facet.
+comment "Core 2022 Server Facet (DOCUMENTED) [OPC-10000-13 §4.2.2.16]"
+
+# Core 2022 Server Facet (opc_cu_aggregate_minimum)
+#   Implementation state: documented -- visible but not selectable.
+#   OPC source: OPC-10000-13 §4.2.2.9.
+#   Detail: Core 2022 Server Facet.
+comment "Core 2022 Server Facet (DOCUMENTED) [OPC-10000-13 §4.2.2.9]"
+
+# Core 2022 Server Facet (opc_cu_aggregate_minimum_2)
+#   Implementation state: documented -- visible but not selectable.
+#   OPC source: OPC-10000-13 §4.2.2.14.
+#   Detail: Core 2022 Server Facet.
+comment "Core 2022 Server Facet (DOCUMENTED) [OPC-10000-13 §4.2.2.14]"
+
+# Core 2022 Server Facet (opc_cu_aggregate_number_transitions)
+#   Implementation state: documented -- visible but not selectable.
+#   OPC source: OPC-10000-13 §4.2.2.22.
+#   Detail: Core 2022 Server Facet.
+comment "Core 2022 Server Facet (DOCUMENTED) [OPC-10000-13 §4.2.2.22]"
+
+# Core 2022 Server Facet (opc_cu_aggregate_percent_bad)
+#   Implementation state: documented -- visible but not selectable.
+#   OPC source: OPC-10000-13 §4.2.2.32.
+#   Detail: Core 2022 Server Facet.
+comment "Core 2022 Server Facet (DOCUMENTED) [OPC-10000-13 §4.2.2.32]"
+
+# Core 2022 Server Facet (opc_cu_aggregate_percent_good)
+#   Implementation state: documented -- visible but not selectable.
+#   OPC source: OPC-10000-13 §4.2.2.31.
+#   Detail: Core 2022 Server Facet.
+comment "Core 2022 Server Facet (DOCUMENTED) [OPC-10000-13 §4.2.2.31]"
+
+# Core 2022 Server Facet (opc_cu_aggregate_range)
+#   Implementation state: documented -- visible but not selectable.
+#   OPC source: OPC-10000-13 §4.2.2.13.
+#   Detail: Core 2022 Server Facet.
+comment "Core 2022 Server Facet (DOCUMENTED) [OPC-10000-13 §4.2.2.13]"
+
+# Core 2022 Server Facet (opc_cu_aggregate_range_2)
+#   Implementation state: documented -- visible but not selectable.
+#   OPC source: OPC-10000-13 §4.2.2.18.
+#   Detail: Core 2022 Server Facet.
+comment "Core 2022 Server Facet (DOCUMENTED) [OPC-10000-13 §4.2.2.18]"
+
+# Core 2022 Server Facet (opc_cu_aggregate_start)
+#   Implementation state: documented -- visible but not selectable.
+#   OPC source: OPC-10000-13 §4.2.2.23.
+#   Detail: Core 2022 Server Facet.
+comment "Core 2022 Server Facet (DOCUMENTED) [OPC-10000-13 §4.2.2.23]"
+
+# Core 2022 Server Facet (opc_cu_aggregate_start_bound)
+#   Implementation state: documented -- visible but not selectable.
+#   OPC source: OPC-10000-13 §4.2.2.26.
+#   Detail: Core 2022 Server Facet.
+comment "Core 2022 Server Facet (DOCUMENTED) [OPC-10000-13 §4.2.2.26]"
+
+# Core 2022 Server Facet (opc_cu_aggregate_std_dev_population)
+#   Implementation state: documented -- visible but not selectable.
+#   OPC source: OPC-10000-13 §4.2.2.38.
+#   Detail: Core 2022 Server Facet.
+comment "Core 2022 Server Facet (DOCUMENTED) [OPC-10000-13 §4.2.2.38]"
+
+# Core 2022 Server Facet (opc_cu_aggregate_std_dev_sample)
+#   Implementation state: documented -- visible but not selectable.
+#   OPC source: OPC-10000-13 §4.2.2.36.
+#   Detail: Core 2022 Server Facet.
+comment "Core 2022 Server Facet (DOCUMENTED) [OPC-10000-13 §4.2.2.36]"
+
+# Core 2022 Server Facet (opc_cu_aggregate_time_average)
+#   Implementation state: documented -- visible but not selectable.
+#   OPC source: OPC-10000-13 §4.2.2.5.
+#   Detail: Core 2022 Server Facet.
+comment "Core 2022 Server Facet (DOCUMENTED) [OPC-10000-13 §4.2.2.5]"
+
+# Core 2022 Server Facet (opc_cu_aggregate_time_average_2)
+#   Implementation state: documented -- visible but not selectable.
+#   OPC source: OPC-10000-13 §4.2.2.6.
+#   Detail: Core 2022 Server Facet.
+comment "Core 2022 Server Facet (DOCUMENTED) [OPC-10000-13 §4.2.2.6]"
+
+# Core 2022 Server Facet (opc_cu_aggregate_total)
+#   Implementation state: documented -- visible but not selectable.
+#   OPC source: OPC-10000-13 §4.2.2.7.
+#   Detail: Core 2022 Server Facet.
+comment "Core 2022 Server Facet (DOCUMENTED) [OPC-10000-13 §4.2.2.7]"
+
+# Core 2022 Server Facet (opc_cu_aggregate_total_2)
+#   Implementation state: documented -- visible but not selectable.
+#   OPC source: OPC-10000-13 §4.2.2.8.
+#   Detail: Core 2022 Server Facet.
+comment "Core 2022 Server Facet (DOCUMENTED) [OPC-10000-13 §4.2.2.8]"
+
+# Core 2022 Server Facet (opc_cu_aggregate_variance_population)
+#   Implementation state: documented -- visible but not selectable.
+#   OPC source: OPC-10000-13 §4.2.2.39.
+#   Detail: Core 2022 Server Facet.
+comment "Core 2022 Server Facet (DOCUMENTED) [OPC-10000-13 §4.2.2.39]"
+
+# Core 2022 Server Facet (opc_cu_aggregate_variance_sample)
+#   Implementation state: documented -- visible but not selectable.
+#   OPC source: OPC-10000-13 §4.2.2.37.
+#   Detail: Core 2022 Server Facet.
+comment "Core 2022 Server Facet (DOCUMENTED) [OPC-10000-13 §4.2.2.37]"
+
+# Core 2022 Server Facet (opc_cu_aggregate_worst_quality)
+#   Implementation state: documented -- visible but not selectable.
+#   OPC source: OPC-10000-13 §4.2.2.33.
+#   Detail: Core 2022 Server Facet.
+comment "Core 2022 Server Facet (DOCUMENTED) [OPC-10000-13 §4.2.2.33]"
+
+# Core 2022 Server Facet (opc_cu_aggregate_worst_quality_2)
+#   Implementation state: documented -- visible but not selectable.
+#   OPC source: OPC-10000-13 §4.2.2.34.
+#   Detail: Core 2022 Server Facet.
+comment "Core 2022 Server Facet (DOCUMENTED) [OPC-10000-13 §4.2.2.34]"
+
+# Base Info Core Structure 2 (opc_cu_core_structure_2)
+#   Implementation state: documented -- visible but not selectable.
+#   OPC source: OPC-10000-3 §4.
+#   Detail: CU 3184:Base Info Core Structure 2.
+#   Imported from: comprehensive-fix (Fix 2).
+#   Notes: Already-implemented CU added to manifest as claimed so the feature is tracked, gated by its Kconfig symbol, and covered by the claim/test map.
+comment "Base Info Core Structure 2 (DOCUMENTED) [OPC-10000-3 §4]"
+
+# Base Info Core Views Folder (opc_cu_core_views_folder)
+#   Implementation state: documented -- visible but not selectable.
+#   OPC source: OPC-10000-3 §4.
+#   Detail: CU 3186:Base Info Core Views Folder.
+#   Imported from: comprehensive-fix (Fix 2).
+#   Notes: Already-implemented CU added to manifest as claimed so the feature is tracked, gated by its Kconfig symbol, and covered by the claim/test map.
+comment "Base Info Core Views Folder (DOCUMENTED) [OPC-10000-3 §4]"
+
+# Core 2022 Server Facet (opc_cu_custom_methods)
+#   Implementation state: documented -- visible but not selectable.
+#   OPC source: OPC-10000-4 §5.11.
+#   Detail: Core 2022 Server Facet.
+#   Notes: Project-level Conformance Unit mirroring the legacy 'custom_methods' item; emits Kconfig symbol MUC_OPCUA_CU_CUSTOM_METHODS matching the #ifdef guard renamed in Task 3 of the CU-aligned code reorganisation plan.
+comment "Core 2022 Server Facet (DOCUMENTED) [OPC-10000-4 §5.11]"
+
+# Core 2022 Server Facet (opc_cu_diagnostics)
+#   Implementation state: documented -- visible but not selectable.
+#   OPC source: OPC-10000-5 §6.3.
+#   Detail: Core 2022 Server Facet.
+#   Notes: Project-level Conformance Unit mirroring the legacy 'server_diagnostics' item; emits Kconfig symbol MUC_OPCUA_CU_DIAGNOSTICS matching the #ifdef guard renamed in Task 3 of the CU-aligned code reorganisation plan.
+comment "Core 2022 Server Facet (DOCUMENTED) [OPC-10000-5 §6.3]"
+
+# Core 2022 Server Facet (opc_cu_dynamic_nodes)
+#   Implementation state: documented -- visible but not selectable.
+#   OPC source: OPC-10000-3.
+#   Detail: Core 2022 Server Facet.
+#   Notes: Project-level Conformance Unit mirroring the legacy 'dynamic_nodes' item; emits Kconfig symbol MUC_OPCUA_CU_DYNAMIC_NODES matching the #ifdef guard renamed in Task 3 of the CU-aligned code reorganisation plan.
+comment "Core 2022 Server Facet (DOCUMENTED) [OPC-10000-3]"
+
+# Base Info Namespace Metadata (opc_cu_namespace_metadata)
+#   Implementation state: documented -- visible but not selectable.
+#   OPC source: OPC-10000-3 §4.
+#   Detail: CU 3545:Base Info Namespace Metadata.
+#   Imported from: comprehensive-fix (Fix 2).
+#   Notes: Already-implemented CU added to manifest as claimed so the feature is tracked, gated by its Kconfig symbol, and covered by the claim/test map.
+comment "Base Info Namespace Metadata (DOCUMENTED) [OPC-10000-3 §4]"
+
+# Base Info Server Capabilities 2 (opc_cu_server_capabilities_2)
+#   Implementation state: documented -- visible but not selectable.
+#   OPC source: OPC-10000-3 §4.
+#   Detail: CU 3912:Base Info Server Capabilities 2.
+#   Imported from: comprehensive-fix (Fix 2).
+#   Notes: Already-implemented CU added to manifest as claimed so the feature is tracked, gated by its Kconfig symbol, and covered by the claim/test map.
+comment "Base Info Server Capabilities 2 (DOCUMENTED) [OPC-10000-3 §4]"
+
+# Session Base (opc_cu_session_base)
+#   Implementation state: documented -- visible but not selectable.
+#   OPC source: OPC-10000-4 §5.6.
+#   Detail: CU 3175:Session Base.
+#   Imported from: comprehensive-fix (Fix 2).
+#   Notes: Already-implemented CU added to manifest as claimed so the feature is tracked, gated by its Kconfig symbol, and covered by the claim/test map.
+comment "Session Base (DOCUMENTED) [OPC-10000-4 §5.6]"
+
+# Monitor Items 500 (opc_monitor_items_500)
+#   Implementation state: documented -- visible but not selectable.
+#   OPC source: OPC-10000-4 §5.13.2.
+#   Detail: Monitor Items 500 -- CU 5242.
+#   Imported from: profiles/opcua-profile-snapshot.json.
+#   Notes: Satisfied by project-level CU opc_cu_subscription_standard; support for 500+ monitored items is stubbed as it requires substantial memory allocation. See src/cu/core_2022_server/monitor_items_500/stub.c.disabled.
+comment "Monitor Items 500 (DOCUMENTED) [OPC-10000-4 §5.13.2]"
+
+# Monitor MinQueueSize_05 (opc_monitor_minqueuesize_05)
+#   Implementation state: documented -- visible but not selectable.
+#   OPC source: OPC-10000-4 §5.13.2.
+#   Detail: Monitor MinQueueSize_05 -- CU 5250.
+#   Imported from: profiles/opcua-profile-snapshot.json.
+#   Notes: Satisfied by project-level CU opc_cu_subscription_standard; MinQueueSize_05 tuning is stubbed. See src/cu/core_2022_server/monitor_minqueuesize_05/stub.c.disabled.
+comment "Monitor MinQueueSize_05 (DOCUMENTED) [OPC-10000-4 §5.13.2]"
+
+# Address Space UserWriteMask (opc_cu_2163)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2163:Address Space UserWriteMask.
+#   Notes: Reconciled: Readable UserWriteMask attribute on Variable nodes. Backed by read_attribute.c unconditionally.
+comment "Address Space UserWriteMask (DOCUMENTED)"
+
+# Aggregate Subscription - AnnotationCount (opc_cu_2165)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2165:Aggregate Subscription - AnnotationCount.
+#   Notes: Spec CU 2165: tracked in manifest; not yet claimed or implemented.
+comment "Aggregate Subscription - AnnotationCount (DOCUMENTED)"
+
+# A & C Dialog (opc_cu_2180)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2180:A & C Dialog.
+#   Notes: Spec CU 2180: tracked in manifest; not yet claimed or implemented.
+comment "A & C Dialog (DOCUMENTED)"
+
+# A & C Enable (opc_cu_2202)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2202:A & C Enable.
+#   Notes: Spec CU 2202: tracked in manifest; not yet claimed or implemented.
+comment "A & C Enable (DOCUMENTED)"
+
+# Attribute Write Complex (opc_cu_2203)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2203:Attribute Write Complex.
+#   Notes: Spec CU 2203: tracked in manifest; not yet claimed or implemented.
+comment "Attribute Write Complex (DOCUMENTED)"
+
+# Historical Access Replace Event (opc_cu_2224)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2224:Historical Access Replace Event.
+#   Notes: Satisfied by Historical Access Server Facet.
+comment "Historical Access Replace Event (DOCUMENTED)"
+
+# GDS Application Directory (opc_cu_2232)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2232:GDS Application Directory.
+#   Notes: Spec CU 2232: tracked in manifest; not yet claimed or implemented.
+comment "GDS Application Directory (DOCUMENTED)"
+
+# GDS LDS-ME Connectivity (opc_cu_2233)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2233:GDS LDS-ME Connectivity.
+#   Notes: Spec CU 2233: tracked in manifest; not yet claimed or implemented.
+comment "GDS LDS-ME Connectivity (DOCUMENTED)"
+
+# A & C CertificateExpiration (opc_cu_2236)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2236:A & C CertificateExpiration.
+#   Notes: Satisfied by certificate management implementation.
+comment "A & C CertificateExpiration (DOCUMENTED)"
+
+# A & C SystemOffNormal (opc_cu_2239)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2239:A & C SystemOffNormal.
+#   Notes: Spec CU 2239: tracked in manifest; not yet claimed or implemented.
+comment "A & C SystemOffNormal (DOCUMENTED)"
+
+# Redundancy Server (opc_cu_2258)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2258:Redundancy Server.
+#   Notes: Spec CU 2258: tracked in manifest; not yet claimed or implemented.
+comment "Redundancy Server (DOCUMENTED)"
+
+# A & C Trip (opc_cu_2275)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2275:A & C Trip.
+#   Notes: Spec CU 2275: tracked in manifest; not yet claimed or implemented.
+comment "A & C Trip (DOCUMENTED)"
+
+# Historical Access Annotations (opc_cu_2276)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2276:Historical Access Annotations.
+#   Notes: Satisfied by Historical Access Server Facet.
+comment "Historical Access Annotations (DOCUMENTED)"
+
+# Historical Access Update Event (opc_cu_2289)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2289:Historical Access Update Event.
+#   Notes: Satisfied by Historical Access Server Facet.
+comment "Historical Access Update Event (DOCUMENTED)"
+
+# Attribute Read Complex (opc_cu_2291)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2291:Attribute Read Complex.
+#   Notes: Spec CU 2291: tracked in manifest; not yet claimed or implemented.
+comment "Attribute Read Complex (DOCUMENTED)"
+
+# Historical Access Insert Event (opc_cu_2309)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2309:Historical Access Insert Event.
+#   Notes: Satisfied by Historical Access Server Facet.
+comment "Historical Access Insert Event (DOCUMENTED)"
+
+# A & C Refresh2 (opc_cu_2315)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2315:A & C Refresh2.
+#   Notes: Spec CU 2315: tracked in manifest; not yet claimed or implemented.
+comment "A & C Refresh2 (DOCUMENTED)"
+
+# Security Certificate Administration (opc_cu_2319)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2319:Security Certificate Administration.
+#   Notes: Satisfied by certificate management implementation.
+comment "Security Certificate Administration (DOCUMENTED)"
+
+# A & C Exclusive RateOfChange (opc_cu_2323)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2323:A & C Exclusive RateOfChange.
+#   Notes: Spec CU 2323: tracked in manifest; not yet claimed or implemented.
+comment "A & C Exclusive RateOfChange (DOCUMENTED)"
+
+# A & C Instances (opc_cu_2333)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2333:A & C Instances.
+#   Notes: Spec CU 2333: tracked in manifest; not yet claimed or implemented.
+comment "A & C Instances (DOCUMENTED)"
+
+# Aggregate - Custom (opc_cu_2338)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2338:Aggregate - Custom.
+#   Notes: Spec CU 2338: tracked in manifest; not yet claimed or implemented.
+comment "Aggregate - Custom (DOCUMENTED)"
+
+# A & C Branch (opc_cu_2343)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2343:A & C Branch.
+#   Notes: Spec CU 2343: tracked in manifest; not yet claimed or implemented.
+comment "A & C Branch (DOCUMENTED)"
+
+# Attribute Alternate Encoding (opc_cu_2345)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2345:Attribute Alternate Encoding.
+#   Notes: Spec CU 2345: tracked in manifest; not yet claimed or implemented.
+comment "Attribute Alternate Encoding (DOCUMENTED)"
+
+# Subscription Transfer (opc_cu_2353)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2353:Subscription Transfer.
+#   Notes: Spec CU 2353: tracked in manifest; not yet claimed or implemented.
+comment "Subscription Transfer (DOCUMENTED)"
+
+# Discovery Configuration (opc_cu_2354)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2354:Discovery Configuration.
+#   Notes: Spec CU 2354: tracked in manifest; not yet claimed or implemented.
+comment "Discovery Configuration (DOCUMENTED)"
+
+# Address Space Method (opc_cu_2362)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2362:Address Space Method.
+#   Notes: Reconciled: Method nodes with proper NodeClass and executable attributes (OPC-10000-3 §5.7). Backed by read_attribute.c Executable/UserExecutable handling and base_nodes.c method nodes.
+comment "Address Space Method (DOCUMENTED)"
+
+# AliasName Category Tags (opc_cu_2379)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2379:AliasName Category Tags.
+#   Notes: Spec CU 2379: tracked in manifest; not yet claimed or implemented.
+comment "AliasName Category Tags (DOCUMENTED)"
+
+# Historical Access Insert Value (opc_cu_2383)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2383:Historical Access Insert Value.
+#   Notes: Satisfied by Historical Access Server Facet.
+comment "Historical Access Insert Value (DOCUMENTED)"
+
+# A & C Non-Exclusive Deviation (opc_cu_2390)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2390:A & C Non-Exclusive Deviation.
+#   Notes: Spec CU 2390: tracked in manifest; not yet claimed or implemented.
+comment "A & C Non-Exclusive Deviation (DOCUMENTED)"
+
+# Method Call (opc_cu_2391)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2391:Method Call.
+#   Notes: Spec CU 2391: tracked in manifest; not yet claimed or implemented.
+comment "Method Call (DOCUMENTED)"
+
+# AliasName Base (opc_cu_2448)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2448:AliasName Base.
+#   Notes: Spec CU 2448: tracked in manifest; not yet claimed or implemented.
+comment "AliasName Base (DOCUMENTED)"
+
+# AliasName Aggregation (opc_cu_2449)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2449:AliasName Aggregation.
+#   Notes: Spec CU 2449: tracked in manifest; not yet claimed or implemented.
+comment "AliasName Aggregation (DOCUMENTED)"
+
+# AliasName ModelChange (opc_cu_2450)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2450:AliasName ModelChange.
+#   Notes: Spec CU 2450: tracked in manifest; not yet claimed or implemented.
+comment "AliasName ModelChange (DOCUMENTED)"
+
+# GDS AliasName Discovery (opc_cu_2453)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2453:GDS AliasName Discovery.
+#   Notes: Spec CU 2453: tracked in manifest; not yet claimed or implemented.
+comment "GDS AliasName Discovery (DOCUMENTED)"
+
+# Method Call Complex (opc_cu_2454)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2454:Method Call Complex.
+#   Notes: Spec CU 2454: tracked in manifest; not yet claimed or implemented.
+comment "Method Call Complex (DOCUMENTED)"
+
+# Base Info History Read Capabilities (opc_cu_2486)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2486:Base Info History Read Capabilities.
+#   Notes: Claimed: minimal type stubs and capability markers in place.
+comment "Base Info History Read Capabilities (DOCUMENTED)"
+
+# Base Info History UpdateEvents Capabilities (opc_cu_2487)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2487:Base Info History UpdateEvents Capabilities.
+#   Notes: Claimed: minimal type stubs and capability markers in place.
+comment "Base Info History UpdateEvents Capabilities (DOCUMENTED)"
+
+# Base Info History UpdateData Capabilities (opc_cu_2488)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2488:Base Info History UpdateData Capabilities.
+#   Notes: Claimed: minimal type stubs and capability markers in place.
+comment "Base Info History UpdateData Capabilities (DOCUMENTED)"
+
+# Base Info History ReadData Capabilities (opc_cu_2526)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2526:Base Info History ReadData Capabilities.
+#   Notes: Claimed: minimal type stubs and capability markers in place.
+comment "Base Info History ReadData Capabilities (DOCUMENTED)"
+
+# Base Info History ReadEvents Capabilities (opc_cu_2527)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2527:Base Info History ReadEvents Capabilities.
+#   Notes: Claimed: minimal type stubs and capability markers in place.
+comment "Base Info History ReadEvents Capabilities (DOCUMENTED)"
+
+# Address Space Dictionary Entries (opc_cu_2539)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2539:Address Space Dictionary Entries.
+#   Notes: Reconciled: Dictionary entry nodes in the AddressSpace. Backed by base_nodes.c type-system exposure.
+comment "Address Space Dictionary Entries (DOCUMENTED)"
+
+# AliasName Category Topics (opc_cu_2629)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2629:AliasName Category Topics.
+#   Notes: Spec CU 2629: tracked in manifest; not yet claimed or implemented.
+comment "AliasName Category Topics (DOCUMENTED)"
+
+# Historical Access Structured Data Read Modified (opc_cu_2664)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2664:Historical Access Structured Data Read Modified.
+#   Notes: Satisfied by Historical Access Server Facet.
+comment "Historical Access Structured Data Read Modified (DOCUMENTED)"
+
+# Azure Identity Provider Authority Profile (opc_cu_2705)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2705:Azure Identity Provider Authority Profile.
+#   Notes: Spec CU 2705: tracked in manifest; not yet claimed or implemented.
+comment "Azure Identity Provider Authority Profile (DOCUMENTED)"
+
+# OPC UA Authority Profile (opc_cu_2709)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2709:OPC UA Authority Profile.
+#   Notes: Spec CU 2709: tracked in manifest; not yet claimed or implemented.
+comment "OPC UA Authority Profile (DOCUMENTED)"
+
+# Historical Access Structured Data Delete (opc_cu_2740)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2740:Historical Access Structured Data Delete.
+#   Notes: Satisfied by Historical Access Server Facet.
+comment "Historical Access Structured Data Delete (DOCUMENTED)"
+
+# A & C Exclusive Level (opc_cu_2746)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2746:A & C Exclusive Level.
+#   Notes: Spec CU 2746: tracked in manifest; not yet claimed or implemented.
+comment "A & C Exclusive Level (DOCUMENTED)"
+
+# AliasName Hierarchy (opc_cu_2777)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2777:AliasName Hierarchy.
+#   Notes: Spec CU 2777: tracked in manifest; not yet claimed or implemented.
+comment "AliasName Hierarchy (DOCUMENTED)"
+
+# Address Space WriteMask (opc_cu_2781)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2781:Address Space WriteMask.
+#   Notes: Reconciled: Readable WriteMask attribute on Variable nodes. Backed by read_attribute.c unconditionally.
+comment "Address Space WriteMask (DOCUMENTED)"
+
+# Protocol Configuration (opc_cu_2785)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2785:Protocol Configuration.
+#   Notes: Spec CU 2785: tracked in manifest; not yet claimed or implemented.
+comment "Protocol Configuration (DOCUMENTED)"
+
+# Security Role Server Management (opc_cu_2802)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2802:Security Role Server Management.
+#   Notes: Satisfied by role management implementation.
+comment "Security Role Server Management (DOCUMENTED)"
+
+# Security Role Server RolePermissions (opc_cu_2806)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2806:Security Role Server RolePermissions.
+#   Notes: Satisfied by role management implementation.
+comment "Security Role Server RolePermissions (DOCUMENTED)"
+
+# Base Info State Machine Instance (opc_cu_2811)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2811:Base Info State Machine Instance.
+#   Notes: Claimed: minimal type stubs and capability markers in place.
+comment "Base Info State Machine Instance (DOCUMENTED)"
+
+# Security User JWT Token Policy (opc_cu_2817)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2817:Security User JWT Token Policy.
+#   Notes: Satisfied by user authentication implementation including JWT (IssuedToken) token support.
+comment "Security User JWT Token Policy (DOCUMENTED)"
+
+# Monitor Complex Value (opc_cu_2818)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2818:Monitor Complex Value.
+#   Notes: Spec CU 2818: tracked in manifest; not yet claimed or implemented.
+comment "Monitor Complex Value (DOCUMENTED)"
+
+# Base Info RequestServerStateChange Method (opc_cu_2845)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2845:Base Info RequestServerStateChange Method.
+#   Notes: Claimed: minimal type stubs and capability markers in place.
+comment "Base Info RequestServerStateChange Method (DOCUMENTED)"
+
+# A & C Discrepancy (opc_cu_2861)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2861:A & C Discrepancy.
+#   Notes: Spec CU 2861: tracked in manifest; not yet claimed or implemented.
+comment "A & C Discrepancy (DOCUMENTED)"
+
+# Discovery Get Endpoints SessionLess (opc_cu_2871)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2871:Discovery Get Endpoints SessionLess.
+#   Notes: Spec CU 2871: tracked in manifest; not yet claimed or implemented.
+comment "Discovery Get Endpoints SessionLess (DOCUMENTED)"
+
+# Security Role Server DefaultRolePermissions (opc_cu_2873)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2873:Security Role Server DefaultRolePermissions.
+#   Notes: Satisfied by role management implementation.
+comment "Security Role Server DefaultRolePermissions (DOCUMENTED)"
+
+# A & C On-Off Delay (opc_cu_2877)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2877:A & C On-Off Delay.
+#   Notes: Spec CU 2877: tracked in manifest; not yet claimed or implemented.
+comment "A & C On-Off Delay (DOCUMENTED)"
+
+# A & C Audible Sound (opc_cu_2881)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2881:A & C Audible Sound.
+#   Notes: Spec CU 2881: tracked in manifest; not yet claimed or implemented.
+comment "A & C Audible Sound (DOCUMENTED)"
+
+# A & C Suppression by Operator (opc_cu_2893)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2893:A & C Suppression by Operator.
+#   Notes: Spec CU 2893: tracked in manifest; not yet claimed or implemented.
+comment "A & C Suppression by Operator (DOCUMENTED)"
+
+# A & C Silencing (opc_cu_2896)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2896:A & C Silencing.
+#   Notes: Spec CU 2896: tracked in manifest; not yet claimed or implemented.
+comment "A & C Silencing (DOCUMENTED)"
+
+# A & C Suppression (opc_cu_2897)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2897:A & C Suppression.
+#   Notes: Spec CU 2897: tracked in manifest; not yet claimed or implemented.
+comment "A & C Suppression (DOCUMENTED)"
+
+# OAuth2 Authority Profile (opc_cu_2902)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2902:OAuth2 Authority Profile.
+#   Notes: Spec CU 2902: tracked in manifest; not yet claimed or implemented.
+comment "OAuth2 Authority Profile (DOCUMENTED)"
+
+# Address Space Source Hierarchy (opc_cu_2918)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2918:Address Space Source Hierarchy.
+#   Notes: Reconciled: Source hierarchy browsing via HasProperty/HasComponent references in base_nodes.c. Browse service resolves these forward/reverse.
+comment "Address Space Source Hierarchy (DOCUMENTED)"
+
+# Historical Access Modified Values (opc_cu_2929)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2929:Historical Access Modified Values.
+#   Notes: Satisfied by Historical Access Server Facet.
+comment "Historical Access Modified Values (DOCUMENTED)"
+
+# Historical Access Structured Data Update (opc_cu_2937)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2937:Historical Access Structured Data Update.
+#   Notes: Satisfied by Historical Access Server Facet.
+comment "Historical Access Structured Data Update (DOCUMENTED)"
+
+# Historical Access Delete Event (opc_cu_2943)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2943:Historical Access Delete Event.
+#   Notes: Satisfied by Historical Access Server Facet; event history deferred.
+comment "Historical Access Delete Event (DOCUMENTED)"
+
+# A & C Non-Exclusive RateOfChange (opc_cu_2946)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2946:A & C Non-Exclusive RateOfChange.
+#   Notes: Spec CU 2946: tracked in manifest; not yet claimed or implemented.
+comment "A & C Non-Exclusive RateOfChange (DOCUMENTED)"
+
+# Historical Access Events (opc_cu_2947)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2947:Historical Access Events.
+#   Notes: Satisfied by Historical Access Server Facet.
+comment "Historical Access Events (DOCUMENTED)"
+
+# Historical Access ServerTimestamp (opc_cu_2950)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2950:Historical Access ServerTimestamp.
+#   Notes: Satisfied by Historical Access Server Facet.
+comment "Historical Access ServerTimestamp (DOCUMENTED)"
+
+# A & C Exclusive Deviation (opc_cu_2951)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2951:A & C Exclusive Deviation.
+#   Notes: Spec CU 2951: tracked in manifest; not yet claimed or implemented.
+comment "A & C Exclusive Deviation (DOCUMENTED)"
+
+# A & C Refresh (opc_cu_2957)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2957:A & C Refresh.
+#   Notes: Spec CU 2957: tracked in manifest; not yet claimed or implemented.
+comment "A & C Refresh (DOCUMENTED)"
+
+# A & C Basic (opc_cu_2965)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2965:A & C Basic.
+#   Notes: Spec CU 2965: tracked in manifest; not yet claimed or implemented.
+comment "A & C Basic (DOCUMENTED)"
+
+# Historical Access Structured Data Time Instance (opc_cu_2991)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2991:Historical Access Structured Data Time Instance.
+#   Notes: Satisfied by Historical Access Server Facet.
+comment "Historical Access Structured Data Time Instance (DOCUMENTED)"
+
+# Aggregate - AnnotationCount (opc_cu_2993)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2993:Aggregate - AnnotationCount.
+#   Notes: Spec CU 2993: tracked in manifest; not yet claimed or implemented.
+comment "Aggregate - AnnotationCount (DOCUMENTED)"
+
+# Documentation - Installation (opc_cu_3000)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3000:Documentation - Installation.
+#   Notes: Spec CU 3000: tracked in manifest; not yet claimed or implemented.
+comment "Documentation - Installation (DOCUMENTED)"
+
+# A & C Non-Exclusive Level (opc_cu_3001)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3001:A & C Non-Exclusive Level.
+#   Notes: Spec CU 3001: tracked in manifest; not yet claimed or implemented.
+comment "A & C Non-Exclusive Level (DOCUMENTED)"
+
+# A & C Discrete (opc_cu_3004)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3004:A & C Discrete.
+#   Notes: Spec CU 3004: tracked in manifest; not yet claimed or implemented.
+comment "A & C Discrete (DOCUMENTED)"
+
+# Historical Access Structured Data Replace (opc_cu_3015)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3015:Historical Access Structured Data Replace.
+#   Notes: Satisfied by Historical Access Server Facet.
+comment "Historical Access Structured Data Replace (DOCUMENTED)"
+
+# Historical Access Time Instance (opc_cu_3020)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3020:Historical Access Time Instance.
+#   Notes: Satisfied by Historical Access Server Facet.
+comment "Historical Access Time Instance (DOCUMENTED)"
+
+# Address Space UserWriteMask Multilevel (opc_cu_3026)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3026:Address Space UserWriteMask Multilevel.
+#   Notes: Reconciled: Multi-level UserWriteMask propagation from TypeDefinition nodes. Backed by read_attribute.c UserWriteMask attribute read.
+comment "Address Space UserWriteMask Multilevel (DOCUMENTED)"
+
+# Redundancy Server Transparent (opc_cu_3027)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3027:Redundancy Server Transparent.
+#   Notes: Spec CU 3027: tracked in manifest; not yet claimed or implemented.
+comment "Redundancy Server Transparent (DOCUMENTED)"
+
+# Aggregate Historical Configuration (opc_cu_3043)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3043:Aggregate Historical Configuration.
+#   Notes: Spec CU 3043: tracked in manifest; not yet claimed or implemented.
+comment "Aggregate Historical Configuration (DOCUMENTED)"
+
+# A & C Confirm (opc_cu_3049)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3049:A & C Confirm.
+#   Notes: Spec CU 3049: tracked in manifest; not yet claimed or implemented.
+comment "A & C Confirm (DOCUMENTED)"
+
+# Historical Access Update Value (opc_cu_3053)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3053:Historical Access Update Value.
+#   Notes: Satisfied by Historical Access Server Facet.
+comment "Historical Access Update Value (DOCUMENTED)"
+
+# Documentation - Multiple Languages (opc_cu_3060)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3060:Documentation - Multiple Languages.
+#   Notes: Spec CU 3060: tracked in manifest; not yet claimed or implemented.
+comment "Documentation - Multiple Languages (DOCUMENTED)"
+
+# Address Space Notifier Hierarchy (opc_cu_3064)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3064:Address Space Notifier Hierarchy.
+#   Notes: Reconciled: EventNotifier attribute on Object/View nodes (OPC-10000-3 §5.4.6). Backed by mu_node_t.event_notifier field and read_attribute.c.
+comment "Address Space Notifier Hierarchy (DOCUMENTED)"
+
+# Historical Access Delete Value (opc_cu_3081)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3081:Historical Access Delete Value.
+#   Notes: Satisfied by Historical Access Server Facet.
+comment "Historical Access Delete Value (DOCUMENTED)"
+
+# A & C Comment (opc_cu_3083)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3083:A & C Comment.
+#   Notes: Spec CU 3083: tracked in manifest; not yet claimed or implemented.
+comment "A & C Comment (DOCUMENTED)"
+
+# Documentation - Users Guide (opc_cu_3084)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3084:Documentation - Users Guide.
+#   Notes: Spec CU 3084: tracked in manifest; not yet claimed or implemented.
+comment "Documentation - Users Guide (DOCUMENTED)"
+
+# A & C OffNormal (opc_cu_3098)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3098:A & C OffNormal.
+#   Notes: Spec CU 3098: tracked in manifest; not yet claimed or implemented.
+comment "A & C OffNormal (DOCUMENTED)"
+
+# Documentation - Supported Profiles (opc_cu_3107)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3107:Documentation - Supported Profiles.
+#   Notes: Spec CU 3107: tracked in manifest; not yet claimed or implemented.
+comment "Documentation - Supported Profiles (DOCUMENTED)"
+
+# Monitor Aggregate Filter (opc_cu_3121)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3121:Monitor Aggregate Filter.
+#   Notes: Spec CU 3121: tracked in manifest; not yet claimed or implemented.
+comment "Monitor Aggregate Filter (DOCUMENTED)"
+
+# Aggregate Subscription - Custom (opc_cu_3137)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3137:Aggregate Subscription - Custom.
+#   Notes: Spec CU 3137: tracked in manifest; not yet claimed or implemented.
+comment "Aggregate Subscription - Custom (DOCUMENTED)"
+
+# Monitor Alternate Encoding (opc_cu_3142)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3142:Monitor Alternate Encoding.
+#   Notes: Spec CU 3142: tracked in manifest; not yet claimed or implemented.
+comment "Monitor Alternate Encoding (DOCUMENTED)"
+
+# A & C Shelving (opc_cu_3165)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3165:A & C Shelving.
+#   Notes: Spec CU 3165: tracked in manifest; not yet claimed or implemented.
+comment "A & C Shelving (DOCUMENTED)"
+
+# Discovery Server Announcement using mDNS  (opc_cu_3171)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3171:Discovery Server Announcement using mDNS .
+#   Notes: Spec CU 3171: tracked in manifest; not yet claimed or implemented.
+comment "Discovery Server Announcement using mDNS  (DOCUMENTED)"
+
+# Authorization Service Configuration Server (opc_cu_3182)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3182:Authorization Service Configuration Server.
+#   Notes: Satisfied by role management implementation.
+comment "Authorization Service Configuration Server (DOCUMENTED)"
+
+# Base Info Security Role Capabilities (opc_cu_3197)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3197:Base Info Security Role Capabilities.
+#   Notes: Claimed: minimal type stubs and capability markers in place.
+comment "Base Info Security Role Capabilities (DOCUMENTED)"
+
+# Base Info Model Change General (opc_cu_3203)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3203:Base Info Model Change General.
+#   Notes: Claimed: minimal type stubs and capability markers in place.
+comment "Base Info Model Change General (DOCUMENTED)"
+
+# Base Info FileType Base (opc_cu_3213)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3213:Base Info FileType Base.
+#   Notes: Claimed: minimal type stubs and capability markers in place.
+comment "Base Info FileType Base (DOCUMENTED)"
+
+# Auditing History Services (opc_cu_3226)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3226:Auditing History Services.
+#   Notes: Satisfied by auditing implementation.
+comment "Auditing History Services (DOCUMENTED)"
+
+# Address Space Dictionary IRDI (opc_cu_3524)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3524:Address Space Dictionary IRDI.
+#   Notes: Reconciled: IRDI-based dictionary references. Backed by base_nodes.c type-system exposure and dictionary entries.
+comment "Address Space Dictionary IRDI (DOCUMENTED)"
+
+# Address Space Dictionary URI (opc_cu_3525)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3525:Address Space Dictionary URI.
+#   Notes: Reconciled: URI-based dictionary references. Backed by base_nodes.c type-system exposure and dictionary entries.
+comment "Address Space Dictionary URI (DOCUMENTED)"
+
+# Security Role Server Base 2 (opc_cu_3538)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3538:Security Role Server Base 2.
+#   Notes: Satisfied by role management implementation.
+comment "Security Role Server Base 2 (DOCUMENTED)"
+
+# Security Role Well Known (opc_cu_3539)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3539:Security Role Well Known.
+#   Notes: Satisfied by role management implementation.
+comment "Security Role Well Known (DOCUMENTED)"
+
+# Security Role Well Known Group 2 (opc_cu_3540)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3540:Security Role Well Known Group 2.
+#   Notes: Satisfied by role management implementation.
+comment "Security Role Well Known Group 2 (DOCUMENTED)"
+
+# Security Role Well Known Group 3 (opc_cu_3541)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3541:Security Role Well Known Group 3.
+#   Notes: Satisfied by role management implementation.
+comment "Security Role Well Known Group 3 (DOCUMENTED)"
+
+# Security Role Server Base Eventing (opc_cu_3542)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3542:Security Role Server Base Eventing.
+#   Notes: Satisfied by role management implementation.
+comment "Security Role Server Base Eventing (DOCUMENTED)"
+
+# Address Space Method Meta Data (opc_cu_3562)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3562:Address Space Method Meta Data.
+#   Notes: Reconciled: Method metadata with HasArgumentDescription/HasOptionalInputArgumentDescription. Backed by read_attribute.c and base_nodes.c method nodes.
+comment "Address Space Method Meta Data (DOCUMENTED)"
+
+# A & C Alarm Metrics (opc_cu_3571)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3571:A & C Alarm Metrics.
+#   Notes: Spec CU 3571: tracked in manifest; not yet claimed or implemented.
+comment "A & C Alarm Metrics (DOCUMENTED)"
+
+# A & E Wrapper Mapping (opc_cu_3572)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3572:A & E Wrapper Mapping.
+#   Notes: Spec CU 3572: tracked in manifest; not yet claimed or implemented.
+comment "A & E Wrapper Mapping (DOCUMENTED)"
+
+# Historical Access Aggregates (opc_cu_3574)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3574:Historical Access Aggregates.
+#   Notes: Spec CU 3574: tracked in manifest; not yet claimed or implemented.
+comment "Historical Access Aggregates (DOCUMENTED)"
+
+# Aggregate Master Configuration (opc_cu_3576)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3576:Aggregate Master Configuration.
+#   Notes: Spec CU 3576: tracked in manifest; not yet claimed or implemented.
+comment "Aggregate Master Configuration (DOCUMENTED)"
+
+# Aggregate Subscription - Filter (opc_cu_3577)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3577:Aggregate Subscription - Filter.
+#   Notes: Spec CU 3577: tracked in manifest; not yet claimed or implemented.
+comment "Aggregate Subscription - Filter (DOCUMENTED)"
+
+# GDS Query Applications (opc_cu_3581)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3581:GDS Query Applications.
+#   Notes: Spec CU 3581: tracked in manifest; not yet claimed or implemented.
+comment "GDS Query Applications (DOCUMENTED)"
+
+# GDS Certificate Manager Pull Model (opc_cu_3582)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3582:GDS Certificate Manager Pull Model.
+#   Notes: Satisfied by certificate management implementation.
+comment "GDS Certificate Manager Pull Model (DOCUMENTED)"
+
+# GDS Key Credential Service Pull Model (opc_cu_3584)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3584:GDS Key Credential Service Pull Model.
+#   Notes: Spec CU 3584: tracked in manifest; not yet claimed or implemented.
+comment "GDS Key Credential Service Pull Model (DOCUMENTED)"
+
+# GDS Authorization Service Server (opc_cu_3586)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3586:GDS Authorization Service Server.
+#   Notes: Satisfied by role management implementation.
+comment "GDS Authorization Service Server (DOCUMENTED)"
+
+# Base Info Method Capabilities (opc_cu_3605)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3605:Base Info Method Capabilities.
+#   Notes: Claimed: minimal type stubs and capability markers in place.
+comment "Base Info Method Capabilities (DOCUMENTED)"
+
+# Subscription Durable (opc_cu_3642)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3642:Subscription Durable.
+#   Notes: Spec CU 3642: tracked in manifest; not yet claimed or implemented.
+comment "Subscription Durable (DOCUMENTED)"
+
+# A & C Suppression Group (opc_cu_3760)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3760:A & C Suppression Group.
+#   Notes: Spec CU 3760: tracked in manifest; not yet claimed or implemented.
+comment "A & C Suppression Group (DOCUMENTED)"
+
+# A & C InstrumentDiagnostic (opc_cu_3761)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3761:A & C InstrumentDiagnostic.
+#   Notes: Spec CU 3761: tracked in manifest; not yet claimed or implemented.
+comment "A & C InstrumentDiagnostic (DOCUMENTED)"
+
+# A & C SystemDiagnostic (opc_cu_3762)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3762:A & C SystemDiagnostic.
+#   Notes: Spec CU 3762: tracked in manifest; not yet claimed or implemented.
+comment "A & C SystemDiagnostic (DOCUMENTED)"
+
+# A & C Acknowledge Auditing (opc_cu_3765)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3765:A & C Acknowledge Auditing.
+#   Notes: Spec CU 3765: tracked in manifest; not yet claimed or implemented.
+comment "A & C Acknowledge Auditing (DOCUMENTED)"
+
+# A & C Latching Auditing (opc_cu_3770)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3770:A & C Latching Auditing.
+#   Notes: Spec CU 3770: tracked in manifest; not yet claimed or implemented.
+comment "A & C Latching Auditing (DOCUMENTED)"
+
+# A & C OutOfService Auditing (opc_cu_3771)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3771:A & C OutOfService Auditing.
+#   Notes: Spec CU 3771: tracked in manifest; not yet claimed or implemented.
+comment "A & C OutOfService Auditing (DOCUMENTED)"
+
+# A & C Statemachine Trigger (opc_cu_3772)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3772:A & C Statemachine Trigger.
+#   Notes: Spec CU 3772: tracked in manifest; not yet claimed or implemented.
+comment "A & C Statemachine Trigger (DOCUMENTED)"
+
+# A & C Statemachine Suppression Trigger (opc_cu_3773)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3773:A & C Statemachine Suppression Trigger.
+#   Notes: Spec CU 3773: tracked in manifest; not yet claimed or implemented.
+comment "A & C Statemachine Suppression Trigger (DOCUMENTED)"
+
+# A & C Latched State (opc_cu_3774)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3774:A & C Latched State.
+#   Notes: Spec CU 3774: tracked in manifest; not yet claimed or implemented.
+comment "A & C Latched State (DOCUMENTED)"
+
+# A & C Alarm Group (opc_cu_3775)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3775:A & C Alarm Group.
+#   Notes: Spec CU 3775: tracked in manifest; not yet claimed or implemented.
+comment "A & C Alarm Group (DOCUMENTED)"
+
+# A & C GetGroupMemberships (opc_cu_3776)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3776:A & C GetGroupMemberships.
+#   Notes: Spec CU 3776: tracked in manifest; not yet claimed or implemented.
+comment "A & C GetGroupMemberships (DOCUMENTED)"
+
+# A & C Limit BaseLimit (opc_cu_3777)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3777:A & C Limit BaseLimit.
+#   Notes: Spec CU 3777: tracked in manifest; not yet claimed or implemented.
+comment "A & C Limit BaseLimit (DOCUMENTED)"
+
+# A & C Limit Severity (opc_cu_3778)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3778:A & C Limit Severity.
+#   Notes: Spec CU 3778: tracked in manifest; not yet claimed or implemented.
+comment "A & C Limit Severity (DOCUMENTED)"
+
+# A & C Limit Deadband (opc_cu_3779)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3779:A & C Limit Deadband.
+#   Notes: Spec CU 3779: tracked in manifest; not yet claimed or implemented.
+comment "A & C Limit Deadband (DOCUMENTED)"
+
+# Security User IssuedToken Kerberos Windows (opc_cu_3820)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3820:Security User IssuedToken Kerberos Windows.
+#   Notes: Satisfied by user authentication implementation; Kerberos Windows negotiation deferred.
+comment "Security User IssuedToken Kerberos Windows (DOCUMENTED)"
+
+# Security User Anonymous Server (opc_cu_3928)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3928:Security User Anonymous Server.
+#   Notes: Satisfied by user authentication implementation (Anonymous token support).
+comment "Security User Anonymous Server (DOCUMENTED)"
+
+# Address Space DataTypeDefinition Attribute (opc_cu_3941)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3941:Address Space DataTypeDefinition Attribute.
+#   Notes: Reconciled: DataTypeDefinition attribute on DataType nodes (OPC-10000-5 §12.2.12.3). Backed by base_nodes.c DataType nodes and read_attribute.c attribute handling.
+comment "Address Space DataTypeDefinition Attribute (DOCUMENTED)"
+
+# Address Space User Access Level Base (opc_cu_3965)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3965:Address Space User Access Level Base.
+#   Notes: Reconciled: Readable UserAccessLevel attribute on Variable nodes (OPC-10000-3 §5.5.9). Backed by read_attribute.c unconditionally.
+comment "Address Space User Access Level Base (DOCUMENTED)"
+
+# Base Info Model Change (opc_cu_3969)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3969:Base Info Model Change.
+#   Notes: Claimed: minimal type stubs and capability markers in place.
+comment "Base Info Model Change (DOCUMENTED)"
+
+# Auditing UpdateStates (opc_cu_3979)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3979:Auditing UpdateStates.
+#   Notes: Satisfied by auditing implementation.
+comment "Auditing UpdateStates (DOCUMENTED)"
+
+# Session Sessionless Invocation (opc_cu_3994)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3994:Session Sessionless Invocation.
+#   Notes: Spec CU 3994: tracked in manifest; not yet claimed or implemented.
+comment "Session Sessionless Invocation (DOCUMENTED)"
+
+# A & C Silencing Auditing (opc_cu_4428)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 4428:A & C Silencing Auditing.
+#   Notes: Spec CU 4428: tracked in manifest; not yet claimed or implemented.
+comment "A & C Silencing Auditing (DOCUMENTED)"
+
+# A & C Suppression2 by Operator (opc_cu_4463)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 4463:A & C Suppression2 by Operator.
+#   Notes: Spec CU 4463: tracked in manifest; not yet claimed or implemented.
+comment "A & C Suppression2 by Operator (DOCUMENTED)"
+
+# A & C OutOfService2 (opc_cu_4464)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 4464:A & C OutOfService2.
+#   Notes: Spec CU 4464: tracked in manifest; not yet claimed or implemented.
+comment "A & C OutOfService2 (DOCUMENTED)"
+
+# A & C Shelving2 (opc_cu_4465)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 4465:A & C Shelving2.
+#   Notes: Spec CU 4465: tracked in manifest; not yet claimed or implemented.
+comment "A & C Shelving2 (DOCUMENTED)"
+
+# A & C Dialog2 (opc_cu_4466)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 4466:A & C Dialog2.
+#   Notes: Spec CU 4466: tracked in manifest; not yet claimed or implemented.
+comment "A & C Dialog2 (DOCUMENTED)"
+
+# A & C OutOfService (opc_cu_4467)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 4467:A & C OutOfService.
+#   Notes: Spec CU 4467: tracked in manifest; not yet claimed or implemented.
+comment "A & C OutOfService (DOCUMENTED)"
+
+# Scheduler Scheduling Base (opc_cu_4500)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 4500:Scheduler Scheduling Base.
+#   Notes: Spec CU 4500: tracked in manifest; not yet claimed or implemented.
+comment "Scheduler Scheduling Base (DOCUMENTED)"
+
+# Scheduler Calendar Base (opc_cu_4501)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 4501:Scheduler Calendar Base.
+#   Notes: Spec CU 4501: tracked in manifest; not yet claimed or implemented.
+comment "Scheduler Calendar Base (DOCUMENTED)"
+
+# Scheduler Scheduling Configuration (opc_cu_4502)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 4502:Scheduler Scheduling Configuration.
+#   Notes: Spec CU 4502: tracked in manifest; not yet claimed or implemented.
+comment "Scheduler Scheduling Configuration (DOCUMENTED)"
+
+# Scheduler Calendar Configuration (opc_cu_4503)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 4503:Scheduler Calendar Configuration.
+#   Notes: Spec CU 4503: tracked in manifest; not yet claimed or implemented.
+comment "Scheduler Calendar Configuration (DOCUMENTED)"
+
+# Security User Management Server (opc_cu_4505)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 4505:Security User Management Server.
+#   Notes: Satisfied by role management and user auth infrastructure.
+comment "Security User Management Server (DOCUMENTED)"
+
+# Security User Identity Token Support (opc_cu_4957)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 4957:Security User Identity Token Support.
+#   Notes: Satisfied by user authentication implementation.
+comment "Security User Identity Token Support (DOCUMENTED)"
+
+# Auditing Connections (opc_cu_5213)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 5213:Auditing Connections.
+#   Notes: Spec CU 5213: tracked in manifest; not yet claimed or implemented.
+comment "Auditing Connections (DOCUMENTED)"
+
+# Monitor Items 500 (opc_cu_5242)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 5242:Monitor Items 500.
+#   Notes: Spec CU 5242: tracked in manifest; not yet claimed or implemented.
+comment "Monitor Items 500 (DOCUMENTED)"
+
+# Subscription Minimum 05 (opc_cu_5248)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 5248:Subscription Minimum 05.
+#   Notes: Spec CU 5248: tracked in manifest; not yet claimed or implemented.
+comment "Subscription Minimum 05 (DOCUMENTED)"
+
+# Subscription Publish Min 10 (opc_cu_5249)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 5249:Subscription Publish Min 10.
+#   Notes: Spec CU 5249: tracked in manifest; not yet claimed or implemented.
+comment "Subscription Publish Min 10 (DOCUMENTED)"
+
+# Monitor MinQueueSize_05 (opc_cu_5250)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 5250:Monitor MinQueueSize_05.
+#   Notes: Spec CU 5250: tracked in manifest; not yet claimed or implemented.
+comment "Monitor MinQueueSize_05 (DOCUMENTED)"
+
+# Security Role Server IdentityManagement (opc_cu_5274)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 5274:Security Role Server IdentityManagement.
+#   Notes: Satisfied by role management implementation.
+comment "Security Role Server IdentityManagement (DOCUMENTED)"
+
+# Security Role Server EndpointManagement (opc_cu_5275)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 5275:Security Role Server EndpointManagement.
+#   Notes: Satisfied by role management implementation.
+comment "Security Role Server EndpointManagement (DOCUMENTED)"
+
+# Security Role Server ApplicationManagement (opc_cu_5276)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 5276:Security Role Server ApplicationManagement.
+#   Notes: Satisfied by role management implementation.
+comment "Security Role Server ApplicationManagement (DOCUMENTED)"
+
+# Security Role TrustedApplication (opc_cu_5277)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 5277:Security Role TrustedApplication.
+#   Notes: Satisfied by role management implementation.
+comment "Security Role TrustedApplication (DOCUMENTED)"
+
+# KeyCredential ProfileURI - UA transport with UserName (opc_cu_5292)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 5292:KeyCredential ProfileURI - UA transport with UserName.
+#   Notes: Spec CU 5292: tracked in manifest; not yet claimed or implemented.
+comment "KeyCredential ProfileURI - UA transport with UserName (DOCUMENTED)"
+
+# KeyCredential Authentication Mechanism Support (opc_cu_5293)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 5293:KeyCredential Authentication Mechanism Support.
+#   Notes: Satisfied by KeyCredential service implementation.
+comment "KeyCredential Authentication Mechanism Support (DOCUMENTED)"
+
+# KeyCredential ProfileURI - AMQP SASL Plain (opc_cu_5301)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 5301:KeyCredential ProfileURI - AMQP SASL Plain.
+#   Notes: Spec CU 5301: tracked in manifest; not yet claimed or implemented.
+comment "KeyCredential ProfileURI - AMQP SASL Plain (DOCUMENTED)"
+
+# KeyCredential ProfileURI - MQTT UserName (opc_cu_5302)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 5302:KeyCredential ProfileURI - MQTT UserName.
+#   Notes: Spec CU 5302: tracked in manifest; not yet claimed or implemented.
+comment "KeyCredential ProfileURI - MQTT UserName (DOCUMENTED)"
+
+# Push Model for KeyCredential Service (opc_cu_5303)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 5303:Push Model for KeyCredential Service.
+#   Notes: Spec CU 5303: tracked in manifest; not yet claimed or implemented.
+comment "Push Model for KeyCredential Service (DOCUMENTED)"
+
+# A & C Enabled TransitionTime (opc_cu_5510)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 5510:A & C Enabled TransitionTime.
+#   Notes: Spec CU 5510: tracked in manifest; not yet claimed or implemented.
+comment "A & C Enabled TransitionTime (DOCUMENTED)"
+
+# A & C Enabled EffectiveTransitionTime  (opc_cu_5511)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 5511:A & C Enabled EffectiveTransitionTime .
+#   Notes: Spec CU 5511: tracked in manifest; not yet claimed or implemented.
+comment "A & C Enabled EffectiveTransitionTime  (DOCUMENTED)"
+
+# A & C Enabled EffectiveDisplayName  (opc_cu_5512)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 5512:A & C Enabled EffectiveDisplayName .
+#   Notes: Spec CU 5512: tracked in manifest; not yet claimed or implemented.
+comment "A & C Enabled EffectiveDisplayName  (DOCUMENTED)"
+
+# A & C Active TransitionTime  (opc_cu_5513)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 5513:A & C Active TransitionTime .
+#   Notes: Spec CU 5513: tracked in manifest; not yet claimed or implemented.
+comment "A & C Active TransitionTime  (DOCUMENTED)"
+
+# A & C Active EffectiveTransitionTime  (opc_cu_5514)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 5514:A & C Active EffectiveTransitionTime .
+#   Notes: Spec CU 5514: tracked in manifest; not yet claimed or implemented.
+comment "A & C Active EffectiveTransitionTime  (DOCUMENTED)"
+
+# A & C Active EffectiveDisplayName  (opc_cu_5515)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 5515:A & C Active EffectiveDisplayName .
+#   Notes: Spec CU 5515: tracked in manifest; not yet claimed or implemented.
+comment "A & C Active EffectiveDisplayName  (DOCUMENTED)"
+
+# A & C Acknowledge TransitionTime (opc_cu_5516)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 5516:A & C Acknowledge TransitionTime.
+#   Notes: Spec CU 5516: tracked in manifest; not yet claimed or implemented.
+comment "A & C Acknowledge TransitionTime (DOCUMENTED)"
+
+# A & C Acknowledge EffectiveTransitionTime  (opc_cu_5517)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 5517:A & C Acknowledge EffectiveTransitionTime .
+#   Notes: Spec CU 5517: tracked in manifest; not yet claimed or implemented.
+comment "A & C Acknowledge EffectiveTransitionTime  (DOCUMENTED)"
+
+# A & C Acknowledge EffectiveDisplayName  (opc_cu_5518)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 5518:A & C Acknowledge EffectiveDisplayName .
+#   Notes: Spec CU 5518: tracked in manifest; not yet claimed or implemented.
+comment "A & C Acknowledge EffectiveDisplayName  (DOCUMENTED)"
+
+# A & C Confirm TransitionTime  (opc_cu_5519)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 5519:A & C Confirm TransitionTime .
+#   Notes: Spec CU 5519: tracked in manifest; not yet claimed or implemented.
+comment "A & C Confirm TransitionTime  (DOCUMENTED)"
+
+# A & C Confirm EffectiveTransitionTime (opc_cu_5520)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 5520:A & C Confirm EffectiveTransitionTime.
+#   Notes: Spec CU 5520: tracked in manifest; not yet claimed or implemented.
+comment "A & C Confirm EffectiveTransitionTime (DOCUMENTED)"
+
+# A & C Confirm EffectiveDisplayName (opc_cu_5521)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 5521:A & C Confirm EffectiveDisplayName.
+#   Notes: Spec CU 5521: tracked in manifest; not yet claimed or implemented.
+comment "A & C Confirm EffectiveDisplayName (DOCUMENTED)"
+
+# A & C Suppression TransitionTime (opc_cu_5522)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 5522:A & C Suppression TransitionTime.
+#   Notes: Spec CU 5522: tracked in manifest; not yet claimed or implemented.
+comment "A & C Suppression TransitionTime (DOCUMENTED)"
+
+# A & C Suppression EffectiveTransitionTime (opc_cu_5523)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 5523:A & C Suppression EffectiveTransitionTime.
+#   Notes: Spec CU 5523: tracked in manifest; not yet claimed or implemented.
+comment "A & C Suppression EffectiveTransitionTime (DOCUMENTED)"
+
+# A & C Suppression EffectiveDisplayName (opc_cu_5524)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 5524:A & C Suppression EffectiveDisplayName.
+#   Notes: Spec CU 5524: tracked in manifest; not yet claimed or implemented.
+comment "A & C Suppression EffectiveDisplayName (DOCUMENTED)"
+
+# A & C OutOfService TransitionTime (opc_cu_5525)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 5525:A & C OutOfService TransitionTime.
+#   Notes: Spec CU 5525: tracked in manifest; not yet claimed or implemented.
+comment "A & C OutOfService TransitionTime (DOCUMENTED)"
+
+# A & C OutOfService EffectiveTransitionTime (opc_cu_5526)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 5526:A & C OutOfService EffectiveTransitionTime.
+#   Notes: Spec CU 5526: tracked in manifest; not yet claimed or implemented.
+comment "A & C OutOfService EffectiveTransitionTime (DOCUMENTED)"
+
+# A & C OutOfService EffectiveDisplayName (opc_cu_5527)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 5527:A & C OutOfService EffectiveDisplayName.
+#   Notes: Spec CU 5527: tracked in manifest; not yet claimed or implemented.
+comment "A & C OutOfService EffectiveDisplayName (DOCUMENTED)"
+
+# A & C Silence TransitionTime (opc_cu_5528)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 5528:A & C Silence TransitionTime.
+#   Notes: Spec CU 5528: tracked in manifest; not yet claimed or implemented.
+comment "A & C Silence TransitionTime (DOCUMENTED)"
+
+# A & C Silence EffectiveTransitionTime (opc_cu_5529)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 5529:A & C Silence EffectiveTransitionTime.
+#   Notes: Spec CU 5529: tracked in manifest; not yet claimed or implemented.
+comment "A & C Silence EffectiveTransitionTime (DOCUMENTED)"
+
+# A & C Silence EffectiveDisplayName (opc_cu_5530)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 5530:A & C Silence EffectiveDisplayName.
+#   Notes: Spec CU 5530: tracked in manifest; not yet claimed or implemented.
+comment "A & C Silence EffectiveDisplayName (DOCUMENTED)"
+
+# A & C Latched TransitionTime (opc_cu_5531)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 5531:A & C Latched TransitionTime.
+#   Notes: Spec CU 5531: tracked in manifest; not yet claimed or implemented.
+comment "A & C Latched TransitionTime (DOCUMENTED)"
+
+# A & C Latched EffectiveTransitionTime (opc_cu_5532)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 5532:A & C Latched EffectiveTransitionTime.
+#   Notes: Spec CU 5532: tracked in manifest; not yet claimed or implemented.
+comment "A & C Latched EffectiveTransitionTime (DOCUMENTED)"
+
+# A & C Latched EffectiveDisplayName (opc_cu_5533)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 5533:A & C Latched EffectiveDisplayName.
+#   Notes: Spec CU 5533: tracked in manifest; not yet claimed or implemented.
+comment "A & C Latched EffectiveDisplayName (DOCUMENTED)"
+
+# A & C Non-Exclusive HighHigh TransitionTime (opc_cu_5534)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 5534:A & C Non-Exclusive HighHigh TransitionTime.
+#   Notes: Spec CU 5534: tracked in manifest; not yet claimed or implemented.
+comment "A & C Non-Exclusive HighHigh TransitionTime (DOCUMENTED)"
+
+# A & C Non-Exclusive High TransitionTime (opc_cu_5535)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 5535:A & C Non-Exclusive High TransitionTime.
+#   Notes: Spec CU 5535: tracked in manifest; not yet claimed or implemented.
+comment "A & C Non-Exclusive High TransitionTime (DOCUMENTED)"
+
+# A & C Non-Exclusive Low TransitionTime (opc_cu_5536)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 5536:A & C Non-Exclusive Low TransitionTime.
+#   Notes: Spec CU 5536: tracked in manifest; not yet claimed or implemented.
+comment "A & C Non-Exclusive Low TransitionTime (DOCUMENTED)"
+
+# A & C Non-Exclusive LowLow TransitionTime (opc_cu_5537)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 5537:A & C Non-Exclusive LowLow TransitionTime.
+#   Notes: Spec CU 5537: tracked in manifest; not yet claimed or implemented.
+comment "A & C Non-Exclusive LowLow TransitionTime (DOCUMENTED)"
+
+# A & C Non-Exclusive HighHigh EffectiveTransitionTime (opc_cu_5538)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 5538:A & C Non-Exclusive HighHigh EffectiveTransitionTime.
+#   Notes: Spec CU 5538: tracked in manifest; not yet claimed or implemented.
+comment "A & C Non-Exclusive HighHigh EffectiveTransitionTime (DOCUMENTED)"
+
+# A & C Non-Exclusive High EffectiveTransitionTime (opc_cu_5539)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 5539:A & C Non-Exclusive High EffectiveTransitionTime.
+#   Notes: Spec CU 5539: tracked in manifest; not yet claimed or implemented.
+comment "A & C Non-Exclusive High EffectiveTransitionTime (DOCUMENTED)"
+
+# A & C Non-Exclusive Low EffectiveTransitionTime (opc_cu_5540)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 5540:A & C Non-Exclusive Low EffectiveTransitionTime.
+#   Notes: Spec CU 5540: tracked in manifest; not yet claimed or implemented.
+comment "A & C Non-Exclusive Low EffectiveTransitionTime (DOCUMENTED)"
+
+# A & C Non-Exclusive LowLow EffectiveTransitionTime (opc_cu_5541)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 5541:A & C Non-Exclusive LowLow EffectiveTransitionTime.
+#   Notes: Spec CU 5541: tracked in manifest; not yet claimed or implemented.
+comment "A & C Non-Exclusive LowLow EffectiveTransitionTime (DOCUMENTED)"
+
+# A & C Non-Exclusive HighHigh EffectiveDisplayName (opc_cu_5542)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 5542:A & C Non-Exclusive HighHigh EffectiveDisplayName.
+#   Notes: Spec CU 5542: tracked in manifest; not yet claimed or implemented.
+comment "A & C Non-Exclusive HighHigh EffectiveDisplayName (DOCUMENTED)"
+
+# A & C Non-Exclusive High EffectiveDisplayName (opc_cu_5543)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 5543:A & C Non-Exclusive High EffectiveDisplayName.
+#   Notes: Spec CU 5543: tracked in manifest; not yet claimed or implemented.
+comment "A & C Non-Exclusive High EffectiveDisplayName (DOCUMENTED)"
+
+# A & C Non-Exclusive Low EffectiveDisplayName (opc_cu_5544)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 5544:A & C Non-Exclusive Low EffectiveDisplayName.
+#   Notes: Spec CU 5544: tracked in manifest; not yet claimed or implemented.
+comment "A & C Non-Exclusive Low EffectiveDisplayName (DOCUMENTED)"
+
+# A & C Non-Exclusive LowLow EffectiveDisplayName (opc_cu_5545)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 5545:A & C Non-Exclusive LowLow EffectiveDisplayName.
+#   Notes: Spec CU 5545: tracked in manifest; not yet claimed or implemented.
+comment "A & C Non-Exclusive LowLow EffectiveDisplayName (DOCUMENTED)"
+
+# A & C Dialog TransitionTime (opc_cu_5546)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 5546:A & C Dialog TransitionTime.
+#   Notes: Spec CU 5546: tracked in manifest; not yet claimed or implemented.
+comment "A & C Dialog TransitionTime (DOCUMENTED)"
+
+# A & C Dialog EffectiveTransitionTime (opc_cu_5547)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 5547:A & C Dialog EffectiveTransitionTime.
+#   Notes: Spec CU 5547: tracked in manifest; not yet claimed or implemented.
+comment "A & C Dialog EffectiveTransitionTime (DOCUMENTED)"
+
+# A & C Dialog EffectiveDisplayName (opc_cu_5548)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 5548:A & C Dialog EffectiveDisplayName.
+#   Notes: Spec CU 5548: tracked in manifest; not yet claimed or implemented.
+comment "A & C Dialog EffectiveDisplayName (DOCUMENTED)"
+
+# A & C Shelving LastTransition (opc_cu_5549)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 5549:A & C Shelving LastTransition.
+#   Notes: Spec CU 5549: tracked in manifest; not yet claimed or implemented.
+comment "A & C Shelving LastTransition (DOCUMENTED)"
+
+# A & C Shelving UnshelvedToTimedShelved TransitionTime (opc_cu_5550)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 5550:A & C Shelving UnshelvedToTimedShelved TransitionTime.
+#   Notes: Spec CU 5550: tracked in manifest; not yet claimed or implemented.
+comment "A & C Shelving UnshelvedToTimedShelved TransitionTime (DOCUMENTED)"
+
+# A & C Shelving TimedShelvedToUnshelved TransitionTime (opc_cu_5551)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 5551:A & C Shelving TimedShelvedToUnshelved TransitionTime.
+#   Notes: Spec CU 5551: tracked in manifest; not yet claimed or implemented.
+comment "A & C Shelving TimedShelvedToUnshelved TransitionTime (DOCUMENTED)"
+
+# A & C Shelving TimedShelvedToOneShotShelved TransitionTime (opc_cu_5552)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 5552:A & C Shelving TimedShelvedToOneShotShelved TransitionTime.
+#   Notes: Spec CU 5552: tracked in manifest; not yet claimed or implemented.
+comment "A & C Shelving TimedShelvedToOneShotShelved TransitionTime (DOCUMENTED)"
+
+# A & C Shelving UnshelvedToOneShotShelved TransitionTime (opc_cu_5553)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 5553:A & C Shelving UnshelvedToOneShotShelved TransitionTime.
+#   Notes: Spec CU 5553: tracked in manifest; not yet claimed or implemented.
+comment "A & C Shelving UnshelvedToOneShotShelved TransitionTime (DOCUMENTED)"
+
+# A & C Shelving OneShotShelvedToUnshelved TransitionTime (opc_cu_5554)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 5554:A & C Shelving OneShotShelvedToUnshelved TransitionTime.
+#   Notes: Spec CU 5554: tracked in manifest; not yet claimed or implemented.
+comment "A & C Shelving OneShotShelvedToUnshelved TransitionTime (DOCUMENTED)"
+
+# A & C Shelving OneShotShelvedToTimedShelved TransitionTime (opc_cu_5555)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 5555:A & C Shelving OneShotShelvedToTimedShelved TransitionTime.
+#   Notes: Spec CU 5555: tracked in manifest; not yet claimed or implemented.
+comment "A & C Shelving OneShotShelvedToTimedShelved TransitionTime (DOCUMENTED)"
+
+# A & C Shelving Unshelved EffectiveDisplayName (opc_cu_5556)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 5556:A & C Shelving Unshelved EffectiveDisplayName.
+#   Notes: Spec CU 5556: tracked in manifest; not yet claimed or implemented.
+comment "A & C Shelving Unshelved EffectiveDisplayName (DOCUMENTED)"
+
+# A & C Shelving TimedShelved EffectiveDisplayName (opc_cu_5557)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 5557:A & C Shelving TimedShelved EffectiveDisplayName.
+#   Notes: Spec CU 5557: tracked in manifest; not yet claimed or implemented.
+comment "A & C Shelving TimedShelved EffectiveDisplayName (DOCUMENTED)"
+
+# A & C Shelving OneShotShelved EffectiveDisplayName (opc_cu_5558)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 5558:A & C Shelving OneShotShelved EffectiveDisplayName.
+#   Notes: Spec CU 5558: tracked in manifest; not yet claimed or implemented.
+comment "A & C Shelving OneShotShelved EffectiveDisplayName (DOCUMENTED)"
+
+# A & C Exclusive Limit LastTransition (opc_cu_5559)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 5559:A & C Exclusive Limit LastTransition.
+#   Notes: Spec CU 5559: tracked in manifest; not yet claimed or implemented.
+comment "A & C Exclusive Limit LastTransition (DOCUMENTED)"
+
+# A & C Exclusive Limit LowToLowLow TransitionTime (opc_cu_5560)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 5560:A & C Exclusive Limit LowToLowLow TransitionTime.
+#   Notes: Spec CU 5560: tracked in manifest; not yet claimed or implemented.
+comment "A & C Exclusive Limit LowToLowLow TransitionTime (DOCUMENTED)"
+
+# A & C Exclusive Limit LowLowToLow TransitionTime (opc_cu_5561)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 5561:A & C Exclusive Limit LowLowToLow TransitionTime.
+#   Notes: Spec CU 5561: tracked in manifest; not yet claimed or implemented.
+comment "A & C Exclusive Limit LowLowToLow TransitionTime (DOCUMENTED)"
+
+# A & C Exclusive Limit HighToHighHigh TransitionTime (opc_cu_5562)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 5562:A & C Exclusive Limit HighToHighHigh TransitionTime.
+#   Notes: Spec CU 5562: tracked in manifest; not yet claimed or implemented.
+comment "A & C Exclusive Limit HighToHighHigh TransitionTime (DOCUMENTED)"
+
+# A & C Exclusive Limit HighHighToHigh TransitionTime (opc_cu_5563)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 5563:A & C Exclusive Limit HighHighToHigh TransitionTime.
+#   Notes: Spec CU 5563: tracked in manifest; not yet claimed or implemented.
+comment "A & C Exclusive Limit HighHighToHigh TransitionTime (DOCUMENTED)"
+
+# A & C Exclusive Limit LowLow EffectiveDisplayName (opc_cu_5564)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 5564:A & C Exclusive Limit LowLow EffectiveDisplayName.
+#   Notes: Spec CU 5564: tracked in manifest; not yet claimed or implemented.
+comment "A & C Exclusive Limit LowLow EffectiveDisplayName (DOCUMENTED)"
+
+# A & C Exclusive Limit Low EffectiveDisplayName (opc_cu_5565)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 5565:A & C Exclusive Limit Low EffectiveDisplayName.
+#   Notes: Spec CU 5565: tracked in manifest; not yet claimed or implemented.
+comment "A & C Exclusive Limit Low EffectiveDisplayName (DOCUMENTED)"
+
+# A & C Exclusive Limit High EffectiveDisplayName (opc_cu_5566)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 5566:A & C Exclusive Limit High EffectiveDisplayName.
+#   Notes: Spec CU 5566: tracked in manifest; not yet claimed or implemented.
+comment "A & C Exclusive Limit High EffectiveDisplayName (DOCUMENTED)"
+
+# A & C Exclusive Limit HighHigh EffectiveDisplayName (opc_cu_5567)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 5567:A & C Exclusive Limit HighHigh EffectiveDisplayName.
+#   Notes: Spec CU 5567: tracked in manifest; not yet claimed or implemented.
+comment "A & C Exclusive Limit HighHigh EffectiveDisplayName (DOCUMENTED)"
+
+# LogObject Base  (opc_cu_5652)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 5652:LogObject Base .
+#   Notes: Spec CU 5652: tracked in manifest; not yet claimed or implemented.
+comment "LogObject Base  (DOCUMENTED)"
+
+# LogObject Persistent Storage  (opc_cu_5653)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 5653:LogObject Persistent Storage .
+#   Notes: Spec CU 5653: tracked in manifest; not yet claimed or implemented.
+comment "LogObject Persistent Storage  (DOCUMENTED)"
+
+# LogObject TraceContext  (opc_cu_5654)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 5654:LogObject TraceContext .
+#   Notes: Spec CU 5654: tracked in manifest; not yet claimed or implemented.
+comment "LogObject TraceContext  (DOCUMENTED)"
+
+# LogObject AdditionalData (opc_cu_5655)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 5655:LogObject AdditionalData.
+#   Notes: Spec CU 5655: tracked in manifest; not yet claimed or implemented.
+comment "LogObject AdditionalData (DOCUMENTED)"
+
+# LogObject Base Event Collection (opc_cu_5656)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 5656:LogObject Base Event Collection.
+#   Notes: Spec CU 5656: tracked in manifest; not yet claimed or implemented.
+comment "LogObject Base Event Collection (DOCUMENTED)"
+
+# LogObject Storage Overflow (opc_cu_5658)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 5658:LogObject Storage Overflow.
+#   Notes: Spec CU 5658: tracked in manifest; not yet claimed or implemented.
+comment "LogObject Storage Overflow (DOCUMENTED)"
+
+# LogObject Event Generation (opc_cu_5659)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 5659:LogObject Event Generation.
+#   Notes: Spec CU 5659: tracked in manifest; not yet claimed or implemented.
+comment "LogObject Event Generation (DOCUMENTED)"
+
+# LogObject MaxRecords (opc_cu_5660)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 5660:LogObject MaxRecords.
+#   Notes: Spec CU 5660: tracked in manifest; not yet claimed or implemented.
+comment "LogObject MaxRecords (DOCUMENTED)"
+
+# LogObject MaxStorageDuration (opc_cu_5661)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 5661:LogObject MaxStorageDuration.
+#   Notes: Spec CU 5661: tracked in manifest; not yet claimed or implemented.
+comment "LogObject MaxStorageDuration (DOCUMENTED)"
+
+# LogObject MinimumSeverity (opc_cu_5662)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 5662:LogObject MinimumSeverity.
+#   Notes: Spec CU 5662: tracked in manifest; not yet claimed or implemented.
+comment "LogObject MinimumSeverity (DOCUMENTED)"
+
+# LogObject Logs Folder (opc_cu_5663)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 5663:LogObject Logs Folder.
+#   Notes: Spec CU 5663: tracked in manifest; not yet claimed or implemented.
+comment "LogObject Logs Folder (DOCUMENTED)"
+
+# LogObject ServerLog  (opc_cu_5664)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 5664:LogObject ServerLog .
+#   Notes: Spec CU 5664: tracked in manifest; not yet claimed or implemented.
+comment "LogObject ServerLog  (DOCUMENTED)"
+
+# LogObject EventType (opc_cu_5775)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 5775:LogObject EventType.
+#   Notes: Spec CU 5775: tracked in manifest; not yet claimed or implemented.
+comment "LogObject EventType (DOCUMENTED)"
+
+# LogObject SourceNode (opc_cu_5776)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 5776:LogObject SourceNode.
+#   Notes: Spec CU 5776: tracked in manifest; not yet claimed or implemented.
+comment "LogObject SourceNode (DOCUMENTED)"
+
+# Base Info TemporaryFileTransferType Base (opc_cu_5791)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 5791:Base Info TemporaryFileTransferType Base.
+#   Notes: Claimed: minimal type stubs and capability markers in place.
+comment "Base Info TemporaryFileTransferType Base (DOCUMENTED)"
+
+# Documentation - Durable Subscription Capacity (opc_cu_5795)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 5795:Documentation - Durable Subscription Capacity.
+#   Notes: Spec CU 5795: tracked in manifest; not yet claimed or implemented.
+comment "Documentation - Durable Subscription Capacity (DOCUMENTED)"
+
+# Documentation - On-line (opc_cu_5796)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 5796:Documentation - On-line.
+#   Notes: Spec CU 5796: tracked in manifest; not yet claimed or implemented.
+comment "Documentation - On-line (DOCUMENTED)"
+
+# Documentation - Trouble Shooting Guide (opc_cu_5797)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 5797:Documentation - Trouble Shooting Guide.
+#   Notes: Spec CU 5797: tracked in manifest; not yet claimed or implemented.
+comment "Documentation - Trouble Shooting Guide (DOCUMENTED)"
+
+# Historical Access Read Raw (opc_cu_5806)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 5806:Historical Access Read Raw.
+#   Notes: Satisfied by Historical Access Server Facet.
+comment "Historical Access Read Raw (DOCUMENTED)"
+
+# A & C Non-Exclusive Limit (opc_cu_5807)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 5807:A & C Non-Exclusive Limit.
+#   Notes: Spec CU 5807: tracked in manifest; not yet claimed or implemented.
+comment "A & C Non-Exclusive Limit (DOCUMENTED)"
+
+# A & C Exclusive Limit (opc_cu_5808)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 5808:A & C Exclusive Limit.
+#   Notes: Spec CU 5808: tracked in manifest; not yet claimed or implemented.
+comment "A & C Exclusive Limit (DOCUMENTED)"
+
+# Security User JWT IssuedToken 2 (opc_cu_5809)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 5809:Security User JWT IssuedToken 2.
+#   Notes: Satisfied by user authentication implementation including JWT (IssuedToken) token support.
+comment "Security User JWT IssuedToken 2 (DOCUMENTED)"
+
+# Security User IssuedToken Kerberos (opc_cu_5810)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 5810:Security User IssuedToken Kerberos.
+#   Notes: Satisfied by user authentication implementation; Kerberos-specific Windows negotiation deferred.
+comment "Security User IssuedToken Kerberos (DOCUMENTED)"
+
+# Attribute Historical Update  (opc_cu_5812)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 5812:Attribute Historical Update .
+#   Notes: Satisfied by Historical Access Server Facet.
+comment "Attribute Historical Update  (DOCUMENTED)"
+
+# Attribute Historical Read  (opc_cu_5813)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 5813:Attribute Historical Read .
+#   Notes: Satisfied by Historical Access Server Facet.
+comment "Attribute Historical Read  (DOCUMENTED)"
+
+# AliasName FindAliasVerbose (opc_cu_5869)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 5869:AliasName FindAliasVerbose.
+#   Notes: Spec CU 5869: tracked in manifest; not yet claimed or implemented.
+comment "AliasName FindAliasVerbose (DOCUMENTED)"
+
+# AliasName Category LastChange (opc_cu_5873)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 5873:AliasName Category LastChange.
+#   Notes: Spec CU 5873: tracked in manifest; not yet claimed or implemented.
+comment "AliasName Category LastChange (DOCUMENTED)"
+
+# AliasName Configuration Support (opc_cu_5874)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 5874:AliasName Configuration Support.
+#   Notes: Spec CU 5874: tracked in manifest; not yet claimed or implemented.
+comment "AliasName Configuration Support (DOCUMENTED)"
+
+# Base Info State Machine DescriptionNodeIdDataType (opc_cu_5875)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 5875:Base Info State Machine DescriptionNodeIdDataType.
+#   Notes: Claimed: minimal type stubs and capability markers in place.
+comment "Base Info State Machine DescriptionNodeIdDataType (DOCUMENTED)"
+
+# AliasName Configuration Support external (opc_cu_5937)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 5937:AliasName Configuration Support external.
+#   Notes: Spec CU 5937: tracked in manifest; not yet claimed or implemented.
+comment "AliasName Configuration Support external (DOCUMENTED)"
+
+# AliasName PubSub Subscriber   (opc_cu_5940)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 5940:AliasName PubSub Subscriber  .
+#   Notes: Spec CU 5940: tracked in manifest; not yet claimed or implemented.
+comment "AliasName PubSub Subscriber   (DOCUMENTED)"
+
+# AliasName PubSub Notification (opc_cu_5941)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 5941:AliasName PubSub Notification.
+#   Notes: Spec CU 5941: tracked in manifest; not yet claimed or implemented.
+comment "AliasName PubSub Notification (DOCUMENTED)"
+
+# Scheduler Base (opc_cu_scheduler)
+#   Implementation state: documented -- visible but not selectable.
+#   OPC source: OPC-10000-7.
+comment "Scheduler Base (DOCUMENTED) [OPC-10000-7]"
+
+# AliasName Server (opc_cu_aliasname)
+#   Implementation state: documented -- visible but not selectable.
+#   OPC source: OPC-10000-7.
+comment "AliasName Server (DOCUMENTED) [OPC-10000-7]"
+
 endif
 
 config MUC_OPCUA_FACET_SECURITY_TIME_SYNCHRONIZATION
@@ -1383,7 +3808,7 @@ config MUC_OPCUA_FACET_SECURITY_TIME_SYNCHRONIZATION
 	  OPC source: OPC-10000-7 §4.2.
 	  Notes: Security Time Sync: CUs 5793,3802,5505,2478,2786 claimed
 
-config MUC_OPCUA_FACET_UA_TCP_UA_SC_UA_BINARY
+menuconfig MUC_OPCUA_FACET_UA_TCP_UA_SC_UA_BINARY
 	bool "UA-TCP UA-SC UA-Binary"
 	default y if MUC_OPCUA_INTERN_PROFILE_NANO_EMBEDDED_DEVICE_2025_SERVER
 	help
@@ -1391,17 +3816,109 @@ config MUC_OPCUA_FACET_UA_TCP_UA_SC_UA_BINARY
 	  OPC source: OPC-10000-7 §4.2.
 	  Notes: UA-TCP UA-SC UA-Binary: CUs 2371,2837,2853 claimed
 
+if MUC_OPCUA_FACET_UA_TCP_UA_SC_UA_BINARY
+
+# Protocol UA TCP (opc_cu_protocol_ua_tcp)
+#   Implementation state: documented -- visible but not selectable.
+#   OPC source: OPC-10000-6 §7.1.
+#   Detail: CU 2371:Protocol UA TCP.
+#   Imported from: comprehensive-fix (Fix 2).
+#   Notes: Already-implemented CU added to manifest as claimed so the feature is tracked, gated by its Kconfig symbol, and covered by the claim/test map.
+comment "Protocol UA TCP (DOCUMENTED) [OPC-10000-6 §7.1]"
+
+# UA Binary Encoding (opc_cu_ua_binary_encoding)
+#   Implementation state: documented -- visible but not selectable.
+#   OPC source: OPC-10000-6 §5.
+#   Detail: CU 2837:UA Binary Encoding.
+#   Imported from: comprehensive-fix (Fix 2).
+#   Notes: Already-implemented CU added to manifest as claimed so the feature is tracked, gated by its Kconfig symbol, and covered by the claim/test map.
+comment "UA Binary Encoding (DOCUMENTED) [OPC-10000-6 §5]"
+
+# UA Secure Conversation (opc_cu_ua_secure_conversation)
+#   Implementation state: documented -- visible but not selectable.
+#   OPC source: OPC-10000-6 §6.
+#   Detail: CU 2853:UA Secure Conversation.
+#   Imported from: comprehensive-fix (Fix 2).
+#   Notes: Already-implemented CU added to manifest as claimed so the feature is tracked, gated by its Kconfig symbol, and covered by the claim/test map.
+comment "UA Secure Conversation (DOCUMENTED) [OPC-10000-6 §6]"
+
+endif
+
 endmenu
 
 menu "Profile: Micro Embedded Device 2025 Server Profile"
 
-config MUC_OPCUA_FACET_EMBEDDED_DATACHANGE_SUBSCRIPTION_2022_SERVER
+menuconfig MUC_OPCUA_FACET_EMBEDDED_DATACHANGE_SUBSCRIPTION_2022_SERVER
 	bool "Embedded DataChange Subscription 2022 Server Facet"
 	default y if MUC_OPCUA_INTERN_PROFILE_MICRO_EMBEDDED_DEVICE_2025_SERVER
 	help
 	  Implementation state: implemented.
 	  OPC source: OPC-10000-7 §4.2.
 	  Notes: Embedded DataChange 2022: all subscription CUs claimed
+
+if MUC_OPCUA_FACET_EMBEDDED_DATACHANGE_SUBSCRIPTION_2022_SERVER
+
+# Monitor Basic (opc_cu_2963)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2963:Monitor Basic.
+#   Notes: Support the following MonitoredItem Services: CreateMonitoredItems, ModifyMonitoredItems, DeleteMonitoredItems and SetMonitoringMode.
+comment "Monitor Basic (DOCUMENTED)"
+
+# Subscription PublishRequest Queue Overflow (opc_cu_3143)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3143:Subscription PublishRequest Queue Overflow.
+#   Notes: Reconciled (spec 073): on Publish-queue overflow handle_publish evicts the OLDEST parked request and answers it with Bad_TooManyPublishRequests, then parks the incoming request (publish_request_evict_oldest, publish_due.c; OPC-10000-4 §5.14.5.1); test_subscriptions_capacity::test_publish_queue_overflow_evicts_oldest_and_parks_newest. Satisfied by opc_cu_subscription_basic. If the maximum supported number of PublishRequests has been queued and a new PublishRequest arrives, the "oldest" PublishRequest has to be discarded by returning the proper error.
+comment "Subscription PublishRequest Queue Overflow (DOCUMENTED)"
+
+# Base Info Fixed SamplingInterval (opc_cu_3196)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3196:Base Info Fixed SamplingInterval.
+#   Notes: Satisfied by project-level CU opc_cu_subscription_basic.
+comment "Base Info Fixed SamplingInterval (DOCUMENTED)"
+
+# Subscription Basic (opc_cu_3727)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3727:Subscription Basic.
+#   Notes: Support the following Subscription Services: CreateSubscription, ModifySubscription, DeleteSubscriptions, Publish, Republish and SetPublishingMode.
+comment "Subscription Basic (DOCUMENTED)"
+
+# Base Info Server Capabilities Subscriptions (opc_cu_3911)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3911:Base Info Server Capabilities Subscriptions.
+#   Notes: Reconciled (spec 073): ServerCapabilities exposes AggregateFunctions(2997), MaxSubscriptions(24096), MaxMonitoredItems(24097), MaxSubscriptionsPerSession(24098), MaxMonitoredItemsPerSubscription(24104) + existing MaxMonitoredItemsPerCall(11714) in base_nodes.c (both address-space tables), advertised values == enforced MU_INTERN_* caps; test_operation_limits::test_subscription_capability_nodes_resolve. Satisfied by opc_cu_subscription_basic. Exposes AggregateFunctions, MaxSubscriptions, MaxMonitoredItems, MaxSubscriptionsPerSession and MaxMonitoredItemsPerSubscription of the ServerCapabilities Object as well as MaxMonitoredItemsPerCall of the OperationLimits Object.
+comment "Base Info Server Capabilities Subscriptions (DOCUMENTED)"
+
+# Subscription Publish Basic (opc_cu_3913)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3913:Subscription Publish Basic.
+#   Notes: Support at least 2 Publish Service requests per Session.
+comment "Subscription Publish Basic (DOCUMENTED)"
+
+# Base Info SemanticChange Bit (opc_cu_3922)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3922:Base Info SemanticChange Bit.
+#   Notes: Reconciled (spec 073): mu_server_signal_semantic_change (public API) latches per-MonitoredItem; the next DataChange Notification sets StatusCode bit 14 (0x4000, SemanticsChanged) then the one-shot latch clears (notification.c + deadband.c, OPC-10000-4 §7.38.1); test_subscriptions::test_publish_semantics_changed_bit (E2E emit->decode). Satisfied by opc_cu_subscription_basic. Supports setting the SemanticsChanged Bit in the statusCode when a semantic change occurs, such as a change in the engineering unit associated with the Value Attribute.
+comment "Base Info SemanticChange Bit (DOCUMENTED)"
+
+# Base Info Server Capabilities MaxMonitoredItemsQueueSize (opc_cu_4055)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 4055:Base Info Server Capabilities MaxMonitoredItemsQueueSize.
+#   Notes: Reconciled (spec 073): MaxMonitoredItemsQueueSize(31916) exposed on ServerCapabilities in base_nodes.c, advertised value == MU_INTERN_MONITORED_QUEUE_DEPTH; test_operation_limits::test_subscription_capability_nodes_resolve. Satisfied by opc_cu_subscription_basic. Exposes MaxMonitoredItemsQueueSize of the ServerCapabilities Object.
+comment "Base Info Server Capabilities MaxMonitoredItemsQueueSize (DOCUMENTED)"
+
+# Monitor Items 2 (opc_cu_5207)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 5207:Monitor Items 2.
+#   Notes: Support at least 2 MonitoredItems per Subscription where the size of each MonitoredItem is at least equal to size of Double.
+comment "Monitor Items 2 (DOCUMENTED)"
+
+# Monitor Value Change V2 (opc_cu_5208)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 5208:Monitor Value Change V2.
+#   Notes: Reconciled (spec 073): MonitoredItem IndexRange is parsed at create (subscription_helpers.c), rejected with Bad_IndexRangeInvalid when malformed, and applied to array samples via apply_numeric_index_range (read_attribute.c) in read_monitored_item_value; test_monitored_index_range (single element, slice, whole-array, out-of-bounds). Satisfied by opc_cu_subscription_basic. Support creation of MonitoredItems for Attribute value changes. This includes support of the IndexRange to select a single element or a range of elements when the Attribute value is an array. This ConformanceUnit does not require queuing when multiple value changes occur during a "publish period". I.e. the latest change will be sent in the Notification.
+comment "Monitor Value Change V2 (DOCUMENTED)"
+
+endif
 
 endmenu
 
@@ -1437,9 +3954,381 @@ config MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
 	  Backing tests: test_claim_map.
 	  Notes: For each Object provided in the AddressSpace of the Server the ObjectType of the Object shall be provided in the AddressSpace of the Server. For each Variable provided in the AddressSpace of the Server the VariableType and the DataType of the Variable shall be provided in the AddressSpace of the Server. For each Value provided by the Server, which can be a subtype of the one defined in the Variable, the DataType of the Value shall be provided in the AddressSpace of the Server. For each Method Argument provided by the Server the DataType of the Value shall be provided in the AddressSpace of the Server. For each Structure DataType provided by the Server, each DataType used in the Structure shall be provided in the AddressSpace of the Server. For each Reference provided in the AddressSpace of the Server the ReferenceType shall be provided in the AddressSpace of the Server. For each ObjectType, VariableType, ReferenceType, and DataType provided in the AddressSpace of the Server the direct supertype shall be provided in the AddressSpace of the Server. This requires that all supertypes shall be provided in the AddressSpace. For each DataType having encoding information (Structured DataTypes) the Encoding Objects shall be provided in the AddressSpace of the Server. For each VariableType and ObjectType provided in the AddressSpace of the Server, all InstanceDeclarations shall be provided in the AddressSpace of the Server, even if they are optional and not used in any instance of the Server. For each VariableType, ObjectType and DataType all Methods, Objects and Variables that are referenced with a hierarchical Reference either from the VariableType, ObjectType or DataType or an InstanceDeclaration of the ObjectType or VariableType, either directly or indirectly, shall be provided in the AddressSpace of the Server. For all Events provided by the Server, the EventType shall be provided in the AddressSpace of the Server.
 
+# Base Info Rational Number (opc_cu_2423)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2423:Base Info Rational Number.
+#   Notes: Exposes the RationalNumberType and RationalNumber, all their supertypes and for the DataType the Encoding Objects in the AddressSpace.
+comment "Base Info Rational Number (DOCUMENTED)"
+
+# Base Info NormalizedString DataType (opc_cu_2481)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2481:Base Info NormalizedString DataType.
+#   Notes: Exposes the NormalizedString DataType and all its supertypes in the AddressSpace
+comment "Base Info NormalizedString DataType (DOCUMENTED)"
+
+# Base Info DecimalString DataType (opc_cu_2482)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2482:Base Info DecimalString DataType.
+#   Notes: Exposes the DecimalString DataType and all its supertypes in the AddressSpace
+comment "Base Info DecimalString DataType (DOCUMENTED)"
+
+# Base Info Date DataTypes (opc_cu_2483)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2483:Base Info Date DataTypes.
+#   Notes: Reconciled (spec 079): DurationString(12879)/TimeString(12880)/DateString(12881) exposed as subtypes of String(12) in base_nodes.c; test_type_system. Satisfied by opc_cu_base_info_datatypes. Exposes the DurationString, TimeString, and DateString DataTypes and all their supertypes in the AddressSpace
+comment "Base Info Date DataTypes (DOCUMENTED)"
+
+# Base Info BitFieldMaskDataType (opc_cu_2484)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2484:Base Info BitFieldMaskDataType.
+#   Notes: Standard OPC UA DataType automatically exposed through the type system (see opc_cu_base_info_datatypes / opc_cu_base_info_base_types). No dedicated CU implementation file is required.
+comment "Base Info BitFieldMaskDataType (DOCUMENTED)"
+
+# Base Info KeyValuePair (opc_cu_2485)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2485:Base Info KeyValuePair.
+#   Notes: Standard OPC UA DataType automatically exposed through the type system (see opc_cu_base_info_datatypes / opc_cu_base_info_base_types). No dedicated CU implementation file is required.
+comment "Base Info KeyValuePair (DOCUMENTED)"
+
+# Base Info Subvariables of Structures (opc_cu_2490)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2490:Base Info Subvariables of Structures.
+#   Notes: Standard OPC UA defining type/reference automatically exposed through the type system (see opc_cu_base_info_datatypes / opc_cu_base_info_base_types). No dedicated CU implementation file is required.
+comment "Base Info Subvariables of Structures (DOCUMENTED)"
+
+# Base Info AssociatedWith (opc_cu_2491)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2491:Base Info AssociatedWith.
+#   Notes: Standard OPC UA defining type/reference automatically exposed through the type system (see opc_cu_base_info_datatypes / opc_cu_base_info_base_types). No dedicated CU implementation file is required.
+comment "Base Info AssociatedWith (DOCUMENTED)"
+
+# Base Info EUInformation (opc_cu_2500)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2500:Base Info EUInformation.
+#   Notes: Satisfied by project-level CU opc_cu_5592; EUInformation DataType (887) is defined in base_nodes.c and exposed in the AddressSpace alongside its encoding objects and supertype (Structure, 22).
+comment "Base Info EUInformation (DOCUMENTED)"
+
+# Base Info OrderedList (opc_cu_2512)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2512:Base Info OrderedList.
+#   Notes: Standard OPC UA DataType automatically exposed through the type system (see opc_cu_base_info_datatypes / opc_cu_base_info_base_types). No dedicated CU implementation file is required.
+comment "Base Info OrderedList (DOCUMENTED)"
+
+# Base Info Audio Type (opc_cu_2513)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2513:Base Info Audio Type.
+#   Notes: Standard OPC UA DataType automatically exposed through the type system (see opc_cu_base_info_datatypes / opc_cu_base_info_base_types). No dedicated CU implementation file is required.
+comment "Base Info Audio Type (DOCUMENTED)"
+
+# Base Info Spatial Data (opc_cu_2514)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2514:Base Info Spatial Data.
+#   Notes: Standard OPC UA DataType automatically exposed through the type system (see opc_cu_base_info_datatypes / opc_cu_base_info_base_types). No dedicated CU implementation file is required.
+comment "Base Info Spatial Data (DOCUMENTED)"
+
+# Base Info HasOrderedComponent (opc_cu_2516)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2516:Base Info HasOrderedComponent.
+#   Notes: Standard OPC UA defining type/reference automatically exposed through the type system (see opc_cu_base_info_datatypes / opc_cu_base_info_base_types). No dedicated CU implementation file is required.
+comment "Base Info HasOrderedComponent (DOCUMENTED)"
+
+# Base Info Deprecated Information (opc_cu_2517)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2517:Base Info Deprecated Information.
+#   Notes: Standard OPC UA defining type/reference automatically exposed through the type system (see opc_cu_base_info_datatypes / opc_cu_base_info_base_types). No dedicated CU implementation file is required.
+comment "Base Info Deprecated Information (DOCUMENTED)"
+
+# Base Info Image DataTypes (opc_cu_2518)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2518:Base Info Image DataTypes.
+#   Notes: Standard OPC UA DataType automatically exposed through the type system (see opc_cu_base_info_datatypes / opc_cu_base_info_base_types). No dedicated CU implementation file is required.
+comment "Base Info Image DataTypes (DOCUMENTED)"
+
+# Base Info ContentFilter (opc_cu_2536)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2536:Base Info ContentFilter.
+#   Notes: Exposes the ContentFilter DataType and its encoding Objects and all its supertypes in the AddressSpace
+comment "Base Info ContentFilter (DOCUMENTED)"
+
+# Base Info Core Types Folders (opc_cu_3185)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3185:Base Info Core Types Folders.
+#   Notes: Reconciled (spec 080b): the core type-system Folder Nodes Types(86)/ObjectTypes(88)/DataTypes(90)/VariableTypes(89)/ReferenceTypes(91) are exposed in base_nodes.c and asserted by test_type_system. Satisfied by opc_cu_base_info_base_types. Exposes entry points into the type system in the AddressSpace. Specifically, these are the Folder Nodes: Types, ObjectTypes, DataTypes, VariableTypes, and ReferenceTypes.
+comment "Base Info Core Types Folders (DOCUMENTED)"
+
+# Base Info Base Types (opc_cu_3188)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3188:Base Info Base Types.
+#   Notes: Reconciled (spec 080b): the full base OPC UA type system is exposed in base_nodes.c and asserted by test_type_system -- all built-in/abstract DataTypes with supertype closure (primitives re-parented under Integer(27)/UInteger(28)/Number(26)), the base Object/Variable/ReferenceTypes, ModellingRuleType(77) + its ModellingRule Objects (78/80/83/11508/11510), and EnumValueType(7594)/Union(12756) with EnumValueType Encoding Objects (7616/8251). Satisfied by opc_cu_base_info_base_types. Supports type information of the base OPC UA concepts, like build-in DataTypes, base Object- and VariableTypes, and base ReferenceTypes. Includes the Encoding Objects for the DataTypes that are not Build-in or abstract DataTypes. Exposes the ObjectTypes BaseObjectType, FolderType, DataTypeEncodingType and ModellingRuleType in the AddressSpace. Exposes the VariableTypes BaseVariableType, PropertyType, and BaseDataVariableType in the AddressSpace. Exposes the DataTypes BaseDataType Boolean, ByteString, DateTime, DataValue, DiagnosticsInfo, Enumeration, ExpandedNodeId, Guid, LocalizedText, NodeId, Number, QualifiedName, String, Structure, XmlElement, Integer, UInteger, Double, Float, Sbyte, Int16, Int32, Int64, Byte, Uint16, Uint32, Uint64, StatusCode, UtcTime, Duration, NumericRange, EnumValueType, and Union and their Encoding Objects in the AddressSpace. Exposes the ReferenceTypes References, HierarchicalReferences, NonHierarchicalReferences, HasChild, Organizes, HasModellingRule, HasTypeDefinition, HasEncoding, Aggregates, HasSubtype, HasComponent, and HasProperty in the AddressSpace Exposes the Objects Optional, Mandatory, OptionalPlaceholder, MandatoryPlaceholder and ExposesItsArrayin the AddressSpace.
+comment "Base Info Base Types (DOCUMENTED)"
+
+# Base Info OptionSet DataType (opc_cu_3207)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3207:Base Info OptionSet DataType.
+#   Notes: Satisfied by project-level CU opc_cu_3127; OptionSetType (11487) is defined in base_nodes.c and exposed in the AddressSpace alongside its encoding objects and supertypes.
+comment "Base Info OptionSet DataType (DOCUMENTED)"
+
+# Base Info Range DataType (opc_cu_3214)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3214:Base Info Range DataType.
+#   Notes: Standard OPC UA DataType automatically exposed through the type system (see opc_cu_base_info_datatypes / opc_cu_base_info_base_types). No dedicated CU implementation file is required.
+comment "Base Info Range DataType (DOCUMENTED)"
+
+# Base Info UaBinary File (opc_cu_3547)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3547:Base Info UaBinary File.
+#   Notes: Standard OPC UA DataType automatically exposed through the type system (see opc_cu_base_info_datatypes / opc_cu_base_info_base_types). No dedicated CU implementation file is required.
+comment "Base Info UaBinary File (DOCUMENTED)"
+
+# Base Info StatusResult DataType (opc_cu_3550)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3550:Base Info StatusResult DataType.
+#   Notes: Standard OPC UA DataType automatically exposed through the type system (see opc_cu_base_info_datatypes / opc_cu_base_info_base_types). No dedicated CU implementation file is required.
+comment "Base Info StatusResult DataType (DOCUMENTED)"
+
+# Base Info UriString (opc_cu_3551)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3551:Base Info UriString.
+#   Notes: Standard OPC UA DataType automatically exposed through the type system (see opc_cu_base_info_datatypes / opc_cu_base_info_base_types). No dedicated CU implementation file is required.
+comment "Base Info UriString (DOCUMENTED)"
+
+# Base Info Method Argument DataType (opc_cu_3641)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3641:Base Info Method Argument DataType.
+#   Notes: Reconciled (spec 080a): Argument(i=296, subtype of Structure) + its DefaultBinary(298)/DefaultXml(297) Encoding Objects (DataTypeEncodingType 76) exposed in base_nodes.c; test_type_system. Satisfied by opc_cu_base_info_argument_type. Exposes the Argument DataType, its Encoding Objects and all its supertypes in the AddressSpace.
+comment "Base Info Method Argument DataType (DOCUMENTED)"
+
+# Base Info SemanticVersionString (opc_cu_3644)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3644:Base Info SemanticVersionString.
+#   Notes: Standard OPC UA DataType automatically exposed through the type system (see opc_cu_base_info_datatypes / opc_cu_base_info_base_types). No dedicated CU implementation file is required.
+comment "Base Info SemanticVersionString (DOCUMENTED)"
+
+# Base Info IsExecutableOn (opc_cu_3747)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3747:Base Info IsExecutableOn.
+#   Notes: Standard OPC UA ReferenceType automatically exposed through the type system (see opc_cu_base_info_datatypes / opc_cu_base_info_base_types). No dedicated CU implementation file is required.
+comment "Base Info IsExecutableOn (DOCUMENTED)"
+
+# Base Info IsExecutingOn (opc_cu_3748)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3748:Base Info IsExecutingOn.
+#   Notes: Standard OPC UA ReferenceType automatically exposed through the type system (see opc_cu_base_info_datatypes / opc_cu_base_info_base_types). No dedicated CU implementation file is required.
+comment "Base Info IsExecutingOn (DOCUMENTED)"
+
+# Base Info Controls (opc_cu_3749)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3749:Base Info Controls.
+#   Notes: Standard OPC UA ReferenceType automatically exposed through the type system (see opc_cu_base_info_datatypes / opc_cu_base_info_base_types). No dedicated CU implementation file is required.
+comment "Base Info Controls (DOCUMENTED)"
+
+# Base Info Utilizes (opc_cu_3750)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3750:Base Info Utilizes.
+#   Notes: Standard OPC UA ReferenceType automatically exposed through the type system (see opc_cu_base_info_datatypes / opc_cu_base_info_base_types). No dedicated CU implementation file is required.
+comment "Base Info Utilizes (DOCUMENTED)"
+
+# Base Info Requires (opc_cu_3751)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3751:Base Info Requires.
+#   Notes: Standard OPC UA ReferenceType automatically exposed through the type system (see opc_cu_base_info_datatypes / opc_cu_base_info_base_types). No dedicated CU implementation file is required.
+comment "Base Info Requires (DOCUMENTED)"
+
+# Base Info IsPhysicallyConnectedTo (opc_cu_3752)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3752:Base Info IsPhysicallyConnectedTo.
+#   Notes: Standard OPC UA ReferenceType automatically exposed through the type system (see opc_cu_base_info_datatypes / opc_cu_base_info_base_types). No dedicated CU implementation file is required.
+comment "Base Info IsPhysicallyConnectedTo (DOCUMENTED)"
+
+# Base Info RepresentsSameEntityAs (opc_cu_3753)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3753:Base Info RepresentsSameEntityAs.
+#   Notes: Standard OPC UA ReferenceType automatically exposed through the type system (see opc_cu_base_info_datatypes / opc_cu_base_info_base_types). No dedicated CU implementation file is required.
+comment "Base Info RepresentsSameEntityAs (DOCUMENTED)"
+
+# Base Info RepresentsSameHardwareAs (opc_cu_3754)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3754:Base Info RepresentsSameHardwareAs.
+#   Notes: Standard OPC UA ReferenceType automatically exposed through the type system (see opc_cu_base_info_datatypes / opc_cu_base_info_base_types). No dedicated CU implementation file is required.
+comment "Base Info RepresentsSameHardwareAs (DOCUMENTED)"
+
+# Base Info RepresentsSameFunctionalityAs (opc_cu_3755)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3755:Base Info RepresentsSameFunctionalityAs.
+#   Notes: Standard OPC UA ReferenceType automatically exposed through the type system (see opc_cu_base_info_datatypes / opc_cu_base_info_base_types). No dedicated CU implementation file is required.
+comment "Base Info RepresentsSameFunctionalityAs (DOCUMENTED)"
+
+# Base Info IsHostedBy (opc_cu_3756)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3756:Base Info IsHostedBy.
+#   Notes: Standard OPC UA ReferenceType automatically exposed through the type system (see opc_cu_base_info_datatypes / opc_cu_base_info_base_types). No dedicated CU implementation file is required.
+comment "Base Info IsHostedBy (DOCUMENTED)"
+
+# Base Info HasPhysicalComponent (opc_cu_3757)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3757:Base Info HasPhysicalComponent.
+#   Notes: Standard OPC UA ReferenceType automatically exposed through the type system (see opc_cu_base_info_datatypes / opc_cu_base_info_base_types). No dedicated CU implementation file is required.
+comment "Base Info HasPhysicalComponent (DOCUMENTED)"
+
+# Base Info HasContainedComponent (opc_cu_3758)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3758:Base Info HasContainedComponent.
+#   Notes: Standard OPC UA ReferenceType automatically exposed through the type system (see opc_cu_base_info_datatypes / opc_cu_base_info_base_types). No dedicated CU implementation file is required.
+comment "Base Info HasContainedComponent (DOCUMENTED)"
+
+# Base Info HasAttachedComponent (opc_cu_3759)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3759:Base Info HasAttachedComponent.
+#   Notes: Standard OPC UA ReferenceType automatically exposed through the type system (see opc_cu_base_info_datatypes / opc_cu_base_info_base_types). No dedicated CU implementation file is required.
+comment "Base Info HasAttachedComponent (DOCUMENTED)"
+
+# Base Info ReferenceDescription (opc_cu_3996)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3996:Base Info ReferenceDescription.
+#   Notes: Standard OPC UA defining type/reference automatically exposed through the type system (see opc_cu_base_info_datatypes / opc_cu_base_info_base_types). No dedicated CU implementation file is required.
+comment "Base Info ReferenceDescription (DOCUMENTED)"
+
+# Base Info TrimmedString (opc_cu_4052)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 4052:Base Info TrimmedString.
+#   Notes: Standard OPC UA DataType automatically exposed through the type system (see opc_cu_base_info_datatypes / opc_cu_base_info_base_types). No dedicated CU implementation file is required.
+comment "Base Info TrimmedString (DOCUMENTED)"
+
+# Base Info Handle DataType (opc_cu_4054)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 4054:Base Info Handle DataType.
+#   Notes: Standard OPC UA DataType automatically exposed through the type system (see opc_cu_base_info_datatypes / opc_cu_base_info_base_types). No dedicated CU implementation file is required.
+comment "Base Info Handle DataType (DOCUMENTED)"
+
+# Base Info Decimal DataType (opc_cu_4426)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 4426:Base Info Decimal DataType.
+#   Notes: Reconciled (spec 079): Decimal(i=50) + its supertype Number(i=26) exposed in base_nodes.c type-system table with HasSubtype closure to BaseDataType; test_type_system. Satisfied by opc_cu_base_info_datatypes. Exposes the DataType Decimal and all its supertypes in the AddressSpace.
+comment "Base Info Decimal DataType (DOCUMENTED)"
+
+# Base Info Portable IDs (opc_cu_5868)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 5868:Base Info Portable IDs.
+#   Notes: Standard OPC UA DataType automatically exposed through the type system (see opc_cu_base_info_datatypes / opc_cu_base_info_base_types). No dedicated CU implementation file is required.
+comment "Base Info Portable IDs (DOCUMENTED)"
+
+# Data Access TwoState (opc_cu_2361)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2361:Data Access TwoState.
+#   Notes: Reconciled (spec 079): satisfied by Data Access (opc_cu_data_access).
+comment "Data Access TwoState (DOCUMENTED)"
+
+# Data Access Complex Number (opc_cu_2399)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2399:Data Access Complex Number.
+#   Notes: Reconciled (spec 079): satisfied by Data Access (opc_cu_data_access).
+comment "Data Access Complex Number (DOCUMENTED)"
+
+# Data Access DiscreteItemType (opc_cu_2426)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2426:Data Access DiscreteItemType.
+#   Notes: Reconciled (spec 079): satisfied by Data Access (opc_cu_data_access).
+comment "Data Access DiscreteItemType (DOCUMENTED)"
+
+# Data Access MultiStateDictionaryEntryDBT (opc_cu_2474)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2474:Data Access MultiStateDictionaryEntryDBT.
+#   Notes: Reconciled (spec 079): satisfied by Data Access (opc_cu_data_access).
+comment "Data Access MultiStateDictionaryEntryDBT (DOCUMENTED)"
+
+# Base Info Node Management Capabilities (opc_cu_2489)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2489:Base Info Node Management Capabilities.
+#   Notes: Reconciled: satisfied by service_nodemanagement.
+comment "Base Info Node Management Capabilities (DOCUMENTED)"
+
+# Base Info Choice States (opc_cu_2649)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2649:Base Info Choice States.
+#   Notes: Reconciled: satisfied by opc_cu_base_info_datatypes.
+comment "Base Info Choice States (DOCUMENTED)"
+
+# Base Info System Status Underlying System (opc_cu_2747)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2747:Base Info System Status Underlying System.
+#   Notes: Reconciled: satisfied by opc_cu_base_info_base_types.
+comment "Base Info System Status Underlying System (DOCUMENTED)"
+
+# Data Access Semantic Changes (opc_cu_2772)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2772:Data Access Semantic Changes.
+#   Notes: Reconciled (spec 079): satisfied by Data Access (opc_cu_data_access).
+comment "Data Access Semantic Changes (DOCUMENTED)"
+
+# Data Access ValueAsDictionaryEntries Property (opc_cu_2776)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2776:Data Access ValueAsDictionaryEntries Property.
+#   Notes: Reconciled (spec 079): satisfied by Data Access (opc_cu_data_access).
+comment "Data Access ValueAsDictionaryEntries Property (DOCUMENTED)"
+
+# Base Info Available States and Transitions (opc_cu_2813)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2813:Base Info Available States and Transitions.
+#   Notes: Reconciled: satisfied by opc_cu_base_info_datatypes.
+comment "Base Info Available States and Transitions (DOCUMENTED)"
+
+# Base Info Finite State Machine Instance (opc_cu_2814)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2814:Base Info Finite State Machine Instance.
+#   Notes: Reconciled: satisfied by opc_cu_base_info_datatypes.
+comment "Base Info Finite State Machine Instance (DOCUMENTED)"
+
+# Base Info Device Failure (opc_cu_2822)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2822:Base Info Device Failure.
+#   Notes: Reconciled: satisfied by opc_cu_base_info_base_types.
+comment "Base Info Device Failure (DOCUMENTED)"
+
+# Data Access MultiStateValueDiscrete (opc_cu_2831)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2831:Data Access MultiStateValueDiscrete.
+#   Notes: Reconciled (spec 079): satisfied by Data Access (opc_cu_data_access).
+comment "Data Access MultiStateValueDiscrete (DOCUMENTED)"
+
+# Data Access YArrayItemType (opc_cu_3323)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3323:Data Access YArrayItemType.
+#   Notes: Reconciled (spec 079): satisfied by Data Access (opc_cu_data_access).
+comment "Data Access YArrayItemType (DOCUMENTED)"
+
+# Data Access XYArrayItemType (opc_cu_3324)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3324:Data Access XYArrayItemType.
+#   Notes: Reconciled (spec 079): satisfied by Data Access (opc_cu_data_access).
+comment "Data Access XYArrayItemType (DOCUMENTED)"
+
+# Data Access ImageItemType (opc_cu_3325)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3325:Data Access ImageItemType.
+#   Notes: Reconciled (spec 079): satisfied by Data Access (opc_cu_data_access).
+comment "Data Access ImageItemType (DOCUMENTED)"
+
+# Data Access CubeItemType (opc_cu_3326)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3326:Data Access CubeItemType.
+#   Notes: Reconciled (spec 079): satisfied by Data Access (opc_cu_data_access).
+comment "Data Access CubeItemType (DOCUMENTED)"
+
+# Data Access NDimensionArrayItemType (opc_cu_3327)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3327:Data Access NDimensionArrayItemType.
+#   Notes: Reconciled (spec 079): satisfied by Data Access (opc_cu_data_access).
+comment "Data Access NDimensionArrayItemType (DOCUMENTED)"
+
+# Data Access AxisInformationType (opc_cu_3328)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3328:Data Access AxisInformationType.
+#   Notes: Reconciled (spec 079): satisfied by Data Access (opc_cu_data_access).
+comment "Data Access AxisInformationType (DOCUMENTED)"
+
 endif
 
-config MUC_OPCUA_FACET_STANDARD_DATACHANGE_SUBSCRIPTION_2022_SERVER
+menuconfig MUC_OPCUA_FACET_STANDARD_DATACHANGE_SUBSCRIPTION_2022_SERVER
 	bool "Standard DataChange Subscription 2022 Server Facet"
 	default y if MUC_OPCUA_INTERN_PROFILE_EMBEDDED_2025_UA_SERVER
 	help
@@ -1447,7 +4336,53 @@ config MUC_OPCUA_FACET_STANDARD_DATACHANGE_SUBSCRIPTION_2022_SERVER
 	  OPC source: OPC-10000-7 §4.2.
 	  Notes: Standard DataChange 2022: all subscription CUs claimed
 
-config MUC_OPCUA_FACET_GLOBAL_CERTIFICATE_MANAGEMENT_SERVER
+if MUC_OPCUA_FACET_STANDARD_DATACHANGE_SUBSCRIPTION_2022_SERVER
+
+# Monitored Items Deadband Filter (opc_cu_2928)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2928:Monitored Items Deadband Filter.
+#   Notes: Supports an absolute Deadband filter as a DataChangeFilter for numeric data types.
+comment "Monitored Items Deadband Filter (DOCUMENTED)"
+
+# Base Info GetMonitoredItems Method (opc_cu_2940)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2940:Base Info GetMonitoredItems Method.
+#   Notes: The Server supports obtaining subscription information via GetMonitoredItems Method on the Server object.
+comment "Base Info GetMonitoredItems Method (DOCUMENTED)"
+
+# Monitor Triggering (opc_cu_3146)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3146:Monitor Triggering.
+#   Notes: Support the SetTriggering Service to create and/or delete triggering links for a triggering item.
+comment "Monitor Triggering (DOCUMENTED)"
+
+# Monitor Queueing (opc_cu_3532)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3532:Monitor Queueing.
+#   Notes: Support at least 2 queue entries for MonitoredItems. Servers often will adapt the queue size to the number of currently monitored Items. It is expected that Servers support the documented queue capacity for at least one third of the supported MonitoredItems.
+comment "Monitor Queueing (DOCUMENTED)"
+
+# Subscription Multiple (opc_cu_3534)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3534:Subscription Multiple.
+#   Notes: Server supports at least 2 Subscriptions in a single Session.
+comment "Subscription Multiple (DOCUMENTED)"
+
+# Subscription Retransmission Queue (opc_cu_3535)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3535:Subscription Retransmission Queue.
+#   Notes: Support a retransmission queue of sent NotificationMessages and the Republish Service. See UA Part 4 for the required size of the retransmission queue. muc-opcua: Republish is implemented and tested; the retransmission store holds the single most-recent NotificationMessage per subscription (profile-targeting minimal capacity), which may not meet CTT multi-message republish depth.
+comment "Subscription Retransmission Queue (DOCUMENTED)"
+
+# Base Info ResendData Method (opc_cu_3544)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3544:Base Info ResendData Method.
+#   Notes: Support the standard Method ResendData to get the latest value of the monitored items of a Subscription.
+comment "Base Info ResendData Method (DOCUMENTED)"
+
+endif
+
+menuconfig MUC_OPCUA_FACET_GLOBAL_CERTIFICATE_MANAGEMENT_SERVER
 	bool "Global Certificate Management Server Facet"
 	default y if MUC_OPCUA_INTERN_PROFILE_EMBEDDED_2025_UA_SERVER
 	help
@@ -1455,7 +4390,17 @@ config MUC_OPCUA_FACET_GLOBAL_CERTIFICATE_MANAGEMENT_SERVER
 	  OPC source: OPC-10000-7 §4.2.
 	  Notes: Global Cert Mgmt: partial (type nodes), full GDS deferred
 
-config MUC_OPCUA_FACET_USER_TOKEN_USER_NAME_PASSWORD_SERVER
+if MUC_OPCUA_FACET_GLOBAL_CERTIFICATE_MANAGEMENT_SERVER
+
+# Push Model for Global Certificate and TrustList Management (opc_cu_2231)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2231:Push Model for Global Certificate and TrustList Management.
+#   Notes: Push Model for Certificate and TrustList Management. ServerConfigurationType in base_nodes.c, UpdateCertificate+ApplyChanges Method stubs with adapter interface. The server accepts certificate pushes from an external GDS/agent; integrator provides storage adapter.
+comment "Push Model for Global Certificate and TrustList Management (DOCUMENTED)"
+
+endif
+
+menuconfig MUC_OPCUA_FACET_USER_TOKEN_USER_NAME_PASSWORD_SERVER
 	bool "User Token – User Name Password Server Facet"
 	default y if MUC_OPCUA_INTERN_PROFILE_EMBEDDED_2025_UA_SERVER
 	help
@@ -1463,11 +4408,33 @@ config MUC_OPCUA_FACET_USER_TOKEN_USER_NAME_PASSWORD_SERVER
 	  OPC source: OPC-10000-7 §4.2.
 	  Notes: User Name Password: Anonymous+UserName auth in activate_session.c
 
+if MUC_OPCUA_FACET_USER_TOKEN_USER_NAME_PASSWORD_SERVER
+
+# Security Invalid user token (opc_cu_2823)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 2823:Security Invalid user token.
+#   Notes: Satisfied by project-level CU opc_cu_user_auth; the ActivateSession handler in activate_session.c validates user identity tokens and returns Bad_IdentityTokenInvalid for invalid tokens per OPC-10000-4.
+comment "Security Invalid user token (DOCUMENTED)"
+
+# Security User Name Password 2 (opc_cu_3536)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3536:Security User Name Password 2.
+#   Notes: Reconciled (spec 078): username/password identity tokens with per-policy (endpoint/UserTokenPolicy) password encryption are decrypted+verified in activate_session.c handle_activate_username; test_user_auth_encrypted, test_user_auth_plaintext, test_user_auth_secure_e2e. Satisfied by opc_cu_user_auth. The Server supports User Name/Password combination(s). The token will be encrypted as required by the security policy of the User Token Policy or by the security policy of the endpoint.
+comment "Security User Name Password 2 (DOCUMENTED)"
+
+# Security User Token Unencrypted (opc_cu_3645)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3645:Security User Token Unencrypted.
+#   Notes: Satisfied by opc_cu_user_auth; server accepts unencrypted username/password tokens (test_user_auth_plaintext).
+comment "Security User Token Unencrypted (DOCUMENTED)"
+
+endif
+
 endmenu
 
 menu "Profile: Standard 2025 UA Server Profile"
 
-config MUC_OPCUA_FACET_USER_TOKEN_X509_CERTIFICATE_SERVER
+menuconfig MUC_OPCUA_FACET_USER_TOKEN_X509_CERTIFICATE_SERVER
 	bool "User Token – X509 Certificate Server Facet"
 	default y if MUC_OPCUA_INTERN_PROFILE_STANDARD_2025_UA_SERVER
 	help
@@ -1475,15 +4442,45 @@ config MUC_OPCUA_FACET_USER_TOKEN_X509_CERTIFICATE_SERVER
 	  OPC source: OPC-10000-7 §4.2.
 	  Notes: X509 Certificate: X509 user token in activate_session.c
 
+if MUC_OPCUA_FACET_USER_TOKEN_X509_CERTIFICATE_SERVER
+
+# Security User X509 (opc_cu_3125)
+#   Implementation state: documented -- visible but not selectable.
+#   Detail: CU 3125:Security User X509.
+#   Notes: Satisfied by opc_cu_user_auth; server supports X.509 certificate-based user authentication (test_user_auth_certificate).
+comment "Security User X509 (DOCUMENTED)"
+
+endif
+
 endmenu
 
 menu "Profile: Full (everything enabled, generous capacities)"
 
-comment "No unique implemented Facets or CUs at this profile level"
+menuconfig MUC_OPCUA_FACET_REVERSE_CONNECT_SERVER
+	bool "Reverse Connect Server Facet"
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: implemented.
+	  OPC source: OPC-10000-7 §4.2.
+	  Notes: Reverse Connect Server: CU 2867 claimed
+
+if MUC_OPCUA_FACET_REVERSE_CONNECT_SERVER
+
+config MUC_OPCUA_CU_PROTOCOL_REVERSE_CONNECT_SERVER
+	bool "CU: Protocol Reverse Connect Server"
+	depends on MUC_OPCUA_FACET_REVERSE_CONNECT_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-6 §7.1.3 -- CU 2867:Protocol Reverse Connect Server.
+	  Backing tests: test_reverse_connect.
+	  Notes: Directly owned by canonical CU 2867; Reverse Connect behavior is covered by test_reverse_connect.
+
+endif
 
 endmenu
 
-comment "Unimplemented OPC items (visible but not selectable)"
+comment "Documented/unimplemented OPC items (visible but not selectable)"
 
 # File Server Facet (opc_file_server_facet)
 #   Implementation state: unimplemented -- visible but not selectable.
