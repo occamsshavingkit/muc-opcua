@@ -121,7 +121,9 @@ class TestCompletion(unittest.TestCase):
         self.assertEqual((r["required_implemented"], r["required_total"]), (1, 1))
         self.assertEqual((r["optional_implemented"], r["optional_total"]), (0, 1))
 
-    def test_manifest_profile_summary_matches_detailed_completion(self):
+    def test_manifest_profile_summary_matches_detailed_completion(  # pylint: disable=too-many-locals
+        self,
+    ):
         # Given the committed manifest, normalized snapshot, and Server catalog.
         manifest = json.loads((_REPO / "profiles/opcua-profile-manifest.yaml").read_text())
         snapshot = json.loads(
@@ -146,7 +148,9 @@ class TestCompletion(unittest.TestCase):
             ),
             key=lambda profile: int(profile["opc_id"]),
         )
-        by_cu_id = completion._index_by_cu_id(manifest["items"])
+        by_cu_id = completion._index_by_cu_id(  # pylint: disable=protected-access
+            manifest["items"]
+        )
         optionality_differences = 0
         not_applicable_cus = 0
         for key, profile in manifest_profiles.items():

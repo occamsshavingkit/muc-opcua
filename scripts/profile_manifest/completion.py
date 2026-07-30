@@ -195,7 +195,9 @@ def compute_catalog_completion(manifest: dict, cu_ids: list[str], optional_by_cu
             "optional_implemented": opt_i, "optional_total": opt_t, "not_applicable": na_n}
 
 
-def _render_server_surface(manifest: dict, snapshot: dict, catalog: dict) -> list[str]:
+def _render_server_surface(  # pylint: disable=too-many-locals
+    manifest: dict, snapshot: dict, catalog: dict
+) -> list[str]:
     opt_map = catalog["conformance_unit_optional"]
     profiles = catalog["profiles"]
     manifest_profiles = {
