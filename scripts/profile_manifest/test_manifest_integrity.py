@@ -29,26 +29,28 @@ def _load(name: str):
 
 completion = _load("completion")
 
+
 class ManifestIntegrityTest(unittest.TestCase):
-    def test_standard_profile_discovery_aggregate_remains_selectable(self) -> None:
+    @classmethod
+    def setUpClass(cls) -> None:
+        super().setUpClass()
         manifest_path = _REPO / "profiles" / "opcua-profile-manifest.yaml"
         with manifest_path.open(encoding="utf-8") as manifest_file:
-            manifest = json.load(manifest_file)
+            cls.manifest = json.load(manifest_file)
 
+    def test_standard_profile_discovery_aggregate_remains_selectable(self) -> None:
         service_discovery = next(
-            item for item in manifest["items"] if item.get("id") == "service_discovery"
+            item
+            for item in self.manifest["items"]
+            if item.get("id") == "service_discovery"
         )
         self.assertEqual(service_discovery["implementation_state"], "claimed")
         self.assertTrue(service_discovery["profile_defaults"]["standard"])
         self.assertIn("test_discovery_endpoint", service_discovery["backing_tests"])
 
     def test_full_profile_write_aggregate_remains_selectable(self) -> None:
-        manifest_path = _REPO / "profiles" / "opcua-profile-manifest.yaml"
-        with manifest_path.open(encoding="utf-8") as manifest_file:
-            manifest = json.load(manifest_file)
-
         service_write = next(
-            item for item in manifest["items"] if item.get("id") == "service_write"
+            item for item in self.manifest["items"] if item.get("id") == "service_write"
         )
         self.assertEqual(service_write["implementation_state"], "claimed")
         self.assertTrue(service_write["profile_defaults"]["full"])
@@ -58,13 +60,11 @@ class ManifestIntegrityTest(unittest.TestCase):
         self,
     ) -> None:
         # Given the committed real manifest.
-        manifest_path = _REPO / "profiles" / "opcua-profile-manifest.yaml"
-        with manifest_path.open(encoding="utf-8") as manifest_file:
-            manifest = json.load(manifest_file)
-
         # When the canonical Reverse Connect Server Facet is selected.
         reverse_connect_facets = [
-            item for item in manifest["items"] if item.get("id") == "opc_facet_1632"
+            item
+            for item in self.manifest["items"]
+            if item.get("id") == "opc_facet_1632"
         ]
 
         # Then its identity, symbol, profile source, and defaults are exact.
@@ -107,34 +107,22 @@ class ManifestIntegrityTest(unittest.TestCase):
         self,
     ) -> None:
         # Given the committed real manifest.
-        manifest_path = _REPO / "profiles" / "opcua-profile-manifest.yaml"
-        with manifest_path.open(encoding="utf-8") as manifest_file:
-            manifest = json.load(manifest_file)
-
         # When Reverse Connect Server Facet containment is resolved.
-        containment = manifest["facet_containment"].get("opc_facet_1632")
+        containment = self.manifest["facet_containment"].get("opc_facet_1632")
 
         # Then CU 2867 is its single mandatory child.
         self.assertEqual(containment, ["opc_cu_2867"])
 
     def test_core_2022_facet_excludes_reverse_connect_when_manifest_loaded(self) -> None:
         # Given the committed real manifest.
-        manifest_path = _REPO / "profiles" / "opcua-profile-manifest.yaml"
-        with manifest_path.open(encoding="utf-8") as manifest_file:
-            manifest = json.load(manifest_file)
-
         # When Core 2022 Server Facet containment is resolved.
-        core_2022_cus = manifest["facet_containment"]["opc_facet_1322"]
+        core_2022_cus = self.manifest["facet_containment"]["opc_facet_1322"]
 
         # Then CU 2867 is not assigned to that noncanonical owner.
         self.assertNotIn("opc_cu_2867", core_2022_cus)
 
     def test_reverse_connect_server_has_canonical_owner(self) -> None:
-        manifest_path = _REPO / "profiles" / "opcua-profile-manifest.yaml"
-        with manifest_path.open(encoding="utf-8") as manifest_file:
-            manifest = json.load(manifest_file)
-
-        items = manifest["items"]
+        items = self.manifest["items"]
         self.assertNotIn(
             "opc_cu_reverse_connect",
             [item.get("id") for item in items],
@@ -166,13 +154,9 @@ class ManifestIntegrityTest(unittest.TestCase):
 
     def test_find_servers_self_uses_cu_specific_test_when_manifest_loaded(self) -> None:
         # Given the committed real manifest.
-        manifest_path = _REPO / "profiles" / "opcua-profile-manifest.yaml"
-        with manifest_path.open(encoding="utf-8") as manifest_file:
-            manifest = json.load(manifest_file)
-
         # When CU 2352 evidence is selected.
         find_servers_self = next(
-            item for item in manifest["items"] if item.get("id") == "opc_cu_2352"
+            item for item in self.manifest["items"] if item.get("id") == "opc_cu_2352"
         )
 
         # Then it names the executable containing the CU-specific scenarios.
