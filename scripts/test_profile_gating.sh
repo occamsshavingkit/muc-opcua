@@ -450,6 +450,37 @@ else
     FAIL=$((FAIL + 1))
 fi
 
+echo "### 20. Public Reverse Connect config layout follows the feature value ###"
+LAYOUT_TEST="tests/config/test_reverse_connect_config_layout.c"
+if cc -std=c11 -Wall -Wextra -Werror -Wpedantic -Iinclude \
+    -DEXPECT_REVERSE_CONNECT_FIELD=0 -fsyntax-only "$LAYOUT_TEST"; then
+    echo "  PASS  undefined Reverse Connect omits reverse_connect_url"
+    PASS=$((PASS + 1))
+else
+    echo "  FAIL  undefined Reverse Connect exposes reverse_connect_url"
+    FAIL=$((FAIL + 1))
+fi
+
+if cc -std=c11 -Wall -Wextra -Werror -Wpedantic -Iinclude \
+    -DMUC_OPCUA_CU_PROTOCOL_REVERSE_CONNECT_SERVER=0 \
+    -DEXPECT_REVERSE_CONNECT_FIELD=0 -fsyntax-only "$LAYOUT_TEST"; then
+    echo "  PASS  zero-valued Reverse Connect omits reverse_connect_url"
+    PASS=$((PASS + 1))
+else
+    echo "  FAIL  zero-valued Reverse Connect exposes reverse_connect_url"
+    FAIL=$((FAIL + 1))
+fi
+
+if cc -std=c11 -Wall -Wextra -Werror -Wpedantic -Iinclude \
+    -DMUC_OPCUA_CU_PROTOCOL_REVERSE_CONNECT_SERVER=1 \
+    -DEXPECT_REVERSE_CONNECT_FIELD=1 -fsyntax-only "$LAYOUT_TEST"; then
+    echo "  PASS  enabled Reverse Connect exposes reverse_connect_url"
+    PASS=$((PASS + 1))
+else
+    echo "  FAIL  enabled Reverse Connect omits reverse_connect_url"
+    FAIL=$((FAIL + 1))
+fi
+
 echo
 echo "===================="
 echo "$PASS passed, $FAIL failed"
