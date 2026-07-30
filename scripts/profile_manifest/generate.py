@@ -30,7 +30,7 @@ from profile_manifest import graph_deps  # noqa: E402  # pylint: disable=wrong-i
 
 _DEFAULT_PROFILES = ("nano", "micro", "embedded", "standard", "full", "custom")
 _SELECTABLE_STATES = ("claimed", "implemented", "deferred")
-_UNSELECTABLE_STATES = ("unimplemented",)
+_UNSELECTABLE_STATES = ("unimplemented", "documented")
 
 _MARKER_ID_RENAMES: dict[str, str] = {
     "STANDARD_PROFILE": "MUC_OPCUA_MARKER_STANDARD_PROFILE",
@@ -514,8 +514,8 @@ def generate_kconfig(manifest: dict) -> str:
     lines.append("#   - `default y if INTERN_*`   = internal cascade seeds defaults by lowest profile.")
     lines.append("#   - Profile choice seeds defaults only; all facet/CU menus stay globally editable.")
     lines.append("#   - Profiles are defconfigs (configs/<profile>.defconfig) selecting the choice.")
-    lines.append("#   - Unimplemented OPC items appear as Kconfig ``comment`` directives so they")
-    lines.append("#     are always visible in menuconfig but cannot be toggled (no config symbol).")
+    lines.append("#   - Documented and unimplemented OPC items use Kconfig comment directives.")
+    lines.append("#     They remain visible in menuconfig but cannot be toggled (no config symbol).")
     lines.append("")
 
     # -- mainmenu ---------------------------------------------------------
@@ -638,7 +638,7 @@ def generate_kconfig(manifest: dict) -> str:
         for item in selectable_flat:
             _emit_selectable(lines, item, profile_symbols)
 
-    # -- Unimplemented items (visible comments, not selectable) ----------
+    # -- Documented/unimplemented items (visible comments, not selectable) --
     unselectable_flat = [
         i for i in items
         if i.get("implementation_state") in _UNSELECTABLE_STATES
@@ -647,7 +647,9 @@ def generate_kconfig(manifest: dict) -> str:
         and i.get("id") not in facet_ids
     ]
     if unselectable_flat:
-        lines.append('comment "Unimplemented OPC items (visible but not selectable)"')
+        lines.append(
+            'comment "Documented/unimplemented OPC items (visible but not selectable)"'
+        )
         lines.append("")
         for item in unselectable_flat:
             _emit_unselectable(lines, item)
@@ -739,7 +741,7 @@ def _emit_selectable(
 
 
 def _emit_unselectable(lines: list[str], item: dict) -> None:
-    """Emit a visible, non-selectable Kconfig ``comment`` for an unimplemented item.
+    """Emit a visible Kconfig ``comment`` for a documented or unimplemented item.
 
     Kconfig ``comment`` directives are always visible in menuconfig regardless of
     dependency state, unlike prompted ``bool`` symbols whose prompts can be hidden
@@ -928,9 +930,9 @@ def _emit_one_facet_menu(
     pattern (OPC-10000-7 §4.2).  The ``if`` block gates every contained CU so
     CU entries inside the block omit the per-CU ``depends on <SYM>`` (the
     ``if`` already enforces facet-off → CU-off, preserving group-off
-    behaviour).  Unselectable (unimplemented) facets retain the ``menu`` /
-    ``comment`` / ``endmenu`` wrapper because they have no toggle symbol to
-    drive a ``menuconfig`` header.
+    behaviour).  Unselectable (documented or unimplemented) facets retain the
+    ``menu`` / ``comment`` / ``endmenu`` wrapper because they have no toggle
+    symbol to drive a ``menuconfig`` header.
     """
     state = facet_item.get("implementation_state")
     if state not in _SELECTABLE_STATES and state not in _UNSELECTABLE_STATES:
@@ -990,7 +992,7 @@ def _emit_one_facet_menu(
             _emit_help(lines, facet_item)
             lines.append("")
     else:
-        # Unimplemented facet: no toggle symbol, keep menu/comment/endmenu
+        # Non-selectable facet: no toggle symbol, keep menu/comment/endmenu
         # so the item is traceable in the generated Kconfig (its item_id and
         # state are visible) even when the facet has zero contained CUs.
         lines.append('menu "Facet: ' + prompt + '"')
@@ -999,8 +1001,8 @@ def _emit_one_facet_menu(
 
     # -- Contained CUs -----------------------------------------------------
     # Emit selectable (claimed/implemented/deferred) CUs FIRST so the working
-    # toggles lead the facet block, then emit unselectable (unimplemented) CUs
-    # as trailing NOT IMPLEMENTED comments.  Inside a ``menuconfig``/``if``
+    # toggles lead the facet block, then emit unselectable (documented or
+    # unimplemented) CUs as trailing comments.  Inside a ``menuconfig``/``if``
     # block the block-level condition already gates the CUs, so the per-CU
     # ``depends on <facet>`` is suppressed (facet_symbol=None) to avoid
     # redundancy; the ``if`` enforces facet-off → CU-off.
@@ -1124,15 +1126,15 @@ def _emit_profile_sections(
         lines.append("endmenu")
         lines.append("")
 
-    # Facets with no profile default (unimplemented with all-false defaults)
-    # still appear as visible empty menus for roadmap awareness.
+    # Non-selectable facets with no profile default still appear as visible
+    # comments for roadmap awareness.
     other_facets = [
         fid for fid in facet_containment
         if facet_lowest.get(fid) is None
         and isinstance(items_by_id.get(fid), dict)
     ]
     if other_facets:
-        lines.append("# -- Unimplemented facets (visible but not selectable) --------------")
+        lines.append("# -- Non-selectable facets (visible but not selectable) -------------")
         lines.append("")
         for facet_id in other_facets:
             facet_item = items_by_id[facet_id]
@@ -1141,11 +1143,10 @@ def _emit_profile_sections(
                 continue
             # Include context lines with the item id for traceability.
             _emit_unselectable(lines, facet_item)
-            # Emit the facet's contained unimplemented Conformance Units as
-            # visible comments too, so roadmap awareness of the facet's CUs is
-            # preserved in menuconfig (OPC-10000-7 §4.2).  These CUs are
-            # excluded from the flat emission (they are listed in
-            # facet_containment), so without this they would be dropped.
+            # Emit contained documented or unimplemented Conformance Units as
+            # visible comments for roadmap awareness (OPC-10000-7 §4.2).  Their
+            # canonical facet ownership excludes them from flat emission, so
+            # without this path they would be dropped.
             cu_ids = facet_containment.get(facet_id)
             if isinstance(cu_ids, list):
                 for cu_id in cu_ids:
@@ -1864,7 +1865,7 @@ def generate_build_docs_section(manifest: dict) -> str:
             item_id = item.get("id", "")
             opc_ref = _roadmap_opc_ref(item)
             state = item.get("implementation_state", "")
-            notes = _sanitize_kconfig_text(item.get("notes"))
+            notes = _sanitize_kconfig_text(item.get("notes")).replace("|", r"\|")
             lines.append(
                 "| " + item_id + " | " + opc_ref + " | " + state + " | " + notes + " |"
             )
@@ -1885,7 +1886,13 @@ def update_build_docs(manifest: dict, path: str) -> None:
     appends at end of file if that heading is absent).
     """
     section = generate_build_docs_section(manifest)
-    blocked = _BUILD_DOCS_BEGIN + "\n" + section + _BUILD_DOCS_END + "\n"
+    blocked = (
+        _BUILD_DOCS_BEGIN
+        + "\n"
+        + section.rstrip("\n")
+        + "\n"
+        + _BUILD_DOCS_END
+    )
 
     try:
         with open(path, "r", encoding="utf-8") as fh:
@@ -1899,17 +1906,18 @@ def update_build_docs(manifest: dict, path: str) -> None:
     if begin_idx != -1 and end_idx != -1 and end_idx > begin_idx:
         before = content[:begin_idx]
         after = content[end_idx + len(_BUILD_DOCS_END):]
-        new_content = before + blocked + after
     else:
         anchor = "\n## Verifying gating behavior\n"
-        insertion = "\n" + blocked + "\n"
         anchor_idx = content.find(anchor)
         if anchor_idx != -1:
-            new_content = content[:anchor_idx] + insertion + content[anchor_idx:]
-        elif content.endswith("\n"):
-            new_content = content + "\n" + blocked
+            before = content[:anchor_idx]
+            after = content[anchor_idx:]
         else:
-            new_content = content + "\n\n" + blocked
+            before = content
+            after = ""
+
+    parts = [part for part in (before.rstrip("\n"), blocked, after.lstrip("\n")) if part]
+    new_content = "\n\n".join(parts).rstrip("\n") + "\n"
 
     with open(path, "w", encoding="utf-8") as fh:
         fh.write(new_content)

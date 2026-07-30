@@ -215,3 +215,46 @@ cmake --build build/standard-check && ctest --test-dir build/standard-check --ou
 cmake -S . -B build/full-check -DMUC_OPCUA_PROFILE=full -DMUC_OPCUA_BUILD_TESTS=ON
 cmake --build build/full-check && ctest --test-dir build/full-check --output-on-failure
 ```
+
+---
+
+## Post-Implementation Evidence Reconciliation Amendment
+
+**Date**: 2026-07-28
+**Status**: Applied — this amendment reconciles plan-level constraints with evidence corrections that occurred after the original rename-only scope was completed.
+
+### Scope of the Original Plan
+
+The Global Constraints (lines 13 and 71–73) stating "No new OPC conformance claims" and "rename/restructure only" applied to the original build-time Kconfig redesign. That work renamed symbols, restructured menus, and introduced Facet grouping without adding, removing, or changing any conformance-unit claim.
+
+### What Changed After the Original Redesign
+
+During post-implementation review, three items were found to be in conflict with the canonical OPC UA specification and required correction:
+
+1. **Reverse Connect ownership (CU 2867)**. The original plan assigned the Reverse Connect capability to a project-internal aggregate (`opc_cu_reverse_connect`). OPC-10000-6 §7.1.3 defines the Reverse Connect Server Conformance Unit (CU 2867) directly. The correction aligns the manifest to claim CU 2867 under the Transport Facet and removes the synthetic aggregate owner. The legacy `MUC_OPCUA_CU_REVERSE_CONNECT` and `MUC_OPCUA_REVERSE_CONNECT` symbols were removed (per FR-004, FR-013, no legacy aliases).
+
+2. **service_write and service_discovery claim correction**. Attribute Write is grounded in OPC-10000-4 §5.10.4, while the combined Discovery service entry is grounded in OPC-10000-4 §5.4. Their manifest states were corrected from `documented` to `claimed` because their existing implementations have direct backing tests.
+
+3. **Discovery combined-gate completeness**. OPC-10000-4 §5.4 describes the Discovery services. The existing combined `MUC_OPCUA_CU_DISCOVERY_FIND_SERVERS_SELF_GET_ENDPOINTS` gate now enables both FindServers and GetEndpoints, matching its declared scope while preserving the dedicated service gates.
+
+### Reverse Connect Lifecycle Hardening
+
+Additional focused tests were written to cover failure paths that were not previously exercised:
+
+- Partial/zero-byte ReverseHello writes
+- Write-error cleanup during ReverseHello transmission
+- High-uptime first-poll behavior while the server waits for the Client Hello after sending ReverseHello
+- Combined-gate `GetEndpoints` dispatch when its dedicated gate is disabled
+
+These tests do not expand conformance claims. They reconcile the existing CU 2867 claim to observable evidence by hardening the lifecycle paths already required by OPC-10000-6 §7.1.3.
+
+### Principle Alignment
+
+All corrections are **evidence reconciliation**: existing claims were aligned to their canonical OPC specification definitions rather than expanded. No new CUs were added beyond CU 2867, which was already implemented before the original redesign but claimed under a non-canonical project name. The Constitution V intent (honesty in conformance claims) is preserved — the original restriction was a scoping constraint for the rename work, not a permanent bar against correcting a mis-claimed CU that was already present in the codebase.
+
+### Verification Snapshot
+
+- Manifest unit-test suite: 33/33 passing (Python `unittest` over the profile_manifest test directory).
+- `validate.py --manifest-only`: OK.
+- Full-profile baseline before the lifecycle hardening: 150/150 CTest tests passed.
+- Focused Reverse Connect failure-path tests and combined Discovery behavior tests: passing after the hardening.

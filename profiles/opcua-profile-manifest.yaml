@@ -768,7 +768,6 @@
       "opc_cu_namespaces",
       "opc_cu_pubsub",
       "opc_cu_redundancy",
-      "opc_cu_reverse_connect",
       "opc_cu_security_ecc",
       "opc_cu_server_capabilities_2",
       "opc_cu_session_base",
@@ -879,7 +878,6 @@
       "opc_cu_2818",
       "opc_cu_2845",
       "opc_cu_2861",
-      "opc_cu_2867",
       "opc_cu_2871",
       "opc_cu_2873",
       "opc_cu_2877",
@@ -1113,6 +1111,9 @@
     ],
     "opc_facet_1631": [
       "opc_cu_2231"
+    ],
+    "opc_facet_1632": [
+      "opc_cu_2867"
     ],
     "opc_facet_1695": [
       "opc_cu_2823",
@@ -2190,6 +2191,35 @@
         "micro": false,
         "nano": false,
         "standard": true
+      },
+      "source_metadata": {
+        "profile_group_id": 171,
+        "source_endpoint": "profile/?pg=171&all=1"
+      }
+    },
+    {
+      "backing_tests": [],
+      "depends_on": [],
+      "id": "opc_facet_1632",
+      "implementation_state": "implemented",
+      "kconfig_symbol": "MUC_OPCUA_FACET_REVERSE_CONNECT_SERVER",
+      "kind": "facet",
+      "notes": "Reverse Connect Server: CU 2867 claimed",
+      "opc_display_name": "Reverse Connect Server Facet",
+      "opc_reference": {
+        "profile_id": "1632",
+        "profile_uri": "http://opcfoundation.org/UA-Profile/Server/ReverseConnect",
+        "section": "4.2",
+        "source_url": "https://profiles.opcfoundation.org",
+        "spec": "OPC-10000-7"
+      },
+      "profile_defaults": {
+        "custom": false,
+        "embedded": false,
+        "full": true,
+        "micro": false,
+        "nano": false,
+        "standard": false
       },
       "source_metadata": {
         "profile_group_id": 171,
@@ -5570,31 +5600,6 @@
     },
     {
       "backing_tests": [
-        "test_reverse_connect"
-      ],
-      "depends_on": [],
-      "id": "opc_cu_reverse_connect",
-      "implementation_state": "claimed",
-      "kconfig_symbol": "MUC_OPCUA_CU_REVERSE_CONNECT",
-      "kind": "optimization",
-      "notes": "Project-level Conformance Unit mirroring the legacy 'reverse_connect' item; emits Kconfig symbol MUC_OPCUA_CU_REVERSE_CONNECT matching the #ifdef guard renamed in Task 3 of the CU-aligned code reorganisation plan.",
-      "opc_display_name": "Reverse Connect",
-      "opc_reference": {
-        "facet": "Core 2022 Server Facet",
-        "section": "7.1.3",
-        "spec": "OPC-10000-6"
-      },
-      "profile_defaults": {
-        "custom": false,
-        "embedded": false,
-        "full": true,
-        "micro": false,
-        "nano": false,
-        "standard": false
-      }
-    },
-    {
-      "backing_tests": [
         "test_read_browsename_namespace"
       ],
       "depends_on": [],
@@ -5758,7 +5763,7 @@
       "default_unconditional": true,
       "depends_on": [],
       "id": "service_discovery",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": "MUC_OPCUA_CU_DISCOVERY_FIND_SERVERS_SELF_GET_ENDPOINTS",
       "kind": "optimization",
       "notes": "FindServers / GetEndpoints.",
@@ -5806,7 +5811,7 @@
       ],
       "depends_on": [],
       "id": "service_write",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": "MUC_OPCUA_CU_CORE_2017_ATTRIBUTE_WRITE",
       "kind": "optimization",
       "notes": "Optional facet; only on full.",
@@ -6606,7 +6611,7 @@
     },
     {
       "backing_tests": [
-        "test_history"
+        "test_discovery_services"
       ],
       "cu_optional": false,
       "id": "opc_cu_2352",
@@ -18267,26 +18272,26 @@
     },
     {
       "backing_tests": [
-        "test_secure_channel"
+        "test_reverse_connect"
       ],
       "cu_optional": false,
       "id": "opc_cu_2867",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": "MUC_OPCUA_CU_PROTOCOL_REVERSE_CONNECT_SERVER",
       "kind": "conformance_unit",
-      "notes": "Spec CU 2867: tracked in manifest; not yet claimed or implemented.",
+      "notes": "Directly owned by canonical CU 2867; Reverse Connect behavior is covered by test_reverse_connect.",
       "opc_display_name": "Protocol Reverse Connect Server",
       "opc_reference": {
         "cu_id": "2867",
         "cu_name": "Protocol Reverse Connect Server",
-        "section": null,
+        "section": "7.1.3",
         "source_url": "https://profiles.opcfoundation.org",
-        "spec": null
+        "spec": "OPC-10000-6"
       },
       "profile_defaults": {
         "custom": false,
         "embedded": false,
-        "full": false,
+        "full": true,
         "micro": false,
         "nano": false,
         "standard": false
@@ -18294,8 +18299,7 @@
       "source_metadata": {
         "source_id": "2867",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_ua_secure_conversation"
+      }
     },
     {
       "backing_tests": [

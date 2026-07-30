@@ -20,7 +20,8 @@ typedef struct mu_tcp_adapter {
     /* Initialize the listening endpoint */
     opcua_statuscode_t (*listen)(void *context, const char *endpoint_url);
 
-    /* Outbound connect to a remote endpoint (OPC-10000-6 §7.5) */
+    /* Outbound connect to a remote endpoint (OPC-10000-6 §7.5).
+     * MU_STATUS_GOOD requires a non-NULL handle valid until close_connection. */
     opcua_statuscode_t (*connect)(void *context, const char *endpoint_url, void **connection_handle);
 
     /* Accept a new connection */

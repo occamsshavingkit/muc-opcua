@@ -195,9 +195,16 @@ def compute_catalog_completion(manifest: dict, cu_ids: list[str], optional_by_cu
             "optional_implemented": opt_i, "optional_total": opt_t, "not_applicable": na_n}
 
 
-def _render_server_surface(manifest: dict, catalog: dict) -> list[str]:
+def _render_server_surface(  # pylint: disable=too-many-locals
+    manifest: dict, snapshot: dict, catalog: dict
+) -> list[str]:
     opt_map = catalog["conformance_unit_optional"]
     profiles = catalog["profiles"]
+    manifest_profiles = {
+        str(profile["opc_id"]): {"key": key, "opc_id": profile["opc_id"]}
+        for key, profile in manifest.get("profiles", {}).items()
+        if profile.get("opc_id") is not None
+    }
     # Overall: distinct CUs across all Server profiles.
     all_ids = sorted({c for p in profiles for c in p["conformance_units"]}, key=int)
     overall = compute_catalog_completion(manifest, all_ids, opt_map)
@@ -217,7 +224,11 @@ def _render_server_surface(manifest: dict, catalog: dict) -> list[str]:
             "| OPC id | Profile / Facet | Required | Optional |",
             "| --- | --- | --- | --- |"]
     for p in sorted(profiles, key=lambda x: int(x["opc_id"])):
-        r = compute_catalog_completion(manifest, p["conformance_units"], opt_map)
+        manifest_profile = manifest_profiles.get(str(p["opc_id"]))
+        if manifest_profile is None:
+            r = compute_catalog_completion(manifest, p["conformance_units"], opt_map)
+        else:
+            r = compute_profile_completion(manifest, snapshot, manifest_profile)
         name = (p.get("name") or p["opc_id"]).strip()
         rows.append(f"| {p['opc_id']} | {name} | {r['required_implemented']}/{r['required_total']} "
                     f"| {r['optional_implemented']}/{r['optional_total']} |")
@@ -239,7 +250,7 @@ def render_report(manifest: dict, snapshot: dict, catalog: dict | None = None) -
              "full Server catalog in `profiles/opcua-server-conformance.json`.",
              "Do not edit by hand. See spec 073.", ""]
     if catalog is not None:
-        lines.extend(_render_server_surface(manifest, catalog))
+        lines.extend(_render_server_surface(manifest, snapshot, catalog))
     lines.append("## Base Server Profiles (detailed)")
     lines.append("")
     profiles = manifest.get("profiles", {})

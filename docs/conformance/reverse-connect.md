@@ -3,7 +3,8 @@
 Reverse Connect (server-initiated connectivity, OPC-10000-6 §7.1.3) lets a server behind a
 firewall with no open inbound ports **initiate** the TCP connection to a client. It is an
 **optional transport capability** — no Server Profile this server advertises mandates it —
-enabled by `MUC_OPCUA_REVERSE_CONNECT` (standard/full).
+enabled by `MUC_OPCUA_CU_PROTOCOL_REVERSE_CONNECT_SERVER` (full by default and directly
+selectable for other profiles).
 
 ## The contract we now honor (previously broken)
 

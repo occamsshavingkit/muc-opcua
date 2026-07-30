@@ -24,9 +24,19 @@ trap 'rm -rf "$WORKDIR"' EXIT
 PASS=0
 FAIL=0
 
-# assert_cfg <build-dir> <SYM> <ON|OFF>   -- checks muc_opcua_config.cmake
+# assert_cfg <build-dir> <SYM> <ON|OFF|UNDEFINED> -- checks muc_opcua_config.cmake
 assert_cfg() {
     local dir="$1" sym="$2" expected="$3" actual
+    if [ "$expected" = "UNDEFINED" ]; then
+        if grep -qE "^set\(MUC_OPCUA_${sym} " "$dir/muc_opcua_config.cmake" 2>/dev/null; then
+            echo "  FAIL  MUC_OPCUA_$sym is defined (expected Kconfig-undefined) [$dir]"
+            FAIL=$((FAIL + 1))
+        else
+            echo "  PASS  MUC_OPCUA_$sym is absent from Kconfig-resolved output"
+            PASS=$((PASS + 1))
+        fi
+        return
+    fi
     actual=$(grep -E "^set\(MUC_OPCUA_${sym} (ON|OFF)\)\$" "$dir/muc_opcua_config.cmake" 2>/dev/null | sed -E 's/.* (ON|OFF)\)/\1/')
     if [ "$actual" = "$expected" ]; then
         echo "  PASS  MUC_OPCUA_$sym=$actual (expected $expected)"
@@ -310,6 +320,165 @@ if grep -q "config MUC_OPCUA_PROFILE_STANDARD_2022_UA_SERVER" Kconfig; then
 else
     echo "  PASS  superseded Standard 2022 profile is not selectable"
     PASS=$((PASS + 1))
+fi
+
+echo "### 17. Aggregate-only Discovery gate builds and runs GetEndpoints coverage ###"
+D17="$WORKDIR/g17"
+D17_CONFIGURE_LOG="$WORKDIR/g17-configure.log"
+D17_BUILD_LOG="$WORKDIR/g17-build.log"
+if cmake -S . -B "$D17" -DMUC_OPCUA_PROFILE=custom \
+    -DMUC_OPCUA_FACET_CORE_2022_SERVER=ON \
+    -DMUC_OPCUA_CU_DISCOVERY_FIND_SERVERS_SELF_GET_ENDPOINTS=ON \
+    -DMUC_OPCUA_CU_DISCOVERY_FIND_SERVERS_SELF=OFF \
+    -DMUC_OPCUA_CU_DISCOVERY_GET_ENDPOINTS=OFF \
+    -DMUC_OPCUA_BUILD_TESTS=ON \
+    -DMUC_OPCUA_PLATFORM=host >"$D17_CONFIGURE_LOG" 2>&1; then
+    assert_cfg "$D17" CU_DISCOVERY_FIND_SERVERS_SELF_GET_ENDPOINTS ON
+    assert_cfg "$D17" CU_DISCOVERY_FIND_SERVERS_SELF UNDEFINED
+    assert_cfg "$D17" CU_DISCOVERY_GET_ENDPOINTS OFF
+
+    if cmake --build "$D17" --target test_get_endpoints_gate -j4 >"$D17_BUILD_LOG" 2>&1; then
+        if "$D17/tests/unit/test_get_endpoints_gate"; then
+            echo "  PASS  test_get_endpoints_gate passes with only the aggregate Discovery gate enabled"
+            PASS=$((PASS + 1))
+        else
+            echo "  FAIL  test_get_endpoints_gate failed with only the aggregate Discovery gate enabled"
+            FAIL=$((FAIL + 1))
+        fi
+    else
+        echo "  FAIL  could not build test_get_endpoints_gate for the aggregate-only Discovery configuration"
+        cat "$D17_BUILD_LOG"
+        FAIL=$((FAIL + 1))
+    fi
+else
+    echo "  FAIL  could not configure the aggregate-only Discovery scenario"
+    cat "$D17_CONFIGURE_LOG"
+    FAIL=$((FAIL + 1))
+fi
+
+echo "### 18. Reverse Connect closes its handle without Multiple Connections ###"
+D18="$WORKDIR/g18"
+D18_CONFIGURE_LOG="$WORKDIR/g18-configure.log"
+D18_BUILD_LOG="$WORKDIR/g18-build.log"
+if cmake -S . -B "$D18" -DMUC_OPCUA_PROFILE=custom \
+    -DMUC_OPCUA_FACET_CORE_2022_SERVER=ON \
+    -DMUC_OPCUA_FACET_REVERSE_CONNECT_SERVER=ON \
+    -DMUC_OPCUA_CU_PROTOCOL_REVERSE_CONNECT_SERVER=ON \
+    -DMUC_OPCUA_CU_MULTIPLE_CONNECTIONS=OFF \
+    -DMUC_OPCUA_BUILD_TESTS=ON \
+    -DMUC_OPCUA_PLATFORM=host >"$D18_CONFIGURE_LOG" 2>&1; then
+    assert_cfg "$D18" FACET_CORE_2022_SERVER ON
+    assert_cfg "$D18" FACET_REVERSE_CONNECT_SERVER ON
+    assert_cfg "$D18" CU_PROTOCOL_REVERSE_CONNECT_SERVER ON
+    assert_cfg "$D18" CU_MULTIPLE_CONNECTIONS OFF
+
+    if cmake --build "$D18" --target test_reverse_connect -j4 >"$D18_BUILD_LOG" 2>&1; then
+        if "$D18/tests/unit/test_reverse_connect"; then
+            echo "  PASS  test_reverse_connect passes without Multiple Connections"
+            PASS=$((PASS + 1))
+        else
+            echo "  FAIL  test_reverse_connect failed without Multiple Connections"
+            FAIL=$((FAIL + 1))
+        fi
+    else
+        echo "  FAIL  could not build test_reverse_connect without Multiple Connections"
+        cat "$D18_BUILD_LOG"
+        FAIL=$((FAIL + 1))
+    fi
+else
+    echo "  FAIL  could not configure Reverse Connect without Multiple Connections"
+    cat "$D18_CONFIGURE_LOG"
+    FAIL=$((FAIL + 1))
+fi
+
+echo "### 19. Stale documented Write Value override cannot bypass canonical Kconfig gate ###"
+D19="$WORKDIR/g19"
+D19_CONFIGURE_LOG="$WORKDIR/g19-configure.log"
+D19_BUILD_LOG="$WORKDIR/g19-build.log"
+if cmake -S . -B "$D19" -DMUC_OPCUA_PROFILE=custom \
+    -DMUC_OPCUA_FACET_CORE_2022_SERVER=ON \
+    -DMUC_OPCUA_CU_CORE_2017_ATTRIBUTE_WRITE=OFF \
+    -DMUC_OPCUA_CU_ATTRIBUTE_WRITE_VALUES=ON \
+    -DMUC_OPCUA_PLATFORM=host \
+    -DCMAKE_EXPORT_COMPILE_COMMANDS=ON >"$D19_CONFIGURE_LOG" 2>&1; then
+    assert_cfg "$D19" CU_CORE_2017_ATTRIBUTE_WRITE OFF
+
+    if [ ! -f "$D19/compile_commands.json" ]; then
+        echo "  FAIL  stale Write Value override scenario did not produce compile_commands.json"
+        FAIL=$((FAIL + 1))
+    else
+        if grep -q -- "-DMUC_OPCUA_SERVICE_WRITE=1" "$D19/compile_commands.json"; then
+            echo "  FAIL  stale Write Value override emitted MUC_OPCUA_SERVICE_WRITE=1"
+            FAIL=$((FAIL + 1))
+        else
+            echo "  PASS  stale Write Value override did not emit MUC_OPCUA_SERVICE_WRITE=1"
+            PASS=$((PASS + 1))
+        fi
+
+        if grep -q -- "-DMUC_OPCUA_CU_ATTRIBUTE_WRITE_VALUES=1" "$D19/compile_commands.json"; then
+            echo "  FAIL  stale Write Value override emitted MUC_OPCUA_CU_ATTRIBUTE_WRITE_VALUES=1"
+            FAIL=$((FAIL + 1))
+        else
+            echo "  PASS  stale Write Value override did not emit MUC_OPCUA_CU_ATTRIBUTE_WRITE_VALUES=1"
+            PASS=$((PASS + 1))
+        fi
+    fi
+
+    if cmake --build "$D19" --target muc_opcua -j4 >"$D19_BUILD_LOG" 2>&1; then
+        if [ ! -f "$D19/src/libmuc_opcua.a" ]; then
+            echo "  FAIL  stale Write Value override scenario did not produce src/libmuc_opcua.a"
+            FAIL=$((FAIL + 1))
+        elif ! D19_NM_OUTPUT=$(nm "$D19/src/libmuc_opcua.a" 2>/dev/null); then
+            echo "  FAIL  could not inspect compiled Write symbols in src/libmuc_opcua.a"
+            FAIL=$((FAIL + 1))
+        elif printf '%s\n' "$D19_NM_OUTPUT" | \
+            grep -qE '(^|[[:space:]])(handle_write|mu_write_request_decode|mu_write_response_encode)$'; then
+            echo "  FAIL  stale Write Value override compiled Write symbols"
+            FAIL=$((FAIL + 1))
+        else
+            echo "  PASS  stale Write Value override did not compile Write symbols"
+            PASS=$((PASS + 1))
+        fi
+    else
+        echo "  FAIL  could not build stale Write Value override scenario"
+        cat "$D19_BUILD_LOG"
+        FAIL=$((FAIL + 1))
+    fi
+else
+    echo "  FAIL  could not configure stale Write Value override scenario"
+    cat "$D19_CONFIGURE_LOG"
+    FAIL=$((FAIL + 1))
+fi
+
+echo "### 20. Public Reverse Connect config layout follows the feature value ###"
+LAYOUT_TEST="tests/config/test_reverse_connect_config_layout.c"
+if cc -std=c11 -Wall -Wextra -Werror -Wpedantic -Iinclude \
+    -DEXPECT_REVERSE_CONNECT_FIELD=0 -fsyntax-only "$LAYOUT_TEST"; then
+    echo "  PASS  undefined Reverse Connect omits reverse_connect_url"
+    PASS=$((PASS + 1))
+else
+    echo "  FAIL  undefined Reverse Connect exposes reverse_connect_url"
+    FAIL=$((FAIL + 1))
+fi
+
+if cc -std=c11 -Wall -Wextra -Werror -Wpedantic -Iinclude \
+    -DMUC_OPCUA_CU_PROTOCOL_REVERSE_CONNECT_SERVER=0 \
+    -DEXPECT_REVERSE_CONNECT_FIELD=0 -fsyntax-only "$LAYOUT_TEST"; then
+    echo "  PASS  zero-valued Reverse Connect omits reverse_connect_url"
+    PASS=$((PASS + 1))
+else
+    echo "  FAIL  zero-valued Reverse Connect exposes reverse_connect_url"
+    FAIL=$((FAIL + 1))
+fi
+
+if cc -std=c11 -Wall -Wextra -Werror -Wpedantic -Iinclude \
+    -DMUC_OPCUA_CU_PROTOCOL_REVERSE_CONNECT_SERVER=1 \
+    -DEXPECT_REVERSE_CONNECT_FIELD=1 -fsyntax-only "$LAYOUT_TEST"; then
+    echo "  PASS  enabled Reverse Connect exposes reverse_connect_url"
+    PASS=$((PASS + 1))
+else
+    echo "  FAIL  enabled Reverse Connect omits reverse_connect_url"
+    FAIL=$((FAIL + 1))
 fi
 
 echo
