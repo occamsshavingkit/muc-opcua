@@ -878,7 +878,6 @@
       "opc_cu_2818",
       "opc_cu_2845",
       "opc_cu_2861",
-      "opc_cu_2867",
       "opc_cu_2871",
       "opc_cu_2873",
       "opc_cu_2877",
@@ -1112,6 +1111,9 @@
     ],
     "opc_facet_1631": [
       "opc_cu_2231"
+    ],
+    "opc_facet_1632": [
+      "opc_cu_2867"
     ],
     "opc_facet_1695": [
       "opc_cu_2823",
@@ -2189,6 +2191,35 @@
         "micro": false,
         "nano": false,
         "standard": true
+      },
+      "source_metadata": {
+        "profile_group_id": 171,
+        "source_endpoint": "profile/?pg=171&all=1"
+      }
+    },
+    {
+      "backing_tests": [],
+      "depends_on": [],
+      "id": "opc_facet_1632",
+      "implementation_state": "implemented",
+      "kconfig_symbol": "MUC_OPCUA_FACET_REVERSE_CONNECT_SERVER",
+      "kind": "facet",
+      "notes": "Reverse Connect Server: CU 2867 claimed",
+      "opc_display_name": "Reverse Connect Server Facet",
+      "opc_reference": {
+        "profile_id": "1632",
+        "profile_uri": "http://opcfoundation.org/UA-Profile/Server/ReverseConnect",
+        "section": "4.2",
+        "source_url": "https://profiles.opcfoundation.org",
+        "spec": "OPC-10000-7"
+      },
+      "profile_defaults": {
+        "custom": false,
+        "embedded": false,
+        "full": true,
+        "micro": false,
+        "nano": false,
+        "standard": false
       },
       "source_metadata": {
         "profile_group_id": 171,
@@ -6580,7 +6611,7 @@
     },
     {
       "backing_tests": [
-        "test_history"
+        "test_discovery_services"
       ],
       "cu_optional": false,
       "id": "opc_cu_2352",
@@ -18260,7 +18291,7 @@
       "profile_defaults": {
         "custom": false,
         "embedded": false,
-        "full": false,
+        "full": true,
         "micro": false,
         "nano": false,
         "standard": false
