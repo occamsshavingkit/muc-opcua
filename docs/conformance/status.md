@@ -128,7 +128,7 @@ for the conformance-unit map.
 | Enhanced DataChange Subscription 2022 facet (standard/full; mandated by StandardUA2017) | Implemented | `test_subscriptions_capacity` (`test_enhanced_*`); see `enhanced-datachange.md` |
 | Base Server Behaviour: Session General Service Behaviour (auth token · requestHandle · timeoutHint) | Implemented | `test_service_state_errors`, `test_write_response`, `test_base_server_behaviour`; see `base-server-behaviour.md` |
 | ServerDiagnostics object (optional; `ServerDiagnosticsSummary` i=2275, standard/full) | Implemented | `test_diagnostics`; see `base-server-behaviour.md` |
-| Reverse Connect (optional; server-initiated, ReverseHello first per §7.1.3, standard/full) | Implemented | `test_reverse_connect`; see `reverse-connect.md` |
+| Reverse Connect (optional; server-initiated, ReverseHello first per §7.1.3, full by default; selectable elsewhere) | Implemented | `test_reverse_connect`; see `reverse-connect.md` |
 | Client Redundancy (optional; TransferSubscriptions cross-session + RedundancySupport, full) | Implemented | `test_transfer_subscriptions`; see `redundancy.md` |
 | Base Info Type System | Implemented | `test_type_system`, `test_view_services` |
 | Data Access Server Facet | Implemented (standard/full) | `test_da_type_nodes`, `test_percent_deadband` |

@@ -76,3 +76,35 @@ Fresh verification after regeneration and the ownership correction:
 - Full-profile build with CU 2867 enabled: 150/150 CTest tests passed.
 - Full-profile build with CU 2867 explicitly disabled: 150/150 CTest tests
   passed.
+
+## Reverse Connect Failure-Path Hardening (2026-07-28)
+
+After the CU 2867 ownership correction, focused tests were added to cover
+lifecycle failure paths previously untested in the Reverse Connect
+implementation:
+
+- **Partial or zero-byte ReverseHello write**: The server rejects initialization
+  when the non-blocking adapter does not transmit the complete mandatory first
+  ReverseHello message.
+- **Write-error cleanup**: When the write to the ReverseHello endpoint
+  fails mid-transmission, the server tears down the partially-constructed
+  connection state without leaking resources.
+- **High-uptime first poll**: A server that initiates Reverse Connect after
+  extended process uptime initializes the connection activity timestamp and
+  does not close the connection on its first poll while waiting for Client Hello.
+
+These tests do not broaden the claim to new CUs; they reconcile the
+existing CU 2867 claim to observable evidence by hardening error and
+edge-case paths required by OPC-10000-6 §7.1.3.
+
+## Dedicated Discovery Ownership (2026-07-28)
+
+Discovery Server behavior (OPC-10000-4 §5.4) retains independent dedicated
+gates for FindServers and GetEndpoints:
+
+- `MUC_OPCUA_CU_DISCOVERY_FIND_SERVERS_SELF`
+- `MUC_OPCUA_CU_DISCOVERY_GET_ENDPOINTS`
+
+No combined Discovery aggregate owns either service. Shared Discovery sources
+compile when either dedicated gate is enabled, while each service dispatcher
+remains controlled by its own CU symbol.

@@ -60,6 +60,7 @@ Backing test column: comma-separated ctest names (as registered).
 | Core 2022 Server Facet | OPC-10000-5 | embedded, standard, full | test_type_system |
 | Core 2017 Server Facet: Attribute Read | OPC-10000-4 §5.10.2 | all | test_read_service |
 | Core 2017: View RegisterNodes | OPC-10000-4 §5.9 | all | test_view_services, test_profile_surface |
+| Core 2017 Attribute Write | OPC-10000-4 §5.10.4 | full | test_write_service |
 | Historical Access Server Facet | OPC-10000-11 | full | test_history |
 | Query | OPC-10000-4 §5.9 | full | test_query_service |
 | NodeManagement | OPC-10000-4 §5.7 | full | test_node_management, test_node_management_errors |

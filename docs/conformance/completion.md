@@ -106,15 +106,15 @@ reconciliation note below.
 | 2250 | Embedded DataChange Subscription 2022 Server Facet | 1/9 | 0/1 |
 | 2252 | Redundancy Visible Server Facet | 0/1 | 0/0 |
 | 2255 | Micro Embedded Device 2022 Server Profile | 9/32 | 17/30 |
-| 2266 | Nano Embedded Device 2025 Server Profile | 8/22 | 17/29 |
+| 2266 | Nano Embedded Device 2025 Server Profile | 8/20 | 17/28 |
 | 2267 | Micro Embedded Device 2025 Server Profile | 9/32 | 17/30 |
-| 2268 | Embedded 2025 UA Server Profile | 11/51 | 17/68 |
-| 2269 | Standard 2025 UA Server Profile | 12/55 | 17/68 |
+| 2268 | Embedded 2025 UA Server Profile | 11/50 | 17/69 |
+| 2269 | Standard 2025 UA Server Profile | 12/54 | 17/69 |
 | 2322 | AliasName Configuration Facet | 0/4 | 0/5 |
 | 2323 | AliasName Server PubSub Publisher Facet | 0/4 | 0/4 |
 
 > Reconciliation status: of the full Server surface, only CUs linked to a
-> build-manifest entry (directly or via `satisfied_by`) count as implemented.
+> build-manifest entry directly or through a shared OPC CU id count as implemented.
 > Our feature-level implementations (PubSub, Alarms, History, Methods,
 > Aggregates, Redundancy, …) are tracked as coarse CUs that do not yet map
 > 1:1 to the granular OPC CU ids; reconciling them is tracked, ongoing work.
@@ -534,6 +534,7 @@ Facet CU membership uses direct `included_conformance_units`
 - **Core 2022 Server Facet** (`opc_facet_1322`): required 8/18, optional 17/26
 - **Standard DataChange Subscription 2022 Server Facet** (`opc_facet_1324`): required 1/16, optional 0/1
 - **Global Certificate Management Server Facet** (`opc_facet_1631`): required 0/1, optional 0/0
+- **Reverse Connect Server Facet** (`opc_facet_1632`): required 1/1, optional 0/0
 - **AliasName Server Facet** (`opc_facet_1636`): required 0/3, optional 0/4
 - **AliasName Aggregating Server Facet** (`opc_facet_1637`): required 0/4, optional 0/5
 - **User Token – User Name Password Server Facet** (`opc_facet_1695`): required 0/2, optional 0/1

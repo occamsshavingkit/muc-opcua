@@ -82,7 +82,7 @@ void test_t050_getendpoints_gate_matches_opc_cu_2328_selection(void) {
     opcua_statuscode_t status =
         mu_service_dispatch(&server, MU_ID_GETENDPOINTSREQUEST, request, request_len, response, &response_len);
 
-#ifdef MUC_OPCUA_CU_DISCOVERY_GET_ENDPOINTS
+#if defined(MUC_OPCUA_CU_DISCOVERY_GET_ENDPOINTS) && MUC_OPCUA_CU_DISCOVERY_GET_ENDPOINTS
     TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, status);
     TEST_ASSERT_EQUAL_UINT32(MU_ID_GETENDPOINTSRESPONSE, response_type(response, response_len));
 #else

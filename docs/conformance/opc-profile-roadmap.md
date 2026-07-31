@@ -15,9 +15,9 @@ remains future work.
 
 | State | Count |
 |-------|-------|
-| claimed | 133 |
-| implemented | 17 |
-| documented | 466 |
+| claimed | 134 |
+| implemented | 18 |
+| documented | 465 |
 | deferred | 7 |
 | unimplemented | 11 |
 
@@ -56,6 +56,7 @@ remains future work.
 | opc_facet_1219 | facet | implemented | OPC-10000-7 §4.2 | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER | embedded, standard, full | — |
 | opc_facet_1324 | facet | implemented | OPC-10000-7 §4.2 | MUC_OPCUA_FACET_STANDARD_DATACHANGE_SUBSCRIPTION_2022_SERVER | embedded, standard, full | — |
 | opc_facet_1631 | facet | implemented | OPC-10000-7 §4.2 | MUC_OPCUA_FACET_GLOBAL_CERTIFICATE_MANAGEMENT_SERVER | embedded, standard, full | — |
+| opc_facet_1632 | facet | implemented | OPC-10000-7 §4.2 | MUC_OPCUA_FACET_REVERSE_CONNECT_SERVER | full | — |
 | opc_facet_1695 | facet | implemented | OPC-10000-7 §4.2 | MUC_OPCUA_FACET_USER_TOKEN_USER_NAME_PASSWORD_SERVER | embedded, standard, full | — |
 | opc_facet_1696 | facet | implemented | OPC-10000-7 §4.2 | MUC_OPCUA_FACET_USER_TOKEN_X509_CERTIFICATE_SERVER | standard, full | — |
 | opc_facet_2250 | facet | implemented | OPC-10000-7 §4.2 | MUC_OPCUA_FACET_EMBEDDED_DATACHANGE_SUBSCRIPTION_2022_SERVER | micro, embedded, standard, full | — |
@@ -181,7 +182,7 @@ remains future work.
 | opc_cu_base_info_base_types | optimization | claimed | OPC-10000-5 Core 2022 Server Facet | MUC_OPCUA_CU_BASE_INFO_BASE_TYPES | embedded, standard, full | test_type_system |
 | service_read | conformance_unit | claimed | OPC-10000-4 §5.10.2 Core 2017 Server Facet | MUC_OPCUA_CU_ATTRIBUTE_READ | all | test_read_service |
 | service_register_nodes | conformance_unit | claimed | OPC-10000-4 §5.9 Core 2017 | MUC_OPCUA_CU_VIEW_REGISTERNODES | all | test_view_services, test_profile_surface |
-| service_write | optimization | documented | OPC-10000-4 §5.10.4 Core 2017 Attribute Write | MUC_OPCUA_CU_CORE_2017_ATTRIBUTE_WRITE | full | test_write_service |
+| service_write | optimization | claimed | OPC-10000-4 §5.10.4 Core 2017 Attribute Write | MUC_OPCUA_CU_CORE_2017_ATTRIBUTE_WRITE | full | test_write_service |
 | service_history | optimization | claimed | OPC-10000-11 Historical Access Server Facet | MUC_OPCUA_CU_HISTORICAL_ACCESS_SERVER_FACET | full | test_history |
 | opc_cu_1571 | conformance_unit | documented | OPC-10000-11 | MUC_OPCUA_CU_HISTORICAL_RAW_DATA_2022_SERVER_FACET | full | test_profile_surface |
 | opc_cu_1572 | conformance_unit | deferred | OPC-10000-11 | — | — | — |

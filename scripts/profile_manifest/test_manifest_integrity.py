@@ -31,26 +31,20 @@ def _load(name: str):
 completion = _load("completion")
 
 
-class ManifestJsonIntegrityTest(unittest.TestCase):
-    def test_committed_manifest_is_strict_json(self) -> None:
-        # Given the committed profile manifest.
+class ManifestIntegrityTest(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls) -> None:
+        super().setUpClass()
         manifest_path = _REPO / "profiles" / "opcua-profile-manifest.yaml"
-
-        # When it is parsed by the standard-library JSON parser.
         with manifest_path.open(encoding="utf-8") as manifest_file:
-            manifest = json.load(manifest_file)
+            cls.manifest = json.load(manifest_file)
 
-        # Then the canonical item collection is available without YAML fallback.
-        self.assertIsInstance(manifest["items"], list)
+    def test_committed_manifest_is_strict_json(self) -> None:
+        self.assertIsInstance(self.manifest["items"], list)
 
     def test_committed_manifest_has_no_recursive_satisfied_by_keys(self) -> None:
-        # Given the committed profile manifest parsed as strict JSON.
-        manifest_path = _REPO / "profiles" / "opcua-profile-manifest.yaml"
-        with manifest_path.open(encoding="utf-8") as manifest_file:
-            manifest = json.load(manifest_file)
-
         # When every object and array in the manifest is traversed recursively.
-        def count_satisfied_by_keys(value: object) -> int:
+        def count_satisfied_by_keys(value) -> int:
             if isinstance(value, dict):
                 return int("satisfied_by" in value) + sum(
                     count_satisfied_by_keys(child) for child in value.values()
@@ -59,21 +53,16 @@ class ManifestJsonIntegrityTest(unittest.TestCase):
                 return sum(count_satisfied_by_keys(child) for child in value)
             return 0
 
-        satisfied_by_count = count_satisfied_by_keys(manifest)
+        satisfied_by_count = count_satisfied_by_keys(self.manifest)
 
         # Then no satisfied_by middleman key remains at any depth.
         self.assertEqual(satisfied_by_count, 0)
 
     def test_committed_manifest_has_unique_canonical_cu_ids(self) -> None:
-        # Given the committed profile manifest parsed as strict JSON.
-        manifest_path = _REPO / "profiles" / "opcua-profile-manifest.yaml"
-        with manifest_path.open(encoding="utf-8") as manifest_file:
-            manifest = json.load(manifest_file)
-
         # When canonical OPC CU identifiers are counted across CU items.
         cu_ids = [
             str(item["opc_reference"]["cu_id"])
-            for item in manifest["items"]
+            for item in self.manifest["items"]
             if item.get("kind") == "conformance_unit"
             and isinstance(item.get("opc_reference"), dict)
             and item["opc_reference"].get("cu_id") is not None
@@ -85,14 +74,41 @@ class ManifestJsonIntegrityTest(unittest.TestCase):
         # Then every canonical OPC CU identifier has one manifest owner.
         self.assertEqual(duplicates, {})
 
+    def test_view_and_discovery_have_only_dedicated_canonical_owners(self) -> None:
+        items = self.manifest["items"]
+        items_by_id = {item["id"]: item for item in items}
+
+        self.assertNotIn("service_browse", items_by_id)
+        self.assertNotIn("service_discovery", items_by_id)
+        self.assertEqual(
+            items_by_id["opc_cu_2317"]["kconfig_symbol"],
+            "MUC_OPCUA_CU_VIEW_TRANSLATEBROWSEPATH",
+        )
+        self.assertEqual(
+            items_by_id["opc_cu_3530"]["kconfig_symbol"],
+            "MUC_OPCUA_CU_VIEW_BASIC_2",
+        )
+        self.assertEqual(
+            items_by_id["opc_cu_2328"]["kconfig_symbol"],
+            "MUC_OPCUA_CU_DISCOVERY_GET_ENDPOINTS",
+        )
+        self.assertEqual(
+            items_by_id["opc_cu_2352"]["kconfig_symbol"],
+            "MUC_OPCUA_CU_DISCOVERY_FIND_SERVERS_SELF",
+        )
+
+    def test_full_profile_write_aggregate_remains_selectable(self) -> None:
+        service_write = next(
+            item for item in self.manifest["items"] if item.get("id") == "service_write"
+        )
+        self.assertEqual(service_write["implementation_state"], "claimed")
+        self.assertTrue(service_write["profile_defaults"]["full"])
+        self.assertIn("test_write_service", service_write["backing_tests"])
+
     def test_authorization_service_configuration_server_has_canonical_owner(self) -> None:
-        # Given the committed profile manifest parsed as strict JSON.
-        manifest_path = _REPO / "profiles" / "opcua-profile-manifest.yaml"
-        with manifest_path.open(encoding="utf-8") as manifest_file:
-            manifest = json.load(manifest_file)
 
         # When the Authorization Service Configuration Server entries are selected.
-        items = manifest["items"]
+        items = self.manifest["items"]
         self.assertNotIn(
             "cu_authorization_service_server",
             [item.get("id") for item in items],
@@ -122,13 +138,7 @@ class ManifestJsonIntegrityTest(unittest.TestCase):
         )
 
     def test_reverse_connect_server_has_canonical_owner(self) -> None:
-        # Given the committed profile manifest parsed as strict JSON.
-        manifest_path = _REPO / "profiles" / "opcua-profile-manifest.yaml"
-        with manifest_path.open(encoding="utf-8") as manifest_file:
-            manifest = json.load(manifest_file)
-
-        # When the Reverse Connect Server entries are selected.
-        items = manifest["items"]
+        items = self.manifest["items"]
         self.assertNotIn(
             "opc_cu_reverse_connect",
             [item.get("id") for item in items],
@@ -147,6 +157,95 @@ class ManifestJsonIntegrityTest(unittest.TestCase):
         self.assertIn("test_reverse_connect", canonical_item["backing_tests"])
         self.assertEqual(canonical_item["opc_reference"]["spec"], "OPC-10000-6")
         self.assertEqual(canonical_item["opc_reference"]["section"], "7.1.3")
+        self.assertEqual(
+            canonical_item["profile_defaults"],
+            {
+                "custom": False,
+                "embedded": False,
+                "full": True,
+                "micro": False,
+                "nano": False,
+                "standard": False,
+            },
+        )
+
+    def test_reverse_connect_facet_matches_canonical_profile_when_manifest_loaded(
+        self,
+    ) -> None:
+        # Given the committed real manifest.
+        # When the canonical Reverse Connect Server Facet is selected.
+        reverse_connect_facets = [
+            item
+            for item in self.manifest["items"]
+            if item.get("id") == "opc_facet_1632"
+        ]
+
+        # Then its identity, symbol, profile source, and defaults are exact.
+        self.assertEqual(len(reverse_connect_facets), 1)
+        reverse_connect_facet = reverse_connect_facets[0]
+        self.assertEqual(
+            reverse_connect_facet["opc_display_name"],
+            "Reverse Connect Server Facet",
+        )
+        self.assertEqual(
+            reverse_connect_facet["kconfig_symbol"],
+            "MUC_OPCUA_FACET_REVERSE_CONNECT_SERVER",
+        )
+        self.assertEqual(reverse_connect_facet["implementation_state"], "implemented")
+        self.assertEqual(reverse_connect_facet["opc_reference"]["profile_id"], "1632")
+        self.assertEqual(
+            reverse_connect_facet["opc_reference"]["profile_uri"],
+            "http://opcfoundation.org/UA-Profile/Server/ReverseConnect",
+        )
+        self.assertEqual(
+            reverse_connect_facet["profile_defaults"],
+            {
+                "custom": False,
+                "embedded": False,
+                "full": True,
+                "micro": False,
+                "nano": False,
+                "standard": False,
+            },
+        )
+        self.assertEqual(
+            reverse_connect_facet["source_metadata"],
+            {
+                "profile_group_id": 171,
+                "source_endpoint": "profile/?pg=171&all=1",
+            },
+        )
+
+    def test_reverse_connect_facet_contains_only_canonical_cu_when_manifest_loaded(
+        self,
+    ) -> None:
+        # Given the committed real manifest.
+        # When Reverse Connect Server Facet containment is resolved.
+        containment = self.manifest["facet_containment"].get("opc_facet_1632")
+
+        # Then CU 2867 is its single mandatory child.
+        self.assertEqual(containment, ["opc_cu_2867"])
+
+    def test_core_2022_facet_excludes_reverse_connect_when_manifest_loaded(self) -> None:
+        # Given the committed real manifest.
+        # When Core 2022 Server Facet containment is resolved.
+        core_2022_cus = self.manifest["facet_containment"]["opc_facet_1322"]
+
+        # Then CU 2867 is not assigned to that noncanonical owner.
+        self.assertNotIn("opc_cu_2867", core_2022_cus)
+
+    def test_find_servers_self_uses_cu_specific_tests_when_manifest_loaded(self) -> None:
+        # Given the committed real manifest.
+        # When CU 2352 evidence is selected.
+        find_servers_self = next(
+            item for item in self.manifest["items"] if item.get("id") == "opc_cu_2352"
+        )
+
+        # Then it names both executables containing CU-specific scenarios.
+        self.assertEqual(
+            find_servers_self["backing_tests"],
+            ["test_discovery_services", "test_discovery_endpoint"],
+        )
 
 
 if __name__ == "__main__":
