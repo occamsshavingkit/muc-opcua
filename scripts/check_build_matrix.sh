@@ -79,8 +79,10 @@ discover_toggles() {
     local option_file="$ROOT_DIR/cmake/MucOpcUaOptions.cmake"
     local top_file="$ROOT_DIR/CMakeLists.txt"
     local file
+    local in_kconfig_features=0
     local line
     local option_name
+    local entries=()
 
     for file in "$option_file" "$top_file"; do
         [ -f "$file" ] || continue
@@ -97,6 +99,30 @@ discover_toggles() {
             fi
         done < "$file"
     done
+
+    while IFS= read -r line || [ -n "$line" ]; do
+        if [[ $line =~ ^[[:space:]]*set[[:space:]]*\([[:space:]]*MUC_OPCUA_KCONFIG_FEATURES([[:space:]]|$) ]]; then
+            in_kconfig_features=1
+            continue
+        fi
+
+        if [ "$in_kconfig_features" -eq 1 ]; then
+            if [[ $line =~ ^[[:space:]]*\) ]]; then
+                break
+            fi
+
+            line=${line%%#*}
+            read -r -a entries <<< "$line"
+            for option_name in "${entries[@]}"; do
+                if [[ $option_name != MUC_OPCUA_* ]]; then
+                    option_name="MUC_OPCUA_$option_name"
+                fi
+                if is_matrix_toggle "$option_name" && ! contains_toggle "$option_name"; then
+                    toggles+=("$option_name")
+                fi
+            done
+        fi
+    done < "$top_file"
 }
 
 join_by() {
@@ -125,18 +151,12 @@ symbols_for_option() {
                 mu_read_process \
                 mu_read_response_encode
             ;;
-        MUC_OPCUA_CU_VIEW_BASIC_TRANSLATEBROWSEPATH)
+        MUC_OPCUA_CU_DISCOVERY_FIND_SERVERS_SELF)
             printf '%s\n' \
-                handle_browse \
-                handle_browse_next \
-                handle_translate_browse_paths \
-                mu_browse_request_decode \
-                mu_browse_process \
-                mu_browse_response_encode
+                handle_find_servers
             ;;
-        MUC_OPCUA_CU_DISCOVERY_FIND_SERVERS_SELF_GET_ENDPOINTS)
+        MUC_OPCUA_CU_DISCOVERY_GET_ENDPOINTS)
             printf '%s\n' \
-                handle_find_servers \
                 handle_get_endpoints
             ;;
         MUC_OPCUA_CU_VIEW_REGISTERNODES)
@@ -393,7 +413,7 @@ main() {
     fi
 
     if [ "$found_toggles_in_options_file" -eq 0 ]; then
-        echo "warning: no matrix toggles found in cmake/MucOpcUaOptions.cmake; using top-level CMake option definitions" >&2
+        echo "warning: no matrix toggles found in cmake/MucOpcUaOptions.cmake; using top-level Kconfig feature declarations" >&2
     fi
 
     build_parent=${BUILD_DIR:-${TMPDIR:-/tmp}}
