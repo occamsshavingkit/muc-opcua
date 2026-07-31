@@ -69,7 +69,7 @@ Extracted claims from a validated JWT.
 | Symbol | CU | Default | Depends |
 |--------|-----|---------|---------|
 | `MUC_OPCUA_CU_USER_TOKEN_JWT` | 1697 | `y` (full) | `MUC_OPCUA_CU_USER_AUTH` |
-| `MUC_OPCUA_CU_AUTHORIZATION_SERVICE_SERVER` | 1629 | `y` (full) | `MUC_OPCUA_CU_USER_TOKEN_JWT && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION` |
+| `MUC_OPCUA_CU_AUTHORIZATION_SERVICE_CONFIGURATION_SERVER` | 3182 | `y` (full) | `MUC_OPCUA_CU_USER_TOKEN_JWT && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION` |
 
 ## File Map
 
@@ -80,6 +80,6 @@ Extracted claims from a validated JWT.
 | `src/cu/core_2022_server/authorization/base64url.c` | Base64url decode (no padding variant) |
 | `src/core/service_dispatch/activate_session.c` | Hook JWT validation into user token dispatch |
 | `include/muc_opcua/server.h` | Add `mu_jwt_config_t` to server config |
-| `Kconfig` | Add `MUC_OPCUA_CU_USER_TOKEN_JWT`, `MUC_OPCUA_CU_AUTHORIZATION_SERVICE_SERVER` |
+| `Kconfig` | Add `MUC_OPCUA_CU_USER_TOKEN_JWT`, `MUC_OPCUA_CU_AUTHORIZATION_SERVICE_CONFIGURATION_SERVER` |
 | `tests/unit/test_jwt.c` | JWT parser unit tests |
 | `tests/integration/test_jwt_activate_session.c` | ActivateSession with JWT integration test |
