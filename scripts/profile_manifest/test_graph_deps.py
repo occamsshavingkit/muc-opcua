@@ -142,6 +142,28 @@ class GraphDepsTests(unittest.TestCase):
             "full": True, "custom": True,
         })
 
+    def test_resolve_into_preserves_semantic_dependencies(self):
+        # Given a graph-mapped CU with stale facet and semantic dependencies.
+        graph = _full_graph()
+        manifest = {"items": [
+            {"id": "opc_facet_1219", "kind": "facet",
+             "kconfig_symbol": "MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER",
+             "opc_reference": {"profile_id": "1219"}},
+            {"id": "opc_cu_3189", "kind": "conformance_unit",
+             "kconfig_symbol": "MUC_OPCUA_CU_BASE_INFO_SERVERTYPE",
+             "opc_reference": {"cu_id": "3189", "cu_name": "Base Info ServerType"},
+             "depends_on": ["STALE_FACET"],
+             "semantic_depends_on": ["MUC_OPCUA_CU_BASE_INFO_BASE_TYPES"]},
+        ]}
+
+        # When graph-derived dependencies are resolved.
+        d.resolve_into(manifest, graph)
+
+        # Then facet visibility is replaced while semantic prerequisites survive.
+        item = manifest["items"][1]
+        self.assertEqual(item["depends_on"], ["MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER"])
+        self.assertEqual(item["semantic_depends_on"], ["MUC_OPCUA_CU_BASE_INFO_BASE_TYPES"])
+
     def test_resolve_into_skips_non_conformance_unit_items(self):
         graph = _full_graph()
         untouched = {"id": "opc_facet_only", "kind": "facet",
