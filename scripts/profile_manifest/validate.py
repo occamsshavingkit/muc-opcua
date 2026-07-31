@@ -38,6 +38,9 @@ if _PKG_PARENT not in sys.path:
 
 from profile_manifest.model import load_manifest, validate_manifest  # noqa: E402
 from profile_manifest import graph_deps  # noqa: E402  # pylint: disable=wrong-import-position
+from profile_manifest.generated_kconfig_policy import (  # noqa: E402
+    check_generated_kconfig_structure as _check_generated_kconfig_structure,
+)
 
 _DEFAULT_PROFILES = ("nano", "micro", "embedded", "standard", "full", "custom")
 _NAMED_PROFILES = ("nano", "micro", "embedded", "standard", "full")
@@ -45,7 +48,6 @@ _KCONFIG_DIR = os.path.join(_REPO_ROOT, "scripts", "kconfig")
 _DEFAULT_MANIFEST = os.path.join(
     _REPO_ROOT, "profiles", "opcua-profile-manifest.yaml"
 )
-_UNSELECTABLE_STATES = ("unimplemented",)
 _IN_SCOPE_071_CU_IDS = frozenset(
     (
         "opc_cu_2317",
@@ -76,7 +78,7 @@ def _parse_args(argv: list[str]) -> argparse.Namespace:
         "--all",
         action="store_true",
         help="Run all checks: manifest validation, generated drift check, "
-        "Kconfig parse check, unimplemented-item availability check, "
+        "Kconfig parse check, incomplete-item visibility check, "
         "capacity compatibility check, named profile resolution check, "
         "profile override-to-custom check, claim/test map validation, "
         "naming convention check, and OPC reference-in-help check.",
@@ -142,76 +144,7 @@ def _check_generated(manifest: dict, manifest_path: str) -> list[str]:
             "generator output (run generate.py --outputs kconfig to regenerate)"
         )
 
-    # OPC UA Kconfig structure check (OPC-10000-7 §4.2, §4.3).
-    # The generated Kconfig must contain internal cascade symbols, profile
-    # drilldown sections, at least one Facet drilldown menu, at least one
-    # Conformance Unit prompt, and a separate 'Project options' menu.
-    if "MUC_OPCUA_INTERN_PROFILE_" not in expected_kconfig:
-        errors.append(
-            "Kconfig: no MUC_OPCUA_INTERN_PROFILE_ symbols found "
-            "(expected internal cascade symbols per OPC-10000-7 §4.3; "
-            "run generate.py --outputs kconfig to regenerate)"
-        )
-    if 'menu "Profile:' not in expected_kconfig:
-        errors.append(
-            "Kconfig: no 'Profile:' menu found in generated Kconfig "
-            "(expected at least one menu \"Profile: ...\" per OPC-10000-7 §4.3; "
-            "run generate.py --outputs kconfig to regenerate)"
-        )
-    # Every named profile must have a drilldown section so users can browse
-    # any profile regardless of selection.  This catches the empty-section
-    # regression where a profile with no unique canonical facets/CUs would
-    # be silently omitted.
-    _NAMED_PROFILE_KEYS = ("nano", "micro", "embedded", "standard", "full")
-    manifest_profiles = manifest.get("profiles", {})
-    for pk in _NAMED_PROFILE_KEYS:
-        profile = manifest_profiles.get(pk, {})
-        opc_display_name = profile.get("opc_display_name")
-        if not isinstance(opc_display_name, str) or not opc_display_name:
-            continue
-        expected_menu = 'menu "Profile: ' + opc_display_name + '"'
-        if expected_menu not in expected_kconfig:
-            errors.append(
-                "Kconfig: no 'Profile: " + opc_display_name
-                + "' menu found for profile '" + pk
-                + "' (every named profile must have a drilldown section "
-                "even if empty; OPC-10000-7 §4.3; run generate.py "
-                "--outputs kconfig to regenerate)"
-            )
-    if 'menu "Facet:' not in expected_kconfig and 'menuconfig MUC_OPCUA_FACET_' not in expected_kconfig:
-        errors.append(
-            "Kconfig: no Facet menu or menuconfig found in generated Kconfig "
-            "(expected at least one menu \"Facet: ...\" or menuconfig MUC_OPCUA_FACET_* "
-            "per OPC-10000-7 §4.2; run generate.py --outputs kconfig to regenerate)"
-        )
-    if '"CU:' not in expected_kconfig:
-        errors.append(
-            "Kconfig: no 'CU:' prompt found in generated Kconfig "
-            "(expected at least one bool \"CU: ...\" per OPC-10000-7 §4.2; "
-            "run generate.py --outputs kconfig to regenerate)"
-        )
-    if 'menu "Project options"' not in expected_kconfig:
-        errors.append(
-            "Kconfig: no 'Project options' menu found in generated Kconfig "
-            "(expected menu \"Project options\" to separate non-OPC "
-            "optimization items from the OPC Facet/CU tree per "
-            "OPC-10000-7 §4.2; run generate.py --outputs kconfig to regenerate)"
-        )
-
-    # Old preset/facets-match symbols must not appear (graph-derived redo).
-    for old_sym in ("MUC_OPCUA_PROFILE_PRESET_", "MUC_OPCUA_FACETS_MATCH_"):
-        if old_sym in expected_kconfig:
-            errors.append(
-                "Kconfig: obsolete symbol prefix '" + old_sym
-                + "' found in generated Kconfig (should use "
-                "MUC_OPCUA_INTERN_PROFILE_ cascade symbols; "
-                "run generate.py --outputs kconfig to regenerate)"
-            )
-            break
-
-    # CUs inside ``if FACET``/``endif`` blocks depend on the facet.
-    # The ``if`` block enforces facet-off → CU-off. No per-CU
-    # ``depends on`` or ``select`` needed.
+    errors.extend(_check_generated_kconfig_structure(manifest, expected_kconfig))
 
     # Defconfig drift check.
     for pk in _DEFAULT_PROFILES:
@@ -1207,214 +1140,6 @@ def _check_kconfig_parse(manifest: dict) -> list[str]:
     return errors
 
 
-def _check_unimplemented_availability(manifest: dict) -> list[str]:
-    """Verify unimplemented items appear in Kconfig as comments, not symbols.
-
-    Checks that (OPC-10000-7 §4.2 and each item's ``opc_reference``):
-      - The manifest declares at least one unimplemented/deferred item.
-      - Each such item's id appears in the generated Kconfig text.
-      - None of them declare a ``kconfig_symbol`` (which would make them
-        selectable).
-      - Each unimplemented OPC item (has ``opc_reference`` or kind
-        ``facet``/``conformance_unit``) is emitted as a Kconfig ``comment``
-        containing its OPC display/facet name and ``(NOT IMPLEMENTED)``,
-        not as a selectable ``config`` symbol.
-      - The computed OPC Kconfig symbol for each such item is not present
-        as a ``config`` entry in the generated Kconfig.
-      - Via kconfiglib, none of them resolve as a settable symbol in the
-        full profile's ``.config``.
-    """
-    errors: list[str] = []
-
-    kconfig_path = os.path.join(_REPO_ROOT, "Kconfig")
-    try:
-        with open(kconfig_path, "r", encoding="utf-8") as fh:
-            kconfig_text = fh.read()
-    except FileNotFoundError:
-        errors.append(
-            "unimplemented availability: Kconfig not found at " + kconfig_path
-        )
-        return errors
-
-    from profile_manifest.generate import (  # noqa: E402
-        _facet_name,
-        compute_kconfig_symbol,
-    )
-
-    items = manifest.get("items", [])
-    unimplemented = [
-        i for i in items
-        if isinstance(i, dict) and i.get("implementation_state") in _UNSELECTABLE_STATES
-    ]
-
-    if not unimplemented:
-        errors.append(
-            "unimplemented availability: manifest has no unimplemented/deferred "
-            "items; at least one is required to prove unavailable entries are "
-            "visible but not selectable in Kconfig"
-        )
-        return errors
-
-    # Symbols legitimately emitted as selectable ``config`` entries from
-    # claimed/implemented items.  The OPC catalog legitimately contains
-    # distinct Conformance Units that share a display name (e.g. CU 1673
-    # "Attribute Read" from the 2017 facet and CU 3072 "Attribute Read" from
-    # the 2022 facet).  When an unimplemented item's computed symbol matches a
-    # symbol owned by a *different* claimed/implemented item, the
-    # unimplemented duplicate is not itself selectable -- toggling that symbol
-    # enables the claimed item's feature -- so it is not a selectability
-    # violation (OPC-10000-7 §4.2).  This set lets the collision check below
-    # distinguish a true violation from such name-sharing roadmap entries.
-    _SELECTABLE_STATES = ("claimed", "implemented")
-    legitimate_selectable_symbols: set[str] = set()
-    for i in items:
-        if not isinstance(i, dict):
-            continue
-        if i.get("implementation_state") not in _SELECTABLE_STATES:
-            continue
-        kind = i.get("kind")
-        raw = i.get("kconfig_symbol")
-        if isinstance(raw, str) and raw:
-            legitimate_selectable_symbols.add(raw)
-        display = i.get("opc_display_name")
-        if isinstance(display, str) and display and kind in ("facet", "conformance_unit"):
-            try:
-                legitimate_selectable_symbols.add(
-                    compute_kconfig_symbol(display, kind)
-                )
-            except ValueError:
-                pass
-
-    at_least_one_visible = False
-    kconfig_lines = kconfig_text.splitlines()
-
-    for item in unimplemented:
-        item_id = item.get("id", "")
-        state = item.get("implementation_state", "")
-
-        sym = item.get("kconfig_symbol")
-        if sym:
-            errors.append(
-                "unimplemented availability: item '" + item_id
-                + "' has implementation_state '" + state
-                + "' but declares kconfig_symbol '" + sym
-                + "' (unimplemented items must not have a selectable symbol)"
-            )
-
-        if item_id and item_id in kconfig_text:
-            at_least_one_visible = True
-        else:
-            errors.append(
-                "unimplemented availability: item '" + item_id
-                + "' does not appear in the generated Kconfig text"
-            )
-
-        # OPC items must be visible ``comment`` directives, not selectable
-        # ``config`` symbols (OPC-10000-7 §4.2 and each item's opc_reference).
-        kind = item.get("kind")
-        opc_ref = item.get("opc_reference")
-        is_opc_item = (
-            isinstance(opc_ref, dict) or kind in ("facet", "conformance_unit")
-        )
-        if not is_opc_item:
-            continue
-
-        expected_name = _facet_name(item)
-        if not expected_name:
-            display = item.get("opc_display_name")
-            if isinstance(display, str) and display:
-                expected_name = display
-
-        if expected_name:
-            comment_marker = expected_name + " (NOT IMPLEMENTED)"
-            has_comment = any(
-                ln.startswith("comment ") and comment_marker in ln
-                for ln in kconfig_lines
-            )
-            if has_comment:
-                at_least_one_visible = True
-            else:
-                errors.append(
-                    "unimplemented availability: OPC item '" + item_id
-                    + "' is not emitted as a Kconfig comment (expected "
-                    + "'comment \"" + expected_name
-                    + " (NOT IMPLEMENTED) ...'; OPC-10000-7 §4.2)"
-                )
-
-        # The item must not be emitted as a selectable ``config`` symbol.
-        forbidden_symbols = set()
-        if sym:
-            forbidden_symbols.add(sym)
-        display_name = item.get("opc_display_name")
-        if (
-            isinstance(display_name, str)
-            and display_name
-            and kind in ("facet", "conformance_unit")
-        ):
-            try:
-                forbidden_symbols.add(compute_kconfig_symbol(display_name, kind))
-            except ValueError:
-                pass
-
-        for sym_name in forbidden_symbols:
-            config_line = "config " + sym_name
-            if not any(ln == config_line for ln in kconfig_lines):
-                continue
-            # A claimed/implemented item may legitimately own a symbol that a
-            # distinct unimplemented OPC item also computes (the OPC catalog
-            # has separate CUs sharing a display name, e.g. CU 1673 vs CU 3072
-            # both "Attribute Read").  The unimplemented duplicate is not made
-            # selectable by that shared config -- selecting it enables the
-            # claimed feature -- so this is not a violation (OPC-10000-7 §4.2).
-            if sym_name in legitimate_selectable_symbols:
-                continue
-            errors.append(
-                "unimplemented availability: OPC item '" + item_id
-                + "' is emitted as selectable config symbol '" + sym_name
-                + "' (unimplemented items must be comments, not config; "
-                "OPC-10000-7 §4.2)"
-            )
-
-    if not at_least_one_visible:
-        errors.append(
-            "unimplemented availability: none of the manifest's unimplemented "
-            "items are visible in the generated Kconfig"
-        )
-
-    if _KCONFIG_DIR not in sys.path:
-        sys.path.insert(0, _KCONFIG_DIR)
-
-    # See _check_named_profile_resolution for why CONFIG_ must be empty:
-    # generated symbols carry the MUC_OPCUA_ prefix and defconfig lines
-    # must match verbatim.
-    os.environ["CONFIG_"] = ""
-    import kconfiglib  # noqa: E402
-
-    full_defconfig = os.path.join(_REPO_ROOT, "configs", "full.defconfig")
-    if os.path.isfile(full_defconfig):
-        kconf = kconfiglib.Kconfig(kconfig_path, warn=False)
-        kconf.load_config(full_defconfig)
-
-        for item in unimplemented:
-            item_id = item.get("id", "")
-            sym_name = item.get("kconfig_symbol")
-            if not sym_name:
-                continue
-
-            sym = kconf.syms.get(sym_name)
-            if sym is not None and sym.tri_value != 0:
-                errors.append(
-                    "unimplemented availability: item '" + item_id
-                    + "' symbol '" + sym_name
-                    + "' is selectable and resolved to y/m in the full profile"
-                )
-
-    return errors
-
-
-
-
-
 def main(argv: list[str] | None = None) -> int:
     args = _parse_args(sys.argv[1:] if argv is None else argv)
 
@@ -1443,7 +1168,6 @@ def main(argv: list[str] | None = None) -> int:
         all_errors: list[str] = []
         all_errors.extend(_check_generated(manifest, args.manifest))
         all_errors.extend(_check_kconfig_parse(manifest))
-        all_errors.extend(_check_unimplemented_availability(manifest))
         all_errors.extend(_check_capacity_defaults(manifest))
         all_errors.extend(_check_named_profile_resolution(manifest))
         all_errors.extend(_check_profile_override_to_custom(manifest))
