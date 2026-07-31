@@ -41,17 +41,28 @@ void tearDown(void) {}
 #define PROFILE_SURFACE_IS_CUSTOM 0
 #endif
 
-#if defined(MUC_OPCUA_CU_DISCOVERY_FIND_SERVERS_SELF_GET_ENDPOINTS) &&                                                 \
-    MUC_OPCUA_CU_DISCOVERY_FIND_SERVERS_SELF_GET_ENDPOINTS
-#define PROFILE_SURFACE_HAS_DISCOVERY_AGGREGATE 1
+#if defined(MUC_OPCUA_CU_DISCOVERY_GET_ENDPOINTS) && MUC_OPCUA_CU_DISCOVERY_GET_ENDPOINTS
+#define PROFILE_SURFACE_HAS_DISCOVERY_GET_ENDPOINTS 1
 #else
-#define PROFILE_SURFACE_HAS_DISCOVERY_AGGREGATE 0
+#define PROFILE_SURFACE_HAS_DISCOVERY_GET_ENDPOINTS 0
 #endif
 
-#if defined(MUC_OPCUA_CU_VIEW_BASIC_TRANSLATEBROWSEPATH) && MUC_OPCUA_CU_VIEW_BASIC_TRANSLATEBROWSEPATH
-#define PROFILE_SURFACE_HAS_VIEW_AGGREGATE 1
+#if defined(MUC_OPCUA_CU_DISCOVERY_FIND_SERVERS_SELF) && MUC_OPCUA_CU_DISCOVERY_FIND_SERVERS_SELF
+#define PROFILE_SURFACE_HAS_DISCOVERY_FIND_SERVERS_SELF 1
 #else
-#define PROFILE_SURFACE_HAS_VIEW_AGGREGATE 0
+#define PROFILE_SURFACE_HAS_DISCOVERY_FIND_SERVERS_SELF 0
+#endif
+
+#if defined(MUC_OPCUA_CU_VIEW_BASIC_2) && MUC_OPCUA_CU_VIEW_BASIC_2
+#define PROFILE_SURFACE_HAS_VIEW_BASIC_2 1
+#else
+#define PROFILE_SURFACE_HAS_VIEW_BASIC_2 0
+#endif
+
+#if defined(MUC_OPCUA_CU_VIEW_TRANSLATEBROWSEPATH) && MUC_OPCUA_CU_VIEW_TRANSLATEBROWSEPATH
+#define PROFILE_SURFACE_HAS_VIEW_TRANSLATEBROWSEPATH 1
+#else
+#define PROFILE_SURFACE_HAS_VIEW_TRANSLATEBROWSEPATH 0
 #endif
 
 #if defined(MUC_OPCUA_CU_CORE_2017_ATTRIBUTE_WRITE) && MUC_OPCUA_CU_CORE_2017_ATTRIBUTE_WRITE
@@ -86,17 +97,19 @@ static void assert_cu_surface_disabled(const char *symbol_name, int enabled) {
 }
 
 void test_nano_default_service_surface_keeps_mandatory_discovery_and_view(void) {
-    /* SCN-001 / CASE-010 / quickstart path 4: current nano/default profile
-       evidence is intentionally bound to existing aggregate symbols. Dedicated
-       in-scope Discovery/View CU symbols are introduced later by T018. */
+    /* SCN-001 / CASE-010 / quickstart path 4: named profiles retain the
+       mandatory GetEndpoints (CU 2328) and FindServers-Self (CU 2352) surface. */
     if (PROFILE_SURFACE_IS_CUSTOM) {
         TEST_PASS_MESSAGE("custom profile may intentionally override the nano/default service surface");
         return;
     }
 
-    assert_cu_surface_enabled("MUC_OPCUA_CU_DISCOVERY_FIND_SERVERS_SELF_GET_ENDPOINTS",
-                              PROFILE_SURFACE_HAS_DISCOVERY_AGGREGATE);
-    assert_cu_surface_enabled("MUC_OPCUA_CU_VIEW_BASIC_TRANSLATEBROWSEPATH", PROFILE_SURFACE_HAS_VIEW_AGGREGATE);
+    assert_cu_surface_enabled("MUC_OPCUA_CU_DISCOVERY_GET_ENDPOINTS", PROFILE_SURFACE_HAS_DISCOVERY_GET_ENDPOINTS);
+    assert_cu_surface_enabled("MUC_OPCUA_CU_DISCOVERY_FIND_SERVERS_SELF",
+                              PROFILE_SURFACE_HAS_DISCOVERY_FIND_SERVERS_SELF);
+    assert_cu_surface_enabled("MUC_OPCUA_CU_VIEW_BASIC_2", PROFILE_SURFACE_HAS_VIEW_BASIC_2);
+    assert_cu_surface_enabled("MUC_OPCUA_CU_VIEW_TRANSLATEBROWSEPATH",
+                              PROFILE_SURFACE_HAS_VIEW_TRANSLATEBROWSEPATH);
 }
 
 void test_nano_default_service_surface_does_not_claim_optional_cus(void) {
