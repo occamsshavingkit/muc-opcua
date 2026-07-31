@@ -111,8 +111,10 @@ See [data-model.md](./data-model.md) for the full manifest schema.
 facet_containment:
   core_2017_server:
     - service_read     # id of CU item, not kconfig_symbol
-    - service_browse
-    - service_discovery
+    - opc_cu_3530      # View Basic 2
+    - opc_cu_2317      # View TranslateBrowsePath
+    - opc_cu_2328      # Discovery Get Endpoints
+    - opc_cu_2352      # Discovery Find Servers Self
     - service_register_nodes
     - base_nodes
 ```
