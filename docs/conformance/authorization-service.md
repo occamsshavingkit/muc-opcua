@@ -1,23 +1,24 @@
-# Conformance: Authorization Service Server Facet (spec 093)
+# Conformance: Authorization Service Configuration Server (spec 093)
 
-This server implements the OPC UA **Authorization Service Server Facet**
-(OPC-10000-7 PG18, CU 1629) — address-space exposure of the
-`AuthorizationServiceConfigurationType` and its InstanceDeclarations per
+This server implements the OPC UA **Authorization Service Configuration
+Server** (OPC-10000-7 PG18, CU 3182) — type-system address-space exposure of
+the `AuthorizationServiceConfigurationType` and its InstanceDeclarations per
 OPC-10000-12 §9.7.4 Table 158. Gated behind
-**`MUC_OPCUA_CU_AUTHORIZATION_SERVICE_SERVER`** (default **ON** for the Full
-profile; depends on `MUC_OPCUA_CU_USER_TOKEN_JWT` and
+**`MUC_OPCUA_CU_AUTHORIZATION_SERVICE_CONFIGURATION_SERVER`** (default **ON**
+for the Full profile; depends on `MUC_OPCUA_CU_USER_TOKEN_JWT` and
 `MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION`).
 
-This facet is paired with the [User Token — JWT Server Facet](jwt-user-token.md)
+This CU is paired with the [User Token — JWT Server Facet](jwt-user-token.md)
 (CU 1697), which performs the actual JWT signature and claim validation at
-ActivateSession. CU 1629 only owns the address-space **type-system
+ActivateSession. CU 3182 owns only the address-space **type-system
 InstanceDeclarations** that let a client browse the server's trusted
 AuthorizationService configuration.
 
 Grounded against:
 
 - OPC-10000-4 §5.7.3 (ActivateSession UserIdentityToken dispatch)
-- OPC-10000-7 v1.05.02 CU 1629 (Authorization Service Server Facet)
+- OPC-10000-7 v1.05.02 CU 3182 (Authorization Service Configuration Server)
+- OPC-10000-7 v1.05.02 CU 1697 (User Token JWT Server Facet)
 - OPC-10000-12 §9.7.4 (`AuthorizationServiceConfigurationType` Table 158)
 - OPC-10000-12 §7.10.14 (`ApplicationConfigurationType.AuthorizationServices`)
 
@@ -61,8 +62,8 @@ Per spec 093 Scope Boundaries:
 ## Build Gating
 
 ```kconfig
-config MUC_OPCUA_CU_AUTHORIZATION_SERVICE_SERVER
-    bool "Authorization Service Server"
+config MUC_OPCUA_CU_AUTHORIZATION_SERVICE_CONFIGURATION_SERVER
+    bool "Authorization Service Configuration Server"
     depends on MUC_OPCUA_CU_USER_TOKEN_JWT && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
     default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
 ```

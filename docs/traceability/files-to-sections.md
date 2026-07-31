@@ -124,7 +124,7 @@ This document maps implementation and test files back to OPC UA normative sectio
 | `tests/unit/test_jwt_claims.c` | Tests | OPC-10000-4 / OPC-10000-7 | 5.7.3 / CU 1697 | JWT `sub` claim handling: valid, empty, truncation, escape sequences |
 | `tests/unit/test_jwt_clock_skew.c` | Tests | OPC-10000-4 / OPC-10000-7 | 5.7.3 / CU 1697 | Per-issuer clock skew tolerance (boundary accepted, beyond boundary rejected) |
 | `tests/unit/test_jwt_multi_issuer.c` | Tests | OPC-10000-4 / OPC-10000-7 | 5.7.3 / CU 1697 | Multi-issuer lookup: correct issuer dispatched, cross-issuer audience mismatch rejected |
-| `docs/conformance/authorization-service.md` | Docs | OPC-10000-7 | 6.6 / CU 1629 | Authorization Service Server Facet conformance evidence |
+| `docs/conformance/authorization-service.md` | Docs | OPC-10000-7 | 6.6 / CU 3182 | Authorization Service Configuration Server conformance evidence |
 | `docs/conformance/jwt-user-token.md` | Docs | OPC-10000-7 | 6.6 / CU 1697 | JWT User Token conformance evidence |
 | `src/cu/core_2022_server/role_management/role_management.c` | Role Management | OPC-10000-4 / OPC-10000-5 | 5.8 / 6.3 | Role-based authorization service implementation |
 | `src/cu/core_2022_server/certificate_manager/cert_manager.h` | Certificate Manager | OPC-10000-4 / OPC-10000-12 | 5.11 / 7.5 | Certificate group manager internal header |
@@ -409,3 +409,11 @@ This document maps implementation and test files back to OPC UA normative sectio
 | `variant_type.c` | Traceability mapped | OPC UA Part 4 / 6 | — | Split file — see directory for service coverage |
 | `view_handler.c` | Traceability mapped | OPC UA Part 4 / 6 | — | Split file — see directory for service coverage |
 | `wrap.c` | Traceability mapped | OPC UA Part 4 / 6 | — | Split file — see directory for service coverage |
+| `monitor_items_500.c` | Monitor Items 500 | OPC-10000-4 | 5.13.2 | CU: Monitor Items 500 capacity enforcement (_Static_assert) |
+| `monitor_items_500.h` | Monitor Items 500 | OPC-10000-4 | 5.13.2 | CU: Monitor Items 500 capacity contract |
+| `monitor_minqueuesize_05.c` | Monitor MinQueueSize_05 | OPC-10000-4 | 5.13.2 | CU: MinQueueSize_05 capacity enforcement (_Static_assert) |
+| `monitor_minqueuesize_05.h` | Monitor MinQueueSize_05 | OPC-10000-4 | 5.13.2 | CU: MinQueueSize_05 capacity contract |
+| `subscription_minimum_05.c` | Subscription Minimum 05 | OPC-10000-4 | 5.14.2 | CU: >= 5 Subscriptions/Session capacity enforcement (_Static_assert) |
+| `subscription_minimum_05.h` | Subscription Minimum 05 | OPC-10000-4 | 5.14.2 | CU: >= 5 Subscriptions/Session capacity contract |
+| `subscription_publish_min_10.c` | Subscription Publish Min 10 | OPC-10000-4 | 5.14.5 | CU: >= 10 parked Publish requests capacity enforcement (_Static_assert) |
+| `subscription_publish_min_10.h` | Subscription Publish Min 10 | OPC-10000-4 | 5.14.5 | CU: >= 10 parked Publish requests capacity contract |

@@ -123,7 +123,7 @@ for the conformance-unit map.
 | Security Default ApplicationInstance Certificate | Satisfied | `test_certificate`, existing certificate handling |
 | Security Time Sync (CU 151) | Implemented | `test_time_sync` |
 | ECC Security Policies (curve25519/nist256) | Implemented (full only) | `test_ecc_crypto`, `test_ecc_handshake_e2e` |
-| Authorization Service / JWT (CU 1629/1697) | Implemented (full only) | `test_jwt`, `test_jwt_activate_session` |
+| Authorization Service Configuration / JWT (CU 3182/1697) | Implemented (full only) | `test_jwt`, `test_jwt_activate_session` |
 | Standard DataChange Subscription 2022 facet | Implemented | `test_subscriptions_capacity`, `test_subscriptions` |
 | Enhanced DataChange Subscription 2022 facet (standard/full; mandated by StandardUA2017) | Implemented | `test_subscriptions_capacity` (`test_enhanced_*`); see `enhanced-datachange.md` |
 | Base Server Behaviour: Session General Service Behaviour (auth token · requestHandle · timeoutHint) | Implemented | `test_service_state_errors`, `test_write_response`, `test_base_server_behaviour`; see `base-server-behaviour.md` |
