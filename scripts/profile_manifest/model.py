@@ -24,6 +24,25 @@ _ALLOWED_CAPACITY_KINDS = ("profile_varying", "invariant", "derived")
 _DEPENDS_ON_OPS = ("and", "or")
 _DEFAULT_PROFILES = ("nano", "micro", "embedded", "standard", "full", "custom")
 
+
+def _find_key_path(value: object, key_name: str, path: str = "") -> str | None:
+    if isinstance(value, dict):
+        for key, child in value.items():
+            child_path = f"{path}.{key}" if path else str(key)
+            if key == key_name:
+                return child_path
+            found_path = _find_key_path(child, key_name, child_path)
+            if found_path is not None:
+                return found_path
+    elif isinstance(value, list):
+        for index, child in enumerate(value):
+            child_path = f"{path}[{index}]"
+            found_path = _find_key_path(child, key_name, child_path)
+            if found_path is not None:
+                return found_path
+    return None
+
+
 def load_manifest(path: str) -> dict:
     """Load the manifest at *path* and return it as a dict.
 
@@ -48,6 +67,11 @@ def load_manifest(path: str) -> dict:
             raise ValueError(f"manifest {path} is not valid JSON or YAML: {exc}") from exc
     if not isinstance(manifest, dict):
         raise ValueError(f"manifest {path} must decode to a JSON object at top level")
+    forbidden_path = _find_key_path(manifest, "satisfied_by")
+    if forbidden_path is not None:
+        raise ValueError(
+            f"manifest {path} uses forbidden satisfied_by field at {forbidden_path}"
+        )
     return manifest
 
 
@@ -84,6 +108,7 @@ def validate_manifest(manifest: dict) -> list[str]:
         kconfig_symbol required for build-gated claimed items,
         backing_tests required for claimed items,
         depends_on referencing known symbols,
+        semantic_depends_on containing only known symbols,
         profile_defaults completeness
       - capacities: required keys, internal classification, defaults
         for every profile
@@ -152,6 +177,7 @@ def validate_manifest(manifest: dict) -> list[str]:
     seen_item_ids: set[str] = set()
     item_kinds: dict[str, str] = {}
     seen_item_kconfig: dict[str, str] = {}
+    seen_opc_cu_ids: dict[str, str] = {}
 
     # Pre-pass: collect every kconfig_symbol declared by any item so that
     # depends_on entries can be validated against the full set regardless of
@@ -262,6 +288,25 @@ def validate_manifest(manifest: dict) -> list[str]:
                         f"item '{item_id}': depends_on references unknown "
                         f"kconfig_symbol '{dep}' (no item declares it)",
                     )
+
+        semantic_depends_on = item.get("semantic_depends_on", [])
+        if semantic_depends_on is None:
+            semantic_depends_on = []
+        if not isinstance(semantic_depends_on, list):
+            _err(errors, f"item '{item_id}': semantic_depends_on must be a list when present")
+        else:
+            for dep in semantic_depends_on:
+                if not isinstance(dep, str) or not dep:
+                    _err(
+                        errors,
+                        f"item '{item_id}': semantic_depends_on entries must be non-empty strings",
+                    )
+                elif dep not in known_kconfig_symbols:
+                    _err(
+                        errors,
+                        f"item '{item_id}': semantic_depends_on references unknown "
+                        f"kconfig_symbol '{dep}' (no item declares it)",
+                    )
         op = item.get("depends_on_op")
         if op is not None and op not in _DEPENDS_ON_OPS:
             _err(
@@ -291,6 +336,19 @@ def validate_manifest(manifest: dict) -> list[str]:
         opc_reference = item.get("opc_reference")
         if opc_reference is not None and not isinstance(opc_reference, dict):
             _err(errors, f"item '{item_id}': opc_reference must be an object when present")
+        elif kind == "conformance_unit" and isinstance(opc_reference, dict):
+            raw_cu_id = opc_reference.get("cu_id")
+            if raw_cu_id is not None:
+                canonical_cu_id = str(raw_cu_id)
+                previous_owner = seen_opc_cu_ids.get(canonical_cu_id)
+                if previous_owner is not None:
+                    _err(
+                        errors,
+                        f"item '{item_id}': canonical OPC CU id '{canonical_cu_id}' "
+                        f"already owned by item '{previous_owner}'",
+                    )
+                else:
+                    seen_opc_cu_ids[canonical_cu_id] = item_id
 
         opc_display_name = item.get("opc_display_name")
         if kind in ("facet", "conformance_unit"):
