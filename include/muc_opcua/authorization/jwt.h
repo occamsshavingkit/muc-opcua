@@ -5,7 +5,6 @@
  * Spec grounding:
  *   OPC-10000-4 §5.7.3 -- ActivateSession user token dispatch
  *   OPC-10000-7 CU 1697 -- User Token JWT Server Facet
- *   OPC-10000-7 CU 1629 -- Authorization Service Server Facet
  *   RFC 7519 -- JSON Web Token (JWT)
  *   RFC 7515 -- JSON Web Signature (JWS)
  *   RFC 7518 §3.1 -- JWT signing algorithms

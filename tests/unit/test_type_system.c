@@ -468,9 +468,9 @@ static void assert_type_decls(opcua_uint32_t type_id, opcua_uint32_t ref_kind, o
 /* spec 093 convergence T038: OPC-10000-12 section 9.7.4 Table 158.
    AuthorizationServiceConfigurationType and its three Mandatory PropertyType
    declarations are owned by CU Authorization Service Configuration Server and
-   must disappear together when that CU is disabled. */
+   must disappear together when CU 3182 is disabled. */
 static void test_authorization_service_configuration_type_is_cu_gated(void) {
-#if MUC_OPCUA_CU_AUTHORIZATION_SERVICE_SERVER
+#if MUC_OPCUA_CU_AUTHORIZATION_SERVICE_CONFIGURATION_SERVER
     static const mu_type_decl_t declarations[] = {
         {17853u, "ServiceUri", 12u, -1},
         {17854u, "ServiceCertificate", 15u, -1},

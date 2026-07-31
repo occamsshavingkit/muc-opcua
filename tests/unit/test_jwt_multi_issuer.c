@@ -14,7 +14,7 @@
  *
  * Spec grounding:
  *   spec.md US2 Acceptance Scenarios 1 & 2.
- *   OPC-10000-7 CU 1629 -- Authorization Service Server Facet.
+ *   OPC-10000-7 CU 1697 -- User Token JWT Server Facet.
  *   RFC 7519 §4.1.1 -- iss claim, §4.1.3 -- aud claim.
  */
 #include "muc_opcua/config.h"
