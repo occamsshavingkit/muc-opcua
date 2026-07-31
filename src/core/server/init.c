@@ -56,7 +56,7 @@ opcua_statuscode_t mu_server_config_validate(const mu_server_config_t *config) {
     }
 
     /* Validate Endpoints */
-#if MUC_OPCUA_CU_REVERSE_CONNECT
+#if MUC_OPCUA_CU_PROTOCOL_REVERSE_CONNECT_SERVER
     if (config->reverse_connect_url != NULL) {
         if (strncmp(config->reverse_connect_url, "opc.tcp://", 10) != 0) {
             return MU_STATUS_BAD_TCPENDPOINTURLINVALID;
@@ -92,7 +92,7 @@ opcua_statuscode_t mu_server_config_validate(const mu_server_config_t *config) {
     }
 
     /* Validate Platform Adapters */
-#if MUC_OPCUA_CU_REVERSE_CONNECT
+#if MUC_OPCUA_CU_PROTOCOL_REVERSE_CONNECT_SERVER
     if (config->reverse_connect_url != NULL) {
         if (config->tcp_adapter.connect == NULL || config->tcp_adapter.accept == NULL ||
             config->tcp_adapter.read == NULL || config->tcp_adapter.write == NULL ||
@@ -278,7 +278,7 @@ opcua_statuscode_t mu_server_init(void *storage, size_t storage_size, const mu_s
 #endif
 
     /* Initialize platform TCP adapter */
-#if MUC_OPCUA_CU_REVERSE_CONNECT
+#if MUC_OPCUA_CU_PROTOCOL_REVERSE_CONNECT_SERVER
     if (config->reverse_connect_url != NULL) {
         void *handle = NULL;
         status = server->config.tcp_adapter.connect(server->config.tcp_adapter.context, config->reverse_connect_url,
