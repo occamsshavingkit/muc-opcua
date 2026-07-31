@@ -640,7 +640,6 @@
       "opc_cu_3048",
       "opc_cu_3062",
       "opc_cu_3072",
-      "opc_cu_3073",
       "opc_cu_3075",
       "opc_cu_3080",
       "opc_cu_3105",
@@ -652,9 +651,6 @@
       "opc_cu_3150",
       "opc_cu_3153",
       "opc_cu_3170",
-      "opc_cu_3175",
-      "opc_cu_3184",
-      "opc_cu_3186",
       "opc_cu_3192",
       "opc_cu_3194",
       "opc_cu_3198",
@@ -667,10 +663,8 @@
       "opc_cu_3228",
       "opc_cu_3230",
       "opc_cu_3530",
-      "opc_cu_3545",
       "opc_cu_3546",
       "opc_cu_3549",
-      "opc_cu_3554",
       "opc_cu_3560",
       "opc_cu_3565",
       "opc_cu_3566",
@@ -690,11 +684,9 @@
       "opc_cu_3811",
       "opc_cu_3812",
       "opc_cu_3813",
-      "opc_cu_3912",
       "opc_cu_3923",
       "opc_cu_3968",
       "opc_cu_3983",
-      "opc_cu_3985",
       "opc_cu_4030",
       "opc_cu_4053",
       "opc_cu_4237",
@@ -768,7 +760,6 @@
       "opc_cu_namespaces",
       "opc_cu_pubsub",
       "opc_cu_redundancy",
-      "opc_cu_reverse_connect",
       "opc_cu_security_ecc",
       "opc_cu_server_capabilities_2",
       "opc_cu_session_base",
@@ -781,8 +772,6 @@
       "opc_cu_user_role_management",
       "opc_monitor_items_500",
       "opc_monitor_minqueuesize_05",
-      "service_browse",
-      "service_discovery",
       "service_history",
       "service_nodemanagement",
       "service_query",
@@ -996,10 +985,8 @@
       "opc_cu_4505",
       "opc_cu_4957",
       "opc_cu_5213",
-      "opc_cu_5242",
       "opc_cu_5248",
       "opc_cu_5249",
-      "opc_cu_5250",
       "opc_cu_5274",
       "opc_cu_5275",
       "opc_cu_5276",
@@ -1127,7 +1114,6 @@
       "opc_cu_2963",
       "opc_cu_3143",
       "opc_cu_3196",
-      "opc_cu_3727",
       "opc_cu_3911",
       "opc_cu_3913",
       "opc_cu_3922",
@@ -1355,11 +1341,11 @@
     },
     {
       "backing_tests": [
-        "test_profile_surface"
+        "test_subscriptions_capacity"
       ],
       "depends_on": [],
       "id": "opc_monitor_items_500",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": "MUC_OPCUA_CU_MONITOR_ITEMS_500",
       "kind": "conformance_unit",
       "notes": "Satisfied by project-level CU opc_cu_subscription_standard; support for 500+ monitored items is stubbed as it requires substantial memory allocation. See src/cu/core_2022_server/monitor_items_500/stub.c.disabled.",
@@ -1377,12 +1363,11 @@
       "profile_defaults": {
         "custom": false,
         "embedded": false,
-        "full": false,
+        "full": true,
         "micro": false,
         "nano": false,
-        "standard": false
+        "standard": true
       },
-      "satisfied_by": "opc_cu_subscription_standard",
       "source_metadata": {
         "imported_from": "profiles/opcua-profile-snapshot.json",
         "snapshot_id": "cu_monitor_items_500",
@@ -1392,11 +1377,11 @@
     },
     {
       "backing_tests": [
-        "test_profile_surface"
+        "test_subscriptions_capacity"
       ],
       "depends_on": [],
       "id": "opc_monitor_minqueuesize_05",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": "MUC_OPCUA_CU_MONITOR_MINQUEUESIZE_05",
       "kind": "conformance_unit",
       "notes": "Satisfied by project-level CU opc_cu_subscription_standard; MinQueueSize_05 tuning is stubbed. See src/cu/core_2022_server/monitor_minqueuesize_05/stub.c.disabled.",
@@ -1414,12 +1399,11 @@
       "profile_defaults": {
         "custom": false,
         "embedded": false,
-        "full": false,
+        "full": true,
         "micro": false,
         "nano": false,
-        "standard": false
+        "standard": true
       },
-      "satisfied_by": "opc_cu_subscription_standard",
       "source_metadata": {
         "imported_from": "profiles/opcua-profile-snapshot.json",
         "snapshot_id": "cu_monitor_min_queue_05",
@@ -1628,7 +1612,7 @@
       ],
       "cu_optional": false,
       "id": "opc_cu_2600",
-      "implementation_state": "documented",
+      "implementation_state": "implemented",
       "kconfig_symbol": "MUC_OPCUA_CU_SECURITYPOLICY_SUPPORT",
       "kind": "conformance_unit",
       "notes": "Support at least one Security Policy.\r\nSupport of SecurityPolicy None is recommended for testing and compatibility reasons even if the UA Server supports a more secure policy.",
@@ -1648,7 +1632,6 @@
         "nano": false,
         "standard": true
       },
-      "satisfied_by": "opc_cu_ua_secure_conversation",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -1686,7 +1669,7 @@
       ],
       "cu_optional": false,
       "id": "opc_cu_2809",
-      "implementation_state": "documented",
+      "implementation_state": "implemented",
       "kconfig_symbol": "MUC_OPCUA_CU_ADDRESS_SPACE_ATOMICITY",
       "kind": "conformance_unit",
       "notes": "Support setting the NonatomicRead and NonatomicWrite flags in the AccessLevelEx Attribute for Variable Nodes to indicate whether Read or Write operations can be performed in atomic manner. If the flags are set to '1', atomicity cannot be assured.",
@@ -1788,72 +1771,6 @@
       "backing_tests": [
         "test_profile_surface"
       ],
-      "cu_optional": false,
-      "depends_on": [],
-      "id": "opc_cu_3184",
-      "implementation_state": "documented",
-      "kconfig_symbol": null,
-      "kind": "conformance_unit",
-      "notes": "Satisfied by project-level CU opc_cu_core_structure_2; Root/Objects/Server base structure with ServerArray/NamespaceArray/ServerStatus/ServiceLevel/ServerCapabilities exposed in base_nodes.c.",
-      "opc_display_name": "Base Info Core Structure 2",
-      "opc_reference": {
-        "cu_id": "3184",
-        "cu_name": "Base Info Core Structure 2",
-        "section": null,
-        "source_url": "https://profiles.opcfoundation.org",
-        "spec": null
-      },
-      "profile_defaults": {
-        "custom": false,
-        "embedded": true,
-        "full": true,
-        "micro": true,
-        "nano": false,
-        "standard": true
-      },
-      "satisfied_by": "opc_cu_core_structure_2",
-      "source_metadata": {
-        "profile_group_id": 171,
-        "source_endpoint": "conformanceunit/?pg=171&all=1"
-      }
-    },
-    {
-      "backing_tests": [
-        "test_profile_surface"
-      ],
-      "cu_optional": true,
-      "depends_on": [],
-      "id": "opc_cu_3186",
-      "implementation_state": "documented",
-      "kconfig_symbol": null,
-      "kind": "conformance_unit",
-      "notes": "Satisfied by project-level CU opc_cu_core_views_folder; Views Object entry point exposed in base_nodes.c.",
-      "opc_display_name": "Base Info Core Views Folder",
-      "opc_reference": {
-        "cu_id": "3186",
-        "cu_name": "Base Info Core Views Folder",
-        "section": null,
-        "source_url": "https://profiles.opcfoundation.org",
-        "spec": null
-      },
-      "profile_defaults": {
-        "custom": false,
-        "embedded": true,
-        "full": true,
-        "micro": true,
-        "nano": false,
-        "standard": true
-      },
-      "satisfied_by": "opc_cu_core_views_folder",
-      "source_metadata": {
-        "profile_group_id": 171,
-        "source_endpoint": "conformanceunit/?pg=171&all=1"
-      }
-    },
-    {
-      "backing_tests": [
-        "test_profile_surface"
-      ],
       "cu_optional": true,
       "id": "opc_cu_3198",
       "implementation_state": "claimed",
@@ -1871,72 +1788,6 @@
       "profile_defaults": {
         "custom": false
       },
-      "source_metadata": {
-        "profile_group_id": 171,
-        "source_endpoint": "conformanceunit/?pg=171&all=1"
-      }
-    },
-    {
-      "backing_tests": [
-        "test_profile_surface"
-      ],
-      "cu_optional": true,
-      "depends_on": [],
-      "id": "opc_cu_3545",
-      "implementation_state": "documented",
-      "kconfig_symbol": null,
-      "kind": "conformance_unit",
-      "notes": "Satisfied by project-level CU opc_cu_namespace_metadata; NamespaceMetadataType exposed + namespace metadata for static-NodeId namespaces.",
-      "opc_display_name": "Base Info Namespace Metadata",
-      "opc_reference": {
-        "cu_id": "3545",
-        "cu_name": "Base Info Namespace Metadata",
-        "section": null,
-        "source_url": "https://profiles.opcfoundation.org",
-        "spec": null
-      },
-      "profile_defaults": {
-        "custom": false,
-        "embedded": true,
-        "full": true,
-        "micro": true,
-        "nano": false,
-        "standard": true
-      },
-      "satisfied_by": "opc_cu_namespace_metadata",
-      "source_metadata": {
-        "profile_group_id": 171,
-        "source_endpoint": "conformanceunit/?pg=171&all=1"
-      }
-    },
-    {
-      "backing_tests": [
-        "test_profile_surface"
-      ],
-      "cu_optional": false,
-      "depends_on": [],
-      "id": "opc_cu_3554",
-      "implementation_state": "documented",
-      "kconfig_symbol": null,
-      "kind": "conformance_unit",
-      "notes": "Satisfied by project-level CU opc_cu_address_space_base; supports Object/ObjectType/Variable/VariableType/ReferenceType/DataType NodeClasses with Attributes and References.",
-      "opc_display_name": "Address Space Base",
-      "opc_reference": {
-        "cu_id": "3554",
-        "cu_name": "Address Space Base",
-        "section": null,
-        "source_url": "https://profiles.opcfoundation.org",
-        "spec": null
-      },
-      "profile_defaults": {
-        "custom": false,
-        "embedded": true,
-        "full": true,
-        "micro": true,
-        "nano": false,
-        "standard": true
-      },
-      "satisfied_by": "opc_cu_address_space_base",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -1992,40 +1843,6 @@
       "profile_defaults": {
         "custom": false
       },
-      "source_metadata": {
-        "profile_group_id": 171,
-        "source_endpoint": "conformanceunit/?pg=171&all=1"
-      },
-      "satisfied_by": "opc_cu_core_structure_2"
-    },
-    {
-      "backing_tests": [
-        "test_profile_surface"
-      ],
-      "cu_optional": false,
-      "depends_on": [],
-      "id": "opc_cu_3912",
-      "implementation_state": "documented",
-      "kconfig_symbol": null,
-      "kind": "conformance_unit",
-      "notes": "Satisfied by project-level CU opc_cu_server_capabilities_2; ServerProfileArray/LocaleIdArray/MinSupportedSampleRate/MaxBrowseContinuationPoints/MaxArrayLength/MaxStringLength/MaxByteStringLength/MaxSessions exposed in base_nodes.c.",
-      "opc_display_name": "Base Info Server Capabilities 2",
-      "opc_reference": {
-        "cu_id": "3912",
-        "cu_name": "Base Info Server Capabilities 2",
-        "section": null,
-        "source_url": "https://profiles.opcfoundation.org",
-        "spec": null
-      },
-      "profile_defaults": {
-        "custom": false,
-        "embedded": true,
-        "full": true,
-        "micro": true,
-        "nano": true,
-        "standard": true
-      },
-      "satisfied_by": "opc_cu_server_capabilities_2",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -2433,7 +2250,6 @@
         "nano": false,
         "standard": true
       },
-      "satisfied_by": "opc_cu_base_info_datatypes",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -2460,7 +2276,6 @@
       "profile_defaults": {
         "custom": false
       },
-      "satisfied_by": "opc_cu_base_info_datatypes",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -2487,7 +2302,6 @@
       "profile_defaults": {
         "custom": false
       },
-      "satisfied_by": "opc_cu_base_info_datatypes",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -2514,7 +2328,6 @@
       "profile_defaults": {
         "custom": false
       },
-      "satisfied_by": "opc_cu_base_info_base_types",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -2541,7 +2354,6 @@
       "profile_defaults": {
         "custom": false
       },
-      "satisfied_by": "opc_cu_base_info_base_types",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -2574,7 +2386,6 @@
         "nano": false,
         "standard": true
       },
-      "satisfied_by": "opc_cu_5592",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -2601,7 +2412,6 @@
       "profile_defaults": {
         "custom": false
       },
-      "satisfied_by": "opc_cu_base_info_datatypes",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -2628,7 +2438,6 @@
       "profile_defaults": {
         "custom": false
       },
-      "satisfied_by": "opc_cu_base_info_datatypes",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -2655,7 +2464,6 @@
       "profile_defaults": {
         "custom": false
       },
-      "satisfied_by": "opc_cu_base_info_datatypes",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -2682,7 +2490,6 @@
       "profile_defaults": {
         "custom": false
       },
-      "satisfied_by": "opc_cu_base_info_base_types",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -2709,7 +2516,6 @@
       "profile_defaults": {
         "custom": false
       },
-      "satisfied_by": "opc_cu_base_info_base_types",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -2736,7 +2542,6 @@
       "profile_defaults": {
         "custom": false
       },
-      "satisfied_by": "opc_cu_base_info_datatypes",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -2768,7 +2573,6 @@
         "nano": false,
         "standard": false
       },
-      "satisfied_by": "opc_cu_event_filter_where",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -2800,7 +2604,6 @@
         "nano": true,
         "standard": true
       },
-      "satisfied_by": "opc_cu_subscription_basic",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -2832,7 +2635,6 @@
         "nano": false,
         "standard": true
       },
-      "satisfied_by": "opc_cu_subscription_standard",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -2864,7 +2666,6 @@
         "nano": true,
         "standard": true
       },
-      "satisfied_by": "opc_cu_subscription_basic",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -2896,7 +2697,6 @@
         "nano": false,
         "standard": true
       },
-      "satisfied_by": "opc_cu_subscription_standard",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -2928,7 +2728,6 @@
         "nano": false,
         "standard": true
       },
-      "satisfied_by": "opc_cu_base_info_base_types",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -2960,7 +2759,6 @@
         "nano": false,
         "standard": true
       },
-      "satisfied_by": "opc_cu_base_info_base_types",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -3018,7 +2816,6 @@
       "profile_defaults": {
         "custom": false
       },
-      "satisfied_by": "opc_cu_subscription_basic",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -3051,7 +2848,6 @@
         "nano": false,
         "standard": true
       },
-      "satisfied_by": "opc_cu_3127",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -3078,7 +2874,6 @@
       "profile_defaults": {
         "custom": false
       },
-      "satisfied_by": "opc_cu_base_info_datatypes",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -3110,7 +2905,6 @@
         "nano": false,
         "standard": true
       },
-      "satisfied_by": "opc_cu_subscription_standard",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -3142,7 +2936,6 @@
         "nano": false,
         "standard": true
       },
-      "satisfied_by": "opc_cu_subscription_standard",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -3169,7 +2962,6 @@
       "profile_defaults": {
         "custom": false
       },
-      "satisfied_by": "opc_cu_base_info_datatypes",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -3196,7 +2988,6 @@
       "profile_defaults": {
         "custom": false
       },
-      "satisfied_by": "opc_cu_base_info_datatypes",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -3223,7 +3014,6 @@
       "profile_defaults": {
         "custom": false
       },
-      "satisfied_by": "opc_cu_base_info_datatypes",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -3255,7 +3045,6 @@
         "nano": false,
         "standard": true
       },
-      "satisfied_by": "opc_cu_base_info_argument_type",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -3282,7 +3071,6 @@
       "profile_defaults": {
         "custom": false
       },
-      "satisfied_by": "opc_cu_base_info_datatypes",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -3309,7 +3097,6 @@
       "profile_defaults": {
         "custom": false
       },
-      "satisfied_by": "opc_cu_base_info_base_types",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -3336,7 +3123,6 @@
       "profile_defaults": {
         "custom": false
       },
-      "satisfied_by": "opc_cu_base_info_base_types",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -3363,7 +3149,6 @@
       "profile_defaults": {
         "custom": false
       },
-      "satisfied_by": "opc_cu_base_info_base_types",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -3390,7 +3175,6 @@
       "profile_defaults": {
         "custom": false
       },
-      "satisfied_by": "opc_cu_base_info_base_types",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -3417,7 +3201,6 @@
       "profile_defaults": {
         "custom": false
       },
-      "satisfied_by": "opc_cu_base_info_base_types",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -3444,7 +3227,6 @@
       "profile_defaults": {
         "custom": false
       },
-      "satisfied_by": "opc_cu_base_info_base_types",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -3471,7 +3253,6 @@
       "profile_defaults": {
         "custom": false
       },
-      "satisfied_by": "opc_cu_base_info_base_types",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -3498,7 +3279,6 @@
       "profile_defaults": {
         "custom": false
       },
-      "satisfied_by": "opc_cu_base_info_base_types",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -3525,7 +3305,6 @@
       "profile_defaults": {
         "custom": false
       },
-      "satisfied_by": "opc_cu_base_info_base_types",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -3552,7 +3331,6 @@
       "profile_defaults": {
         "custom": false
       },
-      "satisfied_by": "opc_cu_base_info_base_types",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -3579,7 +3357,6 @@
       "profile_defaults": {
         "custom": false
       },
-      "satisfied_by": "opc_cu_base_info_base_types",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -3606,7 +3383,6 @@
       "profile_defaults": {
         "custom": false
       },
-      "satisfied_by": "opc_cu_base_info_base_types",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -3633,7 +3409,6 @@
       "profile_defaults": {
         "custom": false
       },
-      "satisfied_by": "opc_cu_base_info_base_types",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -3665,7 +3440,6 @@
         "nano": true,
         "standard": true
       },
-      "satisfied_by": "opc_cu_subscription_basic",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -3697,7 +3471,6 @@
         "nano": true,
         "standard": true
       },
-      "satisfied_by": "opc_cu_subscription_basic",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -3724,7 +3497,6 @@
       "profile_defaults": {
         "custom": false
       },
-      "satisfied_by": "opc_cu_base_info_base_types",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -3751,7 +3523,6 @@
       "profile_defaults": {
         "custom": false
       },
-      "satisfied_by": "opc_cu_base_info_datatypes",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -3778,7 +3549,6 @@
       "profile_defaults": {
         "custom": false
       },
-      "satisfied_by": "opc_cu_base_info_datatypes",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -3810,7 +3580,6 @@
         "nano": true,
         "standard": true
       },
-      "satisfied_by": "opc_cu_subscription_basic",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -3842,7 +3611,6 @@
         "nano": false,
         "standard": true
       },
-      "satisfied_by": "opc_cu_base_info_datatypes",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -3874,7 +3642,6 @@
         "nano": true,
         "standard": true
       },
-      "satisfied_by": "opc_cu_subscription_basic",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -3906,7 +3673,6 @@
         "nano": true,
         "standard": true
       },
-      "satisfied_by": "opc_cu_subscription_basic",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -3964,7 +3730,6 @@
       "profile_defaults": {
         "custom": false
       },
-      "satisfied_by": "opc_cu_base_info_datatypes",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -4503,8 +4268,7 @@
         "micro": false,
         "nano": false,
         "standard": false
-      },
-      "satisfied_by": "opc_cu_aggregate_full"
+      }
     },
     {
       "backing_tests": [
@@ -4531,8 +4295,7 @@
         "micro": false,
         "nano": false,
         "standard": false
-      },
-      "satisfied_by": "opc_cu_aggregate_full"
+      }
     },
     {
       "backing_tests": [
@@ -4559,8 +4322,7 @@
         "micro": false,
         "nano": false,
         "standard": false
-      },
-      "satisfied_by": "opc_cu_aggregate_full"
+      }
     },
     {
       "backing_tests": [
@@ -4587,8 +4349,7 @@
         "micro": false,
         "nano": false,
         "standard": false
-      },
-      "satisfied_by": "opc_cu_aggregate_full"
+      }
     },
     {
       "backing_tests": [
@@ -4615,8 +4376,7 @@
         "micro": false,
         "nano": false,
         "standard": false
-      },
-      "satisfied_by": "opc_cu_aggregate_full"
+      }
     },
     {
       "backing_tests": [
@@ -4643,8 +4403,7 @@
         "micro": false,
         "nano": false,
         "standard": false
-      },
-      "satisfied_by": "opc_cu_aggregate_full"
+      }
     },
     {
       "backing_tests": [
@@ -4671,8 +4430,7 @@
         "micro": false,
         "nano": false,
         "standard": false
-      },
-      "satisfied_by": "opc_cu_aggregate_full"
+      }
     },
     {
       "backing_tests": [
@@ -4699,8 +4457,7 @@
         "micro": false,
         "nano": false,
         "standard": false
-      },
-      "satisfied_by": "opc_cu_aggregate_full"
+      }
     },
     {
       "backing_tests": [
@@ -4727,8 +4484,7 @@
         "micro": false,
         "nano": false,
         "standard": false
-      },
-      "satisfied_by": "opc_cu_aggregate_full"
+      }
     },
     {
       "backing_tests": [
@@ -4755,8 +4511,7 @@
         "micro": false,
         "nano": false,
         "standard": false
-      },
-      "satisfied_by": "opc_cu_aggregate_full"
+      }
     },
     {
       "backing_tests": [
@@ -4783,8 +4538,7 @@
         "micro": false,
         "nano": false,
         "standard": false
-      },
-      "satisfied_by": "opc_cu_aggregate_full"
+      }
     },
     {
       "backing_tests": [
@@ -4811,8 +4565,7 @@
         "micro": false,
         "nano": false,
         "standard": false
-      },
-      "satisfied_by": "opc_cu_aggregate_full"
+      }
     },
     {
       "backing_tests": [
@@ -4839,8 +4592,7 @@
         "micro": false,
         "nano": false,
         "standard": false
-      },
-      "satisfied_by": "opc_cu_aggregate_full"
+      }
     },
     {
       "backing_tests": [
@@ -4867,8 +4619,7 @@
         "micro": false,
         "nano": false,
         "standard": false
-      },
-      "satisfied_by": "opc_cu_aggregate_full"
+      }
     },
     {
       "backing_tests": [
@@ -4895,8 +4646,7 @@
         "micro": false,
         "nano": false,
         "standard": false
-      },
-      "satisfied_by": "opc_cu_aggregate_full"
+      }
     },
     {
       "backing_tests": [
@@ -4923,8 +4673,7 @@
         "micro": false,
         "nano": false,
         "standard": false
-      },
-      "satisfied_by": "opc_cu_aggregate_full"
+      }
     },
     {
       "backing_tests": [
@@ -4951,8 +4700,7 @@
         "micro": false,
         "nano": false,
         "standard": false
-      },
-      "satisfied_by": "opc_cu_aggregate_full"
+      }
     },
     {
       "backing_tests": [
@@ -4979,8 +4727,7 @@
         "micro": false,
         "nano": false,
         "standard": false
-      },
-      "satisfied_by": "opc_cu_aggregate_full"
+      }
     },
     {
       "backing_tests": [
@@ -5007,8 +4754,7 @@
         "micro": false,
         "nano": false,
         "standard": false
-      },
-      "satisfied_by": "opc_cu_aggregate_full"
+      }
     },
     {
       "backing_tests": [
@@ -5035,8 +4781,7 @@
         "micro": false,
         "nano": false,
         "standard": false
-      },
-      "satisfied_by": "opc_cu_aggregate_full"
+      }
     },
     {
       "backing_tests": [
@@ -5063,8 +4808,7 @@
         "micro": false,
         "nano": false,
         "standard": false
-      },
-      "satisfied_by": "opc_cu_aggregate_full"
+      }
     },
     {
       "backing_tests": [
@@ -5091,8 +4835,7 @@
         "micro": false,
         "nano": false,
         "standard": false
-      },
-      "satisfied_by": "opc_cu_aggregate_full"
+      }
     },
     {
       "backing_tests": [
@@ -5119,8 +4862,7 @@
         "micro": false,
         "nano": false,
         "standard": false
-      },
-      "satisfied_by": "opc_cu_aggregate_full"
+      }
     },
     {
       "backing_tests": [
@@ -5147,8 +4889,7 @@
         "micro": false,
         "nano": false,
         "standard": false
-      },
-      "satisfied_by": "opc_cu_aggregate_full"
+      }
     },
     {
       "backing_tests": [
@@ -5175,8 +4916,7 @@
         "micro": false,
         "nano": false,
         "standard": false
-      },
-      "satisfied_by": "opc_cu_aggregate_full"
+      }
     },
     {
       "backing_tests": [
@@ -5203,8 +4943,7 @@
         "micro": false,
         "nano": false,
         "standard": false
-      },
-      "satisfied_by": "opc_cu_aggregate_full"
+      }
     },
     {
       "backing_tests": [
@@ -5231,8 +4970,7 @@
         "micro": false,
         "nano": false,
         "standard": false
-      },
-      "satisfied_by": "opc_cu_aggregate_full"
+      }
     },
     {
       "backing_tests": [
@@ -5259,8 +4997,7 @@
         "micro": false,
         "nano": false,
         "standard": false
-      },
-      "satisfied_by": "opc_cu_aggregate_full"
+      }
     },
     {
       "backing_tests": [
@@ -5287,8 +5024,7 @@
         "micro": false,
         "nano": false,
         "standard": false
-      },
-      "satisfied_by": "opc_cu_aggregate_full"
+      }
     },
     {
       "backing_tests": [
@@ -5315,8 +5051,7 @@
         "micro": false,
         "nano": false,
         "standard": false
-      },
-      "satisfied_by": "opc_cu_aggregate_full"
+      }
     },
     {
       "backing_tests": [
@@ -5343,8 +5078,7 @@
         "micro": false,
         "nano": false,
         "standard": false
-      },
-      "satisfied_by": "opc_cu_aggregate_full"
+      }
     },
     {
       "backing_tests": [
@@ -5371,8 +5105,7 @@
         "micro": false,
         "nano": false,
         "standard": false
-      },
-      "satisfied_by": "opc_cu_aggregate_full"
+      }
     },
     {
       "backing_tests": [
@@ -5399,8 +5132,7 @@
         "micro": false,
         "nano": false,
         "standard": false
-      },
-      "satisfied_by": "opc_cu_aggregate_full"
+      }
     },
     {
       "backing_tests": [
@@ -5427,8 +5159,7 @@
         "micro": false,
         "nano": false,
         "standard": false
-      },
-      "satisfied_by": "opc_cu_aggregate_full"
+      }
     },
     {
       "backing_tests": [
@@ -5455,8 +5186,7 @@
         "micro": false,
         "nano": false,
         "standard": false
-      },
-      "satisfied_by": "opc_cu_aggregate_full"
+      }
     },
     {
       "backing_tests": [
@@ -5483,8 +5213,7 @@
         "micro": false,
         "nano": false,
         "standard": false
-      },
-      "satisfied_by": "opc_cu_aggregate_full"
+      }
     },
     {
       "backing_tests": [
@@ -5511,8 +5240,7 @@
         "micro": false,
         "nano": false,
         "standard": false
-      },
-      "satisfied_by": "opc_cu_aggregate_full"
+      }
     },
     {
       "backing_tests": [
@@ -5558,31 +5286,6 @@
         "facet": "Core 2022 Server Facet",
         "section": null,
         "spec": "OPC-10000-14"
-      },
-      "profile_defaults": {
-        "custom": false,
-        "embedded": false,
-        "full": true,
-        "micro": false,
-        "nano": false,
-        "standard": false
-      }
-    },
-    {
-      "backing_tests": [
-        "test_reverse_connect"
-      ],
-      "depends_on": [],
-      "id": "opc_cu_reverse_connect",
-      "implementation_state": "claimed",
-      "kconfig_symbol": "MUC_OPCUA_CU_REVERSE_CONNECT",
-      "kind": "optimization",
-      "notes": "Project-level Conformance Unit mirroring the legacy 'reverse_connect' item; emits Kconfig symbol MUC_OPCUA_CU_REVERSE_CONNECT matching the #ifdef guard renamed in Task 3 of the CU-aligned code reorganisation plan.",
-      "opc_display_name": "Reverse Connect",
-      "opc_reference": {
-        "facet": "Core 2022 Server Facet",
-        "section": "7.1.3",
-        "spec": "OPC-10000-6"
       },
       "profile_defaults": {
         "custom": false,
@@ -5724,62 +5427,6 @@
     },
     {
       "backing_tests": [
-        "test_browse_service",
-        "test_browse_limits",
-        "test_view_services"
-      ],
-      "default_unconditional": true,
-      "depends_on": [],
-      "id": "service_browse",
-      "implementation_state": "claimed",
-      "kconfig_symbol": "MUC_OPCUA_CU_VIEW_BASIC_TRANSLATEBROWSEPATH",
-      "kind": "optimization",
-      "notes": "Browse + BrowseNext + TranslateBrowsePaths.",
-      "opc_display_name": "View Basic / TranslateBrowsePath",
-      "opc_reference": {
-        "cu_name": "View Basic / TranslateBrowsePath",
-        "facet": "Core 2017",
-        "section": "5.8",
-        "spec": "OPC-10000-4"
-      },
-      "profile_defaults": {
-        "custom": true,
-        "embedded": true,
-        "full": true,
-        "micro": true,
-        "nano": true,
-        "standard": true
-      }
-    },
-    {
-      "backing_tests": [
-        "test_discovery_endpoint"
-      ],
-      "default_unconditional": true,
-      "depends_on": [],
-      "id": "service_discovery",
-      "implementation_state": "documented",
-      "kconfig_symbol": "MUC_OPCUA_CU_DISCOVERY_FIND_SERVERS_SELF_GET_ENDPOINTS",
-      "kind": "optimization",
-      "notes": "FindServers / GetEndpoints.",
-      "opc_display_name": "Discovery Find Servers Self / Get Endpoints",
-      "opc_reference": {
-        "cu_name": "Discovery Find Servers Self / Get Endpoints",
-        "facet": "Core 2017",
-        "section": "5.4",
-        "spec": "OPC-10000-4"
-      },
-      "profile_defaults": {
-        "custom": true,
-        "embedded": true,
-        "full": true,
-        "micro": true,
-        "nano": true,
-        "standard": true
-      }
-    },
-    {
-      "backing_tests": [
         "test_view_services",
         "test_profile_surface"
       ],
@@ -5879,7 +5526,6 @@
         "nano": false,
         "standard": false
       },
-      "satisfied_by": "service_history",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "profile/?pg=171&all=1"
@@ -5942,7 +5588,6 @@
         "nano": false,
         "standard": false
       },
-      "satisfied_by": "service_history",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "profile/?pg=171&all=1"
@@ -5975,7 +5620,6 @@
         "nano": false,
         "standard": false
       },
-      "satisfied_by": "service_history",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "profile/?pg=171&all=1"
@@ -6008,7 +5652,6 @@
         "nano": false,
         "standard": false
       },
-      "satisfied_by": "service_history",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "profile/?pg=171&all=1"
@@ -6041,7 +5684,6 @@
         "nano": false,
         "standard": false
       },
-      "satisfied_by": "service_history",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "profile/?pg=171&all=1"
@@ -6076,7 +5718,6 @@
         "nano": false,
         "standard": false
       },
-      "satisfied_by": "service_history",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -6302,8 +5943,7 @@
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
-      },
-      "satisfied_by": "opc_cu_aggregate_full"
+      }
     },
     {
       "backing_tests": [
@@ -6337,8 +5977,7 @@
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
-      },
-      "satisfied_by": "opc_cu_aggregate_full"
+      }
     },
     {
       "backing_tests": [
@@ -6459,7 +6098,7 @@
       "kconfig_symbol": null,
       "kind": "facet",
       "notes": "AliasName Server PubSub Publisher Facet not implemented; AliasName+PubSub deferred.",
-      "opc_display_name": "AliasName Server PubSub Publisher Facet ",
+      "opc_display_name": "AliasName Server PubSub Publisher Facet",
       "opc_reference": {
         "profile_id": "2323",
         "profile_uri": null,
@@ -6605,15 +6244,16 @@
       }
     },
     {
-      "backing_tests": [
-        "test_history"
-      ],
       "cu_optional": false,
+      "backing_tests": [
+        "test_discovery_services",
+        "test_discovery_endpoint"
+      ],
       "id": "opc_cu_2352",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": "MUC_OPCUA_CU_DISCOVERY_FIND_SERVERS_SELF",
       "kind": "conformance_unit",
-      "notes": "Support the FindServers Service only for itself.",
+      "notes": "Support the FindServers Service only for itself. Gated by #if defined(MUC_OPCUA_DISCOVERY_FIND_SERVERS_ENABLED) || defined(MUC_OPCUA_CU_DISCOVERY_FIND_SERVERS_SELF) in find_servers.c.",
       "opc_display_name": "Discovery Find Servers Self",
       "opc_reference": {
         "cu_id": "2352",
@@ -6623,13 +6263,17 @@
         "spec": "OPC-10000-4"
       },
       "profile_defaults": {
-        "custom": false
+        "custom": true,
+        "nano": true,
+        "micro": true,
+        "embedded": true,
+        "standard": true,
+        "full": true
       },
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
-      },
-      "satisfied_by": "opc_cu_aggregate_full"
+      }
     },
     {
       "backing_tests": [
@@ -6638,7 +6282,7 @@
       ],
       "cu_optional": true,
       "id": "opc_cu_2389",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": "MUC_OPCUA_CU_ATTRIBUTE_WRITE_VALUES",
       "kind": "conformance_unit",
       "notes": "Supports writing to values to one or more Attributes of one or more Nodes. Implemented as Value Attribute writes only; non-Value Attribute writes remain rejected.",
@@ -6711,7 +6355,6 @@
       "profile_defaults": {
         "custom": false
       },
-      "satisfied_by": "opc_cu_user_role_management",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -6743,7 +6386,6 @@
         "nano": true,
         "standard": true
       },
-      "satisfied_by": "opc_cu_time_sync",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -6827,7 +6469,6 @@
         "nano": true,
         "standard": true
       },
-      "satisfied_by": "opc_cu_time_sync",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -6886,7 +6527,6 @@
         "nano": true,
         "standard": true
       },
-      "satisfied_by": "opc_cu_user_auth",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -6902,6 +6542,9 @@
       "implementation_state": "claimed",
       "kconfig_symbol": "MUC_OPCUA_CU_ATTRIBUTE_WRITE_STATUSCODE_TIMESTAMP",
       "kind": "conformance_unit",
+      "semantic_depends_on": [
+        "MUC_OPCUA_CU_ATTRIBUTE_WRITE_VALUES"
+      ],
       "notes": "Supports writing StatusCode and Timestamp DataValue fields along with the Value; depends on Attribute Write Values so it cannot enable Write by itself.",
       "opc_display_name": "Attribute Write StatusCode & Timestamp",
       "opc_reference": {
@@ -6946,40 +6589,6 @@
         "nano": true,
         "standard": true
       },
-      "satisfied_by": "service_read",
-      "source_metadata": {
-        "profile_group_id": 171,
-        "source_endpoint": "conformanceunit/?pg=171&all=1"
-      }
-    },
-    {
-      "backing_tests": [
-        "test_profile_surface"
-      ],
-      "cu_optional": false,
-      "depends_on": [],
-      "id": "opc_cu_3073",
-      "implementation_state": "documented",
-      "kconfig_symbol": null,
-      "kind": "conformance_unit",
-      "notes": "Support the RegisterNodes and UnregisterNodes Services as a way to optimize access to repeatedly used Nodes in the Server's OPC UA AddressSpace.",
-      "opc_display_name": "View RegisterNodes",
-      "opc_reference": {
-        "cu_id": "3073",
-        "cu_name": "View RegisterNodes",
-        "section": null,
-        "source_url": "https://profiles.opcfoundation.org",
-        "spec": null
-      },
-      "profile_defaults": {
-        "custom": false,
-        "embedded": true,
-        "full": true,
-        "micro": true,
-        "nano": true,
-        "standard": true
-      },
-      "satisfied_by": "service_register_nodes",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -7006,7 +6615,6 @@
       "profile_defaults": {
         "custom": false
       },
-      "satisfied_by": "opc_cu_user_auth",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -7038,7 +6646,6 @@
         "nano": true,
         "standard": true
       },
-      "satisfied_by": "opc_cu_subscription_basic",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -7053,6 +6660,9 @@
       "implementation_state": "claimed",
       "kconfig_symbol": "MUC_OPCUA_CU_ATTRIBUTE_WRITE_INDEX_RANGE",
       "kind": "conformance_unit",
+      "semantic_depends_on": [
+        "MUC_OPCUA_CU_ATTRIBUTE_WRITE_VALUES"
+      ],
       "notes": "Supports the IndexRange to write a single element or a range of elements when the Attribute value is an array and partial updates is allowed for this array; depends on Attribute Write Values so it cannot enable Write by itself. Requires heap (array-valued Write decode uses heap), so it is unavailable on the strictly no-heap MCU tiers (nano/micro/embedded) and defaults off there; a _Static_assert in attribute_handler.c enforces MUC_OPCUA_ALLOW_HEAP.",
       "opc_display_name": "Attribute Write Index",
       "opc_reference": {
@@ -7065,39 +6675,6 @@
       "profile_defaults": {
         "custom": false
       },
-      "source_metadata": {
-        "profile_group_id": 171,
-        "source_endpoint": "conformanceunit/?pg=171&all=1"
-      }
-    },
-    {
-      "backing_tests": [
-        "test_profile_surface"
-      ],
-      "cu_optional": false,
-      "depends_on": [],
-      "id": "opc_cu_3175",
-      "implementation_state": "documented",
-      "kconfig_symbol": null,
-      "kind": "conformance_unit",
-      "notes": "Satisfied by project-level CU opc_cu_session_base; CreateSession/ActivateSession/CloseSession with correct parameter handling including SecurityMode=None null signatures.",
-      "opc_display_name": "Session Base",
-      "opc_reference": {
-        "cu_id": "3175",
-        "cu_name": "Session Base",
-        "section": null,
-        "source_url": "https://profiles.opcfoundation.org",
-        "spec": null
-      },
-      "profile_defaults": {
-        "custom": false,
-        "embedded": true,
-        "full": true,
-        "micro": true,
-        "nano": true,
-        "standard": true
-      },
-      "satisfied_by": "opc_cu_session_base",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -7189,7 +6766,6 @@
         "nano": true,
         "standard": true
       },
-      "satisfied_by": "opc_cu_subscription_basic",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -7221,7 +6797,6 @@
         "nano": true,
         "standard": true
       },
-      "satisfied_by": "opc_cu_subscription_basic",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -7253,7 +6828,6 @@
         "nano": true,
         "standard": true
       },
-      "satisfied_by": "opc_cu_user_auth",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -7280,39 +6854,6 @@
       "profile_defaults": {
         "custom": false
       },
-      "satisfied_by": "opc_cu_user_auth",
-      "source_metadata": {
-        "profile_group_id": 171,
-        "source_endpoint": "conformanceunit/?pg=171&all=1"
-      }
-    },
-    {
-      "backing_tests": [
-        "test_profile_surface"
-      ],
-      "cu_optional": false,
-      "id": "opc_cu_3727",
-      "implementation_state": "documented",
-      "kconfig_symbol": null,
-      "kind": "conformance_unit",
-      "notes": "Support the following Subscription Services: CreateSubscription, ModifySubscription, DeleteSubscriptions, Publish, Republish and SetPublishingMode.",
-      "opc_display_name": "Subscription Basic",
-      "opc_reference": {
-        "cu_id": "3727",
-        "cu_name": "Subscription Basic",
-        "section": null,
-        "source_url": "https://profiles.opcfoundation.org",
-        "spec": null
-      },
-      "profile_defaults": {
-        "custom": false,
-        "embedded": true,
-        "full": true,
-        "micro": true,
-        "nano": true,
-        "standard": true
-      },
-      "satisfied_by": "opc_cu_subscription_basic",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -7344,7 +6885,6 @@
         "nano": true,
         "standard": true
       },
-      "satisfied_by": "opc_cu_time_sync",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -7376,7 +6916,6 @@
         "nano": true,
         "standard": true
       },
-      "satisfied_by": "opc_cu_subscription_basic",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -7412,39 +6951,6 @@
       "backing_tests": [
         "test_profile_surface"
       ],
-      "cu_optional": false,
-      "depends_on": [],
-      "id": "opc_cu_3985",
-      "implementation_state": "documented",
-      "kconfig_symbol": null,
-      "kind": "conformance_unit",
-      "notes": "Satisfied by project-level CU opc_cu_session_general_service; authentication-token validation, requestHandle echo, timeoutHint respect in service_dispatch.",
-      "opc_display_name": "Session General Service Behaviour",
-      "opc_reference": {
-        "cu_id": "3985",
-        "cu_name": "Session General Service Behaviour",
-        "section": null,
-        "source_url": "https://profiles.opcfoundation.org",
-        "spec": null
-      },
-      "profile_defaults": {
-        "custom": false,
-        "embedded": true,
-        "full": true,
-        "micro": true,
-        "nano": true,
-        "standard": true
-      },
-      "satisfied_by": "opc_cu_session_general_service",
-      "source_metadata": {
-        "profile_group_id": 171,
-        "source_endpoint": "conformanceunit/?pg=171&all=1"
-      }
-    },
-    {
-      "backing_tests": [
-        "test_profile_surface"
-      ],
       "cu_optional": true,
       "id": "opc_cu_5505",
       "implementation_state": "documented",
@@ -7462,7 +6968,6 @@
       "profile_defaults": {
         "custom": false
       },
-      "satisfied_by": "opc_cu_time_sync",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -7494,7 +6999,6 @@
         "nano": true,
         "standard": true
       },
-      "satisfied_by": "opc_cu_time_sync",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -7782,7 +7286,6 @@
         "nano": false,
         "standard": true
       },
-      "satisfied_by": "opc_cu_subscription_standard",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -7814,7 +7317,6 @@
         "nano": false,
         "standard": false
       },
-      "satisfied_by": "opc_cu_events",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -7846,7 +7348,6 @@
         "nano": false,
         "standard": false
       },
-      "satisfied_by": "opc_cu_events",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -7878,7 +7379,6 @@
         "nano": false,
         "standard": false
       },
-      "satisfied_by": "opc_cu_event_filter_where",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -7910,7 +7410,6 @@
         "nano": false,
         "standard": false
       },
-      "satisfied_by": "service_nodemanagement",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -7942,7 +7441,6 @@
         "nano": false,
         "standard": false
       },
-      "satisfied_by": "service_nodemanagement",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -7974,7 +7472,6 @@
         "nano": false,
         "standard": false
       },
-      "satisfied_by": "service_nodemanagement",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -8006,7 +7503,6 @@
         "nano": false,
         "standard": false
       },
-      "satisfied_by": "service_nodemanagement",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -8039,7 +7535,6 @@
         "nano": false,
         "standard": false
       },
-      "satisfied_by": "opc_cu_events",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -8072,16 +7567,12 @@
         "nano": false,
         "standard": false
       },
-      "satisfied_by": "opc_cu_auditing",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
       }
     },
     {
-      "backing_tests": [
-        "test_event_notifications"
-      ],
       "cu_optional": false,
       "id": "opc_cu_3968",
       "implementation_state": "documented",
@@ -8104,7 +7595,6 @@
         "nano": false,
         "standard": false
       },
-      "satisfied_by": "opc_cu_auditing",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -8137,7 +7627,6 @@
         "nano": false,
         "standard": false
       },
-      "satisfied_by": "opc_cu_auditing",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -8172,8 +7661,7 @@
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
-      },
-      "satisfied_by": "opc_cu_auditing"
+      }
     },
     {
       "backing_tests": [
@@ -8204,8 +7692,7 @@
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
-      },
-      "satisfied_by": "opc_cu_auditing"
+      }
     },
     {
       "backing_tests": [
@@ -8233,7 +7720,6 @@
         "nano": false,
         "standard": false
       },
-      "satisfied_by": "opc_cu_auditing",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -8265,7 +7751,6 @@
         "nano": false,
         "standard": false
       },
-      "satisfied_by": "opc_cu_auditing",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -8297,7 +7782,6 @@
         "nano": false,
         "standard": false
       },
-      "satisfied_by": "opc_cu_auditing",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -8329,7 +7813,6 @@
         "nano": false,
         "standard": false
       },
-      "satisfied_by": "opc_cu_aggregate_full",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -8361,7 +7844,6 @@
         "nano": false,
         "standard": false
       },
-      "satisfied_by": "opc_cu_aggregate_full",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -8393,7 +7875,6 @@
         "nano": true,
         "standard": true
       },
-      "satisfied_by": "opc_cu_session_general_service",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -8456,7 +7937,6 @@
         "nano": false,
         "standard": true
       },
-      "satisfied_by": "opc_cu_ua_secure_conversation",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -8486,8 +7966,7 @@
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
-      },
-      "satisfied_by": "opc_cu_2271"
+      }
     },
     {
       "backing_tests": [
@@ -8515,7 +7994,6 @@
         "nano": false,
         "standard": false
       },
-      "satisfied_by": "opc_cu_security_ecc",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -8547,7 +8025,6 @@
         "nano": true,
         "standard": true
       },
-      "satisfied_by": "opc_cu_multiple_connections",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -8613,7 +8090,6 @@
         "api_fetch": "profiles.opcfoundation.org/api/profile/includedconformanceunits/2266/",
         "isOptional": true
       },
-      "satisfied_by": "opc_cu_base_info_base_types",
       "not_applicable": {
         "nano": "No custom types required by standard profiles."
       }
@@ -8668,8 +8144,7 @@
       "source_metadata": {
         "api_fetch": "profiles.opcfoundation.org/api/profile/includedconformanceunits/2266/",
         "isOptional": true
-      },
-      "satisfied_by": "opc_cu_ua_secure_conversation"
+      }
     },
     {
       "backing_tests": [
@@ -8782,7 +8257,6 @@
       "profile_defaults": {
         "custom": false
       },
-      "satisfied_by": "opc_cu_alarms_conditions",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -8809,7 +8283,6 @@
       "profile_defaults": {
         "custom": false
       },
-      "satisfied_by": "opc_cu_alarms_conditions",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -8836,7 +8309,6 @@
       "profile_defaults": {
         "custom": false
       },
-      "satisfied_by": "opc_cu_alarms_conditions",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -8863,7 +8335,6 @@
       "profile_defaults": {
         "custom": false
       },
-      "satisfied_by": "opc_cu_alarms_conditions",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -8890,7 +8361,6 @@
       "profile_defaults": {
         "custom": false
       },
-      "satisfied_by": "opc_cu_alarms_conditions",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -8917,7 +8387,6 @@
       "profile_defaults": {
         "custom": false
       },
-      "satisfied_by": "opc_cu_alarms_conditions",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -8971,7 +8440,6 @@
       "profile_defaults": {
         "custom": false
       },
-      "satisfied_by": "opc_cu_data_access",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -8998,7 +8466,6 @@
       "profile_defaults": {
         "custom": false
       },
-      "satisfied_by": "opc_cu_data_access",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -9025,7 +8492,6 @@
       "profile_defaults": {
         "custom": false
       },
-      "satisfied_by": "opc_cu_data_access",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -9052,7 +8518,6 @@
       "profile_defaults": {
         "custom": false
       },
-      "satisfied_by": "opc_cu_data_access",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -9079,7 +8544,6 @@
       "profile_defaults": {
         "custom": false
       },
-      "satisfied_by": "opc_cu_data_access",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -9106,7 +8570,6 @@
       "profile_defaults": {
         "custom": false
       },
-      "satisfied_by": "opc_cu_data_access",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -9133,7 +8596,6 @@
       "profile_defaults": {
         "custom": false
       },
-      "satisfied_by": "opc_cu_data_access",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -9160,7 +8622,6 @@
       "profile_defaults": {
         "custom": false
       },
-      "satisfied_by": "opc_cu_data_access",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -9187,7 +8648,6 @@
       "profile_defaults": {
         "custom": false
       },
-      "satisfied_by": "opc_cu_data_access",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -9214,7 +8674,6 @@
       "profile_defaults": {
         "custom": false
       },
-      "satisfied_by": "opc_cu_data_access",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -9241,7 +8700,6 @@
       "profile_defaults": {
         "custom": false
       },
-      "satisfied_by": "opc_cu_data_access",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -9268,7 +8726,6 @@
       "profile_defaults": {
         "custom": false
       },
-      "satisfied_by": "opc_cu_data_access",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -9295,7 +8752,6 @@
       "profile_defaults": {
         "custom": false
       },
-      "satisfied_by": "opc_cu_data_access",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -9322,7 +8778,6 @@
       "profile_defaults": {
         "custom": false
       },
-      "satisfied_by": "opc_cu_data_access",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -9349,7 +8804,6 @@
       "profile_defaults": {
         "custom": false
       },
-      "satisfied_by": "opc_cu_data_access",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -9376,7 +8830,6 @@
       "profile_defaults": {
         "custom": false
       },
-      "satisfied_by": "opc_cu_data_access",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -9403,7 +8856,6 @@
       "profile_defaults": {
         "custom": false
       },
-      "satisfied_by": "opc_cu_data_access",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -9430,7 +8882,6 @@
       "profile_defaults": {
         "custom": false
       },
-      "satisfied_by": "opc_cu_data_access",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -9457,7 +8908,6 @@
       "profile_defaults": {
         "custom": false
       },
-      "satisfied_by": "opc_cu_data_access",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -9484,7 +8934,6 @@
       "profile_defaults": {
         "custom": false
       },
-      "satisfied_by": "opc_cu_data_access",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -9511,7 +8960,6 @@
       "profile_defaults": {
         "custom": false
       },
-      "satisfied_by": "opc_cu_data_access",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -9538,7 +8986,6 @@
       "profile_defaults": {
         "custom": false
       },
-      "satisfied_by": "opc_cu_data_access",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -9565,7 +9012,6 @@
       "profile_defaults": {
         "custom": false
       },
-      "satisfied_by": "service_nodemanagement",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -9592,7 +9038,6 @@
       "profile_defaults": {
         "custom": false
       },
-      "satisfied_by": "opc_cu_base_info_datatypes",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -9619,7 +9064,6 @@
       "profile_defaults": {
         "custom": false
       },
-      "satisfied_by": "opc_cu_base_info_base_types",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -9646,7 +9090,6 @@
       "profile_defaults": {
         "custom": false
       },
-      "satisfied_by": "opc_cu_base_info_datatypes",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -9673,7 +9116,6 @@
       "profile_defaults": {
         "custom": false
       },
-      "satisfied_by": "opc_cu_base_info_datatypes",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -9700,7 +9142,6 @@
       "profile_defaults": {
         "custom": false
       },
-      "satisfied_by": "opc_cu_base_info_base_types",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -9727,7 +9168,6 @@
       "profile_defaults": {
         "custom": false
       },
-      "satisfied_by": "opc_cu_base_info_datatypes",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -9754,7 +9194,6 @@
       "profile_defaults": {
         "custom": false
       },
-      "satisfied_by": "opc_cu_base_info_base_types",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -9781,7 +9220,6 @@
       "profile_defaults": {
         "custom": false
       },
-      "satisfied_by": "opc_cu_base_info_datatypes",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -9808,7 +9246,6 @@
       "profile_defaults": {
         "custom": false
       },
-      "satisfied_by": "opc_cu_base_info_datatypes",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -9835,7 +9272,6 @@
       "profile_defaults": {
         "custom": false
       },
-      "satisfied_by": "opc_cu_base_info_datatypes",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -9862,7 +9298,6 @@
       "profile_defaults": {
         "custom": false
       },
-      "satisfied_by": "opc_cu_base_info_datatypes",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -9889,7 +9324,6 @@
       "profile_defaults": {
         "custom": false
       },
-      "satisfied_by": "opc_cu_base_info_datatypes",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -9916,7 +9350,6 @@
       "profile_defaults": {
         "custom": false
       },
-      "satisfied_by": "opc_cu_base_info_datatypes",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -9943,7 +9376,6 @@
       "profile_defaults": {
         "custom": false
       },
-      "satisfied_by": "opc_cu_base_info_datatypes",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -9970,7 +9402,6 @@
       "profile_defaults": {
         "custom": false
       },
-      "satisfied_by": "opc_cu_base_info_datatypes",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -9997,7 +9428,6 @@
       "profile_defaults": {
         "custom": false
       },
-      "satisfied_by": "opc_cu_base_info_datatypes",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -10024,7 +9454,6 @@
       "profile_defaults": {
         "custom": false
       },
-      "satisfied_by": "opc_cu_base_info_datatypes",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -10051,7 +9480,6 @@
       "profile_defaults": {
         "custom": false
       },
-      "satisfied_by": "opc_cu_base_info_datatypes",
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -10084,7 +9512,6 @@
         "nano": false,
         "standard": false
       },
-      "satisfied_by": "opc_cu_aggregate_average",
       "source_metadata": {
         "source_endpoint": "profiles/opcua-server-conformance.json"
       }
@@ -10116,7 +9543,6 @@
         "nano": false,
         "standard": false
       },
-      "satisfied_by": "opc_cu_aggregate_count",
       "source_metadata": {
         "source_endpoint": "profiles/opcua-server-conformance.json"
       }
@@ -10148,7 +9574,6 @@
         "nano": false,
         "standard": false
       },
-      "satisfied_by": "opc_cu_aggregate_delta",
       "source_metadata": {
         "source_endpoint": "profiles/opcua-server-conformance.json"
       }
@@ -10180,7 +9605,6 @@
         "nano": false,
         "standard": false
       },
-      "satisfied_by": "opc_cu_aggregate_delta_bounds",
       "source_metadata": {
         "source_endpoint": "profiles/opcua-server-conformance.json"
       }
@@ -10212,7 +9636,6 @@
         "nano": false,
         "standard": false
       },
-      "satisfied_by": "opc_cu_aggregate_duration_bad",
       "source_metadata": {
         "source_endpoint": "profiles/opcua-server-conformance.json"
       }
@@ -10244,7 +9667,6 @@
         "nano": false,
         "standard": false
       },
-      "satisfied_by": "opc_cu_aggregate_duration_good",
       "source_metadata": {
         "source_endpoint": "profiles/opcua-server-conformance.json"
       }
@@ -10276,7 +9698,6 @@
         "nano": false,
         "standard": false
       },
-      "satisfied_by": "opc_cu_aggregate_duration_state_zero",
       "source_metadata": {
         "source_endpoint": "profiles/opcua-server-conformance.json"
       }
@@ -10308,7 +9729,6 @@
         "nano": false,
         "standard": false
       },
-      "satisfied_by": "opc_cu_aggregate_end",
       "source_metadata": {
         "source_endpoint": "profiles/opcua-server-conformance.json"
       }
@@ -10340,7 +9760,6 @@
         "nano": false,
         "standard": false
       },
-      "satisfied_by": "opc_cu_aggregate_interpolative",
       "source_metadata": {
         "source_endpoint": "profiles/opcua-server-conformance.json"
       }
@@ -10372,7 +9791,6 @@
         "nano": false,
         "standard": false
       },
-      "satisfied_by": "opc_cu_aggregate_maximum",
       "source_metadata": {
         "source_endpoint": "profiles/opcua-server-conformance.json"
       }
@@ -10404,7 +9822,6 @@
         "nano": false,
         "standard": false
       },
-      "satisfied_by": "opc_cu_aggregate_maximum_2",
       "source_metadata": {
         "source_endpoint": "profiles/opcua-server-conformance.json"
       }
@@ -10436,7 +9853,6 @@
         "nano": false,
         "standard": false
       },
-      "satisfied_by": "opc_cu_aggregate_minimum",
       "source_metadata": {
         "source_endpoint": "profiles/opcua-server-conformance.json"
       }
@@ -10468,7 +9884,6 @@
         "nano": false,
         "standard": false
       },
-      "satisfied_by": "opc_cu_aggregate_minimum_2",
       "source_metadata": {
         "source_endpoint": "profiles/opcua-server-conformance.json"
       }
@@ -10500,7 +9915,6 @@
         "nano": false,
         "standard": false
       },
-      "satisfied_by": "opc_cu_aggregate_percent_bad",
       "source_metadata": {
         "source_endpoint": "profiles/opcua-server-conformance.json"
       }
@@ -10532,7 +9946,6 @@
         "nano": false,
         "standard": false
       },
-      "satisfied_by": "opc_cu_aggregate_percent_good",
       "source_metadata": {
         "source_endpoint": "profiles/opcua-server-conformance.json"
       }
@@ -10564,7 +9977,6 @@
         "nano": false,
         "standard": false
       },
-      "satisfied_by": "opc_cu_aggregate_range",
       "source_metadata": {
         "source_endpoint": "profiles/opcua-server-conformance.json"
       }
@@ -10596,7 +10008,6 @@
         "nano": false,
         "standard": false
       },
-      "satisfied_by": "opc_cu_aggregate_start",
       "source_metadata": {
         "source_endpoint": "profiles/opcua-server-conformance.json"
       }
@@ -10628,7 +10039,6 @@
         "nano": false,
         "standard": false
       },
-      "satisfied_by": "opc_cu_aggregate_time_average",
       "source_metadata": {
         "source_endpoint": "profiles/opcua-server-conformance.json"
       }
@@ -10660,7 +10070,6 @@
         "nano": false,
         "standard": false
       },
-      "satisfied_by": "opc_cu_aggregate_time_average_2",
       "source_metadata": {
         "source_endpoint": "profiles/opcua-server-conformance.json"
       }
@@ -10692,7 +10101,6 @@
         "nano": false,
         "standard": false
       },
-      "satisfied_by": "opc_cu_aggregate_total",
       "source_metadata": {
         "source_endpoint": "profiles/opcua-server-conformance.json"
       }
@@ -10724,7 +10132,6 @@
         "nano": false,
         "standard": false
       },
-      "satisfied_by": "opc_cu_aggregate_total_2",
       "source_metadata": {
         "source_endpoint": "profiles/opcua-server-conformance.json"
       }
@@ -10756,7 +10163,6 @@
         "nano": false,
         "standard": false
       },
-      "satisfied_by": "opc_cu_aggregate_worst_quality",
       "source_metadata": {
         "source_endpoint": "profiles/opcua-server-conformance.json"
       }
@@ -10788,7 +10194,6 @@
         "nano": false,
         "standard": false
       },
-      "satisfied_by": "opc_cu_aggregate_worst_quality_2",
       "source_metadata": {
         "source_endpoint": "profiles/opcua-server-conformance.json"
       }
@@ -10822,7 +10227,6 @@
         "nano": false,
         "standard": false
       },
-      "satisfied_by": "opc_cu_aggregate_min_actual_time",
       "source_metadata": {
         "source_endpoint": "profiles/opcua-server-conformance.json"
       }
@@ -10856,7 +10260,6 @@
         "nano": false,
         "standard": false
       },
-      "satisfied_by": "opc_cu_aggregate_max_actual_time",
       "source_metadata": {
         "source_endpoint": "profiles/opcua-server-conformance.json"
       }
@@ -10890,7 +10293,6 @@
         "nano": false,
         "standard": false
       },
-      "satisfied_by": "opc_cu_aggregate_min_actual_time_2",
       "source_metadata": {
         "source_endpoint": "profiles/opcua-server-conformance.json"
       }
@@ -10924,7 +10326,6 @@
         "nano": false,
         "standard": false
       },
-      "satisfied_by": "opc_cu_aggregate_max_actual_time_2",
       "source_metadata": {
         "source_endpoint": "profiles/opcua-server-conformance.json"
       }
@@ -10958,7 +10359,6 @@
         "nano": false,
         "standard": false
       },
-      "satisfied_by": "opc_cu_aggregate_range_2",
       "source_metadata": {
         "source_endpoint": "profiles/opcua-server-conformance.json"
       }
@@ -10992,7 +10392,6 @@
         "nano": false,
         "standard": false
       },
-      "satisfied_by": "opc_cu_aggregate_duration_state_nonzero",
       "source_metadata": {
         "source_endpoint": "profiles/opcua-server-conformance.json"
       }
@@ -11026,7 +10425,6 @@
         "nano": false,
         "standard": false
       },
-      "satisfied_by": "opc_cu_aggregate_number_transitions",
       "source_metadata": {
         "source_endpoint": "profiles/opcua-server-conformance.json"
       }
@@ -11060,7 +10458,6 @@
         "nano": false,
         "standard": false
       },
-      "satisfied_by": "opc_cu_aggregate_start_bound",
       "source_metadata": {
         "source_endpoint": "profiles/opcua-server-conformance.json"
       }
@@ -11094,7 +10491,6 @@
         "nano": false,
         "standard": false
       },
-      "satisfied_by": "opc_cu_aggregate_end_bound",
       "source_metadata": {
         "source_endpoint": "profiles/opcua-server-conformance.json"
       }
@@ -11128,7 +10524,6 @@
         "nano": false,
         "standard": false
       },
-      "satisfied_by": "opc_cu_aggregate_std_dev_sample",
       "source_metadata": {
         "source_endpoint": "profiles/opcua-server-conformance.json"
       }
@@ -11162,7 +10557,6 @@
         "nano": false,
         "standard": false
       },
-      "satisfied_by": "opc_cu_aggregate_variance_sample",
       "source_metadata": {
         "source_endpoint": "profiles/opcua-server-conformance.json"
       }
@@ -11196,7 +10590,6 @@
         "nano": false,
         "standard": false
       },
-      "satisfied_by": "opc_cu_aggregate_std_dev_population",
       "source_metadata": {
         "source_endpoint": "profiles/opcua-server-conformance.json"
       }
@@ -11230,7 +10623,6 @@
         "nano": false,
         "standard": false
       },
-      "satisfied_by": "opc_cu_aggregate_variance_population",
       "source_metadata": {
         "source_endpoint": "profiles/opcua-server-conformance.json"
       }
@@ -11264,8 +10656,7 @@
       "source_metadata": {
         "source_id": "5941",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_aliasname"
+      }
     },
     {
       "backing_tests": [
@@ -11296,8 +10687,7 @@
       "source_metadata": {
         "source_id": "5940",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_aliasname"
+      }
     },
     {
       "backing_tests": [
@@ -11328,8 +10718,7 @@
       "source_metadata": {
         "source_id": "5937",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_aliasname"
+      }
     },
     {
       "backing_tests": [
@@ -11391,8 +10780,7 @@
       "source_metadata": {
         "source_id": "5874",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_aliasname"
+      }
     },
     {
       "backing_tests": [
@@ -11423,8 +10811,7 @@
       "source_metadata": {
         "source_id": "5873",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_aliasname"
+      }
     },
     {
       "backing_tests": [
@@ -11455,8 +10842,7 @@
       "source_metadata": {
         "source_id": "5869",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_aliasname"
+      }
     },
     {
       "backing_tests": [
@@ -11487,8 +10873,7 @@
       "source_metadata": {
         "source_id": "5813",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "service_history"
+      }
     },
     {
       "backing_tests": [
@@ -11519,8 +10904,7 @@
       "source_metadata": {
         "source_id": "5812",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "service_history"
+      }
     },
     {
       "backing_tests": [
@@ -11551,8 +10935,7 @@
       "source_metadata": {
         "source_id": "5810",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_user_auth"
+      }
     },
     {
       "backing_tests": [
@@ -11583,8 +10966,7 @@
       "source_metadata": {
         "source_id": "5809",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_user_auth"
+      }
     },
     {
       "backing_tests": [
@@ -11615,8 +10997,7 @@
       "source_metadata": {
         "source_id": "5808",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_alarms_conditions"
+      }
     },
     {
       "backing_tests": [
@@ -11647,8 +11028,7 @@
       "source_metadata": {
         "source_id": "5807",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_alarms_conditions"
+      }
     },
     {
       "backing_tests": [
@@ -11679,8 +11059,7 @@
       "source_metadata": {
         "source_id": "5806",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "service_history"
+      }
     },
     {
       "backing_tests": [
@@ -11711,8 +11090,7 @@
       "source_metadata": {
         "source_id": "5797",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_core_structure_2"
+      }
     },
     {
       "backing_tests": [
@@ -11743,8 +11121,7 @@
       "source_metadata": {
         "source_id": "5796",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_core_structure_2"
+      }
     },
     {
       "backing_tests": [
@@ -11775,8 +11152,7 @@
       "source_metadata": {
         "source_id": "5795",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_core_structure_2"
+      }
     },
     {
       "backing_tests": [
@@ -11840,8 +11216,7 @@
       "source_metadata": {
         "source_id": "5776",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_events"
+      }
     },
     {
       "backing_tests": [
@@ -11874,8 +11249,7 @@
       "source_metadata": {
         "source_id": "5775",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_events"
+      }
     },
     {
       "backing_tests": [
@@ -11908,8 +11282,7 @@
       "source_metadata": {
         "source_id": "5664",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_events"
+      }
     },
     {
       "backing_tests": [
@@ -11942,8 +11315,7 @@
       "source_metadata": {
         "source_id": "5663",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_events"
+      }
     },
     {
       "backing_tests": [
@@ -11976,8 +11348,7 @@
       "source_metadata": {
         "source_id": "5662",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_events"
+      }
     },
     {
       "backing_tests": [
@@ -12010,8 +11381,7 @@
       "source_metadata": {
         "source_id": "5661",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_events"
+      }
     },
     {
       "backing_tests": [
@@ -12044,8 +11414,7 @@
       "source_metadata": {
         "source_id": "5660",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_events"
+      }
     },
     {
       "backing_tests": [
@@ -12078,8 +11447,7 @@
       "source_metadata": {
         "source_id": "5659",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_events"
+      }
     },
     {
       "backing_tests": [
@@ -12112,8 +11480,7 @@
       "source_metadata": {
         "source_id": "5658",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_events"
+      }
     },
     {
       "backing_tests": [
@@ -12146,8 +11513,7 @@
       "source_metadata": {
         "source_id": "5656",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_events"
+      }
     },
     {
       "backing_tests": [
@@ -12180,8 +11546,7 @@
       "source_metadata": {
         "source_id": "5655",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_events"
+      }
     },
     {
       "backing_tests": [
@@ -12214,8 +11579,7 @@
       "source_metadata": {
         "source_id": "5654",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_events"
+      }
     },
     {
       "backing_tests": [
@@ -12248,8 +11612,7 @@
       "source_metadata": {
         "source_id": "5653",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_events"
+      }
     },
     {
       "backing_tests": [
@@ -12282,8 +11645,7 @@
       "source_metadata": {
         "source_id": "5652",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_events"
+      }
     },
     {
       "backing_tests": [
@@ -12314,8 +11676,7 @@
       "source_metadata": {
         "source_id": "5567",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_alarms_conditions"
+      }
     },
     {
       "backing_tests": [
@@ -12346,8 +11707,7 @@
       "source_metadata": {
         "source_id": "5566",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_alarms_conditions"
+      }
     },
     {
       "backing_tests": [
@@ -12378,8 +11738,7 @@
       "source_metadata": {
         "source_id": "5565",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_alarms_conditions"
+      }
     },
     {
       "backing_tests": [
@@ -12410,8 +11769,7 @@
       "source_metadata": {
         "source_id": "5564",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_alarms_conditions"
+      }
     },
     {
       "backing_tests": [
@@ -12442,8 +11800,7 @@
       "source_metadata": {
         "source_id": "5563",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_alarms_conditions"
+      }
     },
     {
       "backing_tests": [
@@ -12474,8 +11831,7 @@
       "source_metadata": {
         "source_id": "5562",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_alarms_conditions"
+      }
     },
     {
       "backing_tests": [
@@ -12506,8 +11862,7 @@
       "source_metadata": {
         "source_id": "5561",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_alarms_conditions"
+      }
     },
     {
       "backing_tests": [
@@ -12538,8 +11893,7 @@
       "source_metadata": {
         "source_id": "5560",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_alarms_conditions"
+      }
     },
     {
       "backing_tests": [
@@ -12570,8 +11924,7 @@
       "source_metadata": {
         "source_id": "5559",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_alarms_conditions"
+      }
     },
     {
       "backing_tests": [
@@ -12602,8 +11955,7 @@
       "source_metadata": {
         "source_id": "5558",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_alarms_conditions"
+      }
     },
     {
       "backing_tests": [
@@ -12634,8 +11986,7 @@
       "source_metadata": {
         "source_id": "5557",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_alarms_conditions"
+      }
     },
     {
       "backing_tests": [
@@ -12666,8 +12017,7 @@
       "source_metadata": {
         "source_id": "5556",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_alarms_conditions"
+      }
     },
     {
       "backing_tests": [
@@ -12698,8 +12048,7 @@
       "source_metadata": {
         "source_id": "5555",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_alarms_conditions"
+      }
     },
     {
       "backing_tests": [
@@ -12730,8 +12079,7 @@
       "source_metadata": {
         "source_id": "5554",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_alarms_conditions"
+      }
     },
     {
       "backing_tests": [
@@ -12762,8 +12110,7 @@
       "source_metadata": {
         "source_id": "5553",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_alarms_conditions"
+      }
     },
     {
       "backing_tests": [
@@ -12794,8 +12141,7 @@
       "source_metadata": {
         "source_id": "5552",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_alarms_conditions"
+      }
     },
     {
       "backing_tests": [
@@ -12826,8 +12172,7 @@
       "source_metadata": {
         "source_id": "5551",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_alarms_conditions"
+      }
     },
     {
       "backing_tests": [
@@ -12858,8 +12203,7 @@
       "source_metadata": {
         "source_id": "5550",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_alarms_conditions"
+      }
     },
     {
       "backing_tests": [
@@ -12890,8 +12234,7 @@
       "source_metadata": {
         "source_id": "5549",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_alarms_conditions"
+      }
     },
     {
       "backing_tests": [
@@ -12922,8 +12265,7 @@
       "source_metadata": {
         "source_id": "5548",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_alarms_conditions"
+      }
     },
     {
       "backing_tests": [
@@ -12954,8 +12296,7 @@
       "source_metadata": {
         "source_id": "5547",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_alarms_conditions"
+      }
     },
     {
       "backing_tests": [
@@ -12986,8 +12327,7 @@
       "source_metadata": {
         "source_id": "5546",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_alarms_conditions"
+      }
     },
     {
       "backing_tests": [
@@ -13018,8 +12358,7 @@
       "source_metadata": {
         "source_id": "5545",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_alarms_conditions"
+      }
     },
     {
       "backing_tests": [
@@ -13050,8 +12389,7 @@
       "source_metadata": {
         "source_id": "5544",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_alarms_conditions"
+      }
     },
     {
       "backing_tests": [
@@ -13082,8 +12420,7 @@
       "source_metadata": {
         "source_id": "5543",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_alarms_conditions"
+      }
     },
     {
       "backing_tests": [
@@ -13114,8 +12451,7 @@
       "source_metadata": {
         "source_id": "5542",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_alarms_conditions"
+      }
     },
     {
       "backing_tests": [
@@ -13146,8 +12482,7 @@
       "source_metadata": {
         "source_id": "5541",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_alarms_conditions"
+      }
     },
     {
       "backing_tests": [
@@ -13178,8 +12513,7 @@
       "source_metadata": {
         "source_id": "5540",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_alarms_conditions"
+      }
     },
     {
       "backing_tests": [
@@ -13210,8 +12544,7 @@
       "source_metadata": {
         "source_id": "5539",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_alarms_conditions"
+      }
     },
     {
       "backing_tests": [
@@ -13242,8 +12575,7 @@
       "source_metadata": {
         "source_id": "5538",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_alarms_conditions"
+      }
     },
     {
       "backing_tests": [
@@ -13274,8 +12606,7 @@
       "source_metadata": {
         "source_id": "5537",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_alarms_conditions"
+      }
     },
     {
       "backing_tests": [
@@ -13306,8 +12637,7 @@
       "source_metadata": {
         "source_id": "5536",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_alarms_conditions"
+      }
     },
     {
       "backing_tests": [
@@ -13338,8 +12668,7 @@
       "source_metadata": {
         "source_id": "5535",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_alarms_conditions"
+      }
     },
     {
       "backing_tests": [
@@ -13370,8 +12699,7 @@
       "source_metadata": {
         "source_id": "5534",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_alarms_conditions"
+      }
     },
     {
       "backing_tests": [
@@ -13402,8 +12730,7 @@
       "source_metadata": {
         "source_id": "5533",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_alarms_conditions"
+      }
     },
     {
       "backing_tests": [
@@ -13434,8 +12761,7 @@
       "source_metadata": {
         "source_id": "5532",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_alarms_conditions"
+      }
     },
     {
       "backing_tests": [
@@ -13466,8 +12792,7 @@
       "source_metadata": {
         "source_id": "5531",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_alarms_conditions"
+      }
     },
     {
       "backing_tests": [
@@ -13498,8 +12823,7 @@
       "source_metadata": {
         "source_id": "5530",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_alarms_conditions"
+      }
     },
     {
       "backing_tests": [
@@ -13530,8 +12854,7 @@
       "source_metadata": {
         "source_id": "5529",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_alarms_conditions"
+      }
     },
     {
       "backing_tests": [
@@ -13562,8 +12885,7 @@
       "source_metadata": {
         "source_id": "5528",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_alarms_conditions"
+      }
     },
     {
       "backing_tests": [
@@ -13594,8 +12916,7 @@
       "source_metadata": {
         "source_id": "5527",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_alarms_conditions"
+      }
     },
     {
       "backing_tests": [
@@ -13626,8 +12947,7 @@
       "source_metadata": {
         "source_id": "5526",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_alarms_conditions"
+      }
     },
     {
       "backing_tests": [
@@ -13658,8 +12978,7 @@
       "source_metadata": {
         "source_id": "5525",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_alarms_conditions"
+      }
     },
     {
       "backing_tests": [
@@ -13690,8 +13009,7 @@
       "source_metadata": {
         "source_id": "5524",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_alarms_conditions"
+      }
     },
     {
       "backing_tests": [
@@ -13722,8 +13040,7 @@
       "source_metadata": {
         "source_id": "5523",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_alarms_conditions"
+      }
     },
     {
       "backing_tests": [
@@ -13754,8 +13071,7 @@
       "source_metadata": {
         "source_id": "5522",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_alarms_conditions"
+      }
     },
     {
       "backing_tests": [
@@ -13786,8 +13102,7 @@
       "source_metadata": {
         "source_id": "5521",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_alarms_conditions"
+      }
     },
     {
       "backing_tests": [
@@ -13818,8 +13133,7 @@
       "source_metadata": {
         "source_id": "5520",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_alarms_conditions"
+      }
     },
     {
       "backing_tests": [
@@ -13850,8 +13164,7 @@
       "source_metadata": {
         "source_id": "5519",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_alarms_conditions"
+      }
     },
     {
       "backing_tests": [
@@ -13882,8 +13195,7 @@
       "source_metadata": {
         "source_id": "5518",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_alarms_conditions"
+      }
     },
     {
       "backing_tests": [
@@ -13914,8 +13226,7 @@
       "source_metadata": {
         "source_id": "5517",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_alarms_conditions"
+      }
     },
     {
       "backing_tests": [
@@ -13946,8 +13257,7 @@
       "source_metadata": {
         "source_id": "5516",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_alarms_conditions"
+      }
     },
     {
       "backing_tests": [
@@ -13978,8 +13288,7 @@
       "source_metadata": {
         "source_id": "5515",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_alarms_conditions"
+      }
     },
     {
       "backing_tests": [
@@ -14010,8 +13319,7 @@
       "source_metadata": {
         "source_id": "5514",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_alarms_conditions"
+      }
     },
     {
       "backing_tests": [
@@ -14042,8 +13350,7 @@
       "source_metadata": {
         "source_id": "5513",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_alarms_conditions"
+      }
     },
     {
       "backing_tests": [
@@ -14074,8 +13381,7 @@
       "source_metadata": {
         "source_id": "5512",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_alarms_conditions"
+      }
     },
     {
       "backing_tests": [
@@ -14106,8 +13412,7 @@
       "source_metadata": {
         "source_id": "5511",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_alarms_conditions"
+      }
     },
     {
       "backing_tests": [
@@ -14138,8 +13443,7 @@
       "source_metadata": {
         "source_id": "5510",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_alarms_conditions"
+      }
     },
     {
       "backing_tests": [
@@ -14170,8 +13474,7 @@
       "source_metadata": {
         "source_id": "5303",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_certificate_management"
+      }
     },
     {
       "backing_tests": [
@@ -14202,8 +13505,7 @@
       "source_metadata": {
         "source_id": "5302",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_key_credential_service"
+      }
     },
     {
       "backing_tests": [
@@ -14234,8 +13536,7 @@
       "source_metadata": {
         "source_id": "5301",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_key_credential_service"
+      }
     },
     {
       "backing_tests": [
@@ -14266,8 +13567,7 @@
       "source_metadata": {
         "source_id": "5293",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_key_credential_service"
+      }
     },
     {
       "backing_tests": [
@@ -14298,8 +13598,7 @@
       "source_metadata": {
         "source_id": "5292",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_key_credential_service"
+      }
     },
     {
       "backing_tests": [
@@ -14330,8 +13629,7 @@
       "source_metadata": {
         "source_id": "5277",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_user_role_management"
+      }
     },
     {
       "backing_tests": [
@@ -14362,8 +13660,7 @@
       "source_metadata": {
         "source_id": "5276",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_user_role_management"
+      }
     },
     {
       "backing_tests": [
@@ -14394,8 +13691,7 @@
       "source_metadata": {
         "source_id": "5275",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_user_role_management"
+      }
     },
     {
       "backing_tests": [
@@ -14426,42 +13722,7 @@
       "source_metadata": {
         "source_id": "5274",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_user_role_management"
-    },
-    {
-      "backing_tests": [
-        "test_subscriptions_capacity",
-        "test_subscription_deadband",
-        "test_subscription_publish"
-      ],
-      "cu_optional": false,
-      "id": "opc_cu_5250",
-      "implementation_state": "documented",
-      "kconfig_symbol": null,
-      "kind": "conformance_unit",
-      "notes": "Spec CU 5250: tracked in manifest; not yet claimed or implemented.",
-      "opc_display_name": "Monitor MinQueueSize_05",
-      "opc_reference": {
-        "cu_id": "5250",
-        "cu_name": "Monitor MinQueueSize_05",
-        "section": null,
-        "source_url": "https://profiles.opcfoundation.org",
-        "spec": null
-      },
-      "profile_defaults": {
-        "custom": false,
-        "embedded": false,
-        "full": false,
-        "micro": false,
-        "nano": false,
-        "standard": false
-      },
-      "source_metadata": {
-        "source_id": "5250",
-        "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_subscription_standard"
+      }
     },
     {
       "backing_tests": [
@@ -14471,10 +13732,10 @@
       ],
       "cu_optional": false,
       "id": "opc_cu_5249",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": "MUC_OPCUA_CU_SUBSCRIPTION_PUBLISH_MIN_10",
       "kind": "conformance_unit",
-      "notes": "Spec CU 5249: tracked in manifest; not yet claimed or implemented.",
+      "notes": "Claims >= 10 parked Publish requests per Standard DataChange 2017. Gated in subscription_publish_min_10.c.",
       "opc_display_name": "Subscription Publish Min 10",
       "opc_reference": {
         "cu_id": "5249",
@@ -14486,16 +13747,15 @@
       "profile_defaults": {
         "custom": false,
         "embedded": false,
-        "full": false,
+        "full": true,
         "micro": false,
         "nano": false,
-        "standard": false
+        "standard": true
       },
       "source_metadata": {
         "source_id": "5249",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_subscription_standard"
+      }
     },
     {
       "backing_tests": [
@@ -14505,10 +13765,10 @@
       ],
       "cu_optional": false,
       "id": "opc_cu_5248",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": "MUC_OPCUA_CU_SUBSCRIPTION_MINIMUM_05",
       "kind": "conformance_unit",
-      "notes": "Spec CU 5248: tracked in manifest; not yet claimed or implemented.",
+      "notes": "Claims >= 5 Subscriptions per Session per Standard DataChange 2017. Gated in subscription_minimum_05.c.",
       "opc_display_name": "Subscription Minimum 05",
       "opc_reference": {
         "cu_id": "5248",
@@ -14520,50 +13780,15 @@
       "profile_defaults": {
         "custom": false,
         "embedded": false,
-        "full": false,
+        "full": true,
         "micro": false,
         "nano": false,
-        "standard": false
+        "standard": true
       },
       "source_metadata": {
         "source_id": "5248",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_subscription_standard"
-    },
-    {
-      "backing_tests": [
-        "test_subscriptions_capacity",
-        "test_subscription_deadband",
-        "test_subscription_publish"
-      ],
-      "cu_optional": false,
-      "id": "opc_cu_5242",
-      "implementation_state": "documented",
-      "kconfig_symbol": null,
-      "kind": "conformance_unit",
-      "notes": "Spec CU 5242: tracked in manifest; not yet claimed or implemented.",
-      "opc_display_name": "Monitor Items 500",
-      "opc_reference": {
-        "cu_id": "5242",
-        "cu_name": "Monitor Items 500",
-        "section": null,
-        "source_url": "https://profiles.opcfoundation.org",
-        "spec": null
-      },
-      "profile_defaults": {
-        "custom": false,
-        "embedded": false,
-        "full": false,
-        "micro": false,
-        "nano": false,
-        "standard": false
-      },
-      "source_metadata": {
-        "source_id": "5242",
-        "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_subscription_standard"
+      }
     },
     {
       "backing_tests": [
@@ -14595,8 +13820,7 @@
       "source_metadata": {
         "source_id": "5213",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_auditing"
+      }
     },
     {
       "backing_tests": [
@@ -14627,8 +13851,7 @@
       "source_metadata": {
         "source_id": "4957",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_user_auth"
+      }
     },
     {
       "backing_tests": [
@@ -14659,8 +13882,7 @@
       "source_metadata": {
         "source_id": "4505",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_user_role_management"
+      }
     },
     {
       "backing_tests": [
@@ -14691,8 +13913,7 @@
       "source_metadata": {
         "source_id": "4503",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_scheduler"
+      }
     },
     {
       "backing_tests": [
@@ -14723,8 +13944,7 @@
       "source_metadata": {
         "source_id": "4502",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_scheduler"
+      }
     },
     {
       "backing_tests": [
@@ -14755,8 +13975,7 @@
       "source_metadata": {
         "source_id": "4501",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_scheduler"
+      }
     },
     {
       "backing_tests": [
@@ -14787,8 +14006,7 @@
       "source_metadata": {
         "source_id": "4500",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_scheduler"
+      }
     },
     {
       "backing_tests": [
@@ -14819,8 +14037,7 @@
       "source_metadata": {
         "source_id": "4467",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_alarms_conditions"
+      }
     },
     {
       "backing_tests": [
@@ -14851,8 +14068,7 @@
       "source_metadata": {
         "source_id": "4466",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_alarms_conditions"
+      }
     },
     {
       "backing_tests": [
@@ -14883,8 +14099,7 @@
       "source_metadata": {
         "source_id": "4465",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_alarms_conditions"
+      }
     },
     {
       "backing_tests": [
@@ -14915,8 +14130,7 @@
       "source_metadata": {
         "source_id": "4464",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_alarms_conditions"
+      }
     },
     {
       "backing_tests": [
@@ -14947,8 +14161,7 @@
       "source_metadata": {
         "source_id": "4463",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_alarms_conditions"
+      }
     },
     {
       "backing_tests": [
@@ -14979,8 +14192,7 @@
       "source_metadata": {
         "source_id": "4428",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_alarms_conditions"
+      }
     },
     {
       "backing_tests": [
@@ -15012,8 +14224,7 @@
       "source_metadata": {
         "source_id": "3994",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_session_general_service"
+      }
     },
     {
       "backing_tests": [
@@ -15044,8 +14255,7 @@
       "source_metadata": {
         "source_id": "3979",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_auditing"
+      }
     },
     {
       "backing_tests": [
@@ -15169,8 +14379,7 @@
       "source_metadata": {
         "source_id": "3928",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_user_auth"
+      }
     },
     {
       "backing_tests": [
@@ -15201,8 +14410,7 @@
       "source_metadata": {
         "source_id": "3820",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_user_auth"
+      }
     },
     {
       "backing_tests": [
@@ -15233,8 +14441,7 @@
       "source_metadata": {
         "source_id": "3779",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_alarms_conditions"
+      }
     },
     {
       "backing_tests": [
@@ -15265,8 +14472,7 @@
       "source_metadata": {
         "source_id": "3778",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_alarms_conditions"
+      }
     },
     {
       "backing_tests": [
@@ -15297,8 +14503,7 @@
       "source_metadata": {
         "source_id": "3777",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_alarms_conditions"
+      }
     },
     {
       "backing_tests": [
@@ -15329,8 +14534,7 @@
       "source_metadata": {
         "source_id": "3776",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_alarms_conditions"
+      }
     },
     {
       "backing_tests": [
@@ -15361,8 +14565,7 @@
       "source_metadata": {
         "source_id": "3775",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_alarms_conditions"
+      }
     },
     {
       "backing_tests": [
@@ -15393,8 +14596,7 @@
       "source_metadata": {
         "source_id": "3774",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_alarms_conditions"
+      }
     },
     {
       "backing_tests": [
@@ -15425,8 +14627,7 @@
       "source_metadata": {
         "source_id": "3773",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_alarms_conditions"
+      }
     },
     {
       "backing_tests": [
@@ -15457,8 +14658,7 @@
       "source_metadata": {
         "source_id": "3772",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_alarms_conditions"
+      }
     },
     {
       "backing_tests": [
@@ -15489,8 +14689,7 @@
       "source_metadata": {
         "source_id": "3771",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_alarms_conditions"
+      }
     },
     {
       "backing_tests": [
@@ -15521,8 +14720,7 @@
       "source_metadata": {
         "source_id": "3770",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_alarms_conditions"
+      }
     },
     {
       "backing_tests": [
@@ -15553,8 +14751,7 @@
       "source_metadata": {
         "source_id": "3765",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_alarms_conditions"
+      }
     },
     {
       "backing_tests": [
@@ -15585,8 +14782,7 @@
       "source_metadata": {
         "source_id": "3762",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_alarms_conditions"
+      }
     },
     {
       "backing_tests": [
@@ -15617,8 +14813,7 @@
       "source_metadata": {
         "source_id": "3761",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_alarms_conditions"
+      }
     },
     {
       "backing_tests": [
@@ -15649,8 +14844,7 @@
       "source_metadata": {
         "source_id": "3760",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_alarms_conditions"
+      }
     },
     {
       "backing_tests": [
@@ -15683,8 +14877,7 @@
       "source_metadata": {
         "source_id": "3642",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_subscription_standard"
+      }
     },
     {
       "backing_tests": [
@@ -15746,8 +14939,7 @@
       "source_metadata": {
         "source_id": "3586",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_user_role_management"
+      }
     },
     {
       "backing_tests": [
@@ -15778,8 +14970,7 @@
       "source_metadata": {
         "source_id": "3584",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_certificate_management"
+      }
     },
     {
       "backing_tests": [
@@ -15810,8 +15001,7 @@
       "source_metadata": {
         "source_id": "3582",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_certificate_management"
+      }
     },
     {
       "backing_tests": [
@@ -15842,8 +15032,7 @@
       "source_metadata": {
         "source_id": "3581",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_certificate_management"
+      }
     },
     {
       "backing_tests": [],
@@ -15903,8 +15092,7 @@
       "source_metadata": {
         "source_id": "3576",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_aggregate_full"
+      }
     },
     {
       "backing_tests": [
@@ -15935,8 +15123,7 @@
       "source_metadata": {
         "source_id": "3574",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "service_history"
+      }
     },
     {
       "backing_tests": [
@@ -15967,8 +15154,7 @@
       "source_metadata": {
         "source_id": "3572",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_alarms_conditions"
+      }
     },
     {
       "backing_tests": [
@@ -15999,8 +15185,7 @@
       "source_metadata": {
         "source_id": "3571",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_alarms_conditions"
+      }
     },
     {
       "backing_tests": [
@@ -16062,8 +15247,7 @@
       "source_metadata": {
         "source_id": "3542",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_user_role_management"
+      }
     },
     {
       "backing_tests": [
@@ -16094,8 +15278,7 @@
       "source_metadata": {
         "source_id": "3541",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_user_role_management"
+      }
     },
     {
       "backing_tests": [
@@ -16126,8 +15309,7 @@
       "source_metadata": {
         "source_id": "3540",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_user_role_management"
+      }
     },
     {
       "backing_tests": [
@@ -16158,8 +15340,7 @@
       "source_metadata": {
         "source_id": "3539",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_user_role_management"
+      }
     },
     {
       "backing_tests": [
@@ -16190,8 +15371,7 @@
       "source_metadata": {
         "source_id": "3538",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_user_role_management"
+      }
     },
     {
       "backing_tests": [
@@ -16284,8 +15464,7 @@
       "source_metadata": {
         "source_id": "3226",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_auditing"
+      }
     },
     {
       "backing_tests": [
@@ -16382,14 +15561,20 @@
     },
     {
       "backing_tests": [
-        "test_profile_surface"
+        "test_profile_surface",
+        "tests/unit/test_type_system.c"
       ],
       "cu_optional": false,
       "id": "opc_cu_3182",
-      "implementation_state": "documented",
+      "implementation_state": "implemented",
       "kconfig_symbol": "MUC_OPCUA_CU_AUTHORIZATION_SERVICE_CONFIGURATION_SERVER",
       "kind": "conformance_unit",
-      "notes": "Satisfied by role management implementation.",
+      "semantic_depends_on": [
+        "MUC_OPCUA_CU_USER_TOKEN_JWT",
+        "MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION"
+      ],
+      "depends_on_op": "and",
+      "notes": "AuthorizationServiceConfigurationType nodes are gated directly by this CU.",
       "opc_display_name": "Authorization Service Configuration Server",
       "opc_reference": {
         "cu_id": "3182",
@@ -16409,8 +15594,7 @@
       "source_metadata": {
         "source_id": "3182",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_user_role_management"
+      }
     },
     {
       "backing_tests": [
@@ -16441,8 +15625,7 @@
       "source_metadata": {
         "source_id": "3171",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_2271"
+      }
     },
     {
       "backing_tests": [
@@ -16473,8 +15656,7 @@
       "source_metadata": {
         "source_id": "3165",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_alarms_conditions"
+      }
     },
     {
       "backing_tests": [
@@ -16505,8 +15687,7 @@
       "source_metadata": {
         "source_id": "3162",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_aggregate_full"
+      }
     },
     {
       "backing_tests": [
@@ -16537,8 +15718,7 @@
       "source_metadata": {
         "source_id": "3159",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_aggregate_full"
+      }
     },
     {
       "backing_tests": [
@@ -16571,8 +15751,7 @@
       "source_metadata": {
         "source_id": "3142",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_subscription_standard"
+      }
     },
     {
       "backing_tests": [],
@@ -16634,8 +15813,7 @@
       "source_metadata": {
         "source_id": "3121",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_subscription_standard"
+      }
     },
     {
       "backing_tests": [
@@ -16666,8 +15844,7 @@
       "source_metadata": {
         "source_id": "3107",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_core_structure_2"
+      }
     },
     {
       "backing_tests": [
@@ -16698,8 +15875,7 @@
       "source_metadata": {
         "source_id": "3101",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_aggregate_full"
+      }
     },
     {
       "backing_tests": [
@@ -16730,8 +15906,7 @@
       "source_metadata": {
         "source_id": "3098",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_alarms_conditions"
+      }
     },
     {
       "backing_tests": [
@@ -16762,8 +15937,7 @@
       "source_metadata": {
         "source_id": "3085",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_aggregate_full"
+      }
     },
     {
       "backing_tests": [
@@ -16794,8 +15968,7 @@
       "source_metadata": {
         "source_id": "3084",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_core_structure_2"
+      }
     },
     {
       "backing_tests": [
@@ -16826,8 +15999,7 @@
       "source_metadata": {
         "source_id": "3083",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_alarms_conditions"
+      }
     },
     {
       "backing_tests": [
@@ -16858,8 +16030,7 @@
       "source_metadata": {
         "source_id": "3081",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "service_history"
+      }
     },
     {
       "backing_tests": [
@@ -16921,8 +16092,7 @@
       "source_metadata": {
         "source_id": "3061",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_aggregate_full"
+      }
     },
     {
       "backing_tests": [
@@ -16953,8 +16123,7 @@
       "source_metadata": {
         "source_id": "3060",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_core_structure_2"
+      }
     },
     {
       "backing_tests": [
@@ -16985,8 +16154,7 @@
       "source_metadata": {
         "source_id": "3055",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_aggregate_full"
+      }
     },
     {
       "backing_tests": [
@@ -17017,8 +16185,7 @@
       "source_metadata": {
         "source_id": "3053",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "service_history"
+      }
     },
     {
       "backing_tests": [
@@ -17049,8 +16216,7 @@
       "source_metadata": {
         "source_id": "3049",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_alarms_conditions"
+      }
     },
     {
       "backing_tests": [
@@ -17081,8 +16247,7 @@
       "source_metadata": {
         "source_id": "3043",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_aggregate_full"
+      }
     },
     {
       "backing_tests": [
@@ -17113,8 +16278,7 @@
       "source_metadata": {
         "source_id": "3032",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_aggregate_full"
+      }
     },
     {
       "backing_tests": [
@@ -17145,8 +16309,7 @@
       "source_metadata": {
         "source_id": "3027",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_redundancy"
+      }
     },
     {
       "backing_tests": [
@@ -17208,8 +16371,7 @@
       "source_metadata": {
         "source_id": "3020",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "service_history"
+      }
     },
     {
       "backing_tests": [
@@ -17240,8 +16402,7 @@
       "source_metadata": {
         "source_id": "3018",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_aggregate_full"
+      }
     },
     {
       "backing_tests": [
@@ -17272,8 +16433,7 @@
       "source_metadata": {
         "source_id": "3015",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "service_history"
+      }
     },
     {
       "backing_tests": [
@@ -17304,8 +16464,7 @@
       "source_metadata": {
         "source_id": "3011",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_aggregate_full"
+      }
     },
     {
       "backing_tests": [
@@ -17336,8 +16495,7 @@
       "source_metadata": {
         "source_id": "3006",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_aggregate_full"
+      }
     },
     {
       "backing_tests": [
@@ -17368,8 +16526,7 @@
       "source_metadata": {
         "source_id": "3004",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_alarms_conditions"
+      }
     },
     {
       "backing_tests": [
@@ -17400,8 +16557,7 @@
       "source_metadata": {
         "source_id": "3001",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_alarms_conditions"
+      }
     },
     {
       "backing_tests": [
@@ -17432,8 +16588,7 @@
       "source_metadata": {
         "source_id": "3000",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_core_structure_2"
+      }
     },
     {
       "backing_tests": [
@@ -17464,8 +16619,7 @@
       "source_metadata": {
         "source_id": "2996",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_aggregate_full"
+      }
     },
     {
       "backing_tests": [],
@@ -17525,8 +16679,7 @@
       "source_metadata": {
         "source_id": "2991",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "service_history"
+      }
     },
     {
       "backing_tests": [
@@ -17557,8 +16710,7 @@
       "source_metadata": {
         "source_id": "2985",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_aggregate_full"
+      }
     },
     {
       "backing_tests": [
@@ -17589,8 +16741,7 @@
       "source_metadata": {
         "source_id": "2975",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_aggregate_full"
+      }
     },
     {
       "backing_tests": [
@@ -17621,8 +16772,7 @@
       "source_metadata": {
         "source_id": "2965",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_alarms_conditions"
+      }
     },
     {
       "backing_tests": [
@@ -17653,8 +16803,7 @@
       "source_metadata": {
         "source_id": "2962",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_aggregate_full"
+      }
     },
     {
       "backing_tests": [
@@ -17685,8 +16834,7 @@
       "source_metadata": {
         "source_id": "2960",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_aggregate_full"
+      }
     },
     {
       "backing_tests": [
@@ -17717,8 +16865,7 @@
       "source_metadata": {
         "source_id": "2957",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_alarms_conditions"
+      }
     },
     {
       "backing_tests": [
@@ -17749,8 +16896,7 @@
       "source_metadata": {
         "source_id": "2951",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_alarms_conditions"
+      }
     },
     {
       "backing_tests": [
@@ -17781,8 +16927,7 @@
       "source_metadata": {
         "source_id": "2950",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "service_history"
+      }
     },
     {
       "backing_tests": [
@@ -17813,8 +16958,7 @@
       "source_metadata": {
         "source_id": "2948",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_aggregate_full"
+      }
     },
     {
       "backing_tests": [
@@ -17845,8 +16989,7 @@
       "source_metadata": {
         "source_id": "2947",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "service_history"
+      }
     },
     {
       "backing_tests": [
@@ -17877,8 +17020,7 @@
       "source_metadata": {
         "source_id": "2946",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_alarms_conditions"
+      }
     },
     {
       "backing_tests": [
@@ -17909,8 +17051,7 @@
       "source_metadata": {
         "source_id": "2943",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "service_history"
+      }
     },
     {
       "backing_tests": [
@@ -17941,8 +17082,7 @@
       "source_metadata": {
         "source_id": "2937",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "service_history"
+      }
     },
     {
       "backing_tests": [
@@ -17973,8 +17113,7 @@
       "source_metadata": {
         "source_id": "2929",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "service_history"
+      }
     },
     {
       "backing_tests": [
@@ -18038,8 +17177,7 @@
       "source_metadata": {
         "source_id": "2902",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_user_auth"
+      }
     },
     {
       "backing_tests": [
@@ -18070,8 +17208,7 @@
       "source_metadata": {
         "source_id": "2897",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_alarms_conditions"
+      }
     },
     {
       "backing_tests": [
@@ -18102,8 +17239,7 @@
       "source_metadata": {
         "source_id": "2896",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_alarms_conditions"
+      }
     },
     {
       "backing_tests": [
@@ -18134,8 +17270,7 @@
       "source_metadata": {
         "source_id": "2893",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_alarms_conditions"
+      }
     },
     {
       "backing_tests": [
@@ -18166,8 +17301,7 @@
       "source_metadata": {
         "source_id": "2881",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_alarms_conditions"
+      }
     },
     {
       "backing_tests": [
@@ -18198,8 +17332,7 @@
       "source_metadata": {
         "source_id": "2877",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_alarms_conditions"
+      }
     },
     {
       "backing_tests": [
@@ -18230,8 +17363,7 @@
       "source_metadata": {
         "source_id": "2873",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_user_role_management"
+      }
     },
     {
       "backing_tests": [
@@ -18262,26 +17394,25 @@
       "source_metadata": {
         "source_id": "2871",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_2271"
+      }
     },
     {
       "backing_tests": [
-        "test_secure_channel"
+        "test_reverse_connect"
       ],
       "cu_optional": false,
       "id": "opc_cu_2867",
-      "implementation_state": "documented",
+      "implementation_state": "claimed",
       "kconfig_symbol": "MUC_OPCUA_CU_PROTOCOL_REVERSE_CONNECT_SERVER",
       "kind": "conformance_unit",
-      "notes": "Spec CU 2867: tracked in manifest; not yet claimed or implemented.",
+      "notes": "Directly owned by canonical CU 2867; Reverse Connect behavior is covered by test_reverse_connect.",
       "opc_display_name": "Protocol Reverse Connect Server",
       "opc_reference": {
         "cu_id": "2867",
         "cu_name": "Protocol Reverse Connect Server",
-        "section": null,
+        "section": "7.1.3",
         "source_url": "https://profiles.opcfoundation.org",
-        "spec": null
+        "spec": "OPC-10000-6"
       },
       "profile_defaults": {
         "custom": false,
@@ -18294,8 +17425,7 @@
       "source_metadata": {
         "source_id": "2867",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_ua_secure_conversation"
+      }
     },
     {
       "backing_tests": [
@@ -18326,8 +17456,7 @@
       "source_metadata": {
         "source_id": "2861",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_alarms_conditions"
+      }
     },
     {
       "backing_tests": [
@@ -18391,8 +17520,7 @@
       "source_metadata": {
         "source_id": "2818",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_subscription_standard"
+      }
     },
     {
       "backing_tests": [
@@ -18423,8 +17551,7 @@
       "source_metadata": {
         "source_id": "2817",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_user_auth"
+      }
     },
     {
       "backing_tests": [
@@ -18486,8 +17613,7 @@
       "source_metadata": {
         "source_id": "2806",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_user_role_management"
+      }
     },
     {
       "backing_tests": [
@@ -18518,8 +17644,7 @@
       "source_metadata": {
         "source_id": "2802",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_user_role_management"
+      }
     },
     {
       "backing_tests": [
@@ -18550,8 +17675,7 @@
       "source_metadata": {
         "source_id": "2785",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_ua_secure_conversation"
+      }
     },
     {
       "backing_tests": [
@@ -18613,8 +17737,7 @@
       "source_metadata": {
         "source_id": "2777",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_aliasname"
+      }
     },
     {
       "backing_tests": [
@@ -18645,8 +17768,7 @@
       "source_metadata": {
         "source_id": "2759",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_aggregate_full"
+      }
     },
     {
       "backing_tests": [
@@ -18677,8 +17799,7 @@
       "source_metadata": {
         "source_id": "2746",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_alarms_conditions"
+      }
     },
     {
       "backing_tests": [
@@ -18709,8 +17830,7 @@
       "source_metadata": {
         "source_id": "2740",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "service_history"
+      }
     },
     {
       "backing_tests": [
@@ -18741,8 +17861,7 @@
       "source_metadata": {
         "source_id": "2730",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_aggregate_full"
+      }
     },
     {
       "backing_tests": [
@@ -18773,8 +17892,7 @@
       "source_metadata": {
         "source_id": "2709",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_ua_secure_conversation"
+      }
     },
     {
       "backing_tests": [
@@ -18805,8 +17923,7 @@
       "source_metadata": {
         "source_id": "2705",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_certificate_management"
+      }
     },
     {
       "backing_tests": [
@@ -18837,8 +17954,7 @@
       "source_metadata": {
         "source_id": "2664",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "service_history"
+      }
     },
     {
       "backing_tests": [
@@ -18869,8 +17985,7 @@
       "source_metadata": {
         "source_id": "2629",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_aliasname"
+      }
     },
     {
       "backing_tests": [
@@ -19088,8 +18203,7 @@
       "source_metadata": {
         "source_id": "2454",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_method_server"
+      }
     },
     {
       "backing_tests": [
@@ -19120,8 +18234,7 @@
       "source_metadata": {
         "source_id": "2453",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_certificate_management"
+      }
     },
     {
       "backing_tests": [
@@ -19152,8 +18265,7 @@
       "source_metadata": {
         "source_id": "2450",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_aliasname"
+      }
     },
     {
       "backing_tests": [
@@ -19184,8 +18296,7 @@
       "source_metadata": {
         "source_id": "2449",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_aliasname"
+      }
     },
     {
       "backing_tests": [
@@ -19216,8 +18327,7 @@
       "source_metadata": {
         "source_id": "2448",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_aliasname"
+      }
     },
     {
       "backing_tests": [
@@ -19249,8 +18359,7 @@
       "source_metadata": {
         "source_id": "2391",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_method_server"
+      }
     },
     {
       "backing_tests": [
@@ -19281,8 +18390,7 @@
       "source_metadata": {
         "source_id": "2390",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_alarms_conditions"
+      }
     },
     {
       "backing_tests": [
@@ -19313,8 +18421,7 @@
       "source_metadata": {
         "source_id": "2384",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_aggregate_full"
+      }
     },
     {
       "backing_tests": [
@@ -19345,8 +18452,7 @@
       "source_metadata": {
         "source_id": "2383",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "service_history"
+      }
     },
     {
       "backing_tests": [
@@ -19377,8 +18483,7 @@
       "source_metadata": {
         "source_id": "2382",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_aggregate_full"
+      }
     },
     {
       "backing_tests": [
@@ -19409,8 +18514,7 @@
       "source_metadata": {
         "source_id": "2379",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_aliasname"
+      }
     },
     {
       "backing_tests": [
@@ -19472,8 +18576,7 @@
       "source_metadata": {
         "source_id": "2354",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_2271"
+      }
     },
     {
       "backing_tests": [
@@ -19506,8 +18609,7 @@
       "source_metadata": {
         "source_id": "2353",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_subscription_standard"
+      }
     },
     {
       "backing_tests": [
@@ -19538,8 +18640,7 @@
       "source_metadata": {
         "source_id": "2350",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_aggregate_full"
+      }
     },
     {
       "backing_tests": [
@@ -19570,8 +18671,7 @@
       "source_metadata": {
         "source_id": "2346",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_aggregate_full"
+      }
     },
     {
       "backing_tests": [
@@ -19602,8 +18702,7 @@
       "source_metadata": {
         "source_id": "2345",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "service_read"
+      }
     },
     {
       "backing_tests": [
@@ -19634,8 +18733,7 @@
       "source_metadata": {
         "source_id": "2343",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_alarms_conditions"
+      }
     },
     {
       "backing_tests": [
@@ -19666,8 +18764,7 @@
       "source_metadata": {
         "source_id": "2339",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_aggregate_full"
+      }
     },
     {
       "backing_tests": [],
@@ -19727,8 +18824,7 @@
       "source_metadata": {
         "source_id": "2335",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_aggregate_full"
+      }
     },
     {
       "backing_tests": [
@@ -19759,8 +18855,7 @@
       "source_metadata": {
         "source_id": "2333",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_alarms_conditions"
+      }
     },
     {
       "backing_tests": [
@@ -19791,8 +18886,7 @@
       "source_metadata": {
         "source_id": "2323",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_alarms_conditions"
+      }
     },
     {
       "backing_tests": [
@@ -19823,8 +18917,7 @@
       "source_metadata": {
         "source_id": "2319",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_certificate_management"
+      }
     },
     {
       "backing_tests": [
@@ -19855,8 +18948,7 @@
       "source_metadata": {
         "source_id": "2315",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_alarms_conditions"
+      }
     },
     {
       "backing_tests": [
@@ -19887,8 +18979,7 @@
       "source_metadata": {
         "source_id": "2314",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_aggregate_full"
+      }
     },
     {
       "backing_tests": [
@@ -19919,8 +19010,7 @@
       "source_metadata": {
         "source_id": "2309",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "service_history"
+      }
     },
     {
       "backing_tests": [
@@ -19951,8 +19041,7 @@
       "source_metadata": {
         "source_id": "2305",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_aggregate_full"
+      }
     },
     {
       "backing_tests": [
@@ -19983,8 +19072,7 @@
       "source_metadata": {
         "source_id": "2303",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_aggregate_full"
+      }
     },
     {
       "backing_tests": [
@@ -20015,8 +19103,7 @@
       "source_metadata": {
         "source_id": "2291",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "service_read"
+      }
     },
     {
       "backing_tests": [
@@ -20047,8 +19134,7 @@
       "source_metadata": {
         "source_id": "2289",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "service_history"
+      }
     },
     {
       "backing_tests": [
@@ -20079,8 +19165,7 @@
       "source_metadata": {
         "source_id": "2282",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_aggregate_full"
+      }
     },
     {
       "backing_tests": [
@@ -20111,8 +19196,7 @@
       "source_metadata": {
         "source_id": "2276",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "service_history"
+      }
     },
     {
       "backing_tests": [
@@ -20143,8 +19227,7 @@
       "source_metadata": {
         "source_id": "2275",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_alarms_conditions"
+      }
     },
     {
       "backing_tests": [
@@ -20175,8 +19258,7 @@
       "source_metadata": {
         "source_id": "2273",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_aggregate_full"
+      }
     },
     {
       "backing_tests": [
@@ -20207,8 +19289,7 @@
       "source_metadata": {
         "source_id": "2267",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_aggregate_full"
+      }
     },
     {
       "backing_tests": [
@@ -20239,8 +19320,7 @@
       "source_metadata": {
         "source_id": "2263",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_aggregate_full"
+      }
     },
     {
       "backing_tests": [
@@ -20271,8 +19351,7 @@
       "source_metadata": {
         "source_id": "2258",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_redundancy"
+      }
     },
     {
       "backing_tests": [
@@ -20303,8 +19382,7 @@
       "source_metadata": {
         "source_id": "2239",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_alarms_conditions"
+      }
     },
     {
       "backing_tests": [
@@ -20335,8 +19413,7 @@
       "source_metadata": {
         "source_id": "2236",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_certificate_management"
+      }
     },
     {
       "backing_tests": [
@@ -20367,8 +19444,7 @@
       "source_metadata": {
         "source_id": "2233",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_certificate_management"
+      }
     },
     {
       "backing_tests": [
@@ -20399,8 +19475,7 @@
       "source_metadata": {
         "source_id": "2232",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_certificate_management"
+      }
     },
     {
       "backing_tests": [
@@ -20431,8 +19506,7 @@
       "source_metadata": {
         "source_id": "2224",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "service_history"
+      }
     },
     {
       "backing_tests": [
@@ -20463,8 +19537,7 @@
       "source_metadata": {
         "source_id": "2223",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_aggregate_full"
+      }
     },
     {
       "backing_tests": [
@@ -20495,8 +19568,7 @@
       "source_metadata": {
         "source_id": "2220",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_aggregate_full"
+      }
     },
     {
       "backing_tests": [
@@ -20527,8 +19599,7 @@
       "source_metadata": {
         "source_id": "2210",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_aggregate_full"
+      }
     },
     {
       "backing_tests": [
@@ -20559,8 +19630,7 @@
       "source_metadata": {
         "source_id": "2203",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "service_read"
+      }
     },
     {
       "backing_tests": [
@@ -20591,8 +19661,7 @@
       "source_metadata": {
         "source_id": "2202",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_alarms_conditions"
+      }
     },
     {
       "backing_tests": [
@@ -20623,8 +19692,7 @@
       "source_metadata": {
         "source_id": "2188",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_aggregate_full"
+      }
     },
     {
       "backing_tests": [
@@ -20655,8 +19723,7 @@
       "source_metadata": {
         "source_id": "2180",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_alarms_conditions"
+      }
     },
     {
       "backing_tests": [
@@ -20687,8 +19754,7 @@
       "source_metadata": {
         "source_id": "2175",
         "source_url": "https://profiles.opcfoundation.org"
-      },
-      "satisfied_by": "opc_cu_aggregate_full"
+      }
     },
     {
       "backing_tests": [],
@@ -20828,34 +19894,6 @@
         "custom": false,
         "embedded": false,
         "full": true,
-        "micro": false,
-        "nano": false,
-        "standard": false
-      }
-    },
-    {
-      "backing_tests": [],
-      "default_unconditional": false,
-      "depends_on": [
-        "MUC_OPCUA_CU_USER_TOKEN_JWT",
-        "MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION"
-      ],
-      "depends_on_op": "and",
-      "id": "cu_authorization_service_server",
-      "implementation_state": "implemented",
-      "kconfig_symbol": "MUC_OPCUA_CU_AUTHORIZATION_SERVICE_SERVER",
-      "kind": "optimization",
-      "notes": "Authorization Service configuration nodes (OPC-10000-7 CU 1629). Build gate; off by default in all profiles, selectable. Reconciled from a hand-added Kconfig symbol.",
-      "opc_display_name": "Authorization Service Server",
-      "opc_reference": {
-        "facet": "Authorization Service Server Facet",
-        "section": "CU 1629",
-        "spec": "OPC-10000-7"
-      },
-      "profile_defaults": {
-        "custom": false,
-        "embedded": false,
-        "full": false,
         "micro": false,
         "nano": false,
         "standard": false
