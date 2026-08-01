@@ -1,21 +1,48 @@
 # Conformance: Enhanced DataChange Subscription 2022 Server Facet (spec 063)
 
 This server implements the OPC UA **Enhanced DataChange Subscription 2022 Server Facet**
-(OPC profile-DB facet `EnhancedDataChangeSubscription2017`, **id 1678**). It is a
+(OPC profile-DB facet `EnhancedDataChangeSubscription2017`, **id 1678**). This is the
+documented source identity for the facet; the committed OPC profile composition graph at
+`profiles/opcua-profile-graph.json` models the same facet under **id 1627**. It is a
 **capacity tier** of the DataChange subscription engine, not a distinct code path — it
 raises the mandatory minima of the base **Standard DataChange Subscription 2022** facet
 (id 1675, which Enhanced *includes*).
 
-## Why the server claims it (it is mandatory, not optional)
+## Why the server claims it (project policy bridges the graph snapshot)
 
 The `standard` and `full` Kconfig profiles advertise
 `http://opcfoundation.org/UA-Profile/Server/StandardUA2017` (see
 `src/address_space/base_nodes.c`, `s_server_profile_array`, gated by the generated
-`MUC_OPCUA_STANDARD_PROFILE` marker). The **Standard 2022 UA Server Profile (id 1663)** lists the
-Enhanced DataChange 2022 facet with `isOptional = false` — so any server advertising
-StandardUA2017 **must** meet the Enhanced minima. `embedded` advertises `EmbeddedUA2017`,
-which mandates only the plain **Standard DataChange 2022** facet (a lower queue-depth
-floor), so embedded is a Standard-tier — not Enhanced — DataChange server.
+`MUC_OPCUA_STANDARD_PROFILE` marker) and meet the Enhanced DataChange capacity minima.
+The committed graph at `profiles/opcua-profile-graph.json` does **not** confer this:
+**root 2269** (Standard 2025 UA Server Profile) has mandatory children 2268 (Embedded
+2025) and 1696 (X509), but **no mandatory path** to **facet 1627** (Enhanced DataChange
+Subscription 2017 Server Facet). Facet 1627 itself contains four mandatory CUs (5242,
+5250, 5249, 5248) and one child facet (Standard DataChange Subscription 2022, id 1324,
+`isOptional = false`).
+
+The project enables these four CUs through two mechanisms in
+`profiles/opcua-profile-manifest.yaml`, resolved by
+`scripts/profile_manifest/graph_deps.py` (`resolve_into`):
+
+- **`standard`**: Each of the four Enhanced CUs carries
+  `project_profile_defaults: {"standard": true}` — an explicit project-policy layer
+  applied additively **after** graph derivation. `resolve_into` only enables
+  validated profile keys listed in `project_profile_defaults`; it never removes
+  or weakens graph-derived defaults. This is what enables the CUs for standard
+  builds despite the disconnected graph snapshot.
+
+- **`full`**: `full` is derived from `implementation_state`: every CU whose state
+  is `claimed` is automatically `true` for `full`. All four Enhanced CUs are
+  `claimed` in the manifest, so `full` builds inherit them.
+
+Each CU also lists `semantic_depends_on: [MUC_OPCUA_CU_SUBSCRIPTION_STANDARD]`,
+requiring the Standard DataChange subscription core before Enhanced capacity can
+activate.
+
+`embedded` advertises `EmbeddedUA2017`, which mandates only the Standard DataChange
+2022 facet (a lower queue-depth floor), so embedded stays a Standard-tier DataChange
+server.
 
 | Profile | Advertised profile | DataChange facet claimed | Queue depth |
 |---|---|---|---|
@@ -26,7 +53,7 @@ floor), so embedded is a Standard-tier — not Enhanced — DataChange server.
 
 ## Grounded minima (all four CUs are mandatory)
 
-Grounded from the live OPC profile DB (facet id 1678,
+Grounded from the live OPC profile DB (facet id 1678; graph node 1627 in the committed snapshot,
 [profiles.opcfoundation.org](https://profiles.opcfoundation.org)); `isOptional = false`
 for every unit. There is **no** `MaxNotificationsPerPublish` or `MinSupportedSampleRate`
 CU in this facet — the set below is exhaustive.

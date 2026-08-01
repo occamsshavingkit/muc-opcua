@@ -27,13 +27,18 @@ Grounded against:
 | NodeId | BrowseName | NodeClass | TypeDefinition | Modelling Rule | DataType |
 |---:|---|---|---|---|---|
 | 17852 | AuthorizationServiceConfigurationType | ObjectType | BaseObjectType (58) | — | — |
-| 17853 | ServiceUri | Variable | PropertyType (68) | Mandatory | String (12) |
-| 17854 | ServiceCertificate | Variable | PropertyType (68) | Mandatory | ByteString (15) |
-| 17855 | IssuerEndpointUrl | Variable | PropertyType (68) | Mandatory | String (12) |
+| 18072 | ServiceUri | Variable | PropertyType (68) | Mandatory | String (12) |
+| 17860 | ServiceCertificate | Variable | PropertyType (68) | Mandatory | ByteString (15) |
+| 18073 | IssuerEndpointUrl | Variable | PropertyType (68) | Mandatory | String (12) |
 
-The property NodeIds (17853/17854/17855) are project-local allocations; the
-OPC UA spec ships BrowseNames only for these InstanceDeclarations. They live
-in the 17xxx range alongside the type NodeId.
+NodeIds sourced from the OPC Foundation's official UA-Nodeset repository
+([OPCFoundation/UA-Nodeset@`6338cced8e6cc2fa2c3816bc6b3bad5daee3f101`](https://github.com/OPCFoundation/UA-Nodeset/blob/6338cced8e6cc2fa2c3816bc6b3bad5daee3f101/Schema/Opc.Ua.NodeSet2.Services.xml#L36884-L36918))
+and the companion CSV index
+([`Schema/NodeIds.csv` lines 6025-6033](https://github.com/OPCFoundation/UA-Nodeset/blob/6338cced8e6cc2fa2c3816bc6b3bad5daee3f101/Schema/NodeIds.csv#L6025-L6033)
+and [lines 6245-6246](https://github.com/OPCFoundation/UA-Nodeset/blob/6338cced8e6cc2fa2c3816bc6b3bad5daee3f101/Schema/NodeIds.csv#L6245-L6246)).
+The NodeIds 17853 through 17855 are `WriterGroupType` InstanceDeclaration
+nodes defined in OPC-10000-14 §9.1.6.3 and therefore cannot be reused for
+`AuthorizationServiceConfigurationType` properties.
 
 ## Out of Scope
 

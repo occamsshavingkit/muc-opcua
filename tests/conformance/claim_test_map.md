@@ -20,8 +20,8 @@ Backing test column: comma-separated ctest names (as registered).
 | Claim / conformance unit | OPC UA § | Profiles | Backing test |
 |--------------------------|----------|----------|--------------|
 | Secure channel message crypto | OPC-10000-7 §4.3 | micro, embedded, standard, full | test_secure_handshake_modern |
-| Monitor Items 500 | OPC-10000-4 §5.13.2 | standard, full | test_subscriptions_capacity |
-| Monitor MinQueueSize_05 | OPC-10000-4 §5.13.2 | standard, full | test_subscriptions_capacity |
+| Monitor Items 500: Monitor Items 500 | OPC-10000-4 §5.13.2 | standard, full | test_subscriptions_capacity |
+| Monitor MinQueueSize_05: Monitor MinQueueSize_05 | OPC-10000-4 §5.13.2 | standard, full | test_subscriptions_capacity |
 | Address Space AddIn Reference |  | full | test_profile_surface |
 | Address Space AddIn DefaultInstanceBrowsename |  | full | test_profile_surface |
 | Base Info LocalTime |  | full | test_profile_surface |
@@ -117,9 +117,9 @@ Backing test column: comma-separated ctest names (as registered).
 | Aggregate Subscription – VarianceSample | OPC-10000-13 §5.4.3.38 | full | test_profile_surface |
 | Aggregate Subscription – StandardDeviationPopulation | OPC-10000-13 §5.4.3.39 | full | test_profile_surface |
 | Aggregate Subscription – VariancePopulation | OPC-10000-13 §5.4.3.40 | full | test_profile_surface |
-| Subscription Publish Min 10 |  | full | test_subscriptions_capacity, test_subscription_deadband, test_subscription_publish |
-| Subscription Minimum 05 |  | full | test_subscriptions_capacity, test_subscription_deadband, test_subscription_publish |
-| Authorization Service Configuration Server |  | full | test_profile_surface, tests/unit/test_type_system.c |
+| Subscription Publish Min 10 |  | standard, full | test_subscriptions_capacity, test_subscription_deadband, test_subscription_publish |
+| Subscription Minimum 05 |  | standard, full | test_subscriptions_capacity, test_subscription_deadband, test_subscription_publish |
+| Authorization Service Configuration Server | OPC-10000-12 §9.7.4 | full | test_profile_surface, tests/unit/test_type_system.c |
 | Aggregate - StandardDeviationPopulation |  |  | test_history |
 | Aggregate - Interpolative |  |  | test_history |
 | Aggregate - MaximumActualTime2 |  |  | test_history |

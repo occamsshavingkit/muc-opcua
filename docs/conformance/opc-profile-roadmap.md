@@ -459,8 +459,8 @@ remains future work.
 | opc_cu_5276 | conformance_unit | documented |  | MUC_OPCUA_CU_SECURITY_ROLE_SERVER_APPLICATIONMANAGEMENT | full | test_profile_surface |
 | opc_cu_5275 | conformance_unit | documented |  | MUC_OPCUA_CU_SECURITY_ROLE_SERVER_ENDPOINTMANAGEMENT | full | test_profile_surface |
 | opc_cu_5274 | conformance_unit | documented |  | MUC_OPCUA_CU_SECURITY_ROLE_SERVER_IDENTITYMANAGEMENT | full | test_profile_surface |
-| opc_cu_5249 | conformance_unit | claimed |  | MUC_OPCUA_CU_SUBSCRIPTION_PUBLISH_MIN_10 | full | test_subscriptions_capacity, test_subscription_deadband, test_subscription_publish |
-| opc_cu_5248 | conformance_unit | claimed |  | MUC_OPCUA_CU_SUBSCRIPTION_MINIMUM_05 | full | test_subscriptions_capacity, test_subscription_deadband, test_subscription_publish |
+| opc_cu_5249 | conformance_unit | claimed |  | MUC_OPCUA_CU_SUBSCRIPTION_PUBLISH_MIN_10 | standard, full | test_subscriptions_capacity, test_subscription_deadband, test_subscription_publish |
+| opc_cu_5248 | conformance_unit | claimed |  | MUC_OPCUA_CU_SUBSCRIPTION_MINIMUM_05 | standard, full | test_subscriptions_capacity, test_subscription_deadband, test_subscription_publish |
 | opc_cu_5213 | conformance_unit | documented |  | MUC_OPCUA_CU_AUDITING_CONNECTIONS | full | test_audit_events, test_event_notifications |
 | opc_cu_4957 | conformance_unit | documented |  | MUC_OPCUA_CU_SECURITY_USER_IDENTITY_TOKEN_SUPPORT | full | test_profile_surface |
 | opc_cu_4505 | conformance_unit | documented |  | MUC_OPCUA_CU_SECURITY_USER_MANAGEMENT_SERVER | full | test_profile_surface |
@@ -518,7 +518,7 @@ remains future work.
 | opc_cu_3213 | conformance_unit | documented |  | MUC_OPCUA_CU_BASE_INFO_FILE_TYPE_BASE | full | test_profile_surface |
 | opc_cu_3203 | conformance_unit | documented |  | MUC_OPCUA_CU_BASE_INFO_MODEL_CHANGE_GENERAL | full | test_profile_surface |
 | opc_cu_3197 | conformance_unit | documented |  | MUC_OPCUA_CU_BASE_INFO_SECURITY_ROLE_CAPABILITIES | full | test_profile_surface |
-| opc_cu_3182 | conformance_unit | implemented |  | MUC_OPCUA_CU_AUTHORIZATION_SERVICE_CONFIGURATION_SERVER | full | test_profile_surface, tests/unit/test_type_system.c |
+| opc_cu_3182 | conformance_unit | implemented | OPC-10000-12 §9.7.4 | MUC_OPCUA_CU_AUTHORIZATION_SERVICE_CONFIGURATION_SERVER | full | test_profile_surface, tests/unit/test_type_system.c |
 | opc_cu_3171 | conformance_unit | documented |  | MUC_OPCUA_CU_DISCOVERY_SERVER_ANNOUNCEMENT_USING_MDNS | full | test_claim_map |
 | opc_cu_3165 | conformance_unit | documented |  | MUC_OPCUA_CU_A_C_SHELVING | full | test_alarms_conditions |
 | opc_cu_3162 | conformance_unit | claimed |  | MUC_OPCUA_CU_AGGREGATE_STANDARDDEVIATIONPOPULATION | — | test_history |

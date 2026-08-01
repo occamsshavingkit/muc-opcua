@@ -457,8 +457,8 @@ to refresh.
 |---------|------|-------|------|-------|----------|----------|------|------------|
 | READ_CACHE | read_cache | implemented |  |  |  |  |  |  |
 | SECURE_CHANNEL_CRYPTO | secure_channel_crypto | implemented |  | ✅ | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
-| MUC_OPCUA_CU_MONITOR_ITEMS_500 | opc_monitor_items_500 | claimed |  |  |  | ✅ | ✅ |  |
-| MUC_OPCUA_CU_MONITOR_MINQUEUESIZE_05 | opc_monitor_minqueuesize_05 | claimed |  |  |  | ✅ | ✅ |  |
+| MUC_OPCUA_CU_MONITOR_ITEMS_500 | opc_monitor_items_500 | claimed |  |  |  | ✅ | ✅ | MUC_OPCUA_CU_SUBSCRIPTION_STANDARD |
+| MUC_OPCUA_CU_MONITOR_MINQUEUESIZE_05 | opc_monitor_minqueuesize_05 | claimed |  |  |  | ✅ | ✅ | MUC_OPCUA_CU_SUBSCRIPTION_STANDARD |
 | MUC_OPCUA_FACET_CORE_2022_SERVER | opc_facet_1322 | implemented | ✅ | ✅ | ✅ | ✅ | ✅ |  |
 | MUC_OPCUA_CU_ADDRESS_SPACE_ADDIN_REFERENCE | opc_cu_2446 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
 | MUC_OPCUA_CU_ADDRESS_SPACE_ADDIN_DEFAULTINSTANCEBROWSENAME | opc_cu_2447 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
@@ -523,8 +523,8 @@ to refresh.
 | MUC_OPCUA_CU_DISCOVERY_FIND_SERVERS_SELF | opc_cu_2352 | claimed | ✅ | ✅ | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
 | MUC_OPCUA_CU_ATTRIBUTE_WRITE_VALUES | opc_cu_2389 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
 | MUC_OPCUA_CU_SESSION_CHANGE_USER | opc_cu_2400 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
-| MUC_OPCUA_CU_ATTRIBUTE_WRITE_STATUSCODE_TIMESTAMP | opc_cu_2936 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
-| MUC_OPCUA_CU_ATTRIBUTE_WRITE_INDEX_RANGE | opc_cu_3147 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
+| MUC_OPCUA_CU_ATTRIBUTE_WRITE_STATUSCODE_TIMESTAMP | opc_cu_2936 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER, MUC_OPCUA_CU_ATTRIBUTE_WRITE_VALUES |
+| MUC_OPCUA_CU_ATTRIBUTE_WRITE_INDEX_RANGE | opc_cu_3147 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER, MUC_OPCUA_CU_ATTRIBUTE_WRITE_VALUES |
 | MUC_OPCUA_CU_BASE_INFO_DIAGNOSTICS | opc_cu_3192 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
 | MUC_OPCUA_CU_VIEW_BASIC_2 | opc_cu_3530 | claimed | ✅ | ✅ | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
 | MUC_OPCUA_CU_BASE_SERVICES_DIAGNOSTICS | opc_cu_3983 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
@@ -571,9 +571,9 @@ to refresh.
 | MUC_OPCUA_CU_AGGREGATE_SUBSCRIPTION_VARIANCESAMPLE | opc_cu_2281 | claimed |  |  |  |  | ✅ |  |
 | MUC_OPCUA_CU_AGGREGATE_SUBSCRIPTION_STANDARDDEVIATIONPOPULATION | opc_cu_2955 | claimed |  |  |  |  | ✅ |  |
 | MUC_OPCUA_CU_AGGREGATE_SUBSCRIPTION_VARIANCEPOPULATION | opc_cu_2178 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_SUBSCRIPTION_PUBLISH_MIN_10 | opc_cu_5249 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_SUBSCRIPTION_MINIMUM_05 | opc_cu_5248 | claimed |  |  |  |  | ✅ |  |
-| MUC_OPCUA_CU_AUTHORIZATION_SERVICE_CONFIGURATION_SERVER | opc_cu_3182 | implemented |  |  |  |  | ✅ |  |
+| MUC_OPCUA_CU_SUBSCRIPTION_PUBLISH_MIN_10 | opc_cu_5249 | claimed |  |  |  | ✅ | ✅ | MUC_OPCUA_CU_SUBSCRIPTION_STANDARD |
+| MUC_OPCUA_CU_SUBSCRIPTION_MINIMUM_05 | opc_cu_5248 | claimed |  |  |  | ✅ | ✅ | MUC_OPCUA_CU_SUBSCRIPTION_STANDARD |
+| MUC_OPCUA_CU_AUTHORIZATION_SERVICE_CONFIGURATION_SERVER | opc_cu_3182 | implemented |  |  |  |  | ✅ | MUC_OPCUA_CU_USER_TOKEN_JWT, MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION |
 | MUC_OPCUA_CU_AGGREGATE_STANDARDDEVIATIONPOPULATION | opc_cu_3162 | claimed |  |  |  |  |  |  |
 | MUC_OPCUA_CU_AGGREGATE_INTERPOLATIVE | opc_cu_3159 | claimed |  |  |  |  |  |  |
 | MUC_OPCUA_CU_AGGREGATE_MAXIMUMACTUALTIME2 | opc_cu_3101 | claimed |  |  |  |  |  |  |
