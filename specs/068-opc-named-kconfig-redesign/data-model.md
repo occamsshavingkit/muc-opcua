@@ -67,8 +67,9 @@ No changes to capacity model. Capacities remain in separate menu with existing o
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `id` | string | Marker symbol (e.g., `MARKER_STANDARD_PROFILE`) |
-| `default_if` | string[] | Profile choice values that set this marker to y |
+| `id` | string | Marker symbol (e.g., `MUC_OPCUA_MARKER_STANDARD_PROFILE`) |
+| `required_profile` | string | Profile whose currently selectable mandatory CUs form the marker's AND closure |
+| `note` | string | Generated Kconfig comment explaining the marker's use |
 
 ## Symbol Naming Convention
 
@@ -111,30 +112,44 @@ def compute_symbol(kind: str, opc_display_name: str) -> str:
 - No Profile symbol may end with `_PROFILE` after the `MUC_OPCUA_PROFILE_` prefix.
 - All symbols must be valid Kconfig identifiers (`[A-Za-z0-9_]+`).
 - No duplicate symbols across items or capacities.
+- Every advertised marker id must be a unique valid Kconfig symbol, and its
+  `required_profile` must name a profile declared by the manifest.
+- The generator derives each advertised marker closure from selectable
+  Conformance Units whose requirement for `required_profile` is `mandatory`.
+  A marker with no such selectable closure emits an unconditional `default n`.
 
 ## State Transitions
 
 ### Profile state machine
 
+**Revised 2026-08-01**: Profile selection is stable. The explicitly selected profile seed never auto-changes to `custom` based on Facet/CU overrides. Custom is only ever an explicit user selection. Advertisement markers are generated independently from mandatory CU requirements.
+
 ```
           ┌─────────────┐
-          │   Custom    │◄────────┐
-          └─────────────┘         │
-                ▲                 │ (user changes any Facet/CU
-                 │                 │  from profile default)
-    ┌───────┐   │   ┌────────┐    │
-    │Nano   │◄──┼──►│Standard│────┘
-    └───────┘   │   └────────┘
-    ┌───────┐   │   ┌────────┐
-    │Micro  │◄──┼──►│ Full   │
-    └───────┘   │   └────────┘
-    ┌──────────┐│
-    │Embedded  ││
-    └──────────┘│
-                │
-     (user selects named profile)
+          │   Custom    │  (explicit selection only)
+          └─────────────┘
+          ┌─────────────┐
+          │    Nano     │  (stable seed; markers report fidelity)
+          └─────────────┘
+          ┌─────────────┐
+          │    Micro    │
+          └─────────────┘
+          ┌──────────────┐
+          │  Embedded    │
+          └──────────────┘
+          ┌─────────────┐
+          │  Standard   │
+          └─────────────┘
+          ┌─────────────┐
+          │    Full     │
+          └─────────────┘
 ```
 
-- Selecting a named profile sets all Facet/CU defaults per manifest.
-- Any Facet/CU change from profile defaults → effective profile becomes custom.
-- Return all to profile defaults → fidelity check passes for that profile.
+- Selecting a named profile sets all Facet/CU defaults per manifest and marks the profile choice symbol as the seed.
+- ~~Any Facet/CU change from profile defaults → effective profile becomes custom.~~ **Superseded**: Facet/CU overrides do not rewrite the profile choice. The seed symbol remains stable.
+- ~~Return all to profile defaults → a fidelity helper selects that profile.~~ Superseded: no fidelity-helper symbols are generated. Each advertisement marker is a hidden bool whose `default y if` directly ANDs every currently selectable CU marked mandatory for `required_profile`; if the closure is unavailable, it defaults `n`.
+- Changing `MUC_OPCUA_PROFILE` is an explicit reseed: on each CMake configure,
+  the selected `configs/<profile>.defconfig` is loaded as the Kconfig base and
+  all Facet/CU defaults are resolved again. An explicit
+  `MUC_OPCUA_KCONFIG_CONFIG` replaces that profile defconfig and therefore
+  preserves the supplied `.config` instead of reseeding from the named profile.
