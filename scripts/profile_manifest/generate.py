@@ -33,11 +33,6 @@ _SELECTABLE_STATES = ("claimed", "implemented", "deferred")
 _KCONFIG_SELECTABLE_STATES = ("claimed", "implemented")
 _UNSELECTABLE_STATES = ("unimplemented", "documented", "deferred")
 
-_MARKER_ID_RENAMES: dict[str, str] = {
-    "STANDARD_PROFILE": "MUC_OPCUA_MARKER_STANDARD_PROFILE",
-}
-
-
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
@@ -281,6 +276,42 @@ def _contained_cu_ids(manifest: dict) -> set[str]:
                 if isinstance(cu_id, str):
                     ids.add(cu_id)
     return ids
+
+
+def _required_profile_cu_symbols(
+    manifest: dict, profile_key: object,
+) -> list[str] | None:
+    if not isinstance(profile_key, str) or not profile_key:
+        return None
+
+    symbols: set[str] = set()
+    found_requirement = False
+    for item in manifest.get("items", []):
+        if not isinstance(item, dict) or item.get("kind") != "conformance_unit":
+            continue
+        graph_requirements = item.get("required_for_profile")
+        project_requirements = item.get("project_required_for_profile")
+        required = (
+            isinstance(graph_requirements, dict)
+            and graph_requirements.get(profile_key) is True
+        ) or (
+            isinstance(project_requirements, dict)
+            and project_requirements.get(profile_key) is True
+        )
+        if not required:
+            continue
+
+        found_requirement = True
+        if item.get("implementation_state") not in _KCONFIG_SELECTABLE_STATES:
+            return None
+        symbol = _cu_symbol(item)
+        if not symbol:
+            return None
+        symbols.add(symbol)
+
+    if not found_requirement:
+        return None
+    return sorted(symbols)
 
 
 # ---------------------------------------------------------------------------
@@ -568,12 +599,14 @@ def generate_kconfig(manifest: dict) -> str:
         note = marker.get("note")
         if note:
             lines.append("# " + note)
-        marker_id = str(_MARKER_ID_RENAMES.get(marker["id"], marker["id"]))
+        marker_id = str(marker["id"])
         lines.append("config " + marker_id)
         lines.append("\tbool")
-        conditions = marker.get("default_if", [])
-        if conditions:
-            lines.append("\tdefault y if " + " || ".join(conditions))
+        required_symbols = _required_profile_cu_symbols(
+            manifest, marker.get("required_profile"),
+        )
+        if required_symbols:
+            lines.append("\tdefault y if " + " && ".join(required_symbols))
         else:
             lines.append("\tdefault n")
         lines.append("")
@@ -1504,6 +1537,8 @@ def _claim_name(item: dict) -> str:
     if isinstance(opc_ref, dict):
         facet = opc_ref.get("facet")
         cu_name = opc_ref.get("cu_name")
+    if facet and cu_name and facet == cu_name:
+        return str(cu_name)
     if facet and cu_name:
         return str(facet) + ": " + str(cu_name)
     if facet:
