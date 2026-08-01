@@ -65,10 +65,10 @@ void tearDown(void) {}
 #define PROFILE_SURFACE_HAS_VIEW_TRANSLATEBROWSEPATH 0
 #endif
 
-#if defined(MUC_OPCUA_CU_CORE_2017_ATTRIBUTE_WRITE) && MUC_OPCUA_CU_CORE_2017_ATTRIBUTE_WRITE
-#define PROFILE_SURFACE_HAS_WRITE_AGGREGATE 1
+#if defined(MUC_OPCUA_CU_ATTRIBUTE_WRITE_VALUES) && MUC_OPCUA_CU_ATTRIBUTE_WRITE_VALUES
+#define PROFILE_SURFACE_HAS_WRITE_VALUES 1
 #else
-#define PROFILE_SURFACE_HAS_WRITE_AGGREGATE 0
+#define PROFILE_SURFACE_HAS_WRITE_VALUES 0
 #endif
 
 #if defined(MUC_OPCUA_CU_BASE_INFO_DIAGNOSTICS) && MUC_OPCUA_CU_BASE_INFO_DIAGNOSTICS
@@ -121,19 +121,18 @@ void test_nano_default_service_surface_does_not_claim_optional_cus(void) {
         return;
     }
 
-    assert_cu_surface_disabled("MUC_OPCUA_CU_CORE_2017_ATTRIBUTE_WRITE", PROFILE_SURFACE_HAS_WRITE_AGGREGATE);
+    assert_cu_surface_disabled("MUC_OPCUA_CU_ATTRIBUTE_WRITE_VALUES", PROFILE_SURFACE_HAS_WRITE_VALUES);
     assert_cu_surface_disabled("ActivateSession change-user optional CU", PROFILE_SURFACE_HAS_CHANGE_USER_OPTIONAL_CU);
     assert_cu_surface_disabled("MUC_OPCUA_CU_BASE_INFO_DIAGNOSTICS", PROFILE_SURFACE_HAS_BASE_INFO_DIAGNOSTICS_CU);
 }
 
 void test_optional_service_surface_tracks_current_compile_time_gates(void) {
     /* CASE-010 / quickstart path 4: optional Write and Diagnostics coverage is
-       tied to the current aggregate gates, not to future dedicated in-scope CU
-       symbols. This keeps T009 foundational and avoids promotion by test name. */
-#if PROFILE_SURFACE_HAS_WRITE_AGGREGATE
-    assert_cu_surface_enabled("MUC_OPCUA_CU_CORE_2017_ATTRIBUTE_WRITE", PROFILE_SURFACE_HAS_WRITE_AGGREGATE);
+       tied to their canonical CU gates. */
+#if PROFILE_SURFACE_HAS_WRITE_VALUES
+    assert_cu_surface_enabled("MUC_OPCUA_CU_ATTRIBUTE_WRITE_VALUES", PROFILE_SURFACE_HAS_WRITE_VALUES);
 #else
-    assert_cu_surface_disabled("MUC_OPCUA_CU_CORE_2017_ATTRIBUTE_WRITE", PROFILE_SURFACE_HAS_WRITE_AGGREGATE);
+    assert_cu_surface_disabled("MUC_OPCUA_CU_ATTRIBUTE_WRITE_VALUES", PROFILE_SURFACE_HAS_WRITE_VALUES);
 #endif
 
 #if PROFILE_SURFACE_HAS_BASE_INFO_DIAGNOSTICS_CU
