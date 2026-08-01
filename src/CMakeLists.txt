@@ -57,9 +57,9 @@ endif()
 #   1. file(GLOB[_RECURSE]) on the CU directory under src/cu/<facet>/<cu>/
 #   2. Adds the sources to muc_opcua
 #   3. Emits the CU/facet compile definition
-# Legacy symbol aliases (MUC_OPCUA_<OLD_NAME>=1) are emitted alongside CU
-# defines where include/ or tests/ still reference them. SERVICE_* bridge
-# defines that were unreferenced outside src/CMakeLists.txt have been removed.
+# Canonical CU/facet definitions own source gating. Runtime bridge definitions
+# remain only where production code consumes them; removed subscription and
+# profile aliases are not reintroduced.
 # =============================================================================
 
 # -- CU: Attribute Read (facet: Core 2022 Server) --
@@ -159,10 +159,6 @@ endif()
 if(MUC_OPCUA_CU_ATTRIBUTE_WRITE_INDEX_RANGE)
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_CU_ATTRIBUTE_WRITE_INDEX_RANGE=1)
 endif()
-if(MUC_OPCUA_CU_CORE_2017_ATTRIBUTE_WRITE)
-    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_CU_CORE_2017_ATTRIBUTE_WRITE=1)
-endif()
-
 if(MUC_OPCUA_CU_SESSION_GENERAL_SERVICE)
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_CU_SESSION_GENERAL_SERVICE=1)
 endif()
@@ -244,7 +240,6 @@ if(MUC_OPCUA_CU_SUBSCRIPTION_BASIC)
         ${CMAKE_CURRENT_SOURCE_DIR}/cu/core_2022_server/subscription/basic/uadp_encoder.c)
     target_sources(muc_opcua PRIVATE ${_sources})
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_CU_SUBSCRIPTION_BASIC=1)
-    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_SUBSCRIPTIONS=1)
 
     # -- CU: Subscription Standard (aggregates, triggering) --
     # dispatch_method.c requires the triple condition (Subscriptions + Standard
@@ -256,7 +251,6 @@ if(MUC_OPCUA_CU_SUBSCRIPTION_BASIC)
             ${CMAKE_CURRENT_SOURCE_DIR}/cu/core_2022_server/subscription/standard/dispatch_method.c)
         target_sources(muc_opcua PRIVATE ${_sources})
         target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_CU_SUBSCRIPTION_STANDARD=1)
-        target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_SUBSCRIPTIONS_STANDARD=1)
     endif()
 endif()
 
@@ -291,8 +285,7 @@ if(MUC_OPCUA_CU_HISTORICAL_ACCESS_SERVER_FACET)
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_SERVICE_HISTORY=1)
 endif()
 
-# -- Define-only CU flags (gated entirely on CU symbols; legacy aliases kept
-# for include/ and tests/ backward compatibility) --
+# -- Define-only CU flags and runtime bridge definitions --
 if(MUC_OPCUA_CU_USER_AUTH)
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_CU_USER_AUTH=1)
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_USER_AUTH=1)
@@ -397,7 +390,6 @@ endif()
 
 if(MUC_OPCUA_MARKER_STANDARD_PROFILE)
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_MARKER_STANDARD_PROFILE=1)
-    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_STANDARD_PROFILE=1)
 endif()
 
 # -- CU 2867: Reverse Connect Server (OPC-10000-6 §7.1.3) --
