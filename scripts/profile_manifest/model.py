@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 from typing import Any
 
 
@@ -23,6 +24,10 @@ _ALLOWED_INTERNAL_CLASSIFICATIONS = ("keep_internal", "retire_internal")
 _ALLOWED_CAPACITY_KINDS = ("profile_varying", "invariant", "derived")
 _DEPENDS_ON_OPS = ("and", "or")
 _DEFAULT_PROFILES = ("nano", "micro", "embedded", "standard", "full", "custom")
+_ALLOWED_ADVERTISED_PROFILE_MARKER_FIELDS = frozenset(
+    {"id", "note", "required_profile"}
+)
+_KCONFIG_SYMBOL_PATTERN = re.compile(r"[A-Za-z_][A-Za-z0-9_]*")
 
 
 def _find_key_path(value: object, key_name: str, path: str = "") -> str | None:
@@ -98,6 +103,45 @@ def _is_int(value: Any) -> bool:
     return isinstance(value, int) and not isinstance(value, bool)
 
 
+def _validate_sparse_true_profile_map(
+    errors: list[str],
+    item: dict,
+    item_id: str,
+    kind: object,
+    field_name: str,
+    known_profile_keys: set[str],
+) -> None:
+    if field_name not in item:
+        return
+    if kind != "conformance_unit":
+        _err(
+            errors,
+            f"item '{item_id}': {field_name} is only valid on conformance_unit items",
+        )
+        return
+
+    requirements = item[field_name]
+    if not isinstance(requirements, dict):
+        _err(
+            errors,
+            f"item '{item_id}': {field_name} must be an object when present",
+        )
+        return
+
+    for profile_key, required in requirements.items():
+        if profile_key not in known_profile_keys:
+            _err(
+                errors,
+                f"item '{item_id}': {field_name} references unknown profile "
+                f"'{profile_key}'",
+            )
+        if required is not True:
+            _err(
+                errors,
+                f"item '{item_id}': {field_name}['{profile_key}'] must be exactly true",
+            )
+
+
 def validate_manifest(manifest: dict) -> list[str]:
     """Return a list of human-readable validation errors.
 
@@ -169,6 +213,56 @@ def validate_manifest(manifest: dict) -> list[str]:
             display = profile.get("opc_display_name")
             if not isinstance(display, str) or "2025" not in display:
                 _err(errors, f"profile '{profile_key}': canonical named profile must use 2025 display name")
+
+    advertised_profile_markers = manifest.get("advertised_profile_markers")
+    if advertised_profile_markers is not None:
+        if not isinstance(advertised_profile_markers, list):
+            _err(errors, "manifest.advertised_profile_markers must be a list")
+        else:
+            seen_marker_ids: set[str] = set()
+            for marker_index, marker in enumerate(advertised_profile_markers):
+                marker_context = f"advertised_profile_markers[{marker_index}]"
+                if not isinstance(marker, dict):
+                    _err(errors, f"{marker_context}: must be an object")
+                    continue
+                unknown_fields = sorted(
+                    set(marker) - _ALLOWED_ADVERTISED_PROFILE_MARKER_FIELDS
+                )
+                for field_name in unknown_fields:
+                    _err(errors, f"{marker_context}: unknown field '{field_name}'")
+                _require_keys(
+                    errors,
+                    marker,
+                    ("id", "required_profile"),
+                    marker_context,
+                )
+                marker_id = marker.get("id")
+                if not isinstance(marker_id, str) or not marker_id:
+                    _err(errors, f"{marker_context}: id must be a non-empty string")
+                elif _KCONFIG_SYMBOL_PATTERN.fullmatch(marker_id) is None:
+                    _err(errors, f"{marker_context}: id must be a valid Kconfig symbol")
+                elif marker_id in seen_marker_ids:
+                    _err(errors, f"{marker_context}: duplicate marker id '{marker_id}'")
+                else:
+                    seen_marker_ids.add(marker_id)
+                required_profile = marker.get("required_profile")
+                if not isinstance(required_profile, str) or not required_profile:
+                    _err(
+                        errors,
+                        f"{marker_context}: required_profile must be a non-empty string",
+                    )
+                elif required_profile not in known_profile_keys:
+                    _err(
+                        errors,
+                        f"{marker_context}: required_profile references unknown profile "
+                        f"'{required_profile}'",
+                    )
+                note = marker.get("note")
+                if note is not None and (not isinstance(note, str) or not note):
+                    _err(
+                        errors,
+                        f"{marker_context}: note must be a non-empty string when present",
+                    )
 
     items = manifest.get("items")
     if not isinstance(items, list):
@@ -355,6 +449,16 @@ def validate_manifest(manifest: dict) -> list[str]:
                             f"item '{item_id}': project_profile_defaults['{profile_key}'] "
                             "must be exactly true",
                         )
+
+        for field_name in ("required_for_profile", "project_required_for_profile"):
+            _validate_sparse_true_profile_map(
+                errors,
+                item,
+                item_id,
+                kind,
+                field_name,
+                known_profile_keys,
+            )
 
         opc_reference = item.get("opc_reference")
         if opc_reference is not None and not isinstance(opc_reference, dict):

@@ -116,6 +116,137 @@ def test_validate_manifest_rejects_project_profile_default_values_other_than_tru
     assert "true" in detail.lower()
 
 
+@pytest.mark.parametrize(
+    ("field_name", "invalid_value", "expected_fragment"),
+    [
+        ("required_for_profile", ["standard"], "object"),
+        ("required_for_profile", {"enterprise": True}, "enterprise"),
+        ("project_required_for_profile", ["standard"], "object"),
+        ("project_required_for_profile", {"enterprise": True}, "enterprise"),
+    ],
+)
+def test_validate_manifest_rejects_malformed_sparse_profile_requirement_maps(
+    field_name: str,
+    invalid_value: list[str] | dict[str, bool],
+    expected_fragment: str,
+) -> None:
+    # Given a resolved manifest with a malformed graph or project requirement map.
+    manifest = copy.deepcopy(_resolved_manifest())
+    _cu_item(manifest)[field_name] = invalid_value
+
+    # When the manifest is validated.
+    errors = model.validate_manifest(manifest)
+
+    # Then the sparse true-only requirement contract identifies the field and error.
+    detail = "\n".join(errors)
+    assert field_name in detail
+    assert expected_fragment in detail.lower()
+
+
+@pytest.mark.parametrize(
+    "field_name", ["required_for_profile", "project_required_for_profile"]
+)
+@pytest.mark.parametrize("invalid_value", [False, 0, 1, "true", None])
+def test_validate_manifest_rejects_profile_requirement_values_other_than_true(
+    field_name: str,
+    invalid_value: bool | int | str | None,
+) -> None:
+    # Given a sparse requirement map containing a non-true value.
+    manifest = copy.deepcopy(_resolved_manifest())
+    _cu_item(manifest)[field_name] = {"standard": invalid_value}
+
+    # When the manifest is validated.
+    errors = model.validate_manifest(manifest)
+
+    # Then the exact-true requirement contract identifies the field and profile.
+    detail = "\n".join(errors)
+    assert field_name in detail
+    assert "standard" in detail
+    assert "true" in detail.lower()
+
+
+@pytest.mark.parametrize(
+    "field_name", ["required_for_profile", "project_required_for_profile"]
+)
+def test_validate_manifest_accepts_exact_true_profile_requirement(
+    field_name: str,
+) -> None:
+    # Given a sparse requirement map containing the exact boolean value true.
+    manifest = copy.deepcopy(_resolved_manifest())
+    _cu_item(manifest)[field_name] = {"standard": True}
+
+    # When the manifest is validated.
+    errors = model.validate_manifest(manifest)
+
+    # Then the requirement value is accepted.
+    assert errors == []
+
+
+def test_validate_manifest_rejects_non_list_advertised_profile_markers() -> None:
+    # Given an otherwise valid manifest with a non-list marker collection.
+    manifest = copy.deepcopy(_resolved_manifest())
+    manifest["advertised_profile_markers"] = {"id": "INVALID"}
+
+    # When the manifest is validated.
+    errors = model.validate_manifest(manifest)
+
+    # Then the marker collection shape is rejected.
+    detail = "\n".join(errors)
+    assert "advertised_profile_markers" in detail
+    assert "list" in detail.lower()
+
+
+def test_validate_manifest_rejects_legacy_marker_condition_field() -> None:
+    # Given a marker using the removed default_if compatibility field.
+    manifest = copy.deepcopy(_resolved_manifest())
+    markers = manifest["advertised_profile_markers"]
+    assert isinstance(markers, list)
+    marker = markers[0]
+    assert isinstance(marker, dict)
+    marker["default_if"] = ["MUC_OPCUA_INTERN_PROFILE_STANDARD_2025_UA_SERVER"]
+
+    # When the manifest is validated.
+    errors = model.validate_manifest(manifest)
+
+    # Then the unknown compatibility field is rejected.
+    detail = "\n".join(errors)
+    assert "advertised_profile_markers[0]" in detail
+    assert "default_if" in detail
+
+
+@pytest.mark.parametrize(
+    ("field_name", "invalid_value", "expected_fragment"),
+    [
+        ("id", "", "non-empty string"),
+        ("id", "INVALID MARKER", "valid kconfig symbol"),
+        ("required_profile", "", "non-empty string"),
+        ("required_profile", "enterprise", "unknown profile"),
+        ("note", 1, "string"),
+    ],
+)
+def test_validate_manifest_rejects_invalid_advertised_profile_marker_fields(
+    field_name: str,
+    invalid_value: str | int,
+    expected_fragment: str,
+) -> None:
+    # Given a marker with one malformed strict-schema field.
+    manifest = copy.deepcopy(_resolved_manifest())
+    markers = manifest["advertised_profile_markers"]
+    assert isinstance(markers, list)
+    marker = markers[0]
+    assert isinstance(marker, dict)
+    marker[field_name] = invalid_value
+
+    # When the manifest is validated.
+    errors = model.validate_manifest(manifest)
+
+    # Then the field-specific marker error is reported.
+    detail = "\n".join(errors)
+    assert "advertised_profile_markers[0]" in detail
+    assert field_name in detail
+    assert expected_fragment in detail.lower()
+
+
 def test_load_manifest_rejects_recursive_satisfied_by(tmp_path: Path) -> None:
     # Given a strict-JSON manifest with a nested satisfied_by middleman.
     manifest_path = tmp_path / "manifest.json"
