@@ -336,8 +336,8 @@ python3 scripts/kconfig/gen_config.py \
 Since **spec 067** rebased each named profile onto exactly its OPC-namesake's
 *mandatory* facet set, `standard` is much leaner than `full` — the two are no
 longer the same column. In features `embedded` and `standard` are nearly
-identical (the difference is capacity markers, driving `capacities.h`); the many
-optional facets live only in `full`.
+identical; `standard` raises capacity values and enables the project-required
+Enhanced DataChange CUs, while the many optional facets live only in `full`.
 
 | Flag | What it builds | nano | micro | embedded | standard | full | Depends on |
 |---|---|:-:|:-:|:-:|:-:|:-:|---|
@@ -349,7 +349,7 @@ optional facets live only in `full`.
 | `MUC_OPCUA_SECURE_CHANNEL_CRYPTO` | SecurityPolicy Basic256Sha256 / Aes128_Sha256_RsaOaep / Aes256_Sha256_RsaPss (asym+sym crypto, ~10 KB) | | | ✅ | ✅ | ✅ | |
 | `MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER` | Base Info Type System node subtree | | | ✅ | ✅ | ✅ | `MUC_OPCUA_FACET_CORE_2022_SERVER` |
 | `MUC_OPCUA_CU_SUBSCRIPTION_STANDARD` | Standard DataChange Subscription 2022 facet additions | | | ✅ | ✅ | ✅ | `MUC_OPCUA_CU_SUBSCRIPTION_BASIC` |
-| `MUC_OPCUA_MARKER_STANDARD_PROFILE` | Standard capacity-minima marker (drives `capacities.h`) | | | | ✅ | ✅ | |
+| `MUC_OPCUA_MARKER_STANDARD_PROFILE` | Derived advertisement marker; stays off until the mandatory Standard CU closure is selectable | | | | | | |
 | `MUC_OPCUA_CU_ATTRIBUTE_WRITE_VALUES` | Write service (Value attribute) | | | | | ✅ | |
 | `MUC_OPCUA_CU_SECURITY_ECC` | ECC SecurityPolicies `#ECC_curve25519` + `#ECC_nistP256` (optional CU, spec 059) | | | | | ✅ | `MUC_OPCUA_SECURE_CHANNEL_CRYPTO` |
 | `MUC_OPCUA_CU_EVENTS` | Event notifications | | | | | ✅ | `MUC_OPCUA_CU_SUBSCRIPTION_BASIC` |
