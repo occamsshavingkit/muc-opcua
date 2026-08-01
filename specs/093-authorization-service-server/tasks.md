@@ -167,8 +167,8 @@ Phase 1 + 2 + 3 = working JWT session activation with single issuer. This is ind
 
 ### Authorization Service address-space gating
 
-- [x] T038 [P] Add type-system tests in `tests/unit/test_type_system.c` proving NodeIds 17852-17855, their NodeClasses, DataTypes, PropertyType references, and Mandatory modelling rules are present only when `MUC_OPCUA_CU_AUTHORIZATION_SERVICE_CONFIGURATION_SERVER` is enabled per OPC-10000-12 §9.7.4 Table 158 and spec.md FR-009/OPC-005
-- [x] T039 Implement NodeIds 17853 `ServiceUri`, 17854 `ServiceCertificate`, and 17855 `IssuerEndpointUrl`, and gate NodeIds 17852-17855 on `MUC_OPCUA_CU_AUTHORIZATION_SERVICE_CONFIGURATION_SERVER` in `src/address_space/base_nodes.c` per OPC-10000-12 §9.7.4 Table 158 and spec.md FR-009/OPC-005
+- [x] T038 [P] Add type-system tests in `tests/unit/test_type_system.c` proving NodeIds 17852, 18072, 17860, and 18073, their NodeClasses, DataTypes, PropertyType references, and Mandatory modelling rules are present only when `MUC_OPCUA_CU_AUTHORIZATION_SERVICE_CONFIGURATION_SERVER` is enabled per OPC-10000-12 §9.7.4 Table 158 and spec.md FR-009/OPC-005
+- [x] T039 Implement NodeIds 18072 `ServiceUri`, 17860 `ServiceCertificate`, and 18073 `IssuerEndpointUrl`, and gate them with NodeId 17852 on `MUC_OPCUA_CU_AUTHORIZATION_SERVICE_CONFIGURATION_SERVER` in `src/address_space/base_nodes.c` per OPC-10000-12 §9.7.4 Table 158 and spec.md FR-009/OPC-005
 
 ### JWT endpoint advertisement
 

@@ -44,7 +44,11 @@
 - `MUC_OPCUA_CU_USER_TOKEN_JWT` (CU 1697) — enables JWT token validation at ActivateSession
 - `MUC_OPCUA_CU_AUTHORIZATION_SERVICE_CONFIGURATION_SERVER` (CU 3182) — enables the AuthorizationServiceConfigurationType address-space nodes
 
-`CU_AUTHORIZATION_SERVICE_CONFIGURATION_SERVER` depends on `CU_USER_TOKEN_JWT`. When `CU_USER_TOKEN_JWT` is undefined, JWT tokens at ActivateSession return `Bad_IdentityTokenRejected`. When defined but no issuer keys are configured, same behavior.
+`CU_AUTHORIZATION_SERVICE_CONFIGURATION_SERVER` depends on both
+`CU_USER_TOKEN_JWT` and `CU_BASE_INFO_TYPE_INFORMATION`. When
+`CU_USER_TOKEN_JWT` is undefined, JWT tokens at ActivateSession return
+`Bad_IdentityTokenRejected`. When defined but no issuer keys are configured,
+same behavior.
 
 Default `y` for full profile, `n` for all others.
 
