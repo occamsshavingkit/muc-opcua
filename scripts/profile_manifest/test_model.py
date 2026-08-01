@@ -247,6 +247,33 @@ def test_validate_manifest_rejects_invalid_advertised_profile_marker_fields(
     assert expected_fragment in detail.lower()
 
 
+@pytest.mark.parametrize("owner", ["item", "capacity"])
+def test_validate_manifest_rejects_marker_kconfig_symbol_collision(
+    owner: str,
+) -> None:
+    # Given a marker identifier that is already emitted by another manifest entry.
+    manifest = copy.deepcopy(_resolved_manifest())
+    markers = manifest["advertised_profile_markers"]
+    assert isinstance(markers, list)
+    marker = markers[0]
+    assert isinstance(marker, dict)
+
+    entries = manifest["items" if owner == "item" else "capacities"]
+    assert isinstance(entries, list)
+    conflicting_entry = entries[0]
+    assert isinstance(conflicting_entry, dict)
+    marker["id"] = conflicting_entry["kconfig_symbol"]
+
+    # When the manifest is validated.
+    errors = model.validate_manifest(manifest)
+
+    # Then generation is stopped before duplicate Kconfig declarations are emitted.
+    detail = "\n".join(errors)
+    assert "advertised_profile_markers[0]" in detail
+    assert "kconfig symbol" in detail.lower()
+    assert owner in detail.lower()
+
+
 def test_load_manifest_rejects_recursive_satisfied_by(tmp_path: Path) -> None:
     # Given a strict-JSON manifest with a nested satisfied_by middleman.
     manifest_path = tmp_path / "manifest.json"

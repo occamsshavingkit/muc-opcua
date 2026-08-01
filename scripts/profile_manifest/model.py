@@ -214,6 +214,7 @@ def validate_manifest(manifest: dict) -> list[str]:
             if not isinstance(display, str) or "2025" not in display:
                 _err(errors, f"profile '{profile_key}': canonical named profile must use 2025 display name")
 
+    marker_context_by_id: dict[str, str] = {}
     advertised_profile_markers = manifest.get("advertised_profile_markers")
     if advertised_profile_markers is not None:
         if not isinstance(advertised_profile_markers, list):
@@ -245,6 +246,7 @@ def validate_manifest(manifest: dict) -> list[str]:
                     _err(errors, f"{marker_context}: duplicate marker id '{marker_id}'")
                 else:
                     seen_marker_ids.add(marker_id)
+                    marker_context_by_id[marker_id] = marker_context
                 required_profile = marker.get("required_profile")
                 if not isinstance(required_profile, str) or not required_profile:
                     _err(
@@ -704,6 +706,22 @@ def validate_manifest(manifest: dict) -> list[str]:
         opc_reference = cap.get("opc_reference")
         if opc_reference is not None and not isinstance(opc_reference, dict):
             _err(errors, f"capacity '{cap_id}': opc_reference must be an object when present")
+
+    for marker_id, marker_context in marker_context_by_id.items():
+        item_owner = seen_item_kconfig.get(marker_id)
+        if item_owner is not None:
+            _err(
+                errors,
+                f"{marker_context}: Kconfig symbol '{marker_id}' already used by "
+                f"item '{item_owner}'",
+            )
+        capacity_owner = seen_capacity_kconfig.get(marker_id)
+        if capacity_owner is not None:
+            _err(
+                errors,
+                f"{marker_context}: Kconfig symbol '{marker_id}' already used by "
+                f"capacity '{capacity_owner}'",
+            )
 
     return errors
 
