@@ -109,7 +109,8 @@ def validate_manifest(manifest: dict) -> list[str]:
         backing_tests required for claimed items,
         depends_on referencing known symbols,
         semantic_depends_on containing only known symbols,
-        profile_defaults completeness
+        profile_defaults completeness and optional additive
+        project_profile_defaults entries
       - capacities: required keys, internal classification, defaults
         for every profile
       - facet_containment (when present): keys reference facet items
@@ -332,6 +333,28 @@ def validate_manifest(manifest: dict) -> list[str]:
                     errors,
                     f"item '{item_id}': profile_defaults['{profile_key}'] must be a boolean",
                 )
+
+        project_profile_defaults = item.get("project_profile_defaults")
+        if project_profile_defaults is not None:
+            if not isinstance(project_profile_defaults, dict):
+                _err(
+                    errors,
+                    f"item '{item_id}': project_profile_defaults must be an object when present",
+                )
+            else:
+                for profile_key, enabled in project_profile_defaults.items():
+                    if profile_key not in expected_profiles:
+                        _err(
+                            errors,
+                            f"item '{item_id}': project_profile_defaults references unknown "
+                            f"profile '{profile_key}'",
+                        )
+                    if enabled is not True:
+                        _err(
+                            errors,
+                            f"item '{item_id}': project_profile_defaults['{profile_key}'] "
+                            "must be exactly true",
+                        )
 
         opc_reference = item.get("opc_reference")
         if opc_reference is not None and not isinstance(opc_reference, dict):

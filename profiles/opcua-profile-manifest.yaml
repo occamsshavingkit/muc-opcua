@@ -1350,11 +1350,15 @@
       "implementation_state": "claimed",
       "kconfig_symbol": "MUC_OPCUA_CU_MONITOR_ITEMS_500",
       "kind": "conformance_unit",
+      "semantic_depends_on": [
+        "MUC_OPCUA_CU_SUBSCRIPTION_STANDARD"
+      ],
       "notes": "Satisfied by project-level CU opc_cu_subscription_standard; support for 500+ monitored items is stubbed as it requires substantial memory allocation. See src/cu/core_2022_server/monitor_items_500/stub.c.disabled.",
       "opc_display_name": "Monitor Items 500",
       "opc_reference": {
         "cu_optional": false,
         "facet": "Monitor Items 500",
+        "cu_name": "Monitor Items 500",
         "section": "5.13.2",
         "snapshot_id": "cu_monitor_items_500",
         "source_doc": "docs/conformance/enhanced-datachange.md",
@@ -1370,6 +1374,7 @@
         "nano": false,
         "standard": true
       },
+      "project_profile_defaults": {"standard": true},
       "source_metadata": {
         "imported_from": "profiles/opcua-profile-snapshot.json",
         "snapshot_id": "cu_monitor_items_500",
@@ -1386,11 +1391,15 @@
       "implementation_state": "claimed",
       "kconfig_symbol": "MUC_OPCUA_CU_MONITOR_MINQUEUESIZE_05",
       "kind": "conformance_unit",
+      "semantic_depends_on": [
+        "MUC_OPCUA_CU_SUBSCRIPTION_STANDARD"
+      ],
       "notes": "Satisfied by project-level CU opc_cu_subscription_standard; MinQueueSize_05 tuning is stubbed. See src/cu/core_2022_server/monitor_minqueuesize_05/stub.c.disabled.",
       "opc_display_name": "Monitor MinQueueSize_05",
       "opc_reference": {
         "cu_optional": false,
         "facet": "Monitor MinQueueSize_05",
+        "cu_name": "Monitor MinQueueSize_05",
         "section": "5.13.2",
         "snapshot_id": "cu_monitor_min_queue_05",
         "source_doc": "docs/conformance/enhanced-datachange.md",
@@ -1406,6 +1415,7 @@
         "nano": false,
         "standard": true
       },
+      "project_profile_defaults": {"standard": true},
       "source_metadata": {
         "imported_from": "profiles/opcua-profile-snapshot.json",
         "snapshot_id": "cu_monitor_min_queue_05",
@@ -13766,6 +13776,9 @@
       "implementation_state": "claimed",
       "kconfig_symbol": "MUC_OPCUA_CU_SUBSCRIPTION_PUBLISH_MIN_10",
       "kind": "conformance_unit",
+      "semantic_depends_on": [
+        "MUC_OPCUA_CU_SUBSCRIPTION_STANDARD"
+      ],
       "notes": "Claims >= 10 parked Publish requests per Standard DataChange 2017. Gated in subscription_publish_min_10.c.",
       "opc_display_name": "Subscription Publish Min 10",
       "opc_reference": {
@@ -13783,6 +13796,7 @@
         "nano": false,
         "standard": true
       },
+      "project_profile_defaults": {"standard": true},
       "source_metadata": {
         "source_id": "5249",
         "source_url": "https://profiles.opcfoundation.org"
@@ -13799,6 +13813,9 @@
       "implementation_state": "claimed",
       "kconfig_symbol": "MUC_OPCUA_CU_SUBSCRIPTION_MINIMUM_05",
       "kind": "conformance_unit",
+      "semantic_depends_on": [
+        "MUC_OPCUA_CU_SUBSCRIPTION_STANDARD"
+      ],
       "notes": "Claims >= 5 Subscriptions per Session per Standard DataChange 2017. Gated in subscription_minimum_05.c.",
       "opc_display_name": "Subscription Minimum 05",
       "opc_reference": {
@@ -13816,6 +13833,7 @@
         "nano": false,
         "standard": true
       },
+      "project_profile_defaults": {"standard": true},
       "source_metadata": {
         "source_id": "5248",
         "source_url": "https://profiles.opcfoundation.org"
@@ -15610,9 +15628,9 @@
       "opc_reference": {
         "cu_id": "3182",
         "cu_name": "Authorization Service Configuration Server",
-        "section": null,
+        "section": "9.7.4",
         "source_url": "https://profiles.opcfoundation.org",
-        "spec": null
+        "spec": "OPC-10000-12"
       },
       "profile_defaults": {
         "custom": false,

@@ -8,6 +8,8 @@ import json
 from pathlib import Path
 import sys
 
+import pytest
+
 _ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(_ROOT / "scripts" / "profile_manifest"))
 
@@ -63,6 +65,55 @@ def test_validate_manifest_rejects_unknown_semantic_dependency_symbol() -> None:
     assert "opc_cu_2936" in detail
     assert "semantic_depends_on" in detail
     assert unknown_symbol in detail
+
+
+def test_validate_manifest_rejects_non_mapping_project_profile_defaults() -> None:
+    # Given a graph-resolved manifest with a non-mapping project overlay.
+    manifest = copy.deepcopy(_resolved_manifest())
+    _cu_item(manifest)["project_profile_defaults"] = ["standard"]
+
+    # When the manifest is validated.
+    errors = model.validate_manifest(manifest)
+
+    # Then the malformed overlay type is rejected.
+    detail = "\n".join(errors)
+    assert "opc_cu_2936" in detail
+    assert "project_profile_defaults" in detail
+    assert "object" in detail
+
+
+def test_validate_manifest_rejects_unknown_project_profile_default() -> None:
+    # Given a graph-resolved manifest with an unknown project profile key.
+    manifest = copy.deepcopy(_resolved_manifest())
+    _cu_item(manifest)["project_profile_defaults"] = {"enterprise": True}
+
+    # When the manifest is validated.
+    errors = model.validate_manifest(manifest)
+
+    # Then the unknown key is rejected.
+    detail = "\n".join(errors)
+    assert "opc_cu_2936" in detail
+    assert "project_profile_defaults" in detail
+    assert "enterprise" in detail
+
+
+@pytest.mark.parametrize("invalid_value", [False, 0, 1, "true", None])
+def test_validate_manifest_rejects_project_profile_default_values_other_than_true(
+    invalid_value: bool | int | str | None,
+) -> None:
+    # Given a graph-resolved manifest with a subtractive or non-boolean overlay value.
+    manifest = copy.deepcopy(_resolved_manifest())
+    _cu_item(manifest)["project_profile_defaults"] = {"standard": invalid_value}
+
+    # When the manifest is validated.
+    errors = model.validate_manifest(manifest)
+
+    # Then only the exact boolean value true is accepted.
+    detail = "\n".join(errors)
+    assert "opc_cu_2936" in detail
+    assert "project_profile_defaults" in detail
+    assert "standard" in detail
+    assert "true" in detail.lower()
 
 
 def test_load_manifest_rejects_recursive_satisfied_by(tmp_path: Path) -> None:

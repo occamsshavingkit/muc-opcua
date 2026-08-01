@@ -10,12 +10,14 @@ transitive all-mandatory reachability from each build profile's graph root.
 This module is a pure resolver: :func:`resolve_into` joins the graph
 (spec structure) with a manifest (the "us" side -- kconfig_symbol,
 implementation_state, capacities, backing_tests) IN MEMORY, at generation
-time. It never writes to disk. Graph-derived ``depends_on`` and
-``profile_defaults`` are overwritten for every graph-mapped conformance_unit;
-independent ``semantic_depends_on`` prerequisites are preserved. ``full`` is
-derived from ``implementation_state``; graph-absent items (no cu_name, or a
-cu_name the graph doesn't model) are left untouched -- their hand-authored
-values are the only authoritative data we have for them.
+time. It never writes to disk. Graph-derived ``depends_on`` and named-profile
+defaults are applied first for every graph-mapped conformance_unit; ``full`` is
+then derived from ``implementation_state``, existing ``custom`` behavior is
+preserved, and validated ``project_profile_defaults`` entries are enabled as an
+additive final layer. Independent ``semantic_depends_on`` prerequisites are
+preserved. Graph-absent items (no cu_name, or a cu_name the graph doesn't model)
+are left untouched -- their hand-authored values are the only authoritative
+data we have for them.
 """
 
 import json
@@ -109,10 +111,11 @@ _IMPLEMENTED = {"implemented", "claimed", "documented"}
 def resolve_into(manifest, graph):
     """Join the graph into ``manifest`` in memory.
 
-    Overwrite graph-derived depends_on/profile_defaults on every graph-mapped
-    conformance_unit while preserving semantic_depends_on; leave graph-absent
-    items untouched. Never writes to disk -- callers own the manifest's
-    lifecycle.
+    Overwrite graph-derived depends_on/named-profile defaults on every
+    graph-mapped conformance_unit, derive ``full``, preserve/default ``custom``,
+    then add validated project-profile defaults. Preserve semantic_depends_on
+    and leave graph-absent items untouched. Never writes to disk -- callers own
+    the manifest's lifecycle.
     """
     idx = build_index(manifest)
     graph_cu_names = {
@@ -138,4 +141,8 @@ def resolve_into(manifest, graph):
         pd.update(derive_profile_defaults(graph, cu_name))  # nano/micro/embedded/standard
         pd["full"] = it.get("implementation_state") in _IMPLEMENTED  # us-side, derived
         pd.setdefault("custom", False)
+        project_defaults = it.get("project_profile_defaults")
+        if isinstance(project_defaults, dict):
+            for profile in project_defaults:
+                pd[profile] = True
     return manifest

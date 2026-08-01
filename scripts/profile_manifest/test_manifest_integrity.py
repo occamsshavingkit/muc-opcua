@@ -74,6 +74,42 @@ class ManifestIntegrityTest(unittest.TestCase):
         # Then every canonical OPC CU identifier has one manifest owner.
         self.assertEqual(duplicates, {})
 
+    def test_capacity_cus_have_explicit_standard_project_metadata(self) -> None:
+        capacity_cus = [
+            (
+                "opc_monitor_items_500",
+                "Monitor Items 500",
+                5242,
+            ),
+            (
+                "opc_monitor_minqueuesize_05",
+                "Monitor MinQueueSize_05",
+                5250,
+            ),
+            (
+                "opc_cu_5248",
+                "Subscription Minimum 05",
+                5248,
+            ),
+            (
+                "opc_cu_5249",
+                "Subscription Publish Min 10",
+                5249,
+            ),
+        ]
+        items_by_id = {item["id"]: item for item in self.manifest["items"]}
+
+        for item_id, display_name, cu_id in capacity_cus:
+            with self.subTest(item_id=item_id):
+                item = items_by_id[item_id]
+                self.assertEqual(item["opc_reference"]["cu_name"], display_name)
+                self.assertEqual(str(item["opc_reference"]["cu_id"]), str(cu_id))
+                self.assertEqual(
+                    item["semantic_depends_on"],
+                    ["MUC_OPCUA_CU_SUBSCRIPTION_STANDARD"],
+                )
+                self.assertEqual(item["project_profile_defaults"], {"standard": True})
+
     def test_view_and_discovery_have_only_dedicated_canonical_owners(self) -> None:
         items = self.manifest["items"]
         items_by_id = {item["id"]: item for item in items}
@@ -132,6 +168,8 @@ class ManifestIntegrityTest(unittest.TestCase):
         )
         self.assertEqual(canonical_item["depends_on_op"], "and")
         self.assertIn("tests/unit/test_type_system.c", canonical_item["backing_tests"])
+        self.assertEqual(canonical_item["opc_reference"]["spec"], "OPC-10000-12")
+        self.assertEqual(canonical_item["opc_reference"]["section"], "9.7.4")
         self.assertEqual(
             canonical_item["notes"],
             "AuthorizationServiceConfigurationType nodes are gated directly by this CU.",

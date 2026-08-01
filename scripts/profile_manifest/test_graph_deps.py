@@ -164,6 +164,33 @@ class GraphDepsTests(unittest.TestCase):
         self.assertEqual(item["depends_on"], ["MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER"])
         self.assertEqual(item["semantic_depends_on"], ["MUC_OPCUA_CU_BASE_INFO_BASE_TYPES"])
 
+    def test_resolve_into_adds_project_standard_default_without_deprecated_facet_dependency(self):
+        # Given a capacity CU owned by deprecated Enhanced DataChange facet 1627.
+        graph = {"profiles": {
+            "2269": {"name": "Standard …Profile", "child_profiles": [], "child_cus": []},
+            "1627": {"name": "Enhanced DataChange Subscription 2017 Server Facet",
+                      "child_profiles": [],
+                      "child_cus": [{"id": 5242, "name": "Monitor Items 500", "isOptional": False}]},
+            "cu_master": {},
+        }}
+        manifest = {"items": [
+            {"id": "opc_facet_1627", "kind": "facet", "kconfig_symbol": None,
+             "opc_reference": {"profile_id": "1627"}},
+            {"id": "opc_monitor_items_500", "kind": "conformance_unit",
+             "kconfig_symbol": "MUC_OPCUA_CU_MONITOR_ITEMS_500",
+             "opc_reference": {"cu_id": "5242", "cu_name": "Monitor Items 500"},
+             "implementation_state": "implemented",
+             "project_profile_defaults": {"standard": True}},
+        ]}
+
+        # When graph-derived values are resolved.
+        d.resolve_into(manifest, graph)
+
+        # Then the project Standard default is additive and no facet dependency is synthesized.
+        item = next(i for i in manifest["items"] if i["id"] == "opc_monitor_items_500")
+        self.assertTrue(item["profile_defaults"]["standard"])
+        self.assertEqual(item["depends_on"], [])
+
     def test_resolve_into_skips_non_conformance_unit_items(self):
         graph = _full_graph()
         untouched = {"id": "opc_facet_only", "kind": "facet",
