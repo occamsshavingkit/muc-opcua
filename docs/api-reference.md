@@ -402,7 +402,7 @@ Compare results against `MU_STATUS_GOOD` for the common success check.
 | `MU_STATUS_BAD_TOOMANYSUBSCRIPTIONS` | `0x80DD0000` |
 | `MU_STATUS_BAD_SUBSCRIPTIONIDINVALID` | `0x80280000` |
 
-The following three are defined **only** when `MUC_OPCUA_SUBSCRIPTIONS` is enabled:
+The following three are defined **only** when `MUC_OPCUA_CU_SUBSCRIPTION_BASIC` is enabled:
 
 | Macro (gated) | Value |
 |---------------|-------|
@@ -508,6 +508,11 @@ typedef struct {
 #endif
 } mu_server_config_t;
 ```
+
+`MUC_OPCUA_SERVICE_WRITE` in this source excerpt is an internal generated runtime
+bridge. Applications select the canonical
+`MUC_OPCUA_CU_ATTRIBUTE_WRITE_VALUES` option; the build derives the bridge from
+that CU.
 
 **Field reference:**
 
@@ -656,7 +661,7 @@ too small, misaligned storage, or invalid config).
   accepted; a deliberately mis-offset byte/offset buffer is **rejected**. Prefer
   declaring storage as a plain `static unsigned char buf[MU_SERVER_STORAGE_BYTES];`
   at file scope so the compiler gives it max alignment.
-- `MU_SERVER_STORAGE_BYTES` grows when `MUC_OPCUA_SUBSCRIPTIONS` and/or
+- `MU_SERVER_STORAGE_BYTES` grows when `MUC_OPCUA_CU_SUBSCRIPTION_BASIC` and/or
   `MUC_OPCUA_SECURITY` are compiled in (see [config.h](#8-configh--compile-time-configuration)).
   Always size the storage block with the macro rather than a hard-coded number so it
   tracks the build configuration.
@@ -1246,42 +1251,55 @@ feature toggles**. Always pass `MU_SERVER_STORAGE_BYTES` as the storage size to
 
 ```c
 #ifdef MUC_OPCUA_SECURITY
-/* secure_scratch + 2 per-direction prepared cipher contexts (in client/server keys) */
-#define MU_SERVER_SECURITY_STORAGE_BYTES (MU_SECURE_SCRATCH_SIZE + 2 * MU_CIPHER_CTX_SIZE)
+#define MU_SERVER_SECURITY_STORAGE_BYTES \
+    (MU_SECURE_SCRATCH_SIZE + 2 * MU_CIPHER_CTX_SIZE + MU_MAX_CLIENT_CERT_SIZE)
 #else
 #define MU_SERVER_SECURITY_STORAGE_BYTES 0
 #endif
 
-#ifdef MUC_OPCUA_SUBSCRIPTIONS
-#define MU_SERVER_STORAGE_BYTES \
-    (3072 + MU_SUBSCRIPTIONS_STANDARD_STORAGE_BYTES + MU_SERVER_SECURITY_STORAGE_BYTES + \
-     MU_ADDRESS_SPACE_INDEX_STORAGE_BYTES + MU_MULTIPLE_CONNECTIONS_STORAGE_BYTES + MU_EVENTS_STORAGE_BYTES)
+#if MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
+#define MU_SUBSCRIPTIONS_STANDARD_ITEM_STORAGE_BYTES \
+    (MU_INTERN_MONITORED_QUEUE_DEPTH * 96 + \
+     MU_INTERN_MAX_TRIGGER_LINKS * 8 + MU_WHERE_CLAUSE_STORAGE_BYTES)
 #else
-#define MU_SERVER_STORAGE_BYTES \
-    (1024 + MU_SERVER_SECURITY_STORAGE_BYTES + MU_ADDRESS_SPACE_INDEX_STORAGE_BYTES + MU_MULTIPLE_CONNECTIONS_STORAGE_BYTES)
+#define MU_SUBSCRIPTIONS_STANDARD_ITEM_STORAGE_BYTES 0
 #endif
+
+#if MUC_OPCUA_CU_SUBSCRIPTION_BASIC
+#define MU_SUBSCRIPTIONS_STORAGE_BYTES \
+    (MU_INTERN_MAX_MONITORED_ITEMS * \
+         (384 + MU_SUBSCRIPTIONS_STANDARD_ITEM_STORAGE_BYTES) + \
+     MU_INTERN_MAX_SUBSCRIPTIONS * 336 + \
+     MU_INTERN_MAX_PUBLISH_REQUESTS * 48)
+#else
+#define MU_SUBSCRIPTIONS_STORAGE_BYTES 0
+#endif
+
+#define MU_SERVER_STORAGE_BYTES \
+    (MU_SERVER_STORAGE_BASE_BYTES + MU_SUBSCRIPTIONS_STORAGE_BYTES + \
+     MU_SERVER_SECURITY_STORAGE_BYTES + MU_ADDRESS_SPACE_INDEX_STORAGE_BYTES + \
+     MU_MULTIPLE_CONNECTIONS_STORAGE_BYTES + MU_EVENTS_STORAGE_BYTES + \
+     MU_PUBSUB_STORAGE_BYTES + MU_NODEMANAGEMENT_STORAGE_BYTES + \
+     MU_ALARMS_CONDITIONS_STORAGE_BYTES + MU_CHUNK_ASSEMBLY_STORAGE_BYTES + \
+     MU_AUDITING_STORAGE_BYTES + MU_CUSTOM_METHODS_STORAGE_BYTES + \
+     MU_SERVER_DIAGNOSTICS_STORAGE_BYTES + MU_COMPLEX_TYPES_STORAGE_BYTES + \
+     MU_QUERY_STORAGE_BYTES + MU_SERVER_STATUS_STORAGE_BYTES)
 ```
 
 | Macro | Definition | Notes |
 |-------|------------|-------|
-| `MU_SERVER_SECURITY_STORAGE_BYTES` | `MU_SECURE_SCRATCH_SIZE + 2*MU_CIPHER_CTX_SIZE` when `MUC_OPCUA_SECURITY`, else `0` | Secure scratch + two per-direction prepared cipher contexts. With defaults: `12288 + 2*512 = 13312`. |
-| `MU_ADDRESS_SPACE_INDEX_STORAGE_BYTES` | `MU_MAX_ADDRESS_SPACE_NODES * 2 + 128` | Caller-owned lookup-index storage; default `256` B. |
-| `MU_SUBSCRIPTIONS_STANDARD_STORAGE_BYTES` | Standard DataChange storage when `MUC_OPCUA_SUBSCRIPTIONS_STANDARD`, else `0` | Covers the Embedded 2017 monitored-item queues and trigger links. Default Embedded 2017 capacity contributes `35,200` B. |
-| `MU_MULTIPLE_CONNECTIONS_STORAGE_BYTES` | `MU_MAX_CONNECTIONS * 2500` when multiple connections are enabled, else `0` | Bounded multi-connection state. Defaults to `10000` B. |
-| `MU_EVENTS_STORAGE_BYTES` | `MU_MAX_SUBSCRIPTIONS * 700` when events are enabled, else `0` | Bounded event-queue storage. Defaults to `1400` B. |
+| `MU_SERVER_STORAGE_BASE_BYTES` | `3328` with Basic Subscription, otherwise `1152` | Fixed server-object baseline. |
+| `MU_SERVER_SECURITY_STORAGE_BYTES` | Secure scratch + two cipher contexts + client certificate storage when `MUC_OPCUA_SECURITY`, else `0` | Security-owned caller storage. |
+| `MU_ADDRESS_SPACE_INDEX_STORAGE_BYTES` | `MU_INTERN_MAX_ADDRESS_SPACE_NODES * 2 + 128` | Caller-owned lookup-index storage. |
+| `MU_SUBSCRIPTIONS_STANDARD_ITEM_STORAGE_BYTES` | Queue, trigger-link, and WhereClause storage per MonitoredItem when `MUC_OPCUA_CU_SUBSCRIPTION_STANDARD`, else `0` | Standard DataChange additions owned by the canonical CU. |
+| `MU_SUBSCRIPTIONS_STORAGE_BYTES` | Capacity-scaled subscription, MonitoredItem, and parked-Publish storage when `MUC_OPCUA_CU_SUBSCRIPTION_BASIC`, else `0` | Basic Subscription owns the fixed engine arrays. |
+| `MU_MULTIPLE_CONNECTIONS_STORAGE_BYTES` | `MU_INTERN_MAX_CONNECTIONS * (MU_CONNECTION_RX_BUFFER_SIZE + MU_CONNECTION_BASE_STORAGE_BYTES)` when multiple connections are enabled, else `0` | Bounded multi-connection state. |
+| `MU_EVENTS_STORAGE_BYTES` | `MU_INTERN_MAX_SUBSCRIPTIONS * 700` when events are enabled, else `0` | Bounded event-queue storage. |
 | `MU_SERVER_STORAGE_BYTES` | Sum of all configured profile/engine storage slices | Total caller-provided memory block required for `mu_server_init`. |
 
-**Worked totals (with default knob values):**
-
-| `MUC_OPCUA_SUBSCRIPTIONS` | `MUC_OPCUA_SECURITY` | `MUC_OPCUA_MULTIPLE_CONNECTIONS` | `MU_SERVER_STORAGE_BYTES` |
-|:---:|:---:|:---:|---:|
-| off | off | off | `1024 + 256 = 1280` |
-| off | off | on | `1024 + 256 + 10000 = 11280` |
-| off | on | off | `1024 + 13312 + 256 = 14592` |
-| off | on | on | `1024 + 13312 + 256 + 10000 = 24592` |
-| on | off | off | `3072 + 256 = 3328` |
-| on | off | on | `3072 + 256 + 10000 = 13328` |
-| on + Standard Subscriptions | on | on | `3072 + 35200 + 13312 + 256 + 10000 + 1400 = 63240` (Embedded / Full) |
+Profile-specific measured totals are listed in the README. Use the compiled
+`MU_SERVER_STORAGE_BYTES` value for custom configurations rather than reconstructing
+the total from stale defaults.
 
 ---
 
@@ -1538,33 +1556,35 @@ same script to generate `muc_opcua_autoconf.h` and force-include it before
 `muc_opcua/config.h`. See [build-and-gating.md](build-and-gating.md) for the full
 configuration workflow.
 
-| Setting / feature symbol | Define when ON | Default source | Effect |
+| Selectable setting | Generated compiler gate(s) | Default source | Effect |
 |--------------|----------------|---------|--------|
 | `MUC_OPCUA_PROFILE` | *(string)* | `nano` | Target OPC UA profile (`nano`, `micro`, `embedded`, `standard`, `full`, `custom`). Seeds Kconfig. |
 | `MUC_OPCUA_KCONFIG_CONFIG` | *(path)* | empty | Uses a saved `.config` instead of `configs/<profile>.defconfig`; pass the matching `MUC_OPCUA_PROFILE` too so capacity profile markers stay aligned. |
-| `MUC_OPCUA_SECURITY` | `MUC_OPCUA_SECURITY=1` | profile-derived | Build SecurityPolicy Basic256Sha256 and related modern RSA policies. |
-| `MUC_OPCUA_SUBSCRIPTIONS` | `MUC_OPCUA_SUBSCRIPTIONS=1` | profile-derived | Build the data-change subscription engine. |
-| `MUC_OPCUA_SUBSCRIPTIONS_STANDARD` | `MUC_OPCUA_SUBSCRIPTIONS_STANDARD=1` | profile-derived | Build Standard DataChange subscription additions. |
-| `MUC_OPCUA_SERVICE_READ` | `MUC_OPCUA_SERVICE_READ=1` | ON | Build the Read service. |
-| `MUC_OPCUA_SERVICE_BROWSE` | `MUC_OPCUA_SERVICE_BROWSE=1` | ON | Build Browse + BrowseNext + TranslateBrowsePaths. |
-| `MUC_OPCUA_SERVICE_DISCOVERY` | `MUC_OPCUA_SERVICE_DISCOVERY=1` | ON | Build GetEndpoints/FindServers. |
-| `MUC_OPCUA_SERVICE_REGISTER_NODES` | `MUC_OPCUA_SERVICE_REGISTER_NODES=1` | profile-derived | Build RegisterNodes/UnregisterNodes. |
-| `MUC_OPCUA_SERVICE_WRITE` | `MUC_OPCUA_SERVICE_WRITE=1` | profile-derived | Build the Write service. |
-| `MUC_OPCUA_SERVICE_HISTORY` | `MUC_OPCUA_SERVICE_HISTORY=1` | profile-derived | Build Historical Access (HistoryRead/HistoryUpdate). |
-| `MUC_OPCUA_SERVICE_QUERY` | `MUC_OPCUA_SERVICE_QUERY=1` | profile-derived | Build QueryFirst/QueryNext (OPC-10000-4 Appendix B §B.2.3/§B.2.4). |
-| `MUC_OPCUA_SERVICE_NODEMANAGEMENT` | `MUC_OPCUA_SERVICE_NODEMANAGEMENT=1` | profile-derived | Build the NodeManagement service set: AddNodes, AddReferences, DeleteNodes, and DeleteReferences (OPC-10000-4 §5.8). |
-| `MUC_OPCUA_DYNAMIC_NODES` | `MUC_OPCUA_DYNAMIC_NODES=1` | profile-derived | Runtime-added address-space nodes; `full` enables it with NodeManagement. |
-| `MUC_OPCUA_PUBSUB` | `MUC_OPCUA_PUBSUB=1` | profile-derived | Build the scoped UADP/UDP PubSub publisher and caller-storage decoder; does not claim full PubSub Subscriber profile compliance. |
-| `MUC_OPCUA_METHOD_SERVER` / `MUC_OPCUA_CUSTOM_METHODS` | `=1` | profile-derived | Build support for arbitrary custom method calls. |
-| `MUC_OPCUA_SERVER_DIAGNOSTICS` | `MUC_OPCUA_SERVER_DIAGNOSTICS=1` | profile-derived | Build support for server diagnostics summary nodes. |
-| `MUC_OPCUA_EVENTS` | `MUC_OPCUA_EVENTS=1` | profile-derived | Build support for event notifications. |
-| `MUC_OPCUA_BASE_NODES` | `MUC_OPCUA_BASE_NODES=1` | profile-derived | Build the standard Base Information node set. |
-| `MUC_OPCUA_BASE_TYPE_SYSTEM` | `MUC_OPCUA_BASE_TYPE_SYSTEM=1` | profile-derived | Expose the Base Info Type System node set. |
+| `MUC_OPCUA_SECURE_CHANNEL_CRYPTO` | `MUC_OPCUA_SECURITY=1` (runtime bridge) | profile-derived | Build SecurityPolicy Basic256Sha256 and related modern RSA policies. |
+| `MUC_OPCUA_CU_SUBSCRIPTION_BASIC` | `MUC_OPCUA_CU_SUBSCRIPTION_BASIC=1` | profile-derived | Build the data-change subscription engine. |
+| `MUC_OPCUA_CU_SUBSCRIPTION_STANDARD` | `MUC_OPCUA_CU_SUBSCRIPTION_STANDARD=1` | profile-derived | Build Standard DataChange subscription additions. |
+| `MUC_OPCUA_CU_ATTRIBUTE_READ` | `MUC_OPCUA_CU_ATTRIBUTE_READ=1` | profile-derived | Build the Read service. |
+| `MUC_OPCUA_CU_VIEW_BASIC_2` / `MUC_OPCUA_CU_VIEW_TRANSLATEBROWSEPATH` | matching canonical CU gates | profile-derived | Build Browse + BrowseNext + TranslateBrowsePaths. |
+| `MUC_OPCUA_CU_DISCOVERY_FIND_SERVERS_SELF` / `MUC_OPCUA_CU_DISCOVERY_GET_ENDPOINTS` | matching canonical CU gates | profile-derived | Build GetEndpoints/FindServers. |
+| `MUC_OPCUA_CU_VIEW_REGISTERNODES` | `MUC_OPCUA_CU_VIEW_REGISTERNODES=1` | profile-derived | Build RegisterNodes/UnregisterNodes. |
+| `MUC_OPCUA_CU_ATTRIBUTE_WRITE_VALUES` | `MUC_OPCUA_CU_ATTRIBUTE_WRITE_VALUES=1` | profile-derived | Build the Write service. |
+| `MUC_OPCUA_CU_HISTORICAL_ACCESS_SERVER_FACET` | canonical CU gate + `MUC_OPCUA_SERVICE_HISTORY=1` runtime bridge | profile-derived | Build Historical Access (HistoryRead/HistoryUpdate). |
+| `MUC_OPCUA_CU_QUERY` | canonical CU gate + `MUC_OPCUA_SERVICE_QUERY=1` runtime bridge | profile-derived | Build QueryFirst/QueryNext (OPC-10000-4 Appendix B §B.2.3/§B.2.4). |
+| `MUC_OPCUA_CU_NODEMANAGEMENT` | canonical CU gate + `MUC_OPCUA_SERVICE_NODEMANAGEMENT=1` runtime bridge | profile-derived | Build the NodeManagement service set: AddNodes, AddReferences, DeleteNodes, and DeleteReferences (OPC-10000-4 §5.8). |
+| `MUC_OPCUA_CU_DYNAMIC_NODES` | canonical CU gate + `MUC_OPCUA_DYNAMIC_NODES=1` runtime bridge | profile-derived | Runtime-added address-space nodes; `full` enables it with NodeManagement. |
+| `MUC_OPCUA_CU_PUBSUB` | canonical CU gate + `MUC_OPCUA_PUBSUB=1` runtime bridge | profile-derived | Build the scoped UADP/UDP PubSub publisher and caller-storage decoder; does not claim full PubSub Subscriber profile compliance. |
+| `MUC_OPCUA_CU_METHOD_SERVER` / `MUC_OPCUA_CU_CUSTOM_METHODS` | canonical CU gates plus runtime bridges | profile-derived | Build support for arbitrary custom method calls. |
+| `MUC_OPCUA_CU_BASE_INFO_DIAGNOSTICS` | canonical CU gate + `MUC_OPCUA_SERVER_DIAGNOSTICS=1` runtime bridge | profile-derived | Build support for server diagnostics summary nodes. |
+| `MUC_OPCUA_CU_EVENTS` | canonical CU gate + `MUC_OPCUA_EVENTS=1` runtime bridge | profile-derived | Build support for event notifications. |
+| `MUC_OPCUA_FACET_CORE_2022_SERVER` | facet gate + `MUC_OPCUA_BASE_NODES=1` runtime bridge | profile-derived | Build the standard Base Information node set. |
+| `MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER` | facet gate + `MUC_OPCUA_BASE_TYPE_SYSTEM=1` runtime bridge | profile-derived | Expose the Base Info Type System node set. |
 | `MUC_OPCUA_LTO` | *(toolchain LTO)* | ON | Enable link-time / interprocedural optimization. |
 | `MUC_OPCUA_PLATFORM` | *(string)* | `host` | Target platform: `host`, `external`, `pico`, or `arduino-skeleton`. |
 
 **Notes:**
 - OpenSecureChannel and the Session services are **always present** (not gated).
+- Select only symbols in the first column. Runtime bridge names are emitted for
+  source compatibility and are not CMake or Kconfig inputs.
 - `MUC_OPCUA_STATUS_STRINGS` (the `mu_status_name()` gate) is a source-level `-D` knob, not a CMake option; it is left undefined unless supplied.
 - Because `MU_SERVER_STORAGE_BYTES` depends on enabled options, always compile your application with the **same** feature flags as the library.
 

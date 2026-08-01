@@ -599,7 +599,7 @@ well-known nodes a real client reads during session setup:
 | `ns=0;i=2254` | ServerArray | `String[]` of server URIs |
 | `ns=0;i=11705` | MaxNodesPerRead | Advertises your per-Read batch cap so clients self-limit |
 | `ns=0;i=11710` | MaxNodesPerBrowse | Same for Browse |
-| `ns=0;i=2258` / `i=2256` | CurrentTime / ServerStatus | Provided automatically when `MUC_OPCUA_BASE_NODES` is on (callback-backed by the time adapter) |
+| `ns=0;i=2258` / `i=2256` | CurrentTime / ServerStatus | Provided automatically when `MUC_OPCUA_FACET_CORE_2022_SERVER` is on (callback-backed by the time adapter) |
 
 ```c
 static const mu_node_t s_nodes[] = {
@@ -623,7 +623,8 @@ the server will truncate.
 The NodeManagement service set allows adding and deleting nodes and references at runtime.
 
 To enable dynamic node management:
-1. Compile with `-DMUC_OPCUA_SERVICE_NODEMANAGEMENT=1`.
+1. Compile with `-DMUC_OPCUA_CU_NODEMANAGEMENT=ON` and
+   `-DMUC_OPCUA_CU_DYNAMIC_NODES=ON`.
 2. Configure limits via `-DMU_MAX_DYNAMIC_NODES` (default: 32) and `-DMU_MAX_DYNAMIC_REFERENCES` (default: 64). Note that this proportionally increases `MU_SERVER_STORAGE_BYTES` for your static memory budget.
 3. Set `server->config.allow_node_management = true` in your server configuration. If false, NodeManagement services return `BadUserAccessDenied`.
 
@@ -730,7 +731,7 @@ The authoritative conformance reference is
 - **SecurityPolicy selection is automatic from the crypto adapter.** No crypto
   adapter (`config.crypto_adapter == NULL`) ⇒ **None only**. With a crypto adapter
   ⇒ the server *also* advertises `Basic256Sha256`, `Aes128-Sha256-RsaOaep`, and `Aes256-Sha256-RsaPss`
-  Sign and SignAndEncrypt endpoints alongside None. Build security support in with the `MUC_OPCUA_SECURITY`
+  Sign and SignAndEncrypt endpoints alongside None. Build security support in with the `MUC_OPCUA_SECURE_CHANNEL_CRYPTO`
   option (see §7).
 - **None is non-production.** Per the conformance note, SecurityPolicy None
   endpoints are for trusted/isolated networks and bench testing only. Ship
@@ -903,7 +904,7 @@ Additional notes for budgeting:
   `-DMU_MAX_SESSIONS=4`) if the profile default is more than your target needs.
 - **Crypto backend flash** (mbedTLS/wolfSSL/OpenSSL) is *not* included above and is
   typically the largest single addition on a Standard/Full build; ECC adds a further
-  ~3.1 KB of protocol code on top when `MUC_OPCUA_ECC` is on (default for
+  ~3.1 KB of protocol code on top when `MUC_OPCUA_CU_SECURITY_ECC` is on (default for
   standard/full) — see
   [`docs/conformance/ecc-security-policy.md`](conformance/ecc-security-policy.md).
   Size it from your TLS library plus the ECC delta.
