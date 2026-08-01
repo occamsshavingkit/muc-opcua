@@ -1,17 +1,24 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
+import importlib
 import os
 import re
 import sys
+import tempfile
 import unittest
 
 _HERE = os.path.dirname(os.path.abspath(__file__))
 if _HERE not in sys.path:
     sys.path.insert(0, _HERE)
+_KCONFIG_DIR = os.path.abspath(os.path.join(_HERE, "..", "kconfig"))
+if _KCONFIG_DIR not in sys.path:
+    sys.path.insert(0, _KCONFIG_DIR)
 
 import graph_deps as deps  # noqa: E402  # pylint: disable=wrong-import-position
 from generate import generate_kconfig  # noqa: E402  # pylint: disable=wrong-import-position
+
+kconfiglib = importlib.import_module("kconfiglib")
 
 
 class ProfileRequirementResolutionTest(unittest.TestCase):
@@ -140,6 +147,23 @@ class ProfileMarkerGenerationTest(unittest.TestCase):
                 "MUC_OPCUA_CU_PROJECT_REQUIRED",
             },
         )
+
+        # And Kconfig resolves the marker on only while every mandatory CU is on.
+        with tempfile.TemporaryDirectory() as temp_dir:
+            kconfig_path = os.path.join(temp_dir, "Kconfig")
+            with open(kconfig_path, "w", encoding="utf-8") as kconfig_file:
+                kconfig_file.write(kconfig)
+            kconf = kconfiglib.Kconfig(kconfig_path, warn=False)
+            graph_required = kconf.syms["MUC_OPCUA_CU_GRAPH_REQUIRED"]
+            project_required = kconf.syms["MUC_OPCUA_CU_PROJECT_REQUIRED"]
+            marker = kconf.syms["MUC_OPCUA_MARKER_STANDARD_PROFILE"]
+
+            graph_required.set_value(2)
+            project_required.set_value(2)
+            self.assertEqual(marker.str_value, "y")
+
+            project_required.set_value(0)
+            self.assertEqual(marker.str_value, "n")
 
     def test_marker_id_is_emitted_without_legacy_rename(self) -> None:
         # Given a marker whose identifier matches the former compatibility alias.
