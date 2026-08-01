@@ -23,6 +23,10 @@ data we have for them.
 import json
 
 
+class MandatoryCuOwnershipError(ValueError):
+    pass
+
+
 def load_graph(path="profiles/opcua-profile-graph.json"):
     with open(path, encoding="utf-8") as fh:
         return json.load(fh)
@@ -34,7 +38,7 @@ def items(manifest):
 
 def build_index(manifest):
     """Map graph ids/CU names to the manifest item that carries the kconfig_symbol."""
-    by_profile_id, by_cu_name = {}, {}
+    by_profile_id, by_cu_name, cu_owners_by_name = {}, {}, {}
     for it in items(manifest):
         if not isinstance(it, dict):
             continue
@@ -45,11 +49,17 @@ def build_index(manifest):
             by_profile_id[str(pid)] = it
         cu_name = ref.get("cu_name")
         if cu_name:
+            if it.get("kind") == "conformance_unit":
+                cu_owners_by_name.setdefault(cu_name, []).append(it)
             # prefer the symbol-carrying item
             cur = by_cu_name.get(cu_name)
             if cur is None or (sym and not cur.get("kconfig_symbol")):
                 by_cu_name[cu_name] = it
-    return {"by_profile_id": by_profile_id, "by_cu_name": by_cu_name}
+    return {
+        "by_profile_id": by_profile_id,
+        "by_cu_name": by_cu_name,
+        "cu_owners_by_name": cu_owners_by_name,
+    }
 
 
 def facet_symbol_for_graph_id(idx, graph_id):
@@ -112,12 +122,34 @@ def resolve_into(manifest, graph):
     """Join the graph into ``manifest`` in memory.
 
     Overwrite graph-derived depends_on/named-profile defaults on every
-    graph-mapped conformance_unit, derive ``full``, preserve/default ``custom``,
-    then add validated project-profile defaults. Preserve semantic_depends_on
-    and leave graph-absent items untouched. Never writes to disk -- callers own
-    the manifest's lifecycle.
+    graph-mapped conformance_unit, record sparse true-only mandatory profile
+    membership in ``required_for_profile``, derive ``full``, preserve/default
+    ``custom``, then add validated project-profile defaults. Preserve
+    semantic_depends_on and leave graph-absent items untouched. Never writes to
+    disk -- callers own the manifest's lifecycle.
     """
     idx = build_index(manifest)
+    mandatory_cu_names = set()
+    for root_id in _ROOTS.values():
+        if root_id in graph["profiles"]:
+            mandatory_cu_names.update(_mandatory_cu_names(graph, root_id))
+    for cu_name in sorted(mandatory_cu_names):
+        owners = idx["cu_owners_by_name"].get(cu_name, [])
+        if not owners:
+            raise MandatoryCuOwnershipError(
+                f"Mandatory CU '{cu_name}' has no manifest owner"
+            )
+        if len(owners) > 1:
+            owner_ids = ", ".join(str(owner.get("id")) for owner in owners)
+            raise MandatoryCuOwnershipError(
+                f"Mandatory CU '{cu_name}' has multiple manifest owners: {owner_ids}"
+            )
+        owner = owners[0]
+        if not owner.get("kconfig_symbol"):
+            raise MandatoryCuOwnershipError(
+                f"Mandatory CU '{cu_name}' owner '{owner.get('id')}' "
+                "does not declare kconfig_symbol"
+            )
     graph_cu_names = {
         c["name"] for node in graph["profiles"].values() for c in node.get("child_cus", [])
     }
@@ -137,8 +169,14 @@ def resolve_into(manifest, graph):
             it["depends_on_op"] = op
         elif "depends_on_op" in it:
             del it["depends_on_op"]
+        graph_defaults = derive_profile_defaults(graph, cu_name)
+        it["required_for_profile"] = {
+            profile: True
+            for profile, required in graph_defaults.items()
+            if required
+        }
         pd = it.setdefault("profile_defaults", {})
-        pd.update(derive_profile_defaults(graph, cu_name))  # nano/micro/embedded/standard
+        pd.update(graph_defaults)  # nano/micro/embedded/standard
         pd["full"] = it.get("implementation_state") in _IMPLEMENTED  # us-side, derived
         pd.setdefault("custom", False)
         project_defaults = it.get("project_profile_defaults")
