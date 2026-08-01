@@ -74,7 +74,7 @@ static const statuscode_name_entry_t known_statuscode_names[] = {
     {"Bad_TooManyMonitoredItems", MU_STATUS_BAD_TOOMANYMONITOREDITEMS},
     {"Bad_TooManySubscriptions", MU_STATUS_BAD_TOOMANYSUBSCRIPTIONS},
     {"Bad_SubscriptionIdInvalid", MU_STATUS_BAD_SUBSCRIPTIONIDINVALID},
-    /* These three are only #defined in status.h when MUC_OPCUA_SUBSCRIPTIONS is
+    /* These three are only #defined in status.h when MUC_OPCUA_CU_SUBSCRIPTION_BASIC is
        on, but this table's job is to recognize every StatusCode name the shared
        docs may legitimately use across ANY profile, not just the one this test
        binary happens to be compiled for -- so they're listed unconditionally,
