@@ -10,32 +10,36 @@ mainmenu "muc-opcua OPC UA Server Configuration"
 
 choice
     prompt "OPC UA Server Profile"
-    default MUC_OPCUA_PROFILE_NANO_EMBEDDED_DEVICE_2017
+    default MUC_OPCUA_PROFILE_CUSTOM
     help
       Select an OPC UA Server Profile.  Choosing a named profile sets all
       Facets and Conformance Units to the OPC-defined defaults for that
-      profile.  Changing any Facet or CU from the profile defaults
-      switches to the Custom profile.
+      profile.  Facet and CU overrides are resolved against the profile
+      seed; the selected profile remains stable.  Derived advertisement
+      markers (e.g., MUC_OPCUA_MARKER_STANDARD_PROFILE) report whether
+      the resolved mandatory CU closure satisfies the profile.
+      Select "Custom" to start from core services and hand-pick Facets
+      and CUs.
 
-config MUC_OPCUA_PROFILE_NANO_EMBEDDED_DEVICE_2017
-    bool "Nano Embedded Device 2017 UA Server Profile"
+config MUC_OPCUA_PROFILE_NANO_EMBEDDED_DEVICE_2025_SERVER
+    bool "Nano Embedded Device 2025 Server Profile"
     help
       OPC UA Server Profile URI:
-      http://opcfoundation.org/UA-Profile/Server/NanoEmbeddedDevice2017
+      http://opcfoundation.org/UA-Profile/Server/NanoEmbeddedDevice2025
 
-config MUC_OPCUA_PROFILE_MICRO_EMBEDDED_DEVICE_2017
-    bool "Micro Embedded Device 2017 UA Server Profile"
+config MUC_OPCUA_PROFILE_MICRO_EMBEDDED_DEVICE_2025_SERVER
+    bool "Micro Embedded Device 2025 Server Profile"
     ...
 
-config MUC_OPCUA_PROFILE_EMBEDDED_2017_UA_SERVER
-    bool "Embedded 2017 UA Server Profile"
+config MUC_OPCUA_PROFILE_EMBEDDED_2025_UA_SERVER
+    bool "Embedded 2025 UA Server Profile"
     ...
 
-config MUC_OPCUA_PROFILE_STANDARD_2017_UA_SERVER
-    bool "Standard 2017 UA Server Profile"
+config MUC_OPCUA_PROFILE_STANDARD_2025_UA_SERVER
+    bool "Standard 2025 UA Server Profile"
     ...
 
-config MUC_OPCUA_PROFILE_FULL
+config MUC_OPCUA_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
     bool "Full (everything enabled, generous capacities)"
     ...
 
@@ -75,7 +79,7 @@ endmenu
 menu "Facet: Subscription Server"
 config MUC_OPCUA_FACET_SUBSCRIPTION_SERVER
     bool "Enable Subscription Server Facet"
-    default y if MUC_OPCUA_PROFILE_MICRO_EMBEDDED_DEVICE_2017 || ...
+    default y if MUC_OPCUA_PROFILE_MICRO_EMBEDDED_DEVICE_2025_SERVER || ...
     ...
 
 endmenu
@@ -108,7 +112,7 @@ comment "File Server Facet (NOT IMPLEMENTED) [OPC-10000-20]"
 ### Output file: `configs/<profile>.defconfig`
 
 ```text
-MUC_OPCUA_PROFILE_STANDARD_2017_UA_SERVER=y
+MUC_OPCUA_PROFILE_STANDARD_2025_UA_SERVER=y
 ```
 
 Each defconfig selects exactly one profile symbol.
@@ -116,7 +120,7 @@ Each defconfig selects exactly one profile symbol.
 ### Output file: `muc_opcua_config.cmake` (via `scripts/kconfig/gen_config.py`)
 
 ```cmake
-set(MUC_OPCUA_PROFILE_STANDARD_2017_UA_SERVER y)
+set(MUC_OPCUA_PROFILE_STANDARD_2025_UA_SERVER y)
 set(MUC_OPCUA_FACET_CORE_2017_SERVER y)
 set(MUC_OPCUA_CU_ATTRIBUTE_READ y)
 set(MUC_OPCUA_OPT_READ_CACHE n)
@@ -141,17 +145,18 @@ Must additionally check:
 ### `CMakeLists.txt`
 
 ```cmake
-set(MUC_OPCUA_KCONFIG_FEATURES
-    MUC_OPCUA_FACET_CORE_2017_SERVER
-    MUC_OPCUA_CU_ATTRIBUTE_READ
-    MUC_OPCUA_CU_VIEW_BASIC
-    MUC_OPCUA_CU_DISCOVERY_FIND_SERVERS_SELF
-    ...
-    MUC_OPCUA_MARKER_STANDARD_PROFILE
-)
+file(STRINGS "${CMAKE_CURRENT_SOURCE_DIR}/Kconfig" _kconfig_symbols
+    REGEX "^(menu)?config[ \t]+MUC_OPCUA_(PROFILE|FACET|CU)_[A-Za-z0-9_]+$")
+
+set(MUC_OPCUA_KCONFIG_FEATURES READ_CACHE SECURE_CHANNEL_CRYPTO)
+foreach(_line IN LISTS _kconfig_symbols)
+    string(REGEX REPLACE "^(menu)?config[ \t]+" "" _symbol "${_line}")
+    list(APPEND MUC_OPCUA_KCONFIG_FEATURES "${_symbol}")
+endforeach()
+list(REMOVE_DUPLICATES MUC_OPCUA_KCONFIG_FEATURES)
 ```
 
-The old `SERVICE_READ`, `SECURITY`, `SUBSCRIPTIONS`, etc. symbols are removed from this list. The new OPC-name-derived symbols replace them.
+The canonical override surface is discovered from generated Kconfig rather than duplicated in a partial hand-maintained list. Only selectable Profile, Facet, and CU symbols are discovered; hidden `MUC_OPCUA_MARKER_*` and `MUC_OPCUA_INTERN_*` symbols are derived state and MUST NOT be serialized from CMake cache overrides. The independent `READ_CACHE` and `SECURE_CHANNEL_CRYPTO` project controls remain explicit entries. Capacity symbols remain on their separate typed `MU_MAX_*` path.
 
 ### `src/CMakeLists.txt`
 

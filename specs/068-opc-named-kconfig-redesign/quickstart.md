@@ -66,8 +66,8 @@ cmake -S . -B build/standard-check \
     -DMUC_OPCUA_BUILD_TESTS=ON
 cmake --build build/standard-check
 ctest --test-dir build/standard-check --output-on-failure
-# Expected: all configured tests pass. Standard profile configures 116 tests
-# because full-only feature tests are not added when those features are off.
+# Expected: every configured standard-profile test passes. Full-only feature
+# tests are not added when those features are off.
 ```
 
 ### 8. Full test suite (full profile)
@@ -78,7 +78,7 @@ cmake -S . -B build/full-check \
     -DMUC_OPCUA_BUILD_TESTS=ON
 cmake --build build/full-check
 ctest --test-dir build/full-check --output-on-failure
-# Expected: 132/132 tests passed
+# Expected: every configured full-profile test passes
 ```
 
 ### 9. Capacity override still works
@@ -97,13 +97,19 @@ grep -r "MU_MAX_SESSIONS" build/capacity-check/compile_commands.json | head -1
 ### 10. Verify no old symbols remain in config output
 
 ```sh
-# Old project-centric generated Kconfig symbols should no longer appear in .config.
-# Internal compatibility gates such as MUC_OPCUA_SECURITY may still appear in
-# muc_opcua_config.cmake while source-level migration is in progress.
+# Old project-centric generated Kconfig symbols must not appear in `.config`.
+# Generated CMake output uses the canonical symbols discovered from Kconfig.
 cmake -S . -B build/no-legacy-check -DMUC_OPCUA_PROFILE=standard
 grep -E 'MUC_OPCUA_SERVICE_READ|MUC_OPCUA_SERVICE_BROWSE|MUC_OPCUA_BASE_NODES|MUC_OPCUA_SECURITY[^_]' \
     build/no-legacy-check/.config
 # Expected: no output (symbols removed)
+
+# The generated CMake bridge contains canonical symbols and no removed aliases.
+grep -q '^set(MUC_OPCUA_CU_ATTRIBUTE_READ ON)$' \
+    build/no-legacy-check/muc_opcua_config.cmake
+! grep -qE '^set\(MUC_OPCUA_(SERVICE_READ|SERVICE_BROWSE|BASE_NODES|SECURITY) ' \
+    build/no-legacy-check/muc_opcua_config.cmake
+# Expected: both assertions succeed
 ```
 
 ### 11. Kconfig menu structure
@@ -113,7 +119,7 @@ grep -E 'MUC_OPCUA_SERVICE_READ|MUC_OPCUA_SERVICE_BROWSE|MUC_OPCUA_BASE_NODES|MU
 python3 -c "
 with open('Kconfig') as f:
     content = f.read()
-assert 'Standard 2017 UA Server Profile' in content, 'Missing OPC profile name'
+assert 'Standard 2025 UA Server Profile' in content, 'Missing OPC profile name'
 assert 'Facet: Core 2017 Server' in content, 'Missing Facet label'
 assert 'CU: Attribute Read' in content, 'Missing CU label'
 print('Kconfig structure: OK')
