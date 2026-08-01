@@ -2,7 +2,7 @@
  *
  * Feature 005 US3: Server Call method support for OPC-10000-5 Base Info methods.
  * Active coverage is gated to the Embedded/Standard slice:
- * MUC_OPCUA_SUBSCRIPTIONS_STANDARD + MUC_OPCUA_BASE_TYPE_SYSTEM.
+ * MUC_OPCUA_CU_SUBSCRIPTION_STANDARD + MUC_OPCUA_BASE_TYPE_SYSTEM.
  *
  * OPC-10000-4 5.12.2.2: Call Service request/response wire shape.
  * OPC-10000-5 9.1: Server/GetMonitoredItems.
@@ -24,7 +24,7 @@
 void setUp(void) {}
 void tearDown(void) {}
 
-#if MUC_OPCUA_SUBSCRIPTIONS && MUC_OPCUA_SUBSCRIPTIONS_STANDARD && MUC_OPCUA_BASE_TYPE_SYSTEM
+#if MUC_OPCUA_CU_SUBSCRIPTION_BASIC && MUC_OPCUA_CU_SUBSCRIPTION_STANDARD && MUC_OPCUA_BASE_TYPE_SYSTEM
 
 #define AUTH_TOKEN 12345u
 #define ID_SERVER_OBJECT 2253u
@@ -753,7 +753,7 @@ void test_method_call_us3_is_gated_to_embedded_standard_builds(void) {
 
 int main(void) {
     UNITY_BEGIN();
-#if MUC_OPCUA_SUBSCRIPTIONS && MUC_OPCUA_SUBSCRIPTIONS_STANDARD && MUC_OPCUA_BASE_TYPE_SYSTEM
+#if MUC_OPCUA_CU_SUBSCRIPTION_BASIC && MUC_OPCUA_CU_SUBSCRIPTION_STANDARD && MUC_OPCUA_BASE_TYPE_SYSTEM
     RUN_TEST(test_server_call_method_nodes_are_browsable);
     RUN_TEST(test_get_monitored_items_returns_server_and_client_handles);
     RUN_TEST(test_resend_data_reissues_current_values_on_next_publish);
