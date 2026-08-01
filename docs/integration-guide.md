@@ -939,9 +939,12 @@ network primitives so the cross-compile and server lifecycle validate before a
 real stack is attached.
 
 1. **Compile the core.** Add `src/**/*.c` (excluding the host POSIX/OpenSSL
-   adapters under `src/platform/`) and the `include/` headers to your build. It is
-   freestanding C11; you supply only `<stddef.h>`/`<stdint.h>`/`<string.h>`-level
-   facilities. Set `MUC_OPCUA_PLATFORM` and feature options (§7).
+   adapters under `src/platform/`) and the `include/` headers to your build. The
+   nano/micro/embedded profiles are freestanding C11 and require only
+   `<stddef.h>`/`<stdint.h>`/`<string.h>`-level facilities. Standard/full enable
+   bounded array decoding and therefore require working `calloc`/`free`, unless
+   you explicitly disable heap support and the dependent features. Set
+   `MUC_OPCUA_PLATFORM` and feature options (§7).
 2. **Declare storage.** Three statics:
    `g_server_storage[MU_SERVER_STORAGE_BYTES]`, `g_recv_buffer[MU_MIN_CHUNK_SIZE]`,
    `g_send_buffer[MU_MIN_CHUNK_SIZE]`.
@@ -1018,23 +1021,24 @@ opcua_statuscode_t mu_server_config_validate(const mu_server_config_t *config);
 
 ### Raising the concurrency limits
 
-`MU_MAX_SESSIONS` and `MU_MAX_CONNECTIONS` are both `#ifndef`-guarded, so both can
-be raised with a `-D` flag (e.g. `-DMUC_OPCUA_MULTIPLE_CONNECTIONS -DMU_MAX_CONNECTIONS=8`).
-`MU_MAX_SECURE_CHANNELS` always equals `MU_MAX_CONNECTIONS` (one secure channel
-per connection) and does not need to be set independently. Two things to know
-before raising either:
+`MU_MAX_SESSIONS`, `MU_MAX_CONNECTIONS`, and `MU_MAX_SECURE_CHANNELS` are public
+capacity overrides. Set them as compile definitions and reconfigure the library
+and application together (for example,
+`-DMUC_OPCUA_CU_MULTIPLE_CONNECTIONS=ON -DMU_MAX_CONNECTIONS=8`). By default secure
+channel capacity follows connection capacity because each connection owns one
+SecureChannel; overriding `MU_MAX_SECURE_CHANNELS` cannot create more connection
+slots. Two things to know before changing these limits:
 
 - `config.max_sessions`/`config.max_secure_channels` must not exceed the
   compiled `MU_MAX_SESSIONS`/`MU_MAX_CONNECTIONS` — `mu_server_init` rejects
   the config with `Bad_InternalError` otherwise, rather than silently
   under-provisioning.
-- `MU_SERVER_STORAGE_BYTES` is a flat size calibrated for the **default**
-  limits; it does not automatically grow when you raise `MU_MAX_SESSIONS` or
-  `MU_MAX_CONNECTIONS`. If you raise either, over-allocate the storage buffer
-  passed to `mu_server_init` beyond `MU_SERVER_STORAGE_BYTES` (or size it from
-  a build with your actual flags) — `mu_server_init` returns
-  `Bad_OutOfMemory` cleanly if the buffer is too small, rather than
-  overflowing it.
+- `MU_SERVER_STORAGE_BYTES` is computed from the resolved feature and capacity
+  macros, so it grows when the same `MU_MAX_*` overrides are visible while
+  compiling the library and your application. Always declare the storage array
+  from that macro after reconfiguring with the final capacity flags; do not copy
+  a value from a default-profile build. `mu_server_init` returns
+  `Bad_OutOfMemory` if the supplied block is smaller than the compiled layout.
 
 ### Related docs
 
