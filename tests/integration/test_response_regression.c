@@ -4,7 +4,7 @@
  * The test drives the real server over the mock transport through
  * HEL -> OPN -> CreateSession -> ActivateSession, then captures encoded service
  * response body bytes for Browse (OPC 10000-4 5.9.2), Read (OPC 10000-4
- * 5.11.2), and, when MUC_OPCUA_SUBSCRIPTIONS is enabled, Publish
+ * 5.11.2), and, when MUC_OPCUA_CU_SUBSCRIPTION_BASIC is enabled, Publish
  * (OPC 10000-4 5.14.5).
  *
  * Capture mode is intentional for the first orchestrator run: the golden arrays
@@ -29,7 +29,7 @@ static const opcua_byte_t golden_browse[] = {
     0x00, 0x00, 0x4D, 0x79, 0x56, 0x61, 0x72, 0x31, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 static const opcua_byte_t golden_read[] = {0x01, 0x00, 0x00, 0x00, 0x01, 0x06, 0x2A,
                                            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
-#if MUC_OPCUA_SUBSCRIPTIONS
+#if MUC_OPCUA_CU_SUBSCRIPTION_BASIC
 static const opcua_byte_t golden_publish[] = {0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00,
                                               0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
                                               0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
@@ -302,7 +302,7 @@ static void enqueue_read_myvar1(mock_t *mock, opcua_uint32_t seq) {
     enqueue(mock, chunk, build_msg(chunk, sizeof(chunk), seq, seq, tmp, w.position));
 }
 
-#if MUC_OPCUA_SUBSCRIPTIONS
+#if MUC_OPCUA_CU_SUBSCRIPTION_BASIC
 static opcua_uint64_t s_tick_ms = 0;
 static opcua_uint64_t test_get_tick_ms(void *c) {
     (void)c;
@@ -452,7 +452,7 @@ static mu_server_t *make_server(mock_t *mock, opcua_byte_t *storage, size_t stor
     config->max_sessions = 1;
     config->max_secure_channels = 1;
     fake_platform_init(NULL, &config->time_adapter, &config->entropy_adapter);
-#if MUC_OPCUA_SUBSCRIPTIONS
+#if MUC_OPCUA_CU_SUBSCRIPTION_BASIC
     s_tick_ms = 0;
     config->time_adapter.get_tick_ms = test_get_tick_ms;
 #endif
@@ -486,7 +486,7 @@ void test_read_browse_and_publish_response_bytes_are_stable(void) {
     enqueue_connect(&mock);
     enqueue_browse_objects(&mock, 4);
     enqueue_read_myvar1(&mock, 5);
-#if MUC_OPCUA_SUBSCRIPTIONS
+#if MUC_OPCUA_CU_SUBSCRIPTION_BASIC
     enqueue_create_subscription(&mock, 6);
     enqueue_publish(&mock, 7);
 #endif
@@ -508,7 +508,7 @@ void test_read_browse_and_publish_response_bytes_are_stable(void) {
     body = capture_service_body(&mock, MU_ID_READRESPONSE, &body_len);
     assert_or_capture("golden_read", golden_read, sizeof(golden_read), body, body_len);
 
-#if MUC_OPCUA_SUBSCRIPTIONS
+#if MUC_OPCUA_CU_SUBSCRIPTION_BASIC
     mu_server_poll(server);
     body = capture_service_body(&mock, MU_ID_CREATESUBSCRIPTIONRESPONSE, &body_len);
     TEST_ASSERT_TRUE(body_len > 0);
