@@ -7,7 +7,7 @@
  * bodies must be rejected with a StatusCode and never read out of bounds.
  *
  * Meaningful coverage requires the library to be built with
- * MUC_OPCUA_SUBSCRIPTIONS_STANDARD (and MUC_OPCUA_SUBSCRIPTIONS); without it the
+ * MUC_OPCUA_CU_SUBSCRIPTION_STANDARD (and MUC_OPCUA_CU_SUBSCRIPTION_BASIC); without it the
  * dispatch simply reports the service unsupported, which is still crash-free.
  */
 #include <stdbool.h>
@@ -56,7 +56,7 @@ static bool prepare_server(mu_server_t *server, opcua_uint32_t *session_id_out) 
     }
     *session_id_out = session_id;
 
-#if MUC_OPCUA_SUBSCRIPTIONS
+#if MUC_OPCUA_CU_SUBSCRIPTION_BASIC
     mu_subscriptions_init(&server->subs);
     {
         mu_subscription_t *sub = NULL;

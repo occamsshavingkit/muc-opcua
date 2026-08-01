@@ -67,7 +67,7 @@ static int prepare_server(mu_server_t *server, opcua_byte_t *send_buffer) {
         return 0;
     }
 
-#if MUC_OPCUA_SUBSCRIPTIONS
+#if MUC_OPCUA_CU_SUBSCRIPTION_BASIC
     mu_subscriptions_init(&server->subs);
     {
         mu_subscription_t *sub = NULL;
