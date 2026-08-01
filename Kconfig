@@ -832,20 +832,22 @@ config MUC_OPCUA_CU_USER_ROLE_MANAGEMENT
 
 config MUC_OPCUA_CU_MONITOR_ITEMS_500
 	bool "CU: Monitor Items 500"
+	depends on MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
 	default y if MUC_OPCUA_INTERN_PROFILE_STANDARD_2025_UA_SERVER
 	help
 	  Implementation state: claimed.
-	  OPC source: OPC-10000-4 §5.13.2 -- Monitor Items 500 -- CU 5242.
+	  OPC source: OPC-10000-4 §5.13.2 -- Monitor Items 500 -- CU 5242:Monitor Items 500.
 	  Backing tests: test_subscriptions_capacity.
 	  Imported from: profiles/opcua-profile-snapshot.json.
 	  Notes: Satisfied by project-level CU opc_cu_subscription_standard; support for 500+ monitored items is stubbed as it requires substantial memory allocation. See src/cu/core_2022_server/monitor_items_500/stub.c.disabled.
 
 config MUC_OPCUA_CU_MONITOR_MINQUEUESIZE_05
 	bool "CU: Monitor MinQueueSize_05"
+	depends on MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
 	default y if MUC_OPCUA_INTERN_PROFILE_STANDARD_2025_UA_SERVER
 	help
 	  Implementation state: claimed.
-	  OPC source: OPC-10000-4 §5.13.2 -- Monitor MinQueueSize_05 -- CU 5250.
+	  OPC source: OPC-10000-4 §5.13.2 -- Monitor MinQueueSize_05 -- CU 5250:Monitor MinQueueSize_05.
 	  Backing tests: test_subscriptions_capacity.
 	  Imported from: profiles/opcua-profile-snapshot.json.
 	  Notes: Satisfied by project-level CU opc_cu_subscription_standard; MinQueueSize_05 tuning is stubbed. See src/cu/core_2022_server/monitor_minqueuesize_05/stub.c.disabled.
@@ -1353,13 +1355,14 @@ config MUC_OPCUA_CU_AUTHORIZATION_SERVICE_CONFIGURATION_SERVER
 	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
 	help
 	  Implementation state: implemented.
-	  OPC item: CU 3182:Authorization Service Configuration Server.
+	  OPC source: OPC-10000-12 §9.7.4 -- CU 3182:Authorization Service Configuration Server.
 	  Backing tests: test_profile_surface, tests/unit/test_type_system.c.
 	  Notes: AuthorizationServiceConfigurationType nodes are gated directly by this CU.
 
 config MUC_OPCUA_CU_SUBSCRIPTION_MINIMUM_05
 	bool "CU: Subscription Minimum 05"
-	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	depends on MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
+	default y if MUC_OPCUA_INTERN_PROFILE_STANDARD_2025_UA_SERVER
 	help
 	  Implementation state: claimed.
 	  OPC item: CU 5248:Subscription Minimum 05.
@@ -1368,7 +1371,8 @@ config MUC_OPCUA_CU_SUBSCRIPTION_MINIMUM_05
 
 config MUC_OPCUA_CU_SUBSCRIPTION_PUBLISH_MIN_10
 	bool "CU: Subscription Publish Min 10"
-	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	depends on MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
+	default y if MUC_OPCUA_INTERN_PROFILE_STANDARD_2025_UA_SERVER
 	help
 	  Implementation state: claimed.
 	  OPC item: CU 5249:Subscription Publish Min 10.
@@ -1381,6 +1385,13 @@ config MUC_OPCUA_CU_SUBSCRIPTION_PUBLISH_MIN_10
 #   Detail: CU 1571:Historical Raw Data 2022 Server Facet.
 #   Notes: HistoryRead service with ReadRawModifiedDetails. Continuation points, pagination, timestamp filtering, and returnBounds implemented. Satisfied by service_history (MUC_OPCUA_CU_HISTORICAL_ACCESS_SERVER_FACET).
 comment "Historical Raw Data 2022 Server Facet (DOCUMENTED) [OPC-10000-11]"
+
+# Historical Annotation 2022 Server Facet (opc_cu_1572)
+#   Implementation state: deferred -- visible but not selectable.
+#   OPC source: OPC-10000-11.
+#   Detail: CU 1572:Historical Annotation 2022 Server Facet.
+#   Notes: Historical Annotation not implemented; no annotation storage or retrieval support.
+comment "Historical Annotation 2022 Server Facet (NOT IMPLEMENTED) [OPC-10000-11]"
 
 # Historical Data Update 2022 Server Facet (opc_cu_1573)
 #   Implementation state: documented -- visible but not selectable.
@@ -1409,6 +1420,48 @@ comment "Historical Data Replace 2022 Server Facet (DOCUMENTED) [OPC-10000-11]"
 #   Detail: CU 1576:Historical Data Delete 2022 Server Facet.
 #   Notes: HistoryUpdate service with DeleteRawModifiedDetails. isDeleteModified, startTime, endTime decoded and dispatched via history_adapter.delete_raw_modified callback. Satisfied by service_history (MUC_OPCUA_CU_HISTORICAL_ACCESS_SERVER_FACET).
 comment "Historical Data Delete 2022 Server Facet (DOCUMENTED) [OPC-10000-11]"
+
+# Base Historical Event 2022 Server Facet (opc_cu_1577)
+#   Implementation state: deferred -- visible but not selectable.
+#   OPC source: OPC-10000-11.
+#   Detail: CU 1577:Base Historical Event 2022 Server Facet.
+#   Notes: Base Historical Event not implemented; no event history support.
+comment "Base Historical Event 2022 Server Facet (NOT IMPLEMENTED) [OPC-10000-11]"
+
+# Historical Event Update 2022 Server Facet (opc_cu_1578)
+#   Implementation state: deferred -- visible but not selectable.
+#   OPC source: OPC-10000-11.
+#   Detail: CU 1578:Historical Event Update 2022 Server Facet.
+#   Notes: Historical Event Update not implemented; no event history support.
+comment "Historical Event Update 2022 Server Facet (NOT IMPLEMENTED) [OPC-10000-11]"
+
+# Historical Event Insert 2022 Server Facet (opc_cu_1579)
+#   Implementation state: deferred -- visible but not selectable.
+#   OPC source: OPC-10000-11.
+#   Detail: CU 1579:Historical Event Insert 2022 Server Facet.
+#   Notes: Historical Event Insert not implemented; no event history support.
+comment "Historical Event Insert 2022 Server Facet (NOT IMPLEMENTED) [OPC-10000-11]"
+
+# Historical Event Replace 2022 Server Facet (opc_cu_1580)
+#   Implementation state: deferred -- visible but not selectable.
+#   OPC source: OPC-10000-11.
+#   Detail: CU 1580:Historical Event Replace 2022 Server Facet.
+#   Notes: Historical Event Replace not implemented; no event history support.
+comment "Historical Event Replace 2022 Server Facet (NOT IMPLEMENTED) [OPC-10000-11]"
+
+# Historical Event Delete 2022 Server Facet (opc_cu_1581)
+#   Implementation state: deferred -- visible but not selectable.
+#   OPC source: OPC-10000-11.
+#   Detail: CU 1581:Historical Event Delete 2022 Server Facet.
+#   Notes: Historical Event Delete not implemented; no event history support.
+comment "Historical Event Delete 2022 Server Facet (NOT IMPLEMENTED) [OPC-10000-11]"
+
+# Historical Access Structured Data 2022 Server Facet (opc_cu_1710)
+#   Implementation state: deferred -- visible but not selectable.
+#   OPC source: OPC-10000-11.
+#   Detail: CU 1710:Historical Access Structured Data 2022 Server Facet.
+#   Notes: Historical Access Structured Data not implemented; structured data storage/retrieval requires additional development.
+comment "Historical Access Structured Data 2022 Server Facet (NOT IMPLEMENTED) [OPC-10000-11]"
 
 # Historical Access Structured Data Insert (opc_cu_2185)
 #   Implementation state: documented -- visible but not selectable.

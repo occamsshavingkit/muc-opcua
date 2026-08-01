@@ -31,7 +31,7 @@ from profile_manifest import graph_deps  # noqa: E402  # pylint: disable=wrong-i
 _DEFAULT_PROFILES = ("nano", "micro", "embedded", "standard", "full", "custom")
 _SELECTABLE_STATES = ("claimed", "implemented", "deferred")
 _KCONFIG_SELECTABLE_STATES = ("claimed", "implemented")
-_UNSELECTABLE_STATES = ("unimplemented", "documented")
+_UNSELECTABLE_STATES = ("unimplemented", "documented", "deferred")
 
 _MARKER_ID_RENAMES: dict[str, str] = {
     "STANDARD_PROFILE": "MUC_OPCUA_MARKER_STANDARD_PROFILE",
@@ -1783,7 +1783,9 @@ def generate_build_docs_section(manifest: dict) -> str:
         for pk in _STANDARD_PROFILES_NO_CUSTOM:
             cells.append("✅" if pd.get(pk) is True else "")
         depends_on = item.get("depends_on") or []
-        dep_str = ", ".join(depends_on) if depends_on else ""
+        semantic_depends_on = item.get("semantic_depends_on") or []
+        all_depends_on = list(dict.fromkeys(depends_on + semantic_depends_on))
+        dep_str = ", ".join(all_depends_on) if all_depends_on else ""
         lines.append(
             "| " + kconfig + " | " + item_id + " | " + state + " | "
             + " | ".join(cells) + " | " + dep_str + " |"
@@ -1819,7 +1821,7 @@ def generate_build_docs_section(manifest: dict) -> str:
     # -- Unavailable items ------------------------------------------------
     unavailable = [
         i for i in items
-        if isinstance(i, dict) and i.get("implementation_state") in _UNSELECTABLE_STATES
+        if isinstance(i, dict) and i.get("implementation_state") in ("unimplemented", "documented")
     ]
 
     lines.append("### Unavailable OPC items")

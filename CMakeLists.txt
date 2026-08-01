@@ -242,7 +242,7 @@ if(NOT _muc_opcua_kcfg_rc EQUAL 0)
     message(FATAL_ERROR "Kconfig resolution failed (rc=${_muc_opcua_kcfg_rc}):\n${_muc_opcua_kcfg_out}")
 endif()
 include(${_MUC_OPCUA_CONFIG_CMAKE})
-set(MUC_OPCUA_WRITE_VALUE_ENABLED ${MUC_OPCUA_CU_CORE_2017_ATTRIBUTE_WRITE})
+set(MUC_OPCUA_WRITE_VALUE_ENABLED ${MUC_OPCUA_CU_ATTRIBUTE_WRITE_VALUES})
 set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
     ${CMAKE_CURRENT_SOURCE_DIR}/Kconfig ${_MUC_OPCUA_KCFG_BASE})
 
