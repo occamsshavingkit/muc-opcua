@@ -8,7 +8,7 @@
 #include "muc_opcua/muc_opcua.h"
 #include "services/secure_channel.h"
 #include "services/session.h"
-#ifdef MUC_OPCUA_SUBSCRIPTIONS
+#ifdef MUC_OPCUA_CU_SUBSCRIPTION_BASIC
 #include "services/subscription.h"
 #endif
 
@@ -192,7 +192,7 @@ static bool scenario_supported(scenario_t scenario) {
 #endif
     case SCENARIO_SUBSCRIPTION_IDLE_TICK:
     case SCENARIO_SUBSCRIPTION_ACTIVE_TICK:
-#ifdef MUC_OPCUA_SUBSCRIPTIONS
+#ifdef MUC_OPCUA_CU_SUBSCRIPTION_BASIC
         return true;
 #else
         return false;
@@ -771,7 +771,7 @@ static double run_calibration(uint32_t min_ms) {
     return elapsed_ns > 0u ? ((double)iterations * 1000000000.0) / (double)elapsed_ns : 0.0;
 }
 
-#ifdef MUC_OPCUA_SUBSCRIPTIONS
+#ifdef MUC_OPCUA_CU_SUBSCRIPTION_BASIC
 static opcua_statuscode_t setup_active_subscription(mu_server_t *server, size_t item_count) {
     if (item_count > MU_INTERN_MAX_MONITORED_ITEMS) {
         return MU_STATUS_BAD_TOOMANYMONITOREDITEMS;
@@ -798,7 +798,7 @@ static opcua_statuscode_t setup_active_subscription(mu_server_t *server, size_t 
         item->monitoring_mode = MU_MONITORING_MODE_REPORTING;
         item->trigger = MU_DATACHANGE_TRIGGER_STATUS_VALUE;
         item->last_status = MU_STATUS_GOOD;
-#ifdef MUC_OPCUA_SUBSCRIPTIONS_STANDARD
+#ifdef MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
         item->queue_size = MU_INTERN_MONITORED_QUEUE_DEPTH;
         item->discard_oldest = true;
 #endif
@@ -952,7 +952,7 @@ static int run_benchmark(const bench_options_t *options, uint64_t *elapsed_ns, u
         return 1;
     }
 
-#ifdef MUC_OPCUA_SUBSCRIPTIONS
+#ifdef MUC_OPCUA_CU_SUBSCRIPTION_BASIC
     if (options->scenario == SCENARIO_SUBSCRIPTION_ACTIVE_TICK) {
         status = setup_active_subscription(server, options->batch);
         if (status != MU_STATUS_GOOD) {
@@ -965,7 +965,7 @@ static int run_benchmark(const bench_options_t *options, uint64_t *elapsed_ns, u
     for (uint32_t i = 0; i < options->warmup; ++i) {
         if (options->scenario == SCENARIO_SUBSCRIPTION_IDLE_TICK ||
             options->scenario == SCENARIO_SUBSCRIPTION_ACTIVE_TICK) {
-#ifdef MUC_OPCUA_SUBSCRIPTIONS
+#ifdef MUC_OPCUA_CU_SUBSCRIPTION_BASIC
             mu_subscriptions_tick(server, (opcua_uint64_t)i + 1u);
 #endif
         } else if (run_dispatch_once(server, request_id, request_len, response_id) != 0) {
@@ -985,7 +985,7 @@ static int run_benchmark(const bench_options_t *options, uint64_t *elapsed_ns, u
     do {
         if (options->scenario == SCENARIO_SUBSCRIPTION_IDLE_TICK ||
             options->scenario == SCENARIO_SUBSCRIPTION_ACTIVE_TICK) {
-#ifdef MUC_OPCUA_SUBSCRIPTIONS
+#ifdef MUC_OPCUA_CU_SUBSCRIPTION_BASIC
             for (size_t n = 0; n < options->nodes; ++n) {
                 bench_values[n]++;
             }
