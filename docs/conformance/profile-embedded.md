@@ -35,7 +35,7 @@ claims are out of scope for this profile-targeting build.
 - Data-change subscriptions with Standard DataChange Subscription 2022 facet additions.
   This is the **Standard** DataChange tier (queue depth 2, `MinQueueSize_02`) — embedded
   advertises `EmbeddedUA2017`. The higher **Enhanced** DataChange 2022 tier (queue depth 5)
-  is claimed only by the `standard`/`full` builds that advertise `StandardUA2017`; see
+  is claimed only by `standard`/`full` through its four canonical capacity CUs; see
   `enhanced-datachange.md`.
 - Raised Standard capacity minima:
   `MU_MAX_MONITORED_ITEMS=100`, `MU_MAX_SUBSCRIPTIONS=2`,
@@ -69,9 +69,9 @@ OPC-10000-7 §4.2 conformance-unit or §4.3 profile verification.
 | ResendData | OPC-10000-5 §8.3.2, §9.2 | Targeted behavior | `src/services/subscription.c`, `tests/unit/test_method_call.c` |
 | Base Info Type System | OPC-10000-5 standard NodeSet; OPC-10000-3 §7.7 | Targeted behavior | `src/address_space/base_nodes.c`, `tests/unit/test_type_system.c` |
 | ServerProfileArray | OPC-10000-5 Server object; OPC-10000-7 §4.3 | Targeted metadata | Embedded target URI in `Server.ServerCapabilities.ServerProfileArray`; not external CTT evidence |
-| Events and alarms | OPC-10000-9; OPC-10000-4 §5.13.1 | Optional, not built by `embedded` | Available through `MUC_OPCUA_EVENTS` in optional/full builds; not an embedded-profile default |
-| Historical Access (HA) | OPC-10000-11 | Optional, not built by `embedded` | Available through `MUC_OPCUA_SERVICE_HISTORY` in optional/full builds; not an embedded-profile default |
-| Query Services | OPC-10000-4 §5.9 | Optional, not built by `embedded` | Available through `MUC_OPCUA_SERVICE_QUERY` in optional/full builds; not an embedded-profile default |
+| Events and alarms | OPC-10000-9; OPC-10000-4 §5.13.1 | Optional, not built by `embedded` | Available through `MUC_OPCUA_CU_EVENTS` in optional/full builds; not an embedded-profile default |
+| Historical Access (HA) | OPC-10000-11 | Optional, not built by `embedded` | Available through `MUC_OPCUA_CU_HISTORICAL_ACCESS_SERVER_FACET` in optional/full builds; not an embedded-profile default |
+| Query Services | OPC-10000-4 §5.9 | Optional, not built by `embedded` | Available through `MUC_OPCUA_CU_QUERY` in optional/full builds; not an embedded-profile default |
 
 ## Explicitly Out of Scope
 
