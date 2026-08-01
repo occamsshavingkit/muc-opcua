@@ -13,9 +13,9 @@
  *   DeleteSubscriptionsRequest (§5.14.8.2): UInt32[] subscriptionIds.
  *   DeleteSubscriptionsResponse: StatusCode[] results.
  */
-#include "../../src/core/server_internal.h"
+#include "../../src/core/server_internal.h" // IWYU pragma: keep
 #include "fake_platform.h"
-#include "muc_opcua/muc_opcua.h"
+#include "muc_opcua/muc_opcua.h" // IWYU pragma: keep
 #include "unity.h"
 #include <string.h>
 
@@ -650,7 +650,7 @@ void test_create_monitored_items_sampling_minus_one_uses_publishing_interval(voi
 /* The (default MU_INTERN_MAX_MONITORED_ITEMS = 8)+1-th item in one request is rejected per-op
    with Bad_TooManyMonitoredItems (OPC 10000-4 §5.13.2.4). */
 void test_create_monitored_items_too_many(void) {
-#if MUC_OPCUA_SUBSCRIPTIONS_STANDARD && MU_INTERN_MAX_MONITORED_ITEMS > 32
+#if MUC_OPCUA_CU_SUBSCRIPTION_STANDARD && MU_INTERN_MAX_MONITORED_ITEMS > 32
     TEST_PASS_MESSAGE("Standard-facet raised capacity is covered by test_subscriptions_capacity");
     return;
 #endif
@@ -1753,13 +1753,14 @@ void test_modify_monitored_items(void) {
     mu_binary_read_uint32(&body, &revised_queue_size);
     TEST_ASSERT_EQUAL_UINT32(MU_INTERN_MONITORED_QUEUE_DEPTH, revised_queue_size);
     /* The decoded values must be applied to the monitored item, not discarded. */
-#if MUC_OPCUA_SUBSCRIPTIONS_STANDARD
+#if MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
     mu_monitored_item_t *item = &server->subs.monitored_items[0];
     TEST_ASSERT_EQUAL_UINT32(MU_INTERN_MONITORED_QUEUE_DEPTH, item->queue_size);
     TEST_ASSERT_TRUE(item->discard_oldest);
 #endif
 }
 
+#if MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
 /* OPC-10000-4 §5.13.3.1: "Changes to the MonitoredItem settings shall be applied
    immediately by the Server." A DataChangeFilter in ModifyMonitoredItems must update
    the item's trigger, deadbandType and deadbandValue, not just be decoded and discarded. */
@@ -1819,15 +1820,11 @@ void test_modify_monitored_items_applies_datachange_filter(void) {
     TEST_ASSERT_EQUAL_HEX32(MU_STATUS_GOOD, st);
 
     /* OPC-10000-4 §5.13.3.2: the decoded DataChangeFilter fields must be applied
-       to the monitored item, not decoded and discarded. The trigger and deadband
-       fields are only tracked under MUC_OPCUA_SUBSCRIPTIONS_STANDARD; without it
-       the filter body is decoded-and-skipped, so the item retains its create-time
-       defaults. */
-#if MUC_OPCUA_SUBSCRIPTIONS_STANDARD
+       to the monitored item, not decoded and discarded. */
     TEST_ASSERT_EQUAL_UINT8(MU_DATACHANGE_TRIGGER_STATUS, item->trigger);
     TEST_ASSERT_EQUAL_UINT8(MU_DEADBAND_TYPE_NONE, item->deadband_type);
-#endif
 }
+#endif
 
 /* SetMonitoringMode (OPC 10000-4 §5.13.4): DISABLED stops change detection; REPORTING
    resumes it. */
@@ -2239,7 +2236,7 @@ void test_subscription_session_isolation(void) {
    RED tests authored by Claude; Codex implements the engine + dispatch.
    =================================================================================== */
 
-#if MUC_OPCUA_SUBSCRIPTIONS_STANDARD
+#if MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
 
 #define ID_DATACHANGEFILTER_ENC_BINARY 724 /* DataChangeFilter_Encoding_DefaultBinary (i=724) */
 
@@ -2716,11 +2713,11 @@ void test_standard_facet_errors(void) {
     TEST_ASSERT_EQUAL_HEX32(0x800F0000u, sr); /* Bad_NothingToDo */
 }
 
-#endif /* MUC_OPCUA_SUBSCRIPTIONS_STANDARD */
+#endif /* MUC_OPCUA_CU_SUBSCRIPTION_STANDARD */
 
 int main(void) {
     UNITY_BEGIN();
-#if MUC_OPCUA_SUBSCRIPTIONS_STANDARD
+#if MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
     RUN_TEST(test_monitored_item_absolute_deadband);
 #if MU_INTERN_MONITORED_QUEUE_DEPTH >= 2
     RUN_TEST(test_monitored_item_queue_overflow);
@@ -2752,7 +2749,9 @@ int main(void) {
     RUN_TEST(test_set_publishing_mode);
     RUN_TEST(test_set_publishing_mode_unknown_subscription_returns_item_status);
     RUN_TEST(test_modify_monitored_items);
+#if MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
     RUN_TEST(test_modify_monitored_items_applies_datachange_filter);
+#endif
     RUN_TEST(test_set_monitoring_mode);
     RUN_TEST(test_set_monitoring_mode_unknown_item_returns_item_status);
     RUN_TEST(test_two_sessions);
