@@ -1,8 +1,10 @@
 # OPC-Named Kconfig Redesign — Implementation Plan
 
+**Propagated**: 2026-08-01 — Updated from spec.md refinement (stable profile seeds, mandatory-CU-closure advertisement markers, precise Facet re-enable semantics, and complete canonical CMake override discovery).
+
 **Goal**: Replace project-centric Kconfig symbol names with OPC UA standard names for Profiles, Facets, and Conformance Units, restructure the Kconfig menu tree into an OPC-first drilldown, and remove legacy feature aliases.
 
-**Architecture**: The manifest (`profiles/opcua-profile-manifest.yaml`) is extended with Facet containment (which CUs belong to which Facet) and OPC UA standard display names. The generator (`scripts/profile_manifest/generate.py`) produces a new Kconfig tree: top-level profile choice, Facet drilldown menus with group toggles, CU entries inside Facets, a separate Capacities menu, and a Project options menu. Validation ensures no redundant kind suffixes in generated symbols. CMake and test scripts are updated to use the new symbol names.
+**Architecture**: The manifest (`profiles/opcua-profile-manifest.yaml`) is extended with Facet containment (which CUs belong to which Facet) and OPC UA standard display names. The generator (`scripts/profile_manifest/generate.py`) produces a new Kconfig tree: top-level profile choice, Facet drilldown menus with group toggles, CU entries inside Facets, a separate Capacities menu, and a Project options menu. Validation ensures no redundant kind suffixes in generated symbols. CMake discovers the complete canonical boolean override surface from generated Kconfig, while capacities remain on their separate typed override path.
 
 **Tech Stack**: Python 3 (stdlib + vendored kconfiglib), CMake 3.20+, bash, Kconfig, C11.
 
@@ -15,7 +17,7 @@
 - No silent size regression; existing profiles must produce identical or smaller binaries (Constitution VII).
 - No legacy aliases for old `MUC_OPCUA_*` feature names in Kconfig (Spec Non-goals).
 - Capacity override support (`-DMU_MAX_*=N`) must remain working (Spec FR-010).
-- Full test suite (132 tests) must pass after regeneration (Spec Success Criteria).
+- Every configured standard/full test must pass after regeneration (Spec Success Criteria).
 
 ---
 
@@ -37,7 +39,7 @@ OPC UA Server profile/facet/conformance-unit configuration via Linux kernel-styl
 - Facets appear as drilldown menus labeled `Facet: <OPC UA standard name>` with group toggles.
 - CUs appear inside Facet menus labeled `CU: <OPC UA standard name>`.
 - Symbols follow `MUC_OPCUA_{PROFILE|FACET|CU}_<NAME>` without redundant kind suffixes.
-- Profile→custom transition when user deviates from named profile's Facet/CU set.
+- Stable profile seed under Facet/CU overrides: the explicitly selected named profile remains the Kconfig choice. Advertisement markers such as `MUC_OPCUA_MARKER_STANDARD_PROFILE` are generated independently as an AND of all currently selectable CUs marked mandatory for the required profile; the marker defaults off when that closure is unavailable. `custom` is an explicit profile seed, not an automatic fallback.
 - Capacities remain in separate menu (existing model is correct).
 - Project options isolated in `menu "Project options"`.
 - No legacy aliases for old project-centric feature names.
@@ -48,15 +50,15 @@ OPC UA Server profile/facet/conformance-unit configuration via Linux kernel-styl
 
 2. **Symbol naming algorithm**: `OPC standard name → remove trailing kind word if redundant → uppercase → non-alnum to `_` → trim → prefix with `MUC_OPCUA_{PROFILE|FACET|CU}_`.
 
-3. **Facet group toggle**: Use a `MUC_OPCUA_FACET_<NAME>` bool that defaults to `y` when any of its CUs should be enabled per the profile. CU symbols use `depends on MUC_OPCUA_FACET_<NAME>` so setting the Facet to `n` forces contained CUs off. CUs do not `select` the Facet, preserving the explicit "Facet OFF = all contained CUs OFF" model.
+3. **Facet group toggle**: Use a `MUC_OPCUA_FACET_<NAME>` bool that defaults to `y` when any of its CUs should be enabled per the profile. CU symbols use `depends on MUC_OPCUA_FACET_<NAME>` so setting the Facet to `n` forces contained CUs off. Re-enabling the Facet restores CU visibility and each CU's own resolved value/default; it does not force every CU on. CUs do not `select` the Facet.
 
-4. **Profile→custom**: Generate `MUC_OPCUA_FACETS_MATCH_<PROFILE>` helper symbols that compare resolved Facet/CU state against each named profile's expected set. Named profile choice defaults reference these helpers; `custom` is the unconditional fallback when no named profile matches.
+4. **Advertised-profile markers**: ~~Generate `MUC_OPCUA_FACETS_MATCH_<PROFILE>` helper symbols that compare resolved Facet/CU state against each named profile's expected set. Named profile choice defaults reference these helpers; `custom` is the unconditional fallback when no named profile matches.~~ **Superseded 2026-08-01**: `MUC_OPCUA_FACETS_MATCH_*` is obsolete and MUST NOT be generated. Profile choice symbols are stable. Each advertised-profile marker is emitted directly from its manifest `required_profile` as an AND of currently selectable mandatory CU symbols, or `default n` when the mandatory closure is unavailable. `custom` is explicit, not a fallback.
 
 5. **One symbol, one location**: Kconfig allows each symbol at one menu location. The manifest must assign each CU to exactly one canonical Facet for Kconfig display purposes. Cross-references go in help text.
 
 ### Resolved Planning Decisions
 
-1. **Profile→custom mechanism**: Use generated fidelity-check symbols `MUC_OPCUA_FACETS_MATCH_<PROFILE>` that compare resolved Facet/CU state against each named profile. Named profile choice defaults reference these helpers; `custom` is the unconditional fallback.
+1. **Profile fidelity**: ~~Use generated fidelity-check symbols `MUC_OPCUA_FACETS_MATCH_<PROFILE>` that compare resolved Facet/CU state against each named profile. Named profile choice defaults reference these helpers; `custom` is the unconditional fallback.~~ **Superseded 2026-08-01**: No fidelity-helper symbols are generated. Advertisement markers are emitted directly from mandatory CU requirements and remain off when the required closure is incomplete. The explicitly selected named profile seed stays stable; `custom` is explicit.
 
 2. **Facet group toggle ↔ CU interaction**: CU symbols are gated with `depends on MUC_OPCUA_FACET_<NAME>`. A disabled Facet forces contained CUs off and prevents CU edits until the Facet is re-enabled. CUs do not `select` the Facet.
 
@@ -71,7 +73,7 @@ OPC UA Server profile/facet/conformance-unit configuration via Linux kernel-styl
 | III. Minimal OPC UA Surface | PASS | No new services/features. Same features, new names. |
 | IV. Protocol Correctness Gates | PASS | All 132 existing tests must pass. No parsing/serialization changes. |
 | V. Security and Conformance Honesty | PASS | Conformance claims unchanged. Only display names and symbols change. |
-| VI. Fixed Toolchain | PASS | Generated Kconfig must be byte-identical after regeneration. `kconfiglib` vendored. CMake unchanged. |
+| VI. Fixed Toolchain | PASS | Generated Kconfig must be byte-identical after regeneration. `kconfiglib` is vendored. CMake remains the host build system and discovers canonical boolean overrides from generated Kconfig. |
 | VII. Size Discipline | PASS | No C code changes → no binary size change. Regeneration only affects text files. |
 
 **Gate result**: PASS. No violations.
@@ -84,7 +86,7 @@ See [research.md](./research.md) for resolved decisions.
 
 ### Key Decisions
 
-1. **Profile→custom mechanism**: Use a Kconfig `choice` with named profiles plus `custom`. Each named profile sets `default y if FACETS_MATCH_EXPECTED`. A companion generated symbol `MUC_OPCUA_FACETS_MATCH_<profile>` evaluates whether all profile-controlled Facets/CUs match their profile defaults. If any doesn't match, the `custom` choice becomes selected instead.
+1. **Advertised-profile reporting**: ~~Use a Kconfig `choice` with named profiles plus `custom`. Each named profile sets `default y if FACETS_MATCH_EXPECTED`. A companion generated symbol `MUC_OPCUA_FACETS_MATCH_<profile>` evaluates whether all profile-controlled Facets/CUs match their profile defaults. If any doesn't match, the `custom` choice becomes selected instead.~~ **Superseded 2026-08-01**: `MUC_OPCUA_FACETS_MATCH_*` is obsolete. Profile selection is stable. `generate.py` emits each hidden advertisement marker directly as `default y if <required CU> && ...`; when no complete selectable mandatory closure exists it emits `default n`. The Standard marker therefore remains off today.
 
 2. **Facet-CU interaction**: CU symbols `depends on MUC_OPCUA_FACET_<NAME>`. The Facet toggle is a normal bool. CUs default to profile defaults. Changing a CU does not automatically change the Facet toggle (the toggle is a group setting, not a dependency constraint). Kconfig's `depends on` means: if Facet is OFF, CUs are forced OFF and not user-changeable.
 
@@ -150,19 +152,18 @@ def compute_kconfig_symbol(display_name: str, kind: str) -> str:
 
 The manifest's `kconfig_symbol` field becomes optional/generated. Items that are unimplemented still have `kconfig_symbol: null` and generate `comment` directives.
 
-#### Profile→custom detection
+#### Advertised-profile marker generation
 
-The generator produces a secondary Kconfig include file with helper symbols:
+The generator emits hidden markers directly in generated `Kconfig`:
 
 ```kconfig
-# Generated: profile_fidelity_check.generated.kconfig
-config MUC_OPCUA_FACETS_MATCH_EMBEDDED_2017_UA_SERVER
+config MUC_OPCUA_MARKER_STANDARD_PROFILE
     bool
-    default y if MUC_OPCUA_FACET_CORE_2017_SERVER=y && MUC_OPCUA_FACET_BASE_INFO_TYPE_SYSTEM=y && ...
-    # ... one condition per profile-controlled Facet/CU
+    default n
 ```
 
-These symbols feed the profile choice's `default` values. When all conditions match, the named profile is the default; otherwise `custom` becomes the default.
+<strike>Fidelity helper symbols feed the profile choice's `default` values, with `custom` as the fallback.</strike>
+**Superseded 2026-08-01**: The profile choice is stable and `MUC_OPCUA_FACETS_MATCH_*` is rejected as obsolete. For each manifest advertisement marker, the generator computes the selectable CUs marked mandatory for `required_profile` and emits their conjunction directly. If no complete selectable closure exists, it emits `default n`, as for the current Standard marker.
 
 ### Contracts
 
@@ -173,7 +174,7 @@ See [contracts/](./contracts/) for detailed interface contracts.
 The generator MUST produce:
 
 1. **Profile choice**: `choice` block with `config MUC_OPCUA_PROFILE_<NAME>` entries.
-2. **Profile fidelity helpers**: `config MUC_OPCUA_FACETS_MATCH_<NAME>` bool symbols.
+2. **Advertised-profile markers**: Hidden marker symbols from `advertised_profile_markers`, emitted directly as the AND of currently selectable mandatory CU symbols for `required_profile`, or `default n` when that closure is unavailable. `MUC_OPCUA_FACETS_MATCH_*` symbols MUST NOT be emitted.
 3. **Facet menus**: `menu "Facet: <OPC display name>"` containing a `config MUC_OPCUA_FACET_<NAME>` group toggle and nested `config MUC_OPCUA_CU_<NAME>` entries.
 4. **Capacities menu**: Unchanged from current generation.
 5. **Project options menu**: `menu "Project options"` for optimization/non-OPC items.
@@ -181,7 +182,7 @@ The generator MUST produce:
 
 #### CMake integration contract
 
-The `CMakeLists.txt` `MUC_OPCUA_KCONFIG_FEATURES` list must be updated to list all new OPC-named symbols. The `gen_config.py` script must resolve these symbols from Kconfig and emit them into `muc_opcua_config.cmake`.
+`CMakeLists.txt` must derive `MUC_OPCUA_KCONFIG_FEATURES` from every generated selectable `MUC_OPCUA_*` `config`/`menuconfig` declaration in `Kconfig`, rather than maintaining a partial duplicate list. The `gen_config.py` script resolves these symbols from Kconfig and emits them into `muc_opcua_config.cmake`. Capacity symbols remain on the separate typed `MU_MAX_*` override path.
 
 #### Validation contract
 
