@@ -30,7 +30,7 @@ muc-opcua currently targets the Nano surface documented in
 
 ## Micro-targeted surface (the Embedded Data Change Subscription Server Facet)
 A no-heap subscription engine (`src/services/subscription*.c` and
-`src/services/subscription_publish/`, compiled behind the `MUC_OPCUA_SUBSCRIPTIONS`
+`src/services/subscription_publish/`, compiled behind the `MUC_OPCUA_CU_SUBSCRIPTION_BASIC`
 Kconfig feature, ON for `make micro`). All state is fixed-size
 and lives in the caller-owned server struct; sampling and Publish delivery are driven
 cooperatively by `mu_server_poll`.
