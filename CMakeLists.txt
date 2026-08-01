@@ -17,8 +17,8 @@ set(MUC_OPCUA_CLIENT_PROFILE "none" CACHE STRING "Target OPC UA client profile (
 # select a profile without naming MUC_OPCUA_PROFILE. Promote them to the string
 # profile here, which in turn selects configs/<profile>.defconfig as the Kconfig
 # base. The defconfig sets the corresponding OPC-named profile choice symbol
-# (MUC_OPCUA_PROFILE_STANDARD_2017_UA_SERVER /
-# MUC_OPCUA_PROFILE_EMBEDDED_2017_UA_SERVER; OPC-10000-7 §4.3) that drives the
+# (MUC_OPCUA_PROFILE_STANDARD_2025_UA_SERVER /
+# MUC_OPCUA_PROFILE_EMBEDDED_2025_UA_SERVER; OPC-10000-7 §4.3) that drives the
 # internal cascade symbols seeding Facet/CU/capacity defaults. STANDARD wins
 # over EMBEDDED (it is the larger superset).
 if(NOT MUC_OPCUA_PROFILE_EXPLICIT)
