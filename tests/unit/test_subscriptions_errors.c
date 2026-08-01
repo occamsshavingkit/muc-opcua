@@ -2,7 +2,7 @@
  *
  * Feature 005 US1 malformed request checks for Standard DataChange
  * Subscription 2017 additions. These dispatch-level tests are active only
- * when MUC_OPCUA_SUBSCRIPTIONS_STANDARD is enabled.
+ * when MUC_OPCUA_CU_SUBSCRIPTION_STANDARD is enabled.
  *
  * OPC-10000-4 5.13.5: SetTriggering.
  * OPC-10000-4 7.22.2: DataChangeFilter / DeadbandType.
@@ -23,7 +23,7 @@
 void setUp(void) {}
 void tearDown(void) {}
 
-#if MUC_OPCUA_SUBSCRIPTIONS && MUC_OPCUA_SUBSCRIPTIONS_STANDARD
+#if MUC_OPCUA_CU_SUBSCRIPTION_BASIC && MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
 
 static const mu_value_source_t s_test_value = {MU_VALUESOURCE_STATIC, {.static_value = {MU_TYPE_FLOAT, {.f = 10.0f}}}};
 static const mu_node_t s_test_nodes[] = {{{1u, MU_NODEID_NUMERIC, {TEST_VARIABLE_NODE_ID}},
@@ -981,14 +981,14 @@ void test_oversized_set_triggering_link_array_returns_too_many_operations(void) 
 #else
 
 void test_standard_error_tests_require_standard_subscription_build(void) {
-    TEST_PASS_MESSAGE("MUC_OPCUA_SUBSCRIPTIONS_STANDARD is disabled in this build");
+    TEST_PASS_MESSAGE("MUC_OPCUA_CU_SUBSCRIPTION_BASIC or MUC_OPCUA_CU_SUBSCRIPTION_STANDARD is disabled");
 }
 
 #endif
 
 int main(void) {
     UNITY_BEGIN();
-#if MUC_OPCUA_SUBSCRIPTIONS && MUC_OPCUA_SUBSCRIPTIONS_STANDARD
+#if MUC_OPCUA_CU_SUBSCRIPTION_BASIC && MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
     RUN_TEST(test_malformed_datachange_filter_length_returns_decoding_error);
     RUN_TEST(test_create_monitored_items_truncated_filter_body_returns_decoding_error);
     RUN_TEST(test_modify_monitored_items_truncated_filter_body_returns_decoding_error);
