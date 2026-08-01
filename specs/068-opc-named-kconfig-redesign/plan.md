@@ -71,7 +71,7 @@ OPC UA Server profile/facet/conformance-unit configuration via Linux kernel-styl
 | I. Spec Fidelity | PASS | No new OPC claims. Existing `opc_reference` citations preserved. Only names/menus change. |
 | II. Embedded-First C Core | PASS | Pure manifest/Kconfig/CMake change. No C code changes. No new allocations. |
 | III. Minimal OPC UA Surface | PASS | No new services/features. Same features, new names. |
-| IV. Protocol Correctness Gates | PASS | All 132 existing tests must pass. No parsing/serialization changes. |
+| IV. Protocol Correctness Gates | PASS | The full existing test suite and profile-gating suite must pass. No parsing/serialization changes. |
 | V. Security and Conformance Honesty | PASS | Conformance claims unchanged. Only display names and symbols change. |
 | VI. Fixed Toolchain | PASS | Generated Kconfig must be byte-identical after regeneration. `kconfiglib` is vendored. CMake remains the host build system and discovers canonical boolean overrides from generated Kconfig. |
 | VII. Size Discipline | PASS | No C code changes → no binary size change. Regeneration only affects text files. |
