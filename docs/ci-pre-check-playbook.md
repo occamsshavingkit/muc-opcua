@@ -7,7 +7,7 @@ All commands run from the repo root.
 ## 1. Build & test (host, default profile)
 
 ```bash
-cmake -S . -B build/test -DCMAKE_BUILD_TYPE=Debug -DMUC_OPCUA_BUILD_TESTS=ON -DMUC_OPCUA_PLATFORM=host -DMUC_OPCUA_HAVE_MBEDTLS=ON -DMUC_OPCUA_HAVE_WOLFSSL=ON -DMUC_OPCUA_PUBSUB=ON
+cmake -S . -B build/test -DCMAKE_BUILD_TYPE=Debug -DMUC_OPCUA_BUILD_TESTS=ON -DMUC_OPCUA_PLATFORM=host -DMUC_OPCUA_HAVE_MBEDTLS=ON -DMUC_OPCUA_HAVE_WOLFSSL=ON -DMUC_OPCUA_CU_PUBSUB=ON
 cmake --build build/test
 ctest --test-dir build/test --output-on-failure
 ```
@@ -26,7 +26,7 @@ done
 
 ```bash
 # Format check
-cmake -S . -B build/host -DMUC_OPCUA_BUILD_TESTS=ON -DMUC_OPCUA_PLATFORM=host -DMUC_OPCUA_PUBSUB=ON
+cmake -S . -B build/host -DMUC_OPCUA_BUILD_TESTS=ON -DMUC_OPCUA_PLATFORM=host -DMUC_OPCUA_CU_PUBSUB=ON
 cmake --build build/host --target format-check
 
 # CppCheck
@@ -39,7 +39,7 @@ cmake --build build/host --target clang-tidy
 ## 4. Sanitizer build
 
 ```bash
-CC=clang CXX=clang++ cmake -S . -B build/asan -DMUC_OPCUA_BUILD_TESTS=ON -DMUC_OPCUA_SANITIZERS="address,undefined" -DMUC_OPCUA_PLATFORM=host -DMUC_OPCUA_HAVE_MBEDTLS=ON -DMUC_OPCUA_HAVE_WOLFSSL=ON -DMUC_OPCUA_PUBSUB=ON
+CC=clang CXX=clang++ cmake -S . -B build/asan -DMUC_OPCUA_BUILD_TESTS=ON -DMUC_OPCUA_SANITIZERS="address,undefined" -DMUC_OPCUA_PLATFORM=host -DMUC_OPCUA_HAVE_MBEDTLS=ON -DMUC_OPCUA_HAVE_WOLFSSL=ON -DMUC_OPCUA_CU_PUBSUB=ON
 cmake --build build/asan
 ctest --test-dir build/asan --output-on-failure
 ```
@@ -47,7 +47,7 @@ ctest --test-dir build/asan --output-on-failure
 ## 5. Interop
 
 ```bash
-cmake -S . -B build/host -DMUC_OPCUA_BUILD_EXAMPLES=ON -DMUC_OPCUA_PLATFORM=host -DMUC_OPCUA_PUBSUB=ON
+cmake -S . -B build/host -DMUC_OPCUA_BUILD_EXAMPLES=ON -DMUC_OPCUA_PLATFORM=host -DMUC_OPCUA_CU_PUBSUB=ON
 cmake --build build/host --target minimal_server
 python3 -m venv /tmp/venv && /tmp/venv/bin/pip install --quiet asyncua
 PATH="/tmp/venv/bin:$PATH" tests/interop/run_interop.sh
@@ -73,7 +73,7 @@ bash scripts/measure_size.sh all
 
 ```bash
 bash scripts/measure_size.sh all && \
-cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DMUC_OPCUA_BUILD_TESTS=ON -DMUC_OPCUA_PLATFORM=host -DMUC_OPCUA_HAVE_MBEDTLS=ON -DMUC_OPCUA_HAVE_WOLFSSL=ON -DMUC_OPCUA_PUBSUB=ON && \
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DMUC_OPCUA_BUILD_TESTS=ON -DMUC_OPCUA_PLATFORM=host -DMUC_OPCUA_HAVE_MBEDTLS=ON -DMUC_OPCUA_HAVE_WOLFSSL=ON -DMUC_OPCUA_CU_PUBSUB=ON && \
 cmake --build build && ctest --test-dir build --output-on-failure && \
 cmake --build build --target format-check
 ```
