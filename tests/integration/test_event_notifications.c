@@ -382,7 +382,7 @@ static opcua_datetime_t test_get_time(void *c) {
 }
 
 void test_alarm_event_generation_and_publishing(void) {
-#if MUC_OPCUA_SUBSCRIPTIONS && MUC_OPCUA_EVENTS
+#if MUC_OPCUA_CU_SUBSCRIPTION_BASIC && MUC_OPCUA_EVENTS
     mock_t mock;
     (void)memset(&mock, 0, sizeof(mock));
     enqueue_connect(&mock);
@@ -829,7 +829,7 @@ void test_event_where_unsupported_operator_rejected(void) {
    CreateMonitoredItems. handle_publish must find the subscription (sub_count>0)
    and park the request, NOT return Bad_NoSubscription. */
 void test_publish_immediately_after_create_subscription(void) {
-#if MUC_OPCUA_SUBSCRIPTIONS && MUC_OPCUA_SUBSCRIPTIONS_STANDARD
+#if MUC_OPCUA_CU_SUBSCRIPTION_BASIC && MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
     mock_t mock;
     (void)memset(&mock, 0, sizeof(mock));
     enqueue_connect(&mock);
@@ -904,7 +904,8 @@ void test_publish_immediately_after_create_subscription(void) {
 #endif
 }
 
-#if MUC_OPCUA_SUBSCRIPTIONS && MUC_OPCUA_EVENTS && MUC_OPCUA_CU_AUDITING && defined(MUC_OPCUA_SERVICE_WRITE)
+#if MUC_OPCUA_CU_SUBSCRIPTION_BASIC && MUC_OPCUA_CU_EVENTS && MUC_OPCUA_CU_AUDITING &&                                 \
+    MUC_OPCUA_CU_ATTRIBUTE_WRITE_VALUES
 static opcua_int32_t s_audit_write_value;
 
 static opcua_statuscode_t audit_write_handler(void *handle, const mu_nodeid_t *node_id, opcua_uint32_t attribute_id,
@@ -1101,7 +1102,8 @@ static void parse_single_audit_notification(mock_t *mock, opcua_uint32_t subscri
    AuditWriteUpdateEvent (i=2100) when the server raises a WRITE_UPDATE audit,
    with the selected audit fields (Status, AttributeId) resolved from the pool. */
 void test_audit_write_event_e2e(void) {
-#if MUC_OPCUA_SUBSCRIPTIONS && MUC_OPCUA_EVENTS && MUC_OPCUA_CU_AUDITING && defined(MUC_OPCUA_SERVICE_WRITE)
+#if MUC_OPCUA_CU_SUBSCRIPTION_BASIC && MUC_OPCUA_CU_EVENTS && MUC_OPCUA_CU_AUDITING &&                                 \
+    MUC_OPCUA_CU_ATTRIBUTE_WRITE_VALUES
     mock_t mock;
     (void)memset(&mock, 0, sizeof(mock));
     enqueue_connect(&mock);
@@ -1277,7 +1279,8 @@ int main(void) {
     RUN_TEST(test_event_where_clause_filters_and_counts);
     RUN_TEST(test_event_where_unsupported_operator_rejected);
 #endif
-#if MUC_OPCUA_SUBSCRIPTIONS && MUC_OPCUA_EVENTS && MUC_OPCUA_CU_AUDITING && defined(MUC_OPCUA_SERVICE_WRITE)
+#if MUC_OPCUA_CU_SUBSCRIPTION_BASIC && MUC_OPCUA_CU_EVENTS && MUC_OPCUA_CU_AUDITING &&                                 \
+    MUC_OPCUA_CU_ATTRIBUTE_WRITE_VALUES
     RUN_TEST(test_audit_write_event_e2e);
 #endif
     return UNITY_END();
