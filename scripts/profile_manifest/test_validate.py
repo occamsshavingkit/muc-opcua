@@ -88,6 +88,27 @@ class ValidateInScopeImplementedCuRequirementsTest(unittest.TestCase):
 
 
 class ValidateGeneratedKconfigVisibilityPolicyTest(unittest.TestCase):
+    def test_generated_kconfig_policy_rejects_obsolete_helper_prefixes(self) -> None:
+        for obsolete_prefix in (
+            "MUC_OPCUA_PROFILE_PRESET_",
+            "MUC_OPCUA_FACETS_MATCH_",
+        ):
+            with self.subTest(obsolete_prefix=obsolete_prefix):
+                generated_kconfig = (
+                    "config " + obsolete_prefix + "STANDARD\n"
+                    '\tbool "Obsolete generated helper"\n'
+                )
+
+                errors = validate._check_generated_kconfig_structure(
+                    _manifest_with_item(),
+                    generated_kconfig,
+                )
+
+                self.assertTrue(
+                    any(obsolete_prefix in error for error in errors),
+                    errors,
+                )
+
     def test_generated_kconfig_policy_requires_unimplemented_comment(self) -> None:
         item_id = "opc_cu_missing_comment"
         display_name = "Missing Comment Conformance Unit"

@@ -100,9 +100,9 @@ grep -r "MU_MAX_SESSIONS" build/capacity-check/compile_commands.json | head -1
 # Old project-centric generated Kconfig symbols must not appear in `.config`.
 # Generated CMake output uses the canonical symbols discovered from Kconfig.
 cmake -S . -B build/no-legacy-check -DMUC_OPCUA_PROFILE=standard
-grep -E 'MUC_OPCUA_SERVICE_READ|MUC_OPCUA_SERVICE_BROWSE|MUC_OPCUA_BASE_NODES|MUC_OPCUA_SECURITY[^_]' \
+! grep -qE 'MUC_OPCUA_SERVICE_READ|MUC_OPCUA_SERVICE_BROWSE|MUC_OPCUA_BASE_NODES|MUC_OPCUA_SECURITY[^_]' \
     build/no-legacy-check/.config
-# Expected: no output (symbols removed)
+# Expected: assertion succeeds (symbols removed)
 
 # The generated CMake bridge contains canonical symbols and no removed aliases.
 grep -q '^set(MUC_OPCUA_CU_ATTRIBUTE_READ ON)$' \

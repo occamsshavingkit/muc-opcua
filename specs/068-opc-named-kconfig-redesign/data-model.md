@@ -38,6 +38,8 @@ items:
 | `implementation_state` | enum | yes | One of `claimed`, `implemented`, `unimplemented`, `deferred` |
 | `depends_on` | string[] | no | Kconfig symbol dependencies |
 | `depends_on_op` | enum | no | `and` (default) or `or` |
+| `required_for_profile` | object | no | Per-profile mandatory membership derived from the OPC relationship graph |
+| `project_required_for_profile` | object | no | Project-owned mandatory membership that is not inferred from OPC graph data |
 | `backing_tests` | string[] | no | Test names for claim verification |
 | `opc_reference` | object | no | OPC spec grounding |
 | `default_unconditional` | boolean | no | Always default y if true |

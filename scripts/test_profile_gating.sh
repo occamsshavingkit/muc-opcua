@@ -719,6 +719,42 @@ assert_cfg "$D24B" FACET_EMBEDDED_DATACHANGE_SUBSCRIPTION_2022_SERVER ON
 assert_cfg "$D24B" CU_SUBSCRIPTION_BASIC ON
 assert_cfg "$D24B" CU_EVENTS ON
 
+D24_ALL="$WORKDIR/g24-all"
+D24_ALL_LOG="$WORKDIR/g24-all-configure.log"
+mapfile -t D24_CANONICAL_SYMBOLS < <(
+    awk '($1 == "config" || $1 == "menuconfig") &&
+         $2 ~ /^MUC_OPCUA_(PROFILE|FACET|CU)_/ { print $2 }' Kconfig
+)
+D24_ALL_ARGS=(
+    -S .
+    -B "$D24_ALL"
+    -DMUC_OPCUA_PROFILE=custom
+    -DMUC_OPCUA_PLATFORM=host
+)
+for symbol in "${D24_CANONICAL_SYMBOLS[@]}"; do
+    D24_ALL_ARGS+=("-D${symbol}=ON")
+done
+
+if cmake "${D24_ALL_ARGS[@]}" >"$D24_ALL_LOG" 2>&1; then
+    D24_MISSING_SYMBOLS=()
+    for symbol in "${D24_CANONICAL_SYMBOLS[@]}"; do
+        if ! grep -q "^${symbol}=" "$D24_ALL/kconfig_overrides.config"; then
+            D24_MISSING_SYMBOLS+=("$symbol")
+        fi
+    done
+    if [ "${#D24_MISSING_SYMBOLS[@]}" -eq 0 ]; then
+        echo "  PASS  all discovered canonical symbols accept CMake overrides"
+        PASS=$((PASS + 1))
+    else
+        echo "  FAIL  canonical symbols missing from CMake overrides: ${D24_MISSING_SYMBOLS[*]}"
+        FAIL=$((FAIL + 1))
+    fi
+else
+    echo "  FAIL  complete canonical override configure failed"
+    cat "$D24_ALL_LOG"
+    FAIL=$((FAIL + 1))
+fi
+
 D24C="$WORKDIR/g24c"
 cmake -S . -B "$D24C" -DMUC_OPCUA_PROFILE=standard \
     -DMUC_OPCUA_MARKER_STANDARD_PROFILE=ON \
