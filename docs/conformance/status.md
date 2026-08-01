@@ -37,7 +37,7 @@ values are listed below.
 | `Bad_SessionNotActivated` | `MU_STATUS_BAD_SESSIONNOTACTIVATED` | Existing session used before activation | OPC-10000-4 section 7.38.2 |
 | `Bad_SessionIdInvalid` | `MU_STATUS_BAD_SESSIONIDINVALID` | Missing, unknown, or invalid session id | OPC-10000-4 section 7.38.2 |
 | `Bad_SecureChannelIdInvalid` | `MU_STATUS_BAD_SECURECHANNELIDINVALID` | Service request not bound to a valid SecureChannel | OPC-10000-4 section 7.38.2 |
-| `Bad_SecurityChecksFailed` | `MU_STATUS_BAD_SECURITYCHECKSFAILED` | Security check failure, incl. OpenSecureChannel clock-skew rejection when `MUC_OPCUA_TIME_SYNC` is enabled (Security Time Synch - Configuration, spec 055) | OPC-10000-4 section 7.38.2 |
+| `Bad_SecurityChecksFailed` | `MU_STATUS_BAD_SECURITYCHECKSFAILED` | Security check failure, incl. OpenSecureChannel clock-skew rejection when `MUC_OPCUA_CU_TIME_SYNC` is enabled (Security Time Synch - Configuration, spec 055) | OPC-10000-4 section 7.38.2 |
 | `Bad_IdentityTokenRejected` | `MU_STATUS_BAD_IDENTITYTOKENREJECTED` | Rejected user identity token | OPC-10000-4 section 7.38.2 |
 | `Bad_ResponseTooLarge` | `MU_STATUS_BAD_RESPONSETOOLARGE` | Response would exceed supported response limits | OPC-10000-4 section 7.38.2 |
 | `Bad_TcpMessageTypeInvalid` | `MU_STATUS_BAD_TCPMESSAGETYPEINVALID` | Invalid OPC UA TCP message type | OPC-10000-4 section 7.38.2 |
@@ -125,7 +125,7 @@ for the conformance-unit map.
 | ECC Security Policies (curve25519/nist256) | Implemented (full only) | `test_ecc_crypto`, `test_ecc_handshake_e2e` |
 | Authorization Service Configuration / JWT (CU 3182/1697) | Implemented (full only) | `test_jwt`, `test_jwt_activate_session` |
 | Standard DataChange Subscription 2022 facet | Implemented | `test_subscriptions_capacity`, `test_subscriptions` |
-| Enhanced DataChange Subscription 2022 facet (standard/full; mandated by StandardUA2017) | Implemented | `test_subscriptions_capacity` (`test_enhanced_*`); see `enhanced-datachange.md` |
+| Enhanced DataChange Subscription 2022 facet (standard/full; four canonical capacity CUs) | Implemented | `test_subscriptions_capacity` (`test_enhanced_*`); see `enhanced-datachange.md` |
 | Base Server Behaviour: Session General Service Behaviour (auth token · requestHandle · timeoutHint) | Implemented | `test_service_state_errors`, `test_write_response`, `test_base_server_behaviour`; see `base-server-behaviour.md` |
 | ServerDiagnostics object (optional; `ServerDiagnosticsSummary` i=2275, standard/full) | Implemented | `test_diagnostics`; see `base-server-behaviour.md` |
 | Reverse Connect (optional; server-initiated, ReverseHello first per §7.1.3, full by default; selectable elsewhere) | Implemented | `test_reverse_connect`; see `reverse-connect.md` |
@@ -136,14 +136,14 @@ for the conformance-unit map.
 | Method Server Facet (arbitrary user methods) | Implemented (full) | `test_method_call_arbitrary` |
 | KeyCredential Service Server Facet (CU 2113) | Implemented (full) | `test_key_credential`; see `key-credential-service.md` |
 | User Role Management Server Facet (CU 2080) | Implemented (full) | `test_role_management` |
-| Write Service | Implemented | Optional feature via `MUC_OPCUA_SERVICE_WRITE` |
-| Alarms & Conditions (Events) | Implemented | Event notifications via `MUC_OPCUA_EVENTS` |
+| Write Service | Implemented | Optional feature via `MUC_OPCUA_CU_ATTRIBUTE_WRITE_VALUES` |
+| Alarms & Conditions (Events) | Implemented | Event notifications via `MUC_OPCUA_CU_EVENTS` |
 | Event Filter Where-Clause | Implemented (full) | `src/services/event_filter.c` |
-| Dynamic Nodes | Implemented | Runtime node addition via `MUC_OPCUA_DYNAMIC_NODES` |
-| NodeManagement Services | Implemented | Dynamic NodeManagement via `MUC_OPCUA_SERVICE_NODEMANAGEMENT` |
-| Query Services | Implemented | Search address space via `MUC_OPCUA_SERVICE_QUERY` |
-| Historical Access (HA) | Implemented | HistoryRead/HistoryUpdate via `MUC_OPCUA_SERVICE_HISTORY` |
-| Aggregate Subscriptions | Implemented | Average/Min/Max calculation via `MUC_OPCUA_SUBSCRIPTIONS_STANDARD` (Feature 018) |
+| Dynamic Nodes | Implemented | Runtime node addition via `MUC_OPCUA_CU_DYNAMIC_NODES` |
+| NodeManagement Services | Implemented | Dynamic NodeManagement via `MUC_OPCUA_CU_NODEMANAGEMENT` |
+| Query Services | Implemented | Search address space via `MUC_OPCUA_CU_QUERY` |
+| Historical Access (HA) | Implemented | HistoryRead/HistoryUpdate via `MUC_OPCUA_CU_HISTORICAL_ACCESS_SERVER_FACET` |
+| Aggregate Subscriptions | Implemented | Average/Min/Max calculation via `MUC_OPCUA_CU_SUBSCRIPTION_STANDARD` (Feature 018) |
 
 ## Remaining
 1. **CTT verification** — run the OPC Foundation Compliance Test Tool against the
