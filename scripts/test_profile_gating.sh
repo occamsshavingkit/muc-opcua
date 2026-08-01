@@ -756,10 +756,12 @@ else
 fi
 
 D24C="$WORKDIR/g24c"
-cmake -S . -B "$D24C" -DMUC_OPCUA_PROFILE=standard \
+if ! cmake -S . -B "$D24C" -DMUC_OPCUA_PROFILE=standard \
     -DMUC_OPCUA_MARKER_STANDARD_PROFILE=ON \
-    -DMUC_OPCUA_PLATFORM=host >/dev/null 2>&1
-if grep -q '^MUC_OPCUA_MARKER_STANDARD_PROFILE=' \
+    -DMUC_OPCUA_PLATFORM=host >/dev/null 2>&1; then
+    echo "  FAIL  hidden-marker configure failed"
+    FAIL=$((FAIL + 1))
+elif grep -q '^MUC_OPCUA_MARKER_STANDARD_PROFILE=' \
     "$D24C/kconfig_overrides.config"; then
     echo "  FAIL  hidden marker was accepted as a CMake override"
     FAIL=$((FAIL + 1))
