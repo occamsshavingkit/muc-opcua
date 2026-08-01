@@ -28,7 +28,7 @@
 void setUp(void) {}
 void tearDown(void) {}
 
-#if MUC_OPCUA_SUBSCRIPTIONS
+#if MUC_OPCUA_CU_SUBSCRIPTION_BASIC
 
 /* The 100-iteration bound T007 introduces. With publishing_interval clamped to
  * 1 ms, at most MU_PUBLISH_TIMER_MAX_ITERATIONS ms of forward advance can occur
@@ -82,14 +82,14 @@ void test_advance_publish_timer_advances_one_interval_on_normal_gap(void) {
 #else
 
 void test_subscription_publish_requires_subscriptions_build(void) {
-    TEST_PASS_MESSAGE("MUC_OPCUA_SUBSCRIPTIONS is disabled in this build");
+    TEST_PASS_MESSAGE("MUC_OPCUA_CU_SUBSCRIPTION_BASIC is disabled in this build");
 }
 
 #endif
 
 int main(void) {
     UNITY_BEGIN();
-#if MUC_OPCUA_SUBSCRIPTIONS
+#if MUC_OPCUA_CU_SUBSCRIPTION_BASIC
     RUN_TEST(test_advance_publish_timer_terminates_within_bound_when_interval_is_zero);
     RUN_TEST(test_advance_publish_timer_advances_one_interval_on_normal_gap);
 #else
