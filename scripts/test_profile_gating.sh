@@ -77,6 +77,10 @@ assert_cfg "$D1" CU_QUERY OFF
 # CU: Subscription basic on (micro+); CU: Security ECC off (full only)
 assert_cfg "$D1" CU_SUBSCRIPTION_BASIC ON
 assert_cfg "$D1" CU_SECURITY_ECC OFF
+assert_cfg "$D1" CU_MONITOR_ITEMS_500 ON
+assert_cfg "$D1" CU_MONITOR_MINQUEUESIZE_05 ON
+assert_cfg "$D1" CU_SUBSCRIPTION_MINIMUM_05 ON
+assert_cfg "$D1" CU_SUBSCRIPTION_PUBLISH_MIN_10 ON
 # Secure-channel crypto gate (spec 072): on for security-capable profiles (micro+)
 assert_cfg "$D1" SECURE_CHANNEL_CRYPTO ON
 
@@ -200,6 +204,17 @@ cmake -S . -B "$D5C" -DMUC_OPCUA_PROFILE=full \
 assert_cfg "$D5C" CU_ATTRIBUTE_WRITE_VALUES OFF
 assert_cfg "$D5C" CU_ATTRIBUTE_WRITE_STATUSCODE_TIMESTAMP OFF
 assert_cfg "$D5C" CU_ATTRIBUTE_WRITE_INDEX_RANGE OFF
+
+echo "### 5d. Standard capacity CUs follow the CU_SUBSCRIPTION_STANDARD dependency ###"
+D5D="$WORKDIR/g5d"
+cmake -S . -B "$D5D" -DMUC_OPCUA_PROFILE=standard \
+    -DMUC_OPCUA_CU_SUBSCRIPTION_STANDARD=OFF \
+    -DMUC_OPCUA_PLATFORM=host >/dev/null 2>&1
+assert_cfg "$D5D" CU_SUBSCRIPTION_STANDARD OFF
+assert_cfg "$D5D" CU_MONITOR_ITEMS_500 OFF
+assert_cfg "$D5D" CU_MONITOR_MINQUEUESIZE_05 OFF
+assert_cfg "$D5D" CU_SUBSCRIPTION_MINIMUM_05 OFF
+assert_cfg "$D5D" CU_SUBSCRIPTION_PUBLISH_MIN_10 OFF
 
 echo "### 6. Add to a lean profile: nano + FACET_EXPOSES_TYPE_SYSTEM_SERVER (via .config) ###"
 D6="$WORKDIR/g6"
@@ -409,7 +424,7 @@ else
     FAIL=$((FAIL + 1))
 fi
 
-echo "### 19. Stale documented Write Value override cannot bypass canonical Kconfig gate ###"
+echo "### 19. Canonical Write Value CU owns the Write feature gate ###"
 D19="$WORKDIR/g19"
 D19_CONFIGURE_LOG="$WORKDIR/g19-configure.log"
 D19_BUILD_LOG="$WORKDIR/g19-build.log"
@@ -420,50 +435,51 @@ if cmake -S . -B "$D19" -DMUC_OPCUA_PROFILE=custom \
     -DMUC_OPCUA_PLATFORM=host \
     -DCMAKE_EXPORT_COMPILE_COMMANDS=ON >"$D19_CONFIGURE_LOG" 2>&1; then
     assert_cfg "$D19" CU_CORE_2017_ATTRIBUTE_WRITE OFF
+    assert_cfg "$D19" CU_ATTRIBUTE_WRITE_VALUES ON
 
     if [ ! -f "$D19/compile_commands.json" ]; then
-        echo "  FAIL  stale Write Value override scenario did not produce compile_commands.json"
+        echo "  FAIL  canonical Write Value scenario did not produce compile_commands.json"
         FAIL=$((FAIL + 1))
     else
         if grep -q -- "-DMUC_OPCUA_SERVICE_WRITE=1" "$D19/compile_commands.json"; then
-            echo "  FAIL  stale Write Value override emitted MUC_OPCUA_SERVICE_WRITE=1"
-            FAIL=$((FAIL + 1))
-        else
-            echo "  PASS  stale Write Value override did not emit MUC_OPCUA_SERVICE_WRITE=1"
+            echo "  PASS  canonical Write Value scenario emitted MUC_OPCUA_SERVICE_WRITE=1"
             PASS=$((PASS + 1))
+        else
+            echo "  FAIL  canonical Write Value scenario did not emit MUC_OPCUA_SERVICE_WRITE=1"
+            FAIL=$((FAIL + 1))
         fi
 
         if grep -q -- "-DMUC_OPCUA_CU_ATTRIBUTE_WRITE_VALUES=1" "$D19/compile_commands.json"; then
-            echo "  FAIL  stale Write Value override emitted MUC_OPCUA_CU_ATTRIBUTE_WRITE_VALUES=1"
-            FAIL=$((FAIL + 1))
-        else
-            echo "  PASS  stale Write Value override did not emit MUC_OPCUA_CU_ATTRIBUTE_WRITE_VALUES=1"
+            echo "  PASS  canonical Write Value scenario emitted MUC_OPCUA_CU_ATTRIBUTE_WRITE_VALUES=1"
             PASS=$((PASS + 1))
+        else
+            echo "  FAIL  canonical Write Value scenario did not emit MUC_OPCUA_CU_ATTRIBUTE_WRITE_VALUES=1"
+            FAIL=$((FAIL + 1))
         fi
     fi
 
     if cmake --build "$D19" --target muc_opcua -j4 >"$D19_BUILD_LOG" 2>&1; then
         if [ ! -f "$D19/src/libmuc_opcua.a" ]; then
-            echo "  FAIL  stale Write Value override scenario did not produce src/libmuc_opcua.a"
+            echo "  FAIL  canonical Write Value scenario did not produce src/libmuc_opcua.a"
             FAIL=$((FAIL + 1))
         elif ! D19_NM_OUTPUT=$(nm "$D19/src/libmuc_opcua.a" 2>/dev/null); then
             echo "  FAIL  could not inspect compiled Write symbols in src/libmuc_opcua.a"
             FAIL=$((FAIL + 1))
         elif printf '%s\n' "$D19_NM_OUTPUT" | \
             grep -qE '(^|[[:space:]])(handle_write|mu_write_request_decode|mu_write_response_encode)$'; then
-            echo "  FAIL  stale Write Value override compiled Write symbols"
-            FAIL=$((FAIL + 1))
-        else
-            echo "  PASS  stale Write Value override did not compile Write symbols"
+            echo "  PASS  canonical Write Value scenario compiled Write symbols"
             PASS=$((PASS + 1))
+        else
+            echo "  FAIL  canonical Write Value scenario did not compile Write symbols"
+            FAIL=$((FAIL + 1))
         fi
     else
-        echo "  FAIL  could not build stale Write Value override scenario"
+        echo "  FAIL  could not build canonical Write Value scenario"
         cat "$D19_BUILD_LOG"
         FAIL=$((FAIL + 1))
     fi
 else
-    echo "  FAIL  could not configure stale Write Value override scenario"
+    echo "  FAIL  could not configure canonical Write Value scenario"
     cat "$D19_CONFIGURE_LOG"
     FAIL=$((FAIL + 1))
 fi
