@@ -698,6 +698,38 @@ else
     PASS=$((PASS + 1))
 fi
 
+echo "### 24. Every canonical Kconfig symbol accepts a CMake override ###"
+D24A="$WORKDIR/g24a"
+cmake -S . -B "$D24A" -DMUC_OPCUA_PROFILE=full \
+    -DMUC_OPCUA_CU_AUDITING=OFF \
+    -DMUC_OPCUA_PLATFORM=host >/dev/null 2>&1
+assert_cfg "$D24A" CU_AUDITING OFF
+
+D24B="$WORKDIR/g24b"
+cmake -S . -B "$D24B" -DMUC_OPCUA_PROFILE=custom \
+    -DMUC_OPCUA_FACET_CORE_2022_SERVER=ON \
+    -DMUC_OPCUA_FACET_EMBEDDED_DATACHANGE_SUBSCRIPTION_2022_SERVER=ON \
+    -DMUC_OPCUA_CU_SUBSCRIPTION_BASIC=ON \
+    -DMUC_OPCUA_CU_EVENTS=ON \
+    -DMUC_OPCUA_PLATFORM=host >/dev/null 2>&1
+assert_cfg "$D24B" FACET_CORE_2022_SERVER ON
+assert_cfg "$D24B" FACET_EMBEDDED_DATACHANGE_SUBSCRIPTION_2022_SERVER ON
+assert_cfg "$D24B" CU_SUBSCRIPTION_BASIC ON
+assert_cfg "$D24B" CU_EVENTS ON
+
+D24C="$WORKDIR/g24c"
+cmake -S . -B "$D24C" -DMUC_OPCUA_PROFILE=standard \
+    -DMUC_OPCUA_MARKER_STANDARD_PROFILE=ON \
+    -DMUC_OPCUA_PLATFORM=host >/dev/null 2>&1
+if grep -q '^MUC_OPCUA_MARKER_STANDARD_PROFILE=' \
+    "$D24C/kconfig_overrides.config"; then
+    echo "  FAIL  hidden marker was accepted as a CMake override"
+    FAIL=$((FAIL + 1))
+else
+    echo "  PASS  hidden marker is excluded from CMake overrides"
+    PASS=$((PASS + 1))
+fi
+
 echo
 echo "===================="
 echo "$PASS passed, $FAIL failed"
