@@ -8,13 +8,12 @@ documented source identity for the facet; the committed OPC profile composition 
 raises the mandatory minima of the base **Standard DataChange Subscription 2022** facet
 (id 1675, which Enhanced *includes*).
 
-## Why the server claims it (project policy bridges the graph snapshot)
+## Canonical CU ownership (project policy bridges the graph snapshot)
 
-The `standard` and `full` Kconfig profiles advertise
-`http://opcfoundation.org/UA-Profile/Server/StandardUA2017` (see
-`src/address_space/base_nodes.c`, `s_server_profile_array`, gated by the generated
-`MUC_OPCUA_STANDARD_PROFILE` marker) and meet the Enhanced DataChange capacity minima.
-The committed graph at `profiles/opcua-profile-graph.json` does **not** confer this:
+The `standard` and `full` Kconfig profiles enable the four canonical capacity CUs
+that comprise this facet and meet their minima. This capability is owned by those
+CUs, not by a named-profile selector or advertised-profile marker. The committed
+graph at `profiles/opcua-profile-graph.json` does **not** confer this:
 **root 2269** (Standard 2025 UA Server Profile) has mandatory children 2268 (Embedded
 2025) and 1696 (X509), but **no mandatory path** to **facet 1627** (Enhanced DataChange
 Subscription 2017 Server Facet). Facet 1627 itself contains four mandatory CUs (5242,
@@ -40,16 +39,18 @@ Each CU also lists `semantic_depends_on: [MUC_OPCUA_CU_SUBSCRIPTION_STANDARD]`,
 requiring the Standard DataChange subscription core before Enhanced capacity can
 activate.
 
-`embedded` advertises `EmbeddedUA2017`, which mandates only the Standard DataChange
-2022 facet (a lower queue-depth floor), so embedded stays a Standard-tier DataChange
-server.
+The generated `MUC_OPCUA_MARKER_STANDARD_PROFILE` remains disabled until every
+mandatory CU in the Standard profile closure is implemented and selectable. The
+current `standard` and `full` builds therefore advertise `EmbeddedUA2017` through
+the Base Information Type System fallback in `src/address_space/base_nodes.c` while
+claiming the Enhanced DataChange facet independently through its four CUs.
 
 | Profile | Advertised profile | DataChange facet claimed | Queue depth |
 |---|---|---|---|
 | nano / micro | Nano / (Micro via Nano) | none / base subscriptions | 1 |
 | embedded | EmbeddedUA2017 | Standard DataChange 2022 (`MinQueueSize_02`) | 2 |
-| standard | StandardUA2017 | **Enhanced DataChange 2022** (`MinQueueSize_05`) | **5** |
-| full | StandardUA2017 | **Enhanced DataChange 2022** (`MinQueueSize_05`) | **5** |
+| standard | EmbeddedUA2017 | **Enhanced DataChange 2022** (`MinQueueSize_05`) | **5** |
+| full | EmbeddedUA2017 | **Enhanced DataChange 2022** (`MinQueueSize_05`) | **5** |
 
 ## Grounded minima (all four CUs are mandatory)
 
@@ -65,24 +66,23 @@ CU in this facet — the set below is exhaustive.
 | `Subscription Minimum 05` | ≥ 5 Subscriptions / Session | 50 / 100 | `MU_INTERN_MAX_SUBSCRIPTIONS` |
 | `Subscription Publish Min 10` | ≥ 10 Publish requests / Session | 50 / 100 | `MU_INTERN_MAX_PUBLISH_REQUESTS` |
 
-## Advertised == enforced
+## CU closure == enforced
 
-The facet marker is `MUC_OPCUA_ENHANCED_DATACHANGE` (derived in
-`include/muc_opcua/features.h` when the generated `MUC_OPCUA_STANDARD_PROFILE` marker is set —
-i.e. when the build advertises StandardUA2017). When it is set, `src/services/subscription.h` carries
-four `_Static_assert`s that fail the build if any resolved capacity drops below the claimed
-minima. So a capacity override such as `-DMU_MONITORED_QUEUE_DEPTH=2` on a standard build is
-a **compile error**, not a silently mis-advertised profile. Mirrors the "advertised ==
-enforced" rule of spec 057.
+`include/muc_opcua/features.h` defines `MUC_OPCUA_ENHANCED_DATACHANGE` only when
+all four mandatory CU symbols are enabled. Each canonical CU translation unit under
+`src/cu/core_2022_server/subscription/` carries its own `_Static_assert` against the
+resolved capacity. A capacity override below an enabled CU's minimum is therefore a
+compile error rather than a silently false capability claim.
 
 ## Cost of the queue-depth floor
 
-The monitored-item queue is a **fixed inline ring** of `MU_INTERN_MONITORED_QUEUE_DEPTH`
-entries per item (56 B/entry; no heap). Raising the floor from 2 (Standard) to 5 (Enhanced)
-adds 3 entries × 56 B **per MonitoredItem**:
+The monitored-item queue is a **fixed inline ring** of
+`MU_INTERN_MONITORED_QUEUE_DEPTH` entries per item (56 B per entry on the measured
+32-bit Arm ABI; no heap). Raising the floor from 2 (Standard) to 5 (Enhanced) adds
+three entries per MonitoredItem to the caller-owned server object:
 
-- standard (1000 items): **+164 KiB** static RAM
-- full (2000 items): **+328 KiB** static RAM
+- standard (1000 items): **+168,000 B (~164.1 KiB)**
+- full (2000 items): **+336,000 B (~328.1 KiB)**
 
 `.text` is unaffected (the change is a capacity constant, not code). A future shared-pool
 queue could support depth-5-on-request without paying 5× on every item, but the no-heap
@@ -98,5 +98,5 @@ here rather than hidden.
   `MUC_OPCUA_ENHANCED_DATACHANGE`.
 - `test_subscriptions` — the underlying DataChange sampling / notification / Republish
   behavior shared with the Standard tier.
-- Compile-time: the `subscription.h` `_Static_assert`s (negative-tested: a
-  `-DMU_MONITORED_QUEUE_DEPTH=2` standard build fails to compile).
+- Compile-time: one `_Static_assert` in each canonical capacity-CU translation
+  unit rejects a resolved value below that CU's minimum.
