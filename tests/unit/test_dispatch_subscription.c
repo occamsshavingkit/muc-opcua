@@ -20,7 +20,7 @@
 void setUp(void) {}
 void tearDown(void) {}
 
-#if MUC_OPCUA_SUBSCRIPTIONS
+#if MUC_OPCUA_CU_SUBSCRIPTION_BASIC
 
 static opcua_statuscode_t test_entropy(void *context, opcua_byte_t *buffer, size_t length) {
     (void)context;
@@ -578,14 +578,14 @@ void test_delete_subscriptions_multiple_ids_returns_corresponding_statuses(void)
 #else
 
 void test_subscription_dispatch_tests_require_subscription_build(void) {
-    TEST_PASS_MESSAGE("MUC_OPCUA_SUBSCRIPTIONS is disabled in this build");
+    TEST_PASS_MESSAGE("MUC_OPCUA_CU_SUBSCRIPTION_BASIC is disabled in this build");
 }
 
 #endif
 
 int main(void) {
     UNITY_BEGIN();
-#if MUC_OPCUA_SUBSCRIPTIONS
+#if MUC_OPCUA_CU_SUBSCRIPTION_BASIC
     RUN_TEST(test_create_subscription_returns_valid_subscription_id);
     RUN_TEST(test_create_subscription_returns_revised_parameters);
     RUN_TEST(test_create_subscription_creates_subscription_in_server_state);
