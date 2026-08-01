@@ -51,8 +51,8 @@ doc. Pass the profile and the flag you want to change on the same
 ```sh
 cmake -S . -B build/standard-no-crypto \
     -DMUC_OPCUA_PROFILE=standard \
-    -DMUC_OPCUA_SECURITY=OFF \
-    -DMUC_OPCUA_ECC=OFF          # ECC requires SECURITY; drop both together
+    -DMUC_OPCUA_SECURE_CHANNEL_CRYPTO=OFF \
+    -DMUC_OPCUA_CU_SECURITY_ECC=OFF
 ```
 
 This builds every other `standard` default with the RSA crypto layer entirely
@@ -63,11 +63,12 @@ default to as well as **removing** one the profile does.
 
 If you remove a flag something else still requires, Kconfig **cascades** — the
 dependent features are turned off too, so the build stays consistent (no inconsistent
-binary, no error). E.g. `-DMUC_OPCUA_PROFILE=full -DMUC_OPCUA_BASE_NODES=OFF` also
-disables `BASE_TYPE_SYSTEM`, `DATA_ACCESS`, `NAMESPACES`, `COMPLEX_TYPES` (all
-`depends on BASE_NODES`). Use `menuconfig` to see, live, what a candidate override
-would take down with it. (The `features.h` `#error` guards remain as a compile-time
-backstop for anyone building with raw `-D`s outside this CMake path.)
+binary, no error). E.g. `-DMUC_OPCUA_PROFILE=full
+-DMUC_OPCUA_FACET_CORE_2022_SERVER=OFF` also disables dependent type-system,
+Data Access, Namespaces, and Complex Types CUs. Use `menuconfig` to see, live,
+what a candidate override would take down with it. (The `features.h` `#error`
+guards remain as a compile-time backstop for anyone building with raw `-D`s
+outside this CMake path.)
 
 See [Overriding a profile default](#overriding-a-profile-default-subtraction--addition)
 for the full mechanics and more worked examples, and
@@ -265,9 +266,9 @@ live `cmake` configures:
 | Scenario | Result |
 |---|---|
 | `-DMUC_OPCUA_PROFILE=standard` alone | Every standard default, byte-identical to the pre-Kconfig build |
-| `-DMUC_OPCUA_PROFILE=standard -DMUC_OPCUA_SECURITY=OFF` | Standard minus crypto; `ECC` **cascades off** (it `depends on SECURITY`); everything else still ON |
-| `-DMUC_OPCUA_PROFILE=full -DMUC_OPCUA_BASE_NODES=OFF` | `BASE_TYPE_SYSTEM`, `DATA_ACCESS`, `NAMESPACES`, `COMPLEX_TYPES` all cascade off; no error |
-| Reconfigure the same build dir, same profile, `-DMUC_OPCUA_AUDITING=OFF` only | Only `AUDITING` (and anything depending on it) changes |
+| `-DMUC_OPCUA_PROFILE=full -DMUC_OPCUA_SECURE_CHANNEL_CRYPTO=OFF` | Full minus crypto; `MUC_OPCUA_CU_SECURITY_ECC` cascades off; everything else still ON |
+| `-DMUC_OPCUA_PROFILE=full -DMUC_OPCUA_FACET_CORE_2022_SERVER=OFF` | Dependent type-system, Data Access, Namespaces, and Complex Types CUs cascade off; no error |
+| Reconfigure the same build dir, same profile, `-DMUC_OPCUA_CU_AUDITING=OFF` only | Only Auditing and anything depending on it changes |
 | Reconfigure an existing `full` build dir with `-DMUC_OPCUA_PROFILE=nano` | Fully re-derives nano's defaults — no leftover `full` flags survive |
 | Switch back to `-DMUC_OPCUA_PROFILE=full` | Fully restores full's defaults |
 | `-DMUC_OPCUA_PROFILE=custom` | Nothing preset beyond the always-on core services; every flag is what you `-D`'d |
@@ -276,7 +277,7 @@ Run `scripts/test_profile_gating.sh` yourself to see all of the above
 demonstrated against live `cmake` configures (it also builds one subtraction
 config and checks with `nm` that the dropped feature's symbols are genuinely
 absent from the archive, not just flagged off — e.g. `mu_sym_chunk_wrap` gone
-when `SECURITY=OFF`).
+when `MUC_OPCUA_SECURE_CHANNEL_CRYPTO=OFF`).
 
 ### More worked examples
 
@@ -286,7 +287,7 @@ Full, but without the optional Redundancy and Reverse Connect facets
 ```sh
 cmake -S . -B build/full-lean \
     -DMUC_OPCUA_PROFILE=full \
-    -DMUC_OPCUA_REDUNDANCY=OFF \
+    -DMUC_OPCUA_CU_REDUNDANCY=OFF \
     -DMUC_OPCUA_CU_PROTOCOL_REVERSE_CONNECT_SERVER=OFF
 ```
 
@@ -295,7 +296,7 @@ Embedded, but with PubSub added on top (embedded doesn't default to it):
 ```sh
 cmake -S . -B build/embedded-pubsub \
     -DMUC_OPCUA_PROFILE=embedded \
-    -DMUC_OPCUA_PUBSUB=ON
+    -DMUC_OPCUA_CU_PUBSUB=ON
 ```
 
 Micro, but keep the crypto layer available even though micro doesn't
@@ -304,7 +305,7 @@ mandate it (adds SecurityPolicy support to a Micro-tier server):
 ```sh
 cmake -S . -B build/micro-secure \
     -DMUC_OPCUA_PROFILE=micro \
-    -DMUC_OPCUA_SECURITY=ON
+    -DMUC_OPCUA_SECURE_CHANNEL_CRYPTO=ON
 ```
 
 ### When to reach for `custom` instead
@@ -340,37 +341,37 @@ optional facets live only in `full`.
 
 | Flag | What it builds | nano | micro | embedded | standard | full | Depends on |
 |---|---|:-:|:-:|:-:|:-:|:-:|---|
-| `MUC_OPCUA_BASE_NODES` | Standard Base Information node set (Server object, ServerStatus, ServerCapabilities) | ✅ | ✅ | ✅ | ✅ | ✅ | |
-| `MUC_OPCUA_USER_AUTH` | Username/certificate user identity tokens | ✅ | ✅ | ✅ | ✅ | ✅ | |
-| `MUC_OPCUA_SERVICE_REGISTER_NODES` | RegisterNodes/UnregisterNodes | ✅ | ✅ | ✅ | ✅ | ✅ | |
-| `MUC_OPCUA_SUBSCRIPTIONS` | Data-change subscription engine (Subscription + MonitoredItem service sets) | | ✅ | ✅ | ✅ | ✅ | |
-| `MUC_OPCUA_MULTIPLE_CONNECTIONS` | Multiple concurrent TCP connections / SecureChannels | | ✅ | ✅ | ✅ | ✅ | |
-| `MUC_OPCUA_SECURITY` | SecurityPolicy Basic256Sha256 / Aes128_Sha256_RsaOaep / Aes256_Sha256_RsaPss (asym+sym crypto, ~10 KB) | | | ✅ | ✅ | ✅ | |
-| `MUC_OPCUA_BASE_TYPE_SYSTEM` | Base Info Type System node subtree | | | ✅ | ✅ | ✅ | `BASE_NODES` |
-| `MUC_OPCUA_SUBSCRIPTIONS_STANDARD` | Standard DataChange Subscription 2017 facet additions | | | ✅ | ✅ | ✅ | `SUBSCRIPTIONS` |
-| `MUC_OPCUA_STANDARD_PROFILE` | Standard 2017 capacity-minima marker (drives `capacities.h`) | | | | ✅ | ✅ | |
-| `MUC_OPCUA_SERVICE_WRITE` | Write service (Value attribute) | | | | | ✅ | |
-| `MUC_OPCUA_ECC` | ECC SecurityPolicies `#ECC_curve25519` + `#ECC_nistP256` (optional CU, spec 059) | | | | | ✅ | `SECURITY` |
-| `MUC_OPCUA_EVENTS` | Event notifications | | | | | ✅ | `SUBSCRIPTIONS` |
-| `MUC_OPCUA_MULTI_CHUNK` | Multi-chunk (continuation) message support | | | | | ✅ | |
-| `MUC_OPCUA_EXTENDED_NODEIDS` | GUID / Opaque NodeId formats | | | | | ✅ | |
-| `MUC_OPCUA_SERVICE_HISTORY` | Historical Access | | | | | ✅ | |
-| `MUC_OPCUA_SERVICE_QUERY` | Query services | | | | | ✅ | |
-| `MUC_OPCUA_SERVICE_NODEMANAGEMENT` | Optional NodeManagement service set | | | | | ✅ | |
-| `MUC_OPCUA_DYNAMIC_NODES` | Runtime-added address-space nodes | | | | | ✅ | |
-| `MUC_OPCUA_PUBSUB` | Publish/Subscribe capabilities | | | | | ✅ | |
-| `MUC_OPCUA_CUSTOM_METHODS` | Arbitrary custom Call method dispatch (paired with `METHOD_SERVER`) | | | | | ✅ | |
-| `MUC_OPCUA_SERVER_DIAGNOSTICS` | Server diagnostics node set | | | | | ✅ | |
-| `MUC_OPCUA_DATA_ACCESS` | Data Access Server Facet (deadband, EURange, AnalogItem metadata) | | | | | ✅ | `BASE_NODES` |
-| `MUC_OPCUA_METHOD_SERVER` | Method Server Facet | | | | | ✅ | |
-| `MUC_OPCUA_EVENT_FILTER_WHERE` | EventFilter where-clause evaluation engine | | | | | ✅ | `EVENTS && SUBSCRIPTIONS_STANDARD` |
-| `MUC_OPCUA_AUDITING` | Auditing Server Facet (audit event types) | | | | | ✅ | `EVENTS` |
-| `MUC_OPCUA_COMPLEX_TYPES` | ComplexType Server Facet (custom structs/enums) | | | | | ✅ | `BASE_NODES` |
-| `MUC_OPCUA_REDUNDANCY` | Client Redundancy Facet (TransferSubscriptions) | | | | | ✅ | `SUBSCRIPTIONS` |
-| `MUC_OPCUA_AGGREGATE_FULL` | Full 42-aggregate set (OPC-10000-13) | | | | | ✅ | `SUBSCRIPTIONS_STANDARD` |
+| `MUC_OPCUA_FACET_CORE_2022_SERVER` | Standard Base Information node set (Server object, ServerStatus, ServerCapabilities) | ✅ | ✅ | ✅ | ✅ | ✅ | |
+| `MUC_OPCUA_CU_USER_AUTH` | Username/certificate user identity tokens | ✅ | ✅ | ✅ | ✅ | ✅ | |
+| `MUC_OPCUA_CU_VIEW_REGISTERNODES` | RegisterNodes/UnregisterNodes | ✅ | ✅ | ✅ | ✅ | ✅ | |
+| `MUC_OPCUA_CU_SUBSCRIPTION_BASIC` | Data-change subscription engine (Subscription + MonitoredItem service sets) | | ✅ | ✅ | ✅ | ✅ | |
+| `MUC_OPCUA_CU_MULTIPLE_CONNECTIONS` | Multiple concurrent TCP connections / SecureChannels | | ✅ | ✅ | ✅ | ✅ | |
+| `MUC_OPCUA_SECURE_CHANNEL_CRYPTO` | SecurityPolicy Basic256Sha256 / Aes128_Sha256_RsaOaep / Aes256_Sha256_RsaPss (asym+sym crypto, ~10 KB) | | | ✅ | ✅ | ✅ | |
+| `MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER` | Base Info Type System node subtree | | | ✅ | ✅ | ✅ | `MUC_OPCUA_FACET_CORE_2022_SERVER` |
+| `MUC_OPCUA_CU_SUBSCRIPTION_STANDARD` | Standard DataChange Subscription 2022 facet additions | | | ✅ | ✅ | ✅ | `MUC_OPCUA_CU_SUBSCRIPTION_BASIC` |
+| `MUC_OPCUA_MARKER_STANDARD_PROFILE` | Standard capacity-minima marker (drives `capacities.h`) | | | | ✅ | ✅ | |
+| `MUC_OPCUA_CU_ATTRIBUTE_WRITE_VALUES` | Write service (Value attribute) | | | | | ✅ | |
+| `MUC_OPCUA_CU_SECURITY_ECC` | ECC SecurityPolicies `#ECC_curve25519` + `#ECC_nistP256` (optional CU, spec 059) | | | | | ✅ | `MUC_OPCUA_SECURE_CHANNEL_CRYPTO` |
+| `MUC_OPCUA_CU_EVENTS` | Event notifications | | | | | ✅ | `MUC_OPCUA_CU_SUBSCRIPTION_BASIC` |
+| `MUC_OPCUA_CU_MULTI_CHUNK` | Multi-chunk (continuation) message support | | | | | ✅ | |
+| `MUC_OPCUA_CU_EXTENDED_NODEIDS` | GUID / Opaque NodeId formats | | | | | ✅ | |
+| `MUC_OPCUA_CU_HISTORICAL_ACCESS_SERVER_FACET` | Historical Access | | | | | ✅ | |
+| `MUC_OPCUA_CU_QUERY` | Query services | | | | | ✅ | |
+| `MUC_OPCUA_CU_NODEMANAGEMENT` | Optional NodeManagement service set | | | | | ✅ | |
+| `MUC_OPCUA_CU_DYNAMIC_NODES` | Runtime-added address-space nodes | | | | | ✅ | |
+| `MUC_OPCUA_CU_PUBSUB` | Publish/Subscribe capabilities | | | | | ✅ | |
+| `MUC_OPCUA_CU_CUSTOM_METHODS` | Arbitrary custom Call method dispatch (paired with `MUC_OPCUA_CU_METHOD_SERVER`) | | | | | ✅ | |
+| `MUC_OPCUA_CU_BASE_INFO_DIAGNOSTICS` | Server diagnostics node set | | | | | ✅ | |
+| `MUC_OPCUA_CU_DATA_ACCESS` | Data Access Server Facet (deadband, EURange, AnalogItem metadata) | | | | | ✅ | `MUC_OPCUA_FACET_CORE_2022_SERVER` |
+| `MUC_OPCUA_CU_METHOD_SERVER` | Method Server Facet | | | | | ✅ | |
+| `MUC_OPCUA_CU_EVENT_FILTER_WHERE` | EventFilter where-clause evaluation engine | | | | | ✅ | `MUC_OPCUA_CU_EVENTS && MUC_OPCUA_CU_SUBSCRIPTION_STANDARD` |
+| `MUC_OPCUA_CU_AUDITING` | Auditing Server Facet (audit event types) | | | | | ✅ | `MUC_OPCUA_CU_EVENTS` |
+| `MUC_OPCUA_CU_COMPLEX_TYPES` | ComplexType Server Facet (custom structs/enums) | | | | | ✅ | `MUC_OPCUA_FACET_CORE_2022_SERVER` |
+| `MUC_OPCUA_CU_REDUNDANCY` | Client Redundancy Facet (TransferSubscriptions) | | | | | ✅ | `MUC_OPCUA_CU_SUBSCRIPTION_BASIC` |
+| `MUC_OPCUA_CU_AGGREGATE_FULL` | Full 42-aggregate set (OPC-10000-13) | | | | | ✅ | `MUC_OPCUA_CU_SUBSCRIPTION_STANDARD` |
 | `MUC_OPCUA_CU_PROTOCOL_REVERSE_CONNECT_SERVER` | Protocol Reverse Connect Server CU 2867 (server-initiated connections) | | | | | ✅ | |
-| `MUC_OPCUA_TIME_SYNC` | Security Time Synchronization (timestamp population) | | | | | ✅ | |
-| `MUC_OPCUA_NAMESPACES` | Namespaces metadata node (OPC-10000-5 §6.2.10) | | | | | ✅ | `BASE_NODES` |
+| `MUC_OPCUA_CU_TIME_SYNC` | Security Time Synchronization (timestamp population) | | | | | ✅ | |
+| `MUC_OPCUA_CU_NAMESPACES` | Namespaces metadata node (OPC-10000-5 §6.2.10) | | | | | ✅ | `MUC_OPCUA_FACET_CORE_2022_SERVER` |
 
 `MUC_OPCUA_ALLOW_HEAP` is forced `OFF` for `nano`/`micro`/`embedded` in
 `CMakeLists.txt` as a memory-model consequence of those tiers — **not** in the
@@ -380,16 +381,15 @@ table above because it isn't in the Kconfig feature tree
 
 ### Base services (independent of `MUC_OPCUA_PROFILE`, mostly default ON)
 
-These are Kconfig symbols with an **unconditional `default y`** (not gated on a
-profile), because OpenSecureChannel/Session/Read/Browse/Discovery are close to
-universal — so every profile, including `custom`, gets them ON, and you subtract
-one with `-DMUC_OPCUA_SERVICE_<X>=OFF` like any other flag:
+These canonical CUs have an **unconditional `default y`** once their owning Core
+facet is enabled. Every named profile gets them, and a custom build can subtract
+an individual capability with its canonical CU symbol:
 
 | Flag | What it builds | Default |
 |---|---|:-:|
-| `MUC_OPCUA_SERVICE_READ` | Read service | ON |
-| `MUC_OPCUA_SERVICE_BROWSE` | Browse + BrowseNext + TranslateBrowsePaths | ON |
-| `MUC_OPCUA_SERVICE_DISCOVERY` | GetEndpoints/FindServers | ON |
+| `MUC_OPCUA_CU_ATTRIBUTE_READ` | Read service | ON |
+| `MUC_OPCUA_CU_VIEW_BASIC_2` / `MUC_OPCUA_CU_VIEW_TRANSLATEBROWSEPATH` | Browse + BrowseNext + TranslateBrowsePaths | ON |
+| `MUC_OPCUA_CU_DISCOVERY_FIND_SERVERS_SELF` / `MUC_OPCUA_CU_DISCOVERY_GET_ENDPOINTS` | GetEndpoints/FindServers | ON |
 
 ### Additional Kconfig toggles
 
@@ -479,9 +479,10 @@ to refresh.
 | MUC_OPCUA_FACET_USER_TOKEN_USER_NAME_PASSWORD_SERVER | opc_facet_1695 | implemented |  |  | ✅ | ✅ | ✅ |  |
 | MUC_OPCUA_FACET_USER_TOKEN_X509_CERTIFICATE_SERVER | opc_facet_1696 | implemented |  |  |  | ✅ | ✅ |  |
 | MUC_OPCUA_FACET_EMBEDDED_DATACHANGE_SUBSCRIPTION_2022_SERVER | opc_facet_2250 | implemented |  | ✅ | ✅ | ✅ | ✅ |  |
+| MUC_OPCUA_CU_BASE_INFO_BASE_TYPES | opc_cu_3188 | claimed |  |  | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER, MUC_OPCUA_CU_BASE_INFO_DATATYPES |
 | MUC_OPCUA_CU_BASE_INFO_SERVERTYPE | opc_cu_3189 | claimed |  |  | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER |
 | MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION | opc_cu_5801 | claimed |  |  | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER |
-| MUC_OPCUA_CU_SUBSCRIPTION_BASIC | opc_cu_subscription_basic | claimed |  | ✅ | ✅ | ✅ | ✅ |  |
+| MUC_OPCUA_CU_SUBSCRIPTION_BASIC | opc_cu_subscription_basic | claimed |  | ✅ | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_EMBEDDED_DATACHANGE_SUBSCRIPTION_2022_SERVER |
 | MUC_OPCUA_CU_SUBSCRIPTION_STANDARD | opc_cu_subscription_standard | claimed |  |  | ✅ | ✅ | ✅ | MUC_OPCUA_CU_SUBSCRIPTION_BASIC |
 | MUC_OPCUA_CU_SECURITY_ECC | opc_cu_security_ecc | claimed |  |  |  |  | ✅ | SECURE_CHANNEL_CRYPTO |
 | MUC_OPCUA_CU_EVENTS | opc_cu_events | claimed |  |  |  |  | ✅ | MUC_OPCUA_CU_SUBSCRIPTION_BASIC |
@@ -502,10 +503,7 @@ to refresh.
 | MUC_OPCUA_CU_NAMESPACES | opc_cu_namespaces | claimed |  |  |  |  | ✅ |  |
 | MUC_OPCUA_CU_BASE_INFO_DATATYPES | opc_cu_base_info_datatypes | claimed |  |  | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER |
 | MUC_OPCUA_CU_BASE_INFO_ARGUMENT_TYPE | opc_cu_base_info_argument_type | claimed |  |  | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER |
-| MUC_OPCUA_CU_BASE_INFO_BASE_TYPES | opc_cu_base_info_base_types | claimed |  |  | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER, MUC_OPCUA_CU_BASE_INFO_DATATYPES |
-| MUC_OPCUA_CU_ATTRIBUTE_READ | service_read | claimed | ✅ | ✅ | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
 | MUC_OPCUA_CU_VIEW_REGISTERNODES | service_register_nodes | claimed | ✅ | ✅ | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
-| MUC_OPCUA_CU_CORE_2017_ATTRIBUTE_WRITE | service_write | claimed |  |  |  |  | ✅ |  |
 | MUC_OPCUA_CU_HISTORICAL_ACCESS_SERVER_FACET | service_history | claimed |  |  |  |  | ✅ |  |
 | — | opc_cu_1572 | deferred |  |  |  |  |  |  |
 | — | opc_cu_1577 | deferred |  |  |  |  |  |  |
@@ -524,6 +522,7 @@ to refresh.
 | MUC_OPCUA_CU_ATTRIBUTE_WRITE_VALUES | opc_cu_2389 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
 | MUC_OPCUA_CU_SESSION_CHANGE_USER | opc_cu_2400 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
 | MUC_OPCUA_CU_ATTRIBUTE_WRITE_STATUSCODE_TIMESTAMP | opc_cu_2936 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER, MUC_OPCUA_CU_ATTRIBUTE_WRITE_VALUES |
+| MUC_OPCUA_CU_ATTRIBUTE_READ | opc_cu_3072 | claimed | ✅ | ✅ | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
 | MUC_OPCUA_CU_ATTRIBUTE_WRITE_INDEX_RANGE | opc_cu_3147 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER, MUC_OPCUA_CU_ATTRIBUTE_WRITE_VALUES |
 | MUC_OPCUA_CU_BASE_INFO_DIAGNOSTICS | opc_cu_3192 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
 | MUC_OPCUA_CU_VIEW_BASIC_2 | opc_cu_3530 | claimed | ✅ | ✅ | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
@@ -680,7 +679,6 @@ The following OPC items are tracked in the manifest but are NOT implemented. The
 | opc_cu_2963 |  | documented | Support the following MonitoredItem Services: CreateMonitoredItems, ModifyMonitoredItems, DeleteMonitoredItems and SetMonitoringMode. |
 | opc_cu_3146 |  | documented | Support the SetTriggering Service to create and/or delete triggering links for a triggering item. |
 | opc_cu_3185 |  | documented | Reconciled (spec 080b): the core type-system Folder Nodes Types(86)/ObjectTypes(88)/DataTypes(90)/VariableTypes(89)/ReferenceTypes(91) are exposed in base_nodes.c and asserted by test_type_system. Satisfied by opc_cu_base_info_base_types. Exposes entry points into the type system in the AddressSpace. Specifically, these are the Folder Nodes: Types, ObjectTypes, DataTypes, VariableTypes, and ReferenceTypes. |
-| opc_cu_3188 |  | documented | Reconciled (spec 080b): the full base OPC UA type system is exposed in base_nodes.c and asserted by test_type_system -- all built-in/abstract DataTypes with supertype closure (primitives re-parented under Integer(27)/UInteger(28)/Number(26)), the base Object/Variable/ReferenceTypes, ModellingRuleType(77) + its ModellingRule Objects (78/80/83/11508/11510), and EnumValueType(7594)/Union(12756) with EnumValueType Encoding Objects (7616/8251). Satisfied by opc_cu_base_info_base_types. Supports type information of the base OPC UA concepts, like build-in DataTypes, base Object- and VariableTypes, and base ReferenceTypes. Includes the Encoding Objects for the DataTypes that are not Build-in or abstract DataTypes. Exposes the ObjectTypes BaseObjectType, FolderType, DataTypeEncodingType and ModellingRuleType in the AddressSpace. Exposes the VariableTypes BaseVariableType, PropertyType, and BaseDataVariableType in the AddressSpace. Exposes the DataTypes BaseDataType Boolean, ByteString, DateTime, DataValue, DiagnosticsInfo, Enumeration, ExpandedNodeId, Guid, LocalizedText, NodeId, Number, QualifiedName, String, Structure, XmlElement, Integer, UInteger, Double, Float, Sbyte, Int16, Int32, Int64, Byte, Uint16, Uint32, Uint64, StatusCode, UtcTime, Duration, NumericRange, EnumValueType, and Union and their Encoding Objects in the AddressSpace. Exposes the ReferenceTypes References, HierarchicalReferences, NonHierarchicalReferences, HasChild, Organizes, HasModellingRule, HasTypeDefinition, HasEncoding, Aggregates, HasSubtype, HasComponent, and HasProperty in the AddressSpace Exposes the Objects Optional, Mandatory, OptionalPlaceholder, MandatoryPlaceholder and ExposesItsArrayin the AddressSpace. |
 | opc_cu_3196 |  | documented | Satisfied by project-level CU opc_cu_subscription_basic. |
 | opc_cu_3207 |  | documented | Satisfied by project-level CU opc_cu_3127; OptionSetType (11487) is defined in base_nodes.c and exposed in the AddressSpace alongside its encoding objects and supertypes. |
 | opc_cu_3214 |  | documented | Standard OPC UA DataType automatically exposed through the type system (see opc_cu_base_info_datatypes / opc_cu_base_info_base_types). No dedicated CU implementation file is required. |
@@ -754,6 +752,7 @@ The following OPC items are tracked in the manifest but are NOT implemented. The
 | opc_cu_aggregate_variance_sample | OPC-10000-13 §4.2.2.37 Core 2022 Server Facet | documented |  |
 | opc_cu_aggregate_std_dev_population | OPC-10000-13 §4.2.2.38 Core 2022 Server Facet | documented |  |
 | opc_cu_aggregate_variance_population | OPC-10000-13 §4.2.2.39 Core 2022 Server Facet | documented |  |
+| opc_cu_base_info_base_types | OPC-10000-5 Core 2022 Server Facet | documented | spec 080b: completes the base OPC UA type system in base_nodes.c -- the remaining built-in/abstract DataTypes (Guid14/ByteString15/XmlElement16/ExpandedNodeId18/DataValue23/DiagnosticInfo25/Integer27/UInteger28/Enumeration29/Duration290/NumericRange291/UtcTime294/EnumValueType7594/Union12756) with correct supertype closure (primitives re-parented under Integer/UInteger/Number), HasModellingRule(37) + ModellingRuleType(77) + the ModellingRule Objects (Optional80/Mandatory78/ExposesItsArray83/OptionalPlaceholder11508/MandatoryPlaceholder11510), and the EnumValueType Encoding Objects (DefaultXml7616/DefaultBinary8251). Satisfies CU 3188 (Base Types) and CU 3185 (Core Types Folders). Second slice of the base type-system completion (A2); depends on the specialized-DataTypes CU for the Number/String subtype arrays it extends. |
 | opc_cu_1571 | OPC-10000-11 | documented | HistoryRead service with ReadRawModifiedDetails. Continuation points, pagination, timestamp filtering, and returnBounds implemented. Satisfied by service_history (MUC_OPCUA_CU_HISTORICAL_ACCESS_SERVER_FACET). |
 | opc_cu_1573 | OPC-10000-11 | documented | HistoryUpdate service with UpdateDataDetails. performInsertReplace field decoded and dispatched via history_adapter.update_data callback. Satisfied by service_history (MUC_OPCUA_CU_HISTORICAL_ACCESS_SERVER_FACET). |
 | opc_cu_1574 | OPC-10000-11 | documented | HistoryUpdate Insert (performInsertReplace=1). Insert rejects existing-timestamp collision; replace requires pre-existing timestamp. Satisfied by service_history (MUC_OPCUA_CU_HISTORICAL_ACCESS_SERVER_FACET). |
@@ -772,7 +771,6 @@ The following OPC items are tracked in the manifest but are NOT implemented. The
 | opc_cu_2786 |  | documented | Application supports time synchronization via the Network Time Protocol (NTP). |
 | opc_cu_2808 |  | documented | Stub callback interface for role-based access control. The callback is invoked before each service handler; NULL callback allows all. |
 | opc_cu_2823 |  | documented | Satisfied by project-level CU opc_cu_user_auth; the ActivateSession handler in activate_session.c validates user identity tokens and returns Bad_IdentityTokenInvalid for invalid tokens per OPC-10000-4. |
-| opc_cu_3072 |  | documented | Supports the Read Service to read one or more Attributes of one or more Nodes. This includes support of the IndexRange parameter to read a single element or a range of elements when the Attribute value is an array. |
 | opc_cu_3125 |  | documented | Satisfied by opc_cu_user_auth; server supports X.509 certificate-based user authentication (test_user_auth_certificate). |
 | opc_cu_3143 |  | documented | Reconciled (spec 073): on Publish-queue overflow handle_publish evicts the OLDEST parked request and answers it with Bad_TooManyPublishRequests, then parks the incoming request (publish_request_evict_oldest, publish_due.c; OPC-10000-4 §5.14.5.1); test_subscriptions_capacity::test_publish_queue_overflow_evicts_oldest_and_parks_newest. Satisfied by opc_cu_subscription_basic. If the maximum supported number of PublishRequests has been queued and a new PublishRequest arrives, the "oldest" PublishRequest has to be discarded by returning the proper error. |
 | opc_cu_3534 |  | documented | Server supports at least 2 Subscriptions in a single Session. |
@@ -1200,7 +1198,8 @@ implementation claim.
 - [`scripts/measure_size.sh`](../scripts/measure_size.sh) — cross-compiles
   each named profile for ARM Cortex-M0+ and reports `.text`/`.data`/`.bss`.
   Use it to size any subtraction/addition you make (e.g. confirm "standard
-  minus encryption" actually saves the ~10 KB the `MUC_OPCUA_SECURITY` option
+  minus encryption" actually saves the ~10 KB the
+  `MUC_OPCUA_SECURE_CHANNEL_CRYPTO` option
   doc string promises).
 - [docs/size/feature-size-ledger.md](size/feature-size-ledger.md) — the
   historical record of what each feature costs, per profile.

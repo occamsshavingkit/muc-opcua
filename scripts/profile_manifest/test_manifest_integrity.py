@@ -29,6 +29,7 @@ def _load(name: str):
 
 
 completion = _load("completion")
+graph_deps = _load("graph_deps")
 
 
 class ManifestIntegrityTest(unittest.TestCase):
@@ -38,6 +39,9 @@ class ManifestIntegrityTest(unittest.TestCase):
         manifest_path = _REPO / "profiles" / "opcua-profile-manifest.yaml"
         with manifest_path.open(encoding="utf-8") as manifest_file:
             cls.manifest = json.load(manifest_file)
+        graph_path = _REPO / "profiles" / "opcua-profile-graph.json"
+        with graph_path.open(encoding="utf-8") as graph_file:
+            cls.graph = json.load(graph_file)
 
     def test_committed_manifest_is_strict_json(self) -> None:
         self.assertIsInstance(self.manifest["items"], list)
@@ -74,6 +78,31 @@ class ManifestIntegrityTest(unittest.TestCase):
         # Then every canonical OPC CU identifier has one manifest owner.
         self.assertEqual(duplicates, {})
 
+    def test_standard_mandatory_graph_cus_have_exactly_one_manifest_owner(self) -> None:
+        # Given the canonical mandatory CU closure for Standard 2025 UA Server.
+        mandatory_cu_names = graph_deps._mandatory_cu_names(self.graph, "2269")
+
+        # When manifest owners are grouped by canonical graph CU name.
+        owners_by_name = {
+            cu_name: [
+                item["id"]
+                for item in self.manifest["items"]
+                if item.get("kind") == "conformance_unit"
+                and isinstance(item.get("opc_reference"), dict)
+                and item["opc_reference"].get("cu_name") == cu_name
+            ]
+            for cu_name in mandatory_cu_names
+        }
+        invalid_owners = {
+            cu_name: owners
+            for cu_name, owners in owners_by_name.items()
+            if len(owners) != 1
+        }
+
+        # Then all 52 mandatory CUs have one unambiguous manifest owner.
+        self.assertEqual(len(mandatory_cu_names), 52)
+        self.assertEqual(invalid_owners, {})
+
     def test_capacity_cus_have_explicit_standard_project_metadata(self) -> None:
         capacity_cus = [
             (
@@ -109,6 +138,9 @@ class ManifestIntegrityTest(unittest.TestCase):
                     ["MUC_OPCUA_CU_SUBSCRIPTION_STANDARD"],
                 )
                 self.assertEqual(item["project_profile_defaults"], {"standard": True})
+                self.assertEqual(
+                    item["project_required_for_profile"], {"standard": True}
+                )
 
     def test_view_and_discovery_have_only_dedicated_canonical_owners(self) -> None:
         items = self.manifest["items"]
@@ -133,13 +165,17 @@ class ManifestIntegrityTest(unittest.TestCase):
             "MUC_OPCUA_CU_DISCOVERY_FIND_SERVERS_SELF",
         )
 
-    def test_full_profile_write_aggregate_remains_selectable(self) -> None:
-        service_write = next(
-            item for item in self.manifest["items"] if item.get("id") == "service_write"
+    def test_write_has_only_the_dedicated_canonical_owner(self) -> None:
+        items_by_id = {item["id"]: item for item in self.manifest["items"]}
+        self.assertNotIn("service_write", items_by_id)
+
+        canonical_write = items_by_id["opc_cu_2389"]
+        self.assertEqual(canonical_write["implementation_state"], "claimed")
+        self.assertEqual(
+            canonical_write["kconfig_symbol"],
+            "MUC_OPCUA_CU_ATTRIBUTE_WRITE_VALUES",
         )
-        self.assertEqual(service_write["implementation_state"], "claimed")
-        self.assertTrue(service_write["profile_defaults"]["full"])
-        self.assertIn("test_write_service", service_write["backing_tests"])
+        self.assertIn("test_write_service", canonical_write["backing_tests"])
 
     def test_authorization_service_configuration_server_has_canonical_owner(self) -> None:
 

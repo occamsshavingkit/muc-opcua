@@ -61,7 +61,7 @@ endchoice
 # Advertised-profile marker; drives base_nodes.c ServerProfileArray + capacities.h tier. EMBEDDED_PROFILE is intentionally absent (CMake-only, never a C define).
 config MUC_OPCUA_MARKER_STANDARD_PROFILE
 	bool
-	default y if MUC_OPCUA_INTERN_PROFILE_STANDARD_2025_UA_SERVER
+	default n
 
 # -- Internal profile cascade symbols (OPC-10000-7 §4.3) --------------
 # Invisible bool symbols encoding the profile inclusion hierarchy.
@@ -289,7 +289,7 @@ config MUC_OPCUA_CU_ADDRESS_SPACE_ADDIN_REFERENCE
 	help
 	  Implementation state: claimed.
 	  OPC item: CU 2446:Address Space AddIn Reference.
-	  Backing tests: test_profile_surface.
+	  Backing tests: test_profile_surface, test_type_system.
 	  Notes: Support the HasAddIn Reference to bind an AddIn to an Object or ObjectType.
 
 config MUC_OPCUA_CU_ADDRESS_SPACE_ADDIN_DEFAULTINSTANCEBROWSENAME
@@ -433,6 +433,16 @@ config MUC_OPCUA_CU_AGGREGATE_SUBSCRIPTION_TOTAL
 	  OPC source: OPC-10000-13 §5.4.3.8 -- CU 3062:Aggregate Subscription – Total.
 	  Backing tests: test_profile_surface.
 	  Notes: Satisfied by project-level CU opc_cu_aggregate_total; the Total aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_TOTAL.
+
+config MUC_OPCUA_CU_ATTRIBUTE_READ
+	bool "CU: Attribute Read"
+	depends on MUC_OPCUA_FACET_CORE_2022_SERVER
+	default y
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3072:Attribute Read.
+	  Backing tests: test_profile_surface, test_read_service.
+	  Notes: Supports the Read Service to read one or more Attributes of one or more Nodes. This includes support of the IndexRange parameter to read a single element or a range of elements when the Attribute value is an array. Implemented by the core Read service.
 
 config MUC_OPCUA_CU_AGGREGATE_SUBSCRIPTION_TIMEAVERAGE
 	bool "CU: Aggregate Subscription – TimeAverage"
@@ -610,16 +620,6 @@ config MUC_OPCUA_CU_BASE_INFO_ARGUMENT_TYPE
 	  Backing tests: test_type_system.
 	  Notes: spec 080a: exposes the Argument(i=296) DataType (subtype of Structure) + its DefaultBinary(298)/DefaultXml(297) Encoding Objects, plus the shared DataTypeEncodingType(76) ObjectType and HasEncoding(38) ReferenceType, in base_nodes.c. Satisfies CU 3641. First slice of the base type-system completion (A2); 3188 base DataTypes + 3185 folders follow.
 
-config MUC_OPCUA_CU_BASE_INFO_BASE_TYPES
-	bool "Base Info Base Types + Core Types Folders"
-	depends on MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER && MUC_OPCUA_CU_BASE_INFO_DATATYPES
-	default y if MUC_OPCUA_INTERN_PROFILE_EMBEDDED_2025_UA_SERVER
-	help
-	  Implementation state: claimed.
-	  OPC source: OPC-10000-5 -- Core 2022 Server Facet.
-	  Backing tests: test_type_system.
-	  Notes: spec 080b: completes the base OPC UA type system in base_nodes.c -- the remaining built-in/abstract DataTypes (Guid14/ByteString15/XmlElement16/ExpandedNodeId18/DataValue23/DiagnosticInfo25/Integer27/UInteger28/Enumeration29/Duration290/NumericRange291/UtcTime294/EnumValueType7594/Union12756) with correct supertype closure (primitives re-parented under Integer/UInteger/Number), HasModellingRule(37) + ModellingRuleType(77) + the ModellingRule Objects (Optional80/Mandatory78/ExposesItsArray83/OptionalPlaceholder11508/MandatoryPlaceholder11510), and the EnumValueType Encoding Objects (DefaultXml7616/DefaultBinary8251). Satisfies CU 3188 (Base Types) and CU 3185 (Core Types Folders). Second slice of the base type-system completion (A2); depends on the specialized-DataTypes CU for the Number/String subtype arrays it extends.
-
 config MUC_OPCUA_CU_BASE_INFO_DATATYPES
 	bool "Base Info Specialized DataTypes"
 	depends on MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER
@@ -785,10 +785,11 @@ config MUC_OPCUA_CU_SESSION_TIMEOUT
 
 config MUC_OPCUA_CU_SUBSCRIPTION_BASIC
 	bool "CU: Subscription Basic"
+	depends on MUC_OPCUA_FACET_EMBEDDED_DATACHANGE_SUBSCRIPTION_2022_SERVER
 	default y if MUC_OPCUA_INTERN_PROFILE_MICRO_EMBEDDED_DEVICE_2025_SERVER
 	help
 	  Implementation state: claimed.
-	  OPC source: OPC-10000-4 §5.12/5.13 -- Core 2022 Server Facet -- CU 3727.
+	  OPC source: OPC-10000-4 §5.12/5.13 -- Core 2022 Server Facet -- CU 3727:Subscription Basic.
 	  Backing tests: test_subscriptions, test_subscriptions_errors.
 	  Notes: Project-level Conformance Unit mirroring the legacy 'subscriptions' item; emits Kconfig symbol MUC_OPCUA_CU_SUBSCRIPTION_BASIC matching the #ifdef guard renamed in Task 3 of the CU-aligned code reorganisation plan.
 
@@ -879,16 +880,6 @@ config MUC_OPCUA_CU_QUERY
 	  Backing tests: test_query_service.
 	  Notes: QueryFirst/QueryNext.
 
-config MUC_OPCUA_CU_ATTRIBUTE_READ
-	bool "CU: Attribute Read"
-	depends on MUC_OPCUA_FACET_CORE_2022_SERVER
-	default y
-	help
-	  Implementation state: claimed.
-	  OPC source: OPC-10000-4 §5.10.2 -- Core 2017 Server Facet -- CU 1673:Attribute Read.
-	  Backing tests: test_read_service.
-	  Notes: Current Kconfig help text.
-
 config MUC_OPCUA_CU_VIEW_REGISTERNODES
 	bool "CU: View RegisterNodes"
 	depends on MUC_OPCUA_FACET_CORE_2022_SERVER
@@ -898,15 +889,6 @@ config MUC_OPCUA_CU_VIEW_REGISTERNODES
 	  OPC source: OPC-10000-4 §5.9 -- Core 2017 -- CU 3073:View RegisterNodes.
 	  Backing tests: test_view_services, test_profile_surface.
 	  Notes: RegisterNodes / UnregisterNodes.
-
-config MUC_OPCUA_CU_CORE_2017_ATTRIBUTE_WRITE
-	bool "Core 2017 Attribute Write"
-	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
-	help
-	  Implementation state: claimed.
-	  OPC source: OPC-10000-4 §5.10.4 -- Core 2017 Attribute Write.
-	  Backing tests: test_write_service.
-	  Notes: Optional facet; only on full.
 
 config MUC_OPCUA_CU_AGGREGATE_SUBSCRIPTION_MINIMUMACTUALTIME
 	bool "CU: Aggregate Subscription – MinimumActualTime"
@@ -1636,12 +1618,6 @@ comment "Data Access DoubleComplex Number (DOCUMENTED)"
 #   Notes: Reconciled (spec 079): satisfied by Data Access (opc_cu_data_access).
 comment "Data Access MultiState (DOCUMENTED)"
 
-# Attribute Read (opc_cu_3072)
-#   Implementation state: documented -- visible but not selectable.
-#   Detail: CU 3072:Attribute Read.
-#   Notes: Supports the Read Service to read one or more Attributes of one or more Nodes. This includes support of the IndexRange parameter to read a single element or a range of elements when the Attribute value is an array.
-comment "Attribute Read (DOCUMENTED)"
-
 # Security Default ApplicationInstance Certificate (opc_cu_3080)
 #   Implementation state: documented -- visible but not selectable.
 #   Detail: CU 3080:Security Default ApplicationInstance Certificate.
@@ -2139,6 +2115,13 @@ comment "Aggregates - WorstQuality (DOCUMENTED) [OPC-10000-13 §4.2.2.33]"
 #   OPC source: OPC-10000-13 §4.2.2.34.
 #   Detail: Core 2022 Server Facet.
 comment "Aggregates - WorstQuality2 (DOCUMENTED) [OPC-10000-13 §4.2.2.34]"
+
+# Base Info Base Types + Core Types Folders (opc_cu_base_info_base_types)
+#   Implementation state: documented -- visible but not selectable.
+#   OPC source: OPC-10000-5.
+#   Detail: Core 2022 Server Facet.
+#   Notes: spec 080b: completes the base OPC UA type system in base_nodes.c -- the remaining built-in/abstract DataTypes (Guid14/ByteString15/XmlElement16/ExpandedNodeId18/DataValue23/DiagnosticInfo25/Integer27/UInteger28/Enumeration29/Duration290/NumericRange291/UtcTime294/EnumValueType7594/Union12756) with correct supertype closure (primitives re-parented under Integer/UInteger/Number), HasModellingRule(37) + ModellingRuleType(77) + the ModellingRule Objects (Optional80/Mandatory78/ExposesItsArray83/OptionalPlaceholder11508/MandatoryPlaceholder11510), and the EnumValueType Encoding Objects (DefaultXml7616/DefaultBinary8251). Satisfies CU 3188 (Base Types) and CU 3185 (Core Types Folders). Second slice of the base type-system completion (A2); depends on the specialized-DataTypes CU for the Number/String subtype arrays it extends.
+comment "Base Info Base Types + Core Types Folders (DOCUMENTED) [OPC-10000-5]"
 
 # Base Info Core Structure 2 (opc_cu_core_structure_2)
 #   Implementation state: documented -- visible but not selectable.
@@ -3871,6 +3854,16 @@ menuconfig MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER
 
 if MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER
 
+config MUC_OPCUA_CU_BASE_INFO_BASE_TYPES
+	bool "CU: Base Info Base Types"
+	depends on MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER && MUC_OPCUA_CU_BASE_INFO_DATATYPES
+	default y if MUC_OPCUA_INTERN_PROFILE_EMBEDDED_2025_UA_SERVER
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3188:Base Info Base Types.
+	  Backing tests: test_profile_surface.
+	  Notes: Reconciled (spec 080b): the full base OPC UA type system is exposed in base_nodes.c and asserted by test_type_system -- all built-in/abstract DataTypes with supertype closure (primitives re-parented under Integer(27)/UInteger(28)/Number(26)), the base Object/Variable/ReferenceTypes, ModellingRuleType(77) + its ModellingRule Objects (78/80/83/11508/11510), and EnumValueType(7594)/Union(12756) with EnumValueType Encoding Objects (7616/8251). Satisfied by opc_cu_base_info_base_types. Supports type information of the base OPC UA concepts, like build-in DataTypes, base Object- and VariableTypes, and base ReferenceTypes. Includes the Encoding Objects for the DataTypes that are not Build-in or abstract DataTypes. Exposes the ObjectTypes BaseObjectType, FolderType, DataTypeEncodingType and ModellingRuleType in the AddressSpace. Exposes the VariableTypes BaseVariableType, PropertyType, and BaseDataVariableType in the AddressSpace. Exposes the DataTypes BaseDataType Boolean, ByteString, DateTime, DataValue, DiagnosticsInfo, Enumeration, ExpandedNodeId, Guid, LocalizedText, NodeId, Number, QualifiedName, String, Structure, XmlElement, Integer, UInteger, Double, Float, Sbyte, Int16, Int32, Int64, Byte, Uint16, Uint32, Uint64, StatusCode, UtcTime, Duration, NumericRange, EnumValueType, and Union and their Encoding Objects in the AddressSpace. Exposes the ReferenceTypes References, HierarchicalReferences, NonHierarchicalReferences, HasChild, Organizes, HasModellingRule, HasTypeDefinition, HasEncoding, Aggregates, HasSubtype, HasComponent, and HasProperty in the AddressSpace Exposes the Objects Optional, Mandatory, OptionalPlaceholder, MandatoryPlaceholder and ExposesItsArrayin the AddressSpace.
+
 config MUC_OPCUA_CU_BASE_INFO_SERVERTYPE
 	bool "CU: Base Info ServerType"
 	depends on MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER
@@ -3992,12 +3985,6 @@ comment "Base Info ContentFilter (DOCUMENTED)"
 #   Detail: CU 3185:Base Info Core Types Folders.
 #   Notes: Reconciled (spec 080b): the core type-system Folder Nodes Types(86)/ObjectTypes(88)/DataTypes(90)/VariableTypes(89)/ReferenceTypes(91) are exposed in base_nodes.c and asserted by test_type_system. Satisfied by opc_cu_base_info_base_types. Exposes entry points into the type system in the AddressSpace. Specifically, these are the Folder Nodes: Types, ObjectTypes, DataTypes, VariableTypes, and ReferenceTypes.
 comment "Base Info Core Types Folders (DOCUMENTED)"
-
-# Base Info Base Types (opc_cu_3188)
-#   Implementation state: documented -- visible but not selectable.
-#   Detail: CU 3188:Base Info Base Types.
-#   Notes: Reconciled (spec 080b): the full base OPC UA type system is exposed in base_nodes.c and asserted by test_type_system -- all built-in/abstract DataTypes with supertype closure (primitives re-parented under Integer(27)/UInteger(28)/Number(26)), the base Object/Variable/ReferenceTypes, ModellingRuleType(77) + its ModellingRule Objects (78/80/83/11508/11510), and EnumValueType(7594)/Union(12756) with EnumValueType Encoding Objects (7616/8251). Satisfied by opc_cu_base_info_base_types. Supports type information of the base OPC UA concepts, like build-in DataTypes, base Object- and VariableTypes, and base ReferenceTypes. Includes the Encoding Objects for the DataTypes that are not Build-in or abstract DataTypes. Exposes the ObjectTypes BaseObjectType, FolderType, DataTypeEncodingType and ModellingRuleType in the AddressSpace. Exposes the VariableTypes BaseVariableType, PropertyType, and BaseDataVariableType in the AddressSpace. Exposes the DataTypes BaseDataType Boolean, ByteString, DateTime, DataValue, DiagnosticsInfo, Enumeration, ExpandedNodeId, Guid, LocalizedText, NodeId, Number, QualifiedName, String, Structure, XmlElement, Integer, UInteger, Double, Float, Sbyte, Int16, Int32, Int64, Byte, Uint16, Uint32, Uint64, StatusCode, UtcTime, Duration, NumericRange, EnumValueType, and Union and their Encoding Objects in the AddressSpace. Exposes the ReferenceTypes References, HierarchicalReferences, NonHierarchicalReferences, HasChild, Organizes, HasModellingRule, HasTypeDefinition, HasEncoding, Aggregates, HasSubtype, HasComponent, and HasProperty in the AddressSpace Exposes the Objects Optional, Mandatory, OptionalPlaceholder, MandatoryPlaceholder and ExposesItsArrayin the AddressSpace.
-comment "Base Info Base Types (DOCUMENTED)"
 
 # Base Info OptionSet DataType (opc_cu_3207)
 #   Implementation state: documented -- visible but not selectable.

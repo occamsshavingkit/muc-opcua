@@ -1,11 +1,9 @@
 {
   "advertised_profile_markers": [
     {
-      "default_if": [
-        "MUC_OPCUA_INTERN_PROFILE_STANDARD_2025_UA_SERVER"
-      ],
       "id": "MUC_OPCUA_MARKER_STANDARD_PROFILE",
-      "note": "Advertised-profile marker; drives base_nodes.c ServerProfileArray + capacities.h tier. EMBEDDED_PROFILE is intentionally absent (CMake-only, never a C define)."
+      "note": "Advertised-profile marker; drives base_nodes.c ServerProfileArray + capacities.h tier. EMBEDDED_PROFILE is intentionally absent (CMake-only, never a C define).",
+      "required_profile": "standard"
     }
   ],
   "capacities": [
@@ -775,9 +773,7 @@
       "service_history",
       "service_nodemanagement",
       "service_query",
-      "service_read",
       "service_register_nodes",
-      "service_write",
       "opc_cu_2974",
       "opc_cu_3130",
       "opc_cu_2952",
@@ -1375,6 +1371,7 @@
         "standard": true
       },
       "project_profile_defaults": {"standard": true},
+      "project_required_for_profile": {"standard": true},
       "source_metadata": {
         "imported_from": "profiles/opcua-profile-snapshot.json",
         "snapshot_id": "cu_monitor_items_500",
@@ -1416,6 +1413,7 @@
         "standard": true
       },
       "project_profile_defaults": {"standard": true},
+      "project_required_for_profile": {"standard": true},
       "source_metadata": {
         "imported_from": "profiles/opcua-profile-snapshot.json",
         "snapshot_id": "cu_monitor_min_queue_05",
@@ -1541,7 +1539,8 @@
     },
     {
       "backing_tests": [
-        "test_profile_surface"
+        "test_profile_surface",
+        "test_type_system"
       ],
       "cu_optional": true,
       "id": "opc_cu_2446",
@@ -2780,8 +2779,8 @@
       ],
       "cu_optional": false,
       "id": "opc_cu_3188",
-      "implementation_state": "documented",
-      "kconfig_symbol": null,
+      "implementation_state": "claimed",
+      "kconfig_symbol": "MUC_OPCUA_CU_BASE_INFO_BASE_TYPES",
       "kind": "conformance_unit",
       "notes": "Reconciled (spec 080b): the full base OPC UA type system is exposed in base_nodes.c and asserted by test_type_system -- all built-in/abstract DataTypes with supertype closure (primitives re-parented under Integer(27)/UInteger(28)/Number(26)), the base Object/Variable/ReferenceTypes, ModellingRuleType(77) + its ModellingRule Objects (78/80/83/11508/11510), and EnumValueType(7594)/Union(12756) with EnumValueType Encoding Objects (7616/8251). Satisfied by opc_cu_base_info_base_types. Supports type information of the base OPC UA concepts, like build-in DataTypes, base Object- and VariableTypes, and base ReferenceTypes. Includes the Encoding Objects for the DataTypes that are not Build-in or abstract DataTypes.\r\nExposes the ObjectTypes BaseObjectType, FolderType, DataTypeEncodingType and ModellingRuleType in the AddressSpace.\r\nExposes the VariableTypes BaseVariableType, PropertyType, and BaseDataVariableType in the AddressSpace.\r\nExposes the DataTypes BaseDataType Boolean, ByteString, DateTime, DataValue, DiagnosticsInfo, Enumeration, ExpandedNodeId, Guid, LocalizedText, NodeId, Number, QualifiedName, String, Structure, XmlElement, Integer, UInteger, Double, Float, Sbyte, Int16, Int32, Int64, Byte, Uint16, Uint32, Uint64, StatusCode, UtcTime, Duration, NumericRange, EnumValueType, and Union and their Encoding Objects in the AddressSpace.\r\nExposes the ReferenceTypes References, HierarchicalReferences, NonHierarchicalReferences, HasChild, Organizes, HasModellingRule, HasTypeDefinition, HasEncoding, Aggregates, HasSubtype, HasComponent, and HasProperty in the AddressSpace\r\nExposes the Objects Optional, Mandatory, OptionalPlaceholder, MandatoryPlaceholder and ExposesItsArrayin the AddressSpace.\r\n",
       "opc_display_name": "Base Info Base Types",
@@ -2800,6 +2799,9 @@
         "nano": false,
         "standard": true
       },
+      "semantic_depends_on": [
+        "MUC_OPCUA_CU_BASE_INFO_DATATYPES"
+      ],
       "source_metadata": {
         "profile_group_id": 171,
         "source_endpoint": "conformanceunit/?pg=171&all=1"
@@ -3792,7 +3794,8 @@
         "facet": "Core 2022 Server Facet",
         "section": "5.12/5.13",
         "spec": "OPC-10000-4",
-        "cu_id": 3727
+        "cu_id": 3727,
+        "cu_name": "Subscription Basic"
       },
       "profile_defaults": {
         "custom": false,
@@ -5425,8 +5428,8 @@
         "MUC_OPCUA_CU_BASE_INFO_DATATYPES"
       ],
       "id": "opc_cu_base_info_base_types",
-      "implementation_state": "claimed",
-      "kconfig_symbol": "MUC_OPCUA_CU_BASE_INFO_BASE_TYPES",
+      "implementation_state": "documented",
+      "kconfig_symbol": null,
       "kind": "optimization",
       "notes": "spec 080b: completes the base OPC UA type system in base_nodes.c -- the remaining built-in/abstract DataTypes (Guid14/ByteString15/XmlElement16/ExpandedNodeId18/DataValue23/DiagnosticInfo25/Integer27/UInteger28/Enumeration29/Duration290/NumericRange291/UtcTime294/EnumValueType7594/Union12756) with correct supertype closure (primitives re-parented under Integer/UInteger/Number), HasModellingRule(37) + ModellingRuleType(77) + the ModellingRule Objects (Optional80/Mandatory78/ExposesItsArray83/OptionalPlaceholder11508/MandatoryPlaceholder11510), and the EnumValueType Encoding Objects (DefaultXml7616/DefaultBinary8251). Satisfies CU 3188 (Base Types) and CU 3185 (Core Types Folders). Second slice of the base type-system completion (A2); depends on the specialized-DataTypes CU for the Number/String subtype arrays it extends.",
       "opc_display_name": "Base Info Base Types + Core Types Folders",
@@ -5442,28 +5445,6 @@
         "micro": false,
         "nano": false,
         "standard": true
-      }
-    },
-    {
-      "backing_tests": [
-        "test_read_service"
-      ],
-      "default_unconditional": true,
-      "id": "service_read",
-      "implementation_state": "claimed",
-      "kconfig_symbol": "MUC_OPCUA_CU_ATTRIBUTE_READ",
-      "kind": "conformance_unit",
-      "notes": "Current Kconfig help text.",
-      "opc_display_name": "Attribute Read",
-      "opc_reference": {
-        "cu_id": "1673",
-        "cu_name": "Attribute Read",
-        "facet": "Core 2017 Server Facet",
-        "section": "5.10.2",
-        "spec": "OPC-10000-4"
-      },
-      "profile_defaults": {
-        "custom": true
       }
     },
     {
@@ -5486,32 +5467,6 @@
       },
       "profile_defaults": {
         "custom": false
-      }
-    },
-    {
-      "backing_tests": [
-        "test_write_service"
-      ],
-      "depends_on": [],
-      "id": "service_write",
-      "implementation_state": "claimed",
-      "kconfig_symbol": "MUC_OPCUA_CU_CORE_2017_ATTRIBUTE_WRITE",
-      "kind": "optimization",
-      "notes": "Optional facet; only on full.",
-      "opc_display_name": "Core 2017 Attribute Write",
-      "opc_reference": {
-        "cu_optional": true,
-        "facet": "Core 2017 Attribute Write",
-        "section": "5.10.4",
-        "spec": "OPC-10000-4"
-      },
-      "profile_defaults": {
-        "custom": false,
-        "embedded": false,
-        "full": true,
-        "micro": false,
-        "nano": false,
-        "standard": false
       }
     },
     {
@@ -6605,15 +6560,17 @@
     },
     {
       "backing_tests": [
-        "test_profile_surface"
+        "test_profile_surface",
+        "test_read_service"
       ],
       "cu_optional": false,
+      "default_unconditional": true,
       "depends_on": [],
       "id": "opc_cu_3072",
-      "implementation_state": "documented",
-      "kconfig_symbol": null,
+      "implementation_state": "claimed",
+      "kconfig_symbol": "MUC_OPCUA_CU_ATTRIBUTE_READ",
       "kind": "conformance_unit",
-      "notes": "Supports the Read Service to read one or more Attributes of one or more Nodes. This includes support of the IndexRange parameter to read a single element or a range of elements when the Attribute value is an array.",
+      "notes": "Supports the Read Service to read one or more Attributes of one or more Nodes. This includes support of the IndexRange parameter to read a single element or a range of elements when the Attribute value is an array. Implemented by the core Read service.",
       "opc_display_name": "Attribute Read",
       "opc_reference": {
         "cu_id": "3072",
@@ -6623,7 +6580,7 @@
         "spec": null
       },
       "profile_defaults": {
-        "custom": false,
+        "custom": true,
         "embedded": true,
         "full": true,
         "micro": true,
@@ -13797,6 +13754,7 @@
         "standard": true
       },
       "project_profile_defaults": {"standard": true},
+      "project_required_for_profile": {"standard": true},
       "source_metadata": {
         "source_id": "5249",
         "source_url": "https://profiles.opcfoundation.org"
@@ -13834,6 +13792,7 @@
         "standard": true
       },
       "project_profile_defaults": {"standard": true},
+      "project_required_for_profile": {"standard": true},
       "source_metadata": {
         "source_id": "5248",
         "source_url": "https://profiles.opcfoundation.org"
