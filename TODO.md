@@ -14,6 +14,7 @@
 | D-ECC | ECC cert subtypes | 6 ECC-specific CertificateType subtypes |
 | D-TRUST | TrustList integration | Full TrustList management + CRL parsing |
 | D-PUSH | Push certificate model | ServerConfigurationType reverse-direction management |
+| C-2484 | Implement BitFieldMaskDataType node (NodeId 11737) and `MUC_OPCUA_CU_BASE_INFO_BITFIELDMASKDATATYPE` CMake export under the canonical CU 2484 guard | Blocked: NodeId 11737 is absent from generated ID tables and requires a generator-data addition, not hand-edits to generated content. Intent preserved from stash `bd39b617` (triage: stash-triage report §stash@{3}); the browse-name string already exists at `src/address_space/base_nodes.c:242`. |
 | S-363-1 | too-many-branches (17/15) in `scripts/profile_manifest/generated_kconfig_policy.py:46` | Pre-existing style debt surfaced by Codacy on PR #363; generated-policy parser complexity. |
 | S-363-2 | too-many-locals (24/15) in `scripts/profile_manifest/generated_kconfig_policy.py:46` | Pre-existing style debt surfaced by Codacy on PR #363; same generated-policy parser. |
 | S-363-3 | too-many-arguments (6/5) in `scripts/profile_manifest/model.py:106` | Pre-existing style debt surfaced by Codacy on PR #363; stable internal model API. |
