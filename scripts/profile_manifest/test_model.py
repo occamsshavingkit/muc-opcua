@@ -283,6 +283,7 @@ def test_load_manifest_rejects_recursive_satisfied_by(tmp_path: Path) -> None:
     )
 
     # When the manifest is loaded.
+    detail = ""
     try:
         model.load_manifest(str(manifest_path))
     except ValueError as exc:
