@@ -4,6 +4,14 @@
 # registered in that profile (OPC-10000-7 §4.2/§4.3).
 find_package(Python3 COMPONENTS Interpreter)
 if(Python3_Interpreter_FOUND)
+    add_test(NAME conformance_python_regressions
+        COMMAND ${Python3_EXECUTABLE} -m unittest -v
+                tests.conformance.test_check_baseline
+                tests.conformance.test_check_baseline_boundaries
+                tests.conformance.test_kconfig_cli_environment)
+    set_tests_properties(conformance_python_regressions PROPERTIES
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
+
     # CTest registration - runs the checker during `ctest` with the same args.
     add_test(NAME test_claim_map
         COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/check_claim_map.py
