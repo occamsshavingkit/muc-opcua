@@ -30,6 +30,13 @@ function(muc_opcua_apply_codegen target_name)
     # when the consuming executable is not itself LTO (instrumented test/fuzz
     # binaries) -- "file format not recognized".
     if(MUC_OPCUA_LTO AND NOT MUC_OPCUA_BUILD_TESTS AND NOT MUC_OPCUA_BUILD_FUZZERS AND NOT MUC_OPCUA_SANITIZERS)
+        # GNU Arm Embedded 13 emits invalid Thumb-1 offsets while linking Pico
+        # SDK targets from LTO partitions. Keep -Os and section GC enabled, but
+        # do not turn on IPO for RP2040 builds.
+        if(MUC_OPCUA_PLATFORM STREQUAL "pico")
+            return()
+        endif()
+
         include(CheckIPOSupported)
         check_ipo_supported(RESULT _ipo_ok OUTPUT _ipo_err)
         if(_ipo_ok)
