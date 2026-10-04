@@ -108,8 +108,7 @@ void test_nano_default_service_surface_keeps_mandatory_discovery_and_view(void) 
     assert_cu_surface_enabled("MUC_OPCUA_CU_DISCOVERY_FIND_SERVERS_SELF",
                               PROFILE_SURFACE_HAS_DISCOVERY_FIND_SERVERS_SELF);
     assert_cu_surface_enabled("MUC_OPCUA_CU_VIEW_BASIC_2", PROFILE_SURFACE_HAS_VIEW_BASIC_2);
-    assert_cu_surface_enabled("MUC_OPCUA_CU_VIEW_TRANSLATEBROWSEPATH",
-                              PROFILE_SURFACE_HAS_VIEW_TRANSLATEBROWSEPATH);
+    assert_cu_surface_enabled("MUC_OPCUA_CU_VIEW_TRANSLATEBROWSEPATH", PROFILE_SURFACE_HAS_VIEW_TRANSLATEBROWSEPATH);
 }
 
 void test_nano_default_service_surface_does_not_claim_optional_cus(void) {

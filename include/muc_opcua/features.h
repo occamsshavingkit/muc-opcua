@@ -16,7 +16,7 @@
 
 /* The Standard Subscription CU extends the Basic Subscription CU; without the
    Basic CU, the Standard CU has no subscription state to use. */
-#if defined(MUC_OPCUA_CU_SUBSCRIPTION_STANDARD) && MUC_OPCUA_CU_SUBSCRIPTION_STANDARD &&                         \
+#if defined(MUC_OPCUA_CU_SUBSCRIPTION_STANDARD) && MUC_OPCUA_CU_SUBSCRIPTION_STANDARD &&                               \
     !MUC_OPCUA_CU_SUBSCRIPTION_BASIC
 #error "MUC_OPCUA_CU_SUBSCRIPTION_STANDARD requires MUC_OPCUA_CU_SUBSCRIPTION_BASIC"
 #endif
@@ -46,8 +46,7 @@
 /* The Standard Event Subscription facet's WhereClause evaluation is created and
    flagged through the Standard CU MonitoredItem filter path (per-item filterResult),
    so it requires the Standard Subscription CU. */
-#if defined(MUC_OPCUA_EVENT_FILTER_WHERE) && MUC_OPCUA_EVENT_FILTER_WHERE &&                                     \
-    !MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
+#if defined(MUC_OPCUA_EVENT_FILTER_WHERE) && MUC_OPCUA_EVENT_FILTER_WHERE && !MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
 #error "MUC_OPCUA_EVENT_FILTER_WHERE requires MUC_OPCUA_CU_SUBSCRIPTION_STANDARD"
 #endif
 
@@ -86,9 +85,9 @@
 /* Enhanced DataChange Subscription 2017 is the closure of its four mandatory
    capacity CUs. Profile selection is only a defaulting mechanism and does not
    independently own this capability. */
-#if defined(MUC_OPCUA_CU_MONITOR_ITEMS_500) && MUC_OPCUA_CU_MONITOR_ITEMS_500 &&                                  \
-    defined(MUC_OPCUA_CU_MONITOR_MINQUEUESIZE_05) && MUC_OPCUA_CU_MONITOR_MINQUEUESIZE_05 &&                      \
-    defined(MUC_OPCUA_CU_SUBSCRIPTION_MINIMUM_05) && MUC_OPCUA_CU_SUBSCRIPTION_MINIMUM_05 &&                      \
+#if defined(MUC_OPCUA_CU_MONITOR_ITEMS_500) && MUC_OPCUA_CU_MONITOR_ITEMS_500 &&                                       \
+    defined(MUC_OPCUA_CU_MONITOR_MINQUEUESIZE_05) && MUC_OPCUA_CU_MONITOR_MINQUEUESIZE_05 &&                           \
+    defined(MUC_OPCUA_CU_SUBSCRIPTION_MINIMUM_05) && MUC_OPCUA_CU_SUBSCRIPTION_MINIMUM_05 &&                           \
     defined(MUC_OPCUA_CU_SUBSCRIPTION_PUBLISH_MIN_10) && MUC_OPCUA_CU_SUBSCRIPTION_PUBLISH_MIN_10
 #define MUC_OPCUA_ENHANCED_DATACHANGE 1
 #else
