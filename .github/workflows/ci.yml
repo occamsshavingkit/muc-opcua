@@ -53,7 +53,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Install dependencies
-        run: sudo apt-get update && sudo apt-get install -y cmake build-essential cppcheck clang-tidy clang-format libssl-dev libmbedtls-dev libwolfssl-dev
+        run: sudo apt-get update && sudo apt-get install -y cmake build-essential cppcheck clang-tidy clang-format libssl-dev libmbedtls-dev libwolfssl-dev && python3 -m pip install --quiet pytest
       - name: Configure CMake
         run: cmake -S . -B build/host -DCMAKE_BUILD_TYPE=Debug -DMUC_OPCUA_BUILD_TESTS=ON -DMUC_OPCUA_BUILD_EXAMPLES=ON -DMUC_OPCUA_PLATFORM=host -DMUC_OPCUA_HAVE_MBEDTLS=ON -DMUC_OPCUA_HAVE_WOLFSSL=ON -DMUC_OPCUA_PROFILE=full
       - name: Build
@@ -73,7 +73,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Install dependencies
-        run: sudo apt-get update && sudo apt-get install -y cmake build-essential libssl-dev libmbedtls-dev libwolfssl-dev
+        run: sudo apt-get update && sudo apt-get install -y cmake build-essential libssl-dev libmbedtls-dev libwolfssl-dev && python3 -m pip install --quiet pytest
       - name: Configure (${{ matrix.profile }})
         run: cmake -S . -B build/${{ matrix.profile }} -DCMAKE_BUILD_TYPE=Debug -DMUC_OPCUA_BUILD_TESTS=ON -DMUC_OPCUA_PLATFORM=host -DMUC_OPCUA_HAVE_MBEDTLS=ON -DMUC_OPCUA_HAVE_WOLFSSL=ON -DMUC_OPCUA_PROFILE=${{ matrix.profile }}
       - name: Build (${{ matrix.profile }})
@@ -128,7 +128,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Install dependencies
-        run: sudo apt-get update && sudo apt-get install -y cmake clang libssl-dev libmbedtls-dev libwolfssl-dev
+        run: sudo apt-get update && sudo apt-get install -y cmake clang libssl-dev libmbedtls-dev libwolfssl-dev && python3 -m pip install --quiet pytest
       - name: Configure CMake
         run: CC=clang CXX=clang++ cmake -S . -B build/asan -DMUC_OPCUA_BUILD_TESTS=ON -DMUC_OPCUA_SANITIZERS="address,undefined" -DMUC_OPCUA_PLATFORM=host -DMUC_OPCUA_HAVE_MBEDTLS=ON -DMUC_OPCUA_HAVE_WOLFSSL=ON -DMUC_OPCUA_PROFILE=full
       - name: Build
@@ -198,7 +198,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Install dependencies
-        run: sudo apt-get update && sudo apt-get install -y cmake build-essential gcovr
+        run: sudo apt-get update && sudo apt-get install -y cmake build-essential gcovr && python3 -m pip install --quiet pytest
       - name: Configure CMake (coverage)
         run: cmake -S . -B build/coverage -DCMAKE_C_FLAGS="--coverage" -DCMAKE_EXE_LINKER_FLAGS="--coverage" -DMUC_OPCUA_BUILD_TESTS=ON -DMUC_OPCUA_PLATFORM=host -DMUC_OPCUA_PROFILE=standard
       - name: Build
