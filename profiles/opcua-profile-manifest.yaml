@@ -1680,7 +1680,7 @@
       ],
       "cu_optional": false,
       "id": "opc_cu_2809",
-      "implementation_state": "implemented",
+      "implementation_state": "unimplemented",
       "kconfig_symbol": "MUC_OPCUA_CU_ADDRESS_SPACE_ATOMICITY",
       "kind": "conformance_unit",
       "notes": "Support setting the NonatomicRead and NonatomicWrite flags in the AccessLevelEx Attribute for Variable Nodes to indicate whether Read or Write operations can be performed in atomic manner. If the flags are set to '1', atomicity cannot be assured.",

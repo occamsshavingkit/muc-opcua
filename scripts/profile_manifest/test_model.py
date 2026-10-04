@@ -36,6 +36,15 @@ def _cu_item(manifest: dict[str, object]) -> dict[str, object]:
     return item
 
 
+def test_address_space_atomicity_remains_unimplemented_until_flags_are_configurable() -> None:
+    manifest = _resolved_manifest()
+    items = manifest["items"]
+    assert isinstance(items, list)
+    atomicity = next(item for item in items if item.get("id") == "opc_cu_2809")
+
+    assert atomicity["implementation_state"] == "unimplemented"
+
+
 def test_validate_manifest_rejects_non_list_semantic_depends_on() -> None:
     # Given a graph-resolved manifest with a malformed semantic prerequisite field.
     manifest = copy.deepcopy(_resolved_manifest())

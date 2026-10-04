@@ -27,7 +27,6 @@ Backing test column: comma-separated ctest names (as registered).
 | Base Info LocalTime |  | full | test_profile_surface |
 | SecurityPolicy Support |  | all | test_security_policy, test_secure_channel |
 | Base Info Selection List |  | full | test_profile_surface |
-| Address Space Atomicity |  | all | test_profile_surface |
 | Base Info ValueAsText |  | full | test_profile_surface |
 | Base Info OptionSet |  | full | test_profile_surface |
 | Base Info Estimated Return Time |  | full | test_profile_surface |

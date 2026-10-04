@@ -16,10 +16,10 @@ remains future work.
 | State | Count |
 |-------|-------|
 | claimed | 133 |
-| implemented | 18 |
+| implemented | 17 |
 | documented | 464 |
 | deferred | 7 |
-| unimplemented | 11 |
+| unimplemented | 12 |
 
 ## Item matrix
 
@@ -43,7 +43,7 @@ remains future work.
 | opc_cu_2476 | conformance_unit | claimed |  | MUC_OPCUA_CU_BASE_INFO_LOCALTIME | full | test_profile_surface |
 | opc_cu_2600 | conformance_unit | implemented |  | MUC_OPCUA_CU_SECURITYPOLICY_SUPPORT | all | test_security_policy, test_secure_channel |
 | opc_cu_2711 | conformance_unit | claimed |  | MUC_OPCUA_CU_BASE_INFO_SELECTION_LIST | full | test_profile_surface |
-| opc_cu_2809 | conformance_unit | implemented |  | MUC_OPCUA_CU_ADDRESS_SPACE_ATOMICITY | all | test_profile_surface |
+| opc_cu_2809 | conformance_unit | unimplemented |  | MUC_OPCUA_CU_ADDRESS_SPACE_ATOMICITY | nano, micro, embedded, standard | test_profile_surface |
 | opc_cu_2820 | conformance_unit | documented |  | MUC_OPCUA_CU_ADDRESS_SPACE_FULL_ARRAY_ONLY | all | test_profile_surface |
 | opc_cu_2969 | conformance_unit | claimed |  | MUC_OPCUA_CU_BASE_INFO_VALUEASTEXT | full | test_profile_surface |
 | opc_cu_3127 | conformance_unit | claimed |  | MUC_OPCUA_CU_BASE_INFO_OPTIONSET | full | test_profile_surface |

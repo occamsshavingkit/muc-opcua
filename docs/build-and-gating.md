@@ -465,7 +465,6 @@ to refresh.
 | MUC_OPCUA_CU_BASE_INFO_LOCALTIME | opc_cu_2476 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
 | MUC_OPCUA_CU_SECURITYPOLICY_SUPPORT | opc_cu_2600 | implemented | ✅ | ✅ | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
 | MUC_OPCUA_CU_BASE_INFO_SELECTION_LIST | opc_cu_2711 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
-| MUC_OPCUA_CU_ADDRESS_SPACE_ATOMICITY | opc_cu_2809 | implemented | ✅ | ✅ | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
 | MUC_OPCUA_CU_BASE_INFO_VALUEASTEXT | opc_cu_2969 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
 | MUC_OPCUA_CU_BASE_INFO_OPTIONSET | opc_cu_3127 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
 | MUC_OPCUA_CU_BASE_INFO_ESTIMATED_RETURN_TIME | opc_cu_3198 | claimed |  |  |  |  | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
@@ -647,6 +646,7 @@ The following OPC items are tracked in the manifest but are NOT implemented. The
 | opc_facet_1029 | OPC-10000-7 §4.2 | unimplemented | GDS AliasName Server Facet not implemented; GDS infrastructure is not planned. |
 | opc_facet_1636 | OPC-10000-7 §4.2 | unimplemented | AliasName Server Facet not implemented; AliasName feature is deferred. |
 | opc_facet_1637 | OPC-10000-7 §4.2 | unimplemented | AliasName Aggregating Server Facet not implemented; AliasName feature is deferred. |
+| opc_cu_2809 |  | unimplemented | Support setting the NonatomicRead and NonatomicWrite flags in the AccessLevelEx Attribute for Variable Nodes to indicate whether Read or Write operations can be performed in atomic manner. If the flags are set to '1', atomicity cannot be assured. |
 | opc_cu_2820 |  | documented | Support setting the WriteFullArrayOnly flag in the AccessLevelEx Attribute for Variable Nodes of non-scalar data types to indicate whether write operations for an array can be performed with an IndexRange. |
 | opc_cu_3808 |  | documented | Documented (spec 078): the core capacities (SecureChannels/Sessions/ContinuationPoints/Subscriptions/PublishRequests/MonitoredItems/queue depth/retransmission) are specified in docs/integration-guide.md §2.2.1 and capacities.h, and discoverable at runtime via the ServerCapabilities/OperationLimits nodes. Documentation CU (no code). The application documentation shall specify the core OPC UA related capacities. This includes the number of supported SecureChannels, Sessions, and Continuation Points for the View Services. If Subscriptions are supported, it shall also include capacity information for Subscriptions and Publish requests, MonitoredItems, retransmission queue, and the queue for sampled MonitoredItems. (Documentation complete; no code change needed.) |
 | opc_cu_4237 |  | documented | Support setting the NonVolatile and Constant flags in the AccessLevelEx Attribute for Variable Nodes to indicate whether persistent storage is supported. |

@@ -350,16 +350,6 @@ config MUC_OPCUA_CU_AGGREGATE_SUBSCRIPTION_INTERPOLATIVE
 	  Backing tests: test_profile_surface.
 	  Notes: Satisfied by project-level CU opc_cu_aggregate_interpolative; the Interpolative aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_INTERPOLATIVE.
 
-config MUC_OPCUA_CU_ADDRESS_SPACE_ATOMICITY
-	bool "CU: Address Space Atomicity"
-	depends on MUC_OPCUA_FACET_CORE_2022_SERVER
-	default y if MUC_OPCUA_INTERN_PROFILE_NANO_EMBEDDED_DEVICE_2025_SERVER
-	help
-	  Implementation state: implemented.
-	  OPC item: CU 2809:Address Space Atomicity.
-	  Backing tests: test_profile_surface.
-	  Notes: Support setting the NonatomicRead and NonatomicWrite flags in the AccessLevelEx Attribute for Variable Nodes to indicate whether Read or Write operations can be performed in atomic manner. If the flags are set to '1', atomicity cannot be assured.
-
 config MUC_OPCUA_CU_ATTRIBUTE_WRITE_STATUSCODE_TIMESTAMP
 	bool "CU: Attribute Write StatusCode & Timestamp"
 	depends on MUC_OPCUA_FACET_CORE_2022_SERVER && MUC_OPCUA_CU_ATTRIBUTE_WRITE_VALUES
@@ -1552,6 +1542,12 @@ comment "Time Sync – NTP (DOCUMENTED)"
 #   Detail: CU 2808:Security Role Server Authorization.
 #   Notes: Stub callback interface for role-based access control. The callback is invoked before each service handler; NULL callback allows all.
 comment "Security Role Server Authorization (DOCUMENTED)"
+
+# Address Space Atomicity (opc_cu_2809)
+#   Implementation state: unimplemented -- visible but not selectable.
+#   Detail: CU 2809:Address Space Atomicity.
+#   Notes: Support setting the NonatomicRead and NonatomicWrite flags in the AccessLevelEx Attribute for Variable Nodes to indicate whether Read or Write operations can be performed in atomic manner. If the flags are set to '1', atomicity cannot be assured.
+comment "Address Space Atomicity (NOT IMPLEMENTED) [CU 2809:Address Space Atomicity]"
 
 # Address Space Full Array Only (opc_cu_2820)
 #   Implementation state: documented -- visible but not selectable.
