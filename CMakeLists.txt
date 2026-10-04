@@ -10,7 +10,7 @@ if(DEFINED CACHE{MUC_OPCUA_PROFILE})
 else()
     set(MUC_OPCUA_PROFILE_EXPLICIT OFF)
 endif()
-set(MUC_OPCUA_PROFILE "nano" CACHE STRING "Target OPC UA profile (nano, micro, embedded, standard, full, custom)")
+set(MUC_OPCUA_PROFILE "custom" CACHE STRING "Target OPC UA profile (nano, micro, embedded, standard, full, custom)")
 set(MUC_OPCUA_CLIENT_PROFILE "none" CACHE STRING "Target OPC UA client profile (none, nano, standard)")
 
 # Legacy shorthand: -DMUC_OPCUA_EMBEDDED_PROFILE=ON / -DMUC_OPCUA_STANDARD_PROFILE=ON
@@ -33,7 +33,6 @@ endif()
 
 # Profile resolution
 if((MUC_OPCUA_BUILD_TESTS OR MUC_OPCUA_BUILD_EXAMPLES OR MUC_OPCUA_BUILD_FUZZERS OR MUC_OPCUA_BUILD_BENCHMARKS)
-   AND MUC_OPCUA_PROFILE STREQUAL "nano"
    AND NOT MUC_OPCUA_PROFILE_EXPLICIT)
     set(MUC_OPCUA_PROFILE "full" CACHE STRING "Target OPC UA profile" FORCE)
 endif()
@@ -61,6 +60,8 @@ file(STRINGS "${CMAKE_CURRENT_SOURCE_DIR}/Kconfig"
     _MUC_OPCUA_KCONFIG_SYMBOL_LINES
     REGEX "^(menu)?config[ \t]+MUC_OPCUA_(PROFILE|FACET|CU)_[A-Za-z0-9_]+$")
 set(MUC_OPCUA_KCONFIG_FEATURES READ_CACHE SECURE_CHANNEL_CRYPTO)
+set(MUC_OPCUA_FAIL_CLOSED_OVERRIDES MUC_OPCUA_SECURE_CHANNEL_CRYPTO)
+set(_MUC_OPCUA_EXPLICIT_FAIL_CLOSED_ON "")
 foreach(_line IN LISTS _MUC_OPCUA_KCONFIG_SYMBOL_LINES)
     string(REGEX REPLACE "^(menu)?config[ \t]+" "" _sym "${_line}")
     list(APPEND MUC_OPCUA_KCONFIG_FEATURES "${_sym}")
@@ -82,6 +83,9 @@ foreach(_sym IN LISTS MUC_OPCUA_KCONFIG_FEATURES)
     if(DEFINED CACHE{${_cache_sym}})
         if(${${_cache_sym}})
             file(APPEND ${_MUC_OPCUA_KCFG_FRAG} "${_sym}=y\n")
+            if(_cache_sym IN_LIST MUC_OPCUA_FAIL_CLOSED_OVERRIDES)
+                list(APPEND _MUC_OPCUA_EXPLICIT_FAIL_CLOSED_ON "${_cache_sym}")
+            endif()
         else()
             file(APPEND ${_MUC_OPCUA_KCFG_FRAG} "# ${_sym} is not set\n")
         endif()
@@ -153,6 +157,12 @@ if(NOT _muc_opcua_kcfg_rc EQUAL 0)
     message(FATAL_ERROR "Kconfig resolution failed (rc=${_muc_opcua_kcfg_rc}):\n${_muc_opcua_kcfg_out}")
 endif()
 include(${_MUC_OPCUA_CONFIG_CMAKE})
+foreach(_security_control IN LISTS _MUC_OPCUA_EXPLICIT_FAIL_CLOSED_ON)
+    if(NOT ${_security_control})
+        message(FATAL_ERROR
+            "${_security_control} was explicitly requested ON but resolved OFF; enable its Kconfig dependencies or remove the explicit security override")
+    endif()
+endforeach()
 set(MUC_OPCUA_WRITE_VALUE_ENABLED ${MUC_OPCUA_CU_ATTRIBUTE_WRITE_VALUES})
 set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
     ${CMAKE_CURRENT_SOURCE_DIR}/Kconfig ${_MUC_OPCUA_KCFG_BASE})
@@ -161,14 +171,14 @@ set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
 # from the resolved config above); reconfigure with -DMUC_OPCUA_KCONFIG_CONFIG=${BUILD}/.config
 # to apply. `savedefconfig` exports a minimal defconfig for committing under configs/.
 add_custom_target(menuconfig
-    COMMAND ${CMAKE_COMMAND} -E env CONFIG_=MUC_OPCUA_ KCONFIG_CONFIG=${CMAKE_BINARY_DIR}/.config
+    COMMAND ${CMAKE_COMMAND} -E env CONFIG_= KCONFIG_CONFIG=${CMAKE_BINARY_DIR}/.config
             ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/scripts/kconfig/menuconfig.py
             ${CMAKE_CURRENT_SOURCE_DIR}/Kconfig
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
     COMMENT "Editing ${CMAKE_BINARY_DIR}/.config -- reconfigure with -DMUC_OPCUA_KCONFIG_CONFIG=${CMAKE_BINARY_DIR}/.config to apply"
     USES_TERMINAL VERBATIM)
 add_custom_target(savedefconfig
-    COMMAND ${CMAKE_COMMAND} -E env CONFIG_=MUC_OPCUA_
+    COMMAND ${CMAKE_COMMAND} -E env CONFIG_=
             ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/scripts/kconfig/savedefconfig.py
             ${CMAKE_CURRENT_SOURCE_DIR}/Kconfig ${CMAKE_BINARY_DIR}/.config ${CMAKE_BINARY_DIR}/defconfig
     COMMENT "Minimal defconfig written to ${CMAKE_BINARY_DIR}/defconfig"
