@@ -165,7 +165,7 @@ jobs:
           git clone --depth 1 --branch master https://github.com/raspberrypi/pico-sdk.git ~/pico-sdk
           cd ~/pico-sdk && git submodule update --init
       - name: Configure CMake
-        run: PICO_SDK_PATH=~/pico-sdk cmake -S . -B build/pico -DMUC_OPCUA_PLATFORM=pico -DMUC_OPCUA_BUILD_EXAMPLES=ON -DMUC_OPCUA_PROFILE=full
+        run: PICO_SDK_PATH=~/pico-sdk cmake -S . -B build/pico -DMUC_OPCUA_PLATFORM=pico -DMUC_OPCUA_BUILD_EXAMPLES=ON -DMUC_OPCUA_PROFILE=nano
       - name: Build
         run: cmake --build build/pico || true
 
