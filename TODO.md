@@ -2,7 +2,7 @@
 
 # TODO — muc-opcua
 
-**Updated**: 2026-07-27
+**Updated**: 2026-10-04
 
 ## Pending
 
@@ -14,6 +14,13 @@
 | D-ECC | ECC cert subtypes | 6 ECC-specific CertificateType subtypes |
 | D-TRUST | TrustList integration | Full TrustList management + CRL parsing |
 | D-PUSH | Push certificate model | ServerConfigurationType reverse-direction management |
+| S-363-1 | too-many-branches (17/15) in `scripts/profile_manifest/generated_kconfig_policy.py:46` | Pre-existing style debt surfaced by Codacy on PR #363; generated-policy parser complexity. |
+| S-363-2 | too-many-locals (24/15) in `scripts/profile_manifest/generated_kconfig_policy.py:46` | Pre-existing style debt surfaced by Codacy on PR #363; same generated-policy parser. |
+| S-363-3 | too-many-arguments (6/5) in `scripts/profile_manifest/model.py:106` | Pre-existing style debt surfaced by Codacy on PR #363; stable internal model API. |
+| S-363-4 | too-many-positional-arguments (6/5) in `scripts/profile_manifest/model.py:106` | Pre-existing style debt surfaced by Codacy on PR #363; same stable model API. |
+| S-363-5 | Explicit `validate_manifest(...) == []` comparison in `scripts/profile_manifest/test_model.py:27` | Pre-existing style debt surfaced by Codacy on PR #363; explicit assertion style. |
+| S-363-6 | Explicit `errors == []` comparison in `scripts/profile_manifest/test_model.py:191` | Pre-existing style debt surfaced by Codacy on PR #363; pre-range line shifted by a new test. |
+| S-363-7 | too-many-locals (18/15) in `scripts/profile_manifest/test_profile_requirements.py:71` | Pre-existing style debt surfaced by Codacy on PR #363; pre-existing test readability debt. |
 
 ## Recently Completed
 
