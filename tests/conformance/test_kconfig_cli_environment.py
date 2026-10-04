@@ -15,6 +15,7 @@ NANO_DEFCONFIG = ROOT / "configs" / "nano.defconfig"
 NANO_PROFILE = "MUC_OPCUA_PROFILE_NANO_EMBEDDED_DEVICE_2025_SERVER"
 WRITE_VALUES = "MUC_OPCUA_CU_ATTRIBUTE_WRITE_VALUES"
 CUSTOM_PROFILE = "MUC_OPCUA_PROFILE_CUSTOM"
+STANDARD_PROFILE = "MUC_OPCUA_PROFILE_STANDARD_2025_UA_SERVER"
 FULL_PROFILE = "MUC_OPCUA_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES"
 
 
@@ -142,6 +143,68 @@ class KconfigCliEnvironmentTest(unittest.TestCase):
             )
             self.assertIn("MUC_OPCUA_PROFILE:STRING=full", cache)
             self.assertIn(f"set({FULL_PROFILE} ON)", generated)
+
+    def test_cmake_can_disable_active_standard_profile(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            build_directory = Path(temporary_directory) / "build"
+
+            # Given: the standard defconfig is the profile seed.
+            result = subprocess.run(
+                [
+                    "cmake",
+                    "-S",
+                    str(ROOT),
+                    "-B",
+                    str(build_directory),
+                    "-DMUC_OPCUA_PROFILE=standard",
+                    f"-D{STANDARD_PROFILE}=OFF",
+                ],
+                cwd=ROOT,
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+
+            # When: the active named profile is explicitly disabled.
+            self.assertEqual(result.returncode, 0, result.stderr)
+            generated = (build_directory / "muc_opcua_config.cmake").read_text(
+                encoding="utf-8"
+            )
+
+            # Then: the choice falls back to the explicit custom profile.
+            self.assertIn(f"set({STANDARD_PROFILE} OFF)", generated)
+            self.assertIn(f"set({CUSTOM_PROFILE} ON)", generated)
+
+    def test_cmake_can_replace_custom_profile_with_standard_override(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            build_directory = Path(temporary_directory) / "build"
+
+            # Given: custom is the profile seed.
+            result = subprocess.run(
+                [
+                    "cmake",
+                    "-S",
+                    str(ROOT),
+                    "-B",
+                    str(build_directory),
+                    "-DMUC_OPCUA_PROFILE=custom",
+                    f"-D{STANDARD_PROFILE}=ON",
+                ],
+                cwd=ROOT,
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+
+            # When: a named profile is explicitly enabled.
+            self.assertEqual(result.returncode, 0, result.stderr)
+            generated = (build_directory / "muc_opcua_config.cmake").read_text(
+                encoding="utf-8"
+            )
+
+            # Then: the named profile replaces the custom choice.
+            self.assertIn(f"set({STANDARD_PROFILE} ON)", generated)
+            self.assertIn(f"set({CUSTOM_PROFILE} OFF)", generated)
 
     def test_cmake_rejects_explicit_crypto_request_when_dependency_vetoes_it(self) -> None:
         with tempfile.TemporaryDirectory() as temporary_directory:
