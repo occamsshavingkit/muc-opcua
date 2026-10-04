@@ -173,6 +173,7 @@
 #ifndef MU_CONNECTION_RX_BUFFER_SIZE
 #define MU_CONNECTION_RX_BUFFER_SIZE MU_MIN_CHUNK_SIZE
 #elif MU_CONNECTION_RX_BUFFER_SIZE < MU_MIN_CHUNK_SIZE
+/* cppcheck-suppress preprocessorErrorDirective ; intentional compile-time guard */
 #error "MU_CONNECTION_RX_BUFFER_SIZE must be at least MU_MIN_CHUNK_SIZE"
 #endif
 
