@@ -34,7 +34,7 @@ jobs:
         with:
           python-version: '3.x'
       - name: Install dependencies
-        run: pip install --quiet pyyaml
+        run: python3 -m pip install --quiet pyyaml pytest
       - name: Validate manifest structure and reconciliation links
         run: python3 scripts/profile_manifest/validate.py --manifest profiles/opcua-profile-manifest.yaml --manifest-only
       - name: Validate claim/test coverage
