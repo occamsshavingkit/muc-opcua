@@ -505,13 +505,6 @@ to refresh.
 | MUC_OPCUA_CU_BASE_INFO_ARGUMENT_TYPE | opc_cu_base_info_argument_type | claimed |  |  | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER |
 | MUC_OPCUA_CU_VIEW_REGISTERNODES | service_register_nodes | claimed | ✅ | ✅ | ✅ | ✅ | ✅ | MUC_OPCUA_FACET_CORE_2022_SERVER |
 | MUC_OPCUA_CU_HISTORICAL_ACCESS_SERVER_FACET | service_history | claimed |  |  |  |  | ✅ |  |
-| — | opc_cu_1572 | deferred |  |  |  |  |  |  |
-| — | opc_cu_1577 | deferred |  |  |  |  |  |  |
-| — | opc_cu_1578 | deferred |  |  |  |  |  | MUC_OPCUA_CU_HISTORICAL_ACCESS_SERVER_FACET |
-| — | opc_cu_1579 | deferred |  |  |  |  |  | MUC_OPCUA_CU_HISTORICAL_ACCESS_SERVER_FACET |
-| — | opc_cu_1580 | deferred |  |  |  |  |  | MUC_OPCUA_CU_HISTORICAL_ACCESS_SERVER_FACET |
-| — | opc_cu_1581 | deferred |  |  |  |  |  | MUC_OPCUA_CU_HISTORICAL_ACCESS_SERVER_FACET |
-| — | opc_cu_1710 | deferred |  |  |  |  |  |  |
 | MUC_OPCUA_CU_QUERY | service_query | claimed |  |  |  |  | ✅ |  |
 | MUC_OPCUA_CU_NODEMANAGEMENT | service_nodemanagement | claimed |  |  |  |  | ✅ |  |
 | MUC_OPCUA_FACET_UA_TCP_UA_SC_UA_BINARY | opc_facet_837 | implemented | ✅ | ✅ | ✅ | ✅ | ✅ |  |
@@ -754,11 +747,18 @@ The following OPC items are tracked in the manifest but are NOT implemented. The
 | opc_cu_aggregate_variance_population | OPC-10000-13 §4.2.2.39 Core 2022 Server Facet | documented |  |
 | opc_cu_base_info_base_types | OPC-10000-5 Core 2022 Server Facet | documented | spec 080b: completes the base OPC UA type system in base_nodes.c -- the remaining built-in/abstract DataTypes (Guid14/ByteString15/XmlElement16/ExpandedNodeId18/DataValue23/DiagnosticInfo25/Integer27/UInteger28/Enumeration29/Duration290/NumericRange291/UtcTime294/EnumValueType7594/Union12756) with correct supertype closure (primitives re-parented under Integer/UInteger/Number), HasModellingRule(37) + ModellingRuleType(77) + the ModellingRule Objects (Optional80/Mandatory78/ExposesItsArray83/OptionalPlaceholder11508/MandatoryPlaceholder11510), and the EnumValueType Encoding Objects (DefaultXml7616/DefaultBinary8251). Satisfies CU 3188 (Base Types) and CU 3185 (Core Types Folders). Second slice of the base type-system completion (A2); depends on the specialized-DataTypes CU for the Number/String subtype arrays it extends. |
 | opc_cu_1571 | OPC-10000-11 | documented | HistoryRead service with ReadRawModifiedDetails. Continuation points, pagination, timestamp filtering, and returnBounds implemented. Satisfied by service_history (MUC_OPCUA_CU_HISTORICAL_ACCESS_SERVER_FACET). |
+| opc_cu_1572 | OPC-10000-11 | deferred | Historical Annotation not implemented; no annotation storage or retrieval support. |
 | opc_cu_1573 | OPC-10000-11 | documented | HistoryUpdate service with UpdateDataDetails. performInsertReplace field decoded and dispatched via history_adapter.update_data callback. Satisfied by service_history (MUC_OPCUA_CU_HISTORICAL_ACCESS_SERVER_FACET). |
 | opc_cu_1574 | OPC-10000-11 | documented | HistoryUpdate Insert (performInsertReplace=1). Insert rejects existing-timestamp collision; replace requires pre-existing timestamp. Satisfied by service_history (MUC_OPCUA_CU_HISTORICAL_ACCESS_SERVER_FACET). |
 | opc_cu_1575 | OPC-10000-11 | documented | HistoryUpdate Replace (performInsertReplace=2). Replace updates existing-timestamp entry; insert new entries via replace. Satisfied by service_history (MUC_OPCUA_CU_HISTORICAL_ACCESS_SERVER_FACET). |
 | opc_cu_1576 | OPC-10000-11 | documented | HistoryUpdate service with DeleteRawModifiedDetails. isDeleteModified, startTime, endTime decoded and dispatched via history_adapter.delete_raw_modified callback. Satisfied by service_history (MUC_OPCUA_CU_HISTORICAL_ACCESS_SERVER_FACET). |
 | opc_cu_2264 | OPC-10000-11 | documented | Replace single values in history. Satisfied by Historical Data Replace (opc_cu_1575) via service_history. |
+| opc_cu_1577 | OPC-10000-11 | deferred | Base Historical Event not implemented; no event history support. |
+| opc_cu_1578 | OPC-10000-11 | deferred | Historical Event Update not implemented; no event history support. |
+| opc_cu_1579 | OPC-10000-11 | deferred | Historical Event Insert not implemented; no event history support. |
+| opc_cu_1580 | OPC-10000-11 | deferred | Historical Event Replace not implemented; no event history support. |
+| opc_cu_1581 | OPC-10000-11 | deferred | Historical Event Delete not implemented; no event history support. |
+| opc_cu_1710 | OPC-10000-11 | deferred | Historical Access Structured Data not implemented; structured data storage/retrieval requires additional development. |
 | opc_cu_2185 | OPC-10000-11 | documented | Historical Access Structured Data Insert deferred; depends on opc_cu_1710. |
 | opc_cu_2332 | OPC-10000-11 | documented | Historical Access Structured Data Read Raw deferred; depends on opc_cu_1710. |
 | opc_facet_2242 | OPC-10000-7 §4.2 | unimplemented | LogObject Facet not implemented; no external log-object support planned. |

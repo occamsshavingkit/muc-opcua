@@ -1801,7 +1801,8 @@ def generate_build_docs_section(manifest: dict) -> str:
     items = manifest.get("items", [])
     selectable = [
         i for i in items
-        if isinstance(i, dict) and i.get("implementation_state") in _SELECTABLE_STATES
+        if isinstance(i, dict)
+        and i.get("implementation_state") in _KCONFIG_SELECTABLE_STATES
     ]
 
     lines.append("### Feature symbols")
@@ -1856,7 +1857,8 @@ def generate_build_docs_section(manifest: dict) -> str:
     # -- Unavailable items ------------------------------------------------
     unavailable = [
         i for i in items
-        if isinstance(i, dict) and i.get("implementation_state") in ("unimplemented", "documented")
+        if isinstance(i, dict)
+        and i.get("implementation_state") in _UNSELECTABLE_STATES
     ]
 
     lines.append("### Unavailable OPC items")

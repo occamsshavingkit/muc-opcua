@@ -218,6 +218,32 @@ class GenerateKconfigTest(unittest.TestCase):
 
 
 class GenerateBuildDocsTest(unittest.TestCase):
+    def test_deferred_item_is_unavailable_and_not_selectable(self) -> None:
+        manifest = {
+            "items": [
+                {
+                    "id": "deferred_cu",
+                    "implementation_state": "deferred",
+                    "kconfig_symbol": "MUC_OPCUA_CU_DEFERRED",
+                    "profile_defaults": dict(_PROFILE_DEFAULTS),
+                    "opc_reference": {
+                        "spec": "OPC-10000-7",
+                        "section": "6.3",
+                    },
+                    "notes": "Planned capability.",
+                },
+            ],
+            "capacities": [],
+        }
+
+        section = generate_build_docs_section(manifest)
+
+        self.assertNotIn("| MUC_OPCUA_CU_DEFERRED |", section)
+        self.assertIn(
+            "| deferred_cu | OPC-10000-7 §6.3 | deferred | Planned capability. |",
+            section,
+        )
+
     def test_selectable_item_docs_include_deduplicated_structural_and_semantic_dependencies(self) -> None:
         manifest = {
             "items": [
