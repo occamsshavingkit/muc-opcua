@@ -785,6 +785,7 @@ def _emit_unselectable(lines: list[str], item: dict) -> None:
     source = _opc_source_string(opc_ref if isinstance(opc_ref, dict) else None)
     detail = _opc_detail_string(opc_ref if isinstance(opc_ref, dict) else None)
     state = item.get("implementation_state", "unknown")
+    reference = source or (detail if state == "unimplemented" else "")
     item_id = item.get("id", "")
 
     # Context comment lines (readable in the Kconfig file, not in menuconfig).
@@ -805,8 +806,8 @@ def _emit_unselectable(lines: list[str], item: dict) -> None:
 
     # Visible comment directive in menuconfig (always shown, never toggleable).
     label = "DOCUMENTED" if state == "documented" else "NOT IMPLEMENTED"
-    if source:
-        lines.append('comment "' + name + ' (' + label + ') [' + source + ']"')
+    if reference:
+        lines.append('comment "' + name + ' (' + label + ') [' + reference + ']"')
     else:
         lines.append('comment "' + name + ' (' + label + ')"')
     lines.append("")
