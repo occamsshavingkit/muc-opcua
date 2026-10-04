@@ -591,6 +591,30 @@ else
     FAIL=$((FAIL + 1))
 fi
 
+echo "### 19c. SecurityPolicy Support CU is exported to muc_opcua consumers ###"
+D19C="$WORKDIR/g19c"
+D19C_CONFIGURE_LOG="$WORKDIR/g19c-configure.log"
+if cmake -S . -B "$D19C" -DMUC_OPCUA_PROFILE=custom \
+    -DMUC_OPCUA_FACET_CORE_2022_SERVER=ON \
+    -DMUC_OPCUA_CU_SECURITYPOLICY_SUPPORT=ON \
+    -DMUC_OPCUA_PLATFORM=host \
+    -DCMAKE_EXPORT_COMPILE_COMMANDS=ON >"$D19C_CONFIGURE_LOG" 2>&1; then
+    assert_cfg "$D19C" CU_SECURITYPOLICY_SUPPORT ON
+
+    if grep -q -- "-DMUC_OPCUA_CU_SECURITYPOLICY_SUPPORT=1" \
+        "$D19C/compile_commands.json"; then
+        echo "  PASS  SecurityPolicy Support CU is exported to muc_opcua"
+        PASS=$((PASS + 1))
+    else
+        echo "  FAIL  SecurityPolicy Support CU is not exported to muc_opcua"
+        FAIL=$((FAIL + 1))
+    fi
+else
+    echo "  FAIL  could not configure SecurityPolicy Support export scenario"
+    cat "$D19C_CONFIGURE_LOG"
+    FAIL=$((FAIL + 1))
+fi
+
 echo "### 20. Public Reverse Connect config layout follows the feature value ###"
 LAYOUT_TEST="tests/config/test_reverse_connect_config_layout.c"
 if cc -std=c11 -Wall -Wextra -Werror -Wpedantic -Iinclude \

@@ -528,6 +528,11 @@ if(MUC_OPCUA_FACET_CORE_2022_SERVER)
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_SECURITY=1)
 endif()
 
+# -- CU: SecurityPolicy Support --
+if(MUC_OPCUA_CU_SECURITYPOLICY_SUPPORT)
+    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_CU_SECURITYPOLICY_SUPPORT=1)
+endif()
+
 # -- Secure-channel message crypto (spec 072) --
 # Decoupled from the facet umbrella so the SecurityPolicy-None-only nano profile
 # does not compile the symmetric/asymmetric chunk crypto, certificate, trustlist,
