@@ -89,11 +89,11 @@ discover_toggles() {
         fi
     done < <(
         awk '
-            /^(menu)?config[[:space:]]+MUC_OPCUA_(PROFILE|FACET|CU)_[A-Za-z0-9_]+$/ {
+            /^[[:space:]]*(menu)?config[[:space:]]+MUC_OPCUA_(PROFILE|FACET|CU)_[A-Za-z0-9_]+$/ {
                 candidate = $2
                 next
             }
-            /^(menu)?config[[:space:]]+/ {
+            /^[[:space:]]*(menu)?config[[:space:]]+/ {
                 candidate = ""
                 next
             }
@@ -397,7 +397,8 @@ main() {
     fi
 
     if [ "$found_toggles_in_kconfig" -eq 0 ]; then
-        echo "warning: no supported bool toggles discovered in Kconfig" >&2
+        echo "error: zero supported bool Kconfig toggles discovered" >&2
+        exit 2
     fi
 
     build_parent=${BUILD_DIR:-${TMPDIR:-/tmp}}

@@ -4,6 +4,7 @@ set -euo pipefail
 SCRIPT_DIR=$(CDPATH= cd "$(dirname "$0")" && pwd -P)
 ROOT_DIR=$(CDPATH= cd "$SCRIPT_DIR/.." && pwd -P)
 fixture_root=$(mktemp -d "${TMPDIR:-/tmp}/muc-opcua-matrix-discovery.XXXXXX")
+failures=0
 
 cleanup() {
     rm -rf "$fixture_root"
@@ -24,17 +25,17 @@ endforeach()
 EOF
 
 cat > "$fixture_root/Kconfig" <<'EOF'
-config MUC_OPCUA_PROFILE_FIXTURE_SERVER
-	bool "Fixture profile"
+  config MUC_OPCUA_PROFILE_FIXTURE_SERVER
+    bool "Fixture profile"
 
-menuconfig MUC_OPCUA_FACET_FIXTURE_SERVER
-	bool "Fixture facet"
+    menuconfig MUC_OPCUA_FACET_FIXTURE_SERVER
+        bool "Fixture facet"
 
-config MUC_OPCUA_CU_FIXTURE_BEHAVIOR
-	bool "Fixture CU"
+  config MUC_OPCUA_CU_FIXTURE_BEHAVIOR
+    bool "Fixture CU"
 
-config MUC_OPCUA_MAX_SESSIONS
-	int "Typed capacity"
+    config MUC_OPCUA_MAX_SESSIONS
+        int "Typed capacity"
 EOF
 
 python3 - "$fixture_root/scripts/check_build_matrix.sh" <<'PY'
@@ -66,6 +67,37 @@ EOF
 if [ "$actual" != "$expected" ]; then
     printf 'expected discovered toggles:\n%s\n\nactual discovered toggles:\n%s\n' \
         "$expected" "$actual" >&2
+    failures=$((failures + 1))
+fi
+
+cp "$ROOT_DIR/scripts/check_build_matrix.sh" "$fixture_root/scripts/check_build_matrix.sh"
+cat > "$fixture_root/Kconfig" <<'EOF'
+config MUC_OPCUA_MAX_SESSIONS
+	int "Typed capacity"
+EOF
+
+set +e
+zero_discovery_output=$(
+    CMAKE=/bin/true NM=/bin/false BUILD_DIR="$fixture_root/build" \
+        bash "$fixture_root/scripts/check_build_matrix.sh" 2>&1
+)
+zero_discovery_status=$?
+set -e
+
+if [ "$zero_discovery_status" -ne 2 ]; then
+    printf 'zero-discovery exit status: expected 2, got %s\n' "$zero_discovery_status" >&2
+    failures=$((failures + 1))
+fi
+
+case "$zero_discovery_output" in
+    *"error: zero supported bool Kconfig toggles discovered"*) ;;
+    *)
+        echo "zero-discovery fixture did not report a fatal discovery error" >&2
+        failures=$((failures + 1))
+        ;;
+esac
+
+if [ "$failures" -ne 0 ]; then
     exit 1
 fi
 
