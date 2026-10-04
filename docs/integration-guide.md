@@ -6,16 +6,17 @@ architecture and conformance docs: it tells you exactly which memory you must
 provide, which platform callbacks you must implement, how to declare a static
 address space, how to drive the run loop, and how to size and configure the build.
 
-The library is freestanding C11, **no-heap**, and single-connection. There is no
-`malloc` in the protocol path. Every byte of working RAM is owned and supplied by
-*you*, the integrator: a server storage block plus a receive and a transmit
-buffer. The library talks to the outside world only through a small set of
-function-pointer *adapters* (TCP, time, entropy, and optionally crypto and
-persistence) that you fill in for your platform.
+The library is freestanding C11 with caller-owned protocol state and a bounded
+connection pool. The nano, micro, and embedded profiles force a zero-heap build;
+standard and full permit bounded allocation for array-valued Write/Call decoding.
+You supply the server storage block plus receive and transmit buffers. The
+library talks to the outside world only through a small set of function-pointer
+*adapters* (TCP, time, entropy, and optionally crypto and persistence) that you
+fill in for your platform.
 
 > **Reading paths**
 > - *Just want it running?* Read [Quick start](#1-quick-start), then
->   [The no-heap memory model](#2-the-no-heap-memory-model) and
+>   [The memory model](#2-the-memory-model) and
 >   [Implementing the platform adapters](#3-implementing-the-platform-adapters).
 > - *Bringing up a new board?* Jump to the
 >   [Porting checklist](#8-porting-checklist).
@@ -26,7 +27,7 @@ persistence) that you fill in for your platform.
 ## Table of contents
 
 1. [Quick start](#1-quick-start)
-2. [The no-heap memory model](#2-the-no-heap-memory-model)
+2. [The memory model](#2-the-memory-model)
 3. [Implementing the platform adapters](#3-implementing-the-platform-adapters)
 4. [Defining the address space](#4-defining-the-address-space)
 5. [The run loop](#5-the-run-loop)
@@ -106,10 +107,12 @@ The remaining sections explain each of the seven steps in depth.
 
 ---
 
-## 2. The no-heap memory model
+## 2. The memory model
 
-muc-opcua never allocates. All mutable state lives in memory you declare and
-hand over at init time. There are **three** caller-owned regions.
+All persistent protocol state lives in memory you declare and hand over at init
+time. There are **three** caller-owned regions. Nano, micro, and embedded builds
+also prohibit heap allocation; standard and full may use bounded heap storage
+for array-valued Write/Call payloads.
 
 ### 2.1 The three regions
 
@@ -207,15 +210,15 @@ space, and (for security builds) primes the secure scratch. The listening socket
 is not opened until the first `mu_server_poll` (the adapter's `listen` is invoked
 there).
 
-### 2.4 A note on near-zero `.bss`
+### 2.4 Static and dynamic RAM
 
-The library keeps `.data` at zero and `.bss` to ~156 bytes (an address-space
-lookup-index cache and an OPN policy hand-off; see
-`docs/size/feature-size-ledger.md`). It performs **no dynamic allocation** in the
-protocol hot path, including the subscription engine, which uses fixed-size
-arrays. The practical consequence for you: RAM usage is static and fully
-predictable at link time — `MU_SERVER_STORAGE_BYTES` + two 8 KiB buffers + peak
-stack.
+The library archive has zero mutable static `.data`/`.bss`; protocol state and
+the subscription engine live in caller storage and fixed-size arrays. For nano,
+micro, and embedded builds, RAM usage is fully static: `MU_SERVER_STORAGE_BYTES`
++ two 8 KiB buffers + peak stack. Standard and full additionally permit bounded
+heap use for array-valued Write/Call decoding; account for that application-
+controlled path when budgeting those profiles. See
+`docs/size/feature-size-ledger.md` for measured profile footprints.
 
 ---
 
@@ -599,7 +602,7 @@ well-known nodes a real client reads during session setup:
 | `ns=0;i=2254` | ServerArray | `String[]` of server URIs |
 | `ns=0;i=11705` | MaxNodesPerRead | Advertises your per-Read batch cap so clients self-limit |
 | `ns=0;i=11710` | MaxNodesPerBrowse | Same for Browse |
-| `ns=0;i=2258` / `i=2256` | CurrentTime / ServerStatus | Provided automatically when `MUC_OPCUA_BASE_NODES` is on (callback-backed by the time adapter) |
+| `ns=0;i=2258` / `i=2256` | CurrentTime / ServerStatus | Provided automatically when `MUC_OPCUA_FACET_CORE_2022_SERVER` is on (callback-backed by the time adapter) |
 
 ```c
 static const mu_node_t s_nodes[] = {
@@ -623,7 +626,8 @@ the server will truncate.
 The NodeManagement service set allows adding and deleting nodes and references at runtime.
 
 To enable dynamic node management:
-1. Compile with `-DMUC_OPCUA_SERVICE_NODEMANAGEMENT=1`.
+1. Compile with `-DMUC_OPCUA_CU_NODEMANAGEMENT=ON` and
+   `-DMUC_OPCUA_CU_DYNAMIC_NODES=ON`.
 2. Configure limits via `-DMU_MAX_DYNAMIC_NODES` (default: 32) and `-DMU_MAX_DYNAMIC_REFERENCES` (default: 64). Note that this proportionally increases `MU_SERVER_STORAGE_BYTES` for your static memory budget.
 3. Set `server->config.allow_node_management = true` in your server configuration. If false, NodeManagement services return `BadUserAccessDenied`.
 
@@ -642,7 +646,7 @@ Once enabled, clients can dynamically add variables or objects using `AddNodes` 
   TypeDefinition, set the node's cached `type_definition` field rather than adding an
   explicit `HasTypeDefinition` reference to a ns=0 type node.
 
-### 4.6 Exposing a Data Access AnalogItem (`MUC_OPCUA_DATA_ACCESS`)
+### 4.6 Exposing a Data Access AnalogItem (`MUC_OPCUA_CU_DATA_ACCESS`)
 
 The Data Access Server Facet (spec 060) serves the DA VariableType nodes
 (`AnalogItemType` 2368, `DataItemType`, the discrete types, …); the library serves
@@ -681,8 +685,8 @@ model and the grounded percent-deadband rules.
 
 ## 5. The run loop
 
-muc-opcua is **cooperative and single-connection**. You drive it by calling
-`mu_server_poll` repeatedly; it never blocks and never spawns threads.
+muc-opcua is **cooperative and bounded-multi-connection**. You drive it by
+calling `mu_server_poll` repeatedly; it never blocks and never spawns threads.
 
 ```c
 opcua_statuscode_t mu_server_poll(mu_server_t *server);
@@ -705,11 +709,12 @@ The 10 ms yield (host `usleep(10000)`, Pico `sleep_ms(10)`) keeps a busy-poll fr
 pinning the CPU. On an RTOS, run the poll in its own task and yield with
 `vTaskDelay`, or block on a socket-ready event and poll on wake for lower latency.
 
-**Single-connection model.** The server services one client connection at a time
-(`max_secure_channels` = 1). It does support **≥2 concurrent sessions** on that
-channel (`max_sessions` = 2), per the Micro profile. While a client is connected,
-`accept` returning a new handle is handled per the connection policy; design your
-application around one active peer.
+**Connection pool.** The server services up to `MU_INTERN_MAX_CONNECTIONS`
+connections and the same number of SecureChannels. The generated profile
+defaults are nano 1, micro 2, embedded 4, standard 50, and full 100. One poll
+accepts at most one new handle, then services the bounded pool cooperatively.
+Size application and adapter resources from the generated capacity macros
+rather than assuming one active peer or hard-coding these defaults.
 
 **Idle / timeout behavior.** The library uses `get_tick_ms` to enforce session
 timeouts and to drop idle connections, so a peer that disappears without a clean
@@ -730,7 +735,7 @@ The authoritative conformance reference is
 - **SecurityPolicy selection is automatic from the crypto adapter.** No crypto
   adapter (`config.crypto_adapter == NULL`) ⇒ **None only**. With a crypto adapter
   ⇒ the server *also* advertises `Basic256Sha256`, `Aes128-Sha256-RsaOaep`, and `Aes256-Sha256-RsaPss`
-  Sign and SignAndEncrypt endpoints alongside None. Build security support in with the `MUC_OPCUA_SECURITY`
+  Sign and SignAndEncrypt endpoints alongside None. Build security support in with the `MUC_OPCUA_SECURE_CHANNEL_CRYPTO`
   option (see §7).
 - **None is non-production.** Per the conformance note, SecurityPolicy None
   endpoints are for trusted/isolated networks and bench testing only. Ship
@@ -773,7 +778,7 @@ The authoritative conformance reference is
   or ARM PSA Crypto / a hardware crypto block. muc-opcua ships ready-made adapters
   for OpenSSL (host), mbedTLS, and wolfSSL (`MUC_OPCUA_HAVE_{MBEDTLS,WOLFSSL}`).
 - **Optional ECC SecurityPolicies** (`#ECC_curve25519`, `#ECC_nistP256`; spec 059,
-  `MUC_OPCUA_ECC`, default ON for standard/full) add ephemeral-ECDH secure channels
+  `MUC_OPCUA_CU_SECURITY_ECC`, default ON for full only) add ephemeral-ECDH secure channels
   (X25519+Ed25519 or P-256+ECDSA) alongside the RSA policies above — same crypto
   adapter interface, an extra per-curve certificate/key via
   `get_own_ecc_certificate`. The mbedTLS backend only implements the nistP256 half
@@ -802,7 +807,7 @@ removed from a profile's defaults on the same `cmake` invocation — see
 | **Nano** | Core + View (Browse) + Read, SecurityPolicy None | `MUC_OPCUA_PROFILE=nano` |
 | **Micro** | Nano + data-change Subscriptions / MonitoredItems + multiple sessions/connections | `MUC_OPCUA_PROFILE=micro` |
 | **Embedded** | Micro + Basic256Sha256 + Standard DataChange additions + Base Info Type System | `MUC_OPCUA_PROFILE=embedded` |
-| **Standard** | Embedded-level surface plus Standard profile marker and standard capacity minima | `MUC_OPCUA_PROFILE=standard` |
+| **Standard** | Embedded-level surface plus standard capacity minima; the advertisement marker remains off until every mandatory Standard CU is selectable | `MUC_OPCUA_PROFILE=standard` |
 | **Full** | Standard profile/capacity family plus optional services/facets | `MUC_OPCUA_PROFILE=full` |
 | **Custom** | Always-on core services plus only the features you select | `MUC_OPCUA_PROFILE=custom` |
 
@@ -893,7 +898,14 @@ Additional notes for budgeting:
 
 - **`.bss`** and **`.data`** are 0 for the library archive; **heap is 0** on nano/micro/embedded —
   the subscription engine is fixed-size, no `malloc`. Standard/full keep the heap
-  enabled specifically for array-valued Write/Call decoding.
+  enabled specifically for array-valued Write/Call decoding. A positive decoded
+  array is allocated with `calloc(length, element_size)` only after its element
+  count is checked against `MU_INTERN_MAX_ARRAY_LENGTH`, the remaining wire
+  bytes, and `SIZE_MAX`. Allocation failure returns `Bad_OutOfMemory`; a partial
+  decode frees the temporary buffer before returning. On success, the decoded
+  variant owns `value.array`: the built-in Write and Call handlers release it
+  after dispatch, and any direct caller of `mu_binary_read_variant` must likewise
+  call `free((void *)variant.value.array)` when finished.
 - **Caller RAM scales with capacity presets**, not just feature flags: standard/full
   default to far larger session/subscription/monitored-item counts than
   embedded (see `MU_SERVER_STORAGE_BYTES` per profile in
@@ -903,8 +915,8 @@ Additional notes for budgeting:
   `-DMU_MAX_SESSIONS=4`) if the profile default is more than your target needs.
 - **Crypto backend flash** (mbedTLS/wolfSSL/OpenSSL) is *not* included above and is
   typically the largest single addition on a Standard/Full build; ECC adds a further
-  ~3.1 KB of protocol code on top when `MUC_OPCUA_ECC` is on (default for
-  standard/full) — see
+  ~3.1 KB of protocol code on top when `MUC_OPCUA_CU_SECURITY_ECC` is on (default for
+  full only) — see
   [`docs/conformance/ecc-security-policy.md`](conformance/ecc-security-policy.md).
   Size it from your TLS library plus the ECC delta.
 - **Peak stack:** budget at least 16 KiB for a security build unless you have
@@ -927,9 +939,12 @@ network primitives so the cross-compile and server lifecycle validate before a
 real stack is attached.
 
 1. **Compile the core.** Add `src/**/*.c` (excluding the host POSIX/OpenSSL
-   adapters under `src/platform/`) and the `include/` headers to your build. It is
-   freestanding C11; you supply only `<stddef.h>`/`<stdint.h>`/`<string.h>`-level
-   facilities. Set `MUC_OPCUA_PLATFORM` and feature options (§7).
+   adapters under `src/platform/`) and the `include/` headers to your build. The
+   nano/micro/embedded profiles are freestanding C11 and require only
+   `<stddef.h>`/`<stdint.h>`/`<string.h>`-level facilities. Standard/full enable
+   bounded array decoding and therefore require working `calloc`/`free`, unless
+   you explicitly disable heap support and the dependent features. Set
+   `MUC_OPCUA_PLATFORM` and feature options (§7).
 2. **Declare storage.** Three statics:
    `g_server_storage[MU_SERVER_STORAGE_BYTES]`, `g_recv_buffer[MU_MIN_CHUNK_SIZE]`,
    `g_send_buffer[MU_MIN_CHUNK_SIZE]`.
@@ -986,7 +1001,7 @@ opcua_statuscode_t mu_server_config_validate(const mu_server_config_t *config);
 | `receive_buffer` / `receive_buffer_size` | yes | `>= MU_MIN_CHUNK_SIZE` |
 | `send_buffer` / `send_buffer_size` | yes | `>= MU_MIN_CHUNK_SIZE` |
 | `max_chunk_count`, `max_message_size` | yes | Use `MU_DEFAULT_MAX_CHUNK_COUNT` (1), `MU_DEFAULT_MAX_MESSAGE_SIZE` (8192) |
-| `max_sessions`, `max_secure_channels` | yes | Must not exceed the compiled `MU_MAX_SESSIONS` (2) / `MU_MAX_SECURE_CHANNELS` (== `MU_MAX_CONNECTIONS`, 1) ceilings, or `mu_server_config_validate`/`mu_server_init` reject the config; see "Raising the concurrency limits" below |
+| `max_sessions`, `max_secure_channels` | yes | Must not exceed the compiled profile/build-specific `MU_MAX_SESSIONS` / `MU_MAX_SECURE_CHANNELS` (`== MU_MAX_CONNECTIONS`) ceilings, or `mu_server_config_validate`/`mu_server_init` reject the config; see "Raising the concurrency limits" below |
 | `tcp_adapter`, `time_adapter`, `entropy_adapter` | yes | By value; fill before init |
 | `crypto_adapter` | no | `NULL` ⇒ None only; non-NULL ⇒ advertises all built security policies |
 | `trust_list` | no | Array of trusted peer certificates for strict authentication |
@@ -997,32 +1012,33 @@ opcua_statuscode_t mu_server_config_validate(const mu_server_config_t *config);
 
 | Constant | Value | Header |
 |---|---|---|
-| `MU_SERVER_STORAGE_BYTES` | 1280 / 3328 / 63240 (per profile) | `config.h` |
+| `MU_SERVER_STORAGE_BYTES` | Profile/build-specific; generated from the selected features and capacities | `config.h` |
 | `MU_MIN_CHUNK_SIZE` | 8192 | `config.h` |
 | `MU_DEFAULT_MAX_CHUNK_COUNT` | 1 | `config.h` |
 | `MU_DEFAULT_MAX_MESSAGE_SIZE` | 8192 | `config.h` |
-| `MU_MAX_SESSIONS` / `MU_MAX_SECURE_CHANNELS` / `MU_MAX_CONNECTIONS` | 2 / 1 / 1 | `config.h` |
+| `MU_MAX_SESSIONS` / `MU_MAX_SECURE_CHANNELS` / `MU_MAX_CONNECTIONS` | Profile/build-specific generated capacities | `config.h` |
 | `MU_SHA256_LENGTH` / `MU_AES_BLOCK_SIZE` / `MU_THUMBPRINT_LENGTH` | 32 / 16 / 20 | `platform.h` |
 
 ### Raising the concurrency limits
 
-`MU_MAX_SESSIONS` and `MU_MAX_CONNECTIONS` are both `#ifndef`-guarded, so both can
-be raised with a `-D` flag (e.g. `-DMUC_OPCUA_MULTIPLE_CONNECTIONS -DMU_MAX_CONNECTIONS=8`).
-`MU_MAX_SECURE_CHANNELS` always equals `MU_MAX_CONNECTIONS` (one secure channel
-per connection) and does not need to be set independently. Two things to know
-before raising either:
+`MU_MAX_SESSIONS`, `MU_MAX_CONNECTIONS`, and `MU_MAX_SECURE_CHANNELS` are public
+capacity overrides. Set them as compile definitions and reconfigure the library
+and application together (for example,
+`-DMUC_OPCUA_CU_MULTIPLE_CONNECTIONS=ON -DMU_MAX_CONNECTIONS=8`). By default secure
+channel capacity follows connection capacity because each connection owns one
+SecureChannel; overriding `MU_MAX_SECURE_CHANNELS` cannot create more connection
+slots. Two things to know before changing these limits:
 
 - `config.max_sessions`/`config.max_secure_channels` must not exceed the
   compiled `MU_MAX_SESSIONS`/`MU_MAX_CONNECTIONS` — `mu_server_init` rejects
   the config with `Bad_InternalError` otherwise, rather than silently
   under-provisioning.
-- `MU_SERVER_STORAGE_BYTES` is a flat size calibrated for the **default**
-  limits; it does not automatically grow when you raise `MU_MAX_SESSIONS` or
-  `MU_MAX_CONNECTIONS`. If you raise either, over-allocate the storage buffer
-  passed to `mu_server_init` beyond `MU_SERVER_STORAGE_BYTES` (or size it from
-  a build with your actual flags) — `mu_server_init` returns
-  `Bad_OutOfMemory` cleanly if the buffer is too small, rather than
-  overflowing it.
+- `MU_SERVER_STORAGE_BYTES` is computed from the resolved feature and capacity
+  macros, so it grows when the same `MU_MAX_*` overrides are visible while
+  compiling the library and your application. Always declare the storage array
+  from that macro after reconfiguring with the final capacity flags; do not copy
+  a value from a default-profile build. `mu_server_init` returns
+  `Bad_OutOfMemory` if the supplied block is smaller than the compiled layout.
 
 ### Related docs
 

@@ -25,7 +25,7 @@
 void setUp(void) {}
 void tearDown(void) {}
 
-#if MUC_OPCUA_SUBSCRIPTIONS && MUC_OPCUA_SUBSCRIPTIONS_STANDARD
+#if MUC_OPCUA_CU_SUBSCRIPTION_BASIC && MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
 
 static mu_variant_t make_int32(opcua_int32_t v) {
     mu_variant_t out;
@@ -74,14 +74,14 @@ void test_deadband_none_changed_value_is_reportable(void) {
 #else
 
 void test_deadband_requires_standard_subscription_build(void) {
-    TEST_PASS_MESSAGE("MUC_OPCUA_SUBSCRIPTIONS_STANDARD is disabled in this build");
+    TEST_PASS_MESSAGE("MUC_OPCUA_CU_SUBSCRIPTION_BASIC or MUC_OPCUA_CU_SUBSCRIPTION_STANDARD is disabled");
 }
 
 #endif
 
 int main(void) {
     UNITY_BEGIN();
-#if MUC_OPCUA_SUBSCRIPTIONS && MUC_OPCUA_SUBSCRIPTIONS_STANDARD
+#if MUC_OPCUA_CU_SUBSCRIPTION_BASIC && MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
     RUN_TEST(test_deadband_none_first_sample_is_reportable);
     RUN_TEST(test_deadband_none_unchanged_value_is_not_reportable);
     RUN_TEST(test_deadband_none_changed_value_is_reportable);

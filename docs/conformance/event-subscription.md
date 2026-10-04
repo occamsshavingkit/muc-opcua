@@ -2,9 +2,9 @@
 
 This server evaluates the OPC UA **EventFilter WhereClause** (a ContentFilter,
 OPC-10000-4 §7.7) applied to event MonitoredItems — the Event-Subscription slice of the
-Project-B Part-7 rollout (B2). Gated behind **`MUC_OPCUA_EVENT_FILTER_WHERE`** (default
-**ON for standard/full**), which requires `MUC_OPCUA_EVENTS` and
-`MUC_OPCUA_SUBSCRIPTIONS_STANDARD` (features.h guards). With the flag off, event
+Project-B Part-7 rollout (B2). Gated behind **`MUC_OPCUA_CU_EVENT_FILTER_WHERE`** (default
+**ON for standard/full**), which requires `MUC_OPCUA_CU_EVENTS` and
+`MUC_OPCUA_CU_SUBSCRIPTION_STANDARD` (features.h guards). With the flag off, event
 MonitoredItems still deliver their SelectClause fields unfiltered.
 
 Everything below is grounded against OPC-10000-4: the FilterOperator table from §7.7.3,

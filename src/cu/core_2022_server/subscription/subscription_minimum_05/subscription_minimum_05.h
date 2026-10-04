@@ -1,0 +1,8 @@
+#ifndef MUC_OPCUA_CU_SUBSCRIPTION_MINIMUM_05_H
+#define MUC_OPCUA_CU_SUBSCRIPTION_MINIMUM_05_H
+
+#define MU_CU_SUBSCRIPTION_MINIMUM_05_REQUIRED_SUBSCRIPTIONS 5
+
+extern const unsigned char mu_cu_subscription_minimum_05_enabled;
+
+#endif

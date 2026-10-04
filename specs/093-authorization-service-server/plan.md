@@ -8,7 +8,7 @@
 ## Technical Context
 
 - **Language**: C11 (freestanding, no heap in hot path)
-- **Build**: CMake + Kconfig, profile-gated (`MUC_OPCUA_CU_USER_TOKEN_JWT`, `MUC_OPCUA_CU_AUTHORIZATION_SERVICE_SERVER`)
+- **Build**: CMake + Kconfig, profile-gated (`MUC_OPCUA_CU_USER_TOKEN_JWT`, `MUC_OPCUA_CU_AUTHORIZATION_SERVICE_CONFIGURATION_SERVER`)
 - **Target profiles**: full (by default), standard (opt-in), embedded (opt-in)
 - **Dependencies**: Platform crypto adapter (RSA/ECDSA verify, SHA-256), existing `activate_session.c` user token dispatch
 - **Performance**: JWT validation must complete in <10ms on embedded-class hardware
@@ -18,7 +18,7 @@
 
 | Principle | Status | Notes |
 |-----------|--------|-------|
-| I. Spec Fidelity | ✅ | All JWT behavior cites OPC-10000-4 §5.7.3, OPC-10000-7 CU 1629/1697, RFC 7519/7515 |
+| I. Spec Fidelity | ✅ | All JWT behavior cites OPC-10000-4 §5.7.3, OPC-10000-7 CU 3182/1697, RFC 7519/7515 |
 | II. Embedded-First C Core | ✅ | Freestanding C11, no heap in JWT hot path, caller-provided buffers |
 | III. Minimal OPC UA Surface | ✅ | JWT is an *additional* UserIdentityToken type; existing auth paths unchanged |
 | IV. Protocol Correctness Gates | ✅ | Every rejection path returns correct OPC UA StatusCode |
@@ -80,7 +80,7 @@ See [quickstart.md](./quickstart.md) for:
 4. RSA/ECDSA signature verification integration (crypto adapter wrappers)
 5. `mu_jwt_validate()` public API
 6. ActivateSession JWT hook
-7. AuthorizationServiceConfigurationType address-space nodes (CU 1629)
+7. AuthorizationServiceConfigurationType address-space nodes (CU 3182)
 8. Unit tests (parser, claims, signature, error paths)
 9. Integration test (ActivateSession with JWT)
 10. Size measurement and README update

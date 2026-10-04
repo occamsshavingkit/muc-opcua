@@ -37,9 +37,9 @@ to OPC-10000-7 §4.2/§4.3 evidence.
 - **Attribute:** Read.
 - **View:** Browse, BrowseNext, TranslateBrowsePathsToNodeIds. RegisterNodes /
   UnregisterNodes (OPC-10000-4 §5.9.5 / §5.9.6) are compiled in for the standalone
-  Nano conformance-targeting build (`MUC_OPCUA_SERVICE_REGISTER_NODES`).
+  Nano conformance-targeting build (`MUC_OPCUA_CU_VIEW_REGISTERNODES`).
 - **Address Space / Base Info:** The Nano build compiles the standard Base
-  Information node set (`MUC_OPCUA_BASE_NODES`) so a standalone example exposes
+  Information node set (`MUC_OPCUA_FACET_CORE_2022_SERVER`) so a standalone example exposes
   the Server object hierarchy, ServerStatus (+ State = Running), ServerCapabilities
   (ServerProfileArray, LocaleIdArray, OperationLimits), NamespaceArray, and
   ServerArray. The integrator's address space still takes precedence; the library
@@ -52,7 +52,7 @@ to OPC-10000-7 §4.2/§4.3 evidence.
 
 ## Security Time Synchronization (spec 055)
 - `Security Time Synch - Configuration` (Mandatory in the v1.05.02 Core 2022
-  Server Facet) is **targeted**: when `MUC_OPCUA_TIME_SYNC` is enabled the server
+  Server Facet) is **targeted**: when `MUC_OPCUA_CU_TIME_SYNC` is enabled the server
   stamps `ServerTimestamp` in response headers and, at OpenSecureChannel,
   validates the client's `RequestHeader.timestamp` against server time within
   `MU_TIME_SYNC_MAX_CLOCK_SKEW_MS` (default 5 min), rejecting drift with

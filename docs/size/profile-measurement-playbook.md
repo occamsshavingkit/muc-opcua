@@ -14,7 +14,7 @@ dependencies, no Pico SDK). Running it wrong (host x86-64, missing `-Os`,
 | `nano` | `MUC_OPCUA_PROFILE=nano` | Discovery + Session + Read + Browse (None) |
 | `micro` | `MUC_OPCUA_PROFILE=micro` | nano + data-change subscriptions |
 | `embedded` | `MUC_OPCUA_PROFILE=embedded` | micro + Basic256Sha256 + Base Type System + Standard DataChange capacities + MultiConnection |
-| `standard` | `MUC_OPCUA_PROFILE=standard` | embedded surface + StandardUA2017 advertised-profile marker and Standard capacity minima |
+| `standard` | `MUC_OPCUA_PROFILE=standard` | embedded surface + Enhanced DataChange capacity CUs and standard capacity defaults |
 | `full` | `MUC_OPCUA_PROFILE=full` | everything ON |
 
 The script accepts `full-featured` as a legacy alias for the real `full` profile.

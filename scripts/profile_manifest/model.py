@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 from typing import Any
 
 
@@ -23,6 +24,29 @@ _ALLOWED_INTERNAL_CLASSIFICATIONS = ("keep_internal", "retire_internal")
 _ALLOWED_CAPACITY_KINDS = ("profile_varying", "invariant", "derived")
 _DEPENDS_ON_OPS = ("and", "or")
 _DEFAULT_PROFILES = ("nano", "micro", "embedded", "standard", "full", "custom")
+_ALLOWED_ADVERTISED_PROFILE_MARKER_FIELDS = frozenset(
+    {"id", "note", "required_profile"}
+)
+_KCONFIG_SYMBOL_PATTERN = re.compile(r"[A-Za-z_][A-Za-z0-9_]*")
+
+
+def _find_key_path(value: object, key_name: str, path: str = "") -> str | None:
+    if isinstance(value, dict):
+        for key, child in value.items():
+            child_path = f"{path}.{key}" if path else str(key)
+            if key == key_name:
+                return child_path
+            found_path = _find_key_path(child, key_name, child_path)
+            if found_path is not None:
+                return found_path
+    elif isinstance(value, list):
+        for index, child in enumerate(value):
+            child_path = f"{path}[{index}]"
+            found_path = _find_key_path(child, key_name, child_path)
+            if found_path is not None:
+                return found_path
+    return None
+
 
 def load_manifest(path: str) -> dict:
     """Load the manifest at *path* and return it as a dict.
@@ -48,6 +72,11 @@ def load_manifest(path: str) -> dict:
             raise ValueError(f"manifest {path} is not valid JSON or YAML: {exc}") from exc
     if not isinstance(manifest, dict):
         raise ValueError(f"manifest {path} must decode to a JSON object at top level")
+    forbidden_path = _find_key_path(manifest, "satisfied_by")
+    if forbidden_path is not None:
+        raise ValueError(
+            f"manifest {path} uses forbidden satisfied_by field at {forbidden_path}"
+        )
     return manifest
 
 
@@ -74,6 +103,45 @@ def _is_int(value: Any) -> bool:
     return isinstance(value, int) and not isinstance(value, bool)
 
 
+def _validate_sparse_true_profile_map(
+    errors: list[str],
+    item: dict,
+    item_id: str,
+    kind: object,
+    field_name: str,
+    known_profile_keys: set[str],
+) -> None:
+    if field_name not in item:
+        return
+    if kind != "conformance_unit":
+        _err(
+            errors,
+            f"item '{item_id}': {field_name} is only valid on conformance_unit items",
+        )
+        return
+
+    requirements = item[field_name]
+    if not isinstance(requirements, dict):
+        _err(
+            errors,
+            f"item '{item_id}': {field_name} must be an object when present",
+        )
+        return
+
+    for profile_key, required in requirements.items():
+        if profile_key not in known_profile_keys:
+            _err(
+                errors,
+                f"item '{item_id}': {field_name} references unknown profile "
+                f"'{profile_key}'",
+            )
+        if required is not True:
+            _err(
+                errors,
+                f"item '{item_id}': {field_name}['{profile_key}'] must be exactly true",
+            )
+
+
 def validate_manifest(manifest: dict) -> list[str]:
     """Return a list of human-readable validation errors.
 
@@ -84,7 +152,9 @@ def validate_manifest(manifest: dict) -> list[str]:
         kconfig_symbol required for build-gated claimed items,
         backing_tests required for claimed items,
         depends_on referencing known symbols,
-        profile_defaults completeness
+        semantic_depends_on containing only known symbols,
+        profile_defaults completeness and optional additive
+        project_profile_defaults entries
       - capacities: required keys, internal classification, defaults
         for every profile
       - facet_containment (when present): keys reference facet items
@@ -144,6 +214,58 @@ def validate_manifest(manifest: dict) -> list[str]:
             if not isinstance(display, str) or "2025" not in display:
                 _err(errors, f"profile '{profile_key}': canonical named profile must use 2025 display name")
 
+    marker_context_by_id: dict[str, str] = {}
+    advertised_profile_markers = manifest.get("advertised_profile_markers")
+    if advertised_profile_markers is not None:
+        if not isinstance(advertised_profile_markers, list):
+            _err(errors, "manifest.advertised_profile_markers must be a list")
+        else:
+            seen_marker_ids: set[str] = set()
+            for marker_index, marker in enumerate(advertised_profile_markers):
+                marker_context = f"advertised_profile_markers[{marker_index}]"
+                if not isinstance(marker, dict):
+                    _err(errors, f"{marker_context}: must be an object")
+                    continue
+                unknown_fields = sorted(
+                    set(marker) - _ALLOWED_ADVERTISED_PROFILE_MARKER_FIELDS
+                )
+                for field_name in unknown_fields:
+                    _err(errors, f"{marker_context}: unknown field '{field_name}'")
+                _require_keys(
+                    errors,
+                    marker,
+                    ("id", "required_profile"),
+                    marker_context,
+                )
+                marker_id = marker.get("id")
+                if not isinstance(marker_id, str) or not marker_id:
+                    _err(errors, f"{marker_context}: id must be a non-empty string")
+                elif _KCONFIG_SYMBOL_PATTERN.fullmatch(marker_id) is None:
+                    _err(errors, f"{marker_context}: id must be a valid Kconfig symbol")
+                elif marker_id in seen_marker_ids:
+                    _err(errors, f"{marker_context}: duplicate marker id '{marker_id}'")
+                else:
+                    seen_marker_ids.add(marker_id)
+                    marker_context_by_id[marker_id] = marker_context
+                required_profile = marker.get("required_profile")
+                if not isinstance(required_profile, str) or not required_profile:
+                    _err(
+                        errors,
+                        f"{marker_context}: required_profile must be a non-empty string",
+                    )
+                elif required_profile not in known_profile_keys:
+                    _err(
+                        errors,
+                        f"{marker_context}: required_profile references unknown profile "
+                        f"'{required_profile}'",
+                    )
+                note = marker.get("note")
+                if note is not None and (not isinstance(note, str) or not note):
+                    _err(
+                        errors,
+                        f"{marker_context}: note must be a non-empty string when present",
+                    )
+
     items = manifest.get("items")
     if not isinstance(items, list):
         _err(errors, "manifest.items must be a list")
@@ -152,6 +274,7 @@ def validate_manifest(manifest: dict) -> list[str]:
     seen_item_ids: set[str] = set()
     item_kinds: dict[str, str] = {}
     seen_item_kconfig: dict[str, str] = {}
+    seen_opc_cu_ids: dict[str, str] = {}
 
     # Pre-pass: collect every kconfig_symbol declared by any item so that
     # depends_on entries can be validated against the full set regardless of
@@ -262,6 +385,25 @@ def validate_manifest(manifest: dict) -> list[str]:
                         f"item '{item_id}': depends_on references unknown "
                         f"kconfig_symbol '{dep}' (no item declares it)",
                     )
+
+        semantic_depends_on = item.get("semantic_depends_on", [])
+        if semantic_depends_on is None:
+            semantic_depends_on = []
+        if not isinstance(semantic_depends_on, list):
+            _err(errors, f"item '{item_id}': semantic_depends_on must be a list when present")
+        else:
+            for dep in semantic_depends_on:
+                if not isinstance(dep, str) or not dep:
+                    _err(
+                        errors,
+                        f"item '{item_id}': semantic_depends_on entries must be non-empty strings",
+                    )
+                elif dep not in known_kconfig_symbols:
+                    _err(
+                        errors,
+                        f"item '{item_id}': semantic_depends_on references unknown "
+                        f"kconfig_symbol '{dep}' (no item declares it)",
+                    )
         op = item.get("depends_on_op")
         if op is not None and op not in _DEPENDS_ON_OPS:
             _err(
@@ -288,9 +430,54 @@ def validate_manifest(manifest: dict) -> list[str]:
                     f"item '{item_id}': profile_defaults['{profile_key}'] must be a boolean",
                 )
 
+        project_profile_defaults = item.get("project_profile_defaults")
+        if project_profile_defaults is not None:
+            if not isinstance(project_profile_defaults, dict):
+                _err(
+                    errors,
+                    f"item '{item_id}': project_profile_defaults must be an object when present",
+                )
+            else:
+                for profile_key, enabled in project_profile_defaults.items():
+                    if profile_key not in expected_profiles:
+                        _err(
+                            errors,
+                            f"item '{item_id}': project_profile_defaults references unknown "
+                            f"profile '{profile_key}'",
+                        )
+                    if enabled is not True:
+                        _err(
+                            errors,
+                            f"item '{item_id}': project_profile_defaults['{profile_key}'] "
+                            "must be exactly true",
+                        )
+
+        for field_name in ("required_for_profile", "project_required_for_profile"):
+            _validate_sparse_true_profile_map(
+                errors,
+                item,
+                item_id,
+                kind,
+                field_name,
+                known_profile_keys,
+            )
+
         opc_reference = item.get("opc_reference")
         if opc_reference is not None and not isinstance(opc_reference, dict):
             _err(errors, f"item '{item_id}': opc_reference must be an object when present")
+        elif kind == "conformance_unit" and isinstance(opc_reference, dict):
+            raw_cu_id = opc_reference.get("cu_id")
+            if raw_cu_id is not None:
+                canonical_cu_id = str(raw_cu_id)
+                previous_owner = seen_opc_cu_ids.get(canonical_cu_id)
+                if previous_owner is not None:
+                    _err(
+                        errors,
+                        f"item '{item_id}': canonical OPC CU id '{canonical_cu_id}' "
+                        f"already owned by item '{previous_owner}'",
+                    )
+                else:
+                    seen_opc_cu_ids[canonical_cu_id] = item_id
 
         opc_display_name = item.get("opc_display_name")
         if kind in ("facet", "conformance_unit"):
@@ -519,6 +706,22 @@ def validate_manifest(manifest: dict) -> list[str]:
         opc_reference = cap.get("opc_reference")
         if opc_reference is not None and not isinstance(opc_reference, dict):
             _err(errors, f"capacity '{cap_id}': opc_reference must be an object when present")
+
+    for marker_id, marker_context in marker_context_by_id.items():
+        item_owner = seen_item_kconfig.get(marker_id)
+        if item_owner is not None:
+            _err(
+                errors,
+                f"{marker_context}: Kconfig symbol '{marker_id}' already used by "
+                f"item '{item_owner}'",
+            )
+        capacity_owner = seen_capacity_kconfig.get(marker_id)
+        if capacity_owner is not None:
+            _err(
+                errors,
+                f"{marker_context}: Kconfig symbol '{marker_id}' already used by "
+                f"capacity '{capacity_owner}'",
+            )
 
     return errors
 

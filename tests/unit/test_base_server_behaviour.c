@@ -27,7 +27,7 @@
 void setUp(void) {}
 void tearDown(void) {}
 
-#if MUC_OPCUA_SUBSCRIPTIONS
+#if MUC_OPCUA_CU_SUBSCRIPTION_BASIC
 
 #include "../../src/services/subscription_publish/common.h"
 
@@ -69,14 +69,14 @@ void test_publish_zero_timeout_hint_never_expires(void) {
 #else
 
 void test_base_server_behaviour_requires_subscriptions(void) {
-    TEST_PASS_MESSAGE("MUC_OPCUA_SUBSCRIPTIONS disabled in this build");
+    TEST_PASS_MESSAGE("MUC_OPCUA_CU_SUBSCRIPTION_BASIC disabled in this build");
 }
 
 #endif
 
 int main(void) {
     UNITY_BEGIN();
-#if MUC_OPCUA_SUBSCRIPTIONS
+#if MUC_OPCUA_CU_SUBSCRIPTION_BASIC
     RUN_TEST(test_publish_within_timeout_hint_is_valid);
     RUN_TEST(test_publish_past_timeout_hint_is_dropped);
     RUN_TEST(test_publish_zero_timeout_hint_never_expires);

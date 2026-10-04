@@ -7,7 +7,7 @@
 #include "muc_opcua/opcua_types.h"
 #include "unity.h"
 
-#if MUC_OPCUA_SUBSCRIPTIONS
+#if MUC_OPCUA_CU_SUBSCRIPTION_BASIC
 #include "services/subscription_publish/common.h"
 
 void setUp(void) {}

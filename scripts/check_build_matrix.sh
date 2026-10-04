@@ -14,7 +14,7 @@ summary_statuses=()
 summary_details=()
 matrix_root=""
 have_nm=0
-found_toggles_in_options_file=0
+found_toggles_in_kconfig=0
 
 usage() {
     cat <<EOF
@@ -53,7 +53,8 @@ trap cleanup EXIT
 
 is_matrix_toggle() {
     case "$1" in
-        MUC_OPCUA_CU_*|MUC_OPCUA_SUBSCRIPTIONS|MUC_OPCUA_SECURITY)
+        MUC_OPCUA_READ_CACHE|MUC_OPCUA_SECURE_CHANNEL_CRYPTO|\
+        MUC_OPCUA_PROFILE_*|MUC_OPCUA_FACET_*|MUC_OPCUA_CU_*)
             return 0
             ;;
         *)
@@ -76,27 +77,36 @@ contains_toggle() {
 }
 
 discover_toggles() {
-    local option_file="$ROOT_DIR/cmake/MucOpcUaOptions.cmake"
-    local top_file="$ROOT_DIR/CMakeLists.txt"
-    local file
-    local line
+    local kconfig_file="$ROOT_DIR/Kconfig"
     local option_name
 
-    for file in "$option_file" "$top_file"; do
-        [ -f "$file" ] || continue
+    toggles+=(MUC_OPCUA_READ_CACHE MUC_OPCUA_SECURE_CHANNEL_CRYPTO)
 
-        while IFS= read -r line || [ -n "$line" ]; do
-            if [[ $line =~ ^[[:space:]]*[Oo][Pp][Tt][Ii][Oo][Nn][[:space:]]*\([[:space:]]*([A-Za-z_][A-Za-z0-9_]*) ]]; then
-                option_name=${BASH_REMATCH[1]}
-                if is_matrix_toggle "$option_name" && ! contains_toggle "$option_name"; then
-                    toggles+=("$option_name")
-                    if [ "$file" = "$option_file" ]; then
-                        found_toggles_in_options_file=1
-                    fi
-                fi
-            fi
-        done < "$file"
-    done
+    while IFS= read -r option_name; do
+        if is_matrix_toggle "$option_name" && ! contains_toggle "$option_name"; then
+            toggles+=("$option_name")
+            found_toggles_in_kconfig=1
+        fi
+    done < <(
+        awk '
+            /^(menu)?config[[:space:]]+MUC_OPCUA_(PROFILE|FACET|CU)_[A-Za-z0-9_]+$/ {
+                candidate = $2
+                next
+            }
+            /^(menu)?config[[:space:]]+/ {
+                candidate = ""
+                next
+            }
+            candidate != "" && /^[[:space:]]*bool([[:space:]]|$)/ {
+                print candidate
+                candidate = ""
+                next
+            }
+            candidate != "" && /^[[:space:]]*(tristate|int|hex|string)([[:space:]]|$)/ {
+                candidate = ""
+            }
+        ' "$kconfig_file"
+    )
 }
 
 join_by() {
@@ -125,18 +135,12 @@ symbols_for_option() {
                 mu_read_process \
                 mu_read_response_encode
             ;;
-        MUC_OPCUA_CU_VIEW_BASIC_TRANSLATEBROWSEPATH)
+        MUC_OPCUA_CU_DISCOVERY_FIND_SERVERS_SELF)
             printf '%s\n' \
-                handle_browse \
-                handle_browse_next \
-                handle_translate_browse_paths \
-                mu_browse_request_decode \
-                mu_browse_process \
-                mu_browse_response_encode
+                handle_find_servers
             ;;
-        MUC_OPCUA_CU_DISCOVERY_FIND_SERVERS_SELF_GET_ENDPOINTS)
+        MUC_OPCUA_CU_DISCOVERY_GET_ENDPOINTS)
             printf '%s\n' \
-                handle_find_servers \
                 handle_get_endpoints
             ;;
         MUC_OPCUA_CU_VIEW_REGISTERNODES)
@@ -392,8 +396,8 @@ main() {
         exit 2
     fi
 
-    if [ "$found_toggles_in_options_file" -eq 0 ]; then
-        echo "warning: no matrix toggles found in cmake/MucOpcUaOptions.cmake; using top-level CMake option definitions" >&2
+    if [ "$found_toggles_in_kconfig" -eq 0 ]; then
+        echo "warning: no supported bool toggles discovered in Kconfig" >&2
     fi
 
     build_parent=${BUILD_DIR:-${TMPDIR:-/tmp}}

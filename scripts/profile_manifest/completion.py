@@ -6,15 +6,15 @@ units are implemented, split into required vs optional, against the OPC
 transitive CU closure as the denominator.
 
 Status resolution rules (spec 073):
-  * A CU counts implemented if its own implementation_state is claimed/implemented,
-    OR its `satisfied_by` link points at an entry that is.
+  * A CU counts implemented if any manifest entry with its OPC CU id has an
+    implementation_state of claimed or implemented.
   * required/optional split comes from `cu_optional`.
   * A CU with `not_applicable[profile]` set is excluded from that profile's
     denominator and reported separately (grounded reason required).
   * Denominator = relationships.transitive_cu_closure[profile.opc_id].
 
-Reconciliation links and N/A flags are read from the manifest CU entries
-(`satisfied_by`, `not_applicable`). See spec 073 FR-001/FR-011.
+N/A flags are read from the manifest CU entries (`not_applicable`). See spec 073
+FR-011.
 """
 
 from __future__ import annotations
@@ -60,25 +60,8 @@ def _entries_by_cu_id(items: list[dict]) -> dict[str, list[dict]]:
     return out
 
 
-def _index_by_id(items: list[dict]) -> dict[str, dict]:
-    return {it["id"]: it for it in items if it.get("kind") == "conformance_unit"}
-
-
-def _cu_id_implemented(cid: str, group: list[dict], by_id: dict[str, dict]) -> bool:
-    """Report whether a cu_id resolves to an implemented entry.
-
-    True if any entry sharing the cu_id is implemented, or the entry's grounded
-    `satisfied_by` link resolves to an implemented entry.
-    """
-    for entry in group:
-        if entry.get("implementation_state") in _IMPLEMENTED:
-            return True
-        sat = entry.get("satisfied_by")
-        if sat:
-            target = by_id.get(sat)
-            if target and target.get("implementation_state") in _IMPLEMENTED:
-                return True
-    return False
+def _cu_id_implemented(group: list[dict]) -> bool:
+    return any(entry.get("implementation_state") in _IMPLEMENTED for entry in group)
 
 
 def compute_profile_completion(manifest: dict, snapshot: dict, profile: dict) -> dict[str, Any]:
@@ -89,7 +72,6 @@ def compute_profile_completion(manifest: dict, snapshot: dict, profile: dict) ->
     items = manifest["items"]
     by_cu_id = _index_by_cu_id(items)
     groups = _entries_by_cu_id(items)
-    by_id = _index_by_id(items)
     profile_key = profile.get("key")
 
     opc_id = str(profile["opc_id"])
@@ -116,7 +98,7 @@ def compute_profile_completion(manifest: dict, snapshot: dict, profile: dict) ->
             not_applicable.append({"id": entry["id"], "reason": na[profile_key],
                                     "name": entry.get("opc_display_name")})
             continue
-        implemented = _cu_id_implemented(cid, groups.get(cid, [entry]), by_id)
+        implemented = _cu_id_implemented(groups.get(cid, [entry]))
         row = {"id": entry["id"], "cu_id": cid, "name": entry.get("opc_display_name", ""),
                "implemented": implemented}
         if entry.get("cu_optional") is True:
@@ -155,11 +137,6 @@ def compute_profile_completion(manifest: dict, snapshot: dict, profile: dict) ->
 
 _REPO = pathlib.Path(__file__).resolve().parents[2]
 
-# Reconciliation (`satisfied_by`, `not_applicable`) and CU status now live on the
-# manifest CU entries themselves (spec 073 FR-001); status resolves through
-# shared-cu_id aggregation plus explicit `satisfied_by` links — no overlay here.
-
-
 def _load_yaml(path: pathlib.Path) -> dict:
     import yaml  # local import so the pure-computation API has no hard dep
     return yaml.safe_load(path.read_text())
@@ -176,7 +153,6 @@ def compute_catalog_completion(manifest: dict, cu_ids: list[str], optional_by_cu
     """Completion for a membership list, optionality from the catalog map."""
     by_cu_id = _index_by_cu_id(manifest["items"])
     groups = _entries_by_cu_id(manifest["items"])
-    by_id = _index_by_id(manifest["items"])
     req_t = req_i = opt_t = opt_i = na_n = 0
     for cid in cu_ids:
         cid = str(cid)
@@ -184,7 +160,7 @@ def compute_catalog_completion(manifest: dict, cu_ids: list[str], optional_by_cu
         if entry is not None and profile_key and profile_key in (entry.get("not_applicable") or {}):
             na_n += 1
             continue
-        implemented = _cu_id_implemented(cid, groups.get(cid, []), by_id) if entry is not None else False
+        implemented = _cu_id_implemented(groups.get(cid, [])) if entry is not None else False
         if optional_by_cu_id.get(cid) is True:
             opt_t += 1
             opt_i += 1 if implemented else 0
@@ -234,7 +210,7 @@ def _render_server_surface(  # pylint: disable=too-many-locals
                     f"| {r['optional_implemented']}/{r['optional_total']} |")
     rows.append("")
     rows.append("> Reconciliation status: of the full Server surface, only CUs linked to a")
-    rows.append("> build-manifest entry (directly or via `satisfied_by`) count as implemented.")
+    rows.append("> build-manifest entry directly or through a shared OPC CU id count as implemented.")
     rows.append("> Our feature-level implementations (PubSub, Alarms, History, Methods,")
     rows.append("> Aggregates, Redundancy, …) are tracked as coarse CUs that do not yet map")
     rows.append("> 1:1 to the granular OPC CU ids; reconciling them is tracked, ongoing work.")

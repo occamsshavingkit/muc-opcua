@@ -1,0 +1,8 @@
+#ifndef MUC_OPCUA_CU_SUBSCRIPTION_PUBLISH_MIN_10_H
+#define MUC_OPCUA_CU_SUBSCRIPTION_PUBLISH_MIN_10_H
+
+#define MU_CU_SUBSCRIPTION_PUBLISH_MIN_10_REQUIRED_REQUESTS 10
+
+extern const unsigned char mu_cu_subscription_publish_min_10_enabled;
+
+#endif

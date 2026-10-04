@@ -1,9 +1,13 @@
 # Tasks: OPC-Named Kconfig Redesign
 
+**Propagated**: 2026-08-01 — Updated from spec.md refinement (stable profile seeds, mandatory-CU-closure advertisement markers, precise Facet re-enable semantics, and complete canonical CMake override discovery). US4 tasks and phase description amended; traceability preserved via strikethrough and supersession notes.
+
 **Input**: Design documents from `specs/068-opc-named-kconfig-redesign/`
 **Prerequisites**: plan.md (required), spec.md (required for user stories), research.md, data-model.md, contracts/
 
 **Tests**: No new C protocol tests are required because this feature renames and restructures manifest/generator/CMake/Kconfig surfaces without adding parsing, serialization, service dispatch, StatusCode, SecureChannel, Session, address-space, or security behavior. Verification is through `validate.py --all`, `test_profile_gating.sh`, full CTest suite, and size/headroom checks.
+
+**Behavior artifact applicability**: Browser UIF and HTTP API contracts are N/A. The interactive surface is Kconfig/menuconfig; Given/When/Then coverage maps to defconfig inputs, CMake/Kconfig actions, `.config` assertions, `test_profile_gating.sh`, and the quickstart validation path.
 
 **Task quality gate**: Each task has one goal. Do not batch unrelated edits into a single assignment. A task is atomic only if splitting it further would remove the coherent outcome described in that task.
 
@@ -43,7 +47,7 @@
 **Purpose**: Add the symbol naming algorithm utility used by all subsequent generator changes.
 
 - [X] T010 Add `compute_kconfig_symbol(opc_display_name: str, kind: str) -> str` to `scripts/profile_manifest/generate.py` implementing the naming algorithm from `research.md` Decision 3: strip redundant trailing kind word, uppercase, replace non-alnum with underscore, collapse underscores, trim, and prefix with `MUC_OPCUA_{PROFILE|FACET|CU|OPT}_`.
-- [X] T011 Add unit tests for `compute_kconfig_symbol` in `scripts/profile_manifest/test_naming.py` covering: "Core 2017 Server Facet" → `MUC_OPCUA_FACET_CORE_2017_SERVER`, "Attribute Read" → `MUC_OPCUA_CU_ATTRIBUTE_READ`, and "Embedded 2017 UA Server Profile" → `MUC_OPCUA_PROFILE_EMBEDDED_2017_UA_SERVER`. Run `python3 -m pytest scripts/profile_manifest/test_naming.py -v`; expected: all pass.
+- [X] T011 Add unit tests for `compute_kconfig_symbol` in `scripts/profile_manifest/test_naming.py` covering: "Core 2017 Server Facet" → `MUC_OPCUA_FACET_CORE_2017_SERVER`, "Attribute Read" → `MUC_OPCUA_CU_ATTRIBUTE_READ`, and the historical input "Embedded 2017 UA Server Profile" → `MUC_OPCUA_PROFILE_EMBEDDED_2017_UA_SERVER`. Run `python3 -m pytest scripts/profile_manifest/test_naming.py -v`; expected: all pass.
 - [X] T012 Update `scripts/profile_manifest/generate.py` `_item_prompt()` to use `opc_display_name` when present instead of id-derived prompts.
 
 **Checkpoint**: Naming algorithm is implemented, tested, and used for prompts.
@@ -54,7 +58,7 @@
 
 **Goal**: The Kconfig profile choice uses OPC UA standard names and `MUC_OPCUA_PROFILE_<NAME>` symbols.
 
-**Independent Test**: `python3 scripts/profile_manifest/generate.py --outputs kconfig,defconfigs && grep "Standard 2017 UA Server Profile" Kconfig && grep "MUC_OPCUA_PROFILE_STANDARD_2017_UA_SERVER" configs/standard.defconfig` - both produce matches.
+**Independent Test**: `python3 scripts/profile_manifest/generate.py --outputs kconfig,defconfigs && grep "Standard 2025 UA Server Profile" Kconfig && grep "MUC_OPCUA_PROFILE_STANDARD_2025_UA_SERVER" configs/standard.defconfig` - both produce matches.
 
 - [X] T013 [US1] Update `scripts/profile_manifest/generate.py` `generate_kconfig()` profile `choice` entries to use computed `MUC_OPCUA_PROFILE_<NAME>` symbols. OPC reference: OPC-10000-7 §4.3.
 - [X] T014 [US1] Update `scripts/profile_manifest/generate.py` `generate_kconfig()` profile `choice` prompts to use OPC UA standard profile display names from `opc_display_name`. OPC reference: OPC-10000-7 §4.3.
@@ -62,7 +66,7 @@
 - [X] T016 [US1] Update `scripts/profile_manifest/generate.py` `generate_defconfig()` to emit computed OPC profile symbols instead of `PROFILE_NANO`, `PROFILE_MICRO`, `PROFILE_EMBEDDED`, `PROFILE_STANDARD`, and `PROFILE_FULL`. OPC reference: OPC-10000-7 §4.3.
 - [X] T017 [US1] Update `scripts/profile_manifest/generate.py` `_emit_default()` to reference computed OPC profile symbols in profile-conditioned defaults. OPC reference: OPC-10000-7 §4.3.
 - [X] T018 [US1] Update `scripts/profile_manifest/generate.py` `_capacity_prompt()` to reference computed OPC profile symbols in profile-specific capacity prompts. OPC reference: OPC-10000-7 §4.3 for profile selection; capacity values remain non-OPC project configuration.
-- [X] T019 [US1] Regenerate `Kconfig`, `configs/*.defconfig`, and `include/muc_opcua/capacities.h` with `python3 scripts/profile_manifest/generate.py --manifest profiles/opcua-profile-manifest.yaml --outputs kconfig,defconfigs,capacities_h`; verify `Standard 2017 UA Server Profile` exists in `Kconfig` and `MUC_OPCUA_PROFILE_STANDARD_2017_UA_SERVER=y` exists in `configs/standard.defconfig`.
+- [X] T019 [US1] Regenerate `Kconfig`, `configs/*.defconfig`, and `include/muc_opcua/capacities.h` with `python3 scripts/profile_manifest/generate.py --manifest profiles/opcua-profile-manifest.yaml --outputs kconfig,defconfigs,capacities_h`; verify `Standard 2025 UA Server Profile` exists in `Kconfig` and `MUC_OPCUA_PROFILE_STANDARD_2025_UA_SERVER=y` exists in `configs/standard.defconfig`.
 
 **Checkpoint**: Profile choice uses OPC standard names. Defconfigs select OPC-named symbols.
 
@@ -106,24 +110,27 @@
 
 ---
 
-## Phase 6: User Story 4 - Profile to Custom Transition (Priority: P2)
+## Phase 6: User Story 4 - Profile Fidelity Reporting (Priority: P2) — Superseded
 
-**Goal**: When user changes any Facet or CU from the named profile defaults, the effective profile switches to custom.
+<strike>Original goal: When user changes any Facet or CU from the named profile defaults, the effective profile switches to custom.</strike>
 
-**Independent Test**: Configure standard profile, override a Facet, and verify `MUC_OPCUA_PROFILE_CUSTOM=y` in the resolved `.config`.
+**Superseded 2026-08-01**: The automatically selected profile does not switch to `custom` on Facet/CU override. The explicitly selected named profile remains stable as the Kconfig choice seed. `MUC_OPCUA_FACETS_MATCH_*` symbols are obsolete and rejected by validation. The generator emits `MUC_OPCUA_MARKER_STANDARD_PROFILE` directly from the conjunction of currently selectable mandatory Standard CUs; because the mandatory closure is not yet fully selectable, the marker intentionally emits `default n`. `MUC_OPCUA_PROFILE_CUSTOM` is explicit, never a fallback.
 
-- [X] T036 [US4] Add generation of non-interactive `MUC_OPCUA_FACETS_MATCH_<profile>` bool symbols to `scripts/profile_manifest/generate.py`. OPC reference: OPC-10000-7 §4.2 and OPC-10000-7 §4.3.
-- [X] T037 [US4] Make each `MUC_OPCUA_FACETS_MATCH_<profile>` symbol compare only that profile's controlled Facet defaults against resolved Kconfig symbols. OPC reference: OPC-10000-7 §4.2 and OPC-10000-7 §4.3.
-- [X] T038 [US4] Make each `MUC_OPCUA_FACETS_MATCH_<profile>` symbol compare that profile's controlled CU defaults against resolved Kconfig symbols. OPC reference: OPC-10000-7 §4.2, OPC-10000-7 §4.3, and each CU item's `opc_reference`.
-- [X] T039 [US4] Update the profile choice section in `scripts/profile_manifest/generate.py` so each named profile has `default y if MUC_OPCUA_FACETS_MATCH_<profile>`. OPC reference: OPC-10000-7 §4.3.
-- [X] T040 [US4] Update the profile choice section in `scripts/profile_manifest/generate.py` so `MUC_OPCUA_PROFILE_CUSTOM` is the unconditional final fallback after named profile defaults. OPC reference: OPC-10000-7 §4.3 for named profiles; custom is project-defined.
+<strike>Independent Test: Configure standard profile, override a Facet, and verify `MUC_OPCUA_PROFILE_CUSTOM=y` in the resolved `.config`.</strike>
+**Updated Independent Test**: Configure standard profile, override a Facet or CU, verify the selected profile symbol remains enabled, verify `MUC_OPCUA_MARKER_STANDARD_PROFILE=n`, and verify no `MUC_OPCUA_FACETS_MATCH_*` symbol exists.
+
+- [X] T036 [US4] ~~Add generation of non-interactive `MUC_OPCUA_FACETS_MATCH_<profile>` bool symbols to `scripts/profile_manifest/generate.py`.~~ **Superseded 2026-08-01**: Validation rejects this obsolete prefix. OPC reference: OPC-10000-7 §4.2 and §4.3.
+- [X] T037 [US4] ~~Make each `MUC_OPCUA_FACETS_MATCH_<profile>` symbol compare profile-controlled Facet defaults.~~ **Superseded 2026-08-01**: Marker requirements are modeled as mandatory CUs, not Facet-default equality. OPC reference: OPC-10000-7 §4.2 and §4.3.
+- [X] T038 [US4] ~~Make each `MUC_OPCUA_FACETS_MATCH_<profile>` symbol compare profile-controlled CU defaults.~~ **Superseded 2026-08-01**: `generate.py` emits the required CU conjunction directly on each advertisement marker. OPC reference: OPC-10000-7 §4.2, §4.3, and each CU item's `opc_reference`.
+- [X] T039 [US4] <strike>Update the profile choice section in `scripts/profile_manifest/generate.py` so each named profile has `default y if MUC_OPCUA_FACETS_MATCH_<profile>`. OPC reference: OPC-10000-7 §4.3.</strike> **Superseded 2026-08-01**: The obsolete helper symbols are not generated. Advertisement markers receive mandatory CU conditions directly; the profile choice is determined by the explicitly selected seed and remains stable.
+- [X] T040 [US4] <strike>Update the profile choice section in `scripts/profile_manifest/generate.py` so `MUC_OPCUA_PROFILE_CUSTOM` is the unconditional final fallback after named profile defaults. OPC reference: OPC-10000-7 §4.3 for named profiles; custom is project-defined.</strike> **Superseded 2026-08-01**: `MUC_OPCUA_PROFILE_CUSTOM` is no longer a fallback; it is an explicit profile seed selected by the user. The profile choice `default` does not auto-switch.
 - [X] T041 [US4] Rename the internal generated marker `STANDARD_PROFILE` to `MUC_OPCUA_MARKER_STANDARD_PROFILE` in `scripts/profile_manifest/generate.py`. OPC reference: N/A - internal build marker only.
 - [X] T042 [US4] Update `profiles/opcua-profile-manifest.yaml` `advertised_profile_markers` id from `STANDARD_PROFILE` to `MUC_OPCUA_MARKER_STANDARD_PROFILE`. OPC reference: N/A - internal build marker only.
-- [X] T043 [US4] Add a kconfiglib-based validation case to `scripts/profile_manifest/validate.py` that resolves each named profile without overrides and confirms the named profile remains selected. OPC reference: OPC-10000-7 §4.3.
-- [X] T044 [US4] Add a kconfiglib-based validation case to `scripts/profile_manifest/validate.py` that overrides a standard-profile Facet and confirms `MUC_OPCUA_PROFILE_CUSTOM=y`. OPC reference: OPC-10000-7 §4.2 and OPC-10000-7 §4.3.
-- [X] T045 [US4] Regenerate and run `cmake -S . -B build/custom-check -DMUC_OPCUA_PROFILE=standard -DMUC_OPCUA_FACET_CORE_2017_SERVER=OFF`; verify `grep MUC_OPCUA_PROFILE_CUSTOM build/custom-check/.config` shows `=y`.
+- [X] T043 [US4] Add a kconfiglib-based validation case to `scripts/profile_manifest/validate.py` that resolves each named profile without overrides and confirms the named profile remains selected. OPC reference: OPC-10000-7 §4.3. **Note 2026-08-01**: Marker generation is independent of the profile choice; validation confirms the seed symbol remains unchanged.
+- [X] T044 [US4] <strike>Add a kconfiglib-based validation case to `scripts/profile_manifest/validate.py` that overrides a standard-profile Facet and confirms `MUC_OPCUA_PROFILE_CUSTOM=y`. OPC reference: OPC-10000-7 §4.2 and OPC-10000-7 §4.3.</strike> **Superseded 2026-08-01**: The validation now confirms the named profile seed symbol remains selected and `MUC_OPCUA_MARKER_STANDARD_PROFILE` is `n` under override.
+- [X] T045 [US4] <strike>Regenerate and run `cmake -S . -B build/custom-check -DMUC_OPCUA_PROFILE=standard -DMUC_OPCUA_FACET_CORE_2017_SERVER=OFF`; verify `grep MUC_OPCUA_PROFILE_CUSTOM build/custom-check/.config` shows `=y`.</strike> **Superseded 2026-08-01**: The verification now confirms the named profile seed stays selected and the marker reports appropriately.
 
-**Checkpoint**: Profile→custom transition works when Facet/CU defaults are overridden.
+**Checkpoint**: <strike>Profile→custom transition works when Facet/CU defaults are overridden.</strike> Superseded 2026-08-01: Profile seed is stable; advertisement markers are direct mandatory-CU closures, and obsolete fidelity-helper symbols are absent.
 
 ---
 
@@ -135,7 +142,7 @@
 
 - [X] T046 [US5] Inspect generated `include/muc_opcua/capacities.h` references to determine whether any profile symbol guards require renaming. OPC reference: OPC-10000-7 §4.3 for profile-conditioned defaults; capacity values are project configuration.
 - [X] T047 [US5] Replace any old profile guards emitted by `scripts/profile_manifest/generate.py` `generate_capacities_h()` with computed OPC-named profile symbols. OPC reference: OPC-10000-7 §4.3 for profile-conditioned defaults.
-- [X] T048 [US5] Update `CMakeLists.txt` `MUC_OPCUA_KCONFIG_FEATURES` list to replace old project-centric feature symbols with computed OPC-name-derived Profile/Facet/CU symbols. OPC reference: OPC-10000-7 §4.2, OPC-10000-7 §4.3, and manifest item `opc_reference` fields.
+- [X] T048 [US5] ~~Update `CMakeLists.txt` `MUC_OPCUA_KCONFIG_FEATURES` list to replace old project-centric feature symbols with computed OPC-name-derived Profile/Facet/CU symbols.~~ **Superseded 2026-08-01**: A hand-maintained list is incomplete by construction; T065 derives the canonical boolean override surface from generated Kconfig. OPC reference: OPC-10000-7 §4.2, OPC-10000-7 §4.3, and manifest item `opc_reference` fields.
 - [X] T049 [US5] Update `CMakeLists.txt` legacy profile shorthand handling so `MUC_OPCUA_STANDARD_PROFILE` and `MUC_OPCUA_EMBEDDED_PROFILE` trigger the new OPC profile symbols. OPC reference: OPC-10000-7 §4.3.
 - [X] T050 [US5] Update `src/CMakeLists.txt` build gating references from old project-centric symbols to new OPC-name-derived symbols. OPC reference: OPC-10000-7 §4.2 and manifest item `opc_reference` fields.
 - [X] T051 [US5] Update C preprocessor feature guards under `src/` from old project-centric symbols to new OPC-name-derived symbols. OPC reference: OPC-10000-7 §4.2 and manifest item `opc_reference` fields. This task only changes `#if/#ifdef` guard names, not protocol behavior.
@@ -156,11 +163,14 @@
 - [X] T057 [P] Update `scripts/profile_manifest/validate.py` to verify every generated Profile/Facet/CU Kconfig help entry includes the corresponding manifest OPC source reference. OPC reference: OPC-10000-7 §4.2, OPC-10000-7 §4.3, and each item `opc_reference`.
 - [X] T058 Run full generation and validation: `python3 scripts/profile_manifest/generate.py --manifest profiles/opcua-profile-manifest.yaml --outputs kconfig,defconfigs,capacities_h,claim_map,roadmap,build_docs && python3 scripts/profile_manifest/validate.py --all`. Expected: all checks pass, no drift, no naming violations, and no missing OPC references.
 - [X] T059 Run profile gating tests: `bash scripts/test_profile_gating.sh`. Expected: all checks pass, at least 29 checks.
-- [X] T060 Run full test suite for standard profile: `cmake -S . -B build/standard-final -DMUC_OPCUA_PROFILE=standard -DMUC_OPCUA_BUILD_TESTS=ON && cmake --build build/standard-final && ctest --test-dir build/standard-final --output-on-failure`. Expected: 132/132 tests pass.
-- [X] T061 Run full test suite for full profile: `cmake -S . -B build/full-final -DMUC_OPCUA_PROFILE=full -DMUC_OPCUA_BUILD_TESTS=ON && cmake --build build/full-final && ctest --test-dir build/full-final --output-on-failure`. Expected: 132/132 tests pass.
+- [X] T060 Run full test suite for standard profile: `cmake -S . -B build/standard-final -DMUC_OPCUA_PROFILE=standard -DMUC_OPCUA_BUILD_TESTS=ON && cmake --build build/standard-final && ctest --test-dir build/standard-final --output-on-failure`. Expected: every configured test passes.
+- [X] T061 Run full test suite for full profile: `cmake -S . -B build/full-final -DMUC_OPCUA_PROFILE=full -DMUC_OPCUA_BUILD_TESTS=ON && cmake --build build/full-final && ctest --test-dir build/full-final --output-on-failure`. Expected: every configured test passes.
 - [X] T062 Verify no old project-centric symbols appear in generated config: `grep -E 'MUC_OPCUA_SERVICE_READ|MUC_OPCUA_SERVICE_BROWSE|MUC_OPCUA_BASE_NODES|MUC_OPCUA_SECURITY[^_]' build/standard-final/.config`. Expected: no output.
 - [X] T063 Compare binary size and RAM-linked sections for `build/standard-final` and `build/full-final` against the pre-redesign baseline recorded by T009. Expected: no increase attributable to Kconfig renaming/menu restructuring; document any delta in implementation notes.
 - [X] T064 Verify quickstart.md validation path by following each step in `specs/068-opc-named-kconfig-redesign/quickstart.md` and confirming all commands produce expected output.
+- [X] T065 Update `CMakeLists.txt` to derive `MUC_OPCUA_KCONFIG_FEATURES` from all generated selectable `MUC_OPCUA_*` Kconfig boolean declarations while preserving the separate typed capacity path. This closes FR-016 and SC-009. OPC reference: N/A - build integration only; generated symbols retain their manifest OPC references.
+- [X] T066 Add profile-gating regressions in `scripts/test_profile_gating.sh` proving `MUC_OPCUA_CU_AUDITING=OFF` and `MUC_OPCUA_CU_EVENTS=ON` reach the resolved `.config`, and that unrelated named-profile defaults remain stable. This closes SC-009. OPC reference: N/A - override plumbing only; no conformance claim changes.
+- [X] T067 Reconcile `specs/068-opc-named-kconfig-redesign/` and `docs/integration-guide.md` with current 2025 profile names, profile-specific heap behavior, bounded connection capacity, canonical Data Access/ECC symbols, and honest Standard marker semantics. OPC reference: existing citations are preserved; no new conformance claim is introduced.
 
 ---
 
@@ -173,7 +183,7 @@
 - **US1 (Phase 3)**: Depends on Phase 2. Profile selector needs naming helper.
 - **US2 (Phase 4)**: Depends on Phase 3. Facet/CU drilldown builds on profile choice.
 - **US3 (Phase 5)**: Depends on Phase 4. Facet toggles need Facet menus.
-- **US4 (Phase 6)**: Depends on Phase 5. Custom transition needs Facet/CU symbols.
+- **US4 (Phase 6)**: Depends on Phase 5. Advertisement marker closure needs canonical CU symbols.
 - **US5 (Phase 7)**: Depends on Phase 4. Build/source updates need generated symbol names.
 - **Polish (Phase 8)**: Depends on all prior phases.
 
@@ -204,7 +214,7 @@ Deliver US1 + US2: OPC-named profile selector with Facet/CU drilldown. This prov
 
 1. **MVP**: Phases 1-4 + validation -> profile selector + Facet/CU menu (US1+US2)
 2. **Increment 2**: Phase 5 -> Facet group toggles (US3)
-3. **Increment 3**: Phase 6 -> Profile→custom (US4)
+3. **Increment 3**: Phase 6 — Profile fidelity reporting via markers (US4)
 4. **Increment 4**: Phase 7 -> CMake/C source updates + capacity verification (US5)
 5. **Final**: Phase 8 -> full validation pass
 
@@ -217,15 +227,15 @@ Deliver US1 + US2: OPC-named profile selector with Facet/CU drilldown. This prov
 | 3: US1 | 7 | Profile selector |
 | 4: US2 | 10 | Facet/CU drilldown |
 | 5: US3 | 6 | Facet toggles |
-| 6: US4 | 10 | Profile→custom |
+| 6: US4 | 10 | Profile fidelity (markers) |
 | 7: US5 | 8 | Capacities + CMake/source |
-| 8: Polish | 11 | Validation |
-| **Total** | **64** | |
+| 8: Polish | 14 | Validation |
+| **Total** | **67** | |
 
 ### Independent Test Criteria
 
 - **US1**: Kconfig contains OPC profile names and defconfigs select OPC symbols.
 - **US2**: Kconfig contains `Facet:` menus and `CU:` entries with OPC names.
 - **US3**: Facet toggle disables all contained CUs; individual CUs are toggleable only when the Facet is enabled.
-- **US4**: Overriding a Facet/CU switches profile to custom.
+- **US4**: <strike>Overriding a Facet/CU switches profile to custom.</strike> Superseded: Facet/CU overrides preserve the selected profile seed; fidelity is reported via derived advertisement markers.
 - **US5**: Capacity override `-DMU_MAX_SESSIONS=42` reaches compiled binary.

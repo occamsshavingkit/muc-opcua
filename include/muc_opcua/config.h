@@ -4,15 +4,31 @@
 
 #include <stddef.h>
 
-/* Spec 062: MUC_OPCUA_METHOD_SERVER is the canonical Method Server Facet flag.
-   MUC_OPCUA_CUSTOM_METHODS is the legacy name — alias it so existing -D builds
-   keep working. Must precede features.h and every `#if MUC_OPCUA_METHOD_SERVER`. */
+/* Canonical Facet/CU symbols own public API visibility. Runtime bridge aliases
+   remain for implementation code and legacy direct -D consumers. These bridges
+   must precede features.h and every legacy-gated public declaration. */
+#if defined(MUC_OPCUA_FACET_CORE_2022_SERVER) && MUC_OPCUA_FACET_CORE_2022_SERVER && !defined(MUC_OPCUA_BASE_NODES)
+#define MUC_OPCUA_BASE_NODES 1
+#endif
+#if defined(MUC_OPCUA_CU_ATTRIBUTE_WRITE_VALUES) && MUC_OPCUA_CU_ATTRIBUTE_WRITE_VALUES &&                             \
+    !defined(MUC_OPCUA_SERVICE_WRITE)
+#define MUC_OPCUA_SERVICE_WRITE 1
+#endif
+#if defined(MUC_OPCUA_CU_EVENTS) && MUC_OPCUA_CU_EVENTS && !defined(MUC_OPCUA_EVENTS)
+#define MUC_OPCUA_EVENTS 1
+#endif
+#if defined(MUC_OPCUA_CU_DATA_ACCESS) && MUC_OPCUA_CU_DATA_ACCESS && !defined(MUC_OPCUA_DATA_ACCESS)
+#define MUC_OPCUA_DATA_ACCESS 1
+#endif
+#if defined(MUC_OPCUA_CU_METHOD_SERVER) && MUC_OPCUA_CU_METHOD_SERVER && !defined(MUC_OPCUA_METHOD_SERVER)
+#define MUC_OPCUA_METHOD_SERVER 1
+#endif
 #if defined(MUC_OPCUA_CUSTOM_METHODS) && MUC_OPCUA_CUSTOM_METHODS && !defined(MUC_OPCUA_METHOD_SERVER)
 #define MUC_OPCUA_METHOD_SERVER 1
 #endif
 
 /* Feature 025 (F9): reject illegal feature-gate combinations at compile time. */
-#include "muc_opcua/features.h"
+#include "muc_opcua/features.h" // IWYU pragma: keep
 
 /* Spec 056: the single source of truth for every tunable capacity dimension.
  * Resolves each MU_INTERN_MAX_* via the default<profile<user cascade. ALL code
@@ -157,6 +173,7 @@
 #ifndef MU_CONNECTION_RX_BUFFER_SIZE
 #define MU_CONNECTION_RX_BUFFER_SIZE MU_MIN_CHUNK_SIZE
 #elif MU_CONNECTION_RX_BUFFER_SIZE < MU_MIN_CHUNK_SIZE
+/* cppcheck-suppress preprocessorErrorDirective ; intentional compile-time guard */
 #error "MU_CONNECTION_RX_BUFFER_SIZE must be at least MU_MIN_CHUNK_SIZE"
 #endif
 
@@ -178,7 +195,7 @@
 #define MU_MAX_STRING_VALUE_LENGTH 64
 
 /* Fixed storage allocation size for the server.
- * The subscription engine (MUC_OPCUA_SUBSCRIPTIONS, the Micro profile) adds the
+ * The subscription engine (MUC_OPCUA_CU_SUBSCRIPTION_BASIC) adds the
  * fixed-size subscription / MonitoredItem / parked-Publish arrays to struct mu_server,
  * so the no-heap storage block is larger when it is compiled in. Security builds
  * also reserve server-owned scratch for large secure-channel transient buffers. */
@@ -193,12 +210,12 @@
 /* Feature 025 (T038): single definition of every storage sub-total. Each macro
  * already evaluates to 0 when its feature is disabled, so MU_SERVER_STORAGE_BYTES
  * needs only one form. The base constant is the sole thing that differs between a
- * subscription-capable server (3072, adds the fixed subscription/MonitoredItem/
+ * subscription-capable server (3328, adds the fixed subscription/MonitoredItem/
  * parked-Publish arrays) and a non-subscription server (1024). Previously the two
  * arms duplicated every sub-total macro, which invited drift. */
-#ifdef MUC_OPCUA_SUBSCRIPTIONS
-/* 3328 (was 3200): the extra 128 B covers the per-MonitoredItem IndexRange (two
- * int32, CU 5208) and SemanticsChanged latch (CU 3922) for a BASIC-only server's
+#if MUC_OPCUA_CU_SUBSCRIPTION_BASIC
+/* 3328 bytes covers the per-MonitoredItem IndexRange (two int32, CU 5208),
+ * SemanticsChanged latch (CU 3922), and Basic Subscription state for a server's
  * fixed MonitoredItem array (Standard-tier arrays are sized separately below). */
 #define MU_SERVER_STORAGE_BASE_BYTES 3328
 #else
@@ -230,17 +247,26 @@
 #define MU_WHERE_CLAUSE_STORAGE_BYTES 0
 #endif
 
-#if defined(MUC_OPCUA_SUBSCRIPTIONS) && MUC_OPCUA_SUBSCRIPTIONS_STANDARD
-/* OPC-10000-7 §6.6.17 Standard DataChange Subscription storage; zero unless
- * the Standard facet is enabled. Covers monitored-item arrays, subscription
- * arrays, parked publish requests, and event infrastructure. Capacities come
- * from capacities.h (MU_INTERN_*). */
-#define MU_SUBSCRIPTIONS_STANDARD_STORAGE_BYTES                                                                        \
-    (MU_INTERN_MAX_MONITORED_ITEMS * (MU_INTERN_MONITORED_QUEUE_DEPTH * 96 + MU_INTERN_MAX_TRIGGER_LINKS * 8 +         \
-                                      MU_WHERE_CLAUSE_STORAGE_BYTES + 384) +                                           \
+#if MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
+/* Conservative whole-item storage budget; 96 is intentionally not the
+ * measured sizeof(queue[0]), because this subtotal also covers fixed
+ * Standard-only filter, aggregate, queue-state, and alignment overhead. */
+#define MU_SUBSCRIPTIONS_STANDARD_ITEM_STORAGE_BYTES                                                                   \
+    (MU_INTERN_MONITORED_QUEUE_DEPTH * 96 + MU_INTERN_MAX_TRIGGER_LINKS * 8 + MU_WHERE_CLAUSE_STORAGE_BYTES)
+#else
+#define MU_SUBSCRIPTIONS_STANDARD_ITEM_STORAGE_BYTES 0
+#endif
+
+#if MUC_OPCUA_CU_SUBSCRIPTION_BASIC
+/* The Basic CU owns the fixed subscription, MonitoredItem, parked-Publish, and
+ * reportable-bitmap arrays embedded in struct mu_server. The Standard CU only
+ * adds per-MonitoredItem queue/filter state. Keep the capacity-scaled base
+ * arrays accounted even when a named profile subtracts the Standard CU. */
+#define MU_SUBSCRIPTIONS_STORAGE_BYTES                                                                                 \
+    (MU_INTERN_MAX_MONITORED_ITEMS * (384 + MU_SUBSCRIPTIONS_STANDARD_ITEM_STORAGE_BYTES) +                            \
      MU_INTERN_MAX_SUBSCRIPTIONS * 336 + MU_INTERN_MAX_PUBLISH_REQUESTS * 48)
 #else
-#define MU_SUBSCRIPTIONS_STANDARD_STORAGE_BYTES 0
+#define MU_SUBSCRIPTIONS_STORAGE_BYTES 0
 #endif
 
 #ifdef MUC_OPCUA_MULTIPLE_CONNECTIONS
@@ -327,7 +353,7 @@
 #endif
 
 #define MU_SERVER_STORAGE_BYTES                                                                                        \
-    (MU_SERVER_STORAGE_BASE_BYTES + MU_SUBSCRIPTIONS_STANDARD_STORAGE_BYTES + MU_SERVER_SECURITY_STORAGE_BYTES +       \
+    (MU_SERVER_STORAGE_BASE_BYTES + MU_SUBSCRIPTIONS_STORAGE_BYTES + MU_SERVER_SECURITY_STORAGE_BYTES +                \
      MU_ADDRESS_SPACE_INDEX_STORAGE_BYTES + MU_MULTIPLE_CONNECTIONS_STORAGE_BYTES + MU_EVENTS_STORAGE_BYTES +          \
      MU_PUBSUB_STORAGE_BYTES + MU_NODEMANAGEMENT_STORAGE_BYTES + MU_ALARMS_CONDITIONS_STORAGE_BYTES +                  \
      MU_CHUNK_ASSEMBLY_STORAGE_BYTES + MU_AUDITING_STORAGE_BYTES + MU_CUSTOM_METHODS_STORAGE_BYTES +                   \

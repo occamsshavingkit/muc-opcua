@@ -200,7 +200,7 @@ and supports Anonymous, Username, or X509 identity tokens (else `Bad_IdentityTok
 RevisedSessionTimeout is stored as the **raw IEEE-754 bits** of the Duration and
 clamped by integer comparison, so no FPU is needed.
 
-### Subscriptions (`src/services/subscription.{c,h}`, `MUC_OPCUA_SUBSCRIPTIONS`)
+### Subscriptions (`src/services/subscription.{c,h}`, `MUC_OPCUA_CU_SUBSCRIPTION_BASIC`)
 A no-heap data-change engine implementing the Embedded Data Change Subscription
 Server Facet. All state is fixed-size arrays inside `struct mu_server`:
 `subscriptions[MU_MAX_SUBSCRIPTIONS]`, `monitored_items[MU_MAX_MONITORED_ITEMS]`,
@@ -238,21 +238,19 @@ its code and its fixed-size state. The profile seed lives in
 `configs/<profile>.defconfig`; the symbol prompts, help text, and dependency
 rules live in `/Kconfig`.
 
-- `MUC_OPCUA_SERVICE_READ` defines `MUC_OPCUA_SERVICE_READ` and gates
-  `src/services/read/*` plus the Read dispatch row.
-- `MUC_OPCUA_SERVICE_BROWSE` defines `MUC_OPCUA_SERVICE_BROWSE` and gates
-  `src/services/browse/*` plus Browse/BrowseNext/Translate rows.
-- `MUC_OPCUA_SERVICE_DISCOVERY` defines `MUC_OPCUA_SERVICE_DISCOVERY` and gates
-  GetEndpoints/FindServers rows.
-- `MUC_OPCUA_SERVICE_REGISTER_NODES` defines
-  `MUC_OPCUA_SERVICE_REGISTER_NODES` and gates RegisterNodes/UnregisterNodes
-  rows.
-- `MUC_OPCUA_BASE_NODES` defines `MUC_OPCUA_BASE_NODES` and gates the standard
-  Base Information node-set content.
-- `MUC_OPCUA_SUBSCRIPTIONS` defines `MUC_OPCUA_SUBSCRIPTIONS` and gates
+- `MUC_OPCUA_CU_ATTRIBUTE_READ` gates the Read sources and dispatch row.
+- `MUC_OPCUA_CU_VIEW_BASIC_2` and
+  `MUC_OPCUA_CU_VIEW_TRANSLATEBROWSEPATH` gate the Browse, BrowseNext, and
+  TranslateBrowsePaths rows.
+- `MUC_OPCUA_CU_DISCOVERY_FIND_SERVERS_SELF` and
+  `MUC_OPCUA_CU_DISCOVERY_GET_ENDPOINTS` gate their respective Discovery rows.
+- `MUC_OPCUA_CU_VIEW_REGISTERNODES` gates RegisterNodes/UnregisterNodes rows.
+- `MUC_OPCUA_FACET_CORE_2022_SERVER` gates the standard Base Information
+  node-set content.
+- `MUC_OPCUA_CU_SUBSCRIPTION_BASIC` defines `MUC_OPCUA_CU_SUBSCRIPTION_BASIC` and gates
   subscription/MonitoredItem handlers plus engine state.
-- `MUC_OPCUA_SECURITY` defines `MUC_OPCUA_SECURITY` and gates secure-channel
-  crypto chunks, key derivation, certificate helpers, and `secure_scratch`.
+- `MUC_OPCUA_SECURE_CHANNEL_CRYPTO` gates secure-channel crypto chunks, key
+  derivation, certificate helpers, and `secure_scratch`.
 
 The dispatch table (`g_supported_services[]` in `service_dispatch.c`) is built with
 `#ifdef`/`#if` around each row, so an unbuilt service is simply absent from the
@@ -264,7 +262,7 @@ raw CMake uses `-DMUC_OPCUA_PROFILE=...`):
 
 - **Nano** = Core Server Facet + UA-TCP/UA-SC/UA-Binary + SecurityPolicy None +
   Anonymous identity. Subscriptions OFF.
-- **Micro** = Nano + data-change subscriptions (`MUC_OPCUA_SUBSCRIPTIONS`) and
+- **Micro** = Nano + data-change subscriptions (`MUC_OPCUA_CU_SUBSCRIPTION_BASIC`) and
   multiple concurrent connections/sessions.
 - (All profiles multiplex up to `MU_MAX_SESSIONS` (default 2) logical sessions
   over the `MU_MAX_CONNECTIONS` TCP connections — it is a core capability, not

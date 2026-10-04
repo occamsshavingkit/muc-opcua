@@ -465,16 +465,16 @@ static void assert_type_decls(opcua_uint32_t type_id, opcua_uint32_t ref_kind, o
     }
 }
 
-/* spec 093 convergence T038: OPC-10000-12 section 9.7.4 Table 158.
-   AuthorizationServiceConfigurationType and its three Mandatory PropertyType
-   declarations are owned by CU Authorization Service Configuration Server and
-   must disappear together when that CU is disabled. */
+/* CU 3182: OPC-10000-12 §9.7.4 Table 158 and the official UA-Nodeset/
+   NodeIds.csv define the exact NodeIds for AuthorizationServiceConfigurationType
+   and its three Mandatory PropertyType declarations. They must disappear
+   together when CU 3182 is disabled. */
 static void test_authorization_service_configuration_type_is_cu_gated(void) {
-#if MUC_OPCUA_CU_AUTHORIZATION_SERVICE_SERVER
+#if MUC_OPCUA_CU_AUTHORIZATION_SERVICE_CONFIGURATION_SERVER
     static const mu_type_decl_t declarations[] = {
-        {17853u, "ServiceUri", 12u, -1},
-        {17854u, "ServiceCertificate", 15u, -1},
-        {17855u, "IssuerEndpointUrl", 12u, -1},
+        {18072u, "ServiceUri", 12u, -1},
+        {17860u, "ServiceCertificate", 15u, -1},
+        {18073u, "IssuerEndpointUrl", 12u, -1},
     };
 
     assert_node(17852u, MU_NODECLASS_OBJECTTYPE, "AuthorizationServiceConfigurationType");
@@ -482,9 +482,9 @@ static void test_authorization_service_configuration_type_is_cu_gated(void) {
     assert_type_decls(17852u, 46u, 78u, 68u, declarations, sizeof(declarations) / sizeof(declarations[0]));
 #else
     TEST_ASSERT_NULL(base_node(17852u));
-    TEST_ASSERT_NULL(base_node(17853u));
-    TEST_ASSERT_NULL(base_node(17854u));
-    TEST_ASSERT_NULL(base_node(17855u));
+    TEST_ASSERT_NULL(base_node(18072u));
+    TEST_ASSERT_NULL(base_node(17860u));
+    TEST_ASSERT_NULL(base_node(18073u));
     TEST_ASSERT_FALSE(has_forward_ref(58u, 45u, 17852u));
 #endif
 }

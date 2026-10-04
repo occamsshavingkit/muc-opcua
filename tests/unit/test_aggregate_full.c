@@ -10,7 +10,7 @@
 #include "unity.h"
 #include <string.h>
 
-#if MUC_OPCUA_SUBSCRIPTIONS_STANDARD
+#if MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
 
 void setUp(void) {}
 void tearDown(void) {}
@@ -794,14 +794,14 @@ void setUp(void) {}
 void tearDown(void) {}
 
 void test_aggregate_full_requires_standard_subscriptions(void) {
-    TEST_PASS_MESSAGE("MUC_OPCUA_SUBSCRIPTIONS_STANDARD is disabled in this build");
+    TEST_PASS_MESSAGE("MUC_OPCUA_CU_SUBSCRIPTION_STANDARD is disabled in this build");
 }
 
 #endif
 
 int main(void) {
     UNITY_BEGIN();
-#if MUC_OPCUA_SUBSCRIPTIONS_STANDARD
+#if MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
     RUN_TEST(test_average_aggregate_direct);
     RUN_TEST(test_minimum_aggregate_direct);
     RUN_TEST(test_maximum_aggregate_direct);

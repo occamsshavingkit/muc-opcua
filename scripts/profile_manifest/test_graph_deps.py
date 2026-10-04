@@ -57,6 +57,7 @@ class GraphDepsTests(unittest.TestCase):
         _, manifest = _fixtures()
         idx = d.build_index(manifest)
         it = d.selectable_item_for_cu_name(idx, "Base Info ServerType")
+        assert it is not None
         self.assertEqual(it["kconfig_symbol"], "MUC_OPCUA_CU_BASE_INFO_SERVERTYPE")
 
     def test_depends_on_single_facet(self):
@@ -142,8 +143,57 @@ class GraphDepsTests(unittest.TestCase):
             "full": True, "custom": True,
         })
 
-    def test_resolve_into_skips_non_conformance_unit_items(self):
+    def test_resolve_into_preserves_semantic_dependencies(self):
+        # Given a graph-mapped CU with stale facet and semantic dependencies.
         graph = _full_graph()
+        manifest = {"items": [
+            {"id": "opc_facet_1219", "kind": "facet",
+             "kconfig_symbol": "MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER",
+             "opc_reference": {"profile_id": "1219"}},
+            {"id": "opc_cu_3189", "kind": "conformance_unit",
+             "kconfig_symbol": "MUC_OPCUA_CU_BASE_INFO_SERVERTYPE",
+             "opc_reference": {"cu_id": "3189", "cu_name": "Base Info ServerType"},
+             "depends_on": ["STALE_FACET"],
+             "semantic_depends_on": ["MUC_OPCUA_CU_BASE_INFO_BASE_TYPES"]},
+        ]}
+
+        # When graph-derived dependencies are resolved.
+        d.resolve_into(manifest, graph)
+
+        # Then facet visibility is replaced while semantic prerequisites survive.
+        item = manifest["items"][1]
+        self.assertEqual(item["depends_on"], ["MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER"])
+        self.assertEqual(item["semantic_depends_on"], ["MUC_OPCUA_CU_BASE_INFO_BASE_TYPES"])
+
+    def test_resolve_into_adds_project_standard_default_without_deprecated_facet_dependency(self):
+        # Given a capacity CU owned by deprecated Enhanced DataChange facet 1627.
+        graph = {"profiles": {
+            "2269": {"name": "Standard …Profile", "child_profiles": [], "child_cus": []},
+            "1627": {"name": "Enhanced DataChange Subscription 2017 Server Facet",
+                      "child_profiles": [],
+                      "child_cus": [{"id": 5242, "name": "Monitor Items 500", "isOptional": False}]},
+            "cu_master": {},
+        }}
+        manifest = {"items": [
+            {"id": "opc_facet_1627", "kind": "facet", "kconfig_symbol": None,
+             "opc_reference": {"profile_id": "1627"}},
+            {"id": "opc_monitor_items_500", "kind": "conformance_unit",
+             "kconfig_symbol": "MUC_OPCUA_CU_MONITOR_ITEMS_500",
+             "opc_reference": {"cu_id": "5242", "cu_name": "Monitor Items 500"},
+             "implementation_state": "implemented",
+             "project_profile_defaults": {"standard": True}},
+        ]}
+
+        # When graph-derived values are resolved.
+        d.resolve_into(manifest, graph)
+
+        # Then the project Standard default is additive and no facet dependency is synthesized.
+        item = next(i for i in manifest["items"] if i["id"] == "opc_monitor_items_500")
+        self.assertTrue(item["profile_defaults"]["standard"])
+        self.assertEqual(item["depends_on"], [])
+
+    def test_resolve_into_skips_non_conformance_unit_items(self):
+        graph = {"profiles": {}}
         untouched = {"id": "opc_facet_only", "kind": "facet",
                      "kconfig_symbol": "MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER",
                      "opc_reference": {"profile_id": "1219"}}
@@ -166,6 +216,63 @@ class GraphDepsTests(unittest.TestCase):
         it = manifest["items"][1]
         self.assertFalse(it["profile_defaults"]["full"])
         self.assertFalse(it["profile_defaults"]["custom"])  # defaulted, not present before
+
+    def test_resolve_into_rejects_missing_mandatory_cu_owner(self):
+        # Given a mandatory Standard CU with no manifest representation.
+        graph = {"profiles": {
+            "2269": {"name": "Standard …Profile", "child_profiles": [],
+                     "child_cus": [{"id": 9001, "name": "Missing Required", "isOptional": False}]},
+            "cu_master": {},
+        }}
+        manifest = {"items": []}
+
+        # When graph-derived values are resolved, then the missing owner is rejected.
+        with self.assertRaisesRegex(ValueError, "Missing Required.*no manifest owner"):
+            d.resolve_into(manifest, graph)
+
+    def test_resolve_into_rejects_ambiguous_mandatory_cu_owner(self):
+        # Given two manifest items claiming the same mandatory Standard CU.
+        graph = {"profiles": {
+            "2269": {"name": "Standard …Profile", "child_profiles": [],
+                     "child_cus": [{"id": 9001, "name": "Ambiguous Required", "isOptional": False}]},
+            "cu_master": {},
+        }}
+        manifest = {"items": [
+            {"id": "first_owner", "kind": "conformance_unit",
+             "kconfig_symbol": "MUC_OPCUA_CU_AMBIGUOUS_REQUIRED",
+             "opc_reference": {"cu_id": "9001", "cu_name": "Ambiguous Required"}},
+            {"id": "second_owner", "kind": "conformance_unit",
+             "kconfig_symbol": None,
+             "opc_reference": {"cu_id": "9002", "cu_name": "Ambiguous Required"}},
+        ]}
+
+        # When graph-derived values are resolved, then both owners are reported.
+        with self.assertRaisesRegex(
+            ValueError,
+            "Ambiguous Required.*multiple manifest owners.*first_owner.*second_owner",
+        ):
+            d.resolve_into(manifest, graph)
+
+    def test_resolve_into_rejects_unselectable_mandatory_cu_owner(self):
+        # Given one mandatory Standard CU represented without a Kconfig symbol.
+        graph = {"profiles": {
+            "2269": {"name": "Standard …Profile", "child_profiles": [],
+                     "child_cus": [{"id": 9001, "name": "Unselectable Required", "isOptional": False}]},
+            "cu_master": {},
+        }}
+        manifest = {"items": [
+            {"id": "unselectable_owner", "kind": "conformance_unit",
+             "implementation_state": "claimed",
+             "kconfig_symbol": None,
+             "opc_reference": {"cu_id": "9001", "cu_name": "Unselectable Required"}},
+        ]}
+
+        # When graph-derived values are resolved, then the unselectable owner is rejected.
+        with self.assertRaisesRegex(
+            ValueError,
+            "Unselectable Required.*unselectable_owner.*kconfig_symbol",
+        ):
+            d.resolve_into(manifest, graph)
 
 
 if __name__ == "__main__":

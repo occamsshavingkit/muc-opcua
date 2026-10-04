@@ -61,7 +61,7 @@ endchoice
 # Advertised-profile marker; drives base_nodes.c ServerProfileArray + capacities.h tier. EMBEDDED_PROFILE is intentionally absent (CMake-only, never a C define).
 config MUC_OPCUA_MARKER_STANDARD_PROFILE
 	bool
-	default y if MUC_OPCUA_INTERN_PROFILE_STANDARD_2025_UA_SERVER
+	default n
 
 # -- Internal profile cascade symbols (OPC-10000-7 §4.3) --------------
 # Invisible bool symbols encoding the profile inclusion hierarchy.
@@ -123,66 +123,6 @@ menuconfig MUC_OPCUA_FACET_CORE_2022_SERVER
 	  Notes: Core 2022: all constituent CUs claimed
 
 if MUC_OPCUA_FACET_CORE_2022_SERVER
-
-config MUC_OPCUA_CU_HISTORICAL_ANNOTATION_2022_SERVER_FACET
-	bool "CU: Historical Annotation 2022 Server Facet"
-	default n
-	help
-	  Implementation state: deferred.
-	  OPC source: OPC-10000-11 -- CU 1572:Historical Annotation 2022 Server Facet.
-	  Notes: Historical Annotation not implemented; no annotation storage or retrieval support.
-
-config MUC_OPCUA_CU_BASE_HISTORICAL_EVENT_2022_SERVER_FACET
-	bool "CU: Base Historical Event 2022 Server Facet"
-	default n
-	help
-	  Implementation state: deferred.
-	  OPC source: OPC-10000-11 -- CU 1577:Base Historical Event 2022 Server Facet.
-	  Notes: Base Historical Event not implemented; no event history support.
-
-config MUC_OPCUA_CU_HISTORICAL_EVENT_UPDATE_2022_SERVER_FACET
-	bool "CU: Historical Event Update 2022 Server Facet"
-	depends on MUC_OPCUA_CU_HISTORICAL_ACCESS_SERVER_FACET
-	default n
-	help
-	  Implementation state: deferred.
-	  OPC source: OPC-10000-11 -- CU 1578:Historical Event Update 2022 Server Facet.
-	  Notes: Historical Event Update not implemented; no event history support.
-
-config MUC_OPCUA_CU_HISTORICAL_EVENT_INSERT_2022_SERVER_FACET
-	bool "CU: Historical Event Insert 2022 Server Facet"
-	depends on MUC_OPCUA_CU_HISTORICAL_ACCESS_SERVER_FACET
-	default n
-	help
-	  Implementation state: deferred.
-	  OPC source: OPC-10000-11 -- CU 1579:Historical Event Insert 2022 Server Facet.
-	  Notes: Historical Event Insert not implemented; no event history support.
-
-config MUC_OPCUA_CU_HISTORICAL_EVENT_REPLACE_2022_SERVER_FACET
-	bool "CU: Historical Event Replace 2022 Server Facet"
-	depends on MUC_OPCUA_CU_HISTORICAL_ACCESS_SERVER_FACET
-	default n
-	help
-	  Implementation state: deferred.
-	  OPC source: OPC-10000-11 -- CU 1580:Historical Event Replace 2022 Server Facet.
-	  Notes: Historical Event Replace not implemented; no event history support.
-
-config MUC_OPCUA_CU_HISTORICAL_EVENT_DELETE_2022_SERVER_FACET
-	bool "CU: Historical Event Delete 2022 Server Facet"
-	depends on MUC_OPCUA_CU_HISTORICAL_ACCESS_SERVER_FACET
-	default n
-	help
-	  Implementation state: deferred.
-	  OPC source: OPC-10000-11 -- CU 1581:Historical Event Delete 2022 Server Facet.
-	  Notes: Historical Event Delete not implemented; no event history support.
-
-config MUC_OPCUA_CU_HISTORICAL_ACCESS_STRUCTURED_DATA_2022_SERVER_FACET
-	bool "CU: Historical Access Structured Data 2022 Server Facet"
-	default n
-	help
-	  Implementation state: deferred.
-	  OPC source: OPC-10000-11 -- CU 1710:Historical Access Structured Data 2022 Server Facet.
-	  Notes: Historical Access Structured Data not implemented; structured data storage/retrieval requires additional development.
 
 config MUC_OPCUA_CU_AGGREGATE_SUBSCRIPTION_MAXIMUM2
 	bool "CU: Aggregate Subscription – Maximum2"
@@ -267,6 +207,16 @@ config MUC_OPCUA_CU_DISCOVERY_GET_ENDPOINTS
 	  Backing tests: test_discovery_endpoint, test_discovery_services.
 	  Notes: Support the GetEndpoints Service to obtain all Endpoints of the Server. This includes filtering based on Profiles.
 
+config MUC_OPCUA_CU_DISCOVERY_FIND_SERVERS_SELF
+	bool "CU: Discovery Find Servers Self"
+	depends on MUC_OPCUA_FACET_CORE_2022_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_NANO_EMBEDDED_DEVICE_2025_SERVER || MUC_OPCUA_PROFILE_CUSTOM
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-4 §5.5.2 -- CU 2352:Discovery Find Servers Self.
+	  Backing tests: test_discovery_services, test_discovery_endpoint.
+	  Notes: Support the FindServers Service only for itself. Gated by #if defined(MUC_OPCUA_DISCOVERY_FIND_SERVERS_ENABLED) || defined(MUC_OPCUA_CU_DISCOVERY_FIND_SERVERS_SELF) in find_servers.c.
+
 config MUC_OPCUA_CU_AGGREGATE_SUBSCRIPTION_AVERAGE
 	bool "CU: Aggregate Subscription – Average"
 	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
@@ -303,6 +253,16 @@ config MUC_OPCUA_CU_AGGREGATE_SUBSCRIPTION_MAXIMUM
 	  Backing tests: test_profile_surface.
 	  Notes: Satisfied by project-level CU opc_cu_aggregate_maximum; the Maximum aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_MAXIMUM.
 
+config MUC_OPCUA_CU_ATTRIBUTE_WRITE_VALUES
+	bool "CU: Attribute Write Values"
+	depends on MUC_OPCUA_FACET_CORE_2022_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: claimed.
+	  OPC source: OPC-10000-4 §5.11.4 -- CU 2389:Attribute Write Values.
+	  Backing tests: test_write_value_gate, test_write_service.
+	  Notes: Supports writing to values to one or more Attributes of one or more Nodes. Implemented as Value Attribute writes only; non-Value Attribute writes remain rejected.
+
 config MUC_OPCUA_CU_SESSION_CHANGE_USER
 	bool "CU: Session Change User"
 	depends on MUC_OPCUA_FACET_CORE_2022_SERVER
@@ -329,7 +289,7 @@ config MUC_OPCUA_CU_ADDRESS_SPACE_ADDIN_REFERENCE
 	help
 	  Implementation state: claimed.
 	  OPC item: CU 2446:Address Space AddIn Reference.
-	  Backing tests: test_profile_surface.
+	  Backing tests: test_profile_surface, test_type_system.
 	  Notes: Support the HasAddIn Reference to bind an AddIn to an Object or ObjectType.
 
 config MUC_OPCUA_CU_ADDRESS_SPACE_ADDIN_DEFAULTINSTANCEBROWSENAME
@@ -351,6 +311,16 @@ config MUC_OPCUA_CU_BASE_INFO_LOCALTIME
 	  OPC item: CU 2476:Base Info LocalTime.
 	  Backing tests: test_profile_surface.
 	  Notes: Exposes local time information by providing the LocalTime Variable on the Server Object. Exposes the TimeZoneDataType, its Encoding Object and all its supertypes in the AddressSpace.
+
+config MUC_OPCUA_CU_SECURITYPOLICY_SUPPORT
+	bool "CU: SecurityPolicy Support"
+	depends on MUC_OPCUA_FACET_CORE_2022_SERVER
+	default y if MUC_OPCUA_INTERN_PROFILE_NANO_EMBEDDED_DEVICE_2025_SERVER
+	help
+	  Implementation state: implemented.
+	  OPC item: CU 2600:SecurityPolicy Support.
+	  Backing tests: test_security_policy, test_secure_channel.
+	  Notes: Support at least one Security Policy. Support of SecurityPolicy None is recommended for testing and compatibility reasons even if the UA Server supports a more secure policy.
 
 config MUC_OPCUA_CU_BASE_INFO_SELECTION_LIST
 	bool "CU: Base Info Selection List"
@@ -382,7 +352,7 @@ config MUC_OPCUA_CU_AGGREGATE_SUBSCRIPTION_INTERPOLATIVE
 
 config MUC_OPCUA_CU_ATTRIBUTE_WRITE_STATUSCODE_TIMESTAMP
 	bool "CU: Attribute Write StatusCode & Timestamp"
-	depends on MUC_OPCUA_FACET_CORE_2022_SERVER
+	depends on MUC_OPCUA_FACET_CORE_2022_SERVER && MUC_OPCUA_CU_ATTRIBUTE_WRITE_VALUES
 	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
 	help
 	  Implementation state: claimed.
@@ -454,6 +424,16 @@ config MUC_OPCUA_CU_AGGREGATE_SUBSCRIPTION_TOTAL
 	  Backing tests: test_profile_surface.
 	  Notes: Satisfied by project-level CU opc_cu_aggregate_total; the Total aggregate is computed by src/cu/core_2022_server/subscription/standard/subscription_aggregate.c, which dispatches on MU_ID_AGGREGATETYPE_TOTAL.
 
+config MUC_OPCUA_CU_ATTRIBUTE_READ
+	bool "CU: Attribute Read"
+	depends on MUC_OPCUA_FACET_CORE_2022_SERVER
+	default y
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3072:Attribute Read.
+	  Backing tests: test_profile_surface, test_read_service.
+	  Notes: Supports the Read Service to read one or more Attributes of one or more Nodes. This includes support of the IndexRange parameter to read a single element or a range of elements when the Attribute value is an array. Implemented by the core Read service.
+
 config MUC_OPCUA_CU_AGGREGATE_SUBSCRIPTION_TIMEAVERAGE
 	bool "CU: Aggregate Subscription – TimeAverage"
 	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
@@ -502,7 +482,7 @@ config MUC_OPCUA_CU_BASE_INFO_OPTIONSET
 
 config MUC_OPCUA_CU_ATTRIBUTE_WRITE_INDEX_RANGE
 	bool "CU: Attribute Write Index"
-	depends on MUC_OPCUA_FACET_CORE_2022_SERVER
+	depends on MUC_OPCUA_FACET_CORE_2022_SERVER && MUC_OPCUA_CU_ATTRIBUTE_WRITE_VALUES
 	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
 	help
 	  Implementation state: claimed.
@@ -629,16 +609,6 @@ config MUC_OPCUA_CU_BASE_INFO_ARGUMENT_TYPE
 	  OPC source: OPC-10000-5 -- Core 2022 Server Facet.
 	  Backing tests: test_type_system.
 	  Notes: spec 080a: exposes the Argument(i=296) DataType (subtype of Structure) + its DefaultBinary(298)/DefaultXml(297) Encoding Objects, plus the shared DataTypeEncodingType(76) ObjectType and HasEncoding(38) ReferenceType, in base_nodes.c. Satisfies CU 3641. First slice of the base type-system completion (A2); 3188 base DataTypes + 3185 folders follow.
-
-config MUC_OPCUA_CU_BASE_INFO_BASE_TYPES
-	bool "Base Info Base Types + Core Types Folders"
-	depends on MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER && MUC_OPCUA_CU_BASE_INFO_DATATYPES
-	default y if MUC_OPCUA_INTERN_PROFILE_EMBEDDED_2025_UA_SERVER
-	help
-	  Implementation state: claimed.
-	  OPC source: OPC-10000-5 -- Core 2022 Server Facet.
-	  Backing tests: test_type_system.
-	  Notes: spec 080b: completes the base OPC UA type system in base_nodes.c -- the remaining built-in/abstract DataTypes (Guid14/ByteString15/XmlElement16/ExpandedNodeId18/DataValue23/DiagnosticInfo25/Integer27/UInteger28/Enumeration29/Duration290/NumericRange291/UtcTime294/EnumValueType7594/Union12756) with correct supertype closure (primitives re-parented under Integer/UInteger/Number), HasModellingRule(37) + ModellingRuleType(77) + the ModellingRule Objects (Optional80/Mandatory78/ExposesItsArray83/OptionalPlaceholder11508/MandatoryPlaceholder11510), and the EnumValueType Encoding Objects (DefaultXml7616/DefaultBinary8251). Satisfies CU 3188 (Base Types) and CU 3185 (Core Types Folders). Second slice of the base type-system completion (A2); depends on the specialized-DataTypes CU for the Number/String subtype arrays it extends.
 
 config MUC_OPCUA_CU_BASE_INFO_DATATYPES
 	bool "Base Info Specialized DataTypes"
@@ -805,10 +775,11 @@ config MUC_OPCUA_CU_SESSION_TIMEOUT
 
 config MUC_OPCUA_CU_SUBSCRIPTION_BASIC
 	bool "CU: Subscription Basic"
+	depends on MUC_OPCUA_FACET_EMBEDDED_DATACHANGE_SUBSCRIPTION_2022_SERVER
 	default y if MUC_OPCUA_INTERN_PROFILE_MICRO_EMBEDDED_DEVICE_2025_SERVER
 	help
 	  Implementation state: claimed.
-	  OPC source: OPC-10000-4 §5.12/5.13 -- Core 2022 Server Facet -- CU 3727.
+	  OPC source: OPC-10000-4 §5.12/5.13 -- Core 2022 Server Facet -- CU 3727:Subscription Basic.
 	  Backing tests: test_subscriptions, test_subscriptions_errors.
 	  Notes: Project-level Conformance Unit mirroring the legacy 'subscriptions' item; emits Kconfig symbol MUC_OPCUA_CU_SUBSCRIPTION_BASIC matching the #ifdef guard renamed in Task 3 of the CU-aligned code reorganisation plan.
 
@@ -850,23 +821,27 @@ config MUC_OPCUA_CU_USER_ROLE_MANAGEMENT
 	  Backing tests: test_role_management.
 	  Notes: User Role Management — AddRole/RemoveRole/AddIdentity/RemoveIdentity implemented in PR #330
 
-config MUC_OPCUA_CU_VIEW_BASIC_TRANSLATEBROWSEPATH
-	bool "View Basic / TranslateBrowsePath"
-	default y
+config MUC_OPCUA_CU_MONITOR_ITEMS_500
+	bool "CU: Monitor Items 500"
+	depends on MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
+	default y if MUC_OPCUA_INTERN_PROFILE_STANDARD_2025_UA_SERVER
 	help
 	  Implementation state: claimed.
-	  OPC source: OPC-10000-4 §5.8 -- Core 2017 -- View Basic / TranslateBrowsePath.
-	  Backing tests: test_browse_service, test_browse_limits, test_view_services.
-	  Notes: Browse + BrowseNext + TranslateBrowsePaths.
+	  OPC source: OPC-10000-4 §5.13.2 -- Monitor Items 500 -- CU 5242:Monitor Items 500.
+	  Backing tests: test_subscriptions_capacity.
+	  Imported from: profiles/opcua-profile-snapshot.json.
+	  Notes: Satisfied by project-level CU opc_cu_subscription_standard; support for 500+ monitored items is stubbed as it requires substantial memory allocation. See src/cu/core_2022_server/monitor_items_500/stub.c.disabled.
 
-config MUC_OPCUA_CU_DISCOVERY_FIND_SERVERS_SELF_GET_ENDPOINTS
-	bool "Discovery Find Servers Self / Get Endpoints"
-	default y
+config MUC_OPCUA_CU_MONITOR_MINQUEUESIZE_05
+	bool "CU: Monitor MinQueueSize_05"
+	depends on MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
+	default y if MUC_OPCUA_INTERN_PROFILE_STANDARD_2025_UA_SERVER
 	help
 	  Implementation state: claimed.
-	  OPC source: OPC-10000-4 §5.4 -- Core 2017 -- Discovery Find Servers Self / Get Endpoints.
-	  Backing tests: test_discovery_endpoint.
-	  Notes: FindServers / GetEndpoints.
+	  OPC source: OPC-10000-4 §5.13.2 -- Monitor MinQueueSize_05 -- CU 5250:Monitor MinQueueSize_05.
+	  Backing tests: test_subscriptions_capacity.
+	  Imported from: profiles/opcua-profile-snapshot.json.
+	  Notes: Satisfied by project-level CU opc_cu_subscription_standard; MinQueueSize_05 tuning is stubbed. See src/cu/core_2022_server/monitor_minqueuesize_05/stub.c.disabled.
 
 config MUC_OPCUA_CU_HISTORICAL_ACCESS_SERVER_FACET
 	bool "Historical Access Server Facet"
@@ -895,16 +870,6 @@ config MUC_OPCUA_CU_QUERY
 	  Backing tests: test_query_service.
 	  Notes: QueryFirst/QueryNext.
 
-config MUC_OPCUA_CU_ATTRIBUTE_READ
-	bool "CU: Attribute Read"
-	depends on MUC_OPCUA_FACET_CORE_2022_SERVER
-	default y
-	help
-	  Implementation state: claimed.
-	  OPC source: OPC-10000-4 §5.10.2 -- Core 2017 Server Facet -- CU 1673:Attribute Read.
-	  Backing tests: test_read_service.
-	  Notes: Current Kconfig help text.
-
 config MUC_OPCUA_CU_VIEW_REGISTERNODES
 	bool "CU: View RegisterNodes"
 	depends on MUC_OPCUA_FACET_CORE_2022_SERVER
@@ -914,15 +879,6 @@ config MUC_OPCUA_CU_VIEW_REGISTERNODES
 	  OPC source: OPC-10000-4 §5.9 -- Core 2017 -- CU 3073:View RegisterNodes.
 	  Backing tests: test_view_services, test_profile_surface.
 	  Notes: RegisterNodes / UnregisterNodes.
-
-config MUC_OPCUA_CU_CORE_2017_ATTRIBUTE_WRITE
-	bool "Core 2017 Attribute Write"
-	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
-	help
-	  Implementation state: claimed.
-	  OPC source: OPC-10000-4 §5.10.4 -- Core 2017 Attribute Write.
-	  Backing tests: test_write_service.
-	  Notes: Optional facet; only on full.
 
 config MUC_OPCUA_CU_AGGREGATE_SUBSCRIPTION_MINIMUMACTUALTIME
 	bool "CU: Aggregate Subscription – MinimumActualTime"
@@ -1365,12 +1321,49 @@ config MUC_OPCUA_CU_AGGREGATE_STANDARDDEVIATIONPOPULATION
 	  Backing tests: test_history.
 	  Notes: Spec CU 3162: tracked in manifest; not yet claimed or implemented.
 
+config MUC_OPCUA_CU_AUTHORIZATION_SERVICE_CONFIGURATION_SERVER
+	bool "CU: Authorization Service Configuration Server"
+	depends on MUC_OPCUA_CU_USER_TOKEN_JWT && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+	default y if MUC_OPCUA_INTERN_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES
+	help
+	  Implementation state: implemented.
+	  OPC source: OPC-10000-12 §9.7.4 -- CU 3182:Authorization Service Configuration Server.
+	  Backing tests: test_profile_surface, tests/unit/test_type_system.c.
+	  Notes: AuthorizationServiceConfigurationType nodes are gated directly by this CU.
+
+config MUC_OPCUA_CU_SUBSCRIPTION_MINIMUM_05
+	bool "CU: Subscription Minimum 05"
+	depends on MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
+	default y if MUC_OPCUA_INTERN_PROFILE_STANDARD_2025_UA_SERVER
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5248:Subscription Minimum 05.
+	  Backing tests: test_subscriptions_capacity, test_subscription_deadband, test_subscription_publish.
+	  Notes: Claims >= 5 Subscriptions per Session per Standard DataChange 2017. Gated in subscription_minimum_05.c.
+
+config MUC_OPCUA_CU_SUBSCRIPTION_PUBLISH_MIN_10
+	bool "CU: Subscription Publish Min 10"
+	depends on MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
+	default y if MUC_OPCUA_INTERN_PROFILE_STANDARD_2025_UA_SERVER
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 5249:Subscription Publish Min 10.
+	  Backing tests: test_subscriptions_capacity, test_subscription_deadband, test_subscription_publish.
+	  Notes: Claims >= 10 parked Publish requests per Standard DataChange 2017. Gated in subscription_publish_min_10.c.
+
 # Historical Raw Data 2022 Server Facet (opc_cu_1571)
 #   Implementation state: documented -- visible but not selectable.
 #   OPC source: OPC-10000-11.
 #   Detail: CU 1571:Historical Raw Data 2022 Server Facet.
 #   Notes: HistoryRead service with ReadRawModifiedDetails. Continuation points, pagination, timestamp filtering, and returnBounds implemented. Satisfied by service_history (MUC_OPCUA_CU_HISTORICAL_ACCESS_SERVER_FACET).
 comment "Historical Raw Data 2022 Server Facet (DOCUMENTED) [OPC-10000-11]"
+
+# Historical Annotation 2022 Server Facet (opc_cu_1572)
+#   Implementation state: deferred -- visible but not selectable.
+#   OPC source: OPC-10000-11.
+#   Detail: CU 1572:Historical Annotation 2022 Server Facet.
+#   Notes: Historical Annotation not implemented; no annotation storage or retrieval support.
+comment "Historical Annotation 2022 Server Facet (NOT IMPLEMENTED) [OPC-10000-11]"
 
 # Historical Data Update 2022 Server Facet (opc_cu_1573)
 #   Implementation state: documented -- visible but not selectable.
@@ -1399,6 +1392,48 @@ comment "Historical Data Replace 2022 Server Facet (DOCUMENTED) [OPC-10000-11]"
 #   Detail: CU 1576:Historical Data Delete 2022 Server Facet.
 #   Notes: HistoryUpdate service with DeleteRawModifiedDetails. isDeleteModified, startTime, endTime decoded and dispatched via history_adapter.delete_raw_modified callback. Satisfied by service_history (MUC_OPCUA_CU_HISTORICAL_ACCESS_SERVER_FACET).
 comment "Historical Data Delete 2022 Server Facet (DOCUMENTED) [OPC-10000-11]"
+
+# Base Historical Event 2022 Server Facet (opc_cu_1577)
+#   Implementation state: deferred -- visible but not selectable.
+#   OPC source: OPC-10000-11.
+#   Detail: CU 1577:Base Historical Event 2022 Server Facet.
+#   Notes: Base Historical Event not implemented; no event history support.
+comment "Base Historical Event 2022 Server Facet (NOT IMPLEMENTED) [OPC-10000-11]"
+
+# Historical Event Update 2022 Server Facet (opc_cu_1578)
+#   Implementation state: deferred -- visible but not selectable.
+#   OPC source: OPC-10000-11.
+#   Detail: CU 1578:Historical Event Update 2022 Server Facet.
+#   Notes: Historical Event Update not implemented; no event history support.
+comment "Historical Event Update 2022 Server Facet (NOT IMPLEMENTED) [OPC-10000-11]"
+
+# Historical Event Insert 2022 Server Facet (opc_cu_1579)
+#   Implementation state: deferred -- visible but not selectable.
+#   OPC source: OPC-10000-11.
+#   Detail: CU 1579:Historical Event Insert 2022 Server Facet.
+#   Notes: Historical Event Insert not implemented; no event history support.
+comment "Historical Event Insert 2022 Server Facet (NOT IMPLEMENTED) [OPC-10000-11]"
+
+# Historical Event Replace 2022 Server Facet (opc_cu_1580)
+#   Implementation state: deferred -- visible but not selectable.
+#   OPC source: OPC-10000-11.
+#   Detail: CU 1580:Historical Event Replace 2022 Server Facet.
+#   Notes: Historical Event Replace not implemented; no event history support.
+comment "Historical Event Replace 2022 Server Facet (NOT IMPLEMENTED) [OPC-10000-11]"
+
+# Historical Event Delete 2022 Server Facet (opc_cu_1581)
+#   Implementation state: deferred -- visible but not selectable.
+#   OPC source: OPC-10000-11.
+#   Detail: CU 1581:Historical Event Delete 2022 Server Facet.
+#   Notes: Historical Event Delete not implemented; no event history support.
+comment "Historical Event Delete 2022 Server Facet (NOT IMPLEMENTED) [OPC-10000-11]"
+
+# Historical Access Structured Data 2022 Server Facet (opc_cu_1710)
+#   Implementation state: deferred -- visible but not selectable.
+#   OPC source: OPC-10000-11.
+#   Detail: CU 1710:Historical Access Structured Data 2022 Server Facet.
+#   Notes: Historical Access Structured Data not implemented; structured data storage/retrieval requires additional development.
+comment "Historical Access Structured Data 2022 Server Facet (NOT IMPLEMENTED) [OPC-10000-11]"
 
 # Historical Access Structured Data Insert (opc_cu_2185)
 #   Implementation state: documented -- visible but not selectable.
@@ -1441,25 +1476,11 @@ comment "Monitor QueueSize_ServerMax (DOCUMENTED)"
 #   Notes: Historical Access Structured Data Read Raw deferred; depends on opc_cu_1710.
 comment "Historical Access Structured Data Read Raw (DOCUMENTED) [OPC-10000-11]"
 
-# Discovery Find Servers Self (opc_cu_2352)
-#   Implementation state: documented -- visible but not selectable.
-#   OPC source: OPC-10000-4 §5.5.2.
-#   Detail: CU 2352:Discovery Find Servers Self.
-#   Notes: Support the FindServers Service only for itself.
-comment "Discovery Find Servers Self (DOCUMENTED) [OPC-10000-4 §5.5.2]"
-
 # Node Management Add Node (opc_cu_2380)
 #   Implementation state: documented -- visible but not selectable.
 #   Detail: CU 2380:Node Management Add Node.
 #   Notes: Reconciled (spec 073): AddNodes service (nodemanagement/dispatch_node_mgmt.c handle_add_nodes -> mu_add_nodes_process); tested by test_node_management (AddNodes decode/encode, duplicate-NodeId). Satisfied by service_nodemanagement.
 comment "Node Management Add Node (DOCUMENTED)"
-
-# Attribute Write Values (opc_cu_2389)
-#   Implementation state: documented -- visible but not selectable.
-#   OPC source: OPC-10000-4 §5.11.4.
-#   Detail: CU 2389:Attribute Write Values.
-#   Notes: Supports writing to values to one or more Attributes of one or more Nodes. Implemented as Value Attribute writes only; non-Value Attribute writes remain rejected.
-comment "Attribute Write Values (DOCUMENTED) [OPC-10000-4 §5.11.4]"
 
 # Node Management Delete Node (opc_cu_2394)
 #   Implementation state: documented -- visible but not selectable.
@@ -1503,12 +1524,6 @@ comment "Time Sync – IEEE 802.1AS (DOCUMENTED)"
 #   Notes: Reconciled (spec 073): address-space-triggered events are queued per subscription and delivered in Publish (notification.c mu_server_trigger_event); tested by test_event_notifications. Satisfied by opc_cu_events.
 comment "Address Space Events 2 (DOCUMENTED)"
 
-# SecurityPolicy Support (opc_cu_2600)
-#   Implementation state: documented -- visible but not selectable.
-#   Detail: CU 2600:SecurityPolicy Support.
-#   Notes: Support at least one Security Policy. Support of SecurityPolicy None is recommended for testing and compatibility reasons even if the UA Server supports a more secure policy.
-comment "SecurityPolicy Support (DOCUMENTED)"
-
 # A & C First in Group Alarm (opc_cu_2726)
 #   Implementation state: documented -- visible but not selectable.
 #   OPC source: OPC-10000-9 §5.10.3.
@@ -1529,10 +1544,10 @@ comment "Time Sync – NTP (DOCUMENTED)"
 comment "Security Role Server Authorization (DOCUMENTED)"
 
 # Address Space Atomicity (opc_cu_2809)
-#   Implementation state: documented -- visible but not selectable.
+#   Implementation state: unimplemented -- visible but not selectable.
 #   Detail: CU 2809:Address Space Atomicity.
 #   Notes: Support setting the NonatomicRead and NonatomicWrite flags in the AccessLevelEx Attribute for Variable Nodes to indicate whether Read or Write operations can be performed in atomic manner. If the flags are set to '1', atomicity cannot be assured.
-comment "Address Space Atomicity (DOCUMENTED)"
+comment "Address Space Atomicity (NOT IMPLEMENTED) [CU 2809:Address Space Atomicity]"
 
 # Address Space Full Array Only (opc_cu_2820)
 #   Implementation state: documented -- visible but not selectable.
@@ -1599,18 +1614,6 @@ comment "Data Access DoubleComplex Number (DOCUMENTED)"
 #   Notes: Reconciled (spec 079): satisfied by Data Access (opc_cu_data_access).
 comment "Data Access MultiState (DOCUMENTED)"
 
-# Attribute Read (opc_cu_3072)
-#   Implementation state: documented -- visible but not selectable.
-#   Detail: CU 3072:Attribute Read.
-#   Notes: Supports the Read Service to read one or more Attributes of one or more Nodes. This includes support of the IndexRange parameter to read a single element or a range of elements when the Attribute value is an array.
-comment "Attribute Read (DOCUMENTED)"
-
-# View RegisterNodes (opc_cu_3073)
-#   Implementation state: documented -- visible but not selectable.
-#   Detail: CU 3073:View RegisterNodes.
-#   Notes: Support the RegisterNodes and UnregisterNodes Services as a way to optimize access to repeatedly used Nodes in the Server's OPC UA AddressSpace.
-comment "View RegisterNodes (DOCUMENTED)"
-
 # Security Default ApplicationInstance Certificate (opc_cu_3080)
 #   Implementation state: documented -- visible but not selectable.
 #   Detail: CU 3080:Security Default ApplicationInstance Certificate.
@@ -1641,24 +1644,6 @@ comment "Node Management Delete Ref (DOCUMENTED)"
 #   Detail: CU 3170:Discovery Register2.
 #   Notes: RegisterServer2 is implemented alongside RegisterServer; satisfied by the same service handler.
 comment "Discovery Register2 (DOCUMENTED) [OPC-10000-4 §5.4.6]"
-
-# Session Base (opc_cu_3175)
-#   Implementation state: documented -- visible but not selectable.
-#   Detail: CU 3175:Session Base.
-#   Notes: Satisfied by project-level CU opc_cu_session_base; CreateSession/ActivateSession/CloseSession with correct parameter handling including SecurityMode=None null signatures.
-comment "Session Base (DOCUMENTED)"
-
-# Base Info Core Structure 2 (opc_cu_3184)
-#   Implementation state: documented -- visible but not selectable.
-#   Detail: CU 3184:Base Info Core Structure 2.
-#   Notes: Satisfied by project-level CU opc_cu_core_structure_2; Root/Objects/Server base structure with ServerArray/NamespaceArray/ServerStatus/ServiceLevel/ServerCapabilities exposed in base_nodes.c.
-comment "Base Info Core Structure 2 (DOCUMENTED)"
-
-# Base Info Core Views Folder (opc_cu_3186)
-#   Implementation state: documented -- visible but not selectable.
-#   Detail: CU 3186:Base Info Core Views Folder.
-#   Notes: Satisfied by project-level CU opc_cu_core_views_folder; Views Object entry point exposed in base_nodes.c.
-comment "Base Info Core Views Folder (DOCUMENTED)"
 
 # Base Info Events Capabilities (opc_cu_3194)
 #   Implementation state: documented -- visible but not selectable.
@@ -1716,12 +1701,6 @@ comment "Auditing Write (DOCUMENTED)"
 #   Notes: Auditing infrastructure exists (spec 074). AuditUpdateMethodEvent generation is wired through the auditing event emitter.
 comment "Auditing Method (DOCUMENTED) [OPC-10000-5]"
 
-# Base Info Namespace Metadata (opc_cu_3545)
-#   Implementation state: documented -- visible but not selectable.
-#   Detail: CU 3545:Base Info Namespace Metadata.
-#   Notes: Satisfied by project-level CU opc_cu_namespace_metadata; NamespaceMetadataType exposed + namespace metadata for static-NodeId namespaces.
-comment "Base Info Namespace Metadata (DOCUMENTED)"
-
 # Base Info LocalTime Events (opc_cu_3546)
 #   Implementation state: documented -- visible but not selectable.
 #   Detail: CU 3546:Base Info LocalTime Events.
@@ -1733,12 +1712,6 @@ comment "Base Info LocalTime Events (DOCUMENTED)"
 #   Detail: CU 3549:Base Info OrderedList Change Notification.
 #   Notes: Reconciled: satisfied by opc_cu_base_info_datatypes.
 comment "Base Info OrderedList Change Notification (DOCUMENTED)"
-
-# Address Space Base (opc_cu_3554)
-#   Implementation state: documented -- visible but not selectable.
-#   Detail: CU 3554:Address Space Base.
-#   Notes: Satisfied by project-level CU opc_cu_address_space_base; supports Object/ObjectType/Variable/VariableType/ReferenceType/DataType NodeClasses with Attributes and References.
-comment "Address Space Base (DOCUMENTED)"
 
 # Data Access DataItems (opc_cu_3565)
 #   Implementation state: documented -- visible but not selectable.
@@ -1854,12 +1827,6 @@ comment "Base Info TemporaryFileTransferType Sync Write (DOCUMENTED)"
 #   Notes: Reconciled: satisfied by opc_cu_base_info_datatypes.
 comment "Base Info TemporaryFileTransferType Async Write (DOCUMENTED)"
 
-# Base Info Server Capabilities 2 (opc_cu_3912)
-#   Implementation state: documented -- visible but not selectable.
-#   Detail: CU 3912:Base Info Server Capabilities 2.
-#   Notes: Satisfied by project-level CU opc_cu_server_capabilities_2; ServerProfileArray/LocaleIdArray/MinSupportedSampleRate/MaxBrowseContinuationPoints/MaxArrayLength/MaxStringLength/MaxByteStringLength/MaxSessions exposed in base_nodes.c.
-comment "Base Info Server Capabilities 2 (DOCUMENTED)"
-
 # Session Multiple (opc_cu_3923)
 #   Implementation state: documented -- visible but not selectable.
 #   OPC source: OPC-10000-4 §5.6.
@@ -1872,12 +1839,6 @@ comment "Session Multiple (DOCUMENTED) [OPC-10000-4 §5.6]"
 #   Detail: CU 3968:Auditing Services.
 #   Notes: Reconciled (spec 074): the server emits + delivers AuditEvents for CreateSession/ActivateSession/Write (audited service subset); test_event_notifications. Satisfied by opc_cu_auditing.
 comment "Auditing Services (DOCUMENTED)"
-
-# Session General Service Behaviour (opc_cu_3985)
-#   Implementation state: documented -- visible but not selectable.
-#   Detail: CU 3985:Session General Service Behaviour.
-#   Notes: Satisfied by project-level CU opc_cu_session_general_service; authentication-token validation, requestHandle echo, timeoutHint respect in service_dispatch.
-comment "Session General Service Behaviour (DOCUMENTED)"
 
 # Monitor Complex Event Filter (opc_cu_4030)
 #   Implementation state: documented -- visible but not selectable.
@@ -1929,227 +1890,234 @@ comment "Security – No Application Authentication (DOCUMENTED)"
 #   Notes: Already-implemented CU added to manifest as claimed so the feature is tracked, gated by its Kconfig symbol, and covered by the claim/test map.
 comment "Address Space Base (DOCUMENTED) [OPC-10000-3 §4]"
 
-# Core 2022 Server Facet (opc_cu_aggregate_annotation_count)
+# Aggregates - AnnotationCount (opc_cu_aggregate_annotation_count)
 #   Implementation state: documented -- visible but not selectable.
 #   OPC source: OPC-10000-13 §4.2.2.35.
 #   Detail: Core 2022 Server Facet.
-comment "Core 2022 Server Facet (DOCUMENTED) [OPC-10000-13 §4.2.2.35]"
+comment "Aggregates - AnnotationCount (DOCUMENTED) [OPC-10000-13 §4.2.2.35]"
 
-# Core 2022 Server Facet (opc_cu_aggregate_average)
+# Aggregates - Average (opc_cu_aggregate_average)
 #   Implementation state: documented -- visible but not selectable.
 #   OPC source: OPC-10000-13 §4.2.2.4.
 #   Detail: Core 2022 Server Facet.
-comment "Core 2022 Server Facet (DOCUMENTED) [OPC-10000-13 §4.2.2.4]"
+comment "Aggregates - Average (DOCUMENTED) [OPC-10000-13 §4.2.2.4]"
 
-# Core 2022 Server Facet (opc_cu_aggregate_count)
+# Aggregates - Count (opc_cu_aggregate_count)
 #   Implementation state: documented -- visible but not selectable.
 #   OPC source: OPC-10000-13 §4.2.2.19.
 #   Detail: Core 2022 Server Facet.
-comment "Core 2022 Server Facet (DOCUMENTED) [OPC-10000-13 §4.2.2.19]"
+comment "Aggregates - Count (DOCUMENTED) [OPC-10000-13 §4.2.2.19]"
 
-# Core 2022 Server Facet (opc_cu_aggregate_delta)
+# Aggregates - Delta (opc_cu_aggregate_delta)
 #   Implementation state: documented -- visible but not selectable.
 #   OPC source: OPC-10000-13 §4.2.2.25.
 #   Detail: Core 2022 Server Facet.
-comment "Core 2022 Server Facet (DOCUMENTED) [OPC-10000-13 §4.2.2.25]"
+comment "Aggregates - Delta (DOCUMENTED) [OPC-10000-13 §4.2.2.25]"
 
-# Core 2022 Server Facet (opc_cu_aggregate_delta_bounds)
+# Aggregates - DeltaBounds (opc_cu_aggregate_delta_bounds)
 #   Implementation state: documented -- visible but not selectable.
 #   OPC source: OPC-10000-13 §4.2.2.28.
 #   Detail: Core 2022 Server Facet.
-comment "Core 2022 Server Facet (DOCUMENTED) [OPC-10000-13 §4.2.2.28]"
+comment "Aggregates - DeltaBounds (DOCUMENTED) [OPC-10000-13 §4.2.2.28]"
 
-# Core 2022 Server Facet (opc_cu_aggregate_duration_bad)
+# Aggregates - DurationBad (opc_cu_aggregate_duration_bad)
 #   Implementation state: documented -- visible but not selectable.
 #   OPC source: OPC-10000-13 §4.2.2.30.
 #   Detail: Core 2022 Server Facet.
-comment "Core 2022 Server Facet (DOCUMENTED) [OPC-10000-13 §4.2.2.30]"
+comment "Aggregates - DurationBad (DOCUMENTED) [OPC-10000-13 §4.2.2.30]"
 
-# Core 2022 Server Facet (opc_cu_aggregate_duration_good)
+# Aggregates - DurationGood (opc_cu_aggregate_duration_good)
 #   Implementation state: documented -- visible but not selectable.
 #   OPC source: OPC-10000-13 §4.2.2.29.
 #   Detail: Core 2022 Server Facet.
-comment "Core 2022 Server Facet (DOCUMENTED) [OPC-10000-13 §4.2.2.29]"
+comment "Aggregates - DurationGood (DOCUMENTED) [OPC-10000-13 §4.2.2.29]"
 
-# Core 2022 Server Facet (opc_cu_aggregate_duration_state_nonzero)
+# Aggregates - DurationInStateNonZero (opc_cu_aggregate_duration_state_nonzero)
 #   Implementation state: documented -- visible but not selectable.
 #   OPC source: OPC-10000-13 §4.2.2.21.
 #   Detail: Core 2022 Server Facet.
-comment "Core 2022 Server Facet (DOCUMENTED) [OPC-10000-13 §4.2.2.21]"
+comment "Aggregates - DurationInStateNonZero (DOCUMENTED) [OPC-10000-13 §4.2.2.21]"
 
-# Core 2022 Server Facet (opc_cu_aggregate_duration_state_zero)
+# Aggregates - DurationInStateZero (opc_cu_aggregate_duration_state_zero)
 #   Implementation state: documented -- visible but not selectable.
 #   OPC source: OPC-10000-13 §4.2.2.20.
 #   Detail: Core 2022 Server Facet.
-comment "Core 2022 Server Facet (DOCUMENTED) [OPC-10000-13 §4.2.2.20]"
+comment "Aggregates - DurationInStateZero (DOCUMENTED) [OPC-10000-13 §4.2.2.20]"
 
-# Core 2022 Server Facet (opc_cu_aggregate_end)
+# Aggregates - End (opc_cu_aggregate_end)
 #   Implementation state: documented -- visible but not selectable.
 #   OPC source: OPC-10000-13 §4.2.2.24.
 #   Detail: Core 2022 Server Facet.
-comment "Core 2022 Server Facet (DOCUMENTED) [OPC-10000-13 §4.2.2.24]"
+comment "Aggregates - End (DOCUMENTED) [OPC-10000-13 §4.2.2.24]"
 
-# Core 2022 Server Facet (opc_cu_aggregate_end_bound)
+# Aggregates - EndBound (opc_cu_aggregate_end_bound)
 #   Implementation state: documented -- visible but not selectable.
 #   OPC source: OPC-10000-13 §4.2.2.27.
 #   Detail: Core 2022 Server Facet.
-comment "Core 2022 Server Facet (DOCUMENTED) [OPC-10000-13 §4.2.2.27]"
+comment "Aggregates - EndBound (DOCUMENTED) [OPC-10000-13 §4.2.2.27]"
 
-# Core 2022 Server Facet (opc_cu_aggregate_interpolative)
+# Aggregates - Interpolative (opc_cu_aggregate_interpolative)
 #   Implementation state: documented -- visible but not selectable.
 #   OPC source: OPC-10000-13 §4.2.2.3.
 #   Detail: Core 2022 Server Facet.
-comment "Core 2022 Server Facet (DOCUMENTED) [OPC-10000-13 §4.2.2.3]"
+comment "Aggregates - Interpolative (DOCUMENTED) [OPC-10000-13 §4.2.2.3]"
 
-# Core 2022 Server Facet (opc_cu_aggregate_max_actual_time)
+# Aggregates - MaximumActualTime (opc_cu_aggregate_max_actual_time)
 #   Implementation state: documented -- visible but not selectable.
 #   OPC source: OPC-10000-13 §4.2.2.12.
 #   Detail: Core 2022 Server Facet.
-comment "Core 2022 Server Facet (DOCUMENTED) [OPC-10000-13 §4.2.2.12]"
+comment "Aggregates - MaximumActualTime (DOCUMENTED) [OPC-10000-13 §4.2.2.12]"
 
-# Core 2022 Server Facet (opc_cu_aggregate_max_actual_time_2)
+# Aggregates - MaximumActualTime2 (opc_cu_aggregate_max_actual_time_2)
 #   Implementation state: documented -- visible but not selectable.
 #   OPC source: OPC-10000-13 §4.2.2.17.
 #   Detail: Core 2022 Server Facet.
-comment "Core 2022 Server Facet (DOCUMENTED) [OPC-10000-13 §4.2.2.17]"
+comment "Aggregates - MaximumActualTime2 (DOCUMENTED) [OPC-10000-13 §4.2.2.17]"
 
-# Core 2022 Server Facet (opc_cu_aggregate_maximum)
+# Aggregates - Maximum (opc_cu_aggregate_maximum)
 #   Implementation state: documented -- visible but not selectable.
 #   OPC source: OPC-10000-13 §4.2.2.10.
 #   Detail: Core 2022 Server Facet.
-comment "Core 2022 Server Facet (DOCUMENTED) [OPC-10000-13 §4.2.2.10]"
+comment "Aggregates - Maximum (DOCUMENTED) [OPC-10000-13 §4.2.2.10]"
 
-# Core 2022 Server Facet (opc_cu_aggregate_maximum_2)
+# Aggregates - Maximum2 (opc_cu_aggregate_maximum_2)
 #   Implementation state: documented -- visible but not selectable.
 #   OPC source: OPC-10000-13 §4.2.2.15.
 #   Detail: Core 2022 Server Facet.
-comment "Core 2022 Server Facet (DOCUMENTED) [OPC-10000-13 §4.2.2.15]"
+comment "Aggregates - Maximum2 (DOCUMENTED) [OPC-10000-13 §4.2.2.15]"
 
-# Core 2022 Server Facet (opc_cu_aggregate_min_actual_time)
+# Aggregates - MinimumActualTime (opc_cu_aggregate_min_actual_time)
 #   Implementation state: documented -- visible but not selectable.
 #   OPC source: OPC-10000-13 §4.2.2.11.
 #   Detail: Core 2022 Server Facet.
-comment "Core 2022 Server Facet (DOCUMENTED) [OPC-10000-13 §4.2.2.11]"
+comment "Aggregates - MinimumActualTime (DOCUMENTED) [OPC-10000-13 §4.2.2.11]"
 
-# Core 2022 Server Facet (opc_cu_aggregate_min_actual_time_2)
+# Aggregates - MinimumActualTime2 (opc_cu_aggregate_min_actual_time_2)
 #   Implementation state: documented -- visible but not selectable.
 #   OPC source: OPC-10000-13 §4.2.2.16.
 #   Detail: Core 2022 Server Facet.
-comment "Core 2022 Server Facet (DOCUMENTED) [OPC-10000-13 §4.2.2.16]"
+comment "Aggregates - MinimumActualTime2 (DOCUMENTED) [OPC-10000-13 §4.2.2.16]"
 
-# Core 2022 Server Facet (opc_cu_aggregate_minimum)
+# Aggregates - Minimum (opc_cu_aggregate_minimum)
 #   Implementation state: documented -- visible but not selectable.
 #   OPC source: OPC-10000-13 §4.2.2.9.
 #   Detail: Core 2022 Server Facet.
-comment "Core 2022 Server Facet (DOCUMENTED) [OPC-10000-13 §4.2.2.9]"
+comment "Aggregates - Minimum (DOCUMENTED) [OPC-10000-13 §4.2.2.9]"
 
-# Core 2022 Server Facet (opc_cu_aggregate_minimum_2)
+# Aggregates - Minimum2 (opc_cu_aggregate_minimum_2)
 #   Implementation state: documented -- visible but not selectable.
 #   OPC source: OPC-10000-13 §4.2.2.14.
 #   Detail: Core 2022 Server Facet.
-comment "Core 2022 Server Facet (DOCUMENTED) [OPC-10000-13 §4.2.2.14]"
+comment "Aggregates - Minimum2 (DOCUMENTED) [OPC-10000-13 §4.2.2.14]"
 
-# Core 2022 Server Facet (opc_cu_aggregate_number_transitions)
+# Aggregates - NumberOfTransitions (opc_cu_aggregate_number_transitions)
 #   Implementation state: documented -- visible but not selectable.
 #   OPC source: OPC-10000-13 §4.2.2.22.
 #   Detail: Core 2022 Server Facet.
-comment "Core 2022 Server Facet (DOCUMENTED) [OPC-10000-13 §4.2.2.22]"
+comment "Aggregates - NumberOfTransitions (DOCUMENTED) [OPC-10000-13 §4.2.2.22]"
 
-# Core 2022 Server Facet (opc_cu_aggregate_percent_bad)
+# Aggregates - PercentBad (opc_cu_aggregate_percent_bad)
 #   Implementation state: documented -- visible but not selectable.
 #   OPC source: OPC-10000-13 §4.2.2.32.
 #   Detail: Core 2022 Server Facet.
-comment "Core 2022 Server Facet (DOCUMENTED) [OPC-10000-13 §4.2.2.32]"
+comment "Aggregates - PercentBad (DOCUMENTED) [OPC-10000-13 §4.2.2.32]"
 
-# Core 2022 Server Facet (opc_cu_aggregate_percent_good)
+# Aggregates - PercentGood (opc_cu_aggregate_percent_good)
 #   Implementation state: documented -- visible but not selectable.
 #   OPC source: OPC-10000-13 §4.2.2.31.
 #   Detail: Core 2022 Server Facet.
-comment "Core 2022 Server Facet (DOCUMENTED) [OPC-10000-13 §4.2.2.31]"
+comment "Aggregates - PercentGood (DOCUMENTED) [OPC-10000-13 §4.2.2.31]"
 
-# Core 2022 Server Facet (opc_cu_aggregate_range)
+# Aggregates - Range (opc_cu_aggregate_range)
 #   Implementation state: documented -- visible but not selectable.
 #   OPC source: OPC-10000-13 §4.2.2.13.
 #   Detail: Core 2022 Server Facet.
-comment "Core 2022 Server Facet (DOCUMENTED) [OPC-10000-13 §4.2.2.13]"
+comment "Aggregates - Range (DOCUMENTED) [OPC-10000-13 §4.2.2.13]"
 
-# Core 2022 Server Facet (opc_cu_aggregate_range_2)
+# Aggregates - Range2 (opc_cu_aggregate_range_2)
 #   Implementation state: documented -- visible but not selectable.
 #   OPC source: OPC-10000-13 §4.2.2.18.
 #   Detail: Core 2022 Server Facet.
-comment "Core 2022 Server Facet (DOCUMENTED) [OPC-10000-13 §4.2.2.18]"
+comment "Aggregates - Range2 (DOCUMENTED) [OPC-10000-13 §4.2.2.18]"
 
-# Core 2022 Server Facet (opc_cu_aggregate_start)
+# Aggregates - Start (opc_cu_aggregate_start)
 #   Implementation state: documented -- visible but not selectable.
 #   OPC source: OPC-10000-13 §4.2.2.23.
 #   Detail: Core 2022 Server Facet.
-comment "Core 2022 Server Facet (DOCUMENTED) [OPC-10000-13 §4.2.2.23]"
+comment "Aggregates - Start (DOCUMENTED) [OPC-10000-13 §4.2.2.23]"
 
-# Core 2022 Server Facet (opc_cu_aggregate_start_bound)
+# Aggregates - StartBound (opc_cu_aggregate_start_bound)
 #   Implementation state: documented -- visible but not selectable.
 #   OPC source: OPC-10000-13 §4.2.2.26.
 #   Detail: Core 2022 Server Facet.
-comment "Core 2022 Server Facet (DOCUMENTED) [OPC-10000-13 §4.2.2.26]"
+comment "Aggregates - StartBound (DOCUMENTED) [OPC-10000-13 §4.2.2.26]"
 
-# Core 2022 Server Facet (opc_cu_aggregate_std_dev_population)
+# Aggregates - StandardDeviationPopulation (opc_cu_aggregate_std_dev_population)
 #   Implementation state: documented -- visible but not selectable.
 #   OPC source: OPC-10000-13 §4.2.2.38.
 #   Detail: Core 2022 Server Facet.
-comment "Core 2022 Server Facet (DOCUMENTED) [OPC-10000-13 §4.2.2.38]"
+comment "Aggregates - StandardDeviationPopulation (DOCUMENTED) [OPC-10000-13 §4.2.2.38]"
 
-# Core 2022 Server Facet (opc_cu_aggregate_std_dev_sample)
+# Aggregates - StandardDeviationSample (opc_cu_aggregate_std_dev_sample)
 #   Implementation state: documented -- visible but not selectable.
 #   OPC source: OPC-10000-13 §4.2.2.36.
 #   Detail: Core 2022 Server Facet.
-comment "Core 2022 Server Facet (DOCUMENTED) [OPC-10000-13 §4.2.2.36]"
+comment "Aggregates - StandardDeviationSample (DOCUMENTED) [OPC-10000-13 §4.2.2.36]"
 
-# Core 2022 Server Facet (opc_cu_aggregate_time_average)
+# Aggregates - TimeAverage (opc_cu_aggregate_time_average)
 #   Implementation state: documented -- visible but not selectable.
 #   OPC source: OPC-10000-13 §4.2.2.5.
 #   Detail: Core 2022 Server Facet.
-comment "Core 2022 Server Facet (DOCUMENTED) [OPC-10000-13 §4.2.2.5]"
+comment "Aggregates - TimeAverage (DOCUMENTED) [OPC-10000-13 §4.2.2.5]"
 
-# Core 2022 Server Facet (opc_cu_aggregate_time_average_2)
+# Aggregates - TimeAverage2 (opc_cu_aggregate_time_average_2)
 #   Implementation state: documented -- visible but not selectable.
 #   OPC source: OPC-10000-13 §4.2.2.6.
 #   Detail: Core 2022 Server Facet.
-comment "Core 2022 Server Facet (DOCUMENTED) [OPC-10000-13 §4.2.2.6]"
+comment "Aggregates - TimeAverage2 (DOCUMENTED) [OPC-10000-13 §4.2.2.6]"
 
-# Core 2022 Server Facet (opc_cu_aggregate_total)
+# Aggregates - Total (opc_cu_aggregate_total)
 #   Implementation state: documented -- visible but not selectable.
 #   OPC source: OPC-10000-13 §4.2.2.7.
 #   Detail: Core 2022 Server Facet.
-comment "Core 2022 Server Facet (DOCUMENTED) [OPC-10000-13 §4.2.2.7]"
+comment "Aggregates - Total (DOCUMENTED) [OPC-10000-13 §4.2.2.7]"
 
-# Core 2022 Server Facet (opc_cu_aggregate_total_2)
+# Aggregates - Total2 (opc_cu_aggregate_total_2)
 #   Implementation state: documented -- visible but not selectable.
 #   OPC source: OPC-10000-13 §4.2.2.8.
 #   Detail: Core 2022 Server Facet.
-comment "Core 2022 Server Facet (DOCUMENTED) [OPC-10000-13 §4.2.2.8]"
+comment "Aggregates - Total2 (DOCUMENTED) [OPC-10000-13 §4.2.2.8]"
 
-# Core 2022 Server Facet (opc_cu_aggregate_variance_population)
+# Aggregates - VariancePopulation (opc_cu_aggregate_variance_population)
 #   Implementation state: documented -- visible but not selectable.
 #   OPC source: OPC-10000-13 §4.2.2.39.
 #   Detail: Core 2022 Server Facet.
-comment "Core 2022 Server Facet (DOCUMENTED) [OPC-10000-13 §4.2.2.39]"
+comment "Aggregates - VariancePopulation (DOCUMENTED) [OPC-10000-13 §4.2.2.39]"
 
-# Core 2022 Server Facet (opc_cu_aggregate_variance_sample)
+# Aggregates - VarianceSample (opc_cu_aggregate_variance_sample)
 #   Implementation state: documented -- visible but not selectable.
 #   OPC source: OPC-10000-13 §4.2.2.37.
 #   Detail: Core 2022 Server Facet.
-comment "Core 2022 Server Facet (DOCUMENTED) [OPC-10000-13 §4.2.2.37]"
+comment "Aggregates - VarianceSample (DOCUMENTED) [OPC-10000-13 §4.2.2.37]"
 
-# Core 2022 Server Facet (opc_cu_aggregate_worst_quality)
+# Aggregates - WorstQuality (opc_cu_aggregate_worst_quality)
 #   Implementation state: documented -- visible but not selectable.
 #   OPC source: OPC-10000-13 §4.2.2.33.
 #   Detail: Core 2022 Server Facet.
-comment "Core 2022 Server Facet (DOCUMENTED) [OPC-10000-13 §4.2.2.33]"
+comment "Aggregates - WorstQuality (DOCUMENTED) [OPC-10000-13 §4.2.2.33]"
 
-# Core 2022 Server Facet (opc_cu_aggregate_worst_quality_2)
+# Aggregates - WorstQuality2 (opc_cu_aggregate_worst_quality_2)
 #   Implementation state: documented -- visible but not selectable.
 #   OPC source: OPC-10000-13 §4.2.2.34.
 #   Detail: Core 2022 Server Facet.
-comment "Core 2022 Server Facet (DOCUMENTED) [OPC-10000-13 §4.2.2.34]"
+comment "Aggregates - WorstQuality2 (DOCUMENTED) [OPC-10000-13 §4.2.2.34]"
+
+# Base Info Base Types + Core Types Folders (opc_cu_base_info_base_types)
+#   Implementation state: documented -- visible but not selectable.
+#   OPC source: OPC-10000-5.
+#   Detail: Core 2022 Server Facet.
+#   Notes: spec 080b: completes the base OPC UA type system in base_nodes.c -- the remaining built-in/abstract DataTypes (Guid14/ByteString15/XmlElement16/ExpandedNodeId18/DataValue23/DiagnosticInfo25/Integer27/UInteger28/Enumeration29/Duration290/NumericRange291/UtcTime294/EnumValueType7594/Union12756) with correct supertype closure (primitives re-parented under Integer/UInteger/Number), HasModellingRule(37) + ModellingRuleType(77) + the ModellingRule Objects (Optional80/Mandatory78/ExposesItsArray83/OptionalPlaceholder11508/MandatoryPlaceholder11510), and the EnumValueType Encoding Objects (DefaultXml7616/DefaultBinary8251). Satisfies CU 3188 (Base Types) and CU 3185 (Core Types Folders). Second slice of the base type-system completion (A2); depends on the specialized-DataTypes CU for the Number/String subtype arrays it extends.
+comment "Base Info Base Types + Core Types Folders (DOCUMENTED) [OPC-10000-5]"
 
 # Base Info Core Structure 2 (opc_cu_core_structure_2)
 #   Implementation state: documented -- visible but not selectable.
@@ -2167,26 +2135,26 @@ comment "Base Info Core Structure 2 (DOCUMENTED) [OPC-10000-3 §4]"
 #   Notes: Already-implemented CU added to manifest as claimed so the feature is tracked, gated by its Kconfig symbol, and covered by the claim/test map.
 comment "Base Info Core Views Folder (DOCUMENTED) [OPC-10000-3 §4]"
 
-# Core 2022 Server Facet (opc_cu_custom_methods)
+# Custom Methods (opc_cu_custom_methods)
 #   Implementation state: documented -- visible but not selectable.
 #   OPC source: OPC-10000-4 §5.11.
 #   Detail: Core 2022 Server Facet.
 #   Notes: Project-level Conformance Unit mirroring the legacy 'custom_methods' item; emits Kconfig symbol MUC_OPCUA_CU_CUSTOM_METHODS matching the #ifdef guard renamed in Task 3 of the CU-aligned code reorganisation plan.
-comment "Core 2022 Server Facet (DOCUMENTED) [OPC-10000-4 §5.11]"
+comment "Custom Methods (DOCUMENTED) [OPC-10000-4 §5.11]"
 
-# Core 2022 Server Facet (opc_cu_diagnostics)
+# Diagnostics (opc_cu_diagnostics)
 #   Implementation state: documented -- visible but not selectable.
 #   OPC source: OPC-10000-5 §6.3.
 #   Detail: Core 2022 Server Facet.
 #   Notes: Project-level Conformance Unit mirroring the legacy 'server_diagnostics' item; emits Kconfig symbol MUC_OPCUA_CU_DIAGNOSTICS matching the #ifdef guard renamed in Task 3 of the CU-aligned code reorganisation plan.
-comment "Core 2022 Server Facet (DOCUMENTED) [OPC-10000-5 §6.3]"
+comment "Diagnostics (DOCUMENTED) [OPC-10000-5 §6.3]"
 
-# Core 2022 Server Facet (opc_cu_dynamic_nodes)
+# Dynamic Nodes (opc_cu_dynamic_nodes)
 #   Implementation state: documented -- visible but not selectable.
 #   OPC source: OPC-10000-3.
 #   Detail: Core 2022 Server Facet.
 #   Notes: Project-level Conformance Unit mirroring the legacy 'dynamic_nodes' item; emits Kconfig symbol MUC_OPCUA_CU_DYNAMIC_NODES matching the #ifdef guard renamed in Task 3 of the CU-aligned code reorganisation plan.
-comment "Core 2022 Server Facet (DOCUMENTED) [OPC-10000-3]"
+comment "Dynamic Nodes (DOCUMENTED) [OPC-10000-3]"
 
 # Base Info Namespace Metadata (opc_cu_namespace_metadata)
 #   Implementation state: documented -- visible but not selectable.
@@ -2211,22 +2179,6 @@ comment "Base Info Server Capabilities 2 (DOCUMENTED) [OPC-10000-3 §4]"
 #   Imported from: comprehensive-fix (Fix 2).
 #   Notes: Already-implemented CU added to manifest as claimed so the feature is tracked, gated by its Kconfig symbol, and covered by the claim/test map.
 comment "Session Base (DOCUMENTED) [OPC-10000-4 §5.6]"
-
-# Monitor Items 500 (opc_monitor_items_500)
-#   Implementation state: documented -- visible but not selectable.
-#   OPC source: OPC-10000-4 §5.13.2.
-#   Detail: Monitor Items 500 -- CU 5242.
-#   Imported from: profiles/opcua-profile-snapshot.json.
-#   Notes: Satisfied by project-level CU opc_cu_subscription_standard; support for 500+ monitored items is stubbed as it requires substantial memory allocation. See src/cu/core_2022_server/monitor_items_500/stub.c.disabled.
-comment "Monitor Items 500 (DOCUMENTED) [OPC-10000-4 §5.13.2]"
-
-# Monitor MinQueueSize_05 (opc_monitor_minqueuesize_05)
-#   Implementation state: documented -- visible but not selectable.
-#   OPC source: OPC-10000-4 §5.13.2.
-#   Detail: Monitor MinQueueSize_05 -- CU 5250.
-#   Imported from: profiles/opcua-profile-snapshot.json.
-#   Notes: Satisfied by project-level CU opc_cu_subscription_standard; MinQueueSize_05 tuning is stubbed. See src/cu/core_2022_server/monitor_minqueuesize_05/stub.c.disabled.
-comment "Monitor MinQueueSize_05 (DOCUMENTED) [OPC-10000-4 §5.13.2]"
 
 # Address Space UserWriteMask (opc_cu_2163)
 #   Implementation state: documented -- visible but not selectable.
@@ -2822,12 +2774,6 @@ comment "A & C Shelving (DOCUMENTED)"
 #   Notes: Spec CU 3171: tracked in manifest; not yet claimed or implemented.
 comment "Discovery Server Announcement using mDNS  (DOCUMENTED)"
 
-# Authorization Service Configuration Server (opc_cu_3182)
-#   Implementation state: documented -- visible but not selectable.
-#   Detail: CU 3182:Authorization Service Configuration Server.
-#   Notes: Satisfied by role management implementation.
-comment "Authorization Service Configuration Server (DOCUMENTED)"
-
 # Base Info Security Role Capabilities (opc_cu_3197)
 #   Implementation state: documented -- visible but not selectable.
 #   Detail: CU 3197:Base Info Security Role Capabilities.
@@ -3169,30 +3115,6 @@ comment "Security User Identity Token Support (DOCUMENTED)"
 #   Detail: CU 5213:Auditing Connections.
 #   Notes: Spec CU 5213: tracked in manifest; not yet claimed or implemented.
 comment "Auditing Connections (DOCUMENTED)"
-
-# Monitor Items 500 (opc_cu_5242)
-#   Implementation state: documented -- visible but not selectable.
-#   Detail: CU 5242:Monitor Items 500.
-#   Notes: Spec CU 5242: tracked in manifest; not yet claimed or implemented.
-comment "Monitor Items 500 (DOCUMENTED)"
-
-# Subscription Minimum 05 (opc_cu_5248)
-#   Implementation state: documented -- visible but not selectable.
-#   Detail: CU 5248:Subscription Minimum 05.
-#   Notes: Spec CU 5248: tracked in manifest; not yet claimed or implemented.
-comment "Subscription Minimum 05 (DOCUMENTED)"
-
-# Subscription Publish Min 10 (opc_cu_5249)
-#   Implementation state: documented -- visible but not selectable.
-#   Detail: CU 5249:Subscription Publish Min 10.
-#   Notes: Spec CU 5249: tracked in manifest; not yet claimed or implemented.
-comment "Subscription Publish Min 10 (DOCUMENTED)"
-
-# Monitor MinQueueSize_05 (opc_cu_5250)
-#   Implementation state: documented -- visible but not selectable.
-#   Detail: CU 5250:Monitor MinQueueSize_05.
-#   Notes: Spec CU 5250: tracked in manifest; not yet claimed or implemented.
-comment "Monitor MinQueueSize_05 (DOCUMENTED)"
 
 # Security Role Server IdentityManagement (opc_cu_5274)
 #   Implementation state: documented -- visible but not selectable.
@@ -3876,12 +3798,6 @@ comment "Subscription PublishRequest Queue Overflow (DOCUMENTED)"
 #   Notes: Satisfied by project-level CU opc_cu_subscription_basic.
 comment "Base Info Fixed SamplingInterval (DOCUMENTED)"
 
-# Subscription Basic (opc_cu_3727)
-#   Implementation state: documented -- visible but not selectable.
-#   Detail: CU 3727:Subscription Basic.
-#   Notes: Support the following Subscription Services: CreateSubscription, ModifySubscription, DeleteSubscriptions, Publish, Republish and SetPublishingMode.
-comment "Subscription Basic (DOCUMENTED)"
-
 # Base Info Server Capabilities Subscriptions (opc_cu_3911)
 #   Implementation state: documented -- visible but not selectable.
 #   Detail: CU 3911:Base Info Server Capabilities Subscriptions.
@@ -3933,6 +3849,16 @@ menuconfig MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER
 	  Notes: Exposes Type System: all type-system CUs claimed
 
 if MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER
+
+config MUC_OPCUA_CU_BASE_INFO_BASE_TYPES
+	bool "CU: Base Info Base Types"
+	depends on MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER && MUC_OPCUA_CU_BASE_INFO_DATATYPES
+	default y if MUC_OPCUA_INTERN_PROFILE_EMBEDDED_2025_UA_SERVER
+	help
+	  Implementation state: claimed.
+	  OPC item: CU 3188:Base Info Base Types.
+	  Backing tests: test_profile_surface.
+	  Notes: Reconciled (spec 080b): the full base OPC UA type system is exposed in base_nodes.c and asserted by test_type_system -- all built-in/abstract DataTypes with supertype closure (primitives re-parented under Integer(27)/UInteger(28)/Number(26)), the base Object/Variable/ReferenceTypes, ModellingRuleType(77) + its ModellingRule Objects (78/80/83/11508/11510), and EnumValueType(7594)/Union(12756) with EnumValueType Encoding Objects (7616/8251). Satisfied by opc_cu_base_info_base_types. Supports type information of the base OPC UA concepts, like build-in DataTypes, base Object- and VariableTypes, and base ReferenceTypes. Includes the Encoding Objects for the DataTypes that are not Build-in or abstract DataTypes. Exposes the ObjectTypes BaseObjectType, FolderType, DataTypeEncodingType and ModellingRuleType in the AddressSpace. Exposes the VariableTypes BaseVariableType, PropertyType, and BaseDataVariableType in the AddressSpace. Exposes the DataTypes BaseDataType Boolean, ByteString, DateTime, DataValue, DiagnosticsInfo, Enumeration, ExpandedNodeId, Guid, LocalizedText, NodeId, Number, QualifiedName, String, Structure, XmlElement, Integer, UInteger, Double, Float, Sbyte, Int16, Int32, Int64, Byte, Uint16, Uint32, Uint64, StatusCode, UtcTime, Duration, NumericRange, EnumValueType, and Union and their Encoding Objects in the AddressSpace. Exposes the ReferenceTypes References, HierarchicalReferences, NonHierarchicalReferences, HasChild, Organizes, HasModellingRule, HasTypeDefinition, HasEncoding, Aggregates, HasSubtype, HasComponent, and HasProperty in the AddressSpace Exposes the Objects Optional, Mandatory, OptionalPlaceholder, MandatoryPlaceholder and ExposesItsArrayin the AddressSpace.
 
 config MUC_OPCUA_CU_BASE_INFO_SERVERTYPE
 	bool "CU: Base Info ServerType"
@@ -4055,12 +3981,6 @@ comment "Base Info ContentFilter (DOCUMENTED)"
 #   Detail: CU 3185:Base Info Core Types Folders.
 #   Notes: Reconciled (spec 080b): the core type-system Folder Nodes Types(86)/ObjectTypes(88)/DataTypes(90)/VariableTypes(89)/ReferenceTypes(91) are exposed in base_nodes.c and asserted by test_type_system. Satisfied by opc_cu_base_info_base_types. Exposes entry points into the type system in the AddressSpace. Specifically, these are the Folder Nodes: Types, ObjectTypes, DataTypes, VariableTypes, and ReferenceTypes.
 comment "Base Info Core Types Folders (DOCUMENTED)"
-
-# Base Info Base Types (opc_cu_3188)
-#   Implementation state: documented -- visible but not selectable.
-#   Detail: CU 3188:Base Info Base Types.
-#   Notes: Reconciled (spec 080b): the full base OPC UA type system is exposed in base_nodes.c and asserted by test_type_system -- all built-in/abstract DataTypes with supertype closure (primitives re-parented under Integer(27)/UInteger(28)/Number(26)), the base Object/Variable/ReferenceTypes, ModellingRuleType(77) + its ModellingRule Objects (78/80/83/11508/11510), and EnumValueType(7594)/Union(12756) with EnumValueType Encoding Objects (7616/8251). Satisfied by opc_cu_base_info_base_types. Supports type information of the base OPC UA concepts, like build-in DataTypes, base Object- and VariableTypes, and base ReferenceTypes. Includes the Encoding Objects for the DataTypes that are not Build-in or abstract DataTypes. Exposes the ObjectTypes BaseObjectType, FolderType, DataTypeEncodingType and ModellingRuleType in the AddressSpace. Exposes the VariableTypes BaseVariableType, PropertyType, and BaseDataVariableType in the AddressSpace. Exposes the DataTypes BaseDataType Boolean, ByteString, DateTime, DataValue, DiagnosticsInfo, Enumeration, ExpandedNodeId, Guid, LocalizedText, NodeId, Number, QualifiedName, String, Structure, XmlElement, Integer, UInteger, Double, Float, Sbyte, Int16, Int32, Int64, Byte, Uint16, Uint32, Uint64, StatusCode, UtcTime, Duration, NumericRange, EnumValueType, and Union and their Encoding Objects in the AddressSpace. Exposes the ReferenceTypes References, HierarchicalReferences, NonHierarchicalReferences, HasChild, Organizes, HasModellingRule, HasTypeDefinition, HasEncoding, Aggregates, HasSubtype, HasComponent, and HasProperty in the AddressSpace Exposes the Objects Optional, Mandatory, OptionalPlaceholder, MandatoryPlaceholder and ExposesItsArrayin the AddressSpace.
-comment "Base Info Base Types (DOCUMENTED)"
 
 # Base Info OptionSet DataType (opc_cu_3207)
 #   Implementation state: documented -- visible but not selectable.
@@ -4551,11 +4471,11 @@ comment "LogObject Facet (NOT IMPLEMENTED) [OPC-10000-7 §4.2]"
 #   Notes: AliasName Configuration Facet not implemented; AliasName feature is deferred.
 comment "AliasName Configuration Facet (NOT IMPLEMENTED) [OPC-10000-7 §4.2]"
 
-# AliasName Server PubSub Publisher Facet  (opc_facet_2323)
+# AliasName Server PubSub Publisher Facet (opc_facet_2323)
 #   Implementation state: unimplemented -- visible but not selectable.
 #   OPC source: OPC-10000-7 §4.2.
 #   Notes: AliasName Server PubSub Publisher Facet not implemented; AliasName+PubSub deferred.
-comment "AliasName Server PubSub Publisher Facet  (NOT IMPLEMENTED) [OPC-10000-7 §4.2]"
+comment "AliasName Server PubSub Publisher Facet (NOT IMPLEMENTED) [OPC-10000-7 §4.2]"
 
 endmenu
 
@@ -4605,15 +4525,6 @@ config MUC_OPCUA_CU_CERTIFICATE_MANAGER_PULL
 	  OPC source: OPC-10000-12 §7.6, 7.9.
 	  Backing tests: test_certificate_manager.
 	  Notes: Pull-model certificate management (OPC-10000-12 sections 7.6, 7.9). Build gate for the GDS pull handlers; full profile only. Reconciled from a hand-added Kconfig symbol.
-
-config MUC_OPCUA_CU_AUTHORIZATION_SERVICE_SERVER
-	bool "Authorization Service Server"
-	depends on MUC_OPCUA_CU_USER_TOKEN_JWT && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
-	default n
-	help
-	  Implementation state: implemented.
-	  OPC source: OPC-10000-7 §CU 1629 -- Authorization Service Server Facet.
-	  Notes: Authorization Service configuration nodes (OPC-10000-7 CU 1629). Build gate; off by default in all profiles, selectable. Reconciled from a hand-added Kconfig symbol.
 
 endmenu
 

@@ -20,9 +20,12 @@ Backing test column: comma-separated ctest names (as registered).
 | Claim / conformance unit | OPC UA § | Profiles | Backing test |
 |--------------------------|----------|----------|--------------|
 | Secure channel message crypto | OPC-10000-7 §4.3 | micro, embedded, standard, full | test_secure_handshake_modern |
-| Address Space AddIn Reference |  | full | test_profile_surface |
+| Monitor Items 500 | OPC-10000-4 §5.13.2 | standard, full | test_subscriptions_capacity |
+| Monitor MinQueueSize_05 | OPC-10000-4 §5.13.2 | standard, full | test_subscriptions_capacity |
+| Address Space AddIn Reference |  | full | test_profile_surface, test_type_system |
 | Address Space AddIn DefaultInstanceBrowsename |  | full | test_profile_surface |
 | Base Info LocalTime |  | full | test_profile_surface |
+| SecurityPolicy Support |  | all | test_security_policy, test_secure_channel |
 | Base Info Selection List |  | full | test_profile_surface |
 | Base Info ValueAsText |  | full | test_profile_surface |
 | Base Info OptionSet |  | full | test_profile_surface |
@@ -30,9 +33,10 @@ Backing test column: comma-separated ctest names (as registered).
 | Address Space Interfaces |  | full | test_profile_surface |
 | Base Info Locations Object |  | full | test_profile_surface |
 | Base Info Currency |  | full | test_profile_surface |
+| Base Info Base Types |  | embedded, standard, full | test_profile_surface |
 | Base Info ServerType |  | embedded, standard, full | test_type_system |
 | Base Info Type Information |  | embedded, standard, full | test_claim_map |
-| Core 2022 Server Facet | OPC-10000-4 §5.12/5.13 | micro, embedded, standard, full | test_subscriptions, test_subscriptions_errors |
+| Core 2022 Server Facet: Subscription Basic | OPC-10000-4 §5.12/5.13 | micro, embedded, standard, full | test_subscriptions, test_subscriptions_errors |
 | Core 2022 Server Facet | OPC-10000-7 | embedded, standard, full | test_subscriptions_capacity, test_subscription_deadband, test_subscription_publish |
 | Core 2022 Server Facet | OPC-10000-7 | full | test_ecc_crypto |
 | Core 2022 Server Facet | OPC-10000-9 | full | test_alarms_conditions, test_event_notifier, test_event_serializer |
@@ -53,19 +57,17 @@ Backing test column: comma-separated ctest names (as registered).
 | Core 2022 Server Facet | OPC-10000-4 | full | test_read_browsename_namespace |
 | Core 2022 Server Facet | OPC-10000-5 | embedded, standard, full | test_type_system |
 | Core 2022 Server Facet | OPC-10000-5 | embedded, standard, full | test_type_system |
-| Core 2022 Server Facet | OPC-10000-5 | embedded, standard, full | test_type_system |
-| Core 2017 Server Facet: Attribute Read | OPC-10000-4 §5.10.2 | all | test_read_service |
-| Core 2017: View Basic / TranslateBrowsePath | OPC-10000-4 §5.8 | all | test_browse_service, test_browse_limits, test_view_services |
-| Core 2017: Discovery Find Servers Self / Get Endpoints | OPC-10000-4 §5.4 | all | test_discovery_endpoint |
 | Core 2017: View RegisterNodes | OPC-10000-4 §5.9 | all | test_view_services, test_profile_surface |
-| Core 2017 Attribute Write | OPC-10000-4 §5.10.4 | full | test_write_service |
 | Historical Access Server Facet | OPC-10000-11 | full | test_history |
 | Query | OPC-10000-4 §5.9 | full | test_query_service |
 | NodeManagement | OPC-10000-4 §5.7 | full | test_node_management, test_node_management_errors |
 | View TranslateBrowsePath | OPC-10000-4 §5.9.4 | all | test_browse_service, test_view_services |
 | Discovery Get Endpoints | OPC-10000-4 §5.5.1, 5.5.4 | all | test_discovery_endpoint, test_discovery_services |
+| Discovery Find Servers Self | OPC-10000-4 §5.5.2 | all | test_discovery_services, test_discovery_endpoint |
+| Attribute Write Values | OPC-10000-4 §5.11.4 | full | test_write_value_gate, test_write_service |
 | Session Change User | OPC-10000-4 §5.7.3 | full | test_session, test_session_auth |
 | Attribute Write StatusCode & Timestamp | OPC-10000-4 §5.11.4 | full | test_write_service, test_write_response |
+| Attribute Read |  | all | test_profile_surface, test_read_service |
 | Attribute Write Index | OPC-10000-4 §5.11.4 | full | test_write_service |
 | Base Info Diagnostics | OPC-10000-5 §6.3.1, 6.3.3, 8.3.2, 12.9 | full | test_diagnostics, test_profile_surface |
 | View Basic 2 | OPC-10000-4 §5.9.2, 5.9.3 | all | test_browse_service, test_browse_limits, test_view_services |
@@ -113,6 +115,9 @@ Backing test column: comma-separated ctest names (as registered).
 | Aggregate Subscription – VarianceSample | OPC-10000-13 §5.4.3.38 | full | test_profile_surface |
 | Aggregate Subscription – StandardDeviationPopulation | OPC-10000-13 §5.4.3.39 | full | test_profile_surface |
 | Aggregate Subscription – VariancePopulation | OPC-10000-13 §5.4.3.40 | full | test_profile_surface |
+| Subscription Publish Min 10 |  | standard, full | test_subscriptions_capacity, test_subscription_deadband, test_subscription_publish |
+| Subscription Minimum 05 |  | standard, full | test_subscriptions_capacity, test_subscription_deadband, test_subscription_publish |
+| Authorization Service Configuration Server | OPC-10000-12 §9.7.4 | full | test_profile_surface, tests/unit/test_type_system.c |
 | Aggregate - StandardDeviationPopulation |  |  | test_history |
 | Aggregate - Interpolative |  |  | test_history |
 | Aggregate - MaximumActualTime2 |  |  | test_history |

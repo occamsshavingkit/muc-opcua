@@ -1,0 +1,8 @@
+#ifndef MUC_OPCUA_CU_MONITOR_MINQUEUESIZE_05_H
+#define MUC_OPCUA_CU_MONITOR_MINQUEUESIZE_05_H
+
+#define MU_CU_MONITOR_MINQUEUESIZE_05_REQUIRED_DEPTH 5
+
+extern const unsigned char mu_cu_monitor_minqueuesize_05_enabled;
+
+#endif

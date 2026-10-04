@@ -10,7 +10,7 @@
 void setUp(void) {}
 void tearDown(void) {}
 
-#if MUC_OPCUA_SUBSCRIPTIONS && MUC_OPCUA_SUBSCRIPTIONS_STANDARD
+#if MUC_OPCUA_CU_SUBSCRIPTION_BASIC && MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
 
 static size_t aggregate_filter_body_length(opcua_uint32_t aggregate_type) {
     size_t nodeid_length = 7u;
@@ -890,14 +890,14 @@ void test_aggregate_zero_heap_containment(void) {
 #else
 
 void test_aggregate_requires_standard_subscriptions(void) {
-    TEST_PASS_MESSAGE("MUC_OPCUA_SUBSCRIPTIONS_STANDARD is disabled in this build");
+    TEST_PASS_MESSAGE("MUC_OPCUA_CU_SUBSCRIPTION_STANDARD is disabled in this build");
 }
 
 #endif
 
 int main(void) {
     UNITY_BEGIN();
-#if MUC_OPCUA_SUBSCRIPTIONS && MUC_OPCUA_SUBSCRIPTIONS_STANDARD
+#if MUC_OPCUA_CU_SUBSCRIPTION_BASIC && MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
     RUN_TEST(test_aggregate_standard_nodeids_match_opcua_nodeset);
     RUN_TEST(test_aggregate_filter_rejects_stale_operation_limits_nodeids);
     RUN_TEST(test_aggregate_filter_decodes_correctly);

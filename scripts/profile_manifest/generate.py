@@ -30,12 +30,8 @@ from profile_manifest import graph_deps  # noqa: E402  # pylint: disable=wrong-i
 
 _DEFAULT_PROFILES = ("nano", "micro", "embedded", "standard", "full", "custom")
 _SELECTABLE_STATES = ("claimed", "implemented", "deferred")
-_UNSELECTABLE_STATES = ("unimplemented", "documented")
-
-_MARKER_ID_RENAMES: dict[str, str] = {
-    "STANDARD_PROFILE": "MUC_OPCUA_MARKER_STANDARD_PROFILE",
-}
-
+_KCONFIG_SELECTABLE_STATES = ("claimed", "implemented")
+_UNSELECTABLE_STATES = ("unimplemented", "documented", "deferred")
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -142,19 +138,6 @@ def _cu_symbol(item: dict) -> str | None:
     if isinstance(opc_display_name, str) and opc_display_name:
         return compute_kconfig_symbol(opc_display_name, "conformance_unit")
     return None
-
-
-def _facet_name(item: dict) -> str:
-    """Return a human-readable facet/CU name for *item*.
-
-    Falls back to the item-id-derived prompt when no OPC facet name is present.
-    """
-    opc_ref = item.get("opc_reference")
-    if isinstance(opc_ref, dict):
-        facet = opc_ref.get("facet")
-        if isinstance(facet, str) and facet:
-            return facet
-    return _item_prompt(item)
 
 
 def _opc_source_string(opc_ref: dict | None) -> str | None:
@@ -295,6 +278,42 @@ def _contained_cu_ids(manifest: dict) -> set[str]:
     return ids
 
 
+def _required_profile_cu_symbols(
+    manifest: dict, profile_key: object,
+) -> list[str] | None:
+    if not isinstance(profile_key, str) or not profile_key:
+        return None
+
+    symbols: set[str] = set()
+    found_requirement = False
+    for item in manifest.get("items", []):
+        if not isinstance(item, dict) or item.get("kind") != "conformance_unit":
+            continue
+        graph_requirements = item.get("required_for_profile")
+        project_requirements = item.get("project_required_for_profile")
+        required = (
+            isinstance(graph_requirements, dict)
+            and graph_requirements.get(profile_key) is True
+        ) or (
+            isinstance(project_requirements, dict)
+            and project_requirements.get(profile_key) is True
+        )
+        if not required:
+            continue
+
+        found_requirement = True
+        if item.get("implementation_state") not in _KCONFIG_SELECTABLE_STATES:
+            return None
+        symbol = _cu_symbol(item)
+        if not symbol:
+            return None
+        symbols.add(symbol)
+
+    if not found_requirement:
+        return None
+    return sorted(symbols)
+
+
 # ---------------------------------------------------------------------------
 # Profile facets-match helpers (T036, OPC-10000-7 §4.2 and §4.3)
 # ---------------------------------------------------------------------------
@@ -324,7 +343,7 @@ def _selectable_facet_toggles(manifest: dict) -> list[tuple[str, dict]]:
         facet_item = items_by_id.get(facet_id)
         if not isinstance(facet_item, dict):
             continue
-        if facet_item.get("implementation_state") not in _SELECTABLE_STATES:
+        if facet_item.get("implementation_state") not in _KCONFIG_SELECTABLE_STATES:
             continue
         symbol = _facet_toggle_symbol(facet_item)
         if not symbol or symbol in seen:
@@ -367,7 +386,7 @@ def _selectable_contained_cus(manifest: dict) -> list[tuple[str, dict]]:
             cu_item = items_by_id.get(cu_id)
             if not isinstance(cu_item, dict):
                 continue
-            if cu_item.get("implementation_state") not in _SELECTABLE_STATES:
+            if cu_item.get("implementation_state") not in _KCONFIG_SELECTABLE_STATES:
                 continue
             symbol = _cu_symbol(cu_item)
             if not symbol or symbol in seen:
@@ -580,12 +599,14 @@ def generate_kconfig(manifest: dict) -> str:
         note = marker.get("note")
         if note:
             lines.append("# " + note)
-        marker_id = _MARKER_ID_RENAMES.get(marker["id"], marker["id"])
+        marker_id = str(marker["id"])
         lines.append("config " + marker_id)
         lines.append("\tbool")
-        conditions = marker.get("default_if", [])
-        if conditions:
-            lines.append("\tdefault y if " + " || ".join(conditions))
+        required_symbols = _required_profile_cu_symbols(
+            manifest, marker.get("required_profile"),
+        )
+        if required_symbols:
+            lines.append("\tdefault y if " + " && ".join(required_symbols))
         else:
             lines.append("\tdefault n")
         lines.append("")
@@ -597,8 +618,9 @@ def generate_kconfig(manifest: dict) -> str:
     # implies the Facet toggles whose minimum profile matches this level so a
     # profile switch re-seeds facet defaults (OPC-10000-7 §4.3).
     items = manifest.get("items", [])
-    items_by_id = {
-        i.get("id"): i for i in items if isinstance(i, dict) and i.get("id")
+    items_by_id: dict[str, dict] = {
+        i["id"]: i for i in items
+        if isinstance(i, dict) and isinstance(i.get("id"), str)
     }
     facet_implies = _compute_facet_implies(manifest, items_by_id)
     _emit_internal_profile_symbols(
@@ -627,7 +649,7 @@ def generate_kconfig(manifest: dict) -> str:
     ) else set()
     selectable_flat = [
         i for i in items
-        if i.get("implementation_state") in _SELECTABLE_STATES
+        if i.get("implementation_state") in _KCONFIG_SELECTABLE_STATES
         and i.get("kind") != "optimization"
         and i.get("id") not in contained_cus
         and i.get("id") not in facet_ids
@@ -666,7 +688,7 @@ def generate_kconfig(manifest: dict) -> str:
     optimization_items = [
         i for i in items
         if i.get("kind") == "optimization"
-        and i.get("implementation_state") in _SELECTABLE_STATES
+        and i.get("implementation_state") in _KCONFIG_SELECTABLE_STATES
         and i.get("id") not in contained_cus
     ]
     if optimization_items:
@@ -731,6 +753,14 @@ def _emit_selectable(
 
     depends_on = item.get("depends_on") or []
     depends_expr = _depends_expr(depends_on, item.get("depends_on_op"))
+    semantic_expr = _depends_expr(item.get("semantic_depends_on") or [], "and")
+    if depends_expr and semantic_expr:
+        if len(depends_on) > 1:
+            depends_expr = "(" + depends_expr + ") && " + semantic_expr
+        else:
+            depends_expr += " && " + semantic_expr
+    elif semantic_expr:
+        depends_expr = semantic_expr
     if depends_expr:
         lines.append("\tdepends on " + depends_expr)
 
@@ -750,11 +780,12 @@ def _emit_unselectable(lines: list[str], item: dict) -> None:
     immediately above the ``comment`` directive.  No config symbol is emitted, so the
     item cannot appear in ``.config`` / ``config.cmake`` output and cannot be set.
     """
-    name = _facet_name(item)
+    name = _item_prompt(item)
     opc_ref = item.get("opc_reference")
     source = _opc_source_string(opc_ref if isinstance(opc_ref, dict) else None)
     detail = _opc_detail_string(opc_ref if isinstance(opc_ref, dict) else None)
     state = item.get("implementation_state", "unknown")
+    reference = source or (detail if state == "unimplemented" else "")
     item_id = item.get("id", "")
 
     # Context comment lines (readable in the Kconfig file, not in menuconfig).
@@ -775,8 +806,8 @@ def _emit_unselectable(lines: list[str], item: dict) -> None:
 
     # Visible comment directive in menuconfig (always shown, never toggleable).
     label = "DOCUMENTED" if state == "documented" else "NOT IMPLEMENTED"
-    if source:
-        lines.append('comment "' + name + ' (' + label + ') [' + source + ']"')
+    if reference:
+        lines.append('comment "' + name + ' (' + label + ') [' + reference + ']"')
     else:
         lines.append('comment "' + name + ' (' + label + ')"')
     lines.append("")
@@ -821,7 +852,7 @@ def _facet_default_profile_keys(
     for cu in contained_cu_items:
         if not isinstance(cu, dict):
             continue
-        if cu.get("implementation_state") not in _SELECTABLE_STATES:
+        if cu.get("implementation_state") not in _KCONFIG_SELECTABLE_STATES:
             continue
         cu_pd = cu.get("profile_defaults")
         if not isinstance(cu_pd, dict):
@@ -898,7 +929,7 @@ def _compute_facet_implies(
         facet_item = items_by_id.get(facet_id)
         if not isinstance(facet_item, dict):
             continue
-        if facet_item.get("implementation_state") not in _SELECTABLE_STATES:
+        if facet_item.get("implementation_state") not in _KCONFIG_SELECTABLE_STATES:
             continue
         facet_symbol = _facet_toggle_symbol(facet_item)
         if not facet_symbol:
@@ -930,12 +961,11 @@ def _emit_one_facet_menu(
     pattern (OPC-10000-7 §4.2).  The ``if`` block gates every contained CU so
     CU entries inside the block omit the per-CU ``depends on <SYM>`` (the
     ``if`` already enforces facet-off → CU-off, preserving group-off
-    behaviour).  Unselectable (documented or unimplemented) facets retain the
-    ``menu`` / ``comment`` / ``endmenu`` wrapper because they have no toggle
-    symbol to drive a ``menuconfig`` header.
+    behaviour). Documented and unimplemented contained CUs are emitted as
+    visible comments but never receive selectable symbols.
     """
     state = facet_item.get("implementation_state")
-    if state not in _SELECTABLE_STATES and state not in _UNSELECTABLE_STATES:
+    if state not in _KCONFIG_SELECTABLE_STATES:
         return
     prompt = _item_prompt(facet_item)
 
@@ -949,24 +979,18 @@ def _emit_one_facet_menu(
             if isinstance(cu_item, dict):
                 contained_cu_items.append(cu_item)
 
-    facet_symbol = (
-        _facet_toggle_symbol(facet_item)
-        if state in _SELECTABLE_STATES
-        else None
-    )
+    facet_symbol = _facet_toggle_symbol(facet_item)
+    if facet_symbol is None:
+        return
 
     # -- Facet header -------------------------------------------------------
     has_children = any(
-        cu_item.get("implementation_state") in _SELECTABLE_STATES
+        cu_item.get("implementation_state") in _KCONFIG_SELECTABLE_STATES
         or cu_item.get("implementation_state") in _UNSELECTABLE_STATES
         for cu_item in contained_cu_items
     )
-    use_menuconfig = (
-        state in _SELECTABLE_STATES and facet_symbol is not None and has_children
-    )
-    use_plain_config = (
-        state in _SELECTABLE_STATES and facet_symbol is not None and not has_children
-    )
+    use_menuconfig = has_children
+    use_plain_config = not has_children
     if use_menuconfig:
         assert facet_symbol is not None
         if facet_symbol not in emitted_facet_symbols:
@@ -991,14 +1015,6 @@ def _emit_one_facet_menu(
             )
             _emit_help(lines, facet_item)
             lines.append("")
-    else:
-        # Non-selectable facet: no toggle symbol, keep menu/comment/endmenu
-        # so the item is traceable in the generated Kconfig (its item_id and
-        # state are visible) even when the facet has zero contained CUs.
-        lines.append('menu "Facet: ' + prompt + '"')
-        lines.append("")
-        _emit_unselectable(lines, facet_item)
-
     # -- Contained CUs -----------------------------------------------------
     # Emit selectable (claimed/implemented/deferred) CUs FIRST so the working
     # toggles lead the facet block, then emit unselectable (documented or
@@ -1008,11 +1024,7 @@ def _emit_one_facet_menu(
     # redundancy; the ``if`` enforces facet-off → CU-off.
     selectable_in_facet = [
         cu_item for cu_item in contained_cu_items
-        if cu_item.get("implementation_state") in _SELECTABLE_STATES
-    ]
-    unselectable_in_facet = [
-        cu_item for cu_item in contained_cu_items
-        if cu_item.get("implementation_state") in _UNSELECTABLE_STATES
+        if cu_item.get("implementation_state") in _KCONFIG_SELECTABLE_STATES
     ]
     cu_facet_gate: str | None = None  # if-block handles the dependency
     for cu_item in selectable_in_facet:
@@ -1020,17 +1032,15 @@ def _emit_one_facet_menu(
             lines, cu_item, profile_symbols,
             facet_symbol=cu_facet_gate,
         )
+    unselectable_in_facet = [
+        cu_item for cu_item in contained_cu_items
+        if cu_item.get("implementation_state") in _UNSELECTABLE_STATES
+    ]
     for cu_item in unselectable_in_facet:
         _emit_unselectable(lines, cu_item)
-
     # -- Close block -------------------------------------------------------
     if use_menuconfig:
         lines.append("endif")
-        lines.append("")
-    elif use_plain_config:
-        pass  # config with no children -- no block to close
-    else:
-        lines.append("endmenu")
         lines.append("")
 
 
@@ -1077,7 +1087,7 @@ def _emit_profile_sections(
             continue
         if item.get("id") in contained_cus:
             continue
-        if item.get("implementation_state") not in _SELECTABLE_STATES:
+        if item.get("implementation_state") not in _KCONFIG_SELECTABLE_STATES:
             continue
         bare_cu_lowest[item["id"]] = _lowest_default_profile(item)
 
@@ -1528,6 +1538,8 @@ def _claim_name(item: dict) -> str:
     if isinstance(opc_ref, dict):
         facet = opc_ref.get("facet")
         cu_name = opc_ref.get("cu_name")
+    if facet and cu_name and facet == cu_name:
+        return str(cu_name)
     if facet and cu_name:
         return str(facet) + ": " + str(cu_name)
     if facet:
@@ -1790,7 +1802,8 @@ def generate_build_docs_section(manifest: dict) -> str:
     items = manifest.get("items", [])
     selectable = [
         i for i in items
-        if isinstance(i, dict) and i.get("implementation_state") in _SELECTABLE_STATES
+        if isinstance(i, dict)
+        and i.get("implementation_state") in _KCONFIG_SELECTABLE_STATES
     ]
 
     lines.append("### Feature symbols")
@@ -1807,7 +1820,9 @@ def generate_build_docs_section(manifest: dict) -> str:
         for pk in _STANDARD_PROFILES_NO_CUSTOM:
             cells.append("✅" if pd.get(pk) is True else "")
         depends_on = item.get("depends_on") or []
-        dep_str = ", ".join(depends_on) if depends_on else ""
+        semantic_depends_on = item.get("semantic_depends_on") or []
+        all_depends_on = list(dict.fromkeys(depends_on + semantic_depends_on))
+        dep_str = ", ".join(all_depends_on) if all_depends_on else ""
         lines.append(
             "| " + kconfig + " | " + item_id + " | " + state + " | "
             + " | ".join(cells) + " | " + dep_str + " |"
@@ -1843,18 +1858,17 @@ def generate_build_docs_section(manifest: dict) -> str:
     # -- Unavailable items ------------------------------------------------
     unavailable = [
         i for i in items
-        if isinstance(i, dict) and i.get("implementation_state") in _UNSELECTABLE_STATES
+        if isinstance(i, dict)
+        and i.get("implementation_state") in _UNSELECTABLE_STATES
     ]
 
-    lines.append("### Unavailable OPC items in Kconfig")
+    lines.append("### Unavailable OPC items")
     lines.append("")
     lines.append(
         "The following OPC items are tracked in the manifest but are NOT implemented. "
-        "They appear in the generated `Kconfig` as visible `comment` directives so "
-        "they show up in `menuconfig` for roadmap awareness, but they carry no config "
-        "symbol and cannot be selected, toggled, or set in `.config`. This makes the "
-        "full OPC feature surface visible to developers without implying any "
-        "implementation claim."
+        "They appear in generated `Kconfig` only as non-selectable `comment` lines "
+        "marked `(NOT IMPLEMENTED)` and remain listed here for roadmap awareness "
+        "without implying any implementation claim."
     )
     lines.append("")
 

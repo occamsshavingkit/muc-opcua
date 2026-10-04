@@ -175,9 +175,14 @@ static void require_abort_chunk_tcp_error_no_service_payload(const uint8_t *data
     }
 }
 
-static void require_non_final_chunk_bad_tcp_internal_error_no_service_payload(const uint8_t *data, size_t size) {
+static void require_non_final_chunk_header_status(const uint8_t *data, size_t size) {
     uint8_t buffer[FUZZ_NON_FINAL_CHUNK_SIZE];
     mu_message_header_t header;
+#ifdef MUC_OPCUA_CU_MULTI_CHUNK
+    const opcua_statuscode_t expected_status = MU_STATUS_GOOD;
+#else
+    const opcua_statuscode_t expected_status = MU_STATUS_BAD_TCPMESSAGETYPEINVALID;
+#endif
     size_t i;
 
     buffer[0] = (uint8_t)'M';
@@ -199,8 +204,8 @@ static void require_non_final_chunk_bad_tcp_internal_error_no_service_payload(co
                                     (uint8_t)(0x55u ^ (uint8_t)i));
     }
 
-    /* OPC-10000-6 section 6.7.2: continuation chunks are not complete MessageBody dispatch units. */
-    if (mu_parse_message_header(buffer, sizeof(buffer), &header) != MU_STATUS_BAD_TCPINTERNALERROR) {
+    /* OPC-10000-6 section 6.7.2: continuation chunks are valid only when multi-chunk support is compiled in. */
+    if (mu_parse_message_header(buffer, sizeof(buffer), &header) != expected_status) {
         abort();
     }
 }
@@ -216,6 +221,6 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     require_bad_tcp_message_type_invalid(data, size);
     require_message_size_boundary_tcp_errors(data, size);
     require_abort_chunk_tcp_error_no_service_payload(data, size);
-    require_non_final_chunk_bad_tcp_internal_error_no_service_payload(data, size);
+    require_non_final_chunk_header_status(data, size);
     return 0;
 }

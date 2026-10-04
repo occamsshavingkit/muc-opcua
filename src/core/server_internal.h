@@ -297,13 +297,13 @@ opcua_statuscode_t handle_write(mu_server_t *server, mu_binary_reader_t *r, mu_b
                                 size_t *response_length);
 #endif
 
-/* Browse-family service handlers — implemented in dispatch_view.c (T011).
- * The dispatch table in service_dispatch.c references these by name. */
-#ifdef MUC_OPCUA_CU_VIEW_BASIC_TRANSLATEBROWSEPATH
+#ifdef MUC_OPCUA_CU_VIEW_BASIC_2
 opcua_statuscode_t handle_browse(mu_server_t *server, mu_binary_reader_t *r, mu_binary_writer_t *w,
                                  size_t *response_length);
 opcua_statuscode_t handle_browse_next(mu_server_t *server, mu_binary_reader_t *r, mu_binary_writer_t *w,
                                       size_t *response_length);
+#endif
+#ifdef MUC_OPCUA_CU_VIEW_TRANSLATEBROWSEPATH
 opcua_statuscode_t handle_translate_browse_paths(mu_server_t *server, mu_binary_reader_t *r, mu_binary_writer_t *w,
                                                  size_t *response_length);
 #endif

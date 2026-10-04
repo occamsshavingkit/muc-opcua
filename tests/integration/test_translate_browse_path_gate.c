@@ -10,10 +10,6 @@
 #include "unity.h"
 #include <string.h>
 
-#ifndef MUC_OPCUA_CU_VIEW_BASIC_TRANSLATEBROWSEPATH
-#define MUC_OPCUA_CU_VIEW_BASIC_TRANSLATEBROWSEPATH 0
-#endif
-
 #ifndef MUC_OPCUA_CU_VIEW_TRANSLATEBROWSEPATH
 #define MUC_OPCUA_CU_VIEW_TRANSLATEBROWSEPATH 0
 #endif
@@ -226,7 +222,7 @@ static opcua_uint32_t read_response_type(const opcua_byte_t *buffer, size_t leng
     return response_type.identifier.numeric;
 }
 
-void test_translatebrowsepaths_dedicated_gate_is_independent_of_browse_aggregate(void) {
+void test_view_service_dedicated_gates_are_independent(void) {
     _Alignas(8) opcua_byte_t storage[MU_SERVER_STORAGE_BYTES];
     opcua_byte_t request[256];
     opcua_byte_t response[512];
@@ -234,24 +230,7 @@ void test_translatebrowsepaths_dedicated_gate_is_independent_of_browse_aggregate
     size_t response_len;
     mu_server_t *server = init_activated_server(storage, sizeof(storage));
 
-#if MUC_OPCUA_CU_VIEW_BASIC_TRANSLATEBROWSEPATH && !MUC_OPCUA_CU_VIEW_BASIC_2 && MUC_OPCUA_CU_VIEW_TRANSLATEBROWSEPATH
-    request_len = build_browse_request(request, sizeof(request));
-    response_len = sizeof(response);
-    TEST_ASSERT_EQUAL(MU_STATUS_BAD_SERVICEUNSUPPORTED,
-                      mu_service_dispatch(server, MU_ID_BROWSEREQUEST, request, request_len, response, &response_len));
-
-    request_len = build_browse_next_request(request, sizeof(request));
-    response_len = sizeof(response);
-    TEST_ASSERT_EQUAL(MU_STATUS_BAD_SERVICEUNSUPPORTED, mu_service_dispatch(server, MU_ID_BROWSENEXTREQUEST, request,
-                                                                            request_len, response, &response_len));
-
-    request_len = build_translate_request(request, sizeof(request));
-    response_len = sizeof(response);
-    TEST_ASSERT_EQUAL(MU_STATUS_GOOD, mu_service_dispatch(server, MU_ID_TRANSLATEBROWSEPATHSTONODEIDSREQUEST, request,
-                                                          request_len, response, &response_len));
-    TEST_ASSERT_EQUAL(MU_ID_TRANSLATEBROWSEPATHSTONODEIDSRESPONSE, read_response_type(response, response_len));
-#elif !MUC_OPCUA_CU_VIEW_BASIC_TRANSLATEBROWSEPATH && MUC_OPCUA_CU_VIEW_BASIC_2 &&                                     \
-    !MUC_OPCUA_CU_VIEW_TRANSLATEBROWSEPATH
+#if MUC_OPCUA_CU_VIEW_BASIC_2 && !MUC_OPCUA_CU_VIEW_TRANSLATEBROWSEPATH
     request_len = build_browse_request(request, sizeof(request));
     response_len = sizeof(response);
     TEST_ASSERT_EQUAL(MU_STATUS_GOOD,
@@ -314,6 +293,6 @@ void test_translatebrowsepaths_dedicated_gate_is_independent_of_browse_aggregate
 
 int main(void) {
     UNITY_BEGIN();
-    RUN_TEST(test_translatebrowsepaths_dedicated_gate_is_independent_of_browse_aggregate);
+    RUN_TEST(test_view_service_dedicated_gates_are_independent);
     return UNITY_END();
 }

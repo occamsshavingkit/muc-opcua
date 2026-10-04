@@ -20,7 +20,7 @@
 **Purpose**: Kconfig symbols, CMake gating, build integration
 
 - [x] T001 Add `MUC_OPCUA_CU_USER_TOKEN_JWT` Kconfig symbol with depends on `MUC_OPCUA_CU_USER_AUTH`, default `y` for full profile, `n` otherwise in `Kconfig`
-- [x] T002 [P] Add `MUC_OPCUA_CU_AUTHORIZATION_SERVICE_SERVER` Kconfig symbol with depends on `MUC_OPCUA_CU_USER_TOKEN_JWT && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION`, default `y` for full profile, `n` otherwise in `Kconfig`
+- [x] T002 [P] Add `MUC_OPCUA_CU_AUTHORIZATION_SERVICE_CONFIGURATION_SERVER` Kconfig symbol with depends on `MUC_OPCUA_CU_USER_TOKEN_JWT && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION`, default `y` for full profile, `n` otherwise in `Kconfig`
 - [x] T003 [P] Add `mu_jwt_config_t` and `mu_jwt_issuer_t` structs to `include/muc_opcua/server.h` (gated on `MUC_OPCUA_CU_USER_TOKEN_JWT`) per data-model.md
 - [x] T004 [P] Add `mu_jwt_result_t` enum and `mu_jwt_alg_t` enum to new `include/muc_opcua/authorization/jwt.h`
 - [x] T005 Add CMake gating for `src/cu/core_2022_server/authorization/` source files in `src/CMakeLists.txt`
@@ -110,14 +110,14 @@
 
 ---
 
-## Phase 6: Address Space (CU 1629)
+## Phase 6: Address Space (CU 3182)
 
-**Purpose**: AuthorizationServiceConfigurationType InstanceDeclarations for CU 1629 compliance. Gated on `MUC_OPCUA_CU_AUTHORIZATION_SERVICE_SERVER`.
+**Purpose**: AuthorizationServiceConfigurationType InstanceDeclarations for CU 3182 compliance. Gated on `MUC_OPCUA_CU_AUTHORIZATION_SERVICE_CONFIGURATION_SERVER`.
 
-- [x] T028 Add `AuthorizationServiceConfigurationType` type-system InstanceDeclarations in `src/address_space/base_nodes.c` (gated on `MUC_OPCUA_CU_BASE_INFO_SERVERTYPE && MUC_OPCUA_CU_AUTHORIZATION_SERVICE_SERVER && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION`) per OPC-10000-12 §9.7.4, data-model.md
-- [x] T029 [P] Add conformance doc for CU 1629 in `docs/conformance/authorization-service.md` per OPC-10000-7 §6.6
+- [x] T028 Add `AuthorizationServiceConfigurationType` type-system InstanceDeclarations in `src/address_space/base_nodes.c` (gated on `MUC_OPCUA_CU_BASE_INFO_SERVERTYPE && MUC_OPCUA_CU_AUTHORIZATION_SERVICE_CONFIGURATION_SERVER && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION`) per OPC-10000-12 §9.7.4, data-model.md
+- [x] T029 [P] Add conformance doc for CU 3182 in `docs/conformance/authorization-service.md` per OPC-10000-7 §6.6
 - [x] T030 [P] Add conformance doc for CU 1697 in `docs/conformance/jwt-user-token.md` per OPC-10000-7 §6.6
-- [x] T031 Update `docs/conformance/opc-profile-roadmap.md` to claim CU 1629 and CU 1697 for full profile
+- [x] T031 Update `docs/conformance/opc-profile-roadmap.md` to claim CU 3182 and CU 1697 for full profile
 
 ---
 
@@ -167,8 +167,8 @@ Phase 1 + 2 + 3 = working JWT session activation with single issuer. This is ind
 
 ### Authorization Service address-space gating
 
-- [x] T038 [P] Add type-system tests in `tests/unit/test_type_system.c` proving NodeIds 17852-17855, their NodeClasses, DataTypes, PropertyType references, and Mandatory modelling rules are present only when `MUC_OPCUA_CU_AUTHORIZATION_SERVICE_SERVER` is enabled per OPC-10000-12 §9.7.4 Table 158 and spec.md FR-009/OPC-005
-- [x] T039 Implement NodeIds 17853 `ServiceUri`, 17854 `ServiceCertificate`, and 17855 `IssuerEndpointUrl`, and gate NodeIds 17852-17855 on `MUC_OPCUA_CU_AUTHORIZATION_SERVICE_SERVER` in `src/address_space/base_nodes.c` per OPC-10000-12 §9.7.4 Table 158 and spec.md FR-009/OPC-005
+- [x] T038 [P] Add type-system tests in `tests/unit/test_type_system.c` proving NodeIds 17852, 18072, 17860, and 18073, their NodeClasses, DataTypes, PropertyType references, and Mandatory modelling rules are present only when `MUC_OPCUA_CU_AUTHORIZATION_SERVICE_CONFIGURATION_SERVER` is enabled per OPC-10000-12 §9.7.4 Table 158 and spec.md FR-009/OPC-005
+- [x] T039 Implement NodeIds 18072 `ServiceUri`, 17860 `ServiceCertificate`, and 18073 `IssuerEndpointUrl`, and gate them with NodeId 17852 on `MUC_OPCUA_CU_AUTHORIZATION_SERVICE_CONFIGURATION_SERVER` in `src/address_space/base_nodes.c` per OPC-10000-12 §9.7.4 Table 158 and spec.md FR-009/OPC-005
 
 ### JWT endpoint advertisement
 
@@ -204,7 +204,7 @@ archive builds used `arm-none-eabi-gcc` with
 `MUC_OPCUA_PLATFORM=arduino-skeleton`, and `MUC_OPCUA_OPTIMIZE_SIZE=ON`.
 The default Standard baseline and the explicit
 `MUC_OPCUA_CU_USER_TOKEN_JWT=OFF` /
-`MUC_OPCUA_CU_AUTHORIZATION_SERVICE_SERVER=OFF` build both measured
+`MUC_OPCUA_CU_AUTHORIZATION_SERVICE_CONFIGURATION_SERVER=OFF` build both measured
 103,101 B `.text`, 0 B `.data`, and 0 B `.bss` (zero disabled-feature
 growth). Enabling both symbols measured 107,256 B `.text`, 0 B `.data`, and
 0 B `.bss`: a 4,155 B `.text` increase, below the 5 KiB limit.

@@ -53,6 +53,138 @@ def _profiles() -> dict[str, dict]:
 
 
 class GenerateKconfigTest(unittest.TestCase):
+    def test_unimplemented_cu_comment_includes_cu_reference_without_spec(self) -> None:
+        facet_defaults = dict(_PROFILE_DEFAULTS)
+        facet_defaults["nano"] = True
+        manifest = {
+            "schema_version": 1,
+            "profiles": _profiles(),
+            "items": [
+                {
+                    "id": "test_facet",
+                    "kind": "facet",
+                    "implementation_state": "implemented",
+                    "kconfig_symbol": "MUC_OPCUA_FACET_TEST_SERVER",
+                    "opc_display_name": "Test Server Facet",
+                    "opc_reference": {"spec": "OPC-10000-7", "section": "4.2"},
+                    "profile_defaults": facet_defaults,
+                },
+                {
+                    "id": "unimplemented_cu",
+                    "kind": "conformance_unit",
+                    "implementation_state": "unimplemented",
+                    "kconfig_symbol": "MUC_OPCUA_CU_UNIMPLEMENTED_CAPABILITY",
+                    "opc_display_name": "Unimplemented Capability",
+                    "opc_reference": {
+                        "cu_id": "2809",
+                        "cu_name": "Unimplemented Capability",
+                        "source_url": "https://profiles.opcfoundation.org",
+                    },
+                    "profile_defaults": dict(_PROFILE_DEFAULTS),
+                },
+            ],
+            "capacities": [],
+            "facet_containment": {"test_facet": ["unimplemented_cu"]},
+        }
+
+        self.assertEqual(validate_manifest(manifest), [])
+        kconfig = generate_kconfig(manifest)
+
+        self.assertIn(
+            'comment "Unimplemented Capability (NOT IMPLEMENTED) '
+            '[CU 2809:Unimplemented Capability]"',
+            kconfig,
+        )
+
+    def test_documented_cu_comment_does_not_promote_detail_to_reference(self) -> None:
+        manifest = {
+            "schema_version": 1,
+            "profiles": _profiles(),
+            "items": [
+                {
+                    "id": "documented_cu",
+                    "kind": "conformance_unit",
+                    "implementation_state": "documented",
+                    "kconfig_symbol": "MUC_OPCUA_CU_DOCUMENTED_CAPABILITY",
+                    "opc_display_name": "Documented Capability",
+                    "opc_reference": {
+                        "cu_id": "2810",
+                        "cu_name": "Documented Capability",
+                        "source_url": "https://profiles.opcfoundation.org",
+                    },
+                    "notes": "Satisfied by shipped documentation.",
+                    "profile_defaults": dict(_PROFILE_DEFAULTS),
+                },
+            ],
+            "capacities": [],
+        }
+
+        self.assertEqual(validate_manifest(manifest), [])
+        kconfig = generate_kconfig(manifest)
+
+        self.assertIn('comment "Documented Capability (DOCUMENTED)"', kconfig)
+        self.assertNotIn(
+            'comment "Documented Capability (DOCUMENTED) '
+            '[CU 2810:Documented Capability]"',
+            kconfig,
+        )
+        self.assertIn(
+            "#   Detail: CU 2810:Documented Capability.",
+            kconfig,
+        )
+
+    def test_deferred_cu_is_visible_inside_selectable_facet_without_symbol(self) -> None:
+        facet_defaults = dict(_PROFILE_DEFAULTS)
+        facet_defaults["nano"] = True
+        manifest = {
+            "schema_version": 1,
+            "profiles": _profiles(),
+            "items": [
+                {
+                    "id": "test_facet",
+                    "kind": "facet",
+                    "implementation_state": "implemented",
+                    "kconfig_symbol": "MUC_OPCUA_FACET_TEST_SERVER",
+                    "opc_display_name": "Test Server Facet",
+                    "opc_reference": {"spec": "OPC-10000-7", "section": "4.2"},
+                    "profile_defaults": facet_defaults,
+                },
+                {
+                    "id": "deferred_cu",
+                    "kind": "conformance_unit",
+                    "implementation_state": "deferred",
+                    "kconfig_symbol": "MUC_OPCUA_CU_DEFERRED_CAPABILITY",
+                    "opc_display_name": "Deferred Capability",
+                    "opc_reference": {
+                        "spec": "OPC-10000-7",
+                        "section": "6.6",
+                        "cu_id": "9997",
+                        "cu_name": "Deferred Capability",
+                    },
+                    "profile_defaults": dict(_PROFILE_DEFAULTS),
+                },
+            ],
+            "capacities": [],
+            "facet_containment": {"test_facet": ["deferred_cu"]},
+        }
+
+        self.assertEqual(validate_manifest(manifest), [])
+        kconfig = generate_kconfig(manifest)
+        deferred_comment = (
+            'comment "Deferred Capability (NOT IMPLEMENTED) '
+            '[OPC-10000-7 §6.6]"'
+        )
+
+        self.assertIn(deferred_comment, kconfig)
+        self.assertIn(
+            "#   Implementation state: deferred -- visible but not selectable.",
+            kconfig,
+        )
+        self.assertNotRegex(
+            kconfig,
+            r"(?m)^config MUC_OPCUA_CU_DEFERRED_CAPABILITY$",
+        )
+
     def test_documented_cu_is_visible_inside_selectable_facet_without_symbol(self) -> None:
         facet_defaults = dict(_PROFILE_DEFAULTS)
         facet_defaults["nano"] = True
@@ -166,6 +298,60 @@ class GenerateKconfigTest(unittest.TestCase):
 
 
 class GenerateBuildDocsTest(unittest.TestCase):
+    def test_deferred_item_is_unavailable_and_not_selectable(self) -> None:
+        manifest = {
+            "items": [
+                {
+                    "id": "deferred_cu",
+                    "implementation_state": "deferred",
+                    "kconfig_symbol": "MUC_OPCUA_CU_DEFERRED",
+                    "profile_defaults": dict(_PROFILE_DEFAULTS),
+                    "opc_reference": {
+                        "spec": "OPC-10000-7",
+                        "section": "6.3",
+                    },
+                    "notes": "Planned capability.",
+                },
+            ],
+            "capacities": [],
+        }
+
+        section = generate_build_docs_section(manifest)
+
+        self.assertNotIn("| MUC_OPCUA_CU_DEFERRED |", section)
+        self.assertIn(
+            "| deferred_cu | OPC-10000-7 §6.3 | deferred | Planned capability. |",
+            section,
+        )
+
+    def test_selectable_item_docs_include_deduplicated_structural_and_semantic_dependencies(self) -> None:
+        manifest = {
+            "items": [
+                {
+                    "id": "selectable_cu",
+                    "implementation_state": "implemented",
+                    "kconfig_symbol": "MUC_OPCUA_CU_SELECTABLE",
+                    "profile_defaults": dict(_PROFILE_DEFAULTS),
+                    "depends_on": ["MUC_OPCUA_FACET_STRUCTURAL"],
+                    "semantic_depends_on": [
+                        "MUC_OPCUA_FACET_STRUCTURAL",
+                        "MUC_OPCUA_CU_SEMANTIC",
+                    ],
+                },
+            ],
+            "capacities": [],
+        }
+
+        section = generate_build_docs_section(manifest)
+
+        expected_row = (
+            "| MUC_OPCUA_CU_SELECTABLE | selectable_cu | implemented |  |  |  |  |  | "
+            "MUC_OPCUA_FACET_STRUCTURAL, MUC_OPCUA_CU_SEMANTIC |"
+        )
+        self.assertIn(expected_row, section)
+        self.assertEqual(section.count("MUC_OPCUA_FACET_STRUCTURAL"), 1)
+        self.assertEqual(section.count("MUC_OPCUA_CU_SEMANTIC"), 1)
+
     def test_unavailable_item_notes_escape_markdown_table_pipe(self) -> None:
         manifest = {
             "items": [

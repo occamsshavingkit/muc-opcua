@@ -64,16 +64,23 @@ assert_cfg "$D1" FACET_USER_TOKEN_USER_NAME_PASSWORD_SERVER ON
 assert_cfg "$D1" FACET_USER_TOKEN_X509_CERTIFICATE_SERVER ON
 # CUs: Attribute Read etc. on for all; full-only CUs off
 assert_cfg "$D1" CU_ATTRIBUTE_READ ON
-assert_cfg "$D1" CU_VIEW_BASIC_TRANSLATEBROWSEPATH ON
-assert_cfg "$D1" CU_DISCOVERY_FIND_SERVERS_SELF_GET_ENDPOINTS ON
+assert_cfg "$D1" CU_VIEW_BASIC_2 ON
+assert_cfg "$D1" CU_VIEW_TRANSLATEBROWSEPATH ON
+assert_cfg "$D1" CU_DISCOVERY_GET_ENDPOINTS ON
+assert_cfg "$D1" CU_DISCOVERY_FIND_SERVERS_SELF ON
 assert_cfg "$D1" CU_VIEW_REGISTERNODES ON
-assert_cfg "$D1" CU_CORE_2017_ATTRIBUTE_WRITE OFF
+assert_cfg "$D1" CU_ATTRIBUTE_WRITE_STATUSCODE_TIMESTAMP OFF
+assert_cfg "$D1" CU_ATTRIBUTE_WRITE_INDEX_RANGE OFF
 assert_cfg "$D1" CU_HISTORICAL_ACCESS_SERVER_FACET OFF
 assert_cfg "$D1" CU_NODEMANAGEMENT OFF
 assert_cfg "$D1" CU_QUERY OFF
 # CU: Subscription basic on (micro+); CU: Security ECC off (full only)
 assert_cfg "$D1" CU_SUBSCRIPTION_BASIC ON
 assert_cfg "$D1" CU_SECURITY_ECC OFF
+assert_cfg "$D1" CU_MONITOR_ITEMS_500 ON
+assert_cfg "$D1" CU_MONITOR_MINQUEUESIZE_05 ON
+assert_cfg "$D1" CU_SUBSCRIPTION_MINIMUM_05 ON
+assert_cfg "$D1" CU_SUBSCRIPTION_PUBLISH_MIN_10 ON
 # Secure-channel crypto gate (spec 072): on for security-capable profiles (micro+)
 assert_cfg "$D1" SECURE_CHANNEL_CRYPTO ON
 
@@ -94,10 +101,13 @@ assert_cfg "$D2" FACET_USER_TOKEN_USER_NAME_PASSWORD_SERVER OFF
 assert_cfg "$D2" FACET_USER_TOKEN_X509_CERTIFICATE_SERVER OFF
 # CUs: base CUs on (Attribute Read etc.); full-only off
 assert_cfg "$D2" CU_ATTRIBUTE_READ ON
-assert_cfg "$D2" CU_VIEW_BASIC_TRANSLATEBROWSEPATH ON
-assert_cfg "$D2" CU_DISCOVERY_FIND_SERVERS_SELF_GET_ENDPOINTS ON
+assert_cfg "$D2" CU_VIEW_BASIC_2 ON
+assert_cfg "$D2" CU_VIEW_TRANSLATEBROWSEPATH ON
+assert_cfg "$D2" CU_DISCOVERY_GET_ENDPOINTS ON
+assert_cfg "$D2" CU_DISCOVERY_FIND_SERVERS_SELF ON
 assert_cfg "$D2" CU_VIEW_REGISTERNODES ON
-assert_cfg "$D2" CU_CORE_2017_ATTRIBUTE_WRITE OFF
+assert_cfg "$D2" CU_ATTRIBUTE_WRITE_STATUSCODE_TIMESTAMP OFF
+assert_cfg "$D2" CU_ATTRIBUTE_WRITE_INDEX_RANGE OFF
 # CU: Subscription basic off (micro+); CU: Security ECC off (full only)
 assert_cfg "$D2" CU_SUBSCRIPTION_BASIC OFF
 assert_cfg "$D2" CU_SECURITY_ECC OFF
@@ -106,7 +116,7 @@ assert_cfg "$D2" CU_AUDITING OFF
 assert_cfg "$D2" SECURE_CHANNEL_CRYPTO OFF
 cmake --build "$D2" -j4 >/dev/null 2>&1
 if nm "$D2/src/libmuc_opcua.a" 2>/dev/null | grep -qE \
-    'mu_raise_audit_event|mu_audit_pool_store|mu_server_set_audit_callback'; then
+    '(^|[[:space:]])_?(mu_raise_audit_event|mu_audit_pool_store|mu_server_set_audit_callback)$'; then
     echo "  FAIL  audit emission/routing symbols present with CU_AUDITING=OFF"
     FAIL=$((FAIL + 1))
 else
@@ -131,8 +141,10 @@ assert_cfg "$D3" FACET_USER_TOKEN_USER_NAME_PASSWORD_SERVER ON
 assert_cfg "$D3" FACET_USER_TOKEN_X509_CERTIFICATE_SERVER OFF
 # CUs: base CUs on; full-only off
 assert_cfg "$D3" CU_ATTRIBUTE_READ ON
-assert_cfg "$D3" CU_VIEW_BASIC_TRANSLATEBROWSEPATH ON
-assert_cfg "$D3" CU_DISCOVERY_FIND_SERVERS_SELF_GET_ENDPOINTS ON
+assert_cfg "$D3" CU_VIEW_BASIC_2 ON
+assert_cfg "$D3" CU_VIEW_TRANSLATEBROWSEPATH ON
+assert_cfg "$D3" CU_DISCOVERY_GET_ENDPOINTS ON
+assert_cfg "$D3" CU_DISCOVERY_FIND_SERVERS_SELF ON
 assert_cfg "$D3" CU_VIEW_REGISTERNODES ON
 assert_cfg "$D3" CU_HISTORICAL_ACCESS_SERVER_FACET OFF
 assert_cfg "$D3" CU_NODEMANAGEMENT OFF
@@ -141,6 +153,26 @@ assert_cfg "$D3" CU_SUBSCRIPTION_BASIC ON
 assert_cfg "$D3" CU_SECURITY_ECC OFF
 # Secure-channel crypto gate (spec 072): on for embedded (security-capable)
 assert_cfg "$D3" SECURE_CHANNEL_CRYPTO ON
+
+echo "### 3b. 'full' profile builds the complete muc_opcua runtime ###"
+D3B="$WORKDIR/g3b"
+D3B_CONFIGURE_LOG="$WORKDIR/g3b-configure.log"
+D3B_BUILD_LOG="$WORKDIR/g3b-build.log"
+if cmake -S . -B "$D3B" -DMUC_OPCUA_PROFILE=full \
+    -DMUC_OPCUA_PLATFORM=host >"$D3B_CONFIGURE_LOG" 2>&1; then
+    if cmake --build "$D3B" --target muc_opcua -j4 >"$D3B_BUILD_LOG" 2>&1; then
+        echo "  PASS  full profile builds muc_opcua"
+        PASS=$((PASS + 1))
+    else
+        echo "  FAIL  full profile could not build muc_opcua"
+        cat "$D3B_BUILD_LOG"
+        FAIL=$((FAIL + 1))
+    fi
+else
+    echo "  FAIL  full profile could not configure muc_opcua"
+    cat "$D3B_CONFIGURE_LOG"
+    FAIL=$((FAIL + 1))
+fi
 
 echo "### 4. Subtraction: standard minus CU_SUBSCRIPTION_BASIC drops the code ###"
 D4="$WORKDIR/g4"
@@ -152,7 +184,7 @@ assert_cfg "$D4" PROFILE_STANDARD_2025_UA_SERVER ON   # profile choice preserved
 assert_cfg "$D4" FACET_CORE_2022_SERVER ON   # everything else stays profile-default
 echo "  -- confirm the subtraction drops the code, not just the flag --"
 cmake --build "$D4" -j4 >/dev/null 2>&1
-if nm "$D4/src/libmuc_opcua.a" 2>/dev/null | grep -q "publish_due"; then
+if nm "$D4/src/libmuc_opcua.a" 2>/dev/null | grep -qE '(^|[[:space:]])_?publish_due$'; then
     echo "  FAIL  publish_due still present with CU_SUBSCRIPTION_BASIC=OFF"; FAIL=$((FAIL + 1))
 else
     echo "  PASS  publish_due absent with CU_SUBSCRIPTION_BASIC=OFF"; PASS=$((PASS + 1))
@@ -164,8 +196,10 @@ printf 'MUC_OPCUA_PROFILE_FULL_EVERYTHING_ENABLED_GENEROUS_CAPACITIES=y\n# MUC_O
 cmake -S . -B "$D5" -DMUC_OPCUA_KCONFIG_CONFIG="$WORKDIR/cascade_facet.config" -DMUC_OPCUA_PLATFORM=host >/dev/null 2>&1
 assert_cfg "$D5" FACET_CORE_2022_SERVER OFF
 assert_cfg "$D5" CU_ATTRIBUTE_READ OFF
-assert_cfg "$D5" CU_VIEW_BASIC_TRANSLATEBROWSEPATH OFF
-assert_cfg "$D5" CU_DISCOVERY_FIND_SERVERS_SELF_GET_ENDPOINTS OFF
+assert_cfg "$D5" CU_VIEW_BASIC_2 OFF
+assert_cfg "$D5" CU_VIEW_TRANSLATEBROWSEPATH OFF
+assert_cfg "$D5" CU_DISCOVERY_GET_ENDPOINTS OFF
+assert_cfg "$D5" CU_DISCOVERY_FIND_SERVERS_SELF OFF
 
 echo "### 5b. CU_SUBSCRIPTION_STANDARD follows its CU_SUBSCRIPTION_BASIC dependency ###"
 D5B="$WORKDIR/g5b"
@@ -179,6 +213,50 @@ if grep -q "^set(MUC_OPCUA_CU_SUBSCRIPTION_STANDARD OFF)" "$D5B/muc_opcua_config
     PASS=$((PASS + 1))
 else
     echo "  FAIL  CU_SUBSCRIPTION_STANDARD unexpectedly cascaded OFF"
+    FAIL=$((FAIL + 1))
+fi
+
+echo "### 5c. Advanced Attribute Write CUs follow the base Write CU dependency ###"
+D5C="$WORKDIR/g5c"
+cmake -S . -B "$D5C" -DMUC_OPCUA_PROFILE=full \
+    -DMUC_OPCUA_CU_ATTRIBUTE_WRITE_VALUES=OFF \
+    -DMUC_OPCUA_PLATFORM=host >/dev/null 2>&1
+assert_cfg "$D5C" CU_ATTRIBUTE_WRITE_VALUES OFF
+assert_cfg "$D5C" CU_ATTRIBUTE_WRITE_STATUSCODE_TIMESTAMP OFF
+assert_cfg "$D5C" CU_ATTRIBUTE_WRITE_INDEX_RANGE OFF
+
+echo "### 5d. Standard capacity CUs follow the CU_SUBSCRIPTION_STANDARD dependency ###"
+D5D="$WORKDIR/g5d"
+D5D_BUILD_LOG="$WORKDIR/g5d-build.log"
+cmake -S . -B "$D5D" -DMUC_OPCUA_PROFILE=standard \
+    -DMUC_OPCUA_CU_SUBSCRIPTION_STANDARD=OFF \
+    -DMUC_OPCUA_PLATFORM=host >/dev/null 2>&1
+assert_cfg "$D5D" CU_SUBSCRIPTION_STANDARD OFF
+assert_cfg "$D5D" CU_MONITOR_ITEMS_500 OFF
+assert_cfg "$D5D" CU_MONITOR_MINQUEUESIZE_05 OFF
+assert_cfg "$D5D" CU_SUBSCRIPTION_MINIMUM_05 OFF
+assert_cfg "$D5D" CU_SUBSCRIPTION_PUBLISH_MIN_10 OFF
+if cmake --build "$D5D" --target muc_opcua -j4 >"$D5D_BUILD_LOG" 2>&1; then
+    echo "  PASS  muc_opcua builds with CU_SUBSCRIPTION_STANDARD=OFF"
+    PASS=$((PASS + 1))
+else
+    echo "  FAIL  muc_opcua does not build with CU_SUBSCRIPTION_STANDARD=OFF"
+    cat "$D5D_BUILD_LOG"
+    FAIL=$((FAIL + 1))
+fi
+
+echo "### 5e. Standard marker follows effective mandatory canonical CUs ###"
+D5E="$WORKDIR/g5e"
+D5E_CONFIGURE_LOG="$WORKDIR/g5e-configure.log"
+if cmake -S . -B "$D5E" -DMUC_OPCUA_PROFILE=standard \
+    -DMUC_OPCUA_CU_ATTRIBUTE_READ=OFF \
+    -DMUC_OPCUA_PLATFORM=host >"$D5E_CONFIGURE_LOG" 2>&1; then
+    assert_cfg "$D5E" PROFILE_STANDARD_2025_UA_SERVER ON
+    assert_cfg "$D5E" CU_ATTRIBUTE_READ OFF
+    assert_cfg "$D5E" MARKER_STANDARD_PROFILE OFF
+else
+    echo "  FAIL  could not configure scenario 5e"
+    cat "$D5E_CONFIGURE_LOG"
     FAIL=$((FAIL + 1))
 fi
 
@@ -287,7 +365,8 @@ printf 'MUC_OPCUA_PROFILE_NANO_EMBEDDED_DEVICE_2025_SERVER=y\nMUC_OPCUA_FACET_US
 cmake -S . -B "$D14" -DMUC_OPCUA_KCONFIG_CONFIG="$WORKDIR/nano_x509.config" -DMUC_OPCUA_PLATFORM=host >/dev/null 2>&1
 assert_cfg "$D14" FACET_USER_TOKEN_X509_CERTIFICATE_SERVER ON
 assert_cfg "$D14" PROFILE_NANO_EMBEDDED_DEVICE_2025_SERVER ON   # profile stays nano
-assert_cfg "$D14" CU_CORE_2017_ATTRIBUTE_WRITE OFF   # unrelated full-only CU stays OFF
+assert_cfg "$D14" CU_ATTRIBUTE_WRITE_STATUSCODE_TIMESTAMP OFF   # unrelated full-only CUs stay OFF
+assert_cfg "$D14" CU_ATTRIBUTE_WRITE_INDEX_RANGE OFF
 
 echo "### 15. Internal cascade symbols resolve correctly per profile ###"
 echo "    INTERN_PROFILE_NANO is ON for all named profiles via cascade."
@@ -322,36 +401,34 @@ else
     PASS=$((PASS + 1))
 fi
 
-echo "### 17. Aggregate-only Discovery gate builds and runs GetEndpoints coverage ###"
+echo "### 17. Dedicated Discovery gates compile and dispatch independently ###"
 D17="$WORKDIR/g17"
 D17_CONFIGURE_LOG="$WORKDIR/g17-configure.log"
 D17_BUILD_LOG="$WORKDIR/g17-build.log"
 if cmake -S . -B "$D17" -DMUC_OPCUA_PROFILE=custom \
     -DMUC_OPCUA_FACET_CORE_2022_SERVER=ON \
-    -DMUC_OPCUA_CU_DISCOVERY_FIND_SERVERS_SELF_GET_ENDPOINTS=ON \
     -DMUC_OPCUA_CU_DISCOVERY_FIND_SERVERS_SELF=OFF \
-    -DMUC_OPCUA_CU_DISCOVERY_GET_ENDPOINTS=OFF \
+    -DMUC_OPCUA_CU_DISCOVERY_GET_ENDPOINTS=ON \
     -DMUC_OPCUA_BUILD_TESTS=ON \
     -DMUC_OPCUA_PLATFORM=host >"$D17_CONFIGURE_LOG" 2>&1; then
-    assert_cfg "$D17" CU_DISCOVERY_FIND_SERVERS_SELF_GET_ENDPOINTS ON
-    assert_cfg "$D17" CU_DISCOVERY_FIND_SERVERS_SELF UNDEFINED
-    assert_cfg "$D17" CU_DISCOVERY_GET_ENDPOINTS OFF
+    assert_cfg "$D17" CU_DISCOVERY_FIND_SERVERS_SELF OFF
+    assert_cfg "$D17" CU_DISCOVERY_GET_ENDPOINTS ON
 
     if cmake --build "$D17" --target test_get_endpoints_gate -j4 >"$D17_BUILD_LOG" 2>&1; then
         if "$D17/tests/unit/test_get_endpoints_gate"; then
-            echo "  PASS  test_get_endpoints_gate passes with only the aggregate Discovery gate enabled"
+            echo "  PASS  test_get_endpoints_gate passes with only GetEndpoints enabled"
             PASS=$((PASS + 1))
         else
-            echo "  FAIL  test_get_endpoints_gate failed with only the aggregate Discovery gate enabled"
+            echo "  FAIL  test_get_endpoints_gate failed with only GetEndpoints enabled"
             FAIL=$((FAIL + 1))
         fi
     else
-        echo "  FAIL  could not build test_get_endpoints_gate for the aggregate-only Discovery configuration"
+        echo "  FAIL  could not build test_get_endpoints_gate for dedicated Discovery configuration"
         cat "$D17_BUILD_LOG"
         FAIL=$((FAIL + 1))
     fi
 else
-    echo "  FAIL  could not configure the aggregate-only Discovery scenario"
+    echo "  FAIL  could not configure the dedicated Discovery scenario"
     cat "$D17_CONFIGURE_LOG"
     FAIL=$((FAIL + 1))
 fi
@@ -391,62 +468,150 @@ else
     FAIL=$((FAIL + 1))
 fi
 
-echo "### 19. Stale documented Write Value override cannot bypass canonical Kconfig gate ###"
+echo "### 19. Canonical Write Value CU owns the Write feature gate ###"
 D19="$WORKDIR/g19"
 D19_CONFIGURE_LOG="$WORKDIR/g19-configure.log"
 D19_BUILD_LOG="$WORKDIR/g19-build.log"
 if cmake -S . -B "$D19" -DMUC_OPCUA_PROFILE=custom \
     -DMUC_OPCUA_FACET_CORE_2022_SERVER=ON \
-    -DMUC_OPCUA_CU_CORE_2017_ATTRIBUTE_WRITE=OFF \
     -DMUC_OPCUA_CU_ATTRIBUTE_WRITE_VALUES=ON \
     -DMUC_OPCUA_PLATFORM=host \
     -DCMAKE_EXPORT_COMPILE_COMMANDS=ON >"$D19_CONFIGURE_LOG" 2>&1; then
-    assert_cfg "$D19" CU_CORE_2017_ATTRIBUTE_WRITE OFF
+    assert_cfg "$D19" CU_ATTRIBUTE_WRITE_VALUES ON
 
     if [ ! -f "$D19/compile_commands.json" ]; then
-        echo "  FAIL  stale Write Value override scenario did not produce compile_commands.json"
+        echo "  FAIL  canonical Write Value scenario did not produce compile_commands.json"
         FAIL=$((FAIL + 1))
     else
         if grep -q -- "-DMUC_OPCUA_SERVICE_WRITE=1" "$D19/compile_commands.json"; then
-            echo "  FAIL  stale Write Value override emitted MUC_OPCUA_SERVICE_WRITE=1"
-            FAIL=$((FAIL + 1))
-        else
-            echo "  PASS  stale Write Value override did not emit MUC_OPCUA_SERVICE_WRITE=1"
+            echo "  PASS  canonical Write Value scenario emitted MUC_OPCUA_SERVICE_WRITE=1"
             PASS=$((PASS + 1))
+        else
+            echo "  FAIL  canonical Write Value scenario did not emit MUC_OPCUA_SERVICE_WRITE=1"
+            FAIL=$((FAIL + 1))
         fi
 
         if grep -q -- "-DMUC_OPCUA_CU_ATTRIBUTE_WRITE_VALUES=1" "$D19/compile_commands.json"; then
-            echo "  FAIL  stale Write Value override emitted MUC_OPCUA_CU_ATTRIBUTE_WRITE_VALUES=1"
-            FAIL=$((FAIL + 1))
-        else
-            echo "  PASS  stale Write Value override did not emit MUC_OPCUA_CU_ATTRIBUTE_WRITE_VALUES=1"
+            echo "  PASS  canonical Write Value scenario emitted MUC_OPCUA_CU_ATTRIBUTE_WRITE_VALUES=1"
             PASS=$((PASS + 1))
+        else
+            echo "  FAIL  canonical Write Value scenario did not emit MUC_OPCUA_CU_ATTRIBUTE_WRITE_VALUES=1"
+            FAIL=$((FAIL + 1))
         fi
     fi
 
     if cmake --build "$D19" --target muc_opcua -j4 >"$D19_BUILD_LOG" 2>&1; then
         if [ ! -f "$D19/src/libmuc_opcua.a" ]; then
-            echo "  FAIL  stale Write Value override scenario did not produce src/libmuc_opcua.a"
+            echo "  FAIL  canonical Write Value scenario did not produce src/libmuc_opcua.a"
             FAIL=$((FAIL + 1))
         elif ! D19_NM_OUTPUT=$(nm "$D19/src/libmuc_opcua.a" 2>/dev/null); then
             echo "  FAIL  could not inspect compiled Write symbols in src/libmuc_opcua.a"
             FAIL=$((FAIL + 1))
         elif printf '%s\n' "$D19_NM_OUTPUT" | \
-            grep -qE '(^|[[:space:]])(handle_write|mu_write_request_decode|mu_write_response_encode)$'; then
-            echo "  FAIL  stale Write Value override compiled Write symbols"
-            FAIL=$((FAIL + 1))
-        else
-            echo "  PASS  stale Write Value override did not compile Write symbols"
+            grep -qE '(^|[[:space:]])_?(handle_write|mu_write_request_decode|mu_write_response_encode)$'; then
+            echo "  PASS  canonical Write Value scenario compiled Write symbols"
             PASS=$((PASS + 1))
+        else
+            echo "  FAIL  canonical Write Value scenario did not compile Write symbols"
+            FAIL=$((FAIL + 1))
         fi
     else
-        echo "  FAIL  could not build stale Write Value override scenario"
+        echo "  FAIL  could not build canonical Write Value scenario"
         cat "$D19_BUILD_LOG"
         FAIL=$((FAIL + 1))
     fi
 else
-    echo "  FAIL  could not configure stale Write Value override scenario"
+    echo "  FAIL  could not configure canonical Write Value scenario"
     cat "$D19_CONFIGURE_LOG"
+    FAIL=$((FAIL + 1))
+fi
+
+echo "### 19b. Legacy Write CU does not own the canonical Write feature gate ###"
+D19B="$WORKDIR/g19b"
+D19B_CONFIGURE_LOG="$WORKDIR/g19b-configure.log"
+D19B_BUILD_LOG="$WORKDIR/g19b-build.log"
+D19B_NM_LOG="$WORKDIR/g19b-nm.log"
+D19B_ARCHIVE="$D19B/src/libmuc_opcua.a"
+if cmake -S . -B "$D19B" -DMUC_OPCUA_PROFILE=custom \
+    -DMUC_OPCUA_FACET_CORE_2022_SERVER=ON \
+    -DMUC_OPCUA_CU_CORE_2017_ATTRIBUTE_WRITE=ON \
+    -DMUC_OPCUA_CU_ATTRIBUTE_WRITE_VALUES=OFF \
+    -DMUC_OPCUA_PLATFORM=host \
+    -DCMAKE_EXPORT_COMPILE_COMMANDS=ON >"$D19B_CONFIGURE_LOG" 2>&1; then
+    if grep -qE '^MUC_OPCUA_CU_CORE_2017_ATTRIBUTE_WRITE:[^=]+=ON$' "$D19B/CMakeCache.txt"; then
+        echo "  PASS  legacy Write CU input was explicitly set ON"
+        PASS=$((PASS + 1))
+    else
+        echo "  FAIL  legacy Write CU input was not recorded as ON"
+        FAIL=$((FAIL + 1))
+    fi
+    assert_cfg "$D19B" CU_CORE_2017_ATTRIBUTE_WRITE UNDEFINED
+    assert_cfg "$D19B" CU_ATTRIBUTE_WRITE_VALUES OFF
+
+    if grep -q -- "-DMUC_OPCUA_CU_CORE_2017_ATTRIBUTE_WRITE=1" "$D19B/compile_commands.json"; then
+        echo "  FAIL  legacy Write CU exported an independent claim macro"
+        FAIL=$((FAIL + 1))
+    else
+        echo "  PASS  legacy Write CU did not export an independent claim macro"
+        PASS=$((PASS + 1))
+    fi
+
+    if grep -q -- "-DMUC_OPCUA_SERVICE_WRITE=1" "$D19B/compile_commands.json"; then
+        echo "  FAIL  legacy Write CU emitted MUC_OPCUA_SERVICE_WRITE=1"
+        FAIL=$((FAIL + 1))
+    else
+        echo "  PASS  legacy Write CU did not emit MUC_OPCUA_SERVICE_WRITE=1"
+        PASS=$((PASS + 1))
+    fi
+
+    if cmake --build "$D19B" --target muc_opcua -j4 >"$D19B_BUILD_LOG" 2>&1; then
+        if [ ! -f "$D19B_ARCHIVE" ]; then
+            echo "  FAIL  inverse legacy Write build did not produce src/libmuc_opcua.a"
+            FAIL=$((FAIL + 1))
+        elif ! D19B_NM_OUTPUT=$(nm "$D19B_ARCHIVE" 2>"$D19B_NM_LOG"); then
+            echo "  FAIL  could not inspect inverse legacy Write archive"
+            cat "$D19B_NM_LOG"
+            FAIL=$((FAIL + 1))
+        elif printf '%s\n' "$D19B_NM_OUTPUT" | \
+            grep -qE '(^|[[:space:]])_?(handle_write|mu_write_request_decode|mu_write_response_encode)$'; then
+            echo "  FAIL  legacy Write CU compiled canonical Write symbols"
+            FAIL=$((FAIL + 1))
+        else
+            echo "  PASS  legacy Write CU did not compile canonical Write symbols"
+            PASS=$((PASS + 1))
+        fi
+    else
+        echo "  FAIL  could not build inverse legacy Write scenario"
+        cat "$D19B_BUILD_LOG"
+        FAIL=$((FAIL + 1))
+    fi
+else
+    echo "  FAIL  could not configure inverse legacy Write scenario"
+    cat "$D19B_CONFIGURE_LOG"
+    FAIL=$((FAIL + 1))
+fi
+
+echo "### 19c. SecurityPolicy Support CU is exported to muc_opcua consumers ###"
+D19C="$WORKDIR/g19c"
+D19C_CONFIGURE_LOG="$WORKDIR/g19c-configure.log"
+if cmake -S . -B "$D19C" -DMUC_OPCUA_PROFILE=custom \
+    -DMUC_OPCUA_FACET_CORE_2022_SERVER=ON \
+    -DMUC_OPCUA_CU_SECURITYPOLICY_SUPPORT=ON \
+    -DMUC_OPCUA_PLATFORM=host \
+    -DCMAKE_EXPORT_COMPILE_COMMANDS=ON >"$D19C_CONFIGURE_LOG" 2>&1; then
+    assert_cfg "$D19C" CU_SECURITYPOLICY_SUPPORT ON
+
+    if grep -q -- "-DMUC_OPCUA_CU_SECURITYPOLICY_SUPPORT=1" \
+        "$D19C/compile_commands.json"; then
+        echo "  PASS  SecurityPolicy Support CU is exported to muc_opcua"
+        PASS=$((PASS + 1))
+    else
+        echo "  FAIL  SecurityPolicy Support CU is not exported to muc_opcua"
+        FAIL=$((FAIL + 1))
+    fi
+else
+    echo "  FAIL  could not configure SecurityPolicy Support export scenario"
+    cat "$D19C_CONFIGURE_LOG"
     FAIL=$((FAIL + 1))
 fi
 
@@ -479,6 +644,154 @@ if cc -std=c11 -Wall -Wextra -Werror -Wpedantic -Iinclude \
 else
     echo "  FAIL  enabled Reverse Connect omits reverse_connect_url"
     FAIL=$((FAIL + 1))
+fi
+
+echo "### 21. Enhanced DataChange capability follows its four mandatory CUs ###"
+ENHANCED_TEST="tests/config/test_enhanced_datachange_feature.c"
+compile_enhanced_datachange_case() {
+    local label="$1" expected="$2"
+    shift 2
+    if cc -std=c11 -Wall -Wextra -Werror -Wpedantic -Iinclude \
+        -DEXPECT_ENHANCED_DATACHANGE="$expected" "$@" \
+        -fsyntax-only "$ENHANCED_TEST"; then
+        echo "  PASS  $label"
+        PASS=$((PASS + 1))
+    else
+        echo "  FAIL  $label"
+        FAIL=$((FAIL + 1))
+    fi
+}
+
+compile_enhanced_datachange_case "all four mandatory CUs enable Enhanced DataChange" 1 \
+    -DMUC_OPCUA_CU_MONITOR_ITEMS_500=1 \
+    -DMUC_OPCUA_CU_MONITOR_MINQUEUESIZE_05=1 \
+    -DMUC_OPCUA_CU_SUBSCRIPTION_MINIMUM_05=1 \
+    -DMUC_OPCUA_CU_SUBSCRIPTION_PUBLISH_MIN_10=1
+
+compile_enhanced_datachange_case "missing MonitorItems_500 disables Enhanced DataChange" 0 \
+    -DMUC_OPCUA_STANDARD_PROFILE=1 \
+    -DMUC_OPCUA_CU_MONITOR_ITEMS_500=0 \
+    -DMUC_OPCUA_CU_MONITOR_MINQUEUESIZE_05=1 \
+    -DMUC_OPCUA_CU_SUBSCRIPTION_MINIMUM_05=1 \
+    -DMUC_OPCUA_CU_SUBSCRIPTION_PUBLISH_MIN_10=1
+
+compile_enhanced_datachange_case "missing MinQueueSize_05 disables Enhanced DataChange" 0 \
+    -DMUC_OPCUA_STANDARD_PROFILE=1 \
+    -DMUC_OPCUA_CU_MONITOR_ITEMS_500=1 \
+    -DMUC_OPCUA_CU_MONITOR_MINQUEUESIZE_05=0 \
+    -DMUC_OPCUA_CU_SUBSCRIPTION_MINIMUM_05=1 \
+    -DMUC_OPCUA_CU_SUBSCRIPTION_PUBLISH_MIN_10=1
+
+compile_enhanced_datachange_case "missing SubscriptionMinimum_05 disables Enhanced DataChange" 0 \
+    -DMUC_OPCUA_STANDARD_PROFILE=1 \
+    -DMUC_OPCUA_CU_MONITOR_ITEMS_500=1 \
+    -DMUC_OPCUA_CU_MONITOR_MINQUEUESIZE_05=1 \
+    -DMUC_OPCUA_CU_SUBSCRIPTION_MINIMUM_05=0 \
+    -DMUC_OPCUA_CU_SUBSCRIPTION_PUBLISH_MIN_10=1
+
+compile_enhanced_datachange_case "missing PublishMin_10 disables Enhanced DataChange" 0 \
+    -DMUC_OPCUA_STANDARD_PROFILE=1 \
+    -DMUC_OPCUA_CU_MONITOR_ITEMS_500=1 \
+    -DMUC_OPCUA_CU_MONITOR_MINQUEUESIZE_05=1 \
+    -DMUC_OPCUA_CU_SUBSCRIPTION_MINIMUM_05=1 \
+    -DMUC_OPCUA_CU_SUBSCRIPTION_PUBLISH_MIN_10=0
+
+echo "### 22. Canonical CUs expose their public API without CMake aliases ###"
+PUBLIC_API_GATE_TEST="tests/config/test_canonical_public_api_gates.c"
+if cc -std=c11 -Wall -Wextra -Werror -Wpedantic -Iinclude \
+    -DMUC_OPCUA_FACET_CORE_2022_SERVER=1 \
+    -DMUC_OPCUA_CU_ATTRIBUTE_WRITE_VALUES=1 \
+    -DMUC_OPCUA_CU_SUBSCRIPTION_BASIC=1 \
+    -DMUC_OPCUA_CU_EVENTS=1 \
+    -DMUC_OPCUA_CU_DATA_ACCESS=1 \
+    -DMUC_OPCUA_CU_METHOD_SERVER=1 \
+    -fsyntax-only "$PUBLIC_API_GATE_TEST"; then
+    echo "  PASS  canonical CUs expose matching public APIs"
+    PASS=$((PASS + 1))
+else
+    echo "  FAIL  canonical CUs do not expose matching public APIs"
+    FAIL=$((FAIL + 1))
+fi
+
+echo "### 23. Unit tests use canonical Write CU ownership ###"
+if grep -R -q -E '\bMUC_OPCUA_CU_CORE_2017_ATTRIBUTE_WRITE\b' tests/unit --include='*.c'; then
+    echo "  FAIL  unit tests still depend on the removed legacy Write aggregate"
+    FAIL=$((FAIL + 1))
+else
+    echo "  PASS  unit tests use canonical Write CU ownership"
+    PASS=$((PASS + 1))
+fi
+
+echo "### 24. Every canonical Kconfig symbol accepts a CMake override ###"
+D24A="$WORKDIR/g24a"
+cmake -S . -B "$D24A" -DMUC_OPCUA_PROFILE=full \
+    -DMUC_OPCUA_CU_AUDITING=OFF \
+    -DMUC_OPCUA_PLATFORM=host >/dev/null 2>&1
+assert_cfg "$D24A" CU_AUDITING OFF
+
+D24B="$WORKDIR/g24b"
+cmake -S . -B "$D24B" -DMUC_OPCUA_PROFILE=custom \
+    -DMUC_OPCUA_PROFILE_STANDARD_2025_UA_SERVER=ON \
+    -DMUC_OPCUA_FACET_CORE_2022_SERVER=ON \
+    -DMUC_OPCUA_FACET_EMBEDDED_DATACHANGE_SUBSCRIPTION_2022_SERVER=ON \
+    -DMUC_OPCUA_CU_SUBSCRIPTION_BASIC=ON \
+    -DMUC_OPCUA_CU_EVENTS=ON \
+    -DMUC_OPCUA_PLATFORM=host >/dev/null 2>&1
+assert_cfg "$D24B" PROFILE_STANDARD_2025_UA_SERVER ON
+assert_cfg "$D24B" FACET_CORE_2022_SERVER ON
+assert_cfg "$D24B" FACET_EMBEDDED_DATACHANGE_SUBSCRIPTION_2022_SERVER ON
+assert_cfg "$D24B" CU_SUBSCRIPTION_BASIC ON
+assert_cfg "$D24B" CU_EVENTS ON
+
+D24_ALL="$WORKDIR/g24-all"
+D24_ALL_LOG="$WORKDIR/g24-all-configure.log"
+mapfile -t D24_CANONICAL_SYMBOLS < <(
+    awk '($1 == "config" || $1 == "menuconfig") &&
+         $2 ~ /^MUC_OPCUA_(PROFILE|FACET|CU)_/ { print $2 }' Kconfig
+)
+D24_ALL_ARGS=(
+    -S .
+    -B "$D24_ALL"
+    -DMUC_OPCUA_PROFILE=custom
+    -DMUC_OPCUA_PLATFORM=host
+)
+for symbol in "${D24_CANONICAL_SYMBOLS[@]}"; do
+    D24_ALL_ARGS+=("-D${symbol}=ON")
+done
+
+if cmake "${D24_ALL_ARGS[@]}" >"$D24_ALL_LOG" 2>&1; then
+    D24_MISSING_SYMBOLS=()
+    for symbol in "${D24_CANONICAL_SYMBOLS[@]}"; do
+        if ! grep -q "^${symbol}=" "$D24_ALL/kconfig_overrides.config"; then
+            D24_MISSING_SYMBOLS+=("$symbol")
+        fi
+    done
+    if [ "${#D24_MISSING_SYMBOLS[@]}" -eq 0 ]; then
+        echo "  PASS  all discovered canonical symbols accept CMake overrides"
+        PASS=$((PASS + 1))
+    else
+        echo "  FAIL  canonical symbols missing from CMake overrides: ${D24_MISSING_SYMBOLS[*]}"
+        FAIL=$((FAIL + 1))
+    fi
+else
+    echo "  FAIL  complete canonical override configure failed"
+    cat "$D24_ALL_LOG"
+    FAIL=$((FAIL + 1))
+fi
+
+D24C="$WORKDIR/g24c"
+if ! cmake -S . -B "$D24C" -DMUC_OPCUA_PROFILE=standard \
+    -DMUC_OPCUA_MARKER_STANDARD_PROFILE=ON \
+    -DMUC_OPCUA_PLATFORM=host >/dev/null 2>&1; then
+    echo "  FAIL  hidden-marker configure failed"
+    FAIL=$((FAIL + 1))
+elif grep -q '^MUC_OPCUA_MARKER_STANDARD_PROFILE=' \
+    "$D24C/kconfig_overrides.config"; then
+    echo "  FAIL  hidden marker was accepted as a CMake override"
+    FAIL=$((FAIL + 1))
+else
+    echo "  PASS  hidden marker is excluded from CMake overrides"
+    PASS=$((PASS + 1))
 fi
 
 echo

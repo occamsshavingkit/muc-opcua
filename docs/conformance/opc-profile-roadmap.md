@@ -15,11 +15,11 @@ remains future work.
 
 | State | Count |
 |-------|-------|
-| claimed | 130 |
-| implemented | 16 |
-| documented | 485 |
+| claimed | 133 |
+| implemented | 17 |
+| documented | 464 |
 | deferred | 7 |
-| unimplemented | 11 |
+| unimplemented | 12 |
 
 ## Item matrix
 
@@ -32,29 +32,24 @@ remains future work.
 | opc_xml_encoding | facet | unimplemented | OPC-10000-6 §5.4 XML Encoding | — | — | — |
 | opc_https_transport | facet | unimplemented | OPC-10000-7 HTTPS Transport | — | — | — |
 | opc_websocket_transport | facet | unimplemented | OPC-10000-7 WebSocket Transport | — | — | — |
-| opc_monitor_items_500 | conformance_unit | documented | OPC-10000-4 §5.13.2 Monitor Items 500 | MUC_OPCUA_CU_MONITOR_ITEMS_500 | — | test_profile_surface |
-| opc_monitor_minqueuesize_05 | conformance_unit | documented | OPC-10000-4 §5.13.2 Monitor MinQueueSize_05 | MUC_OPCUA_CU_MONITOR_MINQUEUESIZE_05 | — | test_profile_surface |
+| opc_monitor_items_500 | conformance_unit | claimed | OPC-10000-4 §5.13.2 Monitor Items 500 | MUC_OPCUA_CU_MONITOR_ITEMS_500 | standard, full | test_subscriptions_capacity |
+| opc_monitor_minqueuesize_05 | conformance_unit | claimed | OPC-10000-4 §5.13.2 Monitor MinQueueSize_05 | MUC_OPCUA_CU_MONITOR_MINQUEUESIZE_05 | standard, full | test_subscriptions_capacity |
 | opc_facet_1029 | facet | unimplemented | OPC-10000-7 §4.2 | — | — | — |
 | opc_facet_1322 | facet | implemented | OPC-10000-7 §4.2 | MUC_OPCUA_FACET_CORE_2022_SERVER | all | — |
 | opc_facet_1636 | facet | unimplemented | OPC-10000-7 §4.2 | — | — | — |
 | opc_facet_1637 | facet | unimplemented | OPC-10000-7 §4.2 | — | — | — |
-| opc_cu_2446 | conformance_unit | claimed |  | MUC_OPCUA_CU_ADDRESS_SPACE_ADDIN_REFERENCE | full | test_profile_surface |
+| opc_cu_2446 | conformance_unit | claimed |  | MUC_OPCUA_CU_ADDRESS_SPACE_ADDIN_REFERENCE | full | test_profile_surface, test_type_system |
 | opc_cu_2447 | conformance_unit | claimed |  | MUC_OPCUA_CU_ADDRESS_SPACE_ADDIN_DEFAULTINSTANCEBROWSENAME | full | test_profile_surface |
 | opc_cu_2476 | conformance_unit | claimed |  | MUC_OPCUA_CU_BASE_INFO_LOCALTIME | full | test_profile_surface |
-| opc_cu_2600 | conformance_unit | documented |  | MUC_OPCUA_CU_SECURITYPOLICY_SUPPORT | all | test_security_policy, test_secure_channel |
+| opc_cu_2600 | conformance_unit | implemented |  | MUC_OPCUA_CU_SECURITYPOLICY_SUPPORT | all | test_security_policy, test_secure_channel |
 | opc_cu_2711 | conformance_unit | claimed |  | MUC_OPCUA_CU_BASE_INFO_SELECTION_LIST | full | test_profile_surface |
-| opc_cu_2809 | conformance_unit | documented |  | MUC_OPCUA_CU_ADDRESS_SPACE_ATOMICITY | all | test_profile_surface |
+| opc_cu_2809 | conformance_unit | unimplemented |  | MUC_OPCUA_CU_ADDRESS_SPACE_ATOMICITY | nano, micro, embedded, standard | test_profile_surface |
 | opc_cu_2820 | conformance_unit | documented |  | MUC_OPCUA_CU_ADDRESS_SPACE_FULL_ARRAY_ONLY | all | test_profile_surface |
 | opc_cu_2969 | conformance_unit | claimed |  | MUC_OPCUA_CU_BASE_INFO_VALUEASTEXT | full | test_profile_surface |
 | opc_cu_3127 | conformance_unit | claimed |  | MUC_OPCUA_CU_BASE_INFO_OPTIONSET | full | test_profile_surface |
-| opc_cu_3184 | conformance_unit | documented |  | — | micro, embedded, standard, full | test_profile_surface |
-| opc_cu_3186 | conformance_unit | documented |  | — | micro, embedded, standard, full | test_profile_surface |
 | opc_cu_3198 | conformance_unit | claimed |  | MUC_OPCUA_CU_BASE_INFO_ESTIMATED_RETURN_TIME | full | test_profile_surface |
-| opc_cu_3545 | conformance_unit | documented |  | — | micro, embedded, standard, full | test_profile_surface |
-| opc_cu_3554 | conformance_unit | documented |  | — | micro, embedded, standard, full | test_profile_surface |
 | opc_cu_3560 | conformance_unit | claimed |  | MUC_OPCUA_CU_ADDRESS_SPACE_INTERFACES | full | test_profile_surface |
 | opc_cu_3808 | conformance_unit | documented |  | MUC_OPCUA_CU_DOCUMENTATION_CORE_CAPACITIES | all | test_profile_surface |
-| opc_cu_3912 | conformance_unit | documented |  | — | all | test_profile_surface |
 | opc_cu_4053 | conformance_unit | claimed |  | MUC_OPCUA_CU_BASE_INFO_LOCATIONS_OBJECT | full | test_profile_surface |
 | opc_cu_4237 | conformance_unit | documented |  | MUC_OPCUA_CU_ADDRESS_SPACE_NONVOLATILE_CONSTANT | full | test_profile_surface |
 | opc_cu_5240 | conformance_unit | claimed |  | MUC_OPCUA_CU_BASE_INFO_CURRENCY | full | test_profile_surface |
@@ -87,7 +82,7 @@ remains future work.
 | opc_cu_2963 | conformance_unit | documented |  | MUC_OPCUA_CU_MONITOR_BASIC | micro, embedded, standard, full | test_profile_surface |
 | opc_cu_3146 | conformance_unit | documented |  | MUC_OPCUA_CU_MONITOR_TRIGGERING | embedded, standard, full | test_profile_surface |
 | opc_cu_3185 | conformance_unit | documented |  | MUC_OPCUA_CU_BASE_INFO_CORE_TYPES_FOLDERS | embedded, standard, full | test_profile_surface |
-| opc_cu_3188 | conformance_unit | documented |  | — | embedded, standard, full | test_profile_surface |
+| opc_cu_3188 | conformance_unit | claimed |  | MUC_OPCUA_CU_BASE_INFO_BASE_TYPES | embedded, standard, full | test_profile_surface |
 | opc_cu_3189 | conformance_unit | claimed |  | MUC_OPCUA_CU_BASE_INFO_SERVERTYPE | embedded, standard, full | test_type_system |
 | opc_cu_3196 | conformance_unit | documented |  | MUC_OPCUA_CU_BASE_INFO_FIXED_SAMPLINGINTERVAL | full | test_profile_surface |
 | opc_cu_3207 | conformance_unit | documented |  | MUC_OPCUA_CU_BASE_INFO_OPTIONSET_DATATYPE | full | test_profile_surface |
@@ -184,12 +179,8 @@ remains future work.
 | opc_cu_namespaces | optimization | claimed | OPC-10000-4 Core 2022 Server Facet | MUC_OPCUA_CU_NAMESPACES | full | test_read_browsename_namespace |
 | opc_cu_base_info_datatypes | optimization | claimed | OPC-10000-5 Core 2022 Server Facet | MUC_OPCUA_CU_BASE_INFO_DATATYPES | embedded, standard, full | test_type_system |
 | opc_cu_base_info_argument_type | optimization | claimed | OPC-10000-5 Core 2022 Server Facet | MUC_OPCUA_CU_BASE_INFO_ARGUMENT_TYPE | embedded, standard, full | test_type_system |
-| opc_cu_base_info_base_types | optimization | claimed | OPC-10000-5 Core 2022 Server Facet | MUC_OPCUA_CU_BASE_INFO_BASE_TYPES | embedded, standard, full | test_type_system |
-| service_read | conformance_unit | claimed | OPC-10000-4 §5.10.2 Core 2017 Server Facet | MUC_OPCUA_CU_ATTRIBUTE_READ | all | test_read_service |
-| service_browse | optimization | claimed | OPC-10000-4 §5.8 Core 2017 | MUC_OPCUA_CU_VIEW_BASIC_TRANSLATEBROWSEPATH | all | test_browse_service, test_browse_limits, test_view_services |
-| service_discovery | optimization | claimed | OPC-10000-4 §5.4 Core 2017 | MUC_OPCUA_CU_DISCOVERY_FIND_SERVERS_SELF_GET_ENDPOINTS | all | test_discovery_endpoint |
+| opc_cu_base_info_base_types | optimization | documented | OPC-10000-5 Core 2022 Server Facet | — | embedded, standard, full | test_type_system |
 | service_register_nodes | conformance_unit | claimed | OPC-10000-4 §5.9 Core 2017 | MUC_OPCUA_CU_VIEW_REGISTERNODES | all | test_view_services, test_profile_surface |
-| service_write | optimization | claimed | OPC-10000-4 §5.10.4 Core 2017 Attribute Write | MUC_OPCUA_CU_CORE_2017_ATTRIBUTE_WRITE | full | test_write_service |
 | service_history | optimization | claimed | OPC-10000-11 Historical Access Server Facet | MUC_OPCUA_CU_HISTORICAL_ACCESS_SERVER_FACET | full | test_history |
 | opc_cu_1571 | conformance_unit | documented | OPC-10000-11 | MUC_OPCUA_CU_HISTORICAL_RAW_DATA_2022_SERVER_FACET | full | test_profile_surface |
 | opc_cu_1572 | conformance_unit | deferred | OPC-10000-11 | — | — | — |
@@ -215,8 +206,8 @@ remains future work.
 | opc_facet_1760 | facet | implemented | OPC-10000-7 §4.2 | MUC_OPCUA_FACET_SECURITY_TIME_SYNCHRONIZATION | all | — |
 | opc_cu_2317 | conformance_unit | claimed | OPC-10000-4 §5.9.4 | MUC_OPCUA_CU_VIEW_TRANSLATEBROWSEPATH | all | test_browse_service, test_view_services |
 | opc_cu_2328 | conformance_unit | claimed | OPC-10000-4 §5.5.1, 5.5.4 | MUC_OPCUA_CU_DISCOVERY_GET_ENDPOINTS | all | test_discovery_endpoint, test_discovery_services |
-| opc_cu_2352 | conformance_unit | documented | OPC-10000-4 §5.5.2 | MUC_OPCUA_CU_DISCOVERY_FIND_SERVERS_SELF | all | test_discovery_services |
-| opc_cu_2389 | conformance_unit | documented | OPC-10000-4 §5.11.4 | MUC_OPCUA_CU_ATTRIBUTE_WRITE_VALUES | full | test_write_value_gate, test_write_service |
+| opc_cu_2352 | conformance_unit | claimed | OPC-10000-4 §5.5.2 | MUC_OPCUA_CU_DISCOVERY_FIND_SERVERS_SELF | all | test_discovery_services, test_discovery_endpoint |
+| opc_cu_2389 | conformance_unit | claimed | OPC-10000-4 §5.11.4 | MUC_OPCUA_CU_ATTRIBUTE_WRITE_VALUES | full | test_write_value_gate, test_write_service |
 | opc_cu_2400 | conformance_unit | claimed | OPC-10000-4 §5.7.3 | MUC_OPCUA_CU_SESSION_CHANGE_USER | full | test_session, test_session_auth |
 | opc_cu_2407 | conformance_unit | documented |  | MUC_OPCUA_CU_SECURITY_ADMINISTRATION | full | test_profile_surface |
 | opc_cu_2478 | conformance_unit | documented |  | MUC_OPCUA_CU_TIME_SYNC_OS_BASED_SUPPORT | full | test_time_sync |
@@ -226,23 +217,19 @@ remains future work.
 | opc_cu_2808 | conformance_unit | documented |  | MUC_OPCUA_CU_SECURITY_ROLE_SERVER_AUTHORIZATION | full | test_role_management |
 | opc_cu_2823 | conformance_unit | documented |  | MUC_OPCUA_CU_SECURITY_INVALID_USER_TOKEN | embedded, standard, full | test_profile_surface |
 | opc_cu_2936 | conformance_unit | claimed | OPC-10000-4 §5.11.4 | MUC_OPCUA_CU_ATTRIBUTE_WRITE_STATUSCODE_TIMESTAMP | full | test_write_service, test_write_response |
-| opc_cu_3072 | conformance_unit | documented |  | — | all | test_profile_surface |
-| opc_cu_3073 | conformance_unit | documented |  | — | all | test_profile_surface |
+| opc_cu_3072 | conformance_unit | claimed |  | MUC_OPCUA_CU_ATTRIBUTE_READ | all | test_profile_surface, test_read_service |
 | opc_cu_3125 | conformance_unit | documented |  | MUC_OPCUA_CU_SECURITY_USER_X509 | standard, full | test_profile_surface |
 | opc_cu_3143 | conformance_unit | documented |  | MUC_OPCUA_CU_SUBSCRIPTION_PUBLISHREQUEST_QUEUE_OVERFLOW | micro, embedded, standard, full | test_profile_surface |
 | opc_cu_3147 | conformance_unit | claimed | OPC-10000-4 §5.11.4 | MUC_OPCUA_CU_ATTRIBUTE_WRITE_INDEX_RANGE | full | test_write_service |
-| opc_cu_3175 | conformance_unit | documented |  | — | all | test_profile_surface |
 | opc_cu_3192 | conformance_unit | claimed | OPC-10000-5 §6.3.1, 6.3.3, 8.3.2, 12.9 | MUC_OPCUA_CU_BASE_INFO_DIAGNOSTICS | full | test_diagnostics, test_profile_surface |
 | opc_cu_3530 | conformance_unit | claimed | OPC-10000-4 §5.9.2, 5.9.3 | MUC_OPCUA_CU_VIEW_BASIC_2 | all | test_browse_service, test_browse_limits, test_view_services |
 | opc_cu_3534 | conformance_unit | documented |  | MUC_OPCUA_CU_SUBSCRIPTION_MULTIPLE | embedded, standard, full | test_profile_surface |
 | opc_cu_3535 | conformance_unit | documented |  | MUC_OPCUA_CU_SUBSCRIPTION_RETRANSMISSION_QUEUE | embedded, standard, full | test_profile_surface |
 | opc_cu_3536 | conformance_unit | documented |  | MUC_OPCUA_CU_SECURITY_USER_NAME_PASSWORD_2 | embedded, standard, full | test_profile_surface |
 | opc_cu_3645 | conformance_unit | documented |  | MUC_OPCUA_CU_SECURITY_USER_TOKEN_UNENCRYPTED | full | test_profile_surface |
-| opc_cu_3727 | conformance_unit | documented |  | — | micro, embedded, standard, full | test_profile_surface |
 | opc_cu_3802 | conformance_unit | documented |  | MUC_OPCUA_CU_TIME_SYNC_CONFIGURE_CLOCK_SKEW | full | test_profile_surface |
 | opc_cu_3913 | conformance_unit | documented |  | MUC_OPCUA_CU_SUBSCRIPTION_PUBLISH_BASIC | micro, embedded, standard, full | test_profile_surface |
 | opc_cu_3983 | conformance_unit | claimed | OPC-10000-4 §7.32, 7.38 | MUC_OPCUA_CU_BASE_SERVICES_DIAGNOSTICS | full | test_service_header |
-| opc_cu_3985 | conformance_unit | documented |  | — | all | test_profile_surface |
 | opc_cu_5505 | conformance_unit | documented |  | MUC_OPCUA_CU_TIME_SYNC_UA_BASED_SUPPORT | full | test_profile_surface |
 | opc_cu_5793 | conformance_unit | documented |  | MUC_OPCUA_CU_TIME_SYNC_SUPPORT | all | test_profile_surface |
 | opc_cu_protocol_ua_tcp | conformance_unit | documented | OPC-10000-6 §7.1 | MUC_OPCUA_CU_PROTOCOL_UA_TCP | all | test_tcp_connection |
@@ -265,7 +252,7 @@ remains future work.
 | opc_cu_3153 | conformance_unit | documented |  | MUC_OPCUA_CU_NODE_MANAGEMENT_DELETE_REF | full | test_profile_surface |
 | opc_cu_3194 | conformance_unit | documented |  | MUC_OPCUA_CU_BASE_INFO_EVENTS_CAPABILITIES | full | test_claim_map, test_read_service |
 | opc_cu_2422 | conformance_unit | documented |  | MUC_OPCUA_CU_AUDITING_SECURE_COMMUNICATION | full | test_claim_map, test_event_notifications |
-| opc_cu_3968 | conformance_unit | documented |  | MUC_OPCUA_CU_AUDITING_SERVICES | full | test_event_notifications |
+| opc_cu_3968 | conformance_unit | documented |  | MUC_OPCUA_CU_AUDITING_SERVICES | full | — |
 | opc_cu_3228 | conformance_unit | documented |  | MUC_OPCUA_CU_AUDITING_WRITE | full | test_claim_map, test_event_notifications |
 | opc_cu_3224 | conformance_unit | documented | OPC-10000-5 | MUC_OPCUA_CU_AUDITING_NODEMANAGEMENT | full | test_claim_map |
 | opc_cu_3230 | conformance_unit | documented | OPC-10000-5 | MUC_OPCUA_CU_AUDITING_METHOD | full | test_claim_map |
@@ -470,10 +457,8 @@ remains future work.
 | opc_cu_5276 | conformance_unit | documented |  | MUC_OPCUA_CU_SECURITY_ROLE_SERVER_APPLICATIONMANAGEMENT | full | test_profile_surface |
 | opc_cu_5275 | conformance_unit | documented |  | MUC_OPCUA_CU_SECURITY_ROLE_SERVER_ENDPOINTMANAGEMENT | full | test_profile_surface |
 | opc_cu_5274 | conformance_unit | documented |  | MUC_OPCUA_CU_SECURITY_ROLE_SERVER_IDENTITYMANAGEMENT | full | test_profile_surface |
-| opc_cu_5250 | conformance_unit | documented |  | — | full | test_subscriptions_capacity, test_subscription_deadband, test_subscription_publish |
-| opc_cu_5249 | conformance_unit | documented |  | MUC_OPCUA_CU_SUBSCRIPTION_PUBLISH_MIN_10 | full | test_subscriptions_capacity, test_subscription_deadband, test_subscription_publish |
-| opc_cu_5248 | conformance_unit | documented |  | MUC_OPCUA_CU_SUBSCRIPTION_MINIMUM_05 | full | test_subscriptions_capacity, test_subscription_deadband, test_subscription_publish |
-| opc_cu_5242 | conformance_unit | documented |  | — | full | test_subscriptions_capacity, test_subscription_deadband, test_subscription_publish |
+| opc_cu_5249 | conformance_unit | claimed |  | MUC_OPCUA_CU_SUBSCRIPTION_PUBLISH_MIN_10 | standard, full | test_subscriptions_capacity, test_subscription_deadband, test_subscription_publish |
+| opc_cu_5248 | conformance_unit | claimed |  | MUC_OPCUA_CU_SUBSCRIPTION_MINIMUM_05 | standard, full | test_subscriptions_capacity, test_subscription_deadband, test_subscription_publish |
 | opc_cu_5213 | conformance_unit | documented |  | MUC_OPCUA_CU_AUDITING_CONNECTIONS | full | test_audit_events, test_event_notifications |
 | opc_cu_4957 | conformance_unit | documented |  | MUC_OPCUA_CU_SECURITY_USER_IDENTITY_TOKEN_SUPPORT | full | test_profile_surface |
 | opc_cu_4505 | conformance_unit | documented |  | MUC_OPCUA_CU_SECURITY_USER_MANAGEMENT_SERVER | full | test_profile_surface |
@@ -531,7 +516,7 @@ remains future work.
 | opc_cu_3213 | conformance_unit | documented |  | MUC_OPCUA_CU_BASE_INFO_FILE_TYPE_BASE | full | test_profile_surface |
 | opc_cu_3203 | conformance_unit | documented |  | MUC_OPCUA_CU_BASE_INFO_MODEL_CHANGE_GENERAL | full | test_profile_surface |
 | opc_cu_3197 | conformance_unit | documented |  | MUC_OPCUA_CU_BASE_INFO_SECURITY_ROLE_CAPABILITIES | full | test_profile_surface |
-| opc_cu_3182 | conformance_unit | documented |  | MUC_OPCUA_CU_AUTHORIZATION_SERVICE_CONFIGURATION_SERVER | full | test_profile_surface |
+| opc_cu_3182 | conformance_unit | implemented | OPC-10000-12 §9.7.4 | MUC_OPCUA_CU_AUTHORIZATION_SERVICE_CONFIGURATION_SERVER | full | test_profile_surface, tests/unit/test_type_system.c |
 | opc_cu_3171 | conformance_unit | documented |  | MUC_OPCUA_CU_DISCOVERY_SERVER_ANNOUNCEMENT_USING_MDNS | full | test_claim_map |
 | opc_cu_3165 | conformance_unit | documented |  | MUC_OPCUA_CU_A_C_SHELVING | full | test_alarms_conditions |
 | opc_cu_3162 | conformance_unit | claimed |  | MUC_OPCUA_CU_AGGREGATE_STANDARDDEVIATIONPOPULATION | — | test_history |
@@ -671,7 +656,6 @@ remains future work.
 | mdns_discovery | optimization | implemented | OPC-10000-12 §Annex A | MUC_OPCUA_MDNS_DISCOVERY | full | — |
 | cu_user_token_jwt | optimization | implemented | OPC-10000-7 §CU 1697 User Token JWT Server Facet | MUC_OPCUA_CU_USER_TOKEN_JWT | full | test_jwt_activate_session |
 | cu_certificate_manager_pull | optimization | implemented | OPC-10000-12 §7.6, 7.9 | MUC_OPCUA_CU_CERTIFICATE_MANAGER_PULL | full | test_certificate_manager |
-| cu_authorization_service_server | optimization | implemented | OPC-10000-7 §CU 1629 Authorization Service Server Facet | MUC_OPCUA_CU_AUTHORIZATION_SERVICE_SERVER | — | — |
 | opc_cu_aliasname | optimization | documented | OPC-10000-7 | MUC_OPCUA_CU_ALIASNAME | — | test_aliasname_stub |
 | opc_cu_scheduler | optimization | documented | OPC-10000-7 | MUC_OPCUA_CU_SCHEDULER | — | test_scheduler_stub |
 

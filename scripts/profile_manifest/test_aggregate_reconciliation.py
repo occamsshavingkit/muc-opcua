@@ -147,12 +147,9 @@ class AggregateCuReconciliationTest(unittest.TestCase):
         manifest = completion._load_yaml(_MANIFEST)
         items = manifest["items"]
         self._groups = completion._entries_by_cu_id(items)
-        self._by_id = completion._index_by_id(items)
 
     def _is_implemented(self, cu_id: str) -> bool:
-        return completion._cu_id_implemented(
-            cu_id, self._groups.get(cu_id, []), self._by_id
-        )
+        return completion._cu_id_implemented(self._groups.get(cu_id, []))
 
     def test_extraction_finds_the_expected_shape_of_data(self) -> None:
         """Guard against a silently vacuous suite.

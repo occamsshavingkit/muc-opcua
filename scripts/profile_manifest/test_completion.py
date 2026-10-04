@@ -2,8 +2,8 @@
 """Fixture tests for profile_manifest.completion counting (spec 073).
 
 These verify the completion arithmetic — closure denominator, required/optional
-split from cu_optional, status resolution through reconciliation links, and N/A
-exclusion — on a small known manifest, independent of the real data.
+split from cu_optional, status resolution through shared CU ids, and N/A exclusion
+— on a small known manifest, independent of the real data.
 """
 
 from __future__ import annotations
@@ -43,11 +43,11 @@ class TestCompletion(unittest.TestCase):
         manifest = {
             "items": [
                 _cu("opc_cu_100", state="claimed", optional=False),  # implemented directly
-                _cu("opc_cu_101", optional=False, satisfied_by="alias_x"),  # implemented via alias
+                _cu("opc_cu_101", optional=False),
                 _cu("opc_cu_102", state="implemented", optional=True),  # optional implemented
                 _cu("opc_cu_103", optional=True, na={"p": "mooted by profile constraint"}),  # optional N/A
                 _cu("opc_cu_104", optional=False),  # genuine required gap
-                _cu("alias_x", state="claimed", optional=False, cu_id="9999"),
+                _cu("alias_x", state="claimed", optional=False, cu_id="101"),
             ]
         }
         snapshot = {"relationships": {"transitive_cu_closure": {"55": [100, 101, 102, 103, 104]}}}
@@ -57,7 +57,6 @@ class TestCompletion(unittest.TestCase):
     def test_required_optional_counts_with_alias_and_na(self):
         manifest, snapshot, profiles = self._fixture()
         r = completion.compute_profile_completion(manifest, snapshot, profiles["p"])
-        # required in closure: 100,101,104 (103 is optional; not required). 100 direct, 101 via alias -> 2/3.
         self.assertEqual((r["required_implemented"], r["required_total"]), (2, 3))
         # optional in closure: 102,103. 103 is N/A -> excluded. 102 implemented -> 1/1.
         self.assertEqual((r["optional_implemented"], r["optional_total"]), (1, 1))
@@ -72,14 +71,40 @@ class TestCompletion(unittest.TestCase):
         r = completion.compute_profile_completion(manifest, snapshot, profiles["p"])
         self.assertIn("200", [str(x) for x in r["missing_from_manifest"]])
 
-    def test_alias_resolution_requires_implemented_alias(self):
+    def test_shared_cu_id_resolution_requires_implemented_entry(self):
         manifest, snapshot, profiles = self._fixture()
-        # break the alias's status -> 101 no longer counts
         for it in manifest["items"]:
             if it["id"] == "alias_x":
                 it["implementation_state"] = "unimplemented"
         r = completion.compute_profile_completion(manifest, snapshot, profiles["p"])
         self.assertEqual((r["required_implemented"], r["required_total"]), (1, 3))
+
+    def test_forbidden_satisfied_by_does_not_change_completion(self):
+        manifest = {
+            "items": [
+                _cu("opc_cu_100", state="claimed", optional=False),
+                _cu(
+                    "opc_cu_101",
+                    optional=False,
+                    satisfied_by="alias_x",
+                ),
+                _cu("alias_x", state="claimed", optional=False, cu_id="9999"),
+            ]
+        }
+        snapshot = {
+            "relationships": {"transitive_cu_closure": {"55": [100, 101]}}
+        }
+
+        result = completion.compute_profile_completion(
+            manifest,
+            snapshot,
+            {"key": "p", "opc_id": "55"},
+        )
+
+        self.assertEqual(
+            (result["required_implemented"], result["required_total"]),
+            (1, 2),
+        )
 
     def test_shared_cu_id_aggregation(self):
         # Canonical placeholder (unimplemented) + impl entry share cu_id 300;
@@ -94,7 +119,6 @@ class TestCompletion(unittest.TestCase):
 
     def test_catalog_completion_uses_catalog_optionality(self):
         # Optionality comes from the catalog map, not manifest cu_optional;
-        # status is capability (manifest, via cu_id/aggregate/satisfied_by).
         manifest = {"items": [
             _cu("opc_cu_700", state="claimed"),          # implemented
             _cu("opc_cu_701", state="unimplemented"),    # not implemented
@@ -120,6 +144,31 @@ class TestCompletion(unittest.TestCase):
             manifest, snapshot, {"key": None, "opc_id": "1322", "rel": "included_conformance_units"})
         self.assertEqual((r["required_implemented"], r["required_total"]), (1, 1))
         self.assertEqual((r["optional_implemented"], r["optional_total"]), (0, 1))
+
+    def test_report_describes_direct_shared_cu_id_reconciliation(self):
+        manifest, snapshot, profiles = self._fixture()
+        snapshot["relationships"]["included_conformance_units"] = {}
+        catalog = {
+            "conformance_unit_optional": {
+                "100": False,
+                "101": False,
+                "102": True,
+                "103": True,
+                "104": False,
+            },
+            "profiles": [
+                {
+                    "opc_id": profiles["p"]["opc_id"],
+                    "name": profiles["p"]["display"],
+                    "conformance_units": ["100", "101", "102", "103", "104"],
+                }
+            ],
+        }
+
+        report = completion.render_report(manifest, snapshot, catalog)
+
+        self.assertNotIn("satisfied_by", report)
+        self.assertIn("shared OPC CU id", report)
 
     def test_manifest_profile_summary_matches_detailed_completion(  # pylint: disable=too-many-locals
         self,

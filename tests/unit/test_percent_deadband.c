@@ -17,7 +17,7 @@
 void setUp(void) {}
 void tearDown(void) {}
 
-#if MUC_OPCUA_SUBSCRIPTIONS && MUC_OPCUA_SUBSCRIPTIONS_STANDARD && MUC_OPCUA_DATA_ACCESS
+#if MUC_OPCUA_CU_SUBSCRIPTION_BASIC && MUC_OPCUA_CU_SUBSCRIPTION_STANDARD && MUC_OPCUA_DATA_ACCESS
 
 static mu_variant_t make_double(opcua_double_t v) {
     mu_variant_t out;
@@ -89,7 +89,7 @@ void test_percent_deadband_requires_data_access_build(void) {
 
 int main(void) {
     UNITY_BEGIN();
-#if MUC_OPCUA_SUBSCRIPTIONS && MUC_OPCUA_SUBSCRIPTIONS_STANDARD && MUC_OPCUA_DATA_ACCESS
+#if MUC_OPCUA_CU_SUBSCRIPTION_BASIC && MUC_OPCUA_CU_SUBSCRIPTION_STANDARD && MUC_OPCUA_DATA_ACCESS
     RUN_TEST(test_percent_deadband_below_threshold_not_reportable);
     RUN_TEST(test_percent_deadband_above_threshold_reportable);
     RUN_TEST(test_percent_deadband_at_threshold_reportable);

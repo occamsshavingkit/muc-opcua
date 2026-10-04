@@ -72,17 +72,17 @@ Measured 2026-07-18 (`scripts/measure_size.sh all`, Arm Cortex-M0+ `-Os` archive
 | standard | 102,260 B | Standard 2022 UA Server (Embedded + Enhanced DataChange capacity + X509) |
 | full | 134,447 B | — (everything on: Write, Events, Data Access, Method Server, History, Query, NodeManagement, PubSub, Aggregate, Diagnostics, Reverse Connect, Client Redundancy, ECC, …) |
 
-The base type-system CUs (3188/3185, spec 080b) add ~3.1 KB `.text` to
-`embedded`/`standard` and ~2.9 KB to `full`; `nano`/`micro` are unaffected (their
+The base type-system CUs (3188/3185, spec 080b) add ~3.1 KiB `.text` to
+`embedded`/`standard` and ~2.9 KiB to `full`; `nano`/`micro` are unaffected (their
 minimal address space carries no type system). The `ServerType` type tree (CU 3189,
 spec 083 — 61 nodes) adds a further **+9,280 B** to `embedded`/`standard`/`full`
 alike (identical delta once the type system is on); `nano`/`micro` are unaffected.
 Making `ServerStatus.Value` readable as a `ServerStatusDataType` (CU 3802/3808, spec
-084) adds ~0.6–0.7 KB to **every** profile (it lives in the core Server object, so
+084) adds ~0.6–0.7 KiB to **every** profile (it lives in the core Server object, so
 `nano`/`micro` grow too). The remaining diagnostics type-system InstanceDeclarations
 (CU 5801 part 2, spec 092) — `SubscriptionDiagnosticsType` (31 members),
 `SessionDiagnosticsVariableType` (43 members), `SessionDiagnosticsObjectType` (4),
-and `ServerRedundancyType` (2) — add ~13.2 KB to `embedded`/`standard`/`full`;
+and `ServerRedundancyType` (2) — add ~13.2 KiB to `embedded`/`standard`/`full`;
 `nano`/`micro` are unaffected.
 
 Built with LTO (`MUC_OPCUA_LTO=ON`, the default). The `nano`/`micro`/`embedded`
@@ -90,8 +90,8 @@ profiles are strictly no-heap (`MUC_OPCUA_ALLOW_HEAP=OFF`): 0 B `.data`, 0 B `.b
 no `malloc` in the linked server. With LTO's cross-module optimization the real
 linked `nano` server is smaller after `--gc-sections`, below the archive figure above.
 `standard`/`full` keep the heap enabled for array-valued responses. The optional ECC
-SecurityPolicies (spec 059, ~3.1 KB) are `full`-only by default and available
-on any build via `-DMUC_OPCUA_ECC=ON`; see
+SecurityPolicies (spec 059, ~3.1 KiB) are `full`-only by default and available
+on any build via `-DMUC_OPCUA_CU_SECURITY_ECC=ON`; see
 [docs/conformance/ecc-security-policy.md](docs/conformance/ecc-security-policy.md) and
 [docs/build-and-gating.md](docs/build-and-gating.md).
 
@@ -104,7 +104,9 @@ nonzero `.data`/`.bss`. All server state otherwise lives in the two caller-owned
 blocks below.
 
 **Server object** (`sizeof(struct mu_server)`) — the control block `mu_server_init`
-places into your storage. Scales with the compiled capacities.
+places into your storage. These are 32-bit Arm Cortex-M0+ measurements from the
+same run as the flash table above; host `sizeof` values differ with the ABI. The
+object scales with the compiled capacities.
 
 | Profile | sizeof(struct mu_server) |
 |---------|--------------------------|
@@ -116,6 +118,8 @@ places into your storage. Scales with the compiled capacities.
 
 **Caller-provided storage** (`MU_SERVER_STORAGE_BYTES`) — the single block you hand to
 `mu_server_init`; holds the server object plus its scratch/chunk/security buffers.
+The values below are for the same Arm profile configurations as the server-object
+table.
 Connections scale with sessions (each concurrent session may be an independent
 client holding its own SecureChannel), so the connection pool dominates the
 standard/full storage. Retune per build with `-DMU_MAX_CONNECTIONS=n`.
@@ -128,10 +132,11 @@ standard/full storage. Retune per build with `-DMU_MAX_CONNECTIONS=n`.
 | standard | 1,394,656 B | 50 | 50 | 50 | 1,000 | 5 | 50 |
 | full | 4,380,844 B | 100 | 100 | 100 | 2,000 | 5 | 100 |
 
-The `standard`/`full` monitored-item queue depth is **5** (not 2): they advertise
-`StandardUA2017`, which mandates the **Enhanced DataChange Subscription 2022** facet
-(`MinQueueSize_05`). The deeper fixed inline queue adds +144 KiB (standard) / +288 KiB
-(full) of static RAM vs a depth-2 build — see
+The `standard`/`full` monitored-item queue depth is **5** (not 2): both builds enable
+the four mandatory **Enhanced DataChange Subscription 2022** capacity CUs, including
+`MinQueueSize_05`. On the measured Arm ABI, the deeper fixed inline queue grows the
+server object by 168,000 B (~164.1 KiB) for standard and 336,000 B (~328.1 KiB) for
+full versus a depth-2 build. See
 [docs/conformance/enhanced-datachange.md](docs/conformance/enhanced-datachange.md).
 
 Full methodology in [docs/size/feature-size-ledger.md](docs/size/feature-size-ledger.md).
@@ -305,7 +310,8 @@ and [cmake/MucOpcUaOptions.cmake](cmake/MucOpcUaOptions.cmake)):
 - `MUC_OPCUA_KCONFIG_CONFIG` (default empty) reuses a `.config` saved from
   `menuconfig`.
 - `MUC_OPCUA_<KCONFIG_SYMBOL>` (default profile-derived) overrides one
-  Kconfig feature, e.g. `MUC_OPCUA_SECURITY=OFF` or `MUC_OPCUA_PUBSUB=ON`.
+  Kconfig feature, e.g. `MUC_OPCUA_SECURE_CHANNEL_CRYPTO=OFF` or
+  `MUC_OPCUA_CU_PUBSUB=ON`.
 - `MUC_OPCUA_BUILD_EXAMPLES` / `_BUILD_TESTS` / `_BUILD_FUZZERS` (default
   OFF) build extras.
 - `MUC_OPCUA_PLATFORM` (default `host`) selects `host`, `external`, `pico`, or
@@ -321,7 +327,8 @@ cmake --build build/test
 cd build/test && ctest --output-on-failure
 ```
 
-The host build links a POSIX TCP adapter and (with `MUC_OPCUA_SECURITY=ON`) an OpenSSL
+The host build links a POSIX TCP adapter and (with
+`MUC_OPCUA_SECURE_CHANNEL_CRYPTO=ON`) an OpenSSL
 crypto adapter for interop against real OPC UA clients.
 
 ### Cross-compiling for RP2040

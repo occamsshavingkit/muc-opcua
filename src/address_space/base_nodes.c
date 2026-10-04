@@ -44,7 +44,7 @@ typedef int mu_preamble_anchor_t;
 #endif
 static const opcua_byte_t s_str_AggregateFunctions[] = "AggregateFunctions";
 static const opcua_byte_t s_str_Aggregates[] = "Aggregates";
-#if MUC_OPCUA_CU_AUTHORIZATION_SERVICE_SERVER && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+#if MUC_OPCUA_CU_AUTHORIZATION_SERVICE_CONFIGURATION_SERVER && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
 static const opcua_byte_t s_str_AuthorizationServiceConfigurationDataType[] =
     "AuthorizationServiceConfigurationDataType";
 static const opcua_byte_t s_str_AuthorizationServiceConfigurationType[] = "AuthorizationServiceConfigurationType";
@@ -1004,17 +1004,17 @@ static const mu_reference_t s_base_object_type_refs[] = {
      {0, MU_NODEID_NUMERIC, {15594}},
      true} /* HasSubtype -> CertificateDirectoryType, OPC-10000-12 §7.9.2 */
 #endif
-#if MUC_OPCUA_CU_AUTHORIZATION_SERVICE_SERVER && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+#if MUC_OPCUA_CU_AUTHORIZATION_SERVICE_CONFIGURATION_SERVER && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
     ,
     {{0, MU_NODEID_NUMERIC, {45}}, {0, MU_NODEID_NUMERIC, {17852}}, true}
 #endif
 };
 
-#if MUC_OPCUA_CU_AUTHORIZATION_SERVICE_SERVER && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+#if MUC_OPCUA_CU_AUTHORIZATION_SERVICE_CONFIGURATION_SERVER && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
 static const mu_reference_t s_authorization_service_configuration_type_refs[] = {
-    {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {17853}}, true},
-    {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {17854}}, true},
-    {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {17855}}, true},
+    {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {18072}}, true},
+    {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {17860}}, true},
+    {{0, MU_NODEID_NUMERIC, {46}}, {0, MU_NODEID_NUMERIC, {18073}}, true},
 };
 #endif
 
@@ -7306,7 +7306,7 @@ static const mu_node_t s_base_nodes[] = {
      NULL,
      .type_definition = {0, MU_NODEID_NUMERIC, {61}}},
 #endif
-#if MUC_OPCUA_CU_AUTHORIZATION_SERVICE_SERVER && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
+#if MUC_OPCUA_CU_AUTHORIZATION_SERVICE_CONFIGURATION_SERVER && MUC_OPCUA_CU_BASE_INFO_TYPE_INFORMATION
     {{0, MU_NODEID_NUMERIC, {17852}},
      MU_NODECLASS_OBJECTTYPE,
      {37, s_str_AuthorizationServiceConfigurationType},
@@ -7316,17 +7316,7 @@ static const mu_node_t s_base_nodes[] = {
          sizeof(s_authorization_service_configuration_type_refs[0]),
      NULL,
      .type_definition = {0}},
-    {{0, MU_NODEID_NUMERIC, {17853}},
-     MU_NODECLASS_VARIABLE,
-     {10, s_str_ServiceUri},
-     {10, s_str_ServiceUri},
-     s_mandatory_property_refs,
-     sizeof(s_mandatory_property_refs) / sizeof(s_mandatory_property_refs[0]),
-     NULL,
-     .type_definition = {0, MU_NODEID_NUMERIC, {68}},
-     .value_rank = -1,
-     .data_type = 12},
-    {{0, MU_NODEID_NUMERIC, {17854}},
+    {{0, MU_NODEID_NUMERIC, {17860}},
      MU_NODECLASS_VARIABLE,
      {18, s_str_ServiceCertificate},
      {18, s_str_ServiceCertificate},
@@ -7336,7 +7326,17 @@ static const mu_node_t s_base_nodes[] = {
      .type_definition = {0, MU_NODEID_NUMERIC, {68}},
      .value_rank = -1,
      .data_type = 15},
-    {{0, MU_NODEID_NUMERIC, {17855}},
+    {{0, MU_NODEID_NUMERIC, {18072}},
+     MU_NODECLASS_VARIABLE,
+     {10, s_str_ServiceUri},
+     {10, s_str_ServiceUri},
+     s_mandatory_property_refs,
+     sizeof(s_mandatory_property_refs) / sizeof(s_mandatory_property_refs[0]),
+     NULL,
+     .type_definition = {0, MU_NODEID_NUMERIC, {68}},
+     .value_rank = -1,
+     .data_type = 12},
+    {{0, MU_NODEID_NUMERIC, {18073}},
      MU_NODECLASS_VARIABLE,
      {17, s_str_IssuerEndpointUrl},
      {17, s_str_IssuerEndpointUrl},

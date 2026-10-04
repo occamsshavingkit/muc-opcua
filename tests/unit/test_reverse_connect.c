@@ -69,7 +69,6 @@ static opcua_statuscode_t test_random(void *ctx, opcua_byte_t *buf, size_t len) 
 }
 
 #ifdef MUC_OPCUA_CU_PROTOCOL_REVERSE_CONNECT_SERVER
-
 static opcua_statuscode_t mock_listen_track(void *ctx, const char *url) {
     (void)ctx;
     (void)url;

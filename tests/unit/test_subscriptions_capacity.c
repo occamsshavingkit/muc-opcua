@@ -19,7 +19,7 @@
 void setUp(void) {}
 void tearDown(void) {}
 
-#if MUC_OPCUA_SUBSCRIPTIONS && MUC_OPCUA_SUBSCRIPTIONS_STANDARD
+#if MUC_OPCUA_CU_SUBSCRIPTION_BASIC && MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
 
 #define STATUS_INFO_OVERFLOW 0x00000480u
 
@@ -357,14 +357,14 @@ void test_enhanced_monitored_item_queue_holds_five_before_overflow(void) {
 #else
 
 void test_standard_capacity_tests_require_standard_subscription_build(void) {
-    TEST_PASS_MESSAGE("MUC_OPCUA_SUBSCRIPTIONS_STANDARD is disabled in this build");
+    TEST_PASS_MESSAGE("MUC_OPCUA_CU_SUBSCRIPTION_BASIC or MUC_OPCUA_CU_SUBSCRIPTION_STANDARD is disabled");
 }
 
 #endif
 
 int main(void) {
     UNITY_BEGIN();
-#if MUC_OPCUA_SUBSCRIPTIONS && MUC_OPCUA_SUBSCRIPTIONS_STANDARD
+#if MUC_OPCUA_CU_SUBSCRIPTION_BASIC && MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
     RUN_TEST(test_standard_capacity_macros_meet_profile_minimums);
     RUN_TEST(test_accepts_required_subscriptions_and_rejects_capacity_exhaustion_without_storage_growth);
     RUN_TEST(test_accepts_required_monitored_items_and_rejects_capacity_exhaustion_without_storage_growth);

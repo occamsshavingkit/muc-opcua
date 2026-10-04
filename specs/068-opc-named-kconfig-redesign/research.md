@@ -1,21 +1,23 @@
 # Research: OPC-Named Kconfig Redesign
 
-## Decision 1: Profile→Custom Transition Mechanism
+## Decision 1: Profile Fidelity Reporting
 
-**Decision**: Use a companion generated Kconfig file with fidelity-check symbols.
+**Original (superseded)**: Use a companion generated Kconfig file with fidelity-check symbols to auto-switch the profile choice to `custom` when Facet/CU overrides diverge from the named profile.
 
-**Rationale**: Kconfig `choice` defaults can reference helper bool symbols. By generating `MUC_OPCUA_FACETS_MATCH_<PROFILE>` symbols that evaluate to `y` only when all profile-controlled Facets/CUs match the profile definition, each named profile can `default y if MUC_OPCUA_FACETS_MATCH_<NAME>`. The `custom` profile is the fallback at the end of the `default` chain. When a user overrides any Facet or CU, the match symbol becomes `n`, and the `custom` default fires, switching the choice.
+**Revised 2026-08-01**: Keep profile choice seeds stable and emit each advertised-profile marker directly from the conjunction of currently selectable mandatory CUs for its manifest `required_profile`. `MUC_OPCUA_FACETS_MATCH_*` is obsolete.
+
+**Rationale**: Kconfig `choice` symbols represent the user's explicitly selected seed profile, while the resolved Facet/CU state may intentionally differ. Automatically switching the choice to `custom` is misleading. Instead, `generate.py` derives the required selectable CU symbols for each advertisement marker and emits `default y if CU_A && ...`; when no complete selectable closure exists, it emits `default n`. The current Standard marker therefore remains off. `custom` is always explicit.
 
 **Alternatives considered**:
-- Post-configuration script: Too fragile. Requires running an extra step after every Kconfig resolution. Rejected.
-- `select`-based approach: Each CU override could `select PROFILE_CUSTOM`. This works but pollutes each symbol with a `select` and requires non-bool symbols for profile choice. Rejected for complexity.
+- ~~Post-configuration script: Too fragile. Requires running an extra step after every Kconfig resolution. Rejected.~~
+- ~~`select`-based approach: Each CU override could `select PROFILE_CUSTOM`. This works but pollutes each symbol with a `select` and requires non-bool symbols for profile choice. Rejected for complexity.~~
 - Move profile selection entirely to CMake (not Kconfig): Contradicts the spec's requirement that the Kconfig surface starts with a profile selector.
 
 ## Decision 2: Facet Group Toggle ↔ CU Interaction
 
 **Decision**: CU symbols `depends on MUC_OPCUA_FACET_<NAME>` for a hard gate. Facet is ON by default per profile. When OFF, CUs are forced OFF and not user-changeable. CUs default to profile-set values when Facet is ON.
 
-**Rationale**: This matches the spec requirement: "Facet toggle sets all implemented CUs as a group" (via `depends on`) and "individual CUs remain separately toggleable where implemented" (within the enabled Facet). Kconfig's `depends on` semantics are a natural fit.
+**Rationale**: This matches the spec requirement: the Facet toggle gates all implemented CUs as a group, while individual CUs remain separately toggleable when the Facet is enabled. Kconfig's `depends on` semantics are a natural fit because Facet OFF forces CUs off without making Facet ON force every CU on.
 
 **Alternatives considered**:
 - `select` from CU→Facet: Would auto-enable Facet when any CU is enabled. This prevents a clean "Facet OFF = all CUs OFF" model. Rejected.
@@ -43,8 +45,8 @@ def compute_kconfig_name(opc_display_name: str, kind: str) -> str:
 **Examples**:
 | OPC Name | Kind | Result |
 |----------|------|--------|
-| Embedded 2017 UA Server Profile | profile | EMBEDDED_2017_UA_SERVER |
-| Standard 2017 UA Server Profile | profile | STANDARD_2017_UA_SERVER |
+| Embedded 2025 UA Server Profile | profile | EMBEDDED_2025_UA_SERVER |
+| Standard 2025 UA Server Profile | profile | STANDARD_2025_UA_SERVER |
 | Core 2017 Server Facet | facet | CORE_2017_SERVER |
 | Subscription Server Facet | facet | SUBSCRIPTION_SERVER |
 | Attribute Read | conformance_unit | ATTRIBUTE_READ |
@@ -61,7 +63,7 @@ def compute_kconfig_name(opc_display_name: str, kind: str) -> str:
 
 ## Decision 5: Legacy Symbol Removal Strategy
 
-**Decision**: Remove all old project-centric `kconfig_symbol` values from the manifest. The generator computes new OPC-name-derived symbols. CMakeLists.txt is updated to reference only the new symbols. No backward-compatibility aliases.
+**Decision**: Remove all old project-centric `kconfig_symbol` values from the manifest. The generator computes new OPC-name-derived symbols. `CMakeLists.txt` discovers every generated selectable canonical boolean directly from Kconfig instead of duplicating a partial list. No backward-compatibility aliases.
 
 **Rationale**: The spec explicitly states "Do not preserve old project-internal MUC_OPCUA_* feature aliases." Old symbols like `MUC_OPCUA_SECURITY`, `MUC_OPCUA_SUBSCRIPTIONS` are replaced by `MUC_OPCUA_FACET_SECURITY`, `MUC_OPCUA_FACET_SUBSCRIPTIONS` (computed from OPC names).
 

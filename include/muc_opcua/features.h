@@ -14,16 +14,17 @@
 #ifndef MUC_OPCUA_FEATURES_H
 #define MUC_OPCUA_FEATURES_H
 
-/* The Standard DataChange Subscription facet extends the base subscription
-   engine; without it the standard-facet code has no subscription state to use. */
-#if defined(MUC_OPCUA_SUBSCRIPTIONS_STANDARD) && MUC_OPCUA_SUBSCRIPTIONS_STANDARD && !MUC_OPCUA_SUBSCRIPTIONS
-#error "MUC_OPCUA_SUBSCRIPTIONS_STANDARD requires MUC_OPCUA_SUBSCRIPTIONS"
+/* The Standard Subscription CU extends the Basic Subscription CU; without the
+   Basic CU, the Standard CU has no subscription state to use. */
+#if defined(MUC_OPCUA_CU_SUBSCRIPTION_STANDARD) && MUC_OPCUA_CU_SUBSCRIPTION_STANDARD &&                               \
+    !MUC_OPCUA_CU_SUBSCRIPTION_BASIC
+#error "MUC_OPCUA_CU_SUBSCRIPTION_STANDARD requires MUC_OPCUA_CU_SUBSCRIPTION_BASIC"
 #endif
 
 /* Event notifications are delivered through the subscription/MonitoredItem
-   machinery, so events cannot be built without the subscription engine. */
-#if defined(MUC_OPCUA_EVENTS) && MUC_OPCUA_EVENTS && !MUC_OPCUA_SUBSCRIPTIONS
-#error "MUC_OPCUA_EVENTS requires MUC_OPCUA_SUBSCRIPTIONS"
+   machinery, so events cannot be built without the Basic Subscription CU. */
+#if defined(MUC_OPCUA_EVENTS) && MUC_OPCUA_EVENTS && !MUC_OPCUA_CU_SUBSCRIPTION_BASIC
+#error "MUC_OPCUA_EVENTS requires MUC_OPCUA_CU_SUBSCRIPTION_BASIC"
 #endif
 
 /* The Base Information Type System node set is a subtree of the Base Information
@@ -43,10 +44,10 @@
 #endif
 
 /* The Standard Event Subscription facet's WhereClause evaluation is created and
-   flagged through the standard MonitoredItem filter path (per-item filterResult),
-   so it requires the standard subscription facet. */
-#if defined(MUC_OPCUA_EVENT_FILTER_WHERE) && MUC_OPCUA_EVENT_FILTER_WHERE && !MUC_OPCUA_SUBSCRIPTIONS_STANDARD
-#error "MUC_OPCUA_EVENT_FILTER_WHERE requires MUC_OPCUA_SUBSCRIPTIONS_STANDARD"
+   flagged through the Standard CU MonitoredItem filter path (per-item filterResult),
+   so it requires the Standard Subscription CU. */
+#if defined(MUC_OPCUA_EVENT_FILTER_WHERE) && MUC_OPCUA_EVENT_FILTER_WHERE && !MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
+#error "MUC_OPCUA_EVENT_FILTER_WHERE requires MUC_OPCUA_CU_SUBSCRIPTION_STANDARD"
 #endif
 
 /* Auditing requires events for audit event delivery. */
@@ -59,14 +60,14 @@
 #error "MUC_OPCUA_COMPLEX_TYPES requires MUC_OPCUA_BASE_NODES"
 #endif
 
-/* Full aggregate set requires the standard subscription facet. */
-#if defined(MUC_OPCUA_AGGREGATE_FULL) && MUC_OPCUA_AGGREGATE_FULL && !MUC_OPCUA_SUBSCRIPTIONS_STANDARD
-#error "MUC_OPCUA_AGGREGATE_FULL requires MUC_OPCUA_SUBSCRIPTIONS_STANDARD"
+/* Full aggregate set requires the Standard Subscription CU. */
+#if defined(MUC_OPCUA_AGGREGATE_FULL) && MUC_OPCUA_AGGREGATE_FULL && !MUC_OPCUA_CU_SUBSCRIPTION_STANDARD
+#error "MUC_OPCUA_AGGREGATE_FULL requires MUC_OPCUA_CU_SUBSCRIPTION_STANDARD"
 #endif
 
-/* Redundancy (TransferSubscriptions) requires subscriptions. */
-#if defined(MUC_OPCUA_REDUNDANCY) && MUC_OPCUA_REDUNDANCY && !MUC_OPCUA_SUBSCRIPTIONS
-#error "MUC_OPCUA_REDUNDANCY requires MUC_OPCUA_SUBSCRIPTIONS"
+/* Redundancy (TransferSubscriptions) requires the Basic Subscription CU. */
+#if defined(MUC_OPCUA_REDUNDANCY) && MUC_OPCUA_REDUNDANCY && !MUC_OPCUA_CU_SUBSCRIPTION_BASIC
+#error "MUC_OPCUA_REDUNDANCY requires MUC_OPCUA_CU_SUBSCRIPTION_BASIC"
 #endif
 
 /* Namespaces metadata requires base nodes. */
@@ -77,21 +78,17 @@
 /* The StandardUA2017 profile mandates neither the Data Access facet nor the Method
    Server (arbitrary Call) facet -- both are optional facets an integrator opts into
    (spec 067). The mandated built-in GetMonitoredItems/ResendData methods are served by
-   dispatch_method.c under SUBSCRIPTIONS_STANDARD + BASE_TYPE_SYSTEM, not METHOD_SERVER.
+   dispatch_method.c under MUC_OPCUA_CU_SUBSCRIPTION_STANDARD +
+   MUC_OPCUA_FACET_EXPOSES_TYPE_SYSTEM_SERVER, not METHOD_SERVER.
    So there is intentionally no STANDARD_PROFILE -> DATA_ACCESS / METHOD_SERVER guard. */
 
-/* Enhanced DataChange Subscription 2017 Server Facet (OPC-10000-7, facet
-   `EnhancedDataChangeSubscription2017`, profile-DB id 1678). The Standard 2017 UA
-   Server Profile (id 1663) lists this facet as MANDATORY (isOptional=false), and
-   every `standard`/`full` build advertises StandardUA2017 (via
-   MUC_OPCUA_STANDARD_PROFILE, see base_nodes.c s_server_profile_array). So any build
-   that advertises StandardUA2017 CLAIMS Enhanced and must meet its four mandatory
-   minima: >=500 MonitoredItems/Subscription, >=5 queue entries/MonitoredItem,
-   >=5 Subscriptions/Session, >=10 Publish requests/Session. Enforced (advertised ==
-   enforced) by the _Static_asserts in src/services/subscription.h. `embedded`
-   advertises EmbeddedUA2017 -> the plain Standard DataChange 2017 facet (MinQueueSize_02)
-   and does NOT define this marker. */
-#if defined(MUC_OPCUA_STANDARD_PROFILE) && MUC_OPCUA_STANDARD_PROFILE
+/* Enhanced DataChange Subscription 2017 is the closure of its four mandatory
+   capacity CUs. Profile selection is only a defaulting mechanism and does not
+   independently own this capability. */
+#if defined(MUC_OPCUA_CU_MONITOR_ITEMS_500) && MUC_OPCUA_CU_MONITOR_ITEMS_500 &&                                       \
+    defined(MUC_OPCUA_CU_MONITOR_MINQUEUESIZE_05) && MUC_OPCUA_CU_MONITOR_MINQUEUESIZE_05 &&                           \
+    defined(MUC_OPCUA_CU_SUBSCRIPTION_MINIMUM_05) && MUC_OPCUA_CU_SUBSCRIPTION_MINIMUM_05 &&                           \
+    defined(MUC_OPCUA_CU_SUBSCRIPTION_PUBLISH_MIN_10) && MUC_OPCUA_CU_SUBSCRIPTION_PUBLISH_MIN_10
 #define MUC_OPCUA_ENHANCED_DATACHANGE 1
 #else
 #define MUC_OPCUA_ENHANCED_DATACHANGE 0

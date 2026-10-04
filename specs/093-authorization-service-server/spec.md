@@ -69,7 +69,7 @@ The server extracts user identity and role information from validated JWT claims
 
 ### Functional Requirements
 
-- **FR-001**: Server MUST support the OAuth2 Resource Server role as defined by OPC-10000-7 §6.6 (Authorization Service Server Facet, CU 1629).
+- **FR-001**: Server MUST support the OAuth2 Resource Server role — JWT bearer-token validation during ActivateSession — as defined by OPC-10000-7 §6.6 (User Token — JWT Server Facet, CU 1697).
 - **FR-002**: Server MUST validate JWT access tokens during ActivateSession when a JWT UserIdentityToken is presented (OPC-10000-4 §5.7.3, OPC-10000-7 CU 1697).
 - **FR-003**: JWT validation MUST check: token structure (header.payload.signature), signature against the trusted issuer's public key, expiration (`exp`) claim, not-before (`nbf`) claim if present, issuer (`iss`) claim against configured trusted issuers, and audience (`aud`) claim against the configured audience.
 - **FR-004**: Supported JWT signing algorithms MUST include at minimum RS256 (RSA PKCS#1 v1.5 with SHA-256). RS384, RS512, ES256, ES384, and ES512 are optional extensions.
@@ -77,23 +77,23 @@ The server extracts user identity and role information from validated JWT claims
 - **FR-006**: The `sub` (subject) claim from a validated JWT MUST be used as the user identity for audit and authorization purposes.
 - **FR-007**: JWT token validation failure at ActivateSession MUST return Bad_IdentityTokenInvalid (OPC-10000-4 §5.7.3, OPC-10000-7 Table 137a).
 - **FR-008**: Server MUST gate the JWT token path on the `MUC_OPCUA_CU_USER_TOKEN_JWT` Kconfig symbol. When the symbol is undefined, JWT UserIdentityToken at ActivateSession MUST return Bad_IdentityTokenRejected.
-- **FR-009**: Server MUST gate the Authorization Service configuration objects on `MUC_OPCUA_CU_AUTHORIZATION_SERVICE_SERVER`. When undefined but `MUC_OPCUA_CU_USER_TOKEN_JWT` is defined, JWT validation still works but no AuthorizationServiceConfiguration nodes are exposed.
+- **FR-009**: Server MUST gate the Authorization Service configuration objects on `MUC_OPCUA_CU_AUTHORIZATION_SERVICE_CONFIGURATION_SERVER`. When undefined but `MUC_OPCUA_CU_USER_TOKEN_JWT` is defined, JWT validation still works but no AuthorizationServiceConfiguration nodes are exposed.
 - **FR-010**: JWT validation code MUST be freestanding — no dependency on libcurl, OpenSSL X509 validation, or POSIX filesystem. The integrator provides key material as PEM strings or DER blobs through the server config.
 
 ### OPC UA Normative Scope *(mandatory for protocol features)*
 
-- **OPC-001**: Target profile: Standard 2017 UA Server with v1.05.02 Authorization Service Server Facet (CU 1629) and User Token — JWT Server Facet (CU 1697). OPC-10000-7 §6.6.
+- **OPC-001**: Target profile: Standard 2017 UA Server with v1.05.02 User Token — JWT Server Facet (CU 1697) and Authorization Service Configuration Server (CU 3182). OPC-10000-7 §6.6.
 - **OPC-002**: ActivateSession service with JWT UserIdentityToken per OPC-10000-4 §5.7.3 Table 41.
 - **OPC-003**: JWT UserIdentityToken encoding per OPC-10000-6 §5.2.3 (simple string token body carried as a ByteString).
 - **OPC-004**: JWT validation semantics per RFC 7519 (JWT), RFC 7515 (JWS), RFC 7517 (JWK). JWT best current practices per RFC 8725.
-- **OPC-005**: AuthorizationServiceConfigurationType address-space nodes per OPC-10000-12 §9.7.4 (gated on CU 1629). Only the type-system InstanceDeclarations are in scope; the full GDS server-side logic is deferred.
+- **OPC-005**: AuthorizationServiceConfigurationType address-space nodes per OPC-10000-12 §9.7.4 (gated on CU 3182, symbol `MUC_OPCUA_CU_AUTHORIZATION_SERVICE_CONFIGURATION_SERVER`). Only the type-system InstanceDeclarations are in scope; the full GDS server-side logic is deferred.
 - **OPC-006**: `Bad_IdentityTokenInvalid` StatusCode per OPC-10000-4 §7.38.2.
 
 ### Scope Boundaries *(mandatory)*
 
-- **In Scope**: JWT validation at ActivateSession (P1), issuer configuration via server config (P2), `sub` claim → user identity (P3), Kconfig gating for CU 1629 and CU 1697, type-system InstanceDeclarations for AuthorizationServiceConfigurationType.
+- **In Scope**: JWT validation at ActivateSession (P1), issuer configuration via server config (P2), `sub` claim → user identity (P3), Kconfig gating for CU 3182 and CU 1697, type-system InstanceDeclarations for AuthorizationServiceConfigurationType.
 - **Out of Scope**: Full GDS Authorization Service (token issuance, token introspection endpoint, OAuth2 Client Credentials flow server-side). OAuth2 Authorization Code flow. Dynamic JWKS fetching from issuer URL. Token refresh. The server is an OAuth2 **Resource Server** only, not an Authorization Server. Online token introspection (RFC 7662). Encrypted JWTs (JWE).
-- **Compatibility Claim**: Standard 2017 UA Server Profile gains `Authorization Service Server Facet` and `User Token — JWT Server Facet` conformance claims when both Kconfig symbols are enabled.
+- **Compatibility Claim**: Standard 2017 UA Server Profile gains `User Token — JWT Server Facet` and `Authorization Service Configuration Server` conformance claims when both Kconfig symbols are enabled.
 - **Application Headroom Goal**: JWT validation code adds ≤5 KB `.text`. Cryptographic operations reuse the existing platform crypto adapter (mbedTLS, OpenSSL, wolfSSL). No additional crypto library dependencies.
 
 ### Key Entities
@@ -111,7 +111,7 @@ The server extracts user identity and role information from validated JWT claims
 - **SC-003**: A JWT signed by an unknown key is rejected with `Bad_IdentityTokenInvalid`.
 - **SC-004**: Two independently configured issuers with different keys support concurrent activation from different clients (verified by unit test with two issuer configs).
 - **SC-005**: The `sub` claim from a validated JWT is correctly reported in the session's user identity diagnostics.
-- **SC-006**: JWT code compiles out entirely when both `MUC_OPCUA_CU_AUTHORIZATION_SERVICE_SERVER` and `MUC_OPCUA_CU_USER_TOKEN_JWT` are undefined — no `.text` or `.data` growth.
+- **SC-006**: JWT validation code compiles out entirely when `MUC_OPCUA_CU_USER_TOKEN_JWT` is undefined — no `.text` or `.data` growth. AuthorizationServiceConfiguration type-system nodes compile out when `MUC_OPCUA_CU_AUTHORIZATION_SERVICE_CONFIGURATION_SERVER` is undefined. When both symbols are undefined, zero feature-related code remains.
 - **SC-007**: With JWT support compiled in, `.text` grows ≤5 KB relative to the baseline Standard profile.
 - **SC-008**: All profile build targets (nano, micro, embedded, standard, full) compile and pass their test suites without regression.
 

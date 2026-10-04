@@ -173,7 +173,8 @@ per-profile MonitoredItems count:
 | standard | 1,068,200 → 1,556,368 | **+144,000** (3×48×1000) | 1,178,260 → 2,218,644 |
 | full | 2,084,320 → 3,060,488 | **+288,000** (3×48×2000) | 2,300,460 → 4,380,844 |
 
-Spec 063 contributes only the **+144 KiB (standard) / +288 KiB (full)** `sizeof` growth
+Spec 063 contributes only the **+144,000 B (~140.6 KiB, standard) / +288,000 B
+(~281.3 KiB, full)** `sizeof` growth
 above. The remainder of the standard/full jump reconciles **pre-existing struct-table
 drift** (the README RAM tables predated monitored-item struct growth from earlier event /
 aggregate features); this pass re-measures all five profiles fresh so the README tables are

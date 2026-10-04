@@ -57,9 +57,9 @@ endif()
 #   1. file(GLOB[_RECURSE]) on the CU directory under src/cu/<facet>/<cu>/
 #   2. Adds the sources to muc_opcua
 #   3. Emits the CU/facet compile definition
-# Legacy symbol aliases (MUC_OPCUA_<OLD_NAME>=1) are emitted alongside CU
-# defines where include/ or tests/ still reference them. SERVICE_* bridge
-# defines that were unreferenced outside src/CMakeLists.txt have been removed.
+# Canonical CU/facet definitions own source gating. Runtime bridge definitions
+# remain only where production code consumes them; removed subscription and
+# profile aliases are not reintroduced.
 # =============================================================================
 
 # -- CU: Attribute Read (facet: Core 2022 Server) --
@@ -96,10 +96,6 @@ if(MUC_OPCUA_CU_VIEW_BASIC_2 OR MUC_OPCUA_CU_VIEW_TRANSLATEBROWSEPATH)
     endif()
 endif()
 
-if(MUC_OPCUA_CU_VIEW_BASIC_TRANSLATEBROWSEPATH)
-    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_CU_VIEW_BASIC_TRANSLATEBROWSEPATH=1)
-endif()
-
 if(MUC_OPCUA_CU_VIEW_BASIC_2)
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_CU_VIEW_BASIC_2=1)
 endif()
@@ -108,7 +104,7 @@ if(MUC_OPCUA_CU_VIEW_TRANSLATEBROWSEPATH)
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_CU_VIEW_TRANSLATEBROWSEPATH=1)
 endif()
 
-# -- CU: Discovery FindServers-Self-GetEndpoints compatibility gate / dedicated Discovery CUs --
+# -- Dedicated Discovery CUs --
 set(MUC_OPCUA_DISCOVERY_FIND_SERVERS_ENABLED OFF)
 set(MUC_OPCUA_DISCOVERY_GET_ENDPOINTS_ENABLED OFF)
 if(MUC_OPCUA_CU_DISCOVERY_FIND_SERVERS_SELF)
@@ -116,12 +112,6 @@ if(MUC_OPCUA_CU_DISCOVERY_FIND_SERVERS_SELF)
 endif()
 if(MUC_OPCUA_CU_DISCOVERY_GET_ENDPOINTS)
     set(MUC_OPCUA_DISCOVERY_GET_ENDPOINTS_ENABLED ON)
-endif()
-
-if(MUC_OPCUA_CU_DISCOVERY_FIND_SERVERS_SELF_GET_ENDPOINTS)
-    set(MUC_OPCUA_DISCOVERY_FIND_SERVERS_ENABLED ON)
-    set(MUC_OPCUA_DISCOVERY_GET_ENDPOINTS_ENABLED ON)
-    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_CU_DISCOVERY_FIND_SERVERS_SELF_GET_ENDPOINTS=1)
 endif()
 
 if(MUC_OPCUA_DISCOVERY_FIND_SERVERS_ENABLED OR MUC_OPCUA_DISCOVERY_GET_ENDPOINTS_ENABLED)
@@ -151,12 +141,13 @@ if(MUC_OPCUA_CU_VIEW_REGISTERNODES)
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_CU_VIEW_REGISTERNODES=1)
 endif()
 
-# -- CU: Core 2017 Attribute Write (OPC-10000-4 5.10.4) --
+# -- CU: Attribute Write (CU 2389, OPC-10000-4 5.10.4) --
 # MUC_OPCUA_WRITE_VALUE_ENABLED is derived from the canonical Kconfig CU after
 # dependency resolution and is the only build-system gate for Write support.
 if(MUC_OPCUA_WRITE_VALUE_ENABLED)
     file(GLOB _sources cu/core_2022_server/attribute_write/*.c)
     target_sources(muc_opcua PRIVATE ${_sources})
+    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_CU_ATTRIBUTE_WRITE_VALUES=1)
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_SERVICE_WRITE=1)
 endif()
 if(MUC_OPCUA_CU_SESSION_CHANGE_USER)
@@ -168,10 +159,6 @@ endif()
 if(MUC_OPCUA_CU_ATTRIBUTE_WRITE_INDEX_RANGE)
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_CU_ATTRIBUTE_WRITE_INDEX_RANGE=1)
 endif()
-if(MUC_OPCUA_CU_CORE_2017_ATTRIBUTE_WRITE)
-    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_CU_CORE_2017_ATTRIBUTE_WRITE=1)
-endif()
-
 if(MUC_OPCUA_CU_SESSION_GENERAL_SERVICE)
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_CU_SESSION_GENERAL_SERVICE=1)
 endif()
@@ -253,7 +240,6 @@ if(MUC_OPCUA_CU_SUBSCRIPTION_BASIC)
         ${CMAKE_CURRENT_SOURCE_DIR}/cu/core_2022_server/subscription/basic/uadp_encoder.c)
     target_sources(muc_opcua PRIVATE ${_sources})
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_CU_SUBSCRIPTION_BASIC=1)
-    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_SUBSCRIPTIONS=1)
 
     # -- CU: Subscription Standard (aggregates, triggering) --
     # dispatch_method.c requires the triple condition (Subscriptions + Standard
@@ -265,7 +251,6 @@ if(MUC_OPCUA_CU_SUBSCRIPTION_BASIC)
             ${CMAKE_CURRENT_SOURCE_DIR}/cu/core_2022_server/subscription/standard/dispatch_method.c)
         target_sources(muc_opcua PRIVATE ${_sources})
         target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_CU_SUBSCRIPTION_STANDARD=1)
-        target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_SUBSCRIPTIONS_STANDARD=1)
     endif()
 endif()
 
@@ -300,8 +285,7 @@ if(MUC_OPCUA_CU_HISTORICAL_ACCESS_SERVER_FACET)
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_SERVICE_HISTORY=1)
 endif()
 
-# -- Define-only CU flags (gated entirely on CU symbols; legacy aliases kept
-# for include/ and tests/ backward compatibility) --
+# -- Define-only CU flags and runtime bridge definitions --
 if(MUC_OPCUA_CU_USER_AUTH)
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_CU_USER_AUTH=1)
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_USER_AUTH=1)
@@ -316,11 +300,10 @@ endif()
 # Non-OpenSSL backends will be enabled by relaxing that condition once
 # crypto_jwt.c grows the corresponding dispatch.
 
-# -- CU: Authorization Service Server (spec 093, OPC-10000-7 CU 1629) --
-# Define-only for now: drives AuthorizationServiceConfigurationType
-# address-space nodes (added in a later task).
-if(MUC_OPCUA_CU_AUTHORIZATION_SERVICE_SERVER)
-    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_CU_AUTHORIZATION_SERVICE_SERVER=1)
+# -- CU: Authorization Service Configuration Server (OPC-10000-7 CU 3182) --
+# The define gates AuthorizationServiceConfigurationType address-space nodes.
+if(MUC_OPCUA_CU_AUTHORIZATION_SERVICE_CONFIGURATION_SERVER)
+    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_CU_AUTHORIZATION_SERVICE_CONFIGURATION_SERVER=1)
 endif()
 if(MUC_OPCUA_CU_MULTIPLE_CONNECTIONS)
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_CU_MULTIPLE_CONNECTIONS=1)
@@ -407,10 +390,9 @@ endif()
 
 if(MUC_OPCUA_MARKER_STANDARD_PROFILE)
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_MARKER_STANDARD_PROFILE=1)
-    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_STANDARD_PROFILE=1)
 endif()
 
-# -- CU 2867: Protocol Reverse Connect Server --
+# -- CU 2867: Reverse Connect Server (OPC-10000-6 §7.1.3) --
 if(MUC_OPCUA_CU_PROTOCOL_REVERSE_CONNECT_SERVER)
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_CU_PROTOCOL_REVERSE_CONNECT_SERVER=1)
 endif()
@@ -546,6 +528,11 @@ if(MUC_OPCUA_FACET_CORE_2022_SERVER)
     target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_SECURITY=1)
 endif()
 
+# -- CU: SecurityPolicy Support --
+if(MUC_OPCUA_CU_SECURITYPOLICY_SUPPORT)
+    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_CU_SECURITYPOLICY_SUPPORT=1)
+endif()
+
 # -- Secure-channel message crypto (spec 072) --
 # Decoupled from the facet umbrella so the SecurityPolicy-None-only nano profile
 # does not compile the symmetric/asymmetric chunk crypto, certificate, trustlist,
@@ -650,3 +637,35 @@ endif()
 
 muc_opcua_apply_warnings(muc_opcua)
 muc_opcua_apply_codegen(muc_opcua)
+
+# -- CU: Monitor Items 500 (Standard DataChange Subscription 2017 Facet) --
+if(MUC_OPCUA_CU_MONITOR_ITEMS_500)
+    target_sources(muc_opcua PRIVATE
+        cu/core_2022_server/subscription/monitor_items_500/monitor_items_500.c
+        cu/core_2022_server/subscription/monitor_items_500/monitor_items_500.h)
+    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_CU_MONITOR_ITEMS_500=1)
+endif()
+
+# -- CU: Monitor MinQueueSize_05 (Standard DataChange Subscription 2017 Facet) --
+if(MUC_OPCUA_CU_MONITOR_MINQUEUESIZE_05)
+    target_sources(muc_opcua PRIVATE
+        cu/core_2022_server/subscription/monitor_minqueuesize_05/monitor_minqueuesize_05.c
+        cu/core_2022_server/subscription/monitor_minqueuesize_05/monitor_minqueuesize_05.h)
+    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_CU_MONITOR_MINQUEUESIZE_05=1)
+endif()
+
+# -- CU: Subscription Minimum 05 (Standard DataChange Subscription 2017 Facet) --
+if(MUC_OPCUA_CU_SUBSCRIPTION_MINIMUM_05)
+    target_sources(muc_opcua PRIVATE
+        cu/core_2022_server/subscription/subscription_minimum_05/subscription_minimum_05.c
+        cu/core_2022_server/subscription/subscription_minimum_05/subscription_minimum_05.h)
+    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_CU_SUBSCRIPTION_MINIMUM_05=1)
+endif()
+
+# -- CU: Subscription Publish Min 10 (Standard DataChange Subscription 2017 Facet) --
+if(MUC_OPCUA_CU_SUBSCRIPTION_PUBLISH_MIN_10)
+    target_sources(muc_opcua PRIVATE
+        cu/core_2022_server/subscription/subscription_publish_min_10/subscription_publish_min_10.c
+        cu/core_2022_server/subscription/subscription_publish_min_10/subscription_publish_min_10.h)
+    target_compile_definitions(muc_opcua PUBLIC MUC_OPCUA_CU_SUBSCRIPTION_PUBLISH_MIN_10=1)
+endif()
